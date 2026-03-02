@@ -3,158 +3,323 @@ import { openDB } from 'idb'
 const DB_NAME = 'project-apollo'
 const DB_VERSION = 1
 
-// Initialize the database with all object stores
+let dbInstance = null
+
 export async function initDB() {
-  return openDB(DB_NAME, DB_VERSION, {
+  if (dbInstance) return dbInstance
+
+  dbInstance = await openDB(DB_NAME, DB_VERSION, {
     upgrade(db) {
-      // Conversations
       if (!db.objectStoreNames.contains('conversations')) {
         const convStore = db.createObjectStore('conversations', { keyPath: 'id' })
         convStore.createIndex('updatedAt', 'updatedAt')
       }
 
-      // Messages
       if (!db.objectStoreNames.contains('messages')) {
         const msgStore = db.createObjectStore('messages', { keyPath: 'id' })
         msgStore.createIndex('conversationId', 'conversationId')
       }
 
-      // Highlights
       if (!db.objectStoreNames.contains('highlights')) {
         const hlStore = db.createObjectStore('highlights', { keyPath: 'id' })
         hlStore.createIndex('conversationId', 'conversationId')
       }
 
-      // Notes
       if (!db.objectStoreNames.contains('notes')) {
         const noteStore = db.createObjectStore('notes', { keyPath: 'id' })
         noteStore.createIndex('conversationId', 'conversationId')
       }
 
-      // Favorites
       if (!db.objectStoreNames.contains('favorites')) {
         const favStore = db.createObjectStore('favorites', { keyPath: 'id' })
         favStore.createIndex('conversationId', 'conversationId')
       }
 
-      // Pinned references (from branch transfers)
       if (!db.objectStoreNames.contains('pins')) {
         const pinStore = db.createObjectStore('pins', { keyPath: 'id' })
         pinStore.createIndex('targetConversationId', 'targetConversationId')
       }
 
-      // Settings (key-value)
       if (!db.objectStoreNames.contains('settings')) {
         db.createObjectStore('settings', { keyPath: 'key' })
       }
     }
   })
+
+  return dbInstance
+}
+
+// ─── ID Generation ───────────────────────────────────────
+
+function generateId() {
+  return crypto.randomUUID()
 }
 
 // ─── Conversations ───────────────────────────────────────
 
-export async function createConversation(conversation) {
-  // TODO: implement
+export async function createConversation({ title = 'New Conversation', model = 'claude-sonnet', parentId = null, branchPoint = null } = {}) {
+  const db = await initDB()
+  const now = new Date().toISOString()
+  const conversation = {
+    id: generateId(),
+    title,
+    model,
+    parentId,
+    branchPoint,
+    pinned: false,
+    createdAt: now,
+    updatedAt: now,
+  }
+  await db.put('conversations', conversation)
+  return conversation
 }
 
 export async function getConversation(id) {
-  // TODO: implement
+  const db = await initDB()
+  return db.get('conversations', id)
 }
 
 export async function listConversations() {
-  // TODO: implement — return sorted by updatedAt desc
+  const db = await initDB()
+  const all = await db.getAll('conversations')
+  return all.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
 }
 
 export async function updateConversation(id, updates) {
-  // TODO: implement
+  const db = await initDB()
+  const existing = await db.get('conversations', id)
+  if (!existing) throw new Error(`Conversation not found: ${id}`)
+  const updated = { ...existing, ...updates, updatedAt: new Date().toISOString() }
+  await db.put('conversations', updated)
+  return updated
 }
 
 export async function deleteConversation(id) {
-  // TODO: implement — also delete related messages, highlights, notes, favorites, pins
+  const db = await initDB()
+
+  // Delete all related data
+  const stores = ['messages', 'highlights', 'notes', 'favorites']
+  for (const storeName of stores) {
+    const items = await db.getAllFromIndex(storeName, 'conversationId', id)
+    const tx = db.transaction(storeName, 'readwrite')
+    for (const item of items) {
+      await tx.store.delete(item.id)
+    }
+    await tx.done
+  }
+
+  // Delete pins where this conversation is the target
+  const pins = await db.getAllFromIndex('pins', 'targetConversationId', id)
+  const pinTx = db.transaction('pins', 'readwrite')
+  for (const pin of pins) {
+    await pinTx.store.delete(pin.id)
+  }
+  await pinTx.done
+
+  await db.delete('conversations', id)
 }
 
 // ─── Messages ────────────────────────────────────────────
 
-export async function addMessage(message) {
-  // TODO: implement
+export async function addMessage({ conversationId, role, content, tokenCount = 0 }) {
+  const db = await initDB()
+  const message = {
+    id: generateId(),
+    conversationId,
+    role,
+    content,
+    tokenCount,
+    createdAt: new Date().toISOString(),
+  }
+  await db.put('messages', message)
+
+  // Touch the conversation's updatedAt
+  const conv = await db.get('conversations', conversationId)
+  if (conv) {
+    await db.put('conversations', { ...conv, updatedAt: message.createdAt })
+  }
+
+  return message
 }
 
 export async function getMessages(conversationId) {
-  // TODO: implement — return sorted by createdAt asc
+  const db = await initDB()
+  const messages = await db.getAllFromIndex('messages', 'conversationId', conversationId)
+  return messages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
 }
 
 export async function deleteMessage(id) {
-  // TODO: implement
+  const db = await initDB()
+  await db.delete('messages', id)
 }
 
 // ─── Highlights ──────────────────────────────────────────
 
-export async function addHighlight(highlight) {
-  // TODO: implement
+export async function addHighlight({ conversationId, messageId, text, color = '#4A7AE5' }) {
+  const db = await initDB()
+  const highlight = {
+    id: generateId(),
+    conversationId,
+    messageId,
+    text,
+    color,
+    createdAt: new Date().toISOString(),
+  }
+  await db.put('highlights', highlight)
+  return highlight
 }
 
 export async function getHighlights(conversationId) {
-  // TODO: implement
+  const db = await initDB()
+  return db.getAllFromIndex('highlights', 'conversationId', conversationId)
 }
 
 export async function deleteHighlight(id) {
-  // TODO: implement
+  const db = await initDB()
+  await db.delete('highlights', id)
 }
 
 // ─── Notes ───────────────────────────────────────────────
 
-export async function addNote(note) {
-  // TODO: implement
+export async function addNote({ conversationId, messageId, text }) {
+  const db = await initDB()
+  const note = {
+    id: generateId(),
+    conversationId,
+    messageId,
+    text,
+    createdAt: new Date().toISOString(),
+  }
+  await db.put('notes', note)
+  return note
 }
 
 export async function getNotes(conversationId) {
-  // TODO: implement
+  const db = await initDB()
+  return db.getAllFromIndex('notes', 'conversationId', conversationId)
+}
+
+export async function updateNote(id, text) {
+  const db = await initDB()
+  const existing = await db.get('notes', id)
+  if (!existing) throw new Error(`Note not found: ${id}`)
+  const updated = { ...existing, text }
+  await db.put('notes', updated)
+  return updated
 }
 
 export async function deleteNote(id) {
-  // TODO: implement
+  const db = await initDB()
+  await db.delete('notes', id)
 }
 
 // ─── Favorites ───────────────────────────────────────────
 
-export async function addFavorite(favorite) {
-  // TODO: implement
+export async function addFavorite({ conversationId, messageId }) {
+  const db = await initDB()
+  const favorite = {
+    id: generateId(),
+    conversationId,
+    messageId,
+    createdAt: new Date().toISOString(),
+  }
+  await db.put('favorites', favorite)
+  return favorite
 }
 
 export async function getFavorites(conversationId) {
-  // TODO: implement
+  const db = await initDB()
+  return db.getAllFromIndex('favorites', 'conversationId', conversationId)
 }
 
 export async function deleteFavorite(id) {
-  // TODO: implement
+  const db = await initDB()
+  await db.delete('favorites', id)
 }
 
 // ─── Pins (branch transfer references) ──────────────────
 
-export async function addPin(pin) {
-  // TODO: implement
+export async function addPin({ targetConversationId, sourceConversationId, sourceMessageId, content }) {
+  const db = await initDB()
+  const pin = {
+    id: generateId(),
+    targetConversationId,
+    sourceConversationId,
+    sourceMessageId,
+    content,
+    createdAt: new Date().toISOString(),
+  }
+  await db.put('pins', pin)
+  return pin
 }
 
 export async function getPins(targetConversationId) {
-  // TODO: implement
+  const db = await initDB()
+  return db.getAllFromIndex('pins', 'targetConversationId', targetConversationId)
 }
 
 export async function deletePin(id) {
-  // TODO: implement
+  const db = await initDB()
+  await db.delete('pins', id)
 }
 
 // ─── Settings ────────────────────────────────────────────
 
 export async function getSetting(key) {
-  // TODO: implement — return value or null
+  const db = await initDB()
+  const entry = await db.get('settings', key)
+  return entry ? entry.value : null
 }
 
 export async function setSetting(key, value) {
-  // TODO: implement
+  const db = await initDB()
+  await db.put('settings', { key, value })
+}
+
+// ─── Export / Import ─────────────────────────────────────
+
+export async function exportAllData() {
+  const db = await initDB()
+  return {
+    conversations: await db.getAll('conversations'),
+    messages: await db.getAll('messages'),
+    highlights: await db.getAll('highlights'),
+    notes: await db.getAll('notes'),
+    favorites: await db.getAll('favorites'),
+    pins: await db.getAll('pins'),
+    settings: await db.getAll('settings'),
+    exportedAt: new Date().toISOString(),
+    version: 1,
+  }
+}
+
+export async function importData(data) {
+  const db = await initDB()
+  const stores = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings']
+  let imported = 0
+
+  for (const storeName of stores) {
+    if (!data[storeName]) continue
+    const tx = db.transaction(storeName, 'readwrite')
+    for (const item of data[storeName]) {
+      const existing = await tx.store.get(item.id || item.key)
+      if (!existing) {
+        await tx.store.put(item)
+        imported++
+      }
+    }
+    await tx.done
+  }
+
+  return { imported }
 }
 
 // ─── Danger Zone ─────────────────────────────────────────
 
 export async function clearAllData() {
-  // TODO: implement — delete all object stores' contents
+  const db = await initDB()
+  const stores = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings']
+  for (const storeName of stores) {
+    await db.clear(storeName)
+  }
 }
