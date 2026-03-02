@@ -73,7 +73,10 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
     views/            # Route-level pages (ChatView, SelectorView, SettingsView)
     lib/              # Utilities (db.js, crypto.js, tokens.js)
     providers/        # API provider abstraction (base.js, anthropic.js)
-    stores/           # State management (React context or zustand)
+    stores/           # State management (React Context, split by concern)
+                      #   SettingsContext.jsx — app settings, read often, changed rarely
+                      #   ConversationContext.jsx — conversation list, active conversation metadata
+                      #   ChatContext.jsx — active conversation streaming state, messages in flight
     assets/           # Static assets
   ```
 - Set up ESLint with React config
@@ -133,11 +136,12 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
   - **highlights** store: `{ id, conversationId, messageId, text, color }`
   - **notes** store: `{ id, conversationId, messageId, text, createdAt }`
   - **favorites** store: `{ id, conversationId, messageId }`
+  - **pins** store: `{ id, targetConversationId, sourceConversationId, sourceMessageId, content, createdAt }` (pinned references from branch transfers — visual only, not sent to API)
   - **settings** store: `{ key, value }` (key-value pairs for all settings)
 - Write CRUD functions for each store:
   - `createConversation()`, `getConversation()`, `listConversations()`, `updateConversation()`, `deleteConversation()`
   - `addMessage()`, `getMessages(conversationId)`, `deleteMessage()`
-  - Similar for highlights, notes, favorites
+  - Similar for highlights, notes, favorites, pins
   - `getSetting(key)`, `setSetting(key, value)`
 - Write a `clearAllData()` function for the danger zone
 - Add indexes: `conversationId` on messages/highlights/notes/favorites, `updatedAt` on conversations
@@ -225,7 +229,7 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
 - Wire bulk actions: delete selected, pin/unpin
 - Show branch count badges from real data
 - Expand/collapse to show real branches
-- Auto-generate conversation titles (use the first user message, or ask Claude to summarize)
+- Auto-generate conversation titles: after the first user→assistant exchange, send a lightweight summarization call to Claude in the background to generate a short title. Display it automatically in the chat selector. Users can click-to-edit titles inline to rename (no dedicated input box).
 
 **Done when:** Creating, finding, opening, and deleting conversations all work end-to-end.
 
@@ -233,37 +237,48 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
 
 ## Step 9: Build the Context Health System
 
-**Goal:** Real-time visibility into context window usage with actionable warnings.
+**Goal:** Real-time visibility into context window usage with branch-based compression when the threshold is hit.
 
 **Tasks:**
 - Track cumulative input + output tokens per conversation
 - Wire the context meter (right sidebar) to show `tokensUsed / modelContextWindow`
 - Color-code: green < 50%, amber < threshold (from settings), red above
 - Show the warning threshold from settings (default 80%)
-- Implement the auto-compression prompt flow:
-  - When threshold is crossed, show a prompt (if setting is "Ask me first")
-  - Or auto-compress (if setting is "Automatic")
-  - Compression = summarize older messages via a Claude call, replace them with the summary, preserve highlights/notes
+- Implement branch-based auto-compression:
+  - When threshold is crossed, show a prompt (if setting is "Ask me first") or auto-trigger (if "Automatic")
+  - **Compression creates a new branch**, not an in-place edit:
+    1. Create a new branch from the current conversation
+    2. Generate a compressed summary of the conversation via a Claude call
+    3. The new branch starts with the summary as its foundation — clean context window
+    4. The original conversation is preserved intact as a full archive
+  - The user continues chatting in the new branch
 - Update token counts in real time as messages stream in
+- **Message transfer from original branch — two options:**
+  - "Send to branch" — injects the selected message into the active branch's context (uses tokens, Claude sees it). Show token count per message during selection (e.g., "~340 tokens")
+  - "Pin for reference" — displays the message as a collapsible quote block in the UI. Visual only, no token cost, Claude does not see it
+- Users can navigate back to the original branch at any time to find messages, make corrections, or transfer additional content
 
-**Done when:** The context meter reflects real usage, and the compression prompt appears at the configured threshold.
+**Done when:** The context meter reflects real usage. When the threshold is crossed, a new branch is created with a summary. The user can transfer or pin messages from the original branch into the new one.
 
 ---
 
-## Step 10: Build Highlights, Notes, and Favorites
+## Step 10: Build Highlights, Notes, Favorites, and Pinned References
 
-**Goal:** Message-level annotations that persist across sessions.
+**Goal:** Message-level annotations that persist across sessions, plus pinned references from branch transfers.
 
 **Tasks:**
 - Highlights: select text in a message → color picker → save to IndexedDB with message ID and text range
 - Notes: click note icon → expand note textarea → save to IndexedDB
 - Favorites: click star → toggle in IndexedDB → show filled star
+- **Pinned references:** display messages transferred via "Pin for reference" (from branch compression) as collapsible quote blocks. Stored in IndexedDB with source conversation ID and message ID. Visual only — not included in API calls
 - Right sidebar "Highlights" section shows real highlights for current conversation, with occurrence counts and prev/next navigation
 - Right sidebar "Favorites" section shows favorited messages
+- Right sidebar "Pinned" section shows pinned reference blocks (collapsible)
 - Search across highlights (for the review modal later)
-- Delete highlights, notes, favorites
+- Delete highlights, notes, favorites, pinned references
+- **Review modal category toggles:** the review modal includes toggles for each annotation type — Highlights, Notes, Favorites, Pinned References — all on by default. Users can turn off any category to exclude it from the review synthesis sent to Claude. This keeps reviews focused
 
-**Done when:** You can highlight text, add notes, favorite messages, close the browser, reopen, and see them all preserved.
+**Done when:** You can highlight text, add notes, favorite messages, see pinned references from branch transfers, close the browser, reopen, and see them all preserved. The review modal respects the category toggles.
 
 ---
 
@@ -285,28 +300,28 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
 
 ## Step 12: Build the Export/Import System
 
-**Goal:** Encrypted backups that protect conversation data outside the browser.
+**Goal:** Two export formats — encrypted backups for security, plain JSON for portability.
 
 **Tasks:**
-- **Export flow:**
-  1. Gather all data from IndexedDB (conversations, messages, highlights, notes, favorites, settings)
+- **Export modal with format toggle:**
+  - **Encrypted (.apb):** passphrase → PBKDF2 (100,000 iterations, SHA-256) → AES-GCM. Package as `{ salt, iv, ciphertext, version: 1 }`. For secure backups
+  - **Plain JSON (.json):** unencrypted JSON of all data. For portability — users can feed this into Claude, other tools, or scripts for analysis
+- **Export flow (both formats):**
+  1. Gather all data from IndexedDB (conversations, messages, highlights, notes, favorites, pinned references, settings)
   2. Serialize to JSON
-  3. Derive an AES-256 key from the user's passphrase using PBKDF2 (100,000 iterations, SHA-256)
-  4. Generate a random salt and IV
-  5. Encrypt the JSON payload with AES-GCM
-  6. Package as `{ salt, iv, ciphertext, version: 1 }` and trigger download as `.apb` file
+  3. If encrypted: derive key, generate salt + IV, encrypt payload, trigger `.apb` download
+  4. If plain: trigger `.json` download directly
 - **Import flow:**
-  1. Read the `.apb` file
-  2. Prompt for passphrase
-  3. Derive the key using PBKDF2 with the stored salt
-  4. Decrypt with AES-GCM
-  5. Parse JSON and merge into IndexedDB (skip duplicates by ID)
-  6. Show success/failure with conversation count
+  1. Read file (detect format by extension or header)
+  2. If `.apb`: prompt for passphrase, derive key, decrypt
+  3. If `.json`: parse directly
+  4. Merge into IndexedDB (skip duplicates by ID)
+  5. Show success/failure with conversation count
 - Wire both flows to the modals in the settings Data & Backups section
 - Update "Last backup" timestamp in settings after successful export
 - Show file size estimate in the export modal
 
-**Done when:** You can export all data, clear IndexedDB, import the backup with the correct passphrase, and have everything restored. Wrong passphrase shows an error.
+**Done when:** You can export in both formats. Encrypted export round-trips correctly with the right passphrase and fails with the wrong one. Plain JSON export opens in any text editor and is valid JSON.
 
 ---
 
@@ -336,7 +351,7 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
 **Goal:** The app is live on the internet with proper security headers.
 
 **Tasks:**
-- Configure hosting (Netlify recommended for simpler header config):
+- Deploy to Netlify (confirmed choice for simpler header configuration):
   - `netlify.toml` or `_headers` file with:
     ```
     Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; font-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'self'
