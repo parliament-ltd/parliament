@@ -286,3 +286,309 @@ function ModelSection({ selectedModel, setSelectedModel }) {
     </SettingsSection>
   )
 }
+// ─── Usage & Spending ────────────────────────────────────
+
+function UsageSection({ budgetAlert, setBudgetAlert, budgetEnabled, setBudgetEnabled, spendingLimitDismissed, setSpendingLimitDismissed, spendingLimitConfirmed, setSpendingLimitConfirmed }) {
+  return (
+    <SettingsSection title="Usage & Spending" subtitle="Monitor costs and set budget alerts">
+      <StaggerItem>
+        <Card>
+          <SectionLabel>Current Session</SectionLabel>
+          <div className="grid grid-cols-3 gap-4 mt-3">
+            {[
+              { label: 'Messages', value: '0' },
+              { label: 'Tokens used', value: '0' },
+              { label: 'Estimated cost', value: '$0.00' },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <p className="text-lg font-semibold text-[#1E2532]">{stat.value}</p>
+                <p className="text-xs text-[#6B7C93]">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </StaggerItem>
+
+      <StaggerItem>
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <SectionLabel>Budget Alert</SectionLabel>
+            <Toggle enabled={budgetEnabled} onChange={setBudgetEnabled} />
+          </div>
+          {budgetEnabled && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+            >
+              <div className="flex items-center gap-4">
+                <input
+                  type="range"
+                  min={1}
+                  max={100}
+                  value={budgetAlert}
+                  onChange={(e) => setBudgetAlert(Number(e.target.value))}
+                  className="flex-1 accent-[#4A7AE5]"
+                />
+                <span className="text-sm font-semibold text-[#1E2532] w-16 text-right">${budgetAlert}</span>
+              </div>
+              <p className="text-xs text-[#6B7C93] mt-2">You'll see a warning when your estimated spending reaches this amount.</p>
+            </motion.div>
+          )}
+        </Card>
+      </StaggerItem>
+
+      {!spendingLimitDismissed && (
+        <StaggerItem>
+          <Card>
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-4 h-4 text-[#E5A620] mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h4 className="text-xs font-semibold text-[#1E2532] mb-1">Set a spending limit on Anthropic</h4>
+                <p className="text-xs text-[#6B7C93] leading-relaxed mb-3">
+                  Budget alerts in this app are informational only. For a hard spending cap, set a monthly limit in your Anthropic dashboard.
+                </p>
+                <div className="flex items-center gap-2">
+                  {!spendingLimitConfirmed ? (
+                    <>
+                      
+                        href="https://console.anthropic.com/settings/limits"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button size="sm" icon={ExternalLink}>Set limit on Anthropic</Button>
+                      </a>
+                      <Button size="sm" variant="ghost" onClick={() => setSpendingLimitDismissed(true)}>
+                        Dismiss
+                      </Button>
+                    </>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex items-center gap-2 text-[#22C55E]"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      <span className="text-xs font-semibold">Spending limit confirmed</span>
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </StaggerItem>
+      )}
+    </SettingsSection>
+  )
+}
+
+// ─── Context & Defaults ──────────────────────────────────
+
+function ContextSection({ summaryDepth, setSummaryDepth, contextThreshold, setContextThreshold, autoCompress, setAutoCompress }) {
+  return (
+    <SettingsSection title="Context & Defaults" subtitle="Control how conversations are managed">
+      <StaggerItem>
+        <Card>
+          <SectionLabel>Summary Depth</SectionLabel>
+          <p className="text-xs text-[#6B7C93] mt-1 mb-3">Controls how detailed the review summary is.</p>
+          <SegmentedControl
+            options={[
+              { id: 'brief', label: 'Brief' },
+              { id: 'detailed', label: 'Detailed' },
+            ]}
+            value={summaryDepth}
+            onChange={setSummaryDepth}
+          />
+        </Card>
+      </StaggerItem>
+
+      <StaggerItem>
+        <Card>
+          <div className="flex items-center justify-between mb-1">
+            <SectionLabel>Context Warning Threshold</SectionLabel>
+            <span className="text-sm font-semibold text-[#1E2532]">{contextThreshold}%</span>
+          </div>
+          <p className="text-xs text-[#6B7C93] mt-1 mb-3">When context usage exceeds this level, you'll be prompted to compress via branching.</p>
+          <input
+            type="range"
+            min={50}
+            max={95}
+            step={5}
+            value={contextThreshold}
+            onChange={(e) => setContextThreshold(Number(e.target.value))}
+            className="w-full accent-[#4A7AE5]"
+          />
+          <div className="flex justify-between text-[10px] text-[#6B7C93] mt-1">
+            <span>50%</span>
+            <span>95%</span>
+          </div>
+        </Card>
+      </StaggerItem>
+
+      <StaggerItem>
+        <Card>
+          <RadioGroup
+            label="Auto-Compress Behavior"
+            options={[
+              { id: 'prompt', label: 'Ask me first', description: 'Show a prompt when the threshold is reached' },
+              { id: 'automatic', label: 'Automatic', description: 'Create a compressed branch automatically' },
+              { id: 'disabled', label: 'Disabled', description: "Never compress — I'll manage context manually" },
+            ]}
+            value={autoCompress}
+            onChange={setAutoCompress}
+          />
+        </Card>
+      </StaggerItem>
+    </SettingsSection>
+  )
+}
+
+// ─── Data & Backups ──────────────────────────────────────
+
+function DataSection({ backupReminder, setBackupReminder, showExportModal, setShowExportModal, showImportModal, setShowImportModal, showDeleteConfirm, setShowDeleteConfirm, exportPassphrase, setExportPassphrase, exportConfirmPassphrase, setExportConfirmPassphrase, importPassphrase, setImportPassphrase }) {
+  return (
+    <SettingsSection title="Data & Backups" subtitle="Export, import, and manage your data">
+      <StaggerItem>
+        <Card>
+          <SectionLabel>Backup Reminder</SectionLabel>
+          <p className="text-xs text-[#6B7C93] mt-1 mb-3">How often should we remind you to back up your data?</p>
+          <SegmentedControl
+            options={[
+              { id: 'daily', label: 'Daily' },
+              { id: 'weekly', label: 'Weekly' },
+              { id: 'monthly', label: 'Monthly' },
+              { id: 'never', label: 'Never' },
+            ]}
+            value={backupReminder}
+            onChange={setBackupReminder}
+          />
+        </Card>
+      </StaggerItem>
+
+      <StaggerItem>
+        <Card>
+          <SectionLabel>Export</SectionLabel>
+          <p className="text-xs text-[#6B7C93] mt-1 mb-3">Download all your conversations, highlights, notes, and settings.</p>
+          <div className="flex gap-2">
+            <Button icon={Lock} onClick={() => setShowExportModal(true)}>
+              Export Encrypted (.apb)
+            </Button>
+            <Button icon={Download} variant="ghost" onClick={() => {/* TODO: plain JSON export */}}>
+              Export JSON
+            </Button>
+          </div>
+        </Card>
+      </StaggerItem>
+
+      <StaggerItem>
+        <Card>
+          <SectionLabel>Import</SectionLabel>
+          <p className="text-xs text-[#6B7C93] mt-1 mb-3">Restore from a previous backup file.</p>
+          <Button icon={Upload} onClick={() => setShowImportModal(true)}>
+            Import Backup
+          </Button>
+        </Card>
+      </StaggerItem>
+
+      <StaggerItem>
+        <Card danger>
+          <SectionLabel>Danger Zone</SectionLabel>
+          <p className="text-xs text-[#6B7C93] mt-1 mb-3">Permanently delete all data from this browser. This cannot be undone.</p>
+          <Button variant="danger" icon={Trash2} onClick={() => setShowDeleteConfirm(true)}>
+            Delete Everything
+          </Button>
+        </Card>
+      </StaggerItem>
+
+      {/* Export Modal */}
+      <Modal
+        open={showExportModal}
+        onClose={() => { setShowExportModal(false); setExportPassphrase(''); setExportConfirmPassphrase('') }}
+        title="Export Encrypted Backup"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => { setShowExportModal(false); setExportPassphrase(''); setExportConfirmPassphrase('') }}>
+              Cancel
+            </Button>
+            <Button
+              disabled={!exportPassphrase || exportPassphrase !== exportConfirmPassphrase}
+              onClick={() => { /* TODO: wire to encryptExport */ }}
+            >
+              Export
+            </Button>
+          </>
+        }
+      >
+        <p className="text-xs text-[#6B7C93] mb-4">Choose a passphrase to encrypt your backup. You'll need this to import it later.</p>
+        <div className="space-y-3">
+          <Input label="Passphrase" value={exportPassphrase} onChange={setExportPassphrase} secret placeholder="Enter a passphrase" />
+          <Input
+            label="Confirm Passphrase"
+            value={exportConfirmPassphrase}
+            onChange={setExportConfirmPassphrase}
+            secret
+            placeholder="Confirm your passphrase"
+            error={exportConfirmPassphrase && exportPassphrase !== exportConfirmPassphrase ? 'Passphrases do not match' : undefined}
+          />
+        </div>
+      </Modal>
+
+      {/* Import Modal */}
+      <Modal
+        open={showImportModal}
+        onClose={() => { setShowImportModal(false); setImportPassphrase('') }}
+        title="Import Backup"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => { setShowImportModal(false); setImportPassphrase('') }}>
+              Cancel
+            </Button>
+            <Button onClick={() => { /* TODO: wire to decryptImport */ }}>
+              Import
+            </Button>
+          </>
+        }
+      >
+        <p className="text-xs text-[#6B7C93] mb-4">Select a backup file (.apb or .json) and enter the passphrase if encrypted.</p>
+        <div className="space-y-3">
+          <div>
+            <SectionLabel>Backup File</SectionLabel>
+            <input
+              type="file"
+              accept=".apb,.json"
+              className="mt-2 text-xs text-[#6B7C93] file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border file:border-[#EBEBEB] file:bg-white file:text-xs file:font-semibold file:text-[#1E2532] hover:file:border-[#4A7AE5] file:transition-colors file:cursor-pointer"
+            />
+          </div>
+          <Input label="Passphrase (if encrypted)" value={importPassphrase} onChange={setImportPassphrase} secret placeholder="Enter backup passphrase" />
+        </div>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        title="Delete All Data"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>
+              Cancel
+            </Button>
+            <Button variant="danger" icon={Trash2} onClick={() => { /* TODO: wire to clearAllData */ setShowDeleteConfirm(false) }}>
+              Delete Everything
+            </Button>
+          </>
+        }
+      >
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-[#EF4444] flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-[#1E2532] mb-1">This action cannot be undone.</p>
+            <p className="text-xs text-[#6B7C93] leading-relaxed">
+              All conversations, messages, highlights, notes, favorites, pinned references, and settings will be permanently deleted from this browser. Your Anthropic API key will also be removed.
+            </p>
+          </div>
+        </div>
+      </Modal>
+    </SettingsSection>
+  )
+}
