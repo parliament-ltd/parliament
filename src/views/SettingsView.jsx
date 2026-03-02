@@ -592,3 +592,134 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
     </SettingsSection>
   )
 }
+// ─── Appearance ──────────────────────────────────────────
+
+function AppearanceSection({ theme, setTheme, fontSize, setFontSize }) {
+  return (
+    <SettingsSection title="Appearance" subtitle="Customize how the interface looks">
+      <StaggerItem>
+        <Card>
+          <SectionLabel>Theme</SectionLabel>
+          <div className="flex gap-3 mt-3">
+            {[
+              { id: 'light', label: 'Light', icon: Sun },
+              { id: 'dark', label: 'Dark', icon: Moon },
+            ].map((t) => {
+              const Icon = t.icon
+              const active = theme === t.id
+              return (
+                <motion.button
+                  key={t.id}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setTheme(t.id)}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border transition-colors ${
+                    active ? 'border-[#4A7AE5] bg-[#4A7AE5]/5' : 'border-[#EBEBEB] hover:border-[#D5D5D5]'
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 ${active ? 'text-[#4A7AE5]' : 'text-[#6B7C93]'}`} />
+                  <span className={`text-sm font-semibold ${active ? 'text-[#1E2532]' : 'text-[#6B7C93]'}`}>{t.label}</span>
+                </motion.button>
+              )
+            })}
+          </div>
+          {theme === 'dark' && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-xs text-[#6B7C93] mt-3"
+            >
+              Dark theme is coming in a future update.
+            </motion.p>
+          )}
+        </Card>
+      </StaggerItem>
+
+      <StaggerItem>
+        <Card>
+          <SectionLabel>Text Size</SectionLabel>
+          <div className="mt-3">
+            <SegmentedControl
+              options={[
+                { id: 'compact', label: 'Compact' },
+                { id: 'default', label: 'Default' },
+                { id: 'large', label: 'Large' },
+              ]}
+              value={fontSize}
+              onChange={setFontSize}
+            />
+          </div>
+          <div className="mt-4 px-4 py-3 rounded-lg border border-[#EBEBEB]">
+            <p className={`text-[#1E2532] ${
+              fontSize === 'compact' ? 'text-xs' : fontSize === 'large' ? 'text-base' : 'text-sm'
+            }`}>
+              This is a preview of your selected text size. The entire interface will adjust to match.
+            </p>
+          </div>
+        </Card>
+      </StaggerItem>
+    </SettingsSection>
+  )
+}
+
+// ─── About & Security ────────────────────────────────────
+
+function AboutSection() {
+  return (
+    <SettingsSection title="About & Security" subtitle="How this app works and keeps your data safe">
+      <StaggerItem>
+        <Card>
+          <div className="flex items-center gap-3 mb-4">
+            <motion.div
+              animate={{ rotate: [0, -8, 8, 0] }}
+              transition={{ duration: 0.6, delay: 0.6, ease: 'easeInOut' }}
+            >
+              <MessageSquare className="w-5 h-5 text-[#4A7AE5]" />
+            </motion.div>
+            <div>
+              <h3 className="text-sm font-semibold text-[#1E2532]">Project Apollo</h3>
+              <p className="text-xs text-[#6B7C93]">Version 0.1.0</p>
+            </div>
+          </div>
+          <p className="text-xs text-[#6B7C93] leading-relaxed mb-4">
+            A power-user chat interface for AI. Built with React, Framer Motion, and Tailwind CSS. Open source and community-driven.
+          </p>
+          <Button icon={Github}>
+            View on GitHub
+          </Button>
+        </Card>
+      </StaggerItem>
+
+      <StaggerItem>
+        <Card>
+          <SectionLabel>How Your Data Stays Private</SectionLabel>
+          <div className="space-y-4 mt-3">
+            {[
+              {
+                title: 'No servers, no accounts',
+                text: "This app runs entirely in your browser. There is no backend server, no database, and no user accounts. Nothing is transmitted anywhere except directly to Anthropic's API when you send a message."
+              },
+              {
+                title: 'API key stays local and encrypted',
+                text: 'Your Anthropic API key is encrypted at rest using the Web Crypto API (AES-GCM) with a non-extractable key before being stored in IndexedDB. Even scripts running on the page cannot export the raw encryption key.'
+              },
+              {
+                title: 'Conversations stay local',
+                text: "All conversation data — messages, branches, highlights, notes — lives in your browser's IndexedDB. We have no way to see, access, or recover it."
+              },
+              {
+                title: 'Open source & auditable',
+                text: 'The entire codebase is on GitHub. You can verify every network request, every storage call, and every line of code yourself.'
+              },
+            ].map((item, i) => (
+              <div key={i}>
+                <h4 className="text-xs font-semibold text-[#1E2532] mb-1">{item.title}</h4>
+                <p className="text-xs text-[#6B7C93] leading-relaxed">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </StaggerItem>
+    </SettingsSection>
+  )
+}
