@@ -1,52 +1,210 @@
-// API Key Encryption Module
-// Uses Web Crypto API exclusively — no external libraries
-//
-// Storage modes:
-//   persistent — encrypted in IndexedDB, survives browser restart
-//   session    — sessionStorage, cleared on browser close
-//   memory     — React state only, cleared on page refresh
+import { initDB } from './db'
 
-const ENCRYPTION_KEY_NAME = 'apollo-encryption-key'
+const ENCRYPTION_KEY_STORE = 'encryption-keys'
+const KEY_ID = 'api-key-encryption'
 
-// Generate a non-extractable AES-GCM 256-bit key
+// ─── Internal: Key Storage ───────────────────────────────
+// The encryption key is stored in a separate IndexedDB database
+// from the app data, so clearAllData() doesn't destroy it
+
+let keyDB = null
+
+async function getKeyDB() {
+  if (keyDB) return keyDB
+
+  keyDB = await (await import('idb')).openDB('apollo-keystore', 1, {
+    upgrade(db) {
+      if (!db.objectStoreNames.contains(ENCRYPTION_KEY_STORE)) {
+        db.createObjectStore(ENCRYPTION_KEY_STORE, { keyPath: 'id' })
+      }
+    }
+  })
+
+  return keyDB
+}
+
+// ─── Encryption Key Management ───────────────────────────
+
 export async function generateEncryptionKey() {
-  // TODO: implement using crypto.subtle.generateKey
-  // Store in IndexedDB, return the CryptoKey
+  const key = await crypto.subtle.generateKey(
+    { name: 'AES-GCM', length: 256 },
+    false, // non-extractable
+    ['encrypt', 'decrypt']
+  )
+
+  const db = await getKeyDB()
+  await db.put(ENCRYPTION_KEY_STORE, { id: KEY_ID, key })
+
+  return key
 }
 
-// Retrieve existing key from IndexedDB or generate a new one
 export async function getOrCreateEncryptionKey() {
-  // TODO: implement
+  const db = await getKeyDB()
+  const entry = await db.get(ENCRYPTION_KEY_STORE, KEY_ID)
+
+  if (entry && entry.key) {
+    return entry.key
+  }
+
+  return generateEncryptionKey()
 }
 
-// Encrypt a plaintext string (the API key)
-// Returns { ciphertext: ArrayBuffer, iv: Uint8Array }
+// ─── API Key Encryption ─────────────────────────────────
+
 export async function encryptApiKey(plaintext) {
-  // TODO: implement using AES-GCM with a fresh IV each time
+  const key = await getOrCreateEncryptionKey()
+  const iv = crypto.getRandomValues(new Uint8Array(12))
+  const encoded = new TextEncoder().encode(plaintext)
+
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    encoded
+  )
+
+  return { ciphertext, iv }
 }
 
-// Decrypt ciphertext back to plaintext string
 export async function decryptApiKey(ciphertext, iv) {
-  // TODO: implement
+  const key = await getOrCreateEncryptionKey()
+
+  const decrypted = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    ciphertext
+  )
+
+  return new TextDecoder().decode(decrypted)
 }
 
-// ─── Export/Import Encryption ────────────────────────────
-// Used for encrypted .apb backup files
-// Different from API key encryption — this uses a user passphrase
+// ─── API Key Storage Modes ──────────────────────────────
 
-// Derive an AES-256 key from a passphrase using PBKDF2
+const STORAGE_KEY = 'apollo-api-key'
+
+export async function saveApiKey(apiKey, mode = 'persistent') {
+  switch (mode) {
+    case 'persistent': {
+      const { ciphertext, iv } = await encryptApiKey(apiKey)
+      const db = await initDB()
+      await db.put('settings', {
+        key: STORAGE_KEY,
+        value: {
+          ciphertext: Array.from(new Uint8Array(ciphertext)),
+          iv: Array.from(iv),
+        }
+      })
+      break
+    }
+    case 'session': {
+      sessionStorage.setItem(STORAGE_KEY, apiKey)
+      break
+    }
+    case 'memory': {
+      // Caller is responsible for holding this in React state
+      // Nothing to persist
+      break
+    }
+  }
+}
+
+export async function loadApiKey(mode = 'persistent') {
+  switch (mode) {
+    case 'persistent': {
+      const db = await initDB()
+      const entry = await db.get('settings', STORAGE_KEY)
+      if (!entry || !entry.value) return null
+
+      const { ciphertext, iv } = entry.value
+      try {
+        return await decryptApiKey(
+          new Uint8Array(ciphertext).buffer,
+          new Uint8Array(iv)
+        )
+      } catch {
+        return null
+      }
+    }
+    case 'session': {
+      return sessionStorage.getItem(STORAGE_KEY) || null
+    }
+    case 'memory': {
+      return null
+    }
+  }
+}
+
+export async function deleteApiKey() {
+  // Clear from all possible locations
+  const db = await initDB()
+  try { await db.delete('settings', STORAGE_KEY) } catch {}
+  try { sessionStorage.removeItem(STORAGE_KEY) } catch {}
+}
+
+// ─── Export Encryption (Passphrase-based) ────────────────
+
 export async function deriveKeyFromPassphrase(passphrase, salt) {
-  // TODO: implement — 100,000 iterations, SHA-256
+  const encoded = new TextEncoder().encode(passphrase)
+
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoded,
+    'PBKDF2',
+    false,
+    ['deriveKey']
+  )
+
+  return crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt,
+      iterations: 100000,
+      hash: 'SHA-256',
+    },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  )
 }
 
-// Encrypt a JSON payload for export
-// Returns { salt, iv, ciphertext, version: 1 }
 export async function encryptExport(jsonString, passphrase) {
-  // TODO: implement
+  const salt = crypto.getRandomValues(new Uint8Array(16))
+  const iv = crypto.getRandomValues(new Uint8Array(12))
+  const key = await deriveKeyFromPassphrase(passphrase, salt)
+
+  const encoded = new TextEncoder().encode(jsonString)
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    encoded
+  )
+
+  return {
+    salt: Array.from(salt),
+    iv: Array.from(iv),
+    ciphertext: Array.from(new Uint8Array(ciphertext)),
+    version: 1,
+  }
 }
 
-// Decrypt an imported .apb file
-// Returns parsed JSON or throws on wrong passphrase
 export async function decryptImport(encryptedData, passphrase) {
-  // TODO: implement
+  const { salt, iv, ciphertext } = encryptedData
+
+  const key = await deriveKeyFromPassphrase(
+    passphrase,
+    new Uint8Array(salt)
+  )
+
+  try {
+    const decrypted = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: new Uint8Array(iv) },
+      key,
+      new Uint8Array(ciphertext)
+    )
+
+    const jsonString = new TextDecoder().decode(decrypted)
+    return JSON.parse(jsonString)
+  } catch {
+    throw new Error('Incorrect passphrase or corrupted file')
+  }
 }
