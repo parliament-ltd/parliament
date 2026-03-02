@@ -352,12 +352,13 @@ function UsageSection({ budgetAlert, setBudgetAlert, budgetEnabled, setBudgetEna
                   {!spendingLimitConfirmed ? (
                     <>
                       
-                        href="https://console.anthropic.com/settings/limits"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        <Button
+                        size="sm"
+                        icon={ExternalLink}
+                        onClick={() => window.open('https://console.anthropic.com/settings/limits', '_blank')}
                       >
-                        <Button size="sm" icon={ExternalLink}>Set limit on Anthropic</Button>
-                      </a>
+                        Set limit on Anthropic
+                      </Button>
                       <Button size="sm" variant="ghost" onClick={() => setSpendingLimitDismissed(true)}>
                         Dismiss
                       </Button>
