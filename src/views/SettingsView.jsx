@@ -133,3 +133,156 @@ export default function SettingsView() {
     </div>
   )
 }
+// ─── Section Wrapper ─────────────────────────────────────
+
+function SettingsSection({ title, subtitle, children }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -12 }}
+      transition={SPRING_SMOOTH}
+    >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="mb-6">
+        <h2 className="text-lg font-semibold text-[#1E2532]">{title}</h2>
+        <p className="text-sm text-[#6B7C93] mt-0.5">{subtitle}</p>
+      </motion.div>
+      <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-4">
+        {children}
+      </motion.div>
+    </motion.div>
+  )
+}
+
+function StaggerItem({ children }) {
+  return <motion.div variants={staggerItem}>{children}</motion.div>
+}
+
+// ─── API Configuration ───────────────────────────────────
+
+function ApiSection({ apiKey, setApiKey, keyStatus, validateKey, storageMode, setStorageMode }) {
+  return (
+    <SettingsSection title="API Configuration" subtitle="Connect your Anthropic API key to start chatting">
+      <StaggerItem>
+        <Card>
+          <div className="flex items-end gap-3">
+            <Input
+              label="Anthropic API Key"
+              value={apiKey}
+              onChange={setApiKey}
+              placeholder="sk-ant-..."
+              secret
+              className="flex-1"
+            />
+            <Button
+              onClick={validateKey}
+              disabled={!apiKey || keyStatus === 'validating'}
+              variant={keyStatus === 'valid' ? 'default' : 'default'}
+            >
+              {keyStatus === 'validating' ? 'Checking...' : keyStatus === 'valid' ? 'Valid' : 'Validate'}
+            </Button>
+          </div>
+
+          {keyStatus === 'valid' && (
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-2 mt-3 text-[#22C55E]"
+            >
+              <CheckCircle className="w-4 h-4" />
+              <span className="text-xs font-semibold">API key is valid</span>
+            </motion.div>
+          )}
+
+          {keyStatus === 'invalid' && (
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-2 mt-3 text-[#EF4444]"
+            >
+              <AlertCircle className="w-4 h-4" />
+              <span className="text-xs font-semibold">Invalid API key — check and try again</span>
+            </motion.div>
+          )}
+        </Card>
+      </StaggerItem>
+
+      <StaggerItem>
+        <Card>
+          <RadioGroup
+            label="Key Storage"
+            options={STORAGE_MODES}
+            value={storageMode}
+            onChange={setStorageMode}
+          />
+        </Card>
+      </StaggerItem>
+
+      <StaggerItem>
+        <Card>
+          <div className="flex items-start gap-3">
+            <Info className="w-4 h-4 text-[#4A7AE5] mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-xs text-[#6B7C93] leading-relaxed">
+                Your API key is encrypted using the Web Crypto API (AES-GCM) before being stored. It never leaves your browser.
+              </p>
+              <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-[#4A7AE5] mt-2 hover:underline">
+                Get an API key <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+          </div>
+        </Card>
+      </StaggerItem>
+    </SettingsSection>
+  )
+}
+
+// ─── Model Preferences ───────────────────────────────────
+
+function ModelSection({ selectedModel, setSelectedModel }) {
+  return (
+    <SettingsSection title="Model Preferences" subtitle="Choose your default model for new conversations">
+      {MODELS.map((model) => {
+        const active = selectedModel === model.id
+        return (
+          <StaggerItem key={model.id}>
+            <motion.div
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              onClick={() => setSelectedModel(model.id)}
+              className={`px-5 py-4 rounded-xl border cursor-pointer transition-colors ${
+                active ? 'border-[#4A7AE5] bg-[#4A7AE5]/5' : 'border-[#EBEBEB] hover:border-[#D5D5D5]'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <h3 className={`text-sm font-semibold ${active ? 'text-[#1E2532]' : 'text-[#6B7C93]'}`}>{model.name}</h3>
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                    active ? 'bg-[#4A7AE5]/10 text-[#4A7AE5]' : 'bg-[#F5F5F5] text-[#6B7C93]'
+                  }`}>
+                    {model.badge}
+                  </span>
+                </div>
+                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                  active ? 'border-[#4A7AE5]' : 'border-[#D5D5D5]'
+                }`}>
+                  <motion.div
+                    initial={false}
+                    animate={{ scale: active ? 1 : 0 }}
+                    className="w-2 h-2 rounded-full bg-[#4A7AE5]"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-[#6B7C93] mb-3">{model.description}</p>
+              <div className="flex gap-4 text-xs text-[#6B7C93]">
+                <span>Input: <span className="font-semibold text-[#1E2532]">{model.inputCost}</span>/1M tokens</span>
+                <span>Output: <span className="font-semibold text-[#1E2532]">{model.outputCost}</span>/1M tokens</span>
+                <span>Speed: <span className="font-semibold text-[#1E2532]">{model.speed}</span></span>
+              </div>
+            </motion.div>
+          </StaggerItem>
+        )
+      })}
+    </SettingsSection>
+  )
+}
