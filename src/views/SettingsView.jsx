@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -8,7 +8,11 @@ import {
   Clock, Bell, BellOff, CheckCircle, AlertCircle, Lock
 } from 'lucide-react'
 import { useSettings } from '../stores/SettingsContext'
+import { useConversations } from '../stores/ConversationContext'
 import { Button, Card, Input, Modal, Toggle, RadioGroup, SegmentedControl, SectionLabel, IconButton } from '../components'
+import { getProvider } from '../providers'
+import { saveApiKey, deleteApiKey, encryptExport, decryptImport } from '../lib/crypto'
+import { exportAllData, importData, clearAllData } from '../lib/db'
 
 const SPRING_SMOOTH = { type: 'spring', stiffness: 300, damping: 28 }
 const staggerContainer = {
@@ -44,12 +48,14 @@ const STORAGE_MODES = [
 
 export default function SettingsView() {
   const navigate = useNavigate()
-  const { settings, updateSetting } = useSettings()
+  const { settings, updateSetting, storageUsage } = useSettings()
+  const { conversations } = useConversations()
   const [activeSection, setActiveSection] = useState('api')
 
   // Local state for API key (not persisted until validated)
   const [apiKey, setApiKey] = useState('')
-  const [keyStatus, setKeyStatus] = useState(null)
+  const [keyStatus, setKeyStatus] = useState(null) // null | 'validating' | 'valid' | 'invalid' | 'billing_error'
+  const [keyError, setKeyError] = useState('')
 
   // Modal state
   const [showExportModal, setShowExportModal] = useState(false)
@@ -58,13 +64,24 @@ export default function SettingsView() {
   const [exportPassphrase, setExportPassphrase] = useState('')
   const [exportConfirmPassphrase, setExportConfirmPassphrase] = useState('')
   const [importPassphrase, setImportPassphrase] = useState('')
-  const [spendingLimitDismissed, setSpendingLimitDismissed] = useState(false)
-  const [spendingLimitConfirmed, setSpendingLimitConfirmed] = useState(false)
 
-  const validateKey = () => {
+  const validateKey = async () => {
     setKeyStatus('validating')
-    // TODO: wire to real provider.validateKey()
-    setTimeout(() => setKeyStatus(apiKey.startsWith('sk-') ? 'valid' : 'invalid'), 1500)
+    setKeyError('')
+    try {
+      const provider = getProvider('anthropic')
+      const result = await provider.validateKey(apiKey)
+      setKeyStatus(result.status)
+      if (!result.valid) {
+        setKeyError(result.error)
+      } else {
+        // Key is valid — save it with the chosen storage mode
+        await saveApiKey(apiKey, settings.storageMode)
+      }
+    } catch {
+      setKeyStatus('invalid')
+      setKeyError('Could not reach the Anthropic API. Please check your connection.')
+    }
   }
 
   return (
@@ -121,11 +138,11 @@ export default function SettingsView() {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto px-10 py-8">
         <AnimatePresence mode="wait">
-          {activeSection === 'api' && <ApiSection key="api" apiKey={apiKey} setApiKey={setApiKey} keyStatus={keyStatus} validateKey={validateKey} storageMode={settings.storageMode} setStorageMode={(v) => updateSetting('storageMode', v)} />}
+          {activeSection === 'api' && <ApiSection key="api" apiKey={apiKey} setApiKey={setApiKey} keyStatus={keyStatus} keyError={keyError} validateKey={validateKey} storageMode={settings.storageMode} setStorageMode={(v) => updateSetting('storageMode', v)} />}
           {activeSection === 'model' && <ModelSection key="model" selectedModel={settings.defaultModel} setSelectedModel={(v) => updateSetting('defaultModel', v)} />}
-          {activeSection === 'usage' && <UsageSection key="usage" budgetAlert={settings.budgetAlert} setBudgetAlert={(v) => updateSetting('budgetAlert', v)} budgetEnabled={settings.budgetEnabled} setBudgetEnabled={(v) => updateSetting('budgetEnabled', v)} spendingLimitDismissed={spendingLimitDismissed} setSpendingLimitDismissed={setSpendingLimitDismissed} spendingLimitConfirmed={spendingLimitConfirmed} setSpendingLimitConfirmed={setSpendingLimitConfirmed} />}
+          {activeSection === 'usage' && <UsageSection key="usage" budgetAlert={settings.budgetAlert} setBudgetAlert={(v) => updateSetting('budgetAlert', v)} budgetEnabled={settings.budgetEnabled} setBudgetEnabled={(v) => updateSetting('budgetEnabled', v)} spendingLimitDismissed={settings.spendingLimitDismissed} setSpendingLimitDismissed={(v) => updateSetting('spendingLimitDismissed', v)} />}
           {activeSection === 'context' && <ContextSection key="context" summaryDepth={settings.summaryDepth} setSummaryDepth={(v) => updateSetting('summaryDepth', v)} contextThreshold={settings.contextThreshold} setContextThreshold={(v) => updateSetting('contextThreshold', v)} autoCompress={settings.autoCompress} setAutoCompress={(v) => updateSetting('autoCompress', v)} />}
-          {activeSection === 'data' && <DataSection key="data" backupReminder={settings.backupReminder} setBackupReminder={(v) => updateSetting('backupReminder', v)} showExportModal={showExportModal} setShowExportModal={setShowExportModal} showImportModal={showImportModal} setShowImportModal={setShowImportModal} showDeleteConfirm={showDeleteConfirm} setShowDeleteConfirm={setShowDeleteConfirm} exportPassphrase={exportPassphrase} setExportPassphrase={setExportPassphrase} exportConfirmPassphrase={exportConfirmPassphrase} setExportConfirmPassphrase={setExportConfirmPassphrase} importPassphrase={importPassphrase} setImportPassphrase={setImportPassphrase} />}
+          {activeSection === 'data' && <DataSection key="data" backupReminder={settings.backupReminder} setBackupReminder={(v) => updateSetting('backupReminder', v)} showExportModal={showExportModal} setShowExportModal={setShowExportModal} showImportModal={showImportModal} setShowImportModal={setShowImportModal} showDeleteConfirm={showDeleteConfirm} setShowDeleteConfirm={setShowDeleteConfirm} exportPassphrase={exportPassphrase} setExportPassphrase={setExportPassphrase} exportConfirmPassphrase={exportConfirmPassphrase} setExportConfirmPassphrase={setExportConfirmPassphrase} importPassphrase={importPassphrase} setImportPassphrase={setImportPassphrase} storageUsage={storageUsage} conversations={conversations} />}
           {activeSection === 'appearance' && <AppearanceSection key="appearance" theme={settings.theme} setTheme={(v) => updateSetting('theme', v)} fontSize={settings.fontSize} setFontSize={(v) => updateSetting('fontSize', v)} />}
           {activeSection === 'about' && <AboutSection key="about" />}
         </AnimatePresence>
@@ -133,6 +150,7 @@ export default function SettingsView() {
     </div>
   )
 }
+
 // ─── Section Wrapper ─────────────────────────────────────
 
 function SettingsSection({ title, subtitle, children }) {
@@ -160,7 +178,7 @@ function StaggerItem({ children }) {
 
 // ─── API Configuration ───────────────────────────────────
 
-function ApiSection({ apiKey, setApiKey, keyStatus, validateKey, storageMode, setStorageMode }) {
+function ApiSection({ apiKey, setApiKey, keyStatus, keyError, validateKey, storageMode, setStorageMode }) {
   return (
     <SettingsSection title="API Configuration" subtitle="Connect your Anthropic API key to start chatting">
       <StaggerItem>
@@ -173,11 +191,11 @@ function ApiSection({ apiKey, setApiKey, keyStatus, validateKey, storageMode, se
               placeholder="sk-ant-..."
               secret
               className="flex-1"
+              error={keyStatus === 'invalid' || keyStatus === 'billing_error' ? keyError : undefined}
             />
             <Button
               onClick={validateKey}
               disabled={!apiKey || keyStatus === 'validating'}
-              variant={keyStatus === 'valid' ? 'default' : 'default'}
             >
               {keyStatus === 'validating' ? 'Checking...' : keyStatus === 'valid' ? 'Valid' : 'Validate'}
             </Button>
@@ -191,17 +209,6 @@ function ApiSection({ apiKey, setApiKey, keyStatus, validateKey, storageMode, se
             >
               <CheckCircle className="w-4 h-4" />
               <span className="text-xs font-semibold">API key is valid</span>
-            </motion.div>
-          )}
-
-          {keyStatus === 'invalid' && (
-            <motion.div
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-center gap-2 mt-3 text-[#EF4444]"
-            >
-              <AlertCircle className="w-4 h-4" />
-              <span className="text-xs font-semibold">Invalid API key — check and try again</span>
             </motion.div>
           )}
         </Card>
@@ -286,9 +293,10 @@ function ModelSection({ selectedModel, setSelectedModel }) {
     </SettingsSection>
   )
 }
+
 // ─── Usage & Spending ────────────────────────────────────
 
-function UsageSection({ budgetAlert, setBudgetAlert, budgetEnabled, setBudgetEnabled, spendingLimitDismissed, setSpendingLimitDismissed, spendingLimitConfirmed, setSpendingLimitConfirmed }) {
+function UsageSection({ budgetAlert, setBudgetAlert, budgetEnabled, setBudgetEnabled, spendingLimitDismissed, setSpendingLimitDismissed }) {
   return (
     <SettingsSection title="Usage & Spending" subtitle="Monitor costs and set budget alerts">
       <StaggerItem>
@@ -349,30 +357,16 @@ function UsageSection({ budgetAlert, setBudgetAlert, budgetEnabled, setBudgetEna
                   Budget alerts in this app are informational only. For a hard spending cap, set a monthly limit in your Anthropic dashboard.
                 </p>
                 <div className="flex items-center gap-2">
-                  {!spendingLimitConfirmed ? (
-                    <>
-                      
-                        <Button
-                        size="sm"
-                        icon={ExternalLink}
-                        onClick={() => window.open('https://console.anthropic.com/settings/limits', '_blank')}
-                      >
-                        Set limit on Anthropic
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => setSpendingLimitDismissed(true)}>
-                        Dismiss
-                      </Button>
-                    </>
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex items-center gap-2 text-[#22C55E]"
-                    >
-                      <CheckCircle className="w-4 h-4" />
-                      <span className="text-xs font-semibold">Spending limit confirmed</span>
-                    </motion.div>
-                  )}
+                  <Button
+                    size="sm"
+                    icon={ExternalLink}
+                    onClick={() => window.open('https://console.anthropic.com/settings/limits', '_blank')}
+                  >
+                    Set limit on Anthropic
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setSpendingLimitDismissed(true)}>
+                    Dismiss
+                  </Button>
                 </div>
               </div>
             </div>
@@ -444,11 +438,136 @@ function ContextSection({ summaryDepth, setSummaryDepth, contextThreshold, setCo
   )
 }
 
+// ─── Helpers ─────────────────────────────────────────────
+
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 B'
+  const units = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(1024))
+  return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
+}
+
 // ─── Data & Backups ──────────────────────────────────────
 
-function DataSection({ backupReminder, setBackupReminder, showExportModal, setShowExportModal, showImportModal, setShowImportModal, showDeleteConfirm, setShowDeleteConfirm, exportPassphrase, setExportPassphrase, exportConfirmPassphrase, setExportConfirmPassphrase, importPassphrase, setImportPassphrase }) {
+function DataSection({ backupReminder, setBackupReminder, showExportModal, setShowExportModal, showImportModal, setShowImportModal, showDeleteConfirm, setShowDeleteConfirm, exportPassphrase, setExportPassphrase, exportConfirmPassphrase, setExportConfirmPassphrase, importPassphrase, setImportPassphrase, storageUsage, conversations }) {
+  const fileInputRef = useRef(null)
+  const [importFile, setImportFile] = useState(null)
+  const [importError, setImportError] = useState('')
+  const [exportError, setExportError] = useState('')
+
+  const storagePercent = storageUsage.quota > 0
+    ? Math.round((storageUsage.usage / storageUsage.quota) * 100)
+    : 0
+  const storageWarning = storagePercent >= 80
+  const storageCritical = storagePercent >= 95
+
+  const handleExportEncrypted = async () => {
+    try {
+      setExportError('')
+      const data = await exportAllData()
+      const jsonString = JSON.stringify(data)
+      const encrypted = await encryptExport(jsonString, exportPassphrase)
+      const blob = new Blob([JSON.stringify(encrypted)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `apollo-backup-${new Date().toISOString().slice(0, 10)}.apb`
+      a.click()
+      URL.revokeObjectURL(url)
+      setShowExportModal(false)
+      setExportPassphrase('')
+      setExportConfirmPassphrase('')
+    } catch {
+      setExportError('Export failed. Please try again.')
+    }
+  }
+
+  const handleExportJSON = async () => {
+    const data = await exportAllData()
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `apollo-backup-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleImport = async () => {
+    if (!importFile) return
+    try {
+      setImportError('')
+      const text = await importFile.text()
+      const parsed = JSON.parse(text)
+
+      let data
+      if (parsed.salt && parsed.iv && parsed.ciphertext) {
+        // Encrypted .apb file
+        data = await decryptImport(parsed, importPassphrase)
+      } else {
+        // Plain .json file
+        data = parsed
+      }
+
+      await importData(data)
+      setShowImportModal(false)
+      setImportPassphrase('')
+      setImportFile(null)
+    } catch (error) {
+      setImportError(error.message || 'Import failed. Check the file and passphrase.')
+    }
+  }
+
+  const handleDeleteAll = async () => {
+    await clearAllData()
+    await deleteApiKey()
+    setShowDeleteConfirm(false)
+    window.location.reload()
+  }
+
   return (
     <SettingsSection title="Data & Backups" subtitle="Export, import, and manage your data">
+      {/* Storage Monitoring */}
+      <StaggerItem>
+        <Card>
+          <SectionLabel>Storage</SectionLabel>
+          <div className="mt-3 mb-2">
+            <div className="w-full h-2 rounded-full bg-[#EBEBEB] overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${storagePercent}%` }}
+                transition={SPRING_SMOOTH}
+                className={`h-full rounded-full ${
+                  storageCritical ? 'bg-[#EF4444]' : storageWarning ? 'bg-[#E5A620]' : 'bg-[#4A7AE5]'
+                }`}
+              />
+            </div>
+            <div className="flex justify-between mt-1.5">
+              <span className={`text-xs font-semibold ${storageCritical ? 'text-[#EF4444]' : storageWarning ? 'text-[#E5A620]' : 'text-[#6B7C93]'}`}>
+                {formatBytes(storageUsage.usage)} used
+              </span>
+              <span className="text-xs text-[#6B7C93]">
+                {formatBytes(storageUsage.quota)} available
+              </span>
+            </div>
+          </div>
+          <div className="flex gap-6 mt-3 text-xs text-[#6B7C93]">
+            <span>{conversations.length} conversations</span>
+          </div>
+          {storageWarning && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className={`text-xs mt-2 ${storageCritical ? 'text-[#EF4444]' : 'text-[#E5A620]'}`}
+            >
+              {storageCritical
+                ? 'Storage is nearly full. Export and delete old conversations to free space.'
+                : 'Storage is getting full. Consider exporting and cleaning up old conversations.'}
+            </motion.p>
+          )}
+        </Card>
+      </StaggerItem>
+
       <StaggerItem>
         <Card>
           <SectionLabel>Backup Reminder</SectionLabel>
@@ -474,7 +593,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
             <Button icon={Lock} onClick={() => setShowExportModal(true)}>
               Export Encrypted (.apb)
             </Button>
-            <Button icon={Download} variant="ghost" onClick={() => {/* TODO: plain JSON export */}}>
+            <Button icon={Download} variant="ghost" onClick={handleExportJSON}>
               Export JSON
             </Button>
           </div>
@@ -504,16 +623,16 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
       {/* Export Modal */}
       <Modal
         open={showExportModal}
-        onClose={() => { setShowExportModal(false); setExportPassphrase(''); setExportConfirmPassphrase('') }}
+        onClose={() => { setShowExportModal(false); setExportPassphrase(''); setExportConfirmPassphrase(''); setExportError('') }}
         title="Export Encrypted Backup"
         footer={
           <>
-            <Button variant="ghost" onClick={() => { setShowExportModal(false); setExportPassphrase(''); setExportConfirmPassphrase('') }}>
+            <Button variant="ghost" onClick={() => { setShowExportModal(false); setExportPassphrase(''); setExportConfirmPassphrase(''); setExportError('') }}>
               Cancel
             </Button>
             <Button
               disabled={!exportPassphrase || exportPassphrase !== exportConfirmPassphrase}
-              onClick={() => { /* TODO: wire to encryptExport */ }}
+              onClick={handleExportEncrypted}
             >
               Export
             </Button>
@@ -531,20 +650,21 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
             placeholder="Confirm your passphrase"
             error={exportConfirmPassphrase && exportPassphrase !== exportConfirmPassphrase ? 'Passphrases do not match' : undefined}
           />
+          {exportError && <p className="text-xs text-[#EF4444]">{exportError}</p>}
         </div>
       </Modal>
 
       {/* Import Modal */}
       <Modal
         open={showImportModal}
-        onClose={() => { setShowImportModal(false); setImportPassphrase('') }}
+        onClose={() => { setShowImportModal(false); setImportPassphrase(''); setImportFile(null); setImportError('') }}
         title="Import Backup"
         footer={
           <>
-            <Button variant="ghost" onClick={() => { setShowImportModal(false); setImportPassphrase('') }}>
+            <Button variant="ghost" onClick={() => { setShowImportModal(false); setImportPassphrase(''); setImportFile(null); setImportError('') }}>
               Cancel
             </Button>
-            <Button onClick={() => { /* TODO: wire to decryptImport */ }}>
+            <Button disabled={!importFile} onClick={handleImport}>
               Import
             </Button>
           </>
@@ -555,12 +675,15 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
           <div>
             <SectionLabel>Backup File</SectionLabel>
             <input
+              ref={fileInputRef}
               type="file"
               accept=".apb,.json"
+              onChange={(e) => setImportFile(e.target.files?.[0] || null)}
               className="mt-2 text-xs text-[#6B7C93] file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border file:border-[#EBEBEB] file:bg-white file:text-xs file:font-semibold file:text-[#1E2532] hover:file:border-[#4A7AE5] file:transition-colors file:cursor-pointer"
             />
           </div>
           <Input label="Passphrase (if encrypted)" value={importPassphrase} onChange={setImportPassphrase} secret placeholder="Enter backup passphrase" />
+          {importError && <p className="text-xs text-[#EF4444]">{importError}</p>}
         </div>
       </Modal>
 
@@ -574,7 +697,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
             <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)}>
               Cancel
             </Button>
-            <Button variant="danger" icon={Trash2} onClick={() => { /* TODO: wire to clearAllData */ setShowDeleteConfirm(false) }}>
+            <Button variant="danger" icon={Trash2} onClick={handleDeleteAll}>
               Delete Everything
             </Button>
           </>
@@ -593,6 +716,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
     </SettingsSection>
   )
 }
+
 // ─── Appearance ──────────────────────────────────────────
 
 function AppearanceSection({ theme, setTheme, fontSize, setFontSize }) {
