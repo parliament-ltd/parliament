@@ -2,8 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  ArrowLeft, Send, Square, AlertCircle, Search, Bookmark,
-  GitBranch, Trash2, ChevronLeft, ChevronRight, MessageSquare,
+  Square, AlertCircle,
+  GitBranch, Trash2, MessageSquare,
   FileText, MoreVertical, StickyNote, Activity, Zap, Star,
   Eye, Copy, ArrowRightCircle, Settings2, BookOpen, PanelRight, X
 } from 'lucide-react'
@@ -61,6 +61,7 @@ export default function ChatView() {
   const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false)
   const [favorites, setFavorites] = useState(new Set())
   const [showNotes, setShowNotes] = useState(new Set())
+  const [hiddenMessages, setHiddenMessages] = useState(new Set())
   const [contextUsage] = useState(65) // TODO: wire to real token tracking in Step 9
 
   const messagesEndRef = useRef(null)
@@ -85,6 +86,42 @@ export default function ChatView() {
       n.has(msgId) ? n.delete(msgId) : n.add(msgId)
       return n
     })
+
+  const hideMessage = useCallback((msgId) => {
+    setHiddenMessages((prev) => {
+      const n = new Set(prev)
+      n.add(msgId)
+      return n
+    })
+  }, [])
+
+  const unhideMessage = useCallback((msgId) => {
+    setHiddenMessages((prev) => {
+      const n = new Set(prev)
+      n.delete(msgId)
+      return n
+    })
+  }, [])
+
+  const handleDelete = useCallback(async (msgId) => {
+    // TODO: wire to db.deleteMessage when ChatContext exposes it
+    // For now, hide the message from view (non-destructive)
+    hideMessage(msgId)
+  }, [hideMessage])
+
+  const handleCopyText = useCallback(async (content) => {
+    try {
+      await navigator.clipboard.writeText(content)
+    } catch {
+      // Fallback for older browsers
+      const textarea = document.createElement('textarea')
+      textarea.value = content
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+    }
+  }, [])
 
   /* ── Lifecycle ─────────────────────────────────────────── */
 
@@ -175,9 +212,12 @@ export default function ChatView() {
     }
   }
 
-  /* ── Derive TOC from messages ──────────────────────────── */
+  /* ── Derive visible messages and TOC ────────────────────── */
 
-  const tocItems = messages.map((msg, i) => ({
+  const visibleMessages = messages.filter((m) => !hiddenMessages.has(m.id))
+  const hiddenCount = messages.length - visibleMessages.length
+
+  const tocItems = visibleMessages.map((msg, i) => ({
     id: msg.id,
     label: msg.role === 'user'
       ? msg.content.slice(0, 50) + (msg.content.length > 50 ? '...' : '')
@@ -185,6 +225,9 @@ export default function ChatView() {
     role: msg.role,
     number: i + 1,
   }))
+
+  // Favorited messages for right sidebar
+  const favoritedMessages = visibleMessages.filter((m) => favorites.has(m.id))
 
   /* ── Loading ───────────────────────────────────────────── */
 
@@ -222,17 +265,11 @@ export default function ChatView() {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => navigate('/')}
-                className="text-[#6B7C93] hover:text-[#1E2532] transition-colors p-1.5 rounded hover:bg-[#EEEEEE]"
+                className="text-[#4A7AE5] hover:text-[#3A6AD4] transition-colors p-1.5 rounded hover:bg-[#EEEEEE]"
                 title="Back to Chats"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <MessageSquare className="w-5 h-5" />
               </motion.button>
-              <motion.div
-                animate={{ rotate: [0, -8, 8, 0] }}
-                transition={{ duration: 0.6, delay: 0.6, ease: 'easeInOut' }}
-              >
-                <MessageSquare className="w-5 h-5 text-[#4A7AE5]" />
-              </motion.div>
             </div>
             <div className="flex items-center gap-1">
               <SidebarIconButton title="Undo (Ctrl+Z)">
@@ -323,7 +360,7 @@ export default function ChatView() {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {messages.length === 0 && !isStreaming && (
+          {visibleMessages.length === 0 && !isStreaming && hiddenCount === 0 && (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <MessageSquare className="w-8 h-8 text-[#EBEBEB] mb-3" />
               <p className="text-sm text-[#6B7C93] mb-1">Start a conversation</p>
@@ -331,7 +368,7 @@ export default function ChatView() {
             </div>
           )}
 
-          {messages.map((msg, idx) => {
+          {visibleMessages.map((msg, idx) => {
             const isNew = !seenMessageIds.current.has(msg.id)
             if (isNew) seenMessageIds.current.add(msg.id)
             const isGhostText = msg.incomplete && !isStreaming
@@ -354,11 +391,35 @@ export default function ChatView() {
                 onNote={() => toggleNote(msg.id)}
                 onFavorite={() => toggleFav(msg.id)}
                 onContinue={isGhostText ? () => handleContinue(msg.id) : null}
-                onDelete={() => {}}
+                onDelete={() => handleDelete(msg.id)}
+                onHide={() => hideMessage(msg.id)}
+                onCopyText={() => handleCopyText(msg.content)}
                 onBranch={() => {}}
               />
             )
           })}
+
+          {/* Hidden messages indicator */}
+          {hiddenCount > 0 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={SPRING_GENTLE}
+              className="flex items-center justify-center py-2"
+            >
+              <motion.button
+                whileHover={{ scale: 1.04, borderColor: '#4A7AE5' }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => setHiddenMessages(new Set())}
+                className="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-[#EBEBEB] cursor-pointer transition-colors"
+              >
+                <Eye className="w-3.5 h-3.5 text-[#6B7C93]" />
+                <span className="text-xs text-[#6B7C93]">
+                  {hiddenCount} message{hiddenCount !== 1 ? 's' : ''} hidden
+                </span>
+              </motion.button>
+            </motion.div>
+          )}
 
           <div ref={messagesEndRef} />
         </div>
@@ -397,7 +458,7 @@ export default function ChatView() {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask a follow-up question..."
-              className="flex-1 bg-white rounded-lg px-4 py-3 text-sm text-[#1E2532] resize-none outline-none placeholder:text-[#D5D5D5] border border-[#EBEBEB] focus:border-[#4A7AE5] transition-colors"
+              className="flex-1 bg-white rounded-lg px-4 py-3 text-sm text-[#1E2532] resize-none outline-none placeholder:text-[#9CA3AF] border border-[#EBEBEB] focus:border-[#4A7AE5] transition-colors"
               rows={3}
             />
             <motion.button
@@ -420,7 +481,7 @@ export default function ChatView() {
                     transition={SPRING_SNAPPY}
                     className="flex items-center gap-2"
                   >
-                    <Square className="w-4 h-4" />
+                    <Square className="w-3.5 h-3.5" />
                     Stop
                   </motion.div>
                 ) : (
@@ -430,9 +491,7 @@ export default function ChatView() {
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.8, opacity: 0 }}
                     transition={SPRING_SNAPPY}
-                    className="flex items-center gap-2"
                   >
-                    <Send className="w-4 h-4" />
                     Send
                   </motion.div>
                 )}
@@ -503,13 +562,73 @@ export default function ChatView() {
                 </motion.button>
               </div>
 
+              {/* Favorites Section */}
+              <div className="p-4" style={{ borderBottom: '1px solid #F0F0F0' }}>
+                <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
+                  Favorites {favoritedMessages.length > 0 && (
+                    <span className="text-[#E5A620] normal-case tracking-normal">
+                      ({favoritedMessages.length})
+                    </span>
+                  )}
+                </h3>
+                {favoritedMessages.length === 0 ? (
+                  <p className="text-xs text-[#D5D5D5]">
+                    Star a message to save it here
+                  </p>
+                ) : (
+                  <motion.div
+                    variants={staggerContainer}
+                    initial="hidden"
+                    animate="show"
+                    className="space-y-2"
+                  >
+                    {favoritedMessages.map((msg) => (
+                      <motion.button
+                        key={msg.id}
+                        variants={staggerItem}
+                        whileHover={interactiveHover}
+                        whileTap={interactiveTap}
+                        onClick={() => {
+                          document.getElementById(`msg-${msg.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                        }}
+                        className="w-full text-left px-3 py-2 bg-white border border-[#F0F0F0] rounded-lg group/fav hover:border-[#E5A620]/40 transition-colors"
+                      >
+                        <div className="flex items-start gap-2">
+                          <Star className="w-3 h-3 mt-0.5 flex-shrink-0" style={{ fill: '#E5A620', color: '#E5A620' }} />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-[10px] text-[#6B7C93] mb-0.5">
+                              {msg.role === 'user' ? 'You' : 'Claude'}
+                            </div>
+                            <p className="text-xs text-[#1E2532] truncate">
+                              {msg.content.slice(0, 80)}{msg.content.length > 80 ? '...' : ''}
+                            </p>
+                          </div>
+                          <motion.button
+                            whileHover={{ scale: 1.2 }}
+                            whileTap={{ scale: 0.8 }}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              toggleFav(msg.id)
+                            }}
+                            className="p-1 rounded opacity-0 group-hover/fav:opacity-100 hover:bg-[#EEEEEE] text-[#6B7C93] hover:text-[#EF4444] transition-all"
+                            title="Remove from favorites"
+                          >
+                            <X className="w-3 h-3" />
+                          </motion.button>
+                        </div>
+                      </motion.button>
+                    ))}
+                  </motion.div>
+                )}
+              </div>
+
               {/* Context Health Section */}
               <div className="p-4" style={{ borderBottom: '1px solid #F0F0F0' }}>
                 <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
                   Context Health
                 </h3>
                 <div className="space-y-3">
-                  <MetricRow label="Messages" value={`${messages.length}`} />
+                  <MetricRow label="Messages" value={hiddenCount > 0 ? `${visibleMessages.length} / ${messages.length}` : `${messages.length}`} />
                   <MetricRow
                     label="Context"
                     value={`${contextUsage}%`}
@@ -643,9 +762,18 @@ function MessageCard({
   isGhostText = false,
   isFavorited = false, showNotes = false,
   onNote, onFavorite, onContinue, onDelete, onBranch,
+  onHide, onCopyText,
 }) {
   const [noteText, setNoteText] = useState('')
   const [showMenu, setShowMenu] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = () => {
+    onCopyText?.()
+    setCopied(true)
+    setShowMenu(false)
+    setTimeout(() => setCopied(false), 1500)
+  }
 
   return (
     <motion.div
@@ -710,7 +838,7 @@ function MessageCard({
                     transition={{ duration: 0.12 }}
                     className="absolute right-0 top-8 w-44 border border-[#EBEBEB] rounded-lg shadow-xl z-30 overflow-hidden bg-white"
                   >
-                    <MenuButton icon={Eye} onClick={() => setShowMenu(false)}>
+                    <MenuButton icon={Eye} onClick={() => { onHide?.(); setShowMenu(false) }}>
                       Hide message
                     </MenuButton>
                     <MenuButton icon={ArrowRightCircle} onClick={() => setShowMenu(false)}>
@@ -719,8 +847,8 @@ function MessageCard({
                     <MenuButton icon={Copy} onClick={() => setShowMenu(false)}>
                       Duplicate
                     </MenuButton>
-                    <MenuButton icon={FileText} onClick={() => setShowMenu(false)}>
-                      Copy text
+                    <MenuButton icon={FileText} onClick={handleCopy}>
+                      {copied ? 'Copied!' : 'Copy text'}
                     </MenuButton>
                   </motion.div>
                 )}
