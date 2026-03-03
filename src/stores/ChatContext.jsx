@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
 import { getMessages, addMessage, updateMessage } from '../lib/db'
+import { useConversations } from './ConversationContext'
 
 const ChatContext = createContext(null)
 
@@ -12,6 +13,8 @@ export function ChatProvider({ children }) {
   const [streamingContent, setStreamingContent] = useState('')
   const [tokenUsage, setTokenUsage] = useState({ input: 0, output: 0 })
   const [activeConversationId, setActiveConversationId] = useState(null)
+
+  const { updateConversation } = useConversations()
 
   const abortControllerRef = useRef(null)
   const streamingMessageIdRef = useRef(null)
@@ -62,6 +65,21 @@ export function ChatProvider({ children }) {
       persistIntervalRef.current = null
     }
   }, [])
+
+  // Auto-generate a conversation title after the first user→assistant exchange.
+  // Fire-and-forget: failures are silent, conversation keeps its default title.
+  const generateTitleIfNeeded = useCallback(async (conversationId, currentMessages, apiKey, provider) => {
+    // Only trigger on exactly 2 messages (first user + first assistant)
+    if (currentMessages.length !== 2) return
+    if (currentMessages[0].role !== 'user' || currentMessages[1].role !== 'assistant') return
+
+    try {
+      const title = await provider.generateTitle(apiKey, currentMessages)
+      await updateConversation(conversationId, { title })
+    } catch (err) {
+      console.warn('Auto-title generation failed:', err.message)
+    }
+  }, [updateConversation])
 
   // Send a message and handle streaming response
   const sendMessage = useCallback(async (apiKey, conversationId, userContent, model, provider) => {
@@ -149,6 +167,14 @@ export function ChatProvider({ children }) {
         input: prev.input + inputTokens,
         output: prev.output + tokenCount,
       }))
+
+      // 7. Auto-title generation (fire and forget — not awaited)
+      const completedMessages = messagesRef.current.map(m =>
+        m.id === assistantMsg.id
+          ? { ...m, content: finalContent, incomplete: false, tokenCount }
+          : m
+      )
+      generateTitleIfNeeded(conversationId, completedMessages, apiKey, provider)
     } catch (error) {
       stopPersistInterval()
 
@@ -182,7 +208,7 @@ export function ChatProvider({ children }) {
       latestContentRef.current = ''
       abortControllerRef.current = null
     }
-  }, [startPersistInterval, stopPersistInterval])
+  }, [startPersistInterval, stopPersistInterval, generateTitleIfNeeded])
 
   // Continue from an interrupted (ghost text) message
   const continueMessage = useCallback(async (apiKey, incompleteMessageId, model, provider) => {
