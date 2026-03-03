@@ -1,25 +1,70 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import {
+  listConversations,
+  createConversation,
+  updateConversation as dbUpdateConversation,
+  deleteConversation,
+  runIntegrityCheck,
+} from '../lib/db'
 
 const ConversationContext = createContext(null)
 
 export function ConversationProvider({ children }) {
   const [conversations, setConversations] = useState([])
   const [activeConversationId, setActiveConversationId] = useState(null)
+  const [loaded, setLoaded] = useState(false)
 
-  // Load conversations from IndexedDB
-  async function loadConversations() {
-    // TODO: implement — call listConversations() from db.js
+  // Run integrity check and load conversations on mount
+  useEffect(() => {
+    async function init() {
+      await runIntegrityCheck()
+      const convs = await listConversations()
+      setConversations(convs)
+      setLoaded(true)
+    }
+    init()
+  }, [])
+
+  // Reload conversations from IndexedDB
+  const loadConversations = useCallback(async () => {
+    const convs = await listConversations()
+    setConversations(convs)
+  }, [])
+
+  // Create a new conversation and return it
+  async function createNewConversation(options = {}) {
+    const conv = await createConversation(options)
+    setConversations(prev => [conv, ...prev])
+    return conv
   }
 
-  // Create a new conversation and return its ID
-  async function createNewConversation(model) {
-    // TODO: implement — call createConversation() from db.js
-    // Return the new conversation ID
+  // Update a conversation (title, pinned, storageBytes, etc.)
+  async function updateConv(id, updates) {
+    const updated = await dbUpdateConversation(id, updates)
+    setConversations(prev =>
+      prev.map(c => (c.id === id ? updated : c))
+    )
+    return updated
   }
 
   // Delete a conversation and its related data
   async function removeConversation(id) {
-    // TODO: implement — call deleteConversation() from db.js
+    await deleteConversation(id)
+    setConversations(prev => prev.filter(c => c.id !== id))
+    if (activeConversationId === id) {
+      setActiveConversationId(null)
+    }
+  }
+
+  // Bulk delete conversations
+  async function removeConversations(ids) {
+    for (const id of ids) {
+      await deleteConversation(id)
+    }
+    setConversations(prev => prev.filter(c => !ids.includes(c.id)))
+    if (ids.includes(activeConversationId)) {
+      setActiveConversationId(null)
+    }
   }
 
   return (
@@ -27,9 +72,12 @@ export function ConversationProvider({ children }) {
       conversations,
       activeConversationId,
       setActiveConversationId,
+      loaded,
       loadConversations,
       createNewConversation,
+      updateConversation: updateConv,
       removeConversation,
+      removeConversations,
     }}>
       {children}
     </ConversationContext.Provider>
