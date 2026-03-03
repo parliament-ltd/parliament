@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react'
-import { getSetting, setSetting as dbSetSetting } from '../lib/db'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { getSetting, setSetting as dbSetSetting, getStorageEstimate } from '../lib/db'
 
 const SettingsContext = createContext(null)
 
@@ -15,30 +15,59 @@ const DEFAULT_SETTINGS = {
   budgetEnabled: true,
   backupReminder: 'weekly',
   lastBackup: null,
+  spendingLimitDismissed: false,
 }
 
 export function SettingsProvider({ children }) {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS)
   const [loaded, setLoaded] = useState(false)
+  const [storageUsage, setStorageUsage] = useState({ usage: 0, quota: 0 })
 
   // Load all settings from IndexedDB on mount
   useEffect(() => {
     async function loadSettings() {
-      // TODO: implement — load each key from IndexedDB
-      // Fall back to DEFAULT_SETTINGS for any missing keys
+      const loaded = {}
+      for (const key of Object.keys(DEFAULT_SETTINGS)) {
+        const value = await getSetting(key)
+        if (value !== null) {
+          loaded[key] = value
+        }
+      }
+      setSettings(prev => ({ ...prev, ...loaded }))
       setLoaded(true)
     }
     loadSettings()
   }, [])
 
+  // Check storage estimate on mount
+  useEffect(() => {
+    async function checkStorage() {
+      const estimate = await getStorageEstimate()
+      setStorageUsage(estimate)
+    }
+    checkStorage()
+  }, [])
+
+  // Refresh storage estimate (call after IndexedDB writes)
+  const refreshStorageEstimate = useCallback(async () => {
+    const estimate = await getStorageEstimate()
+    setStorageUsage(estimate)
+  }, [])
+
   // Update a single setting in state and persist to IndexedDB
   async function updateSetting(key, value) {
     setSettings(prev => ({ ...prev, [key]: value }))
-    // TODO: persist to IndexedDB via dbSetSetting(key, value)
+    await dbSetSetting(key, value)
   }
 
   return (
-    <SettingsContext.Provider value={{ settings, updateSetting, loaded }}>
+    <SettingsContext.Provider value={{
+      settings,
+      updateSetting,
+      loaded,
+      storageUsage,
+      refreshStorageEstimate,
+    }}>
       {children}
     </SettingsContext.Provider>
   )
