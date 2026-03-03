@@ -44,6 +44,7 @@ export default function ChatView() {
     async function init() {
       try {
         const key = await loadApiKey(settings.storageMode)
+        console.log('API KEY DEBUG:', key ? 'found' : 'null', 'mode:', settings.storageMode)
         if (!cancelled) setApiKey(key)
         await loadMessages(id)
       } catch {
