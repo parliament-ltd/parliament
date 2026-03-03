@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Send, Square, AlertCircle } from 'lucide-react'
@@ -26,14 +26,15 @@ export default function ChatView() {
 
   const [inputValue, setInputValue] = useState('')
   const [apiKey, setApiKey] = useState(null)
-  const [apiError, setApiError] = useState(null) // { type: 'key_failure' | 'rate_limit' | 'generic', message: string }
+  const [apiError, setApiError] = useState(null)
   const [loading, setLoading] = useState(true)
 
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
   const lastSendTimeRef = useRef(0)
+  // Track which message IDs have already been rendered to skip their entrance animation
+  const seenMessageIds = useRef(new Set())
 
-  // Store stable references for cleanup
   const clearMessagesRef = useRef(clearMessages)
   clearMessagesRef.current = clearMessages
 
@@ -44,7 +45,6 @@ export default function ChatView() {
     async function init() {
       try {
         const key = await loadApiKey(settings.storageMode)
-        console.log('API KEY DEBUG:', key ? 'found' : 'null', 'mode:', settings.storageMode)
         if (!cancelled) setApiKey(key)
         await loadMessages(id)
       } catch {
@@ -58,8 +58,16 @@ export default function ChatView() {
     return () => {
       cancelled = true
       clearMessagesRef.current()
+      seenMessageIds.current.clear()
     }
   }, [id, settings.storageMode, loadMessages])
+
+  // Mark loaded messages as already seen (no entrance animation for existing messages)
+  useEffect(() => {
+    if (!loading) {
+      messages.forEach(m => seenMessageIds.current.add(m.id))
+    }
+  }, [loading]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -73,17 +81,27 @@ export default function ChatView() {
     }
   }, [isStreaming]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Determine which messages are new (need entrance animation)
+  const getMessageAnimation = useCallback((msgId) => {
+    if (seenMessageIds.current.has(msgId)) {
+      return { initial: false, animate: {} }
+    }
+    seenMessageIds.current.add(msgId)
+    return {
+      initial: { opacity: 0, y: 4 },
+      animate: { opacity: 1, y: 0 },
+    }
+  }, [])
+
   const handleSend = useCallback(async () => {
     const trimmed = inputValue.trim()
-    console.log('SEND DEBUG:', { trimmed, isStreaming, hasKey: !!apiKey })
-    if (!trimmed) return // Empty input silently ignored
+    if (!trimmed) return
     if (isStreaming) return
     if (!apiKey) {
       setApiError({ type: 'key_failure', message: 'No API key configured. Add one in Settings to continue.' })
       return
     }
 
-    // 500ms debounce guard
     const now = Date.now()
     if (now - lastSendTimeRef.current < SEND_DEBOUNCE_MS) return
     lastSendTimeRef.current = now
@@ -179,49 +197,54 @@ export default function ChatView() {
           </div>
         )}
 
-        {messages.map((msg) => (
-          <motion.div
-            key={msg.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: msg.incomplete && !isStreaming ? 0.55 : 1, y: 0 }}
-            transition={SPRING_SMOOTH}
-            className={`max-w-2xl ${msg.role === 'user' ? 'ml-auto' : 'mr-auto'}`}
-          >
-            <div
-              className={`px-4 py-3 rounded-xl text-sm leading-relaxed ${
-                msg.role === 'user'
-                  ? 'bg-[#F5F5F5] text-[#1E2532]'
-                  : 'border border-[#EBEBEB] text-[#1E2532]'
-              } ${
-                msg.incomplete && !isStreaming
-                  ? 'border-dashed border-[#D5D5D5]'
-                  : ''
-              }`}
-            >
-              <p className="text-[10px] font-semibold text-[#6B7C93] mb-1.5">
-                {msg.role === 'user' ? 'You' : 'Claude'}
-              </p>
-              <div className="whitespace-pre-wrap">
-                {/* Show streaming content for the active incomplete message */}
-                {msg.incomplete && isStreaming && streamingContent
-                  ? streamingContent
-                  : msg.content}
-              </div>
-            </div>
+        {messages.map((msg) => {
+          const anim = getMessageAnimation(msg.id)
+          const isGhostText = msg.incomplete && !isStreaming
 
-            {/* Ghost text continue button */}
-            {msg.incomplete && !isStreaming && msg.content && (
-              <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                onClick={() => handleContinue(msg.id)}
-                className="mt-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-[#4A7AE5] border border-[#EBEBEB] hover:border-[#4A7AE5] transition-colors"
+          return (
+            <motion.div
+              key={msg.id}
+              initial={anim.initial}
+              animate={{
+                ...anim.animate,
+                opacity: isGhostText ? 0.55 : 1,
+              }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className={`max-w-2xl ${msg.role === 'user' ? 'ml-auto' : 'mr-auto'}`}
+            >
+              <div
+                className={`px-4 py-3 rounded-xl text-sm leading-relaxed ${
+                  msg.role === 'user'
+                    ? 'bg-[#F5F5F5] text-[#1E2532]'
+                    : 'border border-[#EBEBEB] text-[#1E2532]'
+                } ${
+                  isGhostText ? 'border-dashed border-[#D5D5D5]' : ''
+                }`}
               >
-                Continue
-              </motion.button>
-            )}
-          </motion.div>
-        ))}
+                <p className="text-[10px] font-semibold text-[#6B7C93] mb-1.5">
+                  {msg.role === 'user' ? 'You' : 'Claude'}
+                </p>
+                <div className="whitespace-pre-wrap">
+                  {msg.incomplete && isStreaming && streamingContent
+                    ? streamingContent
+                    : msg.content}
+                </div>
+              </div>
+
+              {/* Ghost text continue button */}
+              {isGhostText && msg.content && (
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  onClick={() => handleContinue(msg.id)}
+                  className="mt-2 px-3 py-1.5 rounded-lg text-xs font-semibold text-[#4A7AE5] border border-[#EBEBEB] hover:border-[#4A7AE5] transition-colors"
+                >
+                  Continue
+                </motion.button>
+              )}
+            </motion.div>
+          )
+        })}
 
         <div ref={messagesEndRef} />
       </div>
