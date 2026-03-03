@@ -75,6 +75,7 @@ export default function ChatView() {
 
   const handleSend = useCallback(async () => {
     const trimmed = inputValue.trim()
+    console.log('SEND DEBUG:', { trimmed, isStreaming, hasKey: !!apiKey })
     if (!trimmed) return // Empty input silently ignored
     if (isStreaming) return
     if (!apiKey) {
