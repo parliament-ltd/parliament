@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useRef, useCallback } from 'react'
+import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
 import { getMessages, addMessage, updateMessage } from '../lib/db'
 
 const ChatContext = createContext(null)
@@ -17,6 +17,12 @@ export function ChatProvider({ children }) {
   const streamingMessageIdRef = useRef(null)
   const persistIntervalRef = useRef(null)
   const latestContentRef = useRef('')
+  const messagesRef = useRef([])
+
+  // Keep messagesRef in sync with state
+  useEffect(() => {
+    messagesRef.current = messages
+  }, [messages])
 
   // Load messages for a conversation from IndexedDB
   const loadMessages = useCallback(async (conversationId) => {
@@ -88,14 +94,22 @@ export function ChatProvider({ children }) {
     startPersistInterval()
 
     try {
-      // Build message history for API call (exclude the empty assistant placeholder)
-      let history
-      setMessages(current => {
-        history = current
-          .filter(m => m.id !== assistantMsg.id)
-          .map(m => ({ role: m.role, content: m.content }))
-        return current
-      })
+      // Build message history for API call from the ref (synchronous read).
+      // Exclude the empty assistant placeholder we just added.
+      // Also include the user message we just created in case the ref
+      // hasn't caught up yet via the useEffect.
+      const currentMessages = messagesRef.current
+      const historyMessages = currentMessages.filter(m => m.id !== assistantMsg.id)
+
+      // If the user message we just added isn't in the ref yet, append it
+      const hasUserMsg = historyMessages.some(m => m.id === userMsg.id)
+      if (!hasUserMsg) {
+        historyMessages.push(userMsg)
+      }
+
+      const history = historyMessages
+        .filter(m => m.content) // Exclude any empty messages
+        .map(m => ({ role: m.role, content: m.content }))
 
       // 5. Call provider with streaming
       const response = await provider.sendMessage(
@@ -172,22 +186,14 @@ export function ChatProvider({ children }) {
 
   // Continue from an interrupted (ghost text) message
   const continueMessage = useCallback(async (apiKey, incompleteMessageId, model, provider) => {
-    let incompleteMsg = null
-    let priorMessages = []
-
-    setMessages(current => {
-      incompleteMsg = current.find(m => m.id === incompleteMessageId)
-      if (incompleteMsg) {
-        const msgIndex = current.indexOf(incompleteMsg)
-        priorMessages = current.slice(0, msgIndex).map(m => ({
-          role: m.role,
-          content: m.content,
-        }))
-      }
-      return current
-    })
-
+    const currentMessages = messagesRef.current
+    const incompleteMsg = currentMessages.find(m => m.id === incompleteMessageId)
     if (!incompleteMsg) return
+
+    const msgIndex = currentMessages.indexOf(incompleteMsg)
+    const priorMessages = currentMessages.slice(0, msgIndex)
+      .filter(m => m.content)
+      .map(m => ({ role: m.role, content: m.content }))
 
     // The continue instruction lives as a constant in the provider abstraction
     const continueInstruction = provider.getContinueInstruction()
