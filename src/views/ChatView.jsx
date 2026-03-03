@@ -16,7 +16,11 @@ const SEND_DEBOUNCE_MS = 500
 export default function ChatView() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { messages, isStreaming, streamingContent, loadMessages, sendMessage, continueMessage, stopGenerating, clearMessages } = useChat()
+  const {
+    messages, isStreaming, streamingContent,
+    loadMessages, sendMessage, continueMessage,
+    stopGenerating, clearMessages
+  } = useChat()
   const { updateConversation } = useConversations()
   const { settings, refreshStorageEstimate } = useSettings()
 
@@ -29,34 +33,44 @@ export default function ChatView() {
   const inputRef = useRef(null)
   const lastSendTimeRef = useRef(0)
 
+  // Store stable references for cleanup
+  const clearMessagesRef = useRef(clearMessages)
+  clearMessagesRef.current = clearMessages
+
   // Load conversation messages and API key on mount
   useEffect(() => {
+    let cancelled = false
+
     async function init() {
       try {
         const key = await loadApiKey(settings.storageMode)
-        setApiKey(key)
+        if (!cancelled) setApiKey(key)
         await loadMessages(id)
       } catch {
         // Conversation may not exist
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
     init()
-    return () => clearMessages()
-  }, [id, settings.storageMode, loadMessages, clearMessages])
+
+    return () => {
+      cancelled = true
+      clearMessagesRef.current()
+    }
+  }, [id, settings.storageMode, loadMessages])
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, streamingContent])
 
-  // Clear rate limit error on successful send
+  // Clear rate limit error on next successful non-streaming state
   useEffect(() => {
     if (!isStreaming && apiError?.type === 'rate_limit') {
       setApiError(null)
     }
-  }, [isStreaming, apiError])
+  }, [isStreaming]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSend = useCallback(async () => {
     const trimmed = inputValue.trim()
@@ -221,6 +235,17 @@ export default function ChatView() {
         </motion.div>
       )}
 
+      {/* Generic error inline */}
+      {apiError?.type === 'generic' && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="px-6 py-1.5"
+        >
+          <p className="text-xs text-[#EF4444]">{apiError.message}</p>
+        </motion.div>
+      )}
+
       {/* Input */}
       <div className="border-t border-[#F0F0F0] px-6 py-4">
         <div className="flex items-end gap-3 max-w-2xl mx-auto">
@@ -238,7 +263,11 @@ export default function ChatView() {
             whileTap={{ scale: 0.95 }}
             transition={SPRING_SNAPPY}
             onClick={isStreaming ? stopGenerating : handleSend}
-            className="p-2.5 rounded-lg border border-[#EBEBEB] bg-white text-[#6B7C93] hover:border-[#4A7AE5] hover:text-[#4A7AE5] transition-colors flex-shrink-0"
+            className={`p-2.5 rounded-lg border bg-white flex-shrink-0 transition-colors ${
+              isStreaming
+                ? 'border-[#EF4444]/30 text-[#EF4444] hover:border-[#EF4444]'
+                : 'border-[#EBEBEB] text-[#6B7C93] hover:border-[#4A7AE5] hover:text-[#4A7AE5]'
+            }`}
           >
             <AnimatePresence mode="wait">
               {isStreaming ? (
