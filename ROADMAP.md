@@ -55,6 +55,7 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
 - **Chat interface:** `chat-interface-final.jsx` — Main conversation view with left sidebar (TOC, quick actions), chat area, right sidebar (highlights, branches, context meter). Includes ReviewModal and CollabModal.
 - **Chat selector:** `chat-selector.jsx` — Table-based conversation list with search, sort, bulk actions, expandable branches.
 - **Settings:** `settings.jsx` — Left nav with 7 sections: API Configuration, Model Preferences, Usage & Spending, Context & Defaults, Data & Backups, Appearance, About & Security. Includes encrypted export/import modals with passphrase flow.
+- **Branch creation panel:** `branch-panel-v3.jsx` — Branch creation panel with Full History / Compressed Summary modes, inline context meter, and savings animation.
 
 ---
 
@@ -73,10 +74,7 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
     views/            # Route-level pages (ChatView, SelectorView, SettingsView)
     lib/              # Utilities (db.js, crypto.js, tokens.js)
     providers/        # API provider abstraction (base.js, anthropic.js)
-    stores/           # State management (React Context, split by concern)
-                      #   SettingsContext.jsx — app settings, read often, changed rarely
-                      #   ConversationContext.jsx — conversation list, active conversation metadata
-                      #   ChatContext.jsx — active conversation streaming state, messages in flight
+    stores/           # State management (React context or zustand)
     assets/           # Static assets
   ```
 - Set up ESLint with React config
@@ -116,6 +114,7 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
   - `ContextMeter`, `Sidebar`, `ChatArea`
 - Decompose `chat-selector.jsx` into: `ChatTableRow`, `BranchRow`, `Checkbox`, `InlineAction`
 - Decompose `settings.jsx` into: `SettingsSection`, `SettingsCard`, `InfoTooltip`, `ToggleSwitch`, export/import modals
+- Decompose `branch-panel-v3.jsx` into: `BranchCreationPanel`, `ContextProjection`, `SummaryPreview`
 - Move shared components (buttons, inputs, modals) to `/components`
 - Replace hardcoded mock data with props where possible (still using dummy data, but passed in rather than inline)
 - Verify all animations work correctly in the real app context
@@ -131,8 +130,8 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
 **Tasks:**
 - Create `src/lib/db.js` using the `idb` library
 - Define the database schema (version 1):
-  - **conversations** store: `{ id, title, createdAt, updatedAt, pinned, model, parentId (for branches) }`
-  - **messages** store: `{ id, conversationId, role, content, createdAt, tokenCount }`
+  - **conversations** store: `{ id, title, createdAt, updatedAt, pinned, model, parentId (for branches), storageBytes }`
+  - **messages** store: `{ id, conversationId, role, content, createdAt, tokenCount, incomplete }`
   - **highlights** store: `{ id, conversationId, messageId, text, color }`
   - **notes** store: `{ id, conversationId, messageId, text, createdAt }`
   - **favorites** store: `{ id, conversationId, messageId }`
@@ -140,11 +139,14 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
   - **settings** store: `{ key, value }` (key-value pairs for all settings)
 - Write CRUD functions for each store:
   - `createConversation()`, `getConversation()`, `listConversations()`, `updateConversation()`, `deleteConversation()`
-  - `addMessage()`, `getMessages(conversationId)`, `deleteMessage()`
+  - `addMessage()`, `getMessages(conversationId)`, `updateMessage()`, `deleteMessage()`
   - Similar for highlights, notes, favorites, pins
   - `getSetting(key)`, `setSetting(key, value)`
 - Write a `clearAllData()` function for the danger zone
-- Add indexes: `conversationId` on messages/highlights/notes/favorites, `updatedAt` on conversations
+- Write a `getStorageEstimate()` function wrapping `navigator.storage.estimate()`
+- Write a `runIntegrityCheck()` function for startup (see Step 15)
+- Add indexes: `conversationId` on messages/highlights/notes/favorites, `targetConversationId` on pins, `updatedAt` on conversations
+- The `incomplete` field on messages defaults to `false`. Set to `true` during incremental streaming persistence and stream failures. Messages with `incomplete: true` render in ghost text style
 
 **Done when:** You can import db.js and create/read/update/delete all data types from the browser console.
 
@@ -186,15 +188,21 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
   // countTokens(apiKey, messages, model) → { inputTokens, outputTokens }
   ```
 - Create `src/providers/anthropic.js` — implements the interface:
-  - `validateKey`: call `/v1/messages` with a minimal prompt, check for 200
+  - `validateKey`: call `/v1/messages` with a minimal prompt, check for 200. Differentiate error types:
+    - 401 → invalid/revoked key
+    - 403 / billing error → account issue (insufficient credits, payment failure)
+    - 200 → valid
   - `sendMessage`: call `/v1/messages` with streaming enabled, call `onChunk` callback as tokens arrive
   - `getModels`: return hardcoded list of Haiku, Sonnet, Opus with costs and context windows
   - `countTokens`: call `/v1/messages/count_tokens` endpoint
+- Define the continue instruction as a constant in the provider abstraction:
+  > "Your previous response was interrupted. The partial response above is what was delivered. Continue exactly from where you left off — do not repeat, summarize, or restart any content that already appears above. Maintain the same tone, structure, and formatting."
 - Create `src/providers/index.js` — exports a `getProvider(name)` function, defaults to Anthropic
-- Handle errors gracefully: rate limits, invalid key, network failures, context length exceeded
+- Handle errors gracefully: rate limits (429 → inline message), invalid key (401 → re-enter prompt), billing errors (403 → dashboard link), network failures, context length exceeded
 - Handle CORS: Anthropic's API supports direct browser requests with the API key in the header
+- Note: Anthropic API keys do not expire automatically. Do not use the word "expired" in user-facing copy
 
-**Done when:** You can call `provider.sendMessage()` and get a streaming response from Claude in the browser.
+**Done when:** You can call `provider.sendMessage()` and get a streaming response from Claude in the browser. Validation differentiates invalid key vs billing issue.
 
 ---
 
@@ -205,14 +213,23 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
 **Tasks:**
 - Connect the text input and send button to `provider.sendMessage()`
 - Stream response tokens into the message list in real time (append to assistant message as chunks arrive)
+- **Incremental streaming persistence:** every ~3 seconds (or ~100 tokens), persist a snapshot of the assistant message to IndexedDB marked `incomplete: true`. On stream completion, final write flips to `incomplete: false`. Uses a throttled fire-and-forget pattern — writes in the background without blocking stream rendering
 - Save each user message and completed assistant message to IndexedDB
 - Load conversation history from IndexedDB when navigating to `/chat/:id`
 - Show a typing/streaming indicator while the response is generating
 - Handle the "stop generating" action
+- **Send button behavior:**
+  - Idle → "Send" button. Enabled when textarea has non-whitespace content
+  - Streaming → transforms to Stop button (square icon, subtle red tint). SPRING_SNAPPY transition
+  - Textarea remains editable during streaming (user can pre-compose). Enter while streaming triggers stop
+  - 500ms debounce guard on send handler. Empty/whitespace input silently ignored
+- **Token count indicator:** show estimated token cost of current input next to send button. Warning amber if >25% of remaining context. Informational only — never blocks
 - Display token counts per message (from API response usage data)
 - Wire the context meter to show real cumulative token usage vs. the model's context window
+- **Mid-conversation key failure:** when send fails with 401 or billing error, show persistent banner above input: "Your API key is no longer working. Your conversation is safe — update your key in Settings to continue." Secondary line suggests exporting chat history
+- **Rate limit handling:** on 429, show brief inline message below input that auto-clears on next successful send
 
-**Done when:** You can have a real conversation with Claude, close the browser, reopen, and see the conversation preserved.
+**Done when:** You can have a real conversation with Claude, close the browser, reopen, and see the conversation preserved. Send button transforms during streaming. Key failures and rate limits show appropriate messages.
 
 ---
 
@@ -223,15 +240,18 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
 **Tasks:**
 - Load conversations from IndexedDB on mount, sorted by `updatedAt` desc
 - Make search filter across conversation titles
-- Make column sorting work (last edited, created)
+- Make column sorting work (last edited, created, size)
 - "New Chat" creates a conversation in IndexedDB and navigates to `/chat/:id`
 - Clicking a row navigates to that conversation
 - Wire bulk actions: delete selected, pin/unpin
+- **Per-conversation size indicator:** show approximate storage size (subtle secondary text) for each conversation row
+- **Bulk action size total:** when selecting multiple conversations, show combined size: "3 selected — 12.7 MB"
 - Show branch count badges from real data
 - Expand/collapse to show real branches
-- Auto-generate conversation titles: after the first user→assistant exchange, send a lightweight summarization call to Claude in the background to generate a short title. Display it automatically in the chat selector. Users can click-to-edit titles inline to rename (no dedicated input box).
+- Auto-generate conversation titles: after the first user→assistant exchange, send a lightweight summarization call to Claude in the background to generate a short title. Display it automatically in the chat selector. Users can click-to-edit titles inline to rename
+- **Storage warning banner:** when storage usage exceeds 80%, show a subtle amber banner at top of conversation list suggesting export or cleanup
 
-**Done when:** Creating, finding, opening, and deleting conversations all work end-to-end.
+**Done when:** Creating, finding, opening, and deleting conversations all work end-to-end. Per-conversation size is visible. Storage warning appears when appropriate.
 
 ---
 
@@ -252,13 +272,22 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
     3. The new branch starts with the summary as its foundation — clean context window
     4. The original conversation is preserved intact as a full archive
   - The user continues chatting in the new branch
+  - **Branch creation uses a single IndexedDB transaction** spanning both the conversations and messages stores for atomicity
 - Update token counts in real time as messages stream in
 - **Message transfer from original branch — two options:**
   - "Send to branch" — injects the selected message into the active branch's context (uses tokens, Claude sees it). Show token count per message during selection (e.g., "~340 tokens")
   - "Pin for reference" — displays the message as a collapsible quote block in the UI. Visual only, no token cost, Claude does not see it
-- Users can navigate back to the original branch at any time to find messages, make corrections, or transfer additional content
+- Users can navigate back to the original branch at any time to find messages or transfer additional content
+- **Stream failure recovery (ghost text):**
+  - When a stream fails mid-response (no `stop_reason: "end_turn"`), save the partial message to IndexedDB marked as `incomplete`
+  - Render the entire partial message at reduced opacity (~50-60%) to signal provisional state
+  - Show a thin dashed border with a slow pulsing dot and "Response interrupted" label at the break point
+  - Display a compact pill-style "Continue" button (accent blue on hover) at the break point
+  - On continue: send the conversation back to the API including the partial response, with the continue instruction from the provider abstraction
+  - As the continuation streams in, progressively fade the ghost text back to full opacity
+  - If the continuation also fails, return to ghost state
 
-**Done when:** The context meter reflects real usage. When the threshold is crossed, a new branch is created with a summary. The user can transfer or pin messages from the original branch into the new one.
+**Done when:** The context meter reflects real usage. When the threshold is crossed, a new branch is created with a summary. The user can transfer or pin messages from the original branch into the new one. Stream failures show ghost text with a continue option.
 
 ---
 
@@ -284,17 +313,23 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
 
 ## Step 11: Build Conversation Branching
 
-**Goal:** Fork conversations at any message to explore alternative paths.
+**Goal:** Fork conversations at any message to explore alternative paths, with the option to compress history at branch time.
 
 **Tasks:**
 - Data model: a branch is a new conversation with `parentId` pointing to the original, plus a `branchPoint` (message ID where it forked)
-- "Branch from here" action on a message: creates a new conversation, copies messages up to that point, navigates to the new branch
+- "Branch from here" action on a message opens the **branch creation panel** (reference `branch-panel-v3.jsx`):
+  - Two modes: **Full History** (copies all messages up to the fork point) or **Compressed Summary** (generates a Claude summary, branch starts with clean context)
+  - Panel shows an inline context meter displaying the projected context usage for each mode
+  - Compressed mode shows savings (e.g., "62% → ~8% context"), with a collapsible preview of the summary before committing
+  - **Summary pre-generation timing:** savings percentage and context projection display immediately (calculated locally). The actual summary text generates only when the user clicks "Preview summary" for the first time. Result is cached in component state for the panel session. "Create Branch" is enabled without requiring a preview
+  - Context meter animates to reflect the new percentage when the user selects a mode and creates the branch
+  - **Branch creation uses a single IndexedDB transaction** spanning conversations and messages stores
 - Left sidebar shows branches for the current conversation
 - Chat selector shows branches nested under parent conversations (already designed in the UI)
 - Switching between branches preserves scroll position in each
 - Branch indicator on messages that have branches forking from them
 
-**Done when:** You can branch a conversation, continue both paths independently, and navigate between them.
+**Done when:** You can branch a conversation with either full history or compressed summary, continue both paths independently, see the context savings reflected in the meter, and navigate between branches.
 
 ---
 
@@ -341,8 +376,10 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
   - Backup reminder frequency → banner logic on chat selector
 - Spending limit guidance callout: track dismissed/confirmed state
 - Backup reminder logic: compare last backup timestamp against frequency setting, show banner on chat selector if overdue
+- **Storage monitoring:** check `navigator.storage.estimate()` on startup and after writes. Store in context. Surface warnings at 80% (amber) and 95% (critical red) thresholds in chat selector and chat view respectively
+- **Settings → Data & Backups storage section:** storage bar with used/quota, conversation count, message count
 
-**Done when:** Changing any setting persists across sessions and affects the relevant feature.
+**Done when:** Changing any setting persists across sessions and affects the relevant feature. Storage usage is visible in settings.
 
 ---
 
@@ -351,7 +388,7 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
 **Goal:** The app is live on the internet with proper security headers.
 
 **Tasks:**
-- Deploy to Netlify (confirmed choice for simpler header configuration):
+- Configure hosting (Netlify recommended for simpler header config):
   - `netlify.toml` or `_headers` file with:
     ```
     Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; font-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'self'
@@ -374,18 +411,24 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
 **Goal:** A stable v0.1.0 that handles real usage gracefully.
 
 **Tasks:**
+- **Startup integrity check:** on app load, scan for orphaned conversations (zero messages) and unresolved `incomplete: true` messages. Orphaned conversations silently deleted. Incomplete messages rendered in ghost text state. No crash notification UI
 - End-to-end testing of critical flows:
   - First-time setup: enter API key → validate → send first message
   - Long conversation: 20+ messages, context meter updates correctly
   - Export → clear all data → import with passphrase → everything restored
   - Branch creation and switching
   - Settings persist across sessions
-- Edge cases:
-  - Network failure mid-stream (show error, preserve partial response)
-  - Invalid/expired API key (clear error message)
-  - Very long messages (rendering performance)
-  - Empty states (no conversations, no highlights, no notes)
-  - Browser storage full (graceful error)
+- Edge case testing:
+  - Network failure mid-stream → ghost text with continue option, partial message preserved via incremental persistence
+  - Invalid API key → "This API key is not valid. Please check your key and try again." with red input border
+  - Billing/account issue → amber warning directing to Anthropic dashboard
+  - Mid-conversation key failure → persistent banner above input with Settings and export guidance
+  - Rate limit (429) → brief inline message below input, auto-clears on success
+  - Rapid-fire sends → send button disabled (transformed to Stop), 500ms debounce guard, empty input silently ignored
+  - Very long messages → token count indicator next to send button, warning amber if >25% of remaining context
+  - Empty states → designed placeholder with icon and call to action for each empty view (no conversations, no highlights, no notes, no favorites)
+  - Browser storage full → warnings at 80%/95%, per-conversation size in selector, QuotaExceededError handled with modal and export option
+  - Tab crash during streaming → on reopen, incomplete messages appear as ghost text with continue option (indistinguishable from network failure)
 - Write the README with:
   - What it is, screenshot, key features
   - How to get an Anthropic API key
@@ -410,3 +453,9 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
 - Docker self-host option (Phase 3)
 - Collaboration mode presets (already in UI, needs backend logic)
 - Review modal with AI-generated synthesis
+- Automatic retry/stitching for interrupted streams (opt-in setting, default off)
+- Key age tracking with rotation reminders (Anthropic recommends 60-90 day rotation)
+- Multi-key support (when multi-provider lands)
+- Message queuing during streaming (if user demand exists)
+- Semantic caching for multi-model comparison workflows
+- Message list virtualization (if performance issues arise with very long conversations)
