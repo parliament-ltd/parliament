@@ -3,6 +3,13 @@ import { BaseProvider } from './base'
 const API_BASE = 'https://api.anthropic.com/v1'
 const API_VERSION = '2023-06-01'
 
+const TITLE_SYSTEM_PROMPT = `Generate a short title (2-6 words) for this conversation. Rules:
+- No quotes, no periods, no special characters
+- Capture the core topic or intent
+- Be specific, not generic (e.g. "React Router Migration" not "Coding Help")
+- Title case
+- Respond with ONLY the title, nothing else`
+
 export class AnthropicProvider extends BaseProvider {
   getModels() {
     return [
@@ -185,5 +192,51 @@ export class AnthropicProvider extends BaseProvider {
 
     const data = await response.json()
     return { inputTokens: data.input_tokens }
+  }
+
+  async generateTitle(apiKey, messages) {
+    // Take at most the first 2 messages (first user + assistant exchange)
+    // and truncate long content to keep the request small and cheap
+    const titleMessages = messages.slice(0, 2).map(msg => ({
+      role: msg.role,
+      content: typeof msg.content === 'string'
+        ? msg.content.slice(0, 500)
+        : msg.content,
+    }))
+
+    titleMessages.push({
+      role: 'user',
+      content: 'Based on our exchange above, generate a short title for this conversation.',
+    })
+
+    const response = await fetch(`${API_BASE}/messages`, {
+      method: 'POST',
+      headers: this._headers(apiKey),
+      body: JSON.stringify({
+        model: this._resolveModel('claude-haiku'),
+        max_tokens: 30,
+        system: TITLE_SYSTEM_PROMPT,
+        messages: titleMessages,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Title generation failed: ${response.status}`)
+    }
+
+    const data = await response.json()
+    const rawTitle = data.content?.[0]?.text?.trim() ?? ''
+
+    // Clean up: remove quotes, periods, and excessive whitespace
+    const cleanTitle = rawTitle
+      .replace(/^["']|["']$/g, '')
+      .replace(/\.$/, '')
+      .trim()
+
+    if (cleanTitle.length === 0 || cleanTitle.length > 60) {
+      throw new Error('Generated title was empty or too long')
+    }
+
+    return cleanTitle
   }
 }
