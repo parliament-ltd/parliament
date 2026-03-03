@@ -67,6 +67,7 @@ export async function createConversation({ title = 'New Conversation', model = '
     parentId,
     branchPoint,
     pinned: false,
+    storageBytes: 0,
     createdAt: now,
     updatedAt: now,
   }
@@ -121,7 +122,7 @@ export async function deleteConversation(id) {
 
 // ─── Messages ────────────────────────────────────────────
 
-export async function addMessage({ conversationId, role, content, tokenCount = 0 }) {
+export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false }) {
   const db = await initDB()
   const message = {
     id: generateId(),
@@ -129,6 +130,7 @@ export async function addMessage({ conversationId, role, content, tokenCount = 0
     role,
     content,
     tokenCount,
+    incomplete,
     createdAt: new Date().toISOString(),
   }
   await db.put('messages', message)
@@ -146,6 +148,15 @@ export async function getMessages(conversationId) {
   const db = await initDB()
   const messages = await db.getAllFromIndex('messages', 'conversationId', conversationId)
   return messages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+}
+
+export async function updateMessage(id, updates) {
+  const db = await initDB()
+  const existing = await db.get('messages', id)
+  if (!existing) throw new Error(`Message not found: ${id}`)
+  const updated = { ...existing, ...updates }
+  await db.put('messages', updated)
+  return updated
 }
 
 export async function deleteMessage(id) {
@@ -274,6 +285,32 @@ export async function getSetting(key) {
 export async function setSetting(key, value) {
   const db = await initDB()
   await db.put('settings', { key, value })
+}
+
+// ─── Storage Monitoring ──────────────────────────────────
+
+export async function getStorageEstimate() {
+  if (navigator.storage && navigator.storage.estimate) {
+    const { usage, quota } = await navigator.storage.estimate()
+    return { usage, quota }
+  }
+  return { usage: 0, quota: 0 }
+}
+
+// ─── Startup Integrity Check ─────────────────────────────
+
+export async function runIntegrityCheck() {
+  const db = await initDB()
+  const conversations = await db.getAll('conversations')
+
+  for (const conv of conversations) {
+    const messages = await db.getAllFromIndex('messages', 'conversationId', conv.id)
+    if (messages.length === 0) {
+      await deleteConversation(conv.id)
+    }
+  }
+  // Messages with incomplete: true are intentionally left as-is.
+  // They render in ghost text state with Continue/dismiss options.
 }
 
 // ─── Export / Import ─────────────────────────────────────
