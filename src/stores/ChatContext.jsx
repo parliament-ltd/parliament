@@ -36,7 +36,7 @@ export function ChatProvider({ children }) {
   }, [])
 
   // Start incremental persistence during streaming
-  function startPersistInterval() {
+  const startPersistInterval = useCallback(() => {
     persistIntervalRef.current = setInterval(async () => {
       const msgId = streamingMessageIdRef.current
       const content = latestContentRef.current
@@ -48,17 +48,17 @@ export function ChatProvider({ children }) {
         }
       }
     }, PERSIST_INTERVAL)
-  }
+  }, [])
 
-  function stopPersistInterval() {
+  const stopPersistInterval = useCallback(() => {
     if (persistIntervalRef.current) {
       clearInterval(persistIntervalRef.current)
       persistIntervalRef.current = null
     }
-  }
+  }, [])
 
   // Send a message and handle streaming response
-  async function sendMessage(apiKey, conversationId, userContent, model, provider) {
+  const sendMessage = useCallback(async (apiKey, conversationId, userContent, model, provider) => {
     // 1. Add user message to state and IndexedDB
     const userMsg = await addMessage({
       conversationId,
@@ -88,11 +88,14 @@ export function ChatProvider({ children }) {
     startPersistInterval()
 
     try {
-      // Build message history for API call (exclude incomplete content)
-      const history = [...messages, userMsg].map(m => ({
-        role: m.role,
-        content: m.content,
-      }))
+      // Build message history for API call (exclude the empty assistant placeholder)
+      let history
+      setMessages(current => {
+        history = current
+          .filter(m => m.id !== assistantMsg.id)
+          .map(m => ({ role: m.role, content: m.content }))
+        return current
+      })
 
       // 5. Call provider with streaming
       const response = await provider.sendMessage(
@@ -165,19 +168,26 @@ export function ChatProvider({ children }) {
       latestContentRef.current = ''
       abortControllerRef.current = null
     }
-  }
+  }, [startPersistInterval, stopPersistInterval])
 
   // Continue from an interrupted (ghost text) message
-  async function continueMessage(apiKey, incompleteMessageId, model, provider) {
-    const incompleteMsg = messages.find(m => m.id === incompleteMessageId)
-    if (!incompleteMsg) return
+  const continueMessage = useCallback(async (apiKey, incompleteMessageId, model, provider) => {
+    let incompleteMsg = null
+    let priorMessages = []
 
-    // Build history up to and including the partial response
-    const msgIndex = messages.indexOf(incompleteMsg)
-    const priorMessages = messages.slice(0, msgIndex).map(m => ({
-      role: m.role,
-      content: m.content,
-    }))
+    setMessages(current => {
+      incompleteMsg = current.find(m => m.id === incompleteMessageId)
+      if (incompleteMsg) {
+        const msgIndex = current.indexOf(incompleteMsg)
+        priorMessages = current.slice(0, msgIndex).map(m => ({
+          role: m.role,
+          content: m.content,
+        }))
+      }
+      return current
+    })
+
+    if (!incompleteMsg) return
 
     // The continue instruction lives as a constant in the provider abstraction
     const continueInstruction = provider.getContinueInstruction()
@@ -261,22 +271,22 @@ export function ChatProvider({ children }) {
       latestContentRef.current = ''
       abortControllerRef.current = null
     }
-  }
+  }, [startPersistInterval, stopPersistInterval])
 
   // Stop an in-progress generation
-  function stopGenerating() {
+  const stopGenerating = useCallback(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
     }
-  }
+  }, [])
 
   // Clear messages (when switching conversations)
-  function clearMessages() {
+  const clearMessages = useCallback(() => {
     setMessages([])
     setStreamingContent('')
     setTokenUsage({ input: 0, output: 0 })
     setActiveConversationId(null)
-  }
+  }, [])
 
   return (
     <ChatContext.Provider value={{
