@@ -120,6 +120,170 @@ When viewing the original branch, the user can select specific messages to bring
 - **"Send to branch"** — injects the message content into the active branch's context. Claude sees it on the next API call. Uses tokens. Show a token count per message during selection (e.g., "~340 tokens") so users can be intentional about context space
 - **"Pin for reference"** — displays the message as a collapsible quote block in the UI. Visual only, does not use tokens, Claude does not see it. Useful for keeping wording or details handy without consuming context
 
+### Compression at Branch Time
+
+Compression is not limited to threshold-triggered events. When a user clicks "Branch from here" on any message, the branch creation panel offers two modes:
+
+- **Full History:** copies all messages up to the fork point into the new branch. Context usage stays the same.
+- **Compressed Summary:** generates a Claude summary of the conversation so far. The new branch starts with just the summary, giving a clean context window.
+
+The panel includes:
+- An inline context meter showing projected context usage for the selected mode
+- For Compressed Summary: a savings display (e.g. 62% to 8% context, frees up 54%) and a collapsible summary preview with token count before committing
+- The context meter animates to reflect the new percentage when the branch is created
+- "(saves context)" appears as a green parenthetical next to the Compressed Summary title
+
+Panel design follows the modal pattern: white bg, border #EBEBEB rounded-xl shadow-2xl shadow-black/10, backdrop rgba(0,0,0,0.2). Branch icon uses accent-purple #7C6CD4. Primary CTA uses the gradient from #4A7AE5 to #7C6CD4. Radio-style selection with filled circle on active.
+
+### Summary Pre-Generation Timing
+
+The compressed summary is not pre-generated when the panel opens. Instead:
+1. Savings percentage and context projection display immediately when Compressed Summary is selected (calculated locally from token counts — no API call)
+2. The actual summary text generates only when the user clicks "Preview summary" for the first time
+3. The result is cached in component state for the rest of the panel session (switching modes and back reuses the cache)
+4. Closing and reopening the panel clears the cache (conversation may have changed since)
+5. "Create Branch" is enabled without requiring a preview — users can commit without reading the summary
+
+## Stream Failure Recovery (Ghost Text)
+
+When a streaming response fails mid-output (no `stop_reason: "end_turn"` received), the system preserves the partial response and gives the user a clear path to resume.
+
+**Behavior:**
+1. Save the partial message to IndexedDB with an `incomplete: true` flag
+2. Render the entire partial message at 50-60% opacity to signal provisional state without hiding useful content
+3. At the break point, show a thin dashed border with a slow pulsing dot and "Response interrupted" label
+4. Display a compact pill-style "Continue" button at the break point (accent blue #4A7AE5 on hover)
+5. On click: send the conversation back to the API including the partial response, with a trailing instruction to continue from where it left off
+6. As the continuation streams in, progressively fade the ghost text back to full opacity. The user sees the message heal in real time
+7. If the continuation also fails, return to ghost state with the same recovery option
+
+**Design rationale:** The entire message is faded (not just the tail) because Claude may have been building toward a conclusion that reframes earlier content. Treating it all as provisional is more honest. Ghost text was chosen over a progress stepper because Claude output structure is unpredictable, and a stepper would require forced structured output. The continue action is explicit rather than automatic to respect the user API budget and maintain transparency. Automatic retry/stitching is deferred to V2+ as an opt-in setting.
+
+### Continue Instruction Phrasing
+
+When the user clicks Continue, the API call appends the partial response as an assistant message followed by a user message with a continuation instruction:
+
+```
+[...prior messages, { role: "assistant", content: partialResponse }, { role: "user", content: continueInstruction }]
+```
+
+Starting phrasing (lives as a constant in the provider abstraction):
+
+> "Your previous response was interrupted. The partial response above is what was delivered. Continue exactly from where you left off — do not repeat, summarize, or restart any content that already appears above. Maintain the same tone, structure, and formatting."
+
+This should be tested against different interruption types (mid-sentence, mid-list, mid-code-block) during implementation.
+
+### Incremental Streaming Persistence
+
+During streaming, the assistant message is persisted incrementally to protect against tab/browser crashes:
+
+- Every ~3 seconds (or ~100 tokens), update the message record in IndexedDB with content so far, marked `incomplete: true`
+- On stream completion, final write flips to `incomplete: false`
+- Uses a throttled fire-and-forget pattern — writes happen in the background without blocking stream rendering
+- A crash during streaming becomes indistinguishable from a network failure: on reopen, the user sees ghost text with a Continue button
+
+## API Key Validation and Error Handling
+
+### Key Validation (Settings Page)
+
+The "Validate" button fires a lightweight API call to `/v1/messages` with a minimal prompt. The response determines the feedback:
+
+| HTTP Status | keyStatus | Message | Color |
+|------------|-----------|---------|-------|
+| 200 | `valid` | "API key is valid — connected to Anthropic" | Success green #22C55E |
+| 401 | `invalid` | "This API key is not valid. Please check your key and try again." | Error red #EF4444 |
+| 403 / billing | `billing_error` | "This API key was recognized but your account may have insufficient credits or a billing issue. Please check your Anthropic dashboard." | Warning amber #E5A620 |
+
+On invalid/error states, the input border also turns red (`border-[#EF4444]`). Both border and message reset when the user starts typing (onChange resets keyStatus to null).
+
+Note: Anthropic API keys do not expire automatically. Do not use the word "expired" in any user-facing copy. Keys become invalid when manually revoked or when the account has billing issues.
+
+### Mid-Conversation Key Failure
+
+When a send fails with a 401 or billing error during an active conversation:
+
+- Show a persistent banner above the input area (not a modal)
+- Primary text: "Your API key is no longer working. Your conversation is safe — update your key in Settings to continue."
+- Secondary text: "You can export your chat history from Settings → Data & Backups."
+- Banner persists until key is updated or manually dismissed
+- All conversation data remains in IndexedDB and in React state — nothing is lost
+
+### Rate Limit Handling
+
+When a send returns 429 (Too Many Requests):
+- Show a brief inline message below the input: "Rate limit reached. Please wait a moment before sending."
+- Message auto-clears when the next send succeeds
+- No countdown timer, no proactive rate limit tracking
+
+## Send Button Behavior
+
+### Streaming State
+
+The send button transforms based on the `isStreaming` flag in `ChatContext`:
+
+- **Idle:** "Send" button with standard styling. Enabled when textarea has non-whitespace content
+- **Streaming:** Button transforms to a Stop button (square stop icon, same dimensions, subtle red tint on border). Click aborts the in-flight stream
+- **Transition:** SPRING_SNAPPY animation between states
+
+The textarea remains editable during streaming. The user can pre-compose their next message. Hitting Enter while streaming triggers stop, not send.
+
+### Guards
+
+- 500ms debounce on the send handler (catches double-clicks and keyboard repeat)
+- Empty/whitespace-only input silently ignored (no error message, no feedback)
+- No message queuing, no semantic caching, no content filtering, no redundancy detection
+
+### Token Count Indicator
+
+Display the estimated token cost of the current input next to the send button. Uses the provider's `countTokens()` method or a client-side approximation. If the input would consume >25% of remaining context window, the indicator shifts to warning amber (#E5A620). This is informational only — never blocks sending.
+
+## Browser Storage Management
+
+### Storage Monitoring
+
+The app monitors browser storage via `navigator.storage.estimate()`:
+- Checked on app startup and after every IndexedDB write
+- Results stored in React context for component access
+- Warning threshold: 80% of quota. Critical threshold: 95%
+
+### User-Facing Indicators
+
+**Settings → Data & Backups:**
+- Storage bar showing used vs. quota (e.g., "47 MB of ~1.2 GB used") with a thin progress bar
+- Conversation count and total message count
+- Always visible — this is the user's storage dashboard
+
+**Chat selector (80%+ usage):**
+- Subtle amber banner at top of conversation list
+- Text: "Your browser storage is getting full. Consider exporting a backup or cleaning up old conversations."
+
+**Chat view (95%+ usage):**
+- Persistent red banner above the input area
+- Text with Export and Manage Chats action buttons
+
+### Making Cleanup Actionable
+
+- Per-conversation size indicator in the chat selector (subtle secondary text, always present)
+- Size as a sortable column in the conversation list (alongside last edited, created)
+- Selected-items size total in the bulk action bar: "3 selected — 12.7 MB"
+
+### Write Failure Handling
+
+On `QuotaExceededError`:
+- Message remains visible in React state but shows inline error: "This message couldn't be saved — storage is full."
+- Trigger a modal with export option and storage stats
+- No read-only mode — app stays functional in memory, persistence failures surfaced individually
+
+## Startup Integrity Check
+
+On app load, run a lightweight scan to detect and resolve inconsistencies from crashes:
+
+1. **Orphaned conversations** (zero messages): silently deleted
+2. **Incomplete messages** (`incomplete: true`): rendered in ghost text state with Continue/dismiss options
+3. **Multi-store atomicity**: branch creation and other multi-store operations wrapped in single IndexedDB transactions to prevent partial writes
+
+No "crash detected" modal or notification. The app simply looks correct on reopen.
+
 ## Review Modal
 
 The review modal synthesizes a conversation using Claude. It includes category toggles so the user controls what feeds into the review prompt:
@@ -155,6 +319,7 @@ The UI was designed in standalone `.jsx` mockup files before development began. 
 - `chat-interface-final.jsx` — Chat conversation view
 - `chat-selector.jsx` — Conversation list
 - `settings.jsx` — Settings page with all sections
+- `branch-panel-v3.jsx` — Branch creation panel with Full History / Compressed Summary modes, inline context meter, and savings animation
 
 ## What NOT to Do
 
