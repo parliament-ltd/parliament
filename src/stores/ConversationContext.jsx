@@ -32,40 +32,36 @@ export function ConversationProvider({ children }) {
   }, [])
 
   // Create a new conversation and return it
-  async function createNewConversation(options = {}) {
+  const createNewConversation = useCallback(async (options = {}) => {
     const conv = await createConversation(options)
     setConversations(prev => [conv, ...prev])
     return conv
-  }
+  }, [])
 
   // Update a conversation (title, pinned, storageBytes, etc.)
-  async function updateConv(id, updates) {
+  const updateConversation = useCallback(async (id, updates) => {
     const updated = await dbUpdateConversation(id, updates)
     setConversations(prev =>
       prev.map(c => (c.id === id ? updated : c))
     )
     return updated
-  }
+  }, [])
 
   // Delete a conversation and its related data
-  async function removeConversation(id) {
+  const removeConversation = useCallback(async (id) => {
     await deleteConversation(id)
     setConversations(prev => prev.filter(c => c.id !== id))
-    if (activeConversationId === id) {
-      setActiveConversationId(null)
-    }
-  }
+    setActiveConversationId(prev => prev === id ? null : prev)
+  }, [])
 
   // Bulk delete conversations
-  async function removeConversations(ids) {
+  const removeConversations = useCallback(async (ids) => {
     for (const id of ids) {
       await deleteConversation(id)
     }
     setConversations(prev => prev.filter(c => !ids.includes(c.id)))
-    if (ids.includes(activeConversationId)) {
-      setActiveConversationId(null)
-    }
-  }
+    setActiveConversationId(prev => ids.includes(prev) ? null : prev)
+  }, [])
 
   return (
     <ConversationContext.Provider value={{
@@ -74,10 +70,10 @@ export function ConversationProvider({ children }) {
       setActiveConversationId,
       loaded,
       loadConversations,
-      createNewConversation,
-      updateConversation: updateConv,
-      removeConversation,
-      removeConversations,
+      createConversation: createNewConversation,
+      updateConversation,
+      deleteConversation: removeConversation,
+      deleteConversations: removeConversations,
     }}>
       {children}
     </ConversationContext.Provider>
