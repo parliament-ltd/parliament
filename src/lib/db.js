@@ -120,6 +120,88 @@ export async function deleteConversation(id) {
   await db.delete('conversations', id)
 }
 
+// ─── Branching ───────────────────────────────────────────
+
+/**
+ * Create a branch from an existing conversation at a specific message.
+ * Copies all messages up to and including the branch point message
+ * into a new conversation linked to the parent via parentId.
+ *
+ * @param {string} sourceConversationId - The conversation to branch from
+ * @param {string} branchAtMessageId - The message ID to branch at (inclusive)
+ * @param {object} options - Optional overrides: { title, model }
+ * @returns {object} The new branch conversation record
+ */
+export async function createBranch(sourceConversationId, branchAtMessageId, options = {}) {
+  const db = await initDB()
+
+  // Get source conversation for defaults
+  const source = await db.get('conversations', sourceConversationId)
+  if (!source) throw new Error(`Source conversation not found: ${sourceConversationId}`)
+
+  // Get all messages from source, sorted chronologically
+  const allMessages = await db.getAllFromIndex('messages', 'conversationId', sourceConversationId)
+  allMessages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+
+  // Find the branch point index
+  const branchIdx = allMessages.findIndex(m => m.id === branchAtMessageId)
+  if (branchIdx === -1) throw new Error(`Branch point message not found: ${branchAtMessageId}`)
+
+  // Messages to copy: everything up to and including the branch point
+  const messagesToCopy = allMessages.slice(0, branchIdx + 1)
+
+  // Create the branch conversation
+  const now = new Date().toISOString()
+  const branchConv = {
+    id: generateId(),
+    title: options.title || `Branch: ${source.title}`,
+    model: options.model || source.model,
+    parentId: sourceConversationId,
+    branchPoint: branchAtMessageId,
+    pinned: false,
+    storageBytes: 0,
+    createdAt: now,
+    updatedAt: now,
+  }
+  await db.put('conversations', branchConv)
+
+  // Copy messages into the new conversation in a single transaction
+  const tx = db.transaction('messages', 'readwrite')
+  let totalBytes = 0
+  for (const msg of messagesToCopy) {
+    const newMsg = {
+      id: generateId(),
+      conversationId: branchConv.id,
+      role: msg.role,
+      content: msg.content,
+      tokenCount: msg.tokenCount || 0,
+      incomplete: false,
+      createdAt: msg.createdAt, // preserve original timestamps for ordering
+    }
+    await tx.store.put(newMsg)
+    totalBytes += (msg.content?.length || 0) * 2 // rough byte estimate
+  }
+  await tx.done
+
+  // Update storage estimate on the branch
+  await db.put('conversations', { ...branchConv, storageBytes: totalBytes })
+  branchConv.storageBytes = totalBytes
+
+  return branchConv
+}
+
+/**
+ * Get all branches for a given parent conversation.
+ * Returns them sorted by updatedAt descending.
+ */
+export async function getBranches(parentConversationId) {
+  const db = await initDB()
+  const all = await db.getAll('conversations')
+  return all
+    .filter(c => c.parentId === parentConversationId)
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+}
+
 // ─── Messages ────────────────────────────────────────────
 
 export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false }) {
