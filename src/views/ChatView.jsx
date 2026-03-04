@@ -18,6 +18,7 @@ import {
   getNotes, addNote, updateNote, deleteNote,
   getHighlights, addHighlight, deleteHighlight,
   deleteMessage, createBranch, getBranches,
+  getConversation, createConversation, addMessage,
 } from '../lib/db'
 
 /* ── Animation Constants ─────────────────────────────────── */
@@ -89,6 +90,7 @@ export default function ChatView() {
   // Branching state
   const [branchPanelMessage, setBranchPanelMessage] = useState(null) // message to branch from, or null
   const [branches, setBranches] = useState([]) // branch conversations for this conversation
+  const [currentConversation, setCurrentConversation] = useState(null) // loaded conversation record
 
   // Context health — derive from real token usage
   const modelInfo = useMemo(() => {
@@ -218,8 +220,10 @@ export default function ChatView() {
   const handleCreateBranchFull = useCallback(async (messageId) => {
     try {
       const branchConv = await createBranch(id, messageId)
-      // Update ConversationContext so the selector picks it up
       await loadConversations()
+      // Refresh branches list so sidebar updates immediately
+      const updatedBranches = await getBranches(id)
+      setBranches(updatedBranches)
       navigate(`/chat/${branchConv.id}`)
     } catch (err) {
       console.error('Branch creation failed:', err)
@@ -227,43 +231,70 @@ export default function ChatView() {
   }, [id, navigate, loadConversations])
 
   // Branch creation — "Compressed Summary" mode
+  // Creates a new conversation with a single AI-generated summary message
+  // instead of copying all messages
   const handleCreateBranchCompressed = useCallback(async (messageId) => {
     if (!apiKey) return
     try {
       const provider = getProvider('anthropic')
-      // Get messages up to branch point for the summary
-      const branchMessages = visibleMessages.slice(
-        0,
-        visibleMessages.findIndex(m => m.id === messageId) + 1
-      )
-      const summaryPrompt = branchMessages
-        .map(m => ({ role: m.role, content: m.content?.slice(0, 500) || '' }))
 
-      summaryPrompt.push({
+      // Get messages up to branch point for the summary
+      const branchIdx = visibleMessages.findIndex(m => m.id === messageId)
+      const branchMessages = visibleMessages.slice(0, branchIdx + 1)
+
+      // Build the summary prompt — truncate each message to keep it cheap
+      const summaryMessages = branchMessages
+        .map(m => ({ role: m.role, content: m.content?.slice(0, 500) || '' }))
+      summaryMessages.push({
         role: 'user',
-        content: 'Provide a concise summary of our conversation so far. Focus on key decisions, conclusions, and open questions. Keep it under 200 words.',
+        content: 'Provide a concise summary of our conversation so far. Focus on key decisions, conclusions, and open questions. Keep it under 200 words. Respond with ONLY the summary, no preamble.',
       })
 
-      const summaryResponse = await provider.sendMessage(
+      // Use generateTitle-style non-streaming call via Haiku
+      let summaryText = ''
+      await provider.sendMessage(
         apiKey,
-        summaryPrompt,
+        summaryMessages,
         'claude-haiku',
-        () => {}, // no streaming needed
+        (chunk) => { summaryText += chunk },
         new AbortController().signal
       )
 
-      // Not ideal — sendMessage streams and we don't capture the content via onChunk
-      // For compressed branch, we'll use generateTitle's pattern instead: non-streaming call
-      // For now, fall back to full branch and note the summary intent
-      const branchConv = await createBranch(id, messageId, { title: `Summary: ${visibleMessages[0]?.content?.slice(0, 30) || 'conversation'}` })
+      if (!summaryText.trim()) {
+        throw new Error('Empty summary generated')
+      }
+
+      // Look up parent conversation for title/model defaults
+      const parentConv = await getConversation(id)
+      const title = `Summary: ${parentConv?.title || 'conversation'}`
+
+      // Create the branch conversation manually (not via createBranch,
+      // since we don't want to copy messages — we want a fresh start with just the summary)
+      const branchConv = await createConversation({
+        title,
+        model: parentConv?.model || settings.defaultModel,
+        parentId: id,
+        branchPoint: messageId,
+      })
+
+      // Add the summary as a single assistant message
+      await addMessage({
+        conversationId: branchConv.id,
+        role: 'assistant',
+        content: `**Conversation Summary**\n\n${summaryText.trim()}`,
+        tokenCount: 0,
+      })
+
       await loadConversations()
+      const updatedBranches = await getBranches(id)
+      setBranches(updatedBranches)
       navigate(`/chat/${branchConv.id}`)
     } catch (err) {
       console.error('Compressed branch failed:', err)
       // Fall back to full branch
       await handleCreateBranchFull(messageId)
     }
-  }, [id, apiKey, visibleMessages, navigate, loadConversations, handleCreateBranchFull])
+  }, [id, apiKey, visibleMessages, settings.defaultModel, navigate, loadConversations, handleCreateBranchFull])
 
   const hideMessage = useCallback((msgId) => {
     setHiddenMessages((prev) => {
@@ -314,17 +345,19 @@ export default function ChatView() {
         await loadMessages(id)
 
         // Load persisted annotations
-        const [favs, notes, highlights, branchList] = await Promise.all([
+        const [favs, notes, highlights, branchList, convRecord] = await Promise.all([
           getFavorites(id),
           getNotes(id),
           getHighlights(id),
           getBranches(id),
+          getConversation(id),
         ])
         if (!cancelled) {
           setFavoritesMap(new Map(favs.map(f => [f.messageId, f])))
           setNotesMap(new Map(notes.map(n => [n.messageId, n])))
           setHighlightsList(highlights)
           setBranches(branchList)
+          setCurrentConversation(convRecord || null)
         }
       } catch {
         // Conversation may not exist
@@ -1058,7 +1091,19 @@ export default function ChatView() {
                   animate="show"
                   className="space-y-2"
                 >
-                  <BranchItem label="Main Thread" messages={messages.length} active />
+                  {/* If we're on a branch, show a link back to parent */}
+                  {currentConversation?.parentId && (
+                    <BranchItem
+                      label="← Parent conversation"
+                      messages={0}
+                      onClick={() => navigate(`/chat/${currentConversation.parentId}`)}
+                    />
+                  )}
+                  <BranchItem
+                    label={currentConversation?.parentId ? (currentConversation.title || 'This branch') : 'Main Thread'}
+                    messages={messages.length}
+                    active
+                  />
                   {branches.map((branch) => (
                     <BranchItem
                       key={branch.id}
