@@ -441,14 +441,12 @@ export default function ChatView() {
 
   /* ── Derive TOC and sidebar data ──────────────────────── */
 
-  const tocItems = visibleMessages.map((msg, i) => ({
-    id: msg.id,
-    label: msg.role === 'user'
-      ? msg.content.slice(0, 50) + (msg.content.length > 50 ? '...' : '')
-      : `Response ${Math.ceil((i + 1) / 2)}`,
-    role: msg.role,
-    number: i + 1,
-  }))
+  const tocItems = visibleMessages
+    .filter(msg => msg.role === 'user')
+    .map((msg) => ({
+      id: msg.id,
+      label: msg.content.slice(0, 50) + (msg.content.length > 50 ? '...' : ''),
+    }))
 
   // Favorited messages for right sidebar
   const favoritedMessages = visibleMessages.filter((m) => favoritesMap.has(m.id))
@@ -528,14 +526,14 @@ export default function ChatView() {
           </motion.div>
         </div>
 
-        {/* Scrollable nav area */}
-        <div className="flex-1 overflow-y-auto p-4">
+        {/* Scrollable Contents area */}
+        <div className="flex-1 overflow-y-auto px-4 pt-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}>
           {/* Table of Contents */}
           <motion.div
             variants={staggerContainer}
             initial={false}
             animate="show"
-            className="space-y-1 mb-6"
+            className="space-y-1"
           >
             <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-2">
               Contents
@@ -548,21 +546,19 @@ export default function ChatView() {
               tocItems.map((item) => (
                 <NavItem
                   key={item.id}
-                  indent={item.role === 'assistant'}
                   onClick={() => {
                     document.getElementById(`msg-${item.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
                   }}
                 >
-                  <span className="text-[10px] font-mono text-[#D5D5D5] mr-2">
-                    #{item.number}
-                  </span>
                   {item.label}
                 </NavItem>
               ))
             )}
           </motion.div>
+        </div>
 
-          {/* Quick Actions */}
+        {/* Actions — pinned at bottom */}
+        <div className="px-4 pb-4 pt-3 flex-shrink-0" style={{ borderTop: '1px solid #F0F0F0' }}>
           <motion.div
             variants={staggerContainer}
             initial={false}
@@ -570,7 +566,7 @@ export default function ChatView() {
             className="space-y-1"
           >
             <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-2">
-              Quick Actions
+              Actions
             </h3>
             <ActionButton icon={Settings2}>Collaboration Mode</ActionButton>
             <ActionButton icon={BookOpen}>Review</ActionButton>

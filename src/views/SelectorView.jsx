@@ -182,13 +182,15 @@ function InlineTitleEditor({ title, onSave, onCancel }) {
 function Checkbox({ checked, indeterminate = false, onChange }) {
   return (
     <motion.button
-      whileHover={{ scale: 1.15 }}
+      whileHover={{ scale: 1.15, borderColor: '#4A7AE5' }}
       whileTap={{ scale: 0.85 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
       onClick={(e) => { e.stopPropagation(); onChange() }}
-      className="w-4 h-4 rounded border flex items-center justify-center transition-colors flex-shrink-0"
+      className="w-4 h-4 rounded border flex items-center justify-center flex-shrink-0"
       style={{
         borderColor: checked || indeterminate ? '#4A7AE5' : '#D5D5D5',
         backgroundColor: checked || indeterminate ? '#4A7AE5' : 'transparent',
+        transition: 'background-color 0.3s ease, border-color 0.3s ease',
       }}
     >
       {checked && (
@@ -317,9 +319,7 @@ function ChatTableRow({ chat, isExpanded, onToggleExpand, selected, onToggleSele
 
   return (
     <motion.div variants={staggerItem}>
-      <motion.div
-        whileHover={{ backgroundColor: '#FAFAFA' }}
-        transition={{ duration: 0.1 }}
+      <div
         className="group flex items-center px-2 border-b border-[#F5F5F5] cursor-pointer"
         style={{ minHeight: 52, backgroundColor: isSelected ? '#F0F5FF' : undefined }}
         onClick={() => onNavigate(chat.id)}
@@ -384,7 +384,7 @@ function ChatTableRow({ chat, isExpanded, onToggleExpand, selected, onToggleSele
         <div className="w-28 flex-shrink-0 px-2 text-center">
           <span className="text-xs text-[#6B7C93]">{formatShortDate(chat.createdAt)}</span>
         </div>
-      </motion.div>
+      </div>
 
       {/* Expanded branches */}
       <AnimatePresence>
@@ -418,7 +418,6 @@ function BranchRow({ branch, selected, onToggleSelected, onNavigate }) {
       initial={{ opacity: 0, x: -6 }}
       animate={{ opacity: 1, x: 0 }}
       transition={SPRING_SMOOTH}
-      whileHover={{ backgroundColor: '#FAFAFA' }}
       className="group flex items-center px-2 border-b border-[#F5F5F5] cursor-pointer"
       style={{ minHeight: 44, backgroundColor: isSelected ? '#F0F5FF' : undefined }}
       onClick={() => onNavigate(branch.id)}
