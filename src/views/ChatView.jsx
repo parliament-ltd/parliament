@@ -776,7 +776,8 @@ export default function ChatView() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3, delay: 0.1 }}
-              className="flex flex-col flex-1 pt-10"
+              className="flex flex-col flex-1 pt-10 overflow-y-auto"
+              style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}
             >
               {/* Highlights Section */}
               <div className="p-4" style={{ borderBottom: '1px solid #F0F0F0' }}>
@@ -798,16 +799,12 @@ export default function ChatView() {
                 <p className="text-xs text-[#6B7C93] mb-3">
                   Navigate through highlighted terms
                 </p>
-                <motion.div
-                  variants={staggerContainer}
-                  initial="hidden"
-                  animate="show"
+                <div
                   className="space-y-2"
                 >
                   {uniqueHighlights.map((hl) => (
                     <motion.div
                       key={hl.text}
-                      variants={staggerItem}
                       whileHover={interactiveHover}
                       className="flex items-center gap-2 px-3 py-2 bg-white border border-[#F0F0F0] rounded-lg group/hl cursor-pointer"
                     >
@@ -934,7 +931,6 @@ export default function ChatView() {
                       </motion.div>
                     ) : (
                       <motion.button
-                        variants={staggerItem}
                         whileHover={{ ...interactiveHover, borderColor: '#4A7AE5', color: '#4A7AE5' }}
                         whileTap={interactiveTap}
                         onClick={() => setShowAddHighlight(true)}
@@ -944,7 +940,7 @@ export default function ChatView() {
                       </motion.button>
                     )}
                   </AnimatePresence>
-                </motion.div>
+                </div>
               </div>
 
               {/* Favorites Section */}
@@ -961,16 +957,12 @@ export default function ChatView() {
                     Star a message to save it here
                   </p>
                 ) : (
-                  <motion.div
-                    variants={staggerContainer}
-                    initial="hidden"
-                    animate="show"
+                  <div
                     className="space-y-2"
                   >
                     {favoritedMessages.map((msg) => (
                       <motion.button
                         key={msg.id}
-                        variants={staggerItem}
                         whileHover={interactiveHover}
                         whileTap={interactiveTap}
                         onClick={() => {
@@ -1003,7 +995,7 @@ export default function ChatView() {
                         </div>
                       </motion.button>
                     ))}
-                  </motion.div>
+                  </div>
                 )}
               </div>
 
@@ -1085,10 +1077,7 @@ export default function ChatView() {
                     </span>
                   )}
                 </h3>
-                <motion.div
-                  variants={staggerContainer}
-                  initial="hidden"
-                  animate="show"
+                <div
                   className="space-y-2"
                 >
                   {/* If we're on a branch, show a link back to parent */}
@@ -1112,7 +1101,7 @@ export default function ChatView() {
                       onClick={() => navigate(`/chat/${branch.id}`)}
                     />
                   ))}
-                </motion.div>
+                </div>
               </div>
             </motion.div>
           )}
@@ -1552,7 +1541,6 @@ function MetricRow({ label, value, color }) {
 function BranchItem({ label, messages, active = false, onClick }) {
   return (
     <motion.button
-      variants={staggerItem}
       whileHover={interactiveHover}
       whileTap={interactiveTap}
       onClick={onClick}
