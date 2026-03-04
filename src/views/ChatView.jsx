@@ -541,7 +541,7 @@ export default function ChatView() {
                 isFavorited={favoritesMap.has(msg.id)}
                 showNotes={showNotes.has(msg.id)}
                 savedNoteText={notesMap.get(msg.id)?.text || ''}
-                highlights={highlightsList.filter(h => h.messageId === msg.id)}
+                highlights={highlightsList}
                 onNote={() => toggleNote(msg.id)}
                 onFavorite={() => toggleFav(msg.id)}
                 onNoteSave={(text) => handleNoteSave(msg.id, text)}
