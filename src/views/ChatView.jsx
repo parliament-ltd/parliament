@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Square, AlertCircle,
+  Square, AlertCircle, ChevronLeft, ChevronRight,
   GitBranch, Trash2, MessageSquare,
   FileText, MoreVertical, StickyNote, Activity, Zap, Star,
   Eye, Copy, ArrowRightCircle, Settings2, BookOpen, PanelRight, X,
@@ -81,6 +81,10 @@ export default function ChatView() {
   const [notesMap, setNotesMap] = useState(new Map())         // messageId → { id, conversationId, messageId, text }
   const [highlightsList, setHighlightsList] = useState([])    // Array of { id, conversationId, messageId, text, color }
   const [showNotes, setShowNotes] = useState(new Set())       // which note panels are open (UI-only)
+  const [showAddHighlight, setShowAddHighlight] = useState(false)
+  const [addHighlightText, setAddHighlightText] = useState('')
+  const [addHighlightColor, setAddHighlightColor] = useState(HIGHLIGHT_COLORS[0].color)
+  const [highlightOccurrenceIdx, setHighlightOccurrenceIdx] = useState({}) // highlightText → current index
 
   // Context health — derive from real token usage
   const modelInfo = useMemo(() => {
@@ -155,12 +159,52 @@ export default function ChatView() {
     } catch {}
   }, [id])
 
+  // Add a highlight from the sidebar (applies to ALL messages containing the text)
+  const handleAddHighlightFromSidebar = useCallback(async (text, color) => {
+    if (!text.trim()) return
+    // Find the first message containing this text and store the highlight against it
+    // The rendering logic will highlight all occurrences across all messages
+    const firstMatch = visibleMessages.find(m => m.content?.includes(text.trim()))
+    const msgId = firstMatch?.id || visibleMessages[0]?.id
+    if (!msgId) return
+    try {
+      const record = await addHighlight({ conversationId: id, messageId: msgId, text: text.trim(), color })
+      setHighlightsList(prev => [...prev, record])
+    } catch {}
+  }, [id, visibleMessages])
+
   const handleRemoveHighlight = useCallback(async (highlightId) => {
     try {
       await deleteHighlight(highlightId)
       setHighlightsList(prev => prev.filter(h => h.id !== highlightId))
     } catch {}
   }, [])
+
+  // Find all message occurrences of a highlight term for prev/next navigation
+  const getHighlightOccurrences = useCallback((text) => {
+    const occurrences = []
+    for (const msg of visibleMessages) {
+      if (msg.content?.includes(text)) {
+        occurrences.push(msg.id)
+      }
+    }
+    return occurrences
+  }, [visibleMessages])
+
+  const navigateHighlight = useCallback((text, direction) => {
+    const occurrences = getHighlightOccurrences(text)
+    if (occurrences.length === 0) return
+    const currentIdx = highlightOccurrenceIdx[text] || 0
+    let nextIdx
+    if (direction === 'next') {
+      nextIdx = (currentIdx + 1) % occurrences.length
+    } else {
+      nextIdx = (currentIdx - 1 + occurrences.length) % occurrences.length
+    }
+    setHighlightOccurrenceIdx(prev => ({ ...prev, [text]: nextIdx }))
+    const msgId = occurrences[nextIdx]
+    document.getElementById(`msg-${msgId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [getHighlightOccurrences, highlightOccurrenceIdx])
 
   const hideMessage = useCallback((msgId) => {
     setHiddenMessages((prev) => {
@@ -317,6 +361,24 @@ export default function ChatView() {
 
   // Favorited messages for right sidebar
   const favoritedMessages = visibleMessages.filter((m) => favoritesMap.has(m.id))
+
+  // Unique highlight terms for sidebar display, with occurrence counts
+  const uniqueHighlights = useMemo(() => {
+    const seen = new Map() // text → { ids: [highlightId, ...], color, count }
+    for (const hl of highlightsList) {
+      if (!seen.has(hl.text)) {
+        // Count how many messages contain this text
+        let count = 0
+        for (const msg of visibleMessages) {
+          if (msg.content?.includes(hl.text)) count++
+        }
+        seen.set(hl.text, { text: hl.text, color: hl.color, count, ids: [hl.id] })
+      } else {
+        seen.get(hl.text).ids.push(hl.id)
+      }
+    }
+    return Array.from(seen.values())
+  }, [highlightsList, visibleMessages])
 
   /* ── Loading ───────────────────────────────────────────── */
 
@@ -629,11 +691,7 @@ export default function ChatView() {
               <div className="p-4" style={{ borderBottom: '1px solid #F0F0F0' }}>
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider">
-                    Highlights {highlightsList.length > 0 && (
-                      <span className="text-[#4A7AE5] normal-case tracking-normal">
-                        ({highlightsList.length})
-                      </span>
-                    )}
+                    Highlights
                   </h3>
                   <motion.button
                     whileHover={{ scale: 1.15 }}
@@ -647,53 +705,155 @@ export default function ChatView() {
                   </motion.button>
                 </div>
                 <p className="text-xs text-[#6B7C93] mb-3">
-                  Select text in any message to highlight it
+                  Navigate through highlighted terms
                 </p>
-                {highlightsList.length === 0 ? (
-                  <div className="flex items-center gap-2 px-3 py-2 border border-dashed border-[#EBEBEB] rounded-lg">
-                    <Highlighter className="w-3.5 h-3.5 text-[#D5D5D5]" />
-                    <span className="text-xs text-[#D5D5D5]">No highlights yet</span>
-                  </div>
-                ) : (
-                  <div className="space-y-1.5 max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}>
-                    {highlightsList.map((hl) => (
+                <motion.div
+                  variants={staggerContainer}
+                  initial="hidden"
+                  animate="show"
+                  className="space-y-2"
+                >
+                  {uniqueHighlights.map((hl) => (
+                    <motion.div
+                      key={hl.text}
+                      variants={staggerItem}
+                      whileHover={interactiveHover}
+                      className="flex items-center gap-2 px-3 py-2 bg-white border border-[#F0F0F0] rounded-lg group/hl cursor-pointer"
+                    >
                       <motion.div
-                        key={hl.id}
-                        initial={{ opacity: 0, x: -6 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="group/hl flex items-start gap-2 px-2.5 py-2 rounded-lg hover:bg-[#FAFAFA] transition-colors cursor-pointer"
-                        onClick={() => {
-                          document.getElementById(`msg-${hl.messageId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                        }}
-                      >
-                        <div
-                          className="w-2 h-2 rounded-full mt-1 flex-shrink-0"
-                          style={{ backgroundColor: hl.color }}
-                        />
-                        <p className="text-xs text-[#1E2532] flex-1 line-clamp-2" style={{
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                        }}>
-                          {hl.text}
-                        </p>
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ repeat: Infinity, repeatDelay: 4, duration: 0.5 }}
+                        className="w-3 h-3 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: hl.color }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-semibold text-[#1E2532] truncate">{hl.text}</div>
+                        <div className="text-xs text-[#6B7C93]">
+                          {hl.count} occurrence{hl.count !== 1 ? 's' : ''}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-0.5 opacity-0 group-hover/hl:opacity-100 transition-opacity">
                         <motion.button
-                          whileHover={{ scale: 1.2 }}
-                          whileTap={{ scale: 0.8 }}
+                          whileHover={{ scale: 1.15 }}
+                          whileTap={{ scale: 0.85 }}
+                          onClick={(e) => { e.stopPropagation(); navigateHighlight(hl.text, 'prev') }}
+                          className="p-1 hover:bg-[#EEEEEE] rounded text-[#6B7C93] hover:text-[#1E2532] transition-colors"
+                          title="Previous occurrence"
+                        >
+                          <ChevronLeft className="w-3 h-3" />
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.15 }}
+                          whileTap={{ scale: 0.85 }}
+                          onClick={(e) => { e.stopPropagation(); navigateHighlight(hl.text, 'next') }}
+                          className="p-1 hover:bg-[#EEEEEE] rounded text-[#6B7C93] hover:text-[#1E2532] transition-colors"
+                          title="Next occurrence"
+                        >
+                          <ChevronRight className="w-3 h-3" />
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.15 }}
+                          whileTap={{ scale: 0.85 }}
                           onClick={(e) => {
                             e.stopPropagation()
-                            handleRemoveHighlight(hl.id)
+                            // Delete all highlight records with this text
+                            hl.ids.forEach(hlId => handleRemoveHighlight(hlId))
                           }}
-                          className="p-0.5 rounded opacity-0 group-hover/hl:opacity-100 hover:bg-[#EEEEEE] text-[#6B7C93] hover:text-[#EF4444] transition-all flex-shrink-0"
+                          className="p-1 hover:bg-[#EEEEEE] rounded text-[#6B7C93] hover:text-[#EF4444] transition-colors"
                           title="Remove highlight"
                         >
-                          <X className="w-3 h-3" />
+                          <Trash2 className="w-3 h-3" />
                         </motion.button>
+                      </div>
+                    </motion.div>
+                  ))}
+
+                  {/* Add Highlight — collapsed / expanded */}
+                  <AnimatePresence>
+                    {showAddHighlight ? (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={SPRING_SNAPPY}
+                        className="overflow-hidden"
+                      >
+                        <div className="border border-[#4A7AE5]/30 rounded-lg p-3 bg-white space-y-2">
+                          <input
+                            type="text"
+                            value={addHighlightText}
+                            onChange={(e) => setAddHighlightText(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && addHighlightText.trim()) {
+                                handleAddHighlightFromSidebar(addHighlightText, addHighlightColor)
+                                setAddHighlightText('')
+                                setShowAddHighlight(false)
+                              }
+                              if (e.key === 'Escape') {
+                                setAddHighlightText('')
+                                setShowAddHighlight(false)
+                              }
+                            }}
+                            placeholder="Text to highlight..."
+                            className="w-full bg-white rounded px-2 py-1.5 text-xs text-[#1E2532] outline-none border border-[#EBEBEB] focus:border-[#4A7AE5] transition-colors placeholder:text-[#D5D5D5]"
+                            autoFocus
+                          />
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1">
+                              {HIGHLIGHT_COLORS.map((c) => (
+                                <motion.button
+                                  key={c.id}
+                                  whileHover={{ scale: 1.3 }}
+                                  whileTap={{ scale: 0.85 }}
+                                  onClick={() => setAddHighlightColor(c.color)}
+                                  className="w-5 h-5 rounded-full border-2 shadow-sm"
+                                  style={{
+                                    backgroundColor: c.color,
+                                    borderColor: addHighlightColor === c.color ? '#1E2532' : 'white',
+                                  }}
+                                />
+                              ))}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => { setAddHighlightText(''); setShowAddHighlight(false) }}
+                                className="px-2 py-1 rounded text-[10px] font-semibold text-[#6B7C93] hover:text-[#1E2532] hover:bg-[#EEEEEE] transition-colors"
+                              >
+                                Cancel
+                              </motion.button>
+                              <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => {
+                                  if (addHighlightText.trim()) {
+                                    handleAddHighlightFromSidebar(addHighlightText, addHighlightColor)
+                                    setAddHighlightText('')
+                                    setShowAddHighlight(false)
+                                  }
+                                }}
+                                className="px-2 py-1 rounded text-[10px] font-semibold text-white bg-[#4A7AE5] hover:bg-[#3A6AD4] transition-colors"
+                              >
+                                Add
+                              </motion.button>
+                            </div>
+                          </div>
+                        </div>
                       </motion.div>
-                    ))}
-                  </div>
-                )}
+                    ) : (
+                      <motion.button
+                        variants={staggerItem}
+                        whileHover={{ ...interactiveHover, borderColor: '#4A7AE5', color: '#4A7AE5' }}
+                        whileTap={interactiveTap}
+                        onClick={() => setShowAddHighlight(true)}
+                        className="w-full px-3 py-2 border border-dashed border-[#EBEBEB] rounded-lg text-xs text-[#6B7C93] transition-colors"
+                      >
+                        + Add Highlight
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
               </div>
 
               {/* Favorites Section */}
