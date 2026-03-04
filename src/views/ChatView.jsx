@@ -558,7 +558,7 @@ export default function ChatView() {
         </div>
 
         {/* Actions — pinned at bottom */}
-        <div className="px-4 pb-4 pt-3 flex-shrink-0" style={{ borderTop: '1px solid #F0F0F0' }}>
+        <div className="px-4 pb-4 pt-3 flex-shrink-0">
           <motion.div
             variants={staggerContainer}
             initial={false}
@@ -776,7 +776,7 @@ export default function ChatView() {
               style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}
             >
               {/* Highlights Section */}
-              <div className="p-4" style={{ borderBottom: '1px solid #F0F0F0' }}>
+              <div className="p-4 pb-6">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider">
                     Highlights
@@ -940,7 +940,7 @@ export default function ChatView() {
               </div>
 
               {/* Favorites Section */}
-              <div className="p-4" style={{ borderBottom: '1px solid #F0F0F0' }}>
+              <div className="p-4 pb-6">
                 <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
                   Favorites {favoritedMessages.length > 0 && (
                     <span className="text-[#E5A620] normal-case tracking-normal">
@@ -996,7 +996,7 @@ export default function ChatView() {
               </div>
 
               {/* Context Health Section */}
-              <div className="p-4" style={{ borderBottom: '1px solid #F0F0F0' }}>
+              <div className="p-4 pb-6">
                 <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
                   Context Health
                 </h3>
