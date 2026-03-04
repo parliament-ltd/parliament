@@ -6,7 +6,7 @@ import {
   GitBranch, Trash2, MessageSquare,
   FileText, MoreVertical, StickyNote, Activity, Zap, Star,
   Eye, Copy, ArrowRightCircle, Settings2, BookOpen, PanelRight, X,
-  Highlighter,
+  Pencil,
 } from 'lucide-react'
 import { useChat } from '../stores/ChatContext'
 import { useConversations } from '../stores/ConversationContext'
@@ -97,6 +97,10 @@ export default function ChatView() {
   const contextWindow = modelInfo.contextWindow
   const contextUsage = contextWindow > 0 ? Math.min(Math.round((totalTokens / contextWindow) * 100), 100) : 0
   const contextThreshold = settings.contextThreshold || 80
+
+  // Derive visible messages early — needed by highlight callbacks below
+  const visibleMessages = messages.filter((m) => !hiddenMessages.has(m.id))
+  const hiddenCount = messages.length - visibleMessages.length
 
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
@@ -345,10 +349,7 @@ export default function ChatView() {
     }
   }
 
-  /* ── Derive visible messages and TOC ────────────────────── */
-
-  const visibleMessages = messages.filter((m) => !hiddenMessages.has(m.id))
-  const hiddenCount = messages.length - visibleMessages.length
+  /* ── Derive TOC and sidebar data ──────────────────────── */
 
   const tocItems = visibleMessages.map((msg, i) => ({
     id: msg.id,
@@ -1300,7 +1301,7 @@ function MessageCard({
                   top: selectionPopover.y - 32,
                 }}
               >
-                <Highlighter className="w-3 h-3 text-[#6B7C93] mr-1" />
+                <Pencil className="w-3 h-3 text-[#6B7C93] mr-1" />
                 {HIGHLIGHT_COLORS.map((c) => (
                   <motion.button
                     key={c.id}
