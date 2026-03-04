@@ -8,6 +8,12 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { useConversations } from '../stores/ConversationContext'
 import { useSettings } from '../stores/SettingsContext'
+import {
+  getFavorites as dbGetAllFavorites,
+  deleteFavorite as dbDeleteFavorite,
+  getMessages,
+  initDB,
+} from '../lib/db'
 
 /* ═══════════════════════════════════════════════════════════ */
 /*  CONSTANTS                                                   */
@@ -53,6 +59,41 @@ function formatBytes(bytes) {
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  Load all favorites across all conversations, hydrated      */
+/* ═══════════════════════════════════════════════════════════ */
+
+async function loadAllFavoritesHydrated(conversations) {
+  const db = await initDB()
+  const allFavRecords = await db.getAll('favorites')
+  if (allFavRecords.length === 0) return []
+
+  // Build a conversation title lookup
+  const convTitles = {}
+  ;(conversations || []).forEach(c => { convTitles[c.id] = c.title || 'New conversation' })
+
+  // Fetch the message content for each favorite
+  const hydrated = []
+  for (const fav of allFavRecords) {
+    try {
+      const msg = await db.get('messages', fav.messageId)
+      if (msg) {
+        hydrated.push({
+          id: fav.id,
+          messageId: fav.messageId,
+          conversationId: fav.conversationId,
+          snippet: msg.content?.slice(0, 200) || '',
+          source: convTitles[fav.conversationId] || 'Unknown conversation',
+          sourceConversationId: fav.conversationId,
+        })
+      }
+    } catch {
+      // Message may have been deleted — skip
+    }
+  }
+  return hydrated
 }
 
 /* ═══════════════════════════════════════════════════════════ */
@@ -216,7 +257,7 @@ function FavoriteCard({ favorite, onRemove, onNavigate }) {
       variants={staggerItem}
       whileHover={{ borderColor: '#E0E0E0' }}
       className="group rounded-lg border border-[#EBEBEB] bg-white transition-colors cursor-pointer overflow-hidden"
-      onClick={() => onNavigate?.(favorite.sourceConversationId)}
+      onClick={() => onNavigate?.(favorite.sourceConversationId || favorite.conversationId)}
     >
       <div className="px-3 pt-3 pb-2">
         <p className="text-xs text-[#1E2532] leading-relaxed line-clamp-3" style={{
@@ -416,7 +457,7 @@ export default function SelectorView() {
     updateConversation,
     deleteConversations,
   } = useConversations()
-  const { storageEstimate } = useSettings()
+  const { storageUsage } = useSettings()
 
   // ── Local state ──
   const [searchQuery, setSearchQuery] = useState('')
@@ -425,6 +466,22 @@ export default function SelectorView() {
   const [sortField, setSortField] = useState('updatedAt')
   const [sortDir, setSortDir] = useState('desc')
   const [favSidebarOpen, setFavSidebarOpen] = useState(true)
+  const [favorites, setFavorites] = useState([])
+
+  // ── Load favorites from IndexedDB, hydrated with message content ──
+  useEffect(() => {
+    let cancelled = false
+    async function loadFavs() {
+      try {
+        const hydrated = await loadAllFavoritesHydrated(conversations)
+        if (!cancelled) setFavorites(hydrated)
+      } catch {}
+    }
+    if (conversations && conversations.length > 0) {
+      loadFavs()
+    }
+    return () => { cancelled = true }
+  }, [conversations])
 
   // ── Derived: separate roots from branches, attach branches to parents ──
   const { rootsWithBranches, allBranches } = useMemo(() => {
@@ -440,12 +497,10 @@ export default function SelectorView() {
       }
     })
 
-    // Sort branches within each parent by updatedAt desc
     Object.values(branchesByParent).forEach((branches) => {
       branches.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
     })
 
-    // Attach branches array to each root (matching mockup data shape)
     const rootsWithBranches = roots.map(r => ({
       ...r,
       branches: branchesByParent[r.id] || [],
@@ -514,15 +569,18 @@ export default function SelectorView() {
 
   // ── Storage percent ──
   const storagePercent = useMemo(() => {
-    if (!storageEstimate?.quota) return 0
-    return Math.round((storageEstimate.usage / storageEstimate.quota) * 100)
-  }, [storageEstimate])
-
-  // ── TODO: wire favorites from IndexedDB in Step 10. For now, empty array ──
-  const favorites = []
-  const removeFavorite = useCallback(() => {}, [])
+    if (!storageUsage?.quota) return 0
+    return Math.round((storageUsage.usage / storageUsage.quota) * 100)
+  }, [storageUsage])
 
   // ── Handlers ──
+  const removeFavorite = useCallback(async (favId) => {
+    try {
+      await dbDeleteFavorite(favId)
+      setFavorites(prev => prev.filter(f => f.id !== favId))
+    } catch {}
+  }, [])
+
   const handleSort = useCallback((field) => {
     if (sortField === field) {
       setSortDir(d => d === 'desc' ? 'asc' : 'desc')
@@ -595,9 +653,7 @@ export default function SelectorView() {
           className="flex items-center justify-between px-8 pt-8 pb-4"
         >
           <div className="flex items-center gap-3">
-            <motion.div animate={{ rotate: [0, -8, 8, 0] }} transition={{ duration: 0.6, delay: 0.6, ease: 'easeInOut' }}>
-              <MessageSquare className="w-5 h-5 text-[#4A7AE5]" />
-            </motion.div>
+            <MessageSquare className="w-5 h-5 text-[#4A7AE5]" />
             <h1 className="text-lg font-semibold text-[#1E2532]">Chats</h1>
           </div>
           <div className="flex items-center gap-2">
