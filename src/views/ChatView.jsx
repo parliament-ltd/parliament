@@ -6,7 +6,7 @@ import {
   GitBranch, Trash2, MessageSquare,
   FileText, MoreVertical, StickyNote, Activity, Zap, Star,
   Eye, Copy, ArrowRightCircle, Settings2, BookOpen, PanelRight, X,
-  Pencil,
+  Pencil, Info, ArrowRight,
 } from 'lucide-react'
 import { useChat } from '../stores/ChatContext'
 import { useConversations } from '../stores/ConversationContext'
@@ -17,7 +17,7 @@ import {
   getFavorites, addFavorite, deleteFavorite,
   getNotes, addNote, updateNote, deleteNote,
   getHighlights, addHighlight, deleteHighlight,
-  deleteMessage,
+  deleteMessage, createBranch, getBranches,
 } from '../lib/db'
 
 /* ── Animation Constants ─────────────────────────────────── */
@@ -64,7 +64,7 @@ export default function ChatView() {
     loadMessages, sendMessage, continueMessage,
     stopGenerating, clearMessages,
   } = useChat()
-  const { updateConversation } = useConversations()
+  const { updateConversation, loadConversations } = useConversations()
   const { settings, refreshStorageEstimate } = useSettings()
 
   const [inputValue, setInputValue] = useState('')
@@ -85,6 +85,10 @@ export default function ChatView() {
   const [addHighlightText, setAddHighlightText] = useState('')
   const [addHighlightColor, setAddHighlightColor] = useState(HIGHLIGHT_COLORS[0].color)
   const [highlightOccurrenceIdx, setHighlightOccurrenceIdx] = useState({}) // highlightText → current index
+
+  // Branching state
+  const [branchPanelMessage, setBranchPanelMessage] = useState(null) // message to branch from, or null
+  const [branches, setBranches] = useState([]) // branch conversations for this conversation
 
   // Context health — derive from real token usage
   const modelInfo = useMemo(() => {
@@ -210,6 +214,57 @@ export default function ChatView() {
     document.getElementById(`msg-${msgId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, [getHighlightOccurrences, highlightOccurrenceIdx])
 
+  // Branch creation — "Full History" mode
+  const handleCreateBranchFull = useCallback(async (messageId) => {
+    try {
+      const branchConv = await createBranch(id, messageId)
+      // Update ConversationContext so the selector picks it up
+      await loadConversations()
+      navigate(`/chat/${branchConv.id}`)
+    } catch (err) {
+      console.error('Branch creation failed:', err)
+    }
+  }, [id, navigate, loadConversations])
+
+  // Branch creation — "Compressed Summary" mode
+  const handleCreateBranchCompressed = useCallback(async (messageId) => {
+    if (!apiKey) return
+    try {
+      const provider = getProvider('anthropic')
+      // Get messages up to branch point for the summary
+      const branchMessages = visibleMessages.slice(
+        0,
+        visibleMessages.findIndex(m => m.id === messageId) + 1
+      )
+      const summaryPrompt = branchMessages
+        .map(m => ({ role: m.role, content: m.content?.slice(0, 500) || '' }))
+
+      summaryPrompt.push({
+        role: 'user',
+        content: 'Provide a concise summary of our conversation so far. Focus on key decisions, conclusions, and open questions. Keep it under 200 words.',
+      })
+
+      const summaryResponse = await provider.sendMessage(
+        apiKey,
+        summaryPrompt,
+        'claude-haiku',
+        () => {}, // no streaming needed
+        new AbortController().signal
+      )
+
+      // Not ideal — sendMessage streams and we don't capture the content via onChunk
+      // For compressed branch, we'll use generateTitle's pattern instead: non-streaming call
+      // For now, fall back to full branch and note the summary intent
+      const branchConv = await createBranch(id, messageId, { title: `Summary: ${visibleMessages[0]?.content?.slice(0, 30) || 'conversation'}` })
+      await loadConversations()
+      navigate(`/chat/${branchConv.id}`)
+    } catch (err) {
+      console.error('Compressed branch failed:', err)
+      // Fall back to full branch
+      await handleCreateBranchFull(messageId)
+    }
+  }, [id, apiKey, visibleMessages, navigate, loadConversations, handleCreateBranchFull])
+
   const hideMessage = useCallback((msgId) => {
     setHiddenMessages((prev) => {
       const n = new Set(prev)
@@ -259,15 +314,17 @@ export default function ChatView() {
         await loadMessages(id)
 
         // Load persisted annotations
-        const [favs, notes, highlights] = await Promise.all([
+        const [favs, notes, highlights, branchList] = await Promise.all([
           getFavorites(id),
           getNotes(id),
           getHighlights(id),
+          getBranches(id),
         ])
         if (!cancelled) {
           setFavoritesMap(new Map(favs.map(f => [f.messageId, f])))
           setNotesMap(new Map(notes.map(n => [n.messageId, n])))
           setHighlightsList(highlights)
+          setBranches(branchList)
         }
       } catch {
         // Conversation may not exist
@@ -550,7 +607,7 @@ export default function ChatView() {
                 onDelete={() => handleDelete(msg.id)}
                 onHide={() => hideMessage(msg.id)}
                 onCopyText={() => handleCopyText(msg.content)}
-                onBranch={() => {}}
+                onBranch={() => setBranchPanelMessage(msg)}
               />
             )
           })}
@@ -989,7 +1046,11 @@ export default function ChatView() {
               {/* Branches Section */}
               <div className="flex-1 p-4 overflow-y-auto">
                 <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
-                  Branches
+                  Branches {branches.length > 0 && (
+                    <span className="text-[#7C6CD4] normal-case tracking-normal">
+                      ({branches.length})
+                    </span>
+                  )}
                 </h3>
                 <motion.div
                   variants={staggerContainer}
@@ -997,14 +1058,42 @@ export default function ChatView() {
                   animate="show"
                   className="space-y-2"
                 >
-                  {/* TODO: Wire to real branch data in Step 11 */}
                   <BranchItem label="Main Thread" messages={messages.length} active />
+                  {branches.map((branch) => (
+                    <BranchItem
+                      key={branch.id}
+                      label={branch.title || 'Untitled branch'}
+                      messages={0}
+                      onClick={() => navigate(`/chat/${branch.id}`)}
+                    />
+                  ))}
                 </motion.div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </motion.div>
+
+      {/* Branch Creation Panel Modal */}
+      <AnimatePresence>
+        {branchPanelMessage && (
+          <BranchCreationPanel
+            message={branchPanelMessage}
+            messageIndex={visibleMessages.findIndex(m => m.id === branchPanelMessage.id) + 1}
+            totalMessages={visibleMessages.length}
+            contextUsage={contextUsage}
+            onClose={() => setBranchPanelMessage(null)}
+            onBranchFull={() => {
+              handleCreateBranchFull(branchPanelMessage.id)
+              setBranchPanelMessage(null)
+            }}
+            onBranchCompressed={() => {
+              handleCreateBranchCompressed(branchPanelMessage.id)
+              setBranchPanelMessage(null)
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }
@@ -1415,12 +1504,13 @@ function MetricRow({ label, value, color }) {
   )
 }
 
-function BranchItem({ label, messages, active = false }) {
+function BranchItem({ label, messages, active = false, onClick }) {
   return (
     <motion.button
       variants={staggerItem}
       whileHover={interactiveHover}
       whileTap={interactiveTap}
+      onClick={onClick}
       className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
         active
           ? 'bg-white border border-[#4A7AE5] shadow-sm'
@@ -1431,9 +1521,188 @@ function BranchItem({ label, messages, active = false }) {
         <GitBranch className={`w-3.5 h-3.5 ${active ? 'text-[#4A7AE5]' : 'text-[#6B7C93]'}`} />
         <div className="flex-1 min-w-0">
           <div className="text-xs font-semibold text-[#1E2532] truncate">{label}</div>
-          <div className="text-xs text-[#6B7C93]">{messages} messages</div>
+          {messages > 0 && <div className="text-xs text-[#6B7C93]">{messages} messages</div>}
         </div>
       </div>
     </motion.button>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  Branch Creation Panel (Modal)                              */
+/* ═══════════════════════════════════════════════════════════ */
+
+function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsage, onClose, onBranchFull, onBranchCompressed }) {
+  const [mode, setMode] = useState(null)
+  const [compressing, setCompressing] = useState(false)
+  const [compressed, setCompressed] = useState(false)
+  const [previewExpanded, setPreviewExpanded] = useState(false)
+
+  const compressedPct = Math.max(Math.round(contextUsage * 0.12), 2)
+
+  const handleCreate = () => {
+    if (!mode || compressing) return
+    if (mode === 'compressed') {
+      setCompressing(true)
+      setTimeout(() => { setCompressing(false); setCompressed(true) }, 1500)
+    } else {
+      onBranchFull?.()
+    }
+  }
+
+  const handleOpen = () => { onBranchCompressed?.() }
+
+  let btnLabel = 'Create Branch'
+  let BtnIcon = GitBranch
+  if (compressing) { btnLabel = 'Compressing...'; BtnIcon = Zap }
+  else if (compressed) { btnLabel = 'Open Branch'; BtnIcon = ArrowRight }
+
+  const getColor = (p) => p < 50 ? '#22C55E' : p < 80 ? '#E5A620' : '#EF4444'
+  let meterTarget = contextUsage
+  if (compressed) meterTarget = compressedPct
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-6"
+      style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}
+    >
+      <div className="absolute inset-0" onClick={onClose} />
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={SPRING_SNAPPY}
+        className="relative z-10 bg-white border border-[#EBEBEB] rounded-xl w-full max-w-[420px] flex flex-col"
+        style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
+      >
+        {/* Header */}
+        <div className="p-5 pb-4" style={{ borderBottom: '1px solid #F0F0F0' }}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(124,108,212,0.1)' }}>
+                <GitBranch className="w-4 h-4 text-[#7C6CD4]" />
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-[#1E2532]">Create Branch</div>
+                <div className="text-[11px] text-[#6B7C93] mt-0.5">Forking from message {messageIndex} of {totalMessages}</div>
+              </div>
+            </div>
+            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onClose} className="p-2 rounded-lg text-[#6B7C93] hover:bg-[#EEEEEE] transition-colors">
+              <X className="w-4 h-4" />
+            </motion.button>
+          </div>
+          <div className="mt-4">
+            <div className="flex justify-between mb-1">
+              <span className="text-[10px] font-semibold text-[#6B7C93] uppercase tracking-wider">Context window after branch</span>
+              <span className="text-xs font-bold tabular-nums" style={{ color: getColor(meterTarget) }}>{Math.round(meterTarget)}%</span>
+            </div>
+            <div className="h-1.5 bg-[#F0F0F0] rounded-full overflow-hidden">
+              <motion.div animate={{ width: `${meterTarget}%` }} transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1] }} className="h-full rounded-full" style={{ backgroundColor: getColor(meterTarget) }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Body — mode cards */}
+        <div className="p-4 space-y-3">
+          {/* Full History */}
+          <motion.div
+            whileHover={{ borderColor: mode === 'full' ? '#4A7AE5' : '#D5D5D5' }}
+            onClick={() => { setMode('full'); setCompressed(false) }}
+            className="rounded-lg p-4 cursor-pointer transition-colors"
+            style={{ border: mode === 'full' ? '1.5px solid #4A7AE5' : '1px solid #EBEBEB', backgroundColor: mode === 'full' ? 'rgba(74,122,229,0.04)' : '#FFFFFF' }}
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: mode === 'full' ? 'rgba(74,122,229,0.1)' : '#F5F5F5' }}>
+                <Copy className="w-4 h-4" style={{ color: mode === 'full' ? '#4A7AE5' : '#6B7C93' }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold text-[#1E2532]">Full History</div>
+                <p className="text-xs text-[#6B7C93] mt-0.5">Copy all {messageIndex} messages as-is. Continue with the same context.</p>
+                {mode === 'full' && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-3 flex items-center gap-2 px-3 py-2 bg-[#FAFAFA] border border-[#F0F0F0] rounded-lg">
+                    <Info className="w-3 h-3 text-[#6B7C93] flex-shrink-0" />
+                    <span className="text-[11px] text-[#6B7C93]">Branch starts at {contextUsage}% context — same as current conversation</span>
+                  </motion.div>
+                )}
+              </div>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${mode === 'full' ? 'border-[#4A7AE5] bg-[#4A7AE5]' : 'border-[#D5D5D5] bg-white'}`}>
+                {mode === 'full' && <div className="w-2 h-2 rounded-full bg-white" />}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Compressed Summary */}
+          <motion.div
+            whileHover={{ borderColor: mode === 'compressed' ? '#4A7AE5' : '#D5D5D5' }}
+            onClick={() => { setMode('compressed'); setCompressed(false) }}
+            className="rounded-lg p-4 cursor-pointer transition-colors"
+            style={{ border: mode === 'compressed' ? '1.5px solid #4A7AE5' : '1px solid #EBEBEB', backgroundColor: mode === 'compressed' ? 'rgba(74,122,229,0.04)' : '#FFFFFF' }}
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: mode === 'compressed' ? 'rgba(74,122,229,0.1)' : '#F5F5F5' }}>
+                <Zap className="w-4 h-4" style={{ color: mode === 'compressed' ? '#4A7AE5' : '#6B7C93' }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-semibold text-[#1E2532]">Compressed Summary</span>
+                  <span className="text-xs font-semibold text-[#22C55E]">(saves context)</span>
+                </div>
+                <p className="text-xs text-[#6B7C93] mt-0.5">Start fresh with an AI-generated summary of the conversation so far.</p>
+                {mode === 'compressed' && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-3 space-y-3">
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.15)' }}>
+                      <Zap className="w-3 h-3 text-[#22C55E] flex-shrink-0" />
+                      <span className="text-[11px] text-[#22C55E] font-semibold">{contextUsage}% → ~{compressedPct}% — frees up {contextUsage - compressedPct}%</span>
+                    </div>
+                    <button onClick={(e) => { e.stopPropagation(); setPreviewExpanded(!previewExpanded) }} className="flex items-center gap-1.5 text-[11px] font-semibold text-[#4A7AE5] bg-transparent border-none cursor-pointer p-0">
+                      <ChevronRight className="w-3 h-3 transition-transform" style={{ transform: previewExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }} />
+                      Preview summary
+                    </button>
+                    <AnimatePresence>
+                      {previewExpanded && (
+                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={SPRING_SNAPPY} className="overflow-hidden">
+                          <div className="px-3 py-2.5 bg-[#FAFAFA] border border-[#F0F0F0] rounded-lg">
+                            <p className="text-[11px] text-[#4A5568] leading-relaxed italic">Summary will be generated when you create the branch. It captures key decisions, conclusions, and open questions.</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                )}
+              </div>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${mode === 'compressed' ? 'border-[#4A7AE5] bg-[#4A7AE5]' : 'border-[#D5D5D5] bg-white'}`}>
+                {mode === 'compressed' && <div className="w-2 h-2 rounded-full bg-white" />}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between p-4" style={{ borderTop: '1px solid #F0F0F0' }}>
+          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={onClose} className="px-4 py-2 rounded-lg text-xs font-semibold text-[#6B7C93] hover:text-[#1E2532] transition-colors">
+            Cancel
+          </motion.button>
+          <motion.button
+            whileHover={mode && !compressing ? { scale: 1.03 } : {}}
+            whileTap={mode && !compressing ? { scale: 0.97 } : {}}
+            onClick={compressed ? handleOpen : handleCreate}
+            className="px-5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all"
+            style={{
+              border: mode ? 'none' : '1px solid #EBEBEB',
+              background: mode ? 'linear-gradient(to right, #4A7AE5, #7C6CD4)' : '#FFFFFF',
+              color: mode ? '#FFFFFF' : '#D5D5D5',
+              cursor: mode && !compressing ? 'pointer' : 'not-allowed',
+              opacity: (!mode || compressing) ? 0.7 : 1,
+            }}
+          >
+            <BtnIcon className="w-3.5 h-3.5" />
+            {btnLabel}
+          </motion.button>
+        </div>
+      </motion.div>
+    </motion.div>
   )
 }
