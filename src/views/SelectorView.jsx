@@ -805,7 +805,7 @@ export default function SelectorView() {
 
               {/* Table Body */}
               <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}>
-                <motion.div variants={staggerContainer} initial="hidden" animate="show">
+                <motion.div variants={staggerContainer} initial={false} animate="show">
                   {sortedChats.map((chat) => (
                     <ChatTableRow
                       key={chat.id}
@@ -904,7 +904,7 @@ export default function SelectorView() {
                     </p>
                   </div>
                 ) : (
-                  <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-2">
+                  <motion.div variants={staggerContainer} initial={false} animate="show" className="space-y-2">
                     {favorites.map((fav) => (
                       <FavoriteCard key={fav.id} favorite={fav} onRemove={() => removeFavorite(fav.id)} onNavigate={handleNavigate} />
                     ))}

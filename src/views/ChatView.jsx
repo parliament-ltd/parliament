@@ -533,7 +533,7 @@ export default function ChatView() {
           {/* Table of Contents */}
           <motion.div
             variants={staggerContainer}
-            initial="hidden"
+            initial={false}
             animate="show"
             className="space-y-1 mb-6"
           >
@@ -565,7 +565,7 @@ export default function ChatView() {
           {/* Quick Actions */}
           <motion.div
             variants={staggerContainer}
-            initial="hidden"
+            initial={false}
             animate="show"
             className="space-y-1"
           >
