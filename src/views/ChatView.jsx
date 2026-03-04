@@ -12,6 +12,11 @@ import { useConversations } from '../stores/ConversationContext'
 import { useSettings } from '../stores/SettingsContext'
 import { getProvider } from '../providers'
 import { loadApiKey } from '../lib/crypto'
+import {
+  getFavorites, addFavorite, deleteFavorite,
+  getNotes, addNote, updateNote, deleteNote,
+  deleteMessage,
+} from '../lib/db'
 
 /* ── Animation Constants ─────────────────────────────────── */
 
@@ -59,9 +64,12 @@ export default function ChatView() {
 
   // UI state
   const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false)
-  const [favorites, setFavorites] = useState(new Set())
-  const [showNotes, setShowNotes] = useState(new Set())
   const [hiddenMessages, setHiddenMessages] = useState(new Set())
+
+  // Persisted annotations — Maps keyed by messageId → db record
+  const [favoritesMap, setFavoritesMap] = useState(new Map()) // messageId → { id, conversationId, messageId }
+  const [notesMap, setNotesMap] = useState(new Map())         // messageId → { id, conversationId, messageId, text }
+  const [showNotes, setShowNotes] = useState(new Set())       // which note panels are open (UI-only)
 
   // Context health — derive from real token usage
   const modelInfo = useMemo(() => {
@@ -91,12 +99,43 @@ export default function ChatView() {
       return n
     })
 
-  const toggleFav = (msgId) =>
-    setFavorites((prev) => {
-      const n = new Set(prev)
-      n.has(msgId) ? n.delete(msgId) : n.add(msgId)
-      return n
-    })
+  const toggleFav = useCallback(async (msgId) => {
+    const existing = favoritesMap.get(msgId)
+    if (existing) {
+      // Remove from IndexedDB and state
+      try { await deleteFavorite(existing.id) } catch {}
+      setFavoritesMap(prev => { const n = new Map(prev); n.delete(msgId); return n })
+    } else {
+      // Add to IndexedDB and state
+      try {
+        const record = await addFavorite({ conversationId: id, messageId: msgId })
+        setFavoritesMap(prev => new Map(prev).set(msgId, record))
+      } catch {}
+    }
+  }, [favoritesMap, id])
+
+  const handleNoteSave = useCallback(async (msgId, text) => {
+    const existing = notesMap.get(msgId)
+    if (existing) {
+      if (text.trim()) {
+        // Update existing note
+        try {
+          const updated = await updateNote(existing.id, text)
+          setNotesMap(prev => new Map(prev).set(msgId, updated))
+        } catch {}
+      } else {
+        // Empty text — delete the note
+        try { await deleteNote(existing.id) } catch {}
+        setNotesMap(prev => { const n = new Map(prev); n.delete(msgId); return n })
+      }
+    } else if (text.trim()) {
+      // Create new note
+      try {
+        const record = await addNote({ conversationId: id, messageId: msgId, text })
+        setNotesMap(prev => new Map(prev).set(msgId, record))
+      } catch {}
+    }
+  }, [notesMap, id])
 
   const hideMessage = useCallback((msgId) => {
     setHiddenMessages((prev) => {
@@ -115,8 +154,10 @@ export default function ChatView() {
   }, [])
 
   const handleDelete = useCallback(async (msgId) => {
-    // TODO: wire to db.deleteMessage when ChatContext exposes it
-    // For now, hide the message from view (non-destructive)
+    try {
+      await deleteMessage(msgId)
+    } catch {}
+    // Also remove from local state so it disappears immediately
     hideMessage(msgId)
   }, [hideMessage])
 
@@ -143,6 +184,16 @@ export default function ChatView() {
         const key = await loadApiKey(settings.storageMode)
         if (!cancelled) setApiKey(key)
         await loadMessages(id)
+
+        // Load persisted annotations
+        const [favs, notes] = await Promise.all([
+          getFavorites(id),
+          getNotes(id),
+        ])
+        if (!cancelled) {
+          setFavoritesMap(new Map(favs.map(f => [f.messageId, f])))
+          setNotesMap(new Map(notes.map(n => [n.messageId, n])))
+        }
       } catch {
         // Conversation may not exist
       } finally {
@@ -238,7 +289,7 @@ export default function ChatView() {
   }))
 
   // Favorited messages for right sidebar
-  const favoritedMessages = visibleMessages.filter((m) => favorites.has(m.id))
+  const favoritedMessages = visibleMessages.filter((m) => favoritesMap.has(m.id))
 
   /* ── Loading ───────────────────────────────────────────── */
 
@@ -397,10 +448,12 @@ export default function ChatView() {
                 number={idx + 1}
                 index={isNew ? idx : undefined}
                 isGhostText={isGhostText}
-                isFavorited={favorites.has(msg.id)}
+                isFavorited={favoritesMap.has(msg.id)}
                 showNotes={showNotes.has(msg.id)}
+                savedNoteText={notesMap.get(msg.id)?.text || ''}
                 onNote={() => toggleNote(msg.id)}
                 onFavorite={() => toggleFav(msg.id)}
+                onNoteSave={(text) => handleNoteSave(msg.id, text)}
                 onContinue={isGhostText ? () => handleContinue(msg.id) : null}
                 onDelete={() => handleDelete(msg.id)}
                 onHide={() => hideMessage(msg.id)}
@@ -785,12 +838,24 @@ function MessageCard({
   id, type, content, number, index = 0,
   isGhostText = false,
   isFavorited = false, showNotes = false,
-  onNote, onFavorite, onContinue, onDelete, onBranch,
+  savedNoteText = '',
+  onNote, onFavorite, onNoteSave, onContinue, onDelete, onBranch,
   onHide, onCopyText,
 }) {
-  const [noteText, setNoteText] = useState('')
+  const [noteText, setNoteText] = useState(savedNoteText)
   const [showMenu, setShowMenu] = useState(false)
   const [copied, setCopied] = useState(false)
+
+  // Sync if savedNoteText changes (e.g. on load)
+  useEffect(() => {
+    setNoteText(savedNoteText)
+  }, [savedNoteText])
+
+  const handleNoteBlur = () => {
+    if (noteText !== savedNoteText) {
+      onNoteSave?.(noteText)
+    }
+  }
 
   const handleCopy = () => {
     onCopyText?.()
@@ -826,6 +891,13 @@ function MessageCard({
             <span className="text-xs font-mono text-[#D5D5D5] opacity-0 group-hover:opacity-100 transition-opacity">
               #{number}
             </span>
+            {/* Persistent indicators — visible without hover */}
+            {(isFavorited || savedNoteText) && (
+              <div className="flex items-center gap-1.5">
+                {isFavorited && <Star className="w-3 h-3" style={{ fill: '#E5A620', color: '#E5A620' }} />}
+                {savedNoteText && <StickyNote className="w-3 h-3 text-[#E5A620]" />}
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <MsgIconButton
@@ -910,6 +982,7 @@ function MessageCard({
                   <textarea
                     value={noteText}
                     onChange={(e) => setNoteText(e.target.value)}
+                    onBlur={handleNoteBlur}
                     placeholder="Add a note about this message..."
                     className="w-full bg-transparent text-xs text-[#4A5568] resize-none focus:outline-none placeholder:text-[#D5D5D5]"
                     rows={2}
