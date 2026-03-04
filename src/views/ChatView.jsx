@@ -456,10 +456,15 @@ export default function ChatView() {
     const seen = new Map() // text → { ids: [highlightId, ...], color, count }
     for (const hl of highlightsList) {
       if (!seen.has(hl.text)) {
-        // Count how many messages contain this text
+        // Count total occurrences of this text across all messages
         let count = 0
         for (const msg of visibleMessages) {
-          if (msg.content?.includes(hl.text)) count++
+          if (!msg.content) continue
+          let idx = 0
+          while ((idx = msg.content.indexOf(hl.text, idx)) !== -1) {
+            count++
+            idx += hl.text.length
+          }
         }
         seen.set(hl.text, { text: hl.text, color: hl.color, count, ids: [hl.id] })
       } else {
