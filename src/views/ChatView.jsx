@@ -5,7 +5,8 @@ import {
   Square, AlertCircle,
   GitBranch, Trash2, MessageSquare,
   FileText, MoreVertical, StickyNote, Activity, Zap, Star,
-  Eye, Copy, ArrowRightCircle, Settings2, BookOpen, PanelRight, X
+  Eye, Copy, ArrowRightCircle, Settings2, BookOpen, PanelRight, X,
+  Highlighter,
 } from 'lucide-react'
 import { useChat } from '../stores/ChatContext'
 import { useConversations } from '../stores/ConversationContext'
@@ -15,6 +16,7 @@ import { loadApiKey } from '../lib/crypto'
 import {
   getFavorites, addFavorite, deleteFavorite,
   getNotes, addNote, updateNote, deleteNote,
+  getHighlights, addHighlight, deleteHighlight,
   deleteMessage,
 } from '../lib/db'
 
@@ -25,6 +27,14 @@ const SPRING_SMOOTH = { type: 'spring', stiffness: 300, damping: 28 }
 const SPRING_GENTLE = { type: 'spring', stiffness: 200, damping: 24 }
 const SIDEBAR_RESIZE = { type: 'spring', stiffness: 150, damping: 25 }
 const SEND_DEBOUNCE_MS = 500
+
+const HIGHLIGHT_COLORS = [
+  { id: 'blue', color: '#4A7AE5', bg: 'rgba(74,122,229,0.15)' },
+  { id: 'yellow', color: '#E5A620', bg: 'rgba(229,166,32,0.15)' },
+  { id: 'green', color: '#22C55E', bg: 'rgba(34,197,94,0.15)' },
+  { id: 'purple', color: '#7C6CD4', bg: 'rgba(124,108,212,0.15)' },
+  { id: 'red', color: '#EF4444', bg: 'rgba(239,68,68,0.15)' },
+]
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -69,6 +79,7 @@ export default function ChatView() {
   // Persisted annotations — Maps keyed by messageId → db record
   const [favoritesMap, setFavoritesMap] = useState(new Map()) // messageId → { id, conversationId, messageId }
   const [notesMap, setNotesMap] = useState(new Map())         // messageId → { id, conversationId, messageId, text }
+  const [highlightsList, setHighlightsList] = useState([])    // Array of { id, conversationId, messageId, text, color }
   const [showNotes, setShowNotes] = useState(new Set())       // which note panels are open (UI-only)
 
   // Context health — derive from real token usage
@@ -137,6 +148,20 @@ export default function ChatView() {
     }
   }, [notesMap, id])
 
+  const handleAddHighlight = useCallback(async (msgId, text, color) => {
+    try {
+      const record = await addHighlight({ conversationId: id, messageId: msgId, text, color })
+      setHighlightsList(prev => [...prev, record])
+    } catch {}
+  }, [id])
+
+  const handleRemoveHighlight = useCallback(async (highlightId) => {
+    try {
+      await deleteHighlight(highlightId)
+      setHighlightsList(prev => prev.filter(h => h.id !== highlightId))
+    } catch {}
+  }, [])
+
   const hideMessage = useCallback((msgId) => {
     setHiddenMessages((prev) => {
       const n = new Set(prev)
@@ -186,13 +211,15 @@ export default function ChatView() {
         await loadMessages(id)
 
         // Load persisted annotations
-        const [favs, notes] = await Promise.all([
+        const [favs, notes, highlights] = await Promise.all([
           getFavorites(id),
           getNotes(id),
+          getHighlights(id),
         ])
         if (!cancelled) {
           setFavoritesMap(new Map(favs.map(f => [f.messageId, f])))
           setNotesMap(new Map(notes.map(n => [n.messageId, n])))
+          setHighlightsList(highlights)
         }
       } catch {
         // Conversation may not exist
@@ -451,9 +478,11 @@ export default function ChatView() {
                 isFavorited={favoritesMap.has(msg.id)}
                 showNotes={showNotes.has(msg.id)}
                 savedNoteText={notesMap.get(msg.id)?.text || ''}
+                highlights={highlightsList.filter(h => h.messageId === msg.id)}
                 onNote={() => toggleNote(msg.id)}
                 onFavorite={() => toggleFav(msg.id)}
                 onNoteSave={(text) => handleNoteSave(msg.id, text)}
+                onHighlight={(text, color) => handleAddHighlight(msg.id, text, color)}
                 onContinue={isGhostText ? () => handleContinue(msg.id) : null}
                 onDelete={() => handleDelete(msg.id)}
                 onHide={() => hideMessage(msg.id)}
@@ -600,7 +629,11 @@ export default function ChatView() {
               <div className="p-4" style={{ borderBottom: '1px solid #F0F0F0' }}>
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider">
-                    Highlights
+                    Highlights {highlightsList.length > 0 && (
+                      <span className="text-[#4A7AE5] normal-case tracking-normal">
+                        ({highlightsList.length})
+                      </span>
+                    )}
                   </h3>
                   <motion.button
                     whileHover={{ scale: 1.15 }}
@@ -613,17 +646,54 @@ export default function ChatView() {
                     <PanelRight className="w-5 h-5" />
                   </motion.button>
                 </div>
-                <p className="text-xs text-[#6B7C93] mb-4">
-                  Navigate through highlighted terms
+                <p className="text-xs text-[#6B7C93] mb-3">
+                  Select text in any message to highlight it
                 </p>
-                {/* Placeholder for Step 10 */}
-                <motion.button
-                  whileHover={{ ...interactiveHover, borderColor: '#4A7AE5', color: '#4A7AE5' }}
-                  whileTap={interactiveTap}
-                  className="w-full px-3 py-2 border border-dashed border-[#EBEBEB] rounded-lg text-xs text-[#6B7C93] transition-colors"
-                >
-                  + Add Highlight
-                </motion.button>
+                {highlightsList.length === 0 ? (
+                  <div className="flex items-center gap-2 px-3 py-2 border border-dashed border-[#EBEBEB] rounded-lg">
+                    <Highlighter className="w-3.5 h-3.5 text-[#D5D5D5]" />
+                    <span className="text-xs text-[#D5D5D5]">No highlights yet</span>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5 max-h-48 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}>
+                    {highlightsList.map((hl) => (
+                      <motion.div
+                        key={hl.id}
+                        initial={{ opacity: 0, x: -6 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="group/hl flex items-start gap-2 px-2.5 py-2 rounded-lg hover:bg-[#FAFAFA] transition-colors cursor-pointer"
+                        onClick={() => {
+                          document.getElementById(`msg-${hl.messageId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                        }}
+                      >
+                        <div
+                          className="w-2 h-2 rounded-full mt-1 flex-shrink-0"
+                          style={{ backgroundColor: hl.color }}
+                        />
+                        <p className="text-xs text-[#1E2532] flex-1 line-clamp-2" style={{
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        }}>
+                          {hl.text}
+                        </p>
+                        <motion.button
+                          whileHover={{ scale: 1.2 }}
+                          whileTap={{ scale: 0.8 }}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleRemoveHighlight(hl.id)
+                          }}
+                          className="p-0.5 rounded opacity-0 group-hover/hl:opacity-100 hover:bg-[#EEEEEE] text-[#6B7C93] hover:text-[#EF4444] transition-all flex-shrink-0"
+                          title="Remove highlight"
+                        >
+                          <X className="w-3 h-3" />
+                        </motion.button>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Favorites Section */}
@@ -839,12 +909,15 @@ function MessageCard({
   isGhostText = false,
   isFavorited = false, showNotes = false,
   savedNoteText = '',
-  onNote, onFavorite, onNoteSave, onContinue, onDelete, onBranch,
+  highlights = [],
+  onNote, onFavorite, onNoteSave, onHighlight, onContinue, onDelete, onBranch,
   onHide, onCopyText,
 }) {
   const [noteText, setNoteText] = useState(savedNoteText)
   const [showMenu, setShowMenu] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [selectionPopover, setSelectionPopover] = useState(null) // { text, x, y }
+  const contentRef = useRef(null)
 
   // Sync if savedNoteText changes (e.g. on load)
   useEffect(() => {
@@ -863,6 +936,100 @@ function MessageCard({
     setShowMenu(false)
     setTimeout(() => setCopied(false), 1500)
   }
+
+  // Text selection handler — show color picker popover
+  const handleMouseUp = useCallback(() => {
+    const selection = window.getSelection()
+    const text = selection?.toString().trim()
+    if (!text || text.length < 2) {
+      setSelectionPopover(null)
+      return
+    }
+
+    // Check the selection is within this message's content
+    const range = selection.getRangeAt(0)
+    if (!contentRef.current?.contains(range.commonAncestorContainer)) {
+      setSelectionPopover(null)
+      return
+    }
+
+    const rect = range.getBoundingClientRect()
+    const containerRect = contentRef.current.getBoundingClientRect()
+
+    setSelectionPopover({
+      text,
+      x: rect.left - containerRect.left + rect.width / 2,
+      y: rect.top - containerRect.top - 8,
+    })
+  }, [])
+
+  const handleHighlightColor = (color) => {
+    if (selectionPopover?.text) {
+      onHighlight?.(selectionPopover.text, color)
+    }
+    setSelectionPopover(null)
+    window.getSelection()?.removeAllRanges()
+  }
+
+  // Render content with highlights applied
+  const renderContent = useMemo(() => {
+    if (!highlights.length || !content) {
+      return <span>{content}</span>
+    }
+
+    // Build a list of ranges to highlight
+    const ranges = []
+    for (const hl of highlights) {
+      let startIndex = 0
+      // Find all occurrences of this highlight text
+      while (startIndex < content.length) {
+        const idx = content.indexOf(hl.text, startIndex)
+        if (idx === -1) break
+        ranges.push({ start: idx, end: idx + hl.text.length, color: hl.color })
+        startIndex = idx + hl.text.length
+      }
+    }
+
+    if (ranges.length === 0) return <span>{content}</span>
+
+    // Sort by start position, deduplicate overlaps (first wins)
+    ranges.sort((a, b) => a.start - b.start)
+    const merged = [ranges[0]]
+    for (let i = 1; i < ranges.length; i++) {
+      const last = merged[merged.length - 1]
+      if (ranges[i].start >= last.end) {
+        merged.push(ranges[i])
+      }
+    }
+
+    // Build fragments
+    const fragments = []
+    let cursor = 0
+    for (const r of merged) {
+      if (cursor < r.start) {
+        fragments.push(<span key={`t-${cursor}`}>{content.slice(cursor, r.start)}</span>)
+      }
+      const bgColor = HIGHLIGHT_COLORS.find(c => c.color === r.color)?.bg || 'rgba(74,122,229,0.15)'
+      fragments.push(
+        <mark
+          key={`h-${r.start}`}
+          style={{
+            backgroundColor: bgColor,
+            borderRadius: '2px',
+            padding: '0 1px',
+            color: 'inherit',
+          }}
+        >
+          {content.slice(r.start, r.end)}
+        </mark>
+      )
+      cursor = r.end
+    }
+    if (cursor < content.length) {
+      fragments.push(<span key={`t-${cursor}`}>{content.slice(cursor)}</span>)
+    }
+    return <>{fragments}</>
+  }, [content, highlights])
 
   return (
     <motion.div
@@ -954,10 +1121,40 @@ function MessageCard({
         </div>
 
         {/* Content */}
-        <div className="px-4 py-4 overflow-hidden">
+        <div className="px-4 py-4 overflow-hidden relative" ref={contentRef} onMouseUp={handleMouseUp}>
           <p className="text-sm leading-relaxed text-[#1E2532] whitespace-pre-wrap">
-            {content}
+            {renderContent}
           </p>
+
+          {/* Highlight color picker popover */}
+          <AnimatePresence>
+            {selectionPopover && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 4 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 4 }}
+                transition={{ duration: 0.12 }}
+                className="absolute z-40 flex items-center gap-1 px-2 py-1.5 bg-white border border-[#EBEBEB] rounded-lg shadow-lg"
+                style={{
+                  left: Math.max(0, selectionPopover.x - 60),
+                  top: selectionPopover.y - 32,
+                }}
+              >
+                <Highlighter className="w-3 h-3 text-[#6B7C93] mr-1" />
+                {HIGHLIGHT_COLORS.map((c) => (
+                  <motion.button
+                    key={c.id}
+                    whileHover={{ scale: 1.3 }}
+                    whileTap={{ scale: 0.85 }}
+                    onClick={() => handleHighlightColor(c.color)}
+                    className="w-5 h-5 rounded-full border-2 border-white shadow-sm"
+                    style={{ backgroundColor: c.color }}
+                    title={c.id}
+                  />
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Notes panel */}
