@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -45,7 +45,7 @@ export default function ChatView() {
   const { id } = useParams()
   const navigate = useNavigate()
   const {
-    messages, isStreaming, streamingContent,
+    messages, isStreaming, streamingContent, tokenUsage,
     loadMessages, sendMessage, continueMessage,
     stopGenerating, clearMessages,
   } = useChat()
@@ -62,7 +62,18 @@ export default function ChatView() {
   const [favorites, setFavorites] = useState(new Set())
   const [showNotes, setShowNotes] = useState(new Set())
   const [hiddenMessages, setHiddenMessages] = useState(new Set())
-  const [contextUsage] = useState(65) // TODO: wire to real token tracking in Step 9
+
+  // Context health — derive from real token usage
+  const modelInfo = useMemo(() => {
+    const provider = getProvider('anthropic')
+    const models = provider.getModels()
+    return models.find(m => m.id === settings.defaultModel) || models[0]
+  }, [settings.defaultModel])
+
+  const totalTokens = tokenUsage.input + tokenUsage.output
+  const contextWindow = modelInfo.contextWindow
+  const contextUsage = contextWindow > 0 ? Math.min(Math.round((totalTokens / contextWindow) * 100), 100) : 0
+  const contextThreshold = settings.contextThreshold || 80
 
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
@@ -71,7 +82,7 @@ export default function ChatView() {
   const clearMessagesRef = useRef(clearMessages)
   clearMessagesRef.current = clearMessages
 
-  const getContextColor = (u) => u < 50 ? '#22C55E' : u < 80 ? '#E5A620' : '#EF4444'
+  const getContextColor = (u) => u < (contextThreshold / 2) ? '#22C55E' : u < contextThreshold ? '#E5A620' : '#EF4444'
 
   const toggleNote = (msgId) =>
     setShowNotes((prev) => {
@@ -630,12 +641,17 @@ export default function ChatView() {
                 <div className="space-y-3">
                   <MetricRow label="Messages" value={hiddenCount > 0 ? `${visibleMessages.length} / ${messages.length}` : `${messages.length}`} />
                   <MetricRow
+                    label="Tokens"
+                    value={`${totalTokens.toLocaleString()} / ${contextWindow.toLocaleString()}`}
+                    color={getContextColor(contextUsage)}
+                  />
+                  <MetricRow
                     label="Context"
                     value={`${contextUsage}%`}
                     color={getContextColor(contextUsage)}
                   />
                   {/* Context bar */}
-                  <div className="w-full h-1.5 bg-[#F0F0F0] rounded-full overflow-hidden">
+                  <div className="relative w-full h-1.5 bg-[#F0F0F0] rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${contextUsage}%` }}
@@ -643,9 +659,15 @@ export default function ChatView() {
                       className="h-full rounded-full"
                       style={{ backgroundColor: getContextColor(contextUsage) }}
                     />
+                    {/* Threshold marker */}
+                    <div
+                      className="absolute top-0 bottom-0 w-px bg-[#6B7C93]/30"
+                      style={{ left: `${contextThreshold}%` }}
+                      title={`Threshold: ${contextThreshold}%`}
+                    />
                   </div>
                 </div>
-                {contextUsage >= 50 && (
+                {contextUsage >= (contextThreshold / 2) && (
                   <motion.div
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -667,10 +689,12 @@ export default function ChatView() {
                           className="text-xs font-semibold"
                           style={{ color: getContextColor(contextUsage) }}
                         >
-                          {contextUsage >= 80 ? 'Context Nearly Full' : 'Approaching Limit'}
+                          {contextUsage >= contextThreshold ? 'Context Nearly Full' : 'Approaching Limit'}
                         </div>
                         <div className="text-xs text-[#6B7C93] mt-1">
-                          Consider compressing the conversation or starting a new branch.
+                          {contextUsage >= contextThreshold
+                            ? 'Branch this conversation to free up context space.'
+                            : 'Consider compressing the conversation or starting a new branch.'}
                         </div>
                       </div>
                     </div>
