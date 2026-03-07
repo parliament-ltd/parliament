@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
@@ -35,29 +35,18 @@ const SEND_DEBOUNCE_MS = 500
 /* Used for: favorites star, branch creation moment, milestone flashes */
 
 const DUSTY_GOLD = '#C4A94D'
-const DUSTY_GOLD_SHADOW = '0 1px 3px rgba(196, 169, 77, 0.35)'
-const DUSTY_GOLD_GLOW = '0 0 8px rgba(196, 169, 77, 0.4)'
-const DUSTY_GOLD_BG = 'rgba(196, 169, 77, 0.12)'
 
-/* ── Milestone flash keyframes (injected once) ───────────── */
+/* ── Branch creation flash keyframes (injected once) ─────── */
 
 const MILESTONE_STYLE_ID = 'apollo-milestone-keyframes'
 if (typeof document !== 'undefined' && !document.getElementById(MILESTONE_STYLE_ID)) {
   const style = document.createElement('style')
   style.id = MILESTONE_STYLE_ID
   style.textContent = `
-    @keyframes apolloGoldPulse {
-      0% { filter: drop-shadow(0 0 0px rgba(196,169,77,0)); transform: scale(1); }
-      40% { filter: drop-shadow(0 0 8px rgba(196,169,77,0.5)); transform: scale(1.18); }
-      100% { filter: drop-shadow(0 0 0px rgba(196,169,77,0)); transform: scale(1); }
-    }
     @keyframes apolloBranchFlash {
       0% { box-shadow: 0 0 0px rgba(196,169,77,0); }
       50% { box-shadow: 0 0 16px rgba(196,169,77,0.35); }
       100% { box-shadow: 0 0 0px rgba(196,169,77,0); }
-    }
-    .apollo-gold-pulse {
-      animation: apolloGoldPulse 0.5s ease-out;
     }
     .apollo-branch-flash {
       animation: apolloBranchFlash 0.8s ease-out;
@@ -208,6 +197,7 @@ export default function ChatView() {
   // UI state
   const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false)
   const [hiddenMessages, setHiddenMessages] = useState(new Set())
+  const [activePopoverMsgId, setActivePopoverMsgId] = useState(null) // only one color picker at a time
 
   // Persisted annotations — Maps keyed by messageId → db record
   const [favoritesMap, setFavoritesMap] = useState(new Map()) // messageId → { id, conversationId, messageId }
@@ -395,7 +385,7 @@ export default function ChatView() {
       await addMessage({
         conversationId: branchConv.id,
         role: 'assistant',
-        content: `**Conversation Summary**\n\n${summaryText.trim()}`,
+        content: summaryText.trim(),
         tokenCount: 0,
       })
 
@@ -707,7 +697,14 @@ export default function ChatView() {
         </AnimatePresence>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div
+          className="flex-1 overflow-y-auto p-6 space-y-4"
+          onMouseDown={() => {
+            // Dismiss any active highlight popover when clicking in the messages area
+            // (the popover's own clicks stopPropagation, so they won't trigger this)
+            if (activePopoverMsgId) setActivePopoverMsgId(null)
+          }}
+        >
           {visibleMessages.length === 0 && !isStreaming && hiddenCount === 0 && (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <MessageSquare className="w-8 h-8 text-[#EBEBEB] mb-3" />
@@ -738,6 +735,8 @@ export default function ChatView() {
                 showNotes={showNotes.has(msg.id)}
                 savedNoteText={notesMap.get(msg.id)?.text || ''}
                 highlights={highlightsList}
+                isPopoverActive={activePopoverMsgId === msg.id}
+                onPopoverChange={(active) => setActivePopoverMsgId(active ? msg.id : null)}
                 onNote={() => toggleNote(msg.id)}
                 onFavorite={() => toggleFav(msg.id)}
                 onNoteSave={(text) => handleNoteSave(msg.id, text)}
@@ -1081,7 +1080,6 @@ export default function ChatView() {
                             style={{
                               fill: DUSTY_GOLD,
                               color: DUSTY_GOLD,
-                              filter: `drop-shadow(${DUSTY_GOLD_SHADOW})`,
                               strokeLinejoin: 'round',
                               strokeLinecap: 'round',
                             }}
@@ -1303,14 +1301,14 @@ function MessageCard({
   isFavorited = false, showNotes = false,
   savedNoteText = '',
   highlights = [],
+  isPopoverActive = false, onPopoverChange,
   onNote, onFavorite, onNoteSave, onHighlight, onContinue, onDelete, onBranch,
   onHide, onCopyText,
 }) {
   const [noteText, setNoteText] = useState(savedNoteText)
   const [showMenu, setShowMenu] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [selectionPopover, setSelectionPopover] = useState(null)
-  const [favJustToggled, setFavJustToggled] = useState(false)
+  const [popoverPos, setPopoverPos] = useState(null) // { text, x, y } — position only, visibility controlled by parent
   const contentRef = useRef(null)
 
   useEffect(() => {
@@ -1330,131 +1328,166 @@ function MessageCard({
     setTimeout(() => setCopied(false), 1500)
   }
 
-  // Dusty gold milestone flash on favorite toggle
+  // Favorite click — straight passthrough, no animation
   const handleFavoriteClick = () => {
     onFavorite?.()
-    if (!isFavorited) {
-      // Toggling ON → trigger pulse animation
-      setFavJustToggled(true)
-      setTimeout(() => setFavJustToggled(false), 500)
-    }
   }
 
   const handleMouseUp = useCallback(() => {
     const selection = window.getSelection()
     const text = selection?.toString().trim()
     if (!text || text.length < 2) {
-      setSelectionPopover(null)
+      onPopoverChange?.(false)
+      setPopoverPos(null)
       return
     }
     const range = selection.getRangeAt(0)
     if (!contentRef.current?.contains(range.commonAncestorContainer)) {
-      setSelectionPopover(null)
+      onPopoverChange?.(false)
+      setPopoverPos(null)
       return
     }
     const rect = range.getBoundingClientRect()
     const containerRect = contentRef.current.getBoundingClientRect()
-    setSelectionPopover({
+    setPopoverPos({
       text,
       x: rect.left - containerRect.left + rect.width / 2,
       y: rect.top - containerRect.top - 8,
     })
-  }, [])
+    onPopoverChange?.(true)
+  }, [onPopoverChange])
 
   const handleHighlightColor = (color) => {
-    if (selectionPopover?.text) {
-      onHighlight?.(selectionPopover.text, color)
+    if (popoverPos?.text) {
+      onHighlight?.(popoverPos.text, color)
     }
-    setSelectionPopover(null)
+    setPopoverPos(null)
+    onPopoverChange?.(false)
     window.getSelection()?.removeAllRanges()
   }
 
   // ── Render content with highlights + Markdown ──────────
+  //
+  // Strategy: render Markdown first via ReactMarkdown with custom
+  // component renderers. For each text-bearing element (p, li, td,
+  // strong, em, etc.) we intercept the children and apply highlight
+  // matching on the raw text fragments, wrapping matches in <mark>.
+
+  // Build a sorted, merged list of highlight terms for reuse
+  const highlightTerms = useMemo(() => {
+    if (!highlights.length) return []
+    const seen = new Map()
+    for (const hl of highlights) {
+      const key = hl.text.toLowerCase()
+      if (!seen.has(key)) {
+        const bgColor = HIGHLIGHT_COLORS.find(c => c.color === hl.color)?.bg || 'rgba(74,122,229,0.15)'
+        seen.set(key, { text: hl.text, bg: bgColor })
+      }
+    }
+    return Array.from(seen.values())
+  }, [highlights])
+
   const renderContent = useMemo(() => {
     if (!content) return null
 
-    // If no highlights, render pure Markdown
-    if (!highlights.length) {
-      return (
-        <div className="apollo-md">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {content}
-          </ReactMarkdown>
-        </div>
-      )
+    // Helper: walk React children and apply highlights to string nodes
+    function applyHighlights(children) {
+      if (!highlightTerms.length) return children
+
+      return React.Children.map(children, (child) => {
+        // Only process string nodes
+        if (typeof child === 'string') {
+          return highlightString(child)
+        }
+        // Recurse into React elements that have children
+        if (child && child.props && child.props.children) {
+          return React.cloneElement(child, {
+            ...child.props,
+            children: applyHighlights(child.props.children),
+          })
+        }
+        return child
+      })
     }
 
-    // Strategy: inject HTML <mark> tags into the raw Markdown string
-    // at highlight positions, then render via ReactMarkdown with a
-    // custom mark component.
-    //
-    // We use a unique marker token to avoid breaking Markdown syntax,
-    // then replace after rendering.
-
-    // Build highlight ranges — case-insensitive
-    const ranges = []
-    for (const hl of highlights) {
-      let startIndex = 0
-      while (startIndex < content.length) {
-        const idx = indexOfCI(content, hl.text, startIndex)
-        if (idx === -1) break
-        ranges.push({ start: idx, end: idx + hl.text.length, color: hl.color })
-        startIndex = idx + hl.text.length
+    // Split a string by highlight matches and return fragments with <mark>
+    function highlightString(text) {
+      const ranges = []
+      for (const hl of highlightTerms) {
+        let startIndex = 0
+        while (startIndex < text.length) {
+          const idx = indexOfCI(text, hl.text, startIndex)
+          if (idx === -1) break
+          ranges.push({ start: idx, end: idx + hl.text.length, bg: hl.bg })
+          startIndex = idx + hl.text.length
+        }
       }
-    }
 
-    if (ranges.length === 0) {
-      return (
-        <div className="apollo-md">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {content}
-          </ReactMarkdown>
-        </div>
-      )
-    }
+      if (ranges.length === 0) return text
 
-    // Sort and merge overlapping ranges (first wins)
-    ranges.sort((a, b) => a.start - b.start)
-    const merged = [ranges[0]]
-    for (let i = 1; i < ranges.length; i++) {
-      const last = merged[merged.length - 1]
-      if (ranges[i].start >= last.end) {
-        merged.push(ranges[i])
+      // Sort and merge (first wins on overlap)
+      ranges.sort((a, b) => a.start - b.start)
+      const merged = [ranges[0]]
+      for (let i = 1; i < ranges.length; i++) {
+        const last = merged[merged.length - 1]
+        if (ranges[i].start >= last.end) {
+          merged.push(ranges[i])
+        }
       }
+
+      const fragments = []
+      let cursor = 0
+      for (const r of merged) {
+        if (cursor < r.start) {
+          fragments.push(text.slice(cursor, r.start))
+        }
+        fragments.push(
+          <mark
+            key={`hl-${r.start}`}
+            style={{
+              backgroundColor: r.bg,
+              borderRadius: '2px',
+              padding: '0 1px',
+              color: 'inherit',
+            }}
+          >
+            {text.slice(r.start, r.end)}
+          </mark>
+        )
+        cursor = r.end
+      }
+      if (cursor < text.length) {
+        fragments.push(text.slice(cursor))
+      }
+      return fragments
     }
 
-    // Build a new string with <mark> tags injected
-    // We use data attributes to carry the color through to rendering
-    let marked = ''
-    let cursor = 0
-    for (const r of merged) {
-      marked += content.slice(cursor, r.start)
-      const bgColor = HIGHLIGHT_COLORS.find(c => c.color === r.color)?.bg || 'rgba(74,122,229,0.15)'
-      marked += `<mark style="background-color:${bgColor}">${content.slice(r.start, r.end)}</mark>`
-      cursor = r.end
-    }
-    marked += content.slice(cursor)
+    // Custom components that apply highlight processing to their children
+    const highlightedComponents = highlightTerms.length > 0 ? {
+      p: ({ children, ...props }) => <p {...props}>{applyHighlights(children)}</p>,
+      li: ({ children, ...props }) => <li {...props}>{applyHighlights(children)}</li>,
+      td: ({ children, ...props }) => <td {...props}>{applyHighlights(children)}</td>,
+      th: ({ children, ...props }) => <th {...props}>{applyHighlights(children)}</th>,
+      strong: ({ children, ...props }) => <strong {...props}>{applyHighlights(children)}</strong>,
+      em: ({ children, ...props }) => <em {...props}>{applyHighlights(children)}</em>,
+      h1: ({ children, ...props }) => <h1 {...props}>{applyHighlights(children)}</h1>,
+      h2: ({ children, ...props }) => <h2 {...props}>{applyHighlights(children)}</h2>,
+      h3: ({ children, ...props }) => <h3 {...props}>{applyHighlights(children)}</h3>,
+      h4: ({ children, ...props }) => <h4 {...props}>{applyHighlights(children)}</h4>,
+      blockquote: ({ children, ...props }) => <blockquote {...props}>{applyHighlights(children)}</blockquote>,
+    } : {}
 
     return (
       <div className="apollo-md">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
-          components={{
-            // Allow <mark> tags to pass through
-            mark: ({ children, ...props }) => (
-              <mark {...props}>{children}</mark>
-            ),
-          }}
-          // Allow the mark HTML element through
-          allowedElements={undefined}
-          unwrapDisallowed={false}
-          rehypePlugins={[]}
+          components={highlightedComponents}
         >
-          {marked}
+          {content}
         </ReactMarkdown>
       </div>
     )
-  }, [content, highlights])
+  }, [content, highlights, highlightTerms])
 
   return (
     <motion.div
@@ -1491,7 +1524,6 @@ function MessageCard({
                     style={{
                       fill: DUSTY_GOLD,
                       color: DUSTY_GOLD,
-                      filter: `drop-shadow(${DUSTY_GOLD_SHADOW})`,
                       strokeLinejoin: 'round',
                     }}
                   />
@@ -1507,11 +1539,10 @@ function MessageCard({
               title="Favorite"
             >
               <Star
-                className={`w-3.5 h-3.5 ${favJustToggled ? 'apollo-gold-pulse' : ''}`}
+                className="w-3.5 h-3.5"
                 style={isFavorited ? {
                   fill: DUSTY_GOLD,
                   color: DUSTY_GOLD,
-                  filter: `drop-shadow(${DUSTY_GOLD_SHADOW})`,
                   strokeLinejoin: 'round',
                 } : {}}
               />
@@ -1564,34 +1595,40 @@ function MessageCard({
             {renderContent}
           </div>
 
-          {/* Highlight color picker popover */}
+          {/* Highlight color picker popover — flips below if near top */}
           <AnimatePresence>
-            {selectionPopover && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: 4 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 4 }}
-                transition={{ duration: 0.12 }}
-                className="absolute z-40 flex items-center gap-1 px-2 py-1.5 bg-white border border-[#EBEBEB] rounded-lg shadow-lg"
-                style={{
-                  left: Math.max(0, selectionPopover.x - 60),
-                  top: selectionPopover.y - 32,
-                }}
-              >
-                <Pencil className="w-3 h-3 text-[#6B7C93] mr-1" />
-                {HIGHLIGHT_COLORS.map((c) => (
-                  <motion.button
-                    key={c.id}
-                    whileHover={{ scale: 1.3 }}
-                    whileTap={{ scale: 0.85 }}
-                    onClick={() => handleHighlightColor(c.color)}
-                    className="w-5 h-5 rounded-full border-2 border-white shadow-sm"
-                    style={{ backgroundColor: c.color }}
-                    title={c.id}
-                  />
-                ))}
-              </motion.div>
-            )}
+            {isPopoverActive && popoverPos && (() => {
+              const showBelow = popoverPos.y < 40
+              return (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: showBelow ? -4 : 4 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: showBelow ? -4 : 4 }}
+                  transition={{ duration: 0.12 }}
+                  className="absolute z-40 flex items-center gap-1 px-2 py-1.5 bg-white border border-[#EBEBEB] rounded-lg shadow-lg"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  style={{
+                    left: Math.max(0, popoverPos.x - 60),
+                    top: showBelow
+                      ? popoverPos.y + 24
+                      : popoverPos.y - 32,
+                  }}
+                >
+                  <Pencil className="w-3 h-3 text-[#6B7C93] mr-1" />
+                  {HIGHLIGHT_COLORS.map((c) => (
+                    <motion.button
+                      key={c.id}
+                      whileHover={{ scale: 1.3 }}
+                      whileTap={{ scale: 0.85 }}
+                      onClick={() => handleHighlightColor(c.color)}
+                      className="w-5 h-5 rounded-full border-2 border-white shadow-sm"
+                      style={{ backgroundColor: c.color }}
+                      title={c.id}
+                    />
+                  ))}
+                </motion.div>
+              )
+            })()}
           </AnimatePresence>
         </div>
 
@@ -1724,7 +1761,6 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
   const [compressing, setCompressing] = useState(false)
   const [compressed, setCompressed] = useState(false)
   const [previewExpanded, setPreviewExpanded] = useState(false)
-  const [branchFlash, setBranchFlash] = useState(false)
 
   const compressedPct = Math.max(Math.round(contextUsage * 0.12), 2)
 
@@ -1732,17 +1768,10 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
     if (!mode || compressing) return
     if (mode === 'compressed') {
       setCompressing(true)
-      setTimeout(() => { setCompressing(false); setCompressed(true); triggerFlash() }, 1500)
+      setTimeout(() => { setCompressing(false); setCompressed(true) }, 1500)
     } else {
-      triggerFlash()
-      // Small delay so the user sees the flash before navigation
-      setTimeout(() => onBranchFull?.(), 400)
+      onBranchFull?.()
     }
-  }
-
-  const triggerFlash = () => {
-    setBranchFlash(true)
-    setTimeout(() => setBranchFlash(false), 800)
   }
 
   const handleOpen = () => { onBranchCompressed?.() }
@@ -1770,7 +1799,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={SPRING_SNAPPY}
-        className={`relative z-10 bg-white border border-[#EBEBEB] rounded-xl w-full max-w-[420px] flex flex-col ${branchFlash ? 'apollo-branch-flash' : ''}`}
+        className="relative z-10 bg-white border border-[#EBEBEB] rounded-xl w-full max-w-[420px] flex flex-col"
         style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
       >
         {/* Header */}
@@ -1780,15 +1809,13 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center"
                 style={{
-                  backgroundColor: branchFlash ? DUSTY_GOLD_BG : 'rgba(124,108,212,0.1)',
-                  transition: 'background-color 0.3s ease',
+                  backgroundColor: 'rgba(124,108,212,0.1)',
                 }}
               >
                 <GitBranch
                   className="w-4 h-4"
                   style={{
-                    color: branchFlash ? DUSTY_GOLD : '#7C6CD4',
-                    transition: 'color 0.3s ease',
+                    color: '#7C6CD4',
                   }}
                 />
               </div>
@@ -1887,7 +1914,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
           </motion.div>
         </div>
 
-        {/* Footer — dusty gold flash on the CTA button at creation moment */}
+        {/* Footer — dusty gold gradient CTA */}
         <div className="flex items-center justify-between p-4" style={{ borderTop: '1px solid #F0F0F0' }}>
           <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={onClose} className="px-4 py-2 rounded-lg text-xs font-semibold text-[#6B7C93] hover:text-[#1E2532] transition-colors">
             Cancel
@@ -1899,16 +1926,12 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
             className="px-5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all"
             style={{
               border: mode ? 'none' : '1px solid #EBEBEB',
-              background: branchFlash
-                ? `linear-gradient(to right, ${DUSTY_GOLD}, #D4B85A)`
-                : mode
-                  ? 'linear-gradient(to right, #4A7AE5, #7C6CD4)'
-                  : '#FFFFFF',
+              background: mode
+                ? 'linear-gradient(to right, #C9A84C, #C4A94D)'
+                : '#FFFFFF',
               color: mode ? '#FFFFFF' : '#D5D5D5',
               cursor: mode && !compressing ? 'pointer' : 'not-allowed',
               opacity: (!mode || compressing) ? 0.7 : 1,
-              boxShadow: branchFlash ? DUSTY_GOLD_GLOW : 'none',
-              transition: 'background 0.3s ease, box-shadow 0.3s ease',
             }}
           >
             <BtnIcon className="w-3.5 h-3.5" />
