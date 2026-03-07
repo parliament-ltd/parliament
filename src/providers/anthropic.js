@@ -85,7 +85,7 @@ export class AnthropicProvider extends BaseProvider {
     }
   }
 
-  async sendMessage(apiKey, messages, model, onChunk, signal) {
+  async sendMessage(apiKey, messages, model, onChunk, signal, systemPrompt) {
     const response = await fetch(`${API_BASE}/messages`, {
       method: 'POST',
       headers: this._headers(apiKey),
@@ -94,6 +94,7 @@ export class AnthropicProvider extends BaseProvider {
         max_tokens: 8192,
         stream: true,
         messages,
+        ...(systemPrompt ? { system: systemPrompt } : {}),
       }),
       signal,
     })
