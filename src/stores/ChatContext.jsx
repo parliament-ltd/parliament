@@ -82,7 +82,8 @@ export function ChatProvider({ children }) {
   }, [updateConversation])
 
   // Send a message and handle streaming response
-  const sendMessage = useCallback(async (apiKey, conversationId, userContent, model, provider) => {
+  // systemPrompt: optional string from collaboration mode presets + custom instruction
+  const sendMessage = useCallback(async (apiKey, conversationId, userContent, model, provider, systemPrompt = '') => {
     // 1. Add user message to state and IndexedDB
     const userMsg = await addMessage({
       conversationId,
@@ -130,6 +131,7 @@ export function ChatProvider({ children }) {
         .map(m => ({ role: m.role, content: m.content }))
 
       // 5. Call provider with streaming
+      // Pass systemPrompt so it gets set as the top-level `system` field in the API request
       const response = await provider.sendMessage(
         apiKey,
         history,
@@ -138,7 +140,8 @@ export function ChatProvider({ children }) {
           latestContentRef.current += chunk
           setStreamingContent(prev => prev + chunk)
         },
-        abortControllerRef.current.signal
+        abortControllerRef.current.signal,
+        systemPrompt || undefined
       )
 
       // 6. Stream complete — final persist with incomplete: false
@@ -211,7 +214,8 @@ export function ChatProvider({ children }) {
   }, [startPersistInterval, stopPersistInterval, generateTitleIfNeeded])
 
   // Continue from an interrupted (ghost text) message
-  const continueMessage = useCallback(async (apiKey, incompleteMessageId, model, provider) => {
+  // systemPrompt: optional string from collaboration mode presets + custom instruction
+  const continueMessage = useCallback(async (apiKey, incompleteMessageId, model, provider, systemPrompt = '') => {
     const currentMessages = messagesRef.current
     const incompleteMsg = currentMessages.find(m => m.id === incompleteMessageId)
     if (!incompleteMsg) return
@@ -249,7 +253,8 @@ export function ChatProvider({ children }) {
           latestContentRef.current += chunk
           setStreamingContent(prev => prev + chunk)
         },
-        abortControllerRef.current.signal
+        abortControllerRef.current.signal,
+        systemPrompt || undefined
       )
 
       stopPersistInterval()

@@ -1,5 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import {
   BookOpen, X, Info, StickyNote, Star, GitBranch,
   Zap, Eye, Loader, AlertCircle,
@@ -251,7 +253,11 @@ export default function ReviewModal({
             </h3>
             {synthesis ? (
               <div className="px-4 py-3 bg-[#4A7AE5]/5 border border-[#4A7AE5]/15 rounded-lg">
-                <p className="text-xs text-[#1E2532] leading-relaxed whitespace-pre-wrap">{synthesis}</p>
+                <div className="text-xs text-[#1E2532] leading-relaxed apollo-md">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {synthesis}
+                  </ReactMarkdown>
+                </div>
               </div>
             ) : synthesisError ? (
               <div className="px-4 py-3 bg-[#EF4444]/5 border border-[#EF4444]/15 rounded-lg flex items-start gap-2">

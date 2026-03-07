@@ -509,6 +509,24 @@ export default function ChatView() {
 
   /* ── Handlers ──────────────────────────────────────────── */
 
+  // Build the combined system prompt from active collab presets + custom instruction
+  const buildCollabSystemPrompt = useCallback(() => {
+    const parts = []
+    // Import preset definitions
+    const presetDefs = [
+      { id: 'challenge', prompt: 'Before presenting any artifact or substantial output, critically evaluate it first. Identify assumptions, potential gaps, and weaknesses. Present your self-critique alongside the output.' },
+      { id: 'reasoning', prompt: 'Walk me through your reasoning before giving me the answer. Show your thought process step by step.' },
+      { id: 'pushback', prompt: "Push back if my assumptions are wrong. Don't just agree with me — tell me when you think I'm heading in the wrong direction." },
+      { id: 'alternatives', prompt: "When answering, provide alternative approaches or perspectives. Don't just give one answer — show me the landscape of options." },
+      { id: 'uncertainty', prompt: "Tell me what you're uncertain about. Distinguish between what you're confident in and where you're making educated guesses." },
+    ]
+    for (const p of presetDefs) {
+      if (activePresets.has(p.id)) parts.push(p.prompt)
+    }
+    if (customInstruction?.trim()) parts.push(customInstruction.trim())
+    return parts.length > 0 ? parts.join('\n\n') : ''
+  }, [activePresets, customInstruction])
+
   const handleSend = useCallback(async () => {
     const trimmed = inputValue.trim()
     if (!trimmed || isStreaming) return
@@ -523,7 +541,8 @@ export default function ChatView() {
     setApiError(null)
     try {
       const provider = getProvider('anthropic')
-      await sendMessage(apiKey, id, trimmed, settings.defaultModel, provider)
+      const collabPrompt = buildCollabSystemPrompt()
+      await sendMessage(apiKey, id, trimmed, settings.defaultModel, provider, collabPrompt)
       await refreshStorageEstimate()
     } catch (error) {
       if (error.status === 401 || error.status === 403) {
@@ -534,21 +553,22 @@ export default function ChatView() {
         setApiError({ type: 'generic', message: error.message || 'Something went wrong. Please try again.' })
       }
     }
-  }, [inputValue, isStreaming, apiKey, id, settings.defaultModel, sendMessage, refreshStorageEstimate])
+  }, [inputValue, isStreaming, apiKey, id, settings.defaultModel, sendMessage, refreshStorageEstimate, buildCollabSystemPrompt])
 
   const handleContinue = useCallback(async (messageId) => {
     if (!apiKey) return
     setApiError(null)
     try {
       const provider = getProvider('anthropic')
-      await continueMessage(apiKey, messageId, settings.defaultModel, provider)
+      const collabPrompt = buildCollabSystemPrompt()
+      await continueMessage(apiKey, messageId, settings.defaultModel, provider, collabPrompt)
       await refreshStorageEstimate()
     } catch (error) {
       if (error.name !== 'AbortError') {
         setApiError({ type: 'generic', message: error.message || 'Failed to continue. Please try again.' })
       }
     }
-  }, [apiKey, settings.defaultModel, continueMessage, refreshStorageEstimate])
+  }, [apiKey, settings.defaultModel, continueMessage, refreshStorageEstimate, buildCollabSystemPrompt])
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
