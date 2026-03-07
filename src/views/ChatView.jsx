@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import {
   Square, AlertCircle, ChevronLeft, ChevronRight,
   GitBranch, Trash2, MessageSquare,
@@ -29,6 +31,41 @@ const SPRING_GENTLE = { type: 'spring', stiffness: 200, damping: 24 }
 const SIDEBAR_RESIZE = { type: 'spring', stiffness: 150, damping: 25 }
 const SEND_DEBOUNCE_MS = 500
 
+/* ── Dusty Gold Design Tokens ────────────────────────────── */
+/* Used for: favorites star, branch creation moment, milestone flashes */
+
+const DUSTY_GOLD = '#C4A94D'
+const DUSTY_GOLD_SHADOW = '0 1px 3px rgba(196, 169, 77, 0.35)'
+const DUSTY_GOLD_GLOW = '0 0 8px rgba(196, 169, 77, 0.4)'
+const DUSTY_GOLD_BG = 'rgba(196, 169, 77, 0.12)'
+
+/* ── Milestone flash keyframes (injected once) ───────────── */
+
+const MILESTONE_STYLE_ID = 'apollo-milestone-keyframes'
+if (typeof document !== 'undefined' && !document.getElementById(MILESTONE_STYLE_ID)) {
+  const style = document.createElement('style')
+  style.id = MILESTONE_STYLE_ID
+  style.textContent = `
+    @keyframes apolloGoldPulse {
+      0% { filter: drop-shadow(0 0 0px rgba(196,169,77,0)); transform: scale(1); }
+      40% { filter: drop-shadow(0 0 8px rgba(196,169,77,0.5)); transform: scale(1.18); }
+      100% { filter: drop-shadow(0 0 0px rgba(196,169,77,0)); transform: scale(1); }
+    }
+    @keyframes apolloBranchFlash {
+      0% { box-shadow: 0 0 0px rgba(196,169,77,0); }
+      50% { box-shadow: 0 0 16px rgba(196,169,77,0.35); }
+      100% { box-shadow: 0 0 0px rgba(196,169,77,0); }
+    }
+    .apollo-gold-pulse {
+      animation: apolloGoldPulse 0.5s ease-out;
+    }
+    .apollo-branch-flash {
+      animation: apolloBranchFlash 0.8s ease-out;
+    }
+  `
+  document.head.appendChild(style)
+}
+
 const HIGHLIGHT_COLORS = [
   { id: 'blue', color: '#4A7AE5', bg: 'rgba(74,122,229,0.15)' },
   { id: 'yellow', color: '#E5A620', bg: 'rgba(229,166,32,0.15)' },
@@ -54,6 +91,101 @@ const messageVariants = {
     transition: { ...SPRING_GENTLE, delay: i * 0.08 },
   }),
 }
+
+/* ── Markdown Styles ─────────────────────────────────────── */
+/* Scoped styles for rendered Markdown inside message cards   */
+
+const MD_STYLE_ID = 'apollo-markdown-styles'
+if (typeof document !== 'undefined' && !document.getElementById(MD_STYLE_ID)) {
+  const style = document.createElement('style')
+  style.id = MD_STYLE_ID
+  style.textContent = `
+    .apollo-md h1, .apollo-md h2, .apollo-md h3,
+    .apollo-md h4, .apollo-md h5, .apollo-md h6 {
+      font-weight: 600;
+      margin-top: 1em;
+      margin-bottom: 0.4em;
+      line-height: 1.3;
+      color: #1E2532;
+    }
+    .apollo-md h1 { font-size: 1.15em; }
+    .apollo-md h2 { font-size: 1.08em; }
+    .apollo-md h3 { font-size: 1em; }
+    .apollo-md h4, .apollo-md h5, .apollo-md h6 { font-size: 0.92em; }
+    .apollo-md p { margin-bottom: 0.6em; }
+    .apollo-md p:last-child { margin-bottom: 0; }
+    .apollo-md ul, .apollo-md ol {
+      margin: 0.4em 0 0.6em 1.2em;
+      padding: 0;
+    }
+    .apollo-md li { margin-bottom: 0.2em; }
+    .apollo-md code {
+      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+      font-size: 0.88em;
+      background: rgba(0,0,0,0.05);
+      padding: 0.15em 0.35em;
+      border-radius: 3px;
+    }
+    .apollo-md pre {
+      background: #F5F5F5;
+      border: 1px solid #EBEBEB;
+      border-radius: 6px;
+      padding: 0.75em 1em;
+      overflow-x: auto;
+      margin: 0.6em 0;
+    }
+    .apollo-md pre code {
+      background: transparent;
+      padding: 0;
+      font-size: 0.85em;
+    }
+    .apollo-md blockquote {
+      border-left: 3px solid #EBEBEB;
+      padding-left: 0.8em;
+      margin: 0.5em 0;
+      color: #6B7C93;
+    }
+    .apollo-md strong { font-weight: 600; }
+    .apollo-md a { color: #4A7AE5; text-decoration: underline; }
+    .apollo-md hr {
+      border: none;
+      border-top: 1px solid #EBEBEB;
+      margin: 0.8em 0;
+    }
+    .apollo-md table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 0.5em 0;
+      font-size: 0.9em;
+    }
+    .apollo-md th, .apollo-md td {
+      border: 1px solid #EBEBEB;
+      padding: 0.35em 0.6em;
+      text-align: left;
+    }
+    .apollo-md th { background: #F5F5F5; font-weight: 600; }
+    .apollo-md mark {
+      border-radius: 2px;
+      padding: 0 1px;
+      color: inherit;
+    }
+  `
+  document.head.appendChild(style)
+}
+
+
+/* ── Case-insensitive search helper ──────────────────────── */
+
+function indexOfCI(str, search, fromIndex = 0) {
+  const strLower = str.toLowerCase()
+  const searchLower = search.toLowerCase()
+  return strLower.indexOf(searchLower, fromIndex)
+}
+
+function includesCI(str, search) {
+  return str.toLowerCase().includes(search.toLowerCase())
+}
+
 
 /* ── Main ChatView ───────────────────────────────────────── */
 
@@ -127,11 +259,9 @@ export default function ChatView() {
   const toggleFav = useCallback(async (msgId) => {
     const existing = favoritesMap.get(msgId)
     if (existing) {
-      // Remove from IndexedDB and state
       try { await deleteFavorite(existing.id) } catch {}
       setFavoritesMap(prev => { const n = new Map(prev); n.delete(msgId); return n })
     } else {
-      // Add to IndexedDB and state
       try {
         const record = await addFavorite({ conversationId: id, messageId: msgId })
         setFavoritesMap(prev => new Map(prev).set(msgId, record))
@@ -143,18 +273,15 @@ export default function ChatView() {
     const existing = notesMap.get(msgId)
     if (existing) {
       if (text.trim()) {
-        // Update existing note
         try {
           const updated = await updateNote(existing.id, text)
           setNotesMap(prev => new Map(prev).set(msgId, updated))
         } catch {}
       } else {
-        // Empty text — delete the note
         try { await deleteNote(existing.id) } catch {}
         setNotesMap(prev => { const n = new Map(prev); n.delete(msgId); return n })
       }
     } else if (text.trim()) {
-      // Create new note
       try {
         const record = await addNote({ conversationId: id, messageId: msgId, text })
         setNotesMap(prev => new Map(prev).set(msgId, record))
@@ -172,9 +299,8 @@ export default function ChatView() {
   // Add a highlight from the sidebar (applies to ALL messages containing the text)
   const handleAddHighlightFromSidebar = useCallback(async (text, color) => {
     if (!text.trim()) return
-    // Find the first message containing this text and store the highlight against it
-    // The rendering logic will highlight all occurrences across all messages
-    const firstMatch = visibleMessages.find(m => m.content?.includes(text.trim()))
+    // ── case-insensitive match ──
+    const firstMatch = visibleMessages.find(m => m.content && includesCI(m.content, text.trim()))
     const msgId = firstMatch?.id || visibleMessages[0]?.id
     if (!msgId) return
     try {
@@ -191,10 +317,11 @@ export default function ChatView() {
   }, [])
 
   // Find all message occurrences of a highlight term for prev/next navigation
+  // ── case-insensitive ──
   const getHighlightOccurrences = useCallback((text) => {
     const occurrences = []
     for (const msg of visibleMessages) {
-      if (msg.content?.includes(text)) {
+      if (msg.content && includesCI(msg.content, text)) {
         occurrences.push(msg.id)
       }
     }
@@ -221,7 +348,6 @@ export default function ChatView() {
     try {
       const branchConv = await createBranch(id, messageId)
       await loadConversations()
-      // Refresh branches list so sidebar updates immediately
       const updatedBranches = await getBranches(id)
       setBranches(updatedBranches)
       navigate(`/chat/${branchConv.id}`)
@@ -231,18 +357,12 @@ export default function ChatView() {
   }, [id, navigate, loadConversations])
 
   // Branch creation — "Compressed Summary" mode
-  // Creates a new conversation with a single AI-generated summary message
-  // instead of copying all messages
   const handleCreateBranchCompressed = useCallback(async (messageId) => {
     if (!apiKey) return
     try {
       const provider = getProvider('anthropic')
-
-      // Get messages up to branch point for the summary
       const branchIdx = visibleMessages.findIndex(m => m.id === messageId)
       const branchMessages = visibleMessages.slice(0, branchIdx + 1)
-
-      // Build the summary prompt — truncate each message to keep it cheap
       const summaryMessages = branchMessages
         .map(m => ({ role: m.role, content: m.content?.slice(0, 500) || '' }))
       summaryMessages.push({
@@ -250,7 +370,6 @@ export default function ChatView() {
         content: 'Provide a concise summary of our conversation so far. Focus on key decisions, conclusions, and open questions. Keep it under 200 words. Respond with ONLY the summary, no preamble.',
       })
 
-      // Use generateTitle-style non-streaming call via Haiku
       let summaryText = ''
       await provider.sendMessage(
         apiKey,
@@ -264,12 +383,8 @@ export default function ChatView() {
         throw new Error('Empty summary generated')
       }
 
-      // Look up parent conversation for title/model defaults
       const parentConv = await getConversation(id)
       const title = `Summary: ${parentConv?.title || 'conversation'}`
-
-      // Create the branch conversation manually (not via createBranch,
-      // since we don't want to copy messages — we want a fresh start with just the summary)
       const branchConv = await createConversation({
         title,
         model: parentConv?.model || settings.defaultModel,
@@ -277,7 +392,6 @@ export default function ChatView() {
         branchPoint: messageId,
       })
 
-      // Add the summary as a single assistant message
       await addMessage({
         conversationId: branchConv.id,
         role: 'assistant',
@@ -291,7 +405,6 @@ export default function ChatView() {
       navigate(`/chat/${branchConv.id}`)
     } catch (err) {
       console.error('Compressed branch failed:', err)
-      // Fall back to full branch
       await handleCreateBranchFull(messageId)
     }
   }, [id, apiKey, visibleMessages, settings.defaultModel, navigate, loadConversations, handleCreateBranchFull])
@@ -316,7 +429,6 @@ export default function ChatView() {
     try {
       await deleteMessage(msgId)
     } catch {}
-    // Also remove from local state so it disappears immediately
     hideMessage(msgId)
   }, [hideMessage])
 
@@ -324,7 +436,6 @@ export default function ChatView() {
     try {
       await navigator.clipboard.writeText(content)
     } catch {
-      // Fallback for older browsers
       const textarea = document.createElement('textarea')
       textarea.value = content
       document.body.appendChild(textarea)
@@ -344,7 +455,6 @@ export default function ChatView() {
         if (!cancelled) setApiKey(key)
         await loadMessages(id)
 
-        // Load persisted annotations
         const [favs, notes, highlights, branchList, convRecord] = await Promise.all([
           getFavorites(id),
           getNotes(id),
@@ -448,27 +558,26 @@ export default function ChatView() {
       label: msg.content.slice(0, 50) + (msg.content.length > 50 ? '...' : ''),
     }))
 
-  // Favorited messages for right sidebar
   const favoritedMessages = visibleMessages.filter((m) => favoritesMap.has(m.id))
 
-  // Unique highlight terms for sidebar display, with occurrence counts
+  // Unique highlight terms with occurrence counts — case-insensitive
   const uniqueHighlights = useMemo(() => {
-    const seen = new Map() // text → { ids: [highlightId, ...], color, count }
+    const seen = new Map()
     for (const hl of highlightsList) {
-      if (!seen.has(hl.text)) {
-        // Count total occurrences of this text across all messages
+      const key = hl.text.toLowerCase()
+      if (!seen.has(key)) {
         let count = 0
         for (const msg of visibleMessages) {
           if (!msg.content) continue
           let idx = 0
-          while ((idx = msg.content.indexOf(hl.text, idx)) !== -1) {
+          while ((idx = indexOfCI(msg.content, hl.text, idx)) !== -1) {
             count++
             idx += hl.text.length
           }
         }
-        seen.set(hl.text, { text: hl.text, color: hl.color, count, ids: [hl.id] })
+        seen.set(key, { text: hl.text, color: hl.color, count, ids: [hl.id] })
       } else {
-        seen.get(hl.text).ids.push(hl.id)
+        seen.get(key).ids.push(hl.id)
       }
     }
     return Array.from(seen.values())
@@ -497,7 +606,6 @@ export default function ChatView() {
         className="w-72 flex flex-col flex-shrink-0"
         style={{ borderRight: '1px solid #F0F0F0' }}
       >
-        {/* Sidebar header */}
         <div className="p-4">
           <motion.div
             initial={{ opacity: 0, y: -8 }}
@@ -531,9 +639,7 @@ export default function ChatView() {
           </motion.div>
         </div>
 
-        {/* Scrollable Contents area */}
         <div className="flex-1 overflow-y-auto px-4 pt-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}>
-          {/* Table of Contents */}
           <motion.div
             variants={staggerContainer}
             initial={false}
@@ -562,7 +668,6 @@ export default function ChatView() {
           </motion.div>
         </div>
 
-        {/* Actions — pinned at bottom */}
         <div className="px-4 pb-4 pt-3 flex-shrink-0">
           <motion.div
             variants={staggerContainer}
@@ -800,9 +905,7 @@ export default function ChatView() {
                 <p className="text-xs text-[#6B7C93] mb-3">
                   Navigate through highlighted terms
                 </p>
-                <div
-                  className="space-y-2"
-                >
+                <div className="space-y-2">
                   {uniqueHighlights.map((hl) => (
                     <motion.div
                       key={hl.text}
@@ -845,7 +948,6 @@ export default function ChatView() {
                           whileTap={{ scale: 0.85 }}
                           onClick={(e) => {
                             e.stopPropagation()
-                            // Delete all highlight records with this text
                             hl.ids.forEach(hlId => handleRemoveHighlight(hlId))
                           }}
                           className="p-1 hover:bg-[#EEEEEE] rounded text-[#6B7C93] hover:text-[#EF4444] transition-colors"
@@ -857,7 +959,7 @@ export default function ChatView() {
                     </motion.div>
                   ))}
 
-                  {/* Add Highlight — collapsed / expanded */}
+                  {/* Add Highlight */}
                   <AnimatePresence>
                     {showAddHighlight ? (
                       <motion.div
@@ -944,11 +1046,11 @@ export default function ChatView() {
                 </div>
               </div>
 
-              {/* Favorites Section */}
+              {/* Favorites Section — dusty gold star treatment */}
               <div className="p-4 pb-6">
                 <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
                   Favorites {favoritedMessages.length > 0 && (
-                    <span className="text-[#E5A620] normal-case tracking-normal">
+                    <span style={{ color: DUSTY_GOLD }} className="normal-case tracking-normal">
                       ({favoritedMessages.length})
                     </span>
                   )}
@@ -958,9 +1060,7 @@ export default function ChatView() {
                     Star a message to save it here
                   </p>
                 ) : (
-                  <div
-                    className="space-y-2"
-                  >
+                  <div className="space-y-2">
                     {favoritedMessages.map((msg) => (
                       <motion.button
                         key={msg.id}
@@ -969,10 +1069,23 @@ export default function ChatView() {
                         onClick={() => {
                           document.getElementById(`msg-${msg.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
                         }}
-                        className="w-full text-left px-3 py-2 bg-white border border-[#F0F0F0] rounded-lg group/fav hover:border-[#E5A620]/40 transition-colors"
+                        className="w-full text-left px-3 py-2 bg-white border border-[#F0F0F0] rounded-lg group/fav transition-colors"
+                        style={{ '--hover-border': DUSTY_GOLD + '66' }}
+                        onMouseEnter={(e) => e.currentTarget.style.borderColor = DUSTY_GOLD + '66'}
+                        onMouseLeave={(e) => e.currentTarget.style.borderColor = '#F0F0F0'}
                       >
                         <div className="flex items-start gap-2">
-                          <Star className="w-3 h-3 mt-0.5 flex-shrink-0" style={{ fill: '#E5A620', color: '#E5A620' }} />
+                          {/* Dusty gold star with warm shadow and soft corners */}
+                          <Star
+                            className="w-3 h-3 mt-0.5 flex-shrink-0"
+                            style={{
+                              fill: DUSTY_GOLD,
+                              color: DUSTY_GOLD,
+                              filter: `drop-shadow(${DUSTY_GOLD_SHADOW})`,
+                              strokeLinejoin: 'round',
+                              strokeLinecap: 'round',
+                            }}
+                          />
                           <div className="flex-1 min-w-0">
                             <div className="text-[10px] text-[#6B7C93] mb-0.5">
                               {msg.role === 'user' ? 'You' : 'Claude'}
@@ -1017,7 +1130,6 @@ export default function ChatView() {
                     value={`${contextUsage}%`}
                     color={getContextColor(contextUsage)}
                   />
-                  {/* Context bar */}
                   <div className="relative w-full h-1.5 bg-[#F0F0F0] rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
@@ -1026,7 +1138,6 @@ export default function ChatView() {
                       className="h-full rounded-full"
                       style={{ backgroundColor: getContextColor(contextUsage) }}
                     />
-                    {/* Threshold marker */}
                     <div
                       className="absolute top-0 bottom-0 w-px bg-[#6B7C93]/30"
                       style={{ left: `${contextThreshold}%` }}
@@ -1078,10 +1189,7 @@ export default function ChatView() {
                     </span>
                   )}
                 </h3>
-                <div
-                  className="space-y-2"
-                >
-                  {/* If we're on a branch, show a link back to parent */}
+                <div className="space-y-2">
                   {currentConversation?.parentId && (
                     <BranchItem
                       label="← Parent conversation"
@@ -1201,10 +1309,10 @@ function MessageCard({
   const [noteText, setNoteText] = useState(savedNoteText)
   const [showMenu, setShowMenu] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [selectionPopover, setSelectionPopover] = useState(null) // { text, x, y }
+  const [selectionPopover, setSelectionPopover] = useState(null)
+  const [favJustToggled, setFavJustToggled] = useState(false)
   const contentRef = useRef(null)
 
-  // Sync if savedNoteText changes (e.g. on load)
   useEffect(() => {
     setNoteText(savedNoteText)
   }, [savedNoteText])
@@ -1222,7 +1330,16 @@ function MessageCard({
     setTimeout(() => setCopied(false), 1500)
   }
 
-  // Text selection handler — show color picker popover
+  // Dusty gold milestone flash on favorite toggle
+  const handleFavoriteClick = () => {
+    onFavorite?.()
+    if (!isFavorited) {
+      // Toggling ON → trigger pulse animation
+      setFavJustToggled(true)
+      setTimeout(() => setFavJustToggled(false), 500)
+    }
+  }
+
   const handleMouseUp = useCallback(() => {
     const selection = window.getSelection()
     const text = selection?.toString().trim()
@@ -1230,17 +1347,13 @@ function MessageCard({
       setSelectionPopover(null)
       return
     }
-
-    // Check the selection is within this message's content
     const range = selection.getRangeAt(0)
     if (!contentRef.current?.contains(range.commonAncestorContainer)) {
       setSelectionPopover(null)
       return
     }
-
     const rect = range.getBoundingClientRect()
     const containerRect = contentRef.current.getBoundingClientRect()
-
     setSelectionPopover({
       text,
       x: rect.left - containerRect.left + rect.width / 2,
@@ -1256,28 +1369,51 @@ function MessageCard({
     window.getSelection()?.removeAllRanges()
   }
 
-  // Render content with highlights applied
+  // ── Render content with highlights + Markdown ──────────
   const renderContent = useMemo(() => {
-    if (!highlights.length || !content) {
-      return <span>{content}</span>
+    if (!content) return null
+
+    // If no highlights, render pure Markdown
+    if (!highlights.length) {
+      return (
+        <div className="apollo-md">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {content}
+          </ReactMarkdown>
+        </div>
+      )
     }
 
-    // Build a list of ranges to highlight
+    // Strategy: inject HTML <mark> tags into the raw Markdown string
+    // at highlight positions, then render via ReactMarkdown with a
+    // custom mark component.
+    //
+    // We use a unique marker token to avoid breaking Markdown syntax,
+    // then replace after rendering.
+
+    // Build highlight ranges — case-insensitive
     const ranges = []
     for (const hl of highlights) {
       let startIndex = 0
-      // Find all occurrences of this highlight text
       while (startIndex < content.length) {
-        const idx = content.indexOf(hl.text, startIndex)
+        const idx = indexOfCI(content, hl.text, startIndex)
         if (idx === -1) break
         ranges.push({ start: idx, end: idx + hl.text.length, color: hl.color })
         startIndex = idx + hl.text.length
       }
     }
 
-    if (ranges.length === 0) return <span>{content}</span>
+    if (ranges.length === 0) {
+      return (
+        <div className="apollo-md">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {content}
+          </ReactMarkdown>
+        </div>
+      )
+    }
 
-    // Sort by start position, deduplicate overlaps (first wins)
+    // Sort and merge overlapping ranges (first wins)
     ranges.sort((a, b) => a.start - b.start)
     const merged = [ranges[0]]
     for (let i = 1; i < ranges.length; i++) {
@@ -1287,33 +1423,37 @@ function MessageCard({
       }
     }
 
-    // Build fragments
-    const fragments = []
+    // Build a new string with <mark> tags injected
+    // We use data attributes to carry the color through to rendering
+    let marked = ''
     let cursor = 0
     for (const r of merged) {
-      if (cursor < r.start) {
-        fragments.push(<span key={`t-${cursor}`}>{content.slice(cursor, r.start)}</span>)
-      }
+      marked += content.slice(cursor, r.start)
       const bgColor = HIGHLIGHT_COLORS.find(c => c.color === r.color)?.bg || 'rgba(74,122,229,0.15)'
-      fragments.push(
-        <mark
-          key={`h-${r.start}`}
-          style={{
-            backgroundColor: bgColor,
-            borderRadius: '2px',
-            padding: '0 1px',
-            color: 'inherit',
-          }}
-        >
-          {content.slice(r.start, r.end)}
-        </mark>
-      )
+      marked += `<mark style="background-color:${bgColor}">${content.slice(r.start, r.end)}</mark>`
       cursor = r.end
     }
-    if (cursor < content.length) {
-      fragments.push(<span key={`t-${cursor}`}>{content.slice(cursor)}</span>)
-    }
-    return <>{fragments}</>
+    marked += content.slice(cursor)
+
+    return (
+      <div className="apollo-md">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={{
+            // Allow <mark> tags to pass through
+            mark: ({ children, ...props }) => (
+              <mark {...props}>{children}</mark>
+            ),
+          }}
+          // Allow the mark HTML element through
+          allowedElements={undefined}
+          unwrapDisallowed={false}
+          rehypePlugins={[]}
+        >
+          {marked}
+        </ReactMarkdown>
+      </div>
+    )
   }, [content, highlights])
 
   return (
@@ -1334,7 +1474,7 @@ function MessageCard({
         }`}
         style={{ backgroundColor: '#FFFFFF' }}
       >
-        {/* Header row — visible on hover */}
+        {/* Header row */}
         <div
           className="flex items-center justify-between px-4 py-3"
           style={{ borderBottom: '1px solid #F0F0F0' }}
@@ -1343,23 +1483,37 @@ function MessageCard({
             <span className="text-xs font-mono text-[#D5D5D5] opacity-0 group-hover:opacity-100 transition-opacity">
               #{number}
             </span>
-            {/* Persistent indicators — visible without hover */}
             {(isFavorited || savedNoteText) && (
               <div className="flex items-center gap-1.5">
-                {isFavorited && <Star className="w-3 h-3" style={{ fill: '#E5A620', color: '#E5A620' }} />}
+                {isFavorited && (
+                  <Star
+                    className="w-3 h-3"
+                    style={{
+                      fill: DUSTY_GOLD,
+                      color: DUSTY_GOLD,
+                      filter: `drop-shadow(${DUSTY_GOLD_SHADOW})`,
+                      strokeLinejoin: 'round',
+                    }}
+                  />
+                )}
                 {savedNoteText && <StickyNote className="w-3 h-3 text-[#E5A620]" />}
               </div>
             )}
           </div>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <MsgIconButton
-              onClick={onFavorite}
+              onClick={handleFavoriteClick}
               active={isFavorited}
               title="Favorite"
             >
               <Star
-                className="w-3.5 h-3.5"
-                style={isFavorited ? { fill: '#E5A620', color: '#E5A620' } : {}}
+                className={`w-3.5 h-3.5 ${favJustToggled ? 'apollo-gold-pulse' : ''}`}
+                style={isFavorited ? {
+                  fill: DUSTY_GOLD,
+                  color: DUSTY_GOLD,
+                  filter: `drop-shadow(${DUSTY_GOLD_SHADOW})`,
+                  strokeLinejoin: 'round',
+                } : {}}
               />
             </MsgIconButton>
             <MsgIconButton onClick={onNote} active={showNotes} title="Add note">
@@ -1372,7 +1526,6 @@ function MessageCard({
               <Trash2 className="w-3.5 h-3.5" />
             </MsgIconButton>
 
-            {/* More menu */}
             <div className="relative">
               <MsgIconButton onClick={() => setShowMenu(!showMenu)} title="More options">
                 <MoreVertical className="w-3.5 h-3.5" />
@@ -1405,11 +1558,11 @@ function MessageCard({
           </div>
         </div>
 
-        {/* Content */}
+        {/* Content — Markdown rendered */}
         <div className="px-4 py-4 overflow-hidden relative" ref={contentRef} onMouseUp={handleMouseUp}>
-          <p className="text-sm leading-relaxed text-[#1E2532] whitespace-pre-wrap">
+          <div className="text-sm leading-relaxed text-[#1E2532]">
             {renderContent}
-          </p>
+          </div>
 
           {/* Highlight color picker popover */}
           <AnimatePresence>
@@ -1563,7 +1716,7 @@ function BranchItem({ label, messages, active = false, onClick }) {
 }
 
 /* ═══════════════════════════════════════════════════════════ */
-/*  Branch Creation Panel (Modal)                              */
+/*  Branch Creation Panel (Modal) — with dusty gold flash     */
 /* ═══════════════════════════════════════════════════════════ */
 
 function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsage, onClose, onBranchFull, onBranchCompressed }) {
@@ -1571,6 +1724,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
   const [compressing, setCompressing] = useState(false)
   const [compressed, setCompressed] = useState(false)
   const [previewExpanded, setPreviewExpanded] = useState(false)
+  const [branchFlash, setBranchFlash] = useState(false)
 
   const compressedPct = Math.max(Math.round(contextUsage * 0.12), 2)
 
@@ -1578,10 +1732,17 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
     if (!mode || compressing) return
     if (mode === 'compressed') {
       setCompressing(true)
-      setTimeout(() => { setCompressing(false); setCompressed(true) }, 1500)
+      setTimeout(() => { setCompressing(false); setCompressed(true); triggerFlash() }, 1500)
     } else {
-      onBranchFull?.()
+      triggerFlash()
+      // Small delay so the user sees the flash before navigation
+      setTimeout(() => onBranchFull?.(), 400)
     }
+  }
+
+  const triggerFlash = () => {
+    setBranchFlash(true)
+    setTimeout(() => setBranchFlash(false), 800)
   }
 
   const handleOpen = () => { onBranchCompressed?.() }
@@ -1609,15 +1770,27 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={SPRING_SNAPPY}
-        className="relative z-10 bg-white border border-[#EBEBEB] rounded-xl w-full max-w-[420px] flex flex-col"
+        className={`relative z-10 bg-white border border-[#EBEBEB] rounded-xl w-full max-w-[420px] flex flex-col ${branchFlash ? 'apollo-branch-flash' : ''}`}
         style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
       >
         {/* Header */}
         <div className="p-5 pb-4" style={{ borderBottom: '1px solid #F0F0F0' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(124,108,212,0.1)' }}>
-                <GitBranch className="w-4 h-4 text-[#7C6CD4]" />
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{
+                  backgroundColor: branchFlash ? DUSTY_GOLD_BG : 'rgba(124,108,212,0.1)',
+                  transition: 'background-color 0.3s ease',
+                }}
+              >
+                <GitBranch
+                  className="w-4 h-4"
+                  style={{
+                    color: branchFlash ? DUSTY_GOLD : '#7C6CD4',
+                    transition: 'color 0.3s ease',
+                  }}
+                />
               </div>
               <div>
                 <div className="text-sm font-semibold text-[#1E2532]">Create Branch</div>
@@ -1714,7 +1887,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
           </motion.div>
         </div>
 
-        {/* Footer */}
+        {/* Footer — dusty gold flash on the CTA button at creation moment */}
         <div className="flex items-center justify-between p-4" style={{ borderTop: '1px solid #F0F0F0' }}>
           <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={onClose} className="px-4 py-2 rounded-lg text-xs font-semibold text-[#6B7C93] hover:text-[#1E2532] transition-colors">
             Cancel
@@ -1726,10 +1899,16 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
             className="px-5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all"
             style={{
               border: mode ? 'none' : '1px solid #EBEBEB',
-              background: mode ? 'linear-gradient(to right, #4A7AE5, #7C6CD4)' : '#FFFFFF',
+              background: branchFlash
+                ? `linear-gradient(to right, ${DUSTY_GOLD}, #D4B85A)`
+                : mode
+                  ? 'linear-gradient(to right, #4A7AE5, #7C6CD4)'
+                  : '#FFFFFF',
               color: mode ? '#FFFFFF' : '#D5D5D5',
               cursor: mode && !compressing ? 'pointer' : 'not-allowed',
               opacity: (!mode || compressing) ? 0.7 : 1,
+              boxShadow: branchFlash ? DUSTY_GOLD_GLOW : 'none',
+              transition: 'background 0.3s ease, box-shadow 0.3s ease',
             }}
           >
             <BtnIcon className="w-3.5 h-3.5" />
