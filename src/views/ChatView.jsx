@@ -8,7 +8,7 @@ import {
   GitBranch, Trash2, MessageSquare,
   FileText, MoreVertical, StickyNote, Activity, Zap, Star,
   Eye, Copy, ArrowRightCircle, Settings2, BookOpen, PanelRight, X,
-  Pencil, Info, ArrowRight,
+  Pencil, Info, ArrowRight, Download, Command,
 } from 'lucide-react'
 import { useChat } from '../stores/ChatContext'
 import { useConversations } from '../stores/ConversationContext'
@@ -198,6 +198,7 @@ export default function ChatView() {
   const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false)
   const [hiddenMessages, setHiddenMessages] = useState(new Set())
   const [activePopoverMsgId, setActivePopoverMsgId] = useState(null) // only one color picker at a time
+  const [showShortcutsModal, setShowShortcutsModal] = useState(false)
 
   // Persisted annotations — Maps keyed by messageId → db record
   const [favoritesMap, setFavoritesMap] = useState(new Map()) // messageId → { id, conversationId, messageId }
@@ -539,6 +540,149 @@ export default function ChatView() {
     }
   }
 
+  /* ── Export to Markdown ──────────────────────────────────── */
+
+  const handleExportMarkdown = useCallback(() => {
+    if (messages.length === 0) return
+
+    const title = currentConversation?.title || 'Conversation'
+    const date = new Date().toISOString().split('T')[0]
+    const lines = []
+
+    lines.push(`# ${title}`)
+    lines.push(``)
+    lines.push(`*Exported ${date} — ${messages.length} messages*`)
+    lines.push(``)
+
+    // Highlights summary
+    if (highlightsList.length > 0) {
+      const uniqueTerms = [...new Set(highlightsList.map(h => h.text))]
+      lines.push(`## Highlights`)
+      lines.push(``)
+      uniqueTerms.forEach(t => lines.push(`- ${t}`))
+      lines.push(``)
+    }
+
+    // Favorites summary
+    const favMsgs = messages.filter(m => favoritesMap.has(m.id))
+    if (favMsgs.length > 0) {
+      lines.push(`## Favorites`)
+      lines.push(``)
+      favMsgs.forEach((m, i) => {
+        const preview = m.content.slice(0, 120).replace(/\n/g, ' ')
+        lines.push(`${i + 1}. **${m.role === 'user' ? 'You' : 'Claude'}:** ${preview}${m.content.length > 120 ? '...' : ''}`)
+      })
+      lines.push(``)
+    }
+
+    // Messages
+    lines.push(`---`)
+    lines.push(``)
+
+    for (const msg of messages) {
+      const label = msg.role === 'user' ? '### You' : '### Claude'
+      const isFav = favoritesMap.has(msg.id) ? ' ⭐' : ''
+      lines.push(`${label}${isFav}`)
+      lines.push(``)
+      lines.push(msg.content)
+      lines.push(``)
+
+      // Include note if present
+      const note = notesMap.get(msg.id)
+      if (note?.text) {
+        lines.push(`> **Note:** ${note.text}`)
+        lines.push(``)
+      }
+    }
+
+    // Trigger download
+    const blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${title.replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '-').toLowerCase()}-${date}.md`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }, [messages, currentConversation, highlightsList, favoritesMap, notesMap])
+
+  /* ── Compress Context (opens branch panel for last message) */
+
+  const handleCompressContext = useCallback(() => {
+    if (visibleMessages.length === 0) return
+    // Open the branch creation panel from the last message
+    const lastMsg = visibleMessages[visibleMessages.length - 1]
+    setBranchPanelMessage(lastMsg)
+  }, [visibleMessages])
+
+  /* ── Global Keyboard Shortcuts ─────────────────────────── */
+
+  useEffect(() => {
+    const handler = (e) => {
+      const isMod = e.metaKey || e.ctrlKey
+      const tag = document.activeElement?.tagName
+
+      // Don't intercept when typing in inputs/textareas (except specific combos)
+      const isTyping = tag === 'INPUT' || tag === 'TEXTAREA'
+
+      // Ctrl/Cmd + Enter — send message (works even in textarea)
+      if (isMod && e.key === 'Enter') {
+        e.preventDefault()
+        isStreaming ? stopGenerating() : handleSend()
+        return
+      }
+
+      // Escape — stop streaming or close modals
+      if (e.key === 'Escape') {
+        if (isStreaming) { stopGenerating(); return }
+        if (showShortcutsModal) { setShowShortcutsModal(false); return }
+        if (branchPanelMessage) { setBranchPanelMessage(null); return }
+        return
+      }
+
+      // Skip remaining shortcuts if user is typing
+      if (isTyping) return
+
+      // Ctrl/Cmd + Shift + E — export to markdown
+      if (isMod && e.shiftKey && e.key === 'E') {
+        e.preventDefault()
+        handleExportMarkdown()
+        return
+      }
+
+      // Ctrl/Cmd + / — toggle right sidebar
+      if (isMod && e.key === '/') {
+        e.preventDefault()
+        setRightSidebarCollapsed(prev => !prev)
+        return
+      }
+
+      // Ctrl/Cmd + Shift + B — branch conversation from last message
+      if (isMod && e.shiftKey && (e.key === 'B' || e.key === 'b')) {
+        e.preventDefault()
+        handleCompressContext()
+        return
+      }
+
+      // Ctrl/Cmd + . — focus input
+      if (isMod && e.key === '.') {
+        e.preventDefault()
+        inputRef.current?.focus()
+        return
+      }
+
+      // ? — show keyboard shortcuts (when not typing)
+      if (e.key === '?' && !e.shiftKey) {
+        setShowShortcutsModal(prev => !prev)
+        return
+      }
+    }
+
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [isStreaming, stopGenerating, handleSend, showShortcutsModal, branchPanelMessage, handleExportMarkdown, handleCompressContext])
+
   /* ── Derive TOC and sidebar data ──────────────────────── */
 
   const tocItems = visibleMessages
@@ -670,10 +814,9 @@ export default function ChatView() {
             </h3>
             <ActionButton icon={Settings2}>Collaboration Mode</ActionButton>
             <ActionButton icon={BookOpen}>Review</ActionButton>
-            <ActionButton icon={GitBranch}>Branch Conversation</ActionButton>
-            <ActionButton icon={FileText}>Export to Markdown</ActionButton>
-            <ActionButton icon={Activity}>Compress Context</ActionButton>
-            <ActionButton icon={Zap}>Keyboard Shortcuts</ActionButton>
+            <ActionButton icon={FileText} onClick={handleExportMarkdown}>Export to Markdown</ActionButton>
+            <ActionButton icon={Activity} onClick={handleCompressContext}>Compress Context</ActionButton>
+            <ActionButton icon={Zap} onClick={() => setShowShortcutsModal(true)}>Keyboard Shortcuts</ActionButton>
           </motion.div>
         </div>
       </motion.div>
@@ -1233,6 +1376,13 @@ export default function ChatView() {
               setBranchPanelMessage(null)
             }}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Keyboard Shortcuts Modal */}
+      <AnimatePresence>
+        {showShortcutsModal && (
+          <ShortcutsModal onClose={() => setShowShortcutsModal(false)} />
         )}
       </AnimatePresence>
     </div>
@@ -1937,6 +2087,90 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
             <BtnIcon className="w-3.5 h-3.5" />
             {btnLabel}
           </motion.button>
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  Keyboard Shortcuts Modal                                   */
+/* ═══════════════════════════════════════════════════════════ */
+
+const SHORTCUTS = [
+  { keys: ['Ctrl', 'Enter'], desc: 'Send message (or stop streaming)' },
+  { keys: ['Escape'], desc: 'Stop streaming / close modal' },
+  { keys: ['Ctrl', 'Shift', 'E'], desc: 'Export to Markdown' },
+  { keys: ['Ctrl', 'Shift', 'B'], desc: 'Branch conversation' },
+  { keys: ['Ctrl', '/'], desc: 'Toggle right sidebar' },
+  { keys: ['Ctrl', '.'], desc: 'Focus message input' },
+  { keys: ['?'], desc: 'Toggle this panel' },
+]
+
+// Detect Mac for display
+const IS_MAC = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform)
+
+function ShortcutsModal({ onClose }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-6"
+      style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}
+    >
+      <div className="absolute inset-0" onClick={onClose} />
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={SPRING_SNAPPY}
+        className="relative z-10 bg-white border border-[#EBEBEB] rounded-xl w-full max-w-sm flex flex-col"
+        style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-5 pb-4" style={{ borderBottom: '1px solid #F0F0F0' }}>
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(74,122,229,0.1)' }}>
+              <Command className="w-4 h-4 text-[#4A7AE5]" />
+            </div>
+            <div className="text-sm font-semibold text-[#1E2532]">Keyboard Shortcuts</div>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={onClose}
+            className="p-2 rounded-lg text-[#6B7C93] hover:bg-[#EEEEEE] transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </motion.button>
+        </div>
+
+        {/* Shortcuts list */}
+        <div className="p-5 space-y-3">
+          {SHORTCUTS.map((s, i) => (
+            <div key={i} className="flex items-center justify-between">
+              <span className="text-xs text-[#4A5568]">{s.desc}</span>
+              <div className="flex items-center gap-1">
+                {s.keys.map((k, j) => (
+                  <kbd
+                    key={j}
+                    className="px-1.5 py-0.5 rounded text-[10px] font-semibold text-[#6B7C93] border border-[#EBEBEB] bg-[#FAFAFA]"
+                    style={{ fontFamily: 'ui-monospace, SFMono-Regular, monospace', minWidth: 22, textAlign: 'center' }}
+                  >
+                    {k === 'Ctrl' ? (IS_MAC ? '⌘' : 'Ctrl') : k === 'Shift' ? (IS_MAC ? '⇧' : 'Shift') : k}
+                  </kbd>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="px-5 pb-4 pt-1">
+          <p className="text-[10px] text-[#D5D5D5] text-center">
+            Press <kbd className="px-1 py-0.5 rounded text-[10px] font-semibold border border-[#EBEBEB] bg-[#FAFAFA]" style={{ fontFamily: 'monospace' }}>?</kbd> anytime to toggle
+          </p>
         </div>
       </motion.div>
     </motion.div>
