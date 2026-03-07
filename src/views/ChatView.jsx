@@ -22,6 +22,8 @@ import {
   deleteMessage, createBranch, getBranches,
   getConversation, createConversation, addMessage,
 } from '../lib/db'
+import CollabModal from '../components/CollabModal'
+import ReviewModal from '../components/ReviewModal'
 
 /* ── Animation Constants ─────────────────────────────────── */
 
@@ -199,6 +201,12 @@ export default function ChatView() {
   const [hiddenMessages, setHiddenMessages] = useState(new Set())
   const [activePopoverMsgId, setActivePopoverMsgId] = useState(null) // only one color picker at a time
   const [showShortcutsModal, setShowShortcutsModal] = useState(false)
+  const [showCollabModal, setShowCollabModal] = useState(false)
+  const [showReviewModal, setShowReviewModal] = useState(false)
+
+  // Collaboration mode state
+  const [activePresets, setActivePresets] = useState(new Set())
+  const [customInstruction, setCustomInstruction] = useState('')
 
   // Persisted annotations — Maps keyed by messageId → db record
   const [favoritesMap, setFavoritesMap] = useState(new Map()) // messageId → { id, conversationId, messageId }
@@ -232,6 +240,7 @@ export default function ChatView() {
   const hiddenCount = messages.length - visibleMessages.length
 
   const messagesEndRef = useRef(null)
+  const messagesContainerRef = useRef(null)
   const inputRef = useRef(null)
   const lastSendTimeRef = useRef(0)
   const seenMessageIds = useRef(new Set())
@@ -239,6 +248,14 @@ export default function ChatView() {
   clearMessagesRef.current = clearMessages
 
   const getContextColor = (u) => u < (contextThreshold / 2) ? '#22C55E' : u < contextThreshold ? '#E5A620' : '#EF4444'
+
+  const togglePreset = useCallback((presetId) => {
+    setActivePresets(prev => {
+      const n = new Set(prev)
+      n.has(presetId) ? n.delete(presetId) : n.add(presetId)
+      return n
+    })
+  }, [])
 
   const toggleNote = (msgId) =>
     setShowNotes((prev) => {
@@ -637,7 +654,16 @@ export default function ChatView() {
       if (e.key === 'Escape') {
         if (isStreaming) { stopGenerating(); return }
         if (showShortcutsModal) { setShowShortcutsModal(false); return }
+        if (showCollabModal) { setShowCollabModal(false); return }
+        if (showReviewModal) { setShowReviewModal(false); return }
         if (branchPanelMessage) { setBranchPanelMessage(null); return }
+        return
+      }
+
+      // Ctrl/Cmd + ? — show keyboard shortcuts
+      if (isMod && e.key === '?') {
+        e.preventDefault()
+        setShowShortcutsModal(prev => !prev)
         return
       }
 
@@ -672,16 +698,39 @@ export default function ChatView() {
         return
       }
 
-      // ? — show keyboard shortcuts (when not typing)
-      if (e.key === '?' && !e.shiftKey) {
-        setShowShortcutsModal(prev => !prev)
+      // Home — scroll to top of conversation
+      if (e.key === 'Home') {
+        e.preventDefault()
+        messagesContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
         return
       }
+
+      // End — scroll to bottom of conversation
+      if (e.key === 'End') {
+        e.preventDefault()
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+        return
+      }
+
+      // Ctrl/Cmd + Shift + C — open Collaboration Mode
+      if (isMod && e.shiftKey && (e.key === 'C' || e.key === 'c')) {
+        e.preventDefault()
+        setShowCollabModal(prev => !prev)
+        return
+      }
+
+      // Ctrl/Cmd + Shift + R — open Review
+      if (isMod && e.shiftKey && (e.key === 'R' || e.key === 'r')) {
+        e.preventDefault()
+        setShowReviewModal(prev => !prev)
+        return
+      }
+
     }
 
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [isStreaming, stopGenerating, handleSend, showShortcutsModal, branchPanelMessage, handleExportMarkdown, handleCompressContext])
+  }, [isStreaming, stopGenerating, handleSend, showShortcutsModal, showCollabModal, showReviewModal, branchPanelMessage, handleExportMarkdown, handleCompressContext])
 
   /* ── Derive TOC and sidebar data ──────────────────────── */
 
@@ -812,8 +861,8 @@ export default function ChatView() {
             <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-2">
               Actions
             </h3>
-            <ActionButton icon={Settings2}>Collaboration Mode</ActionButton>
-            <ActionButton icon={BookOpen}>Review</ActionButton>
+            <ActionButton icon={Settings2} onClick={() => setShowCollabModal(true)} badge={activePresets.size > 0 ? activePresets.size : null}>Collaboration Mode</ActionButton>
+            <ActionButton icon={BookOpen} onClick={() => setShowReviewModal(true)}>Review</ActionButton>
             <ActionButton icon={FileText} onClick={handleExportMarkdown}>Export to Markdown</ActionButton>
             <ActionButton icon={Activity} onClick={handleCompressContext}>Compress Context</ActionButton>
             <ActionButton icon={Zap} onClick={() => setShowShortcutsModal(true)}>Keyboard Shortcuts</ActionButton>
@@ -841,6 +890,7 @@ export default function ChatView() {
 
         {/* Messages */}
         <div
+          ref={messagesContainerRef}
           className="flex-1 overflow-y-auto p-6 space-y-4"
           onMouseDown={() => {
             // Dismiss any active highlight popover when clicking in the messages area
@@ -1383,6 +1433,74 @@ export default function ChatView() {
       <AnimatePresence>
         {showShortcutsModal && (
           <ShortcutsModal onClose={() => setShowShortcutsModal(false)} />
+        )}
+      </AnimatePresence>
+
+      {/* Collaboration Mode Modal */}
+      <AnimatePresence>
+        {showCollabModal && (
+          <CollabModal
+            onClose={() => setShowCollabModal(false)}
+            activePresets={activePresets}
+            onTogglePreset={togglePreset}
+            customInstruction={customInstruction}
+            onCustomInstructionChange={setCustomInstruction}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Review Modal */}
+      <AnimatePresence>
+        {showReviewModal && (
+          <ReviewModal
+            onClose={() => setShowReviewModal(false)}
+            messages={messages}
+            highlights={highlightsList}
+            notes={Array.from(notesMap.values())}
+            favorites={favoritedMessages}
+            branches={branches}
+            tokenUsage={tokenUsage}
+            contextUsage={contextUsage}
+            onExportMarkdown={handleExportMarkdown}
+            onGenerateSynthesis={async (options) => {
+              // Build a synthesis prompt from the conversation and annotations
+              if (!apiKey) throw new Error('No API key configured.')
+              const provider = getProvider('anthropic')
+              const depth = options.depth === 'detailed' ? 'detailed' : 'brief'
+
+              let annotationContext = ''
+              if (options.includeHighlights && highlightsList.length > 0) {
+                const terms = [...new Set(highlightsList.map(h => h.text))].join(', ')
+                annotationContext += `\nHighlighted terms: ${terms}`
+              }
+              if (options.includeNotes && notesMap.size > 0) {
+                const noteTexts = Array.from(notesMap.values()).map(n => n.text).join('; ')
+                annotationContext += `\nUser notes: ${noteTexts}`
+              }
+              if (options.includeFavorites && favoritedMessages.length > 0) {
+                const favPreviews = favoritedMessages.map(m => m.content.slice(0, 100)).join('; ')
+                annotationContext += `\nFavorited messages: ${favPreviews}`
+              }
+
+              const synthMessages = messages
+                .slice(-20)
+                .map(m => ({ role: m.role, content: m.content?.slice(0, 300) || '' }))
+              synthMessages.push({
+                role: 'user',
+                content: `Provide a ${depth} synthesis of our conversation.${annotationContext}\n\nFocus on: key decisions, conclusions, open questions, and action items. ${depth === 'brief' ? 'Keep it under 150 words.' : 'Be thorough but concise, under 400 words.'} Respond with ONLY the synthesis.`,
+              })
+
+              let result = ''
+              await provider.sendMessage(
+                apiKey,
+                synthMessages,
+                'claude-haiku',
+                (chunk) => { result += chunk },
+                new AbortController().signal
+              )
+              return result.trim()
+            }}
+          />
         )}
       </AnimatePresence>
     </div>
@@ -2099,12 +2217,17 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
 
 const SHORTCUTS = [
   { keys: ['Ctrl', 'Enter'], desc: 'Send message (or stop streaming)' },
+  { keys: ['Shift', 'Enter'], desc: 'New line in message input' },
   { keys: ['Escape'], desc: 'Stop streaming / close modal' },
   { keys: ['Ctrl', 'Shift', 'E'], desc: 'Export to Markdown' },
   { keys: ['Ctrl', 'Shift', 'B'], desc: 'Branch conversation' },
+  { keys: ['Ctrl', 'Shift', 'C'], desc: 'Collaboration Mode' },
+  { keys: ['Ctrl', 'Shift', 'R'], desc: 'Review' },
   { keys: ['Ctrl', '/'], desc: 'Toggle right sidebar' },
   { keys: ['Ctrl', '.'], desc: 'Focus message input' },
-  { keys: ['?'], desc: 'Toggle this panel' },
+  { keys: ['Home'], desc: 'Scroll to top' },
+  { keys: ['End'], desc: 'Scroll to bottom' },
+  { keys: ['Ctrl', '?'], desc: 'Toggle this panel' },
 ]
 
 // Detect Mac for display
@@ -2169,7 +2292,7 @@ function ShortcutsModal({ onClose }) {
         {/* Footer */}
         <div className="px-5 pb-4 pt-1">
           <p className="text-[10px] text-[#D5D5D5] text-center">
-            Press <kbd className="px-1 py-0.5 rounded text-[10px] font-semibold border border-[#EBEBEB] bg-[#FAFAFA]" style={{ fontFamily: 'monospace' }}>?</kbd> anytime to toggle
+            Press <kbd className="px-1 py-0.5 rounded text-[10px] font-semibold border border-[#EBEBEB] bg-[#FAFAFA]" style={{ fontFamily: 'monospace' }}>{IS_MAC ? '⌘' : 'Ctrl'}</kbd> + <kbd className="px-1 py-0.5 rounded text-[10px] font-semibold border border-[#EBEBEB] bg-[#FAFAFA]" style={{ fontFamily: 'monospace' }}>?</kbd> anytime to toggle
           </p>
         </div>
       </motion.div>
