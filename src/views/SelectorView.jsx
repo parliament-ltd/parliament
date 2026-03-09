@@ -2,8 +2,8 @@ import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Search, GitBranch, Plus, MessageSquare, ArrowUp, ArrowDown,
-  Trash2, Copy, Pin, PinOff, ChevronRight, Star, PanelRight,
-  Check, Settings, AlertCircle, X,
+  Trash2, Copy, Pin, PanelRight, Check, Settings, AlertCircle, X,
+  Star, StickyNote, Highlighter, Pencil, RefreshCw, Sparkles,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useConversations } from '../stores/ConversationContext'
@@ -24,6 +24,25 @@ const SPRING_SMOOTH = { type: 'spring', stiffness: 300, damping: 28 }
 const SIDEBAR_RESIZE = { type: 'spring', stiffness: 150, damping: 25 }
 const staggerContainer = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.03, delayChildren: 0.06 } } }
 const staggerItem = { hidden: { opacity: 0, y: 6 }, show: { opacity: 1, y: 0, transition: SPRING_SMOOTH } }
+
+const FAMILY_COLORS = [
+  '#4A7AE5', // blue
+  '#22C55E', // green
+  '#E5A620', // amber
+  '#7C6CD4', // purple
+  '#EF4444', // red
+  '#06B6D4', // cyan
+  '#EC4899', // pink
+  '#F97316', // orange
+]
+
+const TAG_COLORS = {
+  'design': '#4A7AE5', 'ui': '#7C6CD4', 'api': '#22C55E', 'architecture': '#E5A620',
+  'performance': '#EF4444', 'tokens': '#E5A620', 'research': '#4A7AE5', 'collaboration': '#7C6CD4',
+  'v2': '#6B7C93', 'export': '#22C55E', 'review': '#4A7AE5', 'ux': '#7C6CD4',
+  'shortcuts': '#E5A620', 'prompts': '#EF4444', 'ai': '#4A7AE5', 'product': '#22C55E',
+  'technical': '#7C6CD4', 'experiments': '#E5A620',
+}
 
 /* ═══════════════════════════════════════════════════════════ */
 /*  UTILITIES                                                   */
@@ -61,6 +80,13 @@ function formatBytes(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
+function buildFamilyColorMap(conversations) {
+  const families = [...new Set(conversations.filter(c => c.familyId).map(c => c.familyId))]
+  const map = {}
+  families.forEach((fid, i) => { map[fid] = FAMILY_COLORS[i % FAMILY_COLORS.length] })
+  return map
+}
+
 /* ═══════════════════════════════════════════════════════════ */
 /*  Load all favorites across all conversations, hydrated      */
 /* ═══════════════════════════════════════════════════════════ */
@@ -70,11 +96,9 @@ async function loadAllFavoritesHydrated(conversations) {
   const allFavRecords = await db.getAll('favorites')
   if (allFavRecords.length === 0) return []
 
-  // Build a conversation title lookup
   const convTitles = {}
   ;(conversations || []).forEach(c => { convTitles[c.id] = c.title || 'New conversation' })
 
-  // Fetch the message content for each favorite
   const hydrated = []
   for (const fav of allFavRecords) {
     try {
@@ -103,7 +127,6 @@ async function loadAllFavoritesHydrated(conversations) {
 function StorageWarningBanner({ usagePercent }) {
   const [dismissed, setDismissed] = useState(false)
   if (usagePercent < 80 || dismissed) return null
-
   const isCritical = usagePercent >= 95
 
   return (
@@ -114,64 +137,26 @@ function StorageWarningBanner({ usagePercent }) {
       transition={SPRING_SMOOTH}
       className={`flex items-center gap-2.5 px-8 py-2.5 text-xs border-b ${
         isCritical
-          ? 'bg-[#EF4444]/5 text-[#EF4444] border-[#EF4444]/15'
-          : 'bg-[#E5A620]/5 text-[#E5A620] border-[#E5A620]/15'
+          ? 'text-[#EF4444] border-[#EF4444]/10'
+          : 'text-[#E5A620] border-[#E5A620]/10'
       }`}
+      style={{ backgroundColor: isCritical ? '#FEF2F2' : '#FFFBEB' }}
     >
       <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
       <span className="flex-1">
         {isCritical
-          ? 'Storage is critically full. Export a backup or delete old conversations to continue saving.'
-          : 'Your browser storage is getting full. Consider exporting a backup or cleaning up old conversations.'}
+          ? 'Storage critically full. Export or delete conversations.'
+          : 'Browser storage getting full. Consider exporting a backup.'}
       </span>
       <motion.button
         whileHover={{ scale: 1.15 }}
         whileTap={{ scale: 0.85 }}
         onClick={() => setDismissed(true)}
-        className="p-0.5 rounded hover:bg-black/5 transition-colors"
+        className="p-0.5 rounded hover:bg-black/5"
       >
         <X className="w-3 h-3" />
       </motion.button>
     </motion.div>
-  )
-}
-
-/* ═══════════════════════════════════════════════════════════ */
-/*  INLINE TITLE EDITOR                                        */
-/* ═══════════════════════════════════════════════════════════ */
-
-function InlineTitleEditor({ title, onSave, onCancel }) {
-  const [value, setValue] = useState(title)
-  const inputRef = useRef(null)
-
-  useEffect(() => {
-    inputRef.current?.focus()
-    inputRef.current?.select()
-  }, [])
-
-  const commit = () => {
-    const trimmed = value.trim()
-    if (trimmed && trimmed !== title) {
-      onSave(trimmed)
-    } else {
-      onCancel()
-    }
-  }
-
-  return (
-    <input
-      ref={inputRef}
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') { e.preventDefault(); commit() }
-        if (e.key === 'Escape') onCancel()
-      }}
-      onBlur={commit}
-      onClick={(e) => e.stopPropagation()}
-      className="bg-white rounded px-1.5 py-0.5 text-sm font-semibold text-[#1E2532] outline-none border border-[#4A7AE5] w-full max-w-[320px]"
-      maxLength={60}
-    />
   )
 }
 
@@ -182,15 +167,13 @@ function InlineTitleEditor({ title, onSave, onCancel }) {
 function Checkbox({ checked, indeterminate = false, onChange }) {
   return (
     <motion.button
-      whileHover={{ scale: 1.15, borderColor: '#4A7AE5' }}
+      whileHover={{ scale: 1.15 }}
       whileTap={{ scale: 0.85 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
       onClick={(e) => { e.stopPropagation(); onChange() }}
-      className="w-4 h-4 rounded border flex items-center justify-center flex-shrink-0"
+      className="w-4 h-4 rounded border flex items-center justify-center transition-colors flex-shrink-0"
       style={{
         borderColor: checked || indeterminate ? '#4A7AE5' : '#D5D5D5',
         backgroundColor: checked || indeterminate ? '#4A7AE5' : 'transparent',
-        transition: 'background-color 0.3s ease, border-color 0.3s ease',
       }}
     >
       {checked && (
@@ -219,7 +202,7 @@ function InlineAction({ icon: Icon, label, onClick, danger = false }) {
         onClick={onClick}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
-        className={`p-1.5 rounded-md transition-colors ${danger ? 'hover:bg-[#EF4444]/10 text-[#6B7C93] hover:text-[#EF4444]' : 'hover:bg-white/60 text-[#6B7C93] hover:text-[#1E2532]'}`}
+        className={`p-1.5 rounded-md transition-colors ${danger ? 'hover:bg-[#EF4444]/5 text-[#6B7C93] hover:text-[#EF4444]' : 'hover:bg-white/60 text-[#6B7C93] hover:text-[#1E2532]'}`}
       >
         <Icon className="w-3.5 h-3.5" />
       </motion.button>
@@ -237,6 +220,151 @@ function InlineAction({ icon: Icon, label, onClick, danger = false }) {
         )}
       </AnimatePresence>
     </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  INLINE TITLE EDITOR                                        */
+/* ═══════════════════════════════════════════════════════════ */
+
+function InlineTitleEditor({ title, onSave, onCancel }) {
+  const [value, setValue] = useState(title)
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    inputRef.current?.focus()
+    inputRef.current?.select()
+  }, [])
+
+  const commit = () => {
+    const trimmed = value.trim()
+    if (trimmed && trimmed !== title) onSave(trimmed)
+    else onCancel()
+  }
+
+  return (
+    <input
+      ref={inputRef}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') { e.preventDefault(); commit() }
+        if (e.key === 'Escape') onCancel()
+      }}
+      onBlur={commit}
+      onClick={(e) => e.stopPropagation()}
+      className="bg-white rounded px-1.5 py-0.5 text-sm font-semibold text-[#1E2532] outline-none border border-[#4A7AE5] w-full max-w-[320px]"
+      maxLength={60}
+    />
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  INLINE NOTE EDITOR                                         */
+/* ═══════════════════════════════════════════════════════════ */
+
+function InlineNoteEditor({ note = '', onSave, onCancel }) {
+  const [value, setValue] = useState(note)
+  const inputRef = useRef(null)
+  useEffect(() => { inputRef.current?.focus() }, [])
+
+  return (
+    <div className="flex items-start gap-2 w-full" onClick={(e) => e.stopPropagation()}>
+      <textarea
+        ref={inputRef}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onSave(value.trim()) }
+          if (e.key === 'Escape') onCancel()
+        }}
+        placeholder="Add a note..."
+        className="flex-1 bg-white rounded-lg px-3 py-2 text-xs text-[#1E2532] outline-none border border-[#4A7AE5] resize-none leading-relaxed placeholder:text-[#D5D5D5]"
+        rows={2}
+        maxLength={280}
+      />
+      <div className="flex flex-col gap-1">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => onSave(value.trim())}
+          className="px-2.5 py-1.5 rounded-md text-[10px] font-semibold bg-[#4A7AE5] text-white"
+        >
+          Save
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={onCancel}
+          className="px-2.5 py-1.5 rounded-md text-[10px] font-semibold text-[#6B7C93] hover:bg-[#EEEEEE]"
+        >
+          Cancel
+        </motion.button>
+      </div>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  VIEW TOGGLE                                                 */
+/* ═══════════════════════════════════════════════════════════ */
+
+function ViewToggle({ activeView, onChangeView }) {
+  const views = [
+    { id: 'summary', icon: Sparkles, label: 'Summary' },
+    { id: 'notes', icon: StickyNote, label: 'Notes' },
+    { id: 'highlights', icon: Highlighter, label: 'Highlights' },
+    { id: 'branches', icon: GitBranch, label: 'Branches' },
+  ]
+
+  return (
+    <div className="flex items-center bg-[#F5F5F5] rounded-lg p-0.5 gap-0.5">
+      {views.map(({ id, icon: Icon, label }) => {
+        const isActive = activeView === id
+        return (
+          <motion.button
+            key={id}
+            onClick={() => onChangeView(id)}
+            className={`relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-semibold transition-colors ${
+              isActive ? 'text-[#1E2532]' : 'text-[#9CA7B8] hover:text-[#6B7C93]'
+            }`}
+            whileHover={!isActive ? { backgroundColor: 'rgba(0,0,0,0.03)' } : {}}
+          >
+            {isActive && (
+              <motion.div
+                layoutId="view-toggle-bg"
+                className="absolute inset-0 bg-white rounded-md shadow-sm"
+                transition={SPRING_SNAPPY}
+              />
+            )}
+            <span className="relative flex items-center gap-1.5">
+              <Icon className="w-3 h-3" />{label}
+            </span>
+          </motion.button>
+        )
+      })}
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  COUNT BADGE                                                 */
+/* ═══════════════════════════════════════════════════════════ */
+
+function CountBadge({ icon: Icon, count, isActive, activeColor, onClick }) {
+  if (count === 0) return null
+  return (
+    <motion.button
+      whileHover={{ scale: 1.08 }}
+      whileTap={{ scale: 0.92 }}
+      onClick={(e) => { e.stopPropagation(); onClick() }}
+      className={`flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0 font-semibold transition-colors ${
+        isActive ? 'text-white' : 'text-[#9CA7B8] hover:text-[#6B7C93]'
+      }`}
+      style={isActive ? { backgroundColor: activeColor } : { backgroundColor: 'rgba(0,0,0,0.04)' }}
+    >
+      <Icon className="w-2.5 h-2.5" />{count}
+    </motion.button>
   )
 }
 
@@ -279,7 +407,6 @@ function FavoriteCard({ favorite, onRemove, onNavigate }) {
             whileTap={{ scale: 0.85 }}
             onClick={handleCopy}
             className="p-1 rounded hover:bg-[#EEEEEE] text-[#6B7C93] hover:text-[#1E2532] transition-colors"
-            title="Copy"
           >
             <AnimatePresence mode="wait">
               {copied ? (
@@ -298,7 +425,6 @@ function FavoriteCard({ favorite, onRemove, onNavigate }) {
             whileTap={{ scale: 0.85 }}
             onClick={(e) => { e.stopPropagation(); onRemove() }}
             className="p-1 rounded hover:bg-[#EEEEEE] text-[#6B7C93] hover:text-[#EF4444] transition-colors"
-            title="Remove"
           >
             <Trash2 className="w-3 h-3" />
           </motion.button>
@@ -309,137 +435,322 @@ function FavoriteCard({ favorite, onRemove, onNavigate }) {
 }
 
 /* ═══════════════════════════════════════════════════════════ */
-/*  CHAT TABLE ROW                                              */
+/*  CHAT TABLE ROW — flat model, all conversations equal       */
 /* ═══════════════════════════════════════════════════════════ */
 
-function ChatTableRow({ chat, isExpanded, onToggleExpand, selected, onToggleSelected, onNavigate, onTitleEdit }) {
-  const hasBranches = (chat.branches || []).length > 0
+function ChatTableRow({
+  chat, globalView, familyColor, allChats, isDeemphasized,
+  selected, onToggleSelected, onNavigate, onTitleEdit, onUpdateNotes,
+  rowOverride, onSetRowOverride,
+}) {
   const isSelected = selected.has(chat.id)
   const [editingTitle, setEditingTitle] = useState(false)
+  const [addingNote, setAddingNote] = useState(false)
+  const [editingNoteId, setEditingNoteId] = useState(null)
+
+  const hasNotes = chat.notes && chat.notes.length > 0
+  const hasHighlights = chat.highlights && chat.highlights.length > 0
+  const noteCount = chat.notes?.length || 0
+  const highlightCount = chat.highlights?.length || 0
+  const isBranch = !!chat.parentId
+
+  // Find children for this chat (if it's a parent)
+  const children = allChats.filter(c => c.parentId === chat.id)
+
+  const effectiveView = rowOverride || globalView
+
+  const toggleRowOverride = (view) => {
+    if (rowOverride === view) onSetRowOverride(chat.id, null)
+    else onSetRowOverride(chat.id, view)
+    setAddingNote(false)
+    setEditingNoteId(null)
+  }
+
+  const handleAddNote = (text) => {
+    if (!text) { setAddingNote(false); return }
+    onUpdateNotes(chat.id, [...(chat.notes || []), { id: `n-${Date.now()}`, text, messageRef: null }])
+    setAddingNote(false)
+  }
+
+  const handleEditNote = (noteId, newText) => {
+    if (!newText) { setEditingNoteId(null); return }
+    onUpdateNotes(chat.id, (chat.notes || []).map(n => n.id === noteId ? { ...n, text: newText } : n))
+    setEditingNoteId(null)
+  }
+
+  const handleDeleteNote = (noteId) => {
+    onUpdateNotes(chat.id, (chat.notes || []).filter(n => n.id !== noteId))
+  }
 
   return (
     <motion.div variants={staggerItem}>
-      <div
-        className="group flex items-center px-2 border-b border-[#F5F5F5] cursor-pointer"
-        style={{ minHeight: 52, backgroundColor: isSelected ? '#F0F5FF' : undefined }}
-        onClick={() => onNavigate(chat.id)}
+      <motion.div
+        whileHover={{ backgroundColor: '#FAFAFA' }}
+        transition={{ duration: 0.1 }}
+        className="group border-b border-[#F5F5F5] cursor-pointer"
+        style={{
+          backgroundColor: isSelected ? '#F0F5FF' : undefined,
+          opacity: isDeemphasized ? 0.45 : 1,
+          transition: 'opacity 0.2s ease',
+        }}
       >
-        {/* Checkbox */}
-        <div className="w-10 flex-shrink-0 flex items-center justify-center">
-          <Checkbox checked={isSelected} onChange={() => onToggleSelected(chat.id)} />
-        </div>
+        <div className="flex items-start px-2" style={{ minHeight: 58, paddingTop: 10, paddingBottom: 10 }}>
+          {/* Checkbox */}
+          <div className="w-8 flex-shrink-0 flex items-center justify-center pt-0.5">
+            <Checkbox checked={isSelected} onChange={() => onToggleSelected(chat.id)} />
+          </div>
 
-        {/* Expand toggle */}
-        <div className="w-8 flex-shrink-0 flex items-center justify-center">
-          {hasBranches && (
-            <motion.button
-              animate={{ rotate: isExpanded ? 90 : 0 }}
-              transition={SPRING_SNAPPY}
-              onClick={(e) => { e.stopPropagation(); onToggleExpand() }}
-              className="p-0.5 rounded hover:bg-[#EEEEEE] transition-colors"
-            >
-              <ChevronRight className="w-3.5 h-3.5 text-[#6B7C93]" />
-            </motion.button>
-          )}
-        </div>
-
-        {/* Title + pin + branch badge */}
-        <div className="flex-1 min-w-0 px-2 flex items-center gap-2">
-          {editingTitle ? (
-            <div onClick={(e) => e.stopPropagation()}>
-              <InlineTitleEditor
-                title={chat.title || 'New conversation'}
-                onSave={(newTitle) => { setEditingTitle(false); onTitleEdit(chat.id, newTitle) }}
-                onCancel={() => setEditingTitle(false)}
-              />
-            </div>
-          ) : (
-            <span
-              className="text-sm font-semibold text-[#1E2532] truncate"
-              onDoubleClick={(e) => { e.stopPropagation(); setEditingTitle(true) }}
-              title="Double-click to rename"
-            >
-              {chat.title || 'New conversation'}
-            </span>
-          )}
-          {chat.pinned && <Pin className="w-3 h-3 text-[#4A7AE5] flex-shrink-0" style={{ fill: '#4A7AE5' }} />}
-          {hasBranches && (
-            <span className="flex items-center gap-1 text-[10px] text-[#7C6CD4] bg-[#7C6CD4]/8 px-1.5 py-0.5 rounded-full flex-shrink-0 font-semibold">
-              <GitBranch className="w-2.5 h-2.5" />{chat.branches.length}
-            </span>
-          )}
-        </div>
-
-        {/* Size */}
-        <div className="w-24 flex-shrink-0 px-2 text-center">
-          <span className="text-xs text-[#6B7C93]">{formatBytes(chat.storageBytes)}</span>
-        </div>
-
-        {/* Last edited */}
-        <div className="w-28 flex-shrink-0 px-2 text-center">
-          <span className="text-xs text-[#6B7C93]">{formatRelative(chat.updatedAt)}</span>
-        </div>
-
-        {/* Created */}
-        <div className="w-28 flex-shrink-0 px-2 text-center">
-          <span className="text-xs text-[#6B7C93]">{formatShortDate(chat.createdAt)}</span>
-        </div>
-      </div>
-
-      {/* Expanded branches */}
-      <AnimatePresence>
-        {isExpanded && hasBranches && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={SPRING_SNAPPY}
-            className="overflow-hidden"
+          {/* Title + badges + inline content */}
+          <div
+            className="flex-1 min-w-0 px-2"
+            onClick={() => onNavigate(chat.id)}
           >
-            {chat.branches.map((branch) => (
-              <BranchRow key={branch.id} branch={branch} selected={selected} onToggleSelected={onToggleSelected} onNavigate={onNavigate} />
+            {/* Title line */}
+            <div className="flex items-center gap-1.5">
+              {editingTitle ? (
+                <div onClick={(e) => e.stopPropagation()}>
+                  <InlineTitleEditor
+                    title={chat.title || 'New conversation'}
+                    onSave={(t) => { setEditingTitle(false); onTitleEdit(chat.id, t) }}
+                    onCancel={() => setEditingTitle(false)}
+                  />
+                </div>
+              ) : (
+                <span
+                  className="text-sm font-semibold text-[#1E2532] truncate"
+                  onDoubleClick={(e) => { e.stopPropagation(); setEditingTitle(true) }}
+                  title="Double-click to rename"
+                >
+                  {chat.title || 'New conversation'}
+                </span>
+              )}
+              {chat.pinned && <Pin className="w-3 h-3 text-[#4A7AE5] flex-shrink-0" style={{ fill: '#4A7AE5' }} />}
+
+              {/* Badges: branch count (on parents), notes, highlights */}
+              <div className="flex items-center gap-1 ml-1">
+                {children.length > 0 && (
+                  <CountBadge
+                    icon={GitBranch}
+                    count={children.length}
+                    isActive={effectiveView === 'branches' && rowOverride === 'branches'}
+                    activeColor="#7C6CD4"
+                    onClick={() => toggleRowOverride('branches')}
+                  />
+                )}
+                <CountBadge
+                  icon={StickyNote}
+                  count={noteCount}
+                  isActive={effectiveView === 'notes' && rowOverride === 'notes'}
+                  activeColor="#4A7AE5"
+                  onClick={() => toggleRowOverride('notes')}
+                />
+                <CountBadge
+                  icon={Highlighter}
+                  count={highlightCount}
+                  isActive={effectiveView === 'highlights' && rowOverride === 'highlights'}
+                  activeColor="#E5A620"
+                  onClick={() => toggleRowOverride('highlights')}
+                />
+              </div>
+            </div>
+
+            {/* Inline content based on effective view */}
+            <AnimatePresence mode="wait">
+              {/* Summary view */}
+              {effectiveView === 'summary' && (
+                <motion.p
+                  key="summary"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.12 }}
+                  className="text-[11px] text-[#9CA7B8] leading-relaxed mt-1 line-clamp-1"
+                  style={{ display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                >
+                  {chat.aiSummary}
+                </motion.p>
+              )}
+
+              {/* Notes view */}
+              {effectiveView === 'notes' && (
+                <motion.div
+                  key="notes"
+                  initial={{ opacity: 0, y: 3 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -3 }}
+                  transition={{ duration: 0.15 }}
+                  className="mt-1.5 space-y-1.5"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {hasNotes && chat.notes.map((note) => (
+                    <div key={note.id} className="group/note flex items-start gap-2">
+                      <div className="w-1 min-h-[16px] rounded-full flex-shrink-0 mt-0.5 bg-[#4A7AE5]/20" />
+                      <div className="flex-1 min-w-0">
+                        {editingNoteId === note.id ? (
+                          <InlineNoteEditor
+                            note={note.text}
+                            onSave={(t) => handleEditNote(note.id, t)}
+                            onCancel={() => setEditingNoteId(null)}
+                          />
+                        ) : (
+                          <div className="flex items-start gap-1.5">
+                            <p className="text-[11px] text-[#4A5568] leading-relaxed flex-1">
+                              {note.text}
+                              {note.messageRef && (
+                                <span className="text-[#C0C8D4] ml-1.5">(Message {note.messageRef})</span>
+                              )}
+                            </p>
+                            <div className="flex items-center gap-0 opacity-0 group-hover/note:opacity-100 transition-opacity flex-shrink-0">
+                              <motion.button
+                                whileHover={{ scale: 1.15 }}
+                                whileTap={{ scale: 0.85 }}
+                                onClick={() => setEditingNoteId(note.id)}
+                                className="p-0.5 rounded hover:bg-[#EEEEEE] text-[#C0C8D4] hover:text-[#6B7C93] transition-colors"
+                              >
+                                <Pencil className="w-2.5 h-2.5" />
+                              </motion.button>
+                              <motion.button
+                                whileHover={{ scale: 1.15 }}
+                                whileTap={{ scale: 0.85 }}
+                                onClick={() => handleDeleteNote(note.id)}
+                                className="p-0.5 rounded hover:bg-[#EF4444]/5 text-[#C0C8D4] hover:text-[#EF4444] transition-colors"
+                              >
+                                <Trash2 className="w-2.5 h-2.5" />
+                              </motion.button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {/* Add note — always visible in notes view, de-emphasized */}
+                  {!addingNote && (
+                    <button
+                      onClick={() => setAddingNote(true)}
+                      className="text-left px-2.5 py-1.5 rounded-md border border-dashed border-[#EBEBEB] hover:border-[#4A7AE5] text-[10px] text-[#C0C8D4] hover:text-[#4A7AE5] transition-colors w-full"
+                      style={{ opacity: 0.45 }}
+                      onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                      onMouseLeave={(e) => e.currentTarget.style.opacity = '0.45'}
+                    >
+                      + Add a note
+                    </button>
+                  )}
+                  {addingNote && (
+                    <InlineNoteEditor onSave={handleAddNote} onCancel={() => setAddingNote(false)} />
+                  )}
+                </motion.div>
+              )}
+
+              {/* Highlights view */}
+              {effectiveView === 'highlights' && (
+                <motion.div
+                  key="highlights"
+                  initial={{ opacity: 0, y: 3 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -3 }}
+                  transition={{ duration: 0.15 }}
+                  className="mt-1.5 space-y-1.5"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {hasHighlights && chat.highlights.map((hl) => (
+                    <div key={hl.id} className="flex items-stretch gap-2 group/hl">
+                      <div className="flex-shrink-0 flex items-stretch pt-0.5 pb-0.5">
+                        <div
+                          className="rounded-full"
+                          style={{
+                            backgroundColor: hl.color,
+                            width: 3,
+                            minHeight: hl.multiline ? 28 : 12,
+                            opacity: hl.multiline ? 1 : 0.6,
+                          }}
+                        />
+                      </div>
+                      <p className="text-[11px] text-[#4A5568] leading-relaxed flex-1">{hl.text}</p>
+                      <motion.button
+                        whileHover={{ scale: 1.15 }}
+                        whileTap={{ scale: 0.85 }}
+                        onClick={() => navigator.clipboard.writeText(hl.text).catch(() => {})}
+                        className="p-0.5 rounded opacity-0 group-hover/hl:opacity-100 hover:bg-[#EEEEEE] text-[#C0C8D4] hover:text-[#6B7C93] transition-all flex-shrink-0 self-start"
+                      >
+                        <Copy className="w-2.5 h-2.5" />
+                      </motion.button>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+
+              {/* Branches view */}
+              {effectiveView === 'branches' && (
+                <motion.div
+                  key="branches"
+                  initial={{ opacity: 0, y: 3 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -3 }}
+                  transition={{ duration: 0.15 }}
+                  className="mt-1.5 space-y-1"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {isBranch && (
+                    <div className="flex items-center gap-2">
+                      <div className="flex-shrink-0 flex items-stretch">
+                        <div className="rounded-full" style={{ backgroundColor: familyColor || '#7C6CD4', width: 3, minHeight: 16 }} />
+                      </div>
+                      <span className="text-[10px] text-[#9CA7B8]">↳ branched from</span>
+                      <button
+                        className="text-[10px] text-[#4A5568] font-semibold hover:text-[#4A7AE5] transition-colors cursor-pointer"
+                        onClick={(e) => { e.stopPropagation(); onNavigate(chat.parentId) }}
+                      >
+                        {chat.parentTitle}
+                      </button>
+                    </div>
+                  )}
+                  {children.length > 0 && children.map((child) => (
+                    <div key={child.id} className="flex items-center gap-2">
+                      <div className="flex-shrink-0 flex items-stretch">
+                        <div className="rounded-full" style={{ backgroundColor: familyColor || '#7C6CD4', width: 3, minHeight: 16 }} />
+                      </div>
+                      <GitBranch className="w-2.5 h-2.5 text-[#7C6CD4]" />
+                      <button
+                        className="text-[11px] text-[#4A5568] font-semibold hover:text-[#4A7AE5] transition-colors cursor-pointer"
+                        onClick={(e) => { e.stopPropagation(); onNavigate(child.id) }}
+                      >
+                        {child.title}
+                      </button>
+                      <span className="text-[10px] text-[#C0C8D4]">{formatRelative(child.updatedAt)}</span>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Topics — stacked pills */}
+          <div className="w-36 flex-shrink-0 px-2 flex flex-col items-center justify-center gap-1 pt-0.5">
+            {chat.tags && chat.tags.map(tag => (
+              <span
+                key={tag}
+                className="text-[9px] font-semibold px-2 py-0.5 rounded-full truncate max-w-full text-center"
+                style={{
+                  backgroundColor: `${TAG_COLORS[tag] || '#6B7C93'}11`,
+                  color: TAG_COLORS[tag] || '#6B7C93',
+                }}
+              >
+                {tag}
+              </span>
             ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  )
-}
+          </div>
 
-/* ═══════════════════════════════════════════════════════════ */
-/*  BRANCH ROW                                                  */
-/* ═══════════════════════════════════════════════════════════ */
+          {/* Edited */}
+          <div className="w-24 flex-shrink-0 px-2 text-center pt-0.5">
+            <span className="text-xs text-[#C0C8D4]">{formatRelative(chat.updatedAt)}</span>
+          </div>
 
-function BranchRow({ branch, selected, onToggleSelected, onNavigate }) {
-  const isSelected = selected.has(branch.id)
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -6 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={SPRING_SMOOTH}
-      className="group flex items-center px-2 border-b border-[#F5F5F5] cursor-pointer"
-      style={{ minHeight: 44, backgroundColor: isSelected ? '#F0F5FF' : undefined }}
-      onClick={() => onNavigate(branch.id)}
-    >
-      <div className="w-10 flex-shrink-0 flex items-center justify-center">
-        <Checkbox checked={isSelected} onChange={() => onToggleSelected(branch.id)} />
-      </div>
-      <div className="w-8 flex-shrink-0" />
-      <div className="flex-1 min-w-0 px-2 flex items-center gap-2 pl-4">
-        <div className="w-4 h-px bg-[#7C6CD4]/30 flex-shrink-0" />
-        <GitBranch className="w-3 h-3 text-[#7C6CD4] flex-shrink-0" />
-        <span className="text-xs font-semibold text-[#4A5568] truncate">{branch.title || 'Untitled branch'}</span>
-      </div>
-      <div className="w-24 flex-shrink-0 px-2 text-center">
-        <span className="text-xs text-[#6B7C93]">{formatBytes(branch.storageBytes)}</span>
-      </div>
-      <div className="w-28 flex-shrink-0 px-2 text-center">
-        <span className="text-xs text-[#6B7C93]">{formatRelative(branch.updatedAt)}</span>
-      </div>
-      <div className="w-28 flex-shrink-0 px-2 text-center">
-        <span className="text-xs text-[#6B7C93]">{formatShortDate(branch.createdAt)}</span>
-      </div>
+          {/* Created */}
+          <div className="w-24 flex-shrink-0 px-2 text-center pt-0.5">
+            <span className="text-xs text-[#C0C8D4]">{formatShortDate(chat.createdAt)}</span>
+          </div>
+        </div>
+      </motion.div>
     </motion.div>
   )
 }
@@ -460,14 +771,15 @@ export default function SelectorView() {
 
   // ── Local state ──
   const [searchQuery, setSearchQuery] = useState('')
-  const [expandedChats, setExpandedChats] = useState(new Set())
   const [selected, setSelected] = useState(new Set())
   const [sortField, setSortField] = useState('updatedAt')
   const [sortDir, setSortDir] = useState('desc')
   const [favSidebarOpen, setFavSidebarOpen] = useState(true)
   const [favorites, setFavorites] = useState([])
+  const [globalView, setGlobalView] = useState('summary')
+  const [rowOverrides, setRowOverrides] = useState({})
 
-  // ── Load favorites from IndexedDB, hydrated with message content ──
+  // ── Load favorites from IndexedDB ──
   useEffect(() => {
     let cancelled = false
     async function loadFavs() {
@@ -482,43 +794,27 @@ export default function SelectorView() {
     return () => { cancelled = true }
   }, [conversations])
 
-  // ── Derived: separate roots from branches, attach branches to parents ──
-  const { rootsWithBranches, allBranches } = useMemo(() => {
-    const branchesByParent = {}
-    const roots = []
+  // ── Family color map ──
+  const familyColorMap = useMemo(
+    () => buildFamilyColorMap(conversations || []),
+    [conversations]
+  )
 
-    ;(conversations || []).forEach((conv) => {
-      if (conv.parentId) {
-        if (!branchesByParent[conv.parentId]) branchesByParent[conv.parentId] = []
-        branchesByParent[conv.parentId].push(conv)
-      } else {
-        roots.push(conv)
-      }
-    })
-
-    Object.values(branchesByParent).forEach((branches) => {
-      branches.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-    })
-
-    const rootsWithBranches = roots.map(r => ({
-      ...r,
-      branches: branchesByParent[r.id] || [],
-    }))
-
-    const allBranches = Object.values(branchesByParent).flat()
-
-    return { rootsWithBranches, allBranches }
-  }, [conversations])
-
-  // ── Filter by search ──
+  // ── Filter by search (across titles, summaries, notes, tags, parent titles) ──
   const filteredChats = useMemo(() => {
-    if (!searchQuery.trim()) return rootsWithBranches
-    const q = searchQuery.toLowerCase()
-    return rootsWithBranches.filter(c =>
-      (c.title || '').toLowerCase().includes(q) ||
-      c.branches.some(b => (b.title || '').toLowerCase().includes(q))
-    )
-  }, [rootsWithBranches, searchQuery])
+    let filtered = [...(conversations || [])]
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      filtered = filtered.filter(c =>
+        (c.title || '').toLowerCase().includes(q)
+        || (c.aiSummary && c.aiSummary.toLowerCase().includes(q))
+        || (c.notes && c.notes.some(n => n.text.toLowerCase().includes(q)))
+        || (c.tags && c.tags.some(t => t.toLowerCase().includes(q)))
+        || (c.parentTitle && c.parentTitle.toLowerCase().includes(q))
+      )
+    }
+    return filtered
+  }, [conversations, searchQuery])
 
   // ── Sort: pinned first, then by field ──
   const sortedChats = useMemo(() => {
@@ -538,22 +834,26 @@ export default function SelectorView() {
     return sorted
   }, [filteredChats, sortField, sortDir])
 
-  // ── Select-all logic ──
-  const allVisibleIds = useMemo(() => {
-    const ids = []
-    sortedChats.forEach(c => { ids.push(c.id); c.branches.forEach(b => ids.push(b.id)) })
-    return ids
-  }, [sortedChats])
+  // ── Determine de-emphasis ──
+  const isRowDeemphasized = useCallback((chat) => {
+    if (globalView === 'notes') return !chat.notes || chat.notes.length === 0
+    if (globalView === 'highlights') return !chat.highlights || chat.highlights.length === 0
+    if (globalView === 'branches') {
+      const isBranch = !!chat.parentId
+      const hasChildren = (conversations || []).some(c => c.parentId === chat.id)
+      return !isBranch && !hasChildren
+    }
+    return false
+  }, [globalView, conversations])
 
+  // ── Select-all logic ──
+  const allVisibleIds = useMemo(() => sortedChats.map(c => c.id), [sortedChats])
   const allSelected = allVisibleIds.length > 0 && allVisibleIds.every(id => selected.has(id))
   const someSelected = allVisibleIds.some(id => selected.has(id))
 
   const toggleAll = useCallback(() => {
-    if (allSelected) {
-      setSelected(new Set())
-    } else {
-      setSelected(new Set(allVisibleIds))
-    }
+    if (allSelected) setSelected(new Set())
+    else setSelected(new Set(allVisibleIds))
   }, [allSelected, allVisibleIds])
 
   // ── Selected size total ──
@@ -566,6 +866,15 @@ export default function SelectorView() {
     return total
   }, [selected, conversations])
 
+  // ── Smart pin label ──
+  const pinLabel = useMemo(() => {
+    const anyUnpinned = [...selected].some(id => {
+      const c = (conversations || []).find(ch => ch.id === id)
+      return c && !c.pinned
+    })
+    return anyUnpinned ? 'Pin' : 'Unpin'
+  }, [selected, conversations])
+
   // ── Storage percent ──
   const storagePercent = useMemo(() => {
     if (!storageUsage?.quota) return 0
@@ -573,6 +882,20 @@ export default function SelectorView() {
   }, [storageUsage])
 
   // ── Handlers ──
+  const handleGlobalViewChange = useCallback((view) => {
+    setGlobalView(view)
+    setRowOverrides({})
+  }, [])
+
+  const setRowOverride = useCallback((chatId, view) => {
+    setRowOverrides(prev => {
+      const next = { ...prev }
+      if (view === null || view === globalView) delete next[chatId]
+      else next[chatId] = view
+      return next
+    })
+  }, [globalView])
+
   const removeFavorite = useCallback(async (favId) => {
     try {
       await dbDeleteFavorite(favId)
@@ -591,10 +914,6 @@ export default function SelectorView() {
 
   const toggleSelected = useCallback((id) => {
     setSelected(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
-  }, [])
-
-  const toggleExpanded = useCallback((id) => {
-    setExpandedChats(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
   }, [])
 
   const handleNavigate = useCallback((id) => {
@@ -618,17 +937,29 @@ export default function SelectorView() {
     }
   }, [updateConversation])
 
-  const handleBulkPin = useCallback(async () => {
-    const promises = [...selected].map(id => updateConversation(id, { pinned: true }))
-    await Promise.allSettled(promises)
-    setSelected(new Set())
-  }, [selected, updateConversation])
+  const handleUpdateNotes = useCallback(async (id, notes) => {
+    try {
+      await updateConversation(id, { notes })
+    } catch (err) {
+      console.error('Failed to update notes:', err)
+    }
+  }, [updateConversation])
 
-  const handleBulkUnpin = useCallback(async () => {
-    const promises = [...selected].map(id => updateConversation(id, { pinned: false }))
+  const handleBulkPinToggle = useCallback(async () => {
+    const anyUnpinned = [...selected].some(id => {
+      const c = (conversations || []).find(ch => ch.id === id)
+      return c && !c.pinned
+    })
+    const promises = [...selected].map(id => updateConversation(id, { pinned: anyUnpinned }))
     await Promise.allSettled(promises)
     setSelected(new Set())
-  }, [selected, updateConversation])
+  }, [selected, conversations, updateConversation])
+
+  const handleBulkRegenerate = useCallback(async () => {
+    // TODO: trigger AI summary regeneration for selected conversations
+    // For now, just clear selection as a placeholder
+    setSelected(new Set())
+  }, [])
 
   const handleBulkDelete = useCallback(async () => {
     try {
@@ -651,9 +982,17 @@ export default function SelectorView() {
           transition={{ ...SPRING_SMOOTH, delay: 0.1 }}
           className="flex items-center justify-between px-8 pt-8 pb-4"
         >
-          <div className="flex items-center gap-3">
-            <MessageSquare className="w-5 h-5 text-[#4A7AE5]" />
-            <h1 className="text-lg font-semibold text-[#1E2532]">Chats</h1>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <motion.div
+                animate={{ rotate: [0, -8, 8, 0] }}
+                transition={{ duration: 0.6, delay: 0.6, ease: 'easeInOut' }}
+              >
+                <MessageSquare className="w-5 h-5 text-[#4A7AE5]" />
+              </motion.div>
+              <h1 className="text-lg font-semibold text-[#1E2532]">Chats</h1>
+            </div>
+            <ViewToggle activeView={globalView} onChangeView={handleGlobalViewChange} />
           </div>
           <div className="flex items-center gap-2">
             {!favSidebarOpen && (
@@ -706,7 +1045,7 @@ export default function SelectorView() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search chats..."
+              placeholder="Search chats, notes, highlights, tags..."
               className="w-full bg-white rounded-lg pl-10 pr-4 py-2.5 text-sm text-[#1E2532] outline-none placeholder:text-[#D5D5D5] border border-[#EBEBEB] focus:border-[#4A7AE5] transition-colors"
             />
           </div>
@@ -728,7 +1067,7 @@ export default function SelectorView() {
                 className="flex items-center border-b border-[#EBEBEB] px-2"
                 style={{ minHeight: 40 }}
               >
-                <div className="w-10 flex-shrink-0 flex items-center justify-center">
+                <div className="w-8 flex-shrink-0 flex items-center justify-center">
                   <Checkbox checked={allSelected} indeterminate={someSelected && !allSelected} onChange={toggleAll} />
                 </div>
 
@@ -749,11 +1088,11 @@ export default function SelectorView() {
                         )}
                       </span>
                       <div className="flex items-center gap-0.5 ml-3">
-                        <InlineAction icon={Pin} label="Pin" onClick={handleBulkPin} />
-                        <InlineAction icon={PinOff} label="Unpin" onClick={handleBulkUnpin} />
+                        <InlineAction icon={Pin} label={pinLabel} onClick={handleBulkPinToggle} />
+                        <InlineAction icon={RefreshCw} label="Regenerate summaries" onClick={handleBulkRegenerate} />
                         <InlineAction icon={Trash2} label="Delete" onClick={handleBulkDelete} danger />
                       </div>
-                      <div className="ml-auto flex items-center gap-1">
+                      <div className="ml-auto">
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
@@ -766,22 +1105,16 @@ export default function SelectorView() {
                     </motion.div>
                   ) : (
                     <motion.div key="headers" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex items-center">
-                      <div className="w-8 flex-shrink-0" />
                       <div className="flex-1 min-w-0 px-2">
-                        <span className="text-[11px] font-semibold text-[#6B7C93] uppercase tracking-wider">Title</span>
+                        <span className="text-[11px] font-semibold text-[#C0C8D4] uppercase tracking-wider">Title</span>
                       </div>
 
-                      <button onClick={() => handleSort('storageBytes')} className="w-24 flex-shrink-0 px-2 flex items-center justify-center gap-1 group cursor-pointer">
-                        <span className={`text-[11px] font-semibold uppercase tracking-wider transition-colors ${sortField === 'storageBytes' ? 'text-[#4A7AE5]' : 'text-[#6B7C93] group-hover:text-[#1E2532]'}`}>Size</span>
-                        {sortField === 'storageBytes' && (
-                          <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={SPRING_SNAPPY}>
-                            {sortDir === 'desc' ? <ArrowDown className="w-3 h-3 text-[#4A7AE5]" /> : <ArrowUp className="w-3 h-3 text-[#4A7AE5]" />}
-                          </motion.div>
-                        )}
-                      </button>
+                      <div className="w-36 flex-shrink-0 px-2 text-center">
+                        <span className="text-[11px] font-semibold text-[#C0C8D4] uppercase tracking-wider">Topics</span>
+                      </div>
 
-                      <button onClick={() => handleSort('updatedAt')} className="w-28 flex-shrink-0 px-2 flex items-center justify-center gap-1 group cursor-pointer">
-                        <span className={`text-[11px] font-semibold uppercase tracking-wider transition-colors ${sortField === 'updatedAt' ? 'text-[#4A7AE5]' : 'text-[#6B7C93] group-hover:text-[#1E2532]'}`}>Edited</span>
+                      <button onClick={() => handleSort('updatedAt')} className="w-24 flex-shrink-0 px-2 flex items-center justify-center gap-1 group cursor-pointer">
+                        <span className={`text-[11px] font-semibold uppercase tracking-wider transition-colors ${sortField === 'updatedAt' ? 'text-[#4A7AE5]' : 'text-[#C0C8D4] group-hover:text-[#6B7C93]'}`}>Edited</span>
                         {sortField === 'updatedAt' && (
                           <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={SPRING_SNAPPY}>
                             {sortDir === 'desc' ? <ArrowDown className="w-3 h-3 text-[#4A7AE5]" /> : <ArrowUp className="w-3 h-3 text-[#4A7AE5]" />}
@@ -789,8 +1122,8 @@ export default function SelectorView() {
                         )}
                       </button>
 
-                      <button onClick={() => handleSort('createdAt')} className="w-28 flex-shrink-0 px-2 flex items-center justify-center gap-1 group cursor-pointer">
-                        <span className={`text-[11px] font-semibold uppercase tracking-wider transition-colors ${sortField === 'createdAt' ? 'text-[#4A7AE5]' : 'text-[#6B7C93] group-hover:text-[#1E2532]'}`}>Created</span>
+                      <button onClick={() => handleSort('createdAt')} className="w-24 flex-shrink-0 px-2 flex items-center justify-center gap-1 group cursor-pointer">
+                        <span className={`text-[11px] font-semibold uppercase tracking-wider transition-colors ${sortField === 'createdAt' ? 'text-[#4A7AE5]' : 'text-[#C0C8D4] group-hover:text-[#6B7C93]'}`}>Created</span>
                         {sortField === 'createdAt' && (
                           <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={SPRING_SNAPPY}>
                             {sortDir === 'desc' ? <ArrowDown className="w-3 h-3 text-[#4A7AE5]" /> : <ArrowUp className="w-3 h-3 text-[#4A7AE5]" />}
@@ -809,12 +1142,17 @@ export default function SelectorView() {
                     <ChatTableRow
                       key={chat.id}
                       chat={chat}
-                      isExpanded={expandedChats.has(chat.id)}
-                      onToggleExpand={() => toggleExpanded(chat.id)}
+                      globalView={globalView}
+                      familyColor={chat.familyId ? familyColorMap[chat.familyId] : null}
+                      allChats={conversations || []}
+                      isDeemphasized={isRowDeemphasized(chat)}
+                      rowOverride={rowOverrides[chat.id] || null}
+                      onSetRowOverride={setRowOverride}
                       selected={selected}
                       onToggleSelected={toggleSelected}
                       onNavigate={handleNavigate}
                       onTitleEdit={handleTitleEdit}
+                      onUpdateNotes={handleUpdateNotes}
                     />
                   ))}
                 </motion.div>
@@ -842,15 +1180,12 @@ export default function SelectorView() {
                 )}
               </div>
 
-              {/* Table footer */}
+              {/* Footer — simplified */}
               <div className="flex items-center justify-between px-4 py-2 border-t border-[#EBEBEB] bg-[#FAFAFA]">
-                <span className="text-[11px] text-[#6B7C93]">
-                  {rootsWithBranches.length} conversation{rootsWithBranches.length !== 1 ? 's' : ''}
-                  {allBranches.length > 0 && (
-                    <span> · {allBranches.length} branch{allBranches.length !== 1 ? 'es' : ''}</span>
-                  )}
+                <span className="text-[11px] text-[#C0C8D4]">
+                  {(conversations || []).length} conversation{(conversations || []).length !== 1 ? 's' : ''}
                 </span>
-                <span className="text-[11px] text-[#6B7C93]">
+                <span className="text-[11px] text-[#C0C8D4]">
                   {formatBytes((conversations || []).reduce((sum, c) => sum + (c.storageBytes || 0), 0))} total
                 </span>
               </div>
@@ -880,7 +1215,7 @@ export default function SelectorView() {
                 <div className="flex items-center gap-2">
                   <Star className="w-3.5 h-3.5 text-[#E5A620]" style={{ fill: '#E5A620' }} />
                   <span className="text-sm font-semibold text-[#1E2532]">Favorites</span>
-                  <span className="text-xs text-[#6B7C93]">{favorites.length}</span>
+                  <span className="text-xs text-[#C0C8D4]">{favorites.length}</span>
                 </div>
                 <motion.button
                   whileHover={{ scale: 1.15 }}
