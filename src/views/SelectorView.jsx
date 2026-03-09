@@ -795,6 +795,65 @@ export default function SelectorView() {
   const [favorites, setFavorites] = useState([])
   const [globalView, setGlobalView] = useState('summary')
   const [rowOverrides, setRowOverrides] = useState({})
+  const [notesMap, setNotesMap] = useState({})       // { conversationId: [note, ...] }
+  const [highlightsMap, setHighlightsMap] = useState({}) // { conversationId: [highlight, ...] }
+
+  // ── Load notes and highlights from their IndexedDB stores ──
+  useEffect(() => {
+    let cancelled = false
+    async function loadAnnotations() {
+      try {
+        const db = await initDB()
+
+        // Load all notes, group by conversationId
+        const allNotes = await db.getAll('notes')
+        const nMap = {}
+        for (const note of allNotes) {
+          const cid = note.conversationId
+          if (!nMap[cid]) nMap[cid] = []
+          nMap[cid].push({
+            id: note.id,
+            text: note.text,
+            messageRef: note.messageId || null,
+          })
+        }
+
+        // Load all highlights, group by conversationId
+        const allHighlights = await db.getAll('highlights')
+        const hMap = {}
+        for (const hl of allHighlights) {
+          const cid = hl.conversationId
+          if (!hMap[cid]) hMap[cid] = []
+          hMap[cid].push({
+            id: hl.id,
+            text: hl.text,
+            color: hl.color || '#4A7AE5',
+            multiline: hl.multiline ?? (hl.text && hl.text.length > 80),
+          })
+        }
+
+        if (!cancelled) {
+          setNotesMap(nMap)
+          setHighlightsMap(hMap)
+        }
+      } catch (err) {
+        console.warn('Failed to load annotations:', err)
+      }
+    }
+    loadAnnotations()
+    return () => { cancelled = true }
+  }, [conversations]) // reload when conversations change (e.g. after adding a note)
+
+  // ── Hydrate conversations with notes + highlights from separate stores ──
+  const hydratedConversations = useMemo(() => {
+    return (conversations || []).map(conv => ({
+      ...conv,
+      notes: conv.notes || notesMap[conv.id] || [],
+      highlights: conv.highlights || highlightsMap[conv.id] || [],
+      tags: conv.tags || [],
+      aiSummary: conv.aiSummary || null,
+    }))
+  }, [conversations, notesMap, highlightsMap])
 
   // ── Load favorites from IndexedDB ──
   useEffect(() => {
@@ -813,13 +872,13 @@ export default function SelectorView() {
 
   // ── Family color map ──
   const familyColorMap = useMemo(
-    () => buildFamilyColorMap(conversations || []),
-    [conversations]
+    () => buildFamilyColorMap(hydratedConversations),
+    [hydratedConversations]
   )
 
   // ── Filter by search (across titles, summaries, notes, tags, parent titles) ──
   const filteredChats = useMemo(() => {
-    let filtered = [...(conversations || [])]
+    let filtered = [...hydratedConversations]
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase()
       filtered = filtered.filter(c =>
@@ -831,7 +890,7 @@ export default function SelectorView() {
       )
     }
     return filtered
-  }, [conversations, searchQuery])
+  }, [hydratedConversations, searchQuery])
 
   // ── Sort: pinned first, then by field ──
   const sortedChats = useMemo(() => {
@@ -852,16 +911,33 @@ export default function SelectorView() {
   }, [filteredChats, sortField, sortDir])
 
   // ── Determine de-emphasis ──
+  // Only de-emphasize rows when at least one conversation has content for the active view.
+  // If no conversations have notes/highlights yet, de-emphasis would dim everything — useless.
+  const anyHasNotes = useMemo(
+    () => hydratedConversations.some(c => c.notes && c.notes.length > 0),
+    [hydratedConversations]
+  )
+  const anyHasHighlights = useMemo(
+    () => hydratedConversations.some(c => c.highlights && c.highlights.length > 0),
+    [hydratedConversations]
+  )
+
   const isRowDeemphasized = useCallback((chat) => {
-    if (globalView === 'notes') return !chat.notes || chat.notes.length === 0
-    if (globalView === 'highlights') return !chat.highlights || chat.highlights.length === 0
+    if (globalView === 'notes') {
+      if (!anyHasNotes) return false
+      return !chat.notes || chat.notes.length === 0
+    }
+    if (globalView === 'highlights') {
+      if (!anyHasHighlights) return false
+      return !chat.highlights || chat.highlights.length === 0
+    }
     if (globalView === 'branches') {
       const isBranch = !!chat.parentId
-      const hasChildren = (conversations || []).some(c => c.parentId === chat.id)
+      const hasChildren = hydratedConversations.some(c => c.parentId === chat.id)
       return !isBranch && !hasChildren
     }
     return false
-  }, [globalView, conversations])
+  }, [globalView, hydratedConversations, anyHasNotes, anyHasHighlights])
 
   // ── Select-all logic ──
   const allVisibleIds = useMemo(() => sortedChats.map(c => c.id), [sortedChats])
@@ -877,20 +953,20 @@ export default function SelectorView() {
   const selectedSizeTotal = useMemo(() => {
     let total = 0
     selected.forEach((id) => {
-      const conv = (conversations || []).find((c) => c.id === id)
+      const conv = hydratedConversations.find((c) => c.id === id)
       if (conv?.storageBytes) total += conv.storageBytes
     })
     return total
-  }, [selected, conversations])
+  }, [selected, hydratedConversations])
 
   // ── Smart pin label ──
   const pinLabel = useMemo(() => {
     const anyUnpinned = [...selected].some(id => {
-      const c = (conversations || []).find(ch => ch.id === id)
+      const c = hydratedConversations.find(ch => ch.id === id)
       return c && !c.pinned
     })
     return anyUnpinned ? 'Pin' : 'Unpin'
-  }, [selected, conversations])
+  }, [selected, hydratedConversations])
 
   // ── Storage percent ──
   const storagePercent = useMemo(() => {
@@ -954,23 +1030,43 @@ export default function SelectorView() {
     }
   }, [updateConversation])
 
-  const handleUpdateNotes = useCallback(async (id, notes) => {
+  const handleUpdateNotes = useCallback(async (conversationId, newNotes) => {
     try {
-      await updateConversation(id, { notes })
+      const db = await initDB()
+
+      // Clear existing notes for this conversation and rewrite
+      const existingNotes = await db.getAllFromIndex('notes', 'conversationId', conversationId)
+      const tx = db.transaction('notes', 'readwrite')
+      for (const existing of existingNotes) {
+        await tx.store.delete(existing.id)
+      }
+      for (const note of newNotes) {
+        await tx.store.put({
+          id: note.id,
+          conversationId,
+          messageId: note.messageRef || null,
+          text: note.text,
+          createdAt: note.createdAt || new Date().toISOString(),
+        })
+      }
+      await tx.done
+
+      // Update local state so the UI reflects changes immediately
+      setNotesMap(prev => ({ ...prev, [conversationId]: newNotes }))
     } catch (err) {
       console.error('Failed to update notes:', err)
     }
-  }, [updateConversation])
+  }, [])
 
   const handleBulkPinToggle = useCallback(async () => {
     const anyUnpinned = [...selected].some(id => {
-      const c = (conversations || []).find(ch => ch.id === id)
+      const c = hydratedConversations.find(ch => ch.id === id)
       return c && !c.pinned
     })
     const promises = [...selected].map(id => updateConversation(id, { pinned: anyUnpinned }))
     await Promise.allSettled(promises)
     setSelected(new Set())
-  }, [selected, conversations, updateConversation])
+  }, [selected, hydratedConversations, updateConversation])
 
   const handleBulkRegenerate = useCallback(async () => {
     // TODO: trigger AI summary regeneration for selected conversations
@@ -1161,7 +1257,7 @@ export default function SelectorView() {
                       chat={chat}
                       globalView={globalView}
                       familyColor={chat.familyId ? familyColorMap[chat.familyId] : null}
-                      allChats={conversations || []}
+                      allChats={hydratedConversations}
                       isDeemphasized={isRowDeemphasized(chat)}
                       rowOverride={rowOverrides[chat.id] || null}
                       onSetRowOverride={setRowOverride}
@@ -1200,10 +1296,10 @@ export default function SelectorView() {
               {/* Footer — simplified */}
               <div className="flex items-center justify-between px-4 py-2 border-t border-[#EBEBEB] bg-[#FAFAFA]">
                 <span className="text-[11px] text-[#C0C8D4]">
-                  {(conversations || []).length} conversation{(conversations || []).length !== 1 ? 's' : ''}
+                  {hydratedConversations.length} conversation{hydratedConversations.length !== 1 ? 's' : ''}
                 </span>
                 <span className="text-[11px] text-[#C0C8D4]">
-                  {formatBytes((conversations || []).reduce((sum, c) => sum + (c.storageBytes || 0), 0))} total
+                  {formatBytes(hydratedConversations.reduce((sum, c) => sum + (c.storageBytes || 0), 0))} total
                 </span>
               </div>
             </div>
