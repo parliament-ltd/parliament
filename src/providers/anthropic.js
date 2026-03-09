@@ -8,7 +8,22 @@ const TITLE_SYSTEM_PROMPT = `Generate a short title (2-6 words) for this convers
 - Capture the core topic or intent
 - Be specific, not generic (e.g. "React Router Migration" not "Coding Help")
 - Title case
+- Do NOT prefix with "Title:" or "Summary:" or any label
 - Respond with ONLY the title, nothing else`
+
+const SUMMARY_SYSTEM_PROMPT = `Summarize this conversation in one concise sentence. Rules:
+- Maximum 120 characters
+- Describe what was discussed or accomplished
+- Use past tense (e.g. "Designed a chat interface with branching and context metering")
+- Be specific, not generic
+- Do NOT prefix with "Summary:" or any label
+- Respond with ONLY the summary sentence, nothing else`
+
+const TAGS_SYSTEM_PROMPT = `Generate 1-3 topic tags for this conversation. Rules:
+- Each tag is a single lowercase word (e.g. "design", "api", "architecture")
+- Tags should capture the main topics or domains discussed
+- Return ONLY the tags as a comma-separated list, nothing else
+- Example: "design, api, performance"`
 
 export class AnthropicProvider extends BaseProvider {
   getModels() {
@@ -33,6 +48,46 @@ export class AnthropicProvider extends BaseProvider {
       'anthropic-version': API_VERSION,
       'anthropic-dangerous-direct-browser-access': 'true',
     }
+  }
+
+  // Shared helper for lightweight non-streaming calls (title, summary, tags)
+  async _lightweightCall(apiKey, systemPrompt, messages, maxTokens = 60) {
+    const response = await fetch(`${API_BASE}/messages`, {
+      method: 'POST',
+      headers: this._headers(apiKey),
+      body: JSON.stringify({
+        model: this._resolveModel('claude-haiku'),
+        max_tokens: maxTokens,
+        system: systemPrompt,
+        messages,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`API call failed: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data.content?.[0]?.text?.trim() ?? ''
+  }
+
+  // Prepare messages for lightweight calls: take first N messages, truncate content
+  _prepareMessages(messages, maxMessages = 4, maxContentLength = 500) {
+    return messages.slice(0, maxMessages).map(msg => ({
+      role: msg.role,
+      content: typeof msg.content === 'string'
+        ? msg.content.slice(0, maxContentLength)
+        : msg.content,
+    }))
+  }
+
+  // Strip common prefixes that the model sometimes adds despite instructions
+  _stripPrefixes(text) {
+    return text
+      .replace(/^(Title|Summary|Tags|Branch|Topic|Label|Subject)\s*:\s*/i, '')
+      .replace(/^["']|["']$/g, '')
+      .replace(/\.$/, '')
+      .trim()
   }
 
   async validateKey(apiKey) {
@@ -196,48 +251,63 @@ export class AnthropicProvider extends BaseProvider {
   }
 
   async generateTitle(apiKey, messages) {
-    // Take at most the first 2 messages (first user + assistant exchange)
-    // and truncate long content to keep the request small and cheap
-    const titleMessages = messages.slice(0, 2).map(msg => ({
-      role: msg.role,
-      content: typeof msg.content === 'string'
-        ? msg.content.slice(0, 500)
-        : msg.content,
-    }))
+    const titleMessages = this._prepareMessages(messages, 2, 500)
 
     titleMessages.push({
       role: 'user',
       content: 'Based on our exchange above, generate a short title for this conversation.',
     })
 
-    const response = await fetch(`${API_BASE}/messages`, {
-      method: 'POST',
-      headers: this._headers(apiKey),
-      body: JSON.stringify({
-        model: this._resolveModel('claude-haiku'),
-        max_tokens: 30,
-        system: TITLE_SYSTEM_PROMPT,
-        messages: titleMessages,
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error(`Title generation failed: ${response.status}`)
-    }
-
-    const data = await response.json()
-    const rawTitle = data.content?.[0]?.text?.trim() ?? ''
-
-    // Clean up: remove quotes, periods, and excessive whitespace
-    const cleanTitle = rawTitle
-      .replace(/^["']|["']$/g, '')
-      .replace(/\.$/, '')
-      .trim()
+    const rawTitle = await this._lightweightCall(apiKey, TITLE_SYSTEM_PROMPT, titleMessages, 30)
+    const cleanTitle = this._stripPrefixes(rawTitle)
 
     if (cleanTitle.length === 0 || cleanTitle.length > 60) {
       throw new Error('Generated title was empty or too long')
     }
 
     return cleanTitle
+  }
+
+  async generateSummary(apiKey, messages) {
+    const summaryMessages = this._prepareMessages(messages, 6, 400)
+
+    summaryMessages.push({
+      role: 'user',
+      content: 'Based on the conversation above, write a one-sentence summary of what was discussed.',
+    })
+
+    const rawSummary = await this._lightweightCall(apiKey, SUMMARY_SYSTEM_PROMPT, summaryMessages, 80)
+    const cleanSummary = this._stripPrefixes(rawSummary)
+
+    if (cleanSummary.length === 0 || cleanSummary.length > 200) {
+      throw new Error('Generated summary was empty or too long')
+    }
+
+    return cleanSummary
+  }
+
+  async generateTags(apiKey, messages) {
+    const tagMessages = this._prepareMessages(messages, 4, 400)
+
+    tagMessages.push({
+      role: 'user',
+      content: 'Based on the conversation above, generate topic tags.',
+    })
+
+    const rawTags = await this._lightweightCall(apiKey, TAGS_SYSTEM_PROMPT, tagMessages, 40)
+    const cleanTags = this._stripPrefixes(rawTags)
+
+    // Parse comma-separated tags, clean each one
+    const tags = cleanTags
+      .split(',')
+      .map(t => t.trim().toLowerCase().replace(/[^a-z0-9-]/g, ''))
+      .filter(t => t.length > 0 && t.length <= 20)
+      .slice(0, 3)
+
+    if (tags.length === 0) {
+      throw new Error('No valid tags generated')
+    }
+
+    return tags
   }
 }

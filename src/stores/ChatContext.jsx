@@ -66,19 +66,29 @@ export function ChatProvider({ children }) {
     }
   }, [])
 
-  // Auto-generate a conversation title after the first user→assistant exchange.
-  // Fire-and-forget: failures are silent, conversation keeps its default title.
-  const generateTitleIfNeeded = useCallback(async (conversationId, currentMessages, apiKey, provider) => {
+  // Auto-generate title, summary, and tags after the first user→assistant exchange.
+  // All three are fire-and-forget: failures are silent.
+  // They run in parallel to minimize latency.
+  const generateMetadataIfNeeded = useCallback(async (conversationId, currentMessages, apiKey, provider) => {
     // Only trigger on exactly 2 messages (first user + first assistant)
     if (currentMessages.length !== 2) return
     if (currentMessages[0].role !== 'user' || currentMessages[1].role !== 'assistant') return
 
-    try {
-      const title = await provider.generateTitle(apiKey, currentMessages)
-      await updateConversation(conversationId, { title })
-    } catch (err) {
-      console.warn('Auto-title generation failed:', err.message)
-    }
+    // Run all three in parallel — each is independent and fire-and-forget
+    const titlePromise = provider.generateTitle(apiKey, currentMessages)
+      .then(title => updateConversation(conversationId, { title }))
+      .catch(err => console.warn('Auto-title generation failed:', err.message))
+
+    const summaryPromise = provider.generateSummary(apiKey, currentMessages)
+      .then(aiSummary => updateConversation(conversationId, { aiSummary }))
+      .catch(err => console.warn('Auto-summary generation failed:', err.message))
+
+    const tagsPromise = provider.generateTags(apiKey, currentMessages)
+      .then(tags => updateConversation(conversationId, { tags }))
+      .catch(err => console.warn('Auto-tags generation failed:', err.message))
+
+    // We don't await the combined result — this is background work
+    Promise.allSettled([titlePromise, summaryPromise, tagsPromise])
   }, [updateConversation])
 
   // Send a message and handle streaming response
@@ -171,13 +181,13 @@ export function ChatProvider({ children }) {
         output: prev.output + tokenCount,
       }))
 
-      // 7. Auto-title generation (fire and forget — not awaited)
+      // 7. Auto-generate title, summary, and tags (fire and forget — not awaited)
       const completedMessages = messagesRef.current.map(m =>
         m.id === assistantMsg.id
           ? { ...m, content: finalContent, incomplete: false, tokenCount }
           : m
       )
-      generateTitleIfNeeded(conversationId, completedMessages, apiKey, provider)
+      generateMetadataIfNeeded(conversationId, completedMessages, apiKey, provider)
     } catch (error) {
       stopPersistInterval()
 
@@ -211,7 +221,7 @@ export function ChatProvider({ children }) {
       latestContentRef.current = ''
       abortControllerRef.current = null
     }
-  }, [startPersistInterval, stopPersistInterval, generateTitleIfNeeded])
+  }, [startPersistInterval, stopPersistInterval, generateMetadataIfNeeded])
 
   // Continue from an interrupted (ghost text) message
   // systemPrompt: optional string from collaboration mode presets + custom instruction

@@ -814,7 +814,9 @@ export default function SelectorView() {
           nMap[cid].push({
             id: note.id,
             text: note.text,
-            messageRef: note.messageId || null,
+            // messageId is a UUID in IndexedDB — only show as messageRef if it's a number
+            // Position-based resolution will be added when the notes system is fully built
+            messageRef: typeof note.messageId === 'number' ? note.messageId : null,
           })
         }
 
