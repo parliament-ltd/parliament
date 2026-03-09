@@ -448,10 +448,12 @@ function ChatTableRow({
   const [addingNote, setAddingNote] = useState(false)
   const [editingNoteId, setEditingNoteId] = useState(null)
 
-  const hasNotes = chat.notes && chat.notes.length > 0
-  const hasHighlights = chat.highlights && chat.highlights.length > 0
-  const noteCount = chat.notes?.length || 0
-  const highlightCount = chat.highlights?.length || 0
+  // Safely handle missing arrays
+  const notes = chat.notes || []
+  const highlights = chat.highlights || []
+  const tags = chat.tags || []
+  const noteCount = notes.length
+  const highlightCount = highlights.length
   const isBranch = !!chat.parentId
 
   // Find children for this chat (if it's a parent)
@@ -468,18 +470,18 @@ function ChatTableRow({
 
   const handleAddNote = (text) => {
     if (!text) { setAddingNote(false); return }
-    onUpdateNotes(chat.id, [...(chat.notes || []), { id: `n-${Date.now()}`, text, messageRef: null }])
+    onUpdateNotes(chat.id, [...notes, { id: `n-${Date.now()}`, text, messageRef: null }])
     setAddingNote(false)
   }
 
   const handleEditNote = (noteId, newText) => {
     if (!newText) { setEditingNoteId(null); return }
-    onUpdateNotes(chat.id, (chat.notes || []).map(n => n.id === noteId ? { ...n, text: newText } : n))
+    onUpdateNotes(chat.id, notes.map(n => n.id === noteId ? { ...n, text: newText } : n))
     setEditingNoteId(null)
   }
 
   const handleDeleteNote = (noteId) => {
-    onUpdateNotes(chat.id, (chat.notes || []).filter(n => n.id !== noteId))
+    onUpdateNotes(chat.id, notes.filter(n => n.id !== noteId))
   }
 
   return (
@@ -487,7 +489,7 @@ function ChatTableRow({
       <motion.div
         whileHover={{ backgroundColor: '#FAFAFA' }}
         transition={{ duration: 0.1 }}
-        className="group border-b border-[#F5F5F5] cursor-pointer"
+        className="group border-b border-[#F5F5F5]"
         style={{
           backgroundColor: isSelected ? '#F0F5FF' : undefined,
           opacity: isDeemphasized ? 0.45 : 1,
@@ -501,10 +503,7 @@ function ChatTableRow({
           </div>
 
           {/* Title + badges + inline content */}
-          <div
-            className="flex-1 min-w-0 px-2"
-            onClick={() => onNavigate(chat.id)}
-          >
+          <div className="flex-1 min-w-0 px-2">
             {/* Title line */}
             <div className="flex items-center gap-1.5">
               {editingTitle ? (
@@ -517,7 +516,8 @@ function ChatTableRow({
                 </div>
               ) : (
                 <span
-                  className="text-sm font-semibold text-[#1E2532] truncate"
+                  className="text-sm font-semibold text-[#1E2532] truncate cursor-pointer hover:text-[#4A7AE5] transition-colors"
+                  onClick={() => onNavigate(chat.id)}
                   onDoubleClick={(e) => { e.stopPropagation(); setEditingTitle(true) }}
                   title="Double-click to rename"
                 >
@@ -556,7 +556,7 @@ function ChatTableRow({
 
             {/* Inline content based on effective view */}
             <AnimatePresence mode="wait">
-              {/* Summary view */}
+              {/* ── Summary view ── */}
               {effectiveView === 'summary' && (
                 <motion.p
                   key="summary"
@@ -564,14 +564,20 @@ function ChatTableRow({
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.12 }}
-                  className="text-[11px] text-[#9CA7B8] leading-relaxed mt-1 line-clamp-1"
-                  style={{ display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                  className="text-[11px] leading-relaxed mt-1 line-clamp-1"
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 1,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    color: chat.aiSummary ? '#9CA7B8' : '#D5D5D5',
+                  }}
                 >
-                  {chat.aiSummary}
+                  {chat.aiSummary || 'Summary will appear after your first exchange'}
                 </motion.p>
               )}
 
-              {/* Notes view */}
+              {/* ── Notes view ── */}
               {effectiveView === 'notes' && (
                 <motion.div
                   key="notes"
@@ -582,7 +588,7 @@ function ChatTableRow({
                   className="mt-1.5 space-y-1.5"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {hasNotes && chat.notes.map((note) => (
+                  {notes.map((note) => (
                     <div key={note.id} className="group/note flex items-start gap-2">
                       <div className="w-1 min-h-[16px] rounded-full flex-shrink-0 mt-0.5 bg-[#4A7AE5]/20" />
                       <div className="flex-1 min-w-0">
@@ -623,11 +629,11 @@ function ChatTableRow({
                       </div>
                     </div>
                   ))}
-                  {/* Add note — always visible in notes view, de-emphasized */}
+                  {/* Add note — always visible in notes view */}
                   {!addingNote && (
                     <button
                       onClick={() => setAddingNote(true)}
-                      className="text-left px-2.5 py-1.5 rounded-md border border-dashed border-[#EBEBEB] hover:border-[#4A7AE5] text-[10px] text-[#C0C8D4] hover:text-[#4A7AE5] transition-colors w-full"
+                      className="text-left px-2.5 py-1.5 rounded-md border border-dashed border-[#EBEBEB] hover:border-[#4A7AE5] text-[10px] text-[#C0C8D4] hover:text-[#4A7AE5] transition-all w-full"
                       style={{ opacity: 0.45 }}
                       onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
                       onMouseLeave={(e) => e.currentTarget.style.opacity = '0.45'}
@@ -641,7 +647,7 @@ function ChatTableRow({
                 </motion.div>
               )}
 
-              {/* Highlights view */}
+              {/* ── Highlights view ── */}
               {effectiveView === 'highlights' && (
                 <motion.div
                   key="highlights"
@@ -652,34 +658,40 @@ function ChatTableRow({
                   className="mt-1.5 space-y-1.5"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {hasHighlights && chat.highlights.map((hl) => (
-                    <div key={hl.id} className="flex items-stretch gap-2 group/hl">
-                      <div className="flex-shrink-0 flex items-stretch pt-0.5 pb-0.5">
-                        <div
-                          className="rounded-full"
-                          style={{
-                            backgroundColor: hl.color,
-                            width: 3,
-                            minHeight: hl.multiline ? 28 : 12,
-                            opacity: hl.multiline ? 1 : 0.6,
-                          }}
-                        />
+                  {highlights.length > 0 ? (
+                    highlights.map((hl) => (
+                      <div key={hl.id} className="flex items-stretch gap-2 group/hl">
+                        <div className="flex-shrink-0 flex items-stretch pt-0.5 pb-0.5">
+                          <div
+                            className="rounded-full"
+                            style={{
+                              backgroundColor: hl.color || '#4A7AE5',
+                              width: 3,
+                              minHeight: hl.multiline ? 28 : 12,
+                              opacity: hl.multiline ? 1 : 0.6,
+                            }}
+                          />
+                        </div>
+                        <p className="text-[11px] text-[#4A5568] leading-relaxed flex-1">{hl.text}</p>
+                        <motion.button
+                          whileHover={{ scale: 1.15 }}
+                          whileTap={{ scale: 0.85 }}
+                          onClick={() => navigator.clipboard.writeText(hl.text).catch(() => {})}
+                          className="p-0.5 rounded opacity-0 group-hover/hl:opacity-100 hover:bg-[#EEEEEE] text-[#C0C8D4] hover:text-[#6B7C93] transition-all flex-shrink-0 self-start"
+                        >
+                          <Copy className="w-2.5 h-2.5" />
+                        </motion.button>
                       </div>
-                      <p className="text-[11px] text-[#4A5568] leading-relaxed flex-1">{hl.text}</p>
-                      <motion.button
-                        whileHover={{ scale: 1.15 }}
-                        whileTap={{ scale: 0.85 }}
-                        onClick={() => navigator.clipboard.writeText(hl.text).catch(() => {})}
-                        className="p-0.5 rounded opacity-0 group-hover/hl:opacity-100 hover:bg-[#EEEEEE] text-[#C0C8D4] hover:text-[#6B7C93] transition-all flex-shrink-0 self-start"
-                      >
-                        <Copy className="w-2.5 h-2.5" />
-                      </motion.button>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-[10px] text-[#D5D5D5] italic">
+                      Select text in a conversation to create highlights
+                    </p>
+                  )}
                 </motion.div>
               )}
 
-              {/* Branches view */}
+              {/* ── Branches view ── */}
               {effectiveView === 'branches' && (
                 <motion.div
                   key="branches"
@@ -700,7 +712,7 @@ function ChatTableRow({
                         className="text-[10px] text-[#4A5568] font-semibold hover:text-[#4A7AE5] transition-colors cursor-pointer"
                         onClick={(e) => { e.stopPropagation(); onNavigate(chat.parentId) }}
                       >
-                        {chat.parentTitle}
+                        {chat.parentTitle || 'Parent conversation'}
                       </button>
                     </div>
                   )}
@@ -719,6 +731,11 @@ function ChatTableRow({
                       <span className="text-[10px] text-[#C0C8D4]">{formatRelative(child.updatedAt)}</span>
                     </div>
                   ))}
+                  {!isBranch && children.length === 0 && (
+                    <p className="text-[10px] text-[#D5D5D5] italic">
+                      No branch relationships
+                    </p>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -726,7 +743,7 @@ function ChatTableRow({
 
           {/* Topics — stacked pills */}
           <div className="w-36 flex-shrink-0 px-2 flex flex-col items-center justify-center gap-1 pt-0.5">
-            {chat.tags && chat.tags.map(tag => (
+            {tags.map(tag => (
               <span
                 key={tag}
                 className="text-[9px] font-semibold px-2 py-0.5 rounded-full truncate max-w-full text-center"
