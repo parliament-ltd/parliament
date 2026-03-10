@@ -20,6 +20,7 @@ Project Apollo is a power-user chat interface for AI models, starting with Claud
 - React Router v6
 - Lucide React (icons)
 - `idb` library (IndexedDB wrapper)
+- `react-markdown` + `remark-gfm` (Markdown rendering in message cards)
 - Web Crypto API (native — no crypto libraries)
 
 ## Design System
@@ -88,6 +89,7 @@ src/
     ConversationContext.jsx
     ChatContext.jsx      # Active conversation streaming state
   assets/           # Static assets
+mockups/            # Reference UI mockups (standalone .jsx files, not part of app build)
 ```
 
 ## Key Decisions
@@ -303,6 +305,12 @@ Small pill badges appear next to the title showing counts for branches (on paren
 ### Flat Branch Model
 
 All conversations — parent or branch — live at the same level in the table. Branches are not visually nested or subordinate. A branch is a conversation with a `parentId` and `familyId`. Related conversations share a family color used in the Branches view as a left bar indicator.
+
+**Additional conversation fields (set via `updateConversation()` after creation):**
+- `aiSummary` — auto-generated one-sentence summary, displayed in Summary view
+- `familyId` — shared ID across a parent and all its branches (used for family color assignment)
+- `parentTitle` — denormalized parent title for display in Branches view
+- `tags` — array of 1–3 lowercase strings, auto-generated from conversation content
 
 In the Branches global view, branch rows show `↳ branched from [Parent Title]` with a colored family bar. Parent rows list their children. Standalone conversations are de-emphasized. In all other views (Summary, Notes, Highlights), every conversation looks identical — no "from" subtitles, no hierarchy.
 

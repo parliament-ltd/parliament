@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import {
   Square, AlertCircle, ChevronLeft, ChevronRight,
-  GitBranch, Trash2, MessageSquare,
+  GitBranch, Trash2, MessageSquare, Search,
   FileText, MoreVertical, StickyNote, Activity, Zap, Star,
   Eye, Copy, ArrowRightCircle, Settings2, BookOpen, PanelRight, X,
   Pencil, Info, ArrowRight, Download, Command,
@@ -223,7 +223,7 @@ export default function ChatView() {
     loadMessages, sendMessage, continueMessage,
     stopGenerating, clearMessages,
   } = useChat()
-  const { updateConversation, loadConversations } = useConversations()
+  const { conversations, updateConversation, loadConversations, createConversation } = useConversations()
   const { settings, refreshStorageEstimate } = useSettings()
 
   const [inputValue, setInputValue] = useState('')
@@ -238,6 +238,7 @@ export default function ChatView() {
   const [showShortcutsModal, setShowShortcutsModal] = useState(false)
   const [showCollabModal, setShowCollabModal] = useState(false)
   const [showReviewModal, setShowReviewModal] = useState(false)
+  const [showSelectChatModal, setShowSelectChatModal] = useState(false)
 
   // Collaboration mode state
   const [activePresets, setActivePresets] = useState(new Set())
@@ -451,6 +452,36 @@ export default function ChatView() {
       await handleCreateBranchFull(messageId)
     }
   }, [id, apiKey, visibleMessages, settings.defaultModel, navigate, loadConversations, handleCreateBranchFull])
+
+  // New chat — create a conversation and navigate to it
+  const handleNewChat = useCallback(async () => {
+    const conv = await createConversation()
+    navigate(`/chat/${conv.id}`)
+  }, [createConversation, navigate])
+
+  // Preview summary for the branch creation panel — generates but does NOT create the branch
+  const handlePreviewSummary = useCallback(async (messageId) => {
+    if (!apiKey) throw new Error('No API key configured.')
+    const provider = getProvider('anthropic')
+    const branchIdx = visibleMessages.findIndex(m => m.id === messageId)
+    const branchMessages = visibleMessages.slice(0, branchIdx + 1)
+    const summaryMessages = branchMessages
+      .map(m => ({ role: m.role, content: m.content?.slice(0, 500) || '' }))
+    summaryMessages.push({
+      role: 'user',
+      content: 'Provide a concise summary of our conversation so far. Focus on key decisions, conclusions, and open questions. Keep it under 200 words. Respond with ONLY the summary, no preamble.',
+    })
+    let summaryText = ''
+    await provider.sendMessage(
+      apiKey,
+      summaryMessages,
+      'claude-haiku',
+      (chunk) => { summaryText += chunk },
+      new AbortController().signal
+    )
+    if (!summaryText.trim()) throw new Error('Empty summary generated')
+    return summaryText.trim()
+  }, [apiKey, visibleMessages])
 
   const hideMessage = useCallback((msgId) => {
     setHiddenMessages((prev) => {
@@ -709,14 +740,15 @@ export default function ChatView() {
       if (e.key === 'Escape') {
         if (isStreaming) { stopGenerating(); return }
         if (showShortcutsModal) { setShowShortcutsModal(false); return }
+        if (showSelectChatModal) { setShowSelectChatModal(false); return }
         if (showCollabModal) { setShowCollabModal(false); return }
         if (showReviewModal) { setShowReviewModal(false); return }
         if (branchPanelMessage) { setBranchPanelMessage(null); return }
         return
       }
 
-      // Ctrl/Cmd + ? — show keyboard shortcuts
-      if (isMod && e.key === '?') {
+      // Ctrl/Cmd + ? (or Ctrl+Shift+/) — toggle keyboard shortcuts
+      if (isMod && (e.key === '?' || (e.shiftKey && e.key === '/'))) {
         e.preventDefault()
         setShowShortcutsModal(prev => !prev)
         return
@@ -732,10 +764,31 @@ export default function ChatView() {
         return
       }
 
-      // Ctrl/Cmd + / — toggle right sidebar
+      // Ctrl/Cmd + H — toggle right sidebar
+      if (isMod && (e.key === 'h' || e.key === 'H')) {
+        e.preventDefault()
+        setRightSidebarCollapsed(prev => !prev)
+        return
+      }
+
+      // Ctrl/Cmd + / — toggle right sidebar (alias)
       if (isMod && e.key === '/') {
         e.preventDefault()
         setRightSidebarCollapsed(prev => !prev)
+        return
+      }
+
+      // Ctrl/Cmd + K — select chat (quick switcher)
+      if (isMod && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault()
+        setShowSelectChatModal(prev => !prev)
+        return
+      }
+
+      // Ctrl/Cmd + Shift + N — new chat
+      if (isMod && e.shiftKey && (e.key === 'N' || e.key === 'n')) {
+        e.preventDefault()
+        handleNewChat()
         return
       }
 
@@ -785,7 +838,7 @@ export default function ChatView() {
 
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [isStreaming, stopGenerating, handleSend, showShortcutsModal, showCollabModal, showReviewModal, branchPanelMessage, handleExportMarkdown, handleCompressContext])
+  }, [isStreaming, stopGenerating, handleSend, showShortcutsModal, showSelectChatModal, showCollabModal, showReviewModal, branchPanelMessage, handleExportMarkdown, handleCompressContext, handleNewChat])
 
   /* ── Derive TOC and sidebar data ──────────────────────── */
 
@@ -1480,6 +1533,19 @@ export default function ChatView() {
               handleCreateBranchCompressed(branchPanelMessage.id)
               setBranchPanelMessage(null)
             }}
+            onPreviewSummary={handlePreviewSummary}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Select Chat Modal (Ctrl+K) */}
+      <AnimatePresence>
+        {showSelectChatModal && (
+          <SelectChatModal
+            conversations={conversations}
+            currentId={id}
+            onClose={() => setShowSelectChatModal(false)}
+            onSelect={(convId) => { navigate(`/chat/${convId}`); setShowSelectChatModal(false) }}
           />
         )}
       </AnimatePresence>
@@ -2076,14 +2142,128 @@ function BranchItem({ label, messages, active = false, onClick }) {
 }
 
 /* ═══════════════════════════════════════════════════════════ */
+/*  Select Chat Modal (Ctrl+K quick switcher)                  */
+/* ═══════════════════════════════════════════════════════════ */
+
+function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
+  const [query, setQuery] = useState('')
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    const sorted = [...conversations].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+    if (!q) return sorted.slice(0, 12)
+    return sorted
+      .filter(c =>
+        c.title?.toLowerCase().includes(q) ||
+        c.aiSummary?.toLowerCase().includes(q)
+      )
+      .slice(0, 12)
+  }, [conversations, query])
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] p-6"
+      style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}
+    >
+      <div className="absolute inset-0" onClick={onClose} />
+      <motion.div
+        initial={{ scale: 0.96, opacity: 0, y: -8 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.96, opacity: 0, y: -8 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+        className="relative z-10 bg-white border border-[#EBEBEB] rounded-xl w-full max-w-[480px] overflow-hidden"
+        style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
+      >
+        {/* Search input */}
+        <div className="flex items-center gap-3 px-4 py-3.5" style={{ borderBottom: '1px solid #F0F0F0' }}>
+          <Search className="w-4 h-4 text-[#D5D5D5] flex-shrink-0" />
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && filtered.length > 0) onSelect(filtered[0].id)
+            }}
+            placeholder="Search chats..."
+            className="flex-1 text-sm text-[#1E2532] bg-transparent outline-none placeholder:text-[#D5D5D5]"
+          />
+          {query && (
+            <button onClick={() => setQuery('')} className="text-[#D5D5D5] hover:text-[#6B7C93] transition-colors">
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Results */}
+        <div className="max-h-[320px] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}>
+          {filtered.length === 0 ? (
+            <div className="px-4 py-6 text-center">
+              <p className="text-xs text-[#D5D5D5]">No chats found</p>
+            </div>
+          ) : (
+            filtered.map(c => (
+              <button
+                key={c.id}
+                onClick={() => onSelect(c.id)}
+                className="w-full text-left px-4 py-2.5 transition-colors"
+                style={{ backgroundColor: c.id === currentId ? '#F5F7FF' : 'transparent' }}
+                onMouseEnter={e => { if (c.id !== currentId) e.currentTarget.style.backgroundColor = '#FAFAFA' }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = c.id === currentId ? '#F5F7FF' : 'transparent' }}
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <MessageSquare className="w-3.5 h-3.5 text-[#D5D5D5] flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-[#1E2532] truncate font-medium"
+                      style={{ color: c.id === currentId ? '#4A7AE5' : '#1E2532' }}>
+                      {c.title || 'New Conversation'}
+                    </p>
+                    {c.aiSummary && (
+                      <p className="text-[11px] text-[#9CA7B8] truncate mt-0.5">{c.aiSummary}</p>
+                    )}
+                  </div>
+                  {c.id === currentId && (
+                    <span className="text-[10px] font-semibold text-[#4A7AE5] flex-shrink-0">current</span>
+                  )}
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+
+        {/* Footer hint */}
+        <div className="px-4 py-2.5 flex items-center gap-1" style={{ borderTop: '1px solid #F0F0F0' }}>
+          <kbd className="px-1.5 py-0.5 rounded text-[10px] font-semibold border border-[#EBEBEB] bg-[#FAFAFA] text-[#6B7C93]" style={{ fontFamily: 'monospace' }}>↵</kbd>
+          <span className="text-[10px] text-[#D5D5D5] ml-1">to open</span>
+          <span className="text-[10px] text-[#D5D5D5] mx-2">·</span>
+          <kbd className="px-1.5 py-0.5 rounded text-[10px] font-semibold border border-[#EBEBEB] bg-[#FAFAFA] text-[#6B7C93]" style={{ fontFamily: 'monospace' }}>Esc</kbd>
+          <span className="text-[10px] text-[#D5D5D5] ml-1">to close</span>
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
 /*  Branch Creation Panel (Modal) — with dusty gold flash     */
 /* ═══════════════════════════════════════════════════════════ */
 
-function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsage, onClose, onBranchFull, onBranchCompressed }) {
+function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsage, onClose, onBranchFull, onBranchCompressed, onPreviewSummary }) {
   const [mode, setMode] = useState(null)
   const [compressing, setCompressing] = useState(false)
   const [compressed, setCompressed] = useState(false)
   const [previewExpanded, setPreviewExpanded] = useState(false)
+  const [previewContent, setPreviewContent] = useState(null)   // null = not fetched, string = cached result
+  const [previewLoading, setPreviewLoading] = useState(false)
+  const [previewError, setPreviewError] = useState(null)
 
   const compressedPct = Math.max(Math.round(contextUsage * 0.12), 2)
 
@@ -2214,15 +2394,47 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
                       <Zap className="w-3 h-3 text-[#22C55E] flex-shrink-0" />
                       <span className="text-[11px] text-[#22C55E] font-semibold">{contextUsage}% → ~{compressedPct}% — frees up {contextUsage - compressedPct}%</span>
                     </div>
-                    <button onClick={(e) => { e.stopPropagation(); setPreviewExpanded(!previewExpanded) }} className="flex items-center gap-1.5 text-[11px] font-semibold text-[#4A7AE5] bg-transparent border-none cursor-pointer p-0">
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation()
+                        if (!previewExpanded) {
+                          setPreviewExpanded(true)
+                          // Only fetch if not already cached
+                          if (previewContent === null && !previewLoading) {
+                            setPreviewLoading(true)
+                            setPreviewError(null)
+                            try {
+                              const text = await onPreviewSummary(message.id)
+                              setPreviewContent(text)
+                            } catch (err) {
+                              setPreviewError('Could not generate preview. You can still create the branch.')
+                            } finally {
+                              setPreviewLoading(false)
+                            }
+                          }
+                        } else {
+                          setPreviewExpanded(false)
+                        }
+                      }}
+                      className="flex items-center gap-1.5 text-[11px] font-semibold text-[#4A7AE5] bg-transparent border-none cursor-pointer p-0"
+                    >
                       <ChevronRight className="w-3 h-3 transition-transform" style={{ transform: previewExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }} />
-                      Preview summary
+                      {previewLoading ? 'Generating preview...' : 'Preview summary'}
                     </button>
                     <AnimatePresence>
                       {previewExpanded && (
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={SPRING_SNAPPY} className="overflow-hidden">
                           <div className="px-3 py-2.5 bg-[#FAFAFA] border border-[#F0F0F0] rounded-lg">
-                            <p className="text-[11px] text-[#4A5568] leading-relaxed italic">Summary will be generated when you create the branch. It captures key decisions, conclusions, and open questions.</p>
+                            {previewLoading ? (
+                              <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 border-2 border-[#4A7AE5] border-t-transparent rounded-full animate-spin flex-shrink-0" />
+                                <p className="text-[11px] text-[#6B7C93]">Generating summary...</p>
+                              </div>
+                            ) : previewError ? (
+                              <p className="text-[11px] text-[#E5A620] leading-relaxed">{previewError}</p>
+                            ) : previewContent ? (
+                              <p className="text-[11px] text-[#4A5568] leading-relaxed">{previewContent}</p>
+                            ) : null}
                           </div>
                         </motion.div>
                       )}
@@ -2274,15 +2486,17 @@ const SHORTCUTS = [
   { keys: ['Ctrl', 'Enter'], desc: 'Send message (or stop streaming)' },
   { keys: ['Shift', 'Enter'], desc: 'New line in message input' },
   { keys: ['Escape'], desc: 'Stop streaming / close modal' },
+  { keys: ['Ctrl', 'Shift', 'N'], desc: 'New chat' },
+  { keys: ['Ctrl', 'K'], desc: 'Select chat' },
   { keys: ['Ctrl', 'Shift', 'E'], desc: 'Export to Markdown' },
   { keys: ['Ctrl', 'Shift', 'B'], desc: 'Branch conversation' },
   { keys: ['Ctrl', 'Shift', 'C'], desc: 'Collaboration Mode' },
   { keys: ['Ctrl', 'Shift', 'R'], desc: 'Review' },
-  { keys: ['Ctrl', '/'], desc: 'Toggle right sidebar' },
+  { keys: ['Ctrl', 'H'], desc: 'Toggle right panel' },
   { keys: ['Ctrl', '.'], desc: 'Focus message input' },
   { keys: ['Home'], desc: 'Scroll to top' },
   { keys: ['End'], desc: 'Scroll to bottom' },
-  { keys: ['Ctrl', '?'], desc: 'Toggle this panel' },
+  { keys: ['Ctrl', '?'], desc: 'Toggle keyboard shortcuts' },
 ]
 
 // Detect Mac for display
