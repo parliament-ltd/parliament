@@ -263,9 +263,9 @@ The app monitors browser storage via `navigator.storage.estimate()`:
 
 ### Making Cleanup Actionable
 
-- Per-conversation size indicator in the chat selector (subtle secondary text, always present)
-- Size as a sortable column in the conversation list (alongside last edited, created)
 - Selected-items size total in the bulk action bar: "3 selected — 12.7 MB"
+- Per-conversation size visible in Settings → Data & Backups storage section
+- Note: the Size column was replaced by a Topics column in the V6 chat selector redesign. Size information is still accessible via the bulk action bar selection total and the settings storage dashboard
 
 ### Write Failure Handling
 
@@ -283,6 +283,64 @@ On app load, run a lightweight scan to detect and resolve inconsistencies from c
 3. **Multi-store atomicity**: branch creation and other multi-store operations wrapped in single IndexedDB transactions to prevent partial writes
 
 No "crash detected" modal or notification. The app simply looks correct on reopen.
+
+## Chat Selector Design (V6)
+
+The chat selector is a table-based conversation list that doubles as a knowledge management surface. Reference mockup: `chat-selector-v6.jsx`.
+
+### Global View Toggle
+
+A segmented control in the page header switches what the second line of every row displays: **Summary** (default) | **Notes** | **Highlights** | **Branches**. Changing the global view clears any per-row overrides.
+
+### Row Structure
+
+Every row shows two lines: the conversation title on top, and the active view's content below. In Summary mode, this is a truncated one-line AI-generated summary in light grey (`#9CA7B8`). In other modes, the content swaps accordingly. Rows with no content for the active view are de-emphasized to 45% opacity.
+
+### Interactive Count Badges
+
+Small pill badges appear next to the title showing counts for branches (on parents), notes, and highlights. Clicking a badge overrides that row's view independently of the global toggle. Clicking it again snaps back to the global view. Badges use the same visual pattern as the existing branch badge: `text-[10px] px-1.5 py-0.5 rounded-full font-semibold`. Active badges fill with their color (blue for notes, amber for highlights, purple for branches).
+
+### Flat Branch Model
+
+All conversations — parent or branch — live at the same level in the table. Branches are not visually nested or subordinate. A branch is a conversation with a `parentId` and `familyId`. Related conversations share a family color used in the Branches view as a left bar indicator.
+
+In the Branches global view, branch rows show `↳ branched from [Parent Title]` with a colored family bar. Parent rows list their children. Standalone conversations are de-emphasized. In all other views (Summary, Notes, Highlights), every conversation looks identical — no "from" subtitles, no hierarchy.
+
+### Notes
+
+Notes can be created from the conversation UI (anchored to a specific message, shown as `(Message 14)`) or from the chat selector table (general notes, no label). Notes are editable and deletable from the table. The "+ Add a note" button is always visible in Notes view but rendered at 45% opacity, transitioning to full on hover.
+
+### Highlights
+
+Read-only in the chat selector. Created by selecting text in the conversation UI. Displayed with a colored left bar: taller and fully opaque for multi-line highlights, shorter and partially transparent for single-line. Copy button on hover.
+
+### Tags/Topics Column
+
+Replaces the Size column. Tags are auto-generated from conversation content. Displayed as stacked colored pills, vertically centered. Non-sortable in V1.
+
+### AI Summaries
+
+Auto-generated after the first user→assistant exchange. Displayed as the default inline content under each title. Regenerable via bulk action bar (select chats → Regenerate summaries icon).
+
+### Bulk Actions
+
+Available when one or more rows are selected via checkboxes: **Pin/Unpin** (smart toggle — detects current state), **Regenerate summaries**, **Delete**. Selection shows count and total size.
+
+### Click Targets
+
+- **Title text**: opens the conversation
+- **Count badges**: toggles inline view for that row
+- **"+ Add a note" button**: opens inline note editor
+- **Checkbox**: toggles selection
+- The full row is not a single click target — interactions are zone-based to prevent accidental navigation
+
+### Metadata
+
+Edited and Created columns use lighter text (`#C0C8D4`). Table header labels also use `#C0C8D4`. Footer shows conversation count and total storage size only.
+
+### Favorites Sidebar
+
+Remains as a collapsible right sidebar (300px). Favorites are cross-cutting reference content (snippets from any conversation), not per-conversation metadata, so they don't fit the global view toggle pattern. Collapsible to reclaim horizontal space.
 
 ## Review Modal
 
@@ -317,7 +375,8 @@ npm run lint      # Run ESLint
 The UI was designed in standalone `.jsx` mockup files before development began. When implementing features, reference these for visual accuracy:
 
 - `chat-interface-final.jsx` — Chat conversation view
-- `chat-selector.jsx` — Conversation list
+- `chat-selector-v6.jsx` — **Current** conversation list design (flat branch model, global view toggle, inline summaries/notes/highlights/branches, interactive count badges)
+- `chat-selector.jsx` / `chat-selector-v2.jsx` — **Superseded** conversation list designs (nested branch model). Keep for reference but V6 is the target
 - `settings.jsx` — Settings page with all sections
 - `branch-panel-v3.jsx` — Branch creation panel with Full History / Compressed Summary modes, inline context meter, and savings animation
 
@@ -331,3 +390,4 @@ The UI was designed in standalone `.jsx` mockup files before development began. 
 - Don't use `Inter`, `Roboto`, or other generic fonts — system sans-serif
 - Don't use purple gradients or generic AI aesthetics
 - Don't add emojis to the UI
+- Don't nest branches under parents in the chat selector — use the flat model with Branches view
