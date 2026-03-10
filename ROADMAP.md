@@ -53,7 +53,7 @@ const SPRING_GENTLE = { type: 'spring', stiffness: 200, damping: 24 };
 Reference mockups are available as `.jsx` files. These contain the complete visual design but use hardcoded mock data. Each step should reference these for visual accuracy:
 
 - **Chat interface:** `chat-interface-final.jsx` — Main conversation view with left sidebar (TOC, quick actions), chat area, right sidebar (highlights, branches, context meter). Includes ReviewModal and CollabModal.
-- **Chat selector:** `chat-selector.jsx` — Table-based conversation list with search, sort, bulk actions, expandable branches.
+- **Chat selector:** `chat-selector-v6.jsx` — **(Current)** Table-based conversation list with flat branch model, global view toggle (Summary/Notes/Highlights/Branches), inline AI summaries, interactive count badges, Topics column, de-emphasized empty rows, family colors for branch relationships. Earlier versions (`chat-selector.jsx`, `chat-selector-v2.jsx`) are superseded.
 - **Settings:** `settings.jsx` — Left nav with 7 sections: API Configuration, Model Preferences, Usage & Spending, Context & Defaults, Data & Backups, Appearance, About & Security. Includes encrypted export/import modals with passphrase flow.
 - **Branch creation panel:** `branch-panel-v3.jsx` — Branch creation panel with Full History / Compressed Summary modes, inline context meter, and savings animation.
 
@@ -112,7 +112,7 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
   - `HighlightItem`, `BranchItem`, `MetricRow`
   - `ReviewModal`, `CollabModal`
   - `ContextMeter`, `Sidebar`, `ChatArea`
-- Decompose `chat-selector.jsx` into: `ChatTableRow`, `BranchRow`, `Checkbox`, `InlineAction`
+- Decompose `chat-selector-v6.jsx` into: `ChatTableRow`, `Checkbox`, `InlineAction`, `CountBadge`, `ViewToggle`, `InlineTitleEditor`, `InlineNoteEditor`, `FavoriteCard`
 - Decompose `settings.jsx` into: `SettingsSection`, `SettingsCard`, `InfoTooltip`, `ToggleSwitch`, export/import modals
 - Decompose `branch-panel-v3.jsx` into: `BranchCreationPanel`, `ContextProjection`, `SummaryPreview`
 - Move shared components (buttons, inputs, modals) to `/components`
@@ -235,23 +235,68 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
 
 ## Step 8: Wire Up the Chat Selector to Real Data
 
-**Goal:** The conversation list shows real conversations and supports all management actions.
+**Goal:** The conversation list shows real conversations as a knowledge management surface, matching the V6 chat selector design (`chat-selector-v6.jsx`).
 
 **Tasks:**
-- Load conversations from IndexedDB on mount, sorted by `updatedAt` desc
-- Make search filter across conversation titles
-- Make column sorting work (last edited, created, size)
-- "New Chat" creates a conversation in IndexedDB and navigates to `/chat/:id`
-- Clicking a row navigates to that conversation
-- Wire bulk actions: delete selected, pin/unpin
-- **Per-conversation size indicator:** show approximate storage size (subtle secondary text) for each conversation row
-- **Bulk action size total:** when selecting multiple conversations, show combined size: "3 selected — 12.7 MB"
-- Show branch count badges from real data
-- Expand/collapse to show real branches
-- Auto-generate conversation titles: after the first user→assistant exchange, send a lightweight summarization call to Claude in the background to generate a short title. Display it automatically in the chat selector. Users can click-to-edit titles inline to rename
-- **Storage warning banner:** when storage usage exceeds 80%, show a subtle amber banner at top of conversation list suggesting export or cleanup
 
-**Done when:** Creating, finding, opening, and deleting conversations all work end-to-end. Per-conversation size is visible. Storage warning appears when appropriate.
+**Core data wiring:**
+- Load all conversations from IndexedDB on mount — flat list, no nesting (branches are top-level rows with `parentId` and `familyId`)
+- Make search filter across conversation titles, AI summaries, notes text, tags, and parent titles
+- Make column sorting work (last edited, created) — Size column replaced by Topics (non-sortable)
+- "New Chat" creates a conversation in IndexedDB and navigates to `/chat/:id`
+- Clicking a row's title navigates to that conversation
+- Wire bulk actions: smart pin toggle (single button auto-detects pinned state), regenerate summaries, delete selected
+- **Bulk action size total:** when selecting conversations, show combined size: "3 selected — 12.7 MB"
+
+**Global view toggle:**
+- Segmented control in the page header: Summary (default) | Notes | Highlights | Branches
+- Changing the global view clears any per-row overrides
+- Summary view: truncated one-line AI summary under each title (light grey `#9CA7B8`)
+- Notes view: inline notes with edit/delete, "+ Add a note" button at 45% opacity (full on hover)
+- Highlights view: read-only highlight text with colored left bars (taller/opaque for multi-line, shorter/transparent for single-line), copy button on hover
+- Branches view: branch rows show "↳ branched from [Parent Title]" with family color bar; parent rows list their children; standalone conversations de-emphasized
+
+**Interactive count badges:**
+- Small pill badges next to title showing counts for branches (parents only), notes, and highlights
+- Clicking a badge overrides that specific row's view independently of the global toggle
+- Clicking again snaps back to the global view
+- Active badges fill with their color (blue for notes, amber for highlights, purple for branches)
+
+**Row de-emphasis:**
+- In Notes view, rows with no notes → 45% opacity
+- In Highlights view, rows with no highlights → 45% opacity
+- In Branches view, standalone conversations (no parent, no children) → 45% opacity
+- In Summary view, no de-emphasis
+
+**Topics column:**
+- Replaces Size column
+- Tags auto-generated from conversation content (displayed as stacked colored pills)
+- Non-sortable in V1
+
+**AI summaries:**
+- Auto-generated after the first user→assistant exchange (same timing as auto-title, parallel lightweight call)
+- Displayed as default inline content under each title in Summary view
+- Regenerable via bulk action bar (select chats → Regenerate summaries icon)
+
+**Family colors:**
+- Related conversations (parent + all branches) share a color from a predefined palette
+- Color used in the Branches view as a left bar indicator
+- `buildFamilyColorMap()` assigns colors based on unique `familyId` values
+
+**Metadata and footer:**
+- Edited and Created column values and headers use lighter text (`#C0C8D4`)
+- Footer shows only conversation count and total storage size
+
+**Click target zones:**
+- Title text → opens the conversation
+- Count badges → toggle inline view for that row
+- "+ Add a note" button → opens inline note editor
+- Checkbox → toggles selection
+- Full row is not a single click target — interactions are zone-based
+
+**Storage warning banner:** when storage usage exceeds 80%, show a subtle amber banner at top of conversation list suggesting export or cleanup
+
+**Done when:** The chat selector matches the V6 mockup. Global view toggle switches all rows. Badge overrides work per-row. Branches are flat peers. Notes are editable from the table. Search finds content across summaries, notes, and tags.
 
 ---
 
@@ -316,7 +361,9 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
 **Goal:** Fork conversations at any message to explore alternative paths, with the option to compress history at branch time.
 
 **Tasks:**
-- Data model: a branch is a new conversation with `parentId` pointing to the original, plus a `branchPoint` (message ID where it forked)
+- Data model: a branch is a new conversation with `parentId` pointing to the original, `familyId` shared across parent + all branches (for color grouping), `parentTitle` denormalized for display, plus a `branchPoint` (message ID where it forked)
+- **Flat model:** branches are top-level conversations in the chat selector, not nested under parents. No expand/collapse hierarchy. Branch relationships are only visible in the Branches global view (already implemented in Step 8)
+- **Family color assignment:** when creating a branch, if the parent already has a `familyId`, inherit it. If not, generate a new `familyId` and assign it to both parent and branch
 - "Branch from here" action on a message opens the **branch creation panel** (reference `branch-panel-v3.jsx`):
   - Two modes: **Full History** (copies all messages up to the fork point) or **Compressed Summary** (generates a Claude summary, branch starts with clean context)
   - Panel shows an inline context meter displaying the projected context usage for each mode
@@ -325,11 +372,10 @@ Reference mockups are available as `.jsx` files. These contain the complete visu
   - Context meter animates to reflect the new percentage when the user selects a mode and creates the branch
   - **Branch creation uses a single IndexedDB transaction** spanning conversations and messages stores
 - Left sidebar shows branches for the current conversation
-- Chat selector shows branches nested under parent conversations (already designed in the UI)
 - Switching between branches preserves scroll position in each
 - Branch indicator on messages that have branches forking from them
 
-**Done when:** You can branch a conversation with either full history or compressed summary, continue both paths independently, see the context savings reflected in the meter, and navigate between branches.
+**Done when:** You can branch a conversation with either full history or compressed summary, continue both paths independently, see the context savings reflected in the meter, and navigate between branches. Branches appear as flat peers in the chat selector.
 
 ---
 
