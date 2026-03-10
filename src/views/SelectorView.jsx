@@ -8,6 +8,8 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { useConversations } from '../stores/ConversationContext'
 import { useSettings } from '../stores/SettingsContext'
+import { getProvider } from '../providers'
+import { loadApiKey } from '../lib/crypto'
 import {
   getFavorites as dbGetAllFavorites,
   deleteFavorite as dbDeleteFavorite,
@@ -36,12 +38,27 @@ const FAMILY_COLORS = [
   '#F97316', // orange
 ]
 
-const TAG_COLORS = {
-  'design': '#4A7AE5', 'ui': '#7C6CD4', 'api': '#22C55E', 'architecture': '#E5A620',
-  'performance': '#EF4444', 'tokens': '#E5A620', 'research': '#4A7AE5', 'collaboration': '#7C6CD4',
-  'v2': '#6B7C93', 'export': '#22C55E', 'review': '#4A7AE5', 'ux': '#7C6CD4',
-  'shortcuts': '#E5A620', 'prompts': '#EF4444', 'ai': '#4A7AE5', 'product': '#22C55E',
-  'technical': '#7C6CD4', 'experiments': '#E5A620',
+// Dynamic tag colors — assigns a consistent color to any tag string via hash
+const TAG_PALETTE = [
+  '#4A7AE5', // blue
+  '#7C6CD4', // purple
+  '#22C55E', // green
+  '#E5A620', // amber
+  '#EF4444', // red
+  '#06B6D4', // cyan
+  '#EC4899', // pink
+  '#F97316', // orange
+  '#8B5CF6', // violet
+  '#14B8A6', // teal
+]
+
+function getTagColor(tag) {
+  let hash = 0
+  for (let i = 0; i < tag.length; i++) {
+    hash = tag.charCodeAt(i) + ((hash << 5) - hash)
+    hash = hash & hash // Convert to 32-bit int
+  }
+  return TAG_PALETTE[Math.abs(hash) % TAG_PALETTE.length]
 }
 
 /* ═══════════════════════════════════════════════════════════ */
@@ -570,7 +587,7 @@ function ChatTableRow({
                     WebkitLineClamp: 1,
                     WebkitBoxOrient: 'vertical',
                     overflow: 'hidden',
-                    color: chat.aiSummary ? '#9CA7B8' : '#D5D5D5',
+                    color: chat.aiSummary ? '#7A8694' : '#B0B8C1',
                   }}
                 >
                   {chat.aiSummary || 'Summary will appear after your first exchange'}
@@ -633,7 +650,7 @@ function ChatTableRow({
                   {!addingNote && (
                     <button
                       onClick={() => setAddingNote(true)}
-                      className="text-left px-2.5 py-1.5 rounded-md border border-dashed border-[#EBEBEB] hover:border-[#4A7AE5] text-[10px] text-[#C0C8D4] hover:text-[#4A7AE5] transition-all w-full"
+                      className="text-left px-2.5 py-1.5 rounded-md border border-dashed border-[#EBEBEB] hover:border-[#4A7AE5] text-[10px] text-[#94A0AE] hover:text-[#4A7AE5] transition-all w-full"
                       style={{ opacity: 0.45 }}
                       onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
                       onMouseLeave={(e) => e.currentTarget.style.opacity = '0.45'}
@@ -684,8 +701,7 @@ function ChatTableRow({
                       </div>
                     ))
                   ) : (
-                    <p className="text-[10px] text-[#D5D5D5] italic">
-                      Select text in a conversation to create highlights
+                    <p className="text-[10px] text-[#B0B8C1] italic">
                     </p>
                   )}
                 </motion.div>
@@ -728,11 +744,11 @@ function ChatTableRow({
                       >
                         {child.title}
                       </button>
-                      <span className="text-[10px] text-[#C0C8D4]">{formatRelative(child.updatedAt)}</span>
+                      <span className="text-[10px] text-[#8E99A4]">{formatRelative(child.updatedAt)}</span>
                     </div>
                   ))}
                   {!isBranch && children.length === 0 && (
-                    <p className="text-[10px] text-[#D5D5D5] italic">
+                    <p className="text-[10px] text-[#B0B8C1] italic">
                       No branch relationships
                     </p>
                   )}
@@ -743,28 +759,31 @@ function ChatTableRow({
 
           {/* Topics — stacked pills */}
           <div className="w-36 flex-shrink-0 px-2 flex flex-col items-center justify-center gap-1 pt-0.5">
-            {tags.map(tag => (
-              <span
-                key={tag}
-                className="text-[9px] font-semibold px-2 py-0.5 rounded-full truncate max-w-full text-center"
-                style={{
-                  backgroundColor: `${TAG_COLORS[tag] || '#6B7C93'}11`,
-                  color: TAG_COLORS[tag] || '#6B7C93',
-                }}
-              >
-                {tag}
-              </span>
-            ))}
+            {tags.map(tag => {
+              const color = getTagColor(tag)
+              return (
+                <span
+                  key={tag}
+                  className="text-[9px] font-semibold px-2 py-0.5 rounded-full truncate max-w-full text-center"
+                  style={{
+                    backgroundColor: `${color}15`,
+                    color: color,
+                  }}
+                >
+                  {tag}
+                </span>
+              )
+            })}
           </div>
 
           {/* Edited */}
           <div className="w-24 flex-shrink-0 px-2 text-center pt-0.5">
-            <span className="text-xs text-[#C0C8D4]">{formatRelative(chat.updatedAt)}</span>
+            <span className="text-xs text-[#8E99A4]">{formatRelative(chat.updatedAt)}</span>
           </div>
 
           {/* Created */}
           <div className="w-24 flex-shrink-0 px-2 text-center pt-0.5">
-            <span className="text-xs text-[#C0C8D4]">{formatShortDate(chat.createdAt)}</span>
+            <span className="text-xs text-[#8E99A4]">{formatShortDate(chat.createdAt)}</span>
           </div>
         </div>
       </motion.div>
@@ -784,7 +803,7 @@ export default function SelectorView() {
     updateConversation,
     deleteConversations,
   } = useConversations()
-  const { storageUsage } = useSettings()
+  const { storageUsage, settings } = useSettings()
 
   // ── Local state ──
   const [searchQuery, setSearchQuery] = useState('')
@@ -1071,10 +1090,54 @@ export default function SelectorView() {
   }, [selected, hydratedConversations, updateConversation])
 
   const handleBulkRegenerate = useCallback(async () => {
-    // TODO: trigger AI summary regeneration for selected conversations
-    // For now, just clear selection as a placeholder
+    const selectedIds = [...selected]
     setSelected(new Set())
-  }, [])
+
+    try {
+      const apiKey = await loadApiKey(settings?.storageMode || 'session')
+      if (!apiKey) {
+        console.warn('No API key available for regeneration')
+        return
+      }
+      const provider = getProvider('anthropic')
+
+      // Process each selected conversation in parallel
+      const promises = selectedIds.map(async (convId) => {
+        try {
+          // Load messages for this conversation
+          const msgs = await getMessages(convId)
+          if (msgs.length < 2) return // Need at least one exchange
+
+          // Take the first few messages for generation
+          const messagesToUse = msgs.slice(0, 6).map(m => ({
+            role: m.role,
+            content: m.content,
+          }))
+
+          // Run title, summary, and tags in parallel
+          const results = await Promise.allSettled([
+            provider.generateTitle(apiKey, messagesToUse)
+              .then(title => updateConversation(convId, { title })),
+            provider.generateSummary(apiKey, messagesToUse)
+              .then(aiSummary => updateConversation(convId, { aiSummary })),
+            provider.generateTags(apiKey, messagesToUse)
+              .then(tags => updateConversation(convId, { tags })),
+          ])
+
+          const failures = results.filter(r => r.status === 'rejected')
+          if (failures.length > 0) {
+            console.warn(`Regeneration partially failed for ${convId}:`, failures.map(f => f.reason?.message))
+          }
+        } catch (err) {
+          console.warn(`Regeneration failed for conversation ${convId}:`, err.message)
+        }
+      })
+
+      await Promise.allSettled(promises)
+    } catch (err) {
+      console.warn('Bulk regeneration failed:', err.message)
+    }
+  }, [selected, settings, updateConversation])
 
   const handleBulkDelete = useCallback(async () => {
     try {
@@ -1221,15 +1284,15 @@ export default function SelectorView() {
                   ) : (
                     <motion.div key="headers" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex items-center">
                       <div className="flex-1 min-w-0 px-2">
-                        <span className="text-[11px] font-semibold text-[#C0C8D4] uppercase tracking-wider">Title</span>
+                        <span className="text-[11px] font-semibold text-[#94A0AE] uppercase tracking-wider">Title</span>
                       </div>
 
                       <div className="w-36 flex-shrink-0 px-2 text-center">
-                        <span className="text-[11px] font-semibold text-[#C0C8D4] uppercase tracking-wider">Topics</span>
+                        <span className="text-[11px] font-semibold text-[#94A0AE] uppercase tracking-wider">Topics</span>
                       </div>
 
                       <button onClick={() => handleSort('updatedAt')} className="w-24 flex-shrink-0 px-2 flex items-center justify-center gap-1 group cursor-pointer">
-                        <span className={`text-[11px] font-semibold uppercase tracking-wider transition-colors ${sortField === 'updatedAt' ? 'text-[#4A7AE5]' : 'text-[#C0C8D4] group-hover:text-[#6B7C93]'}`}>Edited</span>
+                        <span className={`text-[11px] font-semibold uppercase tracking-wider transition-colors ${sortField === 'updatedAt' ? 'text-[#4A7AE5]' : 'text-[#94A0AE] group-hover:text-[#6B7C93]'}`}>Edited</span>
                         {sortField === 'updatedAt' && (
                           <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={SPRING_SNAPPY}>
                             {sortDir === 'desc' ? <ArrowDown className="w-3 h-3 text-[#4A7AE5]" /> : <ArrowUp className="w-3 h-3 text-[#4A7AE5]" />}
@@ -1238,7 +1301,7 @@ export default function SelectorView() {
                       </button>
 
                       <button onClick={() => handleSort('createdAt')} className="w-24 flex-shrink-0 px-2 flex items-center justify-center gap-1 group cursor-pointer">
-                        <span className={`text-[11px] font-semibold uppercase tracking-wider transition-colors ${sortField === 'createdAt' ? 'text-[#4A7AE5]' : 'text-[#C0C8D4] group-hover:text-[#6B7C93]'}`}>Created</span>
+                        <span className={`text-[11px] font-semibold uppercase tracking-wider transition-colors ${sortField === 'createdAt' ? 'text-[#4A7AE5]' : 'text-[#94A0AE] group-hover:text-[#6B7C93]'}`}>Created</span>
                         {sortField === 'createdAt' && (
                           <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={SPRING_SNAPPY}>
                             {sortDir === 'desc' ? <ArrowDown className="w-3 h-3 text-[#4A7AE5]" /> : <ArrowUp className="w-3 h-3 text-[#4A7AE5]" />}
@@ -1297,10 +1360,10 @@ export default function SelectorView() {
 
               {/* Footer — simplified */}
               <div className="flex items-center justify-between px-4 py-2 border-t border-[#EBEBEB] bg-[#FAFAFA]">
-                <span className="text-[11px] text-[#C0C8D4]">
+                <span className="text-[11px] text-[#94A0AE]">
                   {hydratedConversations.length} conversation{hydratedConversations.length !== 1 ? 's' : ''}
                 </span>
-                <span className="text-[11px] text-[#C0C8D4]">
+                <span className="text-[11px] text-[#94A0AE]">
                   {formatBytes(hydratedConversations.reduce((sum, c) => sum + (c.storageBytes || 0), 0))} total
                 </span>
               </div>
@@ -1330,7 +1393,7 @@ export default function SelectorView() {
                 <div className="flex items-center gap-2">
                   <Star className="w-3.5 h-3.5 text-[#E5A620]" style={{ fill: '#E5A620' }} />
                   <span className="text-sm font-semibold text-[#1E2532]">Favorites</span>
-                  <span className="text-xs text-[#C0C8D4]">{favorites.length}</span>
+                  <span className="text-xs text-[#94A0AE]">{favorites.length}</span>
                 </div>
                 <motion.button
                   whileHover={{ scale: 1.15 }}

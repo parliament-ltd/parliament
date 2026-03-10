@@ -177,6 +177,41 @@ function includesCI(str, search) {
   return str.toLowerCase().includes(search.toLowerCase())
 }
 
+// Word-boundary-aware version: only matches if the found substring
+// is bounded by non-alphanumeric characters (or string edges)
+function indexOfWord(str, search, fromIndex = 0) {
+  const strLower = str.toLowerCase()
+  const searchLower = search.toLowerCase()
+  let pos = fromIndex
+  while (pos < strLower.length) {
+    const idx = strLower.indexOf(searchLower, pos)
+    if (idx === -1) return -1
+
+    // Check word boundaries
+    const charBefore = idx > 0 ? strLower[idx - 1] : ' '
+    const charAfter = idx + searchLower.length < strLower.length
+      ? strLower[idx + searchLower.length]
+      : ' '
+
+    const isWordBoundaryBefore = !/[a-z0-9]/.test(charBefore)
+    const isWordBoundaryAfter = !/[a-z0-9]/.test(charAfter)
+
+    // For multi-word search terms, only check outer boundaries
+    // For single-word terms, require both boundaries
+    if (isWordBoundaryBefore && isWordBoundaryAfter) {
+      return idx
+    }
+
+    // Not a word boundary match — advance past this occurrence
+    pos = idx + 1
+  }
+  return -1
+}
+
+function includesWord(str, search) {
+  return indexOfWord(str, search) !== -1
+}
+
 
 /* ── Main ChatView ───────────────────────────────────────── */
 
@@ -308,7 +343,7 @@ export default function ChatView() {
   const handleAddHighlightFromSidebar = useCallback(async (text, color) => {
     if (!text.trim()) return
     // ── case-insensitive match ──
-    const firstMatch = visibleMessages.find(m => m.content && includesCI(m.content, text.trim()))
+    const firstMatch = visibleMessages.find(m => m.content && includesWord(m.content, text.trim()))
     const msgId = firstMatch?.id || visibleMessages[0]?.id
     if (!msgId) return
     try {
@@ -329,7 +364,7 @@ export default function ChatView() {
   const getHighlightOccurrences = useCallback((text) => {
     const occurrences = []
     for (const msg of visibleMessages) {
-      if (msg.content && includesCI(msg.content, text)) {
+      if (msg.content && includesWord(msg.content, text)) {
         occurrences.push(msg.id)
       }
     }
@@ -773,7 +808,7 @@ export default function ChatView() {
         for (const msg of visibleMessages) {
           if (!msg.content) continue
           let idx = 0
-          while ((idx = indexOfCI(msg.content, hl.text, idx)) !== -1) {
+          while ((idx = indexOfWord(msg.content, hl.text, idx)) !== -1) {
             count++
             idx += hl.text.length
           }
@@ -1704,7 +1739,7 @@ function MessageCard({
       for (const hl of highlightTerms) {
         let startIndex = 0
         while (startIndex < text.length) {
-          const idx = indexOfCI(text, hl.text, startIndex)
+          const idx = indexOfWord(text, hl.text, startIndex)
           if (idx === -1) break
           ranges.push({ start: idx, end: idx + hl.text.length, bg: hl.bg })
           startIndex = idx + hl.text.length
