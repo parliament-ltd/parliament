@@ -259,6 +259,7 @@ export default function ChatView() {
   const [branches, setBranches] = useState([]) // branch conversations for this conversation
   const [compressBannerDismissed, setCompressBannerDismissed] = useState(false)
   const [pendingDeletes, setPendingDeletes] = useState([]) // [{ msgId, timeoutId }]
+  const [moveToBranchMessage, setMoveToBranchMessage] = useState(null) // message being moved
   const [currentConversation, setCurrentConversation] = useState(null) // loaded conversation record
 
   // Context health — derive from real token usage
@@ -519,6 +520,10 @@ export default function ChatView() {
     unhideMessage(msgId)
   }, [unhideMessage])
 
+  const handleMoveToBranch = useCallback((msg) => {
+    setMoveToBranchMessage(msg)
+  }, [])
+
   const handleCopyText = useCallback(async (content) => {
     try {
       await navigator.clipboard.writeText(content)
@@ -776,6 +781,7 @@ export default function ChatView() {
         if (isStreaming) { stopGenerating(); return }
         if (showShortcutsModal) { setShowShortcutsModal(false); return }
         if (showSelectChatModal) { setShowSelectChatModal(false); return }
+        if (moveToBranchMessage) { setMoveToBranchMessage(null); return }
         if (showCollabModal) { setShowCollabModal(false); return }
         if (showReviewModal) { setShowReviewModal(false); return }
         if (branchPanelMessage) { setBranchPanelMessage(null); return }
@@ -1031,7 +1037,12 @@ export default function ChatView() {
         >
           {visibleMessages.length === 0 && !isStreaming && hiddenCount === 0 && (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <MessageSquare className="w-8 h-8 text-[#EBEBEB] mb-3" />
+              <img
+                src="/logo.png"
+                alt=""
+                className="w-16 h-16 mb-4 object-contain"
+                style={{ opacity: 0.12 }}
+              />
               <p className="text-sm text-[#6B7C93] mb-1">Start a conversation</p>
               <p className="text-xs text-[#D5D5D5]">Type a message below to begin</p>
             </div>
@@ -1070,6 +1081,7 @@ export default function ChatView() {
                 onHide={() => hideMessage(msg.id)}
                 onCopyText={() => handleCopyText(msg.content)}
                 onBranch={() => setBranchPanelMessage(msg)}
+                onMoveToBranch={() => handleMoveToBranch(msg)}
               />
             )
           })}
@@ -1639,6 +1651,35 @@ export default function ChatView() {
         )}
       </AnimatePresence>
 
+      {/* Move to Branch Modal */}
+      <AnimatePresence>
+        {moveToBranchMessage && (
+          <MoveToBranchModal
+            conversations={conversations}
+            currentId={id}
+            onClose={() => setMoveToBranchMessage(null)}
+            onSelect={async (convId) => {
+              await addMessage({
+                conversationId: convId,
+                role: moveToBranchMessage.role,
+                content: moveToBranchMessage.content,
+              })
+              setMoveToBranchMessage(null)
+            }}
+            onNewChat={async () => {
+              const conv = await createConversation()
+              await addMessage({
+                conversationId: conv.id,
+                role: moveToBranchMessage.role,
+                content: moveToBranchMessage.content,
+              })
+              setMoveToBranchMessage(null)
+              navigate(`/chat/${conv.id}`)
+            }}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Keyboard Shortcuts Modal */}
       <AnimatePresence>
         {showShortcutsModal && (
@@ -1781,7 +1822,7 @@ function MessageCard({
   highlights = [],
   isPopoverActive = false, onPopoverChange,
   onNote, onFavorite, onNoteSave, onHighlight, onContinue, onDelete, onBranch,
-  onHide, onCopyText,
+  onHide, onCopyText, onMoveToBranch,
 }) {
   const [noteText, setNoteText] = useState(savedNoteText)
   const [showMenu, setShowMenu] = useState(false)
@@ -2051,13 +2092,10 @@ function MessageCard({
                     <MenuButton icon={Eye} onClick={() => { onHide?.(); setShowMenu(false) }}>
                       Hide message
                     </MenuButton>
-                    <MenuButton icon={ArrowRightCircle} onClick={() => setShowMenu(false)}>
+                    <MenuButton icon={ArrowRightCircle} onClick={() => { onMoveToBranch?.(); setShowMenu(false) }}>
                       Move to branch
                     </MenuButton>
-                    <MenuButton icon={Copy} onClick={() => setShowMenu(false)}>
-                      Duplicate
-                    </MenuButton>
-                    <MenuButton icon={FileText} onClick={handleCopy}>
+                    <MenuButton icon={Copy} onClick={() => { handleCopy(); setShowMenu(false) }}>
                       {copied ? 'Copied!' : 'Copy text'}
                     </MenuButton>
                   </motion.div>
@@ -2333,6 +2371,115 @@ function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
           <kbd className="px-1.5 py-0.5 rounded text-[10px] font-semibold border border-[#EBEBEB] bg-[#FAFAFA] text-[#6B7C93]" style={{ fontFamily: 'monospace' }}>↵</kbd>
           <span className="text-[10px] text-[#D5D5D5] ml-1">to open</span>
           <span className="text-[10px] text-[#D5D5D5] mx-2">·</span>
+          <kbd className="px-1.5 py-0.5 rounded text-[10px] font-semibold border border-[#EBEBEB] bg-[#FAFAFA] text-[#6B7C93]" style={{ fontFamily: 'monospace' }}>Esc</kbd>
+          <span className="text-[10px] text-[#D5D5D5] ml-1">to close</span>
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  Move to Branch Modal                                       */
+/* ═══════════════════════════════════════════════════════════ */
+
+function MoveToBranchModal({ conversations, currentId, onClose, onSelect, onNewChat }) {
+  const [query, setQuery] = useState('')
+  const inputRef = useRef(null)
+
+  useEffect(() => { inputRef.current?.focus() }, [])
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    const others = [...conversations]
+      .filter(c => c.id !== currentId)
+      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+    if (!q) return others.slice(0, 12)
+    return others.filter(c =>
+      c.title?.toLowerCase().includes(q) ||
+      c.aiSummary?.toLowerCase().includes(q)
+    ).slice(0, 12)
+  }, [conversations, currentId, query])
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] p-6"
+      style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}
+    >
+      <div className="absolute inset-0" onClick={onClose} />
+      <motion.div
+        initial={{ scale: 0.96, opacity: 0, y: -8 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.96, opacity: 0, y: -8 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+        className="relative z-10 bg-white border border-[#EBEBEB] rounded-xl w-full max-w-[480px] overflow-hidden"
+        style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
+      >
+        {/* Header */}
+        <div className="px-4 py-3.5" style={{ borderBottom: '1px solid #F0F0F0' }}>
+          <p className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-2.5">Move to conversation</p>
+          <div className="flex items-center gap-3">
+            <Search className="w-4 h-4 text-[#D5D5D5] flex-shrink-0" />
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Search chats..."
+              className="flex-1 text-sm text-[#1E2532] bg-transparent outline-none placeholder:text-[#D5D5D5]"
+            />
+            {query && (
+              <button onClick={() => setQuery('')} className="text-[#D5D5D5] hover:text-[#6B7C93] transition-colors">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* New chat option */}
+        <button
+          onClick={onNewChat}
+          className="w-full text-left px-4 py-2.5 hover:bg-[#FAFAFA] transition-colors"
+          style={{ borderBottom: '1px solid #F0F0F0' }}
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-3.5 h-3.5 rounded-full border-2 border-dashed border-[#4A7AE5] flex-shrink-0" />
+            <p className="text-sm font-medium text-[#4A7AE5]">New conversation with this message</p>
+          </div>
+        </button>
+
+        {/* Results */}
+        <div className="max-h-[280px] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}>
+          {filtered.length === 0 ? (
+            <div className="px-4 py-6 text-center">
+              <p className="text-xs text-[#D5D5D5]">No other conversations found</p>
+            </div>
+          ) : (
+            filtered.map(c => (
+              <button
+                key={c.id}
+                onClick={() => onSelect(c.id)}
+                className="w-full text-left px-4 py-2.5 hover:bg-[#FAFAFA] transition-colors"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <MessageSquare className="w-3.5 h-3.5 text-[#D5D5D5] flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-[#1E2532] truncate font-medium">{c.title || 'New Conversation'}</p>
+                    {c.aiSummary && (
+                      <p className="text-[11px] text-[#9CA7B8] truncate mt-0.5">{c.aiSummary}</p>
+                    )}
+                  </div>
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-4 py-2.5 flex items-center" style={{ borderTop: '1px solid #F0F0F0' }}>
           <kbd className="px-1.5 py-0.5 rounded text-[10px] font-semibold border border-[#EBEBEB] bg-[#FAFAFA] text-[#6B7C93]" style={{ fontFamily: 'monospace' }}>Esc</kbd>
           <span className="text-[10px] text-[#D5D5D5] ml-1">to close</span>
         </div>
