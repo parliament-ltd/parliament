@@ -1,0 +1,220 @@
+import { useEffect, useState, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { X } from 'lucide-react'
+
+const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
+
+/**
+ * TourTooltip — floating guided tour card.
+ *
+ * Each step shape:
+ *   { title, desc, target: '[data-tour="..."]', placement: 'top'|'bottom'|'left'|'right'|'center' }
+ */
+export default function TourTooltip({ steps, onDone }) {
+  const [stepIndex, setStepIndex] = useState(0)
+  const [targetRect, setTargetRect] = useState(null)
+
+  const step = steps[stepIndex]
+
+  // Find and measure the target element whenever the step changes
+  useEffect(() => {
+    if (!step.target) {
+      setTargetRect(null)
+      return
+    }
+    const el = document.querySelector(step.target)
+    if (!el) { setTargetRect(null); return }
+
+    el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' })
+
+    // Small delay so scroll finishes before measuring
+    const t = setTimeout(() => {
+      setTargetRect(el.getBoundingClientRect())
+    }, 180)
+    return () => clearTimeout(t)
+  }, [stepIndex, step.target])
+
+  const handleNext = useCallback(() => {
+    if (stepIndex < steps.length - 1) setStepIndex(i => i + 1)
+    else onDone()
+  }, [stepIndex, steps.length, onDone])
+
+  const handlePrev = useCallback(() => {
+    if (stepIndex > 0) setStepIndex(i => i - 1)
+  }, [stepIndex])
+
+  // Calculate tooltip card position relative to the target
+  const cardStyle = (() => {
+    const PAD = 14 // gap between target and card
+    const CARD_W = 320
+
+    if (!targetRect || step.placement === 'center') {
+      return {
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: CARD_W,
+        zIndex: 200,
+      }
+    }
+
+    const { top, bottom, left, right, width } = targetRect
+    const centerX = left + width / 2
+
+    switch (step.placement) {
+      case 'bottom':
+        return {
+          position: 'fixed',
+          top: bottom + PAD,
+          left: Math.max(12, Math.min(centerX - CARD_W / 2, window.innerWidth - CARD_W - 12)),
+          width: CARD_W,
+          zIndex: 200,
+        }
+      case 'top':
+        return {
+          position: 'fixed',
+          top: top - PAD - 160, // estimated card height
+          left: Math.max(12, Math.min(centerX - CARD_W / 2, window.innerWidth - CARD_W - 12)),
+          width: CARD_W,
+          zIndex: 200,
+        }
+      case 'right':
+        return {
+          position: 'fixed',
+          top: Math.max(12, top),
+          left: right + PAD,
+          width: CARD_W,
+          zIndex: 200,
+        }
+      case 'left':
+        return {
+          position: 'fixed',
+          top: Math.max(12, top),
+          left: left - PAD - CARD_W,
+          width: CARD_W,
+          zIndex: 200,
+        }
+      default:
+        return {
+          position: 'fixed',
+          top: bottom + PAD,
+          left: Math.max(12, Math.min(centerX - CARD_W / 2, window.innerWidth - CARD_W - 12)),
+          width: CARD_W,
+          zIndex: 200,
+        }
+    }
+  })()
+
+  return (
+    <>
+      {/* Dim overlay with spotlight cutout via box-shadow on the highlight ring */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{ zIndex: 198, backgroundColor: 'rgba(0,0,0,0.18)' }}
+      />
+
+      {/* Highlight ring around target */}
+      <AnimatePresence mode="wait">
+        {targetRect && (
+          <motion.div
+            key={step.target}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="pointer-events-none"
+            style={{
+              position: 'fixed',
+              top: targetRect.top - 5,
+              left: targetRect.left - 5,
+              width: targetRect.width + 10,
+              height: targetRect.height + 10,
+              borderRadius: 10,
+              border: '2px solid #4A7AE5',
+              boxShadow: '0 0 0 4000px rgba(0,0,0,0.18)',
+              zIndex: 199,
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Tooltip card */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={stepIndex}
+          initial={{ opacity: 0, y: 6, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -4, scale: 0.97 }}
+          transition={SPRING_SNAPPY}
+          style={cardStyle}
+          className="bg-white border border-[#EBEBEB] rounded-xl shadow-2xl shadow-black/10 p-5"
+        >
+          {/* Header */}
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <span className="text-[10px] font-semibold text-[#6B7C93] uppercase tracking-wider">
+                Step {stepIndex + 1} of {steps.length}
+              </span>
+              <h3 className="text-sm font-semibold text-[#1E2532] mt-0.5">{step.title}</h3>
+            </div>
+            <button
+              onClick={onDone}
+              className="p-1 rounded hover:bg-[#EEEEEE] text-[#6B7C93] hover:text-[#1E2532] transition-colors shrink-0"
+              title="Skip tour"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Description */}
+          <p className="text-xs text-[#4A5568] leading-relaxed">{step.desc}</p>
+
+          {/* Progress dots */}
+          <div className="flex items-center gap-1.5 mt-4">
+            {steps.map((_, i) => (
+              <div
+                key={i}
+                className="rounded-full transition-all duration-200"
+                style={{
+                  width: i === stepIndex ? 16 : 6,
+                  height: 6,
+                  backgroundColor: i === stepIndex ? '#4A7AE5' : '#EBEBEB',
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Buttons */}
+          <div className="flex items-center gap-2 mt-3">
+            {stepIndex > 0 && (
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={handlePrev}
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#EBEBEB] bg-white text-[#6B7C93] hover:text-[#1E2532] transition-colors"
+              >
+                Back
+              </motion.button>
+            )}
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={handleNext}
+              className="px-4 py-1.5 rounded-lg text-xs font-semibold text-white"
+              style={{ background: 'linear-gradient(135deg, #4A7AE5, #7C6CD4)' }}
+            >
+              {stepIndex === steps.length - 1 ? 'Done' : 'Next'}
+            </motion.button>
+            <button
+              onClick={onDone}
+              className="ml-auto text-[10px] text-[#D5D5D5] hover:text-[#6B7C93] transition-colors"
+            >
+              Skip tour
+            </button>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    </>
+  )
+}

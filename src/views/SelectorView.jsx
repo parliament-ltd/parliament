@@ -15,7 +15,37 @@ import {
   deleteFavorite as dbDeleteFavorite,
   getMessages,
   initDB,
+  getSetting,
+  setSetting,
 } from '../lib/db'
+import TourTooltip from '../components/TourTooltip'
+
+const SELECTOR_TOUR_STEPS = [
+  {
+    title: 'Welcome to Apollo',
+    desc: 'Apollo is a power-user chat interface for Claude that runs entirely in your browser. Your conversations, highlights, and notes are stored locally — nothing leaves your device except API calls to Anthropic.',
+    target: null,
+    placement: 'center',
+  },
+  {
+    title: 'Add your API key first',
+    desc: 'Click the Settings icon to add your Anthropic API key. It\'s encrypted and stored only in this browser — Apollo never stores it on a server.',
+    target: '[data-tour="settings-btn"]',
+    placement: 'bottom',
+  },
+  {
+    title: 'Create a new chat',
+    desc: 'Click New Chat to start a conversation. Apollo auto-generates titles, summaries, and topic tags for every conversation.',
+    target: '[data-tour="new-chat-btn"]',
+    placement: 'bottom',
+  },
+  {
+    title: 'Knowledge views',
+    desc: 'Switch between Summary, Notes, Highlights, and Branches to explore your conversations in depth. These views turn your chat history into a searchable knowledge base.',
+    target: '[data-tour="view-toggle"]',
+    placement: 'bottom',
+  },
+]
 
 /* ═══════════════════════════════════════════════════════════ */
 /*  CONSTANTS                                                   */
@@ -805,6 +835,18 @@ export default function SelectorView() {
   } = useConversations()
   const { storageUsage, settings } = useSettings()
 
+  // ── Tour ──
+  const [showTour, setShowTour] = useState(false)
+  useEffect(() => {
+    getSetting('tourCompleted_selector').then(done => {
+      if (!done) setShowTour(true)
+    })
+  }, [])
+  const handleTourDone = useCallback(async () => {
+    setShowTour(false)
+    await setSetting('tourCompleted_selector', true)
+  }, [])
+
   // ── Local state ──
   const [searchQuery, setSearchQuery] = useState('')
   const [selected, setSelected] = useState(new Set())
@@ -1170,7 +1212,9 @@ export default function SelectorView() {
               </motion.div>
               <h1 className="text-lg font-semibold text-[#1E2532]">Chats</h1>
             </div>
-            <ViewToggle activeView={globalView} onChangeView={handleGlobalViewChange} />
+            <div data-tour="view-toggle">
+              <ViewToggle activeView={globalView} onChangeView={handleGlobalViewChange} />
+            </div>
           </div>
           <div className="flex items-center gap-2">
             {!favSidebarOpen && (
@@ -1187,6 +1231,7 @@ export default function SelectorView() {
               </motion.button>
             )}
             <motion.button
+              data-tour="new-chat-btn"
               onClick={handleNewChat}
               whileHover={{ scale: 1.03, borderColor: '#4A7AE5' }}
               whileTap={{ scale: 0.97 }}
@@ -1196,6 +1241,7 @@ export default function SelectorView() {
               New Chat
             </motion.button>
             <motion.button
+              data-tour="settings-btn"
               onClick={() => navigate('/settings')}
               whileHover={{ scale: 1.1, rotate: 45 }}
               whileTap={{ scale: 0.9 }}
@@ -1427,6 +1473,9 @@ export default function SelectorView() {
           )}
         </AnimatePresence>
       </motion.div>
+
+      {/* Onboarding Tour */}
+      {showTour && <TourTooltip steps={SELECTOR_TOUR_STEPS} onDone={handleTourDone} />}
     </div>
   )
 }

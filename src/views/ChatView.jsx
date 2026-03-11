@@ -21,9 +21,11 @@ import {
   getHighlights, addHighlight, deleteHighlight,
   deleteMessage, createBranch, getBranches,
   getConversation, createConversation, addMessage,
+  getSetting, setSetting,
 } from '../lib/db'
 import CollabModal from '../components/CollabModal'
 import ReviewModal from '../components/ReviewModal'
+import TourTooltip from '../components/TourTooltip'
 
 /* ── Animation Constants ─────────────────────────────────── */
 
@@ -215,6 +217,32 @@ function includesWord(str, search) {
 
 /* ── Main ChatView ───────────────────────────────────────── */
 
+const CONVERSATION_TOUR_STEPS = [
+  {
+    title: "You're in a conversation",
+    desc: "This is where you chat with Claude. Here's a quick look at the key features to get you started.",
+    placement: 'center',
+  },
+  {
+    title: 'Message Input',
+    desc: 'Type your message here. Press Enter to send, or Shift+Enter for a new line. You can also use Ctrl+Shift+? to see all keyboard shortcuts.',
+    target: '[data-tour="chat-input"]',
+    placement: 'top',
+  },
+  {
+    title: 'Actions Panel',
+    desc: 'Access Collaboration Mode to shape how Claude responds, or use Review to synthesize the conversation into a summary.',
+    target: '[data-tour="chat-actions"]',
+    placement: 'left',
+  },
+  {
+    title: 'Context Health',
+    desc: 'This tracks how full your context window is. When it gets high, branch or compress the conversation to keep a clean slate.',
+    target: '[data-tour="context-health"]',
+    placement: 'left',
+  },
+]
+
 export default function ChatView() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -261,6 +289,18 @@ export default function ChatView() {
   const [pendingDeletes, setPendingDeletes] = useState([]) // [{ msgId, timeoutId }]
   const [moveToBranchMessage, setMoveToBranchMessage] = useState(null) // message being moved
   const [currentConversation, setCurrentConversation] = useState(null) // loaded conversation record
+
+  // Onboarding tour
+  const [showTour, setShowTour] = useState(false)
+  useEffect(() => {
+    getSetting('tourCompleted_conversation').then(done => {
+      if (!done) setShowTour(true)
+    })
+  }, [])
+  const handleTourDone = useCallback(async () => {
+    setShowTour(false)
+    await setSetting('tourCompleted_conversation', true)
+  }, [])
 
   // Context health — derive from real token usage
   const modelInfo = useMemo(() => {
@@ -988,7 +1028,7 @@ export default function ChatView() {
           </motion.div>
         </div>
 
-        <div className="px-4 pb-4 pt-3 flex-shrink-0">
+        <div className="px-4 pb-4 pt-3 flex-shrink-0" data-tour="chat-actions">
           <motion.div
             variants={staggerContainer}
             initial={false}
@@ -1041,7 +1081,7 @@ export default function ChatView() {
                 src="/logo.png"
                 alt=""
                 className="w-16 h-16 mb-4 object-contain"
-                style={{ opacity: 0.12 }}
+                style={{ opacity: 0.22 }}
               />
               <p className="text-sm text-[#6B7C93] mb-1">Start a conversation</p>
               <p className="text-xs text-[#D5D5D5]">Type a message below to begin</p>
@@ -1198,7 +1238,7 @@ export default function ChatView() {
         </AnimatePresence>
 
         {/* Input area */}
-        <div className="relative p-4">
+        <div className="relative p-4" data-tour="chat-input">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1514,7 +1554,7 @@ export default function ChatView() {
               </div>
 
               {/* Context Health Section */}
-              <div className="p-4 pb-6">
+              <div className="p-4 pb-6" data-tour="context-health">
                 <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
                   Context Health
                 </h3>
@@ -1754,6 +1794,9 @@ export default function ChatView() {
           />
         )}
       </AnimatePresence>
+
+      {/* Onboarding Tour */}
+      {showTour && <TourTooltip steps={CONVERSATION_TOUR_STEPS} onDone={handleTourDone} />}
     </div>
   )
 }

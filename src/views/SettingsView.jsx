@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -12,7 +12,8 @@ import { useConversations } from '../stores/ConversationContext'
 import { Button, Card, Input, Modal, Toggle, RadioGroup, SegmentedControl, SectionLabel, IconButton } from '../components'
 import { getProvider } from '../providers'
 import { saveApiKey, deleteApiKey, encryptExport, decryptImport } from '../lib/crypto'
-import { exportAllData, importData, clearAllData } from '../lib/db'
+import { exportAllData, importData, clearAllData, getSetting, setSetting } from '../lib/db'
+import TourTooltip from '../components/TourTooltip'
 
 const SPRING_SMOOTH = { type: 'spring', stiffness: 300, damping: 28 }
 const staggerContainer = {
@@ -25,13 +26,39 @@ const staggerItem = {
 }
 
 const NAV_ITEMS = [
-  { id: 'api', label: 'API Configuration', icon: Key },
+  { id: 'api', label: 'API Configuration', icon: Key, tourTarget: 'settings-api' },
   { id: 'model', label: 'Model Preferences', icon: Cpu },
   { id: 'usage', label: 'Usage & Spending', icon: DollarSign },
-  { id: 'context', label: 'Context & Defaults', icon: Sliders },
-  { id: 'data', label: 'Data & Backups', icon: Database },
+  { id: 'context', label: 'Context & Defaults', icon: Sliders, tourTarget: 'settings-context' },
+  { id: 'data', label: 'Data & Backups', icon: Database, tourTarget: 'settings-data' },
   { id: 'appearance', label: 'Appearance', icon: Sun },
   { id: 'about', label: 'About & Security', icon: Shield },
+]
+
+const SETTINGS_TOUR_STEPS = [
+  {
+    title: 'Welcome to Settings',
+    desc: 'Here you can configure your API key, model preferences, context settings, and more.',
+    placement: 'center',
+  },
+  {
+    title: 'API Configuration',
+    desc: 'Add your Anthropic API key here to start chatting. Your key is encrypted and stored only in your browser.',
+    target: '[data-tour="settings-api"]',
+    placement: 'right',
+  },
+  {
+    title: 'Context & Defaults',
+    desc: 'Set your context threshold and compression preferences to keep conversations flowing smoothly.',
+    target: '[data-tour="settings-context"]',
+    placement: 'right',
+  },
+  {
+    title: 'Data & Backups',
+    desc: 'Export encrypted backups of all your conversations or import a previous backup to restore your history.',
+    target: '[data-tour="settings-data"]',
+    placement: 'right',
+  },
 ]
 
 const MODELS = [
@@ -51,6 +78,18 @@ export default function SettingsView() {
   const { settings, updateSetting, storageUsage } = useSettings()
   const { conversations } = useConversations()
   const [activeSection, setActiveSection] = useState('api')
+
+  // Onboarding tour
+  const [showTour, setShowTour] = useState(false)
+  useEffect(() => {
+    getSetting('tourCompleted_settings').then(done => {
+      if (!done) setShowTour(true)
+    })
+  }, [])
+  const handleTourDone = useCallback(async () => {
+    setShowTour(false)
+    await setSetting('tourCompleted_settings', true)
+  }, [])
 
   // Local state for API key (not persisted until validated)
   const [apiKey, setApiKey] = useState('')
@@ -121,6 +160,7 @@ export default function SettingsView() {
                 whileHover={{ x: 4 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setActiveSection(item.id)}
+                {...(item.tourTarget ? { 'data-tour': item.tourTarget } : {})}
                 className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors flex items-center gap-2.5 ${
                   active
                     ? 'text-[#1E2532] font-semibold bg-[#F5F5F5]'
@@ -147,6 +187,9 @@ export default function SettingsView() {
           {activeSection === 'about' && <AboutSection key="about" />}
         </AnimatePresence>
       </div>
+
+      {/* Onboarding Tour */}
+      {showTour && <TourTooltip steps={SETTINGS_TOUR_STEPS} onDone={handleTourDone} />}
     </div>
   )
 }
