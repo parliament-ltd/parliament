@@ -258,6 +258,7 @@ export default function ChatView() {
   const [branchPanelMessage, setBranchPanelMessage] = useState(null) // message to branch from, or null
   const [branches, setBranches] = useState([]) // branch conversations for this conversation
   const [compressBannerDismissed, setCompressBannerDismissed] = useState(false)
+  const [pendingDeletes, setPendingDeletes] = useState([]) // [{ msgId, timeoutId }]
   const [currentConversation, setCurrentConversation] = useState(null) // loaded conversation record
 
   // Context health — derive from real token usage
@@ -500,12 +501,23 @@ export default function ChatView() {
     })
   }, [])
 
-  const handleDelete = useCallback(async (msgId) => {
-    try {
-      await deleteMessage(msgId)
-    } catch {}
+  const handleDelete = useCallback((msgId) => {
     hideMessage(msgId)
+    const timeoutId = setTimeout(async () => {
+      try { await deleteMessage(msgId) } catch {}
+      setPendingDeletes(prev => prev.filter(p => p.msgId !== msgId))
+    }, 20000)
+    setPendingDeletes(prev => [...prev, { msgId, timeoutId }])
   }, [hideMessage])
+
+  const handleUndoDelete = useCallback((msgId) => {
+    setPendingDeletes(prev => {
+      const entry = prev.find(p => p.msgId === msgId)
+      if (entry) clearTimeout(entry.timeoutId)
+      return prev.filter(p => p.msgId !== msgId)
+    })
+    unhideMessage(msgId)
+  }, [unhideMessage])
 
   const handleCopyText = useCallback(async (content) => {
     try {
@@ -938,18 +950,6 @@ export default function ChatView() {
                 <MessageSquare className="w-5 h-5" />
               </motion.button>
             </div>
-            <div className="flex items-center gap-1">
-              <SidebarIconButton title="Undo (Ctrl+Z)">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                </svg>
-              </SidebarIconButton>
-              <SidebarIconButton title="Redo (Ctrl+Y)">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6" />
-                </svg>
-              </SidebarIconButton>
-            </div>
           </motion.div>
         </div>
 
@@ -1115,6 +1115,31 @@ export default function ChatView() {
               className="px-6 py-1.5"
             >
               <p className="text-xs text-[#EF4444]">{apiError.message}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Undo delete toast */}
+        <AnimatePresence>
+          {pendingDeletes.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={SPRING_SNAPPY}
+              className="mx-4 mb-2 px-4 py-3 rounded-xl border border-[#EBEBEB] bg-white shadow-sm flex items-center justify-between gap-3"
+            >
+              <span className="text-xs text-[#4A5568]">
+                {pendingDeletes.length === 1 ? 'Message deleted' : `${pendingDeletes.length} messages deleted`}
+              </span>
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => handleUndoDelete(pendingDeletes[pendingDeletes.length - 1].msgId)}
+                className="text-xs font-semibold text-[#4A7AE5] hover:text-[#3A6AD4] transition-colors shrink-0"
+              >
+                Undo
+              </motion.button>
             </motion.div>
           )}
         </AnimatePresence>
