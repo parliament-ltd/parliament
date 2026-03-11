@@ -257,6 +257,7 @@ export default function ChatView() {
   // Branching state
   const [branchPanelMessage, setBranchPanelMessage] = useState(null) // message to branch from, or null
   const [branches, setBranches] = useState([]) // branch conversations for this conversation
+  const [compressBannerDismissed, setCompressBannerDismissed] = useState(false)
   const [currentConversation, setCurrentConversation] = useState(null) // loaded conversation record
 
   // Context health — derive from real token usage
@@ -719,6 +720,28 @@ export default function ChatView() {
     setBranchPanelMessage(lastMsg)
   }, [visibleMessages])
 
+  /* ── Auto-compress trigger ──────────────────────────────── */
+
+  // Reset dismissed state when context drops back below threshold
+  useEffect(() => {
+    if (contextUsage < contextThreshold) {
+      setCompressBannerDismissed(false)
+    }
+  }, [contextUsage, contextThreshold])
+
+  // Fire auto-compress when threshold is crossed
+  useEffect(() => {
+    if (
+      contextUsage >= contextThreshold &&
+      settings.autoCompress === 'automatic' &&
+      !isStreaming &&
+      visibleMessages.length > 0 &&
+      !branchPanelMessage
+    ) {
+      handleCompressContext()
+    }
+  }, [contextUsage, contextThreshold, settings.autoCompress, isStreaming, visibleMessages.length, branchPanelMessage, handleCompressContext])
+
   /* ── Global Keyboard Shortcuts ─────────────────────────── */
 
   useEffect(() => {
@@ -1092,6 +1115,47 @@ export default function ChatView() {
               className="px-6 py-1.5"
             >
               <p className="text-xs text-[#EF4444]">{apiError.message}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Auto-compress banner */}
+        <AnimatePresence>
+          {contextUsage >= contextThreshold &&
+           settings.autoCompress === 'prompt' &&
+           !compressBannerDismissed &&
+           visibleMessages.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={SPRING_SNAPPY}
+              className="mx-4 mb-2 px-4 py-3 rounded-xl border border-[#E5A620]/40 bg-[#E5A620]/5 flex items-center gap-3"
+            >
+              <Activity className="w-4 h-4 text-[#E5A620] shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-[#1E2532]">
+                  Context window is {contextUsage}% full
+                </p>
+                <p className="text-xs text-[#6B7C93] mt-0.5">
+                  Branch this conversation to continue with a fresh context window.
+                </p>
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.03, borderColor: '#4A7AE5' }}
+                whileTap={{ scale: 0.97 }}
+                onClick={handleCompressContext}
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#EBEBEB] bg-white text-[#1E2532] shrink-0 flex items-center gap-1.5"
+              >
+                <GitBranch className="w-3 h-3" />
+                Branch now
+              </motion.button>
+              <button
+                onClick={() => setCompressBannerDismissed(true)}
+                className="text-[#6B7C93] hover:text-[#1E2532] transition-colors shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
@@ -2496,7 +2560,7 @@ const SHORTCUTS = [
   { keys: ['Ctrl', '.'], desc: 'Focus message input' },
   { keys: ['Home'], desc: 'Scroll to top' },
   { keys: ['End'], desc: 'Scroll to bottom' },
-  { keys: ['Ctrl', '?'], desc: 'Toggle keyboard shortcuts' },
+  { keys: ['Ctrl', 'Shift', '?'], desc: 'Toggle keyboard shortcuts' },
 ]
 
 // Detect Mac for display

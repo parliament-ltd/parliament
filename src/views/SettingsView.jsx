@@ -406,7 +406,7 @@ function ContextSection({ summaryDepth, setSummaryDepth, contextThreshold, setCo
           <p className="text-xs text-[#6B7C93] mt-1 mb-3">When context usage exceeds this level, you'll be prompted to compress via branching.</p>
           <input
             type="range"
-            min={50}
+            min={10}
             max={95}
             step={5}
             value={contextThreshold}
@@ -414,7 +414,7 @@ function ContextSection({ summaryDepth, setSummaryDepth, contextThreshold, setCo
             className="w-full accent-[#4A7AE5]"
           />
           <div className="flex justify-between text-[10px] text-[#6B7C93] mt-1">
-            <span>50%</span>
+            <span>10%</span>
             <span>95%</span>
           </div>
         </Card>
@@ -452,8 +452,22 @@ function formatBytes(bytes) {
 function DataSection({ backupReminder, setBackupReminder, showExportModal, setShowExportModal, showImportModal, setShowImportModal, showDeleteConfirm, setShowDeleteConfirm, exportPassphrase, setExportPassphrase, exportConfirmPassphrase, setExportConfirmPassphrase, importPassphrase, setImportPassphrase, storageUsage, conversations }) {
   const fileInputRef = useRef(null)
   const [importFile, setImportFile] = useState(null)
+  const [importFileIsEncrypted, setImportFileIsEncrypted] = useState(false)
   const [importError, setImportError] = useState('')
   const [exportError, setExportError] = useState('')
+  const [importLoading, setImportLoading] = useState(false)
+  const [exportLoading, setExportLoading] = useState(false)
+  const [importSuccess, setImportSuccess] = useState(false)
+
+  const resetImportModal = () => {
+    if (importLoading || importSuccess) return
+    setShowImportModal(false)
+    setImportPassphrase('')
+    setImportFile(null)
+    setImportError('')
+    setImportFileIsEncrypted(false)
+    setImportSuccess(false)
+  }
 
   const storagePercent = storageUsage.quota > 0
     ? Math.round((storageUsage.usage / storageUsage.quota) * 100)
@@ -464,6 +478,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
   const handleExportEncrypted = async () => {
     try {
       setExportError('')
+      setExportLoading(true)
       const data = await exportAllData()
       const jsonString = JSON.stringify(data)
       const encrypted = await encryptExport(jsonString, exportPassphrase)
@@ -479,42 +494,67 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
       setExportConfirmPassphrase('')
     } catch {
       setExportError('Export failed. Please try again.')
+    } finally {
+      setExportLoading(false)
     }
   }
 
   const handleExportJSON = async () => {
-    const data = await exportAllData()
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `apollo-backup-${new Date().toISOString().slice(0, 10)}.json`
-    a.click()
-    URL.revokeObjectURL(url)
+    try {
+      setExportLoading(true)
+      const data = await exportAllData()
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `apollo-backup-${new Date().toISOString().slice(0, 10)}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      // Surface error via a brief alert — no modal for plain export
+      alert('Export failed. Please try again.')
+    } finally {
+      setExportLoading(false)
+    }
   }
 
   const handleImport = async () => {
     if (!importFile) return
     try {
       setImportError('')
+      setImportLoading(true)
       const text = await importFile.text()
-      const parsed = JSON.parse(text)
+
+      let parsed
+      try {
+        parsed = JSON.parse(text)
+      } catch {
+        throw new Error('The file could not be read. Make sure it is a valid Apollo backup file.')
+      }
 
       let data
       if (parsed.salt && parsed.iv && parsed.ciphertext) {
         // Encrypted .apb file
-        data = await decryptImport(parsed, importPassphrase)
+        try {
+          data = await decryptImport(parsed, importPassphrase)
+        } catch {
+          throw new Error('Incorrect passphrase. Please check your passphrase and try again.')
+        }
       } else {
         // Plain .json file
         data = parsed
       }
 
+      if (!data || typeof data !== 'object' || !data.conversations) {
+        throw new Error('The file does not appear to be a valid Apollo backup.')
+      }
+
       await importData(data)
-      setShowImportModal(false)
-      setImportPassphrase('')
-      setImportFile(null)
+      setImportSuccess(true)
     } catch (error) {
       setImportError(error.message || 'Import failed. Check the file and passphrase.')
+    } finally {
+      setImportLoading(false)
     }
   }
 
@@ -631,10 +671,10 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
               Cancel
             </Button>
             <Button
-              disabled={!exportPassphrase || exportPassphrase !== exportConfirmPassphrase}
+              disabled={!exportPassphrase || exportPassphrase !== exportConfirmPassphrase || exportLoading}
               onClick={handleExportEncrypted}
             >
-              Export
+              {exportLoading ? 'Exporting…' : 'Export'}
             </Button>
           </>
         }
@@ -657,17 +697,23 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
       {/* Import Modal */}
       <Modal
         open={showImportModal}
-        onClose={() => { setShowImportModal(false); setImportPassphrase(''); setImportFile(null); setImportError('') }}
+        onClose={resetImportModal}
         title="Import Backup"
         footer={
-          <>
-            <Button variant="ghost" onClick={() => { setShowImportModal(false); setImportPassphrase(''); setImportFile(null); setImportError('') }}>
-              Cancel
+          importSuccess ? (
+            <Button onClick={() => window.location.reload()}>
+              Reload to see your conversations
             </Button>
-            <Button disabled={!importFile} onClick={handleImport}>
-              Import
-            </Button>
-          </>
+          ) : (
+            <>
+              <Button variant="ghost" onClick={resetImportModal} disabled={importLoading}>
+                Cancel
+              </Button>
+              <Button disabled={!importFile || importLoading} onClick={handleImport}>
+                {importLoading ? 'Importing…' : 'Import'}
+              </Button>
+            </>
+          )
         }
       >
         <p className="text-xs text-[#6B7C93] mb-4">Select a backup file (.apb or .json) and enter the passphrase if encrypted.</p>
@@ -678,12 +724,25 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
               ref={fileInputRef}
               type="file"
               accept=".apb,.json"
-              onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null
+                setImportFile(file)
+                setImportError('')
+                setImportFileIsEncrypted(file?.name.endsWith('.apb') ?? false)
+              }}
               className="mt-2 text-xs text-[#6B7C93] file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border file:border-[#EBEBEB] file:bg-white file:text-xs file:font-semibold file:text-[#1E2532] hover:file:border-[#4A7AE5] file:transition-colors file:cursor-pointer"
             />
           </div>
-          <Input label="Passphrase (if encrypted)" value={importPassphrase} onChange={setImportPassphrase} secret placeholder="Enter backup passphrase" />
+          {importFileIsEncrypted && (
+            <Input label="Passphrase" value={importPassphrase} onChange={setImportPassphrase} secret placeholder="Enter backup passphrase" />
+          )}
           {importError && <p className="text-xs text-[#EF4444]">{importError}</p>}
+          {importSuccess && (
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-[#22C55E] shrink-0" />
+              <p className="text-xs text-[#22C55E] font-medium">Backup imported successfully.</p>
+            </div>
+          )}
         </div>
       </Modal>
 
