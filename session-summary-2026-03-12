@@ -1,0 +1,178 @@
+# Session Summary — March 12, 2026
+
+## What we did
+
+Designed and built mobile versions of all three core UI surfaces: Chat Selector, Settings, and Conversation (Chat Interface). Iterated through multiple rounds on each, arriving at a mobile-specific interaction model branded **Swift — Mobile** (fast, agile, compact). The conversation UI diverged significantly from a direct desktop port into its own gesture-driven paradigm.
+
+## Mockup Files Created
+
+| File | Description |
+|------|-------------|
+| `chat-selector-mobile.jsx` | Mobile chat selector — flat list with bottom tab bar, swipe-right selection mode, floating bulk action bar |
+| `settings-mobile.jsx` | Mobile settings — accordion pattern, all 7 sections, bottom sheets for modals |
+| `chat-interface-mobile.jsx` | **Swift mode** conversation UI — gesture-driven, unified panel, tap-to-select cards, context-health-colored controls |
+
+## Swift — Mobile: Design Philosophy
+
+The mobile conversation UI is not a responsive port of the desktop — it's a distinct interaction model optimized for one-handed touch use. The name "Swift" reflects three principles:
+
+- **Fast:** Reduced interaction steps. Swipe gestures replace multi-tap navigation. Tap-to-select replaces three-dot menus. Context health is ambient, not a separate panel.
+- **Agile:** A single unified panel replaces two separate sidebars. Expandable sections let users jump between tools without opening and closing different drawers.
+- **Compact:** The top bar is a single icon. Message cards have no header chrome. The send button doubles as a context health indicator. Every pixel serves a purpose.
+
+---
+
+## Key Design Decisions
+
+### Chat Selector Mobile
+
+**Layout:** Full-screen flat list with thin divider lines between rows. Each row shows title, date line ("edited 3d ago · created 02/20/25"), and the active global view's content (summary, notes, highlights, or branches).
+
+**Bottom tab bar:** Four icon+label tabs (Summary, Notes, Highlights, Branches) with a sliding blue indicator line. Tap to switch views. No swipe-to-switch — swipe is reserved for selection mode.
+
+**Swipe-right → selection mode:** Swiping right anywhere on the list (>60px horizontal, <400ms, 1.8x more horizontal than vertical) enters selection mode globally. All rows get animated checkboxes sliding in from the left. Tapping a row toggles its checkbox.
+
+**Floating bulk action bar:** Overlays the top of the list area when in selection mode. Shows selected count, total size, pin/regenerate/trash icon buttons, and an X to exit. Subtle shadow, rounded corners. An animated spacer pushes the first list item down so it's not hidden behind the bar.
+
+**Top bar:** Settings and Star (with amber count badge) on the left. "+ Chat" button on the right.
+
+**Favorites:** Bottom sheet with drag handle, slides up from bottom with backdrop. Cards are touch-sized with copy and remove buttons.
+
+**View content rendering:** Summary clamps to 2 lines. Notes and highlights show up to 2 items with "+N more" overflow. Branches show parent/child relationships with family color bars. Rows with no content for the active view de-emphasize to 40% opacity.
+
+### Settings Mobile
+
+**Navigation pattern:** Accordion — all 7 sections listed as expandable items. Only one open at a time. Tapping a new section closes the current one.
+
+**Sections preserved (all 7):** API Configuration, Model Preferences, Usage & Spending, Context & Defaults, Data & Backups, Appearance, About & Security.
+
+**Top bar:** Back arrow + "Settings" title with bottom border divider.
+
+**Accordion headers:** Icon in a rounded square (tinted blue when open), section label + subtitle, rotating chevron. Content animates in with height + opacity via SPRING_SMOOTH.
+
+**Touch adaptations:** Inputs use rounded-xl and py-3 for larger touch targets. Validate button is full-width below key input. Radio options have py-3.5 padding and 20px radio circles. Segmented controls replace desktop pill toggles with flex-1 items. All buttons use active: states instead of hover:.
+
+**Modals → bottom sheets:** Export, Import, and Delete Confirmation all use a reusable BottomSheet component with drag handle + header pattern. Max height 85vh.
+
+**Shared components:** SettingsCard, ToggleSwitch (larger 44px wide), RadioOption, SegmentedControl, InfoBanner, BottomSheet — all designed for touch-first use.
+
+### Conversation UI (Swift Mode)
+
+#### Top Bar — Minimal
+
+**Single centered grip icon** (`GripHorizontal`) opens the unified panel. No left/right sidebar icons, no plus button, no borders. The grip icon is color-coded by context health (green/amber/red), serving as an ambient signal that also draws the eye enough for discoverability.
+
+#### Message Cards — Tap to Select
+
+**No three-dot menu, no header divider, no message numbers.** Cards are clean content containers with a `#DDDDE3` border and `rounded-2xl` corners.
+
+**Persistent indicators:** Dusty gold star and note icon appear in the top-left corner when a message is favorited or has a note attached. These are small (12px) and subtle.
+
+**Tap to select:** Tapping a card animates its border to blue (`#4A7AE5`). The card expands at the bottom to reveal an inline action row with 7 icon+label buttons: Favorite (dusty gold), Branch (purple), Note (amber), Copy (grey), Move (blue), Hide (grey), Delete (red). Tapping outside or tapping the card again deselects and collapses.
+
+**Ghost text state:** Dashed border, 55% opacity, with a "Continue" button below the card matching production behavior.
+
+**User messages offset right (ml-8), assistant messages offset left (mr-8).** Branch indicators show on the left edge with a purple GitBranch icon and connecting line.
+
+#### Gesture Vocabulary
+
+| Gesture | Action | Feedback |
+|---------|--------|----------|
+| Swipe left | New blank chat | Blue toast: "New chat started" (1.5s) |
+| Swipe right | Instant compressed branch from last message | Purple toast: "Branching with compressed summary" + subtitle (2s) |
+| Tap card | Select → expand inline action row | Blue border animation, action row slides in |
+| Tap grip icon | Open unified panel | Bottom sheet slides up |
+
+**Swipe detection:** >80px horizontal displacement, horizontal-dominant (2x ratio to vertical), completed within 400ms.
+
+**Swipe right branching** defaults to compressed summary mode — no panel, no choice dialog. For Full History or branching from a specific message, users use the card's expanded action row (tap card → Branch icon).
+
+#### Unified Panel (Bottom Sheet)
+
+Replaces both the left and right desktop sidebars with a single bottom sheet. Organized as a scrollable list of expandable sections:
+
+| Row | Icon | Expandable | Contents |
+|-----|------|------------|----------|
+| Chats | MessageSquare (blue) | No | Navigates back to chat selector |
+| Contents | List (grey) | Yes | TOC derived from user messages (truncated to 55 chars), tap scrolls to message |
+| Highlights | Highlighter (green) | Yes | Highlight items with tap-to-cycle navigation and long-press-to-delete |
+| Branches | GitBranch (purple) | Yes | Branch list with active state highlighting |
+| Collaboration Mode | Settings2 (blue) | Yes | 5 preset toggles with radio-style selection |
+| Review | BookOpen (grey) | No | Opens review |
+| Export to Markdown | FileText (grey) | No | Triggers export |
+| Compress Context | Activity (amber) | No | Opens branch panel |
+
+**Only one section expanded at a time.** Chevron rotates 180° when open. Badge counts shown for Highlights and Branches.
+
+**Highlight interaction:** Tap a highlight item to cycle through occurrences in the conversation (scrolls to each one). Counter shows "2/4" position. Long-press (600ms) to delete with fade-out animation. Hint text: "Tap to jump between occurrences. Hold to remove."
+
+**Collaboration Mode presets:** Challenge Artifacts, Show Reasoning, Push Back on Me, Offer Alternatives, Flag Uncertainty. Each is a toggle with a filled radio circle and description text.
+
+**No keyboard shortcuts section** (mobile doesn't need it). **No context health section** (context health is communicated through the grip icon and send button colors).
+
+#### Send Button — Context Health Indicator
+
+The send button doubles as an ambient context health signal. It's a `rounded-xl` (rounded square) with a thin border.
+
+| State | Border | Fill | Arrow |
+|-------|--------|------|-------|
+| Empty, low context | #DDDDE3 | transparent | green |
+| Empty, medium context | #DDDDE3 | transparent | amber |
+| Empty, high context | #DDDDE3 | transparent | red |
+| Text entered, low context | green | green | white |
+| Text entered, medium context | amber | amber | white |
+| Text entered, high context | red | red | white |
+| Streaming | red | red | white (Square/stop icon) |
+
+This eliminates the need for a dedicated context health panel — users get continuous passive awareness through two color-coded controls (grip icon + send button) that bookend the screen.
+
+#### Input Area
+
+**Always-visible border** (`#DDDDE3` default, `#4A7AE5` on focus) on white background. Auto-expanding textarea (up to 120px). Placeholder: "Type here, or swipe left to start a new chat."
+
+**No divider line** above the input area — it sits cleanly below the messages.
+
+#### Design Token: Dusty Gold
+
+Production uses `#C4A94D` (Dusty Gold) for favorites throughout — not the generic amber `#E5A620`. This is used for the star icon fill/stroke, favorite card borders on hover (desktop), and the Favorite action icon in the expanded card row.
+
+---
+
+## Decisions NOT Made / Deferred
+
+- **Peek strip for swipe gestures:** Discussed as an alternative to the current swipe-to-toast pattern. Would reveal a colored strip with icon buttons behind the message list during swipe. Deferred — current toast pattern is simpler and sufficient for V1.
+- **Swipe-to-switch between global views (chat selector):** Initially implemented, then replaced with tap-only bottom tabs + swipe-right for selection mode. The swipe gesture budget was better spent on selection.
+- **Per-row override badges (chat selector):** Desktop has interactive count badges that override individual rows. Not implemented in mobile V1 — the global view toggle is sufficient on smaller screens.
+- **Onboarding tooltips:** Planned for the grip icon and swipe gestures. Content and implementation deferred to a follow-up session.
+
+---
+
+## Impact on Existing Design Documents
+
+**CLAUDE.md needs updates:**
+- Add Swift — Mobile section documenting the gesture vocabulary, unified panel, tap-to-select cards, and context-health-colored controls
+- Add mobile mockup file references
+- Note the Dusty Gold token usage for favorites
+
+**ROADMAP.md needs updates:**
+- Add mobile implementation steps after the desktop build-out
+- Reference the three mobile mockup files as visual targets
+
+**IMPLEMENTATION-GUIDE.md needs updates:**
+- Add responsive/mobile breakpoint strategy
+- Document the unified panel component architecture
+- Document swipe gesture detection parameters
+
+---
+
+## Docs Status
+
+| Document | Status |
+|----------|--------|
+| `session-summary-2026-03-12.md` | **Created** — this file |
+| `chat-selector-mobile.jsx` | **Created** — mobile chat selector mockup |
+| `settings-mobile.jsx` | **Created** — mobile settings mockup |
+| `chat-interface-mobile.jsx` | **Created** — Swift mode conversation UI mockup |
+| `CLAUDE.md` | **Needs update** — Swift mode section, mobile mockup references |
+| `ROADMAP.md` | **Needs update** — mobile implementation steps |
+| `IMPLEMENTATION-GUIDE.md` | **Needs update** — mobile architecture |
