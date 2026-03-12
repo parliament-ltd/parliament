@@ -233,7 +233,7 @@ const CONVERSATION_TOUR_STEPS = [
     title: 'Actions Panel',
     desc: 'Access Collaboration Mode to shape how Claude responds, or use Review to synthesize the conversation into a summary.',
     target: '[data-tour="chat-actions"]',
-    placement: 'left',
+    placement: 'right',
   },
   {
     title: 'Context Health',
@@ -835,6 +835,13 @@ export default function ChatView() {
         return
       }
 
+      // Ctrl/Cmd + Shift + B — branch conversation (works even while typing)
+      if (isMod && e.shiftKey && (e.key === 'B' || e.key === 'b')) {
+        e.preventDefault()
+        handleCompressContext()
+        return
+      }
+
       // Skip remaining shortcuts if user is typing
       if (isTyping) return
 
@@ -870,13 +877,6 @@ export default function ChatView() {
       if (isMod && e.shiftKey && (e.key === 'N' || e.key === 'n')) {
         e.preventDefault()
         handleNewChat()
-        return
-      }
-
-      // Ctrl/Cmd + Shift + B — branch conversation from last message
-      if (isMod && e.shiftKey && (e.key === 'B' || e.key === 'b')) {
-        e.preventDefault()
-        handleCompressContext()
         return
       }
 
@@ -1665,6 +1665,7 @@ export default function ChatView() {
             messageIndex={visibleMessages.findIndex(m => m.id === branchPanelMessage.id) + 1}
             totalMessages={visibleMessages.length}
             contextUsage={contextUsage}
+            isIncomplete={branchPanelMessage.incomplete === true}
             onClose={() => setBranchPanelMessage(null)}
             onBranchFull={() => {
               handleCreateBranchFull(branchPanelMessage.id)
@@ -1733,9 +1734,11 @@ export default function ChatView() {
           <CollabModal
             onClose={() => setShowCollabModal(false)}
             activePresets={activePresets}
-            onTogglePreset={togglePreset}
             customInstruction={customInstruction}
-            onCustomInstructionChange={setCustomInstruction}
+            onApply={(presets, instruction) => {
+              setActivePresets(presets)
+              setCustomInstruction(instruction || '')
+            }}
           />
         )}
       </AnimatePresence>
@@ -2535,7 +2538,7 @@ function MoveToBranchModal({ conversations, currentId, onClose, onSelect, onNewC
 /*  Branch Creation Panel (Modal) — with dusty gold flash     */
 /* ═══════════════════════════════════════════════════════════ */
 
-function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsage, onClose, onBranchFull, onBranchCompressed, onPreviewSummary }) {
+function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsage, isIncomplete, onClose, onBranchFull, onBranchCompressed, onPreviewSummary }) {
   const [mode, setMode] = useState(null)
   const [compressing, setCompressing] = useState(false)
   const [compressed, setCompressed] = useState(false)
@@ -2623,6 +2626,15 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
 
         {/* Body — mode cards */}
         <div className="p-4 space-y-3">
+          {/* Incomplete message notice */}
+          {isIncomplete && (
+            <div className="flex items-start gap-2.5 px-3.5 py-3 rounded-lg bg-[#FAFAFA] border border-[#EBEBEB]">
+              <AlertCircle className="w-3.5 h-3.5 text-[#E5A620] flex-shrink-0 mt-0.5" />
+              <p className="text-[11px] text-[#6B7C93] leading-relaxed">
+                The last response was interrupted. You can still branch — the partial content will be preserved and you can continue it in the new branch.
+              </p>
+            </div>
+          )}
           {/* Full History */}
           <motion.div
             whileHover={{ borderColor: mode === 'full' ? '#4A7AE5' : '#D5D5D5' }}
@@ -2712,7 +2724,9 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
                             ) : previewError ? (
                               <p className="text-[11px] text-[#E5A620] leading-relaxed">{previewError}</p>
                             ) : previewContent ? (
-                              <p className="text-[11px] text-[#4A5568] leading-relaxed">{previewContent}</p>
+                              <div className="text-[11px] text-[#4A5568] leading-relaxed apollo-md">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{previewContent}</ReactMarkdown>
+                              </div>
                             ) : null}
                           </div>
                         </motion.div>

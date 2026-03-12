@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Search, GitBranch, Plus, MessageSquare, ArrowUp, ArrowDown,
@@ -19,6 +21,39 @@ import {
   setSetting,
 } from '../lib/db'
 import TourTooltip from '../components/TourTooltip'
+
+// Ensure apollo-md styles are available (also injected by ChatView, but SelectorView
+// may load independently so we register them here too — safe to call from multiple modules)
+const MD_STYLE_ID = 'apollo-markdown-styles'
+if (typeof document !== 'undefined' && !document.getElementById(MD_STYLE_ID)) {
+  const style = document.createElement('style')
+  style.id = MD_STYLE_ID
+  style.textContent = `
+    .apollo-md h1, .apollo-md h2, .apollo-md h3,
+    .apollo-md h4, .apollo-md h5, .apollo-md h6 {
+      font-weight: 600; margin-top: 0.6em; margin-bottom: 0.3em;
+      line-height: 1.3; color: #1E2532;
+    }
+    .apollo-md p { margin-bottom: 0.5em; }
+    .apollo-md p:last-child { margin-bottom: 0; }
+    .apollo-md ul, .apollo-md ol { margin: 0.3em 0 0.5em 1.2em; padding: 0; }
+    .apollo-md li { margin-bottom: 0.15em; }
+    .apollo-md strong { font-weight: 600; }
+    .apollo-md em { font-style: italic; }
+    .apollo-md code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.88em; background: rgba(0,0,0,0.05);
+      padding: 0.1em 0.3em; border-radius: 3px;
+    }
+    .apollo-md a { color: #4A7AE5; text-decoration: underline; }
+    .apollo-md blockquote {
+      border-left: 3px solid #EBEBEB; padding-left: 0.7em;
+      margin: 0.4em 0; color: #6B7C93;
+    }
+    .apollo-md mark { border-radius: 2px; padding: 0 1px; color: inherit; }
+  `
+  document.head.appendChild(style)
+}
 
 const SELECTOR_TOUR_STEPS = [
   {
@@ -436,15 +471,18 @@ function FavoriteCard({ favorite, onRemove, onNavigate }) {
       className="group rounded-lg border border-[#EBEBEB] bg-white transition-colors cursor-pointer overflow-hidden"
       onClick={() => onNavigate?.(favorite.sourceConversationId || favorite.conversationId)}
     >
-      <div className="px-3 pt-3 pb-2">
-        <p className="text-xs text-[#1E2532] leading-relaxed line-clamp-3" style={{
+      <div
+        className="px-3 pt-3 pb-2 text-xs text-[#1E2532] leading-relaxed apollo-md"
+        style={{
           display: '-webkit-box',
           WebkitLineClamp: 3,
           WebkitBoxOrient: 'vertical',
           overflow: 'hidden',
-        }}>
-          {favorite.snippet || favorite.text || favorite.content}
-        </p>
+        }}
+      >
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {favorite.snippet || favorite.text || favorite.content || ''}
+        </ReactMarkdown>
       </div>
       <div className="flex items-center justify-between px-3 pb-2.5">
         <span className="text-[10px] text-[#6B7C93] truncate flex-1 mr-2">{favorite.source || ''}</span>

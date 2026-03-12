@@ -2,13 +2,12 @@ import React, { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Shield, Eye, MessageCircleQuestion, RefreshCw, Sparkles,
-  X, Settings2, Plus, Trash2,
+  X, Settings2,
 } from 'lucide-react'
 
 /* ── Animation Constants ─────────────────────────────────── */
 
 const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
-const SPRING_SMOOTH = { type: 'spring', stiffness: 300, damping: 28 }
 
 /* ── Preset Definitions ──────────────────────────────────── */
 
@@ -52,20 +51,50 @@ const COLLAB_PRESETS = [
 
 /* ── Main Component ──────────────────────────────────────── */
 
-export default function CollabModal({ onClose, activePresets, onTogglePreset, customInstruction, onCustomInstructionChange }) {
+/**
+ * CollabModal
+ *
+ * Props:
+ *   onClose()                      — called on Cancel or backdrop click
+ *   onApply(presets, instruction)  — called only when user clicks "Apply to Conversation"
+ *   activePresets  Set<string>     — currently committed presets (read-only, seeds local state)
+ *   customInstruction string       — currently committed custom instruction
+ *
+ * Presets are kept in LOCAL state inside the modal and are only committed to the
+ * parent (via onApply) when the user explicitly clicks "Apply to Conversation".
+ * Clicking Cancel or the X icon discards all pending changes — the badge in the
+ * Actions panel therefore only reflects what has actually been applied.
+ */
+export default function CollabModal({ onClose, onApply, activePresets, customInstruction }) {
+  // Local copies — changes here don't affect the parent until Apply is clicked
+  const [localPresets, setLocalPresets] = useState(() => new Set(activePresets))
   const [localCustom, setLocalCustom] = useState(customInstruction || '')
 
+  const toggleLocalPreset = useCallback((id) => {
+    setLocalPresets(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }, [])
+
   const handleApply = () => {
-    onCustomInstructionChange?.(localCustom)
+    onApply?.(localPresets, localCustom)
     onClose()
   }
 
-  // Build the combined system prompt preview from active presets + custom instruction
+  // Build the combined system prompt preview from local presets + custom instruction
   const activePrompts = COLLAB_PRESETS
-    .filter(p => activePresets.has(p.id))
+    .filter(p => localPresets.has(p.id))
     .map(p => p.prompt)
   if (localCustom.trim()) activePrompts.push(localCustom.trim())
   const combinedPrompt = activePrompts.join('\n\n')
+
+  const hasChanges = (
+    localPresets.size !== activePresets.size ||
+    [...localPresets].some(id => !activePresets.has(id)) ||
+    localCustom !== (customInstruction || '')
+  )
 
   return (
     <motion.div
@@ -113,19 +142,19 @@ export default function CollabModal({ onClose, activePresets, onTogglePreset, cu
           {/* Presets */}
           <div>
             <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
-              Presets {activePresets.size > 0 && (
-                <span className="text-[#4A7AE5] normal-case tracking-normal">({activePresets.size} active)</span>
+              Presets {localPresets.size > 0 && (
+                <span className="text-[#4A7AE5] normal-case tracking-normal">({localPresets.size} selected)</span>
               )}
             </h3>
             <div className="space-y-2">
               {COLLAB_PRESETS.map((preset) => {
                 const Icon = preset.icon
-                const isActive = activePresets.has(preset.id)
+                const isActive = localPresets.has(preset.id)
                 return (
                   <motion.button
                     key={preset.id}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => onTogglePreset(preset.id)}
+                    onClick={() => toggleLocalPreset(preset.id)}
                     className="w-full text-left rounded-lg p-4 transition-colors"
                     style={{
                       border: isActive ? '1.5px solid #4A7AE5' : '1px solid #EBEBEB',
@@ -135,9 +164,7 @@ export default function CollabModal({ onClose, activePresets, onTogglePreset, cu
                     <div className="flex items-start gap-3">
                       <div
                         className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
-                        style={{
-                          backgroundColor: isActive ? 'rgba(74,122,229,0.1)' : '#F5F5F5',
-                        }}
+                        style={{ backgroundColor: isActive ? 'rgba(74,122,229,0.1)' : '#F5F5F5' }}
                       >
                         <Icon className="w-4 h-4" style={{ color: isActive ? '#4A7AE5' : '#6B7C93' }} />
                       </div>
@@ -148,9 +175,7 @@ export default function CollabModal({ onClose, activePresets, onTogglePreset, cu
                       {/* Active indicator dot */}
                       <div
                         className="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5 transition-colors"
-                        style={{
-                          backgroundColor: isActive ? '#4A7AE5' : '#EBEBEB',
-                        }}
+                        style={{ backgroundColor: isActive ? '#4A7AE5' : '#EBEBEB' }}
                       />
                     </div>
                   </motion.button>
@@ -205,8 +230,11 @@ export default function CollabModal({ onClose, activePresets, onTogglePreset, cu
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={handleApply}
-            className="px-5 py-2 rounded-lg text-xs font-semibold text-white"
-            style={{ backgroundColor: '#1E2532' }}
+            className="px-5 py-2 rounded-lg text-xs font-semibold text-white transition-opacity"
+            style={{
+              backgroundColor: '#1E2532',
+              opacity: hasChanges ? 1 : 0.5,
+            }}
           >
             Apply to Conversation
           </motion.button>

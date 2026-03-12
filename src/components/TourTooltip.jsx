@@ -3,12 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 
 const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
+const CARD_W = 320
+const CARD_H_EST = 200 // conservative estimate for clamping
 
 /**
  * TourTooltip — floating guided tour card.
  *
  * Each step shape:
  *   { title, desc, target: '[data-tour="..."]', placement: 'top'|'bottom'|'left'|'right'|'center' }
+ *
+ * If a 'left' placement would push the card off-screen it auto-flips to 'right'.
+ * All placements clamp to viewport edges so the card is always visible.
  */
 export default function TourTooltip({ steps, onDone }) {
   const [stepIndex, setStepIndex] = useState(0)
@@ -43,10 +48,15 @@ export default function TourTooltip({ steps, onDone }) {
     if (stepIndex > 0) setStepIndex(i => i - 1)
   }, [stepIndex])
 
-  // Calculate tooltip card position relative to the target
+  // Calculate tooltip card position relative to the target element.
+  // Clamps to viewport so the card is always reachable even at screen edges.
   const cardStyle = (() => {
     const PAD = 14 // gap between target and card
-    const CARD_W = 320
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+
+    const clampLeft = (x) => Math.max(12, Math.min(x, vw - CARD_W - 12))
+    const clampTop  = (y) => Math.max(12, Math.min(y, vh - CARD_H_EST - 12))
 
     if (!targetRect || step.placement === 'center') {
       return {
@@ -66,40 +76,52 @@ export default function TourTooltip({ steps, onDone }) {
       case 'bottom':
         return {
           position: 'fixed',
-          top: bottom + PAD,
-          left: Math.max(12, Math.min(centerX - CARD_W / 2, window.innerWidth - CARD_W - 12)),
+          top: clampTop(bottom + PAD),
+          left: clampLeft(centerX - CARD_W / 2),
           width: CARD_W,
           zIndex: 200,
         }
       case 'top':
         return {
           position: 'fixed',
-          top: top - PAD - 160, // estimated card height
-          left: Math.max(12, Math.min(centerX - CARD_W / 2, window.innerWidth - CARD_W - 12)),
+          top: clampTop(top - PAD - CARD_H_EST),
+          left: clampLeft(centerX - CARD_W / 2),
           width: CARD_W,
           zIndex: 200,
         }
       case 'right':
         return {
           position: 'fixed',
-          top: Math.max(12, top),
-          left: right + PAD,
+          top: clampTop(top),
+          left: clampLeft(right + PAD),
           width: CARD_W,
           zIndex: 200,
         }
-      case 'left':
+      case 'left': {
+        const leftPos = left - PAD - CARD_W
+        // Auto-flip to right if card would go off-screen to the left
+        if (leftPos < 12) {
+          return {
+            position: 'fixed',
+            top: clampTop(top),
+            left: clampLeft(right + PAD),
+            width: CARD_W,
+            zIndex: 200,
+          }
+        }
         return {
           position: 'fixed',
-          top: Math.max(12, top),
-          left: left - PAD - CARD_W,
+          top: clampTop(top),
+          left: leftPos,
           width: CARD_W,
           zIndex: 200,
         }
+      }
       default:
         return {
           position: 'fixed',
-          top: bottom + PAD,
-          left: Math.max(12, Math.min(centerX - CARD_W / 2, window.innerWidth - CARD_W - 12)),
+          top: clampTop(bottom + PAD),
+          left: clampLeft(centerX - CARD_W / 2),
           width: CARD_W,
           zIndex: 200,
         }
@@ -108,7 +130,7 @@ export default function TourTooltip({ steps, onDone }) {
 
   return (
     <>
-      {/* Dim overlay with spotlight cutout via box-shadow on the highlight ring */}
+      {/* Dim overlay — pointer-events: none so underlying UI stays interactive */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{ zIndex: 198, backgroundColor: 'rgba(0,0,0,0.18)' }}
