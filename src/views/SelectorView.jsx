@@ -57,8 +57,8 @@ if (typeof document !== 'undefined' && !document.getElementById(MD_STYLE_ID)) {
 
 const SELECTOR_TOUR_STEPS = [
   {
-    title: 'Welcome to Apollo',
-    desc: 'Apollo is a power-user chat interface for Claude that runs entirely in your browser. Your conversations, highlights, and notes are stored locally — nothing leaves your device except API calls to Anthropic.',
+    title: 'Welcome to Project Apollo',
+    desc: 'Apollo is a power-user chat interface — currently powered by Claude — that runs entirely in your browser. Your conversations, highlights, and notes are stored locally — nothing leaves your device except API calls to Anthropic.',
     target: null,
     placement: 'center',
   },
