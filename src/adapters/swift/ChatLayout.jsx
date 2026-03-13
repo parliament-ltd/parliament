@@ -47,7 +47,7 @@ function MobileMessageCard({ message, number, isFavorited, hasNote, isSelected, 
     >
       <motion.div
         onClick={() => onSelect(isSelected ? null : message.id)}
-        animate={{ borderColor: isSelected ? '#4A7AE5' : isGhostText ? '#D5D5D5' : '#DDDDE3' }}
+        animate={{ borderColor: isSelected ? '#B8A070' : isGhostText ? '#9B9A97' : '#DDDDE3' }}
         transition={{ duration: 0.15 }}
         className={`rounded-2xl border bg-white cursor-pointer ${isGhostText ? 'border-dashed' : ''}`}
       >
@@ -55,7 +55,7 @@ function MobileMessageCard({ message, number, isFavorited, hasNote, isSelected, 
         {(isFavorited || hasNote) && (
           <div className="flex items-center gap-1.5 px-4 pt-2.5">
             {isFavorited && <Star className="w-3 h-3 flex-shrink-0" style={{ fill: DUSTY_GOLD, color: DUSTY_GOLD }} />}
-            {hasNote && <StickyNote className="w-3 h-3 text-[#E5A620] flex-shrink-0" />}
+            {hasNote && <StickyNote className="w-3 h-3 text-[#D9730D] flex-shrink-0" />}
           </div>
         )}
 
@@ -74,14 +74,14 @@ function MobileMessageCard({ message, number, isFavorited, hasNote, isSelected, 
               transition={SPRING_SNAPPY}
               className="overflow-hidden"
             >
-              <div className="flex items-center justify-around px-2 py-2 border-t border-[#F0F0F0]">
-                <ActionIcon icon={Star} label="Fav" color={isFavorited ? DUSTY_GOLD : '#6B7C93'} filled={isFavorited} onClick={(e) => { e.stopPropagation(); onFavorite() }} />
+              <div className="flex items-center justify-around px-2 py-2 border-t border-[#F1F1EF]">
+                <ActionIcon icon={Star} label="Fav" color={isFavorited ? DUSTY_GOLD : '#787774'} filled={isFavorited} onClick={(e) => { e.stopPropagation(); onFavorite() }} />
                 <ActionIcon icon={GitBranch} label="Branch" color="#7C6CD4" onClick={(e) => { e.stopPropagation(); onBranch() }} />
-                <ActionIcon icon={StickyNote} label="Note" color="#E5A620" onClick={(e) => { e.stopPropagation(); onNote() }} />
-                <ActionIcon icon={Copy} label="Copy" color="#6B7C93" onClick={(e) => { e.stopPropagation(); onCopy() }} />
-                <ActionIcon icon={ArrowRightCircle} label="Move" color="#4A7AE5" onClick={(e) => { e.stopPropagation(); onMoveToBranch() }} />
-                <ActionIcon icon={Eye} label="Hide" color="#6B7C93" onClick={(e) => { e.stopPropagation(); onHide() }} />
-                <ActionIcon icon={Trash2} label="Delete" color="#EF4444" onClick={(e) => { e.stopPropagation(); onDelete() }} />
+                <ActionIcon icon={StickyNote} label="Note" color="#D9730D" onClick={(e) => { e.stopPropagation(); onNote() }} />
+                <ActionIcon icon={Copy} label="Copy" color="#787774" onClick={(e) => { e.stopPropagation(); onCopy() }} />
+                <ActionIcon icon={ArrowRightCircle} label="Move" color="#B8A070" onClick={(e) => { e.stopPropagation(); onMoveToBranch() }} />
+                <ActionIcon icon={Eye} label="Hide" color="#787774" onClick={(e) => { e.stopPropagation(); onHide() }} />
+                <ActionIcon icon={Trash2} label="Delete" color="#E03E3E" onClick={(e) => { e.stopPropagation(); onDelete() }} />
               </div>
             </motion.div>
           )}
@@ -95,7 +95,7 @@ function MobileMessageCard({ message, number, isFavorited, hasNote, isSelected, 
           animate={{ opacity: 1 }}
           whileTap={{ scale: 0.97 }}
           onClick={onContinue}
-          className="mt-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#4A7AE5] border border-[#EBEBEB] active:border-[#4A7AE5] transition-colors"
+          className="mt-2 px-3 py-1.5 rounded-xl text-xs font-medium text-[#B8A070] border border-[#E9E9E7] active:border-[#B8A070] transition-colors"
         >
           Continue
         </motion.button>
@@ -106,9 +106,9 @@ function MobileMessageCard({ message, number, isFavorited, hasNote, isSelected, 
 
 function ActionIcon({ icon: Icon, label, color, filled, onClick }) {
   return (
-    <button onClick={onClick} className="flex flex-col items-center gap-0.5 p-1.5 rounded-xl active:bg-[#FAFAFA] transition-colors">
+    <button onClick={onClick} className="flex flex-col items-center gap-0.5 p-1.5 rounded-xl active:bg-[#F7F6F3] transition-colors">
       <Icon className="w-4 h-4" style={filled ? { fill: color, color, strokeLinejoin: 'round' } : { color }} />
-      <span className="text-[9px] font-semibold" style={{ color }}>{label}</span>
+      <span className="text-[9px] font-medium" style={{ color }}>{label}</span>
     </button>
   )
 }
@@ -117,9 +117,9 @@ function ActionIcon({ icon: Icon, label, color, filled, onClick }) {
 
 function PanelRow({ icon: Icon, label, color, badge, expandable, expanded, onClick }) {
   return (
-    <button onClick={onClick} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left active:bg-[#FAFAFA] transition-colors">
+    <button onClick={onClick} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left active:bg-[#F7F6F3] transition-colors">
       <Icon className="w-5 h-5 flex-shrink-0" style={{ color }} />
-      <span className="flex-1 text-[14px] font-medium text-[#1E2532]">{label}</span>
+      <span className="flex-1 text-[14px] font-medium text-[#191919]">{label}</span>
       {badge != null && (
         <span className="w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center flex-shrink-0"
           style={{ backgroundColor: color + '18', color }}>
@@ -180,25 +180,25 @@ function UnifiedPanel({ open, onClose, messages, highlights, branches, currentCo
       >
         {/* Drag handle */}
         <div className="flex justify-center pt-3 pb-1">
-          <div className="w-9 h-1 rounded-full bg-[#D5D5D5]" />
+          <div className="w-9 h-1 rounded-full bg-[#9B9A97]" />
         </div>
 
         <div className="flex-1 overflow-y-auto px-2 pb-6" style={{ WebkitOverflowScrolling: 'touch', paddingBottom: 'max(env(safe-area-inset-bottom, 24px), 24px)' }}>
 
           {/* Navigate back to chats */}
-          <PanelRow icon={MessageSquare} label="All Chats" color="#4A7AE5" onClick={() => { onClose(); onNavigate('/') }} />
+          <PanelRow icon={MessageSquare} label="All Chats" color="#B8A070" onClick={() => { onClose(); onNavigate('/') }} />
 
           {/* Table of Contents */}
-          <PanelRow icon={List} label="Contents" color="#6B7C93" expandable expanded={expandedSection === 'toc'} onClick={() => toggleSection('toc')} />
+          <PanelRow icon={List} label="Contents" color="#787774" expandable expanded={expandedSection === 'toc'} onClick={() => toggleSection('toc')} />
           <AnimatePresence>
             {expandedSection === 'toc' && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={SPRING_SNAPPY} className="overflow-hidden">
                 <div className="pl-12 pr-4 pb-2 space-y-0.5">
                   {tocItems.length === 0 ? (
-                    <p className="text-xs text-[#D5D5D5] py-2">No messages yet</p>
+                    <p className="text-xs text-[#9B9A97] py-2">No messages yet</p>
                   ) : tocItems.map(item => (
                     <button key={item.id} onClick={() => { document.getElementById(`msg-${item.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); onClose() }}
-                      className="w-full text-left px-3 py-2 rounded-xl text-[13px] text-[#6B7C93] active:bg-[#FAFAFA] active:text-[#1E2532] transition-colors truncate">
+                      className="w-full text-left px-3 py-2 rounded-xl text-[13px] text-[#787774] active:bg-[#F7F6F3] active:text-[#191919] transition-colors truncate">
                       {item.label}
                     </button>
                   ))}
@@ -208,18 +208,18 @@ function UnifiedPanel({ open, onClose, messages, highlights, branches, currentCo
           </AnimatePresence>
 
           {/* Highlights */}
-          <PanelRow icon={Highlighter} label="Highlights" color="#22C55E" badge={highlights.length > 0 ? highlights.length : null} expandable expanded={expandedSection === 'highlights'} onClick={() => toggleSection('highlights')} />
+          <PanelRow icon={Highlighter} label="Highlights" color="#0F7B6C" badge={highlights.length > 0 ? highlights.length : null} expandable expanded={expandedSection === 'highlights'} onClick={() => toggleSection('highlights')} />
           <AnimatePresence>
             {expandedSection === 'highlights' && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={SPRING_SNAPPY} className="overflow-hidden">
                 <div className="pl-12 pr-4 pb-2 space-y-1.5">
                   {highlights.length === 0 ? (
-                    <p className="text-xs text-[#D5D5D5] py-2">No highlights yet. Select text in messages to highlight.</p>
+                    <p className="text-xs text-[#9B9A97] py-2">No highlights yet. Select text in messages to highlight.</p>
                   ) : highlights.map(hl => (
                     <button key={hl.id} onClick={() => handleHighlightTap(hl)}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-[#F0F0F0] active:bg-[#FAFAFA] transition-colors text-left">
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-[#F1F1EF] active:bg-[#F7F6F3] transition-colors text-left">
                       <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: hl.color }} />
-                      <span className="text-xs font-semibold text-[#1E2532] flex-1 truncate">{hl.text}</span>
+                      <span className="text-xs font-medium text-[#191919] flex-1 truncate">{hl.text}</span>
                     </button>
                   ))}
                 </div>
@@ -237,10 +237,10 @@ function UnifiedPanel({ open, onClose, messages, highlights, branches, currentCo
                     const isActive = branch.id === currentConversation?.id
                     return (
                       <button key={branch.id} onClick={() => { onClose(); onNavigate(`/chat/${branch.id}`) }}
-                        className={`w-full text-left px-3 py-2.5 rounded-xl border transition-colors ${isActive ? 'border-[#4A7AE5] bg-[#4A7AE5]/5' : 'border-[#F0F0F0] active:bg-[#FAFAFA]'}`}>
+                        className={`w-full text-left px-3 py-2.5 rounded-lg border transition-colors ${isActive ? 'border-[#B8A070] bg-[#B8A070]/5' : 'border-[#F1F1EF] active:bg-[#F7F6F3]'}`}>
                         <div className="flex items-center gap-2">
-                          <GitBranch className={`w-3 h-3 ${isActive ? 'text-[#4A7AE5]' : 'text-[#6B7C93]'}`} />
-                          <span className="text-xs font-semibold text-[#1E2532] truncate flex-1">{branch.title || 'Untitled'}</span>
+                          <GitBranch className={`w-3 h-3 ${isActive ? 'text-[#B8A070]' : 'text-[#787774]'}`} />
+                          <span className="text-xs font-medium text-[#191919] truncate flex-1">{branch.title || 'Untitled'}</span>
                         </div>
                       </button>
                     )
@@ -251,7 +251,7 @@ function UnifiedPanel({ open, onClose, messages, highlights, branches, currentCo
           </AnimatePresence>
 
           {/* Collaboration Mode */}
-          <PanelRow icon={Settings2} label="Collaboration Mode" color="#4A7AE5" expandable expanded={expandedSection === 'collab'} onClick={() => toggleSection('collab')} />
+          <PanelRow icon={Settings2} label="Collaboration Mode" color="#B8A070" expandable expanded={expandedSection === 'collab'} onClick={() => toggleSection('collab')} />
           <AnimatePresence>
             {expandedSection === 'collab' && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={SPRING_SNAPPY} className="overflow-hidden">
@@ -260,14 +260,14 @@ function UnifiedPanel({ open, onClose, messages, highlights, branches, currentCo
                     const active = activePresets.has(preset.id)
                     return (
                       <button key={preset.id} onClick={() => onTogglePreset(preset.id)}
-                        className={`w-full text-left px-3 py-2.5 rounded-xl border transition-colors ${active ? 'border-[#4A7AE5] bg-[#4A7AE5]/5' : 'border-[#F0F0F0] active:bg-[#FAFAFA]'}`}>
+                        className={`w-full text-left px-3 py-2.5 rounded-lg border transition-colors ${active ? 'border-[#B8A070] bg-[#B8A070]/5' : 'border-[#F1F1EF] active:bg-[#F7F6F3]'}`}>
                         <div className="flex items-center gap-2.5">
-                          <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${active ? 'border-[#4A7AE5] bg-[#4A7AE5]' : 'border-[#D5D5D5]'}`}>
+                          <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${active ? 'border-[#B8A070] bg-[#B8A070]' : 'border-[#9B9A97]'}`}>
                             {active && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <span className={`text-xs font-semibold block ${active ? 'text-[#1E2532]' : 'text-[#4A5568]'}`}>{preset.label}</span>
-                            <span className="text-[10px] text-[#6B7C93]">{preset.desc}</span>
+                            <span className={`text-xs font-medium block ${active ? 'text-[#191919]' : 'text-[#37352F]'}`}>{preset.label}</span>
+                            <span className="text-[10px] text-[#787774]">{preset.desc}</span>
                           </div>
                         </div>
                       </button>
@@ -279,9 +279,9 @@ function UnifiedPanel({ open, onClose, messages, highlights, branches, currentCo
           </AnimatePresence>
 
           {/* Quick actions */}
-          <PanelRow icon={BookOpen} label="Review" color="#6B7C93" onClick={() => { onClose(); onOpenReview() }} />
-          <PanelRow icon={FileText} label="Export to Markdown" color="#6B7C93" onClick={() => { onClose(); onExport() }} />
-          <PanelRow icon={Zap} label="Compress Context" color="#E5A620" onClick={() => { onClose(); onCompress() }} />
+          <PanelRow icon={BookOpen} label="Review" color="#787774" onClick={() => { onClose(); onOpenReview() }} />
+          <PanelRow icon={FileText} label="Export to Markdown" color="#787774" onClick={() => { onClose(); onExport() }} />
+          <PanelRow icon={Zap} label="Compress Context" color="#D9730D" onClick={() => { onClose(); onCompress() }} />
         </div>
       </motion.div>
     </motion.div>
@@ -622,7 +622,7 @@ export default function SwiftChatLayout() {
 
   return (
     <div
-      className="flex flex-col font-sans overflow-hidden bg-white text-[#1E2532]"
+      className="flex flex-col font-sans overflow-hidden bg-white text-[#191919]"
       style={{ height: '100dvh', maxWidth: 430, margin: '0 auto', position: 'relative' }}
     >
       {/* ── Top Bar ── */}
@@ -636,7 +636,7 @@ export default function SwiftChatLayout() {
         <motion.button
           whileTap={{ scale: 0.9 }}
           onClick={() => setPanelOpen(true)}
-          className="p-2 rounded-xl active:bg-[#FAFAFA] transition-colors"
+          className="p-2 rounded-xl active:bg-[#F7F6F3] transition-colors"
         >
           <GripHorizontal className="w-5 h-5" style={{ color: contextColor }} />
         </motion.button>
@@ -646,10 +646,10 @@ export default function SwiftChatLayout() {
       <AnimatePresence>
         {apiError?.type === 'key_failure' && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-            className="px-5 py-3 bg-[#EF4444]/10 flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-[#EF4444] flex-shrink-0" />
-            <p className="text-xs text-[#EF4444] flex-1">{apiError.message}</p>
-            <button onClick={() => setApiError(null)} className="p-1"><X className="w-3.5 h-3.5 text-[#EF4444]" /></button>
+            className="px-5 py-3 bg-[#E03E3E]/10 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-[#E03E3E] flex-shrink-0" />
+            <p className="text-xs text-[#E03E3E] flex-1">{apiError.message}</p>
+            <button onClick={() => setApiError(null)} className="p-1"><X className="w-3.5 h-3.5 text-[#E03E3E]" /></button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -658,10 +658,10 @@ export default function SwiftChatLayout() {
       <AnimatePresence>
         {persistError === 'quota' && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-            className="px-5 py-3 bg-[#E5A620]/10 flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-[#E5A620] flex-shrink-0" />
-            <p className="text-xs text-[#E5A620] flex-1">Storage full — message may not be saved. Export and delete old chats to free space.</p>
-            <button onClick={clearPersistError} className="p-1"><X className="w-3.5 h-3.5 text-[#E5A620]" /></button>
+            className="px-5 py-3 bg-[#D9730D]/10 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-[#D9730D] flex-shrink-0" />
+            <p className="text-xs text-[#D9730D] flex-1">Storage full — message may not be saved. Export and delete old chats to free space.</p>
+            <button onClick={clearPersistError} className="p-1"><X className="w-3.5 h-3.5 text-[#D9730D]" /></button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -678,8 +678,8 @@ export default function SwiftChatLayout() {
         {visibleMessages.length === 0 && !isStreaming && hiddenCount === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center px-8">
             <img src="/flight_logo.png" alt="" className="w-12 h-12 mb-4 object-contain" style={{ opacity: 0.22 }} />
-            <p className="text-sm text-[#6B7C93] mb-1">Start a conversation</p>
-            <p className="text-xs text-[#D5D5D5]">Type below, or swipe left to start fresh</p>
+            <p className="text-sm text-[#787774] mb-1">Start a conversation</p>
+            <p className="text-xs text-[#9B9A97]">Type below, or swipe left to start fresh</p>
           </div>
         )}
 
@@ -713,9 +713,9 @@ export default function SwiftChatLayout() {
         {hiddenCount > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-center py-3">
             <button onClick={() => setHiddenMessages(new Set())}
-              className="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-[#EBEBEB] active:border-[#4A7AE5] transition-colors">
-              <Eye className="w-3.5 h-3.5 text-[#6B7C93]" />
-              <span className="text-xs text-[#6B7C93]">{hiddenCount} message{hiddenCount !== 1 ? 's' : ''} hidden</span>
+              className="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-[#E9E9E7] active:border-[#B8A070] transition-colors">
+              <Eye className="w-3.5 h-3.5 text-[#787774]" />
+              <span className="text-xs text-[#787774]">{hiddenCount} message{hiddenCount !== 1 ? 's' : ''} hidden</span>
             </button>
           </motion.div>
         )}
@@ -727,12 +727,12 @@ export default function SwiftChatLayout() {
       <AnimatePresence>
         {pendingDeletes.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} transition={SPRING_SNAPPY}
-            className="mx-4 mb-2 px-4 py-3 rounded-2xl border border-[#EBEBEB] bg-white shadow-sm flex items-center justify-between gap-3">
-            <span className="text-xs text-[#4A5568]">
+            className="mx-4 mb-2 px-4 py-3 rounded-2xl border border-[#E9E9E7] bg-white shadow-sm flex items-center justify-between gap-3">
+            <span className="text-xs text-[#37352F]">
               {pendingDeletes.length === 1 ? 'Message deleted' : `${pendingDeletes.length} messages deleted`}
             </span>
             <button onClick={() => handleUndoDelete(pendingDeletes[pendingDeletes.length - 1].msgId)}
-              className="text-xs font-semibold text-[#4A7AE5] active:text-[#3A6AD4] shrink-0">
+              className="text-xs font-medium text-[#B8A070] active:text-[#3A6AD4] shrink-0">
               Undo
             </button>
           </motion.div>
@@ -743,9 +743,9 @@ export default function SwiftChatLayout() {
       <AnimatePresence>
         {newChatFlash && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} transition={SPRING_SNAPPY}
-            className="mx-4 mb-2 px-4 py-3 rounded-2xl border border-[#4A7AE5]/30 bg-[#4A7AE5]/5 flex items-center gap-2.5">
-            <MessageSquare className="w-4 h-4 text-[#4A7AE5] flex-shrink-0" />
-            <span className="text-xs font-semibold text-[#1E2532]">Starting new chat</span>
+            className="mx-4 mb-2 px-4 py-3 rounded-2xl border border-[#B8A070]/30 bg-[#B8A070]/5 flex items-center gap-2.5">
+            <MessageSquare className="w-4 h-4 text-[#B8A070] flex-shrink-0" />
+            <span className="text-xs font-medium text-[#191919]">Starting new chat</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -757,8 +757,8 @@ export default function SwiftChatLayout() {
             className="mx-4 mb-2 px-4 py-3 rounded-2xl border border-[#7C6CD4]/30 bg-[#7C6CD4]/5 flex items-center gap-2.5">
             <GitBranch className="w-4 h-4 text-[#7C6CD4] flex-shrink-0" />
             <div className="flex-1">
-              <span className="text-xs font-semibold text-[#1E2532]">Branching with compressed summary</span>
-              <span className="text-[10px] text-[#6B7C93] block mt-0.5">Continuing in a fresh context window</span>
+              <span className="text-xs font-medium text-[#191919]">Branching with compressed summary</span>
+              <span className="text-[10px] text-[#787774] block mt-0.5">Continuing in a fresh context window</span>
             </div>
           </motion.div>
         )}
@@ -768,7 +768,7 @@ export default function SwiftChatLayout() {
       <AnimatePresence>
         {apiError?.type === 'rate_limit' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-5 py-1.5">
-            <p className="text-xs text-[#E5A620]">{apiError.message}</p>
+            <p className="text-xs text-[#D9730D]">{apiError.message}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -789,17 +789,17 @@ export default function SwiftChatLayout() {
             onKeyDown={handleKeyDown}
             placeholder="Type here, or swipe left to start fresh."
             rows={1}
-            className="flex-1 bg-white rounded-xl px-4 py-2.5 text-[#1E2532] outline-none placeholder:text-[#D5D5D5] border transition-colors resize-none"
+            className="flex-1 bg-white rounded-xl px-4 py-2.5 text-[#191919] outline-none placeholder:text-[#9B9A97] border transition-colors resize-none"
             style={{ borderColor: '#DDDDE3', maxHeight: 120, minHeight: 40, lineHeight: '20px', fontSize: 16 }}
           />
           <motion.button
             whileTap={{ scale: 0.85 }}
             onClick={isStreaming ? stopGenerating : handleSend}
-            className="rounded-xl border flex items-center justify-center flex-shrink-0 transition-colors"
+            className="rounded-lg border flex items-center justify-center flex-shrink-0 transition-colors"
             style={{
               width: 40, height: 40,
-              borderColor: isStreaming ? '#EF4444' : inputValue.trim() ? contextColor : '#DDDDE3',
-              backgroundColor: isStreaming ? '#EF4444' : inputValue.trim() ? contextColor : 'transparent',
+              borderColor: isStreaming ? '#E03E3E' : inputValue.trim() ? contextColor : '#DDDDE3',
+              backgroundColor: isStreaming ? '#E03E3E' : inputValue.trim() ? contextColor : 'transparent',
             }}
           >
             <AnimatePresence mode="wait">

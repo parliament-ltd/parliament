@@ -23,7 +23,7 @@ export default function MessageList({
       ref={containerRef}
       className="flex-1 overflow-y-auto p-6 space-y-4"
       onMouseDown={onContainerMouseDown}
-      style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}
+      style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}
     >
       {/* Empty state */}
       {messages.length === 0 && !isStreaming && hiddenCount === 0 && (
@@ -34,8 +34,8 @@ export default function MessageList({
             className="w-16 h-16 mb-4 object-contain"
             style={{ opacity: 0.22 }}
           />
-          <p className="text-sm text-[#6B7C93] mb-1">Start a conversation</p>
-          <p className="text-xs text-[#D5D5D5]">Type a message below to begin</p>
+          <p className="text-sm text-[#787774] mb-1">Start a conversation</p>
+          <p className="text-xs text-[#9B9A97]">Type a message below to begin</p>
         </div>
       )}
 
@@ -51,13 +51,13 @@ export default function MessageList({
           className="flex items-center justify-center py-2"
         >
           <motion.button
-            whileHover={{ scale: 1.04, borderColor: '#4A7AE5' }}
+            whileHover={{ scale: 1.04, borderColor: '#B8A070' }}
             whileTap={{ scale: 0.97 }}
             onClick={onShowHidden}
-            className="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-[#EBEBEB] cursor-pointer transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-[#E9E9E7] cursor-pointer transition-colors"
           >
-            <Eye className="w-3.5 h-3.5 text-[#6B7C93]" />
-            <span className="text-xs text-[#6B7C93]">
+            <Eye className="w-3.5 h-3.5 text-[#787774]" />
+            <span className="text-xs text-[#787774]">
               {hiddenCount} message{hiddenCount !== 1 ? 's' : ''} hidden
             </span>
           </motion.button>

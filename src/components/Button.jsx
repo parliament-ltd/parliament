@@ -3,10 +3,10 @@ import { motion } from 'framer-motion'
 const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
 
 const variants = {
-  default: 'border border-[#EBEBEB] bg-white text-[#1E2532] hover:border-[#4A7AE5]',
-  primary: 'border border-[#4A7AE5] bg-[#4A7AE5] text-white',
-  danger: 'border border-[#EF4444] bg-[#EF4444] text-white hover:bg-[#DC2626]',
-  ghost: 'border border-transparent bg-transparent text-[#6B7C93] hover:bg-[#EEEEEE] hover:text-[#1E2532]',
+  default: 'border border-[#E9E9E7] bg-white text-[#191919] hover:border-[#B8A070]',
+  primary: 'border border-[#B8A070] bg-[#B8A070] text-white',
+  danger: 'border border-[#E03E3E] bg-[#E03E3E] text-white hover:bg-[#C5342A]',
+  ghost: 'border border-transparent bg-transparent text-[#787774] hover:bg-[#F1F1EF] hover:text-[#191919]',
 }
 
 const sizes = {
@@ -28,13 +28,13 @@ export default function Button({
 }) {
   return (
     <motion.button
-      whileHover={disabled ? {} : { scale: 1.03, borderColor: variant === 'default' ? '#4A7AE5' : undefined }}
+      whileHover={disabled ? {} : { scale: 1.03, borderColor: variant === 'default' ? '#B8A070' : undefined }}
       whileTap={disabled ? {} : { scale: 0.97 }}
       transition={SPRING_SNAPPY}
       onClick={onClick}
       disabled={disabled}
       className={`
-        rounded-lg font-semibold transition-colors inline-flex items-center justify-center gap-2
+        rounded-md font-medium transition-colors inline-flex items-center justify-center gap-2
         ${variants[variant]}
         ${iconOnly ? 'p-2.5' : sizes[size]}
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}

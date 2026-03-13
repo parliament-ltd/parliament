@@ -11,7 +11,7 @@ export default function NoteList({ notes = [], onEdit, onDelete }) {
       {notes.map((note) => (
         <div
           key={note.id}
-          className="px-3 py-2 rounded-lg border border-[#EBEBEB] bg-white text-xs text-[#4A5568]"
+          className="px-3 py-2 rounded-lg border border-[#E9E9E7] bg-white text-xs text-[#37352F]"
         >
           {note.text}
         </div>

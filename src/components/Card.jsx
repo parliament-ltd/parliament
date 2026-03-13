@@ -12,7 +12,7 @@ export default function Card({
 }) {
   const Component = hover || onClick ? motion.div : 'div'
   const motionProps = hover || onClick ? {
-    whileHover: { scale: 1.01, borderColor: danger ? '#EF4444' : '#4A7AE5' },
+    whileHover: { scale: 1.01, borderColor: danger ? '#E03E3E' : '#B8A070' },
     transition: SPRING_SMOOTH,
   } : {}
 
@@ -20,8 +20,8 @@ export default function Card({
     <Component
       onClick={onClick}
       className={`
-        px-5 py-4 rounded-xl border bg-white
-        ${danger ? 'border-[#EF4444]/30 bg-[#EF4444]/5' : 'border-[#EBEBEB]'}
+        px-5 py-4 rounded-lg border bg-white
+        ${danger ? 'border-[#E03E3E]/30 bg-[#E03E3E]/5' : 'border-[#E9E9E7]'}
         ${onClick ? 'cursor-pointer' : ''}
         ${className}
       `}

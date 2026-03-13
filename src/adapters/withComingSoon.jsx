@@ -35,7 +35,7 @@ export default function withComingSoon(Layout, modeName) {
               left: 0,
               right: 0,
               zIndex: 9999,
-              backgroundColor: '#E5A620',
+              backgroundColor: '#D9730D',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

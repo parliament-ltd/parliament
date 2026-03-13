@@ -249,7 +249,7 @@ export async function deleteMessage(id) {
 
 // ─── Highlights ──────────────────────────────────────────
 
-export async function addHighlight({ conversationId, messageId, text, color = '#4A7AE5' }) {
+export async function addHighlight({ conversationId, messageId, text, color = '#B8A070' }) {
   const db = await initDB()
   const highlight = {
     id: generateId(),

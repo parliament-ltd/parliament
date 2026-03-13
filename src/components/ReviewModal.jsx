@@ -101,43 +101,43 @@ export default function ReviewModal({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={SPRING_SNAPPY}
-        className="relative z-10 bg-white border border-[#EBEBEB] rounded-xl w-full max-w-2xl max-h-[85vh] flex flex-col"
+        className="relative z-10 bg-white border border-[#E9E9E7] rounded-xl w-full max-w-2xl max-h-[85vh] flex flex-col"
         style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 pb-4" style={{ borderBottom: '1px solid #F0F0F0' }}>
+        <div className="flex items-center justify-between p-5 pb-4" style={{ borderBottom: '1px solid #F1F1EF' }}>
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(74,122,229,0.1)' }}>
-              <BookOpen className="w-4 h-4 text-[#4A7AE5]" />
+              <BookOpen className="w-4 h-4 text-[#B8A070]" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-[#1E2532]">Review</h2>
-              <p className="text-[11px] text-[#6B7C93] mt-0.5">Reflect on your conversation</p>
+              <h2 className="text-sm font-medium text-[#191919]">Review</h2>
+              <p className="text-[11px] text-[#787774] mt-0.5">Reflect on your conversation</p>
             </div>
           </div>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={onClose}
-            className="p-2 rounded-lg text-[#6B7C93] hover:bg-[#EEEEEE] transition-colors"
+            className="p-2 rounded-lg text-[#787774] hover:bg-[#F1F1EF] transition-colors"
           >
             <X className="w-4 h-4" />
           </motion.button>
         </div>
 
         {/* Body — scrollable */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-6" style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}>
+        <div className="flex-1 overflow-y-auto p-5 space-y-6" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}>
 
           {/* Summary Depth */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider">Summary depth</h3>
+              <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider">Summary depth</h3>
               <div
                 className="relative"
                 onMouseEnter={() => setShowInfoTooltip(true)}
                 onMouseLeave={() => setShowInfoTooltip(false)}
               >
-                <Info className="w-3.5 h-3.5 text-[#6B7C93] cursor-help" />
+                <Info className="w-3.5 h-3.5 text-[#787774] cursor-help" />
                 <AnimatePresence>
                   {showInfoTooltip && (
                     <motion.div
@@ -145,9 +145,9 @@ export default function ReviewModal({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 4 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute left-1/2 -translate-x-1/2 top-6 w-52 px-3 py-2 bg-white border border-[#EBEBEB] rounded-lg shadow-lg z-10"
+                      className="absolute left-1/2 -translate-x-1/2 top-6 w-52 px-3 py-2 bg-white border border-[#E9E9E7] rounded-lg shadow-lg z-10"
                     >
-                      <p className="text-[10px] text-[#6B7C93] leading-relaxed">
+                      <p className="text-[10px] text-[#787774] leading-relaxed">
                         Detailed reviews analyze full conversation content and use more tokens. Brief reviews focus on your highlights and notes only.
                       </p>
                     </motion.div>
@@ -155,16 +155,16 @@ export default function ReviewModal({
                 </AnimatePresence>
               </div>
             </div>
-            <div className="flex gap-1 bg-white border border-[#EBEBEB] rounded-lg p-1 w-fit">
+            <div className="flex gap-1 bg-white border border-[#E9E9E7] rounded-lg p-1 w-fit">
               {['brief', 'detailed'].map((d) => (
                 <motion.button
                   key={d}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setSummaryDepth(d)}
-                  className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-colors capitalize ${
+                  className={`px-4 py-1.5 rounded-md text-xs font-medium transition-colors capitalize ${
                     summaryDepth === d
-                      ? 'bg-[#EEEEEE] text-[#1E2532]'
-                      : 'text-[#6B7C93] hover:text-[#1E2532]'
+                      ? 'bg-[#F1F1EF] text-[#191919]'
+                      : 'text-[#787774] hover:text-[#191919]'
                   }`}
                 >
                   {d}
@@ -175,7 +175,7 @@ export default function ReviewModal({
 
           {/* Category Toggles */}
           <div>
-            <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
               Include in review
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -203,14 +203,14 @@ export default function ReviewModal({
           {/* Highlights */}
           {highlights.length > 0 && includeHighlights && (
             <div>
-              <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
+              <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
                 Highlights ({highlights.length})
               </h3>
               <div className="space-y-2">
                 {[...new Map(highlights.map(h => [h.text, h])).values()].map((h) => (
-                  <div key={h.text} className="flex items-center gap-2 px-3 py-2 bg-white border border-[#EBEBEB] rounded-lg">
+                  <div key={h.text} className="flex items-center gap-2 px-3 py-2 bg-white border border-[#E9E9E7] rounded-lg">
                     <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: h.color }} />
-                    <span className="text-xs text-[#1E2532]">{h.text}</span>
+                    <span className="text-xs text-[#191919]">{h.text}</span>
                   </div>
                 ))}
               </div>
@@ -220,14 +220,14 @@ export default function ReviewModal({
           {/* Notes */}
           {notes.length > 0 && includeNotes && (
             <div>
-              <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
+              <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
                 Notes ({notes.length})
               </h3>
               <div className="space-y-2">
                 {notes.map((n, i) => (
-                  <div key={i} className="flex items-start gap-2 px-3 py-2 bg-white border border-[#EBEBEB] rounded-lg">
-                    <StickyNote className="w-3.5 h-3.5 text-[#E5A620] mt-0.5 flex-shrink-0" />
-                    <p className="text-xs text-[#1E2532]">{n.text}</p>
+                  <div key={i} className="flex items-start gap-2 px-3 py-2 bg-white border border-[#E9E9E7] rounded-lg">
+                    <StickyNote className="w-3.5 h-3.5 text-[#D9730D] mt-0.5 flex-shrink-0" />
+                    <p className="text-xs text-[#191919]">{n.text}</p>
                   </div>
                 ))}
               </div>
@@ -236,7 +236,7 @@ export default function ReviewModal({
 
           {/* Session Stats */}
           <div>
-            <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
               Session Stats
             </h3>
             <div className="grid grid-cols-3 gap-2">
@@ -248,29 +248,29 @@ export default function ReviewModal({
 
           {/* Synthesis */}
           <div>
-            <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
               Synthesis
             </h3>
             {synthesis ? (
-              <div className="px-4 py-3 bg-[#4A7AE5]/5 border border-[#4A7AE5]/15 rounded-lg">
-                <div className="text-xs text-[#1E2532] leading-relaxed apollo-md">
+              <div className="px-4 py-3 bg-[#B8A070]/5 border border-[#B8A070]/15 rounded-lg">
+                <div className="text-xs text-[#191919] leading-relaxed apollo-md">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {synthesis}
                   </ReactMarkdown>
                 </div>
               </div>
             ) : synthesisError ? (
-              <div className="px-4 py-3 bg-[#EF4444]/5 border border-[#EF4444]/15 rounded-lg flex items-start gap-2">
-                <AlertCircle className="w-3.5 h-3.5 text-[#EF4444] mt-0.5 flex-shrink-0" />
-                <p className="text-xs text-[#EF4444]">{synthesisError}</p>
+              <div className="px-4 py-3 bg-[#E03E3E]/5 border border-[#E03E3E]/15 rounded-lg flex items-start gap-2">
+                <AlertCircle className="w-3.5 h-3.5 text-[#E03E3E] mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-[#E03E3E]">{synthesisError}</p>
               </div>
             ) : (
               <motion.button
-                whileHover={{ scale: 1.02, borderColor: '#4A7AE5' }}
+                whileHover={{ scale: 1.02, borderColor: '#B8A070' }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleGenerateSynthesis}
                 disabled={synthesisLoading}
-                className="w-full px-4 py-3 bg-white border border-[#EBEBEB] rounded-lg text-xs font-semibold text-[#4A7AE5] transition-colors flex items-center justify-center gap-2"
+                className="w-full px-4 py-3 bg-white border border-[#E9E9E7] rounded-lg text-xs font-medium text-[#B8A070] transition-colors flex items-center justify-center gap-2"
               >
                 {synthesisLoading ? (
                   <>
@@ -289,7 +289,7 @@ export default function ReviewModal({
 
           {/* Reflection Prompts */}
           <div>
-            <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
               Prompts for reflection
             </h3>
             <div className="space-y-2">
@@ -297,9 +297,9 @@ export default function ReviewModal({
                 <motion.div
                   key={i}
                   whileHover={interactiveHover}
-                  className="px-3 py-2.5 bg-white border border-[#EBEBEB] rounded-lg cursor-pointer hover:border-[#4A7AE5]/40 transition-colors"
+                  className="px-3 py-2.5 bg-white border border-[#E9E9E7] rounded-lg cursor-pointer hover:border-[#B8A070]/40 transition-colors"
                 >
-                  <p className="text-xs text-[#4A5568] leading-relaxed">{prompt}</p>
+                  <p className="text-xs text-[#37352F] leading-relaxed">{prompt}</p>
                 </motion.div>
               ))}
             </div>
@@ -307,26 +307,26 @@ export default function ReviewModal({
 
           {/* Reflection Note */}
           <div>
-            <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
               Your reflection
             </h3>
             <textarea
               value={reflectionNote}
               onChange={(e) => setReflectionNote(e.target.value)}
               placeholder="What are your key takeaways from this conversation?"
-              className="w-full bg-white border border-[#EBEBEB] rounded-lg px-4 py-3 text-sm text-[#1E2532] resize-none focus:outline-none focus:border-[#4A7AE5] transition-colors placeholder:text-[#D5D5D5]"
+              className="w-full bg-white border border-[#E9E9E7] rounded-lg px-4 py-3 text-sm text-[#191919] resize-none focus:outline-none focus:border-[#B8A070] transition-colors placeholder:text-[#9B9A97]"
               rows={4}
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-5 pt-4" style={{ borderTop: '1px solid #F0F0F0' }}>
+        <div className="flex items-center justify-between p-5 pt-4" style={{ borderTop: '1px solid #F1F1EF' }}>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-xs font-semibold text-[#6B7C93] hover:text-[#1E2532] hover:bg-[#EEEEEE] transition-colors"
+            className="px-4 py-2 rounded-lg text-xs font-medium text-[#787774] hover:text-[#191919] hover:bg-[#F1F1EF] transition-colors"
           >
             Dismiss
           </motion.button>
@@ -334,8 +334,8 @@ export default function ReviewModal({
             whileHover={{ scale: 1.02, opacity: 0.9 }}
             whileTap={{ scale: 0.98 }}
             onClick={onExportMarkdown}
-            className="px-5 py-2 rounded-lg text-xs font-semibold text-white"
-            style={{ backgroundColor: '#1E2532' }}
+            className="px-5 py-2 rounded-lg text-xs font-medium text-white"
+            style={{ backgroundColor: '#191919' }}
           >
             Save as Markdown
           </motion.button>
@@ -352,12 +352,12 @@ function ToggleChip({ label, active, onClick, disabled }) {
     <motion.button
       whileTap={disabled ? {} : { scale: 0.97 }}
       onClick={disabled ? undefined : onClick}
-      className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
+      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
         disabled
-          ? 'border-[#F0F0F0] text-[#D5D5D5] cursor-not-allowed'
+          ? 'border-[#F1F1EF] text-[#9B9A97] cursor-not-allowed'
           : active
-            ? 'bg-[#4A7AE5]/10 border-[#4A7AE5] text-[#4A7AE5]'
-            : 'bg-white border-[#EBEBEB] text-[#6B7C93] hover:border-[#D5D5D5]'
+            ? 'bg-[#B8A070]/10 border-[#B8A070] text-[#B8A070]'
+            : 'bg-white border-[#E9E9E7] text-[#787774] hover:border-[#9B9A97]'
       }`}
     >
       {label}
@@ -367,9 +367,9 @@ function ToggleChip({ label, active, onClick, disabled }) {
 
 function StatCard({ label, value }) {
   return (
-    <div className="px-3 py-2.5 bg-white border border-[#EBEBEB] rounded-lg">
-      <div className="text-[10px] text-[#6B7C93]">{label}</div>
-      <div className="text-sm font-semibold text-[#1E2532] mt-0.5">{value}</div>
+    <div className="px-3 py-2.5 bg-white border border-[#E9E9E7] rounded-lg">
+      <div className="text-[10px] text-[#787774]">{label}</div>
+      <div className="text-sm font-medium text-[#191919] mt-0.5">{value}</div>
     </div>
   )
 }

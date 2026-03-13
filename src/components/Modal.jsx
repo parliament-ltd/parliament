@@ -22,16 +22,16 @@ export default function Modal({ open, onClose, title, children, footer }) {
             exit={{ opacity: 0, scale: 0.95, y: 8 }}
             transition={SPRING_SMOOTH}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white border border-[#EBEBEB] rounded-xl shadow-2xl shadow-black/10 w-full max-w-md mx-4"
+            className="bg-white border border-[#E9E9E7] rounded-xl shadow-2xl shadow-black/10 w-full max-w-md mx-4"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#EBEBEB]">
-              <h2 className="text-sm font-semibold text-[#1E2532]">{title}</h2>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#E9E9E7]">
+              <h2 className="text-sm font-medium text-[#191919]">{title}</h2>
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={onClose}
-                className="p-1 rounded hover:bg-[#EEEEEE] text-[#6B7C93] hover:text-[#1E2532] transition-colors"
+                className="p-1 rounded hover:bg-[#F1F1EF] text-[#787774] hover:text-[#191919] transition-colors"
               >
                 <X className="w-4 h-4" />
               </motion.button>
@@ -44,7 +44,7 @@ export default function Modal({ open, onClose, title, children, footer }) {
 
             {/* Footer */}
             {footer && (
-              <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-[#EBEBEB]">
+              <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-[#E9E9E7]">
                 {footer}
               </div>
             )}

@@ -110,18 +110,18 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={SPRING_SNAPPY}
-        className="relative z-10 bg-white border border-[#EBEBEB] rounded-xl w-full max-w-xl max-h-[85vh] flex flex-col"
+        className="relative z-10 bg-white border border-[#E9E9E7] rounded-xl w-full max-w-xl max-h-[85vh] flex flex-col"
         style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 pb-4" style={{ borderBottom: '1px solid #F0F0F0' }}>
+        <div className="flex items-center justify-between p-5 pb-4" style={{ borderBottom: '1px solid #F1F1EF' }}>
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(74,122,229,0.1)' }}>
-              <Settings2 className="w-4 h-4 text-[#4A7AE5]" />
+              <Settings2 className="w-4 h-4 text-[#B8A070]" />
             </div>
             <div>
-              <div className="text-sm font-semibold text-[#1E2532]">Collaboration Mode</div>
-              <p className="text-[11px] text-[#6B7C93] mt-0.5">
+              <div className="text-sm font-medium text-[#191919]">Collaboration Mode</div>
+              <p className="text-[11px] text-[#787774] mt-0.5">
                 Shape how Claude responds in this conversation
               </p>
             </div>
@@ -130,20 +130,20 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={onClose}
-            className="p-2 rounded-lg text-[#6B7C93] hover:bg-[#EEEEEE] transition-colors"
+            className="p-2 rounded-lg text-[#787774] hover:bg-[#F1F1EF] transition-colors"
           >
             <X className="w-4 h-4" />
           </motion.button>
         </div>
 
         {/* Body — scrollable */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}>
+        <div className="flex-1 overflow-y-auto p-5 space-y-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}>
 
           {/* Presets */}
           <div>
-            <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
               Presets {localPresets.size > 0 && (
-                <span className="text-[#4A7AE5] normal-case tracking-normal">({localPresets.size} selected)</span>
+                <span className="text-[#B8A070] normal-case tracking-normal">({localPresets.size} selected)</span>
               )}
             </h3>
             <div className="space-y-2">
@@ -157,25 +157,25 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
                     onClick={() => toggleLocalPreset(preset.id)}
                     className="w-full text-left rounded-lg p-4 transition-colors"
                     style={{
-                      border: isActive ? '1.5px solid #4A7AE5' : '1px solid #EBEBEB',
+                      border: isActive ? '1.5px solid #B8A070' : '1px solid #E9E9E7',
                       backgroundColor: isActive ? 'rgba(74,122,229,0.04)' : '#FFFFFF',
                     }}
                   >
                     <div className="flex items-start gap-3">
                       <div
                         className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
-                        style={{ backgroundColor: isActive ? 'rgba(74,122,229,0.1)' : '#F5F5F5' }}
+                        style={{ backgroundColor: isActive ? 'rgba(74,122,229,0.1)' : '#F7F6F3' }}
                       >
-                        <Icon className="w-4 h-4" style={{ color: isActive ? '#4A7AE5' : '#6B7C93' }} />
+                        <Icon className="w-4 h-4" style={{ color: isActive ? '#B8A070' : '#787774' }} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-semibold text-[#1E2532]">{preset.label}</div>
-                        <p className="text-xs text-[#6B7C93] mt-0.5 leading-relaxed">{preset.description}</p>
+                        <div className="text-sm font-medium text-[#191919]">{preset.label}</div>
+                        <p className="text-xs text-[#787774] mt-0.5 leading-relaxed">{preset.description}</p>
                       </div>
                       {/* Active indicator dot */}
                       <div
                         className="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5 transition-colors"
-                        style={{ backgroundColor: isActive ? '#4A7AE5' : '#EBEBEB' }}
+                        style={{ backgroundColor: isActive ? '#B8A070' : '#E9E9E7' }}
                       />
                     </div>
                   </motion.button>
@@ -186,14 +186,14 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
 
           {/* Custom instruction */}
           <div>
-            <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
               Custom Instruction
             </h3>
             <textarea
               value={localCustom}
               onChange={(e) => setLocalCustom(e.target.value)}
               placeholder="Add your own instruction for Claude in this conversation..."
-              className="w-full bg-white rounded-lg px-4 py-3 text-sm text-[#1E2532] resize-none outline-none border border-[#EBEBEB] focus:border-[#4A7AE5] transition-colors placeholder:text-[#D5D5D5]"
+              className="w-full bg-white rounded-lg px-4 py-3 text-sm text-[#191919] resize-none outline-none border border-[#E9E9E7] focus:border-[#B8A070] transition-colors placeholder:text-[#9B9A97]"
               rows={3}
             />
           </div>
@@ -201,15 +201,15 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
           {/* Combined prompt preview */}
           {combinedPrompt && (
             <div>
-              <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
+              <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
                 Combined System Prompt
               </h3>
-              <div className="px-4 py-3 bg-[#FAFAFA] border border-[#F0F0F0] rounded-lg">
-                <p className="text-xs text-[#4A5568] leading-relaxed whitespace-pre-wrap">
+              <div className="px-4 py-3 bg-[#F7F6F3] border border-[#F1F1EF] rounded-lg">
+                <p className="text-xs text-[#37352F] leading-relaxed whitespace-pre-wrap">
                   {combinedPrompt}
                 </p>
               </div>
-              <p className="text-[10px] text-[#D5D5D5] mt-1.5">
+              <p className="text-[10px] text-[#9B9A97] mt-1.5">
                 This will be prepended to every message sent to Claude in this conversation.
               </p>
             </div>
@@ -217,12 +217,12 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-5 pt-4" style={{ borderTop: '1px solid #F0F0F0' }}>
+        <div className="flex items-center justify-between p-5 pt-4" style={{ borderTop: '1px solid #F1F1EF' }}>
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-xs font-semibold text-[#6B7C93] hover:text-[#1E2532] transition-colors"
+            className="px-4 py-2 rounded-lg text-xs font-medium text-[#787774] hover:text-[#191919] transition-colors"
           >
             Cancel
           </motion.button>
@@ -230,9 +230,9 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={handleApply}
-            className="px-5 py-2 rounded-lg text-xs font-semibold text-white transition-opacity"
+            className="px-5 py-2 rounded-lg text-xs font-medium text-white transition-opacity"
             style={{
-              backgroundColor: '#1E2532',
+              backgroundColor: '#191919',
               opacity: hasChanges ? 1 : 0.5,
             }}
           >

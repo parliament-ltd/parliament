@@ -153,7 +153,7 @@ export default function TourTooltip({ steps, onDone }) {
               width: targetRect.width + 10,
               height: targetRect.height + 10,
               borderRadius: 10,
-              border: '2px solid #4A7AE5',
+              border: '2px solid #B8A070',
               boxShadow: '0 0 0 4000px rgba(0,0,0,0.18)',
               zIndex: 199,
             }}
@@ -170,19 +170,19 @@ export default function TourTooltip({ steps, onDone }) {
           exit={{ opacity: 0, y: -4, scale: 0.97 }}
           transition={SPRING_SNAPPY}
           style={cardStyle}
-          className="bg-white border border-[#EBEBEB] rounded-xl shadow-2xl shadow-black/10 p-5"
+          className="bg-white border border-[#E9E9E7] rounded-xl shadow-2xl shadow-black/10 p-5"
         >
           {/* Header */}
           <div className="flex items-start justify-between gap-3 mb-3">
             <div>
-              <span className="text-[10px] font-semibold text-[#6B7C93] uppercase tracking-wider">
+              <span className="text-[10px] font-medium text-[#787774] uppercase tracking-wider">
                 Step {stepIndex + 1} of {steps.length}
               </span>
-              <h3 className="text-sm font-semibold text-[#1E2532] mt-0.5">{step.title}</h3>
+              <h3 className="text-sm font-medium text-[#191919] mt-0.5">{step.title}</h3>
             </div>
             <button
               onClick={onDone}
-              className="p-1 rounded hover:bg-[#EEEEEE] text-[#6B7C93] hover:text-[#1E2532] transition-colors shrink-0"
+              className="p-1 rounded hover:bg-[#F1F1EF] text-[#787774] hover:text-[#191919] transition-colors shrink-0"
               title="Skip tour"
             >
               <X className="w-3.5 h-3.5" />
@@ -190,7 +190,7 @@ export default function TourTooltip({ steps, onDone }) {
           </div>
 
           {/* Description */}
-          <p className="text-xs text-[#4A5568] leading-relaxed">{step.desc}</p>
+          <p className="text-xs text-[#37352F] leading-relaxed">{step.desc}</p>
 
           {/* Progress dots */}
           <div className="flex items-center gap-1.5 mt-4">
@@ -201,7 +201,7 @@ export default function TourTooltip({ steps, onDone }) {
                 style={{
                   width: i === stepIndex ? 16 : 6,
                   height: 6,
-                  backgroundColor: i === stepIndex ? '#4A7AE5' : '#EBEBEB',
+                  backgroundColor: i === stepIndex ? '#B8A070' : '#E9E9E7',
                 }}
               />
             ))}
@@ -214,7 +214,7 @@ export default function TourTooltip({ steps, onDone }) {
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={handlePrev}
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#EBEBEB] bg-white text-[#6B7C93] hover:text-[#1E2532] transition-colors"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#E9E9E7] bg-white text-[#787774] hover:text-[#191919] transition-colors"
               >
                 Back
               </motion.button>
@@ -223,14 +223,14 @@ export default function TourTooltip({ steps, onDone }) {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               onClick={handleNext}
-              className="px-4 py-1.5 rounded-lg text-xs font-semibold text-white"
-              style={{ background: 'linear-gradient(135deg, #4A7AE5, #7C6CD4)' }}
+              className="px-4 py-1.5 rounded-lg text-xs font-medium text-white"
+              style={{ background: 'linear-gradient(135deg, #B8A070, #9C8760)' }}
             >
               {stepIndex === steps.length - 1 ? 'Done' : 'Next'}
             </motion.button>
             <button
               onClick={onDone}
-              className="ml-auto text-[10px] text-[#D5D5D5] hover:text-[#6B7C93] transition-colors"
+              className="ml-auto text-[10px] text-[#9B9A97] hover:text-[#787774] transition-colors"
             >
               Skip tour
             </button>
