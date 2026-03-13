@@ -22,24 +22,24 @@ import {
 } from '../../lib/db'
 import TourTooltip from '../../components/TourTooltip'
 
-// .apollo-md styles are now in src/index.css — no injection needed here
+// .parliament-md styles are now in src/index.css — no injection needed here
 
 const SELECTOR_TOUR_STEPS = [
   {
-    title: 'Welcome to Project Apollo',
-    desc: 'Apollo is a power-user chat interface — currently powered by Claude — that runs entirely in your browser. Your conversations, highlights, and notes are stored locally — nothing leaves your device except API calls to Anthropic.',
+    title: 'Welcome to Parliament',
+    desc: 'Parliament is a power-user chat interface — currently powered by Claude — that runs entirely in your browser. Your conversations, highlights, and notes are stored locally — nothing leaves your device except API calls to Anthropic.',
     target: null,
     placement: 'center',
   },
   {
     title: 'Add your API key first',
-    desc: 'Click the Settings icon to add your Anthropic API key. It\'s encrypted and stored only in this browser — Apollo never stores it on a server.',
+    desc: 'Click the Settings icon to add your Anthropic API key. It\'s encrypted and stored only in this browser — Parliament never stores it on a server.',
     target: '[data-tour="settings-btn"]',
     placement: 'bottom',
   },
   {
     title: 'Create a new chat',
-    desc: 'Click New Chat to start a conversation. Apollo auto-generates titles, summaries, and topic tags for every conversation.',
+    desc: 'Click New Chat to start a conversation. Parliament auto-generates titles, summaries, and topic tags for every conversation.',
     target: '[data-tour="new-chat-btn"]',
     placement: 'bottom',
   },
@@ -441,7 +441,7 @@ function FavoriteCard({ favorite, onRemove, onNavigate }) {
       onClick={() => onNavigate?.(favorite.sourceConversationId || favorite.conversationId)}
     >
       <div
-        className="px-3 pt-3 pb-2 text-xs text-[#191919] leading-relaxed apollo-md"
+        className="px-3 pt-3 pb-2 text-xs text-[#191919] leading-relaxed parliament-md"
         style={{
           display: '-webkit-box',
           WebkitLineClamp: 3,

@@ -1,4 +1,4 @@
-// ─── Apollo Backup Schema Validation ─────────────────────
+// ─── Parliament Backup Schema Validation ─────────────────────
 // Validates imported backup data before writing to IndexedDB.
 // Returns { valid: true } or { valid: false, error: string }.
 
@@ -107,7 +107,7 @@ const VALIDATORS = {
 // ─── Top-level export ────────────────────────────────────
 
 /**
- * Validate a parsed Apollo backup object.
+ * Validate a parsed Parliament backup object.
  * Returns { valid: true } or { valid: false, error: string }.
  */
 export function validateBackup(data) {

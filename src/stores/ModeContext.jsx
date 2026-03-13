@@ -61,7 +61,7 @@ const MODE_CAPABILITIES = {
   },
 }
 
-const LOCAL_STORAGE_KEY = 'apollo-mode'
+const LOCAL_STORAGE_KEY = 'parliament-mode'
 
 function autoDetect() {
   if (typeof window !== 'undefined' && window.innerWidth < 768) return 'swift'

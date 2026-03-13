@@ -60,7 +60,7 @@ function MobileMessageCard({ message, number, isFavorited, hasNote, isSelected, 
         )}
 
         {/* Message content */}
-        <div className={`px-4 py-3 apollo-md text-[14px]`}>
+        <div className={`px-4 py-3 parliament-md text-[14px]`}>
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content || ''}</ReactMarkdown>
         </div>
 
@@ -677,7 +677,7 @@ export default function SwiftChatLayout() {
         {/* Empty state */}
         {visibleMessages.length === 0 && !isStreaming && hiddenCount === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center px-8">
-            <img src="/flight_logo.png" alt="" className="w-12 h-12 mb-4 object-contain" style={{ opacity: 0.22 }} />
+            <img src="/flight_logo.png" alt="" className="w-12 h-12 mb-4 object-contain" style={{ opacity: 0.26 }} />
             <p className="text-sm text-[#787774] mb-1">Start a conversation</p>
             <p className="text-xs text-[#9B9A97]">Type below, or swipe left to start fresh</p>
           </div>

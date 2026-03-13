@@ -1,7 +1,7 @@
 import { openDB } from 'idb'
 import { validateBackup } from './validate'
 
-const DB_NAME = 'project-apollo'
+const DB_NAME = 'parliament'
 const DB_VERSION = 1
 
 let dbInstance = null

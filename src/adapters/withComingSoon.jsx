@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
 
-const STORAGE_KEY_PREFIX = 'apollo_coming_soon_dismissed_'
+const STORAGE_KEY_PREFIX = 'parliament_coming_soon_dismissed_'
 
 /**
  * withComingSoon — wraps any Layout with a dismissible amber banner
