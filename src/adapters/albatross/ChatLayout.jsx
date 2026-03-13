@@ -1095,7 +1095,7 @@ export default function ChatView() {
               transition={SPRING_SNAPPY}
               onClick={() => setRightSidebarCollapsed(false)}
               className="p-3 hover:bg-[#EEEEEE] transition-colors mt-10"
-              style={{ color: getContextColor(contextUsage) }}
+              style={{ color: getContextColor(contextUsage, contextThreshold) }}
               title="Expand sidebar"
             >
               <PanelRight className="w-5 h-5" />
@@ -1121,7 +1121,7 @@ export default function ChatView() {
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setRightSidebarCollapsed(true)}
                     className="p-1 rounded hover:bg-[#EEEEEE] transition-colors"
-                    style={{ color: getContextColor(contextUsage) }}
+                    style={{ color: getContextColor(contextUsage, contextThreshold) }}
                     title="Collapse sidebar"
                   >
                     <PanelRight className="w-5 h-5" />

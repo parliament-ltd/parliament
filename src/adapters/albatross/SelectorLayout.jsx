@@ -541,11 +541,11 @@ function ChatTableRow({
   return (
     <motion.div variants={staggerItem}>
       <motion.div
-        whileHover={{ backgroundColor: '#FAFAFA' }}
+        animate={{ backgroundColor: isSelected ? '#F0F5FF' : '#FFFFFF' }}
+        whileHover={{ backgroundColor: isSelected ? '#F0F5FF' : '#FAFAFA' }}
         transition={{ duration: 0.1 }}
         className="group border-b border-[#F5F5F5]"
         style={{
-          backgroundColor: isSelected ? '#F0F5FF' : undefined,
           opacity: isDeemphasized ? 0.45 : 1,
           transition: 'opacity 0.2s ease',
         }}

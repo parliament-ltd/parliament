@@ -72,3 +72,12 @@
   padding: 0 1px;
   color: inherit;
 }
+
+/* ── Mobile: prevent iOS auto-zoom on input focus ─────────── */
+/* iOS zooms in when focused input font-size < 16px.           */
+/* This rule overrides smaller font sizes on touch devices.    */
+@media (hover: none) and (pointer: coarse) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
