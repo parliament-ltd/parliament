@@ -42,18 +42,18 @@ const SEND_DEBOUNCE_MS = 500
 
 /* ── Branch creation flash keyframes (injected once) ─────── */
 
-const MILESTONE_STYLE_ID = 'apollo-milestone-keyframes'
+const MILESTONE_STYLE_ID = 'parliament-milestone-keyframes'
 if (typeof document !== 'undefined' && !document.getElementById(MILESTONE_STYLE_ID)) {
   const style = document.createElement('style')
   style.id = MILESTONE_STYLE_ID
   style.textContent = `
-    @keyframes apolloBranchFlash {
+    @keyframes parliamentBranchFlash {
       0% { box-shadow: 0 0 0px rgba(196,169,77,0); }
       50% { box-shadow: 0 0 16px rgba(196,169,77,0.35); }
       100% { box-shadow: 0 0 0px rgba(196,169,77,0); }
     }
-    .apollo-branch-flash {
-      animation: apolloBranchFlash 0.8s ease-out;
+    .parliament-branch-flash {
+      animation: parliamentBranchFlash 0.8s ease-out;
     }
   `
   document.head.appendChild(style)
@@ -1847,7 +1847,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
                             ) : previewError ? (
                               <p className="text-[11px] text-[#D9730D] leading-relaxed">{previewError}</p>
                             ) : previewContent ? (
-                              <div className="text-[11px] text-[#37352F] leading-relaxed apollo-md">
+                              <div className="text-[11px] text-[#37352F] leading-relaxed parliament-md">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{previewContent}</ReactMarkdown>
                               </div>
                             ) : null}

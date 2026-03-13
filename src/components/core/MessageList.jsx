@@ -32,7 +32,7 @@ export default function MessageList({
             src="/flight_logo.png"
             alt=""
             className="w-16 h-16 mb-4 object-contain"
-            style={{ opacity: 0.22 }}
+            style={{ opacity: 0.26 }}
           />
           <p className="text-sm text-[#787774] mb-1">Start a conversation</p>
           <p className="text-xs text-[#9B9A97]">Type a message below to begin</p>

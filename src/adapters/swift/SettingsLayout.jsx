@@ -684,7 +684,7 @@ function AboutSection() {
             <MessageSquare className="w-5 h-5 text-[#B8A070]" />
           </motion.div>
           <div>
-            <h3 className="text-sm font-medium text-[#191919]">Project Apollo</h3>
+            <h3 className="text-sm font-medium text-[#191919]">Parliament</h3>
             <p className="text-xs text-[#787774]">Version 0.1.0</p>
           </div>
         </div>
@@ -794,7 +794,7 @@ export default function SwiftSettingsLayout() {
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = `apollo-backup-${Date.now()}.json`
+        a.download = `parliament-backup-${Date.now()}.json`
         a.click()
         URL.revokeObjectURL(url)
       } else {
@@ -804,7 +804,7 @@ export default function SwiftSettingsLayout() {
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = `apollo-backup-${Date.now()}.apb`
+        a.download = `parliament-backup-${Date.now()}.apb`
         a.click()
         URL.revokeObjectURL(url)
       }
@@ -831,7 +831,7 @@ export default function SwiftSettingsLayout() {
       try {
         parsed = JSON.parse(text)
       } catch {
-        throw new Error('Not a valid Apollo backup file.')
+        throw new Error('Not a valid Parliament backup file.')
       }
 
       let data
@@ -848,7 +848,7 @@ export default function SwiftSettingsLayout() {
       }
 
       if (!data || typeof data !== 'object' || !Array.isArray(data.conversations)) {
-        throw new Error('The file does not appear to be a valid Apollo backup.')
+        throw new Error('The file does not appear to be a valid Parliament backup.')
       }
 
       await importData(data)

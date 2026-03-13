@@ -550,7 +550,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `apollo-backup-${new Date().toISOString().slice(0, 10)}.apb`
+      a.download = `parliament-backup-${new Date().toISOString().slice(0, 10)}.apb`
       a.click()
       URL.revokeObjectURL(url)
       setShowExportModal(false)
@@ -571,7 +571,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `apollo-backup-${new Date().toISOString().slice(0, 10)}.json`
+      a.download = `parliament-backup-${new Date().toISOString().slice(0, 10)}.json`
       a.click()
       URL.revokeObjectURL(url)
     } catch {
@@ -593,7 +593,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
       try {
         parsed = JSON.parse(text)
       } catch {
-        throw new Error('The file could not be read. Make sure it is a valid Apollo backup file.')
+        throw new Error('The file could not be read. Make sure it is a valid Parliament backup file.')
       }
 
       let data
@@ -610,7 +610,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
       }
 
       if (!data || typeof data !== 'object' || !data.conversations) {
-        throw new Error('The file does not appear to be a valid Apollo backup.')
+        throw new Error('The file does not appear to be a valid Parliament backup.')
       }
 
       await importData(data)
@@ -1004,7 +1004,7 @@ function AboutSection() {
               <MessageSquare className="w-5 h-5 text-[#B8A070]" />
             </motion.div>
             <div>
-              <h3 className="text-sm font-medium text-[#191919]">Project Apollo</h3>
+              <h3 className="text-sm font-medium text-[#191919]">Parliament</h3>
               <p className="text-xs text-[#787774]">Version 0.1.0</p>
             </div>
           </div>

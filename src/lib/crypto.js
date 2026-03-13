@@ -12,7 +12,7 @@ let keyDB = null
 async function getKeyDB() {
   if (keyDB) return keyDB
 
-  keyDB = await (await import('idb')).openDB('apollo-keystore', 1, {
+  keyDB = await (await import('idb')).openDB('parliament-keystore', 1, {
     upgrade(db) {
       if (!db.objectStoreNames.contains(ENCRYPTION_KEY_STORE)) {
         db.createObjectStore(ENCRYPTION_KEY_STORE, { keyPath: 'id' })
@@ -79,7 +79,7 @@ export async function decryptApiKey(ciphertext, iv) {
 
 // ─── API Key Storage Modes ──────────────────────────────
 
-const STORAGE_KEY = 'apollo-api-key'
+const STORAGE_KEY = 'parliament-api-key'
 
 export async function saveApiKey(apiKey, mode = 'persistent') {
   switch (mode) {

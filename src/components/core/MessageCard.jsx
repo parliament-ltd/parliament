@@ -170,7 +170,7 @@ export default function MessageCard({
     } : {}
 
     return (
-      <div className="apollo-md">
+      <div className="parliament-md">
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={highlightedComponents}>
           {content}
         </ReactMarkdown>

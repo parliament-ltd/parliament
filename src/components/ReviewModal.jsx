@@ -253,7 +253,7 @@ export default function ReviewModal({
             </h3>
             {synthesis ? (
               <div className="px-4 py-3 bg-[#B8A070]/5 border border-[#B8A070]/15 rounded-lg">
-                <div className="text-xs text-[#191919] leading-relaxed apollo-md">
+                <div className="text-xs text-[#191919] leading-relaxed parliament-md">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {synthesis}
                   </ReactMarkdown>
