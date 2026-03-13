@@ -95,14 +95,14 @@ export async function saveApiKey(apiKey, mode = 'persistent') {
       })
       break
     }
-    case 'session': {
-      sessionStorage.setItem(STORAGE_KEY, apiKey)
-      break
-    }
     case 'memory': {
       // Caller is responsible for holding this in React state
       // Nothing to persist
       break
+    }
+    default: {
+      // Treat any unknown mode (including legacy 'session') as persistent
+      return saveApiKey(apiKey, 'persistent')
     }
   }
 }
@@ -124,19 +124,20 @@ export async function loadApiKey(mode = 'persistent') {
         return null
       }
     }
-    case 'session': {
-      return sessionStorage.getItem(STORAGE_KEY) || null
-    }
     case 'memory': {
       return null
+    }
+    default: {
+      // Treat any unknown mode (including legacy 'session') as persistent
+      return loadApiKey('persistent')
     }
   }
 }
 
 export async function deleteApiKey() {
-  // Clear from all possible locations
   const db = await initDB()
   try { await db.delete('settings', STORAGE_KEY) } catch {}
+  // Scrub any legacy session key left from older versions
   try { sessionStorage.removeItem(STORAGE_KEY) } catch {}
 }
 

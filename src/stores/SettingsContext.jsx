@@ -33,6 +33,11 @@ export function SettingsProvider({ children }) {
           loaded[key] = value
         }
       }
+      // Migrate legacy 'session' storage mode — removed for security reasons
+      if (loaded.storageMode === 'session') {
+        loaded.storageMode = 'persistent'
+        await dbSetSetting('storageMode', 'persistent')
+      }
       setSettings(prev => ({ ...prev, ...loaded }))
       setLoaded(true)
     }

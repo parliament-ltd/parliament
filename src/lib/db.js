@@ -1,4 +1,5 @@
 import { openDB } from 'idb'
+import { validateBackup } from './validate'
 
 const DB_NAME = 'project-apollo'
 const DB_VERSION = 1
@@ -413,6 +414,10 @@ export async function exportAllData() {
 }
 
 export async function importData(data) {
+  // Validate before touching IndexedDB
+  const check = validateBackup(data)
+  if (!check.valid) throw new Error(check.error)
+
   const db = await initDB()
   const stores = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings']
   let imported = 0

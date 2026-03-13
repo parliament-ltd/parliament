@@ -13,6 +13,7 @@ export function ChatProvider({ children }) {
   const [streamingContent, setStreamingContent] = useState('')
   const [tokenUsage, setTokenUsage] = useState({ input: 0, output: 0 })
   const [activeConversationId, setActiveConversationId] = useState(null)
+  const [persistError, setPersistError] = useState(null) // 'quota' | null
 
   const { updateConversation } = useConversations()
 
@@ -52,8 +53,11 @@ export function ChatProvider({ children }) {
       if (msgId && content) {
         try {
           await updateMessage(msgId, { content, incomplete: true })
-        } catch {
-          // Fire-and-forget — don't block streaming
+        } catch (err) {
+          // Surface quota errors; swallow others to not block streaming
+          if (err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+            setPersistError('quota')
+          }
         }
       }
     }, PERSIST_INTERVAL)
@@ -333,7 +337,10 @@ export function ChatProvider({ children }) {
     setStreamingContent('')
     setTokenUsage({ input: 0, output: 0 })
     setActiveConversationId(null)
+    setPersistError(null)
   }, [])
+
+  const clearPersistError = useCallback(() => setPersistError(null), [])
 
   return (
     <ChatContext.Provider value={{
@@ -342,6 +349,8 @@ export function ChatProvider({ children }) {
       streamingContent,
       tokenUsage,
       activeConversationId,
+      persistError,
+      clearPersistError,
       loadMessages,
       sendMessage,
       continueMessage,
