@@ -10,11 +10,8 @@ import { useConversations } from '../../stores/ConversationContext'
 import { useSettings } from '../../stores/SettingsContext'
 import {
   getFavorites, deleteFavorite, getHighlights, getNotes,
-  getSetting, setSetting,
 } from '../../lib/db'
 import { SPRING_SNAPPY, SPRING_SMOOTH } from '../../lib/constants'
-import TourTooltip from '../../components/TourTooltip'
-
 const FAMILY_COLORS = ['#4A7AE5', '#22C55E', '#E5A620', '#7C6CD4', '#EF4444', '#06B6D4', '#EC4899', '#F97316']
 
 const VIEWS = [
@@ -22,13 +19,6 @@ const VIEWS = [
   { id: 'notes', icon: StickyNote, label: 'Notes' },
   { id: 'highlights', icon: Highlighter, label: 'Highlights' },
   { id: 'branches', icon: GitBranch, label: 'Branches' },
-]
-
-const SELECTOR_TOUR_STEPS = [
-  { title: 'Welcome to Project Apollo', desc: 'Apollo is a power-user chat interface. Your conversations are stored locally — nothing leaves your device except API calls to Anthropic.', placement: 'center' },
-  { title: 'Add your API key first', desc: 'Tap Settings to add your Anthropic API key. It\'s encrypted and stored only in this browser.', target: '[data-tour="settings-btn"]', placement: 'bottom' },
-  { title: 'Start a conversation', desc: 'Tap the + Chat button to create a new conversation.', target: '[data-tour="new-chat-btn"]', placement: 'bottom' },
-  { title: 'Swipe to select', desc: 'Swipe right on the list to enter selection mode for bulk actions.', placement: 'center' },
 ]
 
 function buildFamilyColorMap(conversations) {
@@ -328,12 +318,10 @@ export default function SwiftSelectorLayout() {
   const [favorites, setFavorites] = useState([])
   const [favSheetOpen, setFavSheetOpen] = useState(false)
   const [rowData, setRowData] = useState({}) // convId → { notes, highlights }
-  const [showTour, setShowTour] = useState(false)
   const touchStartRef = useRef({ x: 0, y: 0, time: 0 })
 
   useEffect(() => {
     getFavorites().then(setFavorites).catch(console.error)
-    getSetting('tourCompleted_selector').then(done => { if (!done) setShowTour(true) })
   }, [])
 
   // Load notes + highlights for visible conversations (lazy, per-view)
@@ -462,8 +450,8 @@ export default function SwiftSelectorLayout() {
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setSearchFocused(true)} onBlur={() => setSearchFocused(false)}
             placeholder="Search chats..."
-            className="w-full bg-[#F8F8F8] rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#1E2532] outline-none placeholder:text-[#D5D5D5] border transition-colors"
-            style={{ borderColor: searchFocused ? '#4A7AE5' : 'transparent' }} />
+            className="w-full bg-[#F8F8F8] rounded-xl pl-9 pr-4 py-2.5 text-[#1E2532] outline-none placeholder:text-[#D5D5D5] border transition-colors"
+            style={{ borderColor: searchFocused ? '#4A7AE5' : 'transparent', fontSize: 16 }} />
           {searchQuery && (
             <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full active:bg-[#EEEEEE]">
               <X className="w-3.5 h-3.5 text-[#C0C8D4]" />
@@ -515,7 +503,7 @@ export default function SwiftSelectorLayout() {
           )}
           {sortedConvs.length === 0 && !searchQuery && (
             <div className="flex flex-col items-center justify-center py-20 px-8">
-              <img src="/logo.png" alt="" className="w-12 h-12 mb-4 object-contain" style={{ opacity: 0.22 }} />
+              <img src="/flight_logo.png" alt="" className="w-12 h-12 mb-4 object-contain" style={{ opacity: 0.22 }} />
               <p className="text-sm text-[#6B7C93] mb-1">No conversations yet</p>
               <p className="text-xs text-[#C0C8D4]">Tap + Chat to start</p>
             </div>
@@ -537,13 +525,7 @@ export default function SwiftSelectorLayout() {
         )}
       </AnimatePresence>
 
-      {/* ── Tour ── */}
-      {showTour && (
-        <TourTooltip
-          steps={SELECTOR_TOUR_STEPS}
-          onDone={async () => { setShowTour(false); await setSetting('tourCompleted_selector', true) }}
-        />
-      )}
+      {/* Tour disabled on mobile — tooltip positioning is unreliable on small screens */}
     </div>
   )
 }

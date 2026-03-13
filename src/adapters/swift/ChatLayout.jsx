@@ -677,7 +677,7 @@ export default function SwiftChatLayout() {
         {/* Empty state */}
         {visibleMessages.length === 0 && !isStreaming && hiddenCount === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center px-8">
-            <img src="/logo.png" alt="" className="w-12 h-12 mb-4 object-contain" style={{ opacity: 0.22 }} />
+            <img src="/flight_logo.png" alt="" className="w-12 h-12 mb-4 object-contain" style={{ opacity: 0.22 }} />
             <p className="text-sm text-[#6B7C93] mb-1">Start a conversation</p>
             <p className="text-xs text-[#D5D5D5]">Type below, or swipe left to start fresh</p>
           </div>
@@ -789,8 +789,8 @@ export default function SwiftChatLayout() {
             onKeyDown={handleKeyDown}
             placeholder="Type here, or swipe left to start fresh."
             rows={1}
-            className="flex-1 bg-white rounded-xl px-4 py-2.5 text-[14px] text-[#1E2532] outline-none placeholder:text-[#D5D5D5] border transition-colors resize-none"
-            style={{ borderColor: '#DDDDE3', maxHeight: 120, minHeight: 40, lineHeight: '20px' }}
+            className="flex-1 bg-white rounded-xl px-4 py-2.5 text-[#1E2532] outline-none placeholder:text-[#D5D5D5] border transition-colors resize-none"
+            style={{ borderColor: '#DDDDE3', maxHeight: 120, minHeight: 40, lineHeight: '20px', fontSize: 16 }}
           />
           <motion.button
             whileTap={{ scale: 0.85 }}
