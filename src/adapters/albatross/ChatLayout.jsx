@@ -112,6 +112,7 @@ export default function ChatView() {
     messages, isStreaming, streamingContent, tokenUsage,
     loadMessages, sendMessage, continueMessage,
     stopGenerating, clearMessages,
+    persistError, clearPersistError,
   } = useChat()
   const { conversations, updateConversation, loadConversations, createConversation } = useConversations()
   const { settings, refreshStorageEstimate } = useSettings()
@@ -911,6 +912,22 @@ export default function ChatView() {
             >
               <AlertCircle className="w-4 h-4 text-[#EF4444] flex-shrink-0" />
               <p className="text-xs text-[#EF4444]">{apiError.message}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Storage quota banner (streaming persist failure) */}
+        <AnimatePresence>
+          {persistError === 'quota' && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="px-6 py-3 bg-[#E5A620]/10 border-b border-[#E5A620]/20 flex items-center gap-2"
+            >
+              <AlertCircle className="w-4 h-4 text-[#E5A620] flex-shrink-0" />
+              <p className="text-xs text-[#E5A620] flex-1">Storage is full — this message may not be saved. Export a backup and delete old conversations to free space.</p>
+              <button onClick={clearPersistError} className="ml-2 text-[#E5A620] hover:text-[#c4891b]"><X className="w-3.5 h-3.5" /></button>
             </motion.div>
           )}
         </AnimatePresence>

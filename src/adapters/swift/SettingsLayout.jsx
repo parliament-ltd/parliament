@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Key, Eye, EyeOff, CheckCircle, AlertCircle, ChevronDown,
   Shield, Cpu, DollarSign, Sliders, Database, Download, Upload, Trash2,
-  Sun, Moon, Info, ExternalLink, Github, HardDrive, Clock,
+  Sun, Moon, Info, ExternalLink, Github, HardDrive,
   ArrowLeft, MessageSquare, X, AlertTriangle, FileJson, RefreshCw, Lock
 } from 'lucide-react'
 import { useSettings } from '../../stores/SettingsContext'
@@ -17,6 +17,19 @@ import { exportAllData, importData, clearAllData } from '../../lib/db'
 const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
 const SPRING_SMOOTH = { type: 'spring', stiffness: 300, damping: 28 }
 
+function passphraseStrength(pw) {
+  if (!pw || pw.length < 8) return null
+  let score = 0
+  if (/[a-z]/.test(pw)) score++
+  if (/[A-Z]/.test(pw)) score++
+  if (/[0-9]/.test(pw)) score++
+  if (/[^a-zA-Z0-9]/.test(pw)) score++
+  if (pw.length >= 12) score++
+  if (score <= 2) return { label: 'Weak', color: '#EF4444' }
+  if (score <= 3) return { label: 'Fair', color: '#E5A620' }
+  return { label: 'Strong', color: '#22C55E' }
+}
+
 const MODELS = [
   { id: 'claude-haiku', name: 'Claude Haiku', description: 'Fast & affordable', inputCost: '$0.25', outputCost: '$1.25', speed: 'Fastest', badge: 'Budget-friendly' },
   { id: 'claude-sonnet', name: 'Claude Sonnet', description: 'Balanced performance', inputCost: '$3.00', outputCost: '$15.00', speed: 'Fast', badge: 'Recommended' },
@@ -25,7 +38,6 @@ const MODELS = [
 
 const STORAGE_MODES = [
   { id: 'persistent', label: 'Remember my key', description: 'Saved in this browser until you delete it', icon: HardDrive },
-  { id: 'session', label: 'Session only', description: 'Cleared when you close the browser', icon: Clock },
   { id: 'memory', label: "Don't save", description: 'Re-enter every time — maximum security', icon: Shield },
 ]
 
@@ -254,7 +266,7 @@ function ApiSection({ apiKey, setApiKey, showKey, setShowKey, keyStatus, setKeyS
         </div>
         <button
           onClick={validateKey}
-          disabled={!apiKey || keyStatus === 'validating'}
+          disabled={!apiKey || keyStatus === 'validating' || validateCooldown}
           className="w-full py-2.5 rounded-xl text-xs font-semibold border border-[#EBEBEB] bg-white text-[#1E2532] active:bg-[#FAFAFA] transition-colors disabled:opacity-40"
         >
           {keyStatus === 'validating' ? (
@@ -702,6 +714,7 @@ export default function SwiftSettingsLayout() {
   const [showKey, setShowKey] = useState(false)
   const [keyStatus, setKeyStatus] = useState(null)
   const [keyError, setKeyError] = useState('')
+  const [validateCooldown, setValidateCooldown] = useState(false)
 
   // Spending limit UI state
   const [spendingLimitDismissed, setSpendingLimitDismissed] = useState(false)
@@ -718,6 +731,7 @@ export default function SwiftSettingsLayout() {
   const [exportStatus, setExportStatus] = useState(null)
   const [importPassphrase, setImportPassphrase] = useState('')
   const [importStatus, setImportStatus] = useState(null)
+  const [importError, setImportError] = useState('')
   const [deleteConfirmText, setDeleteConfirmText] = useState('')
 
   const toggleSection = useCallback((id) => {
@@ -725,8 +739,10 @@ export default function SwiftSettingsLayout() {
   }, [])
 
   const validateKey = useCallback(async () => {
+    if (validateCooldown || keyStatus === 'validating') return
     setKeyStatus('validating')
     setKeyError('')
+    setValidateCooldown(true)
     try {
       const provider = getProvider('anthropic')
       const result = await provider.validateKey(apiKey)
@@ -739,8 +755,10 @@ export default function SwiftSettingsLayout() {
     } catch {
       setKeyStatus('invalid')
       setKeyError('Could not reach the Anthropic API. Please check your connection.')
+    } finally {
+      setTimeout(() => setValidateCooldown(false), 5000)
     }
-  }, [apiKey, settings.storageMode])
+  }, [apiKey, settings.storageMode, validateCooldown, keyStatus])
 
   const handleExport = useCallback(async (plain = false) => {
     setExportStatus('exporting')
@@ -755,8 +773,9 @@ export default function SwiftSettingsLayout() {
         a.click()
         URL.revokeObjectURL(url)
       } else {
-        const encrypted = await encryptExport(data, exportPassphrase)
-        const blob = new Blob([encrypted], { type: 'application/octet-stream' })
+        const jsonString = JSON.stringify(data)
+        const encrypted = await encryptExport(jsonString, exportPassphrase)
+        const blob = new Blob([JSON.stringify(encrypted)], { type: 'application/json' })
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
@@ -773,15 +792,46 @@ export default function SwiftSettingsLayout() {
 
   const handleImport = useCallback(async (file) => {
     if (!file) return
+    setImportError('')
     setImportStatus('importing')
     try {
-      const buffer = await file.arrayBuffer()
-      const data = await decryptImport(buffer, importPassphrase)
+      let text
+      try {
+        text = await file.text()
+      } catch {
+        throw new Error('The file could not be read.')
+      }
+
+      let parsed
+      try {
+        parsed = JSON.parse(text)
+      } catch {
+        throw new Error('Not a valid Apollo backup file.')
+      }
+
+      let data
+      if (parsed.salt && parsed.iv && parsed.ciphertext) {
+        // Encrypted .apb file
+        try {
+          data = await decryptImport(parsed, importPassphrase)
+        } catch {
+          throw new Error('Incorrect passphrase. Please check and try again.')
+        }
+      } else {
+        // Plain .json file
+        data = parsed
+      }
+
+      if (!data || typeof data !== 'object' || !Array.isArray(data.conversations)) {
+        throw new Error('The file does not appear to be a valid Apollo backup.')
+      }
+
       await importData(data)
       setImportStatus('done')
-      setTimeout(() => { setShowImportSheet(false); setImportStatus(null); setImportPassphrase('') }, 1200)
-    } catch {
+      setTimeout(() => { setShowImportSheet(false); setImportStatus(null); setImportPassphrase(''); setImportError('') }, 1200)
+    } catch (err) {
       setImportStatus('error')
+      setImportError(err.message || 'Import failed. Check the file and passphrase.')
     }
   }, [importPassphrase])
 
@@ -897,7 +947,7 @@ export default function SwiftSettingsLayout() {
             title="Export Backup" subtitle="Encrypt and download your data" icon={Download}>
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider block mb-2">Create a passphrase</label>
+                <label className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider block mb-2">Create a passphrase <span className="font-normal normal-case">(min. 8 characters)</span></label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#D5D5D5]" />
                   <input
@@ -908,6 +958,27 @@ export default function SwiftSettingsLayout() {
                     className="w-full bg-white rounded-xl pl-10 pr-4 py-3 text-sm text-[#1E2532] outline-none placeholder:text-[#D5D5D5] border border-[#EBEBEB] focus:border-[#4A7AE5] transition-colors"
                   />
                 </div>
+                {exportPassphrase && (
+                  <div className="mt-1.5 flex items-center gap-2">
+                    {exportPassphrase.length < 8 ? (
+                      <span className="text-xs text-[#EF4444]">Minimum 8 characters</span>
+                    ) : (() => {
+                      const s = passphraseStrength(exportPassphrase)
+                      return s ? (
+                        <>
+                          <div className="flex gap-0.5">
+                            {['Weak', 'Fair', 'Strong'].map((lvl, i) => (
+                              <div key={lvl} className="h-1 w-8 rounded-full" style={{
+                                backgroundColor: ['Weak', 'Fair', 'Strong'].indexOf(s.label) >= i ? s.color : '#EBEBEB'
+                              }} />
+                            ))}
+                          </div>
+                          <span className="text-xs font-semibold" style={{ color: s.color }}>{s.label}</span>
+                        </>
+                      ) : null
+                    })()}
+                  </div>
+                )}
               </div>
               <div>
                 <label className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider block mb-2">Confirm passphrase</label>
@@ -940,7 +1011,7 @@ export default function SwiftSettingsLayout() {
               <div className="flex gap-2 pt-1">
                 <button
                   onClick={() => handleExport(false)}
-                  disabled={!exportPassphrase || exportPassphrase !== exportConfirmPassphrase || exportStatus === 'exporting'}
+                  disabled={!exportPassphrase || exportPassphrase.length < 8 || exportPassphrase !== exportConfirmPassphrase || exportStatus === 'exporting'}
                   className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold bg-[#4A7AE5] text-white active:bg-[#3A6AD5] disabled:opacity-40 transition-colors"
                 >
                   <Lock className="w-3.5 h-3.5" /> Encrypt & Export
@@ -961,7 +1032,7 @@ export default function SwiftSettingsLayout() {
       {/* Import Bottom Sheet */}
       <AnimatePresence>
         {showImportSheet && (
-          <BottomSheet open={showImportSheet} onClose={() => { setShowImportSheet(false); setImportPassphrase(''); setImportStatus(null) }}
+          <BottomSheet open={showImportSheet} onClose={() => { setShowImportSheet(false); setImportPassphrase(''); setImportStatus(null); setImportError('') }}
             title="Import Backup" subtitle="Restore from an encrypted backup" icon={Upload}>
             <div className="space-y-4">
               <label className="flex flex-col items-center justify-center gap-2 py-6 rounded-xl border-2 border-dashed border-[#EBEBEB] text-sm text-[#6B7C93] active:bg-[#FAFAFA] cursor-pointer">
@@ -973,9 +1044,15 @@ export default function SwiftSettingsLayout() {
                   className="hidden"
                   onChange={(e) => {
                     const file = e.target.files?.[0]
-                    if (file && file.name.endsWith('.json')) {
-                      handleImport(file)
+                    if (!file) return
+                    const name = file.name.toLowerCase()
+                    if (!name.endsWith('.apb') && !name.endsWith('.json')) {
+                      setImportError('Invalid file type. Please select a .apb or .json backup file.')
+                      e.target.value = ''
+                      return
                     }
+                    setImportError('')
+                    handleImport(file)
                   }}
                 />
               </label>
@@ -992,9 +1069,9 @@ export default function SwiftSettingsLayout() {
                   />
                 </div>
               </div>
-              {importStatus === 'error' && (
+              {(importStatus === 'error' || importError) && (
                 <p className="text-xs text-[#EF4444] flex items-center gap-1.5">
-                  <AlertCircle className="w-3 h-3" /> Import failed. Wrong passphrase or corrupted file.
+                  <AlertCircle className="w-3 h-3" /> {importError || 'Import failed. Wrong passphrase or corrupted file.'}
                 </p>
               )}
               {importStatus === 'done' && (

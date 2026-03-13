@@ -297,6 +297,7 @@ export default function SwiftChatLayout() {
     messages, isStreaming, streamingContent, tokenUsage,
     loadMessages, sendMessage, continueMessage,
     stopGenerating, clearMessages,
+    persistError, clearPersistError,
   } = useChat()
   const { conversations, updateConversation, loadConversations, createConversation } = useConversations()
   const { settings, refreshStorageEstimate } = useSettings()
@@ -649,6 +650,18 @@ export default function SwiftChatLayout() {
             <AlertCircle className="w-4 h-4 text-[#EF4444] flex-shrink-0" />
             <p className="text-xs text-[#EF4444] flex-1">{apiError.message}</p>
             <button onClick={() => setApiError(null)} className="p-1"><X className="w-3.5 h-3.5 text-[#EF4444]" /></button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Storage Quota Banner ── */}
+      <AnimatePresence>
+        {persistError === 'quota' && (
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+            className="px-5 py-3 bg-[#E5A620]/10 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-[#E5A620] flex-shrink-0" />
+            <p className="text-xs text-[#E5A620] flex-1">Storage full — message may not be saved. Export and delete old chats to free space.</p>
+            <button onClick={clearPersistError} className="p-1"><X className="w-3.5 h-3.5 text-[#E5A620]" /></button>
           </motion.div>
         )}
       </AnimatePresence>

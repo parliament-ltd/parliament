@@ -5,7 +5,7 @@ import {
   Key, Cpu, DollarSign, Sliders, Database, Sun, Shield,
   ArrowLeft, MessageSquare, Github, ExternalLink, Info,
   Download, Upload, Trash2, AlertTriangle, Moon, HardDrive,
-  Clock, Bell, BellOff, CheckCircle, AlertCircle, Lock
+  Bell, BellOff, CheckCircle, AlertCircle, Lock
 } from 'lucide-react'
 import { useSettings } from '../../stores/SettingsContext'
 import { useConversations } from '../../stores/ConversationContext'
@@ -70,7 +70,6 @@ const MODELS = [
 
 const STORAGE_MODES = [
   { id: 'persistent', label: 'Remember my key', description: 'Saved in this browser until you delete it', icon: HardDrive },
-  { id: 'session', label: 'Session only', description: 'Cleared when you close the browser', icon: Clock },
   { id: 'memory', label: "Don't save", description: 'Re-enter every time — maximum security', icon: Shield },
 ]
 
@@ -97,6 +96,7 @@ export default function SettingsView() {
   const [apiKey, setApiKey] = useState('')
   const [keyStatus, setKeyStatus] = useState(null) // null | 'validating' | 'valid' | 'invalid' | 'billing_error'
   const [keyError, setKeyError] = useState('')
+  const [validateCooldown, setValidateCooldown] = useState(false)
 
   // Modal state
   const [showExportModal, setShowExportModal] = useState(false)
@@ -107,8 +107,10 @@ export default function SettingsView() {
   const [importPassphrase, setImportPassphrase] = useState('')
 
   const validateKey = async () => {
+    if (validateCooldown || keyStatus === 'validating') return
     setKeyStatus('validating')
     setKeyError('')
+    setValidateCooldown(true)
     try {
       const provider = getProvider('anthropic')
       const result = await provider.validateKey(apiKey)
@@ -122,6 +124,8 @@ export default function SettingsView() {
     } catch {
       setKeyStatus('invalid')
       setKeyError('Could not reach the Anthropic API. Please check your connection.')
+    } finally {
+      setTimeout(() => setValidateCooldown(false), 5000)
     }
   }
 
@@ -180,7 +184,7 @@ export default function SettingsView() {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto px-10 py-8">
         <AnimatePresence mode="wait">
-          {activeSection === 'api' && <ApiSection key="api" apiKey={apiKey} setApiKey={setApiKey} keyStatus={keyStatus} keyError={keyError} validateKey={validateKey} storageMode={settings.storageMode} setStorageMode={(v) => updateSetting('storageMode', v)} />}
+          {activeSection === 'api' && <ApiSection key="api" apiKey={apiKey} setApiKey={setApiKey} keyStatus={keyStatus} keyError={keyError} validateKey={validateKey} validateCooldown={validateCooldown} storageMode={settings.storageMode} setStorageMode={(v) => updateSetting('storageMode', v)} />}
           {activeSection === 'model' && <ModelSection key="model" selectedModel={settings.defaultModel} setSelectedModel={(v) => updateSetting('defaultModel', v)} />}
           {activeSection === 'usage' && <UsageSection key="usage" budgetAlert={settings.budgetAlert} setBudgetAlert={(v) => updateSetting('budgetAlert', v)} budgetEnabled={settings.budgetEnabled} setBudgetEnabled={(v) => updateSetting('budgetEnabled', v)} spendingLimitDismissed={settings.spendingLimitDismissed} setSpendingLimitDismissed={(v) => updateSetting('spendingLimitDismissed', v)} />}
           {activeSection === 'context' && <ContextSection key="context" summaryDepth={settings.summaryDepth} setSummaryDepth={(v) => updateSetting('summaryDepth', v)} contextThreshold={settings.contextThreshold} setContextThreshold={(v) => updateSetting('contextThreshold', v)} autoCompress={settings.autoCompress} setAutoCompress={(v) => updateSetting('autoCompress', v)} />}
@@ -223,7 +227,7 @@ function StaggerItem({ children }) {
 
 // ─── API Configuration ───────────────────────────────────
 
-function ApiSection({ apiKey, setApiKey, keyStatus, keyError, validateKey, storageMode, setStorageMode }) {
+function ApiSection({ apiKey, setApiKey, keyStatus, keyError, validateKey, validateCooldown, storageMode, setStorageMode }) {
   return (
     <SettingsSection title="API Configuration" subtitle="Connect your Anthropic API key to start chatting">
       <StaggerItem>
@@ -240,7 +244,7 @@ function ApiSection({ apiKey, setApiKey, keyStatus, keyError, validateKey, stora
             />
             <Button
               onClick={validateKey}
-              disabled={!apiKey || keyStatus === 'validating'}
+              disabled={!apiKey || keyStatus === 'validating' || validateCooldown}
             >
               {keyStatus === 'validating' ? 'Checking...' : keyStatus === 'valid' ? 'Valid' : 'Validate'}
             </Button>
@@ -492,6 +496,21 @@ function formatBytes(bytes) {
   return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
 }
 
+// ─── Passphrase Strength ─────────────────────────────────
+
+function passphraseStrength(pw) {
+  if (!pw || pw.length < 8) return null
+  let score = 0
+  if (/[a-z]/.test(pw)) score++
+  if (/[A-Z]/.test(pw)) score++
+  if (/[0-9]/.test(pw)) score++
+  if (/[^a-zA-Z0-9]/.test(pw)) score++
+  if (pw.length >= 12) score++
+  if (score <= 2) return { label: 'Weak', color: '#EF4444' }
+  if (score <= 3) return { label: 'Fair', color: '#E5A620' }
+  return { label: 'Strong', color: '#22C55E' }
+}
+
 // ─── Data & Backups ──────────────────────────────────────
 
 function DataSection({ backupReminder, setBackupReminder, showExportModal, setShowExportModal, showImportModal, setShowImportModal, showDeleteConfirm, setShowDeleteConfirm, exportPassphrase, setExportPassphrase, exportConfirmPassphrase, setExportConfirmPassphrase, importPassphrase, setImportPassphrase, storageUsage, conversations }) {
@@ -716,7 +735,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
               Cancel
             </Button>
             <Button
-              disabled={!exportPassphrase || exportPassphrase !== exportConfirmPassphrase || exportLoading}
+              disabled={!exportPassphrase || exportPassphrase.length < 8 || exportPassphrase !== exportConfirmPassphrase || exportLoading}
               onClick={handleExportEncrypted}
             >
               {exportLoading ? 'Exporting…' : 'Export'}
@@ -724,9 +743,32 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
           </>
         }
       >
-        <p className="text-xs text-[#6B7C93] mb-4">Choose a passphrase to encrypt your backup. You'll need this to import it later.</p>
+        <p className="text-xs text-[#6B7C93] mb-4">Choose a passphrase to encrypt your backup. You'll need this to import it later. Minimum 8 characters.</p>
         <div className="space-y-3">
-          <Input label="Passphrase" value={exportPassphrase} onChange={setExportPassphrase} secret placeholder="Enter a passphrase" />
+          <div>
+            <Input label="Passphrase" value={exportPassphrase} onChange={setExportPassphrase} secret placeholder="Enter a passphrase" />
+            {exportPassphrase && (
+              <div className="mt-1.5 flex items-center gap-2">
+                {exportPassphrase.length < 8 ? (
+                  <span className="text-xs text-[#EF4444]">Minimum 8 characters</span>
+                ) : (() => {
+                  const s = passphraseStrength(exportPassphrase)
+                  return s ? (
+                    <>
+                      <div className="flex gap-0.5">
+                        {['Weak', 'Fair', 'Strong'].map((lvl, i) => (
+                          <div key={lvl} className="h-1 w-8 rounded-full" style={{
+                            backgroundColor: ['Weak', 'Fair', 'Strong'].indexOf(s.label) >= i ? s.color : '#EBEBEB'
+                          }} />
+                        ))}
+                      </div>
+                      <span className="text-xs font-semibold" style={{ color: s.color }}>{s.label}</span>
+                    </>
+                  ) : null
+                })()}
+              </div>
+            )}
+          </div>
           <Input
             label="Confirm Passphrase"
             value={exportConfirmPassphrase}
@@ -771,6 +813,15 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
               accept=".apb,.json"
               onChange={(e) => {
                 const file = e.target.files?.[0] || null
+                if (file) {
+                  const name = file.name.toLowerCase()
+                  if (!name.endsWith('.apb') && !name.endsWith('.json')) {
+                    setImportError('Invalid file type. Please select a .apb or .json backup file.')
+                    setImportFile(null)
+                    e.target.value = ''
+                    return
+                  }
+                }
                 setImportFile(file)
                 setImportError('')
                 setImportFileIsEncrypted(file?.name.endsWith('.apb') ?? false)
