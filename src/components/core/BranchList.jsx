@@ -51,16 +51,16 @@ function BranchItem({ label, messages, active = false, onClick }) {
       onClick={onClick}
       className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
         active
-          ? 'bg-white border border-[#4A7AE5] shadow-sm'
-          : 'bg-white border border-[#F0F0F0] hover:border-[#D5D5D5]'
+          ? 'bg-white border border-[#B8A070] shadow-sm'
+          : 'bg-white border border-[#F1F1EF] hover:border-[#9B9A97]'
       }`}
     >
       <div className="flex items-center gap-2">
-        <GitBranch className={`w-3.5 h-3.5 ${active ? 'text-[#4A7AE5]' : 'text-[#6B7C93]'}`} />
+        <GitBranch className={`w-3.5 h-3.5 ${active ? 'text-[#B8A070]' : 'text-[#787774]'}`} />
         <div className="flex-1 min-w-0">
-          <div className="text-xs font-semibold text-[#1E2532] truncate">{label}</div>
+          <div className="text-xs font-medium text-[#191919] truncate">{label}</div>
           {messages > 0 && (
-            <div className="text-xs text-[#6B7C93]">{messages} messages</div>
+            <div className="text-xs text-[#787774]">{messages} messages</div>
           )}
         </div>
       </div>

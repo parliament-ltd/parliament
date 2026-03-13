@@ -18,7 +18,7 @@ export default function Input({
   return (
     <div className={className}>
       {label && (
-        <label className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider block mb-2">
+        <label className="text-xs font-medium text-[#787774] uppercase tracking-wider block mb-2">
           {label}
         </label>
       )}
@@ -30,9 +30,9 @@ export default function Input({
           placeholder={placeholder}
           disabled={disabled}
           className={`
-            w-full bg-white rounded-lg px-4 py-2.5 text-sm text-[#1E2532] outline-none
-            border transition-colors placeholder:text-[#D5D5D5]
-            ${error ? 'border-[#EF4444] focus:border-[#EF4444]' : 'border-[#EBEBEB] focus:border-[#4A7AE5]'}
+            w-full bg-white rounded-md px-4 py-2.5 text-sm text-[#191919] outline-none
+            border transition-colors placeholder:text-[#9B9A97]
+            ${error ? 'border-[#E03E3E] focus:border-[#E03E3E]' : 'border-[#E9E9E7] focus:border-[#B8A070]'}
             ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
             ${secret ? 'pr-10 font-mono' : ''}
           `}
@@ -42,7 +42,7 @@ export default function Input({
           <button
             type="button"
             onClick={() => setShowSecret(!showSecret)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7C93] hover:text-[#1E2532] transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#787774] hover:text-[#191919] transition-colors"
           >
             {showSecret
               ? <EyeOff className="w-4 h-4" />
@@ -52,7 +52,7 @@ export default function Input({
         )}
       </div>
       {error && (
-        <p className="text-xs text-[#EF4444] mt-1.5">{error}</p>
+        <p className="text-xs text-[#E03E3E] mt-1.5">{error}</p>
       )}
     </div>
   )

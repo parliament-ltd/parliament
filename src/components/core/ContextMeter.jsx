@@ -26,9 +26,9 @@ export default function ContextMeter({
 
   if (displayMode === 'compact') {
     return (
-      <div className="flex items-center gap-1.5 px-2 py-1 rounded-full border border-[#EBEBEB] bg-white">
+      <div className="flex items-center gap-1.5 px-2 py-1 rounded-full border border-[#E9E9E7] bg-white">
         <Activity className="w-3 h-3" style={{ color }} />
-        <span className="text-[10px] font-semibold tabular-nums" style={{ color }}>
+        <span className="text-[10px] font-medium tabular-nums" style={{ color }}>
           {usage}%
         </span>
       </div>
@@ -38,7 +38,7 @@ export default function ContextMeter({
   // displayMode === 'meter'
   return (
     <div className="p-4 pb-6" data-tour="context-health">
-      <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
+      <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
         Context Health
       </h3>
       <div className="space-y-3">
@@ -60,7 +60,7 @@ export default function ContextMeter({
           value={`${usage}%`}
           color={color}
         />
-        <div className="relative w-full h-1.5 bg-[#F0F0F0] rounded-full overflow-hidden">
+        <div className="relative w-full h-1.5 bg-[#F1F1EF] rounded-full overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${usage}%` }}
@@ -69,7 +69,7 @@ export default function ContextMeter({
             style={{ backgroundColor: color }}
           />
           <div
-            className="absolute top-0 bottom-0 w-px bg-[#6B7C93]/30"
+            className="absolute top-0 bottom-0 w-px bg-[#787774]/30"
             style={{ left: `${threshold}%` }}
             title={`Threshold: ${threshold}%`}
           />
@@ -81,7 +81,7 @@ export default function ContextMeter({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...SPRING_GENTLE, delay: 0.5 }}
-          className="mt-4 p-3 bg-white rounded-lg border border-[#EBEBEB]"
+          className="mt-4 p-3 bg-white rounded-lg border border-[#E9E9E7]"
         >
           <div className="flex items-start gap-2">
             <motion.div
@@ -91,10 +91,10 @@ export default function ContextMeter({
               <Activity className="w-4 h-4 mt-0.5" style={{ color }} />
             </motion.div>
             <div>
-              <div className="text-xs font-semibold" style={{ color }}>
+              <div className="text-xs font-medium" style={{ color }}>
                 {usage >= threshold ? 'Context Nearly Full' : 'Approaching Limit'}
               </div>
-              <div className="text-xs text-[#6B7C93] mt-1">
+              <div className="text-xs text-[#787774] mt-1">
                 {usage >= threshold
                   ? 'Branch this conversation to free up context space.'
                   : 'Consider compressing the conversation or starting a new branch.'}
@@ -117,8 +117,8 @@ function MetricRow({ label, value, color }) {
       transition={SPRING_SMOOTH}
       className="flex items-center justify-between text-xs"
     >
-      <span className="text-[#6B7C93]">{label}</span>
-      <span className="font-semibold" style={{ color: color || '#1E2532' }}>
+      <span className="text-[#787774]">{label}</span>
+      <span className="font-medium" style={{ color: color || '#191919' }}>
         {value}
       </span>
     </motion.div>

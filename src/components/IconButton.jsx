@@ -33,8 +33,8 @@ export default function IconButton({
         rounded-lg transition-colors
         ${sizeClasses[size]}
         ${active
-          ? 'bg-[#4A7AE5]/10 text-[#4A7AE5]'
-          : 'text-[#6B7C93] hover:bg-[#EEEEEE] hover:text-[#1E2532]'
+          ? 'bg-[#B8A070]/10 text-[#B8A070]'
+          : 'text-[#787774] hover:bg-[#F1F1EF] hover:text-[#191919]'
         }
         ${className}
       `}

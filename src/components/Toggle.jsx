@@ -11,7 +11,7 @@ export default function Toggle({ enabled, onChange, label, description }) {
       <div
         className={`
           relative flex-shrink-0 w-9 h-5 rounded-full transition-colors mt-0.5
-          ${enabled ? 'bg-[#4A7AE5]' : 'bg-[#EBEBEB]'}
+          ${enabled ? 'bg-[#B8A070]' : 'bg-[#E9E9E7]'}
         `}
       >
         <motion.div
@@ -21,8 +21,8 @@ export default function Toggle({ enabled, onChange, label, description }) {
         />
       </div>
       <div>
-        {label && <span className="text-sm font-semibold text-[#1E2532] block">{label}</span>}
-        {description && <span className="text-xs text-[#6B7C93] block mt-0.5">{description}</span>}
+        {label && <span className="text-sm font-medium text-[#191919] block">{label}</span>}
+        {description && <span className="text-xs text-[#787774] block mt-0.5">{description}</span>}
       </div>
     </button>
   )

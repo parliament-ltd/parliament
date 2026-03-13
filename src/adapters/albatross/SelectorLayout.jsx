@@ -62,11 +62,11 @@ const staggerContainer = { hidden: { opacity: 0 }, show: { opacity: 1, transitio
 const staggerItem = { hidden: { opacity: 0, y: 6 }, show: { opacity: 1, y: 0, transition: SPRING_SMOOTH } }
 
 const FAMILY_COLORS = [
-  '#4A7AE5', // blue
-  '#22C55E', // green
-  '#E5A620', // amber
+  '#B8A070', // blue
+  '#0F7B6C', // green
+  '#D9730D', // amber
   '#7C6CD4', // purple
-  '#EF4444', // red
+  '#E03E3E', // red
   '#06B6D4', // cyan
   '#EC4899', // pink
   '#F97316', // orange
@@ -74,11 +74,11 @@ const FAMILY_COLORS = [
 
 // Dynamic tag colors — assigns a consistent color to any tag string via hash
 const TAG_PALETTE = [
-  '#4A7AE5', // blue
+  '#B8A070', // blue
   '#7C6CD4', // purple
-  '#22C55E', // green
-  '#E5A620', // amber
-  '#EF4444', // red
+  '#0F7B6C', // green
+  '#D9730D', // amber
+  '#E03E3E', // red
   '#06B6D4', // cyan
   '#EC4899', // pink
   '#F97316', // orange
@@ -188,8 +188,8 @@ function StorageWarningBanner({ usagePercent }) {
       transition={SPRING_SMOOTH}
       className={`flex items-center gap-2.5 px-8 py-2.5 text-xs border-b ${
         isCritical
-          ? 'text-[#EF4444] border-[#EF4444]/10'
-          : 'text-[#E5A620] border-[#E5A620]/10'
+          ? 'text-[#E03E3E] border-[#E03E3E]/10'
+          : 'text-[#D9730D] border-[#D9730D]/10'
       }`}
       style={{ backgroundColor: isCritical ? '#FEF2F2' : '#FFFBEB' }}
     >
@@ -223,8 +223,8 @@ function Checkbox({ checked, indeterminate = false, onChange }) {
       onClick={(e) => { e.stopPropagation(); onChange() }}
       className="w-4 h-4 rounded border flex items-center justify-center transition-colors flex-shrink-0"
       style={{
-        borderColor: checked || indeterminate ? '#4A7AE5' : '#D5D5D5',
-        backgroundColor: checked || indeterminate ? '#4A7AE5' : 'transparent',
+        borderColor: checked || indeterminate ? '#B8A070' : '#9B9A97',
+        backgroundColor: checked || indeterminate ? '#B8A070' : 'transparent',
       }}
     >
       {checked && (
@@ -253,7 +253,7 @@ function InlineAction({ icon: Icon, label, onClick, danger = false }) {
         onClick={onClick}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
-        className={`p-1.5 rounded-md transition-colors ${danger ? 'hover:bg-[#EF4444]/5 text-[#6B7C93] hover:text-[#EF4444]' : 'hover:bg-white/60 text-[#6B7C93] hover:text-[#1E2532]'}`}
+        className={`p-1.5 rounded-md transition-colors ${danger ? 'hover:bg-[#E03E3E]/5 text-[#787774] hover:text-[#E03E3E]' : 'hover:bg-white/60 text-[#787774] hover:text-[#191919]'}`}
       >
         <Icon className="w-3.5 h-3.5" />
       </motion.button>
@@ -264,7 +264,7 @@ function InlineAction({ icon: Icon, label, onClick, danger = false }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 4 }}
             transition={{ duration: 0.12 }}
-            className="absolute left-1/2 -translate-x-1/2 top-8 px-2 py-1 bg-[#1E2532] rounded text-[10px] text-white font-medium whitespace-nowrap z-50"
+            className="absolute left-1/2 -translate-x-1/2 top-8 px-2 py-1 bg-[#191919] rounded text-[10px] text-white font-medium whitespace-nowrap z-50"
           >
             {label}
           </motion.div>
@@ -304,7 +304,7 @@ function InlineTitleEditor({ title, onSave, onCancel }) {
       }}
       onBlur={commit}
       onClick={(e) => e.stopPropagation()}
-      className="bg-white rounded px-1.5 py-0.5 text-sm font-semibold text-[#1E2532] outline-none border border-[#4A7AE5] w-full max-w-[320px]"
+      className="bg-white rounded px-1.5 py-0.5 text-sm font-medium text-[#191919] outline-none border border-[#B8A070] w-full max-w-[320px]"
       maxLength={60}
     />
   )
@@ -330,7 +330,7 @@ function InlineNoteEditor({ note = '', onSave, onCancel }) {
           if (e.key === 'Escape') onCancel()
         }}
         placeholder="Add a note..."
-        className="flex-1 bg-white rounded-lg px-3 py-2 text-xs text-[#1E2532] outline-none border border-[#4A7AE5] resize-none leading-relaxed placeholder:text-[#D5D5D5]"
+        className="flex-1 bg-white rounded-lg px-3 py-2 text-xs text-[#191919] outline-none border border-[#B8A070] resize-none leading-relaxed placeholder:text-[#9B9A97]"
         rows={2}
         maxLength={280}
       />
@@ -339,7 +339,7 @@ function InlineNoteEditor({ note = '', onSave, onCancel }) {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => onSave(value.trim())}
-          className="px-2.5 py-1.5 rounded-md text-[10px] font-semibold bg-[#4A7AE5] text-white"
+          className="px-2.5 py-1.5 rounded-md text-[10px] font-medium bg-[#B8A070] text-white"
         >
           Save
         </motion.button>
@@ -347,7 +347,7 @@ function InlineNoteEditor({ note = '', onSave, onCancel }) {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={onCancel}
-          className="px-2.5 py-1.5 rounded-md text-[10px] font-semibold text-[#6B7C93] hover:bg-[#EEEEEE]"
+          className="px-2.5 py-1.5 rounded-md text-[10px] font-medium text-[#787774] hover:bg-[#F1F1EF]"
         >
           Cancel
         </motion.button>
@@ -369,15 +369,15 @@ function ViewToggle({ activeView, onChangeView }) {
   ]
 
   return (
-    <div className="flex items-center bg-[#F5F5F5] rounded-lg p-0.5 gap-0.5">
+    <div className="flex items-center bg-[#F7F6F3] rounded-lg p-0.5 gap-0.5">
       {views.map(({ id, icon: Icon, label }) => {
         const isActive = activeView === id
         return (
           <motion.button
             key={id}
             onClick={() => onChangeView(id)}
-            className={`relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-semibold transition-colors ${
-              isActive ? 'text-[#1E2532]' : 'text-[#9CA7B8] hover:text-[#6B7C93]'
+            className={`relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-colors ${
+              isActive ? 'text-[#191919]' : 'text-[#9CA7B8] hover:text-[#787774]'
             }`}
             whileHover={!isActive ? { backgroundColor: 'rgba(0,0,0,0.03)' } : {}}
           >
@@ -409,8 +409,8 @@ function CountBadge({ icon: Icon, count, isActive, activeColor, onClick }) {
       whileHover={{ scale: 1.08 }}
       whileTap={{ scale: 0.92 }}
       onClick={(e) => { e.stopPropagation(); onClick() }}
-      className={`flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0 font-semibold transition-colors ${
-        isActive ? 'text-white' : 'text-[#9CA7B8] hover:text-[#6B7C93]'
+      className={`flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0 font-medium transition-colors ${
+        isActive ? 'text-white' : 'text-[#9CA7B8] hover:text-[#787774]'
       }`}
       style={isActive ? { backgroundColor: activeColor } : { backgroundColor: 'rgba(0,0,0,0.04)' }}
     >
@@ -437,11 +437,11 @@ function FavoriteCard({ favorite, onRemove, onNavigate }) {
     <motion.div
       variants={staggerItem}
       whileHover={{ borderColor: '#E0E0E0' }}
-      className="group rounded-lg border border-[#EBEBEB] bg-white transition-colors cursor-pointer overflow-hidden"
+      className="group rounded-lg border border-[#E9E9E7] bg-white transition-colors cursor-pointer overflow-hidden"
       onClick={() => onNavigate?.(favorite.sourceConversationId || favorite.conversationId)}
     >
       <div
-        className="px-3 pt-3 pb-2 text-xs text-[#1E2532] leading-relaxed apollo-md"
+        className="px-3 pt-3 pb-2 text-xs text-[#191919] leading-relaxed apollo-md"
         style={{
           display: '-webkit-box',
           WebkitLineClamp: 3,
@@ -454,18 +454,18 @@ function FavoriteCard({ favorite, onRemove, onNavigate }) {
         </ReactMarkdown>
       </div>
       <div className="flex items-center justify-between px-3 pb-2.5">
-        <span className="text-[10px] text-[#6B7C93] truncate flex-1 mr-2">{favorite.source || ''}</span>
+        <span className="text-[10px] text-[#787774] truncate flex-1 mr-2">{favorite.source || ''}</span>
         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
           <motion.button
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.85 }}
             onClick={handleCopy}
-            className="p-1 rounded hover:bg-[#EEEEEE] text-[#6B7C93] hover:text-[#1E2532] transition-colors"
+            className="p-1 rounded hover:bg-[#F1F1EF] text-[#787774] hover:text-[#191919] transition-colors"
           >
             <AnimatePresence mode="wait">
               {copied ? (
                 <motion.div key="check" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }} transition={{ duration: 0.15 }}>
-                  <Check className="w-3 h-3 text-[#22C55E]" />
+                  <Check className="w-3 h-3 text-[#0F7B6C]" />
                 </motion.div>
               ) : (
                 <motion.div key="copy" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }} transition={{ duration: 0.15 }}>
@@ -478,7 +478,7 @@ function FavoriteCard({ favorite, onRemove, onNavigate }) {
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.85 }}
             onClick={(e) => { e.stopPropagation(); onRemove() }}
-            className="p-1 rounded hover:bg-[#EEEEEE] text-[#6B7C93] hover:text-[#EF4444] transition-colors"
+            className="p-1 rounded hover:bg-[#F1F1EF] text-[#787774] hover:text-[#E03E3E] transition-colors"
           >
             <Trash2 className="w-3 h-3" />
           </motion.button>
@@ -542,9 +542,9 @@ function ChatTableRow({
     <motion.div variants={staggerItem}>
       <motion.div
         animate={{ backgroundColor: isSelected ? '#F0F5FF' : '#FFFFFF' }}
-        whileHover={{ backgroundColor: isSelected ? '#F0F5FF' : '#FAFAFA' }}
+        whileHover={{ backgroundColor: isSelected ? '#F0F5FF' : '#F7F6F3' }}
         transition={{ duration: 0.1 }}
-        className="group border-b border-[#F5F5F5]"
+        className="group border-b border-[#F7F6F3]"
         style={{
           opacity: isDeemphasized ? 0.45 : 1,
           transition: 'opacity 0.2s ease',
@@ -570,7 +570,7 @@ function ChatTableRow({
                 </div>
               ) : (
                 <span
-                  className="text-sm font-semibold text-[#1E2532] truncate cursor-pointer hover:text-[#4A7AE5] transition-colors"
+                  className="text-sm font-medium text-[#191919] truncate cursor-pointer hover:text-[#B8A070] transition-colors"
                   onClick={() => onNavigate(chat.id)}
                   onDoubleClick={(e) => { e.stopPropagation(); setEditingTitle(true) }}
                   title="Double-click to rename"
@@ -578,7 +578,7 @@ function ChatTableRow({
                   {chat.title || 'New conversation'}
                 </span>
               )}
-              {chat.pinned && <Pin className="w-3 h-3 text-[#4A7AE5] flex-shrink-0" style={{ fill: '#4A7AE5' }} />}
+              {chat.pinned && <Pin className="w-3 h-3 text-[#B8A070] flex-shrink-0" style={{ fill: '#B8A070' }} />}
 
               {/* Badges: branch count (on parents), notes, highlights */}
               <div className="flex items-center gap-1 ml-1">
@@ -595,14 +595,14 @@ function ChatTableRow({
                   icon={StickyNote}
                   count={noteCount}
                   isActive={effectiveView === 'notes' && rowOverride === 'notes'}
-                  activeColor="#4A7AE5"
+                  activeColor="#B8A070"
                   onClick={() => toggleRowOverride('notes')}
                 />
                 <CountBadge
                   icon={Highlighter}
                   count={highlightCount}
                   isActive={effectiveView === 'highlights' && rowOverride === 'highlights'}
-                  activeColor="#E5A620"
+                  activeColor="#D9730D"
                   onClick={() => toggleRowOverride('highlights')}
                 />
               </div>
@@ -644,7 +644,7 @@ function ChatTableRow({
                 >
                   {notes.map((note) => (
                     <div key={note.id} className="group/note flex items-start gap-2">
-                      <div className="w-1 min-h-[16px] rounded-full flex-shrink-0 mt-0.5 bg-[#4A7AE5]/20" />
+                      <div className="w-1 min-h-[16px] rounded-full flex-shrink-0 mt-0.5 bg-[#B8A070]/20" />
                       <div className="flex-1 min-w-0">
                         {editingNoteId === note.id ? (
                           <InlineNoteEditor
@@ -654,7 +654,7 @@ function ChatTableRow({
                           />
                         ) : (
                           <div className="flex items-start gap-1.5">
-                            <p className="text-[11px] text-[#4A5568] leading-relaxed flex-1">
+                            <p className="text-[11px] text-[#37352F] leading-relaxed flex-1">
                               {note.text}
                               {note.messageRef && (
                                 <span className="text-[#C0C8D4] ml-1.5">(Message {note.messageRef})</span>
@@ -665,7 +665,7 @@ function ChatTableRow({
                                 whileHover={{ scale: 1.15 }}
                                 whileTap={{ scale: 0.85 }}
                                 onClick={() => setEditingNoteId(note.id)}
-                                className="p-0.5 rounded hover:bg-[#EEEEEE] text-[#C0C8D4] hover:text-[#6B7C93] transition-colors"
+                                className="p-0.5 rounded hover:bg-[#F1F1EF] text-[#C0C8D4] hover:text-[#787774] transition-colors"
                               >
                                 <Pencil className="w-2.5 h-2.5" />
                               </motion.button>
@@ -673,7 +673,7 @@ function ChatTableRow({
                                 whileHover={{ scale: 1.15 }}
                                 whileTap={{ scale: 0.85 }}
                                 onClick={() => handleDeleteNote(note.id)}
-                                className="p-0.5 rounded hover:bg-[#EF4444]/5 text-[#C0C8D4] hover:text-[#EF4444] transition-colors"
+                                className="p-0.5 rounded hover:bg-[#E03E3E]/5 text-[#C0C8D4] hover:text-[#E03E3E] transition-colors"
                               >
                                 <Trash2 className="w-2.5 h-2.5" />
                               </motion.button>
@@ -687,7 +687,7 @@ function ChatTableRow({
                   {!addingNote && (
                     <button
                       onClick={() => setAddingNote(true)}
-                      className="text-left px-2.5 py-1.5 rounded-md border border-dashed border-[#EBEBEB] hover:border-[#4A7AE5] text-[10px] text-[#94A0AE] hover:text-[#4A7AE5] transition-all w-full"
+                      className="text-left px-2.5 py-1.5 rounded-md border border-dashed border-[#E9E9E7] hover:border-[#B8A070] text-[10px] text-[#94A0AE] hover:text-[#B8A070] transition-all w-full"
                       style={{ opacity: 0.45 }}
                       onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
                       onMouseLeave={(e) => e.currentTarget.style.opacity = '0.45'}
@@ -719,19 +719,19 @@ function ChatTableRow({
                           <div
                             className="rounded-full"
                             style={{
-                              backgroundColor: hl.color || '#4A7AE5',
+                              backgroundColor: hl.color || '#B8A070',
                               width: 3,
                               minHeight: hl.multiline ? 28 : 12,
                               opacity: hl.multiline ? 1 : 0.6,
                             }}
                           />
                         </div>
-                        <p className="text-[11px] text-[#4A5568] leading-relaxed flex-1">{hl.text}</p>
+                        <p className="text-[11px] text-[#37352F] leading-relaxed flex-1">{hl.text}</p>
                         <motion.button
                           whileHover={{ scale: 1.15 }}
                           whileTap={{ scale: 0.85 }}
                           onClick={() => navigator.clipboard.writeText(hl.text).catch(() => {})}
-                          className="p-0.5 rounded opacity-0 group-hover/hl:opacity-100 hover:bg-[#EEEEEE] text-[#C0C8D4] hover:text-[#6B7C93] transition-all flex-shrink-0 self-start"
+                          className="p-0.5 rounded opacity-0 group-hover/hl:opacity-100 hover:bg-[#F1F1EF] text-[#C0C8D4] hover:text-[#787774] transition-all flex-shrink-0 self-start"
                         >
                           <Copy className="w-2.5 h-2.5" />
                         </motion.button>
@@ -762,7 +762,7 @@ function ChatTableRow({
                       </div>
                       <span className="text-[10px] text-[#9CA7B8]">↳ branched from</span>
                       <button
-                        className="text-[10px] text-[#4A5568] font-semibold hover:text-[#4A7AE5] transition-colors cursor-pointer"
+                        className="text-[10px] text-[#37352F] font-medium hover:text-[#B8A070] transition-colors cursor-pointer"
                         onClick={(e) => { e.stopPropagation(); onNavigate(chat.parentId) }}
                       >
                         {chat.parentTitle || 'Parent conversation'}
@@ -776,7 +776,7 @@ function ChatTableRow({
                       </div>
                       <GitBranch className="w-2.5 h-2.5 text-[#7C6CD4]" />
                       <button
-                        className="text-[11px] text-[#4A5568] font-semibold hover:text-[#4A7AE5] transition-colors cursor-pointer"
+                        className="text-[11px] text-[#37352F] font-medium hover:text-[#B8A070] transition-colors cursor-pointer"
                         onClick={(e) => { e.stopPropagation(); onNavigate(child.id) }}
                       >
                         {child.title}
@@ -801,7 +801,7 @@ function ChatTableRow({
               return (
                 <span
                   key={tag}
-                  className="text-[9px] font-semibold px-2 py-0.5 rounded-full truncate max-w-full text-center"
+                  className="text-[9px] font-medium px-2 py-0.5 rounded-full truncate max-w-full text-center"
                   style={{
                     backgroundColor: `${color}15`,
                     color: color,
@@ -897,7 +897,7 @@ export default function SelectorView() {
           hMap[cid].push({
             id: hl.id,
             text: hl.text,
-            color: hl.color || '#4A7AE5',
+            color: hl.color || '#B8A070',
             multiline: hl.multiline ?? (hl.text && hl.text.length > 80),
           })
         }
@@ -1199,7 +1199,7 @@ export default function SelectorView() {
 
   // ── Render ──
   return (
-    <div className="flex h-screen font-sans overflow-hidden" style={{ backgroundColor: '#FFFFFF', color: '#1E2532' }}>
+    <div className="flex h-screen font-sans overflow-hidden" style={{ backgroundColor: '#FFFFFF', color: '#191919' }}>
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
@@ -1215,9 +1215,9 @@ export default function SelectorView() {
                 animate={{ rotate: [0, -8, 8, 0] }}
                 transition={{ duration: 0.6, delay: 0.6, ease: 'easeInOut' }}
               >
-                <MessageSquare className="w-5 h-5 text-[#4A7AE5]" />
+                <MessageSquare className="w-5 h-5 text-[#B8A070]" />
               </motion.div>
-              <h1 className="text-lg font-semibold text-[#1E2532]">Chats</h1>
+              <h1 className="text-lg font-medium text-[#191919]">Chats</h1>
             </div>
             <div data-tour="view-toggle">
               <ViewToggle activeView={globalView} onChangeView={handleGlobalViewChange} />
@@ -1231,7 +1231,7 @@ export default function SelectorView() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setFavSidebarOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-semibold border border-[#EBEBEB] bg-white text-[#6B7C93] hover:text-[#E5A620] hover:border-[#E5A620]/40 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium border border-[#E9E9E7] bg-white text-[#787774] hover:text-[#D9730D] hover:border-[#D9730D]/40 transition-colors"
               >
                 <Star className="w-3.5 h-3.5" />
                 <span className="text-xs">{favorites.length}</span>
@@ -1240,9 +1240,9 @@ export default function SelectorView() {
             <motion.button
               data-tour="new-chat-btn"
               onClick={handleNewChat}
-              whileHover={{ scale: 1.03, borderColor: '#4A7AE5' }}
+              whileHover={{ scale: 1.03, borderColor: '#B8A070' }}
               whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm border border-[#EBEBEB] bg-white text-[#1E2532] transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm border border-[#E9E9E7] bg-white text-[#191919] transition-colors"
             >
               <Plus className="w-4 h-4" />
               New Chat
@@ -1252,7 +1252,7 @@ export default function SelectorView() {
               onClick={() => navigate('/settings')}
               whileHover={{ scale: 1.1, rotate: 45 }}
               whileTap={{ scale: 0.9 }}
-              className="p-2.5 rounded-lg border border-[#EBEBEB] bg-white text-[#6B7C93] hover:text-[#1E2532] hover:border-[#D5D5D5] transition-colors"
+              className="p-2.5 rounded-lg border border-[#E9E9E7] bg-white text-[#787774] hover:text-[#191919] hover:border-[#9B9A97] transition-colors"
               title="Settings & API"
             >
               <Settings className="w-4 h-4" />
@@ -1271,13 +1271,13 @@ export default function SelectorView() {
           className="px-8 pb-5"
         >
           <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#D5D5D5]" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9B9A97]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search chats, notes, highlights, tags..."
-              className="w-full bg-white rounded-lg pl-10 pr-4 py-2.5 text-sm text-[#1E2532] outline-none placeholder:text-[#D5D5D5] border border-[#EBEBEB] focus:border-[#4A7AE5] transition-colors"
+              className="w-full bg-white rounded-lg pl-10 pr-4 py-2.5 text-sm text-[#191919] outline-none placeholder:text-[#9B9A97] border border-[#E9E9E7] focus:border-[#B8A070] transition-colors"
             />
           </div>
         </motion.div>
@@ -1290,12 +1290,12 @@ export default function SelectorView() {
             transition={{ ...SPRING_SMOOTH, delay: 0.2 }}
             className="flex-1 flex flex-col min-w-0 overflow-hidden"
           >
-            <div className="border border-[#EBEBEB] rounded-xl overflow-hidden flex flex-col flex-1">
+            <div className="border border-[#E9E9E7] rounded-xl overflow-hidden flex flex-col flex-1">
               {/* Table Header */}
               <motion.div
-                animate={{ backgroundColor: someSelected ? '#F0F5FF' : '#FAFAFA' }}
+                animate={{ backgroundColor: someSelected ? '#F0F5FF' : '#F7F6F3' }}
                 transition={{ duration: 0.2 }}
-                className="flex items-center border-b border-[#EBEBEB] px-2"
+                className="flex items-center border-b border-[#E9E9E7] px-2"
                 style={{ minHeight: 40 }}
               >
                 <div className="w-8 flex-shrink-0 flex items-center justify-center">
@@ -1312,10 +1312,10 @@ export default function SelectorView() {
                       transition={SPRING_SNAPPY}
                       className="flex-1 flex items-center gap-1 px-1"
                     >
-                      <span className="text-[11px] font-semibold text-[#4A7AE5]">
+                      <span className="text-[11px] font-medium text-[#B8A070]">
                         {selected.size} selected
                         {selectedSizeTotal > 0 && (
-                          <span className="text-[#6B7C93] font-normal"> — {formatBytes(selectedSizeTotal)}</span>
+                          <span className="text-[#787774] font-normal"> — {formatBytes(selectedSizeTotal)}</span>
                         )}
                       </span>
                       <div className="flex items-center gap-0.5 ml-3">
@@ -1328,7 +1328,7 @@ export default function SelectorView() {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => setSelected(new Set())}
-                          className="px-2.5 py-1 rounded-md text-[11px] font-semibold text-[#6B7C93] hover:text-[#1E2532] hover:bg-white/60 transition-colors"
+                          className="px-2.5 py-1 rounded-md text-[11px] font-medium text-[#787774] hover:text-[#191919] hover:bg-white/60 transition-colors"
                         >
                           Clear
                         </motion.button>
@@ -1337,27 +1337,27 @@ export default function SelectorView() {
                   ) : (
                     <motion.div key="headers" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex items-center">
                       <div className="flex-1 min-w-0 px-2">
-                        <span className="text-[11px] font-semibold text-[#94A0AE] uppercase tracking-wider">Title</span>
+                        <span className="text-[11px] font-medium text-[#94A0AE] uppercase tracking-wider">Title</span>
                       </div>
 
                       <div className="w-36 flex-shrink-0 px-2 text-center">
-                        <span className="text-[11px] font-semibold text-[#94A0AE] uppercase tracking-wider">Topics</span>
+                        <span className="text-[11px] font-medium text-[#94A0AE] uppercase tracking-wider">Topics</span>
                       </div>
 
                       <button onClick={() => handleSort('updatedAt')} className="w-24 flex-shrink-0 px-2 flex items-center justify-center gap-1 group cursor-pointer">
-                        <span className={`text-[11px] font-semibold uppercase tracking-wider transition-colors ${sortField === 'updatedAt' ? 'text-[#4A7AE5]' : 'text-[#94A0AE] group-hover:text-[#6B7C93]'}`}>Edited</span>
+                        <span className={`text-[11px] font-medium uppercase tracking-wider transition-colors ${sortField === 'updatedAt' ? 'text-[#B8A070]' : 'text-[#94A0AE] group-hover:text-[#787774]'}`}>Edited</span>
                         {sortField === 'updatedAt' && (
                           <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={SPRING_SNAPPY}>
-                            {sortDir === 'desc' ? <ArrowDown className="w-3 h-3 text-[#4A7AE5]" /> : <ArrowUp className="w-3 h-3 text-[#4A7AE5]" />}
+                            {sortDir === 'desc' ? <ArrowDown className="w-3 h-3 text-[#B8A070]" /> : <ArrowUp className="w-3 h-3 text-[#B8A070]" />}
                           </motion.div>
                         )}
                       </button>
 
                       <button onClick={() => handleSort('createdAt')} className="w-24 flex-shrink-0 px-2 flex items-center justify-center gap-1 group cursor-pointer">
-                        <span className={`text-[11px] font-semibold uppercase tracking-wider transition-colors ${sortField === 'createdAt' ? 'text-[#4A7AE5]' : 'text-[#94A0AE] group-hover:text-[#6B7C93]'}`}>Created</span>
+                        <span className={`text-[11px] font-medium uppercase tracking-wider transition-colors ${sortField === 'createdAt' ? 'text-[#B8A070]' : 'text-[#94A0AE] group-hover:text-[#787774]'}`}>Created</span>
                         {sortField === 'createdAt' && (
                           <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={SPRING_SNAPPY}>
-                            {sortDir === 'desc' ? <ArrowDown className="w-3 h-3 text-[#4A7AE5]" /> : <ArrowUp className="w-3 h-3 text-[#4A7AE5]" />}
+                            {sortDir === 'desc' ? <ArrowDown className="w-3 h-3 text-[#B8A070]" /> : <ArrowUp className="w-3 h-3 text-[#B8A070]" />}
                           </motion.div>
                         )}
                       </button>
@@ -1367,7 +1367,7 @@ export default function SelectorView() {
               </motion.div>
 
               {/* Table Body */}
-              <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}>
+              <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}>
                 <motion.div variants={staggerContainer} initial={false} animate="show">
                   {sortedChats.map((chat) => (
                     <ChatTableRow
@@ -1389,20 +1389,20 @@ export default function SelectorView() {
                 </motion.div>
                 {sortedChats.length === 0 && searchQuery && (
                   <div className="flex flex-col items-center justify-center py-16 px-4">
-                    <Search className="w-8 h-8 text-[#EBEBEB] mb-3" />
-                    <p className="text-sm text-[#6B7C93]">No chats matching "{searchQuery}"</p>
+                    <Search className="w-8 h-8 text-[#E9E9E7] mb-3" />
+                    <p className="text-sm text-[#787774]">No chats matching "{searchQuery}"</p>
                   </div>
                 )}
                 {sortedChats.length === 0 && !searchQuery && (
                   <div className="flex flex-col items-center justify-center py-16 px-4">
-                    <MessageSquare className="w-8 h-8 text-[#EBEBEB] mb-3" />
-                    <p className="text-sm text-[#6B7C93] mb-1">No conversations yet</p>
-                    <p className="text-xs text-[#6B7C93] mb-4">Start your first conversation with Claude</p>
+                    <MessageSquare className="w-8 h-8 text-[#E9E9E7] mb-3" />
+                    <p className="text-sm text-[#787774] mb-1">No conversations yet</p>
+                    <p className="text-xs text-[#787774] mb-4">Start your first conversation with Claude</p>
                     <motion.button
                       onClick={handleNewChat}
-                      whileHover={{ scale: 1.03, borderColor: '#4A7AE5' }}
+                      whileHover={{ scale: 1.03, borderColor: '#B8A070' }}
                       whileTap={{ scale: 0.97 }}
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm border border-[#EBEBEB] bg-white text-[#1E2532] transition-colors"
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm border border-[#E9E9E7] bg-white text-[#191919] transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       New Chat
@@ -1412,7 +1412,7 @@ export default function SelectorView() {
               </div>
 
               {/* Footer — simplified */}
-              <div className="flex items-center justify-between px-4 py-2 border-t border-[#EBEBEB] bg-[#FAFAFA]">
+              <div className="flex items-center justify-between px-4 py-2 border-t border-[#E9E9E7] bg-[#F7F6F3]">
                 <span className="text-[11px] text-[#94A0AE]">
                   {hydratedConversations.length} conversation{hydratedConversations.length !== 1 ? 's' : ''}
                 </span>
@@ -1430,7 +1430,7 @@ export default function SelectorView() {
         animate={{ width: favSidebarOpen ? 300 : 0 }}
         transition={SIDEBAR_RESIZE}
         className="flex-shrink-0 overflow-hidden"
-        style={{ borderLeft: favSidebarOpen ? '1px solid #F0F0F0' : 'none' }}
+        style={{ borderLeft: favSidebarOpen ? '1px solid #F1F1EF' : 'none' }}
       >
         <AnimatePresence>
           {favSidebarOpen && (
@@ -1444,15 +1444,15 @@ export default function SelectorView() {
               {/* Sidebar Header */}
               <div className="flex items-center justify-between px-4" style={{ paddingTop: '2.25rem', paddingBottom: '1rem' }}>
                 <div className="flex items-center gap-2">
-                  <Star className="w-3.5 h-3.5 text-[#E5A620]" style={{ fill: '#E5A620' }} />
-                  <span className="text-sm font-semibold text-[#1E2532]">Favorites</span>
+                  <Star className="w-3.5 h-3.5 text-[#D9730D]" style={{ fill: '#D9730D' }} />
+                  <span className="text-sm font-medium text-[#191919]">Favorites</span>
                   <span className="text-xs text-[#94A0AE]">{favorites.length}</span>
                 </div>
                 <motion.button
                   whileHover={{ scale: 1.15 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setFavSidebarOpen(false)}
-                  className="p-1.5 rounded hover:bg-[#EEEEEE] text-[#6B7C93] hover:text-[#1E2532] transition-colors"
+                  className="p-1.5 rounded hover:bg-[#F1F1EF] text-[#787774] hover:text-[#191919] transition-colors"
                   title="Collapse"
                 >
                   <PanelRight className="w-4 h-4" />
@@ -1460,11 +1460,11 @@ export default function SelectorView() {
               </div>
 
               {/* Favorites List */}
-              <div className="flex-1 overflow-y-auto px-3 pb-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}>
+              <div className="flex-1 overflow-y-auto px-3 pb-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}>
                 {favorites.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full px-4">
-                    <Star className="w-8 h-8 text-[#EBEBEB] mb-3" />
-                    <p className="text-xs text-[#6B7C93] text-center leading-relaxed">
+                    <Star className="w-8 h-8 text-[#E9E9E7] mb-3" />
+                    <p className="text-xs text-[#787774] text-center leading-relaxed">
                       Star messages in conversations to save them here for quick access
                     </p>
                   </div>

@@ -810,7 +810,7 @@ export default function ChatView() {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center font-sans text-[#6B7C93]">
+      <div className="h-screen flex items-center justify-center font-sans text-[#787774]">
         <p className="text-sm">Loading conversation...</p>
       </div>
     )
@@ -819,7 +819,7 @@ export default function ChatView() {
   /* ── Render ────────────────────────────────────────────── */
 
   return (
-    <div className="flex h-screen text-[#1E2532] font-sans overflow-hidden relative bg-white">
+    <div className="flex h-screen text-[#191919] font-sans overflow-hidden relative bg-white">
 
       {/* ═══ Left Sidebar ═══ */}
       <motion.div
@@ -827,7 +827,7 @@ export default function ChatView() {
         animate={{ x: 0 }}
         transition={SPRING_SMOOTH}
         className="w-72 flex flex-col flex-shrink-0"
-        style={{ borderRight: '1px solid #F0F0F0' }}
+        style={{ borderRight: '1px solid #F1F1EF' }}
       >
         <div className="p-4">
           <motion.div
@@ -841,7 +841,7 @@ export default function ChatView() {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => navigate('/')}
-                className="text-[#4A7AE5] hover:text-[#3A6AD4] transition-colors p-1.5 rounded hover:bg-[#EEEEEE]"
+                className="text-[#B8A070] hover:text-[#3A6AD4] transition-colors p-1.5 rounded hover:bg-[#F1F1EF]"
                 title="Back to Chats"
               >
                 <MessageSquare className="w-5 h-5" />
@@ -850,18 +850,18 @@ export default function ChatView() {
           </motion.div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 pt-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}>
+        <div className="flex-1 overflow-y-auto px-4 pt-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}>
           <motion.div
             variants={staggerContainer}
             initial={false}
             animate="show"
             className="space-y-1"
           >
-            <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-2">
+            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-2">
               Contents
             </h3>
             {tocItems.length === 0 ? (
-              <p className="text-xs text-[#D5D5D5] px-3 py-2">
+              <p className="text-xs text-[#9B9A97] px-3 py-2">
                 Messages will appear here
               </p>
             ) : (
@@ -886,7 +886,7 @@ export default function ChatView() {
             animate="show"
             className="space-y-1"
           >
-            <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-2">
+            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-2">
               Actions
             </h3>
             <ActionButton icon={Settings2} onClick={() => setShowCollabModal(true)} badge={activePresets.size > 0 ? activePresets.size : null}>Collaboration Mode</ActionButton>
@@ -908,10 +908,10 @@ export default function ChatView() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="px-6 py-3 bg-[#EF4444]/10 border-b border-[#EF4444]/20 flex items-center gap-2"
+              className="px-6 py-3 bg-[#E03E3E]/10 border-b border-[#E03E3E]/20 flex items-center gap-2"
             >
-              <AlertCircle className="w-4 h-4 text-[#EF4444] flex-shrink-0" />
-              <p className="text-xs text-[#EF4444]">{apiError.message}</p>
+              <AlertCircle className="w-4 h-4 text-[#E03E3E] flex-shrink-0" />
+              <p className="text-xs text-[#E03E3E]">{apiError.message}</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -923,11 +923,11 @@ export default function ChatView() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="px-6 py-3 bg-[#E5A620]/10 border-b border-[#E5A620]/20 flex items-center gap-2"
+              className="px-6 py-3 bg-[#D9730D]/10 border-b border-[#D9730D]/20 flex items-center gap-2"
             >
-              <AlertCircle className="w-4 h-4 text-[#E5A620] flex-shrink-0" />
-              <p className="text-xs text-[#E5A620] flex-1">Storage is full — this message may not be saved. Export a backup and delete old conversations to free space.</p>
-              <button onClick={clearPersistError} className="ml-2 text-[#E5A620] hover:text-[#c4891b]"><X className="w-3.5 h-3.5" /></button>
+              <AlertCircle className="w-4 h-4 text-[#D9730D] flex-shrink-0" />
+              <p className="text-xs text-[#D9730D] flex-1">Storage is full — this message may not be saved. Export a backup and delete old conversations to free space.</p>
+              <button onClick={clearPersistError} className="ml-2 text-[#D9730D] hover:text-[#c4891b]"><X className="w-3.5 h-3.5" /></button>
             </motion.div>
           )}
         </AnimatePresence>
@@ -988,7 +988,7 @@ export default function ChatView() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="px-6 py-1.5"
             >
-              <p className="text-xs text-[#E5A620]">{apiError.message}</p>
+              <p className="text-xs text-[#D9730D]">{apiError.message}</p>
             </motion.div>
           )}
           {apiError?.type === 'generic' && (
@@ -996,7 +996,7 @@ export default function ChatView() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="px-6 py-1.5"
             >
-              <p className="text-xs text-[#EF4444]">{apiError.message}</p>
+              <p className="text-xs text-[#E03E3E]">{apiError.message}</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -1009,16 +1009,16 @@ export default function ChatView() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
               transition={SPRING_SNAPPY}
-              className="mx-4 mb-2 px-4 py-3 rounded-xl border border-[#EBEBEB] bg-white shadow-sm flex items-center justify-between gap-3"
+              className="mx-4 mb-2 px-4 py-3 rounded-lg border border-[#E9E9E7] bg-white shadow-sm flex items-center justify-between gap-3"
             >
-              <span className="text-xs text-[#4A5568]">
+              <span className="text-xs text-[#37352F]">
                 {pendingDeletes.length === 1 ? 'Message deleted' : `${pendingDeletes.length} messages deleted`}
               </span>
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => handleUndoDelete(pendingDeletes[pendingDeletes.length - 1].msgId)}
-                className="text-xs font-semibold text-[#4A7AE5] hover:text-[#3A6AD4] transition-colors shrink-0"
+                className="text-xs font-medium text-[#B8A070] hover:text-[#3A6AD4] transition-colors shrink-0"
               >
                 Undo
               </motion.button>
@@ -1037,29 +1037,29 @@ export default function ChatView() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
               transition={SPRING_SNAPPY}
-              className="mx-4 mb-2 px-4 py-3 rounded-xl border border-[#E5A620]/40 bg-[#E5A620]/5 flex items-center gap-3"
+              className="mx-4 mb-2 px-4 py-3 rounded-lg border border-[#D9730D]/40 bg-[#D9730D]/5 flex items-center gap-3"
             >
-              <Activity className="w-4 h-4 text-[#E5A620] shrink-0" />
+              <Activity className="w-4 h-4 text-[#D9730D] shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-[#1E2532]">
+                <p className="text-xs font-medium text-[#191919]">
                   Context window is {contextUsage}% full
                 </p>
-                <p className="text-xs text-[#6B7C93] mt-0.5">
+                <p className="text-xs text-[#787774] mt-0.5">
                   Branch this conversation to continue with a fresh context window.
                 </p>
               </div>
               <motion.button
-                whileHover={{ scale: 1.03, borderColor: '#4A7AE5' }}
+                whileHover={{ scale: 1.03, borderColor: '#B8A070' }}
                 whileTap={{ scale: 0.97 }}
                 onClick={handleCompressContext}
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#EBEBEB] bg-white text-[#1E2532] shrink-0 flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#E9E9E7] bg-white text-[#191919] shrink-0 flex items-center gap-1.5"
               >
                 <GitBranch className="w-3 h-3" />
                 Branch now
               </motion.button>
               <button
                 onClick={() => setCompressBannerDismissed(true)}
-                className="text-[#6B7C93] hover:text-[#1E2532] transition-colors shrink-0"
+                className="text-[#787774] hover:text-[#191919] transition-colors shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1083,7 +1083,7 @@ export default function ChatView() {
         animate={{ width: rightSidebarCollapsed ? 48 : 320 }}
         transition={SIDEBAR_RESIZE}
         className="flex flex-col relative overflow-hidden flex-shrink-0"
-        style={{ borderLeft: '1px solid #F0F0F0' }}
+        style={{ borderLeft: '1px solid #F1F1EF' }}
       >
         <AnimatePresence mode="wait">
           {rightSidebarCollapsed ? (
@@ -1094,7 +1094,7 @@ export default function ChatView() {
               exit={{ opacity: 0 }}
               transition={SPRING_SNAPPY}
               onClick={() => setRightSidebarCollapsed(false)}
-              className="p-3 hover:bg-[#EEEEEE] transition-colors mt-10"
+              className="p-3 hover:bg-[#F1F1EF] transition-colors mt-10"
               style={{ color: getContextColor(contextUsage, contextThreshold) }}
               title="Expand sidebar"
             >
@@ -1108,26 +1108,26 @@ export default function ChatView() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3, delay: 0.1 }}
               className="flex flex-col flex-1 pt-10 overflow-y-auto"
-              style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}
+              style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}
             >
               {/* Highlights Section */}
               <div className="p-4 pb-6">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider">
+                  <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider">
                     Highlights
                   </h3>
                   <motion.button
                     whileHover={{ scale: 1.15 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setRightSidebarCollapsed(true)}
-                    className="p-1 rounded hover:bg-[#EEEEEE] transition-colors"
+                    className="p-1 rounded hover:bg-[#F1F1EF] transition-colors"
                     style={{ color: getContextColor(contextUsage, contextThreshold) }}
                     title="Collapse sidebar"
                   >
                     <PanelRight className="w-5 h-5" />
                   </motion.button>
                 </div>
-                <p className="text-xs text-[#6B7C93] mb-3">
+                <p className="text-xs text-[#787774] mb-3">
                   Navigate through highlighted terms
                 </p>
                 <HighlightList
@@ -1140,7 +1140,7 @@ export default function ChatView() {
 
               {/* Favorites Section — dusty gold star treatment */}
               <div className="p-4 pb-6">
-                <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
+                <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
                   Favorites {favoritedMessages.length > 0 && (
                     <span style={{ color: DUSTY_GOLD }} className="normal-case tracking-normal">
                       ({favoritedMessages.length})
@@ -1148,7 +1148,7 @@ export default function ChatView() {
                   )}
                 </h3>
                 {favoritedMessages.length === 0 ? (
-                  <p className="text-xs text-[#D5D5D5]">
+                  <p className="text-xs text-[#9B9A97]">
                     Star a message to save it here
                   </p>
                 ) : (
@@ -1161,10 +1161,10 @@ export default function ChatView() {
                         onClick={() => {
                           document.getElementById(`msg-${msg.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
                         }}
-                        className="w-full text-left px-3 py-2 bg-white border border-[#F0F0F0] rounded-lg group/fav transition-colors"
+                        className="w-full text-left px-3 py-2 bg-white border border-[#F1F1EF] rounded-lg group/fav transition-colors"
                         style={{ '--hover-border': DUSTY_GOLD + '66' }}
                         onMouseEnter={(e) => e.currentTarget.style.borderColor = DUSTY_GOLD + '66'}
-                        onMouseLeave={(e) => e.currentTarget.style.borderColor = '#F0F0F0'}
+                        onMouseLeave={(e) => e.currentTarget.style.borderColor = '#F1F1EF'}
                       >
                         <div className="flex items-start gap-2">
                           {/* Dusty gold star with warm shadow and soft corners */}
@@ -1178,10 +1178,10 @@ export default function ChatView() {
                             }}
                           />
                           <div className="flex-1 min-w-0">
-                            <div className="text-[10px] text-[#6B7C93] mb-0.5">
+                            <div className="text-[10px] text-[#787774] mb-0.5">
                               {msg.role === 'user' ? 'You' : 'Claude'}
                             </div>
-                            <p className="text-xs text-[#1E2532] truncate">
+                            <p className="text-xs text-[#191919] truncate">
                               {msg.content.slice(0, 80)}{msg.content.length > 80 ? '...' : ''}
                             </p>
                           </div>
@@ -1192,7 +1192,7 @@ export default function ChatView() {
                               e.stopPropagation()
                               toggleFav(msg.id)
                             }}
-                            className="p-1 rounded opacity-0 group-hover/fav:opacity-100 hover:bg-[#EEEEEE] text-[#6B7C93] hover:text-[#EF4444] transition-all"
+                            className="p-1 rounded opacity-0 group-hover/fav:opacity-100 hover:bg-[#F1F1EF] text-[#787774] hover:text-[#E03E3E] transition-all"
                             title="Remove from favorites"
                           >
                             <X className="w-3 h-3" />
@@ -1217,7 +1217,7 @@ export default function ChatView() {
 
               {/* Branches Section */}
               <div className="flex-1 p-4 overflow-y-auto">
-                <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3">
+                <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
                   Branches {branches.length > 0 && (
                     <span className="text-[#7C6CD4] normal-case tracking-normal">
                       ({branches.length})
@@ -1393,7 +1393,7 @@ function SidebarIconButton({ children, title, onClick }) {
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
       onClick={onClick}
-      className="text-[#6B7C93] hover:text-[#1E2532] transition-colors p-1.5 rounded hover:bg-[#EEEEEE]"
+      className="text-[#787774] hover:text-[#191919] transition-colors p-1.5 rounded hover:bg-[#F1F1EF]"
       title={title}
     >
       {children}
@@ -1410,7 +1410,7 @@ function NavItem({ children, active = false, indent = false, onClick }) {
       onClick={onClick}
       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors truncate ${
         indent ? 'pl-8' : ''
-      } ${active ? 'text-[#1E2532] font-semibold' : 'text-[#6B7C93] hover:text-[#1E2532]'}`}
+      } ${active ? 'text-[#191919] font-medium' : 'text-[#787774] hover:text-[#191919]'}`}
     >
       {children}
     </motion.button>
@@ -1424,12 +1424,12 @@ function ActionButton({ icon: Icon, children, onClick, badge = null }) {
       whileHover={interactiveHover}
       whileTap={interactiveTap}
       onClick={onClick}
-      className="w-full text-left px-3 py-2 rounded-lg text-sm text-[#4A5568] hover:bg-white hover:text-[#4A7AE5] transition-colors flex items-center gap-2"
+      className="w-full text-left px-3 py-2 rounded-lg text-sm text-[#37352F] hover:bg-white hover:text-[#B8A070] transition-colors flex items-center gap-2"
     >
       <Icon className="w-4 h-4 flex-shrink-0" />
       <span className="truncate flex-1">{children}</span>
       {badge !== null && (
-        <span className="w-4 h-4 rounded-full bg-[#4A7AE5]/15 text-[#4A7AE5] text-[10px] font-bold flex items-center justify-center flex-shrink-0">
+        <span className="w-4 h-4 rounded-full bg-[#B8A070]/15 text-[#B8A070] text-[10px] font-bold flex items-center justify-center flex-shrink-0">
           {badge}
         </span>
       )}
@@ -1475,12 +1475,12 @@ function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.96, opacity: 0, y: -8 }}
         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-        className="relative z-10 bg-white border border-[#EBEBEB] rounded-xl w-full max-w-[480px] overflow-hidden"
+        className="relative z-10 bg-white border border-[#E9E9E7] rounded-xl w-full max-w-[480px] overflow-hidden"
         style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
       >
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 py-3.5" style={{ borderBottom: '1px solid #F0F0F0' }}>
-          <Search className="w-4 h-4 text-[#D5D5D5] flex-shrink-0" />
+        <div className="flex items-center gap-3 px-4 py-3.5" style={{ borderBottom: '1px solid #F1F1EF' }}>
+          <Search className="w-4 h-4 text-[#9B9A97] flex-shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -1490,20 +1490,20 @@ function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
               if (e.key === 'Enter' && filtered.length > 0) onSelect(filtered[0].id)
             }}
             placeholder="Search chats..."
-            className="flex-1 text-sm text-[#1E2532] bg-transparent outline-none placeholder:text-[#D5D5D5]"
+            className="flex-1 text-sm text-[#191919] bg-transparent outline-none placeholder:text-[#9B9A97]"
           />
           {query && (
-            <button onClick={() => setQuery('')} className="text-[#D5D5D5] hover:text-[#6B7C93] transition-colors">
+            <button onClick={() => setQuery('')} className="text-[#9B9A97] hover:text-[#787774] transition-colors">
               <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
 
         {/* Results */}
-        <div className="max-h-[320px] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}>
+        <div className="max-h-[320px] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}>
           {filtered.length === 0 ? (
             <div className="px-4 py-6 text-center">
-              <p className="text-xs text-[#D5D5D5]">No chats found</p>
+              <p className="text-xs text-[#9B9A97]">No chats found</p>
             </div>
           ) : (
             filtered.map(c => (
@@ -1512,14 +1512,14 @@ function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
                 onClick={() => onSelect(c.id)}
                 className="w-full text-left px-4 py-2.5 transition-colors"
                 style={{ backgroundColor: c.id === currentId ? '#F5F7FF' : 'transparent' }}
-                onMouseEnter={e => { if (c.id !== currentId) e.currentTarget.style.backgroundColor = '#FAFAFA' }}
+                onMouseEnter={e => { if (c.id !== currentId) e.currentTarget.style.backgroundColor = '#F7F6F3' }}
                 onMouseLeave={e => { e.currentTarget.style.backgroundColor = c.id === currentId ? '#F5F7FF' : 'transparent' }}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <MessageSquare className="w-3.5 h-3.5 text-[#D5D5D5] flex-shrink-0" />
+                  <MessageSquare className="w-3.5 h-3.5 text-[#9B9A97] flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[#1E2532] truncate font-medium"
-                      style={{ color: c.id === currentId ? '#4A7AE5' : '#1E2532' }}>
+                    <p className="text-sm text-[#191919] truncate font-medium"
+                      style={{ color: c.id === currentId ? '#B8A070' : '#191919' }}>
                       {c.title || 'New Conversation'}
                     </p>
                     {c.aiSummary && (
@@ -1527,7 +1527,7 @@ function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
                     )}
                   </div>
                   {c.id === currentId && (
-                    <span className="text-[10px] font-semibold text-[#4A7AE5] flex-shrink-0">current</span>
+                    <span className="text-[10px] font-medium text-[#B8A070] flex-shrink-0">current</span>
                   )}
                 </div>
               </button>
@@ -1536,12 +1536,12 @@ function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
         </div>
 
         {/* Footer hint */}
-        <div className="px-4 py-2.5 flex items-center gap-1" style={{ borderTop: '1px solid #F0F0F0' }}>
-          <kbd className="px-1.5 py-0.5 rounded text-[10px] font-semibold border border-[#EBEBEB] bg-[#FAFAFA] text-[#6B7C93]" style={{ fontFamily: 'monospace' }}>↵</kbd>
-          <span className="text-[10px] text-[#D5D5D5] ml-1">to open</span>
-          <span className="text-[10px] text-[#D5D5D5] mx-2">·</span>
-          <kbd className="px-1.5 py-0.5 rounded text-[10px] font-semibold border border-[#EBEBEB] bg-[#FAFAFA] text-[#6B7C93]" style={{ fontFamily: 'monospace' }}>Esc</kbd>
-          <span className="text-[10px] text-[#D5D5D5] ml-1">to close</span>
+        <div className="px-4 py-2.5 flex items-center gap-1" style={{ borderTop: '1px solid #F1F1EF' }}>
+          <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium border border-[#E9E9E7] bg-[#F7F6F3] text-[#787774]" style={{ fontFamily: 'monospace' }}>↵</kbd>
+          <span className="text-[10px] text-[#9B9A97] ml-1">to open</span>
+          <span className="text-[10px] text-[#9B9A97] mx-2">·</span>
+          <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium border border-[#E9E9E7] bg-[#F7F6F3] text-[#787774]" style={{ fontFamily: 'monospace' }}>Esc</kbd>
+          <span className="text-[10px] text-[#9B9A97] ml-1">to close</span>
         </div>
       </motion.div>
     </motion.div>
@@ -1584,24 +1584,24 @@ function MoveToBranchModal({ conversations, currentId, onClose, onSelect, onNewC
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.96, opacity: 0, y: -8 }}
         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-        className="relative z-10 bg-white border border-[#EBEBEB] rounded-xl w-full max-w-[480px] overflow-hidden"
+        className="relative z-10 bg-white border border-[#E9E9E7] rounded-xl w-full max-w-[480px] overflow-hidden"
         style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
       >
         {/* Header */}
-        <div className="px-4 py-3.5" style={{ borderBottom: '1px solid #F0F0F0' }}>
-          <p className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-2.5">Move to conversation</p>
+        <div className="px-4 py-3.5" style={{ borderBottom: '1px solid #F1F1EF' }}>
+          <p className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-2.5">Move to conversation</p>
           <div className="flex items-center gap-3">
-            <Search className="w-4 h-4 text-[#D5D5D5] flex-shrink-0" />
+            <Search className="w-4 h-4 text-[#9B9A97] flex-shrink-0" />
             <input
               ref={inputRef}
               type="text"
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Search chats..."
-              className="flex-1 text-sm text-[#1E2532] bg-transparent outline-none placeholder:text-[#D5D5D5]"
+              className="flex-1 text-sm text-[#191919] bg-transparent outline-none placeholder:text-[#9B9A97]"
             />
             {query && (
-              <button onClick={() => setQuery('')} className="text-[#D5D5D5] hover:text-[#6B7C93] transition-colors">
+              <button onClick={() => setQuery('')} className="text-[#9B9A97] hover:text-[#787774] transition-colors">
                 <X className="w-3.5 h-3.5" />
               </button>
             )}
@@ -1611,32 +1611,32 @@ function MoveToBranchModal({ conversations, currentId, onClose, onSelect, onNewC
         {/* New chat option */}
         <button
           onClick={onNewChat}
-          className="w-full text-left px-4 py-2.5 hover:bg-[#FAFAFA] transition-colors"
-          style={{ borderBottom: '1px solid #F0F0F0' }}
+          className="w-full text-left px-4 py-2.5 hover:bg-[#F7F6F3] transition-colors"
+          style={{ borderBottom: '1px solid #F1F1EF' }}
         >
           <div className="flex items-center gap-2.5">
-            <div className="w-3.5 h-3.5 rounded-full border-2 border-dashed border-[#4A7AE5] flex-shrink-0" />
-            <p className="text-sm font-medium text-[#4A7AE5]">New conversation with this message</p>
+            <div className="w-3.5 h-3.5 rounded-full border-2 border-dashed border-[#B8A070] flex-shrink-0" />
+            <p className="text-sm font-medium text-[#B8A070]">New conversation with this message</p>
           </div>
         </button>
 
         {/* Results */}
-        <div className="max-h-[280px] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin', scrollbarColor: '#EBEBEB transparent' }}>
+        <div className="max-h-[280px] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}>
           {filtered.length === 0 ? (
             <div className="px-4 py-6 text-center">
-              <p className="text-xs text-[#D5D5D5]">No other conversations found</p>
+              <p className="text-xs text-[#9B9A97]">No other conversations found</p>
             </div>
           ) : (
             filtered.map(c => (
               <button
                 key={c.id}
                 onClick={() => onSelect(c.id)}
-                className="w-full text-left px-4 py-2.5 hover:bg-[#FAFAFA] transition-colors"
+                className="w-full text-left px-4 py-2.5 hover:bg-[#F7F6F3] transition-colors"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <MessageSquare className="w-3.5 h-3.5 text-[#D5D5D5] flex-shrink-0" />
+                  <MessageSquare className="w-3.5 h-3.5 text-[#9B9A97] flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[#1E2532] truncate font-medium">{c.title || 'New Conversation'}</p>
+                    <p className="text-sm text-[#191919] truncate font-medium">{c.title || 'New Conversation'}</p>
                     {c.aiSummary && (
                       <p className="text-[11px] text-[#9CA7B8] truncate mt-0.5">{c.aiSummary}</p>
                     )}
@@ -1648,9 +1648,9 @@ function MoveToBranchModal({ conversations, currentId, onClose, onSelect, onNewC
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2.5 flex items-center" style={{ borderTop: '1px solid #F0F0F0' }}>
-          <kbd className="px-1.5 py-0.5 rounded text-[10px] font-semibold border border-[#EBEBEB] bg-[#FAFAFA] text-[#6B7C93]" style={{ fontFamily: 'monospace' }}>Esc</kbd>
-          <span className="text-[10px] text-[#D5D5D5] ml-1">to close</span>
+        <div className="px-4 py-2.5 flex items-center" style={{ borderTop: '1px solid #F1F1EF' }}>
+          <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium border border-[#E9E9E7] bg-[#F7F6F3] text-[#787774]" style={{ fontFamily: 'monospace' }}>Esc</kbd>
+          <span className="text-[10px] text-[#9B9A97] ml-1">to close</span>
         </div>
       </motion.div>
     </motion.div>
@@ -1689,7 +1689,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
   if (compressing) { btnLabel = 'Compressing...'; BtnIcon = Zap }
   else if (compressed) { btnLabel = 'Open Branch'; BtnIcon = ArrowRight }
 
-  const getColor = (p) => p < 50 ? '#22C55E' : p < 80 ? '#E5A620' : '#EF4444'
+  const getColor = (p) => p < 50 ? '#0F7B6C' : p < 80 ? '#D9730D' : '#E03E3E'
   let meterTarget = contextUsage
   if (compressed) meterTarget = compressedPct
 
@@ -1707,11 +1707,11 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={SPRING_SNAPPY}
-        className="relative z-10 bg-white border border-[#EBEBEB] rounded-xl w-full max-w-[420px] flex flex-col"
+        className="relative z-10 bg-white border border-[#E9E9E7] rounded-xl w-full max-w-[420px] flex flex-col"
         style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
       >
         {/* Header */}
-        <div className="p-5 pb-4" style={{ borderBottom: '1px solid #F0F0F0' }}>
+        <div className="p-5 pb-4" style={{ borderBottom: '1px solid #F1F1EF' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div
@@ -1728,20 +1728,20 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
                 />
               </div>
               <div>
-                <div className="text-sm font-semibold text-[#1E2532]">Create Branch</div>
-                <div className="text-[11px] text-[#6B7C93] mt-0.5">Forking from message {messageIndex} of {totalMessages}</div>
+                <div className="text-sm font-medium text-[#191919]">Create Branch</div>
+                <div className="text-[11px] text-[#787774] mt-0.5">Forking from message {messageIndex} of {totalMessages}</div>
               </div>
             </div>
-            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onClose} className="p-2 rounded-lg text-[#6B7C93] hover:bg-[#EEEEEE] transition-colors">
+            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onClose} className="p-2 rounded-lg text-[#787774] hover:bg-[#F1F1EF] transition-colors">
               <X className="w-4 h-4" />
             </motion.button>
           </div>
           <div className="mt-4">
             <div className="flex justify-between mb-1">
-              <span className="text-[10px] font-semibold text-[#6B7C93] uppercase tracking-wider">Context window after branch</span>
+              <span className="text-[10px] font-medium text-[#787774] uppercase tracking-wider">Context window after branch</span>
               <span className="text-xs font-bold tabular-nums" style={{ color: getColor(meterTarget) }}>{Math.round(meterTarget)}%</span>
             </div>
-            <div className="h-1.5 bg-[#F0F0F0] rounded-full overflow-hidden">
+            <div className="h-1.5 bg-[#F1F1EF] rounded-full overflow-hidden">
               <motion.div animate={{ width: `${meterTarget}%` }} transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1] }} className="h-full rounded-full" style={{ backgroundColor: getColor(meterTarget) }} />
             </div>
           </div>
@@ -1751,35 +1751,35 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
         <div className="p-4 space-y-3">
           {/* Incomplete message notice */}
           {isIncomplete && (
-            <div className="flex items-start gap-2.5 px-3.5 py-3 rounded-lg bg-[#FAFAFA] border border-[#EBEBEB]">
-              <AlertCircle className="w-3.5 h-3.5 text-[#E5A620] flex-shrink-0 mt-0.5" />
-              <p className="text-[11px] text-[#6B7C93] leading-relaxed">
+            <div className="flex items-start gap-2.5 px-3.5 py-3 rounded-lg bg-[#F7F6F3] border border-[#E9E9E7]">
+              <AlertCircle className="w-3.5 h-3.5 text-[#D9730D] flex-shrink-0 mt-0.5" />
+              <p className="text-[11px] text-[#787774] leading-relaxed">
                 The last response was interrupted. You can still branch — the partial content will be preserved and you can continue it in the new branch.
               </p>
             </div>
           )}
           {/* Full History */}
           <motion.div
-            whileHover={{ borderColor: mode === 'full' ? '#4A7AE5' : '#D5D5D5' }}
+            whileHover={{ borderColor: mode === 'full' ? '#B8A070' : '#9B9A97' }}
             onClick={() => { setMode('full'); setCompressed(false) }}
             className="rounded-lg p-4 cursor-pointer transition-colors"
-            style={{ border: mode === 'full' ? '1.5px solid #4A7AE5' : '1px solid #EBEBEB', backgroundColor: mode === 'full' ? 'rgba(74,122,229,0.04)' : '#FFFFFF' }}
+            style={{ border: mode === 'full' ? '1.5px solid #B8A070' : '1px solid #E9E9E7', backgroundColor: mode === 'full' ? 'rgba(74,122,229,0.04)' : '#FFFFFF' }}
           >
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: mode === 'full' ? 'rgba(74,122,229,0.1)' : '#F5F5F5' }}>
-                <Copy className="w-4 h-4" style={{ color: mode === 'full' ? '#4A7AE5' : '#6B7C93' }} />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: mode === 'full' ? 'rgba(74,122,229,0.1)' : '#F7F6F3' }}>
+                <Copy className="w-4 h-4" style={{ color: mode === 'full' ? '#B8A070' : '#787774' }} />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-semibold text-[#1E2532]">Full History</div>
-                <p className="text-xs text-[#6B7C93] mt-0.5">Copy all {messageIndex} messages as-is. Continue with the same context.</p>
+                <div className="text-sm font-medium text-[#191919]">Full History</div>
+                <p className="text-xs text-[#787774] mt-0.5">Copy all {messageIndex} messages as-is. Continue with the same context.</p>
                 {mode === 'full' && (
-                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-3 flex items-center gap-2 px-3 py-2 bg-[#FAFAFA] border border-[#F0F0F0] rounded-lg">
-                    <Info className="w-3 h-3 text-[#6B7C93] flex-shrink-0" />
-                    <span className="text-[11px] text-[#6B7C93]">Branch starts at {contextUsage}% context — same as current conversation</span>
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-3 flex items-center gap-2 px-3 py-2 bg-[#F7F6F3] border border-[#F1F1EF] rounded-lg">
+                    <Info className="w-3 h-3 text-[#787774] flex-shrink-0" />
+                    <span className="text-[11px] text-[#787774]">Branch starts at {contextUsage}% context — same as current conversation</span>
                   </motion.div>
                 )}
               </div>
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${mode === 'full' ? 'border-[#4A7AE5] bg-[#4A7AE5]' : 'border-[#D5D5D5] bg-white'}`}>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${mode === 'full' ? 'border-[#B8A070] bg-[#B8A070]' : 'border-[#9B9A97] bg-white'}`}>
                 {mode === 'full' && <div className="w-2 h-2 rounded-full bg-white" />}
               </div>
             </div>
@@ -1787,26 +1787,26 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
 
           {/* Compressed Summary */}
           <motion.div
-            whileHover={{ borderColor: mode === 'compressed' ? '#4A7AE5' : '#D5D5D5' }}
+            whileHover={{ borderColor: mode === 'compressed' ? '#B8A070' : '#9B9A97' }}
             onClick={() => { setMode('compressed'); setCompressed(false) }}
             className="rounded-lg p-4 cursor-pointer transition-colors"
-            style={{ border: mode === 'compressed' ? '1.5px solid #4A7AE5' : '1px solid #EBEBEB', backgroundColor: mode === 'compressed' ? 'rgba(74,122,229,0.04)' : '#FFFFFF' }}
+            style={{ border: mode === 'compressed' ? '1.5px solid #B8A070' : '1px solid #E9E9E7', backgroundColor: mode === 'compressed' ? 'rgba(74,122,229,0.04)' : '#FFFFFF' }}
           >
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: mode === 'compressed' ? 'rgba(74,122,229,0.1)' : '#F5F5F5' }}>
-                <Zap className="w-4 h-4" style={{ color: mode === 'compressed' ? '#4A7AE5' : '#6B7C93' }} />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: mode === 'compressed' ? 'rgba(74,122,229,0.1)' : '#F7F6F3' }}>
+                <Zap className="w-4 h-4" style={{ color: mode === 'compressed' ? '#B8A070' : '#787774' }} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-semibold text-[#1E2532]">Compressed Summary</span>
-                  <span className="text-xs font-semibold text-[#22C55E]">(saves context)</span>
+                  <span className="text-sm font-medium text-[#191919]">Compressed Summary</span>
+                  <span className="text-xs font-medium text-[#0F7B6C]">(saves context)</span>
                 </div>
-                <p className="text-xs text-[#6B7C93] mt-0.5">Start fresh with an AI-generated summary of the conversation so far.</p>
+                <p className="text-xs text-[#787774] mt-0.5">Start fresh with an AI-generated summary of the conversation so far.</p>
                 {mode === 'compressed' && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-3 space-y-3">
                     <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.15)' }}>
-                      <Zap className="w-3 h-3 text-[#22C55E] flex-shrink-0" />
-                      <span className="text-[11px] text-[#22C55E] font-semibold">{contextUsage}% → ~{compressedPct}% — frees up {contextUsage - compressedPct}%</span>
+                      <Zap className="w-3 h-3 text-[#0F7B6C] flex-shrink-0" />
+                      <span className="text-[11px] text-[#0F7B6C] font-medium">{contextUsage}% → ~{compressedPct}% — frees up {contextUsage - compressedPct}%</span>
                     </div>
                     <button
                       onClick={async (e) => {
@@ -1830,7 +1830,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
                           setPreviewExpanded(false)
                         }
                       }}
-                      className="flex items-center gap-1.5 text-[11px] font-semibold text-[#4A7AE5] bg-transparent border-none cursor-pointer p-0"
+                      className="flex items-center gap-1.5 text-[11px] font-medium text-[#B8A070] bg-transparent border-none cursor-pointer p-0"
                     >
                       <ChevronRight className="w-3 h-3 transition-transform" style={{ transform: previewExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }} />
                       {previewLoading ? 'Generating preview...' : 'Preview summary'}
@@ -1838,16 +1838,16 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
                     <AnimatePresence>
                       {previewExpanded && (
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={SPRING_SNAPPY} className="overflow-hidden">
-                          <div className="px-3 py-2.5 bg-[#FAFAFA] border border-[#F0F0F0] rounded-lg">
+                          <div className="px-3 py-2.5 bg-[#F7F6F3] border border-[#F1F1EF] rounded-lg">
                             {previewLoading ? (
                               <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 border-2 border-[#4A7AE5] border-t-transparent rounded-full animate-spin flex-shrink-0" />
-                                <p className="text-[11px] text-[#6B7C93]">Generating summary...</p>
+                                <div className="w-3 h-3 border-2 border-[#B8A070] border-t-transparent rounded-full animate-spin flex-shrink-0" />
+                                <p className="text-[11px] text-[#787774]">Generating summary...</p>
                               </div>
                             ) : previewError ? (
-                              <p className="text-[11px] text-[#E5A620] leading-relaxed">{previewError}</p>
+                              <p className="text-[11px] text-[#D9730D] leading-relaxed">{previewError}</p>
                             ) : previewContent ? (
-                              <div className="text-[11px] text-[#4A5568] leading-relaxed apollo-md">
+                              <div className="text-[11px] text-[#37352F] leading-relaxed apollo-md">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{previewContent}</ReactMarkdown>
                               </div>
                             ) : null}
@@ -1858,7 +1858,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
                   </motion.div>
                 )}
               </div>
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${mode === 'compressed' ? 'border-[#4A7AE5] bg-[#4A7AE5]' : 'border-[#D5D5D5] bg-white'}`}>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${mode === 'compressed' ? 'border-[#B8A070] bg-[#B8A070]' : 'border-[#9B9A97] bg-white'}`}>
                 {mode === 'compressed' && <div className="w-2 h-2 rounded-full bg-white" />}
               </div>
             </div>
@@ -1866,23 +1866,23 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
         </div>
 
         {/* Footer — dusty gold gradient CTA */}
-        <div className="flex items-center justify-between p-4" style={{ borderTop: '1px solid #F0F0F0' }}>
-          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={onClose} className="px-4 py-2 rounded-lg text-xs font-semibold text-[#6B7C93] hover:text-[#1E2532] transition-colors">
+        <div className="flex items-center justify-between p-4" style={{ borderTop: '1px solid #F1F1EF' }}>
+          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={onClose} className="px-4 py-2 rounded-lg text-xs font-medium text-[#787774] hover:text-[#191919] transition-colors">
             Cancel
           </motion.button>
           <motion.button
             whileHover={mode && !compressing ? { scale: 1.03 } : {}}
             whileTap={mode && !compressing ? { scale: 0.97 } : {}}
             onClick={compressed ? handleOpen : handleCreate}
-            className="px-5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all"
+            className="px-5 py-2 rounded-lg text-xs font-medium flex items-center gap-2 transition-all"
             style={{
-              border: mode ? 'none' : '1px solid #EBEBEB',
+              border: mode ? 'none' : '1px solid #E9E9E7',
               background: mode
                 ? 'linear-gradient(90deg, #B8A070 25%, #C9B37E 50%, #B8A070 75%)'
                 : '#FFFFFF',
               backgroundSize: mode ? '200% 100%' : 'auto',
               animation: mode && !compressing ? 'gold-shimmer 2s infinite linear' : 'none',
-              color: mode ? '#FFFFFF' : '#D5D5D5',
+              color: mode ? '#FFFFFF' : '#9B9A97',
               cursor: mode && !compressing ? 'pointer' : 'not-allowed',
               opacity: (!mode || compressing) ? 0.7 : 1,
             }}
@@ -1935,22 +1935,22 @@ function ShortcutsModal({ onClose }) {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={SPRING_SNAPPY}
-        className="relative z-10 bg-white border border-[#EBEBEB] rounded-xl w-full max-w-sm flex flex-col"
+        className="relative z-10 bg-white border border-[#E9E9E7] rounded-xl w-full max-w-sm flex flex-col"
         style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 pb-4" style={{ borderBottom: '1px solid #F0F0F0' }}>
+        <div className="flex items-center justify-between p-5 pb-4" style={{ borderBottom: '1px solid #F1F1EF' }}>
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(74,122,229,0.1)' }}>
-              <Command className="w-4 h-4 text-[#4A7AE5]" />
+              <Command className="w-4 h-4 text-[#B8A070]" />
             </div>
-            <div className="text-sm font-semibold text-[#1E2532]">Keyboard Shortcuts</div>
+            <div className="text-sm font-medium text-[#191919]">Keyboard Shortcuts</div>
           </div>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={onClose}
-            className="p-2 rounded-lg text-[#6B7C93] hover:bg-[#EEEEEE] transition-colors"
+            className="p-2 rounded-lg text-[#787774] hover:bg-[#F1F1EF] transition-colors"
           >
             <X className="w-4 h-4" />
           </motion.button>
@@ -1960,12 +1960,12 @@ function ShortcutsModal({ onClose }) {
         <div className="p-5 space-y-3">
           {SHORTCUTS.map((s, i) => (
             <div key={i} className="flex items-center justify-between">
-              <span className="text-xs text-[#4A5568]">{s.desc}</span>
+              <span className="text-xs text-[#37352F]">{s.desc}</span>
               <div className="flex items-center gap-1">
                 {s.keys.map((k, j) => (
                   <kbd
                     key={j}
-                    className="px-1.5 py-0.5 rounded text-[10px] font-semibold text-[#6B7C93] border border-[#EBEBEB] bg-[#FAFAFA]"
+                    className="px-1.5 py-0.5 rounded text-[10px] font-medium text-[#787774] border border-[#E9E9E7] bg-[#F7F6F3]"
                     style={{ fontFamily: 'ui-monospace, SFMono-Regular, monospace', minWidth: 22, textAlign: 'center' }}
                   >
                     {k === 'Ctrl' ? (IS_MAC ? '⌘' : 'Ctrl') : k === 'Shift' ? (IS_MAC ? '⇧' : 'Shift') : k}
@@ -1978,8 +1978,8 @@ function ShortcutsModal({ onClose }) {
 
         {/* Footer */}
         <div className="px-5 pb-4 pt-1">
-          <p className="text-[10px] text-[#D5D5D5] text-center">
-            Press <kbd className="px-1 py-0.5 rounded text-[10px] font-semibold border border-[#EBEBEB] bg-[#FAFAFA]" style={{ fontFamily: 'monospace' }}>{IS_MAC ? '⌘' : 'Ctrl'}</kbd> + <kbd className="px-1 py-0.5 rounded text-[10px] font-semibold border border-[#EBEBEB] bg-[#FAFAFA]" style={{ fontFamily: 'monospace' }}>?</kbd> anytime to toggle
+          <p className="text-[10px] text-[#9B9A97] text-center">
+            Press <kbd className="px-1 py-0.5 rounded text-[10px] font-medium border border-[#E9E9E7] bg-[#F7F6F3]" style={{ fontFamily: 'monospace' }}>{IS_MAC ? '⌘' : 'Ctrl'}</kbd> + <kbd className="px-1 py-0.5 rounded text-[10px] font-medium border border-[#E9E9E7] bg-[#F7F6F3]" style={{ fontFamily: 'monospace' }}>?</kbd> anytime to toggle
           </p>
         </div>
       </motion.div>

@@ -9,11 +9,11 @@ export const SPRING_GENTLE = { type: 'spring', stiffness: 200, damping: 24 }
 export const DUSTY_GOLD = '#C4A94D'
 
 export const HIGHLIGHT_COLORS = [
-  { id: 'blue',   color: '#4A7AE5', bg: 'rgba(74,122,229,0.15)' },
-  { id: 'yellow', color: '#E5A620', bg: 'rgba(229,166,32,0.15)' },
-  { id: 'green',  color: '#22C55E', bg: 'rgba(34,197,94,0.15)' },
-  { id: 'purple', color: '#7C6CD4', bg: 'rgba(124,108,212,0.15)' },
-  { id: 'red',    color: '#EF4444', bg: 'rgba(239,68,68,0.15)' },
+  { id: 'blue',   color: '#B8A070', bg: 'rgba(74,122,229,0.15)' },
+  { id: 'yellow', color: '#D9730D', bg: 'rgba(229,166,32,0.15)' },
+  { id: 'green',  color: '#0F7B6C', bg: 'rgba(34,197,94,0.15)' },
+  { id: 'purple', color: '#B8A070', bg: 'rgba(124,108,212,0.15)' },
+  { id: 'red',    color: '#E03E3E', bg: 'rgba(239,68,68,0.15)' },
 ]
 
 /* ── Context Health Color ────────────────────────────────── */
@@ -24,7 +24,7 @@ export const HIGHLIGHT_COLORS = [
  * @param {number} threshold - 0–100 threshold percentage
  */
 export function getContextColor(usage, threshold) {
-  if (usage < threshold / 2) return '#22C55E'
-  if (usage < threshold)     return '#E5A620'
-  return '#EF4444'
+  if (usage < threshold / 2) return '#0F7B6C'
+  if (usage < threshold)     return '#D9730D'
+  return '#E03E3E'
 }
