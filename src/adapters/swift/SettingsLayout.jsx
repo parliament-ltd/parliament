@@ -25,9 +25,9 @@ function passphraseStrength(pw) {
   if (/[0-9]/.test(pw)) score++
   if (/[^a-zA-Z0-9]/.test(pw)) score++
   if (pw.length >= 12) score++
-  if (score <= 2) return { label: 'Weak', color: '#EF4444' }
-  if (score <= 3) return { label: 'Fair', color: '#E5A620' }
-  return { label: 'Strong', color: '#22C55E' }
+  if (score <= 2) return { label: 'Weak', color: '#E03E3E' }
+  if (score <= 3) return { label: 'Fair', color: '#D9730D' }
+  return { label: 'Strong', color: '#0F7B6C' }
 }
 
 const MODELS = [
@@ -56,9 +56,12 @@ const MODE_OPTIONS = [
 
 function Card({ children, danger = false }) {
   return (
-    <div className={`px-4 py-4 rounded-xl border ${
-      danger ? 'border-[#EF4444]/20 bg-[#EF4444]/[0.02]' : 'border-[#EBEBEB] bg-white'
-    }`}>
+    <div
+      className={`px-4 py-4 border ${
+        danger ? 'border-[#E03E3E]/20 bg-[#E03E3E]/[0.02]' : 'border-[#E9E9E7] bg-white'
+      }`}
+      style={{ borderRadius: 6 }}
+    >
       {children}
     </div>
   )
@@ -66,7 +69,7 @@ function Card({ children, danger = false }) {
 
 function SectionLabel({ children }) {
   return (
-    <label className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider block mb-3">
+    <label className="text-xs font-medium text-[#787774] uppercase tracking-wider block mb-3">
       {children}
     </label>
   )
@@ -77,7 +80,7 @@ function ToggleSwitch({ enabled, onToggle }) {
     <button
       onClick={onToggle}
       className="relative w-11 h-6 rounded-full transition-colors flex-shrink-0"
-      style={{ backgroundColor: enabled ? '#4A7AE5' : '#D5D5D5' }}
+      style={{ backgroundColor: enabled ? '#B8A070' : '#9B9A97' }}
     >
       <motion.div
         animate={{ x: enabled ? 22 : 3 }}
@@ -92,26 +95,27 @@ function RadioOption({ active, onSelect, icon: Icon, label, description, childre
   return (
     <button
       onClick={onSelect}
-      className={`w-full text-left flex items-start gap-3 px-4 py-3.5 rounded-xl border transition-colors ${
-        active ? 'border-[#4A7AE5] bg-[#4A7AE5]/5' : 'border-[#EBEBEB] active:bg-[#FAFAFA]'
+      className={`w-full text-left flex items-start gap-3 px-4 py-3.5 border transition-colors ${
+        active ? 'border-[#B8A070] bg-[#B8A070]/[0.06]' : 'border-[#E9E9E7] active:bg-[#F7F6F3]'
       }`}
+      style={{ borderRadius: 6 }}
     >
       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
-        active ? 'border-[#4A7AE5]' : 'border-[#D5D5D5]'
+        active ? 'border-[#B8A070]' : 'border-[#9B9A97]'
       }`}>
         {active && (
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={SPRING_SNAPPY}
-            className="w-2.5 h-2.5 rounded-full bg-[#4A7AE5]"
+            className="w-2.5 h-2.5 rounded-full bg-[#B8A070]"
           />
         )}
       </div>
-      {Icon && <Icon className={`w-4 h-4 flex-shrink-0 mt-0.5 ${active ? 'text-[#4A7AE5]' : 'text-[#6B7C93]'}`} />}
+      {Icon && <Icon className={`w-4 h-4 flex-shrink-0 mt-0.5 ${active ? 'text-[#B8A070]' : 'text-[#787774]'}`} />}
       <div className="flex-1 min-w-0">
-        <div className={`text-sm font-semibold ${active ? 'text-[#1E2532]' : 'text-[#4A5568]'}`}>{label}</div>
-        {description && <div className="text-xs text-[#6B7C93] mt-0.5">{description}</div>}
+        <div className={`text-sm font-medium ${active ? 'text-[#191919]' : 'text-[#37352F]'}`}>{label}</div>
+        {description && <div className="text-xs text-[#787774] mt-0.5">{description}</div>}
         {children}
       </div>
     </button>
@@ -120,14 +124,15 @@ function RadioOption({ active, onSelect, icon: Icon, label, description, childre
 
 function SegmentedControl({ options, value, onChange }) {
   return (
-    <div className="flex gap-1 bg-[#F5F5F5] rounded-xl p-1">
+    <div className="flex gap-1 bg-[#F1F1EF] p-1" style={{ borderRadius: 6 }}>
       {options.map((opt) => (
         <button
           key={opt.id}
           onClick={() => onChange(opt.id)}
-          className={`flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
-            value === opt.id ? 'bg-white text-[#1E2532] shadow-sm' : 'text-[#6B7C93] active:text-[#1E2532]'
+          className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${
+            value === opt.id ? 'bg-white text-[#191919] shadow-sm' : 'text-[#787774] active:text-[#191919]'
           }`}
+          style={{ borderRadius: 4 }}
         >
           {opt.label}
         </button>
@@ -138,15 +143,15 @@ function SegmentedControl({ options, value, onChange }) {
 
 function InfoBanner({ icon: Icon, color = 'blue', children }) {
   const colors = {
-    blue: 'bg-[#4A7AE5]/5 border-[#4A7AE5]/15',
-    amber: 'bg-[#E5A620]/5 border-[#E5A620]/20',
-    grey: 'bg-[#F5F5F5] border-[#EBEBEB]',
+    blue: 'bg-[#B8A070]/[0.05] border-[#B8A070]/[0.15]',
+    amber: 'bg-[#D9730D]/5 border-[#D9730D]/20',
+    grey: 'bg-[#F1F1EF] border-[#E9E9E7]',
   }
-  const iconColors = { blue: 'text-[#4A7AE5]', amber: 'text-[#E5A620]', grey: 'text-[#6B7C93]' }
+  const iconColors = { blue: 'text-[#B8A070]', amber: 'text-[#D9730D]', grey: 'text-[#787774]' }
   return (
-    <div className={`flex items-start gap-3 px-4 py-3 rounded-xl border ${colors[color]}`}>
+    <div className={`flex items-start gap-3 px-4 py-3 border ${colors[color]}`} style={{ borderRadius: 6 }}>
       <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${iconColors[color]}`} />
-      <div className="text-xs text-[#6B7C93] leading-relaxed flex-1">{children}</div>
+      <div className="text-xs text-[#787774] leading-relaxed flex-1">{children}</div>
     </div>
   )
 }
@@ -172,22 +177,25 @@ function BottomSheet({ open, onClose, title, subtitle, icon: Icon, children }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-center pt-3 pb-1">
-          <div className="w-9 h-1 rounded-full bg-[#D5D5D5]" />
+          <div className="w-9 h-1 rounded-full bg-[#9B9A97]" />
         </div>
         <div className="flex items-center justify-between px-5 pb-3 pt-1">
           <div className="flex items-center gap-3">
             {Icon && (
-              <div className="w-8 h-8 rounded-lg bg-[#4A7AE5]/10 flex items-center justify-center">
-                <Icon className="w-4 h-4 text-[#4A7AE5]" />
+              <div
+                className="w-8 h-8 flex items-center justify-center"
+                style={{ borderRadius: 6, backgroundColor: 'rgba(184,160,112,0.10)' }}
+              >
+                <Icon className="w-4 h-4 text-[#B8A070]" />
               </div>
             )}
             <div>
-              <span className="text-base font-semibold text-[#1E2532]">{title}</span>
-              {subtitle && <p className="text-xs text-[#6B7C93]">{subtitle}</p>}
+              <span className="text-base font-medium text-[#191919]">{title}</span>
+              {subtitle && <p className="text-xs text-[#787774]">{subtitle}</p>}
             </div>
           </div>
-          <button onClick={onClose} className="p-2 -mr-2 rounded-full active:bg-[#EEEEEE]">
-            <X className="w-4 h-4 text-[#6B7C93]" />
+          <button onClick={onClose} className="p-2 -mr-2 rounded-full active:bg-[#F7F6F3]">
+            <X className="w-4 h-4 text-[#787774]" />
           </button>
         </div>
         <div className="flex-1 overflow-y-auto px-5 pb-8" style={{ WebkitOverflowScrolling: 'touch' }}>
@@ -200,22 +208,26 @@ function BottomSheet({ open, onClose, title, subtitle, icon: Icon, children }) {
 
 function AccordionSection({ id, label, subtitle, icon: Icon, isOpen, onToggle, children }) {
   return (
-    <div className="border-b border-[#F0F0F0]">
+    <div className="border-b border-[#F1F1EF]">
       <button
         onClick={() => onToggle(id)}
-        className="w-full flex items-center gap-3.5 px-5 py-4 active:bg-[#FAFAFA] transition-colors"
+        className="w-full flex items-center gap-3.5 px-5 py-4 active:bg-[#F7F6F3] transition-colors"
       >
-        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
-          isOpen ? 'bg-[#4A7AE5]/10' : 'bg-[#F5F5F5]'
-        }`}>
-          <Icon className={`w-4 h-4 transition-colors ${isOpen ? 'text-[#4A7AE5]' : 'text-[#6B7C93]'}`} />
+        <div
+          className="w-9 h-9 flex items-center justify-center flex-shrink-0 transition-colors"
+          style={{
+            borderRadius: 6,
+            backgroundColor: isOpen ? 'rgba(184,160,112,0.10)' : '#F1F1EF',
+          }}
+        >
+          <Icon className={`w-4 h-4 transition-colors ${isOpen ? 'text-[#B8A070]' : 'text-[#787774]'}`} />
         </div>
         <div className="flex-1 min-w-0 text-left">
-          <div className={`text-[14px] font-semibold transition-colors ${isOpen ? 'text-[#1E2532]' : 'text-[#4A5568]'}`}>{label}</div>
-          <div className="text-[11px] text-[#C0C8D4]">{subtitle}</div>
+          <div className={`text-[14px] font-medium transition-colors ${isOpen ? 'text-[#191919]' : 'text-[#37352F]'}`}>{label}</div>
+          <div className="text-[11px] text-[#9B9A97]">{subtitle}</div>
         </div>
         <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={SPRING_SNAPPY}>
-          <ChevronDown className="w-4 h-4 text-[#C0C8D4]" />
+          <ChevronDown className="w-4 h-4 text-[#9B9A97]" />
         </motion.div>
       </button>
       <AnimatePresence>
@@ -247,19 +259,20 @@ function ApiSection({ apiKey, setApiKey, showKey, setShowKey, keyStatus, setKeyS
       <Card>
         <SectionLabel>API Key</SectionLabel>
         <div className="relative mb-2">
-          <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#D5D5D5]" />
+          <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9B9A97]" />
           <input
             type={showKey ? 'text' : 'password'}
             value={apiKey}
             onChange={(e) => { setApiKey(e.target.value); setKeyStatus(null) }}
             placeholder="sk-ant-api03-..."
-            className={`w-full bg-white rounded-xl pl-10 pr-10 py-3 text-sm text-[#1E2532] outline-none placeholder:text-[#D5D5D5] border transition-colors font-mono ${
-              keyStatus === 'invalid' || keyStatus === 'billing_error' ? 'border-[#EF4444]' : 'border-[#EBEBEB] focus:border-[#4A7AE5]'
+            className={`w-full bg-white pl-10 pr-10 py-3 text-sm text-[#191919] outline-none placeholder:text-[#9B9A97] border transition-colors font-mono ${
+              keyStatus === 'invalid' || keyStatus === 'billing_error' ? 'border-[#E03E3E]' : 'border-[#E9E9E7] focus:border-[#B8A070]'
             }`}
+            style={{ borderRadius: 6 }}
           />
           <button
             onClick={() => setShowKey(!showKey)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#6B7C93]"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#787774]"
           >
             {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
@@ -267,7 +280,8 @@ function ApiSection({ apiKey, setApiKey, showKey, setShowKey, keyStatus, setKeyS
         <button
           onClick={validateKey}
           disabled={!apiKey || keyStatus === 'validating' || validateCooldown}
-          className="w-full py-2.5 rounded-xl text-xs font-semibold border border-[#EBEBEB] bg-white text-[#1E2532] active:bg-[#FAFAFA] transition-colors disabled:opacity-40"
+          className="w-full py-2.5 text-xs font-medium border border-[#E9E9E7] bg-white text-[#191919] active:bg-[#F7F6F3] transition-colors disabled:opacity-40"
+          style={{ borderRadius: 6 }}
         >
           {keyStatus === 'validating' ? (
             <motion.span
@@ -284,7 +298,7 @@ function ApiSection({ apiKey, setApiKey, showKey, setShowKey, keyStatus, setKeyS
             <motion.div
               initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               transition={SPRING_SNAPPY}
-              className="flex items-center gap-2 mt-3 text-xs text-[#22C55E]"
+              className="flex items-center gap-2 mt-3 text-xs text-[#0F7B6C]"
             >
               <CheckCircle className="w-3.5 h-3.5" />
               <span>API key is valid — connected to Anthropic</span>
@@ -294,7 +308,7 @@ function ApiSection({ apiKey, setApiKey, showKey, setShowKey, keyStatus, setKeyS
             <motion.div
               initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               transition={SPRING_SNAPPY}
-              className={`flex items-center gap-2 mt-3 text-xs ${keyStatus === 'billing_error' ? 'text-[#E5A620]' : 'text-[#EF4444]'}`}
+              className={`flex items-center gap-2 mt-3 text-xs ${keyStatus === 'billing_error' ? 'text-[#D9730D]' : 'text-[#E03E3E]'}`}
             >
               <AlertCircle className="w-3.5 h-3.5" />
               <span>{keyError || (keyStatus === 'billing_error' ? 'Billing issue — check your Anthropic dashboard.' : 'This API key is not valid. Please check your key and try again.')}</span>
@@ -327,12 +341,15 @@ function ApiSection({ apiKey, setApiKey, showKey, setShowKey, keyStatus, setKeyS
         <Card>
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#E5A620]/10 flex items-center justify-center flex-shrink-0">
-                <DollarSign className="w-4 h-4 text-[#E5A620]" />
+              <div
+                className="w-8 h-8 flex items-center justify-center flex-shrink-0"
+                style={{ borderRadius: 6, backgroundColor: 'rgba(217,115,13,0.10)' }}
+              >
+                <DollarSign className="w-4 h-4 text-[#D9730D]" />
               </div>
               <div className="flex-1">
-                <h4 className="text-sm font-semibold text-[#1E2532] mb-1">Set a spending limit</h4>
-                <p className="text-xs text-[#6B7C93] leading-relaxed mb-3">
+                <h4 className="text-sm font-medium text-[#191919] mb-1">Set a spending limit</h4>
+                <p className="text-xs text-[#787774] leading-relaxed mb-3">
                   We strongly recommend setting a monthly spending limit in your Anthropic dashboard.
                 </p>
                 <div className="flex flex-wrap items-center gap-2">
@@ -340,17 +357,19 @@ function ApiSection({ apiKey, setApiKey, showKey, setShowKey, keyStatus, setKeyS
                     href="https://console.anthropic.com/settings/limits"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border border-[#EBEBEB] bg-white text-[#1E2532] active:bg-[#FAFAFA]"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium border border-[#E9E9E7] bg-white text-[#191919] active:bg-[#F7F6F3]"
+                    style={{ borderRadius: 6 }}
                   >
                     Open Dashboard <ExternalLink className="w-3 h-3" />
                   </a>
                   <button
                     onClick={() => setSpendingLimitConfirmed(true)}
-                    className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium transition-colors ${
                       spendingLimitConfirmed
-                        ? 'bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/20'
-                        : 'text-[#6B7C93] active:bg-[#F5F5F5]'
+                        ? 'bg-[#0F7B6C]/10 text-[#0F7B6C] border border-[#0F7B6C]/20'
+                        : 'text-[#787774] active:bg-[#F1F1EF]'
                     }`}
+                    style={{ borderRadius: 6 }}
                   >
                     {spendingLimitConfirmed ? <><CheckCircle className="w-3 h-3" /> Done</> : "I've set a limit"}
                   </button>
@@ -359,7 +378,7 @@ function ApiSection({ apiKey, setApiKey, showKey, setShowKey, keyStatus, setKeyS
             </div>
             <button
               onClick={() => setSpendingLimitDismissed(true)}
-              className="p-1 rounded-full active:bg-[#EEEEEE] text-[#C0C8D4] flex-shrink-0"
+              className="p-1 rounded-full active:bg-[#F1F1EF] text-[#9B9A97] flex-shrink-0"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -387,15 +406,15 @@ function ModelSection({ selectedModel, setSelectedModel }) {
                 description={model.description}
               >
                 <div className="flex items-center justify-between mt-2">
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                    model.id === 'claude-sonnet' ? 'bg-[#4A7AE5]/10 text-[#4A7AE5]'
-                      : model.id === 'claude-haiku' ? 'bg-[#22C55E]/10 text-[#22C55E]' : 'bg-[#7C6CD4]/10 text-[#7C6CD4]'
+                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                    model.id === 'claude-sonnet' ? 'bg-[#B8A070]/10 text-[#9C8760]'
+                      : model.id === 'claude-haiku' ? 'bg-[#0F7B6C]/10 text-[#0F7B6C]' : 'bg-[#9065B0]/10 text-[#9065B0]'
                   }`}>{model.badge}</span>
                 </div>
                 <div className="flex items-center gap-3 mt-2 flex-wrap">
-                  <span className="text-[10px] text-[#6B7C93]">In: <span className="font-semibold text-[#4A5568]">{model.inputCost}/MTok</span></span>
-                  <span className="text-[10px] text-[#6B7C93]">Out: <span className="font-semibold text-[#4A5568]">{model.outputCost}/MTok</span></span>
-                  <span className="text-[10px] text-[#6B7C93]">Speed: <span className="font-semibold text-[#4A5568]">{model.speed}</span></span>
+                  <span className="text-[10px] text-[#787774]">In: <span className="font-medium text-[#37352F]">{model.inputCost}/MTok</span></span>
+                  <span className="text-[10px] text-[#787774]">Out: <span className="font-medium text-[#37352F]">{model.outputCost}/MTok</span></span>
+                  <span className="text-[10px] text-[#787774]">Speed: <span className="font-medium text-[#37352F]">{model.speed}</span></span>
                 </div>
               </RadioOption>
             )
@@ -420,9 +439,9 @@ function UsageSection({ budgetEnabled, setBudgetEnabled, budgetAlert, setBudgetA
             { label: 'Conversations', value: '—' },
             { label: 'Est. Cost', value: '—' },
           ].map((stat) => (
-            <div key={stat.label} className="px-3 py-3 bg-[#FAFAFA] border border-[#F0F0F0] rounded-xl">
-              <div className="text-[10px] text-[#6B7C93] mb-0.5">{stat.label}</div>
-              <div className="text-lg font-semibold text-[#1E2532]">{stat.value}</div>
+            <div key={stat.label} className="px-3 py-3 bg-[#F7F6F3] border border-[#F1F1EF]" style={{ borderRadius: 6 }}>
+              <div className="text-[10px] text-[#787774] mb-0.5">{stat.label}</div>
+              <div className="text-lg font-medium text-[#191919]">{stat.value}</div>
             </div>
           ))}
         </div>
@@ -443,17 +462,18 @@ function UsageSection({ budgetEnabled, setBudgetEnabled, budgetAlert, setBudgetA
               className="overflow-hidden"
             >
               <div className="flex items-center gap-3">
-                <span className="text-sm text-[#6B7C93]">Warn at</span>
+                <span className="text-sm text-[#787774]">Warn at</span>
                 <div className="relative">
-                  <DollarSign className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#D5D5D5]" />
+                  <DollarSign className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#9B9A97]" />
                   <input
                     type="number"
                     value={budgetAlert}
                     onChange={(e) => setBudgetAlert(Number(e.target.value))}
-                    className="w-24 bg-white rounded-xl pl-7 pr-3 py-2.5 text-sm text-[#1E2532] outline-none border border-[#EBEBEB] focus:border-[#4A7AE5] transition-colors"
+                    className="w-24 bg-white pl-7 pr-3 py-2.5 text-sm text-[#191919] outline-none border border-[#E9E9E7] focus:border-[#B8A070] transition-colors"
+                    style={{ borderRadius: 6 }}
                   />
                 </div>
-                <span className="text-sm text-[#6B7C93]">/ mo</span>
+                <span className="text-sm text-[#787774]">/ mo</span>
               </div>
             </motion.div>
           )}
@@ -473,7 +493,7 @@ function ContextSection({ summaryDepth, setSummaryDepth, contextThreshold, setCo
           value={summaryDepth}
           onChange={setSummaryDepth}
         />
-        <p className="text-[10px] text-[#C0C8D4] mt-2">Brief uses highlights/notes only. Detailed analyzes full content.</p>
+        <p className="text-[10px] text-[#9B9A97] mt-2">Brief uses highlights/notes only. Detailed analyzes full content.</p>
       </Card>
 
       <Card>
@@ -486,9 +506,9 @@ function ContextSection({ summaryDepth, setSummaryDepth, contextThreshold, setCo
             step={5}
             value={contextThreshold}
             onChange={(e) => setContextThreshold(Number(e.target.value))}
-            className="flex-1 accent-[#4A7AE5] h-2"
+            className="flex-1 accent-[#B8A070] h-2"
           />
-          <span className="text-sm font-semibold text-[#1E2532] w-12 text-right">{contextThreshold}%</span>
+          <span className="text-sm font-medium text-[#191919] w-12 text-right">{contextThreshold}%</span>
         </div>
       </Card>
 
@@ -523,33 +543,35 @@ function DataSection({ backupReminder, setBackupReminder, showExportSheet, setSh
       <Card>
         <div className="flex items-center justify-between mb-3">
           <SectionLabel>Storage</SectionLabel>
-          <span className="text-[10px] text-[#6B7C93] bg-[#F5F5F5] px-2 py-0.5 rounded-full">
+          <span className="text-[10px] text-[#787774] bg-[#F1F1EF] px-2 py-0.5 rounded-full">
             {conversations?.length || 0} conversations
           </span>
         </div>
         {storageUsage && (
           <div className="mb-3">
-            <div className="h-1.5 bg-[#F0F0F0] rounded-full overflow-hidden mb-1.5">
+            <div className="h-1.5 bg-[#F1F1EF] rounded-full overflow-hidden mb-1.5">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${Math.min(100, (storageUsage.usage / storageUsage.quota) * 100)}%` }}
                 transition={{ ...SPRING_SMOOTH, delay: 0.2 }}
-                className="h-full rounded-full bg-[#4A7AE5]"
+                className="h-full rounded-full bg-[#B8A070]"
               />
             </div>
-            <p className="text-[10px] text-[#6B7C93]">{usedMB} MB of ~{quotaMB} GB used</p>
+            <p className="text-[10px] text-[#787774]">{usedMB} MB of ~{quotaMB} GB used</p>
           </div>
         )}
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowExportSheet(true)}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold border border-[#EBEBEB] bg-white text-[#1E2532] active:bg-[#FAFAFA]"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-medium border border-[#E9E9E7] bg-white text-[#191919] active:bg-[#F7F6F3]"
+            style={{ borderRadius: 6 }}
           >
             <Download className="w-3.5 h-3.5" /> Export All
           </button>
           <button
             onClick={() => setShowImportSheet(true)}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold border border-[#EBEBEB] bg-white text-[#1E2532] active:bg-[#FAFAFA]"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-medium border border-[#E9E9E7] bg-white text-[#191919] active:bg-[#F7F6F3]"
+            style={{ borderRadius: 6 }}
           >
             <Upload className="w-3.5 h-3.5" /> Import
           </button>
@@ -570,15 +592,16 @@ function DataSection({ backupReminder, setBackupReminder, showExportSheet, setSh
       </Card>
 
       <InfoBanner icon={Shield} color="blue">
-        <span className="font-semibold text-[#1E2532]">Why local storage?</span> Your conversations are in your browser's IndexedDB — not on servers. Clearing browser data removes them. Regular backups keep your work safe.
+        <span className="font-medium text-[#191919]">Why local storage?</span> Your conversations are in your browser's IndexedDB — not on servers. Clearing browser data removes them. Regular backups keep your work safe.
       </InfoBanner>
 
       <Card danger>
         <SectionLabel>Danger Zone</SectionLabel>
-        <p className="text-xs text-[#6B7C93] mb-3">Permanently deletes all conversations, highlights, notes, branches, and settings.</p>
+        <p className="text-xs text-[#787774] mb-3">Permanently deletes all conversations, highlights, notes, branches, and settings.</p>
         <button
           onClick={() => setShowDeleteConfirm(true)}
-          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-semibold border border-[#EF4444]/30 bg-[#EF4444]/5 text-[#EF4444] active:bg-[#EF4444]/10"
+          className="flex items-center justify-center gap-2 w-full py-2.5 text-xs font-medium border border-[#E03E3E]/30 bg-[#E03E3E]/5 text-[#E03E3E] active:bg-[#E03E3E]/10"
+          style={{ borderRadius: 6 }}
         >
           <Trash2 className="w-3.5 h-3.5" /> Delete All Local Data
         </button>
@@ -592,7 +615,7 @@ function AppearanceSection({ theme, setTheme, fontSize, setFontSize, storedMode,
     <>
       <Card>
         <SectionLabel>Interface Mode</SectionLabel>
-        <p className="text-xs text-[#6B7C93] mt-1 mb-3">Choose how the interface adapts to your device.</p>
+        <p className="text-xs text-[#787774] mt-1 mb-3">Choose how the interface adapts to your device.</p>
         <div className="space-y-2">
           {MODE_OPTIONS.map((opt) => {
             const active = storedMode === opt.id || (!storedMode && opt.id === 'auto')
@@ -604,7 +627,7 @@ function AppearanceSection({ theme, setTheme, fontSize, setFontSize, storedMode,
                 label={
                   <span className="flex items-center gap-2">
                     {opt.label}
-                    {opt.soon && <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-[#E5A620]/10 text-[#E5A620]">Soon</span>}
+                    {opt.soon && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#D9730D]/10 text-[#D9730D]">Soon</span>}
                   </span>
                 }
                 description={opt.description}
@@ -627,12 +650,13 @@ function AppearanceSection({ theme, setTheme, fontSize, setFontSize, storedMode,
               <button
                 key={t.id}
                 onClick={() => setTheme(t.id)}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-colors ${
-                  active ? 'border-[#4A7AE5] bg-[#4A7AE5]/5' : 'border-[#EBEBEB] active:bg-[#FAFAFA]'
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 border transition-colors ${
+                  active ? 'border-[#B8A070] bg-[#B8A070]/[0.06]' : 'border-[#E9E9E7] active:bg-[#F7F6F3]'
                 }`}
+                style={{ borderRadius: 6 }}
               >
-                <Icon className={`w-4 h-4 ${active ? 'text-[#4A7AE5]' : 'text-[#6B7C93]'}`} />
-                <span className={`text-sm font-semibold ${active ? 'text-[#1E2532]' : 'text-[#6B7C93]'}`}>{t.label}</span>
+                <Icon className={`w-4 h-4 ${active ? 'text-[#B8A070]' : 'text-[#787774]'}`} />
+                <span className={`text-sm font-medium ${active ? 'text-[#191919]' : 'text-[#787774]'}`}>{t.label}</span>
               </button>
             )
           })}
@@ -657,21 +681,22 @@ function AboutSection() {
       <Card>
         <div className="flex items-center gap-3 mb-4">
           <motion.div animate={{ rotate: [0, -8, 8, 0] }} transition={{ duration: 0.6, delay: 0.6, ease: 'easeInOut' }}>
-            <MessageSquare className="w-5 h-5 text-[#4A7AE5]" />
+            <MessageSquare className="w-5 h-5 text-[#B8A070]" />
           </motion.div>
           <div>
-            <h3 className="text-sm font-semibold text-[#1E2532]">Project Apollo</h3>
-            <p className="text-xs text-[#6B7C93]">Version 0.1.0</p>
+            <h3 className="text-sm font-medium text-[#191919]">Project Apollo</h3>
+            <p className="text-xs text-[#787774]">Version 0.1.0</p>
           </div>
         </div>
-        <p className="text-xs text-[#6B7C93] leading-relaxed mb-4">
+        <p className="text-xs text-[#787774] leading-relaxed mb-4">
           A power-user chat interface for AI. Built with React, Framer Motion, and Tailwind CSS. Open source and community-driven.
         </p>
         <a
           href="https://github.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold border border-[#EBEBEB] bg-white text-[#1E2532] active:bg-[#FAFAFA]"
+          className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-medium border border-[#E9E9E7] bg-white text-[#191919] active:bg-[#F7F6F3]"
+          style={{ borderRadius: 6 }}
         >
           <Github className="w-3.5 h-3.5" /> View on GitHub
         </a>
@@ -687,8 +712,8 @@ function AboutSection() {
             { title: 'Open source & auditable', text: 'Entire codebase on GitHub. Verify every request and storage call yourself.' },
           ].map((item, i) => (
             <div key={i}>
-              <h4 className="text-xs font-semibold text-[#1E2532] mb-0.5">{item.title}</h4>
-              <p className="text-xs text-[#6B7C93] leading-relaxed">{item.text}</p>
+              <h4 className="text-xs font-medium text-[#191919] mb-0.5">{item.title}</h4>
+              <p className="text-xs text-[#787774] leading-relaxed">{item.text}</p>
             </div>
           ))}
         </div>
@@ -844,23 +869,24 @@ export default function SwiftSettingsLayout() {
   return (
     <div
       className="flex flex-col font-sans overflow-hidden"
-      style={{ backgroundColor: '#FFFFFF', color: '#1E2532', height: '100dvh', maxWidth: 430, margin: '0 auto' }}
+      style={{ backgroundColor: '#FFFFFF', color: '#191919', height: '100dvh', maxWidth: 430, margin: '0 auto' }}
     >
       {/* Top Bar */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ ...SPRING_SMOOTH, delay: 0.05 }}
-        className="flex items-center gap-3 px-4 pb-3 border-b border-[#F0F0F0] flex-shrink-0"
+        className="flex items-center gap-3 px-4 pb-3 border-b border-[#F1F1EF] flex-shrink-0"
         style={{ paddingTop: 'max(env(safe-area-inset-top, 12px), 12px)' }}
       >
         <button
           onClick={() => navigate('/')}
-          className="p-2 -ml-1 rounded-xl active:bg-[#EEEEEE]"
+          className="p-2 -ml-1 active:bg-[#F7F6F3]"
+          style={{ borderRadius: 6 }}
         >
-          <ArrowLeft className="w-5 h-5 text-[#6B7C93]" />
+          <ArrowLeft className="w-5 h-5 text-[#787774]" />
         </button>
-        <h1 className="text-lg font-semibold text-[#1E2532]">Settings</h1>
+        <h1 className="text-lg font-medium text-[#191919]">Settings</h1>
       </motion.div>
 
       {/* Accordion List */}
@@ -935,8 +961,8 @@ export default function SwiftSettingsLayout() {
 
         {/* Footer */}
         <div className="flex items-center justify-center gap-2 py-6 px-5">
-          <HardDrive className="w-3 h-3 text-[#D5D5D5]" />
-          <span className="text-[11px] text-[#D5D5D5]">Data stored locally via IndexedDB</span>
+          <HardDrive className="w-3 h-3 text-[#9B9A97]" />
+          <span className="text-[11px] text-[#9B9A97]">Data stored locally via IndexedDB</span>
         </div>
       </div>
 
@@ -947,21 +973,22 @@ export default function SwiftSettingsLayout() {
             title="Export Backup" subtitle="Encrypt and download your data" icon={Download}>
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider block mb-2">Create a passphrase <span className="font-normal normal-case">(min. 8 characters)</span></label>
+                <label className="text-xs font-medium text-[#787774] uppercase tracking-wider block mb-2">Create a passphrase <span className="font-normal normal-case">(min. 8 characters)</span></label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#D5D5D5]" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9B9A97]" />
                   <input
                     type="password"
                     value={exportPassphrase}
                     onChange={(e) => setExportPassphrase(e.target.value)}
                     placeholder="Enter a passphrase..."
-                    className="w-full bg-white rounded-xl pl-10 pr-4 py-3 text-sm text-[#1E2532] outline-none placeholder:text-[#D5D5D5] border border-[#EBEBEB] focus:border-[#4A7AE5] transition-colors"
+                    className="w-full bg-white pl-10 pr-4 py-3 text-sm text-[#191919] outline-none placeholder:text-[#9B9A97] border border-[#E9E9E7] focus:border-[#B8A070] transition-colors"
+                    style={{ borderRadius: 6 }}
                   />
                 </div>
                 {exportPassphrase && (
                   <div className="mt-1.5 flex items-center gap-2">
                     {exportPassphrase.length < 8 ? (
-                      <span className="text-xs text-[#EF4444]">Minimum 8 characters</span>
+                      <span className="text-xs text-[#E03E3E]">Minimum 8 characters</span>
                     ) : (() => {
                       const s = passphraseStrength(exportPassphrase)
                       return s ? (
@@ -969,11 +996,11 @@ export default function SwiftSettingsLayout() {
                           <div className="flex gap-0.5">
                             {['Weak', 'Fair', 'Strong'].map((lvl, i) => (
                               <div key={lvl} className="h-1 w-8 rounded-full" style={{
-                                backgroundColor: ['Weak', 'Fair', 'Strong'].indexOf(s.label) >= i ? s.color : '#EBEBEB'
+                                backgroundColor: ['Weak', 'Fair', 'Strong'].indexOf(s.label) >= i ? s.color : '#E9E9E7'
                               }} />
                             ))}
                           </div>
-                          <span className="text-xs font-semibold" style={{ color: s.color }}>{s.label}</span>
+                          <span className="text-xs font-medium" style={{ color: s.color }}>{s.label}</span>
                         </>
                       ) : null
                     })()}
@@ -981,30 +1008,31 @@ export default function SwiftSettingsLayout() {
                 )}
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider block mb-2">Confirm passphrase</label>
+                <label className="text-xs font-medium text-[#787774] uppercase tracking-wider block mb-2">Confirm passphrase</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#D5D5D5]" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9B9A97]" />
                   <input
                     type="password"
                     value={exportConfirmPassphrase}
                     onChange={(e) => setExportConfirmPassphrase(e.target.value)}
                     placeholder="Re-enter passphrase..."
-                    className="w-full bg-white rounded-xl pl-10 pr-4 py-3 text-sm text-[#1E2532] outline-none placeholder:text-[#D5D5D5] border border-[#EBEBEB] focus:border-[#4A7AE5] transition-colors"
+                    className="w-full bg-white pl-10 pr-4 py-3 text-sm text-[#191919] outline-none placeholder:text-[#9B9A97] border border-[#E9E9E7] focus:border-[#B8A070] transition-colors"
+                    style={{ borderRadius: 6 }}
                   />
                 </div>
               </div>
               {exportPassphrase && exportConfirmPassphrase && exportPassphrase !== exportConfirmPassphrase && (
-                <p className="text-xs text-[#EF4444] flex items-center gap-1.5">
+                <p className="text-xs text-[#E03E3E] flex items-center gap-1.5">
                   <AlertCircle className="w-3 h-3" /> Passphrases don't match
                 </p>
               )}
               {exportStatus === 'error' && (
-                <p className="text-xs text-[#EF4444] flex items-center gap-1.5">
+                <p className="text-xs text-[#E03E3E] flex items-center gap-1.5">
                   <AlertCircle className="w-3 h-3" /> Export failed. Please try again.
                 </p>
               )}
               {exportStatus === 'done' && (
-                <p className="text-xs text-[#22C55E] flex items-center gap-1.5">
+                <p className="text-xs text-[#0F7B6C] flex items-center gap-1.5">
                   <CheckCircle className="w-3 h-3" /> Exported successfully.
                 </p>
               )}
@@ -1012,14 +1040,16 @@ export default function SwiftSettingsLayout() {
                 <button
                   onClick={() => handleExport(false)}
                   disabled={!exportPassphrase || exportPassphrase.length < 8 || exportPassphrase !== exportConfirmPassphrase || exportStatus === 'exporting'}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold bg-[#4A7AE5] text-white active:bg-[#3A6AD5] disabled:opacity-40 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium bg-[#B8A070] text-white active:bg-[#9C8760] disabled:opacity-40 transition-colors"
+                  style={{ borderRadius: 6 }}
                 >
                   <Lock className="w-3.5 h-3.5" /> Encrypt & Export
                 </button>
                 <button
                   onClick={() => handleExport(true)}
                   disabled={exportStatus === 'exporting'}
-                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold border border-[#EBEBEB] text-[#6B7C93] active:bg-[#FAFAFA] disabled:opacity-40"
+                  className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium border border-[#E9E9E7] text-[#787774] active:bg-[#F7F6F3] disabled:opacity-40"
+                  style={{ borderRadius: 6 }}
                 >
                   <FileJson className="w-3.5 h-3.5" /> JSON
                 </button>
@@ -1035,8 +1065,11 @@ export default function SwiftSettingsLayout() {
           <BottomSheet open={showImportSheet} onClose={() => { setShowImportSheet(false); setImportPassphrase(''); setImportStatus(null); setImportError('') }}
             title="Import Backup" subtitle="Restore from an encrypted backup" icon={Upload}>
             <div className="space-y-4">
-              <label className="flex flex-col items-center justify-center gap-2 py-6 rounded-xl border-2 border-dashed border-[#EBEBEB] text-sm text-[#6B7C93] active:bg-[#FAFAFA] cursor-pointer">
-                <Upload className="w-5 h-5 text-[#D5D5D5]" />
+              <label
+                className="flex flex-col items-center justify-center gap-2 py-6 border-2 border-dashed border-[#E9E9E7] text-sm text-[#787774] active:bg-[#F7F6F3] cursor-pointer"
+                style={{ borderRadius: 6 }}
+              >
+                <Upload className="w-5 h-5 text-[#9B9A97]" />
                 <span>Tap to select backup file</span>
                 <input
                   type="file"
@@ -1057,25 +1090,26 @@ export default function SwiftSettingsLayout() {
                 />
               </label>
               <div>
-                <label className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider block mb-2">Passphrase (for .apb files)</label>
+                <label className="text-xs font-medium text-[#787774] uppercase tracking-wider block mb-2">Passphrase (for .apb files)</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#D5D5D5]" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9B9A97]" />
                   <input
                     type="password"
                     value={importPassphrase}
                     onChange={(e) => setImportPassphrase(e.target.value)}
                     placeholder="Enter backup passphrase..."
-                    className="w-full bg-white rounded-xl pl-10 pr-4 py-3 text-sm text-[#1E2532] outline-none placeholder:text-[#D5D5D5] border border-[#EBEBEB] focus:border-[#4A7AE5] transition-colors"
+                    className="w-full bg-white pl-10 pr-4 py-3 text-sm text-[#191919] outline-none placeholder:text-[#9B9A97] border border-[#E9E9E7] focus:border-[#B8A070] transition-colors"
+                    style={{ borderRadius: 6 }}
                   />
                 </div>
               </div>
               {(importStatus === 'error' || importError) && (
-                <p className="text-xs text-[#EF4444] flex items-center gap-1.5">
+                <p className="text-xs text-[#E03E3E] flex items-center gap-1.5">
                   <AlertCircle className="w-3 h-3" /> {importError || 'Import failed. Wrong passphrase or corrupted file.'}
                 </p>
               )}
               {importStatus === 'done' && (
-                <p className="text-xs text-[#22C55E] flex items-center gap-1.5">
+                <p className="text-xs text-[#0F7B6C] flex items-center gap-1.5">
                   <CheckCircle className="w-3 h-3" /> Imported successfully.
                 </p>
               )}
@@ -1094,7 +1128,7 @@ export default function SwiftSettingsLayout() {
                 This will permanently delete all conversations, highlights, notes, branches, and settings. Make sure you have a backup first.
               </InfoBanner>
               <div>
-                <label className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider block mb-2">
+                <label className="text-xs font-medium text-[#787774] uppercase tracking-wider block mb-2">
                   Type "delete" to confirm
                 </label>
                 <input
@@ -1102,13 +1136,15 @@ export default function SwiftSettingsLayout() {
                   value={deleteConfirmText}
                   onChange={(e) => setDeleteConfirmText(e.target.value)}
                   placeholder="delete"
-                  className="w-full bg-white rounded-xl px-4 py-3 text-sm text-[#1E2532] outline-none placeholder:text-[#D5D5D5] border border-[#EBEBEB] focus:border-[#EF4444] transition-colors"
+                  className="w-full bg-white px-4 py-3 text-sm text-[#191919] outline-none placeholder:text-[#9B9A97] border border-[#E9E9E7] focus:border-[#E03E3E] transition-colors"
+                  style={{ borderRadius: 6 }}
                 />
               </div>
               <button
                 onClick={handleDeleteAll}
                 disabled={deleteConfirmText !== 'delete'}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold bg-[#EF4444] text-white active:bg-[#DC2626] disabled:opacity-40 transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium bg-[#E03E3E] text-white active:bg-[#C43434] disabled:opacity-40 transition-colors"
+                style={{ borderRadius: 6 }}
               >
                 <Trash2 className="w-4 h-4" /> Delete Everything
               </button>

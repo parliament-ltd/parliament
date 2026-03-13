@@ -1878,8 +1878,10 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
             style={{
               border: mode ? 'none' : '1px solid #EBEBEB',
               background: mode
-                ? 'linear-gradient(to right, #C9A84C, #C4A94D)'
+                ? 'linear-gradient(90deg, #B8A070 25%, #C9B37E 50%, #B8A070 75%)'
                 : '#FFFFFF',
+              backgroundSize: mode ? '200% 100%' : 'auto',
+              animation: mode && !compressing ? 'gold-shimmer 2s infinite linear' : 'none',
               color: mode ? '#FFFFFF' : '#D5D5D5',
               cursor: mode && !compressing ? 'pointer' : 'not-allowed',
               opacity: (!mode || compressing) ? 0.7 : 1,

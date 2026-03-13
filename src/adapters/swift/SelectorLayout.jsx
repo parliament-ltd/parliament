@@ -503,7 +503,7 @@ export default function SwiftSelectorLayout() {
           )}
           {sortedConvs.length === 0 && !searchQuery && (
             <div className="flex flex-col items-center justify-center py-20 px-8">
-              <img src="/logo.png" alt="" className="w-12 h-12 mb-4 object-contain" style={{ opacity: 0.22 }} />
+              <img src="/flight_logo.png" alt="" className="w-12 h-12 mb-4 object-contain" style={{ opacity: 0.22 }} />
               <p className="text-sm text-[#6B7C93] mb-1">No conversations yet</p>
               <p className="text-xs text-[#C0C8D4]">Tap + Chat to start</p>
             </div>
