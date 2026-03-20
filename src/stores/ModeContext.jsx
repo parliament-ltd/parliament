@@ -59,6 +59,16 @@ const MODE_CAPABILITIES = {
     animations: SPRING_SMOOTH,
     touchTargets: false,
   },
+  pelican: {
+    layout: 'data-canvas',
+    input: 'keyboard',
+    gestures: false,
+    sidebars: 'file-shelf',
+    contextHealth: 'meter',
+    selection: 'checkbox',
+    animations: SPRING_SMOOTH,
+    touchTargets: false,
+  },
 }
 
 const LOCAL_STORAGE_KEY = 'parliament-mode'

@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Shield, Eye, MessageCircleQuestion, RefreshCw, Sparkles,
-  X, Settings2,
+  X, Settings2, Bird, Trash2, Plus,
 } from 'lucide-react'
+import { getSetting, setSetting } from '../lib/db'
 
 /* ── Animation Constants ─────────────────────────────────── */
 
@@ -49,6 +50,8 @@ const COLLAB_PRESETS = [
   },
 ]
 
+const PERSONAS_SETTING_KEY = 'parrotPersonas'
+
 /* ── Main Component ──────────────────────────────────────── */
 
 /**
@@ -59,16 +62,25 @@ const COLLAB_PRESETS = [
  *   onApply(presets, instruction)  — called only when user clicks "Apply to Conversation"
  *   activePresets  Set<string>     — currently committed presets (read-only, seeds local state)
  *   customInstruction string       — currently committed custom instruction
- *
- * Presets are kept in LOCAL state inside the modal and are only committed to the
- * parent (via onApply) when the user explicitly clicks "Apply to Conversation".
- * Clicking Cancel or the X icon discards all pending changes — the badge in the
- * Actions panel therefore only reflects what has actually been applied.
  */
 export default function CollabModal({ onClose, onApply, activePresets, customInstruction }) {
   // Local copies — changes here don't affect the parent until Apply is clicked
   const [localPresets, setLocalPresets] = useState(() => new Set(activePresets))
   const [localCustom, setLocalCustom] = useState(customInstruction || '')
+
+  // Parrot Personas
+  const [personas, setPersonas] = useState([])
+  const [personaTitle, setPersonaTitle] = useState('')
+  const [savedFlash, setSavedFlash] = useState(false)
+
+  // Load saved personas on mount
+  useEffect(() => {
+    getSetting(PERSONAS_SETTING_KEY).then(raw => {
+      if (raw) {
+        try { setPersonas(JSON.parse(raw)) } catch {}
+      }
+    })
+  }, [])
 
   const toggleLocalPreset = useCallback((id) => {
     setLocalPresets(prev => {
@@ -83,11 +95,43 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
     onClose()
   }
 
+  const handleSavePersona = async () => {
+    const title = personaTitle.trim()
+    const instruction = localCustom.trim()
+    if (!title || !instruction) return
+
+    const id = `persona_${Date.now()}`
+    const newPersona = { id, title, instruction }
+    const next = [...personas, newPersona]
+    setPersonas(next)
+    await setSetting(PERSONAS_SETTING_KEY, JSON.stringify(next))
+    setPersonaTitle('')
+    setSavedFlash(true)
+    setTimeout(() => setSavedFlash(false), 1500)
+  }
+
+  const handleDeletePersona = async (id) => {
+    setLocalPresets(prev => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+    const next = personas.filter(p => p.id !== id)
+    setPersonas(next)
+    await setSetting(PERSONAS_SETTING_KEY, JSON.stringify(next))
+  }
+
   // Build the combined system prompt preview from local presets + custom instruction
-  const activePrompts = COLLAB_PRESETS
+  const allPresetsById = [
+    ...COLLAB_PRESETS.map(p => ({ id: p.id, prompt: p.prompt })),
+    ...personas.map(p => ({ id: p.id, prompt: p.instruction })),
+  ]
+  const activePrompts = allPresetsById
     .filter(p => localPresets.has(p.id))
     .map(p => p.prompt)
-  if (localCustom.trim()) activePrompts.push(localCustom.trim())
+  if (localCustom.trim() && !personas.some(p => localPresets.has(p.id) && p.instruction === localCustom.trim())) {
+    activePrompts.push(localCustom.trim())
+  }
   const combinedPrompt = activePrompts.join('\n\n')
 
   const hasChanges = (
@@ -95,6 +139,8 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
     [...localPresets].some(id => !activePresets.has(id)) ||
     localCustom !== (customInstruction || '')
   )
+
+  const canSavePersona = personaTitle.trim().length > 0 && localCustom.trim().length > 0
 
   return (
     <motion.div
@@ -139,7 +185,7 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
         {/* Body — scrollable */}
         <div className="flex-1 overflow-y-auto p-5 space-y-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}>
 
-          {/* Presets */}
+          {/* Built-in Presets */}
           <div>
             <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
               Presets {localPresets.size > 0 && (
@@ -172,7 +218,6 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
                         <div className="text-sm font-medium text-[#191919]">{preset.label}</div>
                         <p className="text-xs text-[#787774] mt-0.5 leading-relaxed">{preset.description}</p>
                       </div>
-                      {/* Active indicator dot */}
                       <div
                         className="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5 transition-colors"
                         style={{ backgroundColor: isActive ? '#B8A070' : '#E9E9E7' }}
@@ -184,11 +229,81 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
             </div>
           </div>
 
-          {/* Custom instruction */}
+          {/* Parrot Personas — saved personas */}
+          {personas.length > 0 && (
+            <div>
+              <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <Bird className="w-3.5 h-3.5 text-[#7C6CD4]" />
+                Parrot Personas
+              </h3>
+              <div className="space-y-2">
+                {personas.map((persona) => {
+                  const isActive = localPresets.has(persona.id)
+                  return (
+                    <motion.div
+                      key={persona.id}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={SPRING_SNAPPY}
+                      className="group relative rounded-lg transition-colors"
+                      style={{
+                        border: isActive ? '1.5px solid #7C6CD4' : '1px solid #EBEBEB',
+                        backgroundColor: isActive ? 'rgba(124,108,212,0.04)' : '#FFFFFF',
+                      }}
+                    >
+                      <button
+                        className="w-full text-left p-4"
+                        onClick={() => toggleLocalPreset(persona.id)}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div
+                            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                            style={{ backgroundColor: isActive ? 'rgba(124,108,212,0.12)' : '#F5F5F5' }}
+                          >
+                            <Bird className="w-4 h-4" style={{ color: isActive ? '#7C6CD4' : '#6B7C93' }} />
+                          </div>
+                          <div className="flex-1 min-w-0 pr-6">
+                            <div className="text-sm font-semibold text-[#1E2532]">{persona.title}</div>
+                            <p className="text-xs text-[#6B7C93] mt-0.5 leading-relaxed line-clamp-2">
+                              {persona.instruction}
+                            </p>
+                          </div>
+                          <div
+                            className="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5 transition-colors"
+                            style={{ backgroundColor: isActive ? '#7C6CD4' : '#EBEBEB' }}
+                          />
+                        </div>
+                      </button>
+                      {/* Delete button */}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDeletePersona(persona.id) }}
+                        className="absolute top-3 right-9 p-1.5 rounded-md text-[#D5D5D5] hover:text-[#EF4444] hover:bg-[#FEF2F2] opacity-0 group-hover:opacity-100 transition-all"
+                        title="Delete persona"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </motion.div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Custom Instruction + Save as Persona */}
           <div>
             <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
               Custom Instruction
             </h3>
+
+            {/* Persona title field */}
+            <input
+              type="text"
+              value={personaTitle}
+              onChange={(e) => setPersonaTitle(e.target.value)}
+              placeholder="Persona title (optional — to save as a Parrot Persona)"
+              className="w-full bg-white rounded-lg px-4 py-2.5 text-sm text-[#1E2532] outline-none border border-[#EBEBEB] focus:border-[#7C6CD4] transition-colors placeholder:text-[#D5D5D5] mb-2"
+            />
+
             <textarea
               value={localCustom}
               onChange={(e) => setLocalCustom(e.target.value)}
@@ -196,6 +311,44 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
               className="w-full bg-white rounded-lg px-4 py-3 text-sm text-[#191919] resize-none outline-none border border-[#E9E9E7] focus:border-[#B8A070] transition-colors placeholder:text-[#9B9A97]"
               rows={3}
             />
+
+            {/* Save Persona button */}
+            <div className="flex items-center justify-between mt-2">
+              <p className="text-[11px] text-[#D5D5D5]">
+                Add a title above to save as a reusable Parrot Persona.
+              </p>
+              <AnimatePresence mode="wait">
+                {savedFlash ? (
+                  <motion.span
+                    key="saved"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={SPRING_SNAPPY}
+                    className="text-[11px] font-semibold text-[#22C55E]"
+                  >
+                    Saved!
+                  </motion.span>
+                ) : (
+                  <motion.button
+                    key="save-btn"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={handleSavePersona}
+                    disabled={!canSavePersona}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold border transition-colors"
+                    style={{
+                      borderColor: canSavePersona ? '#7C6CD4' : '#EBEBEB',
+                      color: canSavePersona ? '#7C6CD4' : '#D5D5D5',
+                      backgroundColor: canSavePersona ? 'rgba(124,108,212,0.06)' : 'transparent',
+                    }}
+                  >
+                    <Plus className="w-3 h-3" />
+                    Save Persona
+                  </motion.button>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
           {/* Combined prompt preview */}

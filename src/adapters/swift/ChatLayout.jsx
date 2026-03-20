@@ -11,7 +11,10 @@ import {
 import { useChat } from '../../stores/ChatContext'
 import { useConversations } from '../../stores/ConversationContext'
 import { useSettings } from '../../stores/SettingsContext'
+import { useMode } from '../../stores/ModeContext'
 import { getProvider } from '../../providers'
+import ModeSuggestion from '../../components/core/ModeSuggestion'
+import { evaluateSuggestions } from '../../lib/modeSuggestions'
 import { loadApiKey } from '../../lib/crypto'
 import {
   getFavorites, addFavorite, deleteFavorite,
@@ -301,6 +304,7 @@ export default function SwiftChatLayout() {
   } = useChat()
   const { conversations, updateConversation, loadConversations, createConversation } = useConversations()
   const { settings, refreshStorageEstimate } = useSettings()
+  const { mode, setMode } = useMode()
 
   const [inputValue, setInputValue] = useState('')
   const [apiKey, setApiKey] = useState(null)
@@ -326,6 +330,10 @@ export default function SwiftChatLayout() {
   const [currentConversation, setCurrentConversation] = useState(null)
   const [activePresets, setActivePresets] = useState(new Set())
 
+  // Mode suggestions
+  const [dismissedSuggestions, setDismissedSuggestions] = useState(new Set())
+  const [suggestionsEnabled, setSuggestionsEnabled] = useState(true)
+
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
   const lastSendTimeRef = useRef(0)
@@ -348,6 +356,13 @@ export default function SwiftChatLayout() {
 
   const visibleMessages = messages.filter(m => !hiddenMessages.has(m.id))
   const hiddenCount = messages.length - visibleMessages.length
+
+  const activeSuggestion = useMemo(() => {
+    if (!suggestionsEnabled) return null
+    const suggestion = evaluateSuggestions({ mode, attachment: null, highlightCount: highlightsList.length })
+    if (!suggestion || dismissedSuggestions.has(suggestion.id)) return null
+    return suggestion
+  }, [suggestionsEnabled, mode, highlightsList.length, dismissedSuggestions])
 
   // Load conversation and annotations
   useEffect(() => {
@@ -772,6 +787,14 @@ export default function SwiftChatLayout() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Mode suggestion banner */}
+      <ModeSuggestion
+        suggestion={activeSuggestion}
+        onSwitch={(m) => { setMode(m); setDismissedSuggestions(prev => { const s = new Set(prev); s.add(activeSuggestion.id); return s }) }}
+        onDismiss={() => setDismissedSuggestions(prev => { const s = new Set(prev); s.add(activeSuggestion.id); return s })}
+        onTurnOff={() => setSuggestionsEnabled(false)}
+      />
 
       {/* ── Input Area ── */}
       <motion.div

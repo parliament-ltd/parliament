@@ -8,6 +8,8 @@ import {
 } from 'lucide-react'
 import { SPRING_SNAPPY, SPRING_GENTLE, DUSTY_GOLD, HIGHLIGHT_COLORS } from '../../lib/constants'
 import { indexOfWord } from '../../lib/textUtils'
+import CitationLink from './CitationLink'
+import ChartRenderer from './ChartRenderer'
 
 /* ── Message entrance animation ─────────────────────────── */
 
@@ -169,9 +171,17 @@ export default function MessageCard({
       blockquote: ({ children, ...props }) => <blockquote {...props}>{applyHighlights(children)}</blockquote>,
     } : {}
 
+    const chartCodeComponent = ({ className, children }) => {
+      const lang = (className || '').replace('language-', '')
+      if (lang === 'chart') {
+        return <ChartRenderer data={String(children).trim()} />
+      }
+      return <code className={className}>{children}</code>
+    }
+
     return (
       <div className="parliament-md">
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={highlightedComponents}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ ...highlightedComponents, a: CitationLink, code: chartCodeComponent }}>
           {content}
         </ReactMarkdown>
       </div>

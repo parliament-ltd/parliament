@@ -10,12 +10,14 @@ const SwiftSelectorLayout         = lazy(() => import('../adapters/swift/Selecto
 const KingfisherSelectorLayout    = lazy(() => import('../adapters/kingfisher/SelectorLayout'))
 const SecretarybirdSelectorLayout = lazy(() => import('../adapters/secretarybird/SelectorLayout'))
 const StarlingSelectorLayout      = lazy(() => import('../adapters/starling/SelectorLayout'))
+const PelicanSelectorLayout       = lazy(() => import('../adapters/pelican/SelectorLayout'))
 
 const LAYOUTS = {
   swift:         SwiftSelectorLayout,
   kingfisher:    KingfisherSelectorLayout,
   secretarybird: SecretarybirdSelectorLayout,
   starling:      StarlingSelectorLayout,
+  pelican:       PelicanSelectorLayout,
 }
 
 export default function SelectorView() {
