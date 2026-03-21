@@ -1,8 +1,9 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Square, ArrowUp, Plus, X, FileText, Globe, Calculator, BarChart2, Paperclip, Check } from 'lucide-react'
+import { Square, ArrowUp, Plus, X, FileText, Globe, Calculator, BarChart2, Paperclip, Check, Mic } from 'lucide-react'
 import { SPRING_SNAPPY, SPRING_SMOOTH } from '../../lib/constants'
 import { ACCEPTED_TYPES, readUploadedFile } from '../../lib/fileUpload'
+import { useVoiceInput } from '../../hooks/useVoiceInput'
 
 const TOOL_META = {
   web_search:   { label: 'Web search',   Icon: Globe,       color: '#4A7AE5' },
@@ -51,6 +52,16 @@ export default function InputArea({
   const menuRef = useRef(null)
   const plusRef = useRef(null)
   const [menuOpen, setMenuOpen] = useState(false)
+
+  // Voice — only active in cardLayout
+  const handleTranscript = useCallback((text, isFinal) => {
+    onChange?.(text)
+    // On final result the recognition session ends naturally;
+    // the textarea now has the text and the Send button appears
+  }, [onChange])
+
+  const { isListening, isSupported: voiceSupported, start: startVoice, stop: stopVoice } =
+    useVoiceInput({ onTranscript: handleTranscript })
 
   const hasActive = activeTools.size > 0 || !!attachment
 
@@ -201,28 +212,89 @@ export default function InputArea({
           {/* Bottom toolbar */}
           <div className="flex items-center justify-between px-3 pb-3 pt-1">
             <PlusMenu />
-            <motion.button
-              whileTap={{ scale: 0.85 }}
-              onClick={isStreaming ? onStop : onSend}
-              className="rounded-lg border flex items-center justify-center flex-shrink-0 transition-colors"
-              style={{
-                width: 36, height: 36,
-                borderColor: isStreaming ? '#E03E3E' : value.trim() ? '#4A7AE5' : '#DDDDE3',
-                backgroundColor: isStreaming ? '#E03E3E' : value.trim() ? '#4A7AE5' : 'transparent',
-              }}
-            >
-              <AnimatePresence mode="wait">
-                {isStreaming ? (
-                  <motion.div key="stop" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={SPRING_SNAPPY}>
-                    <Square className="w-3.5 h-3.5 text-white" />
-                  </motion.div>
-                ) : (
-                  <motion.div key="send" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={SPRING_SNAPPY}>
-                    <ArrowUp className="w-4 h-4 transition-colors" style={{ color: value.trim() ? '#FFFFFF' : '#9B9A97' }} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.button>
+
+            <AnimatePresence mode="wait">
+              {/* ── Streaming: Stop button ── */}
+              {isStreaming ? (
+                <motion.button
+                  key="stop"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={SPRING_SNAPPY}
+                  whileTap={{ scale: 0.85 }}
+                  onClick={onStop}
+                  className="rounded-lg border flex items-center justify-center flex-shrink-0"
+                  style={{ width: 36, height: 36, borderColor: '#E03E3E', backgroundColor: '#E03E3E' }}
+                >
+                  <Square className="w-3.5 h-3.5 text-white" />
+                </motion.button>
+
+              /* ── Has text: Send button ── */
+              ) : value.trim() ? (
+                <motion.button
+                  key="send"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={SPRING_SNAPPY}
+                  whileTap={{ scale: 0.85 }}
+                  onClick={onSend}
+                  className="rounded-lg border flex items-center justify-center flex-shrink-0"
+                  style={{ width: 36, height: 36, borderColor: '#4A7AE5', backgroundColor: '#4A7AE5' }}
+                >
+                  <ArrowUp className="w-4 h-4 text-white" />
+                </motion.button>
+
+              /* ── Empty + voice supported: Mic button ── */
+              ) : voiceSupported ? (
+                <motion.button
+                  key="mic"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={SPRING_SNAPPY}
+                  whileTap={{ scale: 0.85 }}
+                  onClick={isListening ? stopVoice : startVoice}
+                  className="rounded-lg border flex items-center justify-center flex-shrink-0 relative overflow-hidden"
+                  style={{
+                    width: 36, height: 36,
+                    borderColor: isListening ? '#E03E3E' : '#DDDDE3',
+                    backgroundColor: isListening ? '#E03E3E' : 'transparent',
+                  }}
+                >
+                  {/* Pulse ring while recording */}
+                  {isListening && (
+                    <motion.span
+                      className="absolute inset-0 rounded-lg"
+                      style={{ backgroundColor: '#E03E3E' }}
+                      animate={{ opacity: [0.4, 0.15, 0.4] }}
+                      transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                    />
+                  )}
+                  <Mic
+                    className="w-4 h-4 relative z-10 transition-colors"
+                    style={{ color: isListening ? '#FFFFFF' : '#9B9A97' }}
+                  />
+                </motion.button>
+
+              /* ── Empty + no voice support: ghost Send ── */
+              ) : (
+                <motion.button
+                  key="send-empty"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={SPRING_SNAPPY}
+                  whileTap={{ scale: 0.85 }}
+                  onClick={onSend}
+                  className="rounded-lg border flex items-center justify-center flex-shrink-0"
+                  style={{ width: 36, height: 36, borderColor: '#DDDDE3', backgroundColor: 'transparent' }}
+                >
+                  <ArrowUp className="w-4 h-4" style={{ color: '#9B9A97' }} />
+                </motion.button>
+              )}
+            </AnimatePresence>
           </div>
         </motion.div>
 
