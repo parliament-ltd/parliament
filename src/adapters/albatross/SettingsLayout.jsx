@@ -878,6 +878,7 @@ const MODE_OPTIONS = [
   { id: 'auto', label: 'Auto', description: 'Detect from your device — desktop uses Albatross, mobile uses Swift' },
   { id: 'albatross', label: 'Albatross', description: 'Desktop layout with dual sidebars and full keyboard support' },
   { id: 'swift', label: 'Swift', description: 'Mobile-optimized, touch-first layout' },
+  { id: 'pelican', label: 'Pelican', description: 'Data analysis layout with file staging, charts, and bulk processing', soon: true },
   { id: 'kingfisher', label: 'Kingfisher', description: 'Deep reading layout with annotation panel', soon: true },
   { id: 'secretarybird', label: 'Secretarybird', description: 'iPad + stylus canvas layout', soon: true },
   { id: 'starling', label: 'Starling', description: 'Collaborative split-view layout', soon: true },
