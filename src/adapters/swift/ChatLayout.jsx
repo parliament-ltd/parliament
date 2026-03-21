@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import {
-  GitBranch, Trash2, StickyNote, Star, Copy, X, ArrowUp, FileText, Eye,
-  Settings2, BookOpen, Zap, Square, AlertCircle, Highlighter, ChevronDown,
+  GitBranch, Trash2, StickyNote, Star, Copy, X, FileText, Eye,
+  Settings2, BookOpen, Zap, AlertCircle, Highlighter, ChevronDown,
   ArrowRightCircle, GripHorizontal, List, MessageSquare,
 } from 'lucide-react'
 import { useChat } from '../../stores/ChatContext'
@@ -14,7 +14,9 @@ import { useSettings } from '../../stores/SettingsContext'
 import { useMode } from '../../stores/ModeContext'
 import { getProvider } from '../../providers'
 import ModeSuggestion from '../../components/core/ModeSuggestion'
+import InputArea from '../../components/core/InputArea'
 import { evaluateSuggestions } from '../../lib/modeSuggestions'
+import { formatAttachmentForMessage } from '../../lib/fileUpload'
 import { loadApiKey } from '../../lib/crypto'
 import {
   getFavorites, addFavorite, deleteFavorite,
@@ -334,6 +336,14 @@ export default function SwiftChatLayout() {
   const [dismissedSuggestions, setDismissedSuggestions] = useState(new Set())
   const [suggestionsEnabled, setSuggestionsEnabled] = useState(true)
 
+  // Attachment + tools
+  const [attachment, setAttachment] = useState(null)
+  const availableTools = useMemo(() => getProvider('anthropic').getAvailableTools?.() ?? [], [])
+  const [activeTools, setActiveTools] = useState(new Set())
+  const toggleTool = useCallback((toolId) => {
+    setActiveTools(prev => { const n = new Set(prev); n.has(toolId) ? n.delete(toolId) : n.add(toolId); return n })
+  }, [])
+
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
   const lastSendTimeRef = useRef(0)
@@ -428,10 +438,13 @@ export default function SwiftChatLayout() {
     setInputValue('')
     setApiError(null)
     setSelectedMsgId(null)
+    const messageContent = attachment ? formatAttachmentForMessage(attachment) + trimmed : trimmed
+    const toolList = Array.from(activeTools).map(tid => availableTools.find(t => (t.id || t.name) === tid)).filter(Boolean)
+    setAttachment(null)
     try {
       const provider = getProvider('anthropic')
       const collabPrompt = buildCollabSystemPrompt()
-      await sendMessage(apiKey, id, trimmed, settings.defaultModel, provider, collabPrompt)
+      await sendMessage(apiKey, id, messageContent, settings.defaultModel, provider, collabPrompt, toolList)
       await refreshStorageEstimate()
     } catch (error) {
       if (error.status === 401 || error.status === 403) {
@@ -442,7 +455,7 @@ export default function SwiftChatLayout() {
         setApiError({ type: 'generic', message: error.message || 'Something went wrong.' })
       }
     }
-  }, [inputValue, isStreaming, apiKey, id, settings.defaultModel, sendMessage, refreshStorageEstimate, buildCollabSystemPrompt])
+  }, [inputValue, isStreaming, apiKey, id, settings.defaultModel, sendMessage, refreshStorageEstimate, buildCollabSystemPrompt, attachment, activeTools, availableTools])
 
   const handleContinue = useCallback(async (messageId) => {
     if (!apiKey) return
@@ -627,12 +640,6 @@ export default function SwiftChatLayout() {
   }, [isStreaming, stopGenerating, handleSend])
 
   // Auto-resize textarea
-  const handleInputChange = useCallback((e) => {
-    setInputValue(e.target.value)
-    e.target.style.height = 'auto'
-    e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
-  }, [])
-
   if (loading) return null
 
   return (
@@ -797,48 +804,22 @@ export default function SwiftChatLayout() {
       />
 
       {/* ── Input Area ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ ...SPRING_SMOOTH, delay: 0.3 }}
-        className="px-4 pt-2"
-        style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)' }}
-      >
-        <div className="flex items-end gap-2.5">
-          <textarea
-            ref={inputRef}
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Type here, or swipe left to start fresh."
-            rows={1}
-            className="flex-1 bg-white rounded-xl px-4 py-2.5 text-[#191919] outline-none placeholder:text-[#9B9A97] border transition-colors resize-none"
-            style={{ borderColor: '#DDDDE3', maxHeight: 120, minHeight: 40, lineHeight: '20px', fontSize: 16 }}
-          />
-          <motion.button
-            whileTap={{ scale: 0.85 }}
-            onClick={isStreaming ? stopGenerating : handleSend}
-            className="rounded-lg border flex items-center justify-center flex-shrink-0 transition-colors"
-            style={{
-              width: 40, height: 40,
-              borderColor: isStreaming ? '#E03E3E' : inputValue.trim() ? contextColor : '#DDDDE3',
-              backgroundColor: isStreaming ? '#E03E3E' : inputValue.trim() ? contextColor : 'transparent',
-            }}
-          >
-            <AnimatePresence mode="wait">
-              {isStreaming ? (
-                <motion.div key="stop" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={SPRING_SNAPPY}>
-                  <Square className="w-4 h-4 text-white" />
-                </motion.div>
-              ) : (
-                <motion.div key="send" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={SPRING_SNAPPY}>
-                  <ArrowUp className="w-5 h-5 transition-colors" style={{ color: inputValue.trim() ? '#FFFFFF' : contextColor }} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.button>
-        </div>
-      </motion.div>
+      <InputArea
+        cardLayout
+        inputRef={inputRef}
+        value={inputValue}
+        onChange={setInputValue}
+        onSend={handleSend}
+        onStop={stopGenerating}
+        isStreaming={isStreaming}
+        placeholder="Type here, or swipe left to start fresh."
+        attachment={attachment}
+        onAttach={setAttachment}
+        onClearAttach={() => setAttachment(null)}
+        availableTools={availableTools}
+        activeTools={activeTools}
+        onToggleTool={toggleTool}
+      />
 
       {/* ── Unified Panel ── */}
       <AnimatePresence>

@@ -217,6 +217,30 @@ When a send returns 429 (Too Many Requests):
 - Message auto-clears when the next send succeeds
 - No countdown timer, no proactive rate limit tracking
 
+## Input Area Layout
+
+### Desktop / Albatross (inline layout)
+
+`InputArea` renders as a horizontal row: `flex items-stretch gap-3`. The `+` button lives **inside** the textarea wrapper, absolutely positioned at `bottom-3 left-2.5`. The textarea gets `pl-11` so text clears the button. The Send button sits alongside the textarea as a separate flex sibling — `items-stretch` ensures both are always exactly the same height with no manual sizing needed. Do not add explicit `height` or `h-[]` to either element; let flex stretch do the work.
+
+```
+[ textarea (rows=3, py-3, pl-11)  ] [ Send ]
+  ↖ + button (absolute bottom-3 left-2.5)
+```
+
+### Mobile / Swift (card layout)
+
+Pass `cardLayout` prop to `InputArea`. Renders as a unified rounded card: textarea on top, `+` button bottom-left, arrow-up Send button bottom-right. `rows={2}`, no separate Send button alongside.
+
+### + Menu
+
+The `+` button opens a floating popup (anchored bottom-left, opens upward) containing:
+- **Upload file** — triggers the hidden file input; shows a checkmark when a file is attached
+- **Divider** then each available tool (web search, calculate, create chart) — toggleable with a checkmark when active
+- A blue dot indicator appears on the `+` button itself when anything is active
+
+Tool metadata lives in `TOOL_META` in `InputArea.jsx`. Add new tools there to have them appear automatically.
+
 ## Send Button Behavior
 
 ### Streaming State
@@ -349,6 +373,18 @@ Edited and Created columns use lighter text (`#C0C8D4`). Table header labels als
 ### Favorites Sidebar
 
 Remains as a collapsible right sidebar (300px). Favorites are cross-cutting reference content (snippets from any conversation), not per-conversation metadata, so they don't fit the global view toggle pattern. Collapsible to reclaim horizontal space.
+
+## Collab Modal — Parrot Personas
+
+Parrot Personas are user-created system prompt presets stored in IndexedDB via `getSetting`/`setSetting` with key `parrot-personas`. Each persona has `{ id, title, instruction }`.
+
+### CRUD
+- **Create** — title + instruction inputs at the top of the Personas tab; saved on "Save persona"
+- **Edit** — pencil icon appears on hover next to the trash icon. Clicking it switches that persona's card into an inline edit form (title input + instruction textarea). "Save" commits, "Cancel" discards. Uses `editingPersonaId` state to track which card is in edit mode.
+- **Delete** — trash icon (always visible on hover)
+- **Activate** — clicking the card body toggles it as the active preset
+
+Do not add a separate edit page or modal — keep the inline edit pattern within the card.
 
 ## Review Modal
 

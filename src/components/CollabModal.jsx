@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Shield, Eye, MessageCircleQuestion, RefreshCw, Sparkles,
-  X, Settings2, Bird, Trash2, Plus,
+  X, Settings2, Bird, Trash2, Plus, Pencil,
 } from 'lucide-react'
 import { getSetting, setSetting } from '../lib/db'
 
@@ -72,6 +72,9 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
   const [personas, setPersonas] = useState([])
   const [personaTitle, setPersonaTitle] = useState('')
   const [savedFlash, setSavedFlash] = useState(false)
+  const [editingPersonaId, setEditingPersonaId] = useState(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editInstruction, setEditInstruction] = useState('')
 
   // Load saved personas on mount
   useEffect(() => {
@@ -119,6 +122,29 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
     const next = personas.filter(p => p.id !== id)
     setPersonas(next)
     await setSetting(PERSONAS_SETTING_KEY, JSON.stringify(next))
+  }
+
+  const handleStartEdit = (e, persona) => {
+    e.stopPropagation()
+    setEditingPersonaId(persona.id)
+    setEditTitle(persona.title)
+    setEditInstruction(persona.instruction)
+  }
+
+  const handleSaveEdit = async (e, id) => {
+    e.stopPropagation()
+    const title = editTitle.trim()
+    const instruction = editInstruction.trim()
+    if (!title || !instruction) return
+    const next = personas.map(p => p.id === id ? { ...p, title, instruction } : p)
+    setPersonas(next)
+    await setSetting(PERSONAS_SETTING_KEY, JSON.stringify(next))
+    setEditingPersonaId(null)
+  }
+
+  const handleCancelEdit = (e) => {
+    e.stopPropagation()
+    setEditingPersonaId(null)
   }
 
   // Build the combined system prompt preview from local presets + custom instruction
@@ -251,37 +277,83 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
                         backgroundColor: isActive ? 'rgba(124,108,212,0.04)' : '#FFFFFF',
                       }}
                     >
-                      <button
-                        className="w-full text-left p-4"
-                        onClick={() => toggleLocalPreset(persona.id)}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div
-                            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
-                            style={{ backgroundColor: isActive ? 'rgba(124,108,212,0.12)' : '#F5F5F5' }}
-                          >
-                            <Bird className="w-4 h-4" style={{ color: isActive ? '#7C6CD4' : '#6B7C93' }} />
-                          </div>
-                          <div className="flex-1 min-w-0 pr-6">
-                            <div className="text-sm font-semibold text-[#1E2532]">{persona.title}</div>
-                            <p className="text-xs text-[#6B7C93] mt-0.5 leading-relaxed line-clamp-2">
-                              {persona.instruction}
-                            </p>
-                          </div>
-                          <div
-                            className="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5 transition-colors"
-                            style={{ backgroundColor: isActive ? '#7C6CD4' : '#EBEBEB' }}
+                      {editingPersonaId === persona.id ? (
+                        <div className="p-4 space-y-2" onClick={e => e.stopPropagation()}>
+                          <input
+                            autoFocus
+                            className="w-full bg-white rounded-md px-3 py-1.5 text-sm font-semibold text-[#1E2532] outline-none border border-[#EBEBEB] focus:border-[#4A7AE5] transition-colors"
+                            value={editTitle}
+                            onChange={e => setEditTitle(e.target.value)}
+                            placeholder="Persona title"
                           />
+                          <textarea
+                            className="w-full bg-white rounded-md px-3 py-1.5 text-xs text-[#6B7C93] outline-none border border-[#EBEBEB] focus:border-[#4A7AE5] transition-colors resize-none leading-relaxed"
+                            rows={3}
+                            value={editInstruction}
+                            onChange={e => setEditInstruction(e.target.value)}
+                            placeholder="Instruction"
+                          />
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              onClick={handleCancelEdit}
+                              className="px-3 py-1 rounded-md text-xs text-[#6B7C93] border border-[#EBEBEB] hover:bg-[#F5F5F5] transition-colors"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={e => handleSaveEdit(e, persona.id)}
+                              disabled={!editTitle.trim() || !editInstruction.trim()}
+                              className="px-3 py-1 rounded-md text-xs font-semibold transition-colors disabled:opacity-40"
+                              style={{ backgroundColor: 'rgba(124,108,212,0.1)', color: '#7C6CD4' }}
+                            >
+                              Save
+                            </button>
+                          </div>
                         </div>
-                      </button>
-                      {/* Delete button */}
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleDeletePersona(persona.id) }}
-                        className="absolute top-3 right-9 p-1.5 rounded-md text-[#D5D5D5] hover:text-[#EF4444] hover:bg-[#FEF2F2] opacity-0 group-hover:opacity-100 transition-all"
-                        title="Delete persona"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      ) : (
+                        <button
+                          className="w-full text-left p-4"
+                          onClick={() => toggleLocalPreset(persona.id)}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div
+                              className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                              style={{ backgroundColor: isActive ? 'rgba(124,108,212,0.12)' : '#F5F5F5' }}
+                            >
+                              <Bird className="w-4 h-4" style={{ color: isActive ? '#7C6CD4' : '#6B7C93' }} />
+                            </div>
+                            <div className="flex-1 min-w-0 pr-6">
+                              <div className="text-sm font-semibold text-[#1E2532]">{persona.title}</div>
+                              <p className="text-xs text-[#6B7C93] mt-0.5 leading-relaxed line-clamp-2">
+                                {persona.instruction}
+                              </p>
+                            </div>
+                            <div
+                              className="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5 transition-colors"
+                              style={{ backgroundColor: isActive ? '#7C6CD4' : '#EBEBEB' }}
+                            />
+                          </div>
+                        </button>
+                      )}
+                      {/* Edit + Delete buttons (shown on hover, hidden while editing) */}
+                      {editingPersonaId !== persona.id && (
+                        <>
+                          <button
+                            onClick={e => handleStartEdit(e, persona)}
+                            className="absolute top-3 right-9 p-1.5 rounded-md text-[#D5D5D5] hover:text-[#4A7AE5] hover:bg-[#EFF4FE] opacity-0 group-hover:opacity-100 transition-all"
+                            title="Edit persona"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDeletePersona(persona.id) }}
+                            className="absolute top-3 right-1 p-1.5 rounded-md text-[#D5D5D5] hover:text-[#EF4444] hover:bg-[#FEF2F2] opacity-0 group-hover:opacity-100 transition-all"
+                            title="Delete persona"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </>
+                      )}
                     </motion.div>
                   )
                 })}
