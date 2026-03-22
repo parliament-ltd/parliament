@@ -72,3 +72,51 @@
   padding: 0 1px;
   color: inherit;
 }
+
+/* ── Branch Creation: Gold Shimmer Animation ─────────────── */
+/* Applied to the "Create Branch" CTA when a mode is selected  */
+@keyframes gold-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Power-On Shimmer ────────────────────────────────────── */
+/* Fired once when the user first validates their API key.    */
+
+@keyframes shimmer-card-pulse {
+  0%   { border-color: #D4A843; box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.30); }
+  55%  { border-color: #D4A843; box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.30); }
+  100% { border-color: #E9E9E7; box-shadow: none; }
+}
+
+@keyframes shimmer-nav-flash {
+  0%   { background-color: rgba(212, 168, 67, 0.14); }
+  100% { background-color: transparent; }
+}
+
+@keyframes shimmer-sidebar-border {
+  0%   { border-color: #D4A843; }
+  55%  { border-color: #D4A843; }
+  100% { border-color: #F1F1EF; }
+}
+
+.shimmer-card {
+  animation: shimmer-card-pulse 0.85s ease-out forwards;
+}
+
+.shimmer-nav {
+  animation: shimmer-nav-flash 0.7s ease-out forwards;
+}
+
+.shimmer-sidebar-border {
+  animation: shimmer-sidebar-border 0.85s ease-out forwards;
+}
+
+/* ── Mobile: prevent iOS auto-zoom on input focus ─────────── */
+/* iOS zooms in when focused input font-size < 16px.           */
+/* This rule overrides smaller font sizes on touch devices.    */
+@media (hover: none) and (pointer: coarse) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
