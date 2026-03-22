@@ -255,7 +255,7 @@ function AccordionSection({ id, label, subtitle, icon: Icon, isOpen, onToggle, s
 /*  SECTION CONTENTS                                            */
 /* ═══════════════════════════════════════════════════════════ */
 
-function ApiSection({ apiKey, setApiKey, showKey, setShowKey, keyStatus, setKeyStatus, keyError, validateKey, storageMode, setStorageMode, spendingLimitDismissed, setSpendingLimitDismissed, spendingLimitConfirmed, setSpendingLimitConfirmed, shimmerPhase }) {
+function ApiSection({ apiKey, setApiKey, showKey, setShowKey, keyStatus, setKeyStatus, keyError, validateKey, validateCooldown, storageMode, setStorageMode, spendingLimitDismissed, setSpendingLimitDismissed, spendingLimitConfirmed, setSpendingLimitConfirmed, shimmerPhase }) {
   return (
     <>
       <Card className={shimmerPhase >= 1 ? 'shimmer-card' : ''}>
@@ -946,7 +946,7 @@ export default function SwiftSettingsLayout() {
               apiKey={apiKey} setApiKey={setApiKey}
               showKey={showKey} setShowKey={setShowKey}
               keyStatus={keyStatus} setKeyStatus={setKeyStatus}
-              keyError={keyError} validateKey={validateKey}
+              keyError={keyError} validateKey={validateKey} validateCooldown={validateCooldown}
               storageMode={settings.storageMode} setStorageMode={(v) => updateSetting('storageMode', v)}
               spendingLimitDismissed={spendingLimitDismissed} setSpendingLimitDismissed={setSpendingLimitDismissed}
               spendingLimitConfirmed={spendingLimitConfirmed} setSpendingLimitConfirmed={setSpendingLimitConfirmed}
