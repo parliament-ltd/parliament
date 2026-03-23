@@ -21,6 +21,7 @@ import {
   setSetting,
 } from '../../lib/db'
 import TourTooltip from '../../components/TourTooltip'
+import { SPRING_SNAPPY, SPRING_SMOOTH } from '../../lib/constants'
 
 // .parliament-md styles are now in src/index.css — no injection needed here
 
@@ -55,8 +56,6 @@ const SELECTOR_TOUR_STEPS = [
 /*  CONSTANTS                                                   */
 /* ═══════════════════════════════════════════════════════════ */
 
-const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
-const SPRING_SMOOTH = { type: 'spring', stiffness: 300, damping: 28 }
 const SIDEBAR_RESIZE = { type: 'spring', stiffness: 150, damping: 25 }
 const staggerContainer = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.03, delayChildren: 0.06 } } }
 const staggerItem = { hidden: { opacity: 0, y: 6 }, show: { opacity: 1, y: 0, transition: SPRING_SMOOTH } }

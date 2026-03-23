@@ -442,6 +442,9 @@ export async function importData(data) {
 
 export async function clearAllData() {
   const db = await initDB()
+  // Intentionally excludes the 'parliament-keystore' IndexedDB (separate database).
+  // That database holds the non-extractable AES key used to encrypt the API key at rest.
+  // Clearing it would make any stored encrypted API key permanently unreadable.
   const stores = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings']
   for (const storeName of stores) {
     await db.clear(storeName)

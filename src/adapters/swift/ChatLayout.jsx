@@ -305,7 +305,7 @@ export default function SwiftChatLayout() {
     persistError, clearPersistError,
   } = useChat()
   const { conversations, updateConversation, loadConversations, createConversation } = useConversations()
-  const { settings, refreshStorageEstimate } = useSettings()
+  const { settings, storageUsage, refreshStorageEstimate } = useSettings()
   const { mode, setMode } = useMode()
 
   const [inputValue, setInputValue] = useState('')
@@ -672,6 +672,20 @@ export default function SwiftChatLayout() {
             <AlertCircle className="w-4 h-4 text-[#E03E3E] flex-shrink-0" />
             <p className="text-xs text-[#E03E3E] flex-1">{apiError.message}</p>
             <button onClick={() => setApiError(null)} className="p-1"><X className="w-3.5 h-3.5 text-[#E03E3E]" /></button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Storage Critical Banner (proactive — 95%+ full) ── */}
+      <AnimatePresence>
+        {storageUsage?.quota > 0 && (storageUsage.usage / storageUsage.quota) >= 0.95 && (
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+            className="px-5 py-3 bg-[#E03E3E]/10 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-[#E03E3E] flex-shrink-0" />
+            <p className="text-xs text-[#E03E3E] flex-1">Storage critically full — new messages may not be saved.</p>
+            <button onClick={() => navigate('/settings#data')} className="text-xs font-medium text-[#E03E3E] underline underline-offset-2 flex-shrink-0">Export</button>
+            <span className="text-[#E03E3E]/40 text-xs">·</span>
+            <button onClick={() => navigate('/')} className="text-xs font-medium text-[#E03E3E] underline underline-offset-2 flex-shrink-0">Manage Chats</button>
           </motion.div>
         )}
       </AnimatePresence>

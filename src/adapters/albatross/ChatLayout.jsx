@@ -119,7 +119,7 @@ export default function ChatView() {
     persistError, clearPersistError,
   } = useChat()
   const { conversations, updateConversation, loadConversations, createConversation } = useConversations()
-  const { settings, refreshStorageEstimate } = useSettings()
+  const { settings, storageUsage, refreshStorageEstimate } = useSettings()
   const { mode, setMode } = useMode()
 
   const [inputValue, setInputValue] = useState('')
@@ -949,6 +949,34 @@ export default function ChatView() {
             >
               <AlertCircle className="w-4 h-4 text-[#E03E3E] flex-shrink-0" />
               <p className="text-xs text-[#E03E3E]">{apiError.message}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Storage critical banner (proactive — 95%+ full) */}
+        <AnimatePresence>
+          {storageUsage?.quota > 0 && (storageUsage.usage / storageUsage.quota) >= 0.95 && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="px-6 py-3 bg-[#E03E3E]/10 border-b border-[#E03E3E]/20 flex items-center gap-2"
+            >
+              <AlertCircle className="w-4 h-4 text-[#E03E3E] flex-shrink-0" />
+              <p className="text-xs text-[#E03E3E] flex-1">Browser storage is critically full — new messages may not be saved.</p>
+              <button
+                onClick={() => navigate('/settings#data')}
+                className="text-xs font-medium text-[#E03E3E] underline underline-offset-2 hover:opacity-70 transition-opacity flex-shrink-0"
+              >
+                Export
+              </button>
+              <span className="text-[#E03E3E]/40 text-xs">·</span>
+              <button
+                onClick={() => navigate('/')}
+                className="text-xs font-medium text-[#E03E3E] underline underline-offset-2 hover:opacity-70 transition-opacity flex-shrink-0"
+              >
+                Manage Chats
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
