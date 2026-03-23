@@ -184,7 +184,7 @@ export default function SettingsView() {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto px-10 py-8">
         <AnimatePresence mode="wait">
-          {activeSection === 'api' && <ApiSection key="api" apiKey={apiKey} setApiKey={setApiKey} keyStatus={keyStatus} keyError={keyError} validateKey={validateKey} validateCooldown={validateCooldown} storageMode={settings.storageMode} setStorageMode={(v) => updateSetting('storageMode', v)} />}
+          {activeSection === 'api' && <ApiSection key="api" apiKey={apiKey} setApiKey={(v) => { setApiKey(v); setKeyStatus(null) }} keyStatus={keyStatus} keyError={keyError} validateKey={validateKey} validateCooldown={validateCooldown} storageMode={settings.storageMode} setStorageMode={(v) => updateSetting('storageMode', v)} />}
           {activeSection === 'model' && <ModelSection key="model" selectedModel={settings.defaultModel} setSelectedModel={(v) => updateSetting('defaultModel', v)} />}
           {activeSection === 'usage' && <UsageSection key="usage" budgetAlert={settings.budgetAlert} setBudgetAlert={(v) => updateSetting('budgetAlert', v)} budgetEnabled={settings.budgetEnabled} setBudgetEnabled={(v) => updateSetting('budgetEnabled', v)} spendingLimitDismissed={settings.spendingLimitDismissed} setSpendingLimitDismissed={(v) => updateSetting('spendingLimitDismissed', v)} />}
           {activeSection === 'context' && <ContextSection key="context" summaryDepth={settings.summaryDepth} setSummaryDepth={(v) => updateSetting('summaryDepth', v)} contextThreshold={settings.contextThreshold} setContextThreshold={(v) => updateSetting('contextThreshold', v)} autoCompress={settings.autoCompress} setAutoCompress={(v) => updateSetting('autoCompress', v)} />}
