@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
 import { getMessages, addMessage, updateMessage } from '../lib/db'
 import { useConversations } from './ConversationContext'
+import { executeClientTool } from '../providers/anthropic'
 
 const ChatContext = createContext(null)
 
@@ -97,7 +98,8 @@ export function ChatProvider({ children }) {
 
   // Send a message and handle streaming response
   // systemPrompt: optional string from collaboration mode presets + custom instruction
-  const sendMessage = useCallback(async (apiKey, conversationId, userContent, model, provider, systemPrompt = '') => {
+  // tools: optional array of tool definitions from provider.getAvailableTools()
+  const sendMessage = useCallback(async (apiKey, conversationId, userContent, model, provider, systemPrompt = '', tools = []) => {
     // 1. Add user message to state and IndexedDB
     const userMsg = await addMessage({
       conversationId,
@@ -140,28 +142,83 @@ export function ChatProvider({ children }) {
         historyMessages.push(userMsg)
       }
 
-      const history = historyMessages
+      const baseHistory = historyMessages
         .filter(m => m.content) // Exclude any empty messages
         .map(m => ({ role: m.role, content: m.content }))
 
-      // 5. Call provider with streaming
-      // Pass systemPrompt so it gets set as the top-level `system` field in the API request
-      const response = await provider.sendMessage(
-        apiKey,
-        history,
-        model,
-        (chunk) => {
-          latestContentRef.current += chunk
-          setStreamingContent(prev => prev + chunk)
-        },
-        abortControllerRef.current.signal,
-        systemPrompt || undefined
-      )
+      // 5. Call provider with streaming — handle client-side tool loop
+      let totalInputTokens = 0
+      let totalOutputTokens = 0
+      let toolLoopHistory = [...baseHistory]
+      let chartBlocks = '' // accumulated create_chart output across turns
+      const clientSideTools = tools.filter(t => !t.serverSide)
+      const MAX_TOOL_TURNS = 5 // prevent infinite loops
+
+      for (let turn = 0; turn < MAX_TOOL_TURNS; turn++) {
+        const response = await provider.sendMessage(
+          apiKey,
+          toolLoopHistory,
+          model,
+          (chunk) => {
+            latestContentRef.current += chunk
+            setStreamingContent(prev => prev + chunk)
+          },
+          abortControllerRef.current.signal,
+          systemPrompt || undefined,
+          tools
+        )
+
+        totalInputTokens += response?.usage?.input_tokens || 0
+        totalOutputTokens += response?.usage?.output_tokens || 0
+
+        // If no client-side tool calls, or stop reason isn't tool_use, we're done
+        if (!response.toolUses?.length || response.stopReason !== 'tool_use') break
+        const clientToolUses = response.toolUses.filter(tu =>
+          clientSideTools.some(t => t.name === tu.name || t.id === tu.name)
+        )
+        if (!clientToolUses.length) break
+
+        // Accumulate create_chart calls as fenced code blocks embedded in the message
+        for (const tu of clientToolUses) {
+          if (tu.name === 'create_chart') {
+            chartBlocks += `\n\`\`\`chart\n${JSON.stringify(tu.input)}\n\`\`\`\n`
+          }
+        }
+
+        // Execute client-side tools and build tool_result messages
+        const toolResults = clientToolUses.map(tu => ({
+          type: 'tool_result',
+          tool_use_id: tu.id,
+          content: executeClientTool(tu.name, tu.input),
+        }))
+
+        // Build the assistant message content (text + tool_use blocks)
+        const assistantContent = [
+          ...(latestContentRef.current ? [{ type: 'text', text: latestContentRef.current }] : []),
+          ...clientToolUses.map(tu => ({
+            type: 'tool_use',
+            id: tu.id,
+            name: tu.name,
+            input: tu.input,
+          })),
+        ]
+
+        toolLoopHistory = [
+          ...toolLoopHistory,
+          { role: 'assistant', content: assistantContent },
+          { role: 'user', content: toolResults },
+        ]
+
+        // Reset streaming content for the next turn's text
+        latestContentRef.current = ''
+        setStreamingContent('')
+      }
 
       // 6. Stream complete — final persist with incomplete: false
       stopPersistInterval()
-      const finalContent = latestContentRef.current
-      const tokenCount = response?.usage?.output_tokens || 0
+      // Prepend any chart blocks before Claude's explanatory text
+      const finalContent = chartBlocks + latestContentRef.current
+      const tokenCount = totalOutputTokens
 
       await updateMessage(assistantMsg.id, {
         content: finalContent,
@@ -178,10 +235,9 @@ export function ChatProvider({ children }) {
         )
       )
 
-      // Update cumulative token usage
-      const inputTokens = response?.usage?.input_tokens || 0
+      // Update cumulative token usage (accumulated across all tool loop turns)
       setTokenUsage(prev => ({
-        input: prev.input + inputTokens,
+        input: prev.input + totalInputTokens,
         output: prev.output + tokenCount,
       }))
 

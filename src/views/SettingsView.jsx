@@ -10,12 +10,14 @@ const SwiftSettingsLayout         = lazy(() => import('../adapters/swift/Setting
 const KingfisherSettingsLayout    = lazy(() => import('../adapters/kingfisher/SettingsLayout'))
 const SecretarybirdSettingsLayout = lazy(() => import('../adapters/secretarybird/SettingsLayout'))
 const StarlingSettingsLayout      = lazy(() => import('../adapters/starling/SettingsLayout'))
+const PelicanSettingsLayout       = lazy(() => import('../adapters/pelican/SettingsLayout'))
 
 const LAYOUTS = {
   swift:         SwiftSettingsLayout,
   kingfisher:    KingfisherSettingsLayout,
   secretarybird: SecretarybirdSettingsLayout,
   starling:      StarlingSettingsLayout,
+  pelican:       PelicanSettingsLayout,
 }
 
 export default function SettingsView() {
