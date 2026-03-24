@@ -63,11 +63,13 @@ const MODE_CAPABILITIES = {
     layout: 'data-canvas',
     input: 'keyboard',
     gestures: false,
-    sidebars: 'file-shelf',
+    sidebars: 'file-shelf-plus-inspector',
     contextHealth: 'meter',
     selection: 'checkbox',
     animations: SPRING_SMOOTH,
     touchTargets: false,
+    fileHandling: true,
+    toolUse: true,
   },
 }
 
