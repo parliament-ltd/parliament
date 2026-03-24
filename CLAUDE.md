@@ -25,7 +25,7 @@ Project Apollo is a power-user chat interface for AI models, starting with Claud
 
 ## Design System
 
-This app uses a light theme inspired by Notion's warm neutral palette with a Dusty Gold accent. The overall aesthetic is warm white with subtle warm-tinted borders — not cold blue/grey.
+This app uses a light theme inspired by a warm neutral palette with a Dusty Gold accent. The overall aesthetic is warm white with subtle warm-tinted borders — not cold blue/grey.
 
 ### Colors
 | Token | Value | Usage |
