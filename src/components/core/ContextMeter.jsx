@@ -38,7 +38,7 @@ export default function ContextMeter({
   // displayMode === 'meter'
   return (
     <div className="p-4 pb-6" data-tour="context-health">
-      <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
+      <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
         Context Health
       </h3>
       <div className="space-y-3">
@@ -94,7 +94,7 @@ export default function ContextMeter({
               <div className="text-xs font-medium" style={{ color }}>
                 {usage >= threshold ? 'Context Nearly Full' : 'Approaching Limit'}
               </div>
-              <div className="text-xs text-[#787774] mt-1">
+              <div className="text-xs text-[var(--p-text-secondary)] mt-1">
                 {usage >= threshold
                   ? 'Branch this conversation to free up context space.'
                   : 'Consider compressing the conversation or starting a new branch.'}
@@ -117,7 +117,7 @@ function MetricRow({ label, value, color }) {
       transition={SPRING_SMOOTH}
       className="flex items-center justify-between text-xs"
     >
-      <span className="text-[#787774]">{label}</span>
+      <span className="text-[var(--p-text-secondary)]">{label}</span>
       <span className="font-medium" style={{ color: color || '#191919' }}>
         {value}
       </span>

@@ -345,7 +345,7 @@ export default function InputArea({
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             disabled={disabled}
-            className="w-full h-full bg-white rounded-lg pl-11 pr-4 py-3 text-sm text-[#1E2532] resize-none outline-none placeholder:text-[#9CA3AF] border border-[#EBEBEB] focus:border-[#4A7AE5] transition-colors disabled:opacity-50"
+            className="w-full h-full bg-white rounded-lg pl-11 pr-4 py-3 text-sm text-[var(--p-text-primary)] resize-none outline-none placeholder:text-[var(--p-text-muted)] border border-[#E9E9E7] focus:border-[#B8A070] transition-colors disabled:opacity-50"
             rows={3}
           />
           <div className="absolute bottom-3 left-2.5">
@@ -360,7 +360,7 @@ export default function InputArea({
           className={`px-5 rounded-lg font-semibold text-sm border bg-white transition-colors flex items-center gap-2 flex-shrink-0 ${
             isStreaming
               ? 'border-[#EF4444]/30 text-[#EF4444] hover:border-[#EF4444]'
-              : 'border-[#EBEBEB] text-[#1E2532] hover:border-[#4A7AE5] hover:text-[#4A7AE5]'
+              : 'border-[#E9E9E7] text-[var(--p-text-primary)] hover:border-[#B8A070] hover:text-[#B8A070]'
           }`}
         >
           <AnimatePresence mode="wait">

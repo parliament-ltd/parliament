@@ -44,8 +44,8 @@ export default function HighlightList({
             style={{ backgroundColor: hl.color }}
           />
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-medium text-[#191919] truncate">{hl.text}</div>
-            <div className="text-xs text-[#787774]">
+            <div className="text-xs font-medium text-[var(--p-text-primary)] truncate">{hl.text}</div>
+            <div className="text-xs text-[var(--p-text-secondary)]">
               {hl.count} occurrence{hl.count !== 1 ? 's' : ''}
             </div>
           </div>
@@ -54,7 +54,7 @@ export default function HighlightList({
               whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.85 }}
               onClick={(e) => { e.stopPropagation(); onNavigate?.(hl.text, 'prev') }}
-              className="p-1 hover:bg-[#F1F1EF] rounded text-[#787774] hover:text-[#191919] transition-colors"
+              className="p-1 border border-transparent hover:border-[var(--p-text-primary)]/20 rounded text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors"
               title="Previous occurrence"
             >
               <ChevronLeft className="w-3 h-3" />
@@ -63,7 +63,7 @@ export default function HighlightList({
               whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.85 }}
               onClick={(e) => { e.stopPropagation(); onNavigate?.(hl.text, 'next') }}
-              className="p-1 hover:bg-[#F1F1EF] rounded text-[#787774] hover:text-[#191919] transition-colors"
+              className="p-1 border border-transparent hover:border-[var(--p-text-primary)]/20 rounded text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors"
               title="Next occurrence"
             >
               <ChevronRight className="w-3 h-3" />
@@ -72,7 +72,7 @@ export default function HighlightList({
               whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.85 }}
               onClick={(e) => { e.stopPropagation(); onRemove?.(hl.ids) }}
-              className="p-1 hover:bg-[#F1F1EF] rounded text-[#787774] hover:text-[#E03E3E] transition-colors"
+              className="p-1 border border-transparent hover:border-[var(--p-text-primary)]/20 rounded text-[var(--p-text-secondary)] hover:text-[#E03E3E] transition-colors"
               title="Remove highlight"
             >
               <Trash2 className="w-3 h-3" />
@@ -101,7 +101,7 @@ export default function HighlightList({
                   if (e.key === 'Escape') { setAddText(''); setShowAddForm(false) }
                 }}
                 placeholder="Text to highlight..."
-                className="w-full bg-white rounded px-2 py-1.5 text-xs text-[#191919] outline-none border border-[#E9E9E7] focus:border-[#B8A070] transition-colors placeholder:text-[#9B9A97]"
+                className="w-full bg-white rounded px-2 py-1.5 text-xs text-[var(--p-text-primary)] outline-none border border-[#E9E9E7] focus:border-[#B8A070] transition-colors placeholder:text-[var(--p-text-muted)]"
                 autoFocus
               />
               <div className="flex items-center justify-between">
@@ -125,7 +125,7 @@ export default function HighlightList({
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => { setAddText(''); setShowAddForm(false) }}
-                    className="px-2 py-1 rounded text-[10px] font-medium text-[#787774] hover:text-[#191919] hover:bg-[#F1F1EF] transition-colors"
+                    className="px-2 py-1 rounded text-[10px] font-medium text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] border border-transparent hover:border-[var(--p-text-primary)]/20 transition-colors"
                   >
                     Cancel
                   </motion.button>
@@ -146,7 +146,7 @@ export default function HighlightList({
             whileHover={{ x: 4, borderColor: '#B8A070', color: '#B8A070' }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setShowAddForm(true)}
-            className="w-full px-3 py-2 border border-dashed border-[#E9E9E7] rounded-lg text-xs text-[#787774] transition-colors flex items-center gap-1.5"
+            className="w-full px-3 py-2 border border-dashed border-[#E9E9E7] rounded-lg text-xs text-[var(--p-text-secondary)] transition-colors flex items-center gap-1.5"
           >
             <Pencil className="w-3 h-3" />
             + Add Highlight

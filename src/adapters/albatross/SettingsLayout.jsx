@@ -133,7 +133,7 @@ export default function SettingsView() {
   }
 
   return (
-    <div className="flex h-screen font-sans overflow-hidden bg-white text-[#191919]">
+    <div className="flex h-screen font-sans overflow-hidden bg-white text-[var(--p-text-primary)]">
 
       {/* Power-on sweep line */}
       {shimmerPhase >= 1 && (
@@ -154,6 +154,7 @@ export default function SettingsView() {
         />
       )}
 
+
       {/* Left Navigation */}
       <motion.div
         initial={{ x: -260 }}
@@ -170,7 +171,7 @@ export default function SettingsView() {
           >
             <IconButton icon={ArrowLeft} onClick={() => navigate('/')} title="Back to Chats" />
             <div>
-              <h1 className="text-lg font-medium text-[#191919] leading-tight">Settings</h1>
+              <h1 className="text-lg font-medium text-[var(--p-text-primary)] leading-tight">Settings</h1>
               <AnimatePresence>
                 {shimmerDone && (
                   <motion.div
@@ -209,14 +210,14 @@ export default function SettingsView() {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setActiveSection(item.id)}
                 {...(item.tourTarget ? { 'data-tour': item.tourTarget } : {})}
-                className={`w-full text-left px-3 py-2.5 rounded-md text-sm transition-colors flex items-center gap-2.5 ${
+                className={`w-full text-left px-3 py-2.5 rounded-md text-sm transition-colors flex items-center gap-2.5 border ${
                   active
-                    ? 'text-[#191919] font-medium bg-[#F7F6F3]'
-                    : 'text-[#787774] hover:text-[#191919] hover:bg-[#F7F6F3]'
+                    ? 'text-[var(--p-text-primary)] font-medium border-[var(--p-text-primary)]/30'
+                    : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] border-transparent hover:border-[var(--p-text-primary)]/15'
                 } ${shimmerPhase >= 3 ? 'shimmer-nav' : ''}`}
                 style={shimmerPhase >= 3 ? { animationDelay: `${index * 55}ms` } : {}}
               >
-                <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-[#B8A070]' : 'text-[#787774]'}`} />
+                <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-[#B8A070]' : 'text-[var(--p-text-secondary)]'}`} />
                 {item.label}
               </motion.button>
             )
@@ -254,8 +255,8 @@ function SettingsSection({ title, subtitle, children }) {
       transition={SPRING_SMOOTH}
     >
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="mb-6">
-        <h2 className="text-lg font-medium text-[#191919]">{title}</h2>
-        <p className="text-sm text-[#787774] mt-0.5">{subtitle}</p>
+        <h2 className="text-lg font-medium text-[var(--p-text-primary)]">{title}</h2>
+        <p className="text-sm text-[var(--p-text-secondary)] mt-0.5">{subtitle}</p>
       </motion.div>
       <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-4">
         {children}
@@ -328,7 +329,7 @@ function ApiSection({ apiKey, setApiKey, keyStatus, keyError, validateKey, valid
           <div className="flex items-start gap-3">
             <Info className="w-4 h-4 text-[#B8A070] mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-xs text-[#787774] leading-relaxed">
+              <p className="text-xs text-[var(--p-text-secondary)] leading-relaxed">
                 Your API key is encrypted using the Web Crypto API (AES-GCM) before being stored. It never leaves your browser.
               </p>
               <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-medium text-[#B8A070] mt-2 hover:underline">
@@ -361,9 +362,9 @@ function ModelSection({ selectedModel, setSelectedModel }) {
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <h3 className={`text-sm font-medium ${active ? 'text-[#191919]' : 'text-[#787774]'}`}>{model.name}</h3>
+                  <h3 className={`text-sm font-medium ${active ? 'text-[var(--p-text-primary)]' : 'text-[var(--p-text-secondary)]'}`}>{model.name}</h3>
                   <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                    active ? 'bg-[#B8A070]/10 text-[#B8A070]' : 'bg-[#F7F6F3] text-[#787774]'
+                    active ? 'bg-[#B8A070]/10 text-[#B8A070]' : 'bg-[#F7F6F3] text-[var(--p-text-secondary)]'
                   }`}>
                     {model.badge}
                   </span>
@@ -378,11 +379,11 @@ function ModelSection({ selectedModel, setSelectedModel }) {
                   />
                 </div>
               </div>
-              <p className="text-xs text-[#787774] mb-3">{model.description}</p>
-              <div className="flex gap-4 text-xs text-[#787774]">
-                <span>Input: <span className="font-medium text-[#191919]">{model.inputCost}</span>/1M tokens</span>
-                <span>Output: <span className="font-medium text-[#191919]">{model.outputCost}</span>/1M tokens</span>
-                <span>Speed: <span className="font-medium text-[#191919]">{model.speed}</span></span>
+              <p className="text-xs text-[var(--p-text-secondary)] mb-3">{model.description}</p>
+              <div className="flex gap-4 text-xs text-[var(--p-text-secondary)]">
+                <span>Input: <span className="font-medium text-[var(--p-text-primary)]">{model.inputCost}</span>/1M tokens</span>
+                <span>Output: <span className="font-medium text-[var(--p-text-primary)]">{model.outputCost}</span>/1M tokens</span>
+                <span>Speed: <span className="font-medium text-[var(--p-text-primary)]">{model.speed}</span></span>
               </div>
             </motion.div>
           </StaggerItem>
@@ -407,8 +408,8 @@ function UsageSection({ budgetAlert, setBudgetAlert, budgetEnabled, setBudgetEna
               { label: 'Estimated cost', value: '$0.00' },
             ].map((stat) => (
               <div key={stat.label}>
-                <p className="text-lg font-medium text-[#191919]">{stat.value}</p>
-                <p className="text-xs text-[#787774]">{stat.label}</p>
+                <p className="text-lg font-medium text-[var(--p-text-primary)]">{stat.value}</p>
+                <p className="text-xs text-[var(--p-text-secondary)]">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -436,9 +437,9 @@ function UsageSection({ budgetAlert, setBudgetAlert, budgetEnabled, setBudgetEna
                   onChange={(e) => setBudgetAlert(Number(e.target.value))}
                   className="flex-1 accent-[#B8A070]"
                 />
-                <span className="text-sm font-medium text-[#191919] w-16 text-right">${budgetAlert}</span>
+                <span className="text-sm font-medium text-[var(--p-text-primary)] w-16 text-right">${budgetAlert}</span>
               </div>
-              <p className="text-xs text-[#787774] mt-2">You'll see a warning when your estimated spending reaches this amount.</p>
+              <p className="text-xs text-[var(--p-text-secondary)] mt-2">You'll see a warning when your estimated spending reaches this amount.</p>
             </motion.div>
           )}
         </Card>
@@ -450,8 +451,8 @@ function UsageSection({ budgetAlert, setBudgetAlert, budgetEnabled, setBudgetEna
             <div className="flex items-start gap-3">
               <AlertCircle className="w-4 h-4 text-[#D9730D] mt-0.5 flex-shrink-0" />
               <div className="flex-1">
-                <h4 className="text-xs font-medium text-[#191919] mb-1">Set a spending limit on Anthropic</h4>
-                <p className="text-xs text-[#787774] leading-relaxed mb-3">
+                <h4 className="text-xs font-medium text-[var(--p-text-primary)] mb-1">Set a spending limit on Anthropic</h4>
+                <p className="text-xs text-[var(--p-text-secondary)] leading-relaxed mb-3">
                   Budget alerts in this app are informational only. For a hard spending cap, set a monthly limit in your Anthropic dashboard.
                 </p>
                 <div className="flex items-center gap-2">
@@ -483,7 +484,7 @@ function ContextSection({ summaryDepth, setSummaryDepth, contextThreshold, setCo
       <StaggerItem>
         <Card>
           <SectionLabel>Summary Depth</SectionLabel>
-          <p className="text-xs text-[#787774] mt-1 mb-3">Controls how detailed the review summary is.</p>
+          <p className="text-xs text-[var(--p-text-secondary)] mt-1 mb-3">Controls how detailed the review summary is.</p>
           <SegmentedControl
             options={[
               { id: 'brief', label: 'Brief' },
@@ -499,9 +500,9 @@ function ContextSection({ summaryDepth, setSummaryDepth, contextThreshold, setCo
         <Card>
           <div className="flex items-center justify-between mb-1">
             <SectionLabel>Context Warning Threshold</SectionLabel>
-            <span className="text-sm font-medium text-[#191919]">{contextThreshold}%</span>
+            <span className="text-sm font-medium text-[var(--p-text-primary)]">{contextThreshold}%</span>
           </div>
-          <p className="text-xs text-[#787774] mt-1 mb-3">When context usage exceeds this level, you'll be prompted to compress via branching.</p>
+          <p className="text-xs text-[var(--p-text-secondary)] mt-1 mb-3">When context usage exceeds this level, you'll be prompted to compress via branching.</p>
           <input
             type="range"
             min={10}
@@ -511,7 +512,7 @@ function ContextSection({ summaryDepth, setSummaryDepth, contextThreshold, setCo
             onChange={(e) => setContextThreshold(Number(e.target.value))}
             className="w-full accent-[#B8A070]"
           />
-          <div className="flex justify-between text-[10px] text-[#787774] mt-1">
+          <div className="flex justify-between text-[10px] text-[var(--p-text-secondary)] mt-1">
             <span>10%</span>
             <span>95%</span>
           </div>
@@ -696,15 +697,15 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
               />
             </div>
             <div className="flex justify-between mt-1.5">
-              <span className={`text-xs font-medium ${storageCritical ? 'text-[#E03E3E]' : storageWarning ? 'text-[#D9730D]' : 'text-[#787774]'}`}>
+              <span className={`text-xs font-medium ${storageCritical ? 'text-[#E03E3E]' : storageWarning ? 'text-[#D9730D]' : 'text-[var(--p-text-secondary)]'}`}>
                 {formatBytes(storageUsage.usage)} used
               </span>
-              <span className="text-xs text-[#787774]">
+              <span className="text-xs text-[var(--p-text-secondary)]">
                 {formatBytes(storageUsage.quota)} available
               </span>
             </div>
           </div>
-          <div className="flex gap-6 mt-3 text-xs text-[#787774]">
+          <div className="flex gap-6 mt-3 text-xs text-[var(--p-text-secondary)]">
             <span>{conversations.length} conversations</span>
           </div>
           {storageWarning && (
@@ -724,7 +725,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
       <StaggerItem>
         <Card>
           <SectionLabel>Backup Reminder</SectionLabel>
-          <p className="text-xs text-[#787774] mt-1 mb-3">How often should we remind you to back up your data?</p>
+          <p className="text-xs text-[var(--p-text-secondary)] mt-1 mb-3">How often should we remind you to back up your data?</p>
           <SegmentedControl
             options={[
               { id: 'daily', label: 'Daily' },
@@ -741,7 +742,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
       <StaggerItem>
         <Card>
           <SectionLabel>Export</SectionLabel>
-          <p className="text-xs text-[#787774] mt-1 mb-3">Download all your conversations, highlights, notes, and settings.</p>
+          <p className="text-xs text-[var(--p-text-secondary)] mt-1 mb-3">Download all your conversations, highlights, notes, and settings.</p>
           <div className="flex gap-2">
             <Button icon={Lock} onClick={() => setShowExportModal(true)}>
               Export Encrypted (.apb)
@@ -756,7 +757,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
       <StaggerItem>
         <Card>
           <SectionLabel>Import</SectionLabel>
-          <p className="text-xs text-[#787774] mt-1 mb-3">Restore from a previous backup file.</p>
+          <p className="text-xs text-[var(--p-text-secondary)] mt-1 mb-3">Restore from a previous backup file.</p>
           <Button icon={Upload} onClick={() => setShowImportModal(true)}>
             Import Backup
           </Button>
@@ -766,7 +767,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
       <StaggerItem>
         <Card danger>
           <SectionLabel>Danger Zone</SectionLabel>
-          <p className="text-xs text-[#787774] mt-1 mb-3">Permanently delete all data from this browser. This cannot be undone.</p>
+          <p className="text-xs text-[var(--p-text-secondary)] mt-1 mb-3">Permanently delete all data from this browser. This cannot be undone.</p>
           <Button variant="danger" icon={Trash2} onClick={() => setShowDeleteConfirm(true)}>
             Delete Everything
           </Button>
@@ -792,7 +793,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
           </>
         }
       >
-        <p className="text-xs text-[#787774] mb-4">Choose a passphrase to encrypt your backup. You'll need this to import it later. Minimum 8 characters.</p>
+        <p className="text-xs text-[var(--p-text-secondary)] mb-4">Choose a passphrase to encrypt your backup. You'll need this to import it later. Minimum 8 characters.</p>
         <div className="space-y-3">
           <div>
             <Input label="Passphrase" value={exportPassphrase} onChange={setExportPassphrase} secret placeholder="Enter a passphrase" />
@@ -852,7 +853,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
           )
         }
       >
-        <p className="text-xs text-[#787774] mb-4">Select a backup file (.apb or .json) and enter the passphrase if encrypted.</p>
+        <p className="text-xs text-[var(--p-text-secondary)] mb-4">Select a backup file (.apb or .json) and enter the passphrase if encrypted.</p>
         <div className="space-y-3">
           <div>
             <SectionLabel>Backup File</SectionLabel>
@@ -875,7 +876,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
                 setImportError('')
                 setImportFileIsEncrypted(file?.name.endsWith('.apb') ?? false)
               }}
-              className="mt-2 text-xs text-[#787774] file:mr-3 file:px-3 file:py-1.5 file:rounded-md file:border file:border-[#E9E9E7] file:bg-white file:text-xs file:font-medium file:text-[#191919] hover:file:border-[#B8A070] file:transition-colors file:cursor-pointer"
+              className="mt-2 text-xs text-[var(--p-text-secondary)] file:mr-3 file:px-3 file:py-1.5 file:rounded-md file:border file:border-[#E9E9E7] file:bg-white file:text-xs file:font-medium file:text-[var(--p-text-primary)] hover:file:border-[#B8A070] file:transition-colors file:cursor-pointer"
             />
           </div>
           {importFileIsEncrypted && (
@@ -910,8 +911,8 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
         <div className="flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-[#E03E3E] flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-[#191919] mb-1">This action cannot be undone.</p>
-            <p className="text-xs text-[#787774] leading-relaxed">
+            <p className="text-sm font-medium text-[var(--p-text-primary)] mb-1">This action cannot be undone.</p>
+            <p className="text-xs text-[var(--p-text-secondary)] leading-relaxed">
               All conversations, messages, highlights, notes, favorites, pinned references, and settings will be permanently deleted from this browser. Your Anthropic API key will also be removed.
             </p>
           </div>
@@ -939,7 +940,7 @@ function AppearanceSection({ theme, setTheme, fontSize, setFontSize, storedMode,
       <StaggerItem>
         <Card>
           <SectionLabel>Interface Mode</SectionLabel>
-          <p className="text-xs text-[#787774] mt-1 mb-3">
+          <p className="text-xs text-[var(--p-text-secondary)] mt-1 mb-3">
             Choose how the interface adapts to your device and workflow.
           </p>
           <div className="space-y-2">
@@ -962,11 +963,11 @@ function AppearanceSection({ theme, setTheme, fontSize, setFontSize, storedMode,
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className={`text-sm font-medium ${active ? 'text-[#191919]' : 'text-[#787774]'}`}>{opt.label}</p>
+                      <p className={`text-sm font-medium ${active ? 'text-[var(--p-text-primary)]' : 'text-[var(--p-text-secondary)]'}`}>{opt.label}</p>
                       {opt.beta && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#B8A070]/10 text-[#B8A070]">Beta</span>}
                       {opt.soon && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#D9730D]/10 text-[#D9730D]">Soon</span>}
                     </div>
-                    <p className="text-xs text-[#9B9A97] mt-0.5">{opt.description}</p>
+                    <p className="text-xs text-[var(--p-text-muted)] mt-0.5">{opt.description}</p>
                   </div>
                 </motion.button>
               )
@@ -992,24 +993,17 @@ function AppearanceSection({ theme, setTheme, fontSize, setFontSize, storedMode,
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setTheme(t.id)}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md border transition-colors ${
-                    active ? 'border-[#B8A070] bg-[#B8A070]/5' : 'border-[#E9E9E7] hover:border-[#9B9A97]'
+                    active
+                      ? 'border-[#B8A070] bg-[#B8A070]/10'
+                      : 'border-[var(--p-border)] hover:border-[var(--p-text-muted)]'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${active ? 'text-[#B8A070]' : 'text-[#787774]'}`} />
-                  <span className={`text-sm font-medium ${active ? 'text-[#191919]' : 'text-[#787774]'}`}>{t.label}</span>
+                  <Icon className={`w-4 h-4 ${active ? 'text-[#B8A070]' : 'text-[var(--p-text-secondary)]'}`} />
+                  <span className={`text-sm font-medium ${active ? 'text-[var(--p-text-primary)]' : 'text-[var(--p-text-secondary)]'}`}>{t.label}</span>
                 </motion.button>
               )
             })}
           </div>
-          {theme === 'dark' && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-xs text-[#787774] mt-3"
-            >
-              Dark theme is coming in a future update.
-            </motion.p>
-          )}
         </Card>
       </StaggerItem>
 
@@ -1028,7 +1022,7 @@ function AppearanceSection({ theme, setTheme, fontSize, setFontSize, storedMode,
             />
           </div>
           <div className="mt-4 px-4 py-3 rounded-md border border-[#E9E9E7]">
-            <p className={`text-[#191919] ${
+            <p className={`text-[var(--p-text-primary)] ${
               fontSize === 'compact' ? 'text-xs' : fontSize === 'large' ? 'text-base' : 'text-sm'
             }`}>
               This is a preview of your selected text size. The entire interface will adjust to match.
@@ -1055,11 +1049,11 @@ function AboutSection() {
               <MessageSquare className="w-5 h-5 text-[#B8A070]" />
             </motion.div>
             <div>
-              <h3 className="text-sm font-medium text-[#191919]">Parliament</h3>
-              <p className="text-xs text-[#787774]">Version 0.1.0</p>
+              <h3 className="text-sm font-medium text-[var(--p-text-primary)]">Parliament</h3>
+              <p className="text-xs text-[var(--p-text-secondary)]">Version 0.1.0</p>
             </div>
           </div>
-          <p className="text-xs text-[#787774] leading-relaxed mb-4">
+          <p className="text-xs text-[var(--p-text-secondary)] leading-relaxed mb-4">
             A power-user chat interface for AI. Built with React, Framer Motion, and Tailwind CSS. Open source and community-driven.
           </p>
           <Button icon={Github}>
@@ -1091,8 +1085,8 @@ function AboutSection() {
               },
             ].map((item, i) => (
               <div key={i}>
-                <h4 className="text-xs font-medium text-[#191919] mb-1">{item.title}</h4>
-                <p className="text-xs text-[#787774] leading-relaxed">{item.text}</p>
+                <h4 className="text-xs font-medium text-[var(--p-text-primary)] mb-1">{item.title}</h4>
+                <p className="text-xs text-[var(--p-text-secondary)] leading-relaxed">{item.text}</p>
               </div>
             ))}
           </div>

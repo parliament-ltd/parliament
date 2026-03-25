@@ -34,8 +34,8 @@ export default function MessageList({
             className="w-16 h-16 mb-4 object-contain"
             style={{ opacity: 0.26 }}
           />
-          <p className="text-sm text-[#787774] mb-1">Start a conversation</p>
-          <p className="text-xs text-[#9B9A97]">Type a message below to begin</p>
+          <p className="text-sm text-[var(--p-text-secondary)] mb-1">Start a conversation</p>
+          <p className="text-xs text-[var(--p-text-muted)]">Type a message below to begin</p>
         </div>
       )}
 
@@ -56,8 +56,8 @@ export default function MessageList({
             onClick={onShowHidden}
             className="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-[#E9E9E7] cursor-pointer transition-colors"
           >
-            <Eye className="w-3.5 h-3.5 text-[#787774]" />
-            <span className="text-xs text-[#787774]">
+            <Eye className="w-3.5 h-3.5 text-[var(--p-text-secondary)]" />
+            <span className="text-xs text-[var(--p-text-secondary)]">
               {hiddenCount} message{hiddenCount !== 1 ? 's' : ''} hidden
             </span>
           </motion.button>

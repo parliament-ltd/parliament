@@ -10,7 +10,7 @@ export default function TOC({ items = [], onNavigate }) {
   return (
     <>
       {items.length === 0 ? (
-        <p className="text-xs text-[#9B9A97] px-3 py-2">
+        <p className="text-xs text-[var(--p-text-muted)] px-3 py-2">
           Messages will appear here
         </p>
       ) : (
@@ -33,7 +33,7 @@ function TOCItem({ children, onClick }) {
       whileTap={{ scale: 0.98 }}
       transition={SPRING_SMOOTH}
       onClick={onClick}
-      className="w-full text-left px-3 py-2 rounded-lg text-sm text-[#787774] hover:text-[#191919] transition-colors truncate"
+      className="w-full text-left px-3 py-2 rounded-lg text-sm text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors truncate"
     >
       {children}
     </motion.button>

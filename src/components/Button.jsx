@@ -3,10 +3,10 @@ import { motion } from 'framer-motion'
 const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
 
 const variants = {
-  default: 'border border-[#E9E9E7] bg-white text-[#191919] hover:border-[#B8A070]',
+  default: 'border border-[var(--p-border)] bg-[var(--p-bg-surface)] text-[var(--p-text-primary)] hover:border-[var(--p-gold-light)]',
   primary: 'border border-[#B8A070] bg-[#B8A070] text-white',
   danger: 'border border-[#E03E3E] bg-[#E03E3E] text-white hover:bg-[#C5342A]',
-  ghost: 'border border-transparent bg-transparent text-[#787774] hover:bg-[#F1F1EF] hover:text-[#191919]',
+  ghost: 'border border-transparent bg-transparent text-[var(--p-text-secondary)] hover:bg-[var(--p-bg-alt)] hover:text-[var(--p-text-primary)]',
 }
 
 const sizes = {
@@ -28,7 +28,7 @@ export default function Button({
 }) {
   return (
     <motion.button
-      whileHover={disabled ? {} : { scale: 1.03, borderColor: variant === 'default' ? '#B8A070' : undefined }}
+      whileHover={disabled ? {} : { scale: 1.03, borderColor: variant === 'default' ? 'var(--p-gold-light)' : undefined }}
       whileTap={disabled ? {} : { scale: 0.97 }}
       transition={SPRING_SNAPPY}
       onClick={onClick}

@@ -6,7 +6,7 @@ export default function RadioGroup({ label, options, value, onChange }) {
   return (
     <div>
       {label && (
-        <label className="text-xs font-medium text-[#787774] uppercase tracking-wider block mb-3">
+        <label className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider block mb-3">
           {label}
         </label>
       )}
@@ -22,13 +22,16 @@ export default function RadioGroup({ label, options, value, onChange }) {
               onClick={() => onChange(option.id)}
               className={`
                 w-full text-left px-4 py-3 rounded-md border flex items-center gap-3 transition-colors
-                ${active ? 'border-[#B8A070] bg-[#B8A070]/5' : 'border-[#E9E9E7] hover:border-[#9B9A97]'}
+                ${active
+                  ? 'border-[#B8A070] bg-[#B8A070]/5'
+                  : 'border-[var(--p-border)] hover:border-[#9B9A97]'
+                }
               `}
             >
               {/* Radio circle */}
               <div className={`
                 w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0
-                ${active ? 'border-[#B8A070]' : 'border-[#9B9A97]'}
+                ${active ? 'border-[#B8A070]' : 'border-[var(--p-text-muted)]'}
               `}>
                 <motion.div
                   initial={false}
@@ -38,14 +41,14 @@ export default function RadioGroup({ label, options, value, onChange }) {
                 />
               </div>
 
-              {Icon && <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-[#B8A070]' : 'text-[#787774]'}`} />}
+              {Icon && <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-[#B8A070]' : 'text-[var(--p-text-secondary)]'}`} />}
 
               <div>
-                <span className={`text-sm font-medium block ${active ? 'text-[#191919]' : 'text-[#787774]'}`}>
+                <span className={`text-sm font-medium block ${active ? 'text-[var(--p-text-primary)]' : 'text-[var(--p-text-secondary)]'}`}>
                   {option.label}
                 </span>
                 {option.description && (
-                  <span className="text-xs text-[#787774] block mt-0.5">{option.description}</span>
+                  <span className="text-xs text-[var(--p-text-secondary)] block mt-0.5">{option.description}</span>
                 )}
               </div>
             </motion.button>

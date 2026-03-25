@@ -175,14 +175,14 @@ export default function TourTooltip({ steps, onDone }) {
           {/* Header */}
           <div className="flex items-start justify-between gap-3 mb-3">
             <div>
-              <span className="text-[10px] font-medium text-[#787774] uppercase tracking-wider">
+              <span className="text-[10px] font-medium text-[var(--p-text-secondary)] uppercase tracking-wider">
                 Step {stepIndex + 1} of {steps.length}
               </span>
-              <h3 className="text-sm font-medium text-[#191919] mt-0.5">{step.title}</h3>
+              <h3 className="text-sm font-medium text-[var(--p-text-primary)] mt-0.5">{step.title}</h3>
             </div>
             <button
               onClick={onDone}
-              className="p-1 rounded hover:bg-[#F1F1EF] text-[#787774] hover:text-[#191919] transition-colors shrink-0"
+              className="p-1 rounded hover:bg-[#F1F1EF] text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors shrink-0"
               title="Skip tour"
             >
               <X className="w-3.5 h-3.5" />
@@ -214,7 +214,7 @@ export default function TourTooltip({ steps, onDone }) {
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={handlePrev}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#E9E9E7] bg-white text-[#787774] hover:text-[#191919] transition-colors"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#E9E9E7] bg-white text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors"
               >
                 Back
               </motion.button>
@@ -230,7 +230,7 @@ export default function TourTooltip({ steps, onDone }) {
             </motion.button>
             <button
               onClick={onDone}
-              className="ml-auto text-[10px] text-[#9B9A97] hover:text-[#787774] transition-colors"
+              className="ml-auto text-[10px] text-[var(--p-text-muted)] hover:text-[var(--p-text-secondary)] transition-colors"
             >
               Skip tour
             </button>
