@@ -540,14 +540,13 @@ function ChatTableRow({
 
   return (
     <motion.div variants={staggerItem}>
-      <motion.div
-        animate={{ backgroundColor: isSelected ? '#F0F5FF' : '#FFFFFF' }}
-        whileHover={{ backgroundColor: isSelected ? '#F0F5FF' : '#F7F6F3' }}
-        transition={{ duration: 0.1 }}
-        className="group border-b border-[#F7F6F3]"
+      <div
+        className={`group border-b border-[var(--p-border-subtle)] transition-colors ${
+          isSelected ? 'bg-[var(--p-bg-alt)]' : 'bg-[var(--p-bg-surface)] hover:bg-[var(--p-bg-subtle)]'
+        }`}
         style={{
           opacity: isDeemphasized ? 0.45 : 1,
-          transition: 'opacity 0.2s ease',
+          transition: 'background-color 0.1s ease, opacity 0.2s ease',
         }}
       >
         <div className="flex items-start px-2" style={{ minHeight: 58, paddingTop: 10, paddingBottom: 10 }}>
@@ -823,7 +822,7 @@ function ChatTableRow({
             <span className="text-xs text-[#8E99A4]">{formatShortDate(chat.createdAt)}</span>
           </div>
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   )
 }
@@ -1292,10 +1291,10 @@ export default function SelectorView() {
           >
             <div className="border border-[#E9E9E7] rounded-xl overflow-hidden flex flex-col flex-1">
               {/* Table Header */}
-              <motion.div
-                animate={{ backgroundColor: someSelected ? '#F0F5FF' : '#F7F6F3' }}
-                transition={{ duration: 0.2 }}
-                className="flex items-center border-b border-[#E9E9E7] px-2"
+              <div
+                className={`flex items-center border-b border-[var(--p-border)] px-2 transition-colors ${
+                  someSelected ? 'bg-[var(--p-bg-alt)]' : 'bg-[var(--p-bg-subtle)]'
+                }`}
                 style={{ minHeight: 40 }}
               >
                 <div className="w-8 flex-shrink-0 flex items-center justify-center">
@@ -1364,7 +1363,7 @@ export default function SelectorView() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </div>
 
               {/* Table Body */}
               <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--p-border) transparent' }}>

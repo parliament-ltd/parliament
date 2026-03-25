@@ -264,7 +264,7 @@ export default function MessageCard({
 
         {/* Content */}
         <div className="px-4 py-4 overflow-hidden relative" ref={contentRef} onMouseUp={handleMouseUp}>
-          <div className="text-sm leading-relaxed text-[#191919]">
+          <div className="text-sm leading-relaxed" style={{ color: 'var(--p-text-primary)' }}>
             {renderContent}
           </div>
 
