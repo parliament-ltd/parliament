@@ -3,6 +3,110 @@
 /* ── Global Typography ───────────────────────────────────── */
 *, *::before, *::after { font-family: 'Inter Variable', 'Inter', system-ui, sans-serif; }
 
+/* ── Theme Variables ─────────────────────────────────────── */
+/* Light mode (default) */
+:root {
+  --p-bg-base:    #FFFFFF;
+  --p-bg-surface: #FFFFFF;
+  --p-bg-subtle:  #F7F6F3;
+  --p-bg-alt:     #F1F1EF;
+
+  --p-text-primary:   #191919;
+  --p-text-secondary: #787774;
+  --p-text-muted:     #9B9A97;
+  --p-text-light:     #C0C8D4;
+
+  --p-border:        #E9E9E7;
+  --p-border-subtle: #F1F1EF;
+
+  --p-gold:       #C4A94D;
+  --p-gold-light: #B8A070;
+  --p-gold-muted: #9C8760;
+
+  --p-scrollbar-thumb: #D8D6D2;
+  --p-scrollbar-track: transparent;
+}
+
+/* Dark mode — warm studio, dusty gold stays */
+.dark {
+  --p-bg-base:    #15130E;
+  --p-bg-surface: #1C1A14;
+  --p-bg-subtle:  #232018;
+  --p-bg-alt:     #2A271F;
+
+  --p-text-primary:   #EDE8DC;
+  --p-text-secondary: #9B9A97;
+  --p-text-muted:     #6B6963;
+  --p-text-light:     #4A4742;
+
+  --p-border:        #2C2921;
+  --p-border-subtle: #232018;
+
+  --p-gold:       #C4A94D;
+  --p-gold-light: #B8A070;
+  --p-gold-muted: #9C8760;
+
+  --p-scrollbar-thumb: #3A3730;
+  --p-scrollbar-track: transparent;
+}
+
+/* ── Dark Mode: page root ────────────────────────────────── */
+.dark body,
+.dark #root {
+  background-color: var(--p-bg-base);
+  color: var(--p-text-primary);
+}
+
+/* ── Dark Mode: Tailwind arbitrary-value overrides ───────── */
+/*
+  These override the hardcoded hex values compiled into Tailwind classes.
+  Placed outside @layer so they win over layered Tailwind utilities.
+  Backslash-escaped per CSS selector spec: [ → \[  ] → \]
+*/
+
+/* — Text colors — */
+.dark .text-\[#191919\]  { color: var(--p-text-primary); }
+.dark .text-\[#37352F\]  { color: var(--p-text-secondary); }
+.dark .text-\[#787774\]  { color: var(--p-text-secondary); }
+.dark .text-\[#9B9A97\]  { color: var(--p-text-muted); }
+.dark .text-\[#9C8760\]  { color: var(--p-gold-muted); }
+.dark .text-\[#9CA7B8\]  { color: var(--p-text-secondary); }
+.dark .text-\[#7A8694\]  { color: var(--p-text-secondary); }
+.dark .text-\[#8E99A4\]  { color: var(--p-text-secondary); }
+.dark .text-\[#94A0AE\]  { color: var(--p-text-secondary); }
+.dark .text-\[#B0B8C1\]  { color: var(--p-text-light); }
+.dark .text-\[#C0C8D4\]  { color: var(--p-text-light); }
+.dark .text-\[#DDDDE3\]  { color: var(--p-text-light); }
+.dark .text-\[#E0E0E0\]  { color: var(--p-text-light); }
+
+/* — Backgrounds — */
+.dark .bg-white          { background-color: var(--p-bg-surface); }
+.dark .bg-\[#F7F6F3\]   { background-color: var(--p-bg-subtle); }
+.dark .bg-\[#F8F8F8\]   { background-color: var(--p-bg-subtle); }
+.dark .bg-\[#F1F1EF\]   { background-color: var(--p-bg-alt); }
+.dark .bg-\[#FFFBEB\]   { background-color: rgba(196,169,77,0.12); }
+.dark .bg-\[#FEFCE8\]   { background-color: rgba(196,169,77,0.10); }
+.dark .bg-\[#FEF2F2\]   { background-color: rgba(224,62,62,0.10); }
+.dark .bg-\[#F0F5FF\]   { background-color: rgba(58,106,212,0.12); }
+.dark .bg-\[#F5F7FF\]   { background-color: rgba(58,106,212,0.10); }
+
+/* — Borders — */
+.dark .border-\[#E9E9E7\] { border-color: var(--p-border); }
+.dark .border-\[#DDDDE3\] { border-color: var(--p-border); }
+
+/* — Hover states — */
+.dark .hover\:bg-\[#F1F1EF\]:hover   { background-color: var(--p-bg-alt); }
+.dark .hover\:bg-white\/60:hover     { background-color: rgba(255,255,255,0.08); }
+.dark .hover\:text-\[#191919\]:hover { color: var(--p-text-primary); }
+.dark .hover\:border-\[#9B9A97\]:hover { border-color: #5A5753; }
+
+/* — Focus states — */
+.dark .focus\:border-\[#B8A070\]:focus { border-color: var(--p-gold-light); }
+
+/* — Scrollbar — */
+.dark ::-webkit-scrollbar-thumb { background-color: var(--p-scrollbar-thumb); }
+.dark ::-webkit-scrollbar-track { background-color: var(--p-scrollbar-track); }
+
 /* ── Parliament Markdown Styles ──────────────────────────── */
 /* Applied via className="parliament-md" on message content wrappers */
 
@@ -75,6 +179,27 @@
   padding: 0 1px;
   color: inherit;
 }
+
+/* ── Dark mode: parliament-md overrides ──────────────────── */
+.dark .parliament-md h1, .dark .parliament-md h2, .dark .parliament-md h3,
+.dark .parliament-md h4, .dark .parliament-md h5, .dark .parliament-md h6 {
+  color: var(--p-text-primary);
+}
+.dark .parliament-md code {
+  background: rgba(255,255,255,0.08);
+}
+.dark .parliament-md pre {
+  background: var(--p-bg-subtle);
+  border-color: var(--p-border);
+}
+.dark .parliament-md blockquote {
+  border-left-color: var(--p-border);
+  color: var(--p-text-secondary);
+}
+.dark .parliament-md a { color: var(--p-gold-light); }
+.dark .parliament-md hr { border-top-color: var(--p-border); }
+.dark .parliament-md th, .dark .parliament-md td { border-color: var(--p-border); }
+.dark .parliament-md th { background: var(--p-bg-subtle); }
 
 /* ── Branch Creation: Gold Shimmer Animation ─────────────── */
 /* Applied to the "Create Branch" CTA when a mode is selected  */

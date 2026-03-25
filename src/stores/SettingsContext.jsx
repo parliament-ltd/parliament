@@ -44,6 +44,17 @@ export function SettingsProvider({ children }) {
     loadSettings()
   }, [])
 
+  // Apply theme class to <html> whenever it changes (or on first load)
+  useEffect(() => {
+    if (!loaded) return
+    const html = document.documentElement
+    if (settings.theme === 'dark') {
+      html.classList.add('dark')
+    } else {
+      html.classList.remove('dark')
+    }
+  }, [settings.theme, loaded])
+
   // Check storage estimate on mount
   useEffect(() => {
     async function checkStorage() {

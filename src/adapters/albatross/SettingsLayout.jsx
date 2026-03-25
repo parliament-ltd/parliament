@@ -941,24 +941,17 @@ function AppearanceSection({ theme, setTheme, fontSize, setFontSize, storedMode,
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setTheme(t.id)}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md border transition-colors ${
-                    active ? 'border-[#B8A070] bg-[#B8A070]/5' : 'border-[#E9E9E7] hover:border-[#9B9A97]'
+                    active
+                      ? 'border-[#B8A070] bg-[#B8A070]/10'
+                      : 'border-[var(--p-border)] hover:border-[var(--p-text-muted)]'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${active ? 'text-[#B8A070]' : 'text-[#787774]'}`} />
-                  <span className={`text-sm font-medium ${active ? 'text-[#191919]' : 'text-[#787774]'}`}>{t.label}</span>
+                  <Icon className={`w-4 h-4 ${active ? 'text-[#B8A070]' : 'text-[var(--p-text-secondary)]'}`} />
+                  <span className={`text-sm font-medium ${active ? 'text-[var(--p-text-primary)]' : 'text-[var(--p-text-secondary)]'}`}>{t.label}</span>
                 </motion.button>
               )
             })}
           </div>
-          {theme === 'dark' && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-xs text-[#787774] mt-3"
-            >
-              Dark theme is coming in a future update.
-            </motion.p>
-          )}
         </Card>
       </StaggerItem>
 
