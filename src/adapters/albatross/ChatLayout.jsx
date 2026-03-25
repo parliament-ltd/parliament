@@ -841,7 +841,7 @@ export default function ChatView() {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => navigate('/')}
-                className="text-[#B8A070] hover:text-[#3A6AD4] transition-colors p-1.5 rounded hover:bg-[#F1F1EF]"
+                className="text-[#B8A070] hover:text-[#3A6AD4] transition-colors p-1.5 rounded border border-transparent hover:border-[var(--p-text-primary)]/20"
                 title="Back to Chats"
               >
                 <MessageSquare className="w-5 h-5" />
@@ -1094,7 +1094,7 @@ export default function ChatView() {
               exit={{ opacity: 0 }}
               transition={SPRING_SNAPPY}
               onClick={() => setRightSidebarCollapsed(false)}
-              className="p-3 hover:bg-[#F1F1EF] transition-colors mt-10"
+              className="p-3 border border-transparent hover:border-[var(--p-text-primary)]/20 transition-colors mt-10"
               style={{ color: getContextColor(contextUsage, contextThreshold) }}
               title="Expand sidebar"
             >
@@ -1120,7 +1120,7 @@ export default function ChatView() {
                     whileHover={{ scale: 1.15 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setRightSidebarCollapsed(true)}
-                    className="p-1 rounded hover:bg-[#F1F1EF] transition-colors"
+                    className="p-1 rounded border border-transparent hover:border-[var(--p-text-primary)]/20 transition-colors"
                     style={{ color: getContextColor(contextUsage, contextThreshold) }}
                     title="Collapse sidebar"
                   >
@@ -1192,7 +1192,7 @@ export default function ChatView() {
                               e.stopPropagation()
                               toggleFav(msg.id)
                             }}
-                            className="p-1 rounded opacity-0 group-hover/fav:opacity-100 hover:bg-[#F1F1EF] text-[var(--p-text-secondary)] hover:text-[#E03E3E] transition-all"
+                            className="p-1 rounded opacity-0 group-hover/fav:opacity-100 border border-transparent hover:border-[var(--p-text-primary)]/20 text-[var(--p-text-secondary)] hover:text-[#E03E3E] transition-all"
                             title="Remove from favorites"
                           >
                             <X className="w-3 h-3" />
@@ -1393,7 +1393,7 @@ function SidebarIconButton({ children, title, onClick }) {
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
       onClick={onClick}
-      className="text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors p-1.5 rounded hover:bg-[#F1F1EF]"
+      className="text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors p-1.5 rounded border border-transparent hover:border-[var(--p-text-primary)]/20"
       title={title}
     >
       {children}
@@ -1732,7 +1732,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
                 <div className="text-[11px] text-[var(--p-text-secondary)] mt-0.5">Forking from message {messageIndex} of {totalMessages}</div>
               </div>
             </div>
-            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onClose} className="p-2 rounded-lg text-[var(--p-text-secondary)] hover:bg-[#F1F1EF] transition-colors">
+            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onClose} className="p-2 rounded-lg text-[var(--p-text-secondary)] border border-transparent hover:border-[var(--p-text-primary)]/20 transition-colors">
               <X className="w-4 h-4" />
             </motion.button>
           </div>
@@ -1950,7 +1950,7 @@ function ShortcutsModal({ onClose }) {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={onClose}
-            className="p-2 rounded-lg text-[var(--p-text-secondary)] hover:bg-[#F1F1EF] transition-colors"
+            className="p-2 rounded-lg text-[var(--p-text-secondary)] border border-transparent hover:border-[var(--p-text-primary)]/20 transition-colors"
           >
             <X className="w-4 h-4" />
           </motion.button>

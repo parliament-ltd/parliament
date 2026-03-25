@@ -347,7 +347,7 @@ function InlineNoteEditor({ note = '', onSave, onCancel }) {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={onCancel}
-          className="px-2.5 py-1.5 rounded-md text-[10px] font-medium text-[var(--p-text-secondary)] hover:bg-[#F1F1EF]"
+          className="px-2.5 py-1.5 rounded-md text-[10px] font-medium text-[var(--p-text-secondary)] border border-transparent hover:border-[var(--p-text-primary)]/20"
         >
           Cancel
         </motion.button>
@@ -459,7 +459,7 @@ function FavoriteCard({ favorite, onRemove, onNavigate }) {
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.85 }}
             onClick={handleCopy}
-            className="p-1 rounded hover:bg-[#F1F1EF] text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors"
+            className="p-1 rounded border border-transparent hover:border-[var(--p-text-primary)]/20 text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors"
           >
             <AnimatePresence mode="wait">
               {copied ? (
@@ -477,7 +477,7 @@ function FavoriteCard({ favorite, onRemove, onNavigate }) {
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.85 }}
             onClick={(e) => { e.stopPropagation(); onRemove() }}
-            className="p-1 rounded hover:bg-[#F1F1EF] text-[var(--p-text-secondary)] hover:text-[#E03E3E] transition-colors"
+            className="p-1 rounded border border-transparent hover:border-[var(--p-text-primary)]/20 text-[var(--p-text-secondary)] hover:text-[#E03E3E] transition-colors"
           >
             <Trash2 className="w-3 h-3" />
           </motion.button>
@@ -663,7 +663,7 @@ function ChatTableRow({
                                 whileHover={{ scale: 1.15 }}
                                 whileTap={{ scale: 0.85 }}
                                 onClick={() => setEditingNoteId(note.id)}
-                                className="p-0.5 rounded hover:bg-[#F1F1EF] text-[var(--p-text-light)] hover:text-[var(--p-text-secondary)] transition-colors"
+                                className="p-0.5 rounded border border-transparent hover:border-[var(--p-text-primary)]/20 text-[var(--p-text-light)] hover:text-[var(--p-text-secondary)] transition-colors"
                               >
                                 <Pencil className="w-2.5 h-2.5" />
                               </motion.button>
@@ -729,7 +729,7 @@ function ChatTableRow({
                           whileHover={{ scale: 1.15 }}
                           whileTap={{ scale: 0.85 }}
                           onClick={() => navigator.clipboard.writeText(hl.text).catch(() => {})}
-                          className="p-0.5 rounded opacity-0 group-hover/hl:opacity-100 hover:bg-[#F1F1EF] text-[var(--p-text-light)] hover:text-[var(--p-text-secondary)] transition-all flex-shrink-0 self-start"
+                          className="p-0.5 rounded opacity-0 group-hover/hl:opacity-100 border border-transparent hover:border-[var(--p-text-primary)]/20 text-[var(--p-text-light)] hover:text-[var(--p-text-secondary)] transition-all flex-shrink-0 self-start"
                         >
                           <Copy className="w-2.5 h-2.5" />
                         </motion.button>
@@ -1450,7 +1450,7 @@ export default function SelectorView() {
                   whileHover={{ scale: 1.15 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setFavSidebarOpen(false)}
-                  className="p-1.5 rounded hover:bg-[#F1F1EF] text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors"
+                  className="p-1.5 rounded border border-transparent hover:border-[var(--p-text-primary)]/20 text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors"
                   title="Collapse"
                 >
                   <PanelRight className="w-4 h-4" />

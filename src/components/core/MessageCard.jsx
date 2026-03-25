@@ -361,7 +361,7 @@ function MsgIconButton({ onClick, children, active = false, title }) {
       className={`p-1.5 rounded transition-colors ${
         active
           ? 'bg-[#B8A070]/15 text-[#B8A070]'
-          : 'hover:bg-[#F1F1EF] text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)]'
+          : 'border border-transparent hover:border-[var(--p-text-primary)]/20 text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)]'
       }`}
     >
       {children}
@@ -373,7 +373,7 @@ function MenuButton({ icon: Icon, children, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left px-3 py-2 text-xs text-[var(--p-text-secondary)] hover:bg-[#F1F1EF] hover:text-[var(--p-text-primary)] transition-colors flex items-center gap-2"
+      className="w-full text-left px-3 py-2 text-xs text-[var(--p-text-secondary)] border border-transparent hover:border-[var(--p-text-primary)]/20 hover:text-[var(--p-text-primary)] transition-colors flex items-center gap-2"
     >
       <Icon className="w-3.5 h-3.5" />
       {children}

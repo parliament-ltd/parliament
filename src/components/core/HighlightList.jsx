@@ -54,7 +54,7 @@ export default function HighlightList({
               whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.85 }}
               onClick={(e) => { e.stopPropagation(); onNavigate?.(hl.text, 'prev') }}
-              className="p-1 hover:bg-[#F1F1EF] rounded text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors"
+              className="p-1 border border-transparent hover:border-[var(--p-text-primary)]/20 rounded text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors"
               title="Previous occurrence"
             >
               <ChevronLeft className="w-3 h-3" />
@@ -63,7 +63,7 @@ export default function HighlightList({
               whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.85 }}
               onClick={(e) => { e.stopPropagation(); onNavigate?.(hl.text, 'next') }}
-              className="p-1 hover:bg-[#F1F1EF] rounded text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors"
+              className="p-1 border border-transparent hover:border-[var(--p-text-primary)]/20 rounded text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors"
               title="Next occurrence"
             >
               <ChevronRight className="w-3 h-3" />
@@ -72,7 +72,7 @@ export default function HighlightList({
               whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.85 }}
               onClick={(e) => { e.stopPropagation(); onRemove?.(hl.ids) }}
-              className="p-1 hover:bg-[#F1F1EF] rounded text-[var(--p-text-secondary)] hover:text-[#E03E3E] transition-colors"
+              className="p-1 border border-transparent hover:border-[var(--p-text-primary)]/20 rounded text-[var(--p-text-secondary)] hover:text-[#E03E3E] transition-colors"
               title="Remove highlight"
             >
               <Trash2 className="w-3 h-3" />
@@ -125,7 +125,7 @@ export default function HighlightList({
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => { setAddText(''); setShowAddForm(false) }}
-                    className="px-2 py-1 rounded text-[10px] font-medium text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] hover:bg-[#F1F1EF] transition-colors"
+                    className="px-2 py-1 rounded text-[10px] font-medium text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] border border-transparent hover:border-[var(--p-text-primary)]/20 transition-colors"
                   >
                     Cancel
                   </motion.button>

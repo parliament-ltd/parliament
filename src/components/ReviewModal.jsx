@@ -119,7 +119,7 @@ export default function ReviewModal({
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={onClose}
-            className="p-2 rounded-lg text-[var(--p-text-secondary)] hover:bg-[#F1F1EF] transition-colors"
+            className="p-2 rounded-lg text-[var(--p-text-secondary)] border border-transparent hover:border-[var(--p-text-primary)]/20 transition-colors"
           >
             <X className="w-4 h-4" />
           </motion.button>
@@ -326,7 +326,7 @@ export default function ReviewModal({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-xs font-medium text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] hover:bg-[#F1F1EF] transition-colors"
+            className="px-4 py-2 rounded-lg text-xs font-medium text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] border border-transparent hover:border-[var(--p-text-primary)]/20 transition-colors"
           >
             Dismiss
           </motion.button>
