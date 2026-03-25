@@ -369,7 +369,7 @@ function ViewToggle({ activeView, onChangeView }) {
   ]
 
   return (
-    <div className="flex items-center bg-[#F7F6F3] rounded-lg p-0.5 gap-0.5">
+    <div className="flex items-center rounded-lg p-0.5 gap-0.5">
       {views.map(({ id, icon: Icon, label }) => {
         const isActive = activeView === id
         return (
@@ -377,14 +377,13 @@ function ViewToggle({ activeView, onChangeView }) {
             key={id}
             onClick={() => onChangeView(id)}
             className={`relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-colors ${
-              isActive ? 'text-[var(--p-text-primary)]' : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-secondary)]'
+              isActive ? 'text-[var(--p-text-primary)]' : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)]'
             }`}
-            whileHover={!isActive ? { backgroundColor: 'rgba(0,0,0,0.03)' } : {}}
           >
             {isActive && (
               <motion.div
                 layoutId="view-toggle-bg"
-                className="absolute inset-0 bg-white rounded-md shadow-sm"
+                className="absolute inset-0 rounded-md border border-[var(--p-text-primary)]/30"
                 transition={SPRING_SNAPPY}
               />
             )}
