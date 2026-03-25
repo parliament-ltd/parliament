@@ -25,25 +25,24 @@ Project Apollo is a power-user chat interface for AI models, starting with Claud
 
 ## Design System
 
-This app uses a light theme with minimal accent color. Blue (`#4A7AE5`) is used sparingly for active states and interactive elements. The overall aesthetic is clean, white, with subtle borders.
+This app uses a light theme inspired by a warm neutral palette with a Dusty Gold accent. The overall aesthetic is warm white with subtle warm-tinted borders — not cold blue/grey.
 
 ### Colors
 | Token | Value | Usage |
 |-------|-------|-------|
 | `bg-primary` | `#FFFFFF` | Page background, cards |
-| `text-primary` | `#1E2532` | Headings, body text |
-| `text-secondary` | `#6B7C93` | Labels, metadata |
-| `text-muted` | `#4A5568` | Descriptions |
-| `accent-blue` | `#4A7AE5` | Active states, links, validation |
-| `accent-purple` | `#7C6CD4` | Branch indicators |
-| `success` | `#22C55E` | Valid, complete |
-| `warning` | `#E5A620` | Caution, amber alerts |
-| `error` | `#EF4444` | Invalid, danger zone |
-| `border` | `#EBEBEB` | Cards, inputs |
-| `border-subtle` | `#F0F0F0` | Sidebar dividers |
-| `hover-bg` | `#EEEEEE` | Button hover |
-| `row-hover` | `#FAFAFA` | Table row hover |
-| `placeholder` | `#D5D5D5` | Input placeholders |
+| `text-primary` | `#191919` | Headings, body text |
+| `text-secondary` | `#787774` | Labels, metadata, section headers |
+| `text-muted` | `#9B9A97` | Placeholders, de-emphasized |
+| `accent-gold` | `#B8A070` | Focus borders, hover text, links, interactive icons |
+| `dusty-gold` | `#C4A94D` | Branch animations, shimmer effects, special highlights |
+| `success` | `#0F7B6C` | Valid, complete (dark teal) |
+| `warning` | `#D9730D` | Caution, amber alerts (warm orange) |
+| `error` | `#E03E3E` | Invalid, danger zone |
+| `border` | `#E9E9E7` | Cards, inputs (warm off-white) |
+| `border-subtle` | `#F1F1EF` | Sidebar dividers, progress tracks |
+| `hover-bg` | `#FAFAFA` | Row/button hover |
+| `code-bg` | `#F7F6F3` | Code block backgrounds |
 
 ### Animation Springs
 ```javascript
@@ -55,11 +54,11 @@ const SPRING_GENTLE = { type: 'spring', stiffness: 200, damping: 24 };
 Use `SPRING_SMOOTH` as the default. `SPRING_SNAPPY` for toggles and small elements. `SPRING_GENTLE` for page transitions and message cards.
 
 ### Component Patterns
-- **Cards:** `className="px-5 py-4 rounded-xl border border-[#EBEBEB] bg-white"`
-- **Inputs:** `className="bg-white rounded-lg px-4 py-2.5 text-sm text-[#1E2532] outline-none border border-[#EBEBEB] focus:border-[#4A7AE5] transition-colors placeholder:text-[#D5D5D5]"`
-- **Buttons (default):** `className="px-4 py-2.5 rounded-lg text-xs font-semibold border border-[#EBEBEB] bg-white text-[#1E2532]"` with `whileHover={{ scale: 1.03, borderColor: '#4A7AE5' }}` and `whileTap={{ scale: 0.97 }}`
-- **Section labels:** `className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider"`
-- **Modals:** white bg, `border-[#EBEBEB] rounded-xl shadow-2xl shadow-black/10`, backdrop `rgba(0,0,0,0.2)`
+- **Cards:** `className="px-5 py-4 rounded-xl border border-[#E9E9E7] bg-white"`
+- **Inputs:** `className="bg-white rounded-lg px-4 py-3 text-sm text-[#191919] resize-none outline-none border border-[#E9E9E7] focus:border-[#B8A070] transition-colors placeholder:text-[#9B9A97]"`
+- **Buttons (default):** `className="px-4 py-2.5 rounded-lg text-sm font-medium border border-[#E9E9E7] bg-white text-[#191919]"` with `whileHover={{ scale: 1.03, borderColor: '#B8A070' }}` and `whileTap={{ scale: 0.97 }}`
+- **Section labels:** `className="text-xs font-medium text-[#787774] uppercase tracking-wider"`
+- **Modals:** white bg, `border-[#E9E9E7] rounded-xl shadow-2xl shadow-black/10`, backdrop `rgba(0,0,0,0.2)`
 
 ## Folder Structure
 
@@ -135,7 +134,7 @@ The panel includes:
 - The context meter animates to reflect the new percentage when the branch is created
 - "(saves context)" appears as a green parenthetical next to the Compressed Summary title
 
-Panel design follows the modal pattern: white bg, border #EBEBEB rounded-xl shadow-2xl shadow-black/10, backdrop rgba(0,0,0,0.2). Branch icon uses accent-purple #7C6CD4. Primary CTA uses the gradient from #4A7AE5 to #7C6CD4. Radio-style selection with filled circle on active.
+Panel design follows the modal pattern: white bg, border #E9E9E7 rounded-xl shadow-2xl shadow-black/10, backdrop rgba(0,0,0,0.2). Branch icon uses dusty gold #C4A94D. Primary CTA uses a gold shimmer animation. Radio-style selection with filled circle on active.
 
 ### Summary Pre-Generation Timing
 
@@ -154,7 +153,7 @@ When a streaming response fails mid-output (no `stop_reason: "end_turn"` receive
 1. Save the partial message to IndexedDB with an `incomplete: true` flag
 2. Render the entire partial message at 50-60% opacity to signal provisional state without hiding useful content
 3. At the break point, show a thin dashed border with a slow pulsing dot and "Response interrupted" label
-4. Display a compact pill-style "Continue" button at the break point (accent blue #4A7AE5 on hover)
+4. Display a compact pill-style "Continue" button at the break point (accent gold #B8A070 on hover)
 5. On click: send the conversation back to the API including the partial response, with a trailing instruction to continue from where it left off
 6. As the continuation streams in, progressively fade the ghost text back to full opacity. The user sees the message heal in real time
 7. If the continuation also fails, return to ghost state with the same recovery option
@@ -192,11 +191,11 @@ The "Validate" button fires a lightweight API call to `/v1/messages` with a mini
 
 | HTTP Status | keyStatus | Message | Color |
 |------------|-----------|---------|-------|
-| 200 | `valid` | "API key is valid — connected to Anthropic" | Success green #22C55E |
-| 401 | `invalid` | "This API key is not valid. Please check your key and try again." | Error red #EF4444 |
-| 403 / billing | `billing_error` | "This API key was recognized but your account may have insufficient credits or a billing issue. Please check your Anthropic dashboard." | Warning amber #E5A620 |
+| 200 | `valid` | "API key is valid — connected to Anthropic" | Success teal #0F7B6C |
+| 401 | `invalid` | "This API key is not valid. Please check your key and try again." | Error red #E03E3E |
+| 403 / billing | `billing_error` | "This API key was recognized but your account may have insufficient credits or a billing issue. Please check your Anthropic dashboard." | Warning orange #D9730D |
 
-On invalid/error states, the input border also turns red (`border-[#EF4444]`). Both border and message reset when the user starts typing (onChange resets keyStatus to null).
+On invalid/error states, the input border also turns red (`border-[#E03E3E]`). Both border and message reset when the user starts typing (onChange resets keyStatus to null).
 
 Note: Anthropic API keys do not expire automatically. Do not use the word "expired" in any user-facing copy. Keys become invalid when manually revoked or when the account has billing issues.
 
@@ -261,7 +260,7 @@ The textarea remains editable during streaming. The user can pre-compose their n
 
 ### Token Count Indicator
 
-Display the estimated token cost of the current input next to the send button. Uses the provider's `countTokens()` method or a client-side approximation. If the input would consume >25% of remaining context window, the indicator shifts to warning amber (#E5A620). This is informational only — never blocks sending.
+Display the estimated token cost of the current input next to the send button. Uses the provider's `countTokens()` method or a client-side approximation. If the input would consume >25% of remaining context window, the indicator shifts to warning orange (#D9730D). This is informational only — never blocks sending.
 
 ## Browser Storage Management
 
@@ -423,6 +422,7 @@ The UI was designed in standalone `.jsx` mockup files before development began. 
 - `chat-selector.jsx` / `chat-selector-v2.jsx` — **Superseded** conversation list designs (nested branch model). Keep for reference but V6 is the target
 - `settings.jsx` — Settings page with all sections
 - `branch-panel-v3.jsx` — Branch creation panel with Full History / Compressed Summary modes, inline context meter, and savings animation
+- `pelican-mode.jsx` — **Pelican mode** — data analysis workspace (three-panel: file shelf + data canvas + inspector/chat). Reference for color-updated implementation.
 
 ## What NOT to Do
 
@@ -431,7 +431,8 @@ The UI was designed in standalone `.jsx` mockup files before development began. 
 - Don't add third-party scripts or analytics
 - Don't hardcode the Anthropic API — always go through the provider abstraction
 - Don't use external crypto libraries — Web Crypto API only
-- Don't use `Inter`, `Roboto`, or other generic fonts — system sans-serif
+- Don't use cold blue (`#4A7AE5`) as a primary accent — the design system uses warm gold (`#B8A070`) and Dusty Gold (`#C4A94D`)
+- Use `Inter Variable` / `Inter` (set globally in `index.css`) — do not override font-family inline
 - Don't use purple gradients or generic AI aesthetics
 - Don't add emojis to the UI
 - Don't nest branches under parents in the chat selector — use the flat model with Branches view

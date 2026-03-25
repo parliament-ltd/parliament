@@ -926,8 +926,8 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
 const MODE_OPTIONS = [
   { id: 'auto', label: 'Auto', description: 'Detect from your device — desktop uses Albatross, mobile uses Swift' },
   { id: 'albatross', label: 'Albatross', description: 'Desktop layout with dual sidebars and full keyboard support' },
-  { id: 'swift', label: 'Swift', description: 'Mobile-optimized, touch-first layout' },
-  { id: 'pelican', label: 'Pelican', description: 'Data analysis layout with file staging, charts, and bulk processing', soon: true },
+  { id: 'swift', label: 'Swift', description: 'Mobile-optimized, touch-first layout', beta: true },
+  { id: 'pelican', label: 'Pelican', description: 'Data analysis workspace — upload CSV, XLSX, or JSON and explore with charts and AI insights', beta: true },
   { id: 'kingfisher', label: 'Kingfisher', description: 'Deep reading layout with annotation panel', soon: true },
   { id: 'secretarybird', label: 'Secretarybird', description: 'iPad + stylus canvas layout', soon: true },
   { id: 'starling', label: 'Starling', description: 'Collaborative split-view layout', soon: true },
@@ -963,6 +963,7 @@ function AppearanceSection({ theme, setTheme, fontSize, setFontSize, storedMode,
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className={`text-sm font-medium ${active ? 'text-[#191919]' : 'text-[#787774]'}`}>{opt.label}</p>
+                      {opt.beta && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#B8A070]/10 text-[#B8A070]">Beta</span>}
                       {opt.soon && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#D9730D]/10 text-[#D9730D]">Soon</span>}
                     </div>
                     <p className="text-xs text-[#9B9A97] mt-0.5">{opt.description}</p>
