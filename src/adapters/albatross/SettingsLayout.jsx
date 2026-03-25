@@ -167,10 +167,10 @@ export default function SettingsView() {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setActiveSection(item.id)}
                 {...(item.tourTarget ? { 'data-tour': item.tourTarget } : {})}
-                className={`w-full text-left px-3 py-2.5 rounded-md text-sm transition-colors flex items-center gap-2.5 ${
+                className={`w-full text-left px-3 py-2.5 rounded-md text-sm transition-colors flex items-center gap-2.5 border ${
                   active
-                    ? 'text-[var(--p-text-primary)] font-medium bg-[#F7F6F3]'
-                    : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] hover:bg-[#F7F6F3]'
+                    ? 'text-[var(--p-text-primary)] font-medium border-[var(--p-text-primary)]/30'
+                    : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] border-transparent hover:border-[var(--p-text-primary)]/15'
                 }`}
               >
                 <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-[#B8A070]' : 'text-[var(--p-text-secondary)]'}`} />
