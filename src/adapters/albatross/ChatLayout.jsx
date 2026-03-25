@@ -32,8 +32,12 @@ import HighlightList from '../../components/core/HighlightList'
 import BranchList from '../../components/core/BranchList'
 import MessageList from '../../components/core/MessageList'
 import InputArea from '../../components/core/InputArea'
+import ModeSuggestion from '../../components/core/ModeSuggestion'
 import { SPRING_SNAPPY, SPRING_SMOOTH, SPRING_GENTLE, DUSTY_GOLD, HIGHLIGHT_COLORS, getContextColor } from '../../lib/constants'
+import { formatAttachmentForMessage } from '../../lib/fileUpload'
 import { includesWord, indexOfWord } from '../../lib/textUtils'
+import { evaluateSuggestions } from '../../lib/modeSuggestions'
+import { useMode } from '../../stores/ModeContext'
 
 /* ── ChatView-local constants ───────────────────────────── */
 
@@ -115,7 +119,8 @@ export default function ChatView() {
     persistError, clearPersistError,
   } = useChat()
   const { conversations, updateConversation, loadConversations, createConversation } = useConversations()
-  const { settings, refreshStorageEstimate } = useSettings()
+  const { settings, storageUsage, refreshStorageEstimate } = useSettings()
+  const { mode, setMode } = useMode()
 
   const [inputValue, setInputValue] = useState('')
   const [apiKey, setApiKey] = useState(null)
@@ -150,6 +155,24 @@ export default function ChatView() {
   const [moveToBranchMessage, setMoveToBranchMessage] = useState(null) // message being moved
   const [currentConversation, setCurrentConversation] = useState(null) // loaded conversation record
 
+  // File attachment
+  const [attachment, setAttachment] = useState(null)
+
+  // Tool toggles
+  const availableTools = useMemo(() => getProvider('anthropic').getAvailableTools(), [])
+  const [activeTools, setActiveTools] = useState(new Set())
+  const toggleTool = useCallback((toolId) => {
+    setActiveTools(prev => {
+      const next = new Set(prev)
+      next.has(toolId) ? next.delete(toolId) : next.add(toolId)
+      return next
+    })
+  }, [])
+
+  // Mode suggestions
+  const [dismissedSuggestions, setDismissedSuggestions] = useState(new Set())
+  const [suggestionsEnabled, setSuggestionsEnabled] = useState(true)
+
   // Onboarding tour
   const [showTour, setShowTour] = useState(false)
   useEffect(() => {
@@ -177,6 +200,13 @@ export default function ChatView() {
   // Derive visible messages early — needed by highlight callbacks below
   const visibleMessages = messages.filter((m) => !hiddenMessages.has(m.id))
   const hiddenCount = messages.length - visibleMessages.length
+
+  const activeSuggestion = useMemo(() => {
+    if (!suggestionsEnabled) return null
+    const suggestion = evaluateSuggestions({ mode, attachment, highlightCount: highlightsList.length })
+    if (!suggestion || dismissedSuggestions.has(suggestion.id)) return null
+    return suggestion
+  }, [suggestionsEnabled, mode, attachment, highlightsList.length, dismissedSuggestions])
 
   const messagesEndRef = useRef(null)
   const messagesContainerRef = useRef(null)
@@ -524,7 +554,14 @@ export default function ChatView() {
     try {
       const provider = getProvider('anthropic')
       const collabPrompt = buildCollabSystemPrompt()
-      await sendMessage(apiKey, id, trimmed, settings.defaultModel, provider, collabPrompt)
+      const messageContent = attachment
+        ? formatAttachmentForMessage(attachment) + trimmed
+        : trimmed
+      const toolList = Array.from(activeTools)
+        .map(tid => availableTools.find(t => (t.id || t.name) === tid))
+        .filter(Boolean)
+      await sendMessage(apiKey, id, messageContent, settings.defaultModel, provider, collabPrompt, toolList)
+      setAttachment(null)
       await refreshStorageEstimate()
     } catch (error) {
       if (error.status === 401 || error.status === 403) {
@@ -535,7 +572,7 @@ export default function ChatView() {
         setApiError({ type: 'generic', message: error.message || 'Something went wrong. Please try again.' })
       }
     }
-  }, [inputValue, isStreaming, apiKey, id, settings.defaultModel, sendMessage, refreshStorageEstimate, buildCollabSystemPrompt])
+  }, [inputValue, isStreaming, apiKey, id, settings.defaultModel, sendMessage, refreshStorageEstimate, buildCollabSystemPrompt, attachment, activeTools, availableTools])
 
   const handleContinue = useCallback(async (messageId) => {
     if (!apiKey) return
@@ -916,6 +953,34 @@ export default function ChatView() {
           )}
         </AnimatePresence>
 
+        {/* Storage critical banner (proactive — 95%+ full) */}
+        <AnimatePresence>
+          {storageUsage?.quota > 0 && (storageUsage.usage / storageUsage.quota) >= 0.95 && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="px-6 py-3 bg-[#E03E3E]/10 border-b border-[#E03E3E]/20 flex items-center gap-2"
+            >
+              <AlertCircle className="w-4 h-4 text-[#E03E3E] flex-shrink-0" />
+              <p className="text-xs text-[#E03E3E] flex-1">Browser storage is critically full — new messages may not be saved.</p>
+              <button
+                onClick={() => navigate('/settings#data')}
+                className="text-xs font-medium text-[#E03E3E] underline underline-offset-2 hover:opacity-70 transition-opacity flex-shrink-0"
+              >
+                Export
+              </button>
+              <span className="text-[#E03E3E]/40 text-xs">·</span>
+              <button
+                onClick={() => navigate('/')}
+                className="text-xs font-medium text-[#E03E3E] underline underline-offset-2 hover:opacity-70 transition-opacity flex-shrink-0"
+              >
+                Manage Chats
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Storage quota banner (streaming persist failure) */}
         <AnimatePresence>
           {persistError === 'quota' && (
@@ -1067,6 +1132,14 @@ export default function ChatView() {
           )}
         </AnimatePresence>
 
+        {/* Mode suggestion banner */}
+        <ModeSuggestion
+          suggestion={activeSuggestion}
+          onSwitch={(m) => { setMode(m); setDismissedSuggestions(prev => { const s = new Set(prev); s.add(activeSuggestion.id); return s }) }}
+          onDismiss={() => setDismissedSuggestions(prev => { const s = new Set(prev); s.add(activeSuggestion.id); return s })}
+          onTurnOff={() => setSuggestionsEnabled(false)}
+        />
+
         {/* Input area */}
         <InputArea
           value={inputValue}
@@ -1075,6 +1148,12 @@ export default function ChatView() {
           onStop={stopGenerating}
           isStreaming={isStreaming}
           inputRef={inputRef}
+          attachment={attachment}
+          onAttach={setAttachment}
+          onClearAttach={() => setAttachment(null)}
+          availableTools={availableTools}
+          activeTools={activeTools}
+          onToggleTool={toggleTool}
         />
       </div>
 

@@ -10,39 +10,39 @@ export async function initDB() {
   if (dbInstance) return dbInstance
 
   dbInstance = await openDB(DB_NAME, DB_VERSION, {
-    upgrade(db) {
-      if (!db.objectStoreNames.contains('conversations')) {
+    upgrade(db, oldVersion) {
+      // ── v1 stores (created on fresh install or upgrade from nothing) ──
+      if (oldVersion < 1) {
         const convStore = db.createObjectStore('conversations', { keyPath: 'id' })
         convStore.createIndex('updatedAt', 'updatedAt')
-      }
 
-      if (!db.objectStoreNames.contains('messages')) {
         const msgStore = db.createObjectStore('messages', { keyPath: 'id' })
         msgStore.createIndex('conversationId', 'conversationId')
-      }
 
-      if (!db.objectStoreNames.contains('highlights')) {
         const hlStore = db.createObjectStore('highlights', { keyPath: 'id' })
         hlStore.createIndex('conversationId', 'conversationId')
-      }
 
-      if (!db.objectStoreNames.contains('notes')) {
         const noteStore = db.createObjectStore('notes', { keyPath: 'id' })
         noteStore.createIndex('conversationId', 'conversationId')
-      }
 
-      if (!db.objectStoreNames.contains('favorites')) {
         const favStore = db.createObjectStore('favorites', { keyPath: 'id' })
         favStore.createIndex('conversationId', 'conversationId')
-      }
 
-      if (!db.objectStoreNames.contains('pins')) {
         const pinStore = db.createObjectStore('pins', { keyPath: 'id' })
         pinStore.createIndex('targetConversationId', 'targetConversationId')
+
+        db.createObjectStore('settings', { keyPath: 'key' })
       }
 
-      if (!db.objectStoreNames.contains('settings')) {
-        db.createObjectStore('settings', { keyPath: 'key' })
+      // ── v2 stores: Pelican file staging ───────────────────────────────
+      if (oldVersion < 2) {
+        // File metadata: one record per uploaded file
+        const fileStore = db.createObjectStore('files', { keyPath: 'id' })
+        fileStore.createIndex('conversationId', 'conversationId')
+
+        // File data: compressed raw bytes, keyed by fileId (one record per file)
+        // Stored separately to avoid loading binary blobs when listing file metadata
+        db.createObjectStore('file_data', { keyPath: 'fileId' })
       }
     }
   })
@@ -117,6 +117,15 @@ export async function deleteConversation(id) {
     await pinTx.store.delete(pin.id)
   }
   await pinTx.done
+
+  // Delete Pelican staged files and their data
+  const files = await db.getAllFromIndex('files', 'conversationId', id)
+  const fileTx = db.transaction(['files', 'file_data'], 'readwrite')
+  for (const file of files) {
+    fileTx.objectStore('files').delete(file.id)
+    fileTx.objectStore('file_data').delete(file.id)
+  }
+  await fileTx.done
 
   await db.delete('conversations', id)
 }
@@ -370,6 +379,61 @@ export async function setSetting(key, value) {
   await db.put('settings', { key, value })
 }
 
+// ─── Pelican Files ───────────────────────────────────────
+
+/**
+ * Add a staged file record + its compressed raw data.
+ * @param {object} meta  - { conversationId, name, type, rows, cols, sizeBytes }
+ * @param {ArrayBuffer} compressedData - gzip-compressed file bytes
+ */
+export async function addFile(meta, compressedData) {
+  const db = await initDB()
+  const file = {
+    id: generateId(),
+    conversationId: meta.conversationId,
+    name: meta.name,
+    type: meta.type,
+    rows: meta.rows,
+    cols: meta.cols,
+    sizeBytes: meta.sizeBytes,
+    inContext: true,
+    uploadedAt: new Date().toISOString(),
+  }
+  const tx = db.transaction(['files', 'file_data'], 'readwrite')
+  tx.objectStore('files').put(file)
+  tx.objectStore('file_data').put({ fileId: file.id, data: compressedData })
+  await tx.done
+  return file
+}
+
+export async function listFiles(conversationId) {
+  const db = await initDB()
+  const files = await db.getAllFromIndex('files', 'conversationId', conversationId)
+  return files.sort((a, b) => new Date(a.uploadedAt) - new Date(b.uploadedAt))
+}
+
+export async function getFileData(fileId) {
+  const db = await initDB()
+  return db.get('file_data', fileId)
+}
+
+export async function updateFile(id, updates) {
+  const db = await initDB()
+  const existing = await db.get('files', id)
+  if (!existing) throw new Error(`File not found: ${id}`)
+  const updated = { ...existing, ...updates }
+  await db.put('files', updated)
+  return updated
+}
+
+export async function deleteFile(id) {
+  const db = await initDB()
+  const tx = db.transaction(['files', 'file_data'], 'readwrite')
+  tx.objectStore('files').delete(id)
+  tx.objectStore('file_data').delete(id)
+  await tx.done
+}
+
 // ─── Storage Monitoring ──────────────────────────────────
 
 export async function getStorageEstimate() {
@@ -442,7 +506,10 @@ export async function importData(data) {
 
 export async function clearAllData() {
   const db = await initDB()
-  const stores = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings']
+  // Intentionally excludes the 'parliament-keystore' IndexedDB (separate database).
+  // That database holds the non-extractable AES key used to encrypt the API key at rest.
+  // Clearing it would make any stored encrypted API key permanently unreadable.
+  const stores = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings', 'files', 'file_data']
   for (const storeName of stores) {
     await db.clear(storeName)
   }

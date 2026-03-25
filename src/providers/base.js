@@ -13,8 +13,10 @@ export class BaseProvider {
   // messages: [{ role: 'user'|'assistant', content: string }]
   // onChunk: callback called with each text chunk as it arrives
   // signal: AbortController signal to cancel the request
+  // systemPrompt: optional string prepended as a system message
+  // tools: optional array of tool definitions to enable
   // Returns the complete response object with usage data
-  async sendMessage(apiKey, messages, model, onChunk, signal) {
+  async sendMessage(apiKey, messages, model, onChunk, signal, systemPrompt, tools = []) {
     throw new Error('Not implemented')
   }
 
@@ -28,6 +30,13 @@ export class BaseProvider {
   // Returns { inputTokens }
   async countTokens(apiKey, messages, model) {
     throw new Error('Not implemented')
+  }
+
+  // Return the list of tool definitions this provider supports.
+  // Each tool: { name, description, input_schema }
+  // Default: empty — providers with no tool support can skip overriding.
+  getAvailableTools() {
+    return []
   }
 
   // Generate a short conversation title from the first exchange.

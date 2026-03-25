@@ -10,12 +10,14 @@ const SwiftChatLayout         = lazy(() => import('../adapters/swift/ChatLayout'
 const KingfisherChatLayout    = lazy(() => import('../adapters/kingfisher/ChatLayout'))
 const SecretarybirdChatLayout = lazy(() => import('../adapters/secretarybird/ChatLayout'))
 const StarlingChatLayout      = lazy(() => import('../adapters/starling/ChatLayout'))
+const PelicanChatLayout       = lazy(() => import('../adapters/pelican/ChatLayout'))
 
 const LAYOUTS = {
   swift:         SwiftChatLayout,
   kingfisher:    KingfisherChatLayout,
   secretarybird: SecretarybirdChatLayout,
   starling:      StarlingChatLayout,
+  pelican:       PelicanChatLayout,
 }
 
 export default function ChatView() {

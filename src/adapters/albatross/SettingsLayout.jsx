@@ -10,6 +10,7 @@ import {
 import { useSettings } from '../../stores/SettingsContext'
 import { useConversations } from '../../stores/ConversationContext'
 import { useMode } from '../../stores/ModeContext'
+import { useShimmer } from '../../hooks/useShimmer'
 import { Button, Card, Input, Modal, Toggle, RadioGroup, SegmentedControl, SectionLabel, IconButton } from '../../components'
 import { getProvider } from '../../providers'
 import { saveApiKey, deleteApiKey, encryptExport, decryptImport } from '../../lib/crypto'
@@ -79,6 +80,7 @@ export default function SettingsView() {
   const { conversations } = useConversations()
   const { mode: currentMode, storedMode, setMode } = useMode()
   const [activeSection, setActiveSection] = useState('api')
+  const { triggerShimmer, shimmerPhase, shimmerDone } = useShimmer()
 
   // Onboarding tour
   const [showTour, setShowTour] = useState(false)
@@ -120,6 +122,7 @@ export default function SettingsView() {
       } else {
         // Key is valid — save it with the chosen storage mode
         await saveApiKey(apiKey, settings.storageMode)
+        triggerShimmer()
       }
     } catch {
       setKeyStatus('invalid')
@@ -131,12 +134,33 @@ export default function SettingsView() {
 
   return (
     <div className="flex h-screen font-sans overflow-hidden bg-white text-[var(--p-text-primary)]">
+
+      {/* Power-on sweep line */}
+      {shimmerPhase >= 1 && (
+        <motion.div
+          initial={{ top: -3, opacity: 0 }}
+          animate={{ top: '100vh', opacity: [0, 1, 1, 0] }}
+          transition={{ duration: 1, ease: 'easeOut', times: [0, 0.04, 0.8, 1] }}
+          style={{
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            height: 3,
+            background: 'linear-gradient(90deg, transparent, #D4A843, transparent)',
+            boxShadow: '0 0 14px 3px rgba(212,168,67,0.4)',
+            zIndex: 9999,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
+
       {/* Left Navigation */}
       <motion.div
         initial={{ x: -260 }}
         animate={{ x: 0 }}
         transition={SPRING_SMOOTH}
-        className="w-64 flex flex-col flex-shrink-0 border-r border-[#F1F1EF]"
+        className={`w-64 flex flex-col flex-shrink-0 border-r ${shimmerPhase >= 4 ? 'shimmer-sidebar-border' : 'border-[#F1F1EF]'}`}
       >
         <div className="p-4">
           <motion.div
@@ -146,7 +170,26 @@ export default function SettingsView() {
             className="flex items-center gap-2"
           >
             <IconButton icon={ArrowLeft} onClick={() => navigate('/')} title="Back to Chats" />
-            <h1 className="text-lg font-medium text-[var(--p-text-primary)]">Settings</h1>
+            <div>
+              <h1 className="text-lg font-medium text-[var(--p-text-primary)] leading-tight">Settings</h1>
+              <AnimatePresence>
+                {shimmerDone && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -6 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={SPRING_SMOOTH}
+                    className="flex items-center gap-1.5"
+                  >
+                    <motion.span
+                      animate={{ opacity: [1, 0.3, 1] }}
+                      transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+                      className="w-1.5 h-1.5 rounded-full bg-[#22C55E] inline-block"
+                    />
+                    <span className="text-[10px] font-medium text-[#22C55E]">Connected</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         </div>
 
@@ -156,7 +199,7 @@ export default function SettingsView() {
           animate="show"
           className="flex-1 px-3 space-y-0.5"
         >
-          {NAV_ITEMS.map((item) => {
+          {NAV_ITEMS.map((item, index) => {
             const Icon = item.icon
             const active = activeSection === item.id
             return (
@@ -171,7 +214,8 @@ export default function SettingsView() {
                   active
                     ? 'text-[var(--p-text-primary)] font-medium border-[var(--p-text-primary)]/30'
                     : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] border-transparent hover:border-[var(--p-text-primary)]/15'
-                }`}
+                } ${shimmerPhase >= 3 ? 'shimmer-nav' : ''}`}
+                style={shimmerPhase >= 3 ? { animationDelay: `${index * 55}ms` } : {}}
               >
                 <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-[#B8A070]' : 'text-[var(--p-text-secondary)]'}`} />
                 {item.label}
@@ -184,7 +228,7 @@ export default function SettingsView() {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto px-10 py-8">
         <AnimatePresence mode="wait">
-          {activeSection === 'api' && <ApiSection key="api" apiKey={apiKey} setApiKey={setApiKey} keyStatus={keyStatus} keyError={keyError} validateKey={validateKey} validateCooldown={validateCooldown} storageMode={settings.storageMode} setStorageMode={(v) => updateSetting('storageMode', v)} />}
+          {activeSection === 'api' && <ApiSection key="api" apiKey={apiKey} setApiKey={(v) => { setApiKey(v); setKeyStatus(null) }} keyStatus={keyStatus} keyError={keyError} validateKey={validateKey} validateCooldown={validateCooldown} storageMode={settings.storageMode} setStorageMode={(v) => updateSetting('storageMode', v)} shimmerPhase={shimmerPhase} />}
           {activeSection === 'model' && <ModelSection key="model" selectedModel={settings.defaultModel} setSelectedModel={(v) => updateSetting('defaultModel', v)} />}
           {activeSection === 'usage' && <UsageSection key="usage" budgetAlert={settings.budgetAlert} setBudgetAlert={(v) => updateSetting('budgetAlert', v)} budgetEnabled={settings.budgetEnabled} setBudgetEnabled={(v) => updateSetting('budgetEnabled', v)} spendingLimitDismissed={settings.spendingLimitDismissed} setSpendingLimitDismissed={(v) => updateSetting('spendingLimitDismissed', v)} />}
           {activeSection === 'context' && <ContextSection key="context" summaryDepth={settings.summaryDepth} setSummaryDepth={(v) => updateSetting('summaryDepth', v)} contextThreshold={settings.contextThreshold} setContextThreshold={(v) => updateSetting('contextThreshold', v)} autoCompress={settings.autoCompress} setAutoCompress={(v) => updateSetting('autoCompress', v)} />}
@@ -227,11 +271,11 @@ function StaggerItem({ children }) {
 
 // ─── API Configuration ───────────────────────────────────
 
-function ApiSection({ apiKey, setApiKey, keyStatus, keyError, validateKey, validateCooldown, storageMode, setStorageMode }) {
+function ApiSection({ apiKey, setApiKey, keyStatus, keyError, validateKey, validateCooldown, storageMode, setStorageMode, shimmerPhase }) {
   return (
     <SettingsSection title="API Configuration" subtitle="Connect your Anthropic API key to start chatting">
       <StaggerItem>
-        <Card>
+        <Card className={shimmerPhase >= 1 ? 'shimmer-card' : ''}>
           <div className="flex items-end gap-3">
             <Input
               label="Anthropic API Key"
@@ -264,7 +308,10 @@ function ApiSection({ apiKey, setApiKey, keyStatus, keyError, validateKey, valid
       </StaggerItem>
 
       <StaggerItem>
-        <Card>
+        <Card
+          className={shimmerPhase >= 2 ? 'shimmer-card' : ''}
+          style={shimmerPhase >= 2 ? { animationDelay: '0ms' } : {}}
+        >
           <RadioGroup
             label="Key Storage"
             options={STORAGE_MODES}
@@ -275,7 +322,10 @@ function ApiSection({ apiKey, setApiKey, keyStatus, keyError, validateKey, valid
       </StaggerItem>
 
       <StaggerItem>
-        <Card>
+        <Card
+          className={shimmerPhase >= 2 ? 'shimmer-card' : ''}
+          style={shimmerPhase >= 2 ? { animationDelay: '60ms' } : {}}
+        >
           <div className="flex items-start gap-3">
             <Info className="w-4 h-4 text-[#B8A070] mt-0.5 flex-shrink-0" />
             <div>
@@ -877,7 +927,8 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
 const MODE_OPTIONS = [
   { id: 'auto', label: 'Auto', description: 'Detect from your device — desktop uses Albatross, mobile uses Swift' },
   { id: 'albatross', label: 'Albatross', description: 'Desktop layout with dual sidebars and full keyboard support' },
-  { id: 'swift', label: 'Swift', description: 'Mobile-optimized, touch-first layout' },
+  { id: 'swift', label: 'Swift', description: 'Mobile-optimized, touch-first layout', beta: true },
+  { id: 'pelican', label: 'Pelican', description: 'Data analysis workspace — upload CSV, XLSX, or JSON and explore with charts and AI insights', beta: true },
   { id: 'kingfisher', label: 'Kingfisher', description: 'Deep reading layout with annotation panel', soon: true },
   { id: 'secretarybird', label: 'Secretarybird', description: 'iPad + stylus canvas layout', soon: true },
   { id: 'starling', label: 'Starling', description: 'Collaborative split-view layout', soon: true },
@@ -913,6 +964,7 @@ function AppearanceSection({ theme, setTheme, fontSize, setFontSize, storedMode,
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className={`text-sm font-medium ${active ? 'text-[var(--p-text-primary)]' : 'text-[var(--p-text-secondary)]'}`}>{opt.label}</p>
+                      {opt.beta && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#B8A070]/10 text-[#B8A070]">Beta</span>}
                       {opt.soon && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#D9730D]/10 text-[#D9730D]">Soon</span>}
                     </div>
                     <p className="text-xs text-[var(--p-text-muted)] mt-0.5">{opt.description}</p>

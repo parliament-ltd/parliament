@@ -25,12 +25,135 @@ const TAGS_SYSTEM_PROMPT = `Generate 1-3 topic tags for this conversation. Rules
 - Return ONLY the tags as a comma-separated list, nothing else
 - Example: "design, api, performance"`
 
+/* ── Built-in Anthropic tools ─────────────────────────────── */
+
+const WEB_SEARCH_TOOL = {
+  type: 'web_search_20250305',
+  name: 'web_search',
+}
+
+/* ── Client-side custom tools ─────────────────────────────── */
+
+export const CALCULATE_TOOL = {
+  name: 'calculate',
+  description: 'Evaluate a mathematical expression and return the precise numeric result. Use this for arithmetic, percentages, exponents, and any calculation where exact precision matters.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      expression: {
+        type: 'string',
+        description: 'A JavaScript-compatible mathematical expression (e.g. "2 ** 32", "1234 * 5678", "Math.PI * 10 ** 2")',
+      },
+    },
+    required: ['expression'],
+  },
+}
+
+export const CREATE_CHART_TOOL = {
+  name: 'create_chart',
+  description: 'Render a chart in the conversation. Use when the user asks for a visualization, graph, or chart of data. Output structured chart data and the browser will render it.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      type: {
+        type: 'string',
+        enum: ['bar', 'line', 'pie', 'area'],
+        description: 'Chart type',
+      },
+      title: {
+        type: 'string',
+        description: 'Chart title',
+      },
+      labels: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'X-axis labels or pie slice names',
+      },
+      datasets: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            label: { type: 'string' },
+            values: { type: 'array', items: { type: 'number' } },
+          },
+          required: ['values'],
+        },
+        description: 'One or more data series. For pie charts, use a single dataset.',
+      },
+    },
+    required: ['type', 'labels', 'datasets'],
+  },
+}
+
+/* ── Tool execution (client-side) ─────────────────────────── */
+
+/**
+ * Execute a client-side tool call. Returns the result as a string.
+ * @param {string} toolName
+ * @param {object} toolInput
+ */
+export function executeClientTool(toolName, toolInput) {
+  if (toolName === 'calculate') {
+    try {
+      // Restrict to safe math expressions — no assignment, no function calls
+      // except known Math.* methods.
+      const expr = toolInput.expression
+      if (/[=;]|import|require|fetch|window|document|global/.test(expr)) {
+        return 'Error: Expression not allowed for security reasons.'
+      }
+      // eslint-disable-next-line no-new-func
+      const result = new Function('Math', `"use strict"; return (${expr})`)(Math)
+      if (typeof result !== 'number' || !isFinite(result)) {
+        return `Result: ${result}`
+      }
+      return String(result)
+    } catch (err) {
+      return `Error: ${err.message}`
+    }
+  }
+
+  if (toolName === 'create_chart') {
+    // Return a JSON marker that MessageCard will detect and render as a chart
+    return JSON.stringify({ _chartData: toolInput })
+  }
+
+  return 'Unknown tool'
+}
+
 export class AnthropicProvider extends BaseProvider {
   getModels() {
     return [
       { id: 'claude-haiku', apiId: 'claude-haiku-4-5-20251001', name: 'Claude Haiku', inputCost: 0.25, outputCost: 1.25, contextWindow: 200000 },
-      { id: 'claude-sonnet', apiId: 'claude-sonnet-4-5-20250929', name: 'Claude Sonnet', inputCost: 3.00, outputCost: 15.00, contextWindow: 200000 },
+      { id: 'claude-sonnet', apiId: 'claude-sonnet-4-6', name: 'Claude Sonnet', inputCost: 3.00, outputCost: 15.00, contextWindow: 200000 },
       { id: 'claude-opus', apiId: 'claude-opus-4-6', name: 'Claude Opus', inputCost: 15.00, outputCost: 75.00, contextWindow: 200000 },
+    ]
+  }
+
+  /** Return tool definitions this provider supports. */
+  getAvailableTools() {
+    return [
+      {
+        id: 'web_search',
+        label: 'Web search',
+        description: 'Search the web for up-to-date information',
+        definition: WEB_SEARCH_TOOL,
+        serverSide: true, // Anthropic handles execution
+      },
+      {
+        id: 'calculate',
+        label: 'Calculator',
+        description: 'Precise arithmetic and math expressions',
+        definition: CALCULATE_TOOL,
+        serverSide: false,
+      },
+      {
+        id: 'create_chart',
+        label: 'Charts',
+        description: 'Render charts and visualizations inline',
+        definition: CREATE_CHART_TOOL,
+        serverSide: false,
+      },
     ]
   }
 
@@ -140,17 +263,35 @@ export class AnthropicProvider extends BaseProvider {
     }
   }
 
-  async sendMessage(apiKey, messages, model, onChunk, signal, systemPrompt) {
+  /**
+   * Send a message and stream the response.
+   *
+   * @param {string}   apiKey
+   * @param {object[]} messages       - [{ role, content }]
+   * @param {string}   model          - short model ID
+   * @param {Function} onChunk        - called with each text chunk
+   * @param {AbortSignal} signal
+   * @param {string}   [systemPrompt]
+   * @param {object[]} [tools]        - tool definitions to include
+   * @param {Function} [onToolUse]    - called with { id, name, input } for client-side tools
+   * @returns {{ usage, stopReason, toolUses }}
+   */
+  async sendMessage(apiKey, messages, model, onChunk, signal, systemPrompt, tools = [], onToolUse) {
+    const toolDefs = tools.map(t => t.definition ?? t)
+
+    const body = {
+      model: this._resolveModel(model),
+      max_tokens: 8192,
+      stream: true,
+      messages,
+      ...(systemPrompt ? { system: systemPrompt } : {}),
+      ...(toolDefs.length > 0 ? { tools: toolDefs } : {}),
+    }
+
     const response = await fetch(`${API_BASE}/messages`, {
       method: 'POST',
       headers: this._headers(apiKey),
-      body: JSON.stringify({
-        model: this._resolveModel(model),
-        max_tokens: 8192,
-        stream: true,
-        messages,
-        ...(systemPrompt ? { system: systemPrompt } : {}),
-      }),
+      body: JSON.stringify(body),
       signal,
     })
 
@@ -187,6 +328,8 @@ export class AnthropicProvider extends BaseProvider {
     let buffer = ''
     let usage = { input_tokens: 0, output_tokens: 0 }
     let stopReason = null
+    const toolUses = []
+    let currentToolUse = null
 
     while (true) {
       const { done, value } = await reader.read()
@@ -204,8 +347,35 @@ export class AnthropicProvider extends BaseProvider {
         try {
           const event = JSON.parse(data)
 
-          if (event.type === 'content_block_delta' && event.delta?.type === 'text_delta') {
-            onChunk(event.delta.text)
+          if (event.type === 'content_block_start') {
+            if (event.content_block?.type === 'tool_use') {
+              currentToolUse = {
+                id: event.content_block.id,
+                name: event.content_block.name,
+                inputRaw: '',
+              }
+            }
+          }
+
+          if (event.type === 'content_block_delta') {
+            if (event.delta?.type === 'text_delta') {
+              onChunk(event.delta.text)
+            }
+            if (event.delta?.type === 'input_json_delta' && currentToolUse) {
+              currentToolUse.inputRaw += event.delta.partial_json
+            }
+          }
+
+          if (event.type === 'content_block_stop' && currentToolUse) {
+            try {
+              currentToolUse.input = JSON.parse(currentToolUse.inputRaw || '{}')
+            } catch {
+              currentToolUse.input = {}
+            }
+            const { inputRaw: _, ...toolUse } = currentToolUse
+            toolUses.push(toolUse)
+            onToolUse?.(toolUse)
+            currentToolUse = null
           }
 
           if (event.type === 'message_delta') {
@@ -229,6 +399,7 @@ export class AnthropicProvider extends BaseProvider {
     return {
       usage,
       stopReason,
+      toolUses,
     }
   }
 

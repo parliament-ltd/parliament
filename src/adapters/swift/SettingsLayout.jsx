@@ -13,6 +13,7 @@ import { useMode } from '../../stores/ModeContext'
 import { getProvider } from '../../providers'
 import { saveApiKey, encryptExport, decryptImport } from '../../lib/crypto'
 import { exportAllData, importData, clearAllData } from '../../lib/db'
+import { useShimmer } from '../../hooks/useShimmer'
 
 const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
 const SPRING_SMOOTH = { type: 'spring', stiffness: 300, damping: 28 }
@@ -54,13 +55,13 @@ const MODE_OPTIONS = [
 /*  SHARED COMPONENTS                                           */
 /* ═══════════════════════════════════════════════════════════ */
 
-function Card({ children, danger = false }) {
+function Card({ children, danger = false, className = '', style = {} }) {
   return (
     <div
       className={`px-4 py-4 border ${
         danger ? 'border-[#E03E3E]/20 bg-[#E03E3E]/[0.02]' : 'border-[#E9E9E7] bg-white'
-      }`}
-      style={{ borderRadius: 6 }}
+      } ${className}`}
+      style={{ borderRadius: 6, ...style }}
     >
       {children}
     </div>
@@ -206,12 +207,13 @@ function BottomSheet({ open, onClose, title, subtitle, icon: Icon, children }) {
   )
 }
 
-function AccordionSection({ id, label, subtitle, icon: Icon, isOpen, onToggle, children }) {
+function AccordionSection({ id, label, subtitle, icon: Icon, isOpen, onToggle, shimmerClass = '', shimmerStyle = {}, children }) {
   return (
     <div className="border-b border-[#F1F1EF]">
       <button
         onClick={() => onToggle(id)}
-        className="w-full flex items-center gap-3.5 px-5 py-4 active:bg-[#F7F6F3] transition-colors"
+        className={`w-full flex items-center gap-3.5 px-5 py-4 active:bg-[#F7F6F3] transition-colors ${shimmerClass}`}
+        style={shimmerStyle}
       >
         <div
           className="w-9 h-9 flex items-center justify-center flex-shrink-0 transition-colors"
@@ -253,10 +255,10 @@ function AccordionSection({ id, label, subtitle, icon: Icon, isOpen, onToggle, c
 /*  SECTION CONTENTS                                            */
 /* ═══════════════════════════════════════════════════════════ */
 
-function ApiSection({ apiKey, setApiKey, showKey, setShowKey, keyStatus, setKeyStatus, keyError, validateKey, storageMode, setStorageMode, spendingLimitDismissed, setSpendingLimitDismissed, spendingLimitConfirmed, setSpendingLimitConfirmed }) {
+function ApiSection({ apiKey, setApiKey, showKey, setShowKey, keyStatus, setKeyStatus, keyError, validateKey, validateCooldown, storageMode, setStorageMode, spendingLimitDismissed, setSpendingLimitDismissed, spendingLimitConfirmed, setSpendingLimitConfirmed, shimmerPhase }) {
   return (
     <>
-      <Card>
+      <Card className={shimmerPhase >= 1 ? 'shimmer-card' : ''}>
         <SectionLabel>API Key</SectionLabel>
         <div className="relative mb-2">
           <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9B9A97]" />
@@ -317,7 +319,10 @@ function ApiSection({ apiKey, setApiKey, showKey, setShowKey, keyStatus, setKeyS
         </AnimatePresence>
       </Card>
 
-      <Card>
+      <Card
+        className={shimmerPhase >= 2 ? 'shimmer-card' : ''}
+        style={shimmerPhase >= 2 ? { animationDelay: '0ms' } : {}}
+      >
         <SectionLabel>Key Storage</SectionLabel>
         <div className="space-y-2">
           {STORAGE_MODES.map((mode) => (
@@ -733,6 +738,7 @@ export default function SwiftSettingsLayout() {
   const { storedMode, setMode } = useMode()
 
   const [openSection, setOpenSection] = useState('api')
+  const { triggerShimmer, shimmerPhase, shimmerDone } = useShimmer()
 
   // Local API key state
   const [apiKey, setApiKey] = useState('')
@@ -776,6 +782,7 @@ export default function SwiftSettingsLayout() {
         setKeyError(result.error)
       } else {
         await saveApiKey(apiKey, settings.storageMode)
+        triggerShimmer()
       }
     } catch {
       setKeyStatus('invalid')
@@ -871,12 +878,32 @@ export default function SwiftSettingsLayout() {
       className="flex flex-col font-sans overflow-hidden"
       style={{ backgroundColor: '#FFFFFF', color: '#191919', height: '100dvh', maxWidth: 430, margin: '0 auto' }}
     >
+
+      {/* Power-on sweep line */}
+      {shimmerPhase >= 1 && (
+        <motion.div
+          initial={{ top: -3, opacity: 0 }}
+          animate={{ top: '100vh', opacity: [0, 1, 1, 0] }}
+          transition={{ duration: 1, ease: 'easeOut', times: [0, 0.04, 0.8, 1] }}
+          style={{
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            height: 3,
+            background: 'linear-gradient(90deg, transparent, #D4A843, transparent)',
+            boxShadow: '0 0 14px 3px rgba(212,168,67,0.4)',
+            zIndex: 9999,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
       {/* Top Bar */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ ...SPRING_SMOOTH, delay: 0.05 }}
-        className="flex items-center gap-3 px-4 pb-3 border-b border-[#F1F1EF] flex-shrink-0"
+        className={`flex items-center gap-3 px-4 pb-3 border-b flex-shrink-0 ${shimmerPhase >= 4 ? 'shimmer-sidebar-border' : 'border-[#F1F1EF]'}`}
         style={{ paddingTop: 'max(env(safe-area-inset-top, 12px), 12px)' }}
       >
         <button
@@ -886,7 +913,26 @@ export default function SwiftSettingsLayout() {
         >
           <ArrowLeft className="w-5 h-5 text-[#787774]" />
         </button>
-        <h1 className="text-lg font-medium text-[#191919]">Settings</h1>
+        <div>
+          <h1 className="text-lg font-medium text-[#191919] leading-tight">Settings</h1>
+          <AnimatePresence>
+            {shimmerDone && (
+              <motion.div
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={SPRING_SMOOTH}
+                className="flex items-center gap-1.5"
+              >
+                <motion.span
+                  animate={{ opacity: [1, 0.3, 1] }}
+                  transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+                  className="w-1.5 h-1.5 rounded-full bg-[#22C55E] inline-block"
+                />
+                <span className="text-[10px] font-medium text-[#22C55E]">Connected</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </motion.div>
 
       {/* Accordion List */}
@@ -894,20 +940,23 @@ export default function SwiftSettingsLayout() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
 
           <AccordionSection id="api" label="API Configuration" subtitle="Connect your Anthropic API key" icon={Key}
-            isOpen={openSection === 'api'} onToggle={toggleSection}>
+            isOpen={openSection === 'api'} onToggle={toggleSection}
+            shimmerClass={shimmerPhase >= 3 ? 'shimmer-nav' : ''} shimmerStyle={shimmerPhase >= 3 ? { animationDelay: '0ms' } : {}}>
             <ApiSection
               apiKey={apiKey} setApiKey={setApiKey}
               showKey={showKey} setShowKey={setShowKey}
               keyStatus={keyStatus} setKeyStatus={setKeyStatus}
-              keyError={keyError} validateKey={validateKey}
+              keyError={keyError} validateKey={validateKey} validateCooldown={validateCooldown}
               storageMode={settings.storageMode} setStorageMode={(v) => updateSetting('storageMode', v)}
               spendingLimitDismissed={spendingLimitDismissed} setSpendingLimitDismissed={setSpendingLimitDismissed}
               spendingLimitConfirmed={spendingLimitConfirmed} setSpendingLimitConfirmed={setSpendingLimitConfirmed}
+              shimmerPhase={shimmerPhase}
             />
           </AccordionSection>
 
           <AccordionSection id="model" label="Model Preferences" subtitle="Choose your default model" icon={Cpu}
-            isOpen={openSection === 'model'} onToggle={toggleSection}>
+            isOpen={openSection === 'model'} onToggle={toggleSection}
+            shimmerClass={shimmerPhase >= 3 ? 'shimmer-nav' : ''} shimmerStyle={shimmerPhase >= 3 ? { animationDelay: '55ms' } : {}}>
             <ModelSection
               selectedModel={settings.defaultModel}
               setSelectedModel={(v) => updateSetting('defaultModel', v)}
@@ -915,7 +964,8 @@ export default function SwiftSettingsLayout() {
           </AccordionSection>
 
           <AccordionSection id="usage" label="Usage & Spending" subtitle="Track tokens and costs" icon={DollarSign}
-            isOpen={openSection === 'usage'} onToggle={toggleSection}>
+            isOpen={openSection === 'usage'} onToggle={toggleSection}
+            shimmerClass={shimmerPhase >= 3 ? 'shimmer-nav' : ''} shimmerStyle={shimmerPhase >= 3 ? { animationDelay: '110ms' } : {}}>
             <UsageSection
               budgetEnabled={settings.budgetEnabled} setBudgetEnabled={(v) => updateSetting('budgetEnabled', v)}
               budgetAlert={settings.budgetAlert} setBudgetAlert={(v) => updateSetting('budgetAlert', v)}
@@ -924,7 +974,8 @@ export default function SwiftSettingsLayout() {
           </AccordionSection>
 
           <AccordionSection id="context" label="Context & Defaults" subtitle="Conversation behavior" icon={Sliders}
-            isOpen={openSection === 'context'} onToggle={toggleSection}>
+            isOpen={openSection === 'context'} onToggle={toggleSection}
+            shimmerClass={shimmerPhase >= 3 ? 'shimmer-nav' : ''} shimmerStyle={shimmerPhase >= 3 ? { animationDelay: '165ms' } : {}}>
             <ContextSection
               summaryDepth={settings.summaryDepth} setSummaryDepth={(v) => updateSetting('summaryDepth', v)}
               contextThreshold={settings.contextThreshold} setContextThreshold={(v) => updateSetting('contextThreshold', v)}
@@ -933,7 +984,8 @@ export default function SwiftSettingsLayout() {
           </AccordionSection>
 
           <AccordionSection id="data" label="Data & Backups" subtitle="Export, import, manage data" icon={Database}
-            isOpen={openSection === 'data'} onToggle={toggleSection}>
+            isOpen={openSection === 'data'} onToggle={toggleSection}
+            shimmerClass={shimmerPhase >= 3 ? 'shimmer-nav' : ''} shimmerStyle={shimmerPhase >= 3 ? { animationDelay: '220ms' } : {}}>
             <DataSection
               backupReminder={settings.backupReminder} setBackupReminder={(v) => updateSetting('backupReminder', v)}
               showExportSheet={showExportSheet} setShowExportSheet={setShowExportSheet}
@@ -944,7 +996,8 @@ export default function SwiftSettingsLayout() {
           </AccordionSection>
 
           <AccordionSection id="appearance" label="Appearance" subtitle="Theme and text size" icon={Sun}
-            isOpen={openSection === 'appearance'} onToggle={toggleSection}>
+            isOpen={openSection === 'appearance'} onToggle={toggleSection}
+            shimmerClass={shimmerPhase >= 3 ? 'shimmer-nav' : ''} shimmerStyle={shimmerPhase >= 3 ? { animationDelay: '275ms' } : {}}>
             <AppearanceSection
               theme={settings.theme} setTheme={(v) => updateSetting('theme', v)}
               fontSize={settings.fontSize} setFontSize={(v) => updateSetting('fontSize', v)}
@@ -953,7 +1006,8 @@ export default function SwiftSettingsLayout() {
           </AccordionSection>
 
           <AccordionSection id="about" label="About & Security" subtitle="How your data stays private" icon={Shield}
-            isOpen={openSection === 'about'} onToggle={toggleSection}>
+            isOpen={openSection === 'about'} onToggle={toggleSection}
+            shimmerClass={shimmerPhase >= 3 ? 'shimmer-nav' : ''} shimmerStyle={shimmerPhase >= 3 ? { animationDelay: '330ms' } : {}}>
             <AboutSection />
           </AccordionSection>
 
