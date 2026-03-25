@@ -38,7 +38,7 @@ export default function InputArea({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
-          className="flex-1 bg-white rounded-lg px-4 py-3 text-sm text-[#191919] resize-none outline-none placeholder:text-[#9B9A97] border border-[#E9E9E7] focus:border-[#B8A070] transition-colors disabled:opacity-50"
+          className="flex-1 bg-white rounded-lg px-4 py-3 text-sm text-[var(--p-text-primary)] resize-none outline-none placeholder:text-[var(--p-text-muted)] border border-[#E9E9E7] focus:border-[#B8A070] transition-colors disabled:opacity-50"
           rows={3}
         />
         <motion.button
@@ -48,7 +48,7 @@ export default function InputArea({
           className={`px-5 rounded-lg font-medium text-sm border bg-white transition-colors flex items-center gap-2 ${
             isStreaming
               ? 'border-[#E03E3E]/30 text-[#E03E3E] hover:border-[#E03E3E]'
-              : 'border-[#E9E9E7] text-[#191919] hover:border-[#B8A070] hover:text-[#B8A070]'
+              : 'border-[#E9E9E7] text-[var(--p-text-primary)] hover:border-[#B8A070] hover:text-[#B8A070]'
           }`}
         >
           <AnimatePresence mode="wait">

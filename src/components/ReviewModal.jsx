@@ -111,15 +111,15 @@ export default function ReviewModal({
               <BookOpen className="w-4 h-4 text-[#B8A070]" />
             </div>
             <div>
-              <h2 className="text-sm font-medium text-[#191919]">Review</h2>
-              <p className="text-[11px] text-[#787774] mt-0.5">Reflect on your conversation</p>
+              <h2 className="text-sm font-medium text-[var(--p-text-primary)]">Review</h2>
+              <p className="text-[11px] text-[var(--p-text-secondary)] mt-0.5">Reflect on your conversation</p>
             </div>
           </div>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={onClose}
-            className="p-2 rounded-lg text-[#787774] hover:bg-[#F1F1EF] transition-colors"
+            className="p-2 rounded-lg text-[var(--p-text-secondary)] hover:bg-[#F1F1EF] transition-colors"
           >
             <X className="w-4 h-4" />
           </motion.button>
@@ -131,13 +131,13 @@ export default function ReviewModal({
           {/* Summary Depth */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider">Summary depth</h3>
+              <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider">Summary depth</h3>
               <div
                 className="relative"
                 onMouseEnter={() => setShowInfoTooltip(true)}
                 onMouseLeave={() => setShowInfoTooltip(false)}
               >
-                <Info className="w-3.5 h-3.5 text-[#787774] cursor-help" />
+                <Info className="w-3.5 h-3.5 text-[var(--p-text-secondary)] cursor-help" />
                 <AnimatePresence>
                   {showInfoTooltip && (
                     <motion.div
@@ -147,7 +147,7 @@ export default function ReviewModal({
                       transition={{ duration: 0.15 }}
                       className="absolute left-1/2 -translate-x-1/2 top-6 w-52 px-3 py-2 bg-white border border-[#E9E9E7] rounded-lg shadow-lg z-10"
                     >
-                      <p className="text-[10px] text-[#787774] leading-relaxed">
+                      <p className="text-[10px] text-[var(--p-text-secondary)] leading-relaxed">
                         Detailed reviews analyze full conversation content and use more tokens. Brief reviews focus on your highlights and notes only.
                       </p>
                     </motion.div>
@@ -163,8 +163,8 @@ export default function ReviewModal({
                   onClick={() => setSummaryDepth(d)}
                   className={`px-4 py-1.5 rounded-md text-xs font-medium transition-colors capitalize ${
                     summaryDepth === d
-                      ? 'bg-[#F1F1EF] text-[#191919]'
-                      : 'text-[#787774] hover:text-[#191919]'
+                      ? 'bg-[#F1F1EF] text-[var(--p-text-primary)]'
+                      : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)]'
                   }`}
                 >
                   {d}
@@ -175,7 +175,7 @@ export default function ReviewModal({
 
           {/* Category Toggles */}
           <div>
-            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
               Include in review
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -203,14 +203,14 @@ export default function ReviewModal({
           {/* Highlights */}
           {highlights.length > 0 && includeHighlights && (
             <div>
-              <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
+              <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
                 Highlights ({highlights.length})
               </h3>
               <div className="space-y-2">
                 {[...new Map(highlights.map(h => [h.text, h])).values()].map((h) => (
                   <div key={h.text} className="flex items-center gap-2 px-3 py-2 bg-white border border-[#E9E9E7] rounded-lg">
                     <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: h.color }} />
-                    <span className="text-xs text-[#191919]">{h.text}</span>
+                    <span className="text-xs text-[var(--p-text-primary)]">{h.text}</span>
                   </div>
                 ))}
               </div>
@@ -220,14 +220,14 @@ export default function ReviewModal({
           {/* Notes */}
           {notes.length > 0 && includeNotes && (
             <div>
-              <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
+              <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
                 Notes ({notes.length})
               </h3>
               <div className="space-y-2">
                 {notes.map((n, i) => (
                   <div key={i} className="flex items-start gap-2 px-3 py-2 bg-white border border-[#E9E9E7] rounded-lg">
                     <StickyNote className="w-3.5 h-3.5 text-[#D9730D] mt-0.5 flex-shrink-0" />
-                    <p className="text-xs text-[#191919]">{n.text}</p>
+                    <p className="text-xs text-[var(--p-text-primary)]">{n.text}</p>
                   </div>
                 ))}
               </div>
@@ -236,7 +236,7 @@ export default function ReviewModal({
 
           {/* Session Stats */}
           <div>
-            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
               Session Stats
             </h3>
             <div className="grid grid-cols-3 gap-2">
@@ -248,12 +248,12 @@ export default function ReviewModal({
 
           {/* Synthesis */}
           <div>
-            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
               Synthesis
             </h3>
             {synthesis ? (
               <div className="px-4 py-3 bg-[#B8A070]/5 border border-[#B8A070]/15 rounded-lg">
-                <div className="text-xs text-[#191919] leading-relaxed parliament-md">
+                <div className="text-xs text-[var(--p-text-primary)] leading-relaxed parliament-md">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {synthesis}
                   </ReactMarkdown>
@@ -289,7 +289,7 @@ export default function ReviewModal({
 
           {/* Reflection Prompts */}
           <div>
-            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
               Prompts for reflection
             </h3>
             <div className="space-y-2">
@@ -307,14 +307,14 @@ export default function ReviewModal({
 
           {/* Reflection Note */}
           <div>
-            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
               Your reflection
             </h3>
             <textarea
               value={reflectionNote}
               onChange={(e) => setReflectionNote(e.target.value)}
               placeholder="What are your key takeaways from this conversation?"
-              className="w-full bg-white border border-[#E9E9E7] rounded-lg px-4 py-3 text-sm text-[#191919] resize-none focus:outline-none focus:border-[#B8A070] transition-colors placeholder:text-[#9B9A97]"
+              className="w-full bg-white border border-[#E9E9E7] rounded-lg px-4 py-3 text-sm text-[var(--p-text-primary)] resize-none focus:outline-none focus:border-[#B8A070] transition-colors placeholder:text-[var(--p-text-muted)]"
               rows={4}
             />
           </div>
@@ -326,7 +326,7 @@ export default function ReviewModal({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-xs font-medium text-[#787774] hover:text-[#191919] hover:bg-[#F1F1EF] transition-colors"
+            className="px-4 py-2 rounded-lg text-xs font-medium text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] hover:bg-[#F1F1EF] transition-colors"
           >
             Dismiss
           </motion.button>
@@ -354,10 +354,10 @@ function ToggleChip({ label, active, onClick, disabled }) {
       onClick={disabled ? undefined : onClick}
       className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
         disabled
-          ? 'border-[#F1F1EF] text-[#9B9A97] cursor-not-allowed'
+          ? 'border-[#F1F1EF] text-[var(--p-text-muted)] cursor-not-allowed'
           : active
             ? 'bg-[#B8A070]/10 border-[#B8A070] text-[#B8A070]'
-            : 'bg-white border-[#E9E9E7] text-[#787774] hover:border-[#9B9A97]'
+            : 'bg-white border-[#E9E9E7] text-[var(--p-text-secondary)] hover:border-[#9B9A97]'
       }`}
     >
       {label}
@@ -368,8 +368,8 @@ function ToggleChip({ label, active, onClick, disabled }) {
 function StatCard({ label, value }) {
   return (
     <div className="px-3 py-2.5 bg-white border border-[#E9E9E7] rounded-lg">
-      <div className="text-[10px] text-[#787774]">{label}</div>
-      <div className="text-sm font-medium text-[#191919] mt-0.5">{value}</div>
+      <div className="text-[10px] text-[var(--p-text-secondary)]">{label}</div>
+      <div className="text-sm font-medium text-[var(--p-text-primary)] mt-0.5">{value}</div>
     </div>
   )
 }

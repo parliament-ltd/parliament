@@ -56,11 +56,11 @@ function BranchItem({ label, messages, active = false, onClick }) {
       }`}
     >
       <div className="flex items-center gap-2">
-        <GitBranch className={`w-3.5 h-3.5 ${active ? 'text-[#B8A070]' : 'text-[#787774]'}`} />
+        <GitBranch className={`w-3.5 h-3.5 ${active ? 'text-[#B8A070]' : 'text-[var(--p-text-secondary)]'}`} />
         <div className="flex-1 min-w-0">
-          <div className="text-xs font-medium text-[#191919] truncate">{label}</div>
+          <div className="text-xs font-medium text-[var(--p-text-primary)] truncate">{label}</div>
           {messages > 0 && (
-            <div className="text-xs text-[#787774]">{messages} messages</div>
+            <div className="text-xs text-[var(--p-text-secondary)]">{messages} messages</div>
           )}
         </div>
       </div>

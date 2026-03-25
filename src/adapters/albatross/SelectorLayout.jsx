@@ -253,7 +253,7 @@ function InlineAction({ icon: Icon, label, onClick, danger = false }) {
         onClick={onClick}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
-        className={`p-1.5 rounded-md transition-colors ${danger ? 'hover:bg-[#E03E3E]/5 text-[#787774] hover:text-[#E03E3E]' : 'hover:bg-white/60 text-[#787774] hover:text-[#191919]'}`}
+        className={`p-1.5 rounded-md transition-colors ${danger ? 'hover:bg-[#E03E3E]/5 text-[var(--p-text-secondary)] hover:text-[#E03E3E]' : 'hover:bg-white/60 text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)]'}`}
       >
         <Icon className="w-3.5 h-3.5" />
       </motion.button>
@@ -304,7 +304,7 @@ function InlineTitleEditor({ title, onSave, onCancel }) {
       }}
       onBlur={commit}
       onClick={(e) => e.stopPropagation()}
-      className="bg-white rounded px-1.5 py-0.5 text-sm font-medium text-[#191919] outline-none border border-[#B8A070] w-full max-w-[320px]"
+      className="bg-white rounded px-1.5 py-0.5 text-sm font-medium text-[var(--p-text-primary)] outline-none border border-[#B8A070] w-full max-w-[320px]"
       maxLength={60}
     />
   )
@@ -330,7 +330,7 @@ function InlineNoteEditor({ note = '', onSave, onCancel }) {
           if (e.key === 'Escape') onCancel()
         }}
         placeholder="Add a note..."
-        className="flex-1 bg-white rounded-lg px-3 py-2 text-xs text-[#191919] outline-none border border-[#B8A070] resize-none leading-relaxed placeholder:text-[#9B9A97]"
+        className="flex-1 bg-white rounded-lg px-3 py-2 text-xs text-[var(--p-text-primary)] outline-none border border-[#B8A070] resize-none leading-relaxed placeholder:text-[var(--p-text-muted)]"
         rows={2}
         maxLength={280}
       />
@@ -347,7 +347,7 @@ function InlineNoteEditor({ note = '', onSave, onCancel }) {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={onCancel}
-          className="px-2.5 py-1.5 rounded-md text-[10px] font-medium text-[#787774] hover:bg-[#F1F1EF]"
+          className="px-2.5 py-1.5 rounded-md text-[10px] font-medium text-[var(--p-text-secondary)] hover:bg-[#F1F1EF]"
         >
           Cancel
         </motion.button>
@@ -377,7 +377,7 @@ function ViewToggle({ activeView, onChangeView }) {
             key={id}
             onClick={() => onChangeView(id)}
             className={`relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-colors ${
-              isActive ? 'text-[#191919]' : 'text-[#9CA7B8] hover:text-[#787774]'
+              isActive ? 'text-[var(--p-text-primary)]' : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-secondary)]'
             }`}
             whileHover={!isActive ? { backgroundColor: 'rgba(0,0,0,0.03)' } : {}}
           >
@@ -410,7 +410,7 @@ function CountBadge({ icon: Icon, count, isActive, activeColor, onClick }) {
       whileTap={{ scale: 0.92 }}
       onClick={(e) => { e.stopPropagation(); onClick() }}
       className={`flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0 font-medium transition-colors ${
-        isActive ? 'text-white' : 'text-[#9CA7B8] hover:text-[#787774]'
+        isActive ? 'text-white' : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-secondary)]'
       }`}
       style={isActive ? { backgroundColor: activeColor } : { backgroundColor: 'rgba(0,0,0,0.04)' }}
     >
@@ -441,7 +441,7 @@ function FavoriteCard({ favorite, onRemove, onNavigate }) {
       onClick={() => onNavigate?.(favorite.sourceConversationId || favorite.conversationId)}
     >
       <div
-        className="px-3 pt-3 pb-2 text-xs text-[#191919] leading-relaxed parliament-md"
+        className="px-3 pt-3 pb-2 text-xs text-[var(--p-text-primary)] leading-relaxed parliament-md"
         style={{
           display: '-webkit-box',
           WebkitLineClamp: 3,
@@ -454,13 +454,13 @@ function FavoriteCard({ favorite, onRemove, onNavigate }) {
         </ReactMarkdown>
       </div>
       <div className="flex items-center justify-between px-3 pb-2.5">
-        <span className="text-[10px] text-[#787774] truncate flex-1 mr-2">{favorite.source || ''}</span>
+        <span className="text-[10px] text-[var(--p-text-secondary)] truncate flex-1 mr-2">{favorite.source || ''}</span>
         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
           <motion.button
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.85 }}
             onClick={handleCopy}
-            className="p-1 rounded hover:bg-[#F1F1EF] text-[#787774] hover:text-[#191919] transition-colors"
+            className="p-1 rounded hover:bg-[#F1F1EF] text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors"
           >
             <AnimatePresence mode="wait">
               {copied ? (
@@ -478,7 +478,7 @@ function FavoriteCard({ favorite, onRemove, onNavigate }) {
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.85 }}
             onClick={(e) => { e.stopPropagation(); onRemove() }}
-            className="p-1 rounded hover:bg-[#F1F1EF] text-[#787774] hover:text-[#E03E3E] transition-colors"
+            className="p-1 rounded hover:bg-[#F1F1EF] text-[var(--p-text-secondary)] hover:text-[#E03E3E] transition-colors"
           >
             <Trash2 className="w-3 h-3" />
           </motion.button>
@@ -569,7 +569,7 @@ function ChatTableRow({
                 </div>
               ) : (
                 <span
-                  className="text-sm font-medium text-[#191919] truncate cursor-pointer hover:text-[#B8A070] transition-colors"
+                  className="text-sm font-medium text-[var(--p-text-primary)] truncate cursor-pointer hover:text-[#B8A070] transition-colors"
                   onClick={() => onNavigate(chat.id)}
                   onDoubleClick={(e) => { e.stopPropagation(); setEditingTitle(true) }}
                   title="Double-click to rename"
@@ -653,10 +653,10 @@ function ChatTableRow({
                           />
                         ) : (
                           <div className="flex items-start gap-1.5">
-                            <p className="text-[11px] text-[#37352F] leading-relaxed flex-1">
+                            <p className="text-[11px] text-[var(--p-text-secondary)] leading-relaxed flex-1">
                               {note.text}
                               {note.messageRef && (
-                                <span className="text-[#C0C8D4] ml-1.5">(Message {note.messageRef})</span>
+                                <span className="text-[var(--p-text-light)] ml-1.5">(Message {note.messageRef})</span>
                               )}
                             </p>
                             <div className="flex items-center gap-0 opacity-0 group-hover/note:opacity-100 transition-opacity flex-shrink-0">
@@ -664,7 +664,7 @@ function ChatTableRow({
                                 whileHover={{ scale: 1.15 }}
                                 whileTap={{ scale: 0.85 }}
                                 onClick={() => setEditingNoteId(note.id)}
-                                className="p-0.5 rounded hover:bg-[#F1F1EF] text-[#C0C8D4] hover:text-[#787774] transition-colors"
+                                className="p-0.5 rounded hover:bg-[#F1F1EF] text-[var(--p-text-light)] hover:text-[var(--p-text-secondary)] transition-colors"
                               >
                                 <Pencil className="w-2.5 h-2.5" />
                               </motion.button>
@@ -672,7 +672,7 @@ function ChatTableRow({
                                 whileHover={{ scale: 1.15 }}
                                 whileTap={{ scale: 0.85 }}
                                 onClick={() => handleDeleteNote(note.id)}
-                                className="p-0.5 rounded hover:bg-[#E03E3E]/5 text-[#C0C8D4] hover:text-[#E03E3E] transition-colors"
+                                className="p-0.5 rounded hover:bg-[#E03E3E]/5 text-[var(--p-text-light)] hover:text-[#E03E3E] transition-colors"
                               >
                                 <Trash2 className="w-2.5 h-2.5" />
                               </motion.button>
@@ -686,7 +686,7 @@ function ChatTableRow({
                   {!addingNote && (
                     <button
                       onClick={() => setAddingNote(true)}
-                      className="text-left px-2.5 py-1.5 rounded-md border border-dashed border-[#E9E9E7] hover:border-[#B8A070] text-[10px] text-[#94A0AE] hover:text-[#B8A070] transition-all w-full"
+                      className="text-left px-2.5 py-1.5 rounded-md border border-dashed border-[#E9E9E7] hover:border-[#B8A070] text-[10px] text-[var(--p-text-secondary)] hover:text-[#B8A070] transition-all w-full"
                       style={{ opacity: 0.45 }}
                       onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
                       onMouseLeave={(e) => e.currentTarget.style.opacity = '0.45'}
@@ -725,19 +725,19 @@ function ChatTableRow({
                             }}
                           />
                         </div>
-                        <p className="text-[11px] text-[#37352F] leading-relaxed flex-1">{hl.text}</p>
+                        <p className="text-[11px] text-[var(--p-text-secondary)] leading-relaxed flex-1">{hl.text}</p>
                         <motion.button
                           whileHover={{ scale: 1.15 }}
                           whileTap={{ scale: 0.85 }}
                           onClick={() => navigator.clipboard.writeText(hl.text).catch(() => {})}
-                          className="p-0.5 rounded opacity-0 group-hover/hl:opacity-100 hover:bg-[#F1F1EF] text-[#C0C8D4] hover:text-[#787774] transition-all flex-shrink-0 self-start"
+                          className="p-0.5 rounded opacity-0 group-hover/hl:opacity-100 hover:bg-[#F1F1EF] text-[var(--p-text-light)] hover:text-[var(--p-text-secondary)] transition-all flex-shrink-0 self-start"
                         >
                           <Copy className="w-2.5 h-2.5" />
                         </motion.button>
                       </div>
                     ))
                   ) : (
-                    <p className="text-[10px] text-[#B0B8C1] italic">
+                    <p className="text-[10px] text-[var(--p-text-light)] italic">
                     </p>
                   )}
                 </motion.div>
@@ -759,9 +759,9 @@ function ChatTableRow({
                       <div className="flex-shrink-0 flex items-stretch">
                         <div className="rounded-full" style={{ backgroundColor: familyColor || '#7C6CD4', width: 3, minHeight: 16 }} />
                       </div>
-                      <span className="text-[10px] text-[#9CA7B8]">↳ branched from</span>
+                      <span className="text-[10px] text-[var(--p-text-secondary)]">↳ branched from</span>
                       <button
-                        className="text-[10px] text-[#37352F] font-medium hover:text-[#B8A070] transition-colors cursor-pointer"
+                        className="text-[10px] text-[var(--p-text-secondary)] font-medium hover:text-[#B8A070] transition-colors cursor-pointer"
                         onClick={(e) => { e.stopPropagation(); onNavigate(chat.parentId) }}
                       >
                         {chat.parentTitle || 'Parent conversation'}
@@ -775,16 +775,16 @@ function ChatTableRow({
                       </div>
                       <GitBranch className="w-2.5 h-2.5 text-[#7C6CD4]" />
                       <button
-                        className="text-[11px] text-[#37352F] font-medium hover:text-[#B8A070] transition-colors cursor-pointer"
+                        className="text-[11px] text-[var(--p-text-secondary)] font-medium hover:text-[#B8A070] transition-colors cursor-pointer"
                         onClick={(e) => { e.stopPropagation(); onNavigate(child.id) }}
                       >
                         {child.title}
                       </button>
-                      <span className="text-[10px] text-[#8E99A4]">{formatRelative(child.updatedAt)}</span>
+                      <span className="text-[10px] text-[var(--p-text-secondary)]">{formatRelative(child.updatedAt)}</span>
                     </div>
                   ))}
                   {!isBranch && children.length === 0 && (
-                    <p className="text-[10px] text-[#B0B8C1] italic">
+                    <p className="text-[10px] text-[var(--p-text-light)] italic">
                       No branch relationships
                     </p>
                   )}
@@ -814,12 +814,12 @@ function ChatTableRow({
 
           {/* Edited */}
           <div className="w-24 flex-shrink-0 px-2 text-center pt-0.5">
-            <span className="text-xs text-[#8E99A4]">{formatRelative(chat.updatedAt)}</span>
+            <span className="text-xs text-[var(--p-text-secondary)]">{formatRelative(chat.updatedAt)}</span>
           </div>
 
           {/* Created */}
           <div className="w-24 flex-shrink-0 px-2 text-center pt-0.5">
-            <span className="text-xs text-[#8E99A4]">{formatShortDate(chat.createdAt)}</span>
+            <span className="text-xs text-[var(--p-text-secondary)]">{formatShortDate(chat.createdAt)}</span>
           </div>
         </div>
       </div>
@@ -1216,7 +1216,7 @@ export default function SelectorView() {
               >
                 <MessageSquare className="w-5 h-5 text-[#B8A070]" />
               </motion.div>
-              <h1 className="text-lg font-medium text-[#191919]">Chats</h1>
+              <h1 className="text-lg font-medium text-[var(--p-text-primary)]">Chats</h1>
             </div>
             <div data-tour="view-toggle">
               <ViewToggle activeView={globalView} onChangeView={handleGlobalViewChange} />
@@ -1230,7 +1230,7 @@ export default function SelectorView() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setFavSidebarOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium border border-[#E9E9E7] bg-white text-[#787774] hover:text-[#D9730D] hover:border-[#D9730D]/40 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium border border-[#E9E9E7] bg-white text-[var(--p-text-secondary)] hover:text-[#D9730D] hover:border-[#D9730D]/40 transition-colors"
               >
                 <Star className="w-3.5 h-3.5" />
                 <span className="text-xs">{favorites.length}</span>
@@ -1241,7 +1241,7 @@ export default function SelectorView() {
               onClick={handleNewChat}
               whileHover={{ scale: 1.03, borderColor: '#B8A070' }}
               whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm border border-[#E9E9E7] bg-white text-[#191919] transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm border border-[#E9E9E7] bg-white text-[var(--p-text-primary)] transition-colors"
             >
               <Plus className="w-4 h-4" />
               New Chat
@@ -1251,7 +1251,7 @@ export default function SelectorView() {
               onClick={() => navigate('/settings')}
               whileHover={{ scale: 1.1, rotate: 45 }}
               whileTap={{ scale: 0.9 }}
-              className="p-2.5 rounded-lg border border-[#E9E9E7] bg-white text-[#787774] hover:text-[#191919] hover:border-[#9B9A97] transition-colors"
+              className="p-2.5 rounded-lg border border-[#E9E9E7] bg-white text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] hover:border-[#9B9A97] transition-colors"
               title="Settings & API"
             >
               <Settings className="w-4 h-4" />
@@ -1270,13 +1270,13 @@ export default function SelectorView() {
           className="px-8 pb-5"
         >
           <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9B9A97]" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--p-text-muted)]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search chats, notes, highlights, tags..."
-              className="w-full bg-white rounded-lg pl-10 pr-4 py-2.5 text-sm text-[#191919] outline-none placeholder:text-[#9B9A97] border border-[#E9E9E7] focus:border-[#B8A070] transition-colors"
+              className="w-full bg-white rounded-lg pl-10 pr-4 py-2.5 text-sm text-[var(--p-text-primary)] outline-none placeholder:text-[var(--p-text-muted)] border border-[#E9E9E7] focus:border-[#B8A070] transition-colors"
             />
           </div>
         </motion.div>
@@ -1314,7 +1314,7 @@ export default function SelectorView() {
                       <span className="text-[11px] font-medium text-[#B8A070]">
                         {selected.size} selected
                         {selectedSizeTotal > 0 && (
-                          <span className="text-[#787774] font-normal"> — {formatBytes(selectedSizeTotal)}</span>
+                          <span className="text-[var(--p-text-secondary)] font-normal"> — {formatBytes(selectedSizeTotal)}</span>
                         )}
                       </span>
                       <div className="flex items-center gap-0.5 ml-3">
@@ -1327,7 +1327,7 @@ export default function SelectorView() {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => setSelected(new Set())}
-                          className="px-2.5 py-1 rounded-md text-[11px] font-medium text-[#787774] hover:text-[#191919] hover:bg-white/60 transition-colors"
+                          className="px-2.5 py-1 rounded-md text-[11px] font-medium text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] hover:bg-white/60 transition-colors"
                         >
                           Clear
                         </motion.button>
@@ -1336,15 +1336,15 @@ export default function SelectorView() {
                   ) : (
                     <motion.div key="headers" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex items-center">
                       <div className="flex-1 min-w-0 px-2">
-                        <span className="text-[11px] font-medium text-[#94A0AE] uppercase tracking-wider">Title</span>
+                        <span className="text-[11px] font-medium text-[var(--p-text-secondary)] uppercase tracking-wider">Title</span>
                       </div>
 
                       <div className="w-36 flex-shrink-0 px-2 text-center">
-                        <span className="text-[11px] font-medium text-[#94A0AE] uppercase tracking-wider">Topics</span>
+                        <span className="text-[11px] font-medium text-[var(--p-text-secondary)] uppercase tracking-wider">Topics</span>
                       </div>
 
                       <button onClick={() => handleSort('updatedAt')} className="w-24 flex-shrink-0 px-2 flex items-center justify-center gap-1 group cursor-pointer">
-                        <span className={`text-[11px] font-medium uppercase tracking-wider transition-colors ${sortField === 'updatedAt' ? 'text-[#B8A070]' : 'text-[#94A0AE] group-hover:text-[#787774]'}`}>Edited</span>
+                        <span className={`text-[11px] font-medium uppercase tracking-wider transition-colors ${sortField === 'updatedAt' ? 'text-[#B8A070]' : 'text-[var(--p-text-secondary)] group-hover:text-[var(--p-text-secondary)]'}`}>Edited</span>
                         {sortField === 'updatedAt' && (
                           <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={SPRING_SNAPPY}>
                             {sortDir === 'desc' ? <ArrowDown className="w-3 h-3 text-[#B8A070]" /> : <ArrowUp className="w-3 h-3 text-[#B8A070]" />}
@@ -1353,7 +1353,7 @@ export default function SelectorView() {
                       </button>
 
                       <button onClick={() => handleSort('createdAt')} className="w-24 flex-shrink-0 px-2 flex items-center justify-center gap-1 group cursor-pointer">
-                        <span className={`text-[11px] font-medium uppercase tracking-wider transition-colors ${sortField === 'createdAt' ? 'text-[#B8A070]' : 'text-[#94A0AE] group-hover:text-[#787774]'}`}>Created</span>
+                        <span className={`text-[11px] font-medium uppercase tracking-wider transition-colors ${sortField === 'createdAt' ? 'text-[#B8A070]' : 'text-[var(--p-text-secondary)] group-hover:text-[var(--p-text-secondary)]'}`}>Created</span>
                         {sortField === 'createdAt' && (
                           <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={SPRING_SNAPPY}>
                             {sortDir === 'desc' ? <ArrowDown className="w-3 h-3 text-[#B8A070]" /> : <ArrowUp className="w-3 h-3 text-[#B8A070]" />}
@@ -1389,19 +1389,19 @@ export default function SelectorView() {
                 {sortedChats.length === 0 && searchQuery && (
                   <div className="flex flex-col items-center justify-center py-16 px-4">
                     <Search className="w-8 h-8 text-[#E9E9E7] mb-3" />
-                    <p className="text-sm text-[#787774]">No chats matching "{searchQuery}"</p>
+                    <p className="text-sm text-[var(--p-text-secondary)]">No chats matching "{searchQuery}"</p>
                   </div>
                 )}
                 {sortedChats.length === 0 && !searchQuery && (
                   <div className="flex flex-col items-center justify-center py-16 px-4">
                     <MessageSquare className="w-8 h-8 text-[#E9E9E7] mb-3" />
-                    <p className="text-sm text-[#787774] mb-1">No conversations yet</p>
-                    <p className="text-xs text-[#787774] mb-4">Start your first conversation with Claude</p>
+                    <p className="text-sm text-[var(--p-text-secondary)] mb-1">No conversations yet</p>
+                    <p className="text-xs text-[var(--p-text-secondary)] mb-4">Start your first conversation with Claude</p>
                     <motion.button
                       onClick={handleNewChat}
                       whileHover={{ scale: 1.03, borderColor: '#B8A070' }}
                       whileTap={{ scale: 0.97 }}
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm border border-[#E9E9E7] bg-white text-[#191919] transition-colors"
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm border border-[#E9E9E7] bg-white text-[var(--p-text-primary)] transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       New Chat
@@ -1412,10 +1412,10 @@ export default function SelectorView() {
 
               {/* Footer — simplified */}
               <div className="flex items-center justify-between px-4 py-2 border-t border-[#E9E9E7] bg-[#F7F6F3]">
-                <span className="text-[11px] text-[#94A0AE]">
+                <span className="text-[11px] text-[var(--p-text-secondary)]">
                   {hydratedConversations.length} conversation{hydratedConversations.length !== 1 ? 's' : ''}
                 </span>
-                <span className="text-[11px] text-[#94A0AE]">
+                <span className="text-[11px] text-[var(--p-text-secondary)]">
                   {formatBytes(hydratedConversations.reduce((sum, c) => sum + (c.storageBytes || 0), 0))} total
                 </span>
               </div>
@@ -1444,14 +1444,14 @@ export default function SelectorView() {
               <div className="flex items-center justify-between px-4" style={{ paddingTop: '2.25rem', paddingBottom: '1rem' }}>
                 <div className="flex items-center gap-2">
                   <Star className="w-3.5 h-3.5 text-[#D9730D]" style={{ fill: '#D9730D' }} />
-                  <span className="text-sm font-medium text-[#191919]">Favorites</span>
-                  <span className="text-xs text-[#94A0AE]">{favorites.length}</span>
+                  <span className="text-sm font-medium text-[var(--p-text-primary)]">Favorites</span>
+                  <span className="text-xs text-[var(--p-text-secondary)]">{favorites.length}</span>
                 </div>
                 <motion.button
                   whileHover={{ scale: 1.15 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setFavSidebarOpen(false)}
-                  className="p-1.5 rounded hover:bg-[#F1F1EF] text-[#787774] hover:text-[#191919] transition-colors"
+                  className="p-1.5 rounded hover:bg-[#F1F1EF] text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors"
                   title="Collapse"
                 >
                   <PanelRight className="w-4 h-4" />
@@ -1463,7 +1463,7 @@ export default function SelectorView() {
                 {favorites.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full px-4">
                     <Star className="w-8 h-8 text-[#E9E9E7] mb-3" />
-                    <p className="text-xs text-[#787774] text-center leading-relaxed">
+                    <p className="text-xs text-[var(--p-text-secondary)] text-center leading-relaxed">
                       Star messages in conversations to save them here for quick access
                     </p>
                   </div>

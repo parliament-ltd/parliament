@@ -202,7 +202,7 @@ export default function MessageCard({
           style={{ borderBottom: '1px solid var(--p-border-subtle)' }}
         >
           <div className="flex items-center gap-3">
-            <span className="text-xs font-mono text-[#9B9A97] opacity-0 group-hover:opacity-100 transition-opacity">
+            <span className="text-xs font-mono text-[var(--p-text-muted)] opacity-0 group-hover:opacity-100 transition-opacity">
               #{number}
             </span>
             {(isFavorited || savedNoteText) && (
@@ -285,7 +285,7 @@ export default function MessageCard({
                     top:  showBelow ? popoverPos.y + 24 : popoverPos.y - 32,
                   }}
                 >
-                  <Pencil className="w-3 h-3 text-[#787774] mr-1" />
+                  <Pencil className="w-3 h-3 text-[var(--p-text-secondary)] mr-1" />
                   {HIGHLIGHT_COLORS.map((c) => (
                     <motion.button
                       key={c.id}
@@ -324,7 +324,7 @@ export default function MessageCard({
                     onChange={(e) => setNoteText(e.target.value)}
                     onBlur={handleNoteBlur}
                     placeholder="Add a note about this message..."
-                    className="w-full bg-transparent text-xs text-[#37352F] resize-none focus:outline-none placeholder:text-[#9B9A97]"
+                    className="w-full bg-transparent text-xs text-[var(--p-text-secondary)] resize-none focus:outline-none placeholder:text-[var(--p-text-muted)]"
                     rows={2}
                   />
                 </div>
@@ -361,7 +361,7 @@ function MsgIconButton({ onClick, children, active = false, title }) {
       className={`p-1.5 rounded transition-colors ${
         active
           ? 'bg-[#B8A070]/15 text-[#B8A070]'
-          : 'hover:bg-[#F1F1EF] text-[#787774] hover:text-[#191919]'
+          : 'hover:bg-[#F1F1EF] text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)]'
       }`}
     >
       {children}
@@ -373,7 +373,7 @@ function MenuButton({ icon: Icon, children, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left px-3 py-2 text-xs text-[#37352F] hover:bg-[#F1F1EF] hover:text-[#191919] transition-colors flex items-center gap-2"
+      className="w-full text-left px-3 py-2 text-xs text-[var(--p-text-secondary)] hover:bg-[#F1F1EF] hover:text-[var(--p-text-primary)] transition-colors flex items-center gap-2"
     >
       <Icon className="w-3.5 h-3.5" />
       {children}

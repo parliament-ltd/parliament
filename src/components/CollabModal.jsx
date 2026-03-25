@@ -120,8 +120,8 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
               <Settings2 className="w-4 h-4 text-[#B8A070]" />
             </div>
             <div>
-              <div className="text-sm font-medium text-[#191919]">Collaboration Mode</div>
-              <p className="text-[11px] text-[#787774] mt-0.5">
+              <div className="text-sm font-medium text-[var(--p-text-primary)]">Collaboration Mode</div>
+              <p className="text-[11px] text-[var(--p-text-secondary)] mt-0.5">
                 Shape how Claude responds in this conversation
               </p>
             </div>
@@ -130,7 +130,7 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={onClose}
-            className="p-2 rounded-lg text-[#787774] hover:bg-[#F1F1EF] transition-colors"
+            className="p-2 rounded-lg text-[var(--p-text-secondary)] hover:bg-[#F1F1EF] transition-colors"
           >
             <X className="w-4 h-4" />
           </motion.button>
@@ -141,7 +141,7 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
 
           {/* Presets */}
           <div>
-            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
               Presets {localPresets.size > 0 && (
                 <span className="text-[#B8A070] normal-case tracking-normal">({localPresets.size} selected)</span>
               )}
@@ -169,8 +169,8 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
                         <Icon className="w-4 h-4" style={{ color: isActive ? '#B8A070' : '#787774' }} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-[#191919]">{preset.label}</div>
-                        <p className="text-xs text-[#787774] mt-0.5 leading-relaxed">{preset.description}</p>
+                        <div className="text-sm font-medium text-[var(--p-text-primary)]">{preset.label}</div>
+                        <p className="text-xs text-[var(--p-text-secondary)] mt-0.5 leading-relaxed">{preset.description}</p>
                       </div>
                       {/* Active indicator dot */}
                       <div
@@ -186,14 +186,14 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
 
           {/* Custom instruction */}
           <div>
-            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
               Custom Instruction
             </h3>
             <textarea
               value={localCustom}
               onChange={(e) => setLocalCustom(e.target.value)}
               placeholder="Add your own instruction for Claude in this conversation..."
-              className="w-full bg-white rounded-lg px-4 py-3 text-sm text-[#191919] resize-none outline-none border border-[#E9E9E7] focus:border-[#B8A070] transition-colors placeholder:text-[#9B9A97]"
+              className="w-full bg-white rounded-lg px-4 py-3 text-sm text-[var(--p-text-primary)] resize-none outline-none border border-[#E9E9E7] focus:border-[#B8A070] transition-colors placeholder:text-[var(--p-text-muted)]"
               rows={3}
             />
           </div>
@@ -201,7 +201,7 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
           {/* Combined prompt preview */}
           {combinedPrompt && (
             <div>
-              <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
+              <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
                 Combined System Prompt
               </h3>
               <div className="px-4 py-3 bg-[#F7F6F3] border border-[#F1F1EF] rounded-lg">
@@ -209,7 +209,7 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
                   {combinedPrompt}
                 </p>
               </div>
-              <p className="text-[10px] text-[#9B9A97] mt-1.5">
+              <p className="text-[10px] text-[var(--p-text-muted)] mt-1.5">
                 This will be prepended to every message sent to Claude in this conversation.
               </p>
             </div>
@@ -222,7 +222,7 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-xs font-medium text-[#787774] hover:text-[#191919] transition-colors"
+            className="px-4 py-2 rounded-lg text-xs font-medium text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors"
           >
             Cancel
           </motion.button>

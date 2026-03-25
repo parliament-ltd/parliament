@@ -810,7 +810,7 @@ export default function ChatView() {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center font-sans text-[#787774]">
+      <div className="h-screen flex items-center justify-center font-sans text-[var(--p-text-secondary)]">
         <p className="text-sm">Loading conversation...</p>
       </div>
     )
@@ -819,7 +819,7 @@ export default function ChatView() {
   /* ── Render ────────────────────────────────────────────── */
 
   return (
-    <div className="flex h-screen text-[#191919] font-sans overflow-hidden relative bg-white">
+    <div className="flex h-screen text-[var(--p-text-primary)] font-sans overflow-hidden relative bg-white">
 
       {/* ═══ Left Sidebar ═══ */}
       <motion.div
@@ -857,11 +857,11 @@ export default function ChatView() {
             animate="show"
             className="space-y-1"
           >
-            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-2">
+            <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-2">
               Contents
             </h3>
             {tocItems.length === 0 ? (
-              <p className="text-xs text-[#9B9A97] px-3 py-2">
+              <p className="text-xs text-[var(--p-text-muted)] px-3 py-2">
                 Messages will appear here
               </p>
             ) : (
@@ -886,7 +886,7 @@ export default function ChatView() {
             animate="show"
             className="space-y-1"
           >
-            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-2">
+            <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-2">
               Actions
             </h3>
             <ActionButton icon={Settings2} onClick={() => setShowCollabModal(true)} badge={activePresets.size > 0 ? activePresets.size : null}>Collaboration Mode</ActionButton>
@@ -1011,7 +1011,7 @@ export default function ChatView() {
               transition={SPRING_SNAPPY}
               className="mx-4 mb-2 px-4 py-3 rounded-lg border border-[#E9E9E7] bg-white shadow-sm flex items-center justify-between gap-3"
             >
-              <span className="text-xs text-[#37352F]">
+              <span className="text-xs text-[var(--p-text-secondary)]">
                 {pendingDeletes.length === 1 ? 'Message deleted' : `${pendingDeletes.length} messages deleted`}
               </span>
               <motion.button
@@ -1041,10 +1041,10 @@ export default function ChatView() {
             >
               <Activity className="w-4 h-4 text-[#D9730D] shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-[#191919]">
+                <p className="text-xs font-medium text-[var(--p-text-primary)]">
                   Context window is {contextUsage}% full
                 </p>
-                <p className="text-xs text-[#787774] mt-0.5">
+                <p className="text-xs text-[var(--p-text-secondary)] mt-0.5">
                   Branch this conversation to continue with a fresh context window.
                 </p>
               </div>
@@ -1052,14 +1052,14 @@ export default function ChatView() {
                 whileHover={{ scale: 1.03, borderColor: '#B8A070' }}
                 whileTap={{ scale: 0.97 }}
                 onClick={handleCompressContext}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#E9E9E7] bg-white text-[#191919] shrink-0 flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#E9E9E7] bg-white text-[var(--p-text-primary)] shrink-0 flex items-center gap-1.5"
               >
                 <GitBranch className="w-3 h-3" />
                 Branch now
               </motion.button>
               <button
                 onClick={() => setCompressBannerDismissed(true)}
-                className="text-[#787774] hover:text-[#191919] transition-colors shrink-0"
+                className="text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1113,7 +1113,7 @@ export default function ChatView() {
               {/* Highlights Section */}
               <div className="p-4 pb-6">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider">
+                  <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider">
                     Highlights
                   </h3>
                   <motion.button
@@ -1127,7 +1127,7 @@ export default function ChatView() {
                     <PanelRight className="w-5 h-5" />
                   </motion.button>
                 </div>
-                <p className="text-xs text-[#787774] mb-3">
+                <p className="text-xs text-[var(--p-text-secondary)] mb-3">
                   Navigate through highlighted terms
                 </p>
                 <HighlightList
@@ -1140,7 +1140,7 @@ export default function ChatView() {
 
               {/* Favorites Section — dusty gold star treatment */}
               <div className="p-4 pb-6">
-                <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
+                <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
                   Favorites {favoritedMessages.length > 0 && (
                     <span style={{ color: DUSTY_GOLD }} className="normal-case tracking-normal">
                       ({favoritedMessages.length})
@@ -1148,7 +1148,7 @@ export default function ChatView() {
                   )}
                 </h3>
                 {favoritedMessages.length === 0 ? (
-                  <p className="text-xs text-[#9B9A97]">
+                  <p className="text-xs text-[var(--p-text-muted)]">
                     Star a message to save it here
                   </p>
                 ) : (
@@ -1178,10 +1178,10 @@ export default function ChatView() {
                             }}
                           />
                           <div className="flex-1 min-w-0">
-                            <div className="text-[10px] text-[#787774] mb-0.5">
+                            <div className="text-[10px] text-[var(--p-text-secondary)] mb-0.5">
                               {msg.role === 'user' ? 'You' : 'Claude'}
                             </div>
-                            <p className="text-xs text-[#191919] truncate">
+                            <p className="text-xs text-[var(--p-text-primary)] truncate">
                               {msg.content.slice(0, 80)}{msg.content.length > 80 ? '...' : ''}
                             </p>
                           </div>
@@ -1192,7 +1192,7 @@ export default function ChatView() {
                               e.stopPropagation()
                               toggleFav(msg.id)
                             }}
-                            className="p-1 rounded opacity-0 group-hover/fav:opacity-100 hover:bg-[#F1F1EF] text-[#787774] hover:text-[#E03E3E] transition-all"
+                            className="p-1 rounded opacity-0 group-hover/fav:opacity-100 hover:bg-[#F1F1EF] text-[var(--p-text-secondary)] hover:text-[#E03E3E] transition-all"
                             title="Remove from favorites"
                           >
                             <X className="w-3 h-3" />
@@ -1217,7 +1217,7 @@ export default function ChatView() {
 
               {/* Branches Section */}
               <div className="flex-1 p-4 overflow-y-auto">
-                <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">
+                <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
                   Branches {branches.length > 0 && (
                     <span className="text-[#7C6CD4] normal-case tracking-normal">
                       ({branches.length})
@@ -1393,7 +1393,7 @@ function SidebarIconButton({ children, title, onClick }) {
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
       onClick={onClick}
-      className="text-[#787774] hover:text-[#191919] transition-colors p-1.5 rounded hover:bg-[#F1F1EF]"
+      className="text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors p-1.5 rounded hover:bg-[#F1F1EF]"
       title={title}
     >
       {children}
@@ -1410,7 +1410,7 @@ function NavItem({ children, active = false, indent = false, onClick }) {
       onClick={onClick}
       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors truncate ${
         indent ? 'pl-8' : ''
-      } ${active ? 'text-[#191919] font-medium' : 'text-[#787774] hover:text-[#191919]'}`}
+      } ${active ? 'text-[var(--p-text-primary)] font-medium' : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)]'}`}
     >
       {children}
     </motion.button>
@@ -1424,7 +1424,7 @@ function ActionButton({ icon: Icon, children, onClick, badge = null }) {
       whileHover={interactiveHover}
       whileTap={interactiveTap}
       onClick={onClick}
-      className="w-full text-left px-3 py-2 rounded-lg text-sm text-[#37352F] hover:bg-white hover:text-[#B8A070] transition-colors flex items-center gap-2"
+      className="w-full text-left px-3 py-2 rounded-lg text-sm text-[var(--p-text-secondary)] hover:bg-white hover:text-[#B8A070] transition-colors flex items-center gap-2"
     >
       <Icon className="w-4 h-4 flex-shrink-0" />
       <span className="truncate flex-1">{children}</span>
@@ -1480,7 +1480,7 @@ function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
       >
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3.5" style={{ borderBottom: '1px solid var(--p-border-subtle)' }}>
-          <Search className="w-4 h-4 text-[#9B9A97] flex-shrink-0" />
+          <Search className="w-4 h-4 text-[var(--p-text-muted)] flex-shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -1490,10 +1490,10 @@ function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
               if (e.key === 'Enter' && filtered.length > 0) onSelect(filtered[0].id)
             }}
             placeholder="Search chats..."
-            className="flex-1 text-sm text-[#191919] bg-transparent outline-none placeholder:text-[#9B9A97]"
+            className="flex-1 text-sm text-[var(--p-text-primary)] bg-transparent outline-none placeholder:text-[var(--p-text-muted)]"
           />
           {query && (
-            <button onClick={() => setQuery('')} className="text-[#9B9A97] hover:text-[#787774] transition-colors">
+            <button onClick={() => setQuery('')} className="text-[var(--p-text-muted)] hover:text-[var(--p-text-secondary)] transition-colors">
               <X className="w-3.5 h-3.5" />
             </button>
           )}
@@ -1503,7 +1503,7 @@ function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
         <div className="max-h-[320px] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--p-border) transparent' }}>
           {filtered.length === 0 ? (
             <div className="px-4 py-6 text-center">
-              <p className="text-xs text-[#9B9A97]">No chats found</p>
+              <p className="text-xs text-[var(--p-text-muted)]">No chats found</p>
             </div>
           ) : (
             filtered.map(c => (
@@ -1516,14 +1516,14 @@ function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
                 onMouseLeave={e => { e.currentTarget.style.backgroundColor = c.id === currentId ? 'var(--p-bg-alt)' : 'transparent' }}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <MessageSquare className="w-3.5 h-3.5 text-[#9B9A97] flex-shrink-0" />
+                  <MessageSquare className="w-3.5 h-3.5 text-[var(--p-text-muted)] flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[#191919] truncate font-medium"
+                    <p className="text-sm text-[var(--p-text-primary)] truncate font-medium"
                       style={{ color: c.id === currentId ? '#B8A070' : 'var(--p-text-primary)' }}>
                       {c.title || 'New Conversation'}
                     </p>
                     {c.aiSummary && (
-                      <p className="text-[11px] text-[#9CA7B8] truncate mt-0.5">{c.aiSummary}</p>
+                      <p className="text-[11px] text-[var(--p-text-secondary)] truncate mt-0.5">{c.aiSummary}</p>
                     )}
                   </div>
                   {c.id === currentId && (
@@ -1537,11 +1537,11 @@ function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
 
         {/* Footer hint */}
         <div className="px-4 py-2.5 flex items-center gap-1" style={{ borderTop: '1px solid var(--p-border-subtle)' }}>
-          <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium border border-[#E9E9E7] bg-[#F7F6F3] text-[#787774]" style={{ fontFamily: 'monospace' }}>↵</kbd>
-          <span className="text-[10px] text-[#9B9A97] ml-1">to open</span>
-          <span className="text-[10px] text-[#9B9A97] mx-2">·</span>
-          <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium border border-[#E9E9E7] bg-[#F7F6F3] text-[#787774]" style={{ fontFamily: 'monospace' }}>Esc</kbd>
-          <span className="text-[10px] text-[#9B9A97] ml-1">to close</span>
+          <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium border border-[#E9E9E7] bg-[#F7F6F3] text-[var(--p-text-secondary)]" style={{ fontFamily: 'monospace' }}>↵</kbd>
+          <span className="text-[10px] text-[var(--p-text-muted)] ml-1">to open</span>
+          <span className="text-[10px] text-[var(--p-text-muted)] mx-2">·</span>
+          <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium border border-[#E9E9E7] bg-[#F7F6F3] text-[var(--p-text-secondary)]" style={{ fontFamily: 'monospace' }}>Esc</kbd>
+          <span className="text-[10px] text-[var(--p-text-muted)] ml-1">to close</span>
         </div>
       </motion.div>
     </motion.div>
@@ -1589,19 +1589,19 @@ function MoveToBranchModal({ conversations, currentId, onClose, onSelect, onNewC
       >
         {/* Header */}
         <div className="px-4 py-3.5" style={{ borderBottom: '1px solid var(--p-border-subtle)' }}>
-          <p className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-2.5">Move to conversation</p>
+          <p className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-2.5">Move to conversation</p>
           <div className="flex items-center gap-3">
-            <Search className="w-4 h-4 text-[#9B9A97] flex-shrink-0" />
+            <Search className="w-4 h-4 text-[var(--p-text-muted)] flex-shrink-0" />
             <input
               ref={inputRef}
               type="text"
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Search chats..."
-              className="flex-1 text-sm text-[#191919] bg-transparent outline-none placeholder:text-[#9B9A97]"
+              className="flex-1 text-sm text-[var(--p-text-primary)] bg-transparent outline-none placeholder:text-[var(--p-text-muted)]"
             />
             {query && (
-              <button onClick={() => setQuery('')} className="text-[#9B9A97] hover:text-[#787774] transition-colors">
+              <button onClick={() => setQuery('')} className="text-[var(--p-text-muted)] hover:text-[var(--p-text-secondary)] transition-colors">
                 <X className="w-3.5 h-3.5" />
               </button>
             )}
@@ -1624,7 +1624,7 @@ function MoveToBranchModal({ conversations, currentId, onClose, onSelect, onNewC
         <div className="max-h-[280px] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--p-border) transparent' }}>
           {filtered.length === 0 ? (
             <div className="px-4 py-6 text-center">
-              <p className="text-xs text-[#9B9A97]">No other conversations found</p>
+              <p className="text-xs text-[var(--p-text-muted)]">No other conversations found</p>
             </div>
           ) : (
             filtered.map(c => (
@@ -1634,11 +1634,11 @@ function MoveToBranchModal({ conversations, currentId, onClose, onSelect, onNewC
                 className="w-full text-left px-4 py-2.5 hover:bg-[#F7F6F3] transition-colors"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <MessageSquare className="w-3.5 h-3.5 text-[#9B9A97] flex-shrink-0" />
+                  <MessageSquare className="w-3.5 h-3.5 text-[var(--p-text-muted)] flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[#191919] truncate font-medium">{c.title || 'New Conversation'}</p>
+                    <p className="text-sm text-[var(--p-text-primary)] truncate font-medium">{c.title || 'New Conversation'}</p>
                     {c.aiSummary && (
-                      <p className="text-[11px] text-[#9CA7B8] truncate mt-0.5">{c.aiSummary}</p>
+                      <p className="text-[11px] text-[var(--p-text-secondary)] truncate mt-0.5">{c.aiSummary}</p>
                     )}
                   </div>
                 </div>
@@ -1649,8 +1649,8 @@ function MoveToBranchModal({ conversations, currentId, onClose, onSelect, onNewC
 
         {/* Footer */}
         <div className="px-4 py-2.5 flex items-center" style={{ borderTop: '1px solid var(--p-border-subtle)' }}>
-          <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium border border-[#E9E9E7] bg-[#F7F6F3] text-[#787774]" style={{ fontFamily: 'monospace' }}>Esc</kbd>
-          <span className="text-[10px] text-[#9B9A97] ml-1">to close</span>
+          <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium border border-[#E9E9E7] bg-[#F7F6F3] text-[var(--p-text-secondary)]" style={{ fontFamily: 'monospace' }}>Esc</kbd>
+          <span className="text-[10px] text-[var(--p-text-muted)] ml-1">to close</span>
         </div>
       </motion.div>
     </motion.div>
@@ -1728,17 +1728,17 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
                 />
               </div>
               <div>
-                <div className="text-sm font-medium text-[#191919]">Create Branch</div>
-                <div className="text-[11px] text-[#787774] mt-0.5">Forking from message {messageIndex} of {totalMessages}</div>
+                <div className="text-sm font-medium text-[var(--p-text-primary)]">Create Branch</div>
+                <div className="text-[11px] text-[var(--p-text-secondary)] mt-0.5">Forking from message {messageIndex} of {totalMessages}</div>
               </div>
             </div>
-            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onClose} className="p-2 rounded-lg text-[#787774] hover:bg-[#F1F1EF] transition-colors">
+            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onClose} className="p-2 rounded-lg text-[var(--p-text-secondary)] hover:bg-[#F1F1EF] transition-colors">
               <X className="w-4 h-4" />
             </motion.button>
           </div>
           <div className="mt-4">
             <div className="flex justify-between mb-1">
-              <span className="text-[10px] font-medium text-[#787774] uppercase tracking-wider">Context window after branch</span>
+              <span className="text-[10px] font-medium text-[var(--p-text-secondary)] uppercase tracking-wider">Context window after branch</span>
               <span className="text-xs font-bold tabular-nums" style={{ color: getColor(meterTarget) }}>{Math.round(meterTarget)}%</span>
             </div>
             <div className="h-1.5 bg-[#F1F1EF] rounded-full overflow-hidden">
@@ -1753,7 +1753,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
           {isIncomplete && (
             <div className="flex items-start gap-2.5 px-3.5 py-3 rounded-lg bg-[#F7F6F3] border border-[#E9E9E7]">
               <AlertCircle className="w-3.5 h-3.5 text-[#D9730D] flex-shrink-0 mt-0.5" />
-              <p className="text-[11px] text-[#787774] leading-relaxed">
+              <p className="text-[11px] text-[var(--p-text-secondary)] leading-relaxed">
                 The last response was interrupted. You can still branch — the partial content will be preserved and you can continue it in the new branch.
               </p>
             </div>
@@ -1770,12 +1770,12 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
                 <Copy className="w-4 h-4" style={{ color: mode === 'full' ? '#B8A070' : '#787774' }} />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-[#191919]">Full History</div>
-                <p className="text-xs text-[#787774] mt-0.5">Copy all {messageIndex} messages as-is. Continue with the same context.</p>
+                <div className="text-sm font-medium text-[var(--p-text-primary)]">Full History</div>
+                <p className="text-xs text-[var(--p-text-secondary)] mt-0.5">Copy all {messageIndex} messages as-is. Continue with the same context.</p>
                 {mode === 'full' && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-3 flex items-center gap-2 px-3 py-2 bg-[#F7F6F3] border border-[#F1F1EF] rounded-lg">
-                    <Info className="w-3 h-3 text-[#787774] flex-shrink-0" />
-                    <span className="text-[11px] text-[#787774]">Branch starts at {contextUsage}% context — same as current conversation</span>
+                    <Info className="w-3 h-3 text-[var(--p-text-secondary)] flex-shrink-0" />
+                    <span className="text-[11px] text-[var(--p-text-secondary)]">Branch starts at {contextUsage}% context — same as current conversation</span>
                   </motion.div>
                 )}
               </div>
@@ -1798,10 +1798,10 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-medium text-[#191919]">Compressed Summary</span>
+                  <span className="text-sm font-medium text-[var(--p-text-primary)]">Compressed Summary</span>
                   <span className="text-xs font-medium text-[#0F7B6C]">(saves context)</span>
                 </div>
-                <p className="text-xs text-[#787774] mt-0.5">Start fresh with an AI-generated summary of the conversation so far.</p>
+                <p className="text-xs text-[var(--p-text-secondary)] mt-0.5">Start fresh with an AI-generated summary of the conversation so far.</p>
                 {mode === 'compressed' && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-3 space-y-3">
                     <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.15)' }}>
@@ -1842,12 +1842,12 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
                             {previewLoading ? (
                               <div className="flex items-center gap-2">
                                 <div className="w-3 h-3 border-2 border-[#B8A070] border-t-transparent rounded-full animate-spin flex-shrink-0" />
-                                <p className="text-[11px] text-[#787774]">Generating summary...</p>
+                                <p className="text-[11px] text-[var(--p-text-secondary)]">Generating summary...</p>
                               </div>
                             ) : previewError ? (
                               <p className="text-[11px] text-[#D9730D] leading-relaxed">{previewError}</p>
                             ) : previewContent ? (
-                              <div className="text-[11px] text-[#37352F] leading-relaxed parliament-md">
+                              <div className="text-[11px] text-[var(--p-text-secondary)] leading-relaxed parliament-md">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{previewContent}</ReactMarkdown>
                               </div>
                             ) : null}
@@ -1867,7 +1867,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
 
         {/* Footer — dusty gold gradient CTA */}
         <div className="flex items-center justify-between p-4" style={{ borderTop: '1px solid var(--p-border-subtle)' }}>
-          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={onClose} className="px-4 py-2 rounded-lg text-xs font-medium text-[#787774] hover:text-[#191919] transition-colors">
+          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={onClose} className="px-4 py-2 rounded-lg text-xs font-medium text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors">
             Cancel
           </motion.button>
           <motion.button
@@ -1944,13 +1944,13 @@ function ShortcutsModal({ onClose }) {
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(74,122,229,0.1)' }}>
               <Command className="w-4 h-4 text-[#B8A070]" />
             </div>
-            <div className="text-sm font-medium text-[#191919]">Keyboard Shortcuts</div>
+            <div className="text-sm font-medium text-[var(--p-text-primary)]">Keyboard Shortcuts</div>
           </div>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={onClose}
-            className="p-2 rounded-lg text-[#787774] hover:bg-[#F1F1EF] transition-colors"
+            className="p-2 rounded-lg text-[var(--p-text-secondary)] hover:bg-[#F1F1EF] transition-colors"
           >
             <X className="w-4 h-4" />
           </motion.button>
@@ -1960,12 +1960,12 @@ function ShortcutsModal({ onClose }) {
         <div className="p-5 space-y-3">
           {SHORTCUTS.map((s, i) => (
             <div key={i} className="flex items-center justify-between">
-              <span className="text-xs text-[#37352F]">{s.desc}</span>
+              <span className="text-xs text-[var(--p-text-secondary)]">{s.desc}</span>
               <div className="flex items-center gap-1">
                 {s.keys.map((k, j) => (
                   <kbd
                     key={j}
-                    className="px-1.5 py-0.5 rounded text-[10px] font-medium text-[#787774] border border-[#E9E9E7] bg-[#F7F6F3]"
+                    className="px-1.5 py-0.5 rounded text-[10px] font-medium text-[var(--p-text-secondary)] border border-[#E9E9E7] bg-[#F7F6F3]"
                     style={{ fontFamily: 'ui-monospace, SFMono-Regular, monospace', minWidth: 22, textAlign: 'center' }}
                   >
                     {k === 'Ctrl' ? (IS_MAC ? '⌘' : 'Ctrl') : k === 'Shift' ? (IS_MAC ? '⇧' : 'Shift') : k}
@@ -1978,7 +1978,7 @@ function ShortcutsModal({ onClose }) {
 
         {/* Footer */}
         <div className="px-5 pb-4 pt-1">
-          <p className="text-[10px] text-[#9B9A97] text-center">
+          <p className="text-[10px] text-[var(--p-text-muted)] text-center">
             Press <kbd className="px-1 py-0.5 rounded text-[10px] font-medium border border-[#E9E9E7] bg-[#F7F6F3]" style={{ fontFamily: 'monospace' }}>{IS_MAC ? '⌘' : 'Ctrl'}</kbd> + <kbd className="px-1 py-0.5 rounded text-[10px] font-medium border border-[#E9E9E7] bg-[#F7F6F3]" style={{ fontFamily: 'monospace' }}>?</kbd> anytime to toggle
           </p>
         </div>

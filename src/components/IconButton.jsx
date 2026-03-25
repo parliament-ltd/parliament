@@ -34,7 +34,7 @@ export default function IconButton({
         ${sizeClasses[size]}
         ${active
           ? 'bg-[#B8A070]/10 text-[#B8A070]'
-          : 'text-[#787774] hover:bg-[#F1F1EF] hover:text-[#191919]'
+          : 'text-[var(--p-text-secondary)] hover:bg-[#F1F1EF] hover:text-[var(--p-text-primary)]'
         }
         ${className}
       `}
