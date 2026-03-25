@@ -229,14 +229,14 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
                     onClick={() => toggleLocalPreset(preset.id)}
                     className="w-full text-left rounded-lg p-4 transition-colors"
                     style={{
-                      border: isActive ? '1.5px solid #B8A070' : '1px solid #E9E9E7',
-                      backgroundColor: isActive ? 'rgba(74,122,229,0.04)' : '#FFFFFF',
+                      border: isActive ? '1.5px solid #B8A070' : '1px solid var(--p-border)',
+                      backgroundColor: isActive ? 'var(--p-bg-subtle)' : 'var(--p-bg-surface)',
                     }}
                   >
                     <div className="flex items-start gap-3">
                       <div
                         className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
-                        style={{ backgroundColor: isActive ? 'rgba(74,122,229,0.1)' : '#F7F6F3' }}
+                        style={{ backgroundColor: isActive ? 'rgba(184,160,112,0.12)' : 'var(--p-bg-alt)' }}
                       >
                         <Icon className="w-4 h-4" style={{ color: isActive ? '#B8A070' : '#787774' }} />
                       </div>
@@ -429,8 +429,8 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
               <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
                 Combined System Prompt
               </h3>
-              <div className="px-4 py-3 bg-[#F7F6F3] border border-[#F1F1EF] rounded-lg">
-                <p className="text-xs text-[#37352F] leading-relaxed whitespace-pre-wrap">
+              <div className="px-4 py-3 bg-[var(--p-bg-subtle)] border border-[var(--p-border)] rounded-lg">
+                <p className="text-xs text-[var(--p-text-primary)] leading-relaxed whitespace-pre-wrap">
                   {combinedPrompt}
                 </p>
               </div>

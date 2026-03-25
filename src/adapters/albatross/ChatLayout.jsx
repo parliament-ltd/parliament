@@ -1786,7 +1786,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={SPRING_SNAPPY}
-        className="relative z-10 bg-white border border-[#E9E9E7] rounded-xl w-full max-w-[420px] flex flex-col"
+        className="relative z-10 bg-[var(--p-bg-surface)] border border-[var(--p-border)] rounded-xl w-full max-w-[420px] flex flex-col"
         style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
       >
         {/* Header */}
@@ -1820,7 +1820,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
               <span className="text-[10px] font-medium text-[var(--p-text-secondary)] uppercase tracking-wider">Context window after branch</span>
               <span className="text-xs font-bold tabular-nums" style={{ color: getColor(meterTarget) }}>{Math.round(meterTarget)}%</span>
             </div>
-            <div className="h-1.5 bg-[#F1F1EF] rounded-full overflow-hidden">
+            <div className="h-1.5 bg-[var(--p-bg-alt)] rounded-full overflow-hidden">
               <motion.div animate={{ width: `${meterTarget}%` }} transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1] }} className="h-full rounded-full" style={{ backgroundColor: getColor(meterTarget) }} />
             </div>
           </div>
@@ -1830,7 +1830,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
         <div className="p-4 space-y-3">
           {/* Incomplete message notice */}
           {isIncomplete && (
-            <div className="flex items-start gap-2.5 px-3.5 py-3 rounded-lg bg-[#F7F6F3] border border-[#E9E9E7]">
+            <div className="flex items-start gap-2.5 px-3.5 py-3 rounded-lg bg-[var(--p-bg-subtle)] border border-[var(--p-border)]">
               <AlertCircle className="w-3.5 h-3.5 text-[#D9730D] flex-shrink-0 mt-0.5" />
               <p className="text-[11px] text-[var(--p-text-secondary)] leading-relaxed">
                 The last response was interrupted. You can still branch — the partial content will be preserved and you can continue it in the new branch.
@@ -1842,23 +1842,23 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
             whileHover={{ borderColor: mode === 'full' ? '#B8A070' : '#9B9A97' }}
             onClick={() => { setMode('full'); setCompressed(false) }}
             className="rounded-lg p-4 cursor-pointer transition-colors"
-            style={{ border: mode === 'full' ? '1.5px solid #B8A070' : '1px solid #E9E9E7', backgroundColor: mode === 'full' ? 'rgba(74,122,229,0.04)' : '#FFFFFF' }}
+            style={{ border: mode === 'full' ? '1.5px solid #B8A070' : '1px solid var(--p-border)', backgroundColor: mode === 'full' ? 'var(--p-bg-subtle)' : 'var(--p-bg-surface)' }}
           >
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: mode === 'full' ? 'rgba(74,122,229,0.1)' : '#F7F6F3' }}>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: mode === 'full' ? 'rgba(184,160,112,0.12)' : 'var(--p-bg-alt)' }}>
                 <Copy className="w-4 h-4" style={{ color: mode === 'full' ? '#B8A070' : '#787774' }} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-[var(--p-text-primary)]">Full History</div>
                 <p className="text-xs text-[var(--p-text-secondary)] mt-0.5">Copy all {messageIndex} messages as-is. Continue with the same context.</p>
                 {mode === 'full' && (
-                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-3 flex items-center gap-2 px-3 py-2 bg-[#F7F6F3] border border-[#F1F1EF] rounded-lg">
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-3 flex items-center gap-2 px-3 py-2 bg-[var(--p-bg-subtle)] border border-[var(--p-border)] rounded-lg">
                     <Info className="w-3 h-3 text-[var(--p-text-secondary)] flex-shrink-0" />
                     <span className="text-[11px] text-[var(--p-text-secondary)]">Branch starts at {contextUsage}% context — same as current conversation</span>
                   </motion.div>
                 )}
               </div>
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${mode === 'full' ? 'border-[#B8A070] bg-[#B8A070]' : 'border-[#9B9A97] bg-white'}`}>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${mode === 'full' ? 'border-[#B8A070] bg-[#B8A070]' : 'border-[var(--p-text-muted)] bg-[var(--p-bg-surface)]'}`}>
                 {mode === 'full' && <div className="w-2 h-2 rounded-full bg-white" />}
               </div>
             </div>
@@ -1869,10 +1869,10 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
             whileHover={{ borderColor: mode === 'compressed' ? '#B8A070' : '#9B9A97' }}
             onClick={() => { setMode('compressed'); setCompressed(false) }}
             className="rounded-lg p-4 cursor-pointer transition-colors"
-            style={{ border: mode === 'compressed' ? '1.5px solid #B8A070' : '1px solid #E9E9E7', backgroundColor: mode === 'compressed' ? 'rgba(74,122,229,0.04)' : '#FFFFFF' }}
+            style={{ border: mode === 'compressed' ? '1.5px solid #B8A070' : '1px solid var(--p-border)', backgroundColor: mode === 'compressed' ? 'var(--p-bg-subtle)' : 'var(--p-bg-surface)' }}
           >
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: mode === 'compressed' ? 'rgba(74,122,229,0.1)' : '#F7F6F3' }}>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: mode === 'compressed' ? 'rgba(184,160,112,0.12)' : 'var(--p-bg-alt)' }}>
                 <Zap className="w-4 h-4" style={{ color: mode === 'compressed' ? '#B8A070' : '#787774' }} />
               </div>
               <div className="flex-1 min-w-0">
@@ -1917,7 +1917,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
                     <AnimatePresence>
                       {previewExpanded && (
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={SPRING_SNAPPY} className="overflow-hidden">
-                          <div className="px-3 py-2.5 bg-[#F7F6F3] border border-[#F1F1EF] rounded-lg">
+                          <div className="px-3 py-2.5 bg-[var(--p-bg-subtle)] border border-[var(--p-border)] rounded-lg">
                             {previewLoading ? (
                               <div className="flex items-center gap-2">
                                 <div className="w-3 h-3 border-2 border-[#B8A070] border-t-transparent rounded-full animate-spin flex-shrink-0" />
@@ -1937,7 +1937,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
                   </motion.div>
                 )}
               </div>
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${mode === 'compressed' ? 'border-[#B8A070] bg-[#B8A070]' : 'border-[#9B9A97] bg-white'}`}>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${mode === 'compressed' ? 'border-[#B8A070] bg-[#B8A070]' : 'border-[var(--p-text-muted)] bg-[var(--p-bg-surface)]'}`}>
                 {mode === 'compressed' && <div className="w-2 h-2 rounded-full bg-white" />}
               </div>
             </div>
@@ -1955,10 +1955,10 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
             onClick={compressed ? handleOpen : handleCreate}
             className="px-5 py-2 rounded-lg text-xs font-medium flex items-center gap-2 transition-all"
             style={{
-              border: mode ? 'none' : '1px solid #E9E9E7',
+              border: mode ? 'none' : '1px solid var(--p-border)',
               background: mode
                 ? 'linear-gradient(90deg, #B8A070 25%, #C9B37E 50%, #B8A070 75%)'
-                : '#FFFFFF',
+                : 'var(--p-bg-surface)',
               backgroundSize: mode ? '200% 100%' : 'auto',
               animation: mode && !compressing ? 'gold-shimmer 2s infinite linear' : 'none',
               color: mode ? '#FFFFFF' : '#9B9A97',

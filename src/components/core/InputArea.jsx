@@ -101,14 +101,14 @@ export default function InputArea({
         onClick={() => setMenuOpen(prev => !prev)}
         className={`relative w-8 h-8 rounded-lg border flex items-center justify-center transition-colors ${
           menuOpen || hasActive
-            ? 'border-[#4A7AE5]/40 bg-[#4A7AE5]/5 text-[#4A7AE5]'
-            : 'border-[#EBEBEB] text-[#6B7C93] hover:border-[#4A7AE5] hover:text-[#4A7AE5]'
+            ? 'border-[#B8A070]/60 bg-[#B8A070]/8 text-[#B8A070]'
+            : 'border-[#E9E9E7] text-[var(--p-text-secondary)] hover:border-[var(--p-text-primary)]/20 hover:text-[var(--p-text-primary)]'
         }`}
         title="Add attachment or toggle tools"
       >
         <Plus className="w-4 h-4" />
         {hasActive && (
-          <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#4A7AE5]" />
+          <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#B8A070]" />
         )}
       </motion.button>
 
@@ -120,37 +120,34 @@ export default function InputArea({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 6, scale: 0.97 }}
             transition={SPRING_SNAPPY}
-            className="absolute bottom-full left-0 mb-2 z-50 min-w-[180px] rounded-xl border border-[#EBEBEB] bg-white shadow-lg shadow-black/8 overflow-hidden"
+            className="absolute bottom-full left-0 mb-2 z-50 min-w-[180px] rounded-xl border border-[var(--p-border)] bg-[var(--p-bg-surface)] shadow-lg shadow-black/8 overflow-hidden"
           >
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#1E2532] hover:bg-[#FAFAFA] transition-colors text-left"
+              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-[var(--p-text-primary)] border border-transparent hover:border-[var(--p-text-primary)]/20 hover:text-[var(--p-text-primary)] transition-colors text-left"
             >
-              <Paperclip className={`w-4 h-4 shrink-0 ${attachment ? 'text-[#4A7AE5]' : 'text-[#6B7C93]'}`} />
+              <Paperclip className={`w-4 h-4 shrink-0 ${attachment ? 'text-[#B8A070]' : 'text-[var(--p-text-secondary)]'}`} />
               <span className="flex-1">Upload file</span>
-              {attachment && <Check className="w-3.5 h-3.5 text-[#4A7AE5] shrink-0" />}
+              {attachment && <Check className="w-3.5 h-3.5 text-[#B8A070] shrink-0" />}
             </button>
 
             {availableTools.length > 0 && (
               <>
-                <div className="h-px bg-[#F0F0F0] mx-2" />
+                <div className="h-px bg-[var(--p-border-subtle)] mx-2" />
                 {availableTools.map((tool) => {
                   const meta = TOOL_META[tool.name] || TOOL_META[tool.id]
                   if (!meta) return null
                   const isActive = activeTools.has(tool.id || tool.name)
-                  const { label, Icon, color } = meta
+                  const { label, Icon } = meta
                   return (
                     <button
                       key={tool.id || tool.name}
                       onClick={() => onToggleTool?.(tool.id || tool.name)}
-                      className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm hover:bg-[#FAFAFA] transition-colors text-left"
-                      style={{ color: isActive ? color : '#6B7C93' }}
+                      className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm border border-transparent hover:border-[var(--p-text-primary)]/20 transition-colors text-left ${isActive ? 'text-[#B8A070]' : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)]'}`}
                     >
                       <Icon className="w-4 h-4 shrink-0" />
-                      <span className="flex-1" style={{ color: isActive ? '#1E2532' : '#6B7C93' }}>
-                        {label}
-                      </span>
-                      {isActive && <Check className="w-3.5 h-3.5 shrink-0" style={{ color }} />}
+                      <span className="flex-1">{label}</span>
+                      {isActive && <Check className="w-3.5 h-3.5 shrink-0 text-[#B8A070]" />}
                     </button>
                   )
                 })}

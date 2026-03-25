@@ -155,16 +155,16 @@ export default function ReviewModal({
                 </AnimatePresence>
               </div>
             </div>
-            <div className="flex gap-1 bg-white border border-[#E9E9E7] rounded-lg p-1 w-fit">
+            <div className="flex gap-1 bg-[var(--p-bg-surface)] border border-[var(--p-border)] rounded-lg p-1 w-fit">
               {['brief', 'detailed'].map((d) => (
                 <motion.button
                   key={d}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setSummaryDepth(d)}
-                  className={`px-4 py-1.5 rounded-md text-xs font-medium transition-colors capitalize ${
+                  className={`px-4 py-1.5 rounded-md text-xs font-medium transition-colors capitalize border ${
                     summaryDepth === d
-                      ? 'bg-[#F1F1EF] text-[var(--p-text-primary)]'
-                      : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)]'
+                      ? 'border-[var(--p-text-primary)]/30 text-[var(--p-text-primary)]'
+                      : 'border-transparent text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] hover:border-[var(--p-text-primary)]/15'
                   }`}
                 >
                   {d}
@@ -297,9 +297,9 @@ export default function ReviewModal({
                 <motion.div
                   key={i}
                   whileHover={interactiveHover}
-                  className="px-3 py-2.5 bg-white border border-[#E9E9E7] rounded-lg cursor-pointer hover:border-[#B8A070]/40 transition-colors"
+                  className="px-3 py-2.5 bg-[var(--p-bg-surface)] border border-[var(--p-border)] rounded-lg cursor-pointer hover:border-[#B8A070]/40 transition-colors"
                 >
-                  <p className="text-xs text-[#37352F] leading-relaxed">{prompt}</p>
+                  <p className="text-xs text-[var(--p-text-primary)] leading-relaxed">{prompt}</p>
                 </motion.div>
               ))}
             </div>
