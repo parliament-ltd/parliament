@@ -194,12 +194,12 @@ export default function MessageCard({
         className={`rounded-lg border transition-colors ${
           isGhostText ? 'border-dashed border-[#9B9A97]' : 'border-[#E9E9E7]'
         }`}
-        style={{ backgroundColor: '#FFFFFF' }}
+        style={{ backgroundColor: 'var(--p-bg-surface)' }}
       >
         {/* Header row */}
         <div
           className="flex items-center justify-between px-4 py-3"
-          style={{ borderBottom: '1px solid #F1F1EF' }}
+          style={{ borderBottom: '1px solid var(--p-border-subtle)' }}
         >
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono text-[#9B9A97] opacity-0 group-hover:opacity-100 transition-opacity">

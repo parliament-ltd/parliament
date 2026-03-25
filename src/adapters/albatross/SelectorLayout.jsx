@@ -191,7 +191,7 @@ function StorageWarningBanner({ usagePercent }) {
           ? 'text-[#E03E3E] border-[#E03E3E]/10'
           : 'text-[#D9730D] border-[#D9730D]/10'
       }`}
-      style={{ backgroundColor: isCritical ? '#FEF2F2' : '#FFFBEB' }}
+      style={{ backgroundColor: isCritical ? 'rgba(224,62,62,0.12)' : 'rgba(196,169,77,0.12)' }}
     >
       <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
       <span className="flex-1">
@@ -1199,7 +1199,7 @@ export default function SelectorView() {
 
   // ── Render ──
   return (
-    <div className="flex h-screen font-sans overflow-hidden" style={{ backgroundColor: '#FFFFFF', color: '#191919' }}>
+    <div className="flex h-screen font-sans overflow-hidden" style={{ backgroundColor: 'var(--p-bg-base)', color: 'var(--p-text-primary)' }}>
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
@@ -1367,7 +1367,7 @@ export default function SelectorView() {
               </motion.div>
 
               {/* Table Body */}
-              <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}>
+              <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--p-border) transparent' }}>
                 <motion.div variants={staggerContainer} initial={false} animate="show">
                   {sortedChats.map((chat) => (
                     <ChatTableRow
@@ -1430,7 +1430,7 @@ export default function SelectorView() {
         animate={{ width: favSidebarOpen ? 300 : 0 }}
         transition={SIDEBAR_RESIZE}
         className="flex-shrink-0 overflow-hidden"
-        style={{ borderLeft: favSidebarOpen ? '1px solid #F1F1EF' : 'none' }}
+        style={{ borderLeft: favSidebarOpen ? '1px solid var(--p-border-subtle)' : 'none' }}
       >
         <AnimatePresence>
           {favSidebarOpen && (
@@ -1460,7 +1460,7 @@ export default function SelectorView() {
               </div>
 
               {/* Favorites List */}
-              <div className="flex-1 overflow-y-auto px-3 pb-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}>
+              <div className="flex-1 overflow-y-auto px-3 pb-4" style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--p-border) transparent' }}>
                 {favorites.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full px-4">
                     <Star className="w-8 h-8 text-[#E9E9E7] mb-3" />

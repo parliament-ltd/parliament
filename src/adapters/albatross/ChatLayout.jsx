@@ -827,7 +827,7 @@ export default function ChatView() {
         animate={{ x: 0 }}
         transition={SPRING_SMOOTH}
         className="w-72 flex flex-col flex-shrink-0"
-        style={{ borderRight: '1px solid #F1F1EF' }}
+        style={{ borderRight: '1px solid var(--p-border-subtle)' }}
       >
         <div className="p-4">
           <motion.div
@@ -850,7 +850,7 @@ export default function ChatView() {
           </motion.div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 pt-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}>
+        <div className="flex-1 overflow-y-auto px-4 pt-4" style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--p-border) transparent' }}>
           <motion.div
             variants={staggerContainer}
             initial={false}
@@ -1083,7 +1083,7 @@ export default function ChatView() {
         animate={{ width: rightSidebarCollapsed ? 48 : 320 }}
         transition={SIDEBAR_RESIZE}
         className="flex flex-col relative overflow-hidden flex-shrink-0"
-        style={{ borderLeft: '1px solid #F1F1EF' }}
+        style={{ borderLeft: '1px solid var(--p-border-subtle)' }}
       >
         <AnimatePresence mode="wait">
           {rightSidebarCollapsed ? (
@@ -1108,7 +1108,7 @@ export default function ChatView() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3, delay: 0.1 }}
               className="flex flex-col flex-1 pt-10 overflow-y-auto"
-              style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}
+              style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--p-border) transparent' }}
             >
               {/* Highlights Section */}
               <div className="p-4 pb-6">
@@ -1479,7 +1479,7 @@ function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
         style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
       >
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 py-3.5" style={{ borderBottom: '1px solid #F1F1EF' }}>
+        <div className="flex items-center gap-3 px-4 py-3.5" style={{ borderBottom: '1px solid var(--p-border-subtle)' }}>
           <Search className="w-4 h-4 text-[#9B9A97] flex-shrink-0" />
           <input
             ref={inputRef}
@@ -1500,7 +1500,7 @@ function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
         </div>
 
         {/* Results */}
-        <div className="max-h-[320px] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}>
+        <div className="max-h-[320px] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--p-border) transparent' }}>
           {filtered.length === 0 ? (
             <div className="px-4 py-6 text-center">
               <p className="text-xs text-[#9B9A97]">No chats found</p>
@@ -1511,15 +1511,15 @@ function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
                 key={c.id}
                 onClick={() => onSelect(c.id)}
                 className="w-full text-left px-4 py-2.5 transition-colors"
-                style={{ backgroundColor: c.id === currentId ? '#F5F7FF' : 'transparent' }}
-                onMouseEnter={e => { if (c.id !== currentId) e.currentTarget.style.backgroundColor = '#F7F6F3' }}
-                onMouseLeave={e => { e.currentTarget.style.backgroundColor = c.id === currentId ? '#F5F7FF' : 'transparent' }}
+                style={{ backgroundColor: c.id === currentId ? 'var(--p-bg-alt)' : 'transparent' }}
+                onMouseEnter={e => { if (c.id !== currentId) e.currentTarget.style.backgroundColor = 'var(--p-bg-subtle)' }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = c.id === currentId ? 'var(--p-bg-alt)' : 'transparent' }}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <MessageSquare className="w-3.5 h-3.5 text-[#9B9A97] flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-[#191919] truncate font-medium"
-                      style={{ color: c.id === currentId ? '#B8A070' : '#191919' }}>
+                      style={{ color: c.id === currentId ? '#B8A070' : 'var(--p-text-primary)' }}>
                       {c.title || 'New Conversation'}
                     </p>
                     {c.aiSummary && (
@@ -1536,7 +1536,7 @@ function SelectChatModal({ conversations, currentId, onClose, onSelect }) {
         </div>
 
         {/* Footer hint */}
-        <div className="px-4 py-2.5 flex items-center gap-1" style={{ borderTop: '1px solid #F1F1EF' }}>
+        <div className="px-4 py-2.5 flex items-center gap-1" style={{ borderTop: '1px solid var(--p-border-subtle)' }}>
           <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium border border-[#E9E9E7] bg-[#F7F6F3] text-[#787774]" style={{ fontFamily: 'monospace' }}>↵</kbd>
           <span className="text-[10px] text-[#9B9A97] ml-1">to open</span>
           <span className="text-[10px] text-[#9B9A97] mx-2">·</span>
@@ -1588,7 +1588,7 @@ function MoveToBranchModal({ conversations, currentId, onClose, onSelect, onNewC
         style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
       >
         {/* Header */}
-        <div className="px-4 py-3.5" style={{ borderBottom: '1px solid #F1F1EF' }}>
+        <div className="px-4 py-3.5" style={{ borderBottom: '1px solid var(--p-border-subtle)' }}>
           <p className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-2.5">Move to conversation</p>
           <div className="flex items-center gap-3">
             <Search className="w-4 h-4 text-[#9B9A97] flex-shrink-0" />
@@ -1612,7 +1612,7 @@ function MoveToBranchModal({ conversations, currentId, onClose, onSelect, onNewC
         <button
           onClick={onNewChat}
           className="w-full text-left px-4 py-2.5 hover:bg-[#F7F6F3] transition-colors"
-          style={{ borderBottom: '1px solid #F1F1EF' }}
+          style={{ borderBottom: '1px solid var(--p-border-subtle)' }}
         >
           <div className="flex items-center gap-2.5">
             <div className="w-3.5 h-3.5 rounded-full border-2 border-dashed border-[#B8A070] flex-shrink-0" />
@@ -1621,7 +1621,7 @@ function MoveToBranchModal({ conversations, currentId, onClose, onSelect, onNewC
         </button>
 
         {/* Results */}
-        <div className="max-h-[280px] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}>
+        <div className="max-h-[280px] overflow-y-auto py-1.5" style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--p-border) transparent' }}>
           {filtered.length === 0 ? (
             <div className="px-4 py-6 text-center">
               <p className="text-xs text-[#9B9A97]">No other conversations found</p>
@@ -1648,7 +1648,7 @@ function MoveToBranchModal({ conversations, currentId, onClose, onSelect, onNewC
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2.5 flex items-center" style={{ borderTop: '1px solid #F1F1EF' }}>
+        <div className="px-4 py-2.5 flex items-center" style={{ borderTop: '1px solid var(--p-border-subtle)' }}>
           <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium border border-[#E9E9E7] bg-[#F7F6F3] text-[#787774]" style={{ fontFamily: 'monospace' }}>Esc</kbd>
           <span className="text-[10px] text-[#9B9A97] ml-1">to close</span>
         </div>
@@ -1711,7 +1711,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
         style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
       >
         {/* Header */}
-        <div className="p-5 pb-4" style={{ borderBottom: '1px solid #F1F1EF' }}>
+        <div className="p-5 pb-4" style={{ borderBottom: '1px solid var(--p-border-subtle)' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div
@@ -1866,7 +1866,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
         </div>
 
         {/* Footer — dusty gold gradient CTA */}
-        <div className="flex items-center justify-between p-4" style={{ borderTop: '1px solid #F1F1EF' }}>
+        <div className="flex items-center justify-between p-4" style={{ borderTop: '1px solid var(--p-border-subtle)' }}>
           <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={onClose} className="px-4 py-2 rounded-lg text-xs font-medium text-[#787774] hover:text-[#191919] transition-colors">
             Cancel
           </motion.button>
@@ -1939,7 +1939,7 @@ function ShortcutsModal({ onClose }) {
         style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 pb-4" style={{ borderBottom: '1px solid #F1F1EF' }}>
+        <div className="flex items-center justify-between p-5 pb-4" style={{ borderBottom: '1px solid var(--p-border-subtle)' }}>
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(74,122,229,0.1)' }}>
               <Command className="w-4 h-4 text-[#B8A070]" />
