@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Key, Eye, EyeOff, CheckCircle, AlertCircle, ChevronDown,
   Shield, Cpu, DollarSign, Sliders, Database, Download, Upload, Trash2,
-  Sun, Moon, Info, ExternalLink, Github, HardDrive,
+  Sun, Moon, Info, ExternalLink, Github, HardDrive, Layout,
   ArrowLeft, MessageSquare, X, AlertTriangle, FileJson, RefreshCw, Lock
 } from 'lucide-react'
 import { useSettings } from '../../stores/SettingsContext'
@@ -45,7 +45,8 @@ const STORAGE_MODES = [
 const MODE_OPTIONS = [
   { id: 'auto', label: 'Auto', description: 'Detect from your device — desktop uses Albatross, mobile uses Swift' },
   { id: 'albatross', label: 'Albatross', description: 'Desktop layout with dual sidebars and full keyboard support' },
-  { id: 'swift', label: 'Swift', description: 'Mobile-optimized, touch-first layout' },
+  { id: 'swift', label: 'Swift', description: 'Mobile-optimized, touch-first layout', beta: true },
+  { id: 'pelican', label: 'Pelican', description: 'Data analysis workspace — upload CSV, XLSX, or JSON and explore with charts and AI insights', beta: true },
   { id: 'kingfisher', label: 'Kingfisher', description: 'Deep reading layout with annotation panel', soon: true },
   { id: 'secretarybird', label: 'Secretarybird', description: 'iPad + stylus canvas layout', soon: true },
   { id: 'starling', label: 'Starling', description: 'Collaborative split-view layout', soon: true },
@@ -615,7 +616,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportSheet, setSh
   )
 }
 
-function AppearanceSection({ theme, setTheme, fontSize, setFontSize, storedMode, setMode }) {
+function InteractionModeSection({ storedMode, setMode }) {
   return (
     <>
       <Card>
@@ -632,6 +633,7 @@ function AppearanceSection({ theme, setTheme, fontSize, setFontSize, storedMode,
                 label={
                   <span className="flex items-center gap-2">
                     {opt.label}
+                    {opt.beta && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#B8A070]/10 text-[#B8A070]">Beta</span>}
                     {opt.soon && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[#D9730D]/10 text-[#D9730D]">Soon</span>}
                   </span>
                 }
@@ -641,7 +643,13 @@ function AppearanceSection({ theme, setTheme, fontSize, setFontSize, storedMode,
           })}
         </div>
       </Card>
+    </>
+  )
+}
 
+function AppearanceSection({ theme, setTheme, fontSize, setFontSize }) {
+  return (
+    <>
       <Card>
         <SectionLabel>Theme</SectionLabel>
         <div className="flex gap-2">
@@ -954,6 +962,11 @@ export default function SwiftSettingsLayout() {
             />
           </AccordionSection>
 
+          <AccordionSection id="interaction" label="Interface Mode" subtitle="Choose how you interact with Parliament" icon={Layout}
+            isOpen={openSection === 'interaction'} onToggle={toggleSection}>
+            <InteractionModeSection storedMode={storedMode} setMode={setMode} />
+          </AccordionSection>
+
           <AccordionSection id="model" label="Model Preferences" subtitle="Choose your default model" icon={Cpu}
             isOpen={openSection === 'model'} onToggle={toggleSection}
             shimmerClass={shimmerPhase >= 3 ? 'shimmer-nav' : ''} shimmerStyle={shimmerPhase >= 3 ? { animationDelay: '55ms' } : {}}>
@@ -1001,7 +1014,6 @@ export default function SwiftSettingsLayout() {
             <AppearanceSection
               theme={settings.theme} setTheme={(v) => updateSetting('theme', v)}
               fontSize={settings.fontSize} setFontSize={(v) => updateSetting('fontSize', v)}
-              storedMode={storedMode} setMode={setMode}
             />
           </AccordionSection>
 

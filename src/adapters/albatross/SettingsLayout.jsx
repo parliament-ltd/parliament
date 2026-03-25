@@ -5,7 +5,7 @@ import {
   Key, Cpu, DollarSign, Sliders, Database, Sun, Shield,
   ArrowLeft, MessageSquare, Github, ExternalLink, Info,
   Download, Upload, Trash2, AlertTriangle, Moon, HardDrive,
-  Bell, BellOff, CheckCircle, AlertCircle, Lock
+  Bell, BellOff, CheckCircle, AlertCircle, Lock, Layout
 } from 'lucide-react'
 import { useSettings } from '../../stores/SettingsContext'
 import { useConversations } from '../../stores/ConversationContext'
@@ -29,6 +29,7 @@ const staggerItem = {
 
 const NAV_ITEMS = [
   { id: 'api', label: 'API Configuration', icon: Key, tourTarget: 'settings-api' },
+  { id: 'interaction', label: 'Interface Mode', icon: Layout },
   { id: 'model', label: 'Model Preferences', icon: Cpu },
   { id: 'usage', label: 'Usage & Spending', icon: DollarSign },
   { id: 'context', label: 'Context & Defaults', icon: Sliders, tourTarget: 'settings-context' },
@@ -229,11 +230,12 @@ export default function SettingsView() {
       <div className="flex-1 overflow-y-auto px-10 py-8">
         <AnimatePresence mode="wait">
           {activeSection === 'api' && <ApiSection key="api" apiKey={apiKey} setApiKey={(v) => { setApiKey(v); setKeyStatus(null) }} keyStatus={keyStatus} keyError={keyError} validateKey={validateKey} validateCooldown={validateCooldown} storageMode={settings.storageMode} setStorageMode={(v) => updateSetting('storageMode', v)} shimmerPhase={shimmerPhase} />}
+          {activeSection === 'interaction' && <InteractionModeSection key="interaction" storedMode={storedMode} setMode={setMode} />}
           {activeSection === 'model' && <ModelSection key="model" selectedModel={settings.defaultModel} setSelectedModel={(v) => updateSetting('defaultModel', v)} />}
           {activeSection === 'usage' && <UsageSection key="usage" budgetAlert={settings.budgetAlert} setBudgetAlert={(v) => updateSetting('budgetAlert', v)} budgetEnabled={settings.budgetEnabled} setBudgetEnabled={(v) => updateSetting('budgetEnabled', v)} spendingLimitDismissed={settings.spendingLimitDismissed} setSpendingLimitDismissed={(v) => updateSetting('spendingLimitDismissed', v)} />}
           {activeSection === 'context' && <ContextSection key="context" summaryDepth={settings.summaryDepth} setSummaryDepth={(v) => updateSetting('summaryDepth', v)} contextThreshold={settings.contextThreshold} setContextThreshold={(v) => updateSetting('contextThreshold', v)} autoCompress={settings.autoCompress} setAutoCompress={(v) => updateSetting('autoCompress', v)} />}
           {activeSection === 'data' && <DataSection key="data" backupReminder={settings.backupReminder} setBackupReminder={(v) => updateSetting('backupReminder', v)} showExportModal={showExportModal} setShowExportModal={setShowExportModal} showImportModal={showImportModal} setShowImportModal={setShowImportModal} showDeleteConfirm={showDeleteConfirm} setShowDeleteConfirm={setShowDeleteConfirm} exportPassphrase={exportPassphrase} setExportPassphrase={setExportPassphrase} exportConfirmPassphrase={exportConfirmPassphrase} setExportConfirmPassphrase={setExportConfirmPassphrase} importPassphrase={importPassphrase} setImportPassphrase={setImportPassphrase} storageUsage={storageUsage} conversations={conversations} />}
-          {activeSection === 'appearance' && <AppearanceSection key="appearance" theme={settings.theme} setTheme={(v) => updateSetting('theme', v)} fontSize={settings.fontSize} setFontSize={(v) => updateSetting('fontSize', v)} storedMode={storedMode} setMode={setMode} />}
+          {activeSection === 'appearance' && <AppearanceSection key="appearance" theme={settings.theme} setTheme={(v) => updateSetting('theme', v)} fontSize={settings.fontSize} setFontSize={(v) => updateSetting('fontSize', v)} />}
           {activeSection === 'about' && <AboutSection key="about" />}
         </AnimatePresence>
       </div>
@@ -922,7 +924,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
   )
 }
 
-// ─── Appearance ──────────────────────────────────────────
+// ─── Interaction Mode ─────────────────────────────────────
 
 const MODE_OPTIONS = [
   { id: 'auto', label: 'Auto', description: 'Detect from your device — desktop uses Albatross, mobile uses Swift' },
@@ -934,9 +936,9 @@ const MODE_OPTIONS = [
   { id: 'starling', label: 'Starling', description: 'Collaborative split-view layout', soon: true },
 ]
 
-function AppearanceSection({ theme, setTheme, fontSize, setFontSize, storedMode, setMode }) {
+function InteractionModeSection({ storedMode, setMode }) {
   return (
-    <SettingsSection title="Appearance" subtitle="Customize how the interface looks">
+    <SettingsSection title="Interface Mode" subtitle="Choose how you interact with Parliament">
       <StaggerItem>
         <Card>
           <SectionLabel>Interface Mode</SectionLabel>
@@ -975,7 +977,15 @@ function AppearanceSection({ theme, setTheme, fontSize, setFontSize, storedMode,
           </div>
         </Card>
       </StaggerItem>
+    </SettingsSection>
+  )
+}
 
+// ─── Appearance ──────────────────────────────────────────
+
+function AppearanceSection({ theme, setTheme, fontSize, setFontSize }) {
+  return (
+    <SettingsSection title="Appearance" subtitle="Customize how the interface looks">
       <StaggerItem>
         <Card>
           <SectionLabel>Theme</SectionLabel>
