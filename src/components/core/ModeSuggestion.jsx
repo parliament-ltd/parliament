@@ -29,32 +29,32 @@ export default function ModeSuggestion({ suggestion, onSwitch, onDismiss, onDisa
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 8 }}
           transition={SPRING_SNAPPY}
-          className="mx-4 mb-2 px-4 py-3 rounded-xl border border-[#4A7AE5]/25 bg-[#4A7AE5]/5 flex items-center gap-3"
+          className="mx-4 mb-2 px-4 py-3 rounded-xl border border-[var(--p-border)] bg-[var(--p-bg-subtle)] flex items-center gap-3"
         >
-          <Lightbulb className="w-4 h-4 text-[#4A7AE5] shrink-0" />
+          <Lightbulb className="w-4 h-4 text-[#B8A070] shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-[#1E2532]">{suggestion.message}</p>
-            <p className="text-xs text-[#6B7C93] mt-0.5">{suggestion.cta}</p>
+            <p className="text-xs font-semibold text-[var(--p-text-primary)]">{suggestion.message}</p>
+            <p className="text-xs text-[var(--p-text-secondary)] mt-0.5">{suggestion.cta}</p>
           </div>
           <motion.button
-            whileHover={{ scale: 1.03, borderColor: '#4A7AE5' }}
+            whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => onSwitch(suggestion.targetMode)}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#EBEBEB] bg-white text-[#1E2532] shrink-0 flex items-center gap-1.5"
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#B8A070]/50 bg-transparent text-[var(--p-text-primary)] shrink-0 flex items-center gap-1.5 hover:border-[#B8A070] transition-colors"
           >
             <ArrowRight className="w-3 h-3" />
             Switch to {MODE_LABELS[suggestion.targetMode]}
           </motion.button>
           <button
             onClick={onDisable}
-            className="text-[#6B7C93] hover:text-[#1E2532] transition-colors text-[11px] shrink-0"
+            className="text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors text-[11px] shrink-0"
             title="Turn off mode suggestions"
           >
             Turn off
           </button>
           <button
             onClick={onDismiss}
-            className="text-[#6B7C93] hover:text-[#1E2532] transition-colors shrink-0"
+            className="text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] transition-colors shrink-0"
             title="Dismiss"
           >
             <X className="w-4 h-4" />
