@@ -1424,7 +1424,7 @@ function ActionButton({ icon: Icon, children, onClick, badge = null }) {
       whileHover={interactiveHover}
       whileTap={interactiveTap}
       onClick={onClick}
-      className="w-full text-left px-3 py-2 rounded-lg text-sm text-[var(--p-text-secondary)] hover:bg-white hover:text-[#B8A070] transition-colors flex items-center gap-2"
+      className="w-full text-left px-3 py-2 rounded-lg text-sm text-[var(--p-text-secondary)] hover:text-[#B8A070] border border-transparent hover:border-[var(--p-text-primary)]/20 transition-colors flex items-center gap-2"
     >
       <Icon className="w-4 h-4 flex-shrink-0" />
       <span className="truncate flex-1">{children}</span>
