@@ -932,7 +932,7 @@ const MODE_OPTIONS = [
   { id: 'swift', label: 'Swift', description: 'Mobile-optimized, touch-first layout', beta: true },
   { id: 'pelican', label: 'Pelican', description: 'Data analysis workspace — upload CSV, XLSX, or JSON and explore with charts and AI insights', beta: true },
   { id: 'kingfisher', label: 'Kingfisher', description: 'Deep reading layout with annotation panel', soon: true },
-  { id: 'secretarybird', label: 'Secretarybird', description: 'iPad + stylus canvas layout', soon: true },
+  { id: 'secretarybird', label: 'Secretarybird', description: 'Solo writing and editing canvas with tracked changes and Claude suggestions', beta: true },
   { id: 'starling', label: 'Starling', description: 'Collaborative split-view layout', soon: true },
 ]
 

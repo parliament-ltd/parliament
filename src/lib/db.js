@@ -2,7 +2,7 @@ import { openDB } from 'idb'
 import { validateBackup } from './validate'
 
 const DB_NAME = 'parliament'
-const DB_VERSION = 2
+const DB_VERSION = 3
 
 let dbInstance = null
 
@@ -36,6 +36,7 @@ export async function initDB() {
 
       // ── v2 stores: Pelican file staging ───────────────────────────────
       if (oldVersion < 2) {
+        // (migration block preserved for existing installs upgrading through v2)
         // File metadata: one record per uploaded file
         const fileStore = db.createObjectStore('files', { keyPath: 'id' })
         fileStore.createIndex('conversationId', 'conversationId')
@@ -43,6 +44,13 @@ export async function initDB() {
         // File data: compressed raw bytes, keyed by fileId (one record per file)
         // Stored separately to avoid loading binary blobs when listing file metadata
         db.createObjectStore('file_data', { keyPath: 'fileId' })
+      }
+
+      // ── v3 stores: Secretarybird document state ────────────────────────
+      if (oldVersion < 3) {
+        // One document record per conversation — stores paragraphs with tracked
+        // changes, suggestion states, and user replies to Claude comments.
+        db.createObjectStore('sbrd_documents', { keyPath: 'conversationId' })
       }
     }
   })
@@ -126,6 +134,9 @@ export async function deleteConversation(id) {
     fileTx.objectStore('file_data').delete(file.id)
   }
   await fileTx.done
+
+  // Delete Secretarybird document if present
+  await db.delete('sbrd_documents', id)
 
   await db.delete('conversations', id)
 }
@@ -434,6 +445,38 @@ export async function deleteFile(id) {
   await tx.done
 }
 
+// ─── Secretarybird Documents ─────────────────────────────
+
+/**
+ * Load the document state for a Secretarybird conversation.
+ * Returns null if no document has been saved yet.
+ *
+ * @param {string} conversationId
+ * @returns {object|null} { conversationId, paragraphs, suggestionStates, submittedReplies, updatedAt }
+ */
+export async function getSbrdDocument(conversationId) {
+  const db = await initDB()
+  return db.get('sbrd_documents', conversationId)
+}
+
+/**
+ * Persist the full document state for a Secretarybird conversation.
+ * Performs an upsert — safe to call on first save or any subsequent save.
+ *
+ * @param {string} conversationId
+ * @param {{ paragraphs, suggestionStates, submittedReplies }} data
+ */
+export async function saveSbrdDocument(conversationId, { paragraphs, suggestionStates, submittedReplies }) {
+  const db = await initDB()
+  await db.put('sbrd_documents', {
+    conversationId,
+    paragraphs,
+    suggestionStates,
+    submittedReplies,
+    updatedAt: new Date().toISOString(),
+  })
+}
+
 // ─── Storage Monitoring ──────────────────────────────────
 
 export async function getStorageEstimate() {
@@ -453,7 +496,12 @@ export async function runIntegrityCheck() {
   for (const conv of conversations) {
     const messages = await db.getAllFromIndex('messages', 'conversationId', conv.id)
     if (messages.length === 0) {
-      await deleteConversation(conv.id)
+      // Don't delete Secretarybird conversations — they store content in
+      // sbrd_documents rather than the messages store.
+      const sbrdDoc = await db.get('sbrd_documents', conv.id)
+      if (!sbrdDoc) {
+        await deleteConversation(conv.id)
+      }
     }
   }
   // Messages with incomplete: true are intentionally left as-is.
@@ -472,6 +520,7 @@ export async function exportAllData() {
     favorites: await db.getAll('favorites'),
     pins: await db.getAll('pins'),
     settings: await db.getAll('settings'),
+    sbrd_documents: await db.getAll('sbrd_documents'),
     exportedAt: new Date().toISOString(),
     version: 1,
   }
@@ -483,7 +532,7 @@ export async function importData(data) {
   if (!check.valid) throw new Error(check.error)
 
   const db = await initDB()
-  const stores = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings']
+  const stores = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings', 'sbrd_documents']
   let imported = 0
 
   for (const storeName of stores) {
@@ -509,7 +558,7 @@ export async function clearAllData() {
   // Intentionally excludes the 'parliament-keystore' IndexedDB (separate database).
   // That database holds the non-extractable AES key used to encrypt the API key at rest.
   // Clearing it would make any stored encrypted API key permanently unreadable.
-  const stores = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings', 'files', 'file_data']
+  const stores = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings', 'files', 'file_data', 'sbrd_documents']
   for (const storeName of stores) {
     await db.clear(storeName)
   }

@@ -121,6 +121,52 @@
 .dark ::-webkit-scrollbar-thumb { background-color: var(--p-scrollbar-thumb); }
 .dark ::-webkit-scrollbar-track { background-color: var(--p-scrollbar-track); }
 
+/* ── Secretarybird mode overrides ───────────────────────── */
+
+/* Toolbar backdrop — handled via CSS class (inline style can't be overridden) */
+.sbrd-toolbar {
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+}
+.dark .sbrd-toolbar {
+  background-color: rgba(28, 26, 20, 0.92);
+}
+
+/* Outer canvas background */
+.sbrd-canvas {
+  background-color: #FAFAFA;
+}
+.dark .sbrd-canvas {
+  background-color: var(--p-bg-base);
+}
+
+/* Inner document paper shadow — deeper in dark mode */
+.sbrd-paper {
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.04);
+}
+.dark .sbrd-paper {
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
+}
+
+/* — Additional text colors — */
+.dark .text-\[#6B5D1F\]  { color: var(--p-gold-muted) !important; }
+.dark .text-\[#B5A353\]  { color: var(--p-gold-muted) !important; }
+.dark .text-\[#4A5568\]  { color: var(--p-text-secondary) !important; }
+.dark .text-\[#D5D5D5\]  { color: var(--p-text-muted) !important; }
+
+/* — Additional backgrounds — */
+.dark .bg-\[#FAFAFA\]               { background-color: var(--p-bg-subtle) !important; }
+.dark .bg-\[#FFF9E6\]               { background-color: rgba(196, 169, 77, 0.12) !important; }
+.dark .hover\:bg-\[#FFF5D6\]:hover  { background-color: rgba(196, 169, 77, 0.18) !important; }
+.dark .hover\:bg-\[#FAFAFA\]:hover  { background-color: var(--p-bg-subtle) !important; }
+
+/* — Additional borders — */
+.dark .border-\[#F0F0F0\]  { border-color: var(--p-border-subtle) !important; }
+.dark .border-\[#E5D9A8\]  { border-color: rgba(196, 169, 77, 0.25) !important; }
+
+/* — Additional hover states — */
+.dark .hover\:bg-\[#F5F5F5\]:hover  { background-color: var(--p-bg-subtle) !important; }
+
 /* ── Parliament Markdown Styles ──────────────────────────── */
 /* Applied via className="parliament-md" on message content wrappers */
 
