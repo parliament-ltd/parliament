@@ -715,7 +715,7 @@ export default function SwiftChatLayout() {
           <div className="flex flex-col items-center justify-center h-full text-center px-8">
             <img src="/parliament_logo.png" alt="" className="w-12 h-12 mb-4 object-contain" style={{ opacity: 0.26 }} />
             <p className="text-sm text-[#787774] mb-1">Start a conversation</p>
-            <p className="text-xs text-[#9B9A97]">Type below, or swipe left to start fresh</p>
+            <p className="text-xs text-[#9B9A97]">Type below, or swipe left to start a new conversation.</p>
           </div>
         )}
 
@@ -826,7 +826,7 @@ export default function SwiftChatLayout() {
         onSend={handleSend}
         onStop={stopGenerating}
         isStreaming={isStreaming}
-        placeholder="Type here, or swipe left to start fresh."
+        placeholder="Type here"
         attachment={attachment}
         onAttach={setAttachment}
         onClearAttach={() => setAttachment(null)}

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, useLayoutEffect, useCallback } fr
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   getConversation, getBranches, createConversation,
-  getSbrdDocument, saveSbrdDocument,
+  getSbrdDocument, saveSbrdDocument, listConversations,
 } from '../../lib/db'
 import { getProvider } from '../../providers'
 import { loadApiKey } from '../../lib/crypto'
@@ -12,7 +12,7 @@ import {
   AlertTriangle, Lightbulb, ChevronDown, Check, X, Eye, EyeOff,
   Bell, BellOff, Eraser, PanelRight,
   Sparkles, CornerDownRight, ArrowRight,
-  CheckCheck,
+  CheckCheck, Download,
 } from 'lucide-react'
 import { SPRING_SMOOTH, SPRING_GENTLE } from '../../lib/constants'
 
@@ -77,12 +77,12 @@ function wordDiff(original, current) {
 function DiffText({ baseline, text }) {
   const t = text    == null ? '' : String(text)
   const b = baseline == null ? '' : String(baseline)
-  if (!b || b === t) return <span style={{ color: '#1E2532' }}>{t}</span>
+  if (!b || b === t) return <span style={{ color: 'var(--p-text-primary)' }}>{t}</span>
   const parts = wordDiff(b, t)
   return (
     <>
       {parts.map((part, i) => {
-        if (part.type === 'unchanged') return <span key={i} style={{ color: '#1E2532' }}>{part.text}</span>
+        if (part.type === 'unchanged') return <span key={i} style={{ color: 'var(--p-text-primary)' }}>{part.text}</span>
         if (part.type === 'deleted')
           return <span key={i} style={{ color: DELETION, textDecoration: 'line-through', opacity: 0.7 }}>{part.text}</span>
         return <span key={i} style={{ color: INSERTION, fontWeight: 500, borderBottom: `1.5px solid ${INSERTION}50` }}>{part.text}</span>
@@ -94,16 +94,16 @@ function DiffText({ baseline, text }) {
 /* ─── Comment selection highlight renderer ───────────────── */
 
 function HighlightedText({ text, highlight }) {
-  if (!highlight) return <span style={{ color: '#1E2532' }}>{text}</span>
+  if (!highlight) return <span style={{ color: 'var(--p-text-primary)' }}>{text}</span>
   const idx = text.indexOf(highlight)
-  if (idx === -1) return <span style={{ color: '#1E2532' }}>{text}</span>
+  if (idx === -1) return <span style={{ color: 'var(--p-text-primary)' }}>{text}</span>
   return (
     <>
-      {idx > 0 && <span style={{ color: '#1E2532' }}>{text.slice(0, idx)}</span>}
-      <mark style={{ backgroundColor: 'rgba(255, 213, 50, 0.38)', color: '#1E2532', borderRadius: '2px', padding: '1px 0' }}>
+      {idx > 0 && <span style={{ color: 'var(--p-text-primary)' }}>{text.slice(0, idx)}</span>}
+      <mark style={{ backgroundColor: 'rgba(255, 213, 50, 0.38)', color: 'var(--p-text-primary)', borderRadius: '2px', padding: '1px 0' }}>
         {text.slice(idx, idx + highlight.length)}
       </mark>
-      {idx + highlight.length < text.length && <span style={{ color: '#1E2532' }}>{text.slice(idx + highlight.length)}</span>}
+      {idx + highlight.length < text.length && <span style={{ color: 'var(--p-text-primary)' }}>{text.slice(idx + highlight.length)}</span>}
     </>
   )
 }
@@ -240,17 +240,17 @@ function ClaudeInlineSuggestionPreview({ text, suggestion }) {
   if (idx === -1) {
     return (
       <>
-        <span style={{ color: '#1E2532' }}>{text}</span>
+        <span style={{ color: 'var(--p-text-primary)' }}>{text}</span>
         <span style={{ color: SUGGESTION, fontWeight: 500 }}> → {suggestion.replace}</span>
       </>
     )
   }
   return (
     <>
-      <span style={{ color: '#1E2532', opacity: 0.45 }}>{text.slice(0, idx)}</span>
+      <span style={{ color: 'var(--p-text-primary)', opacity: 0.45 }}>{text.slice(0, idx)}</span>
       <span style={{ color: SUGGESTION, textDecoration: 'line-through', opacity: 0.75 }}>{suggestion.find}</span>
       <span style={{ color: SUGGESTION, fontWeight: 500, borderBottom: `1.5px solid ${SUGGESTION}50` }}>{suggestion.replace}</span>
-      <span style={{ color: '#1E2532', opacity: 0.45 }}>{text.slice(idx + suggestion.find.length)}</span>
+      <span style={{ color: 'var(--p-text-primary)', opacity: 0.45 }}>{text.slice(idx + suggestion.find.length)}</span>
     </>
   )
 }
@@ -356,6 +356,10 @@ export default function SecretarybirdChatLayout() {
   const [replyInputs,         setReplyInputs]         = useState({})
   const [showSubmitConfirm,   setShowSubmitConfirm]   = useState(false)
   const [submitting,          setSubmitting]          = useState(false)
+  const [showExportMenu,      setShowExportMenu]      = useState(false)
+  const [rippleScanning,      setRippleScanning]      = useState(false)
+  const [showRippleScopeModal, setShowRippleScopeModal] = useState(false)
+  const exportMenuRef = useRef(null)
 
   // Keep a ref in sync so event listeners can read showMarkup without stale closures
   const showMarkupRef = useRef(showMarkup)
@@ -428,6 +432,10 @@ export default function SecretarybirdChatLayout() {
     return paragraphs.find(p => p.id === paraId) ? paragraphs[paragraphs.findIndex(p => p.id === paraId) - 1]?.text?.length ?? 0 : 0
   }, [paragraphs])
 
+  const handleParagraphTypeChange = useCallback((paraId, newType) => {
+    setParagraphs(prev => prev.map(p => p.id === paraId ? { ...p, type: newType } : p))
+  }, [])
+
   // ── Comment handlers ──────────────────────────────────────────────
 
   const toggleComment = id =>
@@ -478,6 +486,97 @@ export default function SecretarybirdChatLayout() {
         ripple: undefined,
       }))
     })
+  }
+
+  // ── Export handlers ───────────────────────────────────────────────
+
+  const handleCopyCleanText = () => {
+    const text = paragraphs.map(p => {
+      if (p.type === 'heading')  return `# ${p.text}`
+      if (p.type === 'heading2') return `## ${p.text}`
+      if (p.type === 'quote')    return `> ${p.text}`
+      return p.text
+    }).join('\n\n')
+    navigator.clipboard.writeText(text)
+    setShowExportMenu(false)
+  }
+
+  const handleExportWithMarkup = () => {
+    const lines = []
+    for (const p of paragraphs) {
+      const prefix = p.type === 'heading' ? '# ' : p.type === 'heading2' ? '## ' : p.type === 'quote' ? '> ' : ''
+      let content = p.text
+      if (p.text !== p.baseline) {
+        const parts = wordDiff(p.baseline, p.text)
+        content = parts.map(part => {
+          if (part.type === 'deleted')  return `~~${part.text}~~`
+          if (part.type === 'inserted') return `**${part.text}**`
+          return part.text
+        }).join('')
+      }
+      lines.push(prefix + content)
+      for (const c of p.comments || []) {
+        lines.push('')
+        lines.push(`> **Comment:** ${c.text}`)
+        if (c.claudeReply) lines.push(`> *Claude: ${c.claudeReply.text}*`)
+      }
+      lines.push('')
+    }
+    const blob = new Blob([lines.join('\n')], { type: 'text/markdown' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${conversationTitle || 'document'}.md`
+    a.click()
+    URL.revokeObjectURL(url)
+    setShowExportMenu(false)
+  }
+
+  // Close export menu on outside click
+  useEffect(() => {
+    if (!showExportMenu) return
+    const handler = (e) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target)) {
+        setShowExportMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [showExportMenu])
+
+  // ── Markup toggle with ripple scan ────────────────────────────────
+
+  const handleToggleMarkup = async () => {
+    const turningOn = !showMarkup
+    setShowMarkup(turningOn)
+    if (!turningOn || !rippleEnabled || !hasEdits || rippleScanning) return
+    setRippleScanning(true)
+    try {
+      const apiKey = await loadApiKey()
+      if (!apiKey) return
+      const provider = getProvider('anthropic')
+      const changedParas = paragraphs.filter(p => p.text !== p.baseline && !p.claudeOrigin)
+      if (!changedParas.length) return
+      const editSummary = changedParas.map(p =>
+        `[${p.id}] changed from: "${p.baseline.slice(0, 100)}" → to: "${p.text.slice(0, 100)}"`
+      ).join('\n')
+      const allParas = paragraphs.map(p => `[${p.id}] ${p.type === 'heading' || p.type === 'heading2' ? '# ' : ''}${p.text}`).join('\n\n')
+      const systemPrompt = `You are analyzing a document for cross-paragraph consistency impacts from recent edits.\n\nFull document:\n${allParas}\n\nRecent edits:\n${editSummary}\n\nRespond ONLY with valid JSON (no prose, no fences):\n{"rippleFlags":[{"paraId":"...","type":"contradiction|dependency_break|opportunity|tone_shift","severity":"low|medium|high","summary":"...","sourceEdit":"..."}]}\n\nOnly flag genuine cross-paragraph impacts. Return empty rippleFlags array if none.`
+      const abort = new AbortController()
+      let resp = ''
+      await provider.sendMessage(apiKey, [{ role: 'user', content: 'Analyze.' }], 'claude-haiku', chunk => { resp += chunk }, abort.signal, systemPrompt)
+      const match = resp.match(/\{[\s\S]*\}/)
+      if (match) {
+        const parsed = JSON.parse(match[0])
+        if (parsed.rippleFlags?.length) {
+          setParagraphs(prev => prev.map(p => {
+            const flag = parsed.rippleFlags.find(f => f.paraId === p.id)
+            return flag ? { ...p, ripple: flag } : p
+          }))
+        }
+      }
+    } catch (_) {}
+    finally { setRippleScanning(false) }
   }
 
   // ── Claude suggestion accept / reject handlers ────────────────────
@@ -557,10 +656,11 @@ ${commentLines}
 Respond ONLY with a valid JSON object — no prose, no markdown fences:
 {
   "commentReplies": [{"commentId": "...", "reply": "..."}]${rippleEnabled ? `,
-  "rippleFlags": [{"paraId": "...", "type": "contradiction|dependency_break|opportunity|tone_shift|duplication", "severity": "low|medium|high", "summary": "...", "sourceEdit": "..."}]` : ''}
+  "rippleFlags": [{"paraId": "...", "type": "contradiction|dependency_break|opportunity|tone_shift|duplication", "severity": "low|medium|high", "summary": "...", "sourceEdit": "..."}],
+  "rippleSuggestions": [{"paraId": "...", "suggestions": [{"find": "exact text to find", "replace": "replacement", "reasoning": "brief reason"}]}]` : ''}
 }
 
-Reply to every comment helpfully and concisely.${rippleEnabled ? ' Include rippleFlags only for genuine cross-paragraph impacts caused by the edits — omit if none.' : ''}`
+Reply to every comment helpfully and concisely.${rippleEnabled ? ' Include rippleFlags only for genuine cross-paragraph impacts caused by the edits — omit if none. Include rippleSuggestions with concrete fix suggestions for flagged paragraphs — omit if none.' : ''}`
 
         let fullResponse = ''
         const abort = new AbortController()
@@ -588,6 +688,19 @@ Reply to every comment helpfully and concisely.${rippleEnabled ? ' Include rippl
                 return rep ? { ...c, claudeReply: { text: rep.reply } } : c
               }),
             }))
+            if (rippleEnabled && parsed.rippleSuggestions?.length) {
+              finalParagraphs = finalParagraphs.map(p => {
+                const entry = parsed.rippleSuggestions.find(r => r.paraId === p.id)
+                if (!entry?.suggestions?.length) return p
+                const newSuggs = entry.suggestions.map((s, i) => ({
+                  id: `rs-${Date.now()}-${i}`,
+                  find: String(s.find || ''),
+                  replace: String(s.replace || ''),
+                  reasoning: String(s.reasoning || ''),
+                }))
+                return { ...p, claudeSuggestions: [...(p.claudeSuggestions || []), ...newSuggs] }
+              })
+            }
             setParagraphs(finalParagraphs)
             // Switch to comments tab so the user sees Claude's replies
             setSidebarCollapsed(false)
@@ -765,20 +878,17 @@ Rules:
   // ── Prevent canvas scroll-hijack in edit mode ─────────────────────
   // When no contentEditable is focused (e.g. user clicked toolbar then back),
   // Space / PageDown / PageUp scroll the overflow container instead of typing.
-  // Intercept in capture phase, prevent the scroll, focus the last editable,
-  // and for Space also insert the character so the keystroke isn't lost.
+  // Scoped to canvasRef so sidebar inputs are never affected — events in the
+  // sidebar don't pass through the canvas element at all.
   useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
     const onKeyDown = (e) => {
       if (showMarkupRef.current) return  // markup mode — no editables
-      // Use e.target (the event destination) rather than document.activeElement —
-      // more reliable in capture phase, especially for sidebar and modal inputs.
-      const target = e.target
-      const tag = target?.tagName
-      if (target?.contentEditable === 'true') return  // document paragraph — all good
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return  // any native form control
+      if (e.target?.contentEditable === 'true') return  // document paragraph — all good
       if (e.key === ' ' || e.key === 'PageDown' || e.key === 'PageUp') {
         e.preventDefault()
-        const editables = document.querySelectorAll('[data-editable]')
+        const editables = canvas.querySelectorAll('[data-editable]')
         const el = editables[editables.length - 1]
         if (el) {
           el.focus()
@@ -787,8 +897,8 @@ Rules:
       }
     }
     // Capture phase so we intercept before the scroll event fires
-    document.addEventListener('keydown', onKeyDown, true)
-    return () => document.removeEventListener('keydown', onKeyDown, true)
+    canvas.addEventListener('keydown', onKeyDown, true)
+    return () => canvas.removeEventListener('keydown', onKeyDown, true)
   }, [])
 
   // ── Derived counts ────────────────────────────────────────────────
@@ -839,7 +949,7 @@ Rules:
           </span>
         </div>
 
-        {/* Center: Comment shortcut hint + Clear All */}
+        {/* Center: Comment shortcut hint + Clear All + Export */}
         <div className="flex items-center gap-0.5 px-1.5 py-1 rounded-lg bg-[#F5F5F5]" style={{ fontFamily: 'system-ui, sans-serif' }}>
           <div className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] text-[#9B9A97]" title="Highlight text then press Ctrl+Alt+M to add a comment">
             <MessageSquare className="w-3.5 h-3.5" />
@@ -847,7 +957,36 @@ Rules:
             <span className="text-[10px] text-[#C0C8D4] ml-0.5">Ctrl+Alt+M</span>
           </div>
           <div className="h-4 w-px bg-[#EBEBEB] mx-1" />
-          <ToolButton icon={Eraser} label="Accept All" onClick={handleClearAll} />
+          <ToolButton icon={Eraser} label="Clear All" onClick={handleClearAll} />
+          <div className="h-4 w-px bg-[#EBEBEB] mx-1" />
+          <div className="relative" ref={exportMenuRef}>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowExportMenu(v => !v)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-medium text-[#6B7C93] hover:text-[#1E2532] transition-colors"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span className="hidden xl:inline">Export</span>
+              <ChevronDown className="w-3 h-3" />
+            </motion.button>
+            <AnimatePresence>
+              {showExportMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.1 }}
+                  className="absolute top-full left-0 mt-1 bg-white rounded-lg border border-[#E9E9E7] shadow-lg z-50 py-1 w-48"
+                  style={{ fontFamily: 'system-ui, sans-serif' }}
+                >
+                  <button onClick={handleCopyCleanText} className="w-full text-left px-3 py-2 text-xs text-[#1E2532] hover:bg-[#F5F5F5] transition-colors">
+                    Copy Clean Text
+                  </button>
+                  <button onClick={handleExportWithMarkup} className="w-full text-left px-3 py-2 text-xs text-[#1E2532] hover:bg-[#F5F5F5] transition-colors">
+                    Export with Markup
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Right: toggles + context + submit */}
@@ -856,7 +995,7 @@ Rules:
           {/* Markup toggle */}
           <motion.button
             whileTap={{ scale: 0.95 }}
-            onClick={() => setShowMarkup(v => !v)}
+            onClick={handleToggleMarkup}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
               showMarkup ? 'text-[#B8A070]' : 'text-[#6B7C93] hover:bg-[#F5F5F5]'
             }`}
@@ -877,6 +1016,9 @@ Rules:
           >
             {rippleEnabled ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
             Ripple
+            {rippleScanning && (
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse ml-0.5" style={{ backgroundColor: RIPPLE_WARN, display: 'inline-block' }} />
+            )}
           </motion.button>
 
           <div className="h-4 w-px bg-[#EBEBEB]" />
@@ -974,27 +1116,32 @@ Rules:
           )}
 
           {paragraphs.length === 0 ? (
-            <div
-              contentEditable
-              suppressContentEditableWarning
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault()
+            <div className="relative">
+              <div
+                contentEditable
+                suppressContentEditableWarning
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    const text = e.currentTarget.textContent.trim()
+                    if (text) {
+                      setParagraphs([{ id: `p${Date.now()}`, type: 'paragraph', text, baseline: text, comments: [] }])
+                    }
+                  }
+                }}
+                onBlur={(e) => {
                   const text = e.currentTarget.textContent.trim()
                   if (text) {
                     setParagraphs([{ id: `p${Date.now()}`, type: 'paragraph', text, baseline: text, comments: [] }])
                   }
-                }
-              }}
-              onBlur={(e) => {
-                const text = e.currentTarget.textContent.trim()
-                if (text) {
-                  setParagraphs([{ id: `p${Date.now()}`, type: 'paragraph', text, baseline: text, comments: [] }])
-                }
-              }}
-              className="text-base leading-[1.85] text-[#9B9A97] outline-none cursor-text"
-              style={{ minHeight: '1.85em', caretColor: GOLD }}
-            />
+                }}
+                className="text-base leading-[1.85] outline-none cursor-text relative z-10"
+                style={{ minHeight: '1.85em', caretColor: GOLD, color: 'var(--p-text-primary)' }}
+              />
+              <div className="absolute inset-0 pointer-events-none select-none text-base leading-[1.85]" style={{ color: 'var(--p-text-muted)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
+                Start writing here…
+              </div>
+            </div>
           ) : paragraphs.map((para, index) => (
             <DocumentParagraph
               key={para.id}
@@ -1032,6 +1179,7 @@ Rules:
               onRejectSuggestion={handleRejectSuggestion}
               onAcceptOrigin={handleAcceptOrigin}
               onRejectOrigin={handleRejectOrigin}
+              onTypeChange={handleParagraphTypeChange}
             />
           ))}
         </div>
@@ -1166,6 +1314,15 @@ Rules:
                 {sidebarTab === 'ripple' && (
                   <motion.div key="ripple" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={SPRING_SMOOTH} className="p-4 space-y-3">
                     <SidebarSectionLabel label="Impact Analysis" count={pendingRipples} />
+                    <motion.button
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => setShowRippleScopeModal(true)}
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-lg border text-[11px] font-medium transition-colors hover:bg-[#F5F5F5]"
+                      style={{ borderColor: '#E9E9E7', color: '#6B7C93', fontFamily: 'system-ui, sans-serif' }}
+                    >
+                      <span>Expand Scope</span>
+                      <ChevronDown className="w-3 h-3" />
+                    </motion.button>
                     {!rippleEnabled && (
                       <p className="px-3 py-2.5 bg-[#F5F5F5] rounded-lg text-[11px] text-[#6B7C93] leading-relaxed">
                         Ripple is off. Enable it in the toolbar to detect cross-section impacts.
@@ -1292,6 +1449,17 @@ Rules:
         )}
       </motion.div>
 
+      {/* ═══ RIPPLE SCOPE MODAL ═══════════════════════════════ */}
+      <AnimatePresence>
+        {showRippleScopeModal && (
+          <RippleScopeModal
+            currentId={id}
+            currentTitle={conversationTitle}
+            onClose={() => setShowRippleScopeModal(false)}
+          />
+        )}
+      </AnimatePresence>
+
       {/* ═══ SUBMIT CONFIRMATION MODAL ════════════════════════ */}
       <AnimatePresence>
         {showSubmitConfirm && (
@@ -1367,6 +1535,12 @@ Rules:
 /*  DOCUMENT PARAGRAPH — contentEditable with tracked changes  */
 /* ═══════════════════════════════════════════════════════════ */
 
+const SLASH_OPTIONS = [
+  { id: 'h1',    label: 'Heading 1',  description: 'Large section title',  type: 'heading'  },
+  { id: 'h2',    label: 'Heading 2',  description: 'Subsection title',     type: 'heading2' },
+  { id: 'quote', label: 'Quote',      description: 'Blockquote callout',   type: 'quote'    },
+]
+
 function DocumentParagraph({
   para, index, showMarkup, selected, activeTool,
   onSelect, onTextChange, onSplit, onMerge, paragraphs,
@@ -1375,10 +1549,14 @@ function DocumentParagraph({
   onToggleComment, hoveredRipple, onHoverRipple, rippleEnabled,
   replyingTo, setReplyingTo, replyInputs, setReplyInputs, submittedReplies, onSubmitReply,
   onAcceptSuggestion, onRejectSuggestion, onAcceptOrigin, onRejectOrigin,
+  onTypeChange,
 }) {
   const editRef = useRef(null)
   const isComposing = useRef(false)
   const skipNextSync = useRef(false)
+  const [slashOpen,   setSlashOpen]   = useState(false)
+  const [slashFilter, setSlashFilter] = useState('')
+  const [slashIndex,  setSlashIndex]  = useState(0)
 
   // Sync para.text → DOM whenever text changes.
   // showMarkup is NOT a dependency — contentEditable is always mounted now.
@@ -1400,11 +1578,52 @@ function DocumentParagraph({
   const handleInput = (e) => {
     if (isComposing.current) return
     skipNextSync.current = true
-    onTextChange(para.id, e.currentTarget.textContent)
+    const text = e.currentTarget.textContent
+    onTextChange(para.id, text)
+    if (text === '/' || (text.startsWith('/') && !text.includes('\n'))) {
+      setSlashOpen(true)
+      setSlashFilter(text.slice(1).toLowerCase())
+      setSlashIndex(0)
+    } else {
+      setSlashOpen(false)
+    }
   }
 
   const handleKeyDown = (e) => {
     if (isComposing.current) return
+
+    // Slash menu navigation
+    if (slashOpen) {
+      const filtered = SLASH_OPTIONS.filter(opt =>
+        opt.label.toLowerCase().includes(slashFilter) || opt.id.includes(slashFilter)
+      )
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setSlashIndex(i => (i + 1) % Math.max(filtered.length, 1))
+        return
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setSlashIndex(i => (i - 1 + Math.max(filtered.length, 1)) % Math.max(filtered.length, 1))
+        return
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        const opt = filtered[slashIndex]
+        if (opt && onTypeChange) {
+          onTypeChange(para.id, opt.type)
+          onTextChange(para.id, '')
+          setSlashOpen(false)
+          skipNextSync.current = false
+        }
+        return
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        setSlashOpen(false)
+        return
+      }
+    }
 
     if (e.key === 'Enter') {
       e.preventDefault()
@@ -1489,14 +1708,35 @@ function DocumentParagraph({
             onCompositionStart={() => { isComposing.current = true }}
             onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
             className="text-2xl font-semibold leading-tight tracking-tight outline-none"
-            style={{ caretColor: GOLD, color: (showMarkup || activeHighlight) ? 'transparent' : '#1E2532' }}
+            style={{ caretColor: GOLD, color: (showMarkup || activeHighlight) ? 'transparent' : 'var(--p-text-primary)' }}
           />
           {(showMarkup || activeHighlight) && (
-            <h1 className="absolute inset-0 text-2xl font-semibold leading-tight tracking-tight pointer-events-none select-none" style={{ color: '#1E2532' }}>
+            <h1 className="absolute inset-0 text-2xl font-semibold leading-tight tracking-tight pointer-events-none select-none" style={{ color: 'var(--p-text-primary)' }}>
               {activeHighlight
                 ? <HighlightedText text={para.text} highlight={activeHighlight} />
                 : <DiffText baseline={para.baseline} text={para.text} />}
             </h1>
+          )}
+        </div>
+      </motion.div>
+    )
+  }
+
+  if (para.type === 'heading2') {
+    return (
+      <motion.div data-para-id={para.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPRING_GENTLE, delay: Math.min(index * 0.04, 0.3) }} className="mb-6 mt-3" onClick={handleClick}>
+        <div className="relative">
+          <h2 ref={editRef} data-editable contentEditable suppressContentEditableWarning
+            onInput={handleInput} onKeyDown={handleKeyDown} onPaste={handlePaste}
+            onCompositionStart={() => { isComposing.current = true }}
+            onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
+            className="text-xl font-semibold leading-tight outline-none"
+            style={{ caretColor: GOLD, color: (showMarkup || activeHighlight) ? 'transparent' : 'var(--p-text-primary)' }}
+          />
+          {(showMarkup || activeHighlight) && (
+            <h2 className="absolute inset-0 text-xl font-semibold leading-tight pointer-events-none select-none" style={{ color: 'var(--p-text-primary)' }}>
+              {activeHighlight ? <HighlightedText text={para.text} highlight={activeHighlight} /> : <DiffText baseline={para.baseline} text={para.text} />}
+            </h2>
           )}
         </div>
       </motion.div>
@@ -1535,27 +1775,59 @@ function DocumentParagraph({
                 onPaste={handlePaste}
                 onCompositionStart={() => { isComposing.current = true }}
                 onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
-                className="text-base leading-[1.85] outline-none w-full"
+                className={`text-base leading-[1.85] outline-none w-full${para.type === 'quote' ? ' italic pl-4 border-l-2' : ''}`}
                 style={{
                   caretColor: GOLD,
                   whiteSpace: 'pre-wrap',
                   wordBreak: 'break-word',
                   minHeight: '1.85em',
-                  // Make text transparent so the overlay shows through while keeping editing fully functional
-                  color: (showMarkup || activeHighlight) ? 'transparent' : '#1E2532',
+                  color: (showMarkup || activeHighlight) ? 'transparent' : (para.type === 'quote' ? 'var(--p-text-secondary)' : 'var(--p-text-primary)'),
+                  ...(para.type === 'quote' ? { borderLeftColor: `${GOLD}50` } : {}),
                 }}
               />
               {/* Overlay — diff in markup mode, or highlight when a comment is active */}
               {(showMarkup || activeHighlight) && (
                 <p
-                  className="absolute inset-0 text-base leading-[1.85] pointer-events-none select-none"
-                  style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', minHeight: '1.85em', color: '#1E2532' }}
+                  className={`absolute inset-0 text-base leading-[1.85] pointer-events-none select-none${para.type === 'quote' ? ' italic pl-4 border-l-2' : ''}`}
+                  style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', minHeight: '1.85em', color: para.type === 'quote' ? 'var(--p-text-secondary)' : 'var(--p-text-primary)', ...(para.type === 'quote' ? { borderLeftColor: `${GOLD}50` } : {}) }}
                 >
                   {activeHighlight
                     ? <HighlightedText text={para.text} highlight={activeHighlight} />
                     : <DiffText baseline={para.baseline} text={para.text} />}
                 </p>
               )}
+              {/* Slash command menu */}
+              {slashOpen && (() => {
+                const filtered = SLASH_OPTIONS.filter(opt =>
+                  opt.label.toLowerCase().includes(slashFilter) || opt.id.includes(slashFilter)
+                )
+                if (!filtered.length) return null
+                return (
+                  <div
+                    className="absolute top-full left-0 mt-1 bg-white rounded-lg border border-[#E9E9E7] shadow-md py-1 w-52"
+                    style={{ zIndex: 50, fontFamily: 'system-ui, sans-serif' }}
+                    onMouseDown={e => e.preventDefault()}
+                  >
+                    {filtered.map((opt, i) => (
+                      <div
+                        key={opt.id}
+                        className="px-3 py-2 cursor-pointer transition-colors"
+                        style={{ backgroundColor: i === slashIndex ? `${GOLD}18` : 'transparent' }}
+                        onMouseEnter={() => setSlashIndex(i)}
+                        onClick={() => {
+                          if (onTypeChange) onTypeChange(para.id, opt.type)
+                          onTextChange(para.id, '')
+                          setSlashOpen(false)
+                          skipNextSync.current = false
+                        }}
+                      >
+                        <div className="text-[12px] font-medium text-[#1E2532]">{opt.label}</div>
+                        <div className="text-[10px] text-[#6B7C93]">{opt.description}</div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })()}
             </div>
 
             {/* Claude inline suggestion previews — markup mode only */}
@@ -1731,23 +2003,26 @@ function MarginComment({ comment, expanded, isActive, onToggle, onActivate, repl
                   <p className="text-[10px] text-[#6B5D1F] leading-relaxed">{reply.text}</p>
                 </div>
               ))}
-              {!isReplying ? (
-                <motion.button whileTap={{ scale: 0.95 }} onClick={e => { e.stopPropagation(); setReplyingTo(comment.id) }} className="mt-1.5 text-[9px] font-medium transition-colors" style={{ color: `${GOLD}99` }} onMouseEnter={e => e.currentTarget.style.color = GOLD} onMouseLeave={e => e.currentTarget.style.color = `${GOLD}99`}>Reply</motion.button>
-              ) : (
-                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} transition={SPRING_SMOOTH} className="flex items-center gap-1.5 mt-2" onClick={e => e.stopPropagation()}>
-                  <input
-                    autoFocus type="text" placeholder="Reply to Claude…"
-                    value={replyInput} onChange={e => onReplyChange(e.target.value)}
-                    onKeyDown={e => { e.stopPropagation(); if (e.key === 'Enter') { e.preventDefault(); onSubmitReply() } if (e.key === 'Escape') setReplyingTo(null) }}
-                    className="flex-1 px-2 py-1 text-[10px] bg-white border border-[#E5D9A8] rounded focus:outline-none focus:border-[#B8A070] transition-colors text-[#1E2532]"
-                  />
-                  <motion.button whileTap={{ scale: 0.9 }} onClick={onSubmitReply} className="p-1 rounded transition-colors" style={{ color: GOLD }}><Send className="w-3 h-3" /></motion.button>
-                </motion.div>
-              )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+      {/* Reply section — always available */}
+      <div className="mt-1.5" onClick={e => e.stopPropagation()}>
+        {!isReplying ? (
+          <motion.button whileTap={{ scale: 0.95 }} onClick={e => { e.stopPropagation(); setReplyingTo(comment.id) }} className="text-[9px] font-medium transition-colors" style={{ color: `${GOLD}99` }} onMouseEnter={e => e.currentTarget.style.color = GOLD} onMouseLeave={e => e.currentTarget.style.color = `${GOLD}99`}>Reply</motion.button>
+        ) : (
+          <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} transition={SPRING_SMOOTH} className="flex items-center gap-1.5">
+            <input
+              autoFocus type="text" placeholder="Reply…"
+              value={replyInput} onChange={e => onReplyChange(e.target.value)}
+              onKeyDown={e => { e.stopPropagation(); if (e.key === 'Enter') { e.preventDefault(); onSubmitReply() } if (e.key === 'Escape') setReplyingTo(null) }}
+              className="flex-1 px-2 py-1 text-[10px] bg-white border border-[#E5D9A8] rounded focus:outline-none focus:border-[#B8A070] transition-colors text-[#1E2532]"
+            />
+            <motion.button whileTap={{ scale: 0.9 }} onClick={onSubmitReply} className="p-1 rounded transition-colors" style={{ color: GOLD }}><Send className="w-3 h-3" /></motion.button>
+          </motion.div>
+        )}
+      </div>
     </motion.div>
   )
 }
@@ -1806,24 +2081,27 @@ function CommentCard({ comment, expanded, isActive, onToggle, onActivate, onJump
                 {submittedReplies.map((reply, i) => (
                   <div key={i} className="mt-2 pt-2 border-t border-[#E5D9A8]/40"><p className="text-[10px] text-[#6B5D1F] leading-relaxed">{reply.text}</p></div>
                 ))}
-                {!isReplying ? (
-                  <motion.button whileTap={{ scale: 0.95 }} onClick={() => setReplyingTo(comment.id)} className="mt-1.5 text-[9px] font-medium transition-colors" style={{ color: `${GOLD}99` }} onMouseEnter={e => e.currentTarget.style.color = GOLD} onMouseLeave={e => e.currentTarget.style.color = `${GOLD}99`}>Reply</motion.button>
-                ) : (
-                  <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} transition={SPRING_SMOOTH} className="flex items-center gap-1.5 mt-2">
-                    <input
-                      autoFocus type="text" placeholder="Reply to Claude…"
-                      value={replyInput} onChange={e => onReplyChange(e.target.value)}
-                      onKeyDown={e => { e.stopPropagation(); if (e.key === 'Enter') { e.preventDefault(); onSubmitReply() } if (e.key === 'Escape') setReplyingTo(null) }}
-                      className="flex-1 px-2 py-1 text-[10px] bg-white border border-[#E5D9A8] rounded focus:outline-none focus:border-[#B8A070] transition-colors text-[#1E2532]"
-                    />
-                    <motion.button whileTap={{ scale: 0.9 }} onClick={onSubmitReply} className="p-1 rounded transition-colors" style={{ color: GOLD }}><Send className="w-3 h-3" /></motion.button>
-                  </motion.div>
-                )}
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       )}
+      {/* Reply section — always available */}
+      <div className="mt-2">
+        {!isReplying ? (
+          <motion.button whileTap={{ scale: 0.95 }} onClick={e => { e.stopPropagation(); setReplyingTo(comment.id) }} className="text-[9px] font-medium transition-colors" style={{ color: `${GOLD}99` }} onMouseEnter={e => e.currentTarget.style.color = GOLD} onMouseLeave={e => e.currentTarget.style.color = `${GOLD}99`}>Reply</motion.button>
+        ) : (
+          <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} transition={SPRING_SMOOTH} className="flex items-center gap-1.5">
+            <input
+              autoFocus type="text" placeholder="Reply…"
+              value={replyInput} onChange={e => onReplyChange(e.target.value)}
+              onKeyDown={e => { e.stopPropagation(); if (e.key === 'Enter') { e.preventDefault(); onSubmitReply() } if (e.key === 'Escape') setReplyingTo(null) }}
+              className="flex-1 px-2 py-1 text-[10px] bg-white border border-[#E5D9A8] rounded focus:outline-none focus:border-[#B8A070] transition-colors text-[#1E2532]"
+            />
+            <motion.button whileTap={{ scale: 0.9 }} onClick={onSubmitReply} className="p-1 rounded transition-colors" style={{ color: GOLD }}><Send className="w-3 h-3" /></motion.button>
+          </motion.div>
+        )}
+      </div>
     </motion.div>
   )
 }
@@ -2013,5 +2291,125 @@ function ChatShortcut({ label, onClick }) {
     >
       {label}
     </motion.button>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  RIPPLE SCOPE MODAL                                         */
+/* ═══════════════════════════════════════════════════════════ */
+
+function RippleScopeModal({ currentId, currentTitle, onClose }) {
+  const [conversations, setConversations] = useState([])
+  const [selected, setSelected] = useState(new Set())
+  const [generateManifest, setGenerateManifest] = useState(false)
+  const [saveScope, setSaveScope] = useState(false)
+
+  useEffect(() => {
+    listConversations().then(all => setConversations(all.filter(c => c.id !== currentId)))
+  }, [currentId])
+
+  const toggleAll = () => {
+    if (selected.size === conversations.length) setSelected(new Set())
+    else setSelected(new Set(conversations.map(c => c.id)))
+  }
+
+  const toggle = (id) => setSelected(prev => {
+    const n = new Set(prev)
+    n.has(id) ? n.delete(id) : n.add(id)
+    return n
+  })
+
+  // Rough token estimate: ~500 tokens per chat scanned
+  const estTokens = selected.size * 500
+  const estCost = (estTokens / 1000000 * 3).toFixed(2)
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="absolute inset-0 z-50 flex items-center justify-center"
+      style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 8 }}
+        transition={SPRING_SMOOTH}
+        onClick={e => e.stopPropagation()}
+        className="bg-white rounded-xl shadow-2xl shadow-black/10 border border-[#E9E9E7] p-6 w-[480px] max-h-[70vh] flex flex-col"
+        style={{ fontFamily: 'system-ui, sans-serif' }}
+      >
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h3 className="text-sm font-semibold text-[#1E2532]">Expand Ripple Scope</h3>
+            <p className="text-xs text-[#6B7C93] mt-1">Select chats to scan for cross-document consistency impacts.</p>
+          </div>
+          <motion.button whileTap={{ scale: 0.9 }} onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#F5F5F5] text-[#6B7C93]"><X className="w-4 h-4" /></motion.button>
+        </div>
+
+        {/* Select all */}
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[10px] font-semibold text-[#6B7C93] uppercase tracking-wider">Chats</span>
+          <button onClick={toggleAll} className="text-[10px] font-medium transition-colors" style={{ color: GOLD }}>
+            {selected.size === conversations.length ? 'Deselect All' : 'Select All'}
+          </button>
+        </div>
+
+        {/* Chat list */}
+        <div className="flex-1 overflow-y-auto space-y-1 mb-4 min-h-0">
+          {conversations.length === 0 && (
+            <p className="text-[11px] text-[#6B7C93] text-center py-6">No other chats found.</p>
+          )}
+          {conversations.map(conv => (
+            <label key={conv.id} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#F5F5F5] cursor-pointer transition-colors">
+              <input
+                type="checkbox"
+                checked={selected.has(conv.id)}
+                onChange={() => toggle(conv.id)}
+                className="rounded"
+                style={{ accentColor: GOLD }}
+              />
+              <span className="text-[11px] text-[#1E2532] flex-1 truncate">{conv.title || 'Untitled'}</span>
+            </label>
+          ))}
+        </div>
+
+        {/* Token estimate */}
+        {selected.size > 0 && (
+          <div className="px-3 py-2 rounded-lg bg-[#F5F5F5] mb-4 text-[11px] text-[#6B7C93]">
+            Scanning {selected.size} chat{selected.size !== 1 ? 's' : ''} · ~{estTokens.toLocaleString()} tokens · estimated cost ${estCost}
+          </div>
+        )}
+
+        {/* Options */}
+        <div className="space-y-2 mb-4">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={generateManifest} onChange={e => setGenerateManifest(e.target.checked)} style={{ accentColor: GOLD }} />
+            <div>
+              <span className="text-[11px] font-medium text-[#1E2532]">Generate Revision Manifest</span>
+              <p className="text-[10px] text-[#6B7C93]">Save results as a persistent manifest you can act on later</p>
+            </div>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={saveScope} onChange={e => setSaveScope(e.target.checked)} style={{ accentColor: GOLD }} />
+            <div>
+              <span className="text-[11px] font-medium text-[#1E2532]">Save Scope</span>
+              <p className="text-[10px] text-[#6B7C93]">Remember this chat list across sessions</p>
+            </div>
+          </label>
+        </div>
+
+        <div className="flex items-center gap-2 justify-end">
+          <motion.button whileTap={{ scale: 0.97 }} onClick={onClose} className="px-4 py-2 text-xs font-semibold text-[#6B7C93] hover:bg-[#F5F5F5] rounded-lg transition-colors">Cancel</motion.button>
+          <motion.button
+            whileHover={selected.size > 0 ? { scale: 1.02 } : {}}
+            whileTap={selected.size > 0 ? { scale: 0.97 } : {}}
+            disabled={selected.size === 0}
+            className="px-5 py-2 text-white text-xs font-semibold rounded-lg shadow-sm transition-opacity"
+            style={{ backgroundColor: selected.size > 0 ? GOLD : '#D5D5D5' }}
+          >
+            Scan {selected.size > 0 ? `${selected.size} Chat${selected.size !== 1 ? 's' : ''}` : 'Chats'}
+          </motion.button>
+        </div>
+      </motion.div>
+    </motion.div>
   )
 }

@@ -97,10 +97,10 @@ export default function TableCanvas({ fileId, sortColumn, sortDir, onSort, filte
   const hasMore = visibleRows < totalRows
 
   return (
-    <div className="h-full overflow-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}>
+    <div className="h-full overflow-auto plcn-scroll" style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}>
       <table className="w-full text-xs border-collapse">
         <thead className="sticky top-0 z-10">
-          <tr style={{ backgroundColor: '#FAFAFA' }}>
+          <tr className="plcn-table-head" style={{ backgroundColor: '#FAFAFA' }}>
             {columns.map(({ key, type }) => (
               <th
                 key={key}
@@ -133,7 +133,7 @@ export default function TableCanvas({ fileId, sortColumn, sortDir, onSort, filte
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.15, delay: Math.min(i * 0.01, 0.3) }}
-              className="hover:bg-[#FAFAFA] transition-colors cursor-default"
+              className="hover:bg-[#FAFAFA] transition-colors cursor-default plcn-table-row"
               style={{ borderBottom: '1px solid #F1F1EF' }}
             >
               {columns.map(({ key, type }) => (
@@ -156,7 +156,7 @@ export default function TableCanvas({ fileId, sortColumn, sortDir, onSort, filte
 
       {/* Footer */}
       <div
-        className="px-4 py-3 flex items-center justify-between sticky bottom-0 bg-[#FAFAFA]"
+        className="px-4 py-3 flex items-center justify-between sticky bottom-0 bg-[#FAFAFA] plcn-table-foot"
         style={{ borderTop: '1px solid #F1F1EF' }}
       >
         <span className="text-[10px] text-[#787774]">

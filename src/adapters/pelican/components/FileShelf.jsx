@@ -5,6 +5,7 @@ import {
   Wand2, FileSpreadsheet, Link2, Unlink, ChevronLeft,
 } from 'lucide-react'
 import { usePelican } from '../../../stores/PelicanContext'
+import { useSettings } from '../../../stores/SettingsContext'
 import { SPRING_SMOOTH, SPRING_SNAPPY } from '../../../lib/constants'
 
 const staggerContainer = {
@@ -51,7 +52,7 @@ export default function FileShelf({ conversationId, onNavigateBack }) {
       initial={{ x: -260 }}
       animate={{ x: 0 }}
       transition={SPRING_SMOOTH}
-      className="w-[260px] flex flex-col flex-shrink-0 bg-white"
+      className="w-[260px] flex flex-col flex-shrink-0 bg-white plcn-shelf"
       style={{ borderRight: '1px solid #F1F1EF' }}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -247,6 +248,8 @@ export default function FileShelf({ conversationId, onNavigateBack }) {
 // ─── FileCard ─────────────────────────────────────────────
 
 function FileCard({ file, active, inContext, onClick, onToggleContext, onRemove }) {
+  const { settings } = useSettings()
+  const isDark = settings.theme === 'dark'
   const typeColor = file.type === 'csv' || file.type === 'tsv' ? '#0F7B6C'
                   : file.type === 'xlsx' || file.type === 'xls' ? '#D9730D'
                   : '#787774'
@@ -269,7 +272,7 @@ function FileCard({ file, active, inContext, onClick, onToggleContext, onRemove 
         <div className="flex items-start gap-2.5">
           <div
             className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
-            style={{ backgroundColor: active ? 'rgba(184,160,112,0.1)' : '#F7F6F3' }}
+            style={{ backgroundColor: active ? 'rgba(184,160,112,0.1)' : (isDark ? 'rgba(255,255,255,0.06)' : '#F7F6F3') }}
           >
             <FileSpreadsheet
               className="w-3.5 h-3.5"

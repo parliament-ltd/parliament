@@ -34,6 +34,7 @@ export default function InspectorPanel({ conversationId, contextUsage, contextTh
 
   const { messages, isStreaming, streamingContent, sendMessage, stopGenerating } = useChat()
   const { settings } = useSettings()
+  const isDark = settings.theme === 'dark'
   const { conversations } = useConversations()
 
   const [columnStats, setColumnStats] = useState([])
@@ -100,7 +101,7 @@ export default function InspectorPanel({ conversationId, contextUsage, contextTh
     <motion.div
       animate={{ width: inspectorCollapsed ? 48 : 380 }}
       transition={SIDEBAR_RESIZE}
-      className="flex flex-col flex-shrink-0 relative overflow-hidden bg-white"
+      className="flex flex-col flex-shrink-0 relative overflow-hidden bg-white plcn-inspector"
       style={{ borderLeft: '1px solid #F1F1EF' }}
     >
       <AnimatePresence mode="wait">
@@ -139,7 +140,7 @@ export default function InspectorPanel({ conversationId, contextUsage, contextTh
           >
             {/* Inspector header */}
             <div
-              className="flex items-center justify-between px-4 py-3 flex-shrink-0"
+              className="flex items-center justify-between px-4 py-3 flex-shrink-0 plcn-insp-bar"
               style={{ borderBottom: '1px solid #F1F1EF' }}
             >
               <div className="flex items-center gap-2">
@@ -159,7 +160,7 @@ export default function InspectorPanel({ conversationId, contextUsage, contextTh
 
             {/* Schema inspector */}
             <div
-              className="overflow-y-auto flex-shrink-0"
+              className="overflow-y-auto flex-shrink-0 plcn-insp-schema plcn-scroll"
               style={{ maxHeight: 'calc(50vh - 48px)', scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}
             >
               {hasData && columnStats.length > 0 ? (
@@ -219,7 +220,7 @@ export default function InspectorPanel({ conversationId, contextUsage, contextTh
 
               {/* Messages */}
               <div
-                className="flex-1 overflow-y-auto px-3 py-3 space-y-3"
+                className="flex-1 overflow-y-auto px-3 py-3 space-y-3 plcn-scroll"
                 style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}
               >
                 {messages.length === 0 ? (
@@ -301,6 +302,8 @@ export default function InspectorPanel({ conversationId, contextUsage, contextTh
 // ─── ColumnRow ────────────────────────────────────────────
 
 function ColumnRow({ column, selected, onClick }) {
+  const { settings } = useSettings()
+  const isDark = settings.theme === 'dark'
   const Icon = TYPE_ICONS[column.type] || Type
   const typeColors = {
     number: '#B8A070',
@@ -312,7 +315,7 @@ function ColumnRow({ column, selected, onClick }) {
 
   return (
     <motion.button
-      whileHover={{ x: 2, backgroundColor: '#FAFAFA' }}
+      whileHover={{ x: 2, backgroundColor: isDark ? '#141209' : '#FAFAFA' }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
       className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center gap-2 ${
