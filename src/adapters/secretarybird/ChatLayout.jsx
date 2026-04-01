@@ -100,7 +100,7 @@ function HighlightedText({ text, highlight }) {
   return (
     <>
       {idx > 0 && <span style={{ color: '#1E2532' }}>{text.slice(0, idx)}</span>}
-      <mark style={{ backgroundColor: 'rgba(184,160,112,0.28)', color: '#1E2532', borderRadius: '2px', padding: '1px 0', boxShadow: `0 0 0 1.5px rgba(184,160,112,0.35)` }}>
+      <mark style={{ backgroundColor: 'rgba(255, 213, 50, 0.38)', color: '#1E2532', borderRadius: '2px', padding: '1px 0' }}>
         {text.slice(idx, idx + highlight.length)}
       </mark>
       {idx + highlight.length < text.length && <span style={{ color: '#1E2532' }}>{text.slice(idx + highlight.length)}</span>}
@@ -931,7 +931,7 @@ Rules:
               onMouseDown={(e) => {
                 e.preventDefault() // keep selection alive
                 setAddingCommentToParaId(selectionInfo.paraId)
-                setSelectionInfo(null)
+                // Don't clear selectionInfo here — handleAddComment needs it to attach selectedText to the comment
               }}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium text-white shadow-lg whitespace-nowrap"
               style={{ backgroundColor: GOLD }}
@@ -1008,7 +1008,7 @@ Rules:
               newCommentText={newCommentText}
               onCommentTextChange={setNewCommentText}
               onAddComment={handleAddComment}
-              onCancelComment={() => { setAddingCommentToParaId(null); setNewCommentText('') }}
+              onCancelComment={() => { setAddingCommentToParaId(null); setNewCommentText(''); setSelectionInfo(null) }}
               onStartAddComment={() => setAddingCommentToParaId(para.id)}
               expandedComments={expandedComments}
               activeCommentId={activeCommentId}
