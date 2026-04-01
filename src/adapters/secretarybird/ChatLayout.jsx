@@ -772,6 +772,7 @@ Rules:
       if (showMarkupRef.current) return  // markup mode — no editables
       const active = document.activeElement
       if (active?.contentEditable === 'true') return  // editable already focused — all good
+      if (active?.tagName === 'INPUT' || active?.tagName === 'TEXTAREA') return  // native input — don't steal keystrokes
       if (e.key === ' ' || e.key === 'PageDown' || e.key === 'PageUp') {
         e.preventDefault()
         const editables = document.querySelectorAll('[data-editable]')
