@@ -1456,12 +1456,12 @@ function DocumentParagraph({
           onCompositionStart={() => { isComposing.current = true }}
           onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
           className="text-2xl font-semibold text-[#1E2532] leading-tight tracking-tight outline-none"
-          style={{ caretColor: GOLD }}
+          style={{ caretColor: GOLD, display: showMarkup ? 'none' : undefined }}
         />
-        {showMarkup && para.text !== para.baseline && (
-          <div className="mt-1 pl-3 border-l-2 border-[#E9E7E3] text-xl font-semibold leading-tight select-none pointer-events-none">
+        {showMarkup && (
+          <h1 className="text-2xl font-semibold leading-tight tracking-tight select-none pointer-events-none">
             <DiffText baseline={para.baseline} text={para.text} />
-          </div>
+          </h1>
         )}
       </motion.div>
     )
@@ -1487,7 +1487,7 @@ function DocumentParagraph({
               ...(hasOrigin ? { borderLeft: `2px solid ${SUGGESTION}50`, paddingLeft: '10px', backgroundColor: `${SUGGESTION}05` } : {}),
             }}
           >
-            {/* Paragraph text — always editable regardless of markup mode */}
+            {/* Paragraph text — always mounted; hidden via CSS in markup mode (no remount = no duplicate) */}
             <div
               ref={editRef}
               data-editable
@@ -1499,14 +1499,14 @@ function DocumentParagraph({
               onCompositionStart={() => { isComposing.current = true }}
               onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
               className="text-base leading-[1.85] text-[#1E2532] outline-none w-full"
-              style={{ caretColor: GOLD, whiteSpace: 'pre-wrap', wordBreak: 'break-word', minHeight: '1.85em' }}
+              style={{ caretColor: GOLD, whiteSpace: 'pre-wrap', wordBreak: 'break-word', minHeight: '1.85em', display: showMarkup ? 'none' : undefined }}
             />
 
-            {/* Diff annotation — shown below when markup is on and text has changed */}
-            {showMarkup && para.text !== para.baseline && (
-              <div className="mt-1 pl-3 border-l-2 border-[#E9E7E3] text-sm leading-[1.85] select-none pointer-events-none">
+            {/* Inline diff — replaces editable in markup mode, same visual position */}
+            {showMarkup && (
+              <p className="text-base leading-[1.85] text-[#1E2532] select-none pointer-events-none" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', minHeight: '1.85em' }}>
                 <DiffText baseline={para.baseline} text={para.text} />
-              </div>
+              </p>
             )}
 
             {/* Claude inline suggestion previews — markup mode only */}
