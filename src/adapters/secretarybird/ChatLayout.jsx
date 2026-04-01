@@ -157,6 +157,12 @@ function parseResponseToParas(responseText) {
 
 function parseClaudeResponse(responseText, currentParagraphs) {
   const result = { adds: [], edits: [] }
+
+  // Build a set of existing paragraph texts so we can skip duplicates.
+  // Claude sometimes echoes existing content inside "add" blocks — this guard
+  // prevents those from doubling up in the document.
+  const existingTexts = new Set(currentParagraphs.map(p => p.text.trim()))
+
   const jsonBlockRe = /```json\s*([\s\S]*?)```/g
   let match
   while ((match = jsonBlockRe.exec(responseText)) !== null) {
@@ -165,6 +171,8 @@ function parseClaudeResponse(responseText, currentParagraphs) {
       if (action.type === 'add' && Array.isArray(action.paragraphs)) {
         for (const p of action.paragraphs) {
           const text = String(p.text || '')
+          // Skip if this text is already in the document
+          if (existingTexts.has(text.trim())) continue
           result.adds.push({
             id: `ai-${crypto.randomUUID()}`,
             type: p.type === 'heading' ? 'heading' : 'paragraph',
@@ -173,6 +181,8 @@ function parseClaudeResponse(responseText, currentParagraphs) {
             comments: [],
             claudeOrigin: true,
           })
+          // Register the new text so subsequent blocks can't re-add it either
+          existingTexts.add(text.trim())
         }
       } else if (action.type === 'edit' && action.paraId) {
         const paraExists = currentParagraphs.some(p => p.id === action.paraId)
@@ -192,9 +202,12 @@ function parseClaudeResponse(responseText, currentParagraphs) {
       // Skip malformed JSON blocks
     }
   }
-  // Fallback: no JSON blocks — treat full response as new paragraphs (Option A)
+  // Fallback: no JSON blocks — treat full response as new paragraphs (Option A),
+  // again filtering against existing content to avoid echoed text being re-added.
   if (result.adds.length === 0 && result.edits.length === 0) {
-    result.adds = parseResponseToParas(responseText).map(p => ({ ...p, claudeOrigin: true }))
+    result.adds = parseResponseToParas(responseText)
+      .filter(p => !existingTexts.has(p.text.trim()))
+      .map(p => ({ ...p, claudeOrigin: true }))
   }
   return result
 }
@@ -520,7 +533,7 @@ ${docWithIds}
 RESPONSE FORMAT:
 Wrap each action in a \`\`\`json ... \`\`\` block. You may include multiple blocks. Follow them with natural language commentary if helpful.
 
-To add new paragraphs (shown in the document as new Claude-authored content):
+To add NEW paragraphs (content that does not already exist in the document):
 \`\`\`json
 { "type": "add", "paragraphs": [{ "type": "paragraph", "text": "..." }] }
 \`\`\`
@@ -531,6 +544,7 @@ To suggest edits to an existing paragraph (shown as green strikethrough/replace)
 \`\`\`
 
 Rules:
+- ONLY include genuinely new text in "add" blocks — never repeat or paraphrase existing paragraph content.
 - For add requests, use only "add" blocks. For edit requests, use only "edit" blocks. You may combine both.
 - Keep each "find" value short, unique, and verbatim from the paragraph text.
 - Use "paragraph" or "heading" for the type in add blocks.
