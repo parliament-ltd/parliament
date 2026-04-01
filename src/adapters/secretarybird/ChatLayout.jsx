@@ -91,6 +91,23 @@ function DiffText({ baseline, text }) {
   )
 }
 
+/* ─── Comment selection highlight renderer ───────────────── */
+
+function HighlightedText({ text, highlight }) {
+  if (!highlight) return <span style={{ color: '#1E2532' }}>{text}</span>
+  const idx = text.indexOf(highlight)
+  if (idx === -1) return <span style={{ color: '#1E2532' }}>{text}</span>
+  return (
+    <>
+      {idx > 0 && <span style={{ color: '#1E2532' }}>{text.slice(0, idx)}</span>}
+      <mark style={{ backgroundColor: 'rgba(184,160,112,0.28)', color: '#1E2532', borderRadius: '2px', padding: '1px 0', boxShadow: `0 0 0 1.5px rgba(184,160,112,0.35)` }}>
+        {text.slice(idx, idx + highlight.length)}
+      </mark>
+      {idx + highlight.length < text.length && <span style={{ color: '#1E2532' }}>{text.slice(idx + highlight.length)}</span>}
+    </>
+  )
+}
+
 /* ─── Migrate old segments-based paragraphs ──────────────── */
 
 function migrateParagraph(p) {
@@ -332,6 +349,7 @@ export default function SecretarybirdChatLayout() {
   const [rippleEnabled,       setRippleEnabled]       = useState(true)
   const [selectedParagraph,   setSelectedParagraph]   = useState(null)
   const [expandedComments,    setExpandedComments]    = useState(new Set())
+  const [activeCommentId,     setActiveCommentId]     = useState(null)
   const [hoveredRipple,       setHoveredRipple]       = useState(null)
   const [chatInput,           setChatInput]           = useState('')
   const [replyingTo,          setReplyingTo]          = useState(null)
@@ -993,6 +1011,9 @@ Rules:
               onCancelComment={() => { setAddingCommentToParaId(null); setNewCommentText('') }}
               onStartAddComment={() => setAddingCommentToParaId(para.id)}
               expandedComments={expandedComments}
+              activeCommentId={activeCommentId}
+              onSetActiveComment={id => setActiveCommentId(prev => prev === id ? null : id)}
+              onClearActiveComment={() => setActiveCommentId(null)}
               onToggleComment={toggleComment}
               hoveredRipple={hoveredRipple}
               onHoverRipple={setHoveredRipple}
@@ -1113,7 +1134,9 @@ Rules:
                             key={comment.id}
                             comment={comment}
                             expanded={expandedComments.has(comment.id)}
+                            isActive={activeCommentId === comment.id}
                             onToggle={() => toggleComment(comment.id)}
+                            onActivate={() => setActiveCommentId(prev => prev === comment.id ? null : comment.id)}
                             onJump={() => setSelectedParagraph(para.id)}
                             replyingTo={replyingTo}
                             setReplyingTo={setReplyingTo}
@@ -1344,7 +1367,8 @@ function DocumentParagraph({
   para, index, showMarkup, selected, activeTool,
   onSelect, onTextChange, onSplit, onMerge, paragraphs,
   addingComment, newCommentText, onCommentTextChange, onAddComment, onCancelComment, onStartAddComment,
-  expandedComments, onToggleComment, hoveredRipple, onHoverRipple, rippleEnabled,
+  expandedComments, activeCommentId, onSetActiveComment, onClearActiveComment,
+  onToggleComment, hoveredRipple, onHoverRipple, rippleEnabled,
   replyingTo, setReplyingTo, replyInputs, setReplyInputs, submittedReplies, onSubmitReply,
   onAcceptSuggestion, onRejectSuggestion, onAcceptOrigin, onRejectOrigin,
 }) {
@@ -1436,6 +1460,10 @@ function DocumentParagraph({
   const hasRipple       = para.ripple && rippleEnabled
   const isRippleHovered = hoveredRipple === para.id
 
+  // Highlight the selected text that an active comment was made on
+  const activeComment   = para.comments?.find(c => c.id === activeCommentId) ?? null
+  const activeHighlight = activeComment?.selectedText || null
+
   if (para.type === 'heading') {
     return (
       <motion.div
@@ -1445,24 +1473,28 @@ function DocumentParagraph({
         className="mb-8 mt-4"
         onClick={handleClick}
       >
-        <h1
-          ref={editRef}
-          data-editable
-          contentEditable
-          suppressContentEditableWarning
-          onInput={handleInput}
-          onKeyDown={handleKeyDown}
-          onPaste={handlePaste}
-          onCompositionStart={() => { isComposing.current = true }}
-          onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
-          className="text-2xl font-semibold text-[#1E2532] leading-tight tracking-tight outline-none"
-          style={{ caretColor: GOLD, display: showMarkup ? 'none' : undefined }}
-        />
-        {showMarkup && (
-          <h1 className="text-2xl font-semibold leading-tight tracking-tight select-none pointer-events-none">
-            <DiffText baseline={para.baseline} text={para.text} />
-          </h1>
-        )}
+        <div className="relative">
+          <h1
+            ref={editRef}
+            data-editable
+            contentEditable
+            suppressContentEditableWarning
+            onInput={handleInput}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            onCompositionStart={() => { isComposing.current = true }}
+            onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
+            className="text-2xl font-semibold leading-tight tracking-tight outline-none"
+            style={{ caretColor: GOLD, color: (showMarkup || activeHighlight) ? 'transparent' : '#1E2532' }}
+          />
+          {(showMarkup || activeHighlight) && (
+            <h1 className="absolute inset-0 text-2xl font-semibold leading-tight tracking-tight pointer-events-none select-none" style={{ color: '#1E2532' }}>
+              {activeHighlight
+                ? <HighlightedText text={para.text} highlight={activeHighlight} />
+                : <DiffText baseline={para.baseline} text={para.text} />}
+            </h1>
+          )}
+        </div>
       </motion.div>
     )
   }
@@ -1473,7 +1505,7 @@ function DocumentParagraph({
       initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       transition={{ ...SPRING_GENTLE, delay: Math.min(index * 0.04, 0.3) }}
       className="relative group mb-6"
-      onClick={() => { if (editRef.current) editRef.current.focus() }}
+      onClick={() => { onClearActiveComment(); if (editRef.current) editRef.current.focus() }}
     >
       <div className="flex">
         {/* Document column */}
@@ -1487,27 +1519,40 @@ function DocumentParagraph({
               ...(hasOrigin ? { borderLeft: `2px solid ${SUGGESTION}50`, paddingLeft: '10px', backgroundColor: `${SUGGESTION}05` } : {}),
             }}
           >
-            {/* Paragraph text — always mounted; hidden via CSS in markup mode (no remount = no duplicate) */}
-            <div
-              ref={editRef}
-              data-editable
-              contentEditable
-              suppressContentEditableWarning
-              onInput={handleInput}
-              onKeyDown={handleKeyDown}
-              onPaste={handlePaste}
-              onCompositionStart={() => { isComposing.current = true }}
-              onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
-              className="text-base leading-[1.85] text-[#1E2532] outline-none w-full"
-              style={{ caretColor: GOLD, whiteSpace: 'pre-wrap', wordBreak: 'break-word', minHeight: '1.85em', display: showMarkup ? 'none' : undefined }}
-            />
-
-            {/* Inline diff — replaces editable in markup mode, same visual position */}
-            {showMarkup && (
-              <p className="text-base leading-[1.85] text-[#1E2532] select-none pointer-events-none" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', minHeight: '1.85em' }}>
-                <DiffText baseline={para.baseline} text={para.text} />
-              </p>
-            )}
+            {/* Paragraph text — always editable. Overlay shows diff or highlight without blocking input. */}
+            <div className="relative">
+              <div
+                ref={editRef}
+                data-editable
+                contentEditable
+                suppressContentEditableWarning
+                onInput={handleInput}
+                onKeyDown={handleKeyDown}
+                onPaste={handlePaste}
+                onCompositionStart={() => { isComposing.current = true }}
+                onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
+                className="text-base leading-[1.85] outline-none w-full"
+                style={{
+                  caretColor: GOLD,
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  minHeight: '1.85em',
+                  // Make text transparent so the overlay shows through while keeping editing fully functional
+                  color: (showMarkup || activeHighlight) ? 'transparent' : '#1E2532',
+                }}
+              />
+              {/* Overlay — diff in markup mode, or highlight when a comment is active */}
+              {(showMarkup || activeHighlight) && (
+                <p
+                  className="absolute inset-0 text-base leading-[1.85] pointer-events-none select-none"
+                  style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', minHeight: '1.85em', color: '#1E2532' }}
+                >
+                  {activeHighlight
+                    ? <HighlightedText text={para.text} highlight={activeHighlight} />
+                    : <DiffText baseline={para.baseline} text={para.text} />}
+                </p>
+              )}
+            </div>
 
             {/* Claude inline suggestion previews — markup mode only */}
             {showMarkup && hasSuggestions && (
@@ -1624,7 +1669,9 @@ function DocumentParagraph({
                   key={comment.id}
                   comment={comment}
                   expanded={expandedComments.has(comment.id)}
+                  isActive={activeCommentId === comment.id}
                   onToggle={() => onToggleComment(comment.id)}
+                  onActivate={() => onSetActiveComment(comment.id)}
                   replyingTo={replyingTo}
                   setReplyingTo={setReplyingTo}
                   replyInput={replyInputs[comment.id] || ''}
@@ -1645,11 +1692,15 @@ function DocumentParagraph({
 /*  MARGIN COMMENT                                             */
 /* ═══════════════════════════════════════════════════════════ */
 
-function MarginComment({ comment, expanded, onToggle, replyingTo, setReplyingTo, replyInput, onReplyChange, submittedReplies, onSubmitReply }) {
+function MarginComment({ comment, expanded, isActive, onToggle, onActivate, replyingTo, setReplyingTo, replyInput, onReplyChange, submittedReplies, onSubmitReply }) {
   const isReplying = replyingTo === comment.id
   return (
     <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={SPRING_SMOOTH} style={{ fontFamily: 'system-ui, sans-serif' }}>
-      <div className="px-3 py-2 bg-[#FFF9E6] border border-[#E5D9A8] rounded-lg cursor-pointer hover:bg-[#FFF5D6] transition-colors" onClick={onToggle}>
+      <div
+        className="px-3 py-2 bg-[#FFF9E6] rounded-lg cursor-pointer hover:bg-[#FFF5D6] transition-colors"
+        style={{ border: isActive ? `1.5px solid ${GOLD}` : '1px solid #E5D9A8' }}
+        onClick={() => { onActivate(); onToggle() }}
+      >
         {comment.selectedText && (
           <p className="text-[10px] text-[#9B8A2F] italic leading-relaxed mb-1.5 pb-1.5 border-b border-[#E5D9A8]/60 truncate">
             "{comment.selectedText}"
@@ -1719,13 +1770,23 @@ function SidebarSectionLabel({ label, count }) {
   )
 }
 
-function CommentCard({ comment, expanded, onToggle, onJump, replyingTo, setReplyingTo, replyInput, onReplyChange, submittedReplies, onSubmitReply }) {
+function CommentCard({ comment, expanded, isActive, onToggle, onActivate, onJump, replyingTo, setReplyingTo, replyInput, onReplyChange, submittedReplies, onSubmitReply }) {
   const isReplying = replyingTo === comment.id
   return (
-    <motion.div variants={staggerItem} className="px-3 py-2.5 bg-[#FFF9E6] border border-[#E5D9A8] rounded-xl">
+    <motion.div
+      variants={staggerItem}
+      className="px-3 py-2.5 bg-[#FFF9E6] rounded-xl cursor-pointer transition-colors"
+      style={{ border: isActive ? `1.5px solid ${GOLD}` : '1px solid #E5D9A8' }}
+      onClick={onActivate}
+    >
+      {comment.selectedText && (
+        <p className="text-[10px] text-[#9B8A2F] italic leading-relaxed mb-1.5 pb-1.5 border-b border-[#E5D9A8]/60 truncate">
+          "{comment.selectedText}"
+        </p>
+      )}
       <div className="flex items-start justify-between gap-2 mb-1">
         <p className="text-[11px] text-[#6B5D1F] leading-relaxed flex-1">{comment.text}</p>
-        <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onJump} className="p-1 rounded flex-shrink-0 transition-colors" style={{ color: '#B5A353' }} title="Jump to paragraph"><ArrowRight className="w-3 h-3" /></motion.button>
+        <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={e => { e.stopPropagation(); onJump() }} className="p-1 rounded flex-shrink-0 transition-colors" style={{ color: '#B5A353' }} title="Jump to paragraph"><ArrowRight className="w-3 h-3" /></motion.button>
       </div>
       {comment.claudeReply && (
         <div className="mt-2 pt-2 border-t border-[#E5D9A8]/50">
