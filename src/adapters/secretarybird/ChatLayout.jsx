@@ -770,9 +770,12 @@ Rules:
   useEffect(() => {
     const onKeyDown = (e) => {
       if (showMarkupRef.current) return  // markup mode — no editables
-      const active = document.activeElement
-      if (active?.contentEditable === 'true') return  // editable already focused — all good
-      if (active?.tagName === 'INPUT' || active?.tagName === 'TEXTAREA') return  // native input — don't steal keystrokes
+      // Use e.target (the event destination) rather than document.activeElement —
+      // more reliable in capture phase, especially for sidebar and modal inputs.
+      const target = e.target
+      const tag = target?.tagName
+      if (target?.contentEditable === 'true') return  // document paragraph — all good
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return  // any native form control
       if (e.key === ' ' || e.key === 'PageDown' || e.key === 'PageUp') {
         e.preventDefault()
         const editables = document.querySelectorAll('[data-editable]')
