@@ -27,26 +27,26 @@
   --p-scrollbar-track: transparent;
 }
 
-/* Dark mode — warm studio, dusty gold stays */
+/* Dark mode — OLED-optimised, true black canvas, warm surface hierarchy */
 .dark {
-  --p-bg-base:    #15130E;
-  --p-bg-surface: #1C1A14;
-  --p-bg-subtle:  #232018;
-  --p-bg-alt:     #2A271F;
+  --p-bg-base:    #000000;  /* True OLED black — main canvas, page bg */
+  --p-bg-surface: #0D0B07;  /* Near-black warm — cards, sidebars */
+  --p-bg-subtle:  #141209;  /* Subtle elevated areas */
+  --p-bg-alt:     #1C1914;  /* Alt backgrounds, code blocks */
 
   --p-text-primary:   #F5F3EF;
   --p-text-secondary: #9B9A97;
   --p-text-muted:     #6B6963;
   --p-text-light:     #4A4742;
 
-  --p-border:        #2C2921;
-  --p-border-subtle: #232018;
+  --p-border:        #1C1914;
+  --p-border-subtle: #111009;
 
   --p-gold:       #C4A94D;
   --p-gold-light: #B8A070;
   --p-gold-muted: #9C8760;
 
-  --p-scrollbar-thumb: #3A3730;
+  --p-scrollbar-thumb: #2A2720;
   --p-scrollbar-track: transparent;
 }
 
@@ -129,7 +129,7 @@
   backdrop-filter: blur(12px);
 }
 .dark .sbrd-toolbar {
-  background-color: rgba(28, 26, 20, 0.92);
+  background-color: rgba(0, 0, 0, 0.95);
 }
 
 /* Outer canvas background */
@@ -145,7 +145,8 @@
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.04);
 }
 .dark .sbrd-paper {
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
+  background-color: var(--p-bg-surface) !important;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
 }
 
 /* — Additional text colors — */
@@ -166,6 +167,27 @@
 
 /* — Additional hover states — */
 .dark .hover\:bg-\[#F5F5F5\]:hover  { background-color: var(--p-bg-subtle) !important; }
+
+/* ── Pelican mode overrides ─────────────────────────────── */
+
+/* FileShelf border */
+.dark .plcn-shelf        { border-right-color: var(--p-border-subtle) !important; }
+
+/* Canvas toolbar separator */
+.dark .plcn-canvas-bar   { border-bottom-color: var(--p-border-subtle) !important; }
+
+/* Inspector panel borders */
+.dark .plcn-inspector    { border-left-color: var(--p-border-subtle) !important; }
+.dark .plcn-insp-bar     { border-bottom-color: var(--p-border-subtle) !important; }
+.dark .plcn-insp-schema  { border-bottom-color: var(--p-border-subtle) !important; }
+
+/* Table rows and header */
+.dark .plcn-table-head   { background-color: var(--p-bg-subtle) !important; border-bottom-color: var(--p-border) !important; }
+.dark .plcn-table-row    { border-bottom-color: var(--p-border-subtle) !important; }
+.dark .plcn-table-foot   { border-top-color: var(--p-border-subtle) !important; background-color: var(--p-bg-surface) !important; }
+
+/* Scrollbar color override for inline scrollbarColor style */
+.dark .plcn-scroll       { scrollbar-color: var(--p-scrollbar-thumb) transparent !important; }
 
 /* ── Parliament Markdown Styles ──────────────────────────── */
 /* Applied via className="parliament-md" on message content wrappers */

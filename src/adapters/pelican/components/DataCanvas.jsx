@@ -42,7 +42,7 @@ export default function DataCanvas({ conversationId, contextUsage, contextThresh
     <div className="flex-1 flex flex-col min-w-0">
       {/* Toolbar */}
       <div
-        className="flex items-center justify-between px-5 py-3 flex-shrink-0"
+        className="flex items-center justify-between px-5 py-3 flex-shrink-0 plcn-canvas-bar"
         style={{ borderBottom: '1px solid #F1F1EF' }}
       >
         {/* View tabs */}

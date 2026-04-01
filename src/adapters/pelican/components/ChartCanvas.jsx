@@ -7,6 +7,7 @@ import {
 } from 'recharts'
 import { motion } from 'framer-motion'
 import { usePelican, SERIES_COLORS } from '../../../stores/PelicanContext'
+import { useSettings } from '../../../stores/SettingsContext'
 import { SPRING_GENTLE } from '../../../lib/constants'
 
 /**
@@ -21,6 +22,13 @@ import { SPRING_GENTLE } from '../../../lib/constants'
  */
 export default function ChartCanvas({ fileId, chartType, filters }) {
   const { getParsedData, activeFile } = usePelican()
+  const { settings } = useSettings()
+  const isDark = settings.theme === 'dark'
+  const chartBg = isDark ? '#0D0B07' : '#fff'
+  const chartBorder = isDark ? '#1C1914' : '#E9E9E7'
+  const chartGridColor = isDark ? '#1C1914' : '#F1F1EF'
+  const chartTextColor = isDark ? '#6B6963' : '#787774'
+  const chartTextColor2 = isDark ? '#9B9A97' : '#787774'
   const [parsed, setParsed] = useState(null)
   const [loading, setLoading] = useState(false)
 
@@ -137,31 +145,34 @@ export default function ChartCanvas({ fileId, chartType, filters }) {
                 ))}
               </Pie>
               <Tooltip
-                contentStyle={{ background: '#fff', border: '1px solid #E9E9E7', borderRadius: 8, fontSize: 12 }}
+                contentStyle={{ background: chartBg, border: `1px solid ${chartBorder}`, borderRadius: 8, color: chartTextColor2 }}
+                wrapperStyle={{ fontSize: 11, color: chartTextColor2 }}
                 formatter={(value) => [typeof value === 'number' ? value.toLocaleString() : value]}
               />
-              <Legend wrapperStyle={{ fontSize: 11, color: '#787774' }} />
+              <Legend wrapperStyle={{ fontSize: 11, color: chartTextColor2 }} />
             </PieChart>
           ) : chartType === 'scatter' ? (
             <ScatterChart>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F1F1EF" />
-              <XAxis dataKey={xKey} tick={{ fontSize: 10, fill: '#787774' }} />
-              <YAxis dataKey={yKeys[0]} tick={{ fontSize: 10, fill: '#787774' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
+              <XAxis dataKey={xKey} tick={{ fontSize: 10, fill: chartTextColor }} />
+              <YAxis dataKey={yKeys[0]} tick={{ fontSize: 10, fill: chartTextColor }} />
               <Tooltip
-                contentStyle={{ background: '#fff', border: '1px solid #E9E9E7', borderRadius: 8, fontSize: 12 }}
+                contentStyle={{ background: chartBg, border: `1px solid ${chartBorder}`, borderRadius: 8, color: chartTextColor2 }}
+                wrapperStyle={{ fontSize: 11, color: chartTextColor2 }}
               />
               <Scatter data={chartData} fill={SERIES_COLORS[0]} />
             </ScatterChart>
           ) : chartType === 'line' ? (
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F1F1EF" />
-              <XAxis dataKey={xKey} tick={{ fontSize: 10, fill: '#787774' }} />
-              <YAxis tick={{ fontSize: 10, fill: '#787774' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
+              <XAxis dataKey={xKey} tick={{ fontSize: 10, fill: chartTextColor }} />
+              <YAxis tick={{ fontSize: 10, fill: chartTextColor }} />
               <Tooltip
-                contentStyle={{ background: '#fff', border: '1px solid #E9E9E7', borderRadius: 8, fontSize: 12 }}
+                contentStyle={{ background: chartBg, border: `1px solid ${chartBorder}`, borderRadius: 8, color: chartTextColor2 }}
+                wrapperStyle={{ fontSize: 11, color: chartTextColor2 }}
                 formatter={(value) => [typeof value === 'number' ? value.toLocaleString() : value]}
               />
-              <Legend wrapperStyle={{ fontSize: 11, color: '#787774' }} />
+              <Legend wrapperStyle={{ fontSize: 11, color: chartTextColor2 }} />
               {yKeys.map((key, i) => (
                 <Line
                   key={key}
@@ -176,14 +187,15 @@ export default function ChartCanvas({ fileId, chartType, filters }) {
             </LineChart>
           ) : chartType === 'area' ? (
             <AreaChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F1F1EF" />
-              <XAxis dataKey={xKey} tick={{ fontSize: 10, fill: '#787774' }} />
-              <YAxis tick={{ fontSize: 10, fill: '#787774' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
+              <XAxis dataKey={xKey} tick={{ fontSize: 10, fill: chartTextColor }} />
+              <YAxis tick={{ fontSize: 10, fill: chartTextColor }} />
               <Tooltip
-                contentStyle={{ background: '#fff', border: '1px solid #E9E9E7', borderRadius: 8, fontSize: 12 }}
+                contentStyle={{ background: chartBg, border: `1px solid ${chartBorder}`, borderRadius: 8, color: chartTextColor2 }}
+                wrapperStyle={{ fontSize: 11, color: chartTextColor2 }}
                 formatter={(value) => [typeof value === 'number' ? value.toLocaleString() : value]}
               />
-              <Legend wrapperStyle={{ fontSize: 11, color: '#787774' }} />
+              <Legend wrapperStyle={{ fontSize: 11, color: chartTextColor2 }} />
               {yKeys.map((key, i) => (
                 <Area
                   key={key}
@@ -198,14 +210,15 @@ export default function ChartCanvas({ fileId, chartType, filters }) {
           ) : (
             /* Default: Bar */
             <BarChart data={chartData} barCategoryGap="30%">
-              <CartesianGrid strokeDasharray="3 3" stroke="#F1F1EF" />
-              <XAxis dataKey={xKey} tick={{ fontSize: 10, fill: '#787774' }} />
-              <YAxis tick={{ fontSize: 10, fill: '#787774' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
+              <XAxis dataKey={xKey} tick={{ fontSize: 10, fill: chartTextColor }} />
+              <YAxis tick={{ fontSize: 10, fill: chartTextColor }} />
               <Tooltip
-                contentStyle={{ background: '#fff', border: '1px solid #E9E9E7', borderRadius: 8, fontSize: 12 }}
+                contentStyle={{ background: chartBg, border: `1px solid ${chartBorder}`, borderRadius: 8, color: chartTextColor2 }}
+                wrapperStyle={{ fontSize: 11, color: chartTextColor2 }}
                 formatter={(value) => [typeof value === 'number' ? value.toLocaleString() : value]}
               />
-              <Legend wrapperStyle={{ fontSize: 11, color: '#787774' }} />
+              <Legend wrapperStyle={{ fontSize: 11, color: chartTextColor2 }} />
               {yKeys.map((key, i) => (
                 <Bar key={key} dataKey={key} fill={SERIES_COLORS[i]} radius={[3, 3, 0, 0]} />
               ))}
