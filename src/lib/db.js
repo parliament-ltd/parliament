@@ -66,7 +66,7 @@ function generateId() {
 
 // ─── Conversations ───────────────────────────────────────
 
-export async function createConversation({ title = 'New Conversation', model = 'claude-sonnet', parentId = null, branchPoint = null } = {}) {
+export async function createConversation({ title = 'New Conversation', model = 'claude-sonnet', parentId = null, branchPoint = null, createdInMode = null } = {}) {
   const db = await initDB()
   const now = new Date().toISOString()
   const conversation = {
@@ -75,6 +75,7 @@ export async function createConversation({ title = 'New Conversation', model = '
     model,
     parentId,
     branchPoint,
+    createdInMode,
     pinned: false,
     storageBytes: 0,
     createdAt: now,
