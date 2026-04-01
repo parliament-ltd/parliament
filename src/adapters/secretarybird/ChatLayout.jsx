@@ -1352,8 +1352,8 @@ function DocumentParagraph({
   const isComposing = useRef(false)
   const skipNextSync = useRef(false)
 
-  // Sync para.text → DOM. Runs on text change AND when switching back to edit mode
-  // (showMarkup flip mounts a fresh contentEditable whose textContent starts empty)
+  // Sync para.text → DOM whenever text changes.
+  // showMarkup is NOT a dependency — contentEditable is always mounted now.
   useLayoutEffect(() => {
     const el = editRef.current
     if (!el || skipNextSync.current) { skipNextSync.current = false; return }
@@ -1367,7 +1367,7 @@ function DocumentParagraph({
       el.textContent = target
       if (savedOffset !== null) setCursorAt(el, savedOffset)
     }
-  }, [para.text, showMarkup])
+  }, [para.text])
 
   const handleInput = (e) => {
     if (isComposing.current) return
@@ -1445,24 +1445,23 @@ function DocumentParagraph({
         className="mb-8 mt-4"
         onClick={handleClick}
       >
-        {showMarkup ? (
-          <h1 className="text-2xl font-semibold text-[#1E2532] leading-tight tracking-tight">
+        <h1
+          ref={editRef}
+          data-editable
+          contentEditable
+          suppressContentEditableWarning
+          onInput={handleInput}
+          onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
+          onCompositionStart={() => { isComposing.current = true }}
+          onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
+          className="text-2xl font-semibold text-[#1E2532] leading-tight tracking-tight outline-none"
+          style={{ caretColor: GOLD }}
+        />
+        {showMarkup && para.text !== para.baseline && (
+          <div className="mt-1 pl-3 border-l-2 border-[#E9E7E3] text-xl font-semibold leading-tight select-none pointer-events-none">
             <DiffText baseline={para.baseline} text={para.text} />
-          </h1>
-        ) : (
-          <h1
-            ref={editRef}
-            data-editable
-            contentEditable
-            suppressContentEditableWarning
-            onInput={handleInput}
-            onKeyDown={handleKeyDown}
-            onPaste={handlePaste}
-            onCompositionStart={() => { isComposing.current = true }}
-            onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
-            className="text-2xl font-semibold text-[#1E2532] leading-tight tracking-tight outline-none"
-            style={{ caretColor: GOLD }}
-          />
+          </div>
         )}
       </motion.div>
     )
@@ -1474,7 +1473,7 @@ function DocumentParagraph({
       initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       transition={{ ...SPRING_GENTLE, delay: Math.min(index * 0.04, 0.3) }}
       className="relative group mb-6"
-      onClick={() => { if (!showMarkup && editRef.current) editRef.current.focus() }}
+      onClick={() => { if (editRef.current) editRef.current.focus() }}
     >
       <div className="flex">
         {/* Document column */}
@@ -1488,53 +1487,54 @@ function DocumentParagraph({
               ...(hasOrigin ? { borderLeft: `2px solid ${SUGGESTION}50`, paddingLeft: '10px', backgroundColor: `${SUGGESTION}05` } : {}),
             }}
           >
-            {/* Paragraph text */}
-            {showMarkup ? (
-              <div>
-                <p className="text-base leading-[1.85] text-[#1E2532]">
-                  <DiffText baseline={para.baseline} text={para.text} />
-                </p>
-                {/* Claude inline suggestion previews */}
-                {hasSuggestions && (
-                  <div className="mt-2 space-y-2">
-                    {para.claudeSuggestions.map(sugg => (
-                      <div
-                        key={sugg.id}
-                        className="pl-3 border-l-2 py-0.5"
-                        style={{ borderColor: `${SUGGESTION}40` }}
-                      >
-                        <p className="text-[10px] font-semibold mb-0.5" style={{ color: SUGGESTION, fontFamily: 'system-ui, sans-serif' }}>
-                          Suggested edit
-                        </p>
-                        <p className="text-base leading-[1.85]">
-                          <ClaudeInlineSuggestionPreview text={para.text} suggestion={sugg} />
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {/* Claude-origin label */}
-                {hasOrigin && (
-                  <div className="mt-1 flex items-center gap-1.5" style={{ fontFamily: 'system-ui, sans-serif' }}>
-                    <Sparkles className="w-3 h-3" style={{ color: SUGGESTION }} />
-                    <span className="text-[10px] font-medium" style={{ color: SUGGESTION }}>Added by Claude</span>
-                  </div>
-                )}
+            {/* Paragraph text — always editable regardless of markup mode */}
+            <div
+              ref={editRef}
+              data-editable
+              contentEditable
+              suppressContentEditableWarning
+              onInput={handleInput}
+              onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
+              onCompositionStart={() => { isComposing.current = true }}
+              onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
+              className="text-base leading-[1.85] text-[#1E2532] outline-none w-full"
+              style={{ caretColor: GOLD, whiteSpace: 'pre-wrap', wordBreak: 'break-word', minHeight: '1.85em' }}
+            />
+
+            {/* Diff annotation — shown below when markup is on and text has changed */}
+            {showMarkup && para.text !== para.baseline && (
+              <div className="mt-1 pl-3 border-l-2 border-[#E9E7E3] text-sm leading-[1.85] select-none pointer-events-none">
+                <DiffText baseline={para.baseline} text={para.text} />
               </div>
-            ) : (
-              <div
-                ref={editRef}
-                data-editable
-                contentEditable
-                suppressContentEditableWarning
-                onInput={handleInput}
-                onKeyDown={handleKeyDown}
-                onPaste={handlePaste}
-                onCompositionStart={() => { isComposing.current = true }}
-                onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
-                className="text-base leading-[1.85] text-[#1E2532] outline-none w-full"
-                style={{ caretColor: GOLD, whiteSpace: 'pre-wrap', wordBreak: 'break-word', minHeight: '1.85em' }}
-              />
+            )}
+
+            {/* Claude inline suggestion previews — markup mode only */}
+            {showMarkup && hasSuggestions && (
+              <div className="mt-2 space-y-2">
+                {para.claudeSuggestions.map(sugg => (
+                  <div
+                    key={sugg.id}
+                    className="pl-3 border-l-2 py-0.5"
+                    style={{ borderColor: `${SUGGESTION}40` }}
+                  >
+                    <p className="text-[10px] font-semibold mb-0.5" style={{ color: SUGGESTION, fontFamily: 'system-ui, sans-serif' }}>
+                      Suggested edit
+                    </p>
+                    <p className="text-base leading-[1.85]">
+                      <ClaudeInlineSuggestionPreview text={para.text} suggestion={sugg} />
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Claude-origin label — markup mode only */}
+            {showMarkup && hasOrigin && (
+              <div className="mt-1 flex items-center gap-1.5" style={{ fontFamily: 'system-ui, sans-serif' }}>
+                <Sparkles className="w-3 h-3" style={{ color: SUGGESTION }} />
+                <span className="text-[10px] font-medium" style={{ color: SUGGESTION }}>Added by Claude</span>
+              </div>
             )}
 
             {/* Claude note */}
