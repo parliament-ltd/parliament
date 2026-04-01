@@ -38,106 +38,6 @@ const SUGGESTION = '#22C55E'
 const RIPPLE_WARN = '#E5A620'
 const RIPPLE_OPP  = '#4A7AE5'
 
-/* ─── Mock document data ─────────────────────────────────── */
-
-const MOCK_PARAGRAPHS = [
-  {
-    id: 'p1',
-    type: 'heading',
-    text: 'Chapter 7 — The Signal in the Static',
-    comments: [],
-  },
-  {
-    id: 'p2',
-    type: 'paragraph',
-    segments: [
-      { type: 'text',      content: 'The radio tower stood alone on the ridge, its red warning light pulsing against ' },
-      { type: 'deletion',  content: 'a sky the color of wet slate' },
-      { type: 'insertion', content: 'a bruised twilight sky' },
-      { type: 'text',      content: '. Maren had been watching it for ' },
-      { type: 'deletion',  content: 'three hours' },
-      { type: 'insertion', content: 'most of the afternoon' },
-      { type: 'text',      content: ' from the shelter of the abandoned gas station, counting the intervals between blinks. Fourteen seconds. Always fourteen.' },
-    ],
-    comments: [
-      {
-        id: 'c1',
-        text: 'The sky description feels too generic — make it more unsettling',
-        claudeReply: {
-          text: 'Swapped "wet slate" for "bruised twilight" — it carries a sense of injury that mirrors Maren\'s unease. The color word "bruised" also foreshadows the violence in Chapter 9.',
-        },
-      },
-    ],
-  },
-  {
-    id: 'p3',
-    type: 'paragraph',
-    segments: [
-      { type: 'text',       content: 'She pressed the headphones tighter against her ears and twisted the dial. Static hissed and crackled — ' },
-      { type: 'suggestion', content: 'a sound like sand pouring through broken glass' },
-      { type: 'text',       content: ' — but underneath it, barely there, the signal persisted. Three short. Three long. Three short again.' },
-    ],
-    comments: [],
-    claudeNote: 'Added a simile for the static sound to build sensory texture. The glass imagery connects to the broken windows motif from Chapter 3.',
-  },
-  {
-    id: 'p4',
-    type: 'paragraph',
-    segments: [
-      { type: 'text',       content: '"That\'s not random," she whispered, though there was no one to hear her. The gas station had been empty for years — ' },
-      { type: 'deletion',   content: 'the pumps rusted, the sign faded to nothing, the windows all broken.' },
-      { type: 'suggestion', content: 'its pumps seized with rust, its sign bleached to a ghost of letters, every window a dark mouth.' },
-    ],
-    comments: [
-      {
-        id: 'c2',
-        text: 'Expand — add more atmosphere to the gas station. Make it feel haunted.',
-        claudeReply: {
-          text: 'Personified the decay — "ghost of letters" and "dark mouth" make the building feel alive and watching. This supports the chapter\'s theme of signals hiding in abandoned places.',
-        },
-      },
-    ],
-  },
-  {
-    id: 'p5',
-    type: 'paragraph',
-    segments: [
-      { type: 'text', content: 'She pulled the notebook from her jacket and wrote the pattern down again. SOS. It was always SOS. But who was sending it, and from where? The tower had been decommissioned in 2019 — she\'d checked the county records twice.' },
-    ],
-    comments: [],
-  },
-  {
-    id: 'p6',
-    type: 'paragraph',
-    segments: [
-      { type: 'text', content: 'The light blinked. Fourteen seconds. She counted. Fourteen seconds. Then, for the first time in three hours of watching, the pattern broke. The light held steady — a long, burning red — and the static in her headphones resolved into something almost like a voice.' },
-    ],
-    comments: [],
-    ripple: {
-      type: 'contradiction',
-      severity: 'high',
-      summary: 'You changed Maren\'s arrival time to "most of the afternoon" in the second paragraph, but this paragraph still says "three hours of watching." These need to match.',
-      affectedSpan: 'three hours of watching',
-      sourceEdit: 'Paragraph 2 — changed "three hours" to "most of the afternoon"',
-    },
-  },
-  {
-    id: 'p7',
-    type: 'paragraph',
-    segments: [
-      { type: 'text', content: 'Maren froze. In all her years of chasing dead signals across the desert, she had never heard anything like this. Not a recording. Not interference. Something — someone — was using the decommissioned tower to broadcast. And they were asking for help.' },
-    ],
-    comments: [],
-    ripple: {
-      type: 'opportunity',
-      severity: 'low',
-      summary: 'The new "bruised twilight" sky description could be echoed here — describe the sky darkening further as the signal resolves, tying the atmospheric shift to the narrative turn.',
-      sourceEdit: 'Paragraph 2 — sky description changed to "bruised twilight"',
-    },
-  },
-]
-
-
 /* ═══════════════════════════════════════════════════════════ */
 /*  ROOT COMPONENT                                             */
 /* ═══════════════════════════════════════════════════════════ */
@@ -147,7 +47,7 @@ export default function SecretarybirdChatLayout() {
   const { id } = useParams()
 
   // ── Persistent document state (loaded from / saved to IndexedDB) ──
-  const [paragraphs,       setParagraphs]       = useState(MOCK_PARAGRAPHS)
+  const [paragraphs,       setParagraphs]       = useState([])
   const [suggestionStates, setSuggestionStates] = useState({})
   const [submittedReplies, setSubmittedReplies] = useState({})
 
@@ -197,7 +97,6 @@ export default function SecretarybirdChatLayout() {
   const [activeTool,       setActiveTool]       = useState('select')
   const [showMarkup,       setShowMarkup]       = useState(true)
   const [rippleEnabled,    setRippleEnabled]    = useState(true)
-  const [selectedParagraph, setSelectedParagraph] = useState(null)
   const [expandedComments,  setExpandedComments]  = useState(new Set())
   const [hoveredRipple,     setHoveredRipple]     = useState(null)
   const [chatInput,         setChatInput]         = useState('')
@@ -219,6 +118,37 @@ export default function SecretarybirdChatLayout() {
     setSuggestionStates(prev => ({ ...prev, [paraId]: 'accepted' }))
   const rejectSuggestion = (paraId) =>
     setSuggestionStates(prev => ({ ...prev, [paraId]: 'rejected' }))
+
+  const updateParagraph = (paraId, newText) => {
+    setParagraphs(prev => prev.map(p => {
+      if (p.id !== paraId) return p
+      if (p.type === 'heading') return { ...p, text: newText }
+      return { ...p, segments: [{ type: 'text', content: newText }] }
+    }))
+  }
+
+  const insertParagraphAfter = (paraId) => {
+    const newId = `p${Date.now()}`
+    setParagraphs(prev => {
+      const idx = prev.findIndex(p => p.id === paraId)
+      const at = idx === -1 ? prev.length : idx + 1
+      const copy = [...prev]
+      copy.splice(at, 0, { id: newId, type: 'paragraph', segments: [{ type: 'text', content: '' }], comments: [] })
+      return copy
+    })
+    // Focus the new paragraph after React renders it
+    setTimeout(() => {
+      const el = document.querySelector(`[data-para-id="${newId}"]`)
+      if (el) {
+        el.focus()
+        const range = document.createRange()
+        range.selectNodeContents(el)
+        range.collapse(false)
+        window.getSelection()?.removeAllRanges()
+        window.getSelection()?.addRange(range)
+      }
+    }, 30)
+  }
 
   const toggleComment = (commentId) =>
     setExpandedComments(prev => {
@@ -416,14 +346,36 @@ export default function SecretarybirdChatLayout() {
             </div>
           )}
 
-          {paragraphs.map((para, index) => (
+          {paragraphs.length === 0 ? (
+            <div
+              data-para-id="empty"
+              contentEditable
+              suppressContentEditableWarning
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  const text = e.currentTarget.textContent.trim()
+                  if (text) {
+                    setParagraphs([{ id: `p${Date.now()}`, type: 'paragraph', segments: [{ type: 'text', content: text }], comments: [] }])
+                  }
+                }
+              }}
+              onBlur={(e) => {
+                const text = e.currentTarget.textContent.trim()
+                if (text) {
+                  setParagraphs([{ id: `p${Date.now()}`, type: 'paragraph', segments: [{ type: 'text', content: text }], comments: [] }])
+                }
+              }}
+              className="text-base leading-[1.85] text-[#9B9A97] outline-none cursor-text"
+              style={{ minHeight: '1.85em' }}
+            >
+            </div>
+          ) : paragraphs.map((para, index) => (
             <DocumentParagraph
               key={para.id}
               para={para}
               index={index}
               showMarkup={showMarkup}
-              selected={selectedParagraph === para.id}
-              onClick={() => setSelectedParagraph(para.id === selectedParagraph ? null : para.id)}
               suggestionState={suggestionStates[para.id]}
               onAcceptSuggestion={() => acceptSuggestion(para.id)}
               onRejectSuggestion={() => rejectSuggestion(para.id)}
@@ -438,6 +390,8 @@ export default function SecretarybirdChatLayout() {
               setReplyInputs={setReplyInputs}
               submittedReplies={submittedReplies}
               onSubmitReply={submitReply}
+              onUpdateParagraph={updateParagraph}
+              onInsertAfter={insertParagraphAfter}
             />
           ))}
         </div>
@@ -765,10 +719,11 @@ export default function SecretarybirdChatLayout() {
 /* ═══════════════════════════════════════════════════════════ */
 
 function DocumentParagraph({
-  para, index, showMarkup, selected, onClick,
+  para, index, showMarkup,
   suggestionState, onAcceptSuggestion, onRejectSuggestion,
   expandedComments, onToggleComment, hoveredRipple, onHoverRipple, rippleEnabled,
   replyingTo, setReplyingTo, replyInputs, setReplyInputs, submittedReplies, onSubmitReply,
+  onUpdateParagraph, onInsertAfter,
 }) {
   const hasComments  = para.comments?.length > 0
   const hasSuggestion = para.segments?.some(s => s.type === 'suggestion')
@@ -784,7 +739,17 @@ function DocumentParagraph({
         className="mb-8 mt-4 flex"
       >
         <div style={{ width: '65%' }}>
-          <h1 className="text-2xl font-semibold text-[#1E2532] leading-tight tracking-tight">
+          <h1
+            data-para-id={para.id}
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => onUpdateParagraph(para.id, e.currentTarget.textContent.trim())}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') { e.preventDefault(); onInsertAfter(para.id) }
+            }}
+            className="text-2xl font-semibold text-[#1E2532] leading-tight tracking-tight outline-none cursor-text"
+            style={{ caretColor: GOLD }}
+          >
             {para.text}
           </h1>
         </div>
@@ -804,14 +769,22 @@ function DocumentParagraph({
         {/* Document column — 65% */}
         <div style={{ width: '65%' }} className="flex-shrink-0">
           <div
-            className={`relative transition-colors duration-200 rounded-lg px-2 py-1 -mx-2 cursor-text ${
+            className={`relative transition-colors duration-200 rounded-lg px-2 py-1 -mx-2 focus-within:bg-[rgba(184,160,112,0.05)] ${
               isRippleHovered ? 'ring-1 ring-[#E5A620]/40 bg-[#E5A620]/[0.03]' : ''
             }`}
-            style={selected && !isRippleHovered ? { backgroundColor: 'rgba(184,160,112,0.05)' } : {}}
-            onClick={onClick}
           >
-            {/* Paragraph text with inline edits */}
-            <p className="text-base leading-[1.85] text-[#1E2532]">
+            {/* Paragraph text with inline edits — directly editable */}
+            <p
+              data-para-id={para.id}
+              contentEditable
+              suppressContentEditableWarning
+              onBlur={(e) => onUpdateParagraph(para.id, e.currentTarget.textContent)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') { e.preventDefault(); onInsertAfter(para.id) }
+              }}
+              className="text-base leading-[1.85] text-[#1E2532] outline-none"
+              style={{ caretColor: GOLD, cursor: 'text' }}
+            >
               {para.segments?.map((seg, i) => (
                 <InlineSegment key={i} segment={seg} showMarkup={showMarkup} suggestionState={suggestionState} />
               ))}
