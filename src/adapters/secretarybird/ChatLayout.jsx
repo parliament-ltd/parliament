@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, useLayoutEffect, useCallback } fr
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   getConversation, getBranches, createConversation,
-  getSbrdDocument, saveSbrdDocument, listConversations,
+  getSbrdDocument, saveSbrdDocument, listConversations, updateConversation,
 } from '../../lib/db'
 import { getProvider } from '../../providers'
 import { loadApiKey } from '../../lib/crypto'
@@ -330,6 +330,17 @@ export default function SecretarybirdChatLayout() {
     return () => { cancelled = true }
   }, [id])
 
+  // ── Derive title from title/h1 paragraph ──────────────────────────
+  useEffect(() => {
+    if (!loaded || !id) return
+    const titlePara = paragraphs.find(p => p.type === 'title') ?? paragraphs.find(p => p.type === 'heading')
+    const derived = titlePara?.text?.trim() || ''
+    if (derived && derived !== conversationTitle) {
+      setConversationTitle(derived)
+      updateConversation(id, { title: derived }).catch(() => {})
+    }
+  }, [paragraphs, loaded, id])
+
   // ── Auto-save (1 s debounce) ───────────────────────────────────────
   const saveTimerRef = useRef(null)
   useEffect(() => {
@@ -492,6 +503,7 @@ export default function SecretarybirdChatLayout() {
 
   const handleCopyCleanText = () => {
     const text = paragraphs.map(p => {
+      if (p.type === 'title')    return p.text
       if (p.type === 'heading')  return `# ${p.text}`
       if (p.type === 'heading2') return `## ${p.text}`
       if (p.type === 'quote')    return `> ${p.text}`
@@ -1039,7 +1051,7 @@ Rules:
             </span>
           </div>
 
-          <div className="h-4 w-px bg-[#EBEBEB]" />
+          <div className="h-4 w-px" style={{ backgroundColor: 'var(--p-border)' }} />
 
           {/* Submit */}
           <motion.button
@@ -1047,9 +1059,12 @@ Rules:
             whileTap={hasSubmittableChanges && !submitting ? { scale: 0.97 } : {}}
             onClick={() => hasSubmittableChanges && !submitting && setShowSubmitConfirm(true)}
             className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              hasSubmittableChanges ? 'text-white shadow-sm' : 'bg-[#F5F5F5] text-[#6B7C93] cursor-not-allowed'
+              hasSubmittableChanges ? 'text-white shadow-sm' : 'cursor-not-allowed'
             }`}
-            style={hasSubmittableChanges ? { backgroundColor: GOLD } : {}}
+            style={hasSubmittableChanges
+              ? { backgroundColor: GOLD, borderColor: GOLD, border: '1px solid' }
+              : { backgroundColor: '#191919', border: '1px solid #4A4540', color: 'white' }
+            }
           >
             <Send className="w-3.5 h-3.5" />
             Submit Edits
@@ -1317,8 +1332,8 @@ Rules:
                     <motion.button
                       whileTap={{ scale: 0.97 }}
                       onClick={() => setShowRippleScopeModal(true)}
-                      className="w-full flex items-center justify-between px-3 py-2 rounded-lg border text-[11px] font-medium transition-colors hover:bg-[#F5F5F5]"
-                      style={{ borderColor: '#E9E9E7', color: '#6B7C93', fontFamily: 'system-ui, sans-serif' }}
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[11px] font-medium transition-colors"
+                      style={{ backgroundColor: '#191919', border: '1px solid #4A4540', color: 'white', fontFamily: 'system-ui, sans-serif' }}
                     >
                       <span>Expand Scope</span>
                       <ChevronDown className="w-3 h-3" />
@@ -1334,6 +1349,7 @@ Rules:
                           <RippleCard
                             key={`ripple-${para.id}`}
                             ripple={para.ripple}
+                            paraText={para.text}
                             onJump={() => setSelectedParagraph(para.id)}
                             onHover={() => setHoveredRipple(para.id)}
                             onLeave={() => setHoveredRipple(null)}
@@ -1370,7 +1386,7 @@ Rules:
                       <SidebarSectionLabel label="Chat with Claude" />
                       {chatMessages.length === 0 && !chatStreaming && (
                         <>
-                          <div className="px-3 py-2.5 bg-[#F5F5F5] rounded-xl rounded-bl-md text-[11px] text-[#4A5568] leading-relaxed">
+                          <div className="px-3 py-2.5 rounded-xl rounded-bl-md text-[11px] leading-relaxed" style={{ backgroundColor: '#191919', border: '1px solid #3A3730', color: 'white' }}>
                             Ask me to write content, continue the story, suggest edits, or review your draft. My response will be added as new paragraphs in the document.
                           </div>
                           <div className="flex flex-wrap gap-1.5">
@@ -1427,8 +1443,8 @@ Rules:
                           onChange={e => setChatInput(e.target.value)}
                           onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleChatSend() } }}
                           disabled={chatStreaming}
-                          className="flex-1 px-3 py-2 bg-[#F5F5F5] border border-[#EBEBEB] rounded-lg text-xs focus:outline-none transition-colors text-[#1E2532] disabled:opacity-50"
-                          style={{ fontFamily: 'system-ui, sans-serif' }}
+                          className="flex-1 px-3 py-2 rounded-lg text-xs focus:outline-none transition-colors disabled:opacity-50"
+                          style={{ backgroundColor: '#191919', border: '1px solid #3A3730', color: 'white', fontFamily: 'system-ui, sans-serif' }}
                         />
                         <motion.button
                           whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
@@ -1536,9 +1552,10 @@ Rules:
 /* ═══════════════════════════════════════════════════════════ */
 
 const SLASH_OPTIONS = [
-  { id: 'h1',    label: 'Heading 1',  description: 'Large section title',  type: 'heading'  },
-  { id: 'h2',    label: 'Heading 2',  description: 'Subsection title',     type: 'heading2' },
-  { id: 'quote', label: 'Quote',      description: 'Blockquote callout',   type: 'quote'    },
+  { id: 'title', label: 'Title',     description: 'Document title',       type: 'title'    },
+  { id: 'h1',    label: 'Heading 1', description: 'Large section title',  type: 'heading'  },
+  { id: 'h2',    label: 'Heading 2', description: 'Subsection title',     type: 'heading2' },
+  { id: 'quote', label: 'Quote',     description: 'Blockquote callout',   type: 'quote'    },
 ]
 
 function DocumentParagraph({
@@ -1686,6 +1703,41 @@ function DocumentParagraph({
   // Highlight the selected text that an active comment was made on
   const activeComment   = para.comments?.find(c => c.id === activeCommentId) ?? null
   const activeHighlight = activeComment?.selectedText || null
+
+  if (para.type === 'title') {
+    return (
+      <motion.div
+        data-para-id={para.id}
+        initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ ...SPRING_GENTLE, delay: Math.min(index * 0.04, 0.3) }}
+        className="mb-10 mt-2"
+        onClick={handleClick}
+      >
+        <div className="relative">
+          <h1
+            ref={editRef}
+            data-editable
+            contentEditable
+            suppressContentEditableWarning
+            onInput={handleInput}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            onCompositionStart={() => { isComposing.current = true }}
+            onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
+            className="text-3xl font-bold leading-tight tracking-tight outline-none"
+            style={{ caretColor: GOLD, color: (showMarkup || activeHighlight) ? 'transparent' : 'var(--p-text-primary)' }}
+          />
+          {(showMarkup || activeHighlight) && (
+            <h1 className="absolute inset-0 text-3xl font-bold leading-tight tracking-tight pointer-events-none select-none" style={{ color: 'var(--p-text-primary)' }}>
+              {activeHighlight
+                ? <HighlightedText text={para.text} highlight={activeHighlight} />
+                : <DiffText baseline={para.baseline} text={para.text} />}
+            </h1>
+          )}
+        </div>
+      </motion.div>
+    )
+  }
 
   if (para.type === 'heading') {
     return (
@@ -2216,7 +2268,7 @@ function ClaudeSuggestionCard({ suggestion, onAccept, onReject, onJump }) {
   )
 }
 
-function RippleCard({ ripple, onJump, onHover, onLeave }) {
+function RippleCard({ ripple, paraText, onJump, onHover, onLeave }) {
   const isWarning = ripple.type === 'contradiction' || ripple.type === 'dependency_break'
   const color = isWarning ? RIPPLE_WARN : RIPPLE_OPP
   const Icon  = isWarning ? AlertTriangle : Lightbulb
@@ -2231,7 +2283,12 @@ function RippleCard({ ripple, onJump, onHover, onLeave }) {
             <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold" style={{ backgroundColor: ripple.severity === 'high' ? `${DELETION}18` : ripple.severity === 'medium' ? `${RIPPLE_WARN}18` : 'rgba(107,124,147,0.12)', color: ripple.severity === 'high' ? DELETION : ripple.severity === 'medium' ? RIPPLE_WARN : '#6B7C93' }}>{ripple.severity}</span>
           </div>
           <p className="text-[11px] text-[#4A5568] leading-relaxed">{ripple.summary}</p>
-          <p className="text-[10px] text-[#6B7C93] mt-1.5 flex items-center gap-1"><CornerDownRight className="w-2.5 h-2.5" />{ripple.sourceEdit}</p>
+          {paraText && (
+            <p className="text-[10px] text-[#6B7C93] mt-1.5 flex items-center gap-1">
+              <CornerDownRight className="w-2.5 h-2.5 flex-shrink-0" />
+              <span className="truncate italic">&ldquo;{paraText.slice(0, 80)}{paraText.length > 80 ? '…' : ''}&rdquo;</span>
+            </p>
+          )}
         </div>
       </div>
       <div className="flex items-center gap-2 ml-5">
@@ -2339,7 +2396,7 @@ function RippleScopeModal({ currentId, currentTitle, onClose }) {
       >
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h3 className="text-sm font-semibold text-[#1E2532]">Expand Ripple Scope</h3>
+            <h3 className="text-sm font-semibold" style={{ color: 'var(--p-text-primary)' }}>Expand Ripple Scope</h3>
             <p className="text-xs text-[#6B7C93] mt-1">Select chats to scan for cross-document consistency impacts.</p>
           </div>
           <motion.button whileTap={{ scale: 0.9 }} onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#F5F5F5] text-[#6B7C93]"><X className="w-4 h-4" /></motion.button>
@@ -2367,7 +2424,7 @@ function RippleScopeModal({ currentId, currentTitle, onClose }) {
                 className="rounded"
                 style={{ accentColor: GOLD }}
               />
-              <span className="text-[11px] text-[#1E2532] flex-1 truncate">{conv.title || 'Untitled'}</span>
+              <span className="text-[11px] flex-1 truncate" style={{ color: 'var(--p-text-primary)' }}>{conv.title || 'Untitled'}</span>
             </label>
           ))}
         </div>
@@ -2384,14 +2441,14 @@ function RippleScopeModal({ currentId, currentTitle, onClose }) {
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={generateManifest} onChange={e => setGenerateManifest(e.target.checked)} style={{ accentColor: GOLD }} />
             <div>
-              <span className="text-[11px] font-medium text-[#1E2532]">Generate Revision Manifest</span>
+              <span className="text-[11px] font-medium" style={{ color: 'var(--p-text-primary)' }}>Generate Revision Manifest</span>
               <p className="text-[10px] text-[#6B7C93]">Save results as a persistent manifest you can act on later</p>
             </div>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={saveScope} onChange={e => setSaveScope(e.target.checked)} style={{ accentColor: GOLD }} />
             <div>
-              <span className="text-[11px] font-medium text-[#1E2532]">Save Scope</span>
+              <span className="text-[11px] font-medium" style={{ color: 'var(--p-text-primary)' }}>Save Scope</span>
               <p className="text-[10px] text-[#6B7C93]">Remember this chat list across sessions</p>
             </div>
           </label>
@@ -2403,8 +2460,11 @@ function RippleScopeModal({ currentId, currentTitle, onClose }) {
             whileHover={selected.size > 0 ? { scale: 1.02 } : {}}
             whileTap={selected.size > 0 ? { scale: 0.97 } : {}}
             disabled={selected.size === 0}
-            className="px-5 py-2 text-white text-xs font-semibold rounded-lg shadow-sm transition-opacity"
-            style={{ backgroundColor: selected.size > 0 ? GOLD : '#D5D5D5' }}
+            className="px-5 py-2 text-white text-xs font-semibold rounded-lg shadow-sm transition-all"
+            style={selected.size > 0
+              ? { backgroundColor: '#C4A94D', border: '1px solid #C4A94D' }
+              : { backgroundColor: '#191919', border: '1px solid #4A4540' }
+            }
           >
             Scan {selected.size > 0 ? `${selected.size} Chat${selected.size !== 1 ? 's' : ''}` : 'Chats'}
           </motion.button>
