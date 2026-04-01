@@ -1,4 +1,1 @@
-import AlbatrossSelectorLayout from '../albatross/SelectorLayout'
-import withComingSoon from '../withComingSoon'
-
-export default withComingSoon(AlbatrossSelectorLayout, 'Secretarybird')
+export { default } from '../albatross/SelectorLayout'
