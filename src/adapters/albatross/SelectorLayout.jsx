@@ -10,6 +10,7 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { useConversations } from '../../stores/ConversationContext'
 import { useSettings } from '../../stores/SettingsContext'
+import { useMode } from '../../stores/ModeContext'
 import { getProvider } from '../../providers'
 import { loadApiKey } from '../../lib/crypto'
 import {
@@ -207,6 +208,76 @@ function StorageWarningBanner({ usagePercent }) {
         <X className="w-3 h-3" />
       </motion.button>
     </motion.div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  MODE MISMATCH BANNER                                        */
+/* ═══════════════════════════════════════════════════════════ */
+
+const MODE_DISPLAY_NAMES = {
+  albatross: 'Albatross',
+  swift: 'Swift',
+  kingfisher: 'Kingfisher',
+  secretarybird: 'Secretarybird',
+  starling: 'Starling',
+  pelican: 'Pelican',
+}
+
+function ModeMismatchBanner({ conversations, currentMode, onSwitch }) {
+  const [dismissed, setDismissed] = useState(() => new Set())
+
+  // Find modes that conversations were created in, excluding current mode and null
+  const mismatchedModes = useMemo(() => {
+    const counts = {}
+    for (const conv of conversations) {
+      const m = conv.createdInMode
+      if (m && m !== currentMode) {
+        counts[m] = (counts[m] || 0) + 1
+      }
+    }
+    return Object.entries(counts)
+      .filter(([m]) => !dismissed.has(m))
+      .sort((a, b) => b[1] - a[1]) // most conversations first
+  }, [conversations, currentMode, dismissed])
+
+  if (mismatchedModes.length === 0) return null
+
+  return (
+    <AnimatePresence>
+      {mismatchedModes.map(([m, count]) => (
+        <motion.div
+          key={m}
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={SPRING_SMOOTH}
+          className="flex items-center gap-2.5 px-8 py-2.5 text-xs border-b border-[#B8A070]/15"
+          style={{ backgroundColor: 'rgba(184,160,112,0.08)' }}
+        >
+          <span className="flex-1 text-[var(--p-text-secondary)]">
+            {count === 1 ? '1 conversation was' : `${count} conversations were`} created in{' '}
+            <span className="font-medium text-[var(--p-text-primary)]">{MODE_DISPLAY_NAMES[m] || m}</span> mode.
+          </span>
+          <motion.button
+            whileHover={{ scale: 1.03, borderColor: '#B8A070' }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => onSwitch(m)}
+            className="px-3 py-1 rounded-md text-[11px] font-medium border border-[#E9E9E7] bg-white text-[var(--p-text-primary)] transition-colors flex-shrink-0"
+          >
+            Switch to {MODE_DISPLAY_NAMES[m] || m}
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.85 }}
+            onClick={() => setDismissed(prev => new Set([...prev, m]))}
+            className="p-0.5 rounded hover:bg-black/5 flex-shrink-0"
+          >
+            <X className="w-3 h-3 text-[var(--p-text-muted)]" />
+          </motion.button>
+        </motion.div>
+      ))}
+    </AnimatePresence>
   )
 }
 
@@ -838,6 +909,7 @@ export default function SelectorView() {
     deleteConversations,
   } = useConversations()
   const { storageUsage, settings } = useSettings()
+  const { mode, setMode } = useMode()
 
   // ── Tour ──
   const [showTour, setShowTour] = useState(false)
@@ -1082,12 +1154,12 @@ export default function SelectorView() {
 
   const handleNewChat = useCallback(async () => {
     try {
-      const conv = await createConversation({ title: 'New conversation' })
+      const conv = await createConversation({ title: 'New conversation', createdInMode: mode })
       navigate(`/chat/${conv.id}`)
     } catch (err) {
       console.error('Failed to create conversation:', err)
     }
-  }, [createConversation, navigate])
+  }, [createConversation, navigate, mode])
 
   const handleTitleEdit = useCallback(async (id, newTitle) => {
     try {
@@ -1259,6 +1331,11 @@ export default function SelectorView() {
 
         {/* Storage warning banner */}
         <StorageWarningBanner usagePercent={storagePercent} />
+        <ModeMismatchBanner
+          conversations={conversations}
+          currentMode={mode}
+          onSwitch={setMode}
+        />
 
         {/* Search */}
         <motion.div

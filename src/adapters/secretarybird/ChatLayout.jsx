@@ -1,15 +1,17 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo, useLayoutEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   getConversation, getBranches, createConversation,
   getSbrdDocument, saveSbrdDocument,
 } from '../../lib/db'
+import { getProvider } from '../../providers'
+import { loadApiKey } from '../../lib/crypto'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Strikethrough, MessageSquare, Send, GitBranch,
+  MessageSquare, Send, GitBranch,
   AlertTriangle, Lightbulb, ChevronDown, Check, X, Eye, EyeOff,
   Bell, BellOff, Eraser, PanelRight,
-  Sparkles, PenLine, Type, CornerDownRight, Clock, ArrowRight,
+  Sparkles, CornerDownRight, ArrowRight,
   CheckCheck,
 } from 'lucide-react'
 import { SPRING_SMOOTH, SPRING_GENTLE } from '../../lib/constants'
@@ -28,15 +30,235 @@ const staggerItem = {
 
 /* ─── Colors ─────────────────────────────────────────────── */
 
-// Chrome accent — dusty gold (replaces blue for all UI chrome)
-const GOLD = '#B8A070'
-
-// Editorial colors — fixed regardless of theme (per design spec)
-const DELETION   = '#EF4444'
-const INSERTION  = '#4A7AE5'
+const GOLD      = '#B8A070'
+const DELETION  = '#EF4444'
+const INSERTION = '#4A7AE5'
 const SUGGESTION = '#22C55E'
 const RIPPLE_WARN = '#E5A620'
 const RIPPLE_OPP  = '#4A7AE5'
+
+/* ─── Word-level diff ─────────────────────────────────────── */
+// Tokenises by words + surrounding whitespace, runs LCS, returns
+// an array of { type: 'unchanged'|'deleted'|'inserted', text }.
+
+function wordDiff(original, current) {
+  const tokenise = str => str.match(/\S+|\s+/g) || []
+  const orig = tokenise(original)
+  const curr = tokenise(current)
+  const m = orig.length, n = curr.length
+
+  // Build LCS table
+  const dp = Array.from({ length: m + 1 }, () => new Int32Array(n + 1))
+  for (let i = m - 1; i >= 0; i--) {
+    for (let j = n - 1; j >= 0; j--) {
+      dp[i][j] = orig[i] === curr[j]
+        ? dp[i + 1][j + 1] + 1
+        : Math.max(dp[i + 1][j], dp[i][j + 1])
+    }
+  }
+
+  // Traceback
+  const parts = []
+  let i = 0, j = 0
+  while (i < m || j < n) {
+    if (i < m && j < n && orig[i] === curr[j]) {
+      parts.push({ type: 'unchanged', text: curr[j] }); i++; j++
+    } else if (j < n && (i >= m || dp[i][j + 1] >= dp[i + 1][j])) {
+      parts.push({ type: 'inserted', text: curr[j] }); j++
+    } else {
+      parts.push({ type: 'deleted', text: orig[i] }); i++
+    }
+  }
+  return parts
+}
+
+/* ─── Diff renderer ───────────────────────────────────────── */
+
+function DiffText({ baseline, text }) {
+  const t = text    == null ? '' : String(text)
+  const b = baseline == null ? '' : String(baseline)
+  if (!b || b === t) return <span style={{ color: '#1E2532' }}>{t}</span>
+  const parts = wordDiff(b, t)
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part.type === 'unchanged') return <span key={i} style={{ color: '#1E2532' }}>{part.text}</span>
+        if (part.type === 'deleted')
+          return <span key={i} style={{ color: DELETION, textDecoration: 'line-through', opacity: 0.7 }}>{part.text}</span>
+        return <span key={i} style={{ color: INSERTION, fontWeight: 500, borderBottom: `1.5px solid ${INSERTION}50` }}>{part.text}</span>
+      })}
+    </>
+  )
+}
+
+/* ─── Migrate old segments-based paragraphs ──────────────── */
+
+function migrateParagraph(p) {
+  if (p.text !== undefined && p.text !== null) {
+    // Ensure both fields are always strings
+    return { ...p, text: String(p.text ?? ''), baseline: String(p.baseline ?? p.text ?? '') }
+  }
+  // Convert old segments array to text + baseline
+  const text = (p.segments || [])
+    .filter(s => s.type !== 'deletion')
+    .map(s => s.content).join('')
+  const baseline = (p.segments || [])
+    .filter(s => s.type !== 'insertion' && s.type !== 'suggestion')
+    .map(s => s.content).join('')
+  const result = { ...p, text, baseline }
+  delete result.segments
+  return result
+}
+
+/* ─── Parse Claude response into paragraphs ──────────────── */
+
+function parseResponseToParas(responseText) {
+  const lines = responseText.trim().split('\n')
+  const result = []
+  let buffer = []
+  const flush = () => {
+    const content = buffer.join(' ').trim()
+    if (content) {
+      result.push({
+        id: `ai-${crypto.randomUUID()}`,
+        type: 'paragraph',
+        text: content,
+        baseline: content,
+        comments: [],
+      })
+    }
+    buffer = []
+  }
+  for (const line of lines) {
+    const t = line.trim()
+    if (!t) {
+      flush()
+    } else if (t.startsWith('# ')) {
+      flush()
+      result.push({
+        id: `ai-${crypto.randomUUID()}`,
+        type: 'heading',
+        text: t.slice(2).trim(),
+        baseline: t.slice(2).trim(),
+        comments: [],
+      })
+    } else {
+      buffer.push(t)
+    }
+  }
+  flush()
+  return result
+}
+
+/* ─── Parse structured Claude response ───────────────────── */
+// Extracts ```json``` action blocks from Claude's response.
+// Returns { adds: [...paragraphs with claudeOrigin:true], edits: [{paraId, suggestions}] }
+// Falls back to plain-paragraph parsing if no JSON blocks found.
+
+function parseClaudeResponse(responseText, currentParagraphs) {
+  const result = { adds: [], edits: [] }
+  const jsonBlockRe = /```json\s*([\s\S]*?)```/g
+  let match
+  while ((match = jsonBlockRe.exec(responseText)) !== null) {
+    try {
+      const action = JSON.parse(match[1].trim())
+      if (action.type === 'add' && Array.isArray(action.paragraphs)) {
+        for (const p of action.paragraphs) {
+          const text = String(p.text || '')
+          result.adds.push({
+            id: `ai-${crypto.randomUUID()}`,
+            type: p.type === 'heading' ? 'heading' : 'paragraph',
+            text,
+            baseline: text,
+            comments: [],
+            claudeOrigin: true,
+          })
+        }
+      } else if (action.type === 'edit' && action.paraId) {
+        const paraExists = currentParagraphs.some(p => p.id === action.paraId)
+        if (paraExists && Array.isArray(action.suggestions)) {
+          result.edits.push({
+            paraId: action.paraId,
+            suggestions: action.suggestions.map((s, i) => ({
+              id: s.id || `s-${Date.now()}-${i}`,
+              find: String(s.find || ''),
+              replace: String(s.replace || ''),
+              reasoning: String(s.reasoning || ''),
+            })),
+          })
+        }
+      }
+    } catch (_) {
+      // Skip malformed JSON blocks
+    }
+  }
+  // Fallback: no JSON blocks — treat full response as new paragraphs (Option A)
+  if (result.adds.length === 0 && result.edits.length === 0) {
+    result.adds = parseResponseToParas(responseText).map(p => ({ ...p, claudeOrigin: true }))
+  }
+  return result
+}
+
+/* ─── Claude inline suggestion diff renderer ─────────────── */
+// Shows a single find→replace suggestion inline with green diff.
+
+function ClaudeInlineSuggestionPreview({ text, suggestion }) {
+  if (!suggestion.find) {
+    return <span style={{ color: SUGGESTION, fontWeight: 500 }}>{suggestion.replace}</span>
+  }
+  const idx = text.indexOf(suggestion.find)
+  if (idx === -1) {
+    return (
+      <>
+        <span style={{ color: '#1E2532' }}>{text}</span>
+        <span style={{ color: SUGGESTION, fontWeight: 500 }}> → {suggestion.replace}</span>
+      </>
+    )
+  }
+  return (
+    <>
+      <span style={{ color: '#1E2532', opacity: 0.45 }}>{text.slice(0, idx)}</span>
+      <span style={{ color: SUGGESTION, textDecoration: 'line-through', opacity: 0.75 }}>{suggestion.find}</span>
+      <span style={{ color: SUGGESTION, fontWeight: 500, borderBottom: `1.5px solid ${SUGGESTION}50` }}>{suggestion.replace}</span>
+      <span style={{ color: '#1E2532', opacity: 0.45 }}>{text.slice(idx + suggestion.find.length)}</span>
+    </>
+  )
+}
+
+/* ─── DOM cursor helpers ─────────────────────────────────── */
+
+function getTextOffset(container, node, offset) {
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT)
+  let total = 0, cur
+  while ((cur = walker.nextNode())) {
+    if (cur === node) return total + offset
+    total += cur.length
+  }
+  return total
+}
+
+function setCursorAt(container, targetOffset) {
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT)
+  let remaining = targetOffset, cur
+  while ((cur = walker.nextNode())) {
+    if (remaining <= cur.length) {
+      const range = document.createRange()
+      range.setStart(cur, remaining)
+      range.collapse(true)
+      const sel = window.getSelection()
+      sel.removeAllRanges()
+      sel.addRange(range)
+      return
+    }
+    remaining -= cur.length
+  }
+  // Fall back: end of container
+  const range = document.createRange()
+  range.selectNodeContents(container)
+  range.collapse(false)
+  window.getSelection().removeAllRanges()
+  window.getSelection().addRange(range)
+}
 
 /* ═══════════════════════════════════════════════════════════ */
 /*  ROOT COMPONENT                                             */
@@ -46,9 +268,8 @@ export default function SecretarybirdChatLayout() {
   const navigate = useNavigate()
   const { id } = useParams()
 
-  // ── Persistent document state (loaded from / saved to IndexedDB) ──
+  // ── Persistent document state ──────────────────────────────────────
   const [paragraphs,       setParagraphs]       = useState([])
-  const [suggestionStates, setSuggestionStates] = useState({})
   const [submittedReplies, setSubmittedReplies] = useState({})
 
   // ── Conversation metadata ──────────────────────────────────────────
@@ -70,9 +291,8 @@ export default function SecretarybirdChatLayout() {
       setConversationTitle(conv?.title || 'Untitled')
       setBranches(branchList)
       if (doc) {
-        if (doc.paragraphs)       setParagraphs(doc.paragraphs)
-        if (doc.suggestionStates) setSuggestionStates(doc.suggestionStates)
-        if (doc.submittedReplies) setSubmittedReplies(doc.submittedReplies)
+        if (doc.paragraphs?.length) setParagraphs(doc.paragraphs.map(migrateParagraph))
+        if (doc.submittedReplies)   setSubmittedReplies(doc.submittedReplies)
       }
       setLoaded(true)
     }
@@ -86,133 +306,362 @@ export default function SecretarybirdChatLayout() {
     if (!loaded || !id) return
     clearTimeout(saveTimerRef.current)
     saveTimerRef.current = setTimeout(() => {
-      saveSbrdDocument(id, { paragraphs, suggestionStates, submittedReplies })
+      saveSbrdDocument(id, { paragraphs, submittedReplies })
     }, 1000)
     return () => clearTimeout(saveTimerRef.current)
-  }, [paragraphs, suggestionStates, submittedReplies, loaded, id])
+  }, [paragraphs, submittedReplies, loaded, id])
 
-  // ── UI-only state (not persisted) ─────────────────────────────────
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [sidebarTab,       setSidebarTab]       = useState('comments')
-  const [activeTool,       setActiveTool]       = useState('select')
-  const [showMarkup,       setShowMarkup]       = useState(true)
-  const [rippleEnabled,    setRippleEnabled]    = useState(true)
-  const [expandedComments,  setExpandedComments]  = useState(new Set())
-  const [hoveredRipple,     setHoveredRipple]     = useState(null)
-  const [chatInput,         setChatInput]         = useState('')
-  const [replyingTo,        setReplyingTo]        = useState(null)
-  const [replyInputs,       setReplyInputs]       = useState({})
-  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false)
+  // ── UI-only state ─────────────────────────────────────────────────
+  const [sidebarCollapsed,    setSidebarCollapsed]    = useState(false)
+  const [sidebarTab,          setSidebarTab]          = useState('comments')
+  const [activeTool,          setActiveTool]          = useState(null) // null = free edit; 'comment' = comment tool
+  const [showMarkup,          setShowMarkup]          = useState(false)
+  const [rippleEnabled,       setRippleEnabled]       = useState(true)
+  const [selectedParagraph,   setSelectedParagraph]   = useState(null)
+  const [expandedComments,    setExpandedComments]    = useState(new Set())
+  const [hoveredRipple,       setHoveredRipple]       = useState(null)
+  const [chatInput,           setChatInput]           = useState('')
+  const [replyingTo,          setReplyingTo]          = useState(null)
+  const [replyInputs,         setReplyInputs]         = useState({})
+  const [showSubmitConfirm,   setShowSubmitConfirm]   = useState(false)
 
-  // ── Derived state ──────────────────────────────────────────────────
-  const hasEdits = paragraphs.some(p =>
-    p.segments?.some(s => s.type === 'deletion' || s.type === 'insertion') ||
-    (p.segments?.some(s => s.type === 'suggestion') && !suggestionStates[p.id])
-  )
+  // ── Comment tool state ────────────────────────────────────────────
+  const [addingCommentToParaId, setAddingCommentToParaId] = useState(null)
+  const [newCommentText,        setNewCommentText]        = useState('')
+  const [selectionInfo,         setSelectionInfo]         = useState(null) // { paraId, selectedText, rect }
+  const canvasRef = useRef(null)
 
-  const contextUsage = 58
-  const getContextColor = (u) => u < 50 ? '#22C55E' : u < 80 ? RIPPLE_WARN : DELETION
+  // ── Chat panel state ──────────────────────────────────────────────
+  const [chatMessages,      setChatMessages]      = useState([])
+  const [chatStreaming,      setChatStreaming]      = useState(false)
+  const [chatStreamingText, setChatStreamingText] = useState('')
+  const chatAbortRef  = useRef(null)
+  const chatScrollRef = useRef(null)
 
-  // ── Handlers ──────────────────────────────────────────────────────
-  const acceptSuggestion = (paraId) =>
-    setSuggestionStates(prev => ({ ...prev, [paraId]: 'accepted' }))
-  const rejectSuggestion = (paraId) =>
-    setSuggestionStates(prev => ({ ...prev, [paraId]: 'rejected' }))
+  // ── Derived state ─────────────────────────────────────────────────
+  const hasEdits = paragraphs.some(p => p.text !== p.baseline)
 
-  const updateParagraph = (paraId, newText) => {
-    setParagraphs(prev => prev.map(p => {
-      if (p.id !== paraId) return p
-      if (p.type === 'heading') return { ...p, text: newText }
-      return { ...p, segments: [{ type: 'text', content: newText }] }
-    }))
-  }
+  const contextUsage = useMemo(() => {
+    const docChars  = paragraphs.reduce((s, p) => s + (p.text?.length || 0), 0)
+    const chatChars = chatMessages.reduce((s, m) => s + (m.content?.length || 0), 0)
+    return Math.min(100, Math.round(Math.ceil((docChars + chatChars) / 4) / 200000 * 100))
+  }, [paragraphs, chatMessages])
 
-  const insertParagraphAfter = (paraId) => {
-    const newId = `p${Date.now()}`
+  const getContextColor = u => u < 50 ? SUGGESTION : u < 80 ? RIPPLE_WARN : DELETION
+
+  // ── Paragraph editing handlers ────────────────────────────────────
+
+  const handleParagraphTextChange = useCallback((paraId, newText) => {
+    setParagraphs(prev => prev.map(p => p.id === paraId ? { ...p, text: newText } : p))
+  }, [])
+
+  const handleSplitParagraph = useCallback((paraId, cursorOffset) => {
     setParagraphs(prev => {
       const idx = prev.findIndex(p => p.id === paraId)
-      const at = idx === -1 ? prev.length : idx + 1
-      const copy = [...prev]
-      copy.splice(at, 0, { id: newId, type: 'paragraph', segments: [{ type: 'text', content: '' }], comments: [] })
-      return copy
-    })
-    // Focus the new paragraph after React renders it
-    setTimeout(() => {
-      const el = document.querySelector(`[data-para-id="${newId}"]`)
-      if (el) {
-        el.focus()
-        const range = document.createRange()
-        range.selectNodeContents(el)
-        range.collapse(false)
-        window.getSelection()?.removeAllRanges()
-        window.getSelection()?.addRange(range)
+      if (idx === -1) return prev
+      const para = prev[idx]
+      const before = para.text.slice(0, cursorOffset)
+      const after  = para.text.slice(cursorOffset)
+      const newPara = {
+        id: `p-${crypto.randomUUID()}`,
+        type: para.type === 'heading' ? 'paragraph' : para.type,
+        text: after,
+        baseline: after,
+        comments: [],
       }
-    }, 30)
-  }
-
-  const toggleComment = (commentId) =>
-    setExpandedComments(prev => {
-      const n = new Set(prev)
-      n.has(commentId) ? n.delete(commentId) : n.add(commentId)
-      return n
+      return [...prev.slice(0, idx), { ...para, text: before }, newPara, ...prev.slice(idx + 1)]
     })
+  }, [])
+
+  const handleMergeParagraph = useCallback((paraId) => {
+    setParagraphs(prev => {
+      const idx = prev.findIndex(p => p.id === paraId)
+      if (idx === 0) return prev
+      const prevPara = prev[idx - 1]
+      const currPara = prev[idx]
+      const mergedText = prevPara.text + currPara.text
+      // Merge cursor goes to join point — handled by the component via focusMergeAt
+      return [
+        ...prev.slice(0, idx - 1),
+        { ...prevPara, text: mergedText },
+        ...prev.slice(idx + 1),
+      ]
+    })
+    // Return the join offset so the caller can position cursor
+    return paragraphs.find(p => p.id === paraId) ? paragraphs[paragraphs.findIndex(p => p.id === paraId) - 1]?.text?.length ?? 0 : 0
+  }, [paragraphs])
+
+  // ── Comment handlers ──────────────────────────────────────────────
+
+  const toggleComment = id =>
+    setExpandedComments(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
 
   const submitReply = (commentId) => {
     const text = replyInputs[commentId]?.trim()
     if (!text) return
-    setSubmittedReplies(prev => ({
-      ...prev,
-      [commentId]: [...(prev[commentId] || []), { text }],
-    }))
+    setSubmittedReplies(prev => ({ ...prev, [commentId]: [...(prev[commentId] || []), { text }] }))
     setReplyInputs(prev => ({ ...prev, [commentId]: '' }))
     setReplyingTo(null)
   }
 
+  const handleAddComment = (paraId) => {
+    const text = newCommentText.trim()
+    if (!text) return
+    const selectedText = selectionInfo?.paraId === paraId ? selectionInfo.selectedText : null
+    setParagraphs(prev => prev.map(p =>
+      p.id === paraId
+        ? { ...p, comments: [...(p.comments || []), { id: `c${Date.now()}`, text, selectedText, claudeReply: null }] }
+        : p
+    ))
+    setNewCommentText('')
+    setAddingCommentToParaId(null)
+    setSelectionInfo(null)
+  }
+
+  // ── Accept All — apply Claude suggestions, reset baselines ───────
+
+  const handleClearAll = () => {
+    setParagraphs(prev => {
+      // Apply all pending Claude suggestions to their paragraphs
+      const withSuggestions = prev.map(p => {
+        if (!p.claudeSuggestions?.length) return p
+        let text = p.text
+        for (const sugg of p.claudeSuggestions) {
+          if (sugg.find) text = text.replace(sugg.find, sugg.replace)
+        }
+        return { ...p, text, claudeSuggestions: undefined }
+      })
+      // Reset baselines, clear all annotations (accept claudeOrigin paragraphs in-place)
+      return withSuggestions.map(p => ({
+        ...p,
+        baseline: p.text,
+        comments: [],
+        claudeNote: undefined,
+        claudeOrigin: undefined,
+        ripple: undefined,
+      }))
+    })
+  }
+
+  // ── Claude suggestion accept / reject handlers ────────────────────
+
+  const handleAcceptSuggestion = useCallback((paraId, suggId) => {
+    setParagraphs(prev => prev.map(p => {
+      if (p.id !== paraId) return p
+      const sugg = p.claudeSuggestions?.find(s => s.id === suggId)
+      if (!sugg) return p
+      const newText = sugg.find ? p.text.replace(sugg.find, sugg.replace) : p.text
+      const remaining = (p.claudeSuggestions || []).filter(s => s.id !== suggId)
+      return { ...p, text: newText, claudeSuggestions: remaining.length ? remaining : undefined }
+    }))
+  }, [])
+
+  const handleRejectSuggestion = useCallback((paraId, suggId) => {
+    setParagraphs(prev => prev.map(p => {
+      if (p.id !== paraId) return p
+      const remaining = (p.claudeSuggestions || []).filter(s => s.id !== suggId)
+      return { ...p, claudeSuggestions: remaining.length ? remaining : undefined }
+    }))
+  }, [])
+
+  // Keep a Claude-origin paragraph (strip flag, accept baseline)
+  const handleAcceptOrigin = useCallback((paraId) => {
+    setParagraphs(prev => prev.map(p =>
+      p.id === paraId ? { ...p, claudeOrigin: undefined, baseline: p.text } : p
+    ))
+  }, [])
+
+  // Remove a Claude-origin paragraph entirely
+  const handleRejectOrigin = useCallback((paraId) => {
+    setParagraphs(prev => prev.filter(p => p.id !== paraId))
+  }, [])
+
+  // ── Submit & branch ───────────────────────────────────────────────
+
   const handleSubmitAndBranch = async () => {
     setShowSubmitConfirm(false)
-    // Flush any pending auto-save immediately
     clearTimeout(saveTimerRef.current)
-    await saveSbrdDocument(id, { paragraphs, suggestionStates, submittedReplies })
-    // Create a branch conversation preserving the pre-edit state
-    const branch = await createConversation({
-      title: `Branch: ${conversationTitle || 'Untitled'}`,
-      parentId: id,
-    })
-    await saveSbrdDocument(branch.id, {
-      paragraphs,
-      suggestionStates: {},
-      submittedReplies: {},
-    })
-    // Refresh branch list
+    await saveSbrdDocument(id, { paragraphs, submittedReplies })
+    const branch = await createConversation({ title: `Branch: ${conversationTitle || 'Untitled'}`, parentId: id })
+    // New branch starts with baselines reset (no tracked changes)
+    const freshParagraphs = paragraphs.map(p => ({ ...p, baseline: p.text, comments: [] }))
+    await saveSbrdDocument(branch.id, { paragraphs: freshParagraphs, submittedReplies: {} })
     const updated = await getBranches(id)
     setBranches(updated)
   }
 
-  const pendingComments    = paragraphs.reduce((a, p) => a + (p.comments?.length || 0), 0)
-  const pendingRipples     = paragraphs.filter(p => p.ripple).length
-  const pendingSuggestions = paragraphs.filter(
-    p => p.segments?.some(s => s.type === 'suggestion') && !suggestionStates[p.id]
-  ).length
+  // ── Claude chat → document ────────────────────────────────────────
 
-  // ── Formatted branch list for History tab ─────────────────────────
+  const handleChatSend = async () => {
+    const text = chatInput.trim()
+    if (!text || chatStreaming) return
+    const userMsg = { role: 'user', content: text }
+    const newMessages = [...chatMessages, userMsg]
+    setChatMessages(newMessages)
+    setChatInput('')
+    setChatStreaming(true)
+    setChatStreamingText('')
+    try {
+      const apiKey = await loadApiKey()
+      if (!apiKey) throw new Error('Add an API key in Settings to use chat.')
+      const provider = getProvider('anthropic')
+
+      // Snapshot paragraphs so parseClaudeResponse can validate paraIds
+      const currentParas = paragraphs
+      const docWithIds = currentParas.length
+        ? currentParas.map(p => p.type === 'heading' ? `[${p.id}] # ${p.text}` : `[${p.id}] ${p.text}`).join('\n\n')
+        : '(empty document)'
+
+      const systemPrompt = `You are a writing assistant embedded in a document editor. You can add new paragraphs or suggest inline edits to existing ones.
+
+Current document (each paragraph has an ID in square brackets):
+${docWithIds}
+
+RESPONSE FORMAT:
+Wrap each action in a \`\`\`json ... \`\`\` block. You may include multiple blocks. Follow them with natural language commentary if helpful.
+
+To add new paragraphs (shown in the document as new Claude-authored content):
+\`\`\`json
+{ "type": "add", "paragraphs": [{ "type": "paragraph", "text": "..." }] }
+\`\`\`
+
+To suggest edits to an existing paragraph (shown as green strikethrough/replace):
+\`\`\`json
+{ "type": "edit", "paraId": "exact-id-from-document", "suggestions": [{ "id": "s1", "find": "exact text to replace", "replace": "replacement text", "reasoning": "brief reason" }] }
+\`\`\`
+
+Rules:
+- For add requests, use only "add" blocks. For edit requests, use only "edit" blocks. You may combine both.
+- Keep each "find" value short, unique, and verbatim from the paragraph text.
+- Use "paragraph" or "heading" for the type in add blocks.
+- Only reference paraIds that exist in the document above.`
+
+      // PHASE 2 — Ripple: after Claude responds with edits, run a second pass
+      // to detect cross-paragraph impacts (contradictions, dependency breaks, opportunities).
+      // Store results as para.ripple = { type, severity, summary, sourceEdit }.
+
+      const abortController = new AbortController()
+      chatAbortRef.current = abortController
+      let fullResponse = ''
+      await provider.sendMessage(apiKey, newMessages, 'claude-sonnet',
+        chunk => { fullResponse += chunk; setChatStreamingText(fullResponse) },
+        abortController.signal, systemPrompt,
+      )
+      setChatMessages(prev => [...prev, { role: 'assistant', content: fullResponse }])
+      setChatStreamingText('')
+
+      const actions = parseClaudeResponse(fullResponse, currentParas)
+      if (actions.adds.length > 0 || actions.edits.length > 0) {
+        setParagraphs(prev => {
+          let updated = [...prev]
+          // Apply inline edit suggestions to their paragraphs
+          for (const edit of actions.edits) {
+            updated = updated.map(p =>
+              p.id === edit.paraId
+                ? { ...p, claudeSuggestions: [...(p.claudeSuggestions || []), ...edit.suggestions] }
+                : p
+            )
+          }
+          // Append Claude-origin paragraphs at the end
+          return [...updated, ...actions.adds]
+        })
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        setChatMessages(prev => [...prev, { role: 'assistant', content: err.message, error: true }])
+        setChatStreamingText('')
+      }
+    } finally {
+      setChatStreaming(false)
+      chatAbortRef.current = null
+    }
+  }
+
+  // ── Auto-scroll chat ──────────────────────────────────────────────
+
+  useEffect(() => {
+    if (chatScrollRef.current)
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight
+  }, [chatMessages, chatStreamingText])
+
+  // ── Selection → comment tooltip ───────────────────────────────────
+  useEffect(() => {
+    const handleMouseUp = () => {
+      setTimeout(() => {
+        const sel = window.getSelection()
+        if (!sel || sel.isCollapsed || !sel.toString().trim()) {
+          setSelectionInfo(null)
+          return
+        }
+        const selectedText = sel.toString().trim()
+        let node = sel.anchorNode?.nodeType === Node.TEXT_NODE
+          ? sel.anchorNode.parentElement
+          : sel.anchorNode
+        while (node) {
+          if (node.dataset?.paraId) break
+          node = node.parentElement
+        }
+        if (!node?.dataset?.paraId || node.dataset.paraId === 'empty') {
+          setSelectionInfo(null)
+          return
+        }
+        const range = sel.getRangeAt(0)
+        const rect = range.getBoundingClientRect()
+        setSelectionInfo({ paraId: node.dataset.paraId, selectedText, rect })
+      }, 10)
+    }
+    document.addEventListener('mouseup', handleMouseUp)
+    return () => document.removeEventListener('mouseup', handleMouseUp)
+  }, [])
+
+  // ── Ctrl+Alt+M — open comment for current selection ───────────────
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.altKey && e.code === 'KeyM') {
+        e.preventDefault()
+        // Read the live DOM selection — don't rely on selectionInfo state
+        const sel = window.getSelection()
+        const selectedText = sel?.toString()?.trim()
+        if (!selectedText) return
+        // Walk up to find [data-para-id]
+        let node = sel.anchorNode?.nodeType === Node.TEXT_NODE
+          ? sel.anchorNode.parentElement
+          : sel.anchorNode
+        while (node) {
+          if (node.dataset?.paraId) break
+          node = node.parentElement
+        }
+        const paraId = node?.dataset?.paraId
+        if (!paraId) return
+        // Store the selection so handleAddComment can attach selectedText to the comment
+        setSelectionInfo({ paraId, selectedText, rect: sel.getRangeAt(0).getBoundingClientRect() })
+        setAddingCommentToParaId(paraId)
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  // ── Derived counts ────────────────────────────────────────────────
+
+  const pendingComments     = paragraphs.reduce((a, p) => a + (p.comments?.length || 0), 0)
+  const pendingSuggestions  = paragraphs.reduce((a, p) => a + (p.claudeSuggestions?.length || 0) + (p.claudeOrigin ? 1 : 0), 0)
+  const pendingRipples      = paragraphs.filter(p => p.ripple).length
+
   const branchCards = [
-    {
-      id,
-      label: conversationTitle || 'Current draft',
-      time: 'Now',
-      active: true,
-      paragraphs: paragraphs.length,
-    },
+    { id, label: conversationTitle || 'Current draft', time: 'Now', active: true, paraCount: paragraphs.length },
     ...branches.map(b => ({
       id: b.id,
       label: b.title,
-      time: new Date(b.createdAt).toLocaleString('en-US', {
-        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
-      }),
+      time: new Date(b.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
       active: false,
-      paragraphs: null,
+      paraCount: null,
     })),
   ]
+
+  // ── Deletion / insertion counts for submit modal ──────────────────
+  const deletionCount  = paragraphs.filter(p => p.text !== p.baseline && wordDiff(p.baseline, p.text).some(d => d.type === 'deleted')).length
+  const insertionCount = paragraphs.filter(p => p.text !== p.baseline && wordDiff(p.baseline, p.text).some(d => d.type === 'inserted')).length
 
   return (
     <div
@@ -221,14 +670,12 @@ export default function SecretarybirdChatLayout() {
     >
 
       {/* ═══ TOOLBAR ══════════════════════════════════════════ */}
-      <div
-        className="sbrd-toolbar absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 h-12 border-b border-[#F0F0F0]"
-      >
-        {/* Left: back button + mode label + doc info */}
+      <div className="sbrd-toolbar absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 h-12 border-b border-[#F0F0F0]">
+
+        {/* Left: back + title */}
         <div className="flex items-center gap-3" style={{ fontFamily: 'system-ui, sans-serif' }}>
           <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
             onClick={() => navigate('/')}
             className="p-1.5 rounded transition-colors text-[#B8A070] hover:text-[#1E2532]"
             title="Back to Chats"
@@ -238,34 +685,34 @@ export default function SecretarybirdChatLayout() {
           <div className="h-4 w-px bg-[#EBEBEB]" />
           <span className="text-sm font-semibold text-[#1E2532]">Secretarybird</span>
           <div className="h-4 w-px bg-[#EBEBEB]" />
-          <span className="text-xs text-[#6B7C93]">{conversationTitle}{conversationTitle ? ' — ' : ''}{paragraphs.length} paragraphs</span>
+          <span className="text-xs text-[#6B7C93]">
+            {conversationTitle}{conversationTitle ? ' — ' : ''}{paragraphs.length} paragraph{paragraphs.length !== 1 ? 's' : ''}
+          </span>
         </div>
 
-        {/* Center: marking tool selector */}
-        <div
-          className="flex items-center gap-0.5 px-1.5 py-1 rounded-lg bg-[#F5F5F5]"
-          style={{ fontFamily: 'system-ui, sans-serif' }}
-        >
-          <ToolButton icon={Type}         label="Select"    active={activeTool === 'select'}        onClick={() => setActiveTool('select')} />
-          <ToolButton icon={Strikethrough} label="Delete"   active={activeTool === 'strikethrough'} onClick={() => setActiveTool('strikethrough')} activeColor={DELETION} />
-          <ToolButton icon={PenLine}       label="Insert"   active={activeTool === 'insert'}        onClick={() => setActiveTool('insert')}        activeColor={INSERTION} />
-          <ToolButton icon={MessageSquare} label="Comment"  active={activeTool === 'comment'}       onClick={() => setActiveTool('comment')} />
+        {/* Center: Comment shortcut hint + Clear All */}
+        <div className="flex items-center gap-0.5 px-1.5 py-1 rounded-lg bg-[#F5F5F5]" style={{ fontFamily: 'system-ui, sans-serif' }}>
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] text-[#9B9A97]" title="Highlight text then press Ctrl+Alt+M to add a comment">
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span>Comment</span>
+            <span className="text-[10px] text-[#C0C8D4] ml-0.5">Ctrl+Alt+M</span>
+          </div>
           <div className="h-4 w-px bg-[#EBEBEB] mx-1" />
-          <ToolButton icon={Eraser}        label="Clear All" onClick={() => {}} />
+          <ToolButton icon={Eraser} label="Accept All" onClick={handleClearAll} />
         </div>
 
         {/* Right: toggles + context + submit */}
         <div className="flex items-center gap-2" style={{ fontFamily: 'system-ui, sans-serif' }}>
+
           {/* Markup toggle */}
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowMarkup(v => !v)}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
-              showMarkup
-                ? 'text-[#B8A070]'
-                : 'text-[#6B7C93] hover:bg-[#F5F5F5]'
+              showMarkup ? 'text-[#B8A070]' : 'text-[#6B7C93] hover:bg-[#F5F5F5]'
             }`}
             style={showMarkup ? { backgroundColor: 'rgba(184,160,112,0.1)' } : {}}
+            title={showMarkup ? 'Hide tracked changes' : 'Show tracked changes'}
           >
             {showMarkup ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
             Markup
@@ -276,9 +723,7 @@ export default function SecretarybirdChatLayout() {
             whileTap={{ scale: 0.95 }}
             onClick={() => setRippleEnabled(v => !v)}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
-              rippleEnabled
-                ? 'bg-[#E5A620]/10 text-[#E5A620]'
-                : 'text-[#6B7C93] hover:bg-[#F5F5F5]'
+              rippleEnabled ? 'bg-[#E5A620]/10 text-[#E5A620]' : 'text-[#6B7C93] hover:bg-[#F5F5F5]'
             }`}
           >
             {rippleEnabled ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
@@ -287,7 +732,7 @@ export default function SecretarybirdChatLayout() {
 
           <div className="h-4 w-px bg-[#EBEBEB]" />
 
-          {/* Context health bar */}
+          {/* Context bar */}
           <div className="flex items-center gap-2">
             <div className="w-16 h-1.5 bg-[#F5F5F5] rounded-full overflow-hidden">
               <motion.div
@@ -305,15 +750,13 @@ export default function SecretarybirdChatLayout() {
 
           <div className="h-4 w-px bg-[#EBEBEB]" />
 
-          {/* Submit button */}
+          {/* Submit */}
           <motion.button
             whileHover={hasEdits ? { scale: 1.02 } : {}}
             whileTap={hasEdits ? { scale: 0.97 } : {}}
             onClick={() => hasEdits && setShowSubmitConfirm(true)}
             className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              hasEdits
-                ? 'text-white shadow-sm'
-                : 'bg-[#F5F5F5] text-[#6B7C93] cursor-not-allowed'
+              hasEdits ? 'text-white shadow-sm' : 'bg-[#F5F5F5] text-[#6B7C93] cursor-not-allowed'
             }`}
             style={hasEdits ? { backgroundColor: GOLD } : {}}
           >
@@ -323,15 +766,50 @@ export default function SecretarybirdChatLayout() {
         </div>
       </div>
 
+      {/* ═══ FLOATING COMMENT TOOLTIP (selection-triggered) ══ */}
+      <AnimatePresence>
+        {selectionInfo && !addingCommentToParaId && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.12 }}
+            style={{
+              position: 'fixed',
+              top: selectionInfo.rect.top - 40,
+              left: selectionInfo.rect.left + selectionInfo.rect.width / 2 - 72,
+              zIndex: 60,
+              fontFamily: 'system-ui, sans-serif',
+            }}
+          >
+            <button
+              onMouseDown={(e) => {
+                e.preventDefault() // keep selection alive
+                setAddingCommentToParaId(selectionInfo.paraId)
+                setSelectionInfo(null)
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium text-white shadow-lg whitespace-nowrap"
+              style={{ backgroundColor: GOLD }}
+            >
+              <MessageSquare className="w-3 h-3" />
+              Add comment
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ═══ DOCUMENT CANVAS ══════════════════════════════════ */}
-      <div className="flex-1 overflow-y-auto pt-12 sbrd-canvas">
+      <div ref={canvasRef} className="flex-1 overflow-y-auto pt-12 sbrd-canvas">
         <div
           className="sbrd-paper mx-auto px-8 py-10 min-h-full bg-white"
-          style={{
-            maxWidth: '1100px',
-            marginTop: '16px',
-            marginBottom: '16px',
-            borderRadius: '2px',
+          style={{ maxWidth: '860px', marginTop: '16px', marginBottom: '16px', borderRadius: '2px' }}
+          onClick={(e) => {
+            // Clicking on the paper background (not a paragraph) focuses the last editable para
+            if (!showMarkup && e.target === e.currentTarget && paragraphs.length > 0) {
+              const lastId = paragraphs[paragraphs.length - 1].id
+              const el = document.querySelector(`[data-para-id="${lastId}"] [data-editable]`)
+              if (el) { el.focus(); const r = document.createRange(); r.selectNodeContents(el); r.collapse(false); window.getSelection().removeAllRanges(); window.getSelection().addRange(r) }
+            }
           }}
         >
           {/* Column headers — visible only when markup is on */}
@@ -348,7 +826,6 @@ export default function SecretarybirdChatLayout() {
 
           {paragraphs.length === 0 ? (
             <div
-              data-para-id="empty"
               contentEditable
               suppressContentEditableWarning
               onKeyDown={(e) => {
@@ -356,29 +833,38 @@ export default function SecretarybirdChatLayout() {
                   e.preventDefault()
                   const text = e.currentTarget.textContent.trim()
                   if (text) {
-                    setParagraphs([{ id: `p${Date.now()}`, type: 'paragraph', segments: [{ type: 'text', content: text }], comments: [] }])
+                    setParagraphs([{ id: `p${Date.now()}`, type: 'paragraph', text, baseline: text, comments: [] }])
                   }
                 }
               }}
               onBlur={(e) => {
                 const text = e.currentTarget.textContent.trim()
                 if (text) {
-                  setParagraphs([{ id: `p${Date.now()}`, type: 'paragraph', segments: [{ type: 'text', content: text }], comments: [] }])
+                  setParagraphs([{ id: `p${Date.now()}`, type: 'paragraph', text, baseline: text, comments: [] }])
                 }
               }}
               className="text-base leading-[1.85] text-[#9B9A97] outline-none cursor-text"
-              style={{ minHeight: '1.85em' }}
-            >
-            </div>
+              style={{ minHeight: '1.85em', caretColor: GOLD }}
+            />
           ) : paragraphs.map((para, index) => (
             <DocumentParagraph
               key={para.id}
               para={para}
               index={index}
               showMarkup={showMarkup}
-              suggestionState={suggestionStates[para.id]}
-              onAcceptSuggestion={() => acceptSuggestion(para.id)}
-              onRejectSuggestion={() => rejectSuggestion(para.id)}
+              selected={selectedParagraph === para.id}
+              activeTool={activeTool}
+              onSelect={() => setSelectedParagraph(para.id === selectedParagraph ? null : para.id)}
+              onTextChange={handleParagraphTextChange}
+              onSplit={handleSplitParagraph}
+              onMerge={handleMergeParagraph}
+              paragraphs={paragraphs}
+              addingComment={addingCommentToParaId === para.id}
+              newCommentText={newCommentText}
+              onCommentTextChange={setNewCommentText}
+              onAddComment={handleAddComment}
+              onCancelComment={() => { setAddingCommentToParaId(null); setNewCommentText('') }}
+              onStartAddComment={() => setAddingCommentToParaId(para.id)}
               expandedComments={expandedComments}
               onToggleComment={toggleComment}
               hoveredRipple={hoveredRipple}
@@ -390,8 +876,10 @@ export default function SecretarybirdChatLayout() {
               setReplyInputs={setReplyInputs}
               submittedReplies={submittedReplies}
               onSubmitReply={submitReply}
-              onUpdateParagraph={updateParagraph}
-              onInsertAfter={insertParagraphAfter}
+              onAcceptSuggestion={handleAcceptSuggestion}
+              onRejectSuggestion={handleRejectSuggestion}
+              onAcceptOrigin={handleAcceptOrigin}
+              onRejectOrigin={handleRejectOrigin}
             />
           ))}
         </div>
@@ -405,11 +893,9 @@ export default function SecretarybirdChatLayout() {
         className="flex flex-col flex-shrink-0 pt-12 overflow-hidden bg-white border-l border-[#F0F0F0]"
       >
         {sidebarCollapsed ? (
-          /* Collapsed icon strip */
           <div className="flex flex-col items-center pt-3 gap-2" style={{ fontFamily: 'system-ui, sans-serif' }}>
             <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
               onClick={() => setSidebarCollapsed(false)}
               className="p-2 rounded-lg hover:bg-[#F5F5F5] transition-colors"
               style={{ color: GOLD }}
@@ -417,38 +903,18 @@ export default function SecretarybirdChatLayout() {
             >
               <PanelRight className="w-4 h-4" />
             </motion.button>
-            <SidebarIconButton
-              icon={MessageSquare}
-              count={pendingComments}
-              active={sidebarTab === 'comments'}
-              onClick={() => { setSidebarCollapsed(false); setSidebarTab('comments') }}
-            />
-            <SidebarIconButton
-              icon={Bell}
-              count={pendingRipples}
-              badgeColor={RIPPLE_WARN}
-              active={sidebarTab === 'ripple'}
-              onClick={() => { setSidebarCollapsed(false); setSidebarTab('ripple') }}
-            />
-            <SidebarIconButton
-              icon={GitBranch}
-              active={sidebarTab === 'branches'}
-              onClick={() => { setSidebarCollapsed(false); setSidebarTab('branches') }}
-            />
-            <SidebarIconButton
-              icon={Sparkles}
-              active={sidebarTab === 'chat'}
-              onClick={() => { setSidebarCollapsed(false); setSidebarTab('chat') }}
-            />
+            <SidebarIconButton icon={MessageSquare} count={pendingComments + pendingSuggestions} active={sidebarTab === 'comments'} onClick={() => { setSidebarCollapsed(false); setSidebarTab('comments') }} />
+            <SidebarIconButton icon={Bell} count={pendingRipples} badgeColor={RIPPLE_WARN} active={sidebarTab === 'ripple'} onClick={() => { setSidebarCollapsed(false); setSidebarTab('ripple') }} />
+            <SidebarIconButton icon={GitBranch} active={sidebarTab === 'branches'} onClick={() => { setSidebarCollapsed(false); setSidebarTab('branches') }} />
+            <SidebarIconButton icon={Sparkles} active={sidebarTab === 'chat'} onClick={() => { setSidebarCollapsed(false); setSidebarTab('chat') }} />
           </div>
         ) : (
-          /* Expanded sidebar */
           <div className="flex flex-col h-full" style={{ fontFamily: 'system-ui, sans-serif' }}>
             {/* Tab bar */}
             <div className="flex items-center justify-between px-3 py-2.5 border-b border-[#F0F0F0]">
               <div className="flex items-center gap-0.5">
                 {[
-                  { id: 'comments', icon: MessageSquare, count: pendingComments, title: 'Comments' },
+                  { id: 'comments', icon: MessageSquare, count: pendingComments + pendingSuggestions, title: 'Comments & Suggestions' },
                   { id: 'ripple',   icon: Bell,          count: pendingRipples,  title: 'Ripple', badgeColor: RIPPLE_WARN },
                   { id: 'branches', icon: GitBranch,     title: 'Version History' },
                   { id: 'chat',     icon: Sparkles,      title: 'Chat with Claude' },
@@ -458,19 +924,12 @@ export default function SecretarybirdChatLayout() {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setSidebarTab(tab.id)}
                     title={tab.title}
-                    className={`relative p-2 rounded-lg transition-colors ${
-                      sidebarTab === tab.id
-                        ? 'text-[#B8A070]'
-                        : 'text-[#6B7C93] hover:bg-[#F5F5F5]'
-                    }`}
+                    className={`relative p-2 rounded-lg transition-colors ${sidebarTab === tab.id ? 'text-[#B8A070]' : 'text-[#6B7C93] hover:bg-[#F5F5F5]'}`}
                     style={sidebarTab === tab.id ? { backgroundColor: 'rgba(184,160,112,0.1)' } : {}}
                   >
                     <tab.icon className="w-4 h-4" />
                     {tab.count > 0 && (
-                      <span
-                        className="absolute -top-0.5 -right-0.5 text-[8px] font-bold text-white px-1 py-0 rounded-full min-w-[14px] text-center"
-                        style={{ backgroundColor: tab.badgeColor || GOLD }}
-                      >
+                      <span className="absolute -top-0.5 -right-0.5 text-[8px] font-bold text-white px-1 py-0 rounded-full min-w-[14px] text-center" style={{ backgroundColor: tab.badgeColor || GOLD }}>
                         {tab.count}
                       </span>
                     )}
@@ -478,8 +937,7 @@ export default function SecretarybirdChatLayout() {
                 ))}
               </div>
               <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
                 onClick={() => setSidebarCollapsed(true)}
                 className="p-1.5 rounded hover:bg-[#F5F5F5] text-[#6B7C93] hover:text-[#1E2532] transition-colors"
                 title="Collapse sidebar"
@@ -493,14 +951,34 @@ export default function SecretarybirdChatLayout() {
               <AnimatePresence mode="wait">
 
                 {sidebarTab === 'comments' && (
-                  <motion.div
-                    key="comments"
-                    initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }}
-                    transition={SPRING_SMOOTH}
-                    className="p-4 space-y-3"
-                    variants={staggerContainer}
-                  >
-                    <SidebarSectionLabel label="Active Comments" count={pendingComments} />
+                  <motion.div key="comments" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={SPRING_SMOOTH} className="p-4 space-y-3">
+                    {pendingSuggestions > 0 && (
+                      <>
+                        <SidebarSectionLabel label="Claude Suggestions" count={pendingSuggestions} />
+                        <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-2">
+                          {paragraphs.filter(p => p.claudeOrigin).map(para => (
+                            <ClaudeOriginCard
+                              key={`origin-${para.id}`}
+                              onJump={() => setSelectedParagraph(para.id)}
+                              onAccept={() => handleAcceptOrigin(para.id)}
+                              onReject={() => handleRejectOrigin(para.id)}
+                            />
+                          ))}
+                          {paragraphs.filter(p => p.claudeSuggestions?.length > 0).flatMap(para =>
+                            para.claudeSuggestions.map(sugg => (
+                              <ClaudeSuggestionCard
+                                key={sugg.id}
+                                suggestion={sugg}
+                                onJump={() => setSelectedParagraph(para.id)}
+                                onAccept={() => handleAcceptSuggestion(para.id, sugg.id)}
+                                onReject={() => handleRejectSuggestion(para.id, sugg.id)}
+                              />
+                            ))
+                          )}
+                        </motion.div>
+                      </>
+                    )}
+                    <SidebarSectionLabel label="Comments" count={pendingComments} />
                     <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-2">
                       {paragraphs.filter(p => p.comments?.length > 0).flatMap(para =>
                         para.comments.map(comment => (
@@ -513,34 +991,30 @@ export default function SecretarybirdChatLayout() {
                             replyingTo={replyingTo}
                             setReplyingTo={setReplyingTo}
                             replyInput={replyInputs[comment.id] || ''}
-                            onReplyChange={(v) => setReplyInputs(prev => ({ ...prev, [comment.id]: v }))}
+                            onReplyChange={v => setReplyInputs(prev => ({ ...prev, [comment.id]: v }))}
                             submittedReplies={submittedReplies[comment.id] || []}
                             onSubmitReply={() => submitReply(comment.id)}
                           />
                         ))
                       )}
                       {paragraphs.filter(p => p.claudeNote).map(para => (
-                        <ClaudeNoteCard
-                          key={`note-${para.id}`}
-                          note={para.claudeNote}
-                          onJump={() => setSelectedParagraph(para.id)}
-                        />
+                        <ClaudeNoteCard key={`note-${para.id}`} note={para.claudeNote} onJump={() => setSelectedParagraph(para.id)} />
                       ))}
+                      {pendingComments === 0 && !paragraphs.some(p => p.claudeNote) && (
+                        <p className="text-[11px] text-[#6B7C93] text-center py-6">
+                          {pendingSuggestions === 0 ? 'No comments yet. Highlight text then press Ctrl+Alt+M to annotate.' : 'No user comments yet.'}
+                        </p>
+                      )}
                     </motion.div>
                   </motion.div>
                 )}
 
                 {sidebarTab === 'ripple' && (
-                  <motion.div
-                    key="ripple"
-                    initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }}
-                    transition={SPRING_SMOOTH}
-                    className="p-4 space-y-3"
-                  >
+                  <motion.div key="ripple" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={SPRING_SMOOTH} className="p-4 space-y-3">
                     <SidebarSectionLabel label="Impact Analysis" count={pendingRipples} />
                     {!rippleEnabled && (
                       <p className="px-3 py-2.5 bg-[#F5F5F5] rounded-lg text-[11px] text-[#6B7C93] leading-relaxed">
-                        Ripple is off. Enable it in the toolbar to detect cross-section impacts when you submit edits.
+                        Ripple is off. Enable it in the toolbar to detect cross-section impacts.
                       </p>
                     )}
                     {rippleEnabled && (
@@ -566,16 +1040,9 @@ export default function SecretarybirdChatLayout() {
                 )}
 
                 {sidebarTab === 'branches' && (
-                  <motion.div
-                    key="branches"
-                    initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }}
-                    transition={SPRING_SMOOTH}
-                    className="p-4 space-y-3"
-                  >
+                  <motion.div key="branches" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={SPRING_SMOOTH} className="p-4 space-y-3">
                     <SidebarSectionLabel label="Version History" />
-                    <p className="text-[11px] text-[#6B7C93] leading-relaxed">
-                      Each submission creates a branch. Navigate back to any previous version — nothing is lost.
-                    </p>
+                    <p className="text-[11px] text-[#6B7C93] leading-relaxed">Each submission creates a branch. Navigate back to any previous version — nothing is lost.</p>
                     <div className="space-y-0.5">
                       {branchCards.map((branch, i) => (
                         <BranchCard key={branch.id} branch={branch} isLast={i === branchCards.length - 1} />
@@ -585,41 +1052,71 @@ export default function SecretarybirdChatLayout() {
                 )}
 
                 {sidebarTab === 'chat' && (
-                  <motion.div
-                    key="chat"
-                    initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }}
-                    transition={SPRING_SMOOTH}
-                    className="flex flex-col h-full"
-                    style={{ minHeight: 'calc(100vh - 96px)' }}
-                  >
-                    <div className="flex-1 p-4 space-y-3">
+                  <motion.div key="chat" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={SPRING_SMOOTH} className="flex flex-col h-full" style={{ minHeight: 'calc(100vh - 96px)' }}>
+
+                    {/* Messages */}
+                    <div ref={chatScrollRef} className="flex-1 p-4 space-y-3 overflow-y-auto">
                       <SidebarSectionLabel label="Chat with Claude" />
-                      <div className="px-3 py-2.5 bg-[#F5F5F5] rounded-xl rounded-bl-md text-[11px] text-[#4A5568] leading-relaxed">
-                        I've made some suggestions based on your edits. The atmosphere changes are looking strong — the "bruised twilight" and personified gas station details create a much more unsettling tone. Want me to continue this style into the remaining paragraphs?
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        <ChatShortcut label="Continue style" />
-                        <ChatShortcut label="Review all changes" />
-                        <ChatShortcut label="Check consistency" />
-                      </div>
+                      {chatMessages.length === 0 && !chatStreaming && (
+                        <>
+                          <div className="px-3 py-2.5 bg-[#F5F5F5] rounded-xl rounded-bl-md text-[11px] text-[#4A5568] leading-relaxed">
+                            Ask me to write content, continue the story, suggest edits, or review your draft. My response will be added as new paragraphs in the document.
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            <ChatShortcut label="Continue the story" onClick={() => setChatInput('Continue the story in the same style')} />
+                            <ChatShortcut label="Write a new section" onClick={() => setChatInput('Write a new section')} />
+                            <ChatShortcut label="Review my changes" onClick={() => setChatInput('Review the changes I\'ve made and give feedback')} />
+                          </div>
+                        </>
+                      )}
+                      {chatMessages.map((msg, i) => (
+                        <div
+                          key={i}
+                          className={`text-[11px] leading-relaxed rounded-xl ${msg.role === 'user' ? 'ml-3 px-3 py-2 bg-[#F5F5F5] rounded-br-sm text-[#1E2532]' : msg.error ? 'px-3 py-2 bg-red-50 border border-red-100 text-red-600' : 'px-3 py-2.5 text-[#4A5568]'}`}
+                          style={msg.role === 'assistant' && !msg.error ? { backgroundColor: `${SUGGESTION}08`, border: `1px solid ${SUGGESTION}20` } : {}}
+                        >
+                          {msg.content}
+                          {msg.role === 'assistant' && !msg.error && (
+                            <p className="text-[9px] text-[#6B7C93] mt-1.5">Added to document</p>
+                          )}
+                        </div>
+                      ))}
+                      {chatStreaming && chatStreamingText && (
+                        <div className="px-3 py-2.5 rounded-xl rounded-bl-sm text-[11px] text-[#4A5568] leading-relaxed" style={{ backgroundColor: `${SUGGESTION}08`, border: `1px solid ${SUGGESTION}20` }}>
+                          {chatStreamingText}
+                          <span className="inline-block w-1 h-3 bg-current opacity-60 ml-0.5 animate-pulse" />
+                        </div>
+                      )}
+                      {chatStreaming && !chatStreamingText && (
+                        <div className="flex items-center gap-2 px-3 py-2">
+                          {[0, 1, 2].map(i => (
+                            <div key={i} className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: GOLD, animationDelay: `${i * 0.15}s` }} />
+                          ))}
+                          <span className="text-[10px] text-[#6B7C93]">Writing…</span>
+                        </div>
+                      )}
                     </div>
+
+                    {/* Input */}
                     <div className="p-3 border-t border-[#F0F0F0]">
                       <div className="flex items-center gap-2">
                         <input
                           type="text"
-                          placeholder="Ask Claude about your draft..."
+                          placeholder="Ask Claude about your draft…"
                           value={chatInput}
                           onChange={e => setChatInput(e.target.value)}
-                          className="flex-1 px-3 py-2 bg-[#F5F5F5] border border-[#EBEBEB] rounded-lg text-xs focus:outline-none transition-colors text-[#1E2532]"
+                          onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleChatSend() } }}
+                          disabled={chatStreaming}
+                          className="flex-1 px-3 py-2 bg-[#F5F5F5] border border-[#EBEBEB] rounded-lg text-xs focus:outline-none transition-colors text-[#1E2532] disabled:opacity-50"
                           style={{ fontFamily: 'system-ui, sans-serif' }}
                         />
                         <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="p-2 rounded-lg text-white transition-colors"
-                          style={{ backgroundColor: GOLD }}
+                          whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                          onClick={chatStreaming ? () => { chatAbortRef.current?.abort(); setChatStreaming(false) } : handleChatSend}
+                          className="p-2 rounded-lg text-white transition-colors flex-shrink-0"
+                          style={{ backgroundColor: chatStreaming ? DELETION : GOLD }}
                         >
-                          <Send className="w-3.5 h-3.5" />
+                          {chatStreaming ? <X className="w-3.5 h-3.5" /> : <Send className="w-3.5 h-3.5" />}
                         </motion.button>
                       </div>
                     </div>
@@ -636,17 +1133,13 @@ export default function SecretarybirdChatLayout() {
       <AnimatePresence>
         {showSubmitConfirm && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="absolute inset-0 z-50 flex items-center justify-center"
             style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}
             onClick={() => setShowSubmitConfirm(false)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 8 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 8 }}
+              initial={{ opacity: 0, scale: 0.95, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 8 }}
               transition={SPRING_SMOOTH}
               onClick={e => e.stopPropagation()}
               className="bg-white rounded-xl shadow-2xl shadow-black/10 border border-[#E9E9E7] p-6 w-[420px]"
@@ -658,53 +1151,21 @@ export default function SecretarybirdChatLayout() {
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-[#1E2532]">Submit Edits to Claude</h3>
-                  <p className="text-xs text-[#6B7C93] mt-1 leading-relaxed">
-                    Your markups and comments will be sent to Claude for processing. A branch will be created to preserve the current version.
-                  </p>
+                  <p className="text-xs text-[#6B7C93] mt-1 leading-relaxed">Your edits and comments will be sent to Claude. A branch will be created to preserve the current version.</p>
                 </div>
               </div>
-
-              {/* Edit summary */}
               <div className="bg-[#F5F5F5] rounded-xl p-4 mb-4 space-y-2">
-                <SummaryRow icon={Strikethrough}  label="Deletions"          count={3}                color={DELETION} />
-                <SummaryRow icon={PenLine}         label="Insertions"         count={2}                color={INSERTION} />
-                <SummaryRow icon={MessageSquare}   label="Comments"           count={pendingComments}  color={GOLD} />
-                {pendingSuggestions > 0 && (
-                  <SummaryRow icon={Sparkles}      label="Pending suggestions" count={pendingSuggestions} color={SUGGESTION} />
-                )}
-                {rippleEnabled && (
-                  <SummaryRow icon={Bell}          label="Ripple analysis"    count={null} color={RIPPLE_WARN} suffix="will run after" />
-                )}
+                <SummaryRow icon={Eraser}       label="Paragraphs changed"  count={paragraphs.filter(p => p.text !== p.baseline).length} color={INSERTION} />
+                <SummaryRow icon={MessageSquare} label="Comments"            count={pendingComments} color={GOLD} />
+                {rippleEnabled && <SummaryRow icon={Bell} label="Ripple analysis" count={null} color={RIPPLE_WARN} suffix="will run after" />}
               </div>
-
-              {/* Branch notice */}
-              <div
-                className="flex items-center gap-2 px-3 py-2 rounded-lg mb-4"
-                style={{ backgroundColor: 'rgba(184,160,112,0.08)' }}
-              >
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg mb-4" style={{ backgroundColor: 'rgba(184,160,112,0.08)' }}>
                 <GitBranch className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GOLD }} />
-                <span className="text-[11px] leading-relaxed" style={{ color: GOLD }}>
-                  A new branch will be created. You can return to this version anytime.
-                </span>
+                <span className="text-[11px] leading-relaxed" style={{ color: GOLD }}>A new branch will be created. You can return to this version anytime.</span>
               </div>
-
               <div className="flex items-center gap-2 justify-end">
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setShowSubmitConfirm(false)}
-                  className="px-4 py-2 text-xs font-semibold text-[#6B7C93] hover:text-[#1E2532] hover:bg-[#F5F5F5] rounded-lg transition-colors"
-                >
-                  Cancel
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleSubmitAndBranch}
-                  className="px-5 py-2 text-white text-xs font-semibold rounded-lg transition-colors shadow-sm"
-                  style={{ backgroundColor: GOLD }}
-                >
-                  Submit & Branch
-                </motion.button>
+                <motion.button whileTap={{ scale: 0.97 }} onClick={() => setShowSubmitConfirm(false)} className="px-4 py-2 text-xs font-semibold text-[#6B7C93] hover:text-[#1E2532] hover:bg-[#F5F5F5] rounded-lg transition-colors">Cancel</motion.button>
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={handleSubmitAndBranch} className="px-5 py-2 text-white text-xs font-semibold rounded-lg shadow-sm" style={{ backgroundColor: GOLD }}>Submit & Branch</motion.button>
               </div>
             </motion.div>
           </motion.div>
@@ -715,351 +1176,356 @@ export default function SecretarybirdChatLayout() {
 }
 
 /* ═══════════════════════════════════════════════════════════ */
-/*  DOCUMENT PARAGRAPH                                         */
+/*  DOCUMENT PARAGRAPH — contentEditable with tracked changes  */
 /* ═══════════════════════════════════════════════════════════ */
 
 function DocumentParagraph({
-  para, index, showMarkup,
-  suggestionState, onAcceptSuggestion, onRejectSuggestion,
+  para, index, showMarkup, selected, activeTool,
+  onSelect, onTextChange, onSplit, onMerge, paragraphs,
+  addingComment, newCommentText, onCommentTextChange, onAddComment, onCancelComment, onStartAddComment,
   expandedComments, onToggleComment, hoveredRipple, onHoverRipple, rippleEnabled,
   replyingTo, setReplyingTo, replyInputs, setReplyInputs, submittedReplies, onSubmitReply,
-  onUpdateParagraph, onInsertAfter,
+  onAcceptSuggestion, onRejectSuggestion, onAcceptOrigin, onRejectOrigin,
 }) {
-  const hasComments  = para.comments?.length > 0
-  const hasSuggestion = para.segments?.some(s => s.type === 'suggestion')
-  const hasRipple    = para.ripple && rippleEnabled
+  const editRef = useRef(null)
+  const isComposing = useRef(false)
+  const skipNextSync = useRef(false)
+
+  // Sync para.text → DOM. Runs on text change AND when switching back to edit mode
+  // (showMarkup flip mounts a fresh contentEditable whose textContent starts empty)
+  useLayoutEffect(() => {
+    const el = editRef.current
+    if (!el || skipNextSync.current) { skipNextSync.current = false; return }
+    const target = String(para.text ?? '')
+    if (el.textContent !== target) {
+      const sel = window.getSelection()
+      let savedOffset = null
+      if (sel?.rangeCount && el.contains(sel.anchorNode)) {
+        savedOffset = getTextOffset(el, sel.anchorNode, sel.anchorOffset)
+      }
+      el.textContent = target
+      if (savedOffset !== null) setCursorAt(el, savedOffset)
+    }
+  }, [para.text, showMarkup])
+
+  const handleInput = (e) => {
+    if (isComposing.current) return
+    skipNextSync.current = true
+    onTextChange(para.id, e.currentTarget.textContent)
+  }
+
+  const handleKeyDown = (e) => {
+    if (isComposing.current) return
+
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      const sel = window.getSelection()
+      if (!sel?.rangeCount) return
+      const offset = getTextOffset(editRef.current, sel.anchorNode, sel.anchorOffset)
+      onSplit(para.id, offset)
+      // Focus the new paragraph after state updates
+      requestAnimationFrame(() => {
+        const idx = paragraphs.findIndex(p => p.id === para.id)
+        const nextPara = paragraphs[idx + 1]
+        if (nextPara) {
+          const nextEl = document.querySelector(`[data-para-id="${nextPara.id}"] [data-editable]`)
+          if (nextEl) { nextEl.focus(); setCursorAt(nextEl, 0) }
+        }
+      })
+    }
+
+    if (e.key === 'Backspace') {
+      const sel = window.getSelection()
+      if (sel?.isCollapsed && sel.anchorOffset === 0 && getTextOffset(editRef.current, sel.anchorNode, sel.anchorOffset) === 0) {
+        e.preventDefault()
+        const idx = paragraphs.findIndex(p => p.id === para.id)
+        if (idx === 0) return
+        const prevPara = paragraphs[idx - 1]
+        const joinAt = prevPara.text.length
+        onMerge(para.id)
+        // Focus previous paragraph at join point
+        requestAnimationFrame(() => {
+          const prevEl = document.querySelector(`[data-para-id="${prevPara.id}"] [data-editable]`)
+          if (prevEl) { prevEl.focus(); setCursorAt(prevEl, joinAt) }
+        })
+      }
+    }
+  }
+
+  const handlePaste = (e) => {
+    e.preventDefault()
+    const text = e.clipboardData.getData('text/plain')
+    if (!text) return
+    document.execCommand('insertText', false, text)
+  }
+
+  const handleClick = () => {
+    if (activeTool === 'comment') {
+      onStartAddComment()
+      onSelect()
+    } else {
+      onSelect()
+    }
+  }
+
+  const hasComments     = para.comments?.length > 0
+  const hasSuggestions  = para.claudeSuggestions?.length > 0
+  const hasOrigin       = para.claudeOrigin === true
+  const hasGutterContent = hasComments || hasSuggestions || hasOrigin
+  const hasRipple       = para.ripple && rippleEnabled
   const isRippleHovered = hoveredRipple === para.id
 
   if (para.type === 'heading') {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ ...SPRING_GENTLE, delay: index * 0.05 }}
-        className="mb-8 mt-4 flex"
+        data-para-id={para.id}
+        initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ ...SPRING_GENTLE, delay: Math.min(index * 0.04, 0.3) }}
+        className="mb-8 mt-4"
+        onClick={handleClick}
       >
-        <div style={{ width: '65%' }}>
+        {showMarkup ? (
+          <h1 className="text-2xl font-semibold text-[#1E2532] leading-tight tracking-tight">
+            <DiffText baseline={para.baseline} text={para.text} />
+          </h1>
+        ) : (
           <h1
-            data-para-id={para.id}
+            ref={editRef}
+            data-editable
             contentEditable
             suppressContentEditableWarning
-            onBlur={(e) => onUpdateParagraph(para.id, e.currentTarget.textContent.trim())}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') { e.preventDefault(); onInsertAfter(para.id) }
-            }}
-            className="text-2xl font-semibold text-[#1E2532] leading-tight tracking-tight outline-none cursor-text"
+            onInput={handleInput}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            onCompositionStart={() => { isComposing.current = true }}
+            onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
+            className="text-2xl font-semibold text-[#1E2532] leading-tight tracking-tight outline-none"
             style={{ caretColor: GOLD }}
-          >
-            {para.text}
-          </h1>
-        </div>
-        <div style={{ width: '35%' }} />
+          />
+        )}
       </motion.div>
     )
   }
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ ...SPRING_GENTLE, delay: index * 0.05 }}
+      data-para-id={para.id}
+      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      transition={{ ...SPRING_GENTLE, delay: Math.min(index * 0.04, 0.3) }}
       className="relative group mb-6"
+      onClick={() => { if (!showMarkup && editRef.current) editRef.current.focus() }}
     >
       <div className="flex">
-        {/* Document column — 65% */}
-        <div style={{ width: '65%' }} className="flex-shrink-0">
+        {/* Document column */}
+        <div style={{ width: showMarkup && hasGutterContent ? '65%' : '100%' }} className="flex-shrink-0 transition-all duration-200">
           <div
-            className={`relative transition-colors duration-200 rounded-lg px-2 py-1 -mx-2 focus-within:bg-[rgba(184,160,112,0.05)] ${
+            className={`relative transition-colors duration-200 rounded-lg px-2 py-1 -mx-2 ${
               isRippleHovered ? 'ring-1 ring-[#E5A620]/40 bg-[#E5A620]/[0.03]' : ''
             }`}
+            style={{
+              ...(selected && !isRippleHovered ? { backgroundColor: 'rgba(184,160,112,0.05)' } : {}),
+              ...(hasOrigin ? { borderLeft: `2px solid ${SUGGESTION}50`, paddingLeft: '10px', backgroundColor: `${SUGGESTION}05` } : {}),
+            }}
           >
-            {/* Paragraph text with inline edits — directly editable */}
-            <p
-              data-para-id={para.id}
-              contentEditable
-              suppressContentEditableWarning
-              onBlur={(e) => onUpdateParagraph(para.id, e.currentTarget.textContent)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') { e.preventDefault(); onInsertAfter(para.id) }
-              }}
-              className="text-base leading-[1.85] text-[#1E2532] outline-none"
-              style={{ caretColor: GOLD, cursor: 'text' }}
-            >
-              {para.segments?.map((seg, i) => (
-                <InlineSegment key={i} segment={seg} showMarkup={showMarkup} suggestionState={suggestionState} />
-              ))}
-            </p>
+            {/* Paragraph text */}
+            {showMarkup ? (
+              <div>
+                <p className="text-base leading-[1.85] text-[#1E2532]">
+                  <DiffText baseline={para.baseline} text={para.text} />
+                </p>
+                {/* Claude inline suggestion previews */}
+                {hasSuggestions && (
+                  <div className="mt-2 space-y-2">
+                    {para.claudeSuggestions.map(sugg => (
+                      <div
+                        key={sugg.id}
+                        className="pl-3 border-l-2 py-0.5"
+                        style={{ borderColor: `${SUGGESTION}40` }}
+                      >
+                        <p className="text-[10px] font-semibold mb-0.5" style={{ color: SUGGESTION, fontFamily: 'system-ui, sans-serif' }}>
+                          Suggested edit
+                        </p>
+                        <p className="text-base leading-[1.85]">
+                          <ClaudeInlineSuggestionPreview text={para.text} suggestion={sugg} />
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {/* Claude-origin label */}
+                {hasOrigin && (
+                  <div className="mt-1 flex items-center gap-1.5" style={{ fontFamily: 'system-ui, sans-serif' }}>
+                    <Sparkles className="w-3 h-3" style={{ color: SUGGESTION }} />
+                    <span className="text-[10px] font-medium" style={{ color: SUGGESTION }}>Added by Claude</span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div
+                ref={editRef}
+                data-editable
+                contentEditable
+                suppressContentEditableWarning
+                onInput={handleInput}
+                onKeyDown={handleKeyDown}
+                onPaste={handlePaste}
+                onCompositionStart={() => { isComposing.current = true }}
+                onCompositionEnd={e => { isComposing.current = false; handleInput(e) }}
+                className="text-base leading-[1.85] text-[#1E2532] outline-none w-full"
+                style={{ caretColor: GOLD, whiteSpace: 'pre-wrap', wordBreak: 'break-word', minHeight: '1.85em' }}
+              />
+            )}
 
             {/* Claude note */}
             {para.claudeNote && showMarkup && (
               <motion.div
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
                 className="flex items-start gap-2 mt-2 px-3 py-2 rounded-lg border"
-                style={{
-                  backgroundColor: `${SUGGESTION}08`,
-                  borderColor: `${SUGGESTION}20`,
-                }}
+                style={{ backgroundColor: `${SUGGESTION}08`, borderColor: `${SUGGESTION}20` }}
               >
                 <Sparkles className="w-3 h-3 flex-shrink-0 mt-0.5" style={{ color: SUGGESTION }} />
-                <span className="text-[11px] text-[#4A5568] leading-relaxed" style={{ fontFamily: 'system-ui, sans-serif' }}>
-                  {para.claudeNote}
-                </span>
+                <span className="text-[11px] text-[#4A5568] leading-relaxed" style={{ fontFamily: 'system-ui, sans-serif' }}>{para.claudeNote}</span>
               </motion.div>
             )}
 
-            {/* Suggestion accept / reject bar */}
-            {hasSuggestion && showMarkup && !suggestionState && (
-              <motion.div
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-2 mt-2"
-                style={{ fontFamily: 'system-ui, sans-serif' }}
-              >
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={e => { e.stopPropagation(); onAcceptSuggestion() }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-colors"
-                  style={{ backgroundColor: `${SUGGESTION}18`, color: SUGGESTION }}
-                >
-                  <Check className="w-3 h-3" />
-                  Accept
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={e => { e.stopPropagation(); onRejectSuggestion() }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-[#6B7C93] hover:bg-[#F5F5F5] transition-colors"
-                >
-                  <X className="w-3 h-3" />
-                  Reject
-                </motion.button>
-                <span className="text-[10px] text-[#6B7C93] ml-1">Claude's suggestion</span>
-              </motion.div>
-            )}
-
-            {/* Accepted / rejected indicator */}
-            {suggestionState && showMarkup && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex items-center gap-1.5 mt-2 text-[10px] font-medium"
-                style={{
-                  color: suggestionState === 'accepted' ? SUGGESTION : '#6B7C93',
-                  fontFamily: 'system-ui, sans-serif',
-                }}
-              >
-                {suggestionState === 'accepted' ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                {suggestionState === 'accepted' ? 'Suggestion accepted' : 'Suggestion rejected'}
-              </motion.div>
-            )}
-
-            {/* Ripple inline indicator */}
+            {/* Ripple indicator */}
             {hasRipple && showMarkup && (
               <motion.div
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
                 onMouseEnter={() => onHoverRipple(para.id)}
                 onMouseLeave={() => onHoverRipple(null)}
                 className="flex items-start gap-2 mt-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors"
                 style={{
-                  backgroundColor: para.ripple.type === 'contradiction'
-                    ? `${RIPPLE_WARN}0D` : `${RIPPLE_OPP}0A`,
-                  borderColor: para.ripple.type === 'contradiction'
-                    ? `${RIPPLE_WARN}30` : `${RIPPLE_OPP}25`,
+                  backgroundColor: para.ripple.type === 'contradiction' ? `${RIPPLE_WARN}0D` : `${RIPPLE_OPP}0A`,
+                  borderColor:     para.ripple.type === 'contradiction' ? `${RIPPLE_WARN}30` : `${RIPPLE_OPP}25`,
                 }}
               >
-                {para.ripple.type === 'contradiction' ? (
-                  <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: RIPPLE_WARN }} />
-                ) : (
-                  <Lightbulb className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: RIPPLE_OPP }} />
-                )}
-                <span className="text-[11px] text-[#4A5568] leading-relaxed" style={{ fontFamily: 'system-ui, sans-serif' }}>
-                  {para.ripple.summary}
-                </span>
+                {para.ripple.type === 'contradiction'
+                  ? <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: RIPPLE_WARN }} />
+                  : <Lightbulb    className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: RIPPLE_OPP }} />
+                }
+                <span className="text-[11px] text-[#4A5568] leading-relaxed" style={{ fontFamily: 'system-ui, sans-serif' }}>{para.ripple.summary}</span>
+              </motion.div>
+            )}
+
+            {/* Comment tool inline form */}
+            {addingComment && (
+              <motion.div
+                initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-2 mt-3"
+                onClick={e => e.stopPropagation()}
+                style={{ fontFamily: 'system-ui, sans-serif' }}
+              >
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="Add a comment…"
+                  value={newCommentText}
+                  onChange={e => onCommentTextChange(e.target.value)}
+                  onKeyDown={e => {
+                    e.stopPropagation()
+                    if (e.key === 'Enter') { e.preventDefault(); onAddComment(para.id) }
+                    if (e.key === 'Escape') onCancelComment()
+                  }}
+                  className="flex-1 px-3 py-1.5 text-xs bg-[#FFF9E6] border border-[#E5D9A8] rounded-lg focus:outline-none focus:border-[#B8A070] transition-colors text-[#1E2532]"
+                />
+                <motion.button whileTap={{ scale: 0.97 }} onClick={() => onAddComment(para.id)} className="px-2.5 py-1.5 text-[11px] font-semibold rounded-lg text-white flex-shrink-0" style={{ backgroundColor: GOLD }}>Add</motion.button>
+                <motion.button whileTap={{ scale: 0.97 }} onClick={onCancelComment} className="px-2 py-1.5 text-[11px] text-[#6B7C93] hover:bg-[#F5F5F5] rounded-lg transition-colors flex-shrink-0">Cancel</motion.button>
               </motion.div>
             )}
           </div>
         </div>
 
-        {/* Comment gutter — 35%, always present */}
-        <div style={{ width: '35%' }} className="flex-shrink-0 pl-6 relative">
-          {hasComments && showMarkup && (
-            <>
-              {/* Connector line */}
-              <div className="absolute left-0 top-3 w-6 h-px bg-[#EBEBEB]" />
-              <div className="space-y-2">
-                {para.comments.map(comment => (
-                  <MarginComment
-                    key={comment.id}
-                    comment={comment}
-                    expanded={expandedComments.has(comment.id)}
-                    onToggle={() => onToggleComment(comment.id)}
-                    replyingTo={replyingTo}
-                    setReplyingTo={setReplyingTo}
-                    replyInput={replyInputs[comment.id] || ''}
-                    onReplyChange={(v) => setReplyInputs(prev => ({ ...prev, [comment.id]: v }))}
-                    submittedReplies={submittedReplies[comment.id] || []}
-                    onSubmitReply={() => onSubmitReply(comment.id)}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-        </div>
+        {/* Comment / suggestion gutter */}
+        {showMarkup && hasGutterContent && (
+          <div style={{ width: '35%' }} className="flex-shrink-0 pl-6 relative">
+            <div className="absolute left-0 top-3 w-6 h-px bg-[#EBEBEB]" />
+            <div className="space-y-2">
+              {/* Claude-origin card */}
+              {hasOrigin && (
+                <ClaudeOriginCard
+                  onAccept={() => onAcceptOrigin(para.id)}
+                  onReject={() => onRejectOrigin(para.id)}
+                />
+              )}
+              {/* Claude suggestion cards */}
+              {hasSuggestions && para.claudeSuggestions.map(sugg => (
+                <ClaudeSuggestionCard
+                  key={sugg.id}
+                  suggestion={sugg}
+                  onAccept={() => onAcceptSuggestion(para.id, sugg.id)}
+                  onReject={() => onRejectSuggestion(para.id, sugg.id)}
+                />
+              ))}
+              {/* User comments */}
+              {para.comments.map(comment => (
+                <MarginComment
+                  key={comment.id}
+                  comment={comment}
+                  expanded={expandedComments.has(comment.id)}
+                  onToggle={() => onToggleComment(comment.id)}
+                  replyingTo={replyingTo}
+                  setReplyingTo={setReplyingTo}
+                  replyInput={replyInputs[comment.id] || ''}
+                  onReplyChange={v => setReplyInputs(prev => ({ ...prev, [comment.id]: v }))}
+                  submittedReplies={submittedReplies[comment.id] || []}
+                  onSubmitReply={() => onSubmitReply(comment.id)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>
   )
 }
 
 /* ═══════════════════════════════════════════════════════════ */
-/*  INLINE SEGMENT                                             */
-/* ═══════════════════════════════════════════════════════════ */
-
-function InlineSegment({ segment, showMarkup, suggestionState }) {
-  if (segment.type === 'text') {
-    return <span>{segment.content}</span>
-  }
-
-  if (segment.type === 'deletion') {
-    if (!showMarkup) return null
-    return (
-      <span style={{ color: DELETION, textDecoration: 'line-through', textDecorationColor: DELETION, opacity: 0.75 }}>
-        {segment.content}
-      </span>
-    )
-  }
-
-  if (segment.type === 'insertion') {
-    return (
-      <span style={{
-        color: showMarkup ? INSERTION : 'inherit',
-        fontWeight: showMarkup ? 500 : 400,
-        borderBottom: showMarkup ? `1.5px solid ${INSERTION}50` : 'none',
-      }}>
-        {segment.content}
-      </span>
-    )
-  }
-
-  if (segment.type === 'suggestion') {
-    if (suggestionState === 'rejected') return null
-    const accepted = suggestionState === 'accepted'
-    return (
-      <span style={{
-        color: accepted ? 'inherit' : showMarkup ? SUGGESTION : 'inherit',
-        fontWeight: accepted ? 400 : showMarkup ? 500 : 400,
-        borderBottom: showMarkup && !accepted ? `1.5px solid ${SUGGESTION}50` : 'none',
-        backgroundColor: showMarkup && !accepted ? `${SUGGESTION}0C` : 'transparent',
-        borderRadius: showMarkup && !accepted ? '2px' : 0,
-        padding: showMarkup && !accepted ? '0 2px' : 0,
-        transition: 'color 0.3s, background-color 0.3s',
-      }}>
-        {segment.content}
-      </span>
-    )
-  }
-
-  return <span>{segment.content}</span>
-}
-
-/* ═══════════════════════════════════════════════════════════ */
 /*  MARGIN COMMENT                                             */
 /* ═══════════════════════════════════════════════════════════ */
 
-function MarginComment({
-  comment, expanded, onToggle,
-  replyingTo, setReplyingTo, replyInput, onReplyChange, submittedReplies, onSubmitReply,
-}) {
+function MarginComment({ comment, expanded, onToggle, replyingTo, setReplyingTo, replyInput, onReplyChange, submittedReplies, onSubmitReply }) {
   const isReplying = replyingTo === comment.id
-
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 8 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={SPRING_SMOOTH}
-      style={{ fontFamily: 'system-ui, sans-serif' }}
-    >
-      <div
-        className="px-3 py-2 bg-[#FFF9E6] border border-[#E5D9A8] rounded-lg cursor-pointer hover:bg-[#FFF5D6] transition-colors"
-        onClick={onToggle}
-      >
+    <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={SPRING_SMOOTH} style={{ fontFamily: 'system-ui, sans-serif' }}>
+      <div className="px-3 py-2 bg-[#FFF9E6] border border-[#E5D9A8] rounded-lg cursor-pointer hover:bg-[#FFF5D6] transition-colors" onClick={onToggle}>
+        {comment.selectedText && (
+          <p className="text-[10px] text-[#9B8A2F] italic leading-relaxed mb-1.5 pb-1.5 border-b border-[#E5D9A8]/60 truncate">
+            "{comment.selectedText}"
+          </p>
+        )}
         <div className="flex items-start justify-between gap-2">
           <p className="text-[11px] text-[#6B5D1F] leading-relaxed">{comment.text}</p>
           {comment.claudeReply && (
-            <ChevronDown
-              className="w-3 h-3 flex-shrink-0 mt-0.5 transition-transform"
-              style={{ color: '#B5A353', transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
-            />
+            <ChevronDown className="w-3 h-3 flex-shrink-0 mt-0.5 transition-transform" style={{ color: '#B5A353', transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
           )}
         </div>
       </div>
-
-      {/* Claude reasoning reply + user replies */}
       <AnimatePresence>
         {expanded && comment.claudeReply && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={SPRING_SMOOTH}
-            className="overflow-hidden"
-          >
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={SPRING_SMOOTH} className="overflow-hidden">
             <div className="ml-3 mt-1 pl-3 border-l-2 border-[#22C55E]/30">
               <div className="flex items-center gap-1.5 mb-1">
                 <Sparkles className="w-2.5 h-2.5" style={{ color: SUGGESTION }} />
                 <span className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: SUGGESTION }}>Claude</span>
               </div>
               <p className="text-[10px] text-[#4A5568] leading-relaxed">{comment.claudeReply.text}</p>
-
-              {/* Submitted user replies */}
               {submittedReplies.map((reply, i) => (
                 <div key={i} className="mt-2 pt-2 border-t border-[#22C55E]/15">
                   <p className="text-[10px] text-[#6B5D1F] leading-relaxed">{reply.text}</p>
                 </div>
               ))}
-
-              {/* Reply button / input */}
               {!isReplying ? (
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={(e) => { e.stopPropagation(); setReplyingTo(comment.id) }}
-                  className="mt-1.5 text-[9px] font-medium transition-colors"
-                  style={{ color: `${GOLD}99` }}
-                  onMouseEnter={e => e.currentTarget.style.color = GOLD}
-                  onMouseLeave={e => e.currentTarget.style.color = `${GOLD}99`}
-                >
-                  Reply
-                </motion.button>
+                <motion.button whileTap={{ scale: 0.95 }} onClick={e => { e.stopPropagation(); setReplyingTo(comment.id) }} className="mt-1.5 text-[9px] font-medium transition-colors" style={{ color: `${GOLD}99` }} onMouseEnter={e => e.currentTarget.style.color = GOLD} onMouseLeave={e => e.currentTarget.style.color = `${GOLD}99`}>Reply</motion.button>
               ) : (
-                <motion.div
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={SPRING_SMOOTH}
-                  className="flex items-center gap-1.5 mt-2"
-                  onClick={e => e.stopPropagation()}
-                >
+                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} transition={SPRING_SMOOTH} className="flex items-center gap-1.5 mt-2" onClick={e => e.stopPropagation()}>
                   <input
-                    autoFocus
-                    type="text"
-                    placeholder="Reply to Claude..."
-                    value={replyInput}
-                    onChange={e => onReplyChange(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') onSubmitReply()
-                      if (e.key === 'Escape') setReplyingTo(null)
-                    }}
+                    autoFocus type="text" placeholder="Reply to Claude…"
+                    value={replyInput} onChange={e => onReplyChange(e.target.value)}
+                    onKeyDown={e => { e.stopPropagation(); if (e.key === 'Enter') { e.preventDefault(); onSubmitReply() } if (e.key === 'Escape') setReplyingTo(null) }}
                     className="flex-1 px-2 py-1 text-[10px] bg-white border border-[#E5D9A8] rounded focus:outline-none focus:border-[#B8A070] transition-colors text-[#1E2532]"
                   />
-                  <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    onClick={onSubmitReply}
-                    className="p-1 rounded transition-colors"
-                    style={{ color: GOLD }}
-                  >
-                    <Send className="w-3 h-3" />
-                  </motion.button>
+                  <motion.button whileTap={{ scale: 0.9 }} onClick={onSubmitReply} className="p-1 rounded transition-colors" style={{ color: GOLD }}><Send className="w-3 h-3" /></motion.button>
                 </motion.div>
               )}
             </div>
@@ -1076,26 +1542,9 @@ function MarginComment({
 
 function SidebarIconButton({ icon: Icon, count, badgeColor, onClick, active }) {
   return (
-    <motion.button
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
-      onClick={onClick}
-      className="relative p-2 rounded-lg transition-colors"
-      style={
-        active
-          ? { backgroundColor: 'rgba(184,160,112,0.1)', color: GOLD }
-          : { color: '#6B7C93' }
-      }
-    >
+    <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onClick} className="relative p-2 rounded-lg transition-colors" style={active ? { backgroundColor: 'rgba(184,160,112,0.1)', color: GOLD } : { color: '#6B7C93' }}>
       <Icon className="w-4 h-4" />
-      {count > 0 && (
-        <span
-          className="absolute -top-0.5 -right-0.5 text-[8px] font-bold text-white px-1 py-0 rounded-full min-w-[14px] text-center"
-          style={{ backgroundColor: badgeColor || GOLD }}
-        >
-          {count}
-        </span>
-      )}
+      {count > 0 && <span className="absolute -top-0.5 -right-0.5 text-[8px] font-bold text-white px-1 py-0 rounded-full min-w-[14px] text-center" style={{ backgroundColor: badgeColor || GOLD }}>{count}</span>}
     </motion.button>
   )
 }
@@ -1104,106 +1553,44 @@ function SidebarSectionLabel({ label, count }) {
   return (
     <div className="flex items-center justify-between">
       <h3 className="text-xs font-semibold text-[#6B7C93] uppercase tracking-wider">{label}</h3>
-      {count !== undefined && (
-        <span className="text-[10px] font-semibold" style={{ color: GOLD }}>{count}</span>
-      )}
+      {count !== undefined && <span className="text-[10px] font-semibold" style={{ color: GOLD }}>{count}</span>}
     </div>
   )
 }
 
-function CommentCard({
-  comment, expanded, onToggle, onJump,
-  replyingTo, setReplyingTo, replyInput, onReplyChange, submittedReplies, onSubmitReply,
-}) {
+function CommentCard({ comment, expanded, onToggle, onJump, replyingTo, setReplyingTo, replyInput, onReplyChange, submittedReplies, onSubmitReply }) {
   const isReplying = replyingTo === comment.id
-
   return (
-    <motion.div
-      variants={staggerItem}
-      className="px-3 py-2.5 bg-[#FFF9E6] border border-[#E5D9A8] rounded-xl"
-    >
+    <motion.div variants={staggerItem} className="px-3 py-2.5 bg-[#FFF9E6] border border-[#E5D9A8] rounded-xl">
       <div className="flex items-start justify-between gap-2 mb-1">
         <p className="text-[11px] text-[#6B5D1F] leading-relaxed flex-1">{comment.text}</p>
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={onJump}
-          className="p-1 rounded flex-shrink-0 transition-colors"
-          style={{ color: '#B5A353' }}
-          title="Jump to paragraph"
-        >
-          <ArrowRight className="w-3 h-3" />
-        </motion.button>
+        <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onJump} className="p-1 rounded flex-shrink-0 transition-colors" style={{ color: '#B5A353' }} title="Jump to paragraph"><ArrowRight className="w-3 h-3" /></motion.button>
       </div>
       {comment.claudeReply && (
         <div className="mt-2 pt-2 border-t border-[#E5D9A8]/50">
-          <div
-            className="flex items-center gap-1.5 mb-1 cursor-pointer"
-            onClick={onToggle}
-          >
+          <div className="flex items-center gap-1.5 mb-1 cursor-pointer" onClick={onToggle}>
             <Sparkles className="w-2.5 h-2.5" style={{ color: SUGGESTION }} />
             <span className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: SUGGESTION }}>Claude's reasoning</span>
-            <ChevronDown
-              className="w-3 h-3 ml-auto transition-transform"
-              style={{ color: SUGGESTION, transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
-            />
+            <ChevronDown className="w-3 h-3 ml-auto transition-transform" style={{ color: SUGGESTION, transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }} />
           </div>
           <AnimatePresence>
             {expanded && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
-              >
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
                 <p className="text-[10px] text-[#4A5568] leading-relaxed">{comment.claudeReply.text}</p>
-
-                {/* Submitted user replies */}
                 {submittedReplies.map((reply, i) => (
-                  <div key={i} className="mt-2 pt-2 border-t border-[#E5D9A8]/40">
-                    <p className="text-[10px] text-[#6B5D1F] leading-relaxed">{reply.text}</p>
-                  </div>
+                  <div key={i} className="mt-2 pt-2 border-t border-[#E5D9A8]/40"><p className="text-[10px] text-[#6B5D1F] leading-relaxed">{reply.text}</p></div>
                 ))}
-
-                {/* Reply button / input */}
                 {!isReplying ? (
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setReplyingTo(comment.id)}
-                    className="mt-1.5 text-[9px] font-medium transition-colors"
-                    style={{ color: `${GOLD}99` }}
-                    onMouseEnter={e => e.currentTarget.style.color = GOLD}
-                    onMouseLeave={e => e.currentTarget.style.color = `${GOLD}99`}
-                  >
-                    Reply
-                  </motion.button>
+                  <motion.button whileTap={{ scale: 0.95 }} onClick={() => setReplyingTo(comment.id)} className="mt-1.5 text-[9px] font-medium transition-colors" style={{ color: `${GOLD}99` }} onMouseEnter={e => e.currentTarget.style.color = GOLD} onMouseLeave={e => e.currentTarget.style.color = `${GOLD}99`}>Reply</motion.button>
                 ) : (
-                  <motion.div
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={SPRING_SMOOTH}
-                    className="flex items-center gap-1.5 mt-2"
-                  >
+                  <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} transition={SPRING_SMOOTH} className="flex items-center gap-1.5 mt-2">
                     <input
-                      autoFocus
-                      type="text"
-                      placeholder="Reply to Claude..."
-                      value={replyInput}
-                      onChange={e => onReplyChange(e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') onSubmitReply()
-                        if (e.key === 'Escape') setReplyingTo(null)
-                      }}
+                      autoFocus type="text" placeholder="Reply to Claude…"
+                      value={replyInput} onChange={e => onReplyChange(e.target.value)}
+                      onKeyDown={e => { e.stopPropagation(); if (e.key === 'Enter') { e.preventDefault(); onSubmitReply() } if (e.key === 'Escape') setReplyingTo(null) }}
                       className="flex-1 px-2 py-1 text-[10px] bg-white border border-[#E5D9A8] rounded focus:outline-none focus:border-[#B8A070] transition-colors text-[#1E2532]"
                     />
-                    <motion.button
-                      whileTap={{ scale: 0.9 }}
-                      onClick={onSubmitReply}
-                      className="p-1 rounded transition-colors"
-                      style={{ color: GOLD }}
-                    >
-                      <Send className="w-3 h-3" />
-                    </motion.button>
+                    <motion.button whileTap={{ scale: 0.9 }} onClick={onSubmitReply} className="p-1 rounded transition-colors" style={{ color: GOLD }}><Send className="w-3 h-3" /></motion.button>
                   </motion.div>
                 )}
               </motion.div>
@@ -1217,22 +1604,108 @@ function CommentCard({
 
 function ClaudeNoteCard({ note, onJump }) {
   return (
-    <motion.div
-      variants={staggerItem}
-      className="px-3 py-2.5 rounded-xl border"
-      style={{ backgroundColor: `${SUGGESTION}08`, borderColor: `${SUGGESTION}20` }}
-    >
+    <motion.div variants={staggerItem} className="px-3 py-2.5 rounded-xl border" style={{ backgroundColor: `${SUGGESTION}08`, borderColor: `${SUGGESTION}20` }}>
       <div className="flex items-start gap-2">
         <Sparkles className="w-3 h-3 flex-shrink-0 mt-0.5" style={{ color: SUGGESTION }} />
         <p className="text-[11px] text-[#4A5568] leading-relaxed flex-1">{note}</p>
+        <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onJump} className="p-1 rounded flex-shrink-0 transition-colors" style={{ color: `${SUGGESTION}80` }}><ArrowRight className="w-3 h-3" /></motion.button>
+      </div>
+    </motion.div>
+  )
+}
+
+/* ─── Claude-origin paragraph card (Keep / Remove) ──────── */
+
+function ClaudeOriginCard({ onAccept, onReject, onJump }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={SPRING_SMOOTH}
+      className="px-3 py-2.5 rounded-lg border"
+      style={{ backgroundColor: `${SUGGESTION}08`, borderColor: `${SUGGESTION}30`, fontFamily: 'system-ui, sans-serif' }}
+    >
+      <div className="flex items-center gap-1.5 mb-2">
+        <Sparkles className="w-3 h-3 flex-shrink-0" style={{ color: SUGGESTION }} />
+        <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: SUGGESTION }}>Added by Claude</span>
+        {onJump && (
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onJump} className="ml-auto p-0.5 rounded" style={{ color: `${SUGGESTION}70` }}>
+            <ArrowRight className="w-3 h-3" />
+          </motion.button>
+        )}
+      </div>
+      <div className="flex items-center gap-1.5">
         <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={onJump}
-          className="p-1 rounded flex-shrink-0 transition-colors"
-          style={{ color: `${SUGGESTION}80` }}
+          whileTap={{ scale: 0.95 }} onClick={onAccept}
+          className="flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-semibold text-white"
+          style={{ backgroundColor: SUGGESTION }}
         >
-          <ArrowRight className="w-3 h-3" />
+          <Check className="w-2.5 h-2.5" /> Keep
+        </motion.button>
+        <motion.button
+          whileTap={{ scale: 0.95 }} onClick={onReject}
+          className="flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-semibold text-[#6B7C93] border border-[#E5E7EB] hover:bg-[#F5F5F5] transition-colors"
+        >
+          <X className="w-2.5 h-2.5" /> Remove
+        </motion.button>
+      </div>
+    </motion.div>
+  )
+}
+
+/* ─── Claude suggestion card (Accept / Reject per chunk) ─── */
+
+function ClaudeSuggestionCard({ suggestion, onAccept, onReject, onJump }) {
+  const [expanded, setExpanded] = useState(false)
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={SPRING_SMOOTH}
+      className="px-3 py-2.5 rounded-lg border"
+      style={{ backgroundColor: `${SUGGESTION}08`, borderColor: `${SUGGESTION}30`, fontFamily: 'system-ui, sans-serif' }}
+    >
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <Sparkles className="w-3 h-3 flex-shrink-0" style={{ color: SUGGESTION }} />
+        <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: SUGGESTION }}>Suggested edit</span>
+        {onJump && (
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onJump} className="ml-auto p-0.5 rounded" style={{ color: `${SUGGESTION}70` }}>
+            <ArrowRight className="w-3 h-3" />
+          </motion.button>
+        )}
+      </div>
+      {suggestion.reasoning && (
+        <div className="mb-2">
+          <button
+            onClick={() => setExpanded(v => !v)}
+            className="flex items-center gap-1 text-[10px] text-[#6B7C93] hover:text-[#4A5568] transition-colors"
+          >
+            <ChevronDown
+              className="w-3 h-3 transition-transform"
+              style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+            />
+            Reasoning
+          </button>
+          <AnimatePresence>
+            {expanded && (
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                <p className="text-[10px] text-[#4A5568] leading-relaxed mt-1 pl-2 border-l-2" style={{ borderColor: `${SUGGESTION}40` }}>
+                  {suggestion.reasoning}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+      <div className="flex items-center gap-1.5">
+        <motion.button
+          whileTap={{ scale: 0.95 }} onClick={onAccept}
+          className="flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-semibold text-white"
+          style={{ backgroundColor: SUGGESTION }}
+        >
+          <Check className="w-2.5 h-2.5" /> Accept
+        </motion.button>
+        <motion.button
+          whileTap={{ scale: 0.95 }} onClick={onReject}
+          className="flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-semibold text-[#6B7C93] border border-[#E5E7EB] hover:bg-[#F5F5F5] transition-colors"
+        >
+          <X className="w-2.5 h-2.5" /> Reject
         </motion.button>
       </div>
     </motion.div>
@@ -1243,63 +1716,23 @@ function RippleCard({ ripple, onJump, onHover, onLeave }) {
   const isWarning = ripple.type === 'contradiction' || ripple.type === 'dependency_break'
   const color = isWarning ? RIPPLE_WARN : RIPPLE_OPP
   const Icon  = isWarning ? AlertTriangle : Lightbulb
-  const typeLabel = {
-    contradiction:    'Contradiction',
-    dependency_break: 'Dependency Break',
-    opportunity:      'Opportunity',
-    tone_shift:       'Tone Shift',
-    duplication:      'Duplication',
-  }[ripple.type] || ripple.type
-
+  const typeLabel = { contradiction: 'Contradiction', dependency_break: 'Dependency Break', opportunity: 'Opportunity', tone_shift: 'Tone Shift', duplication: 'Duplication' }[ripple.type] || ripple.type
   return (
-    <motion.div
-      variants={staggerItem}
-      onMouseEnter={onHover}
-      onMouseLeave={onLeave}
-      className="px-3 py-2.5 rounded-xl border cursor-pointer transition-colors"
-      style={{ backgroundColor: `${color}0C`, borderColor: `${color}25` }}
-    >
+    <motion.div variants={staggerItem} onMouseEnter={onHover} onMouseLeave={onLeave} className="px-3 py-2.5 rounded-xl border cursor-pointer transition-colors" style={{ backgroundColor: `${color}0C`, borderColor: `${color}25` }}>
       <div className="flex items-start gap-2 mb-2">
         <Icon className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color }} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color }}>{typeLabel}</span>
-            <span
-              className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold"
-              style={{
-                backgroundColor: ripple.severity === 'high'   ? `${DELETION}18`
-                                : ripple.severity === 'medium' ? `${RIPPLE_WARN}18`
-                                : 'rgba(107,124,147,0.12)',
-                color:           ripple.severity === 'high'   ? DELETION
-                                : ripple.severity === 'medium' ? RIPPLE_WARN
-                                : '#6B7C93',
-              }}
-            >
-              {ripple.severity}
-            </span>
+            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold" style={{ backgroundColor: ripple.severity === 'high' ? `${DELETION}18` : ripple.severity === 'medium' ? `${RIPPLE_WARN}18` : 'rgba(107,124,147,0.12)', color: ripple.severity === 'high' ? DELETION : ripple.severity === 'medium' ? RIPPLE_WARN : '#6B7C93' }}>{ripple.severity}</span>
           </div>
           <p className="text-[11px] text-[#4A5568] leading-relaxed">{ripple.summary}</p>
-          <p className="text-[10px] text-[#6B7C93] mt-1.5 flex items-center gap-1">
-            <CornerDownRight className="w-2.5 h-2.5" />
-            {ripple.sourceEdit}
-          </p>
+          <p className="text-[10px] text-[#6B7C93] mt-1.5 flex items-center gap-1"><CornerDownRight className="w-2.5 h-2.5" />{ripple.sourceEdit}</p>
         </div>
       </div>
       <div className="flex items-center gap-2 ml-5">
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          onClick={onJump}
-          className="text-[10px] font-semibold px-2 py-1 rounded-md transition-colors"
-          style={{ color }}
-        >
-          Go to paragraph
-        </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          className="text-[10px] font-semibold text-[#6B7C93] px-2 py-1 rounded-md hover:bg-[#F5F5F5] transition-colors"
-        >
-          Dismiss
-        </motion.button>
+        <motion.button whileTap={{ scale: 0.97 }} onClick={onJump} className="text-[10px] font-semibold px-2 py-1 rounded-md transition-colors" style={{ color }}>Go to paragraph</motion.button>
+        <motion.button whileTap={{ scale: 0.97 }} className="text-[10px] font-semibold text-[#6B7C93] px-2 py-1 rounded-md hover:bg-[#F5F5F5] transition-colors">Dismiss</motion.button>
       </div>
     </motion.div>
   )
@@ -1307,69 +1740,32 @@ function RippleCard({ ripple, onJump, onHover, onLeave }) {
 
 function BranchCard({ branch, isLast }) {
   return (
-    <motion.div
-      whileHover={{ x: 2 }}
-      className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors"
-      style={branch.active ? { backgroundColor: 'rgba(184,160,112,0.07)', border: `1px solid rgba(184,160,112,0.2)` } : {}}
-    >
+    <motion.div whileHover={{ x: 2 }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors" style={branch.active ? { backgroundColor: 'rgba(184,160,112,0.07)', border: `1px solid rgba(184,160,112,0.2)` } : {}}>
       <div className="flex flex-col items-center">
-        <div
-          className="w-2.5 h-2.5 rounded-full border-2"
-          style={branch.active
-            ? { borderColor: GOLD, backgroundColor: GOLD }
-            : { borderColor: '#D5D5D5', backgroundColor: 'white' }
-          }
-        />
-        {!isLast && <div className="w-px h-6 bg-[#EBEBEB] mt-1" />}
+        <div className="w-2.5 h-2.5 rounded-full border-2" style={{ borderColor: branch.active ? GOLD : '#D1D5DB', backgroundColor: branch.active ? GOLD : 'white' }} />
+        {!isLast && <div className="w-px flex-1 mt-1" style={{ backgroundColor: '#E5E7EB', minHeight: '16px' }} />}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span
-            className="text-[11px] font-semibold truncate"
-            style={{ color: branch.active ? GOLD : '#1E2532' }}
-          >
-            {branch.label}
-          </span>
-          {branch.active && (
-            <span
-              className="text-[9px] font-semibold px-1.5 py-0.5 rounded"
-              style={{ color: GOLD, backgroundColor: 'rgba(184,160,112,0.12)' }}
-            >
-              CURRENT
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-2 mt-0.5">
-          <Clock className="w-2.5 h-2.5 text-[#6B7C93]" />
-          <span className="text-[10px] text-[#6B7C93]">{branch.time}</span>
-          <span className="text-[10px] text-[#6B7C93]">· {branch.paragraphs} paragraphs</span>
-        </div>
+        <p className="text-[11px] font-medium text-[#1E2532] truncate">{branch.label}</p>
+        <p className="text-[10px] text-[#6B7C93]">{branch.time}{branch.paraCount != null ? ` · ${branch.paraCount} paragraphs` : ''}</p>
       </div>
     </motion.div>
   )
 }
 
-/* ─── Toolbar helper ─────────────────────────────────────── */
+/* ─── Toolbar helpers ────────────────────────────────────── */
 
 function ToolButton({ icon: Icon, label, active, onClick, activeColor }) {
   return (
     <motion.button
-      whileTap={{ scale: 0.93 }}
-      onClick={onClick}
-      title={label}
-      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-colors ${
-        active
-          ? 'bg-white shadow-sm text-[#1E2532]'
-          : 'text-[#6B7C93] hover:text-[#1E2532]'
-      }`}
+      whileTap={{ scale: 0.93 }} onClick={onClick} title={label}
+      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-colors ${active ? 'bg-white shadow-sm text-[#1E2532]' : 'text-[#6B7C93] hover:text-[#1E2532]'}`}
     >
       <Icon className="w-3.5 h-3.5" style={active && activeColor ? { color: activeColor } : {}} />
       <span className="hidden xl:inline">{label}</span>
     </motion.button>
   )
 }
-
-/* ─── Modal helper ───────────────────────────────────────── */
 
 function SummaryRow({ icon: Icon, label, count, color, suffix }) {
   return (
@@ -1382,19 +1778,12 @@ function SummaryRow({ icon: Icon, label, count, color, suffix }) {
   )
 }
 
-/* ─── Sidebar chat helper ────────────────────────────────── */
-
-function ChatShortcut({ label }) {
+function ChatShortcut({ label, onClick }) {
   return (
     <motion.button
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.97 }}
+      whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={onClick}
       className="text-[10px] font-medium px-2.5 py-1.5 rounded-lg transition-colors"
-      style={{
-        color: GOLD,
-        backgroundColor: 'rgba(184,160,112,0.08)',
-        fontFamily: 'system-ui, sans-serif',
-      }}
+      style={{ color: GOLD, backgroundColor: 'rgba(184,160,112,0.08)', fontFamily: 'system-ui, sans-serif' }}
     >
       {label}
     </motion.button>
