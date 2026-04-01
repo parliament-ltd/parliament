@@ -157,6 +157,12 @@ function parseResponseToParas(responseText) {
 
 function parseClaudeResponse(responseText, currentParagraphs) {
   const result = { adds: [], edits: [] }
+
+  // Build a set of existing paragraph texts so we can skip duplicates.
+  // Claude sometimes echoes existing content inside "add" blocks — this guard
+  // prevents those from doubling up in the document.
+  const existingTexts = new Set(currentParagraphs.map(p => p.text.trim()))
+
   const jsonBlockRe = /```json\s*([\s\S]*?)```/g
   let match
   while ((match = jsonBlockRe.exec(responseText)) !== null) {
@@ -165,6 +171,8 @@ function parseClaudeResponse(responseText, currentParagraphs) {
       if (action.type === 'add' && Array.isArray(action.paragraphs)) {
         for (const p of action.paragraphs) {
           const text = String(p.text || '')
+          // Skip if this text is already in the document
+          if (existingTexts.has(text.trim())) continue
           result.adds.push({
             id: `ai-${crypto.randomUUID()}`,
             type: p.type === 'heading' ? 'heading' : 'paragraph',
@@ -173,6 +181,8 @@ function parseClaudeResponse(responseText, currentParagraphs) {
             comments: [],
             claudeOrigin: true,
           })
+          // Register the new text so subsequent blocks can't re-add it either
+          existingTexts.add(text.trim())
         }
       } else if (action.type === 'edit' && action.paraId) {
         const paraExists = currentParagraphs.some(p => p.id === action.paraId)
@@ -192,9 +202,12 @@ function parseClaudeResponse(responseText, currentParagraphs) {
       // Skip malformed JSON blocks
     }
   }
-  // Fallback: no JSON blocks — treat full response as new paragraphs (Option A)
+  // Fallback: no JSON blocks — treat full response as new paragraphs (Option A),
+  // again filtering against existing content to avoid echoed text being re-added.
   if (result.adds.length === 0 && result.edits.length === 0) {
-    result.adds = parseResponseToParas(responseText).map(p => ({ ...p, claudeOrigin: true }))
+    result.adds = parseResponseToParas(responseText)
+      .filter(p => !existingTexts.has(p.text.trim()))
+      .map(p => ({ ...p, claudeOrigin: true }))
   }
   return result
 }
@@ -324,6 +337,11 @@ export default function SecretarybirdChatLayout() {
   const [replyingTo,          setReplyingTo]          = useState(null)
   const [replyInputs,         setReplyInputs]         = useState({})
   const [showSubmitConfirm,   setShowSubmitConfirm]   = useState(false)
+  const [submitting,          setSubmitting]          = useState(false)
+
+  // Keep a ref in sync so event listeners can read showMarkup without stale closures
+  const showMarkupRef = useRef(showMarkup)
+  useEffect(() => { showMarkupRef.current = showMarkup }, [showMarkup])
 
   // ── Comment tool state ────────────────────────────────────────────
   const [addingCommentToParaId, setAddingCommentToParaId] = useState(null)
@@ -339,7 +357,8 @@ export default function SecretarybirdChatLayout() {
   const chatScrollRef = useRef(null)
 
   // ── Derived state ─────────────────────────────────────────────────
-  const hasEdits = paragraphs.some(p => p.text !== p.baseline)
+  const hasEdits             = paragraphs.some(p => p.text !== p.baseline)
+  const hasSubmittableChanges = hasEdits || paragraphs.some(p => p.comments?.length > 0)
 
   const contextUsage = useMemo(() => {
     const docChars  = paragraphs.reduce((s, p) => s + (p.text?.length || 0), 0)
@@ -479,15 +498,97 @@ export default function SecretarybirdChatLayout() {
   // ── Submit & branch ───────────────────────────────────────────────
 
   const handleSubmitAndBranch = async () => {
-    setShowSubmitConfirm(false)
+    setSubmitting(true)
+
+    // Snapshot current state — will be updated if Claude responds
+    let finalParagraphs = paragraphs
+
+    try {
+      const apiKey = await loadApiKey()
+      if (apiKey) {
+        const provider = getProvider('anthropic')
+
+        // Build document context showing tracked changes
+        const docLines = paragraphs.map(p => {
+          const prefix = p.type === 'heading' ? '# ' : ''
+          const changed = p.text !== p.baseline ? ` (changed from: "${p.baseline}")` : ''
+          return `[${p.id}] ${prefix}${p.text}${changed}`
+        }).join('\n\n')
+
+        // Collect all comments
+        const allComments = paragraphs.flatMap(p =>
+          (p.comments || []).map(c => ({
+            commentId: c.id, paraId: p.id,
+            selected: c.selectedText ? `on "${c.selectedText}" ` : '',
+            text: c.text,
+          }))
+        )
+
+        const commentLines = allComments.length
+          ? allComments.map(c => `[${c.commentId} on ${c.paraId}] ${c.selected}"${c.text}"`).join('\n')
+          : '(no comments)'
+
+        const systemPrompt = `You are reviewing a document submission with tracked changes and user comments.
+
+Document state (paragraphs show current text; changed paragraphs note the original):
+${docLines}
+
+User comments:
+${commentLines}
+
+Respond ONLY with a valid JSON object — no prose, no markdown fences:
+{
+  "commentReplies": [{"commentId": "...", "reply": "..."}]${rippleEnabled ? `,
+  "rippleFlags": [{"paraId": "...", "type": "contradiction|dependency_break|opportunity|tone_shift|duplication", "severity": "low|medium|high", "summary": "...", "sourceEdit": "..."}]` : ''}
+}
+
+Reply to every comment helpfully and concisely.${rippleEnabled ? ' Include rippleFlags only for genuine cross-paragraph impacts caused by the edits — omit if none.' : ''}`
+
+        let fullResponse = ''
+        const abort = new AbortController()
+        await provider.sendMessage(
+          apiKey,
+          [{ role: 'user', content: 'Please review the submission above.' }],
+          'claude-sonnet',
+          chunk => { fullResponse += chunk },
+          abort.signal,
+          systemPrompt,
+        )
+
+        // Parse JSON from Claude's response
+        try {
+          const jsonMatch = fullResponse.match(/\{[\s\S]*\}/)
+          if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0])
+            finalParagraphs = paragraphs.map(p => ({
+              ...p,
+              ripple: rippleEnabled
+                ? (parsed.rippleFlags?.find(r => r.paraId === p.id) ?? p.ripple)
+                : p.ripple,
+              comments: (p.comments || []).map(c => {
+                const rep = parsed.commentReplies?.find(r => r.commentId === c.id)
+                return rep ? { ...c, claudeReply: { text: rep.reply } } : c
+              }),
+            }))
+            setParagraphs(finalParagraphs)
+            // Switch to comments tab so the user sees Claude's replies
+            setSidebarCollapsed(false)
+            setSidebarTab('comments')
+          }
+        } catch (_) { /* malformed JSON — proceed without replies */ }
+      }
+    } catch (_) { /* API unavailable — still create branch */ }
+
+    // Save current version (with any Claude replies) then create branch
     clearTimeout(saveTimerRef.current)
-    await saveSbrdDocument(id, { paragraphs, submittedReplies })
+    await saveSbrdDocument(id, { paragraphs: finalParagraphs, submittedReplies })
     const branch = await createConversation({ title: `Branch: ${conversationTitle || 'Untitled'}`, parentId: id })
-    // New branch starts with baselines reset (no tracked changes)
-    const freshParagraphs = paragraphs.map(p => ({ ...p, baseline: p.text, comments: [] }))
+    const freshParagraphs = finalParagraphs.map(p => ({ ...p, baseline: p.text, comments: [] }))
     await saveSbrdDocument(branch.id, { paragraphs: freshParagraphs, submittedReplies: {} })
     const updated = await getBranches(id)
     setBranches(updated)
+    setSubmitting(false)
+    setShowSubmitConfirm(false)
   }
 
   // ── Claude chat → document ────────────────────────────────────────
@@ -520,7 +621,7 @@ ${docWithIds}
 RESPONSE FORMAT:
 Wrap each action in a \`\`\`json ... \`\`\` block. You may include multiple blocks. Follow them with natural language commentary if helpful.
 
-To add new paragraphs (shown in the document as new Claude-authored content):
+To add NEW paragraphs (content that does not already exist in the document):
 \`\`\`json
 { "type": "add", "paragraphs": [{ "type": "paragraph", "text": "..." }] }
 \`\`\`
@@ -531,6 +632,7 @@ To suggest edits to an existing paragraph (shown as green strikethrough/replace)
 \`\`\`
 
 Rules:
+- ONLY include genuinely new text in "add" blocks — never repeat or paraphrase existing paragraph content.
 - For add requests, use only "add" blocks. For edit requests, use only "edit" blocks. You may combine both.
 - Keep each "find" value short, unique, and verbatim from the paragraph text.
 - Use "paragraph" or "heading" for the type in add blocks.
@@ -640,6 +742,31 @@ Rules:
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  // ── Prevent canvas scroll-hijack in edit mode ─────────────────────
+  // When no contentEditable is focused (e.g. user clicked toolbar then back),
+  // Space / PageDown / PageUp scroll the overflow container instead of typing.
+  // Intercept in capture phase, prevent the scroll, focus the last editable,
+  // and for Space also insert the character so the keystroke isn't lost.
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (showMarkupRef.current) return  // markup mode — no editables
+      const active = document.activeElement
+      if (active?.contentEditable === 'true') return  // editable already focused — all good
+      if (e.key === ' ' || e.key === 'PageDown' || e.key === 'PageUp') {
+        e.preventDefault()
+        const editables = document.querySelectorAll('[data-editable]')
+        const el = editables[editables.length - 1]
+        if (el) {
+          el.focus()
+          if (e.key === ' ') document.execCommand('insertText', false, ' ')
+        }
+      }
+    }
+    // Capture phase so we intercept before the scroll event fires
+    document.addEventListener('keydown', onKeyDown, true)
+    return () => document.removeEventListener('keydown', onKeyDown, true)
   }, [])
 
   // ── Derived counts ────────────────────────────────────────────────
@@ -752,13 +879,13 @@ Rules:
 
           {/* Submit */}
           <motion.button
-            whileHover={hasEdits ? { scale: 1.02 } : {}}
-            whileTap={hasEdits ? { scale: 0.97 } : {}}
-            onClick={() => hasEdits && setShowSubmitConfirm(true)}
+            whileHover={hasSubmittableChanges && !submitting ? { scale: 1.02 } : {}}
+            whileTap={hasSubmittableChanges && !submitting ? { scale: 0.97 } : {}}
+            onClick={() => hasSubmittableChanges && !submitting && setShowSubmitConfirm(true)}
             className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              hasEdits ? 'text-white shadow-sm' : 'bg-[#F5F5F5] text-[#6B7C93] cursor-not-allowed'
+              hasSubmittableChanges ? 'text-white shadow-sm' : 'bg-[#F5F5F5] text-[#6B7C93] cursor-not-allowed'
             }`}
-            style={hasEdits ? { backgroundColor: GOLD } : {}}
+            style={hasSubmittableChanges ? { backgroundColor: GOLD } : {}}
           >
             <Send className="w-3.5 h-3.5" />
             Submit Edits
@@ -1070,29 +1197,38 @@ Rules:
                         </>
                       )}
                       {chatMessages.map((msg, i) => (
-                        <div
-                          key={i}
-                          className={`text-[11px] leading-relaxed rounded-xl ${msg.role === 'user' ? 'ml-3 px-3 py-2 bg-[#F5F5F5] rounded-br-sm text-[#1E2532]' : msg.error ? 'px-3 py-2 bg-red-50 border border-red-100 text-red-600' : 'px-3 py-2.5 text-[#4A5568]'}`}
-                          style={msg.role === 'assistant' && !msg.error ? { backgroundColor: `${SUGGESTION}08`, border: `1px solid ${SUGGESTION}20` } : {}}
-                        >
-                          {msg.content}
-                          {msg.role === 'assistant' && !msg.error && (
-                            <p className="text-[9px] text-[#6B7C93] mt-1.5">Added to document</p>
-                          )}
-                        </div>
+                        msg.role === 'user' ? (
+                          <div key={i} className="ml-3 px-3 py-2 bg-[#F5F5F5] rounded-xl rounded-br-sm text-[11px] text-[#1E2532] leading-relaxed">
+                            {msg.content}
+                          </div>
+                        ) : msg.error ? (
+                          <div key={i} className="px-3 py-2 bg-red-50 border border-red-100 text-red-600 text-[11px] rounded-xl leading-relaxed">
+                            {msg.content}
+                          </div>
+                        ) : (
+                          /* Completed assistant response — compact indicator, full text stays in state for API context */
+                          <div key={i} className="flex items-center gap-1.5 px-1 py-1 text-[11px]">
+                            <CheckCheck className="w-3.5 h-3.5 flex-shrink-0" style={{ color: SUGGESTION }} />
+                            <span style={{ color: SUGGESTION }}>Done — see document</span>
+                          </div>
+                        )
                       ))}
-                      {chatStreaming && chatStreamingText && (
+                      {/* Streaming: show the text being written in real time */}
+                      {chatStreaming && (
                         <div className="px-3 py-2.5 rounded-xl rounded-bl-sm text-[11px] text-[#4A5568] leading-relaxed" style={{ backgroundColor: `${SUGGESTION}08`, border: `1px solid ${SUGGESTION}20` }}>
-                          {chatStreamingText}
-                          <span className="inline-block w-1 h-3 bg-current opacity-60 ml-0.5 animate-pulse" />
-                        </div>
-                      )}
-                      {chatStreaming && !chatStreamingText && (
-                        <div className="flex items-center gap-2 px-3 py-2">
-                          {[0, 1, 2].map(i => (
-                            <div key={i} className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: GOLD, animationDelay: `${i * 0.15}s` }} />
-                          ))}
-                          <span className="text-[10px] text-[#6B7C93]">Writing…</span>
+                          {chatStreamingText ? (
+                            <>
+                              {chatStreamingText}
+                              <span className="inline-block w-1 h-3 bg-current opacity-60 ml-0.5 animate-pulse" />
+                            </>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              {[0, 1, 2].map(i => (
+                                <div key={i} className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: GOLD, animationDelay: `${i * 0.15}s` }} />
+                              ))}
+                              <span className="text-[10px] text-[#6B7C93]">Writing to document…</span>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -1136,7 +1272,7 @@ Rules:
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="absolute inset-0 z-50 flex items-center justify-center"
             style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}
-            onClick={() => setShowSubmitConfirm(false)}
+            onClick={() => !submitting && setShowSubmitConfirm(false)}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 8 }}
@@ -1145,28 +1281,53 @@ Rules:
               className="bg-white rounded-xl shadow-2xl shadow-black/10 border border-[#E9E9E7] p-6 w-[420px]"
               style={{ fontFamily: 'system-ui, sans-serif' }}
             >
-              <div className="flex items-start gap-3 mb-4">
-                <div className="p-2 rounded-xl" style={{ backgroundColor: 'rgba(184,160,112,0.1)' }}>
-                  <Send className="w-5 h-5" style={{ color: GOLD }} />
+              {submitting ? (
+                /* Loading state */
+                <div className="flex flex-col items-center gap-4 py-4">
+                  <div className="flex items-center gap-2">
+                    {[0, 1, 2].map(i => (
+                      <div key={i} className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: GOLD, animationDelay: `${i * 0.15}s` }} />
+                    ))}
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-semibold text-[#1E2532]">Sending to Claude…</p>
+                    <p className="text-xs text-[#6B7C93] mt-1">
+                      {pendingComments > 0 ? 'Claude is reviewing your comments and edits.' : 'Claude is reviewing your edits.'}
+                      {rippleEnabled ? ' Impact analysis running.' : ''}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-[#1E2532]">Submit Edits to Claude</h3>
-                  <p className="text-xs text-[#6B7C93] mt-1 leading-relaxed">Your edits and comments will be sent to Claude. A branch will be created to preserve the current version.</p>
-                </div>
-              </div>
-              <div className="bg-[#F5F5F5] rounded-xl p-4 mb-4 space-y-2">
-                <SummaryRow icon={Eraser}       label="Paragraphs changed"  count={paragraphs.filter(p => p.text !== p.baseline).length} color={INSERTION} />
-                <SummaryRow icon={MessageSquare} label="Comments"            count={pendingComments} color={GOLD} />
-                {rippleEnabled && <SummaryRow icon={Bell} label="Ripple analysis" count={null} color={RIPPLE_WARN} suffix="will run after" />}
-              </div>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg mb-4" style={{ backgroundColor: 'rgba(184,160,112,0.08)' }}>
-                <GitBranch className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GOLD }} />
-                <span className="text-[11px] leading-relaxed" style={{ color: GOLD }}>A new branch will be created. You can return to this version anytime.</span>
-              </div>
-              <div className="flex items-center gap-2 justify-end">
-                <motion.button whileTap={{ scale: 0.97 }} onClick={() => setShowSubmitConfirm(false)} className="px-4 py-2 text-xs font-semibold text-[#6B7C93] hover:text-[#1E2532] hover:bg-[#F5F5F5] rounded-lg transition-colors">Cancel</motion.button>
-                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={handleSubmitAndBranch} className="px-5 py-2 text-white text-xs font-semibold rounded-lg shadow-sm" style={{ backgroundColor: GOLD }}>Submit & Branch</motion.button>
-              </div>
+              ) : (
+                /* Confirmation state */
+                <>
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="p-2 rounded-xl" style={{ backgroundColor: 'rgba(184,160,112,0.1)' }}>
+                      <Send className="w-5 h-5" style={{ color: GOLD }} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-[#1E2532]">Submit Edits to Claude</h3>
+                      <p className="text-xs text-[#6B7C93] mt-1 leading-relaxed">
+                        {pendingComments > 0
+                          ? 'Your edits and comments will be sent to Claude for review. A branch will preserve the current version.'
+                          : 'Your edits will be sent to Claude. A branch will be created to preserve the current version.'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="bg-[#F5F5F5] rounded-xl p-4 mb-4 space-y-2">
+                    <SummaryRow icon={Eraser}        label="Paragraphs changed" count={paragraphs.filter(p => p.text !== p.baseline).length} color={INSERTION} />
+                    <SummaryRow icon={MessageSquare} label="Comments"           count={pendingComments} color={GOLD} />
+                    {rippleEnabled && <SummaryRow icon={Bell} label="Ripple impact analysis" count={null} color={RIPPLE_WARN} suffix="will run" />}
+                  </div>
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg mb-4" style={{ backgroundColor: 'rgba(184,160,112,0.08)' }}>
+                    <GitBranch className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GOLD }} />
+                    <span className="text-[11px] leading-relaxed" style={{ color: GOLD }}>A new branch will be created. You can return to this version anytime.</span>
+                  </div>
+                  <div className="flex items-center gap-2 justify-end">
+                    <motion.button whileTap={{ scale: 0.97 }} onClick={() => setShowSubmitConfirm(false)} className="px-4 py-2 text-xs font-semibold text-[#6B7C93] hover:text-[#1E2532] hover:bg-[#F5F5F5] rounded-lg transition-colors">Cancel</motion.button>
+                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={handleSubmitAndBranch} className="px-5 py-2 text-white text-xs font-semibold rounded-lg shadow-sm" style={{ backgroundColor: GOLD }}>Submit & Branch</motion.button>
+                  </div>
+                </>
+              )}
             </motion.div>
           </motion.div>
         )}
