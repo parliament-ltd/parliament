@@ -641,15 +641,26 @@ export default function SecretarybirdChatLayout() {
 
   const handleRippleScan = useCallback(async (selectedIds, { saveScope, generateManifest }, onProgress) => {
     const apiKey = await loadApiKey()
-    if (!apiKey) return
+    if (!apiKey) return 0
 
+    // Use the full current document — cross-doc scanning doesn't require
+    // tracked changes; it checks overall consistency between documents.
+    const currentParaList = paragraphs.filter(p => p.text?.trim())
+    if (!currentParaList.length) return 0
+
+    const currentDocText = currentParaList
+      .map(p => `[${p.id}] ${p.type === 'heading' || p.type === 'heading2' ? '# ' : ''}${p.text}`)
+      .join('\n\n')
+
+    // Include tracked-change context as a bonus if any exist
     const changedParas = paragraphs.filter(p => p.text !== p.baseline && !p.claudeOrigin)
-    if (!changedParas.length) return
+    const editContext = changedParas.length
+      ? `\n\nRecent edits in this document (for extra context):\n${changedParas.map(p =>
+          `[${p.id}] was: "${p.baseline?.slice(0, 100)}" → now: "${p.text.slice(0, 100)}"`
+        ).join('\n')}`
+      : ''
 
-    const editSummary = changedParas.map(p =>
-      `[${p.id}] changed from: "${p.baseline.slice(0, 150)}" → to: "${p.text.slice(0, 150)}"`
-    ).join('\n')
-
+    const validParaIds = new Set(currentParaList.map(p => p.id))
     const provider = getProvider('anthropic')
     const allNewFlags = []
 
@@ -665,28 +676,32 @@ export default function SecretarybirdChatLayout() {
 
       const extTitle = extConv?.title || 'Untitled'
       const extText = extDoc.paragraphs
+        .filter(p => p.text?.trim())
         .map(p => `[${p.id}] ${p.type === 'heading' || p.type === 'heading2' ? '# ' : ''}${p.text}`)
         .join('\n\n')
 
-      const systemPrompt = `You are checking whether recent edits in the current document create consistency problems with another document.
+      const systemPrompt = `You are a cross-document consistency checker embedded in a writing tool.
 
-Current document — recent edits:
-${editSummary}
+CURRENT DOCUMENT (paragraph IDs are in brackets):
+${currentDocText}${editContext}
 
-Other document — "${extTitle}":
+OTHER DOCUMENT — "${extTitle}":
 ${extText}
 
-Respond ONLY with valid JSON (no prose, no markdown fences):
-{"rippleFlags":[{"paraId":"paragraph-id-from-current-doc","type":"contradiction|inconsistency|dependency_break","severity":"low|medium|high","summary":"brief description — mention the other document by name"}]}
+Your job: find inconsistencies, contradictions, or continuity breaks between the two documents. Look for mismatched facts, character names, timeline events, locations, or tone conflicts.
 
-Only flag genuine cross-document inconsistencies caused by the current doc's edits. Return empty rippleFlags array if none.`
+Respond ONLY with valid JSON — no prose, no markdown fences:
+{"rippleFlags":[{"paraId":"id-from-CURRENT-document-above","type":"contradiction|inconsistency|dependency_break|tone_shift","severity":"low|medium|high","summary":"one-sentence description, naming '${extTitle}' explicitly"}]}
+
+IMPORTANT: paraId values must come ONLY from the Current Document paragraph IDs listed above.
+If the documents are consistent, return: {"rippleFlags":[]}`
 
       let resp = ''
       const abort = new AbortController()
       try {
         await provider.sendMessage(
           apiKey,
-          [{ role: 'user', content: 'Analyze cross-document consistency.' }],
+          [{ role: 'user', content: 'Check cross-document consistency.' }],
           'claude-haiku',
           chunk => { resp += chunk },
           abort.signal,
@@ -696,26 +711,28 @@ Only flag genuine cross-document inconsistencies caused by the current doc's edi
         if (match) {
           const parsed = JSON.parse(match[0])
           if (parsed.rippleFlags?.length) {
-            allNewFlags.push(...parsed.rippleFlags.map(f => ({ ...f, sourceDoc: extTitle })))
+            // Only keep flags whose paraId actually exists in our current document
+            const valid = parsed.rippleFlags.filter(f => validParaIds.has(f.paraId))
+            allNewFlags.push(...valid.map(f => ({ ...f, sourceDoc: extTitle })))
           }
         }
-      } catch (_) { /* skip unavailable chat */ }
+      } catch (_) { /* skip — network or parse error for this chat */ }
     }
 
-    // Merge cross-doc flags into current paragraphs
+    // Merge flags into paragraph state
     if (allNewFlags.length) {
       setParagraphs(prev => prev.map(p => {
         const flag = allNewFlags.find(f => f.paraId === p.id)
         return flag ? { ...p, ripple: flag } : p
       }))
+      // Auto-open the Impact Analysis panel so the user sees the results
+      setSidebarCollapsed(false)
+      setSidebarTab('ripple')
     }
 
-    // Persist scope selection for next session
     if (saveScope) {
       await setSetting(`sbrd-ripple-scope-${id}`, selectedIds)
     }
-
-    // Save manifest to settings for later reference
     if (generateManifest && allNewFlags.length) {
       await setSetting(`sbrd-ripple-manifest-${id}`, {
         scannedAt: new Date().toISOString(),
@@ -723,6 +740,9 @@ Only flag genuine cross-document inconsistencies caused by the current doc's edi
         flags: allNewFlags,
       })
     }
+
+    // Return the count so the modal can show a result summary
+    return allNewFlags.length
   }, [paragraphs, id])
 
   // ── Claude suggestion accept / reject handlers ────────────────────
@@ -2493,6 +2513,7 @@ function RippleScopeModal({ currentId, currentTitle, onScan, onClose }) {
   const [saveScope, setSaveScope] = useState(false)
   const [scanning, setScanning] = useState(false)
   const [scanProgress, setScanProgress] = useState(null) // { current, total }
+  const [scanResult, setScanResult] = useState(null)     // number of flags found, or null
 
   useEffect(() => {
     // Load conversations and restore any previously saved scope selection
@@ -2606,6 +2627,20 @@ function RippleScopeModal({ currentId, currentTitle, onScan, onClose }) {
           </div>
         )}
 
+        {/* Scan result summary */}
+        {scanResult !== null && !scanning && (
+          <div className="mb-3 px-3 py-2.5 rounded-lg text-[11px] leading-relaxed" style={
+            scanResult > 0
+              ? { backgroundColor: `${RIPPLE_WARN}12`, border: `1px solid ${RIPPLE_WARN}30`, color: RIPPLE_WARN }
+              : { backgroundColor: 'rgba(107,124,147,0.08)', border: '1px solid rgba(107,124,147,0.2)', color: '#6B7C93' }
+          }>
+            {scanResult > 0
+              ? `Found ${scanResult} potential inconsistenc${scanResult !== 1 ? 'ies' : 'y'} — see Impact Analysis in the sidebar.`
+              : 'No inconsistencies found across the selected documents.'
+            }
+          </div>
+        )}
+
         <div className="flex items-center gap-2 justify-end">
           <motion.button
             whileTap={{ scale: 0.97 }}
@@ -2613,39 +2648,41 @@ function RippleScopeModal({ currentId, currentTitle, onScan, onClose }) {
             disabled={scanning}
             className="px-4 py-2 text-xs font-semibold text-[#6B7C93] hover:bg-[#F5F5F5] rounded-lg transition-colors disabled:opacity-40"
           >
-            Cancel
+            {scanResult !== null ? 'Close' : 'Cancel'}
           </motion.button>
-          <motion.button
-            whileHover={selected.size > 0 && !scanning ? { scale: 1.02 } : {}}
-            whileTap={selected.size > 0 && !scanning ? { scale: 0.97 } : {}}
-            disabled={selected.size === 0 || scanning}
-            onClick={async () => {
-              setScanning(true)
-              setScanProgress({ current: 0, total: selected.size })
-              try {
-                await onScan(
-                  [...selected],
-                  { saveScope, generateManifest },
-                  (current, total) => setScanProgress({ current, total }),
-                )
-                onClose()
-              } catch (_) {
-                setScanning(false)
-                setScanProgress(null)
+          {scanResult === null && (
+            <motion.button
+              whileHover={selected.size > 0 && !scanning ? { scale: 1.02 } : {}}
+              whileTap={selected.size > 0 && !scanning ? { scale: 0.97 } : {}}
+              disabled={selected.size === 0 || scanning}
+              onClick={async () => {
+                setScanning(true)
+                setScanResult(null)
+                setScanProgress({ current: 0, total: selected.size })
+                try {
+                  const count = await onScan(
+                    [...selected],
+                    { saveScope, generateManifest },
+                    (current, total) => setScanProgress({ current, total }),
+                  )
+                  setScanResult(count)
+                } catch (_) {
+                  setScanResult(0)
+                } finally {
+                  setScanning(false)
+                  setScanProgress(null)
+                }
+              }}
+              className="flex items-center gap-2 px-5 py-2 text-white text-xs font-semibold rounded-lg shadow-sm transition-all"
+              style={selected.size > 0
+                ? { backgroundColor: '#C4A94D', border: '1px solid #C4A94D' }
+                : { backgroundColor: '#191919', border: '1px solid #4A4540' }
               }
-            }}
-            className="flex items-center gap-2 px-5 py-2 text-white text-xs font-semibold rounded-lg shadow-sm transition-all"
-            style={selected.size > 0
-              ? { backgroundColor: '#C4A94D', border: '1px solid #C4A94D' }
-              : { backgroundColor: '#191919', border: '1px solid #4A4540' }
-            }
-          >
-            {scanning && <Loader2 className="w-3 h-3 animate-spin" />}
-            {scanning
-              ? `Scanning…`
-              : `Scan ${selected.size > 0 ? `${selected.size} Chat${selected.size !== 1 ? 's' : ''}` : 'Chats'}`
-            }
-          </motion.button>
+            >
+              {scanning && <Loader2 className="w-3 h-3 animate-spin" />}
+              {scanning ? 'Scanning…' : `Scan ${selected.size > 0 ? `${selected.size} Chat${selected.size !== 1 ? 's' : ''}` : 'Chats'}`}
+            </motion.button>
+          )}
         </div>
       </motion.div>
     </motion.div>
