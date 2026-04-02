@@ -641,17 +641,27 @@ export default function SecretarybirdChatLayout() {
 
   const handleRippleScan = useCallback(async (selectedIds, { saveScope, generateManifest }, onProgress) => {
     const apiKey = await loadApiKey()
-    if (!apiKey) return
+    if (!apiKey) return 0
+
+    const currentParaList = paragraphs.filter(p => p.text?.trim())
+    if (!currentParaList.length) return 0
+
+    const currentDocText = currentParaList
+      .map(p => `[${p.id}] ${p.type === 'heading' || p.type === 'heading2' ? '# ' : ''}${p.text}`)
+      .join('\n\n')
 
     const changedParas = paragraphs.filter(p => p.text !== p.baseline && !p.claudeOrigin)
-    if (!changedParas.length) return
+    const editContext = changedParas.length
+      ? `\n\nRecent edits in Document A (for context):\n${changedParas.map(p =>
+          `[${p.id}] was: "${p.baseline?.slice(0, 100)}" → now: "${p.text.slice(0, 100)}"`
+        ).join('\n')}`
+      : ''
 
-    const editSummary = changedParas.map(p =>
-      `[${p.id}] changed from: "${p.baseline.slice(0, 150)}" → to: "${p.text.slice(0, 150)}"`
-    ).join('\n')
-
-    const provider = getProvider('anthropic')
-    const allNewFlags = []
+    const validCurrentIds = new Set(currentParaList.map(p => p.id))
+    const provider   = getProvider('anthropic')
+    const sourceTitle = conversationTitle || 'Current document'
+    let totalFlagCount = 0
+    const manifestEntries = []
 
     for (let i = 0; i < selectedIds.length; i++) {
       const convId = selectedIds[i]
@@ -663,67 +673,112 @@ export default function SecretarybirdChatLayout() {
       ])
       if (!extDoc?.paragraphs?.length) continue
 
-      const extTitle = extConv?.title || 'Untitled'
-      const extText = extDoc.paragraphs
+      const extTitle      = extConv?.title || 'Untitled'
+      const extParaList   = extDoc.paragraphs.filter(p => p.text?.trim())
+      const validExtIds   = new Set(extParaList.map(p => p.id))
+      const extDocText    = extParaList
         .map(p => `[${p.id}] ${p.type === 'heading' || p.type === 'heading2' ? '# ' : ''}${p.text}`)
         .join('\n\n')
 
-      const systemPrompt = `You are checking whether recent edits in the current document create consistency problems with another document.
+      const systemPrompt = `You are a cross-document consistency checker for a writing tool.
 
-Current document — recent edits:
-${editSummary}
+DOCUMENT A — "${sourceTitle}" (paragraph IDs in brackets):
+${currentDocText}${editContext}
 
-Other document — "${extTitle}":
-${extText}
+DOCUMENT B — "${extTitle}" (paragraph IDs in brackets):
+${extDocText}
 
-Respond ONLY with valid JSON (no prose, no markdown fences):
-{"rippleFlags":[{"paraId":"paragraph-id-from-current-doc","type":"contradiction|inconsistency|dependency_break","severity":"low|medium|high","summary":"brief description — mention the other document by name"}]}
+Find inconsistencies, contradictions, or continuity breaks between the two documents — mismatched facts, character names, timeline events, locations, or tone conflicts.
 
-Only flag genuine cross-document inconsistencies caused by the current doc's edits. Return empty rippleFlags array if none.`
+Respond ONLY with valid JSON, no prose, no markdown fences:
+{
+  "currentFlags": [{"paraId":"id-from-DOCUMENT-A","type":"contradiction|inconsistency|dependency_break|tone_shift","severity":"low|medium|high","summary":"one sentence, name '${extTitle}'"}],
+  "externalFlags": [{"paraId":"id-from-DOCUMENT-B","type":"contradiction|inconsistency|dependency_break|tone_shift","severity":"low|medium|high","summary":"one sentence, name '${sourceTitle}'"}],
+  "externalSuggestions": [{"paraId":"id-from-DOCUMENT-B","find":"exact verbatim text to replace — must exist word-for-word in the paragraph","replace":"corrected text","reasoning":"brief reason referencing Document A"}]
+}
+
+RULES:
+- currentFlags and externalFlags paraIds must come from their respective document only.
+- externalSuggestions paraIds must come ONLY from Document B IDs above.
+- "find" must be a short, unique, verbatim substring of the paragraph's current text.
+- Provide a suggestion for every externalFlag where a concrete text fix is possible.
+- If no inconsistencies, return: {"currentFlags":[],"externalFlags":[],"externalSuggestions":[]}`
 
       let resp = ''
       const abort = new AbortController()
       try {
         await provider.sendMessage(
           apiKey,
-          [{ role: 'user', content: 'Analyze cross-document consistency.' }],
+          [{ role: 'user', content: 'Check cross-document consistency.' }],
           'claude-haiku',
           chunk => { resp += chunk },
           abort.signal,
           systemPrompt,
         )
         const match = resp.match(/\{[\s\S]*\}/)
-        if (match) {
-          const parsed = JSON.parse(match[0])
-          if (parsed.rippleFlags?.length) {
-            allNewFlags.push(...parsed.rippleFlags.map(f => ({ ...f, sourceDoc: extTitle })))
+        if (!match) continue
+
+        const parsed = JSON.parse(match[0])
+
+        // Flags on current document (in-memory)
+        const currentFlags = (parsed.currentFlags || []).filter(f => validCurrentIds.has(f.paraId))
+        if (currentFlags.length) {
+          setParagraphs(prev => prev.map(p => {
+            const flag = currentFlags.find(f => f.paraId === p.id)
+            return flag ? { ...p, ripple: { ...flag, sourceDoc: extTitle } } : p
+          }))
+          setSidebarCollapsed(false)
+          setSidebarTab('ripple')
+          totalFlagCount += currentFlags.length
+        }
+
+        // Flags + suggestions on external document — persist to IndexedDB
+        const externalFlags       = (parsed.externalFlags       || []).filter(f => validExtIds.has(f.paraId))
+        const externalSuggestions = (parsed.externalSuggestions || []).filter(s => validExtIds.has(s.paraId))
+
+        if (externalFlags.length || externalSuggestions.length) {
+          const updatedExtParas = extDoc.paragraphs.map(p => {
+            const flag = externalFlags.find(f => f.paraId === p.id)
+            const suggs = externalSuggestions
+              .filter(s => s.paraId === p.id && s.find && p.text.includes(s.find))
+              .map((s, idx) => ({
+                id:        `ripple-${convId}-${Date.now()}-${idx}`,
+                find:      s.find,
+                replace:   s.replace,
+                reasoning: s.reasoning || '',
+              }))
+            return {
+              ...p,
+              ...(flag  ? { ripple: { ...flag, sourceDoc: sourceTitle } } : {}),
+              ...(suggs.length ? { claudeSuggestions: [...(p.claudeSuggestions || []), ...suggs] } : {}),
+            }
+          })
+          await saveSbrdDocument(convId, {
+            paragraphs:       updatedExtParas,
+            suggestionStates: extDoc.suggestionStates,
+            submittedReplies: extDoc.submittedReplies,
+          })
+          totalFlagCount += externalFlags.length
+          if (generateManifest) {
+            manifestEntries.push({ doc: extTitle, flags: externalFlags, suggestions: externalSuggestions })
           }
         }
-      } catch (_) { /* skip unavailable chat */ }
+      } catch (_) { /* skip — network or parse error for this chat */ }
     }
 
-    // Merge cross-doc flags into current paragraphs
-    if (allNewFlags.length) {
-      setParagraphs(prev => prev.map(p => {
-        const flag = allNewFlags.find(f => f.paraId === p.id)
-        return flag ? { ...p, ripple: flag } : p
-      }))
-    }
-
-    // Persist scope selection for next session
     if (saveScope) {
       await setSetting(`sbrd-ripple-scope-${id}`, selectedIds)
     }
-
-    // Save manifest to settings for later reference
-    if (generateManifest && allNewFlags.length) {
+    if (generateManifest && manifestEntries.length) {
       await setSetting(`sbrd-ripple-manifest-${id}`, {
-        scannedAt: new Date().toISOString(),
+        scannedAt:   new Date().toISOString(),
         scannedDocs: selectedIds.length,
-        flags: allNewFlags,
+        entries:     manifestEntries,
       })
     }
-  }, [paragraphs, id])
+
+    return totalFlagCount
+  }, [paragraphs, id, conversationTitle])
 
   // ── Claude suggestion accept / reject handlers ────────────────────
 
@@ -2493,6 +2548,7 @@ function RippleScopeModal({ currentId, currentTitle, onScan, onClose }) {
   const [saveScope, setSaveScope] = useState(false)
   const [scanning, setScanning] = useState(false)
   const [scanProgress, setScanProgress] = useState(null) // { current, total }
+  const [scanResult, setScanResult] = useState(null)     // number of flags found, or null
 
   useEffect(() => {
     // Load conversations and restore any previously saved scope selection
@@ -2606,6 +2662,20 @@ function RippleScopeModal({ currentId, currentTitle, onScan, onClose }) {
           </div>
         )}
 
+        {/* Scan result summary */}
+        {scanResult !== null && !scanning && (
+          <div className="mb-3 px-3 py-2.5 rounded-lg text-[11px] leading-relaxed" style={
+            scanResult > 0
+              ? { backgroundColor: `${RIPPLE_WARN}12`, border: `1px solid ${RIPPLE_WARN}30`, color: RIPPLE_WARN }
+              : { backgroundColor: 'rgba(107,124,147,0.08)', border: '1px solid rgba(107,124,147,0.2)', color: '#6B7C93' }
+          }>
+            {scanResult > 0
+              ? `Found ${scanResult} potential inconsistenc${scanResult !== 1 ? 'ies' : 'y'} — flags have been added to the affected documents' Impact Analysis panels.`
+              : 'No inconsistencies found across the selected documents.'
+            }
+          </div>
+        )}
+
         <div className="flex items-center gap-2 justify-end">
           <motion.button
             whileTap={{ scale: 0.97 }}
@@ -2613,39 +2683,41 @@ function RippleScopeModal({ currentId, currentTitle, onScan, onClose }) {
             disabled={scanning}
             className="px-4 py-2 text-xs font-semibold text-[#6B7C93] hover:bg-[#F5F5F5] rounded-lg transition-colors disabled:opacity-40"
           >
-            Cancel
+            {scanResult !== null ? 'Close' : 'Cancel'}
           </motion.button>
-          <motion.button
-            whileHover={selected.size > 0 && !scanning ? { scale: 1.02 } : {}}
-            whileTap={selected.size > 0 && !scanning ? { scale: 0.97 } : {}}
-            disabled={selected.size === 0 || scanning}
-            onClick={async () => {
-              setScanning(true)
-              setScanProgress({ current: 0, total: selected.size })
-              try {
-                await onScan(
-                  [...selected],
-                  { saveScope, generateManifest },
-                  (current, total) => setScanProgress({ current, total }),
-                )
-                onClose()
-              } catch (_) {
-                setScanning(false)
-                setScanProgress(null)
+          {scanResult === null && (
+            <motion.button
+              whileHover={selected.size > 0 && !scanning ? { scale: 1.02 } : {}}
+              whileTap={selected.size > 0 && !scanning ? { scale: 0.97 } : {}}
+              disabled={selected.size === 0 || scanning}
+              onClick={async () => {
+                setScanning(true)
+                setScanResult(null)
+                setScanProgress({ current: 0, total: selected.size })
+                try {
+                  const count = await onScan(
+                    [...selected],
+                    { saveScope, generateManifest },
+                    (current, total) => setScanProgress({ current, total }),
+                  )
+                  setScanResult(count)
+                } catch (_) {
+                  setScanResult(0)
+                } finally {
+                  setScanning(false)
+                  setScanProgress(null)
+                }
+              }}
+              className="flex items-center gap-2 px-5 py-2 text-white text-xs font-semibold rounded-lg shadow-sm transition-all"
+              style={selected.size > 0
+                ? { backgroundColor: '#C4A94D', border: '1px solid #C4A94D' }
+                : { backgroundColor: '#191919', border: '1px solid #4A4540' }
               }
-            }}
-            className="flex items-center gap-2 px-5 py-2 text-white text-xs font-semibold rounded-lg shadow-sm transition-all"
-            style={selected.size > 0
-              ? { backgroundColor: '#C4A94D', border: '1px solid #C4A94D' }
-              : { backgroundColor: '#191919', border: '1px solid #4A4540' }
-            }
-          >
-            {scanning && <Loader2 className="w-3 h-3 animate-spin" />}
-            {scanning
-              ? `Scanning…`
-              : `Scan ${selected.size > 0 ? `${selected.size} Chat${selected.size !== 1 ? 's' : ''}` : 'Chats'}`
-            }
-          </motion.button>
+            >
+              {scanning && <Loader2 className="w-3 h-3 animate-spin" />}
+              {scanning ? 'Scanning…' : `Scan ${selected.size > 0 ? `${selected.size} Chat${selected.size !== 1 ? 's' : ''}` : 'Chats'}`}
+            </motion.button>
+          )}
         </div>
       </motion.div>
     </motion.div>
