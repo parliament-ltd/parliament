@@ -692,14 +692,17 @@ Find inconsistencies, contradictions, or continuity breaks between the two docum
 
 Respond ONLY with valid JSON, no prose, no markdown fences:
 {
-  "currentFlags":  [{"paraId":"id-from-DOCUMENT-A","type":"contradiction|inconsistency|dependency_break|tone_shift","severity":"low|medium|high","summary":"one sentence, name '${extTitle}'"}],
-  "externalFlags": [{"paraId":"id-from-DOCUMENT-B","type":"contradiction|inconsistency|dependency_break|tone_shift","severity":"low|medium|high","summary":"one sentence, name '${sourceTitle}'"}]
+  "currentFlags": [{"paraId":"id-from-DOCUMENT-A","type":"contradiction|inconsistency|dependency_break|tone_shift","severity":"low|medium|high","summary":"one sentence, name '${extTitle}'"}],
+  "externalFlags": [{"paraId":"id-from-DOCUMENT-B","type":"contradiction|inconsistency|dependency_break|tone_shift","severity":"low|medium|high","summary":"one sentence, name '${sourceTitle}'"}],
+  "externalSuggestions": [{"paraId":"id-from-DOCUMENT-B","find":"exact verbatim text to replace — must exist word-for-word in the paragraph","replace":"corrected text","reasoning":"brief reason referencing Document A"}]
 }
 
 RULES:
-- currentFlags paraIds must come ONLY from Document A IDs above.
-- externalFlags paraIds must come ONLY from Document B IDs above.
-- If no inconsistencies, return: {"currentFlags":[],"externalFlags":[]}`
+- currentFlags and externalFlags paraIds must come from their respective document only.
+- externalSuggestions paraIds must come ONLY from Document B IDs above.
+- "find" must be a short, unique, verbatim substring of the paragraph's current text.
+- Provide a suggestion for every externalFlag where a concrete text fix is possible.
+- If no inconsistencies, return: {"currentFlags":[],"externalFlags":[],"externalSuggestions":[]}`
 
       let resp = ''
       const abort = new AbortController()
@@ -729,12 +732,26 @@ RULES:
           totalFlagCount += currentFlags.length
         }
 
-        // Flags on external document — persist to IndexedDB
-        const externalFlags = (parsed.externalFlags || []).filter(f => validExtIds.has(f.paraId))
-        if (externalFlags.length) {
+        // Flags + suggestions on external document — persist to IndexedDB
+        const externalFlags       = (parsed.externalFlags       || []).filter(f => validExtIds.has(f.paraId))
+        const externalSuggestions = (parsed.externalSuggestions || []).filter(s => validExtIds.has(s.paraId))
+
+        if (externalFlags.length || externalSuggestions.length) {
           const updatedExtParas = extDoc.paragraphs.map(p => {
             const flag = externalFlags.find(f => f.paraId === p.id)
-            return flag ? { ...p, ripple: { ...flag, sourceDoc: sourceTitle } } : p
+            const suggs = externalSuggestions
+              .filter(s => s.paraId === p.id && s.find && p.text.includes(s.find))
+              .map((s, idx) => ({
+                id:        `ripple-${convId}-${Date.now()}-${idx}`,
+                find:      s.find,
+                replace:   s.replace,
+                reasoning: s.reasoning || '',
+              }))
+            return {
+              ...p,
+              ...(flag  ? { ripple: { ...flag, sourceDoc: sourceTitle } } : {}),
+              ...(suggs.length ? { claudeSuggestions: [...(p.claudeSuggestions || []), ...suggs] } : {}),
+            }
           })
           await saveSbrdDocument(convId, {
             paragraphs:       updatedExtParas,
@@ -743,7 +760,7 @@ RULES:
           })
           totalFlagCount += externalFlags.length
           if (generateManifest) {
-            manifestEntries.push({ doc: extTitle, flags: externalFlags })
+            manifestEntries.push({ doc: extTitle, flags: externalFlags, suggestions: externalSuggestions })
           }
         }
       } catch (_) { /* skip — network or parse error for this chat */ }
