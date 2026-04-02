@@ -492,7 +492,29 @@ export default function SecretarybirdChatLayout() {
     setSelectionInfo(null)
   }
 
-  // ── Accept All — apply Claude suggestions, reset baselines ───────
+  // ── Accept All — apply suggestions, keep comments & ripple flags ──
+
+  const handleAcceptAll = () => {
+    setParagraphs(prev => {
+      const withSuggestions = prev.map(p => {
+        if (!p.claudeSuggestions?.length) return p
+        let text = p.text
+        for (const sugg of p.claudeSuggestions) {
+          if (sugg.find) text = text.replace(sugg.find, sugg.replace)
+        }
+        return { ...p, text, claudeSuggestions: undefined }
+      })
+      return withSuggestions.map(p => ({
+        ...p,
+        baseline: p.text,
+        claudeNote: undefined,
+        claudeOrigin: undefined,
+        // comments and ripple flags intentionally preserved
+      }))
+    })
+  }
+
+  // ── Clear All — accept suggestions + wipe all annotations ─────────
 
   const handleClearAll = () => {
     setParagraphs(prev => {
@@ -986,6 +1008,8 @@ Rules:
             <span>Comment</span>
             <span className="text-[10px] text-[#C0C8D4] ml-0.5">Ctrl+Alt+M</span>
           </div>
+          <div className="h-4 w-px bg-[#EBEBEB] mx-1" />
+          <ToolButton icon={CheckCheck} label="Accept All" onClick={handleAcceptAll} />
           <div className="h-4 w-px bg-[#EBEBEB] mx-1" />
           <ToolButton icon={Eraser} label="Clear All" onClick={handleClearAll} />
           <div className="h-4 w-px bg-[#EBEBEB] mx-1" />
