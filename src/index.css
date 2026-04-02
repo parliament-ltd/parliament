@@ -165,8 +165,73 @@
 .dark .border-\[#F0F0F0\]  { border-color: var(--p-border-subtle) !important; }
 .dark .border-\[#E5D9A8\]  { border-color: rgba(196, 169, 77, 0.25) !important; }
 
+/* — Additional text / bg overrides — */
+.dark .text-\[#6B7C93\]  { color: var(--p-text-secondary) !important; }
+.dark .bg-\[#EBEBEB\]    { background-color: var(--p-border) !important; }
+.dark .bg-\[#F5F5F5\]    { background-color: var(--p-bg-subtle) !important; }
+
 /* — Additional hover states — */
 .dark .hover\:bg-\[#F5F5F5\]:hover  { background-color: var(--p-bg-subtle) !important; }
+
+/* ── Secretarybird semantic component classes ───────────── */
+
+/* "Submit Edits" button — idle state (no submittable changes) */
+.sbrd-btn-idle {
+  background-color: #F5F5F5;
+  border: 1px solid #E9E9E7;
+  color: #6B7C93;
+}
+.dark .sbrd-btn-idle {
+  background-color: #191919;
+  border: 1px solid #4A4540;
+  color: white;
+}
+
+/* "Expand Scope" / Impact Analysis button */
+.sbrd-scope-btn {
+  border-color: #E9E9E7;
+  color: #6B7C93;
+}
+.dark .sbrd-scope-btn {
+  background-color: #191919 !important;
+  border-color: #4A4540 !important;
+  color: white !important;
+}
+.dark .sbrd-scope-btn:hover {
+  background-color: #222 !important;
+}
+
+/* Chat-with-Claude empty-state hint bubble */
+.sbrd-chat-hint {
+  background-color: #F5F5F5;
+  color: #4A5568;
+}
+.dark .sbrd-chat-hint {
+  background-color: #191919;
+  border: 1px solid #3A3730;
+  color: white;
+}
+
+/* Chat text input */
+.sbrd-chat-input {
+  background-color: #F5F5F5;
+  border: 1px solid #EBEBEB;
+  color: #1E2532;
+}
+.sbrd-chat-input::placeholder { color: #9B9A97; }
+.dark .sbrd-chat-input {
+  background-color: #191919;
+  border: 1px solid #3A3730;
+  color: white;
+}
+.dark .sbrd-chat-input::placeholder { color: #6B6963; }
+
+/* Text selection color — warm gold instead of browser-default navy */
+.sbrd-paper [data-editable]::selection,
+.sbrd-paper [data-editable] *::selection {
+  background-color: rgba(184, 160, 112, 0.35);
+  color: inherit;
+}
 
 /* ── Pelican mode overrides ─────────────────────────────── */
 
