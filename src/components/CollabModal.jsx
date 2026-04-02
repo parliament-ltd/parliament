@@ -361,10 +361,10 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
             </div>
           )}
 
-          {/* Custom Instruction + Save as Persona */}
+          {/* Parrot Persona — Custom Interaction */}
           <div>
             <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
-              Custom Instruction
+              Parrot Persona — Custom Interaction
             </h3>
 
             {/* Persona title field */}
@@ -372,8 +372,8 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
               type="text"
               value={personaTitle}
               onChange={(e) => setPersonaTitle(e.target.value)}
-              placeholder="Persona title (optional — to save as a Parrot Persona)"
-              className="w-full bg-white rounded-lg px-4 py-2.5 text-sm text-[#1E2532] outline-none border border-[#EBEBEB] focus:border-[#7C6CD4] transition-colors placeholder:text-[#D5D5D5] mb-2"
+              placeholder="Title"
+              className="w-full bg-white rounded-lg px-4 py-2.5 text-sm text-[#1E2532] outline-none border border-[#EBEBEB] focus:border-[#7C6CD4] transition-colors placeholder:text-[var(--p-text-muted)] mb-2"
             />
 
             <textarea
@@ -386,7 +386,7 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
 
             {/* Save Persona button */}
             <div className="flex items-center justify-between mt-2">
-              <p className="text-[11px] text-[#D5D5D5]">
+              <p className="text-[11px] text-[var(--p-text-muted)]">
                 Add a title above to save as a reusable Parrot Persona.
               </p>
               <AnimatePresence mode="wait">
@@ -408,14 +408,13 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
                     whileTap={{ scale: 0.97 }}
                     onClick={handleSavePersona}
                     disabled={!canSavePersona}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold border transition-colors"
+                    className="px-3 py-1.5 rounded-lg text-[11px] font-semibold border transition-colors"
                     style={{
                       borderColor: canSavePersona ? '#7C6CD4' : '#EBEBEB',
-                      color: canSavePersona ? '#7C6CD4' : '#D5D5D5',
+                      color: canSavePersona ? '#7C6CD4' : 'var(--p-text-muted)',
                       backgroundColor: canSavePersona ? 'rgba(124,108,212,0.06)' : 'transparent',
                     }}
                   >
-                    <Plus className="w-3 h-3" />
                     Save Persona
                   </motion.button>
                 )}
