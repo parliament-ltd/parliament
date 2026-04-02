@@ -643,8 +643,6 @@ export default function SecretarybirdChatLayout() {
     const apiKey = await loadApiKey()
     if (!apiKey) return 0
 
-    // Use the full current document — cross-doc scanning doesn't require
-    // tracked changes; it checks overall consistency between documents.
     const currentParaList = paragraphs.filter(p => p.text?.trim())
     if (!currentParaList.length) return 0
 
@@ -652,17 +650,18 @@ export default function SecretarybirdChatLayout() {
       .map(p => `[${p.id}] ${p.type === 'heading' || p.type === 'heading2' ? '# ' : ''}${p.text}`)
       .join('\n\n')
 
-    // Include tracked-change context as a bonus if any exist
     const changedParas = paragraphs.filter(p => p.text !== p.baseline && !p.claudeOrigin)
     const editContext = changedParas.length
-      ? `\n\nRecent edits in this document (for extra context):\n${changedParas.map(p =>
+      ? `\n\nRecent edits in Document A (for context):\n${changedParas.map(p =>
           `[${p.id}] was: "${p.baseline?.slice(0, 100)}" → now: "${p.text.slice(0, 100)}"`
         ).join('\n')}`
       : ''
 
-    const validParaIds = new Set(currentParaList.map(p => p.id))
-    const provider = getProvider('anthropic')
-    const allNewFlags = []
+    const validCurrentIds = new Set(currentParaList.map(p => p.id))
+    const provider   = getProvider('anthropic')
+    const sourceTitle = conversationTitle || 'Current document'
+    let totalFlagCount = 0
+    const manifestEntries = []
 
     for (let i = 0; i < selectedIds.length; i++) {
       const convId = selectedIds[i]
@@ -674,27 +673,33 @@ export default function SecretarybirdChatLayout() {
       ])
       if (!extDoc?.paragraphs?.length) continue
 
-      const extTitle = extConv?.title || 'Untitled'
-      const extText = extDoc.paragraphs
-        .filter(p => p.text?.trim())
+      const extTitle      = extConv?.title || 'Untitled'
+      const extParaList   = extDoc.paragraphs.filter(p => p.text?.trim())
+      const validExtIds   = new Set(extParaList.map(p => p.id))
+      const extDocText    = extParaList
         .map(p => `[${p.id}] ${p.type === 'heading' || p.type === 'heading2' ? '# ' : ''}${p.text}`)
         .join('\n\n')
 
-      const systemPrompt = `You are a cross-document consistency checker embedded in a writing tool.
+      const systemPrompt = `You are a cross-document consistency checker for a writing tool.
 
-CURRENT DOCUMENT (paragraph IDs are in brackets):
+DOCUMENT A — "${sourceTitle}" (paragraph IDs in brackets):
 ${currentDocText}${editContext}
 
-OTHER DOCUMENT — "${extTitle}":
-${extText}
+DOCUMENT B — "${extTitle}" (paragraph IDs in brackets):
+${extDocText}
 
-Your job: find inconsistencies, contradictions, or continuity breaks between the two documents. Look for mismatched facts, character names, timeline events, locations, or tone conflicts.
+Find inconsistencies, contradictions, or continuity breaks between the two documents — mismatched facts, character names, timeline events, locations, or tone conflicts.
 
-Respond ONLY with valid JSON — no prose, no markdown fences:
-{"rippleFlags":[{"paraId":"id-from-CURRENT-document-above","type":"contradiction|inconsistency|dependency_break|tone_shift","severity":"low|medium|high","summary":"one-sentence description, naming '${extTitle}' explicitly"}]}
+Respond ONLY with valid JSON, no prose, no markdown fences:
+{
+  "currentFlags":  [{"paraId":"id-from-DOCUMENT-A","type":"contradiction|inconsistency|dependency_break|tone_shift","severity":"low|medium|high","summary":"one sentence, name '${extTitle}'"}],
+  "externalFlags": [{"paraId":"id-from-DOCUMENT-B","type":"contradiction|inconsistency|dependency_break|tone_shift","severity":"low|medium|high","summary":"one sentence, name '${sourceTitle}'"}]
+}
 
-IMPORTANT: paraId values must come ONLY from the Current Document paragraph IDs listed above.
-If the documents are consistent, return: {"rippleFlags":[]}`
+RULES:
+- currentFlags paraIds must come ONLY from Document A IDs above.
+- externalFlags paraIds must come ONLY from Document B IDs above.
+- If no inconsistencies, return: {"currentFlags":[],"externalFlags":[]}`
 
       let resp = ''
       const abort = new AbortController()
@@ -708,42 +713,55 @@ If the documents are consistent, return: {"rippleFlags":[]}`
           systemPrompt,
         )
         const match = resp.match(/\{[\s\S]*\}/)
-        if (match) {
-          const parsed = JSON.parse(match[0])
-          if (parsed.rippleFlags?.length) {
-            // Only keep flags whose paraId actually exists in our current document
-            const valid = parsed.rippleFlags.filter(f => validParaIds.has(f.paraId))
-            allNewFlags.push(...valid.map(f => ({ ...f, sourceDoc: extTitle })))
+        if (!match) continue
+
+        const parsed = JSON.parse(match[0])
+
+        // Flags on current document (in-memory)
+        const currentFlags = (parsed.currentFlags || []).filter(f => validCurrentIds.has(f.paraId))
+        if (currentFlags.length) {
+          setParagraphs(prev => prev.map(p => {
+            const flag = currentFlags.find(f => f.paraId === p.id)
+            return flag ? { ...p, ripple: { ...flag, sourceDoc: extTitle } } : p
+          }))
+          setSidebarCollapsed(false)
+          setSidebarTab('ripple')
+          totalFlagCount += currentFlags.length
+        }
+
+        // Flags on external document — persist to IndexedDB
+        const externalFlags = (parsed.externalFlags || []).filter(f => validExtIds.has(f.paraId))
+        if (externalFlags.length) {
+          const updatedExtParas = extDoc.paragraphs.map(p => {
+            const flag = externalFlags.find(f => f.paraId === p.id)
+            return flag ? { ...p, ripple: { ...flag, sourceDoc: sourceTitle } } : p
+          })
+          await saveSbrdDocument(convId, {
+            paragraphs:       updatedExtParas,
+            suggestionStates: extDoc.suggestionStates,
+            submittedReplies: extDoc.submittedReplies,
+          })
+          totalFlagCount += externalFlags.length
+          if (generateManifest) {
+            manifestEntries.push({ doc: extTitle, flags: externalFlags })
           }
         }
       } catch (_) { /* skip — network or parse error for this chat */ }
     }
 
-    // Merge flags into paragraph state
-    if (allNewFlags.length) {
-      setParagraphs(prev => prev.map(p => {
-        const flag = allNewFlags.find(f => f.paraId === p.id)
-        return flag ? { ...p, ripple: flag } : p
-      }))
-      // Auto-open the Impact Analysis panel so the user sees the results
-      setSidebarCollapsed(false)
-      setSidebarTab('ripple')
-    }
-
     if (saveScope) {
       await setSetting(`sbrd-ripple-scope-${id}`, selectedIds)
     }
-    if (generateManifest && allNewFlags.length) {
+    if (generateManifest && manifestEntries.length) {
       await setSetting(`sbrd-ripple-manifest-${id}`, {
-        scannedAt: new Date().toISOString(),
+        scannedAt:   new Date().toISOString(),
         scannedDocs: selectedIds.length,
-        flags: allNewFlags,
+        entries:     manifestEntries,
       })
     }
 
-    // Return the count so the modal can show a result summary
-    return allNewFlags.length
-  }, [paragraphs, id])
+    return totalFlagCount
+  }, [paragraphs, id, conversationTitle])
 
   // ── Claude suggestion accept / reject handlers ────────────────────
 
@@ -2635,7 +2653,7 @@ function RippleScopeModal({ currentId, currentTitle, onScan, onClose }) {
               : { backgroundColor: 'rgba(107,124,147,0.08)', border: '1px solid rgba(107,124,147,0.2)', color: '#6B7C93' }
           }>
             {scanResult > 0
-              ? `Found ${scanResult} potential inconsistenc${scanResult !== 1 ? 'ies' : 'y'} — see Impact Analysis in the sidebar.`
+              ? `Found ${scanResult} potential inconsistenc${scanResult !== 1 ? 'ies' : 'y'} — flags have been added to the affected documents' Impact Analysis panels.`
               : 'No inconsistencies found across the selected documents.'
             }
           </div>
