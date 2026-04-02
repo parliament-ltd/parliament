@@ -167,6 +167,20 @@ function parseResponseToParas(responseText) {
   return result
 }
 
+/* ─── Strip code blocks for display ──────────────────────── */
+// Removes ```json / ``` fences from text before showing it in the chat panel,
+// so users never see raw JSON or technical markup.
+// Handles two cases:
+//   1. Completed blocks  — ```json\n...\n```  → removed entirely
+//   2. In-progress block — ```... (no closing ```) → hidden while streaming
+
+function stripCodeBlocksForDisplay(text) {
+  let cleaned = text
+    .replace(/```[\w]*\n[\s\S]*?```/g, '') // remove completed fenced blocks
+    .replace(/```[\s\S]*$/,          '')    // remove any open (in-progress) block
+  return cleaned.trim()
+}
+
 /* ─── Parse structured Claude response ───────────────────── */
 // Extracts ```json``` action blocks from Claude's response.
 // Returns { adds: [...paragraphs with claudeOrigin:true], edits: [{paraId, suggestions}] }
@@ -1391,22 +1405,25 @@ Rules:
                           </div>
                         )
                       ))}
-                      {/* Streaming: show the text being written in real time */}
+                      {/* Streaming: show only natural-language commentary, never raw JSON */}
                       {chatStreaming && (
                         <div className="px-3 py-2.5 rounded-xl rounded-bl-sm text-[11px] text-[#4A5568] leading-relaxed" style={{ backgroundColor: `${SUGGESTION}08`, border: `1px solid ${SUGGESTION}20` }}>
-                          {chatStreamingText ? (
-                            <>
-                              {chatStreamingText}
-                              <span className="inline-block w-1 h-3 bg-current opacity-60 ml-0.5 animate-pulse" />
-                            </>
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              {[0, 1, 2].map(i => (
-                                <div key={i} className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: GOLD, animationDelay: `${i * 0.15}s` }} />
-                              ))}
-                              <span className="text-[10px] text-[#6B7C93]">Writing to document…</span>
-                            </div>
-                          )}
+                          {(() => {
+                            const visible = stripCodeBlocksForDisplay(chatStreamingText)
+                            return visible ? (
+                              <>
+                                {visible}
+                                <span className="inline-block w-1 h-3 bg-current opacity-60 ml-0.5 animate-pulse" />
+                              </>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                {[0, 1, 2].map(i => (
+                                  <div key={i} className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: GOLD, animationDelay: `${i * 0.15}s` }} />
+                                ))}
+                                <span className="text-[10px] text-[#6B7C93]">Writing to document…</span>
+                              </div>
+                            )
+                          })()}
                         </div>
                       )}
                     </div>
