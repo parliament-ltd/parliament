@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import {
   getConversation, getBranches, createConversation,
   getSbrdDocument, saveSbrdDocument, listConversations, updateConversation,
+  getSetting, setSetting,
 } from '../../lib/db'
 import { getProvider } from '../../providers'
 import { loadApiKey } from '../../lib/crypto'
@@ -12,7 +13,7 @@ import {
   AlertTriangle, Lightbulb, ChevronDown, Check, X, Eye, EyeOff,
   Bell, BellOff, Eraser, PanelRight,
   Sparkles, CornerDownRight, ArrowRight,
-  CheckCheck, Download,
+  CheckCheck, Download, Loader2,
 } from 'lucide-react'
 import { SPRING_SMOOTH, SPRING_GENTLE } from '../../lib/constants'
 
@@ -630,6 +631,99 @@ export default function SecretarybirdChatLayout() {
     } catch (_) {}
     finally { setRippleScanning(false) }
   }
+
+  // ── Cross-document ripple scan ────────────────────────────────────
+  // Called by RippleScopeModal when the user clicks "Scan N Chats".
+  // For each selected conversation, loads its Secretarybird document,
+  // asks Claude (haiku) whether the current doc's edits create
+  // contradictions or inconsistencies in that external doc, then
+  // merges any flags back onto the current paragraphs as ripple markers.
+
+  const handleRippleScan = useCallback(async (selectedIds, { saveScope, generateManifest }, onProgress) => {
+    const apiKey = await loadApiKey()
+    if (!apiKey) return
+
+    const changedParas = paragraphs.filter(p => p.text !== p.baseline && !p.claudeOrigin)
+    if (!changedParas.length) return
+
+    const editSummary = changedParas.map(p =>
+      `[${p.id}] changed from: "${p.baseline.slice(0, 150)}" → to: "${p.text.slice(0, 150)}"`
+    ).join('\n')
+
+    const provider = getProvider('anthropic')
+    const allNewFlags = []
+
+    for (let i = 0; i < selectedIds.length; i++) {
+      const convId = selectedIds[i]
+      onProgress?.(i + 1, selectedIds.length)
+
+      const [extDoc, extConv] = await Promise.all([
+        getSbrdDocument(convId),
+        getConversation(convId),
+      ])
+      if (!extDoc?.paragraphs?.length) continue
+
+      const extTitle = extConv?.title || 'Untitled'
+      const extText = extDoc.paragraphs
+        .map(p => `[${p.id}] ${p.type === 'heading' || p.type === 'heading2' ? '# ' : ''}${p.text}`)
+        .join('\n\n')
+
+      const systemPrompt = `You are checking whether recent edits in the current document create consistency problems with another document.
+
+Current document — recent edits:
+${editSummary}
+
+Other document — "${extTitle}":
+${extText}
+
+Respond ONLY with valid JSON (no prose, no markdown fences):
+{"rippleFlags":[{"paraId":"paragraph-id-from-current-doc","type":"contradiction|inconsistency|dependency_break","severity":"low|medium|high","summary":"brief description — mention the other document by name"}]}
+
+Only flag genuine cross-document inconsistencies caused by the current doc's edits. Return empty rippleFlags array if none.`
+
+      let resp = ''
+      const abort = new AbortController()
+      try {
+        await provider.sendMessage(
+          apiKey,
+          [{ role: 'user', content: 'Analyze cross-document consistency.' }],
+          'claude-haiku',
+          chunk => { resp += chunk },
+          abort.signal,
+          systemPrompt,
+        )
+        const match = resp.match(/\{[\s\S]*\}/)
+        if (match) {
+          const parsed = JSON.parse(match[0])
+          if (parsed.rippleFlags?.length) {
+            allNewFlags.push(...parsed.rippleFlags.map(f => ({ ...f, sourceDoc: extTitle })))
+          }
+        }
+      } catch (_) { /* skip unavailable chat */ }
+    }
+
+    // Merge cross-doc flags into current paragraphs
+    if (allNewFlags.length) {
+      setParagraphs(prev => prev.map(p => {
+        const flag = allNewFlags.find(f => f.paraId === p.id)
+        return flag ? { ...p, ripple: flag } : p
+      }))
+    }
+
+    // Persist scope selection for next session
+    if (saveScope) {
+      await setSetting(`sbrd-ripple-scope-${id}`, selectedIds)
+    }
+
+    // Save manifest to settings for later reference
+    if (generateManifest && allNewFlags.length) {
+      await setSetting(`sbrd-ripple-manifest-${id}`, {
+        scannedAt: new Date().toISOString(),
+        scannedDocs: selectedIds.length,
+        flags: allNewFlags,
+      })
+    }
+  }, [paragraphs, id])
 
   // ── Claude suggestion accept / reject handlers ────────────────────
 
@@ -1490,6 +1584,7 @@ Rules:
           <RippleScopeModal
             currentId={id}
             currentTitle={conversationTitle}
+            onScan={handleRippleScan}
             onClose={() => setShowRippleScopeModal(false)}
           />
         )}
@@ -2391,14 +2486,27 @@ function ChatShortcut({ label, onClick }) {
 /*  RIPPLE SCOPE MODAL                                         */
 /* ═══════════════════════════════════════════════════════════ */
 
-function RippleScopeModal({ currentId, currentTitle, onClose }) {
+function RippleScopeModal({ currentId, currentTitle, onScan, onClose }) {
   const [conversations, setConversations] = useState([])
   const [selected, setSelected] = useState(new Set())
   const [generateManifest, setGenerateManifest] = useState(false)
   const [saveScope, setSaveScope] = useState(false)
+  const [scanning, setScanning] = useState(false)
+  const [scanProgress, setScanProgress] = useState(null) // { current, total }
 
   useEffect(() => {
-    listConversations().then(all => setConversations(all.filter(c => c.id !== currentId)))
+    // Load conversations and restore any previously saved scope selection
+    Promise.all([
+      listConversations(),
+      getSetting(`sbrd-ripple-scope-${currentId}`),
+    ]).then(([all, savedScope]) => {
+      const filtered = all.filter(c => c.id !== currentId)
+      setConversations(filtered)
+      if (savedScope?.length) {
+        const validIds = new Set(savedScope.filter(sid => filtered.some(c => c.id === sid)))
+        if (validIds.size) setSelected(validIds)
+      }
+    })
   }, [currentId])
 
   const toggleAll = () => {
@@ -2490,19 +2598,53 @@ function RippleScopeModal({ currentId, currentTitle, onClose }) {
           </label>
         </div>
 
+        {/* Scan progress */}
+        {scanning && scanProgress && (
+          <div className="mb-3 px-3 py-2 rounded-lg text-[11px] text-[#6B7C93] flex items-center gap-2" style={{ backgroundColor: `${GOLD}10`, border: `1px solid ${GOLD}30` }}>
+            <Loader2 className="w-3 h-3 animate-spin flex-shrink-0" style={{ color: GOLD }} />
+            Scanning {scanProgress.current} of {scanProgress.total} chat{scanProgress.total !== 1 ? 's' : ''}…
+          </div>
+        )}
+
         <div className="flex items-center gap-2 justify-end">
-          <motion.button whileTap={{ scale: 0.97 }} onClick={onClose} className="px-4 py-2 text-xs font-semibold text-[#6B7C93] hover:bg-[#F5F5F5] rounded-lg transition-colors">Cancel</motion.button>
           <motion.button
-            whileHover={selected.size > 0 ? { scale: 1.02 } : {}}
-            whileTap={selected.size > 0 ? { scale: 0.97 } : {}}
-            disabled={selected.size === 0}
-            className="px-5 py-2 text-white text-xs font-semibold rounded-lg shadow-sm transition-all"
+            whileTap={{ scale: 0.97 }}
+            onClick={onClose}
+            disabled={scanning}
+            className="px-4 py-2 text-xs font-semibold text-[#6B7C93] hover:bg-[#F5F5F5] rounded-lg transition-colors disabled:opacity-40"
+          >
+            Cancel
+          </motion.button>
+          <motion.button
+            whileHover={selected.size > 0 && !scanning ? { scale: 1.02 } : {}}
+            whileTap={selected.size > 0 && !scanning ? { scale: 0.97 } : {}}
+            disabled={selected.size === 0 || scanning}
+            onClick={async () => {
+              setScanning(true)
+              setScanProgress({ current: 0, total: selected.size })
+              try {
+                await onScan(
+                  [...selected],
+                  { saveScope, generateManifest },
+                  (current, total) => setScanProgress({ current, total }),
+                )
+                onClose()
+              } catch (_) {
+                setScanning(false)
+                setScanProgress(null)
+              }
+            }}
+            className="flex items-center gap-2 px-5 py-2 text-white text-xs font-semibold rounded-lg shadow-sm transition-all"
             style={selected.size > 0
               ? { backgroundColor: '#C4A94D', border: '1px solid #C4A94D' }
               : { backgroundColor: '#191919', border: '1px solid #4A4540' }
             }
           >
-            Scan {selected.size > 0 ? `${selected.size} Chat${selected.size !== 1 ? 's' : ''}` : 'Chats'}
+            {scanning && <Loader2 className="w-3 h-3 animate-spin" />}
+            {scanning
+              ? `Scanning…`
+              : `Scan ${selected.size > 0 ? `${selected.size} Chat${selected.size !== 1 ? 's' : ''}` : 'Chats'}`
+            }
           </motion.button>
         </div>
       </motion.div>
