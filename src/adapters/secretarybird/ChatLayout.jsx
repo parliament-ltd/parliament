@@ -1059,11 +1059,11 @@ Rules:
             whileTap={hasSubmittableChanges && !submitting ? { scale: 0.97 } : {}}
             onClick={() => hasSubmittableChanges && !submitting && setShowSubmitConfirm(true)}
             className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              hasSubmittableChanges ? 'text-white shadow-sm' : 'cursor-not-allowed'
+              hasSubmittableChanges ? 'text-white shadow-sm' : 'sbrd-btn-idle cursor-not-allowed'
             }`}
             style={hasSubmittableChanges
-              ? { backgroundColor: GOLD, borderColor: GOLD, border: '1px solid' }
-              : { backgroundColor: '#191919', border: '1px solid #4A4540', color: 'white' }
+              ? { backgroundColor: GOLD, border: `1px solid ${GOLD}` }
+              : {}
             }
           >
             <Send className="w-3.5 h-3.5" />
@@ -1332,8 +1332,8 @@ Rules:
                     <motion.button
                       whileTap={{ scale: 0.97 }}
                       onClick={() => setShowRippleScopeModal(true)}
-                      className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[11px] font-medium transition-colors"
-                      style={{ backgroundColor: '#191919', border: '1px solid #4A4540', color: 'white', fontFamily: 'system-ui, sans-serif' }}
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-lg border text-[11px] font-medium transition-colors sbrd-scope-btn"
+                      style={{ fontFamily: 'system-ui, sans-serif' }}
                     >
                       <span>Expand Scope</span>
                       <ChevronDown className="w-3 h-3" />
@@ -1386,7 +1386,7 @@ Rules:
                       <SidebarSectionLabel label="Chat with Claude" />
                       {chatMessages.length === 0 && !chatStreaming && (
                         <>
-                          <div className="px-3 py-2.5 rounded-xl rounded-bl-md text-[11px] leading-relaxed" style={{ backgroundColor: '#191919', border: '1px solid #3A3730', color: 'white' }}>
+                          <div className="sbrd-chat-hint px-3 py-2.5 rounded-xl rounded-bl-md text-[11px] leading-relaxed">
                             Ask me to write content, continue the story, suggest edits, or review your draft. My response will be added as new paragraphs in the document.
                           </div>
                           <div className="flex flex-wrap gap-1.5">
@@ -1443,8 +1443,8 @@ Rules:
                           onChange={e => setChatInput(e.target.value)}
                           onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleChatSend() } }}
                           disabled={chatStreaming}
-                          className="flex-1 px-3 py-2 rounded-lg text-xs focus:outline-none transition-colors disabled:opacity-50"
-                          style={{ backgroundColor: '#191919', border: '1px solid #3A3730', color: 'white', fontFamily: 'system-ui, sans-serif' }}
+                          className="sbrd-chat-input flex-1 px-3 py-2 rounded-lg text-xs focus:outline-none transition-colors disabled:opacity-50"
+                          style={{ fontFamily: 'system-ui, sans-serif' }}
                         />
                         <motion.button
                           whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
@@ -1597,9 +1597,10 @@ function DocumentParagraph({
     skipNextSync.current = true
     const text = e.currentTarget.textContent
     onTextChange(para.id, text)
-    if (text === '/' || (text.startsWith('/') && !text.includes('\n'))) {
+    const trimmed = text.trim()
+    if (trimmed.startsWith('/') && !trimmed.includes('\n')) {
       setSlashOpen(true)
-      setSlashFilter(text.slice(1).toLowerCase())
+      setSlashFilter(trimmed.slice(1).toLowerCase())
       setSlashIndex(0)
     } else {
       setSlashOpen(false)
@@ -1648,14 +1649,12 @@ function DocumentParagraph({
       if (!sel?.rangeCount) return
       const offset = getTextOffset(editRef.current, sel.anchorNode, sel.anchorOffset)
       onSplit(para.id, offset)
-      // Focus the new paragraph after state updates
+      // Focus the newly-created paragraph by DOM order (avoids stale closure on paragraphs)
       requestAnimationFrame(() => {
-        const idx = paragraphs.findIndex(p => p.id === para.id)
-        const nextPara = paragraphs[idx + 1]
-        if (nextPara) {
-          const nextEl = document.querySelector(`[data-para-id="${nextPara.id}"] [data-editable]`)
-          if (nextEl) { nextEl.focus(); setCursorAt(nextEl, 0) }
-        }
+        const allEditables = Array.from(document.querySelectorAll('[data-para-id] [data-editable]'))
+        const currentIdx = allEditables.indexOf(editRef.current)
+        const nextEl = allEditables[currentIdx + 1]
+        if (nextEl) { nextEl.focus(); setCursorAt(nextEl, 0) }
       })
     }
 
@@ -1801,7 +1800,7 @@ function DocumentParagraph({
       initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       transition={{ ...SPRING_GENTLE, delay: Math.min(index * 0.04, 0.3) }}
       className="relative group mb-6"
-      onClick={() => { onClearActiveComment(); if (editRef.current) editRef.current.focus() }}
+      onClick={() => { onClearActiveComment(); if (!addingComment && editRef.current) editRef.current.focus() }}
     >
       <div className="flex">
         {/* Document column */}
@@ -1948,6 +1947,7 @@ function DocumentParagraph({
                 initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
                 className="flex items-center gap-2 mt-3"
                 onClick={e => e.stopPropagation()}
+                onMouseDown={e => e.stopPropagation()}
                 style={{ fontFamily: 'system-ui, sans-serif' }}
               >
                 <input
@@ -2050,15 +2050,18 @@ function MarginComment({ comment, expanded, isActive, onToggle, onActivate, repl
                 <span className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: SUGGESTION }}>Claude</span>
               </div>
               <p className="text-[10px] text-[#4A5568] leading-relaxed">{comment.claudeReply.text}</p>
-              {submittedReplies.map((reply, i) => (
-                <div key={i} className="mt-2 pt-2 border-t border-[#22C55E]/15">
-                  <p className="text-[10px] text-[#6B5D1F] leading-relaxed">{reply.text}</p>
-                </div>
-              ))}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+      {/* User-submitted replies — always visible, not gated behind claudeReply */}
+      {submittedReplies.length > 0 && (
+        <div className="ml-3 mt-1 pl-3 border-l-2 border-[#E5D9A8]/60 space-y-1">
+          {submittedReplies.map((reply, i) => (
+            <p key={i} className="text-[10px] text-[#6B5D1F] leading-relaxed py-0.5">{reply.text}</p>
+          ))}
+        </div>
+      )}
       {/* Reply section — always available */}
       <div className="mt-1.5" onClick={e => e.stopPropagation()}>
         {!isReplying ? (
@@ -2130,12 +2133,17 @@ function CommentCard({ comment, expanded, isActive, onToggle, onActivate, onJump
             {expanded && (
               <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
                 <p className="text-[10px] text-[#4A5568] leading-relaxed">{comment.claudeReply.text}</p>
-                {submittedReplies.map((reply, i) => (
-                  <div key={i} className="mt-2 pt-2 border-t border-[#E5D9A8]/40"><p className="text-[10px] text-[#6B5D1F] leading-relaxed">{reply.text}</p></div>
-                ))}
               </motion.div>
             )}
           </AnimatePresence>
+        </div>
+      )}
+      {/* User-submitted replies — always visible */}
+      {submittedReplies.length > 0 && (
+        <div className="mt-2 pl-3 border-l-2 border-[#E5D9A8]/60 space-y-1">
+          {submittedReplies.map((reply, i) => (
+            <p key={i} className="text-[10px] text-[#6B5D1F] leading-relaxed py-0.5">{reply.text}</p>
+          ))}
         </div>
       )}
       {/* Reply section — always available */}
