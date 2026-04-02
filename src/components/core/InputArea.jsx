@@ -37,7 +37,7 @@ export default function InputArea({
   onSend,
   onStop,
   isStreaming = false,
-  placeholder = 'Ask a follow-up question...',
+  placeholder = 'Ask a question...',
   disabled = false,
   inputRef,
   attachment = null,

@@ -8,7 +8,7 @@ import {
   GitBranch, Trash2, MessageSquare, Search,
   FileText, MoreVertical, StickyNote, Activity, Zap, Star,
   Eye, Copy, ArrowRightCircle, Settings2, BookOpen, PanelRight, X,
-  Pencil, Info, ArrowRight, Download, Command,
+  Pencil, Info, ArrowRight, Download, Command, Globe,
 } from 'lucide-react'
 import { useChat } from '../../stores/ChatContext'
 import { useConversations } from '../../stores/ConversationContext'
@@ -168,6 +168,13 @@ export default function ChatView() {
       return next
     })
   }, [])
+
+  // Web-search tip — shows when input contains time-sensitive keywords but web search is off
+  const WEB_SEARCH_PATTERN = /\b(today|tonight|right now|currently|current[ly]?|latest|recent[ly]?|this (week|month|year)|live|breaking|news|weather|stock|price|score|who (won|is winning)|what (happened|is happening)|just (announced|launched|released|dropped))\b/i
+  const showWebSearchTip = useMemo(
+    () => !activeTools.has('web_search') && WEB_SEARCH_PATTERN.test(inputValue),
+    [inputValue, activeTools]  // eslint-disable-line react-hooks/exhaustive-deps
+  )
 
   // Mode suggestions
   const [dismissedSuggestions, setDismissedSuggestions] = useState(new Set())
@@ -1139,6 +1146,24 @@ export default function ChatView() {
           onDismiss={() => setDismissedSuggestions(prev => { const s = new Set(prev); s.add(activeSuggestion.id); return s })}
           onTurnOff={() => setSuggestionsEnabled(false)}
         />
+
+        {/* Web search tip */}
+        <AnimatePresence>
+          {showWebSearchTip && (
+            <motion.div
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 4 }}
+              transition={SPRING_SNAPPY}
+              className="flex items-center gap-2 px-4 pb-1"
+            >
+              <Globe className="w-3 h-3 flex-shrink-0" style={{ color: '#4A7AE5' }} />
+              <p className="text-[11px]" style={{ color: 'var(--p-text-secondary)' }}>
+                This question may need live data. Select <span className="font-semibold" style={{ color: 'var(--p-text-primary)' }}>+</span> in the input to enable web search.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Input area */}
         <InputArea

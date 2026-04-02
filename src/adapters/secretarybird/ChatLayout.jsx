@@ -320,10 +320,14 @@ export default function SecretarybirdChatLayout() {
       if (cancelled) return
       setConversationTitle(conv?.title || 'Untitled')
       setBranches(branchList)
-      if (doc) {
-        if (doc.paragraphs?.length) setParagraphs(doc.paragraphs.map(migrateParagraph))
-        if (doc.submittedReplies)   setSubmittedReplies(doc.submittedReplies)
+      if (doc?.paragraphs?.length) {
+        setParagraphs(doc.paragraphs.map(migrateParagraph))
+      } else {
+        // New or empty document — seed with one empty paragraph so DocumentParagraph
+        // handles the first line (slash commands, placeholder, etc.)
+        setParagraphs([{ id: `p-${crypto.randomUUID()}`, type: 'paragraph', text: '', baseline: '', comments: [] }])
       }
+      if (doc?.submittedReplies) setSubmittedReplies(doc.submittedReplies)
       setLoaded(true)
     }
     load()
@@ -1130,34 +1134,7 @@ Rules:
             </div>
           )}
 
-          {paragraphs.length === 0 ? (
-            <div className="relative">
-              <div
-                contentEditable
-                suppressContentEditableWarning
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    const text = e.currentTarget.textContent.trim()
-                    if (text) {
-                      setParagraphs([{ id: `p${Date.now()}`, type: 'paragraph', text, baseline: text, comments: [] }])
-                    }
-                  }
-                }}
-                onBlur={(e) => {
-                  const text = e.currentTarget.textContent.trim()
-                  if (text) {
-                    setParagraphs([{ id: `p${Date.now()}`, type: 'paragraph', text, baseline: text, comments: [] }])
-                  }
-                }}
-                className="text-base leading-[1.85] outline-none cursor-text relative z-10"
-                style={{ minHeight: '1.85em', caretColor: GOLD, color: 'var(--p-text-primary)' }}
-              />
-              <div className="absolute inset-0 pointer-events-none select-none text-base leading-[1.85]" style={{ color: 'var(--p-text-muted)', fontFamily: "'Source Serif 4', Georgia, serif" }}>
-                Start writing here…
-              </div>
-            </div>
-          ) : paragraphs.map((para, index) => (
+          {paragraphs.map((para, index) => (
             <DocumentParagraph
               key={para.id}
               para={para}
@@ -1165,6 +1142,7 @@ Rules:
               showMarkup={showMarkup}
               selected={selectedParagraph === para.id}
               activeTool={activeTool}
+              placeholder={index === 0 ? 'Start writing here…' : undefined}
               onSelect={() => setSelectedParagraph(para.id === selectedParagraph ? null : para.id)}
               onTextChange={handleParagraphTextChange}
               onSplit={handleSplitParagraph}
@@ -1559,7 +1537,7 @@ const SLASH_OPTIONS = [
 ]
 
 function DocumentParagraph({
-  para, index, showMarkup, selected, activeTool,
+  para, index, showMarkup, selected, activeTool, placeholder,
   onSelect, onTextChange, onSplit, onMerge, paragraphs,
   addingComment, newCommentText, onCommentTextChange, onAddComment, onCancelComment, onStartAddComment,
   expandedComments, activeCommentId, onSetActiveComment, onClearActiveComment,
@@ -1846,6 +1824,15 @@ function DocumentParagraph({
                     ? <HighlightedText text={para.text} highlight={activeHighlight} />
                     : <DiffText baseline={para.baseline} text={para.text} />}
                 </p>
+              )}
+              {/* Placeholder — shown only when paragraph is empty, hides the instant text is typed */}
+              {!para.text && placeholder && !slashOpen && (
+                <div
+                  className="absolute inset-0 text-base leading-[1.85] pointer-events-none select-none"
+                  style={{ color: 'var(--p-text-muted)', fontFamily: "'Source Serif 4', Georgia, serif" }}
+                >
+                  {placeholder}
+                </div>
               )}
               {/* Slash command menu */}
               {slashOpen && (() => {

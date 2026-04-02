@@ -23,18 +23,19 @@ export const SUGGESTION_RULES = [
       }
     },
   },
-  {
-    id: 'highlights-to-kingfisher',
-    evaluate({ mode, highlightCount }) {
-      if (mode === 'kingfisher') return null
-      if (highlightCount < 3) return null
-      return {
-        targetMode: 'kingfisher',
-        message: "You're building up annotations.",
-        cta: 'Kingfisher has a reading pane built for detailed review.',
-      }
-    },
-  },
+  // 'highlights-to-kingfisher' disabled — Kingfisher not yet available
+  // {
+  //   id: 'highlights-to-kingfisher',
+  //   evaluate({ mode, highlightCount }) {
+  //     if (mode === 'kingfisher') return null
+  //     if (highlightCount < 3) return null
+  //     return {
+  //       targetMode: 'kingfisher',
+  //       message: "You're building up annotations.",
+  //       cta: 'Kingfisher has a reading pane built for detailed review.',
+  //     }
+  //   },
+  // },
   {
     id: 'stylus-to-secretarybird',
     evaluate({ mode }) {
