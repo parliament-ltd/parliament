@@ -856,12 +856,12 @@ ${commentLines}
 
 Respond ONLY with a valid JSON object — no prose, no markdown fences:
 {
-  "commentReplies": [{"commentId": "...", "reply": "..."}]${rippleEnabled ? `,
+  "commentReplies": [{"commentId": "...", "reply": "...", "suggestions": [{"find": "exact verbatim text to replace", "replace": "replacement text", "reasoning": "brief reason"}]}]${rippleEnabled ? `,
   "rippleFlags": [{"paraId": "...", "type": "contradiction|dependency_break|opportunity|tone_shift|duplication", "severity": "low|medium|high", "summary": "...", "sourceEdit": "..."}],
   "rippleSuggestions": [{"paraId": "...", "suggestions": [{"find": "exact text to find", "replace": "replacement", "reasoning": "brief reason"}]}]` : ''}
 }
 
-Reply to every comment helpfully and concisely.${rippleEnabled ? ' Include rippleFlags only for genuine cross-paragraph impacts caused by the edits — omit if none. Include rippleSuggestions with concrete fix suggestions for flagged paragraphs — omit if none.' : ''}`
+Reply to every comment helpfully and concisely. When a comment requests a text edit, rewrite, or improvement, include "suggestions" for that reply — each suggestion must use a short, unique, verbatim substring of the paragraph as "find". Omit "suggestions" when the comment is a question or general feedback that does not call for a text change.${rippleEnabled ? ' Include rippleFlags only for genuine cross-paragraph impacts caused by the edits — omit if none. Include rippleSuggestions with concrete fix suggestions for flagged paragraphs — omit if none.' : ''}`
 
         let fullResponse = ''
         const abort = new AbortController()
@@ -879,6 +879,14 @@ Reply to every comment helpfully and concisely.${rippleEnabled ? ' Include rippl
           const jsonMatch = fullResponse.match(/\{[\s\S]*\}/)
           if (jsonMatch) {
             const parsed = JSON.parse(jsonMatch[0])
+
+            // Build a commentId → paraId lookup so comment suggestions can be
+            // applied to the correct paragraph without a second search.
+            const commentParaMap = {}
+            paragraphs.forEach(p =>
+              (p.comments || []).forEach(c => { commentParaMap[c.id] = p.id })
+            )
+
             finalParagraphs = paragraphs.map(p => ({
               ...p,
               ripple: rippleEnabled
@@ -889,6 +897,27 @@ Reply to every comment helpfully and concisely.${rippleEnabled ? ' Include rippl
                 return rep ? { ...c, claudeReply: { text: rep.reply } } : c
               }),
             }))
+
+            // Apply suggestions from comment replies as claudeSuggestions on
+            // their respective paragraphs.
+            if (parsed.commentReplies?.length) {
+              finalParagraphs = finalParagraphs.map(p => {
+                const repliesForPara = parsed.commentReplies.filter(
+                  r => commentParaMap[r.commentId] === p.id && r.suggestions?.length
+                )
+                if (!repliesForPara.length) return p
+                const newSuggs = repliesForPara.flatMap((r, ri) =>
+                  r.suggestions.map((s, si) => ({
+                    id: `cr-${Date.now()}-${ri}-${si}`,
+                    find: String(s.find || ''),
+                    replace: String(s.replace || ''),
+                    reasoning: String(s.reasoning || ''),
+                  }))
+                )
+                return { ...p, claudeSuggestions: [...(p.claudeSuggestions || []), ...newSuggs] }
+              })
+            }
+
             if (rippleEnabled && parsed.rippleSuggestions?.length) {
               finalParagraphs = finalParagraphs.map(p => {
                 const entry = parsed.rippleSuggestions.find(r => r.paraId === p.id)
