@@ -29,6 +29,7 @@ const TOOL_META = {
  *   availableTools {object[]}
  *   activeTools    {Set<string>}
  *   onToggleTool   {(id) => void}
+ *   isOnline       {boolean}  — when false the send button is disabled with an aria-label. Default: true.
  *   cardLayout     {boolean}  — unified card style (mobile). Default: inline (desktop).
  */
 export default function InputArea({
@@ -39,6 +40,7 @@ export default function InputArea({
   isStreaming = false,
   placeholder = 'Ask a question...',
   disabled = false,
+  isOnline = true,
   inputRef,
   attachment = null,
   onAttach,
@@ -235,10 +237,16 @@ export default function InputArea({
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.8, opacity: 0 }}
                   transition={SPRING_SNAPPY}
-                  whileTap={{ scale: 0.85 }}
-                  onClick={onSend}
-                  className="rounded-lg border flex items-center justify-center flex-shrink-0"
-                  style={{ width: 36, height: 36, borderColor: '#4A7AE5', backgroundColor: '#4A7AE5' }}
+                  whileTap={isOnline ? { scale: 0.85 } : undefined}
+                  onClick={isOnline ? onSend : undefined}
+                  disabled={!isOnline}
+                  aria-label={isOnline ? 'Send message' : 'Send message (unavailable while offline)'}
+                  className="rounded-lg border flex items-center justify-center flex-shrink-0 disabled:opacity-40"
+                  style={{
+                    width: 36, height: 36,
+                    borderColor: isOnline ? '#4A7AE5' : '#9B9A97',
+                    backgroundColor: isOnline ? '#4A7AE5' : '#9B9A97',
+                  }}
                 >
                   <ArrowUp className="w-4 h-4 text-white" />
                 </motion.button>
@@ -351,10 +359,18 @@ export default function InputArea({
         </div>
 
         <motion.button
-          whileHover={{ scale: 1.03, borderColor: '#4A7AE5' }}
-          whileTap={{ scale: 0.97 }}
-          onClick={isStreaming ? onStop : onSend}
-          className={`px-5 rounded-lg font-semibold text-sm border bg-white transition-colors flex items-center gap-2 flex-shrink-0 ${
+          whileHover={!isStreaming && isOnline ? { scale: 1.03, borderColor: '#4A7AE5' } : undefined}
+          whileTap={!isStreaming && isOnline ? { scale: 0.97 } : undefined}
+          onClick={isStreaming ? onStop : (isOnline ? onSend : undefined)}
+          disabled={!isStreaming && !isOnline}
+          aria-label={
+            isStreaming
+              ? 'Stop generating'
+              : isOnline
+                ? 'Send message'
+                : 'Send message (unavailable while offline)'
+          }
+          className={`px-5 rounded-lg font-semibold text-sm border bg-white transition-colors flex items-center gap-2 flex-shrink-0 disabled:opacity-40 ${
             isStreaming
               ? 'border-[#EF4444]/30 text-[#EF4444] hover:border-[#EF4444]'
               : 'border-[#E9E9E7] text-[var(--p-text-primary)] hover:border-[#B8A070] hover:text-[#B8A070]'

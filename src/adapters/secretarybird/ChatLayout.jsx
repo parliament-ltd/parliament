@@ -435,7 +435,7 @@ export default function SecretarybirdChatLayout() {
       const after  = para.text.slice(cursorOffset)
       const newPara = {
         id: `p-${crypto.randomUUID()}`,
-        type: para.type === 'heading' ? 'paragraph' : para.type,
+        type: (para.type === 'heading' || para.type === 'heading2' || para.type === 'title') ? 'paragraph' : para.type,
         text: after,
         baseline: after,
         comments: [],
