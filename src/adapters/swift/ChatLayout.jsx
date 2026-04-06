@@ -6,12 +6,13 @@ import remarkGfm from 'remark-gfm'
 import {
   GitBranch, Trash2, StickyNote, Star, Copy, X, FileText, Eye,
   Settings2, BookOpen, Zap, AlertCircle, Highlighter, ChevronDown,
-  ArrowRightCircle, GripHorizontal, List, MessageSquare,
+  ArrowRightCircle, GripHorizontal, List, MessageSquare, WifiOff, RefreshCw,
 } from 'lucide-react'
 import { useChat } from '../../stores/ChatContext'
 import { useConversations } from '../../stores/ConversationContext'
 import { useSettings } from '../../stores/SettingsContext'
 import { useMode } from '../../stores/ModeContext'
+import { usePWA } from '../../stores/PWAContext'
 import { getProvider } from '../../providers'
 import ModeSuggestion from '../../components/core/ModeSuggestion'
 import InputArea from '../../components/core/InputArea'
@@ -307,6 +308,11 @@ export default function SwiftChatLayout() {
   const { conversations, updateConversation, loadConversations, createConversation } = useConversations()
   const { settings, storageUsage, refreshStorageEstimate } = useSettings()
   const { mode, setMode } = useMode()
+  const {
+    isOnline,
+    needsUpdate, applyUpdate, dismissUpdate,
+    showInstallBanner, trackMessageSent, dismissInstallBanner, triggerInstallPrompt,
+  } = usePWA()
 
   const [inputValue, setInputValue] = useState('')
   const [apiKey, setApiKey] = useState(null)
@@ -428,6 +434,7 @@ export default function SwiftChatLayout() {
   const handleSend = useCallback(async () => {
     const trimmed = inputValue.trim()
     if (!trimmed || isStreaming) return
+    if (!isOnline) return
     if (!apiKey) {
       setApiError({ type: 'key_failure', message: 'No API key. Add one in Settings.' })
       return
@@ -446,6 +453,7 @@ export default function SwiftChatLayout() {
       const collabPrompt = buildCollabSystemPrompt()
       await sendMessage(apiKey, id, messageContent, settings.defaultModel, provider, collabPrompt, toolList)
       await refreshStorageEstimate()
+      trackMessageSent()
     } catch (error) {
       if (error.status === 401 || error.status === 403) {
         setApiError({ type: 'key_failure', message: 'API key no longer working. Update in Settings.' })
@@ -455,7 +463,7 @@ export default function SwiftChatLayout() {
         setApiError({ type: 'generic', message: error.message || 'Something went wrong.' })
       }
     }
-  }, [inputValue, isStreaming, apiKey, id, settings.defaultModel, sendMessage, refreshStorageEstimate, buildCollabSystemPrompt, attachment, activeTools, availableTools])
+  }, [inputValue, isStreaming, isOnline, apiKey, id, settings.defaultModel, sendMessage, refreshStorageEstimate, buildCollabSystemPrompt, attachment, activeTools, availableTools, trackMessageSent])
 
   const handleContinue = useCallback(async (messageId) => {
     if (!apiKey) return
@@ -676,6 +684,69 @@ export default function SwiftChatLayout() {
         )}
       </AnimatePresence>
 
+      {/* Install banner — shown after 3 messages, permanently dismissible */}
+      <AnimatePresence>
+        {showInstallBanner && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="px-5 py-3 bg-[#B8A070]/10 border-b border-[#B8A070]/20 flex items-center gap-2"
+          >
+            <p className="text-xs text-[#B8A070] flex-1">
+              Install Parliament for faster access — works offline for reading your conversations.
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={triggerInstallPrompt}
+              className="text-xs font-medium text-[#B8A070] underline underline-offset-2 hover:opacity-70 transition-opacity shrink-0"
+            >
+              Install
+            </motion.button>
+            <span className="text-[#B8A070]/40 text-xs">·</span>
+            <button
+              onClick={dismissInstallBanner}
+              className="text-[#B8A070]/70 hover:text-[#B8A070] transition-colors shrink-0"
+              aria-label="Dismiss install prompt"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* SW update banner — new version waiting to activate */}
+      <AnimatePresence>
+        {needsUpdate && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="px-5 py-3 bg-[#B8A070]/10 border-b border-[#B8A070]/20 flex items-center gap-2"
+          >
+            <RefreshCw className="w-4 h-4 text-[#B8A070] flex-shrink-0" />
+            <p className="text-xs text-[#B8A070] flex-1">A new version of Parliament is ready.</p>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={applyUpdate}
+              className="text-xs font-medium text-[#B8A070] underline underline-offset-2 hover:opacity-70 transition-opacity shrink-0"
+            >
+              Update now
+            </motion.button>
+            <span className="text-[#B8A070]/40 text-xs">·</span>
+            <button
+              onClick={dismissUpdate}
+              className="text-[#B8A070]/70 hover:text-[#B8A070] transition-colors shrink-0"
+              aria-label="Dismiss update notice"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ── Storage Critical Banner (proactive — 95%+ full) ── */}
       <AnimatePresence>
         {storageUsage?.quota > 0 && (storageUsage.usage / storageUsage.quota) >= 0.95 && (
@@ -809,6 +880,23 @@ export default function SwiftChatLayout() {
         )}
       </AnimatePresence>
 
+      {/* Offline notice — non-blocking, auto-dismisses when connection returns */}
+      <AnimatePresence>
+        {!isOnline && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="px-5 py-1.5 flex items-center gap-2"
+          >
+            <WifiOff className="w-3.5 h-3.5 text-[#D9730D] flex-shrink-0" />
+            <p className="text-xs text-[#D9730D]">
+              You're offline — sending is paused. Your conversations are safe.
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Mode suggestion banner */}
       <ModeSuggestion
         suggestion={activeSuggestion}
@@ -826,6 +914,7 @@ export default function SwiftChatLayout() {
         onSend={handleSend}
         onStop={stopGenerating}
         isStreaming={isStreaming}
+        isOnline={isOnline}
         placeholder="Type here"
         attachment={attachment}
         onAttach={setAttachment}

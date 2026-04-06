@@ -1,0 +1,29 @@
+{
+  "name": "Parliament",
+  "short_name": "Parliament",
+  "description": "A power-user chat interface for Claude. Bring your own API key — no accounts, no servers, all data stays in your browser.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/parliament_logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/parliament_logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/parliament_logo.png",
+      "sizes": "2000x2000",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ]
+}

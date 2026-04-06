@@ -8,7 +8,7 @@ import {
   GitBranch, Trash2, MessageSquare, Search,
   FileText, MoreVertical, StickyNote, Activity, Zap, Star,
   Eye, Copy, ArrowRightCircle, Settings2, BookOpen, PanelRight, X,
-  Pencil, Info, ArrowRight, Download, Command, Globe,
+  Pencil, Info, ArrowRight, Download, Command, Globe, WifiOff, RefreshCw,
 } from 'lucide-react'
 import { useChat } from '../../stores/ChatContext'
 import { useConversations } from '../../stores/ConversationContext'
@@ -38,6 +38,7 @@ import { formatAttachmentForMessage } from '../../lib/fileUpload'
 import { includesWord, indexOfWord } from '../../lib/textUtils'
 import { evaluateSuggestions } from '../../lib/modeSuggestions'
 import { useMode } from '../../stores/ModeContext'
+import { usePWA } from '../../stores/PWAContext'
 
 /* ── ChatView-local constants ───────────────────────────── */
 
@@ -121,6 +122,11 @@ export default function ChatView() {
   const { conversations, updateConversation, loadConversations, createConversation } = useConversations()
   const { settings, storageUsage, refreshStorageEstimate } = useSettings()
   const { mode, setMode } = useMode()
+  const {
+    isOnline,
+    needsUpdate, applyUpdate, dismissUpdate,
+    showInstallBanner, trackMessageSent, dismissInstallBanner, triggerInstallPrompt,
+  } = usePWA()
 
   const [inputValue, setInputValue] = useState('')
   const [apiKey, setApiKey] = useState(null)
@@ -549,6 +555,7 @@ export default function ChatView() {
   const handleSend = useCallback(async () => {
     const trimmed = inputValue.trim()
     if (!trimmed || isStreaming) return
+    if (!isOnline) return
     if (!apiKey) {
       setApiError({ type: 'key_failure', message: 'No API key configured. Add one in Settings to continue.' })
       return
@@ -570,6 +577,7 @@ export default function ChatView() {
       await sendMessage(apiKey, id, messageContent, settings.defaultModel, provider, collabPrompt, toolList)
       setAttachment(null)
       await refreshStorageEstimate()
+      trackMessageSent()
     } catch (error) {
       if (error.status === 401 || error.status === 403) {
         setApiError({ type: 'key_failure', message: 'Your API key is no longer working. Your conversation is safe — update your key in Settings to continue.' })
@@ -579,7 +587,7 @@ export default function ChatView() {
         setApiError({ type: 'generic', message: error.message || 'Something went wrong. Please try again.' })
       }
     }
-  }, [inputValue, isStreaming, apiKey, id, settings.defaultModel, sendMessage, refreshStorageEstimate, buildCollabSystemPrompt, attachment, activeTools, availableTools])
+  }, [inputValue, isStreaming, isOnline, apiKey, id, settings.defaultModel, sendMessage, refreshStorageEstimate, buildCollabSystemPrompt, attachment, activeTools, availableTools, trackMessageSent])
 
   const handleContinue = useCallback(async (messageId) => {
     if (!apiKey) return
@@ -960,6 +968,69 @@ export default function ChatView() {
           )}
         </AnimatePresence>
 
+        {/* Install banner — shown after 3 messages, permanently dismissible */}
+        <AnimatePresence>
+          {showInstallBanner && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="px-6 py-3 bg-[#B8A070]/10 border-b border-[#B8A070]/20 flex items-center gap-2"
+            >
+              <p className="text-xs text-[#B8A070] flex-1">
+                Install Parliament for faster access — works offline for reading your conversations.
+              </p>
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={triggerInstallPrompt}
+                className="text-xs font-medium text-[#B8A070] underline underline-offset-2 hover:opacity-70 transition-opacity shrink-0"
+              >
+                Install
+              </motion.button>
+              <span className="text-[#B8A070]/40 text-xs">·</span>
+              <button
+                onClick={dismissInstallBanner}
+                className="text-[#B8A070]/70 hover:text-[#B8A070] transition-colors shrink-0"
+                aria-label="Dismiss install prompt"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* SW update banner — new version waiting to activate */}
+        <AnimatePresence>
+          {needsUpdate && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="px-6 py-3 bg-[#B8A070]/10 border-b border-[#B8A070]/20 flex items-center gap-2"
+            >
+              <RefreshCw className="w-4 h-4 text-[#B8A070] flex-shrink-0" />
+              <p className="text-xs text-[#B8A070] flex-1">A new version of Parliament is ready.</p>
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={applyUpdate}
+                className="text-xs font-medium text-[#B8A070] underline underline-offset-2 hover:opacity-70 transition-opacity shrink-0"
+              >
+                Update now
+              </motion.button>
+              <span className="text-[#B8A070]/40 text-xs">·</span>
+              <button
+                onClick={dismissUpdate}
+                className="text-[#B8A070]/70 hover:text-[#B8A070] transition-colors shrink-0"
+                aria-label="Dismiss update notice"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Storage critical banner (proactive — 95%+ full) */}
         <AnimatePresence>
           {storageUsage?.quota > 0 && (storageUsage.usage / storageUsage.quota) >= 0.95 && (
@@ -1165,6 +1236,23 @@ export default function ChatView() {
           )}
         </AnimatePresence>
 
+        {/* Offline notice — non-blocking, auto-dismisses when connection returns */}
+        <AnimatePresence>
+          {!isOnline && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="px-6 py-1.5 flex items-center gap-2"
+            >
+              <WifiOff className="w-3.5 h-3.5 text-[#D9730D] flex-shrink-0" />
+              <p className="text-xs text-[#D9730D]">
+                You're offline — sending is paused. Your conversations are safe.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Input area */}
         <InputArea
           value={inputValue}
@@ -1172,6 +1260,7 @@ export default function ChatView() {
           onSend={handleSend}
           onStop={stopGenerating}
           isStreaming={isStreaming}
+          isOnline={isOnline}
           inputRef={inputRef}
           attachment={attachment}
           onAttach={setAttachment}
