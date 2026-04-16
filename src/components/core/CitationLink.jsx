@@ -2,6 +2,16 @@ import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { SPRING_SNAPPY } from '../../lib/constants'
 
+// Reject unsafe URL schemes (javascript:, data:, vbscript:, file:) — anything
+// that could execute code or exfiltrate via the renderer. Relative URLs and
+// http(s) are allowed.
+const UNSAFE_SCHEME = /^\s*(javascript|data|vbscript|file):/i
+function sanitizeHref(href) {
+  if (typeof href !== 'string') return null
+  if (UNSAFE_SCHEME.test(href)) return null
+  return href
+}
+
 /**
  * Renders a markdown link as a highlighted inline citation with hover tooltip.
  * Used by MessageCard for assistant messages when web search is enabled.
@@ -13,13 +23,15 @@ export default function CitationLink({ href, children }) {
   const [showTooltip, setShowTooltip] = useState(false)
   const hideTimeoutRef = useRef(null)
 
-  if (!href) {
+  const safeHref = sanitizeHref(href)
+  if (!safeHref) {
+    // Missing href or unsafe scheme — render link text as plain span.
     return <span>{children}</span>
   }
 
   let domain = null
   try {
-    const url = new URL(href)
+    const url = new URL(safeHref)
     if (url.protocol === 'http:' || url.protocol === 'https:') {
       domain = url.hostname.replace(/^www\./, '')
     }
@@ -29,7 +41,7 @@ export default function CitationLink({ href, children }) {
 
   if (!domain) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#4A7AE5] underline">
+      <a href={safeHref} target="_blank" rel="noopener noreferrer" className="text-[#4A7AE5] underline">
         {children}
       </a>
     )
@@ -47,7 +59,7 @@ export default function CitationLink({ href, children }) {
   return (
     <span className="relative inline">
       <a
-        href={href}
+        href={safeHref}
         target="_blank"
         rel="noopener noreferrer"
         onMouseEnter={show}

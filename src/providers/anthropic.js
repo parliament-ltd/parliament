@@ -1,4 +1,5 @@
 import { BaseProvider } from './base'
+import { evalMath } from '../lib/mathEval'
 
 const API_BASE = 'https://api.anthropic.com/v1'
 const API_VERSION = '2023-06-01'
@@ -96,15 +97,8 @@ export const CREATE_CHART_TOOL = {
 export function executeClientTool(toolName, toolInput) {
   if (toolName === 'calculate') {
     try {
-      // Restrict to safe math expressions — no assignment, no function calls
-      // except known Math.* methods.
-      const expr = toolInput.expression
-      if (/[=;]|import|require|fetch|window|document|global/.test(expr)) {
-        return 'Error: Expression not allowed for security reasons.'
-      }
-      // eslint-disable-next-line no-new-func
-      const result = new Function('Math', `"use strict"; return (${expr})`)(Math)
-      if (typeof result !== 'number' || !isFinite(result)) {
+      const result = evalMath(toolInput.expression ?? '')
+      if (typeof result !== 'number' || !Number.isFinite(result)) {
         return `Result: ${result}`
       }
       return String(result)
@@ -126,7 +120,8 @@ export class AnthropicProvider extends BaseProvider {
     return [
       { id: 'claude-haiku', apiId: 'claude-haiku-4-5-20251001', name: 'Claude Haiku', inputCost: 0.25, outputCost: 1.25, contextWindow: 200000 },
       { id: 'claude-sonnet', apiId: 'claude-sonnet-4-6', name: 'Claude Sonnet', inputCost: 3.00, outputCost: 15.00, contextWindow: 200000 },
-      { id: 'claude-opus', apiId: 'claude-opus-4-6', name: 'Claude Opus', inputCost: 15.00, outputCost: 75.00, contextWindow: 200000 },
+      { id: 'claude-opus', apiId: 'claude-opus-4-6', name: 'Claude Opus 4.6', inputCost: 15.00, outputCost: 75.00, contextWindow: 200000 },
+      { id: 'claude-opus-4-7', apiId: 'claude-opus-4-7', name: 'Claude Opus 4.7', inputCost: 15.00, outputCost: 75.00, contextWindow: 200000 },
     ]
   }
 
@@ -312,8 +307,27 @@ export class AnthropicProvider extends BaseProvider {
       }
 
       if (status === 429) {
-        const error = new Error('Rate limit reached. Please wait a moment before sending.')
+        // Parse `retry-after` — spec allows seconds or HTTP-date, but
+        // Anthropic returns seconds. Defend against both.
+        const retryAfterHeader = response.headers.get('retry-after')
+        let retryAfterSeconds = null
+        if (retryAfterHeader) {
+          const asNum = Number(retryAfterHeader)
+          if (Number.isFinite(asNum) && asNum >= 0) {
+            retryAfterSeconds = Math.ceil(asNum)
+          } else {
+            const asDate = Date.parse(retryAfterHeader)
+            if (!Number.isNaN(asDate)) {
+              retryAfterSeconds = Math.max(0, Math.ceil((asDate - Date.now()) / 1000))
+            }
+          }
+        }
+        const message = retryAfterSeconds
+          ? `Rate limit reached. Please wait ~${retryAfterSeconds}s before sending.`
+          : 'Rate limit reached. Please wait a moment before sending.'
+        const error = new Error(message)
         error.status = 429
+        error.retryAfterSeconds = retryAfterSeconds
         throw error
       }
 
