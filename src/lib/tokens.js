@@ -14,7 +14,13 @@ const MODEL_INFO = {
     outputCostPer1k: 0.015,
   },
   'claude-opus': {
-    name: 'Claude Opus',
+    name: 'Claude Opus 4.6',
+    contextWindow: 200000,
+    inputCostPer1k: 0.015,
+    outputCostPer1k: 0.075,
+  },
+  'claude-opus-4-7': {
+    name: 'Claude Opus 4.7',
     contextWindow: 200000,
     inputCostPer1k: 0.015,
     outputCostPer1k: 0.075,

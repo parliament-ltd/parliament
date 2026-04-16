@@ -34,7 +34,8 @@ function passphraseStrength(pw) {
 const MODELS = [
   { id: 'claude-haiku', name: 'Claude Haiku', description: 'Fast & affordable', inputCost: '$0.25', outputCost: '$1.25', speed: 'Fastest', badge: 'Budget-friendly' },
   { id: 'claude-sonnet', name: 'Claude Sonnet', description: 'Balanced performance', inputCost: '$3.00', outputCost: '$15.00', speed: 'Fast', badge: 'Recommended' },
-  { id: 'claude-opus', name: 'Claude Opus', description: 'Maximum capability', inputCost: '$15.00', outputCost: '$75.00', speed: 'Moderate', badge: 'Most powerful' },
+  { id: 'claude-opus', name: 'Claude Opus 4.6', description: 'Maximum capability', inputCost: '$15.00', outputCost: '$75.00', speed: 'Moderate', badge: 'Most powerful' },
+  { id: 'claude-opus-4-7', name: 'Claude Opus 4.7', description: 'Latest frontier model', inputCost: '$15.00', outputCost: '$75.00', speed: 'Moderate', badge: 'Newest' },
 ]
 
 const STORAGE_MODES = [

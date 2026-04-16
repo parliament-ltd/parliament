@@ -29,6 +29,21 @@ export function ChatProvider({ children }) {
     messagesRef.current = messages
   }, [messages])
 
+  // Unmount cleanup: abort any in-flight stream and clear the persist interval
+  // so we don't leak timers or state updates onto an unmounted component.
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        try { abortControllerRef.current.abort() } catch { /* already aborted */ }
+        abortControllerRef.current = null
+      }
+      if (persistIntervalRef.current) {
+        clearInterval(persistIntervalRef.current)
+        persistIntervalRef.current = null
+      }
+    }
+  }, [])
+
   // Load messages for a conversation from IndexedDB
   const loadMessages = useCallback(async (conversationId) => {
     const msgs = await getMessages(conversationId)

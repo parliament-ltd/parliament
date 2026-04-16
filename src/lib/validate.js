@@ -134,10 +134,12 @@ export function validateBackup(data) {
     return { valid: false, error: `Backup is too large (${totalItems} items, max ${MAX_IMPORT_ITEMS}).` }
   }
 
-  // Per-item validation
+  // Per-item validation + duplicate-id detection per store
+  const idSets = {}
   for (const [storeName, validate] of Object.entries(VALIDATORS)) {
     const arr = data[storeName]
     if (!arr) continue
+    const seen = new Set()
     for (let i = 0; i < arr.length; i++) {
       const item = arr[i]
       if (!item || typeof item !== 'object') {
@@ -146,6 +148,69 @@ export function validateBackup(data) {
       const err = validate(item)
       if (err) {
         return { valid: false, error: `Invalid backup data: ${err} (item ${i} in ${storeName}).` }
+      }
+      const key = item.id ?? item.key
+      if (key !== undefined) {
+        if (seen.has(key)) {
+          return { valid: false, error: `Duplicate id '${key}' in ${storeName}.` }
+        }
+        seen.add(key)
+      }
+    }
+    idSets[storeName] = seen
+  }
+
+  // Cross-reference checks: branch parents must resolve, and messages/notes/
+  // highlights/favorites/pins must reference conversations (and messages)
+  // that exist in this backup.
+  const convIds = idSets.conversations || new Set()
+  const msgIds  = idSets.messages      || new Set()
+
+  for (let i = 0; i < data.conversations.length; i++) {
+    const c = data.conversations[i]
+    if (c.parentId && !convIds.has(c.parentId)) {
+      return { valid: false, error: `conversations[${i}].parentId references unknown conversation '${c.parentId}'.` }
+    }
+    if (c.parentId === c.id) {
+      return { valid: false, error: `conversations[${i}] has parentId equal to its own id (circular).` }
+    }
+  }
+
+  // Detect cycles in the parent chain (A → B → A, etc.) via iterative walk.
+  for (const c of data.conversations) {
+    if (!c.parentId) continue
+    const visited = new Set([c.id])
+    let cursor = c.parentId
+    let steps = 0
+    while (cursor && steps < data.conversations.length + 1) {
+      if (visited.has(cursor)) {
+        return { valid: false, error: `Circular parent chain detected at conversation '${c.id}'.` }
+      }
+      visited.add(cursor)
+      const parent = data.conversations.find(x => x.id === cursor)
+      cursor = parent ? parent.parentId : null
+      steps++
+    }
+  }
+
+  const refChecks = [
+    { store: 'messages',   field: 'conversationId', target: convIds, targetName: 'conversations' },
+    { store: 'highlights', field: 'conversationId', target: convIds, targetName: 'conversations' },
+    { store: 'highlights', field: 'messageId',      target: msgIds,  targetName: 'messages' },
+    { store: 'notes',      field: 'conversationId', target: convIds, targetName: 'conversations' },
+    { store: 'favorites',  field: 'conversationId', target: convIds, targetName: 'conversations' },
+    { store: 'favorites',  field: 'messageId',      target: msgIds,  targetName: 'messages' },
+    { store: 'pins',       field: 'targetConversationId', target: convIds, targetName: 'conversations' },
+    { store: 'pins',       field: 'sourceConversationId', target: convIds, targetName: 'conversations' },
+    { store: 'pins',       field: 'sourceMessageId',      target: msgIds,  targetName: 'messages' },
+  ]
+  for (const { store, field, target, targetName } of refChecks) {
+    const arr = data[store]
+    if (!Array.isArray(arr)) continue
+    for (let i = 0; i < arr.length; i++) {
+      const val = arr[i][field]
+      if (val !== null && val !== undefined && !target.has(val)) {
+        return { valid: false, error: `${store}[${i}].${field} references unknown ${targetName} id '${val}'.` }
       }
     }
   }

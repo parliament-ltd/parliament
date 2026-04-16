@@ -185,6 +185,18 @@ function PieChart({ labels, datasets }) {
 
 /* ── Main component ──────────────────────────────────────── */
 
+const SUPPORTED_TYPES = ['bar', 'line', 'area', 'pie']
+
+function sanitizeDatasets(datasets) {
+  if (!Array.isArray(datasets)) return []
+  return datasets
+    .filter(ds => ds && Array.isArray(ds.values))
+    .map(ds => ({
+      label: typeof ds.label === 'string' ? ds.label : undefined,
+      values: ds.values.map(v => (Number.isFinite(v) ? v : 0)),
+    }))
+}
+
 export default function ChartRenderer({ data }) {
   let parsed
   try {
@@ -193,7 +205,17 @@ export default function ChartRenderer({ data }) {
     return <p className="text-xs text-[#EF4444]">Invalid chart data</p>
   }
 
-  const { type, title, labels = [], datasets = [] } = parsed
+  if (!parsed || typeof parsed !== 'object') {
+    return <p className="text-xs text-[#EF4444]">Invalid chart data</p>
+  }
+
+  const { type, title } = parsed
+  const labels = Array.isArray(parsed.labels) ? parsed.labels.map(String) : []
+  const datasets = sanitizeDatasets(parsed.datasets)
+
+  if (!SUPPORTED_TYPES.includes(type)) {
+    return <p className="text-xs text-[#EF4444]">Unsupported chart type: {String(type)}</p>
+  }
   if (!datasets.length || !labels.length) {
     return <p className="text-xs text-[#6B7C93]">No chart data</p>
   }
@@ -201,7 +223,7 @@ export default function ChartRenderer({ data }) {
   return (
     <div className="my-3 rounded-xl border border-[#EBEBEB] bg-white overflow-hidden">
       {title && (
-        <p className="px-4 pt-3 pb-1 text-xs font-semibold text-[#1E2532]">{title}</p>
+        <p className="px-4 pt-3 pb-1 text-xs font-semibold text-[#1E2532]">{String(title)}</p>
       )}
       <div className="px-2 pb-2">
         {type === 'bar'  && <BarChart  labels={labels} datasets={datasets} />}

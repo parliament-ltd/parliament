@@ -120,7 +120,10 @@ export async function loadApiKey(mode = 'persistent') {
           new Uint8Array(ciphertext).buffer,
           new Uint8Array(iv)
         )
-      } catch {
+      } catch (err) {
+        if (import.meta.env.DEV) {
+          console.warn('[crypto] Failed to decrypt stored API key:', err?.message)
+        }
         return null
       }
     }
@@ -136,9 +139,21 @@ export async function loadApiKey(mode = 'persistent') {
 
 export async function deleteApiKey() {
   const db = await initDB()
-  try { await db.delete('settings', STORAGE_KEY) } catch {}
+  try {
+    await db.delete('settings', STORAGE_KEY)
+  } catch (err) {
+    if (import.meta.env.DEV) {
+      console.warn('[crypto] Failed to delete API key from IndexedDB:', err?.message)
+    }
+  }
   // Scrub any legacy session key left from older versions
-  try { sessionStorage.removeItem(STORAGE_KEY) } catch {}
+  try {
+    sessionStorage.removeItem(STORAGE_KEY)
+  } catch (err) {
+    if (import.meta.env.DEV) {
+      console.warn('[crypto] Failed to scrub legacy session key:', err?.message)
+    }
+  }
 }
 
 // ─── Export Encryption (Passphrase-based) ────────────────
