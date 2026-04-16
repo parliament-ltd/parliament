@@ -229,7 +229,7 @@ export default function InspectorPanel({ conversationId, contextUsage, contextTh
                       <Sparkles className="w-6 h-6 text-[#9B9A97] mx-auto mb-2" />
                       <p className="text-[11px] text-[#787774] leading-relaxed">
                         {hasData
-                          ? 'Ask about your data — or click column actions above to explore.'
+                          ? 'Ask about your data, or click column actions above to explore.'
                           : 'Drop a file to get started, or ask me to help you find data.'}
                       </p>
                     </div>
@@ -361,9 +361,9 @@ function ColumnDetail({ column, onAction }) {
           <span className="text-[10px] text-[#B8A070] font-medium">{column.type}</span>
         </div>
         <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mb-3">
-          <DetailRow label="Unique" value={column.unique?.toLocaleString() ?? '—'} />
+          <DetailRow label="Unique" value={column.unique?.toLocaleString() ?? '-'} />
           <DetailRow label="Nulls" value={String(column.nulls ?? 0)} warn={column.nulls > 0} />
-          <DetailRow label="Sample" value={column.sample ?? '—'} />
+          <DetailRow label="Sample" value={column.sample ?? '-'} />
         </div>
         <div className="flex items-center gap-1.5 flex-wrap">
           {actions.map(action => (

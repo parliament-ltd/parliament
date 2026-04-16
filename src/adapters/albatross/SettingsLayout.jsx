@@ -16,6 +16,7 @@ import { getProvider } from '../../providers'
 import { saveApiKey, deleteApiKey, encryptExport, decryptImport } from '../../lib/crypto'
 import { exportAllData, importData, clearAllData, getSetting, setSetting } from '../../lib/db'
 import TourTooltip from '../../components/TourTooltip'
+import NetworkActivityCard from '../../components/NetworkActivityCard'
 
 const SPRING_SMOOTH = { type: 'spring', stiffness: 300, damping: 28 }
 const staggerContainer = {
@@ -40,13 +41,8 @@ const NAV_ITEMS = [
 
 const SETTINGS_TOUR_STEPS = [
   {
-    title: 'Welcome to Settings',
-    desc: 'Here you can configure your API key, model preferences, context settings, and more.',
-    placement: 'center',
-  },
-  {
-    title: 'API Configuration',
-    desc: 'Add your Anthropic API key here to start chatting. Your key is encrypted and stored only in your browser.',
+    title: 'Add your API key',
+    desc: 'Start by adding your Anthropic API key. It is encrypted with AES-GCM and stored only in your browser. The rest of the settings are optional; you can circle back anytime.',
     target: '[data-tour="settings-api"]',
     placement: 'right',
   },
@@ -73,7 +69,7 @@ const MODELS = [
 
 const STORAGE_MODES = [
   { id: 'persistent', label: 'Remember my key', description: 'Saved in this browser until you delete it', icon: HardDrive },
-  { id: 'memory', label: "Don't save", description: 'Re-enter every time — maximum security', icon: Shield },
+  { id: 'memory', label: "Don't save", description: 'Re-enter every time for maximum security', icon: Shield },
 ]
 
 export default function SettingsView() {
@@ -529,7 +525,7 @@ function ContextSection({ summaryDepth, setSummaryDepth, contextThreshold, setCo
             options={[
               { id: 'prompt', label: 'Ask me first', description: 'Show a prompt when the threshold is reached' },
               { id: 'automatic', label: 'Automatic', description: 'Create a compressed branch automatically' },
-              { id: 'disabled', label: 'Disabled', description: "Never compress — I'll manage context manually" },
+              { id: 'disabled', label: 'Disabled', description: "Never compress. I'll manage context manually" },
             ]}
             value={autoCompress}
             onChange={setAutoCompress}
@@ -687,7 +683,15 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
       {/* Storage Monitoring */}
       <StaggerItem>
         <Card>
-          <SectionLabel>Storage</SectionLabel>
+          <div className="flex items-center gap-1.5">
+            <SectionLabel>Storage</SectionLabel>
+            <span
+              title="Shows how much browser storage your chats, notes, and settings are using."
+              className="inline-flex text-[var(--p-text-muted)] hover:text-[var(--p-text-secondary)] cursor-help transition-colors"
+            >
+              <Info className="w-3 h-3" />
+            </span>
+          </div>
           <div className="mt-3 mb-2">
             <div className="w-full h-2 rounded-full bg-[#E9E9E7] overflow-hidden">
               <motion.div
@@ -928,10 +932,10 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
 // ─── Interaction Mode ─────────────────────────────────────
 
 const MODE_OPTIONS = [
-  { id: 'auto', label: 'Auto', description: 'Detect from your device — desktop uses Albatross, mobile uses Swift' },
+  { id: 'auto', label: 'Auto', description: 'Detect from your device. Desktop uses Albatross, mobile uses Swift' },
   { id: 'albatross', label: 'Albatross', description: 'Desktop layout with dual sidebars and full keyboard support' },
   { id: 'swift', label: 'Swift', description: 'Mobile-optimized, touch-first layout', beta: true },
-  { id: 'pelican', label: 'Pelican', description: 'Data analysis workspace — upload CSV, XLSX, or JSON and explore with charts and AI insights', beta: true },
+  { id: 'pelican', label: 'Pelican', description: 'Data analysis workspace. Upload CSV, XLSX, or JSON and explore with charts and AI insights', beta: true },
   { id: 'kingfisher', label: 'Kingfisher', description: 'Deep reading layout with annotation panel', soon: true },
   { id: 'secretarybird', label: 'Secretarybird', description: 'Solo writing and editing canvas with tracked changes and Claude suggestions', beta: true },
   { id: 'starling', label: 'Starling', description: 'Collaborative split-view layout', soon: true },
@@ -1067,7 +1071,7 @@ function AboutSection() {
           <p className="text-xs text-[var(--p-text-secondary)] leading-relaxed mb-4">
             A power-user chat interface for AI. Built with React, Framer Motion, and Tailwind CSS. Open source and community-driven.
           </p>
-          <Button icon={Github}>
+          <Button icon={Github} disabled title="Available when the app launches publicly">
             View on GitHub
           </Button>
         </Card>
@@ -1088,11 +1092,11 @@ function AboutSection() {
               },
               {
                 title: 'Conversations stay local',
-                text: "All conversation data — messages, branches, highlights, notes — lives in your browser's IndexedDB. We have no way to see, access, or recover it."
+                text: "All conversation data (messages, branches, highlights, notes) lives in your browser's IndexedDB. We have no way to see, access, or recover it."
               },
               {
-                title: 'Open source & auditable',
-                text: 'The entire codebase is on GitHub. You can verify every network request, every storage call, and every line of code yourself.'
+                title: 'Verify it yourself',
+                text: 'The Network Activity log below records every outbound request this app makes. You can confirm only Anthropic\u2019s API ever receives data. When the app launches publicly, the full source will be on GitHub for line-by-line review.'
               },
             ].map((item, i) => (
               <div key={i}>
@@ -1102,6 +1106,10 @@ function AboutSection() {
             ))}
           </div>
         </Card>
+      </StaggerItem>
+
+      <StaggerItem>
+        <NetworkActivityCard />
       </StaggerItem>
     </SettingsSection>
   )

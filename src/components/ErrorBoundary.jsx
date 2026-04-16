@@ -86,7 +86,7 @@ export default class ErrorBoundary extends Component {
 
           {/* Reassurance */}
           <p className="text-sm leading-relaxed mb-1" style={{ color: '#787774' }}>
-            Your conversations are safe — this is a display error, not a data loss.
+            Your conversations are safe. This is a display error, not a data loss.
           </p>
           <p className="text-sm leading-relaxed mb-6" style={{ color: '#787774' }}>
             Reloading the page usually fixes it.

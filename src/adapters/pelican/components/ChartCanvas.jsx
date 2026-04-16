@@ -66,7 +66,7 @@ export default function ChartCanvas({ fileId, chartType, filters }) {
     // Aggregate: group by xKey, sum yKeys (up to 100 data points for chart readability)
     const grouped = new Map()
     for (const row of filtered) {
-      const xVal = row[xKey] ?? '—'
+      const xVal = row[xKey] ?? '-'
       if (!grouped.has(xVal)) {
         const entry = { [xKey]: xVal }
         for (const y of yKeys) entry[y] = 0

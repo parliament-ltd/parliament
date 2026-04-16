@@ -180,7 +180,7 @@ export default function MessageCard({
     }
 
     return (
-      <div className="parliament-md">
+      <div className="parliament-md text-[15px]">
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ ...highlightedComponents, a: CitationLink, code: chartCodeComponent }}>
           {content}
         </ReactMarkdown>

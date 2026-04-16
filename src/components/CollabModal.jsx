@@ -364,7 +364,7 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
           {/* Parrot Persona — Custom Interaction */}
           <div>
             <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider mb-3">
-              Parrot Persona — Custom Interaction
+              Parrot Persona: Custom Interaction
             </h3>
 
             {/* Persona title field */}

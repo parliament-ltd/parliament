@@ -16,6 +16,7 @@ import {
   CheckCheck, Download, Loader2,
 } from 'lucide-react'
 import { SPRING_SMOOTH, SPRING_GENTLE } from '../../lib/constants'
+import TourTooltip from '../../components/TourTooltip'
 
 /* ─── Animation ──────────────────────────────────────────── */
 
@@ -37,6 +38,46 @@ const INSERTION = '#4A7AE5'
 const SUGGESTION = '#22C55E'
 const RIPPLE_WARN = '#E5A620'
 const RIPPLE_OPP  = '#4A7AE5'
+
+/* ─── Onboarding tour ────────────────────────────────────── */
+
+const SECRETARYBIRD_TOUR_STEPS = [
+  {
+    title: 'Welcome to Secretarybird',
+    desc: 'Secretarybird is the mode to write, revise, and get AI feedback on your drafts. It keeps a history of every version so you can trace how a document evolved.',
+    placement: 'center',
+  },
+  {
+    title: 'The canvas',
+    desc: 'Write, edit, and structure your document here. Edits are marked as tracked changes you can accept or reject, giving you full control over what makes it into the final version.',
+    target: '[data-tour="sbrd-canvas"]',
+    placement: 'right',
+  },
+  {
+    title: 'Formatting',
+    desc: 'Type / anywhere in the document to open the formatting menu for headings, quotes, and other block types. Standard shortcuts like Ctrl/Cmd+B, Ctrl/Cmd+I, and Ctrl/Cmd+U also work for bold, italics, and underline.',
+    target: '[data-tour="sbrd-canvas"]',
+    placement: 'right',
+  },
+  {
+    title: 'Comments',
+    desc: 'Select text in the document to open the comment tool, or press Ctrl/Cmd+Alt+M. Claude reads the surrounding paragraphs and replies with context-aware feedback in the sidebar.',
+    target: '[data-tour="sbrd-comments"]',
+    placement: 'left',
+  },
+  {
+    title: 'Ripple analysis',
+    desc: 'Ripple analysis catches contradictions, tone shifts, and broken dependencies across paragraphs. It runs when you Submit & Branch, which also saves your edits as a new version. Flagged issues appear in the Ripple tab so you can review them before moving on.',
+    target: '[data-tour="sbrd-ripple"]',
+    placement: 'left',
+  },
+  {
+    title: 'Chat',
+    desc: 'Use the chat tab for free-form conversation with Claude about your document. Ask questions, request rewrites, or brainstorm. Any edits Claude suggests appear inline as tracked changes you can accept or reject.',
+    target: '[data-tour="sbrd-chat"]',
+    placement: 'left',
+  },
+]
 
 /* ─── Word-level diff ─────────────────────────────────────── */
 // Tokenises by words + surrounding whitespace, runs LCS, returns
@@ -401,6 +442,28 @@ export default function SecretarybirdChatLayout() {
   const [selectionInfo,         setSelectionInfo]         = useState(null) // { paraId, selectedText, rect }
   const canvasRef = useRef(null)
 
+  // ── Toast notification ────────────────────────────────────────────
+  const [toast, setToast] = useState(null) // { text: string }
+  const toastTimerRef = useRef(null)
+  const showToast = useCallback((text) => {
+    clearTimeout(toastTimerRef.current)
+    setToast({ text })
+    toastTimerRef.current = setTimeout(() => setToast(null), 3200)
+  }, [])
+  useEffect(() => () => clearTimeout(toastTimerRef.current), [])
+
+  // ── Onboarding tour ───────────────────────────────────────────────
+  const [showTour, setShowTour] = useState(false)
+  useEffect(() => {
+    getSetting('tourCompleted_secretarybird').then(done => {
+      if (!done) setShowTour(true)
+    })
+  }, [])
+  const handleTourDone = useCallback(async () => {
+    setShowTour(false)
+    await setSetting('tourCompleted_secretarybird', true)
+  }, [])
+
   // ── Chat panel state ──────────────────────────────────────────────
   const [chatMessages,      setChatMessages]      = useState([])
   const [chatStreaming,      setChatStreaming]      = useState(false)
@@ -491,6 +554,35 @@ export default function SecretarybirdChatLayout() {
     setNewCommentText('')
     setAddingCommentToParaId(null)
     setSelectionInfo(null)
+  }
+
+  const handleDeleteComment = (paraId, commentId) => {
+    setParagraphs(prev => prev.map(p =>
+      p.id === paraId
+        ? { ...p, comments: (p.comments || []).filter(c => c.id !== commentId) }
+        : p
+    ))
+    setActiveCommentId(prev => prev === commentId ? null : prev)
+    setExpandedComments(prev => {
+      if (!prev.has(commentId)) return prev
+      const n = new Set(prev); n.delete(commentId); return n
+    })
+    setReplyInputs(prev => {
+      if (!(commentId in prev)) return prev
+      const n = { ...prev }; delete n[commentId]; return n
+    })
+    setSubmittedReplies(prev => {
+      if (!(commentId in prev)) return prev
+      const n = { ...prev }; delete n[commentId]; return n
+    })
+    setReplyingTo(prev => prev === commentId ? null : prev)
+  }
+
+  const handleDismissRipple = (paraId) => {
+    setParagraphs(prev => prev.map(p =>
+      p.id === paraId ? { ...p, ripple: null } : p
+    ))
+    setHoveredRipple(prev => prev === paraId ? null : prev)
   }
 
   // ── Accept All — apply suggestions, keep comments & ripple flags ──
@@ -950,6 +1042,7 @@ Reply to every comment helpfully and concisely. When a comment requests a text e
     setBranches(updated)
     setSubmitting(false)
     setShowSubmitConfirm(false)
+    showToast('Edits submitted. A new branch was created.')
   }
 
   // ── Claude chat → document ────────────────────────────────────────
@@ -1045,7 +1138,7 @@ Rules:
   useEffect(() => {
     if (chatScrollRef.current)
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight
-  }, [chatMessages, chatStreamingText])
+  }, [chatMessages, chatStreamingText, chatStreaming, sidebarTab])
 
   // ── Selection → comment tooltip ───────────────────────────────────
   useEffect(() => {
@@ -1175,7 +1268,7 @@ Rules:
           <span className="text-sm font-semibold text-[#1E2532]">Secretarybird</span>
           <div className="h-4 w-px bg-[#EBEBEB]" />
           <span className="text-xs text-[#6B7C93]">
-            {conversationTitle}{conversationTitle ? ' — ' : ''}{paragraphs.length} paragraph{paragraphs.length !== 1 ? 's' : ''}
+            {conversationTitle}{conversationTitle ? ' - ' : ''}{paragraphs.length} paragraph{paragraphs.length !== 1 ? 's' : ''}
           </span>
         </div>
 
@@ -1256,7 +1349,10 @@ Rules:
           <div className="h-4 w-px bg-[#EBEBEB]" />
 
           {/* Context bar */}
-          <div className="flex items-center gap-2">
+          <div
+            className="flex items-center gap-2"
+            title="Context window used. Includes your document and the chat history. Resets when you create a branch with Compressed Summary."
+          >
             <div className="w-16 h-1.5 bg-[#F5F5F5] rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
@@ -1325,7 +1421,7 @@ Rules:
       </AnimatePresence>
 
       {/* ═══ DOCUMENT CANVAS ══════════════════════════════════ */}
-      <div ref={canvasRef} className="flex-1 overflow-y-auto pt-12 sbrd-canvas">
+      <div ref={canvasRef} data-tour="sbrd-canvas" className="flex-1 overflow-y-auto pt-12 sbrd-canvas">
         <div
           className="sbrd-paper mx-auto px-8 py-10 min-h-full bg-white"
           style={{ maxWidth: '860px', marginTop: '16px', marginBottom: '16px', borderRadius: '2px' }}
@@ -1375,6 +1471,7 @@ Rules:
               onSetActiveComment={id => setActiveCommentId(prev => prev === id ? null : id)}
               onClearActiveComment={() => setActiveCommentId(null)}
               onToggleComment={toggleComment}
+              onDeleteComment={handleDeleteComment}
               hoveredRipple={hoveredRipple}
               onHoverRipple={setHoveredRipple}
               rippleEnabled={rippleEnabled}
@@ -1423,13 +1520,14 @@ Rules:
             <div className="flex items-center justify-between px-3 py-2.5 border-b border-[#F0F0F0]">
               <div className="flex items-center gap-0.5">
                 {[
-                  { id: 'comments', icon: MessageSquare, count: pendingComments + pendingSuggestions, title: 'Comments & Suggestions' },
-                  { id: 'ripple',   icon: Bell,          count: pendingRipples,  title: 'Ripple', badgeColor: RIPPLE_WARN },
+                  { id: 'comments', icon: MessageSquare, count: pendingComments + pendingSuggestions, title: 'Comments & Suggestions', tour: 'sbrd-comments' },
+                  { id: 'ripple',   icon: Bell,          count: pendingRipples,  title: 'Ripple', badgeColor: RIPPLE_WARN, tour: 'sbrd-ripple' },
                   { id: 'branches', icon: GitBranch,     title: 'Version History' },
-                  { id: 'chat',     icon: Sparkles,      title: 'Chat with Claude' },
+                  { id: 'chat',     icon: Sparkles,      title: 'Chat with Claude', tour: 'sbrd-chat' },
                 ].map(tab => (
                   <motion.button
                     key={tab.id}
+                    data-tour={tab.tour}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setSidebarTab(tab.id)}
                     title={tab.title}
@@ -1499,6 +1597,7 @@ Rules:
                             onToggle={() => toggleComment(comment.id)}
                             onActivate={() => setActiveCommentId(prev => prev === comment.id ? null : comment.id)}
                             onJump={() => setSelectedParagraph(para.id)}
+                            onDelete={() => handleDeleteComment(para.id, comment.id)}
                             replyingTo={replyingTo}
                             setReplyingTo={setReplyingTo}
                             replyInput={replyInputs[comment.id] || ''}
@@ -1545,6 +1644,7 @@ Rules:
                             ripple={para.ripple}
                             paraText={para.text}
                             onJump={() => setSelectedParagraph(para.id)}
+                            onDismiss={() => handleDismissRipple(para.id)}
                             onHover={() => setHoveredRipple(para.id)}
                             onLeave={() => setHoveredRipple(null)}
                           />
@@ -1563,10 +1663,15 @@ Rules:
                 {sidebarTab === 'branches' && (
                   <motion.div key="branches" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={SPRING_SMOOTH} className="p-4 space-y-3">
                     <SidebarSectionLabel label="Version History" />
-                    <p className="text-[11px] text-[#6B7C93] leading-relaxed">Each submission creates a branch. Navigate back to any previous version — nothing is lost.</p>
+                    <p className="text-[11px] text-[#6B7C93] leading-relaxed">Each submission creates a branch. Navigate back to any previous version. Nothing is lost.</p>
                     <div className="space-y-0.5">
                       {branchCards.map((branch, i) => (
-                        <BranchCard key={branch.id} branch={branch} isLast={i === branchCards.length - 1} />
+                        <BranchCard
+                          key={branch.id}
+                          branch={branch}
+                          isLast={i === branchCards.length - 1}
+                          onClick={branch.active ? undefined : () => navigate(`/chat/${branch.id}`)}
+                        />
                       ))}
                     </div>
                   </motion.div>
@@ -1603,27 +1708,32 @@ Rules:
                           /* Completed assistant response — compact indicator, full text stays in state for API context */
                           <div key={i} className="flex items-center gap-1.5 px-1 py-1 text-[11px]">
                             <CheckCheck className="w-3.5 h-3.5 flex-shrink-0" style={{ color: SUGGESTION }} />
-                            <span style={{ color: SUGGESTION }}>Done — see document</span>
+                            <span style={{ color: SUGGESTION }}>Done. See document</span>
                           </div>
                         )
                       ))}
-                      {/* Streaming: show only natural-language commentary, never raw JSON */}
+                      {/* Streaming: three-dot indicator stays visible until the response completes */}
                       {chatStreaming && (
                         <div className="px-3 py-2.5 rounded-xl rounded-bl-sm text-[11px] text-[#4A5568] leading-relaxed" style={{ backgroundColor: `${SUGGESTION}08`, border: `1px solid ${SUGGESTION}20` }}>
                           {(() => {
                             const visible = stripCodeBlocksForDisplay(chatStreamingText)
+                            const dots = (
+                              <span className="inline-flex items-center gap-1 mr-2 align-middle">
+                                {[0, 1, 2].map(i => (
+                                  <span key={i} className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: GOLD, animationDelay: `${i * 0.15}s` }} />
+                                ))}
+                              </span>
+                            )
                             return visible ? (
                               <>
+                                {dots}
                                 {visible}
-                                <span className="inline-block w-1 h-3 bg-current opacity-60 ml-0.5 animate-pulse" />
                               </>
                             ) : (
-                              <div className="flex items-center gap-2">
-                                {[0, 1, 2].map(i => (
-                                  <div key={i} className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: GOLD, animationDelay: `${i * 0.15}s` }} />
-                                ))}
-                                <span className="text-[10px] text-[#6B7C93]">Writing to document…</span>
-                              </div>
+                              <>
+                                {dots}
+                                <span className="text-[10px] text-[#6B7C93] align-middle">Writing to document…</span>
+                              </>
                             )
                           })()}
                         </div>
@@ -1741,6 +1851,24 @@ Rules:
           </motion.div>
         )}
       </AnimatePresence>
+
+      {showTour && <TourTooltip steps={SECRETARYBIRD_TOUR_STEPS} onDone={handleTourDone} />}
+
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 12, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.96 }}
+            transition={SPRING_SMOOTH}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-lg shadow-lg flex items-center gap-2 text-xs font-medium"
+            style={{ backgroundColor: '#1E2532', color: 'white', fontFamily: 'system-ui, sans-serif' }}
+          >
+            <CheckCheck className="w-3.5 h-3.5" style={{ color: SUGGESTION }} />
+            {toast.text}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
@@ -1761,7 +1889,7 @@ function DocumentParagraph({
   onSelect, onTextChange, onSplit, onMerge, paragraphs,
   addingComment, newCommentText, onCommentTextChange, onAddComment, onCancelComment, onStartAddComment,
   expandedComments, activeCommentId, onSetActiveComment, onClearActiveComment,
-  onToggleComment, hoveredRipple, onHoverRipple, rippleEnabled,
+  onToggleComment, onDeleteComment, hoveredRipple, onHoverRipple, rippleEnabled,
   replyingTo, setReplyingTo, replyInputs, setReplyInputs, submittedReplies, onSubmitReply,
   onAcceptSuggestion, onRejectSuggestion, onAcceptOrigin, onRejectOrigin,
   onTypeChange,
@@ -2207,6 +2335,7 @@ function DocumentParagraph({
                   isActive={activeCommentId === comment.id}
                   onToggle={() => onToggleComment(comment.id)}
                   onActivate={() => onSetActiveComment(comment.id)}
+                  onDelete={onDeleteComment ? () => onDeleteComment(para.id, comment.id) : undefined}
                   replyingTo={replyingTo}
                   setReplyingTo={setReplyingTo}
                   replyInput={replyInputs[comment.id] || ''}
@@ -2227,15 +2356,27 @@ function DocumentParagraph({
 /*  MARGIN COMMENT                                             */
 /* ═══════════════════════════════════════════════════════════ */
 
-function MarginComment({ comment, expanded, isActive, onToggle, onActivate, replyingTo, setReplyingTo, replyInput, onReplyChange, submittedReplies, onSubmitReply }) {
+function MarginComment({ comment, expanded, isActive, onToggle, onActivate, onDelete, replyingTo, setReplyingTo, replyInput, onReplyChange, submittedReplies, onSubmitReply }) {
   const isReplying = replyingTo === comment.id
   return (
     <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={SPRING_SMOOTH} style={{ fontFamily: 'system-ui, sans-serif' }}>
       <div
-        className="px-3 py-2 bg-[#FFF9E6] rounded-lg cursor-pointer hover:bg-[#FFF5D6] transition-colors"
+        className="group relative px-3 py-2 bg-[#FFF9E6] rounded-lg cursor-pointer hover:bg-[#FFF5D6] transition-colors"
         style={{ border: isActive ? `1.5px solid ${GOLD}` : '1px solid #E5D9A8' }}
         onClick={() => { onActivate(); onToggle() }}
       >
+        {onDelete && (
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={e => { e.stopPropagation(); onDelete() }}
+            className="absolute top-1 right-1 p-1 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity hover:bg-[#E5D9A8]/50"
+            style={{ color: '#B5A353' }}
+            title="Delete comment"
+          >
+            <X className="w-3 h-3" />
+          </motion.button>
+        )}
         {comment.selectedText && (
           <p className="text-[10px] text-[#9B8A2F] italic leading-relaxed mb-1.5 pb-1.5 border-b border-[#E5D9A8]/60 truncate">
             "{comment.selectedText}"
@@ -2311,12 +2452,12 @@ function SidebarSectionLabel({ label, count }) {
   )
 }
 
-function CommentCard({ comment, expanded, isActive, onToggle, onActivate, onJump, replyingTo, setReplyingTo, replyInput, onReplyChange, submittedReplies, onSubmitReply }) {
+function CommentCard({ comment, expanded, isActive, onToggle, onActivate, onJump, onDelete, replyingTo, setReplyingTo, replyInput, onReplyChange, submittedReplies, onSubmitReply }) {
   const isReplying = replyingTo === comment.id
   return (
     <motion.div
       variants={staggerItem}
-      className="px-3 py-2.5 bg-[#FFF9E6] rounded-xl cursor-pointer transition-colors"
+      className="group px-3 py-2.5 bg-[#FFF9E6] rounded-xl cursor-pointer transition-colors"
       style={{ border: isActive ? `1.5px solid ${GOLD}` : '1px solid #E5D9A8' }}
       onClick={onActivate}
     >
@@ -2327,7 +2468,21 @@ function CommentCard({ comment, expanded, isActive, onToggle, onActivate, onJump
       )}
       <div className="flex items-start justify-between gap-2 mb-1">
         <p className="text-[11px] text-[#6B5D1F] leading-relaxed flex-1">{comment.text}</p>
-        <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={e => { e.stopPropagation(); onJump() }} className="p-1 rounded flex-shrink-0 transition-colors" style={{ color: '#B5A353' }} title="Jump to paragraph"><ArrowRight className="w-3 h-3" /></motion.button>
+        <div className="flex items-center gap-0.5 flex-shrink-0">
+          {onDelete && (
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={e => { e.stopPropagation(); onDelete() }}
+              className="p-1 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity hover:bg-[#E5D9A8]/40"
+              style={{ color: '#B5A353' }}
+              title="Delete comment"
+            >
+              <X className="w-3 h-3" />
+            </motion.button>
+          )}
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={e => { e.stopPropagation(); onJump() }} className="p-1 rounded transition-colors" style={{ color: '#B5A353' }} title="Jump to paragraph"><ArrowRight className="w-3 h-3" /></motion.button>
+        </div>
       </div>
       {comment.claudeReply && (
         <div className="mt-2 pt-2 border-t border-[#E5D9A8]/50">
@@ -2483,13 +2638,25 @@ function ClaudeSuggestionCard({ suggestion, onAccept, onReject, onJump }) {
   )
 }
 
-function RippleCard({ ripple, paraText, onJump, onHover, onLeave }) {
+function RippleCard({ ripple, paraText, onJump, onDismiss, onHover, onLeave }) {
   const isWarning = ripple.type === 'contradiction' || ripple.type === 'dependency_break'
   const color = isWarning ? RIPPLE_WARN : RIPPLE_OPP
   const Icon  = isWarning ? AlertTriangle : Lightbulb
   const typeLabel = { contradiction: 'Contradiction', dependency_break: 'Dependency Break', opportunity: 'Opportunity', tone_shift: 'Tone Shift', duplication: 'Duplication' }[ripple.type] || ripple.type
   return (
-    <motion.div variants={staggerItem} onMouseEnter={onHover} onMouseLeave={onLeave} className="px-3 py-2.5 rounded-xl border cursor-pointer transition-colors" style={{ backgroundColor: `${color}0C`, borderColor: `${color}25` }}>
+    <motion.div variants={staggerItem} onMouseEnter={onHover} onMouseLeave={onLeave} className="group relative px-3 py-2.5 rounded-xl border cursor-pointer transition-colors" style={{ backgroundColor: `${color}0C`, borderColor: `${color}25` }}>
+      {onDismiss && (
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={e => { e.stopPropagation(); onDismiss() }}
+          className="absolute top-1.5 right-1.5 p-1 rounded opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity hover:bg-white/60"
+          style={{ color: '#6B7C93' }}
+          title="Dismiss"
+        >
+          <X className="w-3 h-3" />
+        </motion.button>
+      )}
       <div className="flex items-start gap-2 mb-2">
         <Icon className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color }} />
         <div className="flex-1 min-w-0">
@@ -2508,15 +2675,22 @@ function RippleCard({ ripple, paraText, onJump, onHover, onLeave }) {
       </div>
       <div className="flex items-center gap-2 ml-5">
         <motion.button whileTap={{ scale: 0.97 }} onClick={onJump} className="text-[10px] font-semibold px-2 py-1 rounded-md transition-colors" style={{ color }}>Go to paragraph</motion.button>
-        <motion.button whileTap={{ scale: 0.97 }} className="text-[10px] font-semibold text-[#6B7C93] px-2 py-1 rounded-md hover:bg-[#F5F5F5] transition-colors">Dismiss</motion.button>
+        <motion.button whileTap={{ scale: 0.97 }} onClick={onDismiss} className="text-[10px] font-semibold text-[#6B7C93] px-2 py-1 rounded-md hover:bg-[#F5F5F5] transition-colors">Dismiss</motion.button>
       </div>
     </motion.div>
   )
 }
 
-function BranchCard({ branch, isLast }) {
+function BranchCard({ branch, isLast, onClick }) {
+  const interactive = !branch.active && typeof onClick === 'function'
   return (
-    <motion.div whileHover={{ x: 2 }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors" style={branch.active ? { backgroundColor: 'rgba(184,160,112,0.07)', border: `1px solid rgba(184,160,112,0.2)` } : {}}>
+    <motion.div
+      whileHover={interactive ? { x: 2 } : {}}
+      onClick={interactive ? onClick : undefined}
+      title={interactive ? 'Open this version' : undefined}
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${interactive ? 'cursor-pointer hover:bg-[#F5F5F5]' : ''}`}
+      style={branch.active ? { backgroundColor: 'rgba(184,160,112,0.07)', border: `1px solid rgba(184,160,112,0.2)` } : {}}
+    >
       <div className="flex flex-col items-center">
         <div className="w-2.5 h-2.5 rounded-full border-2" style={{ borderColor: branch.active ? GOLD : '#D1D5DB', backgroundColor: branch.active ? GOLD : 'white' }} />
         {!isLast && <div className="w-px flex-1 mt-1" style={{ backgroundColor: '#E5E7EB', minHeight: '16px' }} />}
@@ -2699,7 +2873,7 @@ function RippleScopeModal({ currentId, currentTitle, onScan, onClose }) {
               : { backgroundColor: 'rgba(107,124,147,0.08)', border: '1px solid rgba(107,124,147,0.2)', color: '#6B7C93' }
           }>
             {scanResult > 0
-              ? `Found ${scanResult} potential inconsistenc${scanResult !== 1 ? 'ies' : 'y'} — flags have been added to the affected documents' Impact Analysis panels.`
+              ? `Found ${scanResult} potential inconsistenc${scanResult !== 1 ? 'ies' : 'y'}. Flags have been added to the affected documents' Impact Analysis panels.`
               : 'No inconsistencies found across the selected documents.'
             }
           </div>

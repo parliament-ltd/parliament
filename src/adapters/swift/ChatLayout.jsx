@@ -66,7 +66,7 @@ function MobileMessageCard({ message, number, isFavorited, hasNote, isSelected, 
         )}
 
         {/* Message content */}
-        <div className={`px-4 py-3 parliament-md text-[14px]`}>
+        <div className={`px-4 py-3 parliament-md text-[15px]`}>
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content || ''}</ReactMarkdown>
         </div>
 
@@ -694,7 +694,7 @@ export default function SwiftChatLayout() {
             className="px-5 py-3 bg-[#B8A070]/10 border-b border-[#B8A070]/20 flex items-center gap-2"
           >
             <p className="text-xs text-[#B8A070] flex-1">
-              Install Parliament for faster access — works offline for reading your conversations.
+              Install Parliament for faster access. Works offline for reading your conversations.
             </p>
             <motion.button
               whileHover={{ scale: 1.03 }}
@@ -753,7 +753,7 @@ export default function SwiftChatLayout() {
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
             className="px-5 py-3 bg-[#E03E3E]/10 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-[#E03E3E] flex-shrink-0" />
-            <p className="text-xs text-[#E03E3E] flex-1">Storage critically full — new messages may not be saved.</p>
+            <p className="text-xs text-[#E03E3E] flex-1">Storage critically full. New messages may not be saved.</p>
             <button onClick={() => navigate('/settings#data')} className="text-xs font-medium text-[#E03E3E] underline underline-offset-2 flex-shrink-0">Export</button>
             <span className="text-[#E03E3E]/40 text-xs">·</span>
             <button onClick={() => navigate('/')} className="text-xs font-medium text-[#E03E3E] underline underline-offset-2 flex-shrink-0">Manage Chats</button>
@@ -767,7 +767,7 @@ export default function SwiftChatLayout() {
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
             className="px-5 py-3 bg-[#D9730D]/10 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-[#D9730D] flex-shrink-0" />
-            <p className="text-xs text-[#D9730D] flex-1">Storage full — message may not be saved. Export and delete old chats to free space.</p>
+            <p className="text-xs text-[#D9730D] flex-1">Storage full. Message may not be saved. Export and delete old chats to free space.</p>
             <button onClick={clearPersistError} className="p-1"><X className="w-3.5 h-3.5 text-[#D9730D]" /></button>
           </motion.div>
         )}
@@ -891,7 +891,7 @@ export default function SwiftChatLayout() {
           >
             <WifiOff className="w-3.5 h-3.5 text-[#D9730D] flex-shrink-0" />
             <p className="text-xs text-[#D9730D]">
-              You're offline — sending is paused. Your conversations are safe.
+              You're offline. Sending is paused. Your conversations are safe.
             </p>
           </motion.div>
         )}
