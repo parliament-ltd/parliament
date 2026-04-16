@@ -29,13 +29,13 @@ import { SPRING_SNAPPY, SPRING_SMOOTH } from '../../lib/constants'
 const SELECTOR_TOUR_STEPS = [
   {
     title: 'Welcome to Parliament',
-    desc: 'Parliament is a power-user chat interface — currently powered by Claude — that runs entirely in your browser. Your conversations, highlights, and notes are stored locally — nothing leaves your device except API calls to Anthropic.',
+    desc: 'Parliament is a power-user chat interface (currently powered by Claude) that runs entirely in your browser. Your conversations, highlights, and notes are stored locally. Nothing leaves your device except API calls to Anthropic.',
     target: null,
     placement: 'center',
   },
   {
     title: 'Add your API key first',
-    desc: 'Click the Settings icon to add your Anthropic API key. It\'s encrypted and stored only in this browser — Parliament never stores it on a server.',
+    desc: 'Click the Settings icon to add your Anthropic API key. It\'s encrypted and stored only in this browser. Parliament never stores it on a server.',
     target: '[data-tour="settings-btn"]',
     placement: 'bottom',
   },
@@ -125,7 +125,7 @@ function formatShortDate(dateStr) {
 }
 
 function formatBytes(bytes) {
-  if (bytes == null || bytes === 0) return '—'
+  if (bytes == null || bytes === 0) return '-'
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
@@ -907,9 +907,16 @@ export default function SelectorView() {
     createConversation,
     updateConversation,
     deleteConversations,
+    loadConversations,
   } = useConversations()
   const { storageUsage, settings } = useSettings()
   const { mode, setMode } = useMode()
+
+  // Refresh from IndexedDB on mount — picks up storageBytes/familyId/parentTitle
+  // writes that happen outside the React context (addMessage, createBranch).
+  useEffect(() => {
+    loadConversations()
+  }, [loadConversations])
 
   // ── Tour ──
   const [showTour, setShowTour] = useState(false)
@@ -1286,7 +1293,12 @@ export default function SelectorView() {
               >
                 <MessageSquare className="w-5 h-5 text-[#B8A070]" />
               </motion.div>
-              <h1 className="text-lg font-medium text-[var(--p-text-primary)]">Chats</h1>
+              <div className="flex flex-col">
+                <h1 className="text-lg font-medium leading-tight text-[var(--p-text-primary)]">Chats</h1>
+                <p className="text-xs text-[var(--p-text-secondary)] leading-snug">
+                  Browse your chat history with flexible views including summaries, notes, and more.
+                </p>
+              </div>
             </div>
             <div data-tour="view-toggle">
               <ViewToggle activeView={globalView} onChangeView={handleGlobalViewChange} />
@@ -1389,7 +1401,7 @@ export default function SelectorView() {
                       <span className="text-[11px] font-medium text-[#B8A070]">
                         {selected.size} selected
                         {selectedSizeTotal > 0 && (
-                          <span className="text-[var(--p-text-secondary)] font-normal"> — {formatBytes(selectedSizeTotal)}</span>
+                          <span className="text-[var(--p-text-secondary)] font-normal"> - {formatBytes(selectedSizeTotal)}</span>
                         )}
                       </span>
                       <div className="flex items-center gap-0.5 ml-3">

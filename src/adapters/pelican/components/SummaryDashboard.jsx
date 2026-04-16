@@ -262,7 +262,7 @@ Rules:
             <div className="grid grid-cols-3 gap-4">
               <QualityItem
                 label="Completeness"
-                value={`${insights.quality.completeness?.toFixed(1) ?? '—'}%`}
+                value={`${insights.quality.completeness?.toFixed(1) ?? '-'}%`}
                 color={insights.quality.completeness >= 95 ? '#0F7B6C' : insights.quality.completeness >= 80 ? '#D9730D' : '#E03E3E'}
               />
               <QualityItem
@@ -272,7 +272,7 @@ Rules:
               />
               <QualityItem
                 label="Date Range"
-                value={insights.quality.dateRange || '—'}
+                value={insights.quality.dateRange || '-'}
                 color="#191919"
               />
             </div>

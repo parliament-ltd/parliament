@@ -44,7 +44,7 @@ export default function withComingSoon(Layout, modeName) {
             }}
           >
             <span style={{ fontSize: 12, fontWeight: 600, color: '#FFFFFF', letterSpacing: '0.01em' }}>
-              {modeName} mode is coming soon — showing Albatross in the meantime
+              {modeName} mode is coming soon. Showing Albatross in the meantime
             </span>
             <button
               onClick={handleDismiss}

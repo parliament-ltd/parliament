@@ -64,6 +64,13 @@ function generateId() {
   return crypto.randomUUID()
 }
 
+// UTF-8-accurate byte size of a string. Used to keep per-conversation
+// storageBytes in sync as messages are added, edited, and deleted.
+function byteSize(str) {
+  if (!str) return 0
+  return new Blob([String(str)]).size
+}
+
 // ─── Conversations ───────────────────────────────────────
 
 export async function createConversation({ title = 'New Conversation', model = 'claude-sonnet', parentId = null, branchPoint = null, createdInMode = null } = {}) {
@@ -172,6 +179,12 @@ export async function createBranch(sourceConversationId, branchAtMessageId, opti
   // Messages to copy: everything up to and including the branch point
   const messagesToCopy = allMessages.slice(0, branchIdx + 1)
 
+  // Backfill familyId on the source if missing, so parent + branches share it
+  const familyId = source.familyId || source.id
+  if (!source.familyId) {
+    await db.put('conversations', { ...source, familyId })
+  }
+
   // Create the branch conversation
   const now = new Date().toISOString()
   const branchConv = {
@@ -179,6 +192,8 @@ export async function createBranch(sourceConversationId, branchAtMessageId, opti
     title: options.title || `Branch: ${source.title}`,
     model: options.model || source.model,
     parentId: sourceConversationId,
+    parentTitle: source.title,
+    familyId,
     branchPoint: branchAtMessageId,
     pinned: false,
     storageBytes: 0,
@@ -201,7 +216,7 @@ export async function createBranch(sourceConversationId, branchAtMessageId, opti
       createdAt: msg.createdAt, // preserve original timestamps for ordering
     }
     await tx.store.put(newMsg)
-    totalBytes += (msg.content?.length || 0) * 2 // rough byte estimate
+    totalBytes += byteSize(msg.content)
   }
   await tx.done
 
@@ -239,10 +254,14 @@ export async function addMessage({ conversationId, role, content, tokenCount = 0
   }
   await db.put('messages', message)
 
-  // Touch the conversation's updatedAt
+  // Touch updatedAt and grow storageBytes by the new message's content size
   const conv = await db.get('conversations', conversationId)
   if (conv) {
-    await db.put('conversations', { ...conv, updatedAt: message.createdAt })
+    await db.put('conversations', {
+      ...conv,
+      updatedAt: message.createdAt,
+      storageBytes: (conv.storageBytes || 0) + byteSize(content),
+    })
   }
 
   return message
@@ -260,12 +279,37 @@ export async function updateMessage(id, updates) {
   if (!existing) throw new Error(`Message not found: ${id}`)
   const updated = { ...existing, ...updates }
   await db.put('messages', updated)
+
+  // If content changed, apply the delta to the conversation's storageBytes
+  if ('content' in updates) {
+    const delta = byteSize(updated.content) - byteSize(existing.content)
+    if (delta !== 0) {
+      const conv = await db.get('conversations', existing.conversationId)
+      if (conv) {
+        await db.put('conversations', {
+          ...conv,
+          storageBytes: Math.max(0, (conv.storageBytes || 0) + delta),
+        })
+      }
+    }
+  }
+
   return updated
 }
 
 export async function deleteMessage(id) {
   const db = await initDB()
+  const existing = await db.get('messages', id)
   await db.delete('messages', id)
+  if (existing) {
+    const conv = await db.get('conversations', existing.conversationId)
+    if (conv) {
+      await db.put('conversations', {
+        ...conv,
+        storageBytes: Math.max(0, (conv.storageBytes || 0) - byteSize(existing.content)),
+      })
+    }
+  }
 }
 
 // ─── Highlights ──────────────────────────────────────────

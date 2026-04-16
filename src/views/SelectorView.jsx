@@ -1,5 +1,8 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useMode } from '../stores/ModeContext'
+import { loadApiKey } from '../lib/crypto'
+import { getSetting } from '../lib/db'
 
 /**
  * SelectorView — thin mode-routing shell.
@@ -22,6 +25,30 @@ const LAYOUTS = {
 
 export default function SelectorView() {
   const { mode } = useMode()
+  const navigate = useNavigate()
+  const [onboardingChecked, setOnboardingChecked] = useState(false)
+
+  // First-time onboarding: if no API key and tour hasn't run, send user to Settings.
+  useEffect(() => {
+    let cancelled = false
+    async function check() {
+      const [apiKey, tourDone] = await Promise.all([
+        loadApiKey('persistent'),
+        getSetting('tourCompleted_settings'),
+      ])
+      if (cancelled) return
+      if (!apiKey && !tourDone) {
+        navigate('/settings', { replace: true })
+        return
+      }
+      setOnboardingChecked(true)
+    }
+    check()
+    return () => { cancelled = true }
+  }, [navigate])
+
+  if (!onboardingChecked) return null
+
   const Layout = LAYOUTS[mode] ?? AlbatrossSelectorLayout
   return (
     <Suspense fallback={null}>

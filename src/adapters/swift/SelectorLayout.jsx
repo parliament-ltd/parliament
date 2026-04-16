@@ -310,6 +310,12 @@ export default function SwiftSelectorLayout() {
   const { conversations, deleteConversation, updateConversation, createConversation, loadConversations } = useConversations()
   const { storageUsage } = useSettings()
 
+  // Refresh from IndexedDB on mount — picks up storageBytes/familyId/parentTitle
+  // writes that happen outside the React context (addMessage, createBranch).
+  useEffect(() => {
+    loadConversations()
+  }, [loadConversations])
+
   const [searchQuery, setSearchQuery] = useState('')
   const [activeView, setActiveView] = useState('summary')
   const [searchFocused, setSearchFocused] = useState(false)

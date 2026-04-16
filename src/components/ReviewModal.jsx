@@ -50,13 +50,13 @@ export default function ReviewModal({
     const prompts = []
     if (highlights.length > 0) {
       const terms = [...new Set(highlights.map(h => h.text))].slice(0, 3).join(', ')
-      prompts.push(`You highlighted references to ${terms} — what's your main takeaway?`)
+      prompts.push(`You highlighted references to ${terms}. What's your main takeaway?`)
     }
     if (notes.length > 0) {
-      prompts.push(`You took ${notes.length} note${notes.length !== 1 ? 's' : ''} during this conversation — what patterns do you see?`)
+      prompts.push(`You took ${notes.length} note${notes.length !== 1 ? 's' : ''} during this conversation. What patterns do you see?`)
     }
     if (favorites.length > 0) {
-      prompts.push(`You favorited ${favorites.length} message${favorites.length !== 1 ? 's' : ''} — what made them stand out?`)
+      prompts.push(`You favorited ${favorites.length} message${favorites.length !== 1 ? 's' : ''}. What made them stand out?`)
     }
     if (messages.length > 10) {
       prompts.push('If you had to summarize this conversation in one sentence, what would it be?')

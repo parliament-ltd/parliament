@@ -191,7 +191,7 @@ export default function TableCanvas({ fileId, sortColumn, sortDir, onSort, filte
 // ─── Cell formatting ──────────────────────────────────────
 
 function formatCell(value, type) {
-  if (value === null || value === undefined || value === '') return '—'
+  if (value === null || value === undefined || value === '') return '-'
   if (type === 'number') {
     const n = parseFloat(value)
     if (isNaN(n)) return String(value)

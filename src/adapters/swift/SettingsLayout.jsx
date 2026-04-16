@@ -14,6 +14,7 @@ import { getProvider } from '../../providers'
 import { saveApiKey, encryptExport, decryptImport } from '../../lib/crypto'
 import { exportAllData, importData, clearAllData } from '../../lib/db'
 import { useShimmer } from '../../hooks/useShimmer'
+import NetworkActivityCard from '../../components/NetworkActivityCard'
 
 const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
 const SPRING_SMOOTH = { type: 'spring', stiffness: 300, damping: 28 }
@@ -40,14 +41,14 @@ const MODELS = [
 
 const STORAGE_MODES = [
   { id: 'persistent', label: 'Remember my key', description: 'Saved in this browser until you delete it', icon: HardDrive },
-  { id: 'memory', label: "Don't save", description: 'Re-enter every time — maximum security', icon: Shield },
+  { id: 'memory', label: "Don't save", description: 'Re-enter every time for maximum security', icon: Shield },
 ]
 
 const MODE_OPTIONS = [
-  { id: 'auto', label: 'Auto', description: 'Detect from your device — desktop uses Albatross, mobile uses Swift' },
+  { id: 'auto', label: 'Auto', description: 'Detect from your device. Desktop uses Albatross, mobile uses Swift' },
   { id: 'albatross', label: 'Albatross', description: 'Desktop layout with dual sidebars and full keyboard support' },
   { id: 'swift', label: 'Swift', description: 'Mobile-optimized, touch-first layout', beta: true },
-  { id: 'pelican', label: 'Pelican', description: 'Data analysis workspace — upload CSV, XLSX, or JSON and explore with charts and AI insights', beta: true },
+  { id: 'pelican', label: 'Pelican', description: 'Data analysis workspace. Upload CSV, XLSX, or JSON and explore with charts and AI insights', beta: true },
   { id: 'kingfisher', label: 'Kingfisher', description: 'Deep reading layout with annotation panel', soon: true },
   { id: 'secretarybird', label: 'Secretarybird', description: 'Solo writing and editing canvas with tracked changes and Claude suggestions', beta: true },
   { id: 'starling', label: 'Starling', description: 'Collaborative split-view layout', soon: true },
@@ -305,7 +306,7 @@ function ApiSection({ apiKey, setApiKey, showKey, setShowKey, keyStatus, setKeyS
               className="flex items-center gap-2 mt-3 text-xs text-[#0F7B6C]"
             >
               <CheckCircle className="w-3.5 h-3.5" />
-              <span>API key is valid — connected to Anthropic</span>
+              <span>API key is valid. Connected to Anthropic</span>
             </motion.div>
           )}
           {(keyStatus === 'invalid' || keyStatus === 'billing_error') && (
@@ -315,7 +316,7 @@ function ApiSection({ apiKey, setApiKey, showKey, setShowKey, keyStatus, setKeyS
               className={`flex items-center gap-2 mt-3 text-xs ${keyStatus === 'billing_error' ? 'text-[#D9730D]' : 'text-[#E03E3E]'}`}
             >
               <AlertCircle className="w-3.5 h-3.5" />
-              <span>{keyError || (keyStatus === 'billing_error' ? 'Billing issue — check your Anthropic dashboard.' : 'This API key is not valid. Please check your key and try again.')}</span>
+              <span>{keyError || (keyStatus === 'billing_error' ? 'Billing issue. Check your Anthropic dashboard.' : 'This API key is not valid. Please check your key and try again.')}</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -442,9 +443,9 @@ function UsageSection({ budgetEnabled, setBudgetEnabled, budgetAlert, setBudgetA
         <SectionLabel>This Month</SectionLabel>
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: 'Total Tokens', value: '—' },
-            { label: 'Conversations', value: '—' },
-            { label: 'Est. Cost', value: '—' },
+            { label: 'Total Tokens', value: '-' },
+            { label: 'Conversations', value: '-' },
+            { label: 'Est. Cost', value: '-' },
           ].map((stat) => (
             <div key={stat.label} className="px-3 py-3 bg-[#F7F6F3] border border-[#F1F1EF]" style={{ borderRadius: 6 }}>
               <div className="text-[10px] text-[#787774] mb-0.5">{stat.label}</div>
@@ -549,7 +550,15 @@ function DataSection({ backupReminder, setBackupReminder, showExportSheet, setSh
     <>
       <Card>
         <div className="flex items-center justify-between mb-3">
-          <SectionLabel>Storage</SectionLabel>
+          <div className="flex items-center gap-1.5">
+            <SectionLabel>Storage</SectionLabel>
+            <span
+              title="Shows how much browser storage your chats, notes, and settings are using."
+              className="inline-flex text-[#9B9A97]"
+            >
+              <Info className="w-3 h-3" />
+            </span>
+          </div>
           <span className="text-[10px] text-[#787774] bg-[#F1F1EF] px-2 py-0.5 rounded-full">
             {conversations?.length || 0} conversations
           </span>
@@ -599,7 +608,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportSheet, setSh
       </Card>
 
       <InfoBanner icon={Shield} color="blue">
-        <span className="font-medium text-[#191919]">Why local storage?</span> Your conversations are in your browser's IndexedDB — not on servers. Clearing browser data removes them. Regular backups keep your work safe.
+        <span className="font-medium text-[#191919]">Why local storage?</span> Your conversations are in your browser's IndexedDB, not on servers. Clearing browser data removes them. Regular backups keep your work safe.
       </InfoBanner>
 
       <Card danger>
@@ -705,15 +714,15 @@ function AboutSection() {
         <p className="text-xs text-[#787774] leading-relaxed mb-4">
           A power-user chat interface for AI. Built with React, Framer Motion, and Tailwind CSS. Open source and community-driven.
         </p>
-        <a
-          href="https://github.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-medium border border-[#E9E9E7] bg-white text-[#191919] active:bg-[#F7F6F3]"
+        <button
+          type="button"
+          disabled
+          title="Available when the app launches publicly"
+          className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-medium border border-[#E9E9E7] bg-white text-[#191919] opacity-50 cursor-not-allowed"
           style={{ borderRadius: 6 }}
         >
           <Github className="w-3.5 h-3.5" /> View on GitHub
-        </a>
+        </button>
       </Card>
 
       <Card>
@@ -723,7 +732,7 @@ function AboutSection() {
             { title: 'No servers, no accounts', text: "Runs entirely in your browser. Nothing transmitted except to Anthropic's API." },
             { title: 'API key encrypted at rest', text: 'AES-GCM via Web Crypto API with a non-extractable key in IndexedDB.' },
             { title: 'Conversations stay local', text: 'All data lives in IndexedDB. We cannot see, access, or recover it.' },
-            { title: 'Open source & auditable', text: 'Entire codebase on GitHub. Verify every request and storage call yourself.' },
+            { title: 'Verify it yourself', text: 'The Network Activity log below records every outbound request. Only requests to api.anthropic.com should appear.' },
           ].map((item, i) => (
             <div key={i}>
               <h4 className="text-xs font-medium text-[#191919] mb-0.5">{item.title}</h4>
@@ -732,6 +741,7 @@ function AboutSection() {
           ))}
         </div>
       </Card>
+      <NetworkActivityCard />
     </>
   )
 }

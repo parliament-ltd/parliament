@@ -305,7 +305,7 @@ function FileCard({ file, active, inContext, onClick, onToggleContext, onRemove 
             ? 'text-[#B8A070] bg-[#B8A070]/10 hover:bg-[#B8A070]/20'
             : 'text-[#9B9A97] hover:text-[#787774] hover:bg-[#F1F1EF]'
         }`}
-        title={inContext ? 'In context — click to remove' : 'Click to add to context'}
+        title={inContext ? 'In context. Click to remove' : 'Click to add to context'}
       >
         {inContext ? <Link2 className="w-3 h-3" /> : <Unlink className="w-3 h-3" />}
       </motion.button>
@@ -360,7 +360,7 @@ function QuickAction({ icon: Icon, label, accent = false, disabled = false }) {
 }
 
 function formatBytes(bytes) {
-  if (!bytes) return '—'
+  if (!bytes) return '-'
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`

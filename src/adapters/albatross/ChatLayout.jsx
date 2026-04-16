@@ -580,7 +580,7 @@ export default function ChatView() {
       trackMessageSent()
     } catch (error) {
       if (error.status === 401 || error.status === 403) {
-        setApiError({ type: 'key_failure', message: 'Your API key is no longer working. Your conversation is safe — update your key in Settings to continue.' })
+        setApiError({ type: 'key_failure', message: 'Your API key is no longer working. Your conversation is safe. Update your key in Settings to continue.' })
       } else if (error.status === 429) {
         setApiError({ type: 'rate_limit', message: 'Rate limit reached. Please wait a moment.' })
       } else if (error.name !== 'AbortError') {
@@ -615,7 +615,7 @@ export default function ChatView() {
 
     lines.push(`# ${title}`)
     lines.push(``)
-    lines.push(`*Exported ${date} — ${messages.length} messages*`)
+    lines.push(`*Exported ${date} - ${messages.length} messages*`)
     lines.push(``)
 
     // Highlights summary
@@ -978,7 +978,7 @@ export default function ChatView() {
               className="px-6 py-3 bg-[#B8A070]/10 border-b border-[#B8A070]/20 flex items-center gap-2"
             >
               <p className="text-xs text-[#B8A070] flex-1">
-                Install Parliament for faster access — works offline for reading your conversations.
+                Install Parliament for faster access. Works offline for reading your conversations.
               </p>
               <motion.button
                 whileHover={{ scale: 1.03 }}
@@ -1041,7 +1041,7 @@ export default function ChatView() {
               className="px-6 py-3 bg-[#E03E3E]/10 border-b border-[#E03E3E]/20 flex items-center gap-2"
             >
               <AlertCircle className="w-4 h-4 text-[#E03E3E] flex-shrink-0" />
-              <p className="text-xs text-[#E03E3E] flex-1">Browser storage is critically full — new messages may not be saved.</p>
+              <p className="text-xs text-[#E03E3E] flex-1">Browser storage is critically full. New messages may not be saved.</p>
               <button
                 onClick={() => navigate('/settings#data')}
                 className="text-xs font-medium text-[#E03E3E] underline underline-offset-2 hover:opacity-70 transition-opacity flex-shrink-0"
@@ -1069,7 +1069,7 @@ export default function ChatView() {
               className="px-6 py-3 bg-[#D9730D]/10 border-b border-[#D9730D]/20 flex items-center gap-2"
             >
               <AlertCircle className="w-4 h-4 text-[#D9730D] flex-shrink-0" />
-              <p className="text-xs text-[#D9730D] flex-1">Storage is full — this message may not be saved. Export a backup and delete old conversations to free space.</p>
+              <p className="text-xs text-[#D9730D] flex-1">Storage is full. This message may not be saved. Export a backup and delete old conversations to free space.</p>
               <button onClick={clearPersistError} className="ml-2 text-[#D9730D] hover:text-[#c4891b]"><X className="w-3.5 h-3.5" /></button>
             </motion.div>
           )}
@@ -1247,7 +1247,7 @@ export default function ChatView() {
             >
               <WifiOff className="w-3.5 h-3.5 text-[#D9730D] flex-shrink-0" />
               <p className="text-xs text-[#D9730D]">
-                You're offline — sending is paused. Your conversations are safe.
+                You're offline. Sending is paused. Your conversations are safe.
               </p>
             </motion.div>
           )}
@@ -1947,7 +1947,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
             <div className="flex items-start gap-2.5 px-3.5 py-3 rounded-lg bg-[var(--p-bg-subtle)] border border-[var(--p-border)]">
               <AlertCircle className="w-3.5 h-3.5 text-[#D9730D] flex-shrink-0 mt-0.5" />
               <p className="text-[11px] text-[var(--p-text-secondary)] leading-relaxed">
-                The last response was interrupted. You can still branch — the partial content will be preserved and you can continue it in the new branch.
+                The last response was interrupted. You can still branch. The partial content will be preserved and you can continue it in the new branch.
               </p>
             </div>
           )}
@@ -1968,7 +1968,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
                 {mode === 'full' && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-3 flex items-center gap-2 px-3 py-2 bg-[var(--p-bg-subtle)] border border-[var(--p-border)] rounded-lg">
                     <Info className="w-3 h-3 text-[var(--p-text-secondary)] flex-shrink-0" />
-                    <span className="text-[11px] text-[var(--p-text-secondary)]">Branch starts at {contextUsage}% context — same as current conversation</span>
+                    <span className="text-[11px] text-[var(--p-text-secondary)]">Branch starts at {contextUsage}% context (same as current conversation)</span>
                   </motion.div>
                 )}
               </div>
@@ -1999,7 +1999,7 @@ function BranchCreationPanel({ message, messageIndex, totalMessages, contextUsag
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-3 space-y-3">
                     <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.15)' }}>
                       <Zap className="w-3 h-3 text-[#0F7B6C] flex-shrink-0" />
-                      <span className="text-[11px] text-[#0F7B6C] font-medium">{contextUsage}% → ~{compressedPct}% — frees up {contextUsage - compressedPct}%</span>
+                      <span className="text-[11px] text-[#0F7B6C] font-medium">{contextUsage}% → ~{compressedPct}%, frees up {contextUsage - compressedPct}%</span>
                     </div>
                     <button
                       onClick={async (e) => {

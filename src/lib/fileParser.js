@@ -245,7 +245,7 @@ export function buildColumnStats(headers, rows, columnTypes) {
     const nullCount = values.filter(v => v === null || v === '' || v === undefined).length
     const nonNull = values.filter(v => v !== null && v !== '' && v !== undefined)
     const uniqueCount = new Set(nonNull.map(String)).size
-    const sample = nonNull[0] != null ? String(nonNull[0]) : '—'
+    const sample = nonNull[0] != null ? String(nonNull[0]) : '-'
 
     return {
       name: header,
