@@ -37,6 +37,11 @@ function validateConversation(item) {
   if (!isNumber(item.storageBytes))            return 'conversation.storageBytes must be a number'
   if (!isISODate(item.createdAt))              return 'conversation.createdAt invalid date'
   if (!isISODate(item.updatedAt))              return 'conversation.updatedAt invalid date'
+  // V2: optional `room` field pointing at a mode in the `modes` table.
+  // Older records (pre-v4) may lack the field entirely — accept as null/undefined.
+  if (item.room !== undefined && !isStringOrNull(item.room, 128)) {
+    return 'conversation.room invalid'
+  }
   return null
 }
 
@@ -94,14 +99,100 @@ function validateSetting(item) {
   return null
 }
 
+// ─── V1 store validator (pre-V2 gap closed in PR-1) ──────
+
+function validateSbrdDocument(item) {
+  if (!isId(item.conversationId))     return 'sbrd_document.conversationId invalid'
+  if (!Array.isArray(item.paragraphs)) return 'sbrd_document.paragraphs must be an array'
+  // suggestionStates and submittedReplies are component-internal shapes;
+  // we don't deeply validate them here — they're owned by document-canvas@1.0
+  // and treated as opaque.
+  if (item.suggestionStates !== undefined && typeof item.suggestionStates !== 'object') {
+    return 'sbrd_document.suggestionStates must be an object'
+  }
+  if (item.submittedReplies !== undefined && typeof item.submittedReplies !== 'object') {
+    return 'sbrd_document.submittedReplies must be an object'
+  }
+  if (!isISODate(item.updatedAt))     return 'sbrd_document.updatedAt invalid date'
+  return null
+}
+
+// ─── V2 catalog and mode validators (added in PR-1) ─────
+
+const STATUS_VALUES = ['available', 'beta', 'coming-soon']
+const MODE_SCOPES = ['room', 'homepage']
+
+function validateMode(item) {
+  if (!isId(item.id))                      return 'mode.id invalid'
+  if (!isString(item.schema, 200))         return 'mode.schema invalid'
+  if (!MODE_SCOPES.includes(item.scope))   return 'mode.scope must be room or homepage'
+  if (!Array.isArray(item.components))     return 'mode.components must be an array'
+  if (item.pipelines !== undefined && !Array.isArray(item.pipelines)) {
+    return 'mode.pipelines must be an array if present'
+  }
+  // meta, layout, scheme are objects validated downstream by component
+  // resolvers; we keep validation shallow here so future schema additions
+  // don't require touching this validator.
+  if (item.meta && typeof item.meta !== 'object')   return 'mode.meta must be an object'
+  if (item.layout && typeof item.layout !== 'object') return 'mode.layout must be an object'
+  if (item.scheme && typeof item.scheme !== 'object') return 'mode.scheme must be an object'
+  return null
+}
+
+function validateLibraryLayout(item) {
+  if (!isId(item.id))                       return 'libraryLayout.id invalid'
+  if (!isString(item.displayName, 200))     return 'libraryLayout.displayName invalid'
+  if (!isString(item.version, 50))          return 'libraryLayout.version invalid'
+  if (!STATUS_VALUES.includes(item.status)) return `libraryLayout.status must be one of ${STATUS_VALUES.join(', ')}`
+  if (!Array.isArray(item.scopes))          return 'libraryLayout.scopes must be an array'
+  return null
+}
+
+function validateLibraryRoom(item) {
+  if (!isId(item.id))                       return 'libraryRoom.id invalid'
+  if (!isString(item.displayName, 200))     return 'libraryRoom.displayName invalid'
+  if (!STATUS_VALUES.includes(item.status)) return `libraryRoom.status must be one of ${STATUS_VALUES.join(', ')}`
+  return null
+}
+
+function validateLibraryComponent(item) {
+  if (!isId(item.id))                       return 'libraryComponent.id invalid'
+  if (!isString(item.displayName, 200))     return 'libraryComponent.displayName invalid'
+  if (!isString(item.version, 50))          return 'libraryComponent.version invalid'
+  if (!isString(item.tier, 50))             return 'libraryComponent.tier invalid'
+  return null
+}
+
+function validateLibraryScheme(item) {
+  if (!isId(item.id))                       return 'libraryScheme.id invalid'
+  if (!isString(item.displayName, 200))     return 'libraryScheme.displayName invalid'
+  if (!isString(item.version, 50))          return 'libraryScheme.version invalid'
+  return null
+}
+
+function validateLibraryResource(item) {
+  if (!isId(item.id))                       return 'libraryResource.id invalid'
+  if (!isString(item.displayName, 200))     return 'libraryResource.displayName invalid'
+  if (!STATUS_VALUES.includes(item.status)) return `libraryResource.status must be one of ${STATUS_VALUES.join(', ')}`
+  if (!isString(item.format, 50))           return 'libraryResource.format invalid'
+  return null
+}
+
 const VALIDATORS = {
-  conversations: validateConversation,
-  messages:      validateMessage,
-  highlights:    validateHighlight,
-  notes:         validateNote,
-  favorites:     validateFavorite,
-  pins:          validatePin,
-  settings:      validateSetting,
+  conversations:     validateConversation,
+  messages:          validateMessage,
+  highlights:        validateHighlight,
+  notes:             validateNote,
+  favorites:         validateFavorite,
+  pins:              validatePin,
+  settings:          validateSetting,
+  sbrd_documents:    validateSbrdDocument,
+  modes:             validateMode,
+  libraryLayouts:    validateLibraryLayout,
+  libraryRooms:      validateLibraryRoom,
+  libraryComponents: validateLibraryComponent,
+  librarySchemes:    validateLibraryScheme,
+  libraryResources:  validateLibraryResource,
 }
 
 // ─── Top-level export ────────────────────────────────────
@@ -203,6 +294,7 @@ export function validateBackup(data) {
     { store: 'pins',       field: 'targetConversationId', target: convIds, targetName: 'conversations' },
     { store: 'pins',       field: 'sourceConversationId', target: convIds, targetName: 'conversations' },
     { store: 'pins',       field: 'sourceMessageId',      target: msgIds,  targetName: 'messages' },
+    { store: 'sbrd_documents', field: 'conversationId',   target: convIds, targetName: 'conversations' },
   ]
   for (const { store, field, target, targetName } of refChecks) {
     const arr = data[store]
@@ -211,6 +303,20 @@ export function validateBackup(data) {
       const val = arr[i][field]
       if (val !== null && val !== undefined && !target.has(val)) {
         return { valid: false, error: `${store}[${i}].${field} references unknown ${targetName} id '${val}'.` }
+      }
+    }
+  }
+
+  // Soft cross-ref: if the backup includes a modes table, every non-null
+  // conversation.room should resolve to a mode in this backup. Pre-V2 backups
+  // have no modes table — skip the check entirely in that case so V1 backups
+  // continue to validate cleanly.
+  if (Array.isArray(data.modes) && data.modes.length > 0) {
+    const modeIds = idSets.modes || new Set()
+    for (let i = 0; i < data.conversations.length; i++) {
+      const room = data.conversations[i].room
+      if (room && !modeIds.has(room)) {
+        return { valid: false, error: `conversations[${i}].room references unknown mode '${room}'.` }
       }
     }
   }

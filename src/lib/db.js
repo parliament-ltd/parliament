@@ -2,7 +2,7 @@ import { openDB } from 'idb'
 import { validateBackup } from './validate'
 
 const DB_NAME = 'parliament'
-const DB_VERSION = 3
+const DB_VERSION = 4
 
 let dbInstance = null
 
@@ -10,7 +10,7 @@ export async function initDB() {
   if (dbInstance) return dbInstance
 
   dbInstance = await openDB(DB_NAME, DB_VERSION, {
-    upgrade(db, oldVersion) {
+    async upgrade(db, oldVersion, newVersion, transaction) {
       // ── v1 stores (created on fresh install or upgrade from nothing) ──
       if (oldVersion < 1) {
         const convStore = db.createObjectStore('conversations', { keyPath: 'id' })
@@ -52,10 +52,155 @@ export async function initDB() {
         // changes, suggestion states, and user replies to Claude comments.
         db.createObjectStore('sbrd_documents', { keyPath: 'conversationId' })
       }
+
+      // ── v4 stores: V2 catalog + mode files ────────────────────────────
+      // This is the foundation layer for the V2 refactor (PR-1 of Phase 1).
+      // No code consumes these stores yet; they are populated incrementally
+      // by later PRs. See refactor/data-migration.md for the canonical schema.
+      if (oldVersion < 4) {
+        // Mode files: one row per mode. Either scope='room' (a user-built room)
+        // or scope='homepage' (the single homepage mode per user).
+        const modesStore = db.createObjectStore('modes', { keyPath: 'id' })
+        modesStore.createIndex('scope', 'scope')
+
+        // Library tables — catalog entries the user can install, browse,
+        // and (for layouts/rooms/resources) see "coming soon" placeholders for.
+        const layoutsStore = db.createObjectStore('libraryLayouts', { keyPath: 'id' })
+        layoutsStore.createIndex('status', 'status')
+
+        const roomsStore = db.createObjectStore('libraryRooms', { keyPath: 'id' })
+        roomsStore.createIndex('status', 'status')
+
+        const componentsStore = db.createObjectStore('libraryComponents', { keyPath: 'id' })
+        componentsStore.createIndex('tier', 'tier')
+
+        db.createObjectStore('librarySchemes', { keyPath: 'id' })
+
+        const resourcesStore = db.createObjectStore('libraryResources', { keyPath: 'id' })
+        resourcesStore.createIndex('status', 'status')
+        resourcesStore.createIndex('format', 'format')
+
+        // Add `room: null` field to every existing conversation. Filled in
+        // by PR-10a's one-time migration that maps `createdInMode` → room.
+        // Awaiting the for-await loop keeps the version-change transaction
+        // alive across each cursor.update() call.
+        const convStore2 = transaction.objectStore('conversations')
+        for await (const cursor of convStore2) {
+          if (cursor.value.room === undefined) {
+            await cursor.update({ ...cursor.value, room: null })
+          }
+        }
+      }
     }
   })
 
+  // Post-migration seeding. Idempotent — only seeds when stores are empty.
+  // Runs every initDB() call; the empty-check makes it cheap on subsequent calls.
+  await seedLibraryDefaults(dbInstance)
+
   return dbInstance
+}
+
+// ─── Library seeding (v4 placeholders) ───────────────────
+
+/**
+ * Seed `libraryLayouts` with placeholder entries: 5 available + 2 coming-soon.
+ * Real layout details (slot inventory, render fns) land in PR-3 and PR-9.
+ * Idempotent: only seeds when the table is empty.
+ */
+async function seedLibraryDefaults(db) {
+  const existingLayouts = await db.count('libraryLayouts')
+  if (existingLayouts > 0) return
+
+  const now = new Date().toISOString()
+  const placeholders = [
+    // ── Available layouts (5) ──
+    {
+      id: 'three-panel@1.0',
+      displayName: 'Three-panel',
+      version: '1.0.0',
+      status: 'available',
+      scopes: ['room'],
+      description: 'Dual sidebars and a center message area. Optimal for desktop knowledge work where lots of metadata is visible at once.',
+      slots: [], // Filled in by PR-3
+      seedVersion: 1,
+      createdAt: now,
+    },
+    {
+      id: 'canvas-centric@1.0',
+      displayName: 'Canvas-centric',
+      version: '1.0.0',
+      status: 'available',
+      scopes: ['room'],
+      description: 'A center artifact (chart, table) flanked by a left rail and a chat panel. For working with data and files.',
+      slots: [],
+      seedVersion: 1,
+      createdAt: now,
+    },
+    {
+      id: 'document-centric@1.0',
+      displayName: 'Document-centric',
+      version: '1.0.0',
+      status: 'available',
+      scopes: ['room'],
+      description: 'An editable document body with margin gutters for comments and analysis. For writing and editing.',
+      slots: [],
+      seedVersion: 1,
+      createdAt: now,
+    },
+    {
+      id: 'single-column-with-sheet@1.0',
+      displayName: 'Single column with sheet',
+      version: '1.0.0',
+      status: 'available',
+      scopes: ['room'],
+      description: 'A single scrolling column with a slide-up sheet for secondary controls. Optimized for mobile and touch.',
+      slots: [],
+      seedVersion: 1,
+      createdAt: now,
+    },
+    {
+      id: 'stacked-sections@1.0',
+      displayName: 'Stacked sections',
+      version: '1.0.0',
+      status: 'available',
+      scopes: ['homepage'],
+      description: 'Vertically stacked, reorderable sections. The homepage layout.',
+      slots: [],
+      seedVersion: 1,
+      createdAt: now,
+    },
+
+    // ── Coming-soon layouts (2) ──
+    {
+      id: 'reading-pane@1.0',
+      displayName: 'Reading pane',
+      version: '1.0.0',
+      status: 'coming-soon',
+      scopes: ['room'],
+      description: 'Right-heavy annotation layout. Narrow nav, full-width reading area, wide annotation panel. Optimal for deep reading and annotation across long conversations.',
+      slots: [],
+      seedVersion: 1,
+      createdAt: now,
+    },
+    {
+      id: 'split-view@1.0',
+      displayName: 'Split view',
+      version: '1.0.0',
+      status: 'coming-soon',
+      scopes: ['room'],
+      description: 'Two equal panes side by side for collaboration. Compare conversations or pair a conversation with a document.',
+      slots: [],
+      seedVersion: 1,
+      createdAt: now,
+    },
+  ]
+
+  const tx = db.transaction('libraryLayouts', 'readwrite')
+  for (const entry of placeholders) {
+    await tx.store.put(entry)
+  }
+  await tx.done
 }
 
 // ─── ID Generation ───────────────────────────────────────
