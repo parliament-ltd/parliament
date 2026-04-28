@@ -1,15 +1,18 @@
-// Dev-only inspection surface for the V2 catalog (PR-2).
+// Dev-only inspection surface for the V2 catalog (PR-2 / PR-3).
 //
 // Reachable at /catalog when import.meta.env.DEV is true. Lists every
-// registered manifest entry, shows its validation status, and renders each
-// entry's previewRender (or render) so authors can sanity-check shapes
-// without booting a full RoomShell (PR-3).
+// registered manifest entry with validation status and previewRender, then
+// mounts a Room demo (RoomShell + Bus inspector) at the bottom — that
+// section is PR-3's visible exit-criterion check for the mode→layout→slot→
+// component pipeline plus the hostAPI publish/subscribe bus.
 //
 // This view does NOT touch IndexedDB. It reads only from the in-memory
-// registry in src/catalog/index.js.
+// catalog and layout registries plus the hand-built mode in
+// src/catalog/dev-modes.js.
 
 import { useState } from 'react'
 import { listEntries, validateManifest, entryRef } from '../catalog'
+import RoomDemo from './RoomDemo'
 
 const HEADER_LABEL_CLS = 'text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider'
 
@@ -52,6 +55,8 @@ export default function CatalogDebugView() {
             />
           )
         })}
+
+        <RoomDemo />
       </main>
     </div>
   )
