@@ -10,12 +10,22 @@
 //   - row-hover            : { conversationId: string | null }
 //   - file-context-changed : { fileIds: string[], conversationId: string }
 //
+// Payload shapes above are documentation only — the bus does NOT validate
+// payload structure. Bad payloads surface as runtime errors inside
+// subscriber handlers (caught and logged, see below). Shape validation is
+// deferred to Phase 2 alongside the consent flow / capability framework
+// where typed contracts become load-bearing.
+//
 // Subscribing to an unknown event is allowed (forward-compatible) but
 // publishing one logs a dev-mode warning so typos surface early.
 //
-// Handlers run synchronously in subscription order. A throwing handler does
-// not abort the dispatch — its error is caught and logged so one
-// misbehaving component cannot starve the others.
+// Handlers run synchronously in subscription order. A slow handler will
+// block the publish() call for the duration of the dispatch; for the
+// three small Phase 1 events this is fine, but anything emitting at
+// high frequency (e.g. mouse-move) needs throttling at the publisher.
+//
+// A throwing handler does not abort the dispatch — its error is caught
+// and logged so one misbehaving component cannot starve the others.
 
 export const PHASE_1_EVENTS = Object.freeze({
   VOICE_TRANSCRIPT:     'voice-transcript',

@@ -50,7 +50,7 @@
 - Add 6 new stores: `modes, libraryLayouts, libraryRooms, libraryComponents, librarySchemes, libraryResources`.
 - Add `room: null` field to existing `conversations` records during migration.
 - Add `status: 'available' | 'beta' | 'coming-soon'` field to `libraryLayouts`, `libraryRooms`, `libraryResources`.
-- New `lib/modes.js`: `loadMode(id), saveMode(mode), listModes(), createModeFromTemplate(template)`. Save flow per `parliament_mode_file_format.md` §9.
+- New `lib/modes.js`: `loadMode(id), saveMode(mode), listModes(), createModeFromTemplate(template)`. Save flow stamps `schema`, `parliamentVersion`, and `meta.modified`; preserves `id`, `meta.created`, `meta.author`, `buildIntent` when present (the `parliament_mode_file_format.md` spec is not yet committed; this contract is implemented and documented in `lib/modes.js` directly).
 - New `lib/catalog.js`: registry skeleton with `getComponent`, `listComponents`, `getLayout`, `getScheme`, `getRoom`, `getResource`.
 - Migration seeds `libraryLayouts` with 5 available + 2 coming-soon entries (placeholders only; layout details land in PR-3).
 - Schema validators for all 6 new stores added to `lib/validate.js`.
@@ -80,7 +80,7 @@
   - `tier` (Reader/Composer/Integrator/Agent/Utility)
   - `slotTargets: [{ slot, primary?, fallbackOk? }]`
   - `capabilityRequirements`
-  - `configSchema` (with stable camelCase keys per `parliament_mode_file_format.md` §3.1)
+  - `configSchema` (stable camelCase keys; field shape `{ type, default?, label?, options? }` enforced by [src/catalog/validate.js](src/catalog/validate.js))
   - `softDependencies?: [{ component, fallbackUI }]` (for empty-state contracts)
   - `contributions?: { messageActions?: [...] }` (per NQ-5.8 — components contribute per-message menu items)
   - `render` and optional `previewRender`

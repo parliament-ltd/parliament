@@ -5,7 +5,7 @@
 //   2. Resolves each mode.components[].ref against the component catalog.
 //   3. Groups resolved components by slot and sorts by order.
 //   4. Builds a fresh hostAPI bus scoped to this room instance.
-//   5. Calls each component's render({ config, hostAPI }) function.
+//   5. Calls each component's render({ config, hostAPI, componentId }).
 //   6. Hands the resulting slotContents map to the layout's render function.
 //
 // Missing layouts and missing components do NOT crash the shell — they
@@ -14,6 +14,46 @@
 // active layout does not declare are silently skipped (with a dev-only
 // console warning) per "RoomShell must handle missing components
 // gracefully" in phase-1-pr-plan.md PR-3 risk note.
+//
+// ─── Where conversation data enters the room ──────────────────────────
+//
+// RoomShell deliberately does NOT plumb conversation data through props or
+// hostAPI events. Components that need active-conversation state
+// (messages@1.0 reading the message list, input@1.0 firing sendMessage,
+// context@1.0 reading the token meter) consume the existing React contexts
+// directly via `useChatContext()` / `useConversationContext()` /
+// `useSettingsContext()`. App.jsx keeps those providers mounted around
+// every route, so any RoomShell descendant can subscribe.
+//
+// PR-2/PR-3 entries render with empty defaults because no provider data is
+// in scope on the dev /catalog route — the providers ARE mounted but no
+// active conversation is selected. PR-10a wires /chat/:id to load a
+// conversation, set it active, then render <RoomShell mode={...} /> inside
+// the same provider tree. Each component picks up the live data via its
+// own hook calls. Do not add a "componentData" prop or a hostAPI
+// "data-changed" event to plumb this — contexts already do the job and
+// keep re-renders scoped per CLAUDE.md's state-management guidance.
+//
+// ─── Intentionally deferred behaviors ─────────────────────────────────
+//
+// These are accepted by the manifest format and reserved in the runtime,
+// but RoomShell does not act on them yet. Each has a target PR; if you
+// implement one earlier than that, update this list.
+//
+//   - Slot capacity enforcement (single | stack | overlay): layouts
+//     declare it, RoomShell does not yet check that single-capacity slots
+//     hold at most one component. Mode-file authors are trusted in
+//     Phase 1. Target: enforce when the editor (PR-8) starts producing
+//     mode files automatically.
+//   - softDependencies aggregation: components declare them on the
+//     manifest, but RoomShell does not check whether the dependency is
+//     present in the room or render the declared fallbackUI. Target:
+//     PR-11a, when chart/table/summary canvas components need the
+//     "Add a File shelf component to provide data" empty state.
+//   - contributions.messageActions aggregation: components declare per-
+//     message menu items, but messages@1.0 does not yet collect them
+//     across the room and surface a unified menu. Target: PR-5, when
+//     highlights/notes/branches each ship a contribution.
 
 import { useMemo } from 'react'
 import { getEntry as getComponentEntry } from '../catalog'

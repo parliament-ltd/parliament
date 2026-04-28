@@ -10,6 +10,13 @@
 // are checked strictly.
 //
 // Returns { valid: boolean, errors: string[], warnings: string[] }.
+//
+// ─── Declared-but-unwired fields ──────────────────────────────────────
+//
+// `softDependencies` and `contributions.messageActions` are accepted here
+// (validated for shape) so manifests can declare them today. RoomShell
+// does NOT yet aggregate or act on them — see RoomShell.jsx's
+// "Intentionally deferred behaviors" note for target PRs.
 
 import { TIER_VALUES } from '../lib/catalog'
 import { ALL_SLOT_IDS } from '../lib/slots'
