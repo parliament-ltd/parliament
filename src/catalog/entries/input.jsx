@@ -10,7 +10,6 @@
 // built-in mic button on the underlying InputArea (cardLayout-only) stays
 // for V1 fallback and is removed at PR-10b.
 
-import InputArea from '../../components/core/InputArea'
 import InputPreview from './input-preview'
 
 export default {
@@ -44,7 +43,9 @@ export default {
     },
   },
 
-  render: (props) => <InputArea {...props} />,
-
-  previewRender: () => <InputPreview />,
+  // Same self-contained wrapper for both — input has internal value state
+  // when no controlled value/onChange are passed, which RoomShell exercises
+  // until ChatContext plumbing arrives in a later PR.
+  render: InputPreview,
+  previewRender: InputPreview,
 }

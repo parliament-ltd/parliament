@@ -1,6 +1,10 @@
-// Local preview component for input@1.0's catalog debug card.
-// Kept in its own file so the manifest entry stays a clean default-export
-// (react-refresh's "only-export-components" rule).
+// Self-contained render wrapper for input@1.0. Used both by the catalog
+// debug card (via previewRender) and by RoomShell (via render) until the
+// ChatContext plumbing arrives in a later PR. Manages its own value state
+// when no controlled value/onChange are passed in.
+//
+// Lives in its own file so input.jsx's manifest entry stays a clean
+// default-export (react-refresh's "only-export-components" rule).
 
 import { useState } from 'react'
 import InputArea from '../../components/core/InputArea'
