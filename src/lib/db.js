@@ -104,11 +104,22 @@ export async function initDB() {
 // ─── Library seeding (v4 placeholders) ───────────────────
 
 /**
+ * Run all v4 post-migration seeds. Each seed is independently idempotent
+ * (guarded by its own empty-table check) so adding one in a later PR
+ * doesn't require the others to re-run.
+ */
+async function seedLibraryDefaults(db) {
+  await seedLibraryLayouts(db)
+  await seedLibrarySchemes(db)
+  await seedHomepageMode(db)
+}
+
+/**
  * Seed `libraryLayouts` with placeholder entries: 5 available + 2 coming-soon.
  * Real layout details (slot inventory, render fns) land in PR-3 and PR-9.
  * Idempotent: only seeds when the table is empty.
  */
-async function seedLibraryDefaults(db) {
+async function seedLibraryLayouts(db) {
   const existingLayouts = await db.count('libraryLayouts')
   if (existingLayouts > 0) return
 
@@ -201,6 +212,62 @@ async function seedLibraryDefaults(db) {
     await tx.store.put(entry)
   }
   await tx.done
+}
+
+/**
+ * Seed `librarySchemes` with `parliament@1.0` — the existing Parliament
+ * theme. The full token snapshot and four a11y variants land in PR-4b;
+ * this PR only ensures the record exists so rooms seeded from PR-3
+ * onward can reference `{ ref: 'parliament@^1.0' }` cleanly.
+ * Idempotent: only seeds when the table is empty.
+ */
+async function seedLibrarySchemes(db) {
+  if ((await db.count('librarySchemes')) > 0) return
+
+  const now = new Date().toISOString()
+  await db.put('librarySchemes', {
+    id: 'parliament@1.0',
+    displayName: 'Parliament Default',
+    version: '1.0.0',
+    description: 'The original Parliament theme — warm gold accents on a warm white surface. Token snapshot and a11y variants seeded by PR-4b.',
+    seedVersion: 1,
+    createdAt: now,
+  })
+}
+
+/**
+ * Seed the single homepage mode (one record per user, scope='homepage').
+ * The component list is empty at PR-1 — PR-6 fills it with the homepage
+ * components (blueprint, chats, library, favorites). The record exists
+ * from v4 so the homepage route in PR-6 can resolve a real mode rather
+ * than a hand-built fallback.
+ * Idempotent: only seeds when no homepage mode already exists.
+ *
+ * Constants below mirror src/lib/modes.js — keep in sync if either changes.
+ */
+async function seedHomepageMode(db) {
+  const existing = await db.getAllFromIndex('modes', 'scope', 'homepage')
+  if (existing.length > 0) return
+
+  const now = new Date().toISOString()
+  await db.put('modes', {
+    id: 'home_default',
+    schema: 'parliament-mode/1.0',
+    parliamentVersion: '0.4.0',
+    scope: 'homepage',
+    meta: {
+      name: 'Home',
+      description: 'Default homepage. Components seeded by PR-6.',
+      created: now,
+      modified: now,
+    },
+    layout: { ref: 'stacked-sections@^1.0' },
+    scheme: { ref: 'parliament@^1.0' },
+    components: [],
+    pipelines: [],
+    requestedPermissions: [],
+    buildIntent: null,
+  })
 }
 
 // ─── ID Generation ───────────────────────────────────────
