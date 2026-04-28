@@ -1,0 +1,67 @@
+// Parliament V2 catalog — in-memory registry of component manifests.
+//
+// IMPORTANT: tier classification is governed by refactor/tier-classification.md.
+// The rule in one line:
+//
+//   Components that make model calls in DIRECT response to a user action are
+//   Composer (or below) and don't require consent. Components that make
+//   AUTONOMOUS model calls are Agent and require explicit consent at first use.
+//
+// Phase 1 ships zero Agent components by design. The validator warns (does not
+// reject) on tier='agent' so reviewers catch accidental escalation. Anyone
+// adding a new component that calls a model must read tier-classification.md
+// before classifying — the rule looks small but has real UX consequences.
+//
+// ─── This file vs lib/catalog.js ─────────────────────────
+//
+// This module owns the in-memory registry of component code (manifest +
+// React render functions) shipped with the app. lib/catalog.js owns the
+// IndexedDB CRUD layer for the V2 library tables (libraryComponents, etc.)
+// — those records are the user-facing browse surface and seed/snapshot
+// shape. The two layers reference the same `name@version` refs but serve
+// different concerns and never share storage.
+
+import messagesEntry from './entries/messages'
+import inputEntry    from './entries/input'
+import tocEntry      from './entries/toc'
+import { validateManifest, entryRef } from './validate'
+
+const REGISTRY = new Map()
+
+function register(entry) {
+  const result = validateManifest(entry)
+  if (!result.valid) {
+    const ref = entry?.name && entry?.version ? entryRef(entry) : '<unknown>'
+    throw new Error(
+      `Catalog manifest invalid for ${ref}: ${result.errors.join('; ')}`
+    )
+  }
+  if (result.warnings.length > 0 && import.meta.env.DEV) {
+    const ref = entryRef(entry)
+    console.warn(`[catalog] ${ref}:`, result.warnings.join('; '))
+  }
+  REGISTRY.set(entryRef(entry), entry)
+}
+
+// Register the Phase 1 entries. Order is not significant.
+register(messagesEntry)
+register(inputEntry)
+register(tocEntry)
+
+/**
+ * Look up a manifest entry by `name@version` ref. Exact-match only in PR-2;
+ * semver range resolution lands when component versioning becomes dynamic.
+ */
+export function getEntry(ref) {
+  return REGISTRY.get(ref) || null
+}
+
+/**
+ * List all registered manifest entries, optionally filtered by tier.
+ */
+export function listEntries({ tier } = {}) {
+  const all = [...REGISTRY.values()]
+  return tier ? all.filter(e => e.tier === tier) : all
+}
+
+export { validateManifest, entryRef }
