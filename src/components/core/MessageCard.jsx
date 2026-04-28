@@ -95,7 +95,7 @@ export default function MessageCard({
     for (const hl of highlights) {
       const key = hl.text.toLowerCase()
       if (!seen.has(key)) {
-        const bgColor = HIGHLIGHT_COLORS.find(c => c.color === hl.color)?.bg || 'rgba(74,122,229,0.15)'
+        const bgColor = HIGHLIGHT_COLORS.find(c => c.color === hl.color)?.bg || 'rgba(184,160,112,0.18)'
         seen.set(key, { text: hl.text, bg: bgColor })
       }
     }

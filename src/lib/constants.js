@@ -9,7 +9,7 @@ export const SPRING_GENTLE = { type: 'spring', stiffness: 200, damping: 24 }
 export const DUSTY_GOLD = '#C4A94D'
 
 export const HIGHLIGHT_COLORS = [
-  { id: 'blue',   color: '#B8A070', bg: 'rgba(74,122,229,0.15)' },
+  { id: 'blue',   color: '#B8A070', bg: 'rgba(184,160,112,0.18)' },
   { id: 'yellow', color: '#D9730D', bg: 'rgba(229,166,32,0.15)' },
   { id: 'green',  color: '#0F7B6C', bg: 'rgba(34,197,94,0.15)' },
   { id: 'purple', color: '#B8A070', bg: 'rgba(124,108,212,0.15)' },

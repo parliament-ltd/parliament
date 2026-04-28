@@ -181,7 +181,7 @@ export default function InputArea({
                 transition={SPRING_SNAPPY}
                 className="flex items-center gap-2 mx-3 mt-3 px-3 py-1.5 rounded-lg border border-[#EBEBEB] bg-[#FAFAFA] w-fit max-w-full"
               >
-                <FileText className="w-3.5 h-3.5 text-[#4A7AE5] shrink-0" />
+                <FileText className="w-3.5 h-3.5 text-[#B8A070] shrink-0" />
                 <span className="text-xs text-[#1E2532] font-medium truncate max-w-[220px]">
                   {attachment.name}
                 </span>
@@ -244,8 +244,8 @@ export default function InputArea({
                   className="rounded-lg border flex items-center justify-center flex-shrink-0 disabled:opacity-40"
                   style={{
                     width: 36, height: 36,
-                    borderColor: isOnline ? '#4A7AE5' : '#9B9A97',
-                    backgroundColor: isOnline ? '#4A7AE5' : '#9B9A97',
+                    borderColor: isOnline ? '#B8A070' : '#9B9A97',
+                    backgroundColor: isOnline ? '#B8A070' : '#9B9A97',
                   }}
                 >
                   <ArrowUp className="w-4 h-4 text-white" />
@@ -359,7 +359,7 @@ export default function InputArea({
         </div>
 
         <motion.button
-          whileHover={!isStreaming && isOnline ? { scale: 1.03, borderColor: '#4A7AE5' } : undefined}
+          whileHover={!isStreaming && isOnline ? { scale: 1.03, borderColor: '#B8A070' } : undefined}
           whileTap={!isStreaming && isOnline ? { scale: 0.97 } : undefined}
           onClick={isStreaming ? onStop : (isOnline ? onSend : undefined)}
           disabled={!isStreaming && !isOnline}

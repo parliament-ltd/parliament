@@ -109,7 +109,7 @@ export default function RoomShell({ mode, hostAPI: hostAPIProp }) {
     return (
       <Diagnostic>
         Layout <code>{layoutRef}</code> is not registered. Phase 1 layouts ship
-        incrementally — see <code>src/catalog/layouts/index.js</code>.
+        incrementally. See <code>src/catalog/layouts/index.js</code>.
       </Diagnostic>
     )
   }

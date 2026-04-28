@@ -25,7 +25,7 @@ export default function InputPreview() {
         onToggleTool={() => {}}
       />
       <p className="text-xs text-[var(--p-text-muted)] mt-3">
-        Preview only — Send is a no-op in the catalog debug view.
+        Preview only. Send is a no-op in the catalog debug view.
       </p>
     </div>
   )

@@ -24,7 +24,7 @@ export default function RoomDemo() {
       <header className="mb-4">
         <p className={HEADER_LABEL_CLS}>Room demo</p>
         <h2 className="text-base font-medium text-[var(--p-text-primary)] mt-1">
-          three-panel@1.0 — hand-built mode
+          three-panel@1.0: hand-built room
         </h2>
         <p className="text-xs text-[var(--p-text-secondary)] mt-1">
           Resolved by <code>RoomShell</code>: messages → <code>msg-area</code>,
@@ -88,7 +88,7 @@ function BusInspector({ hostAPI }) {
 
       <ul className="space-y-1 text-xs font-mono bg-[var(--p-code-bg,#F7F6F3)] rounded p-3 min-h-[80px]">
         {events.length === 0 && (
-          <li className="text-[var(--p-text-muted)]">No events yet — click a button to publish.</li>
+          <li className="text-[var(--p-text-muted)]">No events yet. Click a button to publish.</li>
         )}
         {events.map((e) => (
           <li key={e.seq} className="text-[var(--p-text-primary)]">

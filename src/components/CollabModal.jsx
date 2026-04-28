@@ -188,7 +188,7 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
         {/* Header */}
         <div className="flex items-center justify-between p-5 pb-4" style={{ borderBottom: '1px solid #F1F1EF' }}>
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(74,122,229,0.1)' }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(184,160,112,0.12)' }}>
               <Settings2 className="w-4 h-4 text-[#B8A070]" />
             </div>
             <div>
@@ -340,7 +340,7 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
                         <>
                           <button
                             onClick={e => handleStartEdit(e, persona)}
-                            className="absolute top-3 right-9 p-1.5 rounded-md text-[#D5D5D5] hover:text-[#4A7AE5] hover:bg-[#EFF4FE] opacity-0 group-hover:opacity-100 transition-all"
+                            className="absolute top-3 right-9 p-1.5 rounded-md text-[#D5D5D5] hover:text-[#B8A070] hover:bg-[#FAF7EF] opacity-0 group-hover:opacity-100 transition-all"
                             title="Edit persona"
                           >
                             <Pencil className="w-3.5 h-3.5" />
