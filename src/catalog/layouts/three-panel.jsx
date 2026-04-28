@@ -34,7 +34,7 @@ export default {
     const hasRight   = (right && right.length > 0) || (rightExtra && rightExtra.length > 0)
 
     return (
-      <div className="flex h-full min-h-[480px] bg-[var(--p-bg-primary)]">
+      <div className="flex h-full min-h-[480px] bg-[var(--p-bg-base)]">
         {/* Left rail */}
         {left && left.length > 0 && (
           <aside className={`w-56 shrink-0 border-r ${RAIL_BORDER} ${RAIL_BASE}`}>

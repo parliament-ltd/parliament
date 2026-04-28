@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { MotionConfig } from 'framer-motion'
 import { ModeProvider } from './stores/ModeContext'
 import { SettingsProvider } from './stores/SettingsContext'
 import { ConversationProvider } from './stores/ConversationContext'
@@ -20,6 +21,12 @@ const CatalogDebugView = import.meta.env.DEV
 export default function App() {
   return (
     <ErrorBoundary>
+      {/* MotionConfig with reducedMotion="user" makes Framer Motion respect
+          the OS-level prefers-reduced-motion preference for every motion
+          component below. Springs and tween transitions collapse to instant
+          state changes when the user has Reduce motion enabled. CSS keyframe
+          animations are handled separately in index.css. */}
+      <MotionConfig reducedMotion="user">
       {/* PWAProvider must sit outside BrowserRouter so the SW registers
           before any route renders, and so the install / update banners
           can be consumed by any view without prop-drilling. */}
@@ -52,6 +59,7 @@ export default function App() {
           </SettingsProvider>
         </ModeProvider>
       </PWAProvider>
+      </MotionConfig>
     </ErrorBoundary>
   )
 }

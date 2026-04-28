@@ -50,6 +50,50 @@
   --p-scrollbar-track: transparent;
 }
 
+/* ── High-contrast variants (PR-4a) ──────────────────────── */
+/*
+  Triggered automatically by the OS-level "Increase contrast" preference
+  via @media (prefers-contrast: more). Both light + dark variants stiffen
+  text contrast to WCAG AAA where reasonable, darken (light) or brighten
+  (dark) the gold accent so it passes AA against the surface, and replace
+  subtle borders with high-contrast equivalents.
+
+  Coverage caveat: surfaces using hardcoded hex values (rather than the
+  `--p-*` token vars) do NOT shift here. Wave B / PR-4b consolidates more
+  surfaces onto the token system. Until then, HC mode lifts the dominant
+  surfaces (text, borders, link/accent) while leaving inline-hex chrome
+  at base palette. Flagged for design review before sign-off.
+*/
+@media (prefers-contrast: more) {
+  :root {
+    --p-text-primary:   #000000;
+    --p-text-secondary: #2A2A28;
+    --p-text-muted:     #4A4946;
+    --p-text-light:     #6B6963;
+
+    --p-gold:       #806B3E;  /* darker gold passes AA against #FFFFFF */
+    --p-gold-light: #806B3E;
+    --p-gold-muted: #5C4F2C;
+
+    --p-border:        #4A4946;
+    --p-border-subtle: #767474;
+  }
+
+  .dark {
+    --p-text-primary:   #FFFFFF;
+    --p-text-secondary: #E0E0E0;
+    --p-text-muted:     #BCBCBC;
+    --p-text-light:     #9B9A97;
+
+    --p-gold:       #E0C264;  /* brighter gold passes AA against #000000 */
+    --p-gold-light: #E0C264;
+    --p-gold-muted: #C4A94D;
+
+    --p-border:        #BCBCBC;
+    --p-border-subtle: #767474;
+  }
+}
+
 /* ── Dark Mode: page root ────────────────────────────────── */
 .dark body,
 .dark #root {
@@ -91,8 +135,8 @@
 .dark .bg-\[#FFFBEB\]   { background-color: rgba(196,169,77,0.12) !important; }
 .dark .bg-\[#FEFCE8\]   { background-color: rgba(196,169,77,0.10) !important; }
 .dark .bg-\[#FEF2F2\]   { background-color: rgba(224,62,62,0.10) !important; }
-.dark .bg-\[#F0F5FF\]   { background-color: rgba(58,106,212,0.12) !important; }
-.dark .bg-\[#F5F7FF\]   { background-color: rgba(58,106,212,0.10) !important; }
+.dark .bg-\[#F0F5FF\]   { background-color: rgba(184,160,112,0.14) !important; }
+.dark .bg-\[#F5F7FF\]   { background-color: rgba(184,160,112,0.12) !important; }
 
 /* — Borders — */
 .dark .border-\[#E9E9E7\] { border-color: var(--p-border) !important; }
@@ -110,12 +154,9 @@
 .dark .hover\:text-\[#191919\]:hover { color: var(--p-text-primary) !important; }
 .dark .hover\:text-\[#1E2532\]:hover { color: var(--p-text-primary) !important; }
 .dark .hover\:border-\[#9B9A97\]:hover { border-color: #5A5753 !important; }
-.dark .hover\:border-\[#4A7AE5\]:hover { border-color: var(--p-gold-light) !important; }
-.dark .hover\:text-\[#4A7AE5\]:hover   { color: var(--p-gold-light) !important; }
 
 /* — Focus states — */
 .dark .focus\:border-\[#B8A070\]:focus { border-color: var(--p-gold-light) !important; }
-.dark .focus\:border-\[#4A7AE5\]:focus { border-color: var(--p-gold-light) !important; }
 
 /* — Scrollbar — */
 .dark ::-webkit-scrollbar-thumb { background-color: var(--p-scrollbar-thumb); }
@@ -385,6 +426,28 @@
 
 .shimmer-sidebar-border {
   animation: shimmer-sidebar-border 0.85s ease-out forwards;
+}
+
+/* ── Reduced-motion overrides (PR-4a) ─────────────────────── */
+/*
+  When the user has the OS-level "Reduce motion" preference enabled,
+  collapse decorative CSS animations to no-ops. The shimmer effects above
+  still trigger their final state (forwards keeps the end frame) so
+  users who can't tolerate motion still see the "validated" border
+  color settle, just without the pulse / sweep.
+
+  Framer Motion springs are handled at the React layer via MotionConfig
+  in App.jsx (reducedMotion="user").
+*/
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-card,
+  .shimmer-nav,
+  .shimmer-sidebar-border {
+    animation: none !important;
+  }
+  /* Still apply the resting state so power-on UX doesn't feel broken. */
+  .shimmer-card { border-color: #E9E9E7; }
+  .shimmer-sidebar-border { border-color: #F1F1EF; }
 }
 
 /* ── Mobile: prevent iOS auto-zoom on input focus ─────────── */

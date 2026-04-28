@@ -42,7 +42,7 @@ function CitationLink({ href, children }) {
   } catch {
     // Not a valid URL — render as plain link
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#4A7AE5] underline">
+      <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#B8A070] underline">
         {children}
       </a>
     )
@@ -67,10 +67,10 @@ function CitationLink({ href, children }) {
         onMouseLeave={handleMouseLeave}
         className="inline rounded px-0.5 cursor-pointer transition-colors"
         style={{
-          backgroundColor: 'rgba(74, 122, 229, 0.12)',
+          backgroundColor: 'rgba(184, 160, 112, 0.14)',
           color: 'inherit',
           textDecoration: 'none',
-          borderBottom: '1px solid rgba(74, 122, 229, 0.35)',
+          borderBottom: '1px solid rgba(184, 160, 112, 0.4)',
         }}
       >
         {children}
@@ -96,7 +96,7 @@ function CitationLink({ href, children }) {
             >
               <span
                 className="w-3 h-3 rounded-sm flex-shrink-0"
-                style={{ backgroundColor: 'rgba(74,122,229,0.4)' }}
+                style={{ backgroundColor: 'rgba(184,160,112,0.45)' }}
               />
               <span className="truncate">{domain}</span>
             </span>

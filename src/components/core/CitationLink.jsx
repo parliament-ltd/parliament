@@ -41,7 +41,7 @@ export default function CitationLink({ href, children }) {
 
   if (!domain) {
     return (
-      <a href={safeHref} target="_blank" rel="noopener noreferrer" className="text-[#4A7AE5] underline">
+      <a href={safeHref} target="_blank" rel="noopener noreferrer" className="text-[#B8A070] underline">
         {children}
       </a>
     )
@@ -65,8 +65,8 @@ export default function CitationLink({ href, children }) {
         onMouseEnter={show}
         onMouseLeave={hide}
         style={{
-          backgroundColor: 'rgba(74, 122, 229, 0.12)',
-          borderBottom: '1px solid rgba(74, 122, 229, 0.4)',
+          backgroundColor: 'rgba(184, 160, 112, 0.14)',
+          borderBottom: '1px solid rgba(184, 160, 112, 0.45)',
           borderRadius: 2,
           padding: '0 2px',
           color: 'inherit',
@@ -74,8 +74,8 @@ export default function CitationLink({ href, children }) {
           cursor: 'pointer',
           transition: 'background-color 0.15s',
         }}
-        onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'rgba(74, 122, 229, 0.22)' }}
-        onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(74, 122, 229, 0.12)' }}
+        onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'rgba(184, 160, 112, 0.24)' }}
+        onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(184, 160, 112, 0.14)' }}
       >
         {children}
       </a>
@@ -95,7 +95,7 @@ export default function CitationLink({ href, children }) {
               style={{ backgroundColor: '#1E2532', color: '#FFFFFF', maxWidth: 260 }}
             >
               <span
-                className="w-2.5 h-2.5 rounded-sm flex-shrink-0 bg-[#4A7AE5] opacity-60"
+                className="w-2.5 h-2.5 rounded-sm flex-shrink-0 bg-[#B8A070] opacity-70"
               />
               <span className="truncate">{domain}</span>
             </span>

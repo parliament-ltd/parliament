@@ -107,7 +107,7 @@ export default function ReviewModal({
         {/* Header */}
         <div className="flex items-center justify-between p-5 pb-4" style={{ borderBottom: '1px solid #F1F1EF' }}>
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(74,122,229,0.1)' }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(184,160,112,0.12)' }}>
               <BookOpen className="w-4 h-4 text-[#B8A070]" />
             </div>
             <div>

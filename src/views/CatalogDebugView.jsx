@@ -21,7 +21,7 @@ export default function CatalogDebugView() {
   const [openRef, setOpenRef] = useState(entries[0] ? entryRef(entries[0]) : null)
 
   return (
-    <div className="min-h-screen bg-[var(--p-bg-primary)] p-8">
+    <div className="min-h-screen bg-[var(--p-bg-base)] p-8">
       <header className="max-w-5xl mx-auto mb-8">
         <p className={HEADER_LABEL_CLS}>Dev only</p>
         <h1 className="text-2xl font-semibold text-[var(--p-text-primary)] mt-2">
