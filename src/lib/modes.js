@@ -13,8 +13,13 @@
 // introduces <RoomShell>; PR-9 seeds the available room templates; PR-10a
 // performs the one-time createdInMode → room migration.
 //
-// Canonical schema reference: refactor/parliament_mode_file_format.md
-// Phase 1 contract: refactor/data-migration.md §"Per-template mode file contents"
+// The full parliament_mode_file_format.md spec is not yet committed. Until
+// it lands, the canonical Phase 1 contract is split across:
+//   - refactor/data-migration.md §"Per-template mode file contents"
+//     (top-level shape, layout/scheme refs, components array)
+//   - refactor/v2-phase1-audit.md §2 (slot inventory, tier rule)
+//   - src/catalog/validate.js (manifest field shapes, configSchema camelCase)
+//   - src/lib/validate.js → validateMode (top-level mode validation)
 
 import { initDB } from './db'
 
