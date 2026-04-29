@@ -1,5 +1,6 @@
 import { openDB } from 'idb'
 import { validateBackup } from './validate'
+import { SCHEMES } from './schemes'
 
 const DB_NAME = 'parliament'
 const DB_VERSION = 4
@@ -215,24 +216,34 @@ async function seedLibraryLayouts(db) {
 }
 
 /**
- * Seed `librarySchemes` with `parliament@1.0` — the existing Parliament
- * theme. The full token snapshot and four a11y variants land in PR-4b;
- * this PR only ensures the record exists so rooms seeded from PR-3
- * onward can reference `{ ref: 'parliament@^1.0' }` cleanly.
- * Idempotent: only seeds when the table is empty.
+ * Seed `librarySchemes` with all six V2 schemes plus their full token
+ * snapshots (PR-4b). Idempotent at the per-scheme level — each scheme is
+ * only inserted if a record with its id doesn't already exist, so adding
+ * a seventh scheme later won't re-seed the existing six.
+ *
+ * The embedded `variants` snapshot mirrors the CSS in src/index.css. Both
+ * are dual-maintained for now; future PRs may auto-generate the CSS from
+ * this snapshot. The runtime source-of-truth for visual rendering is the
+ * CSS — this snapshot exists for the editor / wizard scheme picker (PR-8 /
+ * PR-9) to read and to keep imported backups self-contained.
  */
 async function seedLibrarySchemes(db) {
-  if ((await db.count('librarySchemes')) > 0) return
-
   const now = new Date().toISOString()
-  await db.put('librarySchemes', {
-    id: 'parliament@1.0',
-    displayName: 'Parliament Default',
-    version: '1.0.0',
-    description: 'The original Parliament theme — warm gold accents on a warm white surface. Token snapshot and a11y variants seeded by PR-4b.',
-    seedVersion: 1,
-    createdAt: now,
-  })
+
+  for (const scheme of SCHEMES) {
+    const existing = await db.get('librarySchemes', scheme.id)
+    if (existing) continue
+    await db.put('librarySchemes', {
+      id: scheme.id,
+      displayName: scheme.displayName,
+      version: '1.0.0',
+      description: scheme.description,
+      defaultVariant: scheme.defaultVariant,
+      variants: scheme.variants,
+      seedVersion: 2,
+      createdAt: now,
+    })
+  }
 }
 
 /**

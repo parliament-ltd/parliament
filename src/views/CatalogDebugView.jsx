@@ -13,6 +13,7 @@
 import { useState } from 'react'
 import { listEntries, validateManifest, entryRef } from '../catalog'
 import RoomDemo from './RoomDemo'
+import SchemePicker from './SchemePicker'
 
 const HEADER_LABEL_CLS = 'text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider'
 
@@ -56,6 +57,7 @@ export default function CatalogDebugView() {
           )
         })}
 
+        <SchemePicker />
         <RoomDemo />
       </main>
     </div>
