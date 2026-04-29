@@ -4,11 +4,12 @@
 // Composer tier per the user-action-vs-autonomous rule (the model call fires
 // when the user clicks Send — direct user action — see refactor/tier-classification.md).
 //
-// `subscribeToVoice` config field is declared here so it round-trips through
-// mode files from PR-2 onward, but the bus subscription that consumes
-// voice-transcript events is wired in PR-5 alongside voice-input@1.0. The
-// built-in mic button on the underlying InputArea (cardLayout-only) stays
-// for V1 fallback and is removed at PR-10b.
+// `subscribeToVoice` config field controls whether this component listens
+// for `voice-transcript` events on the room bus and appends final
+// transcripts to its value. PR-5 wired the subscription alongside
+// voice-input@1.0, the publisher. The built-in mic button on the
+// underlying InputArea (cardLayout-only) stays for V1 fallback and is
+// removed at PR-10b.
 
 import InputPreview from './input-preview'
 

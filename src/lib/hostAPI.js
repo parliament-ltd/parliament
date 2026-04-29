@@ -38,15 +38,26 @@ const KNOWN_EVENTS = new Set(Object.values(PHASE_1_EVENTS))
 /**
  * Create a fresh hostAPI instance. Each room gets its own.
  *
+ * In addition to the pub/sub bus, the hostAPI carries the merged
+ * per-message action contributions for the room. RoomShell calls
+ * `_setMessageActions(list)` once it has resolved every component;
+ * subscribers (e.g. messages@1.0) call `getMessageActions()` to render
+ * the per-message menu. The setter is prefixed with `_` to signal that
+ * only RoomShell should call it — components must read, not write.
+ *
  * @returns {{
- *   publish:   (event: string, payload?: any) => void,
- *   subscribe: (event: string, handler: (payload?: any) => void) => () => void,
- *   _eventCount?: () => number,  // dev-only inspection helper
+ *   publish:           (event: string, payload?: any) => void,
+ *   subscribe:         (event: string, handler: (payload?: any) => void) => () => void,
+ *   getMessageActions: () => Array<{ id, label, componentId?, contributedBy?, [string]: any }>,
+ *   _setMessageActions:(list: Array<object>) => void,
+ *   _eventCount?:      () => number,
  * }}
  */
 export function createHostAPI() {
   /** @type {Map<string, Set<Function>>} */
   const handlers = new Map()
+  /** @type {Array<object>} */
+  let messageActions = []
 
   function subscribe(event, handler) {
     if (typeof event !== 'string' || event.length === 0) {
@@ -90,9 +101,20 @@ export function createHostAPI() {
     }
   }
 
+  function getMessageActions() {
+    // Return a defensive copy so callers can't mutate the shared list.
+    return messageActions.slice()
+  }
+
+  function _setMessageActions(list) {
+    messageActions = Array.isArray(list) ? list : []
+  }
+
   return {
     publish,
     subscribe,
+    getMessageActions,
+    _setMessageActions,
     _eventCount: () => handlers.size,
   }
 }

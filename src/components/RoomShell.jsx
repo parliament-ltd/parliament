@@ -50,10 +50,13 @@
 //     present in the room or render the declared fallbackUI. Target:
 //     PR-11a, when chart/table/summary canvas components need the
 //     "Add a File shelf component to provide data" empty state.
-//   - contributions.messageActions aggregation: components declare per-
-//     message menu items, but messages@1.0 does not yet collect them
-//     across the room and surface a unified menu. Target: PR-5, when
-//     highlights/notes/branches each ship a contribution.
+//   - contributions.messageActions aggregation: PR-5 wires this. RoomShell
+//     scans the resolved component list, collects every entry's
+//     `contributions.messageActions`, and exposes the merged list on
+//     hostAPI as `getMessageActions()`. messages@1.0 reads it to render
+//     the per-message menu. Each item carries the contributing
+//     componentId so handlers can route back to the owning component
+//     when /chat/:id moves through RoomShell at PR-10a.
 
 import { useMemo } from 'react'
 import { getEntry as getComponentEntry } from '../catalog'
@@ -117,6 +120,7 @@ export default function RoomShell({ mode, hostAPI: hostAPIProp }) {
   const declaredSlotIds = new Set(layoutEntry.slots.map(s => s.id))
   const slotContents = {}
   const skipped = []
+  const messageActions = []
 
   // Sort first so insertion order into slotContents reflects component order.
   const ordered = [...(mode.components || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
@@ -135,6 +139,23 @@ export default function RoomShell({ mode, hostAPI: hostAPIProp }) {
       skipped.push({ id: spec.id, reason: `slot '${spec.slot}' not declared by ${layoutRef}` })
       continue
     }
+
+    // Collect message-action contributions. Stamp each with the contributing
+    // componentId + ref so handlers (wired at PR-10a) can route back to the
+    // owning component. Components are iterated in `order`, so the resulting
+    // menu reflects authoring order — predictable for mode-file authors.
+    const acts = entry.contributions?.messageActions
+    if (Array.isArray(acts)) {
+      for (const a of acts) {
+        if (!a || !a.id) continue
+        messageActions.push({
+          ...a,
+          componentId: spec.id,
+          contributedBy: normalizeRef(spec.ref),
+        })
+      }
+    }
+
     if (!slotContents[spec.slot]) slotContents[spec.slot] = []
     // Mount the render function as a React component (via JSX) rather than
     // invoking it imperatively, so entries are free to use hooks internally.
@@ -148,6 +169,13 @@ export default function RoomShell({ mode, hostAPI: hostAPIProp }) {
       />
     )
   }
+
+  // Publish the merged action list onto the room's hostAPI so any
+  // subscriber (notably messages@1.0's per-message menu) can read it
+  // via hostAPI.getMessageActions(). Setting on the same hostAPI
+  // instance keeps the object reference stable across re-renders, so
+  // components subscribing to bus events don't re-bind their handlers.
+  hostAPI._setMessageActions?.(messageActions)
 
   if (skipped.length > 0 && import.meta.env.DEV) {
     console.warn(
