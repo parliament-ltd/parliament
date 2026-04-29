@@ -1,4 +1,4 @@
-// Dev-only Room demo + Bus inspector (PR-3).
+// Dev-only Room demo + Bus inspector (PR-3 / PR-5).
 //
 // Mounts a <RoomShell> against the hand-built three-panel demo mode, and
 // renders a sibling Bus inspector that subscribes to the same hostAPI.
@@ -7,6 +7,13 @@
 // "bus publish/subscribe works between two components in the same room"
 // exit criterion: publisher (button) and subscriber (inspector) share
 // one room-scoped hostAPI instance.
+//
+// PR-5 adds a "Message actions" sub-panel that reads the merged
+// per-message action list from hostAPI.getMessageActions() — showing
+// every contribution declared by the components in the active mode.
+// This makes the contributions wiring visible without needing
+// messages@1.0 to render the menu UI yet (that lands at PR-10a when
+// /chat/:id moves through RoomShell).
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import RoomShell from '../components/RoomShell'
@@ -36,8 +43,41 @@ export default function RoomDemo() {
         <RoomShell mode={THREE_PANEL_DEMO_MODE} hostAPI={hostAPI} />
       </div>
 
+      <MessageActionsInspector hostAPI={hostAPI} />
       <BusInspector hostAPI={hostAPI} />
     </section>
+  )
+}
+
+function MessageActionsInspector({ hostAPI }) {
+  // RoomShell calls _setMessageActions during its render, which precedes
+  // this sibling's render in the parent's JSX order, so we always get
+  // the populated list on first paint.
+  const actions = hostAPI.getMessageActions ? hostAPI.getMessageActions() : []
+
+  return (
+    <div className="mt-5 pt-5 border-t border-[var(--p-border-subtle)]">
+      <div className="flex items-baseline justify-between mb-3">
+        <p className={HEADER_LABEL_CLS}>Message actions</p>
+        <span className="text-xs text-[var(--p-text-muted)]">
+          {actions.length} contribution{actions.length === 1 ? '' : 's'} merged from active components
+        </span>
+      </div>
+      {actions.length === 0 ? (
+        <p className="text-xs text-[var(--p-text-muted)]">
+          No components in the active mode contribute message actions.
+        </p>
+      ) : (
+        <ul className="space-y-1 text-xs font-mono bg-[var(--p-code-bg,#F7F6F3)] rounded p-3">
+          {actions.map((a, i) => (
+            <li key={`${a.contributedBy}-${a.id}-${i}`} className="text-[var(--p-text-primary)]">
+              <span className="text-[var(--p-accent-gold,#B8A070)]">{a.label}</span>{' '}
+              <span className="text-[var(--p-text-muted)]">— {a.contributedBy}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   )
 }
 

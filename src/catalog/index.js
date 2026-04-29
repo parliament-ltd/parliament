@@ -21,9 +21,16 @@
 // shape. The two layers reference the same `name@version` refs but serve
 // different concerns and never share storage.
 
-import messagesEntry from './entries/messages'
-import inputEntry    from './entries/input'
-import tocEntry      from './entries/toc'
+import messagesEntry   from './entries/messages'
+import inputEntry      from './entries/input'
+import tocEntry        from './entries/toc'
+import highlightsEntry from './entries/highlights'
+import notesEntry      from './entries/notes'
+import branchesEntry   from './entries/branches'
+import contextEntry    from './entries/context'
+import collabModeEntry from './entries/collab-mode'
+import reviewEntry     from './entries/review'
+import voiceInputEntry from './entries/voice-input'
 import { validateManifest, entryRef } from './validate'
 
 const REGISTRY = new Map()
@@ -47,6 +54,13 @@ function register(entry) {
 register(messagesEntry)
 register(inputEntry)
 register(tocEntry)
+register(highlightsEntry)
+register(notesEntry)
+register(branchesEntry)
+register(contextEntry)
+register(collabModeEntry)
+register(reviewEntry)
+register(voiceInputEntry)
 
 /**
  * Look up a manifest entry by `name@version` ref. Exact-match only in PR-2;
