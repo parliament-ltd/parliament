@@ -367,7 +367,7 @@ function byteSize(str) {
 
 // ─── Conversations ───────────────────────────────────────
 
-export async function createConversation({ title = 'New Conversation', model = 'claude-sonnet', parentId = null, branchPoint = null, createdInMode = null } = {}) {
+export async function createConversation({ title = 'New Conversation', model = 'claude-sonnet', parentId = null, branchPoint = null, createdInMode = null, room = null } = {}) {
   const db = await initDB()
   const now = new Date().toISOString()
   const conversation = {
@@ -377,6 +377,12 @@ export async function createConversation({ title = 'New Conversation', model = '
     parentId,
     branchPoint,
     createdInMode,
+    // PR-10a.7: explicit `room` so V2 callers (notably the Compressed
+    // Summary branch path) can inherit the source's room mode and keep
+    // the new conversation routing through <RoomShell> instead of
+    // falling back to Albatross. Defaults to null for parity with
+    // pre-V2 callers.
+    room,
     pinned: false,
     storageBytes: 0,
     createdAt: now,
@@ -489,6 +495,11 @@ export async function createBranch(sourceConversationId, branchAtMessageId, opti
     parentTitle: source.title,
     familyId,
     branchPoint: branchAtMessageId,
+    // PR-10a.7: inherit the source's `room` so the new conversation
+    // routes through <RoomShell> like its parent. Pre-V2 sources have
+    // room: null and the new branch follows them — Albatross fallback
+    // stays consistent with the source's render path.
+    room: source.room ?? null,
     pinned: false,
     storageBytes: 0,
     createdAt: now,
