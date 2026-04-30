@@ -9,6 +9,7 @@ import { PWAProvider } from './stores/PWAContext'
 import ChatView from './views/ChatView'
 import SelectorView from './views/SelectorView'
 import SettingsView from './views/SettingsView'
+import HomepageView from './views/HomepageView'
 import ErrorBoundary from './components/ErrorBoundary'
 
 // Dev-only catalog inspection surface (PR-2). Lazy-imported and registered
@@ -37,7 +38,8 @@ export default function App() {
               <ChatProvider>
                 <BrowserRouter>
                   <Routes>
-                    <Route path="/" element={<ErrorBoundary inline><SelectorView /></ErrorBoundary>} />
+                    <Route path="/" element={<ErrorBoundary inline><HomepageView /></ErrorBoundary>} />
+                    <Route path="/chats" element={<ErrorBoundary inline><SelectorView /></ErrorBoundary>} />
                     <Route path="/chat/:id" element={<ErrorBoundary inline><ChatView /></ErrorBoundary>} />
                     <Route path="/settings" element={<ErrorBoundary inline><SettingsView /></ErrorBoundary>} />
                     {CatalogDebugView && (
