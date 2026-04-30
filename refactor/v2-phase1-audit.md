@@ -293,6 +293,61 @@ Each renders as a card with a "Coming soon" tag and target pills; click → read
 - **PWA install / SW update banners** — shell-level via PWAContext.
 - **CollabModal's Parrot Personas storage** — moves *with* `collab-mode@1.0`, not a separate component.
 
+### 2.8a Component data plumbing (the self-bind rule)
+
+The catalog manifest table in §2.3 says what each component wraps but
+not how the wrapper accesses live conversation data. The rule, recorded
+here so it doesn't keep slipping into "implementation detail" status:
+
+**Components that need active-conversation state self-bind via existing
+React contexts.** They call `useChat()`, `useConversations()`,
+`useSettings()` directly inside their render function. RoomShell does
+NOT plumb conversation data through props or hostAPI events.
+
+Why:
+- App.jsx mounts ConversationProvider / ChatProvider / SettingsProvider
+  around every route. Any RoomShell descendant is already inside those
+  providers and can subscribe.
+- Re-renders stay scoped per CLAUDE.md's state-management guidance — a
+  component that only reads `messages` doesn't re-render when streaming
+  state flips, etc.
+- The hostAPI bus stays small. Three Phase 1 events (`voice-transcript`,
+  `row-hover`, `file-context-changed`) are enough; we don't need a
+  `messages-changed` event to mirror state every component already
+  reaches via `useChat()`.
+
+What this means in practice for each component:
+
+| Component | What it self-binds to |
+|---|---|
+| `messages@1.0` | `useChat().messages`, `useChat().streamingContent`, `useChat().isStreaming`, `useConversations().activeConversationId`. Owns the per-message action menu surface; reads contributed actions off `hostAPI.getMessageActions()`. |
+| `input@1.0` | `useChat().sendMessage` / `stopGenerating` / `isStreaming`, `useSettings().defaultModel`, `loadApiKey()`. Subscribes to `voice-transcript` events on the bus when `subscribeToVoice` config is on. |
+| `branches@1.0` | `useChat().messages` for the branch picker, `useConversations()` for the branch list. Owns `BranchCreationPanel` modal. |
+| `highlights@1.0`, `notes@1.0`, `favorites@1.0` | Their respective IndexedDB read functions on mount of the active conversation, scoped state for the panel UI. |
+| `context@1.0` | `useChat().tokenUsage`, `useSettings().defaultModel`. |
+| `collab-mode@1.0` | `getSetting('parrot-personas')`, scoped active-presets state. Provides system prompt to active room via a small bus event TBD or via component-config-derived hook (decide at PR-10a.5). |
+| `review@1.0` | `useChat().messages`, plus the same hand-built provider call pattern Albatross uses today. |
+| `voice-input@1.0` | `useVoiceInput()` hook. Publishes `voice-transcript` to the bus. |
+
+**Conversation activation is the route shell's job.** When `/chat/:id`
+loads a conversation, the route calls `useChat().loadMessages(id)` and
+sets the API key. After that, every component reading `useChat()` sees
+the right messages without RoomShell knowing anything about the
+conversation. This activation lives in the same view that resolves the
+mode (currently `ChatView.jsx`) — not in RoomShell or in any catalog
+component.
+
+**Why the existing catalog renders are preview-shaped.** PR-2 / PR-3 /
+PR-5 wired the manifests and the `/catalog` debug surface, but their
+render functions take props the surface passes from sample data — the
+shims work for the debug route but show empty state under RoomShell on
+production routes. **PR-10a.5** rewrites the render functions to
+self-bind via hooks for the chat-essential components (messages, input,
+plus conversation activation in ChatView). Side-rail and modal
+components (branches, highlights, notes, context, collab-mode, review,
+voice-input) follow in subsequent slices ahead of PR-10b's adapter
+deletion.
+
 ### 2.9 Things that don't fit cleanly
 
 - **`pins` IndexedDB store** — used by branch-transfer "Pin for reference" flow. Stays as backing data for `branches@1.0`. Not a Persister-tier concern (Persister is reserved for cross-mode shared stores per architecture §5g).
@@ -437,6 +492,7 @@ CSP currently allows `connect-src 'self' https://api.anthropic.com`. Adding Olla
 - PR-8 — Three-rail editor (rooms + homepage editing).
 - PR-9 — Wizard + template gallery + ignition (5 available templates + 2 coming-soon).
 - PR-10a — Wire `/chat/:id` through `<RoomShell>` + `createdInMode → room` migration. Albatross still exists as fallback.
+- PR-10a.5 — Wire chat-essential catalog components (messages, input) to ChatContext + activate conversation in ChatView. First slice of the catalog-data plumbing work flagged by §2.8a.
 - PR-10b — Delete adapter directories (Albatross, Kingfisher, Starling) + remove InputArea built-in mic + rotate PWA cache + inject `voice-input@1.0` for migrated mobile users.
 - PR-11a — Decompose Pelican into 6 catalog components.
 - PR-11b — Decompose Secretarybird into 3 catalog components.

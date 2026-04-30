@@ -1,8 +1,10 @@
-// ChatView — `/chat/:id` route shell (PR-10a wiring).
+// ChatView — `/chat/:id` route shell.
 //
-// PR-10a wires this route through <RoomShell>: load the conversation,
+// PR-10a wired this route through <RoomShell>: load the conversation,
 // read `conversation.room`, load the matching mode file, render
-// RoomShell against it. The V1 mode-context adapter selection is gone.
+// RoomShell against it. PR-10a.5 added the conversation-activation
+// step so chat-essential catalog components (messages@1.0, input@1.0)
+// self-bind to ChatContext and see live data.
 //
 // ─── Albatross fallback ────────────────────────────────────────────────
 //
@@ -12,29 +14,35 @@
 // upgraded yet), `conversation.room` stays null and we render the V1
 // Albatross adapter. This is the recoverable state per
 // refactor/data-migration.md §"Rollback plan" — PR-10b is the point
-// of no return; PR-10a deliberately keeps Albatross intact.
+// of no return.
 //
 // We also fall back to Albatross when a room id IS set but the mode
 // file fails to load (deleted out from under the conversation, db
 // corruption, etc.). The failure mode is "user sees their chat in the
 // V1 shell" rather than "user sees a diagnostic stub" — a strictly
-// better outcome until the V2 chat shell wiring matures.
+// better outcome until the V2 chat shell wiring fully matures.
 //
-// ─── Known limitation: V2 catalog components are scaffold-shaped ───────
+// ─── Conversation activation (PR-10a.5) ────────────────────────────────
 //
-// The catalog entries this route renders via <RoomShell> (messages@1.0,
-// input@1.0, branches@1.0, highlights@1.0, notes@1.0, context@1.0)
-// currently use preview-shaped render functions. They display sample or
-// empty state rather than the live conversation. Full ChatContext
-// wiring is follow-up work between PR-10a's migration-validation
-// checkpoint and PR-10b's adapter deletion. See
-// refactor/phase-1-testing.md PR-10a section, "Known limitations".
+// When this route renders <RoomShell>, the catalog components inside
+// (messages@1.0, input@1.0) read live state from useChat() / the other
+// existing React contexts. For that to be the active conversation's
+// state, somebody has to call useChat().loadMessages(id) on entry and
+// useChat().clearMessages() on exit. That somebody is this view —
+// catalog components shouldn't know which conversation is open, just
+// that one IS open.
+//
+// The activation lives in <RoomShellChatHost> below so it only fires
+// on the RoomShell branch. The Albatross fallback runs its own
+// loadMessages call inside its mount effect (unchanged from V1) — no
+// double-load because the two branches never render simultaneously.
 
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import RoomShell from '../components/RoomShell'
 import { getConversation } from '../lib/db'
 import { loadMode } from '../lib/modes'
+import { useChat } from '../stores/ChatContext'
 
 const AlbatrossChatLayout = lazy(() => import('../adapters/albatross/ChatLayout'))
 
@@ -94,13 +102,62 @@ export default function ChatView() {
   // the V2 RoomShell path. Otherwise fall back to Albatross — that
   // covers: missing conversation (Albatross handles its own redirect),
   // null room (migration didn't map this record), and mode-load failure.
-  const useRoomShell = resolution.conversation && resolution.mode
-  if (useRoomShell) {
-    return <RoomShell mode={resolution.mode} />
+  const useRoomShellPath = resolution.conversation && resolution.mode
+  if (useRoomShellPath) {
+    return <RoomShellChatHost conversationId={id} mode={resolution.mode} />
   }
   return (
     <Suspense fallback={null}>
       <AlbatrossChatLayout />
     </Suspense>
   )
+}
+
+/**
+ * RoomShellChatHost — owns the conversation-activation lifecycle for
+ * the V2 RoomShell chat path.
+ *
+ * On mount / id change: load messages for the conversation into
+ * ChatContext so messages@1.0, input@1.0, and any other component that
+ * calls useChat() sees the right data without prop-drilling.
+ *
+ * On unmount: clear ChatContext so a stale message list doesn't
+ * briefly appear when the user opens a different conversation.
+ *
+ * `loaded` gates the RoomShell render until the first loadMessages
+ * resolves. This avoids the empty-state flash that messages@1.0 would
+ * otherwise show between mount and the first ChatContext update.
+ */
+function RoomShellChatHost({ conversationId, mode }) {
+  const { loadMessages, clearMessages, activeConversationId } = useChat()
+  // Track which id our completed loadMessages() call corresponds to.
+  // Comparing against the requested conversationId at render time gives
+  // us a "still loading" signal without setState-in-effect (which the
+  // react-hooks/set-state-in-effect lint rule flags). Same pattern as
+  // src/hooks/useMode.js.
+  const [loadedFor, setLoadedFor] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    loadMessages(conversationId).finally(() => {
+      if (!cancelled) setLoadedFor(conversationId)
+    })
+    return () => {
+      cancelled = true
+      // Clear on id change / unmount so the next mount starts clean.
+      // This also fires when the user navigates away from /chat/:id
+      // entirely, e.g. back to the homepage.
+      clearMessages()
+    }
+  }, [conversationId, loadMessages, clearMessages])
+
+  // Gate the render until loadMessages has resolved AND ChatContext's
+  // activeConversationId matches the route id. Either one being out of
+  // sync indicates a mid-transition state where messages@1.0 would
+  // render the previous conversation's data for one frame.
+  if (loadedFor !== conversationId || activeConversationId !== conversationId) {
+    return null
+  }
+
+  return <RoomShell mode={mode} />
 }

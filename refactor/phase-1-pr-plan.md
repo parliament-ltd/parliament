@@ -374,6 +374,30 @@
 
 ---
 
+### PR-10a.5 — Wire chat-essential catalog components to ChatContext
+
+**Goal:** Make `<RoomShell>` actually render a working chat — messages list, send/stop, ghost-text continue — for conversations whose migration assigned a room. Closes the gap that PR-2 / PR-5 left when they shipped catalog entries as "thin render shims around existing core/components" without saying how the shims access live conversation state.
+
+**Scope:**
+- Rewrite `messages@1.0` render function to self-bind to `useChat()` / `useConversations()` (per §2.8a "Component data plumbing"). Real messages render with MessageCard. Ghost text + Continue button surface for `incomplete: true` messages. Streaming content appears live inside the assistant placeholder.
+- Rewrite `input@1.0` render function to self-bind to `useChat()` + `useSettings()` + the provider abstraction. Send dispatches `useChat().sendMessage()`. Stop dispatches `stopGenerating()`. Voice-transcript bus subscription preserved from PR-5. The built-in cardLayout mic stays for V1 fallback (PR-10b removes it).
+- Update `ChatView.jsx` to activate the conversation in ChatContext when the route mounts: `loadMessages(id)`, set API key, expose system-prompt scaffolding (collab presets land in a later slice). The activation runs whether the route renders RoomShell or falls through to Albatross — Albatross continues calling `loadMessages` itself, so the redundant call is harmless.
+- Documentation: §2.8a in [v2-phase1-audit.md](v2-phase1-audit.md) captures the self-bind-via-hooks rule, this PR section captures the slice that lands first.
+- **Out of scope (next slices, before PR-10b):** branches, highlights, notes, context meter, collab-mode, review, voice-input, favorites, toc — all stay preview-shaped in this PR. Conversations whose migration left `room: null` continue to render via the V1 Albatross adapter; nothing in PR-10a.5 changes that path.
+
+**Dependencies:** PR-10a.
+
+**Exit criteria:**
+- Open a migrated conversation at `/chat/:id` → message history renders correctly via RoomShell. Sending a message persists, streams the assistant reply, and reaches `incomplete: false` on completion.
+- An interrupted `incomplete: true` message renders as ghost text with a Continue button that dispatches `continueMessage`.
+- Stop button aborts an in-flight stream cleanly.
+- Conversations with `room: null` continue to render via the Albatross adapter unchanged.
+- `npm run build` clean. No regressions in homepage / editor / wizard surfaces.
+
+**Risk:** Medium. The render-function rewrite is mechanical, but the conversation-activation lifecycle in ChatView has subtle ordering with ChatContext — wrong order leaves messages empty on first render or double-loads them. Mitigated by mirroring Albatross's existing init pattern.
+
+---
+
 ### PR-10b — Delete adapter directories + cleanup InputArea + rotate PWA cache
 
 **Goal:** Point of no return. V2 is the only path.
@@ -494,9 +518,9 @@
 | 0 | PR-0 | Documentation foundation (5 docs, no code) |
 | A | PR-1, PR-2, PR-3 | Foundation (no user-visible change) |
 | B | PR-4a, PR-4b, PR-5, PR-6, PR-7 | Visual system + new homepage + V2 backup |
-| C | PR-8, PR-8b, PR-9, PR-10a, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
+| C | PR-8, PR-8b, PR-9, PR-10a, PR-10a.5, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
 
-**Total: 17 PRs** including PR-0.
+**Total: 18 PRs** including PR-0.
 
 ## Pause points
 
