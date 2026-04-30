@@ -22,6 +22,7 @@ import EditorCanvas from '../components/editor/EditorCanvas'
 import EditorRightRail from '../components/editor/EditorRightRail'
 import EditorHoldingTray from '../components/editor/EditorHoldingTray'
 import EditorMigrationDialog from '../components/editor/EditorMigrationDialog'
+import EditorPreviewSheet from '../components/editor/EditorPreviewSheet'
 import {
   editorHistoryReducer,
   makeInitialHistoryState,
@@ -48,6 +49,7 @@ export default function EditorView({ scope = 'room' }) {
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState('')
   const [pendingLayoutSwap, setPendingLayoutSwap] = useState(null) // { layoutRef, plan }
+  const [previewOpen, setPreviewOpen] = useState(false)
 
   // ── Load the mode on mount ─────────────────────────────
   useEffect(() => {
@@ -252,6 +254,7 @@ export default function EditorView({ scope = 'room' }) {
           onDeviceClassChange={(deviceClass) => dispatch({ type: 'SET_DEVICE_CLASS', deviceClass })}
           onSchemeChange={(schemeRef) => dispatch({ type: 'APPLY_SCHEME', schemeRef })}
           onSave={handleSave}
+          onPreview={() => setPreviewOpen(true)}
         />
         <div className="grid grid-cols-[240px_1fr_300px] flex-1 min-h-0">
           <EditorLeftRail
@@ -299,6 +302,12 @@ export default function EditorView({ scope = 'room' }) {
             onConfirm={confirmMigration}
           />
         )}
+
+        <EditorPreviewSheet
+          open={previewOpen}
+          mode={state.mode}
+          onClose={() => setPreviewOpen(false)}
+        />
 
         {toast && (
           <div className="fixed bottom-5 left-1/2 -translate-x-1/2 bg-[var(--p-text-primary)] text-white px-4 py-2 rounded-md text-xs z-[200] shadow-lg">

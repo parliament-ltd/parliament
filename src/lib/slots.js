@@ -33,7 +33,9 @@ export const UNIVERSAL_SLOT_IDS = Object.freeze(Object.values(UNIVERSAL_SLOTS))
 export const LAYOUT_SPECIFIC_SLOTS = Object.freeze({
   CANVAS: 'canvas',                 // canvas-centric only
   CHAT_PANEL: 'chat-panel',         // canvas-centric, document-centric
+  INSPECTOR: 'inspector',           // canvas-centric only
   DOCUMENT: 'document',             // document-centric only
+  OUTLINE: 'outline',               // document-centric only
   MARGIN: 'margin',                 // document-centric only
   SHEET: 'sheet',                   // single-column-with-sheet only
   SECTION_SLOT: 'section-slot',     // stacked-sections only (homepage)

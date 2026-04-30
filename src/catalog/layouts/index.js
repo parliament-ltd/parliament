@@ -6,8 +6,11 @@
 // `name@version` ref. RoomShell looks up layouts here, never from
 // IndexedDB.
 
-import threePanel      from './three-panel'
-import stackedSections from './stacked-sections'
+import threePanel             from './three-panel'
+import stackedSections        from './stacked-sections'
+import canvasCentric          from './canvas-centric'
+import documentCentric        from './document-centric'
+import singleColumnWithSheet  from './single-column-with-sheet'
 import { validateLayoutManifest, layoutRef } from './validate'
 
 const REGISTRY = new Map()
@@ -21,13 +24,20 @@ function register(entry) {
   REGISTRY.set(layoutRef(entry), entry)
 }
 
-// Phase 1 layouts. PR-3 shipped `three-panel@1.0`; PR-6 adds
-// `stacked-sections@1.0` for the homepage. The remaining three available
-// layouts (`canvas-centric`, `document-centric`,
-// `single-column-with-sheet`) are seeded as catalog records by PR-1 and
-// gain runtime entries here in later PRs as their consuming surfaces land.
+// Phase 1 layouts.
+//   PR-3:  three-panel@1.0
+//   PR-6:  stacked-sections@1.0 (homepage)
+//   PR-9:  canvas-centric@1.0, document-centric@1.0,
+//          single-column-with-sheet@1.0 — the templates that default to
+//          these layouts also ship in PR-9, so the editor's labeled-grid
+//          fallback no longer applies to them.
+// Coming-soon catalog records (`reading-pane@1.0`, `split-view@1.0`)
+// remain seeded without runtime entries.
 register(threePanel)
 register(stackedSections)
+register(canvasCentric)
+register(documentCentric)
+register(singleColumnWithSheet)
 
 /**
  * Look up a layout entry by `name@version` ref. Exact-match in PR-3.

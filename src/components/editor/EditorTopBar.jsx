@@ -28,6 +28,7 @@ export default function EditorTopBar({
   onDeviceClassChange,
   onSchemeChange,
   onSave,
+  onPreview,
 }) {
   const name = mode?.meta?.name || 'Untitled room'
   const deviceClass = mode?.deviceClass || 'visual-pointer'
@@ -109,9 +110,9 @@ export default function EditorTopBar({
           </button>
         </div>
         <button
-          disabled
-          title="Preview launches with PR-9"
-          className="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--p-border-subtle)] bg-white text-[var(--p-text-muted)] cursor-not-allowed inline-flex items-center gap-1.5"
+          onClick={onPreview}
+          title="Preview the room (read-only)"
+          className="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--p-border)] bg-white text-[var(--p-text-secondary)] hover:border-[var(--p-gold-light)] hover:text-[var(--p-gold-light)] transition-colors inline-flex items-center gap-1.5"
         >
           <Eye className="w-3 h-3" />
           Preview

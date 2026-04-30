@@ -486,6 +486,82 @@ When editing a section component on `/edit-home`:
 
 ---
 
+## PR-9 — Wizard + template gallery + ignition + layout runtimes + Preview
+
+👀 User-visible. Largest single PR after PR-8 — exercises every builder path.
+
+**Surface:** `/build` (entry, gallery, wizard) and the editor's Preview button. Also the homepage's "+ Build a room" button (now wired) and the editor canvas (live-geometry now available for canvas-centric / document-centric / single-column-with-sheet).
+
+### Setup
+- A signed-in browser with at least one available template (the seed runs on every `initDB()` call).
+
+### Path A — homepage entry & template gallery
+
+- [ ] On `/`, the **+ Build a room** button is enabled (no longer disabled with a "PR-9" tooltip).
+- [ ] Clicking it routes to `/build`.
+- [ ] `/build` shows the breadcrumb "Build a room" in the topbar and the heading "What kind of room do you want to build?"
+- [ ] Five available templates appear: Writing Studio, Data Workspace, Drafting Desk, Pocket Chat, Quiet Room.
+- [ ] Two coming-soon templates appear with a "Coming soon" pill: Kingfisher, Starling.
+- [ ] Available cards have a colored icon tile; coming-soon cards are slightly faded.
+- [ ] Click a coming-soon card → a read-only preview overlay opens, with the description and a note about which layout it uses. No "use" button. Esc / X closes.
+- [ ] Click an available card (e.g. Writing Studio) → routes to `/edit/:newId` with the editor open on the new room. The room name matches the template's display name. The mode persists in IndexedDB.
+- [ ] Re-navigate to `/build` after using a template → the same gallery shows; the previously-instantiated room is NOT mutated by re-clicking the same template (each click makes a fresh room).
+
+### Path B — wizard
+
+- [ ] On the entry screen, the **"Take the 30-second wizard"** button advances to step 2.
+- [ ] Stepper at the top shows seven dots; the current one is gold-filled, completed ones are muted-gold, pending ones are grey.
+- [ ] Clicking a past stepper dot jumps back to that step. Clicking a future dot does nothing.
+- [ ] **Step 2 (Purpose):** five choices (Writing, Data analysis, Document drafting, Quick chat, Custom). Picking one highlights it; "Next" is disabled until a pick is made.
+- [ ] **Step 3 (Device):** Desktop and Mobile. Defaults to Desktop. Picking Mobile resets any layout override.
+- [ ] **Step 4 (Density + layout reveal):** three density choices. The Layout reveal box shows the auto-derived layout based on purpose + device + density. "Pick a different one" reveals a layout picker with four room layouts; choosing "Custom" purpose forces the picker open.
+- [ ] **Step 5 (Features):** seven optional components (Highlights, Notes, Branches, Context meter, Voice input, Personas, Review). Features whose target slot doesn't exist in the chosen layout are disabled with "Not available in this layout". Toggling adds/removes from the config.
+- [ ] **Step 6 (Name + scheme):** name field is required to advance. Six color schemes selectable; defaults to Parliament.
+- [ ] **Step 7 (Ignition):** if no API key, button reads "Add API key in Settings" and routes to `/settings`. With a key, button reads "Ignite & open in editor"; clicking it triggers a brief gold shimmer pulse, then routes to `/edit/:newId`.
+
+### "Open in editor" escape (step 3+)
+
+- [ ] On steps 3, 4, 5, and 6, the footer shows an **"Open in editor"** button alongside Back / Next.
+- [ ] Clicking it instantiates a mode using whatever's in the wizard config (filling defaults for unset fields) and routes to `/edit/:newId`.
+- [ ] Step 1 and 2 do NOT show "Open in editor".
+
+### Path identity check
+
+- [ ] Pick a template via gallery → note its components / layout / scheme.
+- [ ] Take the wizard with the matching purpose / device / density / features → the resulting mode file has the same layout, scheme, and component shape (component ids will differ; structure must match).
+- [ ] Both paths persist mode files in IndexedDB; both can be re-opened from the editor without manual re-creation.
+
+### Preview button
+
+- [ ] In the editor (`/edit/:roomId` or `/edit-home`), the Preview button is enabled (no PR-9 tooltip).
+- [ ] Clicking it opens a side sheet from the right with a read-only RoomShell render of the current draft.
+- [ ] The sheet displays the room name in the header and a "Read-only preview — interactions are disabled" note in the footer.
+- [ ] Esc closes the sheet. Clicking the backdrop closes it. Clicking inside doesn't close it.
+- [ ] Unsaved edits in the editor show up in the preview without requiring a save (in-memory draft is what RoomShell renders).
+- [ ] Pointer events on the inner RoomShell are disabled — clicking message components does nothing.
+
+### Live-geometry layouts in the editor canvas
+
+- [ ] Open the editor with a Data Workspace room → the canvas shows the canvas-centric live geometry, not the labeled-grid fallback.
+- [ ] Open the editor with a Drafting Desk room → document-centric live geometry.
+- [ ] Open the editor with a Pocket Chat room → single-column-with-sheet live geometry (narrower, mobile-shaped).
+- [ ] Coming-soon layouts (Kingfisher, Starling) still trigger the labeled-grid fallback if a user manually swaps to them — those don't ship runtime entries in PR-9.
+
+### Edge cases
+
+- [ ] Wizard layout-reveal: choosing Mobile + any purpose ALWAYS yields single-column-with-sheet (overrides purpose-derived layout).
+- [ ] Wizard layout-reveal: choosing Custom yields no auto-layout — picker stays open until user makes a choice. "Next" stays disabled.
+- [ ] Features step: switching layouts after picking features does NOT silently drop incompatible features from the config — they remain in the config but are excluded from the final mode if their slot isn't in the layout. (Implementation detail: deferred prune happens at conversion.)
+- [ ] Reload mid-wizard: state is in-memory only; the wizard restarts at step 1. (Documented as expected — no draft persistence in PR-9.)
+
+### Known limitations to verify (and not flag as bugs)
+
+- [ ] Coming-soon templates point at coming-soon layouts (`reading-pane@1.0`, `split-view@1.0`) which have catalog records but no runtime entries — preview is informational only.
+- [ ] Drafting Desk and Data Workspace ship as functional skeletons (chat panel + input). Document canvas (PR-11b) and file shelf / chart canvas (PR-11a) fill in those layouts in later PRs.
+- [ ] Wizard ignition uses the existing `useShimmer` hook for a brief gold pulse; there is no full power-on cascade like the V1 first-run experience.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

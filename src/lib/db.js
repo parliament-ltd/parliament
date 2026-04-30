@@ -1,6 +1,7 @@
 import { openDB } from 'idb'
 import { validateBackup } from './validate'
 import { SCHEMES } from './schemes'
+import { seedLibraryRooms } from './seedTemplates'
 
 const DB_NAME = 'parliament'
 const DB_VERSION = 4
@@ -112,6 +113,7 @@ export async function initDB() {
 async function seedLibraryDefaults(db) {
   await seedLibraryLayouts(db)
   await seedLibrarySchemes(db)
+  await seedLibraryRooms(db)
   await seedHomepageMode(db)
 }
 
