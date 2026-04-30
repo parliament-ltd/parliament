@@ -4,12 +4,15 @@
 //   Parliament mark | breadcrumb slot | Edit homepage | + Build a room
 //   | settings gear | Backup & Restore
 //
-// "Edit homepage" and "+ Build a room" are placeholders here — they get
-// wired up at PR-8 and PR-9 respectively. They render disabled with a
-// "coming soon" tooltip so the topbar shape is final from PR-6 onward.
+// "+ Build a room" is a placeholder here — gets wired at PR-9. It
+// renders disabled with a "coming soon" tooltip so the topbar shape is
+// final from PR-6 onward.
 //
 // Backup & Restore landed at PR-7: the icon button opens the modal; a
 // status indicator (gold/amber/red dot per backup age) sits next to it.
+//
+// Edit homepage landed at PR-8: routes to the three-rail editor at
+// /edit-home, which loads the user's homepage mode for editing.
 
 import { Settings as SettingsIcon, Database } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -30,7 +33,7 @@ const PARLIAMENT_MARK_PATH = (
 )
 
 const BTN_BASE = 'px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors'
-const BTN_DISABLED = `${BTN_BASE} border-[var(--p-border-subtle)] bg-white text-[var(--p-text-muted)] cursor-not-allowed`
+const BTN_DEFAULT = `${BTN_BASE} border-[var(--p-border)] bg-white text-[var(--p-text-secondary)] hover:border-[var(--p-gold-light)] hover:text-[var(--p-gold-light)]`
 const BTN_PRIMARY_DISABLED = `${BTN_BASE} border-[var(--p-accent-gold,#B8A070)] bg-[var(--p-accent-gold,#B8A070)] text-white opacity-60 cursor-not-allowed`
 
 const ICON_BTN_BASE = 'inline-flex items-center justify-center w-8 h-8 rounded-lg border transition-colors'
@@ -57,9 +60,9 @@ export default function HomepageTopBar({ breadcrumb }) {
 
       <button
         type="button"
-        disabled
-        title="Editor coming soon (PR-8)"
-        className={BTN_DISABLED}
+        onClick={() => navigate('/edit-home')}
+        title="Open the homepage in the editor"
+        className={BTN_DEFAULT}
       >
         Edit homepage
       </button>
