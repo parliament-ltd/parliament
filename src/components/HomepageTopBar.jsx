@@ -4,9 +4,9 @@
 //   Parliament mark | breadcrumb slot | Edit homepage | + Build a room
 //   | settings gear | Backup & Restore
 //
-// "+ Build a room" is a placeholder here — gets wired at PR-9. It
-// renders disabled with a "coming soon" tooltip so the topbar shape is
-// final from PR-6 onward.
+// + Build a room landed at PR-9: routes to /build, which surfaces the
+// template gallery + 7-step wizard. Both paths produce a fresh mode
+// file and route the user to /edit/:newId.
 //
 // Backup & Restore landed at PR-7: the icon button opens the modal; a
 // status indicator (gold/amber/red dot per backup age) sits next to it.
@@ -34,7 +34,7 @@ const PARLIAMENT_MARK_PATH = (
 
 const BTN_BASE = 'px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors'
 const BTN_DEFAULT = `${BTN_BASE} border-[var(--p-border)] bg-white text-[var(--p-text-secondary)] hover:border-[var(--p-gold-light)] hover:text-[var(--p-gold-light)]`
-const BTN_PRIMARY_DISABLED = `${BTN_BASE} border-[var(--p-accent-gold,#B8A070)] bg-[var(--p-accent-gold,#B8A070)] text-white opacity-60 cursor-not-allowed`
+const BTN_PRIMARY = `${BTN_BASE} border-[var(--p-accent-gold,#B8A070)] bg-[var(--p-accent-gold,#B8A070)] text-white hover:bg-[var(--p-gold-muted)] hover:border-[var(--p-gold-muted)]`
 
 const ICON_BTN_BASE = 'inline-flex items-center justify-center w-8 h-8 rounded-lg border transition-colors'
 const ICON_BTN_DEFAULT = `${ICON_BTN_BASE} border-[var(--p-border)] bg-white text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] hover:border-[var(--p-accent-gold,#B8A070)]`
@@ -69,9 +69,9 @@ export default function HomepageTopBar({ breadcrumb }) {
 
       <button
         type="button"
-        disabled
-        title="Builder coming soon (PR-9)"
-        className={BTN_PRIMARY_DISABLED}
+        onClick={() => navigate('/build')}
+        title="Build a new room"
+        className={BTN_PRIMARY}
       >
         + Build a room
       </button>

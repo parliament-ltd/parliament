@@ -12,6 +12,7 @@ import SelectorView from './views/SelectorView'
 import SettingsView from './views/SettingsView'
 import HomepageView from './views/HomepageView'
 import EditorView from './views/EditorView'
+import BuildView from './views/BuildView'
 import ErrorBoundary from './components/ErrorBoundary'
 
 // Dev-only catalog inspection surface (PR-2). Lazy-imported and registered
@@ -47,6 +48,7 @@ export default function App() {
                     <Route path="/settings" element={<ErrorBoundary inline><SettingsView /></ErrorBoundary>} />
                     <Route path="/edit/:roomId" element={<ErrorBoundary inline><EditorView scope="room" /></ErrorBoundary>} />
                     <Route path="/edit-home" element={<ErrorBoundary inline><EditorView scope="homepage" /></ErrorBoundary>} />
+                    <Route path="/build" element={<ErrorBoundary inline><BuildView /></ErrorBoundary>} />
                     {CatalogDebugView && (
                       <Route
                         path="/catalog"
