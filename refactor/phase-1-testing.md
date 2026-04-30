@@ -720,6 +720,135 @@ anything else:
 
 ---
 
+## PR-10a.5 — Wire chat-essential catalog components to ChatContext
+
+👀 User-visible. First slice of catalog data plumbing per
+[v2-phase1-audit.md](v2-phase1-audit.md) §2.8a "Component data plumbing".
+
+**Surface:** `/chat/:id` for any conversation whose `room` is non-null
+(i.e. the migration assigned a Writing Studio / Pocket Chat / etc.
+mode in PR-10a). Conversations with `room: null` continue to render
+via the V1 Albatross adapter — unchanged from PR-10a.
+
+### Setup
+
+- A migrated conversation pointing at a Writing Studio mode (or any
+  room mode whose components include `messages@1.0` + `input@1.0`).
+  `pocket-chat`, `data-workspace`, `drafting-desk`, `quiet-room` all
+  qualify — they all seed those two components.
+- An API key configured in Settings (only required for the actual-send
+  path; the inline-error path can be tested without one).
+
+### Routing — V2 RoomShell path
+
+- [ ] Open a migrated conversation. The page renders the V2 RoomShell
+  layout (no Albatross sidebar / no `[data-tour="chat-actions"]`
+  anchor). The mode's layout slots are visible.
+- [ ] Brief loading flash before messages appear is OK (RoomShell
+  gates the render until `loadMessages()` resolves).
+- [ ] No flash of empty-state text inside `messages@1.0` — the gate
+  prevents that.
+
+### Messages list — live render
+
+- [ ] Existing messages render with their content, user/assistant
+  styling, and a per-role index counter (#1, #2, ...).
+- [ ] Messages are sorted chronologically (oldest first).
+- [ ] Markdown formatting works (headings, lists, code fences,
+  fenced charts via the embedded `chart` language).
+- [ ] Auto-scroll to the bottom on initial load.
+- [ ] Hover a message — copy / favorite / note / branch / delete /
+  more icons appear. Copy works (writes to clipboard). The other
+  icons are no-op for now (next slice — see "Known limitations").
+
+### Send — happy path
+
+- [ ] Type a message in the input. Click Send.
+- [ ] User message appears immediately with #N counter.
+- [ ] Assistant placeholder appears beneath it. Streaming content
+  fills in live.
+- [ ] On completion, the assistant message reaches `incomplete: false`
+  in IndexedDB. (DevTools → `messages` store, find the latest record.)
+- [ ] Auto-scroll keeps the bottom visible during streaming.
+- [ ] After the stream finishes the input is empty and the conversation
+  title regenerates if it was the first user→assistant exchange (PR-9
+  metadata generation still fires).
+
+### Stop — abort an in-flight stream
+
+- [ ] During streaming, the Send button transforms to a Stop button.
+- [ ] Click Stop. The stream aborts.
+- [ ] The partial assistant message persists with `incomplete: true`
+  (DevTools confirms).
+
+### Ghost-text Continue
+
+- [ ] An existing `incomplete: true` message in IndexedDB renders with
+  ghost text (50-60% opacity, dashed border around the card).
+- [ ] A "Continue" button appears beneath the ghost message.
+- [ ] Click Continue. `continueMessage` dispatches; the message heals
+  in real time as new content streams in. On completion the dashed
+  border becomes solid and `incomplete` flips to false.
+
+### Send — no-API-key path
+
+- [ ] Clear the encrypted API key from Settings (or open in a fresh
+  Parliament with no key set yet).
+- [ ] Type a message and click Send.
+- [ ] Inline error appears above the input: "No API key configured.
+  Add one in Settings to continue."
+- [ ] Typed text is preserved in the input (not cleared).
+- [ ] Editing the input clears the inline error.
+
+### Send — offline / rate limit
+
+- [ ] DevTools → Network → Offline. Click Send. Inline error: "You're
+  offline. Reconnect to send."
+- [ ] Inline rate-limit error surfaces if the API returns 429 (hard to
+  reproduce on demand; flag for spot-check).
+
+### Conversation switching
+
+- [ ] Open conversation A. Note which messages render.
+- [ ] Navigate to conversation B (different `id`, also migrated to a
+  V2 room). Messages cleanly transition: A's messages disappear,
+  B's messages appear. No briefly-visible mix of both.
+- [ ] Navigate back to A — A's messages reappear.
+
+### Albatross fallback unchanged
+
+- [ ] Open a conversation with `room: null` (you can synth-edit one in
+  DevTools → IndexedDB). The Albatross adapter renders, including its
+  full sidebar / actions / context-health rails. Send works as in V1.
+- [ ] Ghost-text messages still render correctly under Albatross.
+
+### Known limitations to verify (and not flag as bugs)
+
+- [ ] **Side-rail components still preview-shaped.** `branches@1.0`,
+  `highlights@1.0`, `notes@1.0`, `context@1.0`, `collab-mode@1.0`,
+  `review@1.0`, `voice-input@1.0`, `favorites@1.0`, and `toc@1.0`
+  continue to render their PR-2 / PR-5 preview state inside RoomShell.
+  The right-rail context meter shows zeros, the left rail's branch
+  list shows "Main Thread" generically, etc. These wire in subsequent
+  PR-10a.5 slices ahead of PR-10b's adapter deletion.
+- [ ] **Per-message action icons are no-op (except copy).** Branch /
+  delete / favorite / note / move-to-branch / hide all do nothing
+  yet. The icons render so the layout is correct; click handlers
+  arrive with the side-rail components that own those actions.
+- [ ] **Tool toggles in the +menu are visible but inactive.** Web
+  search, calculate, create_chart can be opened via the +menu but
+  toggling them has no effect on the next send. Albatross fallback
+  still drives tools end-to-end.
+- [ ] **Collab-mode system prompts ignored.** Sends in the V2 path
+  don't carry a system prompt. Users wanting persona presets can
+  open the conversation under the Albatross fallback (set
+  `room: null` in DevTools) until `collab-mode@1.0` wires up.
+- [ ] **Mid-conversation key-failure / rate-limit banners** appear as
+  small inline errors above the input rather than the V1 banner
+  pattern. Functionally equivalent; visual treatment lands later.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

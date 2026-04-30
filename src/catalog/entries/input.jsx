@@ -10,8 +10,16 @@
 // voice-input@1.0, the publisher. The built-in mic button on the
 // underlying InputArea (cardLayout-only) stays for V1 fallback and is
 // removed at PR-10b.
+//
+// PR-10a.5: render is a self-binding component (InputRender) that calls
+// useChat().sendMessage / stopGenerating directly per
+// refactor/v2-phase1-audit.md §2.8a "Component data plumbing". The
+// catalog debug surface (/catalog) keeps using InputPreview which has
+// its own value state and a no-op send — that route doesn't have an
+// active conversation in scope so a real send would have nowhere to land.
 
 import InputPreview from './input-preview'
+import InputRender from './input-render'
 
 export default {
   name: 'input',
@@ -44,9 +52,9 @@ export default {
     },
   },
 
-  // Same self-contained wrapper for both — input has internal value state
-  // when no controlled value/onChange are passed, which RoomShell exercises
-  // until ChatContext plumbing arrives in a later PR.
-  render: InputPreview,
+  // Production render — self-binds to ChatContext (PR-10a.5).
+  // previewRender stays self-contained for the dev /catalog route where
+  // there's no active conversation in scope.
+  render: InputRender,
   previewRender: InputPreview,
 }
