@@ -256,29 +256,98 @@ async function seedLibrarySchemes(db) {
  *
  * Constants below mirror src/lib/modes.js — keep in sync if either changes.
  */
+// PR-6: the homepage mode now ships with four default sections —
+// Blueprint, Chats, Library, Favorites. The seed populates them when
+// it creates `home_default`, AND tops up the components array if an
+// existing `home_default` (from a fresh PR-1 install) still has empty
+// components. Once PR-8's editor lets users edit the homepage, the
+// top-up condition becomes irrelevant — by then every saved homepage
+// has at least one component the user added.
+const HOMEPAGE_DEFAULT_COMPONENTS = [
+  {
+    id: 'home-section-blueprint',
+    ref: 'blueprint@^1.0',
+    slot: 'section-slot',
+    order: 0,
+    essential: true,
+    config: {
+      section: { title: 'Your rooms', meta: 'Hover a chat row to spotlight its room' },
+    },
+  },
+  {
+    id: 'home-section-chats',
+    ref: 'chats@^1.0',
+    slot: 'section-slot',
+    order: 1,
+    essential: true,
+    config: {
+      section: { title: 'Chats', meta: 'Browse your history across rooms' },
+      defaultView: 'summary',
+      publishHoverEvents: true,
+    },
+  },
+  {
+    id: 'home-section-library',
+    ref: 'library@^1.0',
+    slot: 'section-slot',
+    order: 2,
+    essential: false,
+    config: {
+      section: { title: 'Library', meta: 'Rooms, parts, and guides' },
+      defaultTab: 'rooms',
+    },
+  },
+  {
+    id: 'home-section-favorites',
+    ref: 'favorites@^1.0',
+    slot: 'section-slot',
+    order: 3,
+    essential: false,
+    config: {
+      section: { title: 'Favorites', meta: 'Saved snippets across conversations' },
+    },
+  },
+]
+
 async function seedHomepageMode(db) {
   const existing = await db.getAllFromIndex('modes', 'scope', 'homepage')
-  if (existing.length > 0) return
-
   const now = new Date().toISOString()
-  await db.put('modes', {
-    id: 'home_default',
-    schema: 'parliament-mode/1.0',
-    parliamentVersion: '0.4.0',
-    scope: 'homepage',
-    meta: {
-      name: 'Home',
-      description: 'Default homepage. Components seeded by PR-6.',
-      created: now,
-      modified: now,
-    },
-    layout: { ref: 'stacked-sections@^1.0' },
-    scheme: { ref: 'parliament@^1.0' },
-    components: [],
-    pipelines: [],
-    requestedPermissions: [],
-    buildIntent: null,
-  })
+
+  if (existing.length === 0) {
+    await db.put('modes', {
+      id: 'home_default',
+      schema: 'parliament-mode/1.0',
+      parliamentVersion: '0.5.0',
+      scope: 'homepage',
+      meta: {
+        name: 'Home',
+        description: 'Default homepage. Four sections out of the box.',
+        created: now,
+        modified: now,
+      },
+      layout: { ref: 'stacked-sections@^1.0' },
+      scheme: { ref: 'parliament@^1.0' },
+      components: HOMEPAGE_DEFAULT_COMPONENTS,
+      pipelines: [],
+      requestedPermissions: [],
+      buildIntent: null,
+    })
+    return
+  }
+
+  // Top-up: a home_default record from PR-1 has empty `components`. Fill
+  // it in so the new homepage has its four default sections without
+  // requiring users to clear their browser data. Untouched if the user
+  // (or a later PR) populated components already.
+  const home = existing.find(m => m.id === 'home_default') || existing[0]
+  if (Array.isArray(home.components) && home.components.length === 0) {
+    await db.put('modes', {
+      ...home,
+      components: HOMEPAGE_DEFAULT_COMPONENTS,
+      parliamentVersion: '0.5.0',
+      meta: { ...(home.meta || {}), modified: now },
+    })
+  }
 }
 
 // ─── ID Generation ───────────────────────────────────────
