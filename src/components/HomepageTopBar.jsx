@@ -4,13 +4,17 @@
 //   Parliament mark | breadcrumb slot | Edit homepage | + Build a room
 //   | settings gear | Backup & Restore
 //
-// "Edit homepage", "+ Build a room", and "Backup & Restore" are
-// placeholders here — they get wired up at PR-8, PR-9, and PR-7
-// respectively. They render disabled with a "coming soon" tooltip so
-// the topbar shape is final from PR-6 onward.
+// "Edit homepage" and "+ Build a room" are placeholders here — they get
+// wired up at PR-8 and PR-9 respectively. They render disabled with a
+// "coming soon" tooltip so the topbar shape is final from PR-6 onward.
+//
+// Backup & Restore landed at PR-7: the icon button opens the modal; a
+// status indicator (gold/amber/red dot per backup age) sits next to it.
 
 import { Settings as SettingsIcon, Database } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useBackup } from '../stores/BackupContext'
+import BackupStatusIndicator from './BackupStatusIndicator'
 
 const PARLIAMENT_MARK_PATH = (
   <svg width="18" height="16" viewBox="0 0 26 24" fill="none" aria-hidden="true">
@@ -26,16 +30,15 @@ const PARLIAMENT_MARK_PATH = (
 )
 
 const BTN_BASE = 'px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors'
-const BTN_DEFAULT = `${BTN_BASE} border-[var(--p-border)] bg-white text-[var(--p-text-primary)]`
 const BTN_DISABLED = `${BTN_BASE} border-[var(--p-border-subtle)] bg-white text-[var(--p-text-muted)] cursor-not-allowed`
 const BTN_PRIMARY_DISABLED = `${BTN_BASE} border-[var(--p-accent-gold,#B8A070)] bg-[var(--p-accent-gold,#B8A070)] text-white opacity-60 cursor-not-allowed`
 
 const ICON_BTN_BASE = 'inline-flex items-center justify-center w-8 h-8 rounded-lg border transition-colors'
 const ICON_BTN_DEFAULT = `${ICON_BTN_BASE} border-[var(--p-border)] bg-white text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] hover:border-[var(--p-accent-gold,#B8A070)]`
-const ICON_BTN_DISABLED = `${ICON_BTN_BASE} border-[var(--p-border-subtle)] bg-white text-[var(--p-text-muted)] cursor-not-allowed`
 
 export default function HomepageTopBar({ breadcrumb }) {
   const navigate = useNavigate()
+  const { openBackup } = useBackup()
 
   return (
     <div className="flex items-center gap-3 px-6 py-3 bg-white border-b border-[var(--p-border)]">
@@ -49,6 +52,8 @@ export default function HomepageTopBar({ breadcrumb }) {
       </div>
 
       <div className="flex-1" />
+
+      <BackupStatusIndicator />
 
       <button
         type="button"
@@ -70,9 +75,9 @@ export default function HomepageTopBar({ breadcrumb }) {
 
       <button
         type="button"
-        disabled
-        title="Backup & restore coming soon (PR-7)"
-        className={ICON_BTN_DISABLED}
+        onClick={() => openBackup('backup')}
+        title="Backup & restore (Cmd+Shift+B)"
+        className={ICON_BTN_DEFAULT}
         aria-label="Backup & restore"
       >
         <Database className="w-4 h-4" />

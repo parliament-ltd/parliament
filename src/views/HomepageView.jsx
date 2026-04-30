@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import RoomShell from '../components/RoomShell'
 import HomepageTopBar from '../components/HomepageTopBar'
+import BackupReminderBanner from '../components/BackupReminderBanner'
 import { loadHomepageMode } from '../lib/modes'
 import { loadApiKey } from '../lib/crypto'
 import { getSetting } from '../lib/db'
@@ -53,6 +54,9 @@ export default function HomepageView() {
   return (
     <div className="min-h-screen bg-[var(--p-bg-base)]">
       <HomepageTopBar />
+      <div className="max-w-[1100px] mx-auto px-5 pt-6">
+        <BackupReminderBanner />
+      </div>
       {mode ? (
         <RoomShell mode={mode} />
       ) : (

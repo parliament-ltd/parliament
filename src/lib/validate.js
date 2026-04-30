@@ -99,6 +99,32 @@ function validateSetting(item) {
   return null
 }
 
+// ─── File / file_data validators ─────────────────────────
+// V2 closes the V1 gap by including `files` and `file_data` in backups
+// (see refactor/phase-1-pr-plan.md PR-7). Validators are kept light:
+// the binary data field is opaque (ArrayBuffer or Uint8Array), and only
+// presence is checked.
+
+function isBinary(v) {
+  return v instanceof ArrayBuffer || ArrayBuffer.isView(v)
+}
+
+function validateFile(item) {
+  if (!isId(item.id))                 return 'file.id invalid'
+  if (!isId(item.conversationId))     return 'file.conversationId invalid'
+  if (!isString(item.name, 500))      return 'file.name invalid'
+  if (!isString(item.type, 200))      return 'file.type invalid'
+  if (!isNumber(item.sizeBytes))      return 'file.sizeBytes must be a number'
+  if (!isISODate(item.uploadedAt))    return 'file.uploadedAt invalid date'
+  return null
+}
+
+function validateFileData(item) {
+  if (!isId(item.fileId))             return 'file_data.fileId invalid'
+  if (!isBinary(item.data))           return 'file_data.data must be binary'
+  return null
+}
+
 // ─── V1 store validator (pre-V2 gap closed in PR-1) ──────
 
 function validateSbrdDocument(item) {
@@ -187,6 +213,8 @@ const VALIDATORS = {
   pins:              validatePin,
   settings:          validateSetting,
   sbrd_documents:    validateSbrdDocument,
+  files:             validateFile,
+  file_data:         validateFileData,
   modes:             validateMode,
   libraryLayouts:    validateLibraryLayout,
   libraryRooms:      validateLibraryRoom,
@@ -284,6 +312,11 @@ export function validateBackup(data) {
     }
   }
 
+  // file_data references files by fileId. Build a file-id set for the
+  // cross-ref check; the existing idSets pass already collected `files`
+  // by id (since file records have an `id` keyPath) so we can reuse that.
+  const fileIds = idSets.files || new Set()
+
   const refChecks = [
     { store: 'messages',   field: 'conversationId', target: convIds, targetName: 'conversations' },
     { store: 'highlights', field: 'conversationId', target: convIds, targetName: 'conversations' },
@@ -295,6 +328,8 @@ export function validateBackup(data) {
     { store: 'pins',       field: 'sourceConversationId', target: convIds, targetName: 'conversations' },
     { store: 'pins',       field: 'sourceMessageId',      target: msgIds,  targetName: 'messages' },
     { store: 'sbrd_documents', field: 'conversationId',   target: convIds, targetName: 'conversations' },
+    { store: 'files',      field: 'conversationId', target: convIds, targetName: 'conversations' },
+    { store: 'file_data',  field: 'fileId',         target: fileIds, targetName: 'files' },
   ]
   for (const { store, field, target, targetName } of refChecks) {
     const arr = data[store]

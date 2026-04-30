@@ -158,7 +158,17 @@ export async function deleteApiKey() {
 
 // ─── Export Encryption (Passphrase-based) ────────────────
 
-export async function deriveKeyFromPassphrase(passphrase, salt) {
+// Iteration count for new V2 backups. Per OWASP 2023 guidance — superseded
+// the V1 default of 100k. Legacy V1 .apb files were encrypted at 100k; the
+// import path reads `iterations` from the file header so old files still
+// decrypt.
+export const PBKDF2_ITERATIONS_V2 = 210000
+
+// Legacy V1 default. Used only when a V1 .apb file lacks an iterations
+// field (which is always — V1 didn't write one).
+export const PBKDF2_ITERATIONS_V1 = 100000
+
+export async function deriveKeyFromPassphrase(passphrase, salt, iterations = PBKDF2_ITERATIONS_V2) {
   const encoded = new TextEncoder().encode(passphrase)
 
   const keyMaterial = await crypto.subtle.importKey(
@@ -173,7 +183,7 @@ export async function deriveKeyFromPassphrase(passphrase, salt) {
     {
       name: 'PBKDF2',
       salt,
-      iterations: 100000,
+      iterations,
       hash: 'SHA-256',
     },
     keyMaterial,
@@ -183,10 +193,13 @@ export async function deriveKeyFromPassphrase(passphrase, salt) {
   )
 }
 
+// V1 .apb format. Kept for compatibility with the legacy SettingsView export
+// flow until that flow is retired in PR-10b. New code should use the V2
+// backup module (src/lib/backup.js) instead.
 export async function encryptExport(jsonString, passphrase) {
   const salt = crypto.getRandomValues(new Uint8Array(16))
   const iv = crypto.getRandomValues(new Uint8Array(12))
-  const key = await deriveKeyFromPassphrase(passphrase, salt)
+  const key = await deriveKeyFromPassphrase(passphrase, salt, PBKDF2_ITERATIONS_V1)
 
   const encoded = new TextEncoder().encode(jsonString)
   const ciphertext = await crypto.subtle.encrypt(
@@ -208,7 +221,8 @@ export async function decryptImport(encryptedData, passphrase) {
 
   const key = await deriveKeyFromPassphrase(
     passphrase,
-    new Uint8Array(salt)
+    new Uint8Array(salt),
+    PBKDF2_ITERATIONS_V1
   )
 
   try {

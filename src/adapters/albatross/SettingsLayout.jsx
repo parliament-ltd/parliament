@@ -17,6 +17,7 @@ import { saveApiKey, deleteApiKey, encryptExport, decryptImport } from '../../li
 import { exportAllData, importData, clearAllData, getSetting, setSetting } from '../../lib/db'
 import TourTooltip from '../../components/TourTooltip'
 import NetworkActivityCard from '../../components/NetworkActivityCard'
+import { useBackup } from '../../stores/BackupContext'
 
 const SPRING_SMOOTH = { type: 'spring', stiffness: 300, damping: 28 }
 const staggerContainer = {
@@ -562,6 +563,20 @@ function passphraseStrength(pw) {
 
 // ─── Data & Backups ──────────────────────────────────────
 
+// Small entry point that opens the V2 Backup & Restore modal from
+// inside Settings → Data & Backups. PR-7's primary CTA. Lives next to
+// the legacy V1 Export/Import cards during the cutover.
+function V2BackupOpenButton() {
+  const { openBackup } = useBackup()
+  return (
+    <div className="flex gap-2">
+      <Button icon={Database} onClick={() => openBackup('backup')}>
+        Backup &amp; restore
+      </Button>
+    </div>
+  )
+}
+
 function DataSection({ backupReminder, setBackupReminder, showExportModal, setShowExportModal, showImportModal, setShowImportModal, showDeleteConfirm, setShowDeleteConfirm, exportPassphrase, setExportPassphrase, exportConfirmPassphrase, setExportConfirmPassphrase, importPassphrase, setImportPassphrase, storageUsage, conversations }) {
   const fileInputRef = useRef(null)
   const [importFile, setImportFile] = useState(null)
@@ -680,6 +695,23 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
 
   return (
     <SettingsSection title="Data & Backups" subtitle="Export, import, and manage your data">
+      {/* V2 Backup & Restore (PR-7) — primary entry point. Opens the
+          unified .parliament-format modal that supersedes the V1 .apb
+          flow below. The V1 export/import cards are preserved during
+          the V2 cutover so users with existing .apb files can still
+          read them; cleanup at PR-10b. */}
+      <StaggerItem>
+        <Card>
+          <SectionLabel>Backup &amp; restore</SectionLabel>
+          <p className="text-xs text-[var(--p-text-secondary)] mt-1 mb-3">
+            Save a copy of your rooms, chats, library, and annotations to a single
+            <code className="mx-1 px-1 py-0.5 rounded bg-[var(--p-bg-subtle)] text-[var(--p-text-primary)]">.parliament</code>
+            file, or restore one to bring everything back.
+          </p>
+          <V2BackupOpenButton />
+        </Card>
+      </StaggerItem>
+
       {/* Storage Monitoring */}
       <StaggerItem>
         <Card>
