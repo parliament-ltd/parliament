@@ -2,7 +2,24 @@
   command = "npm run build"
   publish = "dist"
 
-# SPA routing — send all paths to index.html for React Router
+# SPA routing — send all paths to index.html for React Router.
+#
+# IMPORTANT: 404 missing /assets/* requests instead of falling through
+# to the SPA index.html. If a stale index.html (held by a browser HTTP
+# cache or PWA precache) references an old hashed chunk that no longer
+# exists in this deploy, we want Netlify to return a real 404 — that
+# signals the browser the chunk is missing instead of returning HTML
+# with a 200 (which the browser then tries to parse as a JS module and
+# rejects on MIME type, breaking the whole page). With a real 404 in
+# place, the SW update flow can detect the missing chunk and prompt
+# the user to reload onto the new build. Static files in /assets that
+# DO exist are still served normally because force defaults to false —
+# the redirect only fires when there's no matching file on disk.
+[[redirects]]
+  from = "/assets/*"
+  to = "/assets/:splat"
+  status = 404
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
