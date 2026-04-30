@@ -21,6 +21,7 @@
 // today so PR-10a migration can populate it without a schema bump later.
 
 import ContextMeter from '../../components/core/ContextMeter'
+import ContextRender from './context-render'
 
 export default {
   name: 'context',
@@ -55,26 +56,8 @@ export default {
     },
   },
 
-  render: ({
-    config = {},
-    usage = 0,
-    totalTokens = 0,
-    contextWindow = 200000,
-    messageCount = 0,
-    hiddenCount = 0,
-    totalMessageCount = 0,
-  }) => (
-    <ContextMeter
-      usage={usage}
-      threshold={config.contextThreshold ?? 75}
-      totalTokens={totalTokens}
-      contextWindow={contextWindow}
-      messageCount={messageCount}
-      hiddenCount={hiddenCount}
-      totalMessageCount={totalMessageCount}
-      displayMode={config.displayMode ?? 'meter'}
-    />
-  ),
+  // Production render — self-binds to ChatContext (PR-10a.6).
+  render: ContextRender,
 
   previewRender: () => (
     <div className="border border-[var(--p-border)] rounded-xl bg-white max-w-sm">

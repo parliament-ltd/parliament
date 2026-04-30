@@ -849,6 +849,154 @@ via the V1 Albatross adapter — unchanged from PR-10a.
 
 ---
 
+## PR-10a.6 — Wire annotations + context meter to ChatContext
+
+👀 User-visible. Second slice of catalog data plumbing. Brings per-message
+annotations (star, note, highlight) and the live context meter online in
+the V2 RoomShell chat path.
+
+**Surface:** `/chat/:id` for any conversation whose `room` is non-null.
+Albatross fallback (room: null) unchanged from prior PRs.
+
+### Setup
+- A migrated conversation pointing at Writing Studio (or any room mode
+  that includes `messages@1.0` + `input@1.0` + at least two of
+  `context@1.0` / `highlights@1.0` / `notes@1.0`). Writing Studio
+  default seeds satisfy this.
+- An API key configured (so the conversation has at least a few real
+  messages to annotate).
+
+### Per-message Star (favorite)
+
+- [ ] Hover a message. Star icon visible.
+- [ ] Click the Star. Icon fills with dusty-gold; the small star-cluster
+  in the message header lights up.
+- [ ] DevTools → IndexedDB → `parliament` → `favorites`: a record
+  appears with `messageId` matching the starred message's id and
+  `conversationId` matching the route id.
+- [ ] Click the Star again. Record disappears from `favorites`. Icon
+  returns to neutral.
+- [ ] Star a message, navigate to `/`, navigate to a different
+  conversation, then navigate back. Star state persists.
+- [ ] On `/`, the Favorites homepage section shows the starred message
+  snippet within a few seconds of returning to the homepage. (Note:
+  the homepage favorites section reloads when conversations refresh,
+  not via cross-context push — a slight delay is expected.)
+
+### Per-message Note (StickyNote)
+
+- [ ] Click the StickyNote icon on a message. Inline yellow note panel
+  slides open beneath the message content.
+- [ ] Type "test note". Click somewhere else (blur). Panel content
+  saved.
+- [ ] DevTools → `notes` store: a record with `messageId` and
+  `text: "test note"`.
+- [ ] Click the StickyNote icon again. Panel collapses (UI state). Note
+  record stays in DB.
+- [ ] Click the icon again. Panel reopens with the saved text.
+- [ ] Edit the text to empty. Blur. The note record is deleted from
+  IndexedDB.
+- [ ] In the side-rail Notes pane (right-rail-extra in Writing Studio):
+  the new note appears as a card with the message excerpt, role label,
+  and trash icon.
+- [ ] Click the side-rail note card. The viewport scrolls to the
+  source message and its inline note panel reopens.
+- [ ] Click the trash icon on the side-rail card. Note removed from
+  side-rail and from the message's StickyNote indicator.
+- [ ] Reload. All notes round-trip correctly.
+
+### Highlights (text-selection popover)
+
+- [ ] Select text inside a message (≥2 chars). Color-picker popover
+  appears just above the selection.
+- [ ] Click any color circle. Popover closes; the selected text
+  renders inline as `<mark>` with the chosen background color.
+- [ ] Other messages containing the same term ALSO get inline
+  highlights (case-insensitive whole-word match — V1 behavior).
+- [ ] DevTools → `highlights` store: one record per (term + message)
+  occurrence got created — typically just the one for the message
+  the user selected in. The whole-word matching expansion is at
+  render time, not at write time.
+- [ ] In the right-rail Highlights pane: the term appears as a row
+  with the color dot, term text, and "N occurrence(s)" count.
+- [ ] Hover the row → prev (◀) / next (▶) / trash icons appear.
+- [ ] Click ▶. Viewport scrolls to the next message containing the
+  term. Click again — cycles through all matches and wraps around.
+- [ ] Click ◀. Cycles backward.
+- [ ] Click trash. The term and all underlying records are removed;
+  the inline `<mark>` background disappears across all messages.
+- [ ] Click the side-rail "+ Add Highlight" affordance. Inline form
+  expands. Type a term, pick a color, click Add. Records persist;
+  inline marks appear on every matching message.
+- [ ] Reload. Highlights round-trip correctly.
+
+### Context meter (right-rail Context Health)
+
+- [ ] On a fresh conversation, meter shows 0 messages, 0 tokens, 0%
+  with a green-tinted progress bar.
+- [ ] Send a message and let Claude respond. Meter updates: messages
+  count goes up by 2, tokens reflect the input + output usage from
+  the response, % is `tokens / contextWindow * 100`.
+- [ ] Send several more messages. % climbs. The progress-bar tint
+  follows the V1 thresholds (green → amber → red). Default warning
+  threshold is 75% per the configSchema default.
+- [ ] In a Compact display mode (config: `displayMode: 'compact'`,
+  set via DevTools → IndexedDB or via the editor) the meter renders
+  as a small pill instead of the full panel.
+
+### Albatross fallback
+
+- [ ] In DevTools, set a conversation's `room` field to null. Reload
+  `/chat/<id>`. The V1 Albatross adapter renders. Star, note,
+  highlight, context-meter — all work as in V1.
+- [ ] Toggle a star in the Albatross adapter. Switch to a V2-routed
+  conversation (different id, room non-null). The starred message in
+  the Albatross adapter is unaffected by the V2 path. (Cross-adapter
+  state isolation is the expected behavior.)
+
+### Conversation switching
+
+- [ ] Open conversation A. Star and note one of its messages.
+- [ ] Navigate to conversation B (also V2-routed). Conversation B's
+  own annotation state shows; A's stars/notes are NOT visible on B's
+  messages.
+- [ ] Navigate back to A. A's annotation state reappears.
+- [ ] DevTools → Network: the page should not refetch annotations on
+  every render — the load is once per conversation activation.
+
+### Edge cases
+
+- [ ] Open a conversation, immediately switch to a different one before
+  the first finishes loading annotations. The second conversation
+  shows its own annotations cleanly; no flash of A's data on B's
+  messages. (RoomShellChatHost gating + AnnotationsContext's `loaded`
+  flag together ensure this.)
+- [ ] Star a message, then delete the message (if the slice ever wires
+  delete — currently no-op). Refresh. The orphaned favorite record
+  remains in DB but the homepage favorites surface skips it (already
+  V1 behavior).
+- [ ] In the side-rail Notes pane, click a note whose source message
+  was deleted. (Manually delete via DevTools → `messages` store.)
+  The note card disappears from the list automatically — `notes-render`
+  filters out notes whose message is gone.
+
+### Known limitations to verify (and not flag as bugs)
+
+- [ ] **Branches still preview-shaped.** Left-rail branch list shows
+  generic content; per-message branch icon is no-op. Next slice wires
+  branches@1.0 + the BranchCreationPanel modal.
+- [ ] **Hide / delete / move-to-branch on per-message menu still
+  no-op.** These will land alongside branches.
+- [ ] **Voice input still inert in V2 path.** InputArea's built-in mic
+  button (cardLayout-only) covers V1 fallback; voice-input@1.0 wires
+  in a later slice.
+- [ ] **Collab-mode system prompts ignored on V2 sends.** Persona
+  storage works (CollabModal still functions), but the active presets
+  don't reach `sendMessage` yet.
+- [ ] **Review modal still preview-shaped.**
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

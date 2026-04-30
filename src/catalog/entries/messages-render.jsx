@@ -1,31 +1,29 @@
 // messages@1.0 — live render component for the V2 RoomShell chat path.
 //
-// PR-10a.5. Self-binds to ChatContext per refactor/v2-phase1-audit.md
-// §2.8a "Component data plumbing": catalog components that need
-// active-conversation state read it directly from the existing React
-// contexts rather than receiving props from RoomShell.
+// PR-10a.5 wired the live message list, streaming, and ghost-text
+// continue. PR-10a.6 adds the per-message annotation handlers:
+// favorites toggle, inline note panel + save, and text-selection
+// highlight popover. State for those is shared with the right-rail
+// components (highlights@1.0, notes@1.0) via AnnotationsContext —
+// see refactor/v2-phase1-audit.md §2.8a "Component data plumbing".
 //
-// What this slice wires:
-//   - Live message list from useChat().messages.
-//   - Streaming content into the latest assistant placeholder.
-//   - Ghost-text rendering for `incomplete: true` messages with a
-//     Continue button that dispatches continueMessage.
-//   - Copy-text action on each message.
+// What this slice wires (cumulative):
+//   - PR-10a.5: live messages, streaming splice, ghost-text continue,
+//     copy.
+//   - PR-10a.6: favorite toggle (Star icon), inline note panel
+//     (StickyNote icon), text-selection highlight (popover with color
+//     picker, persisted), inline highlight rendering (matched terms
+//     wrapped in <mark> via MessageCard's `highlights` prop).
 //
-// What this slice intentionally does NOT wire (still preview-shaped or
-// no-op pending the next slices ahead of PR-10b):
+// What this slice intentionally does NOT wire (subsequent slices,
+// before PR-10b):
 //   - Branch creation / branch panel / move-to-branch (branches@1.0).
-//   - Highlights / notes / favorites (their respective components).
-//   - Hide / delete (UI panel + undo). Albatross still owns these for
-//     conversations that fall back to its adapter.
-//   - Per-message action menu items contributed by other components.
-//     hostAPI.getMessageActions() is called and the merged list is
-//     stamped, but no Phase 1 component contributes anything yet so the
-//     menu shows MessageCard's built-in items only.
-//
-// Lives in its own file (separate from messages.jsx, which is the
-// catalog manifest's default export) so react-refresh's
-// "only-export-components" rule stays happy.
+//   - Hide / delete with undo (still no-op).
+//   - Per-message action menu items contributed by other components —
+//     contributions ARE aggregated by RoomShell, but nothing is rendered
+//     in MessageCard's menu yet (the existing icons cover Phase 1
+//     contributors; the more-options menu surfaces hide/move/copy only
+//     until contributed actions get a UI surface).
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -33,6 +31,7 @@ import MessageList from '../../components/core/MessageList'
 import MessageCard from '../../components/core/MessageCard'
 import { useChat } from '../../stores/ChatContext'
 import { useSettings } from '../../stores/SettingsContext'
+import { useAnnotations } from '../../stores/AnnotationsContext'
 import { getProvider } from '../../providers'
 import { loadApiKey } from '../../lib/crypto'
 
@@ -40,6 +39,10 @@ export default function MessagesRender() {
   const { id: conversationId } = useParams()
   const { messages, isStreaming, streamingContent, continueMessage } = useChat()
   const { settings } = useSettings()
+  const {
+    favorites, notes, highlights, showNotes,
+    toggleFavorite, toggleNotePanel, saveNote, addHighlight,
+  } = useAnnotations()
   const containerRef = useRef(null)
   const bottomRef = useRef(null)
   const [activePopoverMsgId, setActivePopoverMsgId] = useState(null)
@@ -120,6 +123,9 @@ export default function MessagesRender() {
     // incomplete records get the ghost treatment.
     const isGhost = msg.incomplete && !isLatestAssistantStreaming
 
+    const noteRecord = notes.get(msg.id)
+    const isFav = favorites.has(msg.id)
+
     return (
       <MessageCard
         key={msg.id}
@@ -129,20 +135,32 @@ export default function MessagesRender() {
         number={numberByMessageId.get(msg.id) || 0}
         index={idx}
         isGhostText={isGhost}
+        isFavorited={isFav}
+        showNotes={showNotes.has(msg.id)}
+        savedNoteText={noteRecord?.text || ''}
+        // MessageCard renders all conversation highlights and matches
+        // them against this card's content; passing the whole list (not
+        // a per-message slice) is the V1 contract.
+        highlights={highlights}
         isPopoverActive={activePopoverMsgId === msg.id}
         onPopoverChange={(active) => setActivePopoverMsgId(active ? msg.id : null)}
         onContinue={isGhost ? () => handleContinue(msg.id) : undefined}
         onCopyText={() => handleCopyText(msg.content)}
-        // Branches / highlights / notes / favorites / hide / delete /
-        // move-to-branch land in subsequent PR-10a.5 slices. Leaving the
-        // handlers undefined means MessageCard's icon buttons are still
-        // rendered but click is a no-op (optional-chained inside the card).
+        onFavorite={() => toggleFavorite(msg.id)}
+        onNote={() => toggleNotePanel(msg.id)}
+        onNoteSave={(text) => saveNote(msg.id, text)}
+        onHighlight={(text, color) => addHighlight(msg.id, text, color)}
+        // Branch / hide / delete / move-to-branch land in subsequent
+        // slices. Optional-chained inside MessageCard so omitting them
+        // leaves the icon clickable but inert.
       />
     )
   }, [
     messages.length, isStreaming, streamingContent,
     numberByMessageId, activePopoverMsgId,
+    favorites, notes, highlights, showNotes,
     handleContinue, handleCopyText,
+    toggleFavorite, toggleNotePanel, saveNote, addHighlight,
   ])
 
   // Defensive: if for some reason ChatContext's activeConversationId

@@ -318,16 +318,19 @@ Why:
 
 What this means in practice for each component:
 
-| Component | What it self-binds to |
-|---|---|
-| `messages@1.0` | `useChat().messages`, `useChat().streamingContent`, `useChat().isStreaming`, `useConversations().activeConversationId`. Owns the per-message action menu surface; reads contributed actions off `hostAPI.getMessageActions()`. |
-| `input@1.0` | `useChat().sendMessage` / `stopGenerating` / `isStreaming`, `useSettings().defaultModel`, `loadApiKey()`. Subscribes to `voice-transcript` events on the bus when `subscribeToVoice` config is on. |
-| `branches@1.0` | `useChat().messages` for the branch picker, `useConversations()` for the branch list. Owns `BranchCreationPanel` modal. |
-| `highlights@1.0`, `notes@1.0`, `favorites@1.0` | Their respective IndexedDB read functions on mount of the active conversation, scoped state for the panel UI. |
-| `context@1.0` | `useChat().tokenUsage`, `useSettings().defaultModel`. |
-| `collab-mode@1.0` | `getSetting('parrot-personas')`, scoped active-presets state. Provides system prompt to active room via a small bus event TBD or via component-config-derived hook (decide at PR-10a.5). |
-| `review@1.0` | `useChat().messages`, plus the same hand-built provider call pattern Albatross uses today. |
-| `voice-input@1.0` | `useVoiceInput()` hook. Publishes `voice-transcript` to the bus. |
+| Component | What it self-binds to | Wired in |
+|---|---|---|
+| `messages@1.0` | `useChat().messages`, `useChat().streamingContent`, `useChat().isStreaming`, `useConversations().activeConversationId`. Owns the per-message action menu surface; reads contributed actions off `hostAPI.getMessageActions()`. PR-10a.6 added per-message handlers for favorite toggle, note panel, and text-selection highlight via `useAnnotations()`. | PR-10a.5 + PR-10a.6 |
+| `input@1.0` | `useChat().sendMessage` / `stopGenerating` / `isStreaming`, `useSettings().defaultModel`, `loadApiKey()`. Subscribes to `voice-transcript` events on the bus when `subscribeToVoice` config is on. | PR-10a.5 |
+| `context@1.0` | `useChat().tokenUsage`, `useChat().messages.length`, `useSettings().defaultModel` + provider model lookup for the window size. Threshold + display mode read from per-component config (audit §3.6). | PR-10a.6 |
+| `highlights@1.0` | `useAnnotations().highlights` (raw records) aggregated by term into HighlightList shape. `addHighlightFromSidebar`, `deleteHighlights`, `navigateHighlight` mutators dispatched on the side-rail surface. | PR-10a.6 |
+| `notes@1.0` | `useAnnotations().notes` + `useChat().messages`. Side-rail summary list of all conversation notes; click a note to open its inline panel on the source message and scroll to it. The inline note panel itself lives on `messages@1.0`'s MessageCard. | PR-10a.6 |
+| `branches@1.0` | `useChat().messages` for the branch picker, `useConversations()` for the branch list. Owns `BranchCreationPanel` modal. **Pending — next slice.** | (deferred) |
+| `favorites@1.0` | Cross-cutting homepage component (already wired pre-PR-10a.6 via `favorites-preview.jsx`). The chat-rail per-message Star icon dispatches through `useAnnotations().toggleFavorite`. | PR-10a.6 (toggle) |
+| `collab-mode@1.0` | `getSetting('parrot-personas')`, scoped active-presets state. Provides system prompt to active room via a small bus event TBD or via component-config-derived hook (decide at PR-10a.5). **Pending.** | (deferred) |
+| `review@1.0` | `useChat().messages`, plus the same hand-built provider call pattern Albatross uses today. **Pending.** | (deferred) |
+| `voice-input@1.0` | `useVoiceInput()` hook. Publishes `voice-transcript` to the bus. **Pending — currently inert; the InputArea built-in mic still covers V1 cardLayout users.** | (deferred) |
+| `toc@1.0` | `useChat().messages` for the table-of-contents derivation. **Pending.** | (deferred) |
 
 **Conversation activation is the route shell's job.** When `/chat/:id`
 loads a conversation, the route calls `useChat().loadMessages(id)` and
@@ -341,12 +344,25 @@ component.
 PR-5 wired the manifests and the `/catalog` debug surface, but their
 render functions take props the surface passes from sample data — the
 shims work for the debug route but show empty state under RoomShell on
-production routes. **PR-10a.5** rewrites the render functions to
-self-bind via hooks for the chat-essential components (messages, input,
-plus conversation activation in ChatView). Side-rail and modal
-components (branches, highlights, notes, context, collab-mode, review,
-voice-input) follow in subsequent slices ahead of PR-10b's adapter
-deletion.
+production routes. The wiring lands in slices ahead of PR-10b's adapter
+deletion:
+
+- **PR-10a.5** — `messages@1.0`, `input@1.0`, conversation activation in ChatView.
+- **PR-10a.6** — `context@1.0`, `highlights@1.0`, `notes@1.0`, plus per-message Star/StickyNote/highlight handlers wired through a new `AnnotationsContext` shared with the side-rail components.
+- **Pending slices** — `branches@1.0` + BranchCreationPanel, `voice-input@1.0`, `collab-mode@1.0` system prompt, `review@1.0` modal, `toc@1.0`. After those land, PR-10b can safely delete the Albatross adapter.
+
+**A new context for shared annotation state.** PR-10a.6 introduces
+`AnnotationsContext` (mounted between `ChatProvider` and
+`BrowserRouter` in App.jsx). It owns per-conversation favorites /
+notes / highlights state, watching `useChat().activeConversationId`
+to (re)load on conversation change. Both the per-message handlers in
+`messages@1.0` and the side-rail lists in `highlights@1.0` /
+`notes@1.0` consume the same in-memory copy, so a write through one
+surface (e.g. clicking a Star in messages) updates the other (e.g.
+the favorites count in the side-rail) without bus events or polling.
+This is a deliberate exception to the "self-bind to existing
+contexts" wording above — the new context IS now an existing context.
+The bus stays capped at the three Phase 1 events per NQ-4.
 
 ### 2.9 Things that don't fit cleanly
 
@@ -493,6 +509,7 @@ CSP currently allows `connect-src 'self' https://api.anthropic.com`. Adding Olla
 - PR-9 — Wizard + template gallery + ignition (5 available templates + 2 coming-soon).
 - PR-10a — Wire `/chat/:id` through `<RoomShell>` + `createdInMode → room` migration. Albatross still exists as fallback.
 - PR-10a.5 — Wire chat-essential catalog components (messages, input) to ChatContext + activate conversation in ChatView. First slice of the catalog-data plumbing work flagged by §2.8a.
+- PR-10a.6 — Wire annotations (favorites toggle, notes panel + side-rail list, highlights with selection popover) + context meter via a new shared AnnotationsContext.
 - PR-10b — Delete adapter directories (Albatross, Kingfisher, Starling) + remove InputArea built-in mic + rotate PWA cache + inject `voice-input@1.0` for migrated mobile users.
 - PR-11a — Decompose Pelican into 6 catalog components.
 - PR-11b — Decompose Secretarybird into 3 catalog components.
