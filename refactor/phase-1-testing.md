@@ -997,6 +997,184 @@ Albatross fallback (room: null) unchanged from prior PRs.
 
 ---
 
+## PR-10a.7 — Wire branches@1.0 + BranchCreationPanel to ChatContext
+
+👀 User-visible. Third slice of catalog data plumbing. Brings the
+side-rail branch list, the per-message Branch icon, and the
+BranchCreationPanel modal online in the V2 RoomShell chat path.
+
+**Surface:** `/chat/:id` for any conversation whose `room` is non-null
+AND whose mode includes `branches@1.0` (Writing Studio + Pocket Chat
+default seeds; Quiet Room intentionally omits it). Albatross fallback
+(room: null) unchanged from prior PRs.
+
+### Setup
+- A migrated conversation pointing at Writing Studio (or any room mode
+  whose components include `messages@1.0` + `input@1.0` + `branches@1.0`).
+- An API key configured (only required for the Compressed Summary path
+  + the preview button; Full History works without one).
+- A second conversation belonging to the same parent (create one via
+  the panel during the test) so the branch list shows ≥ 1 child.
+
+### Side-rail branch list
+
+- [ ] Open a fresh top-level conversation (no parent). Side rail shows
+  a single "Main Thread" row with the live message count and 0 branches.
+- [ ] Send a message and let Claude respond. Message count on the
+  Main Thread row updates to reflect the new total.
+- [ ] After creating a branch (per the steps below), the branch row
+  appears in the same panel, sorted by `updatedAt` descending.
+- [ ] Click a branch row. Navigation lands at `/chat/<branchId>` — the
+  branch renders via RoomShell (because `room` was inherited from
+  source) and the side rail now shows "← Parent conversation" + the
+  current branch as the active row.
+- [ ] Click "← Parent conversation". Returns to the parent.
+- [ ] On a room that doesn't include `branches@1.0` (Quiet Room):
+  the Branches side rail is absent (correct — the room just has
+  messages + input). The per-message GitBranch icon is no-op there too.
+
+### Per-message Branch icon
+
+- [ ] Hover any message. GitBranch icon appears alongside the other
+  per-message icons.
+- [ ] Click it. BranchCreationPanel modal opens, anchored to that
+  message ("Forking from message N of M" reflects the right index).
+- [ ] Click outside the modal / press Esc / click Cancel. Modal closes.
+  No partial state left behind (no orphaned conversation in
+  IndexedDB → `conversations`).
+
+### Compress Context action
+
+- [ ] In the Branches side rail, a "Compress Context" button appears
+  below the branch list (default config; configurable off via
+  `showCompressButton: false`).
+- [ ] With zero messages, the button is disabled.
+- [ ] After at least one user→assistant exchange, click Compress
+  Context. The panel opens anchored to the LATEST message (not an
+  earlier one).
+
+### Cmd/Ctrl+Shift+B keyboard shortcut
+
+- [ ] On `/chat/:id` with messages, press Cmd+Shift+B (Mac) or
+  Ctrl+Shift+B (others). Panel opens anchored to the latest message.
+- [ ] Same shortcut while focused inside the input textarea — still
+  fires (matches V1 behavior). Browser default doesn't open the
+  bookmarks bar.
+- [ ] On `/`, `/chats`, `/settings`, `/build`: shortcut is inert.
+- [ ] On Quiet Room (no `branches@1.0` in the mode): shortcut still
+  dispatches into BranchPanelContext but the panel doesn't render
+  (no host component mounted). Acceptable Phase 1 behavior — no error.
+
+### Full History branch creation
+
+- [ ] Open the panel. Pick "Full History". The inline meter shows
+  "Branch starts at X% context (same as current conversation)".
+- [ ] Click Create Branch. Button shows "Creating…" briefly while
+  the writes commit; navigation lands at `/chat/<newId>`.
+- [ ] DevTools → IndexedDB → `parliament` → `conversations`: the new
+  record has `parentId` = source id, `branchPoint` = anchor message id,
+  `room` = source's room (non-null), `familyId` populated.
+- [ ] DevTools → `messages` filtered by the new conversationId: every
+  message up to and including the anchor is copied with original
+  timestamps preserved. Timestamps later than the anchor are NOT
+  copied.
+- [ ] On the new branch, send a message. It works (the V2 chat path
+  is fully alive).
+- [ ] Navigate back to the parent. Side rail Branches now lists the
+  new branch.
+
+### Compressed Summary branch creation — preview path
+
+- [ ] Open the panel. Pick Compressed Summary. The savings line shows
+  immediately (e.g. "23% → ~3%, frees up 20%") — no API call yet.
+- [ ] Click "Preview summary". Spinner appears beneath the button;
+  Network tab shows ONE call to `api.anthropic.com/v1/messages`
+  carrying the haiku model and the summary prompt.
+- [ ] Summary text renders inline as Markdown. Caching: clicking
+  "Preview summary" a second time toggles collapse without a
+  second API call.
+- [ ] Switch to Full History, then back to Compressed Summary. The
+  cached preview is still expanded with the same text — same panel
+  session keeps the cache.
+- [ ] Close the panel (Cancel / outside click). Reopen it. Click
+  Preview summary again — fires a fresh API call (cache clears on
+  unmount).
+- [ ] Without an API key configured: clicking Preview summary surfaces
+  the inline error "No API key configured. Add one in Settings to
+  preview a summary." panel doesn't crash.
+
+### Compressed Summary branch creation — create path
+
+- [ ] With Compressed Summary selected and an API key present, click
+  Create Branch. Button shows "Compressing…" while the real Haiku
+  call + branch creation runs.
+- [ ] On success: navigation lands at `/chat/<newId>`. The new
+  conversation has exactly one assistant message — the summary text.
+- [ ] DevTools → `conversations`: title is "Summary: <parent title>",
+  `parentId` + `branchPoint` set, `room` inherited.
+- [ ] No API key configured → falls back to Full History silently
+  (V1 behavior). New branch has all messages copied, not a summary.
+- [ ] Force a failure (e.g. invalid API key, throw inside the provider)
+  → falls back to Full History. Inline error in the panel describes
+  what failed if the fallback also fails.
+
+### Auto-compress (settings.autoCompress === 'automatic')
+
+- [ ] In Settings, set `autoCompress` to "Automatic". Default
+  threshold is 75% (configurable per branches@1.0 component config).
+- [ ] On a conversation with `tokenUsage` already past the threshold,
+  the panel auto-opens anchored to the latest message on next render.
+- [ ] On a conversation below threshold, the panel does NOT auto-open.
+- [ ] With `autoCompress` set to "Off" or "Ask first", auto-open does
+  not fire even past threshold. (User can still open manually.)
+
+### Conversation switching
+
+- [ ] Open conversation A, open the branch panel anchored to a message,
+  then navigate to conversation B (also V2-routed, also has branches).
+  The panel closes cleanly. The side rail shows B's branches.
+- [ ] Open A, open the panel, click Create Branch (Full History). The
+  panel closes, nav lands on the new branch, side rail shows the
+  parent + child arrangement on the new conversation's tree.
+
+### Albatross fallback unchanged
+
+- [ ] In DevTools, set a conversation's `room` field to null. Reload.
+  Albatross adapter renders. The V1 BranchCreationPanel + V1 keyboard
+  shortcut (also Cmd/Ctrl+Shift+B) work end-to-end. No double-firing
+  from the V2 BranchShortcutHandler.
+
+### Edge cases
+
+- [ ] On a conversation with an `incomplete: true` last message, open
+  the panel from that message. The "Response interrupted" warning
+  banner appears in the panel. Both modes still work; Full History
+  branch carries the incomplete record forward (matches V1).
+- [ ] Branch a conversation, then branch the branch. Both create
+  cleanly; the side rail on the original parent still shows just its
+  direct children.
+- [ ] DevTools → manually delete the latest message after opening the
+  panel. The panel's anchor message becomes stale. Closing and
+  reopening picks up the new latest message; creating a branch with
+  the stale anchor surfaces an error inline rather than crashing.
+
+### Known limitations to verify (and not flag as bugs)
+
+- [ ] **"Send to branch" / "Pin for reference" message-transfer flows
+  not yet wired in V2.** These are the next slice. The V1 Albatross
+  fallback (room: null) handles them.
+- [ ] **Hide message + 20-second undo timer still no-op.** Same slice
+  as the message-transfer flows.
+- [ ] **Move to branch in the per-message more-options menu still
+  no-op.** Same slice.
+- [ ] **`voice-input@1.0` still inert in V2.** InputArea's built-in
+  mic (cardLayout-only) still covers V1 fallback.
+- [ ] **Collab-mode system prompts ignored on V2 sends.** Persona
+  storage works, but presets don't reach `sendMessage` yet.
+- [ ] **Review modal still preview-shaped.**
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

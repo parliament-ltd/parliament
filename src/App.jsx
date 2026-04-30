@@ -6,6 +6,8 @@ import { SettingsProvider } from './stores/SettingsContext'
 import { ConversationProvider } from './stores/ConversationContext'
 import { ChatProvider } from './stores/ChatContext'
 import { AnnotationsProvider } from './stores/AnnotationsContext'
+import { BranchPanelProvider } from './stores/BranchPanelContext'
+import BranchShortcutHandler from './components/BranchShortcutHandler'
 import { PWAProvider } from './stores/PWAContext'
 import { BackupProvider } from './stores/BackupContext'
 import ChatView from './views/ChatView'
@@ -41,8 +43,10 @@ export default function App() {
             <ConversationProvider>
               <ChatProvider>
                 <AnnotationsProvider>
+                <BranchPanelProvider>
                 <BrowserRouter>
                   <BackupProvider>
+                  <BranchShortcutHandler />
                   <Routes>
                     <Route path="/" element={<ErrorBoundary inline><HomepageView /></ErrorBoundary>} />
                     <Route path="/chats" element={<ErrorBoundary inline><SelectorView /></ErrorBoundary>} />
@@ -66,6 +70,7 @@ export default function App() {
                   </Routes>
                   </BackupProvider>
                 </BrowserRouter>
+                </BranchPanelProvider>
                 </AnnotationsProvider>
               </ChatProvider>
             </ConversationProvider>

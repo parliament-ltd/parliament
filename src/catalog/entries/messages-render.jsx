@@ -14,11 +14,14 @@
 //     (StickyNote icon), text-selection highlight (popover with color
 //     picker, persisted), inline highlight rendering (matched terms
 //     wrapped in <mark> via MessageCard's `highlights` prop).
+//   - PR-10a.7: per-message GitBranch icon opens the BranchCreationPanel
+//     anchored to that message via BranchPanelContext. The panel itself
+//     lives on branches@1.0; we only dispatch the open intent here.
 //
 // What this slice intentionally does NOT wire (subsequent slices,
 // before PR-10b):
-//   - Branch creation / branch panel / move-to-branch (branches@1.0).
 //   - Hide / delete with undo (still no-op).
+//   - Move-to-branch (still no-op; lives in a follow-up slice).
 //   - Per-message action menu items contributed by other components —
 //     contributions ARE aggregated by RoomShell, but nothing is rendered
 //     in MessageCard's menu yet (the existing icons cover Phase 1
@@ -32,6 +35,7 @@ import MessageCard from '../../components/core/MessageCard'
 import { useChat } from '../../stores/ChatContext'
 import { useSettings } from '../../stores/SettingsContext'
 import { useAnnotations } from '../../stores/AnnotationsContext'
+import { useBranchPanel } from '../../stores/BranchPanelContext'
 import { getProvider } from '../../providers'
 import { loadApiKey } from '../../lib/crypto'
 
@@ -43,6 +47,7 @@ export default function MessagesRender() {
     favorites, notes, highlights, showNotes,
     toggleFavorite, toggleNotePanel, saveNote, addHighlight,
   } = useAnnotations()
+  const { openBranchPanel } = useBranchPanel()
   const containerRef = useRef(null)
   const bottomRef = useRef(null)
   const [activePopoverMsgId, setActivePopoverMsgId] = useState(null)
@@ -150,9 +155,10 @@ export default function MessagesRender() {
         onNote={() => toggleNotePanel(msg.id)}
         onNoteSave={(text) => saveNote(msg.id, text)}
         onHighlight={(text, color) => addHighlight(msg.id, text, color)}
-        // Branch / hide / delete / move-to-branch land in subsequent
-        // slices. Optional-chained inside MessageCard so omitting them
-        // leaves the icon clickable but inert.
+        onBranch={() => openBranchPanel(msg.id)}
+        // Hide / delete / move-to-branch land in subsequent slices.
+        // Optional-chained inside MessageCard so omitting them leaves
+        // the icon clickable but inert.
       />
     )
   }, [
@@ -161,6 +167,7 @@ export default function MessagesRender() {
     favorites, notes, highlights, showNotes,
     handleContinue, handleCopyText,
     toggleFavorite, toggleNotePanel, saveNote, addHighlight,
+    openBranchPanel,
   ])
 
   // Defensive: if for some reason ChatContext's activeConversationId

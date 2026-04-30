@@ -7,14 +7,14 @@
 // it stays Composer (no consent prompt).
 //
 // Per audit decision NQ-5.8, this component OWNS the BranchCreationPanel
-// modal that the V1 Albatross adapter still renders inline. The modal is
-// not yet extracted into its own file — that lift happens during PR-10a
-// when /chat/:id moves through RoomShell. For now the manifest reserves
-// the contribution and the render shim renders just the BranchList; the
-// modal-opening flow is wired through the message-action handler at the
-// consuming surface.
+// modal. PR-10a.7 wired the live render: see ./branches-render.jsx for
+// the production component (self-binds to ChatContext + ConversationContext
+// + BranchPanelContext). The previewRender below stays preview-shaped for
+// the dev /catalog route — sample branches keep the visual record without
+// requiring an active conversation.
 
 import BranchList from '../../components/core/BranchList'
+import BranchesRender from './branches-render'
 
 const SAMPLE_CONVERSATION = {
   id: 'demo-conv',
@@ -54,6 +54,16 @@ export default {
       default: 'full-history',
       label: 'Default mode in the Branch creation panel',
     },
+    showCompressButton: {
+      type: 'boolean',
+      default: true,
+      label: 'Show "Compress Context" action below the list',
+    },
+    contextThreshold: {
+      type: 'number',
+      default: 75,
+      label: 'Auto-compress when context usage reaches this % (audit §3.6)',
+    },
   },
   contributions: {
     messageActions: [
@@ -64,14 +74,9 @@ export default {
     ],
   },
 
-  render: ({ branches = [], currentConversation, messageCount = 0, onNavigate }) => (
-    <BranchList
-      branches={branches}
-      currentConversation={currentConversation}
-      messageCount={messageCount}
-      onNavigate={onNavigate}
-    />
-  ),
+  // Production render — self-binds to ChatContext + ConversationContext +
+  // BranchPanelContext. Owns the BranchCreationPanel modal (PR-10a.7).
+  render: BranchesRender,
 
   previewRender: () => (
     <div className="border border-[var(--p-border)] rounded-xl bg-white p-3 max-w-sm">

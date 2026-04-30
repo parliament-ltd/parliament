@@ -325,7 +325,7 @@ What this means in practice for each component:
 | `context@1.0` | `useChat().tokenUsage`, `useChat().messages.length`, `useSettings().defaultModel` + provider model lookup for the window size. Threshold + display mode read from per-component config (audit §3.6). | PR-10a.6 |
 | `highlights@1.0` | `useAnnotations().highlights` (raw records) aggregated by term into HighlightList shape. `addHighlightFromSidebar`, `deleteHighlights`, `navigateHighlight` mutators dispatched on the side-rail surface. | PR-10a.6 |
 | `notes@1.0` | `useAnnotations().notes` + `useChat().messages`. Side-rail summary list of all conversation notes; click a note to open its inline panel on the source message and scroll to it. The inline note panel itself lives on `messages@1.0`'s MessageCard. | PR-10a.6 |
-| `branches@1.0` | `useChat().messages` for the branch picker, `useConversations()` for the branch list. Owns `BranchCreationPanel` modal. **Pending — next slice.** | (deferred) |
+| `branches@1.0` | `useChat().messages` + `tokenUsage` for the panel's projected-context meter, `useConversations()` for the side-rail branch list, `useSettings()` for the auto-compress threshold + active model context window, `useBranchPanel()` for the shared open/close dispatch. Owns the `BranchCreationPanel` modal. Per-message GitBranch icon (rendered by `messages@1.0`) and the app-wide Cmd/Ctrl+Shift+B keyboard shortcut both dispatch into `openBranchPanel(messageId)`. | PR-10a.7 |
 | `favorites@1.0` | Cross-cutting homepage component (already wired pre-PR-10a.6 via `favorites-preview.jsx`). The chat-rail per-message Star icon dispatches through `useAnnotations().toggleFavorite`. | PR-10a.6 (toggle) |
 | `collab-mode@1.0` | `getSetting('parrot-personas')`, scoped active-presets state. Provides system prompt to active room via a small bus event TBD or via component-config-derived hook (decide at PR-10a.5). **Pending.** | (deferred) |
 | `review@1.0` | `useChat().messages`, plus the same hand-built provider call pattern Albatross uses today. **Pending.** | (deferred) |
@@ -349,7 +349,8 @@ deletion:
 
 - **PR-10a.5** — `messages@1.0`, `input@1.0`, conversation activation in ChatView.
 - **PR-10a.6** — `context@1.0`, `highlights@1.0`, `notes@1.0`, plus per-message Star/StickyNote/highlight handlers wired through a new `AnnotationsContext` shared with the side-rail components.
-- **Pending slices** — `branches@1.0` + BranchCreationPanel, `voice-input@1.0`, `collab-mode@1.0` system prompt, `review@1.0` modal, `toc@1.0`. After those land, PR-10b can safely delete the Albatross adapter.
+- **PR-10a.7** — `branches@1.0` live BranchList, the `BranchCreationPanel` modal owned by branches@1.0, the per-message GitBranch icon → openBranchPanel dispatch, the Compress Context action, and the app-wide Cmd/Ctrl+Shift+B keyboard shortcut. New `BranchPanelContext` shares modal open-state across `messages@1.0` (icon trigger), `branches@1.0` (Compress Context + modal host), and the global shortcut handler.
+- **Pending slices** — `voice-input@1.0`, `collab-mode@1.0` system prompt, `review@1.0` modal, `toc@1.0`, plus the message-transfer / hide / move-to-branch / delete actions. After those land, PR-10b can safely delete the Albatross adapter.
 
 **A new context for shared annotation state.** PR-10a.6 introduces
 `AnnotationsContext` (mounted between `ChatProvider` and
@@ -363,6 +364,19 @@ the favorites count in the side-rail) without bus events or polling.
 This is a deliberate exception to the "self-bind to existing
 contexts" wording above — the new context IS now an existing context.
 The bus stays capped at the three Phase 1 events per NQ-4.
+
+**A second shared context for the branch panel.** PR-10a.7 follows
+the same precedent with `BranchPanelContext` — pure UI dispatch
+(open / close + `openForMessageId`). Three surfaces dispatch into it:
+the per-message GitBranch icon on `messages@1.0`, the Compress Context
+button inside `branches@1.0`'s side rail, and the app-wide
+Cmd/Ctrl+Shift+B keyboard shortcut handler mounted at App.jsx. Only
+`branches@1.0` mounts the modal, so the panel only renders when the
+active room actually includes a branches surface — but the dispatch
+itself is global, which keeps the keyboard shortcut behaving the same
+across rooms. Lazy preview generation lives in the modal's local
+state, NOT in the context, so closing the panel always clears the
+preview cache.
 
 ### 2.9 Things that don't fit cleanly
 
@@ -510,6 +524,7 @@ CSP currently allows `connect-src 'self' https://api.anthropic.com`. Adding Olla
 - PR-10a — Wire `/chat/:id` through `<RoomShell>` + `createdInMode → room` migration. Albatross still exists as fallback.
 - PR-10a.5 — Wire chat-essential catalog components (messages, input) to ChatContext + activate conversation in ChatView. First slice of the catalog-data plumbing work flagged by §2.8a.
 - PR-10a.6 — Wire annotations (favorites toggle, notes panel + side-rail list, highlights with selection popover) + context meter via a new shared AnnotationsContext.
+- PR-10a.7 — Wire `branches@1.0` (live side-rail list + Compress Context action) + the BranchCreationPanel modal owned by branches@1.0; per-message GitBranch icon and app-wide Cmd/Ctrl+Shift+B both dispatch through a new shared `BranchPanelContext`.
 - PR-10b — Delete adapter directories (Albatross, Kingfisher, Starling) + remove InputArea built-in mic + rotate PWA cache + inject `voice-input@1.0` for migrated mobile users.
 - PR-11a — Decompose Pelican into 6 catalog components.
 - PR-11b — Decompose Secretarybird into 3 catalog components.

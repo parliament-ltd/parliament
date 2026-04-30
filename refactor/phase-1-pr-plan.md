@@ -427,6 +427,38 @@
 
 ---
 
+### PR-10a.7 — Wire branches@1.0 + BranchCreationPanel to ChatContext
+
+**Goal:** Third slice of catalog data plumbing (after PR-10a.5 and PR-10a.6). Brings the side-rail branch list, the per-message Branch icon, and the BranchCreationPanel modal online in the V2 RoomShell chat path. Closes the last major chat-surface gap before PR-10b can delete adapter directories — what remains after this slice is `voice-input@1.0`, `collab-mode@1.0` system-prompt wiring, `review@1.0` modal, `toc@1.0`, and the message-transfer / hide / delete actions.
+
+**Scope:**
+- New `src/stores/BranchPanelContext.jsx` — small shared dispatch context. Owns `openForMessageId` (null when closed) plus `openBranchPanel(messageId)` / `closeBranchPanel()` mutators. Mounted in App.jsx between `AnnotationsProvider` and `BrowserRouter` so every `/chat/:id` surface (the per-message GitBranch icon in `messages@1.0`, the Compress Context action in `branches@1.0`, the Cmd/Ctrl+Shift+B keyboard shortcut) can dispatch into the same modal without expanding the hostAPI bus past its three-event Phase 1 cap (per audit NQ-4). Same precedent as AnnotationsContext from PR-10a.6.
+- New `src/components/BranchCreationPanel.jsx` — extracted from the V1 Albatross adapter's inline modal. Two modes (Full History / Compressed Summary), inline context meter showing projected post-branch usage, savings display for Compressed mode (e.g. "62% → ~8%, frees up 54%"), collapsible summary preview generated lazily on click, gold shimmer on the primary CTA. Single-click create — no fake "Compressing…" delay; the real Haiku call + branch creation runs while the button shows progress.
+- New `src/catalog/entries/branches-render.jsx` — live render. Self-binds to `useChat()` / `useConversations()` / `useSettings()` / `useBranchPanel()`. Renders the V1 BranchList against the active conversation's children (parentId === activeConversationId), exposes a "Compress Context" action button below the list (default-on; configurable via `showCompressButton`), and mounts the BranchCreationPanel modal whenever the shared context reports an open message id. Auto-compress on threshold cross preserved (gated behind `settings.autoCompress === 'automatic'`).
+- New `src/components/BranchShortcutHandler.jsx` — global Cmd/Ctrl+Shift+B listener mounted inside the router, gated to `/chat/:id`. Opens the panel anchored to the latest message. Lives at App.jsx (not inside `branches-render`) so the shortcut works app-wide even on rooms that don't include `branches@1.0` in their mode file.
+- `messages-render.jsx` — wires `onBranch={() => openBranchPanel(msg.id)}` on every MessageCard. The per-message GitBranch icon was a no-op since PR-10a.5; now it opens the panel anchored to that message.
+- `branches@1.0` catalog manifest — `render` now points at `BranchesRender` (live). `previewRender` unchanged for the dev `/catalog` route. Config schema gains `showCompressButton` and `contextThreshold` (the Settings → component-config migration per audit §3.6).
+- `lib/db.js` — `createBranch` now copies `room` from the source conversation onto the new branch record, and `createConversation` accepts an explicit `room` option for the Compressed Summary path. Without this, V2 branches would land at `room: null` and route through the Albatross fallback even when the parent uses RoomShell.
+- Documentation: §2.8a in [v2-phase1-audit.md](v2-phase1-audit.md) per-component table updated to mark `branches@1.0` as wired in PR-10a.7. This PR section captures the slice. New PR-10a.7 section in [phase-1-testing.md](phase-1-testing.md) following the PR-10a.6 structure.
+- **Out of scope (next slice, before PR-10b):** "Send to branch" / "Pin for reference" message-transfer flows, Hide message + 20-second undo timer, per-message Move to branch, `voice-input@1.0`, `collab-mode@1.0` system prompts, `review@1.0`, `toc@1.0`. The Albatross fallback path continues to handle the deferred actions for users on `room: null` conversations.
+
+**Dependencies:** PR-10a.6.
+
+**Exit criteria:**
+- Open a migrated conversation in a room that includes `branches@1.0` (Writing Studio default seeds satisfy this). Side-rail Branches pane shows "Main Thread" with the live message count; no children renders empty list correctly.
+- Click the GitBranch icon on any message → BranchCreationPanel opens anchored to that message, "Forking from message N of M" reflects the right index. Click outside / Cancel / Esc closes cleanly.
+- Pick Full History → Create Branch → new conversation with `parentId` + `branchPoint` set, all messages up to the fork point copied, `room` inherited from source, navigation lands at `/chat/<newId>` rendered via RoomShell.
+- Pick Compressed Summary → click Preview summary → Haiku call fires, result renders inline, cached for the panel session. Closing and reopening the panel clears the cache. Click Create Branch → real Haiku summary persists as the new branch's first assistant message; navigation lands on the branch.
+- A failed compressed-summary call falls back to Full History silently (V1 behavior). No API key configured → falls back to Full History.
+- Click "Compress Context" in the side rail → panel opens anchored to the latest message.
+- Press Cmd/Ctrl+Shift+B anywhere on `/chat/:id` → panel opens anchored to the latest message; shortcut is inert on `/`, `/chats`, `/settings`, etc.
+- Albatross fallback (room: null conversations) unchanged — the V1 adapter's own branch flow still works end-to-end.
+- `npm run build` clean. No regressions in homepage / editor / wizard / annotations / context-meter surfaces.
+
+**Risk:** Medium. The branch-panel-state context is a new shared surface (third one in V2 after Annotations + Backup). Risk concentrates in conversation-switch lifecycle: if the panel is open and the user navigates away, the next mount must start clean. Mitigated by the modal's local cache + explicit close-on-navigate via `closeBranchPanel()` in the create handlers. Compressed-summary path is a real user-action Composer-tier model call (per [tier-classification.md](tier-classification.md)) — preview generation is gated behind explicit click so users who close the panel without previewing don't burn tokens.
+
+---
+
 ### PR-10b — Delete adapter directories + cleanup InputArea + rotate PWA cache
 
 **Goal:** Point of no return. V2 is the only path.
@@ -547,9 +579,9 @@
 | 0 | PR-0 | Documentation foundation (5 docs, no code) |
 | A | PR-1, PR-2, PR-3 | Foundation (no user-visible change) |
 | B | PR-4a, PR-4b, PR-5, PR-6, PR-7 | Visual system + new homepage + V2 backup |
-| C | PR-8, PR-8b, PR-9, PR-10a, PR-10a.5, PR-10a.6, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
+| C | PR-8, PR-8b, PR-9, PR-10a, PR-10a.5, PR-10a.6, PR-10a.7, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
 
-**Total: 19 PRs** including PR-0.
+**Total: 20 PRs** including PR-0.
 
 ## Pause points
 
