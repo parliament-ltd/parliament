@@ -19,6 +19,7 @@
 // can be exercised without a live conversation.
 
 import HighlightList from '../../components/core/HighlightList'
+import HighlightsRender from './highlights-render'
 import { HIGHLIGHT_COLORS } from '../../lib/constants'
 
 const SAMPLE_HIGHLIGHTS = [
@@ -67,14 +68,8 @@ export default {
     ],
   },
 
-  render: ({ highlights = [], onNavigate, onRemove, onAdd }) => (
-    <HighlightList
-      highlights={highlights}
-      onNavigate={onNavigate}
-      onRemove={onRemove}
-      onAdd={onAdd}
-    />
-  ),
+  // Production render — self-binds to AnnotationsContext (PR-10a.6).
+  render: HighlightsRender,
 
   previewRender: () => (
     <div className="border border-[var(--p-border)] rounded-xl bg-white p-3 max-w-sm">

@@ -5,6 +5,7 @@ import { ModeProvider } from './stores/ModeContext'
 import { SettingsProvider } from './stores/SettingsContext'
 import { ConversationProvider } from './stores/ConversationContext'
 import { ChatProvider } from './stores/ChatContext'
+import { AnnotationsProvider } from './stores/AnnotationsContext'
 import { PWAProvider } from './stores/PWAContext'
 import { BackupProvider } from './stores/BackupContext'
 import ChatView from './views/ChatView'
@@ -39,6 +40,7 @@ export default function App() {
           <SettingsProvider>
             <ConversationProvider>
               <ChatProvider>
+                <AnnotationsProvider>
                 <BrowserRouter>
                   <BackupProvider>
                   <Routes>
@@ -64,6 +66,7 @@ export default function App() {
                   </Routes>
                   </BackupProvider>
                 </BrowserRouter>
+                </AnnotationsProvider>
               </ChatProvider>
             </ConversationProvider>
           </SettingsProvider>

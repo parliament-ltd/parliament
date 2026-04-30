@@ -11,6 +11,7 @@
 // without an inline add form yet).
 
 import NoteList from '../../components/core/NoteList'
+import NotesRender from './notes-render'
 
 const SAMPLE_NOTES = [
   { id: 'n1', text: 'Cross-reference with the warm-grey palette doc.' },
@@ -55,9 +56,8 @@ export default {
     ],
   },
 
-  render: ({ notes = [], onEdit, onDelete }) => (
-    <NoteList notes={notes} onEdit={onEdit} onDelete={onDelete} />
-  ),
+  // Production render — self-binds to AnnotationsContext (PR-10a.6).
+  render: NotesRender,
 
   previewRender: () => (
     <div className="border border-[var(--p-border)] rounded-xl bg-white p-3 max-w-sm">

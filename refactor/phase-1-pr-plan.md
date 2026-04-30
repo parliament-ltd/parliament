@@ -398,6 +398,35 @@
 
 ---
 
+### PR-10a.6 — Wire annotations + context meter to ChatContext
+
+**Goal:** Second slice of catalog data plumbing (after PR-10a.5). Brings the per-message Star / StickyNote / text-highlight workflows online in the V2 RoomShell chat path, plus a live context meter.
+
+**Scope:**
+- New `src/stores/AnnotationsContext.jsx` — provides `{favorites, notes, highlights, showNotes, toggleFavorite, toggleNotePanel, saveNote, deleteNote, addHighlight, addHighlightFromSidebar, deleteHighlights, navigateHighlight}`. Watches `useChat().activeConversationId`; (re)loads annotations on conversation change. Exposes a `loaded` flag plus stable empty-collection references during the unloaded state so consumer memos stay stable across conversation switches.
+- Mounted in App.jsx between `ChatProvider` and `BrowserRouter` so every route — including the V1 Albatross adapter on the room: null fallback path — has access. Albatross continues to manage its own annotation state directly off IndexedDB; the new context coexists without interference.
+- New `context-render.jsx` — reads `useChat().tokenUsage` + `useSettings().defaultModel` + provider model info → `<ContextMeter>`.
+- New `highlights-render.jsx` — aggregates raw highlight records into the (term, color, count, ids) shape `<HighlightList>` expects, dispatches add/remove/navigate via the annotations context.
+- New `notes-render.jsx` — side-rail summary list of all conversation notes; clicking a note expands the inline panel on its source message and scrolls to it.
+- `messages-render.jsx` updated — pulls favorites/notes/highlights from the annotations context, passes the relevant per-message slice to `MessageCard`, wires `onFavorite` / `onNote` / `onNoteSave` / `onHighlight` to dispatch through context mutators.
+- Catalog manifests for `context@1.0`, `highlights@1.0`, `notes@1.0` updated to point `render` at the new live components. `previewRender` stays unchanged for the dev `/catalog` route.
+- Documentation: §2.8a in [v2-phase1-audit.md](v2-phase1-audit.md) per-component table updated to mark the four newly-wired components.
+- **Out of scope (next slice, before PR-10b):** branches@1.0 + BranchCreationPanel, voice-input@1.0, collab-mode@1.0 system-prompt wiring, review@1.0 modal, toc@1.0, hide/delete with undo. The branch icon on each message is still a no-op; the Albatross fallback path handles branches end-to-end for users who want the V1 surface.
+
+**Dependencies:** PR-10a.5.
+
+**Exit criteria:**
+- Star a message → favorite persists; reload → star still set. Star icon reflects state across the message and the homepage favorites surface.
+- Click StickyNote → inline note panel opens, type → blur → text persists; reload → note re-appears with the same text. Side-rail Notes pane lists all notes; clicking one scrolls to its message and reopens the panel.
+- Select text in a message → popover with color picker → click a color → highlight persists, the term renders inline as `<mark>` on every matching message, the side-rail Highlights pane lists the term with occurrence count and prev/next navigation.
+- Context meter shows live token usage, message count, and threshold-tinted progress bar. The right-rail Context Health pane updates as messages stream in.
+- Albatross fallback (room: null conversations) unchanged; no double-write to IndexedDB stores.
+- `npm run build` clean.
+
+**Risk:** Medium. AnnotationsContext is the first shared cross-component state we've added in V2; if its load timing is wrong, messages@1.0 and the side-rail components see different states briefly. Mitigated by the `loaded` gate plus the stable empty-collection references that prevent consumer-memo invalidation.
+
+---
+
 ### PR-10b — Delete adapter directories + cleanup InputArea + rotate PWA cache
 
 **Goal:** Point of no return. V2 is the only path.
@@ -518,9 +547,9 @@
 | 0 | PR-0 | Documentation foundation (5 docs, no code) |
 | A | PR-1, PR-2, PR-3 | Foundation (no user-visible change) |
 | B | PR-4a, PR-4b, PR-5, PR-6, PR-7 | Visual system + new homepage + V2 backup |
-| C | PR-8, PR-8b, PR-9, PR-10a, PR-10a.5, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
+| C | PR-8, PR-8b, PR-9, PR-10a, PR-10a.5, PR-10a.6, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
 
-**Total: 18 PRs** including PR-0.
+**Total: 19 PRs** including PR-0.
 
 ## Pause points
 
