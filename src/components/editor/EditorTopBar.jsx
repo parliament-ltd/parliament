@@ -5,15 +5,24 @@
 // step (PR-9) handles the API-key-light-up moment. After PR-9 lands,
 // Build will trigger the wizard's last step.
 
-import { ArrowLeft, Smartphone, Monitor, Eye } from 'lucide-react'
+import { ArrowLeft, Smartphone, Monitor, Eye, Undo2, Redo2 } from 'lucide-react'
 import { SCHEMES } from '../../lib/schemes'
 import { normalizeRef } from '../../lib/refs'
+
+const isMac =
+  typeof navigator !== 'undefined' && /mac/i.test(navigator.platform || '')
+const undoShortcut = isMac ? '⌘Z' : 'Ctrl+Z'
+const redoShortcut = isMac ? '⌘⇧Z' : 'Ctrl+Shift+Z'
 
 export default function EditorTopBar({
   mode,
   dirty,
   saving,
   trayBlockingBuild,
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
   onBack,
   onNameChange,
   onDeviceClassChange,
@@ -71,6 +80,34 @@ export default function EditorTopBar({
         </button>
       </div>
       <div className="flex items-center gap-2">
+        <div className="flex items-center gap-0.5 mr-1">
+          <button
+            onClick={onUndo}
+            disabled={!canUndo}
+            title={`Undo (${undoShortcut})`}
+            aria-label="Undo"
+            className={`w-7 h-7 flex items-center justify-center rounded-md transition-colors ${
+              canUndo
+                ? 'text-[var(--p-text-secondary)] hover:bg-[var(--p-bg-subtle)] hover:text-[var(--p-gold-light)]'
+                : 'text-[var(--p-text-muted)] opacity-40 cursor-not-allowed'
+            }`}
+          >
+            <Undo2 className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={onRedo}
+            disabled={!canRedo}
+            title={`Redo (${redoShortcut})`}
+            aria-label="Redo"
+            className={`w-7 h-7 flex items-center justify-center rounded-md transition-colors ${
+              canRedo
+                ? 'text-[var(--p-text-secondary)] hover:bg-[var(--p-bg-subtle)] hover:text-[var(--p-gold-light)]'
+                : 'text-[var(--p-text-muted)] opacity-40 cursor-not-allowed'
+            }`}
+          >
+            <Redo2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
         <button
           disabled
           title="Preview launches with PR-9"

@@ -224,11 +224,19 @@ export function editorReducer(state, action) {
 
     // ─── Save lifecycle ──────────────────────────────────
     case 'MARK_SAVED':
-      return { ...state, dirty: false }
+      // Optionally swap in the saved mode (saveMode returns one with a
+      // stamped meta.modified). Selection and tray are preserved so the
+      // editor stays where the user was. History is preserved by the
+      // wrapping history reducer — undo past a save is allowed.
+      return {
+        ...state,
+        mode: action.mode ? cloneMode(action.mode) : state.mode,
+        dirty: false,
+      }
 
     case 'RESET_TO':
-      // Replace state entirely (e.g. after Save returns the saved mode
-      // with stamped meta.modified).
+      // Replace state entirely. Used on initial load — the history
+      // wrapper treats this as a hard reset and discards undo history.
       return makeInitialState(action.mode)
 
     default:

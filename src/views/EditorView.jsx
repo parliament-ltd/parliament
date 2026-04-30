@@ -1,4 +1,4 @@
-// EditorView — the three-rail mode editor (PR-8).
+// EditorView — the three-rail mode editor (PR-8 + PR-8b).
 //
 // Routes:
 //   /edit/:roomId  → loads modes[roomId] (scope='room')
@@ -9,11 +9,9 @@
 // Save. The three rails plus the holding tray + migration dialog are
 // children — see src/components/editor/.
 //
-// PR-8 deliberately ships without undo/redo. The architecture
-// (refactor/mode-workshop-architecture.md) calls undo non-negotiable;
-// the editor reducer is shaped to support it (every mutation produces a
-// new state) and a later PR can wrap it in a history stack without
-// touching the children.
+// State runs through editorHistoryReducer (PR-8b), which wraps the pure
+// editorReducer with an undo / redo stack. EditorView only reads
+// historyState.present; children never see the history shape.
 
 import { useEffect, useReducer, useState, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -24,7 +22,12 @@ import EditorCanvas from '../components/editor/EditorCanvas'
 import EditorRightRail from '../components/editor/EditorRightRail'
 import EditorHoldingTray from '../components/editor/EditorHoldingTray'
 import EditorMigrationDialog from '../components/editor/EditorMigrationDialog'
-import { editorReducer, makeInitialState } from '../lib/editorReducer'
+import {
+  editorHistoryReducer,
+  makeInitialHistoryState,
+  canUndo,
+  canRedo,
+} from '../lib/editorHistory'
 import { planLayoutMigration } from '../lib/layoutMigration'
 import { loadHomepageMode, loadMode, saveMode } from '../lib/modes'
 import { listEntries as listCatalogEntries } from '../catalog'
@@ -32,7 +35,14 @@ import { listEntries as listCatalogEntries } from '../catalog'
 export default function EditorView({ scope = 'room' }) {
   const navigate = useNavigate()
   const { roomId } = useParams()
-  const [state, dispatch] = useReducer(editorReducer, null, () => makeInitialState(null))
+  const [historyState, dispatch] = useReducer(
+    editorHistoryReducer,
+    null,
+    () => makeInitialHistoryState(null),
+  )
+  const state = historyState.present
+  const undoAvailable = canUndo(historyState)
+  const redoAvailable = canRedo(historyState)
   const [loaded, setLoaded] = useState(false)
   const [loadError, setLoadError] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -79,7 +89,8 @@ export default function EditorView({ scope = 'room' }) {
     setSaving(true)
     try {
       const saved = await saveMode(state.mode)
-      dispatch({ type: 'RESET_TO', mode: saved })
+      // MARK_SAVED (not RESET_TO) so undo history survives a save.
+      dispatch({ type: 'MARK_SAVED', mode: saved })
       showToast('Saved')
     } catch (err) {
       showToast(err.message || 'Save failed.')
@@ -88,14 +99,34 @@ export default function EditorView({ scope = 'room' }) {
     }
   }, [saving, state.tray.length, state.mode, showToast])
 
-  // ── Esc deselects ──────────────────────────────────────
+  // ── Keyboard shortcuts: Esc deselects, Cmd/Ctrl+Z undo, ─
+  //    Cmd/Ctrl+Shift+Z (or Cmd/Ctrl+Y) redo. All gated against
+  //    typing in inputs / textareas / contenteditable so the
+  //    browser's native text-input undo wins there.
   useEffect(() => {
     function onKey(e) {
+      const tag = (e.target?.tagName || '').toLowerCase()
+      const isTyping =
+        tag === 'input' || tag === 'textarea' || e.target?.isContentEditable
+      if (isTyping) return
+
       if (e.key === 'Escape') {
-        // Don't fight a typed input
-        const tag = (e.target?.tagName || '').toLowerCase()
-        if (tag === 'input' || tag === 'textarea' || e.target?.isContentEditable) return
         dispatch({ type: 'CLEAR_SELECTION' })
+        return
+      }
+
+      const mod = e.metaKey || e.ctrlKey
+      if (!mod) return
+      const key = e.key.toLowerCase()
+
+      if (key === 'z' && !e.shiftKey) {
+        e.preventDefault()
+        dispatch({ type: 'UNDO' })
+        return
+      }
+      if ((key === 'z' && e.shiftKey) || key === 'y') {
+        e.preventDefault()
+        dispatch({ type: 'REDO' })
       }
     }
     window.addEventListener('keydown', onKey)
@@ -212,6 +243,10 @@ export default function EditorView({ scope = 'room' }) {
           dirty={state.dirty}
           saving={saving}
           trayBlockingBuild={state.tray.length > 0}
+          canUndo={undoAvailable}
+          canRedo={redoAvailable}
+          onUndo={() => dispatch({ type: 'UNDO' })}
+          onRedo={() => dispatch({ type: 'REDO' })}
           onBack={() => navigate('/')}
           onNameChange={(name) => dispatch({ type: 'SET_NAME', name })}
           onDeviceClassChange={(deviceClass) => dispatch({ type: 'SET_DEVICE_CLASS', deviceClass })}

@@ -285,7 +285,35 @@
 - Migration dialog appears when changing layouts; holding tray catches orphans.
 - Round-trip: build a mode in editor, save, reload page, mode reloads identically.
 
+**Deferred (tracked in follow-up PRs):**
+- **Undo / redo** — the reducer is shaped for it; implementation lands in PR-8b.
+- **Runtime entries for `canvas-centric@1.0`, `document-centric@1.0`, `single-column-with-sheet@1.0`** — editor previews their slot inventory but the canvas falls back to a labeled grid until those layouts ship in PR-9 (which needs them anyway for templates that default to those layouts).
+- **Preview button** in the editor top bar — placeholder until PR-9's ignition step ships.
+- **Continuous validation sidebar** (architecture §"Drag-and-Drop Composition") — non-blocking warnings surface in an inspector panel. Phase 2 work; not required to ship Phase 1.
+
 **Risk:** High. Largest single feature in Phase 1. dnd-kit integration is mature but the visual feedback layer is custom.
+
+---
+
+### PR-8b — Editor undo / redo
+
+**Goal:** Rich undo across editor mutations (architecture calls this non-negotiable).
+
+**Scope:**
+- History stack wrapping `editorReducer` — preserves the last 20+ states across PLACE_COMPONENT, MOVE_COMPONENT, REMOVE_COMPONENT, SWAP_LAYOUT, APPLY_SCHEME, UPDATE_COMPONENT_CONFIG, RESTORE_FROM_TRAY, DISMISS_FROM_TRAY.
+- `Cmd+Z` / `Ctrl+Z` undo, `Cmd+Shift+Z` / `Ctrl+Shift+Z` (or `Cmd+Y`) redo, both gated against typing in inputs.
+- Visual undo / redo affordance in the editor top bar (small back / forward arrows next to Save).
+- Selection state restoration on undo (selecting the component you just removed feels right; selecting the room after a SWAP_LAYOUT is fine).
+- Save MARK_SAVED resets the dirty flag but does not clear history — users can still undo past a save.
+
+**Dependencies:** PR-8.
+
+**Exit criteria:**
+- Twenty operations of any mix can be undone in order; redo replays them.
+- Refresh discards history (it's session-scoped) — no need to persist.
+- Keyboard shortcuts skip when focus is in a text input or contenteditable.
+
+**Risk:** Low–medium. The reducer is already pure; wrapping it is a small mechanical lift. Risk is in the keyboard-shortcut hygiene around text inputs.
 
 ---
 
@@ -299,7 +327,9 @@
 - **5 available templates** (Writing Studio, Data Workspace, Drafting Desk, Pocket Chat, Quiet Room) + **2 coming-soon templates** (Kingfisher (deep reading), Starling (collaboration)) per NQ-3.
 - All available templates default to `parliament@1.0` scheme per NQ-9.
 - Coming-soon templates point at the coming-soon layouts (`reading-pane@1.0`, `split-view@1.0`) seeded in `libraryLayouts`.
+- Runtime entries (slot inventory + React render fn) for `canvas-centric@1.0`, `document-centric@1.0`, `single-column-with-sheet@1.0` — required by the templates that default to those layouts. Editor canvas (from PR-8) auto-upgrades from its labeled-grid fallback to the live geometry when these register.
 - Ignition step uses [useShimmer](src/hooks/useShimmer.js) gold sweep on API key validation.
+- Wire the editor top bar's **Preview** button (placeholder from PR-8) to a read-only render of the current draft mode (uses `<RoomShell>` against the in-memory draft, opens in a side sheet or new route).
 - "Open in editor" escape hatch wired from wizard step 3+ onward.
 - Wire the homepage "+ Build a room" button (placeholder from PR-6) to the entry screen.
 
@@ -464,9 +494,9 @@
 | 0 | PR-0 | Documentation foundation (5 docs, no code) |
 | A | PR-1, PR-2, PR-3 | Foundation (no user-visible change) |
 | B | PR-4a, PR-4b, PR-5, PR-6, PR-7 | Visual system + new homepage + V2 backup |
-| C | PR-8, PR-9, PR-10a, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
+| C | PR-8, PR-8b, PR-9, PR-10a, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
 
-**Total: 16 PRs** including PR-0.
+**Total: 17 PRs** including PR-0.
 
 ## Pause points
 
@@ -487,3 +517,4 @@
 - Resources content production (the 19 launch resources).
 - Onboarding tour rewrites (beyond minimum selector reattachment).
 - Multi-provider work (Ollama, Mistral, OpenAI).
+- **Editor: continuous validation sidebar** (architecture §"Drag-and-Drop Composition") — non-blocking warnings surface in an inspector panel. PR-8 ships drops without blocking; the warning surface is Phase 2 work.
