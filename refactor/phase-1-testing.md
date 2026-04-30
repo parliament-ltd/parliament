@@ -562,6 +562,164 @@ When editing a section component on `/edit-home`:
 
 ---
 
+## PR-10a — Wire `/chat/:id` through `<RoomShell>` + `createdInMode → room` migration
+
+👀 User-visible. **Pause point** — verify thoroughly before PR-10b's adapter deletion.
+
+**Surface:** `/chat/:id` for any existing conversation, plus DevTools → Application → IndexedDB for the migration audit.
+
+### Setup
+
+- An installed Parliament with conversations created across multiple V1 modes.
+  Ideal: at least one conversation per recognized `createdInMode` value
+  (`albatross`, `swift`, `pelican`, `secretarybird`) plus one with
+  `createdInMode = null`. If you don't have variety, the synthetic-seed
+  steps below produce equivalent coverage.
+- DevTools open on the IndexedDB tab so the migration's effects are visible.
+
+### Migration — happy path
+
+- [ ] Boot the app on a Parliament with pre-PR-10a data (no `room` field
+  on conversations, or `room: null` from the PR-1 schema bump). The
+  homepage loads normally.
+- [ ] DevTools → IndexedDB → `parliament` → `conversations`. Every record
+  has a `room` field. Most are non-null mode ids of the form
+  `mode_<uuid>`. The exact value is whatever the migration map yielded
+  (see refactor/data-migration.md for the table).
+- [ ] DevTools → `parliament` → `modes`. Every migrated conversation has
+  a corresponding `scope: 'room'` record. The mode's `layout.ref` matches
+  the template the migration map selected. Each migrated mode's
+  `buildIntent.derivedFrom` ends in `-migration` (e.g.
+  `'secretarybird-migration'`). `home_default` is still present.
+- [ ] DevTools → `settings` table → record with `key:
+  "migration_v2_chat_room_assigned"` and `value: true`.
+- [ ] DevTools console → `localStorage.getItem('parliament-mode')` returns
+  `null`. The legacy key was dropped.
+
+### Per-`createdInMode` mapping spot checks
+
+Verify the right template was instantiated for each known value:
+
+- [ ] `createdInMode === 'albatross'` → mode's `layout.ref` is
+  `three-panel@^1.0` and `meta.name` is "Writing Studio".
+- [ ] `createdInMode === 'pelican'` → `canvas-centric@^1.0` / "Data Workspace".
+- [ ] `createdInMode === 'secretarybird'` → `document-centric@^1.0` / "Drafting Desk".
+- [ ] `createdInMode === 'swift'` → `single-column-with-sheet@^1.0` /
+  "Pocket Chat". The mode's `buildIntent.derivedFrom` is
+  `'swift-migration'` exactly — PR-10b uses this tag to inject
+  `voice-input@1.0` into these specific rooms.
+- [ ] `createdInMode === 'kingfisher'` or `'starling'` → falls back to
+  `three-panel@^1.0` / "Writing Studio" (data-migration.md notes their
+  intended layouts are coming-soon and the migration picks the closest
+  available default).
+- [ ] `createdInMode === null` and `localStorage[parliament-mode]` was
+  set pre-deploy → migration consults the localStorage value and applies
+  the same map, then drops the key.
+- [ ] `createdInMode === null` with no localStorage hint → conversation's
+  `room` stays `null` (Albatross fallback handles rendering).
+- [ ] `createdInMode` value the map doesn't recognize (e.g. a hand-edited
+  `'mystery-mode'`) → `room` stays `null`. **The migration does not guess.**
+
+### Routing — happy path
+
+- [ ] Open a migrated conversation at `/chat/:id`. The page renders the
+  V2 `<RoomShell>` against the assigned mode (no Albatross sidebar /
+  data-tour anchors). The room's layout shape is visible (three-panel
+  for Writing Studio, document gutters for Drafting Desk, etc.).
+- [ ] Open the homepage `/` — the chat row links still work; clicking a
+  migrated chat lands on the V2 path.
+- [ ] V1 selector preserved: `/chats` loads the original V1 chat selector
+  table. Functions for filtering, sorting, bulk actions remain.
+
+### Routing — Albatross fallback
+
+The fallback is the recoverable state for conversations the migration
+didn't assign cleanly. Verify it engages in three scenarios:
+
+- [ ] Conversation with `room: null` (unmapped or unrecognized
+  `createdInMode`) → `/chat/:id` renders the V1 Albatross adapter.
+  Recognizable surfaces: `[data-tour="chat-actions"]`,
+  `[data-tour="context-health"]`, the highlights / favorites / branches
+  rails, the action panel with Collaboration Mode and Review buttons.
+- [ ] Manually set a conversation's `room` to a mode id that does not
+  exist (DevTools → IndexedDB edit), reload `/chat/:id` → Albatross
+  fallback engages (mode-load failure path).
+- [ ] Conversation id in the URL doesn't match any record → Albatross
+  loads its own "conversation not found" path (existing V1 behavior;
+  not changed by PR-10a).
+
+### Idempotency
+
+- [ ] Reload the app a second time. DevTools → `modes`: count is
+  unchanged from the first migration run. No new mode records created.
+- [ ] Spot-check one migrated conversation's `room` value before and
+  after a reload — it's the same mode id (the per-conversation guard
+  skips records that already have a non-null `room`).
+- [ ] Manually set `migration_v2_chat_room_assigned` back to `false` in
+  settings, then reload. Migration runs again but per-conversation
+  guards skip every already-assigned conversation. New mode records
+  appear only for any newly-introduced `room: null` rows. The legacy
+  localStorage key is dropped again (no-op if already gone).
+
+### Data integrity
+
+The migration only adds the `room` field. Confirm it doesn't touch
+anything else:
+
+- [ ] Messages, highlights, notes, favorites, pins, files, file_data,
+  sbrd_documents — counts unchanged before and after the first migration.
+- [ ] `createdInMode` field is still present on conversation records
+  (PR-12 strips it; until then it stays for debugging migration reports).
+- [ ] Settings other than the migration flag are unchanged.
+- [ ] Existing V1 critical flows still work end-to-end via the Albatross
+  fallback (open a conversation with `room: null` to force the path):
+  send a message, create a branch, add a highlight, add a note, export
+  the chat.
+
+### Edge cases
+
+- [ ] **Empty Parliament.** Fresh install with no conversations. The
+  migration runs, scans zero records, drops the legacy localStorage key,
+  flips the settings flag. Boot completes without errors.
+- [ ] **Crash mid-migration.** Simulate by killing the tab partway
+  through a large migration (DevTools → Stop loading on a slow throttle).
+  Reload. Migration retries from scratch on the next boot; the
+  per-conversation guard skips conversations whose `room` was already
+  assigned in the prior partial pass. Mode records from the partial pass
+  remain — they're owned by their assigned conversations and weren't
+  duplicated.
+- [ ] **Private mode / localStorage unavailable.** Migration's
+  localStorage read is wrapped in try/catch. If localStorage throws, the
+  fallback falls through to "leave room: null" rather than failing the
+  whole migration.
+- [ ] **`libraryRooms` template missing.** Hand-delete one of the seeded
+  templates (e.g. `data-workspace@1.0`) from `libraryRooms` then create
+  a Pelican-tagged conversation with `room: null` and reset the migration
+  flag. Reload. The migration logs an error, leaves that conversation's
+  `room` null, and continues processing the rest of the batch. The
+  batch's settings flag is still flipped to true on completion.
+
+### Known limitations to verify (and not flag as bugs)
+
+- [ ] **V2 chat surface renders catalog components in their preview
+  shapes.** Opening a migrated conversation routes through `<RoomShell>`,
+  but the `messages@1.0`, `input@1.0`, `branches@1.0`, `highlights@1.0`,
+  `notes@1.0`, and `context@1.0` catalog entries currently use
+  preview-shaped render functions. They display sample / empty state
+  rather than the live conversation. Full ChatContext wiring lands in
+  follow-up work between PR-10a's migration-validation checkpoint and
+  PR-10b's adapter deletion. Until then, **users wanting full chat
+  functionality should open conversations whose `room` is null** —
+  those route through the Albatross fallback. (You can roll back any
+  conversation to `room: null` via DevTools as a workaround.)
+- [ ] Albatross adapter directory still exists. PR-10b deletes it; PR-10a
+  deliberately keeps it as the rollback path.
+- [ ] PWA cache name still `parliament-adapters-v1` (PR-10b rotates it).
+- [ ] InputArea's built-in cardLayout mic button still present (PR-10b
+  removes it; voice-input@1.0 takes over for migrated swift users).
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

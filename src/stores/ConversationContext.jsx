@@ -6,6 +6,7 @@ import {
   deleteConversation,
   runIntegrityCheck,
 } from '../lib/db'
+import { migrateChatRoomAssignments } from '../lib/migration'
 
 const ConversationContext = createContext(null)
 
@@ -14,10 +15,29 @@ export function ConversationProvider({ children }) {
   const [activeConversationId, setActiveConversationId] = useState(null)
   const [loaded, setLoaded] = useState(false)
 
-  // Run integrity check and load conversations on mount
+  // Run integrity check, then the PR-10a one-time createdInMode → room
+  // migration, then load conversations on mount. Order matters:
+  //   1. Integrity check first — it deletes orphaned (zero-message)
+  //      conversations, so we don't waste a migration on records we're
+  //      about to remove.
+  //   2. Migration second — it sets `conversation.room` for every
+  //      recognized createdInMode value, leaving null when unmapped.
+  //      Idempotent: a settings flag short-circuits subsequent boots.
+  //   3. List third — picks up the migrated `room` field so /chat/:id
+  //      can route through <RoomShell> on first render after migration.
   useEffect(() => {
     async function init() {
       await runIntegrityCheck()
+      try {
+        await migrateChatRoomAssignments()
+      } catch (err) {
+        // A migration failure should not block conversation listing —
+        // unmigrated conversations fall back to the V1 Albatross adapter
+        // (room: null path). Surface the failure in dev so it's noticed.
+        if (import.meta.env.DEV) {
+          console.error('[ConversationProvider] chat-room migration failed:', err)
+        }
+      }
       const convs = await listConversations()
       setConversations(convs)
       setLoaded(true)
