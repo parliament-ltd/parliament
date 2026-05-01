@@ -1283,6 +1283,137 @@ modes — `/catalog` debug route also exercises toc).
 
 ---
 
+## PR-10a.9 — Wire collab-mode@1.0 + review@1.0 to ChatContext
+
+👀 User-visible. Fifth slice of catalog data plumbing. Closes the
+two remaining components that need V1-modal extractions plus a live
+sendMessage-flow integration.
+
+**Surface:** `/chat/:id` for any conversation whose `room` is non-null
+AND whose mode includes `collab-mode@1.0` and/or `review@1.0`. Default
+seed templates don't include them yet — for testing, hand-edit the
+mode in DevTools to inject the components into a slot (right-rail-extra
+in Writing Studio works).
+
+### Setup
+- A migrated Writing Studio conversation with at least one user→assistant
+  exchange so the synthesis path has something to work with.
+- An API key configured (the synthesis call + the eventual send needs
+  one; collab-mode UI works without).
+- DevTools open to confirm IndexedDB writes (parrotPersonas key) and
+  to capture network calls (system prompt threading).
+
+### collab-mode — modal + apply
+
+- [ ] Trigger button renders with label "Collaboration mode" and no
+  badge when no presets are active.
+- [ ] Click the trigger. CollabModal opens with the V1 design — five
+  built-in presets (Challenge Artifacts, Show Reasoning, Push Back on
+  Me, Offer Alternatives, Flag Uncertainty), Parrot Personas section
+  (empty initially), Custom Interaction text area.
+- [ ] Click a preset. The card lights gold. Click another. Both light
+  (multi-select).
+- [ ] Cancel. Close. Reopen. The previously-active presets are NOT
+  remembered — only Apply commits state to the context.
+- [ ] Pick "Show Reasoning" → Apply. Modal closes; trigger badge shows
+  "1".
+- [ ] Reopen the modal. The Show Reasoning card is already lit (seeded
+  from context). Pick another preset → Apply. Badge shows "2".
+- [ ] In the modal, type a Parrot Persona title + a custom instruction
+  → "Save Persona". DevTools → IndexedDB → `settings` → `parrotPersonas`:
+  the new persona record is appended.
+- [ ] Edit the persona via the pencil icon. Save. Record updates.
+- [ ] Delete the persona via trash. Record removed.
+- [ ] With presets active, type a custom instruction without saving →
+  Apply. The custom text persists in the trigger's badge count (now
+  shows preset count + 1 for the custom string).
+
+### System prompt threading — input@1.0 + ghost-continue
+
+- [ ] With one preset active, type a message and click Send. Inspect
+  the network request to `api.anthropic.com/v1/messages` — the body
+  has `system: "<preset prompt text>"`.
+- [ ] Multiple presets → `system` is the joined string with `\n\n`
+  separator.
+- [ ] Custom instruction added → appended after presets.
+- [ ] Force a stream interruption (kill the network mid-stream). The
+  resulting incomplete message renders with ghost text. Click Continue.
+  The request body's `system` field carries the same active preset
+  prompt — V1 parity preserved.
+
+### Conversation switch lifetime
+
+- [ ] On `/chat/X`, apply a preset. Badge shows "1".
+- [ ] Navigate `/chat/X → / → /chat/X` (same conversation via Chats
+  list). Badge still shows "1" — transient null during route nav
+  doesn't wipe state.
+- [ ] Navigate `/chat/X → /chat/Y` (different conversation, also
+  V2-routed). Badge on Y shows "0" — state resets cleanly.
+- [ ] Navigate back to X. Badge resets to "0" too — V1 lifetime is
+  per-mount (NOT per-conversation across reloads).
+
+### review — modal + synthesis
+
+- [ ] Trigger button is disabled when the conversation has zero
+  messages.
+- [ ] With messages, click trigger. ReviewModal opens with the V1
+  design.
+- [ ] Header shows "Review · Reflect on your conversation".
+- [ ] Summary depth toggle: "Brief" / "Detailed".
+- [ ] "Include in review" chips show live counts: Highlights (N),
+  Notes (N), Favorites (N) — pulled from AnnotationsContext.
+- [ ] Disabled chips for categories with zero entries.
+- [ ] Highlights / Notes sections list the active terms / note text.
+- [ ] Session Stats block shows live token usage, message count, and
+  estimated cost.
+- [ ] Reflection Prompts derive from active annotations ("You
+  highlighted references to X. What's your main takeaway?", etc.).
+- [ ] Click "Generate Synthesis with Claude". Loading spinner appears
+  inside the synthesis card.
+- [ ] On success: the synthesis text renders inline as Markdown inside
+  the card (gold-tinted background).
+- [ ] Without an API key configured: the synthesis call surfaces an
+  error inline ("No API key configured. Add one in Settings to
+  generate a synthesis.") rather than crashing.
+- [ ] Click "Save as Markdown". A `.md` file downloads. Open it: the
+  conversation title, "Highlights" section, "Favorites" preview, and
+  per-message inline notes round-trip. Favorited messages get a star
+  in the Markdown body.
+
+### Albatross fallback unchanged
+
+- [ ] Set a conversation's `room` field to null in DevTools. Reload.
+  V1 Albatross renders. The CollabModal + ReviewModal surface via
+  the V1 right-rail action buttons. Both still work end-to-end as in
+  V1.
+- [ ] Active collab presets in V1 do not bleed into the V2 path
+  (they're per-mount in both worlds).
+
+### Edge cases
+
+- [ ] Open the Collab modal, switch conversations mid-edit. The modal
+  closes (component unmount); active state on the new conversation is
+  empty.
+- [ ] Generate a synthesis, then immediately close the modal. The next
+  open shows a fresh state (no cached synthesis — the synthesis state
+  lives in modal-local state by design).
+- [ ] Save as Markdown with zero messages: button is gated upstream
+  (trigger is disabled), so this case shouldn't fire.
+
+### Known limitations to verify (and not flag as bugs)
+
+- [ ] **Per-message hide / move-to-branch / send-to-branch / pin
+  still no-op.** Bundles with PR-10a.10 or PR-10b cleanup.
+- [ ] **Default seed templates don't include collab-mode or review.**
+  Existing migrated conversations need DevTools mode editing to gain
+  these components; new users compose them via the editor (PR-8).
+  Adding to default seeds is a separate scope decision.
+- [ ] **Active collab presets don't persist across browser reloads.**
+  Per-conversation persistence is a Phase 2 question — Phase 1 keeps
+  the V1 session-scoped lifetime.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

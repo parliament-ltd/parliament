@@ -23,9 +23,14 @@
 //   - Tool toggles (web_search / calculate / create_chart) — UI shows
 //     them via the +menu but click is a no-op for now. Sending without
 //     tools selected is the V1 default behavior, so this isn't a regression.
-//   - Collab-mode system prompt (collab-mode@1.0 wires this later).
 //   - Mid-conversation key-failure / rate-limit banners — the input
 //     surfaces a small inline error instead until those land.
+//
+// PR-10a.9: collab-mode system prompt wired in. `useCollabMode().
+// buildSystemPrompt()` resolves the active presets + custom instruction
+// for the active conversation (resets on conversation change inside the
+// context) and threads them into sendMessage's existing systemPrompt
+// argument.
 //
 // Lives in its own file (separate from input.jsx, the catalog manifest's
 // default export) so react-refresh's only-export-components rule stays
@@ -38,6 +43,7 @@ import InputArea from '../../components/core/InputArea'
 import { useChat } from '../../stores/ChatContext'
 import { useSettings } from '../../stores/SettingsContext'
 import { usePWA } from '../../stores/PWAContext'
+import { useCollabMode } from '../../stores/CollabModeContext'
 import { getProvider } from '../../providers'
 import { loadApiKey } from '../../lib/crypto'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
@@ -49,6 +55,7 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
   const { isStreaming, sendMessage, stopGenerating } = useChat()
   const { settings, refreshStorageEstimate } = useSettings()
   const { isOnline, trackMessageSent } = usePWA()
+  const { buildSystemPrompt } = useCollabMode()
 
   const [value, setValue] = useState('')
   const [error, setError] = useState(null) // small inline error for send failures
@@ -103,12 +110,14 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
     }
 
     const provider = getProvider('anthropic')
+    const systemPrompt = buildSystemPrompt() // '' when collab-mode is inactive
     setValue('')
     setError(null)
     try {
-      // No system prompt and no tools in the PR-10a.5 slice — those
-      // hook in when collab-mode@1.0 / tool-toggle wiring lands.
-      await sendMessage(apiKey, conversationId, trimmed, settings.defaultModel, provider, '', [])
+      // PR-10a.9: collab-mode system prompt threads through here. Tool
+      // toggles still no-op until the next slice wires the +menu state
+      // into a live tool list.
+      await sendMessage(apiKey, conversationId, trimmed, settings.defaultModel, provider, systemPrompt, [])
       try { await refreshStorageEstimate() } catch { /* non-fatal */ }
       try { trackMessageSent() } catch { /* non-fatal */ }
     } catch (err) {
@@ -124,6 +133,7 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
     value, isStreaming, conversationId, isOnline, lastSendAt,
     settings.storageMode, settings.defaultModel,
     sendMessage, refreshStorageEstimate, trackMessageSent,
+    buildSystemPrompt,
   ])
 
   const handleStop = useCallback(() => {
