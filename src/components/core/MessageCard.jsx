@@ -4,7 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import {
   Star, StickyNote, GitBranch, Trash2, MoreVertical,
-  Eye, Copy, ArrowRightCircle, Pencil,
+  Eye, Copy, ArrowRightCircle, Pencil, Pin,
 } from 'lucide-react'
 import { SPRING_SNAPPY, SPRING_GENTLE, DUSTY_GOLD, HIGHLIGHT_COLORS } from '../../lib/constants'
 import { indexOfWord } from '../../lib/textUtils'
@@ -31,7 +31,7 @@ export default function MessageCard({
   highlights = [],
   isPopoverActive = false, onPopoverChange,
   onNote, onFavorite, onNoteSave, onHighlight, onContinue, onDelete, onBranch,
-  onHide, onCopyText, onMoveToBranch,
+  onHide, onCopyText, onMoveToBranch, onPinForReference,
 }) {
   const [noteText, setNoteText] = useState(savedNoteText)
   const [showMenu, setShowMenu] = useState(false)
@@ -260,7 +260,10 @@ export default function MessageCard({
                       Hide message
                     </MenuButton>
                     <MenuButton icon={ArrowRightCircle} onClick={() => { onMoveToBranch?.(); setShowMenu(false) }}>
-                      Move to branch
+                      Send to branch
+                    </MenuButton>
+                    <MenuButton icon={Pin} onClick={() => { onPinForReference?.(); setShowMenu(false) }}>
+                      Pin for reference
                     </MenuButton>
                     <MenuButton icon={Copy} onClick={() => { handleCopy(); setShowMenu(false) }}>
                       {copied ? 'Copied!' : 'Copy text'}

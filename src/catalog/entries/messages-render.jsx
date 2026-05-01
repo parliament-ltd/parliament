@@ -1,48 +1,64 @@
 // messages@1.0 — live render component for the V2 RoomShell chat path.
 //
 // PR-10a.5 wired the live message list, streaming, and ghost-text
-// continue. PR-10a.6 adds the per-message annotation handlers:
-// favorites toggle, inline note panel + save, and text-selection
-// highlight popover. State for those is shared with the right-rail
-// components (highlights@1.0, notes@1.0) via AnnotationsContext —
-// see refactor/v2-phase1-audit.md §2.8a "Component data plumbing".
+// continue. PR-10a.6 added per-message annotation handlers (favorites,
+// notes, highlights). PR-10a.7 added the per-message Branch icon.
+// PR-10a.9 threaded the collab-mode system prompt through send + continue.
 //
-// What this slice wires (cumulative):
-//   - PR-10a.5: live messages, streaming splice, ghost-text continue,
-//     copy.
-//   - PR-10a.6: favorite toggle (Star icon), inline note panel
-//     (StickyNote icon), text-selection highlight (popover with color
-//     picker, persisted), inline highlight rendering (matched terms
-//     wrapped in <mark> via MessageCard's `highlights` prop).
-//   - PR-10a.7: per-message GitBranch icon opens the BranchCreationPanel
-//     anchored to that message via BranchPanelContext. The panel itself
-//     lives on branches@1.0; we only dispatch the open intent here.
+// What this slice (PR-10a.10) wires:
+//   - Hide message (Eye menu): session-only Set; filters visibleMessages.
+//     V1 parity — refresh forgets the hide.
+//   - Delete message (trash icon): hides immediately, schedules an
+//     IndexedDB delete after 20s, surfaces an UndoBanner inline above
+//     the bottom of the message list. Undo clears the timer + unhides.
+//   - Send to branch (ArrowRightCircle menu, formerly "Move to branch"):
+//     opens SelectConversationModal; on select, copies the message
+//     content into the target conversation's messages.
+//   - Pin for reference (Pin menu, V2-new): opens SelectConversationModal;
+//     on select, writes a pin record against the target conversation
+//     via the existing `pins` IndexedDB store. Renders pins as
+//     collapsible quote blocks at the top of the active conversation's
+//     message area when pins are present.
 //
-// What this slice intentionally does NOT wire (subsequent slices,
-// before PR-10b):
-//   - Hide / delete with undo (still no-op).
-//   - Move-to-branch (still no-op; lives in a follow-up slice).
+// What this slice intentionally does NOT wire (Phase 2 / future):
+//   - Multi-select "Send to branch" mode for bulk transfer (CLAUDE.md
+//     describes this as a selection mode in the parent's UI).
+//   - Persistent hide across reloads (V1 lifetime is per-mount).
 //   - Per-message action menu items contributed by other components —
-//     contributions ARE aggregated by RoomShell, but nothing is rendered
-//     in MessageCard's menu yet (the existing icons cover Phase 1
-//     contributors; the more-options menu surfaces hide/move/copy only
-//     until contributed actions get a UI surface).
+//     contributions ARE aggregated by RoomShell, but the UI surface for
+//     contributed actions is still deferred.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronDown, ChevronRight, Pin, X } from 'lucide-react'
 import MessageList from '../../components/core/MessageList'
 import MessageCard from '../../components/core/MessageCard'
+import SelectConversationModal from '../../components/SelectConversationModal'
 import { useChat } from '../../stores/ChatContext'
 import { useSettings } from '../../stores/SettingsContext'
 import { useAnnotations } from '../../stores/AnnotationsContext'
 import { useBranchPanel } from '../../stores/BranchPanelContext'
 import { useCollabMode } from '../../stores/CollabModeContext'
+import { useConversations } from '../../stores/ConversationContext'
 import { getProvider } from '../../providers'
 import { loadApiKey } from '../../lib/crypto'
+import {
+  deleteMessage as dbDeleteMessage,
+  addMessage as dbAddMessage,
+  addPin as dbAddPin,
+  getPins as dbGetPins,
+  deletePin as dbDeletePin,
+  createConversation as dbCreateConversation,
+  getConversation as dbGetConversation,
+} from '../../lib/db'
+
+const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
+const DELETE_UNDO_MS = 20_000
 
 export default function MessagesRender() {
   const { id: conversationId } = useParams()
-  const { messages, isStreaming, streamingContent, continueMessage } = useChat()
+  const { messages, isStreaming, streamingContent, continueMessage, activeConversationId } = useChat()
   const { settings } = useSettings()
   const {
     favorites, notes, highlights, showNotes,
@@ -50,29 +66,208 @@ export default function MessagesRender() {
   } = useAnnotations()
   const { openBranchPanel } = useBranchPanel()
   const { buildSystemPrompt } = useCollabMode()
+  const { conversations, loadConversations } = useConversations()
+
   const containerRef = useRef(null)
   const bottomRef = useRef(null)
   const [activePopoverMsgId, setActivePopoverMsgId] = useState(null)
 
-  // Auto-scroll to bottom on new messages or streaming chunks. Mirrors
-  // the V1 Albatross behavior. Uses 'smooth' for finished messages and
-  // 'auto' for streaming so chunked rendering doesn't fight scroll easing.
+  // ─── Hide / delete state ─────────────────────────────────
+  //
+  // hiddenMessages collects ids that should NOT render. V1 keeps this
+  // session-local (refresh forgets it); V2 mirrors that. pendingDeletes
+  // tracks the timeouts so Undo can cancel them — the timeout itself is
+  // the actual db.delete call.
+  const [hiddenMessages, setHiddenMessages] = useState(new Set())
+  const [pendingDeletes, setPendingDeletes] = useState([])
+  const pendingDeletesRef = useRef([])
+  pendingDeletesRef.current = pendingDeletes
+
+  // Reset on conversation switch — V1 per-mount lifetime. Same guard
+  // shape as CollabModeContext: ignore transient nulls so a quick trip
+  // back to the same conversation preserves the hidden state.
+  const lastConvRef = useRef(activeConversationId)
+  useEffect(() => {
+    if (activeConversationId == null) return
+    const prev = lastConvRef.current
+    lastConvRef.current = activeConversationId
+    if (prev != null && prev !== activeConversationId) {
+      // Cancel any in-flight deletes from the old conversation —
+      // their messages are gone from view anyway and re-firing the
+      // db.delete after a switch would surprise users.
+      for (const p of pendingDeletesRef.current) clearTimeout(p.timeoutId)
+      setPendingDeletes([])
+      setHiddenMessages(new Set())
+    }
+  }, [activeConversationId])
+
+  // Cleanup any outstanding timers on unmount so the db.delete doesn't
+  // fire after we're gone.
+  useEffect(() => () => {
+    for (const p of pendingDeletesRef.current) clearTimeout(p.timeoutId)
+  }, [])
+
+  const visibleMessages = useMemo(
+    () => messages.filter(m => !hiddenMessages.has(m.id)),
+    [messages, hiddenMessages]
+  )
+
+  const handleHide = useCallback((msgId) => {
+    setHiddenMessages(prev => {
+      const next = new Set(prev)
+      next.add(msgId)
+      return next
+    })
+  }, [])
+
+  const handleDelete = useCallback((msgId) => {
+    // Hide immediately so the user sees the action take effect; the
+    // actual db.delete fires after the undo window.
+    setHiddenMessages(prev => {
+      const next = new Set(prev)
+      next.add(msgId)
+      return next
+    })
+    const timeoutId = setTimeout(async () => {
+      try { await dbDeleteMessage(msgId) } catch { /* tolerate */ }
+      setPendingDeletes(prev => prev.filter(p => p.msgId !== msgId))
+    }, DELETE_UNDO_MS)
+    setPendingDeletes(prev => [...prev, { msgId, timeoutId }])
+  }, [])
+
+  const handleUndoDelete = useCallback((msgId) => {
+    setPendingDeletes(prev => {
+      const entry = prev.find(p => p.msgId === msgId)
+      if (entry) clearTimeout(entry.timeoutId)
+      return prev.filter(p => p.msgId !== msgId)
+    })
+    setHiddenMessages(prev => {
+      const next = new Set(prev)
+      next.delete(msgId)
+      return next
+    })
+  }, [])
+
+  // ─── Send to branch / Pin for reference state ─────────────
+  //
+  // One modal serves both flows. `transferModal` is null when closed,
+  // otherwise { mode: 'send' | 'pin', message } where message is the
+  // record being acted on.
+  const [transferModal, setTransferModal] = useState(null)
+
+  const handleSendToBranch = useCallback((msg) => {
+    setTransferModal({ mode: 'send', message: msg })
+  }, [])
+
+  const handlePinForReference = useCallback((msg) => {
+    setTransferModal({ mode: 'pin', message: msg })
+  }, [])
+
+  const closeTransferModal = useCallback(() => setTransferModal(null), [])
+
+  const onTransferSelect = useCallback(async (targetConvId) => {
+    const t = transferModal
+    if (!t) return
+    if (t.mode === 'send') {
+      try {
+        await dbAddMessage({
+          conversationId: targetConvId,
+          role: t.message.role,
+          content: t.message.content,
+        })
+      } catch (err) {
+        if (import.meta.env.DEV) console.warn('[messages@1.0] send-to-branch failed:', err)
+      }
+    } else if (t.mode === 'pin') {
+      try {
+        await dbAddPin({
+          targetConversationId: targetConvId,
+          sourceConversationId: activeConversationId,
+          sourceMessageId: t.message.id,
+          content: t.message.content,
+        })
+        // Refresh local pins if we're pinning into the active conversation
+        if (targetConvId === activeConversationId) {
+          await refreshPins()
+        }
+      } catch (err) {
+        if (import.meta.env.DEV) console.warn('[messages@1.0] pin-for-reference failed:', err)
+      }
+    }
+    setTransferModal(null)
+  }, [transferModal, activeConversationId])
+
+  const onTransferNewChat = useCallback(async () => {
+    const t = transferModal
+    if (!t) return
+    try {
+      const source = activeConversationId ? await dbGetConversation(activeConversationId) : null
+      const conv = await dbCreateConversation({
+        title: `From: ${source?.title || 'conversation'}`,
+        model: source?.model || settings.defaultModel,
+        room: source?.room ?? null,
+      })
+      if (t.mode === 'send') {
+        await dbAddMessage({
+          conversationId: conv.id,
+          role: t.message.role,
+          content: t.message.content,
+        })
+      } else {
+        await dbAddPin({
+          targetConversationId: conv.id,
+          sourceConversationId: activeConversationId,
+          sourceMessageId: t.message.id,
+          content: t.message.content,
+        })
+      }
+      await loadConversations()
+    } catch (err) {
+      if (import.meta.env.DEV) console.warn('[messages@1.0] new-chat-from-message failed:', err)
+    }
+    setTransferModal(null)
+  }, [transferModal, activeConversationId, settings.defaultModel, loadConversations])
+
+  // ─── Pinned references for the active conversation ────────
+  //
+  // Loaded on conversation switch + after any pin write that targets
+  // the active conversation. Renders as a collapsible list above the
+  // message stream.
+  const [pins, setPins] = useState([])
+  const refreshPins = useCallback(async () => {
+    if (!activeConversationId) {
+      setPins([])
+      return
+    }
+    try {
+      const list = await dbGetPins(activeConversationId)
+      setPins(list || [])
+    } catch {
+      setPins([])
+    }
+  }, [activeConversationId])
+
+  useEffect(() => {
+    let cancelled = false
+    refreshPins().catch(() => {})
+    void cancelled
+  }, [refreshPins])
+
+  const handleRemovePin = useCallback(async (pinId) => {
+    try { await dbDeletePin(pinId) } catch { /* tolerate */ }
+    setPins(prev => prev.filter(p => p.id !== pinId))
+  }, [])
+
+  // ─── Auto-scroll + numbering ─────────────────────────────
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: isStreaming ? 'auto' : 'smooth' })
   }, [messages, streamingContent, isStreaming])
-
-  // Visible vs hidden — PR-10a.5 doesn't wire the hide-undo flow, so
-  // visibleMessages == messages. Reserved variable name kept so the
-  // signature mirrors Albatross when the next slice wires hide.
-  const visibleMessages = messages
 
   const handleContinue = useCallback(async (incompleteId) => {
     try {
       const apiKey = await loadApiKey(settings.storageMode)
       if (!apiKey) return
       const provider = getProvider('anthropic')
-      // PR-10a.9: thread the active collab-mode system prompt through
-      // continue() too so the resumed turn keeps the same instructions.
       const systemPrompt = buildSystemPrompt()
       await continueMessage(apiKey, incompleteId, settings.defaultModel, provider, systemPrompt)
     } catch (err) {
@@ -86,7 +281,6 @@ export default function MessagesRender() {
     try {
       await navigator.clipboard.writeText(content)
     } catch {
-      // Clipboard API can fail in non-secure contexts; fall back.
       const textarea = document.createElement('textarea')
       textarea.value = content
       document.body.appendChild(textarea)
@@ -96,8 +290,6 @@ export default function MessagesRender() {
     }
   }, [])
 
-  // Stable index → message-number map (1-based per role-pair, matching
-  // Albatross's #N counter behavior).
   const numberByMessageId = useMemo(() => {
     const m = new Map()
     let userCount = 0
@@ -115,24 +307,14 @@ export default function MessagesRender() {
   }, [messages])
 
   const renderCard = useCallback((msg, idx) => {
-    // For the assistant message currently being streamed, splice in the
-    // partial content so the user sees text appear in real time. ChatContext
-    // exposes streamingContent separately because it doesn't write the
-    // partial to state on every chunk — that would be expensive.
     const isLatestAssistantStreaming =
       isStreaming &&
       msg.role === 'assistant' &&
-      idx === messages.length - 1 &&
-      msg.content === '' // empty placeholder created by sendMessage
+      idx === visibleMessages.length - 1 &&
+      msg.content === ''
 
     const displayContent = isLatestAssistantStreaming ? streamingContent : msg.content
-
-    // Ghost text for interrupted messages — same treatment as Albatross
-    // (low opacity + dashed border via MessageCard's isGhostText prop).
-    // Don't ghost the actively-streaming placeholder; only completed-but-
-    // incomplete records get the ghost treatment.
     const isGhost = msg.incomplete && !isLatestAssistantStreaming
-
     const noteRecord = notes.get(msg.id)
     const isFav = favorites.has(msg.id)
 
@@ -148,9 +330,6 @@ export default function MessagesRender() {
         isFavorited={isFav}
         showNotes={showNotes.has(msg.id)}
         savedNoteText={noteRecord?.text || ''}
-        // MessageCard renders all conversation highlights and matches
-        // them against this card's content; passing the whole list (not
-        // a per-message slice) is the V1 contract.
         highlights={highlights}
         isPopoverActive={activePopoverMsgId === msg.id}
         onPopoverChange={(active) => setActivePopoverMsgId(active ? msg.id : null)}
@@ -161,35 +340,164 @@ export default function MessagesRender() {
         onNoteSave={(text) => saveNote(msg.id, text)}
         onHighlight={(text, color) => addHighlight(msg.id, text, color)}
         onBranch={() => openBranchPanel(msg.id)}
-        // Hide / delete / move-to-branch land in subsequent slices.
-        // Optional-chained inside MessageCard so omitting them leaves
-        // the icon clickable but inert.
+        onHide={() => handleHide(msg.id)}
+        onDelete={() => handleDelete(msg.id)}
+        onMoveToBranch={() => handleSendToBranch(msg)}
+        onPinForReference={() => handlePinForReference(msg)}
       />
     )
   }, [
-    messages.length, isStreaming, streamingContent,
+    visibleMessages.length, isStreaming, streamingContent,
     numberByMessageId, activePopoverMsgId,
     favorites, notes, highlights, showNotes,
     handleContinue, handleCopyText,
     toggleFavorite, toggleNotePanel, saveNote, addHighlight,
     openBranchPanel,
+    handleHide, handleDelete, handleSendToBranch, handlePinForReference,
   ])
 
-  // Defensive: if for some reason ChatContext's activeConversationId
-  // doesn't match the route id, fall back to the empty state rather
-  // than render stale messages from another conversation. ChatView's
-  // <RoomShellChatHost> gates the render until they match, so this
-  // shouldn't fire in practice.
   void conversationId
 
   return (
-    <MessageList
-      messages={visibleMessages}
-      renderCard={renderCard}
-      hiddenCount={0}
-      isStreaming={isStreaming}
-      containerRef={containerRef}
-      bottomRef={bottomRef}
-    />
+    <div className="relative h-full flex flex-col">
+      {pins.length > 0 && (
+        <PinnedReferences pins={pins} onRemove={handleRemovePin} />
+      )}
+
+      <MessageList
+        messages={visibleMessages}
+        renderCard={renderCard}
+        hiddenCount={messages.length - visibleMessages.length}
+        isStreaming={isStreaming}
+        containerRef={containerRef}
+        bottomRef={bottomRef}
+      />
+
+      <UndoBanner
+        pendingDeletes={pendingDeletes}
+        onUndo={handleUndoDelete}
+      />
+
+      <AnimatePresence>
+        {transferModal && (
+          <SelectConversationModal
+            conversations={conversations}
+            currentId={activeConversationId}
+            title={transferModal.mode === 'pin' ? 'Pin to conversation' : 'Send to branch'}
+            newChatLabel={
+              transferModal.mode === 'pin'
+                ? 'New conversation pinned with this reference'
+                : 'New conversation with this message'
+            }
+            onClose={closeTransferModal}
+            onSelect={onTransferSelect}
+            onNewChat={onTransferNewChat}
+          />
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// ─── PinnedReferences ────────────────────────────────────────
+//
+// Renders the conversation's pinned references as a collapsible block
+// at the top of the message area. Each pin shows a quoted preview of
+// the source message's content + a small remove (X) affordance. Pins
+// are visual-only — Claude does not see them on subsequent sends.
+
+function PinnedReferences({ pins, onRemove }) {
+  const [expanded, setExpanded] = useState(true)
+
+  return (
+    <div className="mx-4 mt-3 mb-1 rounded-lg border border-[var(--p-border)] bg-[var(--p-bg-subtle)]">
+      <button
+        type="button"
+        onClick={() => setExpanded(prev => !prev)}
+        className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-left hover:bg-[var(--p-hover-bg)] transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          {expanded
+            ? <ChevronDown className="w-3 h-3 text-[var(--p-text-secondary)]" />
+            : <ChevronRight className="w-3 h-3 text-[var(--p-text-secondary)]" />}
+          <Pin className="w-3 h-3 text-[#7C6CD4]" />
+          <span className="text-[10px] font-medium text-[var(--p-text-secondary)] uppercase tracking-wider">
+            Pinned references
+          </span>
+          <span className="text-[10px] text-[#7C6CD4]">({pins.length})</span>
+        </div>
+      </button>
+
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={SPRING_SNAPPY}
+            className="overflow-hidden"
+          >
+            <div className="px-3 pb-3 space-y-2">
+              {pins.map(pin => (
+                <div
+                  key={pin.id}
+                  className="group relative rounded-md border border-[var(--p-border)] bg-white px-3 py-2"
+                >
+                  <p className="text-[11px] text-[var(--p-text-primary)] leading-relaxed line-clamp-3">
+                    {pin.content}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => onRemove(pin.id)}
+                    className="absolute top-1.5 right-1.5 p-0.5 rounded text-[var(--p-text-muted)] opacity-0 group-hover:opacity-100 hover:text-[var(--p-error,#E03E3E)] transition-all"
+                    title="Remove pin"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// ─── UndoBanner ─────────────────────────────────────────────
+//
+// Inline banner that appears when there's a pending delete. Mirrors V1
+// Albatross's bottom-of-message-area toast. Shows a single Undo
+// affordance for the most-recent delete; hitting it cancels the
+// scheduled db.delete and unhides the message. Multiple pending
+// deletes show a count.
+
+function UndoBanner({ pendingDeletes, onUndo }) {
+  return (
+    <AnimatePresence>
+      {pendingDeletes.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 8 }}
+          transition={SPRING_SNAPPY}
+          className="mx-4 mb-2 px-4 py-3 rounded-lg border border-[var(--p-border)] bg-white shadow-sm flex items-center justify-between gap-3"
+        >
+          <span className="text-xs text-[var(--p-text-secondary)]">
+            {pendingDeletes.length === 1
+              ? 'Message deleted'
+              : `${pendingDeletes.length} messages deleted`}
+          </span>
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => onUndo(pendingDeletes[pendingDeletes.length - 1].msgId)}
+            className="text-xs font-medium text-[#B8A070] hover:text-[var(--p-text-primary)] transition-colors shrink-0"
+          >
+            Undo
+          </motion.button>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }

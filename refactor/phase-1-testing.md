@@ -1414,6 +1414,146 @@ in Writing Studio works).
 
 ---
 
+## PR-10a.10 — Wire per-message Hide / Delete / Send to branch / Pin for reference
+
+👀 User-visible. Sixth and final slice of catalog data plumbing
+before PR-10b. Brings the per-message action menu fully online.
+
+**Surface:** `/chat/:id` for any conversation whose `room` is non-null
+(every default Writing Studio / Pocket Chat / Drafting Desk / Quiet
+Room / Data Workspace migration). All four actions live on the
+existing per-message hover icons + more-options menu in MessageCard.
+
+### Setup
+- Two migrated conversations (A and B). Easiest path: clear the
+  `migration_v2_chat_room_assigned` setting in DevTools, create two
+  conversations via the homepage, send a message in each.
+- An API key only needed for the actual-send paths inside the
+  conversation; the action flows themselves don't need one.
+
+### Hide message — session-only
+
+- [ ] Hover a message. Trash icon appears alongside the other icons.
+  Open the more-options menu — "Hide message" is the first item with
+  the Eye icon.
+- [ ] Click "Hide message". The message disappears from the list. No
+  UndoBanner appears (hide is not delete).
+- [ ] DevTools → IndexedDB → `messages`: the record is still there.
+- [ ] Refresh the page. The hidden message returns — V1 per-mount
+  lifetime is preserved.
+- [ ] Hide a message, navigate `/chat/X → / → /chat/X`. The hidden
+  state persists (transient null doesn't wipe it).
+- [ ] Hide a message, navigate `/chat/X → /chat/Y` (different conv).
+  Y's hidden set is empty. Navigate back to X. X's hidden set was
+  cleared on the leaving transition (V1 per-mount lifetime).
+
+### Delete message — 20s undo
+
+- [ ] Click the trash icon on any message. Message disappears
+  immediately; an UndoBanner appears above the input area: "Message
+  deleted · Undo".
+- [ ] Click "Undo" within 20s. Message returns; banner dismisses.
+  DevTools → `messages`: the record is still there.
+- [ ] Click trash, wait 20s without clicking Undo. Banner auto-
+  dismisses; DevTools → `messages`: the record is GONE.
+- [ ] Click trash on multiple messages within the undo window. Banner
+  shows "N messages deleted · Undo". Clicking Undo restores only the
+  most recent (V1 behavior — Undo pops the latest one off the stack).
+- [ ] Click trash, then immediately navigate to a different
+  conversation. The pending-delete timer cancels — the record stays
+  in IndexedDB. Verified by the V1 cleanup pattern.
+- [ ] Click trash, close the browser tab. The next-load cleanup
+  doesn't fire (timer was in-memory only) — record persists.
+
+### Send to branch — copies the message
+
+- [ ] Open the more-options menu → "Send to branch" with the
+  ArrowRightCircle icon.
+- [ ] Modal opens with title "SEND TO BRANCH", a search input, a
+  "New conversation with this message" affordance, and the recent
+  12 conversations (excluding the active one).
+- [ ] Type into search. Results filter by conversation title + aiSummary
+  (case-insensitive substring).
+- [ ] Press Esc. Modal closes.
+- [ ] Reopen, click a target conversation. Modal closes; the message
+  is appended to that conversation's `messages` (DevTools confirms).
+  No removal from the source conversation — "Send to branch" is a copy.
+- [ ] Reopen, click "New conversation with this message". A fresh
+  conversation is created with title `From: <source title>`,
+  inheriting the source's room and model. The seed message is the
+  one being sent.
+
+### Pin for reference — visual quote block, no token cost
+
+- [ ] Open the more-options menu → "Pin for reference" with the Pin
+  icon (between "Send to branch" and "Copy text").
+- [ ] Modal opens with title "PIN TO CONVERSATION" and CTA "New
+  conversation pinned with this reference".
+- [ ] Pick a target conversation. Modal closes.
+- [ ] DevTools → `pins` store: a record appears with
+  `targetConversationId`, `sourceConversationId` (= source's id),
+  `sourceMessageId`, `content`.
+- [ ] Navigate to the target conversation. A "PINNED REFERENCES (1)"
+  block appears at the top of the message area, expanded by default,
+  containing the pinned content quoted in a 3-line clamped box.
+- [ ] Click the chevron / header. Block collapses; click again to
+  expand.
+- [ ] Hover a pin. An X appears in the top-right. Click X. Pin removes
+  from the list AND from IndexedDB.
+- [ ] Pin multiple messages. Block shows count and lists them in
+  insertion order.
+- [ ] Send a follow-up message. The Network tab's request body to
+  `api.anthropic.com` does NOT include the pinned reference content
+  in the messages array — pins are visual-only, Claude doesn't see them.
+
+### Conversation switching
+
+- [ ] Open conversation A, hide a message, then schedule a delete on
+  another. Navigate to conversation B. The hidden set on B is empty;
+  no UndoBanner.
+- [ ] Navigate back to A. Both A's hidden set and pending deletes were
+  reset on the leaving transition (V1 per-mount lifetime).
+- [ ] Schedule a delete in A, navigate to B. The pending timer cancels
+  — A's IndexedDB record is preserved.
+
+### Albatross fallback unchanged
+
+- [ ] Set a conversation's `room` field to null. Reload. V1 Albatross
+  renders. Trash + "Move to branch" menu still work as in V1 (the
+  V1 menu uses "Move to branch" wording; V2 uses "Send to branch").
+- [ ] V1's pending-delete UndoBanner still surfaces alongside the V1
+  text and behaves as before.
+
+### Edge cases
+
+- [ ] Pin a message, then delete the source message in the original
+  conversation. The pin record stays (independent record). Display
+  shows the snapshotted content from when the pin was created.
+- [ ] With a pin block expanded, navigate away and back. The block
+  re-renders at full state (expanded by default). The pins themselves
+  reload from IndexedDB.
+- [ ] Try to "Send to branch" or "Pin for reference" when there are
+  zero other conversations. The modal shows "New conversation with
+  this message" + "No other conversations found". The new-chat path
+  still works.
+
+### Known limitations to verify (and not flag as bugs)
+
+- [ ] **Multi-select "Send to branch" mode not implemented.**
+  CLAUDE.md describes a multi-select selection flow when viewing the
+  parent of an active branch; that's a Phase 2 / follow-up scope.
+  The current Send to branch is single-message only.
+- [ ] **Hide is per-mount, not persisted across reloads.** Matches V1
+  lifetime. If a future need surfaces, add a `hidden` flag to the
+  message record (Phase 2).
+- [ ] **The per-message contribution surface is still preview-only.**
+  RoomShell aggregates `contributions.messageActions` from each
+  catalog component, but MessageCard's menu still hard-codes Hide /
+  Send / Pin / Copy. Rendering contributed actions in the menu is a
+  Phase 2 question.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

@@ -518,6 +518,37 @@
 
 ---
 
+### PR-10a.10 — Wire per-message Hide / Delete / Send to branch / Pin for reference
+
+**Goal:** Sixth and final slice of catalog data plumbing before PR-10b. Brings the per-message action menu online — Hide, Delete (with 20s undo), Send to branch, Pin for reference — and renders pinned references inline on the target conversation. After this lands the V2 chat surface has parity with V1 for every per-message affordance plus the new V2 Pin flow, so PR-10b's adapter deletion is unblocked.
+
+**Scope:**
+- New `src/components/SelectConversationModal.jsx` — extracted from V1's inline `MoveToBranchModal`. Reusable target-conversation picker with search, "New conversation with this message" affordance, recent-12 list. Title + new-chat label parametrized so the same component serves both Send-to-branch and Pin-for-reference flows.
+- `messages-render.jsx` — wires every per-message action:
+  - **Hide** (Eye menu): session-only `Set` of hidden ids; filters `visibleMessages`. Refresh forgets the hide. Per-conversation reset on `activeConversationId` change between two distinct non-null ids (same guard pattern as `CollabModeContext`).
+  - **Delete** (trash icon): hides the message immediately, schedules an IndexedDB delete after 20s, surfaces an inline UndoBanner above the input. Undo clears the timer and unhides. Conversation switch cancels in-flight timers so a delete doesn't fire after the user navigated away.
+  - **Send to branch** (ArrowRightCircle menu — V1 label updated from "Move to branch" per CLAUDE.md V2 vocabulary): opens `SelectConversationModal`; on select, copies the message content into the target conversation's messages via `addMessage`. New-chat path creates a fresh conversation seeded with the source's room + model + the message content.
+  - **Pin for reference** (Pin menu, V2-new): opens the same modal; on select, writes a record to the existing `pins` IndexedDB store via `addPin`. Renders pinned references as a collapsible "PINNED REFERENCES" block at the top of the active conversation's msg-area. Each pin shows a 3-line clamped preview + a hover-only X to remove. Pins are visual-only — Claude does NOT see them on subsequent sends, matching CLAUDE.md's spec.
+- `src/components/core/MessageCard.jsx` — adds `onPinForReference` prop and a "Pin for reference" menu item alongside Hide / Send to branch / Copy text. Renames "Move to branch" label to "Send to branch". Uses lucide's `Pin` icon for the new menu entry.
+- Documentation: §2.8a in [v2-phase1-audit.md](v2-phase1-audit.md) per-component table updated. New PR-10a.10 section in [phase-1-testing.md](phase-1-testing.md) following the PR-10a.9 structure.
+- **Out of scope (Phase 2 / future):** Multi-select "Send to branch" mode for bulk transfer (CLAUDE.md describes this as a selection mode in the parent's UI). Persistent hide across reloads. The per-message action menu items contributed by other catalog components (the contribution machinery exists since PR-3, but rendering them in MessageCard's menu still defers to a Phase 2 surface).
+
+**Dependencies:** PR-10a.9.
+
+**Exit criteria:**
+- Open a conversation in a Writing Studio room. Hover any message → trash icon visible alongside the existing per-message icons. Open the more-options menu → "Hide message", "Send to branch", "Pin for reference", "Copy text" entries visible in that order.
+- Click trash → message disappears from the list; UndoBanner appears above the input ("Message deleted · Undo"). Click Undo within 20s → message returns; banner disappears. Don't click Undo for 20s → IndexedDB record actually deletes.
+- Click "Hide message" menu → message disappears from the list; UndoBanner does NOT appear; IndexedDB record stays intact. Refresh → hidden message returns (V1 lifetime).
+- Click "Send to branch" → modal opens with title "Send to branch", search filter on conversation title + aiSummary, "New conversation with this message" CTA, recent-12 list. Selecting a target appends the message to that conversation's messages. Selecting "New conversation with this message" creates a fresh conversation with the source's room + model and seeds it with the message.
+- Click "Pin for reference" → same modal with title "Pin to conversation". Selecting a target writes a `pins` record. If the target IS the active conversation, the new pin appears immediately at the top of the message area as a quote block. Hovering a pin reveals an X that removes it.
+- Conversation switch resets the hidden set, cancels pending deletes, and reloads pins for the new conversation. Same-conversation route nav (e.g. /chat/X → / → /chat/X) preserves hidden / pending-delete state.
+- Albatross fallback (room: null conversations) unchanged — V1 trash + Move-to-branch flows still work.
+- `npm run build` clean.
+
+**Risk:** Medium. Three live IndexedDB write paths (delete, addMessage to other conv, addPin) can fail individually; each is wrapped with a tolerance try/catch and logs in dev mode. The 20s deferred-delete timer is the trickiest part — pending timers must cancel on conversation switch AND on component unmount, otherwise a stale `db.delete` fires against a record the user has since navigated away from. Mitigated by `pendingDeletesRef` cleanup in both effects and verified live (delete + switch + return → record persists; delete + wait 20s → record actually gone).
+
+---
+
 ### PR-10b — Delete adapter directories + cleanup InputArea + rotate PWA cache
 
 **Goal:** Point of no return. V2 is the only path.
@@ -638,9 +669,9 @@
 | 0 | PR-0 | Documentation foundation (5 docs, no code) |
 | A | PR-1, PR-2, PR-3 | Foundation (no user-visible change) |
 | B | PR-4a, PR-4b, PR-5, PR-6, PR-7 | Visual system + new homepage + V2 backup |
-| C | PR-8, PR-8b, PR-9, PR-10a, PR-10a.5, PR-10a.6, PR-10a.7, PR-10a.8, PR-10a.9, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
+| C | PR-8, PR-8b, PR-9, PR-10a, PR-10a.5, PR-10a.6, PR-10a.7, PR-10a.8, PR-10a.9, PR-10a.10, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
 
-**Total: 22 PRs** including PR-0.
+**Total: 23 PRs** including PR-0.
 
 ## Pause points
 
