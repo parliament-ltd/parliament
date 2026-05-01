@@ -1554,6 +1554,126 @@ existing per-message hover icons + more-options menu in MessageCard.
 
 ---
 
+## PR-10b — Delete adapter directories + cleanup InputArea + rotate PWA cache
+
+👀 User-visible. Point of no return — V2 RoomShell is the only chat path.
+The V1 SelectorLayout / SettingsLayout still render at `/chats` and
+`/settings`, but they're now top-level views rather than dispatched
+through the bird-mode adapter pattern.
+
+**Surface:** the whole app — `/chat/:id`, `/chats`, `/settings`,
+plus boot-time migrations on first load.
+
+### Setup
+- A dev DB with at least three migrated conversations across different
+  templates: a Writing Studio, a Pocket Chat, and a Quiet Room. The
+  homepage / template gallery covers creation.
+- One conversation deliberately stuck at `room: null` to verify repair
+  works (DevTools → IndexedDB → `conversations` → set the active
+  conversation's `room` to null and clear the `migration_v2_room_repair_done`
+  setting; reload).
+- A separate browser profile that already has the legacy
+  `parliament-adapters-v1` cache populated (load any pre-PR-10b build
+  on the profile first). Use this to verify the cache wipe.
+
+### `/chat/:id` — V2 only, repair on demand
+
+- [ ] Open a Writing Studio conversation. Renders through `<RoomShell>`;
+  every per-message affordance, side rail, branches modal, collab /
+  review modals work as before. No Albatross fallback.
+- [ ] Open the conversation you stuck at `room: null`. After a brief
+  loading frame the conversation re-resolves with a fresh Writing
+  Studio room — DevTools → `conversations` → `room` is now a mode id;
+  a corresponding entry exists in `modes` with
+  `buildIntent.derivedFrom === 'null-room-repair'`.
+- [ ] Force the repair to fail: delete the `writing-studio@1.0` record
+  from `libraryRooms`, clear `migration_v2_room_repair_done`, reload.
+  The `ConversationUnavailable` stub renders with "default room
+  template is missing" detail and Back-to-homepage / Open-chat-list
+  buttons. Re-seed by reloading after restoring the template.
+- [ ] Open a non-existent `/chat/<random-uuid>` URL. The stub renders
+  with "Conversation not found" detail.
+
+### `/chats` — extracted V1 selector
+
+- [ ] Loads. Search, sort, view toggle (Summary / Notes / Highlights /
+  Branches), bulk actions, favorites sidebar, count badges, inline
+  title/note edit — everything from the V1 surface still works.
+- [ ] Click "+ New chat" in the header. New conversation lands in the
+  table immediately. `room` is set on the new record before navigation
+  (DevTools → `conversations` confirms); opening it routes through
+  RoomShell with no flash through the repair branch.
+- [ ] No "ModeMismatchBanner" appears regardless of how many migrated
+  conversations exist. The banner was V1-only and was deleted in PR-10b.
+
+### `/settings` — extracted V1 settings
+
+- [ ] Loads. API key validate / save, model picker, usage / spending,
+  context defaults, data & backups, appearance, about — every section
+  works. Tour selectors still attach to their elements.
+- [ ] No "Interface Mode" nav item or section. Sidebar shows seven
+  items (API, Model, Usage, Context, Data, Appearance, About).
+
+### Boot-time migrations
+
+- [ ] DevTools → IndexedDB → `settings`. After a fresh first boot:
+  - `migration_v2_chat_room_assigned` = true (PR-10a).
+  - `migration_v2_room_repair_done` = true (PR-10b).
+  - `migration_v2_voice_input_injected` = true (PR-10b).
+- [ ] Force re-run by clearing one flag at a time — each migration
+  short-circuits on the others' flags and only runs the cleared pass.
+  No double-instantiation of rooms (per-conversation guards already
+  in PR-10a's pass).
+
+### Voice-input injection (mobile)
+
+- [ ] Manually create a room mode in DevTools that mimics a pre-PR-10a.8
+  swift migration: scope `room`, layout.ref `single-column-with-sheet@^1.0`,
+  buildIntent `{ derivedFrom: 'swift-migration' }`, components include
+  `messages@^1.0` + `input@^1.0` but NOT `voice-input@^1.0`. Set a
+  conversation's `room` to its id. Clear
+  `migration_v2_voice_input_injected` and reload.
+- [ ] After reload the room's `components` array gains a
+  `voice-input@^1.0` entry in `input-dock` (order 1). Open the
+  conversation — the Pocket Chat sheet shows a working mic button
+  alongside the textarea.
+- [ ] Re-running the migration on the same room (clear flag, reload)
+  is a no-op — the per-room "already includes voice-input" guard
+  prevents duplicates.
+
+### InputArea — mic button removed
+
+- [ ] Open a Pocket Chat conversation. The cardLayout-only mic button
+  is gone from the textarea row; voice input lives in the standalone
+  voice-input@1.0 button next to it.
+- [ ] Open a Writing Studio (desktop / inline layout) conversation.
+  No regressions — the inline layout never had a mic button.
+
+### PWA cache rotation
+
+- [ ] Fresh browser profile: the SW registers, the precache populates,
+  no `parliament-adapters-v1` cache exists. DevTools → Application →
+  Cache Storage shows `parliament-modules-v2` (will be empty until
+  some lazy chunks load) plus the workbox precache.
+- [ ] Profile that had the legacy cache: on first load post-PR-10b
+  the `parliament-adapters-v1` cache disappears within a few hundred
+  ms (see `src/main.jsx`'s page-context cleanup). No 404s in the
+  Network tab from old adapter chunk URLs.
+
+### Out of scope (don't test here)
+
+- [ ] Bundle size. Extracting the V1 layouts into the synchronous
+  bundle increased main chunk size; lazy-loading is a Phase 2 follow-up.
+- [ ] V2 settings redesign. Settings is still the V1 surface.
+- [ ] Persistent hide-message across reloads. Still session-only per
+  PR-10a.10.
+- [ ] Rendering contributed messageActions in MessageCard's menu.
+  The contribution machinery is in catalog manifests; the UI still
+  hard-codes Hide / Send / Pin / Copy.
+- [ ] voice-input NQ-6 empty-state ("Add an input component to use voice").
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:
@@ -1582,6 +1702,6 @@ When a new PR merges:
 ## What's NOT covered here
 
 - **Browser cross-compat.** Chrome / Edge / Firefox / Safari behavior differences. Spot-check before a release; not per-PR.
-- **Mobile / touch.** Swift adapter still uses V1 paths; PR-10b is the cleanup point.
+- **Mobile / touch.** As of PR-10b every chat path renders through `<RoomShell>`. Mobile-specific surfaces still need spot-checking on real devices, particularly the Pocket Chat sheet + voice input.
 - **Performance benchmarks.** No regression budget yet — eyeball it.
 - **Accessibility audits.** Beyond what's called out per PR — full a11y review is a Phase 2 task.

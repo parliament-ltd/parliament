@@ -329,7 +329,7 @@ What this means in practice for each component:
 | `favorites@1.0` | Cross-cutting homepage component (already wired pre-PR-10a.6 via `favorites-preview.jsx`). The chat-rail per-message Star icon dispatches through `useAnnotations().toggleFavorite`. | PR-10a.6 (toggle) |
 | `collab-mode@1.0` | `getSetting('parrot-personas')` (preserved in CollabModal), scoped active-presets state via new `CollabModeContext`. `useCollabMode().buildSystemPrompt()` is consumed by `input@1.0` (sendMessage) and `messages@1.0` ghost-continue (continueMessage). State resets on a transition between two distinct non-null `activeConversationId`s — matches V1 Albatross's per-mount lifetime; transient nulls during route nav back to the same conversation are ignored. | PR-10a.9 |
 | `review@1.0` | `useChat().messages` + `tokenUsage`, `useAnnotations().highlights` / `notes` / `favorites` (Map → array conversion for V1 ReviewModal contract), `useConversations()` for branches off the active conversation, `useSettings()` for storage mode + active-model context window. Owns the synthesis call (Composer-tier Haiku call against the last 20 messages with optional annotation context — same recipe as V1 Albatross) and the Markdown export (lifted from V1's handleExportMarkdown). | PR-10a.9 |
-| `voice-input@1.0` | `useVoiceInput()` hook. Publishes `voice-transcript` events on the room hostAPI bus on every interim + final transcript; `input@1.0`'s subscription appends finalized text to its value. Production render is a tight mic-only button (separate from the verbose `/catalog` preview card). InputArea's built-in cardLayout mic stays for V1 fallback until PR-10b. | PR-10a.8 |
+| `voice-input@1.0` | `useVoiceInput()` hook. Publishes `voice-transcript` events on the room hostAPI bus on every interim + final transcript; `input@1.0`'s subscription appends finalized text to its value. Production render is a tight mic-only button (separate from the verbose `/catalog` preview card). PR-10b removed InputArea's built-in cardLayout mic — `voice-input@1.0` is the only voice surface. | PR-10a.8 (PR-10b removes InputArea fallback) |
 | `toc@1.0` | `useChat().messages` for the table-of-contents derivation. User-role messages only (matches V1 Albatross), labels truncated to `truncateAt` chars (default 60), most-recent `maxItems` retained (default 50). Click → `scrollIntoView` on `msg-{id}` (set by MessageCard). | PR-10a.8 |
 
 **Conversation activation is the route shell's job.** When `/chat/:id`
@@ -353,7 +353,7 @@ deletion:
 - **PR-10a.8** — `voice-input@1.0` production render (tight mic button publishing `voice-transcript` on the room bus, complete loop with `input@1.0`'s existing subscription) and `toc@1.0` production render (user-message-derived headings list with click-to-scroll). Both light, no new shared contexts.
 - **PR-10a.9** — `collab-mode@1.0` live trigger + active-count badge; new `CollabModeContext` shares the active system prompt with `input@1.0` (sendMessage) and `messages@1.0` ghost-continue. `review@1.0` live trigger + Composer-tier synthesis call wired to `useChat()` + `useAnnotations()` + provider; Markdown export lifted from V1.
 - **PR-10a.10** — per-message message actions wired in `messages@1.0`: Hide (session-only), Delete (with 20s undo banner + IndexedDB delete), Send to branch (target-picker modal → copies into target's messages), Pin for reference (target-picker modal → writes to existing `pins` store; renders as collapsible quote-block list at the top of the active conversation's msg-area). New extracted `SelectConversationModal` shared by both transfer flows. After this lands, the V2 chat surface has parity with V1 for every per-message affordance plus the new V2 Pin flow.
-- **PR-10b is now unblocked** — Albatross adapter can be deleted once a final review pass confirms no V2-only conversation paths still depend on the V1 fallback.
+- **PR-10b** — adapter directories deleted (`albatross/`, `kingfisher/`, `starling/`, plus `withComingSoon.jsx`). `/chats` and `/settings` rendered the V1 selector + settings layouts via the bird-mode adapter pattern; PR-10b extracts those layouts out to `src/views/SelectorLayout.jsx` and inlines settings into `src/views/SettingsView.jsx`, dropping the InteractionMode picker (modes don't drive routing anymore). `ChatView.jsx` no longer falls back to Albatross — a null-room conversation is repaired on the spot via `assignDefaultRoom()` (a fresh Writing Studio mode), with a diagnostic stub if even the repair fails. Boot-time migrations gain two passes: `migrateRepairNullRooms` (assigns Writing Studio to anything PR-10a left at null) and `migrateInjectVoiceInput` (per data-migration.md §"Voice-input migration"). InputArea's cardLayout-only mic button is removed in favor of `voice-input@1.0`. The PWA cache name rotates from `parliament-adapters-v1` to `parliament-modules-v2`; the chunk pattern matches `catalog-/component-/module-` and the legacy adapter cache is wiped from `main.jsx` on first V2 boot.
 
 **A new context for shared annotation state.** PR-10a.6 introduces
 `AnnotationsContext` (mounted between `ChatProvider` and
@@ -420,13 +420,13 @@ Per [data-migration.md](data-migration.md):
 
 ### 3.2 — Bird-mode adapter pattern is load-bearing in routing
 
-`SelectorView`, `ChatView`, `SettingsView` all delegate to `LAYOUTS[mode] ?? AlbatrossLayout`. Migration plan:
+`SelectorView`, `ChatView`, `SettingsView` all delegated to `LAYOUTS[mode] ?? AlbatrossLayout`. Migration plan:
 
 - Each conversation gets a `room` field pointing at a mode file in the user's `modes` table.
 - `/chat/:id` reads `conversation.room`, loads the mode, renders `<RoomShell>`.
 - `localStorage[parliament-mode]` retired entirely after PR-10a's one-time migration.
 
-**The dependent risk:** the `LAYOUTS[mode] ?? AlbatrossLayout` fallback breaks once Albatross goes away. PR-10a wires `<RoomShell>` while Albatross still exists; PR-10b deletes adapter directories and is the point of no return. Per [data-migration.md](data-migration.md), the `createdInMode` → template migration map covers all V1 mode names including the K/S stubs (which fall to `writing-studio`).
+**Resolved in PR-10b.** `ChatView` now renders `<RoomShell>` exclusively — null-room conversations are repaired in place via `assignDefaultRoom()` (which assigns a fresh Writing Studio room) with a diagnostic stub if the repair itself fails. `SelectorView` and `SettingsView` no longer pick adapters: they render the V1 selector layout (extracted to `src/views/SelectorLayout.jsx`) and the V1 settings layout (inlined into `src/views/SettingsView.jsx`) directly. Boot-time migrations (`migrateRepairNullRooms`, `migrateInjectVoiceInput`) run alongside PR-10a's pass to keep existing data routable. Per [data-migration.md](data-migration.md), the `createdInMode` → template migration map covers all V1 mode names including the K/S stubs (which fall to `writing-studio`).
 
 ### 3.3 — ChatContext tool loop is provider-aware in subtle ways
 
@@ -488,7 +488,7 @@ Per NQ-10, `mockups/*.jsx` moved to `refactor/v1-mockups-archive/` in PR-12 rath
 
 ### 3.14 — Mobile users lose voice unless mobile-default seeds with `voice-input@1.0`
 
-InputArea's built-in mic button is removed at PR-10b. Existing mobile users (`createdInMode === 'swift'`) need `voice-input@1.0` injected into their migrated room mode files. Per [data-migration.md](data-migration.md), PR-10b's migration step does this injection. Without it, mobile users wake up to no mic button after upgrade.
+InputArea's built-in mic button was removed at PR-10b. The Pocket Chat seed (PR-10a.8 onward) includes `voice-input@1.0` in `input-dock`, so new mobile rooms get a mic automatically. Pre-PR-10a.8 swift-migrated rooms predate that seed update; PR-10b's `migrateInjectVoiceInput` (lib/migration.js) sweeps any room with `layout.ref` starting `single-column-with-sheet` AND `buildIntent.derivedFrom === 'swift-migration'` and injects `voice-input@1.0` into `input-dock` if it isn't already present. Per-room and whole-pass idempotent so users who edited their room or already had the up-to-date seed are unaffected.
 
 ### 3.15 — Tier classification rule must be documented
 
@@ -508,7 +508,7 @@ PR-10a's migration assigns `room` based on `createdInMode`. After that, `created
 
 ### 3.19 — PWA cache invalidation on V2 cutover
 
-`vite.config.js` declares `cacheName: 'parliament-adapters-v1'` with per-adapter chunk patterns. After PR-10b/PR-11b there are no adapter chunks. **PR-10b rotates the cache name to `parliament-modules-v2`** and adds one-time cleanup that wipes the old cache on first V2 boot.
+`vite.config.js` declares `cacheName: 'parliament-adapters-v1'` with per-adapter chunk patterns. After PR-10b/PR-11b there are no adapter chunks. **PR-10b rotates the cache name to `parliament-modules-v2`** and adds one-time cleanup that wipes the old cache on first V2 boot. Cleanup runs from page context (`src/main.jsx`) rather than the SW activate event because vite-plugin-pwa's `generateSW` strategy doesn't expose a hook for custom listeners; `caches.delete` is callable from the window and idempotent, which is functionally equivalent. PR-12 can drop the cleanup snippet once all live users have rotated past V2 boot.
 
 ### 3.20 — Multi-provider CSP coupling (out of Phase 1, flag for later)
 

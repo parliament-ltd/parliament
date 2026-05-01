@@ -554,14 +554,15 @@
 **Goal:** Point of no return. V2 is the only path.
 
 **Scope:**
-- Delete `src/adapters/albatross/`, `src/adapters/kingfisher/`, `src/adapters/starling/`.
-- Delete `src/adapters/withComingSoon.jsx`.
-- Remove InputArea's built-in mic button (the cardLayout-only feature).
-- Rotate PWA cache name from `parliament-adapters-v1` to `parliament-modules-v2` in [vite.config.js](vite.config.js). Update `runtimeCaching` rule to match new chunk patterns.
-- One-time cleanup that wipes the old `parliament-adapters-v1` cache on first V2 boot (handled in service worker activation).
-- Inject `voice-input@1.0` into any conversation's room mode file where `createdInMode === 'swift'` (per [data-migration.md](data-migration.md)) — this preserves mic access for existing mobile users.
-- Update `vite.config.js` `manualChunks` to remove deleted adapter entries.
-- Delete `src/views/ChatView.jsx`, `src/views/SelectorView.jsx`, `src/views/SettingsView.jsx` adapter-routing logic (the routes themselves remain, but they no longer pick adapters).
+- Delete `src/adapters/albatross/`, `src/adapters/kingfisher/`, `src/adapters/starling/`, and `src/adapters/withComingSoon.jsx`.
+- Migrate `/chats` and `/settings` off the Albatross adapter **before** the directory is deleted. Path (a) per the scope statement: extract the V1 SelectorLayout to `src/views/SelectorLayout.jsx` (`SelectorView` becomes a thin onboarding-redirect wrapper that renders it), and inline the V1 SettingsLayout into `src/views/SettingsView.jsx`. Both extractions drop the dead bird-mode bits — the InteractionMode picker (settings) and ModeMismatchBanner (selector) — and patch up `+ New chat` so it eagerly assigns a Writing Studio room before navigating instead of relying on a stale `createdInMode` value.
+- Drop the Albatross fallback from `src/views/ChatView.jsx`. A null-room conversation triggers an in-place repair via `assignDefaultRoom()` (re-resolves on the next render); a small `ConversationUnavailable` stub renders if the repair itself fails (writing-studio template missing, IndexedDB write fails, etc).
+- Extend `src/lib/migration.js` with two new boot-time passes wired alongside the existing PR-10a `migrateChatRoomAssignments` in `ConversationContext`:
+  - `migrateRepairNullRooms` — assigns Writing Studio to any conversation PR-10a left at `room: null` (idempotent, separate guard key).
+  - `migrateInjectVoiceInput` — per [data-migration.md](data-migration.md) §"Voice-input migration": injects `voice-input@1.0` into legacy swift-migrated rooms (`layout.ref` starts `single-column-with-sheet` AND `buildIntent.derivedFrom === 'swift-migration'`) that don't already include it. Whole-pass and per-room idempotent.
+- Remove InputArea's built-in cardLayout mic button. `voice-input@1.0` (PR-10a.8 production render) is the only voice surface.
+- Rotate the PWA cache name in `vite.config.js` from `parliament-adapters-v1` to `parliament-modules-v2`. Update the `runtimeCaching` `urlPattern` to match the new `catalog-/component-/module-` chunk-name pattern, bump `maxEntries` to 50, and switch `globIgnores` to match. Drop the deleted adapters' `manualChunks` entries (pelican / secretarybird / swift entries also drop because no production import path reaches them anymore — Rollup tree-shakes them out, and PR-11a/b will delete the directories outright).
+- Wipe the legacy `parliament-adapters-v1` runtime cache on first V2 boot. Done from page context (`src/main.jsx`) rather than the SW activate event, because vite-plugin-pwa's `generateSW` strategy doesn't expose a custom-listener hook; `caches.delete` is callable from the window and idempotent. PR-12 can drop the snippet once all live users have rotated past V2 boot.
 
 **Dependencies:** PR-10a, **PR-10a checkpoint passed**.
 
@@ -571,6 +572,11 @@
 - Existing mobile users (post-PR-10a migration to pocket-chat) have working voice via the injected component.
 - PWA cache cleanly rotates: old cache wiped on first boot, new cache populates correctly.
 - No 404s for old adapter chunk URLs.
+
+**Out of scope (Phase 2 / follow-ups):**
+- A redesigned V2 settings page. Settings stays as the extracted V1 layout; redesign is a separate scope statement.
+- Dynamic code-splitting of the extracted V1 layouts. Bringing them into the synchronous main bundle (path (a)) is intentional for safety; if bundle size becomes a problem, lazy-loading these views is a small follow-up.
+- Tour-selector reattachment beyond the V1 surface. The `data-tour` selectors continue to target the moved layouts; tours that broke during the V2 transition still need rewrites per audit §3.11.
 
 **Risk:** High. Point-of-no-return. If problems surface, rollback requires reverting both PR-10a and PR-10b together.
 

@@ -6,7 +6,11 @@ import {
   deleteConversation,
   runIntegrityCheck,
 } from '../lib/db'
-import { migrateChatRoomAssignments } from '../lib/migration'
+import {
+  migrateChatRoomAssignments,
+  migrateRepairNullRooms,
+  migrateInjectVoiceInput,
+} from '../lib/migration'
 
 const ConversationContext = createContext(null)
 
@@ -15,27 +19,39 @@ export function ConversationProvider({ children }) {
   const [activeConversationId, setActiveConversationId] = useState(null)
   const [loaded, setLoaded] = useState(false)
 
-  // Run integrity check, then the PR-10a one-time createdInMode → room
-  // migration, then load conversations on mount. Order matters:
+  // Run integrity check, then the PR-10a/PR-10b one-time migrations,
+  // then load conversations on mount. Order matters:
   //   1. Integrity check first — it deletes orphaned (zero-message)
-  //      conversations, so we don't waste a migration on records we're
+  //      conversations, so we don't waste migrations on records we're
   //      about to remove.
-  //   2. Migration second — it sets `conversation.room` for every
-  //      recognized createdInMode value, leaving null when unmapped.
-  //      Idempotent: a settings flag short-circuits subsequent boots.
-  //   3. List third — picks up the migrated `room` field so /chat/:id
-  //      can route through <RoomShell> on first render after migration.
+  //   2. PR-10a `migrateChatRoomAssignments` — sets `conversation.room`
+  //      for every recognized createdInMode value, leaving null when
+  //      unmapped. Idempotent via its own settings flag.
+  //   3. PR-10b `migrateRepairNullRooms` — assigns a default Writing
+  //      Studio room to any conversation that PR-10a couldn't map. After
+  //      PR-10b there is no Albatross fallback, so a null room means no
+  //      working chat surface. Idempotent via its own flag — safe to
+  //      run on every boot.
+  //   4. PR-10b `migrateInjectVoiceInput` — pre-PR-10a.8 the pocket-chat
+  //      seed didn't include voice-input@1.0; PR-10b removes InputArea's
+  //      built-in cardLayout mic. Inject voice-input into legacy
+  //      swift-migrated rooms so mobile users keep a mic. Idempotent
+  //      whole-pass and per-room.
+  //   5. List last — picks up the assigned `room` so /chat/:id renders
+  //      through <RoomShell> on first read after migration.
   useEffect(() => {
     async function init() {
       await runIntegrityCheck()
       try {
         await migrateChatRoomAssignments()
+        await migrateRepairNullRooms()
+        await migrateInjectVoiceInput()
       } catch (err) {
-        // A migration failure should not block conversation listing —
-        // unmigrated conversations fall back to the V1 Albatross adapter
-        // (room: null path). Surface the failure in dev so it's noticed.
+        // A migration failure should not block conversation listing.
+        // ChatView's null-room repair path catches any room-assignment
+        // gap on demand at /chat/:id render time.
         if (import.meta.env.DEV) {
-          console.error('[ConversationProvider] chat-room migration failed:', err)
+          console.error('[ConversationProvider] migration failed:', err)
         }
       }
       const convs = await listConversations()
