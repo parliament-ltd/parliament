@@ -1175,6 +1175,114 @@ default seeds; Quiet Room intentionally omits it). Albatross fallback
 
 ---
 
+## PR-10a.8 — Wire voice-input@1.0 + toc@1.0 to ChatContext
+
+👀 User-visible. Fourth slice of catalog data plumbing. Closes the
+two lighter remaining components before PR-10a.9 picks up
+`collab-mode@1.0` + `review@1.0`.
+
+**Surface:** `/chat/:id` for any conversation whose `room` is non-null
+AND whose mode includes `voice-input@1.0` (Pocket Chat default seed)
+or `toc@1.0` (no default seed; reachable via custom rooms or hand-built
+modes — `/catalog` debug route also exercises toc).
+
+### Setup
+- A migrated Pocket Chat conversation (createdInMode = 'swift'
+  → migrates to `pocket-chat@1.0` which includes `voice-input@1.0`
+  in `input-dock`).
+- For TOC: either edit a Writing Studio mode in DevTools to inject
+  `toc@1.0` into a slot, or use the `/catalog` debug route which
+  already includes `toc@1.0` in `left-rail`.
+
+### voice-input — production mic button
+
+- [ ] Open a Pocket Chat conversation. The mic button renders inside
+  the input-dock next to the textarea: a small round-9 button with
+  a Mic icon when idle, MicOff icon while listening.
+- [ ] Hover the button. Border tints gold (--p-accent-gold). Idle
+  tooltip: "Start voice input". Listening tooltip: "Stop listening".
+- [ ] Click the button. Browser surfaces the mic permission prompt
+  the first time (managed by the browser, not Parliament).
+- [ ] Allow the prompt. Button turns red-bordered, icon flips to
+  MicOff, `aria-pressed` becomes true.
+- [ ] Speak a phrase. The textarea (input@1.0) receives the final
+  transcript appended to its value (with a leading space if the
+  textarea wasn't empty). Interim transcripts during speech do NOT
+  populate the textarea — only finals (per input@1.0's
+  `subscribeToVoice` filter).
+- [ ] Click the mic again to stop. Border returns to neutral, icon
+  flips back to Mic.
+- [ ] On a browser without SpeechRecognition (Firefox without flag),
+  the mic button collapses to a small disabled badge with a
+  "Voice input not supported" tooltip. The textarea still works
+  normally for keyboard input.
+- [ ] On `/catalog` dev route: voice-input still renders the verbose
+  preview card (with "Last transcript: …" footer) — production
+  render is opt-in via the catalog manifest's `render` field.
+
+### toc — table of contents derived from messages
+
+- [ ] Open a conversation in a room that includes `toc@1.0`. The TOC
+  renders a "TABLE OF CONTENTS" uppercase header followed by one
+  row per user message.
+- [ ] Each row's label is the user message's content with whitespace
+  collapsed and truncated at 60 characters with a trailing "…".
+  Long messages don't wrap into multiple lines.
+- [ ] Assistant messages do NOT appear as rows (matches V1
+  Albatross — only user messages anchor sections).
+- [ ] Click a TOC row. The viewport smooth-scrolls to that message
+  with `block: 'center'` positioning. The targeted message is
+  identified by its `msg-{id}` DOM anchor (set by MessageCard).
+- [ ] Send a new user message. Within one render the new row appears
+  at the bottom of the TOC.
+- [ ] If the conversation has more than `maxItems` user messages
+  (default 50), the oldest rows drop off — the most-recent
+  `maxItems` are retained.
+- [ ] On a fresh conversation with zero user messages, the TOC shows
+  the placeholder "Messages will appear here" inside its header.
+
+### Bus integrity
+
+- [ ] Open DevTools → Console. The room hostAPI publishes
+  `voice-transcript` events on every interim + final transcript.
+  No "publishing unknown event" warning fires (the event name is
+  in the Phase 1 KNOWN_EVENTS set).
+- [ ] In a room that has `voice-input@1.0` but NOT `input@1.0` (e.g.
+  manually edited), publishing transcripts is silently dropped.
+  No subscriber, no error.
+
+### Conversation switching
+
+- [ ] On a Pocket Chat conversation, start listening. Navigate to
+  another conversation via the Chats list. The mic session aborts
+  cleanly (useVoiceInput's unmount cleanup); no continued listening
+  after the unmount.
+- [ ] Returning to the original conversation: mic button starts
+  fresh (not still-listening from before).
+
+### Albatross fallback unchanged
+
+- [ ] In DevTools, set a Pocket Chat conversation's `room` field to
+  null. Reload. The V1 Albatross adapter renders. The cardLayout
+  built-in mic still works (PR-10b is the cleanup point for that).
+- [ ] No double-mic-button on the V2 Pocket Chat path (the
+  cardLayout-only built-in mic is gated to V1 only).
+
+### Known limitations to verify (and not flag as bugs)
+
+- [ ] **NQ-6 empty-state for voice without input subscriber not yet
+  implemented.** The audit plans an "Add an input component"
+  empty state when no `input@1.0` is mounted; today the mic button
+  silently publishes regardless. Defer to PR-11a / PR-10b cleanup.
+- [ ] **Collab-mode system prompts ignored on V2 sends.** Persona
+  storage works, but presets don't reach `sendMessage` yet — next
+  slice (PR-10a.9).
+- [ ] **Review modal still preview-shaped.** Same slice.
+- [ ] **Per-message hide / move-to-branch / send-to-branch / pin
+  still no-op.** Bundles with PR-10a.10 or PR-10b cleanup.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

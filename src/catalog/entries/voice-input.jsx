@@ -11,7 +11,13 @@
 // input@1.0 subscribes (when its `subscribeToVoice` config is true) and
 // appends finalized transcripts to its value. The InputArea's built-in
 // mic button stays in V1 cardLayout for now — removed at PR-10b.
+//
+// PR-10a.8: split production render (tight mic-only button, lives at
+// ./voice-input-render.jsx) from preview render (verbose explanatory
+// card for the dev /catalog route, ./voice-input-preview.jsx). Both
+// publish on the bus identically; only the surface UI differs.
 
+import VoiceInputRender from './voice-input-render'
 import VoiceInputPreview from './voice-input-preview'
 
 export default {
@@ -43,6 +49,10 @@ export default {
     },
   },
 
-  render: VoiceInputPreview,
+  // Production render — tight mic button (PR-10a.8). Self-binds to
+  // useVoiceInput + publishes on the room hostAPI bus. input@1.0
+  // already subscribes and appends final transcripts to its value.
+  render: VoiceInputRender,
+  // Preview render — verbose explanatory card for the dev /catalog route.
   previewRender: VoiceInputPreview,
 }

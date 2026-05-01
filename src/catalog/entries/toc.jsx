@@ -3,8 +3,13 @@
 // Wraps src/components/core/TOC.jsx without moving or modifying it. Reader
 // tier — no model calls, just reads conversation messages and emits
 // scroll-jump intents back to whatever owns the message container.
+//
+// PR-10a.8 wired the live render: see ./toc-render.jsx for the production
+// component (self-binds to ChatContext). The previewRender below stays
+// preview-shaped for the dev /catalog route.
 
 import TOC from '../../components/core/TOC'
+import TocRender from './toc-render'
 
 const SAMPLE_ITEMS = [
   { id: 'sample-1', label: 'How do warm-tinted neutrals differ from cool greys in UI palettes?' },
@@ -40,9 +45,8 @@ export default {
     },
   },
 
-  render: ({ items = [], onNavigate }) => (
-    <TOC items={items} onNavigate={onNavigate} />
-  ),
+  // Production render — self-binds to ChatContext (PR-10a.8).
+  render: TocRender,
 
   previewRender: () => (
     <div className="border border-[var(--p-border)] rounded-xl bg-white p-2 max-w-sm">
