@@ -459,6 +459,33 @@
 
 ---
 
+### PR-10a.8 — Wire voice-input@1.0 + toc@1.0 to ChatContext
+
+**Goal:** Fourth slice of catalog data plumbing (after PR-10a.5 / PR-10a.6 / PR-10a.7). The lighter half of what's left before PR-10b: voice-input + toc are both small, read-only, and require no new shared state. Closes them out so the next slice (PR-10a.9) can focus on `collab-mode@1.0` + `review@1.0` — the two remaining components that touch the `sendMessage` flow and need real V1-modal extractions.
+
+**Scope:**
+- New `src/catalog/entries/voice-input-render.jsx` — production render. Tight mic-only button (rounded full, 9×9 grid units), turns red while listening. Publishes every interim + final transcript via `hostAPI.publish('voice-transcript', { text, isFinal })`; `input@1.0`'s existing subscription (PR-10a.5) appends finalized text to its value. Browser handles mic permission — no Parliament consent flow per [tier-classification.md](tier-classification.md).
+- `voice-input@1.0` manifest now points `render` at `VoiceInputRender` (production button) and `previewRender` at the existing `VoiceInputPreview` (verbose explanatory card for the dev `/catalog` route). Both publish on the bus identically; only the surface UI differs.
+- New `src/catalog/entries/toc-render.jsx` — self-binds to `useChat().messages`. Derives a list of user-role labels (matches V1 Albatross — assistant replies don't anchor a section), truncated at `truncateAt` chars (default 60), capped at `maxItems` most-recent entries (default 50). Click → `scrollIntoView({behavior:'smooth', block:'center'})` on the `msg-{id}` DOM anchor that `MessageCard` already sets.
+- `toc@1.0` manifest now points `render` at `TocRender` (live). `previewRender` unchanged for the dev `/catalog` route.
+- Documentation: §2.8a in [v2-phase1-audit.md](v2-phase1-audit.md) per-component table updated to mark `voice-input@1.0` and `toc@1.0` as wired in PR-10a.8. New PR-10a.8 section in [phase-1-testing.md](phase-1-testing.md) following the PR-10a.7 structure.
+- **Out of scope (next slice, before PR-10b):** `collab-mode@1.0` system-prompt wiring, `review@1.0` modal, plus the message-transfer / hide / move-to-branch / delete actions. None of those land here.
+- **Templates unchanged.** Pocket Chat already seeds `voice-input@1.0` into `input-dock`; Writing Studio / Quiet Room / Drafting Desk / Data Workspace continue to omit voice-input (and TOC) so users opt in via the editor (PR-8) when they want them. The dev `/catalog` route's hand-built mode (`THREE_PANEL_DEMO_MODE`) already includes `toc@1.0` in `left-rail`.
+
+**Dependencies:** PR-10a.7.
+
+**Exit criteria:**
+- Open a Pocket Chat conversation. Mic button renders in the input-dock alongside the textarea. Click toggles between Mic and MicOff icons; "Listening…" state is reflected in `aria-pressed` and red border. On browsers without `SpeechRecognition` (Firefox without flag), the button collapses to a small disabled badge with a "Voice input not supported" tooltip rather than disappearing.
+- Speaking a final transcript while voice-input is active fires `voice-transcript` on the room bus; `input@1.0` appends the trimmed text to its value (existing PR-10a.5 contract).
+- Open a conversation in a hand-built room that includes `toc@1.0`. The TOC renders a "TABLE OF CONTENTS" header followed by one row per user message (truncated). Click a row → viewport scrolls to that message.
+- Sending a new user message updates the TOC live (new row appears at the bottom; cap kicks in past `maxItems`).
+- The dev `/catalog` route still renders the verbose voice-input preview card (no regression on the catalog debug surface).
+- `npm run build` clean. No regressions in homepage / editor / wizard / messages / input / annotations / context / branches surfaces.
+
+**Risk:** Low. Both renders are leaf components: voice-input is a single button that calls into the existing `useVoiceInput` hook (untouched) and the existing bus contract; toc is a pure derivation from `useChat().messages` with the same scroll-into-view pattern that PR-10a.6's `notes-render` already uses. No new shared state, no IndexedDB writes, no API calls.
+
+---
+
 ### PR-10b — Delete adapter directories + cleanup InputArea + rotate PWA cache
 
 **Goal:** Point of no return. V2 is the only path.
@@ -579,9 +606,9 @@
 | 0 | PR-0 | Documentation foundation (5 docs, no code) |
 | A | PR-1, PR-2, PR-3 | Foundation (no user-visible change) |
 | B | PR-4a, PR-4b, PR-5, PR-6, PR-7 | Visual system + new homepage + V2 backup |
-| C | PR-8, PR-8b, PR-9, PR-10a, PR-10a.5, PR-10a.6, PR-10a.7, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
+| C | PR-8, PR-8b, PR-9, PR-10a, PR-10a.5, PR-10a.6, PR-10a.7, PR-10a.8, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
 
-**Total: 20 PRs** including PR-0.
+**Total: 21 PRs** including PR-0.
 
 ## Pause points
 

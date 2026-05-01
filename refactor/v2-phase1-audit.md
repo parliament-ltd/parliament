@@ -329,8 +329,8 @@ What this means in practice for each component:
 | `favorites@1.0` | Cross-cutting homepage component (already wired pre-PR-10a.6 via `favorites-preview.jsx`). The chat-rail per-message Star icon dispatches through `useAnnotations().toggleFavorite`. | PR-10a.6 (toggle) |
 | `collab-mode@1.0` | `getSetting('parrot-personas')`, scoped active-presets state. Provides system prompt to active room via a small bus event TBD or via component-config-derived hook (decide at PR-10a.5). **Pending.** | (deferred) |
 | `review@1.0` | `useChat().messages`, plus the same hand-built provider call pattern Albatross uses today. **Pending.** | (deferred) |
-| `voice-input@1.0` | `useVoiceInput()` hook. Publishes `voice-transcript` to the bus. **Pending — currently inert; the InputArea built-in mic still covers V1 cardLayout users.** | (deferred) |
-| `toc@1.0` | `useChat().messages` for the table-of-contents derivation. **Pending.** | (deferred) |
+| `voice-input@1.0` | `useVoiceInput()` hook. Publishes `voice-transcript` events on the room hostAPI bus on every interim + final transcript; `input@1.0`'s subscription appends finalized text to its value. Production render is a tight mic-only button (separate from the verbose `/catalog` preview card). InputArea's built-in cardLayout mic stays for V1 fallback until PR-10b. | PR-10a.8 |
+| `toc@1.0` | `useChat().messages` for the table-of-contents derivation. User-role messages only (matches V1 Albatross), labels truncated to `truncateAt` chars (default 60), most-recent `maxItems` retained (default 50). Click → `scrollIntoView` on `msg-{id}` (set by MessageCard). | PR-10a.8 |
 
 **Conversation activation is the route shell's job.** When `/chat/:id`
 loads a conversation, the route calls `useChat().loadMessages(id)` and
@@ -350,7 +350,8 @@ deletion:
 - **PR-10a.5** — `messages@1.0`, `input@1.0`, conversation activation in ChatView.
 - **PR-10a.6** — `context@1.0`, `highlights@1.0`, `notes@1.0`, plus per-message Star/StickyNote/highlight handlers wired through a new `AnnotationsContext` shared with the side-rail components.
 - **PR-10a.7** — `branches@1.0` live BranchList, the `BranchCreationPanel` modal owned by branches@1.0, the per-message GitBranch icon → openBranchPanel dispatch, the Compress Context action, and the app-wide Cmd/Ctrl+Shift+B keyboard shortcut. New `BranchPanelContext` shares modal open-state across `messages@1.0` (icon trigger), `branches@1.0` (Compress Context + modal host), and the global shortcut handler.
-- **Pending slices** — `voice-input@1.0`, `collab-mode@1.0` system prompt, `review@1.0` modal, `toc@1.0`, plus the message-transfer / hide / move-to-branch / delete actions. After those land, PR-10b can safely delete the Albatross adapter.
+- **PR-10a.8** — `voice-input@1.0` production render (tight mic button publishing `voice-transcript` on the room bus, complete loop with `input@1.0`'s existing subscription) and `toc@1.0` production render (user-message-derived headings list with click-to-scroll). Both light, no new shared contexts.
+- **Pending slices** — `collab-mode@1.0` system prompt, `review@1.0` modal, plus the message-transfer / hide / move-to-branch / delete actions. After those land, PR-10b can safely delete the Albatross adapter.
 
 **A new context for shared annotation state.** PR-10a.6 introduces
 `AnnotationsContext` (mounted between `ChatProvider` and
