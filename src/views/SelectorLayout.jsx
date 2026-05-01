@@ -8,11 +8,10 @@ import {
   Star, StickyNote, Highlighter, Pencil, RefreshCw, Sparkles,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useConversations } from '../../stores/ConversationContext'
-import { useSettings } from '../../stores/SettingsContext'
-import { useMode } from '../../stores/ModeContext'
-import { getProvider } from '../../providers'
-import { loadApiKey } from '../../lib/crypto'
+import { useConversations } from '../stores/ConversationContext'
+import { useSettings } from '../stores/SettingsContext'
+import { getProvider } from '../providers'
+import { loadApiKey } from '../lib/crypto'
 import {
   getFavorites as dbGetAllFavorites,
   deleteFavorite as dbDeleteFavorite,
@@ -20,9 +19,10 @@ import {
   initDB,
   getSetting,
   setSetting,
-} from '../../lib/db'
-import TourTooltip from '../../components/TourTooltip'
-import { SPRING_SNAPPY, SPRING_SMOOTH } from '../../lib/constants'
+} from '../lib/db'
+import { assignDefaultRoom } from '../lib/migration'
+import TourTooltip from '../components/TourTooltip'
+import { SPRING_SNAPPY, SPRING_SMOOTH } from '../lib/constants'
 
 // .parliament-md styles are now in src/index.css — no injection needed here
 
@@ -211,75 +211,12 @@ function StorageWarningBanner({ usagePercent }) {
   )
 }
 
-/* ═══════════════════════════════════════════════════════════ */
-/*  MODE MISMATCH BANNER                                        */
-/* ═══════════════════════════════════════════════════════════ */
-
-const MODE_DISPLAY_NAMES = {
-  albatross: 'Albatross',
-  swift: 'Swift',
-  kingfisher: 'Kingfisher',
-  secretarybird: 'Secretarybird',
-  starling: 'Starling',
-  pelican: 'Pelican',
-}
-
-function ModeMismatchBanner({ conversations, currentMode, onSwitch }) {
-  const [dismissed, setDismissed] = useState(() => new Set())
-
-  // Find modes that conversations were created in, excluding current mode and null
-  const mismatchedModes = useMemo(() => {
-    const counts = {}
-    for (const conv of conversations) {
-      const m = conv.createdInMode
-      if (m && m !== currentMode) {
-        counts[m] = (counts[m] || 0) + 1
-      }
-    }
-    return Object.entries(counts)
-      .filter(([m]) => !dismissed.has(m))
-      .sort((a, b) => b[1] - a[1]) // most conversations first
-  }, [conversations, currentMode, dismissed])
-
-  if (mismatchedModes.length === 0) return null
-
-  return (
-    <AnimatePresence>
-      {mismatchedModes.map(([m, count]) => (
-        <motion.div
-          key={m}
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={SPRING_SMOOTH}
-          className="flex items-center gap-2.5 px-8 py-2.5 text-xs border-b border-[#B8A070]/15"
-          style={{ backgroundColor: 'rgba(184,160,112,0.08)' }}
-        >
-          <span className="flex-1 text-[var(--p-text-secondary)]">
-            {count === 1 ? '1 conversation was' : `${count} conversations were`} created in{' '}
-            <span className="font-medium text-[var(--p-text-primary)]">{MODE_DISPLAY_NAMES[m] || m}</span> mode.
-          </span>
-          <motion.button
-            whileHover={{ scale: 1.03, borderColor: '#B8A070' }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => onSwitch(m)}
-            className="px-3 py-1 rounded-md text-[11px] font-medium border border-[#E9E9E7] bg-white text-[var(--p-text-primary)] transition-colors flex-shrink-0"
-          >
-            Switch to {MODE_DISPLAY_NAMES[m] || m}
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.15 }}
-            whileTap={{ scale: 0.85 }}
-            onClick={() => setDismissed(prev => new Set([...prev, m]))}
-            className="p-0.5 rounded hover:bg-black/5 flex-shrink-0"
-          >
-            <X className="w-3 h-3 text-[var(--p-text-muted)]" />
-          </motion.button>
-        </motion.div>
-      ))}
-    </AnimatePresence>
-  )
-}
+// PR-10b: ModeMismatchBanner deleted. The banner pointed users at their
+// `createdInMode` value when it diverged from the active V1 bird-mode.
+// After PR-10b the global "active mode" concept is gone — every
+// conversation has a `room` instead — so the banner has nothing
+// meaningful to compare against. `createdInMode` lingers on records for
+// debugging until PR-12 strips it.
 
 /* ═══════════════════════════════════════════════════════════ */
 /*  CHECKBOX                                                    */
@@ -900,7 +837,7 @@ function ChatTableRow({
 /*  MAIN COMPONENT                                              */
 /* ═══════════════════════════════════════════════════════════ */
 
-export default function SelectorView() {
+export default function SelectorLayout() {
   const navigate = useNavigate()
   const {
     conversations,
@@ -910,7 +847,6 @@ export default function SelectorView() {
     loadConversations,
   } = useConversations()
   const { storageUsage, settings } = useSettings()
-  const { mode, setMode } = useMode()
 
   // Refresh from IndexedDB on mount — picks up storageBytes/familyId/parentTitle
   // writes that happen outside the React context (addMessage, createBranch).
@@ -1161,12 +1097,19 @@ export default function SelectorView() {
 
   const handleNewChat = useCallback(async () => {
     try {
-      const conv = await createConversation({ title: 'New conversation', createdInMode: mode })
+      const conv = await createConversation({ title: 'New conversation' })
+      // PR-10b: assign a default Writing Studio room before navigating so
+      // the new conversation already has a room when /chat/:id loads it.
+      // ChatView's null-room repair path is a defense-in-depth fallback;
+      // doing it eagerly here keeps the new chat from briefly rendering
+      // through the repair branch on first paint. assignDefaultRoom is
+      // a no-op if a room is already set, so re-running it is safe.
+      await assignDefaultRoom(conv.id)
       navigate(`/chat/${conv.id}`)
     } catch (err) {
       console.error('Failed to create conversation:', err)
     }
-  }, [createConversation, navigate, mode])
+  }, [createConversation, navigate])
 
   const handleTitleEdit = useCallback(async (id, newTitle) => {
     try {
@@ -1343,11 +1286,6 @@ export default function SelectorView() {
 
         {/* Storage warning banner */}
         <StorageWarningBanner usagePercent={storagePercent} />
-        <ModeMismatchBanner
-          conversations={conversations}
-          currentMode={mode}
-          onSwitch={setMode}
-        />
 
         {/* Search */}
         <motion.div

@@ -36,10 +36,20 @@
 //    migration reports.
 
 import { initDB, getSetting, setSetting } from './db'
-import { createModeFromTemplate } from './modes'
+import { createModeFromTemplate, saveMode } from './modes'
 
-// Settings key for the idempotent guard.
+// Settings keys for the idempotent guards. Each PR-10a/PR-10b migration
+// step has its own flag so adding a new pass later doesn't require
+// re-running prior ones.
 const MIGRATION_DONE_KEY = 'migration_v2_chat_room_assigned'
+const REPAIR_DONE_KEY = 'migration_v2_room_repair_done'
+const VOICE_INJECT_DONE_KEY = 'migration_v2_voice_input_injected'
+
+// Default fallback template for the room-repair pass (PR-10b). Any
+// conversation that didn't get a room assignment from the PR-10a pass
+// defaults to Writing Studio — same closest-available default the
+// kingfisher/starling stubs use in MIGRATION_MAP.
+const DEFAULT_TEMPLATE_ID = 'writing-studio@1.0'
 
 // Legacy localStorage key consulted exactly once for conversations whose
 // createdInMode is null. PR-12 will strip this key on app load; the
@@ -201,9 +211,172 @@ export async function migrateChatRoomAssignments() {
   }
 }
 
+// ─── PR-10b migrations ────────────────────────────────────────────────
+//
+// PR-10b is the point of no return — Albatross adapter goes away, V2 is
+// the only chat path. Two migration steps run alongside the existing
+// PR-10a pass on first PR-10b boot:
+//
+//   1. migrateRepairNullRooms — assigns a default Writing Studio room to
+//      any conversation whose `room` is still null. Catches:
+//        - conversations whose PR-10a `createdInMode` was unrecognized
+//          (and there was no localStorage hint to fall back on)
+//        - conversations created via Albatross "+ New Chat" between
+//          PR-10a's deploy and PR-10b's deploy (those passed `createdInMode`
+//          but the migration's MIGRATION_DONE_KEY guard blocked re-running)
+//      Without this, after PR-10b a null-room conversation would render
+//      a diagnostic stub in ChatView with no recovery path. The repair
+//      itself uses the same template that PR-10a's MIGRATION_MAP picks
+//      for the kingfisher/starling stubs (writing-studio@1.0).
+//
+//   2. migrateInjectVoiceInput — injects voice-input@1.0 into every
+//      pocket-chat-shaped room derived from a swift migration that
+//      doesn't already have it. Pre-PR-10a.8 the pocket-chat seed
+//      didn't include voice-input; after PR-10b removes InputArea's
+//      built-in cardLayout mic, mobile users on those rooms would lose
+//      voice access without this injection. Per-room idempotent (skips
+//      rooms that already include voice-input — covers users who edited
+//      their migrated room in the editor or already have an up-to-date
+//      seed).
+
+/**
+ * Instantiate a fresh Writing Studio mode and assign it to the given
+ * conversation. Used by the repair pass and as a defense-in-depth
+ * fallback the route shell can call when it encounters a null-room
+ * conversation at render time.
+ *
+ * Returns the new mode id, or null on failure. Does nothing if the
+ * conversation already has a non-null room (returns the existing id).
+ *
+ * @param {string} conversationId
+ * @returns {Promise<string | null>}
+ */
+export async function assignDefaultRoom(conversationId) {
+  const db = await initDB()
+  const conv = await db.get('conversations', conversationId)
+  if (!conv) return null
+  if (conv.room) return conv.room
+
+  const template = await db.get('libraryRooms', DEFAULT_TEMPLATE_ID)
+  if (!template) {
+    if (import.meta.env.DEV) {
+      console.warn(
+        `[migration] ${DEFAULT_TEMPLATE_ID} template missing; cannot repair conversation ${conversationId}`,
+      )
+    }
+    return null
+  }
+
+  const newMode = await createModeFromTemplate(template, {
+    buildIntent: { derivedFrom: 'null-room-repair' },
+  })
+  await db.put('conversations', { ...conv, room: newMode.id })
+  return newMode.id
+}
+
+/**
+ * Second-pass migration: any conversation still at room: null gets a
+ * fresh Writing Studio mode. Runs once (idempotent via REPAIR_DONE_KEY).
+ *
+ * Returns a small report shape:
+ *   { skipped: boolean, scanned, repaired, errors }
+ */
+export async function migrateRepairNullRooms() {
+  const done = await getSetting(REPAIR_DONE_KEY)
+  if (done === true) {
+    return { skipped: true, scanned: 0, repaired: 0, errors: [] }
+  }
+
+  const db = await initDB()
+  const conversations = await db.getAll('conversations')
+
+  let repaired = 0
+  const errors = []
+
+  for (const conv of conversations) {
+    if (conv.room != null) continue
+    try {
+      const id = await assignDefaultRoom(conv.id)
+      if (id) repaired++
+      else errors.push({ conversationId: conv.id, reason: 'assignDefaultRoom returned null' })
+    } catch (err) {
+      errors.push({ conversationId: conv.id, reason: err?.message || String(err) })
+    }
+  }
+
+  await setSetting(REPAIR_DONE_KEY, true)
+  return { skipped: false, scanned: conversations.length, repaired, errors }
+}
+
+/**
+ * Third-pass migration: ensure every swift-derived pocket-chat room has
+ * voice-input@1.0 in its input-dock slot. Per-room idempotent (skips
+ * rooms that already include voice-input). Whole-pass idempotent via
+ * VOICE_INJECT_DONE_KEY.
+ *
+ * Selection criteria match data-migration.md §"Voice-input migration":
+ *   - scope === 'room'
+ *   - layout.ref starts with 'single-column-with-sheet'
+ *   - buildIntent.derivedFrom === 'swift-migration'
+ *   - components do not already include a voice-input ref
+ *
+ * Returns:
+ *   { skipped: boolean, scanned, injected, errors }
+ */
+export async function migrateInjectVoiceInput() {
+  const done = await getSetting(VOICE_INJECT_DONE_KEY)
+  if (done === true) {
+    return { skipped: true, scanned: 0, injected: 0, errors: [] }
+  }
+
+  const db = await initDB()
+  const allModes = await db.getAll('modes')
+
+  let scanned = 0
+  let injected = 0
+  const errors = []
+
+  for (const mode of allModes) {
+    if (mode.scope !== 'room') continue
+    const layoutRef = mode.layout?.ref
+    if (!layoutRef || !layoutRef.startsWith('single-column-with-sheet')) continue
+    if (mode.buildIntent?.derivedFrom !== 'swift-migration') continue
+    scanned++
+    const components = mode.components || []
+    if (components.some((c) => c.ref?.startsWith('voice-input'))) continue
+
+    try {
+      const updated = {
+        ...mode,
+        components: [
+          ...components,
+          {
+            id: `comp_${crypto.randomUUID()}`,
+            ref: 'voice-input@^1.0',
+            slot: 'input-dock',
+            order: 1,
+            essential: false,
+            config: {},
+          },
+        ],
+      }
+      await saveMode(updated)
+      injected++
+    } catch (err) {
+      errors.push({ modeId: mode.id, reason: err?.message || String(err) })
+    }
+  }
+
+  await setSetting(VOICE_INJECT_DONE_KEY, true)
+  return { skipped: false, scanned, injected, errors }
+}
+
 // Exported for tests / debug consoles.
 export const _internal = Object.freeze({
   MIGRATION_MAP,
   MIGRATION_DONE_KEY,
+  REPAIR_DONE_KEY,
+  VOICE_INJECT_DONE_KEY,
   LEGACY_MODE_LOCALSTORAGE_KEY,
+  DEFAULT_TEMPLATE_ID,
 })

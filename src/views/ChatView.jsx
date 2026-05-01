@@ -1,53 +1,57 @@
 // ChatView — `/chat/:id` route shell.
 //
-// PR-10a wired this route through <RoomShell>: load the conversation,
-// read `conversation.room`, load the matching mode file, render
-// RoomShell against it. PR-10a.5 added the conversation-activation
-// step so chat-essential catalog components (messages@1.0, input@1.0)
-// self-bind to ChatContext and see live data.
+// PR-10a wired this route through <RoomShell>; PR-10a.5–PR-10a.10
+// brought every chat-essential catalog component online via direct
+// useChat() / useAnnotations() / useBranchPanel() / useCollabMode()
+// self-binding. PR-10b deletes the V1 Albatross fallback — V2 RoomShell
+// is the only chat path.
 //
-// ─── Albatross fallback ────────────────────────────────────────────────
+// ─── Null-room repair ─────────────────────────────────────────────────
 //
-// The PR-10a migration assigns a room to every conversation whose
-// `createdInMode` value is recognized. For records the migration left
-// untouched (unrecognized values, or pre-PR-10a installs that haven't
-// upgraded yet), `conversation.room` stays null and we render the V1
-// Albatross adapter. This is the recoverable state per
-// refactor/data-migration.md §"Rollback plan" — PR-10b is the point
-// of no return.
+// PR-10b's boot-time migration (`migrateRepairNullRooms`) sweeps every
+// existing conversation that PR-10a left at room: null and assigns a
+// fresh Writing Studio room. That covers conversations whose
+// `createdInMode` was unrecognized AND that didn't have a localStorage
+// hint. It also catches conversations created via the V1 Albatross
+// "+ New Chat" handler between PR-10a's deploy and PR-10b's deploy
+// (which set createdInMode but the migration's done-flag blocked
+// re-running).
 //
-// We also fall back to Albatross when a room id IS set but the mode
-// file fails to load (deleted out from under the conversation, db
-// corruption, etc.). The failure mode is "user sees their chat in the
-// V1 shell" rather than "user sees a diagnostic stub" — a strictly
-// better outcome until the V2 chat shell wiring fully matures.
+// As a defense-in-depth fallback, this view still calls
+// `assignDefaultRoom` if it ever encounters a conversation with
+// room: null at render time (e.g., a code path that creates a
+// conversation but doesn't pre-assign a room). The repair runs
+// idempotently and the resolution loop re-fires once it completes.
+// If the repair itself fails — the writing-studio template is missing
+// from libraryRooms, IndexedDB write fails, etc. — we render a small
+// diagnostic stub with a Back-to-chats affordance instead of a blank
+// screen. That state should be unreachable in practice but the user
+// should not be wedged if it ever occurs.
 //
 // ─── Conversation activation (PR-10a.5) ────────────────────────────────
 //
 // When this route renders <RoomShell>, the catalog components inside
 // (messages@1.0, input@1.0) read live state from useChat() / the other
 // existing React contexts. For that to be the active conversation's
-// state, somebody has to call useChat().loadMessages(id) on entry and
-// useChat().clearMessages() on exit. That somebody is this view —
-// catalog components shouldn't know which conversation is open, just
-// that one IS open.
-//
-// The activation lives in <RoomShellChatHost> below so it only fires
-// on the RoomShell branch. The Albatross fallback runs its own
-// loadMessages call inside its mount effect (unchanged from V1) — no
-// double-load because the two branches never render simultaneously.
+// state, the route shell calls useChat().loadMessages(id) on entry and
+// useChat().clearMessages() on exit. Catalog components stay agnostic
+// of which conversation is open.
 
-import { lazy, Suspense, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import RoomShell from '../components/RoomShell'
 import { getConversation } from '../lib/db'
 import { loadMode } from '../lib/modes'
+import { assignDefaultRoom } from '../lib/migration'
 import { useChat } from '../stores/ChatContext'
-
-const AlbatrossChatLayout = lazy(() => import('../adapters/albatross/ChatLayout'))
 
 export default function ChatView() {
   const { id } = useParams()
+  // `repairNonce` bumps after a successful null-room repair to force
+  // the resolution effect to re-run. Without it the effect's dependency
+  // list (just `[id]`) wouldn't pick up the on-disk change to
+  // conversation.room.
+  const [repairNonce, setRepairNonce] = useState(0)
   const [resolution, setResolution] = useState({
     forId: null,
     conversation: null,
@@ -55,11 +59,6 @@ export default function ChatView() {
     error: null,
   })
 
-  // Load conversation + (optionally) its room mode whenever the route
-  // id changes. Cancellation flag prevents a stale resolution from
-  // racing past a newer one. Failures collapse to a null mode so the
-  // render branch falls back to Albatross — surfacing a diagnostic
-  // here would block the user from their data, which is worse.
   useEffect(() => {
     if (!id) return
     let cancelled = false
@@ -68,21 +67,40 @@ export default function ChatView() {
         const conv = await getConversation(id)
         if (cancelled) return
         if (!conv) {
-          setResolution({ forId: id, conversation: null, mode: null, error: null })
+          setResolution({ forId: id, conversation: null, mode: null, error: 'not-found' })
           return
         }
-        let mode = null
-        if (conv.room) {
-          try {
-            mode = await loadMode(conv.room)
-          } catch (err) {
-            if (import.meta.env.DEV) {
-              console.warn(`[ChatView] failed to load mode ${conv.room}:`, err)
-            }
-            mode = null
+
+        // Defense in depth: if the boot-time migrations missed this
+        // conversation (or it was created post-boot without a room),
+        // assign one on the spot and re-resolve. assignDefaultRoom is
+        // a no-op if a room is already set, so a race where the room
+        // appeared between getConversation and now is handled too.
+        if (!conv.room) {
+          const repairedRoomId = await assignDefaultRoom(conv.id)
+          if (cancelled) return
+          if (repairedRoomId) {
+            setRepairNonce((n) => n + 1)
+            return
           }
+          setResolution({ forId: id, conversation: conv, mode: null, error: 'repair-failed' })
+          return
+        }
+
+        let mode = null
+        try {
+          mode = await loadMode(conv.room)
+        } catch (err) {
+          if (import.meta.env.DEV) {
+            console.warn(`[ChatView] failed to load mode ${conv.room}:`, err)
+          }
+          mode = null
         }
         if (cancelled) return
+        if (!mode) {
+          setResolution({ forId: id, conversation: conv, mode: null, error: 'mode-load-failed' })
+          return
+        }
         setResolution({ forId: id, conversation: conv, mode, error: null })
       } catch (err) {
         if (cancelled) return
@@ -91,25 +109,65 @@ export default function ChatView() {
     }
     resolve()
     return () => { cancelled = true }
-  }, [id])
+  }, [id, repairNonce])
 
-  // Resolution hasn't caught up to the current id yet — render nothing
-  // (matches the V1 adapter's Suspense fallback) rather than a flash of
-  // intermediate UI.
   if (resolution.forId !== id) return null
 
-  // If the conversation exists AND has a room AND the mode loaded, use
-  // the V2 RoomShell path. Otherwise fall back to Albatross — that
-  // covers: missing conversation (Albatross handles its own redirect),
-  // null room (migration didn't map this record), and mode-load failure.
-  const useRoomShellPath = resolution.conversation && resolution.mode
-  if (useRoomShellPath) {
+  if (resolution.conversation && resolution.mode) {
     return <RoomShellChatHost conversationId={id} mode={resolution.mode} />
   }
+
+  // Diagnostic fallback. The migration repair pass should make this
+  // unreachable in practice; if it triggers, surface it in dev and
+  // show a recoverable stub rather than a blank screen.
+  if (import.meta.env.DEV && resolution.error) {
+    console.warn(`[ChatView] cannot render conversation ${id}: ${resolution.error}`)
+  }
+  return <ConversationUnavailable conversationId={id} reason={resolution.error} />
+}
+
+function ConversationUnavailable({ conversationId, reason }) {
+  const heading =
+    reason === 'not-found'
+      ? 'Conversation not found.'
+      : 'This conversation can\'t be opened right now.'
+  const detail =
+    reason === 'mode-load-failed'
+      ? 'Its room template could not be loaded. Try restoring from a backup or open another conversation.'
+      : reason === 'repair-failed'
+        ? 'The default room template is missing. Restoring from a backup should bring it back.'
+        : 'It may have been deleted or never finished saving.'
+
   return (
-    <Suspense fallback={null}>
-      <AlbatrossChatLayout />
-    </Suspense>
+    <div className="min-h-screen flex items-center justify-center px-6 bg-[var(--p-bg-base)]">
+      <div className="max-w-md w-full rounded-xl border border-[var(--p-border)] bg-white p-6 shadow-sm">
+        <h1 className="text-base font-semibold text-[var(--p-text-primary)]">
+          {heading}
+        </h1>
+        <p className="mt-2 text-sm text-[var(--p-text-secondary)]">
+          {detail}
+        </p>
+        {import.meta.env.DEV && (
+          <p className="mt-3 text-[11px] font-mono text-[var(--p-text-muted)] break-all">
+            id: {conversationId}
+          </p>
+        )}
+        <div className="mt-5 flex gap-2">
+          <Link
+            to="/"
+            className="px-3.5 py-2 rounded-lg text-sm font-medium border border-[var(--p-border)] bg-white text-[var(--p-text-primary)] hover:border-[#B8A070] transition-colors"
+          >
+            Back to homepage
+          </Link>
+          <Link
+            to="/chats"
+            className="px-3.5 py-2 rounded-lg text-sm font-medium border border-[var(--p-border)] bg-white text-[var(--p-text-primary)] hover:border-[#B8A070] transition-colors"
+          >
+            Open chat list
+          </Link>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -130,11 +188,6 @@ export default function ChatView() {
  */
 function RoomShellChatHost({ conversationId, mode }) {
   const { loadMessages, clearMessages, activeConversationId } = useChat()
-  // Track which id our completed loadMessages() call corresponds to.
-  // Comparing against the requested conversationId at render time gives
-  // us a "still loading" signal without setState-in-effect (which the
-  // react-hooks/set-state-in-effect lint rule flags). Same pattern as
-  // src/hooks/useMode.js.
   const [loadedFor, setLoadedFor] = useState(null)
 
   useEffect(() => {
@@ -144,17 +197,10 @@ function RoomShellChatHost({ conversationId, mode }) {
     })
     return () => {
       cancelled = true
-      // Clear on id change / unmount so the next mount starts clean.
-      // This also fires when the user navigates away from /chat/:id
-      // entirely, e.g. back to the homepage.
       clearMessages()
     }
   }, [conversationId, loadMessages, clearMessages])
 
-  // Gate the render until loadMessages has resolved AND ChatContext's
-  // activeConversationId matches the route id. Either one being out of
-  // sync indicates a mid-transition state where messages@1.0 would
-  // render the previous conversation's data for one frame.
   if (loadedFor !== conversationId || activeConversationId !== conversationId) {
     return null
   }

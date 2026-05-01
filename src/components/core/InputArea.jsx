@@ -1,9 +1,8 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Square, ArrowUp, Plus, X, FileText, Globe, Calculator, BarChart2, Paperclip, Check, Mic } from 'lucide-react'
+import { Square, ArrowUp, Plus, X, FileText, Globe, Calculator, BarChart2, Paperclip, Check } from 'lucide-react'
 import { SPRING_SNAPPY, SPRING_SMOOTH } from '../../lib/constants'
 import { ACCEPTED_TYPES, readUploadedFile } from '../../lib/fileUpload'
-import { useVoiceInput } from '../../hooks/useVoiceInput'
 
 const TOOL_META = {
   web_search:   { label: 'Web search',   Icon: Globe,       color: '#4A7AE5' },
@@ -55,15 +54,13 @@ export default function InputArea({
   const plusRef = useRef(null)
   const [menuOpen, setMenuOpen] = useState(false)
 
-  // Voice — only active in cardLayout
-  const handleTranscript = useCallback((text, isFinal) => {
-    onChange?.(text)
-    // On final result the recognition session ends naturally;
-    // the textarea now has the text and the Send button appears
-  }, [onChange])
-
-  const { isListening, isSupported: voiceSupported, start: startVoice, stop: stopVoice } =
-    useVoiceInput({ onTranscript: handleTranscript })
+  // PR-10b: the cardLayout-only mic button was removed. Voice input is
+  // now contributed by the standalone voice-input@1.0 catalog component
+  // (PR-10a.8 wired its production render); the bus contract remains the
+  // same — voice-input@1.0 publishes `voice-transcript`, which a wired
+  // input-render subscriber appends to its value. Pocket-chat-shaped
+  // rooms seed voice-input@1.0 by default; legacy swift-migrated rooms
+  // get it injected by lib/migration.js → migrateInjectVoiceInput.
 
   const hasActive = activeTools.size > 0 || !!attachment
 
@@ -251,39 +248,7 @@ export default function InputArea({
                   <ArrowUp className="w-4 h-4 text-white" />
                 </motion.button>
 
-              /* ── Empty + voice supported: Mic button ── */
-              ) : voiceSupported ? (
-                <motion.button
-                  key="mic"
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.8, opacity: 0 }}
-                  transition={SPRING_SNAPPY}
-                  whileTap={{ scale: 0.85 }}
-                  onClick={isListening ? stopVoice : startVoice}
-                  className="rounded-lg border flex items-center justify-center flex-shrink-0 relative overflow-hidden"
-                  style={{
-                    width: 36, height: 36,
-                    borderColor: isListening ? '#E03E3E' : '#DDDDE3',
-                    backgroundColor: isListening ? '#E03E3E' : 'transparent',
-                  }}
-                >
-                  {/* Pulse ring while recording */}
-                  {isListening && (
-                    <motion.span
-                      className="absolute inset-0 rounded-lg"
-                      style={{ backgroundColor: '#E03E3E' }}
-                      animate={{ opacity: [0.4, 0.15, 0.4] }}
-                      transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-                    />
-                  )}
-                  <Mic
-                    className="w-4 h-4 relative z-10 transition-colors"
-                    style={{ color: isListening ? '#FFFFFF' : '#9B9A97' }}
-                  />
-                </motion.button>
-
-              /* ── Empty + no voice support: ghost Send ── */
+              /* ── Empty: ghost Send (voice now lives in voice-input@1.0) ── */
               ) : (
                 <motion.button
                   key="send-empty"

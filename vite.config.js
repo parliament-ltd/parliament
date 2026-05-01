@@ -25,15 +25,19 @@ export default defineConfig({
         // Hashed filenames mean each deploy gets its own versioned cache entry.
         globPatterns: ['**/*.{js,css,html,woff2,png,svg,ico,webmanifest}'],
 
-        // Adapter chunks are intentionally excluded from the install-time
-        // precache. They are handled by the runtimeCaching CacheFirst rule
-        // below and are downloaded only on first activation of each mode.
-        // Users who never open Pelican, Secretarybird, etc. never pay the
-        // download cost at install time.
-        globIgnores: ['**/adapter-*.js'],
+        // Lazy-loaded V2 catalog/component/module chunks are excluded from
+        // the install-time precache. The runtimeCaching rule below picks
+        // them up on first use, so users only pay for what they open.
+        globIgnores: ['**/{catalog,component,module}-*.js'],
 
         // SPA fallback: serve index.html for all navigation requests when offline.
         navigateFallback: '/index.html',
+
+        // PR-10b: cleanup orphaned `parliament-adapters-v1` runtime cache
+        // entries left behind by V1 builds. cleanupOutdatedCaches handles
+        // workbox-managed precache rotation; the named runtime cache is
+        // wiped from the page context on V2 boot — see src/main.jsx.
+        cleanupOutdatedCaches: true,
 
         runtimeCaching: [
           {
@@ -49,22 +53,23 @@ export default defineConfig({
             handler: 'NetworkOnly',
           },
           {
-            // Lazy-loaded adapter chunks — CacheFirst, activated at runtime.
+            // PR-10b: V2 catalog / component / module chunks — CacheFirst.
             //
-            // Adapters (albatross, swift, pelican, secretarybird, starling,
-            // kingfisher) are React.lazy() code-split chunks. They are NOT
-            // included in the install-time precache; they download on first
-            // mode activation and are then served from cache on subsequent
-            // visits. Users who never open Pelican never download its chunks.
+            // Catalog components (messages-render, branches-render, …) and
+            // any other React.lazy() code-split chunks named `catalog-*`,
+            // `component-*`, or `module-*` are excluded from the precache
+            // and downloaded lazily on first use. The cache name rotated
+            // from V1's `parliament-adapters-v1` to `parliament-modules-v2`;
+            // see refactor/data-migration.md §"PWA cache rotation".
             urlPattern: ({ url }) =>
               url.origin === self.location.origin &&
               url.pathname.startsWith('/assets/') &&
-              /adapter-/.test(url.pathname),
+              /(catalog|component|module)-/.test(url.pathname),
             handler: 'CacheFirst',
             options: {
-              cacheName: 'parliament-adapters-v1',
+              cacheName: 'parliament-modules-v2',
               expiration: {
-                maxEntries: 30,
+                maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
               },
               cacheableResponse: { statuses: [0, 200] },
@@ -89,38 +94,15 @@ export default defineConfig({
           'vendor-charts':   ['recharts'],
           'vendor-idb':      ['idb'],
 
-          // Adapters — one chunk per adapter family.
-          // These names are matched by the runtimeCaching adapter rule above.
-          'adapter-albatross': [
-            './src/adapters/albatross/ChatLayout.jsx',
-            './src/adapters/albatross/SelectorLayout.jsx',
-            './src/adapters/albatross/SettingsLayout.jsx',
-          ],
-          'adapter-swift': [
-            './src/adapters/swift/ChatLayout.jsx',
-            './src/adapters/swift/SelectorLayout.jsx',
-            './src/adapters/swift/SettingsLayout.jsx',
-          ],
-          'adapter-pelican': [
-            './src/adapters/pelican/ChatLayout.jsx',
-            './src/adapters/pelican/SelectorLayout.jsx',
-            './src/adapters/pelican/SettingsLayout.jsx',
-          ],
-          'adapter-secretarybird': [
-            './src/adapters/secretarybird/ChatLayout.jsx',
-            './src/adapters/secretarybird/SelectorLayout.jsx',
-            './src/adapters/secretarybird/SettingsLayout.jsx',
-          ],
-          'adapter-starling': [
-            './src/adapters/starling/ChatLayout.jsx',
-            './src/adapters/starling/SelectorLayout.jsx',
-            './src/adapters/starling/SettingsLayout.jsx',
-          ],
-          'adapter-kingfisher': [
-            './src/adapters/kingfisher/ChatLayout.jsx',
-            './src/adapters/kingfisher/SelectorLayout.jsx',
-            './src/adapters/kingfisher/SettingsLayout.jsx',
-          ],
+          // PR-10b: per-adapter chunks are gone. Albatross, kingfisher,
+          // and starling were deleted outright; pelican, secretarybird,
+          // and swift remain on disk until PR-11a / PR-11b decompose
+          // them into catalog components, but no production import path
+          // reaches their files anymore — Rollup tree-shakes them out
+          // of the build, so they don't need their own chunks. The
+          // `parliament-modules-v2` runtimeCaching rule above matches
+          // any future `catalog-*`, `component-*`, or `module-*` lazy
+          // chunks created by the catalog/editor surfaces.
         },
       },
     },
