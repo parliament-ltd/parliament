@@ -320,7 +320,7 @@ What this means in practice for each component:
 
 | Component | What it self-binds to | Wired in |
 |---|---|---|
-| `messages@1.0` | `useChat().messages`, `useChat().streamingContent`, `useChat().isStreaming`, `useConversations().activeConversationId`. Owns the per-message action menu surface; reads contributed actions off `hostAPI.getMessageActions()`. PR-10a.6 added per-message handlers for favorite toggle, note panel, and text-selection highlight via `useAnnotations()`. | PR-10a.5 + PR-10a.6 |
+| `messages@1.0` | `useChat()` for messages + streaming, `useAnnotations()` for stars/notes/highlights, `useBranchPanel()` for branch dispatch, `useCollabMode()` for ghost-continue system prompt, `useConversations()` for the Send-to-branch / Pin-for-reference target picker. Owns hide / delete (20s undo) / send-to-branch / pin-for-reference flows. Renders pinned references at the top of msg-area as collapsible quote blocks. Owns the per-message action menu surface; reads contributed actions off `hostAPI.getMessageActions()` (UI surfacing of contributions still deferred). | PR-10a.5 + PR-10a.6 + PR-10a.7 + PR-10a.9 + PR-10a.10 |
 | `input@1.0` | `useChat().sendMessage` / `stopGenerating` / `isStreaming`, `useSettings().defaultModel`, `loadApiKey()`. Subscribes to `voice-transcript` events on the bus when `subscribeToVoice` config is on. | PR-10a.5 |
 | `context@1.0` | `useChat().tokenUsage`, `useChat().messages.length`, `useSettings().defaultModel` + provider model lookup for the window size. Threshold + display mode read from per-component config (audit §3.6). | PR-10a.6 |
 | `highlights@1.0` | `useAnnotations().highlights` (raw records) aggregated by term into HighlightList shape. `addHighlightFromSidebar`, `deleteHighlights`, `navigateHighlight` mutators dispatched on the side-rail surface. | PR-10a.6 |
@@ -352,7 +352,8 @@ deletion:
 - **PR-10a.7** — `branches@1.0` live BranchList, the `BranchCreationPanel` modal owned by branches@1.0, the per-message GitBranch icon → openBranchPanel dispatch, the Compress Context action, and the app-wide Cmd/Ctrl+Shift+B keyboard shortcut. New `BranchPanelContext` shares modal open-state across `messages@1.0` (icon trigger), `branches@1.0` (Compress Context + modal host), and the global shortcut handler.
 - **PR-10a.8** — `voice-input@1.0` production render (tight mic button publishing `voice-transcript` on the room bus, complete loop with `input@1.0`'s existing subscription) and `toc@1.0` production render (user-message-derived headings list with click-to-scroll). Both light, no new shared contexts.
 - **PR-10a.9** — `collab-mode@1.0` live trigger + active-count badge; new `CollabModeContext` shares the active system prompt with `input@1.0` (sendMessage) and `messages@1.0` ghost-continue. `review@1.0` live trigger + Composer-tier synthesis call wired to `useChat()` + `useAnnotations()` + provider; Markdown export lifted from V1.
-- **Pending slices** — message-transfer / hide / move-to-branch / delete actions. Optional bundle into one PR-10a.10 or fold into PR-10b cleanup; once they land PR-10b can safely delete the Albatross adapter.
+- **PR-10a.10** — per-message message actions wired in `messages@1.0`: Hide (session-only), Delete (with 20s undo banner + IndexedDB delete), Send to branch (target-picker modal → copies into target's messages), Pin for reference (target-picker modal → writes to existing `pins` store; renders as collapsible quote-block list at the top of the active conversation's msg-area). New extracted `SelectConversationModal` shared by both transfer flows. After this lands, the V2 chat surface has parity with V1 for every per-message affordance plus the new V2 Pin flow.
+- **PR-10b is now unblocked** — Albatross adapter can be deleted once a final review pass confirms no V2-only conversation paths still depend on the V1 fallback.
 
 **A new context for shared annotation state.** PR-10a.6 introduces
 `AnnotationsContext` (mounted between `ChatProvider` and
@@ -544,6 +545,7 @@ CSP currently allows `connect-src 'self' https://api.anthropic.com`. Adding Olla
 - PR-10a.7 — Wire `branches@1.0` (live side-rail list + Compress Context action) + the BranchCreationPanel modal owned by branches@1.0; per-message GitBranch icon and app-wide Cmd/Ctrl+Shift+B both dispatch through a new shared `BranchPanelContext`.
 - PR-10a.8 — Wire `voice-input@1.0` (production tight mic button + bus publish) and `toc@1.0` (user-message headings + scroll).
 - PR-10a.9 — Wire `collab-mode@1.0` system-prompt builder via a new shared `CollabModeContext` consumed by `input@1.0` + `messages@1.0` ghost-continue, plus `review@1.0` live render with synthesis call + Markdown export.
+- PR-10a.10 — Wire per-message Hide / Delete (20s undo) / Send to branch / Pin for reference. New `SelectConversationModal` extracted from V1's MoveToBranchModal serves both transfer flows. Pinned references render as a collapsible quote-block list at the top of the active conversation's msg-area.
 - PR-10b — Delete adapter directories (Albatross, Kingfisher, Starling) + remove InputArea built-in mic + rotate PWA cache + inject `voice-input@1.0` for migrated mobile users.
 - PR-11a — Decompose Pelican into 6 catalog components.
 - PR-11b — Decompose Secretarybird into 3 catalog components.
