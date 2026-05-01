@@ -36,6 +36,7 @@ import { useChat } from '../../stores/ChatContext'
 import { useSettings } from '../../stores/SettingsContext'
 import { useAnnotations } from '../../stores/AnnotationsContext'
 import { useBranchPanel } from '../../stores/BranchPanelContext'
+import { useCollabMode } from '../../stores/CollabModeContext'
 import { getProvider } from '../../providers'
 import { loadApiKey } from '../../lib/crypto'
 
@@ -48,6 +49,7 @@ export default function MessagesRender() {
     toggleFavorite, toggleNotePanel, saveNote, addHighlight,
   } = useAnnotations()
   const { openBranchPanel } = useBranchPanel()
+  const { buildSystemPrompt } = useCollabMode()
   const containerRef = useRef(null)
   const bottomRef = useRef(null)
   const [activePopoverMsgId, setActivePopoverMsgId] = useState(null)
@@ -69,13 +71,16 @@ export default function MessagesRender() {
       const apiKey = await loadApiKey(settings.storageMode)
       if (!apiKey) return
       const provider = getProvider('anthropic')
-      await continueMessage(apiKey, incompleteId, settings.defaultModel, provider, '')
+      // PR-10a.9: thread the active collab-mode system prompt through
+      // continue() too so the resumed turn keeps the same instructions.
+      const systemPrompt = buildSystemPrompt()
+      await continueMessage(apiKey, incompleteId, settings.defaultModel, provider, systemPrompt)
     } catch (err) {
       if (err?.name !== 'AbortError' && import.meta.env.DEV) {
         console.warn('[messages@1.0] continueMessage failed:', err)
       }
     }
-  }, [settings.storageMode, settings.defaultModel, continueMessage])
+  }, [settings.storageMode, settings.defaultModel, continueMessage, buildSystemPrompt])
 
   const handleCopyText = useCallback(async (content) => {
     try {

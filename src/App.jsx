@@ -7,6 +7,7 @@ import { ConversationProvider } from './stores/ConversationContext'
 import { ChatProvider } from './stores/ChatContext'
 import { AnnotationsProvider } from './stores/AnnotationsContext'
 import { BranchPanelProvider } from './stores/BranchPanelContext'
+import { CollabModeProvider } from './stores/CollabModeContext'
 import BranchShortcutHandler from './components/BranchShortcutHandler'
 import { PWAProvider } from './stores/PWAContext'
 import { BackupProvider } from './stores/BackupContext'
@@ -44,6 +45,7 @@ export default function App() {
               <ChatProvider>
                 <AnnotationsProvider>
                 <BranchPanelProvider>
+                <CollabModeProvider>
                 <BrowserRouter>
                   <BackupProvider>
                   <BranchShortcutHandler />
@@ -70,6 +72,7 @@ export default function App() {
                   </Routes>
                   </BackupProvider>
                 </BrowserRouter>
+                </CollabModeProvider>
                 </BranchPanelProvider>
                 </AnnotationsProvider>
               </ChatProvider>

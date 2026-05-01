@@ -9,8 +9,14 @@
 // it lives here as component config in V2 so a room can declare its
 // preferred depth without affecting other rooms. Migration at PR-10a bakes
 // the existing app setting into each migrated room's review@1.0 instance.
+//
+// PR-10a.9 wired the live render: see ./review-render.jsx for the
+// production component (self-binds to ChatContext + AnnotationsContext +
+// ConversationContext + SettingsContext). The previewRender below stays
+// preview-shaped for the dev /catalog route.
 
 import ReviewPreview from './review-preview'
+import ReviewRender from './review-render'
 
 export default {
   name: 'review',
@@ -58,6 +64,9 @@ export default {
     },
   },
 
-  render: ReviewPreview,
+  // Production render — self-binds to live conversation state
+  // (PR-10a.9). Synthesis call is Composer-tier per [tier-classification.md].
+  render: ReviewRender,
+  // Preview render — verbose explanatory card for the dev /catalog route.
   previewRender: ReviewPreview,
 }

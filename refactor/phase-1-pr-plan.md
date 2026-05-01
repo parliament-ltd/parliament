@@ -486,6 +486,38 @@
 
 ---
 
+### PR-10a.9 — Wire collab-mode@1.0 + review@1.0 to ChatContext
+
+**Goal:** Fifth slice of catalog data plumbing. Closes the two remaining components that need real V1-modal extractions plus a live `sendMessage`-flow integration. After this lands the only deferred V2 chat-shell work before PR-10b is the per-message message-transfer / hide / move-to-branch / delete actions (one PR-10a.10 or fold into PR-10b).
+
+**Scope:**
+- New `src/stores/CollabModeContext.jsx` — small shared dispatch context. Owns `activePresets: Set<string>`, `customInstruction: string`, `apply(presets, instruction)`, `clear()`, `buildSystemPrompt()`, `activeCount`. State resets when `useChat().activeConversationId` transitions between two distinct non-null ids; transient nulls (e.g. ChatView's `clearMessages()` during route nav back to the SAME conversation) are ignored. Built-in preset prompt strings inlined as `PRESET_PROMPTS` so callers don't depend on the modal's component file. Mounted in App.jsx alongside `AnnotationsProvider` + `BranchPanelProvider`.
+- New `src/catalog/entries/collab-mode-render.jsx` — production render. Trigger button with active-count badge. Modal seeded from context state; `onApply` pushes back via `apply()`.
+- New `src/catalog/entries/review-render.jsx` — production render. Trigger button (disabled when no messages). Self-binds to `useChat()` + `useAnnotations()` + `useConversations()` + `useSettings()`. Owns the synthesis call (Composer-tier Haiku call against the most recent ~20 messages with optional annotation context — same recipe as V1 Albatross) and the Markdown export (lifted from V1's `handleExportMarkdown`).
+- `input-render.jsx` — calls `useCollabMode().buildSystemPrompt()` and threads the result into `sendMessage`'s existing `systemPrompt` argument.
+- `messages-render.jsx` — same threading for `continueMessage` so resumed turns keep the active instructions.
+- `collab-mode@1.0` + `review@1.0` manifests now point `render` at the production components. `previewRender` unchanged for the dev `/catalog` route.
+- Documentation: §2.8a in [v2-phase1-audit.md](v2-phase1-audit.md) per-component table updated to mark both as wired in PR-10a.9; new third-shared-context paragraph documents `CollabModeContext`. New PR-10a.9 section in [phase-1-testing.md](phase-1-testing.md) following the PR-10a.8 structure.
+- **Out of scope (next slice, before PR-10b):** Send-to-branch / Pin-for-reference message-transfer flows, Hide message + 20-second undo timer, per-message Move to branch.
+- **Templates unchanged.** Default seed templates (Writing Studio etc.) don't include `collab-mode@1.0` or `review@1.0`. Existing migrated conversations get them via DevTools mode editing or a future editor pass; new users compose them via the editor (PR-8). Adding to default seeds is a separate scope decision.
+
+**Dependencies:** PR-10a.8.
+
+**Exit criteria:**
+- Open a conversation in a room that includes `collab-mode@1.0`. Trigger button renders; clicking opens the V1 CollabModal seeded from current context state. Picking a preset and clicking "Apply to Conversation" dismisses the modal; the trigger now shows an active-count badge.
+- Send a message — DevTools Network shows the request body's `system` field carrying the active preset's prompt text. Continuing a ghost-text message threads the same system prompt.
+- Save a Parrot Persona inside the modal — IndexedDB `settings` store key `parrotPersonas` updated.
+- Navigate `/chat/X → / → /chat/X` — active preset persists. Navigate `/chat/X → /chat/Y` (different id) — active preset clears (V1 lifetime).
+- Open a conversation in a room that includes `review@1.0`. Trigger button is disabled when there are zero messages. With messages, opens the V1 ReviewModal seeded with live highlights / notes / favorites / messages / token usage. Reflection prompts derive from active annotations.
+- Click "Generate Synthesis with Claude" — Composer-tier Haiku call fires; result renders inline in the modal as Markdown.
+- Click "Save as Markdown" — file downloads with the conversation title, highlights summary, favorites preview, and per-message inline notes.
+- Albatross fallback (room: null conversations) unchanged — V1 collab + review surfaces still work end-to-end.
+- `npm run build` clean.
+
+**Risk:** Medium. The `CollabModeContext` reset semantics are subtle: V1's per-mount lifetime needs to be preserved without leaking the active state across conversation boundaries OR wiping it during transient null windows. Mitigated by the "two distinct non-null ids" guard in the reset effect and verified live (preset survives same-conv nav, clears on different-conv nav). Synthesis path is a real Composer-tier model call but only fires on explicit user click — no autonomous spend.
+
+---
+
 ### PR-10b — Delete adapter directories + cleanup InputArea + rotate PWA cache
 
 **Goal:** Point of no return. V2 is the only path.
@@ -606,9 +638,9 @@
 | 0 | PR-0 | Documentation foundation (5 docs, no code) |
 | A | PR-1, PR-2, PR-3 | Foundation (no user-visible change) |
 | B | PR-4a, PR-4b, PR-5, PR-6, PR-7 | Visual system + new homepage + V2 backup |
-| C | PR-8, PR-8b, PR-9, PR-10a, PR-10a.5, PR-10a.6, PR-10a.7, PR-10a.8, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
+| C | PR-8, PR-8b, PR-9, PR-10a, PR-10a.5, PR-10a.6, PR-10a.7, PR-10a.8, PR-10a.9, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
 
-**Total: 21 PRs** including PR-0.
+**Total: 22 PRs** including PR-0.
 
 ## Pause points
 

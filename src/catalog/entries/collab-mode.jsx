@@ -11,8 +11,13 @@
 // implementation reads/writes the `parrotPersonas` setting via getSetting/
 // setSetting; that key migrates with the component when /chat/:id moves
 // through RoomShell at PR-10a.
+//
+// PR-10a.9 wired the live render: see ./collab-mode-render.jsx for the
+// production component (self-binds to CollabModeContext). The previewRender
+// below stays preview-shaped for the dev /catalog route.
 
 import CollabModePreview from './collab-mode-preview'
+import CollabModeRender from './collab-mode-render'
 
 export default {
   name: 'collab-mode',
@@ -42,8 +47,11 @@ export default {
     },
   },
 
-  // Same self-contained wrapper for both — the wrapper opens the V1 modal
-  // against empty defaults until ChatContext plumbing arrives in PR-10a.
-  render: CollabModePreview,
+  // Production render — self-binds to CollabModeContext (PR-10a.9). The
+  // modal is the V1 component; only the host state moves from local-on-mount
+  // to shared context so input@1.0 + messages@1.0 ghost-continue can read
+  // the active system prompt.
+  render: CollabModeRender,
+  // Preview render — verbose explanatory card for the dev /catalog route.
   previewRender: CollabModePreview,
 }
