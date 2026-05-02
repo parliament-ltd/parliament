@@ -685,6 +685,36 @@
 
 ---
 
+### PR-13 — Build wizard rewrite + first-run gate + Table of Contents
+
+**Goal:** Make the build-a-room flow match the user's fine-tuned wizard spec (`parliament_wizard_v5.html`) verbatim. Make the wizard the first thing every new visitor sees AND the destination of every "+ Build a room" click. Ship Table of Contents as a real `response-headings` mode on `toc@1.0`. Stub Open Room as a coming-soon-tagged feature.
+
+**Scope:**
+- New screens 0 (Welcome + 3-path picker) and 7 (Done). Replaces the gallery-first entry of the V1 PR-9 wizard.
+- Multi-select Purpose (Writing / Research / Coding / Thinking) and Device (Desktop / Mobile). "Build another room afterward" checkbox surfaces on step 1 when ≥ 2 purposes are selected.
+- Density-driven layout reveal in step 3. `LAYOUTS_BY_DENSITY`: minimal → single-column-with-sheet, balanced → three-panel, full → all three of three-panel / canvas-centric / document-centric. Single-layout densities auto-select with a gold-pulse animation.
+- Inline layout preview overlay (right-side slide-in panel, Esc closes).
+- Features step lists Table of Contents / Context Health / Highlights / Branches / Collaboration Mode / Open Room (coming-soon, not selectable) / File Shelf with category tags per spec.
+- Name + scheme step with live summary card whose background follows the chosen scheme.
+- Ignition step: paste the API key, click Validate → call `getProvider().validateKey()`. On success: sweep animation through the room preview, room border flashes solid gold, feature chips light in cascade, Connected badge breathes, Enter button reveals. On failure: red / amber border + spec'd error copy.
+- Done step with "Build another room" / "Go to your Parliament" CTAs.
+- HomepageView first-run gate: no API key + no `tourCompleted_wizard` → `/build`. Returning users with no key but a completed wizard fall back to `/settings` (recovery path).
+- Extend `toc@1.0` with a `mode` config option: `'user-prompts'` (default, V1 parity) or `'response-headings'` (NEW — scans assistant-message markdown headings, hierarchical H1–H4). Wizard's Table of Contents feature ships with `mode: 'response-headings'`.
+- `MessageCard.jsx` injects sequential heading anchor ids (`msg-{messageId}-h-{idx}`) on every h1..h4 it renders, regardless of highlight state. The `response-headings` toc mode reconstructs the same ids in document order.
+- `buildAndOpenRoom(config)` adds a fresh conversation tied to the new mode (existing `createConversation` from `lib/db.js`), so the homepage shows the new room after the user completes the wizard.
+
+**Dependencies:** PR-12.
+
+**Exit criteria:**
+- All criteria in `phase-1-testing.md` PR-13 section pass.
+- `npm run build` clean. Bundle no longer ships `BuildStepper` / `BuildSteps`. Symbol-grep confirms `tourCompleted_wizard`, `response-headings`, `user-prompts`, `table-of-contents` are present.
+- A new visitor sees the wizard (not /settings); a returning user with a completed wizard sees the homepage.
+- A successful wizard run produces a persisted mode + a fresh conversation in it; the homepage chats list shows that conversation.
+
+**Risk:** Medium. UI rewrite touching the first-run flow. Mitigated by reusing existing primitives (`validateKey`, `saveApiKey`, `createModeFromTemplate`, `createConversation`, `TemplateGallery`, `loadHomepageMode`) and following the spec verbatim for layout. Multi-provider work stays out per audit §3.20.
+
+---
+
 ## Wave summary
 
 | Wave | PRs | Description |
@@ -693,8 +723,9 @@
 | A | PR-1, PR-2, PR-3 | Foundation (no user-visible change) |
 | B | PR-4a, PR-4b, PR-5, PR-6, PR-7 | Visual system + new homepage + V2 backup |
 | C | PR-8, PR-8b, PR-9, PR-10a, PR-10a.5, PR-10a.6, PR-10a.7, PR-10a.8, PR-10a.9, PR-10a.10, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
+| D | PR-13 | Phase 1 polish — wizard rewrite + first-run gate + TOC component |
 
-**Total: 23 PRs** including PR-0.
+**Total: 24 PRs** including PR-0.
 
 ## Pause points
 

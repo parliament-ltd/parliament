@@ -157,19 +157,34 @@ export default function MessageCard({
       })
     }
 
+    // Heading anchor injector — always on, independent of highlight state.
+    // toc@1.0's `response-headings` mode (PR-13) scans message content with
+    // the same /^(#{1,4})\s+/m regex and reconstructs anchor ids in
+    // document order, so the index must match what react-markdown produces
+    // here. ReactMarkdown processes the mdast→hast tree depth-first so
+    // h1..h4 callbacks fire in document order; a closure counter is
+    // sufficient to keep the indices aligned.
+    let headingIdx = 0
+    const headingId = () => `msg-${id}-h-${headingIdx++}`
+
+    const maybeHL = highlightTerms.length > 0 ? applyHighlights : (c) => c
+    const baseComponents = {
+      h1: ({ children, ...props }) => <h1 {...props} id={headingId()}>{maybeHL(children)}</h1>,
+      h2: ({ children, ...props }) => <h2 {...props} id={headingId()}>{maybeHL(children)}</h2>,
+      h3: ({ children, ...props }) => <h3 {...props} id={headingId()}>{maybeHL(children)}</h3>,
+      h4: ({ children, ...props }) => <h4 {...props} id={headingId()}>{maybeHL(children)}</h4>,
+    }
+
     const highlightedComponents = highlightTerms.length > 0 ? {
+      ...baseComponents,
       p:          ({ children, ...props }) => <p          {...props}>{applyHighlights(children)}</p>,
       li:         ({ children, ...props }) => <li         {...props}>{applyHighlights(children)}</li>,
       td:         ({ children, ...props }) => <td         {...props}>{applyHighlights(children)}</td>,
       th:         ({ children, ...props }) => <th         {...props}>{applyHighlights(children)}</th>,
       strong:     ({ children, ...props }) => <strong     {...props}>{applyHighlights(children)}</strong>,
       em:         ({ children, ...props }) => <em         {...props}>{applyHighlights(children)}</em>,
-      h1:         ({ children, ...props }) => <h1         {...props}>{applyHighlights(children)}</h1>,
-      h2:         ({ children, ...props }) => <h2         {...props}>{applyHighlights(children)}</h2>,
-      h3:         ({ children, ...props }) => <h3         {...props}>{applyHighlights(children)}</h3>,
-      h4:         ({ children, ...props }) => <h4         {...props}>{applyHighlights(children)}</h4>,
       blockquote: ({ children, ...props }) => <blockquote {...props}>{applyHighlights(children)}</blockquote>,
-    } : {}
+    } : baseComponents
 
     const chartCodeComponent = ({ className, children }) => {
       const lang = (className || '').replace('language-', '')
@@ -186,7 +201,7 @@ export default function MessageCard({
         </ReactMarkdown>
       </div>
     )
-  }, [content, highlights, highlightTerms])
+  }, [id, content, highlights, highlightTerms])
 
   return (
     <motion.div
