@@ -1,54 +1,50 @@
 // toc@1.0 — live render for the V2 RoomShell chat path.
 //
-// PR-10a.8. Self-binds to ChatContext per refactor/v2-phase1-audit.md
-// §2.8a. Derives a table-of-contents list from user-role messages
-// (matches V1 Albatross's TOC behavior — assistant replies don't
-// stand alone as section markers; users frame the conversation) and
-// scroll-jumps to the source message on click.
+// PR-10a.8 wired the user-prompts mode (V1 Albatross parity). PR-13 added
+// the response-headings mode for the build wizard's "Table of Contents"
+// feature — the spec describes it as "tracking the structure of long
+// pieces," which means scanning assistant-message markdown headings.
 //
-// MessageCard sets `id="msg-{id}"` on its outer container, so
-// onNavigate is a one-line scrollIntoView lookup — same pattern the
-// notes-render side rail uses for its click-to-scroll behavior.
+// Both modes self-bind to ChatContext and scroll-jump on click:
+//   - user-prompts:      target id `msg-{messageId}` (whole message)
+//   - response-headings: target id `msg-{messageId}-h-{idx}` (specific
+//                        heading; MessageCard injects these ids in
+//                        document order via a closure counter — see
+//                        src/components/core/MessageCard.jsx).
 //
-// Reader tier (no model calls). Config-driven truncation: `truncateAt`
-// caps the label length, `maxItems` caps how many user messages show
-// before older ones drop off the bottom of the list.
+// Reader tier (no model calls). Config:
+//   - mode:       'user-prompts' | 'response-headings'  (default: user-prompts)
+//   - maxItems:   number   (default: 50)
+//   - truncateAt: number   (default: 60)
 
 import { useCallback, useMemo } from 'react'
 import TOC from '../../components/core/TOC'
 import { useChat } from '../../stores/ChatContext'
 
+const HEADING_RE = /^(#{1,4})\s+(.+?)\s*$/gm
+
 export default function TocRender({ config = {} } = {}) {
   const { messages } = useChat()
 
+  const mode = config.mode === 'response-headings' ? 'response-headings' : 'user-prompts'
   const truncateAt = typeof config.truncateAt === 'number' ? config.truncateAt : 60
   const maxItems = typeof config.maxItems === 'number' ? config.maxItems : 50
 
   const items = useMemo(() => {
     if (!messages?.length) return []
-    const labels = []
-    for (const msg of messages) {
-      if (msg.role !== 'user') continue
-      const raw = (msg.content || '').replace(/\s+/g, ' ').trim()
-      if (!raw) continue
-      const label = raw.length > truncateAt
-        ? `${raw.slice(0, truncateAt).trimEnd()}…`
-        : raw
-      labels.push({ id: msg.id, label })
-    }
-    // Keep the most recent maxItems entries — users scrolling far up
-    // a long conversation usually want recent context, not the very
-    // first messages.
+    const labels = mode === 'response-headings'
+      ? extractHeadings(messages, truncateAt)
+      : extractUserPrompts(messages, truncateAt)
     if (labels.length > maxItems) return labels.slice(labels.length - maxItems)
     return labels
-  }, [messages, truncateAt, maxItems])
+  }, [messages, mode, truncateAt, maxItems])
 
-  const handleNavigate = useCallback((id) => {
-    document.getElementById(`msg-${id}`)?.scrollIntoView({
+  const handleNavigate = useCallback((targetId) => {
+    document.getElementById(targetId)?.scrollIntoView({
       behavior: 'smooth',
-      block: 'center',
+      block: mode === 'response-headings' ? 'start' : 'center',
     })
-  }, [])
+  }, [mode])
 
   return (
     <div className="px-2 py-3">
@@ -58,4 +54,46 @@ export default function TocRender({ config = {} } = {}) {
       <TOC items={items} onNavigate={handleNavigate} />
     </div>
   )
+}
+
+// User-prompts mode: one entry per user message, content truncated.
+// Target id is the message wrapper (`msg-{id}`).
+function extractUserPrompts(messages, truncateAt) {
+  const labels = []
+  for (const msg of messages) {
+    if (msg.role !== 'user') continue
+    const raw = (msg.content || '').replace(/\s+/g, ' ').trim()
+    if (!raw) continue
+    const label = raw.length > truncateAt
+      ? `${raw.slice(0, truncateAt).trimEnd()}…`
+      : raw
+    labels.push({ id: `msg-${msg.id}`, label, level: 1 })
+  }
+  return labels
+}
+
+// Response-headings mode: one entry per markdown heading in assistant
+// messages, hierarchical by H1/H2/H3/H4 level. Target id is the heading
+// anchor that MessageCard injects in document order.
+function extractHeadings(messages, truncateAt) {
+  const labels = []
+  for (const msg of messages) {
+    if (msg.role !== 'assistant') continue
+    const content = msg.content || ''
+    if (!content.includes('#')) continue
+    HEADING_RE.lastIndex = 0
+    let match
+    let idx = 0
+    while ((match = HEADING_RE.exec(content)) !== null) {
+      const level = match[1].length
+      const raw = match[2].replace(/\s+/g, ' ').trim()
+      if (!raw) { idx++; continue }
+      const label = raw.length > truncateAt
+        ? `${raw.slice(0, truncateAt).trimEnd()}…`
+        : raw
+      labels.push({ id: `msg-${msg.id}-h-${idx}`, label, level })
+      idx++
+    }
+  }
+  return labels
 }

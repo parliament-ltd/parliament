@@ -1,12 +1,21 @@
-// toc@1.0 — table of contents derived from user messages.
+// toc@1.0 — table of contents.
 //
-// Wraps src/components/core/TOC.jsx without moving or modifying it. Reader
-// tier — no model calls, just reads conversation messages and emits
-// scroll-jump intents back to whatever owns the message container.
+// Wraps src/components/core/TOC.jsx. Reader tier — no model calls, just
+// reads conversation messages and emits scroll-jump intents back to
+// whatever owns the message container.
 //
-// PR-10a.8 wired the live render: see ./toc-render.jsx for the production
-// component (self-binds to ChatContext). The previewRender below stays
-// preview-shaped for the dev /catalog route.
+// Two modes (PR-13 added the second):
+//   - 'user-prompts'      → list of user-message labels (V1 Albatross
+//                           behavior, PR-10a.8 default).
+//   - 'response-headings' → list of markdown headings inside assistant
+//                           messages, hierarchical by H1/H2/H3/H4 level.
+//                           This is what the build wizard's "Table of
+//                           Contents" feature ships — the spec text reads
+//                           "tracks the structure of long pieces."
+//
+// Existing rooms with no `mode` config default to 'user-prompts' for
+// backwards compat; the wizard explicitly sets `mode: 'response-headings'`
+// on rooms it creates.
 
 import TOC from '../../components/core/TOC'
 import TocRender from './toc-render'
@@ -33,6 +42,12 @@ export default {
   ],
   capabilityRequirements: ['storage:read'],
   configSchema: {
+    mode: {
+      type: 'enum',
+      options: ['user-prompts', 'response-headings'],
+      default: 'user-prompts',
+      label: 'Items shown',
+    },
     maxItems: {
       type: 'number',
       default: 50,

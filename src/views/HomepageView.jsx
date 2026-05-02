@@ -6,10 +6,14 @@
 // layout's `section-slot`. Above the layout sits HomepageTopBar with
 // Edit homepage / + Build a room / Backup & Restore placeholders.
 //
-// First-run onboarding (no API key, tour not run) still routes the user
-// to /settings — preserved from the V1 SelectorView. The legacy V1
-// chat selector continues to live at `/chats` for users who prefer the
-// table view.
+// First-run onboarding (PR-13): a user with no API key who has never
+// completed the build wizard lands on `/build` instead of the homepage.
+// The wizard collects their key in the Ignition step, flips the
+// `tourCompleted_wizard` settings flag at completion, and then routes
+// them into their first room. Returning users with no key (i.e. they
+// cleared it) but a completed wizard fall through to /settings — that's
+// the recovery path. Users who completed both — or who have a key —
+// see the homepage.
 
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -28,14 +32,24 @@ export default function HomepageView() {
   useEffect(() => {
     let cancelled = false
     async function init() {
-      // Onboarding gate matches the V1 SelectorView behavior: no key +
-      // no tour completion → bounce to /settings.
-      const [apiKey, tourDone] = await Promise.all([
+      const [apiKey, wizardDone, tourDone] = await Promise.all([
         loadApiKey('persistent'),
+        getSetting('tourCompleted_wizard'),
         getSetting('tourCompleted_settings'),
       ])
       if (cancelled) return
+      if (!apiKey && !wizardDone) {
+        // Brand new visitor — straight to the wizard, which collects
+        // the API key in Ignition (step 6) and flips
+        // `tourCompleted_wizard` on completion.
+        navigate('/build', { replace: true })
+        return
+      }
       if (!apiKey && !tourDone) {
+        // Returning user who cleared their key (or whose key was
+        // revoked). Wizard is already done — route to settings so
+        // they can paste a fresh key without going through the
+        // wizard again.
         navigate('/settings', { replace: true })
         return
       }

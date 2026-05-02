@@ -2113,6 +2113,211 @@ points back at the PR section that owns its detailed verification.
 
 ---
 
+## PR-13 — Build wizard rewrite + first-run gate + Table of Contents
+
+👀 User-visible. The largest UI change since PR-9 (the original
+wizard). Replaces the gallery-first `/build` flow with a Welcome
+screen and an 8-screen wizard matching `parliament_wizard_v5.html`
+verbatim. Makes the wizard the first thing every new visitor sees.
+Ships `toc@1.0` `response-headings` mode (markdown headings as
+anchors) as the wizard's "Table of Contents" feature.
+
+**Surface:** `/build` route — entered from "+ Build a room" on the
+homepage top bar, OR automatically as the first-run landing.
+
+### Setup
+- For the first-run flow: DevTools → Application → Clear site data → reload.
+- For "+ Build a room" flow: any homepage state with the gear icon visible.
+- For Table of Contents verification: a known-valid Anthropic API key.
+
+### First-run gate (HomepageView)
+
+- [ ] Fresh Parliament. Browser lands on `/build` (Welcome screen),
+      not on `/settings`.
+- [ ] DevTools → IndexedDB → `parliament` → `settings` after the
+      wizard completes — `tourCompleted_wizard` = true.
+- [ ] Clear localStorage + the `parliament-keystore` IndexedDB but
+      keep `tourCompleted_wizard` = true. Reload `/`. Routes to
+      `/settings` (the recovery path), NOT `/build`. The user
+      pastes a fresh key in Settings; from then on `/` shows the
+      homepage.
+
+### Screen 0 — Welcome + path picker
+
+- [ ] Three path tiles render: "Guide me through it" (default
+      selected), "Start from a template", "Build it myself".
+- [ ] Click an unselected tile → it gets the gold border + tint
+      bg; the icon swatch flips to gold-tint-2.
+- [ ] "Let's go" with "Guide me through it" → step 1.
+- [ ] "Let's go" with "Start from a template" → inline gallery
+      view; Back arrow returns to the Welcome screen.
+- [ ] "Let's go" with "Build it myself" → routes immediately to
+      `/edit/:newId` with a fresh blank Writing-Studio shape.
+
+### Screen 1 — Purpose (multi-select)
+
+- [ ] Four tiles render: Writing / Research / Coding / Thinking.
+- [ ] Toggle two tiles → both stay selected; "Build another room
+      after this one" checkbox appears below.
+- [ ] Untoggle one of the two → checkbox disappears; selection of
+      the remaining tile persists.
+- [ ] Continue is disabled until ≥ 1 tile is selected.
+
+### Screen 2 — Device (multi-select)
+
+- [ ] Two tiles: Desktop / Mobile. Multi-select works.
+- [ ] Continue disabled with zero selections.
+- [ ] Receipt chips at top show prior selections (Purpose values).
+
+### Screen 3 — Density + revealed Layout
+
+- [ ] Three density tiles: Minimal / Balanced / Full.
+- [ ] Pick Minimal → the Layout section reveals with a 0.22s slide-
+      in. The single-column-with-sheet card auto-selects with a
+      gold-pulse ring (0.6s). Auto-note reads "Only one layout
+      fits this density. Auto-selected for you."
+- [ ] Pick Balanced → reveals three-panel only, also auto-pulse.
+- [ ] Pick Full → reveals 3 layout cards (three-panel, canvas-
+      centric, document-centric), no auto-select. Continue is
+      disabled until the user picks one.
+- [ ] Click "Preview" on any layout card → slide-in overlay from
+      the right (380px wide), shows a larger wireframe + long
+      description. Esc closes; click on the dark backdrop closes.
+
+### Screen 4 — Features
+
+- [ ] Seven rows render in this order: Table of Contents
+      (`Writing` tag), Context Health, Highlights, Branches,
+      Collaboration Mode (`AI behavior` tag), Open Room (`Human
+      sharing` + `Coming soon` tags, opacity reduced, can't
+      toggle), File Shelf (`Research`, `Coding` tags).
+- [ ] Click any of the six available rows → gold border + tint;
+      check fills with white check on gold.
+- [ ] Click Open Room → no state change.
+
+### Screen 5 — Name + scheme
+
+- [ ] Empty room-name input is auto-focused. Continue disabled
+      until non-whitespace text.
+- [ ] Type "My Studio". Summary card name updates live.
+- [ ] Six scheme cards: Parliament Default (selected, "Built in"
+      pill), Cool Bright, Deep Calm, Soft Violet, Fresh Teal,
+      Amber Glow. Click Soft Violet → summary card background
+      turns violet; "Soft Violet" appears in summary tags.
+- [ ] Summary tags reflect: Purposes, Devices, Density, Layout
+      label, Scheme label, and any selected Features.
+
+### Screen 6 — Ignition
+
+- [ ] Header reads "Connect your API key". Room-preview card shows
+      the room name with feature chips (layout label + scheme +
+      selected features), all dashed-border + muted-text.
+- [ ] Paste a known-bad key → click Validate → red border on
+      input, red error: "This API key is not valid. Please check
+      your key and try again."
+- [ ] Paste a known-billing-error key (403) → amber border, amber
+      error message about credits.
+- [ ] Network offline → click Validate → red border + "Could not
+      reach the Anthropic API…" message.
+- [ ] Paste a valid key → click Validate. Sequence:
+        - Sweep line slides down through the room card (~0.75s)
+        - Room card border flashes solid gold + bg gold-tint
+        - Each feature chip "lights" in cascade (110ms stagger):
+          dashed border → solid gold border + tint bg + gold-deep
+          text
+        - Connected badge appears below the input with a pulsing
+          gold dot (~1.2s after click): "Connected. Your room is
+          ready."
+        - Enter button reveals at bottom-right.
+- [ ] Edit the input after a failure → red/amber border resets
+      to default 0.5px border.
+- [ ] After successful connection: DevTools → IndexedDB →
+      `parliament-keystore` shows the encrypted key under the
+      user's storageMode (default 'persistent').
+
+### Screen 7 — Done
+
+- [ ] Click Enter on screen 6 → screen 7 with checkmark icon, "{Name}
+      is ready" headline, "Build another room" + "Go to your
+      Parliament" buttons.
+- [ ] If Build-another was checked on screen 1: subtitle reads
+      "Your first room is built. You said you wanted another —
+      start the wizard again, or jump into your Parliament now."
+- [ ] DevTools → `modes` shows the new room. → `conversations`
+      shows a fresh row whose `room` matches the new mode id.
+- [ ] "Go to your Parliament" → `/`. Homepage shows the new
+      conversation in the chats section.
+- [ ] "Build another room" → screen 0 with config reset.
+
+### Open in editor escape (steps 3–5)
+
+- [ ] On step 3 (after picking density+layout), click "Open in
+      editor" → routes to `/edit/:id`. The mode has the chosen
+      layout + scheme + baseline messages/input components.
+- [ ] On step 5 (after naming the room), click "Open in editor"
+      → routes to `/edit/:id`. The mode includes the user's
+      chosen features.
+
+### Receipt chips + Track
+
+- [ ] Track at top of steps 1–6 shows 6 dots; current step has
+      gold ring; prior steps have gold-filled dots with
+      checkmarks; future steps have grey outline.
+- [ ] Receipt strip at top of steps 1–5 shows chips (gold-dot +
+      label) for prior selections. Chip animation: scale-in 0.85→1
+      on appear.
+
+### Table of Contents (toc@1.0 response-headings mode)
+
+- [ ] Build a room with the Table of Contents feature on, layout
+      = three-panel.
+- [ ] Open the new conversation. Ask Claude to write a long
+      response with multiple `## Heading 2` and `### Heading 3`
+      sections.
+- [ ] As the response streams in, the TOC sidebar populates with
+      one entry per heading. Indent reflects level (H2 deeper
+      than H1; H3 deeper than H2).
+- [ ] Click a TOC entry → smooth-scrolls the page so the
+      corresponding heading is at the top of the viewport (the
+      heading id `msg-{id}-h-{idx}` matches a real DOM element
+      injected by MessageCard).
+
+### Backwards-compat for toc@1.0 user-prompts mode
+
+- [ ] Open the dev `/catalog` route. The `toc@1.0` preview still
+      renders sample user-message labels (the `previewRender`
+      surface). The dev hand-built mode at /catalog continues to
+      ship `toc@1.0` with no `mode` config — defaults to
+      `user-prompts`. No regression vs PR-10a.8.
+
+### Production-bundle symbol-grep
+
+- [ ] `tourCompleted_wizard` appears in the bundle (settings
+      flag).
+- [ ] `response-headings` and `user-prompts` both appear (mode
+      config values).
+- [ ] `BuildStepper` and `BuildSteps` are absent (deleted).
+- [ ] `parliament_wizard_v5` does NOT appear (the spec is in
+      ~/Desktop, not bundled).
+
+### Out of scope (don't test here)
+
+- Multi-provider validation flow (Ollama / OpenAI). Phase 2 — see
+  audit §3.20.
+- Real-time multi-user "Open Room" sharing. Coming-soon stub
+  only. Needs server-side infrastructure that contradicts the
+  no-backend constraint; revisit as a separate scope statement.
+- Wizard state survival across page reloads. The wizard config
+  is in-memory React state only; reload during the wizard
+  resets to step 0. Persistence is not in PR-13's scope.
+- Density-driven layout filtering when device = mobile only. The
+  spec's `LAYOUTS_BY_DENSITY` table doesn't filter by device;
+  PR-13 follows that. A mobile-only user picking Full density
+  sees three layouts, two of which are desktop-feeling — that's
+  intentional per the spec.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

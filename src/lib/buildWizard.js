@@ -1,259 +1,346 @@
-// Wizard config → mode file logic (PR-9).
+// Wizard config → mode file logic.
 //
-// The seven-step wizard collects the user's intent in a small `config`
-// object; this module translates that into the same parliament-mode/1.0
-// shape that template instantiation produces. Both paths flow through
-// `modes.createModeFromTemplate()` so the resulting mode files are
-// structurally identical for matching choices.
+// PR-13 rewrote this module to match parliament_wizard_v5.html — the
+// fine-tuned wizard spec the user owns. The shape is multi-select on
+// purpose + device, density-driven layout reveal, a features list with
+// category tags, and an inline ignition step that validates the API key
+// before committing the mode and a fresh conversation.
 //
-// "Sensible defaults" anywhere config is partially complete — the
-// "Open in editor" escape from step 3+ relies on this being safe to
-// call mid-flow.
+// Two callers consume this module: src/views/BuildView.jsx (the wizard
+// page) and src/components/build/wizard/* (the per-step UIs). Both pull
+// the option arrays + the build helpers from here.
+//
+// The "Open in editor" escape hatch from any step ≥ 3 calls
+// buildModeFromWizard(config) and routes to /edit/:newId. The Done step
+// calls buildAndOpenRoom(config) which also creates a conversation in
+// the new room and routes to /chat/:newConvId.
 
 import { createModeFromTemplate } from './modes'
+import { createConversation as dbCreateConversation } from './db'
 
-// ─── Config defaults / shape ─────────────────────────────
+/* ── Spec-aligned data shape ──────────────────────────────────
+ *
+ * State carried through the wizard:
+ *
+ *   {
+ *     purposes:     Set<string>,    // step 1, multi-select; ids below
+ *     devices:      Set<string>,    // step 2, multi-select; ids below
+ *     density:      string | null,  // step 3, single-select
+ *     layout:       string | null,  // step 3, layout id; auto-set when
+ *                                   //   density picks a single layout
+ *     features:     Set<string>,    // step 4; FEATURE.id values
+ *     buildAnother: boolean,        // step 1 checkbox (only when
+ *                                   //   purposes.size > 1)
+ *     name:         string,         // step 5
+ *     scheme:       string,         // step 5; SCHEME.id values
+ *   }
+ */
 
 export function makeInitialWizardConfig() {
   return {
-    purpose: null,        // 'writing' | 'data' | 'drafting' | 'quick-chat' | 'custom'
-    device: 'visual-pointer',
-    density: 'moderate',  // 'minimal' | 'moderate' | 'dense'
-    layoutOverride: null, // user manually picked a layout in step 4
-    features: new Set(),  // optional component refs (without @version)
+    purposes: new Set(),
+    devices: new Set(),
+    density: null,
+    layout: null,
+    features: new Set(),
+    buildAnother: false,
     name: '',
-    schemeRef: 'parliament@^1.0',
+    scheme: 'parliament@^1.0',
   }
 }
 
-// ─── Step 1: Purpose options ─────────────────────────────
+/* ── Step 1: Purposes (multi-select) ─────────────────────────
+ *
+ * Per spec — Writing / Research / Coding / Thinking. Purpose drives
+ * "Build another room" affordance only; layout selection is density-
+ * driven, not purpose-driven.
+ */
 
 export const PURPOSES = Object.freeze([
-  {
-    id: 'writing',
-    label: 'Writing',
-    description: 'Long-form drafting, essays, prose. Notes and references close at hand.',
-  },
-  {
-    id: 'data',
-    label: 'Data analysis',
-    description: 'Charts, tables, dashboards. A canvas for the data and a chat to help you analyze.',
-  },
-  {
-    id: 'drafting',
-    label: 'Document drafting',
-    description: 'Editable document with margin annotations. Tracked changes flow.',
-  },
-  {
-    id: 'quick-chat',
-    label: 'Quick chat',
-    description: 'Just the conversation. Minimal chrome, fewest distractions.',
-  },
-  {
-    id: 'custom',
-    label: 'Custom',
-    description: 'Pick the layout yourself. Useful when nothing above quite fits.',
-  },
+  { id: 'writing',  label: 'Writing',  description: 'Long-form, drafts, edits and refinements' },
+  { id: 'research', label: 'Research', description: 'Gathering, comparing and exploring ideas' },
+  { id: 'coding',   label: 'Coding',   description: 'Building, debugging and reviewing code' },
+  { id: 'thinking', label: 'Thinking', description: 'Exploring ideas and thinking out loud' },
 ])
 
-// ─── Step 2: Device options ──────────────────────────────
+/* ── Step 2: Devices (multi-select) ──────────────────────────
+ *
+ * Determines deviceClass on the resulting mode. If both Desktop and
+ * Mobile are picked, Desktop wins for the deviceClass field — Mobile-
+ * specific behaviors (touch-first input, slide-up sheet) come from the
+ * single-column-with-sheet layout when the user picks Minimal density.
+ */
 
 export const DEVICES = Object.freeze([
-  { id: 'visual-pointer',    label: 'Desktop',  description: 'Mouse and keyboard, large screen.' },
-  { id: 'visual-touch-phone', label: 'Mobile',   description: 'Touch input, narrow screen.' },
+  { id: 'desktop', label: 'Desktop', description: 'Laptop or desktop, larger screen' },
+  { id: 'mobile',  label: 'Mobile',  description: 'Phone or small tablet, touch first' },
 ])
 
-// ─── Step 3: Density + layout reveal ─────────────────────
+/* ── Step 3: Density + layout reveal ─────────────────────────
+ *
+ * Per the spec's LAYOUTS_BY_DENSITY table — density picks layouts. If a
+ * density has only one layout (Minimal, Balanced) the wizard auto-
+ * selects it with a gold-pulse animation; if multiple (Full) the user
+ * picks one of three.
+ */
 
 export const DENSITIES = Object.freeze([
-  { id: 'minimal',  label: 'Minimal',  description: 'Just the essentials. Easy to focus.' },
-  { id: 'moderate', label: 'Moderate', description: 'Balanced — chat plus a few helpful panels.' },
-  { id: 'dense',    label: 'Dense',    description: 'Everything visible. For power-user workflows.' },
+  { id: 'minimal',  label: 'Minimal',  description: 'Just the conversation, nothing extra' },
+  { id: 'balanced', label: 'Balanced', description: 'Light context alongside the conversation' },
+  { id: 'full',     label: 'Full',     description: 'Panels, tools and context all visible' },
 ])
 
-export const LAYOUT_OPTIONS = Object.freeze([
-  { id: 'three-panel@^1.0',              label: 'Three-panel',              scope: 'room' },
-  { id: 'canvas-centric@^1.0',           label: 'Canvas-centric',           scope: 'room' },
-  { id: 'document-centric@^1.0',         label: 'Document-centric',         scope: 'room' },
-  { id: 'single-column-with-sheet@^1.0', label: 'Single column with sheet', scope: 'room' },
-])
+export const LAYOUTS_BY_DENSITY = Object.freeze({
+  minimal:  ['single-column-with-sheet@^1.0'],
+  balanced: ['three-panel@^1.0'],
+  full:     ['three-panel@^1.0', 'canvas-centric@^1.0', 'document-centric@^1.0'],
+})
+
+export const LAYOUT_META = Object.freeze({
+  'three-panel@^1.0': {
+    label: 'Three-panel',
+    short: 'A sidebar for navigation, the conversation in the middle, a panel for context and tools.',
+    long: 'The Parliament classic. A left rail for table of contents and quick actions, the conversation at the center, and a right rail for highlights, branches, context health, and any other ambient context. Both rails can collapse if you need more focus.',
+  },
+  'canvas-centric@^1.0': {
+    label: 'Canvas-centric',
+    short: 'A workspace at the center for visualizations or data, with chat alongside.',
+    long: 'Built for analysis. A file shelf on the left stages your uploads. The center is a workspace for charts, tables, and computed results. A compact chat panel on the right keeps Claude alongside the work without dominating the screen.',
+  },
+  'document-centric@^1.0': {
+    label: 'Document-centric',
+    short: 'A document you can edit, with comments and chat in the margin.',
+    long: "For real prose. The page takes the center as an editable canvas. Comments and Claude's replies live in the margin alongside the text they refer to. Tracked changes mark every edit so you can accept or reject them deliberately.",
+  },
+  'single-column-with-sheet@^1.0': {
+    label: 'Single column with sheet',
+    short: 'Just the conversation. Tools live in a panel that slides up when needed.',
+    long: 'A single column with the conversation, the input, and a menu. Anything you add as a feature lives in a sheet that slides up from the bottom on demand. Designed for quiet, focused sessions where the tools are out of sight until you ask for them.',
+  },
+})
 
 /**
- * Derive a layout from purpose + device + density. Phone always picks
- * single-column-with-sheet regardless of purpose. Custom returns null —
- * the user has to pick a layout manually in step 4.
+ * Resolve density → layout. If density picks exactly one layout it's
+ * auto-selected. Otherwise the user has to make an explicit pick (config.layout)
+ * and we return that. Returns null when neither has happened yet.
  */
 export function deriveLayout(config) {
-  if (config.layoutOverride) return config.layoutOverride
-  if (config.purpose === 'custom') return null
-  if (config.device === 'visual-touch-phone') return 'single-column-with-sheet@^1.0'
-  switch (config.purpose) {
-    case 'data':
-      return 'canvas-centric@^1.0'
-    case 'drafting':
-      return 'document-centric@^1.0'
-    case 'writing':
-      // Minimal writing → three-panel (less margin clutter); dense / moderate
-      // benefit from the document-centric document body + margin gutters.
-      return config.density === 'minimal'
-        ? 'three-panel@^1.0'
-        : 'document-centric@^1.0'
-    case 'quick-chat':
-    default:
-      return 'three-panel@^1.0'
-  }
+  if (!config?.density) return null
+  const eligible = LAYOUTS_BY_DENSITY[config.density] || []
+  if (eligible.length === 1) return eligible[0]
+  if (config.layout && eligible.includes(config.layout)) return config.layout
+  return null
 }
 
-// ─── Step 4: Features (optional components) ──────────────
-//
-// Each feature carries which slot it lands in for each layout. If a
-// layout doesn't expose a compatible slot, the feature is silently
-// skipped at conversion (the room can still be edited later).
+/* ── Step 4: Features (optional components) ──────────────────
+ *
+ * Each feature carries:
+ *   - id            (unique within FEATURES)
+ *   - label         (what the user sees)
+ *   - description   (the "why this exists" copy)
+ *   - tags[]        (category chips: 'Writing', 'AI behavior', etc.)
+ *   - comingSoon    (if true: render with badge, can't be selected,
+ *                   never shipped as a component when the room builds)
+ *   - catalogRef    (component manifest ref or null for stubs)
+ *   - config        (initial component config, e.g. { mode: 'response-headings' })
+ *   - slotByLayout  (per-layout slot id; if a layout has no entry, the
+ *                   feature is skipped silently when that layout is the
+ *                   target — same pattern V1 wizardComponentsFor used)
+ */
 
 export const FEATURES = Object.freeze([
   {
-    id: 'highlights@^1.0',
+    id: 'table-of-contents',
+    label: 'Table of Contents',
+    description: 'Automatically tracks the structure of long pieces in a side panel, so you can jump to any section without scrolling.',
+    tags: ['Writing'],
+    comingSoon: false,
+    catalogRef: 'toc@^1.0',
+    config: { mode: 'response-headings' },
+    slotByLayout: {
+      'three-panel@^1.0':              'left-rail',
+      'canvas-centric@^1.0':           'left-rail',
+      'document-centric@^1.0':         'outline',
+      'single-column-with-sheet@^1.0': 'sheet',
+    },
+  },
+  {
+    id: 'context-health',
+    label: 'Context Health',
+    description: 'Shows how much of your conversation window remains, so you know when to start a new chat or compress context.',
+    tags: [],
+    comingSoon: false,
+    catalogRef: 'context@^1.0',
+    config: {},
+    slotByLayout: {
+      'three-panel@^1.0':              'right-rail',
+      'canvas-centric@^1.0':           'inspector',
+      'document-centric@^1.0':         'margin',
+      'single-column-with-sheet@^1.0': 'sheet',
+    },
+  },
+  {
+    id: 'highlights',
     label: 'Highlights',
-    description: 'Mark passages of conversation for later reference.',
+    description: 'Mark key terms and navigate every place they appear across the conversation, useful for research or recurring concepts.',
+    tags: [],
+    comingSoon: false,
+    catalogRef: 'highlights@^1.0',
+    config: {},
     slotByLayout: {
-      'three-panel@^1.0': 'right-rail',
-      'document-centric@^1.0': 'margin',
-      'canvas-centric@^1.0': 'inspector',
+      'three-panel@^1.0':              'left-rail',
+      'canvas-centric@^1.0':           'inspector',
+      'document-centric@^1.0':         'margin',
       'single-column-with-sheet@^1.0': 'sheet',
     },
   },
   {
-    id: 'notes@^1.0',
-    label: 'Notes',
-    description: 'Drop standalone or message-anchored notes alongside the chat.',
-    slotByLayout: {
-      'three-panel@^1.0': 'right-rail-extra',
-      'document-centric@^1.0': 'margin',
-      'canvas-centric@^1.0': 'inspector',
-      'single-column-with-sheet@^1.0': 'sheet',
-    },
-  },
-  {
-    id: 'branches@^1.0',
+    id: 'branches',
     label: 'Branches',
-    description: 'Branch off any point in the conversation to explore alternatives.',
+    description: 'Create a duplicate conversation to explore different directions, without losing your original thread.',
+    tags: [],
+    comingSoon: false,
+    catalogRef: 'branches@^1.0',
+    config: {},
     slotByLayout: {
-      'three-panel@^1.0': 'left-rail',
-      'document-centric@^1.0': 'outline',
-      'canvas-centric@^1.0': 'left-rail',
+      'three-panel@^1.0':              'left-rail',
+      'canvas-centric@^1.0':           'left-rail',
+      'document-centric@^1.0':         'outline',
       'single-column-with-sheet@^1.0': 'sheet',
     },
   },
   {
-    id: 'context@^1.0',
-    label: 'Context meter',
-    description: 'A token-budget indicator with auto-compress threshold control.',
+    id: 'collab-mode',
+    label: 'Collaboration Mode',
+    description: 'Toggle behavioral presets that shape how Claude works with you. Push back, show reasoning, flag uncertainty and more.',
+    tags: ['AI behavior'],
+    comingSoon: false,
+    catalogRef: 'collab-mode@^1.0',
+    config: {},
     slotByLayout: {
-      'three-panel@^1.0': 'right-rail',
-      'document-centric@^1.0': 'margin',
-      'canvas-centric@^1.0': 'inspector',
+      'three-panel@^1.0':              'right-rail-extra',
+      'canvas-centric@^1.0':           'inspector',
+      'document-centric@^1.0':         'chat-panel',
       'single-column-with-sheet@^1.0': 'sheet',
     },
   },
   {
-    id: 'voice-input@^1.0',
-    label: 'Voice input',
-    description: 'Dictate messages instead of typing. Browser permission gates the mic.',
-    slotByLayout: {
-      'three-panel@^1.0': 'input-dock',
-      'document-centric@^1.0': 'chat-panel',
-      'canvas-centric@^1.0': 'input-dock',
-      'single-column-with-sheet@^1.0': 'input-dock',
-    },
+    // PR-13: stub. Real-time multi-user collab needs a server, which
+    // contradicts the no-backend constraint (CLAUDE.md). Surfaces in the
+    // wizard with a "Coming soon" badge; never adds a component to the
+    // built mode. Revisit as a separate scope statement after Phase 2.
+    id: 'open-room',
+    label: 'Open Room',
+    description: 'Share a link to invite others into your conversation and work through it together in real time.',
+    tags: ['Human sharing'],
+    comingSoon: true,
+    catalogRef: null,
+    config: {},
+    slotByLayout: {},
   },
   {
-    id: 'collab-mode@^1.0',
-    label: 'Personas',
-    description: 'Switch between Parrot Personas — system-prompt presets you save and reuse.',
+    id: 'file-shelf',
+    label: 'File Shelf',
+    description: 'Keep reference files pinned alongside your conversation so you can refer to documents without re-uploading them each time.',
+    tags: ['Research', 'Coding'],
+    comingSoon: false,
+    catalogRef: 'file-shelf@^1.0',
+    config: {},
     slotByLayout: {
-      'three-panel@^1.0': 'right-rail-extra',
-      'document-centric@^1.0': 'chat-panel',
-      'canvas-centric@^1.0': 'inspector',
-      'single-column-with-sheet@^1.0': 'sheet',
-    },
-  },
-  {
-    id: 'review@^1.0',
-    label: 'Review',
-    description: 'Synthesize a conversation into a structured review across categories.',
-    slotByLayout: {
-      'three-panel@^1.0': 'right-rail-extra',
-      'document-centric@^1.0': 'margin',
-      'canvas-centric@^1.0': 'inspector',
+      // file-shelf is canvas-centric's anchor; no slot in three-panel
+      // (architecture §2.4) so we skip there. Single-column rooms get
+      // file-shelf in the slide-up sheet.
+      'canvas-centric@^1.0':           'left-rail',
       'single-column-with-sheet@^1.0': 'sheet',
     },
   },
 ])
 
-// ─── Step 6: Scheme options ──────────────────────────────
+/* ── Step 5: Schemes ─────────────────────────────────────────
+ *
+ * Per the spec, six schemes. The catalog ids match the seeded library
+ * schemes (PR-4a/4b). Backgrounds are the spec's `data-bg` colors,
+ * shown on the live summary card so the user sees the room's tone.
+ */
 
 export const SCHEMES = Object.freeze([
-  { id: 'parliament@^1.0',  label: 'Parliament',   swatch: '#C4A94D', description: 'Warm dusty gold. The default.' },
-  { id: 'cool-bright@^1.0', label: 'Cool bright',  swatch: '#5A9FD4', description: 'Crisp blue. Good for daytime focus.' },
-  { id: 'deep-calm@^1.0',   label: 'Deep calm',    swatch: '#6B7B8C', description: 'Muted slate. Easy on the eyes.' },
-  { id: 'soft-violet@^1.0', label: 'Soft violet',  swatch: '#A380C4', description: 'Gentle violet. Friendly tone.' },
-  { id: 'fresh-teal@^1.0',  label: 'Fresh teal',   swatch: '#5DAB94', description: 'Cool teal. Modern feel.' },
-  { id: 'amber-glow@^1.0',  label: 'Amber glow',   swatch: '#D9805C', description: 'Warm amber. Cozy.' },
+  { id: 'parliament@^1.0',  label: 'Parliament Default', description: 'Warm base, gold accents',  bg: '#F5F0E8', dot: '#D4A843', line: '#C4A882', builtIn: true  },
+  { id: 'cool-bright@^1.0', label: 'Cool Bright',        description: 'Clean, high contrast',     bg: '#E8F0F8', dot: '#2B6CB0', line: '#90B8E0', builtIn: false },
+  { id: 'deep-calm@^1.0',   label: 'Deep Calm',          description: 'Dark, quiet, focused',     bg: '#1A1F2E', dot: '#7C9CBF', line: '#3A4A5E', builtIn: false },
+  { id: 'soft-violet@^1.0', label: 'Soft Violet',        description: 'Gentle, creative',         bg: '#F0EFF5', dot: '#6B5EA8', line: '#C5BFDF', builtIn: false },
+  { id: 'fresh-teal@^1.0',  label: 'Fresh Teal',         description: 'Light, open, clear',       bg: '#ECFBF4', dot: '#1D9E75', line: '#9FE1CB', builtIn: false },
+  { id: 'amber-glow@^1.0',  label: 'Amber Glow',         description: 'Warm, energetic',          bg: '#FFF8EE', dot: '#B85C00', line: '#F5C57A', builtIn: false },
 ])
 
-// ─── Build mode from wizard config ───────────────────────
-
-/**
- * Turn a (possibly partial) wizard config into a fresh mode record. Falls
- * back to safe defaults wherever the user hasn't reached a step yet, so
- * the "Open in editor" escape can be invoked at any point from step 3+.
+/* ── Build mode + conversation from wizard config ────────────
  *
- * Steps to reach this safely:
- *  - Pick a layout (step 3 or override). If no purpose chosen, defaults
- *    to a Quiet Room shape.
- *  - Components are derived from features set, plus messages + input.
- *
- * @param {object} config - wizard config
- * @returns {Promise<object>} the persisted mode
+ * Two entry points:
+ *   - buildModeFromWizard(config)
+ *       Persists the mode and returns it. Used by the "Open in editor"
+ *       escape from steps ≥ 3.
+ *   - buildAndOpenRoom(config)
+ *       Persists the mode + a fresh conversation tied to it. Used by the
+ *       Ignition step's Enter button. Returns { mode, conversation }.
  */
+
 export async function buildModeFromWizard(config) {
   const layoutRef = deriveLayout(config) || 'three-panel@^1.0'
   const components = wizardComponentsFor(layoutRef, config.features || new Set())
   const name = (config.name && config.name.trim()) || defaultName(config)
 
-  // We re-use createModeFromTemplate — it generates a fresh mode id, fills
-  // timestamps, and persists. The "template" here is synthesized in
-  // memory; it never gets stored as a libraryRooms record.
   const synthetic = {
     id: `wizard_${Date.now()}`,
     scope: 'room',
     displayName: name,
     description: '',
     icon: null,
-    deviceClass: config.device || 'visual-pointer',
+    deviceClass: pickDeviceClass(config.devices),
     layout: { ref: layoutRef },
-    scheme: { ref: config.schemeRef || 'parliament@^1.0' },
+    scheme: { ref: config.scheme || 'parliament@^1.0' },
     components,
-    buildIntent: config.purpose
-      ? { source: 'wizard', purpose: config.purpose, density: config.density }
-      : null,
+    buildIntent: {
+      source: 'wizard',
+      purposes: [...(config.purposes || [])],
+      devices: [...(config.devices || [])],
+      density: config.density || null,
+      buildAnother: Boolean(config.buildAnother),
+    },
   }
 
   return createModeFromTemplate(synthetic, { name })
 }
 
+export async function buildAndOpenRoom(config) {
+  const mode = await buildModeFromWizard(config)
+  const conversation = await dbCreateConversation({
+    title: mode.meta?.name || 'New room',
+    room: mode.id,
+  })
+  return { mode, conversation }
+}
+
 function defaultName(config) {
-  const purpose = (PURPOSES.find(p => p.id === config.purpose) || {}).label
-  if (purpose) return `${purpose} room`
+  const first = [...(config.purposes || [])][0]
+  const purpose = PURPOSES.find(p => p.id === first)
+  if (purpose) return `${purpose.label} room`
   return 'New room'
+}
+
+function pickDeviceClass(devices) {
+  // Desktop wins when both are selected — desktop layouts also work on
+  // mobile, but a mobile-only room should not get a three-panel as the
+  // default deviceClass. Mobile-only rooms get touch-phone.
+  if (devices?.has?.('mobile') && !devices?.has?.('desktop')) {
+    return 'visual-touch-phone'
+  }
+  return 'visual-pointer'
 }
 
 /**
  * Compose the components array for a wizard-built room. Every layout
  * gets messages + input as the baseline, plus any features the user
- * checked that have a slot in the chosen layout.
- *
- * Returns specs WITHOUT ids — createModeFromTemplate stamps fresh ids.
+ * checked that have a slot in the chosen layout. Coming-soon features
+ * are skipped — they have no catalogRef.
  */
 export function wizardComponentsFor(layoutRef, features) {
   const baseline = baselineComponentsFor(layoutRef)
@@ -261,14 +348,16 @@ export function wizardComponentsFor(layoutRef, features) {
   for (const featureId of features) {
     const feat = FEATURES.find(f => f.id === featureId)
     if (!feat) continue
+    if (feat.comingSoon) continue
+    if (!feat.catalogRef) continue
     const slot = feat.slotByLayout[layoutRef]
-    if (!slot) continue // Layout doesn't accommodate this feature; skip.
+    if (!slot) continue
     featureSpecs.push({
-      id: `wiz_${feat.id.split('@')[0]}`,
-      ref: feat.id,
+      id: `wiz_${feat.id}`,
+      ref: feat.catalogRef,
       slot,
       order: orderInSlot(baseline.concat(featureSpecs), slot),
-      config: {},
+      config: feat.config || {},
     })
   }
   return baseline.concat(featureSpecs)
@@ -280,7 +369,6 @@ function orderInSlot(specs, slot) {
 }
 
 function baselineComponentsFor(layoutRef) {
-  // The two everyone needs: messages + input.
   switch (layoutRef) {
     case 'document-centric@^1.0':
       return [
