@@ -59,12 +59,30 @@ const SETTINGS_TOUR_STEPS = [
   },
 ]
 
-const MODELS = [
-  { id: 'claude-haiku', name: 'Claude Haiku', description: 'Fast & affordable', inputCost: '$0.25', outputCost: '$1.25', speed: 'Fastest', badge: 'Budget-friendly' },
-  { id: 'claude-sonnet', name: 'Claude Sonnet', description: 'Balanced performance', inputCost: '$3.00', outputCost: '$15.00', speed: 'Fast', badge: 'Recommended' },
-  { id: 'claude-opus', name: 'Claude Opus 4.6', description: 'Maximum capability', inputCost: '$15.00', outputCost: '$75.00', speed: 'Moderate', badge: 'Most powerful' },
-  { id: 'claude-opus-4-7', name: 'Claude Opus 4.7', description: 'Latest frontier model', inputCost: '$15.00', outputCost: '$75.00', speed: 'Moderate', badge: 'Newest' },
-]
+// PR-12: presentational metadata only (description / speed / badge). The
+// model list itself, plus cost and contextWindow, comes from the provider
+// abstraction at render time — see ModelSection below. Keys must match
+// AnthropicProvider.getModels() ids.
+const MODEL_DISPLAY_META = {
+  'claude-haiku':    { description: 'Fast & affordable',     speed: 'Fastest',  badge: 'Budget-friendly' },
+  'claude-sonnet':   { description: 'Balanced performance',  speed: 'Fast',     badge: 'Recommended' },
+  'claude-opus':     { description: 'Maximum capability',    speed: 'Moderate', badge: 'Most powerful' },
+  'claude-opus-4-7': { description: 'Latest frontier model', speed: 'Moderate', badge: 'Newest' },
+}
+
+// Render `cost` from provider.getModels() as a per-million-tokens dollar
+// string. Returns 'Free' for { type: 'free-local' } and '—' for null /
+// unknown shapes so the row always has something to display.
+function formatModelCost(cost, side) {
+  if (!cost) return '—'
+  if (cost.type === 'free-local') return 'Free'
+  if (cost.type === 'metered') {
+    const value = side === 'input' ? cost.inputPerMillion : cost.outputPerMillion
+    if (typeof value !== 'number') return '—'
+    return `$${value.toFixed(2)}`
+  }
+  return '—'
+}
 
 const STORAGE_MODES = [
   { id: 'persistent', label: 'Remember my key', description: 'Saved in this browser until you delete it', icon: HardDrive },
@@ -342,10 +360,14 @@ function ApiSection({ apiKey, setApiKey, keyStatus, keyError, validateKey, valid
 // ─── Model Preferences ───────────────────────────────────
 
 function ModelSection({ selectedModel, setSelectedModel }) {
+  const providerModels = getProvider().getModels()
   return (
     <SettingsSection title="Model Preferences" subtitle="Choose your default model for new conversations">
-      {MODELS.map((model) => {
+      {providerModels.map((model) => {
         const active = selectedModel === model.id
+        const meta = MODEL_DISPLAY_META[model.id] ?? { description: '', speed: '', badge: '' }
+        const inputCost = formatModelCost(model.cost, 'input')
+        const outputCost = formatModelCost(model.cost, 'output')
         return (
           <StaggerItem key={model.id}>
             <motion.div
@@ -359,11 +381,13 @@ function ModelSection({ selectedModel, setSelectedModel }) {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <h3 className={`text-sm font-medium ${active ? 'text-[var(--p-text-primary)]' : 'text-[var(--p-text-secondary)]'}`}>{model.name}</h3>
-                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                    active ? 'bg-[#B8A070]/10 text-[#B8A070]' : 'bg-[#F7F6F3] text-[var(--p-text-secondary)]'
-                  }`}>
-                    {model.badge}
-                  </span>
+                  {meta.badge && (
+                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                      active ? 'bg-[#B8A070]/10 text-[#B8A070]' : 'bg-[#F7F6F3] text-[var(--p-text-secondary)]'
+                    }`}>
+                      {meta.badge}
+                    </span>
+                  )}
                 </div>
                 <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                   active ? 'border-[#B8A070]' : 'border-[#9B9A97]'
@@ -375,11 +399,11 @@ function ModelSection({ selectedModel, setSelectedModel }) {
                   />
                 </div>
               </div>
-              <p className="text-xs text-[var(--p-text-secondary)] mb-3">{model.description}</p>
+              {meta.description && <p className="text-xs text-[var(--p-text-secondary)] mb-3">{meta.description}</p>}
               <div className="flex gap-4 text-xs text-[var(--p-text-secondary)]">
-                <span>Input: <span className="font-medium text-[var(--p-text-primary)]">{model.inputCost}</span>/1M tokens</span>
-                <span>Output: <span className="font-medium text-[var(--p-text-primary)]">{model.outputCost}</span>/1M tokens</span>
-                <span>Speed: <span className="font-medium text-[var(--p-text-primary)]">{model.speed}</span></span>
+                <span>Input: <span className="font-medium text-[var(--p-text-primary)]">{inputCost}</span>/1M tokens</span>
+                <span>Output: <span className="font-medium text-[var(--p-text-primary)]">{outputCost}</span>/1M tokens</span>
+                {meta.speed && <span>Speed: <span className="font-medium text-[var(--p-text-primary)]">{meta.speed}</span></span>}
               </div>
             </motion.div>
           </StaggerItem>
@@ -956,12 +980,6 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
     </SettingsSection>
   )
 }
-
-// PR-10b: InteractionModeSection deleted. The bird-mode picker drove
-// V1's adapter routing; after PR-10b modes don't drive routing anymore
-// (every conversation has a `room`, every room has a layout). The
-// localStorage[parliament-mode] hint is dropped by lib/migration.js;
-// PR-12 deletes ModeContext entirely.
 
 // ─── Appearance ──────────────────────────────────────────
 

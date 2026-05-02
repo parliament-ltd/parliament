@@ -1983,6 +1983,136 @@ secretarybird conversations).
 
 ---
 
+## PR-12 — Phase 1 cleanup + exit-criteria summary
+
+🧱 Foundation. PR-12 is housekeeping — deletes V1-era infrastructure
+that the route layer / adapter pattern stopped consuming after PR-10b /
+PR-11a / PR-11b, plus the seventh full Phase 1 file delete (`swift`
+adapter) and a short list of stale root-level docs. There is no new
+behavior; the verification surface is "things that should not exist
+no longer exist" and "all prior PR sections still pass."
+
+### What got deleted
+
+- [ ] `src/adapters/` — gone entirely. The directory itself is removed,
+      not just the files inside. Final adapter (`swift`) shed; albatross,
+      kingfisher, starling went in PR-10b, pelican in PR-11a,
+      secretarybird in PR-11b.
+- [ ] `src/lib/modeSuggestions.js` — gone. V1's "switch to a different
+      bird-mode" suggestion engine is no longer reachable.
+- [ ] `src/components/core/ModeSuggestion.jsx` — gone. The UI that
+      surfaced the V1 mode switch suggestion.
+- [ ] `src/stores/ModeContext.jsx` — gone. The V1 active-mode context
+      and its `MODE_CAPABILITIES` registry. `<ModeProvider>` wrapper
+      removed from `src/App.jsx`.
+- [ ] `src/lib/tokens.js` — gone. The duplicate model-info table; cost
+      data now lives only on the provider abstraction with a structured
+      `cost` field hospitable to non-Anthropic providers (`null`,
+      `{ type: 'metered', inputPerMillion, outputPerMillion }`,
+      `{ type: 'free-local' }`).
+- [ ] Root-level V1 working docs: `ROADMAP.md`, `DECISIONS-LOG.md`,
+      `SESSION-LOG-2026-03-02.md`, `session-summary-2026-03-07`,
+      `session-summary-2026-03-12`, `implementation-guide.md`. All
+      preceded the V2 refactor and contradict current architecture in
+      places.
+- [ ] `mockups/` — moved to `refactor/v1-mockups-archive/`. Files
+      preserved verbatim per audit §3.12 / NQ-10.
+
+### What got rewritten
+
+- [ ] `CLAUDE.md` — a 70-ish line redirect pointing at the V2 doc
+      surfaces in `refactor/`. The 438-line V1 spec it replaced is
+      reachable via `git show 12e142f:CLAUDE.md`.
+- [ ] `README.md` — went from the bare Vite template to a real
+      project intro covering V2 vocabulary (rooms, layouts, schemes,
+      catalog components, templates).
+- [ ] `src/main.jsx` — replaced the PR-10b `parliament-adapters-v1`
+      cache wipe (no longer needed pre-launch) with a belt-and-braces
+      `localStorage.removeItem('parliament-mode')` that catches
+      installs whose PR-10a migration short-circuited and never got
+      to drop the legacy key.
+- [ ] `src/providers/anthropic.js` `getModels()` — restructured cost
+      shape; numbers identical to before.
+- [ ] `src/providers/base.js` — interface docstring updated to
+      document the new cost shape.
+- [ ] `src/views/SettingsView.jsx` `ModelSection` — derives the model
+      list from `getProvider().getModels()` instead of a hardcoded
+      duplicate; only UI-only metadata (`description`, `speed`,
+      `badge`) stays local. Eliminates the duplication audit §3.10
+      called out.
+
+### Verification — production-bundle symbol-grep
+
+Run `npm run build`. Then in `dist/assets/index-*.js`:
+
+- [ ] `MODE_CAPABILITIES` — 0 occurrences.
+- [ ] `ModeProvider` — 0 occurrences.
+- [ ] `ModeSuggestion` — 0 occurrences.
+- [ ] `evaluateSuggestions` / `csv-to-pelican` / `stylus-to-secretarybird` —
+      0 occurrences each.
+- [ ] `inputCostPer1k` / `outputCostPer1k` — 0 occurrences (legacy
+      tokens.js shape).
+- [ ] `parliament-adapters-v1` — 0 occurrences (no live cache wipe).
+- [ ] `parliament-mode` — present (one in `lib/migration.js` as the
+      one-shot legacy localStorage fallback; one in `main.jsx` as the
+      defensive boot-time `removeItem`). Schema strings of the form
+      `"parliament-mode/1.0"` also still appear and are unrelated —
+      those are the mode-file schema name in `lib/modes.js` /
+      `lib/db.js`.
+
+### Verification — clean build + lint
+
+- [ ] `npm run build` exits 0.
+- [ ] No `adapter-swift-*.js` chunk emitted in `dist/assets/`.
+- [ ] Bundle size moves slightly downward vs PR-11b (deletion-only
+      change; no expected size growth).
+
+### Phase 1 exit-criteria checklist
+
+This is the canonical exit-criteria pass for Phase 1. Each criterion
+points back at the PR section that owns its detailed verification.
+
+- [ ] **A new user can build a room via any of the three paths and
+      it works.** Verified by PR-8 (template gallery), PR-8b (wizard),
+      PR-9 (editor) sections.
+- [ ] **An existing V1 user's data survives the migration:**
+  - `createdInMode → room` mapping holds. PR-10a section.
+  - `sbrd_documents` records intact for Drafting Desk rooms. PR-11b
+    section.
+  - `files` / `file_data` records intact for Data Workspace rooms.
+    PR-11a section.
+  - Messages, highlights, notes, branches, favorites, pins, and
+    parrot personas all migrate. PR-7 / PR-10a sections.
+- [ ] **All V1 features available somewhere — shell or catalog
+      component.** Walked through in audit §2.4 surface map; verified
+      across PR-10a.5 through PR-11b sections.
+- [ ] **Homepage, template gallery, editor, wizard render per their
+      mockups.** PR-5 (homepage), PR-8 (gallery + wizard), PR-9 (editor)
+      sections.
+- [ ] **Export and restore round-trip correctly.** PR-7 section
+      (encrypted `.apb` + plain JSON), including the new V2 stores
+      and `sbrd_documents` validators.
+- [ ] **No V1 code paths remain for the bird-mode adapter pattern.**
+      PR-10b / PR-11a / PR-11b deletion sections + PR-12 directory
+      sweep above.
+
+### Out of scope (don't test here)
+
+- DB v5 schema bump that strips `createdInMode` and adds
+  `permissionGrants` for the consent flow — Phase 2.
+- Multi-provider work (Ollama / OpenAI / Mistral, CSP relaxation,
+  per-provider auth, model-picker field type) — Phase 2.
+- Onboarding tour rewrites beyond minimum selector reattachment —
+  Phase 2.
+- Continuous validation sidebar in the editor — Phase 2 (PR-8
+  deferred section).
+- Phase 2 Secretarybird ripple work — see project memory note.
+- Resources content production (the 19 launch resources).
+- Catalog publishing infrastructure (npx scaffold, validator, PR
+  template) — Phase 2.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

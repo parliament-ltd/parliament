@@ -118,10 +118,10 @@ export function executeClientTool(toolName, toolInput) {
 export class AnthropicProvider extends BaseProvider {
   getModels() {
     return [
-      { id: 'claude-haiku', apiId: 'claude-haiku-4-5-20251001', name: 'Claude Haiku', inputCost: 0.25, outputCost: 1.25, contextWindow: 200000 },
-      { id: 'claude-sonnet', apiId: 'claude-sonnet-4-6', name: 'Claude Sonnet', inputCost: 3.00, outputCost: 15.00, contextWindow: 200000 },
-      { id: 'claude-opus', apiId: 'claude-opus-4-6', name: 'Claude Opus 4.6', inputCost: 15.00, outputCost: 75.00, contextWindow: 200000 },
-      { id: 'claude-opus-4-7', apiId: 'claude-opus-4-7', name: 'Claude Opus 4.7', inputCost: 15.00, outputCost: 75.00, contextWindow: 200000 },
+      { id: 'claude-haiku',     apiId: 'claude-haiku-4-5-20251001', name: 'Claude Haiku',     contextWindow: 200000, cost: { type: 'metered', inputPerMillion: 0.25,  outputPerMillion: 1.25  } },
+      { id: 'claude-sonnet',    apiId: 'claude-sonnet-4-6',         name: 'Claude Sonnet',    contextWindow: 200000, cost: { type: 'metered', inputPerMillion: 3.00,  outputPerMillion: 15.00 } },
+      { id: 'claude-opus',      apiId: 'claude-opus-4-6',           name: 'Claude Opus 4.6',  contextWindow: 200000, cost: { type: 'metered', inputPerMillion: 15.00, outputPerMillion: 75.00 } },
+      { id: 'claude-opus-4-7',  apiId: 'claude-opus-4-7',           name: 'Claude Opus 4.7',  contextWindow: 200000, cost: { type: 'metered', inputPerMillion: 15.00, outputPerMillion: 75.00 } },
     ]
   }
 

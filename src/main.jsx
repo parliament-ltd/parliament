@@ -7,22 +7,20 @@ import { installFetchLogger } from './lib/networkLog'
 
 installFetchLogger()
 
-// PR-10b: wipe the legacy `parliament-adapters-v1` runtime cache that V1
-// builds used for per-adapter code-split chunks. After PR-10b those URLs
-// no longer exist, so the cached entries are dead weight. Done from the
-// page context (rather than the SW activate event) because vite-plugin-pwa
-// generates the SW for us — adding a custom listener would mean switching
-// to injectManifest. caches.delete is idempotent (returns false if the
-// cache was already gone) so re-running is harmless. Failure is silent
-// in production and logged in dev — a stuck old cache is annoying but
-// not user-blocking. PR-12 can remove this snippet once all live users
-// have rotated past V2 boot.
-if (typeof caches !== 'undefined') {
-  caches.delete('parliament-adapters-v1').catch((err) => {
-    if (import.meta.env.DEV) {
-      console.warn('[main] failed to delete legacy adapter cache:', err)
-    }
-  })
+// PR-12: belt-and-braces removal of the legacy `parliament-mode` localStorage
+// key that V1's ModeContext used to remember the active bird-mode adapter.
+// PR-10a's migration drops it via dropLegacyModeKey() once its
+// createdInMode → room pass completes; this catches installs whose migration
+// short-circuited (e.g. a corrupted IndexedDB during an earlier boot) and
+// never got the chance to clean up. removeItem is idempotent, so re-running
+// on every boot is harmless. Wrapped in try/catch because a private-mode
+// storage error here would be a bad reason to fail app boot.
+try {
+  if (typeof localStorage !== 'undefined') {
+    localStorage.removeItem('parliament-mode')
+  }
+} catch {
+  /* no-op */
 }
 
 createRoot(document.getElementById('root')).render(

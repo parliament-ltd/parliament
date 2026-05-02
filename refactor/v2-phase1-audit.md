@@ -439,9 +439,10 @@ PR-11b does not expand it.
 
 - **`pins` IndexedDB store** — used by branch-transfer "Pin for reference" flow. Stays as backing data for `branches@1.0`. Not a Persister-tier concern (Persister is reserved for cross-mode shared stores per architecture §5g).
 - **`createdInMode` field on conversations** — used in PR-10a for one-time migration to `room` field. Not stripped on read/write afterward (kept in records for at least one release for debugging) but no longer consulted anywhere.
-- **`ModeSuggestion` and `modeSuggestions.js`** — removed entirely in PR-12. No V2 equivalent.
+- **`ModeSuggestion` and `modeSuggestions.js`** — **Resolved in PR-12.** Both files deleted; the V1 mode-switch suggestion engine has no V2 equivalent.
 - **`tourCompleted_*` settings** — user data, not room data. Stays in `settings` IndexedDB store and migrates as-is.
 - **Pelican's session-only parsed-data cache** — component-internal state, not a catalog concern.
+- **`ModeContext` / `MODE_CAPABILITIES`** — **Resolved in PR-12.** PR-3 left the V1 mode context mounted at `App.jsx` for V1-fallback compatibility; PR-10b removed the last live consumer when it deleted the routing layer. PR-12 deleted `src/stores/ModeContext.jsx` outright and stripped the `<ModeProvider>` wrapper from `App.jsx`. The `MODE_CAPABILITIES` registry was already documented dead code at runtime (§1.2) and went with it.
 
 ---
 
@@ -511,7 +512,13 @@ Pre-existing gap. PR-7 fixes it: V2 backup includes `files` and `file_data`. Val
 
 ### 3.10 — Model info source-of-truth duplication and multi-provider readiness
 
-Models listed in both [providers/anthropic.js](src/providers/anthropic.js) and [tokens.js](src/lib/tokens.js) with inconsistent units. PR-12 consolidates to provider with **shape-flexibility for non-Anthropic providers** — `cost` field can be `null` or `{ type: 'free-local' }` for future Ollama. Architectural decisions like per-provider auth model (`validateConnection()` for keyless local providers) and CSP relaxation for `http://localhost:*` are firmly Phase 2+.
+Models listed in both `providers/anthropic.js` and `lib/tokens.js` with inconsistent units. **Resolved in PR-12.** `lib/tokens.js` was deleted (its helpers had no live consumers in `src/`); the model list now lives only on the provider abstraction. The `cost` field is structured for non-Anthropic providers without refactoring callers:
+
+- `{ type: 'metered', inputPerMillion, outputPerMillion }` — paid APIs (Anthropic, OpenAI, Mistral). Both numbers in USD per 1M tokens.
+- `{ type: 'free-local' }` — keyless local providers (Ollama, etc.).
+- `null` — pricing unknown / unspecified.
+
+`SettingsView`'s model picker now derives the list from `getProvider().getModels()` — only UI-only metadata (`description`, `speed`, `badge`) stays in a local presentation map. Architectural decisions like per-provider auth (`validateConnection()` for keyless local providers) and CSP relaxation for `http://localhost:*` remain firmly Phase 2+; see §3.20.
 
 ### 3.11 — Onboarding tour selectors break when adapter elements move
 
@@ -519,7 +526,7 @@ V1 tours target `data-tour="settings-api"`, `data-tour="chat-input"`, etc. — A
 
 ### 3.12 — Mockups directory archived, not deleted
 
-Per NQ-10, `mockups/*.jsx` moved to `refactor/v1-mockups-archive/` in PR-12 rather than deleted. Preserves the visual record for future fidelity validation.
+Per NQ-10, `mockups/*.jsx` moved to `refactor/v1-mockups-archive/` in PR-12 rather than deleted. Preserves the visual record for future fidelity validation. **Resolved in PR-12.** Ten files relocated verbatim plus a short `README.md` explaining what's in the archive and why; the top-level `mockups/` directory is removed.
 
 ### 3.13 — Voice input infrastructure depends on the hostAPI event bus
 
@@ -551,7 +558,9 @@ PR-10a's migration assigns `room` based on `createdInMode`. After that, `created
 
 ### 3.19 — PWA cache invalidation on V2 cutover
 
-`vite.config.js` declares `cacheName: 'parliament-adapters-v1'` with per-adapter chunk patterns. After PR-10b/PR-11b there are no adapter chunks. **PR-10b rotates the cache name to `parliament-modules-v2`** and adds one-time cleanup that wipes the old cache on first V2 boot. Cleanup runs from page context (`src/main.jsx`) rather than the SW activate event because vite-plugin-pwa's `generateSW` strategy doesn't expose a hook for custom listeners; `caches.delete` is callable from the window and idempotent, which is functionally equivalent. PR-12 can drop the cleanup snippet once all live users have rotated past V2 boot.
+`vite.config.js` declared `cacheName: 'parliament-adapters-v1'` with per-adapter chunk patterns. After PR-10b / PR-11a / PR-11b / PR-12 there are no adapter chunks. **PR-10b rotated the cache name to `parliament-modules-v2`** and added one-time cleanup that wiped the old cache on first V2 boot, run from page context (`src/main.jsx`) rather than the SW activate event because vite-plugin-pwa's `generateSW` strategy doesn't expose a hook for custom listeners.
+
+**Resolved in PR-12.** The cleanup snippet was dropped — the project never went public with a V1 build, the dev's local browsers had rotated through V2 boot multiple times, and there is no installed user base to support. `main.jsx` retains a different one-line cleanup for the legacy `parliament-mode` localStorage key (the V1 active-mode persistence) as belt-and-braces against installs whose PR-10a migration short-circuited.
 
 ### 3.20 — Multi-provider CSP coupling (out of Phase 1, flag for later)
 
