@@ -582,35 +582,33 @@
 
 ---
 
-### PR-11a — Decompose Pelican into 6 catalog components
+### PR-11a — Decompose Pelican into 5 catalog components
 
 **Goal:** Pelican functionality fully expressed as catalog components.
 
 **Scope:**
-- Six catalog entries:
-  - `file-shelf@1.0` — owns `files` and `file_data` IndexedDB stores. Publishes `file-context-changed`.
-  - `chart-canvas@1.0` — Reader; chart-type config (bar/line/area/scatter/pie); subscribes to `file-context-changed`.
-  - `table-canvas@1.0` — Reader; sort/density/columns config.
-  - `summary-dashboard@1.0` — Reader; KPI/column-stat config.
-  - `column-inspector@1.0` — Reader; column schema view.
-  - (Reuses existing `messages@1.0` + `input@1.0` for inspector chat.)
-- Each canvas component renders the shared empty-state template ("Add a File shelf component to provide data") when `file-shelf@1.0` isn't present in the room (per audit risk 3.17).
-- Update Data Workspace template (PR-9) to use the decomposition: file-shelf in `left-rail`, chart-canvas + table-canvas + column-inspector in `canvas` (stack capacity).
-- Migrate any conversation with `createdInMode === 'pelican'` to the updated Data Workspace template.
-- Move PelicanContext's file-staging slice into `file-shelf@1.0`'s scoped state.
-- Move `lib/fileParser.js` to be a `file-shelf@1.0` internal helper (or keep at lib/ if used elsewhere — verify).
-- Delete `src/adapters/pelican/`.
-- Delete [PelicanContext](src/stores/PelicanContext.jsx).
+- Five new catalog entries (plus reuse of existing `messages@1.0` + `input@1.0` for the conversational analysis side of the room):
+  - `file-shelf@1.0` — Composer tier. Owns `files` and `file_data` IndexedDB stores via the new App.jsx-mounted [FileShelfContext](src/stores/FileShelfContext.jsx). Publishes `file-context-changed` on the room hostAPI bus on every change to the staged-files set or the in-context subset.
+  - `chart-canvas@1.0` — Reader. Recharts-backed; reads parsed data from FileShelfContext. `chartType` config (bar/line/area/scatter/pie).
+  - `table-canvas@1.0` — Reader. Sortable, paginated grid; sticky header; right-aligned numerics; per-component sort state.
+  - `summary-dashboard@1.0` — Composer. KPI cards + AI-generated insights + distributions + data-quality flags. **Generation gated behind an explicit "Generate insights" click** — V1 Pelican auto-generated on file load, which would have made this an Agent-tier component (autonomous model call) per [tier-classification.md](tier-classification.md); Phase 1 ships zero Agent components.
+  - `column-inspector@1.0` — Reader. Type-tagged column list with null counts, sample values, and an expand-to-detail row. V1 Pelican's InspectorPanel embedded a chat surface alongside the schema view; the catalog decomposition splits those — messages@1.0 + input@1.0 own chat, column-inspector owns just the columns. The "Group by / Filter / Visualize" per-column action chips are not wired in PR-11a (cross-component compose dispatch beyond the three Phase 1 bus events is a Phase 2 concern).
+- New `src/catalog/emptyStates.jsx` — shared empty-state templates keyed by manifest `softDependencies[].fallbackUI`. The chart / table / summary trio declares `softDependencies: [{ component: 'file-shelf@1.0', fallbackUI: 'data-source-needed' }]`. RoomShell's softDependencies aggregation (formerly deferred per `RoomShell.jsx` "Intentionally deferred behaviors" note) now substitutes the empty-state for the dependent component's render whenever the dependency isn't present in the room. Closes audit §3.17.
+- Update [canvas-centric@1.0](src/catalog/layouts/canvas-centric.jsx) layout: bump `canvas` slot capacity from `single` to `stack` so chart-canvas + table-canvas + summary-dashboard coexist (V1 Pelican toggled between them via tabs; the V2 decomposition stacks vertically and scrolls).
+- Update Data Workspace template seed: file-shelf in `left-rail`; chart-canvas + table-canvas + summary-dashboard stacked in `canvas`; column-inspector + context in `inspector`; messages in `chat-panel`; input in `input-dock`. Bump the template's seedVersion in [seedTemplates.js](src/lib/seedTemplates.js) and extend `seedLibraryRooms` so existing libraryRooms records re-seed on next boot when their stored seedVersion is below the current.
+- New `migrateDecomposeDataWorkspaceRooms` pass in [lib/migration.js](src/lib/migration.js), wired alongside the existing PR-10a/PR-10b passes in `ConversationContext`. Rewrites every mode in the `modes` store that uses `canvas-centric@^1.0` AND doesn't already include `file-shelf@1.0` to the new component list. Per-room idempotent (skips rooms already on the new shape) + whole-pass guard via `migration_v2_pelican_room_decomposed`. Tags rewritten modes with `buildIntent.derivedFrom = 'pelican-decomposition'` (preserving any prior `pelican-migration` tag) plus `decomposedAt: 'pr-11a'`.
+- Delete `src/adapters/pelican/` and [PelicanContext](src/stores/PelicanContext.jsx). The component sources move to `src/components/core/` (FileShelf, ChartCanvas, TableCanvas, SummaryDashboard, ColumnInspector) and consume FileShelfContext directly. `lib/fileParser.js` stays in `lib/` — it's used by both file-shelf and column-inspector + summary-dashboard.
 
 **Dependencies:** PR-10b.
 
 **Exit criteria:**
 - Pelican-equivalent functionality available via the Data Workspace template.
 - A user can compose a custom data-analysis room with any subset of canvas components.
-- A canvas component without file-shelf shows the empty state.
-- Existing Pelican users' files/data preserved.
+- A canvas component without file-shelf renders the shared `data-source-needed` empty state.
+- Existing Pelican users' files / file_data preserved (the stores are unchanged; only the components reading them moved).
+- `npm run build` clean.
 
-**Risk:** High. Largest decomposition. Multiple components share state via the bus.
+**Risk:** High. Largest decomposition. State is shared via FileShelfContext rather than the bus (the bus is non-sticky; a late subscriber would miss the most recent payload), but the bus event still fires for forward-compat — same precedent as AnnotationsContext / BranchPanelContext / CollabModeContext.
 
 ---
 

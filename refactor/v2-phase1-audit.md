@@ -331,6 +331,11 @@ What this means in practice for each component:
 | `review@1.0` | `useChat().messages` + `tokenUsage`, `useAnnotations().highlights` / `notes` / `favorites` (Map → array conversion for V1 ReviewModal contract), `useConversations()` for branches off the active conversation, `useSettings()` for storage mode + active-model context window. Owns the synthesis call (Composer-tier Haiku call against the last 20 messages with optional annotation context — same recipe as V1 Albatross) and the Markdown export (lifted from V1's handleExportMarkdown). | PR-10a.9 |
 | `voice-input@1.0` | `useVoiceInput()` hook. Publishes `voice-transcript` events on the room hostAPI bus on every interim + final transcript; `input@1.0`'s subscription appends finalized text to its value. Production render is a tight mic-only button (separate from the verbose `/catalog` preview card). PR-10b removed InputArea's built-in cardLayout mic — `voice-input@1.0` is the only voice surface. | PR-10a.8 (PR-10b removes InputArea fallback) |
 | `toc@1.0` | `useChat().messages` for the table-of-contents derivation. User-role messages only (matches V1 Albatross), labels truncated to `truncateAt` chars (default 60), most-recent `maxItems` retained (default 50). Click → `scrollIntoView` on `msg-{id}` (set by MessageCard). | PR-10a.8 |
+| `file-shelf@1.0` | New App.jsx-mounted `FileShelfContext` owns staged-files + parsed-data cache + active-file-id + in-context set. Resets when `useChat().activeConversationId` transitions between two distinct non-null ids. file-shelf publishes `file-context-changed` on the room hostAPI bus on every change to context-files identity (audit's documented Phase 1 event surface). The canvas trio (chart / table / summary) + column-inspector consume the same hook for state — shared context, not bus, since the bus is non-sticky and a late subscriber would miss the most recent payload. | PR-11a |
+| `chart-canvas@1.0` | `useFileShelf()` for active file id + parsed data via `getParsedData(fileId)`. softDependency on `file-shelf@1.0` → RoomShell substitutes the `data-source-needed` empty-state template when no file-shelf is in the room. | PR-11a |
+| `table-canvas@1.0` | Same as chart-canvas. Sort state is local (V1 PelicanContext kept it global so it persisted across tab toggles; V2 stacks canvases instead of toggling). | PR-11a |
+| `summary-dashboard@1.0` | `useFileShelf()` + `useChat()` for activeConversationId. Composer tier — V1's auto-generate-on-load was an Agent-tier autonomous call; PR-11a removed it and gates generation behind an explicit "Generate insights" button per [tier-classification.md](tier-classification.md). | PR-11a |
+| `column-inspector@1.0` | `useFileShelf()` for columnStats of the active file. V1's per-column "Group by / Filter / Visualize" action chips that populated the chat input are NOT wired; cross-component compose dispatch beyond the three Phase 1 bus events is a Phase 2 concern. | PR-11a |
 
 **Conversation activation is the route shell's job.** When `/chat/:id`
 loads a conversation, the route calls `useChat().loadMessages(id)` and
@@ -395,6 +400,20 @@ to the homepage and back. Per-conversation persistence across browser
 reloads is a Phase 2 concern (probably belongs on the room's permission
 grants or a per-conversation settings record); Phase 1 keeps the
 session-scoped V1 lifetime.
+
+**A fourth shared context for file-shelf state.** PR-11a adds
+`FileShelfContext` for the data-workspace decomposition.
+`file-shelf@1.0` is the only writer (uploads, in-context toggles,
+removals); `chart-canvas@1.0`, `table-canvas@1.0`,
+`summary-dashboard@1.0`, and `column-inspector@1.0` are readers.
+Lifetime mirrors AnnotationsContext: resets when `activeConversationId`
+transitions between two distinct non-null ids; transient nulls are
+ignored. The bus event `file-context-changed` (one of the three
+documented Phase 1 events) still fires on every change, but no Phase 1
+component subscribes — context covers both initial subscribers and
+late ones, while the bus is non-sticky and would force every reader to
+maintain its own mirror. Future plugin components and the editor's
+continuous-validation surface (Phase 2) can subscribe via the bus.
 
 ### 2.9 Things that don't fit cleanly
 
@@ -501,6 +520,8 @@ Architecture §3 requires this. PR-1 enforces via a shared `UNIVERSAL_SLOTS` con
 ### 3.17 — Canvas components need empty states when `file-shelf@1.0` is missing
 
 Per §2.4 and NQ-7. Each of `chart-canvas, table-canvas, summary-dashboard` renders a shared empty-state template ("Add a File shelf component to this room to provide data") when no file-shelf is present. Component-level health-check pattern; PR-2 catalog manifest includes an optional `softDependencies: [{ component, fallbackUI }]` field.
+
+**Resolved in PR-11a.** `src/catalog/emptyStates.jsx` ships the keyed templates (`data-source-needed` for the canvas trio, `component-not-present` for unknown / generic fallbacks). RoomShell's softDependencies aggregation walks the resolved component list; for any dependent whose dependency isn't present, the empty-state template replaces the real render entirely. The dependent's render function never runs while the dependency is absent — no FileShelfContext null-check noise inside individual canvas components.
 
 ### 3.18 — `createdInMode` migration is one-shot and irreversible
 

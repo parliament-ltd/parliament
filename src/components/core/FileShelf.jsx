@@ -1,12 +1,28 @@
+// FileShelf — the staged-files / context-toggle / quick-actions panel.
+//
+// PR-11a moved this here from src/adapters/pelican/components/FileShelf.jsx
+// when Pelican was decomposed into catalog components. Hard dependency
+// on PelicanContext is gone — the component now reads from the
+// FileShelfContext at App.jsx so any room that mounts file-shelf@1.0
+// (currently only the Data Workspace template) shares state with the
+// canvas trio + column-inspector.
+//
+// Behavior parity with V1 PelicanFileShelf except:
+//   - The Pelican-branded header (Database icon + "Pelican" + DATA badge
+//     + ChevronLeft to /chats) is gone. The component is now generic;
+//     room-level navigation lives in the route shell.
+//   - Calls into useFileShelf() for state and mutators rather than
+//     usePelican(); same field shapes.
+
 import { useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Database, Plus, Upload, Filter, X, Download, Sparkles,
-  Wand2, FileSpreadsheet, Link2, Unlink, ChevronLeft,
+  Plus, Upload, Filter, X, Download, Sparkles, Wand2, FileSpreadsheet,
+  Link2, Unlink,
 } from 'lucide-react'
-import { usePelican } from '../../../stores/PelicanContext'
-import { useSettings } from '../../../stores/SettingsContext'
-import { SPRING_SMOOTH, SPRING_SNAPPY } from '../../../lib/constants'
+import { useFileShelf } from '../../stores/FileShelfContext'
+import { useSettings } from '../../stores/SettingsContext'
+import { SPRING_SMOOTH } from '../../lib/constants'
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -19,13 +35,12 @@ const staggerItem = {
 
 const ACCEPTED_TYPES = '.csv,.tsv,.xlsx,.xls,.json'
 
-export default function FileShelf({ conversationId, onNavigateBack }) {
+export default function FileShelf({ conversationId }) {
   const {
-    files, contextFiles, activeFileId, activeFile,
+    files, contextFiles, activeFileId,
     uploading, uploadError,
     setActiveFileId, uploadFile, toggleContext, removeFile,
-    activeFilters, removeFilter, addFilter,
-  } = usePelican()
+  } = useFileShelf()
 
   const fileInputRef = useRef(null)
 
@@ -47,37 +62,22 @@ export default function FileShelf({ conversationId, onNavigateBack }) {
     e.preventDefault()
   }, [])
 
+  const activeFile = files.find(f => f.id === activeFileId) || null
+
   return (
     <motion.div
-      initial={{ x: -260 }}
-      animate={{ x: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={SPRING_SMOOTH}
-      className="w-[260px] flex flex-col flex-shrink-0 bg-white plcn-shelf"
-      style={{ borderRight: '1px solid #F1F1EF' }}
+      className="flex flex-col w-full h-full"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
       {/* Header */}
-      <div className="p-4 flex items-center justify-between flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={onNavigateBack}
-            className="p-1.5 rounded hover:bg-[#F1F1EF] text-[#B8A070] transition-colors"
-            title="Back to Chats"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </motion.button>
-          <motion.div
-            animate={{ rotate: [0, -6, 6, 0] }}
-            transition={{ duration: 0.6, delay: 0.5, ease: 'easeInOut' }}
-          >
-            <Database className="w-4 h-4 text-[#B8A070]" />
-          </motion.div>
-          <span className="text-sm font-semibold text-[#191919]">Pelican</span>
-          <span className="text-[9px] text-[#787774] bg-[#B8A070]/10 px-1.5 py-0.5 rounded font-semibold tracking-wide">DATA</span>
-        </div>
+      <div className="px-1 pt-1 pb-3 flex items-center justify-between flex-shrink-0">
+        <h2 className="text-xs font-semibold text-[var(--p-text-primary)] uppercase tracking-wider">
+          File shelf
+        </h2>
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -103,7 +103,7 @@ export default function FileShelf({ conversationId, onNavigateBack }) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="mx-4 mb-3 px-3 py-2 bg-[#E03E3E]/8 border border-[#E03E3E]/20 rounded-lg"
+            className="mb-3 px-3 py-2 bg-[#E03E3E]/8 border border-[#E03E3E]/20 rounded-lg"
           >
             <p className="text-[11px] text-[#E03E3E] leading-relaxed">{uploadError}</p>
           </motion.div>
@@ -111,9 +111,9 @@ export default function FileShelf({ conversationId, onNavigateBack }) {
       </AnimatePresence>
 
       {/* Staged Files */}
-      <div className="px-4 pb-3 flex-shrink-0">
+      <div className="flex-shrink-0 mb-3">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider">Staged Files</h3>
+          <h3 className="text-[10px] font-medium text-[#787774] uppercase tracking-wider">Staged Files</h3>
           {files.length > 0 && (
             <span className="text-[10px] text-[#787774]">{contextFiles.size} in context</span>
           )}
@@ -167,9 +167,9 @@ export default function FileShelf({ conversationId, onNavigateBack }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="px-4 py-3 border-t border-[#F1F1EF] flex-shrink-0"
+            className="border-t border-[#F1F1EF] pt-3 mb-3 flex-shrink-0"
           >
-            <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider mb-3">Active Dataset</h3>
+            <h3 className="text-[10px] font-medium text-[#787774] uppercase tracking-wider mb-3">Active dataset</h3>
             <div className="space-y-2">
               <StatRow label="File" value={activeFile.name} />
               <StatRow label="Rows" value={activeFile.rows.toLocaleString()} />
@@ -189,56 +189,15 @@ export default function FileShelf({ conversationId, onNavigateBack }) {
         )}
       </AnimatePresence>
 
-      {/* Filters */}
-      <AnimatePresence>
-        {activeFilters.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="px-4 py-3 border-t border-[#F1F1EF] flex-1"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider">Filters</h3>
-              <span className="text-[10px] text-[#B8A070] font-semibold">{activeFilters.length} active</span>
-            </div>
-            <div className="space-y-2">
-              {activeFilters.map((f, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  className="flex items-center gap-2 px-3 py-2 bg-[#B8A070]/5 border border-[#B8A070]/15 rounded-lg"
-                >
-                  <Filter className="w-3 h-3 text-[#B8A070] flex-shrink-0" />
-                  <span className="text-[11px] text-[#191919] flex-1 truncate">
-                    <span className="font-semibold">{f.column}</span> {f.op} {Array.isArray(f.values) ? f.values.join(', ') : f.values}
-                  </span>
-                  <motion.button
-                    whileHover={{ scale: 1.2 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => removeFilter(i)}
-                    className="text-[#787774] hover:text-[#E03E3E] transition-colors"
-                  >
-                    <X className="w-3 h-3" />
-                  </motion.button>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Spacer */}
-      <div className="flex-1" />
+      <div className="flex-1 min-h-0" />
 
       {/* Quick Actions */}
-      <div className="px-4 py-3 border-t border-[#F1F1EF] flex-shrink-0">
+      <div className="border-t border-[#F1F1EF] pt-3 flex-shrink-0">
         <div className="space-y-1">
-          <QuickAction icon={Download} label="Export Results" disabled={files.length === 0} />
-          <QuickAction icon={Sparkles} label="Auto-Analyze" accent disabled={files.length === 0} />
-          <QuickAction icon={Wand2} label="Suggest Charts" disabled={files.length === 0} />
+          <QuickAction icon={Download} label="Export results" disabled={files.length === 0} />
+          <QuickAction icon={Sparkles} label="Auto-analyze" accent disabled={files.length === 0} />
+          <QuickAction icon={Wand2} label="Suggest charts" disabled={files.length === 0} />
         </div>
       </div>
     </motion.div>
@@ -308,6 +267,17 @@ function FileCard({ file, active, inContext, onClick, onToggleContext, onRemove 
         title={inContext ? 'In context. Click to remove' : 'Click to add to context'}
       >
         {inContext ? <Link2 className="w-3 h-3" /> : <Unlink className="w-3 h-3" />}
+      </motion.button>
+
+      {/* Remove */}
+      <motion.button
+        whileHover={{ scale: 1.15 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={(e) => { e.stopPropagation(); onRemove() }}
+        className="absolute bottom-2 right-2 p-1 rounded-md text-[#9B9A97] hover:text-[#E03E3E] transition-colors opacity-0 hover:opacity-100"
+        title="Remove file"
+      >
+        <X className="w-3 h-3" />
       </motion.button>
     </motion.div>
   )

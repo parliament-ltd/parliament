@@ -4,7 +4,13 @@
 // column / schema details, and a docked input bar beneath the canvas.
 //
 // Slot inventory matches refactor/v2-phase1-audit.md §2.1:
-//   left-rail (single) | canvas (single) + input-dock (single) | chat-panel (stack) + inspector (stack)
+//   left-rail (single) | canvas (stack) + input-dock (single) | chat-panel (stack) + inspector (stack)
+//
+// PR-11a: canvas capacity bumped from 'single' to 'stack' so the Data
+// Workspace template can stack chart-canvas + table-canvas + summary-dashboard
+// vertically. V1 Pelican toggled between them via tabs; the V2 decomposition
+// scrolls instead, since each canvas component now ships its own empty-state
+// when no file-shelf is present in the room (per audit §3.17).
 
 const RAIL_BASE   = 'flex flex-col gap-3 p-3 overflow-y-auto bg-white'
 const RAIL_BORDER = 'border-[var(--p-border)]'
@@ -21,7 +27,7 @@ export default {
   scope: 'room',
   slots: [
     { id: 'left-rail',  capacity: 'single' },
-    { id: 'canvas',     capacity: 'single' },
+    { id: 'canvas',     capacity: 'stack'  },
     { id: 'chat-panel', capacity: 'stack'  },
     { id: 'inspector',  capacity: 'stack'  },
     { id: 'input-dock', capacity: 'single' },

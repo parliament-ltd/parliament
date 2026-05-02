@@ -45,11 +45,16 @@
 //     hold at most one component. Mode-file authors are trusted in
 //     Phase 1. Target: enforce when the editor (PR-8) starts producing
 //     mode files automatically.
-//   - softDependencies aggregation: components declare them on the
-//     manifest, but RoomShell does not check whether the dependency is
-//     present in the room or render the declared fallbackUI. Target:
-//     PR-11a, when chart/table/summary canvas components need the
-//     "Add a File shelf component to provide data" empty state.
+//   - softDependencies aggregation: PR-11a wires this. Each resolved
+//     component's manifest may declare softDependencies in the form
+//     [{ component: 'file-shelf@1.0', fallbackUI: 'data-source-needed' }].
+//     RoomShell collects every present component's `name@version` ref,
+//     then for each dependent component checks whether the named
+//     dependency is in that set; if not, it substitutes the empty-state
+//     template (looked up via catalog/emptyStates.jsx) for the real
+//     render. The chart-canvas / table-canvas / summary-dashboard trio
+//     uses this to surface "<canvas> needs data — add a File shelf"
+//     when no file-shelf@1.0 is in the room.
 //   - contributions.messageActions aggregation: PR-5 wires this. RoomShell
 //     scans the resolved component list, collects every entry's
 //     `contributions.messageActions`, and exposes the merged list on
@@ -61,6 +66,7 @@
 import { useMemo } from 'react'
 import { getEntry as getComponentEntry } from '../catalog'
 import { getLayoutEntry } from '../catalog/layouts'
+import { getEmptyStateTemplate } from '../catalog/emptyStates'
 import { createHostAPI } from '../lib/hostAPI'
 
 /**
@@ -125,12 +131,18 @@ export default function RoomShell({ mode, hostAPI: hostAPIProp }) {
   // Sort first so insertion order into slotContents reflects component order.
   const ordered = [...(mode.components || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
 
+  // Resolve every spec to an entry up front so softDependencies can be
+  // checked against the actual mounted set (not just declared ids). A
+  // mode that names file-shelf@1.0 but the catalog doesn't know about
+  // it shouldn't satisfy the dependency.
+  const resolved = []
   for (const spec of ordered) {
     if (!spec || !spec.ref || !spec.slot) {
       skipped.push({ id: spec?.id, reason: 'missing ref or slot' })
       continue
     }
-    const entry = getComponentEntry(normalizeRef(spec.ref))
+    const ref = normalizeRef(spec.ref)
+    const entry = getComponentEntry(ref)
     if (!entry) {
       skipped.push({ id: spec.id, reason: `unknown component ref ${spec.ref}` })
       continue
@@ -139,7 +151,34 @@ export default function RoomShell({ mode, hostAPI: hostAPIProp }) {
       skipped.push({ id: spec.id, reason: `slot '${spec.slot}' not declared by ${layoutRef}` })
       continue
     }
+    resolved.push({ spec, entry, ref })
+  }
 
+  // Build the set of present component refs once for soft-dep lookup.
+  // Includes both `name@version` and the bare `name` form so a
+  // softDependency declared as 'file-shelf@1.0' resolves regardless of
+  // whether the room pinned the same patch version.
+  const presentRefs = new Set()
+  const presentNames = new Set()
+  for (const { ref } of resolved) {
+    presentRefs.add(ref)
+    presentNames.add(ref.split('@')[0])
+  }
+
+  function softDependencyMissing(entry) {
+    const deps = entry.softDependencies
+    if (!Array.isArray(deps) || deps.length === 0) return null
+    for (const dep of deps) {
+      if (!dep || !dep.component) continue
+      const depRef = normalizeRef(dep.component)
+      const depName = depRef.split('@')[0]
+      if (presentRefs.has(depRef) || presentNames.has(depName)) continue
+      return { dep, depRef, depName }
+    }
+    return null
+  }
+
+  for (const { spec, entry, ref } of resolved) {
     // Collect message-action contributions. Stamp each with the contributing
     // componentId + ref so handlers (wired at PR-10a) can route back to the
     // owning component. Components are iterated in `order`, so the resulting
@@ -151,12 +190,33 @@ export default function RoomShell({ mode, hostAPI: hostAPIProp }) {
         messageActions.push({
           ...a,
           componentId: spec.id,
-          contributedBy: normalizeRef(spec.ref),
+          contributedBy: ref,
         })
       }
     }
 
     if (!slotContents[spec.slot]) slotContents[spec.slot] = []
+
+    const missing = softDependencyMissing(entry)
+    if (missing) {
+      // Substitute the empty-state template for the real render. The
+      // dependent component's render never runs while the dependency is
+      // absent — this prevents canvas components from crashing on
+      // missing useFileShelf state and gives mode authors a clear
+      // pointer at what to add.
+      const Fallback = getEmptyStateTemplate(missing.dep.fallbackUI)
+      const missingEntry = getComponentEntry(missing.depRef)
+      slotContents[spec.slot].push(
+        <Fallback
+          key={spec.id || `${spec.ref}-${slotContents[spec.slot].length}`}
+          componentDisplayName={entry.displayName || entry.name}
+          missingComponent={missing.depRef}
+          missingComponentDisplay={missingEntry?.displayName || missing.depName}
+        />
+      )
+      continue
+    }
+
     // Mount the render function as a React component (via JSX) rather than
     // invoking it imperatively, so entries are free to use hooks internally.
     const RenderFn = entry.render
