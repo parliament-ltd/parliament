@@ -43,6 +43,9 @@ import chartCanvasEntry      from './entries/chart-canvas'
 import tableCanvasEntry      from './entries/table-canvas'
 import summaryDashboardEntry from './entries/summary-dashboard'
 import columnInspectorEntry  from './entries/column-inspector'
+import documentCanvasEntry   from './entries/document-canvas'
+import claudeCommentsEntry   from './entries/claude-comments'
+import rippleAnalysisEntry   from './entries/ripple-analysis'
 import { validateManifest, entryRef } from './validate'
 
 const REGISTRY = new Map()
@@ -86,6 +89,10 @@ register(chartCanvasEntry)
 register(tableCanvasEntry)
 register(summaryDashboardEntry)
 register(columnInspectorEntry)
+// PR-11b — Secretarybird decomposition.
+register(documentCanvasEntry)
+register(claudeCommentsEntry)
+register(rippleAnalysisEntry)
 
 /**
  * Look up a manifest entry by `name@version` ref. Exact-match only in PR-2;

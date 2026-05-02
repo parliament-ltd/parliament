@@ -1797,6 +1797,192 @@ pelican conversations).
 
 ---
 
+## PR-11b — Decompose Secretarybird into 3 catalog components
+
+👀 User-visible. Largest single-file decomposition in Phase 1 (V1
+SecretarybirdChatLayout was 2928 lines, the largest single file in the
+V1 codebase). V1 Secretarybird disappears as an adapter; the same
+document-editing room is now expressed as a Drafting Desk template
+composed of document-canvas + claude-comments + ripple-analysis +
+the existing messages / input catalog entries.
+
+**Surface:** `/chat/:id` for any conversation in a Drafting Desk room
+(the `drafting-desk@1.0` libraryRoom — open via the homepage's
+"+ Build a room" → Drafting Desk template, or via PR-10a-migrated
+secretarybird conversations).
+
+### Setup
+- A Drafting Desk conversation. Easiest path: open the homepage,
+  use "+ Build a room" → Drafting Desk, then open the resulting chat.
+- For migration testing: a pre-PR-11b conversation in the same dev DB
+  whose mode uses `document-centric@^1.0` and lacks `document-canvas`
+  in its components — DevTools → IndexedDB → `modes` → confirm the
+  components array doesn't include a `document-canvas@^1.0` entry.
+- For sbrd_documents survival testing: a pre-PR-11b secretarybird
+  conversation with paragraphs / comments / ripple flags already
+  saved to `sbrd_documents`.
+
+### Boot-time decomposition migration
+
+- [ ] Fresh boot. DevTools → IndexedDB → `settings`. After init:
+  - `migration_v2_secretarybird_room_decomposed` = true.
+- [ ] DevTools → `modes` → any record where `layout.ref` starts
+  `document-centric` and `buildIntent.derivedFrom` was previously
+  `secretarybird-migration` now has `decomposedAt: 'pr-11b'` plus a
+  5-component list (document-canvas + claude-comments + ripple-analysis +
+  messages + input). Components have fresh ids.
+- [ ] Clear `migration_v2_secretarybird_room_decomposed`, reload.
+  The pass re-runs but skips every room (per-room "already has
+  document-canvas" guard); the flag flips back to true.
+
+### Library re-seed
+
+- [ ] DevTools → `libraryRooms` → `drafting-desk@1.0` → `seedVersion`
+  is 2 (PR-11b bump). Component list matches the PR-11b shape.
+- [ ] Set `seedVersion: 1` on the record manually, reload. The seed
+  function overwrites the record back to seedVersion 2 with the
+  current component list.
+
+### Drafting Desk room — empty state
+
+- [ ] Open a Drafting Desk conversation that has no saved document.
+  The document slot renders the paper with one empty paragraph
+  ("Start writing here…" placeholder). The margin slots show the
+  Comments section (empty) and Ripple section (no impacts detected).
+- [ ] Type into the first paragraph. Auto-save fires after 1s
+  (DevTools → `sbrd_documents` shows the new record with the typed
+  text in `paragraphs[0].text`).
+
+### Soft-dependency contract
+
+- [ ] DevTools edit a Drafting Desk mode and remove the
+  `document-canvas@^1.0` entry from its components, save. Reload the chat.
+  Each margin component (claude-comments / ripple-analysis) renders the
+  `document-source-needed` empty-state template ("Comments needs a
+  document — Add a Document canvas component to this room to enable
+  annotations") instead of attempting to render against an absent
+  paragraph state.
+- [ ] Add the document-canvas entry back. Empty states disappear; both
+  margin components render normally against the active document.
+
+### Existing user data survives
+
+- [ ] Open a pre-PR-11b secretarybird conversation that was saved with
+  paragraphs / comments / ripple flags. The document loads correctly,
+  comments appear in the claude-comments margin pane, ripple flags
+  appear in ripple-analysis (when rippleEnabled is on). No data loss.
+- [ ] sbrd_documents record schema unchanged: `{ conversationId,
+  paragraphs, suggestionStates, submittedReplies, updatedAt }`. PR-11b
+  doesn't bump `DB_VERSION` — the store is the same one PR-7's
+  validator covered.
+
+### Document editing surface
+
+- [ ] Type a `/` at the start of an empty paragraph → slash menu opens
+  with Title / Heading 1 / Heading 2 / Quote options. Arrow keys
+  navigate, Enter commits, Escape closes.
+- [ ] Press Enter mid-paragraph → split into two paragraphs, cursor
+  lands in the new paragraph at offset 0.
+- [ ] Press Backspace at the start of a non-first paragraph → merge
+  into the previous paragraph, cursor lands at the join point.
+- [ ] Edit a paragraph's text. Toggle the Markup button in the toolbar
+  → the text becomes a transparent caret with a diff overlay showing
+  the original (strikethrough red) and inserted (underlined blue)
+  words. Toggle off — back to clean text.
+- [ ] In Markup mode the comment / suggestion gutter appears at 35%
+  width to the right of paragraphs that have annotations. Plain
+  paragraphs span the full width.
+
+### Comment add / reply / Claude reply lifecycle
+
+- [ ] Highlight text inside a paragraph → floating "Add comment" button
+  appears just above the selection. Click it → inline comment input
+  opens with the highlighted text shown as the comment's anchor.
+- [ ] Type a comment, press Enter → comment appears in the
+  claude-comments margin pane and (in markup mode) inside the document
+  gutter. Selected-text snippet shows above the comment body.
+- [ ] Press Ctrl+Alt+M while text is selected → same flow without the
+  floating button.
+- [ ] Click "Reply" on a comment → reply input appears. Type a reply,
+  press Enter → user reply persists below the comment in both surfaces.
+- [ ] Click the trash icon on a comment (sidebar or gutter) → comment
+  disappears from both surfaces.
+
+### Submit & Branch flow
+
+- [ ] Make some edits + add at least one comment. Click "Submit Edits"
+  in the toolbar → confirmation modal opens with summary
+  (paragraphs changed, comment count, ripple-will-run note).
+- [ ] Click "Submit & Branch" → "Sending to Claude…" loader appears.
+  DevTools Network shows a single Composer-tier `claude-sonnet`
+  request whose system prompt includes the document state, the
+  comments list, and the ripple-flag JSON shape (when rippleEnabled).
+- [ ] Once the call returns: any commentReplies render as Claude's
+  reasoning under the corresponding comment cards. Any rippleFlags
+  render in the ripple-analysis pane. A new branch conversation is
+  created with `parentId` = source id and `room` copied from the
+  source. Toast appears: "Edits submitted. A new branch was created."
+- [ ] Open the branch from the conversation list — it renders via
+  RoomShell (Drafting Desk template), the document loads with its
+  paragraphs, baselines reset to current text (no tracked-changes
+  highlights), comments cleared.
+
+### Ripple toggle + scope
+
+- [ ] Toggle the Ripple bell in the ripple-analysis margin pane off.
+  Submit Edits — the system prompt no longer asks Claude for
+  rippleFlags / rippleSuggestions. Toggle back on, submit again —
+  ripple shape returns to the prompt.
+- [ ] Click "Expand Scope" → RippleScopeModal opens with a list of
+  other conversations. Select a few. The token estimate updates.
+  Click "Scan N Chats" → per-target Composer-tier `claude-haiku`
+  calls fire (DevTools Network shows them sequentially); flag count
+  surfaces on completion.
+- [ ] Tick "Save Scope" before scanning → DevTools → `settings` key
+  `sbrd-ripple-scope-<conversationId>` stores the selected ids.
+- [ ] Tick "Generate Revision Manifest" → after scan,
+  `sbrd-ripple-manifest-<conversationId>` stores the entries.
+
+### Conversation switch lifecycle
+
+- [ ] Open conversation A (Drafting Desk), edit some paragraphs.
+  Navigate to conversation B (different Drafting Desk). B's
+  document loads cleanly (its own paragraphs, not A's).
+  Navigate back to A — A's edits are still there (auto-save
+  persisted). UI state (markup mode, expanded comments,
+  active-comment highlight) resets per V1 lifetime.
+- [ ] Navigate `/chat/A → / → /chat/A` (transient null window).
+  Document state survives — the "two distinct non-null ids"
+  reset guard ignores the homepage detour.
+
+### Albatross / V1 chat surface no longer exists
+
+- [ ] `src/adapters/secretarybird/` directory is gone. No production
+  imports survive.
+- [ ] Production bundle (`dist/assets/index-*.js`) symbol-greps
+  positive for `document-canvas`, `claude-comments`,
+  `ripple-analysis`, `document-source-needed`,
+  `migration_v2_secretarybird_room_decomposed`, `DocumentContext`,
+  `DocumentProvider`. Confirms PR-11b code shipped in the build.
+
+### Out of scope (don't test here)
+
+- [ ] Per-edit ripple analysis. Project memory note
+  `project_secretarybird_ripple_phase2` covers this Phase 2 surface
+  (analysis runs on each edit, fix suggestions surface as
+  claudeSuggestions, post-branch review flow). PR-11b stays with V1's
+  cross-paragraph-on-Submit only behavior.
+- [ ] Document-canvas autosave or version history beyond what V1
+  secretarybird did (one record per conversation in `sbrd_documents`,
+  branches create separate records).
+- [ ] Per-component permission grants for `sbrd_documents` writes —
+  Phase 2 consent flow.
+- [ ] Cross-component compose dispatch beyond the three Phase 1 bus
+  events (e.g. claude-comments populating the chat input). Same
+  Phase 2 punt PR-11a took for column-inspector's V1 action chips.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

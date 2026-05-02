@@ -1,13 +1,18 @@
-// Shared empty-state templates for soft dependencies (PR-11a).
+// Shared empty-state templates for soft dependencies (PR-11a, PR-11b).
 //
 // A catalog entry can declare `softDependencies: [{ component, fallbackUI }]`
 // to say "I need component X to be present in the room; if it isn't,
 // render the fallbackUI keyed below instead of my real UI."
 //
-// PR-11a wires the first three keys: 'data-source-needed' for the
-// chart / table / summary canvas trio (which need file-shelf@1.0 to
-// supply data), and a generic 'component-not-present' fallback the
-// validator points at if the manifest doesn't name a known key.
+// PR-11a wired the first keys:
+//   - 'data-source-needed' for the chart / table / summary canvas trio
+//     (which need file-shelf@1.0 to supply data)
+//   - 'component-not-present' generic fallback the validator points at
+//     if the manifest doesn't name a known key.
+//
+// PR-11b adds:
+//   - 'document-source-needed' for the claude-comments / ripple-analysis
+//     pair (which need document-canvas@1.0 to supply paragraph state).
 //
 // Aggregation lives in RoomShell — it walks each component's manifest
 // softDependencies, checks whether the dependency is present in the
@@ -20,7 +25,7 @@
 // summary-dashboard trio with this contract; future canvas-shaped
 // components (Phase 2 visualization@1.0 etc.) reuse the same template.
 
-import { Database, Plus } from 'lucide-react'
+import { Database, FileText, Plus } from 'lucide-react'
 
 function CanvasEmptyState({ componentDisplayName, missingComponentDisplay }) {
   return (
@@ -45,6 +50,25 @@ function CanvasEmptyState({ componentDisplayName, missingComponentDisplay }) {
   )
 }
 
+function MarginEmptyState({ componentDisplayName, missingComponentDisplay }) {
+  return (
+    <div className="px-4 py-6">
+      <div className="text-center">
+        <div className="w-10 h-10 rounded-2xl bg-[#B8A070]/8 border border-dashed border-[#B8A070]/25 flex items-center justify-center mx-auto mb-3">
+          <FileText className="w-4 h-4 text-[#B8A070]/50" />
+        </div>
+        <h3 className="text-xs font-semibold text-[var(--p-text-primary)] mb-1">
+          {componentDisplayName} needs a document
+        </h3>
+        <p className="text-[11px] text-[var(--p-text-secondary)] leading-relaxed">
+          Add a <span className="font-medium text-[var(--p-text-primary)]">{missingComponentDisplay}</span> component
+          to this room to enable annotations.
+        </p>
+      </div>
+    </div>
+  )
+}
+
 function GenericMissing({ componentDisplayName, missingComponentDisplay }) {
   return (
     <div className="m-4 px-4 py-3 rounded-lg border border-[var(--p-border)] bg-[var(--p-code-bg,#F7F6F3)] text-sm text-[var(--p-text-secondary)]">
@@ -62,6 +86,7 @@ function GenericMissing({ componentDisplayName, missingComponentDisplay }) {
  */
 export const EMPTY_STATE_TEMPLATES = Object.freeze({
   'data-source-needed': CanvasEmptyState,
+  'document-source-needed': MarginEmptyState,
   'component-not-present': GenericMissing,
 })
 

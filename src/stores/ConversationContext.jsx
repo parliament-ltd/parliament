@@ -11,6 +11,7 @@ import {
   migrateRepairNullRooms,
   migrateInjectVoiceInput,
   migrateDecomposeDataWorkspaceRooms,
+  migrateDecomposeDraftingDeskRooms,
 } from '../lib/migration'
 
 const ConversationContext = createContext(null)
@@ -48,6 +49,7 @@ export function ConversationProvider({ children }) {
         await migrateRepairNullRooms()
         await migrateInjectVoiceInput()
         await migrateDecomposeDataWorkspaceRooms()
+        await migrateDecomposeDraftingDeskRooms()
       } catch (err) {
         // A migration failure should not block conversation listing.
         // ChatView's null-room repair path catches any room-assignment

@@ -9,6 +9,7 @@ import { AnnotationsProvider } from './stores/AnnotationsContext'
 import { BranchPanelProvider } from './stores/BranchPanelContext'
 import { CollabModeProvider } from './stores/CollabModeContext'
 import { FileShelfProvider } from './stores/FileShelfContext'
+import { DocumentProvider } from './stores/DocumentContext'
 import BranchShortcutHandler from './components/BranchShortcutHandler'
 import { PWAProvider } from './stores/PWAContext'
 import { BackupProvider } from './stores/BackupContext'
@@ -48,6 +49,7 @@ export default function App() {
                 <BranchPanelProvider>
                 <CollabModeProvider>
                 <FileShelfProvider>
+                <DocumentProvider>
                 <BrowserRouter>
                   <BackupProvider>
                   <BranchShortcutHandler />
@@ -74,6 +76,7 @@ export default function App() {
                   </Routes>
                   </BackupProvider>
                 </BrowserRouter>
+                </DocumentProvider>
                 </FileShelfProvider>
                 </CollabModeProvider>
                 </BranchPanelProvider>

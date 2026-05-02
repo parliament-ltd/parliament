@@ -336,6 +336,9 @@ What this means in practice for each component:
 | `table-canvas@1.0` | Same as chart-canvas. Sort state is local (V1 PelicanContext kept it global so it persisted across tab toggles; V2 stacks canvases instead of toggling). | PR-11a |
 | `summary-dashboard@1.0` | `useFileShelf()` + `useChat()` for activeConversationId. Composer tier — V1's auto-generate-on-load was an Agent-tier autonomous call; PR-11a removed it and gates generation behind an explicit "Generate insights" button per [tier-classification.md](tier-classification.md). | PR-11a |
 | `column-inspector@1.0` | `useFileShelf()` for columnStats of the active file. V1's per-column "Group by / Filter / Visualize" action chips that populated the chat input are NOT wired; cross-component compose dispatch beyond the three Phase 1 bus events is a Phase 2 concern. | PR-11a |
+| `document-canvas@1.0` | New App.jsx-mounted `DocumentContext` owns `sbrd_documents` IndexedDB state — paragraphs, submittedReplies, plus shared UI state for markup mode / active comment / hovered ripple / reply lifecycle. Resets when `useChat().activeConversationId` transitions between two distinct non-null ids. document-canvas is the only writer; auto-saves to `sbrd_documents` via 1s debounce. Owns the toolbar (Markup, Accept All, Clear All, Export, Submit Edits), the contentEditable paper + slash menu, the Submit & Branch flow (Composer-tier Claude call against the V1 verbatim prompt — comment replies + optional ripple flags + ripple suggestions in one JSON blob — followed by a `createConversation` call that copies the source conversation's `room`). | PR-11b |
+| `claude-comments@1.0` | `useDocument()` for paragraphs / comments / suggestion state and the comment / suggestion mutators. Side-rail surface for the per-paragraph comment thread + Claude-origin / Claude-suggestion accept-reject cards. Reply lifecycle is user-driven; Claude replies on user comments come from document-canvas's Submit & Branch flow (the single combined Composer call). softDependency on `document-canvas@1.0` → RoomShell substitutes the `document-source-needed` empty-state template when no document-canvas is in the room. | PR-11b |
+| `ripple-analysis@1.0` | `useDocument()` for paragraphs[i].ripple state + the rippleEnabled toggle that gates whether Submit asks Claude for ripple flags. Owns the side-rail flag list + dismiss UI and the Expand Scope cross-document scan modal (per-target Composer-tier Haiku call, only fires on user click). softDependency on `document-canvas@1.0` — same contract as claude-comments. | PR-11b |
 
 **Conversation activation is the route shell's job.** When `/chat/:id`
 loads a conversation, the route calls `useChat().loadMessages(id)` and
@@ -415,6 +418,23 @@ late ones, while the bus is non-sticky and would force every reader to
 maintain its own mirror. Future plugin components and the editor's
 continuous-validation surface (Phase 2) can subscribe via the bus.
 
+**A fifth shared context for document state.** PR-11b adds
+`DocumentContext` for the drafting-desk decomposition. `document-canvas@1.0`
+is the only writer (paragraph edits, comment add/delete, suggestion
+accept/reject, ripple dismiss, Submit & Branch); `claude-comments@1.0`
+and `ripple-analysis@1.0` are readers that dispatch back through the
+context's mutators. Lifetime mirrors FileShelfContext: resets when
+`activeConversationId` transitions between two distinct non-null ids;
+transient nulls are ignored so a conversation→homepage→conversation
+round trip preserves the editing state (matches V1
+SecretarybirdChatLayout's per-mount lifetime). The context owns the
+auto-save 1s debounce against the existing `sbrd_documents` IndexedDB
+store (the schema and validator land back at PR-7 and survived the
+decomposition unchanged) and the Submit & Branch flow that fires the
+single combined Composer-tier call (comment replies + optional ripple
+flags + ripple suggestions). The bus stays at three Phase 1 events —
+PR-11b does not expand it.
+
 ### 2.9 Things that don't fit cleanly
 
 - **`pins` IndexedDB store** — used by branch-transfer "Pin for reference" flow. Stays as backing data for `branches@1.0`. Not a Persister-tier concern (Persister is reserved for cross-mode shared stores per architecture §5g).
@@ -455,7 +475,7 @@ Per [data-migration.md](data-migration.md):
 
 Two consequences:
 
-- The integrity check in [runIntegrityCheck](src/lib/db.js:537-554) has a special case ("don't delete Secretarybird conversations without messages if they have a sbrd_document"). Survives Phase 1.
+- The integrity check in [runIntegrityCheck](src/lib/db.js:537-554) has a special case ("don't delete Secretarybird conversations without messages if they have a sbrd_document"). Survives Phase 1 — PR-11b's decomposition moves the *components* that own the store (V1 SecretarybirdChatLayout → V2 `document-canvas@1.0` via DocumentContext), but the store schema, the integrity-check special case, and the validator added at PR-7 are all runtime invariants that don't depend on adapter code.
 - **Backup validator gap:** [validate.js](src/lib/validate.js) does not validate `sbrd_documents`. PR-7 adds validators for all stores including `sbrd_documents` and the new V2 ones.
 
 ### 3.5 — Branch creation multi-store atomicity (low impact, defer fix)
@@ -523,6 +543,8 @@ Per §2.4 and NQ-7. Each of `chart-canvas, table-canvas, summary-dashboard` rend
 
 **Resolved in PR-11a.** `src/catalog/emptyStates.jsx` ships the keyed templates (`data-source-needed` for the canvas trio, `component-not-present` for unknown / generic fallbacks). RoomShell's softDependencies aggregation walks the resolved component list; for any dependent whose dependency isn't present, the empty-state template replaces the real render entirely. The dependent's render function never runs while the dependency is absent — no FileShelfContext null-check noise inside individual canvas components.
 
+**Extended in PR-11b.** A new `document-source-needed` template covers the drafting-desk shape: `claude-comments@1.0` and `ripple-analysis@1.0` declare `softDependencies: [{ component: 'document-canvas@1.0', fallbackUI: 'document-source-needed' }]`. Same RoomShell aggregation, same template-substitution behavior — without `document-canvas@1.0` there are no paragraphs to comment on or analyze, so the margin slots render the empty state instead.
+
 ### 3.18 — `createdInMode` migration is one-shot and irreversible
 
 PR-10a's migration assigns `room` based on `createdInMode`. After that, `createdInMode` is meaningless. Phase 1 keeps the field in records for at least one release for debugging — strip in a later cleanup PR.
@@ -568,8 +590,8 @@ CSP currently allows `connect-src 'self' https://api.anthropic.com`. Adding Olla
 - PR-10a.9 — Wire `collab-mode@1.0` system-prompt builder via a new shared `CollabModeContext` consumed by `input@1.0` + `messages@1.0` ghost-continue, plus `review@1.0` live render with synthesis call + Markdown export.
 - PR-10a.10 — Wire per-message Hide / Delete (20s undo) / Send to branch / Pin for reference. New `SelectConversationModal` extracted from V1's MoveToBranchModal serves both transfer flows. Pinned references render as a collapsible quote-block list at the top of the active conversation's msg-area.
 - PR-10b — Delete adapter directories (Albatross, Kingfisher, Starling) + remove InputArea built-in mic + rotate PWA cache + inject `voice-input@1.0` for migrated mobile users.
-- PR-11a — Decompose Pelican into 6 catalog components.
-- PR-11b — Decompose Secretarybird into 3 catalog components.
+- PR-11a — Decompose Pelican into 5 catalog components.
+- PR-11b — Decompose Secretarybird into 3 catalog components (document-canvas + claude-comments + ripple-analysis). New App.jsx-mounted `DocumentContext` (fifth shared context). Adds `document-source-needed` empty-state template for soft-dep on `document-canvas@1.0`.
 - PR-12 — Cleanup (delete `withComingSoon`, `modeSuggestions`, `ModeSuggestion`; consolidate `tokens.js` to provider; archive mockups; update README/SECURITY/etc.).
 
 **Pause points:** after PR-3 (architecture review), PR-7 (data review), PR-9 (UX review), PR-10a (migration validation — must pass before PR-10b lands).
