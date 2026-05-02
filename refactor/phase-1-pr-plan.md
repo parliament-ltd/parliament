@@ -617,22 +617,37 @@
 **Goal:** Secretarybird functionality fully expressed as catalog components.
 
 **Scope:**
-- Three catalog entries:
-  - `document-canvas@1.0` — Composer; owns `sbrd_documents` IndexedDB store. Reads/writes paragraphs, suggestionStates, submittedReplies.
-  - `claude-comments@1.0` — Composer; comment sidebar + lifecycle. Generates Claude replies on user click.
-  - `ripple-analysis@1.0` — Composer; cross-paragraph analysis runs on user-initiated Submit.
-- Update Drafting Desk template (PR-9) to use the decomposition: document-canvas in `document` slot, claude-comments + ripple-analysis in `margin` slots.
-- Migrate any conversation with `createdInMode === 'secretarybird'` to the updated Drafting Desk template.
-- Delete `src/adapters/secretarybird/`.
+- Three new catalog entries (plus reuse of existing `messages@1.0` + `input@1.0` for the conversational drafting side of the room):
+  - `document-canvas@1.0` — Composer tier. Owns the `sbrd_documents` IndexedDB store via the new App.jsx-mounted [DocumentContext](src/stores/DocumentContext.jsx). Auto-saves paragraphs / submittedReplies via 1s debounce. Owns the toolbar (Markup, Accept All, Clear All, Export, Submit Edits), the contentEditable paper + slash menu + tracked-changes overlay, the floating selection→Add-Comment tooltip, and the Submit & Branch flow (single combined Composer-tier Claude call against the V1 verbatim prompt — comment replies + optional ripple flags + ripple suggestions in one JSON blob — followed by `createConversation` that copies the source's `room`). Targets the `document` slot in document-centric@1.0 (capacity: `single`).
+  - `claude-comments@1.0` — Composer tier. Per-paragraph comment sidebar with reply lifecycle. User-driven add / delete / reply; Claude replies on user comments come from document-canvas's Submit & Branch flow (NOT autonomous — Phase 1 ships zero Agent components per [tier-classification.md](tier-classification.md)). Targets the `margin` slot (capacity: `stack`, order 0).
+  - `ripple-analysis@1.0` — Composer tier. Cross-paragraph analysis flag list + dismiss UI; cross-document scan via the Expand Scope modal (per-target Composer-tier Haiku call, only fires on user click). Owns the Ripple toggle that gates whether Submit asks Claude for ripple flags. Targets the `margin` slot (order 1, after claude-comments).
+- New `document-source-needed` empty-state template in `src/catalog/emptyStates.jsx` (margin-shape variant — smaller form factor than the canvas `data-source-needed` template). The claude-comments / ripple-analysis pair declare `softDependencies: [{ component: 'document-canvas@1.0', fallbackUI: 'document-source-needed' }]`. RoomShell's softDependencies aggregation (introduced in PR-11a) substitutes the empty-state for the dependent component's render whenever the dependency isn't present in the room.
+- Update Drafting Desk template seed: document-canvas in `document`; claude-comments + ripple-analysis stacked in `margin`; messages + input in `chat-panel`. Bump `drafting-desk@1.0` seedVersion to 2 in [seedTemplates.js](src/lib/seedTemplates.js) — PR-11a's `seedVersionFor()` helper handles re-seeding on next boot when stored version is below current.
+- New `migrateDecomposeDraftingDeskRooms` pass in [lib/migration.js](src/lib/migration.js), wired alongside the existing PR-10a/PR-10b/PR-11a passes in `ConversationContext`. Mirrors the PR-11a pass shape: rewrites every mode using `document-centric@^1.0` AND not already including `document-canvas@1.0` to the new component list. Per-room idempotent (skips rooms already on the new shape) + whole-pass guard via `migration_v2_secretarybird_room_decomposed`. Tags rewritten modes with `buildIntent.derivedFrom = 'secretarybird-decomposition'` (preserving any prior `secretarybird-migration` tag from PR-10a) plus `decomposedAt: 'pr-11b'`. Covers both PR-10a-secretarybird-migrated rooms AND fresh drafting-desk rooms created from the V1 placeholder seed.
+- New App.jsx-mounted `DocumentContext` (the fifth shared context after Annotations / BranchPanel / CollabMode / FileShelf). Lifetime mirrors FileShelfContext: resets when `useChat().activeConversationId` transitions between two distinct non-null ids; transient nulls ignored. The bus stays at three Phase 1 events — PR-11b does not expand it.
+- The 2928-line V1 [SecretarybirdChatLayout](src/adapters/secretarybird/ChatLayout.jsx) is decomposed into focused files under `src/components/core/`:
+  - `DocumentCanvas.jsx` — toolbar, paper, paragraph rendering, Submit confirmation modal, toast.
+  - `ClaudeComments.jsx` — sidebar comment + suggestion list.
+  - `RippleAnalysis.jsx` — sidebar ripple flag list + Expand Scope trigger.
+  - `sbrd/DocumentParagraph.jsx` — single contentEditable row with slash menu, diff overlay, inline gutter.
+  - `sbrd/cards.jsx` — ClaudeOriginCard / ClaudeSuggestionCard / MarginComment / CommentCard / RippleCard / SidebarSectionLabel primitives.
+  - `sbrd/diff.js` — wordDiff + DOM cursor helpers.
+  - `sbrd/renderers.jsx` — DiffText / HighlightedText / ClaudeInlineSuggestionPreview.
+  - `sbrd/RippleScopeModal.jsx` — cross-document scan modal.
+  The V1 sidebar Chat tab is dropped — `messages@1.0` + `input@1.0` in `chat-panel` own conversational drafting. Free-form Claude responses no longer auto-inject as paragraph adds/edits (V1's `parseClaudeResponse` add/edit JSON action blocks); that surface goes away with the V1 sidebar Chat tab. The on-Markup-toggle ripple scan from V1 is also dropped — Phase 1 keeps ripple analysis to the Submit-triggered flow per the brief's "stay with V1's existing ripple analysis surface (cross-paragraph on Submit only)".
+- Delete `src/adapters/secretarybird/`. The integrity check special case in [db.js](src/lib/db.js:842-859) ("don't delete sbrd-document-bearing conversations whose messages is empty") is a runtime invariant on the `sbrd_documents` store — survives the decomposition unchanged.
 
-**Dependencies:** PR-10b. (Independent of PR-11a; can run in parallel.)
+**Dependencies:** PR-10b. (Independent of PR-11a; runs in parallel.)
 
 **Exit criteria:**
-- Secretarybird-equivalent functionality available via Drafting Desk template.
-- Existing Secretarybird users' documents preserved (`sbrd_documents` reads correctly under the new component).
-- Tracked changes, ripple analysis, comments all work.
+- Secretarybird-equivalent functionality available via the Drafting Desk template.
+- A user can compose a custom drafting room with any subset of the decomposition (e.g. document-canvas alone, document-canvas + claude-comments).
+- A margin component without document-canvas renders the shared `document-source-needed` empty state.
+- Existing Secretarybird users' `sbrd_documents` records preserved (the store is unchanged; only the components reading them moved).
+- Tracked changes, comment add / reply / delete, Submit & Branch with comment replies + ripple flags, Expand Scope cross-document scan all work.
+- `npm run build` clean.
 
-**Risk:** High. Secretarybird is the largest single V1 file (2928 lines). Decomposition cleanliness is hard to verify without thorough manual testing.
+**Risk:** High. Largest single-file decomposition (2928 lines). State is shared via DocumentContext rather than the bus (the bus is non-sticky; a late subscriber would miss the most recent payload), but the same precedent as AnnotationsContext / BranchPanelContext / CollabModeContext / FileShelfContext applies. Decomposition cleanliness is hard to verify without thorough manual testing — production-bundle symbol-grep covers structural verification when the dev server is unavailable; live testing checklist in [phase-1-testing.md](phase-1-testing.md) §PR-11b.
 
 ---
 

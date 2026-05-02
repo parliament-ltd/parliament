@@ -45,6 +45,7 @@ const MIGRATION_DONE_KEY = 'migration_v2_chat_room_assigned'
 const REPAIR_DONE_KEY = 'migration_v2_room_repair_done'
 const VOICE_INJECT_DONE_KEY = 'migration_v2_voice_input_injected'
 const PELICAN_DECOMPOSE_DONE_KEY = 'migration_v2_pelican_room_decomposed'
+const SECRETARYBIRD_DECOMPOSE_DONE_KEY = 'migration_v2_secretarybird_room_decomposed'
 
 // Default fallback template for the room-repair pass (PR-10b). Any
 // conversation that didn't get a room assignment from the PR-10a pass
@@ -469,6 +470,101 @@ export async function migrateDecomposeDataWorkspaceRooms() {
   return { skipped: false, scanned, decomposed, errors }
 }
 
+// ─── PR-11b migration ─────────────────────────────────────────────────
+//
+// PR-11b decomposed Secretarybird into three catalog components
+// (document-canvas, claude-comments, ripple-analysis). The Drafting
+// Desk template seed updated accordingly and the libraryRooms seed
+// bumps its seedVersion to 2 to re-seed existing installs.
+// User-instantiated room MODE records (one per conversation, in the
+// `modes` store) are not touched by the libraryRooms re-seed — those
+// were instantiated at PR-10a-migration time from the OLD template
+// shape (just messages + input in chat-panel) and need rewriting in
+// place to pick up the decomposition.
+//
+// Selection: any mode that uses document-centric layout AND does not
+// already include a document-canvas component. Both
+// secretarybird-migrated rooms (`buildIntent.derivedFrom ===
+// 'secretarybird-migration'`) and any fresh rooms created from the V1
+// drafting-desk seed (no `derivedFrom` set) match. Idempotent at two
+// layers: the per-room "already has document-canvas" check, and the
+// whole-pass guard key.
+//
+// Customisations preserved: the rewrite swaps the components array
+// only. meta.name, scheme override, deviceClass, and any non-component
+// fields stay untouched. The original component instance ids are
+// dropped (replaced with fresh ids on the new components), but
+// per-instance config carried by old components is also dropped — the
+// old shape's two components (messages + input) had no meaningful
+// per-instance config that the new shape doesn't reproduce.
+
+const DRAFTING_DESK_LAYOUT_PREFIX = 'document-centric'
+
+function buildDraftingDeskComponents() {
+  return [
+    { id: `comp_${crypto.randomUUID()}`, ref: 'document-canvas@^1.0',  slot: 'document',   order: 0, essential: true  },
+    { id: `comp_${crypto.randomUUID()}`, ref: 'claude-comments@^1.0',  slot: 'margin',     order: 0, essential: false },
+    { id: `comp_${crypto.randomUUID()}`, ref: 'ripple-analysis@^1.0',  slot: 'margin',     order: 1, essential: false },
+    { id: `comp_${crypto.randomUUID()}`, ref: 'messages@^1.0',         slot: 'chat-panel', order: 0, essential: true  },
+    { id: `comp_${crypto.randomUUID()}`, ref: 'input@^1.0',            slot: 'chat-panel', order: 1, essential: true  },
+  ]
+}
+
+/**
+ * Rewrite every document-centric mode that doesn't yet include
+ * document-canvas to use the full PR-11b decomposition. Idempotent:
+ * per-room (skips rooms that already include document-canvas, so a
+ * partial run survives) + whole-pass via SECRETARYBIRD_DECOMPOSE_DONE_KEY
+ * (subsequent boots short-circuit).
+ *
+ * Returns:
+ *   { skipped: boolean, scanned, decomposed, errors }
+ */
+export async function migrateDecomposeDraftingDeskRooms() {
+  const done = await getSetting(SECRETARYBIRD_DECOMPOSE_DONE_KEY)
+  if (done === true) {
+    return { skipped: true, scanned: 0, decomposed: 0, errors: [] }
+  }
+
+  const db = await initDB()
+  const allModes = await db.getAll('modes')
+
+  let scanned = 0
+  let decomposed = 0
+  const errors = []
+
+  for (const mode of allModes) {
+    if (mode.scope !== 'room') continue
+    const layoutRef = mode.layout?.ref
+    if (!layoutRef || !layoutRef.startsWith(DRAFTING_DESK_LAYOUT_PREFIX)) continue
+    scanned++
+    const components = mode.components || []
+    if (components.some((c) => c.ref?.startsWith('document-canvas'))) continue
+
+    try {
+      const updated = {
+        ...mode,
+        components: buildDraftingDeskComponents(),
+        // Tag the rewrite so future debug surfaces know which migration
+        // touched this mode. Preserves any prior derivedFrom value
+        // (e.g. 'secretarybird-migration' from PR-10a's pass).
+        buildIntent: {
+          ...(mode.buildIntent || {}),
+          derivedFrom: mode.buildIntent?.derivedFrom || 'secretarybird-decomposition',
+          decomposedAt: 'pr-11b',
+        },
+      }
+      await saveMode(updated)
+      decomposed++
+    } catch (err) {
+      errors.push({ modeId: mode.id, reason: err?.message || String(err) })
+    }
+  }
+
+  await setSetting(SECRETARYBIRD_DECOMPOSE_DONE_KEY, true)
+  return { skipped: false, scanned, decomposed, errors }
+}
+
 // Exported for tests / debug consoles.
 export const _internal = Object.freeze({
   MIGRATION_MAP,
@@ -476,7 +572,9 @@ export const _internal = Object.freeze({
   REPAIR_DONE_KEY,
   VOICE_INJECT_DONE_KEY,
   PELICAN_DECOMPOSE_DONE_KEY,
+  SECRETARYBIRD_DECOMPOSE_DONE_KEY,
   LEGACY_MODE_LOCALSTORAGE_KEY,
   DEFAULT_TEMPLATE_ID,
   DATA_WORKSPACE_LAYOUT_PREFIX,
+  DRAFTING_DESK_LAYOUT_PREFIX,
 })

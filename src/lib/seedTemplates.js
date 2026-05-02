@@ -105,17 +105,23 @@ export const TEMPLATES = Object.freeze([
     status: 'available',
     scope: 'room',
     displayName: 'Drafting Desk',
-    description: 'A document canvas with margin annotations. Tracked changes and ripple analysis come online with PR-11b.',
+    description: 'A document canvas with margin annotations. Tracked changes, comments, and ripple analysis ride alongside the draft.',
     icon: ICONS.DRAFTING_DESK,
     deviceClass: 'visual-pointer',
     layout: { ref: 'document-centric@^1.0' },
     scheme: PARLIAMENT_SCHEME,
-    // PR-11b will add document-canvas to document slot and
-    // claude-comments + ripple-analysis to margin. The chat panel ships
-    // here so the room is functional from PR-9 onward.
+    // PR-11b wires the full Secretarybird decomposition: document-canvas
+    // owns the contentEditable paper + tracked-changes + Submit & Branch
+    // flow in the document slot; claude-comments + ripple-analysis stack
+    // in the margin slot for the per-paragraph annotation surface;
+    // messages@1.0 + input@1.0 own free-form chat about the draft in the
+    // chat-panel slot.
     components: [
-      comp('messages', 'messages@^1.0', 'chat-panel', 0),
-      comp('input',    'input@^1.0',    'chat-panel', 1),
+      comp('document', 'document-canvas@^1.0',  'document',   0),
+      comp('comments', 'claude-comments@^1.0',  'margin',     0),
+      comp('ripple',   'ripple-analysis@^1.0',  'margin',     1),
+      comp('messages', 'messages@^1.0',         'chat-panel', 0),
+      comp('input',    'input@^1.0',            'chat-panel', 1),
     ],
     buildIntent: null,
   },
@@ -207,6 +213,7 @@ export const TEMPLATES = Object.freeze([
  */
 const SEED_VERSIONS = Object.freeze({
   'data-workspace@1.0': 2, // PR-11a: full Pelican decomposition
+  'drafting-desk@1.0':  2, // PR-11b: full Secretarybird decomposition
 })
 
 function seedVersionFor(templateId) {
