@@ -38,6 +38,11 @@ import favoritesEntry      from './entries/favorites'
 import quickStatsEntry     from './entries/quick-stats'
 import recentActivityEntry from './entries/recent-activity'
 import scratchpadEntry     from './entries/scratchpad'
+import fileShelfEntry        from './entries/file-shelf'
+import chartCanvasEntry      from './entries/chart-canvas'
+import tableCanvasEntry      from './entries/table-canvas'
+import summaryDashboardEntry from './entries/summary-dashboard'
+import columnInspectorEntry  from './entries/column-inspector'
 import { validateManifest, entryRef } from './validate'
 
 const REGISTRY = new Map()
@@ -75,6 +80,12 @@ register(favoritesEntry)
 register(quickStatsEntry)
 register(recentActivityEntry)
 register(scratchpadEntry)
+// PR-11a — Pelican decomposition.
+register(fileShelfEntry)
+register(chartCanvasEntry)
+register(tableCanvasEntry)
+register(summaryDashboardEntry)
+register(columnInspectorEntry)
 
 /**
  * Look up a manifest entry by `name@version` ref. Exact-match only in PR-2;

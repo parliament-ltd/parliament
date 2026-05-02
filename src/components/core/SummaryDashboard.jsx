@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { TrendingUp, AlertCircle, CheckCircle, Sparkles, ArrowUpRight } from 'lucide-react'
-import { usePelican } from '../../../stores/PelicanContext'
-import { useSettings } from '../../../stores/SettingsContext'
-import { getProvider } from '../../../providers'
-import { loadApiKey } from '../../../lib/crypto'
-import { buildDataSample } from '../../../lib/fileParser'
-import { SPRING_SMOOTH, SPRING_GENTLE } from '../../../lib/constants'
+import { useFileShelf } from '../../stores/FileShelfContext'
+import { useSettings } from '../../stores/SettingsContext'
+import { getProvider } from '../../providers'
+import { loadApiKey } from '../../lib/crypto'
+import { buildDataSample } from '../../lib/fileParser'
+import { SPRING_SMOOTH, SPRING_GENTLE } from '../../lib/constants'
 
 /**
  * SummaryDashboard — KPI cards, AI-generated insights, distributions, data quality.
@@ -32,7 +32,9 @@ const INSIGHT_COLORS = {
 }
 
 export default function SummaryDashboard({ fileId, conversationId, onAskAbout }) {
-  const { getParsedData, activeFile } = usePelican()
+  void conversationId
+  const { getParsedData, files, activeFileId } = useFileShelf()
+  const activeFile = files.find(f => f.id === activeFileId) || null
   const { settings } = useSettings()
 
   const [parsed, setParsed] = useState(null)
@@ -58,11 +60,13 @@ export default function SummaryDashboard({ fileId, conversationId, onAskAbout })
     })
   }, [fileId, getParsedData])
 
-  // Auto-generate insights when data is loaded
-  useEffect(() => {
-    if (!parsed || insights !== null || generating) return
-    generateInsights(parsed)
-  }, [parsed]) // eslint-disable-line react-hooks/exhaustive-deps
+  // PR-11a: removed the auto-generate-on-data-load effect. V1 Pelican fired
+  // a Claude call automatically the first time a user landed on the Summary
+  // tab — that's an autonomous model call (Agent tier per
+  // refactor/tier-classification.md), and Phase 1 ships zero Agent
+  // components. The generation now waits for an explicit "Generate
+  // insights" click; KPIs / quality / distributions still render against
+  // the parsed-data sample once it's loaded but stay empty until clicked.
 
   const generateInsights = useCallback(async (data) => {
     setGenerating(true)
@@ -187,6 +191,16 @@ Rules:
       <section>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-xs font-medium text-[#787774] uppercase tracking-wider">AI Insights</h3>
+          {insights && !generating && (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => parsed && generateInsights(parsed)}
+              className="text-[10px] text-[#B8A070] font-medium hover:underline"
+            >
+              Regenerate
+            </motion.button>
+          )}
           {insightError && (
             <motion.button
               whileHover={{ scale: 1.02 }}
@@ -203,8 +217,24 @@ Rules:
           <div className="px-4 py-3 bg-[#E03E3E]/5 border border-[#E03E3E]/15 rounded-xl">
             <p className="text-xs text-[#E03E3E]">{insightError}</p>
           </div>
-        ) : generating || !insights ? (
-          <InsightSkeleton generating={generating} />
+        ) : generating ? (
+          <InsightSkeleton generating />
+        ) : !insights ? (
+          <motion.button
+            whileHover={{ scale: 1.01, borderColor: '#B8A070' }}
+            whileTap={{ scale: 0.99 }}
+            onClick={() => parsed && generateInsights(parsed)}
+            disabled={!parsed}
+            className="w-full px-4 py-3 rounded-xl border border-dashed border-[#B8A070]/35 bg-white text-left flex items-center gap-3 transition-colors disabled:opacity-50"
+          >
+            <Sparkles className="w-4 h-4 text-[#B8A070] flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-semibold text-[#191919]">Generate insights with Claude</div>
+              <div className="text-[10px] text-[#787774] mt-0.5">
+                Sends a sample of this dataset to Claude for KPI suggestions, trend callouts, and quality flags.
+              </div>
+            </div>
+          </motion.button>
         ) : (
           <div className="space-y-2">
             {insights.insights.map((insight, i) => {

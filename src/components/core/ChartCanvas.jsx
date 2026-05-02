@@ -6,9 +6,8 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { motion } from 'framer-motion'
-import { usePelican, SERIES_COLORS } from '../../../stores/PelicanContext'
-import { useSettings } from '../../../stores/SettingsContext'
-import { SPRING_GENTLE } from '../../../lib/constants'
+import { useFileShelf, SERIES_COLORS } from '../../stores/FileShelfContext'
+import { useSettings } from '../../stores/SettingsContext'
 
 /**
  * ChartCanvas — renders the active chart from real parsed file data.
@@ -21,7 +20,8 @@ import { SPRING_GENTLE } from '../../../lib/constants'
  * axes from the active file's data on every fileId change.
  */
 export default function ChartCanvas({ fileId, chartType, filters }) {
-  const { getParsedData, activeFile } = usePelican()
+  const { getParsedData, files, activeFileId } = useFileShelf()
+  const activeFile = files.find(f => f.id === activeFileId) || null
   const { settings } = useSettings()
   const isDark = settings.theme === 'dark'
   const chartBg = isDark ? '#0D0B07' : '#fff'

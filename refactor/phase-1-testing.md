@@ -1674,6 +1674,129 @@ plus boot-time migrations on first load.
 
 ---
 
+## PR-11a — Decompose Pelican into 5 catalog components
+
+👀 User-visible. Largest decomposition in Phase 1. V1 Pelican
+disappears as an adapter; the same data-analysis room is now expressed
+as a Data Workspace template composed of file-shelf + chart-canvas +
+table-canvas + summary-dashboard + column-inspector + the existing
+messages / input / context catalog entries.
+
+**Surface:** `/chat/:id` for any conversation in a Data Workspace room
+(the `data-workspace@1.0` libraryRoom — open via the homepage's
+"+ Build a room" → Data Workspace template, or via PR-10a-migrated
+pelican conversations).
+
+### Setup
+- A Data Workspace conversation. Easiest path: open the homepage,
+  use "+ Build a room" → Data Workspace, then open the resulting chat.
+- Sample CSV / XLSX / JSON file at hand (any small dataset works).
+- For migration testing: a pre-PR-11a conversation in the same dev DB
+  whose mode uses `canvas-centric@^1.0` and lacks `file-shelf` in its
+  components — DevTools → IndexedDB → `modes` → confirm the components
+  array doesn't include a `file-shelf@^1.0` entry.
+
+### Boot-time decomposition migration
+
+- [ ] Fresh boot. DevTools → IndexedDB → `settings`. After init:
+  - `migration_v2_pelican_room_decomposed` = true.
+- [ ] DevTools → `modes` → any record where `layout.ref` starts
+  `canvas-centric` and `buildIntent.derivedFrom` was previously
+  `pelican-migration` now has `decomposedAt: 'pr-11a'` plus an
+  8-component list (file-shelf + 3 canvases + column-inspector +
+  context + messages + input). Components have fresh ids.
+- [ ] Clear `migration_v2_pelican_room_decomposed`, reload. The pass
+  re-runs but skips every room (per-room "already has file-shelf"
+  guard); the flag flips back to true.
+
+### Library re-seed
+
+- [ ] DevTools → `libraryRooms` → `data-workspace@1.0` → `seedVersion`
+  is 2 (PR-11a bump). Component list matches the PR-11a shape.
+- [ ] Set `seedVersion: 1` on the record manually, reload. The seed
+  function overwrites the record back to seedVersion 2 with the
+  current component list.
+
+### Data Workspace room — empty state
+
+- [ ] Open a Data Workspace conversation that hasn't had any files
+  uploaded. Left rail shows the file-shelf header with a "Drop files
+  or browse" zone. Canvas region shows three stacked
+  "<canvas> needs data — Add a File shelf component to this room to
+  provide data" empty states (one per chart-canvas / table-canvas /
+  summary-dashboard).
+- [ ] Inspector slot shows the Column inspector "Load a file to
+  inspect its schema" empty state plus the context meter.
+
+### Soft-dependency contract
+
+- [ ] DevTools edit a Data Workspace mode and remove the
+  `file-shelf@^1.0` entry from its components, save. Reload the chat.
+  Each remaining canvas (chart / table / summary) renders the
+  `data-source-needed` empty-state template ("<canvas> needs data —
+  Add a File shelf component to this room to provide data") instead
+  of attempting to render against an unset file.
+- [ ] Add the file-shelf entry back. Empty states disappear; each
+  canvas renders normally against the active dataset.
+
+### File upload + canvas rendering
+
+- [ ] Upload a CSV via "Drop files or browse" or the + button. Parsing
+  spinner appears, file lands in the file-shelf list, the new file is
+  marked active + in-context.
+- [ ] Chart canvas renders a bar chart (default chartType) auto-derived
+  from the file's first numeric columns. Table canvas renders rows
+  with sticky header + sortable columns + "Load more" pagination.
+  Summary dashboard renders KPI placeholders + a "Generate insights"
+  click-target.
+- [ ] Click a column header in the table canvas. Sort indicator
+  appears; rows reorder. Click again to flip direction.
+- [ ] Click "Generate insights" in the summary dashboard. Composer-tier
+  Haiku call fires (DevTools Network shows the request); insights /
+  KPIs / quality block render once the response parses. A "Regenerate"
+  link appears alongside the section heading. **Insights do NOT
+  generate automatically on file upload** — Phase 1 ships zero
+  Agent-tier (autonomous-call) components.
+- [ ] Click a column row in the column inspector. The detail row
+  expands with Unique / Nulls / Sample stats. Click again to collapse.
+
+### File-context toggle
+
+- [ ] Click the link icon on a file card. The file flips out of context
+  (icon changes to broken-link). DevTools → `files` → the record's
+  `inContext` is now `false`. The "N file(s) in context" subtitle
+  decrements.
+- [ ] DevTools → publish-event listener: calling
+  `hostAPI.subscribe('file-context-changed', console.log)` from the
+  catalog dev surface and toggling a file logs the event payload
+  `{ fileIds, conversationId }`. (Production code reads via
+  FileShelfContext, but the bus event still fires.)
+
+### Conversation switch
+
+- [ ] Open conversation A (Data Workspace), upload a file. Navigate
+  to conversation B (Data Workspace, different conversation). B's
+  file-shelf is empty (per-conversation file lists). Navigate back
+  to A. The file is still there, parsed-data cache survives
+  (no re-parse spinner).
+- [ ] Navigate `/chat/A → / → /chat/A` (transient null window).
+  File-shelf state survives the round trip — the "two distinct
+  non-null ids" reset guard ignores the homepage detour.
+
+### Out of scope (don't test here)
+
+- [ ] V1's per-column "Group by / Filter / Visualize" action chips
+  that populated the chat input. Cross-component compose dispatch
+  beyond the three Phase 1 bus events is a Phase 2 concern.
+- [ ] A standalone canvas component without file-shelf in a
+  custom-built room (e.g. via the editor in PR-8). The empty-state
+  contract is verified, but composing arbitrary subsets of the
+  decomposition is a follow-up exercise.
+- [ ] Storage / quota behavior on multi-MB datasets — same code paths
+  as V1 Pelican; no PR-11a regression risk.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

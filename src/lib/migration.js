@@ -38,12 +38,13 @@
 import { initDB, getSetting, setSetting } from './db'
 import { createModeFromTemplate, saveMode } from './modes'
 
-// Settings keys for the idempotent guards. Each PR-10a/PR-10b migration
-// step has its own flag so adding a new pass later doesn't require
-// re-running prior ones.
+// Settings keys for the idempotent guards. Each PR-10a/PR-10b/PR-11a
+// migration step has its own flag so adding a new pass later doesn't
+// require re-running prior ones.
 const MIGRATION_DONE_KEY = 'migration_v2_chat_room_assigned'
 const REPAIR_DONE_KEY = 'migration_v2_room_repair_done'
 const VOICE_INJECT_DONE_KEY = 'migration_v2_voice_input_injected'
+const PELICAN_DECOMPOSE_DONE_KEY = 'migration_v2_pelican_room_decomposed'
 
 // Default fallback template for the room-repair pass (PR-10b). Any
 // conversation that didn't get a room assignment from the PR-10a pass
@@ -371,12 +372,111 @@ export async function migrateInjectVoiceInput() {
   return { skipped: false, scanned, injected, errors }
 }
 
+// ─── PR-11a migration ─────────────────────────────────────────────────
+//
+// PR-11a decomposed Pelican into five catalog components (file-shelf,
+// chart-canvas, table-canvas, summary-dashboard, column-inspector). The
+// Data Workspace template seed updated accordingly and the libraryRooms
+// seed bumps its seedVersion to 2 to re-seed existing installs.
+// User-instantiated room MODE records (one per conversation, in the
+// `modes` store) are not touched by the libraryRooms re-seed — those
+// were instantiated at PR-10a-migration time from the OLD template
+// shape (messages + input + context) and need rewriting in place to
+// pick up the decomposition.
+//
+// Selection: any mode that uses canvas-centric layout AND does not
+// already include a file-shelf component. Both pelican-migrated rooms
+// (`buildIntent.derivedFrom === 'pelican-migration'`) and any fresh
+// rooms created from the V1 data-workspace seed (no `derivedFrom` set)
+// match. Idempotent at two layers: the per-room "already has file-shelf"
+// check, and the whole-pass guard key.
+//
+// Customisations preserved: the rewrite swaps the components array
+// only. meta.name, scheme override, deviceClass, and any
+// non-component fields stay untouched. The original component instance
+// ids are dropped (replaced with fresh ids on the new components),
+// but per-instance config carried by old components is also dropped —
+// the old shape's components didn't have meaningful per-instance config
+// (V1 PelicanContext owned all the state), so this is lossless in
+// practice. PR-12's editor pass will let users re-customise.
+
+const DATA_WORKSPACE_LAYOUT_PREFIX = 'canvas-centric'
+
+function buildDataWorkspaceComponents() {
+  return [
+    { id: `comp_${crypto.randomUUID()}`, ref: 'file-shelf@^1.0',        slot: 'left-rail',  order: 0, essential: true },
+    { id: `comp_${crypto.randomUUID()}`, ref: 'chart-canvas@^1.0',      slot: 'canvas',     order: 0, essential: true },
+    { id: `comp_${crypto.randomUUID()}`, ref: 'table-canvas@^1.0',      slot: 'canvas',     order: 1, essential: false },
+    { id: `comp_${crypto.randomUUID()}`, ref: 'summary-dashboard@^1.0', slot: 'canvas',     order: 2, essential: false },
+    { id: `comp_${crypto.randomUUID()}`, ref: 'column-inspector@^1.0',  slot: 'inspector',  order: 0, essential: false },
+    { id: `comp_${crypto.randomUUID()}`, ref: 'context@^1.0',           slot: 'inspector',  order: 1, essential: false },
+    { id: `comp_${crypto.randomUUID()}`, ref: 'messages@^1.0',          slot: 'chat-panel', order: 0, essential: true },
+    { id: `comp_${crypto.randomUUID()}`, ref: 'input@^1.0',             slot: 'input-dock', order: 0, essential: true },
+  ]
+}
+
+/**
+ * Rewrite every canvas-centric mode that doesn't yet include file-shelf
+ * to use the full PR-11a decomposition. Idempotent: per-room (skips
+ * rooms that already include file-shelf, so a partial run survives) +
+ * whole-pass via PELICAN_DECOMPOSE_DONE_KEY (subsequent boots
+ * short-circuit).
+ *
+ * Returns:
+ *   { skipped: boolean, scanned, decomposed, errors }
+ */
+export async function migrateDecomposeDataWorkspaceRooms() {
+  const done = await getSetting(PELICAN_DECOMPOSE_DONE_KEY)
+  if (done === true) {
+    return { skipped: true, scanned: 0, decomposed: 0, errors: [] }
+  }
+
+  const db = await initDB()
+  const allModes = await db.getAll('modes')
+
+  let scanned = 0
+  let decomposed = 0
+  const errors = []
+
+  for (const mode of allModes) {
+    if (mode.scope !== 'room') continue
+    const layoutRef = mode.layout?.ref
+    if (!layoutRef || !layoutRef.startsWith(DATA_WORKSPACE_LAYOUT_PREFIX)) continue
+    scanned++
+    const components = mode.components || []
+    if (components.some((c) => c.ref?.startsWith('file-shelf'))) continue
+
+    try {
+      const updated = {
+        ...mode,
+        components: buildDataWorkspaceComponents(),
+        // Tag the rewrite so future debug surfaces know which migration
+        // touched this mode. Preserves any prior derivedFrom value.
+        buildIntent: {
+          ...(mode.buildIntent || {}),
+          derivedFrom: mode.buildIntent?.derivedFrom || 'pelican-decomposition',
+          decomposedAt: 'pr-11a',
+        },
+      }
+      await saveMode(updated)
+      decomposed++
+    } catch (err) {
+      errors.push({ modeId: mode.id, reason: err?.message || String(err) })
+    }
+  }
+
+  await setSetting(PELICAN_DECOMPOSE_DONE_KEY, true)
+  return { skipped: false, scanned, decomposed, errors }
+}
+
 // Exported for tests / debug consoles.
 export const _internal = Object.freeze({
   MIGRATION_MAP,
   MIGRATION_DONE_KEY,
   REPAIR_DONE_KEY,
   VOICE_INJECT_DONE_KEY,
+  PELICAN_DECOMPOSE_DONE_KEY,
   LEGACY_MODE_LOCALSTORAGE_KEY,
   DEFAULT_TEMPLATE_ID,
+  DATA_WORKSPACE_LAYOUT_PREFIX,
 })

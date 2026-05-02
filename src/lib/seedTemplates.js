@@ -78,12 +78,22 @@ export const TEMPLATES = Object.freeze([
     deviceClass: 'visual-pointer',
     layout: { ref: 'canvas-centric@^1.0' },
     scheme: PARLIAMENT_SCHEME,
-    // PR-11a will add file-shelf to left-rail, plus chart/table/column
-    // components in canvas + inspector. PR-9 ships the chat side wired.
+    // PR-11a wires the full Pelican decomposition: file-shelf in
+    // left-rail; chart-canvas + table-canvas + summary-dashboard stack
+    // in the canvas slot (which became 'stack' capacity in PR-11a so
+    // the three coexist instead of toggling via tabs); column-inspector
+    // owns the inspector slot; the chat side stays as messages@1.0 +
+    // input@1.0. context@1.0 moved to inspector slot alongside the
+    // column-inspector for token-meter visibility.
     components: [
-      comp('messages', 'messages@^1.0', 'chat-panel', 0),
-      comp('input',    'input@^1.0',    'input-dock', 0),
-      comp('context',  'context@^1.0',  'inspector',  0),
+      comp('file-shelf',   'file-shelf@^1.0',        'left-rail',  0),
+      comp('chart',        'chart-canvas@^1.0',      'canvas',     0),
+      comp('table',        'table-canvas@^1.0',      'canvas',     1),
+      comp('summary',      'summary-dashboard@^1.0', 'canvas',     2),
+      comp('schema',       'column-inspector@^1.0',  'inspector',  0),
+      comp('context',      'context@^1.0',           'inspector',  1),
+      comp('messages',     'messages@^1.0',          'chat-panel', 0),
+      comp('input',        'input@^1.0',             'input-dock', 0),
     ],
     buildIntent: null,
   },
@@ -185,24 +195,43 @@ export const TEMPLATES = Object.freeze([
 ])
 
 /**
+ * Per-template seedVersion. Bumped when the canonical components list
+ * for a built-in template changes between releases. The seed function
+ * re-seeds a record when its stored seedVersion is below the current.
+ *
+ * Library records are catalog-data (read-only by users, edited via
+ * code releases); user-customised rooms live in the `modes` store and
+ * are unaffected by this re-seed. Bumping a template's seedVersion is
+ * how PR-11a migrates the Data Workspace template from "messages +
+ * input + context only" to the full Pelican decomposition.
+ */
+const SEED_VERSIONS = Object.freeze({
+  'data-workspace@1.0': 2, // PR-11a: full Pelican decomposition
+})
+
+function seedVersionFor(templateId) {
+  return SEED_VERSIONS[templateId] ?? 1
+}
+
+/**
  * Seed `libraryRooms` with the seven Phase 1 templates.
  *
- * Per-record idempotency: only inserts a template when no record with its
- * id exists. This makes adding a template in a later PR safe — existing
- * users get the new template on next boot without their existing template
- * records being touched. Users may have edited template metadata (or
- * future PRs may bump fields); leaving existing records alone keeps that
- * work in place.
+ * Per-record idempotency: inserts a template when no record exists, OR
+ * overwrites one whose stored seedVersion is below the current. Newer
+ * stored versions are left alone (forward-compat: an older client
+ * shouldn't roll a user back). User-instantiated rooms live in `modes`,
+ * not here, and are migrated separately (see lib/migration.js).
  */
 export async function seedLibraryRooms(db) {
   const now = new Date().toISOString()
   for (const t of TEMPLATES) {
     const existing = await db.get('libraryRooms', t.id)
-    if (existing) continue
+    const currentSeedVersion = seedVersionFor(t.id)
+    if (existing && (existing.seedVersion ?? 1) >= currentSeedVersion) continue
     await db.put('libraryRooms', {
       ...t,
-      seedVersion: 1,
-      createdAt: now,
+      seedVersion: currentSeedVersion,
+      createdAt: existing?.createdAt || now,
     })
   }
 }

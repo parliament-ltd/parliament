@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowUpDown } from 'lucide-react'
-import { usePelican } from '../../../stores/PelicanContext'
-import { SPRING_SMOOTH } from '../../../lib/constants'
+import { useFileShelf } from '../../stores/FileShelfContext'
+import { SPRING_SMOOTH } from '../../lib/constants'
 
 const PAGE_SIZE = 100
 
@@ -14,11 +14,32 @@ const PAGE_SIZE = 100
  * - "Load more" pagination (PAGE_SIZE rows at a time)
  * - Applies active filters from PelicanContext
  */
-export default function TableCanvas({ fileId, sortColumn, sortDir, onSort, filters }) {
-  const { getParsedData, activeFile } = usePelican()
+export default function TableCanvas({ fileId, sortColumn: sortColumnProp, sortDir: sortDirProp, onSort, filters }) {
+  const { getParsedData, files, activeFileId } = useFileShelf()
+  const activeFile = files.find(f => f.id === activeFileId) || null
   const [parsed, setParsed] = useState(null)
   const [loading, setLoading] = useState(false)
   const [visibleRows, setVisibleRows] = useState(PAGE_SIZE)
+
+  // V1 Pelican kept sort state in PelicanContext so it persisted across
+  // canvas-tab toggles. The decomposition put each canvas component on its
+  // own; sort state is now local unless the caller provides controlled
+  // props. Callers (catalog render) typically leave it uncontrolled.
+  const [localSortColumn, setLocalSortColumn] = useState(null)
+  const [localSortDir, setLocalSortDir] = useState('asc')
+  const sortColumn = sortColumnProp !== undefined ? sortColumnProp : localSortColumn
+  const sortDir = sortDirProp !== undefined ? sortDirProp : localSortDir
+  const handleSort = useCallback((col) => {
+    if (typeof onSort === 'function') return onSort(col)
+    setLocalSortColumn(prev => {
+      if (prev === col) {
+        setLocalSortDir(d => d === 'asc' ? 'desc' : 'asc')
+        return col
+      }
+      setLocalSortDir('desc')
+      return col
+    })
+  }, [onSort])
 
   useEffect(() => {
     if (!fileId) return
@@ -104,7 +125,7 @@ export default function TableCanvas({ fileId, sortColumn, sortDir, onSort, filte
             {columns.map(({ key, type }) => (
               <th
                 key={key}
-                onClick={() => onSort(key)}
+                onClick={() => handleSort(key)}
                 className={`text-left px-4 py-3 text-[10px] font-medium text-[#787774] uppercase tracking-wider cursor-pointer hover:text-[#191919] transition-colors select-none whitespace-nowrap ${
                   type === 'number' ? 'text-right' : ''
                 }`}
