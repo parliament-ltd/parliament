@@ -421,4 +421,4 @@ Before each migration-bearing PR ships, confirm:
 - [ ] **PR-10b** — PWA `parliament-adapters-v1` cache is wiped on first V2 activation. `voice-input@1.0` injection is idempotent and only fires once. Migrated mobile users have working voice.
 - [ ] **PR-11a** — Existing Pelican users' files (`files`, `file_data`) are accessible under `file-shelf@1.0`. Charts render under `chart-canvas@1.0` against the same data.
 - [ ] **PR-11b** — Existing Secretarybird users' documents (`sbrd_documents`) are accessible under `document-canvas@1.0`. Comments and ripple analysis work.
-- [ ] **PR-12** — Phase 1 exit criteria from `parliament-v2-refactor-scope.md` §1.8 all pass.
+- [ ] **PR-12** — Phase 1 exit criteria pass — see `phase-1-testing.md` PR-12 section for the canonical checklist.

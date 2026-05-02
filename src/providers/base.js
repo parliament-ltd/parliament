@@ -20,8 +20,19 @@ export class BaseProvider {
     throw new Error('Not implemented')
   }
 
-  // Return available models with metadata
-  // Returns [{ id, apiId, name, inputCost, outputCost, contextWindow }]
+  // Return available models with metadata.
+  //
+  // Returns [{ id, apiId, name, contextWindow, cost }]
+  //
+  // The `cost` field is structured so non-Anthropic providers can fill the
+  // same shape without any refactor of consuming code:
+  //   - { type: 'metered', inputPerMillion, outputPerMillion } — paid APIs
+  //     (Anthropic, OpenAI, Mistral). Both numbers in USD per 1M tokens.
+  //   - { type: 'free-local' } — keyless local providers (Ollama, etc.).
+  //   - null — pricing unknown / unspecified.
+  //
+  // PR-12 consolidated the model info to this shape; the legacy duplicate
+  // cost table in src/lib/tokens.js was removed.
   getModels() {
     throw new Error('Not implemented')
   }

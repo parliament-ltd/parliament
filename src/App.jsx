@@ -1,7 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { MotionConfig } from 'framer-motion'
-import { ModeProvider } from './stores/ModeContext'
 import { SettingsProvider } from './stores/SettingsContext'
 import { ConversationProvider } from './stores/ConversationContext'
 import { ChatProvider } from './stores/ChatContext'
@@ -41,50 +40,48 @@ export default function App() {
           before any route renders, and so the install / update banners
           can be consumed by any view without prop-drilling. */}
       <PWAProvider>
-        <ModeProvider>
-          <SettingsProvider>
-            <ConversationProvider>
-              <ChatProvider>
-                <AnnotationsProvider>
-                <BranchPanelProvider>
-                <CollabModeProvider>
-                <FileShelfProvider>
-                <DocumentProvider>
-                <BrowserRouter>
-                  <BackupProvider>
-                  <BranchShortcutHandler />
-                  <Routes>
-                    <Route path="/" element={<ErrorBoundary inline><HomepageView /></ErrorBoundary>} />
-                    <Route path="/chats" element={<ErrorBoundary inline><SelectorView /></ErrorBoundary>} />
-                    <Route path="/chat/:id" element={<ErrorBoundary inline><ChatView /></ErrorBoundary>} />
-                    <Route path="/settings" element={<ErrorBoundary inline><SettingsView /></ErrorBoundary>} />
-                    <Route path="/edit/:roomId" element={<ErrorBoundary inline><EditorView scope="room" /></ErrorBoundary>} />
-                    <Route path="/edit-home" element={<ErrorBoundary inline><EditorView scope="homepage" /></ErrorBoundary>} />
-                    <Route path="/build" element={<ErrorBoundary inline><BuildView /></ErrorBoundary>} />
-                    {CatalogDebugView && (
-                      <Route
-                        path="/catalog"
-                        element={
-                          <ErrorBoundary inline>
-                            <Suspense fallback={null}>
-                              <CatalogDebugView />
-                            </Suspense>
-                          </ErrorBoundary>
-                        }
-                      />
-                    )}
-                  </Routes>
-                  </BackupProvider>
-                </BrowserRouter>
-                </DocumentProvider>
-                </FileShelfProvider>
-                </CollabModeProvider>
-                </BranchPanelProvider>
-                </AnnotationsProvider>
-              </ChatProvider>
-            </ConversationProvider>
-          </SettingsProvider>
-        </ModeProvider>
+        <SettingsProvider>
+          <ConversationProvider>
+            <ChatProvider>
+              <AnnotationsProvider>
+              <BranchPanelProvider>
+              <CollabModeProvider>
+              <FileShelfProvider>
+              <DocumentProvider>
+              <BrowserRouter>
+                <BackupProvider>
+                <BranchShortcutHandler />
+                <Routes>
+                  <Route path="/" element={<ErrorBoundary inline><HomepageView /></ErrorBoundary>} />
+                  <Route path="/chats" element={<ErrorBoundary inline><SelectorView /></ErrorBoundary>} />
+                  <Route path="/chat/:id" element={<ErrorBoundary inline><ChatView /></ErrorBoundary>} />
+                  <Route path="/settings" element={<ErrorBoundary inline><SettingsView /></ErrorBoundary>} />
+                  <Route path="/edit/:roomId" element={<ErrorBoundary inline><EditorView scope="room" /></ErrorBoundary>} />
+                  <Route path="/edit-home" element={<ErrorBoundary inline><EditorView scope="homepage" /></ErrorBoundary>} />
+                  <Route path="/build" element={<ErrorBoundary inline><BuildView /></ErrorBoundary>} />
+                  {CatalogDebugView && (
+                    <Route
+                      path="/catalog"
+                      element={
+                        <ErrorBoundary inline>
+                          <Suspense fallback={null}>
+                            <CatalogDebugView />
+                          </Suspense>
+                        </ErrorBoundary>
+                      }
+                    />
+                  )}
+                </Routes>
+                </BackupProvider>
+              </BrowserRouter>
+              </DocumentProvider>
+              </FileShelfProvider>
+              </CollabModeProvider>
+              </BranchPanelProvider>
+              </AnnotationsProvider>
+            </ChatProvider>
+          </ConversationProvider>
+        </SettingsProvider>
       </PWAProvider>
       </MotionConfig>
     </ErrorBoundary>

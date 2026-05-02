@@ -33,10 +33,12 @@ export default defineConfig({
         // SPA fallback: serve index.html for all navigation requests when offline.
         navigateFallback: '/index.html',
 
-        // PR-10b: cleanup orphaned `parliament-adapters-v1` runtime cache
-        // entries left behind by V1 builds. cleanupOutdatedCaches handles
-        // workbox-managed precache rotation; the named runtime cache is
-        // wiped from the page context on V2 boot — see src/main.jsx.
+        // Workbox-managed precache rotation. The legacy `parliament-adapters-v1`
+        // runtime cache (V1 per-adapter chunks) was a separate concern handled
+        // by an explicit caches.delete() in src/main.jsx through PR-11b; the
+        // adapter pattern is now gone repo-wide, the project never went public
+        // with a V1 build, and the dev's local browsers have rotated past V2
+        // boot — so PR-12 dropped that snippet.
         cleanupOutdatedCaches: true,
 
         runtimeCaching: [
@@ -94,15 +96,12 @@ export default defineConfig({
           'vendor-charts':   ['recharts'],
           'vendor-idb':      ['idb'],
 
-          // PR-10b: per-adapter chunks are gone. Albatross, kingfisher,
-          // and starling were deleted outright; pelican, secretarybird,
-          // and swift remain on disk until PR-11a / PR-11b decompose
-          // them into catalog components, but no production import path
-          // reaches their files anymore — Rollup tree-shakes them out
-          // of the build, so they don't need their own chunks. The
-          // `parliament-modules-v2` runtimeCaching rule above matches
-          // any future `catalog-*`, `component-*`, or `module-*` lazy
-          // chunks created by the catalog/editor surfaces.
+          // No per-adapter chunks. The V1 bird-mode adapter pattern
+          // (PR-10b deleted albatross/kingfisher/starling, PR-11a deleted
+          // pelican, PR-11b deleted secretarybird, PR-12 deleted swift) is
+          // fully gone. The `parliament-modules-v2` runtimeCaching rule
+          // above matches any future `catalog-*`, `component-*`, or
+          // `module-*` lazy chunks created by the catalog/editor surfaces.
         },
       },
     },

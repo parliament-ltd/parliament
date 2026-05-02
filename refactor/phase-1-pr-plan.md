@@ -659,25 +659,29 @@
 - Delete `src/lib/modeSuggestions.js` and `src/components/core/ModeSuggestion.jsx`.
 - Consolidate `src/lib/tokens.js` cost data into `src/providers/anthropic.js` with shape-flexibility for non-Anthropic providers (`cost: null` or `cost: { type: 'free-local' }` placeholders supported).
 - Delete `src/stores/ModeContext.jsx` (still mounted from PR-3 backwards-compat).
-- Strip the legacy `parliament-mode` localStorage key on app load.
+- Delete `src/adapters/swift/` (the last bird-mode adapter directory; severed from routing in PR-10b but the source files lingered).
+- Strip the legacy `parliament-mode` localStorage key on app load + drop the PR-10b `parliament-adapters-v1` cache wipe (no installed user base).
 - Archive `mockups/*.jsx` to `refactor/v1-mockups-archive/` (don't delete; preserve for fidelity reference).
-- Delete V1-era stale docs: `CLAUDE.md`, `ROADMAP.md`, `DECISIONS-LOG.md`, `SESSION-LOG-2026-03-02.md`, `session-summary-2026-03-07`, `session-summary-2026-03-12`, `implementation-guide.md`. Replace `CLAUDE.md` with a redirect to `refactor/parliament-v2-brief.md`.
+- Delete V1-era stale docs: `ROADMAP.md`, `DECISIONS-LOG.md`, `SESSION-LOG-2026-03-02.md`, `session-summary-2026-03-07`, `session-summary-2026-03-12`, `implementation-guide.md`. Replace `CLAUDE.md` with a short redirect to `refactor/v2-phase1-audit.md` and the rest of `refactor/`.
 - Update `README.md` to V2 vocabulary.
-- Run the Phase 1 exit-criteria checklist from `parliament-v2-refactor-scope.md` §1.8 and confirm.
+- Run the Phase 1 exit-criteria checklist and confirm — section added to `phase-1-testing.md` PR-12.
 
 **Dependencies:** PR-11a, PR-11b.
 
 **Exit criteria:**
-- Phase 1 exit criteria from refactor-scope §1.8 satisfied:
+- Phase 1 exit criteria satisfied (verified via the testing-checklist PR-12 section):
   - A new user can build a room via any of the three paths and it works.
   - An existing V1 user's data survives the migration.
   - All V1 features available somewhere (shell or catalog component).
   - Homepage, template gallery, editor, wizard render per their mockups.
   - Export and restore round-trip correctly.
   - No V1 code paths remain for the bird-mode adapter pattern.
-- All linters/typecheckers clean.
+- `npm run build` clean. Production bundle no longer ships
+  `MODE_CAPABILITIES`, `ModeProvider`, `ModeSuggestion`,
+  `evaluateSuggestions`, `inputCostPer1k` / `outputCostPer1k`, or
+  `parliament-adapters-v1` symbols. `src/adapters/` directory removed.
 
-**Risk:** Low. Mostly housekeeping; the structural work happened in earlier PRs.
+**Risk:** Low. Mostly housekeeping; the structural work happened in earlier PRs. Risk vector is "deletion of a load-bearing import" — mitigated via production-bundle symbol-grep before / after each deletion (the build-success signal alone doesn't catch this — Rollup tree-shakes orphans without complaining; the bundle-grep proves the symbol actually leaves the artifact).
 
 ---
 
