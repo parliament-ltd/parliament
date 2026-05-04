@@ -724,6 +724,79 @@
   animation: shimmer-sidebar-border 0.85s ease-out forwards;
 }
 
+/* ── Build wizard: Ignition step (PR-13) ─────────────────── */
+/* Lifts the spec's keyframes from parliament_wizard_v5.html         */
+/* lines 679–762 verbatim. The component (IgnitionStep.jsx) toggles  */
+/* class names — `wiz-sweep.go`, `wiz-room.igniting`, `wiz-feat.lit`, */
+/* etc. — to drive the chain. Inline-style transitions handled what   */
+/* CSS does best is now back in CSS.                                  */
+
+.wiz-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #D4A843 40%, #F5E6B8 60%, transparent);
+  top: -4px;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 0 8px 2px rgba(212, 168, 67, 0.28);
+}
+.wiz-sweep.go {
+  animation: wiz-sweepdn 0.75s ease-out forwards;
+}
+@keyframes wiz-sweepdn {
+  0%   { top: -4px; opacity: 1; }
+  100% { top: 110%; opacity: 0; }
+}
+
+.wiz-room {
+  border: 1.5px dashed var(--p-text-light);
+  transition: border-color .4s, border-style .4s, background .6s;
+}
+.wiz-room.igniting {
+  animation: wiz-gflash 0.65s ease forwards;
+}
+.wiz-room.lit {
+  border-style: solid;
+  border-color: var(--p-gold-light);
+  background: var(--p-gold-tint);
+}
+@keyframes wiz-gflash {
+  0%   { box-shadow: none; border-color: var(--p-text-light); }
+  35%  { box-shadow: 0 0 0 2px rgba(212, 168, 67, 0.38), 0 0 14px rgba(212, 168, 67, 0.16); border-color: #D4A843; }
+  100% { box-shadow: none; border-color: var(--p-gold-light); }
+}
+
+.wiz-feat {
+  border: 0.5px dashed var(--p-text-light);
+  color: var(--p-text-muted);
+  background: transparent;
+  transition: all .4s;
+}
+.wiz-feat.igniting {
+  animation: wiz-fflash 0.55s ease forwards;
+}
+.wiz-feat.lit {
+  border-style: solid;
+  border-color: var(--p-gold-light);
+  background: var(--p-gold-tint);
+  color: var(--p-gold-deep);
+}
+@keyframes wiz-fflash {
+  0%   { border-color: var(--p-text-light); color: var(--p-text-muted); }
+  40%  { border-color: #D4A843; color: var(--p-gold-deep); background: rgba(212, 168, 67, 0.10); border-style: solid; }
+  100% { border-color: var(--p-gold-light); color: var(--p-gold-deep); background: var(--p-gold-tint); border-style: solid; }
+}
+
+.wiz-conn-dot {
+  animation: wiz-breathe 2.5s ease-in-out infinite;
+}
+@keyframes wiz-breathe {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
 /* ── Reduced-motion overrides (PR-4a) ─────────────────────── */
 /*
   When the user has the OS-level "Reduce motion" preference enabled,
@@ -738,12 +811,20 @@
 @media (prefers-reduced-motion: reduce) {
   .shimmer-card,
   .shimmer-nav,
-  .shimmer-sidebar-border {
+  .shimmer-sidebar-border,
+  .wiz-sweep,
+  .wiz-sweep.go,
+  .wiz-room.igniting,
+  .wiz-feat.igniting,
+  .wiz-conn-dot {
     animation: none !important;
   }
   /* Still apply the resting state so power-on UX doesn't feel broken. */
   .shimmer-card { border-color: #E9E9E7; }
   .shimmer-sidebar-border { border-color: #F1F1EF; }
+  /* The .lit static styles still apply, so users who disable motion */
+  /* see the room jump straight to the gold-tint settled state.       */
+  .wiz-sweep { opacity: 0; }
 }
 
 /* ── Mobile: prevent iOS auto-zoom on input focus ─────────── */
