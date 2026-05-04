@@ -2318,6 +2318,172 @@ homepage top bar, OR automatically as the first-run landing.
 
 ---
 
+## PR-14 — Homepage v2 visual alignment
+
+👀 User-visible. Replaces the v1 grid-of-rounded-boxes blueprint
+with an SVG floor plan whose room shapes reflect their layouts.
+Aligns chats / library / favorites to the spec
+(`parliament_homepage_v2 (2).html`). Adds drag-to-reorder for
+sections. Topbar swaps labelled buttons for borderless icons.
+
+**Surface:** `/` route — landing homepage for any user with an
+API key + a completed wizard.
+
+### Setup
+- A homepage with at least 1 user-built room (run the wizard or
+  `seedTemplates` to instantiate one).
+- ≥ 3 conversations with summaries + tags so the chats section
+  has rendered topic chips.
+- ≥ 1 starred favorite.
+
+### DB schema bump v5
+
+- [ ] Reload Parliament for the first time after PR-14 lands.
+      DevTools → IndexedDB → `parliament` → `parliament` shows
+      version = 5.
+- [ ] DevTools → `libraryRooms` / `libraryLayouts` /
+      `libraryComponents` / `librarySchemes`. Every record has
+      `author: { name: 'Parliament', handle: 'parliament',
+      verified: true }` and `installedCount: 0`.
+- [ ] `libraryComponents` is non-empty — populated from the
+      catalog manifest registry (~24 entries on a default install).
+
+### Topbar icons
+
+- [ ] Topbar shows: Parliament wordmark, breadcrumb slot,
+      backup-status dot, Wrench, Home (gold), Database, Settings.
+      No bordered button rectangles.
+- [ ] Hover Wrench → tooltip "Edit homepage"; click → navigates
+      to `/edit-home`.
+- [ ] Hover Home → tooltip "Build a room"; click → navigates to
+      `/build`.
+- [ ] Hover Database → tooltip "Backup & restore (Cmd+Shift+B)";
+      click opens the backup modal.
+- [ ] Hover Settings → tooltip "Settings"; click navigates to
+      `/settings`.
+
+### Section card chrome
+
+- [ ] Each section has a 14px-radius white card with a
+      thin-rule header.
+- [ ] Hover the section header → grabber dots appear at left.
+- [ ] Click chevron → body collapses with a smooth height
+      transition (~280ms); chevron rotates -90°.
+- [ ] Click chevron again → body expands smoothly.
+- [ ] `prefers-reduced-motion: reduce` enabled → collapse is
+      instantaneous (no transition).
+
+### Section drag-reorder
+
+- [ ] Grab the chats section's grabber → drag onto the
+      blueprint section header → drop. Chats now sits above
+      blueprint.
+- [ ] Reload `/`. The reorder persists.
+- [ ] DevTools → `modes` → `home_default`. The `components`
+      array reflects the new order, with `order: 0..N`
+      renumbered for section-slot entries only.
+
+### Blueprint floor plan
+
+- [ ] Blueprint renders as one SVG canvas with a hatched outer
+      wall and faux floor grid.
+- [ ] Each room has an irregular path matching its layout
+      (three-panel: bump on right edge; canvas-centric:
+      chamfered bottom-right; document-centric: chamfered
+      bottom-left; single-column-with-sheet: chamfered
+      top-right corner).
+- [ ] Two rooms with the same layout have visibly different
+      bump positions / chamfer depths (per-room hash variability).
+- [ ] Active room's interior shows up to 3 gold feature pills
+      drawn from its components (TOC, BRANCHES, HIGHLIGHTS,
+      FILE SHELF, etc.).
+- [ ] Gold pawn marker breathes (2.5s loop) inside the room
+      with the most-recent conversation. With zero rooms, the
+      pawn rides next to "+ Build a room".
+- [ ] Hover the pawn → "You are here" tooltip follows the
+      cursor.
+- [ ] Hover a chat row → its room's path lights gold (cross-
+      section bus working).
+- [ ] Click "+ Build a room" placeholder → navigates to
+      `/build`.
+
+### Chats section
+
+- [ ] Toolbar shows search box (~280px) + view toggle pill on
+      the right with Sparkles / StickyNote / Highlighter /
+      GitBranch icons + their text labels.
+- [ ] Each row is a 5-column grid: gold checkbox, title +
+      summary, topic chips, relative date, absolute date.
+- [ ] Tag chips have hash-stable colors — the same tag string
+      always lights up the same color across reloads.
+- [ ] Click a row checkbox → row highlights gold; the toolbar
+      flips to a gold bulk-toolbar with "N selected", Pin,
+      Regenerate summaries, Delete (red on hover), Clear.
+- [ ] Click Pin → all selected conversations get `pinned:
+      true` in IndexedDB; selection clears.
+- [ ] Click Regenerate summaries → titles / summaries / tags
+      regenerate via the provider; selection clears.
+- [ ] Click Delete → confirm prompt; on accept the
+      conversations are gone.
+- [ ] Footer shows "X conversations" with the live count.
+
+### Library section
+
+- [ ] Filter chips: All (default active) / Rooms / Layouts /
+      Components / Schemes / Resources. Active chip has gold
+      tint + gold border.
+- [ ] Library-search box is at the right of the chip row.
+- [ ] All filter shows ~30+ items (rooms 7, layouts 7,
+      components 24+, schemes 6, resources 6).
+- [ ] Each card shows a type-specific preview: rooms = walls
+      with door dot + gold input dock; layouts = panel
+      rectangles; components = timeline track + dots; schemes
+      = full color swatch in the scheme's accent; resources =
+      gold-tinted icon.
+- [ ] Type chips colored per kind (room=gold, layout=purple,
+      component=teal, scheme=brown, resource=gold).
+- [ ] Click a card → right-side 420px slide-in overlay
+      appears.
+- [ ] Overlay shows author / updated / installs / version;
+      per-type extras: Includes (rooms), Slots (layouts),
+      Fits in slots (components), Covers (resources).
+- [ ] Esc closes the overlay; clicking the backdrop closes
+      it.
+
+### Favorites section
+
+- [ ] Each card has a 3-line snippet, a meta line with a gold
+      star + source conversation title.
+- [ ] Hover a card → copy button fades in top-right with a
+      slight lift.
+- [ ] Click copy → button flashes gold with a checkmark for
+      ~1.5s, snippet text in the clipboard.
+- [ ] Click section "Edit" button → cards grow gold
+      checkboxes; Edit button shows "Done".
+- [ ] Click checkboxes on 2 favorites → toolbar flips to gold
+      bulk-toolbar with "2 selected" + Trash + Done.
+- [ ] Click Trash → confirm; favorites removed; edit mode
+      exits.
+- [ ] Outside edit mode, clicking a card navigates to its
+      source conversation.
+
+### Cleanup verification
+
+- [ ] `dist/assets/index-*.js` does NOT contain the symbol
+      `BluePreview`.
+- [ ] `src/catalog/entries/blueprint-preview.jsx` and
+      `src/catalog/layouts/section-card.jsx` are gone from
+      disk.
+- [ ] `npm run build` clean.
+
+### Out of scope (parked for PR-15)
+
+- Topbar / chats toolbar / library filter chip overflow on
+  mobile widths. The spec uses fixed widths and assumes
+  desktop; the mobile responsiveness pass is its own PR.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

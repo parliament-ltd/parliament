@@ -1,0 +1,413 @@
+// blueprint@1.0 — homepage SVG floor-plan renderer (PR-14).
+//
+// Renders every user-built room as an irregular path on a single SVG
+// canvas, with hatched outer wall, faux floor grid, gold pawn marker,
+// dimension ticks, and per-room feature pills. Replaces the v1 grid
+// of rounded boxes that blueprint-preview.jsx shipped at PR-6.
+//
+// Layout signatures and packing live in src/lib/blueprintShapes.js as
+// pure functions; this file is the React adapter that mounts them and
+// wires up the hostAPI cross-section hover bus.
+//
+// Spec reference: refactor/parliament_homepage_v2 (2).html (the section
+// labelled "BLUEPRINT") plus parliament_v2_design_decisions.md §2.5
+// (room shape signatures) and §5 (homepage blueprint details).
+//
+// Visual notes specific to PR-14:
+//   - Pawn position deviates from spec/design-doc: when the user has no
+//     rooms, the pawn lives next to the "+ Build a room" placeholder
+//     (drawing the eye toward the first build). Once any room exists,
+//     the pawn moves into the room owning the most-recent conversation.
+//   - Cross-section hover: chats@1.0 publishes PHASE_1_EVENTS.ROW_HOVER
+//     and we light up the path matching the conversation's `room` field.
+
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useConversations } from '../../stores/ConversationContext'
+import { listModes } from '../../lib/modes'
+import { PHASE_1_EVENTS } from '../../lib/hostAPI'
+import {
+  packRooms,
+  buildRoomPath,
+  buildPlaceholderPath,
+  placePawn,
+  PLACEHOLDER_KIND,
+} from '../../lib/blueprintShapes'
+
+// ─── Visual constants ────────────────────────────────────────
+
+const WALL_STROKE = '#3A3530'
+const WALL_FILL   = '#F5F0E8'
+const HATCH_FILL  = 'url(#bp-hatch)'
+const FLOOR_GRID  = 'url(#bp-floorgrid)'
+const HATCH_LIGHT = 'url(#bp-hatch-light)'
+
+const ROOM_FILL_DEFAULT = '#F5F0E8'
+const ROOM_FILL_ACTIVE  = 'rgba(196, 169, 77, 0.10)'
+const ROOM_FILL_HOVER   = 'rgba(196, 169, 77, 0.16)'
+const ROOM_FILL_HIGHLIT = 'rgba(196, 169, 77, 0.22)'
+const ROOM_BORDER_DEFAULT = '#C8C2B8'
+const ROOM_BORDER_ACTIVE  = '#B8A070'
+
+// Mapping from component ref name → feature pill label. Limited to the
+// features the wizard actually surfaces (src/lib/buildWizard.js FEATURES)
+// plus a couple of obvious extras. Ordered by perceived importance —
+// only the top 3 fit comfortably on a room floor.
+const FEATURE_LABELS = {
+  toc:         'TOC',
+  branches:    'BRANCHES',
+  highlights:  'HIGHLIGHTS',
+  'file-shelf':'FILE SHELF',
+  context:     'CONTEXT HEALTH',
+  notes:       'NOTES',
+  review:      'REVIEW',
+}
+
+const SCHEME_DISPLAY = {
+  parliament:    'Parliament Default',
+  'cool-bright': 'Cool Bright',
+  'deep-calm':   'Deep Calm',
+  'soft-violet': 'Soft Violet',
+  'fresh-teal':  'Fresh Teal',
+  'amber-glow':  'Amber Glow',
+}
+
+const LAYOUT_DISPLAY = {
+  'three-panel':              'Three-panel',
+  'canvas-centric':           'Canvas-centric',
+  'document-centric':         'Document-centric',
+  'single-column-with-sheet': 'Single column',
+}
+
+const refName = (ref) => (ref || '').split('@')[0]
+
+// Pull up to 3 feature pills off a room's components array.
+function featuresFor(room) {
+  const seen = new Set()
+  const out = []
+  for (const c of room?.components || []) {
+    const label = FEATURE_LABELS[refName(c.ref)]
+    if (label && !seen.has(label)) {
+      seen.add(label)
+      out.push(label)
+      if (out.length === 3) break
+    }
+  }
+  return out
+}
+
+// ─── Component ───────────────────────────────────────────────
+
+export default function BlueprintRender({ hostAPI } = {}) {
+  const { conversations } = useConversations()
+  const navigate = useNavigate()
+  const [rooms, setRooms] = useState([])
+  const [hoveredFromChat, setHoveredFromChat] = useState(null)
+  const [hoveredFromBlueprint, setHoveredFromBlueprint] = useState(null)
+  const [pawnTip, setPawnTip] = useState(null) // { x, y } or null
+
+  // Subscribe to chats@1.0's row-hover bus. Payload = { conversationId | null }.
+  useEffect(() => {
+    if (!hostAPI?.subscribe) return
+    return hostAPI.subscribe(PHASE_1_EVENTS.ROW_HOVER, (payload) => {
+      setHoveredFromChat(payload?.conversationId ?? null)
+    })
+  }, [hostAPI])
+
+  // Load every room mode once. Future PR-15+ may push these through a
+  // useModes() hook that listens for `homepage-mode-changed` so wizard-
+  // built rooms appear without a reload — out of scope here.
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const modes = await listModes({ scope: 'room' })
+        if (!cancelled) setRooms(modes || [])
+      } catch {
+        if (!cancelled) setRooms([])
+      }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
+  // Most-recently-active room: the room of the conversation with the
+  // highest updatedAt. Falls back to null when no conversation has a
+  // room set yet (e.g. legacy V1 conversations).
+  const activeRoomId = useMemo(() => {
+    let best = null
+    let bestT = 0
+    for (const c of conversations) {
+      if (!c.room) continue
+      const t = new Date(c.updatedAt).getTime()
+      if (t > bestT) { bestT = t; best = c.room }
+    }
+    return best
+  }, [conversations])
+
+  // The room id implied by the chat row currently being hovered.
+  const highlightedRoomId = useMemo(() => {
+    if (!hoveredFromChat) return null
+    const c = conversations.find(c => c.id === hoveredFromChat)
+    return c?.room || null
+  }, [hoveredFromChat, conversations])
+
+  // Pack into rows + compute viewBox. Memoized on rooms array identity.
+  const layout = useMemo(() => {
+    const items = rooms.map(r => ({ id: r.id, layoutRef: r.layout?.ref || '' }))
+    return packRooms(items, { includePlaceholder: true })
+  }, [rooms])
+
+  const pawn = useMemo(
+    () => placePawn({ placedRooms: layout.placedRooms, activeRoomId }),
+    [layout.placedRooms, activeRoomId]
+  )
+
+  // Quick lookup of room mode by id for label rendering.
+  const modesById = useMemo(() => {
+    const m = new Map()
+    for (const r of rooms) m.set(r.id, r)
+    return m
+  }, [rooms])
+
+  // Build label text for a room. Last-spoken comes from the latest
+  // conversation in this room; "No conversations yet" if none.
+  const lastModelByRoomId = useMemo(() => {
+    const m = new Map()
+    for (const c of conversations) {
+      if (!c.room) continue
+      const prev = m.get(c.room)
+      if (!prev || new Date(c.updatedAt) > new Date(prev.updatedAt)) {
+        m.set(c.room, c)
+      }
+    }
+    return m
+  }, [conversations])
+
+  const onEnterRoom = (roomId) => {
+    // Find the most-recent conversation in this room and navigate to it.
+    // No conversations? Land in the build wizard (room is empty).
+    let last = null
+    for (const c of conversations) {
+      if (c.room !== roomId) continue
+      if (!last || new Date(c.updatedAt) > new Date(last.updatedAt)) last = c
+    }
+    if (last) navigate(`/chat/${last.id}`)
+    else navigate('/build')
+  }
+
+  return (
+    <div className="bp-wrap">
+      <svg
+        viewBox={`0 0 ${layout.viewBox.width} ${layout.viewBox.height}`}
+        xmlns="http://www.w3.org/2000/svg"
+        className="block w-full h-auto bp-svg"
+        role="img"
+        aria-label="Blueprint floor plan of your rooms"
+      >
+        <defs>
+          <pattern id="bp-hatch" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="5" stroke="#B8B2A8" strokeWidth="1.2" />
+          </pattern>
+          <pattern id="bp-floorgrid" patternUnits="userSpaceOnUse" width="20" height="20">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#DDD8D0" strokeWidth="0.4" />
+          </pattern>
+          <pattern id="bp-hatch-light" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="4" stroke="#DDD8D0" strokeWidth="0.8" />
+          </pattern>
+        </defs>
+
+        {/* Outer wall: floor color + grid + hatched border */}
+        <rect x={layout.floorBox.x} y={layout.floorBox.y} width={layout.floorBox.width} height={layout.floorBox.height} fill={WALL_FILL} />
+        <rect x={layout.floorBox.x} y={layout.floorBox.y} width={layout.floorBox.width} height={layout.floorBox.height} fill={FLOOR_GRID} />
+        <rect x={layout.wallBox.x} y={layout.wallBox.y} width={layout.wallBox.width} height={layout.wallBox.height} fill="none" stroke={WALL_STROKE} strokeWidth="6" rx="2" />
+        <rect x={layout.wallBox.x} y={layout.wallBox.y} width={layout.wallBox.width} height={layout.wallBox.height} fill={HATCH_FILL} fillOpacity="0.22" stroke="none" rx="2" />
+
+        {/* Rooms + placeholder */}
+        {layout.placedRooms.map(placed =>
+          placed.kind === PLACEHOLDER_KIND
+            ? (
+              <PlaceholderRoom
+                key="__placeholder__"
+                box={placed.box}
+                onClick={() => navigate('/build')}
+              />
+            )
+            : (
+              <Room
+                key={placed.id}
+                placed={placed}
+                mode={modesById.get(placed.id)}
+                lastConv={lastModelByRoomId.get(placed.id)}
+                isActive={placed.id === activeRoomId}
+                isHighlitFromChat={placed.id === highlightedRoomId}
+                isHovered={placed.id === hoveredFromBlueprint}
+                onEnter={() => setHoveredFromBlueprint(placed.id)}
+                onLeave={() => setHoveredFromBlueprint(null)}
+                onClick={() => onEnterRoom(placed.id)}
+              />
+            )
+        )}
+
+        {/* Dimension ticks: top edge for first room, right edge for last */}
+        <DimensionTicks layout={layout} modesById={modesById} />
+
+        {/* Pawn marker */}
+        {pawn && (
+          <g
+            transform={`translate(${pawn.x - 10}, ${pawn.y - 8})`}
+            className="bp-pawn"
+            style={{ cursor: 'pointer' }}
+            onMouseEnter={(e) => setPawnTip({ x: e.clientX, y: e.clientY })}
+            onMouseMove={(e) => setPawnTip({ x: e.clientX, y: e.clientY })}
+            onMouseLeave={() => setPawnTip(null)}
+          >
+            <circle cx="10" cy="6" r="5" fill="#D4A843" stroke="#8B6A10" strokeWidth="1" />
+            <rect x="5" y="10" width="10" height="3" rx="1" fill="#D4A843" stroke="#8B6A10" strokeWidth="1" />
+            <rect x="3" y="13" width="14" height="2.5" rx="1" fill="#D4A843" stroke="#8B6A10" strokeWidth="1" />
+            {/* Breathing ring; CSS keyframes handle the animation so reduced-motion users get the still ring */}
+            <circle cx="10" cy="6" r="5" fill="none" stroke="#D4A843" strokeWidth="1.5" opacity="0.5" className="bp-pawn-ring" />
+          </g>
+        )}
+      </svg>
+
+      {pawnTip && (
+        <div
+          className="bp-pawn-tip"
+          style={{ left: pawnTip.x + 10, top: pawnTip.y - 28, position: 'fixed' }}
+        >
+          You are here
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Subcomponents ───────────────────────────────────────────
+
+function Room({ placed, mode, lastConv, isActive, isHighlitFromChat, isHovered, onEnter, onLeave, onClick }) {
+  const { box, layoutRef, id } = placed
+  const { path, interior } = buildRoomPath({ box, layoutRef, roomId: id })
+  const cx = interior.x + interior.width / 2
+  const features = featuresFor(mode)
+
+  let fill = ROOM_FILL_DEFAULT
+  if (isActive) fill = ROOM_FILL_ACTIVE
+  if (isHovered) fill = ROOM_FILL_HOVER
+  if (isHighlitFromChat) fill = ROOM_FILL_HIGHLIT
+
+  const stroke = isActive || isHovered || isHighlitFromChat ? ROOM_BORDER_ACTIVE : ROOM_BORDER_DEFAULT
+  const strokeWidth = isActive ? 1.5 : 0.5
+
+  const name = (mode?.meta?.name || mode?.id || 'Room').toUpperCase()
+  const layoutLabel = LAYOUT_DISPLAY[refName(layoutRef)] || refName(layoutRef) || 'Layout'
+  const schemeLabel = SCHEME_DISPLAY[refName(mode?.scheme?.ref)] || ''
+  const lastModel = lastConv?.model || null
+
+  return (
+    <g
+      style={{ cursor: 'pointer' }}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      onClick={onClick}
+    >
+      {/* Fill */}
+      <path d={path} fill={fill} className="bp-room-fill" />
+      {/* Border */}
+      <path d={path} fill="none" stroke={stroke} strokeWidth={strokeWidth} />
+
+      {/* Faded "THE" tagline + bold name */}
+      <text x={cx} y={interior.y + 28} textAnchor="middle" fontSize="9" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+        THE
+      </text>
+      <text x={cx} y={interior.y + 44} textAnchor="middle" fontSize="12" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
+        {name}
+      </text>
+      <text x={cx} y={interior.y + 64} textAnchor="middle" fontSize="8" fill="#9A9490">
+        {layoutLabel}{schemeLabel ? ` · ${schemeLabel}` : ''}
+      </text>
+      {lastModel && (
+        <text x={cx} y={interior.y + 78} textAnchor="middle" fontSize="8" fill="#9A9490" fontStyle="italic">
+          Last spoken to {lastModel}
+        </text>
+      )}
+
+      {/* Feature pills (only on the active room, per design doc §5) */}
+      {isActive && features.length > 0 && (
+        <FeaturePills features={features} interior={interior} />
+      )}
+    </g>
+  )
+}
+
+function FeaturePills({ features, interior }) {
+  const pillH = 14
+  const pillGap = 6
+  const padX = 6
+  // Approximate pill widths from text length; keep them snug.
+  const widths = features.map(f => Math.max(40, f.length * 5.5 + padX * 2))
+  const total = widths.reduce((s, w) => s + w, 0) + (features.length - 1) * pillGap
+  let cursorX = interior.x + (interior.width - total) / 2
+  const y = interior.y + interior.height - 26
+  return (
+    <>
+      {features.map((label, i) => {
+        const w = widths[i]
+        const node = (
+          <g key={label}>
+            <rect x={cursorX} y={y} width={w} height={pillH} rx={pillH / 2} fill="rgba(196,169,77,0.15)" stroke="rgba(196,169,77,0.4)" strokeWidth="0.5" />
+            <text x={cursorX + w / 2} y={y + 9} textAnchor="middle" fontSize="7" fill="#8B6A10" fontWeight="500">
+              {label}
+            </text>
+          </g>
+        )
+        cursorX += w + pillGap
+        return node
+      })}
+    </>
+  )
+}
+
+function PlaceholderRoom({ box, onClick }) {
+  const path = buildPlaceholderPath(box)
+  const cx = box.x + box.width / 2
+  const cy = box.y + box.height / 2
+  return (
+    <g className="bp-placeholder" style={{ cursor: 'pointer' }} onClick={onClick}>
+      <path d={path} fill="transparent" className="bp-placeholder-fill" />
+      <path d={path} fill="none" stroke="#C8C2B8" strokeWidth="1" strokeDasharray="5 4" className="bp-placeholder-dash" />
+      <text x={cx} y={cy - 4} textAnchor="middle" fontSize="9" fill="#B8B2A8" letterSpacing="0.08em" className="bp-placeholder-title">
+        + BUILD A ROOM
+      </text>
+      <text x={cx} y={cy + 12} textAnchor="middle" fontSize="7.5" fill="#C8C2B8" className="bp-placeholder-sub">
+        Expand your Parliament
+      </text>
+    </g>
+  )
+}
+
+function DimensionTicks({ layout, modesById }) {
+  // Tick the first room across the top edge with its name; tick the
+  // tallest room down the right edge. Lifted from spec, simplified.
+  const realRooms = layout.placedRooms.filter(r => r.kind !== PLACEHOLDER_KIND)
+  if (realRooms.length === 0) return null
+  const first = realRooms[0]
+  const firstName = modesById.get(first.id)?.meta?.name || 'Room'
+  const tickTop = layout.floorBox.y - 12
+  const tickRight = layout.floorBox.x + layout.floorBox.width + 22
+  const colHeight = layout.floorBox.height
+  return (
+    <g>
+      {/* Top tick */}
+      <line x1={first.box.x} y1={tickTop} x2={first.box.x + first.box.width} y2={tickTop} stroke="#C8C2B8" strokeWidth="0.5" />
+      <line x1={first.box.x} y1={tickTop - 3} x2={first.box.x} y2={tickTop + 3} stroke="#C8C2B8" strokeWidth="0.5" />
+      <line x1={first.box.x + first.box.width} y1={tickTop - 3} x2={first.box.x + first.box.width} y2={tickTop + 3} stroke="#C8C2B8" strokeWidth="0.5" />
+      <text x={first.box.x + first.box.width / 2} y={tickTop - 4} textAnchor="middle" fontSize="7" fill="#B8B2A8">
+        {firstName} · {first.box.width}px
+      </text>
+      {/* Right tick (down full floor height) */}
+      <line x1={tickRight} y1={layout.floorBox.y} x2={tickRight} y2={layout.floorBox.y + colHeight} stroke="#C8C2B8" strokeWidth="0.5" />
+      <line x1={tickRight - 3} y1={layout.floorBox.y} x2={tickRight + 3} y2={layout.floorBox.y} stroke="#C8C2B8" strokeWidth="0.5" />
+      <line x1={tickRight - 3} y1={layout.floorBox.y + colHeight} x2={tickRight + 3} y2={layout.floorBox.y + colHeight} stroke="#C8C2B8" strokeWidth="0.5" />
+    </g>
+  )
+}

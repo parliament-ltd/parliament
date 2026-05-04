@@ -1,27 +1,65 @@
-// Self-contained render wrapper for chats@1.0.
+// Self-contained render wrapper for chats@1.0 (PR-14 rewrite to spec).
 //
-// Homepage-section view of the user's conversation list. Renders a search
-// box, a view toggle (Summary / Notes / Highlights / Branches), and a
-// flat list of rows. Each row's mouseenter/leave publishes `row-hover`
-// on the room bus so blueprint@1.0 can highlight the matching room.
+// Spec source: refactor/parliament_homepage_v2 (2).html, the section
+// labelled "CHATS". 5-column grid, custom 15px gold-tinted checkbox,
+// view toggle with Sparkles/StickyNote/Highlighter/GitBranch icons,
+// bulk toolbar that replaces the search+toggle when any row is checked.
 //
-// The full V1 selector — sidebars, family colors, branch hierarchy,
-// inline note editing, regenerate-summaries — stays at /chats per
-// PR-6's "Preserve V1 selector at /chats" requirement. This component
-// is the homepage section, not a wholesale port.
+// All visual classes (`.chats-toolbar`, `.chat-row`, `.bulk-toolbar`,
+// `.topic-chip` …) live in src/index.css under the "Homepage v2 chats"
+// block. The spec was built around precise grid widths and custom
+// checkbox SVGs; matching it cleanly via Tailwind utilities would lose
+// fidelity, so PR-14 ports the CSS verbatim from the HTML and keeps the
+// JSX a thin shell over it.
 //
-// Lives in its own file so chats.jsx's manifest entry stays a clean
-// default-export (react-refresh's "only-export-components" rule).
+// Row hover still publishes PHASE_1_EVENTS.ROW_HOVER on the room
+// hostAPI bus so blueprint@1.0 can highlight the matching room — this
+// is the "hover a chat row, illuminate the corresponding room" behavior
+// from refactor/parliament_v2_design_decisions.md §5.
 
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Trash2, X } from 'lucide-react'
+import { Search, Sparkles, StickyNote, Highlighter, GitBranch, Pin, RotateCw, Trash2 } from 'lucide-react'
 import { useConversations } from '../../stores/ConversationContext'
+import { useSettings } from '../../stores/SettingsContext'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
+import { getMessages } from '../../lib/db'
+import { loadApiKey } from '../../lib/crypto'
+import { getProvider } from '../../providers'
 
-const VIEW_OPTIONS = ['summary', 'notes', 'highlights', 'branches']
+// ─── View toggle config ──────────────────────────────────────
 
-const SEGMENT_BTN_BASE = 'px-3 py-1.5 text-xs font-medium rounded-md transition-colors'
+const VIEWS = [
+  { id: 'summary',    label: 'Summary',    icon: Sparkles    },
+  { id: 'notes',      label: 'Notes',      icon: StickyNote  },
+  { id: 'highlights', label: 'Highlights', icon: Highlighter },
+  { id: 'branches',   label: 'Branches',   icon: GitBranch   },
+]
+
+// ─── Topic chip palette ──────────────────────────────────────
+//
+// Eight stable colors hashed off the tag text so the same tag always
+// lights up the same color across reloads. Roughly mirrors the spec's
+// per-tag handpicked colors (Essay=brown, Drafting=purple, Auth=teal …)
+// without hardcoding any particular tag.
+const TOPIC_PALETTE = [
+  { bg: 'rgba(184,160,112,0.15)', fg: '#8B6A10' }, // brown/gold
+  { bg: 'rgba(124,108,212,0.12)', fg: '#5A4AB0' }, // purple
+  { bg: 'rgba(15,123,108,0.12)',  fg: '#0F7B6C' }, // teal
+  { bg: 'rgba(184,92,0,0.12)',    fg: '#8B4A10' }, // amber
+  { bg: 'rgba(236,72,153,0.12)',  fg: '#BE3878' }, // pink
+  { bg: 'rgba(20,184,166,0.12)',  fg: '#0F766E' }, // mint
+  { bg: 'rgba(59,130,246,0.12)',  fg: '#1D4ED8' }, // blue
+  { bg: 'rgba(120,113,108,0.12)', fg: '#57534E' }, // stone
+]
+
+function hashTag(s) {
+  let h = 5381
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0
+  return (h >>> 0) % TOPIC_PALETTE.length
+}
+
+// ─── Date helpers ────────────────────────────────────────────
 
 function relativeTime(iso) {
   if (!iso) return ''
@@ -37,34 +75,30 @@ function relativeTime(iso) {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
+function absoluteDate(iso) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+}
+
+// ─── Component ───────────────────────────────────────────────
+
 export default function ChatsPreview({ config = {}, hostAPI } = {}) {
-  const { conversations, deleteConversations } = useConversations()
+  const { conversations, deleteConversations, updateConversation } = useConversations()
+  const { settings } = useSettings()
   const navigate = useNavigate()
 
   const [view, setView]       = useState(config.defaultView || 'summary')
   const [query, setQuery]     = useState('')
   const [selected, setSelected] = useState(new Set())
 
-  const filteredConversations = useMemo(() => {
+  const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return conversations
     return conversations.filter(c => {
-      const hay = [
-        c.title || '',
-        c.aiSummary || '',
-        ...(c.tags || []),
-      ].join(' ').toLowerCase()
+      const hay = [c.title || '', c.aiSummary || '', ...(c.tags || [])].join(' ').toLowerCase()
       return hay.includes(q)
     })
   }, [conversations, query])
-
-  const allSelected = filteredConversations.length > 0 &&
-    filteredConversations.every(c => selected.has(c.id))
-
-  const toggleAll = () => {
-    if (allSelected) setSelected(new Set())
-    else setSelected(new Set(filteredConversations.map(c => c.id)))
-  }
 
   const toggleOne = (id) => {
     setSelected(prev => {
@@ -75,88 +109,119 @@ export default function ChatsPreview({ config = {}, hostAPI } = {}) {
     })
   }
 
+  const clearSelection = () => setSelected(new Set())
+
+  const onPinSelected = async () => {
+    if (selected.size === 0) return
+    for (const id of selected) {
+      await updateConversation(id, { pinned: true })
+    }
+    clearSelection()
+  }
+
   const onDeleteSelected = async () => {
     if (selected.size === 0) return
     const ok = window.confirm(`Delete ${selected.size} conversation${selected.size === 1 ? '' : 's'}?`)
     if (!ok) return
     await deleteConversations([...selected])
-    setSelected(new Set())
+    clearSelection()
+  }
+
+  const onRegenerateSelected = async () => {
+    if (selected.size === 0) return
+    const apiKey = await loadApiKey(settings?.persistKey ? 'persistent' : 'session')
+    if (!apiKey) return
+    const provider = getProvider('anthropic')
+    const ids = [...selected]
+    await Promise.allSettled(ids.map(async (convId) => {
+      try {
+        const msgs = await getMessages(convId)
+        if (msgs.length < 2) return
+        const messagesToUse = msgs.slice(0, 6).map(m => ({ role: m.role, content: m.content }))
+        await Promise.allSettled([
+          provider.generateTitle(apiKey, messagesToUse).then(title => updateConversation(convId, { title })),
+          provider.generateSummary(apiKey, messagesToUse).then(aiSummary => updateConversation(convId, { aiSummary })),
+          provider.generateTags(apiKey, messagesToUse).then(tags => updateConversation(convId, { tags })),
+        ])
+      } catch (err) {
+        if (import.meta.env.DEV) console.warn('regenerate failed for', convId, err)
+      }
+    }))
+    clearSelection()
   }
 
   const publishHover = (conversationId) => {
     hostAPI?.publish?.(PHASE_1_EVENTS.ROW_HOVER, { conversationId })
   }
-
   // Clear hover on unmount so blueprint doesn't keep stale highlight.
-  useEffect(() => () => publishHover(null), [])  // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => publishHover(null), []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const hasSelection = selected.size > 0
 
   return (
     <div>
-      {/* Toolbar: search + view toggle + bulk actions */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--p-text-muted)]" />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search chats, summaries, tags…"
-            className="w-full bg-white rounded-lg pl-9 pr-3 py-2 text-sm text-[var(--p-text-primary)] outline-none border border-[var(--p-border)] focus:border-[var(--p-accent-gold,#B8A070)] transition-colors placeholder:text-[var(--p-text-muted)]"
-          />
-        </div>
-
-        <div className="inline-flex bg-[var(--p-bg-subtle,#FAFAFA)] rounded-lg p-1 border border-[var(--p-border)]">
-          {VIEW_OPTIONS.map(v => {
-            const active = v === view
-            return (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setView(v)}
-                className={`${SEGMENT_BTN_BASE} ${
-                  active
-                    ? 'bg-white text-[var(--p-text-primary)] shadow-sm border border-[var(--p-border)]'
-                    : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)]'
-                }`}
-              >
-                {v.charAt(0).toUpperCase() + v.slice(1)}
+      {/* Toolbar — search + view toggle, replaced by bulk toolbar when rows are selected */}
+      <div className={`chats-toolbar${hasSelection ? ' has-selection' : ''}`}>
+        {hasSelection ? (
+          <div className="bulk-toolbar show">
+            <span className="bulk-count">{selected.size} selected</span>
+            <div className="bulk-actions">
+              <button type="button" className="bulk-btn" onClick={onPinSelected} aria-label="Pin">
+                <Pin className="w-3.5 h-3.5" />
+                <span className="bulk-tip">Pin</span>
               </button>
-            )
-          })}
-        </div>
-
-        <button
-          type="button"
-          onClick={toggleAll}
-          className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[var(--p-border)] bg-white text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] hover:border-[var(--p-accent-gold,#B8A070)] transition-colors"
-        >
-          {allSelected ? 'Clear selection' : 'Select all'}
-        </button>
-
-        {selected.size > 0 && (
-          <button
-            type="button"
-            onClick={onDeleteSelected}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-[var(--p-error,#E03E3E)] text-[var(--p-error,#E03E3E)] bg-white hover:bg-[rgba(224,62,62,0.06)] transition-colors"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            Delete {selected.size}
-            <X
-              className="w-3.5 h-3.5 ml-1 hover:scale-110"
-              onClick={(e) => { e.stopPropagation(); setSelected(new Set()) }}
-            />
-          </button>
+              <button type="button" className="bulk-btn" onClick={onRegenerateSelected} aria-label="Regenerate summaries">
+                <RotateCw className="w-3.5 h-3.5" />
+                <span className="bulk-tip">Regenerate summaries</span>
+              </button>
+              <button type="button" className="bulk-btn danger" onClick={onDeleteSelected} aria-label="Delete">
+                <Trash2 className="w-3.5 h-3.5" />
+                <span className="bulk-tip">Delete</span>
+              </button>
+            </div>
+            <button type="button" className="bulk-clear" onClick={clearSelection}>Clear</button>
+          </div>
+        ) : (
+          <>
+            <div className="chats-search">
+              <Search className="search-icon" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search chats, notes, highlights, tags…"
+              />
+            </div>
+            <div className="view-toggle">
+              {VIEWS.map(v => {
+                const Icon = v.icon
+                const active = v.id === view
+                return (
+                  <button
+                    key={v.id}
+                    type="button"
+                    className={active ? 'active' : ''}
+                    onClick={() => setView(v.id)}
+                    title={v.label}
+                  >
+                    <Icon className="w-3 h-3" />
+                    <span>{v.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </>
         )}
       </div>
 
-      {/* Row list */}
-      {filteredConversations.length === 0 ? (
+      {/* Row table */}
+      {filtered.length === 0 ? (
         <div className="text-sm text-[var(--p-text-secondary)] py-6 text-center">
           {query ? 'No matches.' : 'No conversations yet. Start one from any room.'}
         </div>
       ) : (
-        <ul className="divide-y divide-[var(--p-border-subtle)]">
-          {filteredConversations.map(c => (
+        <div className="chat-table">
+          {filtered.map(c => (
             <ChatRow
               key={c.id}
               chat={c}
@@ -168,15 +233,17 @@ export default function ChatsPreview({ config = {}, hostAPI } = {}) {
               onMouseLeave={() => publishHover(null)}
             />
           ))}
-        </ul>
+        </div>
       )}
 
-      <div className="mt-4 flex items-center justify-between text-xs text-[var(--p-text-muted)]">
-        <span>{filteredConversations.length} conversation{filteredConversations.length === 1 ? '' : 's'}</span>
+      <div className="chat-footer">
+        <span>{filtered.length} conversation{filtered.length === 1 ? '' : 's'}</span>
       </div>
     </div>
   )
 }
+
+// ─── Row ─────────────────────────────────────────────────────
 
 function ChatRow({ chat, view, selected, onToggleSelected, onOpen, onMouseEnter, onMouseLeave }) {
   const tags = chat.tags || []
@@ -191,44 +258,44 @@ function ChatRow({ chat, view, selected, onToggleSelected, onOpen, onMouseEnter,
   else if (view === 'branches') secondLine = isBranch ? `↳ branched from ${chat.parentTitle || 'parent'}` : 'Main thread'
 
   return (
-    <li
-      className={`flex items-start gap-3 py-3 px-2 rounded transition-colors cursor-pointer ${
-        selected ? 'bg-[var(--p-bg-alt,#FAFAFA)]' : 'hover:bg-[var(--p-bg-subtle,#FAFAFA)]'
-      }`}
+    <div
+      className={`chat-row${selected ? ' selected' : ''}`}
       onClick={onOpen}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      data-room={chat.room || ''}
     >
-      <input
-        type="checkbox"
-        checked={selected}
-        onChange={() => {}}
+      <button
+        type="button"
+        className={`chat-checkbox${selected ? ' checked' : ''}`}
         onClick={(e) => { e.stopPropagation(); onToggleSelected() }}
-        className="mt-1 accent-[var(--p-accent-gold,#B8A070)]"
-      />
-      <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium text-[var(--p-text-primary)] truncate">
-          {chat.title || 'Untitled conversation'}
+        aria-label="Select chat"
+      >
+        <svg viewBox="0 0 14 14" fill="none">
+          <polyline points="3,7.5 6,10 11,4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+
+      <div className="chat-text">
+        <div className="chat-title">
+          <span className="chat-title-text">{chat.title || 'Untitled conversation'}</span>
         </div>
-        <div className="text-xs text-[var(--p-text-secondary)] truncate mt-0.5">
-          {secondLine}
-        </div>
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-1.5">
-            {tags.slice(0, 3).map(t => (
-              <span
-                key={t}
-                className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--p-code-bg,#F7F6F3)] text-[var(--p-text-secondary)]"
-              >
-                {t}
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="chat-summary">{secondLine}</div>
       </div>
-      <div className="text-xs text-[var(--p-text-muted)] tabular-nums shrink-0 pt-0.5">
-        {relativeTime(chat.updatedAt)}
+
+      <div className="chat-topics">
+        {tags.slice(0, 3).map(t => {
+          const palette = TOPIC_PALETTE[hashTag(t)]
+          return (
+            <span key={t} className="topic-chip" style={{ background: palette.bg, color: palette.fg }}>
+              {t}
+            </span>
+          )
+        })}
       </div>
-    </li>
+
+      <div className="chat-date">{relativeTime(chat.updatedAt)}</div>
+      <div className="chat-date">{absoluteDate(chat.updatedAt)}</div>
+    </div>
   )
 }

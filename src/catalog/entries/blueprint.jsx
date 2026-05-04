@@ -1,14 +1,12 @@
-// blueprint@1.0 — homepage section showing every user-built room as a
-// tile, with a hover-glow when a sibling chats@1.0 row points at the
-// same room.
+// blueprint@1.0 — homepage SVG floor-plan section.
 //
-// Reader tier — no model calls; reads the user's room list from
-// IndexedDB plus the active conversation list to compute per-room
-// counts. Subscribes to `row-hover` on the room hostAPI; chats@1.0
-// publishes them. Exit-criterion check for PR-6: hovering a chat row
-// highlights its room on the blueprint.
+// Reader tier — no model calls. Loads the user's room list from
+// IndexedDB and renders an irregular per-layout SVG path for each
+// room (PR-14 redesign). Subscribes to `row-hover` on the room
+// hostAPI; chats@1.0 publishes the events. Hovering a chat row lights
+// up its room on the floor plan.
 
-import BluePreview from './blueprint-preview'
+import BlueprintRender from './blueprint-render'
 
 export default {
   name: 'blueprint',
@@ -29,6 +27,6 @@ export default {
     },
   },
 
-  render: BluePreview,
-  previewRender: BluePreview,
+  render: BlueprintRender,
+  previewRender: BlueprintRender,
 }

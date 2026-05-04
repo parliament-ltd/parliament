@@ -1,239 +1,353 @@
-// Self-contained render wrapper for library@1.0.
+// Self-contained render wrapper for library@1.0 (PR-14 rewrite to spec).
 //
-// Five tabs — Rooms, Layouts, Components, Schemes, Resources — sourced
-// from IndexedDB library tables (PR-1 seeded those). The "Sections"
-// category from the original audit is hidden in Phase 1 per NQ-8.
+// Filter-chip browsing across Rooms / Layouts / Components / Schemes /
+// Resources, with type-specific preview thumbnails on every card and a
+// right-side slide-in overlay (LibraryOverlay) for details. Spec source:
+// refactor/parliament_homepage_v2 (2).html, the section labelled
+// "LIBRARY".
 //
-// Resources tab shows 6 placeholder coming-soon cards drawn from
-// refactor/parliament_v2_resources_spec.md §4 (parliament_v2_resources_spec.md
-// is in the reference docs folder, not committed). Click any card →
-// read-only preview overlay describing what the resource will be.
+// Data flow (PR-14):
+//   - libraryRooms / libraryLayouts / libraryComponents / librarySchemes
+//     records load from IndexedDB. v5 migration backfilled author and
+//     installedCount on each, and seedLibraryComponents() seeded the
+//     components table from the in-memory catalog manifest registry.
+//   - Resources stay as a static RESOURCES const here; they're a Phase 1
+//     placeholder per refactor/parliament_v2_design_decisions.md §6 — the
+//     real resource content production is parked.
 //
-// Lives in its own file so library.jsx's manifest entry stays a clean
-// default-export (react-refresh's "only-export-components" rule).
+// All visual classes (`.library-filters`, `.library-grid`, `.lib-card`,
+// `.lib-preview`, `.lib-card-type` …) live in src/index.css under the
+// "Homepage v2 library" block. Same approach as chats: spec CSS ports
+// verbatim from the HTML rather than hand-translating to Tailwind utilities.
 
 import { useEffect, useMemo, useState } from 'react'
+import { Search, BookOpen, FileText, Code2, BarChart3, Film } from 'lucide-react'
 import { initDB } from '../../lib/db'
+import LibraryOverlay from '../../components/LibraryOverlay'
 
-const TABS = [
-  { id: 'rooms',      label: 'Rooms',      store: 'libraryRooms' },
-  { id: 'layouts',    label: 'Layouts',    store: 'libraryLayouts' },
-  { id: 'components', label: 'Components', store: 'libraryComponents' },
-  { id: 'schemes',    label: 'Schemes',    store: 'librarySchemes' },
-  { id: 'resources',  label: 'Resources',  store: null },
+const FILTERS = [
+  { id: 'all',       label: 'All',        kinds: ['room', 'layout', 'component', 'scheme', 'resource'] },
+  { id: 'room',      label: 'Rooms',      kinds: ['room'] },
+  { id: 'layout',    label: 'Layouts',    kinds: ['layout'] },
+  { id: 'component', label: 'Components', kinds: ['component'] },
+  { id: 'scheme',    label: 'Schemes',    kinds: ['scheme'] },
+  { id: 'resource',  label: 'Resources',  kinds: ['resource'] },
 ]
 
-// 6 placeholder Resource cards — one each across the 5 §4 categories
-// plus a second guide. Each card is "coming soon" — clicking opens a
-// read-only preview overlay.
+// Resources are static V2 phase 1 placeholders. Field shape matches the
+// canonical metadata in refactor/parliament_v2_design_decisions.md §6.5
+// extended with `format` and `target` (resource-only, per the doc).
 const RESOURCES = [
   {
     id: 'guide-first-room',
-    title: 'Your first room: a walkthrough',
+    kind: 'resource',
+    displayName: 'Your first room: a walkthrough',
+    description: 'Step-by-step walkthrough of building a first room with the wizard. Roughly 6 minutes end to end.',
     format: 'Guide',
-    targets: 'rooms',
-    description: 'Step-by-step walkthrough of building a first room with the wizard. ~6 minutes.',
+    target: ['rooms'],
+    covers: ['The three paths', 'Choosing density', 'Picking features', 'Naming and scheme', 'Ignition', 'Editing a built room'],
+    author: { name: 'Anthropic', verified: true },
+    updatedAt: '2026-04-10',
+    status: 'coming-soon',
+    iconName: 'book-open',
   },
   {
     id: 'guide-homepage',
-    title: 'Your Parliament homepage',
+    kind: 'resource',
+    displayName: 'Your Parliament homepage',
+    description: 'How the homepage works as a configurable room. Reordering, adding sections, essentials.',
     format: 'Guide',
-    targets: 'rooms, sections',
-    description: 'How the homepage works as a configurable room. Reordering, adding sections, essentials. ~5 minutes.',
+    target: ['rooms', 'sections'],
+    covers: ['Stacked sections', 'Reordering', 'Adding sections', 'Essentials and removable items'],
+    author: { name: 'Anthropic', verified: true },
+    updatedAt: '2026-04-12',
+    status: 'coming-soon',
+    iconName: 'book-open',
   },
   {
     id: 'ref-component-catalog',
-    title: 'Component catalog',
+    kind: 'resource',
+    displayName: 'Component catalog and hostAPI',
+    description: 'Canonical list of every built-in component with slot fits, config schema, and capabilities. Plus the hostAPI surface contributors will use when building their own.',
     format: 'Reference',
-    targets: 'components, layouts',
-    description: 'Canonical list of every built-in component with slot fits, config schema, and capabilities. ~25 page PDF.',
+    target: ['components', 'layouts'],
+    covers: ['Component catalog', 'hostAPI reference', 'Mode file format', 'Capability gating', 'Safety guidelines'],
+    author: { name: 'Anthropic', verified: true },
+    updatedAt: '2026-04-15',
+    status: 'coming-soon',
+    iconName: 'file-text',
   },
   {
     id: 'recipe-plan-room',
-    title: 'Help me plan a room',
-    format: 'Prompt recipe',
-    targets: 'rooms',
+    kind: 'resource',
+    displayName: '"Help me plan a room" prompt',
     description: 'A prompt that gets Claude to ask useful questions before proposing a room structure.',
+    format: 'Prompt recipe',
+    target: ['rooms'],
+    covers: ['The prompt', 'When to use it', 'Customizing for your work'],
+    author: { name: '@kindred' },
+    updatedAt: '2026-04-08',
+    status: 'coming-soon',
+    iconName: 'code-2',
   },
   {
     id: 'project-newsroom',
-    title: 'The Newsroom',
-    format: 'Example project',
-    targets: 'rooms',
+    kind: 'resource',
+    displayName: 'The Newsroom',
     description: 'A room built for drafting newsletters. Document-centric, Museum Cream, Timeline + Highlights + Branches.',
+    format: 'Example project',
+    target: ['rooms'],
+    covers: [],
+    author: { name: '@dispatch' },
+    updatedAt: '2026-04-04',
+    status: 'coming-soon',
+    iconName: 'bar-chart-3',
   },
   {
     id: 'video-90sec',
-    title: 'Parliament in 90 seconds',
-    format: 'Video link',
-    targets: 'general',
+    kind: 'resource',
+    displayName: 'Parliament in 90 seconds',
     description: 'Marketing-adjacent intro video. Homepage tour, a room in action, the build flow at a high level.',
+    format: 'Video link',
+    target: ['general'],
+    covers: [],
+    author: { name: 'Anthropic', verified: true },
+    updatedAt: '2026-03-28',
+    status: 'coming-soon',
+    iconName: 'film',
   },
 ]
 
+const ICON_MAP = {
+  'book-open':   BookOpen,
+  'file-text':   FileText,
+  'code-2':      Code2,
+  'bar-chart-3': BarChart3,
+  'film':        Film,
+}
+
+// ─── Component ───────────────────────────────────────────────
+
 export default function LibraryPreview({ config = {} } = {}) {
-  const initialTab = config.defaultTab || 'rooms'
-  const [tab, setTab] = useState(initialTab)
-  const [items, setItems] = useState([])
-  const [resourcePreview, setResourcePreview] = useState(null)
+  const initialFilter = config.defaultFilter || 'all'
+  const [filter, setFilter] = useState(initialFilter)
+  const [query, setQuery]   = useState('')
+  const [items, setItems]   = useState([])
+  const [overlayItem, setOverlayItem] = useState(null)
 
   useEffect(() => {
-    if (tab === 'resources') return  // resources are static — no fetch
     let cancelled = false
     ;(async () => {
       try {
         const db = await initDB()
-        const storeName = TABS.find(t => t.id === tab)?.store
-        if (!storeName) return
-        const rows = await db.getAll(storeName)
-        if (!cancelled) setItems(rows || [])
+        const [rooms, layouts, components, schemes] = await Promise.all([
+          db.getAll('libraryRooms'),
+          db.getAll('libraryLayouts'),
+          db.getAll('libraryComponents'),
+          db.getAll('librarySchemes'),
+        ])
+        if (cancelled) return
+        const all = [
+          ...rooms.map(r =>      ({ ...r, kind: 'room' })),
+          ...layouts.map(l =>    ({ ...l, kind: 'layout' })),
+          ...components.map(c => ({ ...c, kind: 'component' })),
+          ...schemes.map(s =>    ({ ...s, kind: 'scheme' })),
+          ...RESOURCES,
+        ]
+        setItems(all)
       } catch {
         if (!cancelled) setItems([])
       }
     })()
     return () => { cancelled = true }
-  }, [tab])
+  }, [])
 
-  // Render `RESOURCES` directly when the resources tab is active —
-  // no need to round-trip through state since it's a static constant.
-  const renderItems = tab === 'resources' ? RESOURCES : items
-  const visibleTabs = useMemo(() => TABS, [])
+  const visible = useMemo(() => {
+    const f = FILTERS.find(x => x.id === filter) || FILTERS[0]
+    const q = query.trim().toLowerCase()
+    return items.filter(it => {
+      if (!f.kinds.includes(it.kind)) return false
+      if (!q) return true
+      const hay = [it.displayName, it.name, it.description, it.format, ...(it.target || [])]
+        .filter(Boolean).join(' ').toLowerCase()
+      return hay.includes(q)
+    })
+  }, [items, filter, query])
 
   return (
     <div>
-      {/* Tabs */}
-      <div className="flex flex-wrap gap-1 mb-4 border-b border-[var(--p-border-subtle)]">
-        {visibleTabs.map(t => {
-          const active = t.id === tab
-          return (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTab(t.id)}
-              className={`px-3 py-2 text-xs font-medium border-b-2 transition-colors -mb-px ${
-                active
-                  ? 'border-[var(--p-accent-gold,#B8A070)] text-[var(--p-text-primary)]'
-                  : 'border-transparent text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)]'
-              }`}
-            >
-              {t.label}
-            </button>
-          )
-        })}
+      <div className="library-filters">
+        {FILTERS.map(f => (
+          <button
+            key={f.id}
+            type="button"
+            className={`filter-chip${filter === f.id ? ' active' : ''}`}
+            onClick={() => setFilter(f.id)}
+          >
+            {f.label}
+          </button>
+        ))}
+        <div className="library-search">
+          <Search className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search library"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
       </div>
 
-      {/* Tab body */}
-      {tab === 'resources' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {RESOURCES.map(r => (
-            <button
-              key={r.id}
-              type="button"
-              onClick={() => setResourcePreview(r)}
-              className="text-left rounded-lg border border-[var(--p-border)] bg-white p-3 hover:border-[var(--p-accent-gold,#B8A070)] transition-colors"
-            >
-              <div className="flex items-baseline gap-2">
-                <span className="text-[10px] uppercase tracking-wider text-[var(--p-text-muted)]">{r.format}</span>
-                <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[var(--p-code-bg,#F7F6F3)] text-[var(--p-text-secondary)]">
-                  Coming soon
-                </span>
-              </div>
-              <div className="text-sm font-medium text-[var(--p-text-primary)] mt-1.5">
-                {r.title}
-              </div>
-              <p className="text-xs text-[var(--p-text-secondary)] mt-1 line-clamp-3">
-                {r.description}
-              </p>
-            </button>
-          ))}
-        </div>
-      ) : renderItems.length === 0 ? (
+      {visible.length === 0 ? (
         <div className="text-sm text-[var(--p-text-secondary)] py-6 text-center">
-          No {tab} yet. The {tab} catalog seeds populate as Phase 1 PRs land.
+          {query ? 'No matches.' : 'No items in this category yet.'}
         </div>
       ) : (
-        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {renderItems.map(it => (
-            <li
-              key={it.id || `${it.name}@${it.version}`}
-              className="rounded-lg border border-[var(--p-border)] bg-white p-3"
-            >
-              <div className="flex items-baseline gap-2">
-                {it.status && (
-                  <span className={`text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-full ${
-                    it.status === 'available'
-                      ? 'bg-[rgba(15,123,108,0.08)] text-[var(--p-success,#0F7B6C)]'
-                      : 'bg-[var(--p-code-bg,#F7F6F3)] text-[var(--p-text-secondary)]'
-                  }`}>
-                    {it.status}
-                  </span>
-                )}
-              </div>
-              <div className="text-sm font-medium text-[var(--p-text-primary)] mt-1.5">
-                {it.displayName || it.name || it.id}
-              </div>
-              {it.description && (
-                <p className="text-xs text-[var(--p-text-secondary)] mt-1 line-clamp-2">
-                  {it.description}
-                </p>
-              )}
-            </li>
+        <div className="library-grid">
+          {visible.map(it => (
+            <LibraryCard key={`${it.kind}:${it.id}`} item={it} onOpen={() => setOverlayItem(it)} />
           ))}
-        </ul>
+        </div>
       )}
 
-      {/* Resource preview overlay */}
-      {resourcePreview && (
-        <ResourcePreviewOverlay
-          resource={resourcePreview}
-          onClose={() => setResourcePreview(null)}
-        />
-      )}
+      <LibraryOverlay item={overlayItem} onClose={() => setOverlayItem(null)} />
     </div>
   )
 }
 
-function ResourcePreviewOverlay({ resource, onClose }) {
+// ─── Card + per-type preview ─────────────────────────────────
+
+function LibraryCard({ item, onOpen }) {
+  const author = formatAuthor(item.author)
+  const installs = typeof item.installedCount === 'number' ? `${formatInstalls(item.installedCount)} installs` : null
+  const cta = ctaLabel(item.kind)
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.2)' }}
-      onClick={onClose}
-    >
-      <div
-        className="bg-white border border-[var(--p-border)] rounded-xl shadow-2xl shadow-black/10 max-w-md w-full mx-4 p-6"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-baseline gap-2 mb-3">
-          <span className="text-[10px] uppercase tracking-wider text-[var(--p-text-muted)]">
-            {resource.format}
-          </span>
-          <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-[var(--p-code-bg,#F7F6F3)] text-[var(--p-text-secondary)]">
-            Coming soon
-          </span>
-        </div>
-        <h3 className="text-lg font-medium text-[var(--p-text-primary)]">
-          {resource.title}
-        </h3>
-        <p className="text-sm text-[var(--p-text-secondary)] mt-1">
-          Targets: <code className="text-xs">{resource.targets}</code>
-        </p>
-        <p className="text-sm text-[var(--p-text-primary)] mt-3 leading-relaxed">
-          {resource.description}
-        </p>
-        <p className="text-xs text-[var(--p-text-muted)] mt-4">
-          This is a Phase 1 placeholder. Resource content production happens after Phase 1 cleanup (PR-12).
-        </p>
-        <div className="flex justify-end mt-5">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium rounded-lg border border-[var(--p-border)] bg-white text-[var(--p-text-primary)] hover:border-[var(--p-accent-gold,#B8A070)] transition-colors"
-          >
-            Close
-          </button>
+    <button type="button" className="lib-card" onClick={onOpen}>
+      <Preview item={item} />
+      <div className="lib-card-head">
+        <span className={`lib-card-type ${item.kind}`}>{item.format || typeLabel(item.kind)}</span>
+        {item.status === 'coming-soon' && (
+          <span className="lib-card-status">Coming soon</span>
+        )}
+      </div>
+      <div className="lib-card-name">{item.displayName || item.name || item.title}</div>
+      {author && <div className="lib-card-author">{author}</div>}
+      <div className="lib-card-action">
+        <span>{installs || '—'}</span>
+        <span className="lib-card-cta">{cta} →</span>
+      </div>
+    </button>
+  )
+}
+
+function Preview({ item }) {
+  switch (item.kind) {
+    case 'room':      return <RoomPreview item={item} />
+    case 'layout':    return <LayoutPreview item={item} />
+    case 'component': return <ComponentPreview item={item} />
+    case 'scheme':    return <SchemePreview item={item} />
+    case 'resource':  return <ResourcePreview item={item} />
+    default:          return <div className="lib-preview" />
+  }
+}
+
+// Simple wireframe: 3 panels, with a gold input-dock bar on the middle.
+function RoomPreview() {
+  return (
+    <div className="lib-preview">
+      <div className="wr" style={{ width: '20%' }}><span className="wd" /></div>
+      <div className="wr" style={{ flex: 1, position: 'relative' }}><div className="wb" /></div>
+      <div className="wr dashed" style={{ width: '22%' }} />
+    </div>
+  )
+}
+
+// Two equal panels + dashed extra. Closer to "structural" vs the
+// inhabited Room preview.
+function LayoutPreview() {
+  return (
+    <div className="lib-preview">
+      <div className="wr" style={{ flex: 1 }} />
+      <div className="wr" style={{ flex: 1 }} />
+      <div className="wr dashed" style={{ width: '25%' }} />
+    </div>
+  )
+}
+
+// Single panel with a horizontal track + a row of dots.
+function ComponentPreview() {
+  return (
+    <div className="lib-preview">
+      <div className="wr" style={{ flex: 1, padding: '3px' }}>
+        <div style={{ height: 2, background: 'var(--p-gold-muted)', margin: '6px 0', opacity: 0.5 }} />
+        <div style={{ display: 'flex', gap: 4, marginTop: 3 }}>
+          <span className="wd" /><span className="wd" /><span className="wd" /><span className="wd" />
         </div>
       </div>
     </div>
   )
+}
+
+// Pull a representative accent color from the seeded scheme variants.
+// Falls back to gold-light when no variant snapshot is present (V3
+// community-submitted schemes may ship without one).
+function SchemePreview({ item }) {
+  const variant = item.variants?.[item.defaultVariant || 'light'] || {}
+  const bg = variant['bg-base'] || variant['bg-surface'] || '#F8F3E6'
+  const accent = variant['gold-light'] || variant['gold'] || '#B8A070'
+  const muted = variant['gold-muted'] || variant['gold'] || '#A8623A'
+  return (
+    <div className="lib-preview scheme-swatch" style={{ background: bg }}>
+      <div className="sd" style={{ background: muted }} />
+      <div className="sl" style={{ background: accent }} />
+    </div>
+  )
+}
+
+function ResourcePreview({ item }) {
+  const Icon = ICON_MAP[item.iconName] || FileText
+  return (
+    <div className="lib-preview resource">
+      <Icon className="w-7 h-7" />
+    </div>
+  )
+}
+
+// ─── Formatters ──────────────────────────────────────────────
+
+function formatAuthor(a) {
+  if (!a) return null
+  if (typeof a === 'string') return `by ${a}`
+  if (a.handle) return `by @${a.handle}`
+  if (a.name) return `by ${a.name}`
+  return null
+}
+
+function formatInstalls(n) {
+  if (n < 1000) return String(n)
+  if (n < 1_000_000) return `${(n / 1000).toFixed(1)}k`
+  return `${(n / 1_000_000).toFixed(1)}m`
+}
+
+function ctaLabel(kind) {
+  switch (kind) {
+    case 'room':      return 'Add'
+    case 'layout':    return 'Add'
+    case 'component': return 'Add'
+    case 'scheme':    return 'Add'
+    case 'resource':  return 'Open'
+    default:          return 'Add'
+  }
+}
+
+function typeLabel(kind) {
+  switch (kind) {
+    case 'room':      return 'Room'
+    case 'layout':    return 'Layout'
+    case 'component': return 'Component'
+    case 'scheme':    return 'Scheme'
+    case 'resource':  return 'Resource'
+    default:          return 'Item'
+  }
 }
