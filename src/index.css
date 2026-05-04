@@ -842,7 +842,23 @@
   transition: opacity 0.22s ease, transform 0.22s ease;
 }
 .section.dragging { opacity: 0.5; }
-.section.drop-target { box-shadow: 0 0 0 2px var(--p-gold-light); }
+.section.drop-target {
+  box-shadow: 0 0 0 2px var(--p-gold-light);
+  background: rgba(196, 169, 77, 0.04);
+}
+/* Drag handle wrapper: the visible 14x14 grabber, but hit area extends
+   to 24x24 for usability. cursor:grab on hover; cursor:grabbing while
+   actively dragging (browser default). */
+.section-grabber-handle {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  margin-left: -4px;
+}
+.section-grabber-handle:active { cursor: grabbing; }
 .section-head {
   display: flex;
   align-items: center;
