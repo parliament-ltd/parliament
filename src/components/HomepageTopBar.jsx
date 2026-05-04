@@ -1,20 +1,15 @@
 // HomepageTopBar — page-level chrome above the V2 homepage.
 //
-// Per phase-1-pr-plan.md PR-6 scope:
-//   Parliament mark | breadcrumb slot | Edit homepage | + Build a room
-//   | settings gear | Backup & Restore
+// PR-14 swapped the labelled buttons for borderless icon buttons:
+//   Parliament mark | breadcrumb | (spacer) | Backup status dot |
+//   Wrench (Edit homepage) | Home (+ Build a room — gold accent) |
+//   Database (Backup) | Settings
 //
-// + Build a room landed at PR-9: routes to /build, which surfaces the
-// template gallery + 7-step wizard. Both paths produce a fresh mode
-// file and route the user to /edit/:newId.
-//
-// Backup & Restore landed at PR-7: the icon button opens the modal; a
-// status indicator (gold/amber/red dot per backup age) sits next to it.
-//
-// Edit homepage landed at PR-8: routes to the three-rail editor at
-// /edit-home, which loads the user's homepage mode for editing.
+// Backup is preserved (the design doc spec drops it, but it's core to the
+// no-backend story so we keep it). The "+ Build a room" Home icon retains
+// its gold tint to read as the primary action.
 
-import { Settings as SettingsIcon, Database } from 'lucide-react'
+import { Settings as SettingsIcon, Database, Home, Wrench } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useBackup } from '../stores/BackupContext'
 import BackupStatusIndicator from './BackupStatusIndicator'
@@ -32,12 +27,8 @@ const PARLIAMENT_MARK_PATH = (
   </svg>
 )
 
-const BTN_BASE = 'px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors'
-const BTN_DEFAULT = `${BTN_BASE} border-[var(--p-border)] bg-white text-[var(--p-text-secondary)] hover:border-[var(--p-gold-light)] hover:text-[var(--p-gold-light)]`
-const BTN_PRIMARY = `${BTN_BASE} border-[var(--p-accent-gold,#B8A070)] bg-[var(--p-accent-gold,#B8A070)] text-white hover:bg-[var(--p-gold-muted)] hover:border-[var(--p-gold-muted)]`
-
-const ICON_BTN_BASE = 'inline-flex items-center justify-center w-8 h-8 rounded-lg border transition-colors'
-const ICON_BTN_DEFAULT = `${ICON_BTN_BASE} border-[var(--p-border)] bg-white text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] hover:border-[var(--p-accent-gold,#B8A070)]`
+const ICON_BTN = 'inline-flex items-center justify-center w-8 h-8 rounded-md text-[var(--p-text-secondary)] hover:text-[var(--p-gold-light)] transition-colors'
+const ICON_BTN_PRIMARY = 'inline-flex items-center justify-center w-8 h-8 rounded-md text-[var(--p-gold-light)] hover:text-[var(--p-gold-muted)] transition-colors'
 
 export default function HomepageTopBar({ breadcrumb }) {
   const navigate = useNavigate()
@@ -61,27 +52,29 @@ export default function HomepageTopBar({ breadcrumb }) {
       <button
         type="button"
         onClick={() => navigate('/edit-home')}
-        title="Open the homepage in the editor"
-        className={BTN_DEFAULT}
+        title="Edit homepage"
+        aria-label="Edit homepage"
+        className={ICON_BTN}
       >
-        Edit homepage
+        <Wrench className="w-4 h-4" />
       </button>
 
       <button
         type="button"
         onClick={() => navigate('/build')}
-        title="Build a new room"
-        className={BTN_PRIMARY}
+        title="Build a room"
+        aria-label="Build a room"
+        className={ICON_BTN_PRIMARY}
       >
-        + Build a room
+        <Home className="w-4 h-4" />
       </button>
 
       <button
         type="button"
         onClick={() => openBackup('backup')}
         title="Backup & restore (Cmd+Shift+B)"
-        className={ICON_BTN_DEFAULT}
         aria-label="Backup & restore"
+        className={ICON_BTN}
       >
         <Database className="w-4 h-4" />
       </button>
@@ -89,8 +82,9 @@ export default function HomepageTopBar({ breadcrumb }) {
       <button
         type="button"
         onClick={() => navigate('/settings')}
-        className={ICON_BTN_DEFAULT}
+        className={ICON_BTN}
         aria-label="Settings"
+        title="Settings"
         data-tour="settings-btn"
       >
         <SettingsIcon className="w-4 h-4" />

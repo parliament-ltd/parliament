@@ -2,9 +2,18 @@ import { openDB } from 'idb'
 import { validateBackup } from './validate'
 import { SCHEMES } from './schemes'
 import { seedLibraryRooms } from './seedTemplates'
+import { listEntries } from '../catalog'
 
 const DB_NAME = 'parliament'
-const DB_VERSION = 4
+const DB_VERSION = 5
+
+// Built-in library author shape, per refactor/parliament_v2_design_decisions.md §6.5
+// canonical metadata. Used to seed every Parliament-shipped library row.
+const BUILTIN_AUTHOR = Object.freeze({
+  name: 'Parliament',
+  handle: 'parliament',
+  verified: true,
+})
 
 let dbInstance = null
 
@@ -93,6 +102,27 @@ export async function initDB() {
           }
         }
       }
+
+      // ── v5: library canonical metadata (PR-14) ────────────────────────
+      // Backfill `author` and `installedCount` on every library record so
+      // the homepage library section can render the canonical card shape
+      // (per refactor/parliament_v2_design_decisions.md §6.5). Built-in
+      // rows get author=Parliament, installedCount=0; the post-migration
+      // seed top-up may further refine specific rows.
+      if (oldVersion < 5) {
+        for (const storeName of ['libraryRooms', 'libraryLayouts', 'libraryComponents', 'librarySchemes']) {
+          const store = transaction.objectStore(storeName)
+          for await (const cursor of store) {
+            const v = cursor.value
+            if (v.author && v.installedCount !== undefined) continue
+            await cursor.update({
+              ...v,
+              author: v.author || { ...BUILTIN_AUTHOR },
+              installedCount: typeof v.installedCount === 'number' ? v.installedCount : 0,
+            })
+          }
+        }
+      }
     }
   })
 
@@ -114,7 +144,41 @@ async function seedLibraryDefaults(db) {
   await seedLibraryLayouts(db)
   await seedLibrarySchemes(db)
   await seedLibraryRooms(db)
+  await seedLibraryComponents(db)
   await seedHomepageMode(db)
+}
+
+/**
+ * Seed `libraryComponents` from the in-memory catalog manifest registry
+ * (src/catalog/index.js). Each registered component becomes one library
+ * row with the canonical metadata shape (author, installedCount, plus
+ * displayName/description/tier/slotTargets straight from the manifest).
+ *
+ * Idempotent at the per-component level: only inserts a row if no record
+ * with that ref id exists yet. Adding a new catalog entry later won't
+ * re-seed existing rows.
+ */
+async function seedLibraryComponents(db) {
+  const now = new Date().toISOString()
+  const entries = listEntries()
+  for (const e of entries) {
+    const id = `${e.name}@${e.version}`
+    const existing = await db.get('libraryComponents', id)
+    if (existing) continue
+    await db.put('libraryComponents', {
+      id,
+      name: e.name,
+      version: e.version,
+      displayName: e.displayName || e.name,
+      description: e.description || '',
+      tier: e.tier,
+      slotTargets: e.slotTargets || [],
+      author: { ...BUILTIN_AUTHOR },
+      installedCount: 0,
+      seedVersion: 1,
+      createdAt: now,
+    })
+  }
 }
 
 /**
@@ -127,6 +191,7 @@ async function seedLibraryLayouts(db) {
   if (existingLayouts > 0) return
 
   const now = new Date().toISOString()
+  const builtinFields = { author: { ...BUILTIN_AUTHOR }, installedCount: 0 }
   const placeholders = [
     // ── Available layouts (5) ──
     {
@@ -212,7 +277,7 @@ async function seedLibraryLayouts(db) {
 
   const tx = db.transaction('libraryLayouts', 'readwrite')
   for (const entry of placeholders) {
-    await tx.store.put(entry)
+    await tx.store.put({ ...entry, ...builtinFields })
   }
   await tx.done
 }
@@ -242,6 +307,8 @@ async function seedLibrarySchemes(db) {
       description: scheme.description,
       defaultVariant: scheme.defaultVariant,
       variants: scheme.variants,
+      author: { ...BUILTIN_AUTHOR },
+      installedCount: 0,
       seedVersion: 2,
       createdAt: now,
     })

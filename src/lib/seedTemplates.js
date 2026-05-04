@@ -214,11 +214,29 @@ export const TEMPLATES = Object.freeze([
 const SEED_VERSIONS = Object.freeze({
   'data-workspace@1.0': 2, // PR-11a: full Pelican decomposition
   'drafting-desk@1.0':  2, // PR-11b: full Secretarybird decomposition
+  // PR-14 added author + installedCount canonical metadata to every
+  // template. Bumping every record so v4 installs pick up the new fields
+  // without waiting for a per-template content change.
+  'writing-studio@1.0': 2,
+  'pocket-chat@1.0':    2,
+  'quiet-room@1.0':     2,
+  'kingfisher@1.0':     2,
+  'starling@1.0':       2,
 })
 
 function seedVersionFor(templateId) {
   return SEED_VERSIONS[templateId] ?? 1
 }
+
+// PR-14: every built-in template ships with the canonical library-card
+// metadata shape (refactor/parliament_v2_design_decisions.md §6.5).
+// Repeated literal lives here rather than imported from db.js to avoid a
+// cycle (db.js imports seedLibraryRooms from this module).
+const BUILTIN_AUTHOR = Object.freeze({
+  name: 'Parliament',
+  handle: 'parliament',
+  verified: true,
+})
 
 /**
  * Seed `libraryRooms` with the seven Phase 1 templates.
@@ -237,6 +255,8 @@ export async function seedLibraryRooms(db) {
     if (existing && (existing.seedVersion ?? 1) >= currentSeedVersion) continue
     await db.put('libraryRooms', {
       ...t,
+      author: existing?.author || { ...BUILTIN_AUTHOR },
+      installedCount: existing?.installedCount ?? 0,
       seedVersion: currentSeedVersion,
       createdAt: existing?.createdAt || now,
     })

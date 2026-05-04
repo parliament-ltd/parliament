@@ -60,7 +60,21 @@ export default function HomepageView() {
       setReady(true)
     }
     init()
-    return () => { cancelled = true }
+
+    // Listen for in-page mutations of the homepage mode (PR-14: section
+    // drag-reorder writes new order back to IndexedDB and emits this
+    // event). Re-fetching the mode is enough — RoomShell rebuilds the
+    // section list from the new `components` order.
+    const onModeChanged = async () => {
+      const home = await loadHomepageMode()
+      if (!cancelled) setMode(home)
+    }
+    window.addEventListener('homepage-mode-changed', onModeChanged)
+
+    return () => {
+      cancelled = true
+      window.removeEventListener('homepage-mode-changed', onModeChanged)
+    }
   }, [navigate])
 
   if (!ready) return null

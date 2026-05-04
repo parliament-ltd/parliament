@@ -715,6 +715,37 @@
 
 ---
 
+### PR-14 — Homepage v2 visual alignment
+
+**Goal:** Bring the homepage UI flush with the user's `parliament_homepage_v2 (2).html` spec and the principles in `parliament_v2_design_decisions.md`. Replace the v1 grid-of-rounded-boxes blueprint with a real SVG floor plan whose room shapes reflect their layouts. Align chats, library, and favorites sections to the spec's grids, chips, and bulk-toolbar affordances. Make sections drag-reorderable.
+
+**Scope:**
+- DB schema bump v4 → v5: add `author` and `installedCount` to `libraryRooms` / `libraryLayouts` / `libraryComponents` / `librarySchemes`. Migration backfills `{ author: { name: 'Parliament', handle: 'parliament', verified: true }, installedCount: 0 }` on existing rows. Seed updates apply the same to new rows.
+- New `seedLibraryComponents()` step seeds the `libraryComponents` table from the in-memory catalog manifest registry (`src/catalog/index.js`). Required for the library section's Components tab to have anything to show.
+- New `src/lib/blueprintShapes.js` — pure functions: per-layout SVG path generators (three-panel bump, canvas-centric chamfer, document-centric chamfer, single-column chamfer), djb2 hash → per-room variability, greedy left-to-right bin-packing with row wrap, pawn placement helper.
+- New `src/catalog/entries/blueprint-render.jsx` — replaces blueprint-preview.jsx. Single SVG canvas with hatched outer wall, floor grid, irregular per-layout rooms, breathing gold pawn marker, dimension ticks, "+ Build a room" placeholder, hover-cross-link with chats@1.0 via the existing `PHASE_1_EVENTS.ROW_HOVER` bus.
+- New `src/components/SectionCard.jsx` — replaces the inline `src/catalog/layouts/section-card.jsx`. Adds chevron rotation, animated max-height collapse via `requestAnimationFrame` measurement, hover-revealed grabber, and HTML5 native drag-reorder handlers. Layout owns the drag state.
+- `stacked-sections@1.0` rewires drag-reorder: on drop, reorders the section-slot subset of `mode.components`, renumbers `order`, calls `saveMode`, dispatches a `homepage-mode-changed` CustomEvent on `window`. HomepageView listens and re-fetches.
+- Topbar (`HomepageTopBar.jsx`): swap labelled buttons for borderless icon buttons — Wrench (Edit homepage), Home (+ Build a room, gold accent), Database (Backup), Settings. BackupStatusIndicator dot stays.
+- `chats@1.0` rebuild: 5-column grid (`28px 1fr 180px 90px 90px`), custom 15px gold checkbox, view toggle with Sparkles/StickyNote/Highlighter/GitBranch icons, gold bulk toolbar (Pin / Regenerate summaries / Delete / Clear) replaces the search+toggle when any row is selected, topic chips with `hash(tag) % 8` palette, footer with conversation count.
+- `library@1.0` rebuild: filter chips (All / Rooms / Layouts / Components / Schemes / Resources), library-search box, type-specific preview thumbnails (room walls + door + input dock; layout panels; component timeline track + dots; scheme color swatch from variants; resource icon), colored type chip per kind, author byline + install count + "Add →" CTA.
+- New `src/components/LibraryOverlay.jsx` — right-side 420px slide-in panel replacing the centered modal. Per-type extra blocks (`Includes` / `Slots` / `Fits in slots` / `Covers`) derived live from manifest data; resources' `covers` ships in the static `RESOURCES` const.
+- `favorites@1.0` rebuild: hover-revealed copy button (Copy → Check flash 1.5s), gold star icon + source title meta line, 3-line snippet clamp. Section-level Edit button toggles bulk-select mode (gold checkboxes per card → bulk-toolbar with Remove + Done).
+- All visual classes (`.section`, `.bp-*`, `.chats-*`, `.library-*`, `.lib-*`, `.ov-*`, `.favs-*`, `.bulk-*`) live under a new "Homepage v2 (PR-14)" block in `src/index.css` with a `prefers-reduced-motion` override that drops the pawn-breathe / bulk-slide-in / overlay-slide animations.
+- Pawn placement deviates from spec/§5: pawn rides next to "+ Build a room" when zero rooms exist; once any room exists, it moves to the room owning the most-recently-updated conversation.
+
+**Dependencies:** PR-13.
+
+**Exit criteria:**
+- All criteria in `phase-1-testing.md` PR-14 section pass.
+- `npm run build` clean. Symbol-grep confirms `bp-floorgrid` / `chat-row` / `library-grid` / `ov-backdrop` / `favs-grid` / `BlueprintRender` are present in the production bundle. The old `blueprint-preview.jsx` and `src/catalog/layouts/section-card.jsx` files no longer exist on disk and their `BluePreview` symbol no longer appears in `dist/assets/index-*.js`.
+- A user with one or more rooms sees an SVG floor plan with room-specific shapes; hover a chat row → its room's path lights gold. Drag a section's grabber → the order persists across reload.
+- The library Components tab is no longer empty.
+
+**Risk:** Medium. Large visual rewrite touching the most-trafficked surface. Mitigated by keeping the data layer (`listModes`, `useConversations`, `loadHomepageMode`) untouched and handling reorder via a single `saveMode` write per drop. Mobile responsiveness is parked for PR-15 — fixed widths in the topbar / chats toolbar will cut off below ~768px until then.
+
+---
+
 ## Wave summary
 
 | Wave | PRs | Description |
@@ -724,6 +755,7 @@
 | B | PR-4a, PR-4b, PR-5, PR-6, PR-7 | Visual system + new homepage + V2 backup |
 | C | PR-8, PR-8b, PR-9, PR-10a, PR-10a.5, PR-10a.6, PR-10a.7, PR-10a.8, PR-10a.9, PR-10a.10, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
 | D | PR-13 | Phase 1 polish — wizard rewrite + first-run gate + TOC component |
+| D | PR-14 | Homepage v2 visual alignment — SVG blueprint, drag-reorder sections, spec-aligned chats/library/favorites |
 
 **Total: 24 PRs** including PR-0.
 
