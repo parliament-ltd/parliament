@@ -746,6 +746,42 @@
 
 ---
 
+### PR-15 — Mobile responsiveness audit
+
+**Goal:** Close the cosmetic gaps PR-14's desktop-first spec left below 768px without redesigning any surface. Every change is either a CSS media query (cosmetic, scoped) or a thin route-level gate (the editor) so PR-16 can pick up the architectural multi-rail collapse work cleanly.
+
+**Scope:**
+- New `src/lib/useViewportWidth.js` — exports `useIsNarrow(threshold = 768)`. ~15 lines, SSR-safe via `typeof window` guard. First custom hook in the codebase, justified by two consumers: PR-15's editor gate and PR-16's room-layout narrow-mode switching.
+- `HomepageTopBar.jsx`: hide the "Parliament" wordmark below 480px (`hidden min-[480px]:inline`); breadcrumb gets `min-w-0 truncate` so long values ellipsify instead of pushing icons offscreen; outer padding goes from `px-6` to `px-4 sm:px-6` to reclaim 16px on narrow.
+- `EditorView.jsx`: above the existing `loadError` block, gate on `useIsNarrow(768)` and render a new inline `EditorTooNarrow` component — full-screen `<Card>` ([Card.jsx](../src/components/Card.jsx)) with copy explaining the editor needs a wider screen, `<Button>` ([Button.jsx](../src/components/Button.jsx)) "Back to home". Hook-driven so portrait → landscape transitions without reload.
+- New "PR-15: Mobile responsive overrides" block at the end of `src/index.css`:
+  - `.chats-search { width: auto; flex: 1 1 0 }` at `max-width: 600px` (was fixed 280px)
+  - `.view-toggle button span { display: none }` at `max-width: 520px` (icon-only pill; titles preserved on buttons for tooltip a11y)
+  - `.chat-row` grid drops absolute date at 640px and topics at 480px; padding tightens at 480px
+  - `.bulk-toolbar { flex-wrap: wrap }` at 480px
+- Extends the existing `@media (hover: none) and (pointer: coarse)` block: `.section-grabber-handle { display: none }` because HTML5 native drag-and-drop is broken on iOS Safari and unreliable on Android Chrome — section reorder remains a desktop feature until PR-17 migrates it to dnd-kit.
+
+**Out of scope** (deferred):
+- Multi-rail room-layout narrow modes (three-panel / canvas-centric / document-centric → hamburger-left + full-screen-right pattern below 768px) — PR-16.
+- HTML5 D&D → dnd-kit migration for section reorder — PR-17 (optional).
+- Mobile editor (wizard-per-section, library-card icon abstractions, tap-to-place) — V3.
+- Wild Card Creator (DeviceMotionEvent spin-to-roll) — V3.
+- `/chats` V1 SelectorView responsive — its own future pass.
+- Settings — explicitly out of scope per `CLAUDE.md`.
+
+**Dependencies:** PR-14.
+
+**Exit criteria:**
+- All criteria in `phase-1-testing.md` PR-15 section pass.
+- `npm run build` clean. Symbol-grep confirms `useIsNarrow` is in the production JS bundle and the new `@media (max-width: 600px)` / `@media (max-width: 520px)` / `@media (max-width: 640px)` / `@media (max-width: 480px)` rules for chats-* / chat-row / bulk-toolbar are present in `dist/assets/index-*.css`.
+- At 320px / 375px viewport widths: topbar fits without horizontal scroll, chat rows render legibly with title + relative-date, library is 1-col, favorites is 1-col, library overlay is full-bleed with 5% margin.
+- `/edit/:id` and `/edit-home` show the gate panel below 768px with a working "Back to home" button.
+- Desktop (≥768px) is pixel-identical to PR-14.
+
+**Risk:** Low. No data-layer changes, no architecture changes. Largest exposure is the editor gate's resize-listener correctness (handled by useIsNarrow). Section reorder regressions on touch are explicitly accepted (was never functional on iOS Safari).
+
+---
+
 ## Wave summary
 
 | Wave | PRs | Description |
@@ -756,8 +792,9 @@
 | C | PR-8, PR-8b, PR-9, PR-10a, PR-10a.5, PR-10a.6, PR-10a.7, PR-10a.8, PR-10a.9, PR-10a.10, PR-10b, PR-11a, PR-11b, PR-12 | Builder paths + chat-shell migration + cleanup |
 | D | PR-13 | Phase 1 polish — wizard rewrite + first-run gate + TOC component |
 | D | PR-14 | Homepage v2 visual alignment — SVG blueprint, drag-reorder sections, spec-aligned chats/library/favorites |
+| D | PR-15 | Mobile responsiveness audit — cosmetic media queries + editor narrow-screen gate |
 
-**Total: 24 PRs** including PR-0.
+**Total: 25 PRs** including PR-0.
 
 ## Pause points
 

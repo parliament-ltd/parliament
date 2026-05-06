@@ -1730,4 +1730,64 @@
   input, textarea, select {
     font-size: 16px !important;
   }
+
+  /* PR-15: HTML5 drag-and-drop is broken on iOS Safari and unreliable
+     on Android Chrome, so the section grabber affordance shouldn't
+     claim space it can't deliver. Section reorder remains a desktop
+     feature; PR-17 may revisit with dnd-kit (delay: 250ms,
+     tolerance: 5px) to bring it back to touch properly. The grabber
+     was already hover-revealed (.section:hover .section-grabber
+     opacity: 1) so the visible footprint was zero on touch — but the
+     24x24 hit-area wrapper still claimed layout. */
+  .section-grabber-handle { display: none; }
+}
+
+/* ── PR-15: Mobile responsive overrides ─────────────────────
+   Breakpoints align with the existing library-grid steps at
+   640/480/420 so the layout shifts feel coordinated; 600/520
+   are added for the chats toolbar where the existing 280px
+   search width forces a slightly different crossover.
+
+   Cosmetic responsiveness lives here as media queries so the
+   CSS bundle is self-contained — components don't need JS-side
+   viewport awareness for these. The editor gate (route-level
+   decision) is the one exception and goes through useIsNarrow. */
+
+/* Chats toolbar: search loses its fixed 280px width and stretches
+   to share the row with the view-toggle pill. The view-toggle
+   keeps its labels until ~520px where it collapses to icon-only
+   (titles preserved on the buttons for tooltip a11y). */
+@media (max-width: 600px) {
+  .chats-search { width: auto; flex: 1 1 0; min-width: 0; }
+}
+@media (max-width: 520px) {
+  .view-toggle button span { display: none; }
+  .view-toggle button { padding: 5px 8px; }
+}
+
+/* Chat row column priority — drop the absolute date first
+   (relative date carries the same info more compactly), then
+   topics second. Title + summary + relative date always stay. */
+@media (max-width: 640px) {
+  .chat-row {
+    grid-template-columns: 28px 1fr 180px 70px;
+    gap: 6px;
+  }
+  .chat-row .chat-date + .chat-date { display: none; }
+}
+@media (max-width: 480px) {
+  .chat-row {
+    grid-template-columns: 28px 1fr 70px;
+    padding: 10px 10px;
+  }
+  .chat-topics { display: none; }
+}
+
+/* Bulk toolbar: lets controls wrap to a second line on very narrow
+   screens so the Clear button and per-action tooltips don't overflow. */
+@media (max-width: 480px) {
+  .bulk-toolbar {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
 }
