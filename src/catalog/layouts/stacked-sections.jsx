@@ -26,6 +26,36 @@
 import { useState, useMemo } from 'react'
 import SectionCard from '../../components/SectionCard'
 import { saveMode } from '../../lib/modes'
+import { getEntry as getComponentEntry } from '..'
+
+// Strip semver-range prefixes from a `name@version` ref so it matches
+// the catalog registry keys. Mirrors RoomShell's normalizer.
+function normalizeRef(ref) {
+  if (typeof ref !== 'string' || !ref.includes('@')) return ref
+  const [name, versionSpec = ''] = ref.split('@', 2)
+  const trimmed = versionSpec.replace(/^[\^~]/, '').replace(/^(\d+\.\d+)\.0$/, '$1')
+  return `${name}@${trimmed}`
+}
+
+// Resolve a section title with a defensive fallback chain:
+//   1. spec.config.section.title (canonical, set by the seed in db.js)
+//   2. catalog entry's displayName (e.g. 'Library', 'Chats')
+//   3. the ref's bare name as a last resort
+//
+// Defends against modes whose components were created before
+// config.section was added, or whose section config got stripped by an
+// earlier editor flow.
+function resolveSectionTitle(spec) {
+  const fromConfig = spec?.config?.section?.title
+  if (fromConfig) return fromConfig
+  const entry = getComponentEntry(normalizeRef(spec?.ref))
+  if (entry?.displayName) return entry.displayName
+  const bareName = String(spec?.ref || '').split('@')[0]
+  if (bareName) {
+    return bareName.charAt(0).toUpperCase() + bareName.slice(1).replace(/-/g, ' ')
+  }
+  return 'Section'
+}
 
 export default {
   name: 'stacked-sections',
@@ -103,7 +133,7 @@ function StackedSectionsRender({ slotContents = {}, mode }) {
         return (
           <SectionCard
             key={sectionId || i}
-            title={section.title || spec.ref || 'Section'}
+            title={resolveSectionTitle(spec)}
             meta={section.meta}
             draggable
             isDragging={draggingId === sectionId}

@@ -95,23 +95,22 @@ export default function SectionCard({
     <section
       className={`section${collapsed ? ' collapsed' : ''}${isDragging ? ' dragging' : ''}${isDropTarget ? ' drop-target' : ''}`}
       aria-expanded={open}
+      // Drop handlers ride on the whole section so the user can release
+      // anywhere over the target — not just its 50px header strip.
+      // Without this, dragging onto a tall section's body silently fails.
+      onDragOver={draggable ? onSectionDragOver : undefined}
+      onDrop={draggable ? onSectionDrop : undefined}
     >
-      <header
-        className="section-head"
-        // Drag is initiated only from the grabber (draggable=true on the
-        // grabber div), but the dragover/drop handlers live on the whole
-        // header so dropping anywhere in the header counts.
-        onDragOver={onSectionDragOver}
-        onDrop={onSectionDrop}
-      >
+      <header className="section-head">
         {draggable && (
           <div
+            className="section-grabber-handle"
             draggable
             onDragStart={onSectionDragStart}
             onDragEnd={onSectionDragEnd}
-            // Keep the drag image clean: drag the whole section, not the
-            // grabber dot grid.
-            style={{ cursor: 'grab' }}
+            // The grabber's hit-target is the wrapper, not the inner
+            // dot grid — keeps the visible affordance tiny per spec
+            // while making the click area easy to grab.
           >
             <Grabber />
           </div>
