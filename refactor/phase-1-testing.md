@@ -2484,6 +2484,80 @@ API key + a completed wizard.
 
 ---
 
+## PR-15 — Mobile responsiveness audit
+
+👀 User-visible
+
+**Surface:** topbar, homepage chats / library / favorites,
+build wizard, editor, all routes below 768px.
+
+**Setup:**
+- Seeded DB with at least 4 conversations across 2+ rooms (so
+  the chats grid has content to crush at narrow widths).
+- Seeded library (Rooms, Layouts, Components, Schemes tabs all
+  populated — PR-14 seeding handles this).
+- At least 2 favorites pinned.
+- Browser DevTools responsive mode for the 320 / 375 / 480 /
+  640 / 768 / 1280 viewport sizes; ideally also a real iPhone
+  or Android device for touch verification.
+
+**Steps:**
+
+### Topbar
+1. Visit `/` at 1280px viewport. Confirm topbar reads:
+   `[mark] Parliament  [breadcrumb]  ............  [BackupDot] [Wrench] [Home gold] [Database] [Settings]` — pixel-identical to PR-14.
+2. Resize to 600px. Confirm wordmark still visible, all icons fit, no horizontal scroll.
+3. Resize to 480px. Confirm "Parliament" wordmark disappears, bird-mark icon stays. All four right-side icons still fit. Outer padding tightens (`px-4`).
+4. Resize to 320px (iPhone SE). Confirm topbar still fits without horizontal scroll. Breadcrumb (if non-empty) truncates with ellipsis instead of pushing icons offscreen.
+5. Resize back up to 1280px. Wordmark reappears, padding goes back to `px-6`.
+
+### Homepage chats section
+6. At 1280px, confirm chats toolbar reads: `[280px search] ........ [Summary][Notes][Highlights][Branches]` pill on the right.
+7. Resize to 600px. Search box stretches to fill remaining row; view-toggle still has labels.
+8. Resize to 520px. View-toggle drops labels — only icons visible. Hover/long-press a toggle button shows the label as a native title tooltip.
+9. Resize to 640px. Chat row still has 5 visual columns (checkbox + title/subtitle + topics + relative-date + absolute-date) at 641px+, then drops absolute-date at 640 and below.
+10. Resize to 480px. Chat row drops the topics chip column too — only checkbox + title/subtitle + relative-date remain. Padding tightens.
+11. Resize to 320px. Chat row still legible — title ellipsifies, summary clamps, relative-date right-aligned.
+
+### Bulk toolbar
+12. At 480px, click checkboxes on 3 rows. Bulk toolbar (`{n} selected · Pin · Regenerate · Delete · Clear`) wraps to 2 lines if needed without overflowing. Clear button stays right-aligned.
+
+### Library + favorites
+13. At 320px, library grid is 1-col, lib cards still readable.
+14. At 480px, library grid is 2-col.
+15. At 320px, favorites grid is 1-col.
+16. Tap a library card. Overlay slides in from right; at 320px viewport, panel is full-width minus 5% (the existing `max-width: 95vw`). Close button works.
+
+### Build wizard
+17. Visit `/build` at 320px. Wizard panel is 580px-max but `px-4` keeps content clear of edges. Step screens render. Receipt + track render.
+18. Open the layout preview overlay from screen 3 (Density+Layout) at 320px. Panel is 380px-max + 95vw — fits without horizontal scroll.
+
+### Editor gate (the new behavior)
+19. Visit `/edit-home` at 1280px. Full editor renders as PR-8 / PR-14.
+20. Resize to 767px. Editor immediately replaces with full-screen card: "The editor needs a wider screen" + body copy mentioning V3 + "Back to home" button.
+21. Click "Back to home". Returns to `/`.
+22. Visit `/edit/:roomId` at 320px. Same gate panel renders.
+23. Rotate device portrait → landscape (or resize 767 → 769). Gate disappears, editor mounts.
+24. Resize 769 → 767 with the editor mounted. Gate appears, editor unmounts.
+
+### Section reorder on touch (negative test)
+25. On a real iOS Safari device (or DevTools mobile emulation toggled with Cmd+Opt+M), visit `/`. Confirm section grabber dot-grids are not visible on the left of `Blueprint` / `Chats` / `Library` / `Favorites` headers. The 24x24 hit-area wrapper is gone; nothing claims layout space for a feature that wouldn't work.
+26. Trying to drag a section header on touch should not produce any visual drag affordance.
+27. On desktop (mouse-primary), the grabber is still revealed on hover and section reorder still works.
+
+### Regression: desktop above 768px
+28. At 768px, 1024px, 1280px, 1440px — every surface looks pixel-identical to PR-14 (no extra rules accidentally activating above breakpoint).
+
+**Expected:** Every step passes; no horizontal scroll at 320px on any route except the editor (which gates instead of scrolling).
+
+### What's known-broken-but-deferred
+
+- Multi-rail room layouts (three-panel / canvas-centric / document-centric) below 768px still render their full desktop rails and crush content. PR-16 adds narrow-mode collapse.
+- HTML5 D&D for section reorder is gone on touch (intentional). PR-17 may revisit with dnd-kit.
+- `/chats` V1 SelectorView is not in this PR.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

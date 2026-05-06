@@ -23,6 +23,8 @@ import EditorRightRail from '../components/editor/EditorRightRail'
 import EditorHoldingTray from '../components/editor/EditorHoldingTray'
 import EditorMigrationDialog from '../components/editor/EditorMigrationDialog'
 import EditorPreviewSheet from '../components/editor/EditorPreviewSheet'
+import Card from '../components/Card'
+import Button from '../components/Button'
 import {
   editorHistoryReducer,
   makeInitialHistoryState,
@@ -31,11 +33,16 @@ import {
 } from '../lib/editorHistory'
 import { planLayoutMigration } from '../lib/layoutMigration'
 import { loadHomepageMode, loadMode, saveMode } from '../lib/modes'
+import { useIsNarrow } from '../lib/useViewportWidth'
 import { listEntries as listCatalogEntries } from '../catalog'
 
 export default function EditorView({ scope = 'room' }) {
   const navigate = useNavigate()
   const { roomId } = useParams()
+  // The editor's three-rail D&D model is unusable below ~768px. PR-15
+  // gates with a friendly full-screen panel; V3 will replace this with
+  // a phone-first wizard-per-section editor (see refactor docs).
+  const tooNarrow = useIsNarrow(768)
   const [historyState, dispatch] = useReducer(
     editorHistoryReducer,
     null,
@@ -215,6 +222,10 @@ export default function EditorView({ scope = 'room' }) {
     showToast('Layout switched.')
   }
 
+  if (tooNarrow) {
+    return <EditorTooNarrow onBack={() => navigate('/')} />
+  }
+
   if (loadError) {
     return (
       <div className="min-h-screen bg-[var(--p-bg-base)] flex items-center justify-center px-6">
@@ -316,5 +327,34 @@ export default function EditorView({ scope = 'room' }) {
         )}
       </div>
     </DndContext>
+  )
+}
+
+// EditorTooNarrow — full-screen gate shown when the viewport is below
+// the editor's minimum width (768px). PR-15. The editor's three-rail
+// drag-and-drop model assumes a desktop pointer + screen real estate.
+// V3 ships a phone-first wizard-per-section editor that replaces this
+// gate; until then, send the user back to the homepage with a friendly
+// note rather than rendering a broken layout.
+function EditorTooNarrow({ onBack }) {
+  return (
+    <div className="min-h-screen bg-[var(--p-bg-base)] flex items-center justify-center px-6">
+      <Card className="max-w-md w-full text-center flex flex-col gap-4 py-6">
+        <div className="text-base font-medium text-[var(--p-text-primary)]">
+          The editor needs a wider screen
+        </div>
+        <div className="text-xs leading-relaxed text-[var(--p-text-secondary)]">
+          Building rooms is a hands-on, drag-and-drop affair — best on a
+          tablet or laptop for now. We're working on something special
+          for phones in V3. For now, open this on a wider screen to keep
+          building.
+        </div>
+        <div className="flex justify-center pt-2">
+          <Button variant="default" size="md" onClick={onBack}>
+            Back to home
+          </Button>
+        </div>
+      </Card>
+    </div>
   )
 }

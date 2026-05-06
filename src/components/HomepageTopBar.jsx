@@ -35,13 +35,15 @@ export default function HomepageTopBar({ breadcrumb }) {
   const { openBackup } = useBackup()
 
   return (
-    <div className="flex items-center gap-3 px-6 py-3 bg-white border-b border-[var(--p-border)]">
-      <div className="flex items-center gap-2 text-[var(--p-text-primary)] font-medium">
+    <div className="flex items-center gap-3 px-4 sm:px-6 py-3 bg-white border-b border-[var(--p-border)]">
+      <div className="flex items-center gap-2 text-[var(--p-text-primary)] font-medium shrink-0">
         {PARLIAMENT_MARK_PATH}
-        <span className="text-sm">Parliament</span>
+        {/* Wordmark hides below 480px to give the breadcrumb + icons room.
+            The bird-mark icon stays as the brand anchor. */}
+        <span className="text-sm hidden min-[480px]:inline">Parliament</span>
       </div>
 
-      <div className="text-xs text-[var(--p-text-muted)]">
+      <div className="text-xs text-[var(--p-text-muted)] min-w-0 truncate">
         {breadcrumb || ''}
       </div>
 
