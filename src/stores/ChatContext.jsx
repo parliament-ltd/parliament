@@ -115,6 +115,18 @@ export function ChatProvider({ children }) {
   // systemPrompt: optional string from collaboration mode presets + custom instruction
   // tools: optional array of tool definitions from provider.getAvailableTools()
   const sendMessage = useCallback(async (apiKey, conversationId, userContent, model, provider, systemPrompt = '', tools = []) => {
+    // PR-16a: persist the model used on this turn back to the conversation
+    // record. The semantic shift: `conversation.model` now means "the most
+    // recently used model in this room," not "the model the room was
+    // created with." This anchors the homepage blueprint's "Last spoken to"
+    // label and matches what users expect when they switch models mid-room.
+    // Fire-and-forget — same pattern as the title/summary/tags writes
+    // below; the .catch swallows the rare case where the conversation no
+    // longer exists, since it doesn't affect the user-facing send flow.
+    if (model) {
+      updateConversation(conversationId, { model }).catch(() => {})
+    }
+
     // 1. Add user message to state and IndexedDB
     const userMsg = await addMessage({
       conversationId,
@@ -296,7 +308,7 @@ export function ChatProvider({ children }) {
       latestContentRef.current = ''
       abortControllerRef.current = null
     }
-  }, [startPersistInterval, stopPersistInterval, generateMetadataIfNeeded])
+  }, [startPersistInterval, stopPersistInterval, generateMetadataIfNeeded, updateConversation])
 
   // Continue from an interrupted (ghost text) message
   // systemPrompt: optional string from collaboration mode presets + custom instruction

@@ -2558,6 +2558,103 @@ build wizard, editor, all routes below 768px.
 
 ---
 
+## PR-16a — Blueprint variety + pills-on-all-rooms + per-turn model
+
+👀 User-visible
+
+**Surface:** the homepage Blueprint section + the data write that
+backs the "Last spoken to" label.
+
+**Setup:**
+- Seeded with 6+ rooms covering all four layouts (three-panel,
+  canvas-centric, document-centric, single-column-with-sheet) — at
+  least 2 of each. Build them via `/build` if the seed doesn't have
+  them.
+- Each room with at least one conversation so "Last spoken to" has
+  a value to display.
+- A model picker accessible (Settings → Default model, or whatever
+  surface allows changing the per-conversation model).
+
+**Steps:**
+
+### Shape variety
+1. Visit `/`. Open the Blueprint section. Confirm **every layout
+   has visible variety** — across rooms of the same layout, you
+   should see at least two distinctly different shapes (e.g. a
+   three-panel room with a right-rail bump and another with a
+   dual-bump or tall-bump). Mirroring may also flip some bumps to
+   the left side.
+2. Reload the page. Every room renders the **same shape** it had
+   before — variant + mirror are deterministic per room id.
+3. Build a brand-new room via `/build`. The new room appears on the
+   homepage with one of the variant shapes (which one depends on the
+   new id's hash).
+
+### Canvas-centric alcove (spec match)
+4. Find a canvas-centric room with hash mod 3 = 0 (likely the most
+   common variant). Confirm its **right edge protrudes outward** at
+   the bottom (a small annex sticking out 12-14px), with a 45°
+   diagonal transition into the protrusion. Other canvas-centric
+   variants may show a top-right notch (corner cut out
+   rectangularly) or a mid-right L-jog.
+
+### Pills on every room
+5. Confirm pills render on every room with mapped components — not
+   just the active room. The active room (most-recent conversation)
+   shows **gold pills** (`rgba(196,169,77,0.15)` bg). Other rooms
+   show **gray pills** (`#F1F1EF` bg, slightly thinner — height 12
+   vs 14, smaller text).
+6. Hover a chat row in the Chats section → its room highlights
+   gold, but its pill palette stays gray (palette is determined by
+   active-room status, not hover).
+
+### Interior wall hints
+7. Inside each room, faint dashed lines or hatched rectangles
+   suggest the layout's slot structure:
+   - **three-panel**: two vertical dashed lines spanning ~75% of room height.
+   - **canvas-centric**: a faint hatched rectangle in the upper portion.
+   - **document-centric**: two horizontal dashed lines mid-height.
+   - **single-column-with-sheet**: a narrow vertical hatched rectangle.
+8. Hints are slightly perturbed per room (positions ±2-3px), so
+   even rooms of the same layout don't have identical hint placement.
+
+### "Last spoken to" friendly names
+9. For a conversation whose `model` is `claude-sonnet-4-6`, the
+   homepage label should read "Last spoken to **Claude Sonnet 4.6**"
+   — not the raw kebab-case id.
+10. Open a room's chat. Switch the model (e.g. Settings change, or
+    via a model picker if one is exposed on /chat/:id). Send a
+    message. Return to `/`. The "Last spoken to" line for that room
+    should now show the new model name.
+
+### Regression
+11. Pawn breathing animation still runs on the active room.
+12. Hover-cross-link still works: hovering a chat row lights up
+    the corresponding room gold.
+13. Empty homepage (zero rooms) still shows just the "+ Build a
+    room" placeholder with the pawn next to it.
+14. Single-room homepage shows the room with active gold pills + the
+    placeholder beside it.
+15. Long room names still ellipsify or wrap inside the room interior
+    box; pills don't overflow the room footprint.
+
+**Expected:** Every step passes; no rendering errors in the SVG;
+the blueprint feels architecturally varied (not a grid of
+identical shapes); the "Last spoken to" line always reflects the
+most recent model used in each room.
+
+### What's known-broken-but-deferred
+
+- Mirror-induced bumps on rooms at the cluster edges may protrude
+  slightly past the outer wall (rare; accepted as architectural quirk
+  per design doc §2.5 "irregular hatching grammar").
+- Per-turn `conversation.model` write-back is fire-and-forget; if it
+  fails, the homepage label may lag the actual model used. Acceptable
+  trade-off — the catch swallows errors silently rather than
+  affecting the user-facing send flow.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:
