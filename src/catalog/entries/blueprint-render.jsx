@@ -31,6 +31,7 @@ import {
   buildRoomPath,
   buildPlaceholderPath,
   placePawn,
+  interiorHints,
   PLACEHOLDER_KIND,
 } from '../../lib/blueprintShapes'
 
@@ -77,6 +78,31 @@ const LAYOUT_DISPLAY = {
   'canvas-centric':           'Canvas-centric',
   'document-centric':         'Document-centric',
   'single-column-with-sheet': 'Single column',
+}
+
+// PR-16a: friendly model names for the "Last spoken to" line. Maps the
+// raw conversation.model values to display strings. Unknown ids fall
+// through to a humanized fallback (kebab → Title Case).
+const MODEL_DISPLAY = {
+  'claude-sonnet':         'Claude Sonnet',
+  'claude-sonnet-4-6':     'Claude Sonnet 4.6',
+  'claude-sonnet-4-7':     'Claude Sonnet 4.7',
+  'claude-opus':           'Claude Opus',
+  'claude-opus-4-7':       'Claude Opus 4.7',
+  'claude-haiku':          'Claude Haiku',
+  'claude-haiku-4-5':      'Claude Haiku 4.5',
+  'claude-haiku-4-5-20251001': 'Claude Haiku 4.5',
+}
+
+function modelLabel(raw) {
+  if (!raw) return ''
+  const mapped = MODEL_DISPLAY[raw]
+  if (mapped) return mapped
+  // Humanize: turn 'some-model-name' into 'Some Model Name'.
+  return raw
+    .split('-')
+    .map(s => s.length > 0 ? s[0].toUpperCase() + s.slice(1) : '')
+    .join(' ')
 }
 
 const refName = (ref) => (ref || '').split('@')[0]
@@ -289,6 +315,7 @@ function Room({ placed, mode, lastConv, isActive, isHighlitFromChat, isHovered, 
   const { path, interior } = buildRoomPath({ box, layoutRef, roomId: id })
   const cx = interior.x + interior.width / 2
   const features = featuresFor(mode)
+  const hints = interiorHints({ box, layoutRef, roomId: id })
 
   let fill = ROOM_FILL_DEFAULT
   if (isActive) fill = ROOM_FILL_ACTIVE
@@ -301,7 +328,7 @@ function Room({ placed, mode, lastConv, isActive, isHighlitFromChat, isHovered, 
   const name = (mode?.meta?.name || mode?.id || 'Room').toUpperCase()
   const layoutLabel = LAYOUT_DISPLAY[refName(layoutRef)] || refName(layoutRef) || 'Layout'
   const schemeLabel = SCHEME_DISPLAY[refName(mode?.scheme?.ref)] || ''
-  const lastModel = lastConv?.model || null
+  const lastModel = modelLabel(lastConv?.model)
 
   return (
     <g
@@ -312,7 +339,31 @@ function Room({ placed, mode, lastConv, isActive, isHighlitFromChat, isHovered, 
     >
       {/* Fill */}
       <path d={path} fill={fill} className="bp-room-fill" />
-      {/* Border */}
+
+      {/* Interior wall hints — dashed lines/rects suggesting the layout's
+          slot structure (rails, canvas, page bands, mobile column).
+          PR-16a per spec lines 1043-1108. Drawn before the border so the
+          border edge stays crisp on top of any overlapping hint. */}
+      {hints.map((h, i) => h.type === 'line' ? (
+        <line
+          key={`h${i}`}
+          x1={h.x1} y1={h.y1} x2={h.x2} y2={h.y2}
+          stroke="#C8C2B8"
+          strokeWidth="1"
+          strokeDasharray="3 3"
+        />
+      ) : (
+        <rect
+          key={`h${i}`}
+          x={h.x} y={h.y} width={h.width} height={h.height}
+          fill={h.hatched ? 'url(#bp-hatch-light)' : 'none'}
+          stroke="#C8C2B8"
+          strokeWidth="0.5"
+          strokeDasharray="3 3"
+        />
+      ))}
+
+      {/* Border (drawn over the hints so it stays clean) */}
       <path d={path} fill="none" stroke={stroke} strokeWidth={strokeWidth} />
 
       {/* Faded "THE" tagline + bold name */}
@@ -331,31 +382,68 @@ function Room({ placed, mode, lastConv, isActive, isHighlitFromChat, isHovered, 
         </text>
       )}
 
-      {/* Feature pills (only on the active room, per design doc §5) */}
-      {isActive && features.length > 0 && (
-        <FeaturePills features={features} interior={interior} />
+      {/* Feature pills — render on every room, with per-spec gold/gray
+          palette swap controlled by isActive (PR-16a; was active-only). */}
+      {features.length > 0 && (
+        <FeaturePills features={features} interior={interior} isActive={isActive} />
       )}
     </g>
   )
 }
 
-function FeaturePills({ features, interior }) {
-  const pillH = 14
+// PR-16a: pills render on every room. Active room gets the gold palette
+// (current PR-14 treatment); other rooms get a gray palette (per spec
+// lines 1087-1092 — `fill="#F1F1EF" stroke="#C8C2B8"` text fill `#787774`,
+// slightly thinner pills). Same pill geometry; only the colors differ.
+const PILL_PALETTE = {
+  active: {
+    fill: 'rgba(196,169,77,0.15)',
+    stroke: 'rgba(196,169,77,0.4)',
+    text: '#8B6A10',
+    height: 14,
+    fontSize: 7,
+  },
+  inactive: {
+    fill: '#F1F1EF',
+    stroke: '#C8C2B8',
+    text: '#787774',
+    height: 12,
+    fontSize: 6.5,
+  },
+}
+
+function FeaturePills({ features, interior, isActive }) {
+  const palette = isActive ? PILL_PALETTE.active : PILL_PALETTE.inactive
+  const pillH = palette.height
   const pillGap = 6
   const padX = 6
   // Approximate pill widths from text length; keep them snug.
   const widths = features.map(f => Math.max(40, f.length * 5.5 + padX * 2))
   const total = widths.reduce((s, w) => s + w, 0) + (features.length - 1) * pillGap
   let cursorX = interior.x + (interior.width - total) / 2
-  const y = interior.y + interior.height - 26
+  const y = interior.y + interior.height - (pillH + 12)
   return (
     <>
       {features.map((label, i) => {
         const w = widths[i]
         const node = (
           <g key={label}>
-            <rect x={cursorX} y={y} width={w} height={pillH} rx={pillH / 2} fill="rgba(196,169,77,0.15)" stroke="rgba(196,169,77,0.4)" strokeWidth="0.5" />
-            <text x={cursorX + w / 2} y={y + 9} textAnchor="middle" fontSize="7" fill="#8B6A10" fontWeight="500">
+            <rect
+              x={cursorX} y={y}
+              width={w} height={pillH}
+              rx={pillH / 2}
+              fill={palette.fill}
+              stroke={palette.stroke}
+              strokeWidth="0.5"
+            />
+            <text
+              x={cursorX + w / 2}
+              y={y + pillH / 2 + 2.5}
+              textAnchor="middle"
+              fontSize={palette.fontSize}
+              fill={palette.text}
+              fontWeight="500"
+            >
               {label}
             </text>
           </g>

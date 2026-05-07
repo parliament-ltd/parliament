@@ -782,6 +782,36 @@
 
 ---
 
+### PR-16a — Blueprint variety + pills-on-all-rooms + per-turn model
+
+**Goal:** Lift the homepage SVG blueprint from "every room of the same layout looks identical" to a curated-but-unpredictable shape system, where each room renders one of ~5–6 visually distinct shapes per layout. Pills render on every room (active gold, others gray) so the user always sees a room's feature footprint at a glance. The "Last spoken to" line accurately reflects the most-recent model used in each room. Canvas-centric rooms get the spec's outward alcove instead of the current inward chamfer.
+
+**Scope:**
+- `src/lib/blueprintShapes.js`: 3 curated shape variants per layout (12 generators total — 4 of them existing PR-14 code kept verbatim as variant 0; 8 new). Variant picked by `hash mod 3`. Hash bit 8 controls horizontal mirroring. Added `mirrorPath(d, axisX)` helper. `ROOM_GAP` widened 14→24 and `VIEWBOX_PAD` 28→32 so adjacent left+right protrusions don't collide.
+- New exported `interiorHints({ box, layoutRef, roomId })` returning dashed-line/rect specs that hint at the layout's slot structure (three-panel shows two faint vertical rails, canvas-centric shows a faint canvas frame, document-centric shows two horizontal page bands, single-column shows a narrow vertical column). Hash-perturbed by ±2-3px per room.
+- `src/catalog/entries/blueprint-render.jsx`: `<FeaturePills>` now renders on every room, with a `PILL_PALETTE` const switching between active (gold, h=14) and inactive (gray, h=12, smaller text) variants per spec. Added `MODEL_DISPLAY` map next to the existing `LAYOUT_DISPLAY` / `SCHEME_DISPLAY` and a `modelLabel(raw)` helper that maps known model ids to friendly names ("Claude Sonnet 4.6") and humanizes unknowns. `interiorHints()` rendered inside each `<Room>` between the fill and the border.
+- `src/stores/ChatContext.jsx`: `sendMessage` now writes `conversation.model = model` on every turn (fire-and-forget, same pattern as the existing title/summary/tags writes). Anchors the homepage's "Last spoken to" label and reflects the user's actual most-recent model. No schema bump — uses the existing `model` field. Comment explains the semantic shift from "creation default" → "most recently used."
+
+**Out of scope (deferred):**
+- PR-16: room-layout responsive collapse below 768px (multi-rail → hamburger-left + full-screen-right).
+- PR-17: HTML5 D&D → dnd-kit migration for section reorder.
+- V3: Wild Card Creator (DeviceMotionEvent spin), mobile editor (wizard-per-section), voice-to-build.
+- V3 design doc §8: doorways between branched chats.
+
+**Dependencies:** PR-15.
+
+**Exit criteria:**
+- All criteria in `phase-1-testing.md` PR-16a section pass.
+- `npm run build` clean. Symbol-grep confirms `interiorHints`, `MODEL_DISPLAY`, `mirrorPath`, and at least 8 new shape generator function names are present in `dist/assets/index-*.js`.
+- For 6+ seeded rooms across all four layouts, the blueprint shows visible variety per layout — e.g. some three-panel rooms have right-bumps, some left-bumps, some dual-bumps; some canvas-centric rooms have alcoves, some have notches, some have L-jogs. Same room id renders the same shape across reloads.
+- Pills render on every room; active room is gold, others are gray.
+- Sending a message in a model different from the conversation's stored value updates `conversation.model` and the homepage label reflects it on next visit.
+- Canvas-centric rooms protrude outward (alcove); no canvas-centric rooms have chamfered-inward corners as their primary character.
+
+**Risk:** Low-medium. Shape file is heavily refactored but the public API stays the same (`buildRoomPath` still returns `{ path, interior }`). Largest exposure is the bin-packer geometry interaction with mirrored protrusions on edge rooms — partially mitigated by the wider `ROOM_GAP` and `VIEWBOX_PAD`. Mirror-induced bump-vs-wall protrusion is accepted as architectural quirk if it shows.
+
+---
+
 ## Wave summary
 
 | Wave | PRs | Description |
@@ -793,8 +823,9 @@
 | D | PR-13 | Phase 1 polish — wizard rewrite + first-run gate + TOC component |
 | D | PR-14 | Homepage v2 visual alignment — SVG blueprint, drag-reorder sections, spec-aligned chats/library/favorites |
 | D | PR-15 | Mobile responsiveness audit — cosmetic media queries + editor narrow-screen gate |
+| D | PR-16a | Blueprint variety — multiple shape variants per layout + mirroring + interior hints + pills on all rooms + per-turn model |
 
-**Total: 25 PRs** including PR-0.
+**Total: 26 PRs** including PR-0.
 
 ## Pause points
 
