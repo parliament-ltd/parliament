@@ -2655,6 +2655,123 @@ most recent model used in each room.
 
 ---
 
+## PR-16 — Multi-rail room layouts: responsive collapse below 768px
+
+👀 User-visible
+
+**Surface:** the three desktop-only room layouts at narrow viewport
+widths — `three-panel`, `canvas-centric`, `document-centric`. New
+shared primitives in `src/components/layouts/` provide hamburger
+drawer + chrome bar + sheet vocabulary.
+
+**Setup:**
+- Seeded with at least one room for each of the three layouts. The
+  default seed includes a three-panel room (Albatross-equivalent
+  general chat) and the `/build` flow covers all three.
+- Chrome (or any browser with DevTools device-emulation) — narrow
+  testing is done by resizing or toggling device-emulation under
+  768px width.
+- For reduced-motion testing: DevTools "Rendering → Emulate CSS
+  media feature prefers-reduced-motion: reduce" or system
+  Accessibility → Reduce Motion.
+
+**Steps:**
+
+### Three-panel narrow
+1. Open a three-panel room. Resize the window to <768px width (e.g.
+   400px). Confirm:
+   - Rails are gone from the body.
+   - A thin chrome bar at the top shows two icons: hamburger (left)
+     and PanelRight (right).
+   - Default body shows messages + input dock at bottom.
+2. Tap the hamburger icon. Confirm:
+   - A drawer slides in from the left edge with a darkened scrim.
+   - The drawer contains the left-rail content (chats list, etc.).
+3. Press Esc. Drawer closes. Tap hamburger again, then click the
+   scrim outside the drawer. Drawer closes.
+4. Tap the PanelRight icon. Confirm:
+   - The body swaps from messages to a vertical stack of right-rail
+     content (sheet-of-boxes, branches, settings panel).
+   - The PanelRight icon shows its active state (gold tint).
+   - Input dock is hidden in this view.
+5. Tap PanelRight again. Body swaps back to messages.
+6. Resize back to ≥768px. Layout returns to the desktop three-rail
+   composition with no leftover state artifacts.
+
+### Canvas-centric narrow
+7. Open a canvas-centric (Pelican-equivalent data workspace) room.
+   Resize to <768px. Confirm:
+   - Body shows the canvas (chart/table/dashboard) full-width.
+   - A "CHAT" chevron handle sits below the canvas, above the input
+     dock.
+   - Input dock is at the bottom.
+   - Chrome bar at top: hamburger + PanelRight (labeled
+     "Inspector").
+8. Tap the chevron. Chat-panel slides into view (instant — no
+   animation; matches single-column-with-sheet). Tap again →
+   collapses.
+9. Tap PanelRight (Inspector). Body swaps to a stack of inspector
+   components (column / schema details). Tap again → swaps back to
+   canvas + sheet + input.
+10. Tap the hamburger. File-shelf drawer opens.
+
+### Document-centric narrow
+11. Open a document-centric (Secretarybird-equivalent drafting)
+    room. Resize to <768px. Confirm:
+    - Document fills the body, scrolls vertically.
+    - "CHAT" chevron handle at the bottom (no separate input dock —
+      chat panel includes its own input).
+    - Chrome bar: hamburger + PanelRight (labeled "Margin").
+12. Tap chevron → chat panel reveals. Tap PanelRight → margin
+    annotations show as the body. Tap hamburger → outline drawer.
+
+### Reduced motion
+13. Enable `prefers-reduced-motion` (DevTools or system). Tap
+    hamburger. Drawer should appear instantly — no slide animation.
+    Same for closing via Esc / scrim. Backdrop fade is also
+    disabled.
+
+### Untouched layouts
+14. Open a single-column-with-sheet room (Swift-equivalent pocket
+    chat) at <768px. Renders identically to its pre-PR behavior —
+    sheet handle below input dock, no NarrowChrome / NarrowDrawer.
+15. Visit `/` (homepage) at <768px. Renders per PR-14/PR-15 — no
+    NarrowChrome introduced.
+16. Open `/edit/:id` at <768px. Still shows PR-15's "needs wider
+    screen" gate; no narrow editor. (No regression.)
+
+### Desktop regression
+17. Resize back to ≥768px on each layout from steps 1, 7, 11. Confirm
+    pixel-identical desktop rendering — fixed-width rails restore,
+    chrome bar disappears, drawer state is clean.
+
+### Build / lint
+18. `npm run build` — passes. Inspect `dist/assets/index-*.js` and
+    confirm `NarrowDrawer`, `NarrowSheet`, `NarrowChrome` symbols
+    appear (they're referenced from the layout files, so Rollup
+    keeps them).
+19. `npm run lint` — error count unchanged from the ~165-error
+    pre-existing baseline.
+
+**Expected:** Every step passes. Below 768px, the three rail layouts
+present a coherent narrow tree with hamburger drawer for the primary
+rail, chevron sheet for chat-panel (canvas/document layouts),
+panel-toggle for the secondary content. Above 768px, behavior is
+unchanged.
+
+### What's known-broken-but-deferred
+
+- Auto-open-sheet-on-send for canvas-centric/document-centric: the
+  user must tap the chevron to see Claude's reply after sending.
+  Manual; will be revisited if verification surfaces friction.
+- URL-routed right panel: hardware back button leaves the chat
+  rather than dismissing the panel (matches desktop behavior).
+- Editor preview narrow rendering: editor is gated <768px, so the
+  preview's RoomShell never enters narrow mode regardless of
+  preview-pane width. Container-query rewrite is a future PR.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:
