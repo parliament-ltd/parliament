@@ -812,6 +812,39 @@
 
 ---
 
+### PR-16 — Multi-rail room layouts: responsive collapse below 768px
+
+**Goal:** Three of the five room layouts — `three-panel`, `canvas-centric`, `document-centric` — render fixed-width rails that crush content below 768px. PR-16 adds a narrow-mode branch to each that swaps to a chrome bar + drawer + state-toggled panel composition, second consumer of the `useIsNarrow(768)` hook PR-15 introduced. Single-column-with-sheet stays untouched (already mobile-native); stacked-sections is homepage-only.
+
+**Scope:**
+- New `src/components/layouts/NarrowDrawer.jsx` — left-edge slide-in drawer. Mirrors `EditorPreviewSheet`'s Framer Motion modal pattern (`SPRING_GENTLE` slide + scrim fade), anchored left with `x: '-100%'` → `0`. Esc + scrim-click dismiss. Width 288px (`w-72`). Uses `useReducedMotion()` to drop transition duration to 0 when the user prefers reduced motion. `aria-modal="true"` + `role="dialog"`; no programmatic focus trap (matches `EditorPreviewSheet` / `LibraryOverlay` convention).
+- New `src/components/layouts/NarrowSheet.jsx` — chevron-handle expandable panel. Aesthetically mirrors the existing pattern in [single-column-with-sheet.jsx:62-79](../src/catalog/layouts/single-column-with-sheet.jsx); extracted because canvas-centric and document-centric narrow modes need the same handle vocabulary above the input dock. Single-column-with-sheet itself is NOT refactored to consume this — its sheet sits below the input, the new primitive sits above. Open/close is instant (no motion), matching the existing single-column behavior.
+- New `src/components/layouts/NarrowChrome.jsx` — thin h-10 top bar with two `<IconButton>` slots. Hamburger (`Menu` icon, left) opens the drawer; `PanelRight` icon (right) toggles the secondary-content panel. Both buttons are conditional on the layout actually having content for that side. Reuses the existing [IconButton.jsx](../src/components/IconButton.jsx) primitive.
+- `three-panel.jsx`: convert to a named-function `render` so `useState` is legal (mirrors `single-column-with-sheet`'s pattern). Adds `useIsNarrow(768)` gate. Narrow tree: NarrowChrome at top, body swaps between msgs+input and right-rail+right-rail-extra (stacked) based on `panelOpen`, drawer holds left-rail.
+- `canvas-centric.jsx`: same shape, but the body in default narrow state shows canvas (full body) → NarrowSheet labeled "Chat" wrapping the chat-panel slot → input-dock at bottom. Inspector folds into the panel-toggle slot. Auto-open-sheet-on-send is **not** in scope — user taps the chevron to see Claude's reply.
+- `document-centric.jsx`: same shape. Document fills the body, NarrowSheet labeled "Chat" wraps chat-panel, margin folds into the panel-toggle slot. No input-dock slot exists for this layout — chat components carry their own input, so the sheet's inner content includes both messages and input.
+
+**Out of scope (deferred):**
+- Auto-open-sheet-on-send for canvas-centric/document-centric (event-coupling layout↔chat-context). Easy follow-up if verification reveals friction.
+- URL-routed right panel (history.pushState + popstate) — current state-only swap means hardware back button leaves the chat. Acceptable; same as desktop today.
+- Editor preview narrow rendering — `useIsNarrow` reads viewport not container, and the editor itself is gated <768px, so narrow-mode never triggers inside the preview. Container-query rewrite is a possible future PR.
+- Refactoring `single-column-with-sheet` to consume `NarrowSheet`. Different sheet position; same handle. Not worth the churn.
+- Stacked-sections — homepage layout, not at `/chat/:id`. Already responsive per PR-14/PR-15.
+
+**Dependencies:** PR-15 (`useIsNarrow` hook), PR-16a.
+
+**Exit criteria:**
+- All criteria in `phase-1-testing.md` PR-16 section pass.
+- `npm run build` clean. Symbol-grep confirms `NarrowDrawer`, `NarrowSheet`, `NarrowChrome` are present in `dist/assets/index-*.js`.
+- At <768px viewport, three-panel / canvas-centric / document-centric rooms render with chrome bar + drawer + sheet, no horizontal scroll, no crushed rails.
+- At ≥768px viewport, all three layouts render pixel-identically to their pre-PR state.
+- `prefers-reduced-motion` (DevTools emulate or system setting) drops drawer slide duration to 0; no other motion is introduced.
+- No new lint errors versus the ~165 pre-existing baseline.
+
+**Risk:** Low-medium. The layout files are converted from arrow `render` to named-function `render` to make `useState` legal — same conversion `single-column-with-sheet` did at PR-7, no precedent break. Largest exposure is unfamiliar narrow-mode branches in three layout files; tested by resizing each layout's example room across the 768px boundary. Sheet ergonomics for canvas-centric (no auto-open on send) is an explicit accepted trade-off; adjustable in a follow-up.
+
+---
+
 ## Wave summary
 
 | Wave | PRs | Description |
@@ -824,8 +857,9 @@
 | D | PR-14 | Homepage v2 visual alignment — SVG blueprint, drag-reorder sections, spec-aligned chats/library/favorites |
 | D | PR-15 | Mobile responsiveness audit — cosmetic media queries + editor narrow-screen gate |
 | D | PR-16a | Blueprint variety — multiple shape variants per layout + mirroring + interior hints + pills on all rooms + per-turn model |
+| D | PR-16 | Multi-rail room layouts collapse below 768px — NarrowChrome + NarrowDrawer + NarrowSheet primitives, narrow branches in three-panel / canvas-centric / document-centric |
 
-**Total: 26 PRs** including PR-0.
+**Total: 27 PRs** including PR-0.
 
 ## Pause points
 
