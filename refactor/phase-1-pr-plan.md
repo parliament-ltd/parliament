@@ -869,6 +869,30 @@
 
 **Risk:** Low-medium. The persistence logic is unchanged — only the gesture layer swaps. The race-window between two quick drags is guarded by `reorderingRef`. The largest unknown is mobile Safari + Chrome touch behavior with `touch-action: none` + the 250ms TouchSensor delay; PR-15 hid the grabber for this exact reason. Verification on real devices is the gate.
 
+### PR-18a — Mobile homepage polish + touch haptic
+
+**Goal:** Five small mobile-polish items + a haptic confirmation on touch drag-start. All from a user fine-tuning pass after PR-17 verification on real Android and iOS devices. No new primitives, no architectural changes — pure surface-level adjustments to existing components and the new dnd-kit gesture.
+
+**Scope:**
+- [src/catalog/entries/chats-preview.jsx](../src/catalog/entries/chats-preview.jsx) (H1): below 768px the view-toggle (Summary / Notes / Highlights / Branches) moves out of the toolbar and into the footer alongside the conversation count. Frees the toolbar for a full-width search input on phones. Uses the existing `useIsNarrow(768)` hook. The toggle JSX is extracted to a `viewToggle` const that gets rendered in either the toolbar (`!isNarrow`) or the footer (`isNarrow && !hasSelection`).
+- [src/index.css](../src/index.css) (H1 + H2): new `@media (max-width: 480px)` rule wraps the `.chat-footer` so the toggle drops below the count on the smallest viewports rather than crowding it. New `@media (max-width: 600px)` rule pushes `.library-search` to `width: 100%; flex-basis: 100%; margin-left: 0` so it wraps to a full-width row below the filter chips inside `.library-filters` (the parent already has `flex-wrap: wrap`).
+- [src/components/BackupRestoreModal.jsx](../src/components/BackupRestoreModal.jsx) (H3 + H4): the modal footer status line changes from `'Never backed up · This browser'` to plain `'Never backed up'` — keeps the `· This browser` suffix only when there *is* a backup, where it actually disambiguates which browser was used. The recommended-backup card restructures to `flex flex-col gap-3.5` so the `Back up everything` button stacks below the icon + title + stats row and stretches to full-width. Reads as a clearer primary action; works on both desktop and mobile.
+- [src/catalog/layouts/stacked-sections.jsx](../src/catalog/layouts/stacked-sections.jsx) (haptic): `handleDragStart` now calls `navigator.vibrate?.(10)` when the activator event's `pointerType === 'touch'`. Android touch drag-start fires a brief haptic confirming the gesture registered. iOS Safari ignores it (no Web Vibration API). Desktop pointer drags skip the call entirely so touchscreen laptops don't vibrate on mouse drag.
+
+**Out of scope (deferred):**
+- The "I" items batch (input area redesign for mobile + mobile Settings redesign + `+` menu architecture). Deferred to PR-18b/c and a separate components-as-input-actions PR batch (see chat history with the user — Web Search and File Attach get their own catalog components that contribute `inputActions` via a new contribution type).
+- A configurable haptic strength / disable toggle. iOS users get nothing regardless; Android users with OS haptics disabled get nothing regardless. A custom Settings toggle would only matter for Android users who want zero haptic feedback for this app specifically — not enough demand signal yet.
+
+**Dependencies:** PR-14 (chats@1.0 + library@1.0 components), PR-15 (`useIsNarrow` hook), PR-17 (dnd-kit handleDragStart, where the haptic call lives).
+
+**Exit criteria:**
+- All criteria in `phase-1-testing.md` PR-18a section pass.
+- `npm run lint` returns 164 problems (162 errors + 2 warnings) — same as PR-17 post-merge baseline.
+- `npm run build` clean.
+- Symbol-grep confirms `"Back up everything"` (1), `"This browser"` (1 — only the with-backup path), `"Never backed up"` (2 — backup.js label + modal display), and `navigator.vibrate` (1) all ship in `dist/assets/index-*.js`.
+
+**Risk:** Low. Each item is a small isolated adjustment. The haptic addition is gated on `pointerType === 'touch'` so it can't fire on unintended platforms. The H1 change has the most blast radius (a structural toggle-position swap based on viewport) but lives behind the same `useIsNarrow` hook that PR-15/PR-16 already established.
+
 ---
 
 ## Wave summary
@@ -885,8 +909,9 @@
 | D | PR-16a | Blueprint variety — multiple shape variants per layout + mirroring + interior hints + pills on all rooms + per-turn model |
 | D | PR-16 | Multi-rail room layouts collapse below 768px — NarrowChrome + NarrowDrawer + NarrowSheet primitives, narrow branches in three-panel / canvas-centric / document-centric |
 | D | PR-17 | dnd-kit migration for homepage section reorder — touch + keyboard reorder + screen-reader announcements |
+| D | PR-18a | Mobile homepage polish — Chats toolbar / Library search / Backup modal copy + button layout + touch haptic on section drag-start |
 
-**Total: 28 PRs** including PR-0.
+**Total: 29 PRs** including PR-0.
 
 ## Pause points
 

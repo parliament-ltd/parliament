@@ -2902,6 +2902,120 @@ File-upload drop zones and editor drag-drop are unaffected.
 
 ---
 
+## PR-18a — Mobile homepage polish + touch haptic
+
+👀 User-visible
+
+**Surface:** Homepage Chats section toolbar/footer, Library section
+filters/search, Backup & Restore modal footer status + recommended
+card, homepage section drag-start gesture.
+
+**Setup:**
+- Homepage with ≥ 3 sections and ≥ 1 conversation.
+- A browser at < 768px viewport (Chrome DevTools mobile emulation
+  or a real device) for H1 + H2.
+- A real Android device for the haptic test (iOS does not implement
+  the Web Vibration API).
+
+**Steps — H1: Chats section view-toggle moves to footer on narrow:**
+1. Open `/` at ≥ 768px viewport. The Chats section toolbar shows the
+   search input + the view toggle (Summary / Notes / Highlights /
+   Branches) on the right. (Unchanged from PR-14.)
+2. Resize to < 768px (or open the homepage on a phone). The view
+   toggle disappears from the toolbar. The search input now stretches
+   the full width of the toolbar.
+3. Scroll to the bottom of the Chats card. The view toggle now sits
+   in the footer to the right of "N conversations".
+4. Tap any toggle option (Notes / Highlights / Branches / Summary).
+   The chat row second lines update as before — state is preserved
+   across the toggle move.
+5. Resize further to < 480px. The footer wraps so the toggle drops
+   below the "N conversations" count rather than crowding it.
+6. Select a chat row (checkbox) → the bulk toolbar appears in the
+   header; the view toggle is hidden in the footer too while
+   selection is active.
+
+**Steps — H2: Library search input full-width on narrow:**
+1. Open `/` at ≥ 768px viewport. The Library section filter chips
+   row shows the chips on the left and a fixed 180px-wide search
+   input on the right. (Unchanged from PR-14.)
+2. Resize to < 600px. The search input wraps to its own row below
+   the filter chips and stretches the full width of the section card.
+3. Type a query — search functionality is unchanged.
+4. Switch filter tabs — the search input stays on its full-width row.
+
+**Steps — H3: Backup & Restore "Never backed up" copy:**
+1. Open Settings → Backup & Restore on a fresh browser where no
+   backup has been made.
+2. Modal footer reads "Never backed up" (no "· This browser" suffix).
+3. Create a backup. Reopen the modal. Footer now reads
+   "Backed up ... · This browser" — the suffix is preserved for the
+   with-backup case where it disambiguates which browser.
+
+**Steps — H4: Backup & Restore recommended-card button layout:**
+1. Open Settings → Backup & Restore.
+2. The gold-tinted "Everything" recommended card now shows the
+   Database icon + "Everything" title + "Recommended" pill + stats
+   on the top row, and the "Back up everything" button stretches
+   full-width below them.
+3. Tap "Back up everything" → backup flow works as before.
+4. The card layout works on both desktop and mobile (no media query
+   gate — the stacked layout reads as a clearer primary action at
+   all sizes).
+
+**Steps — Haptic on section drag-start (Android only):**
+1. Open `/` on a real Android device. System haptic feedback must
+   be enabled (Settings → Sound & vibration → Vibration & haptics).
+2. Press and hold a section's grabber for 250ms+. Drag starts.
+3. A single brief vibration pulse fires at the moment the drag
+   picks up — confirming the gesture registered.
+4. Subsequent dragover events do NOT fire haptics (intentional —
+   only the start pulse to avoid buzz-fatigue).
+5. Open the same page on an iPhone or iPad. Press and hold the
+   grabber for 250ms+. Drag starts visually but no haptic fires.
+   This is expected — iOS Safari does not implement the Web
+   Vibration API.
+6. On a touchscreen laptop, mouse-press the grabber and drag.
+   No haptic fires (pointerType !== 'touch' gates the call).
+
+**Steps — Regression on previously-working flows:**
+1. Desktop ≥ 768px: Chats toolbar layout unchanged — search +
+   toggle on one row.
+2. Desktop ≥ 600px: Library filter row layout unchanged — chips
+   + 180px search inline.
+3. Backup flow end-to-end still works (create, encrypt, download).
+4. Section reorder (PR-17) still works on all platforms.
+
+**Steps — Lint + bundle:**
+1. `npm run lint` → 164 problems (162 errors + 2 warnings). Same
+   as PR-17 post-merge baseline. No new errors.
+2. `npm run build` → clean.
+3. Symbol-grep: `grep -ohc "Back up everything" dist/assets/index-*.js`
+   returns 1. `"This browser"` returns 1 (the with-backup path).
+   `"Never backed up"` returns 2 (backup.js label constant + modal
+   display). `navigator.vibrate` returns 1.
+
+**Expected:** Every step passes. Mobile chats has a roomier search
++ footer-anchored view toggle. Mobile library has a full-width
+search. Backup modal reads cleaner ("Never backed up" sans suffix,
+primary action as a full-width button). Touch drag-start on Android
+emits a brief haptic confirmation; iOS and desktop are unaffected.
+No regressions on existing desktop or PR-17 behaviors.
+
+### What's known-broken-but-deferred
+
+- The "I" items batch is firmly PR-18b/c+ (input area redesign for
+  mobile + mobile Settings redesign + `+` menu architecture as
+  components-contribute-input-actions). See discussion notes —
+  Web Search and File Attach become catalog components in their
+  own PRs.
+- No iOS haptic alternative shipped. The Web Vibration API is the
+  only standard option for pure web pages, and Apple does not
+  implement it. WKWebView-bridge approaches are out of scope for
+  a pure browser app.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

@@ -153,7 +153,17 @@ export default {
     },
   }), [sections, specs])
 
-  const handleDragStart = ({ active }) => setActiveId(active.id)
+  const handleDragStart = ({ active, activatorEvent }) => {
+    setActiveId(active.id)
+    // Brief haptic pulse on touch drag-start — confirms the gesture
+    // registered. iOS Safari doesn't implement the Vibration API, so
+    // iPhone/iPad users get no haptic; Android gets a 10ms pulse.
+    // Desktop pointer drags don't fire (pointerType check filters them
+    // out) so touchscreen laptops don't vibrate on mouse drag.
+    if (activatorEvent?.pointerType === 'touch') {
+      navigator.vibrate?.(10)
+    }
+  }
 
   const handleDragEnd = async ({ active, over }) => {
     setActiveId(null)

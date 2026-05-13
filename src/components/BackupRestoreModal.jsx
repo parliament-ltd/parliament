@@ -331,7 +331,7 @@ export default function BackupRestoreModal({ initialTab = 'backup', onClose }) {
                 className="w-1.5 h-1.5 rounded-full inline-block"
                 style={{ backgroundColor: statusDotColor(status?.color) }}
               />
-              {status ? (status.lastBackedUpAt ? `${status.label} · This browser` : 'Never backed up · This browser') : 'Loading…'}
+              {status ? (status.lastBackedUpAt ? `${status.label} · This browser` : 'Never backed up') : 'Loading…'}
             </div>
             <div className="flex gap-2">
               <button
@@ -417,34 +417,38 @@ function BackupPane({ stats, checked, setChecked, passwordOn, setPasswordOn, pas
         Your rooms, chats, and everything you've built live in this browser. Save a copy to take with you, or restore later if you switch devices.
       </p>
 
-      {/* Recommended card */}
+      {/* Recommended card — PR-18a: button stacks below the content as
+          a full-width primary action so it reads as the single
+          recommended next step rather than a small pill on the side. */}
       <div
-        className="border rounded-lg p-3.5 mb-4 flex items-center gap-3.5"
+        className="border rounded-lg p-3.5 mb-4 flex flex-col gap-3.5"
         style={{ borderColor: ringingColor, background: 'rgba(196, 169, 77, 0.08)' }}
       >
-        <div
-          className="w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0"
-          style={{ background: 'rgba(196, 169, 77, 0.16)', color: '#8B6A10' }}
-        >
-          <Database className="w-4 h-4" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-[13px] font-medium flex items-center gap-2 mb-0.5" style={{ color: '#8B6A10' }}>
-            Everything
-            <span className="text-[9px] uppercase tracking-wider px-1.5 py-px rounded-full text-white font-medium" style={{ background: ringingColor }}>
-              Recommended
-            </span>
+        <div className="flex items-center gap-3.5">
+          <div
+            className="w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0"
+            style={{ background: 'rgba(196, 169, 77, 0.16)', color: '#8B6A10' }}
+          >
+            <Database className="w-4 h-4" />
           </div>
-          <div className="text-[11px] text-[var(--p-text-secondary)]">
-            {stats
-              ? `${stats.chats} chat${stats.chats === 1 ? '' : 's'} · ${stats.rooms} room${stats.rooms === 1 ? '' : 's'} · ${stats.libraryItems} library item${stats.libraryItems === 1 ? '' : 's'} · ~${formatBytes(stats.storageUsed)}`
-              : 'Loading…'}
+          <div className="flex-1 min-w-0">
+            <div className="text-[13px] font-medium flex items-center gap-2 mb-0.5" style={{ color: '#8B6A10' }}>
+              Everything
+              <span className="text-[9px] uppercase tracking-wider px-1.5 py-px rounded-full text-white font-medium" style={{ background: ringingColor }}>
+                Recommended
+              </span>
+            </div>
+            <div className="text-[11px] text-[var(--p-text-secondary)]">
+              {stats
+                ? `${stats.chats} chat${stats.chats === 1 ? '' : 's'} · ${stats.rooms} room${stats.rooms === 1 ? '' : 's'} · ${stats.libraryItems} library item${stats.libraryItems === 1 ? '' : 's'} · ~${formatBytes(stats.storageUsed)}`
+                : 'Loading…'}
+            </div>
           </div>
         </div>
         <button
           disabled={working}
           onClick={onBackupAll}
-          className={`px-4 py-2 text-xs font-medium rounded-md text-white whitespace-nowrap transition-colors ${
+          className={`w-full px-4 py-2 text-xs font-medium rounded-md text-white whitespace-nowrap transition-colors ${
             working ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           style={{ background: ringingColor }}
