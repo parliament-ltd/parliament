@@ -31,6 +31,8 @@ function iconFor(name) { return ICON_BY_NAME[name] || Plus }
  *   rightPrimaryAction {object|null}  PR-18b: a contributed action where `primary === 'right'`. When text is empty AND not streaming, this renders in the right-side button slot (mic for voice-toggle). Tapping invokes onInvokeAction(action.id).
  *   overflowActions    {object[]}     PR-18b: contributed actions WITHOUT a primary flag — populate the '+' overflow menu.
  *   onInvokeAction     {(actionId, payload) => void}  PR-18b: called when the user taps any contributed action. input-render publishes `input-action:${id}` on the hostAPI bus.
+ *   armedTools         {object[]}     PR-18d: currently armed tools (from hostAPI.getArmedTools()). Each entry has `{ componentId, id, label, iconName, definition, serverSide }`. Rendered as a chip strip above the textarea so the user sees what will run on the next send.
+ *   onDisarmTool       {(componentId) => void}  PR-18d: called when the user clicks the × on a chip. Calls hostAPI._disarmTool(componentId).
  *   isOnline           {boolean}  — when false the send button is disabled with an aria-label. Default: true.
  *   cardLayout         {boolean}  — unified card style (mobile). Default: inline (desktop).
  */
@@ -50,6 +52,8 @@ export default function InputArea({
   rightPrimaryAction = null,
   overflowActions = [],
   onInvokeAction,
+  armedTools = [],
+  onDisarmTool,
   cardLayout = false,
 }) {
   const fileInputRef = useRef(null)
@@ -179,6 +183,47 @@ export default function InputArea({
     </div>
   )}
 
+  /* ── PR-18d: armed-tools chip strip. Renders one pill per entry
+       in hostAPI.getArmedTools() (passed through props). Doubles as
+       cost-transparency surface ("Uses API credits") and disarm
+       affordance (× button calls onDisarmTool with the componentId).
+       Rendered above the textarea in both card and inline layouts. ── */
+  function renderArmedToolsStrip() {
+    if (!armedTools || armedTools.length === 0) return null
+    return (
+      <div className="flex flex-wrap gap-1.5">
+        {armedTools.map((tool) => {
+          const Icon = iconFor(tool.iconName)
+          const label = tool.label || tool.id
+          return (
+            <div
+              key={tool.componentId}
+              className="inline-flex items-center gap-1.5 pl-2 pr-1 py-0.5 rounded-full text-[11px] font-medium"
+              style={{
+                backgroundColor: 'rgba(74,122,229,0.10)',
+                color: '#4A7AE5',
+                border: '1px solid rgba(74,122,229,0.25)',
+              }}
+            >
+              <Icon className="w-3 h-3 shrink-0" />
+              <span>{label}</span>
+              <span className="text-[10px] opacity-70 hidden sm:inline">· Uses API credits</span>
+              <button
+                type="button"
+                onClick={() => onDisarmTool?.(tool.componentId)}
+                aria-label={`Turn off ${label} for next message`}
+                title={`Turn off ${label} for next message`}
+                className="ml-0.5 w-4 h-4 rounded-full inline-flex items-center justify-center hover:bg-[rgba(74,122,229,0.18)] transition-colors"
+              >
+                <X className="w-2.5 h-2.5" />
+              </button>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
   /* ── Card layout (Swift / mobile) ───────────────────────── */
   if (cardLayout) {
     return (
@@ -212,6 +257,13 @@ export default function InputArea({
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* PR-18d: armed-tools chip strip */}
+          {armedTools.length > 0 && (
+            <div className="mx-3 mt-3">
+              {renderArmedToolsStrip()}
+            </div>
+          )}
 
           {/* Textarea */}
           <textarea
@@ -327,6 +379,13 @@ export default function InputArea({
   /* ── Inline layout (Albatross / desktop) ────────────────── */
   return (
     <div className="relative p-4" data-tour="chat-input">
+      {/* PR-18d: armed-tools chip strip */}
+      {armedTools.length > 0 && (
+        <div className="mb-2">
+          {renderArmedToolsStrip()}
+        </div>
+      )}
+
       {/* File attachment chip */}
       <AnimatePresence>
         {attachment && (

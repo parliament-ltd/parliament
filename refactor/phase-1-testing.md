@@ -3311,6 +3311,146 @@ unchanged.
 
 ---
 
+## PR-18d — web-search@1.0 catalog component
+
+👀 User-visible
+
+**Surface:** `/chat/:id` for any room that mounts web-search@1.0
+(pre-mounted on Writing Studio, Data Workspace, Drafting Desk, and
+Pocket Chat after PR-18d's seed bump). The `+` overflow menu gains a
+"Web search" item; tapping it arms the Anthropic `web_search` tool
+for the next outgoing message and renders a blue chip strip above
+the textarea. The chip strip carries "· Uses API credits" copy
+(cost transparency) and a × disarm button. After a successful send,
+the chip auto-clears.
+
+**Setup:**
+- Fresh install (or: clear IndexedDB to force a re-seed of
+  `libraryRooms`). The four affected templates seed at version 3 and
+  include `web-search@^1.0`.
+- Existing installs with templates at seedVersion 2 will re-seed on
+  next page load because PR-18d bumps the versions to 3.
+
+**Steps — Arm / disarm via `+` menu:**
+1. Open a Pocket Chat room (or any of the four pre-mounted templates).
+   The chat input renders normally.
+2. Tap the `+` button. The menu opens. "Upload file" is at the top
+   (intrinsic, PR-18e removes it). Below "Upload file", separated by
+   a divider, is "Web search" with a Globe icon. (And, on rooms with
+   voice-input@1.0 mounted, the mic is to the right of `+` — not in
+   the overflow.)
+3. Tap "Web search". The menu closes. A blue chip pill appears above
+   the textarea: `🌐 Web search · Uses API credits ×`. On viewports
+   ≥640px ("· Uses API credits" copy is shown); below that the copy
+   is hidden to save room.
+4. Tap `+` again. The menu reopens. "Web search" item still rendered
+   normally (no separate armed visual on the menu item — the chip is
+   the only armed signal).
+5. Tap "Web search" again. The menu closes. The chip disappears.
+
+**Steps — Disarm via chip strip:**
+1. Open Pocket Chat. Tap `+` → "Web search" to arm. The chip appears.
+2. Click the × on the chip. The chip disappears.
+3. Reopen `+`. "Web search" item still tappable to re-arm.
+
+**Steps — Auto-reset on send:**
+1. Open Pocket Chat. Type "what's the weather in Tokyo today?" (or
+   any prompt that would benefit from a search).
+2. Arm Web search via the `+` menu.
+3. Send the message. Chip should disappear during or immediately
+   after the send.
+4. Verify in DevTools → Network: the outgoing POST to
+   `api.anthropic.com/v1/messages` body includes a top-level
+   `tools` array with `{ "type": "web_search_20250305", "name":
+   "web_search", "max_uses": 3 }`.
+5. Send a second message ("can you elaborate?"). The chip is NOT
+   present this time. The POST body should NOT include a `tools`
+   array (the W1 per-message-toggle contract).
+6. Re-arm web-search. Send. Chip disappears post-send. Round 3
+   confirms the cycle works repeatedly.
+
+**Steps — Multi-tap toggle:**
+1. Open Pocket Chat. Tap `+` → "Web search" → menu closes → chip
+   present.
+2. Tap `+` → "Web search" → menu closes → chip gone.
+3. Repeat 5 times. Each tap toggles cleanly. No stuck state.
+
+**Steps — Cross-room isolation:**
+1. Open Pocket Chat. Arm web-search. Chip present.
+2. Navigate to a different room (e.g., Quiet Room).
+3. The Quiet Room input has no chip — web-search is not mounted
+   there. The `+` menu shows only "Upload file."
+4. Return to Pocket Chat. The chip is gone (a new RoomShell instance
+   was created on remount; hostAPI is fresh per room).
+
+**Steps — Desktop ≥768px (inline layout):**
+1. Open a Pocket Chat room at ≥768px (note: Pocket Chat uses the
+   single-column-with-sheet layout; for desktop testing of the chip
+   strip, use Writing Studio instead which renders three-panel).
+2. Arm web-search via Writing Studio's `+`. The chip appears above
+   the textarea (inside `p-4` wrapper, before the textarea form
+   row).
+3. Disarm via ×. Send a normal message. No chip; no `tools` in the
+   outgoing API body.
+
+**Steps — Quiet Room is unchanged:**
+1. Open Quiet Room. Tap `+`. The menu opens with only "Upload file."
+   No "Web search" entry. web-search@1.0 is not pre-mounted on
+   Quiet Room by design.
+2. Verify: `seedTemplates.js` shows `'quiet-room@1.0': 2` (unchanged).
+
+**Steps — Provider neutrality:**
+1. In DevTools console: `(await import('/src/providers/index.js'))
+   .getProvider('anthropic').getAvailableTools()` — returns an array
+   that includes `{ id: 'web_search', label: 'Web search',
+   definition: { type: 'web_search_20250305', name: 'web_search',
+   max_uses: 3 }, serverSide: true }`.
+2. When Phase 2 ships other providers (OpenAI / Mistral), the same
+   `getAvailableTools()` call against those providers returns their
+   own web_search definitions; web-search@1.0 picks them up
+   unchanged.
+
+**Steps — Symbol-grep bundled output:**
+1. After `npm run build`:
+   - `grep -ohc "web-search" dist/assets/index-*.js` → ≥2
+   - `grep -ohc "web_search_20250305" dist/assets/index-*.js` → ≥1
+   - `grep -ohc "_armTool" dist/assets/index-*.js` → ≥2
+   - `grep -ohc "getArmedTools" dist/assets/index-*.js` → ≥1
+   - `grep -ohc "tool-armed-changed" dist/assets/index-*.js` → ≥2
+   - `grep -ohc "message-sent" dist/assets/index-*.js` → ≥2
+   - `grep -ohc "max_uses" dist/assets/index-*.js` → ≥1
+
+**Steps — Lint + build:**
+1. `npm run lint` → 164 problems (162 errors + 2 warnings). Same as
+   PR-18c post-merge baseline. No new errors.
+2. `npm run build` → clean.
+
+**Expected:** Every step passes. The web-search inputAction is
+visible in the `+` menu on the four pre-mounted templates. The chip
+strip appears on arm and disappears on send or × click. The
+outgoing API body includes the `tools` array only when armed.
+Cross-room state is isolated. Quiet Room is unchanged. Provider
+neutrality holds — web-search@1.0 doesn't import the Anthropic
+provider directly; it discovers the tool via the provider abstraction.
+
+### What's known-broken-but-deferred
+
+- Rich result rendering — citations as clickable footnotes, "Search
+  results" expandable above the assistant response. The text response
+  streams as normal (Claude's synthesized answer with inline citation
+  brackets), but the `server_tool_use` and `web_search_tool_result`
+  content blocks are silently ignored by the provider stream parser.
+  Separate PR for content-block handling in provider + MessageCard.
+- Per-room configurable `max_uses`. Locked at 3 this PR.
+- `+` menu item visual armed state. The chip strip is the only
+  armed signal; the menu item itself has no "this is on right now"
+  treatment.
+- OpenAI / Mistral provider implementations of web_search. The
+  catalog-component side is ready; the provider-side adapters are
+  firmly Phase 2.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

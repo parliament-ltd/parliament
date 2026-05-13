@@ -46,6 +46,7 @@ import columnInspectorEntry  from './entries/column-inspector'
 import documentCanvasEntry   from './entries/document-canvas'
 import claudeCommentsEntry   from './entries/claude-comments'
 import rippleAnalysisEntry   from './entries/ripple-analysis'
+import webSearchEntry        from './entries/web-search'
 import { validateManifest, entryRef } from './validate'
 
 const REGISTRY = new Map()
@@ -93,6 +94,8 @@ register(columnInspectorEntry)
 register(documentCanvasEntry)
 register(claudeCommentsEntry)
 register(rippleAnalysisEntry)
+// PR-18d — per-message tool arming via inputAction contributions.
+register(webSearchEntry)
 
 /**
  * Look up a manifest entry by `name@version` ref. Exact-match only in PR-2;

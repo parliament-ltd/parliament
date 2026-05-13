@@ -56,12 +56,13 @@ export const TEMPLATES = Object.freeze([
     layout: { ref: 'three-panel@^1.0' },
     scheme: PARLIAMENT_SCHEME,
     components: [
-      comp('messages',   'messages@^1.0',   'msg-area',         0),
-      comp('input',      'input@^1.0',      'input-dock',       0),
-      comp('branches',   'branches@^1.0',   'left-rail',        0),
-      comp('highlights', 'highlights@^1.0', 'right-rail',       0),
-      comp('notes',      'notes@^1.0',      'right-rail-extra', 0),
-      comp('context',    'context@^1.0',    'right-rail',       1),
+      comp('messages',    'messages@^1.0',    'msg-area',         0),
+      comp('input',       'input@^1.0',       'input-dock',       0),
+      comp('web-search',  'web-search@^1.0',  'input-dock',       10),
+      comp('branches',    'branches@^1.0',    'left-rail',        0),
+      comp('highlights',  'highlights@^1.0',  'right-rail',       0),
+      comp('notes',       'notes@^1.0',       'right-rail-extra', 0),
+      comp('context',     'context@^1.0',     'right-rail',       1),
     ],
     buildIntent: null,
   },
@@ -94,6 +95,7 @@ export const TEMPLATES = Object.freeze([
       comp('context',      'context@^1.0',           'inspector',  1),
       comp('messages',     'messages@^1.0',          'chat-panel', 0),
       comp('input',        'input@^1.0',             'input-dock', 0),
+      comp('web-search',   'web-search@^1.0',        'input-dock', 10),
     ],
     buildIntent: null,
   },
@@ -117,11 +119,12 @@ export const TEMPLATES = Object.freeze([
     // messages@1.0 + input@1.0 own free-form chat about the draft in the
     // chat-panel slot.
     components: [
-      comp('document', 'document-canvas@^1.0',  'document',   0),
-      comp('comments', 'claude-comments@^1.0',  'margin',     0),
-      comp('ripple',   'ripple-analysis@^1.0',  'margin',     1),
-      comp('messages', 'messages@^1.0',         'chat-panel', 0),
-      comp('input',    'input@^1.0',            'chat-panel', 1),
+      comp('document',    'document-canvas@^1.0',  'document',   0),
+      comp('comments',    'claude-comments@^1.0',  'margin',     0),
+      comp('ripple',      'ripple-analysis@^1.0',  'margin',     1),
+      comp('messages',    'messages@^1.0',         'chat-panel', 0),
+      comp('input',       'input@^1.0',            'chat-panel', 1),
+      comp('web-search',  'web-search@^1.0',       'chat-panel', 10),
     ],
     buildIntent: null,
   },
@@ -139,11 +142,12 @@ export const TEMPLATES = Object.freeze([
     layout: { ref: 'single-column-with-sheet@^1.0' },
     scheme: PARLIAMENT_SCHEME,
     components: [
-      comp('messages',   'messages@^1.0',    'msg-area',   0),
-      comp('input',      'input@^1.0',       'input-dock', 0),
-      comp('voice',      'voice-input@^1.0', 'input-dock', 1),
-      comp('highlights', 'highlights@^1.0',  'sheet',      0),
-      comp('branches',   'branches@^1.0',    'sheet',      1),
+      comp('messages',    'messages@^1.0',    'msg-area',   0),
+      comp('input',       'input@^1.0',       'input-dock', 0),
+      comp('voice',       'voice-input@^1.0', 'input-dock', 1),
+      comp('web-search',  'web-search@^1.0',  'input-dock', 10),
+      comp('highlights',  'highlights@^1.0',  'sheet',      0),
+      comp('branches',    'branches@^1.0',    'sheet',      1),
     ],
     buildIntent: null,
   },
@@ -212,14 +216,16 @@ export const TEMPLATES = Object.freeze([
  * input + context only" to the full Pelican decomposition.
  */
 const SEED_VERSIONS = Object.freeze({
-  'data-workspace@1.0': 2, // PR-11a: full Pelican decomposition
-  'drafting-desk@1.0':  2, // PR-11b: full Secretarybird decomposition
-  // PR-14 added author + installedCount canonical metadata to every
-  // template. Bumping every record so v4 installs pick up the new fields
-  // without waiting for a per-template content change.
-  'writing-studio@1.0': 2,
-  'pocket-chat@1.0':    2,
-  'quiet-room@1.0':     2,
+  // PR-18d adds web-search@1.0 to the four chat-bearing templates.
+  // Quiet Room intentionally stays at 2 — its description is "Just a
+  // chat. Nothing else in the way." and web-search would conflict
+  // with that ethos. Users who want it on Quiet Room can add it via
+  // the editor.
+  'data-workspace@1.0': 3, // PR-11a Pelican + PR-18d web-search
+  'drafting-desk@1.0':  3, // PR-11b Secretarybird + PR-18d web-search
+  'writing-studio@1.0': 3, // PR-18d web-search
+  'pocket-chat@1.0':    3, // PR-18d web-search
+  'quiet-room@1.0':     2, // unchanged — no web-search by design
   'kingfisher@1.0':     2,
   'starling@1.0':       2,
 })

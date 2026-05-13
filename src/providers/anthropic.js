@@ -28,9 +28,14 @@ const TAGS_SYSTEM_PROMPT = `Generate 1-3 topic tags for this conversation. Rules
 
 /* ── Built-in Anthropic tools ─────────────────────────────── */
 
+// PR-18d: max_uses caps how many times the model can run a search per
+// response. 3 is a deliberate middle — thorough enough for most "look
+// this up" prompts, frugal enough on credits and latency. No per-room
+// config UI yet; revisit if anyone needs to tune it.
 const WEB_SEARCH_TOOL = {
   type: 'web_search_20250305',
   name: 'web_search',
+  max_uses: 3,
 }
 
 /* ── Client-side custom tools ─────────────────────────────── */
