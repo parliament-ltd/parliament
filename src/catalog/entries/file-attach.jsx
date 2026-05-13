@@ -47,6 +47,11 @@ export default {
     { slot: 'right-rail-extra', fallbackOk: true },
     { slot: 'sheet',            fallbackOk: true },
   ],
+  // Files are staged in memory and folded into input@1.0's outbound
+  // send path; the model API call is the consumer. PR-18e shipped
+  // without this required field — caught by the validator at
+  // module-load time when this entry is registered. PR-18f restores it.
+  capabilityRequirements: ['model:complete'],
   configSchema: {},
 
   contributions: {

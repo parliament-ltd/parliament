@@ -1782,20 +1782,29 @@
    hover-capable + fine pointer (excludes touch-only tablets) AND
    viewport ≥768px (excludes phones with attached mice). Continuous
    slow spin while hovered, paused on leave. prefers-reduced-motion
-   is a hard gate — no spin at all when the user opts out. */
+   is a hard gate — no spin at all when the user opts out.
+
+   `transform-origin: center` is set unconditionally on the icon to
+   guard against browsers that default SVG transform-origin to 0 0
+   (the icon would otherwise translate around its top-left corner
+   instead of rotating in place). The conditions are flattened into
+   a single @media rule rather than nested for broader compat. */
 @keyframes settings-spin {
   to { transform: rotate(360deg); }
 }
 
-@media (hover: hover) and (pointer: fine) and (min-width: 768px) {
-  @media (prefers-reduced-motion: no-preference) {
-    .settings-icon-spin {
-      animation: settings-spin 4s linear infinite;
-      animation-play-state: paused;
-    }
-    .settings-icon-spin-host:hover .settings-icon-spin {
-      animation-play-state: running;
-    }
+.settings-icon-spin {
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .settings-icon-spin {
+    animation: settings-spin 4s linear infinite;
+    animation-play-state: paused;
+  }
+  .settings-icon-spin-host:hover .settings-icon-spin {
+    animation-play-state: running;
   }
 }
 

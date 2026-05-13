@@ -41,6 +41,11 @@ export default {
     { slot: 'right-rail-extra', fallbackOk: true },
     { slot: 'sheet',            fallbackOk: true },
   ],
+  // Arms a tool that the model uses to make outbound search calls;
+  // the API call itself goes through input@1.0's send path. PR-18d
+  // shipped without this required field — caught by the validator at
+  // module-load time when this entry is registered. PR-18f restores it.
+  capabilityRequirements: ['model:complete'],
   configSchema: {},
 
   contributions: {
