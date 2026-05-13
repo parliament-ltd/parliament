@@ -114,7 +114,14 @@ export function ChatProvider({ children }) {
   // Send a message and handle streaming response
   // systemPrompt: optional string from collaboration mode presets + custom instruction
   // tools: optional array of tool definitions from provider.getAvailableTools()
-  const sendMessage = useCallback(async (apiKey, conversationId, userContent, model, provider, systemPrompt = '', tools = []) => {
+  // PR-18e: optional `attachments` arg for file-attach@1.0. Shape:
+  //   { parts: Array<Anthropic content block>, meta: Array<{ name, category, mimeType, size }> }
+  //   - parts are folded into THIS turn's user-message content array
+  //     (multi-part API call). Not persisted to IndexedDB — base64 stays
+  //     in memory only.
+  //   - meta is persisted alongside the user message so MessageCard can
+  //     render attachment chips in history (a memory aid, not replay).
+  const sendMessage = useCallback(async (apiKey, conversationId, userContent, model, provider, systemPrompt = '', tools = [], attachments = null) => {
     // PR-16a: persist the model used on this turn back to the conversation
     // record. The semantic shift: `conversation.model` now means "the most
     // recently used model in this room," not "the model the room was
@@ -127,11 +134,17 @@ export function ChatProvider({ children }) {
       updateConversation(conversationId, { model }).catch(() => {})
     }
 
-    // 1. Add user message to state and IndexedDB
+    // 1. Add user message to state and IndexedDB.
+    //    PR-18e: `userContent` is already the text the user typed PLUS
+    //    any `<attached_file>` blocks for text/code attachments (folded
+    //    in by input-render at send time). Binary attachments come via
+    //    `attachments.parts` and are NEVER persisted — they only attach
+    //    to this turn's API call.
     const userMsg = await addMessage({
       conversationId,
       role: 'user',
       content: userContent,
+      ...(attachments?.meta ? { attachmentMeta: attachments.meta } : {}),
     })
     setMessages(prev => [...prev, userMsg])
 
@@ -172,6 +185,27 @@ export function ChatProvider({ children }) {
       const baseHistory = historyMessages
         .filter(m => m.content) // Exclude any empty messages
         .map(m => ({ role: m.role, content: m.content }))
+
+      // PR-18e: for THIS turn only, fold binary attachment content
+      // blocks into the user message's content array. The persisted
+      // record stays as text-only (the text already carries any
+      // <attached_file> wrappers for text/code attachments). Anthropic
+      // accepts either a string or an array of content blocks; we use
+      // the array form when there's at least one binary part.
+      const binaryParts = Array.isArray(attachments?.parts) ? attachments.parts : []
+      if (binaryParts.length > 0 && baseHistory.length > 0) {
+        const lastIdx = baseHistory.length - 1
+        const last = baseHistory[lastIdx]
+        if (last.role === 'user') {
+          baseHistory[lastIdx] = {
+            role: 'user',
+            content: [
+              { type: 'text', text: typeof last.content === 'string' ? last.content : '' },
+              ...binaryParts,
+            ],
+          }
+        }
+      }
 
       // 5. Call provider with streaming — handle client-side tool loop
       let totalInputTokens = 0

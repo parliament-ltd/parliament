@@ -1000,6 +1000,52 @@ The component has no rendered surface in any slot (returns null) — its UI live
 
 **Risk:** Medium. The shared hostAPI registry is a new aggregation pattern — its semantics around the `tool-armed-changed` echo (web-search publishes "armed", InputArea re-reads getArmedTools(), web-search must not re-fire on its own echo and end up in an infinite loop) require care. Mitigation: web-search's `tool-armed-changed` handler only responds to `armed === false` and only when local state was true. Send-time tool array is read once at handleSend rather than from a stale closure — defensive against the user toggling mid-send.
 
+### PR-18e — file-attach@1.0 catalog component
+
+**Goal:** Ship `file-attach@1.0` — first functional V2 file attachment surface, replacing the dead V1 intrinsic upload in InputArea. Composer-tier component contributing an "Attach files" item to input@1.0's `+` overflow menu. Multi-select picker stages files as chips above the textarea; chosen files fold into the next outgoing message — images and PDFs as Anthropic content blocks, text/code wrapped in `<attached_file>` boundary tags and inlined into the prompt. Auto-clears after each successful send. `attachmentMeta` (name / category / size, no base64) persists on the user message record so MessageCard renders memory-aid chips in conversation history.
+
+This PR is also the moment the V2 `+`-disabled state activates live. PR-18b shipped the disabled-tooltip "Add components to enable more actions" but gated it on `intrinsicMenuItemCount === 0`, which the intrinsic file-upload always kept above zero. PR-18e removes the intrinsic upload, drops the count to 0, and any room without an overflow contributor (e.g. a stripped Quiet Room) now shows the `+` disabled at rest. Manual verification of the tooltip is required as part of this PR's exit criteria.
+
+**Scope:**
+- [src/lib/fileUpload.js](../src/lib/fileUpload.js): expand from the V1 text-only pipeline to handle images (`image/jpeg | image/png | image/gif | image/webp`) and PDFs (`application/pdf`) as base64-encoded content alongside text/code. Add `categorizeFile`, `attachmentToContentBlock` (returns Anthropic image / document content blocks), `stripAttachedFileBlocks` (used by MessageCard to hide persisted `<attached_file>` boundary blocks from display), `formatSize` helper. Extended text/code extension list. New limits: 10 MB per binary file (hard reject), 200 KB per text file (truncated, preserved from V1), 10 attachments per message. `ACCEPTED_TYPES` kept as a back-compat alias for `ACCEPTED_FILE_TYPES` during the cutover. Preserves the V1 `<attached_file>` boundary-tag wrapping for prompt-injection mitigation (security-relevant).
+- [src/lib/hostAPI.js](../src/lib/hostAPI.js): third aggregation pair `_setAttachments(componentId, list)` / `getAttachments()` + `attachments-changed` event. Parallel to the armed-tools registry from PR-18d. Adds `attach:` prefix to known-event prefixes for status events like `attach:error`.
+- [src/lib/db.js](../src/lib/db.js): `addMessage` accepts optional `attachmentMeta` (an array of `{ id, name, category, mimeType, size }` descriptors). Persisted on the user message record only when present. No schema migration — `attachmentMeta` is just a new optional field on the existing messages store. Old records have it undefined; renderer treats undefined as "no attachments." DB version stays at 5.
+- [src/stores/ChatContext.jsx](../src/stores/ChatContext.jsx): `sendMessage` gains an optional `attachments` arg with shape `{ parts, meta }`. `parts` is folded into THIS turn's user-message content array (multi-part Anthropic content). `meta` flows through `addMessage` and persists on the user message record. Base64 from `parts` is never persisted.
+- [src/catalog/entries/file-attach.jsx](../src/catalog/entries/file-attach.jsx) + [-render.jsx](../src/catalog/entries/file-attach-render.jsx) + [-preview.jsx](../src/catalog/entries/file-attach-preview.jsx): the catalog component. Manifest declares `inputAction { id: 'file-attach', label: 'Attach files', iconName: 'Paperclip' }`. Render component mounts a hidden `<input type="file" multiple>` at document.body, subscribes to `input-action:file-attach` (open picker), `attachments-changed` (reflect external removals), and `message-sent` (auto-reset). Publishes `attach:error` for unsupported types, oversize files, or read failures. Returns null (contribution-only).
+- [src/catalog/index.js](../src/catalog/index.js): register `file-attach@1.0`.
+- [src/components/core/InputArea.jsx](../src/components/core/InputArea.jsx): remove the intrinsic file-upload code path entirely (the hidden `<input type="file">`, the `handleFileChange` handler, the `attachment` / `onAttach` / `onClearAttach` props, the `Upload file` menu entry). Drop `intrinsicMenuItemCount`. The PlusMenu is now purely contribution-driven; `overflowIsEmpty` triggers the disabled state when there are no overflow contributors. New `attachments` + `onRemoveAttachment` props render the attachment chip strip above the textarea in both card and inline layouts — neutral grey pills (vs. blue for armed-tools), icon by category (image / document / text). When a text file was truncated to fit the 200 KB cap, the chip shows a small orange "truncated" badge.
+- [src/components/core/MessageCard.jsx](../src/components/core/MessageCard.jsx): new `attachmentMeta` prop. Render a grey chip strip under user messages when `attachmentMeta` is non-empty — same visual as the input-area attachment strip but with a `title` tooltip explaining the per-turn-only limitation ("Attachments are visible to Claude only on the turn they were sent. Re-attach if you need them in follow-ups."). Also calls `stripAttachedFileBlocks(content)` on user messages so the persisted `<attached_file>...</attached_file>` blocks don't render visibly — the content stays in the message record for Claude's follow-up context, but the user sees only their prose plus the chip strip.
+- [src/catalog/entries/messages-render.jsx](../src/catalog/entries/messages-render.jsx): pass `attachmentMeta={msg.attachmentMeta}` into each MessageCard.
+- [src/catalog/entries/input-render.jsx](../src/catalog/entries/input-render.jsx): subscribe to `attachments-changed` and `attach:error`, mirror `getAttachments()` into local `attachments` state, pass to InputArea. Allow send with attachments but no typed text. At send time, fold text attachments into the persisted user content via `formatTextAttachmentForMessage`, build binary content blocks via `attachmentToContentBlock`, derive `attachmentMeta` from the staged list, pass everything through the new `sendMessage(..., { parts, meta })` arg. After successful send, publish `message-sent` (already wired in PR-18d) so both armed-tools AND attachments auto-reset.
+- [src/lib/seedTemplates.js](../src/lib/seedTemplates.js): add `file-attach@^1.0` to Pocket Chat (order: 11, just after web-search at order: 10). Bump `pocket-chat@1.0` SEED_VERSIONS from 3 to 4. Other templates (Writing Studio, Data Workspace, Drafting Desk, Quiet Room) intentionally stay without file-attach — Writing Studio / Data Workspace / Drafting Desk have richer per-template file surfaces (file-shelf, document-canvas), and Quiet Room is "Just a chat."
+
+**Locked design decisions:**
+- **S1 persist attachment metadata only** — `attachmentMeta` on user messages so history chips show what was attached. Base64 stays in memory; binary attachments are one-shot per turn (Claude only "sees" them on the message they were attached to). Text/code attachments persist their content inline (via `<attached_file>` wrappers in the message text) so follow-ups have full text context. A V3 Documents homepage section is in the followups bucket for when external storage integrations (Google Drive / local) come online.
+- **S2 MIME types** — Images: JPEG / PNG / GIF / WebP. Documents: PDF. Text/code: expanded list including the V1 set + common code extensions.
+- **S3 size limits** — 10 MB per binary, 200 KB per text/code, 10 attachments per message.
+- **S4 shared hostAPI registry** — verbatim parallel to armed-tools. `_setAttachments(componentId, list)` replaces a component's whole list on every change; removing one chip = re-set with the shorter list.
+- **S5 icons only, no thumbnails** — consistent with the rest of the icon-driven UI. Skips the failure modes of rendering arbitrary base64 inline (broken images, corrupted PDFs).
+- **S6 inline error** — `attach:error` events surface in input-render's existing `error` state above the textarea. Auto-clears on next typing.
+- **S7 `+` disabled state activates live** — with intrinsic upload removed, `intrinsicMenuItemCount === 0`. The tooltip "Add components to enable more actions" was shipped dead in PR-18b; it's live now.
+
+**Out of scope (deferred):**
+- Homepage Documents section (V3) — would let users browse / re-use prior attachments across rooms; only worth building once external storage integrations (Google Drive / local) land.
+- Branching / re-send replay of binary attachments — base64 isn't persisted, so a branch from a message that had an image won't include the image on its API call. Documented as known limitation; the chip in history is a soft cue ("you had an image on this turn").
+- Citations / rich result rendering for image / PDF content. Claude's text response remains the primary user-facing surface.
+- Per-room configurable file-size / MIME limits.
+- Other-provider implementations (OpenAI / Mistral image+PDF mapping) — Phase 2 multi-provider work. The fileUpload pipeline returns provider-neutral category metadata; only the Anthropic-specific content-block shapes in `attachmentToContentBlock` would need a per-provider variant.
+
+**Dependencies:** PR-18b (inputAction contribution model + hostAPI aggregation), PR-18d (armed-tools precedent for the shared-registry pattern and the `message-sent` auto-reset bus event), PR-15 useIsNarrow hook (touched indirectly via InputArea card-layout).
+
+**Exit criteria:**
+- All criteria in `phase-1-testing.md` PR-18e section pass.
+- The V2 `+` disabled state is **manually verified live** in a room with no overflow contributors (strip web-search and file-attach from a Pocket Chat clone via the editor; confirm the `+` is disabled with tooltip "Add components to enable more actions").
+- `npm run lint` returns 164 problems (162 errors + 2 warnings) — same as PR-18d post-merge baseline. No new errors.
+- `npm run build` clean.
+- Symbol-grep of `dist/assets/index-*.js` confirms `file-attach` (≥2), `_setAttachments` (≥2), `getAttachments` (≥2), `attachments-changed` (≥2), `attach:error` (≥2), `Add components to enable` (≥1) all ship. The intrinsic `"Upload file"` menu string is gone from `InputArea.jsx`'s contribution to the bundle (any remaining occurrence is from FileShelf.jsx's separate upload-file button, which is unrelated).
+
+**Risk:** Medium-high. New IndexedDB field (`attachmentMeta`) is non-destructive, but ChatContext.sendMessage's signature changed (new optional arg). All call sites surveyed and the only consumer is input-render.jsx (the per-turn send path); the lightweight non-streaming calls in branches-render / review-render / RippleScopeModal / SummaryDashboard go directly through `provider.sendMessage` and don't pass attachments. The InputArea refactor removes a chunk of dead V1 code (the intrinsic upload was already non-functional in V2), so visible regression risk is low. The biggest watch item: the base64 + multi-part API call shape — needs real-network confirmation on a Pocket Chat send with an image attached.
+
 ---
 
 ## Wave summary
@@ -1020,8 +1066,9 @@ The component has no rendered surface in any slot (returns null) — its UI live
 | D | PR-18b | Mobile input redesign — card layout via useIsNarrow, mic↔send swap, mask-image fade on messages, `inputActions` contribution infrastructure mirroring messageActions |
 | D | PR-18c | Mobile Settings — chevron-expandable cards pattern at <768px, multi-open accordion, decorative handle, section-title hide via SettingsSection useIsNarrow, shimmer/connection-pill desktop-only |
 | D | PR-18d | web-search@1.0 catalog component — first PR-18b `inputAction` consumer beyond voice-input; armed-tools registry on hostAPI; chip strip in InputArea; pre-mounted on 4 of 5 chat templates |
+| D | PR-18e | file-attach@1.0 catalog component — first functional V2 attachment surface; replaces dead V1 intrinsic upload; attachments registry on hostAPI; image / PDF / text support; chip strip in InputArea + history; activates the V2 `+` disabled state live |
 
-**Total: 32 PRs** including PR-0.
+**Total: 33 PRs** including PR-0.
 
 ## Pause points
 

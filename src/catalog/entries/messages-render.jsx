@@ -324,6 +324,7 @@ export default function MessagesRender() {
         id={msg.id}
         type={msg.role === 'user' ? 'user' : 'assistant'}
         content={displayContent}
+        attachmentMeta={msg.attachmentMeta}
         number={numberByMessageId.get(msg.id) || 0}
         index={idx}
         isGhostText={isGhost}

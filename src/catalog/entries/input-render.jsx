@@ -48,6 +48,10 @@ import { getProvider } from '../../providers'
 import { loadApiKey } from '../../lib/crypto'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
 import { useIsNarrow } from '../../lib/useViewportWidth'
+import {
+  attachmentToContentBlock,
+  formatTextAttachmentForMessage,
+} from '../../lib/fileUpload'
 
 const SEND_DEBOUNCE_MS = 500
 
@@ -121,6 +125,41 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
     hostAPI?._disarmTool?.(componentId)
   }, [hostAPI])
 
+  // PR-18e: mirror hostAPI.getAttachments() into local state. file-attach@1.0
+  // calls _setAttachments on every picker change; we refresh the chip
+  // strip via subscription to the resulting `attachments-changed` event.
+  const [attachments, setAttachments] = useState(() => hostAPI?.getAttachments?.() || [])
+  useEffect(() => {
+    if (!hostAPI?.subscribe) return
+    const refresh = () => setAttachments(hostAPI?.getAttachments?.() || [])
+    return hostAPI.subscribe('attachments-changed', refresh)
+  }, [hostAPI])
+
+  // PR-18e: chip × → remove one attachment from the registry. We re-set
+  // the component's list to the same array minus the one being removed.
+  // hostAPI publishes attachments-changed; the contributing component's
+  // local state listens and re-syncs.
+  const handleRemoveAttachment = useCallback((componentId, attachmentId) => {
+    if (!componentId || !attachmentId) return
+    const current = hostAPI?.getAttachments?.() || []
+    const remaining = current
+      .filter(a => a.componentId === componentId && a.id !== attachmentId)
+      .map(a => ({ ...a }))
+    hostAPI?._setAttachments?.(componentId, remaining)
+  }, [hostAPI])
+
+  // PR-18e: surface attach:error bus events inline above the textarea
+  // using the same `error` state that powers send-failure messages.
+  // file-attach@1.0 publishes these on unsupported types, oversize
+  // files, or read failures.
+  useEffect(() => {
+    if (!hostAPI?.subscribe) return
+    return hostAPI.subscribe('attach:error', (payload) => {
+      const msg = payload?.message || 'Could not read that file.'
+      setError(msg)
+    })
+  }, [hostAPI])
+
   // PR-5 bus subscription — append final voice transcripts to the value.
   useEffect(() => {
     if (!subscribeToVoice || !hostAPI?.subscribe) return
@@ -142,8 +181,13 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
   }, [value])
 
   const handleSend = useCallback(async () => {
+    const attachmentsAtSend = hostAPI?.getAttachments?.() || []
     const trimmed = value.trim()
-    if (!trimmed || isStreaming || !conversationId) return
+    // PR-18e: allow sending with attachments but no typed text (e.g.
+    // "here's an image, tell me about it"). The user message text
+    // becomes empty in that case; Claude sees just the attachment.
+    if (!trimmed && attachmentsAtSend.length === 0) return
+    if (isStreaming || !conversationId) return
     if (!isOnline) {
       setError('You\'re offline. Reconnect to send.')
       return
@@ -173,6 +217,32 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
     // resolves (success path below), publish `message-sent` so arming
     // components auto-reset per the W1 per-message-toggle contract.
     const armedToolsAtSend = hostAPI?.getArmedTools?.() || []
+
+    // PR-18e: fold attachments into the send shape.
+    //   - text/code attachments → <attached_file> blocks appended to
+    //     the typed text, so they persist with the user message and
+    //     Claude has the content on follow-up turns.
+    //   - binary attachments (image / PDF) → Anthropic content blocks
+    //     attached to THIS turn's API call only. Not persisted.
+    //   - metadata for all attachments persists on the user message
+    //     record as `attachmentMeta` for the MessageCard chip strip.
+    const textAttachments = attachmentsAtSend.filter(a => a.category === 'text')
+    const binaryAttachments = attachmentsAtSend.filter(a => a.category === 'image' || a.category === 'document')
+    const textBlocks = textAttachments.map(a => formatTextAttachmentForMessage(a)).join('\n\n')
+    const userContentForPersist = trimmed
+      ? (textBlocks ? `${trimmed}\n\n${textBlocks}` : trimmed)
+      : textBlocks // attachments only (no typed text)
+    const binaryParts = binaryAttachments
+      .map(a => attachmentToContentBlock(a))
+      .filter(Boolean)
+    const attachmentMeta = attachmentsAtSend.map(a => ({
+      id: a.id,
+      name: a.name,
+      category: a.category,
+      mimeType: a.mimeType,
+      size: a.size,
+    }))
+
     setValue('')
     setError(null)
     try {
@@ -180,10 +250,24 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
       // PR-18d: armed tools (e.g. web-search) flow through the existing
       // `tools` parameter so ChatContext's tool-loop honors them without
       // any structural change.
-      await sendMessage(apiKey, conversationId, trimmed, settings.defaultModel, provider, systemPrompt, armedToolsAtSend)
-      // PR-18d: announce successful send so per-message tool flags
-      // can auto-reset. Publish before the non-critical side effects
-      // so a slow trackMessageSent never delays the disarm.
+      // PR-18e: attachments arg carries binary parts (for THIS turn's
+      // API call) + metadata (for the persisted user message).
+      await sendMessage(
+        apiKey,
+        conversationId,
+        userContentForPersist,
+        settings.defaultModel,
+        provider,
+        systemPrompt,
+        armedToolsAtSend,
+        binaryParts.length > 0 || attachmentMeta.length > 0
+          ? { parts: binaryParts, meta: attachmentMeta }
+          : null,
+      )
+      // PR-18d/PR-18e: announce successful send so per-message
+      // contributions (armed tools, staged attachments) auto-reset.
+      // Publish before the non-critical side effects so a slow
+      // trackMessageSent never delays the clear.
       hostAPI?.publish?.('message-sent', { conversationId })
       try { await refreshStorageEstimate() } catch { /* non-fatal */ }
       try { trackMessageSent() } catch { /* non-fatal */ }
@@ -233,6 +317,8 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
         cardLayout={cardLayout}
         armedTools={armedTools}
         onDisarmTool={handleDisarmTool}
+        attachments={attachments}
+        onRemoveAttachment={handleRemoveAttachment}
         rightPrimaryAction={rightPrimaryAction}
         overflowActions={overflowActions}
         onInvokeAction={handleInvokeAction}
