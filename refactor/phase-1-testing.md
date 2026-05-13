@@ -2772,6 +2772,136 @@ unchanged.
 
 ---
 
+## PR-17 — dnd-kit migration for homepage section reorder
+
+👀 User-visible
+
+**Surface:** `/` homepage section reorder (Chats / Library / Favorites
+/ Blueprint cards). Affects three files: stacked-sections layout,
+SectionCard component, index.css. Adds `@dnd-kit/modifiers` dep.
+
+**Setup:**
+- A homepage with ≥ 3 sections (the default seed satisfies this:
+  Blueprint, Chats, Library, Favorites).
+- Browsers: Chrome desktop + Firefox desktop + Safari iOS + Chrome
+  Android. The mobile cases are the load-bearing ones — PR-15 hid
+  the grabber on touch primary devices specifically because the
+  HTML5 implementation didn't work there.
+
+**Steps — desktop pointer (Chrome + Firefox):**
+1. Open `/`. Hover a section header → grabber dots fade in (the
+   existing PR-14 hover-revealed affordance is preserved).
+2. Press the grabber, move ≤ 3px without releasing → drag does NOT
+   start (the 4px PointerSensor `distance` threshold gates it).
+3. Press the grabber, move ≥ 5px → drag begins. The source section
+   dims to 0.5 opacity; a lifted clone (`section-drag-preview`)
+   appears at the cursor with a shadow.
+4. Move the cursor horizontally → the clone stays vertically
+   aligned and does NOT slide sideways (axis lock via
+   `restrictToVerticalAxis`).
+5. Move the cursor outside the `max-w-5xl` page container → the
+   clone stays inside the container's horizontal bounds (parent
+   lock via `restrictToParentElement`).
+6. As the clone passes over neighboring sections, those sections
+   smoothly transform-shift to make room.
+7. Release on a different section → the order updates immediately;
+   reload `/` → order persists.
+8. DevTools → Application → IndexedDB → `parliament` → `modes` →
+   `home_default` → `components[].order` is `0..N` for section-slot
+   entries; non-section-slot entries are untouched.
+9. Press Esc mid-drag → the drag cancels; order unchanged; the
+   clone disappears.
+
+**Steps — keyboard (any desktop browser, with a screen reader if
+available — VoiceOver / NVDA / JAWS):**
+1. Tab through the homepage until the grabber receives focus → a
+   visible focus ring appears on the grabber button.
+2. Screen reader announces "Reorder Library section, button" (or
+   equivalent for whichever section's grabber is focused).
+3. Press Space → screen reader announces "Picked up Library
+   section. Position 2 of 4." (positions vary by current order).
+4. Press Arrow Down → screen reader announces "Library section
+   moved to position 3 of 4."; sibling sections visibly shift.
+5. Press Space → screen reader announces "Library section dropped
+   at position 3 of 4."; reorder persists across reload.
+6. Press Tab → focus moves naturally to the next focusable element
+   (not stuck on the grabber).
+7. From step 3, instead of Space at step 5, press Esc → screen
+   reader announces "Reordering cancelled. Library section
+   returned to its original position."; the order is unchanged.
+
+**Steps — touch (iOS Safari 16+ on iPhone, Chrome on Android):**
+1. Open `/` on the device. Grabber dots are visible at rest (NOT
+   hover-revealed — the PR-17 touch-media-query override).
+2. The grabber hit area is comfortably finger-sized (40×40 vs the
+   24×24 desktop size).
+3. Tap a grabber and immediately release (<250ms) → nothing
+   happens. No drag starts. No iOS magnifier/callout appears. No
+   text gets selected. No scroll.
+4. Tap and hold a grabber for ≥ 250ms without moving the finger
+   → drag begins. The lifted clone tracks the finger.
+5. During the 250ms delay, drift the finger up to 5px → drag still
+   starts (within tolerance).
+6. During the 250ms delay, drift the finger > 5px → drag does NOT
+   start; the page scrolls normally.
+7. Mid-drag, swipe the finger toward the screen edge → the clone
+   stays inside the page container (parent lock).
+8. Release on a target section → the order updates; pull-to-refresh
+   or kill-and-reopen the tab → order persists.
+
+**Steps — reduced motion (macOS or iOS preference enabled):**
+1. macOS: System Preferences → Accessibility → Display → enable
+   "Reduce motion". iOS: Settings → Accessibility → Motion → enable
+   "Reduce Motion".
+2. Reload `/`. Drag a section.
+3. Sibling shift is instant (no animated tween between positions).
+   The DragOverlay clone still tracks the pointer/finger — that's
+   responsive feedback to input, not animation, so it stays.
+
+**Steps — regression checks (these gestures should still work):**
+1. Open a chat that has the file-shelf: drag a file from desktop
+   onto it → upload starts as before. (FileShelf still uses HTML5
+   drop; PR-17 did not touch it.)
+2. Open Settings → Backup & Restore → drag a `.parliament` backup
+   file onto the import drop zone → import flow starts. (Backup
+   modal still uses HTML5 drop.)
+3. Open the editor (`/editor/:roomId`) at ≥ 768px viewport → all
+   three rails' dnd-kit drag/drop still works (PR-17 did not touch
+   the editor's `useDraggable`/`useDroppable` wiring).
+
+**Steps — lint + bundle (CI gates):**
+1. `npm run lint` → 164 problems (162 errors + 2 warnings). One
+   less than the PR-16 baseline of 165, because inlining the
+   stacked-sections render function removed a pre-existing
+   `react-refresh/only-export-components` error.
+2. `npm run build` → clean build, no warnings.
+3. Bundle delta: `dist/assets/index-*.js` gzipped size grows by no
+   more than 3 kB versus PR-16 (the modifiers package + sortable
+   keyboard coordinates).
+4. Symbol-grep: `grep -c onSectionDragStart dist/assets/index-*.js`
+   returns 0. Same for `onSectionDragOver`, `onSectionDragEnd`,
+   `onSectionDrop`, `isDropTarget`, `dropTargetId`. The
+   announcement string `"Picked up"` returns 1. The CSS class
+   `section-drag-preview` returns 1 in JS and 1 in CSS.
+
+**Expected:** Every step passes. Section reorder works on desktop
+pointer (existing behavior preserved), keyboard (new), and touch
+devices (new). Screen reader users hear what they're doing at each
+step. The HTML5 D&D code path is completely gone from the bundle.
+File-upload drop zones and editor drag-drop are unaffected.
+
+### What's known-broken-but-deferred
+
+- Library / Favorites overlay reorder: out of scope per scoping
+  with user. Library/Favorites are catalog components that don't
+  currently expose reorder UI. PR-17 makes the dnd-kit primitive
+  available; future PR can apply it there if there's user demand.
+- Reordering rooms inside the blueprint: deferred to the blueprint
+  enhancements PR (PR-19 in the current ledger, which also covers
+  the room "bloom" interaction + duplicate/merge actions).
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

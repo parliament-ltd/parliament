@@ -843,6 +843,32 @@
 
 **Risk:** Low-medium. The layout files are converted from arrow `render` to named-function `render` to make `useState` legal — same conversion `single-column-with-sheet` did at PR-7, no precedent break. Largest exposure is unfamiliar narrow-mode branches in three layout files; tested by resizing each layout's example room across the 768px boundary. Sheet ergonomics for canvas-centric (no auto-open on send) is an explicit accepted trade-off; adjustable in a follow-up.
 
+### PR-17 — dnd-kit migration for homepage section reorder
+
+**Goal:** PR-14 shipped homepage section reorder via native HTML5 drag-and-drop. PR-15 confirmed it's broken on iOS Safari (no `dragstart` fires from touch) and unreliable on Android Chrome, and defensively hid the grabber handle on touch-primary devices. PR-17 swaps the HTML5 implementation for dnd-kit so reorder works on touch (250ms long-press), keyboard (Tab → Space → arrows → Space), and adds proper screen-reader announcements. The grabber handle returns on touch with a finger-sized 40px hit target.
+
+**Scope:**
+- [src/catalog/layouts/stacked-sections.jsx](../src/catalog/layouts/stacked-sections.jsx): rewrite the render to wrap section list in `<DndContext>` + `<SortableContext>`. Sensors: `PointerSensor { distance: 4 }` (matches editor convention) + `TouchSensor { delay: 250, tolerance: 5 }` + `KeyboardSensor { coordinateGetter: sortableKeyboardCoordinates }`. Modifiers: `restrictToVerticalAxis` + `restrictToParentElement` (axis lock prevents the dragged clone sliding horizontally; parent lock keeps it inside the max-w-5xl container). `<DragOverlay>` renders a simplified lifted clone (`SectionDragPreview` inline named function) following the pointer. Custom `accessibility.announcements` strings for screen readers ("Picked up Library section. Position 2 of 4."). `persistReorder` keeps the existing splice + reindex + saveMode + `homepage-mode-changed` event flow; wrap saveMode in try/catch so a failed save snaps the UI back via the same event. A `reorderingRef` guard rejects a second `onDragEnd` while a save is in flight (race window between HomepageView's async refetch and a fast second drag).
+- [src/components/SectionCard.jsx](../src/components/SectionCard.jsx): use `useSortable` internally. Drop the four `onSection*` callback props + `isDragging`/`isDropTarget` props; add `sortable` + `sortableId`. Grabber wrapper converts from `<div draggable>` to `<button type="button">` with an `aria-label` so KeyboardSensor has a focusable activator and screen readers have a name. Destructure useSortable outputs at the hook call site (a stricter `react-hooks/refs` lint rule mis-flags property access on the hook return value). Export `Grabber` as a named export so stacked-sections's drag preview can reuse the dot pattern.
+- [src/index.css](../src/index.css): delete the unused `.section.drop-target` rule (dnd-kit's SortableContext makes siblings shift naturally, no drop-target highlight needed). Reset button chrome on `.section-grabber-handle` (background/border/padding zero) since the element is now a `<button>`. Add `touch-action: none` + `-webkit-user-select: none` so iOS Safari doesn't scroll the page or surface the long-press text callout while the user is initiating a drag. New `.section-drag-preview` class adds a drop shadow + grabbing cursor to the DragOverlay clone. Inside the existing `(hover: none) and (pointer: coarse)` block: remove the PR-15 `display: none` hide; add `opacity: 1` on the inner `.section-grabber` (no hover state on touch) and bump the handle to `40x40` for finger-sized hit area. New `@media (prefers-reduced-motion: reduce) .section { transition: none !important }` for the sibling-shift animation.
+- [package.json](../package.json): add `@dnd-kit/modifiers ^9.0.0` (~1.5 kB gz). Other `@dnd-kit/*` packages were already installed at PR-8.
+
+**Out of scope (deferred):**
+- Adding reorder to library / favorites overlays — not requested by the user; sections are the only top-level draggable surface today.
+- Adding reorder to rooms in the blueprint — blueprint enhancements are PR-19 territory (bloom UX + duplicate/merge actions).
+- Refactoring the editor's existing dnd-kit usage to match PR-17's patterns. The editor uses `useDraggable`/`useDroppable` (free-form) and doesn't need `useSortable` — no churn.
+
+**Dependencies:** PR-14 (sets up the HTML5 implementation PR-17 replaces); PR-15 (hides the grabber on touch as a defensive measure; PR-17 un-hides it).
+
+**Exit criteria:**
+- All criteria in `phase-1-testing.md` PR-17 section pass.
+- `npm run lint` returns ≤ baseline (165 problems). PR-17 actually lands at 164 because inlining the render function eliminates a pre-existing `react-refresh/only-export-components` error.
+- `npm run build` clean. Bundle delta under +3 kB gz versus PR-16.
+- Symbol-grep of `dist/assets/index-*.js` returns 0 hits for the removed HTML5 D&D identifiers (`onSectionDragStart`, `onSectionDragOver`, `onSectionDragEnd`, `onSectionDrop`, `isDropTarget`, `dropTargetId`). Announcements text ("Picked up", "Position N of M") is present.
+- Manual: desktop pointer reorder still works; keyboard reorder (Tab → Space → arrows → Space) now works with audible announcements; iOS Safari + Android Chrome touch reorder works (250ms long-press); `prefers-reduced-motion` skips the sibling-shift tween.
+
+**Risk:** Low-medium. The persistence logic is unchanged — only the gesture layer swaps. The race-window between two quick drags is guarded by `reorderingRef`. The largest unknown is mobile Safari + Chrome touch behavior with `touch-action: none` + the 250ms TouchSensor delay; PR-15 hid the grabber for this exact reason. Verification on real devices is the gate.
+
 ---
 
 ## Wave summary
@@ -858,8 +884,9 @@
 | D | PR-15 | Mobile responsiveness audit — cosmetic media queries + editor narrow-screen gate |
 | D | PR-16a | Blueprint variety — multiple shape variants per layout + mirroring + interior hints + pills on all rooms + per-turn model |
 | D | PR-16 | Multi-rail room layouts collapse below 768px — NarrowChrome + NarrowDrawer + NarrowSheet primitives, narrow branches in three-panel / canvas-centric / document-centric |
+| D | PR-17 | dnd-kit migration for homepage section reorder — touch + keyboard reorder + screen-reader announcements |
 
-**Total: 27 PRs** including PR-0.
+**Total: 28 PRs** including PR-0.
 
 ## Pause points
 
