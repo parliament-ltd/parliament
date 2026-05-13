@@ -26,6 +26,7 @@ import { PHASE_1_EVENTS } from '../../lib/hostAPI'
 import { getMessages } from '../../lib/db'
 import { loadApiKey } from '../../lib/crypto'
 import { getProvider } from '../../providers'
+import { useIsNarrow } from '../../lib/useViewportWidth'
 
 // ─── View toggle config ──────────────────────────────────────
 
@@ -90,6 +91,12 @@ export default function ChatsPreview({ config = {}, hostAPI } = {}) {
   const [view, setView]       = useState(config.defaultView || 'summary')
   const [query, setQuery]     = useState('')
   const [selected, setSelected] = useState(new Set())
+
+  // PR-18a: below 768px, move the view-toggle out of the toolbar
+  // (where it competes with the search input for horizontal space)
+  // and into the footer alongside the conversation count. Frees the
+  // toolbar for a full-width search input on phones.
+  const isNarrow = useIsNarrow(768)
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -158,9 +165,32 @@ export default function ChatsPreview({ config = {}, hostAPI } = {}) {
 
   const hasSelection = selected.size > 0
 
+  const viewToggle = (
+    <div className="view-toggle">
+      {VIEWS.map(v => {
+        const Icon = v.icon
+        const active = v.id === view
+        return (
+          <button
+            key={v.id}
+            type="button"
+            className={active ? 'active' : ''}
+            onClick={() => setView(v.id)}
+            title={v.label}
+          >
+            <Icon className="w-3 h-3" />
+            <span>{v.label}</span>
+          </button>
+        )
+      })}
+    </div>
+  )
+
   return (
     <div>
-      {/* Toolbar — search + view toggle, replaced by bulk toolbar when rows are selected */}
+      {/* Toolbar — search + view toggle, replaced by bulk toolbar when rows are selected.
+          On narrow viewports the view toggle drops out of the toolbar and renders in the
+          footer instead, freeing the toolbar for a full-width search input. */}
       <div className={`chats-toolbar${hasSelection ? ' has-selection' : ''}`}>
         {hasSelection ? (
           <div className="bulk-toolbar show">
@@ -192,24 +222,7 @@ export default function ChatsPreview({ config = {}, hostAPI } = {}) {
                 placeholder="Search chats, notes, highlights, tags…"
               />
             </div>
-            <div className="view-toggle">
-              {VIEWS.map(v => {
-                const Icon = v.icon
-                const active = v.id === view
-                return (
-                  <button
-                    key={v.id}
-                    type="button"
-                    className={active ? 'active' : ''}
-                    onClick={() => setView(v.id)}
-                    title={v.label}
-                  >
-                    <Icon className="w-3 h-3" />
-                    <span>{v.label}</span>
-                  </button>
-                )
-              })}
-            </div>
+            {!isNarrow && viewToggle}
           </>
         )}
       </div>
@@ -238,6 +251,7 @@ export default function ChatsPreview({ config = {}, hostAPI } = {}) {
 
       <div className="chat-footer">
         <span>{filtered.length} conversation{filtered.length === 1 ? '' : 's'}</span>
+        {isNarrow && !hasSelection && viewToggle}
       </div>
     </div>
   )

@@ -1773,13 +1773,43 @@
 /* Chats toolbar: search loses its fixed 280px width and stretches
    to share the row with the view-toggle pill. The view-toggle
    keeps its labels until ~520px where it collapses to icon-only
-   (titles preserved on the buttons for tooltip a11y). */
+   (titles preserved on the buttons for tooltip a11y).
+
+   PR-18a: below 768px the view-toggle moves out of the toolbar
+   entirely (rendered inside .chat-footer via a JS narrow branch
+   in chats-preview.jsx). When it's not present, .chats-search
+   gets the full width of the toolbar. */
 @media (max-width: 600px) {
   .chats-search { width: auto; flex: 1 1 0; min-width: 0; }
 }
 @media (max-width: 520px) {
   .view-toggle button span { display: none; }
   .view-toggle button { padding: 5px 8px; }
+}
+
+/* PR-18a — Chats footer narrow layout: when the view-toggle moves
+   into the footer (chats-preview.jsx narrow branch), the count
+   sits on the left and the toggle pill sits on the right. On the
+   smallest viewports the footer wraps so the toggle drops below
+   the count rather than crowding it. */
+@media (max-width: 480px) {
+  .chat-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chat-footer .view-toggle { margin-left: 0; }
+}
+
+/* PR-18a — Library search: at narrow viewports the 180px search
+   input wraps to its own row inside .library-filters (flex-wrap is
+   already set) and stretches full-width. Keeps the filter chips on
+   the top row, search on the second. */
+@media (max-width: 600px) {
+  .library-search {
+    width: 100%;
+    flex-basis: 100%;
+    margin-left: 0;
+  }
 }
 
 /* Chat row column priority — drop the absolute date first
