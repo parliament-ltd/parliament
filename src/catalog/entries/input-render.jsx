@@ -103,6 +103,24 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
     hostAPI?.publish?.(`input-action:${actionId}`, payload || {})
   }, [hostAPI])
 
+  // PR-18d: mirror hostAPI.getArmedTools() into local state. Bumping
+  // on each tool-armed-changed event re-reads from the registry and
+  // re-renders the chip strip via the InputArea prop.
+  const [armedTools, setArmedTools] = useState(() => hostAPI?.getArmedTools?.() || [])
+  useEffect(() => {
+    if (!hostAPI?.subscribe) return
+    const refresh = () => setArmedTools(hostAPI?.getArmedTools?.() || [])
+    return hostAPI.subscribe('tool-armed-changed', refresh)
+  }, [hostAPI])
+
+  // PR-18d: chip strip × → hostAPI._disarmTool, which publishes
+  // tool-armed-changed back to update the strip and notify the
+  // contributing component to clear its own local armed flag.
+  const handleDisarmTool = useCallback((componentId) => {
+    if (!componentId) return
+    hostAPI?._disarmTool?.(componentId)
+  }, [hostAPI])
+
   // PR-5 bus subscription — append final voice transcripts to the value.
   useEffect(() => {
     if (!subscribeToVoice || !hostAPI?.subscribe) return
@@ -149,13 +167,24 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
 
     const provider = getProvider('anthropic')
     const systemPrompt = buildSystemPrompt() // '' when collab-mode is inactive
+    // PR-18d: read armed-tool registrations once at send time. Each
+    // entry already carries `definition` + `serverSide` — the shape
+    // ChatContext.sendMessage's tool-loop expects. After the send
+    // resolves (success path below), publish `message-sent` so arming
+    // components auto-reset per the W1 per-message-toggle contract.
+    const armedToolsAtSend = hostAPI?.getArmedTools?.() || []
     setValue('')
     setError(null)
     try {
-      // PR-10a.9: collab-mode system prompt threads through here. Tool
-      // toggles still no-op until the next slice wires the +menu state
-      // into a live tool list.
-      await sendMessage(apiKey, conversationId, trimmed, settings.defaultModel, provider, systemPrompt, [])
+      // PR-10a.9: collab-mode system prompt threads through here.
+      // PR-18d: armed tools (e.g. web-search) flow through the existing
+      // `tools` parameter so ChatContext's tool-loop honors them without
+      // any structural change.
+      await sendMessage(apiKey, conversationId, trimmed, settings.defaultModel, provider, systemPrompt, armedToolsAtSend)
+      // PR-18d: announce successful send so per-message tool flags
+      // can auto-reset. Publish before the non-critical side effects
+      // so a slow trackMessageSent never delays the disarm.
+      hostAPI?.publish?.('message-sent', { conversationId })
       try { await refreshStorageEstimate() } catch { /* non-fatal */ }
       try { trackMessageSent() } catch { /* non-fatal */ }
     } catch (err) {
@@ -171,7 +200,7 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
     value, isStreaming, conversationId, isOnline, lastSendAt,
     settings.storageMode, settings.defaultModel,
     sendMessage, refreshStorageEstimate, trackMessageSent,
-    buildSystemPrompt,
+    buildSystemPrompt, hostAPI,
   ])
 
   const handleStop = useCallback(() => {
@@ -202,6 +231,8 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
         isOnline={isOnline}
         placeholder={placeholder}
         cardLayout={cardLayout}
+        armedTools={armedTools}
+        onDisarmTool={handleDisarmTool}
         rightPrimaryAction={rightPrimaryAction}
         overflowActions={overflowActions}
         onInvokeAction={handleInvokeAction}

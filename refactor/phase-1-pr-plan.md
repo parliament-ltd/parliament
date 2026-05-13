@@ -957,6 +957,49 @@
 
 **Risk:** Low. Reuses the seven existing section components verbatim — no new validation or modal logic, no new state semantics. The accordion height-auto animation pattern is already used elsewhere in this file (UsageSection's budget alert). The data-tour attr transfer to the mobile row uses the same string IDs (`settings-api`, `settings-context`, `settings-data`) so the TourTooltip targets resolve regardless of viewport.
 
+### PR-18d — web-search@1.0 catalog component
+
+**Goal:** Ship the first PR-18b `inputAction` consumer beyond voice-input. `web-search@1.0` is a Composer-tier component that contributes a "Web search" item to input@1.0's `+` overflow menu. When the user taps it, the component arms the active provider's `web_search` tool definition for the next outgoing message. After a successful send, the armed flag auto-resets (the W1 per-message-toggle contract). The visible affordance is a chip strip above the input textarea — "🌐 Web search · Uses API credits · ×" — that doubles as cost-transparency surface and disarm button.
+
+The component has no rendered surface in any slot (returns null) — its UI lives entirely inside input@1.0 via the `+` menu and the chip strip. It is pre-mounted on Writing Studio, Data Workspace, Drafting Desk, and Pocket Chat at template-instantiation time. Quiet Room intentionally stays without it ("Just a chat. Nothing else in the way."); editor users can add or remove web-search@1.0 like any other component.
+
+**Scope:**
+- [src/lib/hostAPI.js](../src/lib/hostAPI.js): add a third aggregation pair alongside `_setMessageActions` / `_setInputActions` — `_armTool(componentId, info)` / `_disarmTool(componentId)` / `getArmedTools()`. Unlike the manifest-aggregated message/input actions, `armedTools` is runtime state written by components themselves. Adds `tool-armed-changed` and `message-sent` to the known-events set so dev-mode publish warnings don't fire on the new events.
+- [src/providers/anthropic.js](../src/providers/anthropic.js): add `max_uses: 3` to the existing `WEB_SEARCH_TOOL` constant. Locked default; no per-room config UI this PR.
+- [src/catalog/entries/web-search.jsx](../src/catalog/entries/web-search.jsx): new manifest. Composer tier. Declares an `inputAction` contribution `{ id: 'web-search', label: 'Web search', iconName: 'Globe' }`. Slot targets include `input-dock` (Writing Studio / Data Workspace / Pocket Chat) and `chat-panel` (Drafting Desk, which has no `input-dock`) plus the rail/sheet fallbacks. No UI of its own.
+- [src/catalog/entries/web-search-render.jsx](../src/catalog/entries/web-search-render.jsx): runtime. Looks up the active provider's `web_search` tool registration via `provider.getAvailableTools()`. Manages local `armed` state. Subscribes to `input-action:web-search` to toggle, `tool-armed-changed` to reflect external disarm (chip strip's ×), and `message-sent` to auto-reset after send. Calls `hostAPI._armTool` / `_disarmTool` on every state change. Renders null (contribution-only).
+- [src/catalog/entries/web-search-preview.jsx](../src/catalog/entries/web-search-preview.jsx): verbose explanatory card for the dev /catalog debug route, since the production render is null.
+- [src/catalog/index.js](../src/catalog/index.js): register web-search@1.0.
+- [src/components/core/InputArea.jsx](../src/components/core/InputArea.jsx): new `armedTools` + `onDisarmTool` props. New `renderArmedToolsStrip()` function returning a small flex-wrap container of blue pills, one per armed tool, with the cost-transparency copy "· Uses API credits" (hidden below `sm:` breakpoint for room on phones) and a × that calls `onDisarmTool(componentId)`. Strip renders above the textarea in both card layout (mobile) and inline layout (desktop).
+- [src/catalog/entries/input-render.jsx](../src/catalog/entries/input-render.jsx): subscribe to `tool-armed-changed` and refresh local `armedTools` state. Pass `armedTools` + `handleDisarmTool` into InputArea. At send time, read `hostAPI.getArmedTools()` and thread the array directly through `sendMessage(..., tools)` — each entry already has `definition` + `serverSide`, the shape ChatContext's tool-loop expects. After successful send, `hostAPI.publish('message-sent', { conversationId })` so arming components auto-clear.
+- [src/lib/seedTemplates.js](../src/lib/seedTemplates.js): add `web-search@^1.0` (order: 10) to Writing Studio (input-dock), Data Workspace (input-dock), Drafting Desk (chat-panel), Pocket Chat (input-dock). Bump those four `SEED_VERSIONS` from 2 → 3. Quiet Room stays at 2 by design.
+
+**Locked design decisions:**
+- **M1 shared hostAPI registry** — verbatim parallel to inputActions/messageActions: `_armTool` + `_disarmTool` + `getArmedTools`, plus the `tool-armed-changed` bus event so the chip strip re-renders on changes from any direction.
+- **M2 max_uses: 3** — committed default. Higher = more thorough but more credits + latency; lower = cheaper but Claude may miss something. 3 is the middle. Configurable via component manifest in a later PR if anyone needs to tune it.
+- **M3 (a) chip strip above textarea inside the input card** — the persistent armed-state confirmation + cost-transparency copy + disarm affordance, all in one surface. The `+` menu item itself doesn't show a separate armed visual (the menu closes after tap; the chip is the signal).
+- **M4 ship text-only result display** — Claude streams its synthesized text response as normal. The `server_tool_use` and `web_search_tool_result` content blocks are silently passed-through. Citations and rich result rendering are deferred to a follow-up PR — that adds new content-block handling in the provider stream parser + MessageCard, scoped separately.
+- **M4 multi-provider neutrality** — web-search@1.0 looks up the active provider's `web_search` tool via `provider.getAvailableTools()` at render time. Today only Anthropic ships one; when Phase 2 brings OpenAI / Mistral, each provider exposes its own native shape and this component requires no changes. If the active provider has no `web_search` tool, the component silently no-ops (the chip strip never gets a chip because nothing armed).
+- **M5 (a) park in input-dock / chat-panel at order: 10** — web-search renders null, so the slot is purely a parking spot. The slot vocabulary chosen matches what each template already exposes.
+- **M6 template seed bump** — Writing Studio / Data Workspace / Drafting Desk / Pocket Chat get a `web-search@^1.0` entry at seedVersion 3. Existing user rooms in `modes` are untouched (the library/template seed contract). Users in the editor can add or remove web-search@1.0 from any room.
+
+**Out of scope (deferred):**
+- Citations as clickable footnotes / "Search results" expandable above the assistant response. Requires new content-block handling in the provider stream parser + MessageCard. Separate PR.
+- Per-room configurable `max_uses` field. Locked at 3 for this PR.
+- OpenAI / Mistral provider implementations of web_search (firmly Phase 2 multi-provider work).
+- `+` menu item visual armed state. The chip strip is the only armed indicator.
+- A one-time first-arm warning modal (cost transparency lives in the chip strip "Uses API credits" copy).
+
+**Dependencies:** PR-18b (inputAction contribution model + hostAPI aggregation pattern), PR-17 (no direct dep, but the dnd-kit drag-and-drop changes in the editor make adding/removing web-search@1.0 from a room natural).
+
+**Exit criteria:**
+- All criteria in `phase-1-testing.md` PR-18d section pass.
+- `npm run lint` returns 164 problems (162 errors + 2 warnings) — same as PR-18c post-merge baseline. No new errors.
+- `npm run build` clean.
+- Symbol-grep of `dist/assets/index-*.js` confirms `web-search` (≥2), `web_search_20250305` (≥1), `_armTool` (≥2), `getArmedTools` (≥1), `tool-armed-changed` (≥2), `message-sent` (≥2), `max_uses` (≥1) all ship.
+
+**Risk:** Medium. The shared hostAPI registry is a new aggregation pattern — its semantics around the `tool-armed-changed` echo (web-search publishes "armed", InputArea re-reads getArmedTools(), web-search must not re-fire on its own echo and end up in an infinite loop) require care. Mitigation: web-search's `tool-armed-changed` handler only responds to `armed === false` and only when local state was true. Send-time tool array is read once at handleSend rather than from a stale closure — defensive against the user toggling mid-send.
+
 ---
 
 ## Wave summary
@@ -976,8 +1019,9 @@
 | D | PR-18a | Mobile homepage polish — Chats toolbar / Library search / Backup modal copy + button layout + touch haptic on section drag-start |
 | D | PR-18b | Mobile input redesign — card layout via useIsNarrow, mic↔send swap, mask-image fade on messages, `inputActions` contribution infrastructure mirroring messageActions |
 | D | PR-18c | Mobile Settings — chevron-expandable cards pattern at <768px, multi-open accordion, decorative handle, section-title hide via SettingsSection useIsNarrow, shimmer/connection-pill desktop-only |
+| D | PR-18d | web-search@1.0 catalog component — first PR-18b `inputAction` consumer beyond voice-input; armed-tools registry on hostAPI; chip strip in InputArea; pre-mounted on 4 of 5 chat templates |
 
-**Total: 31 PRs** including PR-0.
+**Total: 32 PRs** including PR-0.
 
 ## Pause points
 

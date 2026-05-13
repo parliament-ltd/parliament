@@ -39,9 +39,21 @@ const KNOWN_EVENTS = new Set(Object.values(PHASE_1_EVENTS))
 // the user invokes a contributed action. The id portion is dynamic
 // (one per inputAction contribution), so we recognize the namespace
 // rather than enumerating every concrete event name.
+//
+// PR-18d adds two more events:
+//   - `tool-armed-changed`: emitted whenever a component calls
+//     `_armTool` / `_disarmTool`. Carries `{ componentId, armed }`
+//     so the arming component can update its own visual state and
+//     the input's chip strip can refresh.
+//   - `message-sent`: emitted by input@1.0 after a successful send.
+//     Arming components (e.g. web-search@1.0) subscribe to this so
+//     they can auto-reset their armed state — the contract for
+//     per-message tool toggles (W1).
 const KNOWN_EVENT_PREFIXES = ['input-action:']
+const KNOWN_EVENTS_PR18D = new Set(['tool-armed-changed', 'message-sent'])
 function isKnownEvent(event) {
   if (KNOWN_EVENTS.has(event)) return true
+  if (KNOWN_EVENTS_PR18D.has(event)) return true
   return KNOWN_EVENT_PREFIXES.some(p => event.startsWith(p))
 }
 
@@ -55,6 +67,14 @@ function isKnownEvent(event) {
  * the per-message menu. The setter is prefixed with `_` to signal that
  * only RoomShell should call it — components must read, not write.
  *
+ * PR-18d adds a third aggregation pair — `armedTools` — for the
+ * "this component wants its tool def included in the next API call"
+ * contract. Unlike `messageActions` / `inputActions` (static manifest
+ * declarations aggregated by RoomShell), `armedTools` is runtime state
+ * written by components themselves as the user toggles them on/off.
+ * input@1.0 reads via `getArmedTools()` at send time and passes the
+ * `definition` field of each entry into `provider.sendMessage(..., tools)`.
+ *
  * @returns {{
  *   publish:           (event: string, payload?: any) => void,
  *   subscribe:         (event: string, handler: (payload?: any) => void) => () => void,
@@ -62,6 +82,9 @@ function isKnownEvent(event) {
  *   _setMessageActions:(list: Array<object>) => void,
  *   getInputActions:   () => Array<{ id, label, primary?: 'right', iconName?, componentId?, contributedBy?, [string]: any }>,
  *   _setInputActions:  (list: Array<object>) => void,
+ *   getArmedTools:     () => Array<{ componentId, id, label?, iconName?, definition, serverSide? }>,
+ *   _armTool:          (componentId: string, info: object) => void,
+ *   _disarmTool:       (componentId: string) => void,
  *   _eventCount?:      () => number,
  * }}
  */
@@ -72,6 +95,8 @@ export function createHostAPI() {
   let messageActions = []
   /** @type {Array<object>} */
   let inputActions = []
+  /** @type {Map<string, object>} componentId → tool registration */
+  const armedTools = new Map()
 
   function subscribe(event, handler) {
     if (typeof event !== 'string' || event.length === 0) {
@@ -137,6 +162,28 @@ export function createHostAPI() {
     inputActions = Array.isArray(list) ? list : []
   }
 
+  // PR-18d: per-message tool arming. Components arm a tool def for
+  // the next outgoing message by calling `_armTool(componentId, info)`.
+  // input@1.0 reads `getArmedTools()` at send time and passes the
+  // `definition` field of each entry into `provider.sendMessage`. After
+  // a successful send, input@1.0 publishes `message-sent`, which arming
+  // components subscribe to in order to clear themselves (the W1
+  // per-message-toggle contract).
+  function getArmedTools() {
+    return Array.from(armedTools.values()).map(t => ({ ...t }))
+  }
+  function _armTool(componentId, info) {
+    if (!componentId || !info) return
+    armedTools.set(componentId, { ...info, componentId })
+    publish('tool-armed-changed', { componentId, armed: true })
+  }
+  function _disarmTool(componentId) {
+    if (!componentId) return
+    if (!armedTools.has(componentId)) return
+    armedTools.delete(componentId)
+    publish('tool-armed-changed', { componentId, armed: false })
+  }
+
   return {
     publish,
     subscribe,
@@ -144,6 +191,9 @@ export function createHostAPI() {
     _setMessageActions,
     getInputActions,
     _setInputActions,
+    getArmedTools,
+    _armTool,
+    _disarmTool,
     _eventCount: () => handlers.size,
   }
 }
