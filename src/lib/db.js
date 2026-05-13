@@ -613,7 +613,7 @@ export async function getBranches(parentConversationId) {
 
 // ─── Messages ────────────────────────────────────────────
 
-export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false }) {
+export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false, attachmentMeta }) {
   const db = await initDB()
   const message = {
     id: generateId(),
@@ -623,6 +623,14 @@ export async function addMessage({ conversationId, role, content, tokenCount = 0
     tokenCount,
     incomplete,
     createdAt: new Date().toISOString(),
+    // PR-18e: optional. Array of `{ id, name, category, mimeType, size }`
+    // descriptors stamped onto user messages so MessageCard can render
+    // chips in history. Base64 payloads are NOT persisted — chips are
+    // memory aids only. Old messages have this undefined, which the
+    // renderer treats as "no attachments." No schema migration needed.
+    ...(Array.isArray(attachmentMeta) && attachmentMeta.length > 0
+      ? { attachmentMeta }
+      : {}),
   }
   await db.put('messages', message)
 

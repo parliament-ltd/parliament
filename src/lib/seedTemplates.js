@@ -146,6 +146,7 @@ export const TEMPLATES = Object.freeze([
       comp('input',       'input@^1.0',       'input-dock', 0),
       comp('voice',       'voice-input@^1.0', 'input-dock', 1),
       comp('web-search',  'web-search@^1.0',  'input-dock', 10),
+      comp('file-attach', 'file-attach@^1.0', 'input-dock', 11),
       comp('highlights',  'highlights@^1.0',  'sheet',      0),
       comp('branches',    'branches@^1.0',    'sheet',      1),
     ],
@@ -224,7 +225,7 @@ const SEED_VERSIONS = Object.freeze({
   'data-workspace@1.0': 3, // PR-11a Pelican + PR-18d web-search
   'drafting-desk@1.0':  3, // PR-11b Secretarybird + PR-18d web-search
   'writing-studio@1.0': 3, // PR-18d web-search
-  'pocket-chat@1.0':    3, // PR-18d web-search
+  'pocket-chat@1.0':    4, // PR-18d web-search + PR-18e file-attach
   'quiet-room@1.0':     2, // unchanged — no web-search by design
   'kingfisher@1.0':     2,
   'starling@1.0':       2,

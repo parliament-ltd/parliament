@@ -5,11 +5,19 @@ import remarkGfm from 'remark-gfm'
 import {
   Star, StickyNote, GitBranch, Trash2, MoreVertical,
   Eye, Copy, ArrowRightCircle, Pencil, Pin,
+  Image as ImageIcon, FileText,
 } from 'lucide-react'
 import { SPRING_SNAPPY, SPRING_GENTLE, DUSTY_GOLD, HIGHLIGHT_COLORS } from '../../lib/constants'
 import { indexOfWord } from '../../lib/textUtils'
+import { stripAttachedFileBlocks, formatSize } from '../../lib/fileUpload'
 import CitationLink from './CitationLink'
 import ChartRenderer from './ChartRenderer'
+
+// PR-18e: chip-icon lookup for the attachmentMeta strip rendered under
+// user messages in history. Icons only (no thumbnails) — base64 isn't
+// persisted, and the chips are a memory aid not a thumbnail gallery.
+const ATTACHMENT_CATEGORY_ICON = { image: ImageIcon, document: FileText, text: FileText }
+function iconForAttachment(category) { return ATTACHMENT_CATEGORY_ICON[category] || FileText }
 
 /* ── Message entrance animation ─────────────────────────── */
 
@@ -32,7 +40,18 @@ export default function MessageCard({
   isPopoverActive = false, onPopoverChange,
   onNote, onFavorite, onNoteSave, onHighlight, onContinue, onDelete, onBranch,
   onHide, onCopyText, onMoveToBranch, onPinForReference,
+  attachmentMeta,
 }) {
+  // PR-18e: strip persisted `<attached_file>...</attached_file>` boundary
+  // blocks from the display text so the user sees only their prose. The
+  // wrapped form stays in the persisted message so Claude still has the
+  // file content on follow-up turns; only the rendered surface is clean.
+  const displayContent = useMemo(
+    () => (type === 'user' && typeof content === 'string'
+      ? stripAttachedFileBlocks(content)
+      : content),
+    [content, type],
+  )
   const [noteText, setNoteText] = useState(savedNoteText)
   const [showMenu, setShowMenu] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -103,7 +122,7 @@ export default function MessageCard({
   }, [highlights])
 
   const renderContent = useMemo(() => {
-    if (!content) return null
+    if (!displayContent) return null
 
     function highlightString(text) {
       const ranges = []
@@ -197,11 +216,11 @@ export default function MessageCard({
     return (
       <div className="parliament-md text-[15px]">
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ ...highlightedComponents, a: CitationLink, code: chartCodeComponent }}>
-          {content}
+          {displayContent}
         </ReactMarkdown>
       </div>
     )
-  }, [id, content, highlights, highlightTerms])
+  }, [id, displayContent, highlights, highlightTerms])
 
   return (
     <motion.div
@@ -295,6 +314,39 @@ export default function MessageCard({
           <div className="text-sm leading-relaxed" style={{ color: 'var(--p-text-primary)' }}>
             {renderContent}
           </div>
+
+          {/* PR-18e: attachment chips on user messages — a memory aid
+              showing what files were attached on this turn. Base64 data
+              isn't persisted, so follow-up turns lose binary context;
+              the chips help users understand why Claude might reference
+              an image they no longer "see" in the rendered text. */}
+          {type === 'user' && Array.isArray(attachmentMeta) && attachmentMeta.length > 0 && (
+            <div
+              className="mt-2 flex flex-wrap gap-1.5"
+              title="Attachments are visible to Claude only on the turn they were sent. Re-attach if you need them in follow-ups."
+            >
+              {attachmentMeta.map((meta) => {
+                const Icon = iconForAttachment(meta.category)
+                return (
+                  <div
+                    key={meta.id || `${meta.name}-${meta.size}`}
+                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium"
+                    style={{
+                      backgroundColor: 'rgba(155,154,151,0.10)',
+                      color: 'var(--p-text-primary)',
+                      border: '1px solid #E9E9E7',
+                    }}
+                  >
+                    <Icon className="w-3 h-3 shrink-0 text-[var(--p-text-secondary)]" />
+                    <span className="truncate max-w-[180px]" title={meta.name}>{meta.name}</span>
+                    {typeof meta.size === 'number' && (
+                      <span className="text-[10px] opacity-60">{formatSize(meta.size)}</span>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
 
           {/* Highlight color picker popover */}
           <AnimatePresence>

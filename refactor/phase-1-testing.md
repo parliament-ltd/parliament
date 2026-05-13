@@ -3451,6 +3451,185 @@ provider directly; it discovers the tool via the provider abstraction.
 
 ---
 
+## PR-18e — file-attach@1.0 catalog component
+
+👀 User-visible
+
+**Surface:** `/chat/:id` for any room that mounts file-attach@1.0
+(pre-mounted on Pocket Chat after PR-18e's seed bump). The `+`
+overflow menu gains "Attach files" alongside the existing
+"Web search" item (from PR-18d). Tapping it opens a multi-select
+picker; chosen files stage as neutral grey chips above the textarea.
+On send, attachments fold into the API call (images + PDFs as
+multi-part content blocks; text/code as inline `<attached_file>`
+blocks). After send, chips clear; user message in history shows a
+chip strip indicating what was attached.
+
+PR-18e is also the moment the V2 `+`-disabled state activates live —
+the intrinsic file-upload is removed, so `intrinsicMenuItemCount`
+drops to 0. In rooms with no overflow contributors at all, the `+`
+button is now disabled with tooltip "Add components to enable more
+actions".
+
+**Setup:**
+- Fresh install (or: clear IndexedDB to force re-seed). Pocket Chat
+  seeds at version 4 and includes both web-search and file-attach.
+- Existing installs at Pocket Chat seedVersion 3 will re-seed on
+  next page load.
+
+**Steps — Picker + chip staging:**
+1. Open a Pocket Chat room. Tap `+`. The menu opens with "Web search"
+   AND "Attach files" (file-attach@1.0). The intrinsic V1 "Upload file"
+   item is gone.
+2. Tap "Attach files". The OS file picker opens with multi-select
+   enabled. The accept filter allows images (JPEG / PNG / GIF / WebP),
+   PDFs, and a broad list of text/code extensions.
+3. Pick one image (small JPEG, e.g. 200 KB). The picker closes. A grey
+   chip appears above the textarea: image icon, filename, size.
+4. Tap `+` → "Attach files" again. Pick two more files (a PDF and a
+   .md file). Now three chips render side-by-side, wrapping if narrow.
+5. Click the × on the first chip. It disappears; the other two remain.
+
+**Steps — Limits + errors:**
+1. Try attaching an .exe or .docx file. An inline red error appears
+   above the textarea: "Sorry, .exe files aren't supported. Try an
+   image, PDF, or text/code file." No chip appears.
+2. Try attaching a 15 MB image (or any binary >10 MB). Inline error:
+   "$NAME is 15.0 MB. The limit is 10 MB per file." No chip.
+3. Attach 10 small files. Try to add an 11th. Inline error: "You can
+   attach up to 10 files per message." No 11th chip.
+4. Errors auto-clear when the user starts typing in the textarea.
+
+**Steps — Send with attachments (image):**
+1. In a Pocket Chat room with a valid API key, type "what's in this
+   image?" and attach a small JPEG.
+2. Send. The chip disappears immediately after send. The user message
+   in history shows the prose "what's in this image?" with a grey chip
+   below: image icon + filename + size.
+3. Hover the chip (desktop) → tooltip explains the per-turn-only
+   limitation.
+4. Claude responds describing the image. Verify the outgoing API POST
+   body in DevTools Network: the user message `content` is an array
+   with `{ type: 'text', text: 'what's in this image?' }` AND
+   `{ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: '...' } }`.
+
+**Steps — Send with attachments (PDF):**
+1. Attach a small PDF (e.g. 1-page test doc). Send "summarize this
+   for me."
+2. API body includes `{ type: 'document', source: { type: 'base64',
+   media_type: 'application/pdf', data: '...' } }`.
+3. Claude responds with a summary.
+4. History shows the chip with a document icon.
+
+**Steps — Send with attachments (text/code):**
+1. Attach a .js file (e.g. a small script). Send "what does this do?"
+2. API body's user message content is a STRING (not an array — no
+   binary parts). The string is the user prose followed by:
+   `\n\n<attached_file name="..." type="..."> ... </attached_file>`
+3. The user message in history shows ONLY the user prose ("what does
+   this do?") — the `<attached_file>` wrapper is stripped from
+   display via stripAttachedFileBlocks. A chip with a document icon
+   renders below.
+4. Send a follow-up "explain the loop." Claude has the file content
+   in conversation history (the wrapped block persisted on the user
+   message). Confirm the response references the actual code.
+
+**Steps — Send with NO typed text:**
+1. Empty the textarea. Attach an image. Send (button still works
+   because attachments are present).
+2. Verify the API gets a user message with empty `text` content + the
+   image content block. Claude responds about the image.
+3. History shows an empty-text user message with just the chip.
+
+**Steps — Multi-attach (mixed types):**
+1. Attach a JPEG + a PDF + a .ts file in one message. Send "review
+   these for me."
+2. API body content array contains: text part (prose + the `<attached_file>`
+   wrapper for the .ts), then the image part, then the document part.
+3. History shows three chips under the user message.
+
+**Steps — Auto-reset on send:**
+1. Attach a file. Send. Chip disappears.
+2. Attach another file. Send. Same.
+3. Type "hello" with no attachments. Send. No chips appear on history.
+
+**Steps — `+` disabled state (manual verification):**
+1. Create a new room via the editor cloning Quiet Room (which has
+   no inputAction contributors). The `+` button should render
+   disabled (opacity ~0.4, `cursor: not-allowed`).
+2. Hover (desktop) → tooltip "Add components to enable more actions".
+3. On tap (mobile / touch) → no menu opens.
+4. Add web-search or file-attach to the room via the editor. The `+`
+   button re-enables.
+
+**Steps — Conversation persistence:**
+1. Send a message with an image attachment to Pocket Chat.
+2. Reload the page. Re-open the same room.
+3. The user message renders with prose + the image chip below. The
+   chip carries the same filename / size / icon (metadata persisted).
+4. The base64 data is NOT persisted (a known limitation). Verify by
+   checking the message record in DevTools → IndexedDB → messages —
+   `attachmentMeta` is present but no base64 anywhere.
+5. Send a follow-up like "tell me more about it." Claude responds
+   without re-seeing the image (the API call's history reconstructs
+   the user message with text only). Claude can still answer from
+   its own prior response in history.
+
+**Steps — Cross-room isolation:**
+1. Open Pocket Chat. Attach a file. Chip stages.
+2. Navigate to a different room (e.g. Writing Studio). The Writing
+   Studio input has no chip — its hostAPI instance is fresh (no
+   file-attach mounted there).
+3. Return to Pocket Chat. The chip is gone (RoomShell remounts on
+   navigation; hostAPI's attachment registry resets).
+
+**Steps — Symbol-grep bundled output:**
+1. After `npm run build`:
+   - `grep -ohc "file-attach" dist/assets/index-*.js` → ≥2
+   - `grep -ohc "_setAttachments" dist/assets/index-*.js` → ≥2
+   - `grep -ohc "getAttachments" dist/assets/index-*.js` → ≥2
+   - `grep -ohc "attachments-changed" dist/assets/index-*.js` → ≥2
+   - `grep -ohc "attach:error" dist/assets/index-*.js` → ≥2
+   - `grep -ohc "Add components to enable" dist/assets/index-*.js` → ≥1
+   - `grep -ohc "attached_file" dist/assets/index-*.js` → ≥2
+2. The intrinsic V1 "Upload file" string survives only via FileShelf.jsx
+   (the Pelican file-shelf), not InputArea — confirm by inspecting
+   FileShelf.jsx is the sole remaining source.
+
+**Steps — Lint + build:**
+1. `npm run lint` → 164 problems (162 errors + 2 warnings). Same as
+   PR-18d post-merge baseline. No new errors.
+2. `npm run build` → clean.
+
+**Expected:** Every step passes. The picker stages files reliably,
+chips render with correct icons (image / document / text), errors
+surface inline, sends transmit the right multi-part content shape,
+auto-reset works, history persists metadata, and the V2 `+`-disabled
+state activates correctly for rooms without overflow contributors.
+
+### What's known-broken-but-deferred
+
+- Branching / re-send of binary attachments. The base64 isn't
+  persisted, so branching from a message with an image won't
+  re-include the image on the new API call. The chip in history
+  hints at this; Claude's prior assistant response is still in
+  context, so follow-up turns can still reference what was shown
+  indirectly.
+- Homepage Documents section. Per the V3 directional commitments —
+  worth doing once external storage integrations (Google Drive /
+  local) land. Until then, attachments are per-room transient.
+- Image thumbnails in chips. Icons only for both input and history
+  surfaces; thumbnails are a polish PR (would require deciding
+  whether to re-read base64 from memory or persist it).
+- OpenAI / Mistral provider mappings of image / PDF attachments.
+  fileUpload.js returns provider-neutral category metadata; only
+  `attachmentToContentBlock`'s Anthropic-specific shape would need
+  per-provider variants. Firmly Phase 2.
+- Rich PDF rendering in history (page-count badge, click-to-preview).
+  PDFs land as opaque chips for now.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

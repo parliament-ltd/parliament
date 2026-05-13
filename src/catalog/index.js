@@ -47,6 +47,7 @@ import documentCanvasEntry   from './entries/document-canvas'
 import claudeCommentsEntry   from './entries/claude-comments'
 import rippleAnalysisEntry   from './entries/ripple-analysis'
 import webSearchEntry        from './entries/web-search'
+import fileAttachEntry       from './entries/file-attach'
 import { validateManifest, entryRef } from './validate'
 
 const REGISTRY = new Map()
@@ -96,6 +97,8 @@ register(claudeCommentsEntry)
 register(rippleAnalysisEntry)
 // PR-18d — per-message tool arming via inputAction contributions.
 register(webSearchEntry)
+// PR-18e — per-message file attachments via inputAction contributions.
+register(fileAttachEntry)
 
 /**
  * Look up a manifest entry by `name@version` ref. Exact-match only in PR-2;

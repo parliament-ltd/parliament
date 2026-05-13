@@ -49,11 +49,19 @@ const KNOWN_EVENTS = new Set(Object.values(PHASE_1_EVENTS))
 //     Arming components (e.g. web-search@1.0) subscribe to this so
 //     they can auto-reset their armed state — the contract for
 //     per-message tool toggles (W1).
-const KNOWN_EVENT_PREFIXES = ['input-action:']
+// PR-18e adds `attach:` for file-attach@1.0 status events (currently
+// just `attach:error`; input@1.0 subscribes to surface the message
+// inline above the textarea).
+const KNOWN_EVENT_PREFIXES = ['input-action:', 'attach:']
 const KNOWN_EVENTS_PR18D = new Set(['tool-armed-changed', 'message-sent'])
+// PR-18e: attachments-changed fires whenever a component calls
+// `_setAttachments`. Mirrors the tool-armed-changed pattern so the
+// input's chip strip refreshes when the underlying registry changes.
+const KNOWN_EVENTS_PR18E = new Set(['attachments-changed'])
 function isKnownEvent(event) {
   if (KNOWN_EVENTS.has(event)) return true
   if (KNOWN_EVENTS_PR18D.has(event)) return true
+  if (KNOWN_EVENTS_PR18E.has(event)) return true
   return KNOWN_EVENT_PREFIXES.some(p => event.startsWith(p))
 }
 
@@ -85,6 +93,8 @@ function isKnownEvent(event) {
  *   getArmedTools:     () => Array<{ componentId, id, label?, iconName?, definition, serverSide? }>,
  *   _armTool:          (componentId: string, info: object) => void,
  *   _disarmTool:       (componentId: string) => void,
+ *   getAttachments:    () => Array<{ componentId, id, name, size, mimeType, category, base64?, content?, truncated? }>,
+ *   _setAttachments:   (componentId: string, list: Array<object>) => void,
  *   _eventCount?:      () => number,
  * }}
  */
@@ -97,6 +107,8 @@ export function createHostAPI() {
   let inputActions = []
   /** @type {Map<string, object>} componentId → tool registration */
   const armedTools = new Map()
+  /** @type {Map<string, Array<object>>} componentId → attachments list */
+  const attachmentsByComponent = new Map()
 
   function subscribe(event, handler) {
     if (typeof event !== 'string' || event.length === 0) {
@@ -184,6 +196,35 @@ export function createHostAPI() {
     publish('tool-armed-changed', { componentId, armed: false })
   }
 
+  // PR-18e: per-message attachments. Components that want to contribute
+  // file content to the next outgoing message call `_setAttachments
+  // (componentId, list)` whenever their local picker state changes.
+  // input@1.0 reads `getAttachments()` at send time and folds the entries
+  // into the multi-part Anthropic content array (binary → image/document
+  // content blocks; text → wrapped inline and appended to the text part).
+  // The list semantics: each call REPLACES that component's entire list,
+  // so removing one attachment from a chip strip is a re-set with the
+  // shorter list. After a successful send, input@1.0 publishes
+  // `message-sent`; arming components clear themselves the same way
+  // armed-tools does.
+  function getAttachments() {
+    const out = []
+    for (const list of attachmentsByComponent.values()) {
+      for (const a of list) out.push({ ...a })
+    }
+    return out
+  }
+  function _setAttachments(componentId, list) {
+    if (!componentId) return
+    const safe = Array.isArray(list) ? list.map(a => ({ ...a, componentId })) : []
+    if (safe.length === 0) {
+      attachmentsByComponent.delete(componentId)
+    } else {
+      attachmentsByComponent.set(componentId, safe)
+    }
+    publish('attachments-changed', { componentId, count: safe.length })
+  }
+
   return {
     publish,
     subscribe,
@@ -194,6 +235,8 @@ export function createHostAPI() {
     getArmedTools,
     _armTool,
     _disarmTool,
+    getAttachments,
+    _setAttachments,
     _eventCount: () => handlers.size,
   }
 }
