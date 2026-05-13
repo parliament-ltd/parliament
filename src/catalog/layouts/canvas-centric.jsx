@@ -89,8 +89,11 @@ export default {
                   {renderSlot(chat)}
                 </NarrowSheet>
               )}
+              {/* PR-18f: narrow input-dock loses border-t + horizontal padding;
+                  the canvas above fades into the input via .messages-fade-mask
+                  on any contained MessageList. */}
               {input && input.length > 0 && (
-                <div className="border-t border-[var(--p-border)] p-3 bg-white">
+                <div className="bg-white py-2">
                   {renderSlot(input)}
                 </div>
               )}

@@ -75,8 +75,11 @@ export default {
               <div className="flex-1 min-h-0">
                 {renderSlot(msgs)}
               </div>
+              {/* PR-18f: narrow input-dock loses border-t + horizontal padding;
+                  the chat fades into the input via .messages-fade-mask
+                  (matches Claude). InputArea card carries its own 16px gutter. */}
               {input && input.length > 0 && (
-                <div className="border-t border-[var(--p-border)] p-3 bg-white">
+                <div className="bg-white py-2">
                   {renderSlot(input)}
                 </div>
               )}

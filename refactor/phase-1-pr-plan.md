@@ -1048,6 +1048,60 @@ This PR is also the moment the V2 `+`-disabled state activates live. PR-18b ship
 
 ---
 
+### PR-18f — Mobile chat polish + settings hover spin
+
+**Goal:** A focused mobile-polish bundle plus the first homepage icon micro-interaction. Five fixes that compose cleanly on a single surface area (the mobile chat shell + the homepage settings icon):
+
+1. **Homepage settings icon** rotates slowly on hover, laptop-only (CSS guards on `(hover: hover) and (pointer: fine) and (min-width: 768px)`, gated by `prefers-reduced-motion`).
+2. **Mobile chat surfaces gain a centered Parliament-mark home button** — there was no way back to `/` from any mobile chat before this PR. Sits in the previously empty middle of NarrowChrome (three-panel / canvas-centric / document-centric narrow branches) and in a parallel minimal home strip on Pocket Chat (single-column-with-sheet has no NarrowChrome).
+3. **NarrowChrome's `border-b` is removed.** Pocket Chat's home strip is also borderless. The chat scroll area below now fades into the topbar via an extended `.messages-fade-mask` (top 48px transparent, bottom 64px transparent — same gradient that PR-18b shipped at the bottom only).
+4. **Input-dock wrapper loses its border-t + horizontal padding on narrow branches** of three-panel, canvas-centric, single-column-with-sheet. Combined with the existing bottom mask fade, the chat reads as flowing into the input card with no hard divider — the Claude-style transition the user asked for. Desktop branches are untouched.
+5. **Input card gutter trimmed from 28px to 16px each side on mobile** (the layout's `p-3` horizontal gutter goes away; InputArea's own `px-4` becomes the sole horizontal padding). Matches Claude's mobile chat input width.
+
+The settings spin is the first laptop-only icon micro-interaction. Other homepage icons (view-toggle, library filter, favorite stars, blueprint shapes, ambient drift) are deferred per user — the user wants to come back to those later. Continuous spin (4s linear, paused → running on hover) was the chosen flavor over a one-shot 360°.
+
+**Scope:**
+- [src/components/ParliamentMark.jsx](../src/components/ParliamentMark.jsx) (NEW): extracted from HomepageTopBar's inline SVG. Two consumers in this PR (HomepageTopBar, NarrowChrome, single-column-with-sheet); single source of truth for the bird-glyph going forward.
+- [src/components/HomepageTopBar.jsx](../src/components/HomepageTopBar.jsx): import `<ParliamentMark />` (drop the inline SVG); add `settings-icon-spin-host` class to the settings button + `settings-icon-spin` class to the SVG icon. Pure CSS-driven hover animation; no React state.
+- [src/components/layouts/NarrowChrome.jsx](../src/components/layouts/NarrowChrome.jsx): drop `border-b border-[var(--p-border)]`. Add an absolutely-positioned centered home button with `<ParliamentMark />`, `aria-label="Go to homepage"`, `title="Home"`, `onClick={() => navigate('/')}`. The existing left/right `justify-between` slots are preserved (the centered button is overlay-positioned, not in the flex flow). `useNavigate` from react-router-dom.
+- [src/catalog/layouts/single-column-with-sheet.jsx](../src/catalog/layouts/single-column-with-sheet.jsx): add a 40px-tall centered home strip above the messages slot (Pocket Chat-only — single-column-with-sheet doesn't render NarrowChrome). Replace the `border-t border-[var(--p-border)] p-3 bg-white` input-dock wrapper with `bg-white py-2`. Single branch — single-column-with-sheet is mobile-native.
+- [src/catalog/layouts/three-panel.jsx](../src/catalog/layouts/three-panel.jsx): narrow branch only — replace input-dock wrapper's `border-t border-[var(--p-border)] p-3 bg-white` → `bg-white py-2`. Desktop branch (≥768px) untouched; the desktop chrome stays as-is.
+- [src/catalog/layouts/canvas-centric.jsx](../src/catalog/layouts/canvas-centric.jsx): same narrow-only swap.
+- [src/index.css](../src/index.css):
+  - Extend `.messages-fade-mask` gradient to fade both top 48px and bottom 64px (was bottom-only). Keeps the `@media (max-width: 768px)` scope.
+  - Add `@keyframes settings-spin { to { transform: rotate(360deg); } }` plus the `.settings-icon-spin` / `.settings-icon-spin-host:hover .settings-icon-spin` pair, both nested inside `@media (hover: hover) and (pointer: fine) and (min-width: 768px)` and `@media (prefers-reduced-motion: no-preference)`. CSS-only laptop guard — no React/JS hook needed.
+- [src/components/core/MessageList.jsx](../src/components/core/MessageList.jsx): docstring update only — note that `.messages-fade-mask` now fades top 48px in addition to the original bottom 64px.
+
+**Locked design decisions:**
+- **F1 laptop detection via CSS, not JS** — `(hover: hover) and (pointer: fine) and (min-width: 768px)`. No JS hook; the spin class is always on the DOM, but the animation rule only takes effect when the media query matches. Trade-off: a touchscreen-laptop without a mouse won't see the spin (correct — they can't hover anyway). A desktop with a touchscreen + mouse gets it (also correct — they have fine-pointer hover).
+- **F2 continuous spin while hovered** (paused on leave) — chosen over one-shot 360°. Lighter, more delightful. 4s/rotation linear is slow enough to read as ambient, fast enough that one full rotation completes during a typical hover dwell.
+- **F3 prefers-reduced-motion is a hard gate** — wrapped at the CSS level, not just the keyframe. If the user opts out, the icon is fully static (no hover animation at all).
+- **F4 single shared ParliamentMark component** — extracted from HomepageTopBar's previously-inline SVG. Same intrinsic 26×24 viewBox; default 18×16 px. Three consumers in this PR; one source of truth.
+- **F5 absolute-positioned centered logo in NarrowChrome** — preserves the existing flex `justify-between` slots for left/right buttons. Cleaner than restructuring to a 3-column grid.
+- **F6 Pocket Chat gets its own home strip** (parallel to NarrowChrome's centered button). single-column-with-sheet doesn't render NarrowChrome, so the home button gets its own minimal 40px-tall borderless container above the messages slot. Consistent navigation pattern across all four chat layouts.
+- **F7 input gutter target 16px each side** — InputArea's existing `px-4` becomes the sole horizontal gutter (the layout's `p-3` horizontals go away). Matches Claude's mobile gutter exactly.
+- **F8 fade gradient: 48px top + 64px bottom** — top matches NarrowChrome / Pocket Chat home strip's height (40px) plus a few px breathing. Bottom is unchanged from PR-18b.
+- **F9 desktop input-dock wrappers untouched** — desktop chrome stays as the layout authors wrote it; only narrow branches get the borderless / horizontal-padding-free treatment.
+
+**Out of scope (deferred):**
+- Other homepage icon animations (view-toggle, library filter chips, favorite stars, blueprint shapes, ambient drift on the floor plan). User wants to come back to these later.
+- One-shot 360° spin variant (F2 — chose continuous while hovered).
+- Container queries for input-card. Phase 2 if it ever becomes worth it.
+- Per-route home-button visibility (always visible in mobile chats here).
+
+**Dependencies:** PR-18b (`.messages-fade-mask` mask-image pattern; bottom 64px gradient that PR-18f extends to also fade the top 48px), PR-16 (NarrowChrome, NarrowDrawer, narrow-branch precedent in three-panel / canvas-centric / document-centric), PR-14 (the inline Parliament-mark SVG in HomepageTopBar that PR-18f extracts to a shared component), PR-15 (useIsNarrow hook — referenced indirectly; this PR adds no new JS hook).
+
+**Exit criteria:**
+- All criteria in `phase-1-testing.md` PR-18f section pass.
+- `npm run lint` returns 164 problems (162 errors + 2 warnings) — same as PR-18e post-merge baseline. No new errors.
+- `npm run build` clean.
+- Symbol-grep of `dist/assets/index-*.js` confirms `ParliamentMark` (≥1), `settings-icon-spin` (≥1), `settings-spin` (keyframe, ≥1), `Go to homepage` (≥2 — once for NarrowChrome, once for Pocket Chat home strip).
+- Manual: hover the settings icon on desktop with a mouse — spins continuously, pauses on leave. Touch-only mobile / `prefers-reduced-motion: reduce` — no spin. Mobile chat (any layout): centered Parliament mark visible, taps navigate to /, no border under the topbar, chat scroll fades both ends, input card is full-width minus 16px gutters, no border above the input card.
+
+**Risk:** Low. CSS-driven animation gates avoid React state. Mark extraction is a pure refactor — same SVG output. Border/padding removals on narrow branches only (desktop chrome preserved). The biggest watch item: the absolute-positioned center logo in NarrowChrome must not overlap the left/right buttons at the smallest viewports — verified at 320px (the existing PR-15 minimum). Pocket Chat's added 40px home strip eats 40px of vertical real estate from the previously-edge-to-edge messages area; this is the deliberate trade for navigability.
+
+---
+
 ## Wave summary
 
 | Wave | PRs | Description |
@@ -1067,8 +1121,9 @@ This PR is also the moment the V2 `+`-disabled state activates live. PR-18b ship
 | D | PR-18c | Mobile Settings — chevron-expandable cards pattern at <768px, multi-open accordion, decorative handle, section-title hide via SettingsSection useIsNarrow, shimmer/connection-pill desktop-only |
 | D | PR-18d | web-search@1.0 catalog component — first PR-18b `inputAction` consumer beyond voice-input; armed-tools registry on hostAPI; chip strip in InputArea; pre-mounted on 4 of 5 chat templates |
 | D | PR-18e | file-attach@1.0 catalog component — first functional V2 attachment surface; replaces dead V1 intrinsic upload; attachments registry on hostAPI; image / PDF / text support; chip strip in InputArea + history; activates the V2 `+` disabled state live |
+| D | PR-18f | Mobile chat polish + settings hover spin — centered Parliament-mark home button on every mobile chat surface, NarrowChrome border-b dropped, top-edge fade extension on `.messages-fade-mask`, input-dock chrome stripped on narrow branches (border + horizontal padding), input gutter trimmed to 16px each side, settings icon CSS-only continuous-spin on hover (laptop / desktop with fine pointer; reduced-motion gate) |
 
-**Total: 33 PRs** including PR-0.
+**Total: 34 PRs** including PR-0.
 
 ## Pause points
 

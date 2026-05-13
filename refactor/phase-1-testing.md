@@ -3630,6 +3630,125 @@ state activates correctly for rooms without overflow contributors.
 
 ---
 
+## PR-18f — Mobile chat polish + settings hover spin
+
+👀 User-visible
+
+**Surface:** `/` (homepage settings icon hover) and `/chat/:id` for any
+mobile chat layout (centered Parliament-mark home button, no border
+under the topbar, chat fades into the topbar AND the input, wider
+input card, no border above the input).
+
+**Setup:**
+- A real mobile device or a desktop browser narrowed to <768px for the
+  mobile chat checks. The settings spin needs a desktop browser with a
+  mouse pointer (the CSS guard requires `(hover: hover) and
+  (pointer: fine) and (min-width: 768px)`).
+- Existing chats / rooms — no DB migration in this PR.
+
+**Steps — Settings icon hover spin (laptop / desktop with mouse):**
+1. On `/` at viewport ≥768px with a mouse, hover the gear icon in the
+   top-right of HomepageTopBar. The icon begins rotating slowly (4s per
+   full revolution, linear, continuous).
+2. Move the cursor off the icon. Rotation pauses at the current angle
+   (does not snap back to 0).
+3. Re-hover. Rotation resumes from where it paused.
+4. Tap the icon (or press Enter when focused). Navigates to /settings
+   as before — animation does not interfere with the click.
+5. Narrow the viewport to <768px (or open on mobile). Hover/long-press
+   the icon — no rotation. The icon is static.
+6. In DevTools, set `prefers-reduced-motion: reduce` (Rendering pane
+   → Emulate CSS media feature). Reload. Hover the icon at desktop
+   width — no rotation. The icon is static.
+
+**Steps — Centered Parliament-mark home button (NarrowChrome layouts):**
+1. Open `/chat/:id` for a Writing Studio room (three-panel layout).
+   Narrow the viewport to <768px. The topbar shows: hamburger (left)
+   + Parliament mark glyph (centered) + sheet/inspector toggle (right
+   when content exists, otherwise a 7px spacer).
+2. Tap the Parliament mark. Navigates to `/`.
+3. Repeat in a Data Workspace room (canvas-centric narrow branch) and
+   a Drafting Desk room (document-centric narrow branch). Same layout,
+   same behavior.
+4. Verify the centered button has `aria-label="Go to homepage"` and
+   `title="Home"` (inspect in DevTools).
+5. At the smallest supported viewport (~320px), the centered logo does
+   not visually overlap or crowd the left/right buttons.
+
+**Steps — Centered Parliament-mark home button (Pocket Chat):**
+1. Open `/chat/:id` for the Pocket Chat room (single-column-with-sheet
+   layout). Narrow to <768px (or open on mobile).
+2. A 40px-tall white strip at the top of the chat shows the Parliament
+   mark, centered. No left/right buttons (Pocket Chat has no drawer or
+   inspector to toggle).
+3. Tap the mark. Navigates to `/`.
+4. The strip is borderless — no `border-b` line; the messages area
+   below fades in via `.messages-fade-mask`.
+
+**Steps — Topbar/strip border removal + chat fade (top edge):**
+1. In any mobile chat at <768px with several messages in history,
+   scroll up so message content reaches the top of the scroll area.
+2. The text fades to transparent over the top ~48px (under the
+   topbar / home strip). No hard border line separates the topbar
+   from the chat content.
+3. Compare to the bottom edge — the existing PR-18b 64px bottom fade
+   is preserved (chat fades into the input).
+4. At ≥768px the fade is inert (mask-image is scoped inside
+   `@media (max-width: 768px)`).
+
+**Steps — Input-dock chrome strip + wider input (mobile):**
+1. In any mobile chat at <768px, focus the input. Verify visually:
+   - There is no border / divider line above the input card.
+   - The input card spans almost the full width of the viewport with
+     a single 16px gutter on each side (= the `px-4` on InputArea's
+     card; the layout's prior `p-3` horizontal padding is gone).
+2. Compare against PR-18e's behavior (28px gutter each side) — the
+   card should be visibly wider.
+3. The input card itself still has its 1px `border-[#DDDDE3]` rounded
+   border — that's the card chrome, not the layout chrome.
+4. At ≥768px the desktop input-dock wrapper is unchanged — the
+   `border-t` and `p-3` padding remain. Only narrow branches were
+   modified.
+
+**Steps — Web-search / file-attach chip strips inside the wider card:**
+1. Stage an attachment AND arm web-search in a Pocket Chat room at
+   <768px. Both chip strips render inside the input card, sized to
+   the new wider card width.
+2. Send. Both clear. The card collapses back to the textarea-only
+   minimum height.
+
+**Steps — Symbol-grep bundled output:**
+1. After `npm run build`:
+   - `grep -ohc "ParliamentMark" dist/assets/index-*.js` → ≥1
+   - `grep -ohc "settings-icon-spin" dist/assets/index-*.js` → ≥1
+   - `grep -ohc "settings-spin" dist/assets/index.css` → ≥1 (keyframe name)
+   - `grep -ohc "Go to homepage" dist/assets/index-*.js` → ≥2
+     (NarrowChrome + Pocket Chat home strip)
+
+**Steps — Lint + build:**
+1. `npm run lint` → 164 problems (162 errors + 2 warnings). Same as
+   PR-18e post-merge baseline. No new errors.
+2. `npm run build` → clean.
+
+**Expected:** Hover spin works on laptop/desktop with a mouse,
+correctly skipped for touch-only and reduced-motion. Centered home
+button is present on every mobile chat surface and navigates to `/`.
+The mobile chat reads as flowing under the topbar and into the input
+with no hard borders. The input card is visibly wider (28px → 16px
+gutter each side). Desktop chat surfaces are unchanged.
+
+### What's known-broken-but-deferred
+
+- Other homepage icon animations (view-toggle in chats, library
+  filter chips, favorite stars, blueprint shapes, ambient drift on
+  the floor plan). User wants to come back to these later.
+- One-shot 360° spin variant. Continuous-while-hovered was the
+  chosen flavor (F2).
+- Container-query rewrite for the input card. Would let the chip
+  strips wrap based on the card's own width instead of the viewport.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

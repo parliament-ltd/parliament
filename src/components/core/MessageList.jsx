@@ -25,7 +25,9 @@ export default function MessageList({
       // CSS `mask-image: linear-gradient(...)` in index.css fades the
       // bottom ~64px of the scroll container into transparency so
       // message content reads as flowing into the input below
-      // (matches the Swift V1 visual).
+      // (matches the Swift V1 visual). PR-18f: same gradient now fades
+      // the top 48px so the chat reads as flowing under NarrowChrome /
+      // Pocket Chat's home strip (those dropped their border-b).
       className="flex-1 overflow-y-auto p-6 space-y-4 messages-fade-mask"
       onMouseDown={onContainerMouseDown}
       style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}
