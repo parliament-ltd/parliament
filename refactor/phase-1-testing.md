@@ -3148,6 +3148,169 @@ Desktop behavior is unchanged.
 
 ---
 
+## PR-18c — Mobile Settings chevron-expandable cards
+
+👀 User-visible
+
+**Surface:** `/settings` on viewports <768px. The page chrome changes
+from the desktop left-nav + main-pane to a vertical list of
+chevron-expandable rows. Each row's expanded panel renders the same
+section component (`ApiSection` / `ModelSection` / etc.) the desktop
+already renders — content semantics are identical across viewports.
+Desktop Settings (≥768px) is untouched.
+
+**Setup:**
+- Browser at <768px viewport (DevTools mobile emulation at 375×667
+  or a real phone). Both iOS Safari and Android Chrome should work.
+- Optional: clear `tourCompleted_settings` in IndexedDB to verify
+  the first-visit tour also lands on the mobile chevron rows.
+
+**Steps — Layout + initial state:**
+1. Open `/settings` at <768px. The page renders the mobile layout:
+   small grey decorative handle pill at top-center, a single top row
+   with a back arrow + "Settings" label, then seven section rows
+   stacked vertically.
+2. The first row (API Configuration) is expanded by default; the
+   API key Input + Key Storage radio + "Get an API key" info card
+   render below the row header.
+3. The remaining six rows (Model Preferences, Usage & Spending,
+   Context & Defaults, Data & Backups, Appearance, About & Security)
+   are collapsed — only the icon + label + right-pointing chevron
+   are visible.
+4. Tap the back arrow → navigates to `/`.
+
+**Steps — Multi-open accordion:**
+1. Tap the Context & Defaults row. It expands; chevron rotates 90°
+   to point down; Summary Depth + Context Threshold + Auto-Compress
+   cards render. API row stays expanded.
+2. Tap the Appearance row. Expands. Theme + Text Size cards render.
+   API and Context rows still expanded.
+3. Tap the Context row's chevron (or anywhere on the row). Collapses.
+   API and Appearance stay expanded.
+4. Tap the API row. Collapses. Appearance stays expanded.
+5. The accordion height animation runs at ~250ms unless
+   `prefers-reduced-motion` is set, in which case it's instant.
+
+**Steps — Section content correctness:**
+1. Expand API Configuration. Tap into the API key Input. Type a
+   sample key (`sk-ant-test`). Storage Mode radio shows the two
+   options. The "Get an API key" link works (opens
+   console.anthropic.com in a new tab).
+2. Expand Model Preferences. The 4 model cards render with cost +
+   speed metadata. Tap a non-active card; the active outline + filled
+   dot move to it. `settings.defaultModel` updates.
+3. Expand Usage & Spending. Stats grid renders. Toggle Budget Alert
+   on → the inline range slider appears with the existing height-auto
+   reveal animation. Dismiss the "Set a spending limit on Anthropic"
+   card.
+4. Expand Context & Defaults. Summary Depth segmented control,
+   Context Threshold slider, and Auto-Compress radio group all
+   interactive.
+5. Expand Data & Backups. Storage usage bar renders with the right
+   color (green / orange / red based on percent). Tap "Backup &
+   restore" → V2 backup modal opens, fills the viewport edge-to-edge
+   (16px gutters from Modal's `mx-4`). Close the modal. Tap "Export
+   Encrypted" → the export modal opens. Cancel. Tap "Import Backup"
+   → import modal opens. Cancel. Tap "Delete Everything" → the
+   delete-confirm modal opens. Cancel. All three modals work on
+   mobile without horizontal scroll.
+6. Expand Appearance. Theme buttons render; tap Dark → theme
+   updates. Tap Light to restore.
+7. Expand About & Security. The app version card + four privacy
+   bullets + NetworkActivityCard all render.
+
+**Steps — Title-hide inside expanded panels:**
+1. Expand any section. The chevron-row header shows the section
+   label (e.g., "API Configuration"). The expanded panel below does
+   NOT repeat the title — only the section's subtitle ("Connect your
+   Anthropic API key to start chatting") + cards. This is by design:
+   `SettingsSection` calls `useIsNarrow(768)` and conditionally
+   omits the `<h2>` on narrow.
+2. At ≥768px, the same `SettingsSection` renders the title (the
+   desktop right pane needs it). Verify by resizing the window from
+   600 → 900px — the title pops back in.
+
+**Steps — First-visit tour (if not yet completed):**
+1. In DevTools → Application → IndexedDB → `parliament_db` →
+   `settings`, delete the `tourCompleted_settings` entry. Reload
+   `/settings`.
+2. The 3-step `TourTooltip` appears, pointing in sequence at:
+   - The API Configuration chevron row (`data-tour="settings-api"`)
+   - The Context & Defaults chevron row (`data-tour="settings-context"`)
+   - The Data & Backups chevron row (`data-tour="settings-data"`)
+3. Sections do NOT auto-expand during the tour — the tooltip
+   anchors to the collapsed rows. The user is expected to expand
+   on their own after the tour. (Locked design decision D4.)
+4. Complete the tour. `tourCompleted_settings` is now `true`;
+   reload won't show the tour again.
+
+**Steps — Reduced motion:**
+1. In DevTools → Rendering, set "Emulate CSS prefers-reduced-motion"
+   to "reduce". Reload `/settings`.
+2. Toggling chevron rows expands/collapses instantly (no height
+   animation, no chevron rotation tween). The mount animations on
+   the section cards (initial `opacity: 0, y: 12 → 1, 0`) still
+   play — those come from SettingsSection and were not gated this
+   PR.
+
+**Steps — Desktop ≥768px regression:**
+1. Open `/settings` at ≥768px. The desktop layout renders: left
+   sidebar nav + main pane on the right + the power-on shimmer
+   sweep if the user just validated a key. None of the
+   `mobile-settings-*` classes apply.
+2. Click each nav item. `AnimatePresence mode="wait"` swap-fades
+   between sections as before. All seven sections render correctly.
+3. Validate a key. The shimmer sweep + Connected dot animation
+   fire as in PR-11b/PR-12 baseline. Mobile-only changes did not
+   regress the shimmer flow.
+4. Resize from 800 → 600 → 800 px. The view re-renders into
+   mobile then back into desktop without losing state (the page
+   re-renders the same `SettingsView` instance; the multi-open
+   `Set` resets if you fully unmount via route change, which is
+   acceptable session-state behavior matching desktop's
+   `activeSection` state).
+
+**Steps — Symbol-grep bundled output:**
+1. After `npm run build`:
+   - `grep -ohc "mobile-settings-screen" dist/assets/index-*.js` → ≥1
+   - `grep -ohc "mobile-settings-handle" dist/assets/index-*.js` → ≥1
+   - `grep -ohc "mobile-settings-handle" dist/assets/index-*.css` → ≥1
+   - `grep -ohc "mobile-settings-row" dist/assets/index-*.css` → ≥1
+   - `grep -ohc "shimmer-sidebar-border" dist/assets/index-*.js` → ≥1
+     (desktop UI is unchanged — this class still ships)
+   - Note: Rollup mangles function names, so `MobileSettings` as a
+     string is not a reliable signal. The className strings above are
+     load-bearing on the rendered DOM and persist through minification.
+
+**Steps — Lint + build:**
+1. `npm run lint` → 164 problems (162 errors + 2 warnings). Same
+   as PR-18b post-merge baseline. No new errors.
+2. `npm run build` → clean.
+
+**Expected:** Every step passes. The mobile Settings layout matches
+the chevron-expandable cards pattern from "Menu for mobile settings.png"
+applied to the existing Settings content. Section content semantics
+(validation, modals, radios, sliders, segmented controls,
+NetworkActivityCard) are identical to desktop. Desktop ≥768px is
+unchanged.
+
+### What's known-broken-but-deferred
+
+- Shimmer + Connected pill: intentionally desktop-only this PR.
+  Today validation runs through the desktop /build wizard. When
+  Phase 2 multi-provider config (audit §3.20) brings key
+  validation surfaces into mobile, revisit `validateKey`'s TODO
+  comment and decide on the mobile shimmer/pill story then.
+- Tour auto-expand: deferred. Tour anchors at the collapsed row;
+  user expands the section themselves.
+- Container-query layout for in-app embedded Settings (e.g., a
+  Settings room embedded in a narrow rail): would need container
+  queries to choose layout per available width, not per viewport.
+  Not in scope; Settings only ships at the `/settings` full-page
+  route today.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import {
   Key, Cpu, DollarSign, Sliders, Database, Sun, Shield,
   ArrowLeft, MessageSquare, Github, ExternalLink, Info,
   Download, Upload, Trash2, AlertTriangle, Moon, HardDrive,
-  Bell, BellOff, CheckCircle, AlertCircle, Lock,
+  Bell, BellOff, CheckCircle, AlertCircle, Lock, ChevronRight,
 } from 'lucide-react'
 import { useSettings } from '../stores/SettingsContext'
 import { useConversations } from '../stores/ConversationContext'
@@ -17,6 +17,7 @@ import { exportAllData, importData, clearAllData, getSetting, setSetting } from 
 import TourTooltip from '../components/TourTooltip'
 import NetworkActivityCard from '../components/NetworkActivityCard'
 import { useBackup } from '../stores/BackupContext'
+import { useIsNarrow } from '../lib/useViewportWidth'
 
 const SPRING_SMOOTH = { type: 'spring', stiffness: 300, damping: 28 }
 const staggerContainer = {
@@ -95,6 +96,7 @@ export default function SettingsView() {
   const { conversations } = useConversations()
   const [activeSection, setActiveSection] = useState('api')
   const { triggerShimmer, shimmerPhase, shimmerDone } = useShimmer()
+  const isNarrow = useIsNarrow(768)
 
   // Onboarding tour
   const [showTour, setShowTour] = useState(false)
@@ -122,6 +124,12 @@ export default function SettingsView() {
   const [exportConfirmPassphrase, setExportConfirmPassphrase] = useState('')
   const [importPassphrase, setImportPassphrase] = useState('')
 
+  // PR-18c: shimmer + connection-pill intentionally desktop-only. Today
+  // mobile users arrive with a key already saved (the /build wizard is
+  // desktop-first), so the validation feedback flow doesn't fire on
+  // narrow. Revisit when Phase 2 multi-provider config (audit §3.20)
+  // brings key validation surfaces onto mobile — at that point we'd
+  // want the sweep + green Connected dot on the mobile header too.
   const validateKey = async () => {
     if (validateCooldown || keyStatus === 'validating') return
     setKeyStatus('validating')
@@ -144,6 +152,39 @@ export default function SettingsView() {
     } finally {
       setTimeout(() => setValidateCooldown(false), 5000)
     }
+  }
+
+  // Per-section rendering closure — shared between desktop's single-pane
+  // AnimatePresence and mobile's multi-open accordion so the section
+  // components themselves stay identical across viewports.
+  const sectionForId = (id) => {
+    switch (id) {
+      case 'api':
+        return <ApiSection key="api" apiKey={apiKey} setApiKey={(v) => { setApiKey(v); setKeyStatus(null) }} keyStatus={keyStatus} keyError={keyError} validateKey={validateKey} validateCooldown={validateCooldown} storageMode={settings.storageMode} setStorageMode={(v) => updateSetting('storageMode', v)} shimmerPhase={shimmerPhase} />
+      case 'model':
+        return <ModelSection key="model" selectedModel={settings.defaultModel} setSelectedModel={(v) => updateSetting('defaultModel', v)} />
+      case 'usage':
+        return <UsageSection key="usage" budgetAlert={settings.budgetAlert} setBudgetAlert={(v) => updateSetting('budgetAlert', v)} budgetEnabled={settings.budgetEnabled} setBudgetEnabled={(v) => updateSetting('budgetEnabled', v)} spendingLimitDismissed={settings.spendingLimitDismissed} setSpendingLimitDismissed={(v) => updateSetting('spendingLimitDismissed', v)} />
+      case 'context':
+        return <ContextSection key="context" summaryDepth={settings.summaryDepth} setSummaryDepth={(v) => updateSetting('summaryDepth', v)} contextThreshold={settings.contextThreshold} setContextThreshold={(v) => updateSetting('contextThreshold', v)} autoCompress={settings.autoCompress} setAutoCompress={(v) => updateSetting('autoCompress', v)} />
+      case 'data':
+        return <DataSection key="data" backupReminder={settings.backupReminder} setBackupReminder={(v) => updateSetting('backupReminder', v)} showExportModal={showExportModal} setShowExportModal={setShowExportModal} showImportModal={showImportModal} setShowImportModal={setShowImportModal} showDeleteConfirm={showDeleteConfirm} setShowDeleteConfirm={setShowDeleteConfirm} exportPassphrase={exportPassphrase} setExportPassphrase={setExportPassphrase} exportConfirmPassphrase={exportConfirmPassphrase} setExportConfirmPassphrase={setExportConfirmPassphrase} importPassphrase={importPassphrase} setImportPassphrase={setImportPassphrase} storageUsage={storageUsage} conversations={conversations} />
+      case 'appearance':
+        return <AppearanceSection key="appearance" theme={settings.theme} setTheme={(v) => updateSetting('theme', v)} fontSize={settings.fontSize} setFontSize={(v) => updateSetting('fontSize', v)} />
+      case 'about':
+        return <AboutSection key="about" />
+      default:
+        return null
+    }
+  }
+
+  if (isNarrow) {
+    return (
+      <>
+        <MobileSettings navigate={navigate} sectionForId={sectionForId} />
+        {showTour && <TourTooltip steps={SETTINGS_TOUR_STEPS} onDone={handleTourDone} />}
+      </>
+    )
   }
 
   return (
@@ -242,13 +283,7 @@ export default function SettingsView() {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto px-10 py-8">
         <AnimatePresence mode="wait">
-          {activeSection === 'api' && <ApiSection key="api" apiKey={apiKey} setApiKey={(v) => { setApiKey(v); setKeyStatus(null) }} keyStatus={keyStatus} keyError={keyError} validateKey={validateKey} validateCooldown={validateCooldown} storageMode={settings.storageMode} setStorageMode={(v) => updateSetting('storageMode', v)} shimmerPhase={shimmerPhase} />}
-          {activeSection === 'model' && <ModelSection key="model" selectedModel={settings.defaultModel} setSelectedModel={(v) => updateSetting('defaultModel', v)} />}
-          {activeSection === 'usage' && <UsageSection key="usage" budgetAlert={settings.budgetAlert} setBudgetAlert={(v) => updateSetting('budgetAlert', v)} budgetEnabled={settings.budgetEnabled} setBudgetEnabled={(v) => updateSetting('budgetEnabled', v)} spendingLimitDismissed={settings.spendingLimitDismissed} setSpendingLimitDismissed={(v) => updateSetting('spendingLimitDismissed', v)} />}
-          {activeSection === 'context' && <ContextSection key="context" summaryDepth={settings.summaryDepth} setSummaryDepth={(v) => updateSetting('summaryDepth', v)} contextThreshold={settings.contextThreshold} setContextThreshold={(v) => updateSetting('contextThreshold', v)} autoCompress={settings.autoCompress} setAutoCompress={(v) => updateSetting('autoCompress', v)} />}
-          {activeSection === 'data' && <DataSection key="data" backupReminder={settings.backupReminder} setBackupReminder={(v) => updateSetting('backupReminder', v)} showExportModal={showExportModal} setShowExportModal={setShowExportModal} showImportModal={showImportModal} setShowImportModal={setShowImportModal} showDeleteConfirm={showDeleteConfirm} setShowDeleteConfirm={setShowDeleteConfirm} exportPassphrase={exportPassphrase} setExportPassphrase={setExportPassphrase} exportConfirmPassphrase={exportConfirmPassphrase} setExportConfirmPassphrase={setExportConfirmPassphrase} importPassphrase={importPassphrase} setImportPassphrase={setImportPassphrase} storageUsage={storageUsage} conversations={conversations} />}
-          {activeSection === 'appearance' && <AppearanceSection key="appearance" theme={settings.theme} setTheme={(v) => updateSetting('theme', v)} fontSize={settings.fontSize} setFontSize={(v) => updateSetting('fontSize', v)} />}
-          {activeSection === 'about' && <AboutSection key="about" />}
+          {sectionForId(activeSection)}
         </AnimatePresence>
       </div>
 
@@ -258,9 +293,103 @@ export default function SettingsView() {
   )
 }
 
+// ─── Mobile Settings (PR-18c) ────────────────────────────
+//
+// Chevron-expandable cards pattern, mirrored from the
+// "Menu for mobile settings.png" mockup. Multi-open accordion: each
+// section toggles independently; the first section (API) is expanded on
+// first paint so the most important config is one tap away. Section
+// content reuses the same per-section components the desktop renders,
+// so semantics, modals, and validation flows are identical across
+// viewports. The h2 inside each SettingsSection auto-hides on narrow
+// (see SettingsSection above) so the row header isn't duplicated.
+
+function MobileSettings({ navigate, sectionForId }) {
+  const [expanded, setExpanded] = useState(() => new Set([NAV_ITEMS[0].id]))
+  const reduceMotion = useReducedMotion()
+
+  const toggle = (id) => {
+    setExpanded(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  return (
+    <div className="mobile-settings-screen font-sans bg-white text-[var(--p-text-primary)]">
+      {/* Decorative handle — visual only, no gesture semantics. */}
+      <div className="mobile-settings-handle" aria-hidden="true" />
+      <div className="mobile-settings-header">
+        <IconButton icon={ArrowLeft} onClick={() => navigate('/')} title="Back" />
+        <h1 className="text-lg font-medium text-[var(--p-text-primary)] leading-tight">Settings</h1>
+      </div>
+      <div className="mobile-settings-list">
+        {NAV_ITEMS.map((item) => (
+          <MobileSettingsRow
+            key={item.id}
+            item={item}
+            expanded={expanded.has(item.id)}
+            onToggle={() => toggle(item.id)}
+            reduceMotion={reduceMotion}
+          >
+            {sectionForId(item.id)}
+          </MobileSettingsRow>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function MobileSettingsRow({ item, expanded, onToggle, reduceMotion, children }) {
+  const Icon = item.icon
+  const heightTransition = reduceMotion ? { duration: 0 } : { duration: 0.25, ease: 'easeInOut' }
+  const rotateTransition = reduceMotion ? { duration: 0 } : { duration: 0.2 }
+  return (
+    <div className="mobile-settings-section">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={expanded}
+        className="mobile-settings-row"
+        {...(item.tourTarget ? { 'data-tour': item.tourTarget } : {})}
+      >
+        <Icon className="w-4 h-4 flex-shrink-0 text-[var(--p-text-secondary)]" />
+        <span className="flex-1 text-left text-sm font-medium text-[var(--p-text-primary)]">{item.label}</span>
+        <motion.span
+          animate={{ rotate: expanded ? 90 : 0 }}
+          transition={rotateTransition}
+          className="inline-flex text-[var(--p-text-secondary)]"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </motion.span>
+      </button>
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={heightTransition}
+            className="mobile-settings-panel"
+          >
+            <div className="mobile-settings-panel-inner">
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
 // ─── Section Wrapper ─────────────────────────────────────
 
 function SettingsSection({ title, subtitle, children }) {
+  // PR-18c: title duplicates the mobile chevron-row label, so hide it
+  // on narrow. The subtitle stays as in-context copy above the cards.
+  const isNarrow = useIsNarrow(768)
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -269,7 +398,7 @@ function SettingsSection({ title, subtitle, children }) {
       transition={SPRING_SMOOTH}
     >
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="mb-6">
-        <h2 className="text-lg font-medium text-[var(--p-text-primary)]">{title}</h2>
+        {!isNarrow && <h2 className="text-lg font-medium text-[var(--p-text-primary)]">{title}</h2>}
         <p className="text-sm text-[var(--p-text-secondary)] mt-0.5">{subtitle}</p>
       </motion.div>
       <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-4">

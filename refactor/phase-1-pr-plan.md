@@ -924,6 +924,39 @@
 
 **Risk:** Medium. The InputArea refactor changes a high-traffic surface. The PlusMenu function-vs-component refactor was a forced lint fix (the rule `react-hooks/static-components` activated at some point post-PR-17; baseline cleared at 164 only after the refactor). The mic↔send swap state machine has four branches (streaming/has-text/right-primary/empty) — verification on real devices is the gate. The disabled-state path is dead-code today; PR-18e is the moment it goes live, so PR-18e MUST re-verify the tooltip rendering manually.
 
+### PR-18c — Mobile Settings chevron-expandable cards
+
+**Goal:** Apply the chevron-expandable cards pattern from the "Menu for mobile settings.png" mockup to `/settings` below 768px. Multi-open accordion: each section row toggles independently; the first section (API Configuration) is expanded on first paint so the most important config is one tap away. Section content is unchanged — the seven section components the desktop already renders are reused verbatim inside the accordion panels, so semantics, validation flows, and modals are identical across viewports. Desktop Settings (≥768px) is untouched per CLAUDE.md (the desktop redesign is firmly out of Phase 1).
+
+**Scope:**
+- [src/views/SettingsView.jsx](../src/views/SettingsView.jsx): import `useIsNarrow` + `useReducedMotion` + `ChevronRight`. Add `useIsNarrow(768)` to the top of `SettingsView`. Extract a `sectionForId(id)` closure that returns the right `<ApiSection / ModelSection / ... />` for a given nav id with all its props wired — both desktop's `AnimatePresence mode="wait"` and the mobile accordion call this same function so the section components don't fork. Add `MobileSettings` (named function) — owns the multi-open `expanded: Set<sectionId>` state initialized to `new Set([NAV_ITEMS[0].id])`, the top bar (back arrow + "Settings" label), the decorative grey handle, and a vertical list of `MobileSettingsRow` per nav item. Add `MobileSettingsRow` — chevron row (icon + label + animated chevron) + `AnimatePresence` height-auto accordion panel. `useReducedMotion()` gates both the chevron rotation and the panel expand/collapse. `data-tour` attributes ride along from `NAV_ITEMS` onto the mobile rows so the existing first-visit tour works in either viewport mode.
+- [src/views/SettingsView.jsx](../src/views/SettingsView.jsx): also modify `SettingsSection` to call `useIsNarrow(768)` internally and hide the `<h2>` title on narrow (the chevron row already shows the section label, so rendering it again inside the panel would be duplication). The subtitle stays as in-context copy above the cards.
+- [src/index.css](../src/index.css): new `.mobile-settings-screen` wrapper + `.mobile-settings-handle` decorative pill + `.mobile-settings-header` flex row + `.mobile-settings-list` flex column + `.mobile-settings-section` card border + `.mobile-settings-row` 56px-min-height touch target with focus-visible outline + `.mobile-settings-panel` / `.mobile-settings-panel-inner` accordion containers. All classes only render via the `MobileSettings` JSX branch; desktop is untouched.
+
+**Locked design decisions:**
+- **D1 multi-open accordion** — user closes via the chevron when they want to. Trade-off: more vertical scroll when several are open; gain: can read two adjacent sections without re-tapping.
+- **D2 first-section initial expansion** — `NAV_ITEMS[0]` is API today, matches the desktop default `useState('api')`. If the nav order ever reshuffles, mobile follows.
+- **D3 hide title inside the expanded panel** — keep subtitle; section row label IS the title.
+- **D4 tour anchors stay on chevron rows** — tooltips point at the collapsed row; the user expands as discovery, no auto-expand.
+- **D5 decorative handle** — small grey pill at top-center, visual only, no gesture binding.
+- **Shimmer + connection pill: skip on mobile.** Today validation happens during the desktop /build wizard (mobile users arrive with a key already saved). A TODO comment in `validateKey` flags revisiting when Phase 2 multi-provider config (audit §3.20) brings validation surfaces into mobile — that's when the sweep + Connected dot would want to fire on the mobile header too.
+
+**Out of scope (deferred):**
+- Desktop Settings redesign (CLAUDE.md: stays as V1 layout per the original audit decision).
+- Tour auto-expand behavior (D4 picked manual expansion).
+- Settings content reorganization — pattern transfer only, the seven sections + their cards stay as-is.
+- Shimmer / connection pill on mobile (see TODO in `validateKey`).
+
+**Dependencies:** PR-15 useIsNarrow hook, PR-16 narrow-branch precedent. PR-18a / PR-18b did not touch SettingsView.
+
+**Exit criteria:**
+- All criteria in `phase-1-testing.md` PR-18c section pass.
+- `npm run lint` returns 164 problems (162 errors + 2 warnings) — same as PR-18b post-merge baseline. No new errors.
+- `npm run build` clean.
+- Symbol-grep of `dist/assets/index-*.js` confirms `MobileSettings` (×1+), `MobileSettingsRow` (×1+), `mobile-settings-handle` (in JS + CSS), `mobile-settings-row` (in JS + CSS) all ship. Desktop-only strings (`shimmer-sidebar-border`, the left-nav slide-in) remain present — desktop UI is unchanged.
+
+**Risk:** Low. Reuses the seven existing section components verbatim — no new validation or modal logic, no new state semantics. The accordion height-auto animation pattern is already used elsewhere in this file (UsageSection's budget alert). The data-tour attr transfer to the mobile row uses the same string IDs (`settings-api`, `settings-context`, `settings-data`) so the TourTooltip targets resolve regardless of viewport.
+
 ---
 
 ## Wave summary
@@ -942,8 +975,9 @@
 | D | PR-17 | dnd-kit migration for homepage section reorder — touch + keyboard reorder + screen-reader announcements |
 | D | PR-18a | Mobile homepage polish — Chats toolbar / Library search / Backup modal copy + button layout + touch haptic on section drag-start |
 | D | PR-18b | Mobile input redesign — card layout via useIsNarrow, mic↔send swap, mask-image fade on messages, `inputActions` contribution infrastructure mirroring messageActions |
+| D | PR-18c | Mobile Settings — chevron-expandable cards pattern at <768px, multi-open accordion, decorative handle, section-title hide via SettingsSection useIsNarrow, shimmer/connection-pill desktop-only |
 
-**Total: 30 PRs** including PR-0.
+**Total: 31 PRs** including PR-0.
 
 ## Pause points
 
