@@ -21,7 +21,12 @@ export default function MessageList({
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-y-auto p-6 space-y-4"
+      // PR-18b: `messages-fade-mask` is inert above 768px; on mobile a
+      // CSS `mask-image: linear-gradient(...)` in index.css fades the
+      // bottom ~64px of the scroll container into transparency so
+      // message content reads as flowing into the input below
+      // (matches the Swift V1 visual).
+      className="flex-1 overflow-y-auto p-6 space-y-4 messages-fade-mask"
       onMouseDown={onContainerMouseDown}
       style={{ scrollbarWidth: 'thin', scrollbarColor: '#E9E9E7 transparent' }}
     >

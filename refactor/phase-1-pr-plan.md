@@ -893,6 +893,37 @@
 
 **Risk:** Low. Each item is a small isolated adjustment. The haptic addition is gated on `pointerType === 'touch'` so it can't fire on unintended platforms. The H1 change has the most blast radius (a structural toggle-position swap based on viewport) but lives behind the same `useIsNarrow` hook that PR-15/PR-16 already established.
 
+### PR-18b — Mobile input redesign + inputActions contribution infrastructure
+
+**Goal:** Redesign the chat input for mobile to match the Swift V1 pattern (a card with `+` on the left and a button on the right that swaps between mic when text is empty and Send when text is present), with message content fading into transparency as it approaches the input. Alongside the visual redesign, introduce a new manifest contribution type — `inputActions` — that mirrors the existing `messageActions` aggregation pattern in RoomShell. Sibling components in a room declare what they contribute to the input's `+` menu (and to the right-side primary slot via a `primary: 'right'` flag); `input@1.0` reads from `hostAPI.getInputActions()` at render time.
+
+**Scope:**
+- [src/components/RoomShell.jsx](../src/components/RoomShell.jsx): mirror the existing messageActions aggregation block at lines 186-196 to collect `inputActions` from every mounted component. Stamp each contribution with `componentId` + `contributedBy`. After the resolve loop, publish via `hostAPI._setInputActions(list)`. ~20 lines of additions, verbatim shape match.
+- [src/lib/hostAPI.js](../src/lib/hostAPI.js): add private `inputActions` slot + `getInputActions()` reader + `_setInputActions(list)` writer mirroring the messageActions pair. Extend the dev-mode `KNOWN_EVENTS` check to allow `input-action:*` prefix events (the dynamic event names for invoked contributions) without warning.
+- [src/catalog/entries/voice-input.jsx](../src/catalog/entries/voice-input.jsx): contributes `{ id: 'voice-toggle', label: 'Voice input', iconName: 'Mic', primary: 'right' }` — the first input-action consumer. Convention introduced by PR-18b: contributions with `primary: 'right'` render as the right-side button (mic↔send slot); contributions without `primary` go in the `+` overflow.
+- [src/catalog/entries/voice-input-render.jsx](../src/catalog/entries/voice-input-render.jsx): subscribe to `input-action:voice-toggle` and call `toggle()` (start/stop SpeechRecognition). On narrow viewports (<768px) return `null` so voice-input's own button doesn't duplicate the one rendered by `input@1.0` in its mobile card. Desktop slot rendering is unchanged.
+- [src/components/core/InputArea.jsx](../src/components/core/InputArea.jsx): refactor PlusMenu from an inner `const PlusMenu = () => (...)` to `function renderPlusMenu()` returning JSX (avoids the `react-hooks/static-components` lint rule's component-during-render flag). PlusMenu now reads `overflowActions` from props and renders contribution items via an icon-name lookup (`ICON_BY_NAME = { Mic, Globe, Paperclip }`); the hardcoded Web Search / Calculate / Create Chart `TOOL_META` stubs are removed. Right-side button gains a fourth state — when text is empty AND not streaming AND a `rightPrimaryAction` exists, render that action's icon (the mic for voice-toggle). Tap publishes `input-action:${id}` via `onInvokeAction`. V2 disabled-state hook for the `+` button is in place, gated on `overflowActions.length === 0 && intrinsicMenuItemCount === 0`; with intrinsic file-upload always present in PR-18b the gate doesn't fire (Rollup dead-code-eliminates the disabled branch), but the infrastructure activates in PR-18e when file-upload moves out to `file-attach@1.0`.
+- [src/catalog/entries/input-render.jsx](../src/catalog/entries/input-render.jsx): import `useIsNarrow(768)` and force `cardLayout` on for narrow viewports regardless of config. Memoize the split of `hostAPI.getInputActions()` into `rightPrimaryAction` + `overflowActions`. New `handleInvokeAction(id, payload)` callback publishes `input-action:${id}` on the bus. Drop the old `availableTools` / `activeTools` / `onToggleTool` props (replaced by the contribution model).
+- [src/catalog/entries/input-preview.jsx](../src/catalog/entries/input-preview.jsx): update the preview's InputArea props to match the new shape (`rightPrimaryAction={null}`, `overflowActions={[]}`, `onInvokeAction={() => {}}`).
+- [src/components/core/MessageList.jsx](../src/components/core/MessageList.jsx): add `messages-fade-mask` class to the scroll container. Inert above 768px; activates the mask-image rule below.
+- [src/index.css](../src/index.css): new `@media (max-width: 768px) .messages-fade-mask { mask-image: linear-gradient(to bottom, black 0, black calc(100% - 64px), transparent 100%) }` rule with `-webkit-mask-image` fallback for Safari.
+
+**Out of scope (deferred):**
+- `web-search@1.0` catalog component (PR-18d) — will contribute an overflow `inputAction` and own the Anthropic web search tool wiring.
+- `file-attach@1.0` catalog component (PR-18e) — will replace the intrinsic file-upload entry. When it ships, `intrinsicMenuItemCount` drops to 0 and the V2 `+` disabled-state activates for rooms without contributors.
+- Mobile Settings redesign — see the separate PR-18c entry below (when that ships).
+- Mic↔send swap on the desktop inline layout: the user's locked decision A1 was mobile-specific. Desktop continues to render Send always.
+
+**Dependencies:** PR-17 (no direct dep; PR-18a's haptic is unaffected). PR-10a.5 input-render, PR-10a.8 voice-input split, PR-15 useIsNarrow hook.
+
+**Exit criteria:**
+- All criteria in `phase-1-testing.md` PR-18b section pass.
+- `npm run lint` returns 164 problems (162 errors + 2 warnings) — same as PR-17/PR-18a baseline. No new errors.
+- `npm run build` clean.
+- Symbol-grep of `dist/assets/index-*.js` confirms `inputActions` (×2), `getInputActions` (×1), `_setInputActions` (×2), `input-action:` (×2), `voice-toggle` (×1), and `messages-fade-mask` (in JS + CSS) all ship. `Create chart` (one of the removed stub tool labels) returns 0. `Web search` returns 1 — but unrelated to the removed PlusMenu stub: it's the Anthropic provider's own web_search tool description in the provider registry (orthogonal to the input UI).
+
+**Risk:** Medium. The InputArea refactor changes a high-traffic surface. The PlusMenu function-vs-component refactor was a forced lint fix (the rule `react-hooks/static-components` activated at some point post-PR-17; baseline cleared at 164 only after the refactor). The mic↔send swap state machine has four branches (streaming/has-text/right-primary/empty) — verification on real devices is the gate. The disabled-state path is dead-code today; PR-18e is the moment it goes live, so PR-18e MUST re-verify the tooltip rendering manually.
+
 ---
 
 ## Wave summary
@@ -910,8 +941,9 @@
 | D | PR-16 | Multi-rail room layouts collapse below 768px — NarrowChrome + NarrowDrawer + NarrowSheet primitives, narrow branches in three-panel / canvas-centric / document-centric |
 | D | PR-17 | dnd-kit migration for homepage section reorder — touch + keyboard reorder + screen-reader announcements |
 | D | PR-18a | Mobile homepage polish — Chats toolbar / Library search / Backup modal copy + button layout + touch haptic on section drag-start |
+| D | PR-18b | Mobile input redesign — card layout via useIsNarrow, mic↔send swap, mask-image fade on messages, `inputActions` contribution infrastructure mirroring messageActions |
 
-**Total: 29 PRs** including PR-0.
+**Total: 30 PRs** including PR-0.
 
 ## Pause points
 

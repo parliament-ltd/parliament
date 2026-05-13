@@ -1759,6 +1759,18 @@
   .section { transition: none !important; }
 }
 
+/* PR-18b — Mobile messages fade.
+   Applied to MessageList's scroll container on viewports <768px so
+   message content fades into transparency over the bottom ~64px,
+   reading as a continuous flow into the input card below (matches
+   Swift V1). Inert on desktop. */
+@media (max-width: 768px) {
+  .messages-fade-mask {
+    -webkit-mask-image: linear-gradient(to bottom, black 0, black calc(100% - 64px), transparent 100%);
+            mask-image: linear-gradient(to bottom, black 0, black calc(100% - 64px), transparent 100%);
+  }
+}
+
 /* ── PR-15: Mobile responsive overrides ─────────────────────
    Breakpoints align with the existing library-grid steps at
    640/480/420 so the layout shifts feel coordinated; 600/520

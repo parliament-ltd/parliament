@@ -37,7 +37,7 @@
 // happy and so input-preview.jsx can stay focused on the catalog
 // debug-route render.
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import InputArea from '../../components/core/InputArea'
 import { useChat } from '../../stores/ChatContext'
@@ -47,6 +47,7 @@ import { useCollabMode } from '../../stores/CollabModeContext'
 import { getProvider } from '../../providers'
 import { loadApiKey } from '../../lib/crypto'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
+import { useIsNarrow } from '../../lib/useViewportWidth'
 
 const SEND_DEBOUNCE_MS = 500
 
@@ -62,8 +63,45 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
   const [lastSendAt, setLastSendAt] = useState(0)
 
   const subscribeToVoice = config.subscribeToVoice !== false // default true
-  const cardLayout = !!config.cardLayout
+  // PR-18b: card layout is forced on narrow viewports regardless of
+  // the config value, so all room layouts that mount input@1.0
+  // inherit the mobile design when the user is on a phone. Above
+  // 768px the config-driven default (off → inline render) wins.
+  const isNarrow = useIsNarrow(768)
+  const cardLayout = !!config.cardLayout || isNarrow
   const placeholder = config.placeholder ?? 'Ask a question...'
+
+  // PR-18b: read sibling inputActions contributions from the room's
+  // hostAPI. RoomShell aggregates these from every mounted component's
+  // manifest (see src/components/RoomShell.jsx). Split into:
+  //   - rightPrimaryAction: first contribution with `primary === 'right'`
+  //     (renders as the right button slot — mic↔send swap consumer)
+  //   - overflowActions: contributions without a `primary` flag
+  //     (render in the `+` overflow menu)
+  // Recomputes when the mode (and therefore the list) changes — hostAPI
+  // is keyed off mode.id in RoomShell so the identity is stable for
+  // the duration of a room view.
+  const { rightPrimaryAction, overflowActions } = useMemo(() => {
+    const list = hostAPI?.getInputActions?.() || []
+    let primary = null
+    const overflow = []
+    for (const action of list) {
+      if (action.primary === 'right' && primary === null) {
+        primary = action
+      } else if (!action.primary) {
+        overflow.push(action)
+      }
+    }
+    return { rightPrimaryAction: primary, overflowActions: overflow }
+  }, [hostAPI])
+
+  // PR-18b: when InputArea invokes a contributed action, publish on the
+  // hostAPI bus so the contributing component (e.g. voice-input@1.0
+  // listening for `input-action:voice-toggle`) can react.
+  const handleInvokeAction = useCallback((actionId, payload) => {
+    if (!actionId) return
+    hostAPI?.publish?.(`input-action:${actionId}`, payload || {})
+  }, [hostAPI])
 
   // PR-5 bus subscription — append final voice transcripts to the value.
   useEffect(() => {
@@ -164,13 +202,9 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
         isOnline={isOnline}
         placeholder={placeholder}
         cardLayout={cardLayout}
-        // Tool toggles UI rendered via the +menu, but the active set is
-        // empty for now — wiring lands with the next slice. Passing an
-        // empty Set + empty list keeps the menu interactive without
-        // surfacing a click that does nothing.
-        availableTools={[]}
-        activeTools={new Set()}
-        onToggleTool={() => { /* no-op until tool wiring lands */ }}
+        rightPrimaryAction={rightPrimaryAction}
+        overflowActions={overflowActions}
+        onInvokeAction={handleInvokeAction}
       />
     </div>
   )
