@@ -842,13 +842,19 @@
   transition: opacity 0.22s ease, transform 0.22s ease;
 }
 .section.dragging { opacity: 0.5; }
-.section.drop-target {
-  box-shadow: 0 0 0 2px var(--p-gold-light);
-  background: rgba(196, 169, 77, 0.04);
+/* PR-17: DragOverlay clone — same .section + .section-head styles plus
+   a lifted shadow so the floating preview reads as "this is the one
+   you're holding." */
+.section-drag-preview {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  cursor: grabbing;
 }
-/* Drag handle wrapper: the visible 14x14 grabber, but hit area extends
-   to 24x24 for usability. cursor:grab on hover; cursor:grabbing while
-   actively dragging (browser default). */
+/* Drag handle wrapper. Now a real <button> (PR-17, for keyboard a11y
+   via dnd-kit's KeyboardSensor); base styling resets button chrome.
+   24x24 hit area on desktop; touch override lower in this file bumps
+   to 40x40. touch-action:none is required on iOS Safari — without it
+   the page scrolls instead of starting the drag. user-select:none
+   suppresses the long-press text callout. */
 .section-grabber-handle {
   width: 24px;
   height: 24px;
@@ -857,6 +863,12 @@
   justify-content: center;
   cursor: grab;
   margin-left: -4px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .section-grabber-handle:active { cursor: grabbing; }
 .section-head {
@@ -1731,15 +1743,20 @@
     font-size: 16px !important;
   }
 
-  /* PR-15: HTML5 drag-and-drop is broken on iOS Safari and unreliable
-     on Android Chrome, so the section grabber affordance shouldn't
-     claim space it can't deliver. Section reorder remains a desktop
-     feature; PR-17 may revisit with dnd-kit (delay: 250ms,
-     tolerance: 5px) to bring it back to touch properly. The grabber
-     was already hover-revealed (.section:hover .section-grabber
-     opacity: 1) so the visible footprint was zero on touch — but the
-     24x24 hit-area wrapper still claimed layout. */
-  .section-grabber-handle { display: none; }
+  /* PR-17: section reorder works on touch via dnd-kit
+     (TouchSensor delay: 250ms + tolerance: 5px). The grabber stays
+     visible at rest (no hover state on touch primary) and bumps to
+     a 40x40 finger-sized hit target. */
+  .section-grabber { opacity: 1; }
+  .section-grabber-handle { width: 40px; height: 40px; }
+}
+
+/* PR-17: respect reduced-motion preference for the sibling-shift
+   animation that dnd-kit drives via CSS transitions on .section.
+   The DragOverlay still tracks the pointer — that's responsive
+   feedback to input, not decorative animation. */
+@media (prefers-reduced-motion: reduce) {
+  .section { transition: none !important; }
 }
 
 /* ── PR-15: Mobile responsive overrides ─────────────────────

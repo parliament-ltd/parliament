@@ -6,10 +6,10 @@
 //
 // Per [phase-1-pr-plan.md](refactor/phase-1-pr-plan.md) PR-6, the seeded
 // homepage mode mounts four default components — blueprint, chats, library,
-// favorites — into this slot, in that order. PR-14 added drag-to-reorder:
-// dragging a section's grabber dispatches an HTML5 drag, dropping it on
-// another section reshuffles the list, and the new order persists back to
-// the homepage mode-file's `components[].order` values via saveMode().
+// favorites — into this slot, in that order. PR-14 added drag-to-reorder;
+// PR-17 swapped HTML5 D&D for dnd-kit so reorder works on touch and via
+// keyboard. The grabber is now a real <button> with announcements;
+// dragging it picks up the section, dropping commits the new order.
 //
 // On successful reorder, the layout dispatches a `homepage-mode-changed`
 // CustomEvent on window. HomepageView listens and re-fetches the mode so
@@ -23,8 +23,23 @@
 // onto the spec at seed time and the layout reads it back via
 // `mode.components` lookup.
 
-import { useState, useMemo } from 'react'
-import SectionCard from '../../components/SectionCard'
+import { useState, useMemo, useRef } from 'react'
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  TouchSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { restrictToVerticalAxis, restrictToParentElement } from '@dnd-kit/modifiers'
+import SectionCard, { Grabber } from '../../components/SectionCard'
 import { saveMode } from '../../lib/modes'
 import { getEntry as getComponentEntry } from '..'
 
@@ -57,6 +72,9 @@ function resolveSectionTitle(spec) {
   return 'Section'
 }
 
+// One inlined named-function render keeps react-refresh happy
+// (no extra top-level component-shaped declarations in this file).
+// Pattern mirrors src/catalog/layouts/single-column-with-sheet.jsx.
 export default {
   name: 'stacked-sections',
   version: '1.0',
@@ -66,11 +84,13 @@ export default {
     { id: 'section-slot', capacity: 'stack' },
   ],
 
-  render: StackedSectionsRender,
-}
-
-function StackedSectionsRender({ slotContents = {}, mode }) {
-  const sections = slotContents['section-slot'] || []
+  render: function StackedSectionsRender({ slotContents = {}, mode }) {
+  // Memoize sections so its identity is stable across renders that
+  // don't actually change the slot contents. Without this, every
+  // render produces a new `[]` (when empty) or a new array reference,
+  // which would cascade through the useMemo hooks below and the
+  // SortableContext items array.
+  const sections = useMemo(() => slotContents['section-slot'] || [], [slotContents])
 
   // Build spec lookup once per mode change. mode.components is the
   // canonical source for section metadata (title/meta) since slotContents
@@ -81,38 +101,73 @@ function StackedSectionsRender({ slotContents = {}, mode }) {
     return map
   }, [mode])
 
-  // Drag state — which section index is being dragged, and which is
-  // currently the visual drop target. Local to this component; persists
-  // back to the mode file only on `drop`.
-  const [draggingId, setDraggingId] = useState(null)
-  const [dropTargetId, setDropTargetId] = useState(null)
+  // SortableContext needs a stable identity array of string IDs. Re-memoize
+  // when the rendered section list changes order or membership.
+  const sectionIds = useMemo(() => sections.map(n => n.key), [sections])
 
-  const onDragStart = (sectionId) => (e) => {
-    setDraggingId(sectionId)
-    // Required for Firefox to allow the drag to start.
-    e.dataTransfer.effectAllowed = 'move'
-    e.dataTransfer.setData('text/plain', sectionId)
+  // Drives the DragOverlay clone: non-null while a section is being dragged.
+  const [activeId, setActiveId] = useState(null)
+
+  // Guards against the race window where HomepageView's async refetch of
+  // `mode` hasn't completed before the user starts a second drag. Without
+  // this, drag-2's onDragEnd reads a stale `mode` prop and the splice math
+  // is wrong, silently clobbering drag-1's reorder.
+  const reorderingRef = useRef(false)
+
+  // PointerSensor distance:4 matches the editor's convention
+  // (src/views/EditorView.jsx:148) — small enough to feel responsive,
+  // big enough that an accidental drift on a click doesn't pick up.
+  // TouchSensor delay:250 + tolerance:5 lets the user scroll the page
+  // with a quick swipe over a section, but a deliberate press-and-hold
+  // picks up. KeyboardSensor with sortableKeyboardCoordinates is what
+  // makes arrow keys actually move list items in a sortable context.
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+
+  // Screen-reader announcements. dnd-kit auto-mounts the visually-hidden
+  // aria-live region — these strings get read on the corresponding events.
+  const announcements = useMemo(() => ({
+    onDragStart({ active }) {
+      const idx = sections.findIndex(n => n.key === active.id)
+      const title = resolveSectionTitle(specs[active.id])
+      return `Picked up ${title} section. Position ${idx + 1} of ${sections.length}.`
+    },
+    onDragOver({ active, over }) {
+      const title = resolveSectionTitle(specs[active.id])
+      if (!over) return `${title} section is no longer over a drop target.`
+      const idx = sections.findIndex(n => n.key === over.id)
+      return `${title} section moved to position ${idx + 1} of ${sections.length}.`
+    },
+    onDragEnd({ active, over }) {
+      const title = resolveSectionTitle(specs[active.id])
+      if (!over) return `${title} section dropped.`
+      const idx = sections.findIndex(n => n.key === over.id)
+      return `${title} section dropped at position ${idx + 1} of ${sections.length}.`
+    },
+    onDragCancel({ active }) {
+      const title = resolveSectionTitle(specs[active.id])
+      return `Reordering cancelled. ${title} section returned to its original position.`
+    },
+  }), [sections, specs])
+
+  const handleDragStart = ({ active }) => setActiveId(active.id)
+
+  const handleDragEnd = async ({ active, over }) => {
+    setActiveId(null)
+    if (!over || active.id === over.id) return
+    if (reorderingRef.current) return
+    reorderingRef.current = true
+    try {
+      await persistReorder(mode, active.id, over.id)
+    } finally {
+      reorderingRef.current = false
+    }
   }
 
-  const onDragOver = (sectionId) => (e) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
-    if (sectionId !== dropTargetId) setDropTargetId(sectionId)
-  }
-
-  const onDragEnd = () => {
-    setDraggingId(null)
-    setDropTargetId(null)
-  }
-
-  const onDrop = (targetId) => async (e) => {
-    e.preventDefault()
-    const sourceId = draggingId || e.dataTransfer.getData('text/plain')
-    setDraggingId(null)
-    setDropTargetId(null)
-    if (!sourceId || sourceId === targetId) return
-    await persistReorder(mode, sourceId, targetId)
-  }
+  const handleDragCancel = () => setActiveId(null)
 
   if (sections.length === 0) {
     return (
@@ -125,30 +180,63 @@ function StackedSectionsRender({ slotContents = {}, mode }) {
   }
 
   return (
-    <div className="stacked-sections max-w-5xl mx-auto px-6 py-8">
-      {sections.map((node, i) => {
-        const spec = specs[node.key] || {}
-        const section = spec.config?.section || {}
-        const sectionId = node.key
-        return (
-          <SectionCard
-            key={sectionId || i}
-            title={resolveSectionTitle(spec)}
-            meta={section.meta}
-            draggable
-            isDragging={draggingId === sectionId}
-            isDropTarget={dropTargetId === sectionId && draggingId !== sectionId}
-            onSectionDragStart={onDragStart(sectionId)}
-            onSectionDragOver={onDragOver(sectionId)}
-            onSectionDragEnd={onDragEnd}
-            onSectionDrop={onDrop(sectionId)}
-          >
-            {node}
-          </SectionCard>
-        )
-      })}
-    </div>
+    <DndContext
+      sensors={sensors}
+      modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
+      accessibility={{ announcements }}
+    >
+      <SortableContext items={sectionIds} strategy={verticalListSortingStrategy}>
+        <div className="stacked-sections max-w-5xl mx-auto px-6 py-8">
+          {sections.map((node, i) => {
+            const spec = specs[node.key] || {}
+            const section = spec.config?.section || {}
+            const sectionId = node.key
+            return (
+              <SectionCard
+                key={sectionId || i}
+                sortableId={sectionId}
+                sortable
+                title={resolveSectionTitle(spec)}
+                meta={section.meta}
+              >
+                {node}
+              </SectionCard>
+            )
+          })}
+        </div>
+      </SortableContext>
+      <DragOverlay>
+        {activeId ? (
+          <SectionDragPreview
+            title={resolveSectionTitle(specs[activeId])}
+            meta={specs[activeId]?.config?.section?.meta}
+          />
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   )
+
+  // Lifted clone that follows the pointer/finger while a drag is in flight.
+  // Renders a simplified section header — no body, no chevron, just the
+  // grabber dots + title + meta with a drop shadow. Reuses every existing
+  // `.section` and `.section-head` style; the `section-drag-preview` class
+  // adds the shadow + grabbing cursor. Defined inline as a named function
+  // so the file has no extra top-level component-shaped declarations.
+  function SectionDragPreview({ title, meta }) {
+    return (
+      <div className="section section-drag-preview">
+        <header className="section-head">
+          <div className="section-grabber-handle"><Grabber /></div>
+          <span className="section-title">{title}</span>
+          {meta && <span className="section-meta">{meta}</span>}
+        </header>
+      </div>
+    )
+  }
+  },
 }
 
 /**
@@ -161,6 +249,12 @@ function StackedSectionsRender({ slotContents = {}, mode }) {
  * the section-slot subset is reordered. (Phase 1 only has section-slot
  * children on the homepage, but stays defensive for future homepage layouts
  * that mix slot capacities.)
+ *
+ * On saveMode failure (validation, IDB error), logs to console and still
+ * dispatches the change event so HomepageView re-fetches the unchanged
+ * mode and the UI snaps back to its pre-drag order. Without this, a failed
+ * save would leave the dnd-kit sibling transforms in their post-drop
+ * positions while IndexedDB still held the old order.
  */
 async function persistReorder(mode, sourceId, targetId) {
   if (!mode || !Array.isArray(mode.components)) return
@@ -183,10 +277,14 @@ async function persistReorder(mode, sourceId, targetId) {
   // so non-section-slot components stay sorted correctly inside their slot.
   const updatedSectionSlot = reordered.map((c, i) => ({ ...c, order: i }))
 
-  await saveMode({
-    ...mode,
-    components: [...updatedSectionSlot, ...otherComponents],
-  })
+  try {
+    await saveMode({
+      ...mode,
+      components: [...updatedSectionSlot, ...otherComponents],
+    })
+  } catch (err) {
+    console.error('[stacked-sections] saveMode failed during reorder:', err)
+  }
 
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('homepage-mode-changed'))

@@ -1,4 +1,4 @@
-// SectionCard — homepage section chrome (PR-14 rewrite).
+// SectionCard — homepage section chrome (PR-14 rewrite, PR-17 dnd-kit migration).
 //
 // Per refactor/parliament_homepage_v2 (2).html `.section` block:
 //   - 14px section radius, 0.5px border, white surface
@@ -6,16 +6,15 @@
 //     chevron toggle that rotates -90deg when collapsed
 //   - Body collapses with a max-height + opacity transition, ~0.28s
 //
-// Drag-reorder lives here as native HTML5 D&D — the parent
-// (stacked-sections@1.0) owns the drag state and persists the new order
-// to the homepage mode file. SectionCard only forwards the events.
-//
-// The previous implementation lived at
-// src/catalog/layouts/section-card.jsx and shipped a plain ▾/▸ glyph
-// header with no animation. PR-14 replaces it; the old file re-exports
-// from here for any straggling imports, then is deleted in the same PR.
+// Drag-reorder uses dnd-kit's useSortable hook directly inside this
+// component (the editor's LayoutCard / ComponentCard / SchemeCard precedent).
+// The parent layout (stacked-sections@1.0) wraps these in a SortableContext
+// and owns the persistence logic. The grabber is a real <button> so the
+// keyboard sensor has a focusable activator and screen readers have a name.
 
 import { useState, useEffect, useRef } from 'react'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 const Chevron = ({ collapsed }) => (
   <svg
@@ -39,7 +38,7 @@ const Chevron = ({ collapsed }) => (
   </svg>
 )
 
-const Grabber = () => (
+export const Grabber = () => (
   <div className="section-grabber" title="Drag to reorder" aria-hidden="true">
     <div /><div /><div />
   </div>
@@ -49,14 +48,11 @@ export default function SectionCard({
   title,
   meta,
   defaultOpen = true,
-  // Drag-reorder props (all optional — section still works without them):
-  draggable = false,
-  isDragging = false,
-  isDropTarget = false,
-  onSectionDragStart,
-  onSectionDragOver,
-  onSectionDragEnd,
-  onSectionDrop,
+  // Drag-reorder via dnd-kit. Pass `sortable` + `sortableId` from the
+  // parent SortableContext to enable. Without them, the section renders
+  // without any drag behavior (useful for non-homepage consumers).
+  sortable = false,
+  sortableId,
   // Right-side header slot for section-level controls (e.g. Favorites' Edit button):
   headerActions,
   children,
@@ -64,6 +60,25 @@ export default function SectionCard({
   const [open, setOpen] = useState(defaultOpen)
   const bodyRef = useRef(null)
   const [bodyMaxHeight, setBodyMaxHeight] = useState(undefined)
+
+  // useSortable is always called (Rules of Hooks). When `sortable` is false
+  // or `sortableId` is absent, we ignore the outputs and skip the wiring.
+  // Destructure at the call site so the eslint react-hooks/refs rule
+  // sees plain local variables rather than property access through an
+  // object (which it mis-flags as ref access during render).
+  const {
+    setNodeRef,
+    setActivatorNodeRef,
+    attributes: sortableAttributes,
+    listeners: sortableListeners,
+    isDragging: sortableIsDragging,
+    transform,
+    transition,
+  } = useSortable({ id: sortableId ?? '__noop__', disabled: !sortable || !sortableId })
+  const isDragging = sortable && sortableIsDragging
+  const dragStyle = sortable
+    ? { transform: CSS.Transform.toString(transform), transition }
+    : undefined
 
   // Measure the body's natural height so we can transition between 0 and
   // the actual content height. Setting max-height to a fixed huge value
@@ -93,27 +108,23 @@ export default function SectionCard({
 
   return (
     <section
-      className={`section${collapsed ? ' collapsed' : ''}${isDragging ? ' dragging' : ''}${isDropTarget ? ' drop-target' : ''}`}
+      ref={sortable ? setNodeRef : undefined}
+      style={dragStyle}
+      className={`section${collapsed ? ' collapsed' : ''}${isDragging ? ' dragging' : ''}`}
       aria-expanded={open}
-      // Drop handlers ride on the whole section so the user can release
-      // anywhere over the target — not just its 50px header strip.
-      // Without this, dragging onto a tall section's body silently fails.
-      onDragOver={draggable ? onSectionDragOver : undefined}
-      onDrop={draggable ? onSectionDrop : undefined}
     >
       <header className="section-head">
-        {draggable && (
-          <div
+        {sortable && (
+          <button
+            type="button"
+            ref={setActivatorNodeRef}
             className="section-grabber-handle"
-            draggable
-            onDragStart={onSectionDragStart}
-            onDragEnd={onSectionDragEnd}
-            // The grabber's hit-target is the wrapper, not the inner
-            // dot grid — keeps the visible affordance tiny per spec
-            // while making the click area easy to grab.
+            aria-label={`Reorder ${title} section`}
+            {...sortableAttributes}
+            {...sortableListeners}
           >
             <Grabber />
-          </div>
+          </button>
         )}
 
         <button
