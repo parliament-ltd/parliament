@@ -3016,6 +3016,138 @@ No regressions on existing desktop or PR-17 behaviors.
 
 ---
 
+## PR-18b — Mobile input redesign + inputActions contribution infrastructure
+
+👀 User-visible | 🧱 Foundation
+
+**Surface:** `/chat/:id` input component (`input@1.0`) on viewports
+<768px. The chat-input card on phones gains a mic↔send swap, a `+`
+overflow that reads from sibling component contributions, and a
+mask-image fade on messages above the input. Plus a new manifest
+contribution type — `inputActions` — that mirrors `messageActions`
+and is the foundation for PR-18d (`web-search@1.0`) and PR-18e
+(`file-attach@1.0`).
+
+**Setup:**
+- Any room with `input@1.0` and `voice-input@1.0` mounted (the
+  default Pocket Chat template satisfies this).
+- Browser at <768px viewport (Chrome DevTools mobile emulation or
+  a real phone). Both iOS Safari and Android Chrome should work,
+  with the known iOS limitation that the Web Speech API requires
+  a user gesture and works in Safari 17+ only.
+
+**Steps — mic↔send swap on mobile:**
+1. Open `/chat/:id` at <768px. The input renders as a card with
+   `+` on the left and a mic icon on the right.
+2. Type one character. The mic icon transforms into a Send arrow
+   (gold filled).
+3. Clear the text. The Send arrow transforms back to a mic icon.
+4. Tap the mic. SpeechRecognition starts (voice-input@1.0
+   subscribed to `input-action:voice-toggle` via the new event).
+   Browser permission prompt may appear on first use.
+5. Speak; final transcripts append to the textarea via the existing
+   `voice-transcript` event. Mic transforms to Send (text now
+   present).
+6. Tap Send. Message sends.
+
+**Steps — `+` overflow menu reads contributions:**
+1. With Pocket Chat (default) mounted, tap the `+`. Menu opens with
+   "Upload file" as the only item (file-upload is intrinsic for
+   PR-18b; moves to `file-attach@1.0` in PR-18e). The hardcoded
+   Web Search / Calculate / Create Chart stubs from V1 are gone.
+2. Verify the bundled JS contains no `Create chart` string
+   (`grep -ohc "Create chart" dist/assets/index-*.js` returns 0).
+3. When PR-18d ships `web-search@1.0`, mount it in a room and
+   reload. Tap the `+`: a "Web search" item appears in the
+   overflow below "Upload file". (Not testable until PR-18d.)
+
+**Steps — `+` disabled state (deferred until PR-18e):**
+1. The V2 disabled-state code path is in place but currently
+   unreachable: `overflowIsEmpty` is gated on intrinsic count === 0,
+   and intrinsic file-upload always counts. Rollup dead-code-
+   eliminates the disabled branch in production.
+2. When PR-18e moves file-upload to `file-attach@1.0`, the gate
+   will activate. PR-18e MUST re-verify: mount a room without
+   any non-primary contributors; the `+` button renders disabled
+   (opacity 0.4, `cursor: not-allowed`); hovering shows the title
+   tooltip "Add components to enable more actions".
+
+**Steps — message fade on mobile:**
+1. Open `/chat/:id` at <768px with at least 5–10 messages in the
+   conversation (scroll to fill the viewport above the input).
+2. The bottom ~64px of visible message content fades into
+   transparency, creating a soft transition into the input card
+   below. The fade is positional — scrolling the message list
+   does not move the fade band; it stays at the bottom of the
+   visible area.
+3. Confirm on iOS Safari (uses `-webkit-mask-image`) and Chrome
+   Android (`mask-image`). Both prefixed and unprefixed
+   declarations ship in `dist/assets/index-*.css`.
+4. Above 768px: no fade. The `@media (max-width: 768px)` gate
+   in `index.css` keeps desktop unchanged.
+
+**Steps — voice-input render gating:**
+1. On mobile (<768px), voice-input@1.0's own button is NOT visible
+   anywhere. The mic affordance is exclusively the one rendered
+   by `input@1.0` in its card layout right slot.
+2. On desktop (≥768px), if voice-input@1.0 is mounted in a slot
+   that has UI presence (e.g., the standalone Pocket Chat layout
+   that puts it in `input-dock` next to `input@1.0`), its own
+   button is visible there — unchanged from PR-10a.8.
+
+**Steps — Desktop ≥768px regression:**
+1. Open `/chat/:id` at ≥768px. Input renders inline (the existing
+   desktop layout) by default — NOT as a card.
+2. Send via Enter / Send button works as before. No mic↔send swap
+   on desktop (the right-primary action slot is only honored in
+   card layout per Swift V1 spec). Desktop honors the existing
+   inline Send button behavior.
+3. The `+` button in the inline layout opens PlusMenu with
+   "Upload file" as the only item (same as mobile minus the
+   contributions if no overflow contributors are mounted).
+4. No mask fade on messages — desktop is unaffected.
+
+**Steps — inputActions infrastructure plumbing:**
+1. Open DevTools console on `/chat/:id` with any room. Type
+   `window.__roomShellHostAPI?.getInputActions?.()` — if exposed,
+   should return an array. (May not be exposed by default; this
+   is a smoke-test invocation.)
+2. Symbol-grep production bundle:
+   - `grep -ohc "inputActions" dist/assets/index-*.js` → ≥2
+   - `grep -ohc "getInputActions" dist/assets/index-*.js` → ≥1
+   - `grep -ohc "_setInputActions" dist/assets/index-*.js` → ≥2
+   - `grep -ohc "input-action:" dist/assets/index-*.js` → ≥2
+   - `grep -ohc "voice-toggle" dist/assets/index-*.js` → ≥1
+   - `grep -ohc "messages-fade-mask" dist/assets/index-*.{js,css}` → ≥1 each
+
+**Steps — Lint + build:**
+1. `npm run lint` → 164 problems (162 errors + 2 warnings). Same
+   as PR-17/PR-18a baseline. No new errors.
+2. `npm run build` → clean.
+
+**Expected:** Every step passes. Mobile input matches the Swift V1
+visual (card layout with `+` on left, mic↔send on right, message
+fade above). The `inputActions` contribution type is fully wired
+infrastructure ready for `web-search@1.0` (PR-18d) and
+`file-attach@1.0` (PR-18e) to consume. voice-input@1.0 demonstrates
+the contribution pattern end-to-end via the right-primary mic slot.
+Desktop behavior is unchanged.
+
+### What's known-broken-but-deferred
+
+- The V2 disabled-state for `+` button is dead-code today. PR-18e
+  flips the gate by moving file-upload out of `InputArea` to
+  `file-attach@1.0`. Manual verification of the disabled tooltip
+  is deferred to PR-18e's checklist.
+- `web-search@1.0` and `file-attach@1.0` catalog components are
+  separate PRs (18d/18e). PR-18b ships only the infrastructure.
+- Mobile Settings redesign is PR-18c (separate scoping pass needed
+  on the existing Settings content's grouping).
+- Mic↔send swap is mobile-only by user direction (locked decision
+  A1). Desktop continues to render Send always at rest.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

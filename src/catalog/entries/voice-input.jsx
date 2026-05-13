@@ -49,6 +49,23 @@ export default {
     },
   },
 
+  // PR-18b: contribute a right-primary input action so input@1.0 can
+  // render the mic icon inside its mobile card layout (matching the
+  // Swift V1 pattern). When the user taps it, input@1.0 publishes
+  // `input-action:voice-toggle` and this component's render subscribes
+  // and starts SpeechRecognition. Without this contribution, input@1.0
+  // shows a plain Send button at rest instead of the mic.
+  contributions: {
+    inputActions: [
+      {
+        id: 'voice-toggle',
+        label: 'Voice input',
+        iconName: 'Mic',
+        primary: 'right',
+      },
+    ],
+  },
+
   // Production render — tight mic button (PR-10a.8). Self-binds to
   // useVoiceInput + publishes on the room hostAPI bus. input@1.0
   // already subscribes and appends final transcripts to its value.

@@ -26,12 +26,13 @@
 // publishes regardless. Concrete edge cases (mic in a Quiet Room
 // with no input) surface in PR-10a.9 / PR-10b cleanup, not here.
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Mic, MicOff } from 'lucide-react'
 import { useVoiceInput } from '../../hooks/useVoiceInput'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
 import { SPRING_SNAPPY } from '../../lib/constants'
+import { useIsNarrow } from '../../lib/useViewportWidth'
 
 export default function VoiceInputRender({ config = {}, hostAPI } = {}) {
   const lang = config.lang ?? 'en-US'
@@ -52,6 +53,28 @@ export default function VoiceInputRender({ config = {}, hostAPI } = {}) {
   if (error && error !== lastError) setLastError(error)
 
   const toggle = () => (isListening ? stop() : start())
+
+  // PR-18b: subscribe to `input-action:voice-toggle` published by
+  // input@1.0 when the user taps its right-primary mic button on the
+  // mobile card layout. Mirrors the toggle behavior of the local
+  // button. Re-binds on isListening/start/stop changes so the handler
+  // always sees the current listening state.
+  useEffect(() => {
+    if (!hostAPI?.subscribe || !isSupported) return
+    const unsubscribe = hostAPI.subscribe('input-action:voice-toggle', toggle)
+    return unsubscribe
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hostAPI, isSupported, isListening])
+
+  // PR-18b: on narrow viewports (<768px) input@1.0 renders the mic
+  // button itself inside its card layout (driven by this component's
+  // `inputActions` contribution). Rendering our own button too would
+  // duplicate the affordance, so we go visually invisible while
+  // keeping the subscription above wired. Above 768px we render
+  // normally — desktop layouts that mount voice-input in a discrete
+  // slot still get the standalone button.
+  const isNarrow = useIsNarrow(768)
+  if (isNarrow) return null
 
   if (!isSupported) {
     // Don't take up dock real estate on browsers without the API —

@@ -40,9 +40,9 @@ export default function InputPreview({ config = {}, hostAPI } = {}) {
         onStop={() => {}}
         isStreaming={false}
         placeholder={config.placeholder ?? 'Ask a question...'}
-        availableTools={[]}
-        activeTools={new Set()}
-        onToggleTool={() => {}}
+        rightPrimaryAction={null}
+        overflowActions={[]}
+        onInvokeAction={() => {}}
         cardLayout={!!config.cardLayout}
       />
       <p className="text-xs text-[var(--p-text-muted)] mt-3">

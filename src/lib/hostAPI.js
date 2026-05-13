@@ -35,6 +35,16 @@ export const PHASE_1_EVENTS = Object.freeze({
 
 const KNOWN_EVENTS = new Set(Object.values(PHASE_1_EVENTS))
 
+// PR-18b: `input-action:${id}` events are published by input@1.0 when
+// the user invokes a contributed action. The id portion is dynamic
+// (one per inputAction contribution), so we recognize the namespace
+// rather than enumerating every concrete event name.
+const KNOWN_EVENT_PREFIXES = ['input-action:']
+function isKnownEvent(event) {
+  if (KNOWN_EVENTS.has(event)) return true
+  return KNOWN_EVENT_PREFIXES.some(p => event.startsWith(p))
+}
+
 /**
  * Create a fresh hostAPI instance. Each room gets its own.
  *
@@ -50,6 +60,8 @@ const KNOWN_EVENTS = new Set(Object.values(PHASE_1_EVENTS))
  *   subscribe:         (event: string, handler: (payload?: any) => void) => () => void,
  *   getMessageActions: () => Array<{ id, label, componentId?, contributedBy?, [string]: any }>,
  *   _setMessageActions:(list: Array<object>) => void,
+ *   getInputActions:   () => Array<{ id, label, primary?: 'right', iconName?, componentId?, contributedBy?, [string]: any }>,
+ *   _setInputActions:  (list: Array<object>) => void,
  *   _eventCount?:      () => number,
  * }}
  */
@@ -58,6 +70,8 @@ export function createHostAPI() {
   const handlers = new Map()
   /** @type {Array<object>} */
   let messageActions = []
+  /** @type {Array<object>} */
+  let inputActions = []
 
   function subscribe(event, handler) {
     if (typeof event !== 'string' || event.length === 0) {
@@ -82,10 +96,11 @@ export function createHostAPI() {
     if (typeof event !== 'string' || event.length === 0) {
       throw new Error('hostAPI.publish: event must be a non-empty string')
     }
-    if (import.meta.env.DEV && !KNOWN_EVENTS.has(event)) {
+    if (import.meta.env.DEV && !isKnownEvent(event)) {
       console.warn(
         `[hostAPI] publishing unknown event '${event}'. ` +
-        `Phase 1 events: ${[...KNOWN_EVENTS].join(', ')}.`
+        `Phase 1 events: ${[...KNOWN_EVENTS].join(', ')}; ` +
+        `or prefixes: ${KNOWN_EVENT_PREFIXES.join(', ')}.`
       )
     }
     const set = handlers.get(event)
@@ -110,11 +125,25 @@ export function createHostAPI() {
     messageActions = Array.isArray(list) ? list : []
   }
 
+  // PR-18b: parallel readers/writers for inputActions. input@1.0 reads
+  // the merged list at render time and splits by `primary` flag —
+  // `primary: 'right'` becomes the right-side button (mic→send swap);
+  // entries without a `primary` flag fill the `+` overflow menu.
+  function getInputActions() {
+    return inputActions.slice()
+  }
+
+  function _setInputActions(list) {
+    inputActions = Array.isArray(list) ? list : []
+  }
+
   return {
     publish,
     subscribe,
     getMessageActions,
     _setMessageActions,
+    getInputActions,
+    _setInputActions,
     _eventCount: () => handlers.size,
   }
 }

@@ -1,35 +1,38 @@
 import { useRef, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Square, ArrowUp, Plus, X, FileText, Globe, Calculator, BarChart2, Paperclip, Check } from 'lucide-react'
+import { Square, ArrowUp, Plus, X, FileText, Mic, Globe, Paperclip, Check } from 'lucide-react'
 import { SPRING_SNAPPY, SPRING_SMOOTH } from '../../lib/constants'
 import { ACCEPTED_TYPES, readUploadedFile } from '../../lib/fileUpload'
 
-const TOOL_META = {
-  web_search:   { label: 'Web search',   Icon: Globe,       color: '#4A7AE5' },
-  calculate:    { label: 'Calculate',    Icon: Calculator,  color: '#22C55E' },
-  create_chart: { label: 'Create chart', Icon: BarChart2,   color: '#7C6CD4' },
-}
+// PR-18b: contribution icon lookup. Components that contribute `inputActions`
+// pass an `iconName` string in their manifest; we resolve it here so the
+// manifest stays serializable JSON. Predeclared with the icons Phase-1
+// contributions are expected to use — voice-input ('Mic'), the future
+// web-search component ('Globe'), the future file-attach component
+// ('Paperclip'). Unknown names render as the generic Plus icon below.
+const ICON_BY_NAME = { Mic, Globe, Paperclip }
+function iconFor(name) { return ICON_BY_NAME[name] || Plus }
 
 /**
- * Textarea + send/stop + '+' menu (upload, tool toggles).
+ * Textarea + send/stop + '+' menu (upload + contributed inputActions).
  *
  * Props:
- *   value          {string}
- *   onChange       {(string) => void}
- *   onSend         {() => void}
- *   onStop         {() => void}
- *   isStreaming    {boolean}
- *   placeholder    {string}
- *   disabled       {boolean}
- *   inputRef       {React.Ref}
- *   attachment     {object|null}
- *   onAttach       {(obj) => void}
- *   onClearAttach  {() => void}
- *   availableTools {object[]}
- *   activeTools    {Set<string>}
- *   onToggleTool   {(id) => void}
- *   isOnline       {boolean}  — when false the send button is disabled with an aria-label. Default: true.
- *   cardLayout     {boolean}  — unified card style (mobile). Default: inline (desktop).
+ *   value              {string}
+ *   onChange           {(string) => void}
+ *   onSend             {() => void}
+ *   onStop             {() => void}
+ *   isStreaming        {boolean}
+ *   placeholder        {string}
+ *   disabled           {boolean}
+ *   inputRef           {React.Ref}
+ *   attachment         {object|null}
+ *   onAttach           {(obj) => void}
+ *   onClearAttach      {() => void}
+ *   rightPrimaryAction {object|null}  PR-18b: a contributed action where `primary === 'right'`. When text is empty AND not streaming, this renders in the right-side button slot (mic for voice-toggle). Tapping invokes onInvokeAction(action.id).
+ *   overflowActions    {object[]}     PR-18b: contributed actions WITHOUT a primary flag — populate the '+' overflow menu.
+ *   onInvokeAction     {(actionId, payload) => void}  PR-18b: called when the user taps any contributed action. input-render publishes `input-action:${id}` on the hostAPI bus.
+ *   isOnline           {boolean}  — when false the send button is disabled with an aria-label. Default: true.
+ *   cardLayout         {boolean}  — unified card style (mobile). Default: inline (desktop).
  */
 export default function InputArea({
   value,
@@ -44,9 +47,9 @@ export default function InputArea({
   attachment = null,
   onAttach,
   onClearAttach,
-  availableTools = [],
-  activeTools = new Set(),
-  onToggleTool,
+  rightPrimaryAction = null,
+  overflowActions = [],
+  onInvokeAction,
   cardLayout = false,
 }) {
   const fileInputRef = useRef(null)
@@ -56,13 +59,22 @@ export default function InputArea({
 
   // PR-10b: the cardLayout-only mic button was removed. Voice input is
   // now contributed by the standalone voice-input@1.0 catalog component
-  // (PR-10a.8 wired its production render); the bus contract remains the
-  // same — voice-input@1.0 publishes `voice-transcript`, which a wired
-  // input-render subscriber appends to its value. Pocket-chat-shaped
-  // rooms seed voice-input@1.0 by default; legacy swift-migrated rooms
-  // get it injected by lib/migration.js → migrateInjectVoiceInput.
+  // (PR-10a.8 wired its production render). PR-18b: voice-input@1.0 now
+  // contributes a `primary: 'right'` inputAction that flows through
+  // rightPrimaryAction below, putting the mic back inside the card's
+  // right button slot on mobile (matches the Swift V1 visual). On
+  // desktop the inline layout doesn't honor rightPrimaryAction, so
+  // voice-input@1.0's own button continues to live wherever it's
+  // mounted via its slot target.
 
-  const hasActive = activeTools.size > 0 || !!attachment
+  // PR-18b: '+' overflow is disabled when there's nothing to put in it.
+  // For PR-18b the intrinsic file-upload always counts, so this never
+  // fires in practice. When file-attach@1.0 ships in PR-18e and the
+  // intrinsic upload moves out, this gate flips on for rooms with no
+  // overflow contributors.
+  const intrinsicMenuItemCount = 1 // file-upload (PR-18e: move out to file-attach@1.0)
+  const overflowIsEmpty = overflowActions.length === 0 && intrinsicMenuItemCount === 0
+  const hasActive = !!attachment
 
   useEffect(() => {
     if (!menuOpen) return
@@ -91,19 +103,27 @@ export default function InputArea({
     setMenuOpen(false)
   }
 
-  /* ── Shared: popup menu ──────────────────────────────────── */
-  const PlusMenu = () => (
+  /* ── Shared: popup menu. Declared as a function returning JSX (not
+       a component) so it stays a stable identity per render — avoids
+       react-hooks/static-components flagging an inner component
+       declaration that would reset state every parent render. ── */
+  function renderPlusMenu() { return (
     <div className="relative" ref={plusRef}>
       <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setMenuOpen(prev => !prev)}
-        className={`relative w-8 h-8 rounded-lg border flex items-center justify-center transition-colors ${
+        whileHover={overflowIsEmpty ? undefined : { scale: 1.05 }}
+        whileTap={overflowIsEmpty ? undefined : { scale: 0.95 }}
+        onClick={() => { if (!overflowIsEmpty) setMenuOpen(prev => !prev) }}
+        disabled={overflowIsEmpty}
+        className={`relative w-8 h-8 rounded-lg border flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
           menuOpen || hasActive
             ? 'border-[#B8A070]/60 bg-[#B8A070]/8 text-[#B8A070]'
             : 'border-[#E9E9E7] text-[var(--p-text-secondary)] hover:border-[var(--p-text-primary)]/20 hover:text-[var(--p-text-primary)]'
         }`}
-        title="Add attachment or toggle tools"
+        title={
+          overflowIsEmpty
+            ? 'Add components to enable more actions'
+            : 'Add attachment or invoke a tool'
+        }
       >
         <Plus className="w-4 h-4" />
         {hasActive && (
@@ -121,6 +141,7 @@ export default function InputArea({
             transition={SPRING_SNAPPY}
             className="absolute bottom-full left-0 mb-2 z-50 min-w-[180px] rounded-xl border border-[var(--p-border)] bg-[var(--p-bg-surface)] shadow-lg shadow-black/8 overflow-hidden"
           >
+            {/* Intrinsic: file upload. PR-18e: moves to file-attach@1.0 as a contribution. */}
             <button
               onClick={() => fileInputRef.current?.click()}
               className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-[var(--p-text-primary)] border border-transparent hover:border-[var(--p-text-primary)]/20 hover:text-[var(--p-text-primary)] transition-colors text-left"
@@ -130,23 +151,23 @@ export default function InputArea({
               {attachment && <Check className="w-3.5 h-3.5 text-[#B8A070] shrink-0" />}
             </button>
 
-            {availableTools.length > 0 && (
+            {/* PR-18b: contributed inputActions from sibling components in the room. */}
+            {overflowActions.length > 0 && (
               <>
                 <div className="h-px bg-[var(--p-border-subtle)] mx-2" />
-                {availableTools.map((tool) => {
-                  const meta = TOOL_META[tool.name] || TOOL_META[tool.id]
-                  if (!meta) return null
-                  const isActive = activeTools.has(tool.id || tool.name)
-                  const { label, Icon } = meta
+                {overflowActions.map((action) => {
+                  const Icon = iconFor(action.iconName)
                   return (
                     <button
-                      key={tool.id || tool.name}
-                      onClick={() => onToggleTool?.(tool.id || tool.name)}
-                      className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm border border-transparent hover:border-[var(--p-text-primary)]/20 transition-colors text-left ${isActive ? 'text-[#B8A070]' : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)]'}`}
+                      key={action.id}
+                      onClick={() => {
+                        onInvokeAction?.(action.id, { componentId: action.componentId, contributedBy: action.contributedBy })
+                        setMenuOpen(false)
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm border border-transparent text-[var(--p-text-secondary)] hover:border-[var(--p-text-primary)]/20 hover:text-[var(--p-text-primary)] transition-colors text-left"
                     >
                       <Icon className="w-4 h-4 shrink-0" />
-                      <span className="flex-1">{label}</span>
-                      {isActive && <Check className="w-3.5 h-3.5 shrink-0 text-[#B8A070]" />}
+                      <span className="flex-1">{action.label || action.id}</span>
                     </button>
                   )
                 })}
@@ -156,7 +177,7 @@ export default function InputArea({
         )}
       </AnimatePresence>
     </div>
-  )
+  )}
 
   /* ── Card layout (Swift / mobile) ───────────────────────── */
   if (cardLayout) {
@@ -207,7 +228,7 @@ export default function InputArea({
 
           {/* Bottom toolbar */}
           <div className="flex items-center justify-between px-3 pb-3 pt-1">
-            <PlusMenu />
+            {renderPlusMenu()}
 
             <AnimatePresence mode="wait">
               {/* ── Streaming: Stop button ── */}
@@ -248,7 +269,37 @@ export default function InputArea({
                   <ArrowUp className="w-4 h-4 text-white" />
                 </motion.button>
 
-              /* ── Empty: ghost Send (voice now lives in voice-input@1.0) ── */
+              /* ── Empty + a right-primary action contributed: render that
+                    action's icon (mic for voice-toggle). PR-18b A1 — the
+                    Swift V1 mic-to-send swap. Tapping publishes the
+                    `input-action:${id}` event so the contributing
+                    component (voice-input@1.0) can act on it. ── */
+              ) : rightPrimaryAction ? (
+                (() => {
+                  const Icon = iconFor(rightPrimaryAction.iconName)
+                  return (
+                    <motion.button
+                      key={`right-${rightPrimaryAction.id}`}
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.8, opacity: 0 }}
+                      transition={SPRING_SNAPPY}
+                      whileTap={{ scale: 0.85 }}
+                      onClick={() => onInvokeAction?.(rightPrimaryAction.id, {
+                        componentId: rightPrimaryAction.componentId,
+                        contributedBy: rightPrimaryAction.contributedBy,
+                      })}
+                      aria-label={rightPrimaryAction.label || rightPrimaryAction.id}
+                      title={rightPrimaryAction.label || rightPrimaryAction.id}
+                      className="rounded-lg border flex items-center justify-center flex-shrink-0"
+                      style={{ width: 36, height: 36, borderColor: '#DDDDE3', backgroundColor: 'transparent' }}
+                    >
+                      <Icon className="w-4 h-4" style={{ color: '#6B7C93' }} />
+                    </motion.button>
+                  )
+                })()
+
+              /* ── Empty + no contributor: ghost Send fallback ── */
               ) : (
                 <motion.button
                   key="send-empty"
@@ -319,7 +370,7 @@ export default function InputArea({
             rows={3}
           />
           <div className="absolute bottom-3 left-2.5">
-            <PlusMenu />
+            {renderPlusMenu()}
           </div>
         </div>
 
