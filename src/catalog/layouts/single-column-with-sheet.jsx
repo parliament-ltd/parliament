@@ -14,6 +14,8 @@
 
 import { useState } from 'react'
 import { ChevronUp, ChevronDown } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import ParliamentMark from '../../components/ParliamentMark'
 
 function renderSlot(nodes) {
   if (!nodes || nodes.length === 0) return null
@@ -41,20 +43,40 @@ export default {
     const sheet = slotContents['sheet']
     const hasSheet = sheet && sheet.length > 0
     const [open, setOpen] = useState(false)
+    const navigate = useNavigate()
 
     return (
       <div
         className="flex flex-col h-full min-h-[480px] bg-[var(--p-bg-base)]"
         data-sheet-open={hasSheet && open ? 'true' : 'false'}
       >
+        {/* PR-18f: home-link strip — Pocket Chat doesn't render NarrowChrome,
+            so it gets its own minimal 40px-tall centered Parliament mark
+            so users can navigate back to /. No border; the top of the
+            scroll area below fades via .messages-fade-mask. */}
+        <div className="relative flex items-center justify-center h-10 bg-white shrink-0">
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            aria-label="Go to homepage"
+            title="Home"
+            className="inline-flex items-center justify-center h-8 w-8 rounded-md text-[var(--p-text-primary)] hover:text-[var(--p-gold-light)] transition-colors"
+          >
+            <ParliamentMark />
+          </button>
+        </div>
+
         {/* Messages */}
         <div className="flex-1 min-h-0 overflow-y-auto">
           {renderSlot(msgs)}
         </div>
 
-        {/* Input dock */}
+        {/* Input dock — PR-18f: chat fades into the input on mobile
+            (.messages-fade-mask) so no border/horizontal-padding wrapper.
+            Stays single-column-with-sheet's only branch (it is
+            mobile-native; no desktop tree to preserve). */}
         {input && input.length > 0 && (
-          <div className="border-t border-[var(--p-border)] p-3 bg-white">
+          <div className="bg-white py-2">
             {renderSlot(input)}
           </div>
         )}

@@ -1763,11 +1763,39 @@
    Applied to MessageList's scroll container on viewports <768px so
    message content fades into transparency over the bottom ~64px,
    reading as a continuous flow into the input card below (matches
-   Swift V1). Inert on desktop. */
+   Swift V1). Inert on desktop.
+
+   PR-18f extended the gradient to fade the top 48px as well, matching
+   the height of NarrowChrome / Pocket Chat's home strip so chat
+   content reads as flowing under the topbar (no hard border needed —
+   NarrowChrome / single-column-with-sheet dropped their border-b's). */
 @media (max-width: 768px) {
   .messages-fade-mask {
-    -webkit-mask-image: linear-gradient(to bottom, black 0, black calc(100% - 64px), transparent 100%);
-            mask-image: linear-gradient(to bottom, black 0, black calc(100% - 64px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 48px, black calc(100% - 64px), transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0, black 48px, black calc(100% - 64px), transparent 100%);
+  }
+}
+
+/* PR-18f — Settings icon hover spin (laptop / desktop with fine pointer).
+   The host button carries `.settings-icon-spin-host` and the SVG icon
+   carries `.settings-icon-spin`. CSS-only laptop guard: requires
+   hover-capable + fine pointer (excludes touch-only tablets) AND
+   viewport ≥768px (excludes phones with attached mice). Continuous
+   slow spin while hovered, paused on leave. prefers-reduced-motion
+   is a hard gate — no spin at all when the user opts out. */
+@keyframes settings-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) {
+  @media (prefers-reduced-motion: no-preference) {
+    .settings-icon-spin {
+      animation: settings-spin 4s linear infinite;
+      animation-play-state: paused;
+    }
+    .settings-icon-spin-host:hover .settings-icon-spin {
+      animation-play-state: running;
+    }
   }
 }
 
