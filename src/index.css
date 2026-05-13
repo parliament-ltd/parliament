@@ -1850,3 +1850,61 @@
     row-gap: 6px;
   }
 }
+
+/* ── PR-18c: Mobile Settings ─────────────────────────────
+   Chevron-expandable cards pattern for /settings below 768px.
+   Pattern source: refactor/Menu for mobile settings.png. Multi-open
+   accordion; the section components themselves are unchanged from
+   desktop — only the chrome and the title-hide differ.
+   Desktop Settings (≥768px) is unaffected: this stylesheet defines
+   classes that only render via the MobileSettings JSX branch. */
+.mobile-settings-screen {
+  min-height: 100vh;
+  padding: 8px 16px 32px;
+}
+.mobile-settings-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: #E9E9E7;
+  margin: 6px auto 12px;
+}
+.mobile-settings-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 16px;
+}
+.mobile-settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mobile-settings-section {
+  border: 1px solid #E9E9E7;
+  border-radius: 10px;
+  background: var(--p-bg-surface, #fff);
+  overflow: hidden;
+}
+.mobile-settings-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  padding: 14px 14px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.mobile-settings-row:focus-visible {
+  outline: 2px solid var(--p-accent, #B8A070);
+  outline-offset: -2px;
+}
+.mobile-settings-panel {
+  overflow: hidden;
+}
+.mobile-settings-panel-inner {
+  padding: 4px 14px 14px;
+}
