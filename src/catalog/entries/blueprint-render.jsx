@@ -107,6 +107,19 @@ function modelLabel(raw) {
 
 const refName = (ref) => (ref || '').split('@')[0]
 
+// PR-19a: rough text-width estimator for SVG layout decisions where we
+// can't measure DOM nodes (text might not be mounted yet, or the
+// measurement is needed during render). Multiplier is empirical:
+// proportional sentence-case at our weights typically averages
+// ~0.55 × fontSize per character; italic runs slightly wider so we
+// nudge to 0.58. Letter-spacing on uppercase rooms is handled by the
+// text element directly — this only feeds the wrap decision.
+function estimateTextWidth(text, fontSize, isItalic = false) {
+  if (!text) return 0
+  const charW = fontSize * (isItalic ? 0.58 : 0.55)
+  return text.length * charW
+}
+
 // Pull up to 3 feature pills off a room's components array.
 function featuresFor(room) {
   const seen = new Set()
@@ -366,21 +379,65 @@ function Room({ placed, mode, lastConv, isActive, isHighlitFromChat, isHovered, 
       {/* Border (drawn over the hints so it stays clean) */}
       <path d={path} fill="none" stroke={stroke} strokeWidth={strokeWidth} />
 
-      {/* Faded "THE" tagline + bold name */}
-      <text x={cx} y={interior.y + 28} textAnchor="middle" fontSize="9" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
-        THE
-      </text>
-      <text x={cx} y={interior.y + 44} textAnchor="middle" fontSize="12" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
-        {name}
-      </text>
-      <text x={cx} y={interior.y + 64} textAnchor="middle" fontSize="8" fill="#9A9490">
-        {layoutLabel}{schemeLabel ? ` · ${schemeLabel}` : ''}
-      </text>
-      {lastModel && (
-        <text x={cx} y={interior.y + 78} textAnchor="middle" fontSize="8" fill="#9A9490" fontStyle="italic">
-          Last spoken to {lastModel}
-        </text>
-      )}
+      {/* PR-19a: +1px global text bump for legibility, plus conditional
+          stacking of the layoutLabel · schemeLabel line and the
+          "Last spoken to" italic line so they wrap to two lines instead
+          of overflowing the room border on long combinations. The text
+          y values shift downward to accommodate the larger font sizes
+          and any extra wrapped row. */}
+      {(() => {
+        const safeWidth = interior.width - 8
+        const joined = `${layoutLabel}${schemeLabel ? ` · ${schemeLabel}` : ''}`
+        const stackLayoutScheme = Boolean(schemeLabel) && estimateTextWidth(joined, 9) > safeWidth
+        const lastModelTail = lastModel || ''
+        const lastModelFull = lastModel ? `Last spoken to ${lastModel}` : ''
+        const stackLastModel = Boolean(lastModel) && estimateTextWidth(lastModelFull, 9, true) > safeWidth
+
+        // Vertical layout — accumulate baselines so wrapped lines push
+        // subsequent rows down instead of overlapping.
+        let cy = interior.y + 24
+        const theY = cy; cy += 20
+        const nameY = cy; cy += 18
+        const layoutY = cy; cy += stackLayoutScheme ? 12 : 0
+        const schemeY = stackLayoutScheme ? cy : null
+        cy += 16
+        const modelTopY = cy
+        const modelBotY = stackLastModel ? cy + 12 : null
+
+        return (
+          <>
+            <text x={cx} y={theY} textAnchor="middle" fontSize="10" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+              THE
+            </text>
+            <text x={cx} y={nameY} textAnchor="middle" fontSize="13" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
+              {name}
+            </text>
+            <text x={cx} y={layoutY} textAnchor="middle" fontSize="9" fill="#9A9490">
+              {stackLayoutScheme ? layoutLabel : joined}
+            </text>
+            {stackLayoutScheme && (
+              <text x={cx} y={schemeY} textAnchor="middle" fontSize="9" fill="#9A9490">
+                {schemeLabel}
+              </text>
+            )}
+            {lastModel && !stackLastModel && (
+              <text x={cx} y={modelTopY} textAnchor="middle" fontSize="9" fill="#9A9490" fontStyle="italic">
+                {lastModelFull}
+              </text>
+            )}
+            {lastModel && stackLastModel && (
+              <>
+                <text x={cx} y={modelTopY} textAnchor="middle" fontSize="9" fill="#9A9490" fontStyle="italic">
+                  Last spoken to
+                </text>
+                <text x={cx} y={modelBotY} textAnchor="middle" fontSize="9" fill="#9A9490" fontStyle="italic">
+                  {lastModelTail}
+                </text>
+              </>
+            )}
+          </>
+        )
+      })()}
 
       {/* Feature pills — render on every room, with per-spec gold/gray
           palette swap controlled by isActive (PR-16a; was active-only). */}
@@ -395,20 +452,24 @@ function Room({ placed, mode, lastConv, isActive, isHighlitFromChat, isHovered, 
 // (current PR-14 treatment); other rooms get a gray palette (per spec
 // lines 1087-1092 — `fill="#F1F1EF" stroke="#C8C2B8"` text fill `#787774`,
 // slightly thinner pills). Same pill geometry; only the colors differ.
+//
+// PR-19a: bumped pill geometry up a notch for legibility
+// (active 14→16 / 7→8.5; inactive 12→14 / 6.5→7.5). Pill widths in
+// FeaturePills derive from font size, so they auto-grow.
 const PILL_PALETTE = {
   active: {
     fill: 'rgba(196,169,77,0.15)',
     stroke: 'rgba(196,169,77,0.4)',
     text: '#8B6A10',
-    height: 14,
-    fontSize: 7,
+    height: 16,
+    fontSize: 8.5,
   },
   inactive: {
     fill: '#F1F1EF',
     stroke: '#C8C2B8',
     text: '#787774',
-    height: 12,
-    fontSize: 6.5,
+    height: 14,
+    fontSize: 7.5,
   },
 }
 
@@ -417,8 +478,13 @@ function FeaturePills({ features, interior, isActive }) {
   const pillH = palette.height
   const pillGap = 6
   const padX = 6
-  // Approximate pill widths from text length; keep them snug.
-  const widths = features.map(f => Math.max(40, f.length * 5.5 + padX * 2))
+  // PR-19a: pill widths and text baseline derive from the palette's
+  // fontSize so the bumped sizes (active 8.5 / inactive 7.5) get
+  // proportional padding instead of clamping at the old 5.5x heuristic.
+  // ~0.7 of fontSize is a reasonable per-character upper bound for the
+  // weights/letter-spacing we use on these short uppercase labels.
+  const charW = palette.fontSize * 0.7
+  const widths = features.map(f => Math.max(40, f.length * charW + padX * 2))
   const total = widths.reduce((s, w) => s + w, 0) + (features.length - 1) * pillGap
   let cursorX = interior.x + (interior.width - total) / 2
   const y = interior.y + interior.height - (pillH + 12)
@@ -438,7 +504,7 @@ function FeaturePills({ features, interior, isActive }) {
             />
             <text
               x={cursorX + w / 2}
-              y={y + pillH / 2 + 2.5}
+              y={y + pillH / 2 + palette.fontSize * 0.36}
               textAnchor="middle"
               fontSize={palette.fontSize}
               fill={palette.text}
@@ -463,10 +529,11 @@ function PlaceholderRoom({ box, onClick }) {
     <g className="bp-placeholder" style={{ cursor: 'pointer' }} onClick={onClick}>
       <path d={path} fill="transparent" className="bp-placeholder-fill" />
       <path d={path} fill="none" stroke="#C8C2B8" strokeWidth="1" strokeDasharray="5 4" className="bp-placeholder-dash" />
-      <text x={cx} y={cy - 4} textAnchor="middle" fontSize="9" fill="#B8B2A8" letterSpacing="0.08em" className="bp-placeholder-title">
+      {/* PR-19a: +1px font bump for legibility (was 9 / 7.5). */}
+      <text x={cx} y={cy - 4} textAnchor="middle" fontSize="10" fill="#B8B2A8" letterSpacing="0.08em" className="bp-placeholder-title">
         + BUILD A ROOM
       </text>
-      <text x={cx} y={cy + 12} textAnchor="middle" fontSize="7.5" fill="#C8C2B8" className="bp-placeholder-sub">
+      <text x={cx} y={cy + 14} textAnchor="middle" fontSize="8.5" fill="#C8C2B8" className="bp-placeholder-sub">
         Expand your Parliament
       </text>
     </g>
@@ -489,7 +556,7 @@ function DimensionTicks({ layout, modesById }) {
       <line x1={first.box.x} y1={tickTop} x2={first.box.x + first.box.width} y2={tickTop} stroke="#C8C2B8" strokeWidth="0.5" />
       <line x1={first.box.x} y1={tickTop - 3} x2={first.box.x} y2={tickTop + 3} stroke="#C8C2B8" strokeWidth="0.5" />
       <line x1={first.box.x + first.box.width} y1={tickTop - 3} x2={first.box.x + first.box.width} y2={tickTop + 3} stroke="#C8C2B8" strokeWidth="0.5" />
-      <text x={first.box.x + first.box.width / 2} y={tickTop - 4} textAnchor="middle" fontSize="7" fill="#B8B2A8">
+      <text x={first.box.x + first.box.width / 2} y={tickTop - 4} textAnchor="middle" fontSize="8" fill="#B8B2A8">
         {firstName} · {first.box.width}px
       </text>
       {/* Right tick (down full floor height) */}

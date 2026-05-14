@@ -1,4 +1,4 @@
-// IgnitionStep — step 6: validate API key + light up the room (PR-13).
+// IgnitionStep — final wizard step (PR-13; reshaped in PR-19a).
 //
 // Per parliament_wizard_v5.html lines 1305–1327 (markup) and lines
 // 634–762 (animations). The keyframes themselves live in src/index.css
@@ -17,10 +17,26 @@
 //                       the chip cascade — each chip i adds
 //                       `wiz-feat.igniting` at i*110ms, then swaps to
 //                       `.lit` 540ms later.
-//   t=1200 'connected': show Connected badge + Enter button.
+//   t=1200 'connected': show Connected badge + the three navigation
+//                       buttons (Enter / Build another / Go to your
+//                       Parliament).
 //
-// On Validate-button click we call getProvider().validateKey(key); on
-// any failure we show the spec'd error copy without firing the chain.
+// PR-19a refinements:
+//   - On mount, check loadApiKey() for an existing key. If present,
+//     show a "saved key on file" prompt with Continue (default) and a
+//     small "Add a different key" toggle. Continue runs the ignite
+//     chain WITHOUT a network re-validation (the user said: trust the
+//     saved key; surface invalidation as a chat-session error if the
+//     key has been revoked since).
+//   - Add Claude logo + Anthropic key link as a more discoverable
+//     help row, designed so additional providers drop in beside it
+//     when Phase 2 multi-provider lands.
+//   - Move the Back button into IgnitionStep's footer so it sits on
+//     the same row as the action button(s).
+//   - Merge the old DoneStep (screen 7) into this step. After
+//     'connected', persist the room + show three buttons (Enter /
+//     Build another / Go to your Parliament) instead of the single
+//     Enter button.
 //
 // Phase 2 multi-provider note: when audit §3.20 lands, this step will
 // read the connection-field shape from the provider abstraction
@@ -29,8 +45,9 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowLeft } from 'lucide-react'
 import { getProvider } from '../../../providers'
-import { saveApiKey } from '../../../lib/crypto'
+import { saveApiKey, loadApiKey } from '../../../lib/crypto'
 import { getSetting } from '../../../lib/db'
 import { LAYOUT_META, SCHEMES, FEATURES } from '../../../lib/buildWizard'
 import StepHeader from './StepHeader'
@@ -43,14 +60,61 @@ const FEATURE_STAGGER_MS = 110
 const FEATURE_FLASH_MS = 540
 const CONNECT_AT_MS = 1200
 
-export default function IgnitionStep({ config, onConnected }) {
+// Anthropic mark — small monochrome SVG so "Get an API key" reads as
+// the model brand, not just generic copy. Phase 2 will add OpenAI /
+// Mistral / Ollama marks beside it; the layout below is already a
+// flex row so they drop in cleanly.
+function ClaudeMark({ size = 14 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 32 32"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M19.4 6.3 25.7 25.7H22.1L20.5 21H11.5L9.9 25.7H6.3L12.6 6.3h6.8Zm-3.4 3.6-3.4 8.5h6.8l-3.4-8.5Z" />
+    </svg>
+  )
+}
+
+export default function IgnitionStep({
+  config,
+  onBack,
+  onPersist,
+  onEnterChat,
+  onBuildAnother,
+  onGoHome,
+}) {
   const [apiKey, setApiKey] = useState('')
   const [validating, setValidating] = useState(false)
   const [status, setStatus] = useState(null) // 'invalid' | 'billing_error' | null
   const [errorMsg, setErrorMsg] = useState('')
   const [phase, setPhase] = useState('idle') // 'idle' | 'sweeping' | 'igniting' | 'lit' | 'connected'
+  // PR-19a: 'has-saved-key' (prompt with Continue + Add-different) /
+  // 'replace-key' (input visible, replacing the saved one) / 'no-key'
+  // (input visible, first-time setup). Set after the loadApiKey check.
+  const [keyMode, setKeyMode] = useState(null) // null | 'has-saved-key' | 'replace-key' | 'no-key'
+  const [keyCheckDone, setKeyCheckDone] = useState(false)
+  const [committedConvId, setCommittedConvId] = useState(null)
   const sweepKey = useRef(0)
   const timersRef = useRef([])
+  const persistedRef = useRef(false)
+
+  // ── Mount: load any saved key to decide which flow to render ──
+  useEffect(() => {
+    let cancelled = false
+    loadApiKey('persistent').then((existing) => {
+      if (cancelled) return
+      setKeyMode(existing ? 'has-saved-key' : 'no-key')
+      setKeyCheckDone(true)
+    }).catch(() => {
+      if (cancelled) return
+      setKeyMode('no-key')
+      setKeyCheckDone(true)
+    })
+    return () => { cancelled = true }
+  }, [])
 
   const featureChips = useMemo(() => {
     const layoutLabel = config.layout && LAYOUT_META[config.layout]?.label
@@ -85,7 +149,41 @@ export default function IgnitionStep({ config, onConnected }) {
     }
   }, [])
 
-  const ignite = async () => {
+  // Run the ignite animation chain WITHOUT touching the network or
+  // saving anything. Used both by the validate-then-ignite path (after
+  // a successful validateKey) and the trust-the-saved-key path
+  // (Continue with no API call at all).
+  const runIgniteAnimation = () => {
+    sweepKey.current += 1
+    setPhase('sweeping')
+
+    const schedule = (fn, ms) => {
+      const t = setTimeout(fn, ms)
+      timersRef.current.push(t)
+    }
+
+    schedule(() => setPhase('igniting'), IGNITE_AT_MS)
+
+    schedule(() => {
+      setPhase('lit')
+      // Cascade-light each feature chip.
+      featureChips.forEach((_, i) => {
+        schedule(() => {
+          setChipPhases(prev => prev.map((p, idx) => idx === i ? 'igniting' : p))
+          schedule(() => {
+            setChipPhases(prev => prev.map((p, idx) => idx === i ? 'lit' : p))
+          }, FEATURE_FLASH_MS)
+        }, i * FEATURE_STAGGER_MS)
+      })
+    }, LIT_AT_MS)
+
+    schedule(() => setPhase('connected'), CONNECT_AT_MS)
+  }
+
+  // Validate the entered key against the live provider, save it on
+  // success, then run the animation. Used in 'no-key' (first-time)
+  // and 'replace-key' (user wants a different key) modes.
+  const validateAndIgnite = async () => {
     const trimmed = apiKey.trim()
     if (!trimmed || validating) return
     setValidating(true)
@@ -118,33 +216,29 @@ export default function IgnitionStep({ config, onConnected }) {
       setErrorMsg('Connected, but key could not be saved locally — you may need to re-enter it next time.')
     }
 
-    sweepKey.current += 1
-    setPhase('sweeping')
-
-    // Schedule the spec's setTimeout chain. Each schedule reference is
-    // tracked so unmount can clear them.
-    const schedule = (fn, ms) => {
-      const t = setTimeout(fn, ms)
-      timersRef.current.push(t)
-    }
-
-    schedule(() => setPhase('igniting'), IGNITE_AT_MS)
-
-    schedule(() => {
-      setPhase('lit')
-      // Cascade-light each feature chip.
-      featureChips.forEach((_, i) => {
-        schedule(() => {
-          setChipPhases(prev => prev.map((p, idx) => idx === i ? 'igniting' : p))
-          schedule(() => {
-            setChipPhases(prev => prev.map((p, idx) => idx === i ? 'lit' : p))
-          }, FEATURE_FLASH_MS)
-        }, i * FEATURE_STAGGER_MS)
-      })
-    }, LIT_AT_MS)
-
-    schedule(() => setPhase('connected'), CONNECT_AT_MS)
+    runIgniteAnimation()
   }
+
+  // Trust the saved key — no network call. Per PR-19a decision: any
+  // revocation surfaces as a chat-session error at first send time.
+  const continueWithSavedKey = () => {
+    setStatus(null)
+    setErrorMsg('')
+    runIgniteAnimation()
+  }
+
+  // Persist the room exactly once when the animation reaches
+  // 'connected'. Capture the resulting conversation id so the three
+  // post-success buttons can navigate to it.
+  useEffect(() => {
+    if (phase !== 'connected' || persistedRef.current) return
+    persistedRef.current = true
+    onPersist().then((convId) => {
+      setCommittedConvId(convId)
+    }).catch((err) => {
+      setErrorMsg(err?.message || 'Could not save the room.')
+    })
+  }, [phase, onPersist])
 
   // CSS class chain for the room card. Matches the spec's class swaps:
   //   sweeping     → wiz-room (dashed, pre-flash)
@@ -154,7 +248,11 @@ export default function IgnitionStep({ config, onConnected }) {
   if (phase === 'igniting') roomClasses.push('igniting')
   if (phase === 'lit' || phase === 'connected') roomClasses.push('lit')
 
-  const showEnter = phase === 'connected'
+  // Cascade is in flight — disable the action row and Back so the
+  // user can't double-fire or rewind mid-animation.
+  const cascadeBusy = phase !== 'idle' && phase !== 'connected'
+  const showInputRow = keyCheckDone && (keyMode === 'no-key' || keyMode === 'replace-key') && phase === 'idle'
+  const showSavedKeyRow = keyCheckDone && keyMode === 'has-saved-key' && phase === 'idle'
 
   return (
     <div>
@@ -196,51 +294,121 @@ export default function IgnitionStep({ config, onConnected }) {
         </div>
       </div>
 
-      <div className="text-[12px] mb-1.5" style={{ color: 'var(--p-text-secondary)' }}>
-        Anthropic API key
-      </div>
-      <div className="flex gap-2 mb-2">
-        <input
-          type="password"
-          value={apiKey}
-          onChange={(e) => {
-            setApiKey(e.target.value)
-            if (status) { setStatus(null); setErrorMsg('') }
-          }}
-          placeholder="sk-ant-..."
-          className="flex-1 px-3 py-2 text-[13px] rounded-md outline-none transition-colors"
+      {/* ── Saved-key prompt (PR-19a) ─────────────────────────── */}
+      {showSavedKeyRow && (
+        <div
+          className="px-3 py-3 mb-3 rounded-md"
           style={{
-            border: status === 'invalid' ? '1px solid var(--p-error,#E03E3E)'
-              : status === 'billing_error' ? '1px solid var(--p-warning,#D9730D)'
-              : '0.5px solid var(--p-border)',
-            background: 'var(--p-bg-surface)',
-            color: 'var(--p-text-primary)',
-            fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+            background: 'var(--p-bg-subtle)',
+            border: '0.5px solid var(--p-border)',
           }}
-          onKeyDown={(e) => { if (e.key === 'Enter') ignite() }}
-        />
-        <button
-          type="button"
-          disabled={validating || !apiKey.trim() || phase === 'connected'}
-          onClick={ignite}
-          className="px-4 py-2 text-[13px] font-medium rounded-md text-white disabled:opacity-50"
-          style={{ background: 'var(--p-gold-light)' }}
         >
-          {validating ? 'Validating…' : 'Validate'}
-        </button>
-      </div>
+          <div className="text-[12px] mb-2" style={{ color: 'var(--p-text-secondary)' }}>
+            An API key is already on file. Continue with your saved key, or add a different one.
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              autoFocus
+              onClick={continueWithSavedKey}
+              className="px-4 py-2 text-[13px] font-medium rounded-md text-white"
+              style={{ background: 'var(--p-gold-light)' }}
+            >
+              Continue
+            </button>
+            <button
+              type="button"
+              onClick={() => { setApiKey(''); setStatus(null); setErrorMsg(''); setKeyMode('replace-key') }}
+              className="text-[12px] underline-offset-2 hover:underline"
+              style={{ color: 'var(--p-text-secondary)' }}
+            >
+              Add a different key
+            </button>
+          </div>
+        </div>
+      )}
 
-      <div className="text-[11px] leading-[1.5]" style={{ color: 'var(--p-text-muted)' }}>
-        Encrypted with AES-GCM and stored locally. Never leaves your browser.{' '}
-        <a
-          href="https://console.anthropic.com/settings/keys"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: 'var(--p-gold-light)', textDecoration: 'none' }}
-        >
-          Get an API key
-        </a>
-      </div>
+      {/* ── Input row (no-key first-time + replace-key path) ─── */}
+      {showInputRow && (
+        <>
+          <div className="text-[12px] mb-1.5" style={{ color: 'var(--p-text-secondary)' }}>
+            Anthropic API key
+          </div>
+          <div className="flex gap-2 mb-2">
+            <input
+              type="password"
+              value={apiKey}
+              onChange={(e) => {
+                setApiKey(e.target.value)
+                if (status) { setStatus(null); setErrorMsg('') }
+              }}
+              placeholder="sk-ant-..."
+              className="flex-1 px-3 py-2 text-[13px] rounded-md outline-none transition-colors"
+              style={{
+                border: status === 'invalid' ? '1px solid var(--p-error,#E03E3E)'
+                  : status === 'billing_error' ? '1px solid var(--p-warning,#D9730D)'
+                  : '0.5px solid var(--p-border)',
+                background: 'var(--p-bg-surface)',
+                color: 'var(--p-text-primary)',
+                fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+              }}
+              onKeyDown={(e) => { if (e.key === 'Enter') validateAndIgnite() }}
+              autoFocus
+            />
+            <button
+              type="button"
+              disabled={validating || !apiKey.trim()}
+              onClick={validateAndIgnite}
+              className="px-4 py-2 text-[13px] font-medium rounded-md text-white disabled:opacity-50"
+              style={{ background: 'var(--p-gold-light)' }}
+            >
+              {validating ? 'Validating…' : 'Validate'}
+            </button>
+          </div>
+
+          {/* Help row — Claude mark + link to grab a key. PR-19a:
+              prominent so first-time users find the right URL fast.
+              Layout designed so additional providers drop in beside
+              the Anthropic mark when Phase 2 multi-provider lands. */}
+          <div
+            className="flex items-center gap-2 mt-2 mb-1 text-[12px]"
+            style={{ color: 'var(--p-text-secondary)' }}
+          >
+            <span>Don&apos;t have a key yet?</span>
+            <a
+              href="https://console.anthropic.com/settings/keys"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors"
+              style={{
+                color: 'var(--p-gold-light)',
+                border: '0.5px solid var(--p-border)',
+                textDecoration: 'none',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--p-gold-light)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--p-border)' }}
+            >
+              <ClaudeMark />
+              Get one from Anthropic
+            </a>
+          </div>
+
+          <div className="text-[11px] leading-[1.5] mt-1.5" style={{ color: 'var(--p-text-muted)' }}>
+            Encrypted with AES-GCM and stored locally. Never leaves your browser.
+          </div>
+
+          {keyMode === 'replace-key' && (
+            <button
+              type="button"
+              onClick={() => { setApiKey(''); setStatus(null); setErrorMsg(''); setKeyMode('has-saved-key') }}
+              className="mt-2 text-[12px] underline-offset-2 hover:underline"
+              style={{ color: 'var(--p-text-secondary)' }}
+            >
+              Cancel — keep saved key
+            </button>
+          )}
+        </>
+      )}
 
       {/* Error / status copy */}
       {errorMsg && (
@@ -275,20 +443,72 @@ export default function IgnitionStep({ config, onConnected }) {
         )}
       </AnimatePresence>
 
-      {/* Enter button reveals once Connected. */}
+      {/* ── Footer row ────────────────────────────────────────── */}
+      {/* Pre-connected: Back ↔ (action button is rendered above
+          inline with the saved-key prompt or the input row). After
+          connected: three navigation buttons. */}
+      {phase !== 'connected' && (
+        <div className="flex justify-start mt-5">
+          <button
+            type="button"
+            disabled={cascadeBusy}
+            onClick={onBack}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-[13px] rounded-md transition-colors disabled:opacity-40 disabled:cursor-default"
+            style={{
+              border: '0.5px solid var(--p-border)',
+              background: 'transparent',
+              color: 'var(--p-text-secondary)',
+            }}
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Back
+          </button>
+        </div>
+      )}
+
       <AnimatePresence>
-        {showEnter && (
+        {phase === 'connected' && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18 }}
-            className="flex justify-end mt-5"
+            className="flex flex-wrap gap-2 justify-end mt-5"
           >
             <button
               type="button"
-              onClick={onConnected}
-              className="px-6 py-2.5 text-sm font-medium rounded-md text-white"
+              onClick={onBuildAnother}
+              className="px-4 py-2 text-[13px] rounded-md transition-colors"
+              style={{
+                border: '0.5px solid var(--p-border)',
+                background: 'transparent',
+                color: 'var(--p-text-secondary)',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--p-gold-light)'; e.currentTarget.style.color = 'var(--p-gold-light)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--p-border)'; e.currentTarget.style.color = 'var(--p-text-secondary)' }}
+            >
+              Build another room
+            </button>
+            <button
+              type="button"
+              onClick={onGoHome}
+              className="px-4 py-2 text-[13px] rounded-md transition-colors"
+              style={{
+                border: '0.5px solid var(--p-border)',
+                background: 'transparent',
+                color: 'var(--p-text-secondary)',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--p-gold-light)'; e.currentTarget.style.color = 'var(--p-gold-light)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--p-border)'; e.currentTarget.style.color = 'var(--p-text-secondary)' }}
+            >
+              Go to your Parliament
+            </button>
+            <button
+              type="button"
+              disabled={!committedConvId}
+              onClick={() => onEnterChat(committedConvId)}
+              className="px-6 py-2 text-[13px] font-medium rounded-md text-white disabled:opacity-50"
               style={{ background: 'var(--p-gold-light)' }}
+              title={!committedConvId ? 'Saving your room…' : 'Open the chat'}
             >
               Enter
             </button>

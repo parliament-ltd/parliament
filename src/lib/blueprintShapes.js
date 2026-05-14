@@ -170,6 +170,30 @@ function threePanelTallBumpPath(box, seed) {
   return { path: d, interior: interiorBox(box) }
 }
 
+/** v3: spec-aligned right-edge tab — narrower bump centered on the
+ *  right side, matching parliament_homepage_v2.html lines 1040-1041
+ *  (Writing Studio shape). Differs from v0/v1/v2 by being shorter and
+ *  more centered, evoking a sidebar notch rather than a full half-edge. */
+function threePanelSpecTabPath(box, seed) {
+  const { x, y, width: w, height: h } = box
+  const tabHeight = Math.min(132, h * 0.65)
+  const tabDepth = 12
+  const top = y, bottom = y + h, right = x + w, left = x
+  const tabY = y + (h - tabHeight) / 2 + Math.round(4 * pertub(seed, 0))
+  const d = [
+    `M ${left} ${top}`,
+    `L ${right} ${top}`,
+    `L ${right} ${tabY}`,
+    `L ${right + tabDepth} ${tabY}`,
+    `L ${right + tabDepth} ${tabY + tabHeight}`,
+    `L ${right} ${tabY + tabHeight}`,
+    `L ${right} ${bottom}`,
+    `L ${left} ${bottom}`,
+    'Z',
+  ].join(' ')
+  return { path: d, interior: interiorBox(box) }
+}
+
 // ─── Canvas-centric variants (3) ─────────────────────────────
 
 /**
@@ -209,6 +233,29 @@ function canvasCentricTopNotchPath(box, seed) {
     `L ${right - notchInset} ${y + notchDepth}`,
     `L ${right} ${y + notchDepth}`,
     `L ${right} ${bottom}`,
+    `L ${x} ${bottom}`,
+    'Z',
+  ].join(' ')
+  return { path: d, interior: interiorBox(box) }
+}
+
+/** v3: spec-aligned BR chamfer-out — straight right edge to ~70% of
+ *  height, then a 12px diagonal protrusion to a new wider right edge
+ *  through the bottom. Matches parliament_homepage_v2.html lines
+ *  1073-1077 (Code Lab shape). Differs from the alcove (v0) by being
+ *  a single chamfer transition rather than a rectangular alcove. */
+function canvasCentricSpecChamferPath(box, seed) {
+  const { x, y, width: w, height: h } = box
+  const right = x + w
+  const bottom = y + h
+  const chamY = y + h * (0.7 + 0.04 * pertub(seed, 0))
+  const depth = 12
+  const d = [
+    `M ${x} ${y}`,
+    `L ${right} ${y}`,
+    `L ${right} ${chamY}`,
+    `L ${right + depth} ${chamY + depth}`,
+    `L ${right + depth} ${bottom}`,
     `L ${x} ${bottom}`,
     'Z',
   ].join(' ')
@@ -328,6 +375,30 @@ function singleColumnBottomRightPath(box, seed) {
   return { path: d, interior: interiorBox(box) }
 }
 
+/** v3: spec-aligned phone chamfer — small straight drop then diagonal,
+ *  evoking a phone's chamfered top corner. The right edge below the
+ *  chamfer sits inset (CUT-IN) so the room narrows below — the
+ *  "phone in a case" feel from parliament_homepage_v2.html lines
+ *  1096-1100 (Pocket shape). Differs from v0 (simple 45° chamfer) by
+ *  having a 12px vertical drop before the diagonal. */
+function singleColumnSpecPhoneChamferPath(box, seed) {
+  const { x, y, width: w, height: h } = box
+  const right = x + w
+  const bottom = y + h
+  const drop = 12
+  const inset = 8 + Math.round(2 * pertub(seed, 0))
+  const d = [
+    `M ${x} ${y}`,
+    `L ${right} ${y}`,
+    `L ${right} ${y + drop}`,
+    `L ${right - inset} ${y + drop + inset}`,
+    `L ${right - inset} ${bottom}`,
+    `L ${x} ${bottom}`,
+    'Z',
+  ].join(' ')
+  return { path: d, interior: interiorBox(box) }
+}
+
 /** v2: capsule — both right corners chamfered, "phone in a hand" feel. */
 function singleColumnCapsulePath(box, seed) {
   const { x, y, width: w, height: h } = box
@@ -359,16 +430,25 @@ function rectanglePath(box) {
 
 // ─── Variant tables ──────────────────────────────────────────
 
+// PR-19a added a fourth, spec-aligned variant for the three layouts
+// the parliament_homepage_v2.html mockup explicitly draws (three-panel
+// = Writing Studio's right-edge tab; canvas-centric = Code Lab's
+// chamfer-out at ~70%; single-column-with-sheet = Pocket's phone-style
+// chamfer-in). document-centric stays at three because the mockup
+// doesn't draw a document room — the existing three already cover its
+// design space.
 const SHAPE_VARIANTS = {
   'three-panel': [
     threePanelRightBumpPath,
     threePanelDualBumpPath,
     threePanelTallBumpPath,
+    threePanelSpecTabPath,
   ],
   'canvas-centric': [
     canvasCentricAlcovePath,
     canvasCentricTopNotchPath,
     canvasCentricLJogPath,
+    canvasCentricSpecChamferPath,
   ],
   'document-centric': [
     documentCentricBottomLeftPath,
@@ -379,6 +459,7 @@ const SHAPE_VARIANTS = {
     singleColumnTopRightPath,
     singleColumnBottomRightPath,
     singleColumnCapsulePath,
+    singleColumnSpecPhoneChamferPath,
   ],
 }
 
