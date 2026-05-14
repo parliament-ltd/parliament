@@ -37,11 +37,31 @@ function nowIso() {
 // ─── Read ────────────────────────────────────────────────
 
 /**
+ * PR-19c: legacy modes (created before the `builtAt` field shipped) have
+ * `meta.builtAt === undefined`. We treat those as already built — the
+ * editor button reads "Save" for them. New modes that need explicit user
+ * confirmation set `meta.builtAt: null` (button reads "Build"). Once built,
+ * `meta.builtAt` is a timestamp. This normalization runs at read time so
+ * we don't need an IDB migration.
+ */
+function normalizeBuiltAt(mode) {
+  if (!mode || !mode.meta) return mode
+  if (mode.meta.builtAt === undefined) {
+    return {
+      ...mode,
+      meta: { ...mode.meta, builtAt: mode.meta.created || new Date().toISOString() },
+    }
+  }
+  return mode
+}
+
+/**
  * Load a single mode by id. Returns null if not found.
  */
 export async function loadMode(id) {
   const db = await initDB()
-  return (await db.get('modes', id)) || null
+  const mode = await db.get('modes', id)
+  return mode ? normalizeBuiltAt(mode) : null
 }
 
 /**
@@ -51,10 +71,10 @@ export async function loadMode(id) {
  */
 export async function listModes({ scope } = {}) {
   const db = await initDB()
-  if (scope) {
-    return db.getAllFromIndex('modes', 'scope', scope)
-  }
-  return db.getAll('modes')
+  const all = scope
+    ? await db.getAllFromIndex('modes', 'scope', scope)
+    : await db.getAll('modes')
+  return all.map(normalizeBuiltAt)
 }
 
 /**
@@ -158,6 +178,11 @@ export async function createModeFromTemplate(template, overrides = {}) {
       preferredProvider: null,
       created: now,
       modified: now,
+      // PR-19c: builtAt: null marks the room as "needs user confirmation"
+      // (button reads "Build" in editor). Set to a timestamp via igniteExistingRoom
+      // or buildAndOpenRoom once the user has committed via Ignition.
+      // Callers can override via `overrides.builtAt`.
+      builtAt: overrides.builtAt !== undefined ? overrides.builtAt : null,
     },
     deviceClass: template.deviceClass || 'visual-pointer',
     layout: template.layout,

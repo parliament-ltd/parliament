@@ -1,15 +1,26 @@
-// EditorLeftRail — three tabs of draggable items: Layouts, Components,
-// Schemes. Pulls layouts from libraryLayouts (IndexedDB seed), components
-// from the in-memory catalog, schemes from src/lib/schemes.js.
+// EditorLeftRail — three tabs of draggable library cards: Layouts,
+// Components, Schemes. Cards render through the shared `<LibraryCard>`
+// primitive (src/components/LibraryCard.jsx) so a Highlights card here
+// and a Highlights card on the homepage look like the same thing.
 //
-// Each draggable card uses dnd-kit's useDraggable. Drag data carries
-// `{ kind, ref, displayName }` — EditorView's onDragEnd routes by `kind`.
+// PR-19c rewrite:
+//   - Switched to LibraryCard everywhere.
+//   - Layouts: distinct per-layout silhouettes via <LayoutSilhouette>.
+//   - Layouts: "Current" pill (renamed from "Active").
+//   - Components: lucide icon centered in the preview area (reads
+//     `entry.icon` added to manifests in PR-19c).
+//   - Components: "Homepage" pill + grey-out when the component's
+//     `surfaces` excludes the current editor scope.
+//   - Schemes: 3-color swatch (bg + accent + soft stripe). Fixed a
+//     pre-existing bug where the SchemesTab built `${s.id}@1.0` (double
+//     `@1.0`) and looked up `--p-gold-light` keys that don't exist in
+//     the SCHEMES const.
 
 import { useEffect, useState } from 'react'
 import { useDraggable } from '@dnd-kit/core'
 import { initDB } from '../../lib/db'
 import { SCHEMES } from '../../lib/schemes'
-import { LAYOUT_SLOTS } from '../../lib/layoutMigration'
+import LibraryCard from '../LibraryCard'
 
 const TABS = [
   { id: 'layouts', label: 'Layouts' },
@@ -33,8 +44,6 @@ export default function EditorLeftRail({
       const db = await initDB()
       const all = await db.getAll('libraryLayouts')
       if (cancelled) return
-      // Filter by scope so room editing doesn't see homepage layouts
-      // and vice versa. A layout's `scopes` array can include both.
       const filtered = all.filter((l) =>
         Array.isArray(l.scopes) ? l.scopes.includes(scope) : true
       )
@@ -61,17 +70,15 @@ export default function EditorLeftRail({
           </button>
         ))}
       </div>
-      <div className="flex-1 overflow-y-auto p-3 space-y-2">
+      <div className="flex-1 overflow-y-auto p-3">
         {tab === 'layouts' && (
-          <LayoutsTab
-            layouts={layouts}
-            currentLayoutRef={currentLayoutRef}
-          />
+          <LayoutsTab layouts={layouts} currentLayoutRef={currentLayoutRef} />
         )}
         {tab === 'components' && (
           <ComponentsTab
             entries={catalogEntries}
             placedRefs={placedComponentRefs}
+            scope={scope}
           />
         )}
         {tab === 'schemes' && (
@@ -89,207 +96,146 @@ function LayoutsTab({ layouts, currentLayoutRef }) {
     return <div className="text-[10.5px] text-[var(--p-text-muted)]">No layouts available.</div>
   }
   return (
-    <>
-      <div className="text-[10.5px] text-[var(--p-text-muted)] leading-[1.5] pb-1">
+    <div className="lrail-cards">
+      <div className="text-[10.5px] text-[var(--p-text-muted)] leading-[1.5] pb-2">
         Drag a layout onto the canvas to swap. Components move to compatible slots.
       </div>
       {layouts.map((l) => (
-        <LayoutCard
+        <DraggableLayoutCard
           key={l.id}
-          id={l.id}
-          displayName={l.displayName}
-          description={l.description}
-          status={l.status}
+          layout={l}
           isCurrent={l.id === currentLayoutRef}
-          slots={LAYOUT_SLOTS[l.id] || []}
         />
       ))}
-    </>
+    </div>
   )
 }
 
-function ComponentsTab({ entries, placedRefs }) {
-  // Filter to entries that target room slots — homepage components
-  // (blueprint, library, favorites, etc.) are mostly stack-targets and
-  // would clutter a room editor, but for PR-8 we list everything.
+function ComponentsTab({ entries, placedRefs, scope }) {
   const sorted = [...entries].sort((a, b) => a.displayName.localeCompare(b.displayName))
   return (
-    <>
-      <div className="text-[10.5px] text-[var(--p-text-muted)] leading-[1.5] pb-1">
+    <div className="lrail-cards">
+      <div className="text-[10.5px] text-[var(--p-text-muted)] leading-[1.5] pb-2">
         Drag onto a slot to place. Configure in the right rail.
       </div>
       {sorted.map((entry) => {
         const ref = `${entry.name}@${entry.version}`
+        // PR-19c: filter by surfaces. Components scoped to a different
+        // surface (e.g. homepage-only blueprint while editing a room) get
+        // greyed out + a "Homepage"/"Room" pill instead of being hidden.
+        const surfaces = entry.surfaces || ['both']
+        const fits = surfaces.includes(scope) || surfaces.includes('both')
         return (
-          <ComponentCard
+          <DraggableComponentCard
             key={ref}
             ref_={ref}
             entry={entry}
             placed={placedRefs.has(ref)}
+            disabled={!fits}
+            surfaceLabel={!fits ? surfaceMismatchLabel(surfaces) : null}
           />
         )
       })}
-    </>
+    </div>
   )
 }
 
 function SchemesTab({ currentSchemeRef }) {
   return (
-    <>
-      <div className="text-[10.5px] text-[var(--p-text-muted)] leading-[1.5] pb-1">
+    <div className="lrail-cards">
+      <div className="text-[10.5px] text-[var(--p-text-muted)] leading-[1.5] pb-2">
         Drag a scheme onto the canvas to apply.
       </div>
       {SCHEMES.map((s) => {
-        const ref = `${s.id}@1.0`
-        const swatch = s.variants?.light?.['--p-gold-light'] || '#C4A94D'
-        const bg = s.variants?.light?.['--p-bg-base'] || '#FFFFFF'
+        const ref = s.id // already 'parliament@1.0' etc — no second @1.0 needed
         return (
-          <SchemeCard
+          <DraggableSchemeCard
             key={ref}
             ref_={ref}
-            displayName={s.displayName}
-            description={s.description}
-            swatch={swatch}
-            bg={bg}
+            scheme={s}
             isActive={ref === currentSchemeRef}
           />
         )
       })}
-    </>
+    </div>
   )
 }
 
-// ─── Cards ───────────────────────────────────────────────
+// ─── Draggable card wrappers ─────────────────────────────
 
-function LayoutCard({ id, displayName, description, status, isCurrent, slots }) {
-  const draggable = !isCurrent && status === 'available'
+function DraggableLayoutCard({ layout, isCurrent }) {
+  const isComingSoon = layout.status === 'coming-soon'
+  const draggable = !isCurrent && !isComingSoon
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: `layout-${id}`,
-    data: { kind: 'layout', ref: id, displayName },
+    id: `layout-${layout.id}`,
+    data: { kind: 'layout', ref: layout.id, displayName: layout.displayName },
     disabled: !draggable,
   })
 
+  const statusLabel = isCurrent ? 'Current' : (isComingSoon ? 'Soon' : null)
+
   return (
-    <div
-      ref={setNodeRef}
-      {...(draggable ? listeners : {})}
-      {...(draggable ? attributes : {})}
-      className={`p-2 border rounded-md bg-white transition-colors ${
-        draggable
-          ? `cursor-grab hover:border-[var(--p-gold-light)] hover:bg-[rgba(196,169,77,0.04)] ${isDragging ? 'opacity-50' : ''}`
-          : 'cursor-default opacity-60 bg-[var(--p-bg-subtle)]'
-      } border-[var(--p-border)]`}
-    >
-      <LayoutWireframe slots={slots} />
-      <div className="flex items-center gap-1.5 mt-1.5">
-        <div className="text-[12px] font-medium text-[var(--p-text-primary)] flex-1 truncate">
-          {displayName}
-        </div>
-        {isCurrent && (
-          <span className="text-[9px] uppercase tracking-wider px-1.5 py-px rounded-full bg-[var(--p-bg-alt)] text-[var(--p-text-muted)]">
-            Active
-          </span>
-        )}
-        {status === 'coming-soon' && (
-          <span className="text-[9px] uppercase tracking-wider px-1.5 py-px rounded-full bg-[var(--p-bg-alt)] text-[var(--p-text-muted)]">
-            Soon
-          </span>
-        )}
-      </div>
-      {description && (
-        <div className="text-[10.5px] text-[var(--p-text-muted)] leading-[1.45]">{description}</div>
-      )}
-    </div>
+    <LibraryCard
+      item={{ ...layout, kind: 'layout' }}
+      dragRef={setNodeRef}
+      dragListeners={draggable ? listeners : undefined}
+      dragAttributes={draggable ? attributes : undefined}
+      isDragging={isDragging}
+      disabled={!draggable}
+      statusLabel={statusLabel}
+    />
   )
 }
 
-// Mini wireframe of the layout's slot inventory. Hardcoded geometries
-// per layout id — for layouts not in this map we fall back to a flat
-// row of equal-width slot rectangles.
-function LayoutWireframe({ slots }) {
-  if (!slots.length) {
-    return <div className="w-full h-10 rounded bg-[var(--p-bg-subtle)] border border-[var(--p-border-subtle)]" />
-  }
-  return (
-    <div className="w-full h-10 rounded bg-[var(--p-bg-subtle)] border border-[var(--p-border-subtle)] flex gap-1 p-1">
-      {slots.slice(0, 4).map((s) => (
-        <div
-          key={s.id}
-          className="border border-[var(--p-text-light)] rounded-sm flex-1"
-          title={s.label}
-        />
-      ))}
-    </div>
-  )
-}
-
-function ComponentCard({ ref_, entry, placed }) {
-  const draggable = true // even placed components can be re-dragged to a new slot
+function DraggableComponentCard({ ref_, entry, placed, disabled, surfaceLabel }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `comp-${ref_}`,
     data: { kind: 'component', ref: ref_, displayName: entry.displayName },
-    disabled: !draggable,
+    disabled,
   })
+
+  const statusLabel = surfaceLabel || (placed ? 'Placed' : null)
+
   return (
-    <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      className={`p-2 border rounded-md bg-white border-[var(--p-border)] transition-colors cursor-grab hover:border-[var(--p-gold-light)] hover:bg-[rgba(196,169,77,0.04)] ${
-        isDragging ? 'opacity-50' : ''
-      } ${placed ? 'opacity-70' : ''}`}
-    >
-      <div className="flex items-center gap-1.5 mb-0.5">
-        <div className="text-[12px] font-medium text-[var(--p-text-primary)] flex-1 truncate">
-          {entry.displayName}
-        </div>
-        {placed && (
-          <span className="text-[9px] uppercase tracking-wider px-1.5 py-px rounded-full bg-[var(--p-bg-alt)] text-[var(--p-text-muted)]">
-            Placed
-          </span>
-        )}
-      </div>
-      {entry.description && (
-        <div className="text-[10.5px] text-[var(--p-text-muted)] leading-[1.45] line-clamp-2">
-          {entry.description}
-        </div>
-      )}
-    </div>
+    <LibraryCard
+      item={{
+        ...entry,
+        id: ref_,
+        kind: 'component',
+        // Surfaces flow through manifest; icon was added in PR-19c.
+      }}
+      dragRef={setNodeRef}
+      dragListeners={!disabled ? listeners : undefined}
+      dragAttributes={!disabled ? attributes : undefined}
+      isDragging={isDragging}
+      disabled={disabled}
+      statusLabel={statusLabel}
+    />
   )
 }
 
-function SchemeCard({ ref_, displayName, description, swatch, bg, isActive }) {
+function DraggableSchemeCard({ ref_, scheme, isActive }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `scheme-${ref_}`,
-    data: { kind: 'scheme', ref: ref_, displayName },
+    data: { kind: 'scheme', ref: ref_, displayName: scheme.displayName },
   })
+
   return (
-    <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      className={`p-2 border rounded-md transition-colors cursor-grab ${
-        isDragging ? 'opacity-50' : ''
-      } ${isActive ? 'border-[var(--p-gold-light)]' : 'border-[var(--p-border)] hover:border-[var(--p-gold-light)]'}`}
-      style={isActive ? { background: 'rgba(196,169,77,0.06)' } : undefined}
-    >
-      <div className="w-full h-7 rounded flex items-center px-2 gap-1.5" style={{ background: bg, border: `0.5px solid ${swatch}` }}>
-        <span className="w-2 h-2 rounded-full" style={{ background: swatch }} />
-        <span className="flex-1 h-0.5 rounded" style={{ background: swatch, opacity: 0.45 }} />
-      </div>
-      <div className="flex items-center gap-1.5 mt-1.5">
-        <div className="text-[12px] font-medium text-[var(--p-text-primary)] flex-1 truncate">
-          {displayName}
-        </div>
-        {isActive && (
-          <span className="text-[9px] uppercase tracking-wider px-1.5 py-px rounded-full bg-[var(--p-bg-alt)] text-[var(--p-text-muted)]">
-            Active
-          </span>
-        )}
-      </div>
-      {description && (
-        <div className="text-[10.5px] text-[var(--p-text-muted)] leading-[1.45]">{description}</div>
-      )}
-    </div>
+    <LibraryCard
+      item={{ ...scheme, kind: 'scheme' }}
+      dragRef={setNodeRef}
+      dragListeners={listeners}
+      dragAttributes={attributes}
+      isDragging={isDragging}
+      statusLabel={isActive ? 'Active' : null}
+    />
   )
+}
+
+// ─── Helpers ─────────────────────────────────────────────
+
+function surfaceMismatchLabel(surfaces) {
+  if (surfaces.includes('homepage') && !surfaces.includes('room')) return 'Homepage'
+  if (surfaces.includes('room') && !surfaces.includes('homepage')) return 'Room'
+  return null
 }

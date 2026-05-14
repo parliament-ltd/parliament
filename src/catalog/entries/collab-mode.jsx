@@ -25,6 +25,8 @@ export default {
   displayName: 'Collaboration mode',
   author: 'parliament',
   description: 'System-prompt presets and saved Parrot Personas applied to the next user send.',
+  icon: 'Users',
+  surfaces: ['room'],
   tier: 'composer',
   slotTargets: [
     { slot: 'right-rail',       primary: true },

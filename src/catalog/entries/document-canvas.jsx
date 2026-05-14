@@ -49,6 +49,8 @@ export default {
   displayName: 'Document canvas',
   author: 'parliament',
   description: 'Paper-style writing surface with tracked changes, slash-command menu, and a Submit & Branch flow that snapshots the current draft.',
+  icon: 'FileText',
+  surfaces: ['room'],
   tier: 'composer',
   slotTargets: [
     { slot: 'document', primary: true },

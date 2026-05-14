@@ -24,6 +24,8 @@ export default {
   displayName: 'Review',
   author: 'parliament',
   description: 'Synthesizes the active conversation; category toggles for highlights, notes, favorites, pins.',
+  icon: 'ListChecks',
+  surfaces: ['room'],
   tier: 'composer',
   slotTargets: [
     { slot: 'right-rail', primary: true },

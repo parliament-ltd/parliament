@@ -12,6 +12,8 @@ export default {
   displayName: 'Scratchpad',
   author: 'parliament',
   description: 'A single free-form note that persists across sessions.',
+  icon: 'NotebookPen',
+  surfaces: ['homepage'],
   tier: 'utility',
   slotTargets: [
     { slot: 'section-slot', primary: true },

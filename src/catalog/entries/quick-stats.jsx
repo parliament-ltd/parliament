@@ -13,6 +13,8 @@ export default {
   displayName: 'Quick stats',
   author: 'parliament',
   description: 'At-a-glance totals: conversations, messages, highlights, notes.',
+  icon: 'Hash',
+  surfaces: ['homepage'],
   tier: 'reader',
   slotTargets: [
     { slot: 'section-slot', primary: true },

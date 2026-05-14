@@ -87,6 +87,8 @@ export default {
   displayName: 'File shelf',
   author: 'parliament',
   description: 'Staged files for data-workspace rooms. Drop CSV/XLSX/JSON; toggle which files Claude can reference.',
+  icon: 'FolderOpen',
+  surfaces: ['room'],
   tier: 'composer',
   slotTargets: [
     { slot: 'left-rail', primary: true },

@@ -14,6 +14,8 @@ export default {
   displayName: 'Blueprint',
   author: 'parliament',
   description: 'Floor-plan view of the rooms the user has built; cross-references chat rows.',
+  icon: 'LayoutDashboard',
+  surfaces: ['homepage'],
   tier: 'reader',
   slotTargets: [
     { slot: 'section-slot', primary: true },

@@ -21,9 +21,11 @@
 // verbatim from the HTML rather than hand-translating to Tailwind utilities.
 
 import { useEffect, useMemo, useState } from 'react'
-import { Search, BookOpen, FileText, Code2, BarChart3, Film } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { initDB } from '../../lib/db'
 import LibraryOverlay from '../../components/LibraryOverlay'
+import LibraryCard from '../../components/LibraryCard'
+import { getEntry } from '../../catalog'
 
 const FILTERS = [
   { id: 'all',       label: 'All',        kinds: ['room', 'layout', 'component', 'scheme', 'resource'] },
@@ -118,14 +120,6 @@ const RESOURCES = [
   },
 ]
 
-const ICON_MAP = {
-  'book-open':   BookOpen,
-  'file-text':   FileText,
-  'code-2':      Code2,
-  'bar-chart-3': BarChart3,
-  'film':        Film,
-}
-
 // ─── Component ───────────────────────────────────────────────
 
 export default function LibraryPreview({ config = {} } = {}) {
@@ -147,10 +141,24 @@ export default function LibraryPreview({ config = {} } = {}) {
           db.getAll('librarySchemes'),
         ])
         if (cancelled) return
+        // PR-19c: enrich component rows with the manifest's icon field
+        // (manifest registry is authoritative; seedLibraryComponents()
+        // predates the icon field, so we look it up at read time rather
+        // than running a migration).
+        const enrichedComponents = components.map((c) => {
+          const ref = c.id || `${c.name}@${c.version}`
+          const manifest = getEntry(ref)
+          return {
+            ...c,
+            kind: 'component',
+            icon: c.icon || manifest?.icon || null,
+            surfaces: c.surfaces || manifest?.surfaces || ['both'],
+          }
+        })
         const all = [
           ...rooms.map(r =>      ({ ...r, kind: 'room' })),
           ...layouts.map(l =>    ({ ...l, kind: 'layout' })),
-          ...components.map(c => ({ ...c, kind: 'component' })),
+          ...enrichedComponents,
           ...schemes.map(s =>    ({ ...s, kind: 'scheme' })),
           ...RESOURCES,
         ]
@@ -205,7 +213,17 @@ export default function LibraryPreview({ config = {} } = {}) {
       ) : (
         <div className="library-grid">
           {visible.map(it => (
-            <LibraryCard key={`${it.kind}:${it.id}`} item={it} onOpen={() => setOverlayItem(it)} />
+            <LibraryCard
+              key={`${it.kind}:${it.id}`}
+              item={it}
+              onClick={() => setOverlayItem(it)}
+              installs={
+                typeof it.installedCount === 'number'
+                  ? `${formatInstalls(it.installedCount)} installs`
+                  : null
+              }
+              cta={ctaLabel(it.kind)}
+            />
           ))}
         </div>
       )}
@@ -215,114 +233,7 @@ export default function LibraryPreview({ config = {} } = {}) {
   )
 }
 
-// ─── Card + per-type preview ─────────────────────────────────
-
-function LibraryCard({ item, onOpen }) {
-  const author = formatAuthor(item.author)
-  const installs = typeof item.installedCount === 'number' ? `${formatInstalls(item.installedCount)} installs` : null
-  const cta = ctaLabel(item.kind)
-
-  return (
-    <button type="button" className="lib-card" onClick={onOpen}>
-      <Preview item={item} />
-      <div className="lib-card-head">
-        <span className={`lib-card-type ${item.kind}`}>{item.format || typeLabel(item.kind)}</span>
-        {item.status === 'coming-soon' && (
-          <span className="lib-card-status">Coming soon</span>
-        )}
-      </div>
-      <div className="lib-card-name">{item.displayName || item.name || item.title}</div>
-      {author && <div className="lib-card-author">{author}</div>}
-      <div className="lib-card-action">
-        <span>{installs || '—'}</span>
-        <span className="lib-card-cta">{cta} →</span>
-      </div>
-    </button>
-  )
-}
-
-function Preview({ item }) {
-  switch (item.kind) {
-    case 'room':      return <RoomPreview item={item} />
-    case 'layout':    return <LayoutPreview item={item} />
-    case 'component': return <ComponentPreview item={item} />
-    case 'scheme':    return <SchemePreview item={item} />
-    case 'resource':  return <ResourcePreview item={item} />
-    default:          return <div className="lib-preview" />
-  }
-}
-
-// Simple wireframe: 3 panels, with a gold input-dock bar on the middle.
-function RoomPreview() {
-  return (
-    <div className="lib-preview">
-      <div className="wr" style={{ width: '20%' }}><span className="wd" /></div>
-      <div className="wr" style={{ flex: 1, position: 'relative' }}><div className="wb" /></div>
-      <div className="wr dashed" style={{ width: '22%' }} />
-    </div>
-  )
-}
-
-// Two equal panels + dashed extra. Closer to "structural" vs the
-// inhabited Room preview.
-function LayoutPreview() {
-  return (
-    <div className="lib-preview">
-      <div className="wr" style={{ flex: 1 }} />
-      <div className="wr" style={{ flex: 1 }} />
-      <div className="wr dashed" style={{ width: '25%' }} />
-    </div>
-  )
-}
-
-// Single panel with a horizontal track + a row of dots.
-function ComponentPreview() {
-  return (
-    <div className="lib-preview">
-      <div className="wr" style={{ flex: 1, padding: '3px' }}>
-        <div style={{ height: 2, background: 'var(--p-gold-muted)', margin: '6px 0', opacity: 0.5 }} />
-        <div style={{ display: 'flex', gap: 4, marginTop: 3 }}>
-          <span className="wd" /><span className="wd" /><span className="wd" /><span className="wd" />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Pull a representative accent color from the seeded scheme variants.
-// Falls back to gold-light when no variant snapshot is present (V3
-// community-submitted schemes may ship without one).
-function SchemePreview({ item }) {
-  const variant = item.variants?.[item.defaultVariant || 'light'] || {}
-  const bg = variant['bg-base'] || variant['bg-surface'] || '#F8F3E6'
-  const accent = variant['gold-light'] || variant['gold'] || '#B8A070'
-  const muted = variant['gold-muted'] || variant['gold'] || '#A8623A'
-  return (
-    <div className="lib-preview scheme-swatch" style={{ background: bg }}>
-      <div className="sd" style={{ background: muted }} />
-      <div className="sl" style={{ background: accent }} />
-    </div>
-  )
-}
-
-function ResourcePreview({ item }) {
-  const Icon = ICON_MAP[item.iconName] || FileText
-  return (
-    <div className="lib-preview resource">
-      <Icon className="w-7 h-7" />
-    </div>
-  )
-}
-
 // ─── Formatters ──────────────────────────────────────────────
-
-function formatAuthor(a) {
-  if (!a) return null
-  if (typeof a === 'string') return `by ${a}`
-  if (a.handle) return `by @${a.handle}`
-  if (a.name) return `by ${a.name}`
-  return null
-}
 
 function formatInstalls(n) {
   if (n < 1000) return String(n)
@@ -338,16 +249,5 @@ function ctaLabel(kind) {
     case 'scheme':    return 'Add'
     case 'resource':  return 'Open'
     default:          return 'Add'
-  }
-}
-
-function typeLabel(kind) {
-  switch (kind) {
-    case 'room':      return 'Room'
-    case 'layout':    return 'Layout'
-    case 'component': return 'Component'
-    case 'scheme':    return 'Scheme'
-    case 'resource':  return 'Resource'
-    default:          return 'Item'
   }
 }

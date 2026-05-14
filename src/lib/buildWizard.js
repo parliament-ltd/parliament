@@ -15,7 +15,7 @@
 // calls buildAndOpenRoom(config) which also creates a conversation in
 // the new room and routes to /chat/:newConvId.
 
-import { createModeFromTemplate } from './modes'
+import { createModeFromTemplate, loadMode, saveMode } from './modes'
 import { createConversation as dbCreateConversation } from './db'
 
 /* ── Spec-aligned data shape ──────────────────────────────────
@@ -312,11 +312,44 @@ export async function buildModeFromWizard(config) {
 
 export async function buildAndOpenRoom(config) {
   const mode = await buildModeFromWizard(config)
-  const conversation = await dbCreateConversation({
-    title: mode.meta?.name || 'New room',
-    room: mode.id,
+  // PR-19c: Ignition path flips meta.builtAt → timestamp so the room is
+  // marked as "user-confirmed" and the editor button reads "Save" if they
+  // ever come back. buildModeFromWizard returns with builtAt: null (the
+  // pre-Ignition state); we override on this path.
+  const builtMode = await saveMode({
+    ...mode,
+    meta: { ...mode.meta, builtAt: new Date().toISOString() },
   })
-  return { mode, conversation }
+  const conversation = await dbCreateConversation({
+    title: builtMode.meta?.name || 'New room',
+    room: builtMode.id,
+  })
+  return { mode: builtMode, conversation }
+}
+
+/**
+ * PR-19c: Ignite an already-existing room from the editor's "Build" button.
+ *
+ * The wizard's Ignition step is reused for this path; BuildView routes there
+ * when its URL has `?ignite=<roomId>`. IgnitionStep validates the API key,
+ * runs its animation, then calls this — which marks the existing mode as
+ * built and creates the first conversation in it.
+ *
+ * Returns { mode, conversation } so the caller can navigate to the chat.
+ */
+export async function igniteExistingRoom(roomId) {
+  if (!roomId) throw new Error('igniteExistingRoom: roomId required')
+  const mode = await loadMode(roomId)
+  if (!mode) throw new Error(`igniteExistingRoom: room not found: ${roomId}`)
+  const builtMode = await saveMode({
+    ...mode,
+    meta: { ...mode.meta, builtAt: new Date().toISOString() },
+  })
+  const conversation = await dbCreateConversation({
+    title: builtMode.meta?.name || 'New room',
+    room: builtMode.id,
+  })
+  return { mode: builtMode, conversation }
 }
 
 function defaultName(config) {

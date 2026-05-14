@@ -19,6 +19,8 @@ export default {
   displayName: 'Chats',
   author: 'parliament',
   description: 'Conversation list with search, view toggle, bulk actions; publishes row-hover on the bus.',
+  icon: 'MessageCircle',
+  surfaces: ['homepage'],
   tier: 'composer',
   slotTargets: [
     { slot: 'section-slot', primary: true },

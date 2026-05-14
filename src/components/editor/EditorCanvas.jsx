@@ -11,6 +11,7 @@
 import { useDroppable } from '@dnd-kit/core'
 import { getLayoutSlots } from '../../lib/layoutMigration'
 import { findCatalogEntry, normalizeRef } from '../../lib/refs'
+import { schemeName } from '../../lib/schemes'
 
 // Per-layout slot positioning. Each entry maps slotId → CSS grid
 // classes so the canvas approximates the live layout's spatial
@@ -75,6 +76,13 @@ export default function EditorCanvas({
   const slots = getLayoutSlots(layoutRef)
   const geometry = LAYOUT_GEOMETRY[layoutKey]
 
+  // PR-19c: live scheme preview. The canvas wrapper carries
+  // data-scheme=<bareName>, which scopes the scheme's CSS variable
+  // overrides to the canvas and its descendants. Editor chrome stays
+  // on the user's global scheme.
+  const schemeRef = normalizeRef(mode?.scheme?.ref) || 'parliament@1.0'
+  const canvasScheme = schemeName(schemeRef)
+
   // Group placed components by slot, sorted by `order`.
   const componentsBySlot = {}
   for (const c of mode?.components || []) {
@@ -96,6 +104,7 @@ export default function EditorCanvas({
           if (e.target === e.currentTarget) onSelectRoom()
         }}
         selected={isRoomSelected}
+        schemeName={canvasScheme}
       >
         {!geometry ? (
           <div className="p-6 text-center text-xs text-[var(--p-text-secondary)]">
@@ -151,7 +160,7 @@ export default function EditorCanvas({
 
 // ─── Canvas (background drop target) ─────────────────────
 
-function CanvasDropTarget({ children, onClick, selected }) {
+function CanvasDropTarget({ children, onClick, selected, schemeName: schemeAttr }) {
   const { setNodeRef, isOver } = useDroppable({
     id: 'canvas-root',
     data: { kind: 'canvas' },
@@ -160,10 +169,12 @@ function CanvasDropTarget({ children, onClick, selected }) {
     <div
       ref={setNodeRef}
       onClick={onClick}
-      className={`w-full max-w-[920px] rounded-lg border bg-white shadow-[0_8px_30px_-10px_rgba(0,0,0,0.08)] transition-shadow ${
+      data-scheme={schemeAttr}
+      className={`w-full max-w-[920px] rounded-lg border shadow-[0_8px_30px_-10px_rgba(0,0,0,0.08)] transition-shadow ${
         selected ? 'border-[var(--p-gold-light)]' : 'border-[var(--p-border)]'
       }`}
       style={{
+        background: 'var(--p-bg-base)',
         boxShadow: isOver
           ? '0 0 0 2px var(--p-gold-light), 0 8px 30px -10px rgba(0,0,0,0.12)'
           : undefined,

@@ -39,6 +39,8 @@ export default {
   displayName: 'File attach',
   author: 'parliament',
   description: 'Pick image / PDF / text files and stage them on the next outgoing message. 10 MB per binary file; 200 KB per text/code file; up to 10 attachments per message.',
+  icon: 'Paperclip',
+  surfaces: ['room'],
   tier: 'composer',
   slotTargets: [
     { slot: 'input-dock',       primary: false, fallbackOk: true },

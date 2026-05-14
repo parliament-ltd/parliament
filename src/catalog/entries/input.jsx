@@ -27,6 +27,8 @@ export default {
   displayName: 'Input',
   author: 'parliament',
   description: 'Message composer with send / stop, attachment, and tool-toggle menu.',
+  icon: 'MessageSquare',
+  surfaces: ['room'],
   tier: 'composer',
   slotTargets: [
     { slot: 'input-dock', primary: true },

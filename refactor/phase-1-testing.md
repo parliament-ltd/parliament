@@ -3914,6 +3914,85 @@ larger titles + meta. Site-wide font bump is deferred to PR-19b.
 
 ---
 
+## PR-19c — Editor visual polish + Build/Save ignite flow
+
+👀 User-visible
+
+**Surface:** `/edit/:roomId`, `/edit-home`, `/build?ignite=:roomId`, homepage Blueprint, homepage Library.
+
+**Setup:** Have at least one room built. Have a homepage with the default sections. Have one room with zero conversations (to test the blueprint click fix). API key persisted.
+
+**Steps:**
+
+1. Open the editor on an existing built room (`/edit/:roomId`).
+   - [ ] Top bar shows: back arrow, "Editing" crumb, Desktop/Mobile chip, scheme chip on the left; undo/redo + Preview + a single primary button on the right. NO room-name input in the top bar.
+   - [ ] Primary button reads **"Save"** (room has been built before, so `meta.builtAt` is a timestamp or pre-PR-19c legacy).
+   - [ ] Right rail still shows the room-name field as the canonical edit point.
+
+2. Look at the left-rail Layouts tab.
+   - [ ] Each layout card has a **distinct silhouette** (not 4 equal rectangles). Three-panel shows two narrow rails + center with chat bubbles + input bar + a scrollbar line on the right rail. Canvas-centric shows the hatched canvas + chat bubbles in the right rail. Document-centric shows text lines + placement dots. Single-column shows chat bubbles + bottom input bar.
+   - [ ] The active layout is labeled **"Current"** (not "Active") in the same pill shape as "Soon".
+
+3. Look at the left-rail Components tab.
+   - [ ] Every component card has an **icon** centered in the preview thumbnail (lucide glyph per `manifest.icon`).
+   - [ ] Already-placed components show a "Placed" pill.
+   - [ ] Homepage-only components (blueprint, chats, library, favorites, recent-activity, quick-stats, scratchpad + previews) show a **"Homepage" pill** and are **greyed out + not draggable** in the room editor.
+
+4. Look at the left-rail Schemes tab.
+   - [ ] Each scheme card's preview shows **three colors**: scheme background, accent dot, soft stripe (not the previous single-color treatment).
+   - [ ] The active scheme has an "Active" pill.
+
+5. Drag a different scheme onto the canvas.
+   - [ ] The **canvas re-tints live** to the new scheme (bg color, gold-light, etc).
+   - [ ] The surrounding editor chrome (left rail, top bar, right rail) stays on the user's global scheme — it does NOT re-tint.
+
+6. Open the editor on a freshly-built `Build it myself` room (Wizard → Build it myself → lands at `/edit/:newId`).
+   - [ ] Primary button reads **"Build"** (because `meta.builtAt` is null for this path).
+   - [ ] Click Build → routes to `/build?ignite=:roomId`. The wizard step track + receipt are hidden. IgnitionStep renders with the room's existing name/layout/scheme/components for the feature chips.
+   - [ ] Continue (saved-key) or Validate (first time) → the ignite animation plays.
+   - [ ] Connected → three buttons (Build another / Go to your Parliament / Enter).
+   - [ ] After "Enter", returning to `/edit/:roomId` → primary button now reads **"Save"** (because `meta.builtAt` flipped to a timestamp).
+
+7. Test the template-gallery path.
+   - [ ] Wizard → Start from a template → pick a template → lands in editor with primary button "Build".
+   - [ ] Same Build → ignite flow as step 6.
+
+8. Test the wizard's Ignition path (full wizard).
+   - [ ] Wizard → Guide me → complete steps 1-5 → step 6 ignites → navigation lands in chat.
+   - [ ] If you later open this room in editor (`/edit/:roomId`), primary button reads "Save".
+
+9. Test the blueprint click fix on the homepage.
+   - [ ] Click on a room with no conversations in the blueprint → **navigates to `/chat/<newId>` in that room** (a fresh conversation is created), NOT to `/build`.
+   - [ ] Click on a room with conversations → navigates to the most recent chat (unchanged).
+   - [ ] Click the "+ Build a room" placeholder → goes to `/build` (unchanged).
+
+10. Open the homepage Library section.
+    - [ ] Component cards show the **icon centered** in the preview area (was: abstract track-and-dots).
+    - [ ] Layout cards show the new **per-layout silhouettes** (same component as in the editor — visual consistency).
+    - [ ] Scheme cards show the **three-color swatch** (bg + accent + soft stripe).
+
+11. Sanity check: open a legacy room (one built before PR-19c).
+    - [ ] Editor button reads "Save" (legacy `builtAt === undefined` normalizes to `meta.created`).
+    - [ ] No errors in the console about missing fields.
+
+**Expected:**
+- Layout silhouettes are visually distinct and identifiable at a glance.
+- Live scheme preview re-tints the canvas only, not the chrome.
+- Build / Save button label matches the room's `meta.builtAt` state.
+- The blueprint click bug is fixed: empty rooms open a fresh chat in the room, not the wizard.
+- Lint baseline 163 preserved.
+
+**Risk:** Low-medium. The biggest change is data: `meta.builtAt` is new on every mode. Runtime normalization in `loadMode` / `loadHomepageMode` treats `undefined` as built (legacy modes pre-PR-19c), so the button reads "Save" for all existing modes. Tested: lint at baseline, build succeeds, no schema changes to IndexedDB. The shared LibraryCard runs in both editor and homepage; size differences are handled via `.lrail-cards .lib-card { padding: 10px }` overrides — verified the editor's 240px rail still fits the cards.
+
+**Out of scope (still deferred):**
+- Center-column library below the canvas (gated on the new shared LibraryCard landing first, per user 2026-05-14).
+- Goal tab in left rail.
+- Chat tab (builder-assistant against the Anthropic API).
+- Slot-config toggles (Collapsible / Collapsed-by-default).
+- "Essential" gold pill on Input.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

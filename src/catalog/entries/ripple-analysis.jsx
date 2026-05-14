@@ -55,6 +55,8 @@ export default {
   displayName: 'Ripple analysis',
   author: 'parliament',
   description: 'Cross-paragraph and cross-document consistency flags. Runs on Submit & Branch; expand scope to scan other chats.',
+  icon: 'Waves',
+  surfaces: ['room'],
   tier: 'composer',
   slotTargets: [
     { slot: 'margin', primary: true },

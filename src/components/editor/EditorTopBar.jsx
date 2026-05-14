@@ -1,10 +1,16 @@
-// EditorTopBar — back, "Editing" crumb, room name input, device chip,
-// scheme chip, Preview/Save/Build buttons.
+// EditorTopBar — back, "Editing" crumb, device chip, scheme chip,
+// Preview / contextual primary action (Build or Save).
 //
-// Build is a deliberate alias for Save in PR-8: the wizard's "Ignite"
-// step (PR-9) handles the API-key-light-up moment. After PR-9 lands,
-// Build will trigger the wizard's last step.
+// PR-19c:
+//   - Room name input removed from the top bar. Identity editing now
+//     lives only in the right rail (one entry point per task).
+//   - Single contextual primary action:
+//       meta.builtAt == null → "Build"  → routes to /build?ignite=:roomId
+//       meta.builtAt is set  → "Save"   → onSave (persist in place)
+//     The duplicate Save+Build pair from PR-8 is gone; the wizard owns
+//     the celebratory Ignite moment for the "Build" semantics.
 
+import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Smartphone, Monitor, Eye, Undo2, Redo2 } from 'lucide-react'
 import { SCHEMES } from '../../lib/schemes'
 import { normalizeRef } from '../../lib/refs'
@@ -24,20 +30,41 @@ export default function EditorTopBar({
   onUndo,
   onRedo,
   onBack,
-  onNameChange,
   onDeviceClassChange,
   onSchemeChange,
   onSave,
   onPreview,
 }) {
-  const name = mode?.meta?.name || 'Untitled room'
+  const navigate = useNavigate()
   const deviceClass = mode?.deviceClass || 'visual-pointer'
   const isMobile = deviceClass === 'visual-touch-phone'
   const schemeRef = mode?.scheme?.ref
   const normalizedSchemeRef = normalizeRef(schemeRef)
   const scheme = SCHEMES.find((s) => `${s.id}@1.0` === normalizedSchemeRef || s.id === normalizedSchemeRef)
   const schemeLabel = scheme?.displayName || schemeRef || 'Default scheme'
-  const schemeSwatch = scheme?.variants?.light?.['--p-gold-light'] || '#C4A94D'
+  const schemeSwatch = scheme?.variants?.light?.['gold-light'] || scheme?.variants?.light?.['gold'] || '#C4A94D'
+
+  // PR-19c: contextual primary action. builtAt === null on rooms the
+  // user hasn't committed via Ignition yet (Build it myself, Open in
+  // editor, Template gallery). Once built, label switches to Save.
+  const isUnbuilt = mode?.meta?.builtAt == null
+  const primaryLabel = isUnbuilt ? 'Build' : 'Save'
+  const primaryDisabled = isUnbuilt
+    ? (saving || trayBlockingBuild)
+    : (saving || !dirty)
+  const primaryTitle = trayBlockingBuild ? 'Empty the holding tray first' : ''
+
+  const onPrimary = () => {
+    if (primaryDisabled) return
+    if (isUnbuilt) {
+      // Route to the wizard's Ignition step in existing-room mode.
+      // BuildView reads ?ignite=:roomId, loads the mode, and reuses
+      // IgnitionStep for the API-key + animation + three-button flow.
+      navigate(`/build?ignite=${mode.id}`)
+      return
+    }
+    onSave()
+  }
 
   return (
     <div className="h-[52px] flex items-center px-4 bg-white border-b border-[var(--p-border)] gap-3">
@@ -53,12 +80,6 @@ export default function EditorTopBar({
         <span className="text-[11px] uppercase tracking-wider font-medium text-[var(--p-text-muted)]">
           Editing
         </span>
-        <input
-          value={name}
-          onChange={(e) => onNameChange(e.target.value)}
-          className="text-sm font-medium text-[var(--p-text-primary)] bg-transparent border-0 px-2 py-1 rounded outline-none hover:bg-[var(--p-bg-subtle)] focus:bg-[var(--p-bg-subtle)] focus:shadow-[inset_0_0_0_1.5px_var(--p-gold-light)] min-w-[140px] max-w-[280px]"
-          aria-label="Room name"
-        />
         <span className="w-px h-5 bg-[var(--p-border)]" />
         <button
           onClick={() => onDeviceClassChange(isMobile ? 'visual-pointer' : 'visual-touch-phone')}
@@ -118,30 +139,18 @@ export default function EditorTopBar({
           Preview
         </button>
         <button
-          onClick={onSave}
-          disabled={saving || !dirty}
+          onClick={onPrimary}
+          disabled={primaryDisabled}
+          title={primaryTitle}
           className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${
-            saving || !dirty
-              ? 'border-[var(--p-border)] bg-white text-[var(--p-text-muted)] cursor-not-allowed'
-              : 'border-[var(--p-border)] bg-white text-[var(--p-text-secondary)] hover:border-[var(--p-gold-light)] hover:text-[var(--p-gold-light)]'
-          }`}
-        >
-          {saving ? 'Saving…' : 'Save'}
-        </button>
-        <button
-          onClick={onSave}
-          disabled={saving || trayBlockingBuild}
-          title={trayBlockingBuild ? 'Empty the holding tray first' : ''}
-          className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${
-            trayBlockingBuild || saving
+            primaryDisabled
               ? 'border-[var(--p-gold-light)] bg-[var(--p-gold-light)] text-white opacity-40 cursor-not-allowed'
               : 'border-[var(--p-gold-light)] bg-[var(--p-gold-light)] text-white hover:bg-[var(--p-gold-muted)] hover:border-[var(--p-gold-muted)]'
           }`}
         >
-          Build
+          {saving ? 'Saving…' : primaryLabel}
         </button>
       </div>
     </div>
   )
 }
-

@@ -29,6 +29,8 @@ export default {
   displayName: 'Context health',
   author: 'parliament',
   description: 'Token / message / context-window meter with threshold warnings.',
+  icon: 'Activity',
+  surfaces: ['room'],
   tier: 'reader',
   slotTargets: [
     { slot: 'right-rail',       primary: true },

@@ -25,6 +25,8 @@ export default {
   displayName: 'Notes',
   author: 'parliament',
   description: 'Saved notes for the active conversation, per-message or general.',
+  icon: 'StickyNote',
+  surfaces: ['room'],
   tier: 'reader',
   slotTargets: [
     { slot: 'left-rail',        primary: true },
