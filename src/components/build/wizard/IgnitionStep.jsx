@@ -80,6 +80,7 @@ function ClaudeMark({ size = 14 }) {
 
 export default function IgnitionStep({
   config,
+  existingMode,         // PR-19c: when set, ignite-existing-room mode
   onBack,
   onPersist,
   onEnterChat,
@@ -117,6 +118,27 @@ export default function IgnitionStep({
   }, [])
 
   const featureChips = useMemo(() => {
+    // PR-19c: existing-room ignite path. Pull labels off the mode's
+    // current layout/scheme + per-component refs rather than from the
+    // wizard's collected config.
+    if (existingMode) {
+      const layoutRef = existingMode.layout?.ref
+      const schemeRef = existingMode.scheme?.ref
+      const layoutLabel = LAYOUT_META[layoutRef]?.label
+      const schemeLabel = SCHEMES.find(s => s.id === schemeRef)?.label
+      const featureLabels = (existingMode.components || [])
+        .map(c => FEATURES.find(f => f.catalogRef === c.ref))
+        .filter(f => f && !f.comingSoon)
+        .map(f => f.label)
+      // De-dupe: baseline messages/input aren't features and won't match.
+      const seen = new Set()
+      const features = featureLabels.filter(l => seen.has(l) ? false : (seen.add(l), true))
+      return [
+        layoutLabel || 'Layout',
+        schemeLabel,
+        ...features,
+      ].filter(Boolean).slice(0, 7)
+    }
     const layoutLabel = config.layout && LAYOUT_META[config.layout]?.label
     const schemeLabel = SCHEMES.find(s => s.id === config.scheme)?.label
     const features = [...config.features]
@@ -128,7 +150,7 @@ export default function IgnitionStep({
       schemeLabel,
       ...features,
     ].filter(Boolean).slice(0, 7)
-  }, [config])
+  }, [config, existingMode])
 
   // Per-chip animation phase — independent because each chip lights at
   // a different t = LIT_AT_MS + i * FEATURE_STAGGER_MS.
@@ -138,7 +160,13 @@ export default function IgnitionStep({
     setChipPhases(featureChips.map(() => 'idle'))
   }, [featureChips])
 
-  const roomName = (config.name || '').trim() || 'The Writing Studio'
+  // PR-19c: prefer the existing mode's saved name when igniting an
+  // already-built room from the editor; otherwise use the wizard's
+  // working config.
+  const roomName =
+    (existingMode?.meta?.name || '').trim() ||
+    (config.name || '').trim() ||
+    'The Writing Studio'
 
   // Reset visible state if the user navigates back to this step or
   // unmounts while the cascade is in flight.

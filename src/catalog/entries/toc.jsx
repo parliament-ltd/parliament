@@ -32,6 +32,8 @@ export default {
   displayName: 'Table of contents',
   author: 'parliament',
   description: 'Scrollable list of user-message labels that scroll-jump to their target on click.',
+  icon: 'List',
+  surfaces: ['room'],
   tier: 'reader',
   slotTargets: [
     { slot: 'left-rail',        primary: true },

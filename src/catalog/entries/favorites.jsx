@@ -13,6 +13,8 @@ export default {
   displayName: 'Favorites',
   author: 'parliament',
   description: 'Cross-cutting saved-message snippets pulled from every conversation.',
+  icon: 'Star',
+  surfaces: ['homepage'],
   tier: 'reader',
   slotTargets: [
     { slot: 'section-slot', primary: true },

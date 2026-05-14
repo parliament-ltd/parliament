@@ -33,6 +33,8 @@ export default {
   displayName: 'Web search',
   author: 'parliament',
   description: 'Arm the active provider’s web_search tool for the next outgoing message. Uses API credits.',
+  icon: 'Globe',
+  surfaces: ['room'],
   tier: 'composer',
   slotTargets: [
     { slot: 'input-dock',       primary: false, fallbackOk: true },

@@ -14,6 +14,8 @@ export default {
   displayName: 'Recent activity',
   author: 'parliament',
   description: 'The most recently updated conversations.',
+  icon: 'Clock',
+  surfaces: ['homepage'],
   tier: 'reader',
   slotTargets: [
     { slot: 'section-slot', primary: true },

@@ -34,6 +34,8 @@ export default {
   displayName: 'Highlights',
   author: 'parliament',
   description: 'Saved highlight terms with occurrence navigation, color tagging, and inline add form.',
+  icon: 'Highlighter',
+  surfaces: ['room'],
   tier: 'reader',
   slotTargets: [
     { slot: 'left-rail',        primary: true },

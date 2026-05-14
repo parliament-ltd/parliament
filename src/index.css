@@ -170,6 +170,25 @@
    See src/lib/schemes.js header for the naming caveat.
 ═══════════════════════════════════════════════════════════════════════ */
 
+/* ── Parliament Default (PR-19c) ─────────────────────────────
+   Mirrors :root so a nested element (e.g. the editor canvas) can opt
+   back into Parliament tokens via `data-scheme="parliament"` even when
+   the user's global scheme is something else. Used by EditorCanvas for
+   the live scheme preview — when the user picks a different scheme in
+   the room, the canvas re-tints, but the surrounding editor chrome
+   stays on the user's global scheme. */
+[data-scheme="parliament"] {
+  --p-bg-base: #FFFFFF; --p-bg-surface: #FFFFFF; --p-bg-subtle: #F7F6F3; --p-bg-alt: #F1F1EF;
+  --p-text-primary: #191919; --p-text-secondary: #787774; --p-text-muted: #9B9A97; --p-text-light: #C0C8D4;
+  --p-border: #E9E9E7; --p-border-subtle: #F1F1EF;
+  --p-gold: #C4A94D; --p-gold-light: #B8A070; --p-gold-muted: #9C8760;
+  --p-scrollbar-thumb: #D8D6D2;
+  --bp-floor: #F5F0E8; --bp-wall: #3A3530; --bp-hatch: #B8B2A8; --bp-line: #C8C2B8;
+  --bp-label: #787774; --bp-soft: rgba(196,169,77,0.08); --bp-grid: #DDD8D0;
+  --token-data-series-1: #C4A94D; --token-data-series-2: #C2825A; --token-data-series-3: #8C9651;
+  --token-data-series-4: #A8482F; --token-data-series-5: #5C6B7C;
+}
+
 /* ── Cool Bright ─────────────────────────────────────────── */
 [data-scheme="cool-bright"] {
   --p-bg-base: #FBFCFE; --p-bg-surface: #FFFFFF; --p-bg-subtle: #F0F4F9; --p-bg-alt: #E8F0F8;
@@ -1450,6 +1469,130 @@
 .lib-card-cta {
   color: var(--p-gold-light);
   font-weight: 500;
+}
+
+/* Editor left-rail vertical card stack (PR-19c). Uses .lib-card for visual
+   consistency with the homepage library, just stacked single-column. */
+.lrail-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.lrail-cards .lib-card { padding: 10px; gap: 6px; }
+.lrail-cards .lib-preview { height: 60px; }
+.lrail-cards .lib-card-name { font-size: 12px; }
+
+/* PR-19c: shared LibraryCard states (used in editor + homepage). */
+.lib-card-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.lib-card-disabled:hover {
+  border-color: var(--p-border);
+  transform: none;
+  box-shadow: none;
+}
+.lib-card-dragging { opacity: 0.5; }
+
+/* Component icon preview — centered lucide glyph in the .lib-preview area. */
+.lib-preview.component-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--p-gold-deep, #8B6A10);
+  background: rgba(196, 169, 77, 0.08);
+  border-color: var(--p-gold-light);
+}
+
+/* ── Layout silhouette (per-layout abstract thumbnail, PR-19c) ── */
+.lib-preview.layout-silhouette {
+  /* Inherit .lib-preview base; extend with row-flex layout for rails. */
+  gap: 3px;
+}
+.ls-rail {
+  border: 0.5px solid var(--p-text-light);
+  border-radius: 2px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: relative;
+  background: var(--p-bg-surface);
+}
+.ls-rail.dashed { border-style: dashed; }
+.ls-rail.ls-center { justify-content: flex-end; }
+.ls-rail.ls-canvas {
+  background:
+    linear-gradient(135deg, transparent 49%, var(--p-text-light) 49%, var(--p-text-light) 51%, transparent 51%),
+    linear-gradient(45deg, transparent 49%, var(--p-text-light) 49%, var(--p-text-light) 51%, transparent 51%);
+  background-size: 6px 6px;
+  background-color: var(--p-bg-subtle);
+  opacity: 0.85;
+}
+.ls-rail.ls-doc { padding: 5px; gap: 3px; }
+.ls-line {
+  display: block;
+  height: 2px;
+  background: var(--p-text-light);
+  border-radius: 1px;
+  opacity: 0.7;
+}
+.ls-textline {
+  display: block;
+  height: 1.5px;
+  background: var(--p-text-light);
+  border-radius: 1px;
+  opacity: 0.55;
+}
+.ls-bubble {
+  display: block;
+  height: 5px;
+  border-radius: 5px;
+  margin-bottom: 1.5px;
+}
+.ls-bubble.assistant {
+  width: 65%;
+  background: var(--p-bg-subtle);
+  align-self: flex-start;
+}
+.ls-bubble.user {
+  width: 50%;
+  background: rgba(196, 169, 77, 0.35);
+  align-self: flex-end;
+}
+.ls-bubble.small { height: 4px; margin-bottom: 1px; }
+.ls-input {
+  display: block;
+  height: 5px;
+  width: 100%;
+  background: var(--p-bg-subtle);
+  border: 0.5px solid var(--p-border);
+  border-radius: 1.5px;
+  margin-top: auto;
+}
+.ls-scrollbar {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  right: 2px;
+  width: 1.5px;
+  background: var(--p-text-light);
+  border-radius: 1px;
+  opacity: 0.55;
+}
+.ls-dot {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--p-gold-light);
+  opacity: 0.55;
+}
+.ls-section {
+  flex: 1;
+  border: 0.5px dashed var(--p-text-light);
+  border-radius: 2px;
+  background: var(--p-bg-surface);
 }
 
 /* ── Library overlay (right-side slide-in) ────────────────── */

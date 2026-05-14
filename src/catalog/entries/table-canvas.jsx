@@ -64,6 +64,8 @@ export default {
   displayName: 'Table canvas',
   author: 'parliament',
   description: 'Sortable, paginated grid over the active dataset. Sticky header, right-aligned numerics.',
+  icon: 'Table2',
+  surfaces: ['room'],
   tier: 'reader',
   slotTargets: [
     { slot: 'canvas', primary: true },

@@ -29,6 +29,8 @@ const FIELD_TYPES = new Set([
   'boolean', 'number', 'string', 'enum', 'object', 'array',
 ])
 
+const SURFACE_VALUES = new Set(['room', 'homepage', 'both'])
+
 function isPlainObject(v) {
   return v !== null && typeof v === 'object' && !Array.isArray(v)
 }
@@ -135,6 +137,25 @@ export function validateManifest(entry) {
   if (!isNonEmptyString(entry.displayName))  errors.push('displayName: required non-empty string')
   if (!isNonEmptyString(entry.author))       errors.push('author: required non-empty string')
   if (!isNonEmptyString(entry.description))  errors.push('description: required non-empty string')
+
+  // ─── Optional: icon (lucide-react name, rendered in LibraryCard) ───
+  if (entry.icon !== undefined && !isNonEmptyString(entry.icon)) {
+    errors.push('icon: must be a non-empty string if present (lucide-react component name)')
+  } else if (entry.icon === undefined) {
+    warnings.push("icon: missing — LibraryCard will fall back to a generic glyph")
+  }
+
+  // ─── Optional: surfaces (which editor scopes this component is placeable in) ───
+  // 'room'     — only placeable in room editor
+  // 'homepage' — only placeable in homepage editor
+  // 'both'     — placeable in either (default if omitted)
+  if (entry.surfaces !== undefined) {
+    if (!Array.isArray(entry.surfaces) || entry.surfaces.length === 0) {
+      errors.push('surfaces: must be a non-empty array if present (e.g. [\'room\'] or [\'homepage\'])')
+    } else if (!entry.surfaces.every(s => SURFACE_VALUES.has(s))) {
+      errors.push(`surfaces: every entry must be one of ${[...SURFACE_VALUES].join(', ')}`)
+    }
+  }
 
   // ─── Tier ──────────────────────────────────────────
   if (!isNonEmptyString(entry.tier)) {

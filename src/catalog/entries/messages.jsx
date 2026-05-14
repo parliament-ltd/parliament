@@ -31,6 +31,8 @@ export default {
   displayName: 'Messages',
   author: 'parliament',
   description: 'Scrollable transcript of conversation messages with per-message action menu.',
+  icon: 'MessagesSquare',
+  surfaces: ['room'],
   tier: 'reader',
   slotTargets: [
     { slot: 'msg-area',   primary: true },

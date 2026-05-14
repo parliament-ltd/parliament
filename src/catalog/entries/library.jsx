@@ -17,6 +17,8 @@ export default {
   displayName: 'Library',
   author: 'parliament',
   description: 'Browse rooms, layouts, components, schemes, and (placeholder) resources.',
+  icon: 'BookOpen',
+  surfaces: ['homepage'],
   tier: 'reader',
   slotTargets: [
     { slot: 'section-slot', primary: true },

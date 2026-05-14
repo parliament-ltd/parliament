@@ -48,6 +48,8 @@ export default {
   displayName: 'Chart canvas',
   author: 'parliament',
   description: 'Auto-detected charts (bar / line / area / scatter / pie) over the active dataset.',
+  icon: 'BarChart3',
+  surfaces: ['room'],
   tier: 'reader',
   slotTargets: [
     { slot: 'canvas', primary: true },

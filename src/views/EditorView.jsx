@@ -261,7 +261,6 @@ export default function EditorView({ scope = 'room' }) {
           onUndo={() => dispatch({ type: 'UNDO' })}
           onRedo={() => dispatch({ type: 'REDO' })}
           onBack={() => navigate('/')}
-          onNameChange={(name) => dispatch({ type: 'SET_NAME', name })}
           onDeviceClassChange={(deviceClass) => dispatch({ type: 'SET_DEVICE_CLASS', deviceClass })}
           onSchemeChange={(schemeRef) => dispatch({ type: 'APPLY_SCHEME', schemeRef })}
           onSave={handleSave}

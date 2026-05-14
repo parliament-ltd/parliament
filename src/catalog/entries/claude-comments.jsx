@@ -50,6 +50,8 @@ export default {
   displayName: 'Comments',
   author: 'parliament',
   description: 'Per-paragraph comment thread with reply lifecycle. Comments anchor to selected text; Claude replies arrive on Submit & Branch.',
+  icon: 'MessageSquareText',
+  surfaces: ['room'],
   tier: 'composer',
   slotTargets: [
     { slot: 'margin', primary: true },

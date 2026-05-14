@@ -422,3 +422,23 @@ Before each migration-bearing PR ships, confirm:
 - [ ] **PR-11a** — Existing Pelican users' files (`files`, `file_data`) are accessible under `file-shelf@1.0`. Charts render under `chart-canvas@1.0` against the same data.
 - [ ] **PR-11b** — Existing Secretarybird users' documents (`sbrd_documents`) are accessible under `document-canvas@1.0`. Comments and ripple analysis work.
 - [ ] **PR-12** — Phase 1 exit criteria pass — see `phase-1-testing.md` PR-12 section for the canonical checklist.
+
+---
+
+## PR-19c — `meta.builtAt` field on modes (no IDB schema change)
+
+PR-19c adds `meta.builtAt: number | string | null` to every mode. The field tracks whether the user has explicitly confirmed (built) the room via the wizard's Ignition step.
+
+**Three states:**
+- `null` — fresh room created via the wizard's non-Ignition paths (Build it myself, Open in editor, Template gallery). Editor button reads "Build". Clicking Build routes to `/build?ignite=:roomId`.
+- `<ISO timestamp>` — Ignition has been run for this room. Editor button reads "Save".
+- `undefined` — legacy mode that predates PR-19c. Treated as built — runtime normalization in `loadMode` / `loadHomepageMode` substitutes `meta.created` for `meta.builtAt`. No IDB write needed for the migration; the value is computed at read time. Re-saving the mode will persist the substituted value.
+
+**Field-setting paths:**
+- `createModeFromTemplate(template, overrides)` — defaults `builtAt: null` (intermediate state); callers override via `overrides.builtAt` when needed.
+- `buildModeFromWizard(config)` (non-Ignition wizard paths) — leaves `builtAt: null`.
+- `buildAndOpenRoom(config)` (full wizard → Ignition path) — saves the mode with `builtAt: Date.now()` as part of the persist-on-connected step.
+- `igniteExistingRoom(roomId)` (editor "Build" → reused IgnitionStep) — loads the mode, sets `builtAt: Date.now()`, persists, creates the first conversation.
+- Editor `handleSave` — preserves whatever `builtAt` is currently on the mode (does NOT auto-flip).
+
+**Backwards compatibility:** no IDB schema bump. Existing modes load unchanged; the runtime treats them as built. Cross-version rollback safe — older code that doesn't know about `builtAt` will preserve it on save.

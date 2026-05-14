@@ -25,6 +25,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useConversations } from '../../stores/ConversationContext'
 import { listModes } from '../../lib/modes'
+import { createConversation } from '../../lib/db'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
 import {
   packRooms,
@@ -222,16 +223,29 @@ export default function BlueprintRender({ hostAPI } = {}) {
     return m
   }, [conversations])
 
-  const onEnterRoom = (roomId) => {
+  const onEnterRoom = async (roomId) => {
     // Find the most-recent conversation in this room and navigate to it.
-    // No conversations? Land in the build wizard (room is empty).
     let last = null
     for (const c of conversations) {
       if (c.room !== roomId) continue
       if (!last || new Date(c.updatedAt) > new Date(last.updatedAt)) last = c
     }
-    if (last) navigate(`/chat/${last.id}`)
-    else navigate('/build')
+    if (last) {
+      navigate(`/chat/${last.id}`)
+      return
+    }
+    // PR-19c: empty room → start a fresh conversation IN the room
+    // (was: navigate to /build, which kicked the user back into the
+    // wizard from a room they had already built). Failure falls
+    // through to the build wizard as a last resort.
+    try {
+      const room = modesById.get(roomId)
+      const title = room?.meta?.name || 'New conversation'
+      const newConv = await createConversation({ title, room: roomId })
+      navigate(`/chat/${newConv.id}`)
+    } catch {
+      navigate('/build')
+    }
   }
 
   return (

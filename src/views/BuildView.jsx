@@ -25,7 +25,7 @@
 // first-run gate.
 
 import { useEffect, useState, useCallback, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import HomepageTopBar from '../components/HomepageTopBar'
@@ -44,6 +44,7 @@ import {
   makeInitialWizardConfig,
   buildModeFromWizard,
   buildAndOpenRoom,
+  igniteExistingRoom,
   deriveLayout,
   PURPOSES,
   DEVICES,
@@ -52,20 +53,48 @@ import {
   SCHEMES,
 } from '../lib/buildWizard'
 import { listRooms } from '../lib/catalog'
-import { createModeFromTemplate } from '../lib/modes'
+import { createModeFromTemplate, loadMode } from '../lib/modes'
 import { setSetting } from '../lib/db'
 
 const SPRING_GENTLE = { type: 'spring', stiffness: 200, damping: 24 }
 
 export default function BuildView() {
   const navigate = useNavigate()
-  const [screen, setScreen] = useState(0)
+  const [searchParams] = useSearchParams()
+  // PR-19c: when arriving from the editor's "Build" button, the URL
+  // carries ?ignite=<roomId>. We jump straight to screen 6 (Ignition)
+  // and reuse it to validate the API key for the existing room rather
+  // than building a fresh one. See lib/buildWizard.js igniteExistingRoom.
+  const igniteRoomId = searchParams.get('ignite') || null
+  const [existingMode, setExistingMode] = useState(null)
+  const [igniteLoadError, setIgniteLoadError] = useState('')
+
+  const [screen, setScreen] = useState(igniteRoomId ? 6 : 0)
   const [view, setView] = useState('wizard') // 'wizard' | 'gallery'
   const [config, setConfig] = useState(makeInitialWizardConfig)
   const [templates, setTemplates] = useState([])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [previewLayoutId, setPreviewLayoutId] = useState(null)
+
+  // ── Load the existing mode for the ignite-existing-room path ──
+  useEffect(() => {
+    if (!igniteRoomId) return
+    let cancelled = false
+    loadMode(igniteRoomId)
+      .then((mode) => {
+        if (cancelled) return
+        if (!mode) {
+          setIgniteLoadError(`Room not found: ${igniteRoomId}`)
+          return
+        }
+        setExistingMode(mode)
+      })
+      .catch((e) => {
+        if (!cancelled) setIgniteLoadError(e?.message || 'Could not load room.')
+      })
+    return () => { cancelled = true }
+  }, [igniteRoomId])
 
   // ── Load templates lazily — only when the user asks for the gallery
   useEffect(() => {
@@ -146,11 +175,19 @@ export default function BuildView() {
   // navigation buttons; each calls back into BuildView so this view
   // owns navigation. Returns the new conversation id so IgnitionStep
   // can route Enter to /chat/:id.
+  // PR-19c: when ignite-existing-room mode, route through
+  // igniteExistingRoom(roomId) instead — the mode already exists; we
+  // just flip its meta.builtAt and spin up a fresh conversation in it.
   const handlePersist = useCallback(async () => {
+    if (igniteRoomId) {
+      const { conversation } = await igniteExistingRoom(igniteRoomId)
+      await setSetting('tourCompleted_wizard', true)
+      return conversation.id
+    }
     const { conversation } = await buildAndOpenRoom(config)
     await setSetting('tourCompleted_wizard', true)
     return conversation.id
-  }, [config])
+  }, [config, igniteRoomId])
 
   // ── Post-success navigation handlers ──────────────────
   const handleEnterChat = useCallback((convId) => {
@@ -232,11 +269,28 @@ export default function BuildView() {
         {/* Wizard view */}
         {view === 'wizard' && (
           <>
-            {screen >= 1 && screen <= 6 && (
+            {/* PR-19c: hide the wizard step track + receipt when arriving
+                via ?ignite=<roomId>. The room already exists; the only
+                thing left is API-key entry + the ignite animation, so
+                the multi-step chrome would be misleading. */}
+            {!igniteRoomId && screen >= 1 && screen <= 6 && (
               <WizardTrack current={screen} />
             )}
-            {screen >= 1 && screen <= 5 && (
+            {!igniteRoomId && screen >= 1 && screen <= 5 && (
               <WizardReceipt items={receiptItems} />
+            )}
+
+            {igniteLoadError && (
+              <div
+                className="px-3 py-2 mb-3 rounded-md text-[12px]"
+                style={{
+                  border: '0.5px solid var(--p-border)',
+                  background: 'var(--p-bg-surface)',
+                  color: 'var(--p-error,#E03E3E)',
+                }}
+              >
+                {igniteLoadError}
+              </div>
             )}
 
             <AnimatePresence mode="wait">
@@ -262,7 +316,12 @@ export default function BuildView() {
                 {screen === 6 && (
                   <IgnitionStep
                     config={config}
-                    onBack={() => goTo(5)}
+                    existingMode={existingMode}
+                    onBack={
+                      igniteRoomId
+                        ? () => navigate(`/edit/${igniteRoomId}`)
+                        : () => goTo(5)
+                    }
                     onPersist={handlePersist}
                     onEnterChat={handleEnterChat}
                     onBuildAnother={handleBuildAnother}

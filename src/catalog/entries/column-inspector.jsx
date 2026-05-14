@@ -53,6 +53,8 @@ export default {
   displayName: 'Column inspector',
   author: 'parliament',
   description: 'Type-tagged column list with null counts, sample values, and an expand-to-detail row for the active dataset.',
+  icon: 'Columns3',
+  surfaces: ['room'],
   tier: 'reader',
   slotTargets: [
     { slot: 'inspector', primary: true },

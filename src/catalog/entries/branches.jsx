@@ -33,6 +33,8 @@ export default {
   displayName: 'Branches',
   author: 'parliament',
   description: 'Branch navigation list with parent/child links; owns the Branch creation panel.',
+  icon: 'GitBranch',
+  surfaces: ['room'],
   tier: 'composer',
   slotTargets: [
     { slot: 'left-rail',        primary: true },

@@ -26,6 +26,8 @@ export default {
   displayName: 'Voice input',
   author: 'parliament',
   description: 'Mic button that publishes Web Speech API transcripts on the room bus.',
+  icon: 'Mic',
+  surfaces: ['room'],
   tier: 'composer',
   // Almost any small slot works — its surface is a single mic button.
   slotTargets: [
