@@ -3,8 +3,9 @@
 // Per parliament_wizard_v5.html lines 151–180. Six dots numbered 1..6
 // connected by thin lines. State per dot: pending (default), active
 // (current step, gold ring), done (filled gold + checkmark). The
-// Welcome screen (step 0) and the Done screen (step 7) don't show the
-// track — it's only on steps 1..6 (the wizard proper).
+// Welcome screen (step 0) doesn't show the track — it's only on
+// steps 1..6 (the wizard proper). PR-19a merged the old Done step
+// (was step 7) into Ignition (step 6); there is no step 7 anymore.
 
 import { Check } from 'lucide-react'
 

@@ -1,14 +1,15 @@
 // BuildView — `/build` route, the build-a-room wizard (rewritten in PR-13).
 //
-// Implements parliament_wizard_v5.html. Eight screens, internal state:
+// Implements parliament_wizard_v5.html. PR-19a collapsed step 7 (Done)
+// into step 6 (Ignition), so the wizard is now seven screens:
 //   0 — Welcome + 3-path picker (Guide me / Template / Build it myself)
 //   1 — Purpose (multi-select)
 //   2 — Device  (multi-select)
 //   3 — Density + revealed Layout
 //   4 — Features
 //   5 — Name + scheme + summary
-//   6 — Ignition (validate API key, light up the room)
-//   7 — Done
+//   6 — Ignition (validate API key OR trust saved key, light up the
+//       room, persist, then surface three navigation buttons in place)
 //
 // Path tile dispatch from screen 0:
 //   - guided   → screen 1 (the wizard proper)
@@ -38,7 +39,6 @@ import DensityLayoutStep from '../components/build/wizard/DensityLayoutStep'
 import FeaturesStep from '../components/build/wizard/FeaturesStep'
 import NameSchemeStep from '../components/build/wizard/NameSchemeStep'
 import IgnitionStep from '../components/build/wizard/IgnitionStep'
-import DoneStep from '../components/build/wizard/DoneStep'
 import LayoutPreviewOverlay from '../components/build/wizard/LayoutPreviewOverlay'
 import {
   makeInitialWizardConfig,
@@ -140,26 +140,22 @@ export default function BuildView() {
     }
   }, [config, navigate])
 
-  // ── Final commit on Ignition Connected → Enter ─────────
-  // Persist mode + conversation here, then advance to the Done screen.
-  // The "Go to your Parliament" button on Done routes to / (homepage,
-  // where the new room is now visible); "Build another room" loops
-  // back to screen 0 with a reset config.
-  const handleConnected = useCallback(async () => {
-    setBusy(true)
-    setError('')
-    try {
-      await buildAndOpenRoom(config)
-      await setSetting('tourCompleted_wizard', true)
-      setBusy(false)
-      setScreen(7)
-    } catch (e) {
-      setError(e?.message || 'Could not create the room.')
-      setBusy(false)
-    }
+  // ── Persist room when Ignition reaches the 'connected' phase ───
+  // PR-19a: persistence happens once the animation finishes (was: on
+  // Enter-button click). IgnitionStep then renders the three
+  // navigation buttons; each calls back into BuildView so this view
+  // owns navigation. Returns the new conversation id so IgnitionStep
+  // can route Enter to /chat/:id.
+  const handlePersist = useCallback(async () => {
+    const { conversation } = await buildAndOpenRoom(config)
+    await setSetting('tourCompleted_wizard', true)
+    return conversation.id
   }, [config])
 
-  // ── Done screen actions ────────────────────────────────
+  // ── Post-success navigation handlers ──────────────────
+  const handleEnterChat = useCallback((convId) => {
+    if (convId) navigate(`/chat/${convId}`)
+  }, [navigate])
   const handleBuildAnother = useCallback(() => {
     setConfig(makeInitialWizardConfig())
     setScreen(0)
@@ -264,14 +260,13 @@ export default function BuildView() {
                 {screen === 4 && <FeaturesStep config={config} onChange={patchConfig} />}
                 {screen === 5 && <NameSchemeStep config={config} onChange={patchConfig} />}
                 {screen === 6 && (
-                  <IgnitionStep config={config} onConnected={handleConnected} />
-                )}
-                {screen === 7 && (
-                  <DoneStep
-                    roomName={config.name}
-                    buildAnother={config.buildAnother}
+                  <IgnitionStep
+                    config={config}
+                    onBack={() => goTo(5)}
+                    onPersist={handlePersist}
+                    onEnterChat={handleEnterChat}
                     onBuildAnother={handleBuildAnother}
-                    onGoToParliament={handleGoToParliament}
+                    onGoHome={handleGoToParliament}
                   />
                 )}
               </motion.div>
@@ -326,23 +321,9 @@ export default function BuildView() {
               </div>
             )}
 
-            {/* Ignition footer: Back only — Enter button is gated inside IgnitionStep */}
-            {screen === 6 && (
-              <div className="flex justify-start mt-5">
-                <button
-                  type="button"
-                  onClick={() => goTo(5)}
-                  className="px-3 py-2 text-[13px] rounded-md transition-colors"
-                  style={{
-                    border: '0.5px solid var(--p-border)',
-                    background: 'transparent',
-                    color: 'var(--p-text-secondary)',
-                  }}
-                >
-                  Back
-                </button>
-              </div>
-            )}
+            {/* PR-19a: Ignition footer is owned by IgnitionStep itself
+                so Back sits on the same row as the action button(s);
+                BuildView no longer renders a footer for screen 6. */}
           </>
         )}
 

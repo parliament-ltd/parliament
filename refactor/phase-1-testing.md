@@ -3749,6 +3749,171 @@ gutter each side). Desktop chat surfaces are unchanged.
 
 ---
 
+## PR-19a — Wizard rewire + homepage blueprint polish
+
+👀 User-visible
+
+**Surface:** `/build` (wizard step 4 features icons + step 6 ignition
++ post-success buttons) and `/` (homepage blueprint pills, room
+shapes, label wrapping, font sizes; section card titles + meta).
+
+**Setup:**
+- Pre-populate at least one room and conversation via the build
+  wizard (or directly via DevTools as in the PR-18f testing) so the
+  homepage blueprint has something to render.
+- For the saved-key flow, complete the wizard at least once
+  (entering a real Anthropic key) so it persists in IndexedDB; then
+  re-open `/build` and reach step 6 to see the saved-key prompt.
+
+**Steps — Wizard Highlights icon (step 4):**
+1. Walk through the wizard to step 4 (Features). Find the
+   "Highlights" row in the feature list.
+2. The icon should be the lucide `Highlighter` glyph (a tilted
+   marker shape), matching the icon used on the homepage Chats
+   section's view-toggle row (Sparkles / StickyNote / Highlighter
+   / GitBranch).
+3. Other feature icons in the list are unchanged — only Highlights
+   was swapped.
+
+**Steps — Wizard step 6 with NO saved key (first-time path):**
+1. Clear IndexedDB or never-completed-wizard state. Walk to step 6.
+2. The step shows the room preview card (dashed pre-flash) plus the
+   "Anthropic API key" input + Validate button + the new help row
+   ("Don't have a key yet? [Claude] Get one from Anthropic" link).
+3. Footer below shows a single Back button on the same row as the
+   action above (visually one row from the input section to the
+   navigation row).
+4. Enter a valid Anthropic key. Click Validate.
+5. The animation chain runs (sweep → ignite → lit → connected with
+   the chip cascade). At the end, three buttons appear in a row:
+   **Build another room** / **Go to your Parliament** / **Enter**
+   (gold filled).
+6. Click Enter. Navigates to `/chat/:newConvId` — the just-created
+   conversation. Confirm the room is also visible on `/`.
+
+**Steps — Wizard step 6 with saved key (returning user):**
+1. With a key on file (from a prior wizard completion), re-enter the
+   wizard, walk to step 6.
+2. Instead of an input field, the step shows a subtle prompt box:
+   "An API key is already on file. Continue with your saved key, or
+   add a different one." with **Continue** (default-focused gold
+   button) and **Add a different key** (text link).
+3. Tab focus / Enter on Continue. The animation runs WITHOUT a
+   network call (verify in DevTools Network — no
+   `messages?test_validate=true` request).
+4. After connected, the same three buttons appear. Enter routes to
+   the new conversation.
+5. Re-enter step 6. Click "Add a different key" — the saved-key
+   prompt swaps for the input field. A "Cancel — keep saved key"
+   text link sits below the input. Clicking Cancel returns to the
+   saved-key prompt.
+
+**Steps — Wizard step 6 Back button:**
+1. From any state of step 6 (saved-key prompt, input row, post-
+   connected), click Back. Returns to step 5 (Name + scheme).
+2. Back is disabled while the cascade animation is in flight (test:
+   click Validate / Continue, then immediately try Back — it
+   shouldn't navigate).
+3. Post-connected, Back is hidden — only the three action buttons
+   render. (The user has committed the room; no rewinding.)
+
+**Steps — Wizard step 7 removed:**
+1. Verify that completing the wizard never reaches a "Done" screen.
+   The three buttons in step 6 are the only post-success surface.
+   `DoneStep.jsx` no longer exists in the source tree.
+2. WizardTrack still shows six dots on steps 1..6 (no change).
+
+**Steps — Build another room cycle:**
+1. Complete the wizard fully. On step 6 connected state, click
+   **Build another room**.
+2. Wizard resets to screen 0 (Welcome + 3-path picker). Config is
+   blank.
+3. The just-built room is preserved on `/` (verify by going to
+   homepage in another tab).
+
+**Steps — Blueprint pill sizes:**
+1. On `/`, hover over the active room (or the only room if there's
+   just one). Pills along the bottom show feature names (TOC,
+   BRANCHES, HIGHLIGHTS, etc.).
+2. Active room pills: font ~8.5px, height ~16px (visibly larger
+   than the prior 7px / 14px).
+3. Inactive room pills (the dimmer ones): font ~7.5px, height
+   ~14px (was 6.5 / 12).
+4. Pills don't visibly overflow the room interior at any default
+   blueprint scale.
+
+**Steps — Spec-aligned room shape variants:**
+1. Add multiple rooms across each layout (three-panel, canvas-
+   centric, single-column-with-sheet). Vary the seed (e.g. by
+   creating different room IDs) so different variants render.
+2. With enough rooms, you should see the new spec-aligned shapes:
+   - **three-panel:** a narrow right-edge tab (rectangular
+     protrusion centered vertically, ~12px wide).
+   - **canvas-centric:** a chamfered bottom-right corner (room
+     widens via a 12px diagonal at ~70% height).
+   - **single-column-with-sheet:** a phone-style top-right
+     chamfer-IN (room narrows below the chamfer).
+3. document-centric is unchanged (3 variants, same as before).
+
+**Steps — Conditional label stacking:**
+1. Find a room with a long layout/scheme combination, e.g.
+   "Single column · Parliament Default" or
+   "Document-centric · Mediterranean Sand".
+2. If the joined string is wider than the room's interior width, the
+   text stacks onto two lines (layoutLabel on top, schemeLabel
+   below).
+3. The italic "Last spoken to {model}" line stacks similarly when
+   wide ("Last spoken to" / "{model name}").
+4. Subsequent rows (lastModel below the layout/scheme line) shift
+   down so they don't overlap.
+
+**Steps — Blueprint SVG text bump:**
+1. Compare any room's text against PR-18f. Confirm:
+   - "THE" tagline visibly larger (10px vs 9px)
+   - Room name larger (13px vs 12px)
+   - Layout · scheme line larger (9px vs 8px)
+   - Italic lastModel larger (9px vs 8px)
+   - "+ BUILD A ROOM" placeholder title larger (10px vs 9px)
+   - "Expand your Parliament" sub larger (8.5px vs 7.5px)
+   - Dimension tick text larger (8px vs 7px)
+2. The pawn tooltip ("You are here") is larger (11px vs 10px).
+
+**Steps — Section title + meta:**
+1. On `/`, the section header strip (Your rooms / Chats / Library /
+   Favorites) shows a title and a meta description ("Hover a chat
+   row…", "Browse your history…", etc.).
+2. Title font: 14px (was 13). Meta: 12px (was 11). Both visibly
+   larger to a careful eye.
+
+**Steps — Lint + build:**
+1. `npm run lint` → 163 problems (161 errors + 2 warnings). Down
+   one from PR-18f baseline because deleting DoneStep removed an
+   unused `motion` import.
+2. `npm run build` → clean.
+
+**Expected:** Wizard step 7 is gone, IgnitionStep handles all
+post-validation behavior in place, the saved-key flow trusts the
+stored key without re-validating, the homepage blueprint reads as
+visibly larger and richer (more variant shapes, bigger pills, bigger
+text, no label overflow), and the homepage section cards have
+larger titles + meta. Site-wide font bump is deferred to PR-19b.
+
+### What's known-broken-but-deferred
+
+- Site-wide font bump across non-blueprint, non-section-card surfaces
+  (chat bubbles, library cards, settings panes, modals). Lands as
+  PR-19b — held separate so layout regressions in constrained
+  containers can be spotted in one diff.
+- Multi-provider help row — the Claude-icon link is shaped as a
+  single button slot ready for siblings, but Phase 1 ships only the
+  Anthropic link.
+- Pre-validation of saved keys in the wizard (per W2 — explicitly
+  out by user decision; revoked-key errors surface at chat send).
+- Document-centric does not get a 4th spec-aligned variant (the
+  spec doesn't draw a document room).
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

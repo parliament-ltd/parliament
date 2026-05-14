@@ -911,13 +911,15 @@
   color: inherit;
 }
 .section-title {
-  font-size: 13px;
+  /* PR-19a: bumped 13→14 for homepage section legibility. */
+  font-size: 14px;
   font-weight: 500;
   color: var(--p-text-primary);
   letter-spacing: -0.005em;
 }
 .section-meta {
-  font-size: 11px;
+  /* PR-19a: bumped 11→12 to pair with the section-title bump. */
+  font-size: 12px;
   color: var(--p-text-muted);
 }
 .section-header-actions {
@@ -994,7 +996,8 @@
 .bp-pawn-tip {
   background: var(--p-text-primary);
   color: white;
-  font-size: 10px;
+  /* PR-19a: bumped from 10px for legibility parity with the SVG text bump. */
+  font-size: 11px;
   padding: 3px 7px;
   border-radius: 3px;
   pointer-events: none;

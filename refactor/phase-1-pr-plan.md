@@ -1102,6 +1102,65 @@ The settings spin is the first laptop-only icon micro-interaction. Other homepag
 
 ---
 
+### PR-19a — Wizard rewire + homepage blueprint polish
+
+**Goal:** Two parallel polish passes that ship together because they each touch a small set of files and benefit from one round of review.
+
+**Wizard side (5 fixes):**
+
+1. **Highlights icon parity** — wizard's FeaturesStep used a custom three-peak SVG; chats-preview uses lucide `Highlighter`. Aligned both to the same icon so the same feature reads consistently across surfaces.
+2. **Trust the saved API key** — IgnitionStep now calls `loadApiKey('persistent')` on mount. If a key is on file, the step shows a "An API key is already on file" prompt with **Continue** (default-focused, runs the ignite animation chain WITHOUT a network re-validation per user decision: revoked-key issues surface at chat-session connect time, not in the wizard) and **Add a different key** (toggles to the input field). The first-time path (no saved key) is unchanged: input + Validate.
+3. **Anthropic help link upgrade** — replaced the inline "Get an API key" tail with a Claude-icon button row ("Don't have a key yet? [Claude] Get one from Anthropic"). Layout designed so additional providers (OpenAI / Mistral / Ollama) drop in beside the Anthropic mark when Phase 2 multi-provider lands.
+4. **Back button location** — was rendered by BuildView's footer outside IgnitionStep, putting it on a separate row from the action button. Moved into IgnitionStep's own footer so Back sits on the same row as Continue / Validate. Disabled while the cascade animation is in flight.
+5. **Merged step 7 (Done) into step 6 (Ignition)** — DoneStep deleted entirely. After the animation reaches `connected`, IgnitionStep persists the room (once, via parent `onPersist` callback) and renders three buttons: **Build another room** (resets config + back to screen 0), **Go to your Parliament** (navigates `/`), and **Enter** (navigates `/chat/:newConvId` — the just-created conversation). The persistence happens in the connected-phase effect so all three buttons are wired the moment the dot lights up.
+
+**Homepage blueprint side (4 fixes):**
+
+6. **Pill bump for legibility** — active pills 7→8.5px font / 14→16px height; inactive pills 6.5→7.5px / 12→14px. FeaturePills width estimator now derives `charW` from the palette's fontSize (was a fixed 5.5x heuristic) so the bigger pills get proportional padding.
+7. **One spec-aligned variant per layout, ON TOP of the existing PR-16a three** — `threePanelSpecTabPath` (right-edge tab matching parliament_homepage_v2.html line 1040 — Writing Studio's narrow notch), `canvasCentricSpecChamferPath` (BR chamfer-out at ~70% height matching the spec's Code Lab), `singleColumnSpecPhoneChamferPath` (TR phone-style chamfer-in matching the spec's Pocket). Document-centric stays at three (no spec equivalent). Variant pool is now 4 per layout for those three; mirroring still applies, so room-shape diversity ~doubles.
+8. **Conditional stacking when labels overflow the room interior** — added an `estimateTextWidth(text, fontSize, isItalic)` helper. The `${layoutLabel} · ${schemeLabel}` line now stacks onto two lines when the joined string would exceed `interior.width - 8`. The italic `Last spoken to ${model}` line stacks similarly, splitting at "Last spoken to" / "{model name}". Subsequent text rows accumulate y-offsets so wrapped lines push the rest down instead of overlapping.
+9. **+1px global text bump on the blueprint SVG** — THE 9→10, NAME 12→13, layoutLabel/schemeLabel 8→9, lastModel italic 8→9, placeholder title 9→10, placeholder sub 7.5→8.5, dimension ticks 7→8. `.bp-pawn-tip` (HTML tooltip) bumped 10→11. **Plus** section-title 13→14 and section-meta 11→12 in `.section-*` CSS — applies across all four homepage section cards (Your rooms / Chats / Library / Favorites). User explicitly asked for "slightly larger across the entire site"; the broader site-wide font bump is firmly out of scope here and lands as PR-19b.
+
+**Scope:**
+- [src/components/build/wizard/FeaturesStep.jsx](../src/components/build/wizard/FeaturesStep.jsx): import + use `lucide-react` `Highlighter` in place of the custom SVG.
+- [src/components/build/wizard/IgnitionStep.jsx](../src/components/build/wizard/IgnitionStep.jsx): substantial rewrite. New props (`onBack` / `onPersist` / `onEnterChat` / `onBuildAnother` / `onGoHome`); add saved-key check on mount; split into `runIgniteAnimation()` (no API call) and `validateAndIgnite()` (with API call); render saved-key prompt or input row depending on `keyMode`; add Claude-mark help row; new footer behavior (Back ↔ post-success buttons). Keeps the existing CSS keyframe animation chain unchanged.
+- [src/components/build/wizard/DoneStep.jsx](../src/components/build/wizard/DoneStep.jsx): **deleted**. Functionality folded into IgnitionStep's connected phase.
+- [src/components/build/wizard/WizardTrack.jsx](../src/components/build/wizard/WizardTrack.jsx): comment-only update (mentions step 7 no longer exists). `TOTAL = 6` already.
+- [src/views/BuildView.jsx](../src/views/BuildView.jsx): drop the DoneStep import + screen 7 case + the Ignition-only Back footer. New `handlePersist` returns the just-created `conversation.id` so IgnitionStep can route Enter to `/chat/:id`. `handleConnected` renamed/replaced; the rest of the wizard rendering is unchanged.
+- [src/lib/blueprintShapes.js](../src/lib/blueprintShapes.js): three new variant fns (`threePanelSpecTabPath`, `canvasCentricSpecChamferPath`, `singleColumnSpecPhoneChamferPath`); registered in `SHAPE_VARIANTS` for the three relevant layouts.
+- [src/catalog/entries/blueprint-render.jsx](../src/catalog/entries/blueprint-render.jsx): `estimateTextWidth` helper; conditional-stacking IIFE replaces the static THE/NAME/layoutLabel/lastModel block; PILL_PALETTE size bumps; FeaturePills width / baseline tuned to palette fontSize; placeholder text bump; dimension tick text bump.
+- [src/index.css](../src/index.css): `.section-title` 13→14, `.section-meta` 11→12, `.bp-pawn-tip` 10→11. Notes the bumps inline.
+
+**Locked design decisions:**
+- **W1 wizard step 7 removed** — Done's "checkmark in gold circle" headline is replaced by the Connected-dot badge that already lives in IgnitionStep, plus the same three navigation buttons it used to host. The animation polish (sweep / ignite / lit / connected chip cascade) is preserved verbatim.
+- **W2 trust-the-stored-key explicit** — Continue runs the animation chain without `provider.validateKey()`. If the saved key has been revoked since storage, the user will see an authentication error on their first chat send, not a wizard error. Trade-off: faster wizard + no spurious "key invalid" if Anthropic's validateKey endpoint hiccups, at the cost of moving the failure surface one screen later.
+- **W3 Continue is auto-selected, never auto-fired** — the user chose "auto-selected" wording. This means the button is default-focused, but the user still has to press Enter / click. We don't auto-trigger the animation on mount because that would feel jarring (you land on a step and the screen ignites without your input).
+- **W4 all three post-success buttons assume the room IS persisted** — persistence happens once when the animation hits `connected`. "Build another room" and "Go to your Parliament" both leave the just-built room intact (it shows up on the homepage immediately).
+- **W5 Claude-icon link is link-shaped, not row-of-icons** — for Phase 1 there's only Anthropic to link to. The layout is a single icon-button so additional providers slot in beside it as siblings when Phase 2 multi-provider arrives, without any layout reshape.
+- **B6 pills bumped to active 8.5/16 + inactive 7.5/14** — chosen by the user after "let's bump first and see." Width estimator updated to derive padding from fontSize so the new sizes don't look cramped.
+- **B7 add new variant per layout, don't replace existing** — user picked (b). Keeps PR-16a's curated set; adds a fourth "expressive spec form" per layout the spec draws (three-panel / canvas-centric / single-column-with-sheet). Document-centric stays at 3.
+- **B8 conditional stack** — adaptive per-room rather than always-stacked. Heuristic: `chars × fontSize × 0.55` (or 0.58 for italics) compared against `interior.width - 8`. When stacked, subsequent rows shift down so the layout stays readable.
+- **B9 blueprint +1px global** — every SVG `<text>` in blueprint-render.jsx bumped, plus the placeholder + dim ticks. Section-title/meta bumps land here as a paired homepage polish; the broader site-wide bump (everywhere arbitrary `text-[Npx]` lives) is split into PR-19b.
+
+**Out of scope (deferred):**
+- Site-wide font-size remap (PR-19b). User explicitly asked for slightly larger fonts across the whole site; that's a 40-60-file bump done as a focused diff so layout regressions in constrained containers can be spotted in one place.
+- One-shot 360° spin alternate (settled on continuous-while-hovered in PR-18f).
+- Multi-provider help-row expansion (Phase 2 — current Anthropic link is the placeholder shape).
+- Pre-validation of the saved key in the wizard (W2 — out by user decision).
+
+**Dependencies:** PR-13 (wizard scaffolding + IgnitionStep base). PR-14 (homepage v2 visual alignment + blueprint pills). PR-16a (the existing 3-variant-per-layout system that PR-19a extends). PR-18f (the `Highlighter` icon usage in chats-preview that the wizard now mirrors).
+
+**Exit criteria:**
+- All criteria in `phase-1-testing.md` PR-19a section pass.
+- `npm run lint` returns ≤164 problems. PR-19a actually drops to 163 because deleting DoneStep removed an unused `motion` import; new baseline is 163 (161 errors + 2 warnings).
+- `npm run build` clean.
+- Walked-through wizard verification: first-time path (no saved key) → input + Validate → animation → three buttons. Saved-key path → "An API key is already on file" → Continue (no API call) → animation → three buttons. Add-a-different-key path → input replaces saved key after Validate.
+- Homepage blueprint visual: pills are visibly larger (8.5/7.5 vs 7/6.5), THE/NAME/layout-line/lastModel/placeholder/dim-tick text all +1px, "Single column · Parliament Default"-style labels stack to two lines on narrow rooms.
+
+**Risk:** Medium. IgnitionStep is the most rewritten file — the animation chain is preserved, but the persist-on-connected effect is new and could fire twice in StrictMode if the `persistedRef` guard is removed. Verified: `persistedRef.current` flips true before the await, so a re-render mid-promise won't double-persist. The wizard's three-button layout uses `flex-wrap`, so on narrow viewports the buttons stack — verified to not collide with the Connected badge. Blueprint label stacking heuristic is approximate; rare long names could still nudge the lastModel into the pill row, but the +12px row offset gives ~12px of slack which covers our current room name lengths (max ~18 chars).
+
+---
+
 ## Wave summary
 
 | Wave | PRs | Description |
@@ -1122,8 +1181,9 @@ The settings spin is the first laptop-only icon micro-interaction. Other homepag
 | D | PR-18d | web-search@1.0 catalog component — first PR-18b `inputAction` consumer beyond voice-input; armed-tools registry on hostAPI; chip strip in InputArea; pre-mounted on 4 of 5 chat templates |
 | D | PR-18e | file-attach@1.0 catalog component — first functional V2 attachment surface; replaces dead V1 intrinsic upload; attachments registry on hostAPI; image / PDF / text support; chip strip in InputArea + history; activates the V2 `+` disabled state live |
 | D | PR-18f | Mobile chat polish + settings hover spin — centered Parliament-mark home button on every mobile chat surface, NarrowChrome border-b dropped, top-edge fade extension on `.messages-fade-mask`, input-dock chrome stripped on narrow branches (border + horizontal padding), input gutter trimmed to 16px each side, settings icon CSS-only continuous-spin on hover (laptop / desktop with fine pointer; reduced-motion gate) |
+| D | PR-19a | Wizard rewire + homepage blueprint polish — Highlights icon parity, trust-saved-key flow, Claude-icon Anthropic help row, Back-on-same-row, merged step 7 into step 6 (Build another / Go to Parliament / Enter), pill bump (active 8.5/16, inactive 7.5/14), spec-aligned 4th variant per layout (notch/chamfer), conditional label stacking on overflow, +1px blueprint SVG text, section title 14 / meta 12 |
 
-**Total: 34 PRs** including PR-0.
+**Total: 35 PRs** including PR-0.
 
 ## Pause points
 

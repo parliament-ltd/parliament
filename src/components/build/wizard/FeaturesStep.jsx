@@ -7,7 +7,7 @@
 
 import { FEATURES } from '../../../lib/buildWizard'
 import StepHeader from './StepHeader'
-import { Check } from 'lucide-react'
+import { Check, Highlighter } from 'lucide-react'
 
 const FEATURE_ICONS = {
   'table-of-contents': (
@@ -23,11 +23,10 @@ const FEATURE_ICONS = {
       <path d="M6.5 3.5v3l2 1" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" fill="none" />
     </svg>
   ),
-  highlights: (
-    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-      <path d="M1.5 9.5L4.5 2.5 6.5 7.5 8.5 4.5 11.5 9.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-    </svg>
-  ),
+  // PR-19a: aligned with the chats-preview view-toggle icon
+  // (lucide Highlighter) so the same feature reads consistently
+  // in both surfaces.
+  highlights: <Highlighter className="w-[13px] h-[13px]" strokeWidth={1} />,
   branches: (
     <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
       <circle cx="6.5" cy="2.5" r="1.6" stroke="currentColor" strokeWidth="1" fill="none" />
