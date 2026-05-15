@@ -1,5 +1,5 @@
-// EditorTopBar — back, "Editing" crumb, device chip, scheme chip,
-// Preview / contextual primary action (Build or Save).
+// EditorTopBar — back, "The Lab" crumb, device chip, scheme chip,
+// center Build/Edit mode pills, undo/redo, Preview, primary action.
 //
 // PR-19c:
 //   - Room name input removed from the top bar. Identity editing now
@@ -9,9 +9,17 @@
 //       meta.builtAt is set  → "Save"   → onSave (persist in place)
 //     The duplicate Save+Build pair from PR-8 is gone; the wizard owns
 //     the celebratory Ignite moment for the "Build" semantics.
+//
+// PR-19e:
+//   - "Editing" crumb renamed to "THE LAB" (the editor IS The Lab).
+//   - Center Build/Edit pills indicate the current sub-mode and let the
+//     user switch. Click Build while editing a room → copies the
+//     current canvas state into a fresh room (parent calls onStartCopy).
+//     Click Edit while on blank canvas → opens the Rooms tab so the
+//     user can pick a room to edit.
 
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Smartphone, Monitor, Eye, Undo2, Redo2 } from 'lucide-react'
+import { ArrowLeft, Smartphone, Monitor, Eye, Undo2, Redo2, Wrench, Wand2 } from 'lucide-react'
 import { SCHEMES } from '../../lib/schemes'
 import { normalizeRef } from '../../lib/refs'
 
@@ -34,6 +42,14 @@ export default function EditorTopBar({
   onSchemeChange,
   onSave,
   onPreview,
+  // PR-19e: Build/Edit pill state + handlers.
+  // labMode is 'build' | 'edit' — drives which pill is active.
+  // onStartCopy fires when user clicks Build from Edit (copies current
+  // canvas state into a fresh draft). onSwitchToEdit fires when user
+  // clicks Edit from blank canvas (opens rooms picker).
+  labMode = 'edit',
+  onStartCopy,
+  onSwitchToEdit,
 }) {
   const navigate = useNavigate()
   const deviceClass = mode?.deviceClass || 'visual-pointer'
@@ -78,6 +94,18 @@ export default function EditorTopBar({
     onSave()
   }
 
+  // PR-19e: Build/Edit pill clicks.
+  const buildActive = labMode === 'build'
+  const editActive = labMode === 'edit'
+  const onPillEdit = () => {
+    if (editActive) return
+    if (onSwitchToEdit) onSwitchToEdit()
+  }
+  const onPillBuild = () => {
+    if (buildActive) return
+    if (onStartCopy) onStartCopy()
+  }
+
   return (
     <div className="h-[52px] flex items-center px-4 bg-white border-b border-[var(--p-border)] gap-3">
       <div className="flex items-center gap-2.5 flex-1 min-w-0">
@@ -90,7 +118,7 @@ export default function EditorTopBar({
         </button>
         <span className="w-px h-5 bg-[var(--p-border)]" />
         <span className="text-[11px] uppercase tracking-wider font-medium text-[var(--p-text-muted)]">
-          {isBlank ? 'New room' : 'Editing'}
+          The Lab
         </span>
         <span className="w-px h-5 bg-[var(--p-border)]" />
         <button
@@ -115,7 +143,44 @@ export default function EditorTopBar({
           {schemeLabel}
         </button>
       </div>
-      <div className="flex items-center gap-2">
+
+      {/* PR-19e: center Build/Edit mode pills. Build copies the current
+          canvas state into a fresh draft; Edit opens the Rooms tab.
+          Hidden on /edit-home (labMode === null). */}
+      {labMode && (
+        <div className="flex items-center rounded-full border border-[var(--p-border)] bg-[var(--p-bg-subtle)] p-0.5 shrink-0">
+          <button
+            type="button"
+            onClick={onPillEdit}
+            title="Enter editing mode to edit an existing room"
+            aria-pressed={editActive}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
+              editActive
+                ? 'bg-white text-[var(--p-text-primary)] shadow-sm'
+                : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)]'
+            }`}
+          >
+            <Wrench className="w-3 h-3" />
+            Edit
+          </button>
+          <button
+            type="button"
+            onClick={onPillBuild}
+            title="Build a new room"
+            aria-pressed={buildActive}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
+              buildActive
+                ? 'bg-white text-[var(--p-gold-deep,#8B6A10)] shadow-sm'
+                : 'text-[var(--p-text-secondary)] hover:text-[var(--p-gold-light)]'
+            }`}
+          >
+            <Wand2 className="w-3 h-3" />
+            Build
+          </button>
+        </div>
+      )}
+
+      <div className="flex items-center gap-2 flex-1 justify-end">
         <div className="flex items-center gap-0.5 mr-1">
           <button
             onClick={onUndo}

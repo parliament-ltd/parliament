@@ -14,7 +14,7 @@
 // historyState.present; children never see the history shape.
 
 import { useEffect, useReducer, useState, useCallback } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { DndContext, PointerSensor, KeyboardSensor, useSensor, useSensors } from '@dnd-kit/core'
 import EditorTopBar from '../components/editor/EditorTopBar'
 import EditorLeftRail from '../components/editor/EditorLeftRail'
@@ -33,13 +33,18 @@ import {
   canRedo,
 } from '../lib/editorHistory'
 import { planLayoutMigration } from '../lib/layoutMigration'
-import { listModes, loadHomepageMode, loadMode, saveMode } from '../lib/modes'
+import { listModes, loadHomepageMode, loadMode, saveMode, createCopyOfMode } from '../lib/modes'
 import { useIsNarrow } from '../lib/useViewportWidth'
 import { listEntries as listCatalogEntries } from '../catalog'
 
 export default function EditorView({ scope = 'room', blank = false }) {
   const navigate = useNavigate()
   const { roomId } = useParams()
+  const location = useLocation()
+  // PR-19e: when the user clicks the Build pill from Edit mode, the
+  // parent navigates to /edit with location.state.seedMode set to a
+  // freshly-copied draft. The blank-canvas load path picks it up.
+  const seedMode = location.state?.seedMode || null
   // The editor's three-rail D&D model is unusable below ~768px. PR-15
   // gates with a friendly full-screen panel; V3 will replace this with
   // a phone-first wizard-per-section editor (see refactor docs).
@@ -70,9 +75,13 @@ export default function EditorView({ scope = 'room', blank = false }) {
     async function init() {
       try {
         // PR-19d: /edit (blank) skips the load entirely.
+        // PR-19e: if location.state.seedMode is set (Build pill from
+        // Edit), seed the canvas with that draft instead of resetting
+        // to null. The draft has a fresh id + blank name, so saveMode
+        // will persist it as a new room.
         if (blank) {
           if (!cancelled) {
-            dispatch({ type: 'RESET_TO', mode: null })
+            dispatch({ type: 'RESET_TO', mode: seedMode })
             setLoaded(true)
           }
           return
@@ -94,7 +103,7 @@ export default function EditorView({ scope = 'room', blank = false }) {
     }
     init()
     return () => { cancelled = true }
-  }, [scope, roomId, blank])
+  }, [scope, roomId, blank, seedMode])
 
   // ── Load modes list for Rooms tab + drop lookups ───────
   useEffect(() => {
@@ -116,6 +125,22 @@ export default function EditorView({ scope = 'room', blank = false }) {
     setToast(msg)
     setTimeout(() => setToast(''), 2200)
   }, [])
+
+  // ── PR-19e: Build/Edit pill handlers. ──────────────────
+  // Build pill (from Edit) copies the current canvas state — including
+  // unsaved edits — into a new draft and navigates to /edit with the
+  // seed in router state. The original room is untouched on disk.
+  // Edit pill (from Build) navigates to the Rooms tab so the user can
+  // pick a room to edit.
+  const onStartCopy = useCallback(() => {
+    const sourceMode = historyState.present?.mode
+    if (!sourceMode) return
+    const draft = createCopyOfMode(sourceMode)
+    navigate('/edit', { state: { seedMode: draft } })
+  }, [historyState, navigate])
+  const onSwitchToEdit = useCallback(() => {
+    navigate('/edit?tab=rooms')
+  }, [navigate])
 
   // ── Save ───────────────────────────────────────────────
   const handleSave = useCallback(async () => {
@@ -333,6 +358,11 @@ export default function EditorView({ scope = 'room', blank = false }) {
   // tab because that's where users typically start; populated editors
   // default to Layouts. ?tab= URL query overrides either.
   const defaultTab = blank ? 'rooms' : 'layouts'
+  // PR-19e: pill state derives from the route. /edit blank canvas =
+  // Build mode; /edit/:roomId = Edit mode. /edit-home (homepage
+  // editing) hides the pills — copy-as-new-room semantics don't apply
+  // to the singleton homepage mode.
+  const labMode = scope === 'homepage' ? null : (blank ? 'build' : 'edit')
 
   function confirmRoomApply({ applyLayout, applyScheme, applyComponents, componentRefsToApply }) {
     if (!pendingRoomApply?.sourceMode) return
@@ -370,6 +400,9 @@ export default function EditorView({ scope = 'room', blank = false }) {
           onSchemeChange={(schemeRef) => dispatch({ type: 'APPLY_SCHEME', schemeRef })}
           onSave={handleSave}
           onPreview={() => setPreviewOpen(true)}
+          labMode={labMode}
+          onStartCopy={onStartCopy}
+          onSwitchToEdit={onSwitchToEdit}
         />
         <div className="grid grid-cols-[300px_1fr_300px] flex-1 min-h-0">
           <EditorLeftRail
