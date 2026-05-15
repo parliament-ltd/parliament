@@ -56,6 +56,7 @@ export default function App() {
                   <Route path="/chats" element={<ErrorBoundary inline><SelectorView /></ErrorBoundary>} />
                   <Route path="/chat/:id" element={<ErrorBoundary inline><ChatView /></ErrorBoundary>} />
                   <Route path="/settings" element={<ErrorBoundary inline><SettingsView /></ErrorBoundary>} />
+                  <Route path="/edit" element={<ErrorBoundary inline><EditorView scope="room" blank /></ErrorBoundary>} />
                   <Route path="/edit/:roomId" element={<ErrorBoundary inline><EditorView scope="room" /></ErrorBoundary>} />
                   <Route path="/edit-home" element={<ErrorBoundary inline><EditorView scope="homepage" /></ErrorBoundary>} />
                   <Route path="/build" element={<ErrorBoundary inline><BuildView /></ErrorBoundary>} />

@@ -137,9 +137,15 @@ function SchemePreview({ item }) {
   )
 }
 
-// Room preview (legacy): 3-panel wireframe with gold input dock bar on the
-// middle column. Kept compatible with the existing library-preview behavior.
-function RoomPreview() {
+// Room preview: when `item.layoutId` is set (PR-19d Rooms tab + any caller
+// that passes the room's layout ref), render the matching LayoutSilhouette
+// so the card visually carries the layout's identity. Falls back to the
+// legacy 3-panel wireframe for rows that don't carry layoutId (homepage
+// Library section still uses the wireframe today).
+function RoomPreview({ item }) {
+  if (item?.layoutId) {
+    return <LayoutSilhouette layoutId={item.layoutId} />
+  }
   return (
     <div className="lib-preview">
       <div className="wr" style={{ width: '20%' }}><span className="wd" /></div>

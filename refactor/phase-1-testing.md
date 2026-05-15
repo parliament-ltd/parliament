@@ -3993,6 +3993,112 @@ larger titles + meta. Site-wide font bump is deferred to PR-19b.
 
 ---
 
+## PR-19d — Rooms tab + chat editor entry
+
+### Rooms tab + apply modal
+
+1. Open `/edit/:roomId` for an existing room. Click the **Rooms** tab in the left rail.
+   - [ ] List shows all user-built modes (room + homepage scope).
+   - [ ] Homepage pinned at the top.
+   - [ ] Other rooms sorted by `meta.modified` descending.
+   - [ ] Cards render via `<LibraryCard>` with `<LayoutSilhouette>` previews matching each room's layout.
+2. Drag a same-layout room onto the canvas.
+   - [ ] `EditorApplyRoomDialog` opens.
+   - [ ] Layout toggle is disabled with copy "Same layout".
+   - [ ] Schema + Components toggles remain interactive.
+3. Drag a different-layout room.
+   - [ ] Layout toggle is enabled.
+   - [ ] An inline migration preview line appears below it ("X components will move to the holding tray. Y will keep their slots." — or "All N placed components fit the new layout." when there are no orphans).
+4. Toggle Components ON. The sub-list of source components expands below.
+   - [ ] Each row has a lucide-style glyph + display name + checkbox, all default ON.
+   - [ ] De-select half. Click Done.
+   - [ ] Canvas reflects: source layout (if Layout was ON), source scheme (if Schema was ON), only the selected components placed.
+   - [ ] Current canvas's prior components are now in the holding tray.
+   - [ ] Cmd+Z (Ctrl+Z) undoes the entire apply in **one** step.
+5. Drag the homepage card.
+   - [ ] Modal opens. Components toggle is disabled with copy "Components don't transfer from the homepage."
+   - [ ] "Open homepage editor" button visible on the footer left.
+   - [ ] Click "Open homepage editor" → navigates to `/edit-home`. Modal closes.
+   - [ ] Re-drag. Click Done with Layout + Schema toggled — both applied to canvas without components transferring.
+6. Open `/edit-home` directly. Click **Rooms** tab.
+   - [ ] Room-scope cards are greyed out with "Room only" status pill (disabled drag).
+   - [ ] Homepage card itself is draggable.
+7. Click any room card.
+   - [ ] Nothing happens (drag is the only verb).
+8. With Layout toggle OFF and a layout mismatch: Components toggle becomes disabled with copy "Layout must be applied to bring over components."
+
+### Blank canvas
+
+9. From homepage, hover the wrench. Tooltip reads **"Open Editor"**. Click.
+   - [ ] Lands on `/edit?tab=rooms`.
+   - [ ] Top bar reads "New room".
+   - [ ] Canvas shows centered splash "Drag a layout, scheme, or room to begin."
+   - [ ] Right rail shows hint "Drop a layout, scheme, or room on the canvas to start configuring."
+   - [ ] Build/Save button is disabled.
+10. Drag a layout onto blank canvas.
+    - [ ] Mode materializes, slots appear in the right scheme.
+    - [ ] Undo is unavailable immediately after (history was cleared on materialization).
+    - [ ] Right rail now shows the identity fields.
+11. Type a name in the right rail.
+    - [ ] Build button becomes enabled (newly-materialized mode has `builtAt: null` so the button reads "Build").
+    - [ ] Without a name, button stays disabled with hint "Name your room first".
+12. Click Build → routes to `/build?ignite=:newId`. Walk through the IgnitionStep, click Enter — saved mode opens at `/chat/:newId` (existing PR-19c flow).
+13. Refresh `/edit` — splash returns. No persistence of in-flight blank state.
+14. Drag a scheme onto blank canvas.
+    - [ ] Toast: "Drop a layout or room first."
+    - [ ] Mode stays null.
+15. Drag a component onto blank canvas.
+    - [ ] Toast: "Drop a layout or room first."
+16. From blank canvas, drag a room.
+    - [ ] Modal opens. Done materializes the canvas with the source's layout + scheme + selected components.
+    - [ ] Undo is unavailable immediately after (blank-materialization clears history).
+
+### Chat wrench + chrome
+
+17. Open any chat on desktop (≥768px).
+    - [ ] New top bar visible above the layout: Parliament + wordmark on the left, wrench on the right.
+    - [ ] **No** border-b under the chrome.
+    - [ ] Click wrench → `/edit/:roomId?tab=components`. Lands in editor with Components tab focused.
+    - [ ] Click Parliament → `/`.
+18. Resize viewport below 768px.
+    - [ ] Desktop chat chrome is hidden.
+    - [ ] `NarrowChrome` shows 4 evenly-distributed icons: `[Menu] [Parliament] [Wrench] [Panel]`.
+    - [ ] All four icons have matching footprint widths.
+    - [ ] Hamburger opens drawer. Parliament navigates `/`. Wrench navigates `/edit/:roomId?tab=components`. Panel toggle still toggles the right pane.
+19. Open a chat whose room has no right-rail content.
+    - [ ] Panel slot renders as an aria-hidden spacer (no visible icon, no jitter in the cluster positions).
+20. Inside the editor, click Preview to open `EditorPreviewSheet`.
+    - [ ] If the preview renders via NarrowChrome (mobile preview), the wrench slot is an aria-hidden spacer (no `ChatFrameContext` provider in scope). The other three slots render normally.
+
+### URL state + tab persistence
+
+21. Navigate to `/edit/:roomId?tab=schemes`. Tab opens to Schemes.
+22. Click Layouts tab. URL updates to `?tab=layouts` (preserving other query params, replace history).
+23. Browser back. Tab returns to Schemes.
+
+### Linting + sanity
+
+24. `npm run lint` — baseline 163 (161 errors + 2 warnings). No new lint regressions.
+25. `npm run build` — succeeds.
+
+**Confirms:**
+- Rooms tab lists all user-built modes; homepage pinned, rest by modified desc.
+- Apply modal toggles + per-component sub-list work; Cmd+Z is one step.
+- `/edit` blank canvas + splash + Save guard until name + layout.
+- Homepage wrench → "Open Editor" → `/edit?tab=rooms`.
+- Chat desktop chrome + 4-icon NarrowChrome + ChatFrameContext-driven wrench.
+- Lint baseline preserved.
+
+**Risk:** Medium. New `APPLY_ROOM` action is compound and touches layout / scheme / components in one undo entry — sanity-tested the swept-to-tray flow and the blank-canvas materialization path. Desktop chat chrome adds a new wrapper around RoomShell only on desktop (mobile renders bare); narrow-branch layout heights (`h-[100dvh]` inside three-panel / single-column-with-sheet) are untouched. NarrowChrome now consumes a context; missing-provider case falls back to a hidden spacer so non-chat usages stay clean.
+
+**Out of scope:**
+- Filtering inside the Rooms tab (alphabetical / by-layout / search). Deferred.
+- Click-to-open room cards. User decision: drag is the only verb.
+- Shared `<EditorDialog>` shell to dedupe `EditorMigrationDialog` + `EditorApplyRoomDialog`. Possible cleanup PR.
+- Direct in-app way to edit the homepage other than "drag homepage → Open homepage editor" button.
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:

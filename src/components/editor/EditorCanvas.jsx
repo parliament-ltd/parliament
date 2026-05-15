@@ -96,6 +96,10 @@ export default function EditorCanvas({
 
   const isRoomSelected = selection.type === 'room'
 
+  // PR-19d: blank-canvas splash when the editor has no mode yet
+  // (the /edit route, before the user drops anything in).
+  const isBlank = !mode
+
   return (
     <div className="p-6 flex flex-col items-center">
       <CanvasDropTarget
@@ -106,7 +110,13 @@ export default function EditorCanvas({
         selected={isRoomSelected}
         schemeName={canvasScheme}
       >
-        {!geometry ? (
+        {isBlank ? (
+          <div className="min-h-[420px] flex items-center justify-center text-center px-6 py-12 text-[var(--p-text-muted)]">
+            <div className="max-w-[320px] text-[12.5px] leading-[1.6]">
+              Drag a layout, scheme, or room to begin.
+            </div>
+          </div>
+        ) : !geometry ? (
           <div className="p-6 text-center text-xs text-[var(--p-text-secondary)]">
             <div className="font-medium text-[var(--p-text-primary)] mb-1">
               {layoutRef || '(no layout selected)'}

@@ -38,11 +38,15 @@
 // of which conversation is open.
 
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Wrench } from 'lucide-react'
 import RoomShell from '../components/RoomShell'
+import { ChatFrameProvider } from '../components/ChatFrameContext'
+import ParliamentMark from '../components/ParliamentMark'
 import { getConversation } from '../lib/db'
 import { loadMode } from '../lib/modes'
 import { assignDefaultRoom } from '../lib/migration'
+import { useIsNarrow } from '../lib/useViewportWidth'
 import { useChat } from '../stores/ChatContext'
 
 export default function ChatView() {
@@ -114,7 +118,13 @@ export default function ChatView() {
   if (resolution.forId !== id) return null
 
   if (resolution.conversation && resolution.mode) {
-    return <RoomShellChatHost conversationId={id} mode={resolution.mode} />
+    return (
+      <RoomShellChatHost
+        conversationId={id}
+        mode={resolution.mode}
+        roomId={resolution.conversation.room}
+      />
+    )
   }
 
   // Diagnostic fallback. The migration repair pass should make this
@@ -186,9 +196,10 @@ function ConversationUnavailable({ conversationId, reason }) {
  * resolves. This avoids the empty-state flash that messages@1.0 would
  * otherwise show between mount and the first ChatContext update.
  */
-function RoomShellChatHost({ conversationId, mode }) {
+function RoomShellChatHost({ conversationId, mode, roomId }) {
   const { loadMessages, clearMessages, activeConversationId } = useChat()
   const [loadedFor, setLoadedFor] = useState(null)
+  const isNarrow = useIsNarrow(768)
 
   useEffect(() => {
     let cancelled = false
@@ -205,5 +216,64 @@ function RoomShellChatHost({ conversationId, mode }) {
     return null
   }
 
-  return <RoomShell mode={mode} />
+  // PR-19d: wrench in every chat opens that room in the editor with
+  // the Components tab focused. The provider also surfaces the same
+  // target to NarrowChrome via useChatFrame() for the mobile cluster.
+  const wrenchTarget = roomId ? `/edit/${roomId}?tab=components` : '/edit'
+
+  // On mobile, the layout's narrow branch already sets h-[100dvh] and
+  // owns its own NarrowChrome — we render the RoomShell bare so we
+  // don't double-stack viewport-height containers. On desktop, we
+  // wrap with a flex column so the new chat chrome sits above the
+  // layout's slot grid (which uses h-full to fill the remainder).
+  if (isNarrow) {
+    return (
+      <ChatFrameProvider value={{ wrenchTarget }}>
+        <RoomShell mode={mode} />
+      </ChatFrameProvider>
+    )
+  }
+
+  return (
+    <ChatFrameProvider value={{ wrenchTarget }}>
+      <div className="flex flex-col h-[100dvh] min-h-0 bg-[var(--p-bg-base)]">
+        <ChatDesktopChrome wrenchTarget={wrenchTarget} />
+        <div className="flex-1 min-h-0">
+          <RoomShell mode={mode} />
+        </div>
+      </div>
+    </ChatFrameProvider>
+  )
+}
+
+// ChatDesktopChrome — minimal top bar for desktop /chat/:id (PR-19d).
+// Parliament left → home. Wrench right → editor for this room.
+// No border-b: the chat fades into the chrome via the existing
+// .messages-fade-mask on the chat scroller.
+function ChatDesktopChrome({ wrenchTarget }) {
+  const navigate = useNavigate()
+  return (
+    <div className="flex items-center px-4 sm:px-6 py-2.5 bg-white shrink-0">
+      <button
+        type="button"
+        onClick={() => navigate('/')}
+        title="Home"
+        aria-label="Home"
+        className="inline-flex items-center gap-2 text-[var(--p-text-primary)] font-medium hover:text-[var(--p-gold-light)] transition-colors"
+      >
+        <ParliamentMark />
+        <span className="text-sm">Parliament</span>
+      </button>
+      <div className="flex-1" />
+      <button
+        type="button"
+        onClick={() => navigate(wrenchTarget)}
+        title="Open Editor"
+        aria-label="Open Editor"
+        className="inline-flex items-center justify-center w-8 h-8 rounded-md text-[var(--p-text-secondary)] hover:text-[var(--p-gold-light)] transition-colors"
+      >
+        <Wrench className="w-4 h-4" />
+      </button>
+    </div>
+  )
 }
