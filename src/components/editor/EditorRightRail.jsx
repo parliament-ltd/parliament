@@ -84,6 +84,15 @@ function findEntry(entries, ref) {
 // ─── Room fields ─────────────────────────────────────────
 
 function RoomFields({ mode, onSetName, onSetDeviceClass, onApplyScheme }) {
+  // PR-19d: blank-canvas state. Nothing to configure until the user
+  // drops a layout or room — show a hint instead of dead inputs.
+  if (!mode) {
+    return (
+      <div className="text-[12px] leading-[1.6] text-[var(--p-text-muted)]">
+        Drop a layout, scheme, or room on the canvas to start configuring.
+      </div>
+    )
+  }
   const isMobile = mode?.deviceClass === 'visual-touch-phone'
   const schemeRef = normalizeRef(mode?.scheme?.ref) || ''
   return (

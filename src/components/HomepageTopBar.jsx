@@ -41,9 +41,9 @@ export default function HomepageTopBar({ breadcrumb }) {
 
       <button
         type="button"
-        onClick={() => navigate('/edit-home')}
-        title="Edit homepage"
-        aria-label="Edit homepage"
+        onClick={() => navigate('/edit?tab=rooms')}
+        title="Open Editor"
+        aria-label="Open Editor"
         className={ICON_BTN}
       >
         <Wrench className="w-4 h-4" />

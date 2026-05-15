@@ -31,6 +31,12 @@ const HISTORY_ACTIONS = new Set([
   'UPDATE_COMPONENT_CONFIG',
   'RESTORE_FROM_TRAY',
   'DISMISS_FROM_TRAY',
+  // PR-19d: room application + first-layout materialization. When
+  // these fire on top of a populated canvas they record one undo step.
+  // When they fire on a blank canvas (state.mode was null), we clear
+  // history below — otherwise the user could undo into a null mode.
+  'INIT_FROM_LAYOUT',
+  'APPLY_ROOM',
 ])
 
 // Cap above the 20-state spec floor. Each entry holds a cloned mode
@@ -77,8 +83,17 @@ export function editorHistoryReducer(state, action) {
       }
 
     default: {
+      const wasBlank = state.present.mode === null
       const newPresent = editorReducer(state.present, action)
       if (newPresent === state.present) return state
+
+      // PR-19d: materializing a mode from a blank canvas (null mode) is
+      // a fresh start. Undo would land back on null and break the canvas,
+      // so we drop history for that one transition. Subsequent edits
+      // accumulate normally.
+      if (wasBlank && (action.type === 'INIT_FROM_LAYOUT' || action.type === 'APPLY_ROOM')) {
+        return { past: [], present: newPresent, future: [] }
+      }
 
       if (HISTORY_ACTIONS.has(action.type)) {
         const newPast = [...state.past, state.present]

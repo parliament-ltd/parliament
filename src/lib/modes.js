@@ -196,6 +196,45 @@ export async function createModeFromTemplate(template, overrides = {}) {
   return saveMode(mode)
 }
 
+/**
+ * Build a fresh blank mode object without persisting it. Used by the
+ * editor's blank-canvas flow (PR-19d): the user lands on /edit with no
+ * mode, drags a layout (or room) onto the canvas, and we materialize a
+ * draft via this helper. Save (in EditorView) writes it to IDB.
+ *
+ * The returned mode has an empty `meta.name`. The editor's top bar
+ * keeps Save disabled until the user enters a name in the right rail.
+ *
+ * @param {string} [layoutRef] - layout ref to seed (e.g. 'three-panel@1.0').
+ *   When omitted, `layout` is null and the canvas stays in splash mode.
+ */
+export function createBlankMode(layoutRef) {
+  const now = nowIso()
+  return {
+    schema: SCHEMA,
+    parliamentVersion: PARLIAMENT_VERSION,
+    id: generateId('mode'),
+    scope: 'room',
+    meta: {
+      name: '',
+      author: null,
+      description: '',
+      icon: null,
+      preferredProvider: null,
+      created: now,
+      modified: now,
+      builtAt: null,
+    },
+    deviceClass: 'visual-pointer',
+    layout: layoutRef ? { ref: layoutRef } : null,
+    scheme: { ref: 'parliament@1.0' },
+    components: [],
+    pipelines: [],
+    requestedPermissions: [],
+    buildIntent: null,
+  }
+}
+
 // ─── Constants exported for other callers ────────────────
 
 export const MODE_SCHEMA = SCHEMA

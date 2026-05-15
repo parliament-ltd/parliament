@@ -1,7 +1,8 @@
-// EditorLeftRail — three tabs of draggable library cards: Layouts,
-// Components, Schemes. Cards render through the shared `<LibraryCard>`
-// primitive (src/components/LibraryCard.jsx) so a Highlights card here
-// and a Highlights card on the homepage look like the same thing.
+// EditorLeftRail — four tabs of draggable library cards: Layouts,
+// Components, Schemes, Rooms. Cards render through the shared
+// `<LibraryCard>` primitive (src/components/LibraryCard.jsx) so a
+// Highlights card here and a Highlights card on the homepage look like
+// the same thing.
 //
 // PR-19c rewrite:
 //   - Switched to LibraryCard everywhere.
@@ -15,9 +16,21 @@
 //     pre-existing bug where the SchemesTab built `${s.id}@1.0` (double
 //     `@1.0`) and looked up `--p-gold-light` keys that don't exist in
 //     the SCHEMES const.
+//
+// PR-19d additions:
+//   - Rooms tab: lists every user-built mode (homepage pinned top, then
+//     rooms by meta.modified desc). Drag a room onto the canvas to
+//     trigger EditorApplyRoomDialog. Click is intentionally no-op —
+//     drag is the only verb.
+//   - Cross-scope rule: in a room editor, homepage rows are draggable
+//     (modal disables Components). In the homepage editor, room rows
+//     are greyed out with a "Room only" status pill.
+//   - Tab state is URL-synced via ?tab=. Initial tab respects the
+//     query; default is 'rooms' on /edit (blank) and 'layouts' elsewhere.
 
 import { useEffect, useState } from 'react'
 import { useDraggable } from '@dnd-kit/core'
+import { useSearchParams } from 'react-router-dom'
 import { initDB } from '../../lib/db'
 import { SCHEMES } from '../../lib/schemes'
 import LibraryCard from '../LibraryCard'
@@ -26,6 +39,7 @@ const TABS = [
   { id: 'layouts', label: 'Layouts' },
   { id: 'components', label: 'Components' },
   { id: 'schemes', label: 'Schemes' },
+  { id: 'rooms', label: 'Rooms' },
 ]
 
 export default function EditorLeftRail({
@@ -34,9 +48,24 @@ export default function EditorLeftRail({
   currentSchemeRef,
   placedComponentRefs,
   catalogEntries,
+  modes,
+  defaultTab = 'layouts',
 }) {
-  const [tab, setTab] = useState('layouts')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const initialTab = TABS.some((t) => t.id === searchParams.get('tab'))
+    ? searchParams.get('tab')
+    : defaultTab
+  const [tab, setTab] = useState(initialTab)
   const [layouts, setLayouts] = useState([])
+
+  function selectTab(id) {
+    setTab(id)
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev)
+      p.set('tab', id)
+      return p
+    }, { replace: true })
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -59,7 +88,7 @@ export default function EditorLeftRail({
         {TABS.map((t) => (
           <button
             key={t.id}
-            onClick={() => setTab(t.id)}
+            onClick={() => selectTab(t.id)}
             className={`flex-1 px-2 py-2.5 text-[11px] font-medium transition-colors border-b-[1.5px] ${
               tab === t.id
                 ? 'text-[var(--p-gold-light)] border-[var(--p-gold-light)]'
@@ -83,6 +112,9 @@ export default function EditorLeftRail({
         )}
         {tab === 'schemes' && (
           <SchemesTab currentSchemeRef={currentSchemeRef} />
+        )}
+        {tab === 'rooms' && (
+          <RoomsTab modes={modes} editorScope={scope} />
         )}
       </div>
     </aside>
@@ -133,6 +165,40 @@ function ComponentsTab({ entries, placedRefs, scope }) {
             placed={placedRefs.has(ref)}
             disabled={!fits}
             surfaceLabel={!fits ? surfaceMismatchLabel(surfaces) : null}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
+function RoomsTab({ modes, editorScope }) {
+  if (!Array.isArray(modes)) {
+    return <div className="text-[10.5px] text-[var(--p-text-muted)]">Loading rooms…</div>
+  }
+  if (modes.length === 0) {
+    return <div className="text-[10.5px] text-[var(--p-text-muted)]">No rooms yet. Build one to see it here.</div>
+  }
+  const sorted = sortRooms(modes)
+  return (
+    <div className="lrail-cards">
+      <div className="text-[10.5px] text-[var(--p-text-muted)] leading-[1.5] pb-2">
+        Drag a room onto the canvas to apply its layout, scheme, and components.
+      </div>
+      {sorted.map((mode) => {
+        const isHomepage = mode.scope === 'homepage'
+        // Room-scope rooms can't be dropped into the homepage editor —
+        // they'd swap the homepage's layout to a room-only one. Disable
+        // with a "Room only" pill. Homepage rooms in the room editor
+        // are draggable (modal handles disabling Components).
+        const fits = isHomepage || editorScope === 'room'
+        const statusLabel = isHomepage ? 'Homepage' : (!fits ? 'Room only' : null)
+        return (
+          <DraggableRoomCard
+            key={mode.id}
+            mode={mode}
+            disabled={!fits}
+            statusLabel={statusLabel}
           />
         )
       })}
@@ -214,6 +280,34 @@ function DraggableComponentCard({ ref_, entry, placed, disabled, surfaceLabel })
   )
 }
 
+function DraggableRoomCard({ mode, disabled, statusLabel }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `room-${mode.id}`,
+    data: { kind: 'room', ref: mode.id },
+    disabled,
+  })
+
+  const displayName = mode.meta?.name?.trim() || (mode.scope === 'homepage' ? 'Homepage' : 'Untitled')
+
+  return (
+    <LibraryCard
+      item={{
+        id: mode.id,
+        kind: 'room',
+        displayName,
+        layoutId: mode.layout?.ref || null,
+        author: 'You',
+      }}
+      dragRef={setNodeRef}
+      dragListeners={!disabled ? listeners : undefined}
+      dragAttributes={!disabled ? attributes : undefined}
+      isDragging={isDragging}
+      disabled={disabled}
+      statusLabel={statusLabel}
+    />
+  )
+}
+
 function DraggableSchemeCard({ ref_, scheme, isActive }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `scheme-${ref_}`,
@@ -238,4 +332,17 @@ function surfaceMismatchLabel(surfaces) {
   if (surfaces.includes('homepage') && !surfaces.includes('room')) return 'Homepage'
   if (surfaces.includes('room') && !surfaces.includes('homepage')) return 'Room'
   return null
+}
+
+// Homepage pinned to the top; everything else sorted by modified desc
+// (most recently edited first).
+function sortRooms(modes) {
+  const homepage = modes.filter((m) => m.scope === 'homepage')
+  const rooms = modes.filter((m) => m.scope !== 'homepage')
+  rooms.sort((a, b) => {
+    const am = a.meta?.modified || ''
+    const bm = b.meta?.modified || ''
+    return bm.localeCompare(am)
+  })
+  return [...homepage, ...rooms]
 }

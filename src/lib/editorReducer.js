@@ -17,6 +17,7 @@
 // onto a slot (RESTORE_FROM_TRAY) reconstitutes a full component spec.
 
 import { applyLayoutMigration, planLayoutMigration } from './layoutMigration'
+import { createBlankMode } from './modes'
 
 export function makeInitialState(mode) {
   return {
@@ -238,6 +239,118 @@ export function editorReducer(state, action) {
       // Replace state entirely. Used on initial load — the history
       // wrapper treats this as a hard reset and discards undo history.
       return makeInitialState(action.mode)
+
+    // ─── Blank-canvas materialization (PR-19d) ───────────
+    case 'INIT_FROM_LAYOUT': {
+      // Materializes a fresh mode when the user drops a layout on a
+      // blank canvas. The history wrapper clears undo when state.mode
+      // was previously null — see editorHistory.js.
+      const fresh = createBlankMode(action.layoutRef)
+      return {
+        mode: fresh,
+        selection: { type: 'room' },
+        tray: [],
+        dirty: true,
+      }
+    }
+
+    // ─── Room application (PR-19d) ───────────────────────
+    case 'APPLY_ROOM': {
+      // Compound action — apply some/all of: layout, scheme, components
+      // from a source mode onto the current canvas. Single undo entry.
+      //
+      // When state.mode is null (blank canvas), we materialize a base
+      // from the source's layout regardless of applyLayout — there has
+      // to be a layout for components to land in.
+      //
+      // Edge: if applyComponents is true but applyLayout is false AND
+      // layouts differ, we no-op the components branch (the dialog
+      // disables this combination upstream; this is defense-in-depth).
+      const {
+        sourceMode,
+        applyLayout,
+        applyScheme,
+        componentRefsToApply,
+      } = action
+
+      const base = state.mode || createBlankMode(sourceMode.layout?.ref)
+      const baseLayoutRef = base.layout?.ref
+      const sourceLayoutRef = sourceMode.layout?.ref
+      const layoutsDiffer = baseLayoutRef !== sourceLayoutRef
+
+      let nextMode = { ...base }
+      let nextTray = [...state.tray]
+
+      // 1) Layout swap (with migration of any current components)
+      if (applyLayout && layoutsDiffer && sourceLayoutRef) {
+        const plan = planLayoutMigration({
+          fromLayout: baseLayoutRef,
+          toLayout: sourceLayoutRef,
+          components: nextMode.components || [],
+        })
+        const moved = applyLayoutMigration({
+          components: nextMode.components || [],
+          moves: plan.moves,
+          orphans: plan.orphans,
+        })
+        const orphanIds = new Set(plan.orphans.map((o) => o.compId))
+        const orphanSpecs = (nextMode.components || []).filter((c) => orphanIds.has(c.id))
+        const newTray = plan.orphans.map((o) => {
+          const spec = orphanSpecs.find((s) => s.id === o.compId) || {}
+          return {
+            compId: o.compId,
+            ref: spec.ref,
+            fromSlot: o.fromSlot,
+            reason: o.reason,
+            config: spec.config || {},
+          }
+        })
+        nextMode = { ...nextMode, layout: { ref: sourceLayoutRef }, components: moved }
+        nextTray = [...nextTray, ...newTray]
+      }
+
+      // 2) Components: sweep current → tray, place selected source comps.
+      // Skip silently if layouts differ and we didn't apply the new layout
+      // (no valid slots for the incoming components).
+      const canApplyComponents =
+        action.applyComponents && (!layoutsDiffer || applyLayout)
+      if (canApplyComponents) {
+        const refsToApply = new Set(componentRefsToApply || [])
+        // Push current components into the tray.
+        const sweptToTray = (nextMode.components || []).map((c) => ({
+          compId: c.id,
+          ref: c.ref,
+          fromSlot: c.slot,
+          reason: 'replaced by applied room',
+          config: c.config || {},
+        }))
+        // Build new component instances from the source's components.
+        const incoming = (sourceMode.components || [])
+          .filter((c) => refsToApply.has(c.id))
+          .map((c) => ({
+            id: `comp_${crypto.randomUUID()}`,
+            ref: c.ref,
+            slot: c.slot,
+            order: c.order ?? 0,
+            config: c.config || {},
+          }))
+        nextMode = { ...nextMode, components: incoming }
+        nextTray = [...nextTray, ...sweptToTray]
+      }
+
+      // 3) Scheme
+      if (applyScheme && sourceMode.scheme?.ref) {
+        nextMode = { ...nextMode, scheme: { ref: sourceMode.scheme.ref } }
+      }
+
+      return {
+        ...state,
+        mode: nextMode,
+        tray: nextTray,
+        selection: { type: 'room' },
+        dirty: true,
+      }
+    }
 
     default:
       return state

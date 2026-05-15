@@ -47,12 +47,24 @@ export default function EditorTopBar({
   // PR-19c: contextual primary action. builtAt === null on rooms the
   // user hasn't committed via Ignition yet (Build it myself, Open in
   // editor, Template gallery). Once built, label switches to Save.
-  const isUnbuilt = mode?.meta?.builtAt == null
-  const primaryLabel = isUnbuilt ? 'Build' : 'Save'
-  const primaryDisabled = isUnbuilt
-    ? (saving || trayBlockingBuild)
-    : (saving || !dirty)
-  const primaryTitle = trayBlockingBuild ? 'Empty the holding tray first' : ''
+  // PR-19d: blank canvas (no mode) forces Save semantics; the button
+  // stays disabled until a layout is placed AND a name is entered.
+  const isBlank = !mode
+  const isUnbuilt = mode?.meta?.builtAt == null && !isBlank
+  const isUnnamed = !!mode && !mode.meta?.name?.trim()
+  const primaryLabel = isBlank || isUnbuilt ? 'Build' : 'Save'
+  const primaryDisabled = isBlank
+    ? true
+    : isUnbuilt
+      ? (saving || trayBlockingBuild || isUnnamed)
+      : (saving || !dirty || isUnnamed)
+  const primaryTitle = isBlank
+    ? 'Drop a layout or room first'
+    : isUnnamed
+      ? 'Name your room first'
+      : trayBlockingBuild
+        ? 'Empty the holding tray first'
+        : ''
 
   const onPrimary = () => {
     if (primaryDisabled) return
@@ -78,12 +90,13 @@ export default function EditorTopBar({
         </button>
         <span className="w-px h-5 bg-[var(--p-border)]" />
         <span className="text-[11px] uppercase tracking-wider font-medium text-[var(--p-text-muted)]">
-          Editing
+          {isBlank ? 'New room' : 'Editing'}
         </span>
         <span className="w-px h-5 bg-[var(--p-border)]" />
         <button
           onClick={() => onDeviceClassChange(isMobile ? 'visual-pointer' : 'visual-touch-phone')}
-          className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--p-bg-subtle)] border border-[var(--p-border)] text-[11px] text-[var(--p-text-secondary)] hover:border-[var(--p-gold-light)] hover:text-[var(--p-gold-light)] transition-colors"
+          disabled={isBlank}
+          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--p-bg-subtle)] border border-[var(--p-border)] text-[11px] text-[var(--p-text-secondary)] transition-colors ${isBlank ? 'opacity-40 cursor-not-allowed' : 'hover:border-[var(--p-gold-light)] hover:text-[var(--p-gold-light)]'}`}
           title="Toggle device class"
         >
           {isMobile ? <Smartphone className="w-3 h-3" /> : <Monitor className="w-3 h-3" />}
@@ -91,7 +104,8 @@ export default function EditorTopBar({
         </button>
         <button
           onClick={() => onSchemeChange(schemeRef)}
-          className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--p-bg-subtle)] border border-[var(--p-border)] text-[11px] text-[var(--p-text-secondary)] hover:border-[var(--p-gold-light)] hover:text-[var(--p-gold-light)] transition-colors"
+          disabled={isBlank}
+          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--p-bg-subtle)] border border-[var(--p-border)] text-[11px] text-[var(--p-text-secondary)] transition-colors ${isBlank ? 'opacity-40 cursor-not-allowed' : 'hover:border-[var(--p-gold-light)] hover:text-[var(--p-gold-light)]'}`}
           title="Switch via the Schemes tab in the left rail, or drop a scheme on the canvas"
         >
           <span

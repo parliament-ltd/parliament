@@ -22,6 +22,7 @@ import EditorCanvas from '../components/editor/EditorCanvas'
 import EditorRightRail from '../components/editor/EditorRightRail'
 import EditorHoldingTray from '../components/editor/EditorHoldingTray'
 import EditorMigrationDialog from '../components/editor/EditorMigrationDialog'
+import EditorApplyRoomDialog from '../components/editor/EditorApplyRoomDialog'
 import EditorPreviewSheet from '../components/editor/EditorPreviewSheet'
 import Card from '../components/Card'
 import Button from '../components/Button'
@@ -32,11 +33,11 @@ import {
   canRedo,
 } from '../lib/editorHistory'
 import { planLayoutMigration } from '../lib/layoutMigration'
-import { loadHomepageMode, loadMode, saveMode } from '../lib/modes'
+import { listModes, loadHomepageMode, loadMode, saveMode } from '../lib/modes'
 import { useIsNarrow } from '../lib/useViewportWidth'
 import { listEntries as listCatalogEntries } from '../catalog'
 
-export default function EditorView({ scope = 'room' }) {
+export default function EditorView({ scope = 'room', blank = false }) {
   const navigate = useNavigate()
   const { roomId } = useParams()
   // The editor's three-rail D&D model is unusable below ~768px. PR-15
@@ -56,13 +57,26 @@ export default function EditorView({ scope = 'room' }) {
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState('')
   const [pendingLayoutSwap, setPendingLayoutSwap] = useState(null) // { layoutRef, plan }
+  const [pendingRoomApply, setPendingRoomApply] = useState(null) // { sourceMode }
   const [previewOpen, setPreviewOpen] = useState(false)
+  // PR-19d: lifted list of all modes for the Rooms tab and for drop-time
+  // source-mode lookups. Loaded once on mount; refreshed after Save so a
+  // freshly-saved mode appears in the tab without a full reload.
+  const [modes, setModes] = useState(null)
 
   // ── Load the mode on mount ─────────────────────────────
   useEffect(() => {
     let cancelled = false
     async function init() {
       try {
+        // PR-19d: /edit (blank) skips the load entirely.
+        if (blank) {
+          if (!cancelled) {
+            dispatch({ type: 'RESET_TO', mode: null })
+            setLoaded(true)
+          }
+          return
+        }
         let mode
         if (scope === 'homepage') {
           mode = await loadHomepageMode()
@@ -80,7 +94,22 @@ export default function EditorView({ scope = 'room' }) {
     }
     init()
     return () => { cancelled = true }
-  }, [scope, roomId])
+  }, [scope, roomId, blank])
+
+  // ── Load modes list for Rooms tab + drop lookups ───────
+  useEffect(() => {
+    let cancelled = false
+    async function loadAllModes() {
+      try {
+        const all = await listModes()
+        if (!cancelled) setModes(all)
+      } catch {
+        if (!cancelled) setModes([])
+      }
+    }
+    loadAllModes()
+    return () => { cancelled = true }
+  }, [])
 
   // ── Toast helper ───────────────────────────────────────
   const showToast = useCallback((msg) => {
@@ -91,6 +120,14 @@ export default function EditorView({ scope = 'room' }) {
   // ── Save ───────────────────────────────────────────────
   const handleSave = useCallback(async () => {
     if (saving) return
+    if (!state.mode) {
+      showToast('Drop a layout, scheme, or room first.')
+      return
+    }
+    if (!state.mode.meta?.name?.trim()) {
+      showToast('Name your room first.')
+      return
+    }
     if (state.tray.length > 0) {
       showToast('Empty the holding tray first.')
       return
@@ -100,13 +137,24 @@ export default function EditorView({ scope = 'room' }) {
       const saved = await saveMode(state.mode)
       // MARK_SAVED (not RESET_TO) so undo history survives a save.
       dispatch({ type: 'MARK_SAVED', mode: saved })
+      // Refresh the lifted modes list so the Rooms tab reflects the new save.
+      try {
+        const all = await listModes()
+        setModes(all)
+      } catch { /* ignore */ }
+      // PR-19d: when saving for the first time on a blank canvas, the
+      // mode now has a real id — switch the URL to /edit/:newId so a
+      // reload returns to the same draft.
+      if (blank) {
+        navigate(`/edit/${saved.id}?tab=rooms`, { replace: true })
+      }
       showToast('Saved')
     } catch (err) {
       showToast(err.message || 'Save failed.')
     } finally {
       setSaving(false)
     }
-  }, [saving, state.tray.length, state.mode, showToast])
+  }, [saving, state.tray.length, state.mode, showToast, blank, navigate])
 
   // ── Keyboard shortcuts: Esc deselects, Cmd/Ctrl+Z undo, ─
   //    Cmd/Ctrl+Shift+Z (or Cmd/Ctrl+Y) redo. All gated against
@@ -157,9 +205,33 @@ export default function EditorView({ scope = 'room' }) {
     const dropData = over.data.current
     if (!dragData || !dropData) return
 
-    // Layout dropped on canvas → migration dialog
+    const isBlankCanvas = state.mode === null
+
+    // Room dropped on canvas (or any slot) → ApplyRoomDialog.
+    // Works on both populated and blank canvases.
+    if (dragData.kind === 'room' && (dropData.kind === 'canvas' || dropData.kind === 'slot')) {
+      const sourceMode = (modes || []).find((m) => m.id === dragData.ref)
+      if (!sourceMode) {
+        showToast('Room not found — try refreshing the page.')
+        return
+      }
+      if (state.mode && sourceMode.id === state.mode.id) {
+        showToast("That's the room you're editing.")
+        return
+      }
+      setPendingRoomApply({ sourceMode })
+      return
+    }
+
+    // Layout dropped on canvas
     if (dragData.kind === 'layout' && dropData.kind === 'canvas') {
       const layoutRef = dragData.ref
+      // Blank canvas: materialize a fresh mode from this layout.
+      if (isBlankCanvas) {
+        dispatch({ type: 'INIT_FROM_LAYOUT', layoutRef })
+        showToast('Layout placed. Name your room in the right panel.')
+        return
+      }
       if (layoutRef === state.mode.layout?.ref) {
         showToast('That layout is already active.')
         return
@@ -173,10 +245,20 @@ export default function EditorView({ scope = 'room' }) {
       return
     }
 
-    // Scheme dropped on canvas → apply
+    // Scheme dropped on canvas → apply (rejected on blank canvas).
     if (dragData.kind === 'scheme' && (dropData.kind === 'canvas' || dropData.kind === 'slot')) {
+      if (isBlankCanvas) {
+        showToast('Drop a layout or room first.')
+        return
+      }
       dispatch({ type: 'APPLY_SCHEME', schemeRef: dragData.ref })
       showToast(`Applied scheme: ${dragData.displayName}`)
+      return
+    }
+
+    // Component dropped on a slot (rejected on blank canvas — no slots yet).
+    if (dragData.kind === 'component' && isBlankCanvas) {
+      showToast('Drop a layout or room first.')
       return
     }
 
@@ -245,8 +327,31 @@ export default function EditorView({ scope = 'room' }) {
 
   if (!loaded) return null
 
-  const placedRefs = new Set((state.mode.components || []).map((c) => c.ref))
+  const placedRefs = new Set((state.mode?.components || []).map((c) => c.ref))
   const catalogEntries = listCatalogEntries()
+  // PR-19d: default tab depends on entry. Blank canvas opens the Rooms
+  // tab because that's where users typically start; populated editors
+  // default to Layouts. ?tab= URL query overrides either.
+  const defaultTab = blank ? 'rooms' : 'layouts'
+
+  function confirmRoomApply({ applyLayout, applyScheme, applyComponents, componentRefsToApply }) {
+    if (!pendingRoomApply?.sourceMode) return
+    dispatch({
+      type: 'APPLY_ROOM',
+      sourceMode: pendingRoomApply.sourceMode,
+      applyLayout,
+      applyScheme,
+      applyComponents,
+      componentRefsToApply,
+    })
+    setPendingRoomApply(null)
+    showToast('Applied')
+  }
+
+  function openHomepageEditorFromModal() {
+    setPendingRoomApply(null)
+    navigate('/edit-home')
+  }
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
@@ -266,13 +371,15 @@ export default function EditorView({ scope = 'room' }) {
           onSave={handleSave}
           onPreview={() => setPreviewOpen(true)}
         />
-        <div className="grid grid-cols-[240px_1fr_300px] flex-1 min-h-0">
+        <div className="grid grid-cols-[300px_1fr_300px] flex-1 min-h-0">
           <EditorLeftRail
             scope={scope}
-            currentLayoutRef={state.mode.layout?.ref}
-            currentSchemeRef={state.mode.scheme?.ref}
+            currentLayoutRef={state.mode?.layout?.ref}
+            currentSchemeRef={state.mode?.scheme?.ref}
             placedComponentRefs={placedRefs}
             catalogEntries={catalogEntries}
+            modes={modes}
+            defaultTab={defaultTab}
           />
           <div className="overflow-y-auto bg-[var(--p-bg-subtle)]">
             <EditorCanvas
@@ -310,6 +417,17 @@ export default function EditorView({ scope = 'room' }) {
             catalogEntries={catalogEntries}
             onCancel={() => setPendingLayoutSwap(null)}
             onConfirm={confirmMigration}
+          />
+        )}
+
+        {pendingRoomApply && (
+          <EditorApplyRoomDialog
+            sourceMode={pendingRoomApply.sourceMode}
+            currentMode={state.mode}
+            catalogEntries={catalogEntries}
+            onCancel={() => setPendingRoomApply(null)}
+            onConfirm={confirmRoomApply}
+            onOpenHomepageEditor={openHomepageEditorFromModal}
           />
         )}
 
