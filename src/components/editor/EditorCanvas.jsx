@@ -16,35 +16,48 @@ import { schemeName } from '../../lib/schemes'
 // Per-layout slot positioning. Each entry maps slotId → CSS grid
 // classes so the canvas approximates the live layout's spatial
 // proportions. Layouts not listed here render as a flat row.
+// PR-19d follow-up: two fixes layered together for the right-rail-
+// off-canvas bug.
+//   (1) Each fr-sized column uses `minmax(0, 1fr)` so intrinsic content
+//       min-widths (e.g. unbreakable strings inside a component
+//       preview) can't push neighboring columns past their share.
+//   (2) `aspect-[16/9]` is removed from the inner grids. When combined
+//       with `min-h-[420px]`, the aspect-ratio rule forces the WIDTH
+//       to grow to 420 * 16/9 = 747px even when the parent canvas is
+//       narrower (e.g. 632px at 1280px viewport with 300px rails).
+//       The grid then overflows horizontally and the right-rail slot
+//       lands outside the canvas's rounded-lg boundary. The canvas
+//       wrapper still pairs `aspect-[16/9]` with `overflow-hidden`
+//       below, so the overall card keeps its 16:9 silhouette.
 const LAYOUT_GEOMETRY = {
   'three-panel@1.0': {
-    container: 'grid grid-cols-[18%_1fr_24%] gap-2 p-2 min-h-[420px] aspect-[16/9]',
+    container: 'grid grid-cols-[18%_minmax(0,1fr)_24%] gap-2 p-2 min-h-[420px] h-full',
     slots: {
-      'left-rail':        { className: 'flex flex-col gap-1.5 row-span-1' },
-      'msg-area':         { className: 'flex flex-col gap-1.5 row-span-1' },
-      'input-dock':       { className: 'col-start-2 row-start-2 mt-1' },
-      'right-rail':       { className: 'flex flex-col gap-1.5 row-start-1 col-start-3' },
-      'right-rail-extra': { className: 'flex flex-col gap-1.5 row-start-2 col-start-3' },
+      'left-rail':        { className: 'flex flex-col gap-1.5 row-span-1 min-w-0' },
+      'msg-area':         { className: 'flex flex-col gap-1.5 row-span-1 min-w-0' },
+      'input-dock':       { className: 'col-start-2 row-start-2 mt-1 min-w-0' },
+      'right-rail':       { className: 'flex flex-col gap-1.5 row-start-1 col-start-3 min-w-0' },
+      'right-rail-extra': { className: 'flex flex-col gap-1.5 row-start-2 col-start-3 min-w-0' },
     },
     style: { gridTemplateRows: '1fr auto' },
   },
   'canvas-centric@1.0': {
-    container: 'grid grid-cols-[22%_1fr_28%] gap-2 p-2 min-h-[420px] aspect-[16/9]',
+    container: 'grid grid-cols-[22%_minmax(0,1fr)_28%] gap-2 p-2 min-h-[420px] h-full',
     slots: {
-      'left-rail':  { className: 'flex flex-col gap-1.5' },
-      'canvas':     { className: 'flex flex-col gap-1.5' },
-      'chat-panel': { className: 'flex flex-col gap-1.5' },
-      'inspector':  { className: 'flex flex-col gap-1.5 col-span-3' },
-      'input-dock': { className: 'col-span-3 mt-1' },
+      'left-rail':  { className: 'flex flex-col gap-1.5 min-w-0' },
+      'canvas':     { className: 'flex flex-col gap-1.5 min-w-0' },
+      'chat-panel': { className: 'flex flex-col gap-1.5 min-w-0' },
+      'inspector':  { className: 'flex flex-col gap-1.5 col-span-3 min-w-0' },
+      'input-dock': { className: 'col-span-3 mt-1 min-w-0' },
     },
   },
   'document-centric@1.0': {
-    container: 'grid grid-cols-[1fr_30%] gap-2 p-2 min-h-[420px] aspect-[16/9]',
+    container: 'grid grid-cols-[minmax(0,1fr)_30%] gap-2 p-2 min-h-[420px] h-full',
     slots: {
-      'outline':    { className: 'flex flex-col gap-1.5 col-span-2' },
-      'document':   { className: 'flex flex-col gap-1.5' },
-      'margin':     { className: 'flex flex-col gap-1.5' },
-      'chat-panel': { className: 'flex flex-col gap-1.5 col-span-2' },
+      'outline':    { className: 'flex flex-col gap-1.5 col-span-2 min-w-0' },
+      'document':   { className: 'flex flex-col gap-1.5 min-w-0' },
+      'margin':     { className: 'flex flex-col gap-1.5 min-w-0' },
+      'chat-panel': { className: 'flex flex-col gap-1.5 col-span-2 min-w-0' },
     },
   },
   'single-column-with-sheet@1.0': {
@@ -180,7 +193,7 @@ function CanvasDropTarget({ children, onClick, selected, schemeName: schemeAttr 
       ref={setNodeRef}
       onClick={onClick}
       data-scheme={schemeAttr}
-      className={`w-full max-w-[920px] rounded-lg border shadow-[0_8px_30px_-10px_rgba(0,0,0,0.08)] transition-shadow ${
+      className={`w-full max-w-[920px] min-h-[420px] rounded-lg border overflow-hidden shadow-[0_8px_30px_-10px_rgba(0,0,0,0.08)] transition-shadow ${
         selected ? 'border-[var(--p-gold-light)]' : 'border-[var(--p-border)]'
       }`}
       style={{
@@ -215,7 +228,7 @@ function SlotDropTarget({
           onSelect(slotId)
         }
       }}
-      className={`relative rounded-md transition-colors flex flex-col gap-1.5 cursor-pointer min-h-[60px] ${
+      className={`relative rounded-md transition-colors flex flex-col gap-1.5 cursor-pointer min-h-[60px] min-w-0 overflow-hidden ${
         isOver
           ? 'border border-[var(--p-gold-light)] bg-[rgba(196,169,77,0.08)]'
           : isEmpty
