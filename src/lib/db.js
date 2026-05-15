@@ -389,8 +389,8 @@ async function seedHomepageMode(db) {
       parliamentVersion: '0.5.0',
       scope: 'homepage',
       meta: {
-        name: 'Home',
-        description: 'Default homepage. Four sections out of the box.',
+        name: 'The Study',
+        description: 'Your default landing surface. Four sections out of the box.',
         created: now,
         modified: now,
       },
@@ -415,6 +415,18 @@ async function seedHomepageMode(db) {
       components: HOMEPAGE_DEFAULT_COMPONENTS,
       parliamentVersion: '0.5.0',
       meta: { ...(home.meta || {}), modified: now },
+    })
+  }
+
+  // PR-19e: rename the default homepage name from "Home" to "The Study".
+  // Only triggers when the current meta.name exactly matches the prior
+  // seed value, so user-renamed homepages are left alone.
+  const refreshed = (await db.getAllFromIndex('modes', 'scope', 'homepage'))
+    .find(m => m.id === 'home_default') || home
+  if (refreshed.meta?.name === 'Home') {
+    await db.put('modes', {
+      ...refreshed,
+      meta: { ...(refreshed.meta || {}), name: 'The Study', modified: now },
     })
   }
 }

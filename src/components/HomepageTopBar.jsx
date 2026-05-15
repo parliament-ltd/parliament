@@ -1,15 +1,18 @@
-// HomepageTopBar — page-level chrome above the V2 homepage.
+// HomepageTopBar — page-level chrome above The Study (V2 homepage) and
+// the Build wizard.
 //
-// PR-14 swapped the labelled buttons for borderless icon buttons:
-//   Parliament mark | breadcrumb | (spacer) | Backup status dot |
-//   Wrench (Edit homepage) | Home (+ Build a room — gold accent) |
+// PR-19e renamed homepage → The Study and swapped the gold "+ Build a
+// room" Home icon for two clearer entry points:
+//   Parliament mark | The Study / breadcrumb | (spacer) | Backup dot |
+//   Wrench (Open the Lab) | Wand2 (Build with the Wizard — gold) |
 //   Database (Backup) | Settings
 //
-// Backup is preserved (the design doc spec drops it, but it's core to the
-// no-backend story so we keep it). The "+ Build a room" Home icon retains
-// its gold tint to read as the primary action.
+// The Lab is the editor; the Wand is the guided build flow. Both
+// entries are reachable from any surface that mounts this top bar.
+// Backup is preserved (the design doc spec drops it, but it's core to
+// the no-backend story so we keep it).
 
-import { Settings as SettingsIcon, Database, Home, Wrench } from 'lucide-react'
+import { Settings as SettingsIcon, Database, Wand2, Wrench } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useBackup } from '../stores/BackupContext'
 import BackupStatusIndicator from './BackupStatusIndicator'
@@ -31,9 +34,14 @@ export default function HomepageTopBar({ breadcrumb }) {
         <span className="text-sm hidden min-[480px]:inline">Parliament</span>
       </div>
 
-      <div className="text-xs text-[var(--p-text-muted)] min-w-0 truncate">
-        {breadcrumb || ''}
-      </div>
+      {breadcrumb && (
+        <>
+          <span className="text-[var(--p-text-light)] text-sm select-none" aria-hidden="true">/</span>
+          <div className="text-sm text-[var(--p-text-secondary)] min-w-0 truncate">
+            {breadcrumb}
+          </div>
+        </>
+      )}
 
       <div className="flex-1" />
 
@@ -42,8 +50,8 @@ export default function HomepageTopBar({ breadcrumb }) {
       <button
         type="button"
         onClick={() => navigate('/edit?tab=rooms')}
-        title="Open Editor"
-        aria-label="Open Editor"
+        title="Open the Lab"
+        aria-label="Open the Lab"
         className={ICON_BTN}
       >
         <Wrench className="w-4 h-4" />
@@ -52,11 +60,11 @@ export default function HomepageTopBar({ breadcrumb }) {
       <button
         type="button"
         onClick={() => navigate('/build')}
-        title="Build a room"
-        aria-label="Build a room"
+        title="Build a room with the Wizard"
+        aria-label="Build a room with the Wizard"
         className={ICON_BTN_PRIMARY}
       >
-        <Home className="w-4 h-4" />
+        <Wand2 className="w-4 h-4" />
       </button>
 
       <button

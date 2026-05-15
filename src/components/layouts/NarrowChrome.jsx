@@ -45,8 +45,8 @@ export default function NarrowChrome({
       <button
         type="button"
         onClick={() => navigate('/')}
-        aria-label="Go to homepage"
-        title="Home"
+        aria-label="Go to The Study"
+        title="The Study"
         className="inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--p-text-primary)] hover:text-[var(--p-gold-light)] transition-colors"
       >
         <ParliamentMark />

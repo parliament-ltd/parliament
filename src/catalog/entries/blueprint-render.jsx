@@ -34,6 +34,8 @@ import {
   placePawn,
   interiorHints,
   PLACEHOLDER_KIND,
+  SYSTEM_KIND,
+  SYSTEM_ROOM_IDS,
 } from '../../lib/blueprintShapes'
 
 // ─── Visual constants ────────────────────────────────────────
@@ -192,9 +194,11 @@ export default function BlueprintRender({ hostAPI } = {}) {
   }, [hoveredFromChat, conversations])
 
   // Pack into rows + compute viewBox. Memoized on rooms array identity.
+  // PR-19e: includeSystem injects The Study + The Lab as compact rooms at
+  // the head of the packing list so they anchor the floor plan.
   const layout = useMemo(() => {
     const items = rooms.map(r => ({ id: r.id, layoutRef: r.layout?.ref || '' }))
-    return packRooms(items, { includePlaceholder: true })
+    return packRooms(items, { includePlaceholder: true, includeSystem: true })
   }, [rooms])
 
   const pawn = useMemo(
@@ -275,31 +279,46 @@ export default function BlueprintRender({ hostAPI } = {}) {
         <rect x={layout.wallBox.x} y={layout.wallBox.y} width={layout.wallBox.width} height={layout.wallBox.height} fill="none" stroke={WALL_STROKE} strokeWidth="6" rx="2" />
         <rect x={layout.wallBox.x} y={layout.wallBox.y} width={layout.wallBox.width} height={layout.wallBox.height} fill={HATCH_FILL} fillOpacity="0.22" stroke="none" rx="2" />
 
-        {/* Rooms + placeholder */}
-        {layout.placedRooms.map(placed =>
-          placed.kind === PLACEHOLDER_KIND
-            ? (
+        {/* Rooms + system cards + placeholder */}
+        {layout.placedRooms.map(placed => {
+          if (placed.kind === PLACEHOLDER_KIND) {
+            return (
               <PlaceholderRoom
                 key="__placeholder__"
                 box={placed.box}
                 onClick={() => navigate('/build')}
               />
             )
-            : (
-              <Room
+          }
+          if (placed.kind === SYSTEM_KIND) {
+            const isStudy = placed.id === SYSTEM_ROOM_IDS.STUDY
+            return (
+              <SystemRoom
                 key={placed.id}
                 placed={placed}
-                mode={modesById.get(placed.id)}
-                lastConv={lastModelByRoomId.get(placed.id)}
-                isActive={placed.id === activeRoomId}
-                isHighlitFromChat={placed.id === highlightedRoomId}
+                isStudy={isStudy}
                 isHovered={placed.id === hoveredFromBlueprint}
                 onEnter={() => setHoveredFromBlueprint(placed.id)}
                 onLeave={() => setHoveredFromBlueprint(null)}
-                onClick={() => onEnterRoom(placed.id)}
+                onClick={() => navigate(isStudy ? '/' : '/edit')}
               />
             )
-        )}
+          }
+          return (
+            <Room
+              key={placed.id}
+              placed={placed}
+              mode={modesById.get(placed.id)}
+              lastConv={lastModelByRoomId.get(placed.id)}
+              isActive={placed.id === activeRoomId}
+              isHighlitFromChat={placed.id === highlightedRoomId}
+              isHovered={placed.id === hoveredFromBlueprint}
+              onEnter={() => setHoveredFromBlueprint(placed.id)}
+              onLeave={() => setHoveredFromBlueprint(null)}
+              onClick={() => onEnterRoom(placed.id)}
+            />
+          )
+        })}
 
         {/* Dimension ticks: top edge for first room, right edge for last */}
         <DimensionTicks layout={layout} modesById={modesById} />
@@ -535,6 +554,89 @@ function FeaturePills({ features, interior, isActive }) {
   )
 }
 
+// PR-19e: compact system room — The Study (Compass) or The Lab
+// (Wrench). Rectangular rounded card, icon-led, distinct from
+// irregularly-shaped user rooms so it reads as a system surface.
+function SystemRoom({ placed, isStudy, isHovered, onEnter, onLeave, onClick }) {
+  const { box } = placed
+  const label = isStudy ? 'THE STUDY' : 'THE LAB'
+  const subtitle = isStudy ? 'Home' : 'Build a room'
+  const cx = box.x + box.width / 2
+  // Icon sits in the upper third; label + subtitle stack below.
+  const iconCenterY = box.y + box.height * 0.36
+  const labelY = box.y + box.height * 0.62
+  const subY = box.y + box.height * 0.74
+
+  // Slight gold-tint fill on hover; thin grey border at rest.
+  const fill = isHovered ? 'rgba(196,169,77,0.10)' : 'rgba(196,169,77,0.035)'
+  const stroke = isHovered ? '#B8A070' : '#C8C2B8'
+  const iconColor = isHovered ? '#8B6A10' : '#5A5550'
+
+  // Each lucide icon is normalized to a 24×24 viewBox. Render at 1.4×
+  // scale → 33.6px effective width; translate so the icon sits centered
+  // on (cx, iconCenterY).
+  const iconScale = 1.4
+  const iconHalf = 12 * iconScale
+
+  return (
+    <g
+      style={{ cursor: 'pointer' }}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      onClick={onClick}
+    >
+      <rect
+        x={box.x}
+        y={box.y}
+        width={box.width}
+        height={box.height}
+        rx="6"
+        fill={fill}
+        stroke={stroke}
+        strokeWidth="0.8"
+      />
+      <g
+        transform={`translate(${cx - iconHalf} ${iconCenterY - iconHalf}) scale(${iconScale})`}
+        stroke={iconColor}
+        strokeWidth="1.6"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {isStudy ? (
+          <>
+            <circle cx="12" cy="12" r="10" />
+            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill={iconColor} fillOpacity="0.18" />
+          </>
+        ) : (
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+        )}
+      </g>
+      <text
+        x={cx}
+        y={labelY}
+        textAnchor="middle"
+        fontSize="11"
+        fill={iconColor}
+        letterSpacing="0.08em"
+        fontWeight="600"
+      >
+        {label}
+      </text>
+      <text
+        x={cx}
+        y={subY}
+        textAnchor="middle"
+        fontSize="9"
+        fill="#9A9490"
+        fontStyle="italic"
+      >
+        {subtitle}
+      </text>
+    </g>
+  )
+}
+
 function PlaceholderRoom({ box, onClick }) {
   const path = buildPlaceholderPath(box)
   const cx = box.x + box.width / 2
@@ -555,9 +657,10 @@ function PlaceholderRoom({ box, onClick }) {
 }
 
 function DimensionTicks({ layout, modesById }) {
-  // Tick the first room across the top edge with its name; tick the
-  // tallest room down the right edge. Lifted from spec, simplified.
-  const realRooms = layout.placedRooms.filter(r => r.kind !== PLACEHOLDER_KIND)
+  // Tick the first user room across the top edge with its name; tick
+  // the tallest user room down the right edge. System rooms and the
+  // placeholder are skipped — the ticks describe the user's own work.
+  const realRooms = layout.placedRooms.filter(r => r.kind === 'room')
   if (realRooms.length === 0) return null
   const first = realRooms[0]
   const firstName = modesById.get(first.id)?.meta?.name || 'Room'

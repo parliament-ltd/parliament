@@ -1,10 +1,10 @@
-// HomepageView (PR-6) — `/` route.
+// HomepageView (PR-6) — `/` route, framed as **The Study** (PR-19e).
 //
-// Loads the user's homepage mode from IndexedDB and renders it via
+// Loads the homepage mode from IndexedDB and renders it via
 // <RoomShell>. The seeded `home_default` mode mounts four sections —
 // blueprint, chats, library, favorites — into the stacked-sections
-// layout's `section-slot`. Above the layout sits HomepageTopBar with
-// Edit homepage / + Build a room / Backup & Restore placeholders.
+// layout's `section-slot`. Above the layout sits HomepageTopBar
+// labelled "The Study" with Wrench (Lab) + Wand2 (Wizard) entry icons.
 //
 // First-run onboarding (PR-13): a user with no API key who has never
 // completed the build wizard lands on `/build` instead of the homepage.
@@ -81,7 +81,7 @@ export default function HomepageView() {
 
   return (
     <div className="min-h-screen bg-[var(--p-bg-base)]">
-      <HomepageTopBar />
+      <HomepageTopBar breadcrumb="The Study" />
       <div className="max-w-[1100px] mx-auto px-5 pt-6">
         <BackupReminderBanner />
       </div>
@@ -89,7 +89,7 @@ export default function HomepageView() {
         <RoomShell mode={mode} />
       ) : (
         <div className="max-w-3xl mx-auto px-6 py-12 text-sm text-[var(--p-text-secondary)]">
-          No homepage mode found. The seed should have created one — try
+          No Study mode found. The seed should have created one — try
           reloading. If the issue persists, check that IndexedDB is at
           schema v4.
         </div>

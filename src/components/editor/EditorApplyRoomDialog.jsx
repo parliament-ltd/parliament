@@ -97,7 +97,7 @@ export default function EditorApplyRoomDialog({
     })
   }
 
-  const sourceName = sourceMode?.meta?.name?.trim() || (isHomepageSource ? 'Homepage' : 'this room')
+  const sourceName = sourceMode?.meta?.name?.trim() || (isHomepageSource ? 'The Study' : 'this room')
 
   return (
     <AnimatePresence>
@@ -158,7 +158,7 @@ export default function EditorApplyRoomDialog({
               onChange={setApplyComponents}
               hint={
                 componentsBlockedByScope
-                  ? "Components don't transfer from the homepage"
+                  ? "Components don't transfer from The Study"
                   : layoutsDifferWithoutApply
                     ? 'Layout must be applied to bring over components'
                     : null
@@ -200,7 +200,7 @@ export default function EditorApplyRoomDialog({
                 onClick={onOpenHomepageEditor}
                 className="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--p-border)] bg-transparent text-[var(--p-text-secondary)] hover:border-[var(--p-gold-light)] hover:text-[var(--p-gold-light)] transition-colors"
               >
-                Open homepage editor
+                Edit The Study
               </button>
             )}
             <div className="flex-1" />
