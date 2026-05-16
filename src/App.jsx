@@ -10,6 +10,7 @@ import { CollabModeProvider } from './stores/CollabModeContext'
 import { FileShelfProvider } from './stores/FileShelfContext'
 import { DocumentProvider } from './stores/DocumentContext'
 import BranchShortcutHandler from './components/BranchShortcutHandler'
+import BlueprintOverlay from './components/BlueprintOverlay'
 import { PWAProvider } from './stores/PWAContext'
 import { BackupProvider } from './stores/BackupContext'
 import ChatView from './views/ChatView'
@@ -51,6 +52,7 @@ export default function App() {
               <BrowserRouter>
                 <BackupProvider>
                 <BranchShortcutHandler />
+                <BlueprintOverlay />
                 <Routes>
                   <Route path="/" element={<ErrorBoundary inline><HomepageView /></ErrorBoundary>} />
                   <Route path="/chats" element={<ErrorBoundary inline><SelectorView /></ErrorBoundary>} />
