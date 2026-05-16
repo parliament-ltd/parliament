@@ -9,10 +9,17 @@
 // string | enum | object | array. PR-8 renders the first four as
 // editable controls; complex types (object, array) show a read-only
 // hint until later PRs need them.
+//
+// PR-19e adds a "Home" section to RoomFields for saved user rooms with
+// a "Make this room your home" toggle. Confirmation modal in both
+// directions; pointer lives in SettingsContext (`chosenHomeRoomId`).
 
+import { useState } from 'react'
+import { Home } from 'lucide-react'
 import { getLayoutSlots } from '../../lib/layoutMigration'
 import { SCHEMES } from '../../lib/schemes'
 import { findCatalogEntry, normalizeRef } from '../../lib/refs'
+import { useSettings } from '../../stores/SettingsContext'
 
 export default function EditorRightRail({
   mode,
@@ -136,6 +143,130 @@ function RoomFields({ mode, onSetName, onSetDeviceClass, onApplyScheme }) {
       <Hint>
         A room can be exported as a mode file and shared. Every choice you make here travels with it.
       </Hint>
+
+      <ChosenHomeSection mode={mode} />
+    </div>
+  )
+}
+
+// PR-19e: surfaces only for saved user rooms (scope='room', has an id
+// already in IDB — unsaved drafts can't be set as the home since the
+// pointer would break on next refresh). Shows a small home icon when
+// the toggle is active; clicking the toggle in either direction pops a
+// confirmation modal before flipping the SettingsContext pointer.
+function ChosenHomeSection({ mode }) {
+  const { settings, updateSetting, loaded } = useSettings()
+  const [confirming, setConfirming] = useState(false)
+
+  if (!mode || mode.scope !== 'room' || !mode.id) return null
+
+  // builtAt === null means the room exists in IDB only as an in-memory
+  // draft (e.g. Build pill copy not yet saved). Wait for a real save
+  // before letting it be the home — otherwise the redirect targets a
+  // mode the user may never have committed.
+  if (mode.meta?.builtAt == null) {
+    return (
+      <>
+        <SectionLabel>Home</SectionLabel>
+        <Hint>Save the room first to set it as your home.</Hint>
+      </>
+    )
+  }
+
+  if (!loaded) return null
+  const isChosen = settings.chosenHomeRoomId === mode.id
+  const roomName = mode.meta?.name?.trim() || 'this room'
+
+  const onConfirm = async () => {
+    await updateSetting('chosenHomeRoomId', isChosen ? null : mode.id)
+    setConfirming(false)
+  }
+
+  return (
+    <>
+      <SectionLabel>Home</SectionLabel>
+      <div className="flex items-start gap-3 py-1">
+        <button
+          type="button"
+          role="switch"
+          aria-checked={isChosen}
+          onClick={() => setConfirming(true)}
+          className={`relative inline-flex h-[18px] w-[32px] shrink-0 rounded-full transition-colors mt-0.5 ${
+            isChosen ? 'bg-[var(--p-gold-light)]' : 'bg-[var(--p-bg-subtle)] border border-[var(--p-border)]'
+          }`}
+        >
+          <span
+            className={`inline-block h-[14px] w-[14px] rounded-full bg-white shadow transition-transform ${
+              isChosen ? 'translate-x-[16px]' : 'translate-x-[2px]'
+            }`}
+            style={{ marginTop: 1 }}
+          />
+        </button>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 text-[12.5px] font-medium text-[var(--p-text-primary)]">
+            Make this room your home
+            {isChosen && <Home className="w-3 h-3 text-[var(--p-gold-light)]" />}
+          </div>
+          <div className="text-[11px] text-[var(--p-text-secondary)] mt-0.5">
+            {isChosen
+              ? 'Opening Parliament drops you into a fresh conversation here.'
+              : 'Parliament will land on The Study by default.'}
+          </div>
+        </div>
+      </div>
+
+      {confirming && (
+        <ChosenHomeConfirm
+          isChosen={isChosen}
+          roomName={roomName}
+          onCancel={() => setConfirming(false)}
+          onConfirm={onConfirm}
+        />
+      )}
+    </>
+  )
+}
+
+function ChosenHomeConfirm({ isChosen, roomName, onCancel, onConfirm }) {
+  const title = isChosen ? 'Remove home pointer?' : `Set "${roomName}" as your home?`
+  const body = isChosen
+    ? 'Parliament will go back to landing on The Study.'
+    : 'Opening Parliament will drop you into a fresh conversation in this room from now on.'
+  const ctaLabel = isChosen ? 'Remove' : 'Set as home'
+
+  return (
+    <div
+      className="fixed inset-0 z-[160] flex items-center justify-center p-5"
+      style={{ backgroundColor: 'rgba(25, 25, 25, 0.32)' }}
+      onClick={onCancel}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        className="w-[400px] max-w-[94vw] bg-[var(--p-bg-surface)] border border-[var(--p-border)] rounded-xl shadow-2xl shadow-black/20 p-5 flex flex-col gap-3"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="text-base font-medium text-[var(--p-text-primary)]">
+          {title}
+        </div>
+        <div className="text-[12.5px] text-[var(--p-text-secondary)] leading-[1.55]">
+          {body}
+        </div>
+        <div className="flex items-center justify-end gap-2 pt-1">
+          <button
+            onClick={onCancel}
+            className="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--p-border)] bg-transparent text-[var(--p-text-secondary)] hover:border-[var(--p-gold-light)] hover:text-[var(--p-gold-light)] transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--p-gold-light)] bg-[var(--p-gold-light)] text-white hover:bg-[var(--p-gold-muted)] hover:border-[var(--p-gold-muted)] transition-colors"
+          >
+            {ctaLabel}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

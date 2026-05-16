@@ -167,7 +167,7 @@ function ConversationUnavailable({ conversationId, reason }) {
             to="/"
             className="px-3.5 py-2 rounded-lg text-sm font-medium border border-[var(--p-border)] bg-white text-[var(--p-text-primary)] hover:border-[#B8A070] transition-colors"
           >
-            Back to homepage
+            Back to The Study
           </Link>
           <Link
             to="/chats"

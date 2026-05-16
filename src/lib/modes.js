@@ -235,6 +235,52 @@ export function createBlankMode(layoutRef) {
   }
 }
 
+/**
+ * In-memory copy of an existing mode, ready to seed the editor's
+ * blank-canvas Build flow (PR-19e). The returned object has:
+ *   - a fresh id (so saveMode persists it as a new record)
+ *   - blank meta.name (the user picks one in the right rail)
+ *   - new component instance ids (so the new room edits don't bleed
+ *     into the source)
+ *   - builtAt: null (Build button lights up; Ignition runs again)
+ *
+ * The source mode is unchanged. Caller is responsible for handing this
+ * object to the editor (e.g. via router location state) and then calling
+ * saveMode when the user names + saves it.
+ */
+export function createCopyOfMode(source) {
+  if (!source || typeof source !== 'object') {
+    throw new Error('createCopyOfMode: source must be an object')
+  }
+  const now = nowIso()
+  return {
+    schema: SCHEMA,
+    parliamentVersion: PARLIAMENT_VERSION,
+    id: generateId('mode'),
+    scope: 'room',
+    meta: {
+      name: '',
+      author: null,
+      description: source.meta?.description || '',
+      icon: source.meta?.icon || null,
+      preferredProvider: null,
+      created: now,
+      modified: now,
+      builtAt: null,
+    },
+    deviceClass: source.deviceClass || 'visual-pointer',
+    layout: source.layout ? { ...source.layout } : null,
+    scheme: source.scheme ? { ...source.scheme } : { ref: 'parliament@1.0' },
+    components: (source.components || []).map((c) => ({
+      ...c,
+      id: `comp_${crypto.randomUUID()}`,
+    })),
+    pipelines: [],
+    requestedPermissions: [],
+    buildIntent: source.buildIntent || null,
+  }
+}
+
 // ─── Constants exported for other callers ────────────────
 
 export const MODE_SCHEMA = SCHEMA

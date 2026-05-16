@@ -62,6 +62,16 @@ const DEFAULT_ASPECT = 1.0
 const PLACEHOLDER_ASPECT = 0.85
 export const PLACEHOLDER_KIND = 'placeholder'
 
+// PR-19e: system rooms (The Study, The Lab) — compact rectangular cards
+// that anchor the floor plan. Injected at the head of the room list so
+// they read as the primary navigation surfaces.
+export const SYSTEM_KIND = 'system'
+const SYSTEM_ASPECT = 0.55
+export const SYSTEM_ROOM_IDS = {
+  STUDY: '__study__',
+  LAB: '__lab__',
+}
+
 // ─── Hash + seeded perturbation ──────────────────────────────
 
 /**
@@ -621,13 +631,32 @@ function aspectFor(layoutRef) {
  *   placedRooms: Array<{ id, layoutRef, kind, box }>,
  * }}
  */
-export function packRooms(rooms, { includePlaceholder = true } = {}) {
-  const items = rooms.map(r => ({
-    id: r.id,
-    layoutRef: r.layoutRef,
-    kind: 'room',
-    width: Math.round(aspectFor(r.layoutRef) * ROW_HEIGHT),
-  }))
+export function packRooms(rooms, { includePlaceholder = true, includeSystem = false } = {}) {
+  const items = []
+
+  if (includeSystem) {
+    items.push({
+      id: SYSTEM_ROOM_IDS.STUDY,
+      layoutRef: null,
+      kind: SYSTEM_KIND,
+      width: Math.round(SYSTEM_ASPECT * ROW_HEIGHT),
+    })
+    items.push({
+      id: SYSTEM_ROOM_IDS.LAB,
+      layoutRef: null,
+      kind: SYSTEM_KIND,
+      width: Math.round(SYSTEM_ASPECT * ROW_HEIGHT),
+    })
+  }
+
+  for (const r of rooms) {
+    items.push({
+      id: r.id,
+      layoutRef: r.layoutRef,
+      kind: 'room',
+      width: Math.round(aspectFor(r.layoutRef) * ROW_HEIGHT),
+    })
+  }
 
   if (includePlaceholder) {
     items.push({
@@ -716,6 +745,17 @@ export function placePawn({ placedRooms, activeRoomId }) {
     return {
       x: active.box.x + active.box.width / 2,
       y: active.box.y + active.box.height * 0.78,
+    }
+  }
+
+  // PR-19e: if no user room is active, rest the pawn on The Study —
+  // that's the default landing and the surface the user is currently
+  // viewing when they see the blueprint inside it.
+  const study = placedRooms.find(p => p.kind === SYSTEM_KIND && p.id === SYSTEM_ROOM_IDS.STUDY)
+  if (study) {
+    return {
+      x: study.box.x + study.box.width / 2,
+      y: study.box.y + study.box.height * 0.78,
     }
   }
 

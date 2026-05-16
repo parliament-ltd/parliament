@@ -7,6 +7,11 @@
 //
 // The selection state is local; the parent (BuildView) only learns the
 // choice when the user clicks "Let's go".
+//
+// PR-19e: when `firstTime` is false (user has at least one room already),
+// trim the hero: drop "Welcome to Parliament" + the open-source paragraph
+// and lead with the "How would you like to build?" prompt. Repeat visits
+// don't need the onboarding copy.
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
@@ -59,7 +64,7 @@ const PATHS = [
   },
 ]
 
-export default function WizardEntry({ onPick, busy }) {
+export default function WizardEntry({ onPick, busy, firstTime = true }) {
   const [selected, setSelected] = useState('guided')
 
   return (
@@ -75,18 +80,25 @@ export default function WizardEntry({ onPick, busy }) {
         {PARLIAMENT_MARK}
       </div>
 
-      <div className="text-[21px] font-medium leading-tight mb-2" style={{ color: 'var(--p-text-primary)' }}>
-        Welcome to Parliament
-      </div>
-      <p
-        className="text-[13px] leading-[1.65] mx-auto mb-7"
-        style={{ color: 'var(--p-text-secondary)', maxWidth: '390px' }}
-      >
-        Your open source home to build your AI as you'd like. Parliament is made of rooms. Each room is a place you've designed for a particular kind of work.
-      </p>
+      {firstTime && (
+        <>
+          <div className="text-[21px] font-medium leading-tight mb-2" style={{ color: 'var(--p-text-primary)' }}>
+            Welcome to Parliament
+          </div>
+          <p
+            className="text-[13px] leading-[1.65] mx-auto mb-7"
+            style={{ color: 'var(--p-text-secondary)', maxWidth: '390px' }}
+          >
+            Your open source home to build your AI as you'd like. Parliament is made of rooms. Each room is a place you've designed for a particular kind of work.
+          </p>
+        </>
+      )}
 
-      <div className="text-sm font-medium mb-4" style={{ color: 'var(--p-text-primary)' }}>
-        To get started, how would you like to build?
+      <div
+        className={`font-medium mb-4 ${firstTime ? 'text-sm' : 'text-[19px] leading-tight mb-5'}`}
+        style={{ color: 'var(--p-text-primary)' }}
+      >
+        {firstTime ? 'To get started, how would you like to build?' : 'How would you like to build?'}
       </div>
 
       <div className="flex flex-col gap-[7px] mx-auto mb-7" style={{ maxWidth: '380px' }}>

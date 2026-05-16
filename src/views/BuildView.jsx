@@ -53,7 +53,7 @@ import {
   SCHEMES,
 } from '../lib/buildWizard'
 import { listRooms } from '../lib/catalog'
-import { createModeFromTemplate, loadMode } from '../lib/modes'
+import { createModeFromTemplate, loadMode, listModes } from '../lib/modes'
 import { setSetting } from '../lib/db'
 
 const SPRING_GENTLE = { type: 'spring', stiffness: 200, damping: 24 }
@@ -76,6 +76,10 @@ export default function BuildView() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [previewLayoutId, setPreviewLayoutId] = useState(null)
+  // PR-19e: detect returning users (>=1 room built) so WizardEntry can
+  // trim its onboarding copy. Defaults to true (treat unknown as
+  // first-time) until the IDB lookup resolves.
+  const [firstTime, setFirstTime] = useState(true)
 
   // ── Load the existing mode for the ignite-existing-room path ──
   useEffect(() => {
@@ -95,6 +99,19 @@ export default function BuildView() {
       })
     return () => { cancelled = true }
   }, [igniteRoomId])
+
+  // ── PR-19e: determine first-time-vs-returning by room count. ──
+  useEffect(() => {
+    let cancelled = false
+    listModes({ scope: 'room' })
+      .then((rooms) => {
+        if (!cancelled) setFirstTime((rooms || []).length === 0)
+      })
+      .catch(() => {
+        if (!cancelled) setFirstTime(true)
+      })
+    return () => { cancelled = true }
+  }, [])
 
   // ── Load templates lazily — only when the user asks for the gallery
   useEffect(() => {
@@ -301,7 +318,7 @@ export default function BuildView() {
                 exit={{ opacity: 0, y: -3 }}
                 transition={{ duration: 0.18 }}
               >
-                {screen === 0 && <WizardEntry onPick={handleEntryPick} busy={busy} />}
+                {screen === 0 && <WizardEntry onPick={handleEntryPick} busy={busy} firstTime={firstTime} />}
                 {screen === 1 && <PurposeStep config={config} onChange={patchConfig} />}
                 {screen === 2 && <DeviceStep config={config} onChange={patchConfig} />}
                 {screen === 3 && (
