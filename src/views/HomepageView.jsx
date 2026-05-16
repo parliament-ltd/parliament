@@ -20,9 +20,9 @@ import { useNavigate } from 'react-router-dom'
 import RoomShell from '../components/RoomShell'
 import HomepageTopBar from '../components/HomepageTopBar'
 import BackupReminderBanner from '../components/BackupReminderBanner'
-import { loadHomepageMode } from '../lib/modes'
+import { loadHomepageMode, loadMode } from '../lib/modes'
 import { loadApiKey } from '../lib/crypto'
-import { getSetting } from '../lib/db'
+import { getSetting, setSetting, createConversation } from '../lib/db'
 
 export default function HomepageView() {
   const navigate = useNavigate()
@@ -32,10 +32,11 @@ export default function HomepageView() {
   useEffect(() => {
     let cancelled = false
     async function init() {
-      const [apiKey, wizardDone, tourDone] = await Promise.all([
+      const [apiKey, wizardDone, tourDone, chosenHomeRoomId] = await Promise.all([
         loadApiKey('persistent'),
         getSetting('tourCompleted_wizard'),
         getSetting('tourCompleted_settings'),
+        getSetting('chosenHomeRoomId'),
       ])
       if (cancelled) return
       if (!apiKey && !wizardDone) {
@@ -52,6 +53,30 @@ export default function HomepageView() {
         // wizard again.
         navigate('/settings', { replace: true })
         return
+      }
+
+      // PR-19e: if the user has chosen a specific room as their home,
+      // open a fresh conversation in that room and route there.
+      // Verifies the room still exists — if it was deleted, the
+      // pointer is cleared and we fall back to The Study.
+      if (chosenHomeRoomId) {
+        try {
+          const room = await loadMode(chosenHomeRoomId)
+          if (cancelled) return
+          if (room && room.scope === 'room') {
+            const conv = await createConversation({
+              title: room.meta?.name || 'New conversation',
+              room: room.id,
+            })
+            if (cancelled) return
+            navigate(`/chat/${conv.id}`, { replace: true })
+            return
+          }
+          // Stale pointer — clear it so subsequent loads don't retry.
+          await setSetting('chosenHomeRoomId', null)
+        } catch {
+          // Fall through to The Study.
+        }
       }
 
       const home = await loadHomepageMode()

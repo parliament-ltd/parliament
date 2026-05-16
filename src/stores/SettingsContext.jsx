@@ -16,6 +16,10 @@ const DEFAULT_SETTINGS = {
   backupReminder: 'weekly',
   lastBackup: null,
   spendingLimitDismissed: false,
+  // PR-19e: pointer to a room mode the user wants to use as their
+  // landing surface. When set, `/` opens a fresh conversation in that
+  // room instead of rendering The Study. null = fall back to The Study.
+  chosenHomeRoomId: null,
 }
 
 export function SettingsProvider({ children }) {
