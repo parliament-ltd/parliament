@@ -15,6 +15,7 @@ import { useEffect } from 'react'
 import { X } from 'lucide-react'
 import { getEntry as getComponentEntry } from '../catalog'
 import { getLayoutEntry } from '../catalog/layouts'
+import { Preview } from './LibraryCard'
 
 const TYPE_LABEL = {
   room:      'Room',
@@ -152,6 +153,13 @@ export default function LibraryOverlay({ item, onClose }) {
   return (
     <div className="ov-backdrop show" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
       <div className="ov-panel" role="dialog" aria-modal="true" aria-labelledby="ov-title">
+        {/* PR-19f: same abstract image the card carries, sized for the
+            overlay header. Reuses LibraryCard's Preview so the visual
+            link between "card I clicked" and "thing I'm reading"
+            stays exact — future screenshot work swaps in here too. */}
+        <div className="ov-preview">
+          <Preview item={item} />
+        </div>
         <div className="ov-head">
           <div>
             <div id="ov-title" className="ov-name">{item.displayName || item.name || item.title}</div>
