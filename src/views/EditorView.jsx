@@ -140,7 +140,12 @@ export default function EditorView({ scope = 'room', blank = false }) {
   }, [historyState, navigate])
   const onSwitchToEdit = useCallback(() => {
     navigate('/edit?tab=rooms')
-  }, [navigate])
+    // PR-19f: the Edit pill on blank canvas opens the Rooms tab but
+    // can't visually toggle the pill (route is unchanged → labMode
+    // stays 'build'). A toast narrates the next step so the click
+    // doesn't feel like a no-op.
+    showToast('Drag a room from the left rail to start editing')
+  }, [navigate, showToast])
 
   // ── Save ───────────────────────────────────────────────
   const handleSave = useCallback(async () => {
@@ -232,8 +237,7 @@ export default function EditorView({ scope = 'room', blank = false }) {
 
     const isBlankCanvas = state.mode === null
 
-    // Room dropped on canvas (or any slot) → ApplyRoomDialog.
-    // Works on both populated and blank canvases.
+    // Room dropped on canvas (or any slot).
     if (dragData.kind === 'room' && (dropData.kind === 'canvas' || dropData.kind === 'slot')) {
       const sourceMode = (modes || []).find((m) => m.id === dragData.ref)
       if (!sourceMode) {
@@ -242,6 +246,13 @@ export default function EditorView({ scope = 'room', blank = false }) {
       }
       if (state.mode && sourceMode.id === state.mode.id) {
         showToast("That's the room you're editing.")
+        return
+      }
+      // PR-19f: blank canvas has nothing to merge into, so the
+      // ApplyRoomDialog's "keep what" toggle + migration preview are
+      // meaningless. Drop a room → open it for editing directly.
+      if (isBlankCanvas) {
+        navigate(`/edit/${sourceMode.id}?tab=rooms`)
         return
       }
       setPendingRoomApply({ sourceMode })

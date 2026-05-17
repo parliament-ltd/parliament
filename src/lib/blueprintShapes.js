@@ -58,15 +58,14 @@ const LAYOUT_ASPECT = {
 // detail. Better than crashing.
 const DEFAULT_ASPECT = 1.0
 
-// "+ Build a room" placeholder dimensions. Always inserted last.
-const PLACEHOLDER_ASPECT = 0.85
-export const PLACEHOLDER_KIND = 'placeholder'
-
-// PR-19e: system rooms (The Study, The Lab) — compact rectangular cards
-// that anchor the floor plan. Injected at the head of the room list so
-// they read as the primary navigation surfaces.
+// PR-19e: system rooms (The Study, The Lab) — straight-edge cards with
+// distinct signature shapes (Study = bottom-left desk wedge; Lab =
+// top-right workbench notch). PR-19f packs them AFTER user rooms so the
+// user's own work anchors row 1 and system rooms flow in naturally.
+// Aspect ratio bumped to 1.10 (was 0.55) to give the new shapes room
+// to breathe and let The Study's four component pills fit on one row.
 export const SYSTEM_KIND = 'system'
-const SYSTEM_ASPECT = 0.55
+const SYSTEM_ASPECT = 1.10
 export const SYSTEM_ROOM_IDS = {
   STUDY: '__study__',
   LAB: '__lab__',
@@ -427,9 +426,64 @@ function singleColumnCapsulePath(box, seed) {
   return { path: d, interior: interiorBox(box) }
 }
 
+// ─── System room signature shapes (PR-19f) ────────────────────
+//
+// The Study and The Lab follow the same straight-edge grammar as user
+// rooms but with one distinct character detail per room, so they read
+// as siblings of user rooms rather than a separate visual species.
+//
+// Study = bottom-left chamfered corner (a desk-wedge — reading nook
+// feel). Lab = top-right rectangular notch (a workbench cubby —
+// pulled-out tool drawer feel). Both share the inset interior so
+// labels + pills stay centered inside the visible body.
+
+/**
+ * The Study — bottom-left desk wedge. A single 22px diagonal chamfer
+ * at the bottom-left corner. Same path grammar as
+ * documentCentricBottomLeftPath but with a deeper cut so the gesture
+ * reads clearly at the system room's larger aspect ratio.
+ */
+export function studyShape(box) {
+  const { x, y, width: w, height: h } = box
+  const cut = 22
+  const right = x + w
+  const bottom = y + h
+  const d = [
+    `M ${x} ${y}`,
+    `L ${right} ${y}`,
+    `L ${right} ${bottom}`,
+    `L ${x + cut} ${bottom}`,
+    `L ${x} ${bottom - cut}`,
+    'Z',
+  ].join(' ')
+  return { path: d, interior: interiorBox(box) }
+}
+
+/**
+ * The Lab — top-right workbench cubby. Small rectangular notch cut
+ * inward from the top-right corner (~22px inset × ~16px deep).
+ */
+export function labShape(box) {
+  const { x, y, width: w, height: h } = box
+  const inset = 22
+  const depth = 16
+  const right = x + w
+  const bottom = y + h
+  const d = [
+    `M ${x} ${y}`,
+    `L ${right - inset} ${y}`,
+    `L ${right - inset} ${y + depth}`,
+    `L ${right} ${y + depth}`,
+    `L ${right} ${bottom}`,
+    `L ${x} ${bottom}`,
+    'Z',
+  ].join(' ')
+  return { path: d, interior: interiorBox(box) }
+}
+
 // ─── Fallback ─────────────────────────────────────────────────
 
-/** Plain rectangle for unknown layouts (and the placeholder). */
+/** Plain rectangle for unknown layouts. */
 function rectanglePath(box) {
   const { x, y, width: w, height: h } = box
   const right = x + w
@@ -530,11 +584,6 @@ export function buildRoomPath({ box, layoutRef, roomId }) {
   return { path: mirrorPath(path, axisX), interior }
 }
 
-/** Build the +Build-a-room placeholder path (always a plain rect). */
-export function buildPlaceholderPath(box) {
-  return rectanglePath(box).path
-}
-
 // ─── Interior wall hints ─────────────────────────────────────
 //
 // Returns an array of SVG node specs the renderer paints inside each
@@ -619,11 +668,13 @@ function aspectFor(layoutRef) {
 /**
  * Pack a list of rooms into rows. Greedy: keep adding to the current row
  * until adding another room would exceed TARGET_INNER_WIDTH, then wrap.
- * Always appends a "+ Build a room" placeholder as the final entry,
- * which can land in the last row (if it fits) or wrap to a new row.
+ *
+ * PR-19f: system rooms (The Study + The Lab, when `includeSystem`) are
+ * appended AFTER user rooms so the user's own work anchors row 1. With
+ * natural packing they often wrap onto row 2 — that's the point.
  *
  * @param {Array<{id: string, layoutRef: string}>} rooms
- * @param {{ includePlaceholder?: boolean }} options
+ * @param {{ includeSystem?: boolean }} options
  * @returns {{
  *   viewBox: { width: number, height: number },
  *   wallBox: { x, y, width, height },
@@ -631,8 +682,17 @@ function aspectFor(layoutRef) {
  *   placedRooms: Array<{ id, layoutRef, kind, box }>,
  * }}
  */
-export function packRooms(rooms, { includePlaceholder = true, includeSystem = false } = {}) {
+export function packRooms(rooms, { includeSystem = false } = {}) {
   const items = []
+
+  for (const r of rooms) {
+    items.push({
+      id: r.id,
+      layoutRef: r.layoutRef,
+      kind: 'room',
+      width: Math.round(aspectFor(r.layoutRef) * ROW_HEIGHT),
+    })
+  }
 
   if (includeSystem) {
     items.push({
@@ -646,24 +706,6 @@ export function packRooms(rooms, { includePlaceholder = true, includeSystem = fa
       layoutRef: null,
       kind: SYSTEM_KIND,
       width: Math.round(SYSTEM_ASPECT * ROW_HEIGHT),
-    })
-  }
-
-  for (const r of rooms) {
-    items.push({
-      id: r.id,
-      layoutRef: r.layoutRef,
-      kind: 'room',
-      width: Math.round(aspectFor(r.layoutRef) * ROW_HEIGHT),
-    })
-  }
-
-  if (includePlaceholder) {
-    items.push({
-      id: '__placeholder__',
-      layoutRef: null,
-      kind: PLACEHOLDER_KIND,
-      width: Math.round(PLACEHOLDER_ASPECT * ROW_HEIGHT),
     })
   }
 
@@ -729,10 +771,11 @@ export function packRooms(rooms, { includePlaceholder = true, includeSystem = fa
  * Pick where the gold pawn marker should sit. Returns absolute SVG
  * coordinates {x, y} or null if no rooms are placed yet.
  *
- * If activeRoomId is given and matches one of the placed rooms, the
- * pawn lands inside that room (centered horizontally, ~80% down). If
- * not — including when the user has zero rooms — the pawn lands next
- * to the placeholder.
+ * If activeRoomId is given and matches a placed user room, the pawn
+ * lands inside it (centered horizontally, ~80% down). Otherwise it
+ * rests on The Study — the default surface the user is viewing when
+ * they see the blueprint. Falls through to the first user room as a
+ * last resort (e.g. if `includeSystem` was false).
  */
 export function placePawn({ placedRooms, activeRoomId }) {
   if (!Array.isArray(placedRooms) || placedRooms.length === 0) return null
@@ -748,9 +791,6 @@ export function placePawn({ placedRooms, activeRoomId }) {
     }
   }
 
-  // PR-19e: if no user room is active, rest the pawn on The Study —
-  // that's the default landing and the surface the user is currently
-  // viewing when they see the blueprint inside it.
   const study = placedRooms.find(p => p.kind === SYSTEM_KIND && p.id === SYSTEM_ROOM_IDS.STUDY)
   if (study) {
     return {
@@ -759,15 +799,6 @@ export function placePawn({ placedRooms, activeRoomId }) {
     }
   }
 
-  const placeholder = placedRooms.find(p => p.kind === PLACEHOLDER_KIND)
-  if (placeholder) {
-    return {
-      x: placeholder.box.x + 28,
-      y: placeholder.box.y + placeholder.box.height / 2,
-    }
-  }
-
-  // Fallback: first room
   const first = placedRooms.find(p => p.kind === 'room')
   if (first) {
     return {

@@ -24,16 +24,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useConversations } from '../../stores/ConversationContext'
-import { listModes } from '../../lib/modes'
+import { listModes, loadHomepageMode } from '../../lib/modes'
 import { createConversation } from '../../lib/db'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
 import {
   packRooms,
   buildRoomPath,
-  buildPlaceholderPath,
   placePawn,
   interiorHints,
-  PLACEHOLDER_KIND,
+  studyShape,
+  labShape,
   SYSTEM_KIND,
   SYSTEM_ROOM_IDS,
 } from '../../lib/blueprintShapes'
@@ -65,6 +65,16 @@ const FEATURE_LABELS = {
   context:     'CONTEXT HEALTH',
   notes:       'NOTES',
   review:      'REVIEW',
+}
+
+// PR-19f: pills for The Study's seeded sections. Kept separate from
+// FEATURE_LABELS so wizard-feature concerns don't leak into the
+// homepage's system-room rendering.
+const SYSTEM_FEATURE_LABELS = {
+  blueprint: 'BLUEPRINT',
+  chats:     'CHATS',
+  library:   'LIBRARY',
+  favorites: 'FAVORITES',
 }
 
 const SCHEME_DISPLAY = {
@@ -123,16 +133,19 @@ function estimateTextWidth(text, fontSize, isItalic = false) {
   return text.length * charW
 }
 
-// Pull up to 3 feature pills off a room's components array.
-function featuresFor(room) {
+// Pull up to N feature pills off a room's components array, looking
+// up labels from the supplied table. `limit` defaults to 3 (the cap
+// that fits on a user-room floor); The Study uses 4 since its seeded
+// components are exactly four.
+function featuresFor(room, labels = FEATURE_LABELS, limit = 3) {
   const seen = new Set()
   const out = []
   for (const c of room?.components || []) {
-    const label = FEATURE_LABELS[refName(c.ref)]
+    const label = labels[refName(c.ref)]
     if (label && !seen.has(label)) {
       seen.add(label)
       out.push(label)
-      if (out.length === 3) break
+      if (out.length === limit) break
     }
   }
   return out
@@ -144,6 +157,9 @@ export default function BlueprintRender({ hostAPI } = {}) {
   const { conversations } = useConversations()
   const navigate = useNavigate()
   const [rooms, setRooms] = useState([])
+  // PR-19f: The Study's actual mode record, used to render its
+  // component pills on the system-room card. Loaded once on mount.
+  const [studyMode, setStudyMode] = useState(null)
   const [hoveredFromChat, setHoveredFromChat] = useState(null)
   const [hoveredFromBlueprint, setHoveredFromBlueprint] = useState(null)
   const [pawnTip, setPawnTip] = useState(null) // { x, y } or null
@@ -159,14 +175,24 @@ export default function BlueprintRender({ hostAPI } = {}) {
   // Load every room mode once. Future PR-15+ may push these through a
   // useModes() hook that listens for `homepage-mode-changed` so wizard-
   // built rooms appear without a reload — out of scope here.
+  // PR-19f: also load the homepage mode so The Study's system-room
+  // card can render its actual components as feature pills.
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       try {
-        const modes = await listModes({ scope: 'room' })
-        if (!cancelled) setRooms(modes || [])
+        const [modes, study] = await Promise.all([
+          listModes({ scope: 'room' }),
+          loadHomepageMode(),
+        ])
+        if (cancelled) return
+        setRooms(modes || [])
+        setStudyMode(study || null)
       } catch {
-        if (!cancelled) setRooms([])
+        if (!cancelled) {
+          setRooms([])
+          setStudyMode(null)
+        }
       }
     })()
     return () => { cancelled = true }
@@ -194,11 +220,13 @@ export default function BlueprintRender({ hostAPI } = {}) {
   }, [hoveredFromChat, conversations])
 
   // Pack into rows + compute viewBox. Memoized on rooms array identity.
-  // PR-19e: includeSystem injects The Study + The Lab as compact rooms at
-  // the head of the packing list so they anchor the floor plan.
+  // PR-19f: system rooms (The Study, The Lab) pack after user rooms so
+  // the user's own work anchors row 1; system rooms flow naturally onto
+  // row 2 once row 1 fills. Placeholder is gone — The Lab IS the build
+  // entry, so the dashed "+ BUILD A ROOM" card was redundant.
   const layout = useMemo(() => {
     const items = rooms.map(r => ({ id: r.id, layoutRef: r.layout?.ref || '' }))
-    return packRooms(items, { includePlaceholder: true, includeSystem: true })
+    return packRooms(items, { includeSystem: true })
   }, [rooms])
 
   const pawn = useMemo(
@@ -279,17 +307,8 @@ export default function BlueprintRender({ hostAPI } = {}) {
         <rect x={layout.wallBox.x} y={layout.wallBox.y} width={layout.wallBox.width} height={layout.wallBox.height} fill="none" stroke={WALL_STROKE} strokeWidth="6" rx="2" />
         <rect x={layout.wallBox.x} y={layout.wallBox.y} width={layout.wallBox.width} height={layout.wallBox.height} fill={HATCH_FILL} fillOpacity="0.22" stroke="none" rx="2" />
 
-        {/* Rooms + system cards + placeholder */}
+        {/* Rooms + system cards */}
         {layout.placedRooms.map(placed => {
-          if (placed.kind === PLACEHOLDER_KIND) {
-            return (
-              <PlaceholderRoom
-                key="__placeholder__"
-                box={placed.box}
-                onClick={() => navigate('/build')}
-              />
-            )
-          }
           if (placed.kind === SYSTEM_KIND) {
             const isStudy = placed.id === SYSTEM_ROOM_IDS.STUDY
             return (
@@ -297,6 +316,7 @@ export default function BlueprintRender({ hostAPI } = {}) {
                 key={placed.id}
                 placed={placed}
                 isStudy={isStudy}
+                studyMode={isStudy ? studyMode : null}
                 isHovered={placed.id === hoveredFromBlueprint}
                 onEnter={() => setHoveredFromBlueprint(placed.id)}
                 onLeave={() => setHoveredFromBlueprint(null)}
@@ -554,29 +574,41 @@ function FeaturePills({ features, interior, isActive }) {
   )
 }
 
-// PR-19e: compact system room — The Study (Compass) or The Lab
-// (Wrench). Rectangular rounded card, icon-led, distinct from
-// irregularly-shaped user rooms so it reads as a system surface.
-function SystemRoom({ placed, isStudy, isHovered, onEnter, onLeave, onClick }) {
+// PR-19f: system room — The Study (Compass) or The Lab (Wrench).
+// Straight-edge signature shape (Study = bottom-left desk wedge;
+// Lab = top-right workbench cubby), faded small icon in the top-left,
+// label sizing that matches user rooms (THE / STUDY stack at the same
+// fontSize as THE / ALBATROSS), and feature pills along the bottom
+// interior for The Study (the seeded mode has four real components).
+function SystemRoom({ placed, isStudy, studyMode, isHovered, onEnter, onLeave, onClick }) {
   const { box } = placed
-  const label = isStudy ? 'THE STUDY' : 'THE LAB'
-  const subtitle = isStudy ? 'Home' : 'Build a room'
-  const cx = box.x + box.width / 2
-  // Icon sits in the upper third; label + subtitle stack below.
-  const iconCenterY = box.y + box.height * 0.36
-  const labelY = box.y + box.height * 0.62
-  const subY = box.y + box.height * 0.74
+  const { path, interior } = isStudy ? studyShape(box) : labShape(box)
+  const cx = interior.x + interior.width / 2
+  const name = isStudy ? 'STUDY' : 'LAB'
+  const subtitle = isStudy ? 'Navigate' : 'Build a room'
 
-  // Slight gold-tint fill on hover; thin grey border at rest.
+  // Slight gold-tint fill on hover; thin grey border at rest. Mirrors
+  // the user-room palette so the cards read as the same species.
   const fill = isHovered ? 'rgba(196,169,77,0.10)' : 'rgba(196,169,77,0.035)'
   const stroke = isHovered ? '#B8A070' : '#C8C2B8'
-  const iconColor = isHovered ? '#8B6A10' : '#5A5550'
+  const labelColor = isHovered ? '#8B6A10' : '#5A5550'
 
-  // Each lucide icon is normalized to a 24×24 viewBox. Render at 1.4×
-  // scale → 33.6px effective width; translate so the icon sits centered
-  // on (cx, iconCenterY).
-  const iconScale = 1.4
-  const iconHalf = 12 * iconScale
+  // Faded top-left icon — a status marker, not the visual centerpiece.
+  // Icon viewBox is 24×24; 0.85× scale → ~20px effective. Translated to
+  // the box's top-left corner with a small 10px inset.
+  const iconScale = 0.85
+  const iconColor = isHovered ? '#8B6A10' : '#B8B2A8'
+
+  // Label baselines mirror Room: THE prefix at 10, name at 13, subtitle
+  // below. Offset down from the icon so the two don't collide.
+  const theY = box.y + 44
+  const nameY = theY + 18
+  const subY = nameY + 14
+
+  // Pills — only The Study has components. Up to 4 (the seeded set).
+  const features = isStudy && studyMode
+    ? featuresFor(studyMode, SYSTEM_FEATURE_LABELS, 4)
+    : []
 
   return (
     <g
@@ -585,20 +617,13 @@ function SystemRoom({ placed, isStudy, isHovered, onEnter, onLeave, onClick }) {
       onMouseLeave={onLeave}
       onClick={onClick}
     >
-      <rect
-        x={box.x}
-        y={box.y}
-        width={box.width}
-        height={box.height}
-        rx="6"
-        fill={fill}
-        stroke={stroke}
-        strokeWidth="0.8"
-      />
+      <path d={path} fill={fill} className="bp-room-fill" />
+      <path d={path} fill="none" stroke={stroke} strokeWidth="0.8" />
+
       <g
-        transform={`translate(${cx - iconHalf} ${iconCenterY - iconHalf}) scale(${iconScale})`}
+        transform={`translate(${box.x + 10} ${box.y + 10}) scale(${iconScale})`}
         stroke={iconColor}
-        strokeWidth="1.6"
+        strokeWidth="1.2"
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -606,52 +631,26 @@ function SystemRoom({ placed, isStudy, isHovered, onEnter, onLeave, onClick }) {
         {isStudy ? (
           <>
             <circle cx="12" cy="12" r="10" />
-            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill={iconColor} fillOpacity="0.18" />
+            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
           </>
         ) : (
           <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
         )}
       </g>
-      <text
-        x={cx}
-        y={labelY}
-        textAnchor="middle"
-        fontSize="11"
-        fill={iconColor}
-        letterSpacing="0.08em"
-        fontWeight="600"
-      >
-        {label}
+
+      <text x={cx} y={theY} textAnchor="middle" fontSize="10" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+        THE
       </text>
-      <text
-        x={cx}
-        y={subY}
-        textAnchor="middle"
-        fontSize="9"
-        fill="#9A9490"
-        fontStyle="italic"
-      >
+      <text x={cx} y={nameY} textAnchor="middle" fontSize="13" fill={labelColor} letterSpacing="0.06em" fontWeight="600">
+        {name}
+      </text>
+      <text x={cx} y={subY} textAnchor="middle" fontSize="9" fill="#9A9490" fontStyle="italic">
         {subtitle}
       </text>
-    </g>
-  )
-}
 
-function PlaceholderRoom({ box, onClick }) {
-  const path = buildPlaceholderPath(box)
-  const cx = box.x + box.width / 2
-  const cy = box.y + box.height / 2
-  return (
-    <g className="bp-placeholder" style={{ cursor: 'pointer' }} onClick={onClick}>
-      <path d={path} fill="transparent" className="bp-placeholder-fill" />
-      <path d={path} fill="none" stroke="#C8C2B8" strokeWidth="1" strokeDasharray="5 4" className="bp-placeholder-dash" />
-      {/* PR-19a: +1px font bump for legibility (was 9 / 7.5). */}
-      <text x={cx} y={cy - 4} textAnchor="middle" fontSize="10" fill="#B8B2A8" letterSpacing="0.08em" className="bp-placeholder-title">
-        + BUILD A ROOM
-      </text>
-      <text x={cx} y={cy + 14} textAnchor="middle" fontSize="8.5" fill="#C8C2B8" className="bp-placeholder-sub">
-        Expand your Parliament
-      </text>
+      {features.length > 0 && (
+        <FeaturePills features={features} interior={interior} isActive={false} />
+      )}
     </g>
   )
 }
