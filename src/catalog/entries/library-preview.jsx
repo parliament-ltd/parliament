@@ -156,7 +156,12 @@ export default function LibraryPreview({ config = {} } = {}) {
           }
         })
         const all = [
-          ...rooms.map(r =>      ({ ...r, kind: 'room' })),
+          // PR-19g (followup): library rooms carry their layout as
+          // `layout.ref` (a structured object), but RoomPreview /
+          // LayoutSilhouette read a flat `layoutId`. Without this
+          // bridge every room card shows the generic 3-panel
+          // fallback instead of its actual layout's silhouette.
+          ...rooms.map(r => ({ ...r, kind: 'room', layoutId: r.layout?.ref || null })),
           ...layouts.map(l =>    ({ ...l, kind: 'layout' })),
           ...enrichedComponents,
           ...schemes.map(s =>    ({ ...s, kind: 'scheme' })),
