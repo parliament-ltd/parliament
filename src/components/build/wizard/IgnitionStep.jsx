@@ -52,6 +52,7 @@ import { getSetting } from '../../../lib/db'
 import { LAYOUT_META, SCHEMES, FEATURES } from '../../../lib/buildWizard'
 import { useIsNarrow } from '../../../lib/useViewportWidth'
 import StepHeader from './StepHeader'
+import LayoutWireframe from './LayoutWireframe'
 
 // Timings from parliament_wizard_v5.html ignite() — keep in sync with
 // the keyframe durations in src/index.css.
@@ -156,6 +157,15 @@ export default function IgnitionStep({
       ...features,
     ].filter(Boolean).slice(0, 7)
   }, [config, existingMode])
+
+  // PR-19g (followup): render a scheme-tinted layout abstract inside the
+  // room preview card so the user sees the layout's shape AND the chosen
+  // scheme's accent color before they ignite. Pulls layout + scheme from
+  // the existing mode when in the ignite-existing-room flow, else from
+  // the wizard's working config.
+  const previewLayoutRef = existingMode?.layout?.ref || config.layout || null
+  const previewSchemeId = existingMode?.scheme?.ref || config.scheme || null
+  const previewScheme = SCHEMES.find(s => s.id === previewSchemeId) || null
 
   // Per-chip animation phase — independent because each chip lights at
   // a different t = LIT_AT_MS + i * FEATURE_STAGGER_MS.
@@ -320,6 +330,23 @@ export default function IgnitionStep({
         >
           {roomName}
         </div>
+
+        {/* PR-19g (followup): layout abstract tinted with the chosen
+            scheme. Sits between the room name and the feature chips so
+            the user sees BOTH spatial shape AND color identity before
+            ignition fires. Falls back gracefully when layout or scheme
+            isn't set yet (config.layout is required by step 5 so this
+            is almost always populated by the time we land on step 6). */}
+        {previewLayoutRef && (
+          <div className="mb-3">
+            <LayoutWireframe
+              id={previewLayoutRef}
+              small
+              scheme={previewScheme}
+            />
+          </div>
+        )}
+
         <div className="flex flex-wrap gap-1 mt-1">
           {featureChips.map((label, i) => (
             <FeatureChip key={`${label}-${i}`} label={label} chipPhase={chipPhases[i] || 'idle'} />
