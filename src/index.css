@@ -998,6 +998,55 @@
   padding: 8px 10px;
 }
 
+/* ── Editor cards (PR-27) ─────────────────────────────────
+   Slot zones in the editor canvas read as soft cards, with each
+   placed component nested inside as a secondary card. Same card
+   recipe as .chat-input-card / .bp-action-card so the editor
+   visually belongs to the same family. Subtle bg variance per
+   area kind (rail vs main vs dock) gives the canvas its sense
+   of structure without competing with the components. */
+.editor-area-card {
+  background: var(--p-bg-base);
+  border: 0.5px solid var(--p-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  padding: 8px;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.editor-area-card[data-area-kind="rail"]  { background: var(--p-bg-subtle); }
+.editor-area-card[data-area-kind="dock"]  { background: var(--p-bg-alt); }
+.editor-area-card[data-area-kind="main"]  { background: var(--p-bg-base); }
+.editor-area-card[data-area-kind="sheet"] { background: var(--p-bg-subtle); }
+.editor-area-card[data-area-empty="true"] {
+  background: transparent;
+  border-style: dashed;
+  box-shadow: none;
+}
+.editor-area-card[data-area-over="true"] {
+  border-color: var(--p-gold-light);
+  background: rgba(196, 169, 77, 0.08);
+}
+.editor-area-card[data-area-selected="true"] {
+  outline: 1.5px solid var(--p-gold-light);
+  outline-offset: 2px;
+}
+.editor-component-card {
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-border);
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.editor-component-card:hover {
+  background: rgba(196, 169, 77, 0.06);
+}
+.editor-component-card[data-selected="true"] {
+  border-color: var(--p-gold-light);
+  outline: 1px solid var(--p-gold-light);
+}
+
 /* ── Blueprint section ────────────────────────────────────── */
 .bp-wrap {
   padding: 10px;
