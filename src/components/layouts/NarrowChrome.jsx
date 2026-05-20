@@ -55,7 +55,7 @@ export default function NarrowChrome({
       {wrenchTarget ? (
         <button
           type="button"
-          onClick={() => navigate(wrenchTarget)}
+          onClick={() => navigate(wrenchTarget, { state: { fromChat: true } })}
           aria-label="Open Editor"
           title="Open Editor"
           className="inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--p-text-secondary)] hover:text-[var(--p-gold-light)] transition-colors"

@@ -4,6 +4,23 @@
 // Per parliament_wizard_v5.html lines 384–461 (.lcard-wire) and lines
 // 901–945 (.lp-preview). Same visual primitives at two sizes; the
 // `small` prop swaps in the card-sized version (64px tall).
+//
+// PR-19g: added a `mini` variant (24×16, inline within a receipt pill)
+// for the wizard receipt's layout chip — same inner primitives, a much
+// tighter container.
+
+const MINI_CONTAINER = {
+  width: 24,
+  height: 16,
+  borderRadius: 2,
+  background: 'var(--p-bg-subtle)',
+  border: '0.5px solid var(--p-border-subtle)',
+  padding: 1.5,
+  display: 'flex',
+  gap: 1.5,
+  position: 'relative',
+  flexShrink: 0,
+}
 
 const SMALL_CONTAINER = {
   width: '100%',
@@ -28,9 +45,9 @@ const LARGE_CONTAINER = {
   gap: 8,
 }
 
-export default function LayoutWireframe({ id, small = false }) {
-  const container = small ? SMALL_CONTAINER : LARGE_CONTAINER
-  return <div style={container}>{renderInner(id, small)}</div>
+export default function LayoutWireframe({ id, small = false, mini = false }) {
+  const container = mini ? MINI_CONTAINER : small ? SMALL_CONTAINER : LARGE_CONTAINER
+  return <div style={container}>{mini ? renderMini(id) : renderInner(id, small)}</div>
 }
 
 function renderInner(id, small) {
@@ -44,6 +61,54 @@ function renderInner(id, small) {
     case 'single-column-with-sheet@^1.0':
     default:
       return <SingleColumn small={small} />
+  }
+}
+
+// PR-19g — minimal block-and-stripe diagram for the 24×16 receipt pill.
+// The desktop renderers use absolute positioning + 3–8px paddings that
+// don't survive at this size, so this branch draws the layout's
+// signature columns as flat colored stripes.
+const MINI_STRIPE = '#9A9490'
+const MINI_STRIPE_FAINT = '#C8C2B8'
+function MiniBlock({ width = '100%', faint = false }) {
+  return (
+    <div style={{
+      height: '100%',
+      width,
+      borderRadius: 1,
+      background: faint ? MINI_STRIPE_FAINT : MINI_STRIPE,
+      opacity: 0.55,
+    }} />
+  )
+}
+function renderMini(id) {
+  switch (id) {
+    case 'three-panel@^1.0':
+      return (
+        <>
+          <MiniBlock width="22%" />
+          <MiniBlock width="48%" />
+          <MiniBlock width="26%" faint />
+        </>
+      )
+    case 'canvas-centric@^1.0':
+      return (
+        <>
+          <MiniBlock width="22%" />
+          <MiniBlock width="48%" />
+          <MiniBlock width="26%" />
+        </>
+      )
+    case 'document-centric@^1.0':
+      return (
+        <>
+          <MiniBlock width="64%" />
+          <MiniBlock width="32%" faint />
+        </>
+      )
+    case 'single-column-with-sheet@^1.0':
+    default:
+      return <MiniBlock width="100%" />
   }
 }
 

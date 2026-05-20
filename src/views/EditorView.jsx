@@ -16,6 +16,7 @@
 import { useEffect, useReducer, useState, useCallback } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { DndContext, PointerSensor, KeyboardSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { X } from 'lucide-react'
 import EditorTopBar from '../components/editor/EditorTopBar'
 import EditorLeftRail from '../components/editor/EditorLeftRail'
 import EditorCanvas from '../components/editor/EditorCanvas'
@@ -341,7 +342,18 @@ export default function EditorView({ scope = 'room', blank = false }) {
   }
 
   if (tooNarrow) {
-    return <EditorTooNarrow onBack={() => navigate('/')} />
+    // PR-19g: when the user came here from a chat via the Wrench icon,
+    // also offer "Back to chat" (browser history back). The Wrench
+    // handlers in NarrowChrome + ChatDesktopChrome pass `fromChat` in
+    // router state.
+    const fromChat = Boolean(location.state?.fromChat)
+    return (
+      <EditorTooNarrow
+        onBackToStudy={() => navigate('/')}
+        onBackToChat={fromChat ? () => navigate(-1) : null}
+        onDismiss={() => navigate(-1)}
+      />
+    )
   }
 
   if (loadError) {
@@ -497,10 +509,22 @@ export default function EditorView({ scope = 'room', blank = false }) {
 // V3 ships a phone-first wizard-per-section editor that replaces this
 // gate; until then, send the user back to the homepage with a friendly
 // note rather than rendering a broken layout.
-function EditorTooNarrow({ onBack }) {
+//
+// PR-19g: surface an X dismiss in the corner (browser back), rename
+// "Back to home" → "Back to The Study", and add "Back to chat" when
+// the user arrived here via the Wrench icon in a chat.
+function EditorTooNarrow({ onBackToStudy, onBackToChat, onDismiss }) {
   return (
     <div className="min-h-screen bg-[var(--p-bg-base)] flex items-center justify-center px-6">
-      <Card className="max-w-md w-full text-center flex flex-col gap-4 py-6">
+      <Card className="max-w-md w-full text-center flex flex-col gap-4 py-6 relative">
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label="Close"
+          className="absolute top-2.5 right-2.5 w-7 h-7 inline-flex items-center justify-center rounded-md text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] hover:bg-[var(--p-bg-subtle)] transition-colors"
+        >
+          <X className="w-4 h-4" />
+        </button>
         <div className="text-base font-medium text-[var(--p-text-primary)]">
           The editor needs a wider screen
         </div>
@@ -510,9 +534,24 @@ function EditorTooNarrow({ onBack }) {
           for phones in V3. For now, open this on a wider screen to keep
           building.
         </div>
-        <div className="flex justify-center pt-2">
-          <Button variant="default" size="md" onClick={onBack}>
-            Back to home
+        <div className="flex gap-2 pt-2">
+          {onBackToChat && (
+            <Button
+              variant="default"
+              size="md"
+              onClick={onBackToChat}
+              className="flex-1"
+            >
+              Back to chat
+            </Button>
+          )}
+          <Button
+            variant="default"
+            size="md"
+            onClick={onBackToStudy}
+            className="flex-1"
+          >
+            Back to The Study
           </Button>
         </div>
       </Card>

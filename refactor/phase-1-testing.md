@@ -4099,6 +4099,35 @@ larger titles + meta. Site-wide font bump is deferred to PR-19b.
 
 ---
 
+## PR-19g — Cosmetic polish wave 2 + room details overlay + jargon audit
+
+👀 User-visible
+
+**Surface:** Homepage (`/`) blueprint + chats section, wizard (`/build`), editor (`/edit/*`), library overlay.
+
+**Setup:** A real API key on file + at least one user-built room + a few conversations across rooms so the active-room walking-human icon and last-spoken-to model line have data.
+
+**Steps:**
+
+1. **#1 mobile Chats section** — open `/` at <600px wide. Confirm the "Chats" title and "Browse your history across rooms" subtitle stack vertically inside the header, and that the drag-grabber + chevron stay vertically centered against the two-line block. Same check on the Library and Favorites section headers.
+2. **#2 wizard receipt** — run `/build` through step 4. Confirm the layout pill in the receipt strip carries a 24×16 mini-wireframe to the left of the label (proxies for the abstract shape; replaces the gold dot for this pill specifically).
+3. **#3 ignition buttons (mobile)** — finish the wizard on a <768px viewport. After the room ignites, confirm three buttons stack vertically: **Build another room → Return to The Study → Enter Room** (Enter Room is gold primary at the bottom, all three full-width). On desktop, confirm the row layout still right-justifies the same three labels.
+4. **#4 wizard footer (mobile, steps 3–5)** — on a <768px viewport on steps 3, 4, or 5: confirm `Open in editor` is disabled with the caption "The editor is currently only available for desktop." beside it, and that Back + Continue sit on a second full-width row (equal-width pair with a small gap). On desktop, footer is unchanged.
+5. **#5 editor-too-narrow modal** — open `/edit/<existing-room-id>` directly at <768px. Confirm: "Back to The Study" button, X close in the top-right corner, no "Back to chat" button. Then open `/chat/<conv-id>` at <768px, tap the wrench, confirm both "Back to chat" and "Back to The Study" are present. Click X → browser history back. Click "Back to chat" → returns to the chat. Click "Back to The Study" → routes to `/`.
+6. **#6 + #8 blueprint cards + walking-human** — at the homepage blueprint: confirm there's no floating gold pawn. The active user room shows only `THE / <NAME>` centered and a small faded-grey walking-human icon below the title. Hover the icon: "You are here" tooltip appears. Inactive user rooms show title only. The Study and The Lab show title + below-title compass/wrench icon respectively — no pill row, no subtitle.
+7. **#7 room details overlay** — click any user room. Confirm: the selected room scales up slightly, hatched diagonal lines fade in over every other room, the overlay slides in from the right on desktop. The overlay shows: name, "Room" tag, description, Layout section with the small wireframe + label, Details meta-row with Created / Last used / Last spoken to, feature pills row, Includes bulleted list (one bullet per layout / scheme / each component with its description), three actions: Copy Room (outline) / Delete Room (red outline) / Enter Room (gold primary). Click Enter Room → routes to a conversation in the room. Reopen, click the highlighted room a second time — same result. Reopen, click Copy Room → lands on `/edit/<newId>` with a copy. Reopen, click Delete Room → confirm prompt → the room disappears from the blueprint without a reload. Esc / X / click backdrop all close and clear the hatch.
+8. **#7 mobile sheet** — at <768px, click a user room. Confirm the overlay slides up from the bottom as a full-width sheet (with the small handle pill at the top), not a right-side panel.
+9. **#9 LibraryOverlay Includes** — open any room in the library (e.g. Writing Studio). Confirm the Includes section is a bulleted list rather than the old `·`-separated string; each bullet has a bold name + a short muted description on the second line.
+10. **Lint + build:** `npm run lint` baseline unchanged (163, or src-only 125); `npm run build` exit 0.
+
+**Expected:** every step's "confirm" passes. Walking-human icon is greyed unless the room is hovered (then it goes gold-deep alongside the title color shift). System rooms (Study/Lab) keep their direct-navigate click and don't trigger the details overlay. `prefers-reduced-motion` users see no scale animation or hatch fade — the selection state still works, but jumps to its final visual.
+
+**Out of scope:**
+- The library jargon audit rewrites (`pr-19g-library-jargon.md`). Ships as a follow-up commit on the same branch after the user signs off on the checklist.
+- Multi-provider naming on the wizard ignition step (still says "Anthropic API key" — Phase 2 multi-provider work).
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:
