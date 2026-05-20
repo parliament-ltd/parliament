@@ -19,7 +19,7 @@
 // place of the pawn marker.
 
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Copy, Trash2, ArrowRight } from 'lucide-react'
 import { useConversations } from '../../stores/ConversationContext'
 import { listModes, deleteMode, saveMode, createCopyOfMode } from '../../lib/modes'
@@ -27,7 +27,7 @@ import { createConversation } from '../../lib/db'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
 import { useIsNarrow } from '../../lib/useViewportWidth'
 import { modelLabel } from '../../lib/modelLabels'
-import { buildIncludes, buildPillLabels, refName as roomRefName } from '../../lib/roomIncludes' // buildPillLabels used inside InlineRoomDetails
+import { buildIncludes, refName as roomRefName } from '../../lib/roomIncludes'
 import LayoutWireframe from '../../components/build/wizard/LayoutWireframe'
 import RoomDetailsOverlay from '../../components/RoomDetailsOverlay'
 import {
@@ -212,17 +212,52 @@ function seededDots(roomId, convIds, interior) {
   return dots
 }
 
-// PR-19j: furniture glyph positions, evenly spaced along the bottom
-// interior. Up to 6 glyphs per room — beyond that the icons get too
-// dense to read; we drop the tail and let the "Includes" sidebar carry
-// the rest.
-function furniturePositions(refs, interior) {
+// PR-19j: furniture glyph positions. Up to 6 glyphs per room — beyond
+// that the icons get too dense to read; we drop the tail and let the
+// "Includes" sidebar carry the rest.
+//
+// PR-19k: moved from the bottom interior up to the same icon band as
+// the system rooms' compass/wrench (cy + 26) so the whole floor reads
+// as one species. When the room is active and the walking-human is
+// rendered at horizontal center, glyphs split into two clusters (left
+// + right) to leave a gap around it; otherwise they spread evenly.
+function furniturePositions(refs, interior, opts = {}) {
+  const { avoidCenter = false } = opts
   const limit = Math.min(6, refs.length)
   if (limit === 0) return []
   const padX = 16
-  const bandW  = Math.max(20, interior.width - padX * 2)
-  const step   = bandW / (limit + 1)
-  const baseY  = interior.y + interior.height - 18
+  const cy    = interior.y + interior.height / 2
+  const baseY = cy + 26
+  if (avoidCenter) {
+    // Split into left/right halves, skipping a center gap (~18px each
+    // side of cx) so the walking-human centered at cx has clearance.
+    const cx = interior.x + interior.width / 2
+    const leftCount  = Math.ceil(limit / 2)
+    const rightCount = limit - leftCount
+    const gap        = 18
+    const leftSpan   = (cx - gap) - (interior.x + padX)
+    const rightSpan  = (interior.x + interior.width - padX) - (cx + gap)
+    const out = []
+    for (let i = 0; i < leftCount; i++) {
+      const t = (i + 1) / (leftCount + 1)
+      out.push({
+        ref: refs[i],
+        x: interior.x + padX + Math.max(0, leftSpan) * t - 7,
+        y: baseY - 7,
+      })
+    }
+    for (let i = 0; i < rightCount; i++) {
+      const t = (i + 1) / (rightCount + 1)
+      out.push({
+        ref: refs[leftCount + i],
+        x: cx + gap + Math.max(0, rightSpan) * t - 7,
+        y: baseY - 7,
+      })
+    }
+    return out
+  }
+  const bandW = Math.max(20, interior.width - padX * 2)
+  const step  = bandW / (limit + 1)
   const out = []
   for (let i = 0; i < limit; i++) {
     out.push({
@@ -239,6 +274,7 @@ function furniturePositions(refs, interior) {
 export default function BlueprintRender({ hostAPI } = {}) {
   const { conversations } = useConversations()
   const navigate = useNavigate()
+  const location = useLocation()
   const [rooms, setRooms] = useState([])
   const [hoveredFromChat, setHoveredFromChat] = useState(null)
   const [hoveredFromBlueprint, setHoveredFromBlueprint] = useState(null)
@@ -305,19 +341,30 @@ export default function BlueprintRender({ hostAPI } = {}) {
     }
   }, [selectedRoomId, isNarrow])
 
-  // Most-recently-active room: the room of the conversation with the
-  // highest updatedAt. Falls back to null when no conversation has a
-  // room set yet.
+  // PR-19k: the walking-human marker follows the user's CURRENT
+  // location, not the most-recently-updated conversation's room. Derive
+  // it from the URL so:
+  //   /              → STUDY    (you're on the homepage)
+  //   /edit, /edit/* → LAB      (you're in the editor)
+  //   /chat/:id      → that conversation's room (user room)
+  //   anything else  → null     (no marker)
+  // Pre-PR-19k this used the most-recent conversation's room, which
+  // meant the marker drifted away from where the user actually was
+  // standing (e.g. they'd be on the Study homepage with the figure
+  // floating in a stale user room).
   const activeRoomId = useMemo(() => {
-    let best = null
-    let bestT = 0
-    for (const c of conversations) {
-      if (!c.room) continue
-      const t = new Date(c.updatedAt).getTime()
-      if (t > bestT) { bestT = t; best = c.room }
+    const path = location.pathname
+    if (path === '/') return SYSTEM_ROOM_IDS.STUDY
+    if (path === '/edit' || path.startsWith('/edit/') || path === '/edit-home') {
+      return SYSTEM_ROOM_IDS.LAB
     }
-    return best
-  }, [conversations])
+    const chatMatch = path.match(/^\/chat\/([^/]+)/)
+    if (chatMatch) {
+      const conv = conversations.find(c => c.id === chatMatch[1])
+      return conv?.room || null
+    }
+    return null
+  }, [location.pathname, conversations])
 
   // PR-19j: per-room conversation lists for the activity-dot scatter.
   const convsByRoom = useMemo(() => {
@@ -456,21 +503,33 @@ export default function BlueprintRender({ hostAPI } = {}) {
   }, [selectedRoomId, isNarrow])
 
   // PR-19j: per-room transform style. The selected room scales up to
-  // ~65% of the floorBox and translates to the canvas center; every
-  // other room scales down to 0.55x in place. Returns an inline style
-  // object suitable for the `<g style>` prop.
+  // a target percentage of the floorBox and translates to the canvas
+  // center; every other room scales down to 0.55x in place. Returns an
+  // inline style object suitable for the `<g style>` prop.
+  //
+  // PR-19k: target shrunk from 65% → 55% of canvas (the freed area lets
+  // the action buttons live inside the room instead of below the
+  // canvas). The computed scale is also exposed via `selectedRoomScale`
+  // so the Room component can counter-scale its interior content to
+  // keep title/dates/buttons at native card-pixel sizes.
+  const selectedRoomScale = useMemo(() => {
+    if (!selectedRoomId || isNarrow) return 1
+    const placed = layout.placedRooms.find(p => p.id === selectedRoomId)
+    if (!placed) return 1
+    const targetW = layout.floorBox.width  * 0.55
+    const targetH = layout.floorBox.height * 0.55
+    return Math.min(targetW / placed.box.width, targetH / placed.box.height)
+  }, [selectedRoomId, isNarrow, layout])
+
   const transformFor = useCallback((placed) => {
     if (!selectedRoomId || isNarrow) return null
     if (placed.id === selectedRoomId) {
-      const targetW = layout.floorBox.width  * 0.65
-      const targetH = layout.floorBox.height * 0.65
-      const scale = Math.min(targetW / placed.box.width, targetH / placed.box.height)
       const cx = placed.box.x + placed.box.width / 2
       const cy = placed.box.y + placed.box.height / 2
       const tx = layout.viewBox.width / 2 - cx
       const ty = layout.viewBox.height / 2 - cy
       return {
-        transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
+        transform: `translate(${tx}px, ${ty}px) scale(${selectedRoomScale})`,
         transformOrigin: 'center',
         transformBox: 'fill-box',
         transition: 'transform 280ms ease, opacity 280ms ease',
@@ -484,7 +543,7 @@ export default function BlueprintRender({ hostAPI } = {}) {
       transition: 'transform 280ms ease, opacity 280ms ease',
       opacity: 0.35,
     }
-  }, [selectedRoomId, isNarrow, layout])
+  }, [selectedRoomId, isNarrow, layout, selectedRoomScale])
 
   // PR-19j: identity transition style applied to non-selected state so
   // rooms ease back to their natural position when the user deselects.
@@ -507,13 +566,12 @@ export default function BlueprintRender({ hostAPI } = {}) {
   }, [selectedRoomId])
 
   // PR-19j: precompute the selected mode + its last conversation +
-  // pills + includes — the sidebar and the foreignObject details
-  // share this data.
+  // includes — the sidebar and the foreignObject details share this
+  // data. PR-19k: pills are dropped from the expanded room (sidebar's
+  // Includes carries the same info more legibly).
   const selectedMode = selectedRoomId ? modesById.get(selectedRoomId) : null
   const selectedLastConv = selectedRoomId ? lastConvByRoomId.get(selectedRoomId) || null : null
   const selectedIncludes = useMemo(() => buildIncludes(selectedMode), [selectedMode])
-  // (pillLabels are derived inside InlineRoomDetails — the sidebar
-  // doesn't render pills, only the bulleted Includes list.)
 
   return (
     <div
@@ -558,9 +616,12 @@ export default function BlueprintRender({ hostAPI } = {}) {
                 isStudy={isStudy}
                 isHovered={placed.id === hoveredFromBlueprint}
                 isDimmed={Boolean(selectedRoomId)}
+                isCurrent={placed.id === activeRoomId}
                 transformStyle={transformStyle}
                 onEnter={() => setHoveredFromBlueprint(placed.id)}
                 onLeave={() => setHoveredFromBlueprint(null)}
+                onHereTipShow={(p) => setHereTip(p)}
+                onHereTipHide={() => setHereTip(null)}
                 onClick={(e) => {
                   if (selectedRoomId) {
                     // System rooms are part of the dimmed-floor click
@@ -590,9 +651,13 @@ export default function BlueprintRender({ hostAPI } = {}) {
               isDimmed={isDimmed}
               showInlineDetails={isSelected && !isNarrow && detailsReady}
               transformStyle={transformStyle}
+              roomScale={isSelected ? selectedRoomScale : 1}
               lastConv={lastConvByRoomId.get(placed.id) || null}
+              onCopy={onOverlayCopy}
+              onDelete={onOverlayDelete}
               onEnter={() => setHoveredFromBlueprint(placed.id)}
               onLeave={() => setHoveredFromBlueprint(null)}
+              onEnterRoom={onOverlayEnter}
               onClick={(e) => {
                 // Stop propagation so the SVG-background click handler
                 // doesn't also fire and deselect the room we just
@@ -653,31 +718,10 @@ export default function BlueprintRender({ hostAPI } = {}) {
         </aside>
       )}
 
-      {!isNarrow && selectedRoomId && (
-        <div className={`bp-action-strip${detailsReady ? ' show' : ''}`}>
-          <button type="button" className="tb-btn" onClick={onOverlayCopy}>
-            <Copy className="inline-block w-3 h-3 mr-1 -mt-px" />
-            Copy Room
-          </button>
-          <button
-            type="button"
-            className="tb-btn"
-            onClick={onOverlayDelete}
-            style={{ color: '#C5342A', borderColor: '#E0A8A8' }}
-          >
-            <Trash2 className="inline-block w-3 h-3 mr-1 -mt-px" />
-            Delete Room
-          </button>
-          <button
-            type="button"
-            className="tb-btn primary"
-            onClick={onOverlayEnter}
-          >
-            Enter Room
-            <ArrowRight className="inline-block w-3 h-3 ml-1 -mt-px" />
-          </button>
-        </div>
-      )}
+      {/* PR-19k: the action strip that used to sit below the canvas is
+          gone — Copy / Delete / Enter buttons now render inside the
+          expanded room itself (InlineRoomDetails). Mobile keeps its
+          own bottom-sheet overlay (below). */}
 
       {/* Mobile-only bottom-sheet overlay. PR-19g shape preserved. */}
       {isNarrow && (
@@ -719,30 +763,34 @@ function WalkingHuman({ x, y, color = IN_ROOM_ICON_COLOR, onShow, onHide }) {
         fill="#D4A843"
         className="bp-walking-human-glow"
       />
-      <g
-        transform={`translate(${x - 8.4} ${y - 8.4}) scale(${scale})`}
-        className="bp-walking-human-bob"
-      >
-        {/* Head */}
-        <circle cx="12" cy="4" r="2.2" fill="none" stroke={color} strokeWidth="1.4" />
-        {/* Body + arms */}
-        <path
-          d="M9 12 12 7l3 5"
-          fill="none"
-          stroke={color}
-          strokeWidth="1.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {/* Stepping leg + standing leg */}
-        <path
-          d="M12 12l-2.5 8M12 12l3 4 0 4"
-          fill="none"
-          stroke={color}
-          strokeWidth="1.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+      {/* PR-19k: the bob animation lives on an INNER <g> so the outer
+          <g> keeps its inline SVG transform attribute. (CSS `transform`
+          on an SVG element replaces — not composes with — the SVG
+          `transform` attribute, so animating both on the same element
+          drops the positioning and the figure renders at viewBox 0,0.) */}
+      <g transform={`translate(${x - 8.4} ${y - 8.4}) scale(${scale})`}>
+        <g className="bp-walking-human-bob">
+          {/* Head */}
+          <circle cx="12" cy="4" r="2.2" fill="none" stroke={color} strokeWidth="1.4" />
+          {/* Body + arms */}
+          <path
+            d="M9 12 12 7l3 5"
+            fill="none"
+            stroke={color}
+            strokeWidth="1.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* Stepping leg + standing leg */}
+          <path
+            d="M12 12l-2.5 8M12 12l3 4 0 4"
+            fill="none"
+            stroke={color}
+            strokeWidth="1.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </g>
       </g>
     </g>
   )
@@ -786,9 +834,13 @@ function Room({
   isDimmed,
   showInlineDetails,
   transformStyle,
+  roomScale,
   lastConv,
+  onCopy,
+  onDelete,
   onEnter,
   onLeave,
+  onEnterRoom,
   onClick,
   onHereTipShow,
   onHereTipHide,
@@ -826,7 +878,7 @@ function Room({
   const componentRefs = mode?.components
     ? Array.from(new Set(mode.components.map(c => roomRefName(c.ref)).filter(r => GLYPHS[r])))
     : []
-  const glyphs = furniturePositions(componentRefs, interior)
+  const glyphs = furniturePositions(componentRefs, interior, { avoidCenter: isActive })
 
   return (
     <g
@@ -896,13 +948,20 @@ function Room({
         vectorEffect="non-scaling-stroke"
       />
 
-      {/* Centered title block */}
-      <text x={cx} y={theY} textAnchor="middle" fontSize="10" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
-        THE
-      </text>
-      <text x={cx} y={nameY} textAnchor="middle" fontSize="13" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
-        {name}
-      </text>
+      {/* Centered title block. PR-19k: hidden when the room is the
+          expand-in-place selection — the title moves inside the
+          foreignObject so it can render at native card-pixel size via
+          the counter-scale transform. */}
+      {!showInlineDetails && (
+        <>
+          <text x={cx} y={theY} textAnchor="middle" fontSize="10" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+            THE
+          </text>
+          <text x={cx} y={nameY} textAnchor="middle" fontSize="13" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
+            {name}
+          </text>
+        </>
+      )}
 
       {/* Active room: walking-human icon below the title (replaces the
           floating gold pawn from PR-14). PR-19j: gains a bob + glow
@@ -920,7 +979,11 @@ function Room({
       {/* PR-19j: inline details rendered via SVG foreignObject when
           this room is the desktop expand-in-place selection. The
           details fade in 60ms after the scale transition settles so
-          the room shape "opens" before the contents appear. */}
+          the room shape "opens" before the contents appear.
+          PR-19k: the HTML inside is counter-scaled by `1/roomScale`
+          via a CSS custom property so title/dates/buttons render at
+          native card-pixel sizes despite the parent <g> being scaled
+          up to ~55% of canvas. */}
       {showInlineDetails && (
         <foreignObject
           x={interior.x}
@@ -931,8 +994,16 @@ function Room({
           <div
             xmlns="http://www.w3.org/1999/xhtml"
             className="bp-foreignobj-details show"
+            style={{ '--bp-room-scale': roomScale || 1 }}
           >
-            <InlineRoomDetails mode={mode} lastConv={lastConv} />
+            <InlineRoomDetails
+              mode={mode}
+              lastConv={lastConv}
+              isActive={isActive}
+              onCopy={onCopy}
+              onDelete={onDelete}
+              onEnterRoom={onEnterRoom}
+            />
           </div>
         </foreignObject>
       )}
@@ -951,15 +1022,33 @@ function Room({
 // PR-19j: HTML content rendered inside the expanded room's
 // `<foreignObject>`. Kept simple (no shadows, no scroll) for
 // foreignObject paint reliability on Safari ≤16.
-function InlineRoomDetails({ mode, lastConv }) {
+//
+// PR-19k: restructured to a single vertical stack — name → wireframe
+// → dates → action buttons. The action strip that used to sit below
+// the canvas folds INTO this stack, freeing the canvas vertical area.
+// Pills are dropped (the sidebar's Includes list already enumerates
+// the same components in more readable form). The wireframe gets an
+// opaque background + thin border so it reads clearly against the
+// room's scheme tint. All content here renders at native card-pixel
+// sizes thanks to the parent div's counter-scale transform.
+function InlineRoomDetails({ mode, lastConv, isActive, onCopy, onDelete, onEnterRoom }) {
   if (!mode) return null
   const layoutRef = mode.layout?.ref
+  const name = (mode?.meta?.name || mode?.id || 'Room').toUpperCase()
   const created = fmtShortDate(mode.meta?.created)
   const lastUsed = lastConv ? fmtShortDate(lastConv.updatedAt) : null
   const lastModel = lastConv ? modelLabel(lastConv.model) : null
-  const pillLabels = buildPillLabels(mode)
   return (
     <div className="bp-inline-details">
+      <div className="bp-inline-title">
+        <span className="bp-inline-the">THE</span>
+        <span
+          className="bp-inline-name"
+          style={{ color: isActive ? '#8B6A10' : '#5A5550' }}
+        >
+          {name}
+        </span>
+      </div>
       {layoutRef && (
         <div className="bp-inline-layout">
           <div className="bp-inline-layout-img">
@@ -972,13 +1061,25 @@ function InlineRoomDetails({ mode, lastConv }) {
         {lastUsed && <><dt>Last used</dt><dd>{lastUsed}</dd></>}
         {lastModel && <><dt>Last spoken to</dt><dd>{lastModel}</dd></>}
       </dl>
-      {pillLabels.length > 0 && (
-        <div className="bp-inline-pills">
-          {pillLabels.map(l => (
-            <span key={l} className="ov-room-pill">{l}</span>
-          ))}
-        </div>
-      )}
+      <div className="bp-inline-actions">
+        <button type="button" className="tb-btn" onClick={onCopy}>
+          <Copy className="inline-block w-3 h-3 mr-1 -mt-px" />
+          Copy
+        </button>
+        <button
+          type="button"
+          className="tb-btn"
+          onClick={onDelete}
+          style={{ color: '#C5342A', borderColor: '#E0A8A8' }}
+        >
+          <Trash2 className="inline-block w-3 h-3 mr-1 -mt-px" />
+          Delete
+        </button>
+        <button type="button" className="tb-btn primary" onClick={onEnterRoom}>
+          Enter
+          <ArrowRight className="inline-block w-3 h-3 ml-1 -mt-px" />
+        </button>
+      </div>
     </div>
   )
 }
@@ -995,7 +1096,11 @@ function fmtShortDate(iso) {
 // placement are dropped to match the strict title-only treatment for
 // every room on the blueprint. Click routes directly (Study → '/',
 // Lab → '/edit') — no details overlay for system rooms.
-function SystemRoom({ placed, isStudy, isHovered, isDimmed, transformStyle, onEnter, onLeave, onClick }) {
+//
+// PR-19k: gains the walking-human + gold-glow pulse when `isCurrent`
+// (the user is on `/` for Study or `/edit*` for Lab). Sits below the
+// compass/wrench so the room's identity icon stays visible.
+function SystemRoom({ placed, isStudy, isHovered, isDimmed, isCurrent, transformStyle, onEnter, onLeave, onClick, onHereTipShow, onHereTipHide }) {
   const { box } = placed
   const { path, interior } = isStudy ? studyShape(box) : labShape(box)
   const cx = interior.x + interior.width / 2
@@ -1048,6 +1153,20 @@ function SystemRoom({ placed, isStudy, isHovered, isDimmed, transformStyle, onEn
           <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
         )}
       </g>
+
+      {/* PR-19k: walking-human + gold glow pulse, shown when the user
+          is currently on this system room's route (`/` for Study,
+          `/edit*` for Lab). Sits 22px below the compass/wrench so the
+          room's identity icon stays visible above. */}
+      {isCurrent && (
+        <WalkingHuman
+          x={cx}
+          y={iconY + 22}
+          color={isHovered ? '#8B6A10' : IN_ROOM_ICON_COLOR}
+          onShow={onHereTipShow}
+          onHide={onHereTipHide}
+        />
+      )}
 
       {/* Hatch overlay when a user room is selected so the system
           cards also dim in sympathy with the rest of the floor. */}
