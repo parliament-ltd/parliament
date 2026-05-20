@@ -985,6 +985,19 @@
   opacity: 0;
 }
 
+/* ── Chat input card (PR-23) ──────────────────────────────
+   Wraps the chat input + send + plus button so the whole input row
+   reads as a single card. Same surface + border + shadow recipe as
+   .bp-action-card and .bp-includes-sidebar so the chat surface and
+   blueprint surface use the same card language. */
+.chat-input-card {
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-border);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 8px 10px;
+}
+
 /* ── Blueprint section ────────────────────────────────────── */
 .bp-wrap {
   padding: 10px;
