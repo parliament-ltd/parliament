@@ -1030,7 +1030,11 @@
   background-size: 16px 16px;
 }
 .chat-room-frame {
-  background: var(--p-bg-base);
+  /* 64% bg-base over the textured chat-page-bg so the dot grid
+     reads softly through the room. color-mix is supported in
+     all browsers from 2023 onwards (Chrome 111+, Safari 16.2+,
+     Firefox 113+) — fine for this PWA. */
+  background: color-mix(in srgb, var(--p-bg-base) 64%, transparent);
   border-radius: 14px;
   box-shadow:
     0 0 0 0.5px rgba(0, 0, 0, 0.04),
@@ -1100,7 +1104,12 @@
 }
 .layout-panel-collapsed {
   width: 24px !important;
-  overflow: hidden;
+  /* PR-28 fix: removed `overflow: hidden`. It clipped the chevron
+     toggle button (positioned at right/left: -9px past the aside
+     edge) when the panel was collapsed, leaving half the chevron
+     hidden behind the adjacent main column. Inner content is
+     already invisible via opacity: 0 + pointer-events: none, so
+     dropping the aside-level clip is safe. */
 }
 .layout-panel-collapsed > .layout-panel-content {
   opacity: 0;
@@ -1125,7 +1134,10 @@
   align-items: center;
   justify-content: center;
   color: var(--p-text-muted);
-  z-index: 2;
+  /* z-index high enough to sit above the main column's content
+     stacking context. PR-28 bumped from 2 → 10 after the chevron
+     was reported partially hidden by the adjacent column. */
+  z-index: 10;
   transition: color 0.15s, border-color 0.15s;
 }
 .layout-panel-toggle:hover {
