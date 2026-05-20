@@ -1914,14 +1914,19 @@
   align-items: center;
   line-height: 1.1;
 }
+/* PR-19l followup: foreignObject HTML scales with the SVG viewBox.
+   With ROW_HEIGHT 200→150 the viewBox stretches more per screen px,
+   so these CSS font sizes need a matching 0.75 shrink (10→7.5,
+   13→9.75) to keep the expanded card's title at its previous on-
+   screen size. */
 .bp-inline-the {
-  font-size: 10px;
+  font-size: 7.5px;
   letter-spacing: 0.08em;
   font-weight: 500;
   color: #9A9490;
 }
 .bp-inline-name {
-  font-size: 13px;
+  font-size: 9.75px;
   letter-spacing: 0.06em;
   font-weight: 600;
 }
@@ -1943,7 +1948,8 @@
   grid-template-columns: auto auto;
   column-gap: 8px;
   row-gap: 2px;
-  font-size: 9px;
+  /* PR-19l followup: 9px → 6.75px to match the SVG-viewBox shrink. */
+  font-size: 6.75px;
   color: var(--p-text-secondary);
   margin: 0;
 }
