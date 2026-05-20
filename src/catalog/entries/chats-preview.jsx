@@ -23,7 +23,7 @@ import { Search, Sparkles, StickyNote, Highlighter, GitBranch, Pin, RotateCw, Tr
 import { useConversations } from '../../stores/ConversationContext'
 import { useSettings } from '../../stores/SettingsContext'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
-import { getMessages } from '../../lib/db'
+import { getMessages, initDB } from '../../lib/db'
 import { loadApiKey } from '../../lib/crypto'
 import { getProvider } from '../../providers'
 import { useIsNarrow } from '../../lib/useViewportWidth'
@@ -98,14 +98,60 @@ export default function ChatsPreview({ config = {}, hostAPI } = {}) {
   // toolbar for a full-width search input on phones.
   const isNarrow = useIsNarrow(768)
 
+  // PR-26: notes + highlights aren't hydrated on conversation records,
+  // so the 'Notes' and 'Highlights' views always showed "No notes /
+  // highlights". Load them once from IndexedDB and group by
+  // conversationId, then merge into each row at render time. Re-fetches
+  // when the conversation set changes (new conv, deletion) — note /
+  // highlight CRUD inside a chat won't auto-propagate, but a homepage
+  // re-visit picks them up.
+  const [notesByConv, setNotesByConv] = useState(new Map())
+  const [highlightsByConv, setHighlightsByConv] = useState(new Map())
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      try {
+        const db = await initDB()
+        const [allNotes, allHighlights] = await Promise.all([
+          db.getAll('notes'),
+          db.getAll('highlights'),
+        ])
+        if (cancelled) return
+        const nMap = new Map()
+        for (const n of allNotes) {
+          if (!n.conversationId) continue
+          if (!nMap.has(n.conversationId)) nMap.set(n.conversationId, [])
+          nMap.get(n.conversationId).push(n)
+        }
+        const hMap = new Map()
+        for (const h of allHighlights) {
+          if (!h.conversationId) continue
+          if (!hMap.has(h.conversationId)) hMap.set(h.conversationId, [])
+          hMap.get(h.conversationId).push(h)
+        }
+        setNotesByConv(nMap)
+        setHighlightsByConv(hMap)
+      } catch { /* tolerate */ }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [conversations.length])
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return conversations
-    return conversations.filter(c => {
-      const hay = [c.title || '', c.aiSummary || '', ...(c.tags || [])].join(' ').toLowerCase()
-      return hay.includes(q)
+    const enrich = (c) => ({
+      ...c,
+      notes: notesByConv.get(c.id) || [],
+      highlights: highlightsByConv.get(c.id) || [],
     })
-  }, [conversations, query])
+    if (!q) return conversations.map(enrich)
+    return conversations
+      .filter(c => {
+        const hay = [c.title || '', c.aiSummary || '', ...(c.tags || [])].join(' ').toLowerCase()
+        return hay.includes(q)
+      })
+      .map(enrich)
+  }, [conversations, query, notesByConv, highlightsByConv])
 
   const toggleOne = (id) => {
     setSelected(prev => {

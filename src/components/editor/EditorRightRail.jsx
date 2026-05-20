@@ -133,10 +133,14 @@ function RoomFields({ mode, onSetName, onSetDeviceClass, onApplyScheme }) {
           onChange={(e) => onApplyScheme(e.target.value)}
           className={fieldInputClass}
         >
-          {SCHEMES.map((s) => {
-            const ref = `${s.id}@1.0`
-            return <option key={ref} value={ref}>{s.displayName}</option>
-          })}
+          {/* PR-26: option value is `s.id` directly — it already
+              includes `@1.0` (e.g. 'parliament@1.0'). The prior
+              `${s.id}@1.0` produced 'parliament@1.0@1.0', so no option
+              matched the normalized select value and "Active Scheme"
+              never reflected drag-applied changes. */}
+          {SCHEMES.map((s) => (
+            <option key={s.id} value={s.id}>{s.displayName}</option>
+          ))}
         </select>
       </Field>
 
