@@ -52,7 +52,11 @@ const ROOM_FILL_DEFAULT = '#F5F0E8'
 const ROOM_FILL_ACTIVE  = 'rgba(196, 169, 77, 0.10)'
 const ROOM_FILL_HOVER   = 'rgba(196, 169, 77, 0.16)'
 const ROOM_FILL_HIGHLIT = 'rgba(196, 169, 77, 0.22)'
-const ROOM_FILL_SELECTED = 'rgba(196, 169, 77, 0.22)'
+// PR-19k followup: selected room fill is now near-opaque. The prior
+// 0.22 alpha let the hatched floor pattern bleed through the expanded
+// card, making the content panel feel transparent. Solid surface bg
+// matches what the wireframe abstract uses inside InlineRoomDetails.
+const ROOM_FILL_SELECTED = '#FBF7EE'
 const ROOM_BORDER_DEFAULT = '#C8C2B8'
 const ROOM_BORDER_ACTIVE  = '#B8A070'
 
@@ -516,9 +520,16 @@ export default function BlueprintRender({ hostAPI } = {}) {
     if (!selectedRoomId || isNarrow) return 1
     const placed = layout.placedRooms.find(p => p.id === selectedRoomId)
     if (!placed) return 1
-    const targetW = layout.floorBox.width  * 0.55
-    const targetH = layout.floorBox.height * 0.55
-    return Math.min(targetW / placed.box.width, targetH / placed.box.height)
+    // PR-19k followup: cut from 0.55 → 0.30 of canvas — the prior size
+    // was still dominating the floor. Content stays at native card-px
+    // sizes via the counter-scale, so the smaller room reads as a
+    // tight, framed card rather than a giant translucent panel. Floor
+    // is clamped at 1.0 so naturally-large rooms never SHRINK on
+    // selection (it would look like the room is collapsing).
+    const targetW = layout.floorBox.width  * 0.30
+    const targetH = layout.floorBox.height * 0.30
+    const scale = Math.min(targetW / placed.box.width, targetH / placed.box.height)
+    return Math.max(1, scale)
   }, [selectedRoomId, isNarrow, layout])
 
   const transformFor = useCallback((placed) => {
