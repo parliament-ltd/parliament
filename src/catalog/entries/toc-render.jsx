@@ -39,6 +39,21 @@ export default function TocRender({ config = {} } = {}) {
     return labels
   }, [messages, mode, truncateAt, maxItems])
 
+  // PR-28: report the active mode + the reason items[] is empty so a
+  // blank ToC says something useful instead of the old generic "Items
+  // will appear here." Lets us tell at a glance whether the room is
+  // in user-prompts mode with no user messages yet, or response-
+  // headings mode and the assistant hasn't written any.
+  const emptyMessage = useMemo(() => {
+    if (!messages?.length) {
+      return 'Send a message to start. The table of contents updates as the conversation grows.'
+    }
+    if (mode === 'response-headings') {
+      return 'No markdown headings (#, ##, ###, ####) detected in assistant replies yet. This list shows response headings — switch the toc component to "user-prompts" mode in the editor to list your messages instead.'
+    }
+    return 'No user messages in this conversation yet.'
+  }, [messages?.length, mode])
+
   const handleNavigate = useCallback((targetId) => {
     document.getElementById(targetId)?.scrollIntoView({
       behavior: 'smooth',
@@ -51,7 +66,7 @@ export default function TocRender({ config = {} } = {}) {
       <h3 className="text-xs font-medium text-[var(--p-text-secondary)] uppercase tracking-wider px-3 mb-2">
         Table of Contents
       </h3>
-      <TOC items={items} onNavigate={handleNavigate} />
+      <TOC items={items} onNavigate={handleNavigate} emptyMessage={emptyMessage} />
     </div>
   )
 }
