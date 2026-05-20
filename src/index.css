@@ -1011,6 +1011,34 @@
     0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
+/* ── Chat "lab" chrome (PR-28) ────────────────────────────
+   The page bg behind a chat room gets a soft dot texture and
+   sits a step darker than the room itself. The room mounts in
+   a rounded frame with a 24px gutter, so it reads as a
+   "specimen on a tray" — same visual move the editor canvas
+   already makes with its centered card. Texture is static; no
+   reduced-motion exception needed.
+   Schemes can override --p-chat-page-dot-color to retint the
+   dot for dark surfaces; default works in both. */
+.chat-page-bg {
+  background-color: var(--p-bg-subtle);
+  background-image: radial-gradient(
+    circle,
+    var(--p-chat-page-dot-color, rgba(127, 127, 127, 0.08)) 1px,
+    transparent 1px
+  );
+  background-size: 16px 16px;
+}
+.chat-room-frame {
+  background: var(--p-bg-base);
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.04),
+    0 6px 24px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  height: 100%;
+}
+
 /* ── Editor cards (PR-27) ─────────────────────────────────
    Slot zones in the editor canvas read as soft cards, with each
    placed component nested inside as a secondary card. Same card
