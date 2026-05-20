@@ -45,22 +45,32 @@ const LARGE_CONTAINER = {
   gap: 8,
 }
 
-export default function LayoutWireframe({ id, small = false, mini = false }) {
-  const container = mini ? MINI_CONTAINER : small ? SMALL_CONTAINER : LARGE_CONTAINER
-  return <div style={container}>{mini ? renderMini(id) : renderInner(id, small)}</div>
+export default function LayoutWireframe({ id, small = false, mini = false, scheme = null }) {
+  // PR-19g (followup): when a scheme is provided, override the container
+  // background AND the inner stroke palette so the abstract reads as
+  // tinted by the user's chosen scheme. The wireframe primitives use
+  // currentColor via CSS variable lookups when the override is active.
+  const base = mini ? MINI_CONTAINER : small ? SMALL_CONTAINER : LARGE_CONTAINER
+  const container = scheme
+    ? { ...base, background: scheme.bg, border: `0.5px solid ${scheme.line}` }
+    : base
+  const inner = mini
+    ? renderMini(id, scheme)
+    : renderInner(id, small, scheme)
+  return <div style={container}>{inner}</div>
 }
 
-function renderInner(id, small) {
+function renderInner(id, small, scheme) {
   switch (id) {
     case 'three-panel@^1.0':
-      return <ThreePanel small={small} />
+      return <ThreePanel small={small} scheme={scheme} />
     case 'canvas-centric@^1.0':
-      return <CanvasCentric small={small} />
+      return <CanvasCentric small={small} scheme={scheme} />
     case 'document-centric@^1.0':
-      return <DocumentCentric small={small} />
+      return <DocumentCentric small={small} scheme={scheme} />
     case 'single-column-with-sheet@^1.0':
     default:
-      return <SingleColumn small={small} />
+      return <SingleColumn small={small} scheme={scheme} />
   }
 }
 
@@ -70,45 +80,50 @@ function renderInner(id, small) {
 // signature columns as flat colored stripes.
 const MINI_STRIPE = '#9A9490'
 const MINI_STRIPE_FAINT = '#C8C2B8'
-function MiniBlock({ width = '100%', faint = false }) {
+function MiniBlock({ width = '100%', faint = false, scheme = null }) {
+  // PR-19g (followup): scheme.line is the soft accent; scheme.dot is the
+  // emphatic one. Faint blocks use line, primary blocks use dot.
+  const color = scheme
+    ? (faint ? scheme.line : scheme.dot)
+    : (faint ? MINI_STRIPE_FAINT : MINI_STRIPE)
   return (
     <div style={{
       height: '100%',
       width,
       borderRadius: 1,
-      background: faint ? MINI_STRIPE_FAINT : MINI_STRIPE,
-      opacity: 0.55,
+      background: color,
+      opacity: scheme ? 0.7 : 0.55,
     }} />
   )
 }
-function renderMini(id) {
+function renderMini(id, scheme) {
   switch (id) {
     case 'three-panel@^1.0':
       return (
         <>
-          <MiniBlock width="22%" />
-          <MiniBlock width="48%" />
-          <MiniBlock width="26%" faint />
+          <MiniBlock width="22%" scheme={scheme} />
+          <MiniBlock width="48%" scheme={scheme} />
+          <MiniBlock width="26%" faint scheme={scheme} />
         </>
       )
     case 'canvas-centric@^1.0':
       return (
         <>
-          <MiniBlock width="22%" />
-          <MiniBlock width="48%" />
-          <MiniBlock width="26%" />
+          <MiniBlock width="22%" scheme={scheme} />
+          <MiniBlock width="48%" scheme={scheme} />
+          <MiniBlock width="26%" scheme={scheme} />
         </>
       )
     case 'document-centric@^1.0':
       return (
         <>
-          <MiniBlock width="64%" />
-          <MiniBlock width="32%" faint />
+          <MiniBlock width="64%" scheme={scheme} />
+          <MiniBlock width="32%" faint scheme={scheme} />
         </>
       )
     case 'single-column-with-sheet@^1.0':
     default:
-      return <MiniBlock width="100%" />
+      return <MiniBlock width="100%" scheme={scheme} />
   }
 }
 
@@ -121,11 +136,16 @@ function Dot() {
 function Line({ width = '70%' }) {
   return <div style={{ height: 1.5, background: 'var(--p-text-light)', borderRadius: 1, margin: '3px 3px 0', width }} />
 }
-function Bar() {
+function Bar({ scheme = null }) {
+  // PR-19g (followup): when a scheme is in play, the Bar takes the
+  // scheme's accent color — it's the strongest accent in the wireframe
+  // so swapping it sells the "tinted to this scheme" effect.
   return (
     <div style={{
       position: 'absolute', bottom: 3, left: 3, right: 3, height: 4,
-      background: 'var(--p-gold-muted)', borderRadius: 1.5, opacity: 0.55,
+      background: scheme ? scheme.dot : 'var(--p-gold-muted)',
+      borderRadius: 1.5,
+      opacity: scheme ? 0.7 : 0.55,
     }} />
   )
 }
@@ -152,17 +172,17 @@ function CanvasCross() {
   )
 }
 
-function SingleColumn() {
+function SingleColumn({ scheme = null } = {}) {
   return (
     <div style={{ ...wireBorder, flex: 1, paddingBottom: 14 }}>
       <Dot /><Dot /><Dot /><br /><Dot /><Dot />
-      <Bar />
+      <Bar scheme={scheme} />
       <MenuDot />
     </div>
   )
 }
 
-function ThreePanel() {
+function ThreePanel({ scheme = null } = {}) {
   return (
     <>
       <div style={{ ...wireBorder, width: '18%' }}>
@@ -173,7 +193,7 @@ function ThreePanel() {
       </div>
       <div style={{ ...wireBorder, flex: 1, paddingBottom: 18 }}>
         <Dot /><Dot /><Dot /><Dot /><Dot />
-        <Bar />
+        <Bar scheme={scheme} />
       </div>
       <div style={{ ...dashedBorder, width: '22%' }}>
         <Line width="70%" />
