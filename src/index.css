@@ -1957,15 +1957,45 @@
   text-align: left;
   color: var(--p-text-primary);
 }
-.bp-inline-actions {
+/* PR-19l: action buttons live in a card below the expanded room, not
+   inside the foreignObject. The card's width matches the expanded
+   room's apparent width; `top` is computed from the room's bottom
+   edge and passed inline. */
+.bp-action-card {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 8px);
   display: flex;
-  gap: 6px;
   justify-content: center;
-  margin-top: 2px;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  opacity: 0;
+  transition: opacity 220ms ease 60ms, transform 220ms ease 60ms;
+  pointer-events: none;
+  z-index: 4;
+  box-sizing: border-box;
 }
-.bp-inline-actions .tb-btn {
-  padding: 5px 10px;
+.bp-action-card.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+.bp-action-card .tb-btn {
+  flex: 0 1 auto;
+  padding: 6px 10px;
   font-size: 11px;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .bp-action-card { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bp-action-card { transition: none; }
 }
 
 .bp-includes-sidebar {

@@ -37,10 +37,14 @@
 
 export const VIEWBOX_PAD = 32        // outer wall margin (PR-16a: was 28; +4 to give edge protrusions breathing room)
 export const WALL_THICKNESS = 6      // outer wall stroke width (spec uses 7)
-export const ROW_HEIGHT = 200        // target room interior height
+// PR-19l: rooms shrunk to 75% of prior sizing (ROW_HEIGHT 200→150,
+// TARGET_INNER_WIDTH 620→465). The blueprint section was eating too
+// much vertical real estate on the homepage; smaller rooms keep the
+// floor feeling like a section rather than the whole page.
+export const ROW_HEIGHT = 150        // target room interior height
 export const ROOM_GAP = 24           // gap between rooms in a row (PR-16a: was 14; +10 so adjacent bump+mirror-bump pairs don't collide)
 export const ROW_GAP = 18            // gap between rows
-export const TARGET_INNER_WIDTH = 620 // packs to this before wrapping
+export const TARGET_INNER_WIDTH = 465 // packs to this before wrapping
 
 // Per-layout aspect ratio (width / ROW_HEIGHT). Loosely follows the
 // proportions in refactor/parliament_homepage_v2 (2).html with small

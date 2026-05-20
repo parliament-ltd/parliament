@@ -526,8 +526,9 @@ export default function BlueprintRender({ hostAPI } = {}) {
     // tight, framed card rather than a giant translucent panel. Floor
     // is clamped at 1.0 so naturally-large rooms never SHRINK on
     // selection (it would look like the room is collapsing).
-    const targetW = layout.floorBox.width  * 0.30
-    const targetH = layout.floorBox.height * 0.30
+    // PR-19l: trim another 10% (0.30 → 0.27 of canvas).
+    const targetW = layout.floorBox.width  * 0.27
+    const targetH = layout.floorBox.height * 0.27
     const scale = Math.min(targetW / placed.box.width, targetH / placed.box.height)
     return Math.max(1, scale)
   }, [selectedRoomId, isNarrow, layout])
@@ -539,12 +540,14 @@ export default function BlueprintRender({ hostAPI } = {}) {
       const cy = placed.box.y + placed.box.height / 2
       const tx = layout.viewBox.width / 2 - cx
       const ty = layout.viewBox.height / 2 - cy
+      // PR-19l: `z-index` removed — it has no effect on SVG <g>
+      // siblings. Stacking order is forced via the two-pass render
+      // below (non-selected rooms first, selected room last).
       return {
         transform: `translate(${tx}px, ${ty}px) scale(${selectedRoomScale})`,
         transformOrigin: 'center',
         transformBox: 'fill-box',
         transition: 'transform 280ms ease, opacity 280ms ease',
-        zIndex: 2,
       }
     }
     return {
@@ -553,6 +556,32 @@ export default function BlueprintRender({ hostAPI } = {}) {
       transformBox: 'fill-box',
       transition: 'transform 280ms ease, opacity 280ms ease',
       opacity: 0.35,
+    }
+  }, [selectedRoomId, isNarrow, layout, selectedRoomScale])
+
+  // PR-19l: ensure the selected room renders LAST in SVG document
+  // order so it sits on top of every other room. (CSS z-index on
+  // SVG <g> siblings is unreliable; document order is authoritative.)
+  const orderedRooms = useMemo(() => {
+    if (!selectedRoomId) return layout.placedRooms
+    const others = layout.placedRooms.filter(p => p.id !== selectedRoomId)
+    const sel = layout.placedRooms.find(p => p.id === selectedRoomId)
+    return sel ? [...others, sel] : layout.placedRooms
+  }, [layout.placedRooms, selectedRoomId])
+
+  // PR-19l: pixel-fractions for positioning the external action card
+  // directly below the expanded room. Width matches the expanded
+  // room's apparent width; top is the room's bottom edge as a fraction
+  // of the viewBox height. Both expressed as percentages of .bp-wrap.
+  const expandedRoomBox = useMemo(() => {
+    if (!selectedRoomId || isNarrow) return null
+    const placed = layout.placedRooms.find(p => p.id === selectedRoomId)
+    if (!placed) return null
+    const w = placed.box.width  * selectedRoomScale
+    const h = placed.box.height * selectedRoomScale
+    return {
+      widthPercent:  (w / layout.viewBox.width)  * 100,
+      bottomPercent: (0.5 + h / (2 * layout.viewBox.height)) * 100,
     }
   }, [selectedRoomId, isNarrow, layout, selectedRoomScale])
 
@@ -615,8 +644,9 @@ export default function BlueprintRender({ hostAPI } = {}) {
         <rect x={layout.wallBox.x} y={layout.wallBox.y} width={layout.wallBox.width} height={layout.wallBox.height} fill="none" stroke={WALL_STROKE} strokeWidth="6" rx="2" />
         <rect x={layout.wallBox.x} y={layout.wallBox.y} width={layout.wallBox.width} height={layout.wallBox.height} fill={HATCH_FILL} fillOpacity="0.22" stroke="none" rx="2" />
 
-        {/* Rooms + system cards */}
-        {layout.placedRooms.map(placed => {
+        {/* Rooms + system cards. PR-19l: orderedRooms puts the selected
+            room last so it draws on top of every other room. */}
+        {orderedRooms.map(placed => {
           const transformStyle = transformFor(placed) || idleTransformStyle
           if (placed.kind === SYSTEM_KIND) {
             const isStudy = placed.id === SYSTEM_ROOM_IDS.STUDY
@@ -664,11 +694,8 @@ export default function BlueprintRender({ hostAPI } = {}) {
               transformStyle={transformStyle}
               roomScale={isSelected ? selectedRoomScale : 1}
               lastConv={lastConvByRoomId.get(placed.id) || null}
-              onCopy={onOverlayCopy}
-              onDelete={onOverlayDelete}
               onEnter={() => setHoveredFromBlueprint(placed.id)}
               onLeave={() => setHoveredFromBlueprint(null)}
-              onEnterRoom={onOverlayEnter}
               onClick={(e) => {
                 // Stop propagation so the SVG-background click handler
                 // doesn't also fire and deselect the room we just
@@ -729,10 +756,38 @@ export default function BlueprintRender({ hostAPI } = {}) {
         </aside>
       )}
 
-      {/* PR-19k: the action strip that used to sit below the canvas is
-          gone — Copy / Delete / Enter buttons now render inside the
-          expanded room itself (InlineRoomDetails). Mobile keeps its
-          own bottom-sheet overlay (below). */}
+      {/* PR-19l: action card positioned directly below the expanded
+          room — same width as the room, center-aligned. Width + top
+          come from `expandedRoomBox` so the card tracks the room as it
+          scales. (Was briefly inside the room in PR-19k, but the
+          buttons read more clearly outside the room frame.) */}
+      {!isNarrow && selectedRoomId && expandedRoomBox && (
+        <div
+          className={`bp-action-card${detailsReady ? ' show' : ''}`}
+          style={{
+            width: `${expandedRoomBox.widthPercent}%`,
+            top: `calc(${expandedRoomBox.bottomPercent}% + 10px)`,
+          }}
+        >
+          <button type="button" className="tb-btn" onClick={onOverlayCopy}>
+            <Copy className="inline-block w-3 h-3 mr-1 -mt-px" />
+            Copy
+          </button>
+          <button
+            type="button"
+            className="tb-btn"
+            onClick={onOverlayDelete}
+            style={{ color: '#C5342A', borderColor: '#E0A8A8' }}
+          >
+            <Trash2 className="inline-block w-3 h-3 mr-1 -mt-px" />
+            Delete
+          </button>
+          <button type="button" className="tb-btn primary" onClick={onOverlayEnter}>
+            Enter
+            <ArrowRight className="inline-block w-3 h-3 ml-1 -mt-px" />
+          </button>
+        </div>
+      )}
 
       {/* Mobile-only bottom-sheet overlay. PR-19g shape preserved. */}
       {isNarrow && (
@@ -847,11 +902,8 @@ function Room({
   transformStyle,
   roomScale,
   lastConv,
-  onCopy,
-  onDelete,
   onEnter,
   onLeave,
-  onEnterRoom,
   onClick,
   onHereTipShow,
   onHereTipHide,
@@ -1011,9 +1063,6 @@ function Room({
               mode={mode}
               lastConv={lastConv}
               isActive={isActive}
-              onCopy={onCopy}
-              onDelete={onDelete}
-              onEnterRoom={onEnterRoom}
             />
           </div>
         </foreignObject>
@@ -1035,14 +1084,17 @@ function Room({
 // foreignObject paint reliability on Safari ≤16.
 //
 // PR-19k: restructured to a single vertical stack — name → wireframe
-// → dates → action buttons. The action strip that used to sit below
-// the canvas folds INTO this stack, freeing the canvas vertical area.
-// Pills are dropped (the sidebar's Includes list already enumerates
-// the same components in more readable form). The wireframe gets an
-// opaque background + thin border so it reads clearly against the
-// room's scheme tint. All content here renders at native card-pixel
-// sizes thanks to the parent div's counter-scale transform.
-function InlineRoomDetails({ mode, lastConv, isActive, onCopy, onDelete, onEnterRoom }) {
+// → dates. Pills are dropped (the sidebar's Includes list already
+// enumerates the same components in more readable form). The
+// wireframe gets an opaque background + thin border so it reads
+// clearly against the room's scheme tint. All content here renders
+// at native card-pixel sizes thanks to the parent div's counter-
+// scale transform.
+//
+// PR-19l: action buttons (Copy / Delete / Enter) moved BACK out into
+// an external `.bp-action-card` positioned below the room — they read
+// more clearly outside the room frame.
+function InlineRoomDetails({ mode, lastConv, isActive }) {
   if (!mode) return null
   const layoutRef = mode.layout?.ref
   const name = (mode?.meta?.name || mode?.id || 'Room').toUpperCase()
@@ -1072,25 +1124,6 @@ function InlineRoomDetails({ mode, lastConv, isActive, onCopy, onDelete, onEnter
         {lastUsed && <><dt>Last used</dt><dd>{lastUsed}</dd></>}
         {lastModel && <><dt>Last spoken to</dt><dd>{lastModel}</dd></>}
       </dl>
-      <div className="bp-inline-actions">
-        <button type="button" className="tb-btn" onClick={onCopy}>
-          <Copy className="inline-block w-3 h-3 mr-1 -mt-px" />
-          Copy
-        </button>
-        <button
-          type="button"
-          className="tb-btn"
-          onClick={onDelete}
-          style={{ color: '#C5342A', borderColor: '#E0A8A8' }}
-        >
-          <Trash2 className="inline-block w-3 h-3 mr-1 -mt-px" />
-          Delete
-        </button>
-        <button type="button" className="tb-btn primary" onClick={onEnterRoom}>
-          Enter
-          <ArrowRight className="inline-block w-3 h-3 ml-1 -mt-px" />
-        </button>
-      </div>
     </div>
   )
 }
