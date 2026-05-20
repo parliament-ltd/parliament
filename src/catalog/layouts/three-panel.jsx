@@ -27,7 +27,10 @@ const RAIL_BASE = 'flex flex-col gap-3 p-3 overflow-y-auto bg-white'
 // content lives inside .layout-rail-card with a soft inset-ring shadow).
 // The 12px aside padding bottom-aligns the rail card with the input card
 // in the center column (whose wrapper also carries p-3).
-const RAIL_OUTER = 'shrink-0 p-3 flex flex-col bg-[var(--p-bg-base)]'
+// The aside drops bg-base in PR-28e so the chat-room-frame's 64%-
+// transparent surface (and the dot texture beneath it) reads through
+// the rail's outer gutter.
+const RAIL_OUTER = 'shrink-0 p-3 flex flex-col'
 const RAIL_INNER = 'layout-rail-card flex-1 min-h-0 overflow-y-auto p-3 flex flex-col gap-3'
 
 function renderSlot(nodes) {
@@ -123,7 +126,10 @@ export default {
     }
 
     return (
-      <div className="flex h-full min-h-[480px] bg-[var(--p-bg-base)]">
+      // PR-28e: outer flex drops bg-base so .chat-room-frame's
+      // 64%-transparent surface and the chat-page-bg dot texture
+      // read through.
+      <div className="flex h-full min-h-[480px]">
         {/* Left rail */}
         {hasLeft && (
           <aside
@@ -155,13 +161,12 @@ export default {
             {renderSlot(msgs)}
           </div>
           {input && input.length > 0 && (
-            // PR-25: input dock matches the chat-base background and
-            // drops its separator line. The input itself lives in a
-            // `.chat-input-card` (PR-23) — wrapping it in another bg
-            // colour + border made the dock feel like a tray under the
-            // card; matching bg-base lets the card float in the chat
-            // surface naturally.
-            <div className="p-3 bg-[var(--p-bg-base)]">
+            // PR-25 set the input wrapper to bg-base so the chat-input-card
+            // floated against the chat surface. PR-28e drops the explicit
+            // bg-base so the .chat-room-frame's 64%-transparent surface
+            // (and the dot texture below it) reads through the wrapper's
+            // 12px gutter around the input card.
+            <div className="p-3">
               {renderSlot(input)}
             </div>
           )}
