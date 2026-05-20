@@ -49,7 +49,7 @@ export default {
   version: '1.0',
   displayName: 'Comments',
   author: 'parliament',
-  description: 'Per-paragraph comment thread with reply lifecycle. Comments anchor to selected text; Claude replies arrive on Submit & Branch.',
+  description: 'Per-paragraph comment threads in the document margin. Highlight text to add a comment; the AI responds when you submit the draft for review.',
   icon: 'MessageSquareText',
   surfaces: ['room'],
   tier: 'composer',

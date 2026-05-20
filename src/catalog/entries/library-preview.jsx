@@ -26,6 +26,7 @@ import { initDB } from '../../lib/db'
 import LibraryOverlay from '../../components/LibraryOverlay'
 import LibraryCard from '../../components/LibraryCard'
 import { getEntry } from '../../catalog'
+import { getLayoutEntry } from '../../catalog/layouts'
 
 const FILTERS = [
   { id: 'all',       label: 'All',        kinds: ['room', 'layout', 'component', 'scheme', 'resource'] },
@@ -109,7 +110,7 @@ const RESOURCES = [
     id: 'video-90sec',
     kind: 'resource',
     displayName: 'Parliament in 90 seconds',
-    description: 'Marketing-adjacent intro video. Homepage tour, a room in action, the build flow at a high level.',
+    description: 'A short intro video. Homepage tour, a room in action, and the build flow at a glance.',
     format: 'Video link',
     target: ['general'],
     covers: [],
@@ -153,6 +154,25 @@ export default function LibraryPreview({ config = {} } = {}) {
             kind: 'component',
             icon: c.icon || manifest?.icon || null,
             surfaces: c.surfaces || manifest?.surfaces || ['both'],
+            // PR-19i: the libraryComponents seed is fire-once per id, so
+            // a stored record's description never refreshes on its own.
+            // Manifest descriptions are dual-maintained with the actual
+            // catalog entry files, so prefer the manifest when present —
+            // that's how the jargon-audit rewrites reach existing installs.
+            description: manifest?.description || c.description || '',
+          }
+        })
+        // PR-19i: layout descriptions are dual-maintained on the
+        // runtime layout manifest (src/catalog/layouts/*.jsx) and in
+        // libraryLayouts IDB. The IDB seed is fire-once, so prefer the
+        // manifest's description so existing installs get jargon-audit
+        // rewrites without a migration.
+        const enrichedLayouts = layouts.map((l) => {
+          const manifest = getLayoutEntry(l.id)
+          return {
+            ...l,
+            kind: 'layout',
+            description: manifest?.description || l.description || '',
           }
         })
         const all = [
@@ -162,7 +182,7 @@ export default function LibraryPreview({ config = {} } = {}) {
           // bridge every room card shows the generic 3-panel
           // fallback instead of its actual layout's silhouette.
           ...rooms.map(r => ({ ...r, kind: 'room', layoutId: r.layout?.ref || null })),
-          ...layouts.map(l =>    ({ ...l, kind: 'layout' })),
+          ...enrichedLayouts,
           ...enrichedComponents,
           ...schemes.map(s =>    ({ ...s, kind: 'scheme' })),
           ...RESOURCES,

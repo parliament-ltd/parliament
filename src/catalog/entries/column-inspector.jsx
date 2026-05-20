@@ -52,7 +52,7 @@ export default {
   version: '1.0',
   displayName: 'Column inspector',
   author: 'parliament',
-  description: 'Type-tagged column list with null counts, sample values, and an expand-to-detail row for the active dataset.',
+  description: 'A column list for your dataset, with types, null counts, sample values, and an expandable detail row.',
   icon: 'Columns3',
   surfaces: ['room'],
   tier: 'reader',

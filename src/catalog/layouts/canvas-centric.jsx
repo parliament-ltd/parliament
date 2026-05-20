@@ -38,6 +38,11 @@ export default {
   name: 'canvas-centric',
   version: '1.0',
   displayName: 'Canvas-centric',
+  // PR-19i: description on the manifest is the source of truth; the
+  // libraryLayouts IDB seed is fire-once, so library-preview.jsx
+  // enriches from this field at read time to ship rewrites without
+  // an IDB migration.
+  description: 'A center canvas (chart, table, dashboard) flanked by a sidebar and a chat panel. For working with data and files.',
   scope: 'room',
   slots: [
     { id: 'left-rail',  capacity: 'single' },

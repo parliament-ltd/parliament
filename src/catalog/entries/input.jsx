@@ -26,7 +26,7 @@ export default {
   version: '1.0',
   displayName: 'Input',
   author: 'parliament',
-  description: 'Message composer with send / stop, attachment, and tool-toggle menu.',
+  description: 'The message box, with send / stop, attachments, and a menu for tool toggles like Web Search.',
   icon: 'MessageSquare',
   surfaces: ['room'],
   tier: 'composer',

@@ -28,7 +28,7 @@ export default {
   version: '1.0',
   displayName: 'Context health',
   author: 'parliament',
-  description: 'Token / message / context-window meter with threshold warnings.',
+  description: 'A meter showing how much of the AI\'s context window you\'ve used, with warnings when you\'re approaching the limit.',
   icon: 'Activity',
   surfaces: ['room'],
   tier: 'reader',

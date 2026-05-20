@@ -24,7 +24,7 @@ export default {
   version: '1.0',
   displayName: 'Collaboration mode',
   author: 'parliament',
-  description: 'System-prompt presets and saved Parrot Personas applied to the next user send.',
+  description: 'Saved instructions and personas applied to your next message. Set the AI\'s tone, role, or focus before sending.',
   icon: 'Users',
   surfaces: ['room'],
   tier: 'composer',

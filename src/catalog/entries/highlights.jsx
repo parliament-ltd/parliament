@@ -33,7 +33,7 @@ export default {
   version: '1.0',
   displayName: 'Highlights',
   author: 'parliament',
-  description: 'Saved highlight terms with occurrence navigation, color tagging, and inline add form.',
+  description: 'Saved highlight terms with color tags and an inline add form. Jump between occurrences with one click.',
   icon: 'Highlighter',
   surfaces: ['room'],
   tier: 'reader',

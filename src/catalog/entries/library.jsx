@@ -16,7 +16,7 @@ export default {
   version: '1.0',
   displayName: 'Library',
   author: 'parliament',
-  description: 'Browse rooms, layouts, components, schemes, and (placeholder) resources.',
+  description: 'Browse rooms, layouts, components, schemes, and resources to install or learn from.',
   icon: 'BookOpen',
   surfaces: ['homepage'],
   tier: 'reader',

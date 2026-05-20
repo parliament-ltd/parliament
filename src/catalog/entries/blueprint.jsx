@@ -13,7 +13,7 @@ export default {
   version: '1.0',
   displayName: 'Blueprint',
   author: 'parliament',
-  description: 'Floor-plan view of the rooms the user has built; cross-references chat rows.',
+  description: 'A floor-plan view of every room you\'ve built. Hover a chat row to spotlight which room it lives in.',
   icon: 'LayoutDashboard',
   surfaces: ['homepage'],
   tier: 'reader',

@@ -86,7 +86,7 @@ export default {
   version: '1.0',
   displayName: 'File shelf',
   author: 'parliament',
-  description: 'Staged files for data-workspace rooms. Drop CSV/XLSX/JSON; toggle which files Claude can reference.',
+  description: 'A staging area for data files (CSV, XLSX, JSON) used in this room. Toggle which files the AI can reference.',
   icon: 'FolderOpen',
   surfaces: ['room'],
   tier: 'composer',
