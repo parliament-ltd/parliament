@@ -28,6 +28,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { useIsNarrow } from '../lib/useViewportWidth'
 import HomepageTopBar from '../components/HomepageTopBar'
 import TemplateGallery from '../components/build/TemplateGallery'
 import WizardEntry from '../components/build/wizard/WizardEntry'
@@ -232,7 +233,9 @@ export default function BuildView() {
       if (dn) items.push(dn.label)
     }
     if (screen >= 4 && config.layout && LAYOUT_META[config.layout]) {
-      items.push(LAYOUT_META[config.layout].label)
+      // PR-19g: the layout pill carries a mini wireframe alongside its
+      // label so users see the abstract shape, not just the term.
+      items.push({ label: LAYOUT_META[config.layout].label, layoutRef: config.layout })
     }
     if (screen >= 6) {
       const s = SCHEMES.find(x => x.id === config.scheme)
@@ -253,6 +256,10 @@ export default function BuildView() {
 
   // ── Render ─────────────────────────────────────────────
   const showOpenInEditor = screen >= 3 && screen <= 5
+  // PR-19g: editor is desktop-only. On mobile (<768px) wizard steps 3–5,
+  // we render "Open in editor" disabled with a help-text caption and
+  // push Back/Continue to a second row that spans the column width.
+  const isNarrow = useIsNarrow(768)
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--p-bg-base)' }}>
@@ -349,7 +356,59 @@ export default function BuildView() {
             </AnimatePresence>
 
             {/* Step-action footer (1–5) */}
-            {screen >= 1 && screen <= 5 && (
+            {/* PR-19g: on mobile + steps 3–5, render two rows — Open in
+                editor (disabled with help text) on top, Back/Continue
+                full-width below. Desktop and steps 1–2 keep the
+                horizontal row. */}
+            {screen >= 1 && screen <= 5 && isNarrow && showOpenInEditor && (
+              <div className="flex flex-col gap-3 mt-2">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled
+                    className="px-3.5 py-2 text-[12px] rounded-md opacity-50 cursor-not-allowed"
+                    style={{
+                      border: '0.5px solid var(--p-border)',
+                      background: 'transparent',
+                      color: 'var(--p-text-secondary)',
+                    }}
+                  >
+                    Open in editor
+                  </button>
+                  <span
+                    className="text-[11px] leading-[1.3] flex-1"
+                    style={{ color: 'var(--p-text-muted)' }}
+                  >
+                    The editor is currently only available for desktop.
+                  </span>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => goTo(screen - 1)}
+                    className="flex-1 px-3 py-2 text-[13px] rounded-md transition-colors"
+                    style={{
+                      border: '0.5px solid var(--p-border)',
+                      background: 'transparent',
+                      color: 'var(--p-text-secondary)',
+                    }}
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!canAdvance || busy}
+                    onClick={() => goTo(screen + 1)}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-5 py-2 text-[13px] font-medium rounded-md text-white disabled:opacity-35 disabled:cursor-default"
+                    style={{ background: 'var(--p-gold-light)' }}
+                  >
+                    Continue
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            )}
+            {screen >= 1 && screen <= 5 && !(isNarrow && showOpenInEditor) && (
               <div className="flex items-center justify-between mt-2">
                 <button
                   type="button"

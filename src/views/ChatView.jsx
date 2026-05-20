@@ -267,7 +267,7 @@ function ChatDesktopChrome({ wrenchTarget }) {
       <div className="flex-1" />
       <button
         type="button"
-        onClick={() => navigate(wrenchTarget)}
+        onClick={() => navigate(wrenchTarget, { state: { fromChat: true } })}
         title="Open Editor"
         aria-label="Open Editor"
         className="inline-flex items-center justify-center w-8 h-8 rounded-md text-[var(--p-text-secondary)] hover:text-[var(--p-gold-light)] transition-colors"

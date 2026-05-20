@@ -50,6 +50,7 @@ import { getProvider } from '../../../providers'
 import { saveApiKey, loadApiKey } from '../../../lib/crypto'
 import { getSetting } from '../../../lib/db'
 import { LAYOUT_META, SCHEMES, FEATURES } from '../../../lib/buildWizard'
+import { useIsNarrow } from '../../../lib/useViewportWidth'
 import StepHeader from './StepHeader'
 
 // Timings from parliament_wizard_v5.html ignite() — keep in sync with
@@ -87,6 +88,10 @@ export default function IgnitionStep({
   onBuildAnother,
   onGoHome,
 }) {
+  // PR-19g: on mobile the three post-success buttons stack vertically
+  // and stretch to the column width (matches the room preview card
+  // directly above). Desktop keeps the right-justified horizontal row.
+  const isNarrow = useIsNarrow(768)
   const [apiKey, setApiKey] = useState('')
   const [validating, setValidating] = useState(false)
   const [status, setStatus] = useState(null) // 'invalid' | 'billing_error' | null
@@ -500,12 +505,19 @@ export default function IgnitionStep({
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18 }}
-            className="flex flex-wrap gap-2 justify-end mt-5"
+            className={
+              isNarrow
+                ? 'flex flex-col gap-2 mt-5'
+                : 'flex flex-wrap gap-2 justify-end mt-5'
+            }
           >
             <button
               type="button"
               onClick={onBuildAnother}
-              className="px-4 py-2 text-[13px] rounded-md transition-colors"
+              className={
+                (isNarrow ? 'w-full ' : '') +
+                'px-4 py-2 text-[13px] rounded-md transition-colors'
+              }
               style={{
                 border: '0.5px solid var(--p-border)',
                 background: 'transparent',
@@ -519,7 +531,10 @@ export default function IgnitionStep({
             <button
               type="button"
               onClick={onGoHome}
-              className="px-4 py-2 text-[13px] rounded-md transition-colors"
+              className={
+                (isNarrow ? 'w-full ' : '') +
+                'px-4 py-2 text-[13px] rounded-md transition-colors'
+              }
               style={{
                 border: '0.5px solid var(--p-border)',
                 background: 'transparent',
@@ -528,17 +543,20 @@ export default function IgnitionStep({
               onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--p-gold-light)'; e.currentTarget.style.color = 'var(--p-gold-light)' }}
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--p-border)'; e.currentTarget.style.color = 'var(--p-text-secondary)' }}
             >
-              Go to your Parliament
+              Return to The Study
             </button>
             <button
               type="button"
               disabled={!committedConvId}
               onClick={() => onEnterChat(committedConvId)}
-              className="px-6 py-2 text-[13px] font-medium rounded-md text-white disabled:opacity-50"
+              className={
+                (isNarrow ? 'w-full ' : '') +
+                'px-6 py-2 text-[13px] font-medium rounded-md text-white disabled:opacity-50'
+              }
               style={{ background: 'var(--p-gold-light)' }}
               title={!committedConvId ? 'Saving your room…' : 'Open the chat'}
             >
-              Enter
+              Enter Room
             </button>
           </motion.div>
         )}

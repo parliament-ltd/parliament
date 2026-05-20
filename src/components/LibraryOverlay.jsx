@@ -57,19 +57,63 @@ function refName(ref) {
   return String(ref || '').split('@')[0]
 }
 
+// PR-19g — Includes-as-bulleted-list. Layout + scheme + each unique
+// component become a bullet with a short description, so users see
+// what they're getting at a glance instead of a dot-separated string
+// of jargon.
+const SCHEME_LABELS = {
+  parliament:    'Parliament Default',
+  'cool-bright': 'Cool Bright',
+  'deep-calm':   'Deep Calm',
+  'soft-violet': 'Soft Violet',
+  'fresh-teal':  'Fresh Teal',
+  'amber-glow':  'Amber Glow',
+}
+
 function RoomExtras({ item }) {
-  const componentNames = (item.components || [])
-    .map(c => getComponentEntry(normalizeRef(c.ref))?.displayName || refName(c.ref))
-    .filter(Boolean)
-  const unique = Array.from(new Set(componentNames))
-  const layoutName = getLayoutEntry(normalizeRef(item.layout?.ref))?.displayName || refName(item.layout?.ref)
-  const schemeName = refName(item.scheme?.ref)
-  const includes = [layoutName, ...unique, schemeName].filter(Boolean).join(' · ')
-  if (!includes) return null
+  const items = []
+  const layoutEntry = getLayoutEntry(normalizeRef(item.layout?.ref))
+  if (layoutEntry || item.layout?.ref) {
+    items.push({
+      kind: 'layout',
+      name: layoutEntry?.displayName || refName(item.layout?.ref),
+      desc: layoutEntry?.description || 'Spatial arrangement of rails, canvas, and chat.',
+    })
+  }
+  const schemeKey = refName(item.scheme?.ref)
+  const schemeName = SCHEME_LABELS[schemeKey] || schemeKey
+  if (schemeName) {
+    items.push({
+      kind: 'scheme',
+      name: schemeName,
+      desc: 'Color scheme and typography.',
+    })
+  }
+  const seen = new Set()
+  for (const c of item.components || []) {
+    const norm = normalizeRef(c.ref)
+    if (seen.has(norm)) continue
+    seen.add(norm)
+    const entry = getComponentEntry(norm)
+    if (!entry) continue
+    items.push({
+      kind: 'component',
+      name: entry.displayName || refName(c.ref),
+      desc: entry.description || '',
+    })
+  }
+  if (items.length === 0) return null
   return (
     <div>
       <div className="ov-section-label">Includes</div>
-      <div className="ov-desc">{includes}</div>
+      <ul className="ov-includes">
+        {items.map((it, i) => (
+          <li key={`${it.kind}-${it.name}-${i}`}>
+            <span className="ov-inc-name">{it.name}</span>
+            {it.desc && <span className="ov-inc-desc">{it.desc}</span>}
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }

@@ -1,36 +1,33 @@
 // blueprint@1.0 — homepage SVG floor-plan renderer (PR-14).
 //
 // Renders every user-built room as an irregular path on a single SVG
-// canvas, with hatched outer wall, faux floor grid, gold pawn marker,
-// dimension ticks, and per-room feature pills. Replaces the v1 grid
-// of rounded boxes that blueprint-preview.jsx shipped at PR-6.
+// canvas, with hatched outer wall, faux floor grid, and the system-room
+// cards (The Study / The Lab). Replaces the v1 grid of rounded boxes
+// that blueprint-preview.jsx shipped at PR-6.
 //
 // Layout signatures and packing live in src/lib/blueprintShapes.js as
 // pure functions; this file is the React adapter that mounts them and
 // wires up the hostAPI cross-section hover bus.
 //
-// Spec reference: refactor/parliament_homepage_v2 (2).html (the section
-// labelled "BLUEPRINT") plus parliament_v2_design_decisions.md §2.5
-// (room shape signatures) and §5 (homepage blueprint details).
-//
-// Visual notes specific to PR-14:
-//   - Pawn position deviates from spec/design-doc: when the user has no
-//     rooms, the pawn lives next to the "+ Build a room" placeholder
-//     (drawing the eye toward the first build). Once any room exists,
-//     the pawn moves into the room owning the most-recent conversation.
-//   - Cross-section hover: chats@1.0 publishes PHASE_1_EVENTS.ROW_HOVER
-//     and we light up the path matching the conversation's `room` field.
+// PR-19g changes the interaction model: clicking a user room no longer
+// navigates straight into it. Instead, it opens RoomDetailsOverlay with
+// the room's details and three actions (Copy / Delete / Enter Room).
+// Clicking the highlighted room a second time also enters. Room cards
+// strip to title-only — pills, layout/scheme/last-spoken, and the
+// floating gold pawn all disappear from the in-blueprint view; the
+// active room shows a faded grey walking-human icon below the title in
+// place of the pawn marker.
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useConversations } from '../../stores/ConversationContext'
-import { listModes, loadHomepageMode } from '../../lib/modes'
+import { listModes, deleteMode, saveMode, createCopyOfMode } from '../../lib/modes'
 import { createConversation } from '../../lib/db'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
+import RoomDetailsOverlay from '../../components/RoomDetailsOverlay'
 import {
   packRooms,
   buildRoomPath,
-  placePawn,
   interiorHints,
   studyShape,
   labShape,
@@ -44,112 +41,19 @@ const WALL_STROKE = '#3A3530'
 const WALL_FILL   = '#F5F0E8'
 const HATCH_FILL  = 'url(#bp-hatch)'
 const FLOOR_GRID  = 'url(#bp-floorgrid)'
-const HATCH_LIGHT = 'url(#bp-hatch-light)'
 
 const ROOM_FILL_DEFAULT = '#F5F0E8'
 const ROOM_FILL_ACTIVE  = 'rgba(196, 169, 77, 0.10)'
 const ROOM_FILL_HOVER   = 'rgba(196, 169, 77, 0.16)'
 const ROOM_FILL_HIGHLIT = 'rgba(196, 169, 77, 0.22)'
+const ROOM_FILL_SELECTED = 'rgba(196, 169, 77, 0.22)'
 const ROOM_BORDER_DEFAULT = '#C8C2B8'
 const ROOM_BORDER_ACTIVE  = '#B8A070'
 
-// Mapping from component ref name → feature pill label. Limited to the
-// features the wizard actually surfaces (src/lib/buildWizard.js FEATURES)
-// plus a couple of obvious extras. Ordered by perceived importance —
-// only the top 3 fit comfortably on a room floor.
-const FEATURE_LABELS = {
-  toc:         'TOC',
-  branches:    'BRANCHES',
-  highlights:  'HIGHLIGHTS',
-  'file-shelf':'FILE SHELF',
-  context:     'CONTEXT HEALTH',
-  notes:       'NOTES',
-  review:      'REVIEW',
-}
-
-// PR-19f: pills for The Study's seeded sections. Kept separate from
-// FEATURE_LABELS so wizard-feature concerns don't leak into the
-// homepage's system-room rendering.
-const SYSTEM_FEATURE_LABELS = {
-  blueprint: 'BLUEPRINT',
-  chats:     'CHATS',
-  library:   'LIBRARY',
-  favorites: 'FAVORITES',
-}
-
-const SCHEME_DISPLAY = {
-  parliament:    'Parliament Default',
-  'cool-bright': 'Cool Bright',
-  'deep-calm':   'Deep Calm',
-  'soft-violet': 'Soft Violet',
-  'fresh-teal':  'Fresh Teal',
-  'amber-glow':  'Amber Glow',
-}
-
-const LAYOUT_DISPLAY = {
-  'three-panel':              'Three-panel',
-  'canvas-centric':           'Canvas-centric',
-  'document-centric':         'Document-centric',
-  'single-column-with-sheet': 'Single column',
-}
-
-// PR-16a: friendly model names for the "Last spoken to" line. Maps the
-// raw conversation.model values to display strings. Unknown ids fall
-// through to a humanized fallback (kebab → Title Case).
-const MODEL_DISPLAY = {
-  'claude-sonnet':         'Claude Sonnet',
-  'claude-sonnet-4-6':     'Claude Sonnet 4.6',
-  'claude-sonnet-4-7':     'Claude Sonnet 4.7',
-  'claude-opus':           'Claude Opus',
-  'claude-opus-4-7':       'Claude Opus 4.7',
-  'claude-haiku':          'Claude Haiku',
-  'claude-haiku-4-5':      'Claude Haiku 4.5',
-  'claude-haiku-4-5-20251001': 'Claude Haiku 4.5',
-}
-
-function modelLabel(raw) {
-  if (!raw) return ''
-  const mapped = MODEL_DISPLAY[raw]
-  if (mapped) return mapped
-  // Humanize: turn 'some-model-name' into 'Some Model Name'.
-  return raw
-    .split('-')
-    .map(s => s.length > 0 ? s[0].toUpperCase() + s.slice(1) : '')
-    .join(' ')
-}
-
-const refName = (ref) => (ref || '').split('@')[0]
-
-// PR-19a: rough text-width estimator for SVG layout decisions where we
-// can't measure DOM nodes (text might not be mounted yet, or the
-// measurement is needed during render). Multiplier is empirical:
-// proportional sentence-case at our weights typically averages
-// ~0.55 × fontSize per character; italic runs slightly wider so we
-// nudge to 0.58. Letter-spacing on uppercase rooms is handled by the
-// text element directly — this only feeds the wrap decision.
-function estimateTextWidth(text, fontSize, isItalic = false) {
-  if (!text) return 0
-  const charW = fontSize * (isItalic ? 0.58 : 0.55)
-  return text.length * charW
-}
-
-// Pull up to N feature pills off a room's components array, looking
-// up labels from the supplied table. `limit` defaults to 3 (the cap
-// that fits on a user-room floor); The Study uses 4 since its seeded
-// components are exactly four.
-function featuresFor(room, labels = FEATURE_LABELS, limit = 3) {
-  const seen = new Set()
-  const out = []
-  for (const c of room?.components || []) {
-    const label = labels[refName(c.ref)]
-    if (label && !seen.has(label)) {
-      seen.add(label)
-      out.push(label)
-      if (out.length === limit) break
-    }
-  }
-  return out
-}
+// PR-19g: faded-grey palette for the small in-room icons (walking
+// human / compass / wrench). Mirrors PR-19f's system-room icon tint so
+// the cards read as the same species.
+const IN_ROOM_ICON_COLOR = '#9A9490'
 
 // ─── Component ───────────────────────────────────────────────
 
@@ -157,12 +61,14 @@ export default function BlueprintRender({ hostAPI } = {}) {
   const { conversations } = useConversations()
   const navigate = useNavigate()
   const [rooms, setRooms] = useState([])
-  // PR-19f: The Study's actual mode record, used to render its
-  // component pills on the system-room card. Loaded once on mount.
-  const [studyMode, setStudyMode] = useState(null)
   const [hoveredFromChat, setHoveredFromChat] = useState(null)
   const [hoveredFromBlueprint, setHoveredFromBlueprint] = useState(null)
-  const [pawnTip, setPawnTip] = useState(null) // { x, y } or null
+  // PR-19g: selectedRoomId drives the details overlay + hatch
+  // animation over other rooms + scale-up of the selected one.
+  const [selectedRoomId, setSelectedRoomId] = useState(null)
+  // PR-19g: "You are here" tooltip moves onto the in-room walking-
+  // human icon (was: floating gold pawn).
+  const [hereTip, setHereTip] = useState(null) // { x, y } or null
 
   // Subscribe to chats@1.0's row-hover bus. Payload = { conversationId | null }.
   useEffect(() => {
@@ -172,35 +78,32 @@ export default function BlueprintRender({ hostAPI } = {}) {
     })
   }, [hostAPI])
 
-  // Load every room mode once. Future PR-15+ may push these through a
-  // useModes() hook that listens for `homepage-mode-changed` so wizard-
-  // built rooms appear without a reload — out of scope here.
-  // PR-19f: also load the homepage mode so The Study's system-room
-  // card can render its actual components as feature pills.
+  // Load every room mode. Refetches on `homepage-mode-changed` (and on
+  // PR-19g's local `room-deleted` event the delete action emits).
   useEffect(() => {
     let cancelled = false
-    ;(async () => {
+    async function loadAll() {
       try {
-        const [modes, study] = await Promise.all([
-          listModes({ scope: 'room' }),
-          loadHomepageMode(),
-        ])
-        if (cancelled) return
-        setRooms(modes || [])
-        setStudyMode(study || null)
+        const modes = await listModes({ scope: 'room' })
+        if (!cancelled) setRooms(modes || [])
       } catch {
-        if (!cancelled) {
-          setRooms([])
-          setStudyMode(null)
-        }
+        if (!cancelled) setRooms([])
       }
-    })()
-    return () => { cancelled = true }
+    }
+    loadAll()
+    const onChange = () => { loadAll() }
+    window.addEventListener('homepage-mode-changed', onChange)
+    window.addEventListener('blueprint-rooms-changed', onChange)
+    return () => {
+      cancelled = true
+      window.removeEventListener('homepage-mode-changed', onChange)
+      window.removeEventListener('blueprint-rooms-changed', onChange)
+    }
   }, [])
 
   // Most-recently-active room: the room of the conversation with the
   // highest updatedAt. Falls back to null when no conversation has a
-  // room set yet (e.g. legacy V1 conversations).
+  // room set yet.
   const activeRoomId = useMemo(() => {
     let best = null
     let bestT = 0
@@ -219,20 +122,12 @@ export default function BlueprintRender({ hostAPI } = {}) {
     return c?.room || null
   }, [hoveredFromChat, conversations])
 
-  // Pack into rows + compute viewBox. Memoized on rooms array identity.
-  // PR-19f: system rooms (The Study, The Lab) pack after user rooms so
-  // the user's own work anchors row 1; system rooms flow naturally onto
-  // row 2 once row 1 fills. Placeholder is gone — The Lab IS the build
-  // entry, so the dashed "+ BUILD A ROOM" card was redundant.
+  // Pack into rows + compute viewBox. PR-19f: system rooms pack after
+  // user rooms; PR-14 placeholder is gone.
   const layout = useMemo(() => {
     const items = rooms.map(r => ({ id: r.id, layoutRef: r.layout?.ref || '' }))
     return packRooms(items, { includeSystem: true })
   }, [rooms])
-
-  const pawn = useMemo(
-    () => placePawn({ placedRooms: layout.placedRooms, activeRoomId }),
-    [layout.placedRooms, activeRoomId]
-  )
 
   // Quick lookup of room mode by id for label rendering.
   const modesById = useMemo(() => {
@@ -241,9 +136,9 @@ export default function BlueprintRender({ hostAPI } = {}) {
     return m
   }, [rooms])
 
-  // Build label text for a room. Last-spoken comes from the latest
-  // conversation in this room; "No conversations yet" if none.
-  const lastModelByRoomId = useMemo(() => {
+  // Latest conversation per room — fuels Last-used / Last-spoken-to in
+  // the details overlay.
+  const lastConvByRoomId = useMemo(() => {
     const m = new Map()
     for (const c of conversations) {
       if (!c.room) continue
@@ -255,8 +150,10 @@ export default function BlueprintRender({ hostAPI } = {}) {
     return m
   }, [conversations])
 
-  const onEnterRoom = async (roomId) => {
-    // Find the most-recent conversation in this room and navigate to it.
+  // Enter the room: route to the most-recent conversation, or create a
+  // fresh one in this room if it has none yet. Same fallback ladder as
+  // PR-19c (was the direct-click handler before PR-19g).
+  const enterRoom = useCallback(async (roomId) => {
     let last = null
     for (const c of conversations) {
       if (c.room !== roomId) continue
@@ -266,10 +163,6 @@ export default function BlueprintRender({ hostAPI } = {}) {
       navigate(`/chat/${last.id}`)
       return
     }
-    // PR-19c: empty room → start a fresh conversation IN the room
-    // (was: navigate to /build, which kicked the user back into the
-    // wizard from a room they had already built). Failure falls
-    // through to the build wizard as a last resort.
     try {
       const room = modesById.get(roomId)
       const title = room?.meta?.name || 'New conversation'
@@ -278,7 +171,61 @@ export default function BlueprintRender({ hostAPI } = {}) {
     } catch {
       navigate('/build')
     }
-  }
+  }, [conversations, modesById, navigate])
+
+  // PR-19g: first click opens details. Second click on the already-
+  // selected room enters. System rooms keep their direct-navigation
+  // behavior (Study → '/', Lab → '/edit').
+  const handleRoomClick = useCallback((roomId) => {
+    if (selectedRoomId === roomId) {
+      setSelectedRoomId(null)
+      enterRoom(roomId)
+      return
+    }
+    setSelectedRoomId(roomId)
+  }, [selectedRoomId, enterRoom])
+
+  const onOverlayClose = useCallback(() => setSelectedRoomId(null), [])
+
+  const onOverlayEnter = useCallback(() => {
+    if (!selectedRoomId) return
+    const id = selectedRoomId
+    setSelectedRoomId(null)
+    enterRoom(id)
+  }, [selectedRoomId, enterRoom])
+
+  const onOverlayCopy = useCallback(async () => {
+    if (!selectedRoomId) return
+    const source = modesById.get(selectedRoomId)
+    if (!source) return
+    try {
+      const draft = createCopyOfMode(source)
+      const saved = await saveMode(draft)
+      setSelectedRoomId(null)
+      window.dispatchEvent(new Event('blueprint-rooms-changed'))
+      navigate(`/edit/${saved.id}`)
+    } catch (err) {
+      // Fall back silently — the overlay closes, user can retry from
+      // the editor. A toast surface would require a wider plumbing.
+      console.error('Copy Room failed:', err)
+      setSelectedRoomId(null)
+    }
+  }, [selectedRoomId, modesById, navigate])
+
+  const onOverlayDelete = useCallback(async () => {
+    if (!selectedRoomId) return
+    const source = modesById.get(selectedRoomId)
+    const label = source?.meta?.name || 'this room'
+    const ok = window.confirm(`Delete ${label}? Conversations in it will lose their room link.`)
+    if (!ok) return
+    try {
+      await deleteMode(selectedRoomId)
+    } catch (err) {
+      console.error('Delete Room failed:', err)
+    }
+    setSelectedRoomId(null)
+    window.dispatchEvent(new Event('blueprint-rooms-changed'))
+  }, [selectedRoomId, modesById])
 
   return (
     <div className="bp-wrap">
@@ -316,88 +263,146 @@ export default function BlueprintRender({ hostAPI } = {}) {
                 key={placed.id}
                 placed={placed}
                 isStudy={isStudy}
-                studyMode={isStudy ? studyMode : null}
                 isHovered={placed.id === hoveredFromBlueprint}
+                isDimmed={Boolean(selectedRoomId)}
                 onEnter={() => setHoveredFromBlueprint(placed.id)}
                 onLeave={() => setHoveredFromBlueprint(null)}
                 onClick={() => navigate(isStudy ? '/' : '/edit')}
               />
             )
           }
+          const isSelected = placed.id === selectedRoomId
+          const isDimmed = Boolean(selectedRoomId) && !isSelected
           return (
             <Room
               key={placed.id}
               placed={placed}
               mode={modesById.get(placed.id)}
-              lastConv={lastModelByRoomId.get(placed.id)}
               isActive={placed.id === activeRoomId}
               isHighlitFromChat={placed.id === highlightedRoomId}
               isHovered={placed.id === hoveredFromBlueprint}
+              isSelected={isSelected}
+              isDimmed={isDimmed}
               onEnter={() => setHoveredFromBlueprint(placed.id)}
               onLeave={() => setHoveredFromBlueprint(null)}
-              onClick={() => onEnterRoom(placed.id)}
+              onClick={() => handleRoomClick(placed.id)}
+              onHereTipShow={(p) => setHereTip(p)}
+              onHereTipHide={() => setHereTip(null)}
             />
           )
         })}
 
         {/* Dimension ticks: top edge for first room, right edge for last */}
         <DimensionTicks layout={layout} modesById={modesById} />
-
-        {/* Pawn marker */}
-        {pawn && (
-          <g
-            transform={`translate(${pawn.x - 10}, ${pawn.y - 8})`}
-            className="bp-pawn"
-            style={{ cursor: 'pointer' }}
-            onMouseEnter={(e) => setPawnTip({ x: e.clientX, y: e.clientY })}
-            onMouseMove={(e) => setPawnTip({ x: e.clientX, y: e.clientY })}
-            onMouseLeave={() => setPawnTip(null)}
-          >
-            <circle cx="10" cy="6" r="5" fill="#D4A843" stroke="#8B6A10" strokeWidth="1" />
-            <rect x="5" y="10" width="10" height="3" rx="1" fill="#D4A843" stroke="#8B6A10" strokeWidth="1" />
-            <rect x="3" y="13" width="14" height="2.5" rx="1" fill="#D4A843" stroke="#8B6A10" strokeWidth="1" />
-            {/* Breathing ring; CSS keyframes handle the animation so reduced-motion users get the still ring */}
-            <circle cx="10" cy="6" r="5" fill="none" stroke="#D4A843" strokeWidth="1.5" opacity="0.5" className="bp-pawn-ring" />
-          </g>
-        )}
       </svg>
 
-      {pawnTip && (
+      {hereTip && (
         <div
           className="bp-pawn-tip"
-          style={{ left: pawnTip.x + 10, top: pawnTip.y - 28, position: 'fixed' }}
+          style={{ left: hereTip.x + 10, top: hereTip.y - 28, position: 'fixed' }}
         >
           You are here
         </div>
       )}
+
+      <RoomDetailsOverlay
+        room={selectedRoomId ? modesById.get(selectedRoomId) : null}
+        lastConv={selectedRoomId ? lastConvByRoomId.get(selectedRoomId) || null : null}
+        onClose={onOverlayClose}
+        onEnter={onOverlayEnter}
+        onCopy={onOverlayCopy}
+        onDelete={onOverlayDelete}
+      />
     </div>
+  )
+}
+
+// ─── Walking-human icon (PR-19g) ─────────────────────────────
+// Replaces the gold pawn marker. Renders inside the active room below
+// the title; faded grey by default, gold-deep on hover. Triggers the
+// "You are here" tooltip via the parent's onHereTipShow callback.
+function WalkingHuman({ x, y, color = IN_ROOM_ICON_COLOR, onShow, onHide }) {
+  const scale = 0.7
+  // 24×24 lucide-style PersonStanding silhouette: head, torso, legs.
+  return (
+    <g
+      transform={`translate(${x - 8.4} ${y - 8.4}) scale(${scale})`}
+      style={{ cursor: 'help' }}
+      onMouseEnter={(e) => onShow?.({ x: e.clientX, y: e.clientY })}
+      onMouseMove={(e) => onShow?.({ x: e.clientX, y: e.clientY })}
+      onMouseLeave={() => onHide?.()}
+    >
+      {/* Head */}
+      <circle cx="12" cy="4" r="2.2" fill="none" stroke={color} strokeWidth="1.4" />
+      {/* Body + arms */}
+      <path
+        d="M9 12 12 7l3 5"
+        fill="none"
+        stroke={color}
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Stepping leg + standing leg */}
+      <path
+        d="M12 12l-2.5 8M12 12l3 4 0 4"
+        fill="none"
+        stroke={color}
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
   )
 }
 
 // ─── Subcomponents ───────────────────────────────────────────
 
-function Room({ placed, mode, lastConv, isActive, isHighlitFromChat, isHovered, onEnter, onLeave, onClick }) {
+// PR-19g: simplified room card. Centered title (THE / NAME) + optional
+// walking-human icon below for the active room. No layout/scheme/last-
+// spoken/feature pills — those moved into the details overlay.
+function Room({
+  placed,
+  mode,
+  isActive,
+  isHighlitFromChat,
+  isHovered,
+  isSelected,
+  isDimmed,
+  onEnter,
+  onLeave,
+  onClick,
+  onHereTipShow,
+  onHereTipHide,
+}) {
   const { box, layoutRef, id } = placed
   const { path, interior } = buildRoomPath({ box, layoutRef, roomId: id })
   const cx = interior.x + interior.width / 2
-  const features = featuresFor(mode)
+  const cy = interior.y + interior.height / 2
   const hints = interiorHints({ box, layoutRef, roomId: id })
 
   let fill = ROOM_FILL_DEFAULT
   if (isActive) fill = ROOM_FILL_ACTIVE
   if (isHovered) fill = ROOM_FILL_HOVER
   if (isHighlitFromChat) fill = ROOM_FILL_HIGHLIT
+  if (isSelected) fill = ROOM_FILL_SELECTED
 
-  const stroke = isActive || isHovered || isHighlitFromChat ? ROOM_BORDER_ACTIVE : ROOM_BORDER_DEFAULT
-  const strokeWidth = isActive ? 1.5 : 0.5
+  const stroke = (isActive || isHovered || isHighlitFromChat || isSelected)
+    ? ROOM_BORDER_ACTIVE
+    : ROOM_BORDER_DEFAULT
+  const strokeWidth = isActive || isSelected ? 1.5 : 0.5
 
   const name = (mode?.meta?.name || mode?.id || 'Room').toUpperCase()
-  const layoutLabel = LAYOUT_DISPLAY[refName(layoutRef)] || refName(layoutRef) || 'Layout'
-  const schemeLabel = SCHEME_DISPLAY[refName(mode?.scheme?.ref)] || ''
-  const lastModel = modelLabel(lastConv?.model)
+
+  // Title placement: centered. THE prefix sits 10px above the name so
+  // the two-line block reads as one anchored unit.
+  const nameY = cy + 4
+  const theY = nameY - 16
+  const iconY = nameY + 18
 
   return (
     <g
+      className={isSelected ? 'bp-room-selected' : undefined}
       style={{ cursor: 'pointer' }}
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
@@ -406,10 +411,8 @@ function Room({ placed, mode, lastConv, isActive, isHighlitFromChat, isHovered, 
       {/* Fill */}
       <path d={path} fill={fill} className="bp-room-fill" />
 
-      {/* Interior wall hints — dashed lines/rects suggesting the layout's
-          slot structure (rails, canvas, page bands, mobile column).
-          PR-16a per spec lines 1043-1108. Drawn before the border so the
-          border edge stays crisp on top of any overlapping hint. */}
+      {/* Interior wall hints — kept from PR-16a; faint dashed lines
+          suggest the layout's slot structure without drawing components. */}
       {hints.map((h, i) => h.type === 'line' ? (
         <line
           key={`h${i}`}
@@ -429,186 +432,60 @@ function Room({ placed, mode, lastConv, isActive, isHighlitFromChat, isHovered, 
         />
       ))}
 
-      {/* Border (drawn over the hints so it stays clean) */}
+      {/* Border (drawn over hints so it stays crisp) */}
       <path d={path} fill="none" stroke={stroke} strokeWidth={strokeWidth} />
 
-      {/* PR-19a: +1px global text bump for legibility, plus conditional
-          stacking of the layoutLabel · schemeLabel line and the
-          "Last spoken to" italic line so they wrap to two lines instead
-          of overflowing the room border on long combinations. The text
-          y values shift downward to accommodate the larger font sizes
-          and any extra wrapped row. */}
-      {(() => {
-        const safeWidth = interior.width - 8
-        const joined = `${layoutLabel}${schemeLabel ? ` · ${schemeLabel}` : ''}`
-        const stackLayoutScheme = Boolean(schemeLabel) && estimateTextWidth(joined, 9) > safeWidth
-        const lastModelTail = lastModel || ''
-        const lastModelFull = lastModel ? `Last spoken to ${lastModel}` : ''
-        const stackLastModel = Boolean(lastModel) && estimateTextWidth(lastModelFull, 9, true) > safeWidth
+      {/* Centered title block */}
+      <text x={cx} y={theY} textAnchor="middle" fontSize="10" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+        THE
+      </text>
+      <text x={cx} y={nameY} textAnchor="middle" fontSize="13" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
+        {name}
+      </text>
 
-        // Vertical layout — accumulate baselines so wrapped lines push
-        // subsequent rows down instead of overlapping.
-        let cy = interior.y + 24
-        const theY = cy; cy += 20
-        const nameY = cy; cy += 18
-        const layoutY = cy; cy += stackLayoutScheme ? 12 : 0
-        const schemeY = stackLayoutScheme ? cy : null
-        cy += 16
-        const modelTopY = cy
-        const modelBotY = stackLastModel ? cy + 12 : null
-
-        return (
-          <>
-            <text x={cx} y={theY} textAnchor="middle" fontSize="10" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
-              THE
-            </text>
-            <text x={cx} y={nameY} textAnchor="middle" fontSize="13" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
-              {name}
-            </text>
-            <text x={cx} y={layoutY} textAnchor="middle" fontSize="9" fill="#9A9490">
-              {stackLayoutScheme ? layoutLabel : joined}
-            </text>
-            {stackLayoutScheme && (
-              <text x={cx} y={schemeY} textAnchor="middle" fontSize="9" fill="#9A9490">
-                {schemeLabel}
-              </text>
-            )}
-            {lastModel && !stackLastModel && (
-              <text x={cx} y={modelTopY} textAnchor="middle" fontSize="9" fill="#9A9490" fontStyle="italic">
-                {lastModelFull}
-              </text>
-            )}
-            {lastModel && stackLastModel && (
-              <>
-                <text x={cx} y={modelTopY} textAnchor="middle" fontSize="9" fill="#9A9490" fontStyle="italic">
-                  Last spoken to
-                </text>
-                <text x={cx} y={modelBotY} textAnchor="middle" fontSize="9" fill="#9A9490" fontStyle="italic">
-                  {lastModelTail}
-                </text>
-              </>
-            )}
-          </>
-        )
-      })()}
-
-      {/* Feature pills — render on every room, with per-spec gold/gray
-          palette swap controlled by isActive (PR-16a; was active-only). */}
-      {features.length > 0 && (
-        <FeaturePills features={features} interior={interior} isActive={isActive} />
+      {/* Active room: walking-human icon below the title (replaces the
+          floating gold pawn from PR-14). */}
+      {isActive && (
+        <WalkingHuman
+          x={cx}
+          y={iconY}
+          color={isHovered ? '#8B6A10' : IN_ROOM_ICON_COLOR}
+          onShow={onHereTipShow}
+          onHide={onHereTipHide}
+        />
       )}
+
+      {/* Hatch overlay for non-selected rooms when a selection is
+          active. Same path, hatched fill, faded in via CSS. */}
+      <path
+        d={path}
+        fill="url(#bp-hatch-light)"
+        className={`bp-room-hatch-overlay${isDimmed ? ' show' : ''}`}
+      />
     </g>
   )
 }
 
-// PR-16a: pills render on every room. Active room gets the gold palette
-// (current PR-14 treatment); other rooms get a gray palette (per spec
-// lines 1087-1092 — `fill="#F1F1EF" stroke="#C8C2B8"` text fill `#787774`,
-// slightly thinner pills). Same pill geometry; only the colors differ.
-//
-// PR-19a: bumped pill geometry up a notch for legibility
-// (active 14→16 / 7→8.5; inactive 12→14 / 6.5→7.5). Pill widths in
-// FeaturePills derive from font size, so they auto-grow.
-const PILL_PALETTE = {
-  active: {
-    fill: 'rgba(196,169,77,0.15)',
-    stroke: 'rgba(196,169,77,0.4)',
-    text: '#8B6A10',
-    height: 16,
-    fontSize: 8.5,
-  },
-  inactive: {
-    fill: '#F1F1EF',
-    stroke: '#C8C2B8',
-    text: '#787774',
-    height: 14,
-    fontSize: 7.5,
-  },
-}
-
-function FeaturePills({ features, interior, isActive }) {
-  const palette = isActive ? PILL_PALETTE.active : PILL_PALETTE.inactive
-  const pillH = palette.height
-  const pillGap = 6
-  const padX = 6
-  // PR-19a: pill widths and text baseline derive from the palette's
-  // fontSize so the bumped sizes (active 8.5 / inactive 7.5) get
-  // proportional padding instead of clamping at the old 5.5x heuristic.
-  // ~0.7 of fontSize is a reasonable per-character upper bound for the
-  // weights/letter-spacing we use on these short uppercase labels.
-  const charW = palette.fontSize * 0.7
-  const widths = features.map(f => Math.max(40, f.length * charW + padX * 2))
-  const total = widths.reduce((s, w) => s + w, 0) + (features.length - 1) * pillGap
-  let cursorX = interior.x + (interior.width - total) / 2
-  const y = interior.y + interior.height - (pillH + 12)
-  return (
-    <>
-      {features.map((label, i) => {
-        const w = widths[i]
-        const node = (
-          <g key={label}>
-            <rect
-              x={cursorX} y={y}
-              width={w} height={pillH}
-              rx={pillH / 2}
-              fill={palette.fill}
-              stroke={palette.stroke}
-              strokeWidth="0.5"
-            />
-            <text
-              x={cursorX + w / 2}
-              y={y + pillH / 2 + palette.fontSize * 0.36}
-              textAnchor="middle"
-              fontSize={palette.fontSize}
-              fill={palette.text}
-              fontWeight="500"
-            >
-              {label}
-            </text>
-          </g>
-        )
-        cursorX += w + pillGap
-        return node
-      })}
-    </>
-  )
-}
-
-// PR-19f: system room — The Study (Compass) or The Lab (Wrench).
-// Straight-edge signature shape (Study = bottom-left desk wedge;
-// Lab = top-right workbench cubby), faded small icon in the top-left,
-// label sizing that matches user rooms (THE / STUDY stack at the same
-// fontSize as THE / ALBATROSS), and feature pills along the bottom
-// interior for The Study (the seeded mode has four real components).
-function SystemRoom({ placed, isStudy, studyMode, isHovered, onEnter, onLeave, onClick }) {
+// PR-19g: simplified system room — Study (compass) or Lab (wrench).
+// Title centered, icon below. PR-19f's feature pills and corner-icon
+// placement are dropped to match the strict title-only treatment for
+// every room on the blueprint. Click routes directly (Study → '/',
+// Lab → '/edit') — no details overlay for system rooms.
+function SystemRoom({ placed, isStudy, isHovered, isDimmed, onEnter, onLeave, onClick }) {
   const { box } = placed
   const { path, interior } = isStudy ? studyShape(box) : labShape(box)
   const cx = interior.x + interior.width / 2
+  const cy = interior.y + interior.height / 2
   const name = isStudy ? 'STUDY' : 'LAB'
-  const subtitle = isStudy ? 'Navigate' : 'Build a room'
 
-  // Slight gold-tint fill on hover; thin grey border at rest. Mirrors
-  // the user-room palette so the cards read as the same species.
   const fill = isHovered ? 'rgba(196,169,77,0.10)' : 'rgba(196,169,77,0.035)'
   const stroke = isHovered ? '#B8A070' : '#C8C2B8'
   const labelColor = isHovered ? '#8B6A10' : '#5A5550'
+  const iconColor = isHovered ? '#8B6A10' : IN_ROOM_ICON_COLOR
 
-  // Faded top-left icon — a status marker, not the visual centerpiece.
-  // Icon viewBox is 24×24; 0.85× scale → ~20px effective. Translated to
-  // the box's top-left corner with a small 10px inset.
-  const iconScale = 0.85
-  const iconColor = isHovered ? '#8B6A10' : '#B8B2A8'
-
-  // Label baselines mirror Room: THE prefix at 10, name at 13, subtitle
-  // below. Offset down from the icon so the two don't collide.
-  const theY = box.y + 44
-  const nameY = theY + 18
-  const subY = nameY + 14
-
-  // Pills — only The Study has components. Up to 4 (the seeded set).
-  const features = isStudy && studyMode
-    ? featuresFor(studyMode, SYSTEM_FEATURE_LABELS, 4)
-    : []
+  const nameY = cy + 4
+  const theY = nameY - 16
+  const iconY = nameY + 22
 
   return (
     <g
@@ -620,10 +497,20 @@ function SystemRoom({ placed, isStudy, studyMode, isHovered, onEnter, onLeave, o
       <path d={path} fill={fill} className="bp-room-fill" />
       <path d={path} fill="none" stroke={stroke} strokeWidth="0.8" />
 
+      <text x={cx} y={theY} textAnchor="middle" fontSize="10" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+        THE
+      </text>
+      <text x={cx} y={nameY} textAnchor="middle" fontSize="13" fill={labelColor} letterSpacing="0.06em" fontWeight="600">
+        {name}
+      </text>
+
+      {/* Icon below title — compass (Study) or wrench (Lab). Lucide
+          24×24 path scaled to ~17px and translated so its center sits
+          on (cx, iconY). */}
       <g
-        transform={`translate(${box.x + 10} ${box.y + 10}) scale(${iconScale})`}
+        transform={`translate(${cx - 8.5} ${iconY - 8.5}) scale(0.71)`}
         stroke={iconColor}
-        strokeWidth="1.2"
+        strokeWidth="1.4"
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -638,27 +525,20 @@ function SystemRoom({ placed, isStudy, studyMode, isHovered, onEnter, onLeave, o
         )}
       </g>
 
-      <text x={cx} y={theY} textAnchor="middle" fontSize="10" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
-        THE
-      </text>
-      <text x={cx} y={nameY} textAnchor="middle" fontSize="13" fill={labelColor} letterSpacing="0.06em" fontWeight="600">
-        {name}
-      </text>
-      <text x={cx} y={subY} textAnchor="middle" fontSize="9" fill="#9A9490" fontStyle="italic">
-        {subtitle}
-      </text>
-
-      {features.length > 0 && (
-        <FeaturePills features={features} interior={interior} isActive={false} />
-      )}
+      {/* Hatch overlay when a user room is selected so the system
+          cards also dim in sympathy with the rest of the floor. */}
+      <path
+        d={path}
+        fill="url(#bp-hatch-light)"
+        className={`bp-room-hatch-overlay${isDimmed ? ' show' : ''}`}
+      />
     </g>
   )
 }
 
 function DimensionTicks({ layout, modesById }) {
   // Tick the first user room across the top edge with its name; tick
-  // the tallest user room down the right edge. System rooms and the
-  // placeholder are skipped — the ticks describe the user's own work.
+  // the right edge of the floor.
   const realRooms = layout.placedRooms.filter(r => r.kind === 'room')
   if (realRooms.length === 0) return null
   const first = realRooms[0]
@@ -668,14 +548,12 @@ function DimensionTicks({ layout, modesById }) {
   const colHeight = layout.floorBox.height
   return (
     <g>
-      {/* Top tick */}
       <line x1={first.box.x} y1={tickTop} x2={first.box.x + first.box.width} y2={tickTop} stroke="#C8C2B8" strokeWidth="0.5" />
       <line x1={first.box.x} y1={tickTop - 3} x2={first.box.x} y2={tickTop + 3} stroke="#C8C2B8" strokeWidth="0.5" />
       <line x1={first.box.x + first.box.width} y1={tickTop - 3} x2={first.box.x + first.box.width} y2={tickTop + 3} stroke="#C8C2B8" strokeWidth="0.5" />
       <text x={first.box.x + first.box.width / 2} y={tickTop - 4} textAnchor="middle" fontSize="8" fill="#B8B2A8">
         {firstName} · {first.box.width}px
       </text>
-      {/* Right tick (down full floor height) */}
       <line x1={tickRight} y1={layout.floorBox.y} x2={tickRight} y2={layout.floorBox.y + colHeight} stroke="#C8C2B8" strokeWidth="0.5" />
       <line x1={tickRight - 3} y1={layout.floorBox.y} x2={tickRight + 3} y2={layout.floorBox.y} stroke="#C8C2B8" strokeWidth="0.5" />
       <line x1={tickRight - 3} y1={layout.floorBox.y + colHeight} x2={tickRight + 3} y2={layout.floorBox.y + colHeight} stroke="#C8C2B8" strokeWidth="0.5" />

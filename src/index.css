@@ -1709,6 +1709,124 @@
   gap: 8px;
 }
 .ov-actions .tb-btn { flex: 1; padding: 9px 14px; font-size: 13px; }
+
+/* PR-19g — Room-details overlay: full-width slide-up bottom sheet on
+   mobile (<768px), right-side panel on desktop. The `.ov-sheet-mobile`
+   modifier is opt-in so the library overlay keeps its right-panel
+   feel at all widths. */
+@media (max-width: 768px) {
+  .ov-backdrop.ov-sheet-mobile {
+    align-items: flex-end;
+    justify-content: stretch;
+  }
+  .ov-backdrop.ov-sheet-mobile .ov-panel {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: 85vh;
+    border-left: none;
+    border-top: 0.5px solid var(--p-border);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    animation: ov-slideup 0.22s ease;
+  }
+}
+@keyframes ov-slideup {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+.ov-sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--p-border);
+  margin: -8px auto 8px;
+  display: none;
+}
+@media (max-width: 768px) {
+  .ov-backdrop.ov-sheet-mobile .ov-sheet-handle { display: block; }
+}
+
+/* PR-19g — Room details overlay extras. Includes-as-bullets shared with
+   LibraryOverlay (item #9) renders here too. */
+.ov-includes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ov-includes li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 14px;
+  position: relative;
+  font-size: 12px;
+  color: var(--p-text-secondary);
+}
+.ov-includes li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 7px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--p-gold-light);
+}
+.ov-includes .ov-inc-name {
+  color: var(--p-text-primary);
+  font-weight: 500;
+}
+.ov-includes .ov-inc-desc {
+  color: var(--p-text-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.ov-room-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ov-room-pill {
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(196, 169, 77, 0.12);
+  border: 0.5px solid rgba(196, 169, 77, 0.35);
+  color: #8B6A10;
+  font-weight: 500;
+}
+
+/* PR-19g — Blueprint: hatched fade-in over non-selected rooms when a
+   room is selected, plus a subtle scale-up on the selected room. */
+.bp-room-hatch-overlay {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+.bp-room-hatch-overlay.show { opacity: 0.55; }
+.bp-room-selected {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: bp-room-pop 0.22s ease forwards;
+}
+@keyframes bp-room-pop {
+  from { transform: scale(1); }
+  to   { transform: scale(1.035); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bp-room-hatch-overlay { transition: none; }
+  .bp-room-selected { animation: none; transform: none; }
+}
+
+/* PR-19g — "You are here" tooltip when the walking-human icon inside
+   the active room is hovered. Reuses the bp-pawn-tip class so the
+   placement keeps working. */
 .tb-btn {
   padding: 6px 12px;
   font-size: 12px;
@@ -1985,6 +2103,18 @@
    gets the full width of the toolbar. */
 @media (max-width: 600px) {
   .chats-search { width: auto; flex: 1 1 0; min-width: 0; }
+}
+
+/* PR-19g — Mobile section header: title + meta stack vertically so
+   the surrounding row (grabber, chevron, header actions) center-
+   aligns against the now-taller two-line block. Desktop keeps the
+   side-by-side baseline-aligned arrangement. */
+@media (max-width: 600px) {
+  .section-title-btn {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
 }
 @media (max-width: 520px) {
   .view-toggle button span { display: none; }
