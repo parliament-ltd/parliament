@@ -162,6 +162,12 @@ function validateMode(item) {
   if (item.meta && typeof item.meta !== 'object')   return 'mode.meta must be an object'
   if (item.layout && typeof item.layout !== 'object') return 'mode.layout must be an object'
   if (item.scheme && typeof item.scheme !== 'object') return 'mode.scheme must be an object'
+  // PR-27: optional layoutConfig holds per-layout opt-in metadata
+  // (e.g. panelButtons). Absence = layout uses its defaults. We accept
+  // any object shape so future layout-config fields don't churn this.
+  if (item.layoutConfig && typeof item.layoutConfig !== 'object') {
+    return 'mode.layoutConfig must be an object'
+  }
   return null
 }
 

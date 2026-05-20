@@ -13,6 +13,25 @@ import { getLayoutSlots } from '../../lib/layoutMigration'
 import { findCatalogEntry, normalizeRef } from '../../lib/refs'
 import { schemeName } from '../../lib/schemes'
 
+// Visual kind per slot id. Drives subtle bg variance for the
+// .editor-area-card on each slot zone (PR-27, item 3). Unknown ids
+// fall through to 'main'.
+const AREA_KIND_BY_SLOT = {
+  'left-rail':        'rail',
+  'right-rail':       'rail',
+  'right-rail-extra': 'rail',
+  'chat-panel':       'rail',
+  'inspector':        'rail',
+  'margin':           'rail',
+  'outline':          'rail',
+  'msg-area':         'main',
+  'canvas':           'main',
+  'document':         'main',
+  'section-slot':     'main',
+  'input-dock':       'dock',
+  'sheet':            'sheet',
+}
+
 // Per-layout slot positioning. Each entry maps slotId → CSS grid
 // classes so the canvas approximates the live layout's spatial
 // proportions. Layouts not listed here render as a flat row.
@@ -219,6 +238,7 @@ function SlotDropTarget({
     data: { kind: 'slot', slot: slotId },
   })
   const isEmpty = components.length === 0
+  const areaKind = AREA_KIND_BY_SLOT[slotId] || 'main'
   return (
     <div
       ref={setNodeRef}
@@ -228,13 +248,11 @@ function SlotDropTarget({
           onSelect(slotId)
         }
       }}
-      className={`relative rounded-md transition-colors flex flex-col gap-1.5 cursor-pointer min-h-[60px] min-w-0 overflow-hidden ${
-        isOver
-          ? 'border border-[var(--p-gold-light)] bg-[rgba(196,169,77,0.08)]'
-          : isEmpty
-            ? 'border border-dashed border-[var(--p-text-light)] bg-transparent'
-            : 'border border-transparent bg-white'
-      } ${selected ? 'outline outline-[1.5px] outline-[var(--p-gold-light)] outline-offset-2' : ''}`}
+      className="editor-area-card relative flex flex-col gap-1.5 cursor-pointer min-h-[60px] min-w-0 overflow-hidden"
+      data-area-kind={areaKind}
+      data-area-empty={isEmpty ? 'true' : 'false'}
+      data-area-over={isOver ? 'true' : 'false'}
+      data-area-selected={selected ? 'true' : 'false'}
       style={{ padding: compact ? '6px' : '10px' }}
     >
       {isEmpty ? (
@@ -272,11 +290,8 @@ function ComponentPreview({ spec, entry, selected, onSelect }) {
         e.stopPropagation()
         onSelect()
       }}
-      className={`relative rounded-sm bg-white px-2.5 py-2 cursor-pointer transition-colors border ${
-        selected
-          ? 'border-[var(--p-gold-light)] outline outline-1 outline-[var(--p-gold-light)]'
-          : 'border-transparent hover:bg-[rgba(196,169,77,0.06)]'
-      }`}
+      className="editor-component-card relative"
+      data-selected={selected ? 'true' : 'false'}
     >
       <div className="text-[9.5px] uppercase tracking-wider font-medium text-[var(--p-gold-muted)] mb-1">
         {entry?.displayName || spec.ref}

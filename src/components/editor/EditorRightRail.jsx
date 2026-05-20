@@ -1,25 +1,40 @@
 // EditorRightRail — properties panel.
 //
-// Selection-driven:
-//   - room       → name, device class, scheme picker
-//   - slot       → label + a hint (slot-level config land in PR-9 if needed)
-//   - component  → render fields from the entry's configSchema
+// PR-27 restructures this from a single selection-driven view into three
+// always-visible collapsible sections: Layout / Room / Components.
+// Selecting a component on the canvas auto-collapses Layout + Room and
+// expands the matching ComponentRow inside Components, but Layout + Room
+// stay clickable so the user can navigate back without losing their
+// component selection. Before PR-27 the right panel REPLACED contents
+// based on selection, so picking a component hid the room-level fields
+// entirely — that's the friction this commit removes.
 //
 // Field types come from src/catalog/validate.js: boolean | number |
-// string | enum | object | array. PR-8 renders the first four as
-// editable controls; complex types (object, array) show a read-only
-// hint until later PRs need them.
-//
-// PR-19e adds a "Home" section to RoomFields for saved user rooms with
-// a "Make this room your home" toggle. Confirmation modal in both
-// directions; pointer lives in SettingsContext (`chosenHomeRoomId`).
+// string | enum | object | array. The first four render as editable
+// controls; complex types (object, array) show a read-only hint.
 
 import { useState } from 'react'
-import { Home } from 'lucide-react'
+import { ChevronDown, ChevronRight, Home } from 'lucide-react'
 import { getLayoutSlots } from '../../lib/layoutMigration'
 import { SCHEMES } from '../../lib/schemes'
 import { findCatalogEntry, normalizeRef } from '../../lib/refs'
 import { useSettings } from '../../stores/SettingsContext'
+
+// PR-27: per-layout list of slot ids the user can opt into a runtime
+// panel-toggle for. Both desktop layouts share the same left-rail key.
+// Three-panel's right-rail toggle covers right-rail + right-rail-extra;
+// canvas-centric's chat-panel toggle covers chat-panel + inspector
+// (they share an aside element in each layout's renderer).
+const PANEL_TOGGLE_SLOTS = {
+  'three-panel@1.0': [
+    { id: 'left-rail',  label: 'Left rail'  },
+    { id: 'right-rail', label: 'Right rail' },
+  ],
+  'canvas-centric@1.0': [
+    { id: 'left-rail',  label: 'Left rail'                },
+    { id: 'chat-panel', label: 'Right panel'              },
+  ],
+}
 
 export default function EditorRightRail({
   mode,
@@ -29,59 +44,260 @@ export default function EditorRightRail({
   onSetName,
   onSetDeviceClass,
   onApplyScheme,
+  onSetPanelButton,
   onRemoveComponent,
 }) {
-  const heading = headingFor(mode, selection, catalogEntries)
+  // Section open/closed state — local UI only, derived from selection
+  // but user toggles override.
+  const [layoutOpen,     setLayoutOpen]     = useState(selection.type === 'room')
+  const [roomOpen,       setRoomOpen]       = useState(selection.type === 'room')
+  const [componentsOpen, setComponentsOpen] = useState(selection.type === 'component')
+  const [expandedComponentId, setExpandedComponentId] = useState(
+    selection.type === 'component' ? selection.id : null
+  )
+
+  // On selection KEY change, reset section visibility to match the new
+  // focus. Done as a render-phase update (React batches these into the
+  // same render) rather than a useEffect — the React 18+ docs prefer
+  // this pattern when state is derived from a prop change. We track
+  // the previous key as STATE (not a ref) so the React lint rule is
+  // happy: refs-during-render is flagged, but compare-and-set on
+  // state during render is the documented pattern for this case.
+  // User toggles after the key settles still win, because we only
+  // react when the key actually changes.
+  const selKey = `${selection.type}:${selection.id || ''}`
+  const [prevSelKey, setPrevSelKey] = useState(selKey)
+  if (prevSelKey !== selKey) {
+    setPrevSelKey(selKey)
+    if (selection.type === 'component') {
+      setLayoutOpen(false)
+      setRoomOpen(false)
+      setComponentsOpen(true)
+      setExpandedComponentId(selection.id)
+    } else if (selection.type === 'room') {
+      setLayoutOpen(true)
+      setRoomOpen(true)
+      setComponentsOpen(false)
+    }
+    // selection.type === 'slot' deliberately leaves section state
+    // alone; the inline hint above the sections covers it.
+  }
 
   return (
     <aside className="bg-white border-l border-[var(--p-border)] flex flex-col overflow-hidden">
-      <div className="px-4 pt-3.5 pb-3 border-b border-[var(--p-border)]">
-        <div className="text-[10px] font-medium uppercase tracking-wider text-[var(--p-text-muted)] mb-1">
-          {heading.kindLabel}
-        </div>
-        <div className="text-sm font-medium text-[var(--p-text-primary)] truncate">
-          {heading.name}
-        </div>
-      </div>
-      <div className="flex-1 overflow-y-auto p-4">
-        {selection.type === 'room' && (
+      <div className="flex-1 overflow-y-auto">
+        {selection.type === 'slot' && (
+          <SlotHint slotId={selection.id} mode={mode} />
+        )}
+
+        <Section
+          title="Layout"
+          open={layoutOpen}
+          onToggle={() => setLayoutOpen((v) => !v)}
+        >
+          <LayoutSectionBody mode={mode} onSetPanelButton={onSetPanelButton} />
+        </Section>
+
+        <Section
+          title="Room"
+          open={roomOpen}
+          onToggle={() => setRoomOpen((v) => !v)}
+        >
           <RoomFields
             mode={mode}
             onSetName={onSetName}
             onSetDeviceClass={onSetDeviceClass}
             onApplyScheme={onApplyScheme}
           />
-        )}
-        {selection.type === 'slot' && <SlotFields slotId={selection.id} mode={mode} />}
-        {selection.type === 'component' && (
-          <ComponentFields
+        </Section>
+
+        <Section
+          title="Components"
+          open={componentsOpen}
+          onToggle={() => setComponentsOpen((v) => !v)}
+        >
+          <ComponentsSectionBody
             mode={mode}
-            componentId={selection.id}
             catalogEntries={catalogEntries}
+            expandedComponentId={expandedComponentId}
+            onToggleComponent={(id) =>
+              setExpandedComponentId((prev) => (prev === id ? null : id))
+            }
             onUpdateConfig={onUpdateConfig}
             onRemove={onRemoveComponent}
           />
-        )}
+        </Section>
       </div>
     </aside>
   )
 }
 
-function headingFor(mode, selection, catalogEntries) {
-  if (selection.type === 'room') {
-    return { kindLabel: 'Room', name: mode?.meta?.name || 'Untitled room' }
+// ─── Section primitive ───────────────────────────────────
+
+function Section({ title, open, onToggle, children }) {
+  return (
+    <div className="border-b border-[var(--p-border)] last:border-b-0">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[var(--p-bg-subtle)] transition-colors"
+        aria-expanded={open}
+      >
+        <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--p-text-secondary)]">
+          {title}
+        </span>
+        <ChevronDown
+          className={`w-3.5 h-3.5 text-[var(--p-text-muted)] transition-transform ${
+            open ? 'rotate-0' : '-rotate-90'
+          }`}
+        />
+      </button>
+      <div
+        className="overflow-hidden transition-all"
+        style={{
+          maxHeight: open ? '4000px' : '0px',
+          opacity: open ? 1 : 0,
+          transitionDuration: '220ms',
+        }}
+      >
+        <div className="px-4 pb-4">{children}</div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Layout section body ─────────────────────────────────
+
+function LayoutSectionBody({ mode, onSetPanelButton }) {
+  if (!mode) {
+    return (
+      <Hint>Drop a layout on the canvas to start configuring.</Hint>
+    )
   }
-  if (selection.type === 'slot') {
-    const allSlots = getLayoutSlots(mode?.layout?.ref)
-    const slot = allSlots.find((s) => s.id === selection.id)
-    return { kindLabel: 'Spot', name: slot?.label || selection.id }
+  const layoutRef = mode.layout?.ref
+  const layoutKey = normalizeRef(layoutRef)
+  const layoutName = layoutKey || '(no layout)'
+  const toggles = PANEL_TOGGLE_SLOTS[layoutKey] || []
+  const panelButtons = mode.layoutConfig?.panelButtons || {}
+
+  return (
+    <div>
+      <Field label="Active layout">
+        <div className="px-2.5 py-1.5 text-xs rounded-md border border-[var(--p-border)] bg-[var(--p-bg-subtle)] text-[var(--p-text-primary)]">
+          {layoutName}
+        </div>
+      </Field>
+      <Hint>Drop a layout from the left rail to swap.</Hint>
+
+      {toggles.length > 0 && (
+        <>
+          <SectionLabel>Panel toggles</SectionLabel>
+          {toggles.map((slot) => (
+            <div key={slot.id} className="mb-3 flex items-center justify-between gap-3">
+              <div className="text-xs text-[var(--p-text-primary)] flex-1">
+                Show open/close button for {slot.label}
+              </div>
+              <Toggle
+                on={!!panelButtons[slot.id]}
+                onChange={(v) => onSetPanelButton(slot.id, v)}
+              />
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  )
+}
+
+// ─── Components section body ─────────────────────────────
+
+function ComponentsSectionBody({
+  mode, catalogEntries, expandedComponentId, onToggleComponent,
+  onUpdateConfig, onRemove,
+}) {
+  const components = mode?.components || []
+  if (!mode) {
+    return <Hint>Drop a layout first, then add components from the left rail.</Hint>
   }
-  if (selection.type === 'component') {
-    const spec = (mode?.components || []).find((c) => c.id === selection.id)
-    const entry = findEntry(catalogEntries, spec?.ref)
-    return { kindLabel: 'Component', name: entry?.displayName || spec?.ref || 'Component' }
+  if (components.length === 0) {
+    return <Hint>No components yet. Drop one onto a slot in the canvas.</Hint>
   }
-  return { kindLabel: '', name: '' }
+  return (
+    <div className="flex flex-col gap-1.5">
+      {components.map((spec) => {
+        const entry = findEntry(catalogEntries, spec.ref)
+        return (
+          <ComponentRow
+            key={spec.id}
+            spec={spec}
+            entry={entry}
+            mode={mode}
+            expanded={spec.id === expandedComponentId}
+            onToggle={() => onToggleComponent(spec.id)}
+            onUpdateConfig={onUpdateConfig}
+            onRemove={onRemove}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
+function ComponentRow({ spec, entry, mode, expanded, onToggle, onUpdateConfig, onRemove }) {
+  const displayName = entry?.displayName || spec.ref
+  return (
+    <div className="border border-[var(--p-border)] rounded-md overflow-hidden bg-[var(--p-bg-surface)]">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full flex items-center gap-2 px-2.5 py-2 text-left hover:bg-[var(--p-bg-subtle)] transition-colors"
+        aria-expanded={expanded}
+      >
+        <ChevronRight
+          className={`w-3 h-3 text-[var(--p-text-muted)] transition-transform ${
+            expanded ? 'rotate-90' : ''
+          }`}
+        />
+        <span className="text-xs font-medium text-[var(--p-text-primary)] truncate flex-1">
+          {displayName}
+        </span>
+        <span className="text-[10px] text-[var(--p-text-muted)] truncate">
+          {spec.slot}
+        </span>
+      </button>
+      {expanded && (
+        <div className="px-3 pb-3 pt-2 border-t border-[var(--p-border)]">
+          <ComponentFields
+            mode={mode}
+            spec={spec}
+            entry={entry}
+            onUpdateConfig={onUpdateConfig}
+            onRemove={onRemove}
+          />
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Slot hint (inline, above sections) ──────────────────
+
+function SlotHint({ slotId, mode }) {
+  const slot = (getLayoutSlots(mode?.layout?.ref)).find((s) => s.id === slotId)
+  if (!slot) return null
+  return (
+    <div className="px-4 py-2.5 border-b border-[var(--p-border)] bg-[var(--p-bg-subtle)]">
+      <div className="text-[10px] font-medium uppercase tracking-wider text-[var(--p-text-muted)] mb-0.5">
+        Spot selected
+      </div>
+      <div className="text-xs text-[var(--p-text-primary)]">
+        {slot.label}{' '}
+        <span className="text-[var(--p-text-muted)]">
+          ({slot.capacity === 'stack' ? 'multiple components, stacked' : 'one component'})
+        </span>
+      </div>
+    </div>
+  )
 }
 
 function findEntry(entries, ref) {
@@ -275,31 +491,13 @@ function ChosenHomeConfirm({ isChosen, roomName, onCancel, onConfirm }) {
   )
 }
 
-// ─── Slot fields ─────────────────────────────────────────
-
-function SlotFields({ slotId, mode }) {
-  const slot = (getLayoutSlots(mode?.layout?.ref)).find((s) => s.id === slotId)
-  return (
-    <div>
-      <Hint>Drop a component from the library to fill this spot.</Hint>
-      {slot && (
-        <div className="mt-3 text-[11px] text-[var(--p-text-secondary)]">
-          <span className="font-medium text-[var(--p-text-primary)]">Capacity:</span>{' '}
-          {slot.capacity === 'stack' ? 'multiple components, stacked' : 'one component'}
-        </div>
-      )}
-    </div>
-  )
-}
-
 // ─── Component fields (configSchema-driven) ─────────────
 
-function ComponentFields({ mode, componentId, catalogEntries, onUpdateConfig, onRemove }) {
-  const spec = (mode?.components || []).find((c) => c.id === componentId)
-  const entry = findEntry(catalogEntries, spec?.ref)
+function ComponentFields({ mode, spec, entry, onUpdateConfig, onRemove }) {
   if (!entry) {
-    return <Hint>This component isn't registered in the catalog. It will not render at runtime.</Hint>
+    return <Hint>This component isn&apos;t registered in the catalog. It will not render at runtime.</Hint>
   }
+  const componentId = spec.id
   const schema = entry.configSchema || {}
   const config = spec?.config || {}
   const fields = Object.entries(schema)
@@ -364,7 +562,7 @@ function ComponentFields({ mode, componentId, catalogEntries, onUpdateConfig, on
         </>
       )}
 
-      <div className="border-t border-[var(--p-border)] pt-3.5 mt-5">
+      <div className="border-t border-[var(--p-border)] pt-3 mt-4">
         <button
           onClick={() => onRemove(componentId)}
           className="w-full px-2.5 py-1.5 text-xs rounded-md border border-[var(--p-border)] bg-transparent text-[var(--p-text-secondary)] transition-colors hover:border-[#E03E3E] hover:text-[#E03E3E] hover:bg-[rgba(224,62,62,0.04)]"
@@ -442,7 +640,7 @@ function ComponentField({ fieldKey, field, value, onChange }) {
   // object / array — not editable inline yet
   return (
     <Field label={label}>
-      <Hint>This field has a complex value and isn't editable inline yet.</Hint>
+      <Hint>This field has a complex value and isn&apos;t editable inline yet.</Hint>
     </Field>
   )
 }

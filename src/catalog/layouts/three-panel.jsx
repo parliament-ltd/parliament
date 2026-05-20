@@ -13,6 +13,7 @@
 // happy.
 
 import { useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useIsNarrow } from '../../lib/useViewportWidth'
 import NarrowDrawer from '../../components/layouts/NarrowDrawer'
 import NarrowChrome from '../../components/layouts/NarrowChrome'
@@ -25,20 +26,27 @@ function renderSlot(nodes) {
   return nodes
 }
 
+// PR-27: per-slot panel-toggle opt-in. The Layout section in the editor
+// flips mode.layoutConfig.panelButtons[slotId]; the runtime renders a
+// chevron handle on the matching aside and a click animates a collapse.
+function panelEnabled(mode, slotId) {
+  return mode?.layoutConfig?.panelButtons?.[slotId] === true
+}
+
 export default {
   name: 'three-panel',
   version: '1.0',
   displayName: 'Three-panel',
   scope: 'room',
   slots: [
-    { id: 'left-rail',        capacity: 'single' },
+    { id: 'left-rail',        capacity: 'stack'  },
     { id: 'msg-area',         capacity: 'single' },
     { id: 'input-dock',       capacity: 'single' },
     { id: 'right-rail',       capacity: 'stack'  },
     { id: 'right-rail-extra', capacity: 'stack'  },
   ],
 
-  render: function ThreePanelRender({ slotContents = {} }) {
+  render: function ThreePanelRender({ slotContents = {}, mode }) {
     const left       = slotContents['left-rail']
     const msgs       = slotContents['msg-area']
     const input      = slotContents['input-dock']
@@ -49,6 +57,13 @@ export default {
     const isNarrow   = useIsNarrow(768)
     const [drawerOpen, setDrawerOpen] = useState(false)
     const [panelOpen, setPanelOpen]   = useState(false)
+    // PR-27: desktop panel-collapse local state. Defaults to expanded.
+    // The chevron handle is only rendered when the user has opted into
+    // it for that slot via the editor's Layout section.
+    const [leftCollapsed,  setLeftCollapsed]  = useState(false)
+    const [rightCollapsed, setRightCollapsed] = useState(false)
+    const leftToggleEnabled  = panelEnabled(mode, 'left-rail')
+    const rightToggleEnabled = panelEnabled(mode, 'right-rail')
 
     if (isNarrow) {
       // h-[100dvh] (dynamic viewport height) anchors the narrow tree to
@@ -102,8 +117,26 @@ export default {
       <div className="flex h-full min-h-[480px] bg-[var(--p-bg-base)]">
         {/* Left rail */}
         {hasLeft && (
-          <aside className={`w-56 shrink-0 border-r ${RAIL_BORDER} ${RAIL_BASE}`}>
-            {renderSlot(left)}
+          <aside
+            className={`layout-panel w-56 shrink-0 border-r ${RAIL_BORDER} ${RAIL_BASE} ${
+              leftToggleEnabled && leftCollapsed ? 'layout-panel-collapsed' : ''
+            }`}
+          >
+            <div className="layout-panel-content flex flex-col gap-3">
+              {renderSlot(left)}
+            </div>
+            {leftToggleEnabled && (
+              <button
+                type="button"
+                className="layout-panel-toggle left"
+                onClick={() => setLeftCollapsed((v) => !v)}
+                aria-label={leftCollapsed ? 'Expand left rail' : 'Collapse left rail'}
+              >
+                {leftCollapsed
+                  ? <ChevronRight className="w-3 h-3" />
+                  : <ChevronLeft className="w-3 h-3" />}
+              </button>
+            )}
           </aside>
         )}
 
@@ -127,9 +160,27 @@ export default {
 
         {/* Right rail (stack) */}
         {hasRight && (
-          <aside className={`w-72 shrink-0 border-l ${RAIL_BORDER} ${RAIL_BASE}`}>
-            {renderSlot(right)}
-            {renderSlot(rightExtra)}
+          <aside
+            className={`layout-panel w-72 shrink-0 border-l ${RAIL_BORDER} ${RAIL_BASE} ${
+              rightToggleEnabled && rightCollapsed ? 'layout-panel-collapsed' : ''
+            }`}
+          >
+            <div className="layout-panel-content flex flex-col gap-3">
+              {renderSlot(right)}
+              {renderSlot(rightExtra)}
+            </div>
+            {rightToggleEnabled && (
+              <button
+                type="button"
+                className="layout-panel-toggle right"
+                onClick={() => setRightCollapsed((v) => !v)}
+                aria-label={rightCollapsed ? 'Expand right rail' : 'Collapse right rail'}
+              >
+                {rightCollapsed
+                  ? <ChevronLeft className="w-3 h-3" />
+                  : <ChevronRight className="w-3 h-3" />}
+              </button>
+            )}
           </aside>
         )}
       </div>

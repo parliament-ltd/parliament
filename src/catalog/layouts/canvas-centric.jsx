@@ -21,6 +21,7 @@
 // component-shaped declaration (matches single-column-with-sheet).
 
 import { useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useIsNarrow } from '../../lib/useViewportWidth'
 import NarrowDrawer from '../../components/layouts/NarrowDrawer'
 import NarrowChrome from '../../components/layouts/NarrowChrome'
@@ -34,6 +35,13 @@ function renderSlot(nodes) {
   return nodes
 }
 
+// PR-27: per-slot panel-toggle opt-in. The canvas-centric right aside
+// holds both chat-panel and inspector — we key the toggle off 'chat-panel'
+// since that's the primary slot the user thinks of when opting in.
+function panelEnabled(mode, slotId) {
+  return mode?.layoutConfig?.panelButtons?.[slotId] === true
+}
+
 export default {
   name: 'canvas-centric',
   version: '1.0',
@@ -45,14 +53,14 @@ export default {
   description: 'A center canvas (chart, table, dashboard) flanked by a sidebar and a chat panel. For working with data and files.',
   scope: 'room',
   slots: [
-    { id: 'left-rail',  capacity: 'single' },
+    { id: 'left-rail',  capacity: 'stack'  },
     { id: 'canvas',     capacity: 'stack'  },
     { id: 'chat-panel', capacity: 'stack'  },
     { id: 'inspector',  capacity: 'stack'  },
     { id: 'input-dock', capacity: 'single' },
   ],
 
-  render: function CanvasCentricRender({ slotContents = {} }) {
+  render: function CanvasCentricRender({ slotContents = {}, mode }) {
     const left      = slotContents['left-rail']
     const canvas    = slotContents['canvas']
     const input     = slotContents['input-dock']
@@ -65,6 +73,13 @@ export default {
     const isNarrow     = useIsNarrow(768)
     const [drawerOpen, setDrawerOpen] = useState(false)
     const [panelOpen, setPanelOpen]   = useState(false)
+    // PR-27: desktop panel-collapse local state. Defaults to expanded.
+    // Right toggle keys off 'chat-panel' but collapses the whole aside
+    // (chat + inspector) since they live in one aside element.
+    const [leftCollapsed,  setLeftCollapsed]  = useState(false)
+    const [rightCollapsed, setRightCollapsed] = useState(false)
+    const leftToggleEnabled  = panelEnabled(mode, 'left-rail')
+    const rightToggleEnabled = panelEnabled(mode, 'chat-panel')
 
     if (isNarrow) {
       // h-[100dvh] anchors the narrow tree to the viewport so stacked
@@ -121,8 +136,26 @@ export default {
       <div className="flex h-full min-h-[480px] bg-[var(--p-bg-base)]">
         {/* Left rail */}
         {hasLeft && (
-          <aside className={`w-60 shrink-0 border-r ${RAIL_BORDER} ${RAIL_BASE}`}>
-            {renderSlot(left)}
+          <aside
+            className={`layout-panel w-60 shrink-0 border-r ${RAIL_BORDER} ${RAIL_BASE} ${
+              leftToggleEnabled && leftCollapsed ? 'layout-panel-collapsed' : ''
+            }`}
+          >
+            <div className="layout-panel-content flex flex-col gap-3">
+              {renderSlot(left)}
+            </div>
+            {leftToggleEnabled && (
+              <button
+                type="button"
+                className="layout-panel-toggle left"
+                onClick={() => setLeftCollapsed((v) => !v)}
+                aria-label={leftCollapsed ? 'Expand left rail' : 'Collapse left rail'}
+              >
+                {leftCollapsed
+                  ? <ChevronRight className="w-3 h-3" />
+                  : <ChevronLeft className="w-3 h-3" />}
+              </button>
+            )}
           </aside>
         )}
 
@@ -146,16 +179,34 @@ export default {
 
         {/* Right: chat panel above, inspector below */}
         {hasRight && (
-          <aside className={`w-80 shrink-0 border-l ${RAIL_BORDER} flex flex-col bg-white`}>
-            {hasChat && (
-              <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-3">
-                {renderSlot(chat)}
-              </div>
-            )}
-            {hasInspector && (
-              <div className="border-t border-[var(--p-border)] p-3 max-h-72 overflow-y-auto space-y-3">
-                {renderSlot(inspector)}
-              </div>
+          <aside
+            className={`layout-panel w-80 shrink-0 border-l ${RAIL_BORDER} flex flex-col bg-white ${
+              rightToggleEnabled && rightCollapsed ? 'layout-panel-collapsed' : ''
+            }`}
+          >
+            <div className="layout-panel-content flex-1 flex flex-col min-h-0">
+              {hasChat && (
+                <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-3">
+                  {renderSlot(chat)}
+                </div>
+              )}
+              {hasInspector && (
+                <div className="border-t border-[var(--p-border)] p-3 max-h-72 overflow-y-auto space-y-3">
+                  {renderSlot(inspector)}
+                </div>
+              )}
+            </div>
+            {rightToggleEnabled && (
+              <button
+                type="button"
+                className="layout-panel-toggle right"
+                onClick={() => setRightCollapsed((v) => !v)}
+                aria-label={rightCollapsed ? 'Expand right rail' : 'Collapse right rail'}
+              >
+                {rightCollapsed
+                  ? <ChevronLeft className="w-3 h-3" />
+                  : <ChevronRight className="w-3 h-3" />}
+              </button>
             )}
           </aside>
         )}
