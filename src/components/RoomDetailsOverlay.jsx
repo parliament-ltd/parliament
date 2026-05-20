@@ -19,34 +19,8 @@
 import { useEffect, useMemo } from 'react'
 import { X, Copy, Trash2, ArrowRight } from 'lucide-react'
 import LayoutWireframe from './build/wizard/LayoutWireframe'
-import { getEntry as getComponentEntry } from '../catalog'
 import { modelLabel } from '../lib/modelLabels'
-
-const LAYOUT_LABELS = {
-  'three-panel':              'Three-panel',
-  'canvas-centric':           'Canvas-centric',
-  'document-centric':         'Document-centric',
-  'single-column-with-sheet': 'Single column',
-}
-
-const SCHEME_LABELS = {
-  parliament:    'Parliament Default',
-  'cool-bright': 'Cool Bright',
-  'deep-calm':   'Deep Calm',
-  'soft-violet': 'Soft Violet',
-  'fresh-teal':  'Fresh Teal',
-  'amber-glow':  'Amber Glow',
-}
-
-function normalizeRef(ref) {
-  if (typeof ref !== 'string' || !ref.includes('@')) return ref
-  const [name, versionSpec = ''] = ref.split('@', 2)
-  const trimmed = versionSpec.replace(/^[\^~]/, '').replace(/^(\d+\.\d+)\.0$/, '$1')
-  return `${name}@${trimmed}`
-}
-function refName(ref) {
-  return String(ref || '').split('@')[0]
-}
+import { buildIncludes, buildPillLabels, refName, LAYOUT_LABELS } from '../lib/roomIncludes'
 
 function fmtDate(iso) {
   if (!iso) return null
@@ -71,66 +45,11 @@ export default function RoomDetailsOverlay({
     return () => window.removeEventListener('keydown', onKey)
   }, [room, onClose])
 
-  // Build the Includes list — each component gets its catalog displayName
-  // and short description so the user sees what actually lives in the
-  // room, not just refs.
-  const includes = useMemo(() => {
-    if (!room) return []
-    const out = []
-    const layoutRef = room.layout?.ref
-    if (layoutRef) {
-      out.push({
-        kind: 'layout',
-        name: LAYOUT_LABELS[refName(layoutRef)] || refName(layoutRef) || 'Layout',
-        desc: 'Spatial arrangement — where rails, canvas, and chat sit.',
-      })
-    }
-    const schemeName = SCHEME_LABELS[refName(room.scheme?.ref)]
-    if (schemeName) {
-      out.push({
-        kind: 'scheme',
-        name: schemeName,
-        desc: 'Color scheme and typography.',
-      })
-    }
-    const seen = new Set()
-    for (const c of room.components || []) {
-      const norm = normalizeRef(c.ref)
-      if (seen.has(norm)) continue
-      seen.add(norm)
-      const entry = getComponentEntry(norm)
-      if (!entry) continue
-      out.push({
-        kind: 'component',
-        name: entry.displayName || refName(c.ref),
-        desc: entry.description || '',
-      })
-    }
-    return out
-  }, [room])
-
-  // Quick pills for the same component refs — short uppercase labels
-  // mirror the blueprint cards' look, so the overlay reads as a richer
-  // view of the same surface.
-  const pillLabels = useMemo(() => {
-    if (!room) return []
-    const PILL_LABELS = {
-      toc:         'TOC',
-      branches:    'BRANCHES',
-      highlights:  'HIGHLIGHTS',
-      'file-shelf':'FILE SHELF',
-      context:     'CONTEXT',
-      notes:       'NOTES',
-      review:      'REVIEW',
-    }
-    const seen = new Set()
-    const out = []
-    for (const c of room.components || []) {
-      const l = PILL_LABELS[refName(c.ref)]
-      if (l && !seen.has(l)) { seen.add(l); out.push(l) }
-    }
-    return out
-  }, [room])
+  // PR-19j: derivation extracted to src/lib/roomIncludes.js so the
+  // desktop expand-in-place rendering in blueprint-render.jsx shares
+  // the same logic.
+  const includes   = useMemo(() => buildIncludes(room),   [room])
+  const pillLabels = useMemo(() => buildPillLabels(room), [room])
 
   if (!room) return null
 

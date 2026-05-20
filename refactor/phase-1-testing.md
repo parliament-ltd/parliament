@@ -4128,6 +4128,77 @@ larger titles + meta. Site-wide font bump is deferred to PR-19b.
 
 ---
 
+## PR-19h — Library room preview image fix
+
+👀 User-visible
+
+**Surface:** `/` library section → Rooms tab + library overlay.
+
+**Steps:**
+
+1. Open `/`, scroll to Library, click Rooms tab.
+2. Confirm each room card shows its own layout silhouette (Writing Studio = three-panel, Data Workspace = canvas-centric, Drafting Desk = document-centric, Pocket Chat = single-column, Quiet Room = three-panel, Kingfisher/Starling = generic fallback since they're coming-soon).
+3. Click any room card → confirm the overlay header shows the same silhouette above the title.
+
+**Expected:** no card falls back to the static 3-panel wireframe except the coming-soon templates (which have no runtime layout entry).
+
+---
+
+## PR-19i — Library jargon rewrites + manifest-as-source-of-truth
+
+👀 User-visible
+
+**Surface:** `/` library section overlays (Rooms / Layouts / Components / Resources tabs).
+
+**Setup:** Existing IDB record set (PR-19i bumps SEED_VERSIONS for rooms; layouts + components rewrites land via the manifest-fallthrough enrichment so the IDB seed itself doesn't need a per-record migration).
+
+**Steps:**
+
+1. Reload, open Library → Rooms → Data Workspace overlay. Confirm description no longer mentions "Pelican experience" — reads as plain CSV/XLSX explanation.
+2. Open Drafting Desk overlay. Confirm the user-supplied rewrite copy: "A place to write documents with tracked changes and margin comments. Leave comments with the AI and flag consistency issues across paragraphs, pages, and chats."
+3. Open Pocket Chat, Kingfisher, Starling — confirm rewrites. Names stay Kingfisher/Starling.
+4. Open Layouts tab → Canvas-centric. Confirm "left rail" reads as "sidebar". Document-centric: "margin gutters" → "margin notes".
+5. Open Components tab → spot-check 5-6 entries: blueprint, branches, claude-comments, web-search, voice-input, context. Confirm "Claude" replaced by "the AI" wherever user-facing; jargon removed.
+6. Open Resources tab → "A short intro video" replaces "Marketing-adjacent intro video".
+
+**Expected:** every approved rewrite is live. No remaining "Pelican experience", no "publishes ... on the bus" / "system-prompt presets" / similar dev jargon.
+
+---
+
+## PR-19j — Blueprint engagement + expand-in-place room details
+
+👀 User-visible
+
+**Surface:** `/` blueprint section.
+
+**Setup:** ≥ 3 user rooms + ≥ 5 conversations spread across them, with at least one room that has multiple component types (file-shelf, branches, highlights, etc.) so the engagement statics have material.
+
+**Steps:**
+
+1. **Activity dots:** open `/`. Confirm each user room shows one small gold-faint dot per conversation in that room (capped at 12). Dots stay in the upper interior. Refresh — dot positions are stable per room.
+2. **Furniture glyphs:** for a room with file-shelf + branches + highlights + toc, confirm 4 distinct grey glyphs along the bottom interior, evenly spaced. Glyphs are faded grey, no fill.
+3. **Walking-human bob + glow:** confirm gentle 1.4s bob on the active room's walking-human icon, and a soft gold glow pulse behind it. Reduced-motion users (toggle in OS settings) see the icon + glow but they stay still.
+4. **Expand on click (desktop ≥768px):** click a user room → room scales up to ~65% of canvas (smooth 280ms ease), other rooms shrink to ~55% and fade to ~35% opacity. After ~280ms the interior details fade in inside the expanded room (layout wireframe, dates row, pills). Sidebar slides in from the right with bulleted Includes list. Action strip slides up below the canvas with Copy Room / Delete Room / Enter Room.
+5. **Interior details legibility:** the LayoutWireframe at 96px, 9px date text, and pill row all render legibly inside the expanded room. No clipping.
+6. **Sidebar Includes:** one bullet per layout / scheme / each component, with a description on the muted-color second line.
+7. **Footer actions:** Copy Room → `/edit/:newId` with a draft. Delete Room → confirm prompt → room disappears from blueprint without reload. Enter Room → routes to the most-recent conversation in the room. Second click on the expanded room → same as Enter Room.
+8. **Deselect:** Esc / click SVG background / click a dimmed room → rooms ease back to scale 1 + full opacity, sidebar fades out, footer slides down. The foreignObject details fade out simultaneously.
+9. **Mobile (<768px):** click a user room → bottom-sheet RoomDetailsOverlay opens (PR-19g behavior preserved). No expand-in-place; rooms stay at scale 1.
+10. **Lint + build:** `npm run lint` baseline preserved (src-only 125); `npm run build` exit 0.
+
+**Expected:**
+
+- All animations honor `prefers-reduced-motion: reduce` — selection snaps to final state, walking-human and glow stay still.
+- `vector-effect="non-scaling-stroke"` keeps room outlines at uniform thickness regardless of scale.
+- System rooms (Study/Lab) shrink + dim in sympathy but never become the expand-in-place selection — they route directly (Study → `/`, Lab → `/edit`) when clicked while no user room is selected; collapse the selection if clicked while one is.
+
+**Out of scope:**
+- Safari ≤16 `<foreignObject>` paint quirks under SVG transforms — verify on Safari 17 only.
+- Activity-dot density tuning beyond 12 per room (cap stays; per-room density indicator could be a future polish).
+- Per-component glyphs for components without a mapping (chart-canvas, table-canvas, etc. are in; future catalog entries need a glyph addition to show up — they'll silently render no glyph until then).
+
+---
+
 ## How to add a section when a new PR lands
 
 When a new PR merges:
