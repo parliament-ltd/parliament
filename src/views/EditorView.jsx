@@ -187,6 +187,40 @@ export default function EditorView({ scope = 'room', blank = false }) {
     }
   }, [saving, state.tray.length, state.mode, showToast, blank, navigate])
 
+  // ── Build ──────────────────────────────────────────────
+  // The Build button on a never-built mode used to navigate directly
+  // to /build?ignite=:id, but a fresh draft (or any never-persisted
+  // mode) isn't in IDB yet — BuildView's loadMode() returned null and
+  // surfaced "Room not found" + the same error from igniteExistingRoom.
+  // Save first so the mode actually exists in IDB before the wizard
+  // tries to load it; saveMode is idempotent so re-saving a clean
+  // mode is harmless.
+  const handleBuild = useCallback(async () => {
+    if (saving) return
+    if (!state.mode) {
+      showToast('Drop a layout, scheme, or room first.')
+      return
+    }
+    if (!state.mode.meta?.name?.trim()) {
+      showToast('Name your room first.')
+      return
+    }
+    if (state.tray.length > 0) {
+      showToast('Empty the holding tray first.')
+      return
+    }
+    setSaving(true)
+    try {
+      const saved = await saveMode(state.mode)
+      dispatch({ type: 'MARK_SAVED', mode: saved })
+      navigate(`/build?ignite=${saved.id}`)
+    } catch (err) {
+      showToast(err.message || 'Save failed.')
+    } finally {
+      setSaving(false)
+    }
+  }, [saving, state.tray.length, state.mode, showToast, navigate])
+
   // ── Keyboard shortcuts: Esc deselects, Cmd/Ctrl+Z undo, ─
   //    Cmd/Ctrl+Shift+Z (or Cmd/Ctrl+Y) redo. All gated against
   //    typing in inputs / textareas / contenteditable so the
@@ -433,6 +467,7 @@ export default function EditorView({ scope = 'room', blank = false }) {
           onDeviceClassChange={(deviceClass) => dispatch({ type: 'SET_DEVICE_CLASS', deviceClass })}
           onSchemeChange={(schemeRef) => dispatch({ type: 'APPLY_SCHEME', schemeRef })}
           onSave={handleSave}
+          onBuild={handleBuild}
           onPreview={() => setPreviewOpen(true)}
           labMode={labMode}
           onStartCopy={onStartCopy}

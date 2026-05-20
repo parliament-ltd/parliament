@@ -18,7 +18,6 @@
 //     Click Edit while on blank canvas → opens the Rooms tab so the
 //     user can pick a room to edit.
 
-import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Smartphone, Monitor, Eye, Undo2, Redo2, Wrench, Wand2 } from 'lucide-react'
 import { SCHEMES } from '../../lib/schemes'
 import { normalizeRef } from '../../lib/refs'
@@ -41,6 +40,12 @@ export default function EditorTopBar({
   onDeviceClassChange,
   onSchemeChange,
   onSave,
+  // PR-28: onBuild fires when the user clicks the primary "Build" button
+  // on a never-built mode. EditorView saves the mode first (so the
+  // wizard's ?ignite=:id can actually find it in IDB) then navigates.
+  // Previously this view inlined the navigate(), which broke for any
+  // mode whose id hadn't been persisted yet.
+  onBuild,
   onPreview,
   // PR-19e: Build/Edit pill state + handlers.
   // labMode is 'build' | 'edit' — drives which pill is active.
@@ -51,7 +56,6 @@ export default function EditorTopBar({
   onStartCopy,
   onSwitchToEdit,
 }) {
-  const navigate = useNavigate()
   const deviceClass = mode?.deviceClass || 'visual-pointer'
   const isMobile = deviceClass === 'visual-touch-phone'
   const schemeRef = mode?.scheme?.ref
@@ -85,10 +89,11 @@ export default function EditorTopBar({
   const onPrimary = () => {
     if (primaryDisabled) return
     if (isUnbuilt) {
-      // Route to the wizard's Ignition step in existing-room mode.
-      // BuildView reads ?ignite=:roomId, loads the mode, and reuses
+      // PR-28: route through EditorView's handleBuild, which saves
+      // the mode first (so IDB has it) and then navigates to
+      // /build?ignite=:savedId. The wizard reads ?ignite and reuses
       // IgnitionStep for the API-key + animation + three-button flow.
-      navigate(`/build?ignite=${mode.id}`)
+      onBuild?.()
       return
     }
     onSave()
