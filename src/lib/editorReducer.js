@@ -80,6 +80,25 @@ export function editorReducer(state, action) {
         dirty: true,
       }
 
+    case 'SET_PANEL_BUTTON':
+      // PR-27: opt-in per-slot panel-toggle metadata. Stored at
+      // mode.layoutConfig.panelButtons[slotId] = boolean. Absence
+      // means no toggle button is rendered at runtime (default off).
+      return {
+        ...state,
+        mode: {
+          ...state.mode,
+          layoutConfig: {
+            ...(state.mode.layoutConfig || {}),
+            panelButtons: {
+              ...(state.mode.layoutConfig?.panelButtons || {}),
+              [action.slotId]: action.enabled,
+            },
+          },
+        },
+        dirty: true,
+      }
+
     // ─── Component placement ─────────────────────────────
     case 'PLACE_COMPONENT': {
       // Place a NEW instance of `ref` in `slot`. Caller can pass an

@@ -37,6 +37,9 @@ const HISTORY_ACTIONS = new Set([
   // history below — otherwise the user could undo into a null mode.
   'INIT_FROM_LAYOUT',
   'APPLY_ROOM',
+  // PR-27: per-slot panel-toggle opt-in is a real mode-file mutation;
+  // a misclick should be undoable like any other field edit.
+  'SET_PANEL_BUTTON',
 ])
 
 // Cap above the 20-state spec floor. Each entry holds a cloned mode

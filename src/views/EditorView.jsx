@@ -472,6 +472,9 @@ export default function EditorView({ scope = 'room', blank = false }) {
             onSetName={(name) => dispatch({ type: 'SET_NAME', name })}
             onSetDeviceClass={(deviceClass) => dispatch({ type: 'SET_DEVICE_CLASS', deviceClass })}
             onApplyScheme={(schemeRef) => dispatch({ type: 'APPLY_SCHEME', schemeRef })}
+            onSetPanelButton={(slotId, enabled) =>
+              dispatch({ type: 'SET_PANEL_BUTTON', slotId, enabled })
+            }
             onRemoveComponent={(componentId) => dispatch({ type: 'REMOVE_COMPONENT', componentId })}
           />
         </div>

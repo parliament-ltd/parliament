@@ -1047,6 +1047,57 @@
   outline: 1px solid var(--p-gold-light);
 }
 
+/* ── Runtime layout-panel slide toggle (PR-27) ────────────
+   Per-slot opt-in lives in mode.layoutConfig.panelButtons. When
+   enabled, layouts render a small chevron button at the panel's
+   outside edge; clicking it animates the panel collapsed (slim
+   strip retains the chevron) or expanded back to full width.
+   Animation is CSS-only; prefers-reduced-motion strips it. */
+.layout-panel {
+  position: relative;
+  transition: width 220ms ease;
+}
+.layout-panel-collapsed {
+  width: 24px !important;
+  overflow: hidden;
+}
+.layout-panel-collapsed > .layout-panel-content {
+  opacity: 0;
+  pointer-events: none;
+}
+.layout-panel-content {
+  transition: opacity 180ms ease;
+  height: 100%;
+}
+.layout-panel-toggle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 36px;
+  border-radius: 4px;
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--p-text-muted);
+  z-index: 2;
+  transition: color 0.15s, border-color 0.15s;
+}
+.layout-panel-toggle:hover {
+  color: var(--p-gold-light);
+  border-color: var(--p-gold-light);
+}
+.layout-panel-toggle.left  { right: -9px; }
+.layout-panel-toggle.right { left:  -9px; }
+@media (prefers-reduced-motion: reduce) {
+  .layout-panel,
+  .layout-panel-content { transition: none; }
+}
+
 /* ── Blueprint section ────────────────────────────────────── */
 .bp-wrap {
   padding: 10px;
