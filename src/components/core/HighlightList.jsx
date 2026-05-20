@@ -43,16 +43,19 @@ export default function HighlightList({
             className="w-3 h-3 rounded-full flex-shrink-0"
             style={{ backgroundColor: hl.color }}
           />
-          {/* PR-23: removed `truncate` so long highlight terms wrap to
-              multiple lines instead of being cut off with an ellipsis.
-              `break-words` lets very long single-word terms still wrap. */}
+          {/* PR-23 removed `truncate` so long terms wrap. PR-28 also
+              drops `break-words`: the hover-action buttons below are
+              now hidden (not just opacity-0), so they no longer reserve
+              ~80px of flex width and short terms have room to fit on
+              one line. Long terms still wrap at natural word boundaries
+              via default `word-wrap: normal` behavior. */}
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-medium text-[var(--p-text-primary)] break-words">{hl.text}</div>
+            <div className="text-xs font-medium text-[var(--p-text-primary)]">{hl.text}</div>
             <div className="text-xs text-[var(--p-text-secondary)]">
               {hl.count} occurrence{hl.count !== 1 ? 's' : ''}
             </div>
           </div>
-          <div className="flex items-center gap-0.5 opacity-0 group-hover/hl:opacity-100 transition-opacity">
+          <div className="hidden group-hover/hl:flex items-center gap-0.5">
             <motion.button
               whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.85 }}

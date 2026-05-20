@@ -18,8 +18,17 @@ import { useIsNarrow } from '../../lib/useViewportWidth'
 import NarrowDrawer from '../../components/layouts/NarrowDrawer'
 import NarrowChrome from '../../components/layouts/NarrowChrome'
 
-const RAIL_BASE   = 'flex flex-col gap-3 p-3 overflow-y-auto bg-white'
-const RAIL_BORDER = 'border-[var(--p-border)]'
+// Narrow-drawer rail class. The desktop tree uses .layout-rail-card
+// (in index.css) for its card-shaped rails instead — see the desktop
+// return below.
+const RAIL_BASE = 'flex flex-col gap-3 p-3 overflow-y-auto bg-white'
+
+// PR-28: desktop rails are now card-shaped (no hard L/R border, rail
+// content lives inside .layout-rail-card with a soft inset-ring shadow).
+// The 12px aside padding bottom-aligns the rail card with the input card
+// in the center column (whose wrapper also carries p-3).
+const RAIL_OUTER = 'shrink-0 p-3 flex flex-col bg-[var(--p-bg-base)]'
+const RAIL_INNER = 'layout-rail-card flex-1 min-h-0 overflow-y-auto p-3 flex flex-col gap-3'
 
 function renderSlot(nodes) {
   if (!nodes || nodes.length === 0) return null
@@ -118,11 +127,11 @@ export default {
         {/* Left rail */}
         {hasLeft && (
           <aside
-            className={`layout-panel w-56 shrink-0 border-r ${RAIL_BORDER} ${RAIL_BASE} ${
+            className={`layout-panel w-72 ${RAIL_OUTER} ${
               leftToggleEnabled && leftCollapsed ? 'layout-panel-collapsed' : ''
             }`}
           >
-            <div className="layout-panel-content flex flex-col gap-3">
+            <div className={`layout-panel-content ${RAIL_INNER}`}>
               {renderSlot(left)}
             </div>
             {leftToggleEnabled && (
@@ -161,11 +170,11 @@ export default {
         {/* Right rail (stack) */}
         {hasRight && (
           <aside
-            className={`layout-panel w-72 shrink-0 border-l ${RAIL_BORDER} ${RAIL_BASE} ${
+            className={`layout-panel w-72 ${RAIL_OUTER} ${
               rightToggleEnabled && rightCollapsed ? 'layout-panel-collapsed' : ''
             }`}
           >
-            <div className="layout-panel-content flex flex-col gap-3">
+            <div className={`layout-panel-content ${RAIL_INNER}`}>
               {renderSlot(right)}
               {renderSlot(rightExtra)}
             </div>

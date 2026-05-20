@@ -985,17 +985,58 @@
   opacity: 0;
 }
 
-/* ── Chat input card (PR-23) ──────────────────────────────
+/* ── Chat input card (PR-23, softened in PR-28) ───────────
    Wraps the chat input + send + plus button so the whole input row
-   reads as a single card. Same surface + border + shadow recipe as
-   .bp-action-card and .bp-includes-sidebar so the chat surface and
-   blueprint surface use the same card language. */
+   reads as a single card. PR-28 drops the hard 0.5px border in favor
+   of a translucent inset ring + drop shadow — fits the quieter
+   Parliament aesthetic the brand is leaning into. Same recipe is
+   reused by .layout-rail-card below so chat rails feel like cards
+   floating next to the input card, with a matching bottom gutter. */
 .chat-input-card {
   background: var(--p-bg-surface);
-  border: 0.5px solid var(--p-border);
+  border: 0;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.04),
+    0 2px 8px rgba(0, 0, 0, 0.04);
   padding: 8px 10px;
+}
+
+.layout-rail-card {
+  background: var(--p-bg-surface);
+  border: 0;
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.04),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* ── Chat "lab" chrome (PR-28) ────────────────────────────
+   The page bg behind a chat room gets a soft dot texture and
+   sits a step darker than the room itself. The room mounts in
+   a rounded frame with a 24px gutter, so it reads as a
+   "specimen on a tray" — same visual move the editor canvas
+   already makes with its centered card. Texture is static; no
+   reduced-motion exception needed.
+   Schemes can override --p-chat-page-dot-color to retint the
+   dot for dark surfaces; default works in both. */
+.chat-page-bg {
+  background-color: var(--p-bg-subtle);
+  background-image: radial-gradient(
+    circle,
+    var(--p-chat-page-dot-color, rgba(127, 127, 127, 0.08)) 1px,
+    transparent 1px
+  );
+  background-size: 16px 16px;
+}
+.chat-room-frame {
+  background: var(--p-bg-base);
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.04),
+    0 6px 24px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  height: 100%;
 }
 
 /* ── Editor cards (PR-27) ─────────────────────────────────

@@ -248,7 +248,7 @@ function SlotDropTarget({
           onSelect(slotId)
         }
       }}
-      className="editor-area-card relative flex flex-col gap-1.5 cursor-pointer min-h-[60px] min-w-0 overflow-hidden"
+      className="editor-area-card relative flex flex-col gap-1.5 cursor-pointer min-h-[60px] max-h-[360px] min-w-0 overflow-y-auto"
       data-area-kind={areaKind}
       data-area-empty={isEmpty ? 'true' : 'false'}
       data-area-over={isOver ? 'true' : 'false'}

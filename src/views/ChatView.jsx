@@ -258,8 +258,14 @@ function RoomShellChatHost({ conversationId, mode, roomId }) {
     <ChatFrameProvider value={{ wrenchTarget }}>
       <div className="flex flex-col h-[100dvh] min-h-0 bg-[var(--p-bg-base)]">
         <ChatDesktopChrome wrenchTarget={wrenchTarget} />
-        <div className="flex-1 min-h-0">
-          <RoomShell mode={mode} />
+        {/* PR-28: page-inset gutter + dot texture around the room.
+            The room frame mounts on a textured "lab tray" surface
+            (chat-page-bg) so the rails+chat float as a specimen —
+            same visual logic the editor canvas already uses. */}
+        <div className="flex-1 min-h-0 chat-page-bg p-6">
+          <div className="chat-room-frame">
+            <RoomShell mode={mode} />
+          </div>
         </div>
       </div>
     </ChatFrameProvider>

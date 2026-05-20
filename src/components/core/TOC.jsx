@@ -9,12 +9,12 @@ import { SPRING_SMOOTH } from '../../lib/constants'
  * user-prompts mode. The level controls indent and font size; the click
  * target stays the same.
  */
-export default function TOC({ items = [], onNavigate }) {
+export default function TOC({ items = [], onNavigate, emptyMessage }) {
   return (
     <>
       {items.length === 0 ? (
-        <p className="text-xs text-[var(--p-text-muted)] px-3 py-2">
-          Items will appear here
+        <p className="text-xs text-[var(--p-text-muted)] px-3 py-2 leading-[1.5]">
+          {emptyMessage || 'Items will appear here'}
         </p>
       ) : (
         items.map((item) => (
