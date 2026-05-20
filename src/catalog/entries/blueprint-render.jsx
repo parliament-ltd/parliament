@@ -1017,10 +1017,16 @@ function Room({
           the counter-scale transform. */}
       {!showInlineDetails && (
         <>
-          <text x={cx} y={theY} textAnchor="middle" fontSize="10" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+          {/* PR-19l followup: font sizes shrunk by 0.75 (10→7.5, 13→9.75)
+              to compensate for the viewBox shrink. SVG fills the
+              container width regardless of viewBox, so a smaller
+              viewBox stretches each SVG unit across more screen
+              pixels — without this compensation the room labels would
+              appear ~33% larger on screen than before. */}
+          <text x={cx} y={theY} textAnchor="middle" fontSize="7.5" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
             THE
           </text>
-          <text x={cx} y={nameY} textAnchor="middle" fontSize="13" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
+          <text x={cx} y={nameY} textAnchor="middle" fontSize="9.75" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
             {name}
           </text>
         </>
@@ -1170,10 +1176,12 @@ function SystemRoom({ placed, isStudy, isHovered, isDimmed, isCurrent, transform
       <path d={path} fill={fill} className="bp-room-fill" />
       <path d={path} fill="none" stroke={stroke} strokeWidth="0.8" vectorEffect="non-scaling-stroke" />
 
-      <text x={cx} y={theY} textAnchor="middle" fontSize="10" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+      {/* PR-19l followup: matches the user-room title size (7.5 / 9.75)
+          to compensate for the smaller viewBox stretching SVG units. */}
+      <text x={cx} y={theY} textAnchor="middle" fontSize="7.5" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
         THE
       </text>
-      <text x={cx} y={nameY} textAnchor="middle" fontSize="13" fill={labelColor} letterSpacing="0.06em" fontWeight="600">
+      <text x={cx} y={nameY} textAnchor="middle" fontSize="9.75" fill={labelColor} letterSpacing="0.06em" fontWeight="600">
         {name}
       </text>
 
