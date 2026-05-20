@@ -32,6 +32,9 @@ export default {
   name: 'document-centric',
   version: '1.0',
   displayName: 'Document-centric',
+  // PR-19i: manifest is the source of truth. See canvas-centric for the
+  // enrichment rationale.
+  description: 'An editable document with margin notes for comments and analysis alongside the draft. For writing and editing.',
   scope: 'room',
   slots: [
     { id: 'outline',    capacity: 'single' },

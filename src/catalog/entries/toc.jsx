@@ -31,7 +31,7 @@ export default {
   version: '1.0',
   displayName: 'Table of contents',
   author: 'parliament',
-  description: 'Scrollable list of user-message labels that scroll-jump to their target on click.',
+  description: 'A scrollable table of contents for the conversation. Click any entry to jump to that point.',
   icon: 'List',
   surfaces: ['room'],
   tier: 'reader',

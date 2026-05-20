@@ -32,7 +32,7 @@ export default {
   version: '1.0',
   displayName: 'Branches',
   author: 'parliament',
-  description: 'Branch navigation list with parent/child links; owns the Branch creation panel.',
+  description: 'A list of conversation branches with links to the parent and any child branches. Includes a panel for creating new branches.',
   icon: 'GitBranch',
   surfaces: ['room'],
   tier: 'composer',

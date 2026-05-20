@@ -25,7 +25,7 @@ export default {
   version: '1.0',
   displayName: 'Voice input',
   author: 'parliament',
-  description: 'Mic button that publishes Web Speech API transcripts on the room bus.',
+  description: 'A mic button that transcribes speech to text using your browser\'s voice recognition.',
   icon: 'Mic',
   surfaces: ['room'],
   tier: 'composer',

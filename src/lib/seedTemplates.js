@@ -74,7 +74,7 @@ export const TEMPLATES = Object.freeze([
     status: 'available',
     scope: 'room',
     displayName: 'Data Workspace',
-    description: 'A canvas for charts and tables with a chat panel to help you analyze. The Pelican experience, decomposed.',
+    description: 'A canvas for charts and tables with a chat panel for analysis. Drop in a CSV or XLSX and ask the AI what\'s in it.',
     icon: ICONS.DATA_WORKSPACE,
     deviceClass: 'visual-pointer',
     layout: { ref: 'canvas-centric@^1.0' },
@@ -107,7 +107,7 @@ export const TEMPLATES = Object.freeze([
     status: 'available',
     scope: 'room',
     displayName: 'Drafting Desk',
-    description: 'A document canvas with margin annotations. Tracked changes, comments, and ripple analysis ride alongside the draft.',
+    description: 'A place to write documents with tracked changes and margin comments. Leave comments with the AI and flag consistency issues across paragraphs, pages, and chats.',
     icon: ICONS.DRAFTING_DESK,
     deviceClass: 'visual-pointer',
     layout: { ref: 'document-centric@^1.0' },
@@ -136,7 +136,7 @@ export const TEMPLATES = Object.freeze([
     status: 'available',
     scope: 'room',
     displayName: 'Pocket Chat',
-    description: 'A focused mobile chat. Highlights, branches, and review just a tap away in the sheet.',
+    description: 'A focused mobile chat. Highlights, branches, and review are one tap away in the slide-up sheet.',
     icon: ICONS.POCKET_CHAT,
     deviceClass: 'visual-touch-phone',
     layout: { ref: 'single-column-with-sheet@^1.0' },
@@ -179,7 +179,7 @@ export const TEMPLATES = Object.freeze([
     status: 'coming-soon',
     scope: 'room',
     displayName: 'Kingfisher',
-    description: 'Deep reading. A wide reading area with annotation gutters for working through long documents and research.',
+    description: 'A wide reading surface for long documents and research, with annotation gutters down the side. For when the work is reading, not chatting.',
     icon: ICONS.KINGFISHER,
     deviceClass: 'visual-pointer',
     layout: { ref: 'reading-pane@^1.0' },
@@ -195,7 +195,7 @@ export const TEMPLATES = Object.freeze([
     status: 'coming-soon',
     scope: 'room',
     displayName: 'Starling',
-    description: 'Two panes side by side for collaboration. Compare conversations or pair a chat with a document.',
+    description: 'Two equal panes side by side. Compare two conversations, or pair a chat with a document.',
     icon: ICONS.STARLING,
     deviceClass: 'visual-pointer',
     layout: { ref: 'split-view@^1.0' },
@@ -222,13 +222,13 @@ const SEED_VERSIONS = Object.freeze({
   // chat. Nothing else in the way." and web-search would conflict
   // with that ethos. Users who want it on Quiet Room can add it via
   // the editor.
-  'data-workspace@1.0': 3, // PR-11a Pelican + PR-18d web-search
-  'drafting-desk@1.0':  3, // PR-11b Secretarybird + PR-18d web-search
-  'writing-studio@1.0': 3, // PR-18d web-search
-  'pocket-chat@1.0':    4, // PR-18d web-search + PR-18e file-attach
+  'data-workspace@1.0': 4, // PR-19i description rewrite (was 3)
+  'drafting-desk@1.0':  4, // PR-19i description rewrite (was 3)
+  'writing-studio@1.0': 3, // PR-18d web-search (unchanged in PR-19i)
+  'pocket-chat@1.0':    5, // PR-19i description rewrite (was 4)
   'quiet-room@1.0':     2, // unchanged — no web-search by design
-  'kingfisher@1.0':     2,
-  'starling@1.0':       2,
+  'kingfisher@1.0':     3, // PR-19i description rewrite (was 2)
+  'starling@1.0':       3, // PR-19i description rewrite (was 2)
 })
 
 function seedVersionFor(templateId) {

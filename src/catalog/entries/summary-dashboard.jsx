@@ -48,7 +48,7 @@ export default {
   version: '1.0',
   displayName: 'Summary dashboard',
   author: 'parliament',
-  description: 'KPI cards, AI-generated insights (on click), distributions, and data-quality flags for the active dataset.',
+  description: 'Headline-stat cards, on-demand AI insights, value distributions, and data-quality flags for the current dataset.',
   icon: 'Gauge',
   surfaces: ['room'],
   tier: 'composer',

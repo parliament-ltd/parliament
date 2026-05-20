@@ -32,7 +32,7 @@ export default {
   version: '1.0',
   displayName: 'Web search',
   author: 'parliament',
-  description: 'Arm the active provider’s web_search tool for the next outgoing message. Uses API credits.',
+  description: 'Lets the AI search the web on your next message. Uses Anthropic API credits.',
   icon: 'Globe',
   surfaces: ['room'],
   tier: 'composer',

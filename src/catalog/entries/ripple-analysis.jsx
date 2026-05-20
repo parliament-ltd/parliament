@@ -54,7 +54,7 @@ export default {
   version: '1.0',
   displayName: 'Ripple analysis',
   author: 'parliament',
-  description: 'Cross-paragraph and cross-document consistency flags. Runs on Submit & Branch; expand scope to scan other chats.',
+  description: 'Flags consistency issues across paragraphs and across documents. Runs when you submit a draft; widen the scope to scan other chats.',
   icon: 'Waves',
   surfaces: ['room'],
   tier: 'composer',

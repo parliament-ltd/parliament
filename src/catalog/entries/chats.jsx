@@ -18,7 +18,7 @@ export default {
   version: '1.0',
   displayName: 'Chats',
   author: 'parliament',
-  description: 'Conversation list with search, view toggle, bulk actions; publishes row-hover on the bus.',
+  description: 'A searchable conversation list with view toggles and bulk actions. Hovering a row highlights its room on the blueprint.',
   icon: 'MessageCircle',
   surfaces: ['homepage'],
   tier: 'composer',

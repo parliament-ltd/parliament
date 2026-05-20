@@ -12,7 +12,7 @@ export default {
   version: '1.0',
   displayName: 'Favorites',
   author: 'parliament',
-  description: 'Cross-cutting saved-message snippets pulled from every conversation.',
+  description: 'Saved message snippets from every conversation in one place.',
   icon: 'Star',
   surfaces: ['homepage'],
   tier: 'reader',
