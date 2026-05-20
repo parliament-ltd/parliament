@@ -79,7 +79,8 @@ export default {
                   the chat fades into the input via .messages-fade-mask
                   (matches Claude). InputArea card carries its own 16px gutter. */}
               {input && input.length > 0 && (
-                <div className="bg-white py-2">
+                // PR-25: narrow input dock matches chat-base bg too.
+                <div className="bg-[var(--p-bg-base)] py-2">
                   {renderSlot(input)}
                 </div>
               )}
@@ -112,7 +113,13 @@ export default {
             {renderSlot(msgs)}
           </div>
           {input && input.length > 0 && (
-            <div className="border-t border-[var(--p-border)] p-3 bg-white">
+            // PR-25: input dock matches the chat-base background and
+            // drops its separator line. The input itself lives in a
+            // `.chat-input-card` (PR-23) — wrapping it in another bg
+            // colour + border made the dock feel like a tray under the
+            // card; matching bg-base lets the card float in the chat
+            // surface naturally.
+            <div className="p-3 bg-[var(--p-bg-base)]">
               {renderSlot(input)}
             </div>
           )}

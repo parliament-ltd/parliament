@@ -76,7 +76,10 @@ export default {
             Stays single-column-with-sheet's only branch (it is
             mobile-native; no desktop tree to preserve). */}
         {input && input.length > 0 && (
-          <div className="bg-white py-2">
+          // PR-25: input dock matches chat-base bg so the .chat-input-card
+          // (PR-23) floats in the chat surface instead of sitting on a
+          // contrasting tray.
+          <div className="bg-[var(--p-bg-base)] py-2">
             {renderSlot(input)}
           </div>
         )}
