@@ -409,6 +409,11 @@ export default function EditorView({ scope = 'room', blank = false }) {
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="h-screen flex flex-col bg-[var(--p-bg-subtle)] overflow-hidden">
+        {/* PR-26: when the user arrived from a chat via the wrench
+            icon, the top-bar Back button returns to that chat
+            (history.back) rather than the homepage. The chat-entry
+            path passes `fromChat: true` in router state; this honors
+            it on every viewport (was: only the tooNarrow branch). */}
         <EditorTopBar
           mode={state.mode}
           dirty={state.dirty}
@@ -418,7 +423,13 @@ export default function EditorView({ scope = 'room', blank = false }) {
           canRedo={redoAvailable}
           onUndo={() => dispatch({ type: 'UNDO' })}
           onRedo={() => dispatch({ type: 'REDO' })}
-          onBack={() => navigate('/')}
+          onBack={() => {
+            if (location.state?.fromChat) {
+              navigate(-1)
+            } else {
+              navigate('/')
+            }
+          }}
           onDeviceClassChange={(deviceClass) => dispatch({ type: 'SET_DEVICE_CLASS', deviceClass })}
           onSchemeChange={(schemeRef) => dispatch({ type: 'APPLY_SCHEME', schemeRef })}
           onSave={handleSave}
