@@ -31,7 +31,7 @@ export default {
   displayName: 'Three-panel',
   scope: 'room',
   slots: [
-    { id: 'left-rail',        capacity: 'single' },
+    { id: 'left-rail',        capacity: 'stack'  },
     { id: 'msg-area',         capacity: 'single' },
     { id: 'input-dock',       capacity: 'single' },
     { id: 'right-rail',       capacity: 'stack'  },

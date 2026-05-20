@@ -29,14 +29,14 @@ import { normalizeRef } from './refs'
 // indexing in. Use getLayoutSlots() below to do that automatically.
 export const LAYOUT_SLOTS = {
   'three-panel@1.0': [
-    { id: 'left-rail',        capacity: 'single', label: 'Left rail' },
+    { id: 'left-rail',        capacity: 'stack',  label: 'Left rail' },
     { id: 'msg-area',         capacity: 'single', label: 'Message area' },
     { id: 'input-dock',       capacity: 'single', label: 'Input dock' },
     { id: 'right-rail',       capacity: 'stack',  label: 'Right rail' },
     { id: 'right-rail-extra', capacity: 'stack',  label: 'Right rail (extra)' },
   ],
   'canvas-centric@1.0': [
-    { id: 'left-rail',  capacity: 'single', label: 'Left rail' },
+    { id: 'left-rail',  capacity: 'stack',  label: 'Left rail' },
     { id: 'canvas',     capacity: 'single', label: 'Canvas' },
     { id: 'chat-panel', capacity: 'stack',  label: 'Chat panel' },
     { id: 'inspector',  capacity: 'stack',  label: 'Inspector' },

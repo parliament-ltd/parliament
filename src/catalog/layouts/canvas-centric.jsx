@@ -45,7 +45,7 @@ export default {
   description: 'A center canvas (chart, table, dashboard) flanked by a sidebar and a chat panel. For working with data and files.',
   scope: 'room',
   slots: [
-    { id: 'left-rail',  capacity: 'single' },
+    { id: 'left-rail',  capacity: 'stack'  },
     { id: 'canvas',     capacity: 'stack'  },
     { id: 'chat-panel', capacity: 'stack'  },
     { id: 'inspector',  capacity: 'stack'  },
