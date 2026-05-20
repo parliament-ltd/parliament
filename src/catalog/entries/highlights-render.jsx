@@ -18,7 +18,7 @@ import { useMemo } from 'react'
 import HighlightList from '../../components/core/HighlightList'
 import { useAnnotations } from '../../stores/AnnotationsContext'
 import { useChat } from '../../stores/ChatContext'
-import { includesWord } from '../../lib/textUtils'
+import { countWordOccurrences } from '../../lib/textUtils'
 
 export default function HighlightsRender({ config = {} } = {}) {
   const {
@@ -42,10 +42,15 @@ export default function HighlightsRender({ config = {} } = {}) {
       }
       groups.get(key).ids.push(hl.id)
     }
-    // Count each term's occurrences across the message list.
+    // PR-23: count every occurrence of the term across all messages
+    // (was: number of messages containing the term, which under-reported
+    // multi-occurrence-per-message terms).
     return Array.from(groups.values()).map(g => ({
       ...g,
-      count: messages.filter(m => m.content && includesWord(m.content, g.text)).length,
+      count: messages.reduce(
+        (sum, m) => sum + (m.content ? countWordOccurrences(m.content, g.text) : 0),
+        0,
+      ),
     }))
   }, [highlights, messages])
 

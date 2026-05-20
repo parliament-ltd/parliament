@@ -201,9 +201,14 @@ export function AnnotationsProvider({ children }) {
   const addHighlightFromSidebar = useCallback(async (text, color) => {
     if (!activeConversationId || !text?.trim()) return
     const t = text.trim()
+    // PR-23: previously this returned early when there were no messages
+    // to anchor to, silently dropping the new highlight. Allow the
+    // record to be created with messageId=null so the term persists and
+    // takes effect once messages arrive. The navigate-to-occurrence
+    // flow still resolves to specific messages at runtime via the
+    // aggregated ids list.
     const firstMatch = messages.find(m => m.content && includesWord(m.content, t))
-    const messageId = firstMatch?.id || messages[0]?.id
-    if (!messageId) return
+    const messageId = firstMatch?.id || messages[0]?.id || null
     try {
       const rec = await dbAddHighlight({
         conversationId: activeConversationId,

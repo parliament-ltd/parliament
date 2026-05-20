@@ -306,6 +306,12 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
           {error}
         </div>
       )}
+      {/* PR-23: the input + send + plus + overflow buttons all live
+          inside a card with rounded corners + gentle shadow, matching
+          the blueprint section's framed feel. The card uses the same
+          surface bg + thin border + soft shadow as .bp-action-card so
+          the chat surface reads as a coherent set of cards. */}
+      <div className="chat-input-card">
       <InputArea
         value={value}
         onChange={setValue}
@@ -323,6 +329,7 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
         overflowActions={overflowActions}
         onInvokeAction={handleInvokeAction}
       />
+      </div>
     </div>
   )
 }

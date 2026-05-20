@@ -49,9 +49,14 @@ const HATCH_FILL  = 'url(#bp-hatch)'
 const FLOOR_GRID  = 'url(#bp-floorgrid)'
 
 const ROOM_FILL_DEFAULT = '#F5F0E8'
-const ROOM_FILL_ACTIVE  = 'rgba(196, 169, 77, 0.10)'
-const ROOM_FILL_HOVER   = 'rgba(196, 169, 77, 0.16)'
-const ROOM_FILL_HIGHLIT = 'rgba(196, 169, 77, 0.22)'
+// PR-23: active-room highlight is the "you are here" signal in
+// blueprint-in-chat (and on the homepage when on `/`). Alpha bumped
+// 0.10 → 0.22 so the active room reads as visibly highlighted; hover
+// and chat-row-highlight bumped proportionally so the visual hierarchy
+// is preserved (active < hover < highlit-from-chat).
+const ROOM_FILL_ACTIVE  = 'rgba(196, 169, 77, 0.22)'
+const ROOM_FILL_HOVER   = 'rgba(196, 169, 77, 0.30)'
+const ROOM_FILL_HIGHLIT = 'rgba(196, 169, 77, 0.36)'
 // PR-19k followup: selected room fill is now near-opaque. The prior
 // 0.22 alpha let the hatched floor pattern bleed through the expanded
 // card, making the content panel feel transparent. Solid surface bg

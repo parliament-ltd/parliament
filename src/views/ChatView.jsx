@@ -48,6 +48,7 @@ import { loadMode } from '../lib/modes'
 import { assignDefaultRoom } from '../lib/migration'
 import { useIsNarrow } from '../lib/useViewportWidth'
 import { useChat } from '../stores/ChatContext'
+import { schemeName } from '../lib/schemes'
 
 export default function ChatView() {
   const { id } = useParams()
@@ -211,6 +212,25 @@ function RoomShellChatHost({ conversationId, mode, roomId }) {
       clearMessages()
     }
   }, [conversationId, loadMessages, clearMessages])
+
+  // PR-23: apply the room's scheme to the document so the chat surface
+  // tints to match the active room (background, surface, accent, etc.
+  // all flow from the scheme's CSS-variable block). Cleared on unmount
+  // so navigating back to the homepage restores Parliament default.
+  useEffect(() => {
+    const ref = mode?.scheme?.ref
+    if (!ref) return undefined
+    const name = schemeName(ref)
+    const html = document.documentElement
+    if (name === 'parliament') {
+      html.removeAttribute('data-scheme')
+    } else {
+      html.setAttribute('data-scheme', name)
+    }
+    return () => {
+      html.removeAttribute('data-scheme')
+    }
+  }, [mode])
 
   if (loadedFor !== conversationId || activeConversationId !== conversationId) {
     return null
