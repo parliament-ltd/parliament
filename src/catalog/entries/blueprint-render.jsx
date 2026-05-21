@@ -293,6 +293,11 @@ export default function BlueprintRender({ hostAPI } = {}) {
   //   expands the selected room to ~65% of canvas while shrinking
   //   the rest to 0.55x. Mobile keeps the bottom-sheet behavior.
   const [selectedRoomId, setSelectedRoomId] = useState(null)
+  // PR-29: two-step Copy flow. `copyTarget` holds the source mode while
+  // the BlueprintCopyModal is open; `copyToast` is the brief inline
+  // confirmation that fades in/out after a successful "Copy as Is."
+  const [copyTarget, setCopyTarget] = useState(null)
+  const [copyToast, setCopyToast] = useState('')
   // PR-19j: gate the foreignObject details opacity fade-in so it
   // appears AFTER the transform settles. Toggled by an effect that
   // runs a 280ms setTimeout when selectedRoomId becomes truthy.
@@ -469,23 +474,38 @@ export default function BlueprintRender({ hostAPI } = {}) {
     enterRoom(id)
   }, [selectedRoomId, enterRoom])
 
-  const onOverlayCopy = useCallback(async () => {
+  // PR-29: Copy is now a two-step flow. The Copy button opens
+  // BlueprintCopyModal, which offers "Copy Room as Is" (saves +
+  // toast, user stays on blueprint) or "Edit new room in The Lab"
+  // (saves + navigates to the editor). Previously the Copy button
+  // jumped straight to the editor, which felt unexplained.
+  const onOverlayCopy = useCallback(() => {
     if (!selectedRoomId) return
     const source = modesById.get(selectedRoomId)
     if (!source) return
+    setCopyTarget({ sourceMode: source })
+  }, [selectedRoomId, modesById])
+
+  const performCopy = useCallback(async (toLab) => {
+    if (!copyTarget) return
+    const sourceName = copyTarget.sourceMode?.meta?.name?.trim() || 'this room'
     try {
-      const draft = createCopyOfMode(source)
+      const draft = createCopyOfMode(copyTarget.sourceMode)
       const saved = await saveMode(draft)
+      setCopyTarget(null)
       setSelectedRoomId(null)
       window.dispatchEvent(new Event('blueprint-rooms-changed'))
-      navigate(`/edit/${saved.id}`)
+      if (toLab) {
+        navigate(`/edit/${saved.id}`)
+        return
+      }
+      setCopyToast(`Copied "${sourceName}" to your blueprint`)
+      window.setTimeout(() => setCopyToast(''), 2500)
     } catch (err) {
-      // Fall back silently — the overlay closes, user can retry from
-      // the editor. A toast surface would require a wider plumbing.
       console.error('Copy Room failed:', err)
-      setSelectedRoomId(null)
+      setCopyTarget(null)
     }
-  }, [selectedRoomId, modesById, navigate])
+  }, [copyTarget, navigate])
 
   const onOverlayDelete = useCallback(async () => {
     if (!selectedRoomId) return
@@ -813,6 +833,76 @@ export default function BlueprintRender({ hostAPI } = {}) {
           onDelete={onOverlayDelete}
         />
       )}
+
+      {/* PR-29: copy-flow modal. Opens when the user picks Copy
+          from either the desktop action card or the mobile overlay. */}
+      {copyTarget && (
+        <BlueprintCopyModal
+          sourceName={copyTarget.sourceMode?.meta?.name?.trim() || 'this room'}
+          onClose={() => setCopyTarget(null)}
+          onCopyAsIs={() => performCopy(false)}
+          onCopyToLab={() => performCopy(true)}
+        />
+      )}
+
+      {/* PR-29: brief inline confirmation when "Copy as Is" succeeds. */}
+      {copyToast && <div className="bp-copy-toast">{copyToast}</div>}
+    </div>
+  )
+}
+
+// PR-29: confirmation modal for the Copy button on a blueprint room.
+// Two actions: "Copy Room as Is" stays on the blueprint with a toast;
+// "Edit new room in The Lab" navigates to the editor with the fresh
+// copy loaded. Naming the room happens in the Lab (or never — the
+// copy ships with a sensible default name).
+function BlueprintCopyModal({ sourceName, onClose, onCopyAsIs, onCopyToLab }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  return (
+    <div
+      className="fixed inset-0 z-[160] flex items-center justify-center p-5"
+      style={{ backgroundColor: 'rgba(25, 25, 25, 0.32)' }}
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        className="w-[440px] max-w-[94vw] bg-[var(--p-bg-surface)] border border-[var(--p-border)] rounded-xl shadow-2xl shadow-black/20 p-5 flex flex-col gap-3"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="text-base font-medium text-[var(--p-text-primary)]">
+          Copy &ldquo;{sourceName}&rdquo;?
+        </div>
+        <div className="text-[12.5px] text-[var(--p-text-secondary)] leading-[1.55]">
+          Make a fresh copy of this room. You can use it right away, or
+          customize it in The Lab first — your choice.
+        </div>
+        <div className="flex items-center justify-end gap-2 pt-2 flex-wrap">
+          <button
+            onClick={onClose}
+            className="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--p-border)] bg-transparent text-[var(--p-text-secondary)] hover:border-[var(--p-gold-light)] hover:text-[var(--p-gold-light)] transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onCopyAsIs}
+            className="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--p-border)] bg-transparent text-[var(--p-text-primary)] hover:border-[var(--p-gold-light)] hover:bg-[rgba(196,169,77,0.06)] transition-colors"
+          >
+            Copy Room as Is
+          </button>
+          <button
+            onClick={onCopyToLab}
+            className="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--p-gold-light)] bg-[var(--p-gold-light)] text-white hover:bg-[var(--p-gold-muted)] hover:border-[var(--p-gold-muted)] transition-colors"
+          >
+            Edit new room in The Lab
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

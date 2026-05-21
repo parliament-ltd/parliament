@@ -2203,6 +2203,32 @@
   .bp-action-card { transition: none; }
 }
 
+/* PR-29: brief confirmation toast after a "Copy as Is" succeeds.
+   Fixed-position pill at the bottom of the viewport. Fades in,
+   stays for ~2.5s, fades out (the JS clears the message). */
+.bp-copy-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 18px;
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-border);
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  font-size: 12px;
+  color: var(--p-text-primary);
+  z-index: 170;
+  animation: bp-copy-toast-in 220ms ease;
+}
+@keyframes bp-copy-toast-in {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bp-copy-toast { animation: none; }
+}
+
 .bp-includes-sidebar {
   /* PR-19k: vertically center-aligned with the expanded room
      (previously top-aligned). The compound entrance transform animates
