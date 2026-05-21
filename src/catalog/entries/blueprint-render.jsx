@@ -309,6 +309,11 @@ export default function BlueprintRender({ hostAPI } = {}) {
   //   <768px viewport. Mobile keeps PR-19g's bottom-sheet overlay.
   const isNarrow = useIsNarrow(768)
   const svgRef = useRef(null)
+  // PR-32: ref on the bp-wrap div so a document-level mousedown
+  // listener can tell whether a click landed OUTSIDE the blueprint
+  // entirely (close the selection) vs inside it (let the SVG /
+  // sidebar / action card handlers decide).
+  const wrapRef = useRef(null)
 
   // Subscribe to chats@1.0's row-hover bus. Payload = { conversationId | null }.
   useEffect(() => {
@@ -611,6 +616,7 @@ export default function BlueprintRender({ hostAPI } = {}) {
     const cy = placed.box.y + placed.box.height / 2
     const topY    = cy - h / 2
     const bottomY = cy + h / 2
+    const leftX   = cx - w / 2
     const rightX  = cx + w / 2
     return {
       widthPercent:  (w / layout.viewBox.width)  * 100,
@@ -624,7 +630,17 @@ export default function BlueprintRender({ hostAPI } = {}) {
       // instead of pinning to the canvas's right edge.
       topPercent:    (topY    / layout.viewBox.height) * 100,
       bottomPercent: (bottomY / layout.viewBox.height) * 100,
-      rightPercent:  (rightX  / layout.viewBox.width)  * 100,
+      // PR-33: room center as a percent of canvas height — used by
+      // the sidebar's vertical flip-side logic (bottom-half rooms
+      // get bottom-aligned with the room so the panel grows upward
+      // and never clips past bp-wrap's bottom edge).
+      centerYPercent: (cy / layout.viewBox.height) * 100,
+      // PR-32: leftEdgePercent + rightPercent let the sidebar pick
+      // a side. When the room sits in the right half of the canvas,
+      // a 240px sidebar 20px past the room's right edge would
+      // overflow the bp-wrap — we flip it to the LEFT instead.
+      leftEdgePercent: (leftX  / layout.viewBox.width) * 100,
+      rightPercent:    (rightX / layout.viewBox.width) * 100,
     }
   }, [selectedRoomId, isNarrow, layout, selectedRoomScale])
 
@@ -639,14 +655,35 @@ export default function BlueprintRender({ hostAPI } = {}) {
     transition: 'transform 280ms ease, opacity 280ms ease',
   }), [])
 
-  const onCanvasClick = useCallback((e) => {
-    // Click on the SVG background (the canvas itself, not a child room
-    // <g>) collapses the selection. Children call stopPropagation via
-    // their own onClick wrappers.
-    if (e.target === e.currentTarget && selectedRoomId) {
+  const onCanvasClick = useCallback(() => {
+    // PR-32: any click that bubbles to the SVG (i.e. not on a room,
+    // since rooms stopPropagation) closes the selection. Previously
+    // this required `e.target === e.currentTarget`, which missed
+    // clicks on inner SVG elements like the floor <rect>, the wall
+    // border, or the hatch pattern — those felt like "empty space"
+    // to the user but didn't actually close the expansion.
+    if (selectedRoomId) {
       setSelectedRoomId(null)
     }
   }, [selectedRoomId])
+
+  // PR-32: close the expanded room when the user clicks anywhere
+  // outside bp-wrap (e.g. the homepage's surrounding chrome, the
+  // favorites section). Clicks inside bp-wrap on rooms / the SVG /
+  // the sidebar / the action card / the Copy modal are all DOM
+  // descendants of wrapRef, so .contains() catches them and we
+  // don't close. mousedown rather than click so we fire ahead of
+  // any bubbling click handler the surrounding page might have.
+  useEffect(() => {
+    if (!selectedRoomId || isNarrow) return undefined
+    const onDocClick = (e) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) {
+        setSelectedRoomId(null)
+      }
+    }
+    document.addEventListener('mousedown', onDocClick)
+    return () => document.removeEventListener('mousedown', onDocClick)
+  }, [selectedRoomId, isNarrow])
 
   // PR-19j: precompute the selected mode + its last conversation +
   // includes — the sidebar and the foreignObject details share this
@@ -658,6 +695,7 @@ export default function BlueprintRender({ hostAPI } = {}) {
 
   return (
     <div
+      ref={wrapRef}
       className={`bp-wrap${selectedRoomId && !isNarrow ? ' bp-wrap-selected' : ''}`}
     >
       <svg
@@ -744,13 +782,14 @@ export default function BlueprintRender({ hostAPI } = {}) {
                 // doesn't also fire and deselect the room we just
                 // selected (or the one the user is opening into).
                 e.stopPropagation()
-                if (isDimmed) {
-                  // Click on a dimmed room with another already selected:
-                  // collapse selection without entering. Mirrors the
-                  // backdrop click feel.
-                  setSelectedRoomId(null)
-                  return
-                }
+                // PR-32: clicking a dimmed room now SWITCHES the
+                // expanded selection to that room (was: deselect
+                // entirely). handleRoomClick already handles all
+                // three cases — first click on a fresh room expands,
+                // second click on the same room enters, click on
+                // another room while one is selected expands the
+                // new one. Closing the expansion still works via
+                // empty-canvas click or outside-bp-wrap click.
                 handleRoomClick(placed.id)
               }}
               onHereTipShow={(p) => setHereTip(p)}
@@ -783,22 +822,31 @@ export default function BlueprintRender({ hostAPI } = {}) {
               enlarged room into the sidebar header so the room
               itself stays quiet (just its name + wireframe).
        */}
-      {!isNarrow && selectedRoomId && (
+      {!isNarrow && selectedRoomId && (() => {
+        // PR-32: horizontal flip — room in right half puts sidebar
+        //        on its LEFT instead of overflowing bp-wrap.
+        // PR-33: vertical flip — room in bottom half bottom-aligns
+        //        the sidebar with the room bottom (extends upward),
+        //        so the panel never clips past bp-wrap's bottom edge.
+        const onLeft = expandedRoomBox && expandedRoomBox.leftPercent  >= 50
+        const onBottom = expandedRoomBox && expandedRoomBox.centerYPercent >= 50
+        const sidebarStyle = !expandedRoomBox ? undefined : {
+          ...(onLeft
+            ? { right: `calc(${100 - expandedRoomBox.leftEdgePercent}% + 20px)`, left: 'auto' }
+            : { left:  `calc(${expandedRoomBox.rightPercent}% + 20px)`,           right: 'auto' }
+          ),
+          ...(onBottom
+            ? { bottom: `calc(${100 - expandedRoomBox.bottomPercent}%)`, top: 'auto' }
+            : { top:    `${expandedRoomBox.topPercent}%`,                 bottom: 'auto' }
+          ),
+        }
+        return (
         <aside
           className={`bp-includes-sidebar${detailsReady ? ' show' : ''}`}
+          data-side={onLeft ? 'left' : 'right'}
+          data-vside={onBottom ? 'bottom' : 'top'}
           aria-label={`Includes for ${selectedMode?.meta?.name || 'this room'}`}
-          style={
-            expandedRoomBox
-              ? {
-                  // PR-31: top-aligned with the room top + 20px to the
-                  // right of the room's right edge. `right: auto`
-                  // overrides the CSS pin to the canvas right edge.
-                  top: `${expandedRoomBox.topPercent}%`,
-                  left: `calc(${expandedRoomBox.rightPercent}% + 20px)`,
-                  right: 'auto',
-                }
-              : undefined
-          }
+          style={sidebarStyle}
         >
           {(() => {
             const created   = fmtShortDate(selectedMode?.meta?.created)
@@ -837,7 +885,8 @@ export default function BlueprintRender({ hostAPI } = {}) {
             </div>
           )}
         </aside>
-      )}
+        )
+      })()}
 
       {/* PR-19l: action card positioned directly below the expanded
           room — same width as the room, center-aligned. Width + top

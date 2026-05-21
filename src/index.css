@@ -2204,8 +2204,14 @@
      PR-31 switches to TOP-aligned with the room top — the inline
      `top` (set in JSX from expandedRoomBox.topPercent) is the
      actual top edge of the sidebar, and the transform is just an
-     X-translation for the slide-in animation. inline `left` puts
-     the sidebar 20px to the right of the room's right edge. */
+     X-translation for the slide-in animation. inline `left` (or
+     `right` when flipped) puts the sidebar 20px past the room's
+     edge.
+     PR-32 adds a flip-side mode: when the room sits in the right
+     half of the blueprint, the sidebar moves to the LEFT of the
+     room instead of overflowing the bp-wrap on the right. The
+     slide-in direction follows `data-side` so the panel always
+     animates inward toward the room. */
   position: absolute;
   /* Fallback when expandedRoomBox isn't computed yet — keeps the
      panel pinned to the canvas right edge instead of flickering
@@ -2227,6 +2233,12 @@
   transition: opacity 220ms ease 60ms, transform 220ms ease 60ms;
   pointer-events: none;
   z-index: 3;
+}
+/* PR-32: sidebar on the LEFT of the room slides IN from the
+   left (translateX(-8px) → 0) so the entrance feels symmetric
+   to the right-anchored variant. */
+.bp-includes-sidebar[data-side="left"] {
+  transform: translateX(-8px);
 }
 .bp-includes-sidebar.show {
   opacity: 1;
