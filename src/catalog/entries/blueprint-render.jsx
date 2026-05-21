@@ -609,16 +609,22 @@ export default function BlueprintRender({ hostAPI } = {}) {
     const h = placed.box.height * selectedRoomScale
     const cx = placed.box.x + placed.box.width  / 2
     const cy = placed.box.y + placed.box.height / 2
+    const topY    = cy - h / 2
     const bottomY = cy + h / 2
+    const rightX  = cx + w / 2
     return {
       widthPercent:  (w / layout.viewBox.width)  * 100,
       leftPercent:   (cx / layout.viewBox.width)  * 100,
-      // PR-30: the Includes sidebar tracks the selected room's
-      // vertical center via this percent instead of sitting on
-      // canvas center (which felt disconnected from the room
-      // after the enlarge-in-place change).
-      centerYPercent: (cy / layout.viewBox.height) * 100,
+      // PR-30: vertical tracking for the Includes sidebar.
+      // PR-31: switched from centerYPercent to topPercent + rightPercent
+      // so the sidebar TOP aligns with the room TOP (rather than the
+      // sidebar's center sitting on the room's center, which let the
+      // bullet list clip when sidebar content was tall). rightPercent
+      // lets the sidebar sit 20px to the right of the room's edge
+      // instead of pinning to the canvas's right edge.
+      topPercent:    (topY    / layout.viewBox.height) * 100,
       bottomPercent: (bottomY / layout.viewBox.height) * 100,
+      rightPercent:  (rightX  / layout.viewBox.width)  * 100,
     }
   }, [selectedRoomId, isNarrow, layout, selectedRoomScale])
 
@@ -783,7 +789,14 @@ export default function BlueprintRender({ hostAPI } = {}) {
           aria-label={`Includes for ${selectedMode?.meta?.name || 'this room'}`}
           style={
             expandedRoomBox
-              ? { top: `${expandedRoomBox.centerYPercent}%` }
+              ? {
+                  // PR-31: top-aligned with the room top + 20px to the
+                  // right of the room's right edge. `right: auto`
+                  // overrides the CSS pin to the canvas right edge.
+                  top: `${expandedRoomBox.topPercent}%`,
+                  left: `calc(${expandedRoomBox.rightPercent}% + 20px)`,
+                  right: 'auto',
+                }
               : undefined
           }
         >
@@ -837,7 +850,7 @@ export default function BlueprintRender({ hostAPI } = {}) {
           style={{
             width: `${expandedRoomBox.widthPercent}%`,
             left: `${expandedRoomBox.leftPercent}%`,
-            top: `calc(${expandedRoomBox.bottomPercent}% + 10px)`,
+            top: `calc(${expandedRoomBox.bottomPercent}% + 20px)`,
           }}
         >
           <button type="button" className="tb-btn" onClick={onOverlayCopy}>

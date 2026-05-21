@@ -2199,15 +2199,23 @@
 }
 
 .bp-includes-sidebar {
-  /* PR-19k: vertically center-aligned with the expanded room
-     (previously top-aligned). The compound entrance transform animates
-     X (slide in from the right) while the steady-state Y translate
-     keeps the panel centered. */
+  /* PR-19k centered the panel vertically on the room.
+     PR-30 changed that to track the room's center y inline.
+     PR-31 switches to TOP-aligned with the room top — the inline
+     `top` (set in JSX from expandedRoomBox.topPercent) is the
+     actual top edge of the sidebar, and the transform is just an
+     X-translation for the slide-in animation. inline `left` puts
+     the sidebar 20px to the right of the room's right edge. */
   position: absolute;
+  /* Fallback when expandedRoomBox isn't computed yet — keeps the
+     panel pinned to the canvas right edge instead of flickering
+     in at top:0/left:0 during the very first render. */
   top: 50%;
   right: -12px;
   width: 240px;
-  max-height: calc(100% - 80px);
+  /* Cap to fit inside bp-wrap regardless of which room is selected;
+     overflow-y: auto handles content that exceeds the cap. */
+  max-height: calc(100% - 40px);
   overflow-y: auto;
   padding: 12px 14px;
   background: var(--p-bg-surface);
@@ -2215,14 +2223,14 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   opacity: 0;
-  transform: translate(8px, -50%);
+  transform: translateX(8px);
   transition: opacity 220ms ease 60ms, transform 220ms ease 60ms;
   pointer-events: none;
   z-index: 3;
 }
 .bp-includes-sidebar.show {
   opacity: 1;
-  transform: translate(0, -50%);
+  transform: translateX(0);
   pointer-events: auto;
 }
 .bp-includes-sidebar .ov-section-label {
