@@ -50,7 +50,10 @@ const AREA_KIND_BY_SLOT = {
 //       below, so the overall card keeps its 16:9 silhouette.
 const LAYOUT_GEOMETRY = {
   'three-panel@1.0': {
-    container: 'grid grid-cols-[18%_minmax(0,1fr)_24%] gap-2 p-2 min-h-[420px] h-full',
+    // PR-28g: both side rails 22% to mirror the runtime w-72/w-72 equal
+    // widths (PR-28a). Previously 18/24 visually disagreed with the
+    // runtime; the preview now reads the same as the live room.
+    container: 'grid grid-cols-[22%_minmax(0,1fr)_22%] gap-2 p-2 min-h-[420px] h-full',
     slots: {
       'left-rail':        { className: 'flex flex-col gap-1.5 row-span-1 min-w-0' },
       'msg-area':         { className: 'flex flex-col gap-1.5 row-span-1 min-w-0' },
@@ -61,7 +64,9 @@ const LAYOUT_GEOMETRY = {
     style: { gridTemplateRows: '1fr auto' },
   },
   'canvas-centric@1.0': {
-    container: 'grid grid-cols-[22%_minmax(0,1fr)_28%] gap-2 p-2 min-h-[420px] h-full',
+    // PR-28g: both sides 24% to mirror canvas-centric's runtime w-72/w-72
+    // equal-width rails. Was 22/28 — visually disagreed with the runtime.
+    container: 'grid grid-cols-[24%_minmax(0,1fr)_24%] gap-2 p-2 min-h-[420px] h-full',
     slots: {
       'left-rail':  { className: 'flex flex-col gap-1.5 min-w-0' },
       'canvas':     { className: 'flex flex-col gap-1.5 min-w-0' },
@@ -248,7 +253,7 @@ function SlotDropTarget({
           onSelect(slotId)
         }
       }}
-      className="editor-area-card relative flex flex-col gap-1.5 cursor-pointer min-h-[60px] max-h-[360px] min-w-0 overflow-y-auto"
+      className="editor-area-card relative flex flex-col gap-1.5 cursor-pointer min-h-[60px] min-w-0"
       data-area-kind={areaKind}
       data-area-empty={isEmpty ? 'true' : 'false'}
       data-area-over={isOver ? 'true' : 'false'}

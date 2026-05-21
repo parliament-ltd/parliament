@@ -137,7 +137,7 @@ export default {
         {/* Left rail */}
         {hasLeft && (
           <aside
-            className={`layout-panel w-60 shrink-0 border-r ${RAIL_BORDER} ${RAIL_BASE} ${
+            className={`layout-panel w-72 shrink-0 border-r ${RAIL_BORDER} ${RAIL_BASE} ${
               leftToggleEnabled && leftCollapsed ? 'layout-panel-collapsed' : ''
             }`}
           >
@@ -180,7 +180,7 @@ export default {
         {/* Right: chat panel above, inspector below */}
         {hasRight && (
           <aside
-            className={`layout-panel w-80 shrink-0 border-l ${RAIL_BORDER} flex flex-col bg-white ${
+            className={`layout-panel w-72 shrink-0 border-l ${RAIL_BORDER} flex flex-col bg-white ${
               rightToggleEnabled && rightCollapsed ? 'layout-panel-collapsed' : ''
             }`}
           >

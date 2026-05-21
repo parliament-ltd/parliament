@@ -137,16 +137,30 @@ export default function EditorView({ scope = 'room', blank = false }) {
     const sourceMode = historyState.present?.mode
     if (!sourceMode) return
     const draft = createCopyOfMode(sourceMode)
-    navigate('/edit', { state: { seedMode: draft } })
+    // PR-28g: carry the source room id so the Edit pill can navigate
+    // back to it. Previously the Edit pill always blanked the canvas
+    // via /edit?tab=rooms, which wiped the user's in-progress work
+    // when they were toggling Build ↔ Edit on a populated canvas.
+    navigate('/edit', {
+      state: { seedMode: draft, returnToRoomId: sourceMode.id },
+    })
   }, [historyState, navigate])
   const onSwitchToEdit = useCallback(() => {
+    // PR-28g: if we got to /edit (build mode) from /edit/:id, return
+    // there instead of blanking the canvas. Carries the user's
+    // original edit context through a Build → Edit toggle.
+    const returnTo = location.state?.returnToRoomId
+    if (returnTo) {
+      navigate(`/edit/${returnTo}`)
+      return
+    }
     navigate('/edit?tab=rooms')
     // PR-19f: the Edit pill on blank canvas opens the Rooms tab but
     // can't visually toggle the pill (route is unchanged → labMode
     // stays 'build'). A toast narrates the next step so the click
     // doesn't feel like a no-op.
     showToast('Drag a room from the left rail to start editing')
-  }, [navigate, showToast])
+  }, [navigate, location.state, showToast])
 
   // ── Save ───────────────────────────────────────────────
   const handleSave = useCallback(async () => {
@@ -335,20 +349,25 @@ export default function EditorView({ scope = 'room', blank = false }) {
 
     // Component dropped on a slot
     if (dragData.kind === 'component' && dropData.kind === 'slot') {
+      // PR-28g: tray chip BEFORE already-placed move. Tray chips carry
+      // both `fromTray: true` AND `componentId: chip.compId` (see
+      // EditorHoldingTray.jsx), so checking componentId first ate the
+      // tray case — MOVE_COMPONENT's .map(c => c.id === id) silently
+      // no-op'd because the chip wasn't in state.mode.components, and
+      // the drop appeared to fail with no error.
+      if (dragData.fromTray) {
+        dispatch({
+          type: 'RESTORE_FROM_TRAY',
+          compId: dragData.componentId || dragData.trayCompId,
+          slot: dropData.slot,
+        })
+        return
+      }
       // Already-placed instance moving between slots
       if (dragData.componentId) {
         dispatch({
           type: 'MOVE_COMPONENT',
           componentId: dragData.componentId,
-          slot: dropData.slot,
-        })
-        return
-      }
-      // Tray chip dropped back into a slot
-      if (dragData.fromTray) {
-        dispatch({
-          type: 'RESTORE_FROM_TRAY',
-          compId: dragData.componentId || dragData.trayCompId,
           slot: dropData.slot,
         })
         return
