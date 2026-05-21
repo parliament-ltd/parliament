@@ -1030,11 +1030,13 @@
   background-size: 16px 16px;
 }
 .chat-room-frame {
-  /* 64% bg-base over the textured chat-page-bg so the dot grid
-     reads softly through the room. color-mix is supported in
-     all browsers from 2023 onwards (Chrome 111+, Safari 16.2+,
-     Firefox 113+) — fine for this PWA. */
-  background: color-mix(in srgb, var(--p-bg-base) 64%, transparent);
+  /* PR-28: 64% bg-base over the textured chat-page-bg.
+     PR-29: dropped to 30% — the user wanted the room to feel more
+     like "elastic goo or spiritual connection" with the lab tray
+     visible through it. color-mix is supported in all browsers
+     from 2023 onwards (Chrome 111+, Safari 16.2+, Firefox 113+) —
+     fine for this PWA. */
+  background: color-mix(in srgb, var(--p-bg-base) 30%, transparent);
   border-radius: 14px;
   box-shadow:
     0 0 0 0.5px rgba(0, 0, 0, 0.04),

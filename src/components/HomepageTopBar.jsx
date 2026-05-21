@@ -27,12 +27,22 @@ export default function HomepageTopBar({ breadcrumb }) {
 
   return (
     <div className="flex items-center gap-3 px-4 sm:px-6 py-3 bg-white border-b border-[var(--p-border)]">
-      <div className="flex items-center gap-2 text-[var(--p-text-primary)] font-medium shrink-0">
+      {/* PR-29: brand cluster (mark + wordmark) is now a clickable
+          anchor back to The Study. Previously the Parliament mark was
+          static SVG with no handler — users in the wizard on mobile
+          had no way to escape back home from the top bar. */}
+      <button
+        type="button"
+        onClick={() => navigate('/')}
+        title="Go to The Study"
+        aria-label="Go to The Study"
+        className="flex items-center gap-2 text-[var(--p-text-primary)] font-medium shrink-0 rounded-md hover:opacity-80 transition-opacity"
+      >
         <ParliamentMark />
         {/* Wordmark hides below 480px to give the breadcrumb + icons room.
             The bird-mark icon stays as the brand anchor. */}
         <span className="text-sm hidden min-[480px]:inline">Parliament</span>
-      </div>
+      </button>
 
       {breadcrumb && (
         <>
