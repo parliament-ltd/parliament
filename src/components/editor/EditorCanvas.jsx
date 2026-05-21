@@ -171,6 +171,7 @@ export default function EditorCanvas({
                   components={componentsBySlot[s.id] || []}
                   catalogEntries={catalogEntries}
                   selectedComponentId={selection.type === 'component' ? selection.id : null}
+                  capacity={s.capacity}
                 />
               ))}
             </div>
@@ -193,6 +194,7 @@ export default function EditorCanvas({
                     components={componentsBySlot[s.id] || []}
                     catalogEntries={catalogEntries}
                     selectedComponentId={selection.type === 'component' ? selection.id : null}
+                    capacity={s.capacity}
                     compact
                   />
                 </div>
@@ -237,6 +239,7 @@ function CanvasDropTarget({ children, onClick, selected, schemeName: schemeAttr 
 function SlotDropTarget({
   slotId, label, selected, onSelect, onSelectComponent,
   components, catalogEntries, selectedComponentId, compact,
+  capacity,
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: `slot-${slotId}`,
@@ -244,6 +247,11 @@ function SlotDropTarget({
   })
   const isEmpty = components.length === 0
   const areaKind = AREA_KIND_BY_SLOT[slotId] || 'main'
+  // PR-28h: for stack/overlay slots, keep a small "Drop another"
+  // hint card visible below placed components so the user always
+  // sees where the next drop will land. Single-capacity slots
+  // suppress the hint once a component is in place.
+  const showHintBelow = !isEmpty && (capacity === 'stack' || capacity === 'overlay')
   return (
     <div
       ref={setNodeRef}
@@ -268,15 +276,22 @@ function SlotDropTarget({
           </span>
         </div>
       ) : (
-        components.map((c) => (
-          <ComponentPreview
-            key={c.id}
-            spec={c}
-            entry={findEntry(catalogEntries, c.ref)}
-            selected={c.id === selectedComponentId}
-            onSelect={() => onSelectComponent(c.id)}
-          />
-        ))
+        <>
+          {components.map((c) => (
+            <ComponentPreview
+              key={c.id}
+              spec={c}
+              entry={findEntry(catalogEntries, c.ref)}
+              selected={c.id === selectedComponentId}
+              onSelect={() => onSelectComponent(c.id)}
+            />
+          ))}
+          {showHintBelow && (
+            <div className="rounded border border-dashed border-[var(--p-text-light)] py-1.5 px-2 text-[10px] text-[var(--p-text-muted)] text-center pointer-events-none">
+              Drop another component here
+            </div>
+          )}
+        </>
       )}
     </div>
   )
