@@ -630,6 +630,11 @@ export default function BlueprintRender({ hostAPI } = {}) {
       // instead of pinning to the canvas's right edge.
       topPercent:    (topY    / layout.viewBox.height) * 100,
       bottomPercent: (bottomY / layout.viewBox.height) * 100,
+      // PR-33: room center as a percent of canvas height — used by
+      // the sidebar's vertical flip-side logic (bottom-half rooms
+      // get bottom-aligned with the room so the panel grows upward
+      // and never clips past bp-wrap's bottom edge).
+      centerYPercent: (cy / layout.viewBox.height) * 100,
       // PR-32: leftEdgePercent + rightPercent let the sidebar pick
       // a side. When the room sits in the right half of the canvas,
       // a 240px sidebar 20px past the room's right edge would
@@ -818,29 +823,28 @@ export default function BlueprintRender({ hostAPI } = {}) {
               itself stays quiet (just its name + wireframe).
        */}
       {!isNarrow && selectedRoomId && (() => {
-        const onLeft = expandedRoomBox && expandedRoomBox.leftPercent >= 50
-        const sidebarStyle = !expandedRoomBox ? undefined : (
-          onLeft
-            ? {
-                // PR-32: room in right half → sidebar to the LEFT of
-                // the room. Position via `right` so the sidebar's
-                // right edge sits 20px to the left of the room's left
-                // edge. `left: auto` overrides the default CSS.
-                top: `${expandedRoomBox.topPercent}%`,
-                right: `calc(${100 - expandedRoomBox.leftEdgePercent}% + 20px)`,
-                left: 'auto',
-              }
-            : {
-                // PR-31: room in left half → sidebar to the RIGHT.
-                top: `${expandedRoomBox.topPercent}%`,
-                left: `calc(${expandedRoomBox.rightPercent}% + 20px)`,
-                right: 'auto',
-              }
-        )
+        // PR-32: horizontal flip — room in right half puts sidebar
+        //        on its LEFT instead of overflowing bp-wrap.
+        // PR-33: vertical flip — room in bottom half bottom-aligns
+        //        the sidebar with the room bottom (extends upward),
+        //        so the panel never clips past bp-wrap's bottom edge.
+        const onLeft = expandedRoomBox && expandedRoomBox.leftPercent  >= 50
+        const onBottom = expandedRoomBox && expandedRoomBox.centerYPercent >= 50
+        const sidebarStyle = !expandedRoomBox ? undefined : {
+          ...(onLeft
+            ? { right: `calc(${100 - expandedRoomBox.leftEdgePercent}% + 20px)`, left: 'auto' }
+            : { left:  `calc(${expandedRoomBox.rightPercent}% + 20px)`,           right: 'auto' }
+          ),
+          ...(onBottom
+            ? { bottom: `calc(${100 - expandedRoomBox.bottomPercent}%)`, top: 'auto' }
+            : { top:    `${expandedRoomBox.topPercent}%`,                 bottom: 'auto' }
+          ),
+        }
         return (
         <aside
           className={`bp-includes-sidebar${detailsReady ? ' show' : ''}`}
           data-side={onLeft ? 'left' : 'right'}
+          data-vside={onBottom ? 'bottom' : 'top'}
           aria-label={`Includes for ${selectedMode?.meta?.name || 'this room'}`}
           style={sidebarStyle}
         >
