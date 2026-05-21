@@ -2073,12 +2073,22 @@
   gap: 8px;
   align-items: center;
   text-align: center;
+  /* PR-29: lock the content to the foreignObject width and let
+     children wrap rather than overflow the room frame. Was causing
+     "THE" + long room names + "Last spoken to" to clip. */
+  width: 100%;
+  min-width: 0;
+  padding: 0 4px;
+  box-sizing: border-box;
 }
 .bp-inline-title {
   display: flex;
   flex-direction: column;
   align-items: center;
   line-height: 1.1;
+  /* Title stays at its native size; if the room name is long it
+     wraps to a second line instead of being cut off. */
+  max-width: 100%;
 }
 /* PR-19l followup: foreignObject HTML scales with the SVG viewBox.
    With ROW_HEIGHT 200→150 the viewBox stretches more per screen px,
@@ -2095,6 +2105,21 @@
   font-size: 9.75px;
   letter-spacing: 0.06em;
   font-weight: 600;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+  max-width: 100%;
+}
+.bp-inline-pill {
+  display: inline-block;
+  padding: 1.5px 7px;
+  border-radius: 999px;
+  font-size: 6.25px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(196, 169, 77, 0.10);
+  color: #8B6A10;
+  border: 0.5px solid rgba(196, 169, 77, 0.4);
 }
 .bp-inline-layout {
   display: flex;
@@ -2111,23 +2136,31 @@
 }
 .bp-inline-dates {
   display: grid;
-  grid-template-columns: auto auto;
-  column-gap: 8px;
+  /* PR-29: minmax(0, ...) lets cells shrink below their content
+     width so long "Last spoken to" entries wrap inside the cell
+     instead of forcing the grid past the room's edge. */
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  column-gap: 6px;
   row-gap: 2px;
   /* PR-19l followup: 9px → 6.75px to match the SVG-viewBox shrink. */
   font-size: 6.75px;
   color: var(--p-text-secondary);
   margin: 0;
+  max-width: 100%;
 }
 .bp-inline-dates dt {
   font-weight: 500;
   color: var(--p-text-muted);
   text-align: right;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .bp-inline-dates dd {
   margin: 0;
   text-align: left;
   color: var(--p-text-primary);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 /* PR-19l: action buttons live in a card below the expanded room, not
    inside the foreignObject. The card's width matches the expanded
