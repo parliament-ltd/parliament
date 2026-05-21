@@ -15,7 +15,7 @@
 
 import { useEffect, useReducer, useState, useCallback } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
-import { DndContext, PointerSensor, KeyboardSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { DndContext, PointerSensor, KeyboardSensor, useSensor, useSensors, rectIntersection } from '@dnd-kit/core'
 import { X } from 'lucide-react'
 import EditorTopBar from '../components/editor/EditorTopBar'
 import EditorLeftRail from '../components/editor/EditorLeftRail'
@@ -277,6 +277,21 @@ export default function EditorView({ scope = 'room', blank = false }) {
     useSensor(KeyboardSensor)
   )
 
+  // PR-28i: collision detection prefers nested slot droppables over the
+  // outer canvas wrapper. With the default rectIntersection, holding-
+  // tray drops were silently landing on `canvas-root` instead of the
+  // slot the user hovered — the slot would highlight gold during drag
+  // (slot.isOver true), but at release the over flipped to canvas-root
+  // and handleDragEnd fired the "drop on a specific slot" toast.
+  // Filtering canvas-root out when any slot also matches forces the
+  // intended drop target to win on every drop.
+  function collisionDetection(args) {
+    const collisions = rectIntersection(args)
+    if (collisions.length <= 1) return collisions
+    const slotCollisions = collisions.filter((c) => c.id !== 'canvas-root')
+    return slotCollisions.length > 0 ? slotCollisions : collisions
+  }
+
   function handleDragEnd(event) {
     const { active, over } = event
     if (!over) return
@@ -460,7 +475,7 @@ export default function EditorView({ scope = 'room', blank = false }) {
   }
 
   return (
-    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragEnd={handleDragEnd}>
       <div className="h-screen flex flex-col bg-[var(--p-bg-subtle)] overflow-hidden">
         {/* PR-26: when the user arrived from a chat via the wrench
             icon, the top-bar Back button returns to that chat
