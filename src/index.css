@@ -2433,6 +2433,57 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+/* PR-29: tight markdown rendering inside the 3-line snippet clamp.
+   The snippet is a 240-char slice of a chat message; we want the
+   formatting (bold, code, lists, links) to show through, but
+   without the default browser margins blowing past the 3-line
+   visual bound. */
+.fav-snippet-md > * {
+  margin: 0;
+}
+.fav-snippet-md > * + * {
+  margin-top: 2px;
+}
+.fav-snippet-md strong { font-weight: 600; }
+.fav-snippet-md em { font-style: italic; }
+.fav-snippet-md code {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.95em;
+  background: var(--p-bg-subtle);
+  padding: 0 4px;
+  border-radius: 3px;
+}
+.fav-snippet-md pre {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.95em;
+  background: var(--p-bg-subtle);
+  padding: 4px 6px;
+  border-radius: 3px;
+  white-space: pre-wrap;
+  overflow: hidden;
+}
+.fav-snippet-md a {
+  color: var(--p-gold-deep, #8B6A10);
+  text-decoration: underline;
+}
+.fav-snippet-md ul,
+.fav-snippet-md ol {
+  padding-left: 1.1em;
+}
+.fav-snippet-md h1,
+.fav-snippet-md h2,
+.fav-snippet-md h3,
+.fav-snippet-md h4,
+.fav-snippet-md h5,
+.fav-snippet-md h6 {
+  font-size: 1em;
+  font-weight: 600;
+}
+.fav-snippet-md blockquote {
+  border-left: 2px solid var(--p-border);
+  padding-left: 6px;
+  color: var(--p-text-secondary);
+}
 .fav-meta {
   font-size: 10px;
   color: var(--p-text-muted);
