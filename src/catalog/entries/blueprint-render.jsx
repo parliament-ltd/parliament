@@ -613,6 +613,11 @@ export default function BlueprintRender({ hostAPI } = {}) {
     return {
       widthPercent:  (w / layout.viewBox.width)  * 100,
       leftPercent:   (cx / layout.viewBox.width)  * 100,
+      // PR-30: the Includes sidebar tracks the selected room's
+      // vertical center via this percent instead of sitting on
+      // canvas center (which felt disconnected from the room
+      // after the enlarge-in-place change).
+      centerYPercent: (cy / layout.viewBox.height) * 100,
       bottomPercent: (bottomY / layout.viewBox.height) * 100,
     }
   }, [selectedRoomId, isNarrow, layout, selectedRoomScale])
@@ -764,12 +769,45 @@ export default function BlueprintRender({ hostAPI } = {}) {
       {/* PR-19j: desktop renders the details inline (inside the
           expanded room <foreignObject> + a sidebar to the right +
           an action strip below). Mobile still uses the bottom-sheet
-          overlay. */}
+          overlay.
+          PR-30:
+            - Sidebar tracks the selected room's vertical center
+              via expandedRoomBox.centerYPercent (was canvas-50%).
+            - Dates row + Desktop/Mobile pill moved out of the
+              enlarged room into the sidebar header so the room
+              itself stays quiet (just its name + wireframe).
+       */}
       {!isNarrow && selectedRoomId && (
         <aside
           className={`bp-includes-sidebar${detailsReady ? ' show' : ''}`}
           aria-label={`Includes for ${selectedMode?.meta?.name || 'this room'}`}
+          style={
+            expandedRoomBox
+              ? { top: `${expandedRoomBox.centerYPercent}%` }
+              : undefined
+          }
         >
+          {(() => {
+            const created   = fmtShortDate(selectedMode?.meta?.created)
+            const lastUsed  = selectedLastConv ? fmtShortDate(selectedLastConv.updatedAt) : null
+            const lastModel = selectedLastConv ? modelLabel(selectedLastConv.model)        : null
+            const deviceLabel = selectedMode?.deviceClass === 'visual-touch-phone'
+              ? 'Mobile' : 'Desktop'
+            const hasDates = created || lastUsed || lastModel
+            return (
+              <>
+                {hasDates && (
+                  <dl className="ov-dates">
+                    {created   && <><dt>Created</dt><dd>{created}</dd></>}
+                    {lastUsed  && <><dt>Last used</dt><dd>{lastUsed}</dd></>}
+                    {lastModel && <><dt>Last spoken to</dt><dd>{lastModel}</dd></>}
+                  </dl>
+                )}
+                <div className="ov-device-pill">{deviceLabel}</div>
+              </>
+            )
+          })()}
+
           <div className="ov-section-label">Includes</div>
           {selectedIncludes.length > 0 ? (
             <ul className="ov-includes">
@@ -1004,7 +1042,6 @@ function Room({
   showInlineDetails,
   transformStyle,
   roomScale,
-  lastConv,
   onEnter,
   onLeave,
   onClick,
@@ -1170,7 +1207,6 @@ function Room({
           >
             <InlineRoomDetails
               mode={mode}
-              lastConv={lastConv}
               isActive={isActive}
             />
           </div>
@@ -1203,17 +1239,14 @@ function Room({
 // PR-19l: action buttons (Copy / Delete / Enter) moved BACK out into
 // an external `.bp-action-card` positioned below the room — they read
 // more clearly outside the room frame.
-function InlineRoomDetails({ mode, lastConv, isActive }) {
+// PR-30: trimmed to title + abstract wireframe only. The dates row
+// and the device-class pill moved to the Includes sidebar so the
+// enlarged room can stay quiet (just its name and a hint of its
+// shape) and all the metadata clusters together in one place.
+function InlineRoomDetails({ mode, isActive }) {
   if (!mode) return null
   const layoutRef = mode.layout?.ref
   const name = (mode?.meta?.name || mode?.id || 'Room').toUpperCase()
-  const created = fmtShortDate(mode.meta?.created)
-  const lastUsed = lastConv ? fmtShortDate(lastConv.updatedAt) : null
-  const lastModel = lastConv ? modelLabel(lastConv.model) : null
-  // PR-29: surface device class as a small pill above the bullet
-  // list so users can tell at a glance whether a built room is
-  // desktop- or mobile-shaped.
-  const deviceLabel = mode?.deviceClass === 'visual-touch-phone' ? 'Mobile' : 'Desktop'
   return (
     <div className="bp-inline-details">
       <div className="bp-inline-title">
@@ -1225,7 +1258,6 @@ function InlineRoomDetails({ mode, lastConv, isActive }) {
           {name}
         </span>
       </div>
-      <div className="bp-inline-pill">{deviceLabel}</div>
       {layoutRef && (
         <div className="bp-inline-layout">
           <div className="bp-inline-layout-img">
@@ -1233,11 +1265,6 @@ function InlineRoomDetails({ mode, lastConv, isActive }) {
           </div>
         </div>
       )}
-      <dl className="bp-inline-dates">
-        {created  && <><dt>Created</dt><dd>{created}</dd></>}
-        {lastUsed && <><dt>Last used</dt><dd>{lastUsed}</dd></>}
-        {lastModel && <><dt>Last spoken to</dt><dd>{lastModel}</dd></>}
-      </dl>
     </div>
   )
 }

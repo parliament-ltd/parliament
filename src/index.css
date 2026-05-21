@@ -2111,18 +2111,8 @@
   text-wrap: balance;
   max-width: 100%;
 }
-.bp-inline-pill {
-  display: inline-block;
-  padding: 1.5px 7px;
-  border-radius: 999px;
-  font-size: 6.25px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  background: rgba(196, 169, 77, 0.10);
-  color: #8B6A10;
-  border: 0.5px solid rgba(196, 169, 77, 0.4);
-}
+/* PR-30: .bp-inline-pill removed — the device pill moved out of the
+   enlarged room into the Includes sidebar (.ov-device-pill). */
 .bp-inline-layout {
   display: flex;
   align-items: center;
@@ -2136,34 +2126,11 @@
   padding: 4px;
   box-sizing: border-box;
 }
-.bp-inline-dates {
-  display: grid;
-  /* PR-29: minmax(0, ...) lets cells shrink below their content
-     width so long "Last spoken to" entries wrap inside the cell
-     instead of forcing the grid past the room's edge. */
-  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
-  column-gap: 6px;
-  row-gap: 2px;
-  /* PR-19l followup: 9px → 6.75px to match the SVG-viewBox shrink. */
-  font-size: 6.75px;
-  color: var(--p-text-secondary);
-  margin: 0;
-  max-width: 100%;
-}
-.bp-inline-dates dt {
-  font-weight: 500;
-  color: var(--p-text-muted);
-  text-align: right;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.bp-inline-dates dd {
-  margin: 0;
-  text-align: left;
-  color: var(--p-text-primary);
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
+/* PR-30: .bp-inline-dates removed — Created / Last used / Last spoken
+   to moved out of the enlarged room into the Includes sidebar
+   (.ov-dates). The dates now read at full legibility inside the
+   sidebar's card rather than at the foreignObject's counter-scaled
+   ~6px size, which was always borderline. */
 /* PR-19l: action buttons live in a card below the expanded room, not
    inside the foreignObject. The card's width matches the expanded
    room's apparent width; `top` is computed from the room's bottom
@@ -2260,6 +2227,50 @@
 }
 .bp-includes-sidebar .ov-section-label {
   margin-bottom: 10px;
+}
+
+/* PR-30: dates row at the top of the Includes sidebar (was inside
+   the enlarged room foreignObject). Two-column grid so the labels
+   right-align against the values without each row taking a full
+   line. minmax(0, ...) and overflow-wrap let long "Last spoken to"
+   model labels wrap within their cell. */
+.bp-includes-sidebar .ov-dates {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  column-gap: 10px;
+  row-gap: 3px;
+  font-size: 10.5px;
+  color: var(--p-text-secondary);
+  margin: 0 0 10px;
+}
+.bp-includes-sidebar .ov-dates dt {
+  font-weight: 500;
+  color: var(--p-text-muted);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.bp-includes-sidebar .ov-dates dd {
+  margin: 0;
+  color: var(--p-text-primary);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* PR-30: Desktop/Mobile pill above the Includes section. Same gold
+   pill recipe as before, just at native sidebar font size now that
+   it isn't being counter-scaled inside the room. */
+.bp-includes-sidebar .ov-device-pill {
+  display: inline-block;
+  padding: 2px 9px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(196, 169, 77, 0.10);
+  color: #8B6A10;
+  border: 0.5px solid rgba(196, 169, 77, 0.4);
 }
 
 @media (max-width: 768px) {
