@@ -293,6 +293,11 @@ export default function BlueprintRender({ hostAPI } = {}) {
   //   expands the selected room to ~65% of canvas while shrinking
   //   the rest to 0.55x. Mobile keeps the bottom-sheet behavior.
   const [selectedRoomId, setSelectedRoomId] = useState(null)
+  // PR-29: two-step Copy flow. `copyTarget` holds the source mode while
+  // the BlueprintCopyModal is open; `copyToast` is the brief inline
+  // confirmation that fades in/out after a successful "Copy as Is."
+  const [copyTarget, setCopyTarget] = useState(null)
+  const [copyToast, setCopyToast] = useState('')
   // PR-19j: gate the foreignObject details opacity fade-in so it
   // appears AFTER the transform settles. Toggled by an effect that
   // runs a 280ms setTimeout when selectedRoomId becomes truthy.
@@ -469,23 +474,38 @@ export default function BlueprintRender({ hostAPI } = {}) {
     enterRoom(id)
   }, [selectedRoomId, enterRoom])
 
-  const onOverlayCopy = useCallback(async () => {
+  // PR-29: Copy is now a two-step flow. The Copy button opens
+  // BlueprintCopyModal, which offers "Copy Room as Is" (saves +
+  // toast, user stays on blueprint) or "Edit new room in The Lab"
+  // (saves + navigates to the editor). Previously the Copy button
+  // jumped straight to the editor, which felt unexplained.
+  const onOverlayCopy = useCallback(() => {
     if (!selectedRoomId) return
     const source = modesById.get(selectedRoomId)
     if (!source) return
+    setCopyTarget({ sourceMode: source })
+  }, [selectedRoomId, modesById])
+
+  const performCopy = useCallback(async (toLab) => {
+    if (!copyTarget) return
+    const sourceName = copyTarget.sourceMode?.meta?.name?.trim() || 'this room'
     try {
-      const draft = createCopyOfMode(source)
+      const draft = createCopyOfMode(copyTarget.sourceMode)
       const saved = await saveMode(draft)
+      setCopyTarget(null)
       setSelectedRoomId(null)
       window.dispatchEvent(new Event('blueprint-rooms-changed'))
-      navigate(`/edit/${saved.id}`)
+      if (toLab) {
+        navigate(`/edit/${saved.id}`)
+        return
+      }
+      setCopyToast(`Copied "${sourceName}" to your blueprint`)
+      window.setTimeout(() => setCopyToast(''), 2500)
     } catch (err) {
-      // Fall back silently — the overlay closes, user can retry from
-      // the editor. A toast surface would require a wider plumbing.
       console.error('Copy Room failed:', err)
-      setSelectedRoomId(null)
+      setCopyTarget(null)
     }
-  }, [selectedRoomId, modesById, navigate])
+  }, [copyTarget, navigate])
 
   const onOverlayDelete = useCallback(async () => {
     if (!selectedRoomId) return
@@ -541,15 +561,16 @@ export default function BlueprintRender({ hostAPI } = {}) {
   const transformFor = useCallback((placed) => {
     if (!selectedRoomId || isNarrow) return null
     if (placed.id === selectedRoomId) {
-      const cx = placed.box.x + placed.box.width / 2
-      const cy = placed.box.y + placed.box.height / 2
-      const tx = layout.viewBox.width / 2 - cx
-      const ty = layout.viewBox.height / 2 - cy
-      // PR-19l: `z-index` removed — it has no effect on SVG <g>
-      // siblings. Stacking order is forced via the two-pass render
-      // below (non-selected rooms first, selected room last).
+      // PR-29: enlarge in place. Previously the selected room was
+      // translated to canvas center on top of the scale, which felt
+      // jarring on smaller viewports — the enlarged room could land
+      // below the fold and force the user to scroll. Now the room
+      // just scales up where it already sits; transform-origin: center
+      // + transform-box: fill-box ensures the scale grows symmetrically
+      // around the room's own center, so it never feels like it
+      // "jumps" sideways.
       return {
-        transform: `translate(${tx}px, ${ty}px) scale(${selectedRoomScale})`,
+        transform: `scale(${selectedRoomScale})`,
         transformOrigin: 'center',
         transformBox: 'fill-box',
         transition: 'transform 280ms ease, opacity 280ms ease',
@@ -562,7 +583,7 @@ export default function BlueprintRender({ hostAPI } = {}) {
       transition: 'transform 280ms ease, opacity 280ms ease',
       opacity: 0.35,
     }
-  }, [selectedRoomId, isNarrow, layout, selectedRoomScale])
+  }, [selectedRoomId, isNarrow, selectedRoomScale])
 
   // PR-19l: ensure the selected room renders LAST in SVG document
   // order so it sits on top of every other room. (CSS z-index on
@@ -574,19 +595,25 @@ export default function BlueprintRender({ hostAPI } = {}) {
     return sel ? [...others, sel] : layout.placedRooms
   }, [layout.placedRooms, selectedRoomId])
 
-  // PR-19l: pixel-fractions for positioning the external action card
-  // directly below the expanded room. Width matches the expanded
-  // room's apparent width; top is the room's bottom edge as a fraction
-  // of the viewBox height. Both expressed as percentages of .bp-wrap.
+  // Pixel-fractions for positioning the external action card directly
+  // below the expanded room. Width matches the expanded room's
+  // apparent width; left/bottom track the room's actual scaled box.
+  // PR-29: the room no longer translates to viewBox center, so the
+  // card position is computed from the room's original center +
+  // half-the-scaled-height instead of assuming canvas-center.
   const expandedRoomBox = useMemo(() => {
     if (!selectedRoomId || isNarrow) return null
     const placed = layout.placedRooms.find(p => p.id === selectedRoomId)
     if (!placed) return null
     const w = placed.box.width  * selectedRoomScale
     const h = placed.box.height * selectedRoomScale
+    const cx = placed.box.x + placed.box.width  / 2
+    const cy = placed.box.y + placed.box.height / 2
+    const bottomY = cy + h / 2
     return {
       widthPercent:  (w / layout.viewBox.width)  * 100,
-      bottomPercent: (0.5 + h / (2 * layout.viewBox.height)) * 100,
+      leftPercent:   (cx / layout.viewBox.width)  * 100,
+      bottomPercent: (bottomY / layout.viewBox.height) * 100,
     }
   }, [selectedRoomId, isNarrow, layout, selectedRoomScale])
 
@@ -771,6 +798,7 @@ export default function BlueprintRender({ hostAPI } = {}) {
           className={`bp-action-card${detailsReady ? ' show' : ''}`}
           style={{
             width: `${expandedRoomBox.widthPercent}%`,
+            left: `${expandedRoomBox.leftPercent}%`,
             top: `calc(${expandedRoomBox.bottomPercent}% + 10px)`,
           }}
         >
@@ -805,6 +833,76 @@ export default function BlueprintRender({ hostAPI } = {}) {
           onDelete={onOverlayDelete}
         />
       )}
+
+      {/* PR-29: copy-flow modal. Opens when the user picks Copy
+          from either the desktop action card or the mobile overlay. */}
+      {copyTarget && (
+        <BlueprintCopyModal
+          sourceName={copyTarget.sourceMode?.meta?.name?.trim() || 'this room'}
+          onClose={() => setCopyTarget(null)}
+          onCopyAsIs={() => performCopy(false)}
+          onCopyToLab={() => performCopy(true)}
+        />
+      )}
+
+      {/* PR-29: brief inline confirmation when "Copy as Is" succeeds. */}
+      {copyToast && <div className="bp-copy-toast">{copyToast}</div>}
+    </div>
+  )
+}
+
+// PR-29: confirmation modal for the Copy button on a blueprint room.
+// Two actions: "Copy Room as Is" stays on the blueprint with a toast;
+// "Edit new room in The Lab" navigates to the editor with the fresh
+// copy loaded. Naming the room happens in the Lab (or never — the
+// copy ships with a sensible default name).
+function BlueprintCopyModal({ sourceName, onClose, onCopyAsIs, onCopyToLab }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  return (
+    <div
+      className="fixed inset-0 z-[160] flex items-center justify-center p-5"
+      style={{ backgroundColor: 'rgba(25, 25, 25, 0.32)' }}
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        className="w-[440px] max-w-[94vw] bg-[var(--p-bg-surface)] border border-[var(--p-border)] rounded-xl shadow-2xl shadow-black/20 p-5 flex flex-col gap-3"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="text-base font-medium text-[var(--p-text-primary)]">
+          Copy &ldquo;{sourceName}&rdquo;?
+        </div>
+        <div className="text-[12.5px] text-[var(--p-text-secondary)] leading-[1.55]">
+          Make a fresh copy of this room. You can use it right away, or
+          customize it in The Lab first — your choice.
+        </div>
+        <div className="flex items-center justify-end gap-2 pt-2 flex-wrap">
+          <button
+            onClick={onClose}
+            className="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--p-border)] bg-transparent text-[var(--p-text-secondary)] hover:border-[var(--p-gold-light)] hover:text-[var(--p-gold-light)] transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onCopyAsIs}
+            className="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--p-border)] bg-transparent text-[var(--p-text-primary)] hover:border-[var(--p-gold-light)] hover:bg-[rgba(196,169,77,0.06)] transition-colors"
+          >
+            Copy Room as Is
+          </button>
+          <button
+            onClick={onCopyToLab}
+            className="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--p-gold-light)] bg-[var(--p-gold-light)] text-white hover:bg-[var(--p-gold-muted)] hover:border-[var(--p-gold-muted)] transition-colors"
+          >
+            Edit new room in The Lab
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
@@ -1112,6 +1210,10 @@ function InlineRoomDetails({ mode, lastConv, isActive }) {
   const created = fmtShortDate(mode.meta?.created)
   const lastUsed = lastConv ? fmtShortDate(lastConv.updatedAt) : null
   const lastModel = lastConv ? modelLabel(lastConv.model) : null
+  // PR-29: surface device class as a small pill above the bullet
+  // list so users can tell at a glance whether a built room is
+  // desktop- or mobile-shaped.
+  const deviceLabel = mode?.deviceClass === 'visual-touch-phone' ? 'Mobile' : 'Desktop'
   return (
     <div className="bp-inline-details">
       <div className="bp-inline-title">
@@ -1123,6 +1225,7 @@ function InlineRoomDetails({ mode, lastConv, isActive }) {
           {name}
         </span>
       </div>
+      <div className="bp-inline-pill">{deviceLabel}</div>
       {layoutRef && (
         <div className="bp-inline-layout">
           <div className="bp-inline-layout-img">

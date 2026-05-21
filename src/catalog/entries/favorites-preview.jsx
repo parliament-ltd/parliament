@@ -19,6 +19,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Copy, Check, Trash2, Star, Pencil } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { initDB, deleteFavorite as dbDeleteFavorite } from '../../lib/db'
 import { useConversations } from '../../stores/ConversationContext'
 
@@ -194,7 +196,15 @@ function FavCard({ fav, editing, selected, onToggleSelected, onOpen }) {
         </button>
       )}
 
-      <div className="fav-snippet">{fav.snippet}</div>
+      {/* PR-29: render as markdown so formatting from the source
+          message (bold, code, lists, links) carries through the
+          snippet. Partial markdown at the 240-char truncation
+          renders as best-effort (react-markdown is forgiving). */}
+      <div className="fav-snippet fav-snippet-md">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {fav.snippet}
+        </ReactMarkdown>
+      </div>
       <div className="fav-meta">
         <Star className="fav-star w-2.5 h-2.5" />
         <span className="fav-source">{fav.source}</span>

@@ -245,7 +245,7 @@ export default function InputArea({
   /* ── Card layout (Swift / mobile) ───────────────────────── */
   if (cardLayout) {
     return (
-      <div className="relative px-4 pt-2" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)' }} data-tour="chat-input">
+      <div className="relative px-2 pt-1" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 8px), 8px)' }} data-tour="chat-input">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
