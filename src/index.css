@@ -1155,12 +1155,70 @@
 
 /* ── Blueprint section ────────────────────────────────────── */
 .bp-wrap {
-  padding: 10px;
-  background: var(--p-bp-floor, #F5F0E8);
-  border-radius: 10px;
+  /* Mini-map redesign: bp-wrap IS the page card the rooms sit on.
+     Background uses the same chat-page-bg recipe (subtle bg + dot
+     texture) as the chat/editor surfaces so the blueprint reads as
+     "the same page surface" as those views. Surrounding card chrome
+     (border + soft shadow + rounded corners) matches editor-area-card.
+     The pre-mini-map heavy hatched border + beige floor are gone —
+     rooms are now little cards floating on a textured page.
+     IMPORTANT: padding is 0 so that absolute-positioned children
+     (bp-action-card, bp-includes-sidebar, bp-gel-frame) share the
+     same percentage-positioning space as the rooms inside the SVG.
+     Visual breathing room around the rooms comes from VIEWBOX_PAD
+     in blueprintShapes.js (24svg-units of inset around the rooms). */
   position: relative;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--p-bg-subtle);
+  background-image: radial-gradient(
+    circle,
+    var(--p-chat-page-dot-color, rgba(127, 127, 127, 0.08)) 1px,
+    transparent 1px
+  );
+  background-size: 16px 16px;
+  border: 0.5px solid var(--p-border);
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.04),
+    0 2px 8px rgba(0, 0, 0, 0.04);
 }
-.bp-svg { font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); }
+.bp-svg {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  /* Mini-map: explicit z-index so the gel-frame can sit BEHIND
+     the rooms (gel z 1, svg z 2) while the action card + sidebar
+     stay ABOVE (z 4 / z 3 from their own rules). */
+  position: relative;
+  z-index: 2;
+}
+
+/* Mini-map: gel container that wraps the selected room + action
+   card + Includes sidebar in a single translucent envelope.
+   Internally three rounded rects in a group at opacity 0.30 — the
+   group opacity composites the union as one shape so adjacent and
+   overlapping cells don't suffer alpha buildup. Each cell is
+   inflated 10px from its underlying card; the 20px gap between
+   cards exactly matches twice that halo, so cells touch seamlessly
+   and the outline becomes one continuous, non-rectangular blob. */
+.bp-gel-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 240ms ease 60ms;
+}
+.bp-gel-frame.show {
+  opacity: 0.30;
+}
+.bp-gel-cell {
+  position: absolute;
+  background: var(--p-bg-base);
+  border-radius: 14px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bp-gel-frame { transition: none; }
+}
 .bp-room-fill { transition: fill 0.2s ease; }
 .bp-pawn-ring {
   transform-origin: 10px 6px;
