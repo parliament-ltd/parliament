@@ -41,15 +41,10 @@ export const WALL_THICKNESS = 6      // outer wall stroke width (spec uses 7)
 // TARGET_INNER_WIDTH 620→465). The blueprint section was eating too
 // much vertical real estate on the homepage; smaller rooms keep the
 // floor feeling like a section rather than the whole page.
-// PR-34: shrunk another 80% (ROW_HEIGHT 150→120, TARGET_INNER_WIDTH
-// 465→370) so the blueprint stops dominating the homepage and reads
-// as one section among several. Font sizes in blueprint-render.jsx
-// scale proportionally — see the PR-19l followup note inside Room
-// for the SVG-unit-to-screen-pixel math.
-export const ROW_HEIGHT = 120        // target room interior height
+export const ROW_HEIGHT = 150        // target room interior height
 export const ROOM_GAP = 24           // gap between rooms in a row (PR-16a: was 14; +10 so adjacent bump+mirror-bump pairs don't collide)
 export const ROW_GAP = 18            // gap between rows
-export const TARGET_INNER_WIDTH = 370 // packs to this before wrapping
+export const TARGET_INNER_WIDTH = 465 // packs to this before wrapping
 
 // Per-layout aspect ratio (width / ROW_HEIGHT). Loosely follows the
 // proportions in refactor/parliament_homepage_v2 (2).html with small
@@ -488,52 +483,6 @@ export function labShape(box) {
     'Z',
   ].join(' ')
   return { path: d, interior: interiorBox(box) }
-}
-
-// ─── Decorative doors (PR-34) ─────────────────────────────────
-//
-// Every room gets one decorative door on its bottom wall. Hash-seeded
-// position + hinge side so a given room id always renders the same
-// door. The door is purely cosmetic — it doesn't currently signal any
-// connection. Hallways will arrive later as the dedicated connectivity
-// signal (linking specific door pairs); placing doors now means the
-// hallway work has natural anchor points to thread between.
-//
-// Why bottom-wall only:
-//   - Every layout variant's bottom edge is straight for the middle
-//     50% of room width (corner chamfers in document-centric BL and
-//     single-column BR stop at ≤16px from the corner; the door's
-//     0.35–0.55 fractional position keeps it clear).
-//   - "Rooms open onto the central floor" is the strongest mental
-//     model. Doors on the bottom face the floor consistently.
-//
-// Door width is fixed (not scaled with room size) — the door is the
-// same physical object across every room, the way a real door is.
-
-export const DOOR_WIDTH = 12
-
-/**
- * Pick the decorative door for a room.
- *
- * @param {object} args
- * @param {{x,y,width,height}} args.box
- * @param {string} args.roomId — used as the hash seed; same id always
- *   yields the same door.
- * @returns {{ x: number, y: number, width: number, hingeSide: 'left'|'right' }}
- *   `x, y` is the LEFT end of the opening (the wall runs +x at y);
- *   the opening spans from x to x + width.
- */
-export function pickDoor({ box, roomId }) {
-  const seed = hashString(roomId)
-  // t in [0.35, 0.55] keeps the door clear of every variant's corner
-  // chamfer. Slots 12+ (mod 256) — separate from the slots packRooms
-  // and the variant generators read so door position is uncorrelated
-  // with shape variant + bump perturbations.
-  const t = 0.35 + 0.20 * (((seed >>> 12) & 0xff) / 255)
-  const x = box.x + box.width * t
-  const y = box.y + box.height
-  const hingeSide = (((seed >>> 20) & 1) === 0) ? 'left' : 'right'
-  return { x, y, width: DOOR_WIDTH, hingeSide }
 }
 
 // ─── Fallback ─────────────────────────────────────────────────
