@@ -29,6 +29,7 @@ import { useIsNarrow } from '../../lib/useViewportWidth'
 import { modelLabel } from '../../lib/modelLabels'
 import { buildIncludes } from '../../lib/roomIncludes'
 import LayoutWireframe from '../../components/build/wizard/LayoutWireframe'
+import LayoutSilhouette from '../../components/LayoutSilhouette'
 import RoomDetailsOverlay from '../../components/RoomDetailsOverlay'
 import {
   packRooms,
@@ -223,6 +224,12 @@ export default function BlueprintRender({ hostAPI } = {}) {
   // entirely (close the selection) vs inside it (let the SVG /
   // sidebar / action card handlers decide).
   const wrapRef = useRef(null)
+  // PR-39: rendered pixel width of the SVG element. Used to convert
+  // viewBox units → CSS pixels so `selectedRoomScale` can grow the
+  // selected room JUST enough for the fixed-pixel HTML overlay
+  // (LayoutSilhouette + title at library-card sizes) to fit inside.
+  // ResizeObserver keeps this in sync on viewport changes.
+  const [svgPxWidth, setSvgPxWidth] = useState(0)
 
   // Subscribe to chats@1.0's row-hover bus. Payload = { conversationId | null }.
   useEffect(() => {
@@ -253,6 +260,23 @@ export default function BlueprintRender({ hostAPI } = {}) {
       window.removeEventListener('homepage-mode-changed', onChange)
       window.removeEventListener('blueprint-rooms-changed', onChange)
     }
+  }, [])
+
+  // PR-39: keep `svgPxWidth` in sync with the rendered SVG width via
+  // ResizeObserver. Combined with `layout.viewBox.width` it gives us the
+  // viewBox-unit → CSS-pixel ratio the selected-room scale needs.
+  useEffect(() => {
+    if (!svgRef.current) return undefined
+    const el = svgRef.current
+    const update = () => {
+      const r = el.getBoundingClientRect()
+      if (r && r.width) setSvgPxWidth(r.width)
+    }
+    update()
+    if (typeof ResizeObserver === 'undefined') return undefined
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
   }, [])
 
   // PR-19j: gate the foreignObject details fade-in. setTimeout cleared
@@ -440,15 +464,32 @@ export default function BlueprintRender({ hostAPI } = {}) {
   // canvas). The computed scale is also exposed via `selectedRoomScale`
   // so the Room component can counter-scale its interior content to
   // keep title/dates/buttons at native card-pixel sizes.
-  // Mini-map redesign: NO in-place enlargement on click. The selected
-  // room stays at its mini-map size. Visual feedback comes from
-  // (a) the gel container appearing around the room + the action
-  // card + Includes sidebar, and (b) all OTHER rooms shrinking to
-  // 0.55 + fading to 0.35 opacity (the existing transformFor logic).
-  // This avoids clipping for bottom-row rooms in multi-row layouts
-  // (a 3x enlargement of a bottom-row room would extend past
-  // bp-wrap's bottom edge).
-  const selectedRoomScale = useMemo(() => 1, [])
+  // PR-39: the selected room scales up just enough to fit a fixed-
+  // pixel HTML overlay (LayoutSilhouette + title at library-card
+  // sizes). The overlay is what the user actually reads — the room
+  // outline is the frame. Target inner size (CSS px) is the library
+  // card's preview block (.lib-preview is 70px tall, ~180-200px wide
+  // depending on container) + a 12.5px title line + 8px gap + 16px
+  // outer padding ≈ 200 × 116. Add a small breathing margin so the
+  // overlay doesn't crowd the room's wall stroke.
+  const OVERLAY_TARGET_W = 220
+  const OVERLAY_TARGET_H = 132
+  const selectedRoomScale = useMemo(() => {
+    if (!selectedRoomId || isNarrow) return 1
+    if (!svgPxWidth || !layout?.viewBox?.width) return 1
+    const placed = layout.placedRooms.find(p => p.id === selectedRoomId)
+    if (!placed) return 1
+    const vbToPx = svgPxWidth / layout.viewBox.width
+    const wPx = placed.box.width  * vbToPx
+    const hPx = placed.box.height * vbToPx
+    if (wPx <= 0 || hPx <= 0) return 1
+    const sx = OVERLAY_TARGET_W / wPx
+    const sy = OVERLAY_TARGET_H / hPx
+    // Never shrink (sometimes a wide three-panel room is already
+    // large enough); cap at 3.5 so a tiny single-column room on a
+    // narrow viewport doesn't blow past bp-wrap edges.
+    return Math.min(3.5, Math.max(1, sx, sy))
+  }, [selectedRoomId, isNarrow, svgPxWidth, layout])
 
   const transformFor = useCallback((placed) => {
     if (!selectedRoomId || isNarrow) return null
@@ -732,6 +773,36 @@ export default function BlueprintRender({ hostAPI } = {}) {
             potential later reintroduction. */}
       </svg>
 
+      {/* PR-39: HTML overlay over the selected room — title +
+          LayoutSilhouette rendered at fixed CSS pixel sizes (the
+          same component the library cards use). The selected room
+          is dynamically scaled (selectedRoomScale, computed from
+          svgPxWidth) so the overlay always fits inside its frame.
+          We position by the room's center percent + CSS translate
+          -50% so the overlay stays anchored as the room scales. The
+          SVG title for the selected room is hidden in <Room> below
+          to avoid double-rendering. */}
+      {!isNarrow && selectedRoomId && expandedRoomBox && selectedMode && (
+        <div
+          className={`bp-room-card-overlay${detailsReady ? ' show' : ''}`}
+          style={{
+            left: `${expandedRoomBox.leftPercent}%`,
+            top: `${expandedRoomBox.centerYPercent}%`,
+          }}
+          aria-hidden="true"
+        >
+          <div className="bp-card-title">
+            <div className="bp-card-the">THE</div>
+            <div className="bp-card-name">
+              {(selectedMode?.meta?.name || selectedMode?.id || 'Room').toUpperCase()}
+            </div>
+          </div>
+          {selectedMode.layout?.ref && (
+            <LayoutSilhouette layoutId={selectedMode.layout.ref} />
+          )}
+        </div>
+      )}
+
       {/* PR-19j: desktop renders the details inline (inside the
           expanded room <foreignObject> + a sidebar to the right +
           an action strip below). Mobile still uses the bottom-sheet
@@ -810,15 +881,15 @@ export default function BlueprintRender({ hostAPI } = {}) {
       })()}
 
       {/* PR-19l: action card positioned directly below the expanded
-          room — same width as the room, center-aligned. Width + top
-          come from `expandedRoomBox` so the card tracks the room as it
-          scales. (Was briefly inside the room in PR-19k, but the
-          buttons read more clearly outside the room frame.) */}
+          room, center-aligned on the room's horizontal midpoint.
+          PR-39: width is now intrinsic (sized to fit Copy/Delete/Enter
+          buttons + padding), NOT the room's apparent width. The
+          centering uses left:roomCenterPercent + the CSS
+          transform: translate(-50%) on .bp-action-card. */}
       {!isNarrow && selectedRoomId && expandedRoomBox && (
         <div
           className={`bp-action-card${detailsReady ? ' show' : ''}`}
           style={{
-            width: `${expandedRoomBox.widthPercent}%`,
             left: `${expandedRoomBox.leftPercent}%`,
             top: `calc(${expandedRoomBox.bottomPercent}% + 20px)`,
           }}
@@ -1074,15 +1145,23 @@ function Room({
           dropped everything else from inside the room (activity
           dots, dashed wall hints, walking-human, furniture glyphs,
           foreignObject inline details). The room is now JUST its
-          shape + title; when selected and enlarged, the SVG text
-          scales up with the <g>, so the title becomes readable
-          without any foreignObject / counter-scale machinery. */}
-      <text x={cx} y={theY} textAnchor="middle" fontSize="3.5" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
-        THE
-      </text>
-      <text x={cx} y={nameY} textAnchor="middle" fontSize="4.5" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
-        {name}
-      </text>
+          shape + title.
+          PR-39: when the room is SELECTED the SVG title is hidden,
+          because the HTML overlay (`.bp-room-card-overlay` in the
+          parent) renders a fixed-pixel-size title + wireframe on
+          top. Without this guard the SVG text would scale with the
+          <g> transform and end up double-stacked behind the HTML
+          overlay. */}
+      {!isSelected && (
+        <>
+          <text x={cx} y={theY} textAnchor="middle" fontSize="3.5" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+            THE
+          </text>
+          <text x={cx} y={nameY} textAnchor="middle" fontSize="4.5" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
+            {name}
+          </text>
+        </>
+      )}
 
       {/* Hatch overlay for non-selected rooms when a selection is
           active. Same path, hatched fill, faded in via CSS. */}

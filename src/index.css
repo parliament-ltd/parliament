@@ -2189,15 +2189,79 @@
    (.ov-dates). The dates now read at full legibility inside the
    sidebar's card rather than at the foreignObject's counter-scaled
    ~6px size, which was always borderline. */
+
+/* PR-39: HTML overlay over the selected room — title (matching the
+   library card's `.lib-card-name` recipe) on top, LayoutSilhouette
+   (the same component homepage Library cards render for room/layout
+   previews) below. Sits in absolute coords relative to `.bp-wrap`;
+   the room itself scales (via dynamic `selectedRoomScale`) so the
+   overlay always fits inside the room's stroked frame.
+   The width is fixed (200px) and the inner LayoutSilhouette's
+   `.lib-preview` rule pegs preview height to 70px, so the overlay's
+   visual footprint never changes regardless of which room is
+   selected. */
+.bp-room-card-overlay {
+  position: absolute;
+  /* Anchor on the room's center (left/top set inline), then center
+     the overlay box on that point. */
+  transform: translate(-50%, calc(-50% + 4px));
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 0;
+  background: transparent;
+  opacity: 0;
+  transition: opacity 220ms ease 60ms;
+  pointer-events: none;
+  z-index: 3;
+  box-sizing: border-box;
+}
+.bp-room-card-overlay.show {
+  opacity: 1;
+}
+.bp-card-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.15;
+  text-align: center;
+}
+.bp-card-the {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  color: #9A9490;
+  text-transform: uppercase;
+}
+.bp-card-name {
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: #5A5550;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+  max-width: 100%;
+}
+@media (max-width: 768px) {
+  .bp-room-card-overlay { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bp-room-card-overlay { transition: none; }
+}
+
 /* PR-19l: action buttons live in a card below the expanded room, not
-   inside the foreignObject. The card's width matches the expanded
-   room's apparent width; `top` is computed from the room's bottom
-   edge and passed inline. */
+   inside the foreignObject. PR-39: width is now intrinsic — the card
+   sizes to fit its three buttons + padding, NOT the room's apparent
+   width. The horizontal center is set via inline `left:roomCenter%`
+   plus the CSS `transform: translate(-50%, ...)` below. */
 .bp-action-card {
   position: absolute;
   left: 50%;
   transform: translate(-50%, 8px);
-  display: flex;
+  display: inline-flex;
+  width: auto;
   justify-content: center;
   gap: 6px;
   padding: 8px 10px;
