@@ -37,7 +37,6 @@ import {
   studyShape,
   labShape,
   hashString,
-  pickDoor,
   SYSTEM_KIND,
   SYSTEM_ROOM_IDS,
 } from '../../lib/blueprintShapes'
@@ -1083,77 +1082,6 @@ function FurnitureGlyph({ x, y, refName }) {
   )
 }
 
-// PR-34: decorative door — wall gap + door panel + quarter-circle
-// swing arc, in the architectural-plan convention. Hash-seeded
-// position + hinge side come from pickDoor(); rendering happens here.
-//
-//   panel (thick) ─┐         ┌─ swing arc (thin)
-//                  │         │
-//                  ╵─ ─ ─ ─ ─╯
-//                  ╵         ↑
-//                  └ hinge   └ opening
-//
-// The "wall gap" is faked by drawing an opaque WALL_FILL rect over the
-// wall stroke at the opening — the same color as the floor, so the
-// stroke visually breaks without leaving any mark. Cheaper than
-// segmenting the room path into two stroked halves, and works
-// uniformly across every variant generator.
-//
-// `wallColor` follows the room's border color so the door reads as
-// part of the same wall (gold on hover/active/selected, grey at rest).
-function Door({ x, y, width, hingeSide, wallColor = ROOM_BORDER_DEFAULT }) {
-  const r = width
-  const hingeX = hingeSide === 'left' ? x : x + width
-  const arcEndX = hingeSide === 'left' ? x + width : x
-  const panelTopY = y - r
-  // Sweep flag picks the arc direction so the curve always swings
-  // INTO the room (upward, in SVG's flipped-y space). Left-hinge =>
-  // sweep 1 (clockwise on screen, upper-right quadrant); right-hinge
-  // => sweep 0 (counterclockwise, upper-left quadrant).
-  const sweepFlag = hingeSide === 'left' ? 1 : 0
-  return (
-    <g aria-hidden="true" className="bp-door">
-      {/* Wall-gap eraser. Matches WALL_FILL (= floor color) so it
-          blanks the wall stroke at the opening without painting a
-          visible mark. Height 2.8 fully covers the stroke at all
-          render states (0.5px idle, 1.5px active/selected). */}
-      <rect
-        x={x}
-        y={y - 1.4}
-        width={width}
-        height={2.8}
-        fill={WALL_FILL}
-        stroke="none"
-      />
-      {/* Door panel — the door slab itself, hinged at one end, swung
-          fully open (90°) into the room. Drawn thicker than the swing
-          arc so the panel reads as the dominant element. */}
-      <line
-        x1={hingeX}
-        y1={y}
-        x2={hingeX}
-        y2={panelTopY}
-        stroke={wallColor}
-        strokeWidth="1"
-        strokeLinecap="round"
-        vectorEffect="non-scaling-stroke"
-      />
-      {/* Swing arc — quarter-circle of radius `width` from the panel
-          tip back to the closed-door position on the wall. Thinner
-          so the panel anchors the visual; the arc reads as the
-          implied motion. */}
-      <path
-        d={`M ${hingeX} ${panelTopY} A ${r} ${r} 0 0 ${sweepFlag} ${arcEndX} ${y}`}
-        fill="none"
-        stroke={wallColor}
-        strokeWidth="0.5"
-        strokeOpacity="0.7"
-        vectorEffect="non-scaling-stroke"
-      />
-    </g>
-  )
-}
-
 // ─── Subcomponents ───────────────────────────────────────────
 
 // PR-19g: simplified room card. Centered title (THE / NAME) + optional
@@ -1216,12 +1144,6 @@ function Room({
     ? Array.from(new Set(mode.components.map(c => roomRefName(c.ref)).filter(r => GLYPHS[r])))
     : []
   const glyphs = furniturePositions(componentRefs, interior, { avoidCenter: isActive })
-
-  // PR-34: decorative door on the bottom wall. Hash-seeded by room id
-  // so the door stays put across renders. Hidden when the room is
-  // expanded in place — the foreignObject details panel covers the
-  // interior and the arc would visually conflict with it.
-  const door = pickDoor({ box, roomId: id })
 
   return (
     <g
@@ -1291,21 +1213,6 @@ function Room({
         vectorEffect="non-scaling-stroke"
       />
 
-      {/* PR-34: decorative door — wall gap + swung-open door panel +
-          quarter-circle swing arc. Drawn AFTER the border so the
-          wall-gap eraser blanks the stroke at the opening. Hidden
-          while the room is showing inline details (the foreignObject
-          panel sits over the interior). */}
-      {!showInlineDetails && (
-        <Door
-          x={door.x}
-          y={door.y}
-          width={door.width}
-          hingeSide={door.hingeSide}
-          wallColor={stroke}
-        />
-      )}
-
       {/* Centered title block. PR-19k: hidden when the room is the
           expand-in-place selection — the title moves inside the
           foreignObject so it can render at native card-pixel size via
@@ -1317,14 +1224,11 @@ function Room({
               container width regardless of viewBox, so a smaller
               viewBox stretches each SVG unit across more screen
               pixels — without this compensation the room labels would
-              appear ~33% larger on screen than before.
-              PR-34: rooms shrunk another ×0.80, so fonts scale to
-              match (7.5→6, 9.75→7.8) and keep the on-screen text
-              size constant across the resize. */}
-          <text x={cx} y={theY} textAnchor="middle" fontSize="6" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+              appear ~33% larger on screen than before. */}
+          <text x={cx} y={theY} textAnchor="middle" fontSize="7.5" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
             THE
           </text>
-          <text x={cx} y={nameY} textAnchor="middle" fontSize="7.8" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
+          <text x={cx} y={nameY} textAnchor="middle" fontSize="9.75" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
             {name}
           </text>
         </>
@@ -1444,7 +1348,7 @@ function fmtShortDate(iso) {
 // (the user is on `/` for Study or `/edit*` for Lab). Sits below the
 // compass/wrench so the room's identity icon stays visible.
 function SystemRoom({ placed, isStudy, isHovered, isDimmed, isCurrent, transformStyle, onEnter, onLeave, onClick, onHereTipShow, onHereTipHide }) {
-  const { box, id } = placed
+  const { box } = placed
   const { path, interior } = isStudy ? studyShape(box) : labShape(box)
   const cx = interior.x + interior.width / 2
   const cy = interior.y + interior.height / 2
@@ -1459,12 +1363,6 @@ function SystemRoom({ placed, isStudy, isHovered, isDimmed, isCurrent, transform
   const theY = nameY - 16
   const iconY = nameY + 22
 
-  // PR-34: same decorative door treatment as user rooms. Study uses
-  // the bottom wall (its chamfer is bottom-LEFT; door lives well to
-  // the right of it). Lab's bottom is fully straight — its notch is
-  // at the top-right.
-  const door = pickDoor({ box, roomId: id })
-
   return (
     <g
       style={{ cursor: 'pointer', ...(transformStyle || {}) }}
@@ -1472,40 +1370,15 @@ function SystemRoom({ placed, isStudy, isHovered, isDimmed, isCurrent, transform
       onMouseLeave={onLeave}
       onClick={onClick}
     >
-      {/* PR-34: opaque base fill stops the outer-wall hatch from
-          bleeding through Study/Lab. Pre-PR-34 the system rooms used
-          only the near-transparent gold tint (alpha 0.035), which let
-          the floor's diagonal hatch pattern show inside the rooms —
-          they read as visually noisier than the user rooms next to
-          them. The gold tint now paints on top of an opaque WALL_FILL
-          base, matching the user rooms' clean interior. */}
-      <path d={path} fill={WALL_FILL} />
       <path d={path} fill={fill} className="bp-room-fill" />
       <path d={path} fill="none" stroke={stroke} strokeWidth="0.8" vectorEffect="non-scaling-stroke" />
 
-      {/* PR-34: decorative door — same convention as user rooms.
-          Suppressed when isCurrent because the walking-human (which
-          only renders for the current system room) sits in the same
-          vertical band as the door arc, and the two visually
-          collide. Leaving the door off the "you are here" room
-          also nudges the user's attention to the figure instead. */}
-      {!isCurrent && (
-        <Door
-          x={door.x}
-          y={door.y}
-          width={door.width}
-          hingeSide={door.hingeSide}
-          wallColor={stroke}
-        />
-      )}
-
       {/* PR-19l followup: matches the user-room title size (7.5 / 9.75)
-          to compensate for the smaller viewBox stretching SVG units.
-          PR-34: matched user-room shrink (6 / 7.8). */}
-      <text x={cx} y={theY} textAnchor="middle" fontSize="6" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+          to compensate for the smaller viewBox stretching SVG units. */}
+      <text x={cx} y={theY} textAnchor="middle" fontSize="7.5" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
         THE
       </text>
-      <text x={cx} y={nameY} textAnchor="middle" fontSize="7.8" fill={labelColor} letterSpacing="0.06em" fontWeight="600">
+      <text x={cx} y={nameY} textAnchor="middle" fontSize="9.75" fill={labelColor} letterSpacing="0.06em" fontWeight="600">
         {name}
       </text>
 
