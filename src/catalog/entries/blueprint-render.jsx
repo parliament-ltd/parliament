@@ -29,15 +29,14 @@
 
 import { useEffect, useMemo, useState, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Copy, Trash2, ArrowRight, LayoutDashboard, Palette } from 'lucide-react'
+import { Copy, Trash2, ArrowRight } from 'lucide-react'
 import { useConversations } from '../../stores/ConversationContext'
 import { listModes, deleteMode, saveMode, createCopyOfMode } from '../../lib/modes'
 import { createConversation } from '../../lib/db'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
 import { modelLabel } from '../../lib/modelLabels'
 import { buildIncludes } from '../../lib/roomIncludes'
-import { getIconComponent } from '../../lib/componentIcons'
-import { getEntry as getCatalogEntry } from '..'
+import LayoutSilhouette from '../../components/LayoutSilhouette'
 import {
   packRooms,
   buildRoomPath,
@@ -683,6 +682,7 @@ function BlueprintRoomModal({ mode, lastConv, includes, onClose, onEnter, onCopy
   const lastModel = lastConv ? modelLabel(lastConv.model) : null
   const lastUsed = lastConv ? fmtShortDate(lastConv.updatedAt) : null
   const deviceLabel = mode?.deviceClass === 'visual-touch-phone' ? 'MOBILE' : 'DESKTOP'
+  const layoutRef = mode?.layout?.ref
 
   return (
     <div
@@ -693,34 +693,39 @@ function BlueprintRoomModal({ mode, lastConv, includes, onClose, onEnter, onCopy
       aria-label={`${name} details`}
     >
       <div className="bp-modal-assembly" onClick={(e) => e.stopPropagation()}>
-        {/* Left: room card */}
-        <div className="bp-trim-wrap">
-          <div className="bp-card-room">
-            <div className="bp-card-room-title">
-              <span className="bp-card-room-label">THE</span>
-              <div className="bp-card-room-name">{name}</div>
-            </div>
-            <div className="bp-card-room-wireframe">
-              <ModalContentsAbstract mode={mode} />
-            </div>
-            <div className="bp-card-actions">
-              <button type="button" className="bp-action-btn" onClick={onCopy} aria-label="Copy room">
-                <Copy size={16} />
-                <span className="bp-action-tooltip">Copy</span>
-              </button>
-              <button type="button" className="bp-action-btn bp-action-btn-delete" onClick={onDelete} aria-label="Delete room">
-                <Trash2 size={16} />
-                <span className="bp-action-tooltip">Delete</span>
-              </button>
-              <button type="button" className="bp-action-btn bp-action-btn-enter" onClick={onEnter} aria-label="Enter room">
-                <ArrowRight size={18} />
-                <span className="bp-action-tooltip">Enter</span>
-              </button>
+        {/* Left column: room card + spool-shaped bridge. The
+            bridge is positioned absolutely against this column so
+            its vertical centre aligns with the room card's centre
+            (rather than the assembly's centre, which would be
+            biased by the taller features card on the right). */}
+        <div className="bp-modal-left-col">
+          <div className="bp-trim-wrap">
+            <div className="bp-card-room">
+              <div className="bp-card-room-title">
+                <span className="bp-card-room-label">THE</span>
+                <div className="bp-card-room-name">{name}</div>
+              </div>
+              <div className="bp-card-room-wireframe">
+                {layoutRef && <LayoutSilhouette layoutId={layoutRef} />}
+              </div>
+              <div className="bp-card-actions">
+                <button type="button" className="bp-action-btn" onClick={onCopy} aria-label="Copy room">
+                  <Copy size={16} />
+                  <span className="bp-action-tooltip">Copy</span>
+                </button>
+                <button type="button" className="bp-action-btn bp-action-btn-delete" onClick={onDelete} aria-label="Delete room">
+                  <Trash2 size={16} />
+                  <span className="bp-action-tooltip">Delete</span>
+                </button>
+                <button type="button" className="bp-action-btn bp-action-btn-enter" onClick={onEnter} aria-label="Enter room">
+                  <ArrowRight size={18} />
+                  <span className="bp-action-tooltip">Enter</span>
+                </button>
+              </div>
             </div>
           </div>
+          <ModalBridge />
         </div>
-        {/* Spool-shaped bridge connecting the two cards. */}
-        <ModalBridge />
         {/* Right: features card. Outer card carries the rounded
             corners + clipping; inner div is the scroll viewport so
             the webkit scrollbar doesn't poke past the rounded
@@ -773,56 +778,11 @@ function BlueprintRoomModal({ mode, lastConv, includes, onClose, onEnter, onCopy
   )
 }
 
-// PR-40h: tiny grid of lucide icons reflecting the room's CONTENTS
-// (layout + scheme + each unique component). Sits in the modal's
-// wireframe slot where the library would show a LayoutSilhouette;
-// this version surfaces what's INSIDE the room rather than what
-// layout shape it carries.
-function ModalContentsAbstract({ mode }) {
-  const cells = useMemo(() => {
-    const out = []
-    if (mode?.layout?.ref) {
-      out.push({ key: 'layout', Icon: LayoutDashboard, title: 'Layout' })
-    }
-    if (mode?.scheme?.ref) {
-      out.push({ key: 'scheme', Icon: Palette, title: 'Scheme' })
-    }
-    const seen = new Set()
-    for (const c of mode?.components || []) {
-      const ref = c?.ref
-      if (!ref) continue
-      const norm = String(ref).split('@')[0]
-      if (seen.has(norm)) continue
-      seen.add(norm)
-      const entry = getCatalogEntry(ref)
-      if (!entry) continue
-      out.push({
-        key: norm,
-        Icon: getIconComponent(entry.icon),
-        title: entry.displayName || norm,
-      })
-    }
-    return out.slice(0, 8)
-  }, [mode])
-  return (
-    <div className="bp-modal-contents-abstract" aria-hidden="true">
-      {cells.map(cell => {
-        const Icon = cell.Icon
-        return (
-          <div key={cell.key} className="bp-mca-cell" title={cell.title}>
-            <Icon size={13} strokeWidth={1.4} />
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
 // PR-40h: spool-shaped bridge between the two modal cards.
-// Double-concave silhouette — flat left/right edges that touch each
-// trim-wrap, top + bottom edges quadratically curve INWARD toward
-// the centre. Same translucent fill as the trim-wraps so the bridge
-// reads as the cards visually melting into each other.
+// Double-concave silhouette — flat left/right edges, top + bottom
+// edges quadratically curve INWARD toward the centre. Same
+// translucent fill as the trim-wraps so the bridge reads as the
+// cards visually melting into each other.
 function ModalBridge() {
   return (
     <div className="bp-modal-bridge" aria-hidden="true">

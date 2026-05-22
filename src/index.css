@@ -2055,27 +2055,15 @@
   padding: 6px;
   box-sizing: border-box;
 }
-
-/* PR-40h: inner-contents abstract — small grid of icons reflecting
-   the components in the room. Replaces LayoutSilhouette so the
-   wireframe communicates what's INSIDE the room rather than the
-   layout shape. */
-.bp-modal-contents-abstract {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: 1fr;
-  gap: 3px;
+/* LayoutSilhouette uses .lib-preview for its own sizing rules.
+   Strip those so it fills the modal's bordered slot cleanly. */
+.bp-card-room-wireframe .lib-preview {
   width: 100%;
   height: 100%;
-}
-.bp-mca-cell {
-  border: 0.5px dashed #D0C8BA;
-  border-radius: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #9A9490;
-  background: rgba(248, 244, 236, 0.35);
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 4px;
 }
 .bp-card-actions {
   display: flex;
@@ -2174,18 +2162,26 @@
   border-radius: 2px;
 }
 
-/* PR-40h: spool-shaped bridge between left + right modal cards.
-   Same translucent fill as .bp-trim-wrap so the cards visually
-   feel connected by a piece of the same ribbon. align-self:
-   center vertically centres it within the (possibly uneven)
-   card heights. */
-.bp-modal-bridge {
-  align-self: center;
-  flex: 0 0 auto;
+/* PR-40h: left column that contains the room card + the
+   spool-shaped bridge. position:relative so the bridge can absolute-
+   position itself against the room card's height (not the much
+   taller features card on the right). */
+.bp-modal-left-col {
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 -2px;
+}
+/* Spool-shaped bridge between left + right cards. Straddles the
+   room card's right edge (right: -13px = half the bridge width)
+   so half of it overlaps into the right card area, half sits
+   over the room card. Same translucent trim color so the bridge
+   reads as the cards melting into each other. */
+.bp-modal-bridge {
+  position: absolute;
+  top: 50%;
+  right: -13px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 1;
 }
 .bp-modal-bridge svg { display: block; }
 .bp-meta-row {
