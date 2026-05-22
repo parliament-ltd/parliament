@@ -43,6 +43,8 @@ import {
   labShape,
   SYSTEM_KIND,
   SYSTEM_ROOM_IDS,
+  ROOM_CONTAINER_PAD,
+  ROOM_CONTAINER_ENTRY_GAP,
 } from '../../lib/blueprintShapes'
 
 // ─── Visual constants ────────────────────────────────────────
@@ -458,7 +460,7 @@ function Room({
   onLeave,
   onClick,
 }) {
-  const { box, layoutRef, id } = placed
+  const { box, layoutRef, id, sides } = placed
   const { path, interior } = buildRoomPath({ box, layoutRef, roomId: id })
   const cx = interior.x + interior.width / 2
   const cy = interior.y + interior.height / 2
@@ -483,6 +485,7 @@ function Room({
       onMouseLeave={onLeave}
       onClick={onClick}
     >
+      <RoomContainer box={box} sides={sides} />
       <path d={path} fill={fill} className="bp-room-fill" />
       <path
         d={path}
@@ -497,7 +500,7 @@ function Room({
 }
 
 function SystemRoom({ placed, isStudy, isHovered, isCurrent, onEnter, onLeave, onClick }) {
-  const { box } = placed
+  const { box, sides } = placed
   const { path, interior } = isStudy ? studyShape(box) : labShape(box)
   const cx = interior.x + interior.width / 2
   const cy = interior.y + interior.height / 2
@@ -517,10 +520,76 @@ function SystemRoom({ placed, isStudy, isHovered, isCurrent, onEnter, onLeave, o
       onMouseLeave={onLeave}
       onClick={onClick}
     >
+      <RoomContainer box={box} sides={sides} />
       <path d={path} fill={ROOM_FILL_DEFAULT} />
       <path d={path} fill={fill} className="bp-room-fill" />
       <path d={path} fill="none" stroke={stroke} strokeWidth={isCurrent ? 1.2 : 0.75} vectorEffect="non-scaling-stroke" />
       <RoomTitle cx={cx} cy={cy} name={name} width={box.width} color={labelColor} />
+    </g>
+  )
+}
+
+// PR-40 polish: outer container rectangle around each room. Sits
+// ROOM_CONTAINER_PAD units outside the room shape on every side,
+// rendered as 4 edges, each broken in the middle when that side
+// faces a hallway (the gap previews where a doorway will land in a
+// follow-up). The container reads as a frame holding the room; the
+// gaps signal entryways into the corridor system.
+function RoomContainer({ box, sides }) {
+  const pad = ROOM_CONTAINER_PAD
+  const bx = box.x - pad
+  const by = box.y - pad
+  const bw = box.width  + 2 * pad
+  const bh = box.height + 2 * pad
+  const gap = ROOM_CONTAINER_ENTRY_GAP
+  const stroke = '#A8A298'
+  const strokeWidth = 0.75
+
+  const segs = []
+  // Top
+  if (sides?.top) {
+    const m = bx + bw / 2
+    segs.push([bx, by,           m - gap / 2, by])
+    segs.push([m + gap / 2, by,  bx + bw, by])
+  } else {
+    segs.push([bx, by, bx + bw, by])
+  }
+  // Right
+  if (sides?.right) {
+    const m = by + bh / 2
+    segs.push([bx + bw, by,            bx + bw, m - gap / 2])
+    segs.push([bx + bw, m + gap / 2,   bx + bw, by + bh])
+  } else {
+    segs.push([bx + bw, by, bx + bw, by + bh])
+  }
+  // Bottom
+  if (sides?.bottom) {
+    const m = bx + bw / 2
+    segs.push([bx, by + bh,           m - gap / 2, by + bh])
+    segs.push([m + gap / 2, by + bh,  bx + bw, by + bh])
+  } else {
+    segs.push([bx, by + bh, bx + bw, by + bh])
+  }
+  // Left
+  if (sides?.left) {
+    const m = by + bh / 2
+    segs.push([bx, by,           bx, m - gap / 2])
+    segs.push([bx, m + gap / 2,  bx, by + bh])
+  } else {
+    segs.push([bx, by, bx, by + bh])
+  }
+
+  return (
+    <g aria-hidden="true">
+      {segs.map(([x1, y1, x2, y2], i) => (
+        <line
+          key={i}
+          x1={x1} y1={y1} x2={x2} y2={y2}
+          stroke={stroke}
+          strokeWidth={strokeWidth}
+          vectorEffect="non-scaling-stroke"
+        />
+      ))}
     </g>
   )
 }

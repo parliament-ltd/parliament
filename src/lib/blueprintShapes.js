@@ -53,12 +53,20 @@ export const TARGET_INNER_WIDTH = 720 // floor inner width — rooms scale to fi
 // hallways + floor strips are accounted for. Heights stay constant
 // at ROW_HEIGHT.
 export const HALLWAY_VERT_WIDTH    = 18  // vertical hallway width
-export const HALLWAY_HORIZ_HEIGHT  = 22  // horizontal hallway height
+export const HALLWAY_HORIZ_HEIGHT  = 18  // horizontal hallway height — matches vertical so corridors read uniformly
 const FLOOR_STRIP = 2                    // small floor-color band between hallway and adjacent rooms
 
 // Pre-derived totals.
 export const COL_GAP = HALLWAY_VERT_WIDTH + 2 * FLOOR_STRIP    // = 22 (between rooms in a row)
-export const ROW_GAP = HALLWAY_HORIZ_HEIGHT + 2 * FLOOR_STRIP  // = 26 (between rows)
+export const ROW_GAP = HALLWAY_HORIZ_HEIGHT + 2 * FLOOR_STRIP  // = 22 (between rows)
+
+// PR-40 polish: outer "container" rectangle around each room. Sits
+// 3 SVG units outside the room shape on every side, with thin
+// entry-gap breaks on each side that faces a hallway. Reads as a
+// frame holding the room — and the gaps prefigure where doorways
+// will land in a follow-up PR.
+export const ROOM_CONTAINER_PAD = 3
+export const ROOM_CONTAINER_ENTRY_GAP = 22
 
 // Padding INSIDE the floor before the first room (and after the
 // last). Matches the mockup's 2-unit inset between floor edge and
@@ -673,17 +681,46 @@ export function mirrorPath(d, axisX) {
  * @param {string} args.roomId — used as hash seed for per-room variability
  * @returns {{ path: string, interior: object }}
  */
-export function buildRoomPath({ box }) {
-  // PR-40 polish: every room now renders as a rounded rectangle the
-  // exact size of its packing box. The variant generators (defined
-  // below) stay in the file but are dormant — they produce outward
-  // bumps that cross the dark wall border and the hallway zones,
-  // which the user's HTML mockup explicitly avoids. A follow-up PR
-  // will reintroduce hallway-aware INWARD-cutting variants (the
-  // mockup's Writing Studio / Study tuck around hallway corners,
-  // not outward).
-  const r = rectanglePath(box)
-  return { path: roundPath(r.path, 6), interior: r.interior }
+export function buildRoomPath({ box, roomId }) {
+  // PR-40 polish: pick one of four INWARD-only variants from the
+  // roomId hash — plain, top-right chamfer, bottom-left chamfer,
+  // bottom-right chamfer. Style mirrors The Study (bottom-left
+  // wedge) and The Lab (top-right notch) so user rooms read as the
+  // same family of shapes. All variants stay STRICTLY inside the
+  // box so they don't cross the dark wall or the hallway hatching.
+  // The old outward-bump variants further down the file are kept
+  // for reference but are not selected by this picker.
+  const seed = roomId ? hashString(roomId) : 0
+  const variant = seed % 4
+  let r
+  if      (variant === 1) r = roomTopRightChamfer(box)
+  else if (variant === 2) r = roomBottomLeftChamfer(box)
+  else if (variant === 3) r = roomBottomRightChamfer(box)
+  else                    r = rectanglePath(box)
+  return { path: roundPath(r.path, 5), interior: r.interior }
+}
+
+// PR-40 polish: four small inward variants. Cut depth (CUT) is kept
+// modest (~14 units) so the chamfer reads as "this room has character"
+// without dominating the rectangle silhouette.
+const ROOM_CUT = 14
+function roomTopRightChamfer(box) {
+  const { x, y, width: w, height: h } = box
+  const right = x + w, bottom = y + h
+  const d = `M ${x} ${y} L ${right - ROOM_CUT} ${y} L ${right} ${y + ROOM_CUT} L ${right} ${bottom} L ${x} ${bottom} Z`
+  return { path: d, interior: interiorBox(box) }
+}
+function roomBottomLeftChamfer(box) {
+  const { x, y, width: w, height: h } = box
+  const right = x + w, bottom = y + h
+  const d = `M ${x} ${y} L ${right} ${y} L ${right} ${bottom} L ${x + ROOM_CUT} ${bottom} L ${x} ${bottom - ROOM_CUT} Z`
+  return { path: d, interior: interiorBox(box) }
+}
+function roomBottomRightChamfer(box) {
+  const { x, y, width: w, height: h } = box
+  const right = x + w, bottom = y + h
+  const d = `M ${x} ${y} L ${right} ${y} L ${right} ${bottom - ROOM_CUT} L ${right - ROOM_CUT} ${bottom} L ${x} ${bottom} Z`
+  return { path: d, interior: interiorBox(box) }
 }
 
 // ─── Interior wall hints ─────────────────────────────────────
@@ -885,6 +922,15 @@ export function packRooms(rooms, { includeSystem = false } = {}) {
         layoutRef: item.layoutRef,
         kind: item.kind,
         box: { x: cursorX, y: rowY, width: roomWidth, height: ROW_HEIGHT },
+        // PR-40 polish: which sides of this room face a hallway. The
+        // renderer paints "entry gap" breaks at these positions on
+        // the room's outer container rectangle.
+        sides: {
+          left:   i > 0,
+          right:  !isLast,
+          top:    r > 0,
+          bottom: r < rowSpecs.length - 1,
+        },
       })
       cursorX += roomWidth
       if (!isLast) {

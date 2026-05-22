@@ -1154,20 +1154,15 @@
 }
 
 /* ── Blueprint section ────────────────────────────────────── */
-/* PR-40: bp-wrap adopts the architectural-blueprint chrome from the
-   mockup at refactor/blueprint_with_room_modal.html. The strip between
-   this CSS border and the SVG's inner dark wall reads as "outside the
-   building" — cream bg with the dot pattern showing through (the SVG
-   carries the dot pattern itself, so the bg-color is just a fallback
-   while the SVG sizes itself). Nests inside SectionCard, which adds
-   its own outer frame above. */
+/* PR-40 polish: bp-wrap carries only the cream bg fallback now. The
+   dark border is drawn by the SVG `wallBox` stroke instead, so we
+   don't double-frame the blueprint with an outer CSS border AND an
+   inner SVG wall stroke. Nests inside SectionCard, which provides
+   its own outer card chrome. */
 .bp-wrap {
   position: relative;
   padding: 0;
   background-color: #EDE6D8;
-  border: 3.5px solid #3A3530;
-  border-radius: 4px;
-  overflow: hidden;
 }
 .bp-svg {
   font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
