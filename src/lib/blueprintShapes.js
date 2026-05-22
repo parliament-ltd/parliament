@@ -35,16 +35,16 @@
 
 // ─── Constants ───────────────────────────────────────────────
 
-export const VIEWBOX_PAD = 32        // outer wall margin (PR-16a: was 28; +4 to give edge protrusions breathing room)
+export const VIEWBOX_PAD = 24        // outer wall margin (PR-16a: was 28; +4 to give edge protrusions breathing room; mini-map: tightened 32→24)
 export const WALL_THICKNESS = 6      // outer wall stroke width (spec uses 7)
-// PR-19l: rooms shrunk to 75% of prior sizing (ROW_HEIGHT 200→150,
-// TARGET_INNER_WIDTH 620→465). The blueprint section was eating too
-// much vertical real estate on the homepage; smaller rooms keep the
-// floor feeling like a section rather than the whole page.
-export const ROW_HEIGHT = 150        // target room interior height
-export const ROOM_GAP = 24           // gap between rooms in a row (PR-16a: was 14; +10 so adjacent bump+mirror-bump pairs don't collide)
-export const ROW_GAP = 18            // gap between rows
-export const TARGET_INNER_WIDTH = 465 // packs to this before wrapping
+// Mini-map redesign: rooms halved again to ROW_HEIGHT 75 (was 150) +
+// TARGET_INNER_WIDTH 232 (was 465). Blueprint reads as a small map of
+// rooms rather than a section in its own right. Aspect ratios + variant
+// generators stay the same — the shrink is purely a constant change.
+export const ROW_HEIGHT = 75         // target room interior height
+export const ROOM_GAP = 16           // gap between rooms in a row (mini-map: tightened 24→16)
+export const ROW_GAP = 12            // gap between rows (mini-map: tightened 18→12)
+export const TARGET_INNER_WIDTH = 232 // packs to this before wrapping
 
 // Per-layout aspect ratio (width / ROW_HEIGHT). Loosely follows the
 // proportions in refactor/parliament_homepage_v2 (2).html with small
@@ -460,7 +460,7 @@ export function studyShape(box) {
     `L ${x} ${bottom - cut}`,
     'Z',
   ].join(' ')
-  return { path: d, interior: interiorBox(box) }
+  return { path: roundPath(d), interior: interiorBox(box) }
 }
 
 /**
@@ -482,7 +482,86 @@ export function labShape(box) {
     `L ${x} ${bottom}`,
     'Z',
   ].join(' ')
-  return { path: d, interior: interiorBox(box) }
+  return { path: roundPath(d), interior: interiorBox(box) }
+}
+
+// ─── Path rounding (mini-map) ─────────────────────────────────
+//
+// All variant generators above emit polygons made of `M` + `L` commands
+// closed with `Z`. For the mini-map redesign we want every interior
+// vertex to be rounded with a small radius (~4-5 svg units), preserving
+// the per-variant character (bumps, notches, chamfers) while softening
+// the silhouette. roundPath() parses the M/L/Z path, and for each
+// vertex of the closed polygon, trims `radius` along the incoming and
+// outgoing edges, replacing the sharp corner with a quadratic Bezier
+// (Q) through the trim points.
+//
+// Trim distance is capped at half the adjacent edge length so very
+// short edges (e.g. the 12px depth of a sidebar bump perpendicular to
+// the wall) don't over-round into themselves.
+
+/**
+ * Round every interior vertex of an M/L/Z polygon path.
+ *
+ * @param {string} d — SVG path string with only M, L, Z commands
+ * @param {number} [radius=5] — max trim distance from each vertex along
+ *   each adjacent edge
+ * @returns {string} — new path string with rounded corners
+ */
+export function roundPath(d, radius = 5) {
+  const tokens = d.trim().split(/\s+/)
+  const points = []
+  let i = 0
+  while (i < tokens.length) {
+    const cmd = tokens[i]
+    if (cmd === 'M' || cmd === 'L') {
+      const x = parseFloat(tokens[i + 1])
+      const y = parseFloat(tokens[i + 2])
+      points.push({ x, y })
+      i += 3
+    } else if (cmd === 'Z' || cmd === 'z') {
+      i += 1
+    } else {
+      // unknown token (curves we don't generate); bail out
+      return d
+    }
+  }
+  const n = points.length
+  if (n < 3) return d
+
+  const trims = []
+  for (let k = 0; k < n; k++) {
+    const prev = points[(k - 1 + n) % n]
+    const curr = points[k]
+    const next = points[(k + 1) % n]
+    const v1x = prev.x - curr.x
+    const v1y = prev.y - curr.y
+    const v2x = next.x - curr.x
+    const v2y = next.y - curr.y
+    const len1 = Math.hypot(v1x, v1y) || 1
+    const len2 = Math.hypot(v2x, v2y) || 1
+    const r1 = Math.min(radius, len1 / 2)
+    const r2 = Math.min(radius, len2 / 2)
+    trims.push({
+      curr,
+      tIn:  { x: curr.x + (v1x / len1) * r1, y: curr.y + (v1y / len1) * r1 },
+      tOut: { x: curr.x + (v2x / len2) * r2, y: curr.y + (v2y / len2) * r2 },
+    })
+  }
+
+  const f = (n) => n.toFixed(2)
+  const parts = []
+  for (let k = 0; k < n; k++) {
+    const { curr, tIn, tOut } = trims[k]
+    if (k === 0) {
+      parts.push(`M ${f(tIn.x)} ${f(tIn.y)}`)
+    } else {
+      parts.push(`L ${f(tIn.x)} ${f(tIn.y)}`)
+    }
+    parts.push(`Q ${f(curr.x)} ${f(curr.y)} ${f(tOut.x)} ${f(tOut.y)}`)
+  }
+  parts.push('Z')
+  return parts.join(' ')
 }
 
 // ─── Fallback ─────────────────────────────────────────────────
@@ -572,7 +651,10 @@ export function mirrorPath(d, axisX) {
 export function buildRoomPath({ box, layoutRef, roomId }) {
   const layout = layoutFor(layoutRef)
   const variants = SHAPE_VARIANTS[layout]
-  if (!variants) return rectanglePath(box)
+  if (!variants) {
+    const r = rectanglePath(box)
+    return { path: roundPath(r.path), interior: r.interior }
+  }
 
   const seed = hashString(roomId)
   const variant = variants[seed % variants.length]
@@ -582,10 +664,13 @@ export function buildRoomPath({ box, layoutRef, roomId }) {
   // pertub() (slots 0–4) so mirror choice doesn't correlate with bump
   // depth/position.
   const shouldMirror = ((seed >>> 8) & 1) === 1
-  if (!shouldMirror) return { path, interior }
+  const raw = shouldMirror ? mirrorPath(path, box.x + box.width / 2) : path
 
-  const axisX = box.x + box.width / 2
-  return { path: mirrorPath(path, axisX), interior }
+  // Mini-map redesign: round every interior vertex so the rooms read
+  // as soft cards on a page rather than sharp polygons. Per-variant
+  // bump/notch/chamfer character is preserved (the trim radius is
+  // small relative to those features); only the corners soften.
+  return { path: roundPath(raw), interior }
 }
 
 // ─── Interior wall hints ─────────────────────────────────────

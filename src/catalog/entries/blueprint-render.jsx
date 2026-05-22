@@ -693,11 +693,76 @@ export default function BlueprintRender({ hostAPI } = {}) {
   const selectedLastConv = selectedRoomId ? lastConvByRoomId.get(selectedRoomId) || null : null
   const selectedIncludes = useMemo(() => buildIncludes(selectedMode), [selectedMode])
 
+  // Mini-map redesign: gel container — a translucent backdrop that
+  // appears when a room is selected, hugging the union of the
+  // enlarged room + action card + Includes sidebar. Implemented as
+  // three absolute-positioned rounded divs inside a group with
+  // opacity 0.30 — the group opacity composites the union as a
+  // single shape, avoiding alpha buildup at internal joints. Each
+  // gel cell is inflated 10px around the underlying card so it forms
+  // a halo; the 20px gap between cards exactly matches twice the
+  // halo radius, so adjacent cells touch seamlessly. The resulting
+  // outline is non-rectangular (L or T shaped depending on which
+  // half of the canvas the room sits in) and visually grows around
+  // the three card components.
+  //
+  // Heights for the action card (44px) and sidebar (~200px) are
+  // estimates; a ref-based measurement pass is the obvious next
+  // step if the eyeballed sizes drift from reality.
+  const gelOnLeft   = expandedRoomBox ? expandedRoomBox.leftPercent  >= 50 : false
+  const gelOnBottom = expandedRoomBox ? expandedRoomBox.centerYPercent >= 50 : false
+
   return (
     <div
       ref={wrapRef}
       className={`bp-wrap${selectedRoomId && !isNarrow ? ' bp-wrap-selected' : ''}`}
     >
+      {/* Gel container — rendered BEFORE the SVG so it sits behind
+          the rooms (SVG has explicit z-index 2; gel has z-index 1).
+          Opacity fades in/out with the selection. */}
+      {!isNarrow && expandedRoomBox && (
+        <div
+          className={`bp-gel-frame${detailsReady && selectedRoomId ? ' show' : ''}`}
+          aria-hidden="true"
+        >
+          {/* Room halo */}
+          <div
+            className="bp-gel-cell"
+            style={{
+              left: `calc(${expandedRoomBox.leftEdgePercent}% - 10px)`,
+              top: `calc(${expandedRoomBox.topPercent}% - 10px)`,
+              width: `calc(${expandedRoomBox.widthPercent}% + 20px)`,
+              height: `calc(${expandedRoomBox.bottomPercent - expandedRoomBox.topPercent}% + 20px)`,
+            }}
+          />
+          {/* Action card halo (below the room, same width, centered) */}
+          <div
+            className="bp-gel-cell"
+            style={{
+              left: `calc(${expandedRoomBox.leftEdgePercent}% - 10px)`,
+              top: `calc(${expandedRoomBox.bottomPercent}% + 10px)`,
+              width: `calc(${expandedRoomBox.widthPercent}% + 20px)`,
+              height: '64px',
+            }}
+          />
+          {/* Sidebar halo (left/right + top/bottom flip per PR-32/33) */}
+          <div
+            className="bp-gel-cell"
+            style={{
+              ...(gelOnLeft
+                ? { right: `calc(${100 - expandedRoomBox.leftEdgePercent}% + 10px)`, left: 'auto' }
+                : { left:  `calc(${expandedRoomBox.rightPercent}% + 10px)`,           right: 'auto' }
+              ),
+              ...(gelOnBottom
+                ? { bottom: `calc(${100 - expandedRoomBox.bottomPercent}% - 10px)`, top: 'auto' }
+                : { top:    `calc(${expandedRoomBox.topPercent}% - 10px)`,          bottom: 'auto' }
+              ),
+              width: '260px',
+              height: '200px',
+            }}
+          />
+        </div>
+      )}
       <svg
         ref={svgRef}
         viewBox={`0 0 ${layout.viewBox.width} ${layout.viewBox.height}`}
@@ -708,22 +773,17 @@ export default function BlueprintRender({ hostAPI } = {}) {
         onClick={onCanvasClick}
       >
         <defs>
-          <pattern id="bp-hatch" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
-            <line x1="0" y1="0" x2="0" y2="5" stroke="#B8B2A8" strokeWidth="1.2" />
-          </pattern>
-          <pattern id="bp-floorgrid" patternUnits="userSpaceOnUse" width="20" height="20">
-            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#DDD8D0" strokeWidth="0.4" />
-          </pattern>
+          {/* Hatch-light is still used by .bp-room-hatch-overlay when
+              a non-selected room is dimmed during expand-in-place.
+              The heavy hatched outer wall + floor grid + dark wall
+              stroke from PR-14/16a were dropped in the mini-map
+              redesign — bp-wrap now carries the dot-textured
+              chat-page-bg backdrop, so the rooms read as little
+              cards on the same page surface as the chat/editor. */}
           <pattern id="bp-hatch-light" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
             <line x1="0" y1="0" x2="0" y2="4" stroke="#DDD8D0" strokeWidth="0.8" />
           </pattern>
         </defs>
-
-        {/* Outer wall: floor color + grid + hatched border */}
-        <rect x={layout.floorBox.x} y={layout.floorBox.y} width={layout.floorBox.width} height={layout.floorBox.height} fill={WALL_FILL} />
-        <rect x={layout.floorBox.x} y={layout.floorBox.y} width={layout.floorBox.width} height={layout.floorBox.height} fill={FLOOR_GRID} />
-        <rect x={layout.wallBox.x} y={layout.wallBox.y} width={layout.wallBox.width} height={layout.wallBox.height} fill="none" stroke={WALL_STROKE} strokeWidth="6" rx="2" />
-        <rect x={layout.wallBox.x} y={layout.wallBox.y} width={layout.wallBox.width} height={layout.wallBox.height} fill={HATCH_FILL} fillOpacity="0.22" stroke="none" rx="2" />
 
         {/* Rooms + system cards. PR-19l: orderedRooms puts the selected
             room last so it draws on top of every other room. */}
@@ -798,8 +858,11 @@ export default function BlueprintRender({ hostAPI } = {}) {
           )
         })}
 
-        {/* Dimension ticks: top edge for first room, right edge for last */}
-        <DimensionTicks layout={layout} modesById={modesById} />
+        {/* PR-14's DimensionTicks (first-room top tick + right-edge
+            floor tick) are dropped from the mini-map redesign — at
+            half-size the small annotation text reads as noise rather
+            than informative. The component still exists below for
+            potential later reintroduction. */}
       </svg>
 
       {hereTip && (
@@ -1129,11 +1192,13 @@ function Room({
 
   const name = (mode?.meta?.name || mode?.id || 'Room').toUpperCase()
 
-  // Title placement: centered. THE prefix sits 10px above the name so
-  // the two-line block reads as one anchored unit.
+  // Title placement: centered. Mini-map tightens the THE/NAME gap
+  // (16→7) to match smaller fonts, and pulls iconY up (18→12) so
+  // the active-room walking-human sits visually close to the title
+  // rather than floating near the bottom wall.
   const nameY = cy + 4
-  const theY = nameY - 16
-  const iconY = nameY + 18
+  const theY = nameY - 7
+  const iconY = nameY + 12
 
   // PR-19j: activity dots + furniture glyph positions. Memoization
   // intentionally skipped — derivations are cheap and depend on stable
@@ -1219,16 +1284,15 @@ function Room({
           the counter-scale transform. */}
       {!showInlineDetails && (
         <>
-          {/* PR-19l followup: font sizes shrunk by 0.75 (10→7.5, 13→9.75)
-              to compensate for the viewBox shrink. SVG fills the
-              container width regardless of viewBox, so a smaller
-              viewBox stretches each SVG unit across more screen
-              pixels — without this compensation the room labels would
-              appear ~33% larger on screen than before. */}
-          <text x={cx} y={theY} textAnchor="middle" fontSize="7.5" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+          {/* Mini-map fonts (4 / 5.5). Tighter than the first preview
+              pass — labels read as compact tags on each room rather
+              than as the room's dominant feature. Followed by an
+              icon (walking-human when active) sitting tightly under
+              the NAME baseline. */}
+          <text x={cx} y={theY} textAnchor="middle" fontSize="4" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
             THE
           </text>
-          <text x={cx} y={nameY} textAnchor="middle" fontSize="9.75" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
+          <text x={cx} y={nameY} textAnchor="middle" fontSize="5.5" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
             {name}
           </text>
         </>
@@ -1359,9 +1423,12 @@ function SystemRoom({ placed, isStudy, isHovered, isDimmed, isCurrent, transform
   const labelColor = isHovered ? '#8B6A10' : '#5A5550'
   const iconColor = isHovered ? '#8B6A10' : IN_ROOM_ICON_COLOR
 
+  // Mini-map layout: tighter title block + icon higher, matching
+  // user rooms above. iconY pulls 22→12; the compass/wrench (or
+  // walking-human when isCurrent) sits just under the NAME baseline.
   const nameY = cy + 4
-  const theY = nameY - 16
-  const iconY = nameY + 22
+  const theY = nameY - 7
+  const iconY = nameY + 12
 
   return (
     <g
@@ -1373,48 +1440,47 @@ function SystemRoom({ placed, isStudy, isHovered, isDimmed, isCurrent, transform
       <path d={path} fill={fill} className="bp-room-fill" />
       <path d={path} fill="none" stroke={stroke} strokeWidth="0.8" vectorEffect="non-scaling-stroke" />
 
-      {/* PR-19l followup: matches the user-room title size (7.5 / 9.75)
-          to compensate for the smaller viewBox stretching SVG units. */}
-      <text x={cx} y={theY} textAnchor="middle" fontSize="7.5" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+      {/* Matches the user-room mini-map font sizing (4 / 5.5). */}
+      <text x={cx} y={theY} textAnchor="middle" fontSize="4" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
         THE
       </text>
-      <text x={cx} y={nameY} textAnchor="middle" fontSize="9.75" fill={labelColor} letterSpacing="0.06em" fontWeight="600">
+      <text x={cx} y={nameY} textAnchor="middle" fontSize="5.5" fill={labelColor} letterSpacing="0.06em" fontWeight="600">
         {name}
       </text>
 
-      {/* Icon below title — compass (Study) or wrench (Lab). Lucide
-          24×24 path scaled to ~17px and translated so its center sits
-          on (cx, iconY). */}
-      <g
-        transform={`translate(${cx - 8.5} ${iconY - 8.5}) scale(0.71)`}
-        stroke={iconColor}
-        strokeWidth="1.4"
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        {isStudy ? (
-          <>
-            <circle cx="12" cy="12" r="10" />
-            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
-          </>
-        ) : (
-          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-        )}
-      </g>
-
-      {/* PR-19k: walking-human + gold glow pulse, shown when the user
-          is currently on this system room's route (`/` for Study,
-          `/edit*` for Lab). Sits 22px below the compass/wrench so the
-          room's identity icon stays visible above. */}
-      {isCurrent && (
+      {/* Mini-map redesign: at half-size the interior height (~59px)
+          can't fit BOTH the compass/wrench AND the walking-human
+          stacked vertically (PR-19k's pattern). Instead, the walking
+          human REPLACES the room's identity icon when isCurrent.
+          The presence signal is what matters when the user is
+          actually in this room; the identity icon (compass/wrench)
+          isn't needed when you're already standing in it. */}
+      {isCurrent ? (
         <WalkingHuman
           x={cx}
-          y={iconY + 22}
+          y={iconY}
           color={isHovered ? '#8B6A10' : IN_ROOM_ICON_COLOR}
           onShow={onHereTipShow}
           onHide={onHereTipHide}
         />
+      ) : (
+        <g
+          transform={`translate(${cx - 8.5} ${iconY - 8.5}) scale(0.71)`}
+          stroke={iconColor}
+          strokeWidth="1.4"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          {isStudy ? (
+            <>
+              <circle cx="12" cy="12" r="10" />
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+            </>
+          ) : (
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+          )}
+        </g>
       )}
 
       {/* Hatch overlay when a user room is selected so the system
