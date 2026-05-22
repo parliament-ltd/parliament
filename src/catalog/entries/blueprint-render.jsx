@@ -394,6 +394,66 @@ export default function BlueprintRender({ hostAPI } = {}) {
 
 // ─── Subcomponents ───────────────────────────────────────────
 
+// PR-40 polish: wrap room titles to a second line when they'd overflow
+// the room's interior width. Greedy at the word boundary — the first
+// line packs as many words as fit; the rest spills to line 2. Single
+// long words (no space) are rendered as-is and may visually overflow.
+function wrapTitle(name, maxWidth, fontSize = 9.5) {
+  if (!name) return ['Room']
+  // Approx glyph width including letter-spacing 0.03em.
+  const charWidth = fontSize * 0.58
+  const maxChars = Math.max(4, Math.floor((maxWidth - 10) / charWidth))
+  if (name.length <= maxChars) return [name]
+  const words = name.split(/\s+/)
+  if (words.length < 2) return [name]
+  let line1 = words[0]
+  let i = 1
+  while (i < words.length) {
+    const tryLine = line1 + ' ' + words[i]
+    if (tryLine.length > maxChars) break
+    line1 = tryLine
+    i++
+  }
+  if (i === words.length) return [name]
+  return [line1, words.slice(i).join(' ')]
+}
+
+// PR-40 polish: render the THE label + NAME (possibly 2 lines)
+// vertically centered around (cx, cy). Title is NOT bold — the mockup
+// uses font-weight 500 for both labels for a softer architect-style
+// feel.
+function RoomTitle({ cx, cy, name, width, color }) {
+  const lines = wrapTitle(name, width)
+  const numLines = lines.length
+  // Total title block height ≈ THE (7) + gap (4) + lines × 11. Center
+  // the block on cy with a slight downward bias so it visually rests
+  // toward the room center (the THE label is small and reads as a
+  // header sitting above the NAME).
+  const titleBlockTop = cy - (numLines === 2 ? 13 : 8)
+  return (
+    <>
+      <text x={cx} y={titleBlockTop} textAnchor="middle" fontSize="7" fill="#B8B0A4" letterSpacing="0.08em" fontWeight="500">
+        THE
+      </text>
+      {lines.map((line, i) => (
+        <text
+          key={i}
+          x={cx}
+          y={titleBlockTop + 11 + i * 11}
+          textAnchor="middle"
+          fontSize="9.5"
+          fill={color}
+          letterSpacing="0.03em"
+          fontWeight="500"
+          className="bp-room-name"
+        >
+          {line}
+        </text>
+      ))}
+    </>
+  )
+}
+
 function Room({
   placed,
   mode,
@@ -421,11 +481,6 @@ function Room({
   const nameColor = (isActive || isHovered) ? ROOM_NAME_COLOR_ACTIVE : ROOM_NAME_COLOR_DEFAULT
   const name = (mode?.meta?.name || mode?.id || 'Room')
 
-  // Title placement: matches the mockup — NAME baseline 6 units below
-  // room center, THE label 11 units above NAME.
-  const nameY = cy + 6
-  const theY = nameY - 11
-
   return (
     <g
       className="bp-room-zone"
@@ -442,12 +497,7 @@ function Room({
         strokeWidth={strokeWidth}
         vectorEffect="non-scaling-stroke"
       />
-      <text x={cx} y={theY} textAnchor="middle" fontSize="7" fill="#B8B0A4" letterSpacing="0.08em" fontWeight="500">
-        THE
-      </text>
-      <text className="bp-room-name" x={cx} y={nameY} textAnchor="middle" fontSize="9.5" fill={nameColor} letterSpacing="0.03em" fontWeight="600">
-        {name}
-      </text>
+      <RoomTitle cx={cx} cy={cy} name={name} width={box.width} color={nameColor} />
     </g>
   )
 }
@@ -465,9 +515,6 @@ function SystemRoom({ placed, isStudy, isHovered, isCurrent, onEnter, onLeave, o
   const stroke = (isHovered || isCurrent) ? ROOM_BORDER_ACTIVE : ROOM_BORDER_DEFAULT
   const labelColor = (isHovered || isCurrent) ? ROOM_NAME_COLOR_ACTIVE : ROOM_NAME_COLOR_DEFAULT
 
-  const nameY = cy + 6
-  const theY = nameY - 11
-
   return (
     <g
       className="bp-room-zone"
@@ -479,12 +526,7 @@ function SystemRoom({ placed, isStudy, isHovered, isCurrent, onEnter, onLeave, o
       <path d={path} fill={ROOM_FILL_DEFAULT} />
       <path d={path} fill={fill} className="bp-room-fill" />
       <path d={path} fill="none" stroke={stroke} strokeWidth={isCurrent ? 1.2 : 0.75} vectorEffect="non-scaling-stroke" />
-      <text x={cx} y={theY} textAnchor="middle" fontSize="7" fill="#B8B0A4" letterSpacing="0.08em" fontWeight="500">
-        THE
-      </text>
-      <text className="bp-room-name" x={cx} y={nameY} textAnchor="middle" fontSize="9.5" fill={labelColor} letterSpacing="0.03em" fontWeight="600">
-        {name}
-      </text>
+      <RoomTitle cx={cx} cy={cy} name={name} width={box.width} color={labelColor} />
     </g>
   )
 }
