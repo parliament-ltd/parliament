@@ -223,13 +223,6 @@ export default function BlueprintRender({ hostAPI } = {}) {
   // entirely (close the selection) vs inside it (let the SVG /
   // sidebar / action card handlers decide).
   const wrapRef = useRef(null)
-  // Mini-map: refs + measured heights for the action card + Includes
-  // sidebar so the gel halo wraps each card exactly (fixed 72/220
-  // estimates were cutting off when the sidebar had many items).
-  const actionCardRef = useRef(null)
-  const sidebarRef = useRef(null)
-  const [actionCardHeight, setActionCardHeight] = useState(48)
-  const [sidebarHeight, setSidebarHeight] = useState(160)
 
   // Subscribe to chats@1.0's row-hover bus. Payload = { conversationId | null }.
   useEffect(() => {
@@ -275,25 +268,6 @@ export default function BlueprintRender({ hostAPI } = {}) {
       setDetailsReady(false)
     }
   }, [selectedRoomId, isNarrow])
-
-  // Mini-map: measure the action card + sidebar heights so the gel
-  // halo wraps each card exactly. ResizeObserver catches content
-  // changes (e.g., sidebar grows when Includes list is long). Refs
-  // are attached on the cards; observer subscribes once detailsReady
-  // is true (cards have mounted).
-  useEffect(() => {
-    if (!detailsReady || isNarrow) return undefined
-    const update = () => {
-      if (actionCardRef.current) setActionCardHeight(actionCardRef.current.offsetHeight)
-      if (sidebarRef.current) setSidebarHeight(sidebarRef.current.offsetHeight)
-    }
-    update()
-    if (typeof ResizeObserver === 'undefined') return undefined
-    const ro = new ResizeObserver(update)
-    if (actionCardRef.current) ro.observe(actionCardRef.current)
-    if (sidebarRef.current) ro.observe(sidebarRef.current)
-    return () => ro.disconnect()
-  }, [detailsReady, selectedRoomId, isNarrow])
 
   // PR-19k: the walking-human marker follows the user's CURRENT
   // location, not the most-recently-updated conversation's room. Derive
@@ -466,14 +440,15 @@ export default function BlueprintRender({ hostAPI } = {}) {
   // canvas). The computed scale is also exposed via `selectedRoomScale`
   // so the Room component can counter-scale its interior content to
   // keep title/dates/buttons at native card-pixel sizes.
-  // Mini-map redesign: moderate enlargement (1.8x) when selected so
-  // the title + LayoutWireframe overlay has room to fit readably
-  // inside the room. Smaller than the old PR-19j 3x to avoid bottom-
-  // row rooms clipping past bp-wrap's bottom edge. The visual focus
-  // also gets help from (a) the gel container appearing around the
-  // 3 cards and (b) all OTHER rooms shrinking to 0.55 + fading to
-  // 0.35 opacity.
-  const selectedRoomScale = useMemo(() => 1.8, [])
+  // Mini-map redesign: NO in-place enlargement on click. The selected
+  // room stays at its mini-map size. Visual feedback comes from
+  // (a) the gel container appearing around the room + the action
+  // card + Includes sidebar, and (b) all OTHER rooms shrinking to
+  // 0.55 + fading to 0.35 opacity (the existing transformFor logic).
+  // This avoids clipping for bottom-row rooms in multi-row layouts
+  // (a 3x enlargement of a bottom-row room would extend past
+  // bp-wrap's bottom edge).
+  const selectedRoomScale = useMemo(() => 1, [])
 
   const transformFor = useCallback((placed) => {
     if (!selectedRoomId || isNarrow) return null
@@ -649,22 +624,17 @@ export default function BlueprintRender({ hostAPI } = {}) {
               height: `calc(${expandedRoomBox.bottomPercent - expandedRoomBox.topPercent}% + 28px)`,
             }}
           />
-          {/* Action card halo (below the room, same width, centered).
-              Height = measured action-card offsetHeight + 28 (14 halo
-              on top + 14 on bottom). */}
+          {/* Action card halo (below the room, same width, centered) */}
           <div
             className="bp-gel-cell"
             style={{
               left: `calc(${expandedRoomBox.leftEdgePercent}% - 14px)`,
               top: `calc(${expandedRoomBox.bottomPercent}% + 6px)`,
               width: `calc(${expandedRoomBox.widthPercent}% + 28px)`,
-              height: `${actionCardHeight + 28}px`,
+              height: '72px',
             }}
           />
-          {/* Sidebar halo (left/right + top/bottom flip per PR-32/33).
-              Height = measured sidebar offsetHeight + 28 so the halo
-              wraps the actual bullet-list height (no more cutoff for
-              tall sidebars). */}
+          {/* Sidebar halo (left/right + top/bottom flip per PR-32/33) */}
           <div
             className="bp-gel-cell"
             style={{
@@ -677,7 +647,7 @@ export default function BlueprintRender({ hostAPI } = {}) {
                 : { top:    `calc(${expandedRoomBox.topPercent}% - 14px)`,          bottom: 'auto' }
               ),
               width: '268px',
-              height: `${sidebarHeight + 28}px`,
+              height: '220px',
             }}
           />
         </div>
@@ -685,10 +655,8 @@ export default function BlueprintRender({ hostAPI } = {}) {
       <svg
         ref={svgRef}
         viewBox={`0 0 ${layout.viewBox.width} ${layout.viewBox.height}`}
-        width={layout.viewBox.width}
-        height={layout.viewBox.height}
         xmlns="http://www.w3.org/2000/svg"
-        className="block bp-svg"
+        className="block w-full h-auto bp-svg"
         role="img"
         aria-label="Blueprint floor plan of your rooms"
         onClick={onCanvasClick}
@@ -746,7 +714,6 @@ export default function BlueprintRender({ hostAPI } = {}) {
               isHovered={placed.id === hoveredFromBlueprint}
               isSelected={isSelected}
               isDimmed={isDimmed}
-              hideTitle={isSelected && !isNarrow && detailsReady}
               transformStyle={transformStyle}
               onEnter={() => setHoveredFromBlueprint(placed.id)}
               onLeave={() => setHoveredFromBlueprint(null)}
@@ -796,7 +763,6 @@ export default function BlueprintRender({ hostAPI } = {}) {
         }
         return (
         <aside
-          ref={sidebarRef}
           className={`bp-includes-sidebar${detailsReady ? ' show' : ''}`}
           data-side={onLeft ? 'left' : 'right'}
           data-vside={onBottom ? 'bottom' : 'top'}
@@ -843,38 +809,6 @@ export default function BlueprintRender({ hostAPI } = {}) {
         )
       })()}
 
-      {/* Mini-map: HTML overlay rendering the selected room's title +
-          LayoutWireframe at native CSS pixel sizes. Positioned over
-          the enlarged room area via expandedRoomBox percentages.
-          Replaces PR-19j's foreignObject + counter-scale approach,
-          which distorted the wireframe at small mini-map sizes. */}
-      {!isNarrow && selectedRoomId && expandedRoomBox && selectedMode && (
-        <div
-          className={`bp-room-overlay${detailsReady ? ' show' : ''}`}
-          style={{
-            left: `${expandedRoomBox.leftEdgePercent}%`,
-            top: `${expandedRoomBox.topPercent}%`,
-            width: `${expandedRoomBox.widthPercent}%`,
-            height: `${expandedRoomBox.bottomPercent - expandedRoomBox.topPercent}%`,
-          }}
-        >
-          <div className="bp-room-overlay-title">
-            <div className="bp-room-overlay-the">THE</div>
-            <div
-              className="bp-room-overlay-name"
-              style={{ color: selectedRoomId === activeRoomId ? '#8B6A10' : '#5A5550' }}
-            >
-              {(selectedMode?.meta?.name || selectedMode?.id || 'Room').toUpperCase()}
-            </div>
-          </div>
-          {selectedMode?.layout?.ref && (
-            <div className="bp-room-overlay-wireframe">
-              <LayoutWireframe id={selectedMode.layout.ref} small />
-            </div>
-          )}
-        </div>
-      )}
-
       {/* PR-19l: action card positioned directly below the expanded
           room — same width as the room, center-aligned. Width + top
           come from `expandedRoomBox` so the card tracks the room as it
@@ -882,7 +816,6 @@ export default function BlueprintRender({ hostAPI } = {}) {
           buttons read more clearly outside the room frame.) */}
       {!isNarrow && selectedRoomId && expandedRoomBox && (
         <div
-          ref={actionCardRef}
           className={`bp-action-card${detailsReady ? ' show' : ''}`}
           style={{
             width: `${expandedRoomBox.widthPercent}%`,
@@ -1086,7 +1019,6 @@ function Room({
   isHovered,
   isSelected,
   isDimmed,
-  hideTitle,
   transformStyle,
   onEnter,
   onLeave,
@@ -1138,20 +1070,19 @@ function Room({
         vectorEffect="non-scaling-stroke"
       />
 
-      {/* Title block — THE / NAME, centered. Suppressed when the
-          room is the expand-in-place selection and details are
-          ready (the HTML overlay div renders title + wireframe at
-          native CSS sizes, so the SVG title would just double-up). */}
-      {!hideTitle && (
-        <>
-          <text x={cx} y={theY} textAnchor="middle" fontSize="3.5" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
-            THE
-          </text>
-          <text x={cx} y={nameY} textAnchor="middle" fontSize="4.5" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
-            {name}
-          </text>
-        </>
-      )}
+      {/* Title block — THE / NAME, centered. Mini-map redesign
+          dropped everything else from inside the room (activity
+          dots, dashed wall hints, walking-human, furniture glyphs,
+          foreignObject inline details). The room is now JUST its
+          shape + title; when selected and enlarged, the SVG text
+          scales up with the <g>, so the title becomes readable
+          without any foreignObject / counter-scale machinery. */}
+      <text x={cx} y={theY} textAnchor="middle" fontSize="3.5" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+        THE
+      </text>
+      <text x={cx} y={nameY} textAnchor="middle" fontSize="4.5" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
+        {name}
+      </text>
 
       {/* Hatch overlay for non-selected rooms when a selection is
           active. Same path, hatched fill, faded in via CSS. */}
