@@ -36,6 +36,7 @@ import { createConversation } from '../../lib/db'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
 import { modelLabel } from '../../lib/modelLabels'
 import { buildIncludes } from '../../lib/roomIncludes'
+import LayoutSilhouette from '../../components/LayoutSilhouette'
 import {
   packRooms,
   buildRoomPath,
@@ -294,7 +295,9 @@ export default function BlueprintRender({ hostAPI } = {}) {
         <rect x="0" y="0" width={layout.viewBox.width} height={layout.viewBox.height} fill="#EDE6D8"/>
         <rect x="0" y="0" width={layout.viewBox.width} height={layout.viewBox.height} fill="url(#bp-dots)"/>
 
-        {/* Dark outer wall stroke around the floor. */}
+        {/* Dark outer wall stroke around the floor. rx matches the
+            14px SectionCard radius so the dark wall reads as a
+            concentric inset frame inside the section. */}
         <rect
           x={layout.wallBox.x}
           y={layout.wallBox.y}
@@ -303,7 +306,7 @@ export default function BlueprintRender({ hostAPI } = {}) {
           fill="none"
           stroke={WALL_STROKE}
           strokeWidth="4"
-          rx="1"
+          rx="14"
         />
 
         {/* Hallway zones — vertical corridors between rooms in a row +
@@ -529,12 +532,13 @@ function SystemRoom({ placed, isStudy, isHovered, isCurrent, onEnter, onLeave, o
   )
 }
 
-// PR-40 polish: outer container rectangle around each room. Sits
-// ROOM_CONTAINER_PAD units outside the room shape on every side,
-// rendered as 4 edges, each broken in the middle when that side
-// faces a hallway (the gap previews where a doorway will land in a
-// follow-up). The container reads as a frame holding the room; the
-// gaps signal entryways into the corridor system.
+// PR-40 polish: outer container rectangle around each room — a
+// translucent FILLED frame matching the room fill at 50% opacity.
+// The frame is rendered as 4 edge strips (each at the container's
+// pad thickness around the room); on hallway-facing sides the
+// strip splits into two segments with an entry-gap break in the
+// middle. The gap exposes the dotted bg + hallway hatching beneath,
+// reading as a doorway opening.
 function RoomContainer({ box, sides }) {
   const pad = ROOM_CONTAINER_PAD
   const bx = box.x - pad
@@ -542,53 +546,55 @@ function RoomContainer({ box, sides }) {
   const bw = box.width  + 2 * pad
   const bh = box.height + 2 * pad
   const gap = ROOM_CONTAINER_ENTRY_GAP
-  const stroke = '#A8A298'
-  const strokeWidth = 0.75
+  const fill = 'rgba(248, 244, 236, 0.5)'
 
-  const segs = []
-  // Top
+  const rects = []
+
+  // Top edge strip (full width × pad height)
+  const topY = by
   if (sides?.top) {
     const m = bx + bw / 2
-    segs.push([bx, by,           m - gap / 2, by])
-    segs.push([m + gap / 2, by,  bx + bw, by])
+    rects.push({ x: bx, y: topY, width: m - gap / 2 - bx, height: pad })
+    rects.push({ x: m + gap / 2, y: topY, width: (bx + bw) - (m + gap / 2), height: pad })
   } else {
-    segs.push([bx, by, bx + bw, by])
+    rects.push({ x: bx, y: topY, width: bw, height: pad })
   }
-  // Right
-  if (sides?.right) {
-    const m = by + bh / 2
-    segs.push([bx + bw, by,            bx + bw, m - gap / 2])
-    segs.push([bx + bw, m + gap / 2,   bx + bw, by + bh])
-  } else {
-    segs.push([bx + bw, by, bx + bw, by + bh])
-  }
-  // Bottom
+
+  // Bottom edge strip
+  const botY = by + bh - pad
   if (sides?.bottom) {
     const m = bx + bw / 2
-    segs.push([bx, by + bh,           m - gap / 2, by + bh])
-    segs.push([m + gap / 2, by + bh,  bx + bw, by + bh])
+    rects.push({ x: bx, y: botY, width: m - gap / 2 - bx, height: pad })
+    rects.push({ x: m + gap / 2, y: botY, width: (bx + bw) - (m + gap / 2), height: pad })
   } else {
-    segs.push([bx, by + bh, bx + bw, by + bh])
+    rects.push({ x: bx, y: botY, width: bw, height: pad })
   }
-  // Left
+
+  // Left edge strip — only the middle band so corners aren't double-painted
+  const leftY = by + pad
+  const leftH = bh - 2 * pad
   if (sides?.left) {
-    const m = by + bh / 2
-    segs.push([bx, by,           bx, m - gap / 2])
-    segs.push([bx, m + gap / 2,  bx, by + bh])
+    const m = leftY + leftH / 2
+    rects.push({ x: bx, y: leftY, width: pad, height: m - gap / 2 - leftY })
+    rects.push({ x: bx, y: m + gap / 2, width: pad, height: (leftY + leftH) - (m + gap / 2) })
   } else {
-    segs.push([bx, by, bx, by + bh])
+    rects.push({ x: bx, y: leftY, width: pad, height: leftH })
+  }
+
+  // Right edge strip
+  const rightX = bx + bw - pad
+  if (sides?.right) {
+    const m = leftY + leftH / 2
+    rects.push({ x: rightX, y: leftY, width: pad, height: m - gap / 2 - leftY })
+    rects.push({ x: rightX, y: m + gap / 2, width: pad, height: (leftY + leftH) - (m + gap / 2) })
+  } else {
+    rects.push({ x: rightX, y: leftY, width: pad, height: leftH })
   }
 
   return (
     <g aria-hidden="true">
-      {segs.map(([x1, y1, x2, y2], i) => (
-        <line
-          key={i}
-          x1={x1} y1={y1} x2={x2} y2={y2}
-          stroke={stroke}
-          strokeWidth={strokeWidth}
-          vectorEffect="non-scaling-stroke"
-        />
+      {rects.map((r, i) => (
+        <rect key={i} {...r} fill={fill} />
       ))}
     </g>
   )
@@ -663,10 +669,13 @@ function DimensionTicks({ layout, modesById }) {
   )
 }
 
-// PR-40: centered selection modal. Two-pane card, left side carries
-// THE / Name + a small wireframe + Copy/Delete/Enter buttons; right
-// side carries Created date + device chip + Includes list. Matches the
-// mockup at refactor/blueprint_with_room_modal.html.
+// PR-40 polish: centered selection modal. Two side-by-side cards
+// each wrapped in a `.bp-trim-wrap` (translucent padded frame).
+// Left card has THE / Name + abstract room preview + circular
+// icon actions (Copy / Delete / Enter). Right card has the
+// metadata rows (Created / Last used / Last spoken to) + device
+// pill + bulleted Includes list. Layout matches the mockup at
+// refactor/blueprint_matched_feature_list.html.
 function BlueprintRoomModal({ mode, lastConv, includes, onClose, onEnter, onCopy, onDelete }) {
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose() }
@@ -679,7 +688,7 @@ function BlueprintRoomModal({ mode, lastConv, includes, onClose, onEnter, onCopy
   const lastModel = lastConv ? modelLabel(lastConv.model) : null
   const lastUsed = lastConv ? fmtShortDate(lastConv.updatedAt) : null
   const deviceLabel = mode?.deviceClass === 'visual-touch-phone' ? 'MOBILE' : 'DESKTOP'
-  const layoutKey = String(mode?.layout?.ref || '').split('@')[0]
+  const layoutRef = mode?.layout?.ref
 
   return (
     <div
@@ -689,97 +698,82 @@ function BlueprintRoomModal({ mode, lastConv, includes, onClose, onEnter, onCopy
       aria-modal="true"
       aria-label={`${name} details`}
     >
-      <div className="bp-modal-card" onClick={(e) => e.stopPropagation()}>
-        <div className="bp-modal-left">
-          <div className="bp-modal-title">
-            <span className="bp-modal-the">THE</span>
-            <div className="bp-modal-name">{name}</div>
-          </div>
-          <ModalWireframe layoutKey={layoutKey} />
-          <div className="bp-modal-actions">
-            <button type="button" className="bp-mbtn" onClick={onCopy}>
-              <Copy className="inline-block w-3 h-3 mr-1 -mt-px" />
-              Copy
-            </button>
-            <button type="button" className="bp-mbtn bp-mbtn-delete" onClick={onDelete}>
-              <Trash2 className="inline-block w-3 h-3 mr-1 -mt-px" />
-              Delete
-            </button>
-            <button type="button" className="bp-mbtn bp-mbtn-enter" onClick={onEnter}>
-              Enter
-              <ArrowRight className="inline-block w-3 h-3 ml-1 -mt-px" />
-            </button>
+      <div className="bp-modal-assembly" onClick={(e) => e.stopPropagation()}>
+        {/* Left: room card */}
+        <div className="bp-trim-wrap">
+          <div className="bp-card-room">
+            <div className="bp-card-room-title">
+              <span className="bp-card-room-label">THE</span>
+              <div className="bp-card-room-name">{name}</div>
+            </div>
+            {/* PR-40 polish: abstract room preview uses the same
+                LayoutSilhouette the homepage library renders for
+                room/layout cards. Reflects the room's layout +
+                (later) its contents in one consistent component. */}
+            <div className="bp-card-room-wireframe">
+              {layoutRef && <LayoutSilhouette layoutId={layoutRef} />}
+            </div>
+            <div className="bp-card-actions">
+              <button type="button" className="bp-action-btn" onClick={onCopy} aria-label="Copy room">
+                <Copy size={16} />
+                <span className="bp-action-tooltip">Copy</span>
+              </button>
+              <button type="button" className="bp-action-btn bp-action-btn-delete" onClick={onDelete} aria-label="Delete room">
+                <Trash2 size={16} />
+                <span className="bp-action-tooltip">Delete</span>
+              </button>
+              <button type="button" className="bp-action-btn bp-action-btn-enter" onClick={onEnter} aria-label="Enter room">
+                <ArrowRight size={18} />
+                <span className="bp-action-tooltip">Enter</span>
+              </button>
+            </div>
           </div>
         </div>
-        <div className="bp-modal-right">
-          <div className="bp-modal-meta">
+        {/* Right: features card */}
+        <div className="bp-trim-wrap">
+          <div className="bp-card-features">
             {created && (
-              <>
-                <span className="bp-modal-meta-label">Created</span>
-                <span className="bp-modal-meta-value">{created}</span>
-              </>
+              <div className="bp-meta-row">
+                <span className="bp-meta-label">Created</span>
+                <span className="bp-meta-value">{created}</span>
+              </div>
             )}
-            <span className="bp-modal-device-chip">{deviceLabel}</span>
-          </div>
-          {(lastUsed || lastModel) && (
-            <div className="bp-modal-meta" style={{ marginTop: '-6px' }}>
-              {lastUsed && (
-                <>
-                  <span className="bp-modal-meta-label">Last used</span>
-                  <span className="bp-modal-meta-value">{lastUsed}</span>
-                </>
-              )}
-              {lastModel && (
-                <>
-                  <span className="bp-modal-meta-label">Last spoken to</span>
-                  <span className="bp-modal-meta-value">{lastModel}</span>
-                </>
-              )}
+            {lastUsed && (
+              <div className="bp-meta-row">
+                <span className="bp-meta-label">Last used</span>
+                <span className="bp-meta-value">{lastUsed}</span>
+              </div>
+            )}
+            {lastModel && (
+              <div className="bp-meta-row">
+                <span className="bp-meta-label">Last spoken to</span>
+                <span className="bp-meta-value">{lastModel}</span>
+              </div>
+            )}
+            <div style={{ margin: '10px 0 4px' }}>
+              <span className="bp-device-chip">{deviceLabel}</span>
             </div>
-          )}
-          <div className="bp-modal-section-label">Includes</div>
-          {includes && includes.length > 0 ? (
-            <ul className="bp-modal-feature-list">
-              {includes.map((it, i) => (
-                <li key={`${it.kind}-${it.name}-${i}`}>
-                  <span className="bp-modal-feat-name">{it.name}</span>
-                  {it.desc && <span className="bp-modal-feat-desc">{it.desc}</span>}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="bp-modal-empty">Nothing in this room yet.</div>
-          )}
+            <div className="bp-section-label">Includes</div>
+            {includes && includes.length > 0 ? (
+              <ul className="bp-feat-list">
+                {includes.map((it, i) => (
+                  <li key={`${it.kind}-${it.name}-${i}`} className="bp-feat-item">
+                    <div className="bp-feat-dot" />
+                    <div className="bp-feat-content">
+                      <span className="bp-feat-name">{it.name}</span>
+                      {it.desc && <span className="bp-feat-desc">{it.desc}</span>}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="bp-modal-empty">Nothing in this room yet.</div>
+            )}
+          </div>
         </div>
       </div>
     </div>
   )
-}
-
-// Mockup wireframe: a 120×80 container with one of a few simple
-// column patterns based on the room's layout id. Distinct from
-// LibraryCard's LayoutSilhouette — the modal's wireframe is
-// deliberately simpler so the card stays scannable.
-function ModalWireframe({ layoutKey }) {
-  const cols = WIREFRAME_COLS[layoutKey] || WIREFRAME_COLS.default
-  return (
-    <div className="bp-modal-wireframe">
-      {cols.map((c, i) => (
-        <div
-          key={i}
-          className={`bp-wf-col${c.narrow ? ' narrow' : ''}${c.wide ? ' wide' : ''}`}
-          style={c.style}
-        />
-      ))}
-    </div>
-  )
-}
-const WIREFRAME_COLS = {
-  'three-panel':               [{ narrow: true }, { wide: true }, { narrow: true }],
-  'canvas-centric':            [{ narrow: true }, { wide: true, style: { borderStyle: 'solid', background: 'rgba(221,214,202,0.15)' } }],
-  'document-centric':          [{ style: { maxWidth: 50, margin: '0 auto' } }, { narrow: true }],
-  'single-column-with-sheet':  [{ style: { maxWidth: 40, margin: '0 auto' } }],
-  default:                     [{ narrow: true }, { wide: true }, { narrow: true }],
 }
 
 // PR-29: confirmation modal for the Copy button on a blueprint room.
