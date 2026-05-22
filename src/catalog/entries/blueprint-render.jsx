@@ -29,14 +29,15 @@
 
 import { useEffect, useMemo, useState, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Copy, Trash2, ArrowRight } from 'lucide-react'
+import { Copy, Trash2, ArrowRight, LayoutDashboard, Palette } from 'lucide-react'
 import { useConversations } from '../../stores/ConversationContext'
 import { listModes, deleteMode, saveMode, createCopyOfMode } from '../../lib/modes'
 import { createConversation } from '../../lib/db'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
 import { modelLabel } from '../../lib/modelLabels'
 import { buildIncludes } from '../../lib/roomIncludes'
-import LayoutSilhouette from '../../components/LayoutSilhouette'
+import { getIconComponent } from '../../lib/componentIcons'
+import { getEntry as getCatalogEntry } from '..'
 import {
   packRooms,
   buildRoomPath,
@@ -295,9 +296,7 @@ export default function BlueprintRender({ hostAPI } = {}) {
         <rect x="0" y="0" width={layout.viewBox.width} height={layout.viewBox.height} fill="#EDE6D8"/>
         <rect x="0" y="0" width={layout.viewBox.width} height={layout.viewBox.height} fill="url(#bp-dots)"/>
 
-        {/* Dark outer wall stroke around the floor. rx matches the
-            14px SectionCard radius so the dark wall reads as a
-            concentric inset frame inside the section. */}
+        {/* Dark outer wall stroke around the floor. */}
         <rect
           x={layout.wallBox.x}
           y={layout.wallBox.y}
@@ -306,7 +305,7 @@ export default function BlueprintRender({ hostAPI } = {}) {
           fill="none"
           stroke={WALL_STROKE}
           strokeWidth="4"
-          rx="14"
+          rx="1"
         />
 
         {/* Hallway zones — vertical corridors between rooms in a row +
@@ -532,13 +531,11 @@ function SystemRoom({ placed, isStudy, isHovered, isCurrent, onEnter, onLeave, o
   )
 }
 
-// PR-40 polish: outer container rectangle around each room — a
-// translucent FILLED frame matching the room fill at 50% opacity.
-// The frame is rendered as 4 edge strips (each at the container's
-// pad thickness around the room); on hallway-facing sides the
-// strip splits into two segments with an entry-gap break in the
-// middle. The gap exposes the dotted bg + hallway hatching beneath,
-// reading as a doorway opening.
+// PR-40 polish: outer container rectangle around each room. Sits
+// ROOM_CONTAINER_PAD units outside the room shape on every side,
+// rendered as 4 edges, each broken in the middle when that side
+// faces a hallway. The container reads as a frame holding the
+// room; the gaps signal entryways into the corridor system.
 function RoomContainer({ box, sides }) {
   const pad = ROOM_CONTAINER_PAD
   const bx = box.x - pad
@@ -546,55 +543,53 @@ function RoomContainer({ box, sides }) {
   const bw = box.width  + 2 * pad
   const bh = box.height + 2 * pad
   const gap = ROOM_CONTAINER_ENTRY_GAP
-  const fill = 'rgba(248, 244, 236, 0.5)'
+  const stroke = '#A8A298'
+  const strokeWidth = 0.75
 
-  const rects = []
-
-  // Top edge strip (full width × pad height)
-  const topY = by
+  const segs = []
+  // Top
   if (sides?.top) {
     const m = bx + bw / 2
-    rects.push({ x: bx, y: topY, width: m - gap / 2 - bx, height: pad })
-    rects.push({ x: m + gap / 2, y: topY, width: (bx + bw) - (m + gap / 2), height: pad })
+    segs.push([bx, by,           m - gap / 2, by])
+    segs.push([m + gap / 2, by,  bx + bw, by])
   } else {
-    rects.push({ x: bx, y: topY, width: bw, height: pad })
+    segs.push([bx, by, bx + bw, by])
   }
-
-  // Bottom edge strip
-  const botY = by + bh - pad
+  // Right
+  if (sides?.right) {
+    const m = by + bh / 2
+    segs.push([bx + bw, by,            bx + bw, m - gap / 2])
+    segs.push([bx + bw, m + gap / 2,   bx + bw, by + bh])
+  } else {
+    segs.push([bx + bw, by, bx + bw, by + bh])
+  }
+  // Bottom
   if (sides?.bottom) {
     const m = bx + bw / 2
-    rects.push({ x: bx, y: botY, width: m - gap / 2 - bx, height: pad })
-    rects.push({ x: m + gap / 2, y: botY, width: (bx + bw) - (m + gap / 2), height: pad })
+    segs.push([bx, by + bh,           m - gap / 2, by + bh])
+    segs.push([m + gap / 2, by + bh,  bx + bw, by + bh])
   } else {
-    rects.push({ x: bx, y: botY, width: bw, height: pad })
+    segs.push([bx, by + bh, bx + bw, by + bh])
   }
-
-  // Left edge strip — only the middle band so corners aren't double-painted
-  const leftY = by + pad
-  const leftH = bh - 2 * pad
+  // Left
   if (sides?.left) {
-    const m = leftY + leftH / 2
-    rects.push({ x: bx, y: leftY, width: pad, height: m - gap / 2 - leftY })
-    rects.push({ x: bx, y: m + gap / 2, width: pad, height: (leftY + leftH) - (m + gap / 2) })
+    const m = by + bh / 2
+    segs.push([bx, by,           bx, m - gap / 2])
+    segs.push([bx, m + gap / 2,  bx, by + bh])
   } else {
-    rects.push({ x: bx, y: leftY, width: pad, height: leftH })
-  }
-
-  // Right edge strip
-  const rightX = bx + bw - pad
-  if (sides?.right) {
-    const m = leftY + leftH / 2
-    rects.push({ x: rightX, y: leftY, width: pad, height: m - gap / 2 - leftY })
-    rects.push({ x: rightX, y: m + gap / 2, width: pad, height: (leftY + leftH) - (m + gap / 2) })
-  } else {
-    rects.push({ x: rightX, y: leftY, width: pad, height: leftH })
+    segs.push([bx, by, bx, by + bh])
   }
 
   return (
     <g aria-hidden="true">
-      {rects.map((r, i) => (
-        <rect key={i} {...r} fill={fill} />
+      {segs.map(([x1, y1, x2, y2], i) => (
+        <line
+          key={i}
+          x1={x1} y1={y1} x2={x2} y2={y2}
+          stroke={stroke}
+          strokeWidth={strokeWidth}
+          vectorEffect="non-scaling-stroke"
+        />
       ))}
     </g>
   )
@@ -688,7 +683,6 @@ function BlueprintRoomModal({ mode, lastConv, includes, onClose, onEnter, onCopy
   const lastModel = lastConv ? modelLabel(lastConv.model) : null
   const lastUsed = lastConv ? fmtShortDate(lastConv.updatedAt) : null
   const deviceLabel = mode?.deviceClass === 'visual-touch-phone' ? 'MOBILE' : 'DESKTOP'
-  const layoutRef = mode?.layout?.ref
 
   return (
     <div
@@ -706,12 +700,8 @@ function BlueprintRoomModal({ mode, lastConv, includes, onClose, onEnter, onCopy
               <span className="bp-card-room-label">THE</span>
               <div className="bp-card-room-name">{name}</div>
             </div>
-            {/* PR-40 polish: abstract room preview uses the same
-                LayoutSilhouette the homepage library renders for
-                room/layout cards. Reflects the room's layout +
-                (later) its contents in one consistent component. */}
             <div className="bp-card-room-wireframe">
-              {layoutRef && <LayoutSilhouette layoutId={layoutRef} />}
+              <ModalContentsAbstract mode={mode} />
             </div>
             <div className="bp-card-actions">
               <button type="button" className="bp-action-btn" onClick={onCopy} aria-label="Copy room">
@@ -729,49 +719,119 @@ function BlueprintRoomModal({ mode, lastConv, includes, onClose, onEnter, onCopy
             </div>
           </div>
         </div>
-        {/* Right: features card */}
+        {/* Spool-shaped bridge connecting the two cards. */}
+        <ModalBridge />
+        {/* Right: features card. Outer card carries the rounded
+            corners + clipping; inner div is the scroll viewport so
+            the webkit scrollbar doesn't poke past the rounded
+            corner at the top. */}
         <div className="bp-trim-wrap">
           <div className="bp-card-features">
-            {created && (
-              <div className="bp-meta-row">
-                <span className="bp-meta-label">Created</span>
-                <span className="bp-meta-value">{created}</span>
+            <div className="bp-card-features-scroll">
+              {created && (
+                <div className="bp-meta-row">
+                  <span className="bp-meta-label">Created</span>
+                  <span className="bp-meta-value">{created}</span>
+                </div>
+              )}
+              {lastUsed && (
+                <div className="bp-meta-row">
+                  <span className="bp-meta-label">Last used</span>
+                  <span className="bp-meta-value">{lastUsed}</span>
+                </div>
+              )}
+              {lastModel && (
+                <div className="bp-meta-row">
+                  <span className="bp-meta-label">Last spoken to</span>
+                  <span className="bp-meta-value">{lastModel}</span>
+                </div>
+              )}
+              <div style={{ margin: '10px 0 4px' }}>
+                <span className="bp-device-chip">{deviceLabel}</span>
               </div>
-            )}
-            {lastUsed && (
-              <div className="bp-meta-row">
-                <span className="bp-meta-label">Last used</span>
-                <span className="bp-meta-value">{lastUsed}</span>
-              </div>
-            )}
-            {lastModel && (
-              <div className="bp-meta-row">
-                <span className="bp-meta-label">Last spoken to</span>
-                <span className="bp-meta-value">{lastModel}</span>
-              </div>
-            )}
-            <div style={{ margin: '10px 0 4px' }}>
-              <span className="bp-device-chip">{deviceLabel}</span>
+              <div className="bp-section-label">Includes</div>
+              {includes && includes.length > 0 ? (
+                <ul className="bp-feat-list">
+                  {includes.map((it, i) => (
+                    <li key={`${it.kind}-${it.name}-${i}`} className="bp-feat-item">
+                      <div className="bp-feat-dot" />
+                      <div className="bp-feat-content">
+                        <span className="bp-feat-name">{it.name}</span>
+                        {it.desc && <span className="bp-feat-desc">{it.desc}</span>}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="bp-modal-empty">Nothing in this room yet.</div>
+              )}
             </div>
-            <div className="bp-section-label">Includes</div>
-            {includes && includes.length > 0 ? (
-              <ul className="bp-feat-list">
-                {includes.map((it, i) => (
-                  <li key={`${it.kind}-${it.name}-${i}`} className="bp-feat-item">
-                    <div className="bp-feat-dot" />
-                    <div className="bp-feat-content">
-                      <span className="bp-feat-name">{it.name}</span>
-                      {it.desc && <span className="bp-feat-desc">{it.desc}</span>}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="bp-modal-empty">Nothing in this room yet.</div>
-            )}
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+// PR-40h: tiny grid of lucide icons reflecting the room's CONTENTS
+// (layout + scheme + each unique component). Sits in the modal's
+// wireframe slot where the library would show a LayoutSilhouette;
+// this version surfaces what's INSIDE the room rather than what
+// layout shape it carries.
+function ModalContentsAbstract({ mode }) {
+  const cells = useMemo(() => {
+    const out = []
+    if (mode?.layout?.ref) {
+      out.push({ key: 'layout', Icon: LayoutDashboard, title: 'Layout' })
+    }
+    if (mode?.scheme?.ref) {
+      out.push({ key: 'scheme', Icon: Palette, title: 'Scheme' })
+    }
+    const seen = new Set()
+    for (const c of mode?.components || []) {
+      const ref = c?.ref
+      if (!ref) continue
+      const norm = String(ref).split('@')[0]
+      if (seen.has(norm)) continue
+      seen.add(norm)
+      const entry = getCatalogEntry(ref)
+      if (!entry) continue
+      out.push({
+        key: norm,
+        Icon: getIconComponent(entry.icon),
+        title: entry.displayName || norm,
+      })
+    }
+    return out.slice(0, 8)
+  }, [mode])
+  return (
+    <div className="bp-modal-contents-abstract" aria-hidden="true">
+      {cells.map(cell => {
+        const Icon = cell.Icon
+        return (
+          <div key={cell.key} className="bp-mca-cell" title={cell.title}>
+            <Icon size={13} strokeWidth={1.4} />
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// PR-40h: spool-shaped bridge between the two modal cards.
+// Double-concave silhouette — flat left/right edges that touch each
+// trim-wrap, top + bottom edges quadratically curve INWARD toward
+// the centre. Same translucent fill as the trim-wraps so the bridge
+// reads as the cards visually melting into each other.
+function ModalBridge() {
+  return (
+    <div className="bp-modal-bridge" aria-hidden="true">
+      <svg width="26" height="86" viewBox="0 0 26 86" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M 0 0 Q 13 22, 26 0 L 26 86 Q 13 64, 0 86 Z"
+          fill="rgba(214, 206, 190, 0.42)"
+        />
+      </svg>
     </div>
   )
 }
