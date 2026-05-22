@@ -1960,20 +1960,11 @@
 }
 
 
-/* PR-39: HTML overlay over the selected room — title (matching the
-   library card's `.lib-card-name` recipe) on top, LayoutSilhouette
-   (the same component homepage Library cards render for room/layout
-   previews) below. Sits in absolute coords relative to `.bp-wrap`;
-   the room itself scales (via dynamic `selectedRoomScale`) so the
-   overlay always fits inside the room's stroked frame.
-   The width is fixed (200px) and the inner LayoutSilhouette's
-   `.lib-preview` rule pegs preview height to 70px, so the overlay's
-   visual footprint never changes regardless of which room is
-   selected. */
-/* PR-40: room modal — centered 2-pane card opened on room click.
-   Replaces the PR-19g RoomDetailsOverlay bottom sheet AND the PR-39
-   in-place expand apparatus. Mirrors the mockup at
-   refactor/blueprint_with_room_modal.html. */
+/* PR-40 polish: room modal — two side-by-side cards each wrapped in
+   a translucent "trim" frame. Left card = THE / Name + LayoutSilhouette
+   preview + circular icon actions. Right card = metadata rows +
+   device pill + bulleted Includes list. Mirrors the mockup at
+   refactor/blueprint_matched_feature_list.html. */
 .bp-modal-overlay {
   position: fixed;
   inset: 0;
@@ -1984,13 +1975,12 @@
   background: rgba(58, 53, 48, 0.45);
   padding: 20px;
   animation: bp-modal-fade-in 200ms ease;
-}
-.bp-modal-card {
-  display: flex;
-  gap: 0;
-  max-width: 580px;
-  width: 100%;
   font-family: var(--font-sans);
+}
+.bp-modal-assembly {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
   animation: bp-modal-pop-in 250ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 @keyframes bp-modal-fade-in {
@@ -2003,212 +1993,240 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .bp-modal-overlay,
-  .bp-modal-card { animation: none; }
+  .bp-modal-assembly { animation: none; }
 }
-.bp-modal-left {
-  width: 200px;
-  min-width: 200px;
-  background: rgba(245, 239, 228, 0.95);
-  border: 0.5px solid rgba(184, 176, 164, 0.5);
-  border-right: none;
-  border-radius: 8px 0 0 8px;
-  padding: 22px 18px;
+
+/* Trim — 6px translucent padding around each card; reads as a
+   ribbon/frame holding the card. */
+.bp-trim-wrap {
+  background: rgba(214, 206, 190, 0.42);
+  border-radius: 16px;
+  padding: 6px;
+}
+
+/* Left card — room snapshot. */
+.bp-card-room {
+  background: rgba(245, 239, 228, 0.96);
+  border-radius: 10px;
+  padding: 18px 16px 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  width: 165px;
 }
-.bp-modal-title {
+.bp-card-room-title {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  line-height: 1.2;
-  max-width: 100%;
 }
-.bp-modal-the {
-  font-size: 9px;
+.bp-card-room-label {
+  font-size: 7px;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: #B8B0A4;
+  text-transform: uppercase;
   font-weight: 500;
-  margin-bottom: 2px;
 }
-.bp-modal-name {
+.bp-card-room-name {
   font-size: 14px;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   color: #5A5550;
   font-weight: 500;
   overflow-wrap: anywhere;
+  text-wrap: balance;
+  margin-top: 2px;
 }
-.bp-modal-wireframe {
-  width: 130px;
-  height: 84px;
+.bp-card-room-wireframe {
+  width: 125px;
+  height: 78px;
   border: 0.75px solid #C8C0B2;
-  border-radius: 4px;
+  border-radius: 6px;
   background: rgba(255, 253, 248, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 8px;
+  padding: 6px;
+  box-sizing: border-box;
 }
-.bp-wf-col {
-  flex: 1;
-  height: 100%;
-  border: 0.5px dashed #D0C8BA;
-  border-radius: 2px;
-}
-.bp-wf-col.narrow { max-width: 18px; }
-.bp-wf-col.wide   { flex: 2; }
-.bp-modal-actions {
-  display: flex;
-  gap: 6px;
+/* LayoutSilhouette borrows .lib-preview for its sizing rules
+   (height 70px + chrome). Inside the modal's small wireframe slot
+   we override those so it fills the bordered box neatly. */
+.bp-card-room-wireframe .lib-preview {
   width: 100%;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.bp-mbtn {
-  font-size: 11px;
-  padding: 6px 10px;
+  height: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
   border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
+}
+.bp-card-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding-top: 4px;
+}
+.bp-action-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
   border: 0.5px solid #C8C0B2;
   background: rgba(255, 253, 248, 0.85);
-  color: #5A5550;
-  transition: border-color 0.12s, background 0.12s, color 0.12s;
-  display: inline-flex;
-  align-items: center;
-  font-family: inherit;
-  white-space: nowrap;
-}
-.bp-mbtn:hover {
-  border-color: #B8A070;
-  color: #8B6A10;
-}
-.bp-mbtn-delete {
-  color: #C05040;
-  border-color: rgba(192, 80, 64, 0.3);
-}
-.bp-mbtn-delete:hover {
-  border-color: #C05040;
-  background: rgba(192, 80, 64, 0.06);
-  color: #C05040;
-}
-.bp-mbtn-enter {
-  background: #3A3530;
-  color: #F5EFE4;
-  border-color: #3A3530;
-}
-.bp-mbtn-enter:hover {
-  background: #4A4540;
-  border-color: #4A4540;
-  color: #F5EFE4;
-}
-.bp-modal-right {
-  flex: 1;
-  background: rgba(255, 253, 248, 0.95);
-  border: 0.5px solid rgba(184, 176, 164, 0.5);
-  border-left: 0.5px solid rgba(200, 192, 178, 0.3);
-  border-radius: 0 8px 8px 0;
-  padding: 22px 22px;
-  max-height: 420px;
-  overflow-y: auto;
-}
-.bp-modal-meta {
+  color: #8B8578;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
-  flex-wrap: wrap;
+  justify-content: center;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  position: relative;
+  padding: 0;
+  font-family: inherit;
 }
-.bp-modal-meta-label {
-  font-size: 11px;
+.bp-action-btn:hover {
+  border-color: #B8A070;
+  color: #8B6A10;
+  background: rgba(255, 253, 248, 1);
+}
+.bp-action-btn-delete:hover {
+  border-color: #C05040;
+  color: #C05040;
+  background: rgba(192, 80, 64, 0.04);
+}
+.bp-action-btn-enter {
+  width: 42px;
+  background: rgba(196, 169, 77, 0.15);
+  border-color: rgba(196, 169, 77, 0.4);
+  color: #C4A94D;
+}
+.bp-action-btn-enter:hover {
+  background: rgba(196, 169, 77, 0.25);
+  border-color: #C4A94D;
+  color: #8B6A10;
+}
+.bp-action-tooltip {
+  position: absolute;
+  bottom: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #3A3530;
+  color: #F5F0E8;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.12s;
+  pointer-events: none;
+}
+.bp-action-tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 3px solid transparent;
+  border-bottom-color: #3A3530;
+}
+.bp-action-btn:hover .bp-action-tooltip { opacity: 1; }
+
+/* Right card — features. */
+.bp-card-features {
+  background: rgba(255, 253, 248, 0.96);
+  border-radius: 10px;
+  padding: 20px 22px 24px;
+  width: 290px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+.bp-card-features::-webkit-scrollbar { width: 4px; }
+.bp-card-features::-webkit-scrollbar-track { background: transparent; }
+.bp-card-features::-webkit-scrollbar-thumb { background: #D0C8BA; border-radius: 2px; }
+.bp-meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  margin-bottom: 5px;
+}
+.bp-meta-label {
+  font-size: 12px;
   color: #9A9490;
+  min-width: 110px;
 }
-.bp-modal-meta-value {
-  font-size: 11px;
-  color: #5A5550;
+.bp-meta-value {
+  font-size: 12px;
+  color: #3A3530;
   font-weight: 500;
 }
-.bp-modal-device-chip {
+/* Device pill — pill-shape rounded corners (999px) to match the
+   other pills on the homepage (lib-card-type / lib-card-status). */
+.bp-device-chip {
+  display: inline-block;
   font-size: 9px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #8B6A10;
   background: rgba(196, 169, 77, 0.12);
   border: 0.5px solid rgba(196, 169, 77, 0.25);
-  padding: 2px 8px;
-  border-radius: 3px;
+  padding: 3px 10px;
+  border-radius: 999px;
   font-weight: 500;
-  margin-left: auto;
 }
-.bp-modal-section-label {
-  font-size: 9px;
-  letter-spacing: 0.08em;
+.bp-section-label {
+  font-size: 11px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #B8B0A4;
-  margin: 4px 0 10px;
-  font-weight: 500;
+  color: #9A9490;
+  margin: 14px 0 14px;
+  font-weight: 400;
 }
-.bp-modal-feature-list {
+.bp-feat-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
+  gap: 16px;
+}
+.bp-feat-item {
+  display: flex;
   gap: 10px;
+  align-items: flex-start;
 }
-.bp-modal-feature-list li {
-  position: relative;
-  padding-left: 12px;
+.bp-feat-dot {
+  width: 6px;
+  height: 6px;
+  min-width: 6px;
+  border-radius: 50%;
+  background: #C4A94D;
+  margin-top: 6px;
 }
-.bp-modal-feature-list li::before {
-  content: '·';
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: #C4A94D;
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 1;
-}
-.bp-modal-feat-name {
-  font-size: 12px;
+.bp-feat-content { flex: 1; min-width: 0; }
+.bp-feat-name {
+  font-size: 13px;
   font-weight: 500;
-  color: #3A3530;
+  color: #2A2520;
   display: block;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
+  line-height: 1.3;
 }
-.bp-modal-feat-desc {
-  font-size: 11px;
+.bp-feat-desc {
+  font-size: 12px;
   color: #8B8578;
-  line-height: 1.45;
-  display: block;
+  line-height: 1.55;
 }
 .bp-modal-empty {
-  font-size: 11.5px;
+  font-size: 12px;
   color: #9A9490;
   opacity: 0.85;
 }
 @media (max-width: 560px) {
-  /* Stack panes vertically on phone widths so the 2-pane modal
-     doesn't squeeze itself off-screen. */
-  .bp-modal-card { flex-direction: column; max-width: 360px; }
-  .bp-modal-left {
-    width: auto;
-    min-width: 0;
-    border-radius: 8px 8px 0 0;
-    border-right: 0.5px solid rgba(184, 176, 164, 0.5);
-    border-bottom: none;
+  /* Stack the two trim-wrapped cards vertically on phone widths. */
+  .bp-modal-assembly {
+    flex-direction: column;
+    align-items: center;
   }
-  .bp-modal-right {
-    border-radius: 0 0 8px 8px;
-    border-left: 0.5px solid rgba(184, 176, 164, 0.5);
-    border-top: 0.5px solid rgba(200, 192, 178, 0.3);
-    max-height: 50vh;
-  }
+  .bp-card-room { width: 200px; }
+  .bp-card-features { width: 280px; }
 }
 
 /* PR-29: brief confirmation toast after a "Copy as Is" succeeds.
