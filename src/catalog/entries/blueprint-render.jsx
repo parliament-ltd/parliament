@@ -279,6 +279,10 @@ export default function BlueprintRender({ hostAPI } = {}) {
           <pattern id="bp-dots" patternUnits="userSpaceOnUse" width="14" height="14">
             <circle cx="7" cy="7" r="0.5" fill="#C8C0B0"/>
           </pattern>
+          {/* 45° hatching used to mark hallway zones. */}
+          <pattern id="bp-hhatch" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="4" stroke="#C8C0B2" strokeWidth="0.5"/>
+          </pattern>
         </defs>
 
         {/* bp-wrap surface fill behind the wall (cream + dots). */}
@@ -305,6 +309,15 @@ export default function BlueprintRender({ hostAPI } = {}) {
           height={layout.floorBox.height}
           fill={FLOOR_FILL}
         />
+
+        {/* Hallway zones — vertical corridors between rooms in a row +
+            horizontal corridors between rows. Rendered BEFORE rooms
+            so room outward bumps overlap (visually paint over) the
+            hallway hatching. Doorways (gaps in room walls where they
+            touch a hallway) come in a follow-up. */}
+        {layout.hallways && layout.hallways.map((h, i) => (
+          <Hallway key={`hall-${i}`} hallway={h} />
+        ))}
 
         {/* Dimension ticks above row-1 rooms. */}
         <DimensionTicks layout={layout} modesById={modesById} />
@@ -472,6 +485,31 @@ function SystemRoom({ placed, isStudy, isHovered, isCurrent, onEnter, onLeave, o
       <text className="bp-room-name" x={cx} y={nameY} textAnchor="middle" fontSize="9.5" fill={labelColor} letterSpacing="0.03em" fontWeight="600">
         {name}
       </text>
+    </g>
+  )
+}
+
+// PR-40 polish: hatched hallway zone. Sits behind rooms so the room
+// shapes can overlap the hatching. Two parallel edges (top/bottom for
+// horizontal hallways; left/right for vertical hallways) carry a thin
+// light-grey border line so the corridor reads as a defined zone.
+function Hallway({ hallway }) {
+  const { x, y, width, height, orientation } = hallway
+  return (
+    <g aria-hidden="true">
+      <rect x={x} y={y} width={width} height={height} fill="#EBE4D6" />
+      <rect x={x} y={y} width={width} height={height} fill="url(#bp-hhatch)" opacity="0.25" />
+      {orientation === 'horizontal' ? (
+        <>
+          <line x1={x} y1={y}          x2={x + width} y2={y}          stroke="#B8B0A0" strokeWidth="0.75" />
+          <line x1={x} y1={y + height} x2={x + width} y2={y + height} stroke="#B8B0A0" strokeWidth="0.75" />
+        </>
+      ) : (
+        <>
+          <line x1={x}         y1={y} x2={x}         y2={y + height} stroke="#B8B0A0" strokeWidth="0.75" />
+          <line x1={x + width} y1={y} x2={x + width} y2={y + height} stroke="#B8B0A0" strokeWidth="0.75" />
+        </>
+      )}
     </g>
   )
 }
