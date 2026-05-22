@@ -1198,23 +1198,23 @@
   z-index: 1;
   pointer-events: none;
   opacity: 0;
+  /* Group opacity at ~18% so internal overlap between cells doesn't
+     build up alpha (the union of all 3 cells renders as ONE shape
+     at this opacity). Increased from 0.07 because the gel halo was
+     barely visible against the bp-wrap dot texture. */
   transition: opacity 240ms ease 60ms;
 }
 .bp-gel-frame.show {
-  opacity: 1;
+  opacity: 0.18;
 }
 .bp-gel-cell {
   position: absolute;
-  /* Warm-gray gel that contrasts against the bp-wrap dot texture.
-     Previously used 30% white on top of the cream bp-wrap bg —
-     invisible against the already near-white surface, especially
-     when the room cards (also white) covered the cells' interior
-     regions. The visible portion of the gel is only the 10px halo
-     ring around each of the 3 cards, so the contrast needs to be
-     real. ~7% warm gray reads as a soft "clearing" zone without
-     becoming a hard shape. */
-  background: rgba(60, 50, 40, 0.07);
-  border-radius: 14px;
+  /* Solid warm-dark cell fill. Group opacity (above) handles the
+     translucency, so cells overlap cleanly without alpha buildup.
+     Color picked to read as a soft "clearing" zone over the cream
+     bg + dot texture without becoming a hard frame. */
+  background: #3C322A;
+  border-radius: 16px;
 }
 @media (prefers-reduced-motion: reduce) {
   .bp-gel-frame { transition: none; }

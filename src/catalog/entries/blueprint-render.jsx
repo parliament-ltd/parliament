@@ -606,7 +606,9 @@ export default function BlueprintRender({ hostAPI } = {}) {
     >
       {/* Gel container — rendered BEFORE the SVG so it sits behind
           the rooms (SVG has explicit z-index 2; gel has z-index 1).
-          Opacity fades in/out with the selection. */}
+          Opacity fades in/out with the selection. Halo padding is
+          14px on each side; with the 20px gap between cards, the
+          halos slightly overlap (4px) to form a connected blob. */}
       {!isNarrow && expandedRoomBox && (
         <div
           className={`bp-gel-frame${detailsReady && selectedRoomId ? ' show' : ''}`}
@@ -616,20 +618,20 @@ export default function BlueprintRender({ hostAPI } = {}) {
           <div
             className="bp-gel-cell"
             style={{
-              left: `calc(${expandedRoomBox.leftEdgePercent}% - 10px)`,
-              top: `calc(${expandedRoomBox.topPercent}% - 10px)`,
-              width: `calc(${expandedRoomBox.widthPercent}% + 20px)`,
-              height: `calc(${expandedRoomBox.bottomPercent - expandedRoomBox.topPercent}% + 20px)`,
+              left: `calc(${expandedRoomBox.leftEdgePercent}% - 14px)`,
+              top: `calc(${expandedRoomBox.topPercent}% - 14px)`,
+              width: `calc(${expandedRoomBox.widthPercent}% + 28px)`,
+              height: `calc(${expandedRoomBox.bottomPercent - expandedRoomBox.topPercent}% + 28px)`,
             }}
           />
           {/* Action card halo (below the room, same width, centered) */}
           <div
             className="bp-gel-cell"
             style={{
-              left: `calc(${expandedRoomBox.leftEdgePercent}% - 10px)`,
-              top: `calc(${expandedRoomBox.bottomPercent}% + 10px)`,
-              width: `calc(${expandedRoomBox.widthPercent}% + 20px)`,
-              height: '64px',
+              left: `calc(${expandedRoomBox.leftEdgePercent}% - 14px)`,
+              top: `calc(${expandedRoomBox.bottomPercent}% + 6px)`,
+              width: `calc(${expandedRoomBox.widthPercent}% + 28px)`,
+              height: '72px',
             }}
           />
           {/* Sidebar halo (left/right + top/bottom flip per PR-32/33) */}
@@ -637,15 +639,15 @@ export default function BlueprintRender({ hostAPI } = {}) {
             className="bp-gel-cell"
             style={{
               ...(gelOnLeft
-                ? { right: `calc(${100 - expandedRoomBox.leftEdgePercent}% + 10px)`, left: 'auto' }
-                : { left:  `calc(${expandedRoomBox.rightPercent}% + 10px)`,           right: 'auto' }
+                ? { right: `calc(${100 - expandedRoomBox.leftEdgePercent}% + 6px)`, left: 'auto' }
+                : { left:  `calc(${expandedRoomBox.rightPercent}% + 6px)`,           right: 'auto' }
               ),
               ...(gelOnBottom
-                ? { bottom: `calc(${100 - expandedRoomBox.bottomPercent}% - 10px)`, top: 'auto' }
-                : { top:    `calc(${expandedRoomBox.topPercent}% - 10px)`,          bottom: 'auto' }
+                ? { bottom: `calc(${100 - expandedRoomBox.bottomPercent}% - 14px)`, top: 'auto' }
+                : { top:    `calc(${expandedRoomBox.topPercent}% - 14px)`,          bottom: 'auto' }
               ),
-              width: '260px',
-              height: '200px',
+              width: '268px',
+              height: '220px',
             }}
           />
         </div>
