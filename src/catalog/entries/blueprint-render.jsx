@@ -27,16 +27,14 @@ import { createConversation } from '../../lib/db'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
 import { useIsNarrow } from '../../lib/useViewportWidth'
 import { modelLabel } from '../../lib/modelLabels'
-import { buildIncludes, refName as roomRefName } from '../../lib/roomIncludes'
+import { buildIncludes } from '../../lib/roomIncludes'
 import LayoutWireframe from '../../components/build/wizard/LayoutWireframe'
 import RoomDetailsOverlay from '../../components/RoomDetailsOverlay'
 import {
   packRooms,
   buildRoomPath,
-  interiorHints,
   studyShape,
   labShape,
-  hashString,
   SYSTEM_KIND,
   SYSTEM_ROOM_IDS,
 } from '../../lib/blueprintShapes'
@@ -48,7 +46,9 @@ const WALL_FILL   = '#F5F0E8'
 const HATCH_FILL  = 'url(#bp-hatch)'
 const FLOOR_GRID  = 'url(#bp-floorgrid)'
 
-const ROOM_FILL_DEFAULT = '#F5F0E8'
+// Mini-map redesign: rooms are pure white cards on the dot-textured
+// page surface (was cream #F5F0E8 to match the old beige floor).
+const ROOM_FILL_DEFAULT = '#FFFFFF'
 // PR-23: active-room highlight is the "you are here" signal in
 // blueprint-in-chat (and on the homepage when on `/`). Alpha bumped
 // 0.10 → 0.22 so the active room reads as visibly highlighted; hover
@@ -190,94 +190,6 @@ const GLYPHS = {
   ),
 }
 
-// PR-19j: stable seeded scatter for activity dots. Each dot's position
-// is derived from a per-(room, conversation) hash so the dots stay put
-// across renders — the user sees the same spatial fingerprint until
-// they add/remove conversations.
-function seededDots(roomId, convIds, interior) {
-  if (!roomId || !convIds || convIds.length === 0) return []
-  const limit = Math.min(12, convIds.length)
-  const ids = convIds.slice(0, limit)
-  const dots = []
-  // Reserve top 12% as a "ceiling" gap and the bottom 55% for furniture
-  // and the title block (THE / NAME). Dots live in the slim band in
-  // between — small, faint, and out of the way of the typography.
-  const padX = 12
-  const topPad = interior.height * 0.18
-  const bandY  = interior.y + topPad
-  const bandH  = interior.height * 0.32
-  const bandX  = interior.x + padX
-  const bandW  = Math.max(20, interior.width - padX * 2)
-  for (let i = 0; i < ids.length; i++) {
-    const h = hashString(`${roomId}|${ids[i]}`)
-    const fx = ((h & 0xffff) / 0xffff)
-    const fy = (((h >>> 16) & 0xffff) / 0xffff)
-    dots.push({
-      cx: bandX + fx * bandW,
-      cy: bandY + fy * bandH,
-      r: 2.2,
-    })
-  }
-  return dots
-}
-
-// PR-19j: furniture glyph positions. Up to 6 glyphs per room — beyond
-// that the icons get too dense to read; we drop the tail and let the
-// "Includes" sidebar carry the rest.
-//
-// PR-19k: moved from the bottom interior up to the same icon band as
-// the system rooms' compass/wrench (cy + 26) so the whole floor reads
-// as one species. When the room is active and the walking-human is
-// rendered at horizontal center, glyphs split into two clusters (left
-// + right) to leave a gap around it; otherwise they spread evenly.
-function furniturePositions(refs, interior, opts = {}) {
-  const { avoidCenter = false } = opts
-  const limit = Math.min(6, refs.length)
-  if (limit === 0) return []
-  const padX = 16
-  const cy    = interior.y + interior.height / 2
-  const baseY = cy + 26
-  if (avoidCenter) {
-    // Split into left/right halves, skipping a center gap (~18px each
-    // side of cx) so the walking-human centered at cx has clearance.
-    const cx = interior.x + interior.width / 2
-    const leftCount  = Math.ceil(limit / 2)
-    const rightCount = limit - leftCount
-    const gap        = 18
-    const leftSpan   = (cx - gap) - (interior.x + padX)
-    const rightSpan  = (interior.x + interior.width - padX) - (cx + gap)
-    const out = []
-    for (let i = 0; i < leftCount; i++) {
-      const t = (i + 1) / (leftCount + 1)
-      out.push({
-        ref: refs[i],
-        x: interior.x + padX + Math.max(0, leftSpan) * t - 7,
-        y: baseY - 7,
-      })
-    }
-    for (let i = 0; i < rightCount; i++) {
-      const t = (i + 1) / (rightCount + 1)
-      out.push({
-        ref: refs[leftCount + i],
-        x: cx + gap + Math.max(0, rightSpan) * t - 7,
-        y: baseY - 7,
-      })
-    }
-    return out
-  }
-  const bandW = Math.max(20, interior.width - padX * 2)
-  const step  = bandW / (limit + 1)
-  const out = []
-  for (let i = 0; i < limit; i++) {
-    out.push({
-      ref: refs[i],
-      x: interior.x + padX + step * (i + 1) - 7,
-      y: baseY - 7,
-    })
-  }
-  return out
-}
-
 // ─── Component ───────────────────────────────────────────────
 
 export default function BlueprintRender({ hostAPI } = {}) {
@@ -302,9 +214,6 @@ export default function BlueprintRender({ hostAPI } = {}) {
   // appears AFTER the transform settles. Toggled by an effect that
   // runs a 280ms setTimeout when selectedRoomId becomes truthy.
   const [detailsReady, setDetailsReady] = useState(false)
-  // PR-19g: "You are here" tooltip moves onto the in-room walking-
-  // human icon (was: floating gold pawn).
-  const [hereTip, setHereTip] = useState(null) // { x, y } or null
   // PR-19j: phone-width fallback — expand-in-place doesn't fit a
   //   <768px viewport. Mobile keeps PR-19g's bottom-sheet overlay.
   const isNarrow = useIsNarrow(768)
@@ -384,21 +293,6 @@ export default function BlueprintRender({ hostAPI } = {}) {
     }
     return null
   }, [location.pathname, conversations])
-
-  // PR-19j: per-room conversation lists for the activity-dot scatter.
-  const convsByRoom = useMemo(() => {
-    const m = new Map()
-    for (const c of conversations) {
-      if (!c.room) continue
-      if (!m.has(c.room)) m.set(c.room, [])
-      m.get(c.room).push(c)
-    }
-    // Sort newest-first so the cap-at-12 sampler keeps the most recent.
-    for (const list of m.values()) {
-      list.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-    }
-    return m
-  }, [conversations])
 
   // The room id implied by the chat row currently being hovered.
   const highlightedRoomId = useMemo(() => {
@@ -546,22 +440,15 @@ export default function BlueprintRender({ hostAPI } = {}) {
   // canvas). The computed scale is also exposed via `selectedRoomScale`
   // so the Room component can counter-scale its interior content to
   // keep title/dates/buttons at native card-pixel sizes.
-  const selectedRoomScale = useMemo(() => {
-    if (!selectedRoomId || isNarrow) return 1
-    const placed = layout.placedRooms.find(p => p.id === selectedRoomId)
-    if (!placed) return 1
-    // PR-19k followup: cut from 0.55 → 0.30 of canvas — the prior size
-    // was still dominating the floor. Content stays at native card-px
-    // sizes via the counter-scale, so the smaller room reads as a
-    // tight, framed card rather than a giant translucent panel. Floor
-    // is clamped at 1.0 so naturally-large rooms never SHRINK on
-    // selection (it would look like the room is collapsing).
-    // PR-19l: trim another 10% (0.30 → 0.27 of canvas).
-    const targetW = layout.floorBox.width  * 0.27
-    const targetH = layout.floorBox.height * 0.27
-    const scale = Math.min(targetW / placed.box.width, targetH / placed.box.height)
-    return Math.max(1, scale)
-  }, [selectedRoomId, isNarrow, layout])
+  // Mini-map redesign: NO in-place enlargement on click. The selected
+  // room stays at its mini-map size. Visual feedback comes from
+  // (a) the gel container appearing around the room + the action
+  // card + Includes sidebar, and (b) all OTHER rooms shrinking to
+  // 0.55 + fading to 0.35 opacity (the existing transformFor logic).
+  // This avoids clipping for bottom-row rooms in multi-row layouts
+  // (a 3x enlargement of a bottom-row room would extend past
+  // bp-wrap's bottom edge).
+  const selectedRoomScale = useMemo(() => 1, [])
 
   const transformFor = useCallback((placed) => {
     if (!selectedRoomId || isNarrow) return null
@@ -802,13 +689,8 @@ export default function BlueprintRender({ hostAPI } = {}) {
                 transformStyle={transformStyle}
                 onEnter={() => setHoveredFromBlueprint(placed.id)}
                 onLeave={() => setHoveredFromBlueprint(null)}
-                onHereTipShow={(p) => setHereTip(p)}
-                onHereTipHide={() => setHereTip(null)}
                 onClick={(e) => {
                   if (selectedRoomId) {
-                    // System rooms are part of the dimmed-floor click
-                    // target — clicking one while a user room is
-                    // selected just deselects.
                     e.stopPropagation()
                     setSelectedRoomId(null)
                     return
@@ -825,35 +707,18 @@ export default function BlueprintRender({ hostAPI } = {}) {
               key={placed.id}
               placed={placed}
               mode={modesById.get(placed.id)}
-              convsInRoom={convsByRoom.get(placed.id) || []}
               isActive={placed.id === activeRoomId}
               isHighlitFromChat={placed.id === highlightedRoomId}
               isHovered={placed.id === hoveredFromBlueprint}
               isSelected={isSelected}
               isDimmed={isDimmed}
-              showInlineDetails={isSelected && !isNarrow && detailsReady}
               transformStyle={transformStyle}
-              roomScale={isSelected ? selectedRoomScale : 1}
-              lastConv={lastConvByRoomId.get(placed.id) || null}
               onEnter={() => setHoveredFromBlueprint(placed.id)}
               onLeave={() => setHoveredFromBlueprint(null)}
               onClick={(e) => {
-                // Stop propagation so the SVG-background click handler
-                // doesn't also fire and deselect the room we just
-                // selected (or the one the user is opening into).
                 e.stopPropagation()
-                // PR-32: clicking a dimmed room now SWITCHES the
-                // expanded selection to that room (was: deselect
-                // entirely). handleRoomClick already handles all
-                // three cases — first click on a fresh room expands,
-                // second click on the same room enters, click on
-                // another room while one is selected expands the
-                // new one. Closing the expansion still works via
-                // empty-canvas click or outside-bp-wrap click.
                 handleRoomClick(placed.id)
               }}
-              onHereTipShow={(p) => setHereTip(p)}
-              onHereTipHide={() => setHereTip(null)}
             />
           )
         })}
@@ -864,15 +729,6 @@ export default function BlueprintRender({ hostAPI } = {}) {
             than informative. The component still exists below for
             potential later reintroduction. */}
       </svg>
-
-      {hereTip && (
-        <div
-          className="bp-pawn-tip"
-          style={{ left: hereTip.x + 10, top: hereTip.y - 28, position: 'fixed' }}
-        >
-          You are here
-        </div>
-      )}
 
       {/* PR-19j: desktop renders the details inline (inside the
           expanded room <foreignObject> + a sidebar to the right +
@@ -1147,37 +1003,29 @@ function FurnitureGlyph({ x, y, refName }) {
 
 // ─── Subcomponents ───────────────────────────────────────────
 
-// PR-19g: simplified room card. Centered title (THE / NAME) + optional
-// walking-human icon below for the active room.
-//
-// PR-19j: gained activity dots (one per conversation, scattered in the
-// upper band), furniture glyphs (one per unique component ref, along
-// the bottom), and an inline `<foreignObject>` details panel that fades
-// in when the room is the expand-in-place selection. The per-room
-// transform style is passed in from BlueprintRender.
+// Mini-map redesign: room subcomponent is just SHAPE + TITLE. The
+// activity dots, dashed wall hints, walking-human icon, furniture
+// glyphs, and foreignObject inline details from PR-19g/19j are all
+// gone. When the room is selected, the entire SVG <g> scales up via
+// transformStyle and the title scales with it — no counter-scale
+// machinery needed.
 function Room({
   placed,
   mode,
-  convsInRoom,
   isActive,
   isHighlitFromChat,
   isHovered,
   isSelected,
   isDimmed,
-  showInlineDetails,
   transformStyle,
-  roomScale,
   onEnter,
   onLeave,
   onClick,
-  onHereTipShow,
-  onHereTipHide,
 }) {
   const { box, layoutRef, id } = placed
   const { path, interior } = buildRoomPath({ box, layoutRef, roomId: id })
   const cx = interior.x + interior.width / 2
   const cy = interior.y + interior.height / 2
-  const hints = interiorHints({ box, layoutRef, roomId: id })
 
   let fill = ROOM_FILL_DEFAULT
   if (isActive) fill = ROOM_FILL_ACTIVE
@@ -1192,23 +1040,11 @@ function Room({
 
   const name = (mode?.meta?.name || mode?.id || 'Room').toUpperCase()
 
-  // Title placement: centered. Mini-map tightens the THE/NAME gap
-  // (16→7) to match smaller fonts, and pulls iconY up (18→12) so
-  // the active-room walking-human sits visually close to the title
-  // rather than floating near the bottom wall.
-  const nameY = cy + 4
-  const theY = nameY - 7
-  const iconY = nameY + 12
-
-  // PR-19j: activity dots + furniture glyph positions. Memoization
-  // intentionally skipped — derivations are cheap and depend on stable
-  // upstream data (room id + conv ids + component refs).
-  const convIds = convsInRoom ? convsInRoom.map(c => c.id) : []
-  const dots = seededDots(id, convIds, interior)
-  const componentRefs = mode?.components
-    ? Array.from(new Set(mode.components.map(c => roomRefName(c.ref)).filter(r => GLYPHS[r])))
-    : []
-  const glyphs = furniturePositions(componentRefs, interior, { avoidCenter: isActive })
+  // Title placement: centered. THE prefix sits 7px above NAME so the
+  // two-line block reads as one anchored unit, sized for the smaller
+  // mini-map fonts (3.5 / 4.5).
+  const nameY = cy + 3
+  const theY = nameY - 6
 
   return (
     <g
@@ -1221,55 +1057,9 @@ function Room({
       {/* Fill */}
       <path d={path} fill={fill} className="bp-room-fill" />
 
-      {/* Interior wall hints — kept from PR-16a; faint dashed lines
-          suggest the layout's slot structure without drawing components. */}
-      {hints.map((h, i) => h.type === 'line' ? (
-        <line
-          key={`h${i}`}
-          x1={h.x1} y1={h.y1} x2={h.x2} y2={h.y2}
-          stroke="#C8C2B8"
-          strokeWidth="1"
-          strokeDasharray="3 3"
-        />
-      ) : (
-        <rect
-          key={`h${i}`}
-          x={h.x} y={h.y} width={h.width} height={h.height}
-          fill={h.hatched ? 'url(#bp-hatch-light)' : 'none'}
-          stroke="#C8C2B8"
-          strokeWidth="0.5"
-          strokeDasharray="3 3"
-        />
-      ))}
-
-      {/* PR-19j: activity dots — one per conversation in this room,
-          capped at 12, seeded scatter in the upper interior. */}
-      {!showInlineDetails && dots.map((d, i) => (
-        <circle
-          key={`d${i}`}
-          cx={d.cx}
-          cy={d.cy}
-          r={d.r}
-          className="bp-activity-dot"
-        />
-      ))}
-
-      {/* PR-19j: furniture glyphs — one per unique component ref,
-          evenly spaced along the bottom interior. Hidden when the
-          room is selected and inline details are visible (they'd
-          collide with the foreignObject content). */}
-      {!showInlineDetails && glyphs.map((g, i) => (
-        <FurnitureGlyph
-          key={`g${i}-${g.ref}`}
-          x={g.x}
-          y={g.y}
-          refName={g.ref}
-        />
-      ))}
-
-      {/* Border (drawn over hints so it stays crisp). PR-19j: the
-          path no longer scales its stroke with the per-room transform
-          (otherwise dimmed rooms would have hairline borders). */}
+      {/* Border. vectorEffect:non-scaling-stroke keeps the stroke
+          width constant even when the parent <g> is scaled (for
+          the expand-in-place selection). */}
       <path
         d={path}
         fill="none"
@@ -1278,66 +1068,19 @@ function Room({
         vectorEffect="non-scaling-stroke"
       />
 
-      {/* Centered title block. PR-19k: hidden when the room is the
-          expand-in-place selection — the title moves inside the
-          foreignObject so it can render at native card-pixel size via
-          the counter-scale transform. */}
-      {!showInlineDetails && (
-        <>
-          {/* Mini-map fonts (4 / 5.5). Tighter than the first preview
-              pass — labels read as compact tags on each room rather
-              than as the room's dominant feature. Followed by an
-              icon (walking-human when active) sitting tightly under
-              the NAME baseline. */}
-          <text x={cx} y={theY} textAnchor="middle" fontSize="4" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
-            THE
-          </text>
-          <text x={cx} y={nameY} textAnchor="middle" fontSize="5.5" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
-            {name}
-          </text>
-        </>
-      )}
-
-      {/* Active room: walking-human icon below the title (replaces the
-          floating gold pawn from PR-14). PR-19j: gains a bob + glow
-          pulse via the WalkingHuman component's own CSS classes. */}
-      {isActive && !showInlineDetails && (
-        <WalkingHuman
-          x={cx}
-          y={iconY}
-          color={isHovered ? '#8B6A10' : IN_ROOM_ICON_COLOR}
-          onShow={onHereTipShow}
-          onHide={onHereTipHide}
-        />
-      )}
-
-      {/* PR-19j: inline details rendered via SVG foreignObject when
-          this room is the desktop expand-in-place selection. The
-          details fade in 60ms after the scale transition settles so
-          the room shape "opens" before the contents appear.
-          PR-19k: the HTML inside is counter-scaled by `1/roomScale`
-          via a CSS custom property so title/dates/buttons render at
-          native card-pixel sizes despite the parent <g> being scaled
-          up to ~55% of canvas. */}
-      {showInlineDetails && (
-        <foreignObject
-          x={interior.x}
-          y={interior.y}
-          width={interior.width}
-          height={interior.height}
-        >
-          <div
-            xmlns="http://www.w3.org/1999/xhtml"
-            className="bp-foreignobj-details show"
-            style={{ '--bp-room-scale': roomScale || 1 }}
-          >
-            <InlineRoomDetails
-              mode={mode}
-              isActive={isActive}
-            />
-          </div>
-        </foreignObject>
-      )}
+      {/* Title block — THE / NAME, centered. Mini-map redesign
+          dropped everything else from inside the room (activity
+          dots, dashed wall hints, walking-human, furniture glyphs,
+          foreignObject inline details). The room is now JUST its
+          shape + title; when selected and enlarged, the SVG text
+          scales up with the <g>, so the title becomes readable
+          without any foreignObject / counter-scale machinery. */}
+      <text x={cx} y={theY} textAnchor="middle" fontSize="3.5" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+        THE
+      </text>
+      <text x={cx} y={nameY} textAnchor="middle" fontSize="4.5" fill={isActive ? '#8B6A10' : '#5A5550'} letterSpacing="0.06em" fontWeight="600">
+        {name}
+      </text>
 
       {/* Hatch overlay for non-selected rooms when a selection is
           active. Same path, hatched fill, faded in via CSS. */}
@@ -1402,33 +1145,31 @@ function fmtShortDate(iso) {
   } catch { return null }
 }
 
-// PR-19g: simplified system room — Study (compass) or Lab (wrench).
-// Title centered, icon below. PR-19f's feature pills and corner-icon
-// placement are dropped to match the strict title-only treatment for
-// every room on the blueprint. Click routes directly (Study → '/',
-// Lab → '/edit') — no details overlay for system rooms.
-//
-// PR-19k: gains the walking-human + gold-glow pulse when `isCurrent`
-// (the user is on `/` for Study or `/edit*` for Lab). Sits below the
-// compass/wrench so the room's identity icon stays visible.
-function SystemRoom({ placed, isStudy, isHovered, isDimmed, isCurrent, transformStyle, onEnter, onLeave, onClick, onHereTipShow, onHereTipHide }) {
+// Mini-map redesign: SystemRoom is just SHAPE + TITLE — same as Room.
+// PR-19g's compass/wrench identity icon and PR-19k's walking-human
+// "you are here" indicator are both gone. Study/Lab are differentiated
+// from user rooms by their signature shape (Study's bottom-left
+// chamfer, Lab's top-right notch) and by their THE STUDY / THE LAB
+// titles.
+function SystemRoom({ placed, isStudy, isHovered, isDimmed, isCurrent, transformStyle, onEnter, onLeave, onClick }) {
   const { box } = placed
   const { path, interior } = isStudy ? studyShape(box) : labShape(box)
   const cx = interior.x + interior.width / 2
   const cy = interior.y + interior.height / 2
   const name = isStudy ? 'STUDY' : 'LAB'
 
-  const fill = isHovered ? 'rgba(196,169,77,0.10)' : 'rgba(196,169,77,0.035)'
-  const stroke = isHovered ? '#B8A070' : '#C8C2B8'
-  const labelColor = isHovered ? '#8B6A10' : '#5A5550'
-  const iconColor = isHovered ? '#8B6A10' : IN_ROOM_ICON_COLOR
+  // Mini-map system-room palette. isCurrent (user is on / for Study
+  // or /edit for Lab) bumps the tint up to match the active user-room
+  // ACTIVE fill alpha so "you are here" stays signalled even without
+  // the walking-human icon.
+  const baseAlpha = isCurrent ? 0.22 : 0.035
+  const hoverAlpha = 0.30
+  const fill = isHovered ? `rgba(196,169,77,${hoverAlpha})` : `rgba(196,169,77,${baseAlpha})`
+  const stroke = (isHovered || isCurrent) ? '#B8A070' : '#C8C2B8'
+  const labelColor = (isHovered || isCurrent) ? '#8B6A10' : '#5A5550'
 
-  // Mini-map layout: tighter title block + icon higher, matching
-  // user rooms above. iconY pulls 22→12; the compass/wrench (or
-  // walking-human when isCurrent) sits just under the NAME baseline.
-  const nameY = cy + 4
-  const theY = nameY - 7
-  const iconY = nameY + 12
+  const nameY = cy + 3
+  const theY = nameY - 6
 
   return (
     <g
@@ -1437,51 +1178,18 @@ function SystemRoom({ placed, isStudy, isHovered, isDimmed, isCurrent, transform
       onMouseLeave={onLeave}
       onClick={onClick}
     >
+      {/* Opaque white base so the dot-textured bp-wrap doesn't show
+          through the room's translucent gold tint. */}
+      <path d={path} fill={ROOM_FILL_DEFAULT} />
       <path d={path} fill={fill} className="bp-room-fill" />
-      <path d={path} fill="none" stroke={stroke} strokeWidth="0.8" vectorEffect="non-scaling-stroke" />
+      <path d={path} fill="none" stroke={stroke} strokeWidth={isCurrent ? 1.5 : 0.8} vectorEffect="non-scaling-stroke" />
 
-      {/* Matches the user-room mini-map font sizing (4 / 5.5). */}
-      <text x={cx} y={theY} textAnchor="middle" fontSize="4" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
+      <text x={cx} y={theY} textAnchor="middle" fontSize="3.5" fill="#9A9490" letterSpacing="0.08em" fontWeight="500">
         THE
       </text>
-      <text x={cx} y={nameY} textAnchor="middle" fontSize="5.5" fill={labelColor} letterSpacing="0.06em" fontWeight="600">
+      <text x={cx} y={nameY} textAnchor="middle" fontSize="4.5" fill={labelColor} letterSpacing="0.06em" fontWeight="600">
         {name}
       </text>
-
-      {/* Mini-map redesign: at half-size the interior height (~59px)
-          can't fit BOTH the compass/wrench AND the walking-human
-          stacked vertically (PR-19k's pattern). Instead, the walking
-          human REPLACES the room's identity icon when isCurrent.
-          The presence signal is what matters when the user is
-          actually in this room; the identity icon (compass/wrench)
-          isn't needed when you're already standing in it. */}
-      {isCurrent ? (
-        <WalkingHuman
-          x={cx}
-          y={iconY}
-          color={isHovered ? '#8B6A10' : IN_ROOM_ICON_COLOR}
-          onShow={onHereTipShow}
-          onHide={onHereTipHide}
-        />
-      ) : (
-        <g
-          transform={`translate(${cx - 8.5} ${iconY - 8.5}) scale(0.71)`}
-          stroke={iconColor}
-          strokeWidth="1.4"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          {isStudy ? (
-            <>
-              <circle cx="12" cy="12" r="10" />
-              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
-            </>
-          ) : (
-            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-          )}
-        </g>
-      )}
 
       {/* Hatch overlay when a user room is selected so the system
           cards also dim in sympathy with the rest of the floor. */}
