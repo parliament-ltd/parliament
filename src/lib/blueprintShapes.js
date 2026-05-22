@@ -37,14 +37,13 @@
 
 export const VIEWBOX_PAD = 24        // outer wall margin (PR-16a: was 28; +4 to give edge protrusions breathing room; mini-map: tightened 32→24)
 export const WALL_THICKNESS = 6      // outer wall stroke width (spec uses 7)
-// Mini-map redesign: rooms halved again to ROW_HEIGHT 75 (was 150) +
-// TARGET_INNER_WIDTH 232 (was 465). Blueprint reads as a small map of
-// rooms rather than a section in its own right. Aspect ratios + variant
+// Mini-map redesign (2nd pass): rooms further shrunk to ROW_HEIGHT 55
+// (was 75) + TARGET_INNER_WIDTH 170 (was 232). Aspect ratios + variant
 // generators stay the same — the shrink is purely a constant change.
-export const ROW_HEIGHT = 75         // target room interior height
-export const ROOM_GAP = 16           // gap between rooms in a row (mini-map: tightened 24→16)
-export const ROW_GAP = 12            // gap between rows (mini-map: tightened 18→12)
-export const TARGET_INNER_WIDTH = 232 // packs to this before wrapping
+export const ROW_HEIGHT = 55         // target room interior height
+export const ROOM_GAP = 14           // gap between rooms in a row
+export const ROW_GAP = 10            // gap between rows
+export const TARGET_INNER_WIDTH = 170 // packs to this before wrapping
 
 // Per-layout aspect ratio (width / ROW_HEIGHT). Loosely follows the
 // proportions in refactor/parliament_homepage_v2 (2).html with small

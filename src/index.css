@@ -1155,21 +1155,18 @@
 
 /* ── Blueprint section ────────────────────────────────────── */
 .bp-wrap {
-  /* Mini-map redesign: bp-wrap IS the page card the rooms sit on.
-     Background uses the same chat-page-bg recipe (subtle bg + dot
-     texture) as the chat/editor surfaces so the blueprint reads as
-     "the same page surface" as those views. Surrounding card chrome
-     (border + soft shadow + rounded corners) matches editor-area-card.
-     The pre-mini-map heavy hatched border + beige floor are gone —
-     rooms are now little cards floating on a textured page.
-     IMPORTANT: padding is 0 so that absolute-positioned children
+  /* Mini-map redesign: bp-wrap is the dot-textured surface inside
+     the homepage section. The OUTER border/shadow/radius come from
+     SectionCard (the surrounding .section element) — bp-wrap itself
+     deliberately has no border + no shadow + no radius, so it fills
+     the section's interior cleanly without doubling up the chrome.
+     IMPORTANT: padding is 0 so absolute-positioned children
      (bp-action-card, bp-includes-sidebar, bp-gel-frame) share the
      same percentage-positioning space as the rooms inside the SVG.
      Visual breathing room around the rooms comes from VIEWBOX_PAD
-     in blueprintShapes.js (24svg-units of inset around the rooms). */
+     in blueprintShapes.js. */
   position: relative;
   padding: 0;
-  overflow: hidden;
   background-color: var(--p-bg-subtle);
   background-image: radial-gradient(
     circle,
@@ -1177,11 +1174,6 @@
     transparent 1px
   );
   background-size: 16px 16px;
-  border: 0.5px solid var(--p-border);
-  border-radius: 12px;
-  box-shadow:
-    0 0 0 0.5px rgba(0, 0, 0, 0.04),
-    0 2px 8px rgba(0, 0, 0, 0.04);
 }
 .bp-svg {
   font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
@@ -1206,15 +1198,23 @@
   z-index: 1;
   pointer-events: none;
   opacity: 0;
+  /* Group opacity at ~18% so internal overlap between cells doesn't
+     build up alpha (the union of all 3 cells renders as ONE shape
+     at this opacity). Increased from 0.07 because the gel halo was
+     barely visible against the bp-wrap dot texture. */
   transition: opacity 240ms ease 60ms;
 }
 .bp-gel-frame.show {
-  opacity: 0.30;
+  opacity: 0.18;
 }
 .bp-gel-cell {
   position: absolute;
-  background: var(--p-bg-base);
-  border-radius: 14px;
+  /* Solid warm-dark cell fill. Group opacity (above) handles the
+     translucency, so cells overlap cleanly without alpha buildup.
+     Color picked to read as a soft "clearing" zone over the cream
+     bg + dot texture without becoming a hard frame. */
+  background: #3C322A;
+  border-radius: 16px;
 }
 @media (prefers-reduced-motion: reduce) {
   .bp-gel-frame { transition: none; }
