@@ -46,17 +46,30 @@
 export const VIEWBOX_PAD = 22        // outer wall margin (mockup uses 22)
 export const WALL_THICKNESS = 4      // outer wall stroke width (mockup)
 export const ROW_HEIGHT = 110        // target room interior height
-export const ROW_GAP = 22            // gap between rows (becomes the horizontal hallway height)
-export const TARGET_INNER_WIDTH = 720 // floor inner width — rooms in a row distribute to fill this
-// PR-40 polish: padding INSIDE the floor before the first room (and
-// after the last) so the irregular shape generators' outward bumps
-// (~12 SVG units deep) have room to fit without crossing the dark
-// wall border. Top/bottom of first/last row also picks up this pad.
-export const INNER_PAD = 14
-// Minimum gap between rooms within a row. The row distribution pass
-// can grow gaps up to whatever leftover space remains after packing
-// — the larger the gap, the more it reads as a corridor.
-export const ROOM_GAP = 22
+export const TARGET_INNER_WIDTH = 720 // floor inner width — rooms scale to fill this
+
+// PR-40 polish: hallway widths are FIXED (match the mockup); rooms in
+// each row scale proportionally to fit whatever width remains after
+// hallways + floor strips are accounted for. Heights stay constant
+// at ROW_HEIGHT.
+export const HALLWAY_VERT_WIDTH    = 18  // vertical hallway width
+export const HALLWAY_HORIZ_HEIGHT  = 22  // horizontal hallway height
+const FLOOR_STRIP = 2                    // small floor-color band between hallway and adjacent rooms
+
+// Pre-derived totals.
+export const COL_GAP = HALLWAY_VERT_WIDTH + 2 * FLOOR_STRIP    // = 22 (between rooms in a row)
+export const ROW_GAP = HALLWAY_HORIZ_HEIGHT + 2 * FLOOR_STRIP  // = 26 (between rows)
+
+// Padding INSIDE the floor before the first room (and after the
+// last). Matches the mockup's 2-unit inset between floor edge and
+// first room.
+export const INNER_PAD = 2
+
+// Cap room natural-width sum per row before wrapping. With NATURAL
+// aspect-derived widths totaling around 250–400 per typical 4-room
+// row, 500 gives the loop enough room to pack a sensible number per
+// row; the row scale step then stretches them to fill TARGET_INNER_WIDTH.
+const ROW_PACK_BUDGET = 500
 
 // Per-layout aspect ratio (width / ROW_HEIGHT). Loosely follows the
 // proportions in refactor/parliament_homepage_v2 (2).html with small
@@ -799,40 +812,39 @@ export function packRooms(rooms, { includeSystem = false } = {}) {
   }
 
   // Floor inner area available for rooms is TARGET_INNER_WIDTH minus
-  // INNER_PAD on each side so first/last room have margin for their
-  // outward bumps.
+  // INNER_PAD on each side (the 2-unit inset matching the mockup).
   const rowBudget = TARGET_INNER_WIDTH - 2 * INNER_PAD
 
-  // PR-40 polish: pack rooms into rows using ROOM_GAP as the minimum
-  // gap. After packing we'll distribute leftover space across the
-  // gaps so each row spans the full rowBudget (and the rooms reach
-  // the floor edges).
-  const rowSpecs = []  // [{ items: [...], totalRoomWidth: number }]
+  // PR-40 polish: pack rooms into rows using NATURAL widths from each
+  // room's aspect ratio. After packing we'll scale each row's room
+  // widths proportionally to fit rowBudget — heights stay at
+  // ROW_HEIGHT, only widths flex. Hallway widths are FIXED.
+  const rowSpecs = []  // [{ items: [...] }]
   let currentRow = []
-  let currentRoomWidth = 0
+  let currentNaturalSum = 0
 
   function commitRow() {
     if (currentRow.length === 0) return
-    rowSpecs.push({ items: currentRow, totalRoomWidth: currentRoomWidth })
+    rowSpecs.push({ items: currentRow })
     currentRow = []
-    currentRoomWidth = 0
+    currentNaturalSum = 0
   }
 
   for (const item of items) {
     const projected =
-      currentRoomWidth +
-      (currentRow.length > 0 ? ROOM_GAP : 0) +
+      currentNaturalSum +
+      (currentRow.length > 0 ? COL_GAP : 0) +
       item.width
-    if (currentRow.length > 0 && projected > rowBudget) {
+    if (currentRow.length > 0 && projected > ROW_PACK_BUDGET) {
       commitRow()
     }
     currentRow.push(item)
-    currentRoomWidth += (currentRow.length > 1 ? ROOM_GAP : 0) + item.width
+    currentNaturalSum += (currentRow.length > 1 ? COL_GAP : 0) + item.width
   }
   commitRow()
 
   // Floor width is fixed by TARGET_INNER_WIDTH so the layout reads as
-  // the "architect's drawing" zoom even when there are only 1–2 rooms.
+  // the "architect's drawing" zoom regardless of how many rooms exist.
   const floorWidth = TARGET_INNER_WIDTH
   const totalWidth = floorWidth + 2 * VIEWBOX_PAD
   const totalHeight =
@@ -840,60 +852,66 @@ export function packRooms(rooms, { includeSystem = false } = {}) {
     rowSpecs.length * ROW_HEIGHT +
     Math.max(0, rowSpecs.length - 1) * ROW_GAP
 
-  // Place rooms — distribute each row's leftover width evenly across
-  // its (N-1) inter-room gaps. Those gaps become the vertical
-  // hallway zones the renderer paints behind the rooms.
+  // Place rooms — scale each row's room widths proportionally so the
+  // row (rooms + fixed-width hallways) spans rowBudget exactly. The
+  // hallways themselves stay at HALLWAY_VERT_WIDTH; the FLOOR_STRIP
+  // bands on each side render as cream floor between hallway hatching
+  // and room walls.
   const placedRooms = []
   const hallways = []
   for (let r = 0; r < rowSpecs.length; r++) {
     const spec = rowSpecs[r]
     const numRooms = spec.items.length
     const numGaps = Math.max(0, numRooms - 1)
-    // leftover = budget after rooms + minimal gaps. Pour it across
-    // the gaps so the row spans the full rowBudget.
-    const sumRoomWidths = spec.items.reduce((s, it) => s + it.width, 0)
-    const leftoverSpace = Math.max(0, rowBudget - sumRoomWidths - numGaps * ROOM_GAP)
-    const extraPerGap = numGaps > 0 ? leftoverSpace / numGaps : 0
-    const finalGapWidth = ROOM_GAP + extraPerGap
+    const gapsTotal = numGaps * COL_GAP
+    const availableForRooms = Math.max(0, rowBudget - gapsTotal)
+    const naturalSum = spec.items.reduce((s, it) => s + it.width, 0)
+    const scale = naturalSum > 0 ? availableForRooms / naturalSum : 1
 
     const rowY = VIEWBOX_PAD + INNER_PAD + r * (ROW_HEIGHT + ROW_GAP)
     let cursorX = VIEWBOX_PAD + INNER_PAD
 
     for (let i = 0; i < numRooms; i++) {
       const item = spec.items[i]
+      const isLast = i === numRooms - 1
+      // Round room widths so adjacent rooms align on integer SVG units;
+      // pin the last room's right edge to (rowBudget + offset) to
+      // absorb any rounding drift and keep the row's right edge clean.
+      const roomWidth = isLast
+        ? (VIEWBOX_PAD + INNER_PAD + rowBudget) - cursorX
+        : Math.round(item.width * scale)
       placedRooms.push({
         id: item.id,
         layoutRef: item.layoutRef,
         kind: item.kind,
-        box: { x: cursorX, y: rowY, width: item.width, height: ROW_HEIGHT },
+        box: { x: cursorX, y: rowY, width: roomWidth, height: ROW_HEIGHT },
       })
-      cursorX += item.width
-      if (i < numRooms - 1) {
-        // Vertical hallway INSET 2 units from each adjacent room. The
-        // 2-unit floor strips that show between room walls and the
-        // hallway hatching are where doorways read as "openings" —
-        // the slight gap the user asked for. Hallway height stays
-        // ROW_HEIGHT so corridors run the full height of the row.
+      cursorX += roomWidth
+      if (!isLast) {
+        // Vertical hallway with FIXED width. 2-unit floor strips on
+        // each side (left + right of the hallway) appear because we
+        // skip those units before placing the hallway hatching and
+        // before the next room.
         hallways.push({
           orientation: 'vertical',
-          x: cursorX + 2,
+          x: cursorX + FLOOR_STRIP,
           y: rowY,
-          width: Math.max(0, finalGapWidth - 4),
+          width: HALLWAY_VERT_WIDTH,
           height: ROW_HEIGHT,
         })
-        cursorX += finalGapWidth
+        cursorX += COL_GAP
       }
     }
 
-    // Horizontal hallway between rows — inset 2 units top/bottom from
-    // the adjacent rows for the same entryway-strip effect.
+    // Horizontal hallway between rows — fixed height, full row width,
+    // with FLOOR_STRIP bands above and below.
     if (r < rowSpecs.length - 1) {
       hallways.push({
         orientation: 'horizontal',
         x: VIEWBOX_PAD + INNER_PAD,
-        y: rowY + ROW_HEIGHT + 2,
+        y: rowY + ROW_HEIGHT + FLOOR_STRIP,
         width: rowBudget,
-        height: Math.max(0, ROW_GAP - 4),
+        height: HALLWAY_HORIZ_HEIGHT,
       })
     }
   }
@@ -903,8 +921,7 @@ export function packRooms(rooms, { includeSystem = false } = {}) {
     wallBox: {
       // Shift wall path inward by an extra 2 units so a 2-unit gap
       // separates the wall's inner edge from the floor, per the
-      // mockup. The architecture feel comes from those small strips
-      // of "between" space between wall, floor, and outer pad.
+      // mockup.
       x: VIEWBOX_PAD - WALL_THICKNESS / 2 - 2,
       y: VIEWBOX_PAD - WALL_THICKNESS / 2 - 2,
       width: totalWidth - 2 * VIEWBOX_PAD + WALL_THICKNESS + 4,

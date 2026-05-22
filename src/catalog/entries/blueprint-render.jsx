@@ -50,7 +50,6 @@ import {
 // refactor/blueprint_with_room_modal.html.
 
 const WALL_STROKE       = '#3A3530'   // dark outer wall
-const FLOOR_FILL        = '#F5EFE4'   // cream inside the wall
 const ROOM_FILL_DEFAULT = '#F8F4EC'
 const ROOM_FILL_HOVER   = 'rgba(196, 169, 77, 0.08)'
 const ROOM_FILL_ACTIVE  = 'rgba(196, 169, 77, 0.22)'
@@ -285,7 +284,11 @@ export default function BlueprintRender({ hostAPI } = {}) {
           </pattern>
         </defs>
 
-        {/* bp-wrap surface fill behind the wall (cream + dots). */}
+        {/* bp-wrap surface fill (cream + dots) — extends across the
+            entire SVG, including the area inside the dark wall. PR-40
+            polish: dropped the separate cream-floor rect so the floor
+            doesn't read as a card sitting inside the wall. The dotted
+            bg shows through; hallway hatching + rooms render on top. */}
         <rect x="0" y="0" width={layout.viewBox.width} height={layout.viewBox.height} fill="#EDE6D8"/>
         <rect x="0" y="0" width={layout.viewBox.width} height={layout.viewBox.height} fill="url(#bp-dots)"/>
 
@@ -299,15 +302,6 @@ export default function BlueprintRender({ hostAPI } = {}) {
           stroke={WALL_STROKE}
           strokeWidth="4"
           rx="1"
-        />
-
-        {/* Cream floor inside the wall. */}
-        <rect
-          x={layout.floorBox.x}
-          y={layout.floorBox.y}
-          width={layout.floorBox.width}
-          height={layout.floorBox.height}
-          fill={FLOOR_FILL}
         />
 
         {/* Hallway zones — vertical corridors between rooms in a row +
@@ -531,27 +525,16 @@ function SystemRoom({ placed, isStudy, isHovered, isCurrent, onEnter, onLeave, o
   )
 }
 
-// PR-40 polish: hatched hallway zone. Sits behind rooms so the room
-// shapes can overlap the hatching. Two parallel edges (top/bottom for
-// horizontal hallways; left/right for vertical hallways) carry a thin
-// light-grey border line so the corridor reads as a defined zone.
+// PR-40 polish: hatched hallway zone. Cream fill + 45° hatch overlay —
+// no outline lines, so adjacent hallways (vertical + horizontal at an
+// intersection) read as one continuous corridor system rather than
+// individually-bordered tiles.
 function Hallway({ hallway }) {
-  const { x, y, width, height, orientation } = hallway
+  const { x, y, width, height } = hallway
   return (
     <g aria-hidden="true">
       <rect x={x} y={y} width={width} height={height} fill="#EBE4D6" />
       <rect x={x} y={y} width={width} height={height} fill="url(#bp-hhatch)" opacity="0.25" />
-      {orientation === 'horizontal' ? (
-        <>
-          <line x1={x} y1={y}          x2={x + width} y2={y}          stroke="#B8B0A0" strokeWidth="0.75" />
-          <line x1={x} y1={y + height} x2={x + width} y2={y + height} stroke="#B8B0A0" strokeWidth="0.75" />
-        </>
-      ) : (
-        <>
-          <line x1={x}         y1={y} x2={x}         y2={y + height} stroke="#B8B0A0" strokeWidth="0.75" />
-          <line x1={x + width} y1={y} x2={x + width} y2={y + height} stroke="#B8B0A0" strokeWidth="0.75" />
-        </>
-      )}
     </g>
   )
 }
