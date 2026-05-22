@@ -660,29 +660,17 @@ export function mirrorPath(d, axisX) {
  * @param {string} args.roomId — used as hash seed for per-room variability
  * @returns {{ path: string, interior: object }}
  */
-export function buildRoomPath({ box, layoutRef, roomId }) {
-  const layout = layoutFor(layoutRef)
-  const variants = SHAPE_VARIANTS[layout]
-  if (!variants) {
-    const r = rectanglePath(box)
-    return { path: roundPath(r.path), interior: r.interior }
-  }
-
-  const seed = hashString(roomId)
-  const variant = variants[seed % variants.length]
-  const { path, interior } = variant(box, seed)
-
-  // Mirror bit lives in seed bit 8 — separate from the slots used by
-  // pertub() (slots 0–4) so mirror choice doesn't correlate with bump
-  // depth/position.
-  const shouldMirror = ((seed >>> 8) & 1) === 1
-  const raw = shouldMirror ? mirrorPath(path, box.x + box.width / 2) : path
-
-  // Mini-map redesign: round every interior vertex so the rooms read
-  // as soft cards on a page rather than sharp polygons. Per-variant
-  // bump/notch/chamfer character is preserved (the trim radius is
-  // small relative to those features); only the corners soften.
-  return { path: roundPath(raw), interior }
+export function buildRoomPath({ box }) {
+  // PR-40 polish: every room now renders as a rounded rectangle the
+  // exact size of its packing box. The variant generators (defined
+  // below) stay in the file but are dormant — they produce outward
+  // bumps that cross the dark wall border and the hallway zones,
+  // which the user's HTML mockup explicitly avoids. A follow-up PR
+  // will reintroduce hallway-aware INWARD-cutting variants (the
+  // mockup's Writing Studio / Study tuck around hallway corners,
+  // not outward).
+  const r = rectanglePath(box)
+  return { path: roundPath(r.path, 6), interior: r.interior }
 }
 
 // ─── Interior wall hints ─────────────────────────────────────
@@ -881,28 +869,31 @@ export function packRooms(rooms, { includeSystem = false } = {}) {
       })
       cursorX += item.width
       if (i < numRooms - 1) {
-        // Vertical hallway in this gap. Spans the full row height +
-        // a small overshoot at top/bottom so the hallway visually
-        // extends to the row-separating hallways above/below.
+        // Vertical hallway INSET 2 units from each adjacent room. The
+        // 2-unit floor strips that show between room walls and the
+        // hallway hatching are where doorways read as "openings" —
+        // the slight gap the user asked for. Hallway height stays
+        // ROW_HEIGHT so corridors run the full height of the row.
         hallways.push({
           orientation: 'vertical',
-          x: cursorX,
+          x: cursorX + 2,
           y: rowY,
-          width: finalGapWidth,
+          width: Math.max(0, finalGapWidth - 4),
           height: ROW_HEIGHT,
         })
         cursorX += finalGapWidth
       }
     }
 
-    // Horizontal hallway between rows (full floor inner width).
+    // Horizontal hallway between rows — inset 2 units top/bottom from
+    // the adjacent rows for the same entryway-strip effect.
     if (r < rowSpecs.length - 1) {
       hallways.push({
         orientation: 'horizontal',
         x: VIEWBOX_PAD + INNER_PAD,
-        y: rowY + ROW_HEIGHT,
+        y: rowY + ROW_HEIGHT + 2,
         width: rowBudget,
-        height: ROW_GAP,
+        height: Math.max(0, ROW_GAP - 4),
       })
     }
   }
