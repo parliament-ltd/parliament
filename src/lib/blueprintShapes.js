@@ -35,15 +35,20 @@
 
 // ─── Constants ───────────────────────────────────────────────
 
-export const VIEWBOX_PAD = 24        // outer wall margin (PR-16a: was 28; +4 to give edge protrusions breathing room; mini-map: tightened 32→24)
-export const WALL_THICKNESS = 6      // outer wall stroke width (spec uses 7)
-// Mini-map redesign (2nd pass): rooms further shrunk to ROW_HEIGHT 55
-// (was 75) + TARGET_INNER_WIDTH 170 (was 232). Aspect ratios + variant
-// generators stay the same — the shrink is purely a constant change.
-export const ROW_HEIGHT = 55         // target room interior height
-export const ROOM_GAP = 14           // gap between rooms in a row
-export const ROW_GAP = 10            // gap between rows
-export const TARGET_INNER_WIDTH = 170 // packs to this before wrapping
+// PR-40 polish: dimensions match refactor/blueprint_with_room_modal.html
+// so the rendered floor plan reads at the same proportions as the
+// mockup. ROW_HEIGHT bumped 55 → 110, gaps 14/10 → 22/22, and
+// TARGET_INNER_WIDTH 170 → 600 so single-row floor plans don't
+// collapse the viewBox onto the rooms and render them oversized.
+// With these defaults the floor plan stays in the ~680px-wide viewBox
+// ballpark even when the user only has 1–2 rooms — matching the
+// "zoomed-out architect's drawing" feel of the mockup.
+export const VIEWBOX_PAD = 22        // outer wall margin (mockup uses 22)
+export const WALL_THICKNESS = 4      // outer wall stroke width (mockup)
+export const ROW_HEIGHT = 110        // target room interior height
+export const ROOM_GAP = 22           // gap between rooms in a row
+export const ROW_GAP = 22            // gap between rows
+export const TARGET_INNER_WIDTH = 600 // min floor inner width — packs to this before wrapping
 
 // Per-layout aspect ratio (width / ROW_HEIGHT). Loosely follows the
 // proportions in refactor/parliament_homepage_v2 (2).html with small
@@ -838,10 +843,14 @@ export function packRooms(rooms, { includeSystem = false } = {}) {
   return {
     viewBox: { width: totalWidth, height: totalHeight },
     wallBox: {
-      x: VIEWBOX_PAD - WALL_THICKNESS / 2,
-      y: VIEWBOX_PAD - WALL_THICKNESS / 2,
-      width: totalWidth - 2 * VIEWBOX_PAD + WALL_THICKNESS,
-      height: totalHeight - 2 * VIEWBOX_PAD + WALL_THICKNESS,
+      // PR-40 polish: shift wall path inward by an extra 2 units so a
+      // 2-unit gap separates the wall's inner edge from the floor, per
+      // the mockup. The architecture feel comes from those small
+      // strips of "between" space between wall, floor, and outer pad.
+      x: VIEWBOX_PAD - WALL_THICKNESS / 2 - 2,
+      y: VIEWBOX_PAD - WALL_THICKNESS / 2 - 2,
+      width: totalWidth - 2 * VIEWBOX_PAD + WALL_THICKNESS + 4,
+      height: totalHeight - 2 * VIEWBOX_PAD + WALL_THICKNESS + 4,
     },
     floorBox: {
       x: VIEWBOX_PAD,
