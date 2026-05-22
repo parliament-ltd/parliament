@@ -1155,17 +1155,20 @@
 
 /* ── Blueprint section ────────────────────────────────────── */
 .bp-wrap {
-  /* Mini-map redesign: bp-wrap is the dot-textured surface inside
-     the homepage section. The OUTER border/shadow/radius come from
-     SectionCard (the surrounding .section element) — bp-wrap itself
-     deliberately has no border + no shadow + no radius, so it fills
-     the section's interior cleanly without doubling up the chrome.
-     IMPORTANT: padding is 0 so absolute-positioned children
-     (bp-action-card, bp-includes-sidebar, bp-gel-frame) share the
-     same percentage-positioning space as the rooms inside the SVG.
-     Visual breathing room around the rooms comes from VIEWBOX_PAD
-     in blueprintShapes.js. */
+  /* Mini-map redesign (2nd pass): bp-wrap hugs the SVG natural width
+     instead of stretching to the section's full width. The SVG now
+     renders at viewBox pixel size (no w-full), and bp-wrap becomes
+     inline-block to fit it. Less unused floor area when no room is
+     selected. The click expansion (gel + action card + Includes
+     sidebar) still positions absolutely from bp-wrap and is
+     ALLOWED to extend past bp-wrap's edges into the section's
+     padding area — that's why .section + .section-body overflow
+     visibility is overridden via :has() below.
+     A 12px border-radius + thin border + soft shadow gives bp-wrap
+     its own subtle "card" feel — it stands apart from the section
+     surface like a framed mini-map. */
   position: relative;
+  display: inline-block;
   padding: 0;
   background-color: var(--p-bg-subtle);
   background-image: radial-gradient(
@@ -1174,6 +1177,27 @@
     transparent 1px
   );
   background-size: 16px 16px;
+  border: 0.5px solid var(--p-border);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  /* overflow: visible so the click-expansion (gel/action/sidebar)
+     can extend past bp-wrap's edges. The dot-texture bg is clipped
+     by border-radius automatically. SVG inside is sized exactly to
+     bp-wrap's content area, so its square corners don't poke past. */
+}
+
+/* Center bp-wrap inside the section body since it's now inline-block. */
+.section-body:has(> .bp-wrap) {
+  text-align: center;
+  overflow: visible;
+}
+
+/* Allow click-expansion content (gel + action card + Includes sidebar)
+   to extend past bp-wrap into the section's interior without clipping.
+   :has() targets only sections containing a bp-wrap, so other sections
+   (chats / library / favorites) keep their default overflow: hidden. */
+.section:has(.bp-wrap) {
+  overflow: visible;
 }
 .bp-svg {
   font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
@@ -1215,6 +1239,60 @@
      bg + dot texture without becoming a hard frame. */
   background: #3C322A;
   border-radius: 16px;
+}
+
+/* Mini-map redesign: HTML overlay rendering the title + layout
+   wireframe inside the selected room. Positioned via expandedRoomBox
+   percentages over the enlarged room area. z-index puts it above the
+   SVG (z 2) so it sits on top of the room shape, but below the
+   action card (z 4) and sidebar (z 3) — the cards stay clickable.
+   pointer-events:none lets clicks pass through to the SVG room
+   underneath (so click-to-enter still works). */
+.bp-room-overlay {
+  position: absolute;
+  z-index: 2.5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 18px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 240ms ease 60ms;
+  box-sizing: border-box;
+  text-align: center;
+}
+.bp-room-overlay.show { opacity: 1; }
+.bp-room-overlay-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.15;
+  gap: 1px;
+}
+.bp-room-overlay-the {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  color: #9A9490;
+}
+.bp-room-overlay-name {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+.bp-room-overlay-wireframe {
+  width: 70%;
+  max-width: 110px;
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-border);
+  border-radius: 4px;
+  padding: 4px;
+  box-sizing: border-box;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bp-room-overlay { transition: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .bp-gel-frame { transition: none; }
