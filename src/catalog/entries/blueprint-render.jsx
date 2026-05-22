@@ -250,16 +250,16 @@ export default function BlueprintRender({ hostAPI } = {}) {
   const selectedLastConv = modalRoomId ? lastConvByRoomId.get(modalRoomId) || null : null
   const selectedIncludes = useMemo(() => buildIncludes(selectedMode), [selectedMode])
 
-  // Position the map-pin glyph inside the active room. Sits roughly
-  // mid-width, near the bottom interior so it doesn't collide with
-  // the centered THE / NAME title.
+  // Position the map-pin glyph inside the active room. Pin tip sits
+  // ~26 SVG units up from the bottom interior so the pin's 21-unit
+  // body lives just below the centered THE / NAME title.
   const mapPinPosition = useMemo(() => {
     if (!activeRoomId) return null
     const placed = layout.placedRooms.find(p => p.id === activeRoomId)
     if (!placed) return null
     return {
       x: placed.box.x + placed.box.width / 2,
-      y: placed.box.y + placed.box.height - 8,
+      y: placed.box.y + placed.box.height - 26,
     }
   }, [activeRoomId, layout])
 
@@ -408,9 +408,10 @@ function Room({
   const nameColor = (isActive || isHovered) ? ROOM_NAME_COLOR_ACTIVE : ROOM_NAME_COLOR_DEFAULT
   const name = (mode?.meta?.name || mode?.id || 'Room')
 
-  // Title placement: centered. THE prefix sits 6px above NAME.
-  const nameY = cy + 3
-  const theY = nameY - 6
+  // Title placement: matches the mockup — NAME baseline 6 units below
+  // room center, THE label 11 units above NAME.
+  const nameY = cy + 6
+  const theY = nameY - 11
 
   return (
     <g
@@ -428,10 +429,10 @@ function Room({
         strokeWidth={strokeWidth}
         vectorEffect="non-scaling-stroke"
       />
-      <text x={cx} y={theY} textAnchor="middle" fontSize="3.5" fill="#B8B0A4" letterSpacing="0.08em" fontWeight="500">
+      <text x={cx} y={theY} textAnchor="middle" fontSize="7" fill="#B8B0A4" letterSpacing="0.08em" fontWeight="500">
         THE
       </text>
-      <text className="bp-room-name" x={cx} y={nameY} textAnchor="middle" fontSize="4.5" fill={nameColor} letterSpacing="0.03em" fontWeight="600">
+      <text className="bp-room-name" x={cx} y={nameY} textAnchor="middle" fontSize="9.5" fill={nameColor} letterSpacing="0.03em" fontWeight="600">
         {name}
       </text>
     </g>
@@ -451,8 +452,8 @@ function SystemRoom({ placed, isStudy, isHovered, isCurrent, onEnter, onLeave, o
   const stroke = (isHovered || isCurrent) ? ROOM_BORDER_ACTIVE : ROOM_BORDER_DEFAULT
   const labelColor = (isHovered || isCurrent) ? ROOM_NAME_COLOR_ACTIVE : ROOM_NAME_COLOR_DEFAULT
 
-  const nameY = cy + 3
-  const theY = nameY - 6
+  const nameY = cy + 6
+  const theY = nameY - 11
 
   return (
     <g
@@ -465,32 +466,33 @@ function SystemRoom({ placed, isStudy, isHovered, isCurrent, onEnter, onLeave, o
       <path d={path} fill={ROOM_FILL_DEFAULT} />
       <path d={path} fill={fill} className="bp-room-fill" />
       <path d={path} fill="none" stroke={stroke} strokeWidth={isCurrent ? 1.2 : 0.75} vectorEffect="non-scaling-stroke" />
-      <text x={cx} y={theY} textAnchor="middle" fontSize="3.5" fill="#B8B0A4" letterSpacing="0.08em" fontWeight="500">
+      <text x={cx} y={theY} textAnchor="middle" fontSize="7" fill="#B8B0A4" letterSpacing="0.08em" fontWeight="500">
         THE
       </text>
-      <text className="bp-room-name" x={cx} y={nameY} textAnchor="middle" fontSize="4.5" fill={labelColor} letterSpacing="0.03em" fontWeight="600">
+      <text className="bp-room-name" x={cx} y={nameY} textAnchor="middle" fontSize="9.5" fill={labelColor} letterSpacing="0.03em" fontWeight="600">
         {name}
       </text>
     </g>
   )
 }
 
-// PR-40: small architectural map-pin glyph with pulsing ring. Replaces
-// the old WalkingHuman icon as the "you are here" affordance, scaled
-// for the mini-map viewBox (pin is ~6×7 SVG units).
+// PR-40: architectural map-pin glyph with pulsing ring. Replaces the
+// old WalkingHuman icon as the "you are here" affordance. Dimensions
+// match refactor/blueprint_with_room_modal.html: ~14×21 SVG units,
+// pulse ring r=7→11.
 function MapPin({ x, y }) {
   return (
-    <g transform={`translate(${x} ${y})`} aria-hidden="true">
+    <g transform={`translate(${x} ${y})`} opacity="0.7" aria-hidden="true">
       <path
-        d="M 0 0 C -1.6 -1.3 -2.3 -3.3 -2.3 -4.3 C -2.3 -5.6 -1.3 -6.9 0 -6.9 C 1.3 -6.9 2.3 -5.6 2.3 -4.3 C 2.3 -3.3 1.6 -1.3 0 0 Z"
+        d="M 0 0 C -5 -4 -7 -10 -7 -13 C -7 -17 -4 -21 0 -21 C 4 -21 7 -17 7 -13 C 7 -10 5 -4 0 0 Z"
         fill="#C4A94D"
         stroke="#8B6A10"
-        strokeWidth="0.25"
+        strokeWidth="0.75"
         vectorEffect="non-scaling-stroke"
       />
-      <circle cx="0" cy="-4.3" r="1" fill="#F5EFE4" />
-      <circle cx="0" cy="-4.3" r="2.3" fill="none" stroke="#C4A94D" strokeWidth="0.25" opacity="0.4">
-        <animate attributeName="r" values="2.3;3.6;2.3" dur="2.5s" repeatCount="indefinite" />
+      <circle cx="0" cy="-13" r="3" fill="#F5EFE4" />
+      <circle cx="0" cy="-13" r="7" fill="none" stroke="#C4A94D" strokeWidth="0.8" opacity="0.4">
+        <animate attributeName="r" values="7;11;7" dur="2.5s" repeatCount="indefinite" />
         <animate attributeName="opacity" values="0.4;0;0.4" dur="2.5s" repeatCount="indefinite" />
       </circle>
     </g>
@@ -501,8 +503,8 @@ function MapPin({ x, y }) {
 // annotation with the room's name and width. Restored from the
 // PR-14 prototype as part of PR-40's blueprint-feel refresh.
 function DimensionTicks({ layout, modesById }) {
-  const tickY = (layout.floorBox.y - 5)
-  const ends = 3
+  const tickY = (layout.floorBox.y - 12)
+  const ends = 6
   // Only annotate the rooms in row 1 (the topmost row).
   const firstRowY = layout.placedRooms[0]?.box?.y
   const row1 = layout.placedRooms.filter(p => p.box.y === firstRowY && p.kind !== SYSTEM_KIND)
@@ -519,7 +521,7 @@ function DimensionTicks({ layout, modesById }) {
             <line x1={x1} y1={tickY} x2={x2} y2={tickY} stroke="#D0C8BA" strokeWidth="0.4" />
             <line x1={x1} y1={tickY - ends / 2} x2={x1} y2={tickY + ends / 2} stroke="#D0C8BA" strokeWidth="0.4" />
             <line x1={x2} y1={tickY - ends / 2} x2={x2} y2={tickY + ends / 2} stroke="#D0C8BA" strokeWidth="0.4" />
-            <text x={mid} y={tickY - 1.5} textAnchor="middle" fontSize="2.8" fill="#C8C0B2" letterSpacing="0.02em">
+            <text x={mid} y={tickY - 2} textAnchor="middle" fontSize="6.5" fill="#C8C0B2" letterSpacing="0.02em">
               {name} · {placed.box.width}px
             </text>
           </g>
