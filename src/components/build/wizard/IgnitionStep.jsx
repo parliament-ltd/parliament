@@ -297,12 +297,21 @@ export default function IgnitionStep({
   const showInputRow = keyCheckDone && (keyMode === 'no-key' || keyMode === 'replace-key') && phase === 'idle'
   const showSavedKeyRow = keyCheckDone && keyMode === 'has-saved-key' && phase === 'idle'
 
+  // PR-43: when there's already a saved key on file, the step is
+  // really "confirm + ignite" rather than "set up your key" — the
+  // header copy reflects that.
+  const hasSavedKey = keyMode === 'has-saved-key'
+
   return (
     <div>
       <StepHeader
         kicker="Turn the lights on"
-        title="Connect your API key"
-        subtitle="Your room is built. Adding your key brings it to life."
+        title={hasSavedKey ? 'API key connected' : 'Connect your API key'}
+        subtitle={
+          hasSavedKey
+            ? 'Click continue to build your room.'
+            : 'Your room is built. Adding your key brings it to life.'
+        }
       />
 
       {/* Room preview card — class names drive the gflash + lit chain */}
@@ -354,7 +363,11 @@ export default function IgnitionStep({
         </div>
       </div>
 
-      {/* ── Saved-key prompt (PR-19a) ─────────────────────────── */}
+      {/* ── Saved-key prompt (PR-19a; PR-43 layout) ─────────────
+          Desktop: message text on top, action row below with the
+          "Add a different key" link left and Continue right.
+          Mobile: stacked top-to-bottom — text, link, full-width
+          Continue at the bottom. */}
       {showSavedKeyRow && (
         <div
           className="px-3 py-3 mb-3 rounded-md"
@@ -366,25 +379,47 @@ export default function IgnitionStep({
           <div className="text-[12px] mb-2" style={{ color: 'var(--p-text-secondary)' }}>
             An API key is already on file. Continue with your saved key, or add a different one.
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              autoFocus
-              onClick={continueWithSavedKey}
-              className="px-4 py-2 text-[13px] font-medium rounded-md text-white"
-              style={{ background: 'var(--p-gold-light)' }}
-            >
-              Continue
-            </button>
-            <button
-              type="button"
-              onClick={() => { setApiKey(''); setStatus(null); setErrorMsg(''); setKeyMode('replace-key') }}
-              className="text-[12px] underline-offset-2 hover:underline"
-              style={{ color: 'var(--p-text-secondary)' }}
-            >
-              Add a different key
-            </button>
-          </div>
+          {isNarrow ? (
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => { setApiKey(''); setStatus(null); setErrorMsg(''); setKeyMode('replace-key') }}
+                className="text-[12px] underline-offset-2 hover:underline self-start"
+                style={{ color: 'var(--p-text-secondary)' }}
+              >
+                Add a different key
+              </button>
+              <button
+                type="button"
+                autoFocus
+                onClick={continueWithSavedKey}
+                className="w-full px-4 py-2 text-[13px] font-medium rounded-md text-white"
+                style={{ background: 'var(--p-gold-light)' }}
+              >
+                Continue
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => { setApiKey(''); setStatus(null); setErrorMsg(''); setKeyMode('replace-key') }}
+                className="text-[12px] underline-offset-2 hover:underline"
+                style={{ color: 'var(--p-text-secondary)' }}
+              >
+                Add a different key
+              </button>
+              <button
+                type="button"
+                autoFocus
+                onClick={continueWithSavedKey}
+                className="px-4 py-2 text-[13px] font-medium rounded-md text-white"
+                style={{ background: 'var(--p-gold-light)' }}
+              >
+                Continue
+              </button>
+            </div>
+          )}
         </div>
       )}
 
