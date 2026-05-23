@@ -266,11 +266,14 @@ export default function BlueprintRender({ hostAPI } = {}) {
   }, [activeRoomId, layout])
 
   return (
-    <div className="bp-wrap">
+    <div
+      className="bp-wrap"
+      style={{ '--bp-natural-width': `${layout.viewBox.width}px` }}
+    >
       <svg
         viewBox={`0 0 ${layout.viewBox.width} ${layout.viewBox.height}`}
         xmlns="http://www.w3.org/2000/svg"
-        className="block w-full h-auto bp-svg"
+        className="block bp-svg"
         role="img"
         aria-label="Blueprint floor plan of your rooms"
       >
@@ -693,38 +696,30 @@ function BlueprintRoomModal({ mode, lastConv, includes, onClose, onEnter, onCopy
       aria-label={`${name} details`}
     >
       <div className="bp-modal-assembly" onClick={(e) => e.stopPropagation()}>
-        {/* Left column: room card + spool-shaped bridge. The
-            bridge is positioned absolutely against this column so
-            its vertical centre aligns with the room card's centre
-            (rather than the assembly's centre, which would be
-            biased by the taller features card on the right). */}
-        <div className="bp-modal-left-col">
-          <div className="bp-trim-wrap">
-            <div className="bp-card-room">
-              <div className="bp-card-room-title">
-                <span className="bp-card-room-label">THE</span>
-                <div className="bp-card-room-name">{name}</div>
-              </div>
-              <div className="bp-card-room-wireframe">
-                {layoutRef && <LayoutSilhouette layoutId={layoutRef} />}
-              </div>
-              <div className="bp-card-actions">
-                <button type="button" className="bp-action-btn" onClick={onCopy} aria-label="Copy room">
-                  <Copy size={16} />
-                  <span className="bp-action-tooltip">Copy</span>
-                </button>
-                <button type="button" className="bp-action-btn bp-action-btn-delete" onClick={onDelete} aria-label="Delete room">
-                  <Trash2 size={16} />
-                  <span className="bp-action-tooltip">Delete</span>
-                </button>
-                <button type="button" className="bp-action-btn bp-action-btn-enter" onClick={onEnter} aria-label="Enter room">
-                  <ArrowRight size={18} />
-                  <span className="bp-action-tooltip">Enter</span>
-                </button>
-              </div>
+        <div className="bp-trim-wrap">
+          <div className="bp-card-room">
+            <div className="bp-card-room-title">
+              <span className="bp-card-room-label">THE</span>
+              <div className="bp-card-room-name">{name}</div>
+            </div>
+            <div className="bp-card-room-wireframe">
+              {layoutRef && <LayoutSilhouette layoutId={layoutRef} />}
+            </div>
+            <div className="bp-card-actions">
+              <button type="button" className="bp-action-btn" onClick={onCopy} aria-label="Copy room">
+                <Copy size={16} />
+                <span className="bp-action-tooltip">Copy</span>
+              </button>
+              <button type="button" className="bp-action-btn bp-action-btn-delete" onClick={onDelete} aria-label="Delete room">
+                <Trash2 size={16} />
+                <span className="bp-action-tooltip">Delete</span>
+              </button>
+              <button type="button" className="bp-action-btn bp-action-btn-enter" onClick={onEnter} aria-label="Enter room">
+                <ArrowRight size={18} />
+                <span className="bp-action-tooltip">Enter</span>
+              </button>
             </div>
           </div>
-          <ModalBridge />
         </div>
         {/* Right: features card. Outer card carries the rounded
             corners + clipping; inner div is the scroll viewport so
@@ -774,24 +769,6 @@ function BlueprintRoomModal({ mode, lastConv, includes, onClose, onEnter, onCopy
           </div>
         </div>
       </div>
-    </div>
-  )
-}
-
-// PR-40h: spool-shaped bridge between the two modal cards.
-// Double-concave silhouette — flat left/right edges, top + bottom
-// edges quadratically curve INWARD toward the centre. Same
-// translucent fill as the trim-wraps so the bridge reads as the
-// cards visually melting into each other.
-function ModalBridge() {
-  return (
-    <div className="bp-modal-bridge" aria-hidden="true">
-      <svg width="26" height="86" viewBox="0 0 26 86" xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M 0 0 Q 13 22, 26 0 L 26 86 Q 13 64, 0 86 Z"
-          fill="rgba(214, 206, 190, 0.42)"
-        />
-      </svg>
     </div>
   )
 }

@@ -1170,8 +1170,36 @@
 .bp-svg {
   font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
   display: block;
+  width: 100%;
+  height: auto;
 }
 .bp-room-fill { transition: fill 0.2s ease; }
+
+/* PR-41 — Phone blueprint: lock the SVG to its natural viewBox width
+   (passed in as --bp-natural-width via inline style on .bp-wrap) and
+   let .bp-wrap scroll horizontally. Keeps every room at its packed
+   desktop dimensions instead of shrinking to phone width. The modal
+   continues to centre on the viewport (position:fixed) so a tapped
+   room that's scrolled half-off-screen still produces a centred
+   dialog. */
+@media (max-width: 640px) {
+  .bp-wrap {
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .bp-wrap .bp-svg {
+    width: var(--bp-natural-width);
+    max-width: none;
+  }
+  .bp-wrap::-webkit-scrollbar { height: 4px; }
+  .bp-wrap::-webkit-scrollbar-track { background: transparent; }
+  .bp-wrap::-webkit-scrollbar-thumb {
+    background: rgba(168, 162, 152, 0.6);
+    border-radius: 2px;
+  }
+}
 
 /* ── Search-icon helper (chats + library) ─────────────────── */
 .chats-search .search-icon,
@@ -1982,10 +2010,10 @@
 }
 .bp-modal-assembly {
   display: flex;
-  /* PR-40h: gap 0 so the spool-shaped bridge can sit flush against
-     the trim-wraps. The bridge itself provides the visual spacing
-     between the two cards. */
-  gap: 0;
+  /* PR-41: 18px gap between the two trim-wrapped cards — same width
+     as a blueprint hallway, so the spacing reads as a corridor between
+     the room (left) and its inventory (right). */
+  gap: 18px;
   align-items: flex-start;
   animation: bp-modal-pop-in 250ms cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -2162,28 +2190,6 @@
   border-radius: 2px;
 }
 
-/* PR-40h: left column that contains the room card + the
-   spool-shaped bridge. position:relative so the bridge can absolute-
-   position itself against the room card's height (not the much
-   taller features card on the right). */
-.bp-modal-left-col {
-  position: relative;
-  display: flex;
-}
-/* Spool-shaped bridge between left + right cards. Straddles the
-   room card's right edge (right: -13px = half the bridge width)
-   so half of it overlaps into the right card area, half sits
-   over the room card. Same translucent trim color so the bridge
-   reads as the cards melting into each other. */
-.bp-modal-bridge {
-  position: absolute;
-  top: 50%;
-  right: -13px;
-  transform: translateY(-50%);
-  pointer-events: none;
-  z-index: 1;
-}
-.bp-modal-bridge svg { display: block; }
 .bp-meta-row {
   display: flex;
   align-items: baseline;
@@ -2666,6 +2672,51 @@
     flex-basis: 100%;
     margin-left: 0;
   }
+}
+
+/* PR-41 — Phone library: swap the multi-column grid for a single
+   horizontal row of desktop-sized cards with scroll-snap. Filter
+   chip row sticky-pins to the viewport top so the user can switch
+   kinds while traversing the row. The grid's vertical max-height
+   cap is dropped because there's no vertical overflow any more.
+   The 22px trailing padding plus card widths sized below viewport
+   width leaves a peek of the next card visible — standard "more
+   here" affordance. */
+@media (max-width: 640px) {
+  .library-filters {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--p-bg-surface);
+    padding: 4px 0 6px;
+    margin: -4px 0 12px;
+  }
+  .library-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 6px 22px 10px 2px;
+    gap: 12px;
+  }
+  .library-grid::-webkit-scrollbar { height: 4px; }
+  .library-grid::-webkit-scrollbar-track { background: transparent; }
+  .library-grid::-webkit-scrollbar-thumb {
+    background: var(--p-border);
+    border-radius: 2px;
+  }
+  .library-grid .lib-card {
+    flex: 0 0 auto;
+    width: clamp(180px, 64vw, 210px);
+    scroll-snap-align: start;
+  }
+  /* Hover-lift translateY plays poorly when the parent is a
+     horizontal scroller — the lift shifts the snap target. */
+  .library-grid .lib-card:hover { transform: none; }
 }
 
 /* Chat row column priority — drop the absolute date first
