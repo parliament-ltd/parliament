@@ -28,6 +28,7 @@
 //   annotations.
 
 import { useEffect, useMemo, useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Copy, Trash2, ArrowRight } from 'lucide-react'
 import { useConversations } from '../../stores/ConversationContext'
@@ -386,8 +387,13 @@ export default function BlueprintRender({ hostAPI } = {}) {
         />
       )}
 
-      {/* PR-29: brief inline confirmation when "Copy as Is" succeeds. */}
-      {copyToast && <div className="bp-copy-toast">{copyToast}</div>}
+      {/* PR-29: brief inline confirmation when "Copy as Is" succeeds.
+          PR-42: portaled to body so the section ancestor's dnd-kit
+          transform doesn't trap its position:fixed inside the section. */}
+      {copyToast && createPortal(
+        <div className="bp-copy-toast">{copyToast}</div>,
+        document.body,
+      )}
     </div>
   )
 }
@@ -666,6 +672,27 @@ function DimensionTicks({ layout, modesById }) {
   )
 }
 
+// PR-42: ref-counted body scroll lock. The Room modal can open the
+// Copy modal on top of itself, so both are mounted at once. A naive
+// useEffect that sets/clears body overflow would let the inner modal's
+// unmount restore scrolling while the outer modal is still up — hence
+// the counter.
+let _bpScrollLockCount = 0
+let _bpPrevOverflow = ''
+function lockBodyScroll() {
+  if (_bpScrollLockCount === 0) {
+    _bpPrevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+  }
+  _bpScrollLockCount++
+  return () => {
+    _bpScrollLockCount = Math.max(0, _bpScrollLockCount - 1)
+    if (_bpScrollLockCount === 0) {
+      document.body.style.overflow = _bpPrevOverflow
+    }
+  }
+}
+
 // PR-40 polish: centered selection modal. Two side-by-side cards
 // each wrapped in a `.bp-trim-wrap` (translucent padded frame).
 // Left card has THE / Name + abstract room preview + circular
@@ -673,12 +700,20 @@ function DimensionTicks({ layout, modesById }) {
 // metadata rows (Created / Last used / Last spoken to) + device
 // pill + bulleted Includes list. Layout matches the mockup at
 // refactor/blueprint_matched_feature_list.html.
+//
+// PR-42: rendered via React Portal to document.body. Without the
+// portal, the homepage <section> wrapping the blueprint applies a
+// dnd-kit transform (translate3d 0,0,0) for drag-reorder, and that
+// transform creates a containing block for position:fixed children —
+// so the "fixed" overlay would be trapped inside the section's
+// bounding box and scroll partly off-screen with it.
 function BlueprintRoomModal({ mode, lastConv, includes, onClose, onEnter, onCopy, onDelete }) {
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
+  useEffect(() => lockBodyScroll(), [])
 
   const name = mode?.meta?.name || mode?.id || 'Room'
   const created = fmtShortDate(mode?.meta?.created)
@@ -687,7 +722,7 @@ function BlueprintRoomModal({ mode, lastConv, includes, onClose, onEnter, onCopy
   const deviceLabel = mode?.deviceClass === 'visual-touch-phone' ? 'MOBILE' : 'DESKTOP'
   const layoutRef = mode?.layout?.ref
 
-  return (
+  return createPortal(
     <div
       className="bp-modal-overlay"
       onClick={onClose}
@@ -769,19 +804,23 @@ function BlueprintRoomModal({ mode, lastConv, includes, onClose, onEnter, onCopy
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
 // PR-29: confirmation modal for the Copy button on a blueprint room.
+// PR-42: portaled to document.body for the same reason as BlueprintRoomModal
+// (escape the dnd-kit transform on the section ancestor).
 function BlueprintCopyModal({ sourceName, onClose, onCopyAsIs, onCopyToLab }) {
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
+  useEffect(() => lockBodyScroll(), [])
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[160] flex items-center justify-center p-5"
       style={{ backgroundColor: 'rgba(25, 25, 25, 0.32)' }}
@@ -821,7 +860,8 @@ function BlueprintCopyModal({ sourceName, onClose, onCopyAsIs, onCopyToLab }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
