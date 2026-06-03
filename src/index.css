@@ -1359,6 +1359,23 @@
 }
 
 /* ── Showcase ─────────────────────────────────────────────── */
+/* PR-48c: showcase wrap holds the grid + a same-size SVG overlay
+   that draws thin connector lines between cards sharing a sourceRoomId. */
+.editor-library-showcase-wrap {
+  position: relative;
+}
+.editor-library-showcase-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.editor-library-showcase-wrap .editor-library-showcase-card {
+  position: relative;
+  z-index: 1;
+}
 .editor-library-showcase-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));

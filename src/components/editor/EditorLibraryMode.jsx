@@ -423,6 +423,82 @@ function ShowcaseBody({ items, layoutConflict, schemeConflict, onRemove }) {
       {schemeConflict && (
         <ConflictBanner message="More than one scheme selected. A room can only use one." />
       )}
+      <ShowcaseGrid
+        items={items}
+        layoutConflict={layoutConflict}
+        schemeConflict={schemeConflict}
+        onRemove={onRemove}
+      />
+    </>
+  )
+}
+
+// PR-48c: thin SVG lines connecting Showcase cards that share a
+// sourceRoomId. Wrap ref hosts both the grid and the overlay so the
+// overlay can measure card positions relative to a common origin.
+// ResizeObserver keeps the lines aligned through resizes / reflows.
+function ShowcaseGrid({ items, layoutConflict, schemeConflict, onRemove }) {
+  const wrapRef = useRef(null)
+  const [edges, setEdges] = useState([])
+
+  const groups = useMemo(() => {
+    const map = new Map()
+    for (const it of items) {
+      if (!it.sourceRoomId) continue
+      const key = it.sourceRoomId
+      if (!map.has(key)) map.set(key, [])
+      map.get(key).push(it)
+    }
+    return [...map.entries()].filter(([, g]) => g.length >= 2)
+  }, [items])
+
+  useEffect(() => {
+    function measure() {
+      const wrap = wrapRef.current
+      if (!wrap) return
+      const wrapRect = wrap.getBoundingClientRect()
+      const next = []
+      for (const [roomId, group] of groups) {
+        const color = colorForRoomId(roomId)
+        const cards = group
+          .map((it) => {
+            const key = `${it.kind}-${it.ref}-${it.source}`
+            const el = wrap.querySelector(`[data-connect="${CSS.escape(key)}"]`)
+            if (!el) return null
+            const r = el.getBoundingClientRect()
+            return {
+              x: r.left - wrapRect.left + r.width / 2,
+              y: r.top - wrapRect.top + r.height / 2,
+            }
+          })
+          .filter(Boolean)
+        for (let i = 0; i < cards.length; i++) {
+          for (let j = i + 1; j < cards.length; j++) {
+            next.push({ a: cards[i], b: cards[j], color })
+          }
+        }
+      }
+      setEdges(next)
+    }
+    measure()
+    const wrap = wrapRef.current
+    if (!wrap) return
+    const ro = new ResizeObserver(measure)
+    ro.observe(wrap)
+    // Observe each card too so showing/hiding the resize handle on the
+    // ancestor section doesn't desync the line endpoints.
+    for (const el of wrap.querySelectorAll('[data-connect]')) {
+      ro.observe(el)
+    }
+    window.addEventListener('resize', measure)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', measure)
+    }
+  }, [groups, items])
+
+  return (
+    <div ref={wrapRef} className="editor-library-showcase-wrap">
       <div className="editor-library-showcase-grid">
         {items.map((item) => (
           <ShowcaseCard
@@ -436,7 +512,26 @@ function ShowcaseBody({ items, layoutConflict, schemeConflict, onRemove }) {
           />
         ))}
       </div>
-    </>
+      {edges.length > 0 && (
+        <svg
+          className="editor-library-showcase-overlay"
+          aria-hidden="true"
+          preserveAspectRatio="none"
+        >
+          {edges.map((e, idx) => (
+            <line
+              key={idx}
+              x1={e.a.x} y1={e.a.y}
+              x2={e.b.x} y2={e.b.y}
+              stroke={e.color}
+              strokeWidth="1"
+              strokeOpacity="0.35"
+              strokeLinecap="round"
+            />
+          ))}
+        </svg>
+      )}
+    </div>
   )
 }
 
@@ -447,10 +542,14 @@ function ShowcaseCard({ item, warning, onRemove }) {
   let tag = null
   if (isDraftItem) tag = 'In room'
   else if (isTrayItem) tag = 'In tray'
+  // PR-48c: data-connect lets the ConnectorOverlay find this card to
+  // measure its center for the bundle lines.
+  const connectKey = `${item.kind}-${item.ref}-${item.source}`
   return (
     <div
       className={`editor-library-showcase-card${warning ? ' is-warning' : ''}${glow ? ' has-glow' : ''}${isDraftItem ? ' is-placed' : ''}${isTrayItem ? ' is-tray' : ''}`}
       style={glow ? { '--glow': glow } : undefined}
+      data-connect={connectKey}
     >
       <div className="editor-library-showcase-card-kind">
         {item.kindLabel}
