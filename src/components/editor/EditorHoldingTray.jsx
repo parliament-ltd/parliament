@@ -34,7 +34,7 @@ export default function EditorHoldingTray({ tray, onDismiss }) {
         Holding tray
       </div>
       <div className="flex-1 min-w-[180px] text-[10.5px] text-[var(--p-text-muted)]">
-        Drag these into a slot, or remove them. Build is disabled until the tray is empty.
+        Drag a component onto the canvas.
       </div>
       <div className="flex flex-wrap gap-1.5">
         {tray.map((chip) => (
@@ -62,22 +62,27 @@ function TrayChip({ chip, entry, onDismiss }) {
     },
   })
   const label = entry?.displayName || chip.ref || 'Component'
+  // PR-45: X moves to a hover-revealed badge in the top-right corner
+  // (was inline next to the label). Wraps the chip in a relative
+  // container so the absolute-positioned X has a frame to anchor to.
   return (
-    <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] cursor-grab transition-opacity ${
-        isDragging ? 'opacity-50' : ''
-      }`}
-      style={{
-        background: 'rgba(196, 169, 77, 0.08)',
-        border: '0.5px dashed var(--p-gold-light)',
-        color: '#8B6A10',
-      }}
-      title={chip.reason ? `Orphaned: ${chip.reason}` : 'Drag to a slot or dismiss'}
-    >
-      <span>{label}</span>
+    <div className="tray-chip-wrap group">
+      <div
+        ref={setNodeRef}
+        {...listeners}
+        {...attributes}
+        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] cursor-grab transition-opacity ${
+          isDragging ? 'opacity-50' : ''
+        }`}
+        style={{
+          background: 'rgba(196, 169, 77, 0.08)',
+          border: '0.5px dashed var(--p-gold-light)',
+          color: '#8B6A10',
+        }}
+        title={chip.reason ? `Orphaned: ${chip.reason}` : 'Drag onto the canvas'}
+      >
+        <span>{label}</span>
+      </div>
       <button
         type="button"
         onClick={(e) => {
@@ -85,7 +90,7 @@ function TrayChip({ chip, entry, onDismiss }) {
           onDismiss()
         }}
         onPointerDown={(e) => e.stopPropagation()}
-        className="text-[var(--p-gold-muted)] hover:text-[#E03E3E] transition-colors flex items-center"
+        className="tray-chip-x"
         aria-label={`Dismiss ${label}`}
       >
         <X className="w-2.5 h-2.5" />
