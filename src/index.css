@@ -1226,6 +1226,24 @@
   border-color: #E0A300;
   background: rgba(224, 163, 0, 0.08);
 }
+/* PR-45: items already placed in the draft render with a subtle
+   "In room" tag in the kind row so users can tell at a glance which
+   Showcase cards are committed vs which are still pending in the bag. */
+.editor-library-showcase-card.is-placed {
+  background: var(--p-bg-surface);
+}
+.editor-library-showcase-card-placed-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: 7px;
+  background: rgba(196, 169, 77, 0.14);
+  color: var(--p-gold-deep, #8B6A10);
+  font-size: 8.5px;
+  letter-spacing: 0.3px;
+  line-height: 12px;
+  vertical-align: 1px;
+}
 .editor-library-showcase-card-kind {
   font-size: 9.5px;
   text-transform: uppercase;

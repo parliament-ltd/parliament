@@ -530,6 +530,7 @@ export default function EditorView({ scope = 'room', blank = false }) {
             {libraryOpen ? (
               <EditorLibraryMode
                 scope={scope}
+                mode={state.mode}
                 bag={state.libraryBag}
                 modes={modes}
                 catalogEntries={catalogEntries}
@@ -537,6 +538,18 @@ export default function EditorView({ scope = 'room', blank = false }) {
                   dispatch({ type: 'LIBRARY_TOGGLE', kind, ref, room })
                 }
                 onShowToast={showToast}
+                onRemovePlacedComponent={(ref) => {
+                  // PR-45: Showcase hover-x / click on a placed
+                  // component removes every instance of that ref from
+                  // the draft. One ref = one Showcase card, so the
+                  // user's mental model is "remove this type from the
+                  // room"; multi-instance editing happens via slot-
+                  // level UI (right rail, drag).
+                  const placed = (state.mode?.components || []).filter((c) => c.ref === ref)
+                  for (const c of placed) {
+                    dispatch({ type: 'REMOVE_COMPONENT', componentId: c.id })
+                  }
+                }}
               />
             ) : (
               <>
