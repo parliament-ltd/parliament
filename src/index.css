@@ -1153,6 +1153,48 @@
   .layout-panel-content { transition: none; }
 }
 
+/* ── Editor top-bar primary action tooltip (PR-47) ────────
+   Disabled buttons don't fire mouseenter in Chrome, so we wrap the
+   button in a relative container and trigger the tooltip from the
+   wrapper's :hover. Tooltip sits below the top bar, pointing up. */
+.primary-action-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.primary-action-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #3A3530;
+  color: #F5F0E8;
+  font-size: 11px;
+  padding: 5px 9px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity 0.12s, transform 0.12s;
+  pointer-events: none;
+  z-index: 50;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+.primary-action-tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  right: 12px;
+  border: 4px solid transparent;
+  border-bottom-color: #3A3530;
+}
+.primary-action-wrap:hover .primary-action-tooltip,
+.primary-action-wrap:focus-within .primary-action-tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .primary-action-tooltip { transition: opacity 0.12s; transform: none; }
+}
+
 /* ── Editor holding tray (PR-45 / PR-46b) ─────────────────
    PR-46b: chips are now mini lib-cards — same shape as the Library
    section's catalog cards, scaled down so a row of them fits below
