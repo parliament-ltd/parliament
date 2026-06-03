@@ -18,7 +18,7 @@
 //     Click Edit while on blank canvas → opens the Rooms tab so the
 //     user can pick a room to edit.
 
-import { ArrowLeft, Smartphone, Monitor, Eye, Undo2, Redo2, Wrench, Wand2 } from 'lucide-react'
+import { ArrowLeft, Smartphone, Monitor, Eye, Undo2, Redo2, Wrench, Wand2, LibraryBig } from 'lucide-react'
 import { SCHEMES } from '../../lib/schemes'
 import { normalizeRef } from '../../lib/refs'
 
@@ -55,6 +55,14 @@ export default function EditorTopBar({
   labMode = 'edit',
   onStartCopy,
   onSwitchToEdit,
+  // PR-44: third pill — Library. libraryOpen=true means the center
+  // column is showing the Library shopping UI in place of the canvas.
+  // onOpenLibrary opens it, onCloseLibrary closes it (also called by
+  // Build/Edit pills when Library is open, since switching away from
+  // Library is the implicit close).
+  libraryOpen = false,
+  onOpenLibrary,
+  onCloseLibrary,
 }) {
   const deviceClass = mode?.deviceClass || 'visual-pointer'
   const isMobile = deviceClass === 'visual-touch-phone'
@@ -99,15 +107,34 @@ export default function EditorTopBar({
     onSave()
   }
 
-  // PR-19e: Build/Edit pill clicks.
-  const buildActive = labMode === 'build'
-  const editActive = labMode === 'edit'
+  // PR-19e: Build/Edit pill clicks. PR-44 adds Library; when Library is
+  // open the canvas-side pills (Build/Edit) reflect the route-derived
+  // state but show as inactive — clicking one closes Library AND fires
+  // its existing navigation handler if a real switch is needed.
+  const libraryActive = libraryOpen
+  const buildActive = !libraryOpen && labMode === 'build'
+  const editActive = !libraryOpen && labMode === 'edit'
+  const onPillLibrary = () => {
+    if (libraryActive) return
+    if (onOpenLibrary) onOpenLibrary()
+  }
   const onPillEdit = () => {
+    // If Library is open and the route already says edit, just close.
+    if (libraryOpen && labMode === 'edit') {
+      onCloseLibrary?.()
+      return
+    }
     if (editActive) return
+    if (libraryOpen) onCloseLibrary?.()
     if (onSwitchToEdit) onSwitchToEdit()
   }
   const onPillBuild = () => {
+    if (libraryOpen && labMode === 'build') {
+      onCloseLibrary?.()
+      return
+    }
     if (buildActive) return
+    if (libraryOpen) onCloseLibrary?.()
     if (onStartCopy) onStartCopy()
   }
 
@@ -149,24 +176,25 @@ export default function EditorTopBar({
         </button>
       </div>
 
-      {/* PR-19e: center Build/Edit mode pills. Build copies the current
+      {/* PR-19e: center Library | Build | Edit mode pills. Library shows
+          the shopping UI in the center column; Build copies the current
           canvas state into a fresh draft; Edit opens the Rooms tab.
-          Hidden on /edit-home (labMode === null). */}
+          Hidden on /edit-home (labMode === null). PR-44 added Library. */}
       {labMode && (
         <div className="flex items-center rounded-full border border-[var(--p-border)] bg-[var(--p-bg-subtle)] p-0.5 shrink-0">
           <button
             type="button"
-            onClick={onPillEdit}
-            title="Enter editing mode to edit an existing room"
-            aria-pressed={editActive}
+            onClick={onPillLibrary}
+            title="Browse layouts, components, schemes, and rooms"
+            aria-pressed={libraryActive}
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
-              editActive
-                ? 'bg-white text-[var(--p-text-primary)] shadow-sm'
-                : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)]'
+              libraryActive
+                ? 'bg-white text-[var(--p-gold-deep,#8B6A10)] shadow-sm'
+                : 'text-[var(--p-text-secondary)] hover:text-[var(--p-gold-light)]'
             }`}
           >
-            <Wrench className="w-3 h-3" />
-            Edit
+            <LibraryBig className="w-3 h-3" />
+            Library
           </button>
           <button
             type="button"
@@ -181,6 +209,20 @@ export default function EditorTopBar({
           >
             <Wand2 className="w-3 h-3" />
             Build
+          </button>
+          <button
+            type="button"
+            onClick={onPillEdit}
+            title="Enter editing mode to edit an existing room"
+            aria-pressed={editActive}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
+              editActive
+                ? 'bg-white text-[var(--p-text-primary)] shadow-sm'
+                : 'text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)]'
+            }`}
+          >
+            <Wrench className="w-3 h-3" />
+            Edit
           </button>
         </div>
       )}
