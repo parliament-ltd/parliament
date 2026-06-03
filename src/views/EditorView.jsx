@@ -168,6 +168,42 @@ export default function EditorView({ scope = 'room', blank = false }) {
     showToast('Drag a room from the left rail to start editing')
   }, [navigate, location.state, showToast])
 
+  // ── PR-46: in-Library conflict-x swap ──────────────────
+  // Hover-x on the active layout in Showcase, when the bag has exactly
+  // one queued layout, swaps to the bag layout (migration moves
+  // components to the holding tray) and clears the bag entry. Lets
+  // the user resolve a layout conflict without bouncing through Build.
+  // Symmetric handler for schemes (APPLY_SCHEME has no migration —
+  // simpler, but the UX intent is the same).
+  const handleSwapToBagLayout = useCallback(() => {
+    const bag = historyState.present.libraryBag
+    const layoutRef = bag?.layouts?.[0]
+    if (!layoutRef) return false
+    const draft = historyState.present.mode
+    // PR-46d: thread the bag's source-room link into the action so
+    // the swapped-in layout remembers which room it came from.
+    const sourceRoomId = bag?.sourceRooms?.layouts?.[layoutRef]?.[0] || null
+    if (!draft) {
+      dispatch({ type: 'INIT_FROM_LAYOUT', layoutRef, sourceRoomId })
+    } else {
+      dispatch({ type: 'SWAP_LAYOUT', layoutRef, sourceRoomId })
+    }
+    dispatch({ type: 'LIBRARY_TOGGLE', kind: 'layout', ref: layoutRef })
+    showToast('New layout applied, components moved to holding.')
+    return true
+  }, [historyState, showToast])
+
+  const handleSwapToBagScheme = useCallback(() => {
+    const bag = historyState.present.libraryBag
+    const schemeRef = bag?.schemes?.[0]
+    if (!schemeRef) return false
+    const sourceRoomId = bag?.sourceRooms?.schemes?.[schemeRef]?.[0] || null
+    dispatch({ type: 'APPLY_SCHEME', schemeRef, sourceRoomId })
+    dispatch({ type: 'LIBRARY_TOGGLE', kind: 'scheme', ref: schemeRef })
+    showToast('New scheme applied.')
+    return true
+  }, [historyState, showToast])
+
   // ── PR-45: Library apply-on-close ──────────────────────
   // Clicking Build or Edit while Library is open commits the bag's
   // diff against the draft via existing actions, then clears the bag.
@@ -202,19 +238,27 @@ export default function EditorView({ scope = 'room', blank = false }) {
     // Apply the diff. Layout swap on a populated canvas bypasses the
     // migration dialog — the user already chose the layout in Library;
     // re-asking would be condescending. Orphaned components flow into
-    // the tray via the existing SWAP_LAYOUT path.
+    // the tray via the existing SWAP_LAYOUT path. PR-46d threads the
+    // bag's source-room links into the actions so the resulting draft
+    // items remember which Library room (if any) contributed each.
     const layoutToApply = bag.layouts[0]
     if (layoutToApply && layoutToApply !== draft?.layout?.ref) {
+      const sourceRoomId = bag.sourceRooms?.layouts?.[layoutToApply]?.[0] || null
       if (!draft) {
-        dispatch({ type: 'INIT_FROM_LAYOUT', layoutRef: layoutToApply })
+        dispatch({ type: 'INIT_FROM_LAYOUT', layoutRef: layoutToApply, sourceRoomId })
       } else {
-        dispatch({ type: 'SWAP_LAYOUT', layoutRef: layoutToApply })
+        dispatch({ type: 'SWAP_LAYOUT', layoutRef: layoutToApply, sourceRoomId })
       }
     }
 
+    // Scheme apply runs even if draft was null at entry — the layout
+    // branch above just materialized a draft via INIT_FROM_LAYOUT, and
+    // the materialized draft has the catalog default scheme that the
+    // bag's scheme should overwrite if different.
     const schemeToApply = bag.schemes[0]
-    if (draft && schemeToApply && schemeToApply !== draft?.scheme?.ref) {
-      dispatch({ type: 'APPLY_SCHEME', schemeRef: schemeToApply })
+    if (schemeToApply && schemeToApply !== draft?.scheme?.ref) {
+      const sourceRoomId = bag.sourceRooms?.schemes?.[schemeToApply]?.[0] || null
+      dispatch({ type: 'APPLY_SCHEME', schemeRef: schemeToApply, sourceRoomId })
     }
 
     // Each bag component ref not already placed in the draft becomes
@@ -223,7 +267,12 @@ export default function EditorView({ scope = 'room', blank = false }) {
     const placedRefs = new Set((draft?.components || []).map((c) => c.ref))
     const newCompRefs = (bag.components || []).filter((ref) => !placedRefs.has(ref))
     if (newCompRefs.length > 0) {
-      dispatch({ type: 'ADD_REFS_TO_TRAY', refs: newCompRefs })
+      const sourceRoomMap = {}
+      for (const ref of newCompRefs) {
+        const src = bag.sourceRooms?.components?.[ref]?.[0]
+        if (src) sourceRoomMap[ref] = src
+      }
+      dispatch({ type: 'ADD_REFS_TO_TRAY', refs: newCompRefs, sourceRoomMap })
     }
 
     dispatch({ type: 'LIBRARY_CLEAR' })
@@ -597,6 +646,7 @@ export default function EditorView({ scope = 'room', blank = false }) {
               <EditorLibraryMode
                 scope={scope}
                 mode={state.mode}
+                tray={state.tray}
                 bag={state.libraryBag}
                 modes={modes}
                 catalogEntries={catalogEntries}
@@ -616,6 +666,17 @@ export default function EditorView({ scope = 'room', blank = false }) {
                     dispatch({ type: 'REMOVE_COMPONENT', componentId: c.id })
                   }
                 }}
+                onDismissTrayByRef={(ref) => {
+                  // PR-46d: dismiss every tray chip matching this ref
+                  // when the user hover-x's a tray-sourced Showcase
+                  // card. Symmetric with the placed-component path.
+                  const chips = (state.tray || []).filter((t) => t.ref === ref)
+                  for (const c of chips) {
+                    dispatch({ type: 'DISMISS_FROM_TRAY', compId: c.compId })
+                  }
+                }}
+                onSwapToBagLayout={handleSwapToBagLayout}
+                onSwapToBagScheme={handleSwapToBagScheme}
               />
             ) : (
               <>
