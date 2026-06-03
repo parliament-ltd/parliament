@@ -1530,12 +1530,38 @@
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 12px;
   padding: 4px 2px;
-  /* PR-46c: cap the catalog grid so a large catalog doesn't push the
-     Details section below the fold. The grid scrolls internally; the
-     page only scrolls if Showcase + Details are both populated and
-     tall. Roughly two rows visible at typical card width. */
-  max-height: 320px;
-  overflow-y: auto;
+}
+/* PR-46c → PR-48b: the catalog grid no longer caps its own height;
+   the Library section body's user-resizable height (default 320px,
+   draggable via the resize handle) is the source of truth, with
+   `overflow-y: auto` set inline by the Section component. */
+.editor-library-section-resize {
+  height: 6px;
+  cursor: row-resize;
+  background: transparent;
+  position: relative;
+  user-select: none;
+  touch-action: none;
+}
+.editor-library-section-resize::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--p-border);
+  transition: background 0.12s;
+}
+.editor-library-section-resize:hover::before,
+.editor-library-section-resize:active::before {
+  background: var(--p-gold-light);
+  height: 3px;
+}
+.editor-library-section-resize:hover {
+  background: rgba(196, 169, 77, 0.04);
 }
 .editor-library-card-wrap {
   position: relative;

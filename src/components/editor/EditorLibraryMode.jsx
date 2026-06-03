@@ -91,6 +91,20 @@ export default function EditorLibraryMode({
     library: true,
     details: false,
   })
+  // PR-48b: per-section heights, driven by drag handles at the bottom
+  // of each section. `null` means "auto" (content height). User-set
+  // values clamp to per-section min/max. Session-only — re-opens
+  // reset to auto (Showcase / Details) or the default cap (Library).
+  const [sectionHeights, setSectionHeights] = useState({
+    showcase: null,
+    library: 320,
+    details: null,
+  })
+  const SECTION_LIMITS = {
+    showcase: { min: 80, max: 600 },
+    library:  { min: 200, max: 720 },
+    details:  { min: 80, max: 500 },
+  }
   const [focused, setFocused] = useState(null) // { kind, ref }
   // PR-46c: scroll the Details section into view when focus changes so
   // a card click doesn't leave the user staring at the Library grid
@@ -155,6 +169,31 @@ export default function EditorLibraryMode({
 
   function toggleSection(key) {
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  // PR-48b: pointer drag on a section's resize handle updates its
+  // height. Clamped to per-section min/max. Live updates while
+  // dragging.
+  function startResize(key, e) {
+    e.preventDefault()
+    const startY = e.clientY
+    const startHeight = sectionHeights[key] ?? e.currentTarget.parentElement?.offsetHeight ?? 200
+    const limits = SECTION_LIMITS[key]
+    function onMove(ev) {
+      const delta = ev.clientY - startY
+      const next = Math.max(limits.min, Math.min(limits.max, startHeight + delta))
+      setSectionHeights((prev) => ({ ...prev, [key]: next }))
+    }
+    function onUp() {
+      document.removeEventListener('pointermove', onMove)
+      document.removeEventListener('pointerup', onUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+    document.addEventListener('pointermove', onMove)
+    document.addEventListener('pointerup', onUp)
+    document.body.style.cursor = 'row-resize'
+    document.body.style.userSelect = 'none'
   }
 
   // PR-45 / PR-46d: card click = toggle. If the card is checked
@@ -257,6 +296,8 @@ export default function EditorLibraryMode({
         subtitle={describeShowcaseSummary(bag, mode, tray)}
         open={openSections.showcase}
         onToggle={() => toggleSection('showcase')}
+        height={sectionHeights.showcase}
+        onResizeStart={(e) => startResize('showcase', e)}
       >
         <ShowcaseBody
           items={showcaseItems}
@@ -271,6 +312,8 @@ export default function EditorLibraryMode({
         subtitle={describeLibrarySummary(filteredCatalog, query)}
         open={openSections.library}
         onToggle={() => toggleSection('library')}
+        height={sectionHeights.library}
+        onResizeStart={(e) => startResize('library', e)}
       >
         <LibraryBody
           activeChip={filterChip}
@@ -292,6 +335,8 @@ export default function EditorLibraryMode({
           subtitle={focusedItem ? focusedItem.displayName : 'Click a card to view details'}
           open={openSections.details}
           onToggle={() => toggleSection('details')}
+          height={sectionHeights.details}
+          onResizeStart={(e) => startResize('details', e)}
         >
           <DetailsBody
             item={focusedItem}
@@ -309,7 +354,13 @@ export default function EditorLibraryMode({
 // ────────────────────────────────────────────────────────
 //  Section shell
 // ────────────────────────────────────────────────────────
-function Section({ title, subtitle, open, onToggle, children }) {
+function Section({ title, subtitle, open, onToggle, children, height, onResizeStart }) {
+  // PR-48b: when a user-set height is present, the body uses that
+  // exact height with internal overflow. `null` height means natural
+  // content height (auto). Resize handle only renders when open.
+  const bodyStyle = open && height
+    ? { height: `${height}px`, overflowY: 'auto' }
+    : undefined
   return (
     <div className="editor-library-section">
       <button
@@ -333,7 +384,22 @@ function Section({ title, subtitle, open, onToggle, children }) {
           )}
         </div>
       </button>
-      {open && <div className="editor-library-section-body">{children}</div>}
+      {open && (
+        <>
+          <div className="editor-library-section-body" style={bodyStyle}>
+            {children}
+          </div>
+          {onResizeStart && (
+            <div
+              className="editor-library-section-resize"
+              onPointerDown={onResizeStart}
+              role="separator"
+              aria-orientation="horizontal"
+              aria-label={`Resize ${title} section`}
+            />
+          )}
+        </>
+      )}
     </div>
   )
 }
