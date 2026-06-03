@@ -92,13 +92,20 @@ export default function EditorTopBar({
     : isUnbuilt
       ? (saving || trayBlockingBuild || isUnnamed)
       : (saving || !dirty || isUnnamed)
-  const primaryTitle = isBlank
-    ? 'Drop a layout or room first'
+  // PR-47: surface the disabled-reason in a hover tooltip on the
+  // primary button. Ordered by severity (most fundamental fix first)
+  // so the user is guided toward an actionable next step.
+  const primaryDisabledReason = isBlank
+    ? 'Please add a layout to start.'
     : isUnnamed
-      ? 'Name your room first'
+      ? 'Please enter a room name.'
       : trayBlockingBuild
-        ? 'Empty the holding tray first'
-        : ''
+        ? 'Please clear the holding tray first.'
+        : !isUnbuilt && !dirty
+          ? 'No unsaved changes.'
+          : saving
+            ? 'Saving…'
+            : ''
 
   const onPrimary = () => {
     if (primaryDisabled) return
@@ -279,18 +286,24 @@ export default function EditorTopBar({
           <Eye className="w-3 h-3" />
           Preview
         </button>
-        <button
-          onClick={onPrimary}
-          disabled={primaryDisabled}
-          title={primaryTitle}
-          className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${
-            primaryDisabled
-              ? 'border-[var(--p-gold-light)] bg-[var(--p-gold-light)] text-white opacity-40 cursor-not-allowed'
-              : 'border-[var(--p-gold-light)] bg-[var(--p-gold-light)] text-white hover:bg-[var(--p-gold-muted)] hover:border-[var(--p-gold-muted)]'
-          }`}
-        >
-          {saving ? 'Saving…' : primaryLabel}
-        </button>
+        <div className="primary-action-wrap">
+          <button
+            onClick={onPrimary}
+            disabled={primaryDisabled}
+            className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${
+              primaryDisabled
+                ? 'border-[var(--p-gold-light)] bg-[var(--p-gold-light)] text-white opacity-40 cursor-not-allowed'
+                : 'border-[var(--p-gold-light)] bg-[var(--p-gold-light)] text-white hover:bg-[var(--p-gold-muted)] hover:border-[var(--p-gold-muted)]'
+            }`}
+          >
+            {saving ? 'Saving…' : primaryLabel}
+          </button>
+          {primaryDisabled && primaryDisabledReason && (
+            <div className="primary-action-tooltip" role="status">
+              {primaryDisabledReason}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
