@@ -75,6 +75,12 @@ export default function EditorView({ scope = 'room', blank = false }) {
   // underlying draft is untouched while Library is open — selections
   // only flow into the draft when Build wiring lands in a later PR.
   const [libraryOpen, setLibraryOpen] = useState(false)
+  // PR-48a: left rail collapses by default. Library mode is the
+  // primary shopping surface; the left rail is the fast-lane drawer
+  // for users who already know what they want. Toggle on the right
+  // edge expands / collapses it; same chevron pattern as the runtime
+  // layout-panel-toggle (canvas-centric / three-panel).
+  const [leftRailOpen, setLeftRailOpen] = useState(false)
 
   // ── Load the mode on mount ─────────────────────────────
   useEffect(() => {
@@ -631,7 +637,10 @@ export default function EditorView({ scope = 'room', blank = false }) {
           onCloseLibrary={() => setLibraryOpen(false)}
           onCommitLibrary={handleCommitLibrary}
         />
-        <div className="grid grid-cols-[300px_1fr_300px] flex-1 min-h-0">
+        <div
+          className="grid flex-1 min-h-0 editor-grid"
+          style={{ gridTemplateColumns: `${leftRailOpen ? '300px' : '36px'} 1fr 300px` }}
+        >
           <EditorLeftRail
             scope={scope}
             currentLayoutRef={state.mode?.layout?.ref}
@@ -640,6 +649,8 @@ export default function EditorView({ scope = 'room', blank = false }) {
             catalogEntries={catalogEntries}
             modes={modes}
             defaultTab={defaultTab}
+            open={leftRailOpen}
+            onToggle={() => setLeftRailOpen((v) => !v)}
           />
           <div className="overflow-y-auto bg-[var(--p-bg-subtle)]">
             {libraryOpen ? (

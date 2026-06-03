@@ -31,7 +31,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useDraggable } from '@dnd-kit/core'
 import { useSearchParams } from 'react-router-dom'
-import { Search, X as XIcon } from 'lucide-react'
+import { Search, X as XIcon, ChevronLeft, ChevronRight, LibraryBig } from 'lucide-react'
 import { initDB } from '../../lib/db'
 import { SCHEMES } from '../../lib/schemes'
 import LibraryCard from '../LibraryCard'
@@ -51,6 +51,11 @@ export default function EditorLeftRail({
   catalogEntries,
   modes,
   defaultTab = 'layouts',
+  // PR-48a: collapse / expand. When false, render a thin vertical
+  // strip with just the toggle button + a "library" glyph cue. When
+  // true, render the full rail.
+  open = true,
+  onToggle,
 }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const initialTab = TABS.some((t) => t.id === searchParams.get('tab'))
@@ -117,8 +122,40 @@ export default function EditorLeftRail({
     }
   }
 
+  // PR-48a: collapsed mode renders a thin vertical strip with just the
+  // expand toggle + a library glyph cue. Search/tabs/cards hidden.
+  if (!open) {
+    return (
+      <aside className="bg-white border-r border-[var(--p-border)] flex flex-col items-center py-3 gap-2 relative overflow-hidden">
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-label="Expand left rail"
+          title="Expand left rail"
+          className="editor-leftrail-toggle is-collapsed"
+        >
+          <ChevronRight className="w-3.5 h-3.5" />
+        </button>
+        <div className="text-[var(--p-text-light)] mt-2">
+          <LibraryBig className="w-4 h-4" />
+        </div>
+      </aside>
+    )
+  }
+
   return (
-    <aside className="bg-white border-r border-[var(--p-border)] flex flex-col overflow-hidden">
+    <aside className="bg-white border-r border-[var(--p-border)] flex flex-col overflow-hidden relative">
+      {onToggle && (
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-label="Collapse left rail"
+          title="Collapse left rail"
+          className="editor-leftrail-toggle is-expanded"
+        >
+          <ChevronLeft className="w-3.5 h-3.5" />
+        </button>
+      )}
       <div className="px-3 pt-3 pb-2 border-b border-[var(--p-border)]">
         <div className="relative">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-[var(--p-text-muted)] pointer-events-none" />
