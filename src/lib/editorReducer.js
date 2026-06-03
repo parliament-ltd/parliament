@@ -110,12 +110,18 @@ export function editorReducer(state, action) {
         dirty: true,
       }
 
-    case 'APPLY_SCHEME':
+    case 'APPLY_SCHEME': {
+      // PR-46d: optional sourceRoomId stamps the scheme with the room
+      // it came from (when applied via a Library room bundle), so the
+      // Showcase can glow draft items by their original source.
+      const newScheme = { ref: action.schemeRef }
+      if (action.sourceRoomId) newScheme.sourceRoomId = action.sourceRoomId
       return {
         ...state,
-        mode: { ...state.mode, scheme: { ref: action.schemeRef } },
+        mode: { ...state.mode, scheme: newScheme },
         dirty: true,
       }
+    }
 
     case 'SET_PANEL_BUTTON':
       // PR-27: opt-in per-slot panel-toggle metadata. Stored at
@@ -220,8 +226,9 @@ export function editorReducer(state, action) {
         orphans: plan.orphans,
       })
 
-      // Convert orphans into tray entries that retain enough of the
-      // component spec to reconstitute on RESTORE_FROM_TRAY.
+      // PR-46d: orphans carry their sourceRoomId into the tray so it
+      // re-appears when they're restored. Same dance the new-from-
+      // Library entries do via ADD_REFS_TO_TRAY's sourceRoomMap.
       const orphanIds = new Set(plan.orphans.map((o) => o.compId))
       const orphanSpecs = (state.mode.components || []).filter((c) => orphanIds.has(c.id))
       const newTray = plan.orphans.map((o) => {
@@ -232,14 +239,19 @@ export function editorReducer(state, action) {
           fromSlot: o.fromSlot,
           reason: o.reason,
           config: spec.config || {},
+          sourceRoomId: spec.sourceRoomId || null,
         }
       })
+
+      // PR-46d: optional sourceRoomId for the swapped-in layout.
+      const newLayout = { ref: action.layoutRef }
+      if (action.sourceRoomId) newLayout.sourceRoomId = action.sourceRoomId
 
       return {
         ...state,
         mode: {
           ...state.mode,
-          layout: { ref: action.layoutRef },
+          layout: newLayout,
           components: movedComponents,
         },
         tray: [...state.tray, ...newTray],
@@ -251,6 +263,8 @@ export function editorReducer(state, action) {
     // ─── Tray ────────────────────────────────────────────
     case 'RESTORE_FROM_TRAY': {
       // Drop a tray chip onto a slot — re-add as a fresh component spec.
+      // PR-46d: carry the chip's sourceRoomId onto the placed instance
+      // so the Library Showcase can glow it by its original source.
       const chip = state.tray.find((t) => t.compId === action.compId)
       if (!chip) return state
       const newComp = {
@@ -260,6 +274,7 @@ export function editorReducer(state, action) {
         order: nextOrder(state.mode, action.slot),
         config: chip.config || {},
       }
+      if (chip.sourceRoomId) newComp.sourceRoomId = chip.sourceRoomId
       return {
         ...state,
         mode: {
@@ -301,7 +316,12 @@ export function editorReducer(state, action) {
       // Materializes a fresh mode when the user drops a layout on a
       // blank canvas. The history wrapper clears undo when state.mode
       // was previously null — see editorHistory.js.
+      // PR-46d: optional sourceRoomId stamps the layout with the room
+      // it was sourced from (Library room bundle).
       const fresh = createBlankMode(action.layoutRef)
+      if (action.sourceRoomId && fresh.layout) {
+        fresh.layout.sourceRoomId = action.sourceRoomId
+      }
       return {
         mode: fresh,
         selection: { type: 'room' },
@@ -497,16 +517,24 @@ export function editorReducer(state, action) {
       // close. Each ref becomes a fresh tray chip the user can drag
       // onto a slot. Skip empties / dupes against existing tray chips
       // so a re-commit doesn't pile up duplicate entries.
+      // PR-46d: action may carry a sourceRoomMap (ref → roomId) so the
+      // chip — and later the placed instance after RESTORE_FROM_TRAY —
+      // retains the originating room for Showcase glow grouping.
       const existing = new Set((state.tray || []).map((t) => t.ref))
       const refs = (action.refs || []).filter((r) => r && !existing.has(r))
       if (refs.length === 0) return state
-      const newEntries = refs.map((ref) => ({
-        compId: genId('comp'),
-        ref,
-        fromSlot: null,
-        reason: 'added from Library',
-        config: {},
-      }))
+      const newEntries = refs.map((ref) => {
+        const entry = {
+          compId: genId('comp'),
+          ref,
+          fromSlot: null,
+          reason: 'added from Library',
+          config: {},
+        }
+        const src = action.sourceRoomMap?.[ref]
+        if (src) entry.sourceRoomId = src
+        return entry
+      })
       return {
         ...state,
         tray: [...(state.tray || []), ...newEntries],

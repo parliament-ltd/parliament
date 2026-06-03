@@ -63,6 +63,7 @@ const CHIP_TO_KIND = {
 export default function EditorLibraryMode({
   scope,
   mode,
+  tray,
   bag,
   modes,
   catalogEntries,
@@ -73,6 +74,10 @@ export default function EditorLibraryMode({
   // EditorView wires this to a handler that removes every placed
   // instance of the ref.
   onRemovePlacedComponent,
+  // PR-46d: hover-x on a Showcase item that's still in the holding
+  // tray (unplaced, e.g. from a recent Library commit). Dismisses
+  // every tray chip matching that ref.
+  onDismissTrayByRef,
   // PR-46: hover-x on the active layout when the bag has exactly one
   // queued layout (i.e., the user has staged a swap and wants to
   // commit it). EditorView's handler does the SWAP_LAYOUT + clears
@@ -120,8 +125,8 @@ export default function EditorLibraryMode({
   // room and (b) bag items pending apply. Each item carries a `source`
   // ('draft' | 'bag') so hover-x can dispatch the right action.
   const showcaseItems = useMemo(
-    () => buildShowcaseItems({ bag, mode, layouts, catalogEntries, modes: modes || [] }),
-    [bag, mode, layouts, catalogEntries, modes]
+    () => buildShowcaseItems({ bag, mode, tray, layouts, catalogEntries, modes: modes || [] }),
+    [bag, mode, tray, layouts, catalogEntries, modes]
   )
   const uniqueLayouts = new Set([
     ...(mode?.layout?.ref ? [mode.layout.ref] : []),
@@ -152,17 +157,21 @@ export default function EditorLibraryMode({
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
-  // PR-45: card click = toggle. If the card is checked because it's
-  // in the bag → remove from bag. If checked because it's placed in
-  // the draft → dispatch the corresponding draft mutation. If
-  // unchecked → add to bag.
+  // PR-45 / PR-46d: card click = toggle. If the card is checked
+  // because it's in the bag → remove from bag. If checked because it's
+  // placed in the draft → dispatch the corresponding draft mutation.
+  // If checked because it's in the holding tray (post-commit, unplaced)
+  // → dismiss from tray. Unchecked → add to bag.
   function handleCardClick(item) {
     const inBag = isInBag(item, bag)
     const inDraft = isInDraft(item, mode)
+    const inTray = isInTray(item, tray)
     if (inBag) {
       onToggle(item.kind, item.id, null)
     } else if (inDraft) {
       removeDraftItem(item)
+    } else if (inTray) {
+      removeDraftItem({ ...item, source: 'tray' })
     } else {
       onToggle(item.kind, item.id, item.kind === 'room' ? item.room : null)
     }
@@ -180,6 +189,8 @@ export default function EditorLibraryMode({
       onToggle(item.kind, item.ref, null)
     } else if (item.source === 'draft') {
       removeDraftItem({ kind: item.kind, id: item.ref })
+    } else if (item.source === 'tray') {
+      removeDraftItem({ kind: item.kind, id: item.ref, source: 'tray' })
     }
     if (focused && focused.kind === item.kind && focused.ref === item.ref) {
       setFocused(null)
@@ -187,6 +198,14 @@ export default function EditorLibraryMode({
   }
 
   function removeDraftItem(item) {
+    // PR-46d: tray-sourced Showcase items dismiss by ref so all
+    // matching chips clear in one go.
+    if (item.source === 'tray') {
+      if (item.kind === 'component') {
+        onDismissTrayByRef?.(item.ref || item.id)
+      }
+      return
+    }
     if (item.kind === 'component') {
       onRemovePlacedComponent?.(item.id)
       return
@@ -235,7 +254,7 @@ export default function EditorLibraryMode({
     <div className="editor-library-mode">
       <Section
         title="Showcase"
-        subtitle={describeShowcaseSummary(bag, mode)}
+        subtitle={describeShowcaseSummary(bag, mode, tray)}
         open={openSections.showcase}
         onToggle={() => toggleSection('showcase')}
       >
@@ -261,6 +280,7 @@ export default function EditorLibraryMode({
           items={filteredCatalog}
           bag={bag}
           mode={mode}
+          tray={tray}
           focused={focused}
           onCardClick={handleCardClick}
         />
@@ -277,6 +297,7 @@ export default function EditorLibraryMode({
             item={focusedItem}
             bag={bag}
             mode={mode}
+            tray={tray}
             onCardClick={handleCardClick}
           />
         </Section>
@@ -356,14 +377,18 @@ function ShowcaseBody({ items, layoutConflict, schemeConflict, onRemove }) {
 function ShowcaseCard({ item, warning, onRemove }) {
   const glow = item.sourceRoomId ? colorForRoomId(item.sourceRoomId) : null
   const isDraftItem = item.source === 'draft'
+  const isTrayItem = item.source === 'tray'
+  let tag = null
+  if (isDraftItem) tag = 'In room'
+  else if (isTrayItem) tag = 'In tray'
   return (
     <div
-      className={`editor-library-showcase-card${warning ? ' is-warning' : ''}${glow ? ' has-glow' : ''}${isDraftItem ? ' is-placed' : ''}`}
+      className={`editor-library-showcase-card${warning ? ' is-warning' : ''}${glow ? ' has-glow' : ''}${isDraftItem ? ' is-placed' : ''}${isTrayItem ? ' is-tray' : ''}`}
       style={glow ? { '--glow': glow } : undefined}
     >
       <div className="editor-library-showcase-card-kind">
         {item.kindLabel}
-        {isDraftItem && <span className="editor-library-showcase-card-placed-tag">In room</span>}
+        {tag && <span className="editor-library-showcase-card-placed-tag">{tag}</span>}
       </div>
       <div className="editor-library-showcase-card-name" title={item.displayName}>
         {item.displayName}
@@ -395,7 +420,7 @@ function ConflictBanner({ message }) {
 function LibraryBody({
   activeChip, onChipChange,
   search, onSearchChange,
-  items, bag, mode, focused, onCardClick,
+  items, bag, mode, tray, focused, onCardClick,
 }) {
   return (
     <>
@@ -444,7 +469,7 @@ function LibraryBody({
             <CatalogCard
               key={`${item.kind}-${item.id}`}
               item={item}
-              checked={isItemCheckedAny(item, bag, mode)}
+              checked={isItemCheckedAny(item, bag, mode, tray)}
               focused={focused?.kind === item.kind && focused?.ref === item.id}
               onClick={() => onCardClick(item)}
             />
@@ -476,7 +501,7 @@ function CatalogCard({ item, checked, focused, onClick }) {
 // ────────────────────────────────────────────────────────
 //  Details
 // ────────────────────────────────────────────────────────
-function DetailsBody({ item, bag, mode, onCardClick }) {
+function DetailsBody({ item, bag, mode, tray, onCardClick }) {
   if (!item) {
     return (
       <div className="text-[11.5px] text-[var(--p-text-muted)] py-6 text-center">
@@ -484,7 +509,7 @@ function DetailsBody({ item, bag, mode, onCardClick }) {
       </div>
     )
   }
-  const checked = isItemCheckedAny(item, bag, mode)
+  const checked = isItemCheckedAny(item, bag, mode, tray)
   const inDraft = isInDraft(item, mode)
   // The Details CTA mirrors the catalog click behavior. Label is the
   // exact action that will fire so users know what they're clicking.
@@ -565,12 +590,14 @@ function SlotList({ slots }) {
 // ────────────────────────────────────────────────────────
 //  Pure helpers
 // ────────────────────────────────────────────────────────
-function buildShowcaseItems({ bag, mode, layouts, catalogEntries, modes }) {
+function buildShowcaseItems({ bag, mode, tray, layouts, catalogEntries, modes }) {
   const out = []
   const seen = new Set()
   const key = (kind, ref) => `${kind}:${ref}`
 
   // ── Draft side (PR-45): what's already in the room.
+  // PR-46d: each draft item may carry a sourceRoomId stamped at the
+  // time it was added via Library — read it here to drive the glow.
   if (mode?.layout?.ref) {
     const ref = mode.layout.ref
     const layout = layouts.find((l) => l.id === ref)
@@ -580,7 +607,7 @@ function buildShowcaseItems({ bag, mode, layouts, catalogEntries, modes }) {
       source: 'draft',
       kindLabel: 'Layout',
       displayName: layout?.displayName || ref,
-      sourceRoomId: null,
+      sourceRoomId: mode.layout.sourceRoomId || null,
     })
     seen.add(key('layout', ref))
   }
@@ -593,20 +620,46 @@ function buildShowcaseItems({ bag, mode, layouts, catalogEntries, modes }) {
       source: 'draft',
       kindLabel: 'Scheme',
       displayName: scheme?.displayName || ref,
-      sourceRoomId: null,
+      sourceRoomId: mode.scheme.sourceRoomId || null,
     })
     seen.add(key('scheme', ref))
   }
   const placedRefs = [...new Set((mode?.components || []).map((c) => c.ref))]
   for (const ref of placedRefs) {
     const entry = findCatalogEntry(catalogEntries, ref)
+    // Use the first placed instance's sourceRoomId; if no instances
+    // have one (the room predates PR-46d, or the component was placed
+    // directly via drag), the glow simply doesn't show.
+    const placedInstance = (mode?.components || []).find(
+      (c) => c.ref === ref && c.sourceRoomId
+    )
     out.push({
       kind: 'component',
       ref,
       source: 'draft',
       kindLabel: 'Component',
       displayName: entry?.displayName || ref,
-      sourceRoomId: null,
+      sourceRoomId: placedInstance?.sourceRoomId || null,
+    })
+    seen.add(key('component', ref))
+  }
+
+  // ── Tray side (PR-46d): unplaced components added via Library or
+  //    orphaned by a layout swap. They're conceptually "in the room
+  //    workflow," just not placed in a slot yet. Skip refs already
+  //    shown from the draft side.
+  const trayRefs = [...new Set((tray || []).map((t) => t.ref).filter(Boolean))]
+  for (const ref of trayRefs) {
+    if (seen.has(key('component', ref))) continue
+    const entry = findCatalogEntry(catalogEntries, ref)
+    const chip = (tray || []).find((t) => t.ref === ref && t.sourceRoomId)
+    out.push({
+      kind: 'component',
+      ref,
+      source: 'tray',
+      kindLabel: 'Component',
+      displayName: entry?.displayName || ref,
+      sourceRoomId: chip?.sourceRoomId || null,
     })
     seen.add(key('component', ref))
   }
@@ -682,8 +735,14 @@ function isInDraft(item, mode) {
   if (item.kind === 'component') return (mode.components || []).some((c) => c.ref === ref)
   return false // rooms have no draft side
 }
-function isItemCheckedAny(item, bag, mode) {
-  return isInBag(item, bag) || isInDraft(item, mode)
+// PR-46d: tray-side check. Only components live in the tray.
+function isInTray(item, tray) {
+  if (item.kind !== 'component') return false
+  const ref = item.id ?? item.ref
+  return (tray || []).some((t) => t.ref === ref)
+}
+function isItemCheckedAny(item, bag, mode, tray) {
+  return isInBag(item, bag) || isInDraft(item, mode) || isInTray(item, tray)
 }
 
 function firstSource(bag, key, ref) {
@@ -748,9 +807,10 @@ function filterCatalogItems(items, chip, query) {
   return list
 }
 
-function describeShowcaseSummary(bag, mode) {
-  // PR-45: union of draft + bag. Dedups refs across both sides so a
-  // layout that's both in the draft AND queued in the bag counts once.
+function describeShowcaseSummary(bag, mode, tray) {
+  // PR-45 / PR-46d: union of draft + tray + bag. Dedups refs across
+  // all sides so a layout that's both in the draft AND queued in the
+  // bag counts once.
   const layoutSet = new Set([
     ...(mode?.layout?.ref ? [mode.layout.ref] : []),
     ...(bag.layouts || []),
@@ -761,6 +821,7 @@ function describeShowcaseSummary(bag, mode) {
   ])
   const compSet = new Set([
     ...(mode?.components || []).map((c) => c.ref),
+    ...(tray || []).map((t) => t.ref).filter(Boolean),
     ...(bag.components || []),
   ])
   const roomCount = bag.rooms?.length || 0
