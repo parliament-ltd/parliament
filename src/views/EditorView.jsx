@@ -25,6 +25,7 @@ import EditorHoldingTray from '../components/editor/EditorHoldingTray'
 import EditorMigrationDialog from '../components/editor/EditorMigrationDialog'
 import EditorApplyRoomDialog from '../components/editor/EditorApplyRoomDialog'
 import EditorPreviewSheet from '../components/editor/EditorPreviewSheet'
+import EditorLibraryMode from '../components/editor/EditorLibraryMode'
 import Card from '../components/Card'
 import Button from '../components/Button'
 import {
@@ -69,6 +70,11 @@ export default function EditorView({ scope = 'room', blank = false }) {
   // source-mode lookups. Loaded once on mount; refreshed after Save so a
   // freshly-saved mode appears in the tab without a full reload.
   const [modes, setModes] = useState(null)
+  // PR-44: Library mode is the third top-bar pill. When open, the center
+  // column renders the Library shopping UI in place of the canvas. The
+  // underlying draft is untouched while Library is open — selections
+  // only flow into the draft when Build wiring lands in a later PR.
+  const [libraryOpen, setLibraryOpen] = useState(false)
 
   // ── Load the mode on mount ─────────────────────────────
   useEffect(() => {
@@ -506,6 +512,9 @@ export default function EditorView({ scope = 'room', blank = false }) {
           labMode={labMode}
           onStartCopy={onStartCopy}
           onSwitchToEdit={onSwitchToEdit}
+          libraryOpen={libraryOpen}
+          onOpenLibrary={() => setLibraryOpen(true)}
+          onCloseLibrary={() => setLibraryOpen(false)}
         />
         <div className="grid grid-cols-[300px_1fr_300px] flex-1 min-h-0">
           <EditorLeftRail
@@ -518,18 +527,33 @@ export default function EditorView({ scope = 'room', blank = false }) {
             defaultTab={defaultTab}
           />
           <div className="overflow-y-auto bg-[var(--p-bg-subtle)]">
-            <EditorCanvas
-              mode={state.mode}
-              selection={state.selection}
-              catalogEntries={catalogEntries}
-              onSelectRoom={() => dispatch({ type: 'SELECT_ROOM' })}
-              onSelectSlot={(slotId) => dispatch({ type: 'SELECT_SLOT', slotId })}
-              onSelectComponent={(componentId) => dispatch({ type: 'SELECT_COMPONENT', componentId })}
-            />
-            <EditorHoldingTray
-              tray={state.tray}
-              onDismiss={(compId) => dispatch({ type: 'DISMISS_FROM_TRAY', compId })}
-            />
+            {libraryOpen ? (
+              <EditorLibraryMode
+                scope={scope}
+                bag={state.libraryBag}
+                modes={modes}
+                catalogEntries={catalogEntries}
+                onToggle={(kind, ref, room) =>
+                  dispatch({ type: 'LIBRARY_TOGGLE', kind, ref, room })
+                }
+                onShowToast={showToast}
+              />
+            ) : (
+              <>
+                <EditorCanvas
+                  mode={state.mode}
+                  selection={state.selection}
+                  catalogEntries={catalogEntries}
+                  onSelectRoom={() => dispatch({ type: 'SELECT_ROOM' })}
+                  onSelectSlot={(slotId) => dispatch({ type: 'SELECT_SLOT', slotId })}
+                  onSelectComponent={(componentId) => dispatch({ type: 'SELECT_COMPONENT', componentId })}
+                />
+                <EditorHoldingTray
+                  tray={state.tray}
+                  onDismiss={(compId) => dispatch({ type: 'DISMISS_FROM_TRAY', compId })}
+                />
+              </>
+            )}
           </div>
           <EditorRightRail
             mode={state.mode}
