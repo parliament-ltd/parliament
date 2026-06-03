@@ -63,6 +63,12 @@ export default function EditorTopBar({
   libraryOpen = false,
   onOpenLibrary,
   onCloseLibrary,
+  // PR-45: Build/Edit pill clicks while Library is open run the bag's
+  // diff against the draft via this callback. Returns true on success,
+  // false if a conflict (>1 layout or >1 scheme in the union) refused
+  // the commit — in that case the pill click is a no-op and the user
+  // stays in Library to resolve.
+  onCommitLibrary,
 }) {
   const deviceClass = mode?.deviceClass || 'visual-pointer'
   const isMobile = deviceClass === 'visual-touch-phone'
@@ -118,23 +124,32 @@ export default function EditorTopBar({
     if (libraryActive) return
     if (onOpenLibrary) onOpenLibrary()
   }
+  // PR-45: closing Library via Build/Edit pill commits the bag first.
+  // A conflict refusal aborts both the commit AND the close, so the
+  // user stays in Library to resolve.
+  const commitIfOpen = () => {
+    if (!libraryOpen) return true
+    if (onCommitLibrary && !onCommitLibrary()) return false
+    onCloseLibrary?.()
+    return true
+  }
   const onPillEdit = () => {
-    // If Library is open and the route already says edit, just close.
+    // Library open + already on the edit route: just commit + close.
     if (libraryOpen && labMode === 'edit') {
-      onCloseLibrary?.()
+      commitIfOpen()
       return
     }
     if (editActive) return
-    if (libraryOpen) onCloseLibrary?.()
+    if (!commitIfOpen()) return
     if (onSwitchToEdit) onSwitchToEdit()
   }
   const onPillBuild = () => {
     if (libraryOpen && labMode === 'build') {
-      onCloseLibrary?.()
+      commitIfOpen()
       return
     }
     if (buildActive) return
-    if (libraryOpen) onCloseLibrary?.()
+    if (!commitIfOpen()) return
     if (onStartCopy) onStartCopy()
   }
 

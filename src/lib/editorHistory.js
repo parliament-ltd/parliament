@@ -40,6 +40,9 @@ const HISTORY_ACTIONS = new Set([
   // PR-27: per-slot panel-toggle opt-in is a real mode-file mutation;
   // a misclick should be undoable like any other field edit.
   'SET_PANEL_BUTTON',
+  // PR-45: Library mode's apply-on-close commits bag components into
+  // the holding tray. Treat each commit batch as one undoable step.
+  'ADD_REFS_TO_TRAY',
 ])
 
 // Cap above the 20-state spec floor. Each entry holds a cloned mode
