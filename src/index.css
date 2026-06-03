@@ -1153,6 +1153,298 @@
   .layout-panel-content { transition: none; }
 }
 
+/* ── Editor Library mode (PR-44) ──────────────────────────
+   The "shopping" surface that replaces the canvas when the user
+   clicks the Library pill in the editor top bar. Three chevron-
+   collapsible sections: Showcase / Library / Details.
+
+   Fixed default section sizes (no drag-to-resize yet — that lands
+   in PR-45+). Showcase + Library sections can grow with content;
+   the parent column scrolls. */
+.editor-library-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 22px 28px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.editor-library-section {
+  border: 0.5px solid var(--p-border);
+  border-radius: 10px;
+  background: var(--p-bg-surface);
+  overflow: hidden;
+}
+.editor-library-section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--p-text-secondary);
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.12s;
+}
+.editor-library-section-head:hover {
+  background: var(--p-bg-subtle);
+}
+.editor-library-section-body {
+  padding: 4px 14px 14px;
+  border-top: 0.5px solid var(--p-border-subtle);
+}
+
+/* ── Showcase ─────────────────────────────────────────────── */
+.editor-library-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  padding: 6px 0;
+}
+.editor-library-showcase-card {
+  position: relative;
+  padding: 9px 11px;
+  border-radius: 7px;
+  border: 0.5px solid var(--p-border);
+  background: var(--p-bg-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 56px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.editor-library-showcase-card.has-glow {
+  border-color: color-mix(in oklab, var(--glow) 60%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--glow) 40%, transparent),
+    0 0 12px -2px color-mix(in oklab, var(--glow) 35%, transparent);
+}
+.editor-library-showcase-card.is-warning {
+  border-color: #E0A300;
+  background: rgba(224, 163, 0, 0.08);
+}
+.editor-library-showcase-card-kind {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--p-text-muted);
+  font-weight: 500;
+}
+.editor-library-showcase-card-name {
+  font-size: 12px;
+  color: var(--p-text-primary);
+  font-weight: 500;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.editor-library-showcase-card-x {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--p-text-muted);
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.12s, color 0.12s, background 0.12s;
+}
+.editor-library-showcase-card:hover .editor-library-showcase-card-x,
+.editor-library-showcase-card-x:focus-visible {
+  opacity: 1;
+}
+.editor-library-showcase-card-x:hover {
+  color: #C8313B;
+  background: rgba(200, 49, 59, 0.08);
+}
+
+.editor-library-conflict {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  background: rgba(224, 163, 0, 0.10);
+  border: 0.5px solid rgba(224, 163, 0, 0.4);
+  color: #8B6A10;
+  font-size: 11px;
+}
+
+/* ── Library (catalog) ────────────────────────────────────── */
+.editor-library-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 12px;
+  flex-wrap: wrap;
+}
+.editor-library-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.editor-library-search {
+  position: relative;
+  margin-left: auto;
+  width: 200px;
+}
+.editor-library-search svg {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--p-text-muted);
+  pointer-events: none;
+}
+.editor-library-search input {
+  width: 100%;
+  padding: 6px 26px 6px 26px;
+  font-size: 11.5px;
+  border: 0.5px solid var(--p-border);
+  border-radius: 6px;
+  background: var(--p-bg-surface);
+  color: var(--p-text-primary);
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.12s;
+}
+.editor-library-search input:focus {
+  border-color: var(--p-gold-light);
+}
+.editor-library-search-clear {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--p-text-muted);
+  cursor: pointer;
+  transition: color 0.12s, background 0.12s;
+}
+.editor-library-search-clear:hover {
+  color: var(--p-text-primary);
+  background: var(--p-bg-subtle);
+}
+.editor-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 4px 0;
+}
+.editor-library-card-wrap {
+  position: relative;
+}
+.editor-library-card-wrap .lib-card {
+  width: 100%;
+  transition: border-color 0.12s, transform 0.12s, box-shadow 0.12s;
+}
+.editor-library-card-wrap.is-checked .lib-card {
+  border-color: var(--p-gold-light);
+  box-shadow: 0 0 0 1px var(--p-gold-light);
+}
+.editor-library-card-wrap.is-focused .lib-card {
+  border-color: var(--p-gold-light);
+  box-shadow: 0 4px 14px -4px rgba(196, 169, 77, 0.30);
+}
+.editor-library-card-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-border);
+  color: transparent;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  pointer-events: none;
+}
+.editor-library-card-check.is-on {
+  background: var(--p-gold-light);
+  border-color: var(--p-gold-light);
+  color: white;
+}
+
+/* ── Details ──────────────────────────────────────────────── */
+.editor-library-details {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 8px 0 4px;
+}
+.editor-library-details-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.editor-library-details-cta {
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 6px;
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-gold-light);
+  color: var(--p-gold-deep, #8B6A10);
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+.editor-library-details-cta:hover {
+  background: rgba(196, 169, 77, 0.08);
+}
+.editor-library-details-cta.is-on {
+  background: var(--p-gold-light);
+  color: white;
+}
+.editor-library-details-cta.is-on:hover {
+  background: var(--p-gold-muted);
+}
+.editor-library-details-body-text {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--p-text-secondary);
+  margin: 0;
+}
+.editor-library-details-bundle {
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--p-bg-subtle);
+  border: 0.5px solid var(--p-border-subtle);
+}
+.editor-library-details-bundle-list {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--p-text-secondary);
+}
+
 /* ── Blueprint section ────────────────────────────────────── */
 /* PR-40 polish: bp-wrap carries the cream bg fallback. The dark
    border is drawn by the SVG `wallBox` stroke instead, so we don't

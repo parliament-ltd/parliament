@@ -25,6 +25,7 @@ import EditorHoldingTray from '../components/editor/EditorHoldingTray'
 import EditorMigrationDialog from '../components/editor/EditorMigrationDialog'
 import EditorApplyRoomDialog from '../components/editor/EditorApplyRoomDialog'
 import EditorPreviewSheet from '../components/editor/EditorPreviewSheet'
+import EditorLibraryMode from '../components/editor/EditorLibraryMode'
 import Card from '../components/Card'
 import Button from '../components/Button'
 import {
@@ -527,16 +528,16 @@ export default function EditorView({ scope = 'room', blank = false }) {
           />
           <div className="overflow-y-auto bg-[var(--p-bg-subtle)]">
             {libraryOpen ? (
-              <div className="p-6 min-h-full flex items-center justify-center text-center text-[var(--p-text-muted)]">
-                <div className="max-w-[360px]">
-                  <div className="text-[13px] font-medium text-[var(--p-text-primary)] mb-1.5">
-                    Library mode
-                  </div>
-                  <div className="text-[11.5px] leading-[1.6]">
-                    The shopping UI lands in commit B. For now, switch back to Build or Edit using the pills above.
-                  </div>
-                </div>
-              </div>
+              <EditorLibraryMode
+                scope={scope}
+                bag={state.libraryBag}
+                modes={modes}
+                catalogEntries={catalogEntries}
+                onToggle={(kind, ref, room) =>
+                  dispatch({ type: 'LIBRARY_TOGGLE', kind, ref, room })
+                }
+                onShowToast={showToast}
+              />
             ) : (
               <>
                 <EditorCanvas
