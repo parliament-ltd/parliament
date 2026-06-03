@@ -4,26 +4,38 @@
 // clicks the Library pill in the top bar. Three vertically stacked
 // chevron-collapsible sections:
 //
-//   1. Showcase    — small cards for each item currently in the
-//                    libraryBag. Items contributed by a checked room
-//                    glow with that room's deterministic color, so
-//                    bundles read as bundles. Hover any card → x in
-//                    the top-right removes it (toggles the bag).
-//                    Layouts and schemes flag a conflict outline +
-//                    toast when more than one is selected.
+//   1. Showcase    — small cards for the UNION of (a) what's already
+//                    in the draft (placed components, current layout,
+//                    current scheme) and (b) what's in the libraryBag
+//                    pending apply. PR-45 made the Showcase a persistent
+//                    "cart": it reflects the room's contents whether
+//                    you're shopping or revisiting after a build.
+//                    Items contributed by a checked room glow with
+//                    that room's deterministic color. Hover any card →
+//                    x in the top-right. For bag items the x just
+//                    removes from bag; for draft items it dispatches
+//                    REMOVE_COMPONENT / clear-layout / clear-scheme
+//                    immediately on the draft (per user decision in
+//                    PR-45 planning). Conflict outline + toast when the
+//                    union has more than one layout / scheme.
 //
 //   2. Library     — filter chips (All / Layouts / Components / …) +
 //                    an in-section search bar + a grid of LibraryCards
-//                    with a check badge overlaid. Clicking a card
-//                    toggles its bag entry and focuses it in Details.
+//                    with a check badge overlaid. A card is checked
+//                    when it's in the bag OR placed in the draft.
+//                    Clicking a card toggles its bag entry and focuses
+//                    it in Details.
 //
 //   3. Details     — info panel for the most-recently-clicked card.
 //                    Mirrors what the study library's right-side modal
 //                    surfaces today.
 //
-// Library mode does not yet feed Build mode's canvas / holding tray —
-// that's PR-45. For now, opening Library is a side-experience: the
-// underlying draft is unaffected while the user shops.
+// Apply-on-close (PR-45): clicking the Build/Edit pill while Library
+// is open commits the bag's diff against the draft via existing
+// actions (SWAP_LAYOUT / INIT_FROM_LAYOUT, APPLY_SCHEME, push
+// components into the holding tray) and then clears the bag. The
+// Showcase keeps showing the same items, now sourced from the draft
+// side of the union. See EditorView.handleLibraryClose.
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronDown, X as XIcon, Check, Search as SearchIcon, AlertTriangle } from 'lucide-react'
@@ -50,11 +62,19 @@ const CHIP_TO_KIND = {
 
 export default function EditorLibraryMode({
   scope,
+  mode,
   bag,
   modes,
   catalogEntries,
   onToggle,
   onShowToast,
+  // PR-45: hover-x on a Showcase item that's already placed in the
+  // draft (the component case) needs to mutate the draft directly.
+  // EditorView wires this to a handler that removes every placed
+  // instance of the ref. Layout / scheme removal toasts instead —
+  // a room can't go without a layout, and clearing a scheme isn't
+  // a clean action today.
+  onRemovePlacedComponent,
 }) {
   const [layouts, setLayouts] = useState([])
   const [openSections, setOpenSections] = useState({
@@ -82,47 +102,91 @@ export default function EditorLibraryMode({
     return () => { cancelled = true }
   }, [scope])
 
-  // Toast on conflict transitions: 1 → 2+ layouts / schemes. Holding
-  // the prev counts in a ref so we only fire on the transition, not on
-  // every render that keeps the count >= 2.
-  const prevConflict = useRef({ layouts: 0, schemes: 0 })
+  // ── Derived: Showcase items + conflict flags ───────────
+  // PR-45: Showcase is the UNION of (a) draft items already in the
+  // room and (b) bag items pending apply. Each item carries a `source`
+  // ('draft' | 'bag') so hover-x can dispatch the right action.
+  const showcaseItems = useMemo(
+    () => buildShowcaseItems({ bag, mode, layouts, catalogEntries, modes: modes || [] }),
+    [bag, mode, layouts, catalogEntries, modes]
+  )
+  const uniqueLayouts = new Set([
+    ...(mode?.layout?.ref ? [mode.layout.ref] : []),
+    ...(bag.layouts || []),
+  ])
+  const uniqueSchemes = new Set([
+    ...(mode?.scheme?.ref ? [mode.scheme.ref] : []),
+    ...(bag.schemes || []),
+  ])
+  const layoutConflict = uniqueLayouts.size > 1
+  const schemeConflict = uniqueSchemes.size > 1
+
+  // Toast when the union flips into a conflict. Stored as booleans so
+  // we fire on the false → true edge, not every render that holds the
+  // conflict open.
+  const prevConflict = useRef({ layouts: false, schemes: false })
   useEffect(() => {
-    const layoutCount = bag.layouts.length
-    const schemeCount = bag.schemes.length
-    if (layoutCount > 1 && prevConflict.current.layouts <= 1) {
+    if (layoutConflict && !prevConflict.current.layouts) {
       onShowToast?.('Only one layout can be used at a time for a room.')
     }
-    if (schemeCount > 1 && prevConflict.current.schemes <= 1) {
+    if (schemeConflict && !prevConflict.current.schemes) {
       onShowToast?.('Only one scheme can be applied at a time for a room.')
     }
-    prevConflict.current = { layouts: layoutCount, schemes: schemeCount }
-  }, [bag.layouts.length, bag.schemes.length, onShowToast])
+    prevConflict.current = { layouts: layoutConflict, schemes: schemeConflict }
+  }, [layoutConflict, schemeConflict, onShowToast])
 
   function toggleSection(key) {
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
-  function handleCardClick(kind, id, room) {
-    onToggle(kind, id, kind === 'room' ? room : null)
-    setFocused({ kind, ref: id })
+  // PR-45: card click = toggle. If the card is checked because it's
+  // in the bag → remove from bag. If checked because it's placed in
+  // the draft → dispatch the corresponding draft mutation. If
+  // unchecked → add to bag.
+  function handleCardClick(item) {
+    const inBag = isInBag(item, bag)
+    const inDraft = isInDraft(item, mode)
+    if (inBag) {
+      onToggle(item.kind, item.id, null)
+    } else if (inDraft) {
+      removeDraftItem(item)
+    } else {
+      onToggle(item.kind, item.id, item.kind === 'room' ? item.room : null)
+    }
+    setFocused({ kind: item.kind, ref: item.id })
     setOpenSections((prev) => ({ ...prev, details: true }))
   }
 
-  function handleRemoveFromShowcase(kind, id) {
-    onToggle(kind, id, null)
-    // If we removed the focused item, drop focus.
-    if (focused && focused.kind === kind && focused.ref === id) {
+  // Hover-x on a Showcase card. Branches on the item's source: a bag
+  // item toggles out of the bag; a draft item fires the corresponding
+  // draft mutation. Active layout / scheme refuse with a toast — a
+  // room can't be left without a layout, and removing-the-scheme isn't
+  // a clean action either (no clear scheme action today).
+  function handleRemoveFromShowcase(item) {
+    if (item.source === 'bag') {
+      onToggle(item.kind, item.ref, null)
+    } else if (item.source === 'draft') {
+      removeDraftItem({ kind: item.kind, id: item.ref })
+    }
+    if (focused && focused.kind === item.kind && focused.ref === item.ref) {
       setFocused(null)
     }
   }
 
-  // ── Derived: Showcase items + conflict flags ───────────
-  const showcaseItems = useMemo(
-    () => buildShowcaseItems({ bag, layouts, catalogEntries, modes: modes || [] }),
-    [bag, layouts, catalogEntries, modes]
-  )
-  const layoutConflict = bag.layouts.length > 1
-  const schemeConflict = bag.schemes.length > 1
+  function removeDraftItem(item) {
+    if (item.kind === 'component') {
+      onRemovePlacedComponent?.(item.id)
+      return
+    }
+    if (item.kind === 'layout') {
+      onShowToast?.('A room needs a layout. Pick a new layout from the catalog below to swap.')
+      return
+    }
+    if (item.kind === 'scheme') {
+      onShowToast?.('Pick a different scheme from the catalog below to change it.')
+      return
+    }
+  }
 
   // ── Derived: catalog items + filtering ─────────────────
   const catalogItems = useMemo(
@@ -146,7 +210,7 @@ export default function EditorLibraryMode({
     <div className="editor-library-mode">
       <Section
         title="Showcase"
-        subtitle={describeShowcaseSummary(bag)}
+        subtitle={describeShowcaseSummary(bag, mode)}
         open={openSections.showcase}
         onToggle={() => toggleSection('showcase')}
       >
@@ -171,6 +235,7 @@ export default function EditorLibraryMode({
           onSearchChange={setSearch}
           items={filteredCatalog}
           bag={bag}
+          mode={mode}
           focused={focused}
           onCardClick={handleCardClick}
         />
@@ -185,7 +250,8 @@ export default function EditorLibraryMode({
         <DetailsBody
           item={focusedItem}
           bag={bag}
-          onToggle={onToggle}
+          mode={mode}
+          onCardClick={handleCardClick}
         />
       </Section>
     </div>
@@ -231,7 +297,7 @@ function ShowcaseBody({ items, layoutConflict, schemeConflict, onRemove }) {
   if (items.length === 0) {
     return (
       <div className="text-[11.5px] text-[var(--p-text-muted)] py-8 text-center">
-        Nothing selected yet. Pick items from the Library section below.
+        Nothing in the room yet. Pick items from the Library section below.
       </div>
     )
   }
@@ -246,13 +312,13 @@ function ShowcaseBody({ items, layoutConflict, schemeConflict, onRemove }) {
       <div className="editor-library-showcase-grid">
         {items.map((item) => (
           <ShowcaseCard
-            key={`${item.kind}-${item.ref}`}
+            key={`${item.kind}-${item.ref}-${item.source}`}
             item={item}
             warning={
               (item.kind === 'layout' && layoutConflict) ||
               (item.kind === 'scheme' && schemeConflict)
             }
-            onRemove={() => onRemove(item.kind, item.ref)}
+            onRemove={() => onRemove(item)}
           />
         ))}
       </div>
@@ -262,12 +328,16 @@ function ShowcaseBody({ items, layoutConflict, schemeConflict, onRemove }) {
 
 function ShowcaseCard({ item, warning, onRemove }) {
   const glow = item.sourceRoomId ? colorForRoomId(item.sourceRoomId) : null
+  const isDraftItem = item.source === 'draft'
   return (
     <div
-      className={`editor-library-showcase-card${warning ? ' is-warning' : ''}${glow ? ' has-glow' : ''}`}
+      className={`editor-library-showcase-card${warning ? ' is-warning' : ''}${glow ? ' has-glow' : ''}${isDraftItem ? ' is-placed' : ''}`}
       style={glow ? { '--glow': glow } : undefined}
     >
-      <div className="editor-library-showcase-card-kind">{item.kindLabel}</div>
+      <div className="editor-library-showcase-card-kind">
+        {item.kindLabel}
+        {isDraftItem && <span className="editor-library-showcase-card-placed-tag">In room</span>}
+      </div>
       <div className="editor-library-showcase-card-name" title={item.displayName}>
         {item.displayName}
       </div>
@@ -298,7 +368,7 @@ function ConflictBanner({ message }) {
 function LibraryBody({
   activeChip, onChipChange,
   search, onSearchChange,
-  items, bag, focused, onCardClick,
+  items, bag, mode, focused, onCardClick,
 }) {
   return (
     <>
@@ -347,9 +417,9 @@ function LibraryBody({
             <CatalogCard
               key={`${item.kind}-${item.id}`}
               item={item}
-              checked={isItemChecked(item, bag)}
+              checked={isItemCheckedAny(item, bag, mode)}
               focused={focused?.kind === item.kind && focused?.ref === item.id}
-              onClick={() => onCardClick(item.kind, item.id, item.room)}
+              onClick={() => onCardClick(item)}
             />
           ))}
         </div>
@@ -379,7 +449,7 @@ function CatalogCard({ item, checked, focused, onClick }) {
 // ────────────────────────────────────────────────────────
 //  Details
 // ────────────────────────────────────────────────────────
-function DetailsBody({ item, bag, onToggle }) {
+function DetailsBody({ item, bag, mode, onCardClick }) {
   if (!item) {
     return (
       <div className="text-[11.5px] text-[var(--p-text-muted)] py-6 text-center">
@@ -387,7 +457,14 @@ function DetailsBody({ item, bag, onToggle }) {
       </div>
     )
   }
-  const checked = isItemChecked(item, bag)
+  const checked = isItemCheckedAny(item, bag, mode)
+  const inDraft = isInDraft(item, mode)
+  // The Details CTA mirrors the catalog click behavior. Label is the
+  // exact action that will fire so users know what they're clicking.
+  let ctaLabel = 'Add to selection'
+  if (checked) {
+    ctaLabel = inDraft ? 'Remove from room' : 'Remove from selection'
+  }
   return (
     <div className="editor-library-details">
       <div className="editor-library-details-head">
@@ -401,10 +478,10 @@ function DetailsBody({ item, bag, onToggle }) {
         </div>
         <button
           type="button"
-          onClick={() => onToggle(item.kind, item.id, item.room)}
+          onClick={() => onCardClick(item)}
           className={`editor-library-details-cta${checked ? ' is-on' : ''}`}
         >
-          {checked ? 'Remove from selection' : 'Add to selection'}
+          {ctaLabel}
         </button>
       </div>
       {item.description && (
@@ -461,49 +538,125 @@ function SlotList({ slots }) {
 // ────────────────────────────────────────────────────────
 //  Pure helpers
 // ────────────────────────────────────────────────────────
-function buildShowcaseItems({ bag, layouts, catalogEntries, modes }) {
+function buildShowcaseItems({ bag, mode, layouts, catalogEntries, modes }) {
   const out = []
-  for (const ref of bag.layouts || []) {
+  const seen = new Set()
+  const key = (kind, ref) => `${kind}:${ref}`
+
+  // ── Draft side (PR-45): what's already in the room.
+  if (mode?.layout?.ref) {
+    const ref = mode.layout.ref
     const layout = layouts.find((l) => l.id === ref)
     out.push({
       kind: 'layout',
       ref,
+      source: 'draft',
+      kindLabel: 'Layout',
+      displayName: layout?.displayName || ref,
+      sourceRoomId: null,
+    })
+    seen.add(key('layout', ref))
+  }
+  if (mode?.scheme?.ref) {
+    const ref = mode.scheme.ref
+    const scheme = SCHEMES.find((s) => s.id === ref || `${s.id}@1.0` === ref)
+    out.push({
+      kind: 'scheme',
+      ref,
+      source: 'draft',
+      kindLabel: 'Scheme',
+      displayName: scheme?.displayName || ref,
+      sourceRoomId: null,
+    })
+    seen.add(key('scheme', ref))
+  }
+  const placedRefs = [...new Set((mode?.components || []).map((c) => c.ref))]
+  for (const ref of placedRefs) {
+    const entry = findCatalogEntry(catalogEntries, ref)
+    out.push({
+      kind: 'component',
+      ref,
+      source: 'draft',
+      kindLabel: 'Component',
+      displayName: entry?.displayName || ref,
+      sourceRoomId: null,
+    })
+    seen.add(key('component', ref))
+  }
+
+  // ── Bag side: pending additions. Skip any item that's already in
+  //    the draft (the union shows it once, sourced from draft).
+  for (const ref of bag.layouts || []) {
+    if (seen.has(key('layout', ref))) continue
+    const layout = layouts.find((l) => l.id === ref)
+    out.push({
+      kind: 'layout',
+      ref,
+      source: 'bag',
       kindLabel: 'Layout',
       displayName: layout?.displayName || ref,
       sourceRoomId: firstSource(bag, 'layouts', ref),
     })
   }
   for (const ref of bag.components || []) {
+    if (seen.has(key('component', ref))) continue
     const entry = findCatalogEntry(catalogEntries, ref)
     out.push({
       kind: 'component',
       ref,
+      source: 'bag',
       kindLabel: 'Component',
       displayName: entry?.displayName || ref,
       sourceRoomId: firstSource(bag, 'components', ref),
     })
   }
   for (const ref of bag.schemes || []) {
+    if (seen.has(key('scheme', ref))) continue
     const scheme = SCHEMES.find((s) => s.id === ref || `${s.id}@1.0` === ref)
     out.push({
       kind: 'scheme',
       ref,
+      source: 'bag',
       kindLabel: 'Scheme',
       displayName: scheme?.displayName || ref,
       sourceRoomId: firstSource(bag, 'schemes', ref),
     })
   }
+  // Rooms are bag-only — no draft representation (the draft holds the
+  // resulting layout / scheme / components, not the source room).
   for (const id of bag.rooms || []) {
     const room = modes.find((m) => m.id === id)
     out.push({
       kind: 'room',
       ref: id,
+      source: 'bag',
       kindLabel: 'Room',
       displayName: room?.meta?.name?.trim() || (room?.scope === 'homepage' ? 'Homepage' : 'Untitled'),
       sourceRoomId: id,
     })
   }
+
   return out
+}
+
+// PR-45: source predicates used by the click + hover-x handlers and
+// by isItemCheckedAny. Catalog items use `.id`; reducer keys are
+// pluralised by item.kind.
+function isInBag(item, bag) {
+  const ref = item.id ?? item.ref
+  const list = bag?.[`${item.kind}s`] || []
+  return list.includes(ref)
+}
+function isInDraft(item, mode) {
+  if (!mode) return false
+  const ref = item.id ?? item.ref
+  if (item.kind === 'layout')    return mode.layout?.ref === ref
+  if (item.kind === 'scheme')    return mode.scheme?.ref === ref
+  if (item.kind === 'component') return (mode.components || []).some((c) => c.ref === ref)
+  return false // rooms have no draft side
+}
+function isItemCheckedAny(item, bag, mode) {
+  return isInBag(item, bag) || isInDraft(item, mode)
 }
 
 function firstSource(bag, key, ref) {
@@ -568,23 +721,29 @@ function filterCatalogItems(items, chip, query) {
   return list
 }
 
-function isItemChecked(item, bag) {
-  const key = `${item.kind}s`
-  return (bag[key] || []).includes(item.id)
-}
-
-function describeShowcaseSummary(bag) {
-  const total =
-    (bag.layouts?.length || 0) +
-    (bag.components?.length || 0) +
-    (bag.schemes?.length || 0) +
-    (bag.rooms?.length || 0)
-  if (total === 0) return 'Nothing selected yet'
+function describeShowcaseSummary(bag, mode) {
+  // PR-45: union of draft + bag. Dedups refs across both sides so a
+  // layout that's both in the draft AND queued in the bag counts once.
+  const layoutSet = new Set([
+    ...(mode?.layout?.ref ? [mode.layout.ref] : []),
+    ...(bag.layouts || []),
+  ])
+  const schemeSet = new Set([
+    ...(mode?.scheme?.ref ? [mode.scheme.ref] : []),
+    ...(bag.schemes || []),
+  ])
+  const compSet = new Set([
+    ...(mode?.components || []).map((c) => c.ref),
+    ...(bag.components || []),
+  ])
+  const roomCount = bag.rooms?.length || 0
+  const total = layoutSet.size + schemeSet.size + compSet.size + roomCount
+  if (total === 0) return 'Nothing in the room yet'
   const parts = []
-  if (bag.rooms?.length)      parts.push(`${bag.rooms.length} room${bag.rooms.length === 1 ? '' : 's'}`)
-  if (bag.layouts?.length)    parts.push(`${bag.layouts.length} layout${bag.layouts.length === 1 ? '' : 's'}`)
-  if (bag.components?.length) parts.push(`${bag.components.length} component${bag.components.length === 1 ? '' : 's'}`)
-  if (bag.schemes?.length)    parts.push(`${bag.schemes.length} scheme${bag.schemes.length === 1 ? '' : 's'}`)
+  if (roomCount)        parts.push(`${roomCount} room${roomCount === 1 ? '' : 's'}`)
+  if (layoutSet.size)   parts.push(`${layoutSet.size} layout${layoutSet.size === 1 ? '' : 's'}`)
+  if (compSet.size)     parts.push(`${compSet.size} component${compSet.size === 1 ? '' : 's'}`)
+  if (schemeSet.size)   parts.push(`${schemeSet.size} scheme${schemeSet.size === 1 ? '' : 's'}`)
   return parts.join(' · ')
 }
 

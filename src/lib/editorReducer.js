@@ -492,6 +492,28 @@ export function editorReducer(state, action) {
     case 'LIBRARY_CLEAR':
       return { ...state, libraryBag: emptyLibraryBag() }
 
+    case 'ADD_REFS_TO_TRAY': {
+      // PR-45: bag components commit to the holding tray on Library
+      // close. Each ref becomes a fresh tray chip the user can drag
+      // onto a slot. Skip empties / dupes against existing tray chips
+      // so a re-commit doesn't pile up duplicate entries.
+      const existing = new Set((state.tray || []).map((t) => t.ref))
+      const refs = (action.refs || []).filter((r) => r && !existing.has(r))
+      if (refs.length === 0) return state
+      const newEntries = refs.map((ref) => ({
+        compId: genId('comp'),
+        ref,
+        fromSlot: null,
+        reason: 'added from Library',
+        config: {},
+      }))
+      return {
+        ...state,
+        tray: [...(state.tray || []), ...newEntries],
+        dirty: true,
+      }
+    }
+
     default:
       return state
   }

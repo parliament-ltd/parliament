@@ -168,6 +168,71 @@ export default function EditorView({ scope = 'room', blank = false }) {
     showToast('Drag a room from the left rail to start editing')
   }, [navigate, location.state, showToast])
 
+  // ── PR-45: Library apply-on-close ──────────────────────
+  // Clicking Build or Edit while Library is open commits the bag's
+  // diff against the draft via existing actions, then clears the bag.
+  // Library pill toggle itself doesn't commit — the cart persists for
+  // a return visit. Returns true on success, false if a conflict
+  // prevented commit (caller should NOT close Library in that case).
+  const handleCommitLibrary = useCallback(() => {
+    const bag = historyState.present.libraryBag
+    const draft = historyState.present.mode
+    if (!bag) return true
+
+    // Conflict check on union counts: refuse to close if the user has
+    // queued a second layout / scheme alongside what's already in the
+    // draft (or two in the bag).
+    const layoutSet = new Set([
+      ...(draft?.layout?.ref ? [draft.layout.ref] : []),
+      ...(bag.layouts || []),
+    ])
+    const schemeSet = new Set([
+      ...(draft?.scheme?.ref ? [draft.scheme.ref] : []),
+      ...(bag.schemes || []),
+    ])
+    if (layoutSet.size > 1) {
+      showToast('Resolve the layout conflict before continuing.')
+      return false
+    }
+    if (schemeSet.size > 1) {
+      showToast('Resolve the scheme conflict before continuing.')
+      return false
+    }
+
+    // Apply the diff. Layout swap on a populated canvas bypasses the
+    // migration dialog — the user already chose the layout in Library;
+    // re-asking would be condescending. Orphaned components flow into
+    // the tray via the existing SWAP_LAYOUT path.
+    const layoutToApply = bag.layouts[0]
+    if (layoutToApply && layoutToApply !== draft?.layout?.ref) {
+      if (!draft) {
+        dispatch({ type: 'INIT_FROM_LAYOUT', layoutRef: layoutToApply })
+      } else {
+        dispatch({ type: 'SWAP_LAYOUT', layoutRef: layoutToApply })
+      }
+    }
+
+    const schemeToApply = bag.schemes[0]
+    if (draft && schemeToApply && schemeToApply !== draft?.scheme?.ref) {
+      dispatch({ type: 'APPLY_SCHEME', schemeRef: schemeToApply })
+    }
+
+    // Each bag component ref not already placed in the draft becomes
+    // a fresh holding-tray chip. (Layout-swap orphans may also land in
+    // the tray via SWAP_LAYOUT above — the reducer dedupes by ref.)
+    const placedRefs = new Set((draft?.components || []).map((c) => c.ref))
+    const newCompRefs = (bag.components || []).filter((ref) => !placedRefs.has(ref))
+    if (newCompRefs.length > 0) {
+      dispatch({ type: 'ADD_REFS_TO_TRAY', refs: newCompRefs })
+    }
+
+    dispatch({ type: 'LIBRARY_CLEAR' })
+    if (newCompRefs.length > 0) {
+      showToast(`Added ${newCompRefs.length} component${newCompRefs.length === 1 ? '' : 's'} to the holding tray.`)
+    }
+    return true
+  }, [historyState, showToast])
+
   // ── Save ───────────────────────────────────────────────
   const handleSave = useCallback(async () => {
     if (saving) return
@@ -515,6 +580,7 @@ export default function EditorView({ scope = 'room', blank = false }) {
           libraryOpen={libraryOpen}
           onOpenLibrary={() => setLibraryOpen(true)}
           onCloseLibrary={() => setLibraryOpen(false)}
+          onCommitLibrary={handleCommitLibrary}
         />
         <div className="grid grid-cols-[300px_1fr_300px] flex-1 min-h-0">
           <EditorLeftRail
@@ -530,6 +596,7 @@ export default function EditorView({ scope = 'room', blank = false }) {
             {libraryOpen ? (
               <EditorLibraryMode
                 scope={scope}
+                mode={state.mode}
                 bag={state.libraryBag}
                 modes={modes}
                 catalogEntries={catalogEntries}
@@ -537,6 +604,18 @@ export default function EditorView({ scope = 'room', blank = false }) {
                   dispatch({ type: 'LIBRARY_TOGGLE', kind, ref, room })
                 }
                 onShowToast={showToast}
+                onRemovePlacedComponent={(ref) => {
+                  // PR-45: Showcase hover-x / click on a placed
+                  // component removes every instance of that ref from
+                  // the draft. One ref = one Showcase card, so the
+                  // user's mental model is "remove this type from the
+                  // room"; multi-instance editing happens via slot-
+                  // level UI (right rail, drag).
+                  const placed = (state.mode?.components || []).filter((c) => c.ref === ref)
+                  for (const c of placed) {
+                    dispatch({ type: 'REMOVE_COMPONENT', componentId: c.id })
+                  }
+                }}
               />
             ) : (
               <>

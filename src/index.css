@@ -1153,6 +1153,40 @@
   .layout-panel-content { transition: none; }
 }
 
+/* ── Editor holding tray (PR-45) ──────────────────────────
+   Chip X moves from inline (always visible) to a small badge in the
+   top-right corner of each chip, hover-revealed. Matches the Library
+   Showcase hover-x pattern so removal feels consistent. */
+.tray-chip-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.tray-chip-x {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-gold-light);
+  color: var(--p-gold-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s, color 0.12s, background 0.12s;
+}
+.tray-chip-wrap:hover .tray-chip-x,
+.tray-chip-x:focus-visible {
+  opacity: 1;
+}
+.tray-chip-x:hover {
+  color: #C8313B;
+  background: rgba(200, 49, 59, 0.10);
+}
+
 /* ── Editor Library mode (PR-44) ──────────────────────────
    The "shopping" surface that replaces the canvas when the user
    clicks the Library pill in the editor top bar. Three chevron-
@@ -1225,6 +1259,24 @@
 .editor-library-showcase-card.is-warning {
   border-color: #E0A300;
   background: rgba(224, 163, 0, 0.08);
+}
+/* PR-45: items already placed in the draft render with a subtle
+   "In room" tag in the kind row so users can tell at a glance which
+   Showcase cards are committed vs which are still pending in the bag. */
+.editor-library-showcase-card.is-placed {
+  background: var(--p-bg-surface);
+}
+.editor-library-showcase-card-placed-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: 7px;
+  background: rgba(196, 169, 77, 0.14);
+  color: var(--p-gold-deep, #8B6A10);
+  font-size: 8.5px;
+  letter-spacing: 0.3px;
+  line-height: 12px;
+  vertical-align: 1px;
 }
 .editor-library-showcase-card-kind {
   font-size: 9.5px;
