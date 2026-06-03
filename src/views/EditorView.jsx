@@ -34,10 +34,81 @@ import {
   canUndo,
   canRedo,
 } from '../lib/editorHistory'
-import { planLayoutMigration } from '../lib/layoutMigration'
+import { planLayoutMigration, applyLayoutMigration } from '../lib/layoutMigration'
 import { listModes, loadHomepageMode, loadMode, saveMode, createCopyOfMode } from '../lib/modes'
 import { useIsNarrow } from '../lib/useViewportWidth'
 import { listEntries as listCatalogEntries } from '../catalog'
+
+// PR-48d: pure helper used by onStartCopy when forking from Edit while
+// Library is open. Applies the bag's layout, scheme, and components
+// to a copy of the source mode. Returns { mode, tray } where `tray`
+// is the seed for the fork's holding tray.
+function applyBagToMode(srcMode, bag) {
+  let mode = JSON.parse(JSON.stringify(srcMode))
+  const tray = []
+
+  // Layout swap (with migration → orphans → tray).
+  const layoutRef = bag.layouts?.[0]
+  if (layoutRef && layoutRef !== mode.layout?.ref) {
+    const plan = planLayoutMigration({
+      fromLayout: mode.layout?.ref,
+      toLayout: layoutRef,
+      components: mode.components || [],
+    })
+    const moved = applyLayoutMigration({
+      components: mode.components || [],
+      moves: plan.moves,
+      orphans: plan.orphans,
+    })
+    const orphanIds = new Set(plan.orphans.map((o) => o.compId))
+    const orphanSpecs = (mode.components || []).filter((c) => orphanIds.has(c.id))
+    for (const o of plan.orphans) {
+      const spec = orphanSpecs.find((s) => s.id === o.compId) || {}
+      const entry = {
+        compId: o.compId,
+        ref: spec.ref,
+        fromSlot: o.fromSlot,
+        reason: o.reason,
+        config: spec.config || {},
+      }
+      if (spec.sourceRoomId) entry.sourceRoomId = spec.sourceRoomId
+      tray.push(entry)
+    }
+    const newLayout = { ref: layoutRef }
+    const layoutSrc = bag.sourceRooms?.layouts?.[layoutRef]?.[0]
+    if (layoutSrc) newLayout.sourceRoomId = layoutSrc
+    mode.layout = newLayout
+    mode.components = moved
+  }
+
+  // Scheme.
+  const schemeRef = bag.schemes?.[0]
+  if (schemeRef && schemeRef !== mode.scheme?.ref) {
+    const newScheme = { ref: schemeRef }
+    const schemeSrc = bag.sourceRooms?.schemes?.[schemeRef]?.[0]
+    if (schemeSrc) newScheme.sourceRoomId = schemeSrc
+    mode.scheme = newScheme
+  }
+
+  // New components → tray (dedup against placed + tray-so-far).
+  const placedRefs = new Set((mode.components || []).map((c) => c.ref))
+  const trayRefs = new Set(tray.map((t) => t.ref))
+  for (const ref of bag.components || []) {
+    if (placedRefs.has(ref) || trayRefs.has(ref)) continue
+    const entry = {
+      compId: `comp_${crypto.randomUUID()}`,
+      ref,
+      fromSlot: null,
+      reason: 'added from Library',
+      config: {},
+    }
+    const srcId = bag.sourceRooms?.components?.[ref]?.[0]
+    if (srcId) entry.sourceRoomId = srcId
+    tray.push(entry)
+  }
+
+  return { mode, tray }
+}
 
 export default function EditorView({ scope = 'room', blank = false }) {
   const navigate = useNavigate()
@@ -46,7 +117,11 @@ export default function EditorView({ scope = 'room', blank = false }) {
   // PR-19e: when the user clicks the Build pill from Edit mode, the
   // parent navigates to /edit with location.state.seedMode set to a
   // freshly-copied draft. The blank-canvas load path picks it up.
+  // PR-48d: forks from Edit while Library was open also carry an
+  // initialTray of unplaced bag components — read here to keep the
+  // init-useEffect dep list honest.
   const seedMode = location.state?.seedMode || null
+  const seedTray = location.state?.initialTray || null
   // The editor's three-rail D&D model is unusable below ~768px. PR-15
   // gates with a friendly full-screen panel; V3 will replace this with
   // a phone-first wizard-per-section editor (see refactor docs).
@@ -94,7 +169,13 @@ export default function EditorView({ scope = 'room', blank = false }) {
         // will persist it as a new room.
         if (blank) {
           if (!cancelled) {
-            dispatch({ type: 'RESET_TO', mode: seedMode })
+            // PR-48d: forking with a pre-applied bag lands new
+            // components in the fork's holding tray via initialTray.
+            dispatch({
+              type: 'RESET_TO',
+              mode: seedMode,
+              initialTray: seedTray,
+            })
             setLoaded(true)
           }
           return
@@ -116,7 +197,7 @@ export default function EditorView({ scope = 'room', blank = false }) {
     }
     init()
     return () => { cancelled = true }
-  }, [scope, roomId, blank, seedMode])
+  }, [scope, roomId, blank, seedMode, seedTray])
 
   // ── Load modes list for Rooms tab + drop lookups ───────
   useEffect(() => {
@@ -143,20 +224,53 @@ export default function EditorView({ scope = 'room', blank = false }) {
   // Build pill (from Edit) copies the current canvas state — including
   // unsaved edits — into a new draft and navigates to /edit with the
   // seed in router state. The original room is untouched on disk.
-  // Edit pill (from Build) navigates to the Rooms tab so the user can
-  // pick a room to edit.
+  // PR-48d: when Library is open with pending bag items, the bag
+  // applies to the FORK, not the source draft. Layout swap migrates
+  // components into the fork's tray; new bag components become tray
+  // entries on the fork; scheme updates the fork's scheme. The source
+  // room stays clean. Without this, the prior commitIfOpen → onStart
+  // sequence committed to the source then forked a pre-commit copy.
   const onStartCopy = useCallback(() => {
     const sourceMode = historyState.present?.mode
     if (!sourceMode) return
-    const draft = createCopyOfMode(sourceMode)
+    let draft = createCopyOfMode(sourceMode)
+    let initialTray = null
+    const bag = historyState.present?.libraryBag
+    if (libraryOpen && bag) {
+      // Conflict refusal lives here — same union check as
+      // handleCommitLibrary, but on the COPY's fields.
+      const layoutSet = new Set([
+        ...(draft?.layout?.ref ? [draft.layout.ref] : []),
+        ...(bag.layouts || []),
+      ])
+      const schemeSet = new Set([
+        ...(draft?.scheme?.ref ? [draft.scheme.ref] : []),
+        ...(bag.schemes || []),
+      ])
+      if (layoutSet.size > 1) {
+        showToast('Resolve the layout conflict before continuing.')
+        return
+      }
+      if (schemeSet.size > 1) {
+        showToast('Resolve the scheme conflict before continuing.')
+        return
+      }
+      const applied = applyBagToMode(draft, bag)
+      draft = applied.mode
+      initialTray = applied.tray
+      // Clear the bag on the source state; the fork carries the
+      // committed result. Source draft is unchanged.
+      dispatch({ type: 'LIBRARY_CLEAR' })
+      setLibraryOpen(false)
+    }
     // PR-28g: carry the source room id so the Edit pill can navigate
     // back to it. Previously the Edit pill always blanked the canvas
     // via /edit?tab=rooms, which wiped the user's in-progress work
     // when they were toggling Build ↔ Edit on a populated canvas.
     navigate('/edit', {
-      state: { seedMode: draft, returnToRoomId: sourceMode.id },
+      state: { seedMode: draft, returnToRoomId: sourceMode.id, initialTray },
     })
-  }, [historyState, navigate])
+  }, [historyState, libraryOpen, navigate, showToast])
   const onSwitchToEdit = useCallback(() => {
     // PR-28g: if we got to /edit (build mode) from /edit/:id, return
     // there instead of blanking the canvas. Carries the user's

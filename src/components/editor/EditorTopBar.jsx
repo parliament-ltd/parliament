@@ -156,6 +156,13 @@ export default function EditorTopBar({
       return
     }
     if (buildActive) return
+    // PR-48d: forking from Edit with Library open — onStartCopy
+    // applies the bag to the FORK (not the source). Skip the
+    // commit-to-current path so the source room stays clean.
+    if (libraryOpen) {
+      onStartCopy?.()
+      return
+    }
     if (!commitIfOpen()) return
     if (onStartCopy) onStartCopy()
   }

@@ -306,10 +306,19 @@ export function editorReducer(state, action) {
         dirty: false,
       }
 
-    case 'RESET_TO':
+    case 'RESET_TO': {
       // Replace state entirely. Used on initial load — the history
       // wrapper treats this as a hard reset and discards undo history.
-      return makeInitialState(action.mode)
+      // PR-48d: an optional initialTray seeds the holding tray (used
+      // when forking from Edit with a populated Library bag — bag
+      // components land on the fork's tray, not the source).
+      const fresh = makeInitialState(action.mode)
+      if (Array.isArray(action.initialTray) && action.initialTray.length > 0) {
+        fresh.tray = [...action.initialTray]
+        fresh.dirty = true
+      }
+      return fresh
+    }
 
     // ─── Blank-canvas materialization (PR-19d) ───────────
     case 'INIT_FROM_LAYOUT': {
