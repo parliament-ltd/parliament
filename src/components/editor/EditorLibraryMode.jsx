@@ -71,10 +71,14 @@ export default function EditorLibraryMode({
   // PR-45: hover-x on a Showcase item that's already placed in the
   // draft (the component case) needs to mutate the draft directly.
   // EditorView wires this to a handler that removes every placed
-  // instance of the ref. Layout / scheme removal toasts instead —
-  // a room can't go without a layout, and clearing a scheme isn't
-  // a clean action today.
+  // instance of the ref.
   onRemovePlacedComponent,
+  // PR-46: hover-x on the active layout when the bag has exactly one
+  // queued layout (i.e., the user has staged a swap and wants to
+  // commit it). EditorView's handler does the SWAP_LAYOUT + clears
+  // the bag entry + toasts. Same idea for scheme.
+  onSwapToBagLayout,
+  onSwapToBagScheme,
 }) {
   const [layouts, setLayouts] = useState([])
   const [openSections, setOpenSections] = useState({
@@ -179,10 +183,22 @@ export default function EditorLibraryMode({
       return
     }
     if (item.kind === 'layout') {
+      // PR-46: if the user staged exactly one replacement layout in
+      // the bag, treat hover-x on the active layout as "commit the
+      // swap." Anything else (no bag layout, or >1) keeps the old
+      // toast — too ambiguous to pick automatically.
+      if ((bag.layouts || []).length === 1 && onSwapToBagLayout) {
+        onSwapToBagLayout()
+        return
+      }
       onShowToast?.('A room needs a layout. Pick a new layout from the catalog below to swap.')
       return
     }
     if (item.kind === 'scheme') {
+      if ((bag.schemes || []).length === 1 && onSwapToBagScheme) {
+        onSwapToBagScheme()
+        return
+      }
       onShowToast?.('Pick a different scheme from the catalog below to change it.')
       return
     }

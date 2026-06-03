@@ -168,6 +168,39 @@ export default function EditorView({ scope = 'room', blank = false }) {
     showToast('Drag a room from the left rail to start editing')
   }, [navigate, location.state, showToast])
 
+  // ── PR-46: in-Library conflict-x swap ──────────────────
+  // Hover-x on the active layout in Showcase, when the bag has exactly
+  // one queued layout, swaps to the bag layout (migration moves
+  // components to the holding tray) and clears the bag entry. Lets
+  // the user resolve a layout conflict without bouncing through Build.
+  // Symmetric handler for schemes (APPLY_SCHEME has no migration —
+  // simpler, but the UX intent is the same).
+  const handleSwapToBagLayout = useCallback(() => {
+    const bag = historyState.present.libraryBag
+    const layoutRef = bag?.layouts?.[0]
+    if (!layoutRef) return false
+    const draft = historyState.present.mode
+    if (!draft) {
+      // Blank canvas — INIT_FROM_LAYOUT instead of SWAP_LAYOUT.
+      dispatch({ type: 'INIT_FROM_LAYOUT', layoutRef })
+    } else {
+      dispatch({ type: 'SWAP_LAYOUT', layoutRef })
+    }
+    dispatch({ type: 'LIBRARY_TOGGLE', kind: 'layout', ref: layoutRef })
+    showToast('New layout applied, components moved to holding.')
+    return true
+  }, [historyState, showToast])
+
+  const handleSwapToBagScheme = useCallback(() => {
+    const bag = historyState.present.libraryBag
+    const schemeRef = bag?.schemes?.[0]
+    if (!schemeRef) return false
+    dispatch({ type: 'APPLY_SCHEME', schemeRef })
+    dispatch({ type: 'LIBRARY_TOGGLE', kind: 'scheme', ref: schemeRef })
+    showToast('New scheme applied.')
+    return true
+  }, [historyState, showToast])
+
   // ── PR-45: Library apply-on-close ──────────────────────
   // Clicking Build or Edit while Library is open commits the bag's
   // diff against the draft via existing actions, then clears the bag.
@@ -616,6 +649,8 @@ export default function EditorView({ scope = 'room', blank = false }) {
                     dispatch({ type: 'REMOVE_COMPONENT', componentId: c.id })
                   }
                 }}
+                onSwapToBagLayout={handleSwapToBagLayout}
+                onSwapToBagScheme={handleSwapToBagScheme}
               />
             ) : (
               <>
