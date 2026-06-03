@@ -4,10 +4,11 @@
 //
 // State shape:
 //   {
-//     mode:       parliament-mode/1.0 mode object (the draft)
-//     selection:  { type: 'room'|'slot'|'component', id?: string }
-//     tray:       Array<{compId, ref, fromSlot, reason, config}>  // orphans pulled out by a layout migration
-//     dirty:      boolean — true if mutated since last load/save
+//     mode:        parliament-mode/1.0 mode object (the draft)
+//     selection:   { type: 'room'|'slot'|'component', id?: string }
+//     tray:        Array<{compId, ref, fromSlot, reason, config}>  // orphans pulled out by a layout migration
+//     libraryBag:  PR-44 shopping-cart state for Library mode (see below)
+//     dirty:       boolean — true if mutated since last load/save
 //   }
 //
 // Selection is held alongside mode rather than on the mode itself — it's
@@ -15,6 +16,25 @@
 //
 // Tray entries hold enough of the component spec that dragging them back
 // onto a slot (RESTORE_FROM_TRAY) reconstitutes a full component spec.
+//
+// PR-44: libraryBag is the user's set of Library-mode selections — the
+// "shopping cart" that feeds Build mode in PR-45. Shape:
+//   {
+//     layouts:     string[]  // layout refs (e.g. 'three-panel@1.0')
+//     components:  string[]  // component refs (e.g. 'highlights@1.0')
+//     schemes:     string[]  // scheme refs (e.g. 'parliament@1.0')
+//     rooms:       string[]  // mode ids of checked rooms
+//     sourceRooms: { layouts|components|schemes: { ref: roomId[] } }
+//   }
+// sourceRooms tracks which rooms (if any) contributed each item, so the
+// Showcase can render colored-glow grouping by source room. An item not
+// present in sourceRooms (or with an empty list) was added directly via
+// a Library card click, not via a room.
+//
+// Library actions do NOT set dirty: the bag is transient UI state, not
+// part of the saved mode file. They also don't push to the editor's
+// undo/redo history (see editorHistory.js) — undo there covers canvas
+// changes only.
 
 import { applyLayoutMigration, planLayoutMigration } from './layoutMigration'
 import { createBlankMode } from './modes'
@@ -24,8 +44,25 @@ export function makeInitialState(mode) {
     mode: cloneMode(mode),
     selection: { type: 'room' },
     tray: [],
+    libraryBag: emptyLibraryBag(),
     dirty: false,
   }
+}
+
+function emptyLibraryBag() {
+  return {
+    layouts: [],
+    components: [],
+    schemes: [],
+    rooms: [],
+    sourceRooms: { layouts: {}, components: {}, schemes: {} },
+  }
+}
+
+// PR-44: pluralised bag key for a given item kind.
+// 'layout' → 'layouts', etc. 'room' → 'rooms'.
+function bagKeyFor(kind) {
+  return `${kind}s`
 }
 
 function cloneMode(mode) {
@@ -269,6 +306,7 @@ export function editorReducer(state, action) {
         mode: fresh,
         selection: { type: 'room' },
         tray: [],
+        libraryBag: state.libraryBag || emptyLibraryBag(),
         dirty: true,
       }
     }
@@ -370,6 +408,89 @@ export function editorReducer(state, action) {
         dirty: true,
       }
     }
+
+    // ─── PR-44: Library mode shopping cart ───────────────
+    case 'LIBRARY_TOGGLE': {
+      // Toggle an item in the bag. `kind` is 'layout' | 'component' |
+      // 'scheme' | 'room'. For rooms, the room's constituent layout,
+      // scheme, and components are also added (or, on toggle-off, the
+      // room is dropped from sourceRooms — constituent items stay so
+      // the user can manage them independently).
+      const { kind, ref } = action
+      const key = bagKeyFor(kind)
+      const bag = state.libraryBag || emptyLibraryBag()
+      const list = bag[key] || []
+      const present = list.includes(ref)
+
+      if (present) {
+        let nextBag = {
+          ...bag,
+          [key]: list.filter((r) => r !== ref),
+          sourceRooms: { ...bag.sourceRooms },
+        }
+        // Drop sourceRooms tracking for this item (if any).
+        if (kind !== 'room' && nextBag.sourceRooms[key]) {
+          const { [ref]: _drop, ...rest } = nextBag.sourceRooms[key]
+          nextBag.sourceRooms = { ...nextBag.sourceRooms, [key]: rest }
+        }
+        // Toggling off a room: drop this room id from every item's
+        // source list. Constituent items stay in the bag; only the
+        // colored-glow association is severed.
+        if (kind === 'room') {
+          for (const itemKind of ['layouts', 'components', 'schemes']) {
+            const map = nextBag.sourceRooms[itemKind] || {}
+            const updated = {}
+            for (const [itemRef, roomIds] of Object.entries(map)) {
+              const filtered = roomIds.filter((id) => id !== ref)
+              if (filtered.length > 0) updated[itemRef] = filtered
+            }
+            nextBag.sourceRooms = { ...nextBag.sourceRooms, [itemKind]: updated }
+          }
+        }
+        return { ...state, libraryBag: nextBag }
+      }
+
+      // Toggle on.
+      let nextBag = {
+        ...bag,
+        [key]: [...list, ref],
+        sourceRooms: { ...bag.sourceRooms },
+      }
+
+      // Rooms expand into their constituent layout/scheme/components.
+      // The room id is passed through action.room as a snapshot.
+      if (kind === 'room' && action.room) {
+        const room = action.room
+        const roomId = ref
+        const layoutRef = room.layout?.ref || null
+        const schemeRef = room.scheme?.ref || null
+        const compRefs = [...new Set((room.components || []).map((c) => c.ref))]
+
+        const addWithSource = (itemKey, itemRef) => {
+          if (!itemRef) return
+          const itemList = nextBag[itemKey] || []
+          if (!itemList.includes(itemRef)) {
+            nextBag[itemKey] = [...itemList, itemRef]
+          }
+          const srcMap = nextBag.sourceRooms[itemKey] || {}
+          const existing = srcMap[itemRef] || []
+          if (!existing.includes(roomId)) {
+            nextBag.sourceRooms = {
+              ...nextBag.sourceRooms,
+              [itemKey]: { ...srcMap, [itemRef]: [...existing, roomId] },
+            }
+          }
+        }
+        addWithSource('layouts', layoutRef)
+        addWithSource('schemes', schemeRef)
+        for (const r of compRefs) addWithSource('components', r)
+      }
+
+      return { ...state, libraryBag: nextBag }
+    }
+
+    case 'LIBRARY_CLEAR':
+      return { ...state, libraryBag: emptyLibraryBag() }
 
     default:
       return state

@@ -28,9 +28,10 @@
 //   - Tab state is URL-synced via ?tab=. Initial tab respects the
 //     query; default is 'rooms' on /edit (blank) and 'layouts' elsewhere.
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDraggable } from '@dnd-kit/core'
 import { useSearchParams } from 'react-router-dom'
+import { Search, X as XIcon } from 'lucide-react'
 import { initDB } from '../../lib/db'
 import { SCHEMES } from '../../lib/schemes'
 import LibraryCard from '../LibraryCard'
@@ -57,6 +58,12 @@ export default function EditorLeftRail({
     : defaultTab
   const [tab, setTab] = useState(initialTab)
   const [layouts, setLayouts] = useState([])
+  // PR-44: search bar above the tabs. Filters cards in the active tab,
+  // and auto-switches to the first tab with matches when the query
+  // changes — so typing 'highlights' while Layouts is active jumps
+  // straight to Components.
+  const [search, setSearch] = useState('')
+  const query = search.trim().toLowerCase()
 
   function selectTab(id) {
     setTab(id)
@@ -82,50 +89,169 @@ export default function EditorLeftRail({
     return () => { cancelled = true }
   }, [scope])
 
+  // Per-tab filtered lists. Recomputed when the search query or the
+  // source lists change. Empty query → unfiltered (each tab gets its
+  // full list back).
+  const filtered = useMemo(() => {
+    return {
+      layouts: filterLayouts(layouts, query),
+      components: filterComponents(catalogEntries, query),
+      schemes: filterSchemes(SCHEMES, query),
+      rooms: filterRooms(modes || [], query),
+    }
+  }, [layouts, catalogEntries, modes, query])
+
+  // Auto-switch tabs when the query gains hits in a different tab.
+  // Track the last query we reacted to so we only switch when the
+  // query actually changes (not on every render).
+  const [prevQuery, setPrevQuery] = useState(query)
+  if (prevQuery !== query) {
+    setPrevQuery(query)
+    if (query.length > 0) {
+      const order = ['layouts', 'components', 'schemes', 'rooms']
+      const activeHasHits = (filtered[tab]?.length || 0) > 0
+      if (!activeHasHits) {
+        const firstHit = order.find((t) => (filtered[t]?.length || 0) > 0)
+        if (firstHit && firstHit !== tab) selectTab(firstHit)
+      }
+    }
+  }
+
   return (
     <aside className="bg-white border-r border-[var(--p-border)] flex flex-col overflow-hidden">
+      <div className="px-3 pt-3 pb-2 border-b border-[var(--p-border)]">
+        <div className="relative">
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-[var(--p-text-muted)] pointer-events-none" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search the library"
+            aria-label="Search the library"
+            className="w-full pl-7 pr-7 py-1.5 rounded-md border border-[var(--p-border)] bg-[var(--p-bg-subtle)] text-[11.5px] text-[var(--p-text-primary)] placeholder:text-[var(--p-text-muted)] focus:outline-none focus:border-[var(--p-gold-light)] focus:bg-white transition-colors"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch('')}
+              aria-label="Clear search"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 w-5 h-5 inline-flex items-center justify-center rounded text-[var(--p-text-muted)] hover:text-[var(--p-text-primary)] hover:bg-[var(--p-bg-base)] transition-colors"
+            >
+              <XIcon className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+      </div>
       <div className="flex border-b border-[var(--p-border)]">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => selectTab(t.id)}
-            className={`flex-1 px-2 py-2.5 text-[11px] font-medium transition-colors border-b-[1.5px] ${
-              tab === t.id
-                ? 'text-[var(--p-gold-light)] border-[var(--p-gold-light)]'
-                : 'text-[var(--p-text-muted)] hover:text-[var(--p-text-secondary)] border-transparent'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+        {TABS.map((t) => {
+          const hits = filtered[t.id]?.length || 0
+          const dim = query.length > 0 && hits === 0
+          return (
+            <button
+              key={t.id}
+              onClick={() => selectTab(t.id)}
+              className={`flex-1 px-2 py-2.5 text-[11px] font-medium transition-colors border-b-[1.5px] ${
+                tab === t.id
+                  ? 'text-[var(--p-gold-light)] border-[var(--p-gold-light)]'
+                  : dim
+                    ? 'text-[var(--p-text-light)] border-transparent'
+                    : 'text-[var(--p-text-muted)] hover:text-[var(--p-text-secondary)] border-transparent'
+              }`}
+            >
+              {t.label}
+              {query.length > 0 && hits > 0 && (
+                <span className="ml-1 text-[9px] text-[var(--p-text-muted)]">{hits}</span>
+              )}
+            </button>
+          )
+        })}
       </div>
       <div className="flex-1 overflow-y-auto p-3">
         {tab === 'layouts' && (
-          <LayoutsTab layouts={layouts} currentLayoutRef={currentLayoutRef} />
+          <LayoutsTab
+            layouts={filtered.layouts}
+            currentLayoutRef={currentLayoutRef}
+            isFiltered={query.length > 0}
+          />
         )}
         {tab === 'components' && (
           <ComponentsTab
-            entries={catalogEntries}
+            entries={filtered.components}
             placedRefs={placedComponentRefs}
             scope={scope}
+            isFiltered={query.length > 0}
           />
         )}
         {tab === 'schemes' && (
-          <SchemesTab currentSchemeRef={currentSchemeRef} />
+          <SchemesTab
+            schemes={filtered.schemes}
+            currentSchemeRef={currentSchemeRef}
+            isFiltered={query.length > 0}
+          />
         )}
         {tab === 'rooms' && (
-          <RoomsTab modes={modes} editorScope={scope} />
+          <RoomsTab
+            modes={filtered.rooms}
+            editorScope={scope}
+            isFiltered={query.length > 0}
+            isLoading={!Array.isArray(modes)}
+          />
         )}
       </div>
     </aside>
   )
 }
 
+// PR-44: per-kind filter helpers. Each matches displayName + a kind-
+// specific secondary field (id/ref/scope) so a user searching for
+// 'three-panel' matches the layout id and not just the human name.
+function matches(haystack, query) {
+  if (!query) return true
+  if (!haystack) return false
+  return String(haystack).toLowerCase().includes(query)
+}
+
+function filterLayouts(layouts, query) {
+  if (!query) return layouts
+  return layouts.filter(
+    (l) => matches(l.displayName, query) || matches(l.id, query)
+  )
+}
+
+function filterComponents(entries, query) {
+  if (!query) return entries
+  return entries.filter(
+    (e) =>
+      matches(e.displayName, query) ||
+      matches(e.name, query) ||
+      matches(e.description, query)
+  )
+}
+
+function filterSchemes(schemes, query) {
+  if (!query) return schemes
+  return schemes.filter(
+    (s) => matches(s.displayName, query) || matches(s.id, query)
+  )
+}
+
+function filterRooms(modes, query) {
+  if (!query) return modes
+  return modes.filter((m) => {
+    const name = m.meta?.name?.trim() || (m.scope === 'homepage' ? 'Homepage' : 'Untitled')
+    return matches(name, query) || matches(m.layout?.ref, query)
+  })
+}
+
 // ─── Tabs ────────────────────────────────────────────────
 
-function LayoutsTab({ layouts, currentLayoutRef }) {
+function LayoutsTab({ layouts, currentLayoutRef, isFiltered }) {
   if (!layouts.length) {
-    return <div className="text-[10.5px] text-[var(--p-text-muted)]">No layouts available.</div>
+    return (
+      <div className="text-[10.5px] text-[var(--p-text-muted)]">
+        {isFiltered ? 'No matching layouts.' : 'No layouts available.'}
+      </div>
+    )
   }
   return (
     <div className="lrail-cards">
@@ -143,8 +269,15 @@ function LayoutsTab({ layouts, currentLayoutRef }) {
   )
 }
 
-function ComponentsTab({ entries, placedRefs, scope }) {
+function ComponentsTab({ entries, placedRefs, scope, isFiltered }) {
   const sorted = [...entries].sort((a, b) => a.displayName.localeCompare(b.displayName))
+  if (!sorted.length) {
+    return (
+      <div className="text-[10.5px] text-[var(--p-text-muted)]">
+        {isFiltered ? 'No matching components.' : 'No components available.'}
+      </div>
+    )
+  }
   return (
     <div className="lrail-cards">
       <div className="text-[10.5px] text-[var(--p-text-muted)] leading-[1.5] pb-2">
@@ -172,12 +305,16 @@ function ComponentsTab({ entries, placedRefs, scope }) {
   )
 }
 
-function RoomsTab({ modes, editorScope }) {
-  if (!Array.isArray(modes)) {
+function RoomsTab({ modes, editorScope, isFiltered, isLoading }) {
+  if (isLoading) {
     return <div className="text-[10.5px] text-[var(--p-text-muted)]">Loading rooms…</div>
   }
-  if (modes.length === 0) {
-    return <div className="text-[10.5px] text-[var(--p-text-muted)]">No rooms yet. Build one to see it here.</div>
+  if (!Array.isArray(modes) || modes.length === 0) {
+    return (
+      <div className="text-[10.5px] text-[var(--p-text-muted)]">
+        {isFiltered ? 'No matching rooms.' : 'No rooms yet. Build one to see it here.'}
+      </div>
+    )
   }
   const sorted = sortRooms(modes)
   return (
@@ -206,13 +343,21 @@ function RoomsTab({ modes, editorScope }) {
   )
 }
 
-function SchemesTab({ currentSchemeRef }) {
+function SchemesTab({ schemes, currentSchemeRef, isFiltered }) {
+  const list = schemes || SCHEMES
+  if (!list.length) {
+    return (
+      <div className="text-[10.5px] text-[var(--p-text-muted)]">
+        {isFiltered ? 'No matching schemes.' : 'No schemes available.'}
+      </div>
+    )
+  }
   return (
     <div className="lrail-cards">
       <div className="text-[10.5px] text-[var(--p-text-muted)] leading-[1.5] pb-2">
         Drag a scheme onto the canvas to apply.
       </div>
-      {SCHEMES.map((s) => {
+      {list.map((s) => {
         const ref = s.id // already 'parliament@1.0' etc — no second @1.0 needed
         return (
           <DraggableSchemeCard
