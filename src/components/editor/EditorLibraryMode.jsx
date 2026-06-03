@@ -87,6 +87,15 @@ export default function EditorLibraryMode({
     details: false,
   })
   const [focused, setFocused] = useState(null) // { kind, ref }
+  // PR-46c: scroll the Details section into view when focus changes so
+  // a card click doesn't leave the user staring at the Library grid
+  // with the Details panel below the fold.
+  const detailsRef = useRef(null)
+  useEffect(() => {
+    if (focused && detailsRef.current) {
+      detailsRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  }, [focused])
   const [filterChip, setFilterChip] = useState('all')
   const [search, setSearch] = useState('')
   const query = search.trim().toLowerCase()
@@ -257,19 +266,21 @@ export default function EditorLibraryMode({
         />
       </Section>
 
-      <Section
-        title="Details"
-        subtitle={focusedItem ? focusedItem.displayName : 'Click a card to view details'}
-        open={openSections.details}
-        onToggle={() => toggleSection('details')}
-      >
-        <DetailsBody
-          item={focusedItem}
-          bag={bag}
-          mode={mode}
-          onCardClick={handleCardClick}
-        />
-      </Section>
+      <div ref={detailsRef}>
+        <Section
+          title="Details"
+          subtitle={focusedItem ? focusedItem.displayName : 'Click a card to view details'}
+          open={openSections.details}
+          onToggle={() => toggleSection('details')}
+        >
+          <DetailsBody
+            item={focusedItem}
+            bag={bag}
+            mode={mode}
+            onCardClick={handleCardClick}
+          />
+        </Section>
+      </div>
     </div>
   )
 }

@@ -1446,7 +1446,13 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 12px;
-  padding: 4px 0;
+  padding: 4px 2px;
+  /* PR-46c: cap the catalog grid so a large catalog doesn't push the
+     Details section below the fold. The grid scrolls internally; the
+     page only scrolls if Showcase + Details are both populated and
+     tall. Roughly two rows visible at typical card width. */
+  max-height: 320px;
+  overflow-y: auto;
 }
 .editor-library-card-wrap {
   position: relative;
