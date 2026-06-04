@@ -8,7 +8,7 @@
 // horizontal strip of slot rectangles drawn from LAYOUT_SLOTS — users
 // can still configure rooms before those layouts get full renderers.
 
-import { useDroppable } from '@dnd-kit/core'
+import { useDraggable, useDroppable } from '@dnd-kit/core'
 import { getLayoutSlots } from '../../lib/layoutMigration'
 import { findCatalogEntry, normalizeRef } from '../../lib/refs'
 import { schemeName } from '../../lib/schemes'
@@ -304,14 +304,28 @@ function findEntry(entries, ref) {
 }
 
 function ComponentPreview({ spec, entry, selected, onSelect }) {
+  // PR-49b: placed components are draggable between slots. The reducer
+  // (MOVE_COMPONENT) and EditorView's drop handler were already wired
+  // for this case from a prior PR — only the UI hook was missing.
+  // Click-to-select still fires because dnd-kit's pointer sensor has
+  // an activation distance threshold; a press-without-drag passes
+  // through to onClick.
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `placed-${spec.id}`,
+    data: { kind: 'component', componentId: spec.id, ref: spec.ref },
+  })
   return (
     <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
       onClick={(e) => {
         e.stopPropagation()
         onSelect()
       }}
-      className="editor-component-card relative"
+      className={`editor-component-card relative${isDragging ? ' is-dragging' : ''}`}
       data-selected={selected ? 'true' : 'false'}
+      style={{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none' }}
     >
       <div className="text-[9.5px] uppercase tracking-wider font-medium text-[var(--p-gold-muted)] mb-1">
         {entry?.displayName || spec.ref}

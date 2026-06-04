@@ -25,7 +25,10 @@ import { editorReducer, makeInitialState } from './editorReducer'
 const HISTORY_ACTIONS = new Set([
   'PLACE_COMPONENT',
   'MOVE_COMPONENT',
-  'REMOVE_COMPONENT',
+  // PR-49a: removing a placed component sends it to the holding tray
+  // (no true-delete action exists for canvas components anymore — the
+  // tray's x via DISMISS_FROM_TRAY is the only permanent removal path).
+  'MOVE_COMPONENT_TO_TRAY',
   'SWAP_LAYOUT',
   'APPLY_SCHEME',
   'UPDATE_COMPONENT_CONFIG',

@@ -1093,6 +1093,14 @@
   border-color: var(--p-gold-light);
   outline: 1px solid var(--p-gold-light);
 }
+/* PR-49b: subtle feedback while a placed component is being dragged
+   between slots. dnd-kit keeps the source mounted in place during the
+   drag (the visual move is a transform on the overlay), so fading the
+   source while it's airborne makes the move feel real. */
+.editor-component-card.is-dragging {
+  opacity: 0.4;
+  box-shadow: 0 0 0 1px var(--p-gold-light);
+}
 
 /* ── Runtime layout-panel slide toggle (PR-27) ────────────
    Per-slot opt-in lives in mode.layoutConfig.panelButtons. When

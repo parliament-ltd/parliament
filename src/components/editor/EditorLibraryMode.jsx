@@ -14,10 +14,11 @@
 //                    that room's deterministic color. Hover any card →
 //                    x in the top-right. For bag items the x just
 //                    removes from bag; for draft items it dispatches
-//                    REMOVE_COMPONENT / clear-layout / clear-scheme
-//                    immediately on the draft (per user decision in
-//                    PR-45 planning). Conflict outline + toast when the
-//                    union has more than one layout / scheme.
+//                    MOVE_COMPONENT_TO_TRAY (PR-49a) / clear-layout /
+//                    clear-scheme immediately on the draft (per user
+//                    decision in PR-45 planning). Conflict outline +
+//                    toast when the union has more than one layout /
+//                    scheme.
 //
 //   2. Library     — filter chips (All / Layouts / Components / …) +
 //                    an in-section search bar + a grid of LibraryCards
