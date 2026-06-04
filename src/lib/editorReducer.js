@@ -178,11 +178,32 @@ export function editorReducer(state, action) {
       }
     }
 
-    case 'REMOVE_COMPONENT': {
+    case 'MOVE_COMPONENT_TO_TRAY': {
+      // PR-49a: "Remove from spot" no longer drops the component
+      // outright — it sends the instance to the holding tray so the
+      // user can either restore it (drag back onto a slot) or
+      // confirm-delete via the tray's x. Same safety pattern dnd-kit
+      // already gives orphans from a layout swap.
+      //
+      // Preserves the component's id (as compId), ref, config, and
+      // sourceRoomId so RESTORE_FROM_TRAY rehydrates the same instance
+      // it removed. No dedup against existing tray refs: two distinct
+      // placed instances become two distinct chips.
+      const target = (state.mode.components || []).find(
+        (c) => c.id === action.componentId
+      )
+      if (!target) return state
       const components = (state.mode.components || []).filter(
         (c) => c.id !== action.componentId
       )
-      // If the removed component was selected, fall back to the room.
+      const chip = {
+        compId: target.id,
+        ref: target.ref,
+        fromSlot: target.slot || null,
+        reason: 'removed from canvas',
+        config: target.config || {},
+      }
+      if (target.sourceRoomId) chip.sourceRoomId = target.sourceRoomId
       const selection =
         state.selection.type === 'component' && state.selection.id === action.componentId
           ? { type: 'room' }
@@ -190,6 +211,7 @@ export function editorReducer(state, action) {
       return {
         ...state,
         mode: { ...state.mode, components },
+        tray: [...(state.tray || []), chip],
         selection,
         dirty: true,
       }

@@ -786,9 +786,14 @@ export default function EditorView({ scope = 'room', blank = false }) {
                   // user's mental model is "remove this type from the
                   // room"; multi-instance editing happens via slot-
                   // level UI (right rail, drag).
+                  //
+                  // PR-49a: route through the tray instead of dropping
+                  // outright. Multi-instance moves become multi-chip
+                  // commits — the user can dismiss them en masse from
+                  // the tray or restore the ones they actually wanted.
                   const placed = (state.mode?.components || []).filter((c) => c.ref === ref)
                   for (const c of placed) {
-                    dispatch({ type: 'REMOVE_COMPONENT', componentId: c.id })
+                    dispatch({ type: 'MOVE_COMPONENT_TO_TRAY', componentId: c.id })
                   }
                 }}
                 onDismissTrayByRef={(ref) => {
@@ -833,7 +838,7 @@ export default function EditorView({ scope = 'room', blank = false }) {
             onSetPanelButton={(slotId, enabled) =>
               dispatch({ type: 'SET_PANEL_BUTTON', slotId, enabled })
             }
-            onRemoveComponent={(componentId) => dispatch({ type: 'REMOVE_COMPONENT', componentId })}
+            onRemoveComponent={(componentId) => dispatch({ type: 'MOVE_COMPONENT_TO_TRAY', componentId })}
           />
         </div>
 

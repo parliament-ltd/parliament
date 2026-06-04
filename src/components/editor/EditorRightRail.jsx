@@ -563,11 +563,16 @@ function ComponentFields({ mode, spec, entry, onUpdateConfig, onRemove }) {
       )}
 
       <div className="border-t border-[var(--p-border)] pt-3 mt-4">
+        {/* PR-49a: no longer a destructive action — the component goes
+            to the holding tray and can be restored (drag back) or
+            permanently dismissed (x in the tray). Hover color drops the
+            old red treatment since the action is now reversible. */}
         <button
           onClick={() => onRemove(componentId)}
-          className="w-full px-2.5 py-1.5 text-xs rounded-md border border-[var(--p-border)] bg-transparent text-[var(--p-text-secondary)] transition-colors hover:border-[#E03E3E] hover:text-[#E03E3E] hover:bg-[rgba(224,62,62,0.04)]"
+          className="w-full px-2.5 py-1.5 text-xs rounded-md border border-[var(--p-border)] bg-transparent text-[var(--p-text-secondary)] transition-colors hover:border-[var(--p-gold-light)] hover:text-[var(--p-gold-muted)] hover:bg-[rgba(196,169,77,0.06)]"
+          title="Move this component to the holding tray. Drag it back onto a slot to restore, or x it from the tray to delete."
         >
-          Remove from spot
+          Move to holding
         </button>
       </div>
     </div>
