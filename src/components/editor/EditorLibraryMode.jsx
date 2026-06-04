@@ -91,6 +91,20 @@ export default function EditorLibraryMode({
     library: true,
     details: false,
   })
+  // PR-48b: per-section heights, driven by drag handles at the bottom
+  // of each section. `null` means "auto" (content height). User-set
+  // values clamp to per-section min/max. Session-only — re-opens
+  // reset to auto (Showcase / Details) or the default cap (Library).
+  const [sectionHeights, setSectionHeights] = useState({
+    showcase: null,
+    library: 320,
+    details: null,
+  })
+  const SECTION_LIMITS = {
+    showcase: { min: 80, max: 600 },
+    library:  { min: 200, max: 720 },
+    details:  { min: 80, max: 500 },
+  }
   const [focused, setFocused] = useState(null) // { kind, ref }
   // PR-46c: scroll the Details section into view when focus changes so
   // a card click doesn't leave the user staring at the Library grid
@@ -155,6 +169,31 @@ export default function EditorLibraryMode({
 
   function toggleSection(key) {
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  // PR-48b: pointer drag on a section's resize handle updates its
+  // height. Clamped to per-section min/max. Live updates while
+  // dragging.
+  function startResize(key, e) {
+    e.preventDefault()
+    const startY = e.clientY
+    const startHeight = sectionHeights[key] ?? e.currentTarget.parentElement?.offsetHeight ?? 200
+    const limits = SECTION_LIMITS[key]
+    function onMove(ev) {
+      const delta = ev.clientY - startY
+      const next = Math.max(limits.min, Math.min(limits.max, startHeight + delta))
+      setSectionHeights((prev) => ({ ...prev, [key]: next }))
+    }
+    function onUp() {
+      document.removeEventListener('pointermove', onMove)
+      document.removeEventListener('pointerup', onUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+    document.addEventListener('pointermove', onMove)
+    document.addEventListener('pointerup', onUp)
+    document.body.style.cursor = 'row-resize'
+    document.body.style.userSelect = 'none'
   }
 
   // PR-45 / PR-46d: card click = toggle. If the card is checked
@@ -257,6 +296,8 @@ export default function EditorLibraryMode({
         subtitle={describeShowcaseSummary(bag, mode, tray)}
         open={openSections.showcase}
         onToggle={() => toggleSection('showcase')}
+        height={sectionHeights.showcase}
+        onResizeStart={(e) => startResize('showcase', e)}
       >
         <ShowcaseBody
           items={showcaseItems}
@@ -271,6 +312,8 @@ export default function EditorLibraryMode({
         subtitle={describeLibrarySummary(filteredCatalog, query)}
         open={openSections.library}
         onToggle={() => toggleSection('library')}
+        height={sectionHeights.library}
+        onResizeStart={(e) => startResize('library', e)}
       >
         <LibraryBody
           activeChip={filterChip}
@@ -292,6 +335,8 @@ export default function EditorLibraryMode({
           subtitle={focusedItem ? focusedItem.displayName : 'Click a card to view details'}
           open={openSections.details}
           onToggle={() => toggleSection('details')}
+          height={sectionHeights.details}
+          onResizeStart={(e) => startResize('details', e)}
         >
           <DetailsBody
             item={focusedItem}
@@ -309,7 +354,13 @@ export default function EditorLibraryMode({
 // ────────────────────────────────────────────────────────
 //  Section shell
 // ────────────────────────────────────────────────────────
-function Section({ title, subtitle, open, onToggle, children }) {
+function Section({ title, subtitle, open, onToggle, children, height, onResizeStart }) {
+  // PR-48b: when a user-set height is present, the body uses that
+  // exact height with internal overflow. `null` height means natural
+  // content height (auto). Resize handle only renders when open.
+  const bodyStyle = open && height
+    ? { height: `${height}px`, overflowY: 'auto' }
+    : undefined
   return (
     <div className="editor-library-section">
       <button
@@ -333,7 +384,22 @@ function Section({ title, subtitle, open, onToggle, children }) {
           )}
         </div>
       </button>
-      {open && <div className="editor-library-section-body">{children}</div>}
+      {open && (
+        <>
+          <div className="editor-library-section-body" style={bodyStyle}>
+            {children}
+          </div>
+          {onResizeStart && (
+            <div
+              className="editor-library-section-resize"
+              onPointerDown={onResizeStart}
+              role="separator"
+              aria-orientation="horizontal"
+              aria-label={`Resize ${title} section`}
+            />
+          )}
+        </>
+      )}
     </div>
   )
 }
@@ -357,6 +423,82 @@ function ShowcaseBody({ items, layoutConflict, schemeConflict, onRemove }) {
       {schemeConflict && (
         <ConflictBanner message="More than one scheme selected. A room can only use one." />
       )}
+      <ShowcaseGrid
+        items={items}
+        layoutConflict={layoutConflict}
+        schemeConflict={schemeConflict}
+        onRemove={onRemove}
+      />
+    </>
+  )
+}
+
+// PR-48c: thin SVG lines connecting Showcase cards that share a
+// sourceRoomId. Wrap ref hosts both the grid and the overlay so the
+// overlay can measure card positions relative to a common origin.
+// ResizeObserver keeps the lines aligned through resizes / reflows.
+function ShowcaseGrid({ items, layoutConflict, schemeConflict, onRemove }) {
+  const wrapRef = useRef(null)
+  const [edges, setEdges] = useState([])
+
+  const groups = useMemo(() => {
+    const map = new Map()
+    for (const it of items) {
+      if (!it.sourceRoomId) continue
+      const key = it.sourceRoomId
+      if (!map.has(key)) map.set(key, [])
+      map.get(key).push(it)
+    }
+    return [...map.entries()].filter(([, g]) => g.length >= 2)
+  }, [items])
+
+  useEffect(() => {
+    function measure() {
+      const wrap = wrapRef.current
+      if (!wrap) return
+      const wrapRect = wrap.getBoundingClientRect()
+      const next = []
+      for (const [roomId, group] of groups) {
+        const color = colorForRoomId(roomId)
+        const cards = group
+          .map((it) => {
+            const key = `${it.kind}-${it.ref}-${it.source}`
+            const el = wrap.querySelector(`[data-connect="${CSS.escape(key)}"]`)
+            if (!el) return null
+            const r = el.getBoundingClientRect()
+            return {
+              x: r.left - wrapRect.left + r.width / 2,
+              y: r.top - wrapRect.top + r.height / 2,
+            }
+          })
+          .filter(Boolean)
+        for (let i = 0; i < cards.length; i++) {
+          for (let j = i + 1; j < cards.length; j++) {
+            next.push({ a: cards[i], b: cards[j], color })
+          }
+        }
+      }
+      setEdges(next)
+    }
+    measure()
+    const wrap = wrapRef.current
+    if (!wrap) return
+    const ro = new ResizeObserver(measure)
+    ro.observe(wrap)
+    // Observe each card too so showing/hiding the resize handle on the
+    // ancestor section doesn't desync the line endpoints.
+    for (const el of wrap.querySelectorAll('[data-connect]')) {
+      ro.observe(el)
+    }
+    window.addEventListener('resize', measure)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', measure)
+    }
+  }, [groups, items])
+
+  return (
+    <div ref={wrapRef} className="editor-library-showcase-wrap">
       <div className="editor-library-showcase-grid">
         {items.map((item) => (
           <ShowcaseCard
@@ -370,7 +512,26 @@ function ShowcaseBody({ items, layoutConflict, schemeConflict, onRemove }) {
           />
         ))}
       </div>
-    </>
+      {edges.length > 0 && (
+        <svg
+          className="editor-library-showcase-overlay"
+          aria-hidden="true"
+          preserveAspectRatio="none"
+        >
+          {edges.map((e, idx) => (
+            <line
+              key={idx}
+              x1={e.a.x} y1={e.a.y}
+              x2={e.b.x} y2={e.b.y}
+              stroke={e.color}
+              strokeWidth="1"
+              strokeOpacity="0.35"
+              strokeLinecap="round"
+            />
+          ))}
+        </svg>
+      )}
+    </div>
   )
 }
 
@@ -381,10 +542,14 @@ function ShowcaseCard({ item, warning, onRemove }) {
   let tag = null
   if (isDraftItem) tag = 'In room'
   else if (isTrayItem) tag = 'In tray'
+  // PR-48c: data-connect lets the ConnectorOverlay find this card to
+  // measure its center for the bundle lines.
+  const connectKey = `${item.kind}-${item.ref}-${item.source}`
   return (
     <div
       className={`editor-library-showcase-card${warning ? ' is-warning' : ''}${glow ? ' has-glow' : ''}${isDraftItem ? ' is-placed' : ''}${isTrayItem ? ' is-tray' : ''}`}
       style={glow ? { '--glow': glow } : undefined}
+      data-connect={connectKey}
     >
       <div className="editor-library-showcase-card-kind">
         {item.kindLabel}

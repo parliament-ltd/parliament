@@ -1153,6 +1153,47 @@
   .layout-panel-content { transition: none; }
 }
 
+/* ── Editor grid + left-rail toggle (PR-48a) ──────────────
+   The 3-column editor grid transitions its template-columns when the
+   left rail collapses / expands, so the rail width animates smoothly
+   from 36px (collapsed) to 300px (expanded). The toggle button sits
+   on the rail's right edge — chevron-right when collapsed, chevron-
+   left when expanded — same visual language as the runtime
+   layout-panel-toggle. */
+.editor-grid {
+  transition: grid-template-columns 0.18s ease;
+}
+.editor-leftrail-toggle {
+  position: absolute;
+  top: 14px;
+  right: -10px;
+  width: 20px;
+  height: 28px;
+  border-radius: 5px;
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--p-text-muted);
+  cursor: pointer;
+  z-index: 12;
+  transition: color 0.15s, border-color 0.15s;
+}
+.editor-leftrail-toggle.is-collapsed {
+  position: relative;
+  top: 0;
+  right: 0;
+}
+.editor-leftrail-toggle:hover {
+  color: var(--p-gold-light);
+  border-color: var(--p-gold-light);
+}
+@media (prefers-reduced-motion: reduce) {
+  .editor-grid { transition: none; }
+}
+
 /* ── Editor top-bar primary action tooltip (PR-47) ────────
    Disabled buttons don't fire mouseenter in Chrome, so we wrap the
    button in a relative container and trigger the tooltip from the
@@ -1318,6 +1359,23 @@
 }
 
 /* ── Showcase ─────────────────────────────────────────────── */
+/* PR-48c: showcase wrap holds the grid + a same-size SVG overlay
+   that draws thin connector lines between cards sharing a sourceRoomId. */
+.editor-library-showcase-wrap {
+  position: relative;
+}
+.editor-library-showcase-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.editor-library-showcase-wrap .editor-library-showcase-card {
+  position: relative;
+  z-index: 1;
+}
 .editor-library-showcase-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -1489,12 +1547,38 @@
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 12px;
   padding: 4px 2px;
-  /* PR-46c: cap the catalog grid so a large catalog doesn't push the
-     Details section below the fold. The grid scrolls internally; the
-     page only scrolls if Showcase + Details are both populated and
-     tall. Roughly two rows visible at typical card width. */
-  max-height: 320px;
-  overflow-y: auto;
+}
+/* PR-46c → PR-48b: the catalog grid no longer caps its own height;
+   the Library section body's user-resizable height (default 320px,
+   draggable via the resize handle) is the source of truth, with
+   `overflow-y: auto` set inline by the Section component. */
+.editor-library-section-resize {
+  height: 6px;
+  cursor: row-resize;
+  background: transparent;
+  position: relative;
+  user-select: none;
+  touch-action: none;
+}
+.editor-library-section-resize::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--p-border);
+  transition: background 0.12s;
+}
+.editor-library-section-resize:hover::before,
+.editor-library-section-resize:active::before {
+  background: var(--p-gold-light);
+  height: 3px;
+}
+.editor-library-section-resize:hover {
+  background: rgba(196, 169, 77, 0.04);
 }
 .editor-library-card-wrap {
   position: relative;
