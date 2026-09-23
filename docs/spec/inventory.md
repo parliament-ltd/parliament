@@ -13,23 +13,32 @@ the State column for certain, so correct it in place.
 - **Specced**: described in a document, no code anywhere.
 - **Named**: mentioned as a concept only.
 
-## Read this before the table
+## Rulings so far (23 September 2026)
 
-1. **The two seed rows marked Live are not Live in this repo.** §13 seeds
-   "Almanac table, filters, collection" and "Export and import" as Live. There is
-   no Almanac anywhere in `src/`: no table mixing chats, notes, highlights and
-   dockets, no id column, no collection panel, no filter schemes. What exists is
-   the `/chats` selector and the homepage Chats section (rows below). Export and
-   import is Live, but as the `.parliament` backup, not the Almanac's
-   markdown/JSONL export in v30. Either the Live Almanac is somewhere else (another
-   repo, or a deploy not built from `main`) or the seed rows are aspirational. I have
-   marked both `Live?`.
-2. **Nothing in the new vocabulary exists in code.** Searches for almanac, docket,
-   symposium, marginalia, command line, numeric ids, runs, steps, statuses, sources,
-   pop-outs and cross-tab messaging all came back empty. Every record id is a UUID.
-3. **Several docs the older plans rely on are not in the repo** (V2 refactor scope,
-   mode file format, consent flow spec, architecture spec, visual system). Listed at
-   the foot so you can say whether they should be.
+1. **The Almanac is new.** The §13 seed rows marked Live were aspirational. The
+   Almanac replaces the chat history (`/chats` and the homepage Chats section),
+   and the blueprint is to go. Removal still goes item by item through the
+   change plan.
+2. **Symposium is the new chat room**, and more than one room: it is the flow of
+   chats from room to room, possibly on different models, as the docket directs.
+3. **`lab:` goes to `/edit`.** The Lab, editor and wizard are the next piece of
+   work after this refactor, not part of it.
+4. **This is a new refactor.** The only spec documents are the four in
+   `docs/spec/`. `refactor/` is the old V2 Phase 1 refactor: background for how
+   the code got here, not a source of requirements. Docs that `refactor/` cites
+   but that are missing from the repo are ignored.
+5. **The design style of the two mockups replaces everything**, across all
+   surfaces.
+6. **The Almanac can run.** Comments and toasts in v30 saying otherwise are left
+   over and are not conflicts.
+7. **Branch base is `main`.** The unmerged PR-50a/b work
+   (`claude/pr50-house-visualizer-contract`, house@1.0 visualizer and homepage
+   default swap) is parked. Return to it once this refactor lands and decide
+   which of its ideas survive.
+
+Nothing in the new vocabulary exists in code. Searches for almanac, docket,
+symposium, marginalia, command line, numeric ids, runs, steps, statuses, sources,
+pop-outs and cross-tab messaging all came back empty. Every record id is a UUID.
 
 ## The spine: command line
 
@@ -86,7 +95,7 @@ the State column for certain, so correct it in place.
 | Status vocabulary ready / running / done / waiting / paused | Mockup | v30 ~L130-143; docket v12 header. No status strings in code | Docket, `stop:` |
 | Cost per run | Mockup | docket v12 `cost:{1:..}` | Execution |
 | IndexedDB `parliament` v5 (conversations, messages, notes, highlights, favorites, pins, files, sbrd_documents, modes, library stores) | Live | `src/lib/db.js:7-126` | Any schema change |
-| Export and import | Live? | Live as `.parliament` backup: `src/lib/backup.js`, `BackupContext.jsx`, `BackupRestoreModal.jsx`. Older `.apb`/JSON path still in `SettingsView.jsx:759,782`. Almanac-style markdown/JSONL export is Mockup (v30 ~L1866) | Format versioning |
+| Export and import | Live | Live as `.parliament` backup: `src/lib/backup.js`, `BackupContext.jsx`, `BackupRestoreModal.jsx`. Older `.apb`/JSON path still in `SettingsView.jsx:759,782`. Almanac-style markdown/JSONL export is Mockup (v30 ~L1866) | Format versioning |
 | Format versioning (version field plus migration path on import) | Specced, and owed? | Almanac spec §10. Partly present: envelope has `version: 1` and rejects newer; older files converted by shape (`backup.js:313-347`, `flatV1ToContents`). No per-version record migration | Any schema change (your rule 7) |
 | Cross-tab channel (storage event) | Specced | Almanac spec §5, §10. Code has no storage listener, BroadcastChannel or locks; data is in IndexedDB, localStorage is essentially unused | `stop:all`, stale-tab marginalia |
 | Stale-tab marginalia; orphaned pop-out message on `beforeunload` | Specced | Almanac spec §10 | Tabs and pop-outs |
@@ -98,7 +107,9 @@ the State column for certain, so correct it in place.
 
 | What it is | State | Where | Blocks |
 |---|---|---|---|
-| Almanac table, filters, collection | Live? (not found in this repo) | Mockup in v30. Nearest Live: `/chats` selector (`src/views/SelectorView.jsx`, `SelectorLayout.jsx`) and homepage Chats section (`src/catalog/entries/chats-preview.jsx`) | Almanac work; "do not change the table layout" needs to know which table |
+| Almanac table, filters, collection | Mockup | v30. Replaces the Live chat history below | Almanac work |
+| Chat history: `/chats` selector | Live, to be replaced | `src/views/SelectorView.jsx`, `SelectorLayout.jsx` | Almanac |
+| Chat history: homepage Chats section | Live, to be replaced | `src/catalog/entries/chats*.jsx` | Almanac |
 | `id` column (always visible, draggable, cannot be hidden) | Mockup | v30 ~L334, ~L1718 | Numeric ids |
 | Kept searches rail (left panel) | Mockup | v30 LEFT ~L174, ~L2126 | |
 | Collection panel and working set | Mockup | v30 RIGHT ~L452, ~L2294 | |
@@ -130,7 +141,7 @@ the State column for certain, so correct it in place.
 
 | What it is | State | Where | Blocks |
 |---|---|---|---|
-| Symposium (name) | Named? | Only in the specs. The Live chat surface is `/chat/:id` via `src/views/ChatView.jsx` and `RoomShell` | Confirm Symposium = today's chat room |
+| Symposium (the flow of chats from room to room, per the docket) | Specced | Named in the specs; no design yet beyond docket spec §3. Today's single chat room is `/chat/:id` via `src/views/ChatView.jsx` and `RoomShell` | Docket data model; the Symposium design |
 | Chat composer | Live | `src/catalog/entries/input-render.jsx`, `src/components/core/InputArea.jsx` | ⌘K inside the composer |
 | Forking writes a branch into the docket | Specced | docket spec §3 | Docket data model |
 | Free typing appends a step to the current run | Specced | docket spec §3 | Same |
@@ -163,10 +174,11 @@ the State column for certain, so correct it in place.
 | What it is | State | Where | Blocks |
 |---|---|---|---|
 | Rooms, mode files, `RoomShell`, layouts, schemes, catalog | Live | `src/lib/modes.js`, `src/components/RoomShell.jsx`, `src/catalog/`, `src/lib/schemes.js` | Where Almanac and Docket live as surfaces |
-| The Study (homepage) with blueprint | Live | `src/views/HomepageView.jsx`, `blueprint*.jsx` | Almanac placement? |
-| The Lab (room editor) | Live | `/edit`, `src/views/EditorView.jsx`, `src/components/editor/` | Target of `lab:`? |
-| Build wizard (room builder by template) | Live | `/build`, `src/lib/buildWizard.js`, `src/components/build/wizard/` | |
-| Room builder (target of `new:room`) | Named | Almanac spec §13. Is this the Live wizard, the Lab, or something new? | `new:room` |
+| The Study (homepage) | Live | `src/views/HomepageView.jsx` | Almanac placement |
+| Blueprint (homepage section and Cmd/Ctrl+. overlay) | Live, to go | `src/catalog/entries/blueprint*.jsx`, `src/components/BlueprintOverlay.jsx`, `src/lib/blueprintShapes.js` | Retirement list in the change plan |
+| The Lab (room editor) | Live; next refactor | `/edit`, `src/views/EditorView.jsx`, `src/components/editor/`. Target of `lab:` | |
+| Build wizard (room builder by template) | Live; next refactor | `/build`, `src/lib/buildWizard.js`, `src/components/build/wizard/` | |
+| Room builder (target of `new:room`) | Named | Almanac spec §13; out of scope, lands with the Lab work | `new:room` |
 | Library overlay (catalog browser) | Live | `src/components/LibraryOverlay.jsx`, `library*.jsx` | |
 | Editor undo | Live | `src/lib/editorHistory.js` (editor only, 50 steps) | `undo:` scope |
 | Backup undo toast (60 s) | Live | `BackupUndoToast.jsx` | |
@@ -175,22 +187,13 @@ the State column for certain, so correct it in place.
 | Voice input | Live | `useVoiceInput.js`, `voice-input-render.jsx` (Pocket Chat rooms) | Spec treats voice as Named, V2 |
 | Voice on the prompt line | Named | Almanac spec §11 | Out of scope |
 | Component tiers (utility … persister) | Live as constants | `src/lib/catalog.js:22-29`, enforced editorially | Consent flow |
-| Consent flow | Specced | `refactor/tier-classification.md`; `consent-flow-ui-spec.md` referenced but missing | `invoke:` |
+| Consent flow | Specced | Almanac spec §11 (tiering for model-proposed actions). The old refactor's version is in `refactor/tier-classification.md`, background only | `invoke:` |
 | `invoke:` and `analyze:` | Named | Almanac spec §11 | Out of scope |
 | Free-speech interpretation on the prompt line | Named | Almanac spec §11 | Out of scope |
 | `PANELS` registration rule | Mockup | v30 ~L952; Almanac spec §9 | |
 
-## Docs referenced but not in the repo
+## Parked
 
-These are cited by `refactor/*.md` and the handoff files. None is present. Tell me if
-any should be added to `docs/` or can be treated as gone.
-
-`parliament-v2-refactor-scope.md` (the V2 brief), `parliament_mode_file_format.md`,
-`mode-workshop-architecture.md`, `consent-flow-ui-spec.md`, `build-ui-decisions.md`,
-`parliament_wizard_v5.html`, `parliament_homepage_v2.html`, `parliament_editor_v2.html`,
-`parliament_template_gallery_v2.html`, `parliament_backup_restore_implementation.md`,
-`parliament_v2_resources_spec.md`, `parliament_v2_design_decisions.md`,
-`parliament_component_catalog_v0_1.md`, `model-picker-field-type-spec.md`.
-
-There is no standalone visual system doc; "visual system" is the name of Wave B in
-`refactor/phase-1-pr-plan.md`.
+| What it is | State | Where | Return when |
+|---|---|---|---|
+| PR-50a/b: house@1.0 visualizer, homepage default swap, saved-seed migration | Unmerged branch | `claude/pr50-house-visualizer-contract` (abe2ac5, 8f7c5cb) | After this refactor lands; keep what survives the new direction |
