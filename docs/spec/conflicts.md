@@ -13,6 +13,27 @@ Abbreviations: **A** = `almanac-spec-decisions.md`, **D** = `docket-spec-decisio
 **v30** = `parliament_almanac_v30.html`, **v12** = `parliament_docket_v12.html`.
 Line numbers are approximate.
 
+## Rulings
+
+**Ruled 23 September 2026:**
+
+- **C15. The network is no longer limited to Anthropic.**
+  - Providers: Anthropic, Mistral and Ollama (local).
+  - Sources: Wikipedia, Hacker News, OpenAlex and the Guardian Open Platform.
+  - Later: offline archives such as Kiwix, served locally, as a source component scoped to localhost.
+  - Open follow-ups are under C15.
+- **C17. Four kinds get a number: chats, notes, highlights and dockets.**
+  - These are also the four kind pills (blue chat, purple note, pink highlight, teal docket), and each is a row with an id column.
+  - All four share one number space and numbers never overlap, so `open:207` knows the kind from the number alone.
+  - Branches get an address, not a number: docket number plus letter (`201B`, and `201AA` past Z). Letters are never reshuffled or reissued, and I and O are skipped.
+  - Branches are not rows. They are found by typing the address, and appear as rows only under a grouping mode.
+  - Steps are ordinals inside their branch (step 2 of 210B). The address stops at two levels, so there is no `201B2`.
+  - A run is never part of an address. It is an argument (`open:run 3`, `from:run 3`), and the card's chrome names it.
+  - Running a docket creates chats, not a docket. Each chat gets its own number and carries `from 201B, run 4` in its marginalia.
+  - Still open: the starting number and the digit ceiling.
+- **C18 and C19. Every chat belongs to a docket.** No chat stands alone. This overrides D §3.3, which assumed standalone chats. For the migration, existing chats may become dockets of their own. How branch families map is still open.
+- **C20. Favorites fold into pins.** Users can tag a pin `favorite` themselves. The message-level detail is still open.
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it
