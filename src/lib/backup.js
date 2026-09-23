@@ -25,22 +25,26 @@ import {
   decryptImport,
   PBKDF2_ITERATIONS_V2,
 } from './crypto'
-import { validateBackup } from './validate'
+import { planRestore } from './restorePlan'
+import {
+  BACKUP_FORMAT, BACKUP_VERSION, SETTINGS_BLOCKLIST,
+  bytesToBase64, base64ToBytes, arrayBufferToBase64, base64ToArrayBuffer,
+  flatV1ToContents, contentsToFlatStores, liftToCurrent,
+} from './backupFormat'
 
-export const BACKUP_FORMAT = 'parliament-backup'
-export const BACKUP_VERSION = 1
+// The file format itself (parsing, older exports, validation) lives in
+// backupFormat.js. Re-exported so callers keep importing from here.
+export {
+  BACKUP_FORMAT, BACKUP_VERSION, parseBackupFile, flatV1ToContents,
+  contentsToFlatStores, validateContents,
+} from './backupFormat'
+
 const PARLIAMENT_VERSION = '0.5.0'
 
 // All possible top-level categories the user can include in a custom backup.
 // The "preferences" category is opt-out by default in the UI; the rest are
 // opt-in by default. Order here also drives display order in the modal.
 export const CATEGORIES = ['chats', 'annotations', 'rooms', 'homepage', 'library', 'preferences']
-
-// Settings keys that should NEVER appear in a backup. The API key is the
-// big one — it's encrypted with browser-specific crypto and shouldn't leave
-// this browser. The legacy session storage key is also stripped just in
-// case a stale record lingers.
-const SETTINGS_BLOCKLIST = new Set(['parliament-api-key'])
 
 // ─── Compression (native CompressionStream) ──────────────
 
@@ -56,38 +60,13 @@ async function gunzipToString(bytes) {
   return new TextDecoder().decode(buf)
 }
 
-// ─── Base64 helpers ──────────────────────────────────────
-
-function bytesToBase64(bytes) {
-  let s = ''
-  const chunk = 0x8000
-  for (let i = 0; i < bytes.length; i += chunk) {
-    s += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk))
-  }
-  return btoa(s)
-}
-
-function base64ToBytes(b64) {
-  const s = atob(b64)
-  const bytes = new Uint8Array(s.length)
-  for (let i = 0; i < s.length; i++) bytes[i] = s.charCodeAt(i)
-  return bytes
-}
-
-function arrayBufferToBase64(ab) {
-  return bytesToBase64(new Uint8Array(ab))
-}
-
-function base64ToArrayBuffer(b64) {
-  return base64ToBytes(b64).buffer
-}
 
 // ─── Browser fingerprint (non-tracking) ──────────────────
 // Stored in IndexedDB on first backup so we can show "From: This browser"
 // in the restore preview. Hash-based, no userAgent leak.
 
-async function getBrowserFingerprint() {
-  const db = await initDB()
+async function getBrowserFingerprint(db = null) {
+  db = db || await initDB()
   const existing = await db.get('settings', 'browserFingerprint')
   if (existing && existing.value) return existing.value
   const random = crypto.getRandomValues(new Uint8Array(8))
@@ -106,8 +85,8 @@ async function getBrowserFingerprint() {
  * Files (the V1 gap fix) ride along with `chats` since file metadata is
  * keyed by conversationId. Sbrd documents likewise live with chats.
  */
-export async function gatherBackupContents(categories = CATEGORIES) {
-  const db = await initDB()
+export async function gatherBackupContents(categories = CATEGORIES, db = null) {
+  db = db || await initDB()
   const want = new Set(categories)
   const contents = {}
 
@@ -217,13 +196,13 @@ export function buildManifest(contents) {
 
 // ─── Filename ────────────────────────────────────────────
 
-export async function buildFilename({ encrypted = false, date = new Date() } = {}) {
+export async function buildFilename({ encrypted = false, date = new Date(), db = null } = {}) {
   const isoDate = date.toISOString().slice(0, 10)
   const enc = encrypted ? '-encrypted' : ''
   // De-dup against any backup already created today by counting same-prefix
   // entries in the metadata log. The user gets a -2, -3, etc. suffix.
   const base = `parliament-backup-${isoDate}${enc}`
-  const log = (await getBackupLog()) || []
+  const log = (await getBackupLog(db)) || []
   const same = log.filter((e) => (e.filename || '').startsWith(base))
   const suffix = same.length === 0 ? '' : `-${same.length + 1}`
   return `${base}${suffix}.parliament`
@@ -236,9 +215,9 @@ export async function buildFilename({ encrypted = false, date = new Date() } = {
  * filename. Encrypted backups gzip+encrypt the contents into a base64
  * payload; unencrypted backups embed contents as plain JSON.
  */
-export async function buildBackupFile({ contents, password = null }) {
+export async function buildBackupFile({ contents, password = null, db = null }) {
   const manifest = buildManifest(contents)
-  const fingerprint = await getBrowserFingerprint()
+  const fingerprint = await getBrowserFingerprint(db)
   const createdAt = new Date().toISOString()
 
   let envelope
@@ -283,7 +262,7 @@ export async function buildBackupFile({ contents, password = null }) {
   }
 
   const json = JSON.stringify(envelope, null, password ? 0 : 2)
-  const filename = await buildFilename({ encrypted: !!password })
+  const filename = await buildFilename({ encrypted: !!password, db })
   const blob = new Blob([json], { type: 'application/json' })
   return { blob, filename, manifest, createdAt }
 }
@@ -301,57 +280,12 @@ export function downloadBlob(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
-// ─── Parse backup file ───────────────────────────────────
-
-/**
- * Read the raw text of a backup file and identify its shape. Returns
- * { kind: 'v2'|'v1-apb'|'v1-json'|'unknown', envelope, raw }.
- *
- * Encrypted files (v2 or v1-apb) still need a password to surface
- * `contents` — call decryptBackup() with the user's password.
- */
-export async function parseBackupFile(file) {
-  let text
-  try {
-    text = await file.text()
-  } catch {
-    throw new Error('Could not read file. Check the file isn\'t damaged.')
-  }
-
-  let json
-  try {
-    json = JSON.parse(text)
-  } catch {
-    throw new Error('This file is not a valid Parliament backup.')
-  }
-
-  if (json && typeof json === 'object' && json.format === BACKUP_FORMAT) {
-    if (typeof json.version !== 'number' || json.version > BACKUP_VERSION) {
-      throw new Error('This backup was created by a newer version of Parliament. Please update to restore it.')
-    }
-    return { kind: 'v2', envelope: json, raw: text }
-  }
-
-  // Legacy V1 .apb (encrypted). Has top-level salt/iv/ciphertext arrays.
-  if (json && Array.isArray(json.salt) && Array.isArray(json.iv) && Array.isArray(json.ciphertext)) {
-    return { kind: 'v1-apb', envelope: json, raw: text }
-  }
-
-  // Legacy V1 plaintext export from exportAllData(). Has a top-level
-  // conversations array.
-  if (json && Array.isArray(json.conversations)) {
-    return { kind: 'v1-json', envelope: json, raw: text }
-  }
-
-  throw new Error('This file is not a valid Parliament backup.')
+export async function decryptBackup(parsed, password = null) {
+  const contents = await readContents(parsed, password)
+  return liftToCurrent(parsed, contents)
 }
 
-/**
- * Resolve `contents` from a parsed file, using the password if encrypted.
- * For V1 files, returns a contents object adapted into the V2 shape.
- * Throws on wrong password or corrupt payload.
- */
-export async function decryptBackup(parsed, password = null) {
+async function readContents(parsed, password) {
   if (parsed.kind === 'v2') {
     const env = parsed.envelope
     if (!env.encrypted) return env.contents
@@ -391,136 +325,6 @@ export async function decryptBackup(parsed, password = null) {
   }
 
   throw new Error('Unsupported backup format.')
-}
-
-// ─── V1 → V2 contents migration ──────────────────────────
-
-/**
- * Convert a V1 flat-store backup (the legacy `exportAllData()` shape) into
- * the V2 nested `contents` shape. Best-effort: if a V2-only category like
- * library or rooms isn't present in V1, the migrated contents simply omit
- * that category — restore() handles missing categories cleanly.
- */
-export function flatV1ToContents(flat) {
-  const contents = {}
-
-  if (Array.isArray(flat.conversations)) {
-    const messagesByConv = new Map()
-    for (const m of flat.messages || []) {
-      let arr = messagesByConv.get(m.conversationId)
-      if (!arr) { arr = []; messagesByConv.set(m.conversationId, arr) }
-      arr.push(m)
-    }
-    for (const arr of messagesByConv.values()) {
-      arr.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-    }
-    const sbrdByConv = new Map()
-    for (const d of flat.sbrd_documents || []) sbrdByConv.set(d.conversationId, d)
-
-    contents.chats = flat.conversations.map((c) => {
-      const chat = { ...c, messages: messagesByConv.get(c.id) || [] }
-      const sbrd = sbrdByConv.get(c.id)
-      if (sbrd) chat.sbrdDocument = sbrd
-      // V1 had no files included in backup — gap fixed by V2.
-      return chat
-    })
-  }
-
-  if ((flat.notes && flat.notes.length) ||
-      (flat.highlights && flat.highlights.length) ||
-      (flat.favorites && flat.favorites.length) ||
-      (flat.pins && flat.pins.length)) {
-    contents.annotations = {
-      notes: flat.notes || [],
-      highlights: flat.highlights || [],
-      favorites: flat.favorites || [],
-      pins: flat.pins || [],
-    }
-  }
-
-  if (Array.isArray(flat.settings) && flat.settings.length) {
-    contents.preferences = flat.settings.filter((s) => !SETTINGS_BLOCKLIST.has(s.key))
-  }
-
-  return contents
-}
-
-// ─── Validation (V2 contents → flat → existing validator) ────
-
-/**
- * Flatten V2 contents to the per-store shape the existing validateBackup()
- * understands. Returns { conversations, messages, notes, ... }.
- */
-export function contentsToFlatStores(contents) {
-  const flat = {
-    conversations: [],
-    messages: [],
-    highlights: [],
-    notes: [],
-    favorites: [],
-    pins: [],
-    settings: [],
-    sbrd_documents: [],
-    files: [],
-    file_data: [],
-    modes: [],
-    libraryLayouts: [],
-    libraryRooms: [],
-    libraryComponents: [],
-    librarySchemes: [],
-    libraryResources: [],
-  }
-
-  for (const chat of contents.chats || []) {
-    const { messages, files, fileData, sbrdDocument, ...conv } = chat
-    flat.conversations.push(conv)
-    if (Array.isArray(messages)) {
-      for (const m of messages) flat.messages.push(m)
-    }
-    if (Array.isArray(files)) {
-      for (const f of files) flat.files.push(f)
-    }
-    if (fileData && typeof fileData === 'object') {
-      for (const [fileId, b64] of Object.entries(fileData)) {
-        flat.file_data.push({ fileId, data: base64ToArrayBuffer(b64) })
-      }
-    }
-    if (sbrdDocument) flat.sbrd_documents.push(sbrdDocument)
-  }
-
-  if (contents.annotations) {
-    flat.notes = contents.annotations.notes || []
-    flat.highlights = contents.annotations.highlights || []
-    flat.favorites = contents.annotations.favorites || []
-    flat.pins = contents.annotations.pins || []
-  }
-
-  if (Array.isArray(contents.rooms)) flat.modes.push(...contents.rooms)
-  if (contents.homepage) flat.modes.push(contents.homepage)
-
-  if (contents.library) {
-    flat.libraryLayouts = contents.library.layouts || []
-    flat.libraryComponents = contents.library.components || []
-    flat.librarySchemes = contents.library.schemes || []
-    flat.libraryRooms = contents.library.rooms || []
-    flat.libraryResources = contents.library.resources || []
-  }
-
-  if (Array.isArray(contents.preferences)) {
-    flat.settings = contents.preferences.filter((s) => !SETTINGS_BLOCKLIST.has(s.key))
-  }
-
-  return flat
-}
-
-export function validateContents(contents) {
-  const flat = contentsToFlatStores(contents)
-  // validateBackup requires a `conversations` array as a baseline. If the
-  // backup is partial (only library, say), pass an empty array — that
-  // satisfies the schema while letting the per-store validators catch
-  // structural problems.
-  if (!flat.conversations) flat.conversations = []
-  return validateBackup(flat)
 }
 
 // ─── Restore ─────────────────────────────────────────────
@@ -578,157 +382,50 @@ export async function restoreContents(contents, { strategy = 'merge' } = {}) {
     }
   }
 
-  // ── Conversations + messages + sbrd + files ─────────────
+  // ── Conversations + messages + annotations + sbrd + files ─────
+  // planRestore() decides every write and keeps references intact when a
+  // merge renames a colliding conversation (see restorePlan.js).
   if (flat.conversations.length) {
-    // Pre-read all existing ids we'll need, outside any tx, so the
-    // write-side transactions are pure puts.
-    const existingConvIds = new Set((await db.getAll('conversations')).map((c) => c.id))
-    const existingMsgIds = new Set((await db.getAllKeys('messages')))
-    const existingNoteIds = new Set((await db.getAllKeys('notes')))
-    const existingHighlightIds = new Set((await db.getAllKeys('highlights')))
-    const existingFavoriteIds = new Set((await db.getAllKeys('favorites')))
-    const existingPinIds = new Set((await db.getAllKeys('pins')))
-    const existingFileIds = new Set((await db.getAllKeys('files')))
+    // Pre-read all existing ids outside any tx, so the write-side
+    // transactions are pure puts.
+    const existing = {
+      conversations: new Set(await db.getAllKeys('conversations')),
+      messages: new Set(await db.getAllKeys('messages')),
+      notes: new Set(await db.getAllKeys('notes')),
+      highlights: new Set(await db.getAllKeys('highlights')),
+      favorites: new Set(await db.getAllKeys('favorites')),
+      pins: new Set(await db.getAllKeys('pins')),
+      files: new Set(await db.getAllKeys('files')),
+    }
+    const { writes, skipped } = planRestore(flat, { strategy, existing })
 
-    const renamedConvIds = new Map() // oldId -> newId
-    const remapConv = (oldId) => renamedConvIds.get(oldId) || oldId
-    const newFileIds = new Map() // oldFileId -> newFileId (only when conv renamed)
-
-    // ── Conversations ──
-    {
-      const tx = db.transaction('conversations', 'readwrite')
-      for (const c of flat.conversations) {
-        if (strategy === 'merge' && existingConvIds.has(c.id)) {
-          const newId = crypto.randomUUID()
-          renamedConvIds.set(c.id, newId)
-          await tx.store.put({
-            ...c,
-            id: newId,
-            title: `${c.title || 'Conversation'} (from backup)`,
-          })
-        } else {
-          await tx.store.put(c)
-        }
-        summary.chats.added++
-      }
+    const put = async (store, records) => {
+      if (!records.length) return
+      const tx = db.transaction(store, 'readwrite')
+      for (const r of records) await tx.store.put(r)
       await tx.done
     }
 
-    // ── Messages ──
-    if (flat.messages.length) {
-      const tx = db.transaction('messages', 'readwrite')
-      for (const m of flat.messages) {
-        const newMsg = { ...m, conversationId: remapConv(m.conversationId) }
-        if (renamedConvIds.has(m.conversationId)) newMsg.id = crypto.randomUUID()
-        if (strategy === 'merge' && existingMsgIds.has(newMsg.id)) {
-          summary.messages.skipped++
-          continue
-        }
-        await tx.store.put(newMsg)
-        summary.messages.added++
-      }
-      await tx.done
-    }
+    await put('conversations', writes.conversations)
+    summary.chats.added += writes.conversations.length
 
-    // ── Annotations ──
-    if (flat.notes.length) {
-      const tx = db.transaction('notes', 'readwrite')
-      for (const n of flat.notes) {
-        const note = { ...n, conversationId: remapConv(n.conversationId) }
-        if (renamedConvIds.has(n.conversationId)) note.id = crypto.randomUUID()
-        if (strategy === 'merge' && existingNoteIds.has(note.id)) {
-          summary.annotations.skipped++
-          continue
-        }
-        await tx.store.put(note)
-        summary.annotations.added++
-      }
-      await tx.done
-    }
-    if (flat.highlights.length) {
-      const tx = db.transaction('highlights', 'readwrite')
-      for (const h of flat.highlights) {
-        const hl = { ...h, conversationId: remapConv(h.conversationId) }
-        if (renamedConvIds.has(h.conversationId)) hl.id = crypto.randomUUID()
-        if (strategy === 'merge' && existingHighlightIds.has(hl.id)) {
-          summary.annotations.skipped++
-          continue
-        }
-        await tx.store.put(hl)
-        summary.annotations.added++
-      }
-      await tx.done
-    }
-    if (flat.favorites.length) {
-      const tx = db.transaction('favorites', 'readwrite')
-      for (const f of flat.favorites) {
-        const fav = { ...f, conversationId: remapConv(f.conversationId) }
-        if (renamedConvIds.has(f.conversationId)) fav.id = crypto.randomUUID()
-        if (strategy === 'merge' && existingFavoriteIds.has(fav.id)) {
-          summary.annotations.skipped++
-          continue
-        }
-        await tx.store.put(fav)
-        summary.annotations.added++
-      }
-      await tx.done
-    }
-    if (flat.pins.length) {
-      const tx = db.transaction('pins', 'readwrite')
-      for (const p of flat.pins) {
-        const pin = {
-          ...p,
-          targetConversationId: remapConv(p.targetConversationId),
-          sourceConversationId: remapConv(p.sourceConversationId),
-        }
-        if (renamedConvIds.has(p.targetConversationId)) pin.id = crypto.randomUUID()
-        if (strategy === 'merge' && existingPinIds.has(pin.id)) {
-          summary.annotations.skipped++
-          continue
-        }
-        await tx.store.put(pin)
-        summary.annotations.added++
-      }
-      await tx.done
-    }
+    await put('messages', writes.messages)
+    summary.messages.added += writes.messages.length
+    summary.messages.skipped += skipped.messages
 
-    // ── Sbrd documents (key: conversationId) ──
-    if (flat.sbrd_documents.length) {
-      const tx = db.transaction('sbrd_documents', 'readwrite')
-      for (const doc of flat.sbrd_documents) {
-        await tx.store.put({ ...doc, conversationId: remapConv(doc.conversationId) })
-        summary.sbrdDocuments.added++
-      }
-      await tx.done
+    for (const store of ['notes', 'highlights', 'favorites', 'pins']) {
+      await put(store, writes[store])
+      summary.annotations.added += writes[store].length
     }
+    summary.annotations.skipped += skipped.annotations
 
-    // ── Files + file_data (V1 gap fix) ──
-    if (flat.files.length) {
-      const tx = db.transaction('files', 'readwrite')
-      for (const fileMeta of flat.files) {
-        const remapped = { ...fileMeta, conversationId: remapConv(fileMeta.conversationId) }
-        if (renamedConvIds.has(fileMeta.conversationId)) {
-          const newFid = crypto.randomUUID()
-          newFileIds.set(fileMeta.id, newFid)
-          remapped.id = newFid
-        }
-        if (strategy === 'merge' && existingFileIds.has(remapped.id)) {
-          summary.files.skipped++
-          continue
-        }
-        await tx.store.put(remapped)
-        summary.files.added++
-      }
-      await tx.done
-    }
-    if (flat.file_data.length) {
-      const tx = db.transaction('file_data', 'readwrite')
-      for (const fd of flat.file_data) {
-        const fileId = newFileIds.get(fd.fileId) || fd.fileId
-        await tx.store.put({ fileId, data: fd.data })
-      }
-      await tx.done
-    }
+    await put('sbrd_documents', writes.sbrd_documents)
+    summary.sbrdDocuments.added += writes.sbrd_documents.length
+
+    await put('files', writes.files)
+    summary.files.added += writes.files.length
+    summary.files.skipped += skipped.files
+    await put('file_data', writes.file_data)
   }
 
   // ── Modes (rooms + homepage) ────────────────────────────
@@ -797,8 +494,8 @@ export async function restoreContents(contents, { strategy = 'merge' } = {}) {
 const BACKUP_LOG_KEY = 'backupLog'
 const BANNER_DISMISSED_KEY = 'backupBannerDismissedAt'
 
-export async function getBackupLog() {
-  const db = await initDB()
+export async function getBackupLog(db = null) {
+  db = db || await initDB()
   const entry = await db.get('settings', BACKUP_LOG_KEY)
   return entry?.value || []
 }

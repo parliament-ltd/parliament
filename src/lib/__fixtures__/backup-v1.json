@@ -1,0 +1,37 @@
+{
+  "format": "parliament-backup",
+  "version": 1,
+  "createdAt": "2026-09-01T10:00:00.000Z",
+  "parliamentVersion": "0.5.0",
+  "source": { "browserFingerprint": "0011223344556677" },
+  "encrypted": false,
+  "manifest": { "counts": { "chats": 2 }, "sizeBeforeCompression": 0 },
+  "contents": {
+    "chats": [
+      {
+        "id": "conv-root", "title": "Water tower", "model": "claude-sonnet",
+        "parentId": null, "branchPoint": null, "familyId": "conv-root", "room": "writing-studio",
+        "pinned": false, "storageBytes": 0, "createdAt": "2026-08-01T09:00:00.000Z", "updatedAt": "2026-08-01T09:05:00.000Z",
+        "messages": [
+          { "id": "m1", "conversationId": "conv-root", "role": "user", "content": "Draft it with the tower.", "tokenCount": 6, "incomplete": false, "createdAt": "2026-08-01T09:00:00.000Z" },
+          { "id": "m2", "conversationId": "conv-root", "role": "assistant", "content": "Here is a draft.", "tokenCount": 5, "incomplete": false, "createdAt": "2026-08-01T09:00:05.000Z" }
+        ]
+      },
+      {
+        "id": "conv-fork", "title": "Branch: Water tower", "model": "claude-sonnet",
+        "parentId": "conv-root", "parentTitle": "Water tower", "branchPoint": "m2", "familyId": "conv-root", "room": "writing-studio",
+        "pinned": false, "storageBytes": 0, "createdAt": "2026-08-02T09:00:00.000Z", "updatedAt": "2026-08-02T09:05:00.000Z",
+        "messages": [
+          { "id": "m3", "conversationId": "conv-fork", "role": "user", "content": "Draft it with the tower.", "tokenCount": 6, "incomplete": false, "createdAt": "2026-08-01T09:00:00.000Z" },
+          { "id": "m4", "conversationId": "conv-fork", "role": "assistant", "content": "Here is a draft.", "tokenCount": 5, "incomplete": false, "createdAt": "2026-08-01T09:00:05.000Z" }
+        ]
+      }
+    ],
+    "annotations": {
+      "notes": [ { "id": "n1", "conversationId": "conv-root", "messageId": "m2", "text": "Keep the tower.", "createdAt": "2026-08-01T09:06:00.000Z" } ],
+      "highlights": [ { "id": "h1", "conversationId": "conv-root", "messageId": "m2", "text": "a draft", "color": "#B8A070", "createdAt": "2026-08-01T09:07:00.000Z" } ],
+      "favorites": [ { "id": "f1", "conversationId": "conv-fork", "messageId": "m4", "createdAt": "2026-08-02T09:06:00.000Z" } ],
+      "pins": [ { "id": "p1", "targetConversationId": "conv-fork", "sourceConversationId": "conv-root", "sourceMessageId": "m2", "content": "Here is a draft.", "createdAt": "2026-08-02T09:07:00.000Z" } ]
+    }
+  }
+}

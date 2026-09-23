@@ -4,8 +4,8 @@ import { SCHEMES } from './schemes'
 import { seedLibraryRooms } from './seedTemplates'
 import { listEntries } from '../catalog'
 
-const DB_NAME = 'parliament'
-const DB_VERSION = 5
+export const DB_NAME = 'parliament'
+export const DB_VERSION = 5
 
 // Built-in library author shape, per refactor/parliament_v2_design_decisions.md §6.5
 // canonical metadata. Used to seed every Parliament-shipped library row.
@@ -16,6 +16,17 @@ const BUILTIN_AUTHOR = Object.freeze({
 })
 
 let dbInstance = null
+
+// Database connection state, for DbStateNotice. 'superseded': another tab
+// upgraded the schema and this tab must reload. 'blocked': this tab's
+// upgrade is waiting for an older tab to close.
+export const DB_STATE_EVENT = 'parliament-db-state'
+
+function announceDbState(state) {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(DB_STATE_EVENT, { detail: state }))
+  }
+}
 
 export async function initDB() {
   if (dbInstance) return dbInstance
@@ -123,7 +134,22 @@ export async function initDB() {
           }
         }
       }
-    }
+    },
+
+    // Another tab is opening a newer schema. Close this connection so its
+    // upgrade can run, and tell the page, which can no longer write.
+    blocking(currentVersion, blockedVersion, event) {
+      // The raw IDBDatabase is event.target; closing it lets the upgrade proceed.
+      event.target.close()
+      dbInstance = null
+      announceDbState('superseded')
+    },
+
+    // This tab wants a newer schema but an older tab still holds the
+    // database open. The upgrade waits until that tab closes or reloads.
+    blocked() {
+      announceDbState('blocked')
+    },
   })
 
   // Post-migration seeding. Idempotent — only seeds when stores are empty.
@@ -975,8 +1001,11 @@ export async function importData(data) {
   for (const storeName of stores) {
     if (!data[storeName]) continue
     const tx = db.transaction(storeName, 'readwrite')
+    // Key by each store's own keyPath: sbrd_documents is keyed on
+    // conversationId, settings on key, everything else on id.
+    const keyPath = tx.store.keyPath
     for (const item of data[storeName]) {
-      const existing = await tx.store.get(item.id || item.key)
+      const existing = await tx.store.get(item[keyPath])
       if (!existing) {
         await tx.store.put(item)
         imported++
