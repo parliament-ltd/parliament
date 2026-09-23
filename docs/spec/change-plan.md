@@ -54,6 +54,7 @@ Areas 6 and 7 can run in parallel with 3 to 5 if that is useful.
 - Settings takes the new fonts and colours now, with a standalone HTML snapshot provided for you to redesign it elsewhere.
 - arXiv is dropped.
 - Retirements are approved one by one as each area lands.
+- Links use the number alone: `/207`, `/201`, `/201B`. Old `/chat/<uuid>` links redirect. This replaces "/chat/207" in 5.1 and "/docket/:num" in 4.1.
 
 Out of scope, per the brief:
 - the room builder and wizard, and the Lab and editor redesign
