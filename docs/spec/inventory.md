@@ -35,6 +35,17 @@ the State column for certain, so correct it in place.
    (`claude/pr50-house-visualizer-contract`, house@1.0 visualizer and homepage
    default swap) is parked. Return to it once this refactor lands and decide
    which of its ideas survive.
+8. **The Almanac replaces The Study as the homepage.** It can also be opened from
+   anywhere with the command line, or popped out and placed on any screen. From a
+   chat you can go to it or pop it out.
+9. **Rooms keep their own colour schemes inside the room.** The new style governs
+   everything around them.
+10. **Dark mode is deferred.** The mockups are the guide: bone off-white, ink, navy
+    for certain items, gold for the live action.
+11. **Design work still owed, as separate steps:** the Symposium room flow (popping
+    out and comparing is central to it), and the Lab, wizard and editor. For each, I
+    export standalone HTML snapshots of the current screens so you can design them
+    outside Claude Code.
 
 Nothing in the new vocabulary exists in code. Searches for almanac, docket,
 symposium, marginalia, command line, numeric ids, runs, steps, statuses, sources,
