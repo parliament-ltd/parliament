@@ -55,6 +55,11 @@ Line numbers are approximate.
 - **C17, follow-up.** Numbering starts at 201, so every id has at least three digits and never reads as a run or step number. There is no upper digit limit.
 - **C18.** Each existing branch family becomes one docket: the root is branch A and each fork takes the next letter, all in run 1. The migration is shown before it runs.
 - **C20, follow-up.** Each favorited message becomes a pinned highlight of that message.
+- **The collection panel's Prompt/Send button** and its composer are removed on trial. Prompting happens only through `p>` in the bar, which carries the ticked rows.
+- **`new:chat`** creates a docket and its first chat, so it uses two numbers.
+- **The CLAUDE.md rewrite is approved and applied.** Wording changes on the way in:
+  - "API key" became "API keys".
+  - The read-first block's line "the rest of this file describes V2 Phase 1" now points to the rulings instead.
 
 ## Part 1. Settled by precedence
 
@@ -261,8 +266,7 @@ covers all of them.
 
 ## Proposed CLAUDE.md rewrite
 
-Not applied. Approve, amend or reject. The "Read this first" block already in the file
-stays as it is.
+Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
 
 ```markdown
 # CLAUDE.md: Parliament

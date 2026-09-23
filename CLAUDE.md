@@ -1,4 +1,4 @@
-# CLAUDE.md — Project Apollo / Parliament
+# CLAUDE.md: Parliament
 
 ## Read this first
 
@@ -11,8 +11,8 @@ over every other document in the repo:
 - `docket-spec-decisions.md`
 - `parliament_docket_v12.html` (see the divergence list in its header)
 
-The rest of this file describes V2 Phase 1 and is being rewritten. Where it
-conflicts with the files above, the files above win. Do not resolve the
+Rulings on where they disagree are in `docs/spec/conflicts.md`. Where this
+file conflicts with the files above, the files above win. Do not resolve the
 conflict yourself; record it in `docs/spec/conflicts.md` and ask.
 
 Never delete files, components, routes or stored data without explicit
@@ -20,71 +20,64 @@ approval, item by item.
 
 ## Orientation
 
-Project Apollo (codename **Parliament** in the V2 architecture) is a
-power-user chat interface for AI models. It runs entirely client-side in
-the browser — no backend, no accounts. Users bring their own Anthropic
-API key; everything else lives in the browser's IndexedDB.
+Parliament is a client-side AI workspace. No backend, no accounts. Users bring
+their own API keys; everything else lives in the browser's IndexedDB.
 
-V1 organized the app around six bird-named "modes" (Albatross, Swift,
-Pelican, Secretarybird, Kingfisher, Starling) and routed every screen
-through a per-mode adapter. **Phase 1 of V2 replaced that with a four-
-layer composition model: layouts, schemes, catalog components, and
-rooms.** V1 adapter code is fully deleted; every chat surface now
-renders through `<RoomShell>` against a mode file in IndexedDB.
+It is mid-refactor to a new direction, defined only by the four files in
+`docs/spec/`:
 
-This file is a redirect. The canonical V2 specification lives in
-[refactor/](refactor/). Read those before making non-trivial changes.
+- **Almanac**: the homepage. One table of everything you have made (chats,
+  notes, highlights, dockets), addressed by number. Can also be opened or
+  popped out from anywhere.
+- **Docket**: a plan of steps across branches and runs.
+- **Symposium**: the flow of chats from room to room that a docket directs.
+- **The command line**: one field read three ways (search, `>` command,
+  `p>` prompt). It is the actor on every surface; surfaces do not execute.
 
-## Where to look
+Rooms (mode files rendered by `<RoomShell>`, with their own colour schemes)
+stay. The Lab (`/edit`), wizard (`/build`) and editor are redesigned in a
+later step.
 
-| Topic | Doc |
-|---|---|
-| End-to-end audit + decision record | [refactor/v2-phase1-audit.md](refactor/v2-phase1-audit.md) |
-| Vocabulary (rooms, modes, layouts, schemes, catalog) | [refactor/glossary.md](refactor/glossary.md) |
-| IndexedDB schema, migration map, version-bump notes | [refactor/data-migration.md](refactor/data-migration.md) |
-| Composer / Persister / Agent tier rules | [refactor/tier-classification.md](refactor/tier-classification.md) |
-| PR-by-PR Phase 1 plan + scope | [refactor/phase-1-pr-plan.md](refactor/phase-1-pr-plan.md) |
-| Manual verification checklist (one section per PR) | [refactor/phase-1-testing.md](refactor/phase-1-testing.md) |
-| V1 visual mockups (preserved for fidelity reference) | [refactor/v1-mockups-archive/](refactor/v1-mockups-archive/) |
+Working files: `docs/spec/inventory.md` (what exists), `docs/spec/conflicts.md`
+(rulings), `docs/spec/change-plan.md` (the plan).
+
+`refactor/` holds the previous refactor (V2 Phase 1). It explains how the
+current code got here. It is not a source of requirements, and documents it
+cites that are missing from the repo are gone.
 
 ## Hard constraints (do not relax without scope review)
 
-- **Pure client-side.** No backend, no servers, no accounts.
-- **Strict CSP.** Scripts from self only; connections to self +
-  `api.anthropic.com` only. No third-party origins.
-- **API key encrypted at rest** via Web Crypto API (AES-GCM,
-  non-extractable). No external crypto libraries.
-- **Web Crypto API only** for everything cryptographic — `window.crypto.subtle`.
-- **Provider abstraction always.** All API calls go through
-  `src/providers/anthropic.js` against the interface in
-  `src/providers/base.js`. Don't hardcode the Anthropic API anywhere
-  else. Multi-provider support (Ollama / OpenAI / Mistral) is firmly
-  Phase 2 and ships behind the same interface — see audit §3.10 / §3.20.
-- **No third-party scripts, analytics, or tracking.** The app makes
-  zero network requests except to the Anthropic API.
+- Pure client-side. No backend, no servers, no accounts.
+- Strict CSP. Scripts from self only. Connections only to self, the model
+  providers (Anthropic, Mistral, Ollama on localhost) and the named source
+  hosts (Wikipedia, Hacker News via Algolia, OpenAlex), each listed in
+  `netlify.toml`. A new host is added only with its provider or source. No
+  third-party scripts, analytics or tracking.
+- Cross-window messages (BroadcastChannel) carry ids and signals only, never
+  content or keys.
+- API keys encrypted at rest via Web Crypto (AES-GCM, non-extractable). Web
+  Crypto only for anything cryptographic.
+- Provider abstraction always. Model calls go through `src/providers/`,
+  against the interface in `src/providers/base.js`. Every provider key is
+  encrypted the same way as the Anthropic key.
+- Stored data: never run a migration or schema change without showing it
+  first. Every backup ever written must stay readable.
+- Nothing is deleted without explicit approval, item by item. Prefer
+  `/deprecated` or a flag.
 
-## What's gone (V1 concepts that do not map cleanly to V2)
+## Conventions
 
-- The `parliament-mode` localStorage key (V1's active-mode persistence).
-- `ModeContext` / `ModeProvider` / `useMode()` (the V1 mode-driven
-  routing context).
-- Per-mode layout adapters in `src/adapters/` — every layout now lives
-  in the catalog or the editor.
-- `ModeSuggestion` and `modeSuggestions.js` — V1 affordance for
-  suggesting an alternate mode for a task. No V2 equivalent.
+- Visual values come from the mockups in `docs/spec/`. Gold means the live
+  action and nothing else. Light mode only for now.
+- Copy: sentence case, no em dashes.
 
-If you find a reference to any of these in a doc or a comment, it's
-stale. Either update it to V2 vocabulary or flag it.
+## Going (proposed, pending approval item by item)
 
-## V1 archive pointer
+The Study and homepage-scope mode files, the blueprint and its Cmd/Ctrl+.
+overlay, the `/chats` selector and homepage Chats section (replaced by the
+Almanac). See the retirement section of `docs/spec/change-plan.md`.
 
-The pre-V2 CLAUDE.md (the original 438-line V1 spec — chat selector
-model, input area, branching flow, design system as it stood for V1)
-was archived when PR-12 landed. To read it:
+## Archive pointers
 
-```bash
-git show 12e142f:CLAUDE.md
-```
-
-(`12e142f` is the merge commit for PR-11b — the last commit on `main`
-before this redirect replaced the V1 file.)
+- V1 spec: `git show 12e142f:CLAUDE.md`
+- V2 Phase 1 CLAUDE.md: `git show 5ac8a1d:CLAUDE.md`
