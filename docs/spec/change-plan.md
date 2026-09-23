@@ -46,6 +46,15 @@ sources, execution. I propose one change and two additions.
 
 Areas 6 and 7 can run in parallel with 3 to 5 if that is useful.
 
+**Approved 23 September 2026:**
+- The order above.
+- Vitest as a dev-only dependency.
+- The compressed-summary branch stays (5.7), and you want to return to it later.
+- The model list is the current lineup: Opus 5.5, Sonnet 5, Haiku 4.5, Fable 5.1.
+- Settings takes the new fonts and colours now, with a standalone HTML snapshot provided for you to redesign it elsewhere.
+- arXiv is dropped.
+- Retirements are approved one by one as each area lands.
+
 Out of scope, per the brief:
 - the room builder and wizard, and the Lab and editor redesign
 - `invoke:` and `analyze:`

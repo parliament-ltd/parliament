@@ -208,3 +208,4 @@ pop-outs and cross-tab messaging all came back empty. Every record id is a UUID.
 | What it is | State | Where | Return when |
 |---|---|---|---|
 | PR-50a/b: house@1.0 visualizer, homepage default swap, saved-seed migration | Unmerged branch | `claude/pr50-house-visualizer-contract` (abe2ac5, 8f7c5cb) | After this refactor lands; keep what survives the new direction |
+| Compressed-summary branch | Live | `src/catalog/entries/branches-render.jsx`, `BranchCreationPanel.jsx` | Kept as a docket branch (change plan 5.7); you want to rethink it after this refactor |
