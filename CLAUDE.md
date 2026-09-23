@@ -1,5 +1,23 @@
 # CLAUDE.md — Project Apollo / Parliament
 
+## Read this first
+
+Parliament is mid-refactor. The current design and workflow are defined by
+four files in `docs/spec/`, which take priority over everything below and
+over every other document in the repo:
+
+- `almanac-spec-decisions.md` (newest; wins where it addresses something)
+- `parliament_almanac_v30.html` (source of truth for visual values)
+- `docket-spec-decisions.md`
+- `parliament_docket_v12.html` (see the divergence list in its header)
+
+The rest of this file describes V2 Phase 1 and is being rewritten. Where it
+conflicts with the files above, the files above win. Do not resolve the
+conflict yourself; record it in `docs/spec/conflicts.md` and ask.
+
+Never delete files, components, routes or stored data without explicit
+approval, item by item.
+
 ## Orientation
 
 Project Apollo (codename **Parliament** in the V2 architecture) is a

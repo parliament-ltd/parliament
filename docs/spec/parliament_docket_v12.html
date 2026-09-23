@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Parliament · Docket v12</title>
+<!--
+
+PARLIAMENT · DOCKET v12
+Follows parliament_almanac_v30.html and almanac-spec-decisions.md (23 Sept 2026).
+Companion to docket-spec-decisions.md (22 Sept 2026).
+Reference material, not production code.
+
+WHICH DOCUMENT WINS
+  This comment is the record for everything the mockup demonstrates. Where it
+  disagrees with docket-spec-decisions.md, this comment wins. Where
+  almanac-spec-decisions.md addresses something, the Almanac document wins
+  over both, because it is newer and was written against this surface. The
+  divergences that remain are listed at the foot of this comment.
+
+CHANGES FROM v11
+  · Status vocabulary follows the Almanac. Five values, one vocabulary:
+      ready     has not run yet                silent
+      running   happening now                  filled ink, pulsing dot
+      done      produced a turn; locked        ink wash
+      waiting   parked before it started       dashed outline, ink-2 type
+      paused    started, then halted           dashed outline, ink-3 type
+    `held` is gone as a stored value. It needed a label map to render as
+    "waiting on"; `waiting` is stored and shown as itself.
+  · waiting and paused share the dashed outline and differ only in type
+    colour, one step quieter for paused. The distinction is fine, and a second
+    shape would claim it is larger than it is. If it proves thin in use, merge
+    them rather than explain them.
+  · stop: is built, so paused has a way in. stop: bare halts the addressed
+    card's run, stop:201B one branch, stop:all every open docket. The Enter
+    line says before you commit that finished steps stay done and stay paid.
+    Stopping is not undoing.
+  · A paused step is fixed like a done one. It started and it cost something,
+    so its prompt is read-only and its marginalia says what it spent. new:run
+    copies it forward as ready.
+  · run: skips paused branches and says so on the Enter line. hold: refuses a
+    running branch and points at stop:.
+  · run: no longer marks a branch running when it has nothing left to run.
+  · Docket 202 carries a paused branch in its sample data so the state can be
+    seen without typing anything.
+
+WHAT v8 TO v11 ADDED (recorded here for the first time)
+  · Cards. A card is a docket AT A RUN. Two runs side by side and two dockets
+    side by side are one mechanism, so there is no compare view and no run
+    switcher. Three cards is the cap; a fourth closes the oldest. Clicking a
+    card addresses it.
+  · Pips open runs. A pip under an ordinal opens that run as its own card
+    beside this one rather than switching in place.
+  · Record cards. A run whose every step is done is a record: subtle
+    background, quieter type, no add row. The chrome says so once
+    ("a record, fixed", "running now", "the plan", "unfinished") instead of
+    every line saying "locked".
+  · Difference between two runs of one docket. Opening a second run of the
+    same docket IS the request to compare, so marking turns itself on. A change
+    bar in the gutter says which lines differ; a pale ink wash says which words
+    (longest common subsequence, whitespace never counts). Symmetric, on both
+    cards, in ink only. Editable steps show only the bar, because you cannot
+    paint inside a textarea. diff:off turns the marks off. Two different
+    dockets share no positions, so nothing is marked.
+  · Marginalia on every step, always. The diff washes what differs; it never
+    hides what matches.
+  · The caret. Marginalia that opens a picker (room, model, the run) grows a
+    caret on card hover. Marginalia that navigates (a chat number) never does.
+  · Three bar placements.
+      INLINE    one card: travels inside the document under the selected line.
+                More than one card: detaches to its own strip below them and
+                stays there, wearing the navy rule. Never enters a card, never
+                hops columns.
+      PARKED    one card only: bar:foot or bar:top, stops following selection.
+      POPPED    bar:pop: a window the user places, which never moves again. It
+                wears the navy rule and names its target in its head.
+    Position never carries the addressing. The navy rule on the card, the same
+    rule on the bar when detached or popped, the target at the head of the
+    Enter line, and the selection wash on the line do.
+  · The verb table: new, hold, move, delete, run, stop, open, close, diff, bar,
+    help. new: makes, run: starts. help: opens the verbs plus the notes that
+    do not fit in a one-line gloss.
+  · Opening a docket ENTERS command mode. Escape goes to prompt and prompt is
+    where the docket rests.
+
+WHAT BELONGS TO THE BRANCH AND WHAT BELONGS TO THE RUN
+
+  Shared, and the same in every run:  the letter, and the name.
+  Owned by one run:                   the steps, their prompts, their rooms,
+                                      their models, their status, their cost.
+
+  That is what makes "edit within a run" safe. Editing step 2 of 201B while
+  you are in run 3 edits run 3's copy and touches nothing else. A step that
+  has already produced a turn, or started and was halted, is locked. Starting
+  run 4 copies run 3's plan forward, so a run is a fresh sheet with last
+  time's writing already on it.
+
+  The pips under each ordinal say, at a glance, which runs reached this step.
+  Filled means that run produced something here. The dark one is the run you
+  are standing in. Click one to open that run beside this one.
+
+ADDRESSES
+  201 is the docket. 201A, 201B are branches, assigned at creation and never
+  reshuffled or reissued. Move one and the list reads out of order, which is
+  correct. Steps are ordinals inside their branch; the address stops at two
+  levels. A run is never part of an address. Past Z the letters double. I and
+  O are skipped, because 201I is one glance from 2011 in a mono column.
+
+THE KEY ELEMENT
+  The docket has none of its own. It does not execute; the command line does.
+  Almanac spec §5.5 makes the bar the key element on every surface, with its
+  border left to the visual pass. Nothing here draws a progressive dash.
+
+KNOWN DIVERGENCES FROM almanac-spec-decisions.md, NOT YET APPLIED
+  Each of these is a change the mockup still owes. Build to the spec, not to
+  this file, on these points.
+  1. run:201B. Here it always makes a new run with the others parked. Spec §5.2:
+     if 201B has not run in the current run, it runs there; only if it has does
+     run: make a new run. The Enter line should say which. RUNPOL (max 1, no
+     ranges) is not modelled.
+  2. The Enter line before a run should state what will run, in which rooms, on
+     which models, and the cost where it can be computed (spec §2). Here it
+     names the run only.
+  3. Room belongs to the branch (spec §9). Steps here each carry a room; they
+     should inherit it and show one only when they override.
+  4. The answered-by picker should be one flat list ordered by cost mark
+     (×15, ×3, ×1, free, 0 tokens), with no groups (spec §8). Here it is an
+     unordered list with glosses. Model names are sample data.
+  5. The navy rule is permanent on the addressed surface, one card or several
+     (spec §7). Here a single card shows it only in command mode.
+  6. ⌘K is not bound; only / outside a field jumps to the bar, and the Enter
+     line advertises neither. Spec: ⌘K from anywhere including inside fields,
+     and the docket advertises ⌘K only. ? is not bound to help.
+  7. stop:all acts on open cards only. Spec §5: it must cross windows over the
+     storage event.
+  8. Not built: undo: and its boundary at execution, new:branch <chat id>,
+     open: taking a branch address, pop:, from:, and the empty-docket first-run
+     help (docket spec §6).
+-->
+<style>
+:root{
+  --paper-bg:#FCFCFA;
+  --paper-ink:rgba(46,58,79,.011);
+  --paper-hatch:none;   /* page hatch retired — it was noise, not texture */
+  --card-lift:0 1px 2px rgba(40,36,28,.035);
+  --p-surface:#FFFFFF;
+  --p-subtle:#FAF9F5;          /* heading rows — off-white, warmer than grey */
+  --p-tray:#F6F5F1;            /* the working-set tray, so white cards read  */
+  --p-ink:#191919; --p-ink-2:#787774; --p-ink-3:#9B9A97; --p-line-soft:#C0C8D4;
+  --p-border:#E9E9E7; --p-border-2:#F1F1EF;
+  --p-gold-light:#B8A070; --p-gold-muted:#9C8760; --p-gold-deep:#8B6A10;
+  --p-gold-tint:rgba(196,169,77,.08); --p-gold-tint-2:rgba(196,169,77,.14);
+  --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --font-serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --font-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --r-sm:4px; --r-md:6px; --r-xl:16px; --r-btn:8px;
+
+  /* Command mode. Ruling only, no field behind it — the crosshatch carries
+     the mode on its own and the type goes white over it. */
+  --navy:38,56,92;
+  --line-c:22,38,70;
+  --line-a:1;
+  --line-w:3px;
+  --hatch-gap:3.5px;
+
+  /* Prompt mode. Same idea as command — the fill carries the mode — but bone
+     rather than navy, ruled into tall parallelograms with a diagonal through
+     each, so the type stays ink and the field still reads as paper. */
+  --tri:rgba(122,120,114,.17);
+  --prm-bg:var(--paper-bg);
+
+  /* Border and paper spec, light mode. Dark is unfinished and not referenced. */
+  --ink:#191919;
+  --ink-dot:rgba(25,25,25,.18);      /* structural: evenly spaced dots       */
+  --ink-prog:rgba(25,25,25,.10);     /* key: progressive dash, one at a time  */
+  --divider:rgba(25,25,25,.08);      /* header rules                          */
+  --ink-soft:rgba(25,25,25,.30);     /* checkbox rule, quiet icons            */
+  --ink-wash:rgba(25,25,25,.045);    /* selected rows and cards               */
+  --ink-wash-2:rgba(25,25,25,.075);
+  --marg:rgba(25,25,25,.46);         /* marginalia at rest                    */
+
+  /* GOLD MEANS THE LIVE ACTION, AND NOTHING ELSE.
+     The search field when engaged, the trigger on hover, keyboard focus.
+     Every other former use is ink. */
+}
+@media (prefers-contrast:more){:root{--paper-hatch:none}}
+*{box-sizing:border-box;margin:0;padding:0}
+
+[data-border]{position:relative}
+svg.bx{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+:focus-visible{outline:2px solid var(--p-gold-deep);outline-offset:2px}
+
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  font-family:var(--font-sans);background-color:var(--paper-bg);
+  background-image:var(--paper-hatch);background-attachment:fixed;
+  color:var(--p-ink);-webkit-font-smoothing:antialiased;
+  padding:34px 16px 90px;
+}
+/* One window: the rule is fixed to the viewport. Two: it sits on the window
+   being addressed. Same mark, same place, nothing else dims. */
+body.addressed.one::before{content:"";position:fixed;left:0;top:0;bottom:0;width:2px;
+  background:rgb(var(--navy));z-index:80;pointer-events:none;animation:ruleIn .18s ease-out}
+@keyframes ruleIn{from{transform:scaleY(0);transform-origin:top}to{transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){body.addressed.one::before,.win.live::before{animation:none}}
+
+.sheet{max-width:860px;margin:0 auto}
+.desk{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media (max-width:980px){.desk{grid-template-columns:1fr}}
+body.multi .sheet{display:none}
+body.one .desk{display:none}
+.desk.n3{max-width:1500px;grid-template-columns:repeat(3,1fr)}
+@media (max-width:1320px){.desk.n3{grid-template-columns:1fr 1fr}}
+
+/* ══════════ Ids ══════════
+   Plain, as in the Almanac. An address is a constant: no fill, no colour,
+   never a state. */
+.addr{font:500 10.5px var(--font-mono);color:var(--p-ink-3);white-space:nowrap}
+.addr.big{font-size:12px}
+.ord{font:400 10px var(--font-mono);color:var(--p-ink-3)}
+
+/* ══════════ Head ══════════ */
+.dhead{display:flex;align-items:baseline;gap:10px;padding:0 2px}
+.dtitle{flex:1;min-width:0;border:none;background:transparent;padding:0;
+  font:400 21px/1.3 var(--font-serif);color:var(--p-ink)}
+.dtitle:focus{outline:none;box-shadow:0 1px 0 var(--ink-soft)}
+.win .dtitle{font-size:15.5px}
+
+/* ══════════ Marginalia ══════════ */
+.marg{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 5px;
+  font:italic 400 11px var(--font-serif);color:var(--marg);line-height:1.7;
+  transition:color .16s ease}
+.marg>*{white-space:nowrap}
+.marg .sep{opacity:.4}
+.marg button{font:inherit;color:inherit;border:none;background:none;padding:0;
+  cursor:pointer;white-space:nowrap;transition:color .12s ease}
+.marg button:hover{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+.dmarg{margin:5px 0 0 2px}
+
+/* ══════════ The picker affordance ══════════
+   Marginalia that OPENS something grows a caret when the card it sits on is
+   hovered. Marginalia that navigates — a chat number — never does. At rest
+   the line still reads as prose, so nothing is paid for until the pointer is
+   near enough to care. */
+.marg button.picks::after{content:"\25BE";font-style:normal;font-size:8px;margin-left:3px;
+  opacity:0;transition:opacity .14s ease;vertical-align:.09em}
+.line:hover .marg button.picks::after,
+.dwrap:hover .marg button.picks::after,
+.marg button.picks:focus-visible::after{opacity:.5}
+.line:hover .marg{color:var(--p-gold-deep)}
+
+/* ══════════ The document ══════════ */
+.doc{margin-top:18px;background:var(--p-surface);border-radius:var(--r-xl);
+  box-shadow:var(--card-lift);padding:6px 20px 8px}
+.win .doc{margin-top:0;box-shadow:none;border-radius:0;padding:4px 14px 6px}
+.line{position:relative;display:grid;grid-template-columns:64px minmax(0,1fr) auto;column-gap:12px;
+  align-items:start;padding:11px 0;border-top:.5px solid var(--p-border-2);cursor:default}
+.doc>.line:first-child{border-top:none}
+.line.sel{background:var(--ink-wash);margin:0 -20px;padding-left:20px;padding-right:20px;border-radius:var(--r-sm)}
+.win .line.sel{margin:0 -14px;padding-left:14px;padding-right:14px}
+.line.branch{padding-top:20px}
+.doc>.line.branch:first-child{padding-top:12px}
+.win .line{grid-template-columns:52px minmax(0,1fr) auto;padding:8px 0}
+
+.gut{padding-top:2px;display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+.line.step .gut{align-items:flex-end;padding-right:6px}
+
+.bname{width:100%;border:none;background:transparent;padding:0;
+  font:500 13.5px var(--font-sans);color:var(--p-ink)}
+.bname:focus{outline:none;box-shadow:0 1px 0 var(--ink-soft)}
+.bname::placeholder{color:var(--p-ink-3)}
+.ptext{width:100%;border:none;background:transparent;padding:0;resize:none;overflow:hidden;
+  font:400 13.5px/1.55 var(--font-sans);color:var(--p-ink);display:block}
+.ptext:focus{outline:none}
+.ptext[readonly]{cursor:default}
+.ptext::placeholder{color:var(--p-ink-3)}
+.win .ptext,.win .bname{font-size:12.5px}
+
+/* ══════════ Run pips ══════════ */
+.pips{display:flex;gap:3px}
+.pip{width:5px;height:5px;padding:0;border-radius:50%;cursor:pointer;
+  border:1px solid var(--ink-soft);background:transparent;transition:border-color .12s,background .12s}
+.pip.has{background:var(--ink-soft)}
+.pip.now{border-color:var(--ink)}
+.pip.now.has{background:var(--ink)}
+.pip:hover{border-color:var(--p-gold-deep)}
+
+/* ══════════ Status ══════════
+   A pill, never interactive, like the mode pill in the bar. Ready is silent,
+   so a chip on a line always means there is something to know. */
+.st{display:inline-flex;align-items:center;gap:5px;font:500 10px var(--font-sans);
+  padding:2px 7px;border-radius:9px;white-space:nowrap;margin-top:2px}
+.st-done{background:var(--ink-wash-2);color:var(--p-ink-2)}
+.st-running{background:var(--ink);color:var(--paper-bg)}
+/* waiting and paused are both deliberately not running, so both take the
+   dashed outline. They differ only in type colour: paused is one step quieter.
+   The distinction is fine; a second shape would claim it is larger than it is. */
+.st-waiting{background:transparent;border:.5px dashed var(--ink-soft);color:var(--p-ink-2)}
+.st-paused{background:transparent;border:.5px dashed var(--ink-soft);color:var(--p-ink-3)}
+.st-running .dot{width:5px;height:5px;border-radius:50%;background:var(--paper-bg);
+  animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@media (prefers-reduced-motion:reduce){.st-running .dot{animation:none}}
+.line.waiting .bname,.line.waiting .ptext{color:var(--p-ink-3)}
+
+/* ══════════ Difference between two runs ══════════
+   No new hue. Neither run is the original, so nothing here can be "added" or
+   "removed" — the marks are symmetric and appear on both cards at once. A
+   change bar in the gutter says WHICH lines differ; a pale ink wash says
+   WHICH WORDS. Green and red would import a base-and-patch idea that does
+   not hold between two siblings, and would spend two colours the palette has
+   not got. Italics are unavailable: italic serif already means marginalia. */
+.line.chg::before{content:"";position:absolute;left:-11px;top:9px;bottom:9px;width:2px;
+  background:var(--ink-soft);border-radius:1px}
+.win .line.chg::before{left:-8px}
+.dw{background:var(--ink-wash-2);border-radius:2px;padding:0 1px;margin:0 -1px}
+.ptext.ro{white-space:pre-wrap;cursor:text}
+.line.only .ord{color:var(--ink);font-weight:600}
+
+/* ══════════ The one plus ══════════ */
+.addrow{display:grid;grid-template-columns:64px minmax(0,1fr);column-gap:12px;
+  padding:7px 0 12px;border-top:.5px solid var(--p-border-2)}
+.win .addrow{grid-template-columns:52px minmax(0,1fr)}
+.addrow .gut{align-items:flex-end;padding-right:6px}
+.plus{width:17px;height:17px;display:flex;align-items:center;justify-content:center;
+  border:none;background:transparent;color:var(--p-ink-3);cursor:pointer;border-radius:var(--r-sm)}
+.plus:hover{color:var(--p-gold-deep)}
+.plus svg{width:11px;height:11px}
+.addlbl{font:italic 400 11px var(--font-serif);color:var(--marg);align-self:center}
+.addrow:hover .addlbl{color:var(--p-gold-deep)}
+
+/* ══════════ The bar, unanchored ══════════
+   It is a block in the flow, not a fixture. It sits under the line you are
+   working on and travels with the selection. */
+/* ══════════ Where the bar can be ══════════
+   Three states, and which one it is in decides how you know what it acts on.
+   INLINE  with ONE card it travels inside the document, under the selected
+           line. With more than one it detaches to its own strip below them
+           and stays there: it never enters a card and never hops columns.
+   PARKED  single-card only — it sits at the foot and stops following the
+           selection.
+   POPPED  it is a window of its own, placed by the user, and it NEVER moves
+           on its own again. Position can no longer say anything, so the bar
+           wears the same navy rule as the card it is addressing: one mark on
+           two objects is what joins them.
+   It is never a full-width strip under several cards. A bar that sits under
+   two things is a bar that belongs to neither. */
+.barslot{padding:2px 0 10px}
+.line.sel+.barslot{padding-top:0}
+#barhost{max-width:100%}
+.sbar{position:relative}
+.sfield{position:relative;display:flex;align-items:center;border-radius:var(--r-btn);
+  background-color:var(--p-surface);overflow:hidden;box-shadow:var(--card-lift)}
+.sfield input{width:100%;padding:10px 14px 10px 74px;font:400 13.5px var(--font-sans);
+  border:none;border-radius:var(--r-btn);background:transparent;color:var(--p-ink);position:relative;z-index:1}
+.sfield input:focus{outline:none}
+.sfield .fillwrap{position:absolute;inset:0;pointer-events:none;z-index:0;
+  clip-path:inset(0 100% 0 0);transition:clip-path .28s cubic-bezier(.4,0,.2,1)}
+.sfield.cmd .cmdwrap{clip-path:inset(0 0 0 0)}
+.sfield.prm .prmwrap{clip-path:inset(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){.sfield .fillwrap{transition:none}}
+.sfield .fill{position:absolute;inset:0}
+.sfield .fill>svg{width:100%;height:100%;display:block}
+.sfield .cmdfill{background:rgb(var(--line-c))}
+.sfield .prmfill{background:var(--prm-bg)}
+.sfield.cmd input{font-family:var(--font-mono);font-size:13px;color:#fff;
+  text-shadow:0 0 3px rgba(12,20,40,.95),0 1px 2px rgba(12,20,40,.85)}
+.sfield.cmd input::placeholder{color:#fff;opacity:.95;text-shadow:0 0 3px rgba(12,20,40,.9)}
+.modechip{position:absolute;left:12px;top:50%;margin-top:-8px;z-index:2;
+  font:600 8.5px var(--font-sans);letter-spacing:.06em;padding:3px 7px;border-radius:9px;
+  background:rgb(var(--navy));color:#fff;opacity:0;transform:translateX(-4px);
+  transition:opacity .16s ease,transform .16s ease;pointer-events:none}
+.sfield .pchip{background:var(--ink);color:var(--paper-bg);opacity:1;transform:none}
+.sfield .schip{background:var(--paper-bg);color:var(--ink);border:1px solid var(--ink);padding:2px 6px}
+.sfield.cmd .pchip,.sfield.srch .pchip{opacity:0;transform:translateX(-4px)}
+.sfield.cmd .cmdchip{opacity:1;transform:none}
+.sfield.srch .schip{opacity:1;transform:none}
+.sfield.cmd input{padding-left:82px}
+.sfield.srch input{padding-left:66px}
+
+/* The Almanac's hint line, unchanged: one line of reserved height that
+   changes what it says rather than appearing, so nothing below it moves. */
+.shint{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 4px;min-height:19px;padding:6px 13px 0;
+  font:italic 400 11px var(--font-serif);color:var(--marg);line-height:1.6}
+.shint:hover{color:var(--p-gold-deep)}
+.shint .it{white-space:nowrap}
+.shint .sep{opacity:.5;margin:0 3px 0 1px}
+.shint code{font:normal 600 11px var(--font-serif);color:inherit;letter-spacing:.01em}
+.shint button{font:inherit;color:inherit;border:none;background:none;padding:0;cursor:pointer}
+.shint button:hover{color:var(--ink)}
+.shint button:hover .gl{text-decoration:underline;text-underline-offset:2px}
+.shint .it.first code{color:var(--ink)}
+.shint .pre{color:var(--ink);font-style:italic}
+.shint .bad{color:var(--ink)}
+.shint .tgt{color:var(--ink);font-style:normal;font-weight:600}
+
+/* ══════════ Two dockets ══════════ */
+.win{background:var(--p-surface);border:.5px solid var(--p-border);border-radius:var(--r-md);
+  box-shadow:var(--card-lift);overflow:hidden;position:relative;cursor:pointer}
+.win.live::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;z-index:3;background:transparent}
+/* With one surface the rule appears only while the command line is open,
+   because there is nothing to disambiguate. With two or more it is on
+   permanently: a prompt lands in one of them too, not just a command, so
+   "which one am I editing" is a live question at all times. */
+body.multi .win.live::before{background:rgb(var(--navy));animation:ruleIn .18s ease-out}
+.chrome{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--p-subtle);
+  border-bottom:.5px solid var(--p-border-2)}
+.chrome .dots{display:flex;gap:4px}
+.chrome .dots i{width:7px;height:7px;border-radius:50%;background:rgba(25,25,25,.13)}
+.wname{font:500 11px var(--font-sans);color:var(--p-ink-2)}
+.wkind{margin-left:auto;font:italic 400 10.5px var(--font-serif);color:var(--marg)}
+.wrun{font:500 10.5px var(--font-mono);color:var(--p-ink-3)}
+.wclose{border:none;background:none;padding:0 0 0 6px;color:var(--p-ink-3);cursor:pointer;
+  font:400 13px var(--font-sans);line-height:1}
+.wclose:hover{color:var(--ink)}
+/* A run that has finished is a record. Saying so once in the chrome is better
+   than saying "locked" on every line inside it. */
+.win.record .doc{background:var(--p-subtle)}
+.win.record .ptext,.win.record .bname{color:var(--p-ink-2)}
+.wbody{padding:10px 14px 4px}
+.deskbar{max-width:1240px;margin:16px auto 0}
+#barhost.detached{position:relative;padding-left:13px}
+#barhost.detached::before{content:"";position:absolute;left:0;top:1px;bottom:19px;width:2px;
+  background:rgb(var(--navy));border-radius:1px}
+#popbar{position:fixed;z-index:75;width:min(540px,92vw);
+  background:var(--p-surface);border:.5px solid var(--p-border);border-radius:var(--r-md);
+  box-shadow:0 10px 30px rgba(40,36,28,.16);overflow:hidden}
+#popbar .pophead{display:flex;align-items:center;gap:8px;padding:6px 11px;cursor:grab;
+  background:var(--p-subtle);border-bottom:.5px solid var(--p-border-2);user-select:none}
+#popbar.drag .pophead{cursor:grabbing}
+#popbar .popbody{padding:9px 11px 4px}
+#popbar .sfield{box-shadow:none}
+/* The rule that joins the bar to what it addresses. Same colour, same width,
+   same edge as the card's. */
+body.ambig #popbar::before,body.ambig #popbar{position:fixed}
+body.ambig #popbar::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:rgb(var(--navy));z-index:2}
+.poptgt{margin-left:auto;font:italic 400 10.5px var(--font-serif);color:var(--marg)}
+.poptgt b{font-style:normal;font-weight:600;color:rgb(var(--navy))}
+
+/* ══════════ Try bar, mock only ══════════ */
+.try{max-width:1240px;margin:24px auto 0;display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  font:italic 400 11px var(--font-serif);color:var(--marg)}
+.try button{font:500 11px var(--font-sans);padding:4px 10px;border:.5px solid var(--p-border);
+  background:var(--p-surface);color:var(--p-ink-2);border-radius:var(--r-sm);cursor:pointer}
+.try button:hover{background:var(--p-subtle);color:var(--p-ink)}
+.try button.on{background:rgba(var(--navy),.07);color:rgb(var(--navy));border-color:transparent}
+
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(8px);
+  padding:7px 14px;border-radius:var(--r-md);background:var(--p-ink);color:#fff;font-size:12px;
+  opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;z-index:90;max-width:80vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.menu{display:none;position:fixed;z-index:70;min-width:190px;max-height:290px;overflow-y:auto;padding:4px;
+  background:var(--p-surface);border:.5px solid var(--p-border);border-radius:var(--r-md);
+  box-shadow:0 6px 20px rgba(40,36,28,.14)}
+.menu.open{display:block}
+.menu button{display:block;width:100%;text-align:left;padding:6px 9px;border:none;background:none;
+  font:400 12px var(--font-sans);color:var(--p-ink);border-radius:var(--r-sm);cursor:pointer}
+.menu button:hover{background:var(--p-subtle)}
+.menu button .g{display:block;font:italic 400 10px var(--font-serif);color:var(--marg);margin-top:1px}
+
+@media (max-width:620px){
+  .line,.addrow{grid-template-columns:44px minmax(0,1fr)}
+  .line{row-gap:5px}
+  .line>.stwrap{grid-column:2}
+  .doc{padding:6px 14px 8px}
+  .line.sel{margin:0 -14px;padding-left:14px;padding-right:14px}
+}
+</style>
+</head>
+<body class="one">
+
+<div class="sheet" id="sheet"></div>
+
+<div class="desk" id="desk"></div>
+<div class="deskbar" id="deskbar"></div>
+
+<div id="park"></div>
+<div id="popbar" hidden>
+  <div class="pophead" id="pophead"><span class="dots"><i></i><i></i><i></i></span>
+    <span class="wname">Command line</span><span class="poptgt" id="poptgt"></span>
+    <button class="wclose" onclick="barDock()" aria-label="Dock the bar">&times;</button></div>
+  <div class="popbody" id="popbody"></div>
+</div>
+<div id="barhost">
+  <div class="sbar">
+    <div class="sfield" id="sfield" data-border="dot" data-radius="8">
+      <div class="fillwrap cmdwrap"><div class="fill cmdfill"><svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true"><defs><pattern id="stars" width="57.158" height="99.000" patternUnits="userSpaceOnUse" patternTransform="rotate(-22)"><g fill="#fff"><circle cx="-52.39" cy="-85.25" r="0.55" opacity="0.61"/><circle cx="-52.39" cy="13.75" r="0.55" opacity="0.61"/><circle cx="-52.39" cy="112.75" r="0.55" opacity="0.61"/><circle cx="4.76" cy="-85.25" r="0.55" opacity="0.61"/><circle cx="4.76" cy="13.75" r="0.55" opacity="0.61"/><circle cx="4.76" cy="112.75" r="0.55" opacity="0.61"/><circle cx="61.92" cy="-85.25" r="0.55" opacity="0.61"/><circle cx="61.92" cy="13.75" r="0.55" opacity="0.61"/><circle cx="61.92" cy="112.75" r="0.55" opacity="0.61"/><circle cx="-61.92" cy="-85.25" r="0.55" opacity="0.98"/><circle cx="-61.92" cy="13.75" r="0.55" opacity="0.98"/><circle cx="-61.92" cy="112.75" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="-85.25" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="13.75" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="112.75" r="0.55" opacity="0.98"/><circle cx="52.39" cy="-85.25" r="0.55" opacity="0.98"/><circle cx="52.39" cy="13.75" r="0.55" opacity="0.98"/><circle cx="52.39" cy="112.75" r="0.55" opacity="0.98"/><circle cx="-66.68" cy="-88.00" r="0.55" opacity="0.56"/><circle cx="-66.68" cy="11.00" r="0.55" opacity="0.56"/><circle cx="-66.68" cy="110.00" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="-88.00" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="11.00" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="110.00" r="0.55" opacity="0.56"/><circle cx="47.63" cy="-88.00" r="0.55" opacity="0.56"/><circle cx="47.63" cy="11.00" r="0.55" opacity="0.56"/><circle cx="47.63" cy="110.00" r="0.55" opacity="0.56"/><circle cx="-71.45" cy="-96.25" r="0.55" opacity="0.92"/><circle cx="-71.45" cy="2.75" r="0.55" opacity="0.92"/><circle cx="-71.45" cy="101.75" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="-96.25" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="2.75" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="101.75" r="0.55" opacity="0.92"/><circle cx="42.87" cy="-96.25" r="0.55" opacity="0.92"/><circle cx="42.87" cy="2.75" r="0.55" opacity="0.92"/><circle cx="42.87" cy="101.75" r="0.55" opacity="0.92"/><circle cx="-71.45" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="-71.45" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="-71.45" cy="96.25" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="96.25" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="96.25" r="0.55" opacity="0.50"/><circle cx="-66.68" cy="-110.00" r="0.55" opacity="0.87"/><circle cx="-66.68" cy="-11.00" r="0.55" opacity="0.87"/><circle cx="-66.68" cy="88.00" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="-110.00" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="-11.00" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="88.00" r="0.55" opacity="0.87"/><circle cx="47.63" cy="-110.00" r="0.55" opacity="0.87"/><circle cx="47.63" cy="-11.00" r="0.55" opacity="0.87"/><circle cx="47.63" cy="88.00" r="0.55" opacity="0.87"/><circle cx="-61.92" cy="-112.75" r="0.55" opacity="0.45"/><circle cx="-61.92" cy="-13.75" r="0.55" opacity="0.45"/><circle cx="-61.92" cy="85.25" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="-112.75" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="-13.75" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="85.25" r="0.55" opacity="0.45"/><circle cx="52.39" cy="-112.75" r="0.55" opacity="0.45"/><circle cx="52.39" cy="-13.75" r="0.55" opacity="0.45"/><circle cx="52.39" cy="85.25" r="0.55" opacity="0.45"/><circle cx="-52.39" cy="-112.75" r="0.55" opacity="0.82"/><circle cx="-52.39" cy="-13.75" r="0.55" opacity="0.82"/><circle cx="-52.39" cy="85.25" r="0.55" opacity="0.82"/><circle cx="4.76" cy="-112.75" r="0.55" opacity="0.82"/><circle cx="4.76" cy="-13.75" r="0.55" opacity="0.82"/><circle cx="4.76" cy="85.25" r="0.55" opacity="0.82"/><circle cx="61.92" cy="-112.75" r="0.55" opacity="0.82"/><circle cx="61.92" cy="-13.75" r="0.55" opacity="0.82"/><circle cx="61.92" cy="85.25" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="-110.00" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="-11.00" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="88.00" r="0.55" opacity="0.40"/><circle cx="9.53" cy="-110.00" r="0.55" opacity="0.40"/><circle cx="9.53" cy="-11.00" r="0.55" opacity="0.40"/><circle cx="9.53" cy="88.00" r="0.55" opacity="0.40"/><circle cx="66.68" cy="-110.00" r="0.55" opacity="0.40"/><circle cx="66.68" cy="-11.00" r="0.55" opacity="0.40"/><circle cx="66.68" cy="88.00" r="0.55" opacity="0.40"/><circle cx="-42.87" cy="-101.75" r="0.55" opacity="0.77"/><circle cx="-42.87" cy="-2.75" r="0.55" opacity="0.77"/><circle cx="-42.87" cy="96.25" r="0.55" opacity="0.77"/><circle cx="14.29" cy="-101.75" r="0.55" opacity="0.77"/><circle cx="14.29" cy="-2.75" r="0.55" opacity="0.77"/><circle cx="14.29" cy="96.25" r="0.55" opacity="0.77"/><circle cx="71.45" cy="-101.75" r="0.55" opacity="0.77"/><circle cx="71.45" cy="-2.75" r="0.55" opacity="0.77"/><circle cx="71.45" cy="96.25" r="0.55" opacity="0.77"/><circle cx="-33.34" cy="-85.25" r="0.55" opacity="0.66"/><circle cx="-33.34" cy="13.75" r="0.55" opacity="0.66"/><circle cx="-33.34" cy="112.75" r="0.55" opacity="0.66"/><circle cx="23.82" cy="-85.25" r="0.55" opacity="0.66"/><circle cx="23.82" cy="13.75" r="0.55" opacity="0.66"/><circle cx="23.82" cy="112.75" r="0.55" opacity="0.66"/><circle cx="80.97" cy="-85.25" r="0.55" opacity="0.66"/><circle cx="80.97" cy="13.75" r="0.55" opacity="0.66"/><circle cx="80.97" cy="112.75" r="0.55" opacity="0.66"/><circle cx="-38.11" cy="-110.00" r="0.55" opacity="0.61"/><circle cx="-38.11" cy="-11.00" r="0.55" opacity="0.61"/><circle cx="-38.11" cy="88.00" r="0.55" opacity="0.61"/><circle cx="19.05" cy="-110.00" r="0.55" opacity="0.61"/><circle cx="19.05" cy="-11.00" r="0.55" opacity="0.61"/><circle cx="19.05" cy="88.00" r="0.55" opacity="0.61"/><circle cx="76.21" cy="-110.00" r="0.55" opacity="0.61"/><circle cx="76.21" cy="-11.00" r="0.55" opacity="0.61"/><circle cx="76.21" cy="88.00" r="0.55" opacity="0.61"/><circle cx="-33.34" cy="-112.75" r="0.55" opacity="0.98"/><circle cx="-33.34" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="-33.34" cy="85.25" r="0.55" opacity="0.98"/><circle cx="23.82" cy="-112.75" r="0.55" opacity="0.98"/><circle cx="23.82" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="23.82" cy="85.25" r="0.55" opacity="0.98"/><circle cx="80.97" cy="-112.75" r="0.55" opacity="0.98"/><circle cx="80.97" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="80.97" cy="85.25" r="0.55" opacity="0.98"/><circle cx="-23.82" cy="-112.75" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="-13.75" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="85.25" r="0.55" opacity="0.56"/><circle cx="33.34" cy="-112.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="-13.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="85.25" r="0.55" opacity="0.56"/><circle cx="90.50" cy="-112.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="-13.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="85.25" r="0.55" opacity="0.56"/><circle cx="-19.05" cy="-110.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="88.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="-110.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="88.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="-110.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="88.00" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="96.25" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="96.25" r="0.55" opacity="0.50"/><circle cx="100.03" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="100.03" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="100.03" cy="96.25" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-96.25" r="0.55" opacity="0.87"/><circle cx="-14.29" cy="2.75" r="0.55" opacity="0.87"/><circle cx="-14.29" cy="101.75" r="0.55" opacity="0.87"/><circle cx="42.87" cy="-96.25" r="0.55" opacity="0.87"/><circle cx="42.87" cy="2.75" r="0.55" opacity="0.87"/><circle cx="42.87" cy="101.75" r="0.55" opacity="0.87"/><circle cx="100.03" cy="-96.25" r="0.55" opacity="0.87"/><circle cx="100.03" cy="2.75" r="0.55" opacity="0.87"/><circle cx="100.03" cy="101.75" r="0.55" opacity="0.87"/><circle cx="-33.34" cy="-63.25" r="0.55" opacity="0.45"/><circle cx="-33.34" cy="35.75" r="0.55" opacity="0.45"/><circle cx="-33.34" cy="134.75" r="0.55" opacity="0.45"/><circle cx="23.82" cy="-63.25" r="0.55" opacity="0.45"/><circle cx="23.82" cy="35.75" r="0.55" opacity="0.45"/><circle cx="23.82" cy="134.75" r="0.55" opacity="0.45"/><circle cx="80.97" cy="-63.25" r="0.55" opacity="0.45"/><circle cx="80.97" cy="35.75" r="0.55" opacity="0.45"/><circle cx="80.97" cy="134.75" r="0.55" opacity="0.45"/><circle cx="-38.11" cy="-60.50" r="0.55" opacity="0.82"/><circle cx="-38.11" cy="38.50" r="0.55" opacity="0.82"/><circle cx="-38.11" cy="137.50" r="0.55" opacity="0.82"/><circle cx="19.05" cy="-60.50" r="0.55" opacity="0.82"/><circle cx="19.05" cy="38.50" r="0.55" opacity="0.82"/><circle cx="19.05" cy="137.50" r="0.55" opacity="0.82"/><circle cx="76.21" cy="-60.50" r="0.55" opacity="0.82"/><circle cx="76.21" cy="38.50" r="0.55" opacity="0.82"/><circle cx="76.21" cy="137.50" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="-60.50" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="38.50" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="137.50" r="0.55" opacity="0.40"/><circle cx="9.53" cy="-60.50" r="0.55" opacity="0.40"/><circle cx="9.53" cy="38.50" r="0.55" opacity="0.40"/><circle cx="9.53" cy="137.50" r="0.55" opacity="0.40"/><circle cx="66.68" cy="-60.50" r="0.55" opacity="0.40"/><circle cx="66.68" cy="38.50" r="0.55" opacity="0.40"/><circle cx="66.68" cy="137.50" r="0.55" opacity="0.40"/><circle cx="-52.39" cy="-63.25" r="0.55" opacity="0.77"/><circle cx="-52.39" cy="35.75" r="0.55" opacity="0.77"/><circle cx="-52.39" cy="134.75" r="0.55" opacity="0.77"/><circle cx="4.76" cy="-63.25" r="0.55" opacity="0.77"/><circle cx="4.76" cy="35.75" r="0.55" opacity="0.77"/><circle cx="4.76" cy="134.75" r="0.55" opacity="0.77"/><circle cx="61.92" cy="-63.25" r="0.55" opacity="0.77"/><circle cx="61.92" cy="35.75" r="0.55" opacity="0.77"/><circle cx="61.92" cy="134.75" r="0.55" opacity="0.77"/><circle cx="-57.16" cy="-77.00" r="0.55" opacity="0.71"/><circle cx="-57.16" cy="22.00" r="0.55" opacity="0.71"/><circle cx="-57.16" cy="121.00" r="0.55" opacity="0.71"/><circle cx="-0.00" cy="-77.00" r="0.55" opacity="0.71"/><circle cx="-0.00" cy="22.00" r="0.55" opacity="0.71"/><circle cx="-0.00" cy="121.00" r="0.55" opacity="0.71"/><circle cx="57.16" cy="-77.00" r="0.55" opacity="0.71"/><circle cx="57.16" cy="22.00" r="0.55" opacity="0.71"/><circle cx="57.16" cy="121.00" r="0.55" opacity="0.71"/><circle cx="-9.53" cy="-60.50" r="0.55" opacity="0.61"/><circle cx="-9.53" cy="38.50" r="0.55" opacity="0.61"/><circle cx="-9.53" cy="137.50" r="0.55" opacity="0.61"/><circle cx="47.63" cy="-60.50" r="0.55" opacity="0.61"/><circle cx="47.63" cy="38.50" r="0.55" opacity="0.61"/><circle cx="47.63" cy="137.50" r="0.55" opacity="0.61"/><circle cx="104.79" cy="-60.50" r="0.55" opacity="0.61"/><circle cx="104.79" cy="38.50" r="0.55" opacity="0.61"/><circle cx="104.79" cy="137.50" r="0.55" opacity="0.61"/><circle cx="-19.05" cy="-60.50" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="38.50" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="137.50" r="0.55" opacity="0.98"/><circle cx="38.11" cy="-60.50" r="0.55" opacity="0.98"/><circle cx="38.11" cy="38.50" r="0.55" opacity="0.98"/><circle cx="38.11" cy="137.50" r="0.55" opacity="0.98"/><circle cx="95.26" cy="-60.50" r="0.55" opacity="0.98"/><circle cx="95.26" cy="38.50" r="0.55" opacity="0.98"/><circle cx="95.26" cy="137.50" r="0.55" opacity="0.98"/><circle cx="-23.82" cy="-63.25" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="35.75" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="134.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="-63.25" r="0.55" opacity="0.56"/><circle cx="33.34" cy="35.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="134.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="-63.25" r="0.55" opacity="0.56"/><circle cx="90.50" cy="35.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="134.75" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="-88.00" r="0.55" opacity="0.92"/><circle cx="-9.53" cy="11.00" r="0.55" opacity="0.92"/><circle cx="-9.53" cy="110.00" r="0.55" opacity="0.92"/><circle cx="47.63" cy="-88.00" r="0.55" opacity="0.92"/><circle cx="47.63" cy="11.00" r="0.55" opacity="0.92"/><circle cx="47.63" cy="110.00" r="0.55" opacity="0.92"/><circle cx="104.79" cy="-88.00" r="0.55" opacity="0.92"/><circle cx="104.79" cy="11.00" r="0.55" opacity="0.92"/><circle cx="104.79" cy="110.00" r="0.55" opacity="0.92"/><circle cx="-4.76" cy="-85.25" r="0.55" opacity="0.50"/><circle cx="-4.76" cy="13.75" r="0.55" opacity="0.50"/><circle cx="-4.76" cy="112.75" r="0.55" opacity="0.50"/><circle cx="52.39" cy="-85.25" r="0.55" opacity="0.50"/><circle cx="52.39" cy="13.75" r="0.55" opacity="0.50"/><circle cx="52.39" cy="112.75" r="0.55" opacity="0.50"/><circle cx="109.55" cy="-85.25" r="0.55" opacity="0.50"/><circle cx="109.55" cy="13.75" r="0.55" opacity="0.50"/><circle cx="109.55" cy="112.75" r="0.55" opacity="0.50"/><circle cx="-0.00" cy="-77.00" r="0.55" opacity="0.87"/><circle cx="-0.00" cy="22.00" r="0.55" opacity="0.87"/><circle cx="-0.00" cy="121.00" r="0.55" opacity="0.87"/><circle cx="57.16" cy="-77.00" r="0.55" opacity="0.87"/><circle cx="57.16" cy="22.00" r="0.55" opacity="0.87"/><circle cx="57.16" cy="121.00" r="0.55" opacity="0.87"/><circle cx="114.32" cy="-77.00" r="0.55" opacity="0.87"/><circle cx="114.32" cy="22.00" r="0.55" opacity="0.87"/><circle cx="114.32" cy="121.00" r="0.55" opacity="0.87"/><circle cx="0.00" cy="-71.50" r="0.55" opacity="0.45"/><circle cx="0.00" cy="27.50" r="0.55" opacity="0.45"/><circle cx="0.00" cy="126.50" r="0.55" opacity="0.45"/><circle cx="57.16" cy="-71.50" r="0.55" opacity="0.45"/><circle cx="57.16" cy="27.50" r="0.55" opacity="0.45"/><circle cx="57.16" cy="126.50" r="0.55" opacity="0.45"/><circle cx="114.32" cy="-71.50" r="0.55" opacity="0.45"/><circle cx="114.32" cy="27.50" r="0.55" opacity="0.45"/><circle cx="114.32" cy="126.50" r="0.55" opacity="0.45"/><circle cx="-47.63" cy="-38.50" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="60.50" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="159.50" r="0.55" opacity="0.82"/><circle cx="9.53" cy="-38.50" r="0.55" opacity="0.82"/><circle cx="9.53" cy="60.50" r="0.55" opacity="0.82"/><circle cx="9.53" cy="159.50" r="0.55" opacity="0.82"/><circle cx="66.68" cy="-38.50" r="0.55" opacity="0.82"/><circle cx="66.68" cy="60.50" r="0.55" opacity="0.82"/><circle cx="66.68" cy="159.50" r="0.55" opacity="0.82"/><circle cx="-52.39" cy="-35.75" r="0.55" opacity="0.40"/><circle cx="-52.39" cy="63.25" r="0.55" opacity="0.40"/><circle cx="-52.39" cy="162.25" r="0.55" opacity="0.40"/><circle cx="4.76" cy="-35.75" r="0.55" opacity="0.40"/><circle cx="4.76" cy="63.25" r="0.55" opacity="0.40"/><circle cx="4.76" cy="162.25" r="0.55" opacity="0.40"/><circle cx="61.92" cy="-35.75" r="0.55" opacity="0.40"/><circle cx="61.92" cy="63.25" r="0.55" opacity="0.40"/><circle cx="61.92" cy="162.25" r="0.55" opacity="0.40"/><circle cx="-61.92" cy="-35.75" r="0.55" opacity="0.77"/><circle cx="-61.92" cy="63.25" r="0.55" opacity="0.77"/><circle cx="-61.92" cy="162.25" r="0.55" opacity="0.77"/><circle cx="-4.76" cy="-35.75" r="0.55" opacity="0.77"/><circle cx="-4.76" cy="63.25" r="0.55" opacity="0.77"/><circle cx="-4.76" cy="162.25" r="0.55" opacity="0.77"/><circle cx="52.39" cy="-35.75" r="0.55" opacity="0.77"/><circle cx="52.39" cy="63.25" r="0.55" opacity="0.77"/><circle cx="52.39" cy="162.25" r="0.55" opacity="0.77"/><circle cx="-71.45" cy="-46.75" r="0.55" opacity="0.71"/><circle cx="-71.45" cy="52.25" r="0.55" opacity="0.71"/><circle cx="-71.45" cy="151.25" r="0.55" opacity="0.71"/><circle cx="-14.29" cy="-46.75" r="0.55" opacity="0.71"/><circle cx="-14.29" cy="52.25" r="0.55" opacity="0.71"/><circle cx="-14.29" cy="151.25" r="0.55" opacity="0.71"/><circle cx="42.87" cy="-46.75" r="0.55" opacity="0.71"/><circle cx="42.87" cy="52.25" r="0.55" opacity="0.71"/><circle cx="42.87" cy="151.25" r="0.55" opacity="0.71"/><circle cx="-66.68" cy="-60.50" r="0.55" opacity="0.66"/><circle cx="-66.68" cy="38.50" r="0.55" opacity="0.66"/><circle cx="-66.68" cy="137.50" r="0.55" opacity="0.66"/><circle cx="-9.53" cy="-60.50" r="0.55" opacity="0.66"/><circle cx="-9.53" cy="38.50" r="0.55" opacity="0.66"/><circle cx="-9.53" cy="137.50" r="0.55" opacity="0.66"/><circle cx="47.63" cy="-60.50" r="0.55" opacity="0.66"/><circle cx="47.63" cy="38.50" r="0.55" opacity="0.66"/><circle cx="47.63" cy="137.50" r="0.55" opacity="0.66"/><circle cx="-42.87" cy="-46.75" r="0.55" opacity="0.98"/><circle cx="-42.87" cy="52.25" r="0.55" opacity="0.98"/><circle cx="-42.87" cy="151.25" r="0.55" opacity="0.98"/><circle cx="14.29" cy="-46.75" r="0.55" opacity="0.98"/><circle cx="14.29" cy="52.25" r="0.55" opacity="0.98"/><circle cx="14.29" cy="151.25" r="0.55" opacity="0.98"/><circle cx="71.45" cy="-46.75" r="0.55" opacity="0.98"/><circle cx="71.45" cy="52.25" r="0.55" opacity="0.98"/><circle cx="71.45" cy="151.25" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="-38.50" r="0.55" opacity="0.56"/><circle cx="-19.05" cy="60.50" r="0.55" opacity="0.56"/><circle cx="-19.05" cy="159.50" r="0.55" opacity="0.56"/><circle cx="38.11" cy="-38.50" r="0.55" opacity="0.56"/><circle cx="38.11" cy="60.50" r="0.55" opacity="0.56"/><circle cx="38.11" cy="159.50" r="0.55" opacity="0.56"/><circle cx="95.26" cy="-38.50" r="0.55" opacity="0.56"/><circle cx="95.26" cy="60.50" r="0.55" opacity="0.56"/><circle cx="95.26" cy="159.50" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="-35.75" r="0.55" opacity="0.92"/><circle cx="-23.82" cy="63.25" r="0.55" opacity="0.92"/><circle cx="-23.82" cy="162.25" r="0.55" opacity="0.92"/><circle cx="33.34" cy="-35.75" r="0.55" opacity="0.92"/><circle cx="33.34" cy="63.25" r="0.55" opacity="0.92"/><circle cx="33.34" cy="162.25" r="0.55" opacity="0.92"/><circle cx="90.50" cy="-35.75" r="0.55" opacity="0.92"/><circle cx="90.50" cy="63.25" r="0.55" opacity="0.92"/><circle cx="90.50" cy="162.25" r="0.55" opacity="0.92"/><circle cx="-33.34" cy="-35.75" r="0.55" opacity="0.50"/><circle cx="-33.34" cy="63.25" r="0.55" opacity="0.50"/><circle cx="-33.34" cy="162.25" r="0.55" opacity="0.50"/><circle cx="23.82" cy="-35.75" r="0.55" opacity="0.50"/><circle cx="23.82" cy="63.25" r="0.55" opacity="0.50"/><circle cx="23.82" cy="162.25" r="0.55" opacity="0.50"/><circle cx="80.97" cy="-35.75" r="0.55" opacity="0.50"/><circle cx="80.97" cy="63.25" r="0.55" opacity="0.50"/><circle cx="80.97" cy="162.25" r="0.55" opacity="0.50"/><circle cx="-38.11" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="-38.11" cy="60.50" r="0.55" opacity="0.87"/><circle cx="-38.11" cy="159.50" r="0.55" opacity="0.87"/><circle cx="19.05" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="19.05" cy="60.50" r="0.55" opacity="0.87"/><circle cx="19.05" cy="159.50" r="0.55" opacity="0.87"/><circle cx="76.21" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="76.21" cy="60.50" r="0.55" opacity="0.87"/><circle cx="76.21" cy="159.50" r="0.55" opacity="0.87"/><circle cx="-14.29" cy="-52.25" r="0.55" opacity="0.45"/><circle cx="-14.29" cy="46.75" r="0.55" opacity="0.45"/><circle cx="-14.29" cy="145.75" r="0.55" opacity="0.45"/><circle cx="42.87" cy="-52.25" r="0.55" opacity="0.45"/><circle cx="42.87" cy="46.75" r="0.55" opacity="0.45"/><circle cx="42.87" cy="145.75" r="0.55" opacity="0.45"/><circle cx="100.03" cy="-52.25" r="0.55" opacity="0.45"/><circle cx="100.03" cy="46.75" r="0.55" opacity="0.45"/><circle cx="100.03" cy="145.75" r="0.55" opacity="0.45"/><circle cx="-14.29" cy="-46.75" r="0.55" opacity="0.82"/><circle cx="-14.29" cy="52.25" r="0.55" opacity="0.82"/><circle cx="-14.29" cy="151.25" r="0.55" opacity="0.82"/><circle cx="42.87" cy="-46.75" r="0.55" opacity="0.82"/><circle cx="42.87" cy="52.25" r="0.55" opacity="0.82"/><circle cx="42.87" cy="151.25" r="0.55" opacity="0.82"/><circle cx="100.03" cy="-46.75" r="0.55" opacity="0.82"/><circle cx="100.03" cy="52.25" r="0.55" opacity="0.82"/><circle cx="100.03" cy="151.25" r="0.55" opacity="0.82"/><circle cx="-33.34" cy="-13.75" r="0.55" opacity="0.40"/><circle cx="-33.34" cy="85.25" r="0.55" opacity="0.40"/><circle cx="-33.34" cy="184.25" r="0.55" opacity="0.40"/><circle cx="23.82" cy="-13.75" r="0.55" opacity="0.40"/><circle cx="23.82" cy="85.25" r="0.55" opacity="0.40"/><circle cx="23.82" cy="184.25" r="0.55" opacity="0.40"/><circle cx="80.97" cy="-13.75" r="0.55" opacity="0.40"/><circle cx="80.97" cy="85.25" r="0.55" opacity="0.40"/><circle cx="80.97" cy="184.25" r="0.55" opacity="0.40"/><circle cx="-38.11" cy="-11.00" r="0.55" opacity="0.77"/><circle cx="-38.11" cy="88.00" r="0.55" opacity="0.77"/><circle cx="-38.11" cy="187.00" r="0.55" opacity="0.77"/><circle cx="19.05" cy="-11.00" r="0.55" opacity="0.77"/><circle cx="19.05" cy="88.00" r="0.55" opacity="0.77"/><circle cx="19.05" cy="187.00" r="0.55" opacity="0.77"/><circle cx="76.21" cy="-11.00" r="0.55" opacity="0.77"/><circle cx="76.21" cy="88.00" r="0.55" opacity="0.77"/><circle cx="76.21" cy="187.00" r="0.55" opacity="0.77"/><circle cx="-52.39" cy="-13.75" r="0.55" opacity="0.71"/><circle cx="-52.39" cy="85.25" r="0.55" opacity="0.71"/><circle cx="-52.39" cy="184.25" r="0.55" opacity="0.71"/><circle cx="4.76" cy="-13.75" r="0.55" opacity="0.71"/><circle cx="4.76" cy="85.25" r="0.55" opacity="0.71"/><circle cx="4.76" cy="184.25" r="0.55" opacity="0.71"/><circle cx="61.92" cy="-13.75" r="0.55" opacity="0.71"/><circle cx="61.92" cy="85.25" r="0.55" opacity="0.71"/><circle cx="61.92" cy="184.25" r="0.55" opacity="0.71"/><circle cx="-57.16" cy="-27.50" r="0.55" opacity="0.66"/><circle cx="-57.16" cy="71.50" r="0.55" opacity="0.66"/><circle cx="-57.16" cy="170.50" r="0.55" opacity="0.66"/><circle cx="-0.00" cy="-27.50" r="0.55" opacity="0.66"/><circle cx="-0.00" cy="71.50" r="0.55" opacity="0.66"/><circle cx="-0.00" cy="170.50" r="0.55" opacity="0.66"/><circle cx="57.16" cy="-27.50" r="0.55" opacity="0.66"/><circle cx="57.16" cy="71.50" r="0.55" opacity="0.66"/><circle cx="57.16" cy="170.50" r="0.55" opacity="0.66"/><circle cx="-28.58" cy="-22.00" r="0.55" opacity="0.61"/><circle cx="-28.58" cy="77.00" r="0.55" opacity="0.61"/><circle cx="-28.58" cy="176.00" r="0.55" opacity="0.61"/><circle cx="28.58" cy="-22.00" r="0.55" opacity="0.61"/><circle cx="28.58" cy="77.00" r="0.55" opacity="0.61"/><circle cx="28.58" cy="176.00" r="0.55" opacity="0.61"/><circle cx="85.74" cy="-22.00" r="0.55" opacity="0.61"/><circle cx="85.74" cy="77.00" r="0.55" opacity="0.61"/><circle cx="85.74" cy="176.00" r="0.55" opacity="0.61"/><circle cx="-4.76" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="85.25" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="184.25" r="0.55" opacity="0.98"/><circle cx="52.39" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="52.39" cy="85.25" r="0.55" opacity="0.98"/><circle cx="52.39" cy="184.25" r="0.55" opacity="0.98"/><circle cx="109.55" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="109.55" cy="85.25" r="0.55" opacity="0.98"/><circle cx="109.55" cy="184.25" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="88.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="187.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="88.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="187.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="88.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="187.00" r="0.55" opacity="0.92"/><circle cx="-23.82" cy="-13.75" r="0.55" opacity="0.50"/><circle cx="-23.82" cy="85.25" r="0.55" opacity="0.50"/><circle cx="-23.82" cy="184.25" r="0.55" opacity="0.50"/><circle cx="33.34" cy="-13.75" r="0.55" opacity="0.50"/><circle cx="33.34" cy="85.25" r="0.55" opacity="0.50"/><circle cx="33.34" cy="184.25" r="0.55" opacity="0.50"/><circle cx="90.50" cy="-13.75" r="0.55" opacity="0.50"/><circle cx="90.50" cy="85.25" r="0.55" opacity="0.50"/><circle cx="90.50" cy="184.25" r="0.55" opacity="0.50"/><circle cx="-9.53" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="60.50" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="159.50" r="0.55" opacity="0.87"/><circle cx="47.63" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="47.63" cy="60.50" r="0.55" opacity="0.87"/><circle cx="47.63" cy="159.50" r="0.55" opacity="0.87"/><circle cx="104.79" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="104.79" cy="60.50" r="0.55" opacity="0.87"/><circle cx="104.79" cy="159.50" r="0.55" opacity="0.87"/><circle cx="-4.76" cy="-35.75" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="63.25" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="162.25" r="0.55" opacity="0.45"/><circle cx="52.39" cy="-35.75" r="0.55" opacity="0.45"/><circle cx="52.39" cy="63.25" r="0.55" opacity="0.45"/><circle cx="52.39" cy="162.25" r="0.55" opacity="0.45"/><circle cx="109.55" cy="-35.75" r="0.55" opacity="0.45"/><circle cx="109.55" cy="63.25" r="0.55" opacity="0.45"/><circle cx="109.55" cy="162.25" r="0.55" opacity="0.45"/><circle cx="-0.00" cy="-27.50" r="0.55" opacity="0.82"/><circle cx="-0.00" cy="71.50" r="0.55" opacity="0.82"/><circle cx="-0.00" cy="170.50" r="0.55" opacity="0.82"/><circle cx="57.16" cy="-27.50" r="0.55" opacity="0.82"/><circle cx="57.16" cy="71.50" r="0.55" opacity="0.82"/><circle cx="57.16" cy="170.50" r="0.55" opacity="0.82"/><circle cx="114.32" cy="-27.50" r="0.55" opacity="0.82"/><circle cx="114.32" cy="71.50" r="0.55" opacity="0.82"/><circle cx="114.32" cy="170.50" r="0.55" opacity="0.82"/><circle cx="0.00" cy="-22.00" r="0.55" opacity="0.40"/><circle cx="0.00" cy="77.00" r="0.55" opacity="0.40"/><circle cx="0.00" cy="176.00" r="0.55" opacity="0.40"/><circle cx="57.16" cy="-22.00" r="0.55" opacity="0.40"/><circle cx="57.16" cy="77.00" r="0.55" opacity="0.40"/><circle cx="57.16" cy="176.00" r="0.55" opacity="0.40"/><circle cx="114.32" cy="-22.00" r="0.55" opacity="0.40"/><circle cx="114.32" cy="77.00" r="0.55" opacity="0.40"/><circle cx="114.32" cy="176.00" r="0.55" opacity="0.40"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#stars)"/></svg></div></div>
+<div class="fillwrap prmwrap"><div class="fill prmfill"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><pattern id="mosaic" width="16" height="24" patternUnits="userSpaceOnUse" patternTransform="skewY(-17)"><g fill="none" stroke="var(--tri)" stroke-width=".7"><path d="M0 0V24M16 0V24"/><path d="M0 0H16M0 24H16"/><path d="M0 0L16 24"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#mosaic)"/></svg></div></div>
+      <span class="modechip schip">SEARCH</span>
+      <span class="modechip cmdchip">COMMAND</span>
+      <span class="modechip pchip">PROMPT</span>
+      <input id="q" type="text" aria-label="Prompt, command or search">
+    </div>
+    <div class="shint" id="shint" aria-live="polite"></div>
+  </div>
+</div>
+
+<div class="try">
+  <span>Try:</span>
+  <button onclick="demo('one')">one card</button>
+  <button onclick="demo('runs')">two runs, side by side</button>
+  <button onclick="demo('dockets')">two dockets</button>
+  <span class="sep">·</span>
+  <button onclick="grow()">add 24 branches</button>
+  <button onclick="reset()">reset</button>
+</div>
+
+<div class="menu" id="menu"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+var NS='http://www.w3.org/2000/svg';
+
+function rrPath(w,h,r){
+  var i=0.5, rad=r-i, m=r-rad*0.7071;
+  return 'M'+m+','+m+
+    'A'+rad+','+rad+' 0 0 1 '+r+','+i+' H'+(w-r)+
+    'A'+rad+','+rad+' 0 0 1 '+(w-i)+','+r+' V'+(h-r)+
+    'A'+rad+','+rad+' 0 0 1 '+(w-r)+','+(h-i)+' H'+r+
+    'A'+rad+','+rad+' 0 0 1 '+i+','+(h-r)+' V'+r+
+    'A'+rad+','+rad+' 0 0 1 '+m+','+m;
+}
+
+function paintBorder(el){
+  var kind=el.getAttribute('data-border'), r=+(el.getAttribute('data-radius')||8);
+  var w=el.offsetWidth, h=el.offsetHeight;
+  if(w<2*r+2||h<2*r+2) return;
+
+  var svg=el.querySelector(':scope > svg.bx');
+  if(!svg){
+    svg=document.createElementNS(NS,'svg');
+    svg.setAttribute('class','bx'); svg.setAttribute('aria-hidden','true');
+    el.appendChild(svg);
+  }
+  svg.innerHTML='';
+  svg.setAttribute('width',w); svg.setAttribute('height',h);
+  svg.setAttribute('viewBox','0 0 '+w+' '+h);
+
+  var d=rrPath(w,h,r);
+  function mkPath(cls){
+    var q=document.createElementNS(NS,'path');
+    q.setAttribute('d',d); q.setAttribute('fill','none');
+    q.setAttribute('stroke-width','1'); q.setAttribute('stroke-linecap','round');
+    if(cls) q.setAttribute('class',cls);
+    svg.appendChild(q); return q;
+  }
+
+  if(kind==='prog'){
+    /* Two paths. The ink one is the resting progressive dash: mirrored halves
+       growing from a dot at the top-left to a solid bottom-right corner, so it
+       reads like light falling from the top-left. The gold one is solid and
+       hidden by its own length, and draws itself in when the element is live. */
+    var ink=mkPath('prog-ink');
+    var L=ink.getTotalLength();
+    ink.style.stroke='var(--ink-prog)';
+    var gEnd=3.5, gJoin=1, maxDash=12;
+    var half=(L-gEnd-gJoin)/2, A=[], S=0;
+    while(true){
+      var t=Math.min(S/half,1);
+      var dash=0.01+maxDash*Math.pow(t,1.4);
+      var gap=3.5-2.6*t;
+      if(A.length && S+gap+dash>half) break;
+      if(A.length){A.push(gap);S+=gap;}
+      A.push(dash); S+=dash;
+    }
+    A[A.length-1]+=half-S;
+    ink.setAttribute('stroke-dasharray',A.concat([gJoin],A.slice().reverse(),[gEnd]).join(' '));
+
+  }else{
+    /* Even dots, spacing nudged so a whole number fits the perimeter exactly. */
+    var dots=mkPath('');
+    var L2=dots.getTotalLength();
+    dots.style.stroke='var(--ink-dot)';
+    var count=Math.max(4,Math.round(L2/4)), seg=L2/count;
+    dots.setAttribute('stroke-dasharray','0.01 '+(seg-0.01));
+  }
+}
+
+
+
+var RO = window.ResizeObserver ? new ResizeObserver(function(es){
+  es.forEach(function(e){ paintBorder(e.target); });
+}) : null;
+function paintAll(){
+  document.querySelectorAll('[data-border]').forEach(function(el){
+    paintBorder(el);
+    if(RO && !el.__ro){ RO.observe(el); el.__ro=true; }
+  });
+}
+function $id(i){return document.getElementById(i)}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+var tt;function toast(m){var t=$id('toast');t.innerHTML=m;t.classList.add('show');
+  clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show')},3200)}
+function plural(n,w){return n+' '+w+(n===1?'':(/(ch|sh|s|x|z)$/.test(w)?'es':'s'))}
+var PLUS='<svg viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>';
+
+var AL='ABCDEFGHJKLMNPQRSTUVWXYZ';
+function letterAt(n){var s='';do{s=AL[n%AL.length]+s;n=Math.floor(n/AL.length)-1;}while(n>=0);return s;}
+
+var ROOMS=['Writing Studio','Reading Room','Code Lab','Pocket'];
+var MODELS=['Opus 4.6','Sonnet 4.6','Haiku 4.5','llama3.1:8b · local','Wikipedia'];
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DATA
+   A branch owns its letter and its name, in every run. A RUN owns the steps:
+   their prompts, rooms, models and status. Starting a run copies the last
+   one forward, so a run is a fresh sheet with last time's writing on it.
+   ═══════════════════════════════════════════════════════════════════════ */
+function S(t,room,m,st,extra){var o={t:t,room:room,m:m,st:st||'ready'};for(var k in (extra||{}))o[k]=extra[k];return o}
+
+function seed201(){return {
+  id:201, title:'Three openings for the Q2 essay', runs:3, cost:{1:0.41,2:0.55,3:0.63},
+  B:[
+   {L:0,name:'Brief the angle',r:{
+     1:{st:'done',steps:[S('Read the three openings and say which the ending needs.','Writing Studio','Sonnet 4.6','done',{chat:231})]},
+     2:{st:'done',steps:[S('Read the three openings against the ending.','Writing Studio','Sonnet 4.6','done',{chat:238}),
+                         S('Name the promise each one makes.','Writing Studio','Sonnet 4.6','done',{chat:239})]},
+     3:{st:'done',steps:[S('Read the three candidate openings against the ending and say which one the ending needs.','Writing Studio','Sonnet 4.6','done',{chat:242}),
+                         S('Name the promise each opening makes, in one sentence each.','Writing Studio','Sonnet 4.6','done',{chat:243})]}}},
+   {L:1,name:'The water tower',r:{
+     1:{st:'done',steps:[S('Draft it with the tower.','Writing Studio','Opus 4.6','done',{chat:232})]},
+     2:{st:'done',steps:[S('Draft the revision with the tower.','Writing Studio','Opus 4.6','done',{chat:240})]},
+     3:{st:'running',steps:[S('Draft the revision, keeping the tower but cutting the second paragraph.','Writing Studio','Opus 4.6','done',{chat:251}),
+                            S('Check the ending still lands now that the setup is shorter.','Writing Studio','Opus 4.6','running',{tok:1180}),
+                            S('Mark what changed, so run 4 can start from the diff.','Reading Room','Haiku 4.5')]}}},
+   {L:2,name:'The letter',r:{
+     2:{st:'done',steps:[S('Rewrite the opening as a letter.','Writing Studio','Sonnet 4.6','done',{chat:241})]},
+     3:{st:'ready',steps:[S('Rewrite the opening as a letter to the reader, second person, no preamble.','Writing Studio','Sonnet 4.6')]}}},
+   {L:3,name:'The list',r:{
+     3:{st:'waiting',steps:[S('Try the list form. Parked until the other two are settled.','Writing Studio','Haiku 4.5','waiting')]}}}
+  ]};}
+
+function seed202(){return {
+  id:202, title:'Pricing page rewrite', runs:1, cost:{1:0.29},
+  B:[{L:0,name:'Audit what is there',r:{1:{st:'done',steps:[S('List every claim the page makes and mark the ones we can prove.','Code Lab','Sonnet 4.6','done',{chat:258})]}}},
+     {L:1,name:'Headlines',r:{1:{st:'paused',steps:[S('Eleven headline options, no more than nine words each.','Writing Studio','Opus 4.6','paused',{tok:640}),
+                                                   S('Pick the three strongest and say why, one line each.','Writing Studio','Sonnet 4.6')]}}}
+  ]};}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CARDS
+   One mechanism. A card is a docket AT A RUN. Two dockets side by side and
+   two runs side by side are the same thing, so there is no separate compare
+   view and no run switcher — opening run 1 is opening a card.
+   ═══════════════════════════════════════════════════════════════════════ */
+var D={201:seed201(),202:seed202()};
+var CARDS=[{k:1,id:201,run:3}], NK=2, ADDR=1, SEL=null, MAX=3, DIFF=true;
+var BARMODE='inline', POPXY={x:null,y:null};
+
+/* ═══ Difference between two runs of one docket ═══
+   Comparison turns itself on: opening run 1 beside run 3 IS the request to
+   compare, so there is nothing to switch on. Two different dockets have no
+   shared positions, so nothing is marked. diff: turns the marks off. */
+function sibOf(c){ return DIFF ? CARDS.filter(function(x){return x!==c&&x.id===c.id})[0]||null : null }
+function stepAt(c,L,i){
+  var b=D[c.id].B.filter(function(x){return x.L===L})[0], rr=b&&b.r[c.run];
+  return rr?(rr.steps[i]||null):null;
+}
+function cmpStep(c,b,i,s){
+  var sib=sibOf(c); if(!sib) return null;
+  var o=stepAt(sib,b.L,i);
+  if(!o) return {only:true,run:sib.run};
+  return {o:o,run:sib.run,txt:o.t!==s.t,room:o.room!==s.room,m:o.m!==s.m,
+          chg:(o.t!==s.t||o.room!==s.room||o.m!==s.m)};
+}
+/* Word-level, by longest common subsequence. Whitespace never counts as a
+   change, or a reflowed line would light up end to end. */
+function wdiff(a,b){
+  var A=a.split(/(\s+)/), Bk=b.split(/(\s+)/), n=A.length, m=Bk.length, x, y;
+  var dp=[]; for(x=0;x<=n;x++){ dp.push([]); for(y=0;y<=m;y++) dp[x][y]=0; }
+  for(x=n-1;x>=0;x--) for(y=m-1;y>=0;y--)
+    dp[x][y]=A[x]===Bk[y]?dp[x+1][y+1]+1:Math.max(dp[x+1][y],dp[x][y+1]);
+  var out=[]; x=0; y=0;
+  while(x<n&&y<m){
+    if(A[x]===Bk[y]){out.push({t:A[x],s:1});x++;y++;}
+    else if(dp[x+1][y]>=dp[x][y+1]){out.push({t:A[x],s:0});x++;}
+    else y++;
+  }
+  while(x<n){out.push({t:A[x],s:0});x++;}
+  return out.map(function(w){ return /^\s+$/.test(w.t)?{t:w.t,s:1}:w; });
+}
+function diffHTML(s,d){
+  if(!d||!d.o||!d.txt) return esc(s.t);
+  return wdiff(s.t,d.o.t).map(function(w){
+    return w.s?esc(w.t):'<span class="dw">'+esc(w.t)+'</span>'; }).join('');
+}
+
+function card(k){for(var i=0;i<CARDS.length;i++) if(CARDS[i].k===k) return CARDS[i]; return CARDS[0]}
+function AC(){return card(ADDR)}
+function dk(){return D[AC().id]}
+function addrOf(d,b){return d.id+letterAt(b.L)}
+function nextL(d){var m=-1;d.B.forEach(function(b){if(b.L>m)m=b.L});return m+1}
+function findB(d,a){a=String(a).toUpperCase().replace(new RegExp('^'+d.id),'');
+  for(var i=0;i<d.B.length;i++) if(letterAt(d.B[i].L)===a) return d.B[i]; return null}
+function liveB(d,run){return d.B.filter(function(b){return b.r[run]})}
+function isRecord(c){var d=D[c.id];
+  return liveB(d,c.run).every(function(b){return b.r[c.run].steps.every(function(s){return s.st==='done'})})}
+function isRunning(c){var d=D[c.id];
+  return liveB(d,c.run).some(function(b){return b.r[c.run].steps.some(function(s){return s.st==='running'})})}
+
+function openCard(id,run,why){
+  if(!D[id]) return;
+  run=run||D[id].runs;
+  var ex=CARDS.filter(function(c){return c.id===id&&c.run===run})[0];
+  if(ex){ ADDR=ex.k; SEL=null; render(); toast('Docket '+id+', run '+run+' is already open.'); return; }
+  if(CARDS.length>=MAX){ var drop=CARDS.shift();
+    toast('Three cards is the readable limit, so '+drop.id+' run '+drop.run+' closed.'); }
+  var c={k:NK++,id:id,run:run}; CARDS.push(c); ADDR=c.k; SEL=null; render();
+  if(why) toast(why);
+}
+function closeCard(k){
+  if(CARDS.length<2) return toast('The last card stays open.');
+  var i=CARDS.map(function(c){return c.k}).indexOf(k);
+  CARDS.splice(i,1); if(ADDR===k) ADDR=CARDS[Math.max(0,i-1)].k; SEL=null; render();
+}
+function address(k){ if(ADDR!==k){ ADDR=k; SEL=null; render();
+  toast('The bar now acts on docket '+AC().id+', run '+AC().run+'.'); } }
+
+/* ═══ Render ═══ */
+function chip(st){
+  if(st==='running') return '<span class="st st-running"><span class="dot"></span>running</span>';
+  if(st==='done')    return '<span class="st st-done">done</span>';
+  if(st==='waiting') return '<span class="st st-waiting">waiting</span>';
+  if(st==='paused')  return '<span class="st st-paused">paused</span>';
+  return '';                      /* ready is silent */
+}
+/* A pip no longer switches the run in place. It OPENS that run as its own
+   card beside this one, which is the only mechanism for seeing two of
+   anything at once. */
+function pips(c,b,i){
+  var d=D[c.id], h='';
+  for(var r=1;r<=d.runs;r++){
+    var rr=b.r[r], has=rr&&rr.steps.length>i;
+    h+='<button class="pip'+(has?' has':'')+(r===c.run?' now':'')+'" onclick="pipHit(event,'+c.id+','+r+')" '+
+       'title="run '+r+(has?': open it beside this one':': did not reach this step')+'" aria-label="Open run '+r+'"></button>';
+  }
+  return '<div class="pips">'+h+'</div>';
+}
+function pipHit(e,id,r){ e.stopPropagation();
+  openCard(id,r,'Run '+r+' opened as its own card. Runs and dockets are the same kind of card.'); }
+
+function stepMarg(c,b,i,s,df){
+  var d=D[c.id], bi=d.B.indexOf(b);
+  /* Marginalia is on EVERY step, always. Room and model say how a step
+     behaves; that is true whether or not the other card says something else.
+     Hiding the unchanged ones would make a line read differently depending
+     on what else happens to be open, and would make marginalia mean "look
+     here", which is the change bar's job. The diff only WASHES what differs. */
+  function w(txt,on){ return on?'<span class="dw">'+esc(txt)+'</span>':esc(txt) }
+  var p=['<button class="picks" onclick="pick(event,'+c.k+','+bi+','+i+',\'room\')">'+w(s.room,df&&df.room)+'</button>',
+         '<button class="picks" onclick="pick(event,'+c.k+','+bi+','+i+',\'m\')">'+w(s.m,df&&df.m)+'</button>'];
+  if(df&&df.only) p.push('<span class="dw">not in run '+df.run+'</span>');
+  if(s.st==='running'&&s.tok) p.push('<span>'+s.tok.toLocaleString()+' tokens so far</span>');
+  if(s.st==='paused') p.push('<span>halted'+(s.tok?' at '+s.tok.toLocaleString()+' tokens, spent':'')+'</span>');
+  if(s.chat) p.push('<button onclick="toast(\'Opens chat '+s.chat+'. In the Almanac it reads: from '+addrOf(d,b)+', run '+c.run+'.\')">chat '+s.chat+'</button>');
+  return p.join('<span class="sep">·</span>');
+}
+
+function renderDoc(c){
+  var d=D[c.id], h='';
+  liveB(d,c.run).forEach(function(b){
+    var a=addrOf(d,b), rr=b.r[c.run], bi=d.B.indexOf(b), key=c.k+':'+a;
+    var first=Math.min.apply(null,Object.keys(b.r).map(Number));
+    h+='<div class="line branch'+(rr.st==='waiting'?' waiting':'')+(SEL===key?' sel':'')+'" '+
+         'onclick="select(event,\''+key+'\','+c.k+')">'+
+       '<div class="gut"><span class="addr">'+a+'</span></div>'+
+       '<div><input class="bname" value="'+esc(b.name)+'" placeholder="Untitled branch" aria-label="Branch name" '+
+         'oninput="D['+c.id+'].B['+bi+'].name=this.value">'+
+       '<div class="marg"><span>'+plural(rr.steps.length,'step')+'</span>'+
+         (first>1?'<span class="sep">·</span><span>new in run '+first+'</span>':'')+
+       '</div></div><div class="stwrap">'+chip(rr.st)+'</div></div>';
+    h+=slotFor(key);
+
+    rr.steps.forEach(function(s,i){
+      var sk=c.k+':'+a+':'+(i+1), lock=isFixed(s);
+      var df=cmpStep(c,b,i,s);
+      /* A step that has run is text, so it can carry word-level marks. A step
+         still open for editing stays a field, and shows only the change bar:
+         you cannot paint inside a textarea, and a step you are still writing
+         is not really the one you came to compare. */
+      var body = lock
+        ? '<div class="ptext ro">'+diffHTML(s,df)+'</div>'
+        : '<textarea class="ptext" rows="1" aria-label="Prompt" '+
+          'oninput="D['+c.id+'].B['+bi+'].r['+c.run+'].steps['+i+'].t=this.value;grow1(this)">'+esc(s.t)+'</textarea>';
+      h+='<div class="line step'+(s.st==='waiting'?' waiting':'')+(SEL===sk?' sel':'')+
+           (df&&df.chg?' chg':'')+(df&&df.only?' chg only':'')+'" '+
+           'onclick="select(event,\''+sk+'\','+c.k+')">'+
+         '<div class="gut"><span class="ord">'+(i+1)+'</span>'+pips(c,b,i)+'</div>'+
+         '<div>'+body+
+         '<div class="marg">'+stepMarg(c,b,i,s,df)+'</div></div>'+
+         '<div class="stwrap">'+chip(s.st)+'</div></div>';
+      h+=slotFor(sk);
+    });
+
+    if(!isRecord(c))
+      h+='<div class="addrow"><div class="gut"><button class="plus" onclick="event.stopPropagation();addStep('+c.k+','+bi+')" '+
+         'aria-label="Add a step to '+a+'">'+PLUS+'</button></div>'+
+         '<div class="addlbl">add a step to '+a+'</div></div>';
+  });
+  h+=slotFor('foot:'+c.k);
+  return h;
+}
+/* The command line is its own object and never enters a card. With one card
+   it travels inside the document, because there is only one document and
+   position is free information. With two, it detaches to its own strip below
+   them — it does not hop between columns. Which card it acts on is carried by
+   marks, not by where it happens to be sitting: the navy rule on the card,
+   the same rule on the bar, the target in its hint line, and the selection
+   wash on the line itself. */
+function slotFor(key){
+  return (CARDS.length===1 && BARMODE!=='popped' && barKey()===key)
+    ? '<div class="barslot" id="slot"></div>' : '';
+}
+function barKey(){ return (BARMODE==='parked'?null:SEL) || ('foot:'+ADDR); }
+
+function barPop(){
+  BARMODE='popped';
+  var pb=$id('popbar'); pb.hidden=false;
+  if(POPXY.x===null){ POPXY.x=Math.max(12,innerWidth-580); POPXY.y=innerHeight-190; }
+  pb.style.left=POPXY.x+'px'; pb.style.top=POPXY.y+'px';
+  render(); toast('The command line is its own window now. It will stay where you put it.');
+}
+function barDock(){ BARMODE='inline'; $id('popbar').hidden=true; render();
+  toast(CARDS.length>1?'Back below the cards.':'Back in the document, under the line you are on.'); }
+(function(){
+  var h=$id('pophead'), pb=$id('popbar'), dx=0, dy=0, on=false;
+  h.addEventListener('pointerdown',function(e){
+    if(e.target.closest('button')) return;
+    on=true; pb.classList.add('drag'); h.setPointerCapture(e.pointerId);
+    dx=e.clientX-pb.offsetLeft; dy=e.clientY-pb.offsetTop;
+  });
+  h.addEventListener('pointermove',function(e){
+    if(!on) return;
+    POPXY.x=Math.min(Math.max(6,e.clientX-dx),innerWidth-pb.offsetWidth-6);
+    POPXY.y=Math.min(Math.max(6,e.clientY-dy),innerHeight-pb.offsetHeight-6);
+    pb.style.left=POPXY.x+'px'; pb.style.top=POPXY.y+'px';
+  });
+  h.addEventListener('pointerup',function(e){ on=false; pb.classList.remove('drag'); });
+})();
+
+function headHTML(c){
+  var d=D[c.id], bs=liveB(d,c.run);
+  var steps=bs.reduce(function(n,b){return n+b.r[c.run].steps.length},0);
+  var live=bs.filter(function(b){return b.r[c.run].st!=='waiting'}).length;
+  return '<div class="dwrap"><div class="dhead"><span class="addr big">'+d.id+'</span>'+
+    '<input class="dtitle" value="'+esc(d.title)+'" aria-label="Docket name" '+
+      'oninput="D['+c.id+'].title=this.value"></div>'+
+    '<div class="marg dmarg">'+
+      '<button class="picks" onclick="runMenu(event,'+c.k+')">run '+c.run+' of '+d.runs+'</button>'+
+      '<span class="sep">·</span><span>'+plural(bs.length,'branch')+', '+plural(steps,'step')+'</span>'+
+      (live<bs.length?'<span class="sep">·</span><span>'+plural(live,'branch')+' in the run</span>':'')+
+      '<span class="sep">·</span><span>$'+(d.cost[c.run]||0).toFixed(2)+' this run</span>'+
+    '</div></div>';
+}
+
+function render(){
+  var had=document.activeElement&&document.activeElement.id==='q';
+  var caret=had?$id('q').selectionStart:null;
+  $id('park').appendChild($id('barhost'));
+  var ambig=(CARDS.length>1)||BARMODE==='popped';
+  document.body.className=(CARDS.length>1?'multi':'one')+(MODE==='cmd'?' addressed':'')+(ambig?' ambig':'');
+
+  if(CARDS.length===1){
+    var c=CARDS[0];
+    $id('sheet').innerHTML=headHTML(c)+'<div class="doc">'+renderDoc(c)+'</div>';
+    $id('desk').innerHTML=''; $id('desk').className='desk';
+  }else{
+    $id('sheet').innerHTML='';
+    $id('desk').className='desk'+(CARDS.length>2?' n3':'');
+    $id('desk').innerHTML=CARDS.map(function(c){
+      var rec=isRecord(c), run=isRunning(c), d=D[c.id];
+      var kind=run?'running now':rec?'a record, fixed':c.run===d.runs?'the plan':'unfinished';
+      return '<div class="win'+(ADDR===c.k?' live':'')+(rec?' record':'')+'" onclick="address('+c.k+')">'+
+        '<div class="chrome"><span class="dots"><i></i><i></i><i></i></span>'+
+        '<span class="wname">Docket '+c.id+'</span><span class="wrun">run '+c.run+'</span>'+
+        '<span class="wkind">'+kind+'</span>'+
+        '<button class="wclose" onclick="event.stopPropagation();closeCard('+c.k+')" aria-label="Close">\u00d7</button></div>'+
+        '<div class="wbody">'+headHTML(c)+'<div class="doc">'+renderDoc(c)+'</div></div></div>';
+    }).join('');
+  }
+  var slot=(BARMODE==='popped')?$id('popbody'):($id('slot')||$id('deskbar'));
+  slot.appendChild($id('barhost'));
+  /* Detached but not popped: it still needs the rule, because a strip below
+     two cards cannot say by itself which one it is for. */
+  $id('barhost').className=(BARMODE!=='popped'&&!$id('slot')&&ambig)?'detached':'';
+  $id('popbar').hidden=(BARMODE!=='popped');
+  if(BARMODE==='popped'){ var c=AC();
+    $id('poptgt').innerHTML='acting on <b>docket '+c.id+', run '+c.run+'</b>'; }
+  if(had){ $id('q').focus(); if(caret!=null) $id('q').setSelectionRange(caret,caret); }
+  document.querySelectorAll('.ptext').forEach(grow1);
+  hint(); paintAll();
+}
+function grow1(el){el.style.height='auto';el.style.height=el.scrollHeight+'px'}
+
+function select(e,key,k){
+  if(e.target.closest('button')) return;
+  if(e.target.closest('textarea,input')){ SEL=key; ADDR=k; render(); return; }
+  SEL=(SEL===key&&ADDR===k?null:key); ADDR=k; render();
+}
+/* done, running and paused are all fixed: each has started, and each has
+   cost something. Only ready and waiting steps are still open to edit. */
+function isFixed(s){ return s.st==='done'||s.st==='running'||s.st==='paused' }
+function locked(k,st){ var c=card(k);
+  toast((st==='paused'?'This step started in run '+c.run+' and was halted, so its prompt is fixed. '
+                      :'This step already ran in run '+c.run+', so its prompt is fixed. ')+
+        'new:run copies the plan forward to change it.'); }
+
+/* ═══ Runs ═══ */
+function runMenu(e,k){
+  e.stopPropagation(); var c=card(k), d=D[c.id], m=$id('menu'), h='';
+  for(var r=1;r<=d.runs;r++) h+='<button onclick="pipHit(event,'+c.id+','+r+')">'+
+    (r===c.run?'run '+r+', this card':'open run '+r)+
+    '<span class="g">'+plural(liveB(d,r).length,'branch')+(r===d.runs?', the plan':'')+'</span></button>';
+  h+='<button onclick="newRun(event,'+c.k+')">start run '+(d.runs+1)+'<span class="g">copies run '+c.run+' forward</span></button>';
+  m.innerHTML=h; m.classList.add('open');
+  var rc=e.target.getBoundingClientRect();
+  m.style.left=Math.min(rc.left,innerWidth-215)+'px'; m.style.top=Math.min(rc.bottom+5,innerHeight-300)+'px';
+}
+function newRun(e,k){
+  if(e) e.stopPropagation();
+  var c=card(k), d=D[c.id], from=c.run, to=d.runs+1;
+  d.B.forEach(function(b){
+    var src=b.r[from]; if(!src) return;
+    b.r[to]=JSON.parse(JSON.stringify(src));
+    b.r[to].steps.forEach(function(s){ if(s.st!=='waiting') s.st='ready'; delete s.chat; delete s.tok; });
+    if(b.r[to].st!=='waiting') b.r[to].st='ready';
+  });
+  d.cost[to]=0; d.runs=to; $id('menu').classList.remove('open');
+  openCard(d.id,to,'Run '+to+' made beside run '+from+', plan copied forward. Nothing is running yet \u2014 '+
+    'edit what you want, then run: to start it.');
+}
+
+/* Running one branch is still a run: the others are parked in it. That needs
+   no new idea, and the pips stay readable — run 5 shows one filled column. */
+function soloRun(k,b){
+  var c=card(k), d=D[c.id], from=c.run, to=d.runs+1;
+  d.B.forEach(function(x){
+    var src=x.r[from]; if(!src) return;
+    x.r[to]=JSON.parse(JSON.stringify(src));
+    x.r[to].steps.forEach(function(s){ delete s.chat; delete s.tok;
+      s.st=(x===b)?'ready':'waiting'; });
+    x.r[to].st=(x===b)?'running':'waiting';
+  });
+  if(b.r[to]&&b.r[to].steps[0]) b.r[to].steps[0].st='running';
+  d.cost[to]=0; d.runs=to;
+  openCard(d.id,to,'Run '+to+' is running '+addrOf(d,b)+' alone. The other branches are parked in it, '+
+    'so this is still one run and the pips still line up.');
+}
+
+/* ═══ Pickers ═══ */
+function pick(e,k,bi,i,f){
+  e.stopPropagation();
+  var c=card(k), d=D[c.id], s=d.B[bi].r[c.run].steps[i];
+  if(isFixed(s)) return locked(k,s.st);
+  var list=f==='room'?ROOMS:MODELS, m=$id('menu');
+  m.innerHTML=list.map(function(v){
+    return '<button onclick="setF('+k+','+bi+','+i+',\''+f+'\',\''+v.replace(/'/g,"\\'")+'\')">'+esc(v)+
+      (f==='m'&&v==='Wikipedia'?'<span class="g">no tokens</span>':'')+
+      (f==='m'&&v.indexOf('local')>-1?'<span class="g">on your machine</span>':'')+'</button>';}).join('');
+  m.classList.add('open');
+  var r=e.target.getBoundingClientRect();
+  m.style.left=Math.min(r.left,innerWidth-215)+'px'; m.style.top=Math.min(r.bottom+5,innerHeight-300)+'px';
+}
+function setF(k,bi,i,f,v){var c=card(k);D[c.id].B[bi].r[c.run].steps[i][f]=v;$id('menu').classList.remove('open');render()}
+document.addEventListener('click',function(){$id('menu').classList.remove('open')});
+
+function addStep(k,bi){
+  var c=card(k), d=D[c.id], rr=d.B[bi].r[c.run], last=rr.steps[rr.steps.length-1];
+  rr.steps.push(S('',last?last.room:'Writing Studio','Opus 4.6'));
+  ADDR=k; SEL=k+':'+addrOf(d,d.B[bi])+':'+rr.steps.length; render();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   THE BAR
+   Resting mode is prompt. Command is entered, never rested in. Verbs act on
+   the addressed card and default to the line the bar is sitting under.
+   ═══════════════════════════════════════════════════════════════════════ */
+var MODE='prm';
+var STOP={AFTER:1,BEFORE:1,TO:1,IN:1,THE:1,AND:1,STEP:1,BRANCH:1,RUN:1,BESIDE:1};
+function addrsIn(t){
+  return (String(t).toUpperCase().match(/[A-Z0-9]+/g)||[])
+    .map(function(w){return w.replace(new RegExp('^'+AC().id),'')})
+    .filter(function(w){return w && !STOP[w] && /^[A-Z]+$/.test(w)});
+}
+function selBranch(){ if(!SEL) return null; var p=SEL.split(':');
+  return p[0]==='foot'?null:findB(dk(),p[1]) }
+function selIndex(){ var p=(SEL||'').split(':'); return p.length===3?+p[2]:null }
+function guard(){ return isRecord(AC())
+  ? 'run '+AC().run+' is a record; open run '+D[AC().id].runs+' to change the plan' : null }
+
+var VERBS=[
+ {s:'new',eg:'new:step',g:'step, branch, run or docket',run:function(a){
+    var g=guard(); if(g) return {bad:g};
+    var c=AC(), d=D[c.id];
+    if(/^\s*run\b/i.test(a)){
+      return {ok:'Enter makes run '+(d.runs+1)+' beside this one, copying run '+c.run+' forward, not started',
+        go:function(){newRun(null,c.k)}};
+    }
+    if(/^\s*docket/i.test(a)){
+      return {ok:'Enter makes a new, empty docket',go:function(){
+        toast('A new docket opens as its own card, empty, with the command line already open in it.')}};
+    }
+    if(/^\s*branch/i.test(a)){
+      var L=nextL(d);
+      return {ok:'Enter adds branch '+d.id+letterAt(L)+' to run '+c.run,go:function(){
+        var b={L:L,name:'',r:{}}; b.r[c.run]={st:'ready',steps:[]}; d.B.push(b);
+        SEL=c.k+':'+d.id+letterAt(L); render();
+        toast(d.id+letterAt(L)+' added. It keeps this letter for good, in every run.')}};
+    }
+    var p=addrsIn(a), b=p.length?findB(d,p[0]):selBranch();
+    if(!b) return {bad:'a step in which branch? select a line, or try new:step in '+d.id+'B'};
+    if(!b.r[c.run]) return {bad:d.id+letterAt(b.L)+' is not in run '+c.run};
+    var at=p.length?null:selIndex();
+    return {ok:'Enter adds a step to '+addrOf(d,b)+(at?' after step '+at:' at the end')+', in run '+c.run,go:function(){
+      var rr=b.r[c.run], s=S('','Writing Studio','Opus 4.6');
+      if(at) rr.steps.splice(at,0,s); else rr.steps.push(s);
+      SEL=c.k+':'+addrOf(d,b)+':'+(at?at+1:rr.steps.length); render();
+      toast('Added to '+addrOf(d,b)+', in run '+c.run+' only.')}};
+  }},
+ {s:'hold',eg:'hold:201C',g:'park a branch; it shows as waiting',run:function(a){
+    var g=guard(); if(g) return {bad:g};
+    var c=AC(), d=D[c.id], b=findB(d,addrsIn(a)[0])||selBranch();
+    if(!b||!b.r[c.run]) return {bad:'hold which branch? try hold:'+d.id+'C'};
+    var rr=b.r[c.run], on=rr.st==='waiting';
+    if(rr.st==='running') return {bad:addrOf(d,b)+' is running; stop:'+addrOf(d,b)+' halts it'};
+    return {ok:on?'Enter brings '+addrOf(d,b)+' back into run '+c.run
+                 :'Enter parks '+addrOf(d,b)+' in run '+c.run+'; it stays, it will not run',go:function(){
+      rr.st=on?'ready':'waiting';
+      rr.steps.forEach(function(s){if(!isFixed(s))s.st=rr.st});
+      render(); toast(on?addrOf(d,b)+' is back in run '+c.run+'.'
+        :addrOf(d,b)+' is parked in run '+c.run+' and shows as waiting. Other runs are untouched.')}};
+  }},
+ {s:'move',eg:'move:201C after 201A',g:'reorder, the letter goes with it',run:function(a){
+    var c=AC(), d=D[c.id], p=addrsIn(a), before=/\bbefore\b/i.test(a);
+    var b=findB(d,p[0]), t=findB(d,p[1]);
+    if(!p.length) return {bad:'move which branch?'};
+    if(!b) return {bad:'no branch '+d.id+p[0]+' here'};
+    if(!t) return {bad:'move '+addrOf(d,b)+' where? after '+d.id+'A, or before '+d.id+'A'};
+    if(b===t) return {bad:addrOf(d,b)+' is already where it is'};
+    return {ok:'Enter moves '+addrOf(d,b)+' '+(before?'before ':'after ')+addrOf(d,t)+'; it keeps its letter',go:function(){
+      d.B.splice(d.B.indexOf(b),1); d.B.splice(d.B.indexOf(t)+(before?0:1),0,b); render();
+      toast(addrOf(d,b)+' moved and kept its letter. The list can read out of order \u2014 an address that shifts is not an address.')}};
+  }},
+ {s:'delete',eg:'delete:201D',g:'remove it from every run',run:function(a){
+    var c=AC(), d=D[c.id], b=findB(d,addrsIn(a)[0])||selBranch();
+    if(!b) return {bad:'delete which branch?'};
+    return {ok:'Enter deletes '+addrOf(d,b)+' from every run of this docket',go:function(){
+      d.B.splice(d.B.indexOf(b),1); SEL=null; render();
+      toast('Gone for good. Its letter is not reissued to anything else.')}};
+  }},
+ /* new: makes things; run: starts them. Creating a run and running it are
+    two acts, and the gap between them is where you edit the plan before it
+    goes. */
+ {s:'run',eg:'run:',g:'start this run, or one branch of it',run:function(a){
+    var c=AC(), d=D[c.id], p=addrsIn(a);
+    if(p.length){
+      var b=findB(d,p[0]);
+      if(!b) return {bad:'no branch '+d.id+p[0]+' here'};
+      return {ok:'Enter runs '+addrOf(d,b)+' alone, as run '+(d.runs+1)+' with the others parked',
+        go:function(){ soloRun(c.k,b) }};
+    }
+    if(isRecord(c)) return {bad:'run '+c.run+' has already finished; new:run to make the next one'};
+    var pz=liveB(d,c.run).filter(function(b){return b.r[c.run].st==='paused'}).map(function(b){return addrOf(d,b)});
+    return {ok:'Enter starts run '+c.run+' of docket '+d.id+
+        (pz.length?'; '+pz.join(', ')+(pz.length>1?' stay':' stays')+' paused':''),go:function(){
+      liveB(d,c.run).forEach(function(b){ var rr=b.r[c.run]; if(rr.st==='waiting'||rr.st==='paused') return;
+        var f=rr.steps.filter(function(s){return s.st==='ready'})[0]; if(!f) return;
+        rr.st='running'; f.st='running'; });
+      render(); toast('Run '+c.run+' started.')}};
+  }},
+ /* stop: halts. A step halted mid-flight becomes paused: not done (no turn
+    exists), not ready (it started and cost something), not waiting (that is
+    parked before the fact). Stopping is not undoing, and the Enter line says
+    so before you commit. stop:all should cross windows over the storage
+    event; here it reaches the open cards only. */
+ {s:'stop',eg:'stop:201B',g:'halt this run, one branch, or all',run:function(a){
+    var w=(a||'').trim().toLowerCase(), c=AC(), d=D[c.id], hit=[], what;
+    function gather(dd,run,b){ var rr=b.r[run]; if(!rr) return;
+      rr.steps.forEach(function(s){ if(s.st==='running') hit.push({rr:rr,s:s}); }); }
+    if(w==='all'){
+      var seen={};
+      CARDS.forEach(function(x){ var key=x.id+':'+x.run; if(seen[key]) return; seen[key]=1;
+        D[x.id].B.forEach(function(b){ gather(D[x.id],x.run,b); }); });
+      what='everything running in the open cards';
+      if(!hit.length) return {bad:'nothing is running anywhere'};
+    }else{
+      var p=addrsIn(a);
+      if(p.length){ var b=findB(d,p[0]);
+        if(!b) return {bad:'no branch '+d.id+p[0]+' here'};
+        gather(d,c.run,b); what=addrOf(d,b)+' in run '+c.run;
+        if(!hit.length) return {bad:addrOf(d,b)+' is not running in run '+c.run};
+      }else{
+        liveB(d,c.run).forEach(function(b){ gather(d,c.run,b); });
+        what='run '+c.run+' of docket '+d.id;
+        if(!hit.length) return {bad:'nothing is running in run '+c.run};
+      }
+    }
+    return {ok:'Enter halts '+what+'; '+(hit.length===1?'the running step becomes':'the '+hit.length+' running steps become')+
+        ' paused, and finished steps stay done and stay paid',go:function(){
+      hit.forEach(function(h){ h.s.st='paused'; if(h.rr.st==='running') h.rr.st='paused'; });
+      render(); toast('Halted. What already ran is kept and paid for. Stopping is not undoing.')}};
+  }},
+ {s:'open',eg:'open:202, or open:run 1',g:'a docket or a run, as a card',run:function(a){
+    var m=/run\s*(\d+)/i.exec(a), id=(a.match(/\b(20\d)\b/)||[])[1];
+    if(m&&!id){ var r=+m[1], d=dk();
+      if(r<1||r>d.runs) return {bad:'docket '+d.id+' has runs 1 to '+d.runs};
+      return {ok:'Enter opens run '+r+' beside this card',go:function(){pipHit({stopPropagation:function(){}},d.id,r)}};
+    }
+    if(!id||!D[+id]) return {bad:'open:202, or open:run 1'};
+    var rr=m?+m[1]:D[+id].runs;
+    if(rr<1||rr>D[+id].runs) return {bad:'docket '+id+' has runs 1 to '+D[+id].runs};
+    return {ok:'Enter opens docket '+id+', run '+rr+', as a card',go:function(){
+      openCard(+id,rr,'Docket '+id+' opened. A docket card and a run card are the same object.')}};
+  }},
+ {s:'close',eg:'close:',g:'this card',run:function(){
+    if(CARDS.length<2) return {bad:'the last card stays open'};
+    var c=AC(); return {ok:'Enter closes docket '+c.id+', run '+c.run,go:function(){closeCard(c.k)}};
+  }},
+ {s:'diff',eg:'diff:off',g:'stop marking what differs',run:function(a){
+    var w=(a||'').trim().toLowerCase();
+    if(!sibOf(AC())&&DIFF) return {bad:'nothing to compare; open another run of this docket'};
+    if(w!=='on'&&w!=='off') return {bad:'diff:on or diff:off'};
+    return {ok:'Enter turns the difference marks '+w,go:function(){DIFF=(w==='on');render();
+      toast(DIFF?'Marking what differs from the other run.':'Difference marks off.')}};
+  }},
+ {s:'bar',eg:'bar:pop',g:'pop, dock, foot or top',run:function(a){
+    var w=(a||'').trim().toLowerCase();
+    if(w==='pop') return {ok:'Enter gives the command line its own window; it will stop moving',go:barPop};
+    if(w==='dock') return {ok:'Enter puts the bar back below the '+(CARDS.length>1?'cards':'document'),go:barDock};
+    if(w!=='foot'&&w!=='top') return {bad:'bar:pop, bar:dock, bar:foot or bar:top'};
+    if(CARDS.length>1) return {bad:'with more than one card the bar sits below them; bar:pop gives it a window'};
+    return {ok:'Enter parks the bar at the '+w+' of the card; it stops following the selection',go:function(){
+      BARMODE='parked';
+      if(w==='top'){ var c=AC(), b=liveB(D[c.id],c.run)[0]; SEL=b?c.k+':'+addrOf(D[c.id],b):null; BARMODE='inline'; }
+      else SEL=null;
+      render(); }};
+  }},
+ {s:'help',eg:'help:',g:'the verbs, and the notes on them',run:function(){
+    return {ok:'Enter opens the verb table',go:helpMenu};
+  }}
+];
+
+function parse(v){
+  var t=v.slice(1), c=t.indexOf(':');
+  if(c<0) return {list:VERBS.filter(function(x){return x.s.indexOf(t.toLowerCase())===0})};
+  var name=t.slice(0,c).toLowerCase(), v2=VERBS.filter(function(x){return x.s===name})[0];
+  if(!v2) return {bad:'no verb called '+name+'; new, hold, move, delete, run, stop, open, close, diff, bar, help'};
+  return v2.run(t.slice(c+1));
+}
+
+function whereAmI(){
+  if(!SEL) return 'docket '+AC().id;
+  var p=SEL.split(':');
+  return p.length===3 ? 'step '+p[2]+' of '+p[1] : p[1];
+}
+function setQ(v){
+  var f=$id('sfield');
+  if(v.indexOf('p>')===0){ MODE='prm'; $id('q').value=v.slice(2); v=$id('q').value; }
+  else if(v.indexOf('s>')===0){ MODE='srch'; $id('q').value=v.slice(2); v=$id('q').value; }
+  else if(v.charAt(0)==='>'){ MODE='cmd'; }
+  else if(MODE==='cmd'){ MODE='prm'; }
+  f.className='sfield'+(MODE==='cmd'?' cmd':MODE==='srch'?' srch':' prm');
+  document.body.classList.toggle('addressed',MODE==='cmd');
+  $id('q').placeholder=MODE==='cmd'?'':MODE==='srch'?'Find a step or a branch\u2026':'Write a step\u2026';
+  hint();
+}
+function it(code,gloss,first,click){
+  return '<span class="it'+(first?' first':'')+'">'+(click?'<button onclick="'+click+'">':'')+
+    '<code>'+code+'</code> <span class="gl">'+gloss+'</span>'+(click?'</button>':'')+
+    '<span class="sep">;</span></span>';
+}
+function tgtLine(){
+  if(CARDS.length<2) return '';
+  var c=AC();
+  return '<span class="tgt">\u2192 Docket '+c.id+', run '+c.run+'</span><span class="sep">;</span>';
+}
+function hint(){
+  var box=$id('shint'); if(!box) return;
+  var v=$id('q').value, tgt=tgtLine();
+  if(MODE==='cmd'){
+    var r=parse(v);
+    if(r.list) box.innerHTML=tgt+r.list.map(function(x,i){return it(x.eg,x.g,i===0,'setCmd(\''+x.s+'\')')}).join('');
+    else if(r.bad) box.innerHTML=tgt+'<span class="bad">'+esc(r.bad)+'</span>';
+    else box.innerHTML=tgt+'<span class="pre">'+esc(r.ok)+'</span>';
+    return;
+  }
+  if(MODE==='srch'){ box.innerHTML=tgt+it('p&gt;','to write instead',0)+it('&gt;','for the command line',0); return; }
+  var g=guard();
+  box.innerHTML=tgt+(g
+    ? '<span class="it first"><span class="pre">'+esc(g.charAt(0).toUpperCase()+g.slice(1))+'</span><span class="sep">;</span></span>'
+    : '<span class="it first"><span class="pre">Enter adds a step to '+esc(whereAmI())+'</span><span class="sep">;</span></span>')+
+    it('&gt;','branches, runs, cards',0,'setCmd(\'\')')+it('s&gt;','search this docket',0);
+}
+function setCmd(s){ var f=$id('q'); f.value='>'+(s?s+':':''); setQ(f.value); f.focus(); }
+
+document.addEventListener('input',function(e){ if(e.target.id==='q') setQ(e.target.value); });
+document.addEventListener('keydown',function(e){
+  if(e.target.id!=='q'){
+    if(e.key==='/'&&e.target.tagName!=='INPUT'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();$id('q').focus();}
+    return;
+  }
+  if(e.key==='Escape'){
+    if(MODE!=='prm'){MODE='prm';e.target.value='';setQ('');}
+    else if(e.target.value){e.target.value='';hint();}
+    else {SEL=null;render();}
+    return;
+  }
+  if(e.key!=='Enter') return;
+  e.preventDefault();
+  if(MODE==='cmd'){
+    var r=parse(e.target.value);
+    if(r&&r.go){ r.go(); e.target.value=''; MODE='prm'; setQ(''); $id('q').focus(); }
+    else if(r&&r.bad) toast(r.bad);
+    return;
+  }
+  if(MODE==='prm'){
+    var t=e.target.value.trim(); if(!t) return;
+    var g=guard(); if(g) return toast(g.charAt(0).toUpperCase()+g.slice(1)+'.');
+    var c=AC(), d=D[c.id], bs=liveB(d,c.run), b=selBranch()||bs[bs.length-1];
+    if(!b) return toast('No branch yet. Try >new:branch');
+    var rr=b.r[c.run], at=selIndex(), s=S(t,'Writing Studio','Opus 4.6');
+    if(at) rr.steps.splice(at,0,s); else rr.steps.push(s);
+    e.target.value=''; SEL=c.k+':'+addrOf(d,b)+':'+(at?at+1:rr.steps.length); render(); $id('q').focus();
+    toast('Added to '+addrOf(d,b)+', run '+c.run+'.');
+  }
+});
+
+/* The ? table. A gloss fits on one line; these do not, and they are exactly
+   the things people get wrong. */
+var NOTES=[
+ ['run: and new:run','new:run makes the next run and copies this plan into it. Nothing starts until run:. The gap between them is where you edit.'],
+ ['run:201B','Running one branch still makes a run. The others are parked in it, so the run numbers and the pips stay honest.'],
+ ['branches','A branch is an alternative path, whether you planned it here or forked it from a chat. Forking a chat writes a branch into this docket.'],
+ ['letters','A letter is fixed at creation and never reshuffles or gets reissued. Move a branch and the list reads out of order. That is correct.'],
+ ['what a run owns','The letter and the name are the branch\u2019s, in every run. The steps are the run\u2019s. Editing a step touches this run only.'],
+ ['waiting and paused','Waiting was parked before it started. Paused started and was stopped, and what it spent is still spent. Neither will run until you say so.'],
+ ['stop:','Halts what is running. Steps already done stay done and stay paid. Stopping is not undoing.'],
+ ['\u2318K','Jumps to the command line from anywhere, including from inside a prompt. / only works when your cursor is not in a field.']
+];
+function helpMenu(){
+  var m=$id('menu');
+  m.innerHTML=VERBS.map(function(v){
+      return '<button onclick="setCmd(\''+v.s+'\')"><code>'+v.eg+'</code><span class="g">'+v.g+'</span></button>'}).join('')+
+    '<div style="border-top:.5px solid var(--p-border-2);margin:4px 0"></div>'+
+    NOTES.map(function(nn){
+      return '<button onclick="toast(\''+nn[1].replace(/'/g,"\\'")+'\')">'+nn[0]+'<span class="g">'+esc(nn[1].slice(0,46))+'\u2026</span></button>'}).join('');
+  m.classList.add('open');
+  var f=$id('sfield').getBoundingClientRect();
+  m.style.left=Math.min(f.left,innerWidth-250)+'px';
+  m.style.top=Math.max(8,Math.min(f.top-300,innerHeight-320))+'px';
+  m.style.minWidth='250px';
+}
+
+/* ═══ Mock controls ═══ */
+function demo(what){
+  if(what==='runs'){ CARDS=[{k:1,id:201,run:3}]; NK=2; ADDR=1; SEL=null;
+    openCard(201,1,'Run 1 and run 3 of the same docket, side by side. Same mechanism as two dockets.'); }
+  if(what==='dockets'){ CARDS=[{k:1,id:201,run:3}]; NK=2; ADDR=1; SEL=null;
+    openCard(202,1,'Two dockets. The one being edited wears the navy rule, always \u2014 not only in command mode.'); }
+  if(what==='one'){ CARDS=[{k:1,id:201,run:3}]; NK=2; ADDR=1; SEL=null; render(); }
+  enterDocket();
+}
+function grow(){
+  var c=AC(), d=D[c.id];
+  for(var i=0;i<24;i++){ var L=nextL(d), b={L:L,name:'Variation '+letterAt(L),r:{}};
+    b.r[c.run]={st:'ready',steps:[S('','Writing Studio','Haiku 4.5')]}; d.B.push(b); }
+  render();
+  toast('Past Z the letters double. I and O are skipped, so '+d.id+'I never collides with '+d.id+'1.');
+}
+function reset(){ D={201:seed201(),202:seed202()}; CARDS=[{k:1,id:201,run:3}]; NK=2; ADDR=1; SEL=null;
+  BARMODE='inline'; POPXY={x:null,y:null}; $id('popbar').hidden=true; render(); enterDocket(); }
+
+/* Opening a docket ENTERS command mode, which is not the same as resting in
+   it: Escape returns to prompt and prompt is where you stay. Opening is an
+   entering event, so > still means one thing. The cost is one Escape for
+   someone who opened the docket to write; the gain is that nobody has to
+   guess that run: exists. */
+function enterDocket(){ $id('q').value='>'; MODE='cmd'; setQ('>'); }
+render(); enterDocket();
+window.addEventListener('resize',paintAll);
+</script>
+</body>
+</html>

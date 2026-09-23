@@ -1,0 +1,2581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parliament — Almanac</title>
+<!--
+═══════════════════════════════════════════════════════════════════════════
+MARGINALIA — per rule 2 of the docket decisions, Sept 12
+═══════════════════════════════════════════════════════════════════════════
+  Chips, always visible, bordered or filled: what a thing IS.  (type, room)
+  Marginalia, italic serif, gold-muted, no borders or fills, clickable:
+  how it behaves and where it came from.  (source, anchor, model, provenance)
+
+  Horizontal, across the width of the card, reading as a phrase rather than
+  as label-and-value pairs. Omitted entirely when there is nothing to say.
+
+═══════════════════════════════════════════════════════════════════════════
+CONTAINERS
+═══════════════════════════════════════════════════════════════════════════
+  A chat is not a title. It is everything you marked while you were in it.
+  A docket is every chat across every run, and therefore every marking in
+  all of them. So nothing is filtered out of a collection — a container
+  renders what it contains, live, by pointer. Add a note to a chat tomorrow
+  and it appears in every collection that holds that chat.
+-->
+<style>
+:root{
+  --paper-bg:#FCFCFA;
+  --paper-ink:rgba(46,58,79,.011);
+  --paper-hatch:none;   /* page hatch retired — it was noise, not texture */
+  --card-lift:0 1px 2px rgba(40,36,28,.035);
+  --p-surface:#FFFFFF;
+  --p-subtle:#FAF9F5;          /* heading rows — off-white, warmer than grey */
+  --p-tray:#F6F5F1;            /* the working-set tray, so white cards read  */
+  --p-ink:#191919; --p-ink-2:#787774; --p-ink-3:#9B9A97; --p-line-soft:#C0C8D4;
+  --p-border:#E9E9E7; --p-border-2:#F1F1EF;
+  --p-gold-light:#B8A070; --p-gold-muted:#9C8760; --p-gold-deep:#8B6A10;
+  --p-gold-tint:rgba(196,169,77,.08); --p-gold-tint-2:rgba(196,169,77,.14);
+  --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --font-serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --font-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --r-sm:4px; --r-md:6px; --r-xl:16px; --r-btn:8px;
+
+  /* Command mode. Ruling only, no field behind it — the crosshatch carries
+     the mode on its own and the type goes white over it. */
+  --navy:38,56,92;
+  --line-c:22,38,70;
+  --line-a:1;
+  --line-w:3px;
+  --hatch-gap:3.5px;
+
+  /* Prompt mode. Same idea as command — the fill carries the mode — but bone
+     rather than navy, ruled into tall parallelograms with a diagonal through
+     each, so the type stays ink and the field still reads as paper. */
+  --tri:rgba(122,120,114,.17);
+  --prm-bg:var(--paper-bg);
+
+  /* Border and paper spec, light mode. Dark is unfinished and not referenced. */
+  --ink:#191919;
+  --ink-dot:rgba(25,25,25,.18);      /* structural: evenly spaced dots       */
+  --ink-prog:rgba(25,25,25,.10);     /* key: progressive dash, one at a time  */
+  --divider:rgba(25,25,25,.08);      /* header rules                          */
+  --ink-soft:rgba(25,25,25,.30);     /* checkbox rule, quiet icons            */
+  --ink-wash:rgba(25,25,25,.045);    /* selected rows and cards               */
+  --ink-wash-2:rgba(25,25,25,.075);
+  --marg:rgba(25,25,25,.46);         /* marginalia at rest                    */
+
+  /* GOLD MEANS THE LIVE ACTION, AND NOTHING ELSE.
+     The search field when engaged, the trigger on hover, keyboard focus.
+     Every other former use is ink. */
+}
+@media (prefers-contrast:more){:root{--paper-hatch:none}}
+*{box-sizing:border-box;margin:0;padding:0}
+
+/* Borders are drawn as an SVG overlay, never as a CSS border. Patterns are
+   computed from the element's real perimeter so they always close cleanly. */
+[data-border]{position:relative}
+svg.bx{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+
+/* The key border is static. Nothing draws, nothing fades. */
+
+/* The faint borders cannot carry focus. Keyboard focus gets its own ring. */
+:focus-visible{outline:2px solid var(--p-gold-deep);outline-offset:2px}
+/* Focus is a live action, so it keeps gold. Nothing else at rest does. */
+body{
+  font-family:var(--font-sans);background-color:var(--paper-bg);
+  background-image:var(--paper-hatch);background-attachment:fixed;
+  color:var(--p-ink);-webkit-font-smoothing:antialiased;padding:44px 16px 64px;
+}
+.page{max-width:1420px;margin:0 auto}
+.wrap,.topgrid{display:grid;grid-template-columns:var(--tpl,212px minmax(0,1fr) clamp(320px,28vw,430px));gap:13px;align-items:start}
+.topgrid .sbar{grid-column:var(--barcol,2)}
+
+/* The field floats. On top it sticks under the top edge; at the bottom it sits
+   over the flexible column like a composer, with its marginalia flipped above
+   it so the hints stay between the field and the content. */
+.topgrid{position:sticky;top:0;z-index:55;margin:-12px 0 4px;padding:12px 0 12px;
+  background:linear-gradient(var(--paper-bg) 78%,rgba(252,252,250,0))}
+.topgrid.atbottom{position:fixed;top:auto;bottom:34px;display:block;margin:0;padding:22px 0 10px;
+  background:linear-gradient(rgba(252,252,250,0),var(--paper-bg) 34%)}
+.topgrid.atbottom .sbar{display:flex;flex-direction:column}
+.topgrid.atbottom .sfield{order:3}
+.topgrid.atbottom .shint{order:2;padding:0 13px 6px}
+.topgrid.atbottom .params{order:1;padding:0 2px 6px}
+.topgrid.atbottom .cref{top:auto;bottom:calc(100% - 14px)}
+body.bar-bottom{padding-top:28px;padding-bottom:150px}
+body.bar-bottom .toast{bottom:auto;top:20px}
+
+.barph{grid-column:var(--barcol,2);padding:10px 13px;font:italic 400 11px var(--font-serif);color:var(--marg)}
+.barph button{border:none;background:none;padding:0;font:inherit;color:inherit;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.barph button:hover{color:var(--ink)}
+body.popwin .pophost>.sbar{padding:6px 4px}
+body.popwin .pophost>.sbar .cref{position:static;margin-top:8px}
+.popph{padding:26px 22px;text-align:center;font-size:12px;color:var(--p-ink-2);line-height:1.6}
+.popph .marg{display:block;margin-top:4px;font:italic 400 11px var(--font-serif);color:var(--marg)}
+.popph button{border:none;background:none;padding:0;font:inherit;color:inherit;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+
+/* pop-out windows */
+body.popwin{padding:12px;background:var(--paper-bg)}
+body.popwin .pophost>.card{margin:0}
+.dockpop{padding:8px 10px}
+.dockpop .dp-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.dockpop h1{font-size:15px;font-weight:600;margin:0 0 3px;line-height:1.3}
+.dp-marg{font:italic 400 11px var(--font-serif);color:var(--marg)}
+.dp-steps{list-style:none;margin:16px 0 0;padding:0}
+.dp-steps li{display:flex;gap:10px;padding:10px 0;border-top:.5px solid var(--p-border-2)}
+.dp-n{font-size:12.5px;font-weight:500;margin-bottom:2px}
+.dp-dot{flex-shrink:0;width:9px;height:9px;margin-top:4px;border-radius:50%;border:1.2px solid var(--ink)}
+/* ready · running · done · waiting.
+   ready has not run yet and is SILENT — a mark means there is news, and
+   "has not started" is not news. waiting is a branch deliberately parked,
+   which is news, so it takes a dashed dot. */
+.dp-done .dp-dot{background:var(--ink)}
+.dp-ready{color:var(--p-ink-3)}
+.dp-ready .dp-dot{border-color:var(--p-ink-3)}
+.dp-waiting{color:var(--p-ink-2)}
+.dp-waiting .dp-dot{border-style:dashed;border-color:var(--p-ink-2);background:none}
+/* paused is a step that started and was halted; waiting is a branch parked
+   before the fact. Both are deliberately not running, so both take the
+   dashed dot — the difference is carried in the type, one step quieter,
+   because the distinction is fine and a second dot shape would claim it is
+   larger than it is. If it proves thin in use, merge them. */
+.dp-paused{color:var(--p-ink-3)}
+.dp-paused .dp-dot{border-style:dashed;border-color:var(--p-ink-3);background:none}
+.dp-running .dp-dot{animation:dpPulse 1.4s ease-in-out infinite}
+@keyframes dpPulse{50%{box-shadow:0 0 0 4px rgba(25,25,25,.10)}}
+@media (prefers-reduced-motion:reduce){.dp-running .dp-dot{animation:none}}
+.dp-foot{margin-top:14px;padding-top:10px;border-top:.5px solid var(--p-border-2);font:italic 400 11px var(--font-serif);color:var(--marg);line-height:1.5}
+@media (max-width:1240px){
+  .wrap,.topgrid{grid-template-columns:196px minmax(0,1fr)}
+  .card.right{grid-column:1 / -1}
+}
+@media (max-width:1240px){.topgrid .sbar{grid-column:2}}
+@media (max-width:840px){
+  .wrap,.topgrid{grid-template-columns:1fr}
+  .topgrid .sbar{grid-column:1}
+}
+
+.card{background:var(--p-surface);border-radius:var(--r-xl);box-shadow:var(--card-lift);overflow:hidden}
+/* Kept searches and collections are an index, not a surface. No fill, no lift. */
+.card.rail-card{background:transparent;box-shadow:none}
+/* The collection follows the rail: no outline, no fill, only its inner rules. */
+.card.right{background:transparent;box-shadow:none;border-radius:0}
+.card.right .wsbody{background:transparent;padding-left:0;padding-right:0}
+/* If the middle column is narrower than the table, the table scrolls inside
+   its card rather than losing its last columns off the edge. */
+.tscroll{overflow-x:auto}
+.tscroll .grid{min-width:min-content}
+.card.rail-card .rfoot{background:transparent}
+.kbd{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;
+  font:500 10px var(--font-mono);background:var(--p-subtle);border:.5px solid var(--p-border);border-radius:3px;color:var(--p-ink-3)}
+
+/* ══════════ LEFT ══════════ */
+.rgroup{padding:9px 7px 5px}
+.rgroup+.rgroup{border-top:.5px solid var(--p-border-2)}
+.rlabel{display:flex;align-items:center;gap:6px;font:600 9px var(--font-sans);letter-spacing:.055em;
+  color:var(--ink);padding:4px 6px 7px}
+.rlabel svg{width:12px;height:12px;color:var(--ink);flex-shrink:0}
+.rlabel .n{margin-left:auto;font-family:var(--font-mono);font-size:9px}
+.ritem{display:block;width:100%;padding:6px 7px;border:none;background:transparent;
+  border-radius:var(--r-sm);cursor:pointer;text-align:left}
+.ritem:hover{background:transparent}
+.ritem:hover .rds{color:var(--p-gold-deep)}
+.ritem .rds{transition:color .14s ease}
+.ritem.on .rnm{font-weight:600}
+.ritem.on .rds{color:var(--p-gold-deep)}
+.rnm{display:block;font:500 11.5px var(--font-sans);color:var(--p-ink);line-height:1.3;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rds{display:block;font:italic 400 10px var(--font-serif);color:var(--marg);margin-top:3px;line-height:1.4;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rfoot{padding:10px 12px;border-top:1px solid var(--divider);background:var(--p-subtle);
+  font-size:9.5px;line-height:1.55;color:var(--p-ink-3)}
+.rfoot b{color:var(--p-ink-2);font-weight:600}
+
+/* ══════════ MIDDLE ══════════ */
+.sbar{padding:0;position:relative}
+.sfield{position:relative;display:flex;align-items:center}
+.sfield>svg:not(.bx){position:absolute;right:12px;top:50%;margin-top:-7.5px;width:15px;height:15px;color:var(--ink);pointer-events:none}
+.sfield{border-radius:var(--r-btn)}
+.sfield input{width:100%;padding:10px 38px 10px 68px;font:400 13.5px var(--font-sans);
+  border:none;border-radius:var(--r-btn);background:transparent;color:var(--p-ink)}
+.sfield input:focus{outline:none}
+/* ═══ The field is also the command line ═══
+   Plain text searches. A leading > switches it into command mode: the box
+   fills with a navy crosshatch and the type goes white. Deleting the > puts
+   it straight back to prose. The first-character rule is what makes that
+   safe — a > anywhere else is just a character. */
+.sfield{
+  background-color:var(--p-surface);   /* plain at rest; only command mode is ruled */
+  overflow:hidden;
+}
+.sfield .fillwrap{
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+  clip-path:inset(0 100% 0 0);
+  transition:clip-path .28s cubic-bezier(.4,0,.2,1);
+}
+.sfield.cmd .cmdwrap{clip-path:inset(0 0 0 0)}
+.sfield.prm .prmwrap{clip-path:inset(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){.sfield .fillwrap{transition:none}}
+.sfield .fill{position:absolute;inset:0}
+.sfield .fill>svg{width:100%;height:100%;display:block}
+/* Command: a hexagonal lattice marked only at its edge points, two dots a side,
+   one dot size throughout, about a quarter of them left dark. The hexagons
+   themselves are never drawn. */
+.sfield .cmdfill{background:rgb(var(--line-c))}
+/* Prompt: the page's own bone, ruled into vertical parallelograms. */
+.sfield .prmfill{background:var(--prm-bg)}
+.sfield input{position:relative;z-index:1}
+.sfield>svg:not(.bx),.sfield .modechip{z-index:2}
+.sfield.cmd input{
+  font-family:var(--font-mono);font-size:13px;color:#fff;
+  text-shadow:0 0 3px rgba(12,20,40,.95),0 1px 2px rgba(12,20,40,.85);
+}
+.sfield.cmd input::placeholder{color:#fff;opacity:.95;text-shadow:0 0 3px rgba(12,20,40,.9)}
+.sfield.cmd>svg:not(.bx){color:#fff;filter:drop-shadow(0 0 2px rgba(12,20,40,.9))}
+.modechip{
+  position:absolute;left:12px;top:50%;margin-top:-8px;font:600 8.5px var(--font-sans);letter-spacing:.06em;
+  padding:3px 7px;border-radius:9px;background:rgb(var(--navy));color:#fff;
+  opacity:0;transform:translateX(-4px);transition:opacity .16s ease,transform .16s ease;pointer-events:none;
+}
+.sfield .schip{opacity:1;transform:none}
+.sfield.cmd .schip,.sfield.prm .schip{opacity:0;transform:translateX(-4px)}
+.sfield.cmd .cmdchip{opacity:1;transform:none}
+.sfield.cmd input{padding-left:82px}
+.sfield.cmd>svg:not(.bx){opacity:0}
+.sfield>svg:not(.bx){transition:opacity .16s ease}
+/* Prompt names itself in ink, the way command names itself in navy. Search is
+   the resting mode, so its pill is drawn rather than filled: bone inside, an
+   ink rule around it, ink type. Gold is still only the live action. */
+.sfield .pchip{background:var(--ink);color:var(--paper-bg)}
+.sfield .schip{background:var(--paper-bg);color:var(--ink);border:1px solid var(--ink);padding:2px 6px}
+
+/* ═══ The field is also the prompt ═══
+   p> at the front switches it. Same pill as command, quill on the right where
+   the magnifier sits, type left in ink. Deleting the leader puts it back. */
+.sfield>svg.quillmark{right:10px;width:21px;height:21px;margin-top:-10.5px;color:var(--ink);opacity:0}
+.sfield.prm>svg.quillmark{opacity:1}
+.sfield.prm>svg.mag{opacity:0}
+.sfield.prm .pchip{opacity:1;transform:none}
+.sfield.prm input{padding-left:72px;padding-right:42px;color:var(--p-ink)}
+
+/* Marginalia under the field. One line of reserved height that changes
+   what it says rather than appearing, so nothing below it moves. At rest it
+   says how to reach the command line; in command mode it lists the commands,
+   narrowing as you type. Schemes are upright because they are literal text
+   to type; the gloss beside each is italic, like all marginalia. */
+.shint{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 4px;min-height:19px;padding:6px 13px 0;
+  font:italic 400 11px var(--font-serif);color:var(--marg);line-height:1.6}
+.shint:hover{color:var(--p-gold-deep)}
+.shint .it{white-space:nowrap}
+.shint .sep{opacity:.5;margin:0 3px 0 1px}
+.shint code{font:normal 600 11px var(--font-serif);color:inherit;letter-spacing:.01em}
+.shint button{font:inherit;color:inherit;border:none;background:none;padding:0;cursor:pointer}
+.shint button:hover{color:var(--ink)}
+.shint button:hover .gl{text-decoration:underline;text-underline-offset:2px}
+.shint .it.first code{color:var(--ink)}
+.shint .none{white-space:nowrap}
+.shint .pre{color:var(--ink);font-style:italic}
+.shint .bad{color:var(--ink)}
+
+/* The full reference. Asked for with ?, so it may cover the table; it floats
+   rather than pushing anything down, and it goes the moment you type past it. */
+.cref{display:none;position:absolute;left:0;right:0;top:66px;z-index:60;background:var(--p-surface);
+  border-radius:var(--r-btn);padding:13px 16px 12px;box-shadow:0 8px 28px rgba(40,36,28,.08);
+  max-height:64vh;overflow:auto}
+.cref.open{display:block}
+.topgrid.atbottom .cref{max-height:58vh}
+
+/* Header: what this is, and a way to keep only one group */
+.cref .rhead{padding-bottom:8px;margin-bottom:11px;border-bottom:.5px solid var(--p-border-2)}
+.cref .rtop{display:flex;align-items:baseline;gap:10px}
+.cref .rlab{font:600 9px var(--font-sans);letter-spacing:.055em;color:var(--ink)}
+.cref .rlab .n{margin-left:5px;font-family:var(--font-mono);font-size:9px;color:var(--p-ink-3)}
+.cref .chips{display:flex;gap:2px;margin-top:6px;flex-wrap:wrap}
+.cref .chip{display:inline-block;width:auto;grid-template-columns:none;text-align:center;
+  font:italic 400 11px var(--font-serif);color:var(--marg);border:none;background:none;
+  padding:2px 8px;border-radius:9px;cursor:pointer}
+.cref .chip:hover{color:var(--ink)}
+.cref .chip.on{color:var(--ink);background:rgba(25,25,25,.055)}
+
+/* Groups flow in columns; a group never splits across one */
+.cref .cols{columns:318px;column-gap:28px}
+.cref .grp{break-inside:avoid;margin:0 0 15px}
+.cref h4{display:flex;align-items:baseline;font:600 9px var(--font-sans);letter-spacing:.055em;color:var(--ink);
+  margin:0 0 5px;padding-bottom:4px;border-bottom:.5px solid var(--p-border-2)}
+.cref h4 .n{margin-left:auto;font-family:var(--font-mono);font-size:9px;color:var(--p-ink-3);letter-spacing:0}
+/* Two aligned columns so the eye runs down the syntax, not a ragged edge */
+.cref button{display:grid;grid-template-columns:168px 1fr;gap:9px;align-items:baseline;width:100%;
+  border:none;background:none;padding:4px 6px;border-radius:7px;cursor:pointer;text-align:left;color:var(--p-ink-2)}
+.cref button:hover{color:var(--ink);background:rgba(25,25,25,.04)}
+.cref button.sel{color:var(--ink);background:rgba(25,25,25,.06)}
+.cref code{font:500 11px var(--font-mono);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cref .gl{font:italic 400 11px var(--font-serif);line-height:1.35}
+.cref mark{background:none;color:inherit;font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.cref .nohit{font:italic 400 11px var(--font-serif);color:var(--marg);padding:4px 6px}
+.cref .foot{margin-top:4px;padding-top:9px;border-top:.5px solid var(--p-border-2);
+  font:italic 400 10.5px var(--font-serif);color:var(--marg);line-height:1.5}
+.t-mk.pin{color:var(--ink)}
+.peek{display:none;position:absolute;left:0;right:0;top:66px;z-index:61;background:var(--p-surface);border-radius:var(--r-btn);
+  padding:16px 20px 14px;box-shadow:0 8px 28px rgba(40,36,28,.08);max-height:62vh;overflow:auto}
+.peek.open{display:block}
+.topgrid.atbottom .peek{top:auto;bottom:calc(100% - 14px)}
+body.popwin .pophost>.sbar .peek{position:static;margin-top:8px}
+.peek .pk-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.peek .pk-tags{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+.peek h3{font-size:15px;font-weight:600;margin:0 0 4px}
+.peek h4{font:italic 400 11px var(--font-serif);color:var(--marg);margin:14px 0 4px;font-weight:400}
+.peek blockquote{margin:0 0 6px;padding-left:10px;border-left:2px solid var(--ink);font-style:italic;font-size:14px}
+.peek p{font-size:12.5px;line-height:1.55;margin:6px 0;color:var(--p-ink)}
+.peek .pk-sub{color:var(--p-ink-2)}
+.peek .pk-mark{font-size:12px;padding:4px 0;border-top:.5px solid var(--p-border-2)}
+
+/* An id is an address, not a pointing device. It is always on screen, because
+   nobody can remember a number they were only shown while holding a key down,
+   and a column that comes and goes is harder to explain than one that stays.
+   It never changes colour: an address is a constant, and a number that shifts
+   with the mode invites the reader to work out what the shift means. */
+.c-id{font:500 10.5px var(--font-mono);color:var(--p-ink-3);text-align:center}
+/* Cards have no columns, so the id rides inline ahead of the kind pill. */
+.rowid{display:inline-block;font:500 9.5px var(--font-mono);color:var(--p-ink-3);
+  background:rgba(25,25,25,.05);padding:1px 5px;border-radius:3px;margin-right:6px}
+
+/* ═══ The addressed surface wears a rule ═══
+   While the command line is open, the surface it acts on carries a navy rule
+   down its left edge. One window or four, the rule is in the same place and
+   means the same thing, so nothing new has to be learned when a panel is
+   popped out. Nothing else dims: the other windows are usually the reference
+   you opened the command line to act on, and a reference you cannot read is
+   worse than an unmarked one. */
+body::before{content:"";position:fixed;left:0;top:0;bottom:0;width:2px;
+  background:rgb(var(--navy));z-index:80;pointer-events:none;
+  animation:ruleIn .18s ease-out}
+@keyframes ruleIn{from{transform:scaleY(0);transform-origin:top}to{transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){body::before{animation:none}}
+/* A popped panel is not the addressed surface; commands still act on the
+   page that opened it. A popped surface would wear its own rule. */
+body.popwin::before{display:none}
+.sfield input::placeholder{color:var(--p-ink-3)}
+
+.params{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:4px 2px 0}
+.params:empty{display:none}
+.pill{display:inline-flex;align-items:center;gap:5px;font:500 10.5px var(--font-sans);padding:4px 7px 4px 9px;
+  border-radius:12px;background:transparent;color:var(--ink)}
+.pill .k{opacity:.5;font-weight:400}
+.pill button{border:none;background:transparent;color:inherit;cursor:pointer;opacity:.55;font-size:12px;line-height:1;padding:0 2px}
+.pill button:hover{opacity:1}
+.savebtn{margin-left:auto;display:flex;align-items:center;gap:5px;padding:6px 11px;font:500 11px var(--font-sans);
+  border:none;background:transparent;color:var(--p-ink-2);border-radius:var(--r-btn);cursor:pointer}
+.savebtn:hover{color:var(--ink)}
+.savebtn[disabled]{opacity:.38;cursor:default}
+.savebtn svg:not(.bx){width:11px;height:11px}
+
+.grid{display:grid;grid-template-columns:var(--cols);gap:9px;align-items:center;padding:0 13px}
+.thead{background:transparent;border-bottom:1px solid var(--divider);min-height:33px;
+  border-radius:var(--r-xl) var(--r-xl) 0 0}
+.th{position:relative;display:flex;align-items:center;min-width:0}
+.th,.th.c,.th.r{justify-content:center}
+.hbtn{position:relative;display:flex;align-items:center;justify-content:center;max-width:100%;padding:3px 11px;font:500 10.5px var(--font-sans);
+  color:var(--p-ink-3);border:.5px solid transparent;background:transparent;border-radius:var(--r-sm);cursor:pointer}
+.hbtn:hover{background:var(--ink-wash);color:var(--ink)}
+.hbtn.on{background:var(--ink-wash-2);color:var(--ink);font-weight:600}
+.hbtn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbtn .chev{position:absolute;right:3px;width:8px;height:8px;opacity:.62}
+.hbtn .arrow{position:absolute;right:2px;width:9px;height:9px;transition:transform .14s ease}
+.hbtn.asc .arrow{transform:rotate(180deg)}
+.hbtn.idle .arrow{display:none}
+.hbtn .drag{position:absolute;left:2px;width:9px;height:9px;opacity:0}
+.th:hover .drag{opacity:.45}
+.grip{position:absolute;left:-9px;top:-9px;bottom:-9px;width:9px;border:none;background:transparent;padding:0;cursor:col-resize;z-index:2}
+.grip::after{content:"";position:absolute;left:4px;top:8px;bottom:8px;width:1px;background:var(--p-border)}
+.grip:hover::after,.grip:focus-visible::after{background:var(--p-gold-deep);width:2px;left:3.5px}
+.grip:focus-visible{outline:none}
+.th.dragover{box-shadow:inset 2px 0 0 var(--p-gold-deep)}
+
+.row{min-height:45px;border-bottom:.5px solid var(--p-border-2);cursor:pointer;position:relative}
+.row:hover{background:var(--p-subtle)}
+.row.picked{background:var(--ink-wash)}
+.row.picked:hover{background:var(--ink-wash-2)}
+.row:focus-visible{outline:2px solid var(--p-gold-deep);outline-offset:-2px}
+.row:hover{background:var(--p-subtle)}
+.cb{width:16px;height:16px;border:1px solid var(--ink-soft);border-radius:3px;background:transparent;
+  color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:border-color .12s;flex-shrink:0;position:relative}
+.cb:hover{border-color:var(--ink)}
+.cb.on{border-color:var(--ink)}
+.cb svg{width:11px;height:11px;opacity:0;transition:opacity .12s}
+.cb.on svg{opacity:1}
+
+.c-type{display:flex;align-items:center;justify-content:center;min-width:0}
+.kpill{display:inline-flex;align-items:center;gap:4px;font:500 10px var(--font-sans);padding:2px 7px;border-radius:9px;white-space:nowrap}
+.k-chat{background:rgba(74,122,229,.11);color:#2F5BC4}
+.k-note{background:rgba(124,108,212,.12);color:#5A4AB0}
+.k-high{background:rgba(236,72,153,.11);color:#BE3878}
+/* Teal, not gold. The kind pills are a hue family — blue, purple, pink —
+   and docket had picked the one hue reserved for live action. Gold is the
+   only colour that appears in both the pills and the chrome, so a gold
+   docket pill sitting near a gold running mark is confusable in a way a
+   blue chat pill never is. */
+.k-dock{background:rgba(13,148,136,.12);color:#0E7490}
+.kpill svg{width:9px;height:9px}
+.c-title{min-width:0;padding:8px 0}
+.t-t{font-size:12.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-s{font-size:11px;color:var(--p-ink-2);line-height:1.4;margin-top:2px;
+  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.t-q{font-size:11.5px;line-height:1.4;font-style:italic;border-left:2px solid var(--ink-soft);padding-left:7px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.t-mk{font:italic 400 10px var(--font-serif);color:var(--marg);margin-top:2px}
+.c-room{font-size:11px;color:var(--p-ink-2);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-when{font-size:11px;color:var(--p-ink-3);text-align:center;white-space:nowrap}
+.c-tags{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;padding:6px 0}
+.tag{font:500 10px var(--font-sans);padding:2px 8px;border-radius:10px;white-space:nowrap;
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;
+  background:transparent;border:.5px dashed var(--ink-soft);color:var(--p-ink-2)}
+.tag.ai,.tag.mine,.tag.link{background:transparent;border:.5px dashed var(--ink-soft);color:var(--p-ink-2)}
+
+.tfoot{display:flex;align-items:center;justify-content:space-between;padding:8px 13px;
+  border-top:1px solid var(--divider);background:var(--p-subtle);font-size:11px;color:var(--p-ink-3)}
+.empty{display:none;padding:38px 16px;text-align:center;font-size:12.5px;color:var(--p-ink-3)}
+.empty.show{display:block}
+
+.menu{display:none;position:fixed;z-index:70;min-width:186px;max-height:300px;overflow-y:auto;padding:4px;
+  background:var(--p-surface);border:.5px solid var(--p-border);border-radius:var(--r-md);box-shadow:0 6px 20px rgba(40,36,28,.14)}
+.menu.open{display:block}
+.menu button{display:flex;align-items:center;gap:7px;width:100%;padding:6px 8px;font:400 12px var(--font-sans);
+  border:none;background:transparent;color:var(--p-ink);border-radius:var(--r-sm);cursor:pointer;text-align:left}
+.menu button:hover{background:var(--p-subtle)}
+.menu .tick{width:12px;height:12px;flex-shrink:0;color:var(--ink);opacity:0}
+.menu button.on .tick{opacity:1}
+.menu .n{margin-left:auto;font-size:10.5px;color:var(--p-ink-3)}
+
+/* ══════════ RIGHT ══════════ */
+.wshead{display:flex;align-items:center;gap:7px;padding:10px 12px;border-bottom:1px solid var(--divider)}
+.wsname{font-size:12.5px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wskind{font:500 8.5px var(--font-sans);letter-spacing:.05em;padding:2px 6px;border-radius:8px;flex-shrink:0}
+.wskind.draft{background:var(--p-subtle);color:var(--p-ink-3)}
+.wskind.saved{background:var(--ink-wash-2);color:var(--ink)}
+.wscount{margin-left:auto;font-size:10.5px;color:var(--p-ink-3);flex-shrink:0}
+.wsbody{max-height:640px;overflow-y:auto;padding:12px;background:var(--paper-bg)}
+.wsempty{padding:36px 22px;text-align:center}
+.wsempty svg{width:25px;height:25px;color:var(--p-line-soft);margin-bottom:10px}
+.wsempty p{font-size:11.5px;line-height:1.55;color:var(--p-ink-3)}
+
+/* ── The card ── */
+.mc{background:var(--p-surface);border:.5px solid var(--p-border);border-radius:var(--r-md);
+  margin-bottom:9px;box-shadow:var(--card-lift);cursor:grab;overflow:hidden}
+.mc:hover{border-color:var(--p-line-soft)}
+.mc.on{border-color:var(--ink-soft);box-shadow:0 0 0 2px var(--ink-wash)}
+.mc.dragging{opacity:.4}
+.mc.dragover{box-shadow:inset 0 2px 0 var(--p-gold-deep)}
+.mc-top{display:flex;align-items:center;gap:7px;padding:7px 10px;border-bottom:.5px solid var(--p-border-2)}
+.mc-tags{display:flex;gap:3px;flex-wrap:wrap;margin-left:auto}
+.mc-rm{width:17px;height:17px;border:none;background:transparent;color:var(--p-ink-3);flex-shrink:0;
+  cursor:pointer;border-radius:3px;font-size:14px;line-height:1;opacity:0}
+.mc:hover .mc-rm{opacity:.6}
+.mc-rm:hover{background:rgba(224,62,62,.1);color:#E03E3E;opacity:1}
+.mc-body{padding:11px 13px 12px}
+.ttl{font-size:13px;font-weight:600;line-height:1.35}
+.prose{font-size:11.5px;line-height:1.62;color:var(--p-ink);margin-top:5px}
+.prose p+p{margin-top:7px}
+.quote{font-size:13.5px;line-height:1.55;font-style:italic;color:var(--p-ink);
+  border-left:2px solid var(--ink-soft);padding-left:11px}
+
+/* ── Marginalia: italic serif, gold-muted, no fills, horizontal ── */
+.marg{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 5px;margin-top:9px;
+  font:italic 400 11px var(--font-serif);color:var(--marg);line-height:1.7;
+  transition:color .16s ease}
+.mc:hover .marg,.mk:hover .marg{color:var(--p-gold-deep)}
+.marg > *{white-space:nowrap}
+.marg .sep{opacity:.4}
+.marg button{font:inherit;color:inherit;border:none;background:none;padding:0;cursor:pointer;
+  white-space:nowrap;transition:color .12s ease}
+.marg button:hover{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+
+/* ── Markings held inside a container card ── */
+.holds{margin-top:11px;border-top:.5px solid var(--p-border-2);padding-top:10px}
+.holds-lb{font:600 8.5px var(--font-sans);letter-spacing:.05em;color:var(--p-ink-3);margin-bottom:8px;
+  display:flex;align-items:center;gap:6px}
+.holds-lb button{margin-left:auto;font:400 9.5px var(--font-sans);border:none;background:transparent;
+  color:var(--p-ink-3);cursor:pointer;text-decoration:underline;letter-spacing:0}
+.holds-lb button:hover{color:var(--ink)}
+.mk{border-left:2px solid var(--p-border);padding:2px 0 2px 10px;margin-bottom:9px}
+.mk:last-child{margin-bottom:0}
+.mk.note{border-left-color:rgba(124,108,212,.4)}
+.mk.high{border-left-color:rgba(236,72,153,.38)}
+.mk.singled{border-left-width:3px;border-left-color:var(--p-gold-deep)}
+.mk .mkt{font-size:11.5px;font-weight:600;line-height:1.35}
+.mk .mkp{font-size:11px;line-height:1.55;color:var(--p-ink-2);margin-top:3px}
+.mk .mkq{font-size:12px;line-height:1.5;font-style:italic;color:var(--p-ink)}
+.mk .marg{margin-top:5px;font-size:10px}
+.holds-none{font:italic 400 11px var(--font-serif);color:var(--marg)}
+.runlb{font:600 8.5px var(--font-sans);letter-spacing:.04em;color:var(--p-ink-3);margin:12px 0 7px}
+.runlb:first-child{margin-top:0}
+
+/* The dock has no fill and no rule of its own. Only the button outlines. */
+.wsacts{position:sticky;bottom:0;padding:13px 12px 14px;background:transparent}
+.scopeline{font-size:10px;color:var(--p-ink-3);display:flex;align-items:center;gap:8px;
+  flex-wrap:wrap;min-width:0}
+.scopeline b{color:var(--ink);font-weight:600}
+.scopeline .lnk{border:none;background:transparent;color:var(--p-ink-3);padding:0;
+  font:400 10px var(--font-sans);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.scopeline .lnk:hover{color:var(--ink)}
+
+/* Equal widths, equal height, one row. Definition comes from the dots. */
+.btnrow{display:flex;gap:6px;align-items:stretch}
+.btnrow button{
+  flex:1 1 0;min-width:0;height:46px;padding:0 6px;
+  font:500 10.5px var(--font-sans);letter-spacing:.005em;white-space:nowrap;
+  display:flex;align-items:center;justify-content:center;
+  border:none;background:transparent;color:var(--p-ink-2);border-radius:var(--r-btn);cursor:pointer;
+}
+.btnrow button:hover:not([disabled]){color:var(--ink)}
+.btnrow button[disabled]{opacity:.3;cursor:default}
+
+/* The scope line and the trigger share the last row, so the key element sits
+   at the bottom-right — the same corner the progressive border is solid at. */
+.btnrow .trigger{flex:0 0 46px;margin-left:0}
+.scopeline{margin-bottom:8px}
+
+.composer{margin:0 0 9px;background:var(--p-surface);border-radius:var(--r-xl);padding:13px;display:none}
+.composer.open{display:block}
+.composer textarea{width:100%;min-height:62px;resize:vertical;padding:8px 2px;font:400 12px var(--font-sans);
+  border:none;border-radius:0;color:var(--p-ink);background:transparent}
+.composer textarea:focus{outline:none}
+
+/* The one key element in the whole surface. Progressive dash, and it only
+   exists while the composer is open. A surface that never executes has no
+   action at rest, so it has nothing to mark. */
+.cfoot{display:flex;align-items:center;gap:9px;margin-top:9px;justify-content:flex-end}
+.ghost{padding:7px 11px;font:500 11px var(--font-sans);border:none;background:transparent;
+  color:var(--p-ink-3);border-radius:var(--r-btn);cursor:pointer}
+.ghost:hover{color:var(--p-ink-2)}
+.trigger{margin-left:auto;width:46px;height:46px;flex-shrink:0;border:none;background:var(--p-surface);
+  border-radius:var(--r-xl);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.trigger[aria-expanded="true"]{color:var(--p-gold-deep)}
+.trigger:hover{color:var(--p-gold-deep)}
+.trigger svg:not(.bx){width:22px;height:22px}
+.composer .lb{font:600 8.5px var(--font-sans);letter-spacing:.05em;color:var(--p-ink-3);margin-bottom:5px;display:block}
+.sugg{display:flex;gap:4px;flex-wrap:wrap;margin:7px 0}
+.sugg button{padding:3px 8px;font:400 10px var(--font-sans);border:.5px dashed var(--p-line-soft);
+  background:transparent;color:var(--p-ink-3);border-radius:10px;cursor:pointer}
+.sugg button:hover{border-color:var(--ink-soft);color:var(--ink);border-style:solid}
+.ctx{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:7px}
+.ctx span{font:500 9px var(--font-sans);padding:2px 6px;border-radius:8px;background:var(--p-subtle);color:var(--p-ink-3)}
+
+.notebar{position:fixed;left:0;right:0;bottom:0;z-index:50;padding:8px 18px;background:var(--paper-bg);
+  border-top:.5px solid var(--p-border);box-shadow:0 -1px 3px rgba(40,36,28,.05);
+  font-size:11px;color:var(--p-ink-2);line-height:1.5}
+.notebar b{color:var(--p-ink);font-weight:600}
+.toast{position:fixed;bottom:52px;left:50%;transform:translateX(-50%) translateY(8px);padding:7px 14px;
+  border-radius:var(--r-md);background:var(--p-ink);color:#fff;font-size:12px;opacity:0;pointer-events:none;
+  transition:opacity .16s,transform .16s;z-index:90;max-width:80vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+ <div class="topgrid">
+   <div class="barph" id="p-barph" style="display:none">the command line is in its own window;
+     <button onclick="focusField()">press / to jump to it</button>, or <button onclick="closePop('command')">bring it back</button></div>
+   <div class="sbar" id="p-bar">
+     <div class="sfield" id="sfield" data-border="dot" data-radius="8">
+       <div class="fillwrap cmdwrap"><div class="fill cmdfill"><svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true"><defs><pattern id="stars" width="57.158" height="99.000" patternUnits="userSpaceOnUse" patternTransform="rotate(-22)"><g fill="#fff"><circle cx="-52.39" cy="-85.25" r="0.55" opacity="0.61"/><circle cx="-52.39" cy="13.75" r="0.55" opacity="0.61"/><circle cx="-52.39" cy="112.75" r="0.55" opacity="0.61"/><circle cx="4.76" cy="-85.25" r="0.55" opacity="0.61"/><circle cx="4.76" cy="13.75" r="0.55" opacity="0.61"/><circle cx="4.76" cy="112.75" r="0.55" opacity="0.61"/><circle cx="61.92" cy="-85.25" r="0.55" opacity="0.61"/><circle cx="61.92" cy="13.75" r="0.55" opacity="0.61"/><circle cx="61.92" cy="112.75" r="0.55" opacity="0.61"/><circle cx="-61.92" cy="-85.25" r="0.55" opacity="0.98"/><circle cx="-61.92" cy="13.75" r="0.55" opacity="0.98"/><circle cx="-61.92" cy="112.75" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="-85.25" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="13.75" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="112.75" r="0.55" opacity="0.98"/><circle cx="52.39" cy="-85.25" r="0.55" opacity="0.98"/><circle cx="52.39" cy="13.75" r="0.55" opacity="0.98"/><circle cx="52.39" cy="112.75" r="0.55" opacity="0.98"/><circle cx="-66.68" cy="-88.00" r="0.55" opacity="0.56"/><circle cx="-66.68" cy="11.00" r="0.55" opacity="0.56"/><circle cx="-66.68" cy="110.00" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="-88.00" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="11.00" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="110.00" r="0.55" opacity="0.56"/><circle cx="47.63" cy="-88.00" r="0.55" opacity="0.56"/><circle cx="47.63" cy="11.00" r="0.55" opacity="0.56"/><circle cx="47.63" cy="110.00" r="0.55" opacity="0.56"/><circle cx="-71.45" cy="-96.25" r="0.55" opacity="0.92"/><circle cx="-71.45" cy="2.75" r="0.55" opacity="0.92"/><circle cx="-71.45" cy="101.75" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="-96.25" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="2.75" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="101.75" r="0.55" opacity="0.92"/><circle cx="42.87" cy="-96.25" r="0.55" opacity="0.92"/><circle cx="42.87" cy="2.75" r="0.55" opacity="0.92"/><circle cx="42.87" cy="101.75" r="0.55" opacity="0.92"/><circle cx="-71.45" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="-71.45" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="-71.45" cy="96.25" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="96.25" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="96.25" r="0.55" opacity="0.50"/><circle cx="-66.68" cy="-110.00" r="0.55" opacity="0.87"/><circle cx="-66.68" cy="-11.00" r="0.55" opacity="0.87"/><circle cx="-66.68" cy="88.00" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="-110.00" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="-11.00" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="88.00" r="0.55" opacity="0.87"/><circle cx="47.63" cy="-110.00" r="0.55" opacity="0.87"/><circle cx="47.63" cy="-11.00" r="0.55" opacity="0.87"/><circle cx="47.63" cy="88.00" r="0.55" opacity="0.87"/><circle cx="-61.92" cy="-112.75" r="0.55" opacity="0.45"/><circle cx="-61.92" cy="-13.75" r="0.55" opacity="0.45"/><circle cx="-61.92" cy="85.25" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="-112.75" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="-13.75" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="85.25" r="0.55" opacity="0.45"/><circle cx="52.39" cy="-112.75" r="0.55" opacity="0.45"/><circle cx="52.39" cy="-13.75" r="0.55" opacity="0.45"/><circle cx="52.39" cy="85.25" r="0.55" opacity="0.45"/><circle cx="-52.39" cy="-112.75" r="0.55" opacity="0.82"/><circle cx="-52.39" cy="-13.75" r="0.55" opacity="0.82"/><circle cx="-52.39" cy="85.25" r="0.55" opacity="0.82"/><circle cx="4.76" cy="-112.75" r="0.55" opacity="0.82"/><circle cx="4.76" cy="-13.75" r="0.55" opacity="0.82"/><circle cx="4.76" cy="85.25" r="0.55" opacity="0.82"/><circle cx="61.92" cy="-112.75" r="0.55" opacity="0.82"/><circle cx="61.92" cy="-13.75" r="0.55" opacity="0.82"/><circle cx="61.92" cy="85.25" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="-110.00" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="-11.00" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="88.00" r="0.55" opacity="0.40"/><circle cx="9.53" cy="-110.00" r="0.55" opacity="0.40"/><circle cx="9.53" cy="-11.00" r="0.55" opacity="0.40"/><circle cx="9.53" cy="88.00" r="0.55" opacity="0.40"/><circle cx="66.68" cy="-110.00" r="0.55" opacity="0.40"/><circle cx="66.68" cy="-11.00" r="0.55" opacity="0.40"/><circle cx="66.68" cy="88.00" r="0.55" opacity="0.40"/><circle cx="-42.87" cy="-101.75" r="0.55" opacity="0.77"/><circle cx="-42.87" cy="-2.75" r="0.55" opacity="0.77"/><circle cx="-42.87" cy="96.25" r="0.55" opacity="0.77"/><circle cx="14.29" cy="-101.75" r="0.55" opacity="0.77"/><circle cx="14.29" cy="-2.75" r="0.55" opacity="0.77"/><circle cx="14.29" cy="96.25" r="0.55" opacity="0.77"/><circle cx="71.45" cy="-101.75" r="0.55" opacity="0.77"/><circle cx="71.45" cy="-2.75" r="0.55" opacity="0.77"/><circle cx="71.45" cy="96.25" r="0.55" opacity="0.77"/><circle cx="-33.34" cy="-85.25" r="0.55" opacity="0.66"/><circle cx="-33.34" cy="13.75" r="0.55" opacity="0.66"/><circle cx="-33.34" cy="112.75" r="0.55" opacity="0.66"/><circle cx="23.82" cy="-85.25" r="0.55" opacity="0.66"/><circle cx="23.82" cy="13.75" r="0.55" opacity="0.66"/><circle cx="23.82" cy="112.75" r="0.55" opacity="0.66"/><circle cx="80.97" cy="-85.25" r="0.55" opacity="0.66"/><circle cx="80.97" cy="13.75" r="0.55" opacity="0.66"/><circle cx="80.97" cy="112.75" r="0.55" opacity="0.66"/><circle cx="-38.11" cy="-110.00" r="0.55" opacity="0.61"/><circle cx="-38.11" cy="-11.00" r="0.55" opacity="0.61"/><circle cx="-38.11" cy="88.00" r="0.55" opacity="0.61"/><circle cx="19.05" cy="-110.00" r="0.55" opacity="0.61"/><circle cx="19.05" cy="-11.00" r="0.55" opacity="0.61"/><circle cx="19.05" cy="88.00" r="0.55" opacity="0.61"/><circle cx="76.21" cy="-110.00" r="0.55" opacity="0.61"/><circle cx="76.21" cy="-11.00" r="0.55" opacity="0.61"/><circle cx="76.21" cy="88.00" r="0.55" opacity="0.61"/><circle cx="-33.34" cy="-112.75" r="0.55" opacity="0.98"/><circle cx="-33.34" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="-33.34" cy="85.25" r="0.55" opacity="0.98"/><circle cx="23.82" cy="-112.75" r="0.55" opacity="0.98"/><circle cx="23.82" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="23.82" cy="85.25" r="0.55" opacity="0.98"/><circle cx="80.97" cy="-112.75" r="0.55" opacity="0.98"/><circle cx="80.97" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="80.97" cy="85.25" r="0.55" opacity="0.98"/><circle cx="-23.82" cy="-112.75" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="-13.75" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="85.25" r="0.55" opacity="0.56"/><circle cx="33.34" cy="-112.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="-13.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="85.25" r="0.55" opacity="0.56"/><circle cx="90.50" cy="-112.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="-13.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="85.25" r="0.55" opacity="0.56"/><circle cx="-19.05" cy="-110.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="88.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="-110.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="88.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="-110.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="88.00" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="96.25" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="96.25" r="0.55" opacity="0.50"/><circle cx="100.03" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="100.03" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="100.03" cy="96.25" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-96.25" r="0.55" opacity="0.87"/><circle cx="-14.29" cy="2.75" r="0.55" opacity="0.87"/><circle cx="-14.29" cy="101.75" r="0.55" opacity="0.87"/><circle cx="42.87" cy="-96.25" r="0.55" opacity="0.87"/><circle cx="42.87" cy="2.75" r="0.55" opacity="0.87"/><circle cx="42.87" cy="101.75" r="0.55" opacity="0.87"/><circle cx="100.03" cy="-96.25" r="0.55" opacity="0.87"/><circle cx="100.03" cy="2.75" r="0.55" opacity="0.87"/><circle cx="100.03" cy="101.75" r="0.55" opacity="0.87"/><circle cx="-33.34" cy="-63.25" r="0.55" opacity="0.45"/><circle cx="-33.34" cy="35.75" r="0.55" opacity="0.45"/><circle cx="-33.34" cy="134.75" r="0.55" opacity="0.45"/><circle cx="23.82" cy="-63.25" r="0.55" opacity="0.45"/><circle cx="23.82" cy="35.75" r="0.55" opacity="0.45"/><circle cx="23.82" cy="134.75" r="0.55" opacity="0.45"/><circle cx="80.97" cy="-63.25" r="0.55" opacity="0.45"/><circle cx="80.97" cy="35.75" r="0.55" opacity="0.45"/><circle cx="80.97" cy="134.75" r="0.55" opacity="0.45"/><circle cx="-38.11" cy="-60.50" r="0.55" opacity="0.82"/><circle cx="-38.11" cy="38.50" r="0.55" opacity="0.82"/><circle cx="-38.11" cy="137.50" r="0.55" opacity="0.82"/><circle cx="19.05" cy="-60.50" r="0.55" opacity="0.82"/><circle cx="19.05" cy="38.50" r="0.55" opacity="0.82"/><circle cx="19.05" cy="137.50" r="0.55" opacity="0.82"/><circle cx="76.21" cy="-60.50" r="0.55" opacity="0.82"/><circle cx="76.21" cy="38.50" r="0.55" opacity="0.82"/><circle cx="76.21" cy="137.50" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="-60.50" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="38.50" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="137.50" r="0.55" opacity="0.40"/><circle cx="9.53" cy="-60.50" r="0.55" opacity="0.40"/><circle cx="9.53" cy="38.50" r="0.55" opacity="0.40"/><circle cx="9.53" cy="137.50" r="0.55" opacity="0.40"/><circle cx="66.68" cy="-60.50" r="0.55" opacity="0.40"/><circle cx="66.68" cy="38.50" r="0.55" opacity="0.40"/><circle cx="66.68" cy="137.50" r="0.55" opacity="0.40"/><circle cx="-52.39" cy="-63.25" r="0.55" opacity="0.77"/><circle cx="-52.39" cy="35.75" r="0.55" opacity="0.77"/><circle cx="-52.39" cy="134.75" r="0.55" opacity="0.77"/><circle cx="4.76" cy="-63.25" r="0.55" opacity="0.77"/><circle cx="4.76" cy="35.75" r="0.55" opacity="0.77"/><circle cx="4.76" cy="134.75" r="0.55" opacity="0.77"/><circle cx="61.92" cy="-63.25" r="0.55" opacity="0.77"/><circle cx="61.92" cy="35.75" r="0.55" opacity="0.77"/><circle cx="61.92" cy="134.75" r="0.55" opacity="0.77"/><circle cx="-57.16" cy="-77.00" r="0.55" opacity="0.71"/><circle cx="-57.16" cy="22.00" r="0.55" opacity="0.71"/><circle cx="-57.16" cy="121.00" r="0.55" opacity="0.71"/><circle cx="-0.00" cy="-77.00" r="0.55" opacity="0.71"/><circle cx="-0.00" cy="22.00" r="0.55" opacity="0.71"/><circle cx="-0.00" cy="121.00" r="0.55" opacity="0.71"/><circle cx="57.16" cy="-77.00" r="0.55" opacity="0.71"/><circle cx="57.16" cy="22.00" r="0.55" opacity="0.71"/><circle cx="57.16" cy="121.00" r="0.55" opacity="0.71"/><circle cx="-9.53" cy="-60.50" r="0.55" opacity="0.61"/><circle cx="-9.53" cy="38.50" r="0.55" opacity="0.61"/><circle cx="-9.53" cy="137.50" r="0.55" opacity="0.61"/><circle cx="47.63" cy="-60.50" r="0.55" opacity="0.61"/><circle cx="47.63" cy="38.50" r="0.55" opacity="0.61"/><circle cx="47.63" cy="137.50" r="0.55" opacity="0.61"/><circle cx="104.79" cy="-60.50" r="0.55" opacity="0.61"/><circle cx="104.79" cy="38.50" r="0.55" opacity="0.61"/><circle cx="104.79" cy="137.50" r="0.55" opacity="0.61"/><circle cx="-19.05" cy="-60.50" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="38.50" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="137.50" r="0.55" opacity="0.98"/><circle cx="38.11" cy="-60.50" r="0.55" opacity="0.98"/><circle cx="38.11" cy="38.50" r="0.55" opacity="0.98"/><circle cx="38.11" cy="137.50" r="0.55" opacity="0.98"/><circle cx="95.26" cy="-60.50" r="0.55" opacity="0.98"/><circle cx="95.26" cy="38.50" r="0.55" opacity="0.98"/><circle cx="95.26" cy="137.50" r="0.55" opacity="0.98"/><circle cx="-23.82" cy="-63.25" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="35.75" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="134.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="-63.25" r="0.55" opacity="0.56"/><circle cx="33.34" cy="35.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="134.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="-63.25" r="0.55" opacity="0.56"/><circle cx="90.50" cy="35.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="134.75" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="-88.00" r="0.55" opacity="0.92"/><circle cx="-9.53" cy="11.00" r="0.55" opacity="0.92"/><circle cx="-9.53" cy="110.00" r="0.55" opacity="0.92"/><circle cx="47.63" cy="-88.00" r="0.55" opacity="0.92"/><circle cx="47.63" cy="11.00" r="0.55" opacity="0.92"/><circle cx="47.63" cy="110.00" r="0.55" opacity="0.92"/><circle cx="104.79" cy="-88.00" r="0.55" opacity="0.92"/><circle cx="104.79" cy="11.00" r="0.55" opacity="0.92"/><circle cx="104.79" cy="110.00" r="0.55" opacity="0.92"/><circle cx="-4.76" cy="-85.25" r="0.55" opacity="0.50"/><circle cx="-4.76" cy="13.75" r="0.55" opacity="0.50"/><circle cx="-4.76" cy="112.75" r="0.55" opacity="0.50"/><circle cx="52.39" cy="-85.25" r="0.55" opacity="0.50"/><circle cx="52.39" cy="13.75" r="0.55" opacity="0.50"/><circle cx="52.39" cy="112.75" r="0.55" opacity="0.50"/><circle cx="109.55" cy="-85.25" r="0.55" opacity="0.50"/><circle cx="109.55" cy="13.75" r="0.55" opacity="0.50"/><circle cx="109.55" cy="112.75" r="0.55" opacity="0.50"/><circle cx="-0.00" cy="-77.00" r="0.55" opacity="0.87"/><circle cx="-0.00" cy="22.00" r="0.55" opacity="0.87"/><circle cx="-0.00" cy="121.00" r="0.55" opacity="0.87"/><circle cx="57.16" cy="-77.00" r="0.55" opacity="0.87"/><circle cx="57.16" cy="22.00" r="0.55" opacity="0.87"/><circle cx="57.16" cy="121.00" r="0.55" opacity="0.87"/><circle cx="114.32" cy="-77.00" r="0.55" opacity="0.87"/><circle cx="114.32" cy="22.00" r="0.55" opacity="0.87"/><circle cx="114.32" cy="121.00" r="0.55" opacity="0.87"/><circle cx="0.00" cy="-71.50" r="0.55" opacity="0.45"/><circle cx="0.00" cy="27.50" r="0.55" opacity="0.45"/><circle cx="0.00" cy="126.50" r="0.55" opacity="0.45"/><circle cx="57.16" cy="-71.50" r="0.55" opacity="0.45"/><circle cx="57.16" cy="27.50" r="0.55" opacity="0.45"/><circle cx="57.16" cy="126.50" r="0.55" opacity="0.45"/><circle cx="114.32" cy="-71.50" r="0.55" opacity="0.45"/><circle cx="114.32" cy="27.50" r="0.55" opacity="0.45"/><circle cx="114.32" cy="126.50" r="0.55" opacity="0.45"/><circle cx="-47.63" cy="-38.50" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="60.50" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="159.50" r="0.55" opacity="0.82"/><circle cx="9.53" cy="-38.50" r="0.55" opacity="0.82"/><circle cx="9.53" cy="60.50" r="0.55" opacity="0.82"/><circle cx="9.53" cy="159.50" r="0.55" opacity="0.82"/><circle cx="66.68" cy="-38.50" r="0.55" opacity="0.82"/><circle cx="66.68" cy="60.50" r="0.55" opacity="0.82"/><circle cx="66.68" cy="159.50" r="0.55" opacity="0.82"/><circle cx="-52.39" cy="-35.75" r="0.55" opacity="0.40"/><circle cx="-52.39" cy="63.25" r="0.55" opacity="0.40"/><circle cx="-52.39" cy="162.25" r="0.55" opacity="0.40"/><circle cx="4.76" cy="-35.75" r="0.55" opacity="0.40"/><circle cx="4.76" cy="63.25" r="0.55" opacity="0.40"/><circle cx="4.76" cy="162.25" r="0.55" opacity="0.40"/><circle cx="61.92" cy="-35.75" r="0.55" opacity="0.40"/><circle cx="61.92" cy="63.25" r="0.55" opacity="0.40"/><circle cx="61.92" cy="162.25" r="0.55" opacity="0.40"/><circle cx="-61.92" cy="-35.75" r="0.55" opacity="0.77"/><circle cx="-61.92" cy="63.25" r="0.55" opacity="0.77"/><circle cx="-61.92" cy="162.25" r="0.55" opacity="0.77"/><circle cx="-4.76" cy="-35.75" r="0.55" opacity="0.77"/><circle cx="-4.76" cy="63.25" r="0.55" opacity="0.77"/><circle cx="-4.76" cy="162.25" r="0.55" opacity="0.77"/><circle cx="52.39" cy="-35.75" r="0.55" opacity="0.77"/><circle cx="52.39" cy="63.25" r="0.55" opacity="0.77"/><circle cx="52.39" cy="162.25" r="0.55" opacity="0.77"/><circle cx="-71.45" cy="-46.75" r="0.55" opacity="0.71"/><circle cx="-71.45" cy="52.25" r="0.55" opacity="0.71"/><circle cx="-71.45" cy="151.25" r="0.55" opacity="0.71"/><circle cx="-14.29" cy="-46.75" r="0.55" opacity="0.71"/><circle cx="-14.29" cy="52.25" r="0.55" opacity="0.71"/><circle cx="-14.29" cy="151.25" r="0.55" opacity="0.71"/><circle cx="42.87" cy="-46.75" r="0.55" opacity="0.71"/><circle cx="42.87" cy="52.25" r="0.55" opacity="0.71"/><circle cx="42.87" cy="151.25" r="0.55" opacity="0.71"/><circle cx="-66.68" cy="-60.50" r="0.55" opacity="0.66"/><circle cx="-66.68" cy="38.50" r="0.55" opacity="0.66"/><circle cx="-66.68" cy="137.50" r="0.55" opacity="0.66"/><circle cx="-9.53" cy="-60.50" r="0.55" opacity="0.66"/><circle cx="-9.53" cy="38.50" r="0.55" opacity="0.66"/><circle cx="-9.53" cy="137.50" r="0.55" opacity="0.66"/><circle cx="47.63" cy="-60.50" r="0.55" opacity="0.66"/><circle cx="47.63" cy="38.50" r="0.55" opacity="0.66"/><circle cx="47.63" cy="137.50" r="0.55" opacity="0.66"/><circle cx="-42.87" cy="-46.75" r="0.55" opacity="0.98"/><circle cx="-42.87" cy="52.25" r="0.55" opacity="0.98"/><circle cx="-42.87" cy="151.25" r="0.55" opacity="0.98"/><circle cx="14.29" cy="-46.75" r="0.55" opacity="0.98"/><circle cx="14.29" cy="52.25" r="0.55" opacity="0.98"/><circle cx="14.29" cy="151.25" r="0.55" opacity="0.98"/><circle cx="71.45" cy="-46.75" r="0.55" opacity="0.98"/><circle cx="71.45" cy="52.25" r="0.55" opacity="0.98"/><circle cx="71.45" cy="151.25" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="-38.50" r="0.55" opacity="0.56"/><circle cx="-19.05" cy="60.50" r="0.55" opacity="0.56"/><circle cx="-19.05" cy="159.50" r="0.55" opacity="0.56"/><circle cx="38.11" cy="-38.50" r="0.55" opacity="0.56"/><circle cx="38.11" cy="60.50" r="0.55" opacity="0.56"/><circle cx="38.11" cy="159.50" r="0.55" opacity="0.56"/><circle cx="95.26" cy="-38.50" r="0.55" opacity="0.56"/><circle cx="95.26" cy="60.50" r="0.55" opacity="0.56"/><circle cx="95.26" cy="159.50" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="-35.75" r="0.55" opacity="0.92"/><circle cx="-23.82" cy="63.25" r="0.55" opacity="0.92"/><circle cx="-23.82" cy="162.25" r="0.55" opacity="0.92"/><circle cx="33.34" cy="-35.75" r="0.55" opacity="0.92"/><circle cx="33.34" cy="63.25" r="0.55" opacity="0.92"/><circle cx="33.34" cy="162.25" r="0.55" opacity="0.92"/><circle cx="90.50" cy="-35.75" r="0.55" opacity="0.92"/><circle cx="90.50" cy="63.25" r="0.55" opacity="0.92"/><circle cx="90.50" cy="162.25" r="0.55" opacity="0.92"/><circle cx="-33.34" cy="-35.75" r="0.55" opacity="0.50"/><circle cx="-33.34" cy="63.25" r="0.55" opacity="0.50"/><circle cx="-33.34" cy="162.25" r="0.55" opacity="0.50"/><circle cx="23.82" cy="-35.75" r="0.55" opacity="0.50"/><circle cx="23.82" cy="63.25" r="0.55" opacity="0.50"/><circle cx="23.82" cy="162.25" r="0.55" opacity="0.50"/><circle cx="80.97" cy="-35.75" r="0.55" opacity="0.50"/><circle cx="80.97" cy="63.25" r="0.55" opacity="0.50"/><circle cx="80.97" cy="162.25" r="0.55" opacity="0.50"/><circle cx="-38.11" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="-38.11" cy="60.50" r="0.55" opacity="0.87"/><circle cx="-38.11" cy="159.50" r="0.55" opacity="0.87"/><circle cx="19.05" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="19.05" cy="60.50" r="0.55" opacity="0.87"/><circle cx="19.05" cy="159.50" r="0.55" opacity="0.87"/><circle cx="76.21" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="76.21" cy="60.50" r="0.55" opacity="0.87"/><circle cx="76.21" cy="159.50" r="0.55" opacity="0.87"/><circle cx="-14.29" cy="-52.25" r="0.55" opacity="0.45"/><circle cx="-14.29" cy="46.75" r="0.55" opacity="0.45"/><circle cx="-14.29" cy="145.75" r="0.55" opacity="0.45"/><circle cx="42.87" cy="-52.25" r="0.55" opacity="0.45"/><circle cx="42.87" cy="46.75" r="0.55" opacity="0.45"/><circle cx="42.87" cy="145.75" r="0.55" opacity="0.45"/><circle cx="100.03" cy="-52.25" r="0.55" opacity="0.45"/><circle cx="100.03" cy="46.75" r="0.55" opacity="0.45"/><circle cx="100.03" cy="145.75" r="0.55" opacity="0.45"/><circle cx="-14.29" cy="-46.75" r="0.55" opacity="0.82"/><circle cx="-14.29" cy="52.25" r="0.55" opacity="0.82"/><circle cx="-14.29" cy="151.25" r="0.55" opacity="0.82"/><circle cx="42.87" cy="-46.75" r="0.55" opacity="0.82"/><circle cx="42.87" cy="52.25" r="0.55" opacity="0.82"/><circle cx="42.87" cy="151.25" r="0.55" opacity="0.82"/><circle cx="100.03" cy="-46.75" r="0.55" opacity="0.82"/><circle cx="100.03" cy="52.25" r="0.55" opacity="0.82"/><circle cx="100.03" cy="151.25" r="0.55" opacity="0.82"/><circle cx="-33.34" cy="-13.75" r="0.55" opacity="0.40"/><circle cx="-33.34" cy="85.25" r="0.55" opacity="0.40"/><circle cx="-33.34" cy="184.25" r="0.55" opacity="0.40"/><circle cx="23.82" cy="-13.75" r="0.55" opacity="0.40"/><circle cx="23.82" cy="85.25" r="0.55" opacity="0.40"/><circle cx="23.82" cy="184.25" r="0.55" opacity="0.40"/><circle cx="80.97" cy="-13.75" r="0.55" opacity="0.40"/><circle cx="80.97" cy="85.25" r="0.55" opacity="0.40"/><circle cx="80.97" cy="184.25" r="0.55" opacity="0.40"/><circle cx="-38.11" cy="-11.00" r="0.55" opacity="0.77"/><circle cx="-38.11" cy="88.00" r="0.55" opacity="0.77"/><circle cx="-38.11" cy="187.00" r="0.55" opacity="0.77"/><circle cx="19.05" cy="-11.00" r="0.55" opacity="0.77"/><circle cx="19.05" cy="88.00" r="0.55" opacity="0.77"/><circle cx="19.05" cy="187.00" r="0.55" opacity="0.77"/><circle cx="76.21" cy="-11.00" r="0.55" opacity="0.77"/><circle cx="76.21" cy="88.00" r="0.55" opacity="0.77"/><circle cx="76.21" cy="187.00" r="0.55" opacity="0.77"/><circle cx="-52.39" cy="-13.75" r="0.55" opacity="0.71"/><circle cx="-52.39" cy="85.25" r="0.55" opacity="0.71"/><circle cx="-52.39" cy="184.25" r="0.55" opacity="0.71"/><circle cx="4.76" cy="-13.75" r="0.55" opacity="0.71"/><circle cx="4.76" cy="85.25" r="0.55" opacity="0.71"/><circle cx="4.76" cy="184.25" r="0.55" opacity="0.71"/><circle cx="61.92" cy="-13.75" r="0.55" opacity="0.71"/><circle cx="61.92" cy="85.25" r="0.55" opacity="0.71"/><circle cx="61.92" cy="184.25" r="0.55" opacity="0.71"/><circle cx="-57.16" cy="-27.50" r="0.55" opacity="0.66"/><circle cx="-57.16" cy="71.50" r="0.55" opacity="0.66"/><circle cx="-57.16" cy="170.50" r="0.55" opacity="0.66"/><circle cx="-0.00" cy="-27.50" r="0.55" opacity="0.66"/><circle cx="-0.00" cy="71.50" r="0.55" opacity="0.66"/><circle cx="-0.00" cy="170.50" r="0.55" opacity="0.66"/><circle cx="57.16" cy="-27.50" r="0.55" opacity="0.66"/><circle cx="57.16" cy="71.50" r="0.55" opacity="0.66"/><circle cx="57.16" cy="170.50" r="0.55" opacity="0.66"/><circle cx="-28.58" cy="-22.00" r="0.55" opacity="0.61"/><circle cx="-28.58" cy="77.00" r="0.55" opacity="0.61"/><circle cx="-28.58" cy="176.00" r="0.55" opacity="0.61"/><circle cx="28.58" cy="-22.00" r="0.55" opacity="0.61"/><circle cx="28.58" cy="77.00" r="0.55" opacity="0.61"/><circle cx="28.58" cy="176.00" r="0.55" opacity="0.61"/><circle cx="85.74" cy="-22.00" r="0.55" opacity="0.61"/><circle cx="85.74" cy="77.00" r="0.55" opacity="0.61"/><circle cx="85.74" cy="176.00" r="0.55" opacity="0.61"/><circle cx="-4.76" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="85.25" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="184.25" r="0.55" opacity="0.98"/><circle cx="52.39" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="52.39" cy="85.25" r="0.55" opacity="0.98"/><circle cx="52.39" cy="184.25" r="0.55" opacity="0.98"/><circle cx="109.55" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="109.55" cy="85.25" r="0.55" opacity="0.98"/><circle cx="109.55" cy="184.25" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="88.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="187.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="88.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="187.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="88.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="187.00" r="0.55" opacity="0.92"/><circle cx="-23.82" cy="-13.75" r="0.55" opacity="0.50"/><circle cx="-23.82" cy="85.25" r="0.55" opacity="0.50"/><circle cx="-23.82" cy="184.25" r="0.55" opacity="0.50"/><circle cx="33.34" cy="-13.75" r="0.55" opacity="0.50"/><circle cx="33.34" cy="85.25" r="0.55" opacity="0.50"/><circle cx="33.34" cy="184.25" r="0.55" opacity="0.50"/><circle cx="90.50" cy="-13.75" r="0.55" opacity="0.50"/><circle cx="90.50" cy="85.25" r="0.55" opacity="0.50"/><circle cx="90.50" cy="184.25" r="0.55" opacity="0.50"/><circle cx="-9.53" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="60.50" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="159.50" r="0.55" opacity="0.87"/><circle cx="47.63" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="47.63" cy="60.50" r="0.55" opacity="0.87"/><circle cx="47.63" cy="159.50" r="0.55" opacity="0.87"/><circle cx="104.79" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="104.79" cy="60.50" r="0.55" opacity="0.87"/><circle cx="104.79" cy="159.50" r="0.55" opacity="0.87"/><circle cx="-4.76" cy="-35.75" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="63.25" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="162.25" r="0.55" opacity="0.45"/><circle cx="52.39" cy="-35.75" r="0.55" opacity="0.45"/><circle cx="52.39" cy="63.25" r="0.55" opacity="0.45"/><circle cx="52.39" cy="162.25" r="0.55" opacity="0.45"/><circle cx="109.55" cy="-35.75" r="0.55" opacity="0.45"/><circle cx="109.55" cy="63.25" r="0.55" opacity="0.45"/><circle cx="109.55" cy="162.25" r="0.55" opacity="0.45"/><circle cx="-0.00" cy="-27.50" r="0.55" opacity="0.82"/><circle cx="-0.00" cy="71.50" r="0.55" opacity="0.82"/><circle cx="-0.00" cy="170.50" r="0.55" opacity="0.82"/><circle cx="57.16" cy="-27.50" r="0.55" opacity="0.82"/><circle cx="57.16" cy="71.50" r="0.55" opacity="0.82"/><circle cx="57.16" cy="170.50" r="0.55" opacity="0.82"/><circle cx="114.32" cy="-27.50" r="0.55" opacity="0.82"/><circle cx="114.32" cy="71.50" r="0.55" opacity="0.82"/><circle cx="114.32" cy="170.50" r="0.55" opacity="0.82"/><circle cx="0.00" cy="-22.00" r="0.55" opacity="0.40"/><circle cx="0.00" cy="77.00" r="0.55" opacity="0.40"/><circle cx="0.00" cy="176.00" r="0.55" opacity="0.40"/><circle cx="57.16" cy="-22.00" r="0.55" opacity="0.40"/><circle cx="57.16" cy="77.00" r="0.55" opacity="0.40"/><circle cx="57.16" cy="176.00" r="0.55" opacity="0.40"/><circle cx="114.32" cy="-22.00" r="0.55" opacity="0.40"/><circle cx="114.32" cy="77.00" r="0.55" opacity="0.40"/><circle cx="114.32" cy="176.00" r="0.55" opacity="0.40"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#stars)"/></svg></div></div>
+       <div class="fillwrap prmwrap"><div class="fill prmfill"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><pattern id="mosaic" width="16" height="24" patternUnits="userSpaceOnUse" patternTransform="skewY(-17)"><g fill="none" stroke="var(--tri)" stroke-width=".7"><path d="M0 0V24M16 0V24"/><path d="M0 0H16M0 24H16"/><path d="M0 0L16 24"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#mosaic)"/></svg></div></div>
+       <span class="modechip schip">SEARCH</span>
+       <span class="modechip cmdchip">COMMAND</span>
+       <span class="modechip pchip">PROMPT</span>
+       <svg class="mag" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><line x1="10.2" y1="10.2" x2="13.8" y2="13.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+       <svg class="quillmark" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.3 14.8h8.5l-.7 5.1a1.5 1.5 0 0 1-1.5 1.3H8.5a1.5 1.5 0 0 1-1.5-1.3z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.2 14.8h10.7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M21.3 2.3c-5.7 1.2-9.1 5-9.8 10l3.1-1c3.9-1.4 6.4-4.6 6.7-9z" fill="currentColor"/><path d="M11.9 12.2 10.4 14.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+       <input id="q" type="text" placeholder="Titles, notes, highlights, tags, sources…" oninput="setQ(this.value)">
+     </div>
+     <div class="shint" id="shint" aria-live="polite"></div>
+     <div class="cref" id="cref" data-border="dot" data-radius="8"></div>
+     <div class="peek" id="peek" data-border="dot" data-radius="8"></div>
+     <div class="params" id="params"></div>
+   </div>
+ </div>
+
+ <div class="wrap">
+
+  <div class="card rail-card" id="p-rail"><div id="rail"></div>
+    <div class="rfoot">
+      A <b>saved search</b> recomputes every time you open it, so it cannot be hand-ordered.
+      A <b>collection</b> holds pointers you put there, so it can.
+    </div>
+  </div>
+
+  <div class="card" id="p-table" data-border="dot" data-radius="16">
+    <div class="tscroll"><div class="grid thead" id="thead"></div>
+    <div id="rows"></div></div>
+    <div class="empty" id="empty">Nothing matches. Drop a parameter above, or search for something shorter.</div>
+    <div class="tfoot"><span id="fcount"></span><span id="fsel"></span></div>
+  </div>
+
+  <div class="card popph" id="p-tableph" data-border="dot" data-radius="16" style="display:none">
+    The table is in its own window.
+    <span class="marg">checking a row there still fills the collection here; <button onclick="closePop('table')">bring it back</button> or type pop:back</span>
+  </div>
+
+  <div class="card right" id="p-coll">
+    <div class="wshead" id="wshead"></div>
+    <div class="wsbody" id="wsbody"></div>
+    <div id="wsacts"></div>
+  </div>
+
+ </div>
+
+</div>
+
+<div class="menu" id="menu"></div>
+<div class="notebar"><b>Try this.</b> Type <b>&gt;</b> and the field becomes a command line, with every row showing its id. Type <b>p&gt;</b> and it becomes a prompt about what is in view, with the leader swallowed. Delete the <b>&gt;</b> to leave command; type <b>s&gt;</b> to leave prompt.</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   BORDER ENGINE — per the border and paper spec, light mode
+   ═══════════════════════════════════════════════════════════════════════
+   Three tiers, one per element:
+     key        progressive dash   the trigger, and nothing else
+     structural evenly spaced dots cards, the field, secondary buttons
+     none       no border          headers, footers, running text, rows
+   Patterns are computed from the element's real perimeter, so a whole
+   number of dots always fits and the path closes without a half gap.
+   ═══════════════════════════════════════════════════════════════════════ */
+var NS='http://www.w3.org/2000/svg';
+
+function rrPath(w,h,r){
+  var i=0.5, rad=r-i, m=r-rad*0.7071;
+  return 'M'+m+','+m+
+    'A'+rad+','+rad+' 0 0 1 '+r+','+i+' H'+(w-r)+
+    'A'+rad+','+rad+' 0 0 1 '+(w-i)+','+r+' V'+(h-r)+
+    'A'+rad+','+rad+' 0 0 1 '+(w-r)+','+(h-i)+' H'+r+
+    'A'+rad+','+rad+' 0 0 1 '+i+','+(h-r)+' V'+r+
+    'A'+rad+','+rad+' 0 0 1 '+m+','+m;
+}
+
+function paintBorder(el){
+  var kind=el.getAttribute('data-border'), r=+(el.getAttribute('data-radius')||8);
+  var w=el.offsetWidth, h=el.offsetHeight;
+  if(w<2*r+2||h<2*r+2) return;
+
+  var svg=el.querySelector(':scope > svg.bx');
+  if(!svg){
+    svg=document.createElementNS(NS,'svg');
+    svg.setAttribute('class','bx'); svg.setAttribute('aria-hidden','true');
+    el.appendChild(svg);
+  }
+  svg.innerHTML='';
+  svg.setAttribute('width',w); svg.setAttribute('height',h);
+  svg.setAttribute('viewBox','0 0 '+w+' '+h);
+
+  var d=rrPath(w,h,r);
+  function mkPath(cls){
+    var q=document.createElementNS(NS,'path');
+    q.setAttribute('d',d); q.setAttribute('fill','none');
+    q.setAttribute('stroke-width','1'); q.setAttribute('stroke-linecap','round');
+    if(cls) q.setAttribute('class',cls);
+    svg.appendChild(q); return q;
+  }
+
+  if(kind==='prog'){
+    /* Two paths. The ink one is the resting progressive dash: mirrored halves
+       growing from a dot at the top-left to a solid bottom-right corner, so it
+       reads like light falling from the top-left. The gold one is solid and
+       hidden by its own length, and draws itself in when the element is live. */
+    var ink=mkPath('prog-ink');
+    var L=ink.getTotalLength();
+    ink.style.stroke='var(--ink-prog)';
+    var gEnd=3.5, gJoin=1, maxDash=12;
+    var half=(L-gEnd-gJoin)/2, A=[], S=0;
+    while(true){
+      var t=Math.min(S/half,1);
+      var dash=0.01+maxDash*Math.pow(t,1.4);
+      var gap=3.5-2.6*t;
+      if(A.length && S+gap+dash>half) break;
+      if(A.length){A.push(gap);S+=gap;}
+      A.push(dash); S+=dash;
+    }
+    A[A.length-1]+=half-S;
+    ink.setAttribute('stroke-dasharray',A.concat([gJoin],A.slice().reverse(),[gEnd]).join(' '));
+
+  }else{
+    /* Even dots, spacing nudged so a whole number fits the perimeter exactly. */
+    var dots=mkPath('');
+    var L2=dots.getTotalLength();
+    dots.style.stroke='var(--ink-dot)';
+    var count=Math.max(4,Math.round(L2/4)), seg=L2/count;
+    dots.setAttribute('stroke-dasharray','0.01 '+(seg-0.01));
+  }
+}
+
+/* ═══ One key element per card, at most ═══
+   The middle card's action is finding, so the search field carries the mark.
+   The right card's action is starting work, so the trigger carries it there —
+   and the trigger is the same object as the docket's: one glyph that means
+   "start", in Prompt state until the composer opens and Send after. The left
+   card has no action, so it has no mark. Nothing moves between cards. */
+
+var RO = window.ResizeObserver ? new ResizeObserver(function(es){
+  es.forEach(function(e){ paintBorder(e.target); });
+}) : null;
+
+function paintAll(){
+  if(typeof POPS!=='undefined') for(var k in POPS){try{POPS[k].win.document.body.className=document.body.className+' popwin';}catch(e){}}
+  qsa('[data-border]').forEach(function(el){
+    paintBorder(el);
+    if(RO && !el.__ro){ RO.observe(el); el.__ro=true; }
+  });
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+var tt;function toast(m){var t=$id('toast');t.innerHTML=m;t.classList.add('show');
+  clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show');},2400);}
+
+var TICK='<svg viewBox="0 0 14 14" fill="none"><polyline points="3,7.5 6,10 11,4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var MTICK='<svg class="tick" viewBox="0 0 12 12" fill="none"><polyline points="2,6.5 5,9.5 10,3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var DOWN='<svg class="chev" viewBox="0 0 12 12" fill="none"><polyline points="3,4.5 6,7.5 9,4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var ARROW='<svg class="arrow" viewBox="0 0 12 12" fill="none"><polyline points="3,5 6,8.5 9,5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var GRAB='<svg class="drag" viewBox="0 0 12 12" fill="none"><circle cx="4" cy="3" r=".9" fill="currentColor"/><circle cx="8" cy="3" r=".9" fill="currentColor"/><circle cx="4" cy="6" r=".9" fill="currentColor"/><circle cx="8" cy="6" r=".9" fill="currentColor"/><circle cx="4" cy="9" r=".9" fill="currentColor"/><circle cx="8" cy="9" r=".9" fill="currentColor"/></svg>';
+var QUILL='<svg viewBox="0 0 24 25" fill="none" stroke="currentColor" stroke-width="1.9" '+
+  'stroke-linecap="round" stroke-linejoin="round">'+
+  '<path d="M12 22.5V3"/><path d="M7 8L12 3L19 10"/>'+
+  '<path d="M12 8.5L17.5 14"/><path d="M12 13.5L16 18.5"/></svg>';
+var GLASS='<svg viewBox="0 0 12 12" fill="none"><circle cx="5.2" cy="5.2" r="3.4" stroke="currentColor" stroke-width="1.2"/><line x1="7.8" y1="7.8" x2="10.3" y2="10.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>';
+var FOLDER='<svg viewBox="0 0 12 12" fill="none"><path d="M1.5 3.2a1 1 0 011-1h2.2l1 1.2h3.8a1 1 0 011 1v4.4a1 1 0 01-1 1h-7a1 1 0 01-1-1z" stroke="currentColor" stroke-width="1.2"/></svg>';
+
+var KIND={
+  chat:{label:'Chat',cls:'k-chat',svg:'<svg viewBox="0 0 12 12" fill="none"><path d="M2 3.2a1 1 0 011-1h6a1 1 0 011 1v3.6a1 1 0 01-1 1H5.4L3 10V7.8a1 1 0 01-1-1z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>'},
+  note:{label:'Note',cls:'k-note',svg:'<svg viewBox="0 0 12 12" fill="none"><path d="M3 2h4.4L9.5 4.1V10H3z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M4.6 6h3.2M4.6 7.8h2.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>'},
+  high:{label:'Highlight',cls:'k-high',svg:'<svg viewBox="0 0 12 12" fill="none"><path d="M2.4 8.2l5-5 1.9 1.9-5 5H2.4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>'},
+  dock:{label:'Docket',cls:'k-dock',svg:'<svg viewBox="0 0 12 12" fill="none"><circle cx="3.6" cy="3" r="1.2" stroke="currentColor" stroke-width="1"/><circle cx="3.6" cy="9" r="1.2" stroke="currentColor" stroke-width="1"/><circle cx="8.6" cy="6" r="1.2" stroke="currentColor" stroke-width="1"/><path d="M3.6 4.2v3.6M3.6 4.6c0 1.6.9 1.4 2.4 1.4h1.3" stroke="currentColor" stroke-width="1"/></svg>'}
+};
+
+/* ═══ Data. Markings carry a parent; chats carry a docket. ═══ */
+var I=[
+ /* dockets */
+ {id:1,k:'dock',title:'Three openings for the Q2 essay',sub:'3 runs · 4 branches',room:'Writing Studio',
+  tags:[['mine','Q2 essay'],['ai','Essay']],when:'2h ago',ts:1000,marg:[['3 runs'],['4 branches'],['$1.59 spent'],['begun Sep 9']]},
+ {id:7,k:'dock',title:'Competitor teardown',sub:'1 run · 4 branches · running',room:'Code Lab',
+  tags:[['mine','Surprised me'],['ai','Research']],when:'Running',ts:1006,marg:[['1 run'],['4 branches'],['$0.18 so far'],['still running']]},
+ {id:11,k:'dock',title:'Pricing page rewrite',sub:'1 run · 3 branches',room:'Writing Studio',
+  tags:[['ai','Pricing'],['ai','Drafting']],when:'Sep 8',ts:420,marg:[['1 run'],['3 branches'],['$0.29 spent']]},
+
+ /* chats */
+ {id:3,k:'chat',dock:1,run:'Run 3',title:'Opening A — the water tower',sub:'Kept. Concrete, and it earns the ending.',
+  room:'Writing Studio',tags:[['mine','Q2 essay'],['ai','Essay']],when:'2h ago',ts:999,
+  marg:[['Opus 4.6'],['34 messages'],['in Run 3']]},
+ {id:20,k:'chat',dock:1,run:'Run 2',title:'Opening B — the letter',sub:'Better in this run than in run 3, oddly.',
+  room:'Writing Studio',tags:[['ai','Essay']],when:'Sep 10',ts:611,marg:[['Sonnet 4.6'],['21 messages'],['in Run 2']]},
+ {id:10,k:'chat',title:'Notes from the Patten essay re-read',sub:'Marked three passages.',
+  room:'Reading Room',tags:[['mine','Q2 essay'],['ai','Essay'],['ai','Criticism']],when:'3d ago',ts:850,
+  marg:[['Opus 4.6'],['18 messages']]},
+ {id:5,k:'chat',title:'Debugging the auth middleware timeout',sub:'Root cause was token refresh blocking the renewal path.',
+  room:'Code Lab',tags:[['ai','Auth'],['ai','Debugging']],when:'Yesterday',ts:900,marg:[['Opus 4.6'],['52 messages']]},
+ {id:13,k:'chat',title:'Why the IndexedDB migration stalled',sub:'Version bump fired twice in dev.',
+  room:'Code Lab',tags:[['ai','Debugging']],when:'Sep 5',ts:300,marg:[['Opus 4.6'],['41 messages']]},
+ {id:22,k:'chat',dock:11,run:'Run 1',title:'Headline options',sub:'Eleven of them. Two survive.',
+  room:'Writing Studio',tags:[['ai','Drafting']],when:'Sep 8',ts:421,marg:[['Opus 4.6'],['16 messages'],['in Run 1']]},
+ {id:15,k:'chat',title:'Quick — grocery list from the fridge photo',sub:'Eight items, cross-referenced with planned meals.',
+  room:'Pocket',tags:[['ai','Life']],when:'Sep 7',ts:350,marg:[['Haiku 4.5'],['6 messages']]},
+ {id:17,k:'chat',title:'Reading list for the winter',sub:'Nine books, sorted by how likely I am to finish them.',
+  room:'Pocket',tags:[['ai','Life']],when:'Sep 2',ts:200,marg:[['Opus 4.6'],['12 messages']]},
+
+ /* notes */
+ {id:2,k:'note',parent:20,title:'Run 2 beat run 3 on a cheaper model',room:'Writing Studio',
+  body:['Sonnet held the letter framing better than Opus did, which I did not expect and still cannot fully explain.',
+        'Two hypotheses. Either the prompt is over-specified for the larger model, so it spends capacity satisfying constraints instead of writing, or the letter form genuinely rewards constraint and the smaller model happens to be constrained in a way that suits it.',
+        'Worth testing deliberately: same branch, same prompt, three models, no other variable.'],
+  tags:[['mine','Surprised me'],['mine','Model behaviour']],when:'Sep 10',ts:610,marg:[['at message 14'],['Sonnet 4.6']]},
+ {id:12,k:'note',parent:3,title:'The water tower is doing two jobs',room:'Writing Studio',
+  body:['It sets the scene and it plants the ending, and I only noticed the second on the third read.',
+        'That is why opening A survives. B is prettier line by line, C has the better first sentence, and neither is load bearing.'],
+  tags:[['mine','Q2 essay'],['mine','Surprised me'],['ai','Essay']],when:'Aug 29',ts:150,marg:[['at message 31']]},
+ {id:6,k:'note',parent:13,title:'Strict mode double mount explains the version bump',room:'Code Lab',
+  body:['Two hours lost to something that only happens in development. React mounts twice under strict mode, the version bump fires twice, and the second collides with the first.',
+        'Guard the migration with a promise held outside the component.'],
+  tags:[['mine','Surprised me'],['ai','Debugging']],when:'Sep 5',ts:300,marg:[['at message 22']]},
+ {id:8,k:'note',parent:22,title:'Cut the comparison table',room:'Writing Studio',
+  body:['It answered a question nobody asks. Every draft kept it because every competitor has one, which is the worst reason to keep anything.'],
+  tags:[['ai','Pricing']],when:'Sep 8',ts:420,marg:[['at message 9']]},
+ {id:16,k:'note',parent:5,title:'Their changelog admits the August failure',room:'Code Lab',
+  body:['We guessed in August that the migration had gone badly. The changelog confirms it in one line, buried between two feature notes.'],
+  tags:[['mine','Surprised me'],['ai','Research']],when:'2h ago',ts:1005,marg:[['at message 4']]},
+ {id:24,k:'note',parent:10,title:'Same move as the water tower',room:'Reading Room',
+  body:['Patten plants the ending in the first paragraph and never names it. That is exactly what opening A is doing.'],
+  tags:[['mine','Q2 essay']],when:'Sep 11',ts:701,marg:[['at message 9']]},
+
+ /* highlights */
+ {id:4,k:'high',parent:10,quote:'the narrator\'s ambivalence toward his own reliability',room:'Reading Room',
+  tags:[['mine','Surprised me'],['ai','Criticism']],when:'Sep 11',ts:700,marg:[['at message 6']]},
+ {id:25,k:'high',parent:10,quote:'a reliability he keeps auditing and never quite trusts',room:'Reading Room',
+  tags:[['ai','Criticism']],when:'Sep 11',ts:699,marg:[['at message 12']]},
+ {id:9,k:'high',parent:22,quote:'eleven headlines, and two of them survive contact with the page',room:'Writing Studio',
+  tags:[['mine','Q2 essay'],['ai','Drafting']],when:'Sep 8',ts:419,marg:[['at message 7']]},
+ {id:14,k:'high',parent:3,quote:'a first line that has nowhere to go',room:'Writing Studio',
+  tags:[['ai','Criticism']],when:'Sep 14',ts:998,marg:[['at message 11']]}
+];
+
+/* Added: when the thing first existed. Last active: when it last moved.
+   Day numbers count from Aug 1 so both sort as integers. */
+var ADDED={1:40,7:44,11:39,3:40,20:41,10:27,5:33,13:30,22:39,15:38,17:21,
+  2:41,12:29,6:36,8:39,16:45,24:42,4:42,25:42,9:39,14:45};
+function dayLabel(n){var m=n>31?9:8,d=n>31?n-31:n;return '0'+m+'/'+(d<10?'0':'')+d+'/26';}
+I.forEach(function(it){it.add=ADDED[it.id]||45;});
+
+var SEARCHES=[
+ {name:'Unfinished dockets',desc:'a docket, with a branch still waiting',st:{q:'',type:'dock',room:'all',tag:'all',asc:false}},
+ {name:'Surprised me',desc:'tagged surprised me, any type, newest first',st:{q:'',type:'all',room:'all',tag:'Surprised me',asc:false}},
+ {name:'Code Lab, September',desc:'in the Code Lab, since the first',st:{q:'',type:'all',room:'Code Lab',tag:'all',asc:false}},
+ {name:'Everything about the water tower',desc:'the words water tower, anywhere, oldest first',st:{q:'water tower',type:'all',room:'all',tag:'all',asc:true}}
+];
+var COLLECTIONS=[
+ {name:'Q2 essay reading',desc:'four things, in the order they should be read',ids:[1,10,12,9]},
+ {name:'Model behaviour evidence',desc:'gathered across three separate searches',ids:[2,16,7]}
+];
+
+var ST={q:'',type:'all',room:'all',tag:'all',asc:false,sort:'when'};
+var COLS=['type','id','title','room','tags','add','when'];
+var WIDTH={type:78,id:40,room:80,tags:92,add:70,when:82};
+var MIN={type:66,id:36,room:72,tags:84,add:58,when:62}, MAX={type:150,id:80,room:250,tags:280,add:130,when:150};
+var DEF_COLS=COLS.slice(), DEF_WIDTH=JSON.parse(JSON.stringify(WIDTH));
+var WS={name:null,items:[],dirty:false}, CARDSEL=[], activeKept=null, menuFor=null, nextId=30, COMPOSER=false;
+
+var HEAD={type:{label:'Type',align:'',kind:'filter'},title:{label:'Title',align:'',kind:'plain'},
+  room:{label:'Room',align:'c',kind:'filter'},tags:{label:'Tags',align:'c',kind:'filter'},
+  id:{label:'ID',align:'c',kind:'plain'},add:{label:'Created',align:'r',kind:'sort'},when:{label:'Last active',align:'r',kind:'sort'}};
+
+function byId(id){return I.filter(function(x){return x.id===id;})[0];}
+function titleOf(it){return it.k==='high'?it.quote:it.title;}
+function isContainer(it){return it.k==='chat'||it.k==='dock';}
+function chatsOf(d){return I.filter(function(x){return x.k==='chat'&&x.dock===d.id;});}
+function marksOf(chat){return I.filter(function(x){return x.parent===chat.id;})
+  .sort(function(a,b){return b.ts-a.ts;});}
+function allMarks(it){
+  if(it.k==='chat')return marksOf(it);
+  if(it.k==='dock'){var out=[];chatsOf(it).forEach(function(c){out=out.concat(marksOf(c));});return out;}
+  return [];
+}
+function textOf(it){
+  var own=[titleOf(it),it.sub||'',(it.body||[]).join(' '),it.room,
+    it.tags.map(function(t){return t[1];}).join(' ')].join(' ');
+  allMarks(it).forEach(function(m){own+=' '+titleOf(m)+' '+((m.body||[]).join(' '));});
+  return own.toLowerCase();
+}
+function opts(f){var m={};I.forEach(function(it){
+  if(f==='type')m[it.k]=(m[it.k]||0)+1;
+  else if(f==='room')m[it.room]=(m[it.room]||0)+1;
+  else it.tags.forEach(function(t){m[t[1]]=(m[t[1]]||0)+1;});});return m;}
+function matches(it){ return withF(ST)(it); }
+function matchesOld(it){
+  if(ST.q&&textOf(it).indexOf(ST.q)<0)return false;
+  if(ST.type!=='all'&&it.k!==ST.type)return false;
+  if(ST.room!=='all'&&it.room!==ST.room)return false;
+  if(ST.tag!=='all'&&!it.tags.some(function(t){return t[1]===ST.tag;}))return false;
+  if(it.arch)return false;
+  return true;
+}
+function today(){return 'Sep 14';}
+
+/* ═══ Marginalia — horizontal, italic serif, clickable, omitted when empty ═══ */
+function marginalia(parts){
+  parts=parts.filter(Boolean);
+  if(!parts.length) return '';
+  return '<div class="marg">'+parts.map(function(p,i){
+    var sep = i ? '<span class="sep">·</span>' : '';
+    return sep + (p.act
+      ? '<button onclick="'+p.act+'">'+esc(p.text)+'</button>'
+      : '<span>'+esc(p.text)+'</span>');
+  }).join('')+'</div>';
+}
+function itemMarg(it,p){
+  var parts=[];
+  if(it.parent){
+    var par=byId(it.parent);
+    if(par) parts.push({text:'from '+titleOf(par),act:"toast('Opens the source in the Symposium')"});
+  }
+  (it.marg||[]).forEach(function(m){parts.push({text:m[0]});});
+  parts.push({text:it.when});
+  if(p) parts.push({text:'added '+p.at+' via '+p.via,act:"reRun('"+esc(p.via).replace(/'/g,"")+"')"});
+  return marginalia(parts);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   COMMAND LINE
+   One grammar, two kinds of scheme. Filter schemes (tag:, room:, type:)
+   narrow the table. Verb schemes (new:, open:, co:, alm:, lab:) act. Numbers
+   are one global space, so open:242 means "open 242" whatever 242 is.
+   ═══════════════════════════════════════════════════════════════════ */
+/* Every command is a scheme. pre() says, before Enter, exactly what Enter
+   will do, so the marginalia under the field is a preview, not a menu.
+   A pre() that returns {bad:...} blocks Enter. */
+function unq(x){return String(x||'').trim().replace(/^["“]([\s\S]*)["”]$/,'$1').trim();}
+/* Two parsers, deliberately.
+   idsIn reads row ids and is what Items and Collection verbs use, because
+   pin: and copy: act on rows. addrsIn reads ADDRESSES — 201, 201B, 201AB —
+   and is used only by the verbs that can take a branch: new:branch, open:,
+   pop:, from:, run:, stop:. Widening idsIn instead would have quietly made
+   a dozen verbs accept something they cannot act on.
+   I and O are skipped in the letter class: 201I is one glance from 2011. */
+var ADDR=/\b(\d{3,4})([A-HJ-NP-Za-hj-np-z]{1,2})?\b/g;
+function addrsIn(x){
+  var out=[],m; ADDR.lastIndex=0;
+  while((m=ADDR.exec(String(x)))){
+    out.push({raw:m[0],id:+m[1]-200,letter:m[2]?m[2].toUpperCase():null});
+  }
+  return out.filter(function(a){return byId(a.id);});
+}
+function addrLabel(a){return (a.id+200)+(a.letter||'');}
+
+function idsIn(x){return expandIds(x).map(function(n){return n-200;})
+  .filter(function(id){return byId(id);});}
+function badIds(x){var b=expandIds(x).filter(function(n){return !byId(n-200);});return b.length>6?[b[0]+'…'+b[b.length-1]]:b;}
+function tagName(x){var want=unq(x).toLowerCase(),hit=null;
+  I.forEach(function(it){it.tags.forEach(function(t){if(t[1].toLowerCase()===want)hit=t[1];});});return hit;}
+function tagCount(n){return I.filter(function(it){return it.tags.some(function(t){return t[1]===n;});}).length;}
+function splitIds(arg){ /* "Some name 207, 216" -> name + ids */
+  var m=String(arg).match(/^([\s\S]*?)\s*((?:\d+\s*,?\s*)+)$/);
+  return m?{name:unq(m[1]),ids:m[2]}:{name:unq(arg),ids:''};}
+function plural(n,w){return n+' '+(n===1?w:w.replace(/y$/,'ie')+'s');}
+function live(){return ST.q||ST.type!=='all'||ST.room!=='all'||ST.tag!=='all'||(ST.F&&ST.F.length);}
+function launch(what){return {ok:'Enter hands off to '+what,
+  run:function(){toast('Would open '+esc(what)+'. The Almanac launches; it never runs anything.');}};}
+
+/* ═══ Layout, bar position, pop-outs ═══
+   The page is three slots. Commands reorder, hide and show panels; the flexible
+   column always goes to the table if it is on the page, so no arrangement can
+   squeeze the table into 212px. A saved arrangement is a Lab layout, not a
+   private Almanac setting. A pop-out is a window, not a surface: it obeys the
+   rules of whatever it came from, so a popped table still never executes. */
+var RUNPOL={max:1,ranges:false};
+function uniq(a){return a.filter(function(x,i){return a.indexOf(x)===i;});}
+var PANELS={rail:'the saved searches',table:'the table',coll:'the collection'};
+/* What new: can begin, and the words people type for each. A kind is not
+   startable until it is named here, the same rule panels follow. */
+var STARTABLE={chat:'a chat',branch:'a branch',docket:'a docket',room:'a room'};
+var START_ALIAS={chat:'chat',c:'chat',conversation:'chat',
+  branch:'branch',b:'branch',
+  docket:'docket',d:'docket',dock:'docket',
+  room:'room',r:'room'};
+var PANEL_ALIAS={rail:'rail',index:'rail',searches:'rail',left:'rail',table:'table',results:'table',
+  coll:'coll',collection:'coll',right:'coll'};
+var LAY={order:['rail','table','coll'],hidden:[]}, BAR='top', BARSHAPE='line', LAYOUTS=[], DESKS=[];
+var POPS={}, PIP_BUSY=false;
+try{var saved=JSON.parse(localStorage.getItem('almanac-layout')||'null');
+  if(saved){LAY=saved.LAY||LAY;BAR=saved.BAR||BAR;BARSHAPE=saved.BARSHAPE||'line';LAYOUTS=saved.LAYOUTS||[];DESKS=saved.DESKS||[];}}catch(e){}
+function keepLayout(){try{localStorage.setItem('almanac-layout',JSON.stringify({LAY:LAY,BAR:BAR,BARSHAPE:BARSHAPE,LAYOUTS:LAYOUTS,DESKS:DESKS}));}catch(e){}}
+
+function $id(id){
+  var el=document.getElementById(id); if(el) return el;
+  for(var k in POPS){ var w=POPS[k].win; if(w&&!w.closed){ el=w.document.getElementById(id); if(el) return el; } }
+  return null;
+}
+function qsa(sel){
+  var out=Array.prototype.slice.call(document.querySelectorAll(sel));
+  for(var k in POPS){ var w=POPS[k].win; if(w&&!w.closed) out=out.concat(Array.prototype.slice.call(w.document.querySelectorAll(sel))); }
+  return out;
+}
+function panelOf(word){return PANEL_ALIAS[String(word||'').trim().toLowerCase()]||null;}
+
+function applyLayout(){
+  var W={rail:'212px',table:'minmax(0,1fr)',coll:'clamp(320px,28vw,430px)'};
+  var vis=LAY.order.filter(function(p){return LAY.hidden.indexOf(p)<0;});
+  var flex=vis.indexOf('table')>-1?'table':vis.indexOf('coll')>-1?'coll':'rail';
+  var tpl=vis.map(function(p){return p===flex?'minmax(0,1fr)':W[p];}).join(' ');
+  var wrap=document.querySelector('.wrap'), top=document.querySelector('.topgrid');
+  [wrap,top].forEach(function(g){g.style.setProperty('--tpl',tpl);g.style.setProperty('--ncols',vis.length);});
+  top.style.setProperty('--barcol',vis.indexOf(flex)+1);
+  LAY.order.forEach(function(p,i){
+    var hid=LAY.hidden.indexOf(p)>-1;
+    var el=document.getElementById('p-'+p), ph=document.getElementById('p-tableph');
+    if(p==='table'){
+      ph.style.order=i; ph.style.display=(POPS.table&&!hid)?'':'none';
+      if(el&&el.ownerDocument===document){el.style.order=i;el.style.display=hid?'none':'';}
+    } else { el.style.order=i; el.style.display=hid?'none':''; }
+  });
+  document.body.classList.toggle('bar-bottom',BAR==='bottom');
+  top.classList.toggle('atbottom',BAR==='bottom');
+  placeBar();
+}
+function placeBar(){
+  var top=document.querySelector('.topgrid');
+  if(BAR!=='bottom'){top.style.left='';top.style.width='';return;}
+  var vis=LAY.order.filter(function(p){return LAY.hidden.indexOf(p)<0;});
+  var flex=vis.indexOf('table')>-1?'table':vis.indexOf('coll')>-1?'coll':'rail';
+  var el=flex==='table'&&POPS.table?document.getElementById('p-tableph'):document.getElementById('p-'+flex);
+  if(!el) return;
+  var r=el.getBoundingClientRect();
+  top.style.left=r.left+'px'; top.style.width=r.width+'px';
+}
+window.addEventListener('resize',placeBar);
+
+/* ── pop-out windows ───────────────────────────────────────────── */
+function winGlobals(win){
+  for(var k in window){
+    try{ if(typeof window[k]==='function' && !(k in win)) win[k]=window[k]; }catch(e){}
+  }
+}
+/* A popped window never wears the rule, even while it holds the command line.
+   The rule marks the surface being acted on, and commands still act on the
+   page that opened the window. */
+function setupWin(win,title){
+  var d=win.document;
+  d.title=title;
+  document.querySelectorAll('style,link[rel="stylesheet"]').forEach(function(s){d.head.appendChild(s.cloneNode(true));});
+  d.body.className=document.body.className.replace(/\baddressed\b/,'')+' popwin';
+  winGlobals(win);
+  win.addEventListener('mousemove',onRzMove);
+  win.addEventListener('mouseup',onRzUp);
+  win.addEventListener('resize',paintAll);
+  d.addEventListener('click',closeMenu);
+  d.addEventListener('keydown',onKey);
+}
+/* Always-on-top where the browser has it; an ordinary window otherwise.
+   Both need the keypress or click that ran the command. */
+function openWin(key,title,w,h,done){
+  function plain(){
+    var from=(KEYWIN&&!KEYWIN.closed)?KEYWIN:window;
+    var win=from.open('','almanac_'+key,'popup=yes,width='+w+',height='+h);
+    if(!win){toast('The browser blocked the window. Allow pop-ups for this page and try again.');return;}
+    win.document.open();win.document.write('<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>');win.document.close();
+    setupWin(win,title); POPS[key]={win:win,pip:false}; watch(key); done(win,false);
+  }
+  if('documentPictureInPicture' in window && !PIP_BUSY){
+    PIP_BUSY=true;
+    window.documentPictureInPicture.requestWindow({width:w,height:h}).then(function(win){
+      setupWin(win,title); POPS[key]={win:win,pip:true}; watch(key); done(win,true);
+    }).catch(function(){PIP_BUSY=false;plain();});
+    return;
+  }
+  plain();
+}
+function watch(key){
+  var p=POPS[key], gone=false;
+  function end(){ if(gone) return; gone=true; clearInterval(t); if(p.pip) PIP_BUSY=false; p.onclose&&p.onclose(); delete POPS[key]; applyLayout(); render(); }
+  p.win.addEventListener('pagehide',end);
+  var t=setInterval(function(){ if(p.win.closed) end(); },600);
+  p.end=end;
+}
+function closePop(key){var p=POPS[key]; if(!p) return; try{p.win.close();}catch(e){} p.end&&p.end();}
+window.addEventListener('pagehide',function(){for(var k in POPS){try{POPS[k].win.close();}catch(e){}}});
+
+function popCommand(){
+  if(POPS.command){focusField();return;}
+  openWin('command','Almanac · command line',660,440,function(win,pip){
+    var node=document.getElementById('p-bar'), ph=document.getElementById('p-barph');
+    var host=win.document.createElement('div'); host.className='pophost';
+    host.appendChild(node); win.document.body.appendChild(host);
+    ph.style.display='';
+    POPS.command.onclose=function(){ ph.style.display='none'; ph.parentNode.insertBefore(node,ph.nextSibling);
+      var q=document.getElementById('q'); if(q) q.focus(); };
+    var q=win.document.getElementById('q'); q.value='>'; enterCmd(); render(); q.focus();
+    toast(pip?'The command line is floating on top. Commands still act on this page.'
+             :'The command line is in its own window. Commands still act on this page.');
+  });
+}
+function popTable(){
+  if(POPS.table){POPS.table.win.focus();toast('The table is already in its own window.');return;}
+  openWin('table','Almanac · table',920,660,function(win,pip){
+    var node=document.getElementById('p-table'), ph=document.getElementById('p-tableph');
+    var host=win.document.createElement('div'); host.className='pophost';
+    host.appendChild(node); win.document.body.appendChild(host);
+    node.style.display=''; node.style.order='';
+    POPS.table.onclose=function(){
+      ph.parentNode.insertBefore(node,ph);
+      var m=win.document&&win.document.getElementById('menu');
+      if(m) document.body.appendChild(m);
+      closeMenu();
+    };
+    applyLayout(); render();
+    toast(pip?'The table is in an always-on-top window. Drag it anywhere, including another screen.'
+             :'The table is in its own window. Drag it to another screen; checking a row still fills the collection here.');
+  });
+}
+
+/* A docket's steps, for keeping beside a chat. Branch state is invented for
+   the prototype; what matters is that it re-renders live with everything else. */
+var STEPS={
+  1:{run:'Run 3',runs:3,steps:[
+    {n:'Brief the angle',m:'Sonnet 4.6',s:'done'},
+    {n:'Opening A — the water tower',m:'Opus 4.6',s:'done',chat:3},
+    {n:'Opening B — the letter',m:'Sonnet 4.6',s:'done',chat:20},
+    {n:'Opening C — the list',m:'Haiku 4.5',s:'done'}]},
+  7:{run:'Run 1',runs:1,steps:[
+    {n:'Collect the changelogs',m:'Sonnet 4.6',s:'done'},
+    {n:'Pricing scan',m:'Opus 4.6',s:'running',tok:1180},
+    {n:'Competitor pull',m:'Haiku 4.5',s:'paused'},
+    {n:'Feature matrix',m:'Sonnet 4.6',s:'ready'},
+    {n:'Hold for the Q3 numbers',m:'Opus 4.6',s:'waiting'},
+    {n:'Write it up',m:'Opus 4.6',s:'ready'}]},
+  11:{run:'Run 1',runs:1,steps:[
+    {n:'Audit the current page',m:'Sonnet 4.6',s:'done'},
+    {n:'Three headline options',m:'Opus 4.6',s:'done'},
+    {n:'Rewrite the tiers',m:'llama3.1:8b · local',s:'done'}]}
+};
+function popDocket(id){
+  var key='dock'+id;
+  if(POPS[key]){POPS[key].win.focus();return;}
+  openWin(key,'Docket '+(200+id)+' · '+byId(id).title,380,560,function(win,pip){
+    var host=win.document.createElement('div'); host.className='dockpop'; host.id='dockpop-'+id;
+    win.document.body.appendChild(host);
+    render();
+    toast(pip?'Docket '+(200+id)+' is floating on top. Keep it beside a chat.':'Docket '+(200+id)+' is in its own window.');
+  });
+}
+function drawDockPops(){
+  for(var k in POPS){
+    if(k.indexOf('dock')!==0) continue;
+    var id=+k.slice(4), it=byId(id), sp=STEPS[id], host=POPS[k].win.document.getElementById('dockpop-'+id);
+    if(!host||!it||!sp) continue;
+    var done=sp.steps.filter(function(s){return s.s==='done';}).length;
+    host.innerHTML='<div class="dp-head"><span class="kpill k-dock">'+KIND.dock.svg+'Docket</span><span class="c-id">'+(200+id)+'</span></div>'+
+      '<h1>'+esc(it.title)+'</h1>'+
+      '<div class="dp-marg">'+esc(sp.run)+' of '+sp.runs+' · '+done+' of '+sp.steps.length+' branches done · '+esc(it.room)+'</div>'+
+      '<ol class="dp-steps">'+sp.steps.map(function(s,i){
+        var mk=s.chat?allMarks(byId(s.chat)).length:0;
+        return '<li class="dp-'+s.s+'"><span class="dp-dot"></span><div><div class="dp-n">'+(i+1)+'. '+esc(s.n)+'</div>'+
+          '<div class="dp-marg">'+esc(s.m)+' · '+(s.s==='running'?'running, '+s.tok.toLocaleString()+' tokens':s.s)+
+          (s.chat?' · chat '+(200+s.chat):'')+(mk?' · '+plural(mk,'marking'):'')+'</div></div></li>';}).join('')+'</ol>'+
+      '<div class="dp-foot">A view of the docket. Editing a step changes the plan for the next run; '+esc(sp.run.toLowerCase())+' stays as it ran.</div>';
+  }
+}
+/* the running branch keeps moving, so a pop-out visibly updates */
+setInterval(function(){
+  var st=STEPS[7].steps, i=st.findIndex(function(x){return x.s==='running';}); if(i<0) return;
+  st[i].tok+=137+Math.round(Math.random()*90);
+  if(st[i].tok>3200){ st[i].s='done'; if(st[i+1]){st[i+1].s='running';st[i+1].tok=0;} }
+  if(POPS.dock7) drawDockPops();
+},1600);
+
+/* ═══ Filter schemes ═══
+   Same grammar as the verbs: scheme:value. Commas OR, repeating a scheme in one
+   line ANDs, a leading - negates, bare words search. A new line that names a
+   scheme replaces the earlier filter on that scheme, so model:opus followed by
+   model:sonnet changes the model rather than finding nothing. */
+var TODAY_DAY=45;   /* Sep 14 in the prototype's calendar */
+var FILTER_ORDER=['type','room','tag','in','has','from','model','run','cost','since','until'];
+var FILTER_ALIAS={source:'from',src:'from',models:'model',tags:'tag',rooms:'room',types:'type'};
+var FLABEL={type:'Type',room:'Room',tag:'Tag',in:'In',has:'Has',from:'From',model:'Model',run:'Run',cost:'Cost',since:'Since',until:'Until'};
+var TYPEWORD={chat:'chat',chats:'chat',note:'note',notes:'note',highlight:'high',highlights:'high',high:'high',
+  docket:'dock',dockets:'dock',dock:'dock'};
+var MODEL_RE=/^(opus|sonnet|haiku|claude|gpt|llama|mistral|qwen|gemma|phi|deepseek)/i;
+ST.F=ST.F||[];
+
+function modelsOf(it){
+  var out=[];
+  function add(m){m=String(m).split(' · ')[0]; if(MODEL_RE.test(m)&&out.indexOf(m)<0) out.push(m);}
+  if(it.k==='chat') (it.marg||[]).forEach(function(m){add(m[0]);});
+  else if(it.k==='dock'){ chatsOf(it).forEach(function(c){modelsOf(c).forEach(add);});
+    if(STEPS[it.id]) STEPS[it.id].steps.forEach(function(s){add(s.m);}); }
+  else if(it.parent&&byId(it.parent)) modelsOf(byId(it.parent)).forEach(add);
+  return out;
+}
+function runOf(it){
+  if(it.k==='chat'&&it.run) return parseInt(it.run.replace(/\D/g,''),10);
+  if(it.parent&&byId(it.parent)) return runOf(byId(it.parent));
+  return null;
+}
+function costOf(it){
+  if(it.k!=='dock') return null;   /* never fabricate a cost */
+  var hit=(it.marg||[]).map(function(m){return m[0];}).filter(function(m){return /^\$/.test(m);})[0];
+  return hit?parseFloat(hit.slice(1)):null;
+}
+function sourcesOf(it){
+  var out=[];
+  if(it.parent&&byId(it.parent)){var p=byId(it.parent); out.push(p); if(p.dock&&byId(p.dock)) out.push(byId(p.dock));}
+  if(it.k==='chat'&&it.dock&&byId(it.dock)) out.push(byId(it.dock));
+  return out;
+}
+function dayOf(v,end){
+  v=String(v).toLowerCase().trim(); var m;
+  if((m=v.match(/^(\d+)\s*([dwm])$/))) return TODAY_DAY-(+m[1])*({d:1,w:7,m:30})[m[2]];
+  if(/^aug(ust)?$/.test(v)) return end?31:1;
+  if(/^sep(t|tember)?$/.test(v)) return end?61:32;
+  if(v==='today') return TODAY_DAY;
+  if(v==='yesterday') return TODAY_DAY-1;
+  if((m=v.match(/^(?:2026-)?(\d{1,2})[-\/](\d{1,2})(?:[-\/](?:20)?26)?$/))){
+    var mo=+m[1], d=+m[2]; if(mo===8) return d; if(mo===9) return 31+d; return null; }
+  return null;
+}
+function tokenize(text){
+  var s=String(text).replace(/\s*,\s*/g,','), toks=[], cur='', q=false;
+  for(var i=0;i<s.length;i++){var ch=s[i];
+    if(ch==='"'||ch==='“'||ch==='”'){q=(ch==='“')?true:(ch==='”')?false:!q;cur+=ch;continue;}
+    if(/\s/.test(ch)&&!q){ if(cur){toks.push(cur);cur='';} continue; }
+    cur+=ch;}
+  if(cur) toks.push(cur);
+  return toks.map(function(t){
+    var m=t.match(/^(-?)([a-z]+):([\s\S]*)$/i);
+    if(!m) return {bare:unq(t)};
+    var sc=m[2].toLowerCase(); sc=FILTER_ALIAS[sc]||sc;
+    var vals=[], cur2='', qq=false;
+    for(var j=0;j<m[3].length;j++){var c=m[3][j];
+      if(c==='"'||c==='“'||c==='”'){qq=(c==='“')?true:(c==='”')?false:!qq;continue;}
+      if(c===','&&!qq){vals.push(cur2);cur2='';continue;} cur2+=c;}
+    vals.push(cur2);
+    return {neg:!!m[1],scheme:sc,raw:t,vals:vals.map(function(v){return v.trim();}).filter(function(v){return v!=='';})};
+  });
+}
+function isFilterScheme(sc){return FILTER_ORDER.indexOf(sc)>-1||sc==='sort';}
+
+/* Returns null if the line is not a filter line; otherwise what it would do. */
+function parseFilterLine(text){
+  var toks=tokenize(text.trim()); if(!toks.length) return null;
+  /* order is irrelevant: a filter line is any line whose schemes are all filters */
+  var schemes=toks.filter(function(t){return t.scheme;});
+  if(!schemes.length||schemes.some(function(t){return !isFilterScheme(t.scheme);})) return null;
+  var out={F:[],bare:[],sort:null,bad:null,open:null};
+  toks.forEach(function(t){
+    if(!t.scheme||!isFilterScheme(t.scheme)){ out.bare.push(t.bare||t.raw); return; }
+    if(!t.vals.length){ out.open=t.scheme; return; }
+    var e={k:t.scheme,v:t.vals,neg:t.neg};
+    if(t.scheme==='sort'){
+      var v=t.vals[0].toLowerCase(), map={created:['add',false],date:['add',false],added:['add',false],active:['when',false],
+        oldest:[null,true],newest:[null,false]};
+      if(!map[v]){out.bad='sort by created, active, oldest or newest';return;}
+      out.sort=map[v]; return;
+    }
+    if(t.scheme==='type'){ var bad=t.vals.filter(function(v){return !TYPEWORD[v.toLowerCase()];});
+      if(bad.length){out.bad='no type called '+bad[0]+'; chat, note, highlight or docket';return;} }
+    if(t.scheme==='has'){ var b2=t.vals.filter(function(v){return ['note','notes','highlight','highlights'].indexOf(v.toLowerCase())<0;});
+      if(b2.length){out.bad='has: takes note or highlight';return;} }
+    if(t.scheme==='run'&&t.vals.some(function(v){return !/^\d+$/.test(v);})){out.bad='run: takes a run number';return;}
+    if(t.scheme==='cost'&&t.vals.some(function(v){return !/^[<>]=?\s*\$?\d*\.?\d+$|^\$?\d*\.?\d+$/.test(v);})){out.bad='cost: takes >0.50, <1 or 0.18';return;}
+    if((t.scheme==='since'||t.scheme==='until')&&t.vals.some(function(v){return dayOf(v)===null;})){out.bad=t.scheme+': takes 7d, 3w, september, or 09/10/26';return;}
+    if(t.scheme==='in'){ var b3=t.vals.filter(function(v){return !collectionIds(v);});
+      if(b3.length){out.bad='no collection called '+b3[0];return;} }
+    out.F.push(e);
+  });
+  return out;
+}
+function collectionIds(name){
+  var n=String(name).toLowerCase();
+  if(n==='collection'||n==='this') return WS.items.map(function(p){return p.id;});
+  var hit=COLLECTIONS.filter(function(c){return c.name.toLowerCase()===n;})[0]||
+          COLLECTIONS.filter(function(c){return c.name.toLowerCase().indexOf(n)===0;})[0];
+  return hit?hit.ids:null;
+}
+function passes(it,e){
+  var hit=e.v.some(function(v){
+    var lv=v.toLowerCase();
+    switch(e.k){
+      case 'type': return it.k===TYPEWORD[lv];
+      case 'room': return it.room.toLowerCase().indexOf(lv)===0||it.room.toLowerCase()===lv;
+      case 'tag':  return it.tags.some(function(t){return t[1].toLowerCase()===lv||t[1].toLowerCase().indexOf(lv)===0;});
+      case 'in':   return (collectionIds(v)||[]).indexOf(it.id)>-1;
+      case 'has':  var k=lv.indexOf('high')===0?'high':'note'; return allMarks(it).some(function(m){return m.k===k;});
+      case 'from': return sourcesOf(it).some(function(s){return String(200+s.id)===v||titleOf(s).toLowerCase().indexOf(lv)>-1;});
+      case 'model':return modelsOf(it).some(function(m){return m.toLowerCase().indexOf(lv)>-1;});
+      case 'run':  return runOf(it)===+v;
+      case 'cost': var c=costOf(it); if(c===null) return false;
+                   var m=v.replace(/\s|\$/g,'').match(/^([<>]=?)?(\d*\.?\d+)$/); if(!m) return false;
+                   var n=+m[2]; return m[1]==='>'?c>n:m[1]==='>='?c>=n:m[1]==='<'?c<n:m[1]==='<='?c<=n:Math.abs(c-n)<0.005;
+      case 'since':return it.add>=dayOf(v,false);
+      case 'until':return it.add<=dayOf(v,true);
+    }
+    return true;
+  });
+  return e.neg?!hit:hit;
+}
+function withF(st){
+  return function(it){
+    if(st.q&&textOf(it).indexOf(st.q)<0)return false;
+    if(st.type!=='all'&&it.k!==st.type)return false;
+    if(st.room!=='all'&&it.room!==st.room)return false;
+    if(st.tag!=='all'&&!it.tags.some(function(t){return t[1]===st.tag;}))return false;
+    if(it.arch)return false;
+    return (st.F||[]).every(function(e){return passes(it,e);});
+  };
+}
+function nextST(fl){
+  var st=JSON.parse(JSON.stringify(ST)); st.F=st.F||[];
+  var named=fl.F.map(function(e){return e.k;});
+  st.F=st.F.filter(function(e){return named.indexOf(e.k)<0;}).concat(fl.F);
+  named.forEach(function(k){ if(k==='type')st.type='all'; if(k==='room')st.room='all'; if(k==='tag')st.tag='all'; });
+  if(fl.bare.length) st.q=fl.bare.join(' ').toLowerCase();
+  if(fl.sort){ if(fl.sort[0]) st.sort=fl.sort[0]; st.asc=fl.sort[1]; }
+  return st;
+}
+function qv(v){return /[\s,]/.test(v)?'"'+v+'"':v;}
+/* Canonical order: bare terms, then type room tag in has model run cost since until sort. */
+function canon(st){
+  var t=[];
+  if(st.q) t.push(st.q.split(/\s+/).map(qv).join(' '));
+  var F=(st.F||[]).slice();
+  if(st.type!=='all') F.push({k:'type',v:[({chat:'chat',note:'note',high:'highlight',dock:'docket'})[st.type]]});
+  if(st.room!=='all') F.push({k:'room',v:[st.room]});
+  if(st.tag!=='all') F.push({k:'tag',v:[st.tag]});
+  var ord=['type','room','tag','in','has','from','model','run','cost','since','until'];
+  F.sort(function(a,b){return ord.indexOf(a.k)-ord.indexOf(b.k);});
+  F.forEach(function(e){t.push((e.neg?'-':'')+e.k+':'+e.v.map(qv).join(','));});
+  if(st.sort==='add'||st.asc) t.push('sort:'+(st.asc?'oldest':st.sort==='add'?'created':'newest'));
+  return t.join(' ');
+}
+function describeF(e){
+  var v=e.v.map(function(x){ return e.k==='type'?(KIND[TYPEWORD[x.toLowerCase()]]||{label:x}).label.toLowerCase():x; }).join(' or ');
+  return (e.neg?'not ':'')+v;
+}
+
+/* Values for the scheme being typed, shown in the hint line and taken by Tab. */
+function valuesFor(sc){
+  var seen={}, out=[];
+  function add(v,label){ if(v==null||seen[v]) return; seen[v]=1; out.push({v:String(v),label:label||String(v)}); }
+  switch(sc){
+    case 'type': ['chat','note','highlight','docket'].forEach(function(v){add(v);}); break;
+    case 'room': I.forEach(function(it){add(it.room);}); break;
+    case 'tag':  I.forEach(function(it){it.tags.forEach(function(t){add(t[1]);});}); break;
+    case 'in':   COLLECTIONS.forEach(function(c){add(c.name);}); if(WS.items.length) add('collection','collection (the open one)'); break;
+    case 'has':  add('note'); add('highlight'); break;
+    case 'from': I.filter(function(it){return it.k==='dock'||(it.k==='chat'&&allMarks(it).length);})
+                  .forEach(function(it){add(String(200+it.id),(200+it.id)+' '+titleOf(it));}); break;
+    case 'model':I.forEach(function(it){modelsOf(it).forEach(function(m){add(m);});}); break;
+    case 'run':  I.forEach(function(it){var r=runOf(it); if(r) add(String(r),'run '+r);}); out.sort(function(a,b){return a.v-b.v;}); break;
+    case 'cost': ['>0.10','>0.50','>1.00','<0.25'].forEach(function(v){add(v);}); break;
+    case 'since': case 'until': ['7d','3w','september','august','09/01/26'].forEach(function(v){add(v);}); break;
+    case 'sort': ['created','active','oldest','newest'].forEach(function(v){add(v);}); break;
+  }
+  return out;
+}
+function lastToken(text){
+  if(/\s$/.test(text)) return null;
+  var m=text.match(/(-?)([a-z]+):((?:"[^"]*"?|[^\s"])*)$/i); if(!m) return null;
+  var sc=m[2].toLowerCase(); sc=FILTER_ALIAS[sc]||sc;
+  if(!isFilterScheme(sc)) return null;
+  var valpart=m[3], idx=valpart.lastIndexOf(','), partial=unq(idx>-1?valpart.slice(idx+1):valpart).replace(/^"/,'');
+  return {scheme:sc,partial:partial,start:text.length-(idx>-1?valpart.length-idx-1:valpart.length)};
+}
+function fillVal(v){
+  var f=$id('q'), text=f.value.replace(/^>/,''), lt=lastToken(text); if(!lt) return;
+  f.value='>'+text.slice(0,lt.start)+qv(v); f.focus(); drawSuggest();
+}
+function drawFilterHint(box,text,fl){
+  var lt=lastToken(text);
+  if(lt){
+    var vals=valuesFor(lt.scheme), p=lt.partial.toLowerCase();
+    var hits=vals.filter(function(x){return !p||x.v.toLowerCase().indexOf(p)===0||x.label.toLowerCase().indexOf(p)>-1;});
+    if(hits.length&&!(hits.length===1&&hits[0].v.toLowerCase()===p)){
+      var lead=[];
+      if(p&&!fl.bad){ var st0=nextST(fl); lead=['<span class="it pre">Enter narrows to '+plural(I.filter(withF(st0)).length,'row')+'</span>']; }
+      fitLine(box,lead.concat(hits.map(function(x,i){
+        return '<span class="it'+(i===0&&p?' first':'')+'"><button onclick="fillVal(\''+esc(x.v).replace(/'/g,"\\'")+'\')"><code>'+esc(lt.scheme)+':</code><span class="gl">'+esc(x.label)+'</span></button></span>';})),
+        ['<span class="it pre">Tab takes the first</span>']);
+      return;
+    }
+  }
+  if(fl.bad){ box.innerHTML='<span class="it bad">'+esc(fl.bad)+'</span>'; return; }
+  if(fl.open&&!fl.F.length&&!fl.sort){ box.innerHTML='<span class="it pre">pick a value for '+esc(fl.open)+':</span>'; return; }
+  var st=nextST(fl), n=I.filter(withF(st)).length;
+  var line=canon(st);
+  fitLine(box,['<span class="it pre">Enter narrows the table to '+plural(n,'row')+'</span>'],
+    ['<span class="it"><code>'+esc(line||'everything')+'</code></span>']);
+}
+function runFilterLine(fl){
+  if(fl.bad){toast(esc(fl.bad));return false;}
+  if(!fl.F.length&&!fl.sort&&!fl.bare.length){toast('Pick a value first.');return false;}
+  snap(); ST=nextST(fl); activeKept=null;
+  var n=I.filter(withF(ST)).length;
+  render(); toast(plural(n,'row')+'. <b>clear:filters</b> takes them off.');
+  return true;
+}
+function clearF(i){ST.F.splice(i,1);activeKept=null;render();}
+
+/* ═══ Peek ═══ a record read in place, without adding it to anything */
+var PEEK=null;
+function drawPeek(id){
+  var el=$id('peek'); if(!el) return;
+  var it=id&&byId(id);
+  if(!it){el.classList.remove('open');el.innerHTML='';return;}
+  var h='<div class="pk-head"><span class="kpill '+KIND[it.k].cls+'">'+KIND[it.k].svg+KIND[it.k].label+'</span>'+
+    '<span class="c-id">'+(200+it.id)+'</span><span class="pk-tags">'+it.tags.map(function(t){return '<span class="tag">'+esc(t[1])+'</span>';}).join('')+'</span></div>';
+  h+=it.k==='high'?'<blockquote>'+esc(it.quote)+'</blockquote>':'<h3>'+esc(it.title)+'</h3>';
+  if(it.sub) h+='<p class="pk-sub">'+esc(it.sub)+'</p>';
+  (it.body||[]).forEach(function(b){h+='<p>'+esc(b)+'</p>';});
+  var facts=[it.room,'created '+dayLabel(it.add),'last active '+it.when].concat(modelsOf(it)).concat(costOf(it)!==null?['$'+costOf(it).toFixed(2)]:[]);
+  h+=itemMarg(it)+'<div class="dp-marg">'+facts.map(esc).join(' · ')+'</div>';
+  if(it.k==='dock'){
+    var sp=STEPS[it.id];
+    if(sp) h+='<h4>'+esc(sp.run)+' · branches</h4><ol class="dp-steps">'+sp.steps.map(function(s,i){
+      return '<li class="dp-'+s.s+'"><span class="dp-dot"></span><div><div class="dp-n">'+(i+1)+'. '+esc(s.n)+'</div><div class="dp-marg">'+esc(s.m)+' · '+s.s+(s.chat?' · chat '+(200+s.chat):'')+'</div></div></li>';}).join('')+'</ol>';
+  }
+  var mk=allMarks(it);
+  if(mk.length) h+='<h4>'+plural(mk.length,'marking')+'</h4>'+mk.map(function(m){
+    return '<div class="pk-mark"><span class="c-id">'+(200+m.id)+'</span> '+(m.k==='high'?'<i>'+esc(m.quote)+'</i>':'<b>'+esc(m.title)+'</b>')+'</div>';}).join('');
+  h+='<div class="dp-foot">add:'+(200+it.id)+' puts it in the collection; c:'+(200+it.id)+' '+(it.k==='chat'?'continues it':'starts a chat about it')+'; Escape closes</div>';
+  el.innerHTML=h; el.classList.add('open');
+}
+
+/* ═══ History ═══ ↑ and ↓ on the command line, kept between visits */
+var HIST=[], HPOS=-1, HDRAFT='';
+try{HIST=JSON.parse(localStorage.getItem('almanac-history')||'[]');}catch(e){}
+function remember(line){
+  line=line.trim(); if(!line||line==='>') return;
+  HIST=HIST.filter(function(h){return h!==line;}); HIST.push(line); if(HIST.length>50) HIST.shift();
+  HPOS=-1; try{localStorage.setItem('almanac-history',JSON.stringify(HIST));}catch(e){}
+}
+function histStep(dir){
+  var f=$id('q'); if(!HIST.length) return false;
+  if(HPOS===-1){ if(dir>0) return false; HDRAFT=f.value; HPOS=HIST.length; }
+  HPOS=Math.max(0,Math.min(HIST.length,HPOS+dir));
+  f.value=HPOS===HIST.length?HDRAFT:HIST[HPOS];
+  if(HPOS===HIST.length) HPOS=-1;
+  var n=f.value.length; try{f.setSelectionRange(n,n);}catch(e){}
+  drawSuggest(); return true;
+}
+
+/* ids: ranges, and the collection when none are given */
+function expandIds(x){
+  var out=[]; String(x).replace(/(\d+)\s*-\s*(\d+)|(\d+)/g,function(_,a,b,c){
+    if(c){out.push(+c);return;} a=+a;b=+b; if(b<a){var t=a;a=b;b=t;} if(b-a>400) b=a+400;
+    for(var i=a;i<=b;i++) out.push(i);});
+  return out;
+}
+function targets(arg){
+  var ids=idsIn(arg);
+  if(ids.length) return {ids:ids,what:plural(ids.length,'item')};
+  if(/\d/.test(String(arg))) return {ids:[],what:''};
+  if(WS.items.length) return {ids:WS.items.map(function(p){return p.id;}),what:'the '+plural(WS.items.length,'item')+' in the collection',fromWS:true};
+  return {ids:[],what:''};
+}
+function buildMarkdown(list,what){
+  var lines=['# '+what,''];
+  list.forEach(function(it){
+    lines.push((it.k==='high'?'> '+it.quote:'## '+it.title),'');
+    lines.push('*'+[KIND[it.k].label.toLowerCase(),'id '+(200+it.id),it.room,'created '+dayLabel(it.add)].join('; ')+'*','');
+    (it.body||[]).forEach(function(b){lines.push(b,'');});
+    allMarks(it).forEach(function(m){lines.push('- '+(m.k==='high'?'“'+m.quote+'”':m.title)+' ('+(200+m.id)+')');});
+    if(allMarks(it).length) lines.push('');
+  });
+  return lines.join('\n');
+}
+function copyText(text){
+  function fallback(){var t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();
+    try{document.execCommand('copy');}catch(e){} t.remove();}
+  try{ if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).catch(fallback);} else fallback(); }catch(e){fallback();}
+}
+var COLNAME={type:'type',id:'id',title:'title',room:'room',tags:'tags',created:'add',date:'add',add:'add',active:'when',when:'when','last':'when'};
+
+var CMDS=[
+ /* go */
+ {s:'alm',sig:'alm:',g:'Almanac',grp:'Go to',pre:function(){return launch('the Almanac');}},
+ {s:'lab',sig:'lab:',g:'Lab',grp:'Go to',pre:function(){return launch('the Lab');}},
+ {s:'open',sig:'open:',eg:'open:207',g:'a chat, docket or note that exists',grp:'Go to',pre:function(a){
+   var id=idsIn(a)[0];
+   if(!id) return {bad:'open which id?'};
+   var it=byId(id); if(!it) return {bad:'no item '+a.trim()};
+   if(it.k==='dock') return launch('“'+titleOf(it)+'”');
+   if(it.k==='chat') return launch('“'+titleOf(it)+'”, where it left off');
+   return launch('a new chat about “'+titleOf(it)+'”');}},
+ {s:'sym',sig:'sym:',g:'last Symposium',grp:'Go to',pre:function(){return launch('the last Symposium');}},
+
+ /* start */
+ /* One verb, and the object says what kind of thing to begin. The same shape
+    as the layout verbs: a small registry of nouns, a table of the words people
+    actually type, and a verb count that stays flat as the kinds grow. Making
+    something and going to something already made are different acts, so they
+    live in different groups: new: begins, open: arrives. */
+ {s:'new',sig:'new:',eg:'new:branch 207',g:'chat, branch, docket or room',grp:'Start',pre:function(a){
+   var t=a.trim();
+   if(!t) return {bad:'new what? chat, branch, docket or room'};
+   var word=t.split(/\s+/)[0].toLowerCase().replace(/[^a-z]/g,''),
+       kind=START_ALIAS[word], rest=t.slice(t.indexOf(word)+word.length);
+   if(!kind) return {bad:'no such thing as a '+word+'; chat, branch, docket or room'};
+   if(kind==='chat')   return idsIn(rest).length
+     ? {bad:'new:chat takes no id; open:'+(idsIn(rest)[0]+200)+' continues that one, new:branch '+(idsIn(rest)[0]+200)+' goes a different way'}
+     : launch('a new chat');
+   if(kind==='docket') return launch('a new docket');
+   if(kind==='room')   return launch('the room builder');
+   /* branch */
+   var id=idsIn(rest)[0];
+   if(!id) return {bad:'branch from which id?'};
+   var it=byId(id); if(!it) return {bad:'no item '+(id+200)};
+   if(it.k!=='chat') return {bad:(id+200)+' is a '+KIND[it.k].label.toLowerCase()+'; branches come off chats'};
+   var room=unq(rest);
+   return launch('a branch from the end of “'+titleOf(it)+'”'+(room?', in '+room:''));}},
+
+ /* The prompt is a mode, not a command, so it has no colon. It sits in Start
+    because it is the one leader that begins something: > opens this very
+    panel, and s> is a way back. Picking it here types the leader rather than
+    running anything. */
+ {s:'prompt',sig:'p>',eg:'p>',g:'ask about the ticked rows',grp:'Start',lead:'p>',
+  pre:function(){return {ok:'Enter switches to the prompt; typing p> at the front does the same',
+    run:function(){var f=$id('q'); f.value='p>'; setQ('p>'); f.focus();}};}},
+
+ /* ═══ Run ═══
+    The Almanac used to say it launches and never runs anything. That was a
+    surface-level rule in a product where the ACTOR is the bar: the docket
+    has no run button either, because the docket does not execute, the
+    command line does. So the rule is retired, and the Enter line becomes
+    the guard — it says what will run, where, on what, and what it costs,
+    before you press anything. A typed command is the user acting directly,
+    and Enter is the confirmation. */
+ {s:'run',sig:'run:',eg:'run:201',g:'start a docket, or one branch of it',grp:'Run',pre:function(a){
+   var p=addrsIn(a);
+   if(!p.length) return {bad:'run which docket? try run:201, or run:201B for one branch'};
+   /* A policy, not a buried check. Raise max and the message follows,
+      because the message is generated from it rather than written beside
+      it. Lists are worth having later — running three dockets to compare
+      outputs is a real want — and then the Enter line's job is to show the
+      SIZE of what was asked for, not to refuse it. */
+   if(p.length>RUNPOL.max) return {bad:'run: takes '+plural(RUNPOL.max,'docket')+' at a time for now'};
+   var a0=p[0], it=byId(a0.id);
+   if(it.k!=='dock') return {bad:addrLabel(a0)+' is a '+KIND[it.k].label.toLowerCase()+'; run: starts dockets'};
+   var st=STEPS[it.id], ready=st?st.steps.filter(function(x){return x.s==='ready';}):[],
+       rooms=uniq(ready.map(function(x){return x.m;}));
+   if(!ready.length) return {bad:'nothing in '+addrLabel(a0)+' is ready to run'};
+   return {ok:'Enter runs '+addrLabel(a0)+(a0.letter?'':'')+': '+plural(ready.length,'step')+
+     ', '+plural(rooms.length,'model')+'. Steps already done stay done',
+     run:function(){toast('Would start '+esc(addrLabel(a0))+'. <b>stop:</b> halts it; undo: does not reach past a run.')}};}},
+
+ {s:'stop',sig:'stop:',eg:'stop:all',g:'halt a run; stop:all halts everything',grp:'Run',pre:function(a){
+   var t=a.trim().toLowerCase();
+   /* stop:all is the first thing that must cross windows. Fan-out opens
+      tabs, each its own instance of the app, so "everything" cannot mean
+      "everything in this tab". The storage event is the channel. */
+   if(/^all$/.test(t)) return {ok:'Enter halts every run, in this window and any others. Steps already done stay done',
+     run:function(){toast('Would halt every run, here and in other tabs.')}};
+   var p=addrsIn(t);
+   if(!p.length) return {bad:'stop what? a docket id, a branch, or stop:all'};
+   return {ok:'Enter halts '+addrLabel(p[0])+'. Steps already done stay done; a step mid-flight is marked stopped',
+     run:function(){toast('Would halt '+esc(addrLabel(p[0]))+'.')}};}},
+
+ /* search */
+ {s:'save',sig:'save:',eg:'save:"Water tower"',g:'save search',grp:'Search',feat:1,pre:function(a){
+   if(!live()) return {bad:'nothing to save yet; search or filter first, then come back'};
+   var n=unq(a)||'Untitled search';
+   return {ok:'Enter saves this search as '+n,run:function(){snap();saveSearch(n);}};}},
+
+
+ /* collection */
+ {s:'add',sig:'add:',eg:'add:207, 216',g:'put ids in the collection',grp:'Collection',feat:1,pre:function(a){
+   var b=badIds(a); if(b.length) return {bad:'no item '+b.join(', ')};
+   var ids=idsIn(a).filter(function(id){return !WS.items.some(function(p){return p.id===id;});});
+   if(!ids.length) return {bad:idsIn(a).length?'already in the collection':'which ids?'};
+   return {ok:'Enter adds '+ids.map(function(id){return '“'+titleOf(byId(id))+'”';}).join(', '),run:function(){snap();
+     ids.forEach(function(id){WS.items.push({id:id,via:'the command line',at:today()});});WS.dirty=true;render();
+     toast('Added '+plural(ids.length,'item')+'.');}};}},
+ {s:'rm',sig:'rm:',eg:'rm:207',g:'take ids out of the collection',grp:'Collection',pre:function(a){
+   var ids=idsIn(a).filter(function(id){return WS.items.some(function(p){return p.id===id;});});
+   if(!ids.length) return {bad:'none of those are in the collection'};
+   return {ok:'Enter takes out '+plural(ids.length,'item')+'; the items themselves stay',run:function(){snap();
+     WS.items=WS.items.filter(function(p){return ids.indexOf(p.id)<0;});WS.dirty=true;render();}};}},
+ {s:'co',sig:'co:',eg:'co:207, 216, 221',g:'a fresh collection from ids',grp:'Collection',pre:function(a){
+   var b=badIds(a); if(b.length) return {bad:'no item '+b.join(', ')};
+   var ids=idsIn(a); if(!ids.length) return {bad:'which ids?'};
+   return {ok:'Enter replaces the collection with '+plural(ids.length,'item')+(WS.items.length?'; undo: brings the old one back':''),
+     run:function(){snap();WS={name:null,dirty:true,items:ids.map(function(id){return {id:id,via:'the command line',at:today()};})};
+       CARDSEL=[];render();}};}},
+ {s:'name',sig:'name:',eg:'name:"Q2 evidence"',g:'name the collection, which keeps it',grp:'Collection',pre:function(a){
+   if(!WS.items.length) return {bad:'the collection is empty'};
+   var n=unq(a); if(!n) return {bad:'name it what?'};
+   var ex=COLLECTIONS.some(function(l){return l.name===n;});
+   return {ok:'Enter '+(ex?'overwrites the saved collection ':'keeps it as ')+n,run:function(){snap();
+     var ids=WS.items.map(function(p){return p.id;}),rec={name:n,desc:plural(ids.length,'thing')+', in the order you put them',ids:ids};
+     var i=COLLECTIONS.findIndex(function(l){return l.name===n;}); if(i>-1)COLLECTIONS[i]=rec; else COLLECTIONS.unshift(rec);
+     WS.name=n;WS.dirty=false;activeKept=null;render();toast('Kept as <b>'+esc(n)+'</b>.');}};}},
+ {s:'clear',sig:'clear:',eg:'clear:filters',g:'empty the collection, or clear:filters',grp:'Collection',feat:1,pre:function(a){
+   if(/^\s*(filters?|search)\s*$/i.test(a)){
+     if(!live()) return {bad:'no search or filters to clear'};
+     return {ok:'Enter clears the search and every filter; undo: brings them back',run:function(){snap();
+       ST.q='';ST.type='all';ST.room='all';ST.tag='all';ST.F=[];activeKept=null;render();}};
+   }
+   if(!WS.items.length) return {bad:'the collection is already empty'};
+   return {ok:'Enter empties '+plural(WS.items.length,'item')+(WS.name?' from the open copy; '+WS.name+' stays saved':'')+'; undo: puts them back',
+     run:function(){snap();clearWS();toast('Emptied. <b>undo:</b> puts it back.');}};}},
+ {s:'compare',sig:'compare:',eg:'compare:201, 207',g:'diff two, align more',grp:'Collection',pre:function(a){
+   var ids=targets(a).ids; if(ids.length<2) return {bad:'compare needs at least two ids, or two in the collection'};
+   return {ok:'Enter compares '+ids.length+(ids.length===2?' as a diff':' side by side'),
+     run:function(){toast('Compare is not built in this prototype.');}};}},
+
+ {s:'export',sig:'export:',eg:'export:jsonl 207, 216',g:'download as markdown or jsonl',grp:'Collection',feat:1,pre:function(a){
+   var t=a.toLowerCase(), fmt=/\bjsonl\b/.test(t)?'jsonl':'md', all=/\ball\b/.test(t);
+   var b=badIds(a); if(b.length) return {bad:'no item '+b.join(', ')};
+   var ids=idsIn(a), list, what;
+   if(all){list=I.slice();what='everything';}
+   else if(ids.length){list=ids.map(byId);what=plural(ids.length,'item');}
+   else if(WS.items.length){list=WS.items.map(function(p){return byId(p.id);});what=WS.name?WS.name:'the collection';}
+   else {list=I.filter(matches);what='the '+plural(list.length,'row')+' in the table';}
+   if(!list.length) return {bad:'nothing to export'};
+   var n=0; list.forEach(function(it){n+=1+allMarks(it).length+(it.k==='dock'?chatsOf(it).length:0);});
+   return {ok:'Enter downloads '+what+' as '+(fmt==='md'?'markdown':'jsonl')+', '+plural(n,'entry')+' with markings'+
+     (all||ids.length||WS.items.length?'':'; all or ids to widen it'),
+     run:function(){exportItems(list,fmt,what);}};}},
+ /* tags */
+ {s:'tagadd',sig:'tagadd:',eg:'tagadd:Essay 207, 216',g:'put a tag on ids, or on the collection',grp:'Tags',pre:function(a){
+   var p=splitIds(a); if(!p.name) return {bad:'which tag?'};
+   var tg=targets(p.ids), ids=tg.ids; if(!ids.length) return {ok:'add ids, or put things in the collection'};
+   var n=tagName(p.name)||p.name;
+   return {ok:'Enter tags '+tg.what+' '+n+(tagName(p.name)?'':', a new tag'),run:function(){snap();
+     ids.forEach(function(id){var it=byId(id);if(!it.tags.some(function(t){return t[1]===n;}))it.tags.push(['mine',n]);});render();}};}},
+ {s:'retag',sig:'retag:',eg:'retag:Essay to "Long form"',g:'rename a tag everywhere',grp:'Tags',feat:1,pre:function(a){
+   var m=a.split(/\s+to\s+/i);
+   if(!unq(m[0])) return {bad:'which tag?'};
+   var from=tagName(m[0]);
+   if(!from) return {bad:'no tag called '+unq(m[0])};
+   if(m.length<2||!unq(m[1])) return {ok:from+' is on '+plural(tagCount(from),'item')+'; add to and the new name'};
+   var to=unq(m[1]), into=tagName(to);
+   return {ok:'Enter renames '+from+' to '+to+' on '+plural(tagCount(from),'item')+(into&&into!==from?', merging it into the existing tag':''),
+     run:function(){snap();var dest=into||to;
+       I.forEach(function(it){var seen=false;it.tags=it.tags.filter(function(t){
+         if(t[1]===from||t[1]===dest){ if(seen) return false; seen=true; t[1]=dest; t[0]='mine'; } return true;});});
+       if(ST.tag===from)ST.tag=dest; render();}};}},
+ {s:'untag',sig:'untag:',eg:'untag:Essay 207',g:'remove a tag from ids, or from everything',grp:'Tags',pre:function(a){
+   var p=splitIds(a);
+   if(!p.name) return {bad:'which tag?'};
+   var n=tagName(p.name);
+   if(!n) return {bad:'no tag called '+p.name};
+   var ids=p.ids?idsIn(p.ids).filter(function(id){return byId(id).tags.some(function(t){return t[1]===n;});})
+                :I.filter(function(it){return it.tags.some(function(t){return t[1]===n;});}).map(function(it){return it.id;});
+   if(!ids.length) return {bad:'none of those carry '+n};
+   return {ok:'Enter removes '+n+' from '+(p.ids?plural(ids.length,'item'):ids.length>1?'all '+plural(ids.length,'item'):'the one item that has it')+(p.ids?'':'; add ids to limit it'),run:function(){snap();
+     ids.forEach(function(id){var it=byId(id);it.tags=it.tags.filter(function(t){return t[1]!==n;});});
+     if(ST.tag===n&&!p.ids)ST.tag='all'; render();}};}},
+
+ /* items */
+ {s:'rename',sig:'rename:',eg:'rename:207 "New title"',g:'retitle an item',grp:'Items',pre:function(a){
+   var m=a.match(/^\s*(\d+)\s*([\s\S]*)$/); if(!m) return {bad:'which id?'};
+   var it=byId(+m[1]-200); if(!it) return {bad:'no item '+m[1]};
+   if(it.k==='high') return {bad:'a highlight is its quote; there is no title to change'};
+   var t=unq(m[2]); if(!t) return {ok:'now “'+it.title+'”; add the new title'};
+   return {ok:'Enter retitles it “'+t+'”',run:function(){snap();it.title=t;it.handTitled=true;render();}};}},
+ {s:'pin',sig:'pin:',eg:'pin:207',g:'keep ids at the top',grp:'Items',pre:function(a){
+   var tg=targets(a), ids=tg.ids; if(!ids.length) return {bad:'which ids? or put things in the collection'};
+   var on=!byId(ids[0]).pin;
+   return {ok:'Enter '+(on?'pins ':'unpins ')+tg.what,
+     run:function(){snap();ids.forEach(function(id){byId(id).pin=on;});render();}};}},
+ {s:'archive',sig:'archive:',eg:'archive:209',g:'hide ids without deleting them',grp:'Items',pre:function(a){
+   var tg=targets(a), ids=tg.ids; if(!ids.length) return {bad:'which ids? or put things in the collection'};
+   return {ok:'Enter archives '+tg.what+'; runs and their facts are kept',
+     run:function(){snap();ids.forEach(function(id){byId(id).arch=true;});render();}};}},
+ /* filters: intercepted by parseFilterLine before these run; listed for Tab, hints and ? */
+ {s:'type',sig:'type:',eg:'type:note,chat',g:'chat, note, highlight or docket',grp:'Filters',filt:1,feat:1,pre:function(){return {ok:'pick a value'};}},
+ {s:'model',sig:'model:',eg:'model:opus',g:'made with a model',grp:'Filters',filt:1,feat:1,pre:function(){return {ok:'pick a value'};}},
+ /* from: is the one filter for provenance: a chat or docket (from:203), a
+    branch across every run of its life (from:201B), or a single run
+    (from:run 3). run: used to be a filter here, which made one word a
+    filter on this surface and a verb on the docket — the only scheme in
+    the grammar that differed in KIND rather than vocabulary. */
+ {s:'from',sig:'from:',eg:'from:201B',g:'a chat, docket, branch or run it came from',grp:'Filters',filt:1,feat:1,pre:function(){return {ok:'pick a value'};}},
+ {s:'room',sig:'room:',eg:'room:"Code Lab"',g:'a room',grp:'Filters',filt:1,pre:function(){return {ok:'pick a value'};}},
+ {s:'tag',sig:'tag:',eg:'-tag:Research',g:'a tag; a leading - leaves it out',grp:'Filters',filt:1,pre:function(){return {ok:'pick a value'};}},
+ {s:'in',sig:'in:',eg:'in:"Q2 essay reading"',g:'inside a collection',grp:'Filters',filt:1,pre:function(){return {ok:'pick a value'};}},
+ {s:'has',sig:'has:',eg:'has:highlight',g:'holds notes or highlights',grp:'Filters',filt:1,pre:function(){return {ok:'pick a value'};}},
+ {s:'cost',sig:'cost:',eg:'cost:>0.50',g:'dockets by what they cost',grp:'Filters',filt:1,pre:function(){return {ok:'pick a value'};}},
+ {s:'since',sig:'since:',eg:'since:7d',g:'created since; 3w, september, 09/01/26',grp:'Filters',filt:1,pre:function(){return {ok:'pick a value'};}},
+ {s:'until',sig:'until:',eg:'until:09/10/26',g:'created until',grp:'Filters',filt:1,pre:function(){return {ok:'pick a value'};}},
+ {s:'sort',sig:'sort:',eg:'sort:created',g:'created, active, oldest or newest',grp:'Filters',filt:1,pre:function(){return {ok:'pick a value'};}},
+
+ /* items, new */
+ {s:'peek',sig:'peek:',eg:'peek:207',g:'read a record in place; read: works too',grp:'Items',feat:1,pre:function(a){
+   var id=idsIn(a)[0]; if(!a.trim()) return {ok:'which id?'};
+   if(!id) return {bad:'no item '+a.trim()};
+   return {ok:'showing '+(200+id)+'; Enter keeps it open, Escape closes',run:function(){PEEK=id;}};}},
+ {s:'read',sig:'read:',eg:'read:207',g:'same as peek:',grp:'Items',pre:function(a){return CMDS.filter(function(c){return c.s==='peek';})[0].pre(a);}},
+ {s:'note',sig:'note:',eg:'note:203 "Try it without the ending"',g:'write a note on an item, or on the collection',grp:'Items',feat:1,pre:function(a){
+   var m=String(a).match(/^\s*((?:\d+\s*(?:-\s*\d+)?\s*,?\s*)*)([\s\S]*)$/), idpart=m[1]||'', text=unq(m[2]||'');
+   var b=badIds(idpart); if(b.length) return {bad:'no item '+b.join(', ')};
+   var t=targets(idpart);
+   if(!t.ids.length) return {bad:'which id? or put things in the collection first'};
+   if(!text) return {ok:'writing on '+(t.ids.length===1?'“'+titleOf(byId(t.ids[0]))+'”':t.what)+'; add the text'};
+   return {ok:'Enter adds a note on '+(t.ids.length===1?'“'+titleOf(byId(t.ids[0]))+'”':t.what),run:function(){snap();
+     var first=byId(t.ids[0]), about=t.ids.length===1?titleOf(first):t.what;
+     var it={id:nextId++,k:'note',title:text.length>60?text.slice(0,57)+'…':text,room:t.ids.length===1?first.room:'Almanac',body:text.length>60?[text]:[],
+       tags:[],when:'just now',ts:1200,add:TODAY_DAY,marg:[['written in the Almanac']]};
+     if(t.ids.length===1&&first.k==='chat') it.parent=first.id; else it.marg.unshift(['about '+about]);
+     I.push(it); render(); toast('Note '+(200+it.id)+' added. It is a real item; search finds it.');}};}},
+ {s:'copy',sig:'copy:',eg:'copy:207',g:'markdown to the clipboard',grp:'Items',pre:function(a){
+   var b=badIds(a); if(b.length) return {bad:'no item '+b.join(', ')};
+   var t=targets(a); if(!t.ids.length) return {bad:'which ids? or put things in the collection first'};
+   return {ok:'Enter copies '+t.what+' as markdown',run:function(){
+     copyText(buildMarkdown(t.ids.map(byId),t.fromWS?(WS.name||'Collection'):'From the Almanac')); toast('Copied '+t.what+'.');}};}},
+
+ /* collection, new */
+ {s:'dup',sig:'dup:',eg:'dup:"Q2 essay, second pass"',g:'copy the collection under a new name',grp:'Collection',pre:function(a){
+   if(!WS.items.length) return {bad:'the collection is empty'};
+   var n=unq(a)||('Copy of '+(WS.name||'untitled collection'));
+   if(COLLECTIONS.some(function(c){return c.name.toLowerCase()===n.toLowerCase();})) return {bad:'there is already a collection called '+n};
+   return {ok:'Enter keeps a copy as '+n+(WS.name?'; '+WS.name+' stays as it was':''),run:function(){snap();
+     var ids=WS.items.map(function(p){return p.id;});
+     COLLECTIONS.unshift({name:n,desc:plural(ids.length,'thing')+', copied from '+(WS.name||'an unsaved collection'),ids:ids});
+     WS.name=n; WS.dirty=false; activeKept=null; render(); toast('Copied. You are editing <b>'+esc(n)+'</b> now.');}};}},
+ {s:'forget',sig:'forget:',eg:'forget:"Surprised me"',g:'remove a saved search or collection',grp:'Collection',pre:function(a){
+   var n=unq(a).toLowerCase(); if(!n) return {ok:'name a saved search or collection'};
+   var si=SEARCHES.findIndex(function(x){return x.name.toLowerCase()===n;}), ci=COLLECTIONS.findIndex(function(x){return x.name.toLowerCase()===n;});
+   if(si<0&&ci<0) return {bad:'nothing saved as '+unq(a)};
+   var what=si>-1?'the saved search '+SEARCHES[si].name:'the collection '+COLLECTIONS[ci].name;
+   return {ok:'Enter forgets '+what+'; the items themselves stay; undo: brings it back',run:function(){snap();
+     if(si>-1) SEARCHES.splice(si,1); else COLLECTIONS.splice(ci,1); activeKept=null; render();}};}},
+
+ /* table */
+ {s:'cols',sig:'cols:',eg:'cols:-room +created',g:'hide or show table columns',grp:'Layout',pre:function(a){
+   var toks=a.trim().split(/[\s,]+/).filter(Boolean);
+   if(!toks.length) return {ok:'showing '+COLS.map(function(c){return HEAD[c].label.toLowerCase();}).join(', ')+'; -name hides, +name shows'};
+   var ops=[], bad=null;
+   toks.forEach(function(t){var sign=t[0]==='-'?'-':'+', name=t.replace(/^[-+]/,'').toLowerCase(), c=COLNAME[name];
+     if(!c){bad='no column called '+name;return;}
+     if(c==='title'&&sign==='-'){bad='the title stays';return;}
+     /* The id is how the command line addresses a row, so it cannot be hidden.
+        It can still be dragged anywhere in the order. */
+     if(c==='id'&&sign==='-'){bad='the id stays; drag it if you want it elsewhere';return;}
+     ops.push([sign,c]);});
+   if(bad) return {bad:bad};
+   return {ok:'Enter '+ops.map(function(o){return (o[0]==='-'?'hides ':'shows ')+HEAD[o[1]].label.toLowerCase();}).join(', '),run:function(){snap();
+     ops.forEach(function(o){var i=COLS.indexOf(o[1]);
+       if(o[0]==='-'&&i>-1) COLS.splice(i,1);
+       if(o[0]==='+'&&i<0){ var at=DEF_COLS.indexOf(o[1]), pos=COLS.filter(function(c){return DEF_COLS.indexOf(c)<at;}).length; COLS.splice(pos,0,o[1]); }});
+     render();}};}},
+ /* layout */
+ {s:'reset',sig:'reset:',g:'original layout, pop-outs closed',grp:'Layout',feat:1,pre:function(){
+   var n=Object.keys(POPS).length,
+       moved=LAY.hidden.length||LAY.order.join()!=='rail,table,coll'||BAR!=='top'||
+             COLS.join()!==DEF_COLS.join()||JSON.stringify(WIDTH)!==JSON.stringify(DEF_WIDTH);
+   if(!n&&!moved) return {bad:'the layout is already original'+(live()?'; clear:filters clears the search and filters':'')};
+   var bits=[]; if(n) bits.push('closes '+plural(n,'window')); if(moved) bits.push('restores panels, columns and the field on top');
+   return {ok:'Enter '+bits.join(' and ')+'; your search and collection stay',run:function(){
+     Object.keys(POPS).forEach(closePop);
+     snap();
+     LAY={order:['rail','table','coll'],hidden:[]}; BAR='top';
+     COLS=DEF_COLS.slice(); WIDTH=JSON.parse(JSON.stringify(DEF_WIDTH));
+     keepLayout(); applyLayout(); render();
+     setTimeout(function(){var q=document.getElementById('q'); if(q){q.value='>';q.focus();}},40);
+     toast('Back to the original layout.');}};}},
+ {s:'refresh',sig:'refresh:',g:'same as reset:',grp:'Layout',pre:function(a){return CMDS.filter(function(c){return c.s==='reset';})[0].pre(a);}},
+ /* Two axes in one verb. top, bottom, left and right are POSITIONS; pop
+    and dock are STATES. Which answers the obvious question: a position
+    only means something relative to a surface, and a popped bar has no
+    surface, so any position implies dock. Nothing needs to remember which
+    screen it came from — it returns to the addressed card, wherever that
+    card is.
+    left and right make the field a square, because a line of text pinned
+    to a vertical edge is either rotated and unusable or a narrow-column
+    variant pretending otherwise. The square reserves three lines for the
+    Enter line so nothing below it moves when the gloss wraps. Any other
+    position makes it a line again; popping keeps whatever shape it had. */
+ {s:'bar',sig:'bar:',eg:'bar:left',g:'top, bottom, left, right, pop or dock',grp:'Layout',pre:function(a){
+   var v=unq(a).toLowerCase(), POS={top:1,bottom:1,left:1,right:1};
+   if(/^screen\b/.test(v)){
+     if(!('getScreenDetails' in window)) return {bad:'this browser cannot place windows on a named screen'};
+     return {ok:'Enter moves the popped field to that screen',run:function(){toast('Would place the field on that screen.')}};
+   }
+   if(v==='pop') return {ok:'Enter opens the field in its own window, keeping its shape',run:popCommand};
+   if(v==='dock') return POPS.command?{ok:'Enter brings the field back to the addressed card',run:function(){closePop('command');}}
+     :{bad:'the field is already docked'};
+   if(!POS[v]) return {ok:'now at the '+BAR+'; top, bottom, left, right, pop or dock'};
+   if(v===BAR) return {bad:'already at the '+v};
+   var sq=(v==='left'||v==='right');
+   return {ok:'Enter puts the field at the '+v+(sq?', as a square':', as a line')+
+     (POPS.command?'; it docks first':''),
+     run:function(){BAR=v;BARSHAPE=sq?'square':'line';keepLayout();applyLayout();render();
+     setTimeout(function(){$id('q').focus();},30);}};}},
+ {s:'swap',sig:'swap:',eg:'swap:table collection',g:'exchange two panels',grp:'Layout',pre:function(a){
+   var w=a.trim().split(/[\s,]+/).filter(Boolean), x=panelOf(w[0]), y=panelOf(w[1]);
+   if(!w.length) return {ok:'rail, table or collection; name two'};
+   if(!x) return {bad:'no panel called '+w[0]+'; rail, table or collection'};
+   if(!y) return {ok:'swap '+PANELS[x]+' with rail, table or collection'};
+   if(x===y) return {bad:'name two different panels'};
+   return {ok:'Enter swaps '+PANELS[x]+' and '+PANELS[y],run:function(){snap();
+     var i=LAY.order.indexOf(x),j=LAY.order.indexOf(y); LAY.order[i]=y; LAY.order[j]=x; keepLayout();applyLayout();render();}};}},
+ {s:'move',sig:'move:',eg:'move:collection left',g:'send a panel left or right',grp:'Layout',pre:function(a){
+   var w=a.trim().split(/\s+/), x=panelOf(w[0]), dir=(w[1]||'').toLowerCase();
+   if(!x) return {bad:w[0]?'no panel called '+w[0]:'which panel?'};
+   if(dir!=='left'&&dir!=='right') return {ok:'move '+PANELS[x]+' left or right'};
+   var i=LAY.order.indexOf(x), j=dir==='left'?0:LAY.order.length-1;
+   if(i===j) return {bad:PANELS[x]+' is already on the '+dir};
+   return {ok:'Enter moves '+PANELS[x]+' to the '+dir,run:function(){snap();
+     LAY.order.splice(i,1); if(dir==='left')LAY.order.unshift(x); else LAY.order.push(x); keepLayout();applyLayout();render();}};}},
+ {s:'hide',sig:'hide:',eg:'hide:rail',g:'take a panel off the page',grp:'Layout',pre:function(a){
+   var x=panelOf(a); if(!x) return {bad:a.trim()?'no panel called '+a.trim():'which panel?'};
+   if(LAY.hidden.indexOf(x)>-1) return {bad:PANELS[x]+' is already hidden'};
+   if(LAY.hidden.length>=2) return {bad:'one panel has to stay'};
+   return {ok:'Enter hides '+PANELS[x]+'; show: brings it back',run:function(){snap();LAY.hidden.push(x);keepLayout();applyLayout();render();}};}},
+ {s:'show',sig:'show:',eg:'show:rail',g:'bring a hidden panel back',grp:'Layout',pre:function(a){
+   var x=panelOf(a);
+   if(!x) return LAY.hidden.length?{ok:'hidden now: '+LAY.hidden.map(function(p){return PANELS[p];}).join(', ')}:{bad:'nothing is hidden'};
+   if(LAY.hidden.indexOf(x)<0) return {bad:PANELS[x]+' is already showing'};
+   return {ok:'Enter shows '+PANELS[x],run:function(){snap();LAY.hidden=LAY.hidden.filter(function(p){return p!==x;});keepLayout();applyLayout();render();}};}},
+ {s:'layout',sig:'layout:',eg:'layout:save "Reading"',g:'default, save a layout, or apply one',grp:'Layout',pre:function(a){
+   var t=a.trim(), m=t.match(/^save\s+([\s\S]+)$/i);
+   if(!t) return {ok:'default'+(LAYOUTS.length?', '+LAYOUTS.map(function(l){return l.name;}).join(', '):'')+', or save "name"'};
+   if(/^default$/i.test(t)) return {ok:'Enter puts every panel back and the field on top',run:function(){snap();
+     LAY={order:['rail','table','coll'],hidden:[]};BAR='top';keepLayout();applyLayout();render();}};
+   if(m){ var n=unq(m[1]); return {ok:'Enter keeps this arrangement in the Lab as '+n,run:function(){
+     LAYOUTS=LAYOUTS.filter(function(l){return l.name!==n;});
+     LAYOUTS.unshift({name:n,LAY:JSON.parse(JSON.stringify(LAY)),BAR:BAR});keepLayout();
+     toast('Kept <b>'+esc(n)+'</b> as a Lab layout. <b>layout:'+esc(n)+'</b> brings it back.');}}; }
+   var want=unq(t).toLowerCase(), hit=LAYOUTS.filter(function(l){return l.name.toLowerCase()===want;})[0];
+   if(!hit) return {bad:'no layout called '+unq(t)};
+   return {ok:'Enter applies '+hit.name,run:function(){snap();LAY=JSON.parse(JSON.stringify(hit.LAY));BAR=hit.BAR;keepLayout();applyLayout();render();}};}},
+ /* layout: is the page — three slots, portable to any device. arrange: is
+    the WINDOWS — which things are popped, where they sit, on which screen.
+    Kept apart because a page layout travels and a window arrangement does
+    not: screens differ per device, so arrangements are saved per device and
+    fall back to the main screen with a toast when a monitor is missing.
+    The layout and the contents are separate too, which is what makes one
+    desk reusable: arrange:"Review desk" 207 puts docket 207 where the
+    docket goes, and 212 there tomorrow. Bare resumes what was there last. */
+ {s:'arrange',sig:'arrange:',eg:'arrange:"Review desk" 207',g:'save or restore a desk of windows',grp:'Layout',pre:function(a){
+   var t=a.trim(), m=t.match(/^save\s+([\s\S]+)$/i), open=Object.keys(POPS).length;
+   if(!t) return {ok:'save "name"'+(DESKS.length?', or '+DESKS.map(function(d){return d.name;}).join(', '):'')};
+   if(m){
+     if(!open) return {bad:'nothing is popped out to save'};
+     var nm=unq(m[1]);
+     return {ok:'Enter keeps '+plural(open,'window')+' as '+nm+', on this device',run:function(){
+       DESKS=DESKS.filter(function(d){return d.name!==nm;});
+       DESKS.unshift({name:nm,wins:Object.keys(POPS)});keepLayout();
+       toast('Kept <b>'+esc(nm)+'</b>. <b>arrange:'+esc(nm)+'</b> sets it up again.');}};
+   }
+   var want=splitIds(t), hit=DESKS.filter(function(d){return d.name.toLowerCase()===want.name.toLowerCase();})[0];
+   if(!hit) return {bad:'no desk called '+want.name};
+   var ad=addrsIn(want.ids)[0], canScreen='getScreenDetails' in window;
+   return {ok:'Enter opens '+plural(hit.wins.length,'window')+(ad?' with '+addrLabel(ad)+' in it':' as they were')+
+     (canScreen?'':'; this browser cannot place them on named screens')+
+     (hit.wins.length>1?'. Pop-up blockers allow one per click':''),
+     run:function(){toast('Would set up <b>'+esc(hit.name)+'</b>.')}};}},
+
+ {s:'pop',sig:'pop:',eg:'pop:table',g:'the table, the command line, or a docket in its own window',grp:'Layout',pre:function(a){
+   var t=a.trim().toLowerCase(), can='documentPictureInPicture' in window;
+   if(!t) return {ok:'pop:table, pop:command, a docket id, or pop:back'};
+   if(/^(command|bar|search|cmd)$/.test(t)) return POPS.command?{bad:'the command line is already out; pop:back brings it home'}:
+     {ok:'Enter opens the command line in '+(can&&!PIP_BUSY?'an always-on-top window':'its own window'),run:popCommand};
+   if(t==='back'){ var n=Object.keys(POPS).length; if(!n) return {bad:'nothing is popped out'};
+     return {ok:'Enter closes '+plural(n,'window')+' and puts everything back',run:function(){Object.keys(POPS).forEach(closePop);}}; }
+   if(panelOf(t)==='table') return POPS.table?{bad:'the table is already out; pop:back brings it home'}:
+     {ok:'Enter opens the table in '+(can&&!PIP_BUSY?'an always-on-top window':'its own window'),run:popTable};
+   /* pop: is the only verb that takes both noun classes — a panel, or an
+      addressable thing. One rule covers what you get: POP GIVES YOU THAT
+      THING'S OWN VIEW. A popped panel carries its parent surface's rules;
+      a popped surface carries its own, which is why a popped docket can
+      run while a popped table still cannot. That also keeps the live chat
+      out without an exception: a chat's own view is its record, and the
+      composer lives in the Symposium. A branch has no standalone view, so
+      pop:201B pops the docket with B addressed. */
+   var ad=addrsIn(t)[0];
+   if(!ad) return {bad:'pop:table, pop:command, or an id'};
+   var id=ad.id;
+   return {ok:'Enter floats docket '+(id+200)+(can&&!PIP_BUSY?' on top of every window':' in its own window'),run:function(){popDocket(id);}};}},
+ /* ? is the binding; help is the word, because someone who does not know
+    the grammar types the word. Both open the same panel. */
+ {s:'help',sig:'help:',g:'the same panel ? opens',grp:'Search',pre:function(){
+   return {ok:'Enter opens the command reference',run:function(){$id('q').value='>?';setQ('>?');}};}},
+ {s:'undo',sig:'undo:',g:'take back the last command; it stops at a run',grp:'Items',feat:1,pre:function(){
+   if(!UNDO.length) return {bad:'nothing to undo yet'};
+   return {ok:'Enter takes back '+UNDO[UNDO.length-1].what,run:function(){var u=UNDO.pop();
+     I=u.I;WS=u.WS;SEARCHES=u.S;COLLECTIONS=u.C;ST=u.ST;LAY=u.LAY;BAR=u.BAR;CARDSEL=[];keepLayout();applyLayout();render();toast('Taken back.');}};}}
+];
+/* Export is computation over the record, like Compare, so it belongs here.
+   Containers bring their markings; nothing is flattened into copies of copies. */
+function exportItems(list,fmt,what){
+  var seen={}, out=[];
+  var depth={};
+  function rec(it,parent,d){
+    if(seen[it.id]) return; seen[it.id]=1;
+    out.push({id:200+it.id,type:KIND[it.k].label.toLowerCase(),title:it.k==='high'?null:it.title,
+      quote:it.k==='high'?it.quote:null,body:(it.body||[]).join('\n\n')||null,room:it.room,
+      tags:it.tags.map(function(t){return t[1];}),created:dayLabel(it.add),last_active:it.when,
+      parent:parent?200+parent.id:null});
+    depth[200+it.id]=d||0;
+    if(it.k==='dock') chatsOf(it).forEach(function(c){rec(c,it,(d||0)+1);});
+    else allMarks(it).forEach(function(m){rec(m,it,(d||0)+1);});
+  }
+  list.forEach(function(it){rec(it,null,0);});
+  var text;
+  if(fmt==='jsonl') text=out.map(function(o){return JSON.stringify(o);}).join('\n')+'\n';
+  else text='# Almanac export: '+what+'\n\nExported from the Almanac, 09/16/26.\n\n'+out.map(function(o){
+    var h=['## ','### ','#### '][Math.min(depth[o.id],2)]+(o.title||'Highlight')+'\n\n';
+    var meta='*'+[o.type,'id '+o.id,o.room,'created '+o.created,'last active '+o.last_active].concat(o.tags.length?['tags: '+o.tags.join(', ')]:[]).join('; ')+'*\n\n';
+    var body=(o.quote?'> '+o.quote+'\n\n':'')+(o.body?o.body+'\n\n':'');
+    return h+meta+body;}).join('');
+  var blob=new Blob([text],{type:fmt==='jsonl'?'application/jsonl':'text/markdown'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='almanac-export-2026-09-16.'+fmt; document.body.appendChild(a); a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+  toast('Exported '+plural(out.length,'entry')+' as <b>'+fmt+'</b>.');
+}
+var UNDO=[], LASTCMD='';
+function snap(){UNDO.push({what:LASTCMD,I:JSON.parse(JSON.stringify(I)),WS:JSON.parse(JSON.stringify(WS)),
+  S:JSON.parse(JSON.stringify(SEARCHES)),C:JSON.parse(JSON.stringify(COLLECTIONS)),ST:JSON.parse(JSON.stringify(ST)),
+  LAY:JSON.parse(JSON.stringify(LAY)),BAR:BAR});
+  if(UNDO.length>20)UNDO.shift();}
+/* A command typed without its colon still runs: reset and reset: are the same.
+   Only an exact command name counts, so a search word never becomes a verb. */
+function normLine(text){
+  var t=String(text).trim().toLowerCase();
+  if(t.indexOf(':')<0&&/^[a-z]+$/.test(t)&&CMDS.some(function(c){return c.s===t;})) return t+':';
+  return text;
+}
+function cmdOf(text){var i=text.indexOf(':'); if(i<0) return null;
+  var sc=text.slice(0,i).trim().toLowerCase();
+  return {c:CMDS.filter(function(c){return c.s===sc;})[0],scheme:sc,arg:text.slice(i+1)};}
+var CMD=false, PRM=false;
+
+/* Prompt mode. It hands off like c: and sym: do; the Almanac still never
+   runs anything itself. */
+function enterPrm(){
+  if(PRM) return;
+  if(CMD) exitCmd(false);
+  PRM=true; $id('sfield').classList.add('prm'); paintAll();
+  /* The p of the leader was a keystroke in the search a heartbeat ago. Nobody
+     searched for it, so it should not survive into the prompt or come back
+     when Escape restores what was underneath. */
+  if(ST.q==='p'){ ST.q=''; activeKept=null; render(); }
+}
+function exitPrm(clear){
+  PRM=false; $id('sfield').classList.remove('prm');
+  if(clear) $id('q').value=ST.q||'';
+  paintAll();
+}
+function leavePrompt(){var f=$id('q'); exitPrm(true); setQ(f.value); f.focus();}
+/* What a prompt carries. Ticked rows are an explicit choice, so they go with
+   the question. Nothing ticked means nothing chosen — the prompt opens empty
+   rather than silently hauling along whatever the filter happened to leave on
+   screen. A collection is reached through its own card, or by naming it here. */
+function prmTarget(){
+  return WS.items.length?{n:WS.items.length,what:plural(WS.items.length,'ticked row')}:null;
+}
+function runPrompt(){
+  var f=$id('q'), text=f.value.trim(), t=prmTarget();
+  if(!text){ toast('Type the question first.'); return; }
+  toast(t?'Would open a Symposium about the '+t.what+', with the question attached. '+
+          'The Almanac launches; it never runs anything.'
+         :'Would open a Symposium with just the question. '+
+          'Tick rows first if you want them to come along.');
+  f.value=''; drawSuggest();
+}
+
+function enterCmd(){
+  if(CMD) return;
+  CMD=true;
+  $id('sfield').classList.add('cmd');
+  drawSuggest(); paintAll();
+}
+function exitCmd(clear){
+  CMD=false;
+  $id('sfield').classList.remove('cmd');
+  if(clear) $id('q').value=ST.q||'';
+  drawSuggest(); paintAll();
+}
+function hintItem(c,first){
+  return '<span class="it'+(first?' first':'')+'"><button onclick="fillCmd(\''+c.s+'\')"><code>'+esc(c.sig)+
+    '</code> <span class="gl">'+esc(c.g)+'</span></button></span>';}
+function helpItem(){return '<span class="it"><button onclick="fillHelp()"><code>?</code> <span class="gl">every command</span></button></span>';}
+/* Semicolons between, and drop from the end until it fits one line, so the
+   line never grows and nothing under it moves. The tail always stays. */
+function fitLine(box,items,tail){
+  var n=items.length;
+  function paint(){var all=items.slice(0,n).concat(tail||[]);
+    box.innerHTML=all.map(function(h,i){
+      return i<all.length-1?h.replace(/<\/span>$/,'<span class="sep">;</span></span>'):h;}).join('');}
+  paint(); while(n>1&&box.scrollHeight>30){n--;paint();}
+}
+function drawSuggest(){
+  var box=$id('shint'), ref=$id('cref');
+  var refWas=ref.classList.contains('open');
+  ref.classList.remove('open');
+  if(PRM){
+    var pt=prmTarget();
+    box.innerHTML='<span class="it pre">'+(pt?'Enter asks about the '+pt.what:'Enter asks on its own; tick rows to send them too')+
+      '<span class="sep">;</span></span>'+
+      '<span class="it"><button onclick="leavePrompt()"><span class="gl">type <code>s&gt;</code> or press Escape to go back to the search</span></button></span>';
+    if(refWas) paintAll();
+    return;
+  }
+  if(!CMD){
+    /* At rest the line suggests the one command that fits what you just did. */
+    var msg = live()&&!(activeKept&&activeKept[0]==='s')
+      ? '<button onclick="fillCmd(\'save\')"><span class="gl">type <code>&gt;save:</code> to save this search</span></button>'
+      : WS.items.length&&WS.dirty&&!WS.name
+      ? '<button onclick="fillCmd(\'name\')"><span class="gl">type <code>&gt;name:</code> to keep this collection</span></button>'
+      : '<button onclick="openCmd()"><span class="gl">press <code>/</code> or <code>⌘K</code> to jump here; <code>&gt;</code> for the command line, '+
+        '<code>p&gt;</code> for a prompt, <code>s&gt;</code> back to the search</span></button>';
+    box.innerHTML='<span class="it">'+msg+'</span>'; return;
+  }
+  var text=normLine($id('q').value.replace(/^>/,''));
+  var q=text.trim().toLowerCase();
+  var cmPk=cmdOf(text), pkId=cmPk&&cmPk.c&&(cmPk.c.s==='peek'||cmPk.c.s==='read')?idsIn(cmPk.arg)[0]:null;
+  if(pkId) drawPeek(pkId); else if(!q&&PEEK) drawPeek(PEEK); else { if(q) PEEK=null; drawPeek(null); }
+  if(q.charAt(0)==='?'){
+    var rq=text.trim().slice(1);
+    drawRef(rq); ref.classList.add('open'); paintAll();
+    var sel=REFLIST[REFSEL];
+    box.innerHTML='<span class="it">'+(sel
+      ? '<button onclick="fillCmd(\''+sel.s+'\')"><code>'+esc(sel.sig)+'</code> <span class="gl">Enter takes this one</span></button>'+
+        '<span class="sep">;</span></span><span class="it pre">↑ ↓ to move' + (rq?'':', or keep typing to narrow') + '</span>'
+      : 'keep typing, or Escape to leave</span>'); return;
+  }
+  if(refWas) paintAll();
+  if(!q){
+    var pri=['type','model','from','peek','note','save','add','export','reset','undo'];
+    fitLine(box,CMDS.filter(function(c){return c.feat;}).sort(function(a,b){return pri.indexOf(a.s)-pri.indexOf(b.s);})
+      .map(function(c){return hintItem(c);}),[helpItem()]);
+    return;
+  }
+  var fl=parseFilterLine(text);
+  if(fl){ drawFilterHint(box,text,fl); return; }
+  var cm=cmdOf(text);
+  if(cm&&cm.c){
+    var p=cm.c.pre(cm.arg)||{};
+    var how='<span class="it"><code>'+esc(cm.c.eg||cm.c.sig)+'</code> <span class="gl">'+esc(cm.c.g)+'</span></span>';
+    var what=p.bad?'<span class="it bad">'+esc(p.bad)+'</span>':'<span class="it pre">'+esc(p.ok)+'</span>';
+    fitLine(box,[how],[what]); return;
+  }
+  if(cm){ box.innerHTML='<span class="it bad">no command called '+esc(cm.scheme)+':<span class="sep">;</span></span>'+helpItem(); return; }
+  var hits=CMDS.filter(function(c){return c.s.indexOf(q)===0;})
+    .concat(CMDS.filter(function(c){return c.s.indexOf(q)!==0&&c.g.toLowerCase().indexOf(q)>-1;}));
+  if(!hits.length){ box.innerHTML='<span class="it bad">no command matches that<span class="sep">;</span></span>'+helpItem(); return; }
+  fitLine(box,hits.map(function(c,i){return hintItem(c,i===0);}),[helpItem()]);
+}
+/* ═══ The command menu ═══
+   Grouped, headed and counted, narrowed by typing after the ? or by picking one
+   group, and walkable with the arrow keys. Ink only: no colour is doing work. */
+var REFGRP='All', REFSEL=0, REFLIST=[];
+var GRPORDER=['Filters','Items','Collection','Tags','Search','Start','Run','Go to','Layout'];
+/* One line per group, shown beside the heading when that group is alone. The
+   Layout note carries the panel vocabulary, because every layout verb takes a
+   panel as its object and naming the set ten times would be ten chances to
+   fall out of step with PANEL_ALIAS. */
+var GRPNOTE={Filters:'narrow the table',Items:'one thing at a time',Collection:'the third card',
+  Tags:'labels, everywhere at once',Search:'keep what you found',Start:'bring something into being',Run:'start it, or halt it',
+  'Go to':'surfaces, and things that already exist',
+  Layout:'the shape of the page; the panels are rail, table and collection'};
+function setRefGrp(g){REFGRP=g;REFSEL=0;drawSuggest();}
+function hl(text,q){
+  if(!q) return esc(text);
+  var i=text.toLowerCase().indexOf(q.toLowerCase()); if(i<0) return esc(text);
+  return esc(text.slice(0,i))+'<mark>'+esc(text.slice(i,i+q.length))+'</mark>'+esc(text.slice(i+q.length));
+}
+function refHits(q){
+  return CMDS.filter(function(c){
+    if(REFGRP!=='All'&&c.grp!==REFGRP) return false;
+    if(!q) return true;
+    return (c.s+' '+(c.eg||c.sig)+' '+c.g).toLowerCase().indexOf(q.toLowerCase())>-1;});
+}
+function drawRef(q){
+  q=(q||'').trim();
+  var hits=refHits(q), groups={}, order=[];
+  hits.forEach(function(c){if(!groups[c.grp]){groups[c.grp]=[];order.push(c.grp);}groups[c.grp].push(c);});
+  order.sort(function(a,b){return GRPORDER.indexOf(a)-GRPORDER.indexOf(b);});
+  REFLIST=[]; order.forEach(function(g){groups[g].forEach(function(c){REFLIST.push(c);});});
+  if(REFSEL>=REFLIST.length) REFSEL=REFLIST.length-1;
+  if(REFSEL<0) REFSEL=0;
+  var chips=['All'].concat(GRPORDER.filter(function(g){return CMDS.some(function(c){return c.grp===g;});}))
+    .map(function(g){return '<button class="chip'+(REFGRP===g?' on':'')+'" onclick="setRefGrp(\''+g+'\')">'+g.toLowerCase()+'</button>';}).join('');
+  /* No total. A count of everything goes stale the moment a verb is added,
+     and nobody reads a panel to learn how many things are in it. A count
+     while NARROWING is different — it is feedback on what you just typed,
+     it cannot go stale, and it disappears with the query. */
+  var head='<div class="rhead"><div class="rtop"><span class="rlab">COMMANDS'+
+    (q?'<span class="n">'+hits.length+' matching</span>':'')+'</span>'+
+    '<span class="gl" style="font:italic 400 11px var(--font-serif);color:var(--marg)">'+
+    (REFGRP==='All'?'every verb and filter; one group at a time below':esc(GRPNOTE[REFGRP]||''))+'</span></div>'+
+    '<div class="chips">'+chips+'</div></div>';
+  var body=hits.length? '<div class="cols">'+order.map(function(g){
+      return '<div class="grp"><h4>'+g.toUpperCase()+'</h4>'+
+        groups[g].map(function(c){
+          var i=REFLIST.indexOf(c);
+          return '<button class="'+(i===REFSEL?'sel':'')+'" onclick="fillCmd(\''+c.s+'\')">'+
+            '<code>'+hl(c.eg||c.sig,q)+'</code><span class="gl">'+hl(c.g,q)+'</span></button>';}).join('')+'</div>';
+    }).join('')+'</div>'
+    : '<div class="nohit">nothing matches “'+esc(q)+'”; delete it, or pick another group</div>';
+  var foot=q||REFGRP!=='All'
+    ? 'Typing after the ? narrows this list. ↑ ↓ to move, Enter to take one, Escape to leave.'
+    : 'Every row carries its id. Tab completes, Enter runs, ↑ ↓ walk this list. '+
+      'new: begins, open: arrives. Filters stack: type:note model:opus since:7d. Commas mean or, a leading - means not. No ids means the collection.';
+  $id('cref').innerHTML=head+body+'<div class="foot">'+foot+'</div>';
+  var sel=$id('cref').querySelector('button.sel'); if(sel&&sel.scrollIntoView) sel.scrollIntoView({block:'nearest'});
+}
+function refOpen(){var r=$id('cref');return !!r&&r.classList.contains('open');}
+function openCmd(){
+  var f=$id('q'); f.focus(); f.value='>'; enterCmd();
+}
+function fillCmd(scheme){
+  var f=$id('q'), c=CMDS.filter(function(x){return x.s===scheme;})[0];
+  f.focus();
+  /* setQ enters prompt mode, and drawSuggest closes the reference on its way. */
+  if(c&&c.lead){ f.value=c.lead; setQ(c.lead); return; }
+  f.value='>'+scheme+':'; enterCmd(); drawSuggest();
+}
+function fillHelp(){var f=$id('q'); f.focus(); f.value='>?'; REFGRP='All'; REFSEL=0; enterCmd(); drawSuggest();}
+function runLine(){
+  var f=$id('q'), text=normLine(f.value.replace(/^>/,'')), cm=cmdOf(text);
+  var fl=parseFilterLine(text);
+  if(fl){ if(runFilterLine(fl)){ remember(f.value); var g0=$id('q'); g0.value='>'; g0.focus(); drawSuggest(); } return; }
+  if(!cm||!cm.c){ toast(text.trim()?'No command called that. Type <b>?</b> for every command.':'Type a command, or <b>?</b> for every command.'); return; }
+  var p=cm.c.pre(cm.arg)||{};
+  if(p.bad||!p.run){ toast(esc(p.bad||'Not finished yet.')); return; }
+  LASTCMD=cm.scheme+':'+cm.arg.trim();
+  remember(f.value);
+  /* Stay on the command line: one command usually leads to the next.
+     Escape is the way back to the search, which is still underneath. */
+  f.value='>';
+  p.run();
+  var g=$id('q'); if(g){ g.value='>'; if(!POPS.command||g.ownerDocument!==document) g.focus(); }
+  drawSuggest();
+}
+function completeLine(){
+  var f=$id('q'), raw=f.value.replace(/^>/,''), lt=lastToken(raw);
+  if(lt){ var p=lt.partial.toLowerCase(), v=valuesFor(lt.scheme).filter(function(x){return !p||x.v.toLowerCase().indexOf(p)===0||x.label.toLowerCase().indexOf(p)>-1;})[0];
+    if(v){ fillVal(v.v); return; } }
+  var q=raw.trim().toLowerCase();
+  if(!q||q.indexOf(':')>-1) return;
+  var hit=CMDS.filter(function(c){return c.s.indexOf(q)===0;})[0]||
+          CMDS.filter(function(c){return c.g.toLowerCase().indexOf(q)>-1;})[0];
+  if(hit){ f.value='>'+hit.s+':'; drawSuggest(); }
+}
+
+/* ═══ LEFT ═══ */
+function drawRail(){
+  var h='<div class="rgroup"><div class="rlabel">'+GLASS+'SAVED SEARCHES<span class="n">'+SEARCHES.length+'</span></div>';
+  SEARCHES.forEach(function(r,i){
+    h+='<button class="ritem'+(activeKept==='s'+i?' on':'')+'" onclick="openSearch('+i+')">'+
+      '<span class="rnm">'+esc(r.name)+'</span><span class="rds">'+esc(r.desc)+'</span></button>';
+  });
+  h+='</div><div class="rgroup"><div class="rlabel">'+FOLDER+'COLLECTIONS<span class="n">'+COLLECTIONS.length+'</span></div>';
+  COLLECTIONS.forEach(function(l,i){
+    h+='<button class="ritem'+(activeKept==='c'+i?' on':'')+'" onclick="openCollection('+i+')">'+
+      '<span class="rnm">'+esc(l.name)+'</span><span class="rds">'+esc(l.desc)+'</span></button>';
+  });
+  $id('rail').innerHTML=h+'</div>';
+}
+function openSearch(i){
+  activeKept='s'+i; ST=JSON.parse(JSON.stringify(SEARCHES[i].st)); ST.sort=ST.sort||'when'; ST.F=ST.F||[];
+  $id('q').value=ST.q;
+  toast('Every parameter at once. The collection is untouched.'); render();
+}
+function openCollection(i){
+  var l=COLLECTIONS[i]; activeKept='c'+i;
+  WS={name:l.name,dirty:false,items:l.ids.map(function(id){return {id:id,via:l.name,at:'Sep 12'};})};
+  CARDSEL=[]; toast('A saved collection is the same object, reopened.'); render();
+}
+function reRun(v){
+  $id('q').value=v.replace(/[“”]/g,'');
+  setQ(v.replace(/[“”]/g,''));
+  toast('Re-ran the search that brought it in.');
+}
+
+/* ═══ MIDDLE ═══ */
+function gridCols(){return '26px '+COLS.map(function(c){
+  return c==='title'?'minmax(124px,1fr)':WIDTH[c]+'px';}).join(' ');}
+function drawParams(){
+  var p=[];
+  if(ST.q)p.push(['Search','“'+ST.q+'”','q']);
+  if(ST.type!=='all')p.push(['Type',KIND[ST.type].label,'type']);
+  if(ST.room!=='all')p.push(['Room',ST.room,'room']);
+  if(ST.tag!=='all')p.push(['Tag',ST.tag,'tag']);
+  $id('params').innerHTML=p.map(function(x){
+    return '<span class="pill"><span class="k">'+x[0]+'</span>'+esc(x[1])+
+      (x[2]!=='sort'?'<button onclick="clearP(\''+x[2]+'\')" aria-label="Remove">×</button>':'')+'</span>';
+  }).join('')+(ST.F||[]).map(function(e,i){
+    return '<span class="pill"><span class="k">'+FLABEL[e.k]+'</span>'+esc(describeF(e))+
+      '<button onclick="clearF('+i+')" aria-label="Remove">×</button></span>';
+  }).join('');
+}
+function clearP(k){if(k==='q'){ST.q='';$id('q').value='';}else ST[k]='all';activeKept=null;render();}
+function saveSearch(name){
+  var d=[];
+  if(ST.q)d.push('the words '+ST.q);
+  if(ST.type!=='all')d.push('only '+KIND[ST.type].label.toLowerCase()+'s');
+  if(ST.room!=='all')d.push('in the '+ST.room);
+  if(ST.tag!=='all')d.push('tagged '+ST.tag);
+  (ST.F||[]).forEach(function(e){d.push(FLABEL[e.k].toLowerCase()+' '+describeF(e));});
+  d.push(ST.asc?'oldest first':'newest first');
+  SEARCHES.unshift({name:name||'Untitled search',desc:d.join(', '),query:canon(ST),st:JSON.parse(JSON.stringify(ST))});
+  activeKept='s0'; toast('Saved <b>'+esc(name||'Untitled search')+'</b>. It recomputes every time you open it.'); render();
+}
+function drawHead(){
+  var h='<span></span>';
+  COLS.forEach(function(c){
+    var H=HEAD[c],on=false,label=H.label;
+    if(c==='type'&&ST.type!=='all'){on=true;label=KIND[ST.type].label;}
+    if(c==='room'&&ST.room!=='all'){on=true;label=ST.room;}
+    if(c==='tags'&&ST.tag!=='all'){on=true;label=ST.tag;}
+    var inner = H.kind==='filter'
+      ? '<button class="hbtn'+(on?' on':'')+'" onclick="openMenu(event,\''+c+'\')">'+GRAB+'<span>'+esc(label)+'</span>'+DOWN+'</button>'
+      : H.kind==='sort'
+      ? '<button class="hbtn'+(ST.sort!==c?' idle':ST.asc?' asc':'')+'" onclick="flipSort(\''+c+'\')">'+GRAB+'<span>'+label+'</span>'+ARROW+'</button>'
+      : '<button class="hbtn" onclick="event.stopPropagation()">'+GRAB+'<span>'+label+'</span></button>';
+    h+='<span class="th '+H.align+'" draggable="true" data-col="'+c+'">'+
+      (c!=='type'?'<button class="grip" data-col="'+c+'" aria-label="Resize"></button>':'')+inner+'</span>';
+  });
+  var t=$id('thead'); t.innerHTML=h;
+  t.style.setProperty('--cols',gridCols()); wireHeadDrag();
+}
+function cellFor(c,it){
+  if(c==='type'){var K=KIND[it.k];return '<div class="c-type"><span class="kpill '+K.cls+'">'+K.svg+esc(K.label)+'</span></div>';}
+  if(c==='title'){
+    if(it.k==='high')return '<div class="c-title"><div class="t-q">'+esc(it.quote)+'</div></div>';
+    var s=it.body?esc(it.body[0]):it.sub?esc(it.sub):'';
+    var n=allMarks(it).length;
+    var mk=n?'<div class="t-mk">holds '+n+' marking'+(n===1?'':'s')+'</div>':'';
+    if(it.pin) mk='<div class="t-mk pin">pinned'+(n?' · holds '+n+' marking'+(n===1?'':'s'):'')+'</div>';
+    return '<div class="c-title"><div class="t-t">'+
+      esc(it.title)+'</div>'+(s?'<div class="t-s">'+s+'</div>':'')+mk+'</div>';
+  }
+  if(c==='room')return '<div class="c-room">'+esc(it.room)+'</div>';
+  if(c==='tags')return '<div class="c-tags">'+it.tags.map(function(t){return '<span class="tag '+t[0]+'">'+esc(t[1])+'</span>';}).join('')+'</div>';
+  if(c==='id')return '<div class="c-id">'+(200+it.id)+'</div>';
+  if(c==='add')return '<div class="c-when">'+dayLabel(it.add)+'</div>';
+  return '<div class="c-when">'+esc(it.when)+'</div>';
+}
+function drawRows(){
+  var key=ST.sort==='add'?'add':'ts';
+  var list=I.filter(matches).sort(function(a,b){
+    if(!!a.pin!==!!b.pin) return a.pin?-1:1;          /* pinned rows lead, whatever the sort */
+    return ST.asc?a[key]-b[key]||a.ts-b.ts:b[key]-a[key]||b.ts-a.ts;});
+  var cols=gridCols();
+  $id('rows').innerHTML=list.map(function(it){
+    var on=WS.items.some(function(p){return p.id===it.id;});
+    return '<div class="row grid'+(on?' picked':'')+'" style="--cols:'+cols+'" tabindex="0" '+
+      'onclick="toast(\'Would open it in the Symposium\')">'+
+      '<button class="cb'+(on?' on':'')+'" onclick="pick(event,'+it.id+')" aria-label="Add to collection">'+TICK+'</button>'+
+      COLS.map(function(c){return cellFor(c,it);}).join('')+'</div>';
+  }).join('');
+  $id('empty').classList.toggle('show',list.length===0);
+  var ar=I.filter(function(x){return x.arch;}).length;
+  $id('fcount').textContent=list.length+' of '+I.length+' shown'+(ar?', '+ar+' archived':'');
+  $id('fsel').textContent=WS.items.length?WS.items.length+' in collection':'';
+  wireGrips();
+}
+function openMenu(e,field){
+  e.stopPropagation();
+  var m=$id('menu');
+  if(menuFor===field){closeMenu();return;}
+  menuFor=field;
+  var key=field==='tags'?'tag':field,cur=ST[key],src=opts(field);
+  var h='<button class="'+(cur==='all'?'on':'')+'" onclick="setF(\''+key+'\',\'all\')">'+MTICK+
+    'All '+(field==='type'?'types':field)+'<span class="n">'+I.length+'</span></button>';
+  Object.keys(src).sort().forEach(function(k){
+    h+='<button class="'+(cur===k?'on':'')+'" onclick="setF(\''+key+'\',\''+esc(k)+'\')">'+MTICK+
+      esc(field==='type'?KIND[k].label:k)+'<span class="n">'+src[k]+'</span></button>';
+  });
+  var od=e.currentTarget.ownerDocument; if(m.ownerDocument!==od) od.body.appendChild(m);
+  m.innerHTML=h;m.classList.add('open');
+  var r=e.currentTarget.getBoundingClientRect(),w=m.offsetWidth;
+  m.style.left=Math.max(8,Math.min(od.defaultView.innerWidth-w-8,r.left))+'px';
+  m.style.top=(r.bottom+5)+'px';
+}
+function closeMenu(){menuFor=null;$id('menu').classList.remove('open');}
+document.addEventListener('click',closeMenu);
+function setF(k,v){ST[k]=v;activeKept=null;closeMenu();render();}
+function flipSort(c){if(c&&ST.sort!==c){ST.sort=c;ST.asc=false;}else ST.asc=!ST.asc;render();}
+function setQ(v){
+  /* Leaders count at the front only, so a >, a p> or an s> typed anywhere else
+     in a line is just characters.
+
+     Command keeps its > in the field, because deleting it is how you leave.
+     Prompt swallows its p>, so the field holds nothing but the question —
+     which means prompt needs a way out that is not a deletion: s> or search>,
+     or Escape. Deliberately not backspace on an empty field, the way an empty
+     chip works elsewhere — this field holds sentences, and a stray delete at
+     the start of one should not change what Enter does. */
+  var lead=v.match(/^(?:s|search)>/i);
+  if(lead){
+    var rest=v.slice(lead[0].length);
+    $id('q').value=rest;
+    if(PRM) exitPrm(false);
+    if(CMD) exitCmd(false);
+    ST.q=rest.trim().toLowerCase(); activeKept=null; render(); return;
+  }
+  if(v.indexOf('p>')===0){ $id('q').value=v.slice(2); enterPrm(); drawSuggest(); return; }
+  if(PRM){
+    if(v.indexOf('>')===0){ exitPrm(false); enterCmd(); drawSuggest(); return; }
+    drawSuggest(); return;   /* the question itself; the search underneath is untouched */
+  }
+  if(v.indexOf('>')===0){
+    /* The search underneath survives: save: needs it, and leaving the
+       command line should put you back where you were. */
+    enterCmd(); drawSuggest();
+    return;
+  }
+  if(CMD) exitCmd(false);
+  ST.q=v.trim().toLowerCase(); activeKept=null; render();
+}
+
+/* ═══ Working set ═══ */
+function pick(e,id){
+  e.stopPropagation();
+  var i=WS.items.findIndex(function(p){return p.id===id;});
+  WS.dirty=true;
+  if(i>-1){WS.items.splice(i,1);CARDSEL=CARDSEL.filter(function(x){return x!==id;});}
+  else{
+    var via=ST.q?'“'+ST.q+'”':ST.tag!=='all'?ST.tag:ST.room!=='all'?ST.room:ST.type!=='all'?KIND[ST.type].label:'browsing';
+    WS.items.push({id:id,via:via,at:today()});
+    var it=byId(id), n=allMarks(it).length;
+    if(n) toast('Brought '+n+' marking'+(n===1?'':'s')+' with it.');
+  }
+  render();
+}
+function unpick(id){WS.dirty=true;WS.items=WS.items.filter(function(p){return p.id!==id;});
+  CARDSEL=CARDSEL.filter(function(x){return x!==id;});render();}
+function cardTap(id){var i=CARDSEL.indexOf(id);if(i>-1)CARDSEL.splice(i,1);else CARDSEL.push(id);drawWS();}
+
+function markBlock(m,singled){
+  var inner = m.k==='high'
+    ? '<div class="mkq">'+esc(m.quote)+'</div>'
+    : '<div class="mkt">'+esc(m.title)+'</div><div class="mkp">'+esc((m.body||[]).join(' '))+'</div>';
+  var parts=(m.marg||[]).map(function(x){return {text:x[0]};});
+  parts.push({text:m.when});
+  if(singled) parts.push({text:'singled out'});
+  return '<div class="mk '+m.k+(singled?' singled':'')+'">'+inner+marginalia(parts)+'</div>';
+}
+
+function cardFor(p){
+  var it=byId(p.id),K=KIND[it.k],on=CARDSEL.indexOf(p.id)>-1;
+  var main, holds='';
+
+  if(it.k==='high') main='<div class="quote">'+esc(it.quote)+'</div>';
+  else if(it.k==='note') main='<div class="ttl">'+esc(it.title)+'</div><div class="prose">'+
+    it.body.map(function(x){return '<p>'+esc(x)+'</p>';}).join('')+'</div>';
+  else main='<div class="ttl">'+esc(it.title)+'</div>'+(it.sub?'<div class="prose">'+esc(it.sub)+'</div>':'');
+
+  if(isContainer(it)){
+    var singles=WS.items.map(function(x){return x.id;});
+    var body='';
+    if(it.k==='chat'){
+      var mk=marksOf(it);
+      body = mk.length ? mk.map(function(m){return markBlock(m,singles.indexOf(m.id)>-1);}).join('')
+                       : '<div class="holds-none">Nothing marked in this one yet.</div>';
+    }else{
+      var any=false;
+      chatsOf(it).forEach(function(c){
+        var mk=marksOf(c);
+        if(!mk.length) return;
+        any=true;
+        body+='<div class="runlb">'+esc(c.run||'')+(c.run?' · ':'')+esc(c.title)+'</div>'+
+          mk.map(function(m){return markBlock(m,singles.indexOf(m.id)>-1);}).join('');
+      });
+      if(!any) body='<div class="holds-none">Nothing marked across any run yet.</div>';
+    }
+    var n=allMarks(it).length;
+    holds='<div class="holds"><div class="holds-lb">HOLDS '+n+' MARKING'+(n===1?'':'S')+
+      (n?'<button onclick="event.stopPropagation();liftAll('+it.id+')">lift them out</button>':'')+'</div>'+body+'</div>';
+  }
+
+  return '<div class="mc'+(on?' on':'')+'" draggable="true" data-id="'+p.id+'" onclick="cardTap('+p.id+')">'+
+    '<div class="mc-top"><button class="cb'+(on?' on':'')+'" onclick="event.stopPropagation();cardTap('+p.id+')" aria-label="Select card">'+TICK+'</button>'+
+    '<span class="rowid">'+(200+it.id)+'</span>'+
+    '<span class="kpill '+K.cls+'">'+K.svg+esc(K.label)+'</span>'+
+    '<span class="mc-tags">'+it.tags.map(function(t){return '<span class="tag '+t[0]+'">'+esc(t[1])+'</span>';}).join('')+'</span>'+
+    '<button class="mc-rm" onclick="event.stopPropagation();unpick('+p.id+')" aria-label="Remove">×</button></div>'+
+    '<div class="mc-body">'+main+itemMarg(it,p)+holds+'</div></div>';
+}
+
+function liftAll(id){
+  var it=byId(id), added=0;
+  allMarks(it).forEach(function(m){
+    if(!WS.items.some(function(p){return p.id===m.id;})){
+      WS.items.push({id:m.id,via:'lifted from '+titleOf(it),at:today()}); added++;
+    }
+  });
+  toast(added?added+' lifted out as their own cards.':'All of them are already out.');
+  render();
+}
+
+function drawWS(){
+  var saved=!!WS.name;
+  $id('wshead').innerHTML=
+    '<span class="wsname">'+esc(WS.name||'Collection')+'</span>'+
+    '<span class="wskind '+(saved?'saved':'draft')+'">'+(saved?'SAVED':'UNSAVED')+'</span>'+
+    '<span class="wscount">'+WS.items.length+' item'+(WS.items.length===1?'':'s')+'</span>';
+
+  var b=$id('wsbody'),a=$id('wsacts');
+  if(!WS.items.length){
+    b.innerHTML='<div class="wsempty"><svg viewBox="0 0 24 24" fill="none">'+
+      '<path d="M4 7h16l-1.4 12.2a1.6 1.6 0 01-1.6 1.4H7a1.6 1.6 0 01-1.6-1.4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>'+
+      '<path d="M8.6 7V5.2A1.6 1.6 0 0110.2 3.6h3.6A1.6 1.6 0 0115.4 5.2V7" stroke="currentColor" stroke-width="1.3"/></svg>'+
+      '<p>Check anything on the left and it lands here, read in full.<br>A chat or a docket brings everything marked inside it.<br>Name it when you want to keep it.</p></div>';
+    a.innerHTML=''; return;
+  }
+  b.innerHTML='<div class="composer" id="composer" data-border="dot" data-radius="16"></div>'+WS.items.map(cardFor).join('');
+
+  var n=CARDSEL.length, scope = n ? '<b>'+n+' card'+(n===1?'':'s')+'</b> selected'
+    : 'Acting on the <b>whole set</b> · '+WS.items.length+' items';
+
+  /* Three text buttons of equal width, then the scope line and the trigger.
+     Prompt is gone as a button — the trigger IS Prompt, and stays put to
+     become Send once the composer is open. One glyph, one mark, two states. */
+  /* Card-scoped actions appear only when cards are selected. A permanently
+     disabled button leading the row was teaching people to ignore the row. */
+  var lbl=(COMPOSER?'Send to the Symposium':'Prompt with these');
+  var clean = !!WS.name && !WS.dirty;
+  a.innerHTML='<div class="wsacts">'+
+    '<span class="scopeline">'+scope+
+      (n?'<button class="lnk" onclick="CARDSEL=[];drawWS()">clear selection</button>':'')+
+      '<button class="lnk" onclick="clearWS()">clear set</button></span>'+
+    '<div class="btnrow">'+
+      (n>1?'<button data-border="dot" onclick="connect()">Connect</button>':'')+
+      (n>1?'<button data-border="dot" onclick="compare('+n+')">Compare</button>':'')+
+      '<button data-border="dot" onclick="addNote()">Add note</button>'+
+      '<button data-border="dot" '+(clean?'disabled':'')+' onclick="saveCollection()">'+
+        (clean?'Saved':'Save')+'</button>'+
+      '<button class="trigger" data-border="prog" data-radius="16" id="trigger" '+
+        'aria-expanded="'+(COMPOSER?'true':'false')+'" onclick="triggerHit()" '+
+        'aria-label="'+lbl+'" title="'+lbl+'">'+QUILL+'</button>'+
+    '</div></div>';
+  wireCardDrag();
+  if(COMPOSER) fillComposer();
+}
+
+/* Two items can show a true diff, because one is the baseline for the other.
+   More than two have no baseline, so they align into a column each — which
+   for runs of one docket is the nodes-down, runs-across matrix. Either way
+   it needs the middle card: four columns will not fit in 400px. */
+function compare(n){
+  toast(n===2
+    ? 'Two: a diff with change marks, opening in the middle card.'
+    : n+': a column each, aligned by what they share. Nominate one as the baseline for change marks.');
+}
+
+function connect(){
+  var name=prompt('Name the connection. It becomes a tag on all '+CARDSEL.length+' cards.','Model behaviour');
+  if(!name) return;
+  CARDSEL.forEach(function(id){var it=byId(id);
+    if(!it.tags.some(function(t){return t[1]===name;})) it.tags.push(['link',name]);});
+  toast('Tagged <b>'+esc(name)+'</b> on '+CARDSEL.length+' items.');
+  CARDSEL=[]; render();
+}
+function addNote(){
+  var text=prompt('Write a note about '+(CARDSEL.length?CARDSEL.length+' selected card(s)':'this set')+':','');
+  if(!text) return;
+  var about = CARDSEL.length ? CARDSEL.map(function(id){return titleOf(byId(id));}).slice(0,2).join(' + ') : WS.name||'this set';
+  var it={id:nextId++,k:'note',title:'Note written here',room:'Almanac',body:[text],add:45,
+    tags:[['mine','Written here']],when:today(),ts:1100,marg:[['about '+about]]};
+  I.push(it); WS.dirty=true; WS.items.unshift({id:it.id,via:'written here',at:today()});
+  CARDSEL=[]; toast('A real item. It shows up in searches too.'); render();
+}
+function saveCollection(){
+  var name=prompt(WS.name?'Rename or keep, then save:':'Name this collection:',
+                  WS.name||'Untitled collection');
+  if(!name) return;
+  var ids=WS.items.map(function(p){return p.id;});
+  var ex=COLLECTIONS.findIndex(function(l){return l.name===name;});
+  var rec={name:name,desc:ids.length+' things, in the order you put them',ids:ids};
+  if(ex>-1)COLLECTIONS[ex]=rec; else COLLECTIONS.unshift(rec);
+  WS.name=name; WS.dirty=false; activeKept=null; toast('Naming it is what keeps it.'); render();
+}
+function clearWS(){WS={name:null,items:[],dirty:false};CARDSEL=[];activeKept=null;COMPOSER=false;render();}
+
+function triggerHit(){ COMPOSER ? send() : openComposer(); }
+
+function openComposer(){ COMPOSER=true; drawWS(); paintAll();
+  var t=$id('ptext'); if(t) t.focus(); }
+
+/* Called from drawWS so the composer survives a re-render of the set. */
+function fillComposer(){
+  var c=$id('composer');
+  if(!c) return;
+  var ids=CARDSEL.length?CARDSEL:WS.items.map(function(p){return p.id;});
+  var expanded=0; ids.forEach(function(id){expanded+=1+allMarks(byId(id)).length;});
+  c.innerHTML='<span class="lb">CONTEXT · '+expanded+' pieces</span><div class="ctx">'+
+    ids.map(function(id){var it=byId(id),n=allMarks(it).length;
+      return '<span>'+esc(KIND[it.k].label)+' · '+esc(titleOf(it)).slice(0,22)+'…'+(n?' +'+n:'')+'</span>';}).join('')+'</div>'+
+    '<textarea id="ptext" placeholder="Ask anything about these…"></textarea>'+
+    '<div class="sugg"><button onclick="fillP(\'Summarize these and say what they have in common.\')">Summarize these</button>'+
+    '<button onclick="fillP(\'Where do these disagree?\')">Where do they conflict?</button>'+
+    '<button onclick="fillP(\'Draft an opening that uses all of these.\')">Draft from these</button></div>'+
+    '<div class="cfoot"><button class="ghost" onclick="closeComposer()">Cancel</button></div>';
+  c.classList.add('open');
+}
+function fillP(t){$id('ptext').value=t;}
+function closeComposer(){COMPOSER=false;$id('composer').classList.remove('open');drawWS();paintAll();}
+function send(){
+  COMPOSER=false;
+  $id('composer').classList.remove('open');
+  drawWS(); paintAll();
+  toast('Opens a Symposium with these attached. The Almanac still never executes.');
+}
+
+/* ═══ Drag and resize ═══ */
+var dragCol=null;
+function wireHeadDrag(){
+  qsa('.th[draggable]').forEach(function(th){
+    th.ondragstart=function(e){dragCol=th.dataset.col;e.dataTransfer.effectAllowed='move';};
+    th.ondragover=function(e){e.preventDefault();th.classList.add('dragover');};
+    th.ondragleave=function(){th.classList.remove('dragover');};
+    th.ondrop=function(e){e.preventDefault();th.classList.remove('dragover');
+      var f=COLS.indexOf(dragCol),t=COLS.indexOf(th.dataset.col);
+      if(f<0||t<0||f===t)return;
+      COLS.splice(t,0,COLS.splice(f,1)[0]); render();};
+  });
+}
+var rz=null;
+function wireGrips(){
+  qsa('.grip').forEach(function(g){
+    g.onmousedown=function(e){e.preventDefault();e.stopPropagation();
+      rz={c:g.dataset.col,x:e.clientX,w:WIDTH[g.dataset.col]};document.body.style.cursor='col-resize';};
+    g.onclick=function(e){e.stopPropagation();};
+    g.onkeydown=function(e){var c=g.dataset.col,s=e.shiftKey?24:8;
+      if(e.key==='ArrowLeft'){e.preventDefault();WIDTH[c]=Math.min(MAX[c],WIDTH[c]+s);render();}
+      if(e.key==='ArrowRight'){e.preventDefault();WIDTH[c]=Math.max(MIN[c],WIDTH[c]-s);render();}};
+  });
+}
+function onRzMove(e){
+  if(!rz)return;
+  WIDTH[rz.c]=Math.min(MAX[rz.c],Math.max(MIN[rz.c],rz.w-(e.clientX-rz.x)));
+  var cols=gridCols();
+  $id('thead').style.setProperty('--cols',cols);
+  qsa('#rows .row').forEach(function(r){r.style.setProperty('--cols',cols);});
+}
+function onRzUp(){if(rz){rz=null;document.body.style.cursor='';}}
+window.addEventListener('mousemove',onRzMove);
+window.addEventListener('mouseup',onRzUp);
+
+var cFrom=null;
+function wireCardDrag(){
+  document.querySelectorAll('.mc').forEach(function(el){
+    el.ondragstart=function(){cFrom=+el.dataset.id;el.classList.add('dragging');};
+    el.ondragend=function(){el.classList.remove('dragging');};
+    el.ondragover=function(e){e.preventDefault();el.classList.add('dragover');};
+    el.ondragleave=function(){el.classList.remove('dragover');};
+    el.ondrop=function(e){e.preventDefault();el.classList.remove('dragover');
+      var to=WS.items.findIndex(function(p){return p.id===+el.dataset.id;});
+      var from=WS.items.findIndex(function(p){return p.id===cFrom;});
+      if(from<0||to<0||from===to)return;
+      WS.items.splice(to,0,WS.items.splice(from,1)[0]); WS.dirty=true; drawWS();};
+  });
+}
+
+function render(){drawSuggest();drawRail();drawParams();drawHead();drawRows();drawWS();drawDockPops();
+  for(var k in POPS){try{var b=POPS[k].win.document.body;b.className=document.body.className.replace(/\baddressed\b/,'')+' popwin';}catch(e){}}
+  paintAll();placeBar();}
+applyLayout();
+render();
+window.addEventListener('load',paintAll);
+var KEYWIN=null;
+function focusField(){
+  var f=$id('q'); if(!f) return;
+  if(POPS.command){ try{POPS.command.win.focus();}catch(e){} }
+  f.focus(); var n=f.value.length; try{f.setSelectionRange(n,n);}catch(e){}
+}
+function onKey(e){
+  var f=$id('q'); if(!f) return;
+  KEYWIN=(e.target&&e.target.ownerDocument&&e.target.ownerDocument.defaultView)||window;
+  var inField=f.ownerDocument.activeElement===f;
+  var t=e.target, typing=t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable);
+  /* / jumps to the field from anywhere that isn't already taking text */
+  if(e.key==='/'&&!typing&&!e.metaKey&&!e.ctrlKey&&!e.altKey){ e.preventDefault(); focusField(); return; }
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){
+    e.preventDefault(); focusField();
+    if(CMD){ exitCmd(true); setQ(f.value); }
+    else { f.value='>'; enterCmd(); }
+    return;
+  }
+  if(CMD&&inField&&refOpen()&&(e.key==='ArrowDown'||e.key==='ArrowUp')){
+    e.preventDefault(); REFSEL+=(e.key==='ArrowDown'?1:-1);
+    if(REFSEL<0)REFSEL=REFLIST.length-1; if(REFSEL>=REFLIST.length)REFSEL=0; drawSuggest(); return; }
+  if(CMD&&inField&&refOpen()&&e.key==='Enter'){ e.preventDefault(); if(REFLIST[REFSEL]) fillCmd(REFLIST[REFSEL].s); return; }
+  if(PRM&&inField&&e.key==='Enter'){ e.preventDefault(); runPrompt(); return; }
+  if(CMD&&inField&&e.key==='Enter'){ e.preventDefault(); HPOS=-1; runLine(); return; }
+  if(CMD&&inField&&e.key==='Tab'){ e.preventDefault(); completeLine(); return; }
+  if(CMD&&inField&&(e.key==='ArrowUp'||e.key==='ArrowDown')){ if(histStep(e.key==='ArrowUp'?-1:1)) e.preventDefault(); return; }
+  if(e.key==='Escape'){
+    closeMenu();
+    var pk=$id('peek'); if(pk&&pk.classList.contains('open')){ PEEK=null; drawPeek(null); if(f.value!=='>'){f.value='>';drawSuggest();} return; }
+    if(PRM){ exitPrm(true); setQ(f.value); return; }
+    if(CMD){ exitCmd(true); setQ(f.value); }
+  }
+}
+document.addEventListener('keydown',onKey);
+</script>
+</body>
+</html>
