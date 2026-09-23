@@ -34,6 +34,28 @@ Line numbers are approximate.
 - **C18 and C19. Every chat belongs to a docket.** No chat stands alone. This overrides D §3.3, which assumed standalone chats. For the migration, existing chats may become dockets of their own. How branch families map is still open.
 - **C20. Favorites fold into pins.** Users can tag a pin `favorite` themselves. The message-level detail is still open.
 
+**Ruled 23 September 2026, second round:**
+
+- **Part 1 is confirmed, with two changes.**
+  - **S2:** the picker has three groups: models, local models, and sources that are not models (Wikipedia and the like). This overrides A §8's "no groups".
+  - **S6:** every surface advertises both `/` and ⌘K. `/` still types a slash while the cursor is in a text field. ⌘K works everywhere.
+- **C1.** Room is stored on the branch within each run, so a new run can change it. Steps show a room only when they override.
+- **C5. The key element and its progressive dash are old design and are discarded.** This includes the `prog` tier of the border engine and the trigger's dash.
+  - The search, command and prompt field is built exactly as in the mockups.
+  - The mockups are the explicit design instruction and the most up to date.
+  - The structural dotted border stays wherever the mockups draw it.
+- **C6.** A popped Almanac can run. Each window keeps its own bar, and the navy rule shows which one is addressed.
+- **C14. BroadcastChannel** is used between tabs, with Web Locks so only one tab executes a run. Pop-outs share the opener's state directly.
+  - Security rule: messages carry ids and signals only, never message content or keys.
+- **C15, follow-up.**
+  - Multi-provider support (Mistral, Ollama) is in this refactor.
+  - The Guardian is a future source.
+  - arXiv, Europe PMC, Open Library, Openverse and Wikidata come later, unless one proves trivial.
+  - This refactor ships Wikipedia, Hacker News and OpenAlex.
+- **C17, follow-up.** Numbering starts at 201, so every id has at least three digits and never reads as a run or step number. There is no upper digit limit.
+- **C18.** Each existing branch family becomes one docket: the root is branch A and each fork takes the next letter, all in run 1. The migration is shown before it runs.
+- **C20, follow-up.** Each favorited message becomes a pinned highlight of that message.
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it
@@ -278,13 +300,18 @@ cites that are missing from the repo are gone.
 ## Hard constraints (do not relax without scope review)
 
 - Pure client-side. No backend, no servers, no accounts.
-- Strict CSP. Scripts from self only. Connections to self, `api.anthropic.com`,
-  and the named source hosts listed in `netlify.toml` (one per shipped source
-  manifest). No third-party scripts, analytics or tracking.
+- Strict CSP. Scripts from self only. Connections only to self, the model
+  providers (Anthropic, Mistral, Ollama on localhost) and the named source
+  hosts (Wikipedia, Hacker News via Algolia, OpenAlex), each listed in
+  `netlify.toml`. A new host is added only with its provider or source. No
+  third-party scripts, analytics or tracking.
+- Cross-window messages (BroadcastChannel) carry ids and signals only, never
+  content or keys.
 - API key encrypted at rest via Web Crypto (AES-GCM, non-extractable). Web
   Crypto only for anything cryptographic.
 - Provider abstraction always. Model calls go through `src/providers/`,
-  against the interface in `src/providers/base.js`.
+  against the interface in `src/providers/base.js`. Every provider key is
+  encrypted the same way as the Anthropic key.
 - Stored data: never run a migration or schema change without showing it
   first. Every backup ever written must stay readable.
 - Nothing is deleted without explicit approval, item by item. Prefer
