@@ -1,0 +1,238 @@
+import { useState } from 'react'
+import { parseBackupFile, decryptBackup, contentsToFlatStores } from '../lib/backup'
+import { initDB } from '../lib/db'
+import { planV6Migration } from '../lib/migrations/v6Plan'
+
+// Dry run of the schema v6 migration (change-plan.md 1.6). Dev only, at
+// /dev/migration. Reads a .parliament backup, or this browser's data, runs
+// the migration plan in memory, and shows what it would do. Writes nothing.
+//
+// Styled inline with the mockups' values until area 2 lands shared tokens.
+
+const C = {
+  paper: '#FCFCFA', surface: '#FFFFFF', subtle: '#FAF9F5', ink: '#191919', ink2: '#787774', ink3: '#9B9A97',
+  border: '#E9E9E7', border2: '#F1F1EF', wash: 'rgba(25,25,25,.045)',
+  sans: '-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif',
+  serif: '"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif',
+  mono: 'ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace',
+}
+
+const STATUS_STYLE = {
+  done: { background: 'rgba(25,25,25,.075)', color: C.ink2 },
+  paused: { border: '.5px dashed rgba(25,25,25,.30)', color: C.ink3 },
+  waiting: { border: '.5px dashed rgba(25,25,25,.30)', color: C.ink2 },
+  running: { background: C.ink, color: C.paper },
+}
+
+async function readThisBrowser() {
+  const db = await initDB()
+  return {
+    conversations: await db.getAll('conversations'),
+    messages: await db.getAll('messages'),
+    notes: await db.getAll('notes'),
+    highlights: await db.getAll('highlights'),
+    favorites: await db.getAll('favorites'),
+    settings: await db.getAll('settings'),
+  }
+}
+
+export default function MigrationPreview() {
+  const [file, setFile] = useState(null)
+  const [password, setPassword] = useState('')
+  const [source, setSource] = useState('')
+  const [report, setReport] = useState(null)
+  const [error, setError] = useState('')
+  const [working, setWorking] = useState(false)
+
+  const run = async (label, loadSnap) => {
+    setWorking(true)
+    setError('')
+    setReport(null)
+    try {
+      const snap = await loadSnap()
+      setReport(planV6Migration(snap).report)
+      setSource(label)
+    } catch (e) {
+      setError(e?.message || 'Could not read that.')
+    } finally {
+      setWorking(false)
+    }
+  }
+
+  const fromFile = () => run(file.name, async () => {
+    const parsed = await parseBackupFile(file)
+    const contents = await decryptBackup(parsed, password || null)
+    return contentsToFlatStores(contents)
+  })
+
+  const btn = {
+    font: `500 13px ${C.sans}`, padding: '7px 13px', borderRadius: 8, cursor: 'pointer',
+    color: C.ink, background: C.surface, border: `1px solid ${C.ink3}`,
+  }
+
+  return (
+    <div style={{ minHeight: '100vh', background: C.paper, color: C.ink, font: `400 14px ${C.sans}`, padding: '40px 16px 80px' }}>
+      <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+        <h1 style={{ font: `500 20px ${C.sans}`, margin: 0 }}>Migration dry run</h1>
+        <p style={{ margin: '6px 0 0', font: `italic 400 13px ${C.serif}`, color: C.ink2 }}>
+          What the schema v6 upgrade would do to this data. Nothing is written.
+        </p>
+
+        <Card>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'end' }}>
+            <label style={{ font: `500 12px ${C.sans}`, color: C.ink2 }}>
+              Backup file
+              <input type="file" accept=".parliament,.json,.apb" onChange={(e) => setFile(e.target.files?.[0] || null)}
+                style={{ display: 'block', marginTop: 6, font: `400 13px ${C.sans}` }} />
+            </label>
+            <label style={{ font: `500 12px ${C.sans}`, color: C.ink2 }}>
+              Password, if encrypted
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="off"
+                style={{ display: 'block', marginTop: 6, padding: '6px 9px', font: `400 13px ${C.sans}`, border: `1px solid ${C.border}`, borderRadius: 6 }} />
+            </label>
+            <button type="button" style={btn} disabled={!file || working} onClick={fromFile}>Read the backup</button>
+            <span style={{ font: `italic 400 13px ${C.serif}`, color: C.ink3 }}>or</span>
+            <button type="button" style={btn} disabled={working} onClick={() => run("this browser's data", readThisBrowser)}>
+              Read this browser&apos;s data
+            </button>
+          </div>
+          {error && <p style={{ margin: '12px 0 0', color: C.ink }}>{error}</p>}
+          {working && <p style={{ margin: '12px 0 0', font: `italic 400 13px ${C.serif}`, color: C.ink2 }}>Reading…</p>}
+        </Card>
+
+        {report && <Report report={report} source={source} />}
+      </div>
+    </div>
+  )
+}
+
+function Card({ children, style }) {
+  return (
+    <div style={{ background: C.surface, borderRadius: 16, padding: '18px 20px', marginTop: 20, boxShadow: '0 1px 2px rgba(40,36,28,.035)', ...style }}>
+      {children}
+    </div>
+  )
+}
+
+function H2({ children }) {
+  return <h2 style={{ font: `500 15px ${C.sans}`, margin: '0 0 10px' }}>{children}</h2>
+}
+
+function Report({ report, source }) {
+  const c = report.counts
+  const facts = [
+    [c.chats, 'chats'],
+    [c.dockets, 'dockets'],
+    [c.multiBranchDockets, 'dockets with more than one branch'],
+    [c.branches, 'branches'],
+    [c.steps, 'steps'],
+    [c.notes, 'notes numbered'],
+    [c.highlights, 'highlights numbered'],
+    [c.favoritesToHighlights, 'favorites become pinned highlights'],
+    [c.scratchpadToNote, 'scratchpad becomes a note'],
+  ]
+  return (
+    <>
+      <Card>
+        <H2>Summary</H2>
+        <p style={{ margin: '0 0 12px', font: `italic 400 13px ${C.serif}`, color: C.ink2 }}>From {source}.</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: '8px 24px' }}>
+          {facts.map(([n, label]) => (
+            <div key={label}><span style={{ font: `500 16px ${C.sans}` }}>{n}</span> <span style={{ color: C.ink2 }}>{label}</span></div>
+          ))}
+        </div>
+        <p style={{ margin: '14px 0 0', color: C.ink2 }}>
+          Numbers run from <Mono>{c.firstNum}</Mono> to <Mono>{c.lastNum}</Mono>. The next new item takes <Mono>{c.nextNum}</Mono>.
+          Branch states: {Object.entries(c.branchStatus).map(([s, n]) => `${n} ${s}`).join(', ') || 'none'}.
+        </p>
+      </Card>
+
+      {report.warnings.length > 0 && (
+        <Card>
+          <H2>Worth knowing</H2>
+          <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.6 }}>
+            {report.warnings.map((w) => <li key={w}>{w}</li>)}
+          </ul>
+        </Card>
+      )}
+
+      <Card style={{ padding: 0, overflow: 'hidden' }}>
+        <div style={{ padding: '18px 20px 6px' }}><H2>Dockets</H2></div>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', font: `400 13px ${C.sans}` }}>
+            <thead>
+              <tr style={{ background: C.subtle, color: C.ink2, textAlign: 'left' }}>
+                {['Address', 'Branch', 'Chat', 'Room', 'Steps', 'State', 'Forked from'].map((h) => (
+                  <th key={h} style={{ padding: '8px 12px', fontWeight: 500, whiteSpace: 'nowrap' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {report.dockets.map((d) => (
+                <DocketRows key={d.num} d={d} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      {report.favorites.length > 0 && (
+        <Card>
+          <H2>Favorites becoming pinned highlights</H2>
+          {report.favorites.map((f) => (
+            <div key={f.num} style={{ padding: '6px 0', borderTop: `.5px solid ${C.border2}` }}>
+              <Mono>{f.num}</Mono> <span style={{ color: C.ink2 }}>{f.excerpt}</span>{' '}
+              <span style={{ font: `italic 400 12px ${C.serif}`, color: C.ink3 }}>in chat {f.chatNum}, {f.chatTitle}</span>
+            </div>
+          ))}
+        </Card>
+      )}
+
+      {report.newNotes.length > 0 && (
+        <Card>
+          <H2>New notes</H2>
+          {report.newNotes.map((n) => (
+            <div key={n.num}><Mono>{n.num}</Mono> <span style={{ color: C.ink2 }}>{n.excerpt}</span> <span style={{ font: `italic 400 12px ${C.serif}`, color: C.ink3 }}>from the {n.from}</span></div>
+          ))}
+        </Card>
+      )}
+    </>
+  )
+}
+
+function DocketRows({ d }) {
+  return (
+    <>
+      <tr style={{ borderTop: `.5px solid ${C.border}` }}>
+        <td style={{ padding: '10px 12px 4px' }}><Mono>{d.num}</Mono></td>
+        <td colSpan={6} style={{ padding: '10px 12px 4px', fontWeight: 500 }}>{d.title}</td>
+      </tr>
+      {d.branches.map((b) => (
+        <tr key={b.address} style={{ color: C.ink }}>
+          <td style={{ padding: '3px 12px 3px 24px' }}><Mono>{b.address}</Mono></td>
+          <td style={{ padding: '3px 12px' }}>{b.name}</td>
+          <td style={{ padding: '3px 12px' }}><Mono>{b.chatNum}</Mono></td>
+          <td style={{ padding: '3px 12px', font: `italic 400 12px ${C.serif}`, color: C.ink2 }}>{b.room || 'no room'}</td>
+          <td style={{ padding: '3px 12px' }}>{b.steps}{b.paused ? <span style={{ color: C.ink3 }}>{`, ${b.paused} paused`}</span> : null}</td>
+          <td style={{ padding: '3px 12px' }}>{b.status === 'ready' ? null : <Chip status={b.status} />}</td>
+          <td style={{ padding: '3px 12px', font: `italic 400 12px ${C.serif}`, color: C.ink2 }}>
+            {b.forkedFrom ? `chat ${b.forkedFrom.chatNum}${b.forkedFrom.step ? `, at step ${b.forkedFrom.step}` : ''}` : ''}
+          </td>
+        </tr>
+      ))}
+    </>
+  )
+}
+
+// Status pill as the docket mockup draws it. Ready is silent.
+function Chip({ status }) {
+  return (
+    <span style={{ display: 'inline-flex', font: `500 10px ${C.sans}`, padding: '2px 7px', borderRadius: 9, ...STATUS_STYLE[status] }}>
+      {status}
+    </span>
+  )
+}
+
+function Mono({ children }) {
+  return <span style={{ font: `400 12px ${C.mono}`, color: C.ink3 }}>{children}</span>
+}

@@ -25,6 +25,11 @@ import DbStateNotice from './components/DbStateNotice'
 // Dev-only catalog inspection surface (PR-2). Lazy-imported and registered
 // only when import.meta.env.DEV is true so production builds don't ship the
 // chunk or expose the route.
+// Dev-only migration dry run (change-plan.md 1.6). Reads, never writes.
+const MigrationPreview = import.meta.env.DEV
+  ? lazy(() => import('./views/MigrationPreview'))
+  : null
+
 const CatalogDebugView = import.meta.env.DEV
   ? lazy(() => import('./views/CatalogDebugView'))
   : null
@@ -64,6 +69,18 @@ export default function App() {
                   <Route path="/edit/:roomId" element={<ErrorBoundary inline><EditorView scope="room" /></ErrorBoundary>} />
                   <Route path="/edit-home" element={<ErrorBoundary inline><EditorView scope="homepage" /></ErrorBoundary>} />
                   <Route path="/build" element={<ErrorBoundary inline><BuildView /></ErrorBoundary>} />
+                  {MigrationPreview && (
+                    <Route
+                      path="/dev/migration"
+                      element={
+                        <ErrorBoundary inline>
+                          <Suspense fallback={null}>
+                            <MigrationPreview />
+                          </Suspense>
+                        </ErrorBoundary>
+                      }
+                    />
+                  )}
                   {CatalogDebugView && (
                     <Route
                       path="/catalog"
