@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import '@fontsource-variable/inter'
 import './index.css'
 import App from './App'
+import UpgradeGate from './components/UpgradeGate'
 import { installFetchLogger } from './lib/networkLog'
 
 installFetchLogger()
@@ -25,6 +26,8 @@ try {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <UpgradeGate>
+      <App />
+    </UpgradeGate>
   </StrictMode>
 )
