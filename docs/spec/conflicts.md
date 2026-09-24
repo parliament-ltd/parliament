@@ -257,6 +257,65 @@ covers all of them.
 - The current Anthropic lineup is Opus 5.5, Sonnet 5, Haiku 4.5 and Fable 5.1.
 - **Suggestion:** update the provider's model list to the current lineup when the picker is built. Cost marks are stored per model as fixed multipliers, as A §8 intends. Which models appear is your call.
 
+## Part 3b. Settings (added 24 September 2026)
+
+From `settings-spec-decisions.md` and `parliament_settings_v1.html`, both dated
+23 September. Abbreviations: **St** = the Settings decisions doc, **v1** = the
+Settings mockup.
+
+**C27. Picker groups.**
+- St §14.1 and v1 divergence 1 keep the answered-by picker as one flat list with no groups, and group by provider only on Settings.
+- Your earlier ruling (Part 1, S2 as amended) gives the picker three groups: models, local models, and sources.
+- **Suggestion:** keep your ruling for the picker, and keep St's provider groups on Settings. The two lists do different jobs: choosing an answerer, and managing keys.
+
+**C28. The source list on Settings.**
+- St §8 lists Wikipedia, arXiv, Europe PMC, Hacker News, Open Library, Openverse, Wikidata, OpenAlex and News.
+- Your C15 rulings put only Wikipedia, Hacker News and OpenAlex in this refactor, and drop arXiv, which cannot be reached from a browser.
+- **Suggestion:** Settings lists the sources that ship. Others appear as they ship. arXiv does not appear.
+
+**C29. Which shortcut the hint line shows.**
+- St §5 and v1: "/ or ⌘K" when focus is outside a field, "⌘K" alone when it is inside one, because `/` types a slash there.
+- Your S6 ruling: reference both on every surface.
+- **Suggestion:** St's version, on every surface. Both keys are shown everywhere, except while the cursor is in a text field, where only the one that works is shown. It is consistent across surfaces and never advertises a key that does nothing.
+
+**C30. A popped command line and the navy rule.**
+- St §7: a popped command line is a panel and does not wear the rule; the docket mockup's popped bar should lose its rule. This matches A §7.
+- v12 (and change plan 2.9 and 2.10) drew the rule on a popped bar.
+- **Suggestion:** St. The change plan is updated to match.
+
+**C31. The rule follows the section.**
+- St §3: on a long, sectioned surface the navy rule marks the addressed section and slides as you scroll, replacing the page-edge rule.
+- A §7 says the page. St records this as a deliberate generalisation, and the Almanac keeps the page rule.
+- **Suggestion:** build it on Settings. The docket waits, per St §16.5.
+
+**C32. Desks on Settings.**
+- St §12 lists "desks on this device", made with `arrange:save`.
+- `arrange:` is out of scope for this refactor.
+- **Suggestion:** leave the desks list out until `arrange:` is built. An empty list for a feature that does not exist would be the dead option St §12 warns against for themes.
+
+**C33. Finding Ollama on your machine.**
+- St §6 has the key panel say "no key · found on your machine" for Ollama. Knowing that means calling `localhost:11434`.
+- Chrome, and soon Firefox, show a local network permission prompt the first time a site calls localhost (change plan, network check results). Probing every time Settings or `api:` opens would put that prompt in front of people who never use Ollama.
+- **Suggestion:** probe only after you ask: a Check button on the Ollama row, or once Ollama has been chosen as a model. Until then it says "not checked". On Safari it says Ollama cannot be reached from Safari, greyed rather than hidden.
+
+**C34. Cost marks still owed.**
+- St §16.1: marks for Fable 5.1, Mistral Large and Mistral Small are `×?`.
+- **Suggestion:** compute each mark from the provider's published price per token against Haiku 4.5, rounded, and fix it in the model list. I need current prices for those three. Tell me the marks, or I look them up when area 6 starts.
+
+**C35. Backup version rule.**
+- St §11: "a file with no version field is format 1. Every backup written so far has none."
+- In fact every `.parliament` file already carries `version: 1` (`backup.js` since PR-9). The older `.apb` and JSON exports carry one too.
+- The rule is still worth having, and it is cheap. **Suggestion:** a `parliament-backup` file with no version field is read as format 1 instead of rejected. The other two rules, refusing newer files with a message and keeping migrations forever with fixtures, already hold since area 0.
+
+**C36. Settings in the plan.**
+- Earlier ruling: Settings only takes the new fonts and colours in this refactor.
+- St and v1 are a full redesign. It depends on:
+  - the bar (area 2)
+  - keys and models (area 6)
+  - run cost, for "this month" and the warn threshold (area 8)
+  - the backup changes (area 0, done)
+- **Suggestion:** Settings becomes its own area in the change plan, after area 6. The parts that need run cost land with area 8.
+
 ## Part 4. Code issues found on the way (not spec conflicts)
 
 - **Cmd/Ctrl+Shift+B is bound twice.** It opens the branch panel (`BranchShortcutHandler.jsx:41`) and the backup modal (`BackupContext.jsx:53`) at once on chat pages.

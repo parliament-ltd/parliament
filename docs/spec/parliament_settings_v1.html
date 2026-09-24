@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Parliament · Settings v1</title>
+<!--
+
+PARLIAMENT · SETTINGS v1
+Redesign of /settings (snapshot parliament-settings-current.html, main 5ac8a1d)
+in the style of parliament_almanac_v30.html. Follows almanac-spec-decisions.md
+(23 Sept 2026) and docket-spec-decisions.md (22 Sept 2026).
+Reference material, not production code. Dated 23 September 2026.
+
+WHICH DOCUMENT WINS
+  This comment is the record for everything the mockup demonstrates. The
+  Almanac spec wins over it wherever the spec speaks; the divergences that
+  remain are listed at the foot, each with a reason.
+
+THE SURFACE
+  · Settings is a surface, so it has the bar. The bar stays at the top as the
+    one thing present on every surface; it is how you arrive and how you leave.
+  · Sections are stacked in one card. The left rail is an index, in the shape
+    of the Almanac's saved-searches rail, and follows the scroll. The live app
+    shows one section at a time; that changes.
+  · Each section has an alias, shown beside its title the way ids are shown:
+    mono, ink-3, no fill, never changes colour. It is what you type after
+    open:settings. Sections are registered in PANELS with aliases (spec §9).
+  · The navy rule marks the addressed section, not the page edge. It sits on
+    the card's left edge beside the section you are in and slides as you
+    scroll, as open: lands and as set: changes something. It is always on,
+    as frame (spec §7). It travels inside the card, so a popped Settings
+    window carries it and the page it left has none.
+  · Gold is the live action and nothing else: keyboard focus, an engaged key
+    field, marginalia under the pointer. Every former gold use is ink.
+    Selection is the table's ink wash.
+  · Help text is plain sans in ink-2. Italic serif means marginalia, and
+    marginalia is always clickable. Rail descriptions stay italic because they
+    sit inside a button.
+  · Copy is sentence case with no em dashes. "API Configuration" is "API keys".
+
+THE BAR ON THIS SURFACE
+  Search      finds settings. It narrows the card to matching rows and says how
+              many match. It never interprets.
+  Command     open:settings <section>   scroll to and address a section
+              pop:settings [section]    Settings in its own window; pop:back returns it
+              set:<name> <value>        change a setting; the Enter line says
+                                        what Enter will do, in full, first
+              api:                      your keys, in a panel under the field
+              api:<provider>  api:new   that provider's field; new is the first without a key
+              bar:<where>               top, bottom, left, right, pop or dock
+              backup:  restore:  undo:  help / ?
+              alm:  sym:  lab:  open:<id>   leave Settings (navigation)
+  Prompt      p> hands a question to the Symposium. Settings travel with nothing.
+  The hint line advertises / and ⌘K when focus is outside a field, and ⌘K only
+  when focus is in one, because / is a character there.
+
+  No keys in the command line, for security. The line keeps a history, and a
+  voice command would speak the key aloud. api: is the fast path, on every
+  surface: it opens a panel under the field listing each provider and its
+  key. api:mistral opens that field in the panel, empty if Mistral has no key
+  and for replacing if it has one. api:new opens the first provider without
+  a key; the Enter line names it first. The panel is a peek, not a window
+  and not a trip to Settings: a key is a ten-second errand taken in the
+  middle of something else. Escape returns to the command line. A key typed
+  after the provider is refused before Enter, and history never keeps a line
+  that looks like one. set:key points at api:.
+  Not yet: new:api as an alias for api:new, for people who reach for new:.
+
+  bar: works as in the Almanac (spec §4). top and bottom are lines; left and
+  right are squares that reserve three lines for the Enter line; pop opens
+  the command line in its own window and keeps its shape; any position
+  implies dock. The popped command line is a panel, so it does not wear the
+  rule; its commands still act on Settings, and the Enter line names the
+  target at its head. The position is kept per device.
+
+  undo: covers set: and every click on this page. It does not reach
+  "Delete everything", which is not a command at all.
+
+API KEYS (spec §8, with one divergence below)
+  One section holds the providers, their keys, and the models each key
+  unlocks. The default for new chats is chosen here, from the same rows, so a
+  key sits next to the cost it unlocks. Auto is the default: lookups go to a
+  source at 0 tokens, everything else to the model named in its marginalia.
+  A provider without a key shows its models in ink-3; they cannot be picked,
+  and their marginalia takes you to the key field.
+  Ollama needs no key, only OLLAMA_ORIGINS set so the browser may reach it.
+  Sources are listed read-only (spec: not yet configurable). They carry no
+  mark column, since they are not models; the group's marginalia says 0
+  tokens once. OpenAlex takes an
+  optional key, which raises its rate limit.
+  "Remember my keys / Don't save" is one setting for all providers.
+
+SPENDING
+  Marks where you are choosing, dollars where you are billed. The session
+  figures are gone: cost belongs to the run. The section shows this month's
+  spend and the costliest recent runs. New: a threshold at which the Enter
+  line warns before a run, because the Enter line is now the only guard on
+  execution (spec §5.1). Budget alerts remain informational; hard caps belong
+  to each provider's console.
+
+CONTEXT AND DEFAULTS
+  "Automatic" compression is gone. It would write a branch into a docket, or
+  create a docket, without anyone asking, which the model-produced-actions
+  rule forbids (spec §11). Ask me first and Disabled remain. New: the default
+  room for new dockets, since room belongs to the branch (spec §9).
+
+DATA AND BACKUPS
+  .apb and JSON export are gone; .parliament stays. The format version is
+  shown. Rules the implementation must meet before that line ships:
+    · A backup with no version field is format 1. Every file written so far
+      has none, and must be read as 1 rather than rejected.
+    · A file from a newer Parliament is refused with a message, never half-read.
+      Silently dropping fields is the failure the spec warns about.
+    · Migrations are kept forever and tested against a fixture file per format.
+  Delete everything stays red, the one red in the product, and asks for the
+  word delete before the button works.
+
+APPEARANCE
+  The theme choice is gone; dark mode is deferred and a dead option is worse
+  than none. Text size stays. Desks on this device are listed with a way to
+  forget them: they are made with arrange:save, are per device, are not in
+  backups, and would otherwise be invisible.
+
+ABOUT AND SECURITY
+  The privacy copy no longer claims only Anthropic is contacted. The network
+  log is grouped by host, and every host is named by the provider or source
+  that called it.
+
+NOT IN THIS MOCKUP
+  · Consent grants from invoke: (V2). Settings is the obvious place to list and
+    revoke them when they exist.
+  · Source roles (responder, material, trigger). Not yet.
+
+DIVERGENCES FROM THE SPECS, DELIBERATE
+  1. Grouped by provider. Spec §8 says the answered-by picker is one flat list
+     with no groups. That rule is kept for the picker. Settings groups by
+     provider because this is where keys live, and a key belongs to a
+     provider, not to a model. Within each group, rows are ordered by mark.
+  2. open:settings. Spec §3 says open: takes addressable things. Settings is a
+     place, not an id. open:settings <section> is kept at the author's request
+     as the one named place open: accepts; pop: already takes both classes.
+
+OWED
+  · Cost marks for Fable 5.1 and both Mistral models, shown as ×? here.
+  · Model names follow the change plan (Opus 5.5, Sonnet 5, Haiku 4.5,
+    Fable 5.1), confirmed 23 Sept. Spec §8's Opus 5 is out of date.
+-->
+<style>
+:root{
+  --paper-bg:#FCFCFA;
+  --paper-ink:rgba(46,58,79,.011);
+  --paper-hatch:none;   /* page hatch retired — it was noise, not texture */
+  --card-lift:0 1px 2px rgba(40,36,28,.035);
+  --p-surface:#FFFFFF;
+  --p-subtle:#FAF9F5;          /* heading rows — off-white, warmer than grey */
+  --p-tray:#F6F5F1;            /* the working-set tray, so white cards read  */
+  --p-ink:#191919; --p-ink-2:#787774; --p-ink-3:#9B9A97; --p-line-soft:#C0C8D4;
+  --p-border:#E9E9E7; --p-border-2:#F1F1EF;
+  --p-gold-light:#B8A070; --p-gold-muted:#9C8760; --p-gold-deep:#8B6A10;
+  --p-gold-tint:rgba(196,169,77,.08); --p-gold-tint-2:rgba(196,169,77,.14);
+  --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --font-serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --font-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --r-sm:4px; --r-md:6px; --r-xl:16px; --r-btn:8px;
+
+  /* Command mode. Ruling only, no field behind it — the crosshatch carries
+     the mode on its own and the type goes white over it. */
+  --navy:38,56,92;
+  --line-c:22,38,70;
+  --line-a:1;
+  --line-w:3px;
+  --hatch-gap:3.5px;
+
+  /* Prompt mode. Same idea as command — the fill carries the mode — but bone
+     rather than navy, ruled into tall parallelograms with a diagonal through
+     each, so the type stays ink and the field still reads as paper. */
+  --tri:rgba(122,120,114,.17);
+  --prm-bg:var(--paper-bg);
+
+  /* Border and paper spec, light mode. Dark is unfinished and not referenced. */
+  --ink:#191919;
+  --ink-dot:rgba(25,25,25,.18);      /* structural: evenly spaced dots       */
+  --ink-prog:rgba(25,25,25,.10);     /* key: progressive dash, one at a time  */
+  --divider:rgba(25,25,25,.08);      /* header rules                          */
+  --ink-soft:rgba(25,25,25,.30);     /* checkbox rule, quiet icons            */
+  --ink-wash:rgba(25,25,25,.045);    /* selected rows and cards               */
+  --ink-wash-2:rgba(25,25,25,.075);
+  --marg:rgba(25,25,25,.46);         /* marginalia at rest                    */
+
+  /* GOLD MEANS THE LIVE ACTION, AND NOTHING ELSE.
+     The search field when engaged, the trigger on hover, keyboard focus.
+     Every other former use is ink. */
+}
+@media (prefers-contrast:more){:root{--paper-hatch:none}}
+*{box-sizing:border-box;margin:0;padding:0}
+
+/* Borders are drawn as an SVG overlay, never as a CSS border. Patterns are
+   computed from the element's real perimeter so they always close cleanly. */
+[data-border]{position:relative}
+svg.bx{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+
+/* The key border is static. Nothing draws, nothing fades. */
+
+/* The faint borders cannot carry focus. Keyboard focus gets its own ring. */
+:focus-visible{outline:2px solid var(--p-gold-deep);outline-offset:2px}
+/* Focus is a live action, so it keeps gold. Nothing else at rest does. */
+body{
+  font-family:var(--font-sans);background-color:var(--paper-bg);
+  background-image:var(--paper-hatch);background-attachment:fixed;
+  color:var(--p-ink);-webkit-font-smoothing:antialiased;padding:44px 16px 64px;
+}
+.page{max-width:1420px;margin:0 auto}
+.wrap,.topgrid{display:grid;grid-template-columns:var(--tpl,212px minmax(0,1fr) clamp(320px,28vw,430px));gap:13px;align-items:start}
+.topgrid .sbar{grid-column:var(--barcol,2)}
+
+/* The field floats. On top it sticks under the top edge; at the bottom it sits
+   over the flexible column like a composer, with its marginalia flipped above
+   it so the hints stay between the field and the content. */
+.topgrid{position:sticky;top:0;z-index:55;margin:-12px 0 4px;padding:12px 0 12px;
+  background:linear-gradient(var(--paper-bg) 78%,rgba(252,252,250,0))}
+.topgrid.atbottom{position:fixed;top:auto;bottom:34px;display:block;margin:0;padding:22px 0 10px;
+  background:linear-gradient(rgba(252,252,250,0),var(--paper-bg) 34%)}
+.topgrid.atbottom .sbar{display:flex;flex-direction:column}
+.topgrid.atbottom .sfield{order:3}
+.topgrid.atbottom .shint{order:2;padding:0 13px 6px}
+.topgrid.atbottom .params{order:1;padding:0 2px 6px}
+.topgrid.atbottom .cref{top:auto;bottom:calc(100% - 14px)}
+body.bar-bottom{padding-top:28px;padding-bottom:150px}
+body.bar-bottom .toast{bottom:auto;top:20px}
+
+.barph{grid-column:var(--barcol,2);padding:10px 13px;font:italic 400 11px var(--font-serif);color:var(--marg)}
+.barph button{border:none;background:none;padding:0;font:inherit;color:inherit;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.barph button:hover{color:var(--ink)}
+body.popwin .pophost>.sbar{padding:6px 4px}
+body.popwin .pophost>.sbar .cref{position:static;margin-top:8px}
+.popph{padding:26px 22px;text-align:center;font-size:12px;color:var(--p-ink-2);line-height:1.6}
+.popph .marg{display:block;margin-top:4px;font:italic 400 11px var(--font-serif);color:var(--marg)}
+.popph button{border:none;background:none;padding:0;font:inherit;color:inherit;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+
+/* pop-out windows */
+body.popwin{padding:12px;background:var(--paper-bg)}
+body.popwin .pophost>.card{margin:0}
+.dockpop{padding:8px 10px}
+.dockpop .dp-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.dockpop h1{font-size:15px;font-weight:600;margin:0 0 3px;line-height:1.3}
+.dp-marg{font:italic 400 11px var(--font-serif);color:var(--marg)}
+.dp-steps{list-style:none;margin:16px 0 0;padding:0}
+.dp-steps li{display:flex;gap:10px;padding:10px 0;border-top:.5px solid var(--p-border-2)}
+.dp-n{font-size:12.5px;font-weight:500;margin-bottom:2px}
+.dp-dot{flex-shrink:0;width:9px;height:9px;margin-top:4px;border-radius:50%;border:1.2px solid var(--ink)}
+/* ready · running · done · waiting.
+   ready has not run yet and is SILENT — a mark means there is news, and
+   "has not started" is not news. waiting is a branch deliberately parked,
+   which is news, so it takes a dashed dot. */
+.dp-done .dp-dot{background:var(--ink)}
+.dp-ready{color:var(--p-ink-3)}
+.dp-ready .dp-dot{border-color:var(--p-ink-3)}
+.dp-waiting{color:var(--p-ink-2)}
+.dp-waiting .dp-dot{border-style:dashed;border-color:var(--p-ink-2);background:none}
+/* paused is a step that started and was halted; waiting is a branch parked
+   before the fact. Both are deliberately not running, so both take the
+   dashed dot — the difference is carried in the type, one step quieter,
+   because the distinction is fine and a second dot shape would claim it is
+   larger than it is. If it proves thin in use, merge them. */
+.dp-paused{color:var(--p-ink-3)}
+.dp-paused .dp-dot{border-style:dashed;border-color:var(--p-ink-3);background:none}
+.dp-running .dp-dot{animation:dpPulse 1.4s ease-in-out infinite}
+@keyframes dpPulse{50%{box-shadow:0 0 0 4px rgba(25,25,25,.10)}}
+@media (prefers-reduced-motion:reduce){.dp-running .dp-dot{animation:none}}
+.dp-foot{margin-top:14px;padding-top:10px;border-top:.5px solid var(--p-border-2);font:italic 400 11px var(--font-serif);color:var(--marg);line-height:1.5}
+@media (max-width:1240px){
+  .wrap,.topgrid{grid-template-columns:196px minmax(0,1fr)}
+  .card.right{grid-column:1 / -1}
+}
+@media (max-width:1240px){.topgrid .sbar{grid-column:2}}
+@media (max-width:840px){
+  .wrap,.topgrid{grid-template-columns:1fr}
+  .topgrid .sbar{grid-column:1}
+}
+
+.card{background:var(--p-surface);border-radius:var(--r-xl);box-shadow:var(--card-lift);overflow:hidden}
+/* Kept searches and collections are an index, not a surface. No fill, no lift. */
+.card.rail-card{background:transparent;box-shadow:none}
+/* The collection follows the rail: no outline, no fill, only its inner rules. */
+.card.right{background:transparent;box-shadow:none;border-radius:0}
+.card.right .wsbody{background:transparent;padding-left:0;padding-right:0}
+/* If the middle column is narrower than the table, the table scrolls inside
+   its card rather than losing its last columns off the edge. */
+.tscroll{overflow-x:auto}
+.tscroll .grid{min-width:min-content}
+.card.rail-card .rfoot{background:transparent}
+.kbd{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;
+  font:500 10px var(--font-mono);background:var(--p-subtle);border:.5px solid var(--p-border);border-radius:3px;color:var(--p-ink-3)}
+
+/* ══════════ LEFT ══════════ */
+.rgroup{padding:9px 7px 5px}
+.rgroup+.rgroup{border-top:.5px solid var(--p-border-2)}
+.rlabel{display:flex;align-items:center;gap:6px;font:600 9px var(--font-sans);letter-spacing:.055em;
+  color:var(--ink);padding:4px 6px 7px}
+.rlabel svg{width:12px;height:12px;color:var(--ink);flex-shrink:0}
+.rlabel .n{margin-left:auto;font-family:var(--font-mono);font-size:9px}
+.ritem{display:block;width:100%;padding:6px 7px;border:none;background:transparent;
+  border-radius:var(--r-sm);cursor:pointer;text-align:left}
+.ritem:hover{background:transparent}
+.ritem:hover .rds{color:var(--p-gold-deep)}
+.ritem .rds{transition:color .14s ease}
+.ritem.on .rnm{font-weight:600}
+.ritem.on .rds{color:var(--p-gold-deep)}
+.rnm{display:block;font:500 11.5px var(--font-sans);color:var(--p-ink);line-height:1.3;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rds{display:block;font:italic 400 10px var(--font-serif);color:var(--marg);margin-top:3px;line-height:1.4;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rfoot{padding:10px 12px;border-top:1px solid var(--divider);background:var(--p-subtle);
+  font-size:9.5px;line-height:1.55;color:var(--p-ink-3)}
+.rfoot b{color:var(--p-ink-2);font-weight:600}
+
+/* ══════════ MIDDLE ══════════ */
+.sbar{padding:0;position:relative}
+.sfield{position:relative;display:flex;align-items:center}
+.sfield>svg:not(.bx){position:absolute;right:12px;top:50%;margin-top:-7.5px;width:15px;height:15px;color:var(--ink);pointer-events:none}
+.sfield{border-radius:var(--r-btn)}
+.sfield input{width:100%;padding:10px 38px 10px 68px;font:400 13.5px var(--font-sans);
+  border:none;border-radius:var(--r-btn);background:transparent;color:var(--p-ink)}
+.sfield input:focus{outline:none}
+/* ═══ The field is also the command line ═══
+   Plain text searches. A leading > switches it into command mode: the box
+   fills with a navy crosshatch and the type goes white. Deleting the > puts
+   it straight back to prose. The first-character rule is what makes that
+   safe — a > anywhere else is just a character. */
+.sfield{
+  background-color:var(--p-surface);   /* plain at rest; only command mode is ruled */
+  overflow:hidden;
+}
+.sfield .fillwrap{
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+  clip-path:inset(0 100% 0 0);
+  transition:clip-path .28s cubic-bezier(.4,0,.2,1);
+}
+.sfield.cmd .cmdwrap{clip-path:inset(0 0 0 0)}
+.sfield.prm .prmwrap{clip-path:inset(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){.sfield .fillwrap{transition:none}}
+.sfield .fill{position:absolute;inset:0}
+.sfield .fill>svg{width:100%;height:100%;display:block}
+/* Command: a hexagonal lattice marked only at its edge points, two dots a side,
+   one dot size throughout, about a quarter of them left dark. The hexagons
+   themselves are never drawn. */
+.sfield .cmdfill{background:rgb(var(--line-c))}
+/* Prompt: the page's own bone, ruled into vertical parallelograms. */
+.sfield .prmfill{background:var(--prm-bg)}
+.sfield input{position:relative;z-index:1}
+.sfield>svg:not(.bx),.sfield .modechip{z-index:2}
+.sfield.cmd input{
+  font-family:var(--font-mono);font-size:13px;color:#fff;
+  text-shadow:0 0 3px rgba(12,20,40,.95),0 1px 2px rgba(12,20,40,.85);
+}
+.sfield.cmd input::placeholder{color:#fff;opacity:.95;text-shadow:0 0 3px rgba(12,20,40,.9)}
+.sfield.cmd>svg:not(.bx){color:#fff;filter:drop-shadow(0 0 2px rgba(12,20,40,.9))}
+.modechip{
+  position:absolute;left:12px;top:50%;margin-top:-8px;font:600 8.5px var(--font-sans);letter-spacing:.06em;
+  padding:3px 7px;border-radius:9px;background:rgb(var(--navy));color:#fff;
+  opacity:0;transform:translateX(-4px);transition:opacity .16s ease,transform .16s ease;pointer-events:none;
+}
+.sfield .schip{opacity:1;transform:none}
+.sfield.cmd .schip,.sfield.prm .schip{opacity:0;transform:translateX(-4px)}
+.sfield.cmd .cmdchip{opacity:1;transform:none}
+.sfield.cmd input{padding-left:82px}
+.sfield.cmd>svg:not(.bx){opacity:0}
+.sfield>svg:not(.bx){transition:opacity .16s ease}
+/* Prompt names itself in ink, the way command names itself in navy. Search is
+   the resting mode, so its pill is drawn rather than filled: bone inside, an
+   ink rule around it, ink type. Gold is still only the live action. */
+.sfield .pchip{background:var(--ink);color:var(--paper-bg)}
+.sfield .schip{background:var(--paper-bg);color:var(--ink);border:1px solid var(--ink);padding:2px 6px}
+
+/* ═══ The field is also the prompt ═══
+   p> at the front switches it. Same pill as command, quill on the right where
+   the magnifier sits, type left in ink. Deleting the leader puts it back. */
+.sfield>svg.quillmark{right:10px;width:21px;height:21px;margin-top:-10.5px;color:var(--ink);opacity:0}
+.sfield.prm>svg.quillmark{opacity:1}
+.sfield.prm>svg.mag{opacity:0}
+.sfield.prm .pchip{opacity:1;transform:none}
+.sfield.prm input{padding-left:72px;padding-right:42px;color:var(--p-ink)}
+
+/* Marginalia under the field. One line of reserved height that changes
+   what it says rather than appearing, so nothing below it moves. At rest it
+   says how to reach the command line; in command mode it lists the commands,
+   narrowing as you type. Schemes are upright because they are literal text
+   to type; the gloss beside each is italic, like all marginalia. */
+.shint{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 4px;min-height:19px;padding:6px 13px 0;
+  font:italic 400 11px var(--font-serif);color:var(--marg);line-height:1.6}
+.shint:hover{color:var(--p-gold-deep)}
+.shint .it{white-space:nowrap}
+.shint .sep{opacity:.5;margin:0 3px 0 1px}
+.shint code{font:normal 600 11px var(--font-serif);color:inherit;letter-spacing:.01em}
+.shint button{font:inherit;color:inherit;border:none;background:none;padding:0;cursor:pointer}
+.shint button:hover{color:var(--ink)}
+.shint button:hover .gl{text-decoration:underline;text-underline-offset:2px}
+.shint .it.first code{color:var(--ink)}
+.shint .none{white-space:nowrap}
+.shint .pre{color:var(--ink);font-style:italic}
+.shint .bad{color:var(--ink)}
+
+/* The full reference. Asked for with ?, so it may cover the table; it floats
+   rather than pushing anything down, and it goes the moment you type past it. */
+.cref{display:none;position:absolute;left:0;right:0;top:66px;z-index:60;background:var(--p-surface);
+  border-radius:var(--r-btn);padding:13px 16px 12px;box-shadow:0 8px 28px rgba(40,36,28,.08);
+  max-height:64vh;overflow:auto}
+.cref.open{display:block}
+.topgrid.atbottom .cref{max-height:58vh}
+
+/* Header: what this is, and a way to keep only one group */
+.cref .rhead{padding-bottom:8px;margin-bottom:11px;border-bottom:.5px solid var(--p-border-2)}
+.cref .rtop{display:flex;align-items:baseline;gap:10px}
+.cref .rlab{font:600 9px var(--font-sans);letter-spacing:.055em;color:var(--ink)}
+.cref .rlab .n{margin-left:5px;font-family:var(--font-mono);font-size:9px;color:var(--p-ink-3)}
+.cref .chips{display:flex;gap:2px;margin-top:6px;flex-wrap:wrap}
+.cref .chip{display:inline-block;width:auto;grid-template-columns:none;text-align:center;
+  font:italic 400 11px var(--font-serif);color:var(--marg);border:none;background:none;
+  padding:2px 8px;border-radius:9px;cursor:pointer}
+.cref .chip:hover{color:var(--ink)}
+.cref .chip.on{color:var(--ink);background:rgba(25,25,25,.055)}
+
+/* Groups flow in columns; a group never splits across one */
+.cref .cols{columns:318px;column-gap:28px}
+.cref .grp{break-inside:avoid;margin:0 0 15px}
+.cref h4{display:flex;align-items:baseline;font:600 9px var(--font-sans);letter-spacing:.055em;color:var(--ink);
+  margin:0 0 5px;padding-bottom:4px;border-bottom:.5px solid var(--p-border-2)}
+.cref h4 .n{margin-left:auto;font-family:var(--font-mono);font-size:9px;color:var(--p-ink-3);letter-spacing:0}
+/* Two aligned columns so the eye runs down the syntax, not a ragged edge */
+.cref button{display:grid;grid-template-columns:168px 1fr;gap:9px;align-items:baseline;width:100%;
+  border:none;background:none;padding:4px 6px;border-radius:7px;cursor:pointer;text-align:left;color:var(--p-ink-2)}
+.cref button:hover{color:var(--ink);background:rgba(25,25,25,.04)}
+.cref button.sel{color:var(--ink);background:rgba(25,25,25,.06)}
+.cref code{font:500 11px var(--font-mono);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cref .gl{font:italic 400 11px var(--font-serif);line-height:1.35}
+.cref mark{background:none;color:inherit;font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.cref .nohit{font:italic 400 11px var(--font-serif);color:var(--marg);padding:4px 6px}
+.cref .foot{margin-top:4px;padding-top:9px;border-top:.5px solid var(--p-border-2);
+  font:italic 400 10.5px var(--font-serif);color:var(--marg);line-height:1.5}
+.t-mk.pin{color:var(--ink)}
+.peek{display:none;position:absolute;left:0;right:0;top:66px;z-index:61;background:var(--p-surface);border-radius:var(--r-btn);
+  padding:16px 20px 14px;box-shadow:0 8px 28px rgba(40,36,28,.08);max-height:62vh;overflow:auto}
+.peek.open{display:block}
+.topgrid.atbottom .peek{top:auto;bottom:calc(100% - 14px)}
+body.popwin .pophost>.sbar .peek{position:static;margin-top:8px}
+.peek .pk-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.peek .pk-tags{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+.peek h3{font-size:15px;font-weight:600;margin:0 0 4px}
+.peek h4{font:italic 400 11px var(--font-serif);color:var(--marg);margin:14px 0 4px;font-weight:400}
+.peek blockquote{margin:0 0 6px;padding-left:10px;border-left:2px solid var(--ink);font-style:italic;font-size:14px}
+.peek p{font-size:12.5px;line-height:1.55;margin:6px 0;color:var(--p-ink)}
+.peek .pk-sub{color:var(--p-ink-2)}
+.peek .pk-mark{font-size:12px;padding:4px 0;border-top:.5px solid var(--p-border-2)}
+
+/* An id is an address, not a pointing device. It is always on screen, because
+   nobody can remember a number they were only shown while holding a key down,
+   and a column that comes and goes is harder to explain than one that stays.
+   It never changes colour: an address is a constant, and a number that shifts
+   with the mode invites the reader to work out what the shift means. */
+.c-id{font:500 10.5px var(--font-mono);color:var(--p-ink-3);text-align:center}
+/* Cards have no columns, so the id rides inline ahead of the kind pill. */
+.rowid{display:inline-block;font:500 9.5px var(--font-mono);color:var(--p-ink-3);
+  background:rgba(25,25,25,.05);padding:1px 5px;border-radius:3px;margin-right:6px}
+
+/* ═══ The addressed surface wears a rule ═══
+   While the command line is open, the surface it acts on carries a navy rule
+   down its left edge. One window or four, the rule is in the same place and
+   means the same thing, so nothing new has to be learned when a panel is
+   popped out. Nothing else dims: the other windows are usually the reference
+   you opened the command line to act on, and a reference you cannot read is
+   worse than an unmarked one. */
+body::before{content:"";position:fixed;left:0;top:0;bottom:0;width:2px;
+  background:rgb(var(--navy));z-index:80;pointer-events:none;
+  animation:ruleIn .18s ease-out}
+@keyframes ruleIn{from{transform:scaleY(0);transform-origin:top}to{transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){body::before{animation:none}}
+/* A popped panel is not the addressed surface; commands still act on the
+   page that opened it. A popped surface would wear its own rule. */
+body.popwin::before{display:none}
+.sfield input::placeholder{color:var(--p-ink-3)}
+
+.params{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:4px 2px 0}
+.params:empty{display:none}
+.menu{display:none;position:fixed;z-index:70;min-width:186px;max-height:300px;overflow-y:auto;padding:4px;
+  background:var(--p-surface);border:.5px solid var(--p-border);border-radius:var(--r-md);box-shadow:0 6px 20px rgba(40,36,28,.14)}
+.menu.open{display:block}
+.menu button{display:flex;align-items:center;gap:7px;width:100%;padding:6px 8px;font:400 12px var(--font-sans);
+  border:none;background:transparent;color:var(--p-ink);border-radius:var(--r-sm);cursor:pointer;text-align:left}
+.menu button:hover{background:var(--p-subtle)}
+.menu .tick{width:12px;height:12px;flex-shrink:0;color:var(--ink);opacity:0}
+.menu button.on .tick{opacity:1}
+.menu .n{margin-left:auto;font-size:10.5px;color:var(--p-ink-3)}
+.notebar{position:fixed;left:0;right:0;bottom:0;z-index:50;padding:8px 18px;background:var(--paper-bg);
+  border-top:.5px solid var(--p-border);box-shadow:0 -1px 3px rgba(40,36,28,.05);
+  font-size:11px;color:var(--p-ink-2);line-height:1.5}
+.notebar b{color:var(--p-ink);font-weight:600}
+.toast{position:fixed;bottom:52px;left:50%;transform:translateX(-50%) translateY(8px);padding:7px 14px;
+  border-radius:var(--r-md);background:var(--p-ink);color:#fff;font-size:12px;opacity:0;pointer-events:none;
+  transition:opacity .16s,transform .16s;z-index:90;max-width:80vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+
+/* ══════════ SETTINGS ══════════
+   One card, sections stacked, a rail as the index. Nothing here is new
+   vocabulary: rows are the table's rows, labels are the rail's labels, the
+   selected state is the table's ink wash, and gold is only the live action. */
+.page{max-width:1120px}
+.wrap,.topgrid{grid-template-columns:212px minmax(0,1fr)}
+.topgrid .sbar{grid-column:2}
+
+/* the rail: sections, with the word you type for each */
+.ritem .ralias{float:right;font:500 9.5px var(--font-mono);color:var(--p-ink-3);margin-left:6px;line-height:1.5}
+.rlabel .n{display:none}
+.ritem .rnm .hits{font:500 9.5px var(--font-mono);color:var(--p-ink-3);margin-left:5px}
+.ritem.dim{opacity:.38}
+
+.scard{padding:0}
+.sec{padding:24px 28px 10px;scroll-margin-top:120px}
+.sec+.sec{border-top:1px solid var(--divider)}
+.sec.hidden{display:none}
+.sec-h{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.sec-h h2{font:600 15px var(--font-sans);color:var(--ink);letter-spacing:-.005em}
+/* The alias is an address, shown the way ids are: mono, ink-3, no fill, and
+   it never changes colour. It is what you type after open:settings. */
+.sec-h .alias{font:500 10.5px var(--font-mono);color:var(--p-ink-3)}
+.sec-lede{font-size:12px;color:var(--p-ink-2);line-height:1.55;margin:-7px 0 14px;max-width:64ch}
+
+/* rows */
+.srow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 22px;align-items:center;
+  padding:13px 0;border-top:.5px solid var(--p-border-2)}
+.srow.stack{grid-template-columns:minmax(0,1fr)}
+.srow.hidden,.grp.hidden{display:none}
+.sl{font:500 12.5px var(--font-sans);color:var(--p-ink)}
+/* Help text is plain sans. Italic serif means marginalia, and marginalia is
+   always something you can click. */
+.sh{font-size:11.5px;color:var(--p-ink-2);line-height:1.5;margin-top:3px;max-width:62ch}
+.sh code,.sec-lede code{font:500 10.5px var(--font-mono);color:var(--ink)}
+.sctl{display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+
+/* Marginalia: italic serif, clickable, gold only while it is the live action. */
+.marg{font:italic 400 11px var(--font-serif);color:var(--marg);line-height:1.5}
+.marg button,button.marg{font:inherit;color:inherit;border:none;background:none;padding:0;cursor:pointer;text-align:left}
+.marg button:hover,button.marg:hover{color:var(--p-gold-deep);text-decoration:underline;text-underline-offset:2px}
+.marg .sep{opacity:.5;margin:0 5px 0 0}
+/* Marginalia that opens a picker grows a caret on card hover; marginalia that
+   navigates never does. */
+.caret{display:inline-block;width:8px;height:8px;margin-left:2px;opacity:0;transition:opacity .14s;vertical-align:1px}
+.scard:hover .caret{opacity:.7}
+
+/* segmented choice */
+.seg{display:inline-flex;gap:2px;padding:2px;border-radius:var(--r-btn);background:var(--p-subtle)}
+.seg button{padding:5px 11px;font:500 11px var(--font-sans);color:var(--p-ink-3);border:none;background:transparent;
+  border-radius:6px;cursor:pointer;white-space:nowrap}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:var(--p-surface);color:var(--ink);font-weight:600;box-shadow:0 0 0 .5px var(--ink-soft)}
+
+/* one-of-several, as rows */
+.pick{display:grid;grid-template-columns:18px minmax(0,1fr);gap:0 8px;align-items:start;width:100%;
+  padding:9px 10px;margin:0 -10px;border:none;background:transparent;border-radius:var(--r-md);cursor:pointer;text-align:left;
+  width:calc(100% + 20px)}
+.pick:hover{background:var(--p-subtle)}
+.pick.on{background:var(--ink-wash)}
+.pick .dot,.mrow .dot{width:11px;height:11px;margin-top:3px;border-radius:50%;border:1.2px solid var(--ink-soft);background:transparent}
+.pick.on .dot,.mrow.on .dot{border-color:var(--ink);box-shadow:inset 0 0 0 2px var(--p-surface);background:var(--ink)}
+.pick .pl{font:500 12.5px var(--font-sans);color:var(--p-ink)}
+.pick .ph{display:block;font-size:11.5px;color:var(--p-ink-2);margin-top:2px;line-height:1.45}
+.picks{margin:4px 0 2px}
+
+/* switch */
+.sw{position:relative;width:30px;height:17px;border-radius:9px;border:1px solid var(--ink-soft);background:transparent;cursor:pointer;flex-shrink:0}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:var(--ink-soft);transition:transform .16s ease,background .16s}
+.sw.on{background:var(--ink);border-color:var(--ink)}
+.sw.on::after{transform:translateX(13px);background:var(--p-surface)}
+@media (prefers-reduced-motion:reduce){.sw::after{transition:none}}
+
+input[type=range]{accent-color:var(--ink);width:220px}
+.val{font:600 12.5px var(--font-sans);color:var(--ink);min-width:44px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* secondary buttons carry the structural dotted border, like the field */
+.btn{position:relative;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;font:500 11.5px var(--font-sans);
+  color:var(--p-ink);background:var(--p-surface);border:none;border-radius:var(--r-btn);cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--ink-wash)}
+.btn[disabled]{opacity:.4;cursor:default}
+.btn[disabled]:hover{background:var(--p-surface)}
+.btn svg:not(.bx){width:12px;height:12px}
+
+/* ═══ Providers: key and models together ═══ */
+.auto{margin:2px 0 8px}
+.grp{margin:14px 0 4px}
+.grp-h{display:flex;align-items:baseline;gap:10px;padding:10px 0 8px;border-top:1px solid var(--divider)}
+.grp-h .gn{font:600 12.5px var(--font-sans);color:var(--ink)}
+.grp-h .marg{margin-left:auto;text-align:right}
+.keyrow{display:flex;align-items:center;gap:8px;padding:2px 0 10px}
+.kfield{position:relative;flex:1;max-width:420px;border-radius:var(--r-btn);background:var(--p-surface)}
+.kfield input{width:100%;padding:8px 11px;font:400 12px var(--font-mono);color:var(--p-ink);border:none;background:transparent;border-radius:var(--r-btn)}
+.kfield input:focus{outline:none}
+.kfield:focus-within{box-shadow:0 0 0 1.5px var(--p-gold-light)}   /* engaged: the live action */
+.kfield input::placeholder{color:var(--p-ink-3)}
+.kset{flex:1;max-width:420px;font:500 12px var(--font-mono);color:var(--p-ink-2);padding:8px 0}
+.mrow{display:grid;grid-template-columns:18px minmax(0,1fr) auto 62px;gap:8px;align-items:center;
+  width:calc(100% + 20px);margin:0 -10px;padding:7px 10px;border:none;background:transparent;border-radius:var(--r-md);text-align:left;cursor:pointer}
+.mrow:hover{background:var(--p-subtle)}
+.mrow.on{background:var(--ink-wash)}
+.mrow .mn{font:500 12.5px var(--font-sans);color:var(--p-ink)}
+.mrow .mk{white-space:nowrap;font:500 11px var(--font-sans);color:var(--p-ink-2);text-align:right;font-variant-numeric:tabular-nums}
+.mrow.off{cursor:default}
+.mrow.off:hover{background:transparent}
+.mrow.off .mn,.mrow.off .mk{color:var(--p-ink-3)}
+.mrow.off .dot{border-color:var(--p-border)}
+.mrow.src{cursor:default}
+.mrow.src:hover{background:transparent}
+.mrow.src .dot{visibility:hidden}
+.setup{font-size:11.5px;color:var(--p-ink-2);line-height:1.55;padding:0 0 10px;max-width:62ch}
+.setup code{font:500 10.5px var(--font-mono);color:var(--ink);background:var(--p-subtle);padding:1px 5px;border-radius:3px}
+
+/* ═══ Spending ═══ */
+.spent{font:400 13px var(--font-sans);color:var(--p-ink);line-height:1.55}
+.spent b{font-weight:600;font-variant-numeric:tabular-nums}
+.runs{margin:6px 0 0}
+.runrow{display:grid;grid-template-columns:42px minmax(0,1fr) auto 58px;gap:10px;align-items:baseline;width:100%;
+  padding:6px 8px;margin:0 -8px;width:calc(100% + 16px);border:none;background:none;border-radius:var(--r-md);cursor:pointer;text-align:left}
+.runrow:hover{background:var(--p-subtle)}
+.runrow .c-id{text-align:left}
+.runrow .rt{font-size:12px;color:var(--p-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.runrow .rc{font:500 12px var(--font-sans);text-align:right;font-variant-numeric:tabular-nums}
+
+/* ═══ Data ═══ */
+.meter{height:5px;border-radius:3px;background:var(--p-border-2);overflow:hidden;margin:8px 0 6px;max-width:420px}
+.meter i{display:block;height:100%;background:var(--ink)}
+/* Red, and only here. The one place in the product that cannot be undone. */
+.danger{margin:18px 0 14px;padding:14px 16px;border-radius:10px;border:1px solid rgba(224,62,62,.3);background:rgba(224,62,62,.04)}
+.danger .sl{color:#B42E2E}
+.btn.red{background:#E03E3E;color:#fff}
+.btn.red:hover{background:#C5342A}
+.btn.red[disabled]{background:#E03E3E}
+.confirm{display:none;align-items:center;gap:8px;margin-top:10px}
+.confirm.open{display:flex}
+.confirm input{width:130px;padding:7px 10px;font:400 12px var(--font-mono);border:1px solid rgba(224,62,62,.35);border-radius:var(--r-btn);background:var(--p-surface)}
+.confirm input:focus{outline:none;border-color:#E03E3E}
+
+/* ═══ Appearance ═══ */
+.preview{margin-top:10px;padding:11px 14px;border-radius:var(--r-md);background:var(--p-subtle);color:var(--p-ink);line-height:1.5;max-width:520px}
+.desk{display:flex;align-items:baseline;gap:10px;padding:6px 0}
+.desk .dn{font:500 12px var(--font-sans)}
+
+/* ═══ About ═══ */
+.prose h4{font:600 12px var(--font-sans);color:var(--ink);margin:12px 0 3px}
+.prose p{font-size:12px;color:var(--p-ink-2);line-height:1.6;max-width:66ch}
+.net{margin-top:8px}
+.nethead,.netrow{display:grid;grid-template-columns:minmax(150px,210px) minmax(0,1fr) 44px;gap:12px;padding:6px 0;align-items:baseline}
+.nethead{font:600 9px var(--font-sans);letter-spacing:.055em;color:var(--ink);border-bottom:1px solid var(--divider)}
+.nethead span:last-child,.netrow span:last-child{text-align:right}
+.netrow{border-bottom:.5px solid var(--p-border-2)}
+.netrow .h{font:500 11px var(--font-mono);color:var(--p-ink)}
+.netrow .w{font-size:11.5px;color:var(--p-ink-2)}
+.netrow .n{font:500 11px var(--font-sans);color:var(--p-ink-3);font-variant-numeric:tabular-nums}
+
+.empty-s{display:none;padding:40px 28px;text-align:center;font-size:12.5px;color:var(--p-ink-3)}
+.empty-s.show{display:block}
+
+/* A popped surface wears its own rule; the page it left does not. */
+body.surface-out::before{display:none}
+body.popwin.popsurf{padding:0}
+body.popwin.popsurf .pophost>.card{border-radius:0;box-shadow:none;min-height:100vh}
+body.popwin.popsurf .sec{scroll-margin-top:12px}
+
+/* text size, applied to the card */
+.scard.t-compact{zoom:.92}
+.scard.t-large{zoom:1.1}
+
+@media (max-width:840px){
+  .wrap,.topgrid{grid-template-columns:1fr}
+  .topgrid .sbar{grid-column:1}
+  .srow{grid-template-columns:1fr}
+  .sctl{justify-content:flex-start}
+  .sec{padding:20px 18px 8px}
+  input[type=range]{width:100%}
+}
+@media (min-width:841px){.card.rail-card{position:sticky;top:112px}}
+
+/* ═══ The rule follows the section ═══
+   The addressed thing on this surface is a section, so the navy rule sits on
+   the card's left edge beside it and slides as you scroll, as open: lands,
+   and as set: changes something. It replaces the page-edge rule here; it
+   travels with the card when Settings is popped. */
+body::before{display:none}
+.srule{position:absolute;left:0;top:0;width:2px;height:0;background:rgb(var(--navy));z-index:3;pointer-events:none;
+  transition:top .32s cubic-bezier(.4,0,.2,1),height .32s cubic-bezier(.4,0,.2,1)}
+@media (prefers-reduced-motion:reduce){.srule{transition:none}}
+
+/* sources: no mark column; the group says 0 tokens once */
+.mrow.src{grid-template-columns:18px minmax(0,1fr)}
+
+/* ═══ Bar positions ═══
+   top and bottom are lines; left and right are squares, which reserve three
+   lines for the Enter line so nothing below it moves when the gloss wraps. */
+body.bar-left .page,body.bar-right .page{display:grid;gap:13px;max-width:1400px;align-items:start}
+body.bar-left .page{grid-template-columns:248px minmax(0,1fr)}
+body.bar-right .page{grid-template-columns:minmax(0,1fr) 248px}
+body.bar-right .topgrid{order:2}
+body.bar-left .topgrid,body.bar-right .topgrid{display:block;position:sticky;top:44px;margin:0;padding:0;background:none}
+.sbar.sq .sfield{flex-direction:column;align-items:stretch;min-height:132px;justify-content:flex-start;padding-top:38px}
+.sbar.sq .modechip{top:14px;margin-top:0}
+.sbar.sq .sfield>svg:not(.bx){top:12px;margin-top:0}
+.sbar.sq .sfield input,.sbar.sq .sfield.cmd input,.sbar.sq .sfield.prm input{padding:6px 13px}
+.sbar.sq .shint{min-height:62px;align-content:flex-start;padding-top:8px}
+.sbar.sq .cref{width:min(640px,calc(100vw - 300px));top:calc(100% + 6px)}
+body.bar-right .sbar.sq .cref{left:auto;right:0}
+body.bar-left .wrap,body.bar-right .wrap{grid-template-columns:212px minmax(0,1fr)}
+body.bar-left .card.rail-card,body.bar-right .card.rail-card,body.bar-bottom .card.rail-card{top:44px}
+body.bar-bottom .topgrid.atbottom{z-index:55}
+.barph{padding:10px 13px}
+body.popwin .pophost>.sbar{padding:10px}
+body.popwin .pophost>.sbar .cref{position:static;margin-top:8px;width:auto;max-height:none}
+@media (max-width:840px){
+  body.bar-left .page,body.bar-right .page{grid-template-columns:1fr}
+  body.bar-right .topgrid{order:0}
+  .sbar.sq .cref{width:auto}
+}
+.sbar.sq .shint .it{white-space:normal}
+.sbar.sq .shint{overflow:hidden;max-height:66px}
+
+/* ═══ The key panel ═══ a peek under the field */
+.apip{padding:13px 16px 12px}
+.apip .rhead{padding-bottom:8px;margin-bottom:4px;border-bottom:.5px solid var(--p-border-2)}
+.apip .rtop{display:flex;align-items:baseline;gap:10px}
+.apip .rlab{font:600 9px var(--font-sans);letter-spacing:.055em;color:var(--ink)}
+.apirow{padding:8px 0;border-bottom:.5px solid var(--p-border-2)}
+.apirow .apitop{display:flex;align-items:baseline;gap:10px}
+.apirow .gn{font:600 12px var(--font-sans);color:var(--ink)}
+.apirow .apitop .marg{margin-left:auto}
+.apirow .keyrow{padding:8px 0 2px}
+.apip .foot{padding-top:9px;font:italic 400 10.5px var(--font-serif);color:var(--marg)}
+.sbar.sq .apip{width:min(520px,calc(100vw - 300px));top:calc(100% + 6px)}
+body.bar-right .sbar.sq .apip{left:auto;right:0}
+body.popwin .pophost>.sbar .apip{position:static;margin-top:8px;width:auto}
+
+</style>
+</head>
+<body>
+
+<div class="page">
+
+ <div class="topgrid">
+   <div class="barph" id="p-barph" style="display:none">the command line is in its own window;
+     <button onclick="focusField()">press ⌘K to jump to it</button>, or <button onclick="closePop('command')">bring it back</button></div>
+   <div class="sbar" id="p-bar">
+     <div class="sfield" id="sfield" data-border="dot" data-radius="8">
+       <div class="fillwrap cmdwrap"><div class="fill cmdfill"><svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true"><defs><pattern id="stars" width="57.158" height="99.000" patternUnits="userSpaceOnUse" patternTransform="rotate(-22)"><g fill="#fff"><circle cx="-52.39" cy="-85.25" r="0.55" opacity="0.61"/><circle cx="-52.39" cy="13.75" r="0.55" opacity="0.61"/><circle cx="-52.39" cy="112.75" r="0.55" opacity="0.61"/><circle cx="4.76" cy="-85.25" r="0.55" opacity="0.61"/><circle cx="4.76" cy="13.75" r="0.55" opacity="0.61"/><circle cx="4.76" cy="112.75" r="0.55" opacity="0.61"/><circle cx="61.92" cy="-85.25" r="0.55" opacity="0.61"/><circle cx="61.92" cy="13.75" r="0.55" opacity="0.61"/><circle cx="61.92" cy="112.75" r="0.55" opacity="0.61"/><circle cx="-61.92" cy="-85.25" r="0.55" opacity="0.98"/><circle cx="-61.92" cy="13.75" r="0.55" opacity="0.98"/><circle cx="-61.92" cy="112.75" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="-85.25" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="13.75" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="112.75" r="0.55" opacity="0.98"/><circle cx="52.39" cy="-85.25" r="0.55" opacity="0.98"/><circle cx="52.39" cy="13.75" r="0.55" opacity="0.98"/><circle cx="52.39" cy="112.75" r="0.55" opacity="0.98"/><circle cx="-66.68" cy="-88.00" r="0.55" opacity="0.56"/><circle cx="-66.68" cy="11.00" r="0.55" opacity="0.56"/><circle cx="-66.68" cy="110.00" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="-88.00" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="11.00" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="110.00" r="0.55" opacity="0.56"/><circle cx="47.63" cy="-88.00" r="0.55" opacity="0.56"/><circle cx="47.63" cy="11.00" r="0.55" opacity="0.56"/><circle cx="47.63" cy="110.00" r="0.55" opacity="0.56"/><circle cx="-71.45" cy="-96.25" r="0.55" opacity="0.92"/><circle cx="-71.45" cy="2.75" r="0.55" opacity="0.92"/><circle cx="-71.45" cy="101.75" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="-96.25" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="2.75" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="101.75" r="0.55" opacity="0.92"/><circle cx="42.87" cy="-96.25" r="0.55" opacity="0.92"/><circle cx="42.87" cy="2.75" r="0.55" opacity="0.92"/><circle cx="42.87" cy="101.75" r="0.55" opacity="0.92"/><circle cx="-71.45" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="-71.45" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="-71.45" cy="96.25" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="96.25" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="96.25" r="0.55" opacity="0.50"/><circle cx="-66.68" cy="-110.00" r="0.55" opacity="0.87"/><circle cx="-66.68" cy="-11.00" r="0.55" opacity="0.87"/><circle cx="-66.68" cy="88.00" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="-110.00" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="-11.00" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="88.00" r="0.55" opacity="0.87"/><circle cx="47.63" cy="-110.00" r="0.55" opacity="0.87"/><circle cx="47.63" cy="-11.00" r="0.55" opacity="0.87"/><circle cx="47.63" cy="88.00" r="0.55" opacity="0.87"/><circle cx="-61.92" cy="-112.75" r="0.55" opacity="0.45"/><circle cx="-61.92" cy="-13.75" r="0.55" opacity="0.45"/><circle cx="-61.92" cy="85.25" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="-112.75" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="-13.75" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="85.25" r="0.55" opacity="0.45"/><circle cx="52.39" cy="-112.75" r="0.55" opacity="0.45"/><circle cx="52.39" cy="-13.75" r="0.55" opacity="0.45"/><circle cx="52.39" cy="85.25" r="0.55" opacity="0.45"/><circle cx="-52.39" cy="-112.75" r="0.55" opacity="0.82"/><circle cx="-52.39" cy="-13.75" r="0.55" opacity="0.82"/><circle cx="-52.39" cy="85.25" r="0.55" opacity="0.82"/><circle cx="4.76" cy="-112.75" r="0.55" opacity="0.82"/><circle cx="4.76" cy="-13.75" r="0.55" opacity="0.82"/><circle cx="4.76" cy="85.25" r="0.55" opacity="0.82"/><circle cx="61.92" cy="-112.75" r="0.55" opacity="0.82"/><circle cx="61.92" cy="-13.75" r="0.55" opacity="0.82"/><circle cx="61.92" cy="85.25" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="-110.00" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="-11.00" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="88.00" r="0.55" opacity="0.40"/><circle cx="9.53" cy="-110.00" r="0.55" opacity="0.40"/><circle cx="9.53" cy="-11.00" r="0.55" opacity="0.40"/><circle cx="9.53" cy="88.00" r="0.55" opacity="0.40"/><circle cx="66.68" cy="-110.00" r="0.55" opacity="0.40"/><circle cx="66.68" cy="-11.00" r="0.55" opacity="0.40"/><circle cx="66.68" cy="88.00" r="0.55" opacity="0.40"/><circle cx="-42.87" cy="-101.75" r="0.55" opacity="0.77"/><circle cx="-42.87" cy="-2.75" r="0.55" opacity="0.77"/><circle cx="-42.87" cy="96.25" r="0.55" opacity="0.77"/><circle cx="14.29" cy="-101.75" r="0.55" opacity="0.77"/><circle cx="14.29" cy="-2.75" r="0.55" opacity="0.77"/><circle cx="14.29" cy="96.25" r="0.55" opacity="0.77"/><circle cx="71.45" cy="-101.75" r="0.55" opacity="0.77"/><circle cx="71.45" cy="-2.75" r="0.55" opacity="0.77"/><circle cx="71.45" cy="96.25" r="0.55" opacity="0.77"/><circle cx="-33.34" cy="-85.25" r="0.55" opacity="0.66"/><circle cx="-33.34" cy="13.75" r="0.55" opacity="0.66"/><circle cx="-33.34" cy="112.75" r="0.55" opacity="0.66"/><circle cx="23.82" cy="-85.25" r="0.55" opacity="0.66"/><circle cx="23.82" cy="13.75" r="0.55" opacity="0.66"/><circle cx="23.82" cy="112.75" r="0.55" opacity="0.66"/><circle cx="80.97" cy="-85.25" r="0.55" opacity="0.66"/><circle cx="80.97" cy="13.75" r="0.55" opacity="0.66"/><circle cx="80.97" cy="112.75" r="0.55" opacity="0.66"/><circle cx="-38.11" cy="-110.00" r="0.55" opacity="0.61"/><circle cx="-38.11" cy="-11.00" r="0.55" opacity="0.61"/><circle cx="-38.11" cy="88.00" r="0.55" opacity="0.61"/><circle cx="19.05" cy="-110.00" r="0.55" opacity="0.61"/><circle cx="19.05" cy="-11.00" r="0.55" opacity="0.61"/><circle cx="19.05" cy="88.00" r="0.55" opacity="0.61"/><circle cx="76.21" cy="-110.00" r="0.55" opacity="0.61"/><circle cx="76.21" cy="-11.00" r="0.55" opacity="0.61"/><circle cx="76.21" cy="88.00" r="0.55" opacity="0.61"/><circle cx="-33.34" cy="-112.75" r="0.55" opacity="0.98"/><circle cx="-33.34" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="-33.34" cy="85.25" r="0.55" opacity="0.98"/><circle cx="23.82" cy="-112.75" r="0.55" opacity="0.98"/><circle cx="23.82" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="23.82" cy="85.25" r="0.55" opacity="0.98"/><circle cx="80.97" cy="-112.75" r="0.55" opacity="0.98"/><circle cx="80.97" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="80.97" cy="85.25" r="0.55" opacity="0.98"/><circle cx="-23.82" cy="-112.75" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="-13.75" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="85.25" r="0.55" opacity="0.56"/><circle cx="33.34" cy="-112.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="-13.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="85.25" r="0.55" opacity="0.56"/><circle cx="90.50" cy="-112.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="-13.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="85.25" r="0.55" opacity="0.56"/><circle cx="-19.05" cy="-110.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="88.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="-110.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="88.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="-110.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="88.00" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="96.25" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="96.25" r="0.55" opacity="0.50"/><circle cx="100.03" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="100.03" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="100.03" cy="96.25" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-96.25" r="0.55" opacity="0.87"/><circle cx="-14.29" cy="2.75" r="0.55" opacity="0.87"/><circle cx="-14.29" cy="101.75" r="0.55" opacity="0.87"/><circle cx="42.87" cy="-96.25" r="0.55" opacity="0.87"/><circle cx="42.87" cy="2.75" r="0.55" opacity="0.87"/><circle cx="42.87" cy="101.75" r="0.55" opacity="0.87"/><circle cx="100.03" cy="-96.25" r="0.55" opacity="0.87"/><circle cx="100.03" cy="2.75" r="0.55" opacity="0.87"/><circle cx="100.03" cy="101.75" r="0.55" opacity="0.87"/><circle cx="-33.34" cy="-63.25" r="0.55" opacity="0.45"/><circle cx="-33.34" cy="35.75" r="0.55" opacity="0.45"/><circle cx="-33.34" cy="134.75" r="0.55" opacity="0.45"/><circle cx="23.82" cy="-63.25" r="0.55" opacity="0.45"/><circle cx="23.82" cy="35.75" r="0.55" opacity="0.45"/><circle cx="23.82" cy="134.75" r="0.55" opacity="0.45"/><circle cx="80.97" cy="-63.25" r="0.55" opacity="0.45"/><circle cx="80.97" cy="35.75" r="0.55" opacity="0.45"/><circle cx="80.97" cy="134.75" r="0.55" opacity="0.45"/><circle cx="-38.11" cy="-60.50" r="0.55" opacity="0.82"/><circle cx="-38.11" cy="38.50" r="0.55" opacity="0.82"/><circle cx="-38.11" cy="137.50" r="0.55" opacity="0.82"/><circle cx="19.05" cy="-60.50" r="0.55" opacity="0.82"/><circle cx="19.05" cy="38.50" r="0.55" opacity="0.82"/><circle cx="19.05" cy="137.50" r="0.55" opacity="0.82"/><circle cx="76.21" cy="-60.50" r="0.55" opacity="0.82"/><circle cx="76.21" cy="38.50" r="0.55" opacity="0.82"/><circle cx="76.21" cy="137.50" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="-60.50" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="38.50" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="137.50" r="0.55" opacity="0.40"/><circle cx="9.53" cy="-60.50" r="0.55" opacity="0.40"/><circle cx="9.53" cy="38.50" r="0.55" opacity="0.40"/><circle cx="9.53" cy="137.50" r="0.55" opacity="0.40"/><circle cx="66.68" cy="-60.50" r="0.55" opacity="0.40"/><circle cx="66.68" cy="38.50" r="0.55" opacity="0.40"/><circle cx="66.68" cy="137.50" r="0.55" opacity="0.40"/><circle cx="-52.39" cy="-63.25" r="0.55" opacity="0.77"/><circle cx="-52.39" cy="35.75" r="0.55" opacity="0.77"/><circle cx="-52.39" cy="134.75" r="0.55" opacity="0.77"/><circle cx="4.76" cy="-63.25" r="0.55" opacity="0.77"/><circle cx="4.76" cy="35.75" r="0.55" opacity="0.77"/><circle cx="4.76" cy="134.75" r="0.55" opacity="0.77"/><circle cx="61.92" cy="-63.25" r="0.55" opacity="0.77"/><circle cx="61.92" cy="35.75" r="0.55" opacity="0.77"/><circle cx="61.92" cy="134.75" r="0.55" opacity="0.77"/><circle cx="-57.16" cy="-77.00" r="0.55" opacity="0.71"/><circle cx="-57.16" cy="22.00" r="0.55" opacity="0.71"/><circle cx="-57.16" cy="121.00" r="0.55" opacity="0.71"/><circle cx="-0.00" cy="-77.00" r="0.55" opacity="0.71"/><circle cx="-0.00" cy="22.00" r="0.55" opacity="0.71"/><circle cx="-0.00" cy="121.00" r="0.55" opacity="0.71"/><circle cx="57.16" cy="-77.00" r="0.55" opacity="0.71"/><circle cx="57.16" cy="22.00" r="0.55" opacity="0.71"/><circle cx="57.16" cy="121.00" r="0.55" opacity="0.71"/><circle cx="-9.53" cy="-60.50" r="0.55" opacity="0.61"/><circle cx="-9.53" cy="38.50" r="0.55" opacity="0.61"/><circle cx="-9.53" cy="137.50" r="0.55" opacity="0.61"/><circle cx="47.63" cy="-60.50" r="0.55" opacity="0.61"/><circle cx="47.63" cy="38.50" r="0.55" opacity="0.61"/><circle cx="47.63" cy="137.50" r="0.55" opacity="0.61"/><circle cx="104.79" cy="-60.50" r="0.55" opacity="0.61"/><circle cx="104.79" cy="38.50" r="0.55" opacity="0.61"/><circle cx="104.79" cy="137.50" r="0.55" opacity="0.61"/><circle cx="-19.05" cy="-60.50" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="38.50" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="137.50" r="0.55" opacity="0.98"/><circle cx="38.11" cy="-60.50" r="0.55" opacity="0.98"/><circle cx="38.11" cy="38.50" r="0.55" opacity="0.98"/><circle cx="38.11" cy="137.50" r="0.55" opacity="0.98"/><circle cx="95.26" cy="-60.50" r="0.55" opacity="0.98"/><circle cx="95.26" cy="38.50" r="0.55" opacity="0.98"/><circle cx="95.26" cy="137.50" r="0.55" opacity="0.98"/><circle cx="-23.82" cy="-63.25" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="35.75" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="134.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="-63.25" r="0.55" opacity="0.56"/><circle cx="33.34" cy="35.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="134.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="-63.25" r="0.55" opacity="0.56"/><circle cx="90.50" cy="35.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="134.75" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="-88.00" r="0.55" opacity="0.92"/><circle cx="-9.53" cy="11.00" r="0.55" opacity="0.92"/><circle cx="-9.53" cy="110.00" r="0.55" opacity="0.92"/><circle cx="47.63" cy="-88.00" r="0.55" opacity="0.92"/><circle cx="47.63" cy="11.00" r="0.55" opacity="0.92"/><circle cx="47.63" cy="110.00" r="0.55" opacity="0.92"/><circle cx="104.79" cy="-88.00" r="0.55" opacity="0.92"/><circle cx="104.79" cy="11.00" r="0.55" opacity="0.92"/><circle cx="104.79" cy="110.00" r="0.55" opacity="0.92"/><circle cx="-4.76" cy="-85.25" r="0.55" opacity="0.50"/><circle cx="-4.76" cy="13.75" r="0.55" opacity="0.50"/><circle cx="-4.76" cy="112.75" r="0.55" opacity="0.50"/><circle cx="52.39" cy="-85.25" r="0.55" opacity="0.50"/><circle cx="52.39" cy="13.75" r="0.55" opacity="0.50"/><circle cx="52.39" cy="112.75" r="0.55" opacity="0.50"/><circle cx="109.55" cy="-85.25" r="0.55" opacity="0.50"/><circle cx="109.55" cy="13.75" r="0.55" opacity="0.50"/><circle cx="109.55" cy="112.75" r="0.55" opacity="0.50"/><circle cx="-0.00" cy="-77.00" r="0.55" opacity="0.87"/><circle cx="-0.00" cy="22.00" r="0.55" opacity="0.87"/><circle cx="-0.00" cy="121.00" r="0.55" opacity="0.87"/><circle cx="57.16" cy="-77.00" r="0.55" opacity="0.87"/><circle cx="57.16" cy="22.00" r="0.55" opacity="0.87"/><circle cx="57.16" cy="121.00" r="0.55" opacity="0.87"/><circle cx="114.32" cy="-77.00" r="0.55" opacity="0.87"/><circle cx="114.32" cy="22.00" r="0.55" opacity="0.87"/><circle cx="114.32" cy="121.00" r="0.55" opacity="0.87"/><circle cx="0.00" cy="-71.50" r="0.55" opacity="0.45"/><circle cx="0.00" cy="27.50" r="0.55" opacity="0.45"/><circle cx="0.00" cy="126.50" r="0.55" opacity="0.45"/><circle cx="57.16" cy="-71.50" r="0.55" opacity="0.45"/><circle cx="57.16" cy="27.50" r="0.55" opacity="0.45"/><circle cx="57.16" cy="126.50" r="0.55" opacity="0.45"/><circle cx="114.32" cy="-71.50" r="0.55" opacity="0.45"/><circle cx="114.32" cy="27.50" r="0.55" opacity="0.45"/><circle cx="114.32" cy="126.50" r="0.55" opacity="0.45"/><circle cx="-47.63" cy="-38.50" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="60.50" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="159.50" r="0.55" opacity="0.82"/><circle cx="9.53" cy="-38.50" r="0.55" opacity="0.82"/><circle cx="9.53" cy="60.50" r="0.55" opacity="0.82"/><circle cx="9.53" cy="159.50" r="0.55" opacity="0.82"/><circle cx="66.68" cy="-38.50" r="0.55" opacity="0.82"/><circle cx="66.68" cy="60.50" r="0.55" opacity="0.82"/><circle cx="66.68" cy="159.50" r="0.55" opacity="0.82"/><circle cx="-52.39" cy="-35.75" r="0.55" opacity="0.40"/><circle cx="-52.39" cy="63.25" r="0.55" opacity="0.40"/><circle cx="-52.39" cy="162.25" r="0.55" opacity="0.40"/><circle cx="4.76" cy="-35.75" r="0.55" opacity="0.40"/><circle cx="4.76" cy="63.25" r="0.55" opacity="0.40"/><circle cx="4.76" cy="162.25" r="0.55" opacity="0.40"/><circle cx="61.92" cy="-35.75" r="0.55" opacity="0.40"/><circle cx="61.92" cy="63.25" r="0.55" opacity="0.40"/><circle cx="61.92" cy="162.25" r="0.55" opacity="0.40"/><circle cx="-61.92" cy="-35.75" r="0.55" opacity="0.77"/><circle cx="-61.92" cy="63.25" r="0.55" opacity="0.77"/><circle cx="-61.92" cy="162.25" r="0.55" opacity="0.77"/><circle cx="-4.76" cy="-35.75" r="0.55" opacity="0.77"/><circle cx="-4.76" cy="63.25" r="0.55" opacity="0.77"/><circle cx="-4.76" cy="162.25" r="0.55" opacity="0.77"/><circle cx="52.39" cy="-35.75" r="0.55" opacity="0.77"/><circle cx="52.39" cy="63.25" r="0.55" opacity="0.77"/><circle cx="52.39" cy="162.25" r="0.55" opacity="0.77"/><circle cx="-71.45" cy="-46.75" r="0.55" opacity="0.71"/><circle cx="-71.45" cy="52.25" r="0.55" opacity="0.71"/><circle cx="-71.45" cy="151.25" r="0.55" opacity="0.71"/><circle cx="-14.29" cy="-46.75" r="0.55" opacity="0.71"/><circle cx="-14.29" cy="52.25" r="0.55" opacity="0.71"/><circle cx="-14.29" cy="151.25" r="0.55" opacity="0.71"/><circle cx="42.87" cy="-46.75" r="0.55" opacity="0.71"/><circle cx="42.87" cy="52.25" r="0.55" opacity="0.71"/><circle cx="42.87" cy="151.25" r="0.55" opacity="0.71"/><circle cx="-66.68" cy="-60.50" r="0.55" opacity="0.66"/><circle cx="-66.68" cy="38.50" r="0.55" opacity="0.66"/><circle cx="-66.68" cy="137.50" r="0.55" opacity="0.66"/><circle cx="-9.53" cy="-60.50" r="0.55" opacity="0.66"/><circle cx="-9.53" cy="38.50" r="0.55" opacity="0.66"/><circle cx="-9.53" cy="137.50" r="0.55" opacity="0.66"/><circle cx="47.63" cy="-60.50" r="0.55" opacity="0.66"/><circle cx="47.63" cy="38.50" r="0.55" opacity="0.66"/><circle cx="47.63" cy="137.50" r="0.55" opacity="0.66"/><circle cx="-42.87" cy="-46.75" r="0.55" opacity="0.98"/><circle cx="-42.87" cy="52.25" r="0.55" opacity="0.98"/><circle cx="-42.87" cy="151.25" r="0.55" opacity="0.98"/><circle cx="14.29" cy="-46.75" r="0.55" opacity="0.98"/><circle cx="14.29" cy="52.25" r="0.55" opacity="0.98"/><circle cx="14.29" cy="151.25" r="0.55" opacity="0.98"/><circle cx="71.45" cy="-46.75" r="0.55" opacity="0.98"/><circle cx="71.45" cy="52.25" r="0.55" opacity="0.98"/><circle cx="71.45" cy="151.25" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="-38.50" r="0.55" opacity="0.56"/><circle cx="-19.05" cy="60.50" r="0.55" opacity="0.56"/><circle cx="-19.05" cy="159.50" r="0.55" opacity="0.56"/><circle cx="38.11" cy="-38.50" r="0.55" opacity="0.56"/><circle cx="38.11" cy="60.50" r="0.55" opacity="0.56"/><circle cx="38.11" cy="159.50" r="0.55" opacity="0.56"/><circle cx="95.26" cy="-38.50" r="0.55" opacity="0.56"/><circle cx="95.26" cy="60.50" r="0.55" opacity="0.56"/><circle cx="95.26" cy="159.50" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="-35.75" r="0.55" opacity="0.92"/><circle cx="-23.82" cy="63.25" r="0.55" opacity="0.92"/><circle cx="-23.82" cy="162.25" r="0.55" opacity="0.92"/><circle cx="33.34" cy="-35.75" r="0.55" opacity="0.92"/><circle cx="33.34" cy="63.25" r="0.55" opacity="0.92"/><circle cx="33.34" cy="162.25" r="0.55" opacity="0.92"/><circle cx="90.50" cy="-35.75" r="0.55" opacity="0.92"/><circle cx="90.50" cy="63.25" r="0.55" opacity="0.92"/><circle cx="90.50" cy="162.25" r="0.55" opacity="0.92"/><circle cx="-33.34" cy="-35.75" r="0.55" opacity="0.50"/><circle cx="-33.34" cy="63.25" r="0.55" opacity="0.50"/><circle cx="-33.34" cy="162.25" r="0.55" opacity="0.50"/><circle cx="23.82" cy="-35.75" r="0.55" opacity="0.50"/><circle cx="23.82" cy="63.25" r="0.55" opacity="0.50"/><circle cx="23.82" cy="162.25" r="0.55" opacity="0.50"/><circle cx="80.97" cy="-35.75" r="0.55" opacity="0.50"/><circle cx="80.97" cy="63.25" r="0.55" opacity="0.50"/><circle cx="80.97" cy="162.25" r="0.55" opacity="0.50"/><circle cx="-38.11" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="-38.11" cy="60.50" r="0.55" opacity="0.87"/><circle cx="-38.11" cy="159.50" r="0.55" opacity="0.87"/><circle cx="19.05" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="19.05" cy="60.50" r="0.55" opacity="0.87"/><circle cx="19.05" cy="159.50" r="0.55" opacity="0.87"/><circle cx="76.21" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="76.21" cy="60.50" r="0.55" opacity="0.87"/><circle cx="76.21" cy="159.50" r="0.55" opacity="0.87"/><circle cx="-14.29" cy="-52.25" r="0.55" opacity="0.45"/><circle cx="-14.29" cy="46.75" r="0.55" opacity="0.45"/><circle cx="-14.29" cy="145.75" r="0.55" opacity="0.45"/><circle cx="42.87" cy="-52.25" r="0.55" opacity="0.45"/><circle cx="42.87" cy="46.75" r="0.55" opacity="0.45"/><circle cx="42.87" cy="145.75" r="0.55" opacity="0.45"/><circle cx="100.03" cy="-52.25" r="0.55" opacity="0.45"/><circle cx="100.03" cy="46.75" r="0.55" opacity="0.45"/><circle cx="100.03" cy="145.75" r="0.55" opacity="0.45"/><circle cx="-14.29" cy="-46.75" r="0.55" opacity="0.82"/><circle cx="-14.29" cy="52.25" r="0.55" opacity="0.82"/><circle cx="-14.29" cy="151.25" r="0.55" opacity="0.82"/><circle cx="42.87" cy="-46.75" r="0.55" opacity="0.82"/><circle cx="42.87" cy="52.25" r="0.55" opacity="0.82"/><circle cx="42.87" cy="151.25" r="0.55" opacity="0.82"/><circle cx="100.03" cy="-46.75" r="0.55" opacity="0.82"/><circle cx="100.03" cy="52.25" r="0.55" opacity="0.82"/><circle cx="100.03" cy="151.25" r="0.55" opacity="0.82"/><circle cx="-33.34" cy="-13.75" r="0.55" opacity="0.40"/><circle cx="-33.34" cy="85.25" r="0.55" opacity="0.40"/><circle cx="-33.34" cy="184.25" r="0.55" opacity="0.40"/><circle cx="23.82" cy="-13.75" r="0.55" opacity="0.40"/><circle cx="23.82" cy="85.25" r="0.55" opacity="0.40"/><circle cx="23.82" cy="184.25" r="0.55" opacity="0.40"/><circle cx="80.97" cy="-13.75" r="0.55" opacity="0.40"/><circle cx="80.97" cy="85.25" r="0.55" opacity="0.40"/><circle cx="80.97" cy="184.25" r="0.55" opacity="0.40"/><circle cx="-38.11" cy="-11.00" r="0.55" opacity="0.77"/><circle cx="-38.11" cy="88.00" r="0.55" opacity="0.77"/><circle cx="-38.11" cy="187.00" r="0.55" opacity="0.77"/><circle cx="19.05" cy="-11.00" r="0.55" opacity="0.77"/><circle cx="19.05" cy="88.00" r="0.55" opacity="0.77"/><circle cx="19.05" cy="187.00" r="0.55" opacity="0.77"/><circle cx="76.21" cy="-11.00" r="0.55" opacity="0.77"/><circle cx="76.21" cy="88.00" r="0.55" opacity="0.77"/><circle cx="76.21" cy="187.00" r="0.55" opacity="0.77"/><circle cx="-52.39" cy="-13.75" r="0.55" opacity="0.71"/><circle cx="-52.39" cy="85.25" r="0.55" opacity="0.71"/><circle cx="-52.39" cy="184.25" r="0.55" opacity="0.71"/><circle cx="4.76" cy="-13.75" r="0.55" opacity="0.71"/><circle cx="4.76" cy="85.25" r="0.55" opacity="0.71"/><circle cx="4.76" cy="184.25" r="0.55" opacity="0.71"/><circle cx="61.92" cy="-13.75" r="0.55" opacity="0.71"/><circle cx="61.92" cy="85.25" r="0.55" opacity="0.71"/><circle cx="61.92" cy="184.25" r="0.55" opacity="0.71"/><circle cx="-57.16" cy="-27.50" r="0.55" opacity="0.66"/><circle cx="-57.16" cy="71.50" r="0.55" opacity="0.66"/><circle cx="-57.16" cy="170.50" r="0.55" opacity="0.66"/><circle cx="-0.00" cy="-27.50" r="0.55" opacity="0.66"/><circle cx="-0.00" cy="71.50" r="0.55" opacity="0.66"/><circle cx="-0.00" cy="170.50" r="0.55" opacity="0.66"/><circle cx="57.16" cy="-27.50" r="0.55" opacity="0.66"/><circle cx="57.16" cy="71.50" r="0.55" opacity="0.66"/><circle cx="57.16" cy="170.50" r="0.55" opacity="0.66"/><circle cx="-28.58" cy="-22.00" r="0.55" opacity="0.61"/><circle cx="-28.58" cy="77.00" r="0.55" opacity="0.61"/><circle cx="-28.58" cy="176.00" r="0.55" opacity="0.61"/><circle cx="28.58" cy="-22.00" r="0.55" opacity="0.61"/><circle cx="28.58" cy="77.00" r="0.55" opacity="0.61"/><circle cx="28.58" cy="176.00" r="0.55" opacity="0.61"/><circle cx="85.74" cy="-22.00" r="0.55" opacity="0.61"/><circle cx="85.74" cy="77.00" r="0.55" opacity="0.61"/><circle cx="85.74" cy="176.00" r="0.55" opacity="0.61"/><circle cx="-4.76" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="85.25" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="184.25" r="0.55" opacity="0.98"/><circle cx="52.39" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="52.39" cy="85.25" r="0.55" opacity="0.98"/><circle cx="52.39" cy="184.25" r="0.55" opacity="0.98"/><circle cx="109.55" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="109.55" cy="85.25" r="0.55" opacity="0.98"/><circle cx="109.55" cy="184.25" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="88.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="187.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="88.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="187.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="88.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="187.00" r="0.55" opacity="0.92"/><circle cx="-23.82" cy="-13.75" r="0.55" opacity="0.50"/><circle cx="-23.82" cy="85.25" r="0.55" opacity="0.50"/><circle cx="-23.82" cy="184.25" r="0.55" opacity="0.50"/><circle cx="33.34" cy="-13.75" r="0.55" opacity="0.50"/><circle cx="33.34" cy="85.25" r="0.55" opacity="0.50"/><circle cx="33.34" cy="184.25" r="0.55" opacity="0.50"/><circle cx="90.50" cy="-13.75" r="0.55" opacity="0.50"/><circle cx="90.50" cy="85.25" r="0.55" opacity="0.50"/><circle cx="90.50" cy="184.25" r="0.55" opacity="0.50"/><circle cx="-9.53" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="60.50" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="159.50" r="0.55" opacity="0.87"/><circle cx="47.63" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="47.63" cy="60.50" r="0.55" opacity="0.87"/><circle cx="47.63" cy="159.50" r="0.55" opacity="0.87"/><circle cx="104.79" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="104.79" cy="60.50" r="0.55" opacity="0.87"/><circle cx="104.79" cy="159.50" r="0.55" opacity="0.87"/><circle cx="-4.76" cy="-35.75" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="63.25" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="162.25" r="0.55" opacity="0.45"/><circle cx="52.39" cy="-35.75" r="0.55" opacity="0.45"/><circle cx="52.39" cy="63.25" r="0.55" opacity="0.45"/><circle cx="52.39" cy="162.25" r="0.55" opacity="0.45"/><circle cx="109.55" cy="-35.75" r="0.55" opacity="0.45"/><circle cx="109.55" cy="63.25" r="0.55" opacity="0.45"/><circle cx="109.55" cy="162.25" r="0.55" opacity="0.45"/><circle cx="-0.00" cy="-27.50" r="0.55" opacity="0.82"/><circle cx="-0.00" cy="71.50" r="0.55" opacity="0.82"/><circle cx="-0.00" cy="170.50" r="0.55" opacity="0.82"/><circle cx="57.16" cy="-27.50" r="0.55" opacity="0.82"/><circle cx="57.16" cy="71.50" r="0.55" opacity="0.82"/><circle cx="57.16" cy="170.50" r="0.55" opacity="0.82"/><circle cx="114.32" cy="-27.50" r="0.55" opacity="0.82"/><circle cx="114.32" cy="71.50" r="0.55" opacity="0.82"/><circle cx="114.32" cy="170.50" r="0.55" opacity="0.82"/><circle cx="0.00" cy="-22.00" r="0.55" opacity="0.40"/><circle cx="0.00" cy="77.00" r="0.55" opacity="0.40"/><circle cx="0.00" cy="176.00" r="0.55" opacity="0.40"/><circle cx="57.16" cy="-22.00" r="0.55" opacity="0.40"/><circle cx="57.16" cy="77.00" r="0.55" opacity="0.40"/><circle cx="57.16" cy="176.00" r="0.55" opacity="0.40"/><circle cx="114.32" cy="-22.00" r="0.55" opacity="0.40"/><circle cx="114.32" cy="77.00" r="0.55" opacity="0.40"/><circle cx="114.32" cy="176.00" r="0.55" opacity="0.40"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#stars)"/></svg></div></div>
+       <div class="fillwrap prmwrap"><div class="fill prmfill"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><pattern id="mosaic" width="16" height="24" patternUnits="userSpaceOnUse" patternTransform="skewY(-17)"><g fill="none" stroke="var(--tri)" stroke-width=".7"><path d="M0 0V24M16 0V24"/><path d="M0 0H16M0 24H16"/><path d="M0 0L16 24"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#mosaic)"/></svg></div></div>
+       <span class="modechip schip">SEARCH</span>
+       <span class="modechip cmdchip">COMMAND</span>
+       <span class="modechip pchip">PROMPT</span>
+       <svg class="mag" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><line x1="10.2" y1="10.2" x2="13.8" y2="13.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+       <svg class="quillmark" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.3 14.8h8.5l-.7 5.1a1.5 1.5 0 0 1-1.5 1.3H8.5a1.5 1.5 0 0 1-1.5-1.3z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.2 14.8h10.7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M21.3 2.3c-5.7 1.2-9.1 5-9.8 10l3.1-1c3.9-1.4 6.4-4.6 6.7-9z" fill="currentColor"/><path d="M11.9 12.2 10.4 14.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+       <input id="q" type="text" placeholder="Search settings" autocomplete="off" spellcheck="false" oninput="setQ(this.value)" aria-label="Search settings, or type > for the command line">
+     </div>
+     <div class="shint" id="shint" aria-live="polite"></div>
+     <div class="cref" id="cref" data-border="dot" data-radius="8"></div>
+     <div class="peek apip" id="apip" data-border="dot" data-radius="8" role="dialog" aria-label="API keys"></div>
+   </div>
+ </div>
+
+ <div class="wrap">
+  <div class="card rail-card" id="p-rail"><div id="rail"></div>
+    <div class="rfoot">Every section has a word. <b>open:settings</b> and the word goes straight there;
+      <b>pop:settings</b> keeps it beside whatever you are working on.</div>
+  </div>
+
+  <div class="card scard" id="p-card" data-border="dot" data-radius="16"><div class="srule" id="srule"></div>
+    <div id="secs"></div>
+    <div class="empty-s" id="empty">No setting matches that. Try a shorter word, or type <b>s&gt;</b> to clear.</div>
+  </div>
+
+  <div class="card popph" id="p-cardph" data-border="dot" data-radius="16" style="display:none">
+    Settings is in its own window.
+    <span class="marg">commands typed here still reach it; <button onclick="closePop('settings')">bring it back</button> or type pop:back</span>
+  </div>
+ </div>
+</div>
+
+<div class="menu" id="menu"></div>
+<div class="notebar"><b>Try this.</b> Type <b>&gt;open:settings spending</b>, <b>&gt;set:default haiku</b> (read the line under the field first), <b>&gt;api:</b> for your keys, or <b>&gt;bar:left</b> and <b>&gt;bar:pop</b> to move the command line.</div>
+<div class="toast" id="toast"></div>
+<input type="file" id="restorefile" accept=".parliament" style="display:none" onchange="restored(this)">
+
+<script>
+var NS='http://www.w3.org/2000/svg';
+
+function rrPath(w,h,r){
+  var i=0.5, rad=r-i, m=r-rad*0.7071;
+  return 'M'+m+','+m+
+    'A'+rad+','+rad+' 0 0 1 '+r+','+i+' H'+(w-r)+
+    'A'+rad+','+rad+' 0 0 1 '+(w-i)+','+r+' V'+(h-r)+
+    'A'+rad+','+rad+' 0 0 1 '+(w-r)+','+(h-i)+' H'+r+
+    'A'+rad+','+rad+' 0 0 1 '+i+','+(h-r)+' V'+r+
+    'A'+rad+','+rad+' 0 0 1 '+m+','+m;
+}
+
+function paintBorder(el){
+  var kind=el.getAttribute('data-border'), r=+(el.getAttribute('data-radius')||8);
+  var w=el.offsetWidth, h=el.offsetHeight;
+  if(w<2*r+2||h<2*r+2) return;
+
+  var svg=el.querySelector(':scope > svg.bx');
+  if(!svg){
+    svg=document.createElementNS(NS,'svg');
+    svg.setAttribute('class','bx'); svg.setAttribute('aria-hidden','true');
+    el.appendChild(svg);
+  }
+  svg.innerHTML='';
+  svg.setAttribute('width',w); svg.setAttribute('height',h);
+  svg.setAttribute('viewBox','0 0 '+w+' '+h);
+
+  var d=rrPath(w,h,r);
+  function mkPath(cls){
+    var q=document.createElementNS(NS,'path');
+    q.setAttribute('d',d); q.setAttribute('fill','none');
+    q.setAttribute('stroke-width','1'); q.setAttribute('stroke-linecap','round');
+    if(cls) q.setAttribute('class',cls);
+    svg.appendChild(q); return q;
+  }
+
+  if(kind==='prog'){
+    /* Two paths. The ink one is the resting progressive dash: mirrored halves
+       growing from a dot at the top-left to a solid bottom-right corner, so it
+       reads like light falling from the top-left. The gold one is solid and
+       hidden by its own length, and draws itself in when the element is live. */
+    var ink=mkPath('prog-ink');
+    var L=ink.getTotalLength();
+    ink.style.stroke='var(--ink-prog)';
+    var gEnd=3.5, gJoin=1, maxDash=12;
+    var half=(L-gEnd-gJoin)/2, A=[], S=0;
+    while(true){
+      var t=Math.min(S/half,1);
+      var dash=0.01+maxDash*Math.pow(t,1.4);
+      var gap=3.5-2.6*t;
+      if(A.length && S+gap+dash>half) break;
+      if(A.length){A.push(gap);S+=gap;}
+      A.push(dash); S+=dash;
+    }
+    A[A.length-1]+=half-S;
+    ink.setAttribute('stroke-dasharray',A.concat([gJoin],A.slice().reverse(),[gEnd]).join(' '));
+
+  }else{
+    /* Even dots, spacing nudged so a whole number fits the perimeter exactly. */
+    var dots=mkPath('');
+    var L2=dots.getTotalLength();
+    dots.style.stroke='var(--ink-dot)';
+    var count=Math.max(4,Math.round(L2/4)), seg=L2/count;
+    dots.setAttribute('stroke-dasharray','0.01 '+(seg-0.01));
+  }
+}
+
+/* ═══ One key element per card, at most ═══
+   The middle card's action is finding, so the search field carries the mark.
+   The right card's action is starting work, so the trigger carries it there —
+   and the trigger is the same object as the docket's: one glyph that means
+   "start", in Prompt state until the composer opens and Send after. The left
+   card has no action, so it has no mark. Nothing moves between cards. */
+
+var RO = window.ResizeObserver ? new ResizeObserver(function(es){
+  es.forEach(function(e){ paintBorder(e.target); });
+}) : null;
+
+function paintAll(){
+  if(typeof POPS!=='undefined') for(var k in POPS){try{POPS[k].win.document.body.className=document.body.className+' popwin';}catch(e){}}
+  qsa('[data-border]').forEach(function(el){
+    paintBorder(el);
+    if(RO && !el.__ro){ RO.observe(el); el.__ro=true; }
+  });
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+var tt;function toast(m){var t=$id('toast');t.innerHTML=m;t.classList.add('show');
+  clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show');},2400);}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════════════════════════════════ */
+var POPS={}, PIP_BUSY=false, KEYWIN=null;
+function $id(id){
+  var el=document.getElementById(id); if(el) return el;
+  for(var k in POPS){ var w=POPS[k].win; if(w&&!w.closed){ el=w.document.getElementById(id); if(el) return el; } }
+  return null;
+}
+function qsa(sel){
+  var out=Array.prototype.slice.call(document.querySelectorAll(sel));
+  for(var k in POPS){ var w=POPS[k].win; if(w&&!w.closed) out=out.concat(Array.prototype.slice.call(w.document.querySelectorAll(sel))); }
+  return out;
+}
+
+var S={
+  keys:{anthropic:'4f2a',mistral:'',openalex:''},
+  ollama:true,
+  storage:'remember',
+  def:'auto', autoFallback:'sonnet',
+  budgetOn:true, budget:20, warn:1,
+  summary:'brief', threshold:80, compress:'ask', room:'Writing Studio',
+  reminder:'weekly', text:'default',
+  desks:[{n:'Review desk',d:'table and command line popped, two screens'},{n:'Morning',d:'docket 201 beside the Almanac'}]
+};
+
+/* Providers own keys; models belong to providers; within a provider, rows go
+   by mark, most expensive first. The answered-by picker elsewhere stays one
+   flat list (spec §8). */
+var PROV=[
+  {id:'anthropic',name:'Anthropic',key:true,ph:'sk-ant-…',get:'console.anthropic.com',
+   models:[{id:'fable',n:'Claude Fable 5.1',m:'×?'},{id:'opus',n:'Claude Opus 5.5',m:'×15'},
+           {id:'sonnet',n:'Claude Sonnet 5',m:'×3'},{id:'haiku',n:'Claude Haiku 4.5',m:'×1'}]},
+  {id:'mistral',name:'Mistral',key:true,ph:'paste a Mistral key',get:'console.mistral.ai',
+   models:[{id:'mlarge',n:'Mistral Large',m:'×?'},{id:'msmall',n:'Mistral Small',m:'×?'}]},
+  {id:'ollama',name:'Ollama',key:false,local:true,
+   models:[{id:'llama',n:'Llama 3.1 8B',m:'free'}]},
+  {id:'sources',name:'Sources',key:false,src:true,
+   models:[{n:'Wikipedia',g:'articles, summary first'},{n:'arXiv',g:'preprints'},
+     {n:'Europe PMC',g:'biomedical literature'},{n:'Hacker News',g:'through Algolia'},
+     {n:'Open Library',g:'books'},{n:'Openverse',g:'openly licensed images'},
+     {n:'Wikidata',g:'facts as records'},{n:'OpenAlex',g:'scholarly works',okey:true},
+     {n:'News',g:'not yet',later:true}]}
+];
+function allModels(){var o=[];PROV.forEach(function(p){if(!p.src)p.models.forEach(function(m){o.push({m:m,p:p});});});return o;}
+function modelById(id){return allModels().filter(function(x){return x.m.id===id;})[0];}
+function connected(p){return p.local?S.ollama:p.key?!!S.keys[p.id]:true;}
+function modelName(id){if(id==='auto')return 'Auto';var x=modelById(id);return x?x.m.n:id;}
+/* Words people type for a model, resolved the way invoke: will resolve them. */
+var MODEL_ALIAS={auto:'auto',opus:'opus','opus 5.5':'opus',sonnet:'sonnet','sonnet 5':'sonnet',haiku:'haiku','haiku 4.5':'haiku',
+  fable:'fable','fable 5.1':'fable',llama:'llama','llama 3.1':'llama',local:'llama',ollama:'llama',
+  mistral:'mlarge','mistral large':'mlarge',large:'mlarge','mistral small':'msmall',small:'msmall'};
+
+var SECS=[
+  {id:'keys',title:'API keys',rd:'providers, keys, and the default model',al:['keys','key','api','models','model','providers']},
+  {id:'spending',title:'Spending',rd:'this month, and when to warn',al:['spending','spend','cost','budget','usage']},
+  {id:'context',title:'Context and defaults',rd:'summaries, long chats, new dockets',al:['context','defaults','default']},
+  {id:'data',title:'Data and backups',rd:'backup, restore, storage',al:['data','backup','backups','storage']},
+  {id:'appearance',title:'Appearance',rd:'text size, and desks on this device',al:['appearance','look','text','desks']},
+  {id:'about',title:'About and security',rd:'what leaves this browser, and where',al:['about','security','network','privacy']}
+];
+/* A component is not finished until it is registered (spec §9). */
+var PANELS={}, PANEL_ALIAS={};
+SECS.forEach(function(s){PANELS[s.id]=s.title;s.al.forEach(function(a){PANEL_ALIAS[a]=s.id;});});
+function secOf(w){return PANEL_ALIAS[String(w||'').trim().toLowerCase()]||null;}
+
+var UNDO=[];
+function snap(what){UNDO.push({what:what,S:JSON.parse(JSON.stringify(S))}); if(UNDO.length>30)UNDO.shift();}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   RENDER
+   ═══════════════════════════════════════════════════════════════════════ */
+var CARET='<svg class="caret" viewBox="0 0 12 12" fill="none"><polyline points="3,4.5 6,7.5 9,4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var MTICK='<svg class="tick" viewBox="0 0 12 12" fill="none"><polyline points="2,6.5 5,9.5 10,3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var GEAR='<svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="1.8" stroke="currentColor" stroke-width="1.1"/><path d="M6 1.2v1.4M6 9.4v1.4M1.2 6h1.4M9.4 6h1.4M2.6 2.6l1 1M8.4 8.4l1 1M2.6 9.4l1-1M8.4 3.6l1-1" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>';
+
+function row(label,help,ctl,words,cls){
+  return '<div class="srow'+(cls?' '+cls:'')+'" data-w="'+esc((label+' '+(words||'')+' '+help.replace(/<[^>]+>/g,'')).toLowerCase())+'">'+
+    '<div><div class="sl">'+label+'</div>'+(help?'<div class="sh">'+help+'</div>':'')+'</div>'+
+    (ctl!==null?'<div class="sctl">'+ctl+'</div>':'')+'</div>';
+}
+function seg(key,opts){
+  return '<div class="seg" role="radiogroup">'+opts.map(function(o){
+    var v=o[0],l=o[1],on=String(S[key])===String(v);
+    return '<button role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" onclick="setVal(\''+key+'\','+JSON.stringify(v).replace(/"/g,'&quot;')+')">'+esc(l)+'</button>';
+  }).join('')+'</div>';
+}
+function picks(key,opts){
+  return '<div class="picks" role="radiogroup">'+opts.map(function(o){
+    var on=S[key]===o[0];
+    return '<button role="radio" aria-checked="'+on+'" class="pick'+(on?' on':'')+'" onclick="setVal(\''+key+'\',\''+o[0]+'\')">'+
+      '<span class="dot"></span><span><span class="pl">'+esc(o[1])+'</span><span class="ph">'+o[2]+'</span></span></button>';
+  }).join('')+'</div>';
+}
+function secHead(s,lede){
+  return '<div class="sec-h"><h2>'+esc(s.title)+'</h2><span class="alias">'+s.id+'</span></div>'+
+    (lede?'<p class="sec-lede">'+lede+'</p>':'');
+}
+
+function drawKeys(s){
+  var h=secHead(s,'Each provider\'s key sits with the models it unlocks. Pick one as the default for new chats. '+
+    'Marks compare cost against Haiku: <code>×15</code> costs fifteen times as much per token.');
+  var fb=modelName(S.autoFallback);
+  h+='<div class="auto" data-w="auto default lookup sources">'+
+    '<button class="mrow'+(S.def==='auto'?' on':'')+'" role="radio" aria-checked="'+(S.def==='auto')+'" onclick="setVal(\'def\',\'auto\')">'+
+    '<span class="dot"></span><span><span class="mn">Auto</span></span><span class="mk"></span><span class="mk">default</span></button>'+
+    '<div class="marg" style="padding:0 0 0 18px">lookups go to a source at 0 tokens; everything else to '+
+    '<button onclick="fallbackMenu(event)">'+esc(fb)+CARET+'</button></div></div>';
+  PROV.forEach(function(p){
+    var on=connected(p), status;
+    if(p.src) status='no key needed; Auto uses these for lookups; 0 tokens';
+    else if(p.local) status=on?'on your machine, found at localhost:11434':'on your machine, not found';
+    else status=on?'connected, key ends '+S.keys[p.id]:'needs a key';
+    h+='<div class="grp" data-grp="'+p.id+'" data-w="'+esc((p.name+' '+status+' '+p.models.map(function(m){return m.n;}).join(' ')).toLowerCase())+'">'+
+      '<div class="grp-h"><span class="gn">'+esc(p.name)+'</span><span class="marg">'+status+'</span></div>';
+    if(p.key){
+      var rep=REPL[p.id];
+      h+='<div class="keyrow">'+(on&&!rep
+        ? '<span class="kset">••••••••••••••••'+esc(S.keys[p.id])+'</span>'+
+          '<button class="btn" data-border="dot" data-radius="8" onclick="checkKey(\''+p.id+'\')">Check</button>'+
+          '<button class="btn" data-border="dot" data-radius="8" onclick="replaceKey(\''+p.id+'\')">Replace</button>'+
+          '<button class="btn" data-border="dot" data-radius="8" onclick="removeKey(\''+p.id+'\')">Remove</button>'
+        : '<div class="kfield" data-border="dot" data-radius="8"><input id="key-'+p.id+'" type="password" placeholder="'+esc(rep?'paste the new key':p.ph)+'" '+
+          'aria-label="'+esc(p.name)+' API key" autocomplete="off" onkeydown="if(event.key===\'Enter\')saveKey(\''+p.id+'\');if(event.key===\'Escape\')cancelReplace(\''+p.id+'\')"></div>'+
+          '<button class="btn" data-border="dot" data-radius="8" onclick="saveKey(\''+p.id+'\')">Save</button>'+
+          (rep?'<button class="btn" data-border="dot" data-radius="8" onclick="cancelReplace(\''+p.id+'\')">Keep the old one</button>':''))+
+        '</div><div class="marg" style="margin:-4px 0 8px">'+
+        (on?'':'<button onclick="toast(\'Would open '+p.get+' in a new tab.\')">get a key at '+p.get+'</button><span class="sep">;</span>')+
+        '<button onclick="fillLine(\'api:'+p.id+'\')">api:'+p.id+'</button> opens this from anywhere</div>';
+    }
+    if(p.local&&!on) h+='<div class="setup">Start Ollama with <code>OLLAMA_ORIGINS</code> set to this page\'s address, so the browser is allowed to reach it. No key is needed.</div>';
+    p.models.forEach(function(m){
+      if(p.src){
+        h+='<div class="mrow src'+(m.later?' off':'')+'"><span class="dot"></span><span><span class="mn">'+esc(m.n)+'</span> '+
+          '<span class="marg">'+esc(m.g)+(m.okey?'; <button onclick="focusKey(\'openalex\')">'+(S.keys.openalex?'key saved':'add a key for a higher rate limit')+'</button>':'')+'</span></span></div>';
+        if(m.okey&&!S.keys.openalex) h+='<div class="keyrow" id="okey" style="display:none;padding-left:18px"><div class="kfield" data-border="dot" data-radius="8">'+
+          '<input id="key-openalex" type="password" placeholder="optional OpenAlex key" aria-label="OpenAlex API key" onkeydown="if(event.key===\'Enter\')saveKey(\'openalex\')"></div>'+
+          '<button class="btn" data-border="dot" data-radius="8" onclick="saveKey(\'openalex\')">Save</button></div>';
+        return;
+      }
+      var sel=S.def===m.id;
+      h+=on
+        ? '<button class="mrow'+(sel?' on':'')+'" role="radio" aria-checked="'+sel+'" onclick="setVal(\'def\',\''+m.id+'\')"><span class="dot"></span>'+
+          '<span class="mn">'+esc(m.n)+'</span><span class="marg">'+(sel?'default for new chats':'')+'</span><span class="mk">'+esc(m.m)+'</span></button>'
+        : '<div class="mrow off"><span class="dot"></span><span class="mn">'+esc(m.n)+'</span>'+
+          '<span class="marg">'+(p.local?'':'<button onclick="focusKey(\''+p.id+'\')">add a key to use it</button>')+'</span><span class="mk">'+esc(m.m)+'</span></div>';
+    });
+    h+='</div>';
+  });
+  h+='<div style="margin-top:14px">'+row('Keeping keys',
+    'Keys are encrypted with the Web Crypto API (AES-GCM) before they are stored, and each one goes only to the provider it belongs to. '+
+    'They never pass through the command line, which keeps a history; <code>api:</code> lists them from any surface.',null,'storage remember save encrypt','stack')+
+    picks('storage',[['remember','Remember my keys','Saved in this browser until you remove them'],
+                     ['forget','Don\'t save','Enter them again each visit']])+'</div>';
+  return h;
+}
+
+var RUNS=[{id:201,t:'Three openings for the Q2 essay',r:'run 3',c:.63},{id:207,t:'Competitor teardown',r:'run 1, running',c:.58},
+  {id:211,t:'Pricing page rewrite',r:'run 1',c:.41},{id:201,t:'Three openings for the Q2 essay',r:'run 2',c:.37}];
+function money(n){return '$'+(n<1&&n>0?n.toFixed(2):n%1?n.toFixed(2):n);}
+function drawSpending(s){
+  var h=secHead(s,'Marks are for choosing; this section is in dollars, because it is the bill. Cost belongs to a run, so that is how it is counted.');
+  h+=row('This month','<span class="spent"><b>$4.82</b> spent in September, across <b>11</b> runs and <b>23</b> chats. Estimated from token counts; your provider\'s bill is the record.</span>'+
+    '<div class="runs">'+RUNS.map(function(r){
+      return '<button class="runrow" onclick="toast(\'Would open '+r.id+' at '+r.r.split(',')[0]+'.\')"><span class="c-id">'+r.id+'</span>'+
+        '<span class="rt">'+esc(r.t)+'</span><span class="marg">'+esc(r.r)+'</span><span class="rc">'+money(r.c)+'</span></button>';}).join('')+'</div>',
+    null,'month spent runs chats cost','stack');
+  h+=row('Warn before a costly run',
+    'The line under the field says what a run will cost before you press Enter. Above this amount it says so first, in words you cannot miss.',
+    seg('warn',[[0,'Off'],[0.5,'$0.50'],[1,'$1'],[5,'$5']]),'warn enter line run threshold');
+  h+=row('Monthly budget alert',
+    S.budgetOn?'A notice when this month\'s estimated spend reaches the amount. It warns; it does not stop anything.':'Off. Nothing will tell you when a month runs high.',
+    '<button class="sw'+(S.budgetOn?' on':'')+'" role="switch" aria-checked="'+S.budgetOn+'" aria-label="Monthly budget alert" onclick="setVal(\'budgetOn\','+(!S.budgetOn)+')"></button>'+
+    (S.budgetOn?'<input type="range" min="1" max="100" value="'+S.budget+'" aria-label="Budget" oninput="liveBudget(this.value)" onchange="setVal(\'budget\',+this.value)">'+
+    '<span class="val" id="bval">$'+S.budget+'</span>':''),'budget alert monthly limit');
+  h+=row('Hard limits','For a cap that actually stops spending, set a monthly limit with each provider. '+
+    '<span class="marg"><button onclick="toast(\'Would open console.anthropic.com in a new tab.\')">Anthropic</button><span class="sep">;</span>'+
+    '<button onclick="toast(\'Would open console.mistral.ai in a new tab.\')">Mistral</button></span>',null,'hard cap limit provider console','stack');
+  return h;
+}
+
+function drawContext(s){
+  var h=secHead(s,'How long chats are kept manageable, and what a new docket starts with.');
+  h+=row('Summary depth','How much the review summary keeps when a chat is compressed.',
+    seg('summary',[['brief','Brief'],['detailed','Detailed']]),'summary depth brief detailed review');
+  h+=row('Context warning','When a chat uses this much of the model\'s context, you are asked what to do.',
+    '<input type="range" min="10" max="95" step="5" value="'+S.threshold+'" aria-label="Context warning threshold" oninput="liveThresh(this.value)" onchange="setVal(\'threshold\',+this.value)">'+
+    '<span class="val" id="tval">'+S.threshold+'%</span>','context threshold warning percent');
+  h+=row('When a chat passes it','Compressing makes a branch. It is written into the chat\'s docket, or starts one if the chat has none, so it is never done without asking.',
+    null,'compress branch automatic ask disabled','stack')+
+    picks('compress',[['ask','Ask me first','Offer a compressed branch when the warning is reached'],
+                      ['off','Disabled','Never offer. I will manage context myself']]);
+  h+=row('Room for new dockets','Room belongs to the branch; steps inherit it. This is where a new docket\'s first branch starts.',
+    seg('room',[['Writing Studio','Writing Studio'],['Code Lab','Code Lab'],['Reading Room','Reading Room']]),'room docket default new branch');
+  return h;
+}
+
+function drawData(s){
+  var h=secHead(s,'Everything lives in this browser. A backup is the only copy anywhere else.');
+  h+=row('Backup and restore',
+    'Rooms, chats, dockets, the library and every marking, in one <code>.parliament</code> file. '+
+    'Backups are format 1. Any older backup restores; one from a newer Parliament asks you to update first.'+
+    '<div class="marg" style="margin-top:4px">last backup Sep 20, three days ago</div>',
+    '<button class="btn" data-border="dot" data-radius="8" onclick="doBackup()">Back up now</button>'+
+    '<button class="btn" data-border="dot" data-radius="8" onclick="doRestore()">Restore from a file</button>','backup restore export import parliament file format');
+  h+=row('Backup reminder','How often to remind you, counted from the last backup.',
+    seg('reminder',[['daily','Daily'],['weekly','Weekly'],['monthly','Monthly'],['never','Never']]),'reminder backup daily weekly monthly never');
+  h+=row('Storage','<div class="meter"><i style="width:7%"></i></div>112 KB used of about 1.5 GB this browser allows. 46 chats, 4 dockets, 31 markings.',
+    null,'storage used space browser','stack');
+  h+='<div class="danger" data-w="delete everything danger erase wipe">'+
+    '<div class="sl">Delete everything</div><div class="sh">Removes every chat, docket, marking, key and setting from this browser. Undo cannot reach it, and nothing is kept anywhere else. Back up first.</div>'+
+    '<div style="margin-top:10px"><button class="btn red" onclick="armDelete()">Delete everything</button></div>'+
+    '<div class="confirm" id="confirm"><input id="confirmin" placeholder="type delete" aria-label="Type delete to confirm" oninput="$id(\'killbtn\').disabled=this.value.trim().toLowerCase()!==\'delete\'">'+
+    '<button class="btn red" id="killbtn" disabled onclick="toast(\'Would delete everything and reload. Not in a mockup.\')">Delete it all</button>'+
+    '<button class="btn" data-border="dot" data-radius="8" onclick="$id(\'confirm\').classList.remove(\'open\')">Keep it</button></div></div>';
+  return h;
+}
+
+function drawAppearance(s){
+  var h=secHead(s,'');
+  h+=row('Text size','The whole interface scales with it.',
+    seg('text',[['compact','Compact'],['default','Default'],['large','Large']]),'text size font compact large zoom')+
+    '<div class="preview" data-w="text size preview">This is how text reads at this size. Every surface follows it.</div>';
+  h+=row('Desks on this device','Made with <code>arrange:save</code>. A desk remembers which windows were popped and where. '+
+    'Desks stay on this device and are not in backups.'+
+    (S.desks.length?S.desks.map(function(d,i){return '<div class="desk"><span class="dn">'+esc(d.n)+'</span><span class="marg">'+esc(d.d)+
+      '<span class="sep">;</span><button onclick="forgetDesk('+i+')">forget it</button></span></div>';}).join('')
+     :'<div class="desk"><span class="marg">none yet; <button onclick="fillCmd(\'arrange\')">arrange:save</button> keeps the current one</span></div>'),
+    null,'desks arrange layout windows device','stack');
+  return h;
+}
+
+var NET=[['api.anthropic.com','Anthropic, your models',38],['localhost:11434','Ollama, on your machine',6],
+  ['en.wikipedia.org','Wikipedia, a source',9],['export.arxiv.org','arXiv, a source',2]];
+function drawAbout(s){
+  var h=secHead(s,'');
+  h+=row('Parliament','Version 0.1.0. A chat interface for people who plan their work. No server, no accounts.',
+    '<button class="btn" data-border="dot" data-radius="8" disabled title="Available when the app launches publicly">View on GitHub</button>','version github about');
+  h+=row('How your data stays private','<div class="prose">'+
+    '<h4>No servers, no accounts</h4><p>Parliament runs in your browser. There is no backend and nothing to sign in to. '+
+    'Requests go straight from this browser to the providers and sources you use, and nowhere else.</p>'+
+    '<h4>Keys stay local and encrypted</h4><p>Keys are encrypted at rest with a non-extractable Web Crypto key and kept in IndexedDB. '+
+    'Scripts on the page cannot export the raw encryption key. Each key is sent only to its own provider.</p>'+
+    '<h4>Your work stays local</h4><p>Chats, dockets, runs and markings live in this browser\'s IndexedDB. Nobody else can see or recover them.</p>'+
+    '<h4>Check it yourself</h4><p>The log below records every request this app makes, grouped by where it went. '+
+    'Every host should be a provider or source you use. If one is not, something is wrong.</p></div>',null,'privacy data security servers accounts local','stack');
+  h+=row('Network activity','Since this page loaded. The log clears on reload.'+
+    '<div class="net"><div class="nethead"><span>HOST</span><span>CALLED BY</span><span>REQ</span></div>'+
+    NET.map(function(n){return '<div class="netrow"><span class="h">'+n[0]+'</span><span class="w">'+n[1]+'</span><span class="n">'+n[2]+'</span></div>';}).join('')+'</div>',
+    null,'network activity requests log hosts','stack');
+  return h;
+}
+
+var DRAW={keys:drawKeys,spending:drawSpending,context:drawContext,data:drawData,appearance:drawAppearance,about:drawAbout};
+function render(){
+  var box=$id('secs'); if(!box) return;
+  box.innerHTML=SECS.map(function(s){return '<section class="sec" id="sec-'+s.id+'">'+DRAW[s.id](s)+'</section>';}).join('');
+  var card=$id('p-card'); card.classList.remove('t-compact','t-large'); if(S.text!=='default') card.classList.add('t-'+S.text);
+  applySearch(); drawRail(); paintAll(); moveRule();
+}
+var CUR='keys';
+function drawRail(){
+  var h='<div class="rgroup"><div class="rlabel">'+GEAR+'SETTINGS</div>';
+  SECS.forEach(function(s){
+    var hits=SEARCH?countIn(s.id):null;
+    h+='<button class="ritem'+(CUR===s.id?' on':'')+(hits===0?' dim':'')+'" onclick="goSec(\''+s.id+'\')">'+
+      '<span class="ralias">'+s.id+'</span><span class="rnm">'+esc(s.title)+(hits?'<span class="hits">'+hits+'</span>':'')+'</span>'+
+      '<span class="rds">'+esc(s.rd)+'</span></button>';
+  });
+  $id('rail').innerHTML=h+'</div>';
+  moveRule();
+}
+/* The rule sits beside the section you are in. */
+function moveRule(){
+  var r=$id('srule'), el=$id('sec-'+CUR); if(!r) return;
+  if(!el||el.classList.contains('hidden')){ var v=SECS.filter(function(s){var e=$id('sec-'+s.id);return e&&!e.classList.contains('hidden');})[0];
+    el=v?$id('sec-'+v.id):null; }
+  if(!el){ r.style.height='0'; return; }
+  r.style.top=el.offsetTop+'px'; r.style.height=el.offsetHeight+'px';
+}
+window.addEventListener('resize',function(){moveRule();placeBar();});
+
+/* ═══ Search finds settings, and only that ═══ */
+var SEARCH='';
+function applySearch(){
+  var q=SEARCH, any=0;
+  SECS.forEach(function(s){
+    var sec=$id('sec-'+s.id); if(!sec) return;
+    var n=0, secHit=q&&(s.title.toLowerCase().indexOf(q)>-1||s.al.indexOf(q)>-1);
+    sec.querySelectorAll('.srow,.grp,.auto,.danger,.preview,.picks').forEach(function(r){
+      var w=r.getAttribute('data-w');
+      if(w===null){ r.classList.remove('hidden'); r.style.display=''; return; }
+      var hit=!q||secHit||w.indexOf(q)>-1;
+      r.classList.toggle('hidden',!hit); r.style.display=hit?'':'none'; if(hit&&q) n++;
+    });
+    /* a picks group follows the row above it */
+    sec.querySelectorAll('.picks').forEach(function(pk){var prev=pk.previousElementSibling;
+      if(prev&&prev.classList.contains('srow')) pk.style.display=prev.style.display;});
+    var show=!q||n>0; sec.classList.toggle('hidden',!show); if(show) any++;
+    sec.setAttribute('data-hits',n);
+  });
+  $id('empty').classList.toggle('show',!!q&&!any);
+}
+function countIn(id){var sec=$id('sec-'+id);return sec?+(sec.getAttribute('data-hits')||0):0;}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ACTIONS
+   ═══════════════════════════════════════════════════════════════════════ */
+var LABEL={def:'default model',storage:'keeping keys',budgetOn:'budget alert',budget:'budget',warn:'run warning',
+  summary:'summary depth',threshold:'context warning',compress:'long chats',room:'room for new dockets',
+  reminder:'backup reminder',text:'text size',autoFallback:'Auto\'s model'};
+function setVal(k,v,quiet){
+  if(S[k]===v) return;
+  snap(LABEL[k]||k); S[k]=v; render();
+  if(!quiet&&k==='def') toast(v==='auto'?'New chats start on Auto.':'New chats start on '+esc(modelName(v))+'.');
+}
+function liveBudget(v){var b=$id('bval'); if(b) b.textContent='$'+v;}
+function liveThresh(v){var b=$id('tval'); if(b) b.textContent=v+'%';}
+function saveKey(p){
+  var f=$id('key-'+p), v=f?f.value.trim():'';
+  if(!v){ toast('Paste the key first.'); if(f) f.focus(); return; }
+  snap(p+' key'); S.keys[p]=v.slice(-4); delete REPL[p]; render();
+  toast('Saved. Encrypted in this browser; it goes only to '+(p==='openalex'?'OpenAlex':esc(PROV.filter(function(x){return x.id===p;})[0].name))+'.');
+}
+function removeKey(p){
+  snap(p+' key'); S.keys[p]='';
+  var gone=allModels().filter(function(x){return x.p.id===p;}).map(function(x){return x.m.id;});
+  if(gone.indexOf(S.def)>-1) S.def='auto';
+  if(gone.indexOf(S.autoFallback)>-1) S.autoFallback='haiku';
+  render(); toast('Key removed. Its models stay listed and cannot be picked until a key is back.');
+}
+var REPL={};
+function replaceKey(p){REPL[p]=true; render(); setTimeout(function(){var f=$id('key-'+p); if(f) f.focus();},20);}
+function cancelReplace(p){if(!REPL[p]) return; delete REPL[p]; render();}
+function checkKey(p){toast('Would send one tiny request to check the key. It costs a fraction of a cent.');}
+function focusKey(p){
+  if(p==='openalex'){ var r=$id('okey'); if(r){ r.style.display='flex'; paintAll(); } }
+  else if(S.keys[p]&&!REPL[p]){ REPL[p]=true; render(); }
+  goSec('keys',true);
+  setTimeout(function(){var f=$id('key-'+p); if(f){ f.focus(); f.scrollIntoView({block:'center',behavior:'smooth'}); }},60);
+}
+function fallbackMenu(e){
+  e.stopPropagation();
+  var m=$id('menu'), od=e.currentTarget.ownerDocument;
+  if(m.ownerDocument!==od) od.body.appendChild(m);
+  m.innerHTML=allModels().filter(function(x){return connected(x.p);}).map(function(x){
+    return '<button class="'+(S.autoFallback===x.m.id?'on':'')+'" onclick="setVal(\'autoFallback\',\''+x.m.id+'\');closeMenu()">'+MTICK+
+      esc(x.m.n)+'<span class="n">'+esc(x.m.m)+'</span></button>';}).join('');
+  m.classList.add('open');
+  var r=e.currentTarget.getBoundingClientRect();
+  m.style.left=Math.max(8,Math.min(od.defaultView.innerWidth-m.offsetWidth-8,r.left))+'px'; m.style.top=(r.bottom+5)+'px';
+}
+function closeMenu(){var m=$id('menu'); if(m) m.classList.remove('open');}
+document.addEventListener('click',closeMenu);
+function doBackup(){toast('Would download parliament-2026-09-23.parliament, format 1.');}
+function doRestore(){toast('Would open a file picker for a .parliament file. Restoring replaces what is here; you are asked first.');}
+function restored(){}
+function armDelete(){var c=$id('confirm'); c.classList.add('open'); var i=$id('confirmin'); i.value=''; $id('killbtn').disabled=true; i.focus(); paintAll();}
+function forgetDesk(i){snap('desk '+S.desks[i].n); var n=S.desks[i].n; S.desks.splice(i,1); render(); toast('Forgot '+esc(n)+'. undo: brings it back.');}
+
+/* Scroll to a section and address it. */
+function goSec(id,quiet){
+  CUR=id; drawRail();
+  var el=$id('sec-'+id); if(!el) return;
+  el.scrollIntoView({block:'start',behavior:quiet?'auto':'smooth'});
+}
+function trackScroll(win){
+  win.addEventListener('scroll',function(){
+    var best=null, bestTop=-1e9, line=win.innerHeight*0.32, vis=[];
+    SECS.forEach(function(s){var el=$id('sec-'+s.id); if(!el||el.classList.contains('hidden')) return;
+      if(el.ownerDocument.defaultView!==win) return; vis.push(s.id);
+      var t=el.getBoundingClientRect().top; if(t<line&&t>bestTop){best=s.id;bestTop=t;}});
+    var d=win.document.documentElement;
+    if(vis.length&&win.innerHeight+win.scrollY>=d.scrollHeight-4) best=vis[vis.length-1];
+    if(!best&&vis.length) best=vis[0];
+    if(best&&best!==CUR){CUR=best;drawRail();}
+  },{passive:true});
+}
+trackScroll(window);
+
+/* ═══ The key panel ═══
+   Floats under the field like the reference, so checking a key never takes
+   you off the surface you are on. It closes on Escape, or when the line is
+   turned to anything else. */
+var KEYP=[{id:'anthropic',name:'Anthropic',ph:'sk-ant-…'},{id:'mistral',name:'Mistral',ph:'paste a Mistral key'},
+  {id:'openalex',name:'OpenAlex',ph:'optional; raises the rate limit',opt:true}];
+var APIP=null, APIFOCUS=null;
+function openApi(id){ APIP=true; APIFOCUS=id; drawApi();
+  setTimeout(function(){ var f=id?$id('pk-'+id):null; if(f) f.focus(); },20); }
+function closeApi(back){ APIP=null; APIFOCUS=null; var el=$id('apip'); if(el) el.classList.remove('open');
+  if(back){ var q=$id('q'); if(q){ q.focus(); } } paintAll(); }
+function drawApi(){
+  var el=$id('apip'); if(!el) return;
+  if(!APIP){ el.classList.remove('open'); return; }
+  var h='<div class="rhead"><div class="rtop"><span class="rlab">API KEYS</span>'+
+    '<span class="gl marg">encrypted in this browser; each goes only to its provider</span></div></div>';
+  KEYP.forEach(function(p){
+    var k=S.keys[p.id], open=APIFOCUS===p.id;
+    h+='<div class="apirow'+(open?' on':'')+'"><div class="apitop"><span class="gn">'+p.name+'</span><span class="marg">'+
+      (k?'key ends '+esc(k)+'<span class="sep">;</span><button onclick="openApi(\''+p.id+'\')">replace</button>'
+        :(p.opt?'no key, which is fine<span class="sep">;</span>':'needs a key<span class="sep">;</span>')+'<button onclick="openApi(\''+p.id+'\')">add one</button>')+
+      '</span></div>'+
+      (open?'<div class="keyrow"><div class="kfield" data-border="dot" data-radius="8"><input id="pk-'+p.id+'" type="password" autocomplete="off" '+
+        'placeholder="'+esc(k?'paste the new key':p.ph)+'" aria-label="'+p.name+' API key" '+
+        'onkeydown="if(event.key===\'Enter\'){event.preventDefault();savePanelKey(\''+p.id+'\');}if(event.key===\'Escape\'){event.preventDefault();event.stopPropagation();closeApi(true);}"></div>'+
+        '<button class="btn" data-border="dot" data-radius="8" onclick="savePanelKey(\''+p.id+'\')">Save</button></div>':'')+'</div>';
+  });
+  h+='<div class="apirow"><div class="apitop"><span class="gn">Ollama</span><span class="marg">no key; '+(S.ollama?'found on your machine':'not found')+'</span></div></div>';
+  h+='<div class="foot">Escape goes back to the command line. <button class="marg" onclick="closeApi();goSec(\'keys\')">open:settings keys</button> has models and the default.</div>';
+  el.innerHTML=h; el.classList.add('open'); paintAll();
+}
+function savePanelKey(p){
+  var f=$id('pk-'+p), v=f?f.value.trim():'';
+  if(!v){ toast('Paste the key first.'); if(f) f.focus(); return; }
+  snap(p+' key'); S.keys[p]=v.slice(-4); delete REPL[p]; APIFOCUS=null; render(); drawApi();
+  toast('Saved. Encrypted in this browser; it goes only to '+esc(KEYP.filter(function(x){return x.id===p;})[0].name)+'.');
+  var q=$id('q'); if(q) q.focus();
+}
+
+/* ═══ Where the command line sits ═══ */
+var BAR='top';
+try{ var sb=localStorage.getItem('parliament-bar'); if(/^(top|bottom|left|right)$/.test(sb)) BAR=sb; }catch(e){}
+function keepBar(){ try{ localStorage.setItem('parliament-bar',BAR); }catch(e){} }
+function snapBar(){ UNDO.push({what:'command line position',BAR:BAR}); }
+function applyBar(){
+  var b=document.body, top=document.querySelector('.topgrid'), bar=document.getElementById('p-bar')||$id('p-bar');
+  b.classList.remove('bar-bottom','bar-left','bar-right');
+  if(BAR!=='top') b.classList.add('bar-'+BAR);
+  top.classList.toggle('atbottom',BAR==='bottom');
+  if(bar) bar.classList.toggle('sq',BAR==='left'||BAR==='right');
+  placeBar(); drawSuggest(); paintAll(); moveRule();
+}
+function placeBar(){
+  var top=document.querySelector('.topgrid');
+  if(BAR!=='bottom'){ top.style.left=''; top.style.width=''; return; }
+  var el=POPS.settings?document.getElementById('p-cardph'):document.getElementById('p-card');
+  if(!el) return; var r=el.getBoundingClientRect();
+  top.style.left=r.left+'px'; top.style.width=r.width+'px';
+}
+/* The popped command line is a panel, not a surface: it does not wear the
+   rule, and its commands still act on Settings. The Enter line names the
+   target, so the window never has to. */
+function popCommand(){
+  if(POPS.command){ focusField(); return; }
+  openWin('command','Parliament · command line',640,BAR==='left'||BAR==='right'?420:320,function(win,pip){
+    var node=document.getElementById('p-bar'), ph=document.getElementById('p-barph');
+    win.document.body.className='popwin';
+    var host=win.document.createElement('div'); host.className='pophost';
+    host.appendChild(node); win.document.body.appendChild(host);
+    ph.style.display='';
+    POPS.command.onclose=function(){ ph.style.display='none'; ph.parentNode.insertBefore(node,ph.nextSibling); applyBar();
+      var q=document.getElementById('q'); if(q) q.focus(); };
+    var q=win.document.getElementById('q'); q.value='>'; enterCmd(); drawSuggest(); paintAll(); q.focus();
+    toast(pip?'The command line is floating on top. Commands still act on Settings.'
+             :'The command line is in its own window. Commands still act on Settings.');
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   POP-OUT
+   Settings is a surface, so popped it carries its own rules and wears its own
+   rule. The bar stays on the page; commands typed there reach the window.
+   ═══════════════════════════════════════════════════════════════════════ */
+function winGlobals(win){for(var k in window){try{if(typeof window[k]==='function'&&!(k in win))win[k]=window[k];}catch(e){}}}
+function setupWin(win,title){
+  var d=win.document; d.title=title;
+  document.querySelectorAll('style').forEach(function(s){d.head.appendChild(s.cloneNode(true));});
+  d.body.className='popwin popsurf';
+  winGlobals(win);
+  win.addEventListener('resize',paintAll);
+  d.addEventListener('click',closeMenu);
+  d.addEventListener('keydown',onKey);
+}
+function openWin(key,title,w,h,done){
+  function plain(){
+    var from=(KEYWIN&&!KEYWIN.closed)?KEYWIN:window;
+    var win=from.open('','parliament_'+key,'popup=yes,width='+w+',height='+h);
+    if(!win){toast('The browser blocked the window. Allow pop-ups for this page and try again.');return;}
+    win.document.open();win.document.write('<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>');win.document.close();
+    setupWin(win,title); POPS[key]={win:win,pip:false}; watch(key); done(win,false);
+  }
+  if('documentPictureInPicture' in window && !PIP_BUSY){
+    PIP_BUSY=true;
+    window.documentPictureInPicture.requestWindow({width:w,height:h}).then(function(win){
+      setupWin(win,title); POPS[key]={win:win,pip:true}; watch(key); done(win,true);
+    }).catch(function(){PIP_BUSY=false;plain();});
+    return;
+  }
+  plain();
+}
+function watch(key){
+  var p=POPS[key], gone=false;
+  function end(){ if(gone) return; gone=true; clearInterval(t); if(p.pip) PIP_BUSY=false; p.onclose&&p.onclose(); delete POPS[key]; render(); placeBar(); drawSuggest(); }
+  p.win.addEventListener('pagehide',end);
+  var t=setInterval(function(){ if(p.win.closed) end(); },600);
+  p.end=end;
+}
+function closePop(key){var p=POPS[key]; if(!p) return; try{p.win.close();}catch(e){} p.end&&p.end();}
+window.addEventListener('pagehide',function(){for(var k in POPS){try{POPS[k].win.close();}catch(e){}}});
+function popSettings(sec){
+  if(POPS.settings){ try{POPS.settings.win.focus();}catch(e){} if(sec) goSec(sec); return; }
+  openWin('settings','Parliament · Settings',620,760,function(win,pip){
+    var node=document.getElementById('p-card'), ph=document.getElementById('p-cardph');
+    var host=win.document.createElement('div'); host.className='pophost';
+    host.appendChild(node); win.document.body.appendChild(host);
+    ph.style.display=''; document.body.classList.add('surface-out'); setTimeout(placeBar,0);
+    trackScroll(win);
+    POPS.settings.onclose=function(){ ph.style.display='none'; document.body.classList.remove('surface-out');
+      ph.parentNode.insertBefore(node,ph); var m=win.document.getElementById('menu'); if(m) document.body.appendChild(m); };
+    render(); if(sec) setTimeout(function(){goSec(sec,true);},250);
+    toast(pip?'Settings is floating on top. Commands here still reach it.'
+             :'Settings is in its own window. Commands here still reach it.');
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   THE COMMAND LINE
+   Same grammar as the Almanac: leaders at position 0, the Enter line says
+   what Enter will do before you press it, and a scheme never changes kind.
+   ═══════════════════════════════════════════════════════════════════════ */
+function launch(what){return {ok:'Enter leaves Settings for '+what,run:function(){toast('Would go to '+esc(what)+'.');}};}
+function lower(a){return String(a||'').trim().toLowerCase().replace(/^["“]|["”]$/g,'');}
+
+/* What set: can change. Each entry parses its own value and describes the
+   change in full, so the Enter line is generated rather than written beside it. */
+var SETTERS={
+  default:{k:'def',eg:'haiku',g:'the model new chats start on',parse:function(v){
+    var id=MODEL_ALIAS[v]; if(!id) return {bad:'no model called '+v+'; auto, opus, sonnet, haiku, fable, llama or mistral'};
+    if(id==='auto') return {v:'auto',say:'Auto the default for new chats: lookups to a source, the rest to '+modelName(S.autoFallback)};
+    var x=modelById(id); if(!connected(x.p)) return {bad:x.m.n+' needs a '+x.p.name+' key first; open:settings keys'};
+    return {v:id,say:x.m.n+' ('+x.m.m+') the default for new chats'};}},
+  budget:{k:'budget',eg:'20',g:'monthly alert, in dollars, or off',parse:function(v){
+    if(v==='off') return {v:false,k:'budgetOn',say:'the monthly budget alert off'};
+    var n=+v.replace('$',''); if(!(n>=1&&n<=100)) return {bad:'a budget between $1 and $100, or off'};
+    return {v:Math.round(n),also:{budgetOn:true},say:'the monthly alert $'+Math.round(n)};}},
+  warn:{k:'warn',eg:'1',g:'warn on the Enter line above this run cost',parse:function(v){
+    if(v==='off') return {v:0,say:'run warnings off'};
+    var n=+v.replace('$',''); if(!(n>0&&n<=100)) return {bad:'an amount like 0.50, 1 or 5, or off'};
+    return {v:n,say:'the Enter line warn before any run over '+money(n)};}},
+  summary:{k:'summary',eg:'detailed',g:'brief or detailed',parse:function(v){
+    return /^(brief|detailed)$/.test(v)?{v:v,say:'summaries '+v}:{bad:'brief or detailed'};}},
+  threshold:{k:'threshold',eg:'80',g:'context warning, 10 to 95 percent',parse:function(v){
+    var n=+v.replace('%',''); if(!(n>=10&&n<=95)) return {bad:'a percentage from 10 to 95'};
+    n=Math.round(n/5)*5; return {v:n,say:'the context warning '+n+'%'};}},
+  compress:{k:'compress',eg:'ask',g:'ask or off',parse:function(v){
+    if(v==='auto'||v==='automatic') return {bad:'automatic is gone: compressing writes a branch, and that is never done without asking'};
+    return v==='ask'?{v:'ask',say:'long chats ask before compressing'}:v==='off'?{v:'off',say:'compression never offered'}:{bad:'ask or off'};}},
+  room:{k:'room',eg:'"Code Lab"',g:'room for new dockets',parse:function(v){
+    var r=['Writing Studio','Code Lab','Reading Room'].filter(function(x){return x.toLowerCase().indexOf(v)===0||x.toLowerCase()===v;})[0];
+    return r?{v:r,say:'new dockets start in the '+r}:{bad:'no room called '+v+'; Writing Studio, Code Lab or Reading Room'};}},
+  reminder:{k:'reminder',eg:'weekly',g:'daily, weekly, monthly or never',parse:function(v){
+    return /^(daily|weekly|monthly|never)$/.test(v)?{v:v,say:'backup reminders '+v}:{bad:'daily, weekly, monthly or never'};}},
+  text:{k:'text',eg:'large',g:'compact, default or large',parse:function(v){
+    return /^(compact|default|large)$/.test(v)?{v:v,say:'text '+v}:{bad:'compact, default or large'};}},
+  keys:{k:'storage',eg:'remember',g:'remember or forget, for every key',parse:function(v){
+    return v==='remember'?{v:'remember',say:'keys remembered in this browser'}:(v==='forget'||v==='off')?{v:'forget',say:'keys forgotten when you leave'}:{bad:'remember or forget'};}},
+  key:{special:true}
+};
+var SET_ALIAS={default:'default',model:'default',budget:'budget',warn:'warn',warning:'warn',summary:'summary',threshold:'threshold',
+  context:'threshold',compress:'compress',room:'room',reminder:'reminder',text:'text',size:'text',keys:'keys',storage:'keys',key:'key'};
+
+var CMDS=[
+ /* go to */
+ {s:'open',sig:'open:',eg:'open:settings keys',g:'a section here, or anything that exists',grp:'Go to',feat:1,pre:function(a){
+   var t=lower(a); if(!t) return {bad:'open what? open:settings keys, or an id like open:201'};
+   var w=t.split(/\s+/);
+   if(w[0]==='settings'){
+     if(!w[1]) return {ok:'Enter goes to the top of Settings',run:function(){goSec('keys');}};
+     var id=secOf(w.slice(1).join(' ')); if(!id) return {bad:'no section called '+w.slice(1).join(' ')+'; '+SECS.map(function(s){return s.id;}).join(', ')};
+     return {ok:'Enter goes to '+PANELS[id]+(POPS.settings?', in its window':''),run:function(){goSec(id); if(POPS.settings)try{POPS.settings.win.focus();}catch(e){}}};
+   }
+   if(secOf(t)) return {bad:'that is a section; open:settings '+secOf(t)};
+   if(/^\d{3,4}[a-hj-np-z]{0,2}$/i.test(t)) return launch(t.toUpperCase());
+   return {bad:'open takes an id, or settings and a section'};}},
+ {s:'alm',sig:'alm:',g:'Almanac',grp:'Go to',pre:function(){return launch('the Almanac');}},
+ {s:'sym',sig:'sym:',g:'last Symposium',grp:'Go to',pre:function(){return launch('the last Symposium');}},
+ {s:'lab',sig:'lab:',g:'Lab',grp:'Go to',pre:function(){return launch('the Lab');}},
+
+ /* settings */
+ {s:'set',sig:'set:',eg:'set:default haiku',g:'change a setting, said in full before Enter',grp:'Settings',feat:1,pre:function(a){
+   var t=String(a||'').trim(); if(!t) return {bad:'set what? '+SETNAMES()};
+   var sp=t.search(/\s/), name=(sp<0?t:t.slice(0,sp)).toLowerCase(), rest=sp<0?'':lower(t.slice(sp+1));
+   var key=SET_ALIAS[name]; if(!key) return {bad:'no setting called '+name+'; '+SETNAMES()};
+   var st=SETTERS[key];
+   if(st.special) return {bad:'keys go through api:, like api:'+(rest.split(/\s/)[0]||'mistral')};
+   if(!rest) return {bad:'set:'+key+' to what? '+st.g};
+   var r=st.parse(rest); if(r.bad) return {bad:r.bad};
+   var k=r.k||st.k;
+   if(S[k]===r.v&&!r.also) return {bad:'already '+rest};
+   return {ok:'Enter makes '+r.say,run:function(){
+     snap(LABEL[k]||k); S[k]=r.v; if(r.also) for(var x in r.also) S[x]=r.also[x];
+     render(); goSec(secFor(k),true); toast('Done: '+esc(r.say)+'. <b>undo:</b> puts it back.');}};}},
+ /* api: opens the key panel under the field, on any surface. The key goes
+    into a password field in the panel, never into this line: the line keeps
+    a history, and a voice command would speak it aloud. api:<provider>
+    opens that provider's field, empty if it has no key and for replacing if
+    it has one. api:new opens the first provider without a key. */
+ {s:'api',sig:'api:',eg:'api:mistral',g:'your keys, or one provider\'s field',grp:'Settings',feat:1,pre:function(a){
+   var w=lower(a).split(/\s+/).filter(Boolean), sec='; no keys in the command line, for security';
+   if(!w.length) return {ok:'Enter lists your providers and their keys, here under the field',run:function(){openApi(null);}};
+   if(w.length>1) return {bad:'no keys in the command line, for security; delete it, and Enter opens the field'};
+   if(w[0]==='new'){
+     var free=KEYP.filter(function(p){return !p.opt&&!S.keys[p.id];})[0];
+     if(!free) return {bad:'every provider has a key; api:anthropic or api:mistral to replace one'};
+     return {ok:'Enter opens the '+free.name+' key field, the first without a key'+sec,run:function(){openApi(free.id);}};
+   }
+   if(w[0]==='ollama'||w[0]==='llama') return {bad:'Ollama needs no key; start it with OLLAMA_ORIGINS set to this page'};
+   var p=KEYP.filter(function(x){return x.id===w[0]||x.name.toLowerCase()===w[0];})[0];
+   if(!p) return {bad:'no provider called '+w[0]+'; '+KEYP.map(function(x){return x.id;}).join(', ')+', or new'};
+   var saved=S.keys[p.id];
+   return {ok:(saved?p.name+' has a key ending '+saved+'; Enter opens it for replacing':'Enter opens the '+p.name+' key field')+sec,
+     run:function(){openApi(p.id);}};}},
+ {s:'undo',sig:'undo:',g:'put back the last change',grp:'Settings',feat:1,pre:function(){
+   var u=UNDO[UNDO.length-1]; if(!u) return {bad:'nothing to undo on this page'};
+   return {ok:'Enter puts back the '+u.what,run:function(){var x=UNDO.pop(); if(x.BAR){BAR=x.BAR;keepBar();applyBar();} else {S=x.S; render();} toast('Put back the '+esc(x.what)+'.');}};}},
+
+ /* data */
+ {s:'backup',sig:'backup:',g:'download a .parliament file now',grp:'Data',feat:1,pre:function(){
+   return {ok:'Enter downloads a backup of everything, format 1',run:doBackup};}},
+ {s:'restore',sig:'restore:',g:'choose a .parliament file',grp:'Data',pre:function(){
+   return {ok:'Enter opens a file picker; restoring asks before it replaces anything',run:doRestore};}},
+
+ /* layout */
+ {s:'pop',sig:'pop:',eg:'pop:settings keys',g:'Settings in its own window',grp:'Layout',feat:1,pre:function(a){
+   var t=lower(a), w=t.split(/\s+/);
+   if(t==='back') return POPS.settings?{ok:'Enter brings Settings back into this page',run:function(){closePop('settings');}}:{bad:'nothing is popped'};
+   if(w[0]!=='settings') return {bad:secOf(w[0])?'sections go with the surface; pop:settings '+secOf(w[0]):'pop:settings, or pop:back'};
+   var id=w[1]?secOf(w.slice(1).join(' ')):null;
+   if(w[1]&&!id) return {bad:'no section called '+w.slice(1).join(' ')};
+   return {ok:(POPS.settings?'Enter brings the Settings window forward':'Enter opens Settings in its own window')+(id?', at '+PANELS[id]:''),
+     run:function(){popSettings(id);}};}},
+ /* Two axes in one verb, as in the Almanac: top, bottom, left and right are
+    positions; pop and dock are states. Any position implies dock. left and
+    right make the field a square. Popping keeps the shape it had. */
+ {s:'bar',sig:'bar:',eg:'bar:left',g:'top, bottom, left, right, pop or dock',grp:'Layout',feat:1,pre:function(a){
+   var v=lower(a), POS={top:1,bottom:1,left:1,right:1};
+   if(v==='pop') return POPS.command?{bad:'the command line is already in its own window'}
+     :{ok:'Enter opens the command line in its own window, keeping its shape',run:popCommand};
+   if(v==='dock') return POPS.command?{ok:'Enter brings the command line back to Settings, at the '+BAR,run:function(){closePop('command');}}
+     :{bad:'the command line is already docked'};
+   if(!POS[v]) return {bad:'now at the '+(POPS.command?BAR+', popped':BAR)+'; top, bottom, left, right, pop or dock'};
+   if(v===BAR&&!POPS.command) return {bad:'already at the '+v};
+   var sq=(v==='left'||v==='right');
+   return {ok:(POPS.command?'Enter docks the command line and puts it':'Enter puts the command line')+' at the '+v+(sq?', as a square':', as a line'),
+     run:function(){ var go=function(){ snapBar(); BAR=v; keepBar(); applyBar(); setTimeout(function(){focusField();},40); };
+       if(POPS.command){ closePop('command'); setTimeout(go,60); } else go(); }};}},
+ {s:'help',sig:'help:',g:'every command',grp:'Layout',pre:function(){return {ok:'Enter lists every command',run:function(){fillHelp();}};}},
+ {s:'prompt',sig:'p>',eg:'p>',g:'ask a question; settings do not travel with it',grp:'Go to',lead:'p>',
+  pre:function(){return {ok:'Enter switches to the prompt',run:function(){var f=$id('q'); f.value='p>'; setQ('p>'); f.focus();}};}}
+];
+function SETNAMES(){return Object.keys(SETTERS).filter(function(k){return !SETTERS[k].special;}).join(', ');}
+function secFor(k){return {def:'keys',autoFallback:'keys',storage:'keys',budget:'spending',budgetOn:'spending',warn:'spending',
+  summary:'context',threshold:'context',compress:'context',room:'context',reminder:'data',text:'appearance'}[k]||'keys';}
+
+var CMD=false, PRM=false;
+function normLine(text){
+  var t=String(text).trim().toLowerCase();
+  if(t.indexOf(':')<0&&/^[a-z]+$/.test(t)&&CMDS.some(function(c){return c.s===t;})) return t+':';
+  if(t==='help') return 'help:';
+  return text;
+}
+function cmdOf(text){var i=text.indexOf(':'); if(i<0) return null;
+  var sc=text.slice(0,i).trim().toLowerCase();
+  return {c:CMDS.filter(function(c){return c.s===sc;})[0],scheme:sc,arg:text.slice(i+1)};}
+
+function enterPrm(){ if(PRM) return; if(CMD) exitCmd(false); PRM=true; $id('sfield').classList.add('prm'); paintAll(); }
+function exitPrm(clear){ PRM=false; $id('sfield').classList.remove('prm'); if(clear) $id('q').value=SEARCH; paintAll(); }
+function leavePrompt(){var f=$id('q'); exitPrm(true); setQ(f.value); f.focus();}
+function runPrompt(){
+  var f=$id('q'), text=f.value.trim();
+  if(!text){ toast('Type the question first.'); return; }
+  toast('Would open a Symposium with the question. Nothing from Settings goes with it.'); f.value=''; drawSuggest();
+}
+function enterCmd(){ if(CMD) return; CMD=true; $id('sfield').classList.add('cmd'); drawSuggest(); paintAll(); }
+function exitCmd(clear){ CMD=false; $id('sfield').classList.remove('cmd'); if(clear) $id('q').value=SEARCH; drawSuggest(); paintAll(); }
+
+function hintItem(c,first){
+  return '<span class="it'+(first?' first':'')+'"><button onclick="fillCmd(\''+c.s+'\')"><code>'+esc(c.sig)+
+    '</code> <span class="gl">'+esc(c.g)+'</span></button></span>';}
+function helpItem(){return '<span class="it"><button onclick="fillHelp()"><code>?</code> <span class="gl">every command</span></button></span>';}
+function fitLine(box,items,tail){
+  var n=items.length;
+  function paint(){var all=items.slice(0,n).concat(tail||[]);
+    box.innerHTML=all.map(function(h,i){return i<all.length-1?h.replace(/<\/span>$/,'<span class="sep">;</span></span>'):h;}).join('');}
+  var lim=BAR==='left'||BAR==='right'?66:30;
+  paint(); while(n>1&&box.scrollHeight>lim){n--;paint();}
+}
+/* Advertise only the keys that work where focus is. / is a character inside a field. */
+function inOtherField(){
+  var a=document.activeElement, q=$id('q');
+  for(var k in POPS){try{var d=POPS[k].win.document; if(d.hasFocus()) a=d.activeElement;}catch(e){}}
+  return a&&a!==q&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.isContentEditable);
+}
+function drawSuggest(){
+  var box=$id('shint'), ref=$id('cref'); if(!box) return;
+  if(APIP){ var cur=($id('q').value||'').replace(/^>/,'').trim().toLowerCase(); if(cur&&cur.indexOf('api')!==0) closeApi(); }
+  var refWas=ref.classList.contains('open'); ref.classList.remove('open');
+  if(PRM){
+    box.innerHTML='<span class="it pre">Enter asks on its own; settings do not travel with a prompt<span class="sep">;</span></span>'+
+      '<span class="it"><button onclick="leavePrompt()"><span class="gl">type <code>s&gt;</code> or press Escape to go back to the search</span></button></span>';
+    if(refWas) paintAll(); return;
+  }
+  if(!CMD){
+    if(SEARCH){
+      var n=0; SECS.forEach(function(s){n+=countIn(s.id);});
+      box.innerHTML='<span class="it pre">'+(n?n+' setting'+(n===1?'':'s')+' match':'nothing matches')+'<span class="sep">;</span></span>'+
+        '<span class="it"><button onclick="clearSearch()"><span class="gl">Escape clears the search</span></button></span>';
+      return;
+    }
+    box.innerHTML='<span class="it"><button onclick="openCmd()"><span class="gl">'+(inOtherField()
+      ? 'press <code>⌘K</code> for the command line'
+      : 'press <code>/</code> or <code>⌘K</code> to jump here; <code>&gt;</code> for the command line, <code>p&gt;</code> for a prompt, <code>s&gt;</code> back to the search')+
+      '</span></button></span>';
+    return;
+  }
+  var text=normLine($id('q').value.replace(/^>/,'')), q=text.trim().toLowerCase();
+  if(q.charAt(0)==='?'){
+    drawRef(text.trim().slice(1)); ref.classList.add('open'); paintAll();
+    var sel=REFLIST[REFSEL];
+    box.innerHTML='<span class="it">'+(sel?'<button onclick="fillCmd(\''+sel.s+'\')"><code>'+esc(sel.sig)+'</code> <span class="gl">Enter takes this one</span></button>'+
+      '<span class="sep">;</span></span><span class="it pre">↑ ↓ to move</span>':'keep typing, or Escape to leave</span>');
+    return;
+  }
+  if(refWas) paintAll();
+  if(!q){
+    fitLine(box,CMDS.filter(function(c){return c.feat;}).map(function(c){return hintItem(c);}),[helpItem()]); return;
+  }
+  var cm=cmdOf(text);
+  if(cm&&cm.c){
+    var p=cm.c.pre(cm.arg)||{};
+    /* The target leads the line, so it says what it is pointed at. */
+    var tgt='<span class="it"><code>'+(POPS.settings?'settings, popped':'settings')+'</code></span>';
+    var how='<span class="it"><code>'+esc(cm.c.eg||cm.c.sig)+'</code> <span class="gl">'+esc(cm.c.g)+'</span></span>';
+    var what=p.bad?'<span class="it bad">'+esc(p.bad)+'</span>':'<span class="it pre">'+esc(p.ok)+'</span>';
+    fitLine(box,p.bad?[how]:[tgt,how],[what]);
+    return;
+  }
+  if(cm){ box.innerHTML='<span class="it bad">no command called '+esc(cm.scheme)+':<span class="sep">;</span></span>'+helpItem(); return; }
+  var hits=CMDS.filter(function(c){return c.s.indexOf(q)===0;})
+    .concat(CMDS.filter(function(c){return c.s.indexOf(q)!==0&&c.g.toLowerCase().indexOf(q)>-1;}));
+  if(!hits.length){ box.innerHTML='<span class="it bad">no command matches that<span class="sep">;</span></span>'+helpItem(); return; }
+  fitLine(box,hits.map(function(c,i){return hintItem(c,i===0);}),[helpItem()]);
+}
+
+var REFSEL=0, REFLIST=[], GRPORDER=['Settings','Go to','Data','Layout'];
+var GRPNOTE={Settings:'change what is on this page',
+  'Go to':'sections here, and the other surfaces','Data':'the only copy outside this browser','Layout':'where Settings and the command line sit'};
+function hl(text,q){ if(!q) return esc(text); var i=text.toLowerCase().indexOf(q.toLowerCase()); if(i<0) return esc(text);
+  return esc(text.slice(0,i))+'<mark>'+esc(text.slice(i,i+q.length))+'</mark>'+esc(text.slice(i+q.length)); }
+function drawRef(q){
+  q=(q||'').trim();
+  var hits=CMDS.filter(function(c){return !q||(c.s+' '+(c.eg||c.sig)+' '+c.g).toLowerCase().indexOf(q.toLowerCase())>-1;});
+  var groups={}; hits.forEach(function(c){(groups[c.grp]=groups[c.grp]||[]).push(c);});
+  var order=GRPORDER.filter(function(g){return groups[g];});
+  REFLIST=[]; order.forEach(function(g){groups[g].forEach(function(c){REFLIST.push(c);});});
+  if(REFSEL>=REFLIST.length) REFSEL=REFLIST.length-1; if(REFSEL<0) REFSEL=0;
+  /* No total, only a count while narrowing (spec §4). */
+  var head='<div class="rhead"><div class="rtop"><span class="rlab">COMMANDS'+(q?'<span class="n">'+hits.length+' matching</span>':'')+'</span>'+
+    '<span class="gl" style="font:italic 400 11px var(--font-serif);color:var(--marg)">the verbs that work on Settings, and the way out</span></div></div>';
+  var body=hits.length?'<div class="cols">'+order.map(function(g){
+    return '<div class="grp"><h4>'+g.toUpperCase()+'<span class="n" style="font:italic 400 10.5px var(--font-serif);color:var(--marg);letter-spacing:0">'+GRPNOTE[g]+'</span></h4>'+
+      groups[g].map(function(c){var i=REFLIST.indexOf(c);
+        return '<button class="'+(i===REFSEL?'sel':'')+'" onclick="fillCmd(\''+c.s+'\')"><code>'+hl(c.eg||c.sig,q)+'</code><span class="gl">'+hl(c.g,q)+'</span></button>';}).join('')+'</div>';
+  }).join('')+'</div>':'<div class="nohit">nothing matches “'+esc(q)+'”</div>';
+  var sets='<div class="grp" style="margin-top:4px"><h4>SET:, BY NAME</h4>'+Object.keys(SETTERS).filter(function(k){return !SETTERS[k].special;}).map(function(k){
+    return '<button onclick="fillSet(\''+k+'\')"><code>set:'+k+' '+esc(SETTERS[k].eg)+'</code><span class="gl">'+esc(SETTERS[k].g)+'</span></button>';}).join('')+'</div>';
+  var foot='Sections: '+SECS.map(function(s){return s.id;}).join(', ')+'. open:settings and a section goes there; pop:settings and a section opens the window there. '+
+    'Tab completes, Enter runs, ↑ ↓ walk this list.';
+  $id('cref').innerHTML=head+body+(q?'':sets)+'<div class="foot">'+foot+'</div>';
+}
+function refOpen(){var r=$id('cref');return !!r&&r.classList.contains('open');}
+function openCmd(){var f=$id('q'); f.focus(); f.value='>'; enterCmd();}
+function fillCmd(scheme){
+  var f=$id('q'), c=CMDS.filter(function(x){return x.s===scheme;})[0];
+  f.focus();
+  if(c&&c.lead){ f.value=c.lead; setQ(c.lead); return; }
+  if(scheme==='arrange'){ f.value='>arrange:save '; enterCmd(); drawSuggest(); return; }
+  f.value='>'+scheme+':'; enterCmd(); drawSuggest();
+}
+function fillLine(t){closeApi();var f=$id('q'); f.focus(); f.value='>'+t; enterCmd(); drawSuggest();}
+function fillSet(k){var f=$id('q'); f.focus(); f.value='>set:'+k+' '; enterCmd(); drawSuggest();}
+function fillHelp(){var f=$id('q'); f.focus(); f.value='>?'; REFSEL=0; enterCmd(); drawSuggest();}
+
+var HIST=[], HPOS=-1;
+function runLine(){
+  var f=$id('q'), text=normLine(f.value.replace(/^>/,'')), cm=cmdOf(text);
+  if(!cm||!cm.c){ toast(text.trim()?'No command called that. Type <b>?</b> for every command.':'Type a command, or <b>?</b> for every command.'); return; }
+  var p=cm.c.pre(cm.arg)||{};
+  if(p.bad||!p.run){ toast(esc(p.bad||'Not finished yet.')); return; }
+  /* History keeps the line, which is exactly why set:key never carries one. */
+  if(!/sk-|[A-Za-z0-9_-]{28,}/.test(f.value)){ HIST.unshift(f.value); HIST=HIST.slice(0,40); }
+  f.value='>'; p.run();
+  var g=$id('q'); if(g&&g.value==='') g.value='>';
+  drawSuggest();
+}
+function histStep(dir){
+  if(!HIST.length) return false;
+  HPOS=Math.max(-1,Math.min(HIST.length-1,HPOS-dir)); var f=$id('q');
+  f.value=HPOS<0?'>':HIST[HPOS]; drawSuggest(); return true;
+}
+function completeLine(){
+  var f=$id('q'), raw=f.value.replace(/^>/,''), q=raw.trim().toLowerCase();
+  var m=q.match(/^(open:settings|pop:settings)\s+(\S*)$/);
+  if(m){ var s=SECS.filter(function(x){return x.id.indexOf(m[2])===0;})[0]; if(s){ f.value='>'+m[1]+' '+s.id; drawSuggest(); } return; }
+  var ms=q.match(/^set:(\S*)$/);
+  if(ms){ var k=Object.keys(SETTERS).filter(function(x){return x.indexOf(ms[1])===0;})[0]; if(k){ f.value='>set:'+k+' '; drawSuggest(); } return; }
+  if(!q||q.indexOf(':')>-1) return;
+  var hit=CMDS.filter(function(c){return c.s.indexOf(q)===0;})[0];
+  if(hit){ f.value='>'+hit.s+':'; drawSuggest(); }
+}
+
+function clearSearch(){var f=$id('q'); f.value=''; setQ(''); f.focus();}
+function setQ(v){
+  var lead=v.match(/^(?:s|search)>/i);
+  if(lead){ var rest=v.slice(lead[0].length); $id('q').value=rest; if(PRM) exitPrm(false); if(CMD) exitCmd(false);
+    SEARCH=rest.trim().toLowerCase(); applySearch(); drawRail(); drawSuggest(); return; }
+  if(v.indexOf('p>')===0){ $id('q').value=v.slice(2); enterPrm(); drawSuggest(); return; }
+  if(PRM){ if(v.indexOf('>')===0){ exitPrm(false); enterCmd(); drawSuggest(); return; } drawSuggest(); return; }
+  if(v.indexOf('>')===0){ enterCmd(); drawSuggest(); return; }
+  if(CMD) exitCmd(false);
+  SEARCH=v.trim().toLowerCase(); applySearch(); drawRail(); drawSuggest();
+}
+
+function focusField(){
+  var f=$id('q'); if(!f) return;
+  if(POPS.command){ try{POPS.command.win.focus();}catch(e){} } else { try{window.focus();}catch(e){} }
+  f.focus(); var n=f.value.length; try{f.setSelectionRange(n,n);}catch(e){}
+}
+function onKey(e){
+  var f=$id('q'); if(!f) return;
+  KEYWIN=(e.target&&e.target.ownerDocument&&e.target.ownerDocument.defaultView)||window;
+  var inField=e.target===f;
+  var t=e.target, typing=t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable);
+  if(e.key==='/'&&!typing&&!e.metaKey&&!e.ctrlKey&&!e.altKey){ e.preventDefault(); focusField(); return; }
+  /* ⌘K fires from anywhere, including inside the key fields. */
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){
+    e.preventDefault(); focusField();
+    if(CMD){ exitCmd(true); setQ(f.value); } else { f.value='>'; if(PRM) exitPrm(false); enterCmd(); }
+    return;
+  }
+  if(!typing&&e.key==='?'&&!CMD){ e.preventDefault(); fillHelp(); return; }
+  if(CMD&&inField&&refOpen()&&(e.key==='ArrowDown'||e.key==='ArrowUp')){
+    e.preventDefault(); REFSEL+=(e.key==='ArrowDown'?1:-1);
+    if(REFSEL<0)REFSEL=REFLIST.length-1; if(REFSEL>=REFLIST.length)REFSEL=0; drawSuggest(); return; }
+  if(CMD&&inField&&refOpen()&&e.key==='Enter'){ e.preventDefault(); if(REFLIST[REFSEL]) fillCmd(REFLIST[REFSEL].s); return; }
+  if(PRM&&inField&&e.key==='Enter'){ e.preventDefault(); runPrompt(); return; }
+  if(CMD&&inField&&e.key==='Enter'){ e.preventDefault(); HPOS=-1; runLine(); return; }
+  if(CMD&&inField&&e.key==='Tab'){ e.preventDefault(); completeLine(); return; }
+  if(CMD&&inField&&(e.key==='ArrowUp'||e.key==='ArrowDown')){ if(histStep(e.key==='ArrowUp'?-1:1)) e.preventDefault(); return; }
+  if(e.key==='Escape'){
+    closeMenu();
+    if(APIP){ closeApi(true); return; }
+    if(PRM){ exitPrm(true); setQ(f.value); return; }
+    if(CMD){ exitCmd(true); setQ(f.value); return; }
+    if(inField&&SEARCH){ clearSearch(); }
+  }
+}
+document.addEventListener('keydown',onKey);
+document.addEventListener('focusin',function(){ if(!CMD&&!PRM) drawSuggest(); });
+document.addEventListener('focusout',function(){ setTimeout(function(){ if(!CMD&&!PRM) drawSuggest(); },0); });
+
+render(); applyBar();
+window.addEventListener('load',function(){paintAll();moveRule();placeBar();});
+
+</script>
+</body>
+</html>

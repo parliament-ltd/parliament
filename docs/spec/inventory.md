@@ -209,3 +209,17 @@ pop-outs and cross-tab messaging all came back empty. Every record id is a UUID.
 |---|---|---|---|
 | PR-50a/b: house@1.0 visualizer, homepage default swap, saved-seed migration | Unmerged branch | `claude/pr50-house-visualizer-contract` (abe2ac5, 8f7c5cb) | After this refactor lands; keep what survives the new direction |
 | Compressed-summary branch | Live | `src/catalog/entries/branches-render.jsx`, `BranchCreationPanel.jsx` | Kept as a docket branch (change plan 5.7); you want to rethink it after this refactor |
+
+## Settings (added 24 September 2026)
+
+| What it is | State | Where | Blocks |
+|---|---|---|---|
+| Settings as built (one section at a time, gold, Anthropic only) | Live | `src/views/SettingsView.jsx`; snapshot `docs/design-snapshots/settings-current.html` | |
+| Settings v1 (stacked card, rail, section rule, aliases) | Mockup | `docs/spec/parliament_settings_v1.html`; `settings-spec-decisions.md` | Change plan area 6b |
+| `api:` key panel, on every surface | Mockup | v1; St §6 | Keys for several providers (area 6) |
+| `set:` and the `SETTERS` registry | Mockup | v1; St §5 | Command bar (area 2) |
+| `open:settings`, `pop:settings`, `pop:back`, `backup:`, `restore:` | Mockup | v1; St §5 | Command bar, pop-outs |
+| `bar:` positions and states | Mockup | v1 (built there); St §7; A §4 | Command bar |
+| Section navy rule | Mockup | v1; St §3 | |
+| Warn before a costly run | Mockup | v1; St §9 | Run cost (area 8) |
+| Desks on this device | Mockup | v1; St §12 | `arrange:` (out of scope) |

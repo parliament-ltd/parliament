@@ -40,6 +40,7 @@ sources, execution. I propose one change and two additions.
 | 4 | Docket | 1, 2 |
 | 5 | Symposium, first pass | 1, 2, 4 |
 | 6 | Multi-provider and the answered-by picker | 0 (key store) |
+| 6b | Settings, built to `parliament_settings_v1.html` (C36) | 2, 6; the cost parts need 8 |
 | 7 | Sources | 2, 6 |
 | 8 | Execution: `run:`, `new:run`, `stop:`, undo boundary | 4, 5, 6 |
 | 9 | Retirements you approve | 3 |
@@ -203,7 +204,7 @@ The command bar is the spine (brief). It is built once and mounted on every surf
   - `?` and `help` open the reference panel.
   - Also fixes the double Cmd/Ctrl+Shift+B binding (conflicts Part 4).
 - **2.8 Reference panel**, per v30: grouped, walkable with arrow keys, no totals, and a count only while narrowing (A §4).
-- **2.9 Navy rule.** It is shown permanently on the addressed surface and designed as frame, not alert (A §7). A popped panel does not wear it; a popped surface wears its own.
+- **2.9 Navy rule.** It is shown permanently on the addressed surface and designed as frame, not alert (A §7). A popped panel does not wear it, and a popped command line is a panel (C30). A popped surface wears its own. On a long sectioned surface the rule marks the addressed section and slides with the scroll (C31; Settings first).
 - **2.10 Bar placements.**
   - **Inline:** one card, travelling under the selected line.
   - **Detached strip:** more than one card.
@@ -337,6 +338,59 @@ Before that work starts, I export standalone HTML snapshots of the current chat 
 
 ---
 
+## Area 6b. Settings
+
+Built to `parliament_settings_v1.html`, whose header comment is the record for
+what it shows, and to `settings-spec-decisions.md` (St), with the rulings on C27
+to C36.
+
+**Kept:**
+- Every stored setting. Removed options stop showing but their stored values stay, so nothing is lost:
+  - the theme
+  - automatic compression, which is read as "ask me first"
+- Encryption of keys at rest (Web Crypto, AES-GCM, non-extractable).
+- The `.parliament` backup and restore flow, restyled.
+
+**Changed:**
+- **6b.1 One stacked card with a rail** that serves as an index, instead of one section at a time (St §2).
+- **6b.2 Section aliases** registered in `PANELS`: `keys`, `spending`, `context`, `data`, `appearance`, `about`.
+- **6b.3 The navy rule follows the section** and slides with the scroll, taking 320 ms and stopping under reduced motion (St §3, C31).
+- **6b.4 API keys** (St §8).
+  - Grouped by provider: Anthropic, Mistral, Ollama, Sources. Rows run most expensive first, with cost marks.
+  - Auto is the default, and the default for new chats is picked from the rows.
+  - A provider with no key shows its models greyed, with "add a key to use it".
+  - A saved key shows its last four characters, with Check, Replace and Remove.
+  - One "keep keys" setting covers every provider.
+- **6b.5 Context and defaults.**
+  - Automatic compression is removed (St §10).
+  - New setting: the room for new dockets.
+- **6b.6 Data and backups** (St §11).
+  - `.parliament` only. The older export buttons go under retirement R10.
+  - The format version is shown.
+  - A file with no version field reads as format 1 (C35).
+  - The reminder offers daily, weekly, monthly or never.
+  - The storage meter stays.
+  - "Delete everything" is armed by typing `delete`. It is the one red in the product.
+- **6b.7 Appearance.** Text size with a preview, and no theme choice. The desks list waits for `arrange:` (C32).
+- **6b.8 About and security.** New privacy copy, and the network log grouped by host, each host named by the provider or source that called it (St §13).
+
+**Added:**
+- **6b.9 Search narrows to matching rows.** It hides sections with no matches, dims their rail entries, and gives a count on the Enter line.
+- **6b.10 Settings verbs.**
+  - `open:settings <section>` and `pop:settings <section>`, plus `pop:back`.
+  - `set:<name> <value>`, driven by a `SETTERS` registry that generates the Enter line and the docs.
+  - `backup:` and `restore:`.
+  - `undo:` over every `set:`, every click on the page, and bar moves.
+- **6b.11 `api:` key panel, on every surface** (St §6).
+  - `api:`, `api:<provider>` and `api:new`.
+  - A line that carries a key is refused before Enter.
+  - The shared history (2.11) never stores a key-shaped line.
+  - `set:key` points at `api:`.
+- **6b.12 Ollama status is checked only when asked** (C33). Safari shows why Ollama is unavailable.
+- **6b.13 Spending, after area 8:** this month's spend, the costliest runs, and the warn-before-a-costly-run threshold that the `run:` Enter line reads.
+
+---
+
 ## Area 7. Sources
 
 **Added:**
@@ -390,7 +444,7 @@ exported for you to design outside Claude Code:
 
 1. **The Symposium room-to-room flow**, including popping out and comparing.
 2. **The Lab, wizard and editor** (`/edit`, `/build`, `/edit/:roomId`).
-3. **Settings.** In this plan it only takes the new tokens; a real redesign would be a later step. Tell me if Settings should wait entirely.
+3. **Settings.** Designed: `docs/spec/parliament_settings_v1.html` and `settings-spec-decisions.md`. Now area 6b (C36).
 
 ---
 
