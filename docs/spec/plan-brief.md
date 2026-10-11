@@ -491,3 +491,83 @@ M8 and M12 can run beside the others once M2 exists.
 5. Add Part 5 to `conflicts.md` (C37 onward) and the new rows to `inventory.md`.
 6. Propose the CLAUDE.md update. Do not apply it without approval.
 7. Revise `src/lib/migrations/v6Plan.js` and its tests only after the rulings on C20, C39 and C49, and show the dry run before anything migrates.
+
+## 13. Corrections from the research
+
+Added after the audits came back. **Where this section and sections 7 or 8
+disagree, this section is right.** Each audit's full report is in `research/`.
+
+### From `research/request-path.md`
+
+- **R23 is wrong.** There is no persona editor in Settings. Personas exist only inside the Collaboration window, as `{ id, title, instruction }` in one settings value, `parrotPersonas`. The spec's description of Parrots (a default model, tool preferences, its own store, a `parrotId` on conversations) matches nothing in the code.
+- **Ticking a saved persona has never changed what is sent.** Only the five presets and the custom text reach the model. After a migration to collabs, ticked personas would start to take effect for the first time. Stefan should know before it happens.
+- **Collab state is memory only.** It resets on reload and on changing chat, and no reply records which presets applied. "Until turned off" and "a reply names the collabs it worked under" both need new stored fields.
+- **The five presets match the built-in collabs in name only.** Two ids differ (`alternatives`, `uncertainty`), and the existing "challenge" text asks the model to critique its own output, where the spec says "question what it is given".
+- **Three model calls happen that nobody asks for:** a title, a summary and tags, on Haiku, after the first exchange of every chat. No setting turns them off and nothing says so beforehand. See C62.
+- **"Automatic" compression spends nothing.** It only opens the branch panel.
+- **Components call the provider directly.** Thirteen places read the key and seventeen fetch a provider. Tiers and `capabilityRequirements` gate nothing at run time, and six entries declare less than they do. The gateway in section 9 is a real change, and for first-party code it holds only with a lint rule and a single import path.
+- **What is sent is not what is shown.** Hidden messages, and messages deleted earlier in a session, are still sent. A reply cut off by the token limit or by a stream error is stored as complete. A stream keeps running after you leave the chat. The token meter over-counts. Any promise that the Enter line names what goes needs the real payload first.
+- **"Do not save" for the key is broken:** nothing holds the key, so sending fails.
+- **Only web search can be switched on.** `ToolToggles.jsx` is unused. The calculator and chart tools are declared but unreachable. Search results and citation data from the provider are dropped; only links the model writes survive.
+- **The file shelf's "in context" files never reach the model,** though the screen says they do. Three of its buttons do nothing.
+- **The network log cannot say who made a request,** and it records query strings, which would expose source searches. It also misses anything that is not a page fetch: the preconnect to Anthropic on every page load (before any key or choice), the service worker, and speech recognition.
+- **The production headers disable the microphone** (`Permissions-Policy: microphone=()`), so voice input probably fails on the deployed site while working locally. Not tested.
+- **A "replace" restore clears the settings store, stored key included.** The separate key store in section 9 fixes this as a side effect.
+- **The Review window is thinner than the editing spec's "carried forward" table says:** no branch chips, no pins toggle, the reflection text is thrown away, and "Save as Markdown" exports the chat, not the review.
+- **The ignition and the Settings shimmer are two separate animations,** both in `#D4A843`, not the `#C4A94D` the bar document cites.
+- **Several settings are stored and read by nothing:** the budget alert, the backup reminder frequency, summary depth, last backup. The "current session" figures in Settings are literal zeros.
+- **Choosing a home room creates a new empty chat on every visit to `/`.**
+
+### From `research/editing-code.md`
+
+- **Secretarybird cannot be the editing engine.** The salvage row in section 7 overstates it. Its editor lets the browser edit one element per paragraph and reads the text back. Tracked changes are not recorded: they are a word-level comparison of the text against a baseline, drawn in a non-interactive overlay above text made transparent. Struck words never exist in the editable text. There are no edit records, no edit ids and no offsets.
+- **What does carry over is smaller:** the paragraph list with its split, join and retype functions (as a pattern), the filtering and keyboard handling of the `/` menu, two caret helpers, the suggestion and comment cards, the selection tooltips, and the scaffolding for model calls.
+- **Option a in section 7 still stands, but as new work,** not as "growing Secretarybird". The comparison-against-baseline approach must not be carried over: it orders added words before struck ones, works on whole words, cannot place a deletion among repeated words, and treats splitting or joining a paragraph as an edit.
+- **Keep `content` as the original string beside the new blocks and edits.** About 25 places read it as a string, and the spec says the model keeps reading the original.
+- **Highlights are terms matched across the whole conversation,** not anchored passages. C57 is a real question.
+- **Three commits sit on `refactor/main` and never reached `main`** (all 6 April): two Secretarybird fixes (`974d659`, the space bar hijacked in comment and chat inputs; `50ecd25`, revision suggestions missing in scanned chats) and `c2ed12a`, which moves the update banner for the service worker to the app level. The last one bears on section 7, item 8. See C65.
+- **Every chat that is opened gets an empty document record,** because the document provider is mounted app-wide and saves a seed paragraph a second later. That clutters the data the migration reads and should be fixed before it.
+- **Accept All and Clear All both accept every suggestion.** Neither discards, and there is no undo.
+- **No HTML sinks** in the editing or message code. The fragile parts are three uses of the deprecated `execCommand`, rich `contentEditable` with no `beforeinput` handling, and input-method handling that rests on one flag.
+- **Each message card animates its position** (`layout="position"`), which will fight live edits in place.
+
+### From `research/lab-code.md`
+
+- **The theme of a room is applied to the whole page in a chat** (`data-scheme` on `<html>`), and only to a wrapper in the editor. The dark and high-contrast variants do not scope at all. "A theme applies inside the edges of the room only" is not true today and must be made true before the new chrome sits beside a room. See C64.
+- **There is no command layer of any kind.** The reducer has an action for most Lab commands, but each takes ids and slot ids. Nothing resolves names, finds a first free slot, checks capacity or refuses to remove a required block.
+- **The slot vocabulary is the largest structural gap.** Code has 13 slot ids with "single" or "stack" capacity. Lab v7 uses five words (left, right, main, input, sheet) with numeric capacities. `slotTargets` is declared on all 27 entries and never consulted; templates and the wizard contradict it in at least nine places.
+- **15 of the 33 settings that room blocks declare are read by nothing,** including message density and timestamps and the highlight colour. The Blocks board in Lab v7 would show settings that do not work.
+- **"Built for" (desktop or phone) is stored and ignored.** Layouts switch on the width of the window.
+- **The input block takes its chat from the address bar,** so it cannot send from the Lab. Trying a room with `p>` needs that changed.
+- **Undo already makes "no holding tray" possible:** it is a whole-state snapshot, 50 deep. But the name and device of a room are not undoable, typing in a setting burns a step per keystroke, and undo after saving leaves the unsaved-changes flag wrong.
+- **`@dnd-kit` cannot be dropped yet.** Six files import it, and one is the stacked-sections layout, which the layout registry loads at start. Lab v7 keeps that layout for rooms, so its reorder-by-drag code has to go first.
+- **R30 corrected.** Unused today: `src/hooks/useMode.js`, `src/components/core/ToolToggles.jsx`, `src/components/core/CitedMarkdown.jsx`. Dev-only, and in use by the `/catalog` page: `RoomDemo.jsx`, `SchemePicker.jsx`, `catalog/dev-modes.js`.
+- **Web search and file attach are already "features of input" in mechanism:** they draw nothing and talk to the input over the bus of the room. Folding them in is about 250 lines moved and a change to stored rooms.
+- **Rebuild, per the audit:** the view layer of the editor (its controller is the drag handler); the slot model, with the layout as the single source; the rule for what happens to blocks on a layout change; one read layer for the catalogue (layout knowledge is duplicated in about ten places and references are spelled three ways, which already causes wrong labels); theme scoping.
+- **Mockup descriptions that do not match the code:** Collaboration (a second person, against system-prompt presets), Summary dashboard (a conversation summary, against dataset statistics), Ripple (later messages, against document consistency), Review, Chart, Table, File shelf. The step list has no code.
+
+### From `research/state-architecture.md`
+
+- **Section 7, item 1 is confirmed, with a concrete shape.** One conversation and one stream are assumed throughout. Each streamed chunk sets state in a provider at the root of the app whose value is rebuilt every render, and 21 files read it. The audit recommends a plain store module keyed by conversation, read with `useSyncExternalStore`, with `ChatContext` kept as a facade over it. Splitting contexts is not enough: React context has no selectors.
+- **A ten-step order of least risk** is in the report (section 11b). It starts with a tiny per-board "which conversation" context to replace reading the address bar, then stream state, then messages, then per-board providers, one write path that emits change signals, lazy blocks, and pop-outs last.
+- **Four providers do work for every chat whatever room it is in** (documents, the file shelf, collab, the branch panel). They should be mounted per board, only when a block needs them. This is also what writes the empty document records noted above.
+- **Pop-outs are harder than section 9 implies.** State reaches through a portal; the page does not. In a popped window today: no styles; none of the 14 window or document key listeners fire; all 12 selection reads look at the wrong window, which breaks highlighting and all editing; lookups by id fail; menus do not close on an outside click; width checks measure the wrong window; the clipboard, confirm boxes and the file picker act on the opener.
+- **The highest risk in pop-outs is animation and timers.** They run on the clock of the window that opened the pop-out. When that tab is hidden its frames stop, so cards that mount invisible may stay invisible and a running timer may stall. **This should be prototyped before pop-outs are promised anywhere,** including welcome step 6.
+- **Lazy loading is blocked by three things:** `db.js` imports the whole catalogue (an import cycle), manifests and render code are not split everywhere, and there is no loading or error boundary per block.
+- **The table is fine in memory for a few thousand rows.** The work is one write path that notifies, fixed-height windowed rows, and at larger scale indexes on type, time, number, room and tags. Indexes mean a schema change, so they belong in the one upgrade of section 9, item 8.
+- **Lint:** the count of about 120 errors is inflated by false positives on `motion`. Fix the config first so the real hook-rule findings (ten sites) can be read. There is no type checking and no continuous integration.
+- **Defects found in passing:** Continue shows no progress and can be clicked twice; a stream that outlives its chat can title another chat from the wrong messages; empty chats are deleted at every start, including one another tab has just made; search boxes promise more than they search; the Inter font is shipped and precached but never applied; Tailwind may be scanning the old worktrees under `.claude/` (unverified).
+
+### New conflicts and questions these raise
+
+**C61. Is the prompt of a step locked or editable?** Docket spec §1 and `docketModel.js`: a step that has produced a turn is locked, "because a transcript exists and rewriting the prompt would make the record a lie". Editing spec: every prompt is editable in place, struck and blue, per branch. **Suggestion:** both hold. An edit to a prompt is a marking on the transcript, and the original stays visible, struck. The step in the run does not change; "ask again as 201d" makes a new branch from the edited wording. To confirm.
+
+**C62. The three automatic calls after a first exchange.** They spend without being asked or announced, which breaks proposed rule 2, and a reader with no key has no model to make them. **Question:** keep them and say so on the Enter line; make them on request (`summarize:` already exists as a verb); or drop them when the answer came from a keyless source.
+
+**C63. Does the Lab save on every command, or keep a separate save?** Today saving is explicit, with an unsaved-changes flag and a first-time "Build" step. Lab v7 applies settings on click and shows no save. **Question.** Also: may a room hold two of the same block, given that commands address blocks by name?
+
+**C64. Theme scope.** Decided by the arrangements doc (inside the edges of the room only); not how the code works. No question for Stefan, but it is work, and the hard-coded colours inside blocks limit how true it can be made.
+
+**C65. The three commits on `refactor/main`.** **Question:** bring them onto this branch?
+
+**C66. What "web search on" means.** Offered for each message, as today, or sent with every message? The guide in Lab v7 says "Yes, when I ask".
