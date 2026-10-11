@@ -20,6 +20,18 @@ ones written inside each document.
 | 6 Oct | `editing-in-place-spec.md` | Editing replies and prompts, asks, Ripple, the Collection's cards, collab, Reflection, sweeps, focus, calm, legibility | `parliament-inline-editing-v5.html` |
 | 7 Oct, updated 9 Oct | `bar-and-commands-decisions.md` | The field, minimising to a hexagon, gold, seven renamed verbs, the command inventory | `parliament-bar-reference.html` |
 
+### Mockups supplied later on 11 October
+
+Four mockups the documents above refer to. None carries a date in its header;
+the dates are worked out from what cites them.
+
+| About | File | What it is | Read it with |
+|---|---|---|---|
+| 23 to 30 Sep | `parliament-branch-slider-v9.html` | Several sources answering one prompt, as tabs in a slider. The numbered source picker, grouped into Models and Sources. "All at once" or "one after another" with a condition. Reply to one branch or all. `open:201a` and `open:201a summary` | The editing spec (6 Oct) for edits and asks per branch, and the bar reference (9 Oct) for how the field looks. Its field is the older square one |
+| 23 to 30 Sep, after the slider | `parliament-collection-board-v3.html` | The Collection as cards: highlights, notes and quotes; the four acts (note, tag, summarize, prompt); headings; finding in both directions; what happens to markings when their chat is removed | The editing spec replaces its tabs and adds edits, asks and suggestions. Its `delete:` is now `erase:` (ruled 11 Oct) |
+| 28 Sep | `parliament_lab_v6.html` | The Lab as two boards, Library and Canvas, which the arrangements document describes | Lab v7 is the same file plus a third board, Blocks. Which one is built is C38 |
+| 28 Sep | `parliament_screens_v1.html` | The map that bare `arrange:` shows across screens | The arrangements document §7a. `arrange:` is deferred |
+
 Working files written during the refactor: `inventory.md`, `conflicts.md`,
 `change-plan.md` (the 24 September plan, due to be replaced by
 `refactor-plan.md`), `plan-brief.md` (the analysis the new plan is built from),
@@ -56,11 +68,7 @@ again: docket v12, the Settings decisions, and the original Claude Code prompt.
 
 | File | Named by | Needed for |
 |---|---|---|
-| `parliament-branch-slider-v9.html` | editing spec, welcome spec §13 | Branch tabs, reply to one or all, `open:` with or without a summary, the numbered source picker. The conversation board cannot be planned in detail without it |
-| `parliament-collection-board-v3.html` | editing spec, welcome spec §13 | Collection cards, ids, finding in both directions, `new:collection`, `note:`, `compare:`, `summarize:` |
-| `parliament_lab_v6.html` | arrangements doc | The decided Lab. v7 calls itself an alternative to it |
-| `parliament_screens_v1.html` | arrangements doc §7a | The `arrange:` map across screens |
-| `parliament-bar-final.html` | bar decisions doc | Believed to be `parliament-bar-reference.html` under another name. To confirm |
+| `parliament-bar-final.html` | bar decisions doc | Taken to be `parliament-bar-reference.html` under another name, unless Stefan says otherwise |
 | The power-on shimmer spec | bar decisions doc | Timing and colour of the `api:` ignition |
 | `parliament_welcome_v8.html` | welcome spec | Not needed; v9 replaces it |
 | `secretarybird-mode.jsx`, `starling-ripple-and-naming.md` | editing spec | History only. Secretarybird's code is in `src/components/core/sbrd/` |

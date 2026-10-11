@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parliament · Lab v6</title>
+<!--
+
+PARLIAMENT · THE LAB v6
+Supersedes parliament_lab_v5.html. The canvas style switch stays for now;
+medium is the decided style.
+
+CHANGES FROM v5
+  · Ticking. Blocks, layouts and themes in the Library have checkboxes.
+    Rooms, boards and resources do not, because they do not go into a room.
+    A line under the filters says what is ticked, with "add to room" and
+    "clear". The ticks survive a change of filter or search, as in the
+    Almanac. "add to room" writes add: with everything ticked; the Enter
+    line resolves it at once (a layout, a theme, blocks to their first free
+    place) and refuses two layouts or two themes.
+  · add: puts things into whatever the navy rule is on: the room when the
+    Canvas is addressed, the collection when that is. place: stays for
+    choosing a slot.
+  · The Library's marginalia is facts only. use, paint, place and collect
+    are gone. Rooms keep one action (edit here, or duplicate); boards keep
+    open.
+  · Details open in place, under the item you clicked, while the Library is
+    in its slot. Popped out, the Library shows details in a side column
+    beside the grid. Clicking the row opens details; the checkbox selects.
+    The details section at the top of the Library is gone.
+  · The room line: pickers on the left (layout, theme, built for), actions
+    at the right end (name, inspect). Rail buttons moved into the room's
+    details. Each picker's menu opens with a heading naming what it changes,
+    so the line can show values without keys.
+  · name: replaces rename:. It names whatever the navy rule is on: the room,
+    or the collection; with an id it names an Almanac item.
+  · Trying a room with p> keeps the exchange as chats, tagged "tried in the
+    Lab", and the Enter line says it spends tokens.
+
+PARLIAMENT · THE LAB v5 (notes kept)
+v4 without the collection.
+
+CHANGES FROM v4
+  · The Lab arrangement is two boards: Library and Canvas. They are the
+    focus and need to be solid first.
+  · The collection is not part of the Lab. It can still be called:
+    open:collection brings it beside the Canvas, and add: or compare: open it
+    too. It is not reported as missing when it is not there.
+  · "collect" is gone from the Library's marginalia, to keep the Library
+    about browsing and placing.
+
+PARLIAMENT · THE LAB v4 (notes kept)
+
+CHANGES FROM v3
+  · The canvas has three drawing styles, switched from the Try row, so they
+    can be compared in place. Medium is the default and the proposal:
+      earlier   the v2 canvas: well, raised room, filled slots, raised
+                blocks, accent dots, placeholder bars, bubbles
+      medium    the earlier depth with the Almanac's type: the well, the
+                lifted room, soft slot areas, raised blocks, accent dots and
+                bubbles stay; slot labels are letter-spaced, a block's state
+                is one line of italic marginalia instead of bars, features
+                are tags, selection is the navy rule
+      lines     the v3 canvas: dotted outline, hairline rules, rows
+    Only one style ships. The switch exists to choose.
+  · Everything outside the canvas is as in v3.
+
+(v3 notes follow.)
+
+PARLIAMENT · THE LAB v3
+Applies arrangements-boards-blocks-decisions.md (28 Sept 2026, later
+session) and the review of v2. Follows parliament_almanac_v30.html for visual
+values. Supersedes parliament_lab_v2.html. Reference material, not
+production code.
+
+CHANGES FROM v2
+  · The Lab is an arrangement, not a board. It holds three boards: Library,
+    Canvas and Collection. The middle board is called Canvas, plainly, so it
+    can be called: pop:canvas, move:canvas left.
+  · No "pop out" on any board, as in the Almanac. Popping is found through
+    the field and the reference. A clear board name is what matters.
+  · Clicks that only move things around the screen act at once: "bring it
+    back" on a popped window or under the field, "open it" for a closed
+    board. Clicks that change a room still write the command and wait for
+    Enter.
+  · The Canvas: its name in the top row; under the rule, one line, centred
+    vertically, with the room's name and its pickers (layout, theme, device,
+    rail buttons, rename, inspect). Select a block and the same line reads
+    "Writing Studio / Highlights" with that block's pickers. One place for
+    marginalia; it changes what it says rather than moving. The v2 head and
+    foot pickers are gone.
+  · The Library: its name in the top row, then a details section (what the
+    inspector showed), then the filters, then the catalogue. inspect: shows
+    things there, opening the Library if it is closed. With nothing selected
+    the section is one quiet line, so the catalogue does not jump. The v2
+    overlay under the field is gone.
+  · The Canvas is drawn in the Almanac's language: a dotted outline, hairline
+    rules between slots and between blocks, letter-spaced slot labels, a
+    block's state as one line of italic marginalia, the transcript as rows
+    with a mono speaker column, features as tags (dashed off, ruled on),
+    washes only for selection and for where a block fits. The grey well,
+    raised boxes, filled slots, sketch bars, bubbles and dots are gone. The
+    room keeps its own theme inside its edges.
+
+WORKING NAMES (placeholders; one copy table in the product)
+  arrangement   what is on your screen or screens, popped windows included
+  board         something built from blocks: Library, Collection, Almanac,
+                Docket, and every room
+  room          a board built around a conversation
+  block         a piece: messages, input, highlights, notes, the step list
+  feature       something a block can do, set with set:. Web search is a
+                feature of the input block
+  theme         colour and type inside a room (was "scheme")
+  layout        where blocks go inside a room (was "floor plan")
+
+CHANGES IN v2, FROM v1
+  · The inspector is gone. Its jobs moved:
+      the room's own settings   marginalia pickers in the room board's head
+                                (name, layout, theme, device, rail buttons)
+      the selected block's      marginalia pickers in the room board's foot
+                                (where it sits, its settings and features)
+      one thing in detail       inspect:, an overlay under the field, the
+                                Almanac's peek under a better name. Clicking
+                                anything in the Library opens it; Escape
+                                closes it
+      several things at once    the collection
+    The foot is one answer to the open question of where a selected block's
+    marginalia lives. It keeps the room's own theme free of Lab chrome.
+  · Features. Web search, file attach and voice input are features of the
+    input block, drawn as toggles inside it. Clicking one writes
+    set:input web search on. In the Library they are listed on the input
+    block's entry, and searching "web search" finds it with the line marked.
+    place:web search still works and says it is switching a feature on.
+  · Messages and input are two blocks every room must have: rm: refuses them.
+  · Where a block fits. Hover a block in the Library, hover its place
+    marginalia, or type place: with a block named, and its slots light up:
+    the best free slot strongest, other fitting slots gently, full or
+    unsuitable ones dimmed with a one-line reason. A slot word narrows it.
+    Navy, not gold. This keeps what the old Lab did on drag.
+  · Verbs renamed or retired: plan: is layout:, scheme: is theme:, peek: is
+    inspect:, lab:"name" is edit:"name" (and edit: takes boards), hide: and
+    show: are close: and open:, hold: is gone.
+  · rm: follows the navy rule. With the room addressed it takes a block out
+    of the room; with the collection addressed, out of the collection. The
+    Library keeps the block either way. A layout change that leaves a block
+    without a place takes it out of the room, and undo: puts it back; there
+    is no holding tray.
+  · The Library lists Boards (Almanac, Library, Collection, Docket) with open
+    and edit, and every block says where it can go: room only, a room or the
+    screen, the screen only.
+  · The step list is a block, so a room can carry its docket's steps. The
+    docket itself is a board.
+  · The guide gains a step for web search, to show a feature being set.
+
+STILL AS IN v1
+  The field's three modes, commands written by clicks and run by Enter, the
+  Library as one board that becomes a grid when popped, the collection with
+  its source, numbering, sections and notes in context, the guide, the empty
+  room, pop-outs drawn inside the page.
+
+NOT BUILT HERE
+  open: and edit: on the Almanac and Docket boards, arrange:, export:, pin:,
+  tour:, real windows, multi-select.
+-->
+<style>
+
+/* ═══ Carried from Almanac v30 ═══ */
+:root{
+  --paper-bg:#FCFCFA;
+  --paper-ink:rgba(46,58,79,.011);
+  --paper-hatch:none;   /* page hatch retired — it was noise, not texture */
+  --card-lift:0 1px 2px rgba(40,36,28,.035);
+  --p-surface:#FFFFFF;
+  --p-subtle:#FAF9F5;          /* heading rows — off-white, warmer than grey */
+  --p-tray:#F6F5F1;            /* the working-set tray, so white cards read  */
+  --p-ink:#191919; --p-ink-2:#787774; --p-ink-3:#9B9A97; --p-line-soft:#C0C8D4;
+  --p-border:#E9E9E7; --p-border-2:#F1F1EF;
+  --p-gold-light:#B8A070; --p-gold-muted:#9C8760; --p-gold-deep:#8B6A10;
+  --p-gold-tint:rgba(196,169,77,.08); --p-gold-tint-2:rgba(196,169,77,.14);
+  --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --font-serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --font-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --r-sm:4px; --r-md:6px; --r-xl:16px; --r-btn:8px;
+
+  /* Command mode. Ruling only, no field behind it — the crosshatch carries
+     the mode on its own and the type goes white over it. */
+  --navy:38,56,92;
+  --line-c:22,38,70;
+  --line-a:1;
+  --line-w:3px;
+  --hatch-gap:3.5px;
+
+  /* Prompt mode. Same idea as command — the fill carries the mode — but bone
+     rather than navy, ruled into tall parallelograms with a diagonal through
+     each, so the type stays ink and the field still reads as paper. */
+  --tri:rgba(122,120,114,.17);
+  --prm-bg:var(--paper-bg);
+
+  /* Border and paper spec, light mode. Dark is unfinished and not referenced. */
+  --ink:#191919;
+  --ink-dot:rgba(25,25,25,.18);      /* structural: evenly spaced dots       */
+  --ink-prog:rgba(25,25,25,.10);     /* key: progressive dash, one at a time  */
+  --divider:rgba(25,25,25,.08);      /* header rules                          */
+  --ink-soft:rgba(25,25,25,.30);     /* checkbox rule, quiet icons            */
+  --ink-wash:rgba(25,25,25,.045);    /* selected rows and cards               */
+  --ink-wash-2:rgba(25,25,25,.075);
+  --marg:rgba(25,25,25,.46);         /* marginalia at rest                    */
+
+  /* GOLD MEANS THE LIVE ACTION, AND NOTHING ELSE.
+     The search field when engaged, the trigger on hover, keyboard focus.
+     Every other former use is ink. */
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+/* Borders are drawn as an SVG overlay, never as a CSS border. Patterns are
+   computed from the element's real perimeter so they always close cleanly. */
+[data-border]{position:relative}
+svg.bx{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+
+/* The key border is static. Nothing draws, nothing fades. */
+
+/* The faint borders cannot carry focus. Keyboard focus gets its own ring. */
+:focus-visible{outline:2px solid var(--p-gold-deep);outline-offset:2px}
+/* Focus is a live action, so it keeps gold. Nothing else at rest does. */
+body{
+  font-family:var(--font-sans);background-color:var(--paper-bg);
+  background-image:var(--paper-hatch);background-attachment:fixed;
+  color:var(--p-ink);-webkit-font-smoothing:antialiased;padding:44px 16px 64px;
+}
+
+.card{background:var(--p-surface);border-radius:var(--r-xl);box-shadow:var(--card-lift);overflow:hidden}
+
+.kbd{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;
+  font:500 10px var(--font-mono);background:var(--p-subtle);border:.5px solid var(--p-border);border-radius:3px;color:var(--p-ink-3)}
+
+
+.sbar{padding:0;position:relative}
+.sfield{position:relative;display:flex;align-items:center}
+.sfield>svg:not(.bx){position:absolute;right:12px;top:50%;margin-top:-7.5px;width:15px;height:15px;color:var(--ink);pointer-events:none}
+.sfield{border-radius:var(--r-btn)}
+.sfield input{width:100%;padding:10px 38px 10px 68px;font:400 13.5px var(--font-sans);
+  border:none;border-radius:var(--r-btn);background:transparent;color:var(--p-ink)}
+.sfield input:focus{outline:none}
+/* ═══ The field is also the command line ═══
+   Plain text searches. A leading > switches it into command mode: the box
+   fills with a navy crosshatch and the type goes white. Deleting the > puts
+   it straight back to prose. The first-character rule is what makes that
+   safe — a > anywhere else is just a character. */
+.sfield{
+  background-color:var(--p-surface);   /* plain at rest; only command mode is ruled */
+  overflow:hidden;
+}
+.sfield .fillwrap{
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+  clip-path:inset(0 100% 0 0);
+  transition:clip-path .28s cubic-bezier(.4,0,.2,1);
+}
+.sfield.cmd .cmdwrap{clip-path:inset(0 0 0 0)}
+.sfield.prm .prmwrap{clip-path:inset(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){.sfield .fillwrap{transition:none}}
+.sfield .fill{position:absolute;inset:0}
+.sfield .fill>svg{width:100%;height:100%;display:block}
+/* Command: a hexagonal lattice marked only at its edge points, two dots a side,
+   one dot size throughout, about a quarter of them left dark. The hexagons
+   themselves are never drawn. */
+.sfield .cmdfill{background:rgb(var(--line-c))}
+/* Prompt: the page's own bone, ruled into vertical parallelograms. */
+.sfield .prmfill{background:var(--prm-bg)}
+.sfield input{position:relative;z-index:1}
+.sfield>svg:not(.bx),.sfield .modechip{z-index:2}
+.sfield.cmd input{
+  font-family:var(--font-mono);font-size:13px;color:#fff;
+  text-shadow:0 0 3px rgba(12,20,40,.95),0 1px 2px rgba(12,20,40,.85);
+}
+.sfield.cmd input::placeholder{color:#fff;opacity:.95;text-shadow:0 0 3px rgba(12,20,40,.9)}
+.sfield.cmd>svg:not(.bx){color:#fff;filter:drop-shadow(0 0 2px rgba(12,20,40,.9))}
+.modechip{
+  position:absolute;left:12px;top:50%;margin-top:-8px;font:600 8.5px var(--font-sans);letter-spacing:.06em;
+  padding:3px 7px;border-radius:9px;background:rgb(var(--navy));color:#fff;
+  opacity:0;transform:translateX(-4px);transition:opacity .16s ease,transform .16s ease;pointer-events:none;
+}
+.sfield .schip{opacity:1;transform:none}
+.sfield.cmd .schip,.sfield.prm .schip{opacity:0;transform:translateX(-4px)}
+.sfield.cmd .cmdchip{opacity:1;transform:none}
+.sfield.cmd input{padding-left:82px}
+.sfield.cmd>svg:not(.bx){opacity:0}
+.sfield>svg:not(.bx){transition:opacity .16s ease}
+/* Prompt names itself in ink, the way command names itself in navy. Search is
+   the resting mode, so its pill is drawn rather than filled: bone inside, an
+   ink rule around it, ink type. Gold is still only the live action. */
+.sfield .pchip{background:var(--ink);color:var(--paper-bg)}
+.sfield .schip{background:var(--paper-bg);color:var(--ink);border:1px solid var(--ink);padding:2px 6px}
+
+/* ═══ The field is also the prompt ═══
+   p> at the front switches it. Same pill as command, quill on the right where
+   the magnifier sits, type left in ink. Deleting the leader puts it back. */
+.sfield>svg.quillmark{right:10px;width:21px;height:21px;margin-top:-10.5px;color:var(--ink);opacity:0}
+.sfield.prm>svg.quillmark{opacity:1}
+.sfield.prm>svg.mag{opacity:0}
+.sfield.prm .pchip{opacity:1;transform:none}
+.sfield.prm input{padding-left:72px;padding-right:42px;color:var(--p-ink)}
+
+/* Marginalia under the field. One line of reserved height that changes
+   what it says rather than appearing, so nothing below it moves. At rest it
+   says how to reach the command line; in command mode it lists the commands,
+   narrowing as you type. Schemes are upright because they are literal text
+   to type; the gloss beside each is italic, like all marginalia. */
+.shint{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 4px;min-height:19px;padding:6px 13px 0;
+  font:italic 400 11px var(--font-serif);color:var(--marg);line-height:1.6}
+.shint:hover{color:var(--p-gold-deep)}
+.shint .it{white-space:nowrap}
+.shint .sep{opacity:.5;margin:0 3px 0 1px}
+.shint code{font:normal 600 11px var(--font-serif);color:inherit;letter-spacing:.01em}
+.shint button{font:inherit;color:inherit;border:none;background:none;padding:0;cursor:pointer}
+.shint button:hover{color:var(--ink)}
+.shint button:hover .gl{text-decoration:underline;text-underline-offset:2px}
+.shint .it.first code{color:var(--ink)}
+.shint .none{white-space:nowrap}
+.shint .pre{color:var(--ink);font-style:italic}
+.shint .bad{color:var(--ink)}
+
+/* The full reference. Asked for with ?, so it may cover the table; it floats
+   rather than pushing anything down, and it goes the moment you type past it. */
+.cref{display:none;position:absolute;left:0;right:0;top:66px;z-index:60;background:var(--p-surface);
+  border-radius:var(--r-btn);padding:13px 16px 12px;box-shadow:0 8px 28px rgba(40,36,28,.08);
+  max-height:64vh;overflow:auto}
+.cref.open{display:block}
+.topgrid.atbottom .cref{max-height:58vh}
+
+/* Header: what this is, and a way to keep only one group */
+
+.cref .rhead{padding-bottom:8px;margin-bottom:11px;border-bottom:.5px solid var(--p-border-2)}
+.cref .rtop{display:flex;align-items:baseline;gap:10px}
+.cref .rlab{font:600 9px var(--font-sans);letter-spacing:.055em;color:var(--ink)}
+.cref .rlab .n{margin-left:5px;font-family:var(--font-mono);font-size:9px;color:var(--p-ink-3)}
+.cref .chips{display:flex;gap:2px;margin-top:6px;flex-wrap:wrap}
+.cref .chip{display:inline-block;width:auto;grid-template-columns:none;text-align:center;
+  font:italic 400 11px var(--font-serif);color:var(--marg);border:none;background:none;
+  padding:2px 8px;border-radius:9px;cursor:pointer}
+.cref .chip:hover{color:var(--ink)}
+.cref .chip.on{color:var(--ink);background:rgba(25,25,25,.055)}
+
+/* Groups flow in columns; a group never splits across one */
+.cref .cols{columns:318px;column-gap:28px}
+.cref .grp{break-inside:avoid;margin:0 0 15px}
+.cref h4{display:flex;align-items:baseline;font:600 9px var(--font-sans);letter-spacing:.055em;color:var(--ink);
+  margin:0 0 5px;padding-bottom:4px;border-bottom:.5px solid var(--p-border-2)}
+.cref h4 .n{margin-left:auto;font-family:var(--font-mono);font-size:9px;color:var(--p-ink-3);letter-spacing:0}
+/* Two aligned columns so the eye runs down the syntax, not a ragged edge */
+.cref button{display:grid;grid-template-columns:168px 1fr;gap:9px;align-items:baseline;width:100%;
+  border:none;background:none;padding:4px 6px;border-radius:7px;cursor:pointer;text-align:left;color:var(--p-ink-2)}
+.cref button:hover{color:var(--ink);background:rgba(25,25,25,.04)}
+.cref button.sel{color:var(--ink);background:rgba(25,25,25,.06)}
+.cref code{font:500 11px var(--font-mono);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cref .gl{font:italic 400 11px var(--font-serif);line-height:1.35}
+.cref mark{background:none;color:inherit;font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.cref .nohit{font:italic 400 11px var(--font-serif);color:var(--marg);padding:4px 6px}
+.cref .foot{margin-top:4px;padding-top:9px;border-top:.5px solid var(--p-border-2);
+  font:italic 400 10.5px var(--font-serif);color:var(--marg);line-height:1.5}
+
+.kpill{display:inline-flex;align-items:center;gap:4px;font:500 10px var(--font-sans);padding:2px 7px;border-radius:9px;white-space:nowrap}
+
+.menu{display:none;position:fixed;z-index:70;min-width:186px;max-height:300px;overflow-y:auto;padding:4px;
+  background:var(--p-surface);border:.5px solid var(--p-border);border-radius:var(--r-md);box-shadow:0 6px 20px rgba(40,36,28,.14)}
+.menu.open{display:block}
+.menu button{display:flex;align-items:center;gap:7px;width:100%;padding:6px 8px;font:400 12px var(--font-sans);
+  border:none;background:transparent;color:var(--p-ink);border-radius:var(--r-sm);cursor:pointer;text-align:left}
+.menu button:hover{background:var(--p-subtle)}
+.menu .tick{width:12px;height:12px;flex-shrink:0;color:var(--ink);opacity:0}
+.menu button.on .tick{opacity:1}
+.menu .n{margin-left:auto;font-size:10.5px;color:var(--p-ink-3)}
+
+
+.wshead{display:flex;align-items:center;gap:7px;padding:10px 12px;border-bottom:1px solid var(--divider)}
+.wsname{font-size:12.5px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wskind{font:500 8.5px var(--font-sans);letter-spacing:.05em;padding:2px 6px;border-radius:8px;flex-shrink:0}
+.wskind.draft{background:var(--p-subtle);color:var(--p-ink-3)}
+.wskind.saved{background:var(--ink-wash-2);color:var(--ink)}
+.wscount{margin-left:auto;font-size:10.5px;color:var(--p-ink-3);flex-shrink:0}
+.wsbody{max-height:640px;overflow-y:auto;padding:12px;background:var(--paper-bg)}
+.wsempty{padding:36px 22px;text-align:center}
+.wsempty svg{width:25px;height:25px;color:var(--p-line-soft);margin-bottom:10px}
+.wsempty p{font-size:11.5px;line-height:1.55;color:var(--p-ink-3)}
+
+
+/* ── Marginalia: italic serif, gold-muted, no fills, horizontal ── */
+.marg{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 5px;margin-top:9px;
+  font:italic 400 11px var(--font-serif);color:var(--marg);line-height:1.7;
+  transition:color .16s ease}
+.mc:hover .marg,.mk:hover .marg{color:var(--p-gold-deep)}
+.marg > *{white-space:nowrap}
+.marg .sep{opacity:.4}
+.marg button{font:inherit;color:inherit;border:none;background:none;padding:0;cursor:pointer;
+  white-space:nowrap;transition:color .12s ease}
+.marg button:hover{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+
+
+.btnrow{display:flex;gap:6px;align-items:stretch}
+.btnrow button{
+  flex:1 1 0;min-width:0;height:46px;padding:0 6px;
+  font:500 10.5px var(--font-sans);letter-spacing:.005em;white-space:nowrap;
+  display:flex;align-items:center;justify-content:center;
+  border:none;background:transparent;color:var(--p-ink-2);border-radius:var(--r-btn);cursor:pointer;
+}
+.btnrow button:hover:not([disabled]){color:var(--ink)}
+.btnrow button[disabled]{opacity:.3;cursor:default}
+
+
+.sugg{display:flex;gap:4px;flex-wrap:wrap;margin:7px 0}
+.sugg button{padding:3px 8px;font:400 10px var(--font-sans);border:.5px dashed var(--p-line-soft);
+  background:transparent;color:var(--p-ink-3);border-radius:10px;cursor:pointer}
+.sugg button:hover{border-color:var(--ink-soft);color:var(--ink);border-style:solid}
+
+/* ═══════════════════════════════════════════════════════════════════
+   THE LAB
+   ═══════════════════════════════════════════════════════════════════ */
+body{font-family:var(--font-sans);background:var(--paper-bg);color:var(--p-ink);
+  -webkit-font-smoothing:antialiased;padding:0 16px 120px}
+.page{max-width:1500px;margin:0 auto}
+.toast{position:fixed;bottom:64px;left:50%;transform:translateX(-50%) translateY(8px);padding:7px 14px;
+  border-radius:var(--r-md);background:var(--p-ink);color:#fff;font-size:12px;opacity:0;pointer-events:none;
+  transition:opacity .16s,transform .16s;z-index:90;max-width:80vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* The field sits over the canvas column, as it sits over the table in the
+   Almanac: it acts on what is in the middle unless something else is
+   addressed. */
+.topgrid{position:sticky;top:0;z-index:55;display:grid;gap:13px;align-items:start;
+  grid-template-columns:var(--tpl);padding:14px 0 12px;margin-bottom:2px;
+  background:linear-gradient(var(--paper-bg) 80%,rgba(252,252,250,0))}
+.topgrid .sbar{grid-column:var(--barcol,2)}
+.wrap{display:grid;gap:13px;align-items:start;grid-template-columns:var(--tpl)}
+.slot{min-width:0;display:flex;flex-direction:column;gap:13px}
+
+/* ── Cards ── */
+.lcard{position:relative;background:var(--p-surface);border-radius:var(--r-xl);box-shadow:var(--card-lift);min-width:0}
+.lcard.flat{background:transparent;box-shadow:none;border-radius:0}
+.chead{display:flex;align-items:baseline;gap:8px;padding:11px 14px 9px;border-bottom:1px solid var(--divider)}
+.lcard.flat .chead{padding-left:2px;padding-right:2px}
+.ctitle{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chead .marg{margin:0 0 0 auto;flex-wrap:nowrap;overflow:hidden}
+.cbody{padding:10px 14px 14px}
+.lcard.flat .cbody{padding-left:2px;padding-right:2px}
+
+/* The addressed card wears the navy rule. One card or four, it is in the
+   same place and means the same thing: a bare command acts here. */
+.lcard::before{content:"";position:absolute;left:-7px;top:10px;bottom:10px;width:2px;border-radius:1px;
+  background:rgb(var(--navy));opacity:0;transition:opacity .14s}
+.lcard.addr::before{opacity:1}
+.fwin .lcard::before{left:-1px}
+
+/* ── Library ── */
+.lfilt{display:flex;flex-wrap:wrap;gap:0 10px;padding:2px 14px 8px;font:italic 400 11px var(--font-serif);color:var(--marg)}
+.lfilt button{font:inherit;color:inherit;border:none;background:none;padding:2px 0;cursor:pointer}
+.lfilt button:hover{color:var(--ink)}
+.lfilt button.on{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.lscroll{max-height:calc(100vh - 210px);overflow:auto;padding:0 8px 10px}
+.lgrp{font:600 9px var(--font-sans);letter-spacing:.055em;color:var(--ink);padding:12px 6px 6px;display:flex}
+.lgrp .n{margin-left:auto;font:500 9px var(--font-mono);color:var(--p-ink-3);letter-spacing:0}
+.li{display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;padding:8px 6px;border-radius:var(--r-md);cursor:pointer}
+.li:hover{background:var(--p-subtle)}
+.li.sel{background:var(--ink-wash)}
+.li.soon{cursor:default}
+.li.soon .lname,.li.soon .ldesc,.li.soon .pv{opacity:.45}
+.lname{display:flex;align-items:baseline;gap:6px;font-size:12px;font-weight:500;line-height:1.3}
+.ldesc{font-size:11px;color:var(--p-ink-2);line-height:1.4;margin-top:2px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.li .marg{margin-top:3px;font-size:10.5px;line-height:1.55}
+.li:hover .marg{color:var(--p-gold-deep)}
+/* Library kinds are ink, never the Almanac's hues: a catalogue entry must
+   not be mistaken for a chat or a note. Pills are never interactive. */
+.lpill{display:inline-flex;font:500 9.5px var(--font-sans);padding:1px 6px;border-radius:8px;
+  border:.5px solid var(--ink-soft);color:var(--p-ink-2);white-space:nowrap;flex-shrink:0}
+.lpill.soon{border-style:dashed;color:var(--p-ink-3)}
+.lpill.mine{background:var(--ink-wash-2);border-color:transparent;color:var(--ink)}
+.lcount{font:500 10px var(--font-mono);color:var(--p-ink-3)}
+.lnone{padding:26px 10px;text-align:center;font:italic 400 11.5px var(--font-serif);color:var(--marg)}
+
+/* previews: the existing Library's swatches and silhouettes, kept */
+.pv{width:40px;height:30px;border-radius:5px;border:.5px solid var(--p-border);background:var(--p-subtle);
+  position:relative;overflow:hidden;flex-shrink:0}
+.pv.sw{border-color:rgba(25,25,25,.12)}
+.pv.sw i{position:absolute;width:9px;height:9px;border-radius:50%;top:10px}
+.pv.sw i:nth-child(1){left:9px}.pv.sw i:nth-child(2){left:21px}
+.pv.pl b{position:absolute;background:rgba(25,25,25,.16);border-radius:1.5px}
+.pv.ic{display:flex;align-items:center;justify-content:center;color:var(--p-ink-2)}
+.pv.ic svg{width:15px;height:15px}
+.pv.rm b{position:absolute;border-radius:1.5px}
+
+/* popped: the grid, because there is room for it */
+.fwin .lscroll{max-height:none;display:block}
+.fwin .lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:10px;padding:0 6px}
+.fwin .li{grid-template-columns:1fr;border:.5px solid var(--p-border-2);background:var(--p-surface);padding:8px}
+.fwin .li.sel{background:var(--ink-wash);border-color:var(--ink-soft)}
+.fwin .pv{width:100%;height:78px;border-radius:6px}
+.fwin .pv.sw i{width:18px;height:18px;top:30px}
+.fwin .pv.sw i:nth-child(1){left:calc(50% - 22px)}.fwin .pv.sw i:nth-child(2){left:calc(50% + 4px)}
+.fwin .pv.ic svg{width:24px;height:24px}
+
+/* ── Canvas ── */
+.cvwrap{padding:16px;background:var(--p-subtle);border-radius:0 0 var(--r-xl) var(--r-xl);display:flex;justify-content:center}
+.room{--rbg:#fff;--racc:#B8A070;--rdeep:#9C8760;--rink:#191919;--rline:rgba(25,25,25,.10);
+  width:100%;max-width:860px;min-height:430px;background:var(--rbg);color:var(--rink);border-radius:12px;
+  box-shadow:0 1px 3px rgba(40,36,28,.08),0 0 0 .5px rgba(25,25,25,.08);display:grid;gap:10px;padding:12px;
+  transition:background .25s,color .25s,max-width .3s}
+.room.mobile{max-width:340px;min-height:560px}
+.rslot{border-radius:8px;display:flex;flex-direction:column;gap:7px;min-width:0;padding:6px;
+  background:color-mix(in srgb,var(--rink) 3%,transparent)}
+.rlab{font:500 9px var(--font-sans);letter-spacing:.03em;opacity:.45;padding:0 2px}
+.comp{position:relative;border-radius:7px;padding:8px 9px;background:color-mix(in srgb,var(--rbg) 88%,var(--rink) 6%);
+  border:.5px solid var(--rline);cursor:pointer;min-width:0}
+.comp:hover{border-color:color-mix(in srgb,var(--rink) 30%,transparent)}
+/* What a bare command acts on carries the navy rule, inside the room too.
+   The room keeps its own scheme; the rule is the Lab's, not the room's. */
+.comp.sel{box-shadow:inset 2px 0 0 rgb(var(--navy)),0 0 0 1px rgba(38,56,92,.35)}
+.cname{font:600 10.5px var(--font-sans);display:flex;align-items:center;gap:6px}
+.cname .dot{width:6px;height:6px;border-radius:50%;background:var(--racc)}
+.sk{margin-top:6px;display:flex;flex-direction:column;gap:4px}
+.sk i{display:block;height:4px;border-radius:2px;background:color-mix(in srgb,var(--rink) 12%,transparent)}
+.bub{font-size:10.5px;line-height:1.35;padding:5px 8px;border-radius:8px;max-width:82%;
+  background:color-mix(in srgb,var(--rink) 6%,transparent)}
+.bub.me{align-self:flex-end;background:color-mix(in srgb,var(--racc) 22%,transparent)}
+.bub.try{outline:1px dashed color-mix(in srgb,var(--rink) 30%,transparent)}
+.msgs{display:flex;flex-direction:column;gap:5px;margin-top:6px}
+.inp{margin-top:5px;font-size:10.5px;padding:6px 8px;border-radius:7px;opacity:.7;
+  border:.5px solid color-mix(in srgb,var(--rink) 22%,transparent)}
+.chipr{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.chipr span{font-size:9px;padding:1px 6px;border-radius:7px;background:color-mix(in srgb,var(--racc) 25%,transparent)}
+.meter{margin-top:6px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--rink) 10%,transparent);overflow:hidden}
+.meter b{display:block;height:100%;width:32%;background:var(--racc)}
+.cap{border:1px dashed color-mix(in srgb,var(--rink) 18%,transparent);border-radius:7px;padding:7px 9px;
+  font-size:9.5px;opacity:.55;text-align:center}
+.sheetrow{display:flex;gap:6px;flex-wrap:wrap}
+.sheetrow .comp{flex:1 1 90px}
+.ghost .rslot{background:none;border:1px dashed rgba(25,25,25,.14)}
+.ghostmsg{grid-column:1/-1;align-self:center;text-align:center;font:italic 400 12px var(--font-serif);color:var(--marg);line-height:1.7}
+.ghostmsg code{font:500 11px var(--font-mono);color:var(--ink);font-style:normal}
+
+/* ── The guide ── */
+.guide{margin:0 0 12px;background:var(--p-surface);border-radius:12px;padding:14px 16px 12px;position:relative}
+.gtop{display:flex;align-items:baseline;gap:10px}
+.gstep{font:500 10px var(--font-mono);color:var(--p-ink-3)}
+.gq{font-size:14px;font-weight:600;margin-top:3px}
+.gwhy{font:italic 400 11px var(--font-serif);color:var(--marg);margin-top:3px;line-height:1.5}
+.gopts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.gopts button{position:relative;border:none;background:transparent;border-radius:var(--r-btn);padding:8px 12px;
+  font:500 11.5px var(--font-sans);color:var(--p-ink-2);cursor:pointer;text-align:left}
+.gopts button small{display:block;font:italic 400 10.5px var(--font-serif);color:var(--marg);margin-top:2px}
+.gopts button:hover{color:var(--ink)}
+.gopts button.on{background:var(--ink-wash);color:var(--ink)}
+.gtrack{display:flex;gap:5px;margin-left:auto}
+.gtrack i{width:6px;height:6px;border-radius:50%;border:1px solid var(--ink-soft)}
+.gtrack i.done{background:var(--ink);border-color:var(--ink)}
+.gtrack i.now{border-color:var(--ink)}
+.gfoot{margin-top:10px;display:flex;gap:12px;font:italic 400 11px var(--font-serif);color:var(--marg)}
+.gfoot button{font:inherit;color:inherit;border:none;background:none;padding:0;cursor:pointer}
+.gfoot button:hover{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+
+/* ── Inspector ── */
+.ihead{display:flex;align-items:center;gap:8px}
+.iname{font-size:14px;font-weight:600}
+.idesc{font-size:11.5px;line-height:1.55;color:var(--p-ink-2);margin-top:6px}
+.irows{margin-top:10px;border-top:.5px solid var(--p-border-2)}
+.irow{display:grid;grid-template-columns:98px minmax(0,1fr);gap:8px;padding:6px 0;border-bottom:.5px solid var(--p-border-2);align-items:baseline}
+.irow .k{font-size:10.5px;color:var(--p-ink-3)}
+.irow .v{font-size:11.5px;min-width:0}
+.pick{font:italic 400 11.5px var(--font-serif);color:var(--p-ink);border:none;background:none;padding:0;cursor:pointer;display:inline-flex;align-items:baseline;gap:3px}
+.pick .car{font-style:normal;font-size:8px;opacity:0;transition:opacity .12s}
+.lcard:hover .pick .car{opacity:.6}
+.pick:hover{text-decoration:underline;text-underline-offset:2px}
+.ilist{margin-top:4px}
+.ilist button{display:flex;width:100%;gap:8px;align-items:baseline;border:none;background:none;padding:4px 0;cursor:pointer;text-align:left;font-size:11.5px;color:var(--p-ink)}
+.ilist button span{margin-left:auto;font:italic 400 10.5px var(--font-serif);color:var(--marg)}
+.ilist button:hover{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+.isec{font:600 9px var(--font-sans);letter-spacing:.055em;color:var(--ink);margin:14px 0 4px}
+.ifoot{margin-top:12px;font:italic 400 10.5px var(--font-serif);color:var(--marg);line-height:1.5}
+
+/* ── Collection (the Almanac's card, sourced) ── */
+.coll .wshead{padding:10px 2px}
+.coll .wsbody{background:transparent;padding:10px 0;max-height:none}
+.ci{display:grid;grid-template-columns:18px 30px minmax(0,1fr);gap:8px;padding:8px 8px;margin-bottom:6px;
+  background:var(--p-surface);border:.5px solid var(--p-border);border-radius:var(--r-md);box-shadow:var(--card-lift)}
+.ci .num{font:500 10px var(--font-mono);color:var(--p-ink-3);padding-top:2px;text-align:right}
+.ci .pv{width:30px;height:24px}
+.ci .nm{font-size:12px;font-weight:500;display:flex;gap:6px;align-items:baseline}
+.ci .nt{font:italic 400 11.5px var(--font-serif);color:var(--p-ink);margin-top:4px;padding-left:8px;border-left:2px solid var(--ink-soft);line-height:1.45}
+.ci .marg{margin-top:3px;font-size:10.5px}
+.ci:hover .marg{color:var(--p-gold-deep)}
+.csec{display:flex;align-items:baseline;gap:8px;margin:12px 0 6px;padding:0 2px 4px;border-bottom:.5px solid var(--ink-soft)}
+.csec b{font:600 9px var(--font-sans);letter-spacing:.055em;color:var(--ink)}
+.csec span{font:italic 400 10.5px var(--font-serif);color:var(--marg)}
+.cmpt{width:100%;border-collapse:collapse;font-size:11px;margin:4px 0 10px;background:var(--p-surface);border-radius:var(--r-md);overflow:hidden}
+.cmpt th,.cmpt td{padding:6px 8px;text-align:left;border-bottom:.5px solid var(--p-border-2);vertical-align:top}
+.cmpt th{font:600 10.5px var(--font-sans)}
+.cmpt td.k{font-size:10.5px;color:var(--p-ink-3);width:64px}
+/* difference in ink, never colour: a pale wash on what differs */
+.cmpt td.diff{background:var(--ink-wash)}
+.reply{background:var(--p-surface);border-radius:var(--r-md);padding:10px 12px;margin:6px 0 10px;font-size:11.5px;line-height:1.55}
+.reply .q{font:italic 400 11px var(--font-serif);color:var(--marg);margin-bottom:5px}
+.reply .marg{margin-top:6px;font-size:10.5px}
+.wsacts{padding:6px 0 4px}
+.scopeline{font-size:10px;color:var(--p-ink-3)}
+.scopeline b{color:var(--ink);font-weight:600}
+.cnote{font:italic 400 11.5px var(--font-serif);color:var(--p-ink);margin:0 0 10px;padding-left:8px;border-left:2px solid var(--ink)}
+.btnrow button{position:relative}
+
+/* ── Popped windows (drawn in page; real windows in the product) ── */
+.fwin{position:fixed;z-index:65;background:var(--paper-bg);border-radius:10px;
+  box-shadow:0 18px 50px rgba(40,36,28,.18),0 0 0 .5px rgba(25,25,25,.12);display:flex;flex-direction:column;
+  min-width:320px;max-height:86vh}
+.fbar{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:move;border-bottom:.5px solid var(--p-border);
+  font:500 10.5px var(--font-sans);color:var(--p-ink-3);user-select:none}
+.fbar .dots{display:flex;gap:4px}.fbar .dots i{width:8px;height:8px;border-radius:50%;background:var(--p-border)}
+.fbar .marg{margin:0 0 0 auto}
+.fin{overflow:auto;padding:12px}
+.fin .lcard{box-shadow:none}
+.popph{padding:18px 16px;text-align:center;font-size:11.5px;color:var(--p-ink-2);line-height:1.6;border-radius:var(--r-xl)}
+.popph .marg{justify-content:center;margin-top:4px}
+
+/* ── Try row ── */
+.trybar{position:fixed;left:0;right:0;bottom:0;z-index:50;padding:9px 18px;background:var(--paper-bg);
+  border-top:.5px solid var(--p-border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--p-ink-2)}
+.trybar b{font:italic 400 11px var(--font-serif);color:var(--marg);font-weight:400}
+.trybar button{border:.5px solid var(--p-border);background:var(--p-surface);border-radius:12px;padding:3px 10px;
+  font:400 11px var(--font-sans);color:var(--p-ink-2);cursor:pointer}
+.trybar button:hover{color:var(--ink);border-color:var(--ink-soft)}
+
+
+/* ═══ v2 ═══ */
+/* The room's own settings sit in its head; the selected block's in its foot. */
+.chead .ctitle .pick{font:600 12.5px var(--font-sans);font-style:normal;color:var(--p-ink)}
+.chead .marg.rh{gap:0 6px}
+.chead .marg.rh .pick{font-size:11px;color:inherit}
+.cfoot2{padding:8px 14px 10px;border-top:1px solid var(--divider);min-height:38px}
+.cfoot2 .marg{margin:0}
+.cfoot2.on .marg{color:var(--p-ink-2)}
+.cfoot2 b{font:600 11.5px var(--font-sans);font-style:normal;color:var(--ink)}
+.cfoot2 .pick{font-size:11px}
+/* Features live inside their block: toggles, never blocks. */
+.feats{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.ft{font:500 9px var(--font-sans);padding:2px 7px;border-radius:8px;cursor:pointer;color:inherit;opacity:.6;
+  background:transparent;border:.5px dashed color-mix(in srgb,var(--rink) 35%,transparent)}
+.ft.on{opacity:1;border-style:solid;background:color-mix(in srgb,var(--racc) 22%,transparent);border-color:transparent}
+.lfeat{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.lfeat span{font:500 9.5px var(--font-sans);padding:1px 6px;border-radius:8px;border:.5px dashed var(--ink-soft);color:var(--p-ink-2)}
+.lfeat span.hit{border-style:solid;border-color:var(--ink);color:var(--ink);background:var(--ink-wash)}
+/* inspect: the Almanac's peek, under the field, one thing in detail */
+.insp{display:none;position:absolute;left:0;right:0;top:66px;z-index:61;background:var(--p-surface);border-radius:var(--r-btn);
+  padding:16px 20px 14px;box-shadow:0 8px 28px rgba(40,36,28,.08);max-height:64vh;overflow:auto}
+.insp.open{display:block}
+.insp .irows{max-width:620px}
+/* Where a block fits. Navy: it previews what the command addresses. */
+.room .rslot{transition:background .14s,box-shadow .14s,opacity .14s}
+.room .rslot.g1{background:rgba(38,56,92,.12);box-shadow:inset 0 0 0 1.5px rgba(38,56,92,.75)}
+.room .rslot.g2{background:rgba(38,56,92,.05);box-shadow:inset 0 0 0 1px rgba(38,56,92,.32)}
+.room .rslot.g0{opacity:.42}
+.room.dk .rslot.g1{background:rgba(200,215,240,.14);box-shadow:inset 0 0 0 1.5px rgba(200,215,240,.8)}
+.room.dk .rslot.g2{background:rgba(200,215,240,.06);box-shadow:inset 0 0 0 1px rgba(200,215,240,.35)}
+.why{font:italic 400 10px var(--font-serif);text-align:center;opacity:.9}
+.why:empty{display:none}
+
+
+/* ═══ v3: the Canvas drawn the Almanac's way ═══
+   The old canvas carried the previous design: a grey well, raised boxes,
+   filled slots, bars and bubbles, coloured dots. The Almanac draws with
+   rules and type instead: a dotted outline, hairline dividers, small
+   letter-spaced labels, one line of italic marginalia per row, washes only
+   for selection. The room keeps its own theme inside its edges; the drawing
+   language around and through it is the Almanac's. */
+.rline{display:flex;align-items:center;flex-wrap:wrap;gap:4px 14px;min-height:48px;padding:8px 14px;border-bottom:1px solid var(--divider)}
+.rl-t{font-size:15px;font-weight:600;line-height:1.3;display:flex;align-items:baseline;gap:7px;white-space:nowrap}
+.rl-t .crumb{font:inherit;color:var(--p-ink-3);border:none;background:none;padding:0;cursor:pointer}
+.rl-t .crumb:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.rl-t .sl{color:var(--p-ink-3);font-weight:400}
+.rline .marg{margin:0}
+.rline .pick{font-size:11px;color:inherit}
+body.cv-lines .cvwrap{padding:18px 18px 20px;background:transparent;display:block;border-radius:0}
+body.cv-lines .cvroom{display:flex;justify-content:center}
+
+body.cv-lines .room{box-shadow:none;border-radius:10px;padding:0;gap:0;min-height:400px;background:var(--rbg);overflow:hidden}
+body.cv-lines .room .rslot{background:transparent;border-radius:0;padding:10px 12px 12px;gap:0;border:none;
+  --edge:1px 0 0 var(--rline),0 1px 0 var(--rline);box-shadow:var(--edge)}
+body.cv-lines .rlab{font:600 9px var(--font-sans);letter-spacing:.055em;opacity:.62;padding:0 0 7px}
+body.cv-lines .comp{background:transparent;border:none;border-radius:0;padding:8px 8px 8px 9px;border-top:.5px solid var(--rline);margin:0 -4px}
+body.cv-lines .comp:hover{border-color:var(--rline);background:color-mix(in srgb,var(--rink) 3%,transparent)}
+body.cv-lines .comp.sel{background:color-mix(in srgb,var(--rink) 5.5%,transparent);box-shadow:inset 2px 0 0 rgb(var(--navy))}
+body.cv-lines .room.dk .comp.sel{box-shadow:inset 2px 0 0 rgba(200,215,240,.85)}
+body.cv-lines .cname{font:500 11.5px var(--font-sans);display:block}
+body.cv-lines .cst{font:italic 400 10.5px var(--font-serif);opacity:.6;margin-top:2px;line-height:1.45}
+body.cv-lines .tx{margin-top:6px;display:flex;flex-direction:column;gap:5px}
+body.cv-lines .txr{display:grid;grid-template-columns:44px minmax(0,1fr);gap:8px;font-size:11.5px;line-height:1.45}
+body.cv-lines .txr .who{font:500 9.5px var(--font-mono);opacity:.5;padding-top:2px}
+body.cv-lines .txr.try{opacity:.7}
+body.cv-lines .inp{margin-top:7px;font-size:11px;padding:7px 9px;opacity:1;border:none;color:color-mix(in srgb,var(--rink) 45%,transparent)}
+body.cv-lines .inp svg.bx path{stroke:color-mix(in srgb,var(--rink) 30%,transparent) !important}
+body.cv-lines .feats{margin-top:7px}
+body.cv-lines .ft{font:500 9.5px var(--font-sans);padding:2px 8px;border-radius:10px;opacity:1;color:color-mix(in srgb,var(--rink) 60%,transparent);
+  background:transparent;border:.5px dashed color-mix(in srgb,var(--rink) 32%,transparent)}
+body.cv-lines .ft.on{color:var(--rink);background:color-mix(in srgb,var(--rink) 6%,transparent);border:.5px solid color-mix(in srgb,var(--rink) 55%,transparent)}
+body.cv-lines .cap{border:none;padding:8px 0 0;font:italic 400 10.5px var(--font-serif);opacity:.5;text-align:left}
+body.cv-lines .why{text-align:left;padding-top:4px}
+body.cv-lines .ghost .rslot{--rline:rgba(25,25,25,.10)}
+body.cv-lines .room .rslot.g1{background:rgba(38,56,92,.08);box-shadow:inset 2px 0 0 rgb(var(--navy)),var(--edge)}
+body.cv-lines .room .rslot.g2{background:rgba(38,56,92,.035);box-shadow:inset 1px 0 0 rgba(38,56,92,.45),var(--edge)}
+body.cv-lines .room.dk .rslot.g1{background:rgba(200,215,240,.10);box-shadow:inset 2px 0 0 rgba(200,215,240,.85),var(--edge)}
+body.cv-lines .room.dk .rslot.g2{background:rgba(200,215,240,.05);box-shadow:inset 1px 0 0 rgba(200,215,240,.4),var(--edge)}
+body.cv-lines .guide{margin-bottom:16px}
+
+
+/* ═══ v4: the medium canvas (default) ═══
+   The earlier canvas's depth, the Almanac's type. Kept from before: the
+   well the room sits in, the room lifted off it, soft slot areas, raised
+   blocks, the theme's accent dot, message bubbles, capacity as a dashed
+   space. Taken from the Almanac: letter-spaced slot labels, a block's state
+   as one line of italic marginalia instead of placeholder bars, features as
+   tags, the navy rule for selection. */
+body.cv-mid .cvwrap,body.cv-early .cvwrap{display:block;padding:16px 16px 18px;background:var(--p-subtle);border-radius:0 0 var(--r-xl) var(--r-xl)}
+body.cv-mid .cvroom,body.cv-early .cvroom{display:flex;justify-content:center}
+body:not(.cv-lines) .room>svg.bx,body:not(.cv-lines) .inp>svg.bx{display:none}
+body.cv-mid .room{padding:10px;gap:8px;border-radius:12px;box-shadow:0 1px 3px rgba(40,36,28,.07),0 0 0 .5px rgba(25,25,25,.07)}
+body.cv-mid .rslot{background:color-mix(in srgb,var(--rink) 2.5%,transparent);border-radius:8px;padding:8px 8px 9px;gap:6px}
+body.cv-mid .rlab,body.cv-lines .rlab{font:600 9px var(--font-sans);letter-spacing:.055em;opacity:.6;padding:0 2px 2px}
+body.cv-mid .comp{padding:8px 10px 9px;border-radius:7px;background:color-mix(in srgb,var(--rbg) 90%,var(--rink) 4%);border:.5px solid var(--rline)}
+body.cv-mid .comp.sel{box-shadow:inset 2px 0 0 rgb(var(--navy)),0 0 0 1px rgba(38,56,92,.28)}
+body.cv-mid .cname{font:500 11.5px var(--font-sans)}
+body.cv-mid .cname .dot{width:5px;height:5px}
+body.cv-mid .cst{font:italic 400 10.5px var(--font-serif);opacity:.62;margin-top:3px;line-height:1.45}
+body.cv-mid .bub{font-size:11px;background:color-mix(in srgb,var(--rink) 5%,transparent)}
+body.cv-mid .bub.me{background:color-mix(in srgb,var(--racc) 18%,transparent)}
+body.cv-mid .inp{border:.5px solid color-mix(in srgb,var(--rink) 20%,transparent);opacity:.75;margin-top:6px}
+body.cv-mid .ft{font:500 9.5px var(--font-sans);padding:2px 8px;border-radius:10px;opacity:1;color:color-mix(in srgb,var(--rink) 60%,transparent);
+  background:transparent;border:.5px dashed color-mix(in srgb,var(--rink) 32%,transparent)}
+body.cv-mid .ft.on{color:var(--rink);background:color-mix(in srgb,var(--racc) 20%,transparent);border:.5px solid transparent}
+body.cv-mid .cap{border:1px dashed color-mix(in srgb,var(--rink) 14%,transparent);font:italic 400 10.5px var(--font-serif);opacity:.55;padding:6px 9px;text-align:center}
+body.cv-mid .why{font:italic 400 10px var(--font-serif);text-align:center}
+body.cv-mid .room .rslot.g1{background:rgba(38,56,92,.10);box-shadow:inset 0 0 0 1.5px rgba(38,56,92,.7)}
+body.cv-mid .room .rslot.g2{background:rgba(38,56,92,.045);box-shadow:inset 0 0 0 1px rgba(38,56,92,.28)}
+body.cv-mid .room.dk .rslot.g1{background:rgba(200,215,240,.13);box-shadow:inset 0 0 0 1.5px rgba(200,215,240,.8)}
+body.cv-mid .room.dk .rslot.g2{background:rgba(200,215,240,.06);box-shadow:inset 0 0 0 1px rgba(200,215,240,.35)}
+/* what each style shows */
+body.cv-early .cst{display:none}
+body.cv-mid .sk,body.cv-lines .sk{display:none}
+body.cv-lines .msgs{display:none}
+body.cv-early .tx,body.cv-mid .tx{display:none}
+body.cv-lines .cname .dot{display:none}
+body.cv-early .ldet,body.cv-early .rline{}
+.cvsw{display:inline-flex;gap:2px;margin-left:8px;padding-left:10px;border-left:.5px solid var(--p-border)}
+.cvsw button.on{color:var(--ink);border-color:var(--ink)}
+/* ═══ v3: the Library's details section ═══ */
+.ldet{position:relative;padding:12px 14px 12px;border-bottom:1px solid var(--divider)}
+.ldet.none{padding:9px 14px;font:italic 400 11px var(--font-serif);color:var(--marg)}
+.ldet .iname{font-size:14px}
+.ldet .irows{margin-top:8px}
+.ldet .irow{grid-template-columns:78px minmax(0,1fr)}
+.ldet .marg{margin-top:8px}
+.xclose{position:absolute;right:10px;top:9px;width:20px;height:20px;border:none;background:none;color:var(--p-ink-3);
+  font-size:15px;line-height:1;cursor:pointer;border-radius:4px}
+.xclose:hover{color:var(--ink);background:var(--ink-wash)}
+.fwin .ldet{max-width:720px}
+.fbar button{font:inherit;color:inherit;border:none;background:none;padding:0;cursor:pointer}
+.fbar button:hover{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+#poprow button{font:inherit;color:inherit;border:none;background:none;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+#poprow button:hover{color:var(--ink)}
+
+
+/* ═══ v6 ═══ */
+/* Library rows: checkbox, preview, text. Details open under the row. */
+.li{grid-template-columns:16px 40px minmax(0,1fr);gap:9px;align-items:start}
+.li .cb,.li .cbsp{margin-top:7px}
+.cb{width:16px;height:16px;border:1px solid var(--ink-soft);border-radius:3px;background:var(--p-surface);color:var(--ink);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0}
+.cb:hover{border-color:var(--ink)}
+.cb.on{border-color:var(--ink)}
+.cb svg{width:11px;height:11px;opacity:0}
+.cb.on svg{opacity:1}
+.cb.dis{opacity:.3;cursor:default}
+.cbsp{width:16px;height:16px;display:block}
+.linl{grid-column:1/-1;margin:6px 0 2px 25px;padding:10px 12px;background:var(--p-surface);border:.5px solid var(--p-border);
+  border-radius:var(--r-md);position:relative;cursor:default}
+.linl .iname{font-size:13px}
+.linl .irow{grid-template-columns:74px minmax(0,1fr)}
+.li.sel{background:var(--ink-wash)}
+.lsel{padding:0 14px 8px;min-height:24px}
+.lsel .marg{margin:0}
+.lsel.on .marg{color:var(--p-ink-2)}
+.lsel b{font:600 11px var(--font-sans);font-style:normal;color:var(--ink)}
+/* popped: grid, and details in a side column */
+.fwin .li{grid-template-columns:1fr;position:relative}
+.fwin .li .cb,.fwin .li .cbsp{position:absolute;left:14px;top:14px;margin:0;z-index:1}
+.lsplit{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+.lside{position:sticky;top:0;padding:12px 14px;background:var(--p-surface);border:.5px solid var(--p-border);border-radius:var(--r-md);margin-right:6px}
+.lside .irow{grid-template-columns:74px minmax(0,1fr)}
+/* the room line: pickers left, actions at the right end */
+.rline{flex-wrap:nowrap}
+.rline>.marg{flex:1 1 auto;min-width:0}
+.rl-act{margin-left:auto;flex-shrink:0}
+.rl-act .marg{margin:0}
+.mhead{font:600 9px var(--font-sans);letter-spacing:.055em;color:var(--p-ink-3);padding:6px 8px 4px}
+
+@media (max-width:1100px){
+  .wrap,.topgrid{grid-template-columns:1fr !important}
+  .topgrid .sbar{grid-column:1 !important}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body class="cv-mid">
+<div class="page">
+ <div class="topgrid" id="topgrid">
+  <div class="sbar" id="p-bar">
+   <div class="sfield" id="sfield" data-border="dot" data-radius="8">
+       <div class="fillwrap cmdwrap"><div class="fill cmdfill"><svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true"><defs><pattern id="stars" width="57.158" height="99.000" patternUnits="userSpaceOnUse" patternTransform="rotate(-22)"><g fill="#fff"><circle cx="-52.39" cy="-85.25" r="0.55" opacity="0.61"/><circle cx="-52.39" cy="13.75" r="0.55" opacity="0.61"/><circle cx="-52.39" cy="112.75" r="0.55" opacity="0.61"/><circle cx="4.76" cy="-85.25" r="0.55" opacity="0.61"/><circle cx="4.76" cy="13.75" r="0.55" opacity="0.61"/><circle cx="4.76" cy="112.75" r="0.55" opacity="0.61"/><circle cx="61.92" cy="-85.25" r="0.55" opacity="0.61"/><circle cx="61.92" cy="13.75" r="0.55" opacity="0.61"/><circle cx="61.92" cy="112.75" r="0.55" opacity="0.61"/><circle cx="-61.92" cy="-85.25" r="0.55" opacity="0.98"/><circle cx="-61.92" cy="13.75" r="0.55" opacity="0.98"/><circle cx="-61.92" cy="112.75" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="-85.25" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="13.75" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="112.75" r="0.55" opacity="0.98"/><circle cx="52.39" cy="-85.25" r="0.55" opacity="0.98"/><circle cx="52.39" cy="13.75" r="0.55" opacity="0.98"/><circle cx="52.39" cy="112.75" r="0.55" opacity="0.98"/><circle cx="-66.68" cy="-88.00" r="0.55" opacity="0.56"/><circle cx="-66.68" cy="11.00" r="0.55" opacity="0.56"/><circle cx="-66.68" cy="110.00" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="-88.00" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="11.00" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="110.00" r="0.55" opacity="0.56"/><circle cx="47.63" cy="-88.00" r="0.55" opacity="0.56"/><circle cx="47.63" cy="11.00" r="0.55" opacity="0.56"/><circle cx="47.63" cy="110.00" r="0.55" opacity="0.56"/><circle cx="-71.45" cy="-96.25" r="0.55" opacity="0.92"/><circle cx="-71.45" cy="2.75" r="0.55" opacity="0.92"/><circle cx="-71.45" cy="101.75" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="-96.25" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="2.75" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="101.75" r="0.55" opacity="0.92"/><circle cx="42.87" cy="-96.25" r="0.55" opacity="0.92"/><circle cx="42.87" cy="2.75" r="0.55" opacity="0.92"/><circle cx="42.87" cy="101.75" r="0.55" opacity="0.92"/><circle cx="-71.45" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="-71.45" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="-71.45" cy="96.25" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="96.25" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="96.25" r="0.55" opacity="0.50"/><circle cx="-66.68" cy="-110.00" r="0.55" opacity="0.87"/><circle cx="-66.68" cy="-11.00" r="0.55" opacity="0.87"/><circle cx="-66.68" cy="88.00" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="-110.00" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="-11.00" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="88.00" r="0.55" opacity="0.87"/><circle cx="47.63" cy="-110.00" r="0.55" opacity="0.87"/><circle cx="47.63" cy="-11.00" r="0.55" opacity="0.87"/><circle cx="47.63" cy="88.00" r="0.55" opacity="0.87"/><circle cx="-61.92" cy="-112.75" r="0.55" opacity="0.45"/><circle cx="-61.92" cy="-13.75" r="0.55" opacity="0.45"/><circle cx="-61.92" cy="85.25" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="-112.75" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="-13.75" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="85.25" r="0.55" opacity="0.45"/><circle cx="52.39" cy="-112.75" r="0.55" opacity="0.45"/><circle cx="52.39" cy="-13.75" r="0.55" opacity="0.45"/><circle cx="52.39" cy="85.25" r="0.55" opacity="0.45"/><circle cx="-52.39" cy="-112.75" r="0.55" opacity="0.82"/><circle cx="-52.39" cy="-13.75" r="0.55" opacity="0.82"/><circle cx="-52.39" cy="85.25" r="0.55" opacity="0.82"/><circle cx="4.76" cy="-112.75" r="0.55" opacity="0.82"/><circle cx="4.76" cy="-13.75" r="0.55" opacity="0.82"/><circle cx="4.76" cy="85.25" r="0.55" opacity="0.82"/><circle cx="61.92" cy="-112.75" r="0.55" opacity="0.82"/><circle cx="61.92" cy="-13.75" r="0.55" opacity="0.82"/><circle cx="61.92" cy="85.25" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="-110.00" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="-11.00" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="88.00" r="0.55" opacity="0.40"/><circle cx="9.53" cy="-110.00" r="0.55" opacity="0.40"/><circle cx="9.53" cy="-11.00" r="0.55" opacity="0.40"/><circle cx="9.53" cy="88.00" r="0.55" opacity="0.40"/><circle cx="66.68" cy="-110.00" r="0.55" opacity="0.40"/><circle cx="66.68" cy="-11.00" r="0.55" opacity="0.40"/><circle cx="66.68" cy="88.00" r="0.55" opacity="0.40"/><circle cx="-42.87" cy="-101.75" r="0.55" opacity="0.77"/><circle cx="-42.87" cy="-2.75" r="0.55" opacity="0.77"/><circle cx="-42.87" cy="96.25" r="0.55" opacity="0.77"/><circle cx="14.29" cy="-101.75" r="0.55" opacity="0.77"/><circle cx="14.29" cy="-2.75" r="0.55" opacity="0.77"/><circle cx="14.29" cy="96.25" r="0.55" opacity="0.77"/><circle cx="71.45" cy="-101.75" r="0.55" opacity="0.77"/><circle cx="71.45" cy="-2.75" r="0.55" opacity="0.77"/><circle cx="71.45" cy="96.25" r="0.55" opacity="0.77"/><circle cx="-33.34" cy="-85.25" r="0.55" opacity="0.66"/><circle cx="-33.34" cy="13.75" r="0.55" opacity="0.66"/><circle cx="-33.34" cy="112.75" r="0.55" opacity="0.66"/><circle cx="23.82" cy="-85.25" r="0.55" opacity="0.66"/><circle cx="23.82" cy="13.75" r="0.55" opacity="0.66"/><circle cx="23.82" cy="112.75" r="0.55" opacity="0.66"/><circle cx="80.97" cy="-85.25" r="0.55" opacity="0.66"/><circle cx="80.97" cy="13.75" r="0.55" opacity="0.66"/><circle cx="80.97" cy="112.75" r="0.55" opacity="0.66"/><circle cx="-38.11" cy="-110.00" r="0.55" opacity="0.61"/><circle cx="-38.11" cy="-11.00" r="0.55" opacity="0.61"/><circle cx="-38.11" cy="88.00" r="0.55" opacity="0.61"/><circle cx="19.05" cy="-110.00" r="0.55" opacity="0.61"/><circle cx="19.05" cy="-11.00" r="0.55" opacity="0.61"/><circle cx="19.05" cy="88.00" r="0.55" opacity="0.61"/><circle cx="76.21" cy="-110.00" r="0.55" opacity="0.61"/><circle cx="76.21" cy="-11.00" r="0.55" opacity="0.61"/><circle cx="76.21" cy="88.00" r="0.55" opacity="0.61"/><circle cx="-33.34" cy="-112.75" r="0.55" opacity="0.98"/><circle cx="-33.34" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="-33.34" cy="85.25" r="0.55" opacity="0.98"/><circle cx="23.82" cy="-112.75" r="0.55" opacity="0.98"/><circle cx="23.82" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="23.82" cy="85.25" r="0.55" opacity="0.98"/><circle cx="80.97" cy="-112.75" r="0.55" opacity="0.98"/><circle cx="80.97" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="80.97" cy="85.25" r="0.55" opacity="0.98"/><circle cx="-23.82" cy="-112.75" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="-13.75" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="85.25" r="0.55" opacity="0.56"/><circle cx="33.34" cy="-112.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="-13.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="85.25" r="0.55" opacity="0.56"/><circle cx="90.50" cy="-112.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="-13.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="85.25" r="0.55" opacity="0.56"/><circle cx="-19.05" cy="-110.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="88.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="-110.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="88.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="-110.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="88.00" r="0.55" opacity="0.92"/><circle cx="-14.29" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="96.25" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="42.87" cy="96.25" r="0.55" opacity="0.50"/><circle cx="100.03" cy="-101.75" r="0.55" opacity="0.50"/><circle cx="100.03" cy="-2.75" r="0.55" opacity="0.50"/><circle cx="100.03" cy="96.25" r="0.55" opacity="0.50"/><circle cx="-14.29" cy="-96.25" r="0.55" opacity="0.87"/><circle cx="-14.29" cy="2.75" r="0.55" opacity="0.87"/><circle cx="-14.29" cy="101.75" r="0.55" opacity="0.87"/><circle cx="42.87" cy="-96.25" r="0.55" opacity="0.87"/><circle cx="42.87" cy="2.75" r="0.55" opacity="0.87"/><circle cx="42.87" cy="101.75" r="0.55" opacity="0.87"/><circle cx="100.03" cy="-96.25" r="0.55" opacity="0.87"/><circle cx="100.03" cy="2.75" r="0.55" opacity="0.87"/><circle cx="100.03" cy="101.75" r="0.55" opacity="0.87"/><circle cx="-33.34" cy="-63.25" r="0.55" opacity="0.45"/><circle cx="-33.34" cy="35.75" r="0.55" opacity="0.45"/><circle cx="-33.34" cy="134.75" r="0.55" opacity="0.45"/><circle cx="23.82" cy="-63.25" r="0.55" opacity="0.45"/><circle cx="23.82" cy="35.75" r="0.55" opacity="0.45"/><circle cx="23.82" cy="134.75" r="0.55" opacity="0.45"/><circle cx="80.97" cy="-63.25" r="0.55" opacity="0.45"/><circle cx="80.97" cy="35.75" r="0.55" opacity="0.45"/><circle cx="80.97" cy="134.75" r="0.55" opacity="0.45"/><circle cx="-38.11" cy="-60.50" r="0.55" opacity="0.82"/><circle cx="-38.11" cy="38.50" r="0.55" opacity="0.82"/><circle cx="-38.11" cy="137.50" r="0.55" opacity="0.82"/><circle cx="19.05" cy="-60.50" r="0.55" opacity="0.82"/><circle cx="19.05" cy="38.50" r="0.55" opacity="0.82"/><circle cx="19.05" cy="137.50" r="0.55" opacity="0.82"/><circle cx="76.21" cy="-60.50" r="0.55" opacity="0.82"/><circle cx="76.21" cy="38.50" r="0.55" opacity="0.82"/><circle cx="76.21" cy="137.50" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="-60.50" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="38.50" r="0.55" opacity="0.40"/><circle cx="-47.63" cy="137.50" r="0.55" opacity="0.40"/><circle cx="9.53" cy="-60.50" r="0.55" opacity="0.40"/><circle cx="9.53" cy="38.50" r="0.55" opacity="0.40"/><circle cx="9.53" cy="137.50" r="0.55" opacity="0.40"/><circle cx="66.68" cy="-60.50" r="0.55" opacity="0.40"/><circle cx="66.68" cy="38.50" r="0.55" opacity="0.40"/><circle cx="66.68" cy="137.50" r="0.55" opacity="0.40"/><circle cx="-52.39" cy="-63.25" r="0.55" opacity="0.77"/><circle cx="-52.39" cy="35.75" r="0.55" opacity="0.77"/><circle cx="-52.39" cy="134.75" r="0.55" opacity="0.77"/><circle cx="4.76" cy="-63.25" r="0.55" opacity="0.77"/><circle cx="4.76" cy="35.75" r="0.55" opacity="0.77"/><circle cx="4.76" cy="134.75" r="0.55" opacity="0.77"/><circle cx="61.92" cy="-63.25" r="0.55" opacity="0.77"/><circle cx="61.92" cy="35.75" r="0.55" opacity="0.77"/><circle cx="61.92" cy="134.75" r="0.55" opacity="0.77"/><circle cx="-57.16" cy="-77.00" r="0.55" opacity="0.71"/><circle cx="-57.16" cy="22.00" r="0.55" opacity="0.71"/><circle cx="-57.16" cy="121.00" r="0.55" opacity="0.71"/><circle cx="-0.00" cy="-77.00" r="0.55" opacity="0.71"/><circle cx="-0.00" cy="22.00" r="0.55" opacity="0.71"/><circle cx="-0.00" cy="121.00" r="0.55" opacity="0.71"/><circle cx="57.16" cy="-77.00" r="0.55" opacity="0.71"/><circle cx="57.16" cy="22.00" r="0.55" opacity="0.71"/><circle cx="57.16" cy="121.00" r="0.55" opacity="0.71"/><circle cx="-9.53" cy="-60.50" r="0.55" opacity="0.61"/><circle cx="-9.53" cy="38.50" r="0.55" opacity="0.61"/><circle cx="-9.53" cy="137.50" r="0.55" opacity="0.61"/><circle cx="47.63" cy="-60.50" r="0.55" opacity="0.61"/><circle cx="47.63" cy="38.50" r="0.55" opacity="0.61"/><circle cx="47.63" cy="137.50" r="0.55" opacity="0.61"/><circle cx="104.79" cy="-60.50" r="0.55" opacity="0.61"/><circle cx="104.79" cy="38.50" r="0.55" opacity="0.61"/><circle cx="104.79" cy="137.50" r="0.55" opacity="0.61"/><circle cx="-19.05" cy="-60.50" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="38.50" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="137.50" r="0.55" opacity="0.98"/><circle cx="38.11" cy="-60.50" r="0.55" opacity="0.98"/><circle cx="38.11" cy="38.50" r="0.55" opacity="0.98"/><circle cx="38.11" cy="137.50" r="0.55" opacity="0.98"/><circle cx="95.26" cy="-60.50" r="0.55" opacity="0.98"/><circle cx="95.26" cy="38.50" r="0.55" opacity="0.98"/><circle cx="95.26" cy="137.50" r="0.55" opacity="0.98"/><circle cx="-23.82" cy="-63.25" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="35.75" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="134.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="-63.25" r="0.55" opacity="0.56"/><circle cx="33.34" cy="35.75" r="0.55" opacity="0.56"/><circle cx="33.34" cy="134.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="-63.25" r="0.55" opacity="0.56"/><circle cx="90.50" cy="35.75" r="0.55" opacity="0.56"/><circle cx="90.50" cy="134.75" r="0.55" opacity="0.56"/><circle cx="-9.53" cy="-88.00" r="0.55" opacity="0.92"/><circle cx="-9.53" cy="11.00" r="0.55" opacity="0.92"/><circle cx="-9.53" cy="110.00" r="0.55" opacity="0.92"/><circle cx="47.63" cy="-88.00" r="0.55" opacity="0.92"/><circle cx="47.63" cy="11.00" r="0.55" opacity="0.92"/><circle cx="47.63" cy="110.00" r="0.55" opacity="0.92"/><circle cx="104.79" cy="-88.00" r="0.55" opacity="0.92"/><circle cx="104.79" cy="11.00" r="0.55" opacity="0.92"/><circle cx="104.79" cy="110.00" r="0.55" opacity="0.92"/><circle cx="-4.76" cy="-85.25" r="0.55" opacity="0.50"/><circle cx="-4.76" cy="13.75" r="0.55" opacity="0.50"/><circle cx="-4.76" cy="112.75" r="0.55" opacity="0.50"/><circle cx="52.39" cy="-85.25" r="0.55" opacity="0.50"/><circle cx="52.39" cy="13.75" r="0.55" opacity="0.50"/><circle cx="52.39" cy="112.75" r="0.55" opacity="0.50"/><circle cx="109.55" cy="-85.25" r="0.55" opacity="0.50"/><circle cx="109.55" cy="13.75" r="0.55" opacity="0.50"/><circle cx="109.55" cy="112.75" r="0.55" opacity="0.50"/><circle cx="-0.00" cy="-77.00" r="0.55" opacity="0.87"/><circle cx="-0.00" cy="22.00" r="0.55" opacity="0.87"/><circle cx="-0.00" cy="121.00" r="0.55" opacity="0.87"/><circle cx="57.16" cy="-77.00" r="0.55" opacity="0.87"/><circle cx="57.16" cy="22.00" r="0.55" opacity="0.87"/><circle cx="57.16" cy="121.00" r="0.55" opacity="0.87"/><circle cx="114.32" cy="-77.00" r="0.55" opacity="0.87"/><circle cx="114.32" cy="22.00" r="0.55" opacity="0.87"/><circle cx="114.32" cy="121.00" r="0.55" opacity="0.87"/><circle cx="0.00" cy="-71.50" r="0.55" opacity="0.45"/><circle cx="0.00" cy="27.50" r="0.55" opacity="0.45"/><circle cx="0.00" cy="126.50" r="0.55" opacity="0.45"/><circle cx="57.16" cy="-71.50" r="0.55" opacity="0.45"/><circle cx="57.16" cy="27.50" r="0.55" opacity="0.45"/><circle cx="57.16" cy="126.50" r="0.55" opacity="0.45"/><circle cx="114.32" cy="-71.50" r="0.55" opacity="0.45"/><circle cx="114.32" cy="27.50" r="0.55" opacity="0.45"/><circle cx="114.32" cy="126.50" r="0.55" opacity="0.45"/><circle cx="-47.63" cy="-38.50" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="60.50" r="0.55" opacity="0.82"/><circle cx="-47.63" cy="159.50" r="0.55" opacity="0.82"/><circle cx="9.53" cy="-38.50" r="0.55" opacity="0.82"/><circle cx="9.53" cy="60.50" r="0.55" opacity="0.82"/><circle cx="9.53" cy="159.50" r="0.55" opacity="0.82"/><circle cx="66.68" cy="-38.50" r="0.55" opacity="0.82"/><circle cx="66.68" cy="60.50" r="0.55" opacity="0.82"/><circle cx="66.68" cy="159.50" r="0.55" opacity="0.82"/><circle cx="-52.39" cy="-35.75" r="0.55" opacity="0.40"/><circle cx="-52.39" cy="63.25" r="0.55" opacity="0.40"/><circle cx="-52.39" cy="162.25" r="0.55" opacity="0.40"/><circle cx="4.76" cy="-35.75" r="0.55" opacity="0.40"/><circle cx="4.76" cy="63.25" r="0.55" opacity="0.40"/><circle cx="4.76" cy="162.25" r="0.55" opacity="0.40"/><circle cx="61.92" cy="-35.75" r="0.55" opacity="0.40"/><circle cx="61.92" cy="63.25" r="0.55" opacity="0.40"/><circle cx="61.92" cy="162.25" r="0.55" opacity="0.40"/><circle cx="-61.92" cy="-35.75" r="0.55" opacity="0.77"/><circle cx="-61.92" cy="63.25" r="0.55" opacity="0.77"/><circle cx="-61.92" cy="162.25" r="0.55" opacity="0.77"/><circle cx="-4.76" cy="-35.75" r="0.55" opacity="0.77"/><circle cx="-4.76" cy="63.25" r="0.55" opacity="0.77"/><circle cx="-4.76" cy="162.25" r="0.55" opacity="0.77"/><circle cx="52.39" cy="-35.75" r="0.55" opacity="0.77"/><circle cx="52.39" cy="63.25" r="0.55" opacity="0.77"/><circle cx="52.39" cy="162.25" r="0.55" opacity="0.77"/><circle cx="-71.45" cy="-46.75" r="0.55" opacity="0.71"/><circle cx="-71.45" cy="52.25" r="0.55" opacity="0.71"/><circle cx="-71.45" cy="151.25" r="0.55" opacity="0.71"/><circle cx="-14.29" cy="-46.75" r="0.55" opacity="0.71"/><circle cx="-14.29" cy="52.25" r="0.55" opacity="0.71"/><circle cx="-14.29" cy="151.25" r="0.55" opacity="0.71"/><circle cx="42.87" cy="-46.75" r="0.55" opacity="0.71"/><circle cx="42.87" cy="52.25" r="0.55" opacity="0.71"/><circle cx="42.87" cy="151.25" r="0.55" opacity="0.71"/><circle cx="-66.68" cy="-60.50" r="0.55" opacity="0.66"/><circle cx="-66.68" cy="38.50" r="0.55" opacity="0.66"/><circle cx="-66.68" cy="137.50" r="0.55" opacity="0.66"/><circle cx="-9.53" cy="-60.50" r="0.55" opacity="0.66"/><circle cx="-9.53" cy="38.50" r="0.55" opacity="0.66"/><circle cx="-9.53" cy="137.50" r="0.55" opacity="0.66"/><circle cx="47.63" cy="-60.50" r="0.55" opacity="0.66"/><circle cx="47.63" cy="38.50" r="0.55" opacity="0.66"/><circle cx="47.63" cy="137.50" r="0.55" opacity="0.66"/><circle cx="-42.87" cy="-46.75" r="0.55" opacity="0.98"/><circle cx="-42.87" cy="52.25" r="0.55" opacity="0.98"/><circle cx="-42.87" cy="151.25" r="0.55" opacity="0.98"/><circle cx="14.29" cy="-46.75" r="0.55" opacity="0.98"/><circle cx="14.29" cy="52.25" r="0.55" opacity="0.98"/><circle cx="14.29" cy="151.25" r="0.55" opacity="0.98"/><circle cx="71.45" cy="-46.75" r="0.55" opacity="0.98"/><circle cx="71.45" cy="52.25" r="0.55" opacity="0.98"/><circle cx="71.45" cy="151.25" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="-38.50" r="0.55" opacity="0.56"/><circle cx="-19.05" cy="60.50" r="0.55" opacity="0.56"/><circle cx="-19.05" cy="159.50" r="0.55" opacity="0.56"/><circle cx="38.11" cy="-38.50" r="0.55" opacity="0.56"/><circle cx="38.11" cy="60.50" r="0.55" opacity="0.56"/><circle cx="38.11" cy="159.50" r="0.55" opacity="0.56"/><circle cx="95.26" cy="-38.50" r="0.55" opacity="0.56"/><circle cx="95.26" cy="60.50" r="0.55" opacity="0.56"/><circle cx="95.26" cy="159.50" r="0.55" opacity="0.56"/><circle cx="-23.82" cy="-35.75" r="0.55" opacity="0.92"/><circle cx="-23.82" cy="63.25" r="0.55" opacity="0.92"/><circle cx="-23.82" cy="162.25" r="0.55" opacity="0.92"/><circle cx="33.34" cy="-35.75" r="0.55" opacity="0.92"/><circle cx="33.34" cy="63.25" r="0.55" opacity="0.92"/><circle cx="33.34" cy="162.25" r="0.55" opacity="0.92"/><circle cx="90.50" cy="-35.75" r="0.55" opacity="0.92"/><circle cx="90.50" cy="63.25" r="0.55" opacity="0.92"/><circle cx="90.50" cy="162.25" r="0.55" opacity="0.92"/><circle cx="-33.34" cy="-35.75" r="0.55" opacity="0.50"/><circle cx="-33.34" cy="63.25" r="0.55" opacity="0.50"/><circle cx="-33.34" cy="162.25" r="0.55" opacity="0.50"/><circle cx="23.82" cy="-35.75" r="0.55" opacity="0.50"/><circle cx="23.82" cy="63.25" r="0.55" opacity="0.50"/><circle cx="23.82" cy="162.25" r="0.55" opacity="0.50"/><circle cx="80.97" cy="-35.75" r="0.55" opacity="0.50"/><circle cx="80.97" cy="63.25" r="0.55" opacity="0.50"/><circle cx="80.97" cy="162.25" r="0.55" opacity="0.50"/><circle cx="-38.11" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="-38.11" cy="60.50" r="0.55" opacity="0.87"/><circle cx="-38.11" cy="159.50" r="0.55" opacity="0.87"/><circle cx="19.05" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="19.05" cy="60.50" r="0.55" opacity="0.87"/><circle cx="19.05" cy="159.50" r="0.55" opacity="0.87"/><circle cx="76.21" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="76.21" cy="60.50" r="0.55" opacity="0.87"/><circle cx="76.21" cy="159.50" r="0.55" opacity="0.87"/><circle cx="-14.29" cy="-52.25" r="0.55" opacity="0.45"/><circle cx="-14.29" cy="46.75" r="0.55" opacity="0.45"/><circle cx="-14.29" cy="145.75" r="0.55" opacity="0.45"/><circle cx="42.87" cy="-52.25" r="0.55" opacity="0.45"/><circle cx="42.87" cy="46.75" r="0.55" opacity="0.45"/><circle cx="42.87" cy="145.75" r="0.55" opacity="0.45"/><circle cx="100.03" cy="-52.25" r="0.55" opacity="0.45"/><circle cx="100.03" cy="46.75" r="0.55" opacity="0.45"/><circle cx="100.03" cy="145.75" r="0.55" opacity="0.45"/><circle cx="-14.29" cy="-46.75" r="0.55" opacity="0.82"/><circle cx="-14.29" cy="52.25" r="0.55" opacity="0.82"/><circle cx="-14.29" cy="151.25" r="0.55" opacity="0.82"/><circle cx="42.87" cy="-46.75" r="0.55" opacity="0.82"/><circle cx="42.87" cy="52.25" r="0.55" opacity="0.82"/><circle cx="42.87" cy="151.25" r="0.55" opacity="0.82"/><circle cx="100.03" cy="-46.75" r="0.55" opacity="0.82"/><circle cx="100.03" cy="52.25" r="0.55" opacity="0.82"/><circle cx="100.03" cy="151.25" r="0.55" opacity="0.82"/><circle cx="-33.34" cy="-13.75" r="0.55" opacity="0.40"/><circle cx="-33.34" cy="85.25" r="0.55" opacity="0.40"/><circle cx="-33.34" cy="184.25" r="0.55" opacity="0.40"/><circle cx="23.82" cy="-13.75" r="0.55" opacity="0.40"/><circle cx="23.82" cy="85.25" r="0.55" opacity="0.40"/><circle cx="23.82" cy="184.25" r="0.55" opacity="0.40"/><circle cx="80.97" cy="-13.75" r="0.55" opacity="0.40"/><circle cx="80.97" cy="85.25" r="0.55" opacity="0.40"/><circle cx="80.97" cy="184.25" r="0.55" opacity="0.40"/><circle cx="-38.11" cy="-11.00" r="0.55" opacity="0.77"/><circle cx="-38.11" cy="88.00" r="0.55" opacity="0.77"/><circle cx="-38.11" cy="187.00" r="0.55" opacity="0.77"/><circle cx="19.05" cy="-11.00" r="0.55" opacity="0.77"/><circle cx="19.05" cy="88.00" r="0.55" opacity="0.77"/><circle cx="19.05" cy="187.00" r="0.55" opacity="0.77"/><circle cx="76.21" cy="-11.00" r="0.55" opacity="0.77"/><circle cx="76.21" cy="88.00" r="0.55" opacity="0.77"/><circle cx="76.21" cy="187.00" r="0.55" opacity="0.77"/><circle cx="-52.39" cy="-13.75" r="0.55" opacity="0.71"/><circle cx="-52.39" cy="85.25" r="0.55" opacity="0.71"/><circle cx="-52.39" cy="184.25" r="0.55" opacity="0.71"/><circle cx="4.76" cy="-13.75" r="0.55" opacity="0.71"/><circle cx="4.76" cy="85.25" r="0.55" opacity="0.71"/><circle cx="4.76" cy="184.25" r="0.55" opacity="0.71"/><circle cx="61.92" cy="-13.75" r="0.55" opacity="0.71"/><circle cx="61.92" cy="85.25" r="0.55" opacity="0.71"/><circle cx="61.92" cy="184.25" r="0.55" opacity="0.71"/><circle cx="-57.16" cy="-27.50" r="0.55" opacity="0.66"/><circle cx="-57.16" cy="71.50" r="0.55" opacity="0.66"/><circle cx="-57.16" cy="170.50" r="0.55" opacity="0.66"/><circle cx="-0.00" cy="-27.50" r="0.55" opacity="0.66"/><circle cx="-0.00" cy="71.50" r="0.55" opacity="0.66"/><circle cx="-0.00" cy="170.50" r="0.55" opacity="0.66"/><circle cx="57.16" cy="-27.50" r="0.55" opacity="0.66"/><circle cx="57.16" cy="71.50" r="0.55" opacity="0.66"/><circle cx="57.16" cy="170.50" r="0.55" opacity="0.66"/><circle cx="-28.58" cy="-22.00" r="0.55" opacity="0.61"/><circle cx="-28.58" cy="77.00" r="0.55" opacity="0.61"/><circle cx="-28.58" cy="176.00" r="0.55" opacity="0.61"/><circle cx="28.58" cy="-22.00" r="0.55" opacity="0.61"/><circle cx="28.58" cy="77.00" r="0.55" opacity="0.61"/><circle cx="28.58" cy="176.00" r="0.55" opacity="0.61"/><circle cx="85.74" cy="-22.00" r="0.55" opacity="0.61"/><circle cx="85.74" cy="77.00" r="0.55" opacity="0.61"/><circle cx="85.74" cy="176.00" r="0.55" opacity="0.61"/><circle cx="-4.76" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="85.25" r="0.55" opacity="0.98"/><circle cx="-4.76" cy="184.25" r="0.55" opacity="0.98"/><circle cx="52.39" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="52.39" cy="85.25" r="0.55" opacity="0.98"/><circle cx="52.39" cy="184.25" r="0.55" opacity="0.98"/><circle cx="109.55" cy="-13.75" r="0.55" opacity="0.98"/><circle cx="109.55" cy="85.25" r="0.55" opacity="0.98"/><circle cx="109.55" cy="184.25" r="0.55" opacity="0.98"/><circle cx="-19.05" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="88.00" r="0.55" opacity="0.92"/><circle cx="-19.05" cy="187.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="88.00" r="0.55" opacity="0.92"/><circle cx="38.11" cy="187.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="-11.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="88.00" r="0.55" opacity="0.92"/><circle cx="95.26" cy="187.00" r="0.55" opacity="0.92"/><circle cx="-23.82" cy="-13.75" r="0.55" opacity="0.50"/><circle cx="-23.82" cy="85.25" r="0.55" opacity="0.50"/><circle cx="-23.82" cy="184.25" r="0.55" opacity="0.50"/><circle cx="33.34" cy="-13.75" r="0.55" opacity="0.50"/><circle cx="33.34" cy="85.25" r="0.55" opacity="0.50"/><circle cx="33.34" cy="184.25" r="0.55" opacity="0.50"/><circle cx="90.50" cy="-13.75" r="0.55" opacity="0.50"/><circle cx="90.50" cy="85.25" r="0.55" opacity="0.50"/><circle cx="90.50" cy="184.25" r="0.55" opacity="0.50"/><circle cx="-9.53" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="60.50" r="0.55" opacity="0.87"/><circle cx="-9.53" cy="159.50" r="0.55" opacity="0.87"/><circle cx="47.63" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="47.63" cy="60.50" r="0.55" opacity="0.87"/><circle cx="47.63" cy="159.50" r="0.55" opacity="0.87"/><circle cx="104.79" cy="-38.50" r="0.55" opacity="0.87"/><circle cx="104.79" cy="60.50" r="0.55" opacity="0.87"/><circle cx="104.79" cy="159.50" r="0.55" opacity="0.87"/><circle cx="-4.76" cy="-35.75" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="63.25" r="0.55" opacity="0.45"/><circle cx="-4.76" cy="162.25" r="0.55" opacity="0.45"/><circle cx="52.39" cy="-35.75" r="0.55" opacity="0.45"/><circle cx="52.39" cy="63.25" r="0.55" opacity="0.45"/><circle cx="52.39" cy="162.25" r="0.55" opacity="0.45"/><circle cx="109.55" cy="-35.75" r="0.55" opacity="0.45"/><circle cx="109.55" cy="63.25" r="0.55" opacity="0.45"/><circle cx="109.55" cy="162.25" r="0.55" opacity="0.45"/><circle cx="-0.00" cy="-27.50" r="0.55" opacity="0.82"/><circle cx="-0.00" cy="71.50" r="0.55" opacity="0.82"/><circle cx="-0.00" cy="170.50" r="0.55" opacity="0.82"/><circle cx="57.16" cy="-27.50" r="0.55" opacity="0.82"/><circle cx="57.16" cy="71.50" r="0.55" opacity="0.82"/><circle cx="57.16" cy="170.50" r="0.55" opacity="0.82"/><circle cx="114.32" cy="-27.50" r="0.55" opacity="0.82"/><circle cx="114.32" cy="71.50" r="0.55" opacity="0.82"/><circle cx="114.32" cy="170.50" r="0.55" opacity="0.82"/><circle cx="0.00" cy="-22.00" r="0.55" opacity="0.40"/><circle cx="0.00" cy="77.00" r="0.55" opacity="0.40"/><circle cx="0.00" cy="176.00" r="0.55" opacity="0.40"/><circle cx="57.16" cy="-22.00" r="0.55" opacity="0.40"/><circle cx="57.16" cy="77.00" r="0.55" opacity="0.40"/><circle cx="57.16" cy="176.00" r="0.55" opacity="0.40"/><circle cx="114.32" cy="-22.00" r="0.55" opacity="0.40"/><circle cx="114.32" cy="77.00" r="0.55" opacity="0.40"/><circle cx="114.32" cy="176.00" r="0.55" opacity="0.40"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#stars)"/></svg></div></div>
+       <div class="fillwrap prmwrap"><div class="fill prmfill"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><pattern id="mosaic" width="16" height="24" patternUnits="userSpaceOnUse" patternTransform="skewY(-17)"><g fill="none" stroke="var(--tri)" stroke-width=".7"><path d="M0 0V24M16 0V24"/><path d="M0 0H16M0 24H16"/><path d="M0 0L16 24"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#mosaic)"/></svg></div></div>
+       <span class="modechip schip">SEARCH</span>
+       <span class="modechip cmdchip">COMMAND</span>
+       <span class="modechip pchip">PROMPT</span>
+       <svg class="mag" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><line x1="10.2" y1="10.2" x2="13.8" y2="13.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+       <svg class="quillmark" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.3 14.8h8.5l-.7 5.1a1.5 1.5 0 0 1-1.5 1.3H8.5a1.5 1.5 0 0 1-1.5-1.3z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.2 14.8h10.7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M21.3 2.3c-5.7 1.2-9.1 5-9.8 10l3.1-1c3.9-1.4 6.4-4.6 6.7-9z" fill="currentColor"/><path d="M11.9 12.2 10.4 14.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+       <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Search the Library: rooms, boards, blocks, features, themes…">
+     </div>
+     <div class="shint" id="shint" aria-live="polite"></div>
+   <div class="cref" id="cref" data-border="dot" data-radius="8"></div>
+  </div>
+ </div>
+ <div class="wrap" id="wrap"></div>
+</div>
+<div id="wins"></div>
+<div class="menu" id="menu"></div>
+<div class="trybar"><b>Try:</b>
+ <button data-try="studio">Writing Studio</button>
+ <button data-try="block">a block selected</button>
+ <button data-try="fits">where a block fits</button>
+ <button data-try="picked">several ticked</button>
+ <button data-try="inspect">inspect:</button>
+ <button data-try="first">first visit, with the guide</button>
+ <button data-try="popped">the Library in its own window</button>
+ <button data-try="mobile">built for mobile</button>
+ <button data-try="reset">reset</button>
+ <span class="cvsw"><b>Canvas:</b> <button data-cv="early">earlier</button><button data-cv="mid" class="on">medium</button><button data-cv="lines">lines</button></span>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   BORDERS (carried from Almanac v30 unchanged)
+   ═══════════════════════════════════════════════════════════════════ */
+var NS='http://www.w3.org/2000/svg';
+
+function rrPath(w,h,r){
+  var i=0.5, rad=r-i, m=r-rad*0.7071;
+  return 'M'+m+','+m+
+    'A'+rad+','+rad+' 0 0 1 '+r+','+i+' H'+(w-r)+
+    'A'+rad+','+rad+' 0 0 1 '+(w-i)+','+r+' V'+(h-r)+
+    'A'+rad+','+rad+' 0 0 1 '+(w-r)+','+(h-i)+' H'+r+
+    'A'+rad+','+rad+' 0 0 1 '+i+','+(h-r)+' V'+r+
+    'A'+rad+','+rad+' 0 0 1 '+m+','+m;
+}
+
+function paintBorder(el){
+  var kind=el.getAttribute('data-border'), r=+(el.getAttribute('data-radius')||8);
+  var w=el.offsetWidth, h=el.offsetHeight;
+  if(w<2*r+2||h<2*r+2) return;
+
+  var svg=el.querySelector(':scope > svg.bx');
+  if(!svg){
+    svg=document.createElementNS(NS,'svg');
+    svg.setAttribute('class','bx'); svg.setAttribute('aria-hidden','true');
+    el.appendChild(svg);
+  }
+  svg.innerHTML='';
+  svg.setAttribute('width',w); svg.setAttribute('height',h);
+  svg.setAttribute('viewBox','0 0 '+w+' '+h);
+
+  var d=rrPath(w,h,r);
+  function mkPath(cls){
+    var q=document.createElementNS(NS,'path');
+    q.setAttribute('d',d); q.setAttribute('fill','none');
+    q.setAttribute('stroke-width','1'); q.setAttribute('stroke-linecap','round');
+    if(cls) q.setAttribute('class',cls);
+    svg.appendChild(q); return q;
+  }
+
+  if(kind==='prog'){
+    /* Two paths. The ink one is the resting progressive dash: mirrored halves
+       growing from a dot at the top-left to a solid bottom-right corner, so it
+       reads like light falling from the top-left. The gold one is solid and
+       hidden by its own length, and draws itself in when the element is live. */
+    var ink=mkPath('prog-ink');
+    var L=ink.getTotalLength();
+    ink.style.stroke='var(--ink-prog)';
+    var gEnd=3.5, gJoin=1, maxDash=12;
+    var half=(L-gEnd-gJoin)/2, A=[], S=0;
+    while(true){
+      var t=Math.min(S/half,1);
+      var dash=0.01+maxDash*Math.pow(t,1.4);
+      var gap=3.5-2.6*t;
+      if(A.length && S+gap+dash>half) break;
+      if(A.length){A.push(gap);S+=gap;}
+      A.push(dash); S+=dash;
+    }
+    A[A.length-1]+=half-S;
+    ink.setAttribute('stroke-dasharray',A.concat([gJoin],A.slice().reverse(),[gEnd]).join(' '));
+
+  }else{
+    /* Even dots, spacing nudged so a whole number fits the perimeter exactly. */
+    var dots=mkPath('');
+    var L2=dots.getTotalLength();
+    dots.style.stroke='var(--ink-dot)';
+    var count=Math.max(4,Math.round(L2/4)), seg=L2/count;
+    dots.setAttribute('stroke-dasharray','0.01 '+(seg-0.01));
+  }
+}
+
+var RO=window.ResizeObserver?new ResizeObserver(function(es){es.forEach(function(e){paintBorder(e.target);});}):null;
+function paintAll(){document.querySelectorAll('[data-border]').forEach(function(el){paintBorder(el);if(RO&&!el.__ro){RO.observe(el);el.__ro=1;}});}
+
+/* ═══════════════════════════════════════════════════════════════════
+   THE CATALOGUE
+   Library items are catalogue entries, not Almanac rows: unnumbered,
+   addressed by name.
+   ═══════════════════════════════════════════════════════════════════ */
+var SLOTNAME={left:'left rail',right:'right rail',main:'main area',input:'input dock',sheet:'bottom sheet'};
+var PLANS={
+  three: {name:'Three-panel',areas:"'left main right' 'left input right'",cols:'150px minmax(0,1fr) 172px',slots:{left:2,main:1,input:2,right:3},
+          desc:'A rail either side of the conversation. The shape most rooms start from.'},
+  doc:   {name:'Document-centric',areas:"'main right' 'input right'",cols:'minmax(0,1fr) 184px',slots:{main:2,input:2,right:3},
+          desc:'The page in the middle, the conversation beside it. For writing you go back to.'},
+  canvas:{name:'Canvas-centric',areas:"'left main' 'left input'",cols:'172px minmax(0,1fr)',slots:{left:3,main:1,input:2},
+          desc:'One wide working surface with its tools down the left. For tables and charts.'},
+  sheet: {name:'Single column with sheet',areas:"'main' 'input' 'sheet'",cols:'minmax(0,1fr)',slots:{main:1,input:2,sheet:3},
+          desc:'One column, with a sheet of tools under it. Quiet, and the shape phones use.'},
+  stack: {name:'Stacked sections',areas:"'main' 'input'",cols:'minmax(0,1fr)',slots:{main:3,input:2},
+          desc:'Several things stacked in one column, read top to bottom.'},
+  read:  {name:'Reading pane',soon:1,desc:'A long text on one side and your marks on the other.'},
+  split: {name:'Split view',soon:1,desc:'Two conversations side by side.'}
+};
+var SCHEMES={
+  'default':{name:'Parliament Default',bg:'#FFFFFF',acc:'#B8A070',deep:'#9C8760'},
+  cool:{name:'Cool Bright',bg:'#FBFCFE',acc:'#4288CC',deep:'#234F84'},
+  calm:{name:'Deep Calm',bg:'#1A1F2E',acc:'#9CB4D0',deep:'#5A7898'},
+  violet:{name:'Soft Violet',bg:'#FAF8FE',acc:'#8878C0',deep:'#544684'},
+  teal:{name:'Fresh Teal',bg:'#F8FCFB',acc:'#33B58A',deep:'#147A5C'},
+  amber:{name:'Amber Glow',bg:'#FFFCF5',acc:'#D4731A',deep:'#8C4500'}
+};
+/* place: 'room' (reads one conversation), 'either' (works alone too) */
+function C(id,name,grp,fits,desc,o){o=o||{};return {id:id,k:'comp',name:name,grp:grp,fits:fits,desc:desc,needs:o.needs||'nothing',
+  cfg:o.cfg||null,feat:o.feat||null,place:o.place||'room',req:o.req||false,ver:o.ver||'1.0.0'};}
+/* Features are things a block can do, switched on or off. They are settings,
+   not blocks: they have no edges and never hold anything. */
+var FEATDESC={'web search':'Lets the model search the web on your next message. Needs network and tokens.',
+  'file attach':'Attach a file to the next message.','voice input':'Speak instead of typing. Needs the microphone.'};
+var COMPS=[
+ C('messages','Messages','Conversation',['main'],'The conversation itself, with a menu on each message. Every room has one.',{req:true}),
+ C('input','Input','Conversation',['input'],'Where you write to the model. Every room has one.',{req:true,
+   cfg:{'web search':['on','off'],'file attach':['on','off'],'voice input':['on','off']},feat:['web search','file attach','voice input']}),
+ C('branches','Branches','Conversation',['left','right','sheet'],'The ways this conversation has forked, with links to the parent and children.',{cfg:{view:['tree','list']}}),
+ C('health','Context health','Conversation',['right','left','sheet'],'How much of the context window you have used, with a warning as it fills.',{cfg:{'warn at':['70%','80%','90%']}}),
+ C('toc','Contents','Conversation',['left','right'],'Headings from the conversation, so a long one can be walked.'),
+ C('highlights','Highlights','Marking',['right','left','sheet'],'Saved highlight terms with colour tags. Jump between occurrences with one click.',{cfg:{colour:['blue','yellow','green','purple','red'],'inline add':['on','off']}}),
+ C('notes','Notes','Marking',['right','left','sheet'],'Notes on one message or on the whole conversation.',{place:'either',cfg:{'new notes':['per message','general']}}),
+ C('comments','Comments','Marking',['right','sheet'],'Threaded comments pinned to a passage.'),
+ C('review','Review','Marking',['right','main'],'Walks a draft paragraph by paragraph and collects what to change.'),
+ C('doccanvas','Document canvas','Making',['main'],'A page you and the model write into together.',{place:'either'}),
+ C('chart','Chart canvas','Making',['main'],'Charts drawn from the conversation, kept and redrawn.'),
+ C('table','Table canvas','Making',['main'],'A table the conversation can fill, sort and extend.'),
+ C('scratch','Scratchpad','Making',['right','left','sheet'],'A loose page for anything not yet worth a note.',{place:'either'}),
+ C('shelf','File shelf','Making',['left','right','sheet'],'Files kept in reach across chats.',{place:'either'}),
+ C('colinsp','Column inspector','Making',['right','left'],'Details of the table column in focus: type, spread, blanks.'),
+ C('steps','Step list','Planning',['right','left','sheet'],'The docket\u2019s steps, following this room\u2019s conversation. The whole docket is a board of its own.'),
+ C('collab','Collaboration','Reaching out',['right','sheet'],'Someone else in the room with you, and what they are looking at.',{needs:'network'}),
+ C('summary','Summary dashboard','Reading the room',['main','right'],'A running summary of the conversation so far.',{needs:'tokens'}),
+ C('ripple','Ripple analysis','Reading the room',['right','main'],'Which later messages an earlier one changed.',{needs:'tokens'})
+];
+var BOARDS=[
+ {name:'Almanac',desc:'Everything you have made, in one table you can search, filter and collect from.',place:'arrangement'},
+ {name:'Library',desc:'Rooms, layouts, blocks, themes and resources. The board you are browsing now.',place:'arrangement'},
+ {name:'Collection',desc:'Things set side by side to compare, ask about, or apply. Takes its source from the first thing added.',place:'arrangement'},
+ {name:'Docket',desc:'A plan of prompts, run in branches. Its step list can also sit inside a room.',place:'arrangement'}
+];
+var TEMPLATES={
+  'Writing Studio':{desc:'A versatile chat with notes, highlights and branches close at hand. For long-form writing where you go back and forth.',
+    plan:'three',scheme:'default',web:1,comps:[['messages','main'],['input','input'],['branches','left'],['highlights','right'],['health','right'],['notes','right']]},
+  'Quiet Room':{desc:'The conversation and nothing else. For thinking out loud.',plan:'sheet',scheme:'calm',comps:[['messages','main'],['input','input']]},
+  'Pocket Chat':{desc:'Built for a phone: one column, and your notes in a sheet under it.',plan:'sheet',scheme:'teal',device:'mobile',comps:[['messages','main'],['input','input'],['notes','sheet']]},
+  'Drafting Desk':{desc:'A page to write on, with review and comments beside it.',plan:'doc',scheme:'amber',comps:[['doccanvas','main'],['messages','main'],['input','input'],['review','right'],['comments','right']]},
+  'Data Workspace':{desc:'A table canvas with its column inspector, and a chart beside.',plan:'canvas',scheme:'cool',comps:[['table','main'],['input','input'],['colinsp','left'],['shelf','left']]},
+  'Kingfisher':{soon:1,desc:'Research across sources, with a trail of where each fact came from.'},
+  'Starling':{soon:1,desc:'Several models answering at once, compared as they arrive.'}
+};
+var RESOURCES=[
+  {name:'Your first room: a walkthrough',fmt:'Guide',by:'Anthropic',desc:'From an empty room to one you use, in about ten minutes.'},
+  {name:'Component catalogue and hostAPI',fmt:'Reference',by:'Anthropic',desc:'What each component is, what it may touch, and how to write one.'},
+  {name:'Help me plan a room',fmt:'Prompt recipe',by:'@kindred',desc:'A prompt that asks the right questions before you build.'},
+  {name:'The Newsroom',fmt:'Example project',by:'@dispatch',desc:'A room built for a small editorial team, taken apart.'},
+  {name:'Parliament in 90 seconds',fmt:'Video link',by:'Anthropic',desc:'The whole idea, once, quickly.'}
+];
+var GRPS=['Conversation','Marking','Making','Planning','Reaching out','Reading the room'];
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════════════════════════════ */
+var S, HIST=[], LASTRUN='';
+function roomFromTpl(name,tn){var t=TEMPLATES[tn];return {name:name,plan:t.plan,scheme:t.scheme,device:t.device||'desktop',rails:'both',
+  cfg:{highlights:{colour:'blue','inline add':'on'},health:{'warn at':'80%'},input:{'web search':t.web?'on':'off','file attach':'on','voice input':'off'}},comps:t.comps.map(function(p){return {c:p[0],slot:p[1]};})};}
+function fresh(){
+  return {rooms:[roomFromTpl('Writing Studio','Writing Studio')],cur:0,
+    coll:{name:'',items:[]},lib:{kind:'all'},q:'',sel:{t:'room'},addr:'canvas',
+    pops:{},hidden:{collection:true},order:['library','canvas','side'],guide:null,cmp:false,reply:null,tries:[],insp:null,glow:null,pick:[]};
+}
+S=fresh();
+function R(){return S.rooms[S.cur];}
+function snap(){HIST.push(JSON.stringify(S));if(HIST.length>60)HIST.shift();}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LOOKUPS
+   ═══════════════════════════════════════════════════════════════════ */
+function norm(t){return String(t||'').toLowerCase().replace(/["“”']/g,'').replace(/\s+/g,' ').trim();}
+function esc(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function compBy(id){return COMPS.filter(function(c){return c.id===id;})[0];}
+function libItems(){
+  var out=[];
+  S.rooms.forEach(function(r,i){out.push({k:'room',name:r.name,mine:1,ri:i,desc:describeRoom(r),key:'mine:'+r.name});});
+  Object.keys(TEMPLATES).forEach(function(n){var t=TEMPLATES[n];out.push({k:'room',name:n,tpl:1,soon:t.soon,desc:t.desc,key:'tpl:'+n,by:'@parliament'});});
+  Object.keys(PLANS).forEach(function(k){var p=PLANS[k];out.push({k:'plan',pid:k,name:p.name,soon:p.soon,desc:p.desc,key:'plan:'+k,by:'@parliament'});});
+  BOARDS.forEach(function(b){out.push({k:'board',name:b.name,desc:b.desc,key:'board:'+b.name,by:'@parliament'});});
+  COMPS.forEach(function(c){out.push({k:'comp',cid:c.id,name:c.name,grp:c.grp,desc:c.desc,feat:c.feat,key:'comp:'+c.id,by:'parliament'});});
+  Object.keys(SCHEMES).forEach(function(k){var s=SCHEMES[k];out.push({k:'scheme',sid:k,name:s.name,desc:'A theme: colour and type for the inside of a room.',key:'scheme:'+k,by:'@parliament'});});
+  RESOURCES.forEach(function(r){out.push({k:'res',name:r.name,fmt:r.fmt,soon:1,desc:r.desc,by:r.by,key:'res:'+r.name});});
+  return out;
+}
+function byKey(key){return libItems().filter(function(x){return x.key===key;})[0];}
+/* Names resolve to yours first, then the Library. */
+function find(name,kinds){
+  var n=norm(name); if(!n) return null;
+  var all=libItems().filter(function(x){return !kinds||kinds.indexOf(x.k)>-1;});
+  var hit=all.filter(function(x){return norm(x.name)===n||norm(x.name).replace(/ /g,'')===n.replace(/ /g,'');});
+  if(!hit.length) hit=all.filter(function(x){return norm(x.name).indexOf(n)===0;});
+  hit.sort(function(a,b){return (b.mine?1:0)-(a.mine?1:0);});
+  return hit[0]||null;
+}
+function describeRoom(r){return (r.plan?PLANS[r.plan].name:'No layout yet')+', '+r.comps.length+' block'+(r.comps.length===1?'':'s')+', '+SCHEMES[r.scheme].name+' theme'+(r.device==='mobile'?', for mobile':'');}
+function usedIn(it){
+  var n=S.rooms.filter(function(r){
+    if(it.k==='comp') return r.comps.some(function(p){return p.c===it.cid;});
+    if(it.k==='plan') return r.plan===it.pid;
+    if(it.k==='scheme') return r.scheme===it.sid;
+    return false;}).length;
+  return n?'used in '+n+' of your rooms'.replace('1 of your rooms','1 of your rooms'):'not in any of your rooms';
+}
+function slotWord(t){
+  t=norm(t);
+  var map={'left':'left','left rail':'left','right':'right','right rail':'right','main':'main','main area':'main','middle':'main',
+    'input':'input','input dock':'input','dock':'input','sheet':'sheet','bottom sheet':'sheet','bottom':'sheet'};
+  return map[t]||null;
+}
+function inRoom(cid){return R().comps.filter(function(p){return p.c===cid;})[0];}
+function slotCount(slot){return R().comps.filter(function(p){return p.slot===slot;}).length;}
+function planSlots(){return R().plan?PLANS[R().plan].slots:{};}
+function firstFit(c,exclude){
+  var ps=planSlots();
+  for(var i=0;i<c.fits.length;i++){var s=c.fits[i];if(ps[s]&&s!==exclude&&slotCount(s)<ps[s]) return s;}
+  return null;
+}
+function plural(n,w){return n+' '+w+(n===1?'':'s');}
+function list(a){return a.length<2?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length-1];}
+function lum(hex){var h=hex.replace('#','');var r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);return (0.299*r+0.587*g+0.114*b)/255;}
+
+/* collection: entries are {t:'i',key,note} or {t:'s',name} */
+function collKeys(){return S.coll.items.filter(function(e){return e.t==='i';}).map(function(e){return e.key;});}
+function collHas(key){return collKeys().indexOf(key)>-1;}
+
+/* ═══ RENDER ═══ */
+var ICON={
+  messages:'<path d="M3 4h10v6H7l-3 2.5V10H3z"/>',input:'<rect x="2" y="6" width="12" height="4.5" rx="2"/><path d="M11 8.2h1.2"/>',
+  branches:'<circle cx="4" cy="3.5" r="1.3"/><circle cx="4" cy="12.5" r="1.3"/><circle cx="12" cy="8" r="1.3"/><path d="M4 5v6M4 8c3 0 4-.1 6.7 0"/>',
+  health:'<path d="M2 11a6 6 0 0 1 12 0"/><path d="M8 11l2.5-3"/>',toc:'<path d="M3 4h10M5 7h8M5 10h8M3 13h10"/>',
+  highlights:'<path d="M3 12l5-8 5 8"/><path d="M5 9h6"/><path d="M2 14h12"/>',notes:'<path d="M4 2h6l3 3v9H4z"/><path d="M6 8h5M6 11h4"/>',
+  comments:'<path d="M3 3h10v7H8l-3 3v-3H3z"/>',review:'<path d="M3 8l3 3 7-7"/>',doccanvas:'<rect x="3" y="2" width="10" height="12" rx="1"/><path d="M5.5 6h5M5.5 9h5"/>',
+  chart:'<path d="M3 13V3M3 13h10"/><path d="M5.5 10.5V8M8.5 10.5V5.5M11.5 10.5V7"/>',table:'<rect x="2.5" y="3" width="11" height="10" rx="1"/><path d="M2.5 6.5h11M6.5 3v10"/>',
+  scratch:'<path d="M3 13l2-.5 7.5-7.5-1.5-1.5L3.5 11z"/>',shelf:'<path d="M2 5h12M2 11h12"/><path d="M4 5V3h3v2M9 11V8h3v3"/>',
+  colinsp:'<rect x="5.5" y="2" width="5" height="12" rx="1"/><path d="M5.5 6h5"/>',web:'<circle cx="8" cy="8" r="5.5"/><path d="M2.5 8h11M8 2.5c2 2 2 9 0 11M8 2.5c-2 2-2 9 0 11"/>',
+  attach:'<path d="M10.5 5l-4.5 4.5a1.4 1.4 0 0 0 2 2L13 6.5a2.8 2.8 0 0 0-4-4L4 7.5"/>',voice:'<rect x="6" y="2" width="4" height="7.5" rx="2"/><path d="M3.5 8a4.5 4.5 0 0 0 9 0M8 12.5V14"/>',
+  collab:'<circle cx="5.5" cy="6" r="2"/><circle cx="11" cy="6" r="2"/><path d="M2 13c.5-2.5 6.5-2.5 7 0M7.5 13c.5-2.5 6.5-2.5 7 0"/>',
+  summary:'<path d="M3 4h10M3 7h10M3 10h6"/>',ripple:'<path d="M2 6c2-2 4 2 6 0s4-2 6 0M2 10c2-2 4 2 6 0s4-2 6 0"/>',
+  res:'<path d="M3 3h4a2 2 0 0 1 2 2v8a1.5 1.5 0 0 0-1.5-1.5H3zM13 3H9"/><path d="M13 3v8.5H9.5"/>'
+};
+function svgI(k){return '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">'+(ICON[k]||ICON.summary)+'</svg>';}
+function planPV(pid){
+  var b={three:[[3,3,8,24],[13,3,14,24],[29,3,8,24]],doc:[[3,3,22,24],[27,3,10,24]],canvas:[[3,3,9,24],[14,3,23,24]],
+    sheet:[[3,3,34,15],[3,20,34,7]],stack:[[3,3,34,7],[3,12,34,7],[3,21,34,6]],read:[[3,3,20,24],[25,3,12,24]],split:[[3,3,16,24],[21,3,16,24]]}[pid]||[];
+  return '<div class="pv pl">'+b.map(function(r){return '<b style="left:'+(r[0]/40*100)+'%;top:'+(r[1]/30*100)+'%;width:'+(r[2]/40*100)+'%;height:'+(r[3]/30*100)+'%"></b>';}).join('')+'</div>';
+}
+function schemePV(sid){var s=SCHEMES[sid];return '<div class="pv sw" style="background:'+s.bg+'"><i style="background:'+s.acc+'"></i><i style="background:'+s.deep+'"></i></div>';}
+function roomPV(it){
+  var sc,pid;
+  if(it.mine){var r=S.rooms[it.ri];sc=r.scheme;pid=r.plan||'three';}
+  else {var t=TEMPLATES[it.name];sc=t.scheme||'default';pid=t.plan||'three';}
+  var s=SCHEMES[sc];
+  return planPV(pid).replace('class="pv pl"','class="pv pl rm" style="background:'+s.bg+'"').replace(/<b style="/g,'<b style="background:'+s.acc+';opacity:.55;');
+}
+function pvFor(it){
+  if(it.k==='comp') return '<div class="pv ic">'+svgI(it.cid)+'</div>';
+  if(it.k==='plan') return planPV(it.pid);
+  if(it.k==='scheme') return schemePV(it.sid);
+  if(it.k==='room') return roomPV(it);
+  return '<div class="pv ic">'+svgI('res')+'</div>';
+}
+ICON.steps='<path d="M4 4h1M4 8h1M4 12h1M7 4h6M7 8h6M7 12h6"/>';
+ICON.board='<rect x="2.5" y="3" width="11" height="10" rx="1.5"/><path d="M6.5 3v10"/>';
+function pvFor2(it){
+  if(it.k==='board') return '<div class="pv ic">'+svgI('board')+'</div>';
+  return pvFor(it);
+}
+var KLAB={room:'Room',board:'Board',plan:'Layout',comp:'Block',scheme:'Theme',res:'Resource'};
+var DEFCFG={input:{'web search':'off','file attach':'on','voice input':'off'},highlights:{colour:'blue','inline add':'on'},health:{'warn at':'80%'},
+  branches:{view:'tree'},notes:{'new notes':'per message'}};
+function getCfg(cid,key){var r=R(), v=(r.cfg[cid]||{})[key]; if(v) return v; var d=(DEFCFG[cid]||{})[key]; if(d) return d; var c=compBy(cid); return c.cfg[key][0];}
+function qn(n){return /\s/.test(n)?'"'+n+'"':n;}
+function W(cmd,label,extra){return '<button data-w="'+esc(cmd)+'"'+(extra||'')+'>'+esc(label)+'</button>';}
+function sep(){return '<span class="sep">·</span>';}
+function marg(a,cls){return '<div class="marg'+(cls?' '+cls:'')+'">'+a.filter(Boolean).join(sep())+'</div>';}
+function pick(label,opts,head){return '<button class="pick" data-pick="'+esc(JSON.stringify(opts))+'"'+(head?' data-head="'+esc(head)+'"':'')+'>'+esc(label)+'<span class="car">\u25BE</span></button>';}
+var PLACE={room:'room only',either:'a room or the screen',arrangement:'the screen only'};
+
+/* Facts only. Choosing things is the checkbox's job; the one action left is
+   on things that do not go into a room (duplicate a room, open a board). */
+function itemMarg(it){
+  var m=[];
+  if(it.soon) return marg(['<span>'+(it.fmt?it.fmt.toLowerCase()+', ':'')+'coming soon</span>']);
+  if(it.k==='comp'){var c=compBy(it.cid); m.push('<span>'+PLACE[c.place]+'</span>'); m.push('<span>'+(inRoom(it.cid)?'in this room':usedIn(it))+'</span>');}
+  else if(it.k==='plan'){m.push('<span>'+plural(Object.keys(PLANS[it.pid].slots).length,'place')+' for blocks</span>'); if(R().plan===it.pid) m.push('<span>this room\u2019s layout</span>');}
+  else if(it.k==='scheme'){m.push('<span>'+(R().scheme===it.sid?'this room\u2019s theme':usedIn(it))+'</span>');}
+  else if(it.k==='board'){m.push('<span>'+PLACE.arrangement+'</span>'); m.push(W('open:'+it.name.toLowerCase(),'open'));}
+  else if(it.k==='room'){
+    if(it.mine) m.push(S.rooms[S.cur].name===it.name?'<span>on the Canvas</span>':W('edit:"'+it.name+'"','edit here'));
+    else {m.push('<span>'+plural(TEMPLATES[it.name].comps.length,'block')+'</span>'); m.push(W('duplicate:"'+it.name+'"','duplicate'));}
+  }
+  return marg(m);
+}
+function pickable(it){return !it.soon&&(it.k==='comp'||it.k==='plan'||it.k==='scheme');}
+function inRoomAlready(it){return (it.k==='comp'&&inRoom(it.cid))||(it.k==='plan'&&R().plan===it.pid)||(it.k==='scheme'&&R().scheme===it.sid);}
+var CHECK='<svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.2l2.3 2.3 4.7-4.9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function liHTML(it,q,popped){
+  var pills='';
+  if(it.k==='room') pills=it.mine?'<span class="lpill mine">yours</span>':'<span class="lpill">template</span>';
+  if(it.soon) pills+=' <span class="lpill soon">coming soon</span>';
+  var feat='';
+  if(it.feat) feat='<div class="lfeat">'+it.feat.map(function(f){var hit=q&&f.indexOf(q)>-1;return '<span class="'+(hit?'hit':'')+'">'+f+'</span>';}).join('')+'</div>';
+  var open=S.insp===it.key, cb='';
+  if(pickable(it)){var dis=inRoomAlready(it), on=S.pick.indexOf(it.key)>-1;
+    cb='<button class="cb'+(on?' on':'')+(dis?' dis':'')+'" data-pk="'+esc(it.key)+'"'+(dis?' disabled title="already in this room"':'')+' aria-label="Select '+esc(it.name)+'">'+CHECK+'</button>';}
+  else cb='<span class="cbsp"></span>';
+  /* In its slot the Library opens details right under the item you clicked,
+     so your eye stays where it was. Popped out, details get a side column. */
+  var det=open&&!popped?'<div class="linl">'+inspectHTML(it.key)+'</div>':'';
+  return '<div class="li'+(open?' sel':'')+(it.soon?' soon':'')+'" data-sl="'+esc(it.key)+'"'+(it.k==='comp'?' data-glow="'+it.cid+'"':'')+'>'+cb+pvFor2(it)+
+    '<div style="min-width:0"><div class="lname">'+esc(it.name)+' '+pills+'</div><div class="ldesc">'+esc(it.desc)+'</div>'+feat+itemMarg(it)+'</div>'+det+'</div>';
+}
+function libHTML(popped){
+  var all=libItems(), k=S.lib.kind, q=norm(S.q);
+  var vis=all.filter(function(it){
+    if(k!=='all'&&it.k!==k) return false;
+    if(q&&(norm(it.name)+' '+norm(it.desc)+' '+norm(KLAB[it.k])+' '+(it.feat||[]).join(' ')).indexOf(q)<0) return false;
+    return true;});
+  var narrowing=(k!=='all'||q);
+  var h='<div class="chead"><span class="ctitle">Library</span>'+
+    marg([narrowing?'<span class="lcount">'+vis.length+' of '+all.length+'</span>':''])+'</div>';
+  /* What used to be the inspector: the selected thing, above the catalogue
+     it came from. One quiet line when nothing is selected, so the catalogue
+     does not jump the first time you click. */
+  h+='<div class="lfilt">'+[['all','All'],['room','Rooms'],['board','Boards'],['plan','Layouts'],['comp','Blocks'],['scheme','Themes'],['res','Resources']].map(function(f){
+      return '<button data-kind="'+f[0]+'" class="'+(k===f[0]?'on':'')+'">'+f[1]+'</button>';}).join('')+'</div>';
+  /* The selection survives a change of filter or search, as in the Almanac. */
+  var pk=S.pick.map(byKey).filter(Boolean);
+  h+='<div class="lsel'+(pk.length?' on':'')+'">'+(pk.length?marg(['<span><b>'+pk.length+' selected</b>: '+esc(list(pk.map(function(x){return x.name;})))+'</span>',
+      W('add:'+pk.map(function(x){return x.k==='comp'?x.name.toLowerCase():'"'+x.name+'"';}).join(', '),'add to room',' data-addr="canvas"'),'<button data-clearpick="1">clear</button>']):
+      marg(['<span>tick blocks, a layout or a theme, then add them to the room together</span>']))+'</div>';
+  var side=popped&&S.insp&&byKey(S.insp);
+  h+=side?'<div class="lsplit"><div class="lscroll">':'<div class="lscroll">';
+  if(!vis.length) h+='<div class="lnone">Nothing in the Library matches \u201c'+esc(S.q)+'\u201d. Try a shorter word, or clear the field.</div>';
+  function group(title,items){
+    if(!items.length) return '';
+    return '<div class="lgrp">'+title+'<span class="n">'+items.length+'</span></div><div class="lgrid">'+items.map(function(x){return liHTML(x,q,popped);}).join('')+'</div>';
+  }
+  h+=group('Your rooms',vis.filter(function(x){return x.k==='room'&&x.mine;}));
+  h+=group('Room templates',vis.filter(function(x){return x.k==='room'&&x.tpl;}));
+  h+=group('Boards',vis.filter(function(x){return x.k==='board';}));
+  h+=group('Layouts',vis.filter(function(x){return x.k==='plan';}));
+  GRPS.forEach(function(g){h+=group((k==='comp'?'':'Blocks: ')+(k==='comp'?g:g.toLowerCase()),vis.filter(function(x){return x.k==='comp'&&x.grp===g;}));});
+  h+=group('Themes',vis.filter(function(x){return x.k==='scheme';}));
+  h+=group('Resources',vis.filter(function(x){return x.k==='res';}));
+  if(side) return h+'</div><div class="lside">'+inspectHTML(S.insp)+'</div></div>';
+  return h+'</div>';
+}
+
+/* ── canvas ── */
+/* Blocks are drawn as the Almanac draws rows: a name, and one line of
+   marginalia saying what state it is in. No bars, no bubbles, no dots. */
+function stateLine(cid){
+  var r=R();
+  return {branches:'2 forks, drawn as a '+getCfg('branches','view'),health:'32% of 200k tokens, warns at '+getCfg('health','warn at'),
+    toc:'4 headings',highlights:'2 marked, new ones in '+getCfg('highlights','colour'),notes:'1 note, new ones '+getCfg('notes','new notes'),
+    comments:'no threads yet',review:'nothing to review yet',doccanvas:'one page, 420 words',chart:'no charts yet',table:'no table yet',
+    scratch:'empty',shelf:'3 files',colinsp:'no column in focus',steps:'following this chat, 3 steps',collab:'only you',
+    summary:'updated after each reply',ripple:'nothing changed yet'}[cid]||'';
+}
+/* Every style gets the same markup; the stylesheet decides what shows.
+   The earlier style draws placeholder bars and bubbles, the medium style
+   bubbles and a line of marginalia, the lines style rows and marginalia. */
+function sketch(cid){
+  if(cid==='messages'){
+    var rows=[['claude','How can I help today?'],['you','Let\u2019s start drafting\u2026'],['claude','Sure. What\u2019s the angle?']];
+    var bub='<div class="msgs">'+rows.map(function(x){return '<div class="bub'+(x[0]==='you'?' me':'')+'">'+esc(x[1])+'</div>';}).join('');
+    var tx='<div class="tx">'+rows.slice(1).map(function(x){return '<div class="txr"><span class="who">'+x[0]+'</span><span>'+esc(x[1])+'</span></div>';}).join('');
+    S.tries.forEach(function(t){bub+='<div class="bub me try">'+esc(t.me)+'</div><div class="bub try">'+esc(t.ai)+'</div>';
+      tx+='<div class="txr try"><span class="who">you</span><span>'+esc(t.me)+'</span></div><div class="txr try"><span class="who">claude</span><span>'+esc(t.ai)+'</span></div>';});
+    return bub+'</div>'+tx+'</div>'+(S.tries.length?'<div class="cst">kept as chats, tagged tried in the Lab</div>':'');
+  }
+  if(cid==='input'){
+    return '<div class="inp" data-border="dot" data-radius="8">Message Claude\u2026</div><div class="feats">'+compBy('input').feat.map(function(f){var on=getCfg('input',f)==='on';
+      return '<button class="ft'+(on?' on':'')+'" data-w="set:input '+f+' '+(on?'off':'on')+'" title="'+esc(FEATDESC[f])+'">'+f+'</button>';}).join('')+'</div>';
+  }
+  var early='<div class="sk"><i style="width:88%"></i><i style="width:64%"></i><i style="width:76%"></i></div>';
+  if(cid==='health') early='<div class="sk"><div class="meter"><b></b></div><div class="rlab" style="margin-top:4px;opacity:.55">32% of 200k tokens</div></div>';
+  if(cid==='highlights') early='<div class="sk"><div class="chipr"><span>water tower</span><span>the ending</span></div></div>';
+  return early+'<div class="cst">'+esc(stateLine(cid))+'</div>';
+}
+function compBlock(p){
+  var c=compBy(p.c), sel=S.sel.t==='comp'&&S.sel.cid===p.c;
+  return '<div class="comp'+(sel?' sel':'')+'" data-sc="'+p.c+'"><div class="cname"><span class="dot"></span>'+esc(c.name)+'</div>'+sketch(p.c)+'</div>';
+}
+function roomHTML(){
+  var r=R(), s=SCHEMES[r.scheme], dark=lum(s.bg)<.5;
+  var style='--rbg:'+s.bg+';--racc:'+s.acc+';--rdeep:'+s.deep+';--rink:'+(dark?'#E8ECF4':'#191919')+';--rline:'+(dark?'rgba(232,236,244,.14)':'rgba(25,25,25,.10)');
+  if(!r.plan){
+    var gp=PLANS.three;
+    return '<div class="room ghost" data-border="dot" data-radius="10" style="grid-template-areas:'+gp.areas+';grid-template-columns:'+gp.cols+';grid-template-rows:1fr auto">'+
+      '<div class="rslot" style="grid-area:left"></div><div class="rslot" style="grid-area:right"></div>'+
+      '<div class="rslot" style="grid-area:input;min-height:40px"></div>'+
+      '<div class="ghostmsg" style="grid-area:main">An empty room.<br>Give it a layout: <code>layout:"Three-panel"</code><br>or be walked through it: <code>new:room guided</code></div></div>';
+  }
+  var P=PLANS[r.plan], mobile=r.device==='mobile';
+  var areas=mobile?"'main' 'input' 'sheet'":P.areas, cols=mobile?'minmax(0,1fr)':P.cols;
+  var slots=mobile?['main','input','sheet']:Object.keys(P.slots);
+  var h='<div class="room'+(mobile?' mobile':'')+(dark?' dk':'')+'" data-border="dot" data-radius="10" style="'+style+';grid-template-areas:'+areas+';grid-template-columns:'+cols+';grid-template-rows:'+(areas.split("' '").length>2?'1fr auto auto':'1fr auto')+'">';
+  slots.forEach(function(sl){
+    var ps=r.comps.filter(function(p){return mobile&&sl==='sheet'?['left','right','sheet'].indexOf(p.slot)>-1:p.slot===sl;});
+    var capN=mobile&&sl==='sheet'?0:(P.slots[sl]||0)-ps.length;
+    h+='<div class="rslot" data-slot="'+sl+'" style="grid-area:'+sl+'"><div class="rlab">'+(mobile&&sl==='sheet'?'bottom sheet, where the rails fold on a phone':SLOTNAME[sl])+'</div>';
+    h+=(mobile&&sl==='sheet'?'<div class="sheetrow">'+ps.map(compBlock).join('')+'</div>':ps.map(compBlock).join(''));
+    if(capN>0&&!(mobile&&sl==='sheet')) h+='<div class="cap">room for '+capN+' more</div>';
+    if(!ps.length&&!(capN>0)) h+='<div class="cap">empty</div>';
+    h+='<div class="why"></div></div>';
+  });
+  return h+'</div>';
+}
+var GUIDE=[
+  {verb:'layout',q:'What is this room for?',why:'This picks a layout: where the main area and the rails go.',
+   opts:[['Writing long pieces','layout:"Document-centric"'],['Talking things through','layout:"Three-panel"'],['Tables and data','layout:"Canvas-centric"'],['Quick questions','layout:"Single column with sheet"']]},
+  {verb:'device',q:'Where will you use it?',why:'A room built for a phone folds its rails into a sheet.',opts:[['At a desk','device:desktop'],['On a phone','device:mobile']]},
+  {verb:'place',q:'What should be in reach?',why:'Blocks are the pieces of a room. You can add more from the Library at any time.',
+   opts:[['Highlights and notes','place:highlights, notes'],['Branches','place:branches'],['Context health','place:context health'],['Step list','place:step list']]},
+  {verb:'set',q:'Should it search the web?',why:'Web search is a feature of the input block, not a block of its own. It spends tokens when used.',
+   opts:[['Yes, when I ask','set:input web search on'],['No','set:input web search off']]},
+  {verb:'theme',q:'How should it feel?',why:'A theme colours the inside of the room. The Lab around it stays as it is.',
+   opts:[['Soft Violet','theme:"Soft Violet"'],['Deep Calm','theme:"Deep Calm"'],['Fresh Teal','theme:"Fresh Teal"'],['Amber Glow','theme:"Amber Glow"']]},
+  {verb:'name',q:'What is it called?',why:'Type your own after name:, or take one of these.',opts:[['Essay room','name:"Essay room"'],['Thinking room','name:"Thinking room"'],['Data desk','name:"Data desk"']]}
+];
+function guideHTML(){
+  var g=S.guide; if(!g) return '';
+  var track='<div class="gtrack">'+GUIDE.map(function(x,i){return '<i class="'+(i<g.step?'done':i===g.step?'now':'')+'"></i>';}).join('')+'</div>';
+  if(g.step>=GUIDE.length) return '<div class="guide" data-border="dot" data-radius="12"><div class="gtop"><span class="gstep">done</span>'+track+'</div>'+
+    '<div class="gq">The room is built.</div><div class="gwhy">Every step was a command. Press \u2191 in the field to see them again, or undo: to take one back.</div>'+
+    '<div class="gfoot"><button data-guide="off">put the guide away</button></div></div>';
+  var st=GUIDE[g.step];
+  return '<div class="guide" data-border="dot" data-radius="12"><div class="gtop"><span class="gstep">'+(g.step+1)+' of '+GUIDE.length+'</span>'+track+'</div>'+
+    '<div class="gq">'+st.q+'</div><div class="gwhy">'+st.why+' Each answer writes a command into the field; Enter runs it.</div>'+
+    '<div class="gopts">'+st.opts.map(function(o){return '<button data-w="'+esc(o[1])+'" data-border="dot" data-radius="8">'+esc(o[0])+'<small>'+esc(o[1])+'</small></button>';}).join('')+'</div>'+
+    '<div class="gfoot"><button data-guide="skip">skip this one</button><button data-guide="off">put the guide away</button><span>new:room guided brings it back</span></div></div>';
+}
+/* The card is the Canvas, named plainly so it can be called (pop:canvas).
+   The room being edited, and every picker for it, sit on one line under the
+   rule, vertically centred. Select a block and the same line becomes
+   "Writing Studio / Highlights" with that block's pickers: one place for
+   marginalia, which changes what it says rather than moving. */
+function roomLine(){
+  var r=R(), sel=S.sel, plans=Object.keys(PLANS).filter(function(k){return !PLANS[k].soon;});
+  function line(title,left,right){return '<div class="rline"><div class="rl-t">'+title+'</div>'+marg(left)+'<div class="rl-act">'+marg(right)+'</div></div>';}
+  if(sel.t==='comp'&&inRoom(sel.cid)){
+    var c=compBy(sel.cid), p=inRoom(sel.cid);
+    var slotOpts=Object.keys(planSlots()).map(function(s){return [SLOTNAME[s]+(c.fits.indexOf(s)<0?' (not built for it)':''),'place:'+c.name.toLowerCase()+' '+s];});
+    var left=[pick(SLOTNAME[p.slot],slotOpts,'Where it sits')];
+    if(c.cfg) Object.keys(c.cfg).forEach(function(key){left.push(pick((c.feat?key+' ':'')+getCfg(c.id,key),c.cfg[key].map(function(v){return [v,'set:'+c.name.toLowerCase()+' '+key+' '+v];}),key.charAt(0).toUpperCase()+key.slice(1)));});
+    var right=[W('inspect:'+c.name.toLowerCase(),'inspect')]; if(!c.req) right.push(W('rm:'+c.name.toLowerCase(),'rm'));
+    return line('<button class="crumb" data-selroom="1">'+esc(r.name)+'</button><span class="sl">/</span>'+esc(c.name),left,right);
+  }
+  return line(esc(r.name),
+    [pick(r.plan?PLANS[r.plan].name:'no layout',plans.map(function(k){return [PLANS[k].name,'layout:"'+PLANS[k].name+'"'];}),'Layout'),
+     pick(SCHEMES[r.scheme].name,Object.keys(SCHEMES).map(function(k){return [SCHEMES[k].name,'theme:"'+SCHEMES[k].name+'"'];}),'Theme'),
+     pick(r.device==='mobile'?'Mobile':'Desktop',[['Desktop','device:desktop'],['Mobile','device:mobile']],'Built for')],
+    [W('name:""','name',' data-addr="canvas"'),W('inspect:"'+r.name+'"','inspect')]);
+}
+function canvasHTML(popped){
+  return '<div class="chead"><span class="ctitle">Canvas</span></div>'+roomLine()+
+    '<div class="cvwrap">'+guideHTML()+'<div class="cvroom">'+roomHTML()+'</div></div>';
+}
+
+/* ── inspect: one thing in detail, the same overlay everywhere ── */
+function irow(k,v){return '<div class="irow"><span class="k">'+k+'</span><span class="v">'+v+'</span></div>';}
+function inspectHTML(key){
+  var h='', r=R();
+  if(key==='room:current') key='mine:'+R().name;
+  if(false){
+    h+='<div class="ihead"><span class="iname">'+esc(r.name)+'</span><span class="lpill mine">your room</span></div><div class="idesc">'+esc(describeRoom(r))+'.</div><div class="irows">';
+    h+=irow('Blocks',esc(list(r.comps.map(function(p){return compBy(p.c).name+' ('+SLOTNAME[p.slot]+')';}))||'none yet'));
+    h+=irow('Input features',esc(list(compBy('input').feat.filter(function(f){return getCfg('input',f)==='on';}))||'none on'));
+    h+=irow('Chats in it','12, in the Almanac as room:"'+esc(r.name)+'"')+'</div>';
+    return h+marg([W('duplicate:"'+r.name+'"','duplicate'),W('export:room','export'),'<button data-closeinsp="1">close</button>']);
+  }
+  var it=byKey(key); if(!it) return '';
+  h+='<div class="ihead"><span class="iname">'+esc(it.name)+'</span><span class="lpill">'+KLAB[it.k]+'</span>'+(it.soon?'<span class="lpill soon">coming soon</span>':'')+'</div><div class="idesc">'+esc(it.desc)+'</div><div class="irows">';
+  h+=irow('By',esc(it.mine?'you':it.by||'@parliament'));
+  if(it.k==='comp'){var c=compBy(it.cid);
+    h+=irow('Goes in',esc(PLACE[c.place]))+irow('Fits',esc(list(c.fits.map(function(s){return SLOTNAME[s];}))))+irow('Needs',esc(c.needs));
+    if(c.feat) h+=irow('Features',c.feat.map(function(f){return '<div style="margin-bottom:4px"><span style="font-weight:500">'+f+'</span><br><span style="color:var(--p-ink-2);font-size:11px">'+esc(FEATDESC[f])+'</span></div>';}).join(''));
+    else if(c.cfg) h+=irow('Settings',esc(list(Object.keys(c.cfg))));
+    h+=irow('Used',esc(usedIn(it)))+irow('Version',c.ver);}
+  if(it.k==='board') h+=irow('Goes in',PLACE.arrangement)+irow('Built from','blocks, and editable in the Lab like a room');
+  if(it.k==='plan'&&!it.soon) h+=irow('Places',esc(list(Object.keys(PLANS[it.pid].slots).map(function(s){return SLOTNAME[s]+' ('+PLANS[it.pid].slots[s]+')';}))));
+  if(it.k==='room'&&!it.soon){var src=it.mine?S.rooms[it.ri].comps.map(function(p){return p.c;}):TEMPLATES[it.name].comps.map(function(p){return p[0];});
+    h+=irow('Blocks',esc(list(src.map(function(id){return compBy(id).name;}))));}
+  if(it.k==='scheme') h+=irow('Colours','<span style="display:inline-flex;gap:5px">'+['bg','acc','deep'].map(function(x){return '<i style="width:14px;height:14px;border-radius:50%;background:'+SCHEMES[it.sid][x]+';border:.5px solid rgba(25,25,25,.15);display:inline-block"></i>';}).join('')+'</span>')+irow('Used',esc(usedIn(it)));
+  if(it.k==='res') h+=irow('Format',esc(it.fmt));
+  h+=irow('Updated','Sep 23, 2026')+'</div>';
+  if(it.mine){var rr=S.rooms[it.ri]; h=h.replace('<div class="irows">','<div class="irows">'+irow('Rail buttons',pick(rr.rails,[['both','set:room rails both'],['left only','set:room rails left'],['right only','set:room rails right'],['none','set:room rails none']],'Rail buttons'))+irow('Input features',esc(list(compBy('input').feat.filter(function(f){return ((rr.cfg.input||{})[f]||DEFCFG.input[f])==='on';}))||'none on'))+irow('Chats in it','12, in the Almanac as room:"'+esc(rr.name)+'"'));}
+  return '<button class="xclose" data-closeinsp="1" aria-label="Close">\u00d7</button>'+h+itemMarg(it);
+}
+/* ── collection ── */
+function attr(it,a){
+  if(a==='Kind') return KLAB[it.k];
+  if(a==='Fits') return it.k==='comp'?list(compBy(it.cid).fits.map(function(s){return SLOTNAME[s];})):'\u2013';
+  if(a==='Needs') return it.k==='comp'?compBy(it.cid).needs:'nothing';
+  if(a==='Used') return usedIn(it).replace(' of your rooms','');
+  if(a==='Settings') return it.k==='comp'?(compBy(it.cid).cfg?Object.keys(compBy(it.cid).cfg).join(', '):'none'):'\u2013';
+  if(a==='Goes in') return it.k==='comp'?PLACE[compBy(it.cid).place]:it.k==='board'?PLACE.arrangement:'\u2013';
+  return '';
+}
+function compareHTML(){
+  var its=collKeys().map(byKey).filter(Boolean).slice(0,4);
+  if(its.length<2) return '<div class="reply"><div class="q">compare</div>Compare needs two things in the collection.</div>';
+  var rows=['Kind','Goes in','Fits','Needs','Settings','Used'];
+  var h='<table class="cmpt"><tr><th></th>'+its.map(function(i){return '<th>'+esc(i.name)+'</th>';}).join('')+'</tr>';
+  rows.forEach(function(a){var vals=its.map(function(i){return attr(i,a);});var d=vals.some(function(v){return v!==vals[0];});
+    h+='<tr><td class="k">'+a+'</td>'+vals.map(function(v){return '<td class="'+(d?'diff':'')+'">'+esc(v)+'</td>';}).join('')+'</tr>';});
+  return h+'</table><div class="marg" style="margin:-4px 0 10px">'+'<span>facts from your rooms, no tokens spent</span>'+sep()+W('compare:off','close the comparison')+'</div>';
+}
+function collHTML(popped){
+  var items=S.coll.items, n=collKeys().length, named=!!S.coll.name;
+  var h='<div class="wshead"><span class="wsname">'+esc(S.coll.name||'Collection')+'</span><span class="wskind '+(named?'saved':'draft')+'">'+(named?'kept':'unsaved')+'</span>'+
+    '<span class="wscount">'+(n?plural(n,'thing'):'')+'</span>'+'</div>';
+  h+='<div class="wsbody">';
+  if(!items.length){
+    h+='<div class="wsempty"><p>Nothing collected yet. Click <i>collect</i> on anything in the Library, or type <b>add:</b> and a name.<br><br>A collection starts the moment something goes in, and its source is wherever that came from.</p></div></div>';
+    return h;
+  }
+  h+='<div class="scopeline" style="margin-bottom:8px">from <b>the Library</b>'+(S.coll.name?'':' <span>\u00b7 name:"\u2026" keeps it</span>')+'</div>';
+  if(S.coll.note) h+='<div class="cnote">'+esc(S.coll.note)+'</div>';
+  if(S.cmp) h+=compareHTML();
+  if(S.reply) h+='<div class="reply"><div class="q">'+esc(S.reply.q)+'</div>'+esc(S.reply.a)+'<div class="marg"><span>sample reply</span>'+sep()+'<span>Sonnet, about $0.01</span>'+sep()+W('note:collection "'+S.reply.a.slice(0,40)+'\u2026"','keep as a note')+sep()+'<button data-dropreply="1">dismiss</button></div></div>';
+  var num=0;
+  items.forEach(function(e){
+    if(e.t==='s'){h+='<div class="csec"><b>'+esc(e.name)+'</b></div>';return;}
+    var it=byKey(e.key); if(!it) return; num++;
+    h+='<div class="ci"><span class="num">'+num+'</span>'+pvFor(it)+'<div style="min-width:0"><div class="nm">'+esc(it.name)+' <span class="lpill">'+KLAB[it.k]+'</span></div>'+
+      (e.note?'<div class="nt">'+esc(e.note)+'</div>':'')+
+      marg([it.k==='comp'&&inRoom(it.cid)?'<span>in this room</span>':'<span>'+(it.k==='room'?'':usedIn(it))+'</span>',W('note:'+it.name.toLowerCase()+' ""','note'),W('rm:'+it.name.toLowerCase(),'rm',' data-addr="collection"')])+'</div></div>';
+  });
+  h+='</div><div class="wsacts"><div class="btnrow">'+
+    '<button data-w="compare:" data-border="dot" data-radius="8">Compare</button>'+
+    '<button data-w="apply:" data-border="dot" data-radius="8">Apply</button>'+
+    '<button data-ask="1" data-border="dot" data-radius="8">Ask</button>'+
+    '<button data-w="export:collection" data-border="dot" data-radius="8">Export</button></div>'+
+    '<div class="sugg"><button data-p="How are these different?">How are these different?</button><button data-p="Which of these suits long-form writing?">Which suits long-form writing?</button><button data-p="What have I used these for?">What have I used these for?</button></div></div>';
+  return h;
+}
+
+/* ── layout ── */
+var CARDS={library:libHTML,canvas:canvasHTML,collection:collHTML};
+var WIN_T={library:'Library',canvas:'Canvas',collection:'Collection'};
+function cardEl(name,popped){
+  return '<div class="lcard'+(name==='collection'?' flat coll':'')+(S.addr===name?' addr':'')+'" data-card="'+name+'"'+(name==='collection'?'':' data-border="dot" data-radius="16"')+'>'+CARDS[name](popped)+'</div>';
+}
+function render(){
+  var wrap=document.getElementById('wrap'), shown={};
+  ['library','canvas','collection'].forEach(function(c){shown[c]=!S.pops[c]&&!S.hidden[c];});
+  var cols=[], tpl=[];
+  S.order.forEach(function(sl){
+    if(sl==='side'){ if(shown.collection){cols.push('collection');tpl.push('clamp(290px,23vw,360px)');} }
+    else if(shown[sl]){cols.push(sl);tpl.push(sl==='canvas'?'minmax(0,1fr)':'clamp(270px,21vw,330px)');}
+  });
+  if(cols.indexOf('canvas')<0){cols.push('_');tpl.push('minmax(0,1fr)');}
+  document.documentElement.style.setProperty('--tpl',tpl.join(' '));
+  document.documentElement.style.setProperty('--barcol',(Math.max(cols.indexOf('canvas'),cols.indexOf('_'),0)+1));
+  wrap.innerHTML=cols.map(function(sl){
+    if(sl==='_') return '<div class="slot"><div class="popph">The Canvas is in its own window.</div></div>';
+    return '<div class="slot">'+cardEl(sl)+'</div>';
+  }).join('');
+  var wins=document.getElementById('wins'), keep={};
+  Object.keys(S.pops).forEach(function(name){
+    keep[name]=1;
+    var p=S.pops[name], el=document.getElementById('win-'+name);
+    if(!el){el=document.createElement('div');el.id='win-'+name;el.className='fwin';wins.appendChild(el);}
+    el.style.left=p.x+'px';el.style.top=p.y+'px';el.style.width=p.w+'px';
+    el.innerHTML='<div class="fbar" data-drag="'+name+'"><span class="dots"><i></i><i></i><i></i></span>'+WIN_T[name]+', in its own window'+
+      '<span class="marg"><span>a real window in the product</span><span class="sep">·</span><button data-do="back:'+name+'">bring it back</button></span></div><div class="fin">'+cardEl(name,true)+'</div>';
+  });
+  Array.prototype.slice.call(wins.children).forEach(function(el){if(!keep[el.id.slice(4)]) el.remove();});
+  /* The Lab arrangement is the Library and the Canvas. The collection is not
+     part of it, so a closed collection is not reported as missing. */
+  var away=Object.keys(S.pops).concat(Object.keys(S.hidden).filter(function(k){return S.hidden[k]&&k!=='collection';}));
+  document.getElementById('poprow').innerHTML=away.length?away.map(function(k){return WIN_T[k]+(S.pops[k]?' is in its own window, ':' is closed, ')+
+      '<button data-do="'+(S.pops[k]?'back:':'open:')+k+'">'+(S.pops[k]?'bring it back':'open it')+'</button>';}).join('<span class="sep"> \u00b7 </span>'):'';
+  paintAll(); hint(); applyGlow();
+  /* keep the item whose details just opened in view */
+  if(S.insp&&S.insp!==render.lastInsp){var el=document.querySelector('[data-card=library] .li.sel'); if(el&&el.scrollIntoView) el.scrollIntoView({block:'nearest'});}
+  render.lastInsp=S.insp;
+}
+
+/* ═══ Where a block fits ═══
+   The old Lab lit up the slots while a block was dragged. Without drag, the
+   same light comes on when you hover a block in the Library, hover its
+   place marginalia, or type place: with a block named. The best free slot
+   shows strongest, other slots it fits more gently; a full slot, or one it
+   is not built for, dims and says why. A slot word narrows it to that slot.
+   Navy, not gold: it previews what the command will address. */
+var HOVERGLOW=null;
+function glowFor(cid,only){
+  var r=R(); if(!r.plan) return null;
+  var c=compBy(cid), ps=planSlots(), here=inRoom(cid), out={}, best=null;
+  Object.keys(ps).forEach(function(s){
+    var n=slotCount(s)-(here&&here.slot===s?1:0), full=n>=ps[s], fits=c.fits.indexOf(s)>-1;
+    if(only&&s!==only){out[s]={k:'off'};return;}
+    if(here&&here.slot===s) out[s]={k:'off',why:'it is here now'};
+    else if(!fits&&!only) out[s]={k:'no',why:'not built for it'};
+    else if(full) out[s]={k:'no',why:'full'};
+    else if(!fits) out[s]={k:'two',why:'not built for it'};
+    else {out[s]={k:'two'}; if(!best) best=s;}
+  });
+  c.fits.forEach(function(s){if(out[s]&&out[s].k==='two'&&!best) best=s;});
+  var first=null; for(var i=0;i<c.fits.length;i++){if(out[c.fits[i]]&&out[c.fits[i]].k==='two'){first=c.fits[i];break;}}
+  if(only&&out[only]&&out[only].k==='two') first=only;
+  if(first) out[first].k='one';
+  return out;
+}
+function applyGlow(){
+  var g=null, v=document.getElementById('q').value, p=/^>/.test(v)?parse(v):null;
+  if(p&&p.colon&&p.s==='place'){var sp=splitSlot(p.a), nm=names(sp.rest)[0], it=nm&&find(nm,['comp']); if(it) g=glowFor(it.cid,sp.slot);}
+  if(!g&&HOVERGLOW) g=glowFor(HOVERGLOW,null);
+  document.querySelectorAll('.room .rslot[data-slot]').forEach(function(el){
+    var s=el.getAttribute('data-slot'), st=g&&g[s];
+    el.classList.remove('g1','g2','g0'); var w=el.querySelector('.why'); if(w) w.textContent='';
+    if(!st) return;
+    if(st.k==='one') el.classList.add('g1'); else if(st.k==='two') el.classList.add('g2'); else if(st.k==='no'){el.classList.add('g0'); if(w) w.textContent=st.why;}
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   THE VERBS
+   Same shape as the Almanac and the docket: pre() says what Enter will do
+   before you press it, run() does it. Nothing runs without an Enter line.
+   ═══════════════════════════════════════════════════════════════════ */
+function unq(t){var m=String(t||'').match(/"([^"]*)"|“([^”]*)”/);return m?(m[1]!=null?m[1]:m[2]):String(t||'').trim();}
+function names(a){return String(a||'').split(',').map(function(x){return x.replace(/["“”]/g,'').trim();}).filter(Boolean);}
+function splitSlot(a){
+  var w=String(a||'').trim().split(/\s+/);
+  for(var n=2;n>=1;n--){ if(w.length>n){ var tail=w.slice(-n).join(' '), s=slotWord(tail); if(s) return {rest:w.slice(0,-n).join(' '),slot:s}; } }
+  return {rest:String(a||'').trim(),slot:null};
+}
+var ANY=null;
+function heldSection(){
+  var i=S.coll.items.findIndex(function(e){return e.t==='s'&&e.name==='Held from the room';});
+  if(i<0){S.coll.items.push({t:'s',name:'Held from the room'});i=S.coll.items.length-1;}
+  return i;
+}
+function addToColl(key,held){
+  if(collHas(key)) return;
+  if(held){var i=heldSection();S.coll.items.splice(S.coll.items.length,0,{t:'i',key:key});}
+  else{ var hi=S.coll.items.findIndex(function(e){return e.t==='s'&&e.name==='Held from the room';});
+    if(hi>-1) S.coll.items.splice(hi,0,{t:'i',key:key}); else S.coll.items.push({t:'i',key:key}); }
+}
+function dropFromColl(key){S.coll.items=S.coll.items.filter(function(e){return !(e.t==='i'&&e.key===key);});
+  var last=S.coll.items[S.coll.items.length-1]; if(last&&last.t==='s'&&last.name==='Held from the room') S.coll.items.pop();}
+function launch(what){return {ok:'Enter opens '+what+'; this mockup stops at the Lab',run:function(){toast('Not built here: that leaves the Lab.');}};}
+function notBuilt(msg){return {ok:msg,run:function(){toast('Not built in this mockup.');}};}
+var PANELS={library:'library',lib:'library',canvas:'canvas',room:'canvas',collection:'collection',coll:'collection'};
+
+/* plan migration, used by plan: and apply: */
+function migrate(pid){
+  var P=PLANS[pid], taken={}, moves=[], held=[], keep=[], r=R();
+  function room(s){return (P.slots[s]||0)-(taken[s]||0);}
+  r.comps.forEach(function(p){
+    var c=compBy(p.c), to=null;
+    if(room(p.slot)>0) to=p.slot; else for(var i=0;i<c.fits.length;i++){if(room(c.fits[i])>0){to=c.fits[i];break;}}
+    if(to){taken[to]=(taken[to]||0)+1;keep.push({c:p.c,slot:to});if(to!==p.slot) moves.push(c.name+' moves from the '+SLOTNAME[p.slot]+' to the '+SLOTNAME[to]);}
+    else held.push(p.c);
+  });
+  var adds=[];
+  if(!r.plan){ var base=[['messages','main'],['input','input']]; if(pid==='doc') base.unshift(['doccanvas','main']); if(pid==='canvas') base=[['table','main'],['input','input']];
+    base.forEach(function(b){if(room(b[1])>0){taken[b[1]]=(taken[b[1]]||0)+1;keep.push({c:b[0],slot:b[1]});adds.push(compBy(b[0]).name);}}); }
+  return {keep:keep,moves:moves,held:held,adds:adds};
+}
+
+function addToCollection(its){
+  its=its.filter(function(x){return !collHas(x.key);}); if(!its.length) return {bad:'already in the collection'};
+  var start=!collKeys().length;
+  return {ok:'Enter '+(start?'starts a collection from the Library with ':'adds ')+list(its.map(function(x){return x.name;}))+(start?'':' to the collection'),run:function(){
+    its.forEach(function(x){addToColl(x.key);});S.hidden.collection=false;}};
+}
+var V=[
+ /* Go to */
+ {s:'edit',eg:'edit:"Essay room"',g:'open a board in the Lab',grp:'Go to',pre:function(a){
+   var n=unq(a); if(!n) return {bad:'edit which? edit:"Essay room", or edit:almanac'};
+   if(/^\d+$/.test(n.trim())) return {bad:n+' is an item; edit: works on boards and rooms'};
+   var b=find(n,['board']); if(b) return notBuilt('Enter opens the '+b.name+' board in the Lab, with its blocks exposed');
+   var it=find(n,['room']); if(!it) return {bad:'no board or room called '+n};
+   if(!it.mine) return {bad:it.name+' is a template; duplicate:"'+it.name+'" makes it yours to edit'};
+   if(it.ri===S.cur) return {bad:'you are already editing '+it.name};
+   return {ok:'Enter opens '+it.name+' here',run:function(){S.cur=it.ri;S.sel={t:'room'};S.tries=[];}};}},
+ {s:'lab',eg:'lab:',g:'the Lab, from anywhere',grp:'Go to',pre:function(){return {bad:'you are in the Lab'};}},
+ {s:'open',eg:'open:library, or open:"Writing Studio"',g:'bring a board here, or focus it',grp:'Go to',pre:function(a){
+   var n=norm(unq(a)), p=PANELS[n];
+   if(p){ if(!S.pops[p]&&!S.hidden[p]) return {ok:'the '+p+' is already here; Enter focuses it',run:function(){S.addr=p;}};
+     return {ok:'Enter brings the '+p+' onto this screen',run:function(){S.hidden[p]=false;delete S.pops[p];S.addr=p;}}; }
+   var b=find(n,['board']); if(b) return launch('the '+b.name+' board on this screen');
+   var it=find(n,['room']); if(it) return launch(it.name+' with a new chat');
+   if(/^\d+$/.test(n)) return launch(n+' where it left off');
+   return {bad:'open what? a board, a room, or an id'};}},
+ {s:'close',eg:'close:collection',g:'take a board off the screen; nothing is lost',grp:'Go to',pre:function(a){
+   var p=PANELS[norm(a)]; if(!p) return {bad:'close which? library, room or collection'};
+   if(S.hidden[p]) return {bad:'the '+p+' is already closed'};
+   return {ok:'Enter takes the '+p+' off the screen; open:'+p+' brings it back',run:function(){S.hidden[p]=true;delete S.pops[p];if(S.addr===p)S.addr='canvas';}};}},
+ {s:'library',eg:'library:themes',g:'same as open:library, on one kind',grp:'Go to',pre:function(a){
+   var map={rooms:'room',boards:'board',layouts:'plan',layout:'plan',blocks:'comp',block:'comp',themes:'scheme',theme:'scheme',resources:'res'};
+   var k=map[norm(a)]||(norm(a)?null:'all'); if(!k) return {bad:'the Library has rooms, boards, layouts, blocks, themes and resources'};
+   return {ok:'Enter shows the Library'+(k==='all'?'':' on its '+norm(a)),run:function(){S.hidden.library=false;S.lib.kind=k;S.addr='library';}};}},
+ {s:'resources',eg:'resources:',g:'guides and references, popped out',grp:'Go to',pre:function(){
+   return {ok:'Enter opens the Library on its resources, in its own window',run:function(){S.lib.kind='res';popOut('library');}};}},
+ {s:'alm',eg:'alm:',g:'same as open:almanac',grp:'Go to',pre:function(){return launch('the Almanac board on this screen');}},
+ {s:'arrange',eg:'arrange:save "Build desk"',g:'switch to, or save, an arrangement',grp:'Go to',pre:function(a){
+   return /^save\b/.test(norm(a))?notBuilt('Enter saves what is on screen as '+(unq(a.replace(/^\s*save/i,''))||'a new arrangement')+'; window positions stay on this computer'):launch('the arrangement '+(unq(a)||'you named'));}},
+ {s:'home',eg:'home:set "Writing Studio"',g:'go home, or set where home is',grp:'Go to',pre:function(a){
+   return /^set\b/.test(norm(a))?notBuilt('Enter makes '+(unq(a.replace(/^\s*set/i,''))||'this room')+' the place Parliament opens to'):launch('home');}},
+
+ /* Rooms */
+ {s:'new',eg:'new:room guided',g:'an empty room here, or with the guide',grp:'Rooms',pre:function(a){
+   var t=norm(a);
+   if(/^room/.test(t)){var g=/guided/.test(t);
+     return {ok:'Enter starts an empty room here'+(g?', with the guide':'; new:room guided walks you through it'),run:function(){
+       S.rooms.push({name:'Untitled room',plan:null,scheme:'default',device:'desktop',rails:'both',cfg:{},comps:[]});S.cur=S.rooms.length-1;S.sel={t:'room'};S.tries=[];S.insp=null;
+       S.guide=g?{step:0}:null;}};}
+   if(/^(chat|docket)/.test(t)) return launch('a new '+t.split(' ')[0]);
+   return {bad:'new what? room, room guided, chat or docket'};}},
+ {s:'duplicate',eg:'duplicate:"Writing Studio"',g:'copy a room and edit the copy here',grp:'Rooms',pre:function(a){
+   var n=unq(a); var it=find(n,['room']); if(!it) return {bad:n?'no room called '+n:'duplicate which room?'};
+   if(it.soon) return {bad:it.name+' is coming soon'};
+   var base=it.name, k=2; while(S.rooms.some(function(r){return r.name===base+' '+k;})) k++;
+   var nn=base+' '+k;
+   return {ok:'Enter copies '+(it.mine?'your ':'the template ')+it.name+' as '+nn+' and opens it here',run:function(){
+     var copy=it.mine?JSON.parse(JSON.stringify(S.rooms[it.ri])):roomFromTpl(nn,it.name); copy.name=nn;
+     S.rooms.push(copy);S.cur=S.rooms.length-1;S.sel={t:'room'};S.tries=[];}};}},
+ {s:'layout',eg:'layout:"Document-centric"',g:'where blocks go in this room',grp:'Rooms',pre:function(a){
+   var it=find(unq(a),['plan']); if(!it) return {bad:'which layout? '+Object.keys(PLANS).filter(function(k){return !PLANS[k].soon;}).map(function(k){return PLANS[k].name;}).join(', ')};
+   if(it.soon) return {bad:it.name+' is coming soon'};
+   if(R().plan===it.pid) return {bad:'this room already uses '+it.name};
+   var m=migrate(it.pid), bits=[];
+   if(m.adds.length) bits.push(list(m.adds)+' go in, since a room needs somewhere to talk');
+   bits=bits.concat(m.moves);
+   if(m.held.length) bits.push(list(m.held.map(function(c){return compBy(c).name;}))+' '+(m.held.length>1?'have':'has')+' no place and '+(m.held.length>1?'come':'comes')+' out of the room; undo: puts '+(m.held.length>1?'them':'it')+' back');
+   if(!bits.length&&R().plan) bits.push('everything keeps its place');
+   return {ok:'Enter uses '+it.name+(bits.length?'; '+bits.join('; '):''),run:function(){
+     R().plan=it.pid;R().comps=m.keep;}};}},
+ {s:'theme',eg:'theme:"Deep Calm", or theme:any',g:'colour and type inside the room',grp:'Rooms',pre:function(a){
+   var sid;
+   if(norm(a)==='any'){ if(!ANY||ANY===R().scheme){var ks=Object.keys(SCHEMES).filter(function(k){return k!==R().scheme;});ANY=ks[Math.floor(Math.random()*ks.length)];} sid=ANY; }
+   else {var it=find(unq(a),['scheme']); if(!it) return {bad:'which theme? '+Object.keys(SCHEMES).map(function(k){return SCHEMES[k].name;}).join(', ')}; sid=it.sid;}
+   if(sid===R().scheme) return {bad:'the room is already in '+SCHEMES[sid].name};
+   return {ok:'Enter paints the room in '+SCHEMES[sid].name+(norm(a)==='any'?', picked at random; undo: brings the old one back':'; the Lab around it stays as it is'),
+     run:function(){R().scheme=sid;ANY=null;}};}},
+ {s:'device',eg:'device:mobile',g:'what the room is built for',grp:'Rooms',pre:function(a){
+   var t=norm(a), d=t==='phone'||t==='mobile'?'mobile':t==='desktop'||t==='desk'?'desktop':null;
+   if(!d) return {bad:'desktop or mobile'}; if(R().device===d) return {ok:'Enter keeps this room built for '+d+'; it already is',run:function(){}};
+   return {ok:'Enter builds this room for '+d+(d==='mobile'?'; the rails fold into a bottom sheet':''),run:function(){R().device=d;}};}},
+ {s:'delete',eg:'delete:"Essay room"',g:'destroy it; the Library keeps templates',grp:'Rooms',pre:function(a){
+   if(/\d/.test(a)&&!/"/.test(a)) return {bad:'ids live in the Almanac; delete:207 works there'};
+   var it=find(unq(a),['room']); if(!it) return {bad:'delete which room?'};
+   if(!it.mine) return {bad:it.name+' is from the Library; there is nothing of yours to delete'};
+   return {ok:'Enter deletes your room '+it.name+'; its chats stay in the Almanac and keep its name; undo: brings it back',run:function(){
+     S.rooms.splice(it.ri,1); if(!S.rooms.length) S.rooms.push({name:'Untitled room',plan:null,scheme:'default',device:'desktop',rails:'both',cfg:{},comps:[]});
+     S.cur=Math.min(S.cur,S.rooms.length-1); S.sel={t:'room'};}};}},
+ {s:'export',eg:'export:room',g:'a file to give someone',grp:'Rooms',pre:function(a){
+   return notBuilt(/coll/.test(norm(a))?'Enter exports the collection as a mode file of its parts':'Enter makes '+R().name+' into a file you can give to someone, every choice included');}},
+
+ /* Parts */
+ {s:'place',eg:'place:highlights right',g:'put a component in, or move it',grp:'Parts',pre:function(a){
+   if(!R().plan) return {bad:'this room has no layout yet; layout:"Three-panel" first'};
+   var sp=splitSlot(a), ns=names(sp.rest); if(!ns.length) return {bad:'place what? place:highlights right'};
+   var ps=planSlots(); if(sp.slot&&!ps[sp.slot]) return {bad:PLANS[R().plan].name+' has no '+SLOTNAME[sp.slot]};
+   var ops=[], load={}, lines=[];
+   var feat=norm(sp.rest); if(FEATDESC[feat]) return getCfg('input',feat)==='on'?{bad:feat.charAt(0).toUpperCase()+feat.slice(1)+' is already on in Input'}:
+     {ok:'Enter switches on '+feat+'; it is a feature of the input block, not a block of its own',run:function(){R().cfg.input=R().cfg.input||{};R().cfg.input[feat]='on';S.sel={t:'comp',cid:'input'};}};
+   for(var i=0;i<ns.length;i++){
+     var it=find(ns[i],['comp']); if(!it) return {bad:'no block called '+ns[i]};
+     var c=compBy(it.cid), here=inRoom(c.id), to=sp.slot;
+     if(!to){ if(here) return {bad:'where to? place:'+c.name.toLowerCase()+' left'};
+       var ps2=planSlots(); to=null; for(var j=0;j<c.fits.length;j++){var s=c.fits[j]; if(ps2[s]&&slotCount(s)+(load[s]||0)<ps2[s]){to=s;break;}}
+       if(!to) return {bad:'nowhere in '+PLANS[R().plan].name+' has room for '+c.name+'; the '+list(c.fits.filter(function(x){return ps2[x];}).map(function(x){return SLOTNAME[x];}))+' '+(c.fits.filter(function(x){return ps2[x];}).length>1?'are':'is')+' full; rm: something first'}; }
+     if(here&&here.slot===to) return {bad:c.name+' is already in the '+SLOTNAME[to]};
+     if(slotCount(to)+(load[to]||0)>=ps[to]) return {bad:'the '+SLOTNAME[to]+' is full; rm: something first'};
+     load[to]=(load[to]||0)+1;
+     var t=(here?'moves '+c.name+' from the '+SLOTNAME[here.slot]+' to the ':'places '+c.name+' in the ')+SLOTNAME[to];
+     if(c.fits.indexOf(to)<0) t+=', which it is not built for, so it may be cramped';
+     lines.push(t); ops.push({c:c.id,slot:to,here:here});
+   }
+   return {ok:'Enter '+lines.join('; '),run:function(){
+     ops.forEach(function(o){ if(o.here) o.here.slot=o.slot; else R().comps.push({c:o.c,slot:o.slot}); dropFromColl('comp:'+o.c); });
+     if(ops.length===1) S.sel={t:'comp',cid:ops[0].c};}};}},
+ {s:'set',eg:'set:highlights colour yellow',g:'a component\u2019s settings',grp:'Parts',pre:function(a){
+   var t=norm(a);
+   if(/^room rails/.test(t)){var v=t.replace(/^room rails\s*/,''); if(['both','left','right','none'].indexOf(v)<0) return {bad:'rails: both, left, right or none'};
+     return {ok:'Enter shows the open and close buttons on '+(v==='both'?'both rails':v==='none'?'neither rail':'the '+v+' rail only'),run:function(){R().rails=v;}};}
+   var c=null; R().comps.forEach(function(p){var cc=compBy(p.c); if(t.indexOf(norm(cc.name))===0&&(!c||cc.name.length>c.name.length)) c=cc;});
+   if(!c) return {bad:'set what? name a block in this room first'};
+   if(!c.cfg) return {bad:c.name+' has nothing to set'};
+   var rest=t.slice(norm(c.name).length).trim(), key=null;
+   Object.keys(c.cfg).forEach(function(k){if(rest.indexOf(k)===0) key=k;});
+   if(!key) return {bad:c.name+' has '+list(Object.keys(c.cfg))};
+   var v=rest.slice(key.length).trim(); if(c.cfg[key].indexOf(v)<0) return {bad:key+': '+c.cfg[key].join(', ')};
+   if(getCfg(c.id,key)===v) return {ok:'Enter keeps '+c.name+' '+key+' '+v+'; it already is',run:function(){}};
+   return {ok:c.feat&&c.feat.indexOf(key)>-1?'Enter switches '+key+' '+v+' in '+c.name+(key==='web search'&&v==='on'?'; it spends tokens when used':''):'Enter sets '+c.name+' '+key+' to '+v,run:function(){R().cfg[c.id]=R().cfg[c.id]||{};R().cfg[c.id][key]=v;S.sel={t:'comp',cid:c.id};}};}},
+ {s:'inspect',eg:'inspect:highlights',g:'one thing in detail, at the top of the Library',grp:'Parts',pre:function(a){
+   var n=unq(a); if(/^\d+$/.test((n||'').trim())) return {bad:'ids live in the Almanac; inspect:'+n+' works there'};
+   var it=!n||norm(n)===norm(R().name)?find(R().name,['room']):find(n); if(!it) return {bad:'nothing called '+n};
+   var shown=!S.hidden.library;
+   return {ok:'Enter shows '+it.name+' at the top of the Library'+(shown?'':', opening it'),run:function(){S.insp=it.key;S.hidden.library=false;S.lib.kind='all';}};}},
+ {s:'add',eg:'add:highlights, notes, "Deep Calm"',g:'into the room, or the collection if that is addressed',grp:'Parts',pre:function(a){
+   var ns=names(a); if(!ns.length) return {bad:'add what? add:highlights, notes'};
+   var its=[]; for(var i=0;i<ns.length;i++){var it=find(ns[i]); if(!it) return {bad:'nothing in the Library called '+ns[i]}; its.push(it);}
+   if(S.addr==='collection') return addToCollection(its);
+   /* Into the room: blocks find their first free place, a layout replaces the
+      layout, a theme repaints. A room has one layout and one theme. */
+   var plans=its.filter(function(x){return x.k==='plan';}), schs=its.filter(function(x){return x.k==='scheme';}), comps=its.filter(function(x){return x.k==='comp';});
+   var other=its.filter(function(x){return ['plan','scheme','comp'].indexOf(x.k)<0;});
+   if(other.length) return {bad:other[0].name+' is a '+KLAB[other[0].k].toLowerCase()+'; only blocks, a layout and a theme go into a room'};
+   if(plans.length>1) return {bad:'a room has one layout; untick '+plans[1].name};
+   if(schs.length>1) return {bad:'a room has one theme; untick '+schs[1].name};
+   if(!R().plan&&!plans.length&&comps.length) return {bad:'this room needs a layout first; tick one too'};
+   var plan=plans[0], sch=schs[0], bits=[], ops=[], load={}, left=[];
+   var m=plan&&plan.pid!==R().plan?migrate(plan.pid):null;
+   if(plan&&plan.pid!==R().plan) bits.push('uses '+plan.name+(m.held.length?' ('+list(m.held.map(function(c){return compBy(c).name;}))+' '+(m.held.length>1?'come':'comes')+' out)':''));
+   if(sch&&sch.sid!==R().scheme) bits.push('paints it '+sch.name);
+   var ps=plan?PLANS[plan.pid].slots:planSlots(), base=m?m.keep:R().comps;
+   comps.forEach(function(x){var c=compBy(x.cid); if(base.some(function(p){return p.c===c.id;})) return; var to=null;
+     for(var j=0;j<c.fits.length;j++){var sl=c.fits[j]; var cur=base.filter(function(p){return p.slot===sl;}).length; if(ps[sl]&&cur+(load[sl]||0)<ps[sl]){to=sl;break;}}
+     if(to){load[to]=(load[to]||0)+1;ops.push({c:c.id,slot:to});bits.push('places '+c.name+' in the '+SLOTNAME[to]);} else left.push(c.name);});
+   if(left.length) bits.push('leaves '+list(left)+' ticked because there is no free place');
+   if(!ops.length&&!bits.length) return {bad:'all of that is already in the room'};
+   return {ok:'Enter '+bits.join(', ').replace(/, ([^,]*)$/,' and $1'),run:function(){
+     if(m){R().plan=plan.pid;R().comps=m.keep;}
+     if(sch) R().scheme=sch.sid;
+     ops.forEach(function(o){R().comps.push(o);});
+     S.pick=comps.filter(function(x){return left.indexOf(x.name)>-1;}).map(function(x){return x.key;}); if(ops.length===1) S.sel={t:'comp',cid:ops[0].c};}};}},
+ {s:'rm',eg:'rm:notes',g:'out of whatever the navy rule is on',grp:'Parts',pre:function(a){
+   var ns=names(a); if(!ns.length) return {bad:'rm what?'};
+   var inColl=S.addr==='collection';
+   var its=[]; for(var i=0;i<ns.length;i++){var it=find(ns[i]); if(!it) return {bad:'nothing called '+ns[i]}; its.push(it);}
+   if(!inColl){
+     var bad=its.filter(function(x){return x.k!=='comp'||!inRoom(x.cid);});
+     if(bad.length){ if(bad.every(function(x){return collHas(x.key);})) inColl=true; else return {bad:bad[0].name+' is not in this room'}; }
+   }
+   if(inColl){ var nb=its.filter(function(x){return !collHas(x.key);}); if(nb.length) return {bad:nb[0].name+' is not in the collection'};
+     return {ok:'Enter takes '+list(its.map(function(x){return x.name;}))+' out of the collection; the Library keeps '+(its.length>1?'them':'it'),run:function(){its.forEach(function(x){dropFromColl(x.key);});}}; }
+   var req=its.filter(function(x){return compBy(x.cid).req;}); if(req.length) return {bad:'every room has one conversation, so '+req[0].name+' stays'};
+   return {ok:'Enter takes '+list(its.map(function(x){return x.name;}))+' out of the room; the Library keeps '+(its.length>1?'them':'it')+', and undo: puts '+(its.length>1?'them':'it')+' back',
+     run:function(){R().comps=R().comps.filter(function(p){return !its.some(function(x){return x.cid===p.c;});});S.sel={t:'room'};}};}},
+ {s:'section',eg:'section:"Rails"',g:'a break in the collection',grp:'Collection',pre:function(a){
+   var n=unq(a); if(!n) return {bad:'call it what? section:"Rails"'}; if(!collKeys().length) return {bad:'the collection is empty'};
+   return {ok:'Enter adds a break called '+n+' after item '+collKeys().length+'; what you add next goes under it',run:function(){S.coll.items.push({t:'s',name:n});}};}},
+ {s:'note',eg:'note:highlights "for the essay"',g:'a note on a collected thing, here only',grp:'Collection',pre:function(a){
+   var m=String(a).match(/^(.*?)\s*["“](.*)["”]?\s*$/); if(!m) return {bad:'note:highlights "what the note says"'};
+   var txt=m[2].replace(/["”]$/,'');
+   if(norm(m[1])==='collection') return {ok:txt?'Enter writes that on the collection':'type the note inside the quotes',run:txt?function(){S.coll.note=txt;S.reply=null;}:null};
+   var it=find(m[1]); if(!it||!collHas(it.key)) return {bad:'note on what? it has to be in the collection'};
+   if(!txt) return {ok:'writing on '+it.name+' as it sits in this collection; type inside the quotes'};
+   return {ok:'Enter notes '+it.name+' in this collection; the note travels with the collection, not with '+it.name,run:function(){
+     S.coll.items.forEach(function(e){if(e.t==='i'&&e.key===it.key) e.note=txt;});}};}},
+ {s:'name',eg:'name:"Essay room"',g:'name, or rename, whatever the navy rule is on',grp:'Rooms',pre:function(a){
+   var m=String(a).match(/^\s*(\d+)\s*(.*)$/); if(m) return notBuilt('Enter names '+m[1]+' '+(unq(m[2])||'\u2026')+' in the Almanac');
+   var n=unq(a);
+   if(S.addr==='collection'){ if(!n) return {bad:'name:"Rail candidates"'}; if(!collKeys().length) return {bad:'the collection is empty'};
+     return {ok:'Enter '+(S.coll.name?'renames the collection '+n:'keeps the collection as '+n),run:function(){S.coll.name=n;}}; }
+   if(!n) return {ok:'type the room\u2019s new name inside the quotes'};
+   if(S.rooms.some(function(r,i){return i!==S.cur&&norm(r.name)===norm(n);})) return {bad:'you already have a room called '+n};
+   if(norm(n)===norm(R().name)) return {bad:'it is already called '+n};
+   return {ok:'Enter names the room '+n+(R().name!=='Untitled room'?', instead of '+R().name:''),run:function(){R().name=n;}};}},
+ {s:'compare',eg:'compare:',g:'side by side, differences washed',grp:'Collection',pre:function(a){
+   if(norm(a)==='off') return {ok:'Enter closes the comparison',run:function(){S.cmp=false;}};
+   var ns=names(a), add=[]; for(var i=0;i<ns.length;i++){var it=find(ns[i]); if(!it) return {bad:'nothing called '+ns[i]}; if(!collHas(it.key)) add.push(it);}
+   if(collKeys().length+add.length<2) return {bad:'compare needs two things in the collection'};
+   return {ok:'Enter compares '+Math.min(4,collKeys().length+add.length)+' things side by side'+(add.length?', collecting '+list(add.map(function(x){return x.name;}))+' first':'')+'; facts only, no tokens',
+     run:function(){add.forEach(function(x){addToColl(x.key);});S.cmp=true;S.addr='collection';S.hidden.collection=false;}};}},
+ {s:'apply',eg:'apply:',g:'put the collection into the room',grp:'Collection',pre:function(){
+   var its=collKeys().map(byKey).filter(Boolean); if(!its.length) return {bad:'the collection is empty'};
+   var plan=its.filter(function(x){return x.k==='plan'&&!x.soon;})[0], sch=its.filter(function(x){return x.k==='scheme';})[0];
+   var comps=its.filter(function(x){return x.k==='comp'&&!inRoom(x.cid);}), bits=[], ops=[], load={};
+   if(!R().plan&&!plan) return {bad:'the room needs a layout first; collect one, or layout:"Three-panel"'};
+   var ps=plan?PLANS[plan.pid].slots:planSlots();
+   if(plan&&plan.pid!==R().plan) bits.push('uses '+plan.name);
+   if(sch&&sch.sid!==R().scheme) bits.push('paints it '+sch.name);
+   var left=[];
+   comps.forEach(function(x){var c=compBy(x.cid),to=null;
+     for(var j=0;j<c.fits.length;j++){var s=c.fits[j]; var cur=R().comps.filter(function(p){return p.slot===s;}).length; if(ps[s]&&cur+(load[s]||0)<ps[s]){to=s;break;}}
+     if(to){load[to]=(load[to]||0)+1;ops.push({c:c.id,slot:to});bits.push('places '+c.name+' in the '+SLOTNAME[to]);} else left.push(c.name);});
+   if(!ops.length&&!(plan&&plan.pid!==R().plan)&&!(sch&&sch.sid!==R().scheme)) return {bad:left.length?'nothing collected can go in: '+list(left)+' '+(left.length>1?'have':'has')+' nowhere free in this plan':'everything collected is already in the room'};
+   if(left.length) bits.push('leaves '+list(left)+' collected, with nowhere free');
+   if(its.some(function(x){return x.k==='room';})) bits.push('rooms are duplicated, not applied, so they stay');
+   if(!bits.length) return {bad:'everything collected is already in the room'};
+   return {ok:'Enter '+bits.join('; '),run:function(){
+     if(plan&&plan.pid!==R().plan){var m=migrate(plan.pid);R().plan=plan.pid;R().comps=m.keep;}
+     if(sch) R().scheme=sch.sid;
+     ops.forEach(function(o){R().comps.push(o);dropFromColl('comp:'+o.c);});}};}},
+ {s:'pin',eg:'pin:"Rail candidates"',g:'a collection leads the rail',grp:'Collection',pre:function(){return notBuilt('Enter pins the collection so it leads the rail, here and in the Almanac');}},
+
+ /* Layout: the same verbs as the Almanac */
+ {s:'pop',eg:'pop:library, or pop:back library',g:'a card into its own window, or back',grp:'Layout',pre:function(a){
+   var t=norm(a), back=/^back\b/.test(t); t=t.replace(/^back\s*/,'');
+   if(back&&(!t||t==='all')) return Object.keys(S.pops).length?{ok:'Enter brings every window back',run:function(){S.pops={};}}:{bad:'nothing is in its own window'};
+   var p=PANELS[t]; if(!p) return {bad:'pop which? library, room or collection'};
+   if(back) return S.pops[p]?{ok:'Enter brings the '+p+' back',run:function(){delete S.pops[p];}}:{bad:'the '+p+' is not in its own window'};
+   if(S.pops[p]) return {bad:'the '+p+' is already in its own window'};
+   return {ok:'Enter puts the '+p+' in its own window'+(p==='library'?', where it shows as a grid':''),run:function(){popOut(p);}};}},
+ {s:'move',eg:'move:library right',g:'reorder the columns',grp:'Layout',pre:function(a){
+   var w=norm(a).split(' '), p=PANELS[w[0]], d=w[1]; if(!p||['left','right'].indexOf(d)<0) return {bad:'move:library right, or move:room left'};
+   var sl=p==='collection'?'side':p, o=S.order.slice(), i=o.indexOf(sl);
+   o.splice(i,1); if(d==='left') o.unshift(sl); else o.push(sl);
+   return {ok:'Enter moves the '+p+' to the '+d,run:function(){S.order=o;}};}},
+
+ /* Everywhere */
+ {s:'undo',eg:'undo:',g:'take back the last change',grp:'Help',pre:function(){
+   return HIST.length?{ok:'Enter takes back: '+(LASTRUN||'the last change'),undo:1}:{bad:'nothing to undo'};}},
+ {s:'tour',eg:'tour:, or tour:docket',g:'a walk through this page, or another',grp:'Help',pre:function(a){return notBuilt('Enter starts a tour of '+(norm(a)||'the Lab'));}},
+ {s:'help',eg:'help',g:'every command, same as ?',grp:'Help',pre:function(){return {ok:'Enter opens every command',keep:1,run:function(){openRef();}};}}
+];
+function verb(s){return V.filter(function(v){return v.s===s;})[0];}
+
+/* ═══════════════════════════════════════════════════════════════════
+   THE FIELD
+   ═══════════════════════════════════════════════════════════════════ */
+var Q=function(){return document.getElementById('q');};
+var CMDH=[], HPOS=-1;
+function mode(v){v=v==null?Q().value:v; if(/^p>/i.test(v)) return 'prm'; if(/^>/.test(v)) return 'cmd'; return 'search';}
+function parse(v){var m=v.replace(/^>\s*/,'').match(/^([a-z]+)(:?)(.*)$/i); if(!m) return null; return {s:m[1].toLowerCase(),colon:!!m[2],a:m[3]};}
+function setQ(){
+  var v=Q().value, md=mode(v), f=document.getElementById('sfield');
+  f.classList.toggle('cmd',md==='cmd'); f.classList.toggle('prm',md==='prm');
+  if(md==='search'){ if(S.q!==v){S.q=v; if(v&&S.lib.kind==='all'){} render(); return;} }
+  else if(S.q){S.q='';render();return;}
+  hint();
+}
+function targetName(){return S.addr==='collection'?'the collection':S.addr==='library'?'the Library':R().name;}
+function hint(){
+  var el=document.getElementById('shint'), v=Q().value, md=mode(v), h='';
+  if(md==='search'){
+    if(!v) h='<span class="it first"><span class="pre">search the Library</span></span><span class="sep">·</span><span class="it"><code>&gt;</code> changes the room</span><span class="sep">·</span><span class="it"><code>p&gt;</code> tries it</span><span class="sep">·</span><span class="it">⌘K or / from anywhere</span><span class="sep">·</span><span class="it"><button data-ref="1"><code>?</code> <span class="gl">every command</span></button></span>';
+    else {var n=document.querySelectorAll('[data-card=library] .li').length;
+      h='<span class="it"><span class="pre">'+(S.pops.library||!S.hidden.library?plural(n,'thing')+' in the Library '+(n===1?'matches':'match'):'the Library is hidden; show:library to see what matches')+'</span></span><span class="sep">·</span><span class="it">Escape clears</span>';}
+  }else if(md==='prm'){
+    var t=v.replace(/^p>\s*/i,'');
+    if(S.addr==='collection'&&collKeys().length) h='<span class="pre">\u2192 the collection</span><span class="sep">·</span>'+(t?'Enter asks about the '+plural(collKeys().length,'thing')+' collected, and keeps the reply there':'ask something about what is collected');
+    else if(!inRoom('messages')) h='<span class="pre">\u2192 '+esc(R().name)+'</span><span class="sep">·</span><span class="bad">this room has no Messages to answer in; place:messages first</span>';
+    else h='<span class="pre">\u2192 '+esc(R().name)+'</span><span class="sep">·</span>'+(t?'Enter tries this in the room; it is kept as a chat tagged tried in the Lab, and spends tokens':'talk to the room to try it; what you say is kept as a chat');
+  }else{
+    var p=parse(v);
+    if(!p||!p.colon){
+      var pre=p?p.s:'', hits=V.filter(function(x){return x.s.indexOf(pre)===0;});
+      if(!hits.length) h='<span class="bad">no verb called '+esc(pre)+'; ? lists them all</span>';
+      else h=hits.slice(0,8).map(function(x,i){return '<span class="it'+(i===0?' first':'')+'"><button data-w="'+esc(x.s+':')+'"><code>'+x.s+':</code> <span class="gl">'+esc(x.g)+'</span></button></span>';}).join('<span class="sep">·</span>');
+    }else{
+      var vb=verb(p.s);
+      if(!vb) h='<span class="bad">no verb called '+esc(p.s)+'; ? lists them all</span>';
+      else {var r=vb.pre(p.a);
+        h='<span class="pre">\u2192 '+esc(['pop','move','close','open','library','resources','arrange','alm','edit','lab'].indexOf(p.s)>-1?'the Lab':p.s==='inspect'?'the Library':['section','note','compare','apply','pin'].indexOf(p.s)>-1||(['rm','add','name'].indexOf(p.s)>-1&&S.addr==='collection')?'the collection':R().name)+'</span><span class="sep">·</span>'+
+          (r.bad?'<span class="bad">'+esc(r.bad)+'</span>':esc(r.ok));}
+    }
+  }
+  el.innerHTML=h;
+  if(typeof applyGlow==='function') applyGlow();
+  var g=document.querySelector('.guide'); if(g&&S.guide){ g.querySelectorAll('.gopts button').forEach(function(b){b.classList.toggle('on',norm('>'+b.getAttribute('data-w'))===norm(v));}); }
+}
+function write(cmd,lead){
+  var q=Q(); q.value=(lead||'>')+cmd; q.focus();
+  var i=q.value.indexOf('""'); var pos=i>-1?i+1:q.value.length; q.setSelectionRange(pos,pos);
+  closeRef(); setQ();
+}
+function submit(){
+  var v=Q().value, md=mode(v);
+  if(md==='search'){ var first=document.querySelector('[data-card=library] .li:not(.soon)'); if(first){S.insp=first.getAttribute('data-sl');render();} return; }
+  if(md==='prm'){
+    var t=v.replace(/^p>\s*/i,'').trim(); if(!t) return;
+    if(S.addr==='collection'&&collKeys().length){snap();S.reply={q:t,a:sampleAnswer(t)};}
+    else { if(!inRoom('messages')) return; snap(); S.tries.push({me:t,ai:'A sample reply. In the product this is '+R().name+'\u2019s model answering, inside the room, in its scheme.'}); }
+    Q().value=''; setQ(); render(); return;
+  }
+  var p=parse(v); if(!p||!p.colon) return; var vb=verb(p.s); if(!vb) return; var r=vb.pre(p.a); if(r.bad) return;
+  CMDH.push(v); HPOS=-1;
+  if(r.undo){ S=JSON.parse(HIST.pop()); LASTRUN=''; Q().value=''; setQ(); render(); toast('Taken back.'); return; }
+  if(!r.run){return;}
+  if(!r.keep) snap();
+  r.run(); LASTRUN=v.replace(/^>\s*/,'');
+  if(S.guide&&S.guide.step<GUIDE.length&&GUIDE[S.guide.step].verb===p.s) S.guide.step++;
+  if(!r.keep){Q().value='';}
+  setQ(); render();
+}
+function sampleAnswer(q){
+  var its=collKeys().map(byKey).filter(Boolean), nm=its.map(function(x){return x.name;});
+  function gist(x){return x.desc.split(/[.;]/)[0].replace(/^./,function(c){return c.toLowerCase();});}
+  if(/used/.test(norm(q))) return list(its.map(function(x){return x.name+' is '+usedIn(x).replace('used in','in').replace('not in any','in none');}))+'. Those are facts read from your rooms; the model only puts them into a sentence.';
+  if(/writing|suit/.test(norm(q))) return nm[0]+' suits long writing best, because it stays out of the way until you want it. '+(nm[1]?nm[1]+' earns its place on a second pass rather than a first.':'');
+  var here=its.filter(function(x){return x.k==='comp'&&inRoom(x.cid);}).map(function(x){return x.name;});
+  return 'They differ in what each one keeps: '+its.map(function(x){return x.name+', '+gist(x);}).join('; ')+'. '+(here.length?list(here)+(here.length>1?' are':' is')+' already in this room.':'');
+}
+
+/* ── the reference ── */
+function openRef(){
+  var el=document.getElementById('cref'), grps={};
+  V.forEach(function(x){(grps[x.grp]=grps[x.grp]||[]).push(x);});
+  el.innerHTML='<div class="rhead"><div class="rtop"><span class="rlab">Every command in the Lab</span></div></div><div class="cols">'+
+    Object.keys(grps).map(function(g){return '<div class="grp"><h4>'+g+'</h4>'+grps[g].map(function(x){
+      return '<button data-w="'+esc(x.eg.split(', or ')[0].replace(/^[a-z]+:/,function(m){return m;}))+'"><code>'+esc(x.eg)+'</code><span class="gl">'+esc(x.g)+'</span></button>';}).join('')+'</div>';}).join('')+
+    '</div><div class="foot">Clicking one writes it into the field. Nothing runs until Enter, and the line under the field says what Enter will do.</div>';
+  el.classList.add('open'); paintAll();
+}
+function closeRef(){document.getElementById('cref').classList.remove('open');}
+
+/* ── windows ── */
+function popOut(p){
+  var n=Object.keys(S.pops).length, w=p==='library'?Math.min(900,window.innerWidth-80):p==='canvas'?Math.min(960,window.innerWidth-80):380;
+  S.pops[p]={x:Math.max(20,window.innerWidth-w-40-n*30),y:90+n*30,w:w};
+}
+function toast(t){var el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(function(){el.classList.remove('show');},2200);}
+
+/* ── menus (pickers) ── */
+function openMenu(btn){
+  var opts=JSON.parse(btn.getAttribute('data-pick')), m=document.getElementById('menu'), r=btn.getBoundingClientRect();
+  var head=btn.getAttribute('data-head');
+  m.innerHTML=(head?'<div class="mhead">'+esc(head)+'</div>':'')+opts.map(function(o){return '<button data-w="'+esc(o[1])+'">'+esc(o[0])+'</button>';}).join('');
+  m.style.left=r.left+'px'; m.style.top=(r.bottom+4)+'px'; m.classList.add('open');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   EVENTS
+   ═══════════════════════════════════════════════════════════════════ */
+document.addEventListener('mousedown',function(e){
+  var c=e.target.closest('[data-card]'); if(c&&S.addr!==c.getAttribute('data-card')){S.addr=c.getAttribute('data-card');
+    document.querySelectorAll('.lcard').forEach(function(x){x.classList.toggle('addr',x.getAttribute('data-card')===S.addr);}); hint();}
+  var d=e.target.closest('[data-drag]'); if(d&&!e.target.closest('button')){
+    var name=d.getAttribute('data-drag'), p=S.pops[name], sx=e.clientX, sy=e.clientY, ox=p.x, oy=p.y, el=document.getElementById('win-'+name);
+    function mv(ev){p.x=ox+ev.clientX-sx;p.y=Math.max(0,oy+ev.clientY-sy);el.style.left=p.x+'px';el.style.top=p.y+'px';}
+    function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);}
+    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);e.preventDefault();}
+});
+document.addEventListener('click',function(e){
+  var m=document.getElementById('menu'); if(!e.target.closest('#menu')&&!e.target.closest('[data-pick]')) m.classList.remove('open');
+  var t;
+  if((t=e.target.closest('[data-pick]'))){openMenu(t);return;}
+  if((t=e.target.closest('[data-closeinsp]'))){S.insp=null;render();return;}
+  if((t=e.target.closest('[data-pk]'))){var key=t.getAttribute('data-pk'),i=S.pick.indexOf(key);if(i>-1)S.pick.splice(i,1);else S.pick.push(key);S.addr='canvas';render();return;}
+  if((t=e.target.closest('[data-clearpick]'))){S.pick=[];render();return;}
+  /* Moving things around the screen is not an edit, so it happens on click:
+     bringing a window back, opening a closed board. Edits to a room still
+     go through the field. */
+  if((t=e.target.closest('[data-do]'))){var dv=t.getAttribute('data-do').split(':');snap();
+    if(dv[0]==='back') delete S.pops[dv[1]]; else {S.hidden[dv[1]]=false;} render();return;}
+  if((t=e.target.closest('[data-w]'))){m.classList.remove('open');if(t.getAttribute('data-addr')){S.addr=t.getAttribute('data-addr');}write(t.getAttribute('data-w'));return;}
+  if((t=e.target.closest('[data-ref]'))){openRef();return;}
+  if((t=e.target.closest('[data-kind]'))){S.lib.kind=t.getAttribute('data-kind');render();return;}
+  if((t=e.target.closest('[data-guide]'))){snap();if(t.getAttribute('data-guide')==='skip')S.guide.step++;else S.guide=null;render();return;}
+  if((t=e.target.closest('[data-ask]'))){S.addr='collection';write('','p>');return;}
+  if((t=e.target.closest('[data-p]'))){S.addr='collection';write(t.getAttribute('data-p'),'p>');return;}
+  if((t=e.target.closest('[data-dropreply]'))){S.reply=null;render();return;}
+  if((t=e.target.closest('[data-selroom]'))){S.sel={t:'room'};render();return;}
+  if((t=e.target.closest('[data-cv]'))){var v=t.getAttribute('data-cv');document.body.classList.remove('cv-early','cv-mid','cv-lines');document.body.classList.add('cv-'+v);
+    document.querySelectorAll('[data-cv]').forEach(function(x){x.classList.toggle('on',x===t);});paintAll();return;}
+  if((t=e.target.closest('[data-try]'))){tryState(t.getAttribute('data-try'));return;}
+  if((t=e.target.closest('[data-sc]'))){S.sel={t:'comp',cid:t.getAttribute('data-sc')};S.addr='canvas';render();return;}
+  if((t=e.target.closest('[data-sl]'))){if(e.target.closest('.linl'))return;var ky=t.getAttribute('data-sl');S.insp=S.insp===ky?null:ky;render();return;}
+  if(e.target.closest('.room')){S.sel={t:'room'};render();return;}
+  if(!e.target.closest('#cref')&&!e.target.closest('.sbar')) closeRef();
+});
+document.addEventListener('mouseover',function(e){var g=e.target.closest('[data-glow]'); var v=g?g.getAttribute('data-glow'):null; if(v!==HOVERGLOW){HOVERGLOW=v;applyGlow();}});
+Q().addEventListener('input',setQ);
+Q().addEventListener('keydown',function(e){
+  if(e.key==='Enter'){e.preventDefault();submit();}
+  else if(e.key==='Escape'){if(document.getElementById('cref').classList.contains('open')) closeRef(); else if(S.insp){S.insp=null;render();} else {Q().value='';setQ();}}
+  else if(e.key==='ArrowUp'&&CMDH.length&&(!Q().value||HPOS>-1)){e.preventDefault();HPOS=HPOS<0?CMDH.length-1:Math.max(0,HPOS-1);Q().value=CMDH[HPOS];setQ();}
+  else if(e.key==='ArrowDown'&&HPOS>-1){e.preventDefault();HPOS++;if(HPOS>=CMDH.length){HPOS=-1;Q().value='';}else Q().value=CMDH[HPOS];setQ();}
+  else if(e.key==='?'&&!Q().value){e.preventDefault();openRef();}
+});
+document.addEventListener('keydown',function(e){
+  var inField=/INPUT|TEXTAREA/.test(document.activeElement.tagName);
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();Q().focus();Q().select();return;}
+  if(!inField&&e.key==='/'){e.preventDefault();Q().focus();return;}
+  if(!inField&&e.key==='?'){e.preventDefault();openRef();}
+  if(!inField&&e.key==='Escape'&&S.insp){S.insp=null;render();}
+});
+
+/* ── the Try row ── */
+function tryState(k){
+  HIST=[];CMDH=[];S=fresh();
+  if(k==='first'){S.rooms=[{name:'Untitled room',plan:null,scheme:'default',device:'desktop',rails:'both',cfg:{},comps:[]}];S.guide={step:0};}
+  if(k==='popped'){S.lib.kind='comp';popOut('library');}
+  if(k==='compare'){S.hidden.collection=false;['comp:highlights','comp:notes','comp:comments'].forEach(function(x){addToColl(x);});S.coll.items.splice(2,0,{t:'s',name:'For the second pass'});
+    S.coll.items[0].note='Keep: the essay leans on repeated phrases.';S.coll.name='Marking, for the essay';S.cmp=true;S.addr='collection';}
+  if(k==='mobile'){var r=roomFromTpl('Pocket Chat','Pocket Chat');S.rooms.push(r);S.cur=1;}
+  if(k==='block'){S.sel={t:'comp',cid:'input'};}
+  if(k==='picked'){S.pick=['comp:toc','comp:comments','scheme:violet'];}
+  if(k==='inspect'){S.insp='comp:input';}
+  if(k==='popped'){S.insp='comp:highlights';}
+  Q().value='';setQ();render();
+  if(k==='fits'){write('place:contents');}
+}
+
+var pr=document.createElement('div');pr.id='poprow';pr.className='shint';pr.style.paddingTop='2px';pr.style.minHeight='0';
+document.getElementById('p-bar').insertBefore(pr,document.getElementById('cref'));
+window.addEventListener('resize',function(){render();});
+render();
+</script>
+</body>
+</html>

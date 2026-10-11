@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Parliament · Collection board v1</title>
+<!--
+PARLIAMENT · COLLECTION BOARD v3
+Follows parliament_almanac_v30.html (collections hold pointers, markings carry
+a parent, ids always on screen, .mk cards, the Enter rule) and
+parliament-branch-slider-v9.html (tabs, numbered picker, open: … summary).
+Reference material, not production code.
+
+CHANGES FROM v2
+  · Headings, in your order only. A heading is a place in one collection; a
+    tag is a name that travels with an item everywhere. In the other orders a
+    card says which heading it sits under.
+  · When a passage's chat or branch is gone, its card keeps the text, takes a
+    dashed rule, and its marginalia says what happened.
+  · delete: on something with markings says so on the Enter line before it
+    runs. delete:201c keeps them as cards; delete:201c all removes them too.
+  · Summaries are dated and never change. When a source changes, the summary
+    says so; rewrite: writes a new dated note beside it, and compare: shows
+    the difference with no model call.
+  · export:md takes any target: this collection (the default when the board
+    is addressed), chats, a docket, alm for the whole Almanac. Sources are
+    footnoted, with Wikipedia's licence and revision.
+  · Search uses the field, not a box on the board: s> searches this
+    collection when it is the addressed board, and the board narrows in place.
+    The head offers it ("search: s>"); the pair in the field switches between
+    this collection and everywhere.
+  · The in-chat review modal is NOT replaced. It is a separate surface in the
+    current code and will be looked at on its own; Summarize here is the
+    collection's act, not the chat's.
+
+CHANGES FROM v1
+  · Four actions, each a different kind of act:
+      Note        your words. With a selection, the selected items are quoted
+                  beneath it and each points back. This absorbs Combine.
+      Tag         a name on each selected item, so they find each other. This
+                  is what Connect did; it uses the Almanac's tagadd:.
+      Summarize   a model's words; one call.
+      Prompt      a new chat about them, in full or from a summary.
+  · The selection names each item's type: highlight 214, note 219, quote 217,
+    with the type's colour; the Enter line does the same.
+  · Notes no longer appear in the chat. Writing one from the chat opens a draft
+    card in the collection; the passage gets a faint dotted underline.
+  · Both directions link: click an id on a card to find it in the chat; click
+    a marked passage in the chat to find its card here.
+  · co: becomes new:collection.
+
+PROPOSED
+  · No separate Notepad. The Collection is the board for notes, highlights and
+    quotes, and it is portable: beside a chat its source defaults to that chat.
+  · "Quote" replaces "pin for reference": a passage kept for you that the model
+    never sees. pin: keeps its Almanac meaning, keep at the top.
+  · Tabs are the type: filter. All, Highlights, Notes, Quotes.
+  · Cards, not a table. Markings are read, not scanned.
+  · Three orders: by source (grouped under ids), by date, and yours (drag).
+  · Sources come from a picker in the board head: the same numbered boxes as
+    the prompt's source picker; the numbers set the order of the groups.
+    Picking a chat holds all of it, live. add:218 holds one marking.
+  · A note written here has no parent chat. It is its own item with its own id.
+  · Selection actions follow the Enter rule: each writes its command into the
+    field, the line under it says what will happen, Enter does it.
+      note:       your words; with a selection, quoting each beneath
+      tagadd:     a name on each selected item
+      summarize:  a new note summarising them; one model call
+      p>          a new chat about them, in full or from a summary
+  · Clicking a marking's id jumps to it: the chat switches to its branch's tab
+    and the passage flashes.
+-->
+<style>
+:root{
+  --paper-bg:#FCFCFA; --p-surface:#FFFFFF; --p-subtle:#FAF9F5; --p-tray:#F6F5F1;
+  --ink:#191919; --p-ink-2:#787774; --p-ink-3:#9B9A97;
+  --p-border:#E9E9E7; --p-border-2:#F1F1EF; --p-gold-deep:#8B6A10;
+  --divider:rgba(25,25,25,.08); --ink-soft:rgba(25,25,25,.30);
+  --ink-wash:rgba(25,25,25,.045); --ink-wash-2:rgba(25,25,25,.075);
+  --marg:rgba(25,25,25,.46); --tri:rgba(122,120,114,.17);
+  --navy:38,56,92; --line-c:22,38,70;
+  --c-note:rgba(124,108,212,.45); --c-high:rgba(236,72,153,.40); --c-quote:rgba(25,25,25,.28);
+  --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --font-serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --font-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --r-btn:8px; --r-xl:16px;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper-bg);color:var(--ink);font-family:var(--font-sans);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+
+/* marginalia */
+.marg{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 5px;font:italic 400 11px/1.7 var(--font-serif);color:var(--marg);transition:color .16s}
+.marg>*{white-space:nowrap}
+.marg .sep{opacity:.4}
+.marg button{border:none;background:none;padding:0;cursor:pointer;font:inherit;color:inherit}
+.marg button:hover,.marg button:focus-visible{color:var(--ink);text-decoration:underline;text-underline-offset:2px;outline:none}
+.marg button.picks::after{content:"\25BE";font-style:normal;font-size:8px;margin-left:3px;opacity:0;transition:opacity .14s;vertical-align:.09em}
+.chead:hover .marg button.picks::after,.marg button.picks.open::after{opacity:.5}
+
+/* board strip */
+.strip{display:flex;align-items:baseline;gap:18px;padding:14px 20px 4px;overflow-x:auto}
+.btitle{border:none;background:none;padding:0;cursor:pointer;font:600 12.5px var(--font-sans);color:var(--p-ink-3);white-space:nowrap}
+.btitle .c{font-weight:400;opacity:.6}
+.btitle:hover,.btitle.here{color:var(--ink)}
+.btitle.here::after{content:"";display:block;height:2px;background:var(--ink);margin-top:4px}
+
+/* two boards */
+.stage{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr);gap:14px;padding:10px 16px 150px;max-width:1360px;margin:0 auto;align-items:start}
+@media (max-width:980px){.stage{grid-template-columns:1fr}}
+.lcard{background:var(--p-surface);border-radius:var(--r-xl);box-shadow:0 1px 2px rgba(40,36,28,.035);min-width:0}
+.chead{position:relative;display:flex;align-items:baseline;gap:8px;padding:11px 14px 9px;border-bottom:1px solid var(--divider)}
+.ctitle{font:600 12.5px var(--font-sans);white-space:nowrap;border:none;background:none;padding:0;cursor:pointer}
+.ctitle .c{font-weight:400;opacity:.6}
+.ctitle:hover{color:var(--p-gold-deep)}
+.chead .marg{margin-left:auto}
+.colboard{position:sticky;top:10px;max-height:calc(100vh - 210px);display:flex;flex-direction:column}
+@media (max-width:980px){.colboard{position:static;max-height:none}}
+
+/* the chat */
+.cbody{padding:14px 10px 20px}
+.you{max-width:600px;margin:0 auto 12px;padding:11px 14px;background:var(--p-subtle);border-radius:12px;font-size:13.5px;line-height:1.5}
+.ans{font:400 14.5px/1.62 var(--font-serif)}
+.ans p{margin:0 0 .85em}
+.ans .cite{font:italic 11px var(--font-serif);color:var(--marg)}
+.ans.wiki{border-left:2px solid var(--divider);padding-left:12px}
+mark{background:rgba(236,72,153,.13);color:inherit;border-radius:2px;padding:0 1px;transition:background .3s,box-shadow .3s}
+mark.quote{background:rgba(25,25,25,.06)}
+mark.flash{background:rgba(196,169,77,.35);box-shadow:0 0 0 3px rgba(196,169,77,.2)}
+.tabs{display:flex;justify-content:center;align-items:flex-end;gap:16px;padding:6px 4px 0;margin:0 30px 14px;border-bottom:1px solid var(--divider);overflow-x:auto}
+.tab{border:none;border-bottom:2px solid transparent;background:none;padding:2px 0 8px;cursor:pointer;display:flex;align-items:baseline;gap:6px;white-space:nowrap;color:var(--p-ink-3);font:500 12px var(--font-sans)}
+.tab .id{font:500 10.5px var(--font-mono)}
+.tab:hover,.tab.on{color:var(--ink)}
+.tab.on{border-bottom-color:var(--ink)}
+.slider{display:grid;grid-template-columns:30px minmax(0,1fr) 30px}
+.side .arrow{position:sticky;top:45vh;display:flex;align-items:center;justify-content:center;width:28px;height:28px;margin:0 auto;border:none;border-radius:50%;background:none;color:var(--p-ink-3);cursor:pointer}
+.side .arrow:hover{color:var(--ink);background:var(--ink-wash)}
+.side .arrow:disabled{opacity:.25;cursor:default;background:none}
+.side .arrow svg{width:14px;height:14px}
+.slide{display:none}.slide.on{display:block}
+.slide>.marg{justify-content:center;margin-top:12px}
+.notein{margin:10px 0 0;padding:8px 12px;border-left:2px solid var(--c-note);font:italic 13px/1.5 var(--font-serif);color:var(--p-ink-2)}
+
+/* the collection */
+.ctabs{display:flex;gap:16px;padding:8px 14px 0;border-bottom:1px solid var(--divider);overflow-x:auto}
+.ctab{border:none;border-bottom:2px solid transparent;background:none;padding:2px 0 8px;cursor:pointer;white-space:nowrap;color:var(--p-ink-3);font:500 12px var(--font-sans)}
+.ctab .n{font:500 10px var(--font-mono);margin-left:4px;opacity:.8}
+.ctab:hover,.ctab.on{color:var(--ink)}
+.ctab.on{border-bottom-color:var(--ink)}
+.ctools{display:flex;align-items:baseline;padding:7px 14px 0}
+.ctools .marg{margin-left:auto}
+.ctools .marg button.on{color:var(--ink)}
+.clist{flex:1;overflow-y:auto;padding:4px 14px 12px}
+.grp{font:500 10px var(--font-mono);color:var(--p-ink-3);margin:14px 0 6px;display:flex;align-items:baseline;gap:8px}
+.grp .marg{font-size:10.5px}
+.mk{position:relative;display:grid;grid-template-columns:16px minmax(0,1fr);gap:10px;padding:8px 8px 8px 0;border-radius:8px;margin:0 -8px 4px -2px;padding-left:8px}
+.mk:hover{background:var(--p-subtle)}
+.mk.sel{background:var(--ink-wash)}
+.mk.drag{opacity:.4}
+.mk.over{box-shadow:0 -2px 0 var(--ink)}
+.mk .body{border-left:2px solid var(--c-quote);padding:1px 0 1px 10px;min-width:0}
+.mk.high .body{border-left-color:var(--c-high)}
+.mk.note .body{border-left-color:var(--c-note)}
+.mk .q{font:italic 13px/1.5 var(--font-serif);color:var(--ink)}
+.mk .t{font-size:12.5px;line-height:1.5;color:var(--ink)}
+.mk .marg{margin-top:4px;font-size:10.5px}
+.mk .marg .id{font:normal 500 10px var(--font-mono);color:var(--p-ink-3)}
+.mk[draggable="true"]{cursor:grab}
+.cb{width:14px;height:14px;margin-top:3px;border:1px solid var(--ink-soft);border-radius:3px;display:flex;align-items:center;justify-content:center;background:none;padding:0;cursor:pointer}
+.cb svg{width:9px;height:9px;opacity:0}
+.mk:hover .cb{border-color:var(--ink)}
+.mk.sel .cb{border-color:var(--ink)}
+.mk.sel .cb svg{opacity:1}
+.newnote{display:block;width:100%;margin:10px 0 4px;padding:8px 10px;border:.5px dashed var(--ink-soft);border-radius:8px;background:none;text-align:left;cursor:pointer;font:italic 12px var(--font-serif);color:var(--marg)}
+.newnote:hover{color:var(--ink);border-color:var(--ink)}
+.empty{font:italic 12px var(--font-serif);color:var(--marg);padding:20px 0;text-align:center}
+
+/* the action row: outlines only, as the Almanac's dock */
+.acts{border-top:1px solid var(--divider);padding:10px 14px 12px}
+.acts .scope{font-size:10.5px;color:var(--p-ink-3);margin-bottom:8px;display:flex;gap:8px;align-items:baseline}
+.acts .scope b{color:var(--ink);font-weight:600}
+.acts .scope button{border:none;background:none;padding:0;cursor:pointer;color:var(--p-ink-3);text-decoration:underline;font-size:10.5px}
+.acts .row{display:flex;flex-wrap:wrap;gap:6px}
+.act{border:.5px solid var(--p-border);background:var(--p-surface);border-radius:var(--r-btn);padding:6px 10px;cursor:pointer;font:500 11.5px var(--font-sans);color:var(--p-ink-2)}
+.act:hover{color:var(--ink);border-color:var(--ink-soft)}
+.act:disabled{opacity:.4;cursor:default}
+.act small{font:italic 10.5px var(--font-serif);color:var(--marg);margin-left:4px}
+
+/* menu, as the answered-by picker */
+.picker{display:none;position:absolute;right:10px;top:calc(100% + 4px);z-index:70;width:320px;max-width:calc(100vw - 32px);max-height:60vh;overflow-y:auto;border:.5px solid var(--p-border);border-radius:10px;background:#fff;box-shadow:0 8px 26px rgba(0,0,0,.08)}
+.picker.open{display:block}
+.pkGroup{display:flex;align-items:baseline;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--p-ink-3);padding:9px 12px 5px;background:var(--p-subtle);border-bottom:.5px solid var(--p-border-2)}
+.pkItem{display:flex;gap:10px;width:100%;text-align:left;border:none;background:none;padding:8px 12px;cursor:pointer;border-bottom:.5px solid var(--p-border-2);align-items:flex-start}
+.pkItem:hover{background:var(--p-subtle)}
+.pkItem.on{background:var(--ink-wash)}
+.pkBody{flex:1;min-width:0}
+.pkTop{display:flex;align-items:baseline;gap:8px}
+.pkName{font-size:12.5px}
+.pkId{font:500 10px var(--font-mono);color:var(--p-ink-3)}
+.pkCost{font-size:11px;color:var(--p-ink-2);margin-left:auto;white-space:nowrap}
+.pkDesc{font-size:11px;color:var(--p-ink-3);line-height:1.45;margin-top:2px}
+.box{flex:none;width:13px;height:13px;margin-top:2px;border:1px solid var(--ink-soft);border-radius:3px;display:flex;align-items:center;justify-content:center}
+.box.num{font:600 9px/1 var(--font-sans);color:var(--paper-bg);background:var(--ink);border-color:var(--ink)}
+.pkItem:hover .box{border-color:var(--ink)}
+.pkFoot{padding:8px 12px 9px}
+
+/* the field */
+.dock{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--paper-bg) 72%,rgba(252,252,250,0));z-index:30}
+.dock-in{max-width:720px;margin:0 auto;position:relative}
+.sfield{position:relative;display:flex;align-items:center;border-radius:var(--r-btn);background:var(--p-surface);overflow:hidden;box-shadow:0 1px 2px rgba(40,36,28,.035),0 0 0 .5px rgba(25,25,25,.10)}
+.fill{position:absolute;inset:0;pointer-events:none;transition:opacity .2s}
+.fill svg{width:100%;height:100%;display:block}
+.cmdfill{background:rgb(var(--line-c));opacity:0}
+.sfield.cmd .cmdfill{opacity:1}.sfield.cmd .prmfill{opacity:0}
+.sfield input{position:relative;z-index:1;flex:1;min-width:0;padding:10px 6px 10px 72px;border:none;background:transparent;font:400 13.5px var(--font-sans);color:var(--ink);outline:none}
+.sfield.cmd input{font-family:var(--font-mono);font-size:13px;color:#fff;padding-left:86px;text-shadow:0 0 3px rgba(12,20,40,.95)}
+.sfield.cmd input::placeholder{color:#fff;opacity:.8}
+.modechip{position:absolute;left:12px;top:50%;margin-top:-8px;z-index:2;font:600 8.5px var(--font-sans);letter-spacing:.06em;padding:3px 7px;border-radius:9px;background:var(--ink);color:var(--paper-bg)}
+.sfield.cmd .modechip{background:rgb(var(--navy));color:#fff}
+.fmarg{position:relative;z-index:2;display:flex;align-items:baseline;flex-shrink:0;padding-left:8px;font:italic 400 11.5px var(--font-serif);color:var(--marg)}
+.fmarg .tg{border:none;background:none;padding:4px 0;cursor:pointer;font:inherit;color:var(--marg);white-space:nowrap}
+.fmarg .tg.on{color:var(--ink)}
+.fmarg .tg:hover{color:var(--p-gold-deep)}
+.fmarg .sep{opacity:.4;margin:0 5px}
+.sfield.cmd .fmarg{display:none}
+.quill{position:relative;z-index:2;width:21px;height:21px;margin:0 10px 0 6px;flex-shrink:0;color:var(--ink)}
+.sfield.cmd .quill{display:none}
+.shint{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 4px;min-height:19px;padding:6px 13px 0;font:italic 400 11px/1.6 var(--font-serif);color:var(--marg)}
+.shint .sep{opacity:.5;margin:0 3px 0 1px}
+.shint code{font:normal 600 11px var(--font-serif);color:var(--ink)}
+.shint button{font:inherit;color:inherit;border:none;background:none;padding:0;cursor:pointer}
+.shint button:hover{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+.shint .now{color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:120px;transform:translateX(-50%);background:var(--p-surface);border-radius:10px;padding:9px 14px;box-shadow:0 8px 28px rgba(40,36,28,.12);font:italic 12px var(--font-serif);color:var(--p-ink-2);opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;z-index:40}
+.toast.on{opacity:1}
+
+/* ═══ v2 additions ═══ */
+mark.noted{background:none;border-bottom:1.5px dotted var(--c-note);padding:0;border-radius:0;cursor:pointer}
+#chat mark{cursor:pointer}
+.mk.flash{background:rgba(196,169,77,.10);box-shadow:inset 0 0 0 1px rgba(196,169,77,.45)}
+.mk .qs{margin-top:6px;display:flex;flex-direction:column;gap:3px}
+.mk .qs div{font:italic 11.5px/1.45 var(--font-serif);color:var(--p-ink-2);padding-left:8px;border-left:1.5px solid var(--c-quote)}
+.mk .qs div.high{border-left-color:var(--c-high)}
+.mk .qs div.note{border-left-color:var(--c-note)}
+.mk .qs code,.mk .ref code{font:normal 500 10px var(--font-mono);color:var(--p-ink-3);margin-left:4px}
+.mk .ref{font:italic 11.5px/1.45 var(--font-serif);color:var(--p-ink-2);margin-bottom:5px}
+.mk.draft{background:var(--p-subtle)}
+.mk.draft textarea{width:100%;min-height:54px;resize:vertical;border:none;outline:none;background:transparent;font:400 12.5px/1.5 var(--font-sans);color:var(--ink);padding:0}
+.mk.draft textarea::placeholder{color:var(--p-ink-3)}
+/* the selection, named by type */
+.acts .scope{flex-wrap:wrap;row-gap:4px}
+.pick{display:inline-flex;align-items:baseline;gap:4px;border:none;background:none;padding:0;cursor:pointer;font:500 10.5px var(--font-sans);color:var(--p-ink-2)}
+.pick i{display:inline-block;width:2px;height:10px;background:var(--c-quote);align-self:center}
+.pick.high i{background:var(--c-high)}.pick.note i{background:var(--c-note)}
+.pick code{font:500 10px var(--font-mono);color:var(--ink)}
+.acts .scope .pick{text-decoration:none;font-size:10.5px;color:var(--p-ink-2)}
+.acts .scope .pick:hover{color:var(--ink)}
+.typecount{font:italic 11px var(--font-serif);color:var(--marg)}
+/* marking menu over a selection in the chat */
+.selmenu{position:fixed;z-index:60;display:none;align-items:baseline;gap:0 6px;padding:5px 10px;background:#fff;border:.5px solid var(--p-border);border-radius:8px;box-shadow:0 6px 20px rgba(40,36,28,.14);font:italic 12px var(--font-serif);color:var(--marg)}
+.selmenu.open{display:flex}
+.selmenu button{border:none;background:none;padding:2px 0;cursor:pointer;font:inherit;color:var(--p-ink-2)}
+.selmenu button:hover{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+.selmenu .sep{opacity:.4}
+
+/* ═══ v3 additions ═══ */
+.try{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 16px;border-bottom:1px dashed rgba(25,25,25,.15)}
+.try span{font:600 9px var(--font-sans);letter-spacing:.055em;color:var(--p-ink-3);margin-right:4px}
+.try button{border:none;border-radius:var(--r-btn);padding:6px 10px;cursor:pointer;color:var(--p-ink-2);background:var(--p-subtle);font:500 11px var(--font-mono)}
+.try button:hover{color:var(--ink)}
+.hd{display:grid;grid-template-columns:16px minmax(0,1fr);gap:10px;align-items:baseline;margin:16px -8px 6px -2px;padding:4px 8px;border-radius:8px;border-bottom:.5px solid var(--p-border-2)}
+.hd[draggable="true"]{cursor:grab}
+.hd .h{font:600 13px var(--font-sans);letter-spacing:-.005em}
+.hd .marg{font-size:10.5px}
+.hd.over{box-shadow:0 -2px 0 var(--ink)}
+.hd .grip{font:500 10px var(--font-mono);color:var(--p-ink-3)}
+.mk.gone .q,.mk.gone .t{color:var(--p-ink-2)}
+.mk.gone .body{border-left-style:dashed}
+.mk .marg .warn{color:var(--ink)}
+.mk .tagm{font:normal 500 10px var(--font-sans);color:var(--p-ink-2);background:var(--ink-wash);border-radius:9px;padding:1px 7px}
+.tab.del{text-decoration:line-through;color:var(--p-ink-3);cursor:default}
+.addrow{display:flex;gap:6px;margin:10px 0 4px}
+.addrow .newnote{margin:0;flex:1}
+.addrow .newnote.h{flex:0 0 auto;width:auto}
+/* search mode, as the Almanac: drawn pill, magnifier */
+.sfield.srch .modechip{background:var(--paper-bg);color:var(--ink);border:1px solid var(--ink);padding:2px 6px}
+.sfield.srch .quill{display:none}
+.sfield.srch .prmfill{opacity:0}
+.mag{display:none;position:relative;z-index:2;width:15px;height:15px;margin:0 12px 0 6px;flex-shrink:0;color:var(--ink)}
+.sfield.srch .mag{display:block}
+.mk mark.hit{background:rgba(196,169,77,.22);padding:0;border-radius:2px}
+</style>
+</head>
+<body>
+
+<div class="try"><span>TRY</span>
+  <button data-try="cmd" data-v="delete:201c">delete:201c</button>
+  <button data-try="cmd" data-v="export:md">export:md</button>
+  <button data-try="cmd" data-v="export:md 201, 207">export:md 201, 207</button>
+  <button data-try="cmd" data-v="rewrite:234">rewrite:234</button>
+  <button data-try="cmd" data-v="compare:234 235">compare:234 235</button>
+  <button data-try="srch" data-v="rodrigues">s&gt;rodrigues</button>
+</div>
+<nav class="strip" aria-label="Boards">
+  <button class="btitle" data-cmd="alm:">Alm:</button>
+  <button class="btitle" data-cmd="lib:">Lib:</button>
+  <button class="btitle here" data-cmd="sym:Research">Sym:<span class="c"> Research</span></button>
+  <button class="btitle here" data-cmd="col:&quot;Krakatoa reading&quot;">Col:<span class="c"> Krakatoa reading</span></button>
+  <button class="btitle" data-cmd="dkt:201">Dkt:</button>
+</nav>
+
+<main class="stage">
+  <section class="lcard" id="chat"></section>
+  <section class="lcard colboard" id="col"></section>
+</main>
+
+<div class="dock"><div class="dock-in">
+  <div class="sfield" id="field">
+    <div class="fill prmfill"><svg aria-hidden="true"><defs><pattern id="mosaic" width="16" height="24" patternUnits="userSpaceOnUse" patternTransform="skewY(-17)"><g fill="none" stroke="var(--tri)" stroke-width=".7"><path d="M0 0V24M16 0V24"/><path d="M0 0H16M0 24H16"/><path d="M0 0L16 24"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#mosaic)"/></svg></div>
+    <div class="fill cmdfill"></div>
+    <span class="modechip" id="chip">PROMPT</span>
+    <input id="inp" autocomplete="off" spellcheck="false">
+    <span class="fmarg" id="fmarg"></span>
+    <svg class="mag" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><line x1="10.2" y1="10.2" x2="13.8" y2="13.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <svg class="quill" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.3 14.8h8.5l-.7 5.1a1.5 1.5 0 0 1-1.5 1.3H8.5a1.5 1.5 0 0 1-1.5-1.3z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.2 14.8h10.7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M21.3 2.3c-5.7 1.2-9.1 5-9.8 10l3.1-1c3.9-1.4 6.4-4.6 6.7-9z" fill="currentColor"/><path d="M11.9 12.2 10.4 14.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </div>
+  <div class="shint" id="hint"></div>
+</div></div>
+<div class="toast" id="toast"></div>
+<div class="selmenu" id="selmenu"><button data-mark="high">highlight</button><span class="sep">·</span><button data-mark="note">note</button><span class="sep">·</span><button data-mark="quote">quote</button></div>
+
+<script>
+/* ═══ Data ═══ */
+const BR = {
+  a:{src:'Sonnet 4.6', html:'<p>The short answer is that the final explosion released an enormous pressure wave in a fraction of a second. Close to the volcano it behaved as a shock wave; farther out it relaxed into ordinary sound, but <mark data-mk="214">sound so strong that it stayed above the threshold of hearing for thousands of kilometres</mark>.</p><p>Much of the blast was very low in frequency, and <mark data-mk="221">low frequencies lose far less energy over distance than high ones</mark>. Air absorbs the high end quickly, which is why distant thunder rumbles rather than cracks.</p>'},
+  b:{src:'Wikipedia', wiki:true, html:'<p>From the article on the 1883 eruption, section on the sound. <mark class="noted" data-mk="216">Reports placed the final blast among the loudest sounds in recorded history.</mark> <mark data-mk="215">On Rodrigues Island, near Mauritius, people took it for distant gunfire.</mark></p><p class="cite">Wikipedia, CC BY-SA 4.0 · revision 1249</p>'},
+  c:{src:'Opus 4.6', html:'<p>It helps to separate three effects: the energy of the event, the frequency content of the blast, and the state of the atmosphere that morning. <mark class="quote" data-mk="217">Energy alone does not explain the range; the atmosphere did a good share of the carrying.</mark></p><p>Sound bends as temperature and wind change with height, and on some paths it was guided along the upper air and returned to the ground far away.</p>'}
+};
+/* Markings. parent: where they live (null: written here). gone: why its passage is missing.
+   ref: the passage a note is on. quotes: items quoted beneath a note. sum: a dated summary. */
+let MK = [
+  {id:214, type:'high',  parent:'201a', src:'Sonnet 4.6', tags:['Essay'], text:'sound so strong that it stayed above the threshold of hearing for thousands of kilometres', when:3},
+  {id:221, type:'high',  parent:'201a', src:'Sonnet 4.6', text:'low frequencies lose far less energy over distance than high ones', when:7},
+  {id:215, type:'high',  parent:'201b', src:'Wikipedia',  text:'On Rodrigues Island, near Mauritius, people took it for distant gunfire.', when:4},
+  {id:216, type:'note',  parent:'201b', src:'Wikipedia',  ref:'Reports placed the final blast among the loudest sounds in recorded history.', text:'Check the Rodrigues distance against a second source before the essay uses it.', when:5},
+  {id:217, type:'quote', parent:'201c', src:'Opus 4.6',   text:'Energy alone does not explain the range; the atmosphere did a good share of the carrying.', when:6, changedD:31},
+  {id:218, type:'high',  parent:'207',  src:'Sonnet 4.6', tags:['Contrast'], text:'Tambora in 1815 was larger, but far fewer people were placed to write down what they heard.', when:1},
+  {id:226, type:'high',  parent:'201d', src:'Haiku 4.5', gone:'deleted Sep 29', goneD:29, text:'The pressure wave circled the globe roughly seven times.', when:2},
+  {id:219, type:'note',  parent:'207',  src:'Sonnet 4.6', tags:['Essay'], text:'Good contrast for the essay: the bigger eruption, the quieter record.', when:2},
+  {id:231, type:'note',  parent:null,   src:'', text:'Thread for the essay: loudness is mostly about what the air did, not only about the blast.', when:8, quotes:[214,217]},
+  {id:234, type:'note',  parent:null,   src:'', sum:{date:'Sep 30', d:30, from:[214,217]}, text:'Krakatoa carried so far because a very strong, very low-pitched pulse lost little energy, and the atmosphere guided part of it a long way.', when:9}
+];
+let HEADS = {h1:'Causes', h2:'Evidence', h3:'Open questions'};
+const CHATS = {'201':'Krakatoa: why so far','207':'Tambora, 1815'};
+const SOURCES = [
+  {g:'Dockets', id:'209', nm:'Volcano essay plan', d:'Every chat in every run, and all their markings.'},
+  {g:'Chats', id:'201', nm:'Krakatoa: why so far', d:'Three branches: Sonnet, Wikipedia, Opus.'},
+  {g:'Chats', id:'207', nm:'Tambora, 1815', d:'One branch. Two markings so far.'},
+  {g:'Chats', id:'212', nm:'Pinatubo and the cooling', d:'Four markings.'},
+  {g:'Collections', id:'Q2 essay reading', nm:'Q2 essay reading', d:'Another collection; everything it holds comes too.'},
+  {g:'Searches', id:'volcano', nm:'“volcano”', d:'A saved search. Whatever it finds, as it finds it.'}
+];
+
+/* ═══ State ═══ */
+let cur = 'b', tab = 'all', sort = 'mine', sel = [], from = ['201','207'];
+let order = ['h1','214','221','217','231','234','h2','215','216','218','226','h3','219'];
+let mode = 'none', carry = 'full', scope = 'here', pickOpen = false, nextId = 235, draft = null, deleted = {};
+const $ = s => document.querySelector(s);
+const inp = $('#inp'), field = $('#field');
+const CHECK = '<svg viewBox="0 0 12 12" fill="none"><polyline points="2,6.5 5,9.5 10,3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const TYPE = {high:'highlight', note:'note', quote:'quote'};
+const byId = id => MK.find(m=>m.id===+id);
+const named = id => byId(id) ? TYPE[byId(id).type]+' '+id : id;
+const plural = (n,w) => n+' '+w+(n===1?'':'s');
+const arrow = d => `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+const esc = t => t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+
+/* ═══ The chat ═══ */
+function renderChat(){
+  const K = ['a','b','c'].filter(k=>!deleted[k]); if (!K.includes(cur)) cur = K[0];
+  const i = K.indexOf(cur);
+  $('#chat').innerHTML = `<div class="chead">
+    <button class="ctitle" data-cmd="sym:Research">Sym:<span class="c"> Research</span></button>
+    <div class="marg"><span>chat 201</span><span class="sep">·</span><button data-cmd="dkt:201">dkt:201</button></div></div>
+  <div class="cbody">
+    <div class="you">Why could the 1883 Krakatoa eruption be heard thousands of kilometres away?</div>
+    <div class="tabs">${['a','b','c'].map(k=> deleted[k]
+      ? `<span class="tab del"><span class="id">${k}</span>${BR[k].src}</span>`
+      : `<button class="tab ${k===cur?'on':''}" data-k="${k}"><span class="id">${k}</span>${BR[k].src}</button>`).join('')}</div>
+    <div class="slider">
+      <div class="side"><button class="arrow" data-step="-1" aria-label="Previous reply" ${i===0?'disabled':''}>${arrow('M10 3 5 8l5 5')}</button></div>
+      <div>${K.map(k=>`<div class="slide ${k===cur?'on':''}"><div class="ans ${BR[k].wiki?'wiki':''}" data-branch="${k}">${BR[k].html}</div>
+        <div class="marg"><button data-cmd="open:201${k}">open:201${k}</button><span>with its history</span><span class="sep">·</span><button data-cmd="open:201${k} summary">open:201${k} summary</button></div></div>`).join('')}</div>
+      <div class="side"><button class="arrow" data-step="1" aria-label="Next reply" ${i===K.length-1?'disabled':''}>${arrow('M6 3l5 5-5 5')}</button></div>
+    </div>
+  </div>`;
+}
+function stepTo(d){ const K=['a','b','c'].filter(k=>!deleted[k]), i=K.indexOf(cur)+d; if (i>=0&&i<K.length){ cur=K[i]; renderChat(); renderField(); } }
+function jump(id){
+  const m = byId(id); if (!m) return;
+  if (m.gone){ toast('That passage is gone: '+m.parent+' was '+m.gone+'. The card keeps the text.'); return; }
+  if (!m.parent){ toast('Note '+id+' was written here. It has no chat to jump to.'); return; }
+  if (!m.parent.startsWith('201')){ toast(m.parent+' is another chat: open:'+m.parent+' brings it beside this one.'); return; }
+  cur = m.parent.slice(-1); renderChat(); renderField();
+  const el = document.querySelector(`#chat [data-mk="${id}"]`);
+  if (el){ el.scrollIntoView({behavior:'smooth', block:'center'}); el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'), 1400); }
+}
+function findCard(id){
+  const m = byId(id); if (!m) return;
+  if (tab!=='all' && tab!==m.type) tab = 'all';
+  renderCol();
+  const el = document.querySelector(`#clist [data-id="${id}"]`);
+  if (el){ el.scrollIntoView({behavior:'smooth', block:'center'}); el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'), 1600); }
+}
+
+/* ═══ Marking from the chat ═══ */
+let pending = null;
+function showSelMenu(){
+  const s = window.getSelection();
+  if (!s.rangeCount || s.isCollapsed){ hideSelMenu(); return; }
+  const r = s.getRangeAt(0), ans = r.commonAncestorContainer.parentElement?.closest('#chat .ans');
+  if (!ans || r.startContainer!==r.endContainer || r.startContainer.nodeType!==3 || r.startContainer.parentElement.closest('mark')){ hideSelMenu(); return; }
+  pending = {range:r.cloneRange(), k:ans.dataset.branch, text:s.toString().trim()};
+  const b = r.getBoundingClientRect(), m = $('#selmenu');
+  m.classList.add('open');
+  m.style.left = Math.max(8, Math.min(innerWidth - m.offsetWidth - 8, b.left + b.width/2 - m.offsetWidth/2)) + 'px';
+  m.style.top = (b.top - m.offsetHeight - 8) + 'px';
+}
+function hideSelMenu(){ $('#selmenu').classList.remove('open'); }
+function makeMark(type){
+  if (!pending) return;
+  const {range, k, text} = pending, id = nextId++, el = document.createElement('mark');
+  el.dataset.mk = id; if (type==='quote') el.className = 'quote'; if (type==='note') el.className = 'noted';
+  range.surroundContents(el);
+  BR[k].html = document.querySelector(`#chat .ans[data-branch="${k}"]`).innerHTML;
+  window.getSelection().removeAllRanges(); hideSelMenu(); pending = null;
+  const base = {id, parent:'201'+k, src:BR[k].src, when:30+id};
+  order.push(String(id));
+  if (type==='note'){
+    MK.push({...base, type:'note', ref:text, text:''}); draft = id;
+    if (tab!=='all' && tab!=='note') tab = 'all';
+    renderCol();
+    const ta = document.querySelector('#clist textarea'); if (ta){ ta.scrollIntoView({block:'center'}); ta.focus(); }
+    hint();
+  } else {
+    MK.push({...base, type, text});
+    findCard(id); toast(TYPE[type][0].toUpperCase()+TYPE[type].slice(1)+' '+id+' kept. It is in the collection now.');
+  }
+}
+function finishDraft(keep){
+  const m = byId(draft), ta = document.querySelector('#clist textarea');
+  if (keep && ta && ta.value.trim()){ m.text = ta.value.trim(); toast('Note '+m.id+' kept.'); }
+  else {
+    const k = m.parent.slice(-1), el = document.querySelector(`#chat [data-mk="${m.id}"]`);
+    if (el){ el.replaceWith(document.createTextNode(el.textContent)); BR[k].html = document.querySelector(`#chat .ans[data-branch="${k}"]`).innerHTML; }
+    MK = MK.filter(x=>x.id!==m.id); order = order.filter(x=>x!==String(m.id)); toast('Note dropped.');
+  }
+  draft = null; renderCol(); hint();
+}
+
+/* ═══ The collection ═══ */
+const holds = m => m.parent===null || from.includes(m.parent.slice(0,3));
+const query = () => mode==='srch' && scope==='here' ? inp.value.trim().toLowerCase() : '';
+const matches = m => { const q = query(); return !q || (m.text+' '+(m.ref||'')).toLowerCase().includes(q); };
+const inView = () => MK.filter(m => holds(m) && (tab==='all' || m.type===tab) && matches(m));
+function underHeading(id){ let h = null; for (const o of order){ if (o[0]==='h') h = HEADS[o]; if (o===String(id)) return h; } return null; }
+function hl(t){ const q = query(); return q ? t.replace(new RegExp('('+esc(q)+')','ig'),'<mark class="hit">$1</mark>') : t; }
+function staleOf(m){ return m.sum ? m.sum.from.filter(i=>{ const x=byId(i); return x && x.changedD > m.sum.d; }) : []; }
+function goneOf(m){ return m.sum ? m.sum.from.filter(i=>{ const x=byId(i); return !x || (x.goneD && x.goneD > m.sum.d); }) : []; }
+
+function card(m){
+  if (m.id===draft) return `<div class="mk note draft" data-id="${m.id}"><span></span>
+    <div class="body"><div class="ref">“${m.ref}”<code>${m.parent}</code></div>
+    <textarea placeholder="Write the note. Enter keeps it, Shift+Enter for a new line, Escape drops it."></textarea>
+    <div class="marg"><span class="id">${m.id}</span><span class="sep">·</span><span>note</span><span class="sep">·</span><button data-jump="${m.id}">${m.parent}</button></div></div></div>`;
+  const on = sel.includes(m.id), drag = sort==='mine' && !query() ? 'draggable="true"' : '';
+  let where;
+  if (m.gone) where = `<span>${m.parent}</span><span class="sep">·</span><span class="warn">passage gone, ${m.parent} ${m.gone}</span>`;
+  else if (m.sum){
+    const st = staleOf(m), gn = goneOf(m);
+    where = `<span>summary, written ${m.sum.date} from ${m.sum.from.join(', ')}</span>`
+      + (st.length ? `<span class="sep">·</span><span class="warn">${st.join(', ')} changed since</span>` : '')
+      + (gn.length ? `<span class="sep">·</span><span class="warn">${gn.join(', ')} gone since</span>` : '')
+      + (st.length||gn.length ? `<span class="sep">·</span><button data-cmd="rewrite:${m.id}">rewrite:${m.id}</button>` : '');
+  }
+  else if (m.parent) where = `<button data-jump="${m.id}">${m.parent}</button><span class="sep">·</span><span>${m.src}</span>`;
+  else where = `<span>written here</span>`;
+  const under = sort!=='mine' && underHeading(m.id) ? `<span class="sep">·</span><span>under ${underHeading(m.id)}</span>` : '';
+  const tags = (m.tags||[]).map(t=>`<span class="tagm">${t}</span>`).join('');
+  const ref = m.ref ? `<div class="ref">on “${hl(m.ref)}”</div>` : '';
+  const qs = m.quotes ? `<div class="qs">${m.quotes.map(q=>{const x=byId(q); return x?`<div class="${x.type}">${x.text}<code>${q}${x.gone?' · passage gone':''}</code></div>`:`<div>deleted<code>${q}</code></div>`;}).join('')}</div>` : '';
+  return `<div class="mk ${m.type} ${on?'sel':''} ${m.gone?'gone':''}" data-id="${m.id}" ${drag}>
+    <button class="cb" data-sel="${m.id}" aria-label="Select ${named(m.id)}" aria-pressed="${on}">${CHECK}</button>
+    <div class="body">${ref}<div class="${m.type==='note'?'t':'q'}">${hl(m.text)}</div>${qs}
+      <div class="marg"><span class="id">${m.id}</span><span class="sep">·</span><span>${TYPE[m.type]}</span><span class="sep">·</span>${where}${under}${tags?'<span class="sep">·</span>'+tags:''}</div></div></div>`;
+}
+function head(h){
+  return `<div class="hd" data-id="${h}" ${query()?'':'draggable="true"'}><span class="grip">§</span><div><div class="h">${HEADS[h]}</div></div></div>`;
+}
+function scopeLine(){
+  if (!sel.length) return '<span>Select cards to act on them, or act on the whole collection.</span>';
+  const counts = {}; sel.forEach(id=>{ const t=byId(id).type; counts[t]=(counts[t]||0)+1; });
+  const sum = Object.entries(counts).map(([t,n])=>plural(n,TYPE[t])).join(', ');
+  return `<b>${sel.length} selected</b><span class="typecount">${sum}</span>`
+    + sel.map(id=>`<button class="pick ${byId(id).type}" data-find="${id}"><i></i>${TYPE[byId(id).type]}<code>${id}</code></button>`).join('')
+    + `<button data-clear="1">clear</button>`;
+}
+function renderCol(){
+  const all = MK.filter(holds), n = t => all.filter(m=>t==='all'||m.type===t).length;
+  let items = inView(), body = '';
+  if (!items.length) body = `<div class="empty">${query()?'Nothing in this collection matches “'+query()+'”.':'Nothing here yet.'}</div>`;
+  else if (sort==='mine'){
+    order.forEach(o=>{
+      if (o[0]==='h'){ if (HEADS[o] && !query()) body += head(o); return; }
+      const m = items.find(x=>String(x.id)===o); if (m) body += card(m);
+    });
+  } else if (sort==='source'){
+    [...from.map(f=>({k:f, label:f+' · '+CHATS[f]})), {k:null, label:'written here'}].forEach(g=>{
+      const sub = items.filter(m => g.k===null ? !m.parent : (m.parent && m.parent.slice(0,3)===g.k));
+      if (!sub.length) return;
+      body += `<div class="grp">${g.label}</div>`;
+      [...new Set(sub.map(m=>m.parent))].sort().forEach(b => sub.filter(m=>m.parent===b).forEach(m => body += card(m)));
+    });
+  } else body = items.slice().sort((a,b)=>b.when-a.when).map(card).join('');
+  body += `<div class="addrow"><button class="newnote" data-act="note">Write a note here. It keeps its own id and needs no chat.</button>${sort==='mine'?'<button class="newnote h" data-cmd=\'heading:""\'>+ heading</button>':''}</div>`;
+  const k = sel.length;
+  $('#col').innerHTML = `<div class="chead">
+    <button class="ctitle" data-cmd='col:"Krakatoa reading"'>Col:<span class="c"> Krakatoa reading</span></button>
+    <div class="marg"><span>from</span><button class="picks ${pickOpen?'open':''}" id="frombtn">${from.join(', ')}</button><span class="sep">·</span><button data-try="srch" data-v="">search: s&gt;</button><span class="sep">·</span><button data-cmd="export:md">export:md</button></div>
+    <div class="picker ${pickOpen?'open':''}" id="picker">${renderPicker()}</div></div>
+  <div class="ctabs">${[['all','All'],['high','Highlights'],['note','Notes'],['quote','Quotes']].map(([t,l])=>`<button class="ctab ${tab===t?'on':''}" data-tab="${t}">${l}<span class="n">${n(t)}</span></button>`).join('')}</div>
+  <div class="ctools"><span></span><div class="marg"><span>by</span>${[['mine','your order'],['source','source'],['date','date']].map(([s,l])=>`<button class="${sort===s?'on':''}" data-sort="${s}">${l}</button>`).join('<span class="sep">·</span>')}</div></div>
+  <div class="clist" id="clist">${body}</div>
+  <div class="acts">
+    <div class="scope">${scopeLine()}</div>
+    <div class="row">
+      <button class="act" data-act="note">Note${k?'<small>quoting '+k+'</small>':''}</button>
+      <button class="act" data-act="tag" ${k?'':'disabled'}>Tag</button>
+      <button class="act" data-act="summarize">Summarize<small>1 call</small></button>
+      <button class="act" data-act="prompt">Prompt<small>new chat</small></button>
+    </div>
+  </div>`;
+  bindDrag();
+}
+function renderPicker(){
+  let h = '', last = null;
+  SOURCES.forEach(s=>{
+    if (s.g!==last){ h += `<div class="pkGroup">${s.g}</div>`; last = s.g; }
+    const on = from.includes(s.id), n = from.indexOf(s.id);
+    h += `<button class="pkItem ${on?'on':''}" data-from="${s.id}">${on?`<span class="box num">${n+1}</span>`:'<span class="box"></span>'}
+      <span class="pkBody"><span class="pkTop"><span class="pkName">${s.nm}</span>${/^\d+$/.test(s.id)?`<span class="pkId">${s.id}</span>`:''}</span><span class="pkDesc">${s.d}</span></span></button>`;
+  });
+  return h + `<div class="pkFoot marg"><span>numbers set the order of the groups</span><span class="sep">·</span><span>one marking: <code>add:218</code></span></div>`;
+}
+function bindDrag(){
+  if (sort!=='mine' || query()) return;
+  let dragId = null;
+  document.querySelectorAll('#clist [draggable="true"]').forEach(el=>{
+    el.addEventListener('dragstart', e=>{ dragId=el.dataset.id; el.classList.add('drag'); e.dataTransfer.effectAllowed='move'; });
+    el.addEventListener('dragend', ()=>el.classList.remove('drag'));
+    el.addEventListener('dragover', e=>{ e.preventDefault(); el.classList.add('over'); });
+    el.addEventListener('dragleave', ()=>el.classList.remove('over'));
+    el.addEventListener('drop', e=>{ e.preventDefault(); el.classList.remove('over');
+      const to=el.dataset.id; if (dragId===to) return;
+      order.splice(order.indexOf(dragId),1); order.splice(order.indexOf(to),0,dragId); renderCol(); });
+  });
+}
+
+/* ═══ The field ═══ */
+const list = () => sel.length ? sel.map(named).join(', ') : 'the whole collection';
+const toks = () => { const n = sel.length || inView().length; return {full:(n*160+900).toLocaleString(), sum:(n*40+300).toLocaleString()}; };
+function renderField(){
+  const chip = {cmd:'COMMAND', srch:'SEARCH'}[mode] || 'PROMPT';
+  $('#chip').textContent = chip;
+  field.classList.toggle('cmd', mode==='cmd'); field.classList.toggle('srch', mode==='srch');
+  $('#fmarg').innerHTML =
+      mode==='prm'  ? `<button class="tg ${carry==='full'?'on':''}" data-carry="full">in full</button><span class="sep">·</span><button class="tg ${carry==='sum'?'on':''}" data-carry="sum">from a summary</button>`
+    : mode==='srch' ? `<button class="tg ${scope==='here'?'on':''}" data-scope="here">in Krakatoa reading</button><span class="sep">·</span><button class="tg ${scope==='all'?'on':''}" data-scope="all">everywhere</button>`
+    : `<span>to 201${cur} · ${BR[cur].src.replace(/ \d.*$/,'')}</span>`;
+  inp.placeholder = mode==='cmd' ? 'note:, heading:, tagadd:, export:md, delete:' : mode==='prm' ? 'Ask about '+(sel.length?sel.length+' selected':'the collection')
+    : mode==='srch' ? (scope==='here' ? 'Search this collection' : 'Search everything') : 'Reply to 201'+cur;
+  hint();
+}
+function inChat(k){ return MK.filter(m=>m.parent==='201'+k); }
+function quotedBy(ids){ return MK.filter(m=>(m.quotes||[]).concat(m.sum?m.sum.from:[]).some(q=>ids.includes(q))).map(m=>m.id); }
+function hint(){
+  const h = $('#hint'), v = inp.value.trim().replace(/^>/,''); let m;
+  if (draft){ h.innerHTML = `<span class="now">Writing note ${draft} in the collection</span><span class="sep">·</span><span>Enter keeps it · Escape drops it</span>`; return; }
+  if (mode==='srch'){
+    const q = inp.value.trim();
+    h.innerHTML = scope==='here'
+      ? (q ? `<span class="now">${plural(inView().length,'card')} in Krakatoa reading match</span><span class="sep">·</span><span>Escape clears it</span>` : `<span>type to narrow this collection in place</span><span class="sep">·</span><span>the same filters work: <code>type:note</code>, <code>from:201b</code>, <code>tag:Essay</code></span>`)
+      : `<span class="now">Enter searches everything in the Almanac</span><span class="sep">·</span><span>results open there</span>`;
+    return;
+  }
+  if (mode==='cmd'){
+    if ((m = v.match(/^delete:201([abc])(\s+all)?$/))){
+      const ins = inChat(m[1]).map(x=>x.id), q = quotedBy(ins);
+      const what = ins.length ? 'It holds '+ins.map(named).join(', ') : 'Nothing in it is marked';
+      h.innerHTML = m[2]
+        ? `<span class="now">Enter deletes 201${m[1]} and ${ins.map(named).join(', ')||'nothing else'}</span>${q.length?`<span class="sep">·</span><span>notes ${q.join(', ')} quote it; they stay and say so</span>`:''}`
+        : `<span class="now">Enter deletes 201${m[1]}. ${what}${ins.length?'; it stays as a card, marked passage gone':''}</span>${q.length?`<span class="sep">·</span><span>notes ${q.join(', ')} quote it and will say so</span>`:''}${ins.length?`<span class="sep">·</span><button data-cmd="delete:201${m[1]} all">delete:201${m[1]} all removes ${ins.length===1?'it':'them'} too</button>`:''}`;
+    }
+    else if ((m = v.match(/^export:md\s*(.*)$/))){
+      const t = m[1].trim();
+      const a = sort==='mine'; 
+      h.innerHTML = !t ? `<span class="now">Enter downloads Krakatoa reading.md</span><span class="sep">·</span><span>${Object.keys(HEADS).length} headings, ${plural(inView().length,'card')} in your order; sources as footnotes, with Wikipedia's licence and revision</span>`
+        : t==='alm' ? `<span class="now">Enter downloads the whole Almanac</span><span class="sep">·</span><span>a folder: one .md per chat and docket, an index, and every collection</span>`
+        : `<span class="now">Enter downloads ${t.split(/,\s*/).map(x=>x+'.md').join(' and ')}</span><span class="sep">·</span><span>each chat with its branches as sections; highlights inline, notes as footnotes</span>`;
+    }
+    else if ((m = v.match(/^rewrite:(\d+)$/))) h.innerHTML = `<span class="now">Enter writes note ${nextId}, a new summary of ${(byId(m[1])?.sum?.from||[]).join(', ')}</span><span class="sep">·</span><span>${m[1]} stays as it is, dated ${byId(m[1])?.sum?.date}</span><span class="sep">·</span><span>one model call</span>`;
+    else if ((m = v.match(/^compare:(\d+)\s+(\d+)$/))) h.innerHTML = byId(m[2]) ? `<span class="now">Enter shows what changed between ${m[1]} and ${m[2]}</span><span class="sep">·</span><span>word by word, no model call</span>` : `<span>${m[2]} doesn't exist yet</span><span class="sep">·</span><button data-cmd="rewrite:${m[1]}">rewrite:${m[1]} writes it</button>`;
+    else if (v.startsWith('heading:')) h.innerHTML = `<span class="now">Enter adds a heading at the end of your order</span><span class="sep">·</span><span>drag it into place; it belongs to this collection only</span>`;
+    else if (v.startsWith('note:')) h.innerHTML = sel.length
+      ? `<span class="now">Enter writes note ${nextId} in your words, quoting ${list()} beneath it</span><span class="sep">·</span><span>each points back to where it came from</span>`
+      : `<span class="now">Enter writes note ${nextId} here, with no chat behind it</span><span class="sep">·</span><span>type it inside the quotes</span>`;
+    else if (v.startsWith('tagadd:')) h.innerHTML = `<span class="now">Enter puts the tag on ${list()}</span><span class="sep">·</span><span>it travels with them, in every collection and the Almanac</span>`;
+    else if (v.startsWith('summarize:')) h.innerHTML = `<span class="now">Enter writes note ${nextId}, a summary of ${list()}, dated today</span><span class="sep">·</span><span>one model call</span>`;
+    else if (/^open:201[abc](\s+summary)?$/.test(v)) h.innerHTML = /summary$/.test(v) ? `<span class="now">Enter starts 201d on its own card from a summary</span><span class="sep">·</span><span>one model call</span>` : `<span class="now">Enter opens it on its own card with its full history</span>`;
+    else h.innerHTML = `<span>Enter runs it</span><span class="sep">·</span><span>Escape goes back to the prompt</span>`;
+    return;
+  }
+  if (mode==='prm'){
+    const t = toks(), qn = (sel.length?sel:inView().map(x=>x.id)).filter(id=>byId(id)?.type==='quote');
+    const qx = qn.length ? `<span class="sep">·</span><span>includes ${qn.map(named).join(', ')}, normally kept from the model</span>` : '';
+    h.innerHTML = carry==='full'
+      ? `<span class="now">Enter opens a new chat about ${list()}, sent in full</span><span class="sep">·</span><span>about ${t.full} tokens</span>${qx}`
+      : `<span class="now">Enter summarises ${list()} first, then opens a new chat</span><span class="sep">·</span><span>about ${t.sum} tokens, plus one call</span>${qx}`;
+    return;
+  }
+  h.innerHTML = `<span>select text in the chat to mark it</span><span class="sep">·</span><span>click a mark or an id to find its pair</span><span class="sep">·</span><span><code>s&gt;</code> searches this collection</span>`;
+}
+function setMode(m, text){
+  mode = m; inp.value = text || '';
+  renderField(); renderCol(); inp.focus();
+  if (m==='cmd' && text && text.includes('""')){ const p = text.indexOf('""')+1; inp.setSelectionRange(p,p); }
+}
+function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('on'); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('on'),3200); }
+function addNote(obj){ MK.push(obj); return obj.id; }
+
+function runCmd(){
+  const v = inp.value.trim().replace(/^>/,''); let m;
+  if ((m = v.match(/^note:[^"]*"(.*)"\s*$/))){
+    const text = m[1].trim(); if (!text){ toast('Type the note inside the quotes.'); return; }
+    const id = addNote({id:nextId++, type:'note', parent:null, src:'', text, when:40+nextId, quotes: sel.length?sel.slice():null});
+    order.push(String(id)); sel=[]; setMode('none'); findCard(id); toast('Note '+id+' written.'); return;
+  }
+  if ((m = v.match(/^heading:"(.*)"/))){
+    if (!m[1].trim()){ toast('Type the heading inside the quotes.'); return; }
+    const k = 'h'+(Object.keys(HEADS).length+1+Math.floor(Math.random()*1000)); HEADS[k] = m[1].trim(); order.push(k);
+    sort='mine'; setMode('none'); toast('Heading added at the end. Drag it into place.'); return;
+  }
+  if ((m = v.match(/^tagadd:"(.*)"/))){
+    if (!m[1].trim()){ toast('Type the tag inside the quotes.'); return; }
+    sel.forEach(id=>{ const x=byId(id); x.tags=[...new Set([...(x.tags||[]), m[1].trim()])]; });
+    toast('“'+m[1]+'” is on '+list()+'.'); sel=[];
+  }
+  else if (v.startsWith('summarize:')){
+    const id = addNote({id:nextId++, type:'note', parent:null, src:'', when:40+nextId, sum:{date:'Oct 1', d:32, from:sel.slice()}, text:'[A one-paragraph summary is written here.]'});
+    order.push(String(id)); sel=[]; setMode('none'); findCard(id); toast('Note '+id+' holds the summary, dated today.'); return;
+  }
+  else if ((m = v.match(/^rewrite:(\d+)$/))){
+    const old = byId(m[1]); if (!old?.sum){ toast(m[1]+' is not a summary.'); return; }
+    const id = addNote({id:nextId++, type:'note', parent:null, src:'', when:40+nextId, sum:{date:'Oct 1', d:32, from:old.sum.from.slice()},
+      text:'Krakatoa carried so far because a very strong, very low-pitched pulse lost little energy, and the atmosphere, more than the energy of the blast, guided part of it a long way.'});
+    order.splice(order.indexOf(String(old.id))+1, 0, String(id));
+    setMode('none'); findCard(id); toast('Note '+id+' is the new summary. '+old.id+' stays, dated '+old.sum.date+'. compare:'+old.id+' '+id+' shows the difference.'); return;
+  }
+  else if ((m = v.match(/^compare:(\d+)\s+(\d+)$/))){
+    if (!byId(m[2])){ toast(m[2]+" doesn't exist yet. rewrite:"+m[1]+' writes it.'); return; }
+    toast('Compare opens beside the two notes, word by word: here the new summary adds “the atmosphere, more than the energy of the blast”.');
+  }
+  else if ((m = v.match(/^delete:201([abc])(\s+all)?$/))){
+    const k = m[1], ins = inChat(k);
+    deleted[k] = true;
+    if (m[2]){ const ids = ins.map(x=>x.id); MK = MK.filter(x=>!ids.includes(x.id)); order = order.filter(o=>!ids.map(String).includes(o)); }
+    else ins.forEach(x=>{ x.gone = 'deleted just now'; x.goneD = 31; });
+    renderChat(); renderField();
+    toast(m[2] ? '201'+k+' and its markings are deleted. Notes that quoted them say so.' : '201'+k+' is deleted. Its markings stay as cards, marked passage gone.');
+  }
+  else if ((m = v.match(/^export:md\s*(.*)$/))) toast(m[1].trim() ? 'Downloading '+m[1].trim().split(/,\s*/).map(x=>x+'.md').join(' and ')+'.' : 'Downloading Krakatoa reading.md.');
+  else if (v.startsWith('new:collection')) toast('A new collection opens as its own board.');
+  else if ((m = v.match(/^open:201([abc])(\s+summary)?$/))) toast(m[2] ? '201d would open from a summary of 201'+m[1]+'.' : '201'+m[1]+' would open as its own card, with its history.');
+  else if (/^(alm|lib|sym|col|dkt):/.test(v)) toast(v+' brings that board onto the screen.');
+  else toast('Not a command in this mockup: '+v);
+  setMode('none');
+}
+
+/* ═══ Events ═══ */
+document.addEventListener('mouseup', e=>{ if (!e.target.closest('#selmenu')) setTimeout(showSelMenu, 0); });
+document.addEventListener('click', e=>{
+  const t = e.target;
+  const tr = t.closest('[data-try]'); if (tr){ setMode(tr.dataset.try, tr.dataset.v); return; }
+  const mk = t.closest('[data-mark]'); if (mk){ makeMark(mk.dataset.mark); return; }
+  const cm = t.closest('#chat mark[data-mk]'); if (cm && window.getSelection().isCollapsed){ findCard(+cm.dataset.mk); return; }
+  if (t.closest('#frombtn')){ pickOpen=!pickOpen; renderCol(); return; }
+  const f = t.closest('[data-from]');
+  if (f){ const id=f.dataset.from, i=from.indexOf(id); if (i>-1) from.splice(i,1); else from.push(id);
+    if (!/^20[17]$/.test(id) && i===-1) toast('Mockup: only 201 and 207 have markings to show.'); renderCol(); return; }
+  if (pickOpen && !t.closest('#picker')){ pickOpen=false; renderCol(); }
+  const k = t.closest('button.tab'); if (k){ cur=k.dataset.k; renderChat(); renderField(); return; }
+  const a = t.closest('.arrow'); if (a){ stepTo(+a.dataset.step); return; }
+  const j = t.closest('[data-jump]'); if (j){ jump(+j.dataset.jump); return; }
+  const fd = t.closest('[data-find]'); if (fd){ findCard(+fd.dataset.find); return; }
+  const s = t.closest('[data-sel]'); if (s){ const id=+s.dataset.sel, i=sel.indexOf(id); if (i>-1) sel.splice(i,1); else sel.push(id); renderCol(); if (mode!=='none') hint(); return; }
+  const tb = t.closest('[data-tab]'); if (tb){ tab=tb.dataset.tab; renderCol(); return; }
+  const so = t.closest('[data-sort]'); if (so){ sort=so.dataset.sort; renderCol(); return; }
+  if (t.closest('[data-clear]')){ sel=[]; renderCol(); if (mode!=='none') hint(); return; }
+  const sc = t.closest('[data-scope]'); if (sc){ scope=sc.dataset.scope; renderField(); renderCol(); inp.focus(); return; }
+  const ac = t.closest('[data-act]');
+  if (ac){ const x = ac.dataset.act, ids = sel.join(', ');
+    if (x==='prompt') setMode('prm');
+    else if (x==='note') setMode('cmd', sel.length ? `note:${ids} ""` : 'note:""');
+    else if (x==='tag') setMode('cmd', `tagadd:"" ${ids}`);
+    else setMode('cmd', `summarize:${ids}`);
+    return; }
+  const cr = t.closest('[data-carry]'); if (cr){ carry = cr.dataset.carry; renderField(); inp.focus(); return; }
+  const c = t.closest('[data-cmd]'); if (c){ setMode('cmd', c.dataset.cmd); return; }
+});
+document.addEventListener('keydown', e=>{
+  if (draft && e.target.matches('#clist textarea')){
+    if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); finishDraft(true); }
+    if (e.key==='Escape'){ e.preventDefault(); finishDraft(false); }
+  }
+});
+inp.addEventListener('input', ()=>{
+  if (mode!=='cmd' && inp.value.startsWith('>')){ setMode('cmd', inp.value.slice(1)); return; }
+  if (mode==='none' && inp.value.startsWith('p>')){ setMode('prm', inp.value.slice(2)); return; }
+  if (mode!=='cmd' && inp.value.startsWith('s>')){ setMode('srch', inp.value.slice(2)); return; }
+  if (mode==='srch') renderCol();
+  hint();
+});
+inp.addEventListener('keydown', e=>{
+  if (e.key==='Escape'){ setMode('none'); return; }
+  if (e.altKey && (e.key==='ArrowLeft'||e.key==='ArrowRight')){ e.preventDefault(); stepTo(e.key==='ArrowRight'?1:-1); return; }
+  if (e.key==='Enter'){
+    if (mode==='cmd') runCmd();
+    else if (mode==='srch'){ if (scope==='all') toast('The Almanac opens with these results.'); }
+    else if (mode==='prm'){ toast(carry==='full' ? 'A new chat opens about '+list()+', linked to each.' : 'Summarised '+list()+', then a new chat opens. The summary is kept as a note.'); sel=[]; setMode('none'); }
+    else if (inp.value.trim()){ toast('Sent to 201'+cur+'.'); inp.value=''; }
+  }
+});
+renderChat(); renderCol(); renderField();
+</script>
+</body>
+</html>
