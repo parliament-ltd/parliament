@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parliament · Welcome</title>
+<!--
+PARLIAMENT · WELCOME v9. A first run taught by the command line itself.
+
+v9: the conversation is editable, and the intro shows it.
+  · Every reply can be edited in place, by default. Click into it and type.
+  · Two new steps after the key:
+      9  Strike through a line     select it, then strike (or ⌘⇧X)
+      10 Leave the AI a note       type beside it, then Note for the AI
+  · Striking keeps the words, struck, in the reply, and opens the Collection
+    with a card for the strike: what was struck, and a space for a reply or a
+    replacement. What is typed there appears in the reply as you type,
+    after the strike.
+  · Edits are yours until noted. "Note for the AI" is what lets the model see
+    a strike and its words on the next turn; the prompt line says so. A
+    keyless source (Wikipedia) reads no notes, and the line says that too.
+
+
+v8: when the steps are done, the letter gives way to one line, "Now, let's
+focus:". focus: clears the screen to the chat alone, with the field docked
+under it in prompt mode. Every board closes (popped windows too); nothing
+is lost, and focus:off brings the welcome card back.
+
+
+v7: when the last step is crossed off, the heading finishes its own sentence.
+"Welcome" gains a second line, "to Parliament", in the same serif and size,
+fading in as the steps fade out.
+
+
+v6: the letter sits to the right of the steps, level with them, and joins
+the single column when the card narrows. Signed with a dash, in the
+letter's colour. The foot adds "Looking for other builders" (CONTRIB_URL).
+The signature dash is a deliberate exception to the no em dash rule.
+
+
+THE PAGE
+  · One large card, almost the size of the screen: Welcome, a short letter
+    from So Lov, eight steps in the same serif, and the field under them.
+  · At the foot of the screen, outside the card: "Created with Claude Code ·
+    Open source on GitHub". The GitHub link is a placeholder until the repo
+    is public (GITHUB_URL below).
+
+THE STEPS, in order (crossed off in any order)
+  1 Open the command line            >
+  2 Pop the command bar out          pop:command
+  3 Ask something                    p> and a question
+  4 See what you have made           esc, then alm:
+  5 Name the room                    name:"…"
+  6 Move it to another monitor       pop:almanac
+  7 Browse tools to add and customize library:
+  8 Add an AI API key                key:
+
+HOW THE SCREEN CHANGES
+  · pop:command lifts the field out of the card and docks it at the foot of
+    the screen; the card shortens to make room. pop:back command returns it.
+  · The first prompt opens the chat in a card of its own. The welcome card
+    moves left and narrows; it keeps the letter and the steps.
+  · alm:, library: and key: open on the right, stacked. pop:almanac puts the
+    Almanac in a real browser window (drawn in the page if the browser
+    blocks it); closing the window brings it back.
+
+THE FIELD STAYS WHERE YOU PUT IT
+  · After a command runs, the field stays in the command line, so > is never
+    typed twice. After a prompt, it stays in the prompt.
+  · Escape steps back one mode: prompt → command line → search. The line by
+    the field says so in prompt mode, because step 4 depends on it.
+-->
+<style>
+:root{
+  --paper:#FCFCFA; --surface:#FFFFFF; --subtle:#FAF9F5;
+  --ink:#191919; --ink-2:#787774; --ink-3:#9B9A97;
+  --marg:rgba(25,25,25,.46); --rule:rgba(25,25,25,.12); --divider:rgba(25,25,25,.08); --hair:#F1F1EF;
+  --wash:rgba(25,25,25,.045); --wash-2:rgba(25,25,25,.075);
+  --gold-deep:#8B6A10; --navy:38,56,92; --line-c:22,38,70; --tri:rgba(122,120,114,.17);
+  --lift:0 1px 2px rgba(40,36,28,.035),0 0 0 .5px rgba(25,25,25,.05);
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --foot:40px; --dock:0px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden}
+body.docked{--dock:92px}
+:focus-visible{outline:2px solid var(--gold-deep);outline-offset:2px}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+a{color:inherit}
+[hidden]{display:none !important}
+
+.rule{position:fixed;left:0;top:0;bottom:0;width:2px;background:rgb(var(--navy));transform:scaleY(0);transform-origin:top;transition:transform .18s ease-out;z-index:20}
+body.addr .rule{transform:scaleY(1)}
+
+/* ── the desk: cards side by side ── */
+.desk{position:fixed;left:20px;right:20px;top:20px;bottom:calc(var(--foot) + var(--dock));display:flex;gap:16px;transition:bottom .4s cubic-bezier(.3,.7,.3,1)}
+.card{position:relative;background:var(--surface);border-radius:16px;box-shadow:var(--lift);min-width:0;overflow:hidden;display:flex;flex-direction:column}
+.slot{min-width:0;flex:0 0 0%;opacity:0;transition:flex-basis .45s cubic-bezier(.3,.7,.3,1),opacity .3s}
+#main{flex:1 1 100%;opacity:1}
+body.has-chat #main{flex:0 0 34%}
+body.has-chat #chat{flex:1 1 0%;opacity:1}
+body.has-right #right{flex:0 0 40%;opacity:1}
+body.has-right #main{flex:1 1 60%}
+body.has-chat.has-right #main{flex:0 0 27%}
+body.has-chat.has-right #right{flex:0 0 31%}
+#right{display:flex;flex-direction:column;gap:16px;overflow:auto}
+#right .card{flex-shrink:0}
+@keyframes pip{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+.card.new{animation:pip .3s cubic-bezier(.3,.7,.3,1) both}
+
+/* ── the welcome card ── */
+.mscroll{flex:1;overflow:auto;display:flex;flex-direction:column;padding:32px 28px}
+.mcol{width:100%;max-width:960px;margin:auto}
+.mgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:64px;grid-template-areas:"top ." "list letter" "bar letter";grid-template-rows:auto auto 1fr;align-items:start}
+.mgrid>.top{grid-area:top}.mgrid>.list{grid-area:list}.mgrid>.barslot{grid-area:bar}.mgrid>.letter{grid-area:letter}
+body.has-chat .mgrid,body.has-right .mgrid{grid-template-columns:minmax(0,1fr);grid-template-areas:"top" "list" "bar" "letter";max-width:520px}
+body.has-chat .mgrid>.letter,body.has-right .mgrid>.letter{margin-top:26px}
+body.has-chat .mcol,body.has-right .mcol{margin:0 auto}
+h1{font:400 16px/1.3 var(--serif);padding:0 2px}
+h1 .to{opacity:0;transition:opacity 1.2s ease .3s}
+body.finished h1 .to{opacity:1}
+.marg{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 5px;font:italic 400 11px/1.7 var(--serif);color:var(--marg);transition:color .16s ease}
+.marg>*{white-space:nowrap}
+.marg .sep{opacity:.4}
+.marg button:hover,.marg a:hover{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+.marg a{text-decoration:none}
+.marg code{font:normal 600 11px var(--serif)}
+.top .marg{padding:2px 2px 0}
+.top:hover .marg,.line:hover .marg,.card:hover .chead .marg,.foot:hover{color:var(--gold-deep)}
+
+.letter{margin:22px 2px 0;font:400 13px/1.7 var(--serif);color:var(--ink-2);max-width:46ch}
+.letter p+p{margin-top:9px}
+.letter .sig{margin-top:12px}
+.letter{transition:opacity .6s}
+body.finished .letter{opacity:0}
+.now{grid-area:letter;margin:22px 2px 0;font:400 16px/1.3 var(--serif);color:var(--ink);animation:pip .6s ease both}
+.now button{font:inherit;color:var(--ink);text-decoration:underline;text-decoration-color:var(--rule);text-underline-offset:4px}
+.now button:hover{text-decoration-color:var(--ink)}
+body.has-chat .now,body.has-right .now{margin-top:26px}
+
+/* focus: the chat alone */
+body.focus #main,body.focus #right{flex:0 0 0% !important;opacity:0;pointer-events:none;margin:0 -8px}
+body.focus #chat{flex:1 1 100% !important;max-width:820px}
+body.focus .desk{justify-content:center}
+
+.list{margin-top:22px;padding:0 2px;transition:opacity .6s}
+.list.gone{opacity:0;pointer-events:none}
+.list ol{list-style:none}
+.list li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:6px;padding:2px 0;font:400 13px/1.6 var(--serif);color:var(--ink)}
+.list .n{color:var(--ink-3)}
+.list .t{text-decoration:line-through;text-decoration-color:transparent;transition:text-decoration-color .3s,color .3s}
+.list .c{margin-left:8px;color:var(--ink-3);font:inherit;text-align:left}
+.list .c:hover{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+.list li.done .t{text-decoration-color:var(--ink-3);color:var(--ink-3)}
+.list li.done .c{opacity:.6}
+.list li.next .n{color:var(--ink)}
+.hello{color:var(--ink)}
+
+/* ── the field ── */
+.barslot{margin-top:22px}
+.bar{position:relative;z-index:15;display:flex;flex-direction:column}
+.dock{position:fixed;left:50%;bottom:calc(var(--foot) + 4px);width:min(640px,calc(100vw - 40px));transform:translateX(-50%);z-index:15}
+.dock .bar{flex-direction:column-reverse}
+.dock .shint{padding:0 13px 6px}
+@keyframes arrive{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.bar.arrive{animation:arrive .35s cubic-bezier(.3,.7,.3,1) both}
+.shint{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 4px;min-height:19px;padding:6px 13px 0;font:italic 400 11px/1.6 var(--serif);color:var(--marg)}
+.shint:hover{color:var(--gold-deep)}
+.shint .sep{opacity:.5;margin:0 3px 0 1px}
+.shint code{font:normal 600 11px var(--serif);letter-spacing:.01em}
+.shint button:hover{color:var(--ink)}
+.shint button:hover .gl{text-decoration:underline;text-underline-offset:2px}
+.shint .first code,.shint .pre,.shint .bad{color:var(--ink)}
+.shint .pick::after{content:" \25BE";font-style:normal;font-size:8px;opacity:0;transition:opacity .12s}
+.shint:hover .pick::after{opacity:.6}
+.sfield{position:relative;display:flex;align-items:center;border-radius:8px;overflow:hidden;background:transparent}
+.dock .sfield{background:var(--paper)}
+.sfield::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--rule);transition:opacity .2s}
+.sfield.cmd::after,.sfield.prm::after{opacity:0}
+.fillwrap{position:absolute;inset:0;pointer-events:none;clip-path:inset(0 100% 0 0);transition:clip-path .28s cubic-bezier(.4,0,.2,1)}
+.sfield.cmd .cmdwrap,.sfield.prm .prmwrap{clip-path:inset(0 0 0 0)}
+.fill{position:absolute;inset:0}.fill svg{width:100%;height:100%;display:block}
+.cmdfill{background:rgb(var(--line-c))}.prmfill{background:var(--paper)}
+.sfield input{position:relative;z-index:1;width:100%;padding:10px 38px 10px 68px;font:400 13.5px var(--sans);border:none;background:transparent;color:var(--ink);outline:none}
+.sfield input::placeholder{color:var(--ink-3)}
+.chip{position:absolute;left:12px;top:50%;margin-top:-8px;z-index:2;font:600 8.5px var(--sans);letter-spacing:.06em;padding:3px 7px;border-radius:9px;opacity:0;transform:translateX(-4px);transition:opacity .16s,transform .16s;pointer-events:none}
+.schip{background:var(--paper);border:1px solid var(--ink);padding:2px 6px}
+.cchip{background:rgb(var(--navy));color:#fff}
+.pchip{background:var(--ink);color:var(--paper)}
+.sfield:not(.cmd):not(.prm) .schip,.sfield.cmd .cchip,.sfield.prm .pchip{opacity:1;transform:none}
+.glyph{position:absolute;z-index:2;top:50%;pointer-events:none;color:var(--ink);opacity:0;transition:opacity .16s}
+.mag{right:12px;width:15px;height:15px;margin-top:-7.5px}
+.quill{right:10px;width:21px;height:21px;margin-top:-10.5px}
+.sfield:not(.cmd):not(.prm) .mag,.sfield.prm .quill{opacity:1}
+.sfield.cmd input{font:400 13px var(--mono);color:#fff;padding-left:82px;text-shadow:0 0 3px rgba(12,20,40,.95),0 1px 2px rgba(12,20,40,.85)}
+.sfield.cmd input::placeholder{color:#fff;opacity:.95}
+.sfield.prm input{padding-left:72px;padding-right:42px}
+
+.cref{display:none;position:absolute;left:0;right:0;top:46px;z-index:10;background:var(--surface);border-radius:8px;padding:13px 16px 12px;box-shadow:0 8px 28px rgba(40,36,28,.10);max-height:60vh;overflow:auto}
+.dock .cref{top:auto;bottom:calc(100% + 4px);box-shadow:0 -4px 28px rgba(40,36,28,.10)}
+.cref.open{display:block}
+.lab{font:600 9px var(--sans);letter-spacing:.055em;text-transform:uppercase;color:var(--ink)}
+.cref .head{padding-bottom:9px;margin-bottom:11px;border-bottom:.5px solid var(--hair)}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 28px}
+.cref h4{font:600 9px var(--sans);letter-spacing:.055em;text-transform:uppercase;margin-bottom:5px;padding-bottom:4px;border-bottom:.5px solid var(--hair)}
+.row{display:grid;grid-template-columns:128px 1fr;gap:10px;align-items:baseline;width:100%;padding:4px 6px;border-radius:7px;text-align:left;color:var(--ink-2)}
+.row:hover{color:var(--ink);background:rgba(25,25,25,.04)}
+.row code{font:500 11px var(--mono);color:var(--ink);white-space:nowrap}
+.row .gl{font:italic 400 11px/1.35 var(--serif)}
+.cfoot{margin-top:4px;padding-top:9px;border-top:.5px solid var(--hair);font:italic 400 10.5px/1.5 var(--serif);color:var(--marg)}
+.menu{display:none;position:absolute;z-index:11;top:68px;min-width:190px;padding:4px;background:var(--surface);border:.5px solid #E9E9E7;border-radius:6px;box-shadow:0 6px 20px rgba(40,36,28,.14)}
+.dock .menu{top:auto;bottom:calc(100% - 14px)}
+.menu.open{display:block}
+.menu button{display:block;width:100%;text-align:left;padding:6px 9px;border-radius:4px;font-size:12px}
+.menu button:hover{background:#F7F6F3}
+.menu small{font:italic 400 11px var(--serif);color:var(--marg);margin-left:6px}
+
+/* ── other cards ── */
+.chead{display:flex;align-items:baseline;gap:8px;padding:12px 16px 10px;border-bottom:1px solid var(--divider);flex-shrink:0}
+.ctitle{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chead .marg{margin-left:auto}
+.cbody{padding:10px 16px 16px;font-size:11.5px;line-height:1.55;color:var(--ink-2);overflow:auto}
+#chat .cbody{flex:1}
+.cbody .marg{margin-top:6px}
+.line{display:grid;grid-template-columns:34px minmax(0,1fr);column-gap:12px;padding:12px 0;border-top:.5px solid var(--hair)}
+.line:first-child{border-top:none}
+.ord{font:500 10px var(--mono);color:var(--ink-3);padding-top:3px}
+.q{font-size:13.5px;line-height:1.55;font-weight:500;color:var(--ink)}
+.a{font-size:13.5px;line-height:1.55;color:var(--ink-2);margin-top:6px}
+.grp{display:flex;padding:12px 0 5px;border-bottom:.5px solid var(--hair)}
+.grp .n{margin-left:auto;font:500 9px var(--mono);color:var(--ink-3)}
+.item{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;padding:7px 0;border-bottom:.5px solid var(--hair);align-items:center}
+.item:last-child{border-bottom:none}
+.item b{display:block;font:500 12px var(--sans);color:var(--ink)}
+.item span{font-size:11px;color:var(--ink-2)}
+.pv{width:30px;height:22px;border-radius:5px;background:var(--subtle);border:.5px solid #E9E9E7;position:relative;overflow:hidden}
+.pv i{position:absolute;border-radius:1.5px;background:rgba(25,25,25,.16)}
+.sw{position:absolute;width:8px;height:8px;border-radius:50%;top:7px}
+table.alm{width:100%;border-collapse:collapse;font-size:12px}
+.alm th{font:600 9px var(--sans);letter-spacing:.055em;text-transform:uppercase;text-align:left;padding:8px 6px 5px;border-bottom:.5px solid var(--hair)}
+.alm td{padding:8px 6px;border-bottom:.5px solid var(--hair);color:var(--ink);vertical-align:baseline}
+.alm td.id{font:500 10px var(--mono);color:var(--ink-3);width:30px}
+.alm td.m{color:var(--ink-2);font-size:11px;white-space:nowrap}
+.kin{width:100%;height:36px;border:0;outline:0;border-radius:8px;background:var(--subtle);padding:0 12px;font:400 13px var(--mono);color:var(--ink);margin-top:8px}
+.btns{display:flex;justify-content:flex-end;gap:6px;margin-top:10px}
+.btn{border-radius:8px;padding:7px 12px;font:500 11.5px var(--sans);color:var(--ink-2);min-height:30px}
+.btn:hover{color:var(--ink)}
+.btn.on{background:var(--wash);color:var(--ink)}
+.away{font:italic 400 11px var(--serif);color:var(--marg);padding:6px 4px}
+.away button{text-decoration:underline;text-underline-offset:2px}
+.away button:hover{color:var(--ink)}
+
+.fwin{position:fixed;z-index:25;width:440px;background:var(--paper);border-radius:10px;box-shadow:0 18px 50px rgba(40,36,28,.18),0 0 0 .5px rgba(25,25,25,.12)}
+.fbar{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:.5px solid #E9E9E7;font:500 10.5px var(--sans);color:var(--ink-3);cursor:move;user-select:none}
+.dots{display:flex;gap:4px}.dots i{width:8px;height:8px;border-radius:50%;background:#E9E9E7}
+.fbar .marg{margin-left:auto}
+.fin{padding:12px;max-height:60vh;overflow:auto}
+.fin .card{box-shadow:none}
+
+.veil{display:none;position:fixed;inset:0;z-index:30;background:rgba(252,252,250,.6);align-items:flex-start;justify-content:center;padding-top:22vh}
+.veil.open{display:flex}
+.win{width:min(420px,calc(100vw - 32px));background:var(--paper);border-radius:10px;box-shadow:0 18px 50px rgba(40,36,28,.18),0 0 0 .5px rgba(25,25,25,.12)}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:104px;border-radius:8px;background:var(--subtle);cursor:pointer;font-size:12.5px;font-weight:500;color:var(--ink)}
+
+/* ── the foot of the screen ── */
+.foot{position:fixed;left:0;right:0;bottom:0;height:var(--foot);display:flex;align-items:center;justify-content:center;gap:0 6px;font:italic 400 11px var(--serif);color:var(--marg);transition:color .16s}
+.foot .sep{opacity:.4}
+.foot a{text-decoration:none}
+.foot a:hover{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+
+/* ── the conversation is editable ── */
+.a[contenteditable]{outline:none;border-radius:4px;margin-left:-4px;margin-right:-4px;padding:1px 4px;transition:background .15s;cursor:text}
+.a[contenteditable]:hover{background:var(--subtle)}
+.a[contenteditable]:focus{background:var(--subtle);box-shadow:inset 0 0 0 1px var(--rule)}
+.a s.struck{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--ink)}
+.a s.struck.noted{text-decoration-thickness:1.5px}
+.a ins{text-decoration:none;color:var(--ink);border-bottom:1px dotted var(--ink-3)}
+.a ins:empty{display:none}
+.strikebtn{position:fixed;z-index:35;display:inline-flex;align-items:baseline;gap:6px;padding:4px 9px;border-radius:6px;background:var(--ink);color:#fff;font:400 12px var(--serif);box-shadow:0 4px 14px rgba(40,36,28,.18)}
+.strikebtn span{font:500 9.5px var(--mono);opacity:.6}
+.mk{padding:12px 0 14px;border-bottom:.5px solid var(--hair)}
+.mk:last-child{border-bottom:none}
+.mkh{display:flex;align-items:baseline;gap:7px}
+.mkt{font:600 9px var(--sans);letter-spacing:.055em;text-transform:uppercase;color:var(--ink)}
+.mkid{font:500 10px var(--mono);color:var(--ink-3)}
+.mkw{margin-left:auto;font:italic 400 11px var(--serif);color:var(--marg)}
+.mks{margin-top:6px;font:400 13px/1.55 var(--serif);color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--ink)}
+.mkr{width:100%;margin-top:5px;border:0;outline:0;border-radius:8px;background:var(--subtle);padding:8px 10px;font:400 13px/1.5 var(--serif);color:var(--ink);resize:vertical;min-height:54px}
+.mkr:focus{box-shadow:inset 0 0 0 1px var(--rule)}
+.mkf{display:flex;align-items:center;gap:8px;margin-top:8px}
+.mkf .marg{margin:0;flex:1}
+.mkf .ink{color:var(--ink);font-style:normal}
+.mk.noted .mkr{background:transparent;box-shadow:inset 0 0 0 1px var(--hair)}
+
+.toast{position:fixed;top:30px;left:50%;transform:translateX(-50%) translateY(-8px);padding:7px 14px;border-radius:6px;background:var(--ink);color:#fff;font-size:12px;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;z-index:40}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+@media (max-width:960px){
+  .mgrid{grid-template-columns:minmax(0,1fr);grid-template-areas:"top" "list" "bar" "letter"}
+  body{overflow:auto}
+  .desk{position:static;flex-direction:column;padding:12px;min-height:100vh}
+  .slot,#main,body.has-chat #main,body.has-right #main,body.has-chat.has-right #main{flex:none !important;opacity:1}
+  #chat:not(.on),#right:not(.on){display:none}
+  .dock{position:sticky;bottom:40px;left:auto;transform:none;margin:0 auto}
+  .foot{position:static}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body>
+<div class="rule"></div>
+
+<div class="desk">
+  <section class="card slot" id="main" aria-label="Welcome">
+    <div class="mscroll"><div class="mcol mgrid">
+      <div class="top"><h1>Welcome<span class="to" id="to" aria-hidden="true"><br>to Parliament</span></h1><div class="marg" id="topmarg"></div></div>
+      
+      <div class="list" id="list" aria-label="Eight things to try"><ol id="steps"></ol></div>
+      <div class="barslot" id="barslot">
+        <div class="bar" id="bar">
+          <label for="q" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search, or type &gt; for commands</label>
+          <div class="sfield" id="sfield">
+            <div class="fillwrap cmdwrap"><div class="fill cmdfill"><svg preserveAspectRatio="none" aria-hidden="true"><defs><pattern id="stars" width="57.158" height="99" patternUnits="userSpaceOnUse" patternTransform="rotate(-22)"><g id="starg" fill="#fff"></g></pattern></defs><rect width="100%" height="100%" fill="url(#stars)"/></svg></div></div>
+    <div class="fillwrap prmwrap"><div class="fill prmfill"><svg aria-hidden="true"><defs><pattern id="mosaic" width="16" height="24" patternUnits="userSpaceOnUse" patternTransform="skewY(-17)"><g fill="none" stroke="var(--tri)" stroke-width=".7"><path d="M0 0V24M16 0V24"/><path d="M0 0H16M0 24H16"/><path d="M0 0L16 24"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#mosaic)"/></svg></div></div>
+            <span class="chip schip">SEARCH</span><span class="chip cchip">COMMAND</span><span class="chip pchip">PROMPT</span>
+            <svg class="glyph mag" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.3"/><line x1="10.2" y1="10.2" x2="13.8" y2="13.8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <svg class="glyph quill" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.3 14.8h8.5l-.7 5.1a1.5 1.5 0 0 1-1.5 1.3H8.5a1.5 1.5 0 0 1-1.5-1.3z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.2 14.8h10.7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M21.3 2.3c-5.7 1.2-9.1 5-9.8 10l3.1-1c3.9-1.4 6.4-4.6 6.7-9z" fill="currentColor"/><path d="M11.9 12.2 10.4 14.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Rooms, chats, notes, highlights…">
+          </div>
+          <div class="shint" id="shint" aria-live="polite"></div>
+          <div class="menu" id="menu"></div>
+          <div class="cref" id="cref"></div>
+        </div>
+      </div>
+      <p class="now" id="now" hidden>Now, let’s <button data-w=">focus:">focus:</button></p>
+      <div class="letter" id="letter">
+        <p>Parliament is a place to work with AI on your own terms. It is early, and still being built.</p>
+        <p>It runs in your browser, with no servers and no accounts. Your chats and keys stay on this computer, and each request goes straight to the provider you pick, to a model running on your own machine, or just Wikipedia. There are no ads.</p>
+        <p>With the goal of rethinking how we interact with AI, it is yours to shape. Rooms are built from blocks, layouts and themes. You create the space, you choose how to interact.</p>
+        <p>Most AI apps are built for passive consumption. You ask something, you receive a response. Here you steer from a command line: branch chats, highlight, add and combine notes across chats, plan a run of prompts, and more. Let’s take back control.</p>
+        <p class="sig">— So Lov</p>
+      </div>
+    </div></div>
+  </section>
+  <section class="card slot" id="chat" aria-label="Chat"></section>
+  <div class="slot" id="right"></div>
+</div>
+
+<div class="dock" id="dock"></div>
+
+<footer class="foot">
+  <span>Created with Claude Code</span><span class="sep">·</span>
+  <a id="gh" href="#" target="_blank" rel="noopener">Open source on GitHub</a><span class="sep">·</span>
+  <a id="contrib" href="#" target="_blank" rel="noopener">Looking for other builders</a>
+</footer>
+
+<div id="wins"></div>
+
+<div class="veil" id="impwin"><div class="win" role="dialog" aria-label="Import">
+  <div class="fbar" style="cursor:default"><span class="dots"><i></i><i></i><i></i></span>Import<div class="marg"><button data-close="impwin">close</button></div></div>
+  <div style="padding:14px"><div class="card">
+    <div class="chead"><span class="ctitle">From a Parliament backup</span><div class="marg"><span>rooms, chats, dockets, notes</span></div></div>
+    <div class="cbody">
+      <label class="drop" for="bk"><span>Drop a backup file here</span><span class="marg">or choose one</span></label>
+      <input id="bk" type="file" accept=".json" hidden>
+      <div style="margin-top:10px">What is here now stays. You see what the backup holds before anything is added.</div>
+      <div class="btns"><button class="btn" data-close="impwin">Cancel</button><button class="btn on" id="doimport">Import</button></div>
+    </div>
+  </div></div>
+</div></div>
+
+<button class="strikebtn" id="strikebtn" hidden><s>strike</s><span>⌘⇧X</span></button>
+<div class="toast" id="toast"></div>
+
+<script>
+var GITHUB_URL='#';   /* placeholder until the repository is public */
+var CONTRIB_URL='#';  /* where builders go: CONTRIBUTING.md, or an issue asking for help */
+
+(function(){
+  var B=[[-52.39,-85.25,.61],[-61.92,-85.25,.98],[-66.68,-88,.56],[-71.45,-96.25,.92],[-71.45,-101.75,.5],[-66.68,-110,.87],[-61.92,-112.75,.45],[-52.39,-112.75,.82],[-47.63,-110,.4],[-42.87,-101.75,.77],[-33.34,-85.25,.66],[-38.11,-110,.61],[-33.34,-112.75,.98],[-23.82,-112.75,.56],[-19.05,-110,.92],[-14.29,-101.75,.5],[-14.29,-96.25,.87],[-33.34,-63.25,.45],[-38.11,-60.5,.82],[-47.63,-60.5,.4],[-52.39,-63.25,.77],[-57.16,-77,.71],[-9.53,-60.5,.61],[-19.05,-60.5,.98],[-23.82,-63.25,.56],[-9.53,-88,.92],[-4.76,-85.25,.5],[0,-77,.87],[0,-71.5,.45],[-47.63,-38.5,.82],[-52.39,-35.75,.4],[-61.92,-35.75,.77],[-71.45,-46.75,.71],[-66.68,-60.5,.66],[-42.87,-46.75,.98],[-19.05,-38.5,.56],[-23.82,-35.75,.92],[-33.34,-35.75,.5],[-38.11,-38.5,.87],[-14.29,-52.25,.45],[-14.29,-46.75,.82],[-33.34,-13.75,.4],[-38.11,-11,.77],[-52.39,-13.75,.71],[-57.16,-27.5,.66],[-28.58,-22,.61],[-4.76,-13.75,.98],[-19.05,-11,.92],[-23.82,-13.75,.5],[-9.53,-38.5,.87],[-4.76,-35.75,.45],[0,-27.5,.82],[0,-22,.4]];
+  var h='';B.forEach(function(b){for(var i=0;i<3;i++)for(var j=0;j<3;j++)h+='<circle cx="'+(b[0]+i*57.158).toFixed(2)+'" cy="'+(b[1]+j*99).toFixed(2)+'" r="0.55" opacity="'+b[2]+'"/>';});
+  document.getElementById('starg').innerHTML=h;
+})();
+
+var $=function(id){return document.getElementById(id);};
+var Q=$('q');
+$('gh').href=GITHUB_URL; $('contrib').href=CONTRIB_URL;
+function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function sep(){return '<span class="sep">·</span>';}
+function toast(t){var el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(function(){el.classList.remove('show');},2600);}
+
+/* ═══ the steps ═══ */
+var STEPS=[
+  {id:'cmd',  t:'Open the command line',             c:'>',                 w:'>'},
+  {id:'pop',  t:'Pop the command bar out',           c:'pop:command',       w:'>pop:command'},
+  {id:'ask',  t:'Ask something',                     c:'p> and a question', w:'p>'},
+  {id:'alm',  t:'See what you have made',            c:'esc, then alm:',    w:'>alm:'},
+  {id:'name', t:'Name the room',                     c:'name:"…"',          w:'>name:""'},
+  {id:'move', t:'Move it to another monitor',        c:'pop:almanac',       w:'>pop:almanac'},
+  {id:'lib',  t:'Browse tools to add and customize', c:'library:',          w:'>library:'},
+  {id:'key',  t:'Add an AI API key',                 c:'key:',              w:'>key:'},
+  {id:'strike',t:'Strike through a line',            c:'select it, then strike', w:null},
+  {id:'note', t:'Leave the AI a note',               c:'type beside it, then Note for the AI', w:null}
+];
+var S={prm:false,hasKey:false,source:'Wikipedia',room:'',msgs:[],done:{},listOff:false,finished:false,
+  docked:false,boards:{},order:[],fresh:null,marks:[],nextId:214};
+
+function nextStep(){for(var i=0;i<STEPS.length;i++) if(!S.done[STEPS[i].id]) return STEPS[i]; return null;}
+function tick(id){
+  if(S.done[id]) return; S.done[id]=1;
+  if(Object.keys(S.done).length===STEPS.length&&!S.finished){S.finished=true;
+    setTimeout(function(){$('list').classList.add('gone');setTimeout(function(){S.listOff=true;S.nowLine=true;draw();},650);},900);}
+}
+function drawList(){
+  var nx=nextStep();
+  $('steps').innerHTML=STEPS.map(function(s,i){
+    return '<li class="'+(S.done[s.id]?'done':(nx&&nx.id===s.id?'next':''))+'"><span class="n">'+(i+1)+'</span>'+
+      '<span><span class="t">'+s.t+'</span>'+(s.w?'<button class="c" data-w="'+esc(s.w)+'">'+esc(s.c)+'</button>':'<span class="c">'+esc(s.c)+'</span>')+'</span></li>';}).join('');
+  $('list').hidden=S.listOff;
+  if(!S.listOff&&!S.finished) $('list').classList.remove('gone');
+}
+
+/* ═══ the field: in the card, or docked at the foot ═══ */
+function dock(on){
+  if(S.docked===on) return; S.docked=on;
+  var bar=$('bar'); (on?$('dock'):$('barslot')).appendChild(bar);
+  document.body.classList.toggle('docked',on);
+  bar.classList.remove('arrive'); void bar.offsetWidth; bar.classList.add('arrive');
+  Q.focus();
+}
+
+/* ═══ boards ═══ */
+var BN={alm:'Almanac',library:'Library',settings:'Settings',col:'Collection'};
+function boardKey(t){return {alm:'alm',almanac:'alm',library:'library',lib:'library',settings:'settings',key:'settings',collection:'col',col:'col'}[String(t||'').toLowerCase().trim()]||null;}
+function openBoard(k){
+  if(!S.boards[k]){S.boards[k]={where:'right'};S.order.push(k);S.fresh=k;}
+  else if(S.boards[k].where==='pop') focusPop(k);
+}
+function almBody(){
+  if(!S.msgs.length) return '<div class="marg">Nothing made yet. <code>p&gt;</code> starts your first chat, and it appears here.</div>';
+  return '<table class="alm"><tr><th>#</th><th>Title</th><th>Room</th><th>When</th></tr><tr><td class="id">1</td><td>'+esc(S.msgs[0].q)+'</td><td class="m">'+esc(S.room||'unnamed')+'</td><td class="m">just now</td></tr></table>'+
+    '<div class="marg"><span>'+S.msgs.length+(S.msgs.length===1?' prompt':' prompts')+' in this chat</span>'+sep()+'<span>everything you make lands here</span></div>';
+}
+function libBody(){
+  function pl(b){return '<div class="pv">'+b.map(function(r){return '<i style="left:'+r[0]+'%;top:'+r[1]+'%;width:'+r[2]+'%;height:'+r[3]+'%"></i>';}).join('')+'</div>';}
+  function sw(bg,a,d){return '<div class="pv" style="background:'+bg+'"><span class="sw" style="left:6px;background:'+a+'"></span><span class="sw" style="left:16px;background:'+d+'"></span></div>';}
+  var blk=[['Messages','the conversation itself'],['Input','where you write; web search is one of its features'],['Highlights','terms you mark, jumped between'],['Notes','notes on a message or the chat'],['Branches','the ways a chat has forked']];
+  var lay=[['Three-panel','a rail either side',[[8,10,20,80],[32,10,36,80],[72,10,20,80]]],['Document-centric','the page in the middle',[[8,10,55,80],[68,10,24,80]]],['Single column with sheet','the shape phones use',[[8,10,84,50],[8,66,84,24]]]];
+  var th=[['Parliament Default','#FFFFFF','#B8A070','#9C8760'],['Deep Calm','#1A1F2E','#9CB4D0','#5A7898'],['Soft Violet','#FAF8FE','#8878C0','#544684']];
+  return '<div class="marg" style="margin:0 0 2px">these are all tools you can add and customize</div>'+
+    '<div class="grp"><span class="lab">Blocks</span><span class="n">'+blk.length+'</span></div>'+blk.map(function(b){return '<div class="item"><div class="pv"></div><div><b>'+b[0]+'</b><span>'+b[1]+'</span></div></div>';}).join('')+
+    '<div class="grp"><span class="lab">Layouts</span><span class="n">'+lay.length+'</span></div>'+lay.map(function(b){return '<div class="item">'+pl(b[2])+'<div><b>'+b[0]+'</b><span>'+b[1]+'</span></div></div>';}).join('')+
+    '<div class="grp"><span class="lab">Themes</span><span class="n">'+th.length+'</span></div>'+th.map(function(b){return '<div class="item">'+sw(b[1],b[2],b[3])+'<div><b>'+b[0]+'</b></div></div>';}).join('');
+}
+function setBody(){
+  return '<div class="lab" style="margin-bottom:4px">API keys</div>'+
+    (S.hasKey?'<div style="color:var(--ink)">An Anthropic key is saved. Prompts go to Claude.</div>':'<div>Without a key, prompts are answered from Wikipedia. Add a key from Anthropic or Mistral and they go to that model instead. Ollama needs no key; it runs models on your own machine.</div>')+
+    '<input id="k" class="kin" type="password" autocomplete="off" placeholder="'+(S.hasKey?'Paste a new key to replace it':'sk-ant-…')+'" aria-label="Anthropic API key">'+
+    '<div class="marg"><span>kept in this browser, encrypted</span>'+sep()+'<span>sent only to its own provider</span>'+sep()+'<span><code>key:</code> brings you back here</span></div>'+
+    '<div class="btns"><button class="btn on" id="savekey">Save key</button></div>';
+}
+function colBody(){
+  if(!S.marks.length) return '<div class="marg">Nothing kept yet. Strike a line in a reply, and it lands here.</div>';
+  return '<div class="marg" style="margin:0 0 4px"><span>from '+esc(S.room||'the unnamed room')+'</span>'+sep()+'<span>yours until you note it for the AI</span></div>'+
+    S.marks.slice().reverse().map(function(m){
+      return '<div class="mk'+(m.noted?' noted':'')+'" data-mk="'+m.id+'"><div class="mkh"><span class="mkt">strike</span><span class="mkid">'+m.id+'</span>'+
+        '<span class="mkw">in 201 \u00b7 reply '+(m.i+1)+'</span></div>'+
+        '<div class="mks">'+esc(m.text)+'</div>'+
+        '<label class="lab" for="rp-'+m.id+'" style="display:block;margin-top:10px">Reply or replacement</label>'+
+        '<textarea id="rp-'+m.id+'" class="mkr" data-rp="'+m.id+'" rows="2" placeholder="What it should say, or what you think">'+esc(m.repl||'')+'</textarea>'+
+        '<div class="mkf">'+(m.noted
+          ?'<div class="marg"><span class="ink">noted</span>'+sep()+'<span>'+(S.source==='Wikipedia'?'a model sees this on your next prompt; Wikipedia reads no notes':'the AI sees the strike and your words on your next prompt')+'</span>'+sep()+'<button data-unnote="'+m.id+'">take it back</button></div>'
+          :'<div class="marg"><span>shown in the reply as you type</span></div><button class="btn on" data-note="'+m.id+'">Note for the AI</button>')+'</div></div>';}).join('');
+}
+function cardHTML(k,inWin){
+  var body=k==='alm'?almBody():k==='library'?libBody():k==='col'?colBody():setBody(), nm=k==='alm'?'almanac':k==='col'?'collection':k;
+  return '<div class="card'+(S.fresh===k?' new':'')+'" data-board="'+k+'"><div class="chead"><span class="ctitle">'+BN[k]+'</span><div class="marg">'+
+    (inWin?'<span>close this window to bring it back</span>':'<button data-w=">pop:'+nm+'">pop out</button>'+sep()+'<button data-w=">close:'+nm+'">close</button>')+
+    '</div></div><div class="cbody">'+body+'</div></div>';
+}
+function chatHTML(){
+  return '<div class="chead"><span class="ctitle">'+esc(S.room||'Unnamed room')+'</span><div class="marg">'+
+    '<span>'+S.msgs.length+(S.msgs.length===1?' prompt':' prompts')+'</span>'+sep()+'<button data-w=\'>name:""\'>'+(S.room?'rename':'name it')+'</button></div></div>'+
+    '<div class="cbody" id="convo">'+convoHTML()+'</div>';
+}
+function convoHTML(){
+  return S.msgs.map(function(m,i){return '<div class="line"><span class="ord">'+(i<9?'0':'')+(i+1)+'</span><div><div class="q">'+esc(m.q)+'</div>'+
+    '<div class="a" contenteditable="true" spellcheck="false" data-a="'+i+'" aria-label="Reply '+(i+1)+', editable">'+m.html+'</div>'+
+    '<div class="marg" style="margin-top:4px"><span>'+m.src+'</span>'+(m.nudge&&!S.hasKey?sep()+'<button data-w=">key:">add a key for full answers</button>':'')+
+    (i===0?sep()+'<span>click to edit; select a line to strike it</span>':'')+'</div></div></div>';}).join('');
+}
+
+/* popping: a real window where the browser allows it */
+var POPS={};
+function popDoc(k){
+  var css=Array.prototype.map.call(document.querySelectorAll('style'),function(s){return s.textContent;}).join('\n');
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Parliament · '+BN[k]+'</title><style>'+css+'body{overflow:auto;padding:14px}</style></head><body>'+cardHTML(k,true)+'</body></html>';
+}
+function popOut(k){
+  var w=null; try{w=window.open('','parl_'+k,'width=560,height=620');}catch(e){}
+  if(w&&!w.closed){
+    w.document.open();w.document.write(popDoc(k));w.document.close();
+    POPS[k]={win:w}; S.boards[k].where='pop';
+    POPS[k].t=setInterval(function(){if(w.closed){clearInterval(POPS[k].t);delete POPS[k];if(S.boards[k]){S.boards[k].where='right';S.fresh=k;}draw();}},500);
+    toast(BN[k]+' is in its own window. Drag it to another monitor.');
+  }else{
+    POPS[k]={drawn:true,x:Math.max(20,window.innerWidth-480),y:70}; S.boards[k].where='pop';
+    toast('Your browser blocked the window, so it is drawn here.');
+  }
+}
+function refreshPops(){Object.keys(POPS).forEach(function(k){var p=POPS[k]; if(p.win&&!p.win.closed){p.win.document.open();p.win.document.write(popDoc(k));p.win.document.close();}});}
+function focusPop(k){var p=POPS[k]; if(p&&p.win&&!p.win.closed) p.win.focus();}
+function unpop(k){var p=POPS[k]; if(!p) return; if(p.win&&!p.win.closed){clearInterval(p.t);p.win.close();} delete POPS[k]; S.boards[k].where='right'; S.fresh=k;}
+function drawWins(){
+  var h='';
+  Object.keys(POPS).forEach(function(k){var p=POPS[k]; if(!p.drawn) return;
+    h+='<div class="fwin" id="fw-'+k+'" style="left:'+p.x+'px;top:'+p.y+'px"><div class="fbar" data-drag="'+k+'"><span class="dots"><i></i><i></i><i></i></span>'+BN[k]+', in its own window'+
+      '<div class="marg"><span>a real window when the browser allows it</span>'+sep()+'<button data-back="'+k+'">bring it back</button></div></div><div class="fin">'+cardHTML(k,true).replace('close this window to bring it back','')+'</div></div>';});
+  $('wins').innerHTML=h;
+}
+
+/* ═══ the verbs ═══ */
+var V=[
+  {s:'p',eg:'p>',g:'start a prompt',grp:'Start',lead:1},
+  {s:'name',eg:'name:"Reading room"',g:'name this room',grp:'Start'},
+  {s:'import',eg:'import:',g:'bring in a backup',grp:'Start'},
+  {s:'key',eg:'key:',g:'add an AI API key',grp:'Start'},
+  {s:'alm',eg:'alm:',g:'everything you have made',grp:'Boards'},
+  {s:'library',eg:'library:',g:'tools to add and customize',grp:'Boards'},
+  {s:'settings',eg:'settings:',g:'your keys and preferences',grp:'Boards'},
+  {s:'close',eg:'close:almanac',g:'take a board off the screen',grp:'Boards'},
+  {s:'pop',eg:'pop:command',g:'the bar, or a board, on its own',grp:'Arranging'},
+  {s:'move',eg:'move:almanac left',g:'left, right or middle',grp:'Arranging'},
+  {s:'focus',eg:'focus:',g:'the chat alone; focus:off to come back',grp:'Arranging'},
+  {s:'list',eg:'list:',g:'the steps back, or list:off',grp:'Help'},
+  {s:'help',eg:'help',g:'every command, same as ?',grp:'Help'}
+];
+function mode(){return S.prm?'prm':(Q.value.charAt(0)==='>'?'cmd':'search');}
+function parse(){var m=Q.value.replace(/^>\s*/,'').match(/^([a-z]+)(:?)(.*)$/i);return m?{s:m[1].toLowerCase(),colon:!!m[2],a:m[3].trim()}:null;}
+function unq(t){var m=String(t||'').match(/"([^"]*)"/);return m?m[1]:String(t||'').trim();}
+var BAR_WORDS={command:1,bar:1,field:1,line:1,'command line':1};
+
+function pre(){
+  var p=parse(); if(!p) return {bad:'type a command, or ? for all of them'};
+  var room=S.room||'this unnamed room', a=p.a;
+  switch(p.s){
+    case 'key': case 'settings': return {t:'this screen',ok:'Enter opens Settings at your API keys',run:function(){openBoard('settings');tick('key');}};
+    case 'name': var n=unq(a); if(!n) return {t:room,bad:'name it what? type it inside the quotes'};
+      return {t:room,ok:'Enter names the room '+n+(S.boards.alm?'; the Almanac shows it too':''),run:function(){S.room=n;tick('name');toast('Room named '+n+'.');}};
+    case 'import': return {t:'Parliament',ok:'Enter opens import, to bring in a backup',run:function(){$('impwin').classList.add('open');}};
+    case 'alm': case 'almanac': return {t:'this screen',ok:S.boards.alm?'the Almanac is open; Enter brings it forward':'Enter opens the Almanac on the right',run:function(){openBoard('alm');tick('alm');}};
+    case 'library': return {t:'this screen',ok:S.boards.library?'the Library is open; Enter brings it forward':'Enter opens the Library on the right',run:function(){openBoard('library');tick('lib');}};
+    case 'close': var c=boardKey(a); if(!c||!S.boards[c]) return {t:'this screen',bad:'close what? '+(a?'nothing called '+a+' is open':'almanac, library or settings')};
+      return {t:'this screen',ok:'Enter takes the '+BN[c]+' off the screen; nothing is lost',run:function(){if(POPS[c])unpop(c);delete S.boards[c];S.order=S.order.filter(function(x){return x!==c;});}};
+    case 'pop': var back=/^back\b/i.test(a), rest=a.replace(/^back\s*/i,'').toLowerCase().trim();
+      if(BAR_WORDS[rest]){
+        if(back) return S.docked?{t:'this screen',ok:'Enter puts the command bar back in the welcome card',run:function(){dock(false);}}:{t:'this screen',bad:'the command bar is already in the card'};
+        return S.docked?{t:'this screen',bad:'the command bar is already out; pop:back command returns it'}:{t:'this screen',ok:'Enter lifts the command bar out of the card and docks it at the foot of the screen',run:function(){dock(true);tick('pop');}};
+      }
+      var k=boardKey(rest);
+      if(!k) return {t:'this screen',bad:'pop what? command, almanac, library or settings'};
+      if(back) return S.boards[k]&&S.boards[k].where==='pop'?{t:'this screen',ok:'Enter brings the '+BN[k]+' back',run:function(){unpop(k);}}:{t:'this screen',bad:'the '+BN[k]+' is not in its own window'};
+      if(S.boards[k]&&S.boards[k].where==='pop') return {t:'this screen',bad:'the '+BN[k]+' is already in its own window'};
+      return {t:'this screen',ok:'Enter puts the '+BN[k]+' in its own window'+(S.boards[k]?'':', opening it')+'; you can drag it to another monitor',run:function(){openBoard(k);if(k==='alm')tick('alm');if(k==='library')tick('lib');popOut(k);tick('move');}};
+    case 'move': var w=a.split(/\s+/), mk=boardKey(w[0]);
+      if(!mk) return {t:'this screen',bad:'move:almanac left or right'};
+      if(!S.boards[mk]) return {t:'this screen',bad:'the '+BN[mk]+' is not open; '+(mk==='alm'?'alm:':mk+':')+' first'};
+      return {t:'this screen',bad:'boards sit on the right in this test; pop:'+(mk==='alm'?'almanac':mk)+' moves one to its own window'};
+    case 'list': if(/^off/i.test(a)) return {t:'this screen',ok:'Enter puts the steps away',run:function(){S.listOff=true;}};
+      return {t:'this screen',ok:S.listOff?'Enter brings the steps back':'the steps are already here',run:function(){S.listOff=false;S.finished=false;}};
+    case 'focus':
+      if(/^off\b/i.test(a)) return S.focus?{t:'this screen',ok:'Enter brings the welcome card back',run:function(){S.focus=false;}}:{t:'this screen',bad:'nothing is in focus'};
+      if(S.focus) return {t:'this screen',bad:'already focused; focus:off brings everything back'};
+      if(!S.msgs.length) return {t:'this screen',bad:'nothing to focus on yet; p> starts a chat'};
+      var open=S.order.map(function(k){return k==='settings'?'Settings':'the '+BN[k];});
+      var names=open.length<2?open.join(''):open.slice(0,-1).join(', ')+' and '+open[open.length-1];
+      return {t:'this screen',ok:'Enter clears the screen to '+(S.room||'the unnamed room')+(open.length?', closing '+names:'')+'; nothing is lost',run:function(){
+        S.order.forEach(function(k){if(POPS[k])unpop(k);}); S.boards={}; S.order=[]; S.focus=true; dock(true); S.afterRun='prm';}};
+    case 'help': return {t:'this screen',ok:'Enter opens every command',keep:1,run:function(){openRef();}};
+  }
+  return {bad:'no verb called '+p.s+'; ? lists them all'};
+}
+
+function notesLine(){
+  var n=S.marks.filter(function(m){return m.noted&&!m.sent;}).length; if(!n) return '';
+  return '<span class="pre">'+(S.source==='Wikipedia'?(n===1?'1 note':n+' notes')+' waiting; Wikipedia reads none':(n===1?'1 note':n+' notes')+' for the AI go with this')+'</span>'+sep();
+}
+var NEXTHINT={pop:['>pop:command','pop:command','the bar on its own'],ask:['p>','p&gt;','start a prompt'],alm:['>alm:','alm:','everything you have made'],
+  name:['>name:""','name:','name this room'],move:['>pop:almanac','pop:almanac','its own window'],lib:['>library:','library:','tools to add and customize'],key:['>key:','key:','add an AI API key']};
+function hint(){
+  var md=mode(), v=Q.value, h='';
+  if(md==='search'){
+    h=v?'<span class="pre">nothing made yet to search</span>'+sep()+'<span>Escape clears</span>'
+      :'<span class="first"><button data-w=">"><code>&gt;</code> <span class="gl">to begin</span></button></span>';
+  }else if(md==='prm'){
+    h='<span class="pre">\u2192</span><button class="pre" data-w=\'>name:""\'>'+esc(S.room||'unnamed room')+'</button>'+sep()+
+      '<span>answered from</span><button class="pick" id="srcbtn">'+S.source+'</button>'+sep()+notesLine()+
+      (v.trim()?'<span>Enter asks</span>':'<button data-w=">"><code>esc</code> <span class="gl">back to the command line</span></button>');
+  }else{
+    var p=parse();
+    if(!p){
+      var nx=nextStep(), items=[], seen={};
+      function add(w,label,gl){if(seen[w])return;seen[w]=1;items.push('<button data-w="'+esc(w)+'"><code>'+label+'</code> <span class="gl">'+gl+'</span></button>');}
+      if(nx&&nx.id==='strike'&&!S.listOff) items.push('<span class="pre">select a line in a reply, then strike</span>');
+      else if(nx&&nx.id==='note'&&!S.listOff) items.push('<span class="pre">type beside the strike, then Note for the AI</span>');
+      else if(nx&&nx.id!=='cmd'&&!S.listOff){var vv=NEXTHINT[nx.id]; add(vv[0],vv[1],vv[2]);}
+      if(S.nowLine&&!S.focus) add('>focus:','focus:','the chat alone');
+      add('p>','p&gt;','start a prompt'); if(!S.msgs.length) add('>import:','import:','bring in a backup');
+      items.push('<button data-ref="1"><code>?</code> <span class="gl">every command</span></button>');
+      h=items.map(function(x,i){return '<span class="'+(i?'':'first')+'">'+x+'</span>';}).join(sep());
+    }else if(!p.colon){
+      var hits=V.filter(function(x){return x.s.indexOf(p.s)===0;});
+      h=hits.length?hits.map(function(x,i){return '<span class="'+(i?'':'first')+'"><button data-w="'+(x.lead?'p>':esc('>'+x.eg))+'"><code>'+(x.lead?'p&gt;':x.s+':')+'</code> <span class="gl">'+x.g+'</span></button></span>';}).join(sep())
+        :'<span class="bad">no verb called '+esc(p.s)+'; ? lists them all</span>';
+    }else{
+      var r=pre();
+      h='<span class="pre">\u2192 '+esc(r.t||'Parliament')+'</span>'+sep()+'<span class="'+(r.bad?'bad':'')+'">'+esc(r.bad||r.ok)+'</span>';
+    }
+  }
+  $('shint').innerHTML=h;
+}
+
+function draw(){
+  var md=mode(), f=$('sfield');
+  f.classList.toggle('cmd',md==='cmd'); f.classList.toggle('prm',md==='prm');
+  document.body.classList.toggle('addr',md==='cmd');
+  Q.placeholder=md==='prm'?(S.source==='Wikipedia'?'Ask anything':'Ask Claude anything'):md==='cmd'?'':'Rooms, chats, notes, highlights…';
+  var talking=S.msgs.length>0, right=S.order.filter(function(k){return S.boards[k].where==='right';}), popped=S.order.filter(function(k){return S.boards[k].where==='pop';});
+  document.body.classList.toggle('has-chat',talking);
+  document.body.classList.toggle('has-right',right.length>0||popped.length>0);
+  $('chat').classList.toggle('on',talking); $('right').classList.toggle('on',right.length>0||popped.length>0);
+  var ch=$('chat');
+  if(talking){
+    if(!$('convo')||ch.dataset.ver!==String(S.chatVer)){ch.innerHTML=chatHTML(); ch.dataset.ver=String(S.chatVer); var cv=$('convo'); cv.scrollTop=cv.scrollHeight;}
+    else ch.querySelector('.chead').outerHTML=chatHTML().split('<div class="cbody" id="convo">')[0];
+  }
+  document.body.classList.toggle('finished',S.finished); document.body.classList.toggle('focus',!!S.focus);
+  $('letter').hidden=!!S.nowLine; $('now').hidden=!S.nowLine; $('to').setAttribute('aria-hidden',S.finished?'false':'true');
+  var rh=right.map(function(k){return cardHTML(k);}).join('')+
+    popped.map(function(k){return '<div class="away">The '+BN[k]+' is in its own window'+(POPS[k]&&POPS[k].win?', behind this one or on another monitor':'')+'. <button data-back="'+k+'">bring it back</button></div>';}).join('');
+  if(rh!==draw.lastRight){$('right').innerHTML=rh; draw.lastRight=rh;}
+  drawList(); drawWins(); hint();
+  if(S.fresh){var nc=document.querySelector('#right [data-board="'+S.fresh+'"]'); if(nc) setTimeout(function(){nc.scrollIntoView({block:'nearest',behavior:'smooth'});},320);}
+  S.fresh=null;
+}
+
+function openRef(){
+  var g={};V.forEach(function(x){(g[x.grp]=g[x.grp]||[]).push(x);});
+  $('cref').innerHTML='<div class="head"><span class="lab">Every command</span></div><div class="cols">'+Object.keys(g).map(function(k){
+    return '<div><h4>'+k+'</h4>'+g[k].map(function(x){return '<button class="row" data-w="'+(x.lead?'p>':esc('>'+x.eg))+'"><code>'+esc(x.eg)+'</code><span class="gl">'+x.g+'</span></button>';}).join('')+'</div>';}).join('')+
+    '</div><div class="cfoot">Clicking one writes it into the field. Nothing runs until Enter, and the line by the field says what Enter will do.</div>';
+  $('cref').classList.add('open');
+}
+function closeRef(){$('cref').classList.remove('open');}
+
+function write(cmd){
+  closeRef();$('menu').classList.remove('open');
+  if(cmd==='p>'){S.prm=true;Q.value='';}
+  else{S.prm=false;Q.value=cmd;if(cmd.charAt(0)==='>')tick('cmd');}
+  Q.focus();var i=Q.value.indexOf('""');var pos=i>-1?i+1:Q.value.length;Q.setSelectionRange(pos,pos);
+  draw();
+}
+function enter(){
+  var md=mode(), v=Q.value.trim();
+  if(md==='search'){ if(v) toast('Nothing made yet. What you make will be found here.'); return; }
+  if(md==='prm'){ if(!v) return; var wiki=S.source==='Wikipedia';
+    var noted=S.marks.filter(function(m){return m.noted&&!m.sent;});
+    var body=wiki?'[The Wikipedia summary for \u201c'+esc(v)+'\u201d appears here.] This sentence stands in for the article\u2019s opening line. This one stands in for a detail you might not agree with, so strike it.'
+      :'[Claude\u2019s reply streams here'+(noted.length?', having read your '+(noted.length===1?'note':noted.length+' notes'):'')+'.]';
+    if(!wiki) noted.forEach(function(m){m.sent=1;});
+    S.msgs.push({q:v,html:body,src:wiki?'from Wikipedia':'answered by Claude',nudge:wiki}); S.chatVer=(S.chatVer||0)+1;
+    tick('ask'); Q.value=''; draw(); refreshPops(); return; }
+  var p=parse(); if(!p) return;
+  if(!p.colon){var hit=V.filter(function(x){return !x.lead&&x.s.indexOf(p.s)===0;})[0]; if(hit) write('>'+hit.eg); return;}
+  var r=pre(); if(r.bad||!r.run) return;
+  r.run(); if(!r.keep) Q.value='>';   /* stay in the command line */
+  if(S.afterRun==='prm'){S.afterRun=null;S.prm=true;Q.value='';}
+  draw(); refreshPops();
+}
+/* ═══ editing the conversation ═══ */
+function replyOf(node){var el=node&&(node.nodeType===1?node:node.parentElement); return el&&el.closest?el.closest('.a[data-a]'):null;}
+function selInReply(){
+  var sel=window.getSelection(); if(!sel||sel.isCollapsed||!sel.rangeCount) return null;
+  var rg=sel.getRangeAt(0), a=replyOf(rg.startContainer); if(!a||a!==replyOf(rg.endContainer)) return null;
+  if(!rg.toString().trim()) return null; return {rg:rg,a:a};
+}
+function placeStrikeBtn(){
+  var b=$('strikebtn'), x=selInReply(); if(!x){b.hidden=true;return;}
+  var r=x.rg.getBoundingClientRect(); b.hidden=false;
+  b.style.left=Math.max(8,r.left+r.width/2-30)+'px'; b.style.top=Math.max(8,r.top-34)+'px';
+}
+function strike(){
+  var x=selInReply(); if(!x) return;
+  var id=S.nextId++, i=+x.a.getAttribute('data-a'), text=x.rg.toString();
+  var sEl=document.createElement('s'); sEl.className='struck'; sEl.setAttribute('data-mk',id);
+  sEl.appendChild(x.rg.extractContents()); x.rg.insertNode(sEl);
+  var ins=document.createElement('ins'); ins.setAttribute('data-mk',id); sEl.after(ins);
+  window.getSelection().removeAllRanges(); $('strikebtn').hidden=true;
+  S.msgs[i].html=x.a.innerHTML;
+  S.marks.push({id:id,i:i,text:text.trim(),repl:'',noted:false});
+  openBoard('col'); tick('strike'); draw();
+  setTimeout(function(){var t=$('rp-'+id); if(t){t.focus(); t.scrollIntoView({block:'nearest',behavior:'smooth'});}},360);
+}
+function mirror(id,txt){
+  var m=S.marks.filter(function(x){return x.id===id;})[0]; if(!m) return; m.repl=txt;
+  var ins=document.querySelector('#convo ins[data-mk="'+id+'"]');
+  if(ins){ins.textContent=txt?' '+txt+' ':''; var a=replyOf(ins); if(a) S.msgs[+a.getAttribute('data-a')].html=a.innerHTML;}
+}
+function setNoted(id,on){
+  var m=S.marks.filter(function(x){return x.id===id;})[0]; if(!m) return; m.noted=on; m.sent=0;
+  var el=document.querySelector('#convo s[data-mk="'+id+'"]'); if(el){el.classList.toggle('noted',on); var a=replyOf(el); if(a) S.msgs[+a.getAttribute('data-a')].html=a.innerHTML;}
+  if(on){tick('note'); toast(S.source==='Wikipedia'?'Noted. A model will see it; Wikipedia reads no notes.':'Noted. The AI sees it on your next prompt.');}
+  draw();
+}
+
+function saveKey(){var k=$('k'); if(!k||!k.value.trim()) return;
+  S.hasKey=true; S.source='Claude'; S.chatVer=(S.chatVer||0)+1; draw(); refreshPops(); Q.focus(); toast('Key saved. Prompts now go to Claude.');}
+
+Q.addEventListener('input',function(){
+  var v=Q.value;
+  if(/^>?\s*s(earch)?>/i.test(v)){S.prm=false;Q.value=v.replace(/^>?\s*s(earch)?>\s*/i,'');}
+  else if(/^>?\s*p>/i.test(v)){S.prm=true;Q.value=v.replace(/^>?\s*p>\s*/i,'');closeRef();tick('cmd');}
+  else if(!S.prm&&(v==='?'||v==='>?')){Q.value='>';openRef();tick('cmd');}
+  if(Q.value.charAt(0)==='>'&&!S.prm) tick('cmd');
+  $('menu').classList.remove('open'); draw();
+});
+Q.addEventListener('keydown',function(e){
+  if(e.key==='Enter'){e.preventDefault();enter();}
+  else if(e.key==='Escape'){e.preventDefault();
+    if($('menu').classList.contains('open'))$('menu').classList.remove('open');
+    else if($('cref').classList.contains('open'))closeRef();
+    else if(S.prm){S.prm=false;Q.value='>';draw();}      /* prompt → command line */
+    else{Q.value='';draw();}}                             /* command line → search */
+  else if(e.key==='Backspace'&&S.prm&&!Q.value){e.preventDefault();S.prm=false;Q.value='>';draw();}
+});
+$('doimport').addEventListener('click',function(){$('impwin').classList.remove('open');toast('The backup is read and shown before anything is added.');});
+
+document.addEventListener('click',function(e){
+  var t;
+  if((t=e.target.closest('#savekey'))){saveKey();return;}
+  if((t=e.target.closest('[data-close]'))){$(t.getAttribute('data-close')).classList.remove('open');Q.focus();return;}
+  if(e.target.classList.contains('veil')){e.target.classList.remove('open');return;}
+  if((t=e.target.closest('[data-back]'))){unpop(t.getAttribute('data-back'));draw();return;}
+  if((t=e.target.closest('#srcbtn'))){var m=$('menu');
+    m.innerHTML='<button data-src="Wikipedia">Wikipedia<small>no key needed</small></button>'+(S.hasKey?'<button data-src="Claude">Claude<small>your key</small></button>':'<button data-w=">key:">Claude<small>add a key first</small></button>');
+    m.style.left=t.offsetLeft+'px'; m.classList.toggle('open'); return;}
+  if((t=e.target.closest('[data-src]'))){S.source=t.getAttribute('data-src');$('menu').classList.remove('open');draw();Q.focus();return;}
+  if((t=e.target.closest('#strikebtn'))){strike();return;}
+  if((t=e.target.closest('[data-note]'))){setNoted(+t.getAttribute('data-note'),true);return;}
+  if((t=e.target.closest('[data-unnote]'))){setNoted(+t.getAttribute('data-unnote'),false);return;}
+  if((t=e.target.closest('[data-w]'))){write(t.getAttribute('data-w'));return;}
+  if((t=e.target.closest('[data-ref]'))){openRef();Q.focus();return;}
+  if(!e.target.closest('.bar')){closeRef();$('menu').classList.remove('open');}
+});
+document.addEventListener('mouseup',function(){setTimeout(placeStrikeBtn,0);});
+document.addEventListener('selectionchange',function(){if(!selInReply()) $('strikebtn').hidden=true;});
+document.addEventListener('input',function(e){
+  var a=e.target.closest&&e.target.closest('.a[data-a]'); if(a){S.msgs[+a.getAttribute('data-a')].html=a.innerHTML; return;}
+  if(e.target.hasAttribute&&e.target.hasAttribute('data-rp')){mirror(+e.target.getAttribute('data-rp'),e.target.value);}
+});
+document.addEventListener('keydown',function(e){
+  if(e.target&&e.target.id==='k'&&e.key==='Enter'){e.preventDefault();saveKey();return;}
+  if(e.key==='Escape'){document.querySelectorAll('.veil.open').forEach(function(v){v.classList.remove('open');});}
+  if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key.toLowerCase()==='x'&&selInReply()){e.preventDefault();strike();return;}
+  if(e.key==='Enter'&&!e.shiftKey&&replyOf(e.target)&&e.target.isContentEditable){e.preventDefault();e.target.blur();return;}
+  var inField=/INPUT|TEXTAREA/.test(document.activeElement.tagName)||document.activeElement.isContentEditable;
+  if(!inField&&(e.key==='/'||e.key==='>')){e.preventDefault();Q.focus();if(e.key==='>')write('>');}
+});
+document.addEventListener('mousedown',function(e){
+  var d=e.target.closest('[data-drag]'); if(!d||e.target.closest('button')) return;
+  var k=d.getAttribute('data-drag'), p=POPS[k], sx=e.clientX, sy=e.clientY, ox=p.x, oy=p.y, el=$('fw-'+k);
+  function mv(ev){p.x=ox+ev.clientX-sx;p.y=Math.max(0,oy+ev.clientY-sy);el.style.left=p.x+'px';el.style.top=p.y+'px';}
+  function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);}
+  document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);e.preventDefault();
+});
+window.addEventListener('beforeunload',function(){Object.keys(POPS).forEach(function(k){var p=POPS[k];if(p.win&&!p.win.closed)p.win.close();});});
+draw(); Q.focus();
+</script>
+</body>
+</html>

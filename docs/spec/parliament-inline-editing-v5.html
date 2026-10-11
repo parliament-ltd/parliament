@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Parliament · Editing replies in place v3</title>
+<!--
+PARLIAMENT · EDITING REPLIES IN PLACE v5
+Follows v2, parliament_welcome_v9.html, welcome-inline-editing-spec.md,
+parliament-branch-slider-v9 and Secretarybird (three colours, accept or
+reject, a markup switch, Ripple). Reference material, not production code.
+
+CHANGES FROM v4
+  · Legibility: marginalia at 62% ink and 11.5px (4.9:1, was 2.9:1); ink-2
+    and ink-3 darkened to pass 4.5:1; rust darkened to #94491F. Each mark has
+    its own underline as well as its colour: yours solid blue, an answer or
+    sweep dotted green, Ripple dashed rust. Visible keyboard focus; reduced
+    motion turns off flashes and fades.
+  · calm: and calm:off, also marginalia in the board strip. Nothing is
+    removed; detail waits until you are near it. Marginalia beyond a reply's
+    open: appear on hover or focus; board heads' marginalia likewise. Inline
+    markers become numbered dots that open on hover. The reply you are in shows
+    markup; the others read clean with a blue tick in the margin. Cards fold
+    to one line. The legend folds to "colours".
+  · focus: keeps a set you choose. focus:sym col sets it and focuses; focus:
+    alone uses the saved set (the chat alone until set); focus:save keeps
+    what is on screen now; focus:off brings back what you had open. Also
+    "focus: off ▾" in the board strip, with the numbered picker.
+  · Every marginalia has a command, with its own Enter line: view:, ripple:,
+    to:, accept:, reject:, undo:, hold:, helper:, go:, again:, reflect:,
+    sweep:, collab:, calm:, focus:.
+
+CHANGES FROM v3
+  · Replies take blocks. Typing / at the start of a line opens a menu: Text,
+    Heading 1 to 3, Bulleted list, Numbered list, Checklist, Quote, Code block,
+    Divider; typing filters it, arrows and Enter pick. Enter starts a new block;
+    Enter on an empty list item leaves the list; Backspace at the start of a
+    formatted block makes it plain text, and of a plain one joins it upward.
+    Formatting is never an edit and never reaches the model. Checklist boxes
+    tick in place, also not an edit.
+  · collab: replaces Parrots and the Collaboration modal. Five built in
+    (Challenge artifacts, Show reasoning, Push back on me, Offer alternatives,
+    Flag uncertainty) and your own (Editor in the mockup). Picked from
+    marginalia in the field, "collab: none", with the numbered boxes; they
+    stack in the order ticked and go with every prompt until turned off.
+    The command works too: >collab:editor, >collab:off.
+  · Reflection is its own board, Ref: 201, beside the Collection. It shows
+    what is marked and the session's numbers without a call; Reflect is one
+    call and writes a synthesis and questions drawn from your markings. You can
+    talk about the chat there; nothing said goes back into it.
+  · Reflection reads, never writes. It can propose a sweep: a collab's rule
+    applied across a branch, one suggestion per sentence (one call). Sweep
+    suggestions are green, sit beside Ripple's under a Suggestions tab, and use
+    the same review bar. Accepted, they become part of the reply, like an ask.
+
+CHANGES FROM v2
+  · Prompt edits stay in their branch. Each branch has its own copy of the
+    first prompt; editing it while viewing 201a changes 201a's only, so people
+    can reword a prompt to see a different reply. Carrying an edit to the other
+    branches is Ripple's job, never automatic. "ask again as 201d" stays.
+  · Wikipedia's text can be marked, edited and asked about like any reply.
+    Those go to a model, never to Wikipedia. The branch says so once, under
+    its tab: "Wikipedia supplies the text ... those go to Sonnet 4.6", and the
+    model name is a picker. The ask box, its marker, the card and the line
+    under the field all name the model. A prompt typed to the Wikipedia branch
+    searches Wikipedia again; the results come in as text, ready to work on.
+  · Edits are told to the model once, as a note of what changed. The original
+    is not replaced in what the model reads. (Decided.)
+  · markup · clean in the Collection's head as well as the chat's. Clean shows
+    each edit's result only.
+  · Ripple is a switch in the chat's head, off by default ("ripple: off").
+    When on, edits that are sent are checked against the other branches.
+    Suggestions appear in place, in rust, with accept · reject, and in the
+    Collection under a Ripple tab. A review bar steps through them one at a
+    time, moving the chat to each: ‹ 1 of 3 ›, accept, reject, accept all;
+    A, R and the arrow keys do the same. An accepted suggestion becomes your
+    edit in that branch and goes with your next prompt there.
+  · The command is strikethrough: (proposed), and the menu says strikethrough.
+-->
+<style>
+
+:root{
+  --paper-bg:#FCFCFA; --p-surface:#FFFFFF; --p-subtle:#FAF9F5; --p-tray:#F6F5F1;
+  --ink:#191919; --p-ink-2:#5F5E59; --p-ink-3:#6F6E69;
+  --p-border:#E9E9E7; --p-border-2:#F1F1EF; --p-gold-deep:#8B6A10;
+  --divider:rgba(25,25,25,.08); --ink-soft:rgba(25,25,25,.30);
+  --ink-wash:rgba(25,25,25,.045); --ink-wash-2:rgba(25,25,25,.075);
+  --marg:rgba(25,25,25,.62); --tri:rgba(122,120,114,.17);
+  --navy:38,56,92; --line-c:22,38,70;
+  --c-note:rgba(124,108,212,.45); --c-high:rgba(236,72,153,.40); --c-quote:rgba(25,25,25,.28);
+  --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --font-serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --font-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --r-btn:8px; --r-xl:16px;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper-bg);color:var(--ink);font-family:var(--font-sans);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+
+/* marginalia */
+.marg{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 5px;font:italic 400 11px/1.7 var(--font-serif);color:var(--marg);transition:color .16s}
+.marg>*{white-space:nowrap}
+.marg .sep{opacity:.4}
+.marg button{border:none;background:none;padding:0;cursor:pointer;font:inherit;color:inherit}
+.marg button:hover,.marg button:focus-visible{color:var(--ink);text-decoration:underline;text-underline-offset:2px;outline:none}
+.marg button.picks::after{content:"\25BE";font-style:normal;font-size:8px;margin-left:3px;opacity:0;transition:opacity .14s;vertical-align:.09em}
+.chead:hover .marg button.picks::after,.marg button.picks.open::after{opacity:.5}
+
+/* board strip */
+.strip{display:flex;align-items:baseline;gap:18px;padding:14px 20px 4px;overflow-x:auto}
+.btitle{border:none;background:none;padding:0;cursor:pointer;font:600 12.5px var(--font-sans);color:var(--p-ink-3);white-space:nowrap}
+.btitle .c{font-weight:400;opacity:.6}
+.btitle:hover,.btitle.here{color:var(--ink)}
+.btitle.here::after{content:"";display:block;height:2px;background:var(--ink);margin-top:4px}
+
+/* two boards */
+.stage{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr);gap:14px;padding:10px 16px 150px;max-width:1360px;margin:0 auto;align-items:start}
+@media (max-width:980px){.stage{grid-template-columns:1fr}}
+.lcard{background:var(--p-surface);border-radius:var(--r-xl);box-shadow:0 1px 2px rgba(40,36,28,.035);min-width:0}
+.chead{position:relative;display:flex;align-items:baseline;gap:8px;padding:11px 14px 9px;border-bottom:1px solid var(--divider)}
+.ctitle{font:600 12.5px var(--font-sans);white-space:nowrap;border:none;background:none;padding:0;cursor:pointer}
+.ctitle .c{font-weight:400;opacity:.6}
+.ctitle:hover{color:var(--p-gold-deep)}
+.chead .marg{margin-left:auto}
+.colboard{position:sticky;top:10px;max-height:calc(100vh - 210px);display:flex;flex-direction:column}
+@media (max-width:980px){.colboard{position:static;max-height:none}}
+
+/* the chat */
+.cbody{padding:14px 10px 20px}
+.you{max-width:600px;margin:0 auto 12px;padding:11px 14px;background:var(--p-subtle);border-radius:12px;font-size:13.5px;line-height:1.5}
+.ans{font:400 14.5px/1.62 var(--font-serif)}
+.ans p{margin:0 0 .85em}
+.ans .cite{font:italic 11px var(--font-serif);color:var(--marg)}
+.ans.wiki{border-left:2px solid var(--divider);padding-left:12px}
+mark{background:rgba(236,72,153,.13);color:inherit;border-radius:2px;padding:0 1px;transition:background .3s,box-shadow .3s}
+mark.quote{background:rgba(25,25,25,.06)}
+mark.flash{background:rgba(196,169,77,.35);box-shadow:0 0 0 3px rgba(196,169,77,.2)}
+.tabs{display:flex;justify-content:center;align-items:flex-end;gap:16px;padding:6px 4px 0;margin:0 30px 14px;border-bottom:1px solid var(--divider);overflow-x:auto}
+.tab{border:none;border-bottom:2px solid transparent;background:none;padding:2px 0 8px;cursor:pointer;display:flex;align-items:baseline;gap:6px;white-space:nowrap;color:var(--p-ink-3);font:500 12px var(--font-sans)}
+.tab .id{font:500 10.5px var(--font-mono)}
+.tab:hover,.tab.on{color:var(--ink)}
+.tab.on{border-bottom-color:var(--ink)}
+.slider{display:grid;grid-template-columns:30px minmax(0,1fr) 30px}
+.side .arrow{position:sticky;top:45vh;display:flex;align-items:center;justify-content:center;width:28px;height:28px;margin:0 auto;border:none;border-radius:50%;background:none;color:var(--p-ink-3);cursor:pointer}
+.side .arrow:hover{color:var(--ink);background:var(--ink-wash)}
+.side .arrow:disabled{opacity:.25;cursor:default;background:none}
+.side .arrow svg{width:14px;height:14px}
+.slide{display:none}.slide.on{display:block}
+.slide>.marg{justify-content:center;margin-top:12px}
+.notein{margin:10px 0 0;padding:8px 12px;border-left:2px solid var(--c-note);font:italic 13px/1.5 var(--font-serif);color:var(--p-ink-2)}
+
+/* the collection */
+.ctabs{display:flex;gap:16px;padding:8px 14px 0;border-bottom:1px solid var(--divider);overflow-x:auto}
+.ctab{border:none;border-bottom:2px solid transparent;background:none;padding:2px 0 8px;cursor:pointer;white-space:nowrap;color:var(--p-ink-3);font:500 12px var(--font-sans)}
+.ctab .n{font:500 10px var(--font-mono);margin-left:4px;opacity:.8}
+.ctab:hover,.ctab.on{color:var(--ink)}
+.ctab.on{border-bottom-color:var(--ink)}
+.ctools{display:flex;align-items:baseline;padding:7px 14px 0}
+.ctools .marg{margin-left:auto}
+.ctools .marg button.on{color:var(--ink)}
+.clist{flex:1;overflow-y:auto;padding:4px 14px 12px}
+.grp{font:500 10px var(--font-mono);color:var(--p-ink-3);margin:14px 0 6px;display:flex;align-items:baseline;gap:8px}
+.grp .marg{font-size:10.5px}
+.mk{position:relative;display:grid;grid-template-columns:16px minmax(0,1fr);gap:10px;padding:8px 8px 8px 0;border-radius:8px;margin:0 -8px 4px -2px;padding-left:8px}
+.mk:hover{background:var(--p-subtle)}
+.mk.sel{background:var(--ink-wash)}
+.mk.drag{opacity:.4}
+.mk.over{box-shadow:0 -2px 0 var(--ink)}
+.mk .body{border-left:2px solid var(--c-quote);padding:1px 0 1px 10px;min-width:0}
+.mk.high .body{border-left-color:var(--c-high)}
+.mk.note .body{border-left-color:var(--c-note)}
+.mk .q{font:italic 13px/1.5 var(--font-serif);color:var(--ink)}
+.mk .t{font-size:12.5px;line-height:1.5;color:var(--ink)}
+.mk .marg{margin-top:4px;font-size:10.5px}
+.mk .marg .id{font:normal 500 10px var(--font-mono);color:var(--p-ink-3)}
+.mk[draggable="true"]{cursor:grab}
+.cb{width:14px;height:14px;margin-top:3px;border:1px solid var(--ink-soft);border-radius:3px;display:flex;align-items:center;justify-content:center;background:none;padding:0;cursor:pointer}
+.cb svg{width:9px;height:9px;opacity:0}
+.mk:hover .cb{border-color:var(--ink)}
+.mk.sel .cb{border-color:var(--ink)}
+.mk.sel .cb svg{opacity:1}
+.newnote{display:block;width:100%;margin:10px 0 4px;padding:8px 10px;border:.5px dashed var(--ink-soft);border-radius:8px;background:none;text-align:left;cursor:pointer;font:italic 12px var(--font-serif);color:var(--marg)}
+.newnote:hover{color:var(--ink);border-color:var(--ink)}
+.empty{font:italic 12px var(--font-serif);color:var(--marg);padding:20px 0;text-align:center}
+
+/* the action row: outlines only, as the Almanac's dock */
+.acts{border-top:1px solid var(--divider);padding:10px 14px 12px}
+.acts .scope{font-size:10.5px;color:var(--p-ink-3);margin-bottom:8px;display:flex;gap:8px;align-items:baseline}
+.acts .scope b{color:var(--ink);font-weight:600}
+.acts .scope button{border:none;background:none;padding:0;cursor:pointer;color:var(--p-ink-3);text-decoration:underline;font-size:10.5px}
+.acts .row{display:flex;flex-wrap:wrap;gap:6px}
+.act{border:.5px solid var(--p-border);background:var(--p-surface);border-radius:var(--r-btn);padding:6px 10px;cursor:pointer;font:500 11.5px var(--font-sans);color:var(--p-ink-2)}
+.act:hover{color:var(--ink);border-color:var(--ink-soft)}
+.act:disabled{opacity:.4;cursor:default}
+.act small{font:italic 10.5px var(--font-serif);color:var(--marg);margin-left:4px}
+
+/* menu, as the answered-by picker */
+.picker{display:none;position:absolute;right:10px;top:calc(100% + 4px);z-index:70;width:320px;max-width:calc(100vw - 32px);max-height:60vh;overflow-y:auto;border:.5px solid var(--p-border);border-radius:10px;background:#fff;box-shadow:0 8px 26px rgba(0,0,0,.08)}
+.picker.open{display:block}
+.pkGroup{display:flex;align-items:baseline;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--p-ink-3);padding:9px 12px 5px;background:var(--p-subtle);border-bottom:.5px solid var(--p-border-2)}
+.pkItem{display:flex;gap:10px;width:100%;text-align:left;border:none;background:none;padding:8px 12px;cursor:pointer;border-bottom:.5px solid var(--p-border-2);align-items:flex-start}
+.pkItem:hover{background:var(--p-subtle)}
+.pkItem.on{background:var(--ink-wash)}
+.pkBody{flex:1;min-width:0}
+.pkTop{display:flex;align-items:baseline;gap:8px}
+.pkName{font-size:12.5px}
+.pkId{font:500 10px var(--font-mono);color:var(--p-ink-3)}
+.pkCost{font-size:11px;color:var(--p-ink-2);margin-left:auto;white-space:nowrap}
+.pkDesc{font-size:11px;color:var(--p-ink-3);line-height:1.45;margin-top:2px}
+.box{flex:none;width:13px;height:13px;margin-top:2px;border:1px solid var(--ink-soft);border-radius:3px;display:flex;align-items:center;justify-content:center}
+.box.num{font:600 9px/1 var(--font-sans);color:var(--paper-bg);background:var(--ink);border-color:var(--ink)}
+.pkItem:hover .box{border-color:var(--ink)}
+.pkFoot{padding:8px 12px 9px}
+
+/* the field */
+.dock{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--paper-bg) 72%,rgba(252,252,250,0));z-index:30}
+.dock-in{max-width:720px;margin:0 auto;position:relative}
+.sfield{position:relative;display:flex;align-items:center;border-radius:var(--r-btn);background:var(--p-surface);overflow:hidden;box-shadow:0 1px 2px rgba(40,36,28,.035),0 0 0 .5px rgba(25,25,25,.10)}
+.fill{position:absolute;inset:0;pointer-events:none;transition:opacity .2s}
+.fill svg{width:100%;height:100%;display:block}
+.cmdfill{background:rgb(var(--line-c));opacity:0}
+.sfield.cmd .cmdfill{opacity:1}.sfield.cmd .prmfill{opacity:0}
+.sfield input{position:relative;z-index:1;flex:1;min-width:0;padding:10px 6px 10px 72px;border:none;background:transparent;font:400 13.5px var(--font-sans);color:var(--ink);outline:none}
+.sfield.cmd input{font-family:var(--font-mono);font-size:13px;color:#fff;padding-left:86px;text-shadow:0 0 3px rgba(12,20,40,.95)}
+.sfield.cmd input::placeholder{color:#fff;opacity:.8}
+.modechip{position:absolute;left:12px;top:50%;margin-top:-8px;z-index:2;font:600 8.5px var(--font-sans);letter-spacing:.06em;padding:3px 7px;border-radius:9px;background:var(--ink);color:var(--paper-bg)}
+.sfield.cmd .modechip{background:rgb(var(--navy));color:#fff}
+.fmarg{position:relative;z-index:2;display:flex;align-items:baseline;flex-shrink:0;padding-left:8px;font:italic 400 11.5px var(--font-serif);color:var(--marg)}
+.fmarg .tg{border:none;background:none;padding:4px 0;cursor:pointer;font:inherit;color:var(--marg);white-space:nowrap}
+.fmarg .tg.on{color:var(--ink)}
+.fmarg .tg:hover{color:var(--p-gold-deep)}
+.fmarg .sep{opacity:.4;margin:0 5px}
+.sfield.cmd .fmarg{display:none}
+.quill{position:relative;z-index:2;width:21px;height:21px;margin:0 10px 0 6px;flex-shrink:0;color:var(--ink)}
+.sfield.cmd .quill{display:none}
+.shint{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 4px;min-height:19px;padding:6px 13px 0;font:italic 400 11px/1.6 var(--font-serif);color:var(--marg)}
+.shint .sep{opacity:.5;margin:0 3px 0 1px}
+.shint code{font:normal 600 11px var(--font-serif);color:var(--ink)}
+.shint button{font:inherit;color:inherit;border:none;background:none;padding:0;cursor:pointer}
+.shint button:hover{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+.shint .now{color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:120px;transform:translateX(-50%);background:var(--p-surface);border-radius:10px;padding:9px 14px;box-shadow:0 8px 28px rgba(40,36,28,.12);font:italic 12px var(--font-serif);color:var(--p-ink-2);opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;z-index:40}
+.toast.on{opacity:1}
+
+
+/* ═══ Inline editing ═══ */
+:root{--c-you:#2F5DA8; --c-ai:#2E7458; --c-edit:rgba(47,93,168,.45); --c-ask:rgba(46,116,88,.45)}
+.ans[contenteditable]{outline:none;border-radius:6px;margin:0 -6px;padding:2px 6px;transition:background .15s,box-shadow .15s;cursor:text}
+.ans[contenteditable]:hover{background:var(--p-subtle)}
+.ans[contenteditable]:focus{background:var(--p-subtle);box-shadow:inset 0 0 0 1px var(--divider)}
+/* yours: struck in place, added in your ink */
+s.del{color:var(--p-ink-3);text-decoration:line-through;text-decoration-color:rgba(25,25,25,.55);text-decoration-thickness:1px}
+ins.mine{color:var(--c-you);text-decoration:none}
+/* the AI's answer to an ask, waiting for you */
+ins.ai{color:var(--c-ai);text-decoration:underline dotted;text-decoration-color:rgba(46,116,88,.6);text-underline-offset:3px}
+s.del.byai{text-decoration-color:rgba(46,116,88,.7)}
+.anch{background:rgba(46,116,88,.08);border-bottom:1px dotted rgba(46,116,88,.6)}
+.askmark,.ansmark{font:italic 400 10.5px var(--font-serif);color:var(--c-ai);margin:0 2px;cursor:pointer;white-space:nowrap;user-select:none}
+.askmark:hover{text-decoration:underline}
+.ansmark span:hover{text-decoration:underline;color:var(--ink)}
+s.del + ins.mine, s.del + ins.ai, s.del + .anch{margin-left:.28em}
+.askbox{display:inline-flex;align-items:center;gap:6px;margin:0 3px;padding:2px 4px 2px 8px;border:1px solid rgba(46,116,88,.5);border-radius:6px;background:#fff;vertical-align:baseline;user-select:none}
+.askbox input{border:none;outline:none;font:400 12.5px var(--font-sans);width:min(360px,52vw);background:transparent;color:var(--ink)}
+.askbox span{font:600 8.5px var(--font-sans);letter-spacing:.06em;color:var(--c-ai)}
+.flash{background:rgba(196,169,77,.3)!important;transition:background .3s}
+/* clean view: the result, without markup */
+.chatclean s.del{display:none}
+.chatclean ins.mine,.chatclean ins.ai{color:inherit;text-decoration:none}
+.chatclean .askmark,.chatclean .ansmark{display:none}
+.chatclean .anch{background:none;border:none}
+.chead .marg button.on{color:var(--ink)}
+.tab .cnt{font:500 9.5px var(--font-mono);color:var(--c-you);margin-left:2px}
+.turn{margin-top:20px}
+/* selection menu */
+.selmenu{position:fixed;z-index:60;display:none;align-items:baseline;gap:0 6px;padding:5px 10px;background:#fff;border:.5px solid var(--p-border);border-radius:8px;box-shadow:0 6px 20px rgba(40,36,28,.14);font:italic 12px var(--font-serif);color:var(--marg)}
+.selmenu.open{display:flex}
+.selmenu button{border:none;background:none;padding:2px 0;cursor:pointer;font:inherit;color:var(--p-ink-2)}
+.selmenu button:hover{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+.selmenu .sep{opacity:.4}
+.selmenu.strikeonly .opt{display:none}
+.you[contenteditable]{outline:none;cursor:text;transition:box-shadow .15s}
+.you[contenteditable]:hover,.you[contenteditable]:focus{box-shadow:inset 0 0 0 1px var(--divider)}
+.pm{justify-content:center;margin:-6px 0 12px}
+.pm[hidden]{display:none}
+.selmenu kbd{font:500 9.5px var(--font-mono);color:var(--p-ink-3)}
+/* collection cards for edits and asks */
+.mk.edit .body{border-left-color:var(--c-edit)}
+.mk.ask .body{border-left-color:var(--c-ask)}
+.mk.held .body{border-left-style:dashed}
+.mk .ed{font:13px/1.55 var(--font-serif)}
+.mk .ed s{color:var(--p-ink-3)}
+.mk .ed ins{color:var(--c-you);text-decoration:none}
+.mk .ed .arrow{color:var(--p-ink-3);margin:0 4px;font-family:var(--font-sans);font-size:11px}
+.mk .instr{font-size:12.5px;line-height:1.5}
+.mk .on{font:italic 11.5px/1.45 var(--font-serif);color:var(--p-ink-2);margin-bottom:4px}
+.mk .res{margin-top:6px;font:13px/1.5 var(--font-serif);color:var(--c-ai)}
+.mk .marg .st{color:var(--ink)}
+.mk.flash{background:rgba(196,169,77,.10)!important;box-shadow:inset 0 0 0 1px rgba(196,169,77,.45)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;padding:6px 14px 0;font:italic 11px var(--font-serif);color:var(--marg)}
+.legend s{color:var(--p-ink-3)} .legend ins{text-decoration:none}
+
+
+/* ═══ v3 ═══ */
+:root{--c-rip:#94491F}
+.try{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 16px;border-bottom:1px dashed rgba(25,25,25,.15)}
+.try span{font:600 9px var(--font-sans);letter-spacing:.055em;color:var(--p-ink-3);margin-right:4px}
+.try button{border:none;border-radius:var(--r-btn);padding:6px 10px;cursor:pointer;color:var(--p-ink-2);background:var(--p-subtle);font:500 11px var(--font-sans)}
+.try button:hover{color:var(--ink)}
+.wikinote{justify-content:center;margin:-6px 0 12px;text-align:center}
+.wikinote button{color:var(--ink)!important}
+s.rip{color:var(--p-ink-3);text-decoration:line-through;text-decoration-color:var(--c-rip)}
+ins.rip{color:var(--c-rip);text-decoration:underline dotted;text-decoration-color:rgba(168,87,42,.6);text-underline-offset:3px;margin-left:.28em}
+.ripmark{font:italic 400 10.5px var(--font-serif);color:var(--c-rip);margin:0 2px;white-space:nowrap;user-select:none;cursor:pointer}
+.ripmark span:hover{text-decoration:underline;color:var(--ink)}
+.chatclean s.rip{display:none}.chatclean ins.rip{color:inherit;text-decoration:none}.chatclean .ripmark{display:none}
+.tab .rcnt{font:500 9.5px var(--font-mono);color:var(--c-rip);margin-left:3px}
+.mk.rip .body{border-left-color:rgba(168,87,42,.5)}
+.mk.rip.focus{background:rgba(168,87,42,.06);box-shadow:inset 0 0 0 1px rgba(168,87,42,.35)}
+.mk .ed.rp ins{color:var(--c-rip)}
+.mk .out{font:13px/1.55 var(--font-serif);color:var(--ink)}
+.ctab.hot .n{color:var(--c-rip)}
+.ripbar{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:10px 0 4px;padding:9px 12px;border-radius:8px;background:rgba(168,87,42,.06);border:.5px solid rgba(168,87,42,.3);font:italic 11.5px var(--font-serif);color:var(--p-ink-2)}
+.ripbar .t{font:600 9px var(--font-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--c-rip);font-style:normal}
+.ripbar .stepper{display:inline-flex;align-items:baseline;gap:6px;font:500 11px var(--font-sans);font-style:normal;color:var(--ink)}
+.ripbar .stepper button{border:none;background:none;cursor:pointer;font:500 14px var(--font-sans);color:var(--p-ink-2);padding:0 2px}
+.ripbar .stepper button:hover{color:var(--ink)}
+.ripbar .acts2 button{border:none;background:none;padding:0;cursor:pointer;font:inherit;color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+.ripbar .acts2 .sep{opacity:.4;margin:0 3px}
+.ripbar .keys{flex-basis:100%;font-size:10.5px;color:var(--marg)}
+
+/* ═══ v4 ═══ */
+/* blocks inside replies */
+.ans h1{font:600 22px/1.3 var(--font-sans);margin:.4em 0 .4em}
+.ans h2{font:600 18px/1.35 var(--font-sans);margin:.4em 0 .35em}
+.ans h3{font:600 15.5px/1.4 var(--font-sans);margin:.4em 0 .3em}
+.ans ul,.ans ol{margin:0 0 .85em;padding-left:1.4em}
+.ans ul.check{list-style:none;padding-left:.2em}
+.ans li{margin:.15em 0}
+.ans li.chk{display:flex;gap:8px;align-items:baseline}
+.chkbox{flex:none;width:13px;height:13px;border:1px solid var(--ink-soft);border-radius:3px;cursor:pointer;position:relative;top:2px;user-select:none}
+li.done>.chkbox{background:var(--ink);border-color:var(--ink)}
+li.done>.chkbox::after{content:"";position:absolute;left:3.5px;top:1px;width:3px;height:7px;border:solid #fff;border-width:0 1.5px 1.5px 0;transform:rotate(45deg)}
+li.done{color:var(--p-ink-3)}
+.ans blockquote{margin:0 0 .85em;padding-left:12px;border-left:2px solid var(--ink-soft);color:var(--p-ink-2)}
+.ans pre{margin:0 0 .85em;padding:10px 12px;border-radius:8px;background:var(--p-subtle);font:12.5px/1.5 var(--font-mono);white-space:pre-wrap}
+.ans hr{border:none;border-top:1px solid var(--divider);margin:1em 0}
+/* the / menu */
+.slash{position:fixed;z-index:65;display:none;width:240px;padding:4px;background:#fff;border:.5px solid var(--p-border);border-radius:10px;box-shadow:0 8px 26px rgba(0,0,0,.08)}
+.slash.open{display:block}
+.slash .sq{font:500 11px var(--font-mono);color:var(--p-ink-3);padding:4px 8px 6px}
+.slash button{display:flex;align-items:center;gap:10px;width:100%;padding:6px 8px;border:none;background:none;border-radius:6px;cursor:pointer;font:400 13px var(--font-sans);color:var(--ink);text-align:left}
+.slash button:hover,.slash button.on{background:var(--p-subtle)}
+.slash .ic{width:22px;text-align:center;font:600 11px var(--font-sans);color:var(--p-ink-2)}
+.slash .none{padding:8px;font:italic 12px var(--font-serif);color:var(--marg)}
+.slash .sf{border-top:.5px solid var(--p-border-2);margin-top:4px;padding:6px 8px 3px;font:italic 11px var(--font-serif);color:var(--marg)}
+/* collab picker, the answered-by picker's shape */
+#collabpick{display:none;position:absolute;right:0;bottom:calc(100% + 6px);z-index:70;width:340px;max-width:calc(100vw - 32px);max-height:60vh;overflow-y:auto;border:.5px solid var(--p-border);border-radius:10px;background:#fff;box-shadow:0 8px 26px rgba(0,0,0,.08)}
+#collabpick.open{display:block}
+#collabpick .pkCost{font:500 10px var(--font-mono);color:var(--p-ink-3)}
+.fmarg .cbtn{color:var(--marg)}
+.fmarg .cbtn.on{color:var(--ink)}
+/* sweeps: the AI's suggestions, green, reviewed like Ripple */
+s.rip.sw{text-decoration-color:var(--c-ai)}
+ins.rip.sw{color:var(--c-ai);text-decoration-color:rgba(46,116,88,.6)}
+.ripmark.sw{color:var(--c-ai)}
+.mk.rip.sweep .body{border-left-color:var(--c-ask)}
+.mk.rip.sweep .ed.rp ins{color:var(--c-ai)}
+.mk.rip.sweep.focus{background:rgba(46,116,88,.06);box-shadow:inset 0 0 0 1px rgba(46,116,88,.35)}
+/* reflection board */
+.clist.ref{padding:6px 16px 16px}
+.rsec{padding:12px 0;border-bottom:.5px solid var(--p-border-2)}
+.rsec:last-child{border-bottom:none}
+.rh{font:600 9px var(--font-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--p-ink-3);margin-bottom:6px}
+.rh .nc{font:italic 400 10.5px var(--font-serif);letter-spacing:0;text-transform:none;color:var(--marg);margin-left:6px}
+.rt{font:14px/1.6 var(--font-serif);margin:0 0 .5em}
+.rt.dim{font-size:12.5px;color:var(--p-ink-2);margin-top:8px}
+.rq{display:block;width:100%;text-align:left;border:none;background:var(--p-subtle);border-radius:8px;padding:8px 10px;margin:0 0 6px;cursor:pointer;font:italic 13px/1.5 var(--font-serif);color:var(--ink)}
+.rq:hover{background:var(--ink-wash-2)}
+.rmsg{margin:8px 0 6px;max-width:none}
+.rin input{width:100%;border:.5px solid var(--p-border);border-radius:8px;padding:9px 11px;font:13px var(--font-sans);outline:none;background:#fff}
+.rin input:focus{border-color:var(--ink-soft)}
+.propose{background:rgba(46,116,88,.04);border-radius:8px;padding:12px;border:.5px solid rgba(46,116,88,.25);margin:10px 0}
+
+/* ═══ v5: legibility ═══
+   Marginalia at 62% ink (4.9:1 on paper, was 2.9:1) and at least 11.5px.
+   ink-2 and ink-3 darkened to pass 4.5:1. Each mark has its own underline,
+   so none relies on colour alone: yours solid, an answer dotted, Ripple dashed. */
+.marg,.mk .marg,.grp .marg,.shint,.ans .cite,.askmark,.ansmark,.ripmark,.legend,.slash .sf,.pkFoot{font-size:11.5px!important}
+.mk .marg .id{font-size:10.5px}
+ins.mine{text-decoration:underline solid;text-decoration-color:rgba(47,93,168,.45);text-decoration-thickness:1px;text-underline-offset:3px}
+ins.ai,ins.rip.sw{text-decoration:underline dotted;text-decoration-color:rgba(46,116,88,.75);text-decoration-thickness:1.5px;text-underline-offset:3px}
+ins.rip:not(.sw){text-decoration:underline dashed;text-decoration-color:rgba(148,73,31,.7);text-decoration-thickness:1px;text-underline-offset:3px}
+.mk .ed ins{text-decoration:underline solid;text-decoration-color:rgba(47,93,168,.45);text-underline-offset:3px}
+.mk .ed.rp ins{text-decoration:underline dashed}
+.mk.sweep .ed.rp ins,.mk .res{text-decoration:underline dotted;text-underline-offset:3px}
+.legend ins{text-underline-offset:3px}
+.legend .l-you{text-decoration:underline solid;color:var(--c-you)}
+.legend .l-ai{text-decoration:underline dotted;color:var(--c-ai)}
+.legend .l-rip{text-decoration:underline dashed;color:var(--c-rip)}
+.chatclean ins.mine,.chatclean ins.ai,.chatclean ins.rip{text-decoration:none}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:3px}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important;scroll-behavior:auto!important} }
+
+/* ═══ v5: strip marginalia, focus picker ═══ */
+.stripmarg{margin-left:auto;display:flex;align-items:baseline;gap:0 5px;font:italic 400 11.5px var(--font-serif);color:var(--marg);white-space:nowrap}
+.stripmarg button{border:none;background:none;padding:0;cursor:pointer;font:inherit;color:inherit}
+.stripmarg button.on{color:var(--ink)}
+.stripmarg button:hover{color:var(--p-gold-deep)}
+.stripmarg .caret{font-size:9px;font-style:normal;margin-left:-2px}
+.stripmarg .sep{opacity:.5}
+.focuspick{display:none;position:absolute;z-index:70;width:300px;border:.5px solid var(--p-border);border-radius:10px;background:#fff;box-shadow:0 8px 26px rgba(0,0,0,.08)}
+.focuspick.open{display:block}
+.focuspick .pkFoot span,.focuspick .pkFoot code{white-space:normal}
+.focuspick .pkCost{font:500 10px var(--font-mono);color:var(--p-ink-3)}
+.stage.single{max-width:860px}
+.stage>[hidden]{display:none!important}
+.lgbtn{border:none;background:none;padding:0;cursor:pointer;font:inherit;color:inherit}
+
+/* ═══ v5: calm ═══
+   Nothing is removed; detail waits until you are near it. */
+.calm .slide>.marg>*:not(:first-child){opacity:0;transition:opacity .15s}
+.calm .slide:hover>.marg>*,.calm .slide:focus-within>.marg>*{opacity:1}
+.calm .lcard>.chead .marg{opacity:0;transition:opacity .15s}
+.calm .lcard:hover>.chead .marg,.calm .lcard>.chead:focus-within .marg{opacity:1}
+.calm .pm,.calm .wikinote{opacity:0;transition:opacity .15s}
+.calm .cbody:hover .pm,.calm .cbody:hover .wikinote{opacity:1}
+/* inline markers become numbered dots, full text on hover */
+.calm .askmark,.calm .ansmark,.calm .ripmark{font-size:0!important;margin:0 2px;vertical-align:2px}
+.calm .askmark::before,.calm .ansmark::before{content:attr(data-a)}
+.calm .ripmark::before{content:attr(data-r)}
+.calm .askmark::before,.calm .ansmark::before,.calm .ripmark::before{display:inline-block;font:600 9px/15px var(--font-sans);font-style:normal;padding:0 4px;min-width:15px;height:15px;border-radius:8px;text-align:center;color:#fff;background:var(--c-ai)}
+.calm .ripmark:not(.sw)::before{background:var(--c-rip)}
+.calm .askmark:hover,.calm .ansmark:hover,.calm .ripmark:hover{font-size:11.5px!important;vertical-align:baseline}
+.calm .askmark:hover::before,.calm .ansmark:hover::before,.calm .ripmark:hover::before{display:none}
+/* markup follows attention: the reply you are in shows it; the rest read clean, with a margin tick */
+.calm .ans:not(:hover):not(:focus) s.del,.calm .ans:not(:hover):not(:focus) s.rip,
+.calm .you:not(:hover):not(:focus) s.del,.calm .you:not(:hover):not(:focus) s.rip{display:none}
+.calm .ans:not(:hover):not(:focus) :is(ins.mine,ins.ai,ins.rip),
+.calm .you:not(:hover):not(:focus) :is(ins.mine,ins.ai,ins.rip){color:inherit;text-decoration:none}
+.calm .ans:not(:hover):not(:focus):has(s.del,ins.mine,ins.ai,ins.rip){box-shadow:inset 2px 0 0 rgba(47,93,168,.45);border-radius:0}
+/* pending suggestions and answers are not yet accepted: at rest the reply reads as it stands */
+.calm .ans:not(:hover):not(:focus) :is(s.rip,s.del.byai){display:inline!important;text-decoration:none;color:inherit}
+.calm .ans:not(:hover):not(:focus) :is(ins.rip,ins.ai){display:none}
+/* cards fold to one line */
+.calm .mk .on,.calm .mk .res,.calm .mk .qs,.calm .mk .marg{display:none}
+.calm .mk:not(:hover):not(:focus-within) .ed:has(ins) :is(s,.arrow){display:none}
+.calm .mk .ed,.calm .mk .instr,.calm .mk .q,.calm .mk .out{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.calm .mk:hover .on,.calm .mk:focus-within .on,.calm .mk:hover .res,.calm .mk:hover .qs{display:block}
+.calm .mk:hover .marg,.calm .mk:focus-within .marg,.calm .mk.focus .marg{display:flex}
+.calm .mk:hover :is(.ed,.instr,.q,.out){white-space:normal}
+.calm .ripbar .keys{display:none}
+.calm .tab .cnt,.calm .tab .rcnt{opacity:.75}
+</style>
+</head>
+<body>
+
+<div class="try"><span>TRY</span>
+  <button data-try="e1">edit 201a: eleven years → nearly a century</button>
+  <button data-try="e2">edit 201a's prompt: short story → ghost story</button>
+  <button data-try="rip">ripple on</button>
+  <button data-try="send">send to 201a</button>
+  <button data-try="wiki">go to Wikipedia</button>
+  <button data-try="slash">new line in 201a, then /</button>
+  <button data-try="collab">collab: Editor</button>
+  <button data-try="ref">open Ref: 201</button>
+  <button data-try="cmd" data-v="calm:">calm:</button>
+  <button data-try="cmd" data-v="calm:off">calm:off</button>
+  <button data-try="cmd" data-v="focus:sym col">focus:sym col</button>
+  <button data-try="cmd" data-v="focus:save">focus:save</button>
+  <button data-try="cmd" data-v="focus:off">focus:off</button>
+</div>
+<nav class="strip" aria-label="Boards">
+  <button class="btitle">Alm:</button>
+  <button class="btitle here" data-b="sym">Sym:<span class="c"> Writing studio</span></button>
+  <button class="btitle here" data-b="col">Col:<span class="c"> Murano story</span></button>
+  <button class="btitle" data-b="ref">Ref:<span class="c"> 201</span></button>
+  <button class="btitle">Dkt:</button>
+  <span class="stripmarg" id="stripmarg"></span>
+</nav>
+
+<main class="stage">
+  <section class="lcard" id="chat"></section>
+  <section class="lcard colboard" id="col"></section>
+  <section class="lcard colboard" id="refb" hidden></section>
+</main>
+
+<div class="dock"><div class="dock-in">
+  <div id="collabpick" role="menu"></div>
+  <div class="sfield" id="field">
+    <div class="fill prmfill"><svg aria-hidden="true"><defs><pattern id="mosaic" width="16" height="24" patternUnits="userSpaceOnUse" patternTransform="skewY(-17)"><g fill="none" stroke="var(--tri)" stroke-width=".7"><path d="M0 0V24M16 0V24"/><path d="M0 0H16M0 24H16"/><path d="M0 0L16 24"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#mosaic)"/></svg></div>
+    <div class="fill cmdfill"></div>
+    <span class="modechip" id="chip">PROMPT</span>
+    <input id="inp" autocomplete="off" spellcheck="false">
+    <span class="fmarg" id="fmarg"></span>
+    <svg class="quill" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.3 14.8h8.5l-.7 5.1a1.5 1.5 0 0 1-1.5 1.3H8.5a1.5 1.5 0 0 1-1.5-1.3z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.2 14.8h10.7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M21.3 2.3c-5.7 1.2-9.1 5-9.8 10l3.1-1c3.9-1.4 6.4-4.6 6.7-9z" fill="currentColor"/><path d="M11.9 12.2 10.4 14.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </div>
+  <div class="shint" id="hint"></div>
+</div></div>
+<div class="toast" id="toast"></div>
+<div class="slash" id="slash" role="menu"></div>
+<div class="focuspick" id="focuspick" role="menu"></div>
+<div class="selmenu" id="selmenu"><button data-sm="strike">strikethrough <kbd>⌘⇧X</kbd></button><span class="sep opt">·</span><button class="opt" data-sm="ask">ask <kbd>⌘K</kbd></button><span class="sep opt">·</span><button class="opt" data-sm="high">highlight</button></div>
+
+<script>
+/* ═══ Data ═══ */
+const P0 = 'Draft the opening of a short story set in a glassworks on Murano in 1880.';
+/* Each branch keeps its own copy of the first prompt, so editing it in one branch
+   leaves the others alone. Carrying an edit across is Ripple's job. */
+const BR = {
+  a:{src:'Sonnet 4.6', prompt:P0, turns:[{html:'<p>The furnace on the Rio dei Vetrai had not gone out in eleven years, and old Ferro meant to keep it that way. Every morning before light he climbed the stairs from the canal with <s class="del" data-e="240">two apprentices</s><ins class="mine" data-e="240"><span class="anch" data-a="241">Tom and Ellen</span></ins><span class="askmark" contenteditable="false" data-a="241">ask 241</span> at his heels, and every morning he told them the same thing: glass remembers the hand that rushed it.</p><p>That winter a stranger came to the workshop asking for a mirror that would show a face as it would look in ten years.</p>'}]},
+  b:{src:'Wikipedia', wiki:true, prompt:P0, turns:[{html:'<p>From the article on Murano glass. Glassmaking on Murano dates to 1291, when the Republic of Venice ordered glassmakers to move their furnaces to the island, partly to protect the city from fire. The island became known for coloured glass, enamelled glass and, later, mirrors.</p><p class="cite">Wikipedia, CC BY-SA 4.0 · revision 1188</p>'}]},
+  c:{src:'Opus 4.6', prompt:P0, turns:[{html:'<p>Lucia learned to count by the colours of the glass: one was clear, two was the green of bottle ends, three was the red they made only for the church. Her father’s furnace had not gone out in eleven years, and she had never once seen it dark.</p><p>By the time she was nine she could tell a good batch from a bad one by the sound it made cooling, a thin ringing like a spoon against a cup.</p>'}]}
+};
+const EM = {240:{held:false, sent:null}};
+const ASKS = {241:{id:241, k:'a', t:0, on:'Tom and Ellen', instr:'make these names sound more Italian', state:'queued'}};
+const RIP = {};      // Suggestions in place: Ripple (your edit carried across) and sweeps (a collab rule applied)
+/* Collab: saved standing instructions on how the AI should work. Five ship built in; people write their own.
+   They stack, in the order ticked, and go with every prompt until turned off. */
+const COLLABS = [
+  {k:'challenge', nm:'Challenge artifacts', d:'Question what it is given instead of taking it as settled.'},
+  {k:'reasoning', nm:'Show reasoning', d:'Lay out the steps before the answer.'},
+  {k:'pushback',  nm:'Push back on me', d:'Disagree when it thinks you are wrong.'},
+  {k:'alts',      nm:'Offer alternatives', d:'Give two or three ways, not one.'},
+  {k:'uncertain', nm:'Flag uncertainty', d:'Say how sure it is, and where it is guessing.'},
+  {k:'editor',    nm:'Editor', mine:true, d:'Make each sentence more concise. Never combine sentences.'}
+];
+let collab = [], collabOpen = false;
+/* Boards on screen. Without focus: the ones opened. With focus: the saved focus set. */
+const BOARDS = {sym:'Sym: Writing studio', col:'Col: Murano story', ref:'Ref: 201'};
+let openB = ['sym','col'], focusSet = ['sym'], focusOn = false, focusPick = false;
+let calm = false, legendOpen = false;
+const visible = () => focusOn ? focusSet : openB;
+function ensureVisible(b){ if (visible().includes(b)) return; if (focusOn){ focusOn = false; toast('Focus is off so the '+BOARDS[b].split(':')[0]+' board can show. focus: brings it back.'); } if (!openB.includes(b)) openB.push(b); layout(); }
+const REF = {done:false, msgs:[], swept:false};
+let HL = [];
+let nextId = 242, cur = 'a', to = 'one', clean = false, colClean = false, ripple = false, tab = 'all', pending = null, helper = 'Sonnet 4.6', ripIx = 0;
+const HELPERS = ['Sonnet 4.6','Haiku 4.5','Opus 4.6'];
+const $ = s => document.querySelector(s);
+const inp = $('#inp'), field = $('#field');
+const K = ['a','b','c'];
+const EDSEL = '#chat .ans[contenteditable], #chat .you[contenteditable]';
+const arrow = d => `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+const plural = (n,w) => n+' '+w+(n===1?'':'s');
+const esc = t => String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const who = k => BR[k].wiki ? helper : BR[k].src;     // who reads a branch's edits and asks
+
+/* ═══ Reading state back out of the text ═══ */
+function scan(html, k, t, out){
+  const d = document.createElement('div'); d.innerHTML = html;
+  d.querySelectorAll('s.del[data-e], ins.mine[data-e]').forEach(el => {
+    const id = +el.dataset.e; out[id] = out[id] || {id, k, t, del:'', ins:''};
+    if (el.tagName==='S') out[id].del += el.textContent;
+    else { const c = el.cloneNode(true); c.querySelectorAll('ins.ai,.askmark,.ansmark,s.rip,ins.rip,.ripmark').forEach(n=>n.remove()); out[id].ins += c.textContent; }
+  });
+}
+const meta = id => EM[id] || (EM[id] = {held:false, sent:null});
+function editsIn(k){
+  const out = {};
+  scan(BR[k].prompt, k, 'p', out);
+  BR[k].turns.forEach((tn, t) => { scan(tn.html, k, t, out); if (tn.youHtml) scan(tn.youHtml, k, 'y'+t, out); });
+  return Object.values(out).map(e => ({...e, ...meta(e.id)}));
+}
+const allEdits = () => K.flatMap(editsIn);
+const pendingEdits = k => editsIn(k).filter(e => !e.held && !e.sent);
+const queuedAsks = k => Object.values(ASKS).filter(a => a.k===k && a.state==='queued');
+const openRips = () => Object.values(RIP).filter(r => r.state==='pending').sort((x,y)=> x.k===y.k ? x.id-y.id : x.k<y.k ? -1 : 1);
+const targets = () => to==='all' ? K : [cur];
+
+/* ═══ The chat ═══ */
+function renderChat(){
+  const i = K.indexOf(cur), b = BR[cur];
+  const pe = editsIn(cur).some(e=>e.t==='p');
+  $('#chat').innerHTML = `<div class="chead">
+    <button class="ctitle">Sym:<span class="c"> Writing studio</span></button>
+    <div class="marg"><span>chat 201</span><span class="sep">·</span><button class="${clean?'':'on'}" data-view="markup">markup</button><span class="sep">·</span><button class="${clean?'on':''}" data-view="clean">clean</button><span class="sep">·</span><button class="${ripple?'on':''}" data-ripple="1">ripple: ${ripple?'on':'off'}</button></div></div>
+  <div class="cbody ${clean?'chatclean':''}">
+    <div class="you" ${clean?'':'contenteditable="true"'} spellcheck="false" data-k="${cur}" data-t="p" aria-label="Your prompt in 201${cur}, editable">${b.prompt}</div>
+    <div class="marg pm" id="pm" ${pe?'':'hidden'}><span>your prompt in 201${cur}, edited; the other branches keep theirs</span><span class="sep">·</span><button data-again="1">ask again as 201d</button></div>
+    <div class="tabs">${K.map(k=>{ const n = pendingEdits(k).length + queuedAsks(k).length, r = openRips().filter(x=>x.k===k).length;
+      return `<button class="tab ${k===cur?'on':''}" data-k="${k}"><span class="id">${k}</span>${BR[k].src}${n?`<span class="cnt">${n}</span>`:''}${r?`<span class="rcnt">${r}</span>`:''}</button>`; }).join('')}</div>
+    ${b.wiki ? `<div class="marg wikinote"><span>Wikipedia supplies the text. Mark it, edit it, ask about it: those go to</span><button data-helper="1">${helper}</button><span>, never to Wikipedia</span></div>` : ''}
+    <div class="slider">
+      <div class="side"><button class="arrow" data-step="-1" aria-label="Previous reply" ${i===0?'disabled':''}>${arrow('M10 3 5 8l5 5')}</button></div>
+      <div>${K.map(k=>`<div class="slide ${k===cur?'on':''}">${BR[k].turns.map((tn,t)=>`
+          ${t ? `<div class="turn"><div class="you" ${clean?'':'contenteditable="true"'} spellcheck="false" data-k="${k}" data-t="y${t}">${tn.youHtml || esc(tn.you)}</div></div>` : ''}
+          <div class="ans ${BR[k].wiki && !tn.model?'wiki':''}" ${clean?'':'contenteditable="true"'} spellcheck="false" data-k="${k}" data-t="${t}" aria-label="Reply, editable">${tn.html}</div>`).join('')}
+        <div class="marg"><button data-cmd="open:201${k}">open:201${k}</button><span>with its history</span><span class="sep">·</span><button data-cmd="open:201${k} summary">open:201${k} summary</button></div></div>`).join('')}</div>
+      <div class="side"><button class="arrow" data-step="1" aria-label="Next reply" ${i===2?'disabled':''}>${arrow('M6 3l5 5-5 5')}</button></div>
+    </div>
+  </div>`;
+}
+function save(ed){
+  const k = ed.dataset.k, t = ed.dataset.t;
+  if (t==='p') BR[k].prompt = ed.innerHTML;
+  else if (t[0]==='y') BR[k].turns[+t.slice(1)].youHtml = ed.innerHTML;
+  else BR[k].turns[+t].html = ed.innerHTML;
+  clearTimeout(save._t); save._t = setTimeout(()=>{ renderCol(); renderTabsOnly(); hint(); const pm=$('#pm'); if (pm) pm.hidden = !editsIn(cur).some(e=>e.t==='p'); }, 120);
+}
+function renderTabsOnly(){
+  document.querySelectorAll('#chat .tab').forEach(b=>{ const k=b.dataset.k, n=pendingEdits(k).length+queuedAsks(k).length;
+    let c=b.querySelector('.cnt'); if (n){ if(!c){ c=document.createElement('span'); c.className='cnt'; b.insertBefore(c, b.querySelector('.rcnt')); } c.textContent=n; } else if (c) c.remove(); });
+}
+const edOf = (k,t) => document.querySelector(`#chat [data-k="${k}"][data-t="${t}"]`);
+function storeOf(k,t){ return t==='p' ? ['prompt'] : String(t)[0]==='y' ? ['youHtml', +String(t).slice(1)] : ['html', +t]; }
+function getHtml(k,t){ const [f,i] = storeOf(k,t); return f==='prompt' ? BR[k].prompt : (BR[k].turns[i][f] || esc(BR[k].turns[i].you||'')); }
+function setHtml(k,t,h){ const [f,i] = storeOf(k,t); if (f==='prompt') BR[k].prompt = h; else BR[k].turns[i][f] = h; }
+
+/* ═══ Editing in place ═══ */
+const up = (n, sel) => { n = n && (n.nodeType===3 ? n.parentElement : n); return n ? n.closest(sel) : null; };
+function caretAt(node, off){ const r=document.createRange(); r.setStart(node, off); r.collapse(true); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
+function adjacent(r, dir){
+  let n = r.startContainer, o = r.startOffset;
+  if (n.nodeType===3){ if (dir<0 && o>0) return null; if (dir>0 && o<n.length) return null; n = dir<0 ? n.previousSibling : n.nextSibling; }
+  else n = dir<0 ? n.childNodes[o-1] : n.childNodes[o];
+  while (n && n.nodeType===3 && !n.length) n = dir<0 ? n.previousSibling : n.nextSibling;
+  return n && n.nodeType===1 ? n : null;
+}
+function strikeRange(r, backward){
+  const inside = up(r.startContainer,'s.del');
+  if (inside && inside===up(r.endContainer,'s.del')){ r.collapse(backward); return +inside.dataset.e; }
+  const frag = r.extractContents();
+  frag.querySelectorAll('ins.mine').forEach(n=>n.remove());
+  frag.querySelectorAll('.askmark,.ansmark,.askbox,.ripmark').forEach(n=>n.remove());
+  const text = frag.textContent; if (!text) return null;
+  let el = document.createElement('s'); el.className='del'; el.textContent = text;
+  r.insertNode(el);
+  const sib = (n, d) => { let x = d<0 ? n.previousSibling : n.nextSibling; while (x && x.nodeType===3 && !x.length) x = d<0 ? x.previousSibling : x.nextSibling; return x; };
+  const prev = sib(el,-1), next = sib(el,1);
+  if (prev && prev.matches && prev.matches('s.del')){ prev.textContent += el.textContent; el.remove(); el = prev; }
+  if (next && next.matches && next.matches('s.del')){ el.textContent += next.textContent; el.dataset.e = el.dataset.e || next.dataset.e; next.remove(); }
+  if (!el.dataset.e) el.dataset.e = nextId++;
+  const p = el.parentNode, idx = [...p.childNodes].indexOf(el);
+  caretAt(p, backward ? idx : idx+1);
+  return +el.dataset.e;
+}
+function insertYours(text, id){
+  const s = getSelection(); let r = s.getRangeAt(0);
+  const inDel = up(r.startContainer,'s.del'); if (inDel){ const p=inDel.parentNode; caretAt(p, [...p.childNodes].indexOf(inDel)+1); r = s.getRangeAt(0); }
+  let ins = up(r.startContainer,'ins.mine');
+  if (!ins){ const b = adjacent(r,-1); if (b && b.matches('ins.mine')) ins = b; }
+  if (ins && ins.contains(r.startContainer)){ const tn=document.createTextNode(text); r.insertNode(tn); caretAt(tn, tn.length); return +ins.dataset.e; }
+  if (ins){ ins.appendChild(document.createTextNode(text)); ins.normalize(); caretAt(ins.lastChild, ins.lastChild.length); return +ins.dataset.e; }
+  if (!id){ const b = adjacent(r,-1); if (b && b.matches('s.del')) id = +b.dataset.e; }
+  ins = document.createElement('ins'); ins.className='mine'; ins.dataset.e = id || nextId++; ins.textContent = text;
+  r.insertNode(ins); caretAt(ins.firstChild, text.length);
+  return +ins.dataset.e;
+}
+document.addEventListener('beforeinput', e=>{
+  if (e.target.tagName==='INPUT') return;
+  const ed = e.target.closest && e.target.closest(EDSEL); if (!ed) return;
+  const t = e.inputType, s = getSelection(); if (!s.rangeCount) return;
+  if (t==='insertParagraph' && ed.classList.contains('ans')){ e.preventDefault(); splitBlock(ed); save(ed); return; }
+  if (/^(insertParagraph|insertLineBreak|history|format)/.test(t)){ e.preventDefault(); if (t==='historyUndo') toast('Undo an edit from its card in the collection.'); return; }
+  if (slash.open && /^insertText$/.test(t)){ e.preventDefault(); slash.q += e.data; renderSlash(); return; }
+  if (t==='insertText' && e.data==='/' && ed.classList.contains('ans') && atBlockStart(ed)){ e.preventDefault(); openSlash(ed); return; }
+  if (slash.open && t==='deleteContentBackward'){ e.preventDefault(); if (slash.q) { slash.q = slash.q.slice(0,-1); renderSlash(); } else closeSlash(); return; }
+  if (t==='deleteContentBackward' && ed.classList.contains('ans') && s.getRangeAt(0).collapsed && atBlockStart(ed)){ e.preventDefault(); joinBlock(ed); save(ed); return; }
+  if (/^insert(Text|ReplacementText|FromPaste|FromDrop)$/.test(t)){
+    e.preventDefault();
+    const text = e.data ?? (e.dataTransfer ? e.dataTransfer.getData('text/plain') : ''); if (!text) return;
+    let id = null; const r = s.getRangeAt(0); if (!r.collapsed) id = strikeRange(r, false);
+    insertYours(text, id); save(ed); return;
+  }
+  if (t.startsWith('delete')){
+    e.preventDefault();
+    const back = t.includes('Backward'), unit = /Word/.test(t) ? 'word' : /Line|Soft|Hard/.test(t) ? 'lineboundary' : 'character';
+    if (s.getRangeAt(0).collapsed) s.modify('extend', back?'backward':'forward', unit);
+    const r = s.getRangeAt(0); if (r.collapsed) return;
+    const a = up(r.startContainer,'ins.mine');
+    if (a && a===up(r.endContainer,'ins.mine')){ r.deleteContents(); if (!a.textContent){ const p=a.parentNode, i=[...p.childNodes].indexOf(a); a.remove(); caretAt(p,i); } save(ed); return; }
+    strikeRange(r, back); save(ed); return;
+  }
+  e.preventDefault();
+});
+
+/* ═══ Blocks: Enter, joining, and the / menu ═══
+   Formatting is yours and is never sent to the model: changing a block's type,
+   splitting or joining paragraphs makes no edit. Only words struck or added do. */
+const BLOCKS = 'p,li,h1,h2,h3,blockquote,pre';
+function blockOf(n, ed){ const b = up(n, BLOCKS); return b && ed.contains(b) ? b : null; }
+function textStart(b){ return [...b.childNodes].find(n => !(n.nodeType===1 && n.classList.contains('chkbox'))); }
+function atBlockStart(ed){
+  const s = getSelection(); if (!s.rangeCount) return false; const r = s.getRangeAt(0); if (!r.collapsed) return false;
+  const b = blockOf(r.startContainer, ed); if (!b) return false;
+  const pre = document.createRange(); pre.setStart(b, 0); pre.setEnd(r.startContainer, r.startOffset);
+  return pre.toString().replace(/\u200b/g,'') === '';
+}
+function chkBox(){ const c = document.createElement('span'); c.className='chkbox'; c.contentEditable='false'; c.setAttribute('role','checkbox'); c.setAttribute('aria-checked','false'); return c; }
+function emptyFill(el){ if (!el.textContent.replace(/\u200b/g,'')) el.appendChild(document.createElement('br')); }
+function caretIn(b){ const f = textStart(b); if (f && f.nodeType===3) caretAt(f, 0); else caretAt(b, b.querySelector('.chkbox') ? 1 : 0); }
+function splitBlock(ed){
+  const s = getSelection(); let r = s.getRangeAt(0);
+  if (!r.collapsed){ strikeRange(r, false); r = s.getRangeAt(0); }
+  const b = blockOf(r.startContainer, ed); if (!b) return;
+  if (b.tagName==='LI' && !b.textContent.replace(/\u200b/g,'').trim()){     // Enter on an empty item leaves the list
+    const list = b.parentNode, p = document.createElement('p'); p.appendChild(document.createElement('br'));
+    const after = [...list.children].slice([...list.children].indexOf(b)+1);
+    list.after(p); if (after.length){ const tail = document.createElement(list.tagName); tail.className = list.className; after.forEach(x=>tail.appendChild(x)); p.after(tail); }
+    b.remove(); if (!list.children.length) list.remove(); caretAt(p, 0); return;
+  }
+  const tail = document.createRange(); tail.setStart(r.startContainer, r.startOffset); tail.setEnd(b, b.childNodes.length);
+  const frag = tail.extractContents();
+  const tag = b.tagName==='LI' ? 'li' : b.tagName==='PRE' ? 'pre' : 'p';
+  const nb = document.createElement(tag);
+  if (b.classList.contains('chk')){ nb.className='chk'; nb.appendChild(chkBox()); }
+  nb.appendChild(frag); emptyFill(nb); emptyFill(b);
+  b.after(nb); caretIn(nb);
+}
+function joinBlock(ed){
+  const r = getSelection().getRangeAt(0), b = blockOf(r.startContainer, ed); if (!b) return;
+  if (b.tagName!=='P'){ setBlock(b, 'p', ed); toast('Back to plain text. Formatting is never sent to the model.'); return; }
+  let prev = b.previousElementSibling; if (prev && /^(UL|OL)$/.test(prev.tagName)) prev = prev.lastElementChild;
+  if (!prev || prev.tagName==='HR'){ if (prev) prev.remove(); return; }
+  prev.querySelectorAll(':scope > br').forEach(x=>x.remove());
+  const mark = document.createTextNode(''); prev.appendChild(mark);
+  [...b.childNodes].forEach(n => { if (!(n.nodeName==='BR')) prev.appendChild(n); });
+  b.remove(); caretAt(mark, 0);
+}
+function wrapList(li, kind){ const l = document.createElement(kind==='ol' ? 'ol' : 'ul'); if (kind==='check') l.className='check'; l.appendChild(li); return l; }
+function mergeLists(node){
+  if (!node || !/^(UL|OL)$/.test(node.tagName)) return;
+  const same = (a,b) => a && b && a.tagName===b.tagName && a.className===b.className;
+  const prev = node.previousElementSibling, next = node.nextElementSibling;
+  if (same(prev,node)){ [...node.children].forEach(x=>prev.appendChild(x)); node.remove(); node = prev; }
+  if (same(node,next)){ [...next.children].forEach(x=>node.appendChild(x)); next.remove(); }
+}
+function setBlock(b, type, ed){
+  if (type==='hr'){ const hr = document.createElement('hr'); hr.contentEditable='false'; (b.tagName==='LI' ? b.parentNode : b).after(hr);
+    if (!b.textContent.replace(/\u200b/g,'')){ const p=document.createElement('p'); p.appendChild(document.createElement('br')); hr.after(p); (b.tagName==='LI' && b.parentNode.children.length===1 ? b.parentNode : b).remove(); caretAt(p,0); } return; }
+  const kids = [...b.childNodes].filter(n => !(n.nodeType===1 && n.classList.contains('chkbox')) && n.nodeName!=='BR');
+  const listKind = {ul:'ul', ol:'ol', check:'check'}[type];
+  const el = document.createElement(listKind ? 'li' : type);
+  if (type==='check'){ el.className='chk'; el.appendChild(chkBox()); }
+  kids.forEach(k=>el.appendChild(k)); emptyFill(el);
+  let node = listKind ? wrapList(el, listKind) : el;
+  if (b.tagName==='LI'){
+    const list = b.parentNode, after = [...list.children].slice([...list.children].indexOf(b)+1);
+    b.remove(); list.after(node);
+    if (after.length){ const tail = document.createElement(list.tagName); tail.className = list.className; after.forEach(x=>tail.appendChild(x)); node.after(tail); }
+    if (!list.children.length) list.remove();
+  } else b.replaceWith(node);
+  mergeLists(node); caretIn(el);
+}
+const SLASH = [
+  {t:'p',  ic:'¶',  nm:'Text'},
+  {t:'h1', ic:'H1', nm:'Heading 1'}, {t:'h2', ic:'H2', nm:'Heading 2'}, {t:'h3', ic:'H3', nm:'Heading 3'},
+  {t:'ul', ic:'•',  nm:'Bulleted list'}, {t:'ol', ic:'1.', nm:'Numbered list'}, {t:'check', ic:'☐', nm:'Checklist'},
+  {t:'blockquote', ic:'❝', nm:'Quote'}, {t:'pre', ic:'</>', nm:'Code block'}, {t:'hr', ic:'—', nm:'Divider'}
+];
+const slash = {open:false, q:'', i:0, ed:null, b:null};
+function openSlash(ed){
+  const r = getSelection().getRangeAt(0); slash.ed = ed; slash.b = blockOf(r.startContainer, ed); slash.open = true; slash.q=''; slash.i=0;
+  const m = $('#slash'), rc = r.getClientRects()[0] || slash.b.getBoundingClientRect();
+  m.style.left = Math.max(8, Math.min(innerWidth-260, rc.left))+'px'; m.style.top = (rc.bottom + 6)+'px';
+  renderSlash(); m.classList.add('open');
+}
+function slashItems(){ const q = slash.q.toLowerCase(); return SLASH.filter(x => !q || x.nm.toLowerCase().includes(q) || x.t.startsWith(q)); }
+function renderSlash(){
+  const L = slashItems(); if (slash.i >= L.length) slash.i = Math.max(0, L.length-1);
+  $('#slash').innerHTML = `<div class="sq">/${esc(slash.q)}</div>` + (L.length ? L.map((x,i)=>`<button class="${i===slash.i?'on':''}" data-slash="${x.t}"><span class="ic">${esc(x.ic)}</span>${x.nm}</button>`).join('') : '<div class="none">Nothing matches</div>')
+    + `<div class="sf">Formatting is yours; it is never sent to the model.</div>`;
+}
+function closeSlash(){ slash.open = false; $('#slash').classList.remove('open'); }
+function pickSlash(t){ const {ed, b} = slash; closeSlash(); if (!b) return; ed.focus(); setBlock(b, t, ed); save(ed); }
+
+/* ═══ Selection menu ═══ */
+function showSelMenu(){
+  const s = getSelection(), m = $('#selmenu');
+  if (!s.rangeCount || s.isCollapsed){ m.classList.remove('open'); return; }
+  const r = s.getRangeAt(0), ed = up(r.commonAncestorContainer, EDSEL);
+  if (!ed){ m.classList.remove('open'); return; }
+  pending = {ed, range:r.cloneRange()};
+  m.classList.toggle('strikeonly', ed.classList.contains('you'));
+  const b = r.getBoundingClientRect(); m.classList.add('open');
+  m.style.left = Math.max(8, Math.min(innerWidth-m.offsetWidth-8, b.left+b.width/2-m.offsetWidth/2))+'px';
+  m.style.top = (b.top - m.offsetHeight - 8)+'px';
+}
+function hideSelMenu(){ $('#selmenu').classList.remove('open'); }
+function doStrike(){ if (!pending) return; const {ed, range} = pending; const s=getSelection(); s.removeAllRanges(); s.addRange(range); strikeRange(range, false); save(ed); hideSelMenu(); pending=null; }
+function doHighlight(){
+  if (!pending) return; const {ed, range} = pending;
+  const id = nextId++, mk = document.createElement('mark'); mk.dataset.h = id;
+  try { range.surroundContents(mk); } catch(_){ toast('Highlight inside one passage at a time.'); return; }
+  HL.push({id, k:ed.dataset.k, text:mk.textContent}); getSelection().removeAllRanges(); hideSelMenu(); pending=null; save(ed); findCard(id);
+}
+function openAsk(fromSel){
+  const s = getSelection(); if (!s.rangeCount) return;
+  let r = fromSel && pending ? pending.range : s.getRangeAt(0);
+  const ed = up(r.commonAncestorContainer,'#chat .ans[contenteditable]'); if (!ed) return;
+  document.querySelectorAll('#chat .askbox').forEach(b=>cancelAsk(b));
+  const id = nextId++, k = ed.dataset.k; let onText = '';
+  if (!r.collapsed){
+    const an = document.createElement('span'); an.className='anch'; an.dataset.a=id;
+    try { r.surroundContents(an); } catch(_){ an.appendChild(r.extractContents()); r.insertNode(an); }
+    onText = an.textContent; r = document.createRange(); r.setStartAfter(an); r.collapse(true);
+  }
+  const box = document.createElement('span'); box.className='askbox'; box.contentEditable='false'; box.dataset.a=id; box.dataset.on=onText;
+  box.innerHTML = `<span>ASK${BR[k].wiki?' · '+helper.toUpperCase():''}</span><input placeholder="${onText ? (BR[k].wiki ? 'e.g. find examples of this, explain it' : 'e.g. more concise, expand') : 'e.g. add some historical detail here'}" aria-label="Ask the AI">`;
+  r.insertNode(box); hideSelMenu(); pending=null; getSelection().removeAllRanges();
+  box.querySelector('input').focus(); hint();
+}
+function cancelAsk(box){
+  const id = box.dataset.a, an = document.querySelector(`#chat .anch[data-a="${id}"]`), ed = box.closest('.ans');
+  box.remove(); if (an) an.replaceWith(...an.childNodes); if (ed) save(ed);
+}
+function queueAsk(box){
+  const v = box.querySelector('input').value.trim(); if (!v){ cancelAsk(box); return; }
+  const id = +box.dataset.a, ed = box.closest('.ans'), k = ed.dataset.k;
+  const mk = document.createElement('span'); mk.className='askmark'; mk.contentEditable='false'; mk.dataset.a=id; mk.textContent='ask '+id+(BR[k].wiki?' · '+helper:'');
+  box.replaceWith(mk);
+  ASKS[id] = {id, k, t:+ed.dataset.t, on:box.dataset.on, instr:v, state:'queued', model:who(k)};
+  save(ed); findCard(id); toast('Ask '+id+' waits for your next prompt to 201'+k+(BR[k].wiki?'. '+helper+' will answer it; Wikipedia only supplied the text.':'.'));
+}
+
+/* ═══ Sending ═══ */
+function answerFor(a){
+  const i = a.instr.toLowerCase();
+  if (/italian/.test(i)) return a.on.replace(/Tom/,'Tommaso').replace(/Ellen/,'Elena') || 'Tommaso and Elena';
+  if (/example/.test(i)) return a.on + ' [examples follow: two or three pieces, each with its maker and date, from what ' + a.model + ' can find]';
+  if (/histor/.test(i)) return 'By 1880 the island’s furnaces had been working for nearly six centuries, ever since Venice moved its glassmakers there in 1291 to keep fire away from the city.';
+  if (/concise|shorter|tighten/.test(i)) return (a.on.split(/[,;:]| and /)[0] || a.on).trim();
+  if (/expand|detail|more/.test(i)) return a.on + (a.on ? ', ' : '') + 'the heat pressing at their faces and the smell of wet ash in the stairwell';
+  return '[Rewritten to follow: “'+a.instr+'”]';
+}
+function runAsk(a){
+  const ed = edOf(a.k, a.t); if (!ed) return;
+  const mk = ed.querySelector(`.askmark[data-a="${a.id}"]`), an = ed.querySelector(`.anch[data-a="${a.id}"]`);
+  const res = answerFor(a), ins = document.createElement('ins'); ins.className='ai'; ins.dataset.a=a.id; ins.textContent = (an?'':' ')+res;
+  if (an){ const old = document.createElement('s'); old.className='del byai'; old.dataset.a=a.id; old.textContent = an.textContent; an.replaceWith(old, ins); }
+  else if (mk) mk.before(ins);
+  if (mk){ const am = document.createElement('span'); am.className='ansmark'; am.contentEditable='false'; am.dataset.a=a.id; am.innerHTML='ask '+a.id+(BR[a.k].wiki?' · '+a.model:'')+': <span data-accept="'+a.id+'">accept</span> · <span data-reject="'+a.id+'">undo</span>'; mk.replaceWith(am); }
+  a.state='answered'; a.res=res; save(ed);
+}
+function settle(id, accept){
+  const a = ASKS[id]; if (!a) return; const ed = edOf(a.k, a.t);
+  ed.querySelectorAll(`[data-a="${id}"]`).forEach(n=>{
+    if (n.matches('s.del.byai')) accept ? n.remove() : n.replaceWith(document.createTextNode(n.textContent));
+    else if (n.matches('ins.ai')) accept ? n.replaceWith(document.createTextNode(n.textContent)) : n.remove();
+    else if (n.matches('.ansmark')) n.remove();
+  });
+  ed.normalize(); a.state = accept ? 'accepted' : 'undone'; save(ed);
+  toast(accept ? 'Kept. It is part of the reply now.' : 'Put back as it was.');
+}
+function undoEdit(id){
+  const e = allEdits().find(x=>x.id===id); if (!e) return;
+  if (cur!==e.k){ cur = e.k; renderChat(); }
+  const ed = edOf(e.k, e.t);
+  ed.querySelectorAll(`[data-e="${id}"]`).forEach(n=> n.tagName==='S' ? n.replaceWith(...n.childNodes) : n.remove());
+  ed.normalize(); delete EM[id]; save(ed); toast('Edit '+id+' undone.');
+}
+function send(text){
+  const T = targets(), lines = [], sentEdits = [];
+  T.forEach(k=>{
+    const ed = pendingEdits(k), as = queuedAsks(k), w = who(k);
+    as.forEach(runAsk);
+    ed.forEach(e=>{ EM[e.id].sent = 'Oct 6'; EM[e.id].to = w; sentEdits.push(e); });
+    const did = [ed.length?'read '+plural(ed.length,'edit'):'', as.length?'answered '+plural(as.length,'ask'):''].filter(Boolean).join(' and ');
+    if (text){
+      if (BR[k].wiki) addTurn(k, text, `[Wikipedia's search results for “${esc(text)}” come in here as text: matching articles, each with its summary, ready to mark, edit or ask about.]`);
+      else addTurn(k, text, `[${BR[k].src}'s reply streams here${collab.length ? ', working as '+collab.map(x=>COLLABS.find(c=>c.k===x).nm).join(' and ') : ''}${did ? ', having '+did : ''}.]`);
+    }
+    if (ed.length||as.length) lines.push('201'+k+': '+[ed.length?plural(ed.length,'edit')+' to '+w:'', as.length?plural(as.length,'ask')+' answered by '+w:''].filter(Boolean).join(', '));
+  });
+  renderChat();
+  const found = ripple ? runRipple(sentEdits) : 0;
+  renderChat(); renderCol(); hint();
+  toast((lines.length ? lines.join(' · ') : 'Sent.') + (found ? ' · Ripple has '+plural(found,'suggestion')+' for the other branches.' : ''));
+  if (found){ tab='rip'; ripIx=0; renderCol(); }
+}
+function addTurn(k, you, html){ BR[k].turns.push({you, html:'<p>'+html+'</p>'}); }
+
+/* ═══ Ripple ═══
+   Opt-in. When edits are sent, it looks in the other branches for the same thing
+   and suggests the same change there. Here it matches words; in the product it
+   is a model call per check, which is why it is off by default. */
+function suggestAt(j, t, del, ins, extra){
+  const d = document.createElement('div'); d.innerHTML = getHtml(j,t);
+  const tw = document.createTreeWalker(d, NodeFilter.SHOW_TEXT); let node;
+  while ((node = tw.nextNode())){
+    if (node.parentElement.closest('s,ins,.askmark,.ansmark,.ripmark,.anch')) continue;
+    const i = node.data.indexOf(del); if (i<0) continue;
+    const id = nextId++, rest = node.splitText(i); rest.splitText(del.length);
+    const sw = extra.kind==='sweep' ? ' sw' : '';
+    const st = document.createElement('s'); st.className='rip'+sw; st.dataset.r=id; st.textContent=del;
+    const ni = document.createElement('ins'); ni.className='rip'+sw; ni.dataset.r=id; ni.textContent=ins;
+    const mk = document.createElement('span'); mk.className='ripmark'+sw; mk.contentEditable='false'; mk.dataset.r=id;
+    mk.innerHTML = (extra.kind==='sweep' ? 'sweep '+id+' · '+extra.by : 'ripple '+id)+': <span data-racc="'+id+'">accept</span> · <span data-rrej="'+id+'">reject</span>';
+    rest.replaceWith(st, ni, mk);
+    RIP[id] = {id, k:j, t, del, ins, state:'pending', where: t==='p' ? 'prompt' : 'reply', ...extra};
+    setHtml(j, t, d.innerHTML); return true;
+  }
+  return false;
+}
+function runRipple(edits){
+  let n = 0;
+  edits.forEach(e=>{
+    if (!e.del || !e.del.trim()) return;
+    K.filter(j=>j!==e.k).forEach(j=>{
+      if (Object.values(RIP).some(r=>r.from===e.id && r.k===j)) return;
+      const spots = e.t==='p' ? ['p'] : BR[j].turns.map((_,t)=>t);
+      for (const t of spots) if (suggestAt(j, t, e.del, e.ins, {kind:'ripple', from:e.id, fromK:e.k})){ n++; break; }
+    });
+  });
+  return n;
+}
+/* A sweep applies a collab's rule across a branch, one suggestion per sentence.
+   In the product each sweep is one model call; here the Editor's results are written out. */
+const EDITOR_SWEEP = [
+  ['and old Ferro meant to keep it that way', 'and Ferro meant to keep it lit'],
+  ['and every morning he told them the same thing: glass remembers the hand that rushed it', 'and told them each morning that glass remembers the hand that rushed it'],
+  ['That winter a stranger came to the workshop asking for a mirror that would show a face as it would look in ten years.', 'That winter a stranger asked for a mirror that showed a face ten years on.'],
+  ['Every morning before light he climbed the stairs from the canal with', 'Each morning before light he climbed from the canal with']
+];
+function runSweep(k){
+  let n = 0;
+  EDITOR_SWEEP.forEach(([del, ins]) => { for (let t=0; t<BR[k].turns.length; t++) if (suggestAt(k, t, del, ins, {kind:'sweep', by:'Editor', rule:'Make each sentence more concise. Never combine sentences.'})){ n++; break; } });
+  return n;
+}
+function settleRip(id, accept){
+  const r = RIP[id]; if (!r || r.state!=='pending') return;
+  const d = document.createElement('div'); d.innerHTML = getHtml(r.k, r.t);
+  const eid = nextId++;
+  d.querySelectorAll(`[data-r="${id}"]`).forEach(n=>{
+    const sweep = r.kind==='sweep';
+    if (n.matches('s.rip')){ if (accept && sweep) n.remove(); else if (accept){ const s=document.createElement('s'); s.className='del'; s.dataset.e=eid; s.textContent=n.textContent; n.replaceWith(s); } else n.replaceWith(document.createTextNode(n.textContent)); }
+    else if (n.matches('ins.rip')){ if (accept && sweep) n.replaceWith(document.createTextNode(n.textContent)); else if (accept){ const i=document.createElement('ins'); i.className='mine'; i.dataset.e=eid; i.textContent=n.textContent; n.replaceWith(i); } else n.remove(); }
+    else n.remove();
+  });
+  d.normalize(); setHtml(r.k, r.t, d.innerHTML);
+  r.state = accept ? 'accepted' : 'rejected'; if (accept) r.edit = eid;
+  const left = openRips(); if (ripIx >= left.length) ripIx = Math.max(0, left.length-1);
+  renderChat(); renderCol(); hint();
+  if (left.length) focusRip(); else toast(accept ? (r.kind==='sweep' ? 'Accepted. It is part of the reply now.' : 'Accepted. It is your edit in 201'+r.k+' now, and goes with your next prompt there.') : 'Rejected. 201'+r.k+' stays as it was.');
+}
+function focusRip(){
+  ensureVisible('col');
+  const r = openRips()[ripIx]; if (!r) return;
+  if (cur!==r.k){ cur = r.k; renderChat(); renderField(); }
+  const el = document.querySelector(`#chat [data-r="${r.id}"]`);
+  if (el){ el.scrollIntoView({block:'center', behavior:'smooth'}); el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'), 1200); }
+  document.querySelectorAll('#clist .mk.rip').forEach(c=>c.classList.toggle('focus', +c.dataset.id===r.id));
+  const st = $('#ripstep'); if (st) st.textContent = (ripIx+1)+' of '+openRips().length;
+}
+
+/* ═══ The collection ═══ */
+function items(){
+  const e = allEdits().map(x=>({...x, type:'edit'}));
+  const a = Object.values(ASKS).map(x=>({...x, type:'ask'}));
+  const r = Object.values(RIP).filter(x=>x.state==='pending').map(x=>({...x, type:'rip'}));
+  const h = HL.map(x=>({...x, type:'high'}));
+  return [...e, ...a, ...r, ...h].filter(x=> tab==='all' || x.type===tab).sort((p,q)=>p.id-q.id);
+}
+function edText(del, ins){
+  if (colClean) return `<span class="out">${esc(ins || '(removed)')}</span>`;
+  return `${del?`<s>${esc(del)}</s>`:''}${del&&ins?'<span class="arrow">→</span>':''}${ins?`<ins>${esc(ins)}</ins>`:''}`;
+}
+function card(x){
+  if (x.type==='edit'){
+    const w = who(x.k);
+    const st = x.sent ? `sent to ${x.to||w}, ${x.sent}` : x.held ? 'held back: stays yours' : BR[x.k].wiki ? `goes to ${w} with your next prompt; Wikipedia reads none` : 'goes with your next prompt';
+    const where = x.t==='p' ? 'your prompt in 201'+x.k : String(x.t)[0]==='y' ? 'your prompt in 201'+x.k : '201'+x.k;
+    return `<div class="mk edit ${x.held?'held':''}" data-id="${x.id}"><span></span><div class="body">
+      <div class="ed">${edText(x.del, x.ins)}</div>
+      <div class="marg"><span class="id">${x.id}</span><span class="sep">·</span><span>edit</span><span class="sep">·</span><button data-find="${x.id}">${where}</button><span class="sep">·</span><span class="st">${st}</span>
+      ${x.sent?'':`<span class="sep">·</span><button data-hold="${x.id}">${x.held?'let it go':'hold back'}</button>`}<span class="sep">·</span><button data-undo="${x.id}">undo</button></div></div></div>`;
+  }
+  if (x.type==='rip'){
+    const sw = x.kind==='sweep';
+    return `<div class="mk rip ${sw?'sweep':''}" data-id="${x.id}"><span></span><div class="body">
+      <div class="on">${sw ? 'collab: '+x.by+', “'+x.rule+'”' : 'the same as your edit '+x.from+' in 201'+x.fromK}</div>
+      <div class="ed rp">${edText(x.del, x.ins)}</div>
+      <div class="marg"><span class="id">${x.id}</span><span class="sep">·</span><span>${sw?'sweep':'ripple'}</span><span class="sep">·</span><button data-rfind="${x.id}">${x.where==='prompt'?'your prompt in 201'+x.k:'201'+x.k}</button><span class="sep">·</span><button data-racc="${x.id}">accept</button><span class="sep">·</span><button data-rrej="${x.id}">reject</button></div></div></div>`;
+  }
+  if (x.type==='ask'){
+    const st = {queued:'runs with your next prompt', answered:'answered in place', accepted:'accepted', undone:'undone'}[x.state];
+    return `<div class="mk ask" data-id="${x.id}"><span></span><div class="body">
+      <div class="on">${x.on ? 'on “'+esc(x.on)+'”' : 'at a point in the reply'}</div>
+      <div class="instr">${esc(x.instr)}</div>${x.res && x.state!=='undone' ? `<div class="res">${esc(x.res)}</div>` : ''}
+      <div class="marg"><span class="id">${x.id}</span><span class="sep">·</span><span>ask</span><span class="sep">·</span><button data-find="${x.id}">201${x.k}</button>${BR[x.k].wiki?`<span class="sep">·</span><span>answered by ${x.model}</span>`:''}<span class="sep">·</span><span class="st">${st}</span>
+      ${x.state==='answered'?`<span class="sep">·</span><button data-accept="${x.id}">accept</button><span class="sep">·</span><button data-reject="${x.id}">undo</button>`:''}
+      ${x.state==='queued'?`<span class="sep">·</span><button data-drop="${x.id}">drop</button>`:''}</div></div></div>`;
+  }
+  return `<div class="mk high" data-id="${x.id}"><span></span><div class="body"><div class="q">${esc(x.text)}</div>
+    <div class="marg"><span class="id">${x.id}</span><span class="sep">·</span><span>highlight</span><span class="sep">·</span><button data-find="${x.id}">201${x.k}</button></div></div></div>`;
+}
+function renderCol(){ if (visible().includes('col')) renderColBoard(); if (visible().includes('ref')) renderRef(); }
+function layout(){
+  const V = visible(), st = document.querySelector('.stage');
+  $('#chat').hidden = !V.includes('sym'); $('#col').hidden = !V.includes('col'); $('#refb').hidden = !V.includes('ref');
+  const order = V.filter(b=>BOARDS[b]); const el = {sym:'#chat', col:'#col', ref:'#refb'};
+  order.forEach((b,i)=>{ $(el[b]).style.order = i; });
+  st.style.gridTemplateColumns = order.map(b=> b==='sym' ? 'minmax(0,1.25fr)' : 'minmax(300px,1fr)').join(' ') || '1fr';
+  st.classList.toggle('single', order.length===1);
+  document.body.classList.toggle('calm', calm);
+  renderStrip(); renderCol();
+}
+function renderColBoard(){
+  const counts = {edit:allEdits().length, ask:Object.keys(ASKS).length, rip:openRips().length, high:HL.length};
+  const n = t => t==='all' ? Object.values(counts).reduce((a,b)=>a+b,0) : counts[t];
+  const list = items(); let body = '';
+  const R = openRips();
+  const nR = R.filter(x=>x.kind!=='sweep').length, nS = R.length - nR;
+  if (R.length && (tab==='all' || tab==='rip')) body += `<div class="ripbar"><span class="t">Review</span><span>${[nR?plural(nR,'ripple suggestion'):'', nS?plural(nS,'sweep suggestion')+' from Editor':''].filter(Boolean).join(', ')}</span>
+    <span class="stepper"><button data-rstep="-1" aria-label="Previous suggestion">‹</button><span id="ripstep">${Math.min(ripIx+1,R.length)} of ${R.length}</span><button data-rstep="1" aria-label="Next suggestion">›</button></span>
+    <span class="acts2"><button data-racc="${R[ripIx]?.id}">accept</button><span class="sep">·</span><button data-rrej="${R[ripIx]?.id}">reject</button><span class="sep">·</span><button data-rall="1">accept all</button></span>
+    <span class="keys">A accepts, R rejects, ← → moves</span></div>`;
+  K.forEach(k=>{ const sub = list.filter(x=>x.k===k); if (!sub.length) return;
+    body += `<div class="grp">201${k} · ${BR[k].src}</div>` + sub.map(card).join(''); });
+  if (!list.length && !R.length) body = `<div class="empty">Nothing yet. Click into a reply or a prompt and change it.</div>`;
+  $('#col').innerHTML = `<div class="chead"><button class="ctitle">Col:<span class="c"> Murano story</span></button>
+    <div class="marg"><span>from 201</span><span class="sep">·</span><button class="${colClean?'':'on'}" data-colview="markup">markup</button><span class="sep">·</span><button class="${colClean?'on':''}" data-colview="clean">clean</button><span class="sep">·</span><button data-cmd="export:md">export:md</button></div></div>
+    <div class="ctabs">${[['all','All'],['edit','Edits'],['ask','Asks'],['rip','Suggestions'],['high','Highlights']].map(([t,l])=>`<button class="ctab ${tab===t?'on':''} ${t==='rip'&&R.length?'hot':''}" data-tab="${t}">${l}<span class="n">${n(t)}</span></button>`).join('')}</div>
+    ${colClean?'': (calm && !legendOpen) ? `<div class="legend"><button class="lgbtn" data-legend="1">colours ▾</button></div>` : `<div class="legend">${calm?'<button class="lgbtn" data-legend="1">colours ▴</button>':''}<span><s>struck</s> yours, removed</span><span><ins class="l-you">blue, solid</ins> yours, added</span><span><ins class="l-ai">green, dotted</ins> an answer or a sweep</span><span><ins class="l-rip">rust, dashed</ins> ripple</span></div>`}
+    <div class="clist" id="clist">${body}</div>`;
+  const r = R[ripIx]; if (r) document.querySelectorAll('#clist .mk.rip').forEach(c=>c.classList.toggle('focus', +c.dataset.id===r.id));
+}
+function findCard(id){
+  ensureVisible('col');
+  const el = document.querySelector(`#clist [data-id="${id}"]`) || (tab='all', renderCol(), document.querySelector(`#clist [data-id="${id}"]`));
+  if (el){ el.scrollIntoView({block:'nearest', behavior:'smooth'}); el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'), 1400); }
+}
+function findInChat(id){
+  const x = [...allEdits(), ...Object.values(ASKS), ...HL].find(y=>y.id===id); if (!x) return;
+  cur = x.k; renderChat(); renderField();
+  const el = document.querySelector(`#chat [data-e="${id}"], #chat [data-a="${id}"], #chat [data-h="${id}"]`);
+  if (el){ el.scrollIntoView({block:'center', behavior:'smooth'}); el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'), 1400); }
+}
+
+/* ═══ Reflection: a chat about the chat ═══
+   Its own board. It reads the chats it is given and their markings; it never
+   writes to them. What it proposes reaches a chat only as suggestions you accept. */
+function renderStrip(){
+  document.querySelectorAll('.strip [data-b]').forEach(b=>b.classList.toggle('here', visible().includes(b.dataset.b)));
+  $('#stripmarg').innerHTML = `<button class="${focusOn?'on':''}" data-focus="1">focus: ${focusOn ? focusSet.join(' ') : 'off'}</button><button class="caret" data-focuspick="1" aria-label="Choose what focus keeps">▾</button><span class="sep">·</span><button class="${calm?'on':''}" data-calm="1">calm: ${calm?'on':'off'}</button>`;
+  renderFocusPick();
+}
+function renderFocusPick(){
+  const m = $('#focuspick'); m.classList.toggle('open', focusPick); if (!focusPick) return;
+  const sp = $('#stripmarg').getBoundingClientRect(); m.style.left = Math.max(8, Math.min(innerWidth - 316, sp.right - 300))+'px'; m.style.top = (sp.bottom+window.scrollY+6)+'px';
+  m.innerHTML = `<div class="pkGroup">Focus keeps</div>` + Object.keys(BOARDS).map(b=>{ const on = focusSet.includes(b), n = focusSet.indexOf(b);
+    return `<button class="pkItem ${on?'on':''}" data-fb="${b}">${on?`<span class="box num">${n+1}</span>`:'<span class="box"></span>'}<span class="pkBody"><span class="pkTop"><span class="pkName">${BOARDS[b]}</span><span class="pkCost">${b}</span></span></span></button>`; }).join('')
+    + `<div class="pkFoot marg"><span>numbers set the order, left to right</span><span class="sep">·</span><span><code>focus:sym col</code> does the same; <code>focus:save</code> keeps what is on screen now</span></div>`;
+}
+function renderRef(){
+  const E = allEdits(), A = Object.values(ASKS), R = Object.values(RIP), H = HL;
+  const marked = [
+    [E.length, 'edit'], [A.length, 'ask'], [R.filter(x=>x.kind!=='sweep').length, 'ripple suggestion'], [H.length, 'highlight']
+  ].filter(([n])=>n).map(([n,w])=>plural(n,w)).join(', ') || 'nothing yet';
+  const prompts = ['You renamed the apprentices and asked for Italian names: who are they to Ferro, and does the story need both?',
+                   'Two branches open on a furnace that never goes out. Is that the image the story turns on?',
+                   'You struck “eleven years” for “nearly a century”. Is the age of the furnace the point, or the man?'];
+  $('#refb').innerHTML = `<div class="chead"><button class="ctitle">Ref:<span class="c"> 201</span></button>
+    <div class="marg"><span>from 201</span><span class="sep">·</span><span>reads, never writes</span></div></div>
+    <div class="clist ref" id="rlist">
+      <div class="rsec"><div class="rh">Marked so far <span class="nc">no call</span></div>
+        <p class="rt">${marked}, across 201a, 201b and 201c.</p></div>
+      <div class="rsec"><div class="rh">Session <span class="nc">no call</span></div>
+        <p class="rt">7 messages · about 4,200 tokens · $0.03</p></div>
+      ${REF.done ? `
+      <div class="rsec"><div class="rh">Synthesis</div>
+        <p class="rt">You are steering three openings toward one story: a long-burning furnace, an old master and two apprentices, and a stranger who wants to see the future. Most of your changes make the furnace older and the names more Venetian; you have not yet touched the stranger.</p></div>
+      <div class="rsec"><div class="rh">Prompts for reflection</div>
+        ${prompts.map(q=>`<button class="rq" data-rq="${esc(q)}">${esc(q)}</button>`).join('')}</div>
+      <div class="rsec propose"><div class="rh">A proposal</div>
+        <p class="rt">Several sentences in 201a run long. ${REF.swept ? 'The sweep is in the chat; review it from the Collection.' : 'Sweep 201a with <b>collab: Editor</b>, one suggestion per sentence, never combining them?'}</p>
+        ${REF.swept ? '' : `<button class="act" data-sweep="a">Sweep 201a as Editor<small>1 call</small></button>`}</div>
+      <div class="rsec"><div class="rh">Talk about the chat</div>
+        ${REF.msgs.map(m=>`<div class="you rmsg">${esc(m.you)}</div><p class="rt">${m.ai}</p>`).join('')}
+        <div class="rin"><input id="refinp" placeholder="Nothing said here goes back into 201" aria-label="Talk about the chat"></div></div>`
+      : `<div class="rsec"><button class="act" data-reflect="1">Reflect<small>1 call to ${helper}</small></button>
+        <p class="rt dim">Reads 201 and everything marked in it, then writes a synthesis and a few questions drawn from your own markings.</p></div>`}
+    </div>`;
+}
+
+/* ═══ The field ═══ */
+function renderField(){
+  const cl = collab.map(k=>COLLABS.find(c=>c.k===k).nm);
+  $('#fmarg').innerHTML = `<button class="tg cbtn ${collab.length?'on':''}" data-collab="1">collab: ${cl.length ? (cl.length>1 ? cl[0]+' +'+(cl.length-1) : cl[0]) : 'none'}</button><span class="sep">·</span><button class="tg ${to==='one'?'on':''}" data-to="one">to 201${cur}</button><span class="sep">·</span><button class="tg ${to==='all'?'on':''}" data-to="all">all three</button>`;
+  renderCollab();
+  inp.placeholder = to==='all' ? 'Reply to all three' : BR[cur].wiki ? 'Search Wikipedia again, e.g. find me examples of Murano glass' : 'Reply to 201'+cur;
+  hint();
+}
+function renderCollab(){
+  const m = $('#collabpick'); m.classList.toggle('open', collabOpen); if (!collabOpen) return;
+  const BOX = '<span class="box"></span>';
+  const row = c => { const on = collab.includes(c.k), n = collab.indexOf(c.k);
+    return `<button class="pkItem ${on?'on':''}" data-ck="${c.k}">${on?`<span class="box num">${n+1}</span>`:BOX}<span class="pkBody"><span class="pkTop"><span class="pkName">${c.nm}</span><span class="pkCost">collab:${c.k}</span></span><span class="pkDesc">${c.d}</span></span></button>`; };
+  m.innerHTML = `<div class="pkGroup">Built in</div>${COLLABS.filter(c=>!c.mine).map(row).join('')}<div class="pkGroup">Yours</div>${COLLABS.filter(c=>c.mine).map(row).join('')}
+    <div class="pkFoot marg"><span>they stack in the order ticked and go with every prompt until turned off</span><span class="sep">·</span><span><code>collab:off</code></span></div>`;
+}
+function hint(){
+  const h = $('#hint');
+  if (field.classList.contains('cmd')){ const v = inp.value.replace(/^>/,'').trim(); h.innerHTML = `<span class="now">${v ? cmdPlan(v).say : 'Type a command'}</span><span class="sep">·</span><span>Escape goes back to the prompt</span>`; return; }
+  if (document.querySelector('#chat .askbox')){ h.innerHTML = `<span class="now">Write what should happen, in your own words</span><span class="sep">·</span><span>Enter keeps the ask; it runs with your next prompt</span><span class="sep">·</span><span>Escape drops it</span>`; return; }
+  const parts = targets().map(k=>{ const e=pendingEdits(k).length, a=queuedAsks(k).length; if (!e&&!a) return null;
+    const what = [e?plural(e,'edit'):'', a?plural(a,'ask'):''].filter(Boolean).join(' and ');
+    return BR[k].wiki ? `201${k}: ${what} for ${helper}` : (to==='all' ? `201${k}: ${what}` : what); }).filter(Boolean);
+  const cp = collab.length ? `<span class="sep">·</span><span>collab: ${collab.map(k=>COLLABS.find(c=>c.k===k).nm).join(', ')} goes with each prompt</span>` : '';
+  const rp = cp + (ripple ? `<span class="sep">·</span><span>ripple is on: sent edits are checked against the other branches</span>` : '');
+  if (parts.length){
+    h.innerHTML = to==='all'
+      ? `<span class="now">Each branch gets its own: ${parts.join(' · ')}</span><span class="sep">·</span><span>Enter on an empty field sends just these</span>${rp}`
+      : BR[cur].wiki
+        ? `<span class="now">${parts[0].replace(/^201\w: /,'').replace(' for '+helper,'')} go${/^1 \w+$/.test(parts[0].replace(/^201\w: /,'').replace(' for '+helper,''))?'es':''} to ${helper} with your next prompt</span><span class="sep">·</span><span>Wikipedia reads none</span><span class="sep">·</span><span>Enter on an empty field sends just these</span>${rp}`
+        : `<span class="now">${parts[0]} go${/^1 \w+$/.test(parts[0])?'es':''} with your next prompt to 201${cur}</span><span class="sep">·</span><span>Enter on an empty field sends just these</span>${rp}`;
+  } else h.innerHTML = BR[cur].wiki && to==='one'
+    ? `<span>a prompt here searches Wikipedia again</span><span class="sep">·</span><span>marks, edits and asks on its text go to ${helper}</span>`
+    : `<span>click into a reply or your prompt to change it</span><span class="sep">·</span><span>select text to strike, ask or highlight</span><span class="sep">·</span><span><code>⌘K</code> asks at the caret</span>${rp}`;
+}
+function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('on'); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('on'),3800); }
+
+/* ═══ Scripted steps for the TRY strip ═══ */
+function scripted(edK, t, find, repl){
+  cur = edK; renderChat(); renderField();
+  const ed = edOf(edK, t); ed.focus();
+  const tw = document.createTreeWalker(ed, NodeFilter.SHOW_TEXT); let n;
+  while ((n = tw.nextNode())){ if (n.parentElement.closest('s,ins')) continue; const i = n.data.indexOf(find); if (i<0) continue;
+    const r = document.createRange(); r.setStart(n,i); r.setEnd(n,i+find.length); const s=getSelection(); s.removeAllRanges(); s.addRange(r);
+    const id = strikeRange(r,false); insertYours(repl, id); save(ed); return; }
+  toast('Already edited.');
+}
+
+/* ═══ Events ═══ */
+document.addEventListener('mouseup', e=>{ if (!e.target.closest('#selmenu') && !e.target.closest('.askbox')) setTimeout(showSelMenu,0); });
+document.addEventListener('keyup', e=>{ if (e.shiftKey && /Arrow/.test(e.key)) showSelMenu(); });
+document.addEventListener('keydown', e=>{
+  if (slash.open){ const L = slashItems();
+    if (e.key==='ArrowDown'){ e.preventDefault(); slash.i=(slash.i+1)%Math.max(1,L.length); renderSlash(); return; }
+    if (e.key==='ArrowUp'){ e.preventDefault(); slash.i=(slash.i-1+L.length)%Math.max(1,L.length); renderSlash(); return; }
+    if (e.key==='Enter'){ e.preventDefault(); e.stopPropagation(); if (L[slash.i]) pickSlash(L[slash.i].t); return; }
+    if (e.key==='Escape'){ e.preventDefault(); closeSlash(); return; } }
+  if (e.target.id==='refinp' && e.key==='Enter' && e.target.value.trim()){ REF.msgs.push({you:e.target.value.trim(), ai:'[A reply about the chat, reading 201 and your markings. It stays here; 201 never sees it.]'}); renderRef(); const ri=$('#refinp'); if (ri) ri.focus(); return; }
+  const box = e.target.closest && e.target.closest('.askbox');
+  if (box){ if (e.key==='Enter'){ e.preventDefault(); queueAsk(box); } else if (e.key==='Escape'){ e.preventDefault(); cancelAsk(box); hint(); } return; }
+  if ((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='k'){
+    if (up(document.activeElement,'#chat .you[contenteditable]')){ e.preventDefault(); toast('Asks are for replies. Your own prompt you just edit.'); return; }
+    if (up(document.activeElement,'#chat .ans[contenteditable]')){ e.preventDefault(); openAsk(false); return; }
+  }
+  if ((e.metaKey||e.ctrlKey) && e.shiftKey && e.key.toLowerCase()==='x'){ const s=getSelection(); if (s.rangeCount && !s.isCollapsed){ e.preventDefault(); pending={ed:up(s.anchorNode,EDSEL), range:s.getRangeAt(0)}; doStrike(); } return; }
+  const editing = document.activeElement && (document.activeElement.isContentEditable || document.activeElement.tagName==='INPUT');
+  if (!editing && openRips().length && (tab==='rip' || tab==='all')){
+    const r = openRips()[ripIx];
+    if (e.key==='a' || e.key==='A'){ e.preventDefault(); settleRip(r.id, true); }
+    else if (e.key==='r' || e.key==='R'){ e.preventDefault(); settleRip(r.id, false); }
+    else if (e.key==='ArrowRight' || e.key==='ArrowLeft'){ e.preventDefault(); ripIx = (ripIx + (e.key==='ArrowRight'?1:-1) + openRips().length) % openRips().length; renderCol(); focusRip(); }
+  }
+});
+document.addEventListener('click', e=>{
+  const t = e.target;
+  const sl = t.closest('[data-slash]'); if (sl){ pickSlash(sl.dataset.slash); return; }
+  if (slash.open && !t.closest('#slash')) closeSlash();
+  const cb = t.closest('.chkbox'); if (cb){ const li = cb.closest('li'); li.classList.toggle('done'); cb.setAttribute('aria-checked', li.classList.contains('done')); save(cb.closest('.ans')); return; }
+  const bt = t.closest('.strip [data-b]'); if (bt){ const b = bt.dataset.b;
+    if (focusOn){ toast('In focus, the boards come from focus:. focus:off to arrange freely.'); return; }
+    if (openB.includes(b) && openB.length>1) openB = openB.filter(x=>x!==b); else if (!openB.includes(b)) openB.push(b); layout(); return; }
+  if (t.closest('[data-focus]')){ runCmd(focusOn ? 'focus:off' : 'focus:'); return; }
+  if (t.closest('[data-focuspick]')){ focusPick = !focusPick; renderFocusPick(); return; }
+  const fb = t.closest('[data-fb]'); if (fb){ const b = fb.dataset.fb, i = focusSet.indexOf(b); if (i>-1){ if (focusSet.length>1) focusSet.splice(i,1); } else focusSet.push(b); renderFocusPick(); if (focusOn) layout(); else renderStrip(); return; }
+  if (focusPick && !t.closest('#focuspick')){ focusPick = false; renderFocusPick(); }
+  if (t.closest('[data-calm]')){ runCmd(calm ? 'calm:off' : 'calm:'); return; }
+  if (t.closest('[data-legend]')){ legendOpen = !legendOpen; renderCol(); return; }
+  if (t.closest('[data-collab]')){ collabOpen = !collabOpen; renderCollab(); return; }
+  const ck = t.closest('[data-ck]'); if (ck){ const k = ck.dataset.ck, i = collab.indexOf(k); if (i>-1) collab.splice(i,1); else collab.push(k); renderField(); return; }
+  if (collabOpen && !t.closest('#collabpick')){ collabOpen = false; renderCollab(); }
+  if (t.closest('[data-reflect]')){ REF.done = true; renderRef(); toast('Reflected: one call to '+helper+'. Nothing in 201 changed.'); return; }
+  const rq = t.closest('[data-rq]'); if (rq){ const ri=$('#refinp'); if (ri){ ri.value = rq.dataset.rq; ri.focus(); } return; }
+  const swp = t.closest('[data-sweep]'); if (swp){ const n = runSweep(swp.dataset.sweep); REF.swept = true; cur = swp.dataset.sweep; renderChat(); renderField(); tab='rip'; ripIx=0; ensureVisible('col'); renderCol(); toast(n ? 'Editor swept 201a: '+plural(n,'suggestion')+' to review. One call.' : 'Nothing left to sweep.'); return; }
+  const tr = t.closest('[data-try]'); if (tr){ const x = tr.dataset.try;
+    if (x==='e1') scripted('a', 0, 'eleven years', 'nearly a century');
+    if (x==='e2') scripted('a', 'p', 'short story', 'ghost story');
+    if (x==='rip'){ ripple = true; renderChat(); hint(); toast('Ripple is on. Sent edits are checked against the other branches.'); }
+    if (x==='send'){ to='one'; cur='a'; renderField(); send(''); }
+      if (x==='wiki'){ cur='b'; renderChat(); renderField(); }
+    if (x==='slash'){ cur='a'; renderChat(); renderField(); const ed = edOf('a',0); ed.focus(); const last = ed.querySelector('p:last-of-type'); caretAt(last, last.childNodes.length); splitBlock(ed); save(ed); openSlash(ed); }
+    if (x==='collab'){ collab=['editor']; renderField(); toast('collab: Editor goes with every prompt until turned off.'); }
+    if (x==='ref'){ if (!openB.includes('ref')) openB.push('ref'); layout(); }
+    if (x==='cmd'){ runCmd(tr.dataset.v); }
+    return; }
+  const sm = t.closest('[data-sm]'); if (sm){ const x=sm.dataset.sm; if (x==='strike') doStrike(); else if (x==='ask') openAsk(true); else doHighlight(); return; }
+  const ac0 = t.closest('[data-accept]'); if (ac0){ settle(+ac0.dataset.accept, true); return; }
+  const rj0 = t.closest('[data-reject]'); if (rj0){ settle(+rj0.dataset.reject, false); return; }
+  const ra = t.closest('[data-racc]'); if (ra){ settleRip(+ra.dataset.racc, true); return; }
+  const rr = t.closest('[data-rrej]'); if (rr){ settleRip(+rr.dataset.rrej, false); return; }
+  if (t.closest('[data-rall]')){ openRips().forEach(r=>settleRip(r.id, true)); toast('All accepted. Each is your edit in its branch now.'); return; }
+  const rs = t.closest('[data-rstep]'); if (rs){ const L=openRips().length; ripIx=(ripIx + +rs.dataset.rstep + L)%L; renderCol(); focusRip(); return; }
+  const rf = t.closest('[data-rfind]'); if (rf){ ripIx = openRips().findIndex(r=>r.id===+rf.dataset.rfind); renderCol(); focusRip(); return; }
+  const am = t.closest('.askmark,.ansmark'); if (am){ findCard(+am.dataset.a); return; }
+  const rm = t.closest('.ripmark'); if (rm){ tab='rip'; ripIx = openRips().findIndex(r=>r.id===+rm.dataset.r); renderCol(); return; }
+  const v = t.closest('[data-view]'); if (v){ clean = v.dataset.view==='clean'; renderChat(); return; }
+  const cv = t.closest('[data-colview]'); if (cv){ colClean = cv.dataset.colview==='clean'; renderCol(); return; }
+  if (t.closest('[data-ripple]')){ ripple=!ripple; renderChat(); hint(); toast(ripple ? 'Ripple is on. When edits are sent, it checks the other branches for the same thing and suggests the change there. Each check is a model call.' : 'Ripple is off.'); return; }
+  if (t.closest('[data-helper]')){ helper = HELPERS[(HELPERS.indexOf(helper)+1)%HELPERS.length]; renderChat(); renderCol(); hint(); return; }
+  const k = t.closest('button.tab'); if (k){ cur=k.dataset.k; renderChat(); renderField(); return; }
+  const a = t.closest('.arrow'); if (a){ const i=K.indexOf(cur)+ +a.dataset.step; if (i>=0&&i<3){ cur=K[i]; renderChat(); renderField(); } return; }
+  const tg = t.closest('[data-to]'); if (tg){ to=tg.dataset.to; renderField(); inp.focus(); return; }
+  const tb = t.closest('[data-tab]'); if (tb){ tab=tb.dataset.tab; renderCol(); return; }
+  const f = t.closest('[data-find]'); if (f){ findInChat(+f.dataset.find); return; }
+  const hd = t.closest('[data-hold]'); if (hd){ const id=+hd.dataset.hold; EM[id].held=!EM[id].held; renderCol(); renderTabsOnly(); hint(); return; }
+  const ud = t.closest('[data-undo]'); if (ud){ undoEdit(+ud.dataset.undo); return; }
+  const dr = t.closest('[data-drop]'); if (dr){ const id=+dr.dataset.drop, A=ASKS[id], ed=edOf(A.k,A.t);
+    ed.querySelectorAll(`[data-a="${id}"]`).forEach(n=> n.classList.contains('anch') ? n.replaceWith(...n.childNodes) : n.remove());
+    delete ASKS[id]; save(ed); toast('Ask '+id+' dropped.'); return; }
+  if (t.closest('[data-again]')){ toast('201d would open with your edited prompt, sent to the sources you pick. 201a, b and c stay as they were.'); return; }
+  const c = t.closest('[data-cmd]'); if (c){ toast(c.dataset.cmd+' is a command; see the slider mockup.'); return; }
+});
+inp.addEventListener('input', ()=>{ const c = inp.value.startsWith('>'); field.classList.toggle('cmd', c); $('#chip').textContent = c ? 'COMMAND' : 'PROMPT'; hint(); });
+/* Every marginalia has a command. describe() is the Enter line; run() does it. */
+function parseBoards(t){ return t.split(/[,\s]+/).map(x=>x.toLowerCase().replace(/:$/,'')).filter(Boolean); }
+function cmdPlan(v){
+  v = v.replace(/^>/,'').trim(); let m;
+  if ((m = v.match(/^focus:\s*(.*)$/))){
+    const a = m[1].trim();
+    if (a==='off') return focusOn ? {say:'Enter brings back every board you had open', run:()=>{ focusOn=false; layout(); }} : {say:'Focus is already off'};
+    if (a==='save') return {say:'Enter keeps what is on screen now as your focus: '+openB.join(' '), run:()=>{ focusSet = openB.slice(); renderStrip(); toast('Saved. focus: now keeps '+focusSet.join(' ')+'.'); }};
+    if (!a) return {say:'Enter clears the screen to your focus: '+focusSet.join(' ')+'. Nothing is lost', run:()=>{ focusOn=true; layout(); }};
+    const B = parseBoards(a), bad = B.filter(b=>!BOARDS[b]);
+    if (bad.length) return {say:bad.join(', ')+' is not on screen in this mockup; sym, col and ref are'};
+    return {say:'Enter focuses on '+B.join(' ')+', in that order, and keeps it as your focus', run:()=>{ focusSet = B; focusOn = true; layout(); }};
+  }
+  if ((m = v.match(/^calm:\s*(.*)$/))) return m[1]==='off' ? {say:'Enter shows every detail again', run:()=>{ calm=false; layout(); }} : {say:'Enter calms the screen: details wait until you are near them', run:()=>{ calm=true; layout(); }};
+  if ((m = v.match(/^view:\s*(clean|markup)\s*(col)?$/))) return {say:'Enter shows '+(m[2]?'the Collection':'the chat')+' '+(m[1]==='clean'?'clean, without markup':'with markup'), run:()=>{ if (m[2]) colClean = m[1]==='clean'; else clean = m[1]==='clean'; renderChat(); renderCol(); }};
+  if ((m = v.match(/^ripple:\s*(on|off)$/))) return {say:'Enter turns Ripple '+m[1]+(m[1]==='on'?'; each check is a model call':''), run:()=>{ ripple = m[1]==='on'; renderChat(); hint(); }};
+  if ((m = v.match(/^to:\s*(201[abc]|all)$/))) return {say:'Enter sends the next prompt to '+(m[1]==='all'?'all three':m[1]), run:()=>{ if (m[1]==='all') to='all'; else { to='one'; cur=m[1].slice(-1); renderChat(); } renderField(); }};
+  if ((m = v.match(/^(accept|reject):\s*(\d+|all)$/))){
+    const acc = m[1]==='accept';
+    if (m[2]==='all') return {say:'Enter '+(acc?'accepts':'rejects')+' all '+plural(openRips().length,'open suggestion'), run:()=>{ openRips().forEach(r=>settleRip(r.id, acc)); }};
+    const id = +m[2]; if (RIP[id]) return {say:'Enter '+(acc?'accepts':'rejects')+' suggestion '+id, run:()=>settleRip(id, acc)};
+    if (ASKS[id]) return {say:'Enter '+(acc?'keeps':'undoes')+' the answer to ask '+id, run:()=>settle(id, acc)};
+    return {say:'Nothing open with id '+id};
+  }
+  if ((m = v.match(/^undo:\s*(\d+)$/))) return {say:'Enter undoes edit '+m[1]+' and puts the text back', run:()=>undoEdit(+m[1])};
+  if ((m = v.match(/^hold:\s*(off\s+)?(\d+)$/))) return {say:'Enter '+(m[1]?'lets edit '+m[2]+' go with the next prompt':'holds edit '+m[2]+' back; it stays yours'), run:()=>{ meta(+m[2]).held = !m[1]; renderCol(); renderTabsOnly(); hint(); }};
+  if ((m = v.match(/^helper:\s*(sonnet|haiku|opus)$/i))) return {say:'Enter makes '+m[1]+' the model for Wikipedia text', run:()=>{ helper = HELPERS.find(h=>h.toLowerCase().startsWith(m[1].toLowerCase())); renderChat(); hint(); }};
+  if ((m = v.match(/^go:\s*(\d+)$/))) return {say:'Enter finds '+m[1]+' in the chat', run:()=>findInChat(+m[1])};
+  if (/^again:/.test(v)) return {say:'Enter asks again from the edited prompt as 201d', run:()=>toast('201d would open with the edited prompt.')};
+  if (/^reflect:/.test(v)) return {say:'Enter reflects on 201: one call to '+helper, run:()=>{ if (!openB.includes('ref')) openB.push('ref'); layout(); REF.done = true; renderRef(); }};
+  if ((m = v.match(/^sweep:\s*201([abc])\s*(\w+)?$/))) return {say:'Enter sweeps 201'+m[1]+' as Editor: one suggestion per sentence, one call', run:()=>{ runSweep(m[1]); REF.swept=true; cur=m[1]; renderChat(); tab='rip'; ripIx=0; ensureVisible('col'); renderCol(); }};
+  if ((m = v.match(/^collab:\s*(.*)$/))){
+    if (/^(off|none)$/.test(m[1])) return {say:'Enter turns collab off', run:()=>{ collab=[]; renderField(); }};
+    const want = m[1].split(/,\s*|\s+/).map(x=>x.toLowerCase()); const found = COLLABS.filter(c=> want.some(w=> w && (c.k===w || c.nm.toLowerCase().startsWith(w))));
+    if (!found.length) return {say:'No collab called '+m[1]};
+    return {say:'Enter sets collab: '+found.map(c=>c.nm).join(', ')+' for every prompt until turned off', run:()=>{ collab = found.map(c=>c.k); renderField(); }};
+  }
+  if (/^(export:md|open:)/.test(v)) return {say:'Enter runs it (see the other mockups)', run:()=>toast(v+' is shown in the slider and collection mockups.')};
+  return {say:'Not a command in this mockup'};
+}
+function runCmd(v){ const p = cmdPlan(v); if (p.run) p.run(); else toast(p.say+'.'); }
+inp.addEventListener('keydown', e=>{
+  if (e.key==='Escape' && field.classList.contains('cmd')){ inp.value=''; field.classList.remove('cmd'); $('#chip').textContent='PROMPT'; hint(); return; }
+  if (e.key==='Enter' && field.classList.contains('cmd')){ runCmd(inp.value); inp.value=''; field.classList.remove('cmd'); $('#chip').textContent='PROMPT'; hint(); return; }
+  if (e.key==='Enter'){ const v = inp.value.trim(); const any = targets().some(k=>pendingEdits(k).length||queuedAsks(k).length);
+    if (!v && !any) return; send(v); inp.value=''; }
+});
+renderChat(); renderField(); layout();
+</script>
+</body>
+</html>
