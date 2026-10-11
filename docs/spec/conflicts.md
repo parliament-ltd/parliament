@@ -70,6 +70,22 @@ Line numbers are approximate.
 - **C71, direction.** Parliament is to be open source. The author address is to be removed from the history first; the method is not yet chosen.
 - **"Don't save" for the key is to be fixed** (C73, second half), not hidden.
 
+**Ruled 11 October 2026, second round:**
+
+- **C71. Open source, after the refactor is finished.** The history is kept. The author address is rewritten on a copy to GitHub's no-reply address and pushed, `main` only, to a new public repository; this one stays private as the archive. No force push. The site lives at `parliament.ltd`, hosted through Netlify.
+- **Redundancy.** A bundle of the whole repository is kept on a drive outside this machine. The recommended steps go into the plan: a mirror of the code on a second host once public, a standby copy of the site that `parliament.ltd` can be pointed at, each release saved with a checksum, backups for people's data, and two-factor with recovery codes on the accounts.
+- **Keys are saved by default.** "Don't save" is an option for people who want it, off unless chosen, and it has to work.
+- **C72. The spreadsheet library:** the fixed version is taken from the vendor into the repository, loaded only when a spreadsheet is opened, and run in a worker with limits.
+- **C73 and C39. Removal.** "Delete everything" stays a button in Settings, never a command or a link. Its confirmation lists what goes and is armed by typing a word, a backup is offered first, and it says what it cannot reach. One item is removed with `erase:`, which takes explicit numbers only. (`erase:` is recorded on "fine with your lean"; say if `wipe:` was meant.)
+- **C53. Boards are built from blocks and shipped arranged.** They are not editable in this refactor, and they must be built so that they can be made editable later.
+- **One schema upgrade.** Everything that changes existing data happens in one upgrade to version 6, with one dry run.
+- **Other people's blocks arrive by pull request only,** reviewed and shipped in the catalogue.
+- **The order in `plan-brief.md` section 10 is accepted. The first thing Stefan wants to try is the welcome page.**
+- **The fixes that are true on the live site today are part of the refactor,** not a separate branch.
+- **C43. `pop:command` stays.** The bar can be popped into its own window and moved to another monitor. `bar:bottom` and the like are quick positions on the page.
+- **C50. Ink,** for the focus ring and for marginalia under the pointer. Gold stays for the `api:` ignition and the edge of the hexagon.
+- **C57. Both kinds of highlight are kept,** and each must be clearly shown for what it is. How they are named and drawn is still open.
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it
@@ -588,6 +604,41 @@ These look settled by date. "Part 5a: yes" confirms them all, or name a row.
 - The editor says so (`EditorRightRail.jsx:364`). AB §6 lists "Mode file" as the Library's export. W §13 promises "how to load a finished block".
 - Code: no room import or export exists. A room from someone else can arrive only inside a restored backup.
 - **Suggestion:** the sentence goes with the inspector (R18). Room files are their own later item: data only, validated on the way in, with any standing instructions they carry shown before anything is applied.
+
+**C75. From the four mockups supplied later on 11 October.** **BS** = `parliament-branch-slider-v9.html`, **CB** = `parliament-collection-board-v3.html`, **L6** = `parliament_lab_v6.html`, **SC** = `parliament_screens_v1.html`.
+
+- **C38, now that L6 can be read.** By their header comments, L7 is L6 plus what L7 lists under "What this tries": the Blocks board, settings applied on click, input and messages allowed in any column, blocks reordered within a column, and the room line no longer showing a selected block's settings. L6 keeps the canvas style switch, which L7 drops. The two files have not been compared line by line.
+- **C60, confirmed.** BS: `open:201a` is "its own card, full history, keeps its letter"; `open:201a summary` is "a new branch (next free letter) from a summary", costing one model call, with the context estimate worked out locally.
+- **C27, picker groups, drawn a third way.** St: one flat list. Ruled 23 September: three groups (models, local models, sources). BS: two groups, "Models" with the local model inside it marked "free", and "Sources, no tokens" under four quiet labels (Reference, Research, Web and discussion, Media and data). BS says it "reverses the Sept 23 decision (flat list, no groups)". **Suggestion:** BS, since it is the newest drawing of the picker.
+- **C28, the source list.** BS lists sixteen rows, twelve of them sources, among them arXiv, Kiwix and Brave Search, which its own header marks "not yet checked". arXiv cannot be reached from a browser. Brave needs a key. **Suggestion:** unchanged. Wikipedia, Hacker News and OpenAlex ship; the picker shows others greyed as "later" only if you want them advertised.
+
+**C76. One prompt to several sources, in order.**
+- BS: "All at once" (one reply from each, in a slider) or "One after another", where each source after the first runs on a condition: "if nothing is found", "if it fails", "after it finishes" or "always". Every prompt sent to several sources is kept as steps in the docket.
+- D: a step has a prompt, a room and a model. It has no condition.
+- **Suggestion:** "all at once" is built with the branch tabs. "One after another" follows once the docket can run, and the step record gets a condition field in the one schema upgrade so no second upgrade is needed for it.
+
+**C77. The Collection's tabs, and where notes and quotes go.**
+- CB: tabs are All, Highlights, Notes, Quotes.
+- E (newer): tabs are All, Edits, Asks, Suggestions, Highlights. E's table says this replaces CB's tabs. Notes and quotes are not mentioned.
+- **Suggestion:** nothing is lost: All, Highlights, Quotes, Notes, Edits, Asks, Suggestions, each shown only when it has something in it.
+
+**C78. Quotes** (bears on C57 and on "Pin for reference" in C60).
+- CB (Proposed): "'Quote' replaces 'pin for reference': a passage kept for you that the model never sees. `pin:` keeps its Almanac meaning, keep at the top."
+- Code: "Pin for reference" copies a whole message into another chat.
+- So the mockups have three kinds of marking where the code has one: a highlight (a passage marked in place), a quote (a passage kept beside the chat), and today's highlight (a phrase lit wherever it occurs).
+- **Suggestion:** see the naming proposal put to Stefan on 11 October; rule on C57 and this together.
+
+**C79. Summaries: rewritten, or dated and fixed?**
+- AB §7 (Decided): "`summarize:207, 216` rewrites each item's own summary line."
+- CB: "Summaries are dated and never change. When a source changes, the summary says so; `rewrite:` writes a new dated note beside it, and `compare:` shows the difference with no model call."
+- These may be two different things: the one-line summary on a row in the table, and a summary note made in a collection. **Suggestion:** treat them so. A row's summary line can be rewritten with `summarize:`. A summary note in a collection is dated and fixed, and `rewrite:` makes a new one beside it.
+
+**C80. Small ones from the four mockups.**
+- CB uses `heading:` for a place in a collection; AB §6 uses `section:`. Suggest `heading:`, as the mockup draws it.
+- CB: `delete:201c` keeps a branch's markings as cards and `delete:201c all` removes them too. With `erase:` ruled, suggest `erase:201c` and `erase:201c all`, the Enter line saying which.
+- SC uses `delete:` on a saved arrangement. Suggest `forget:`, which already removes a saved search or collection.
+- BS draws marginalia turning gold under the pointer. Ruled ink on 11 October (C50).
+- BS: ⌥← and ⌥→ switch between replies from inside the field; ← and → when it is empty.
 
 ### 5c. Open in the documents themselves
 
