@@ -61,6 +61,15 @@ Line numbers are approximate.
   - "API key" became "API keys".
   - The read-first block's line "the rest of this file describes V2 Phase 1" now points to the rulings instead.
 
+**Ruled 11 October 2026:**
+
+- **C37. Yes. The bar is the only place a prompt is typed in a room.** "Let's keep it simple." A room's input block is where the bar docks and what holds the input features.
+- **C20, reopened. Favourites become a collection.** This replaces the ruling of 23 September (pinned highlights). The migration planner changes to match before the dry run.
+- **C73, first half. "Delete everything" deletes everything,** and the person must be sure before it happens. The safeguards are still being discussed.
+- **C39, in progress.** Permanent removal of one item will exist. Candidate words: `wipe:` or `erase:`.
+- **C71, direction.** Parliament is to be open source. The author address is to be removed from the history first; the method is not yet chosen.
+- **"Don't save" for the key is to be fixed** (C73, second half), not hidden.
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it
