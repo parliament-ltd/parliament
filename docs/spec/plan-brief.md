@@ -117,7 +117,7 @@ Standing rules from the original brief still apply:
 | Earlier | Now | Source |
 |---|---|---|
 | C5: the structural dotted border stays wherever the mockups draw it | Dotted borders and the page hatch are retired. No SVG border engine is needed. Lab v7 still draws them; it predates the decision | welcome spec §2, 30 Sep |
-| C4, unruled: marginalia stays ink on hover | Clickable marginalia turns gold-deep under the pointer in every newer mockup | Settings §4, bar reference |
+| C4, unruled: marginalia stays ink on hover | Not settled. Welcome v9, Lab v7 and Settings v1 turn marginalia gold-deep under the pointer; inline editing v5 keeps it ink with an underline, and the bar decisions say gold only on the ignition. Now part of C50 (corrected in section 13) | Settings §4, v5, bar decisions |
 | C17: four kinds take a number | Edits, asks, Ripple suggestions and sweep suggestions also take numbers from the same counter ("ask 241", "edit 242", "ripple 244"). `type:edit` is a filter | editing spec, bar doc |
 | C20: each favourite becomes a pinned highlight | **Proposed:** favourites become a collection called Favorites, in their existing order. `v6Plan.js` still does pinned highlights. Needs a ruling | arrangements §7 |
 | C21: the Almanac is an app surface, not composed from parts | Boards are built from blocks and are editable in the Lab. How soon is a staging question (section 9) | arrangements §2 |
@@ -557,6 +557,12 @@ disagree, this section is right.** Each audit's full report is in `research/`.
 - **The table is fine in memory for a few thousand rows.** The work is one write path that notifies, fixed-height windowed rows, and at larger scale indexes on type, time, number, room and tags. Indexes mean a schema change, so they belong in the one upgrade of section 9, item 8.
 - **Lint:** the count of about 120 errors is inflated by false positives on `motion`. Fix the config first so the real hook-rule findings (ten sites) can be read. There is no type checking and no continuous integration.
 - **Defects found in passing:** Continue shows no progress and can be clicked twice; a stream that outlives its chat can title another chat from the wrong messages; empty chats are deleted at every start, including one another tab has just made; search boxes promise more than they search; the Inter font is shipped and precached but never applied; Tailwind may be scanning the old worktrees under `.claude/` (unverified).
+
+### From a recheck of the mockups, while writing the register
+
+- **Section 4's row on C4 was wrong.** It said clickable marginalia turns gold-deep under the pointer "in every newer mockup". Inline editing v5 (6 Oct) keeps marginalia ink with an underline on hover and draws the focus ring in ink. The bar reference file (9 Oct) draws the focus ring in gold-deep, while its own decisions document says gold appears only on the `api:` ignition and on the edge of the hexagon. So gold at rest is one open question covering both the focus ring and marginalia; it is C50 in `conflicts.md`.
+- **C20 (favourites) and C67 (personas) are entries in the register** that this brief only mentions in passing (section 3 and the request-path notes above).
+- **The register gives a suggestion for every entry,** including the ones marked "Question" in section 5. Where the two differ, the register is newer.
 
 ### New conflicts and questions these raise
 

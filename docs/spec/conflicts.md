@@ -323,6 +323,234 @@ Settings mockup.
 - **The older import path (`db.js` `importData`, L979) likely throws on `sbrd_documents`.** It keys on `item.id || item.key`, but those records are keyed on `conversationId`.
 - **The homepage Chats section loads the API key by a different setting than the rest of the app** (`settings.persistKey` against `settings.storageMode`, `chats-preview.jsx`).
 
+## Part 5. The October documents (added 11 October 2026)
+
+From the nine spec files supplied on 11 October (indexed in `README.md`), read
+against each other, against the September documents, and against the code audits
+in `research/`. The reasoning behind each entry is in `plan-brief.md`, sections
+4, 5 and 13. Entry numbers match the brief.
+
+Abbreviations: **AB** = `arrangements-boards-blocks-decisions.md` (28 Sep).
+**L7** = the header comment of `parliament_lab_v7_blocks.html` (about 29 Sep).
+**W** = `welcome-spec-decisions.md` (30 Sep). **W9** =
+`welcome-inline-editing-spec.md` and `parliament_welcome_v9.html` (6 Oct).
+**E** = `editing-in-place-spec.md` (6 Oct), and **v5** its mockup. **B** =
+`bar-and-commands-decisions.md` (7 Oct, updated 9 Oct). **BR** = the header
+comment of `parliament-bar-reference.html` (9 Oct). **St**, **A**, **D**, **v30**
+and **v12** as above.
+
+B's command inventory says it was "rebuilt from transcripts because the v30 file
+itself was not readable". Where it lists a verb as current against a decision
+made elsewhere, the entry treats that as a question, not as the newer document
+winning.
+
+### 5a. Earlier rulings and plans the October documents change
+
+These look settled by date. "Part 5a: yes" confirms them all, or name a row.
+
+| # | Earlier | Now | Source | Result |
+|---|---|---|---|---|
+| P1 | C5: the structural dotted border stays wherever the mockups draw it | "No page hatch, no dotted borders. Both are retired." Cards carry a faint lift shadow only | W §2 | No border engine is built (change plan 2.2 goes). L7 still draws dotted outlines; it predates the decision |
+| P2 | C29: which shortcut the hint line shows | `/` jumps to the field when no other text field has focus. Cmd/Ctrl+K opens it from anywhere, including inside a reply, where `/` belongs to the block menu | B "The field"; BR | Settled. Cmd/Ctrl+K stays (B lists "confirm it stays" as open) |
+| P3 | St §5: `open:settings` is the one named place `open:` accepts | Every board opens by name: `open:library`, `open:collection`, `open:history` | AB §2, §4 | No exception to keep |
+| P4 | Inventory ruling 3 and CLAUDE.md: the Lab, wizard and editor are a later step | The Lab is designed, and the wizard becomes a guide inside it (`new:room guided`) | AB §5 | In scope. Where it falls in the order is a plan question |
+| P5 | Inventory ruling 11: the room-to-room flow still needs design | Partly supplied: branch tabs, reply to one branch or all, edits and asks per branch | E "Branches" | The mockup that draws it (`parliament-branch-slider-v9.html`) has not been supplied |
+| P6 | Area 0, as built: a colliding conversation comes in as a copy titled "(from backup)" | Identical items are skipped. An item with a colliding id and different content comes in as a copy with a new id, every reference inside the backup rewritten, marginalia "restored, was 207". Counts first | AB §7 (Decided) | `restorePlan.js` changes. Once items carry numbers, every restore into a database that is not empty collides on numbers, so numbers are remapped and references to them rewritten |
+| P7 | C32: leave desks out until `arrange:` exists | An arrangement includes popped windows (AB §2, Decided), while B's inventory lists `arrange:` as deferred | AB §2; B | Arrangements are stored as data from the start. The `arrange:` verb, saved desks and the screens map come later |
+| P8 | D §6 and change plan 2.12: a `docs:` verb later | `docs:` is dropped. The generated verb reference is one of the resources | AB §7 | `resources:` carries it |
+| P9 | Change plan 3.5 to 3.8: `co:`, page-level `layout:` | `co:` is replaced by `add:` and the collection card. The Almanac's page-level `layout:` moves to `arrange:`; `layout:` means the shape of a room only | B inventory; AB §4 (Decided) | Rewritten in the new plan |
+| P10 | St §15, W §11: `api:` or `key:` | `api:` everywhere, no alias | B "Decisions" | Welcome step 8 reads `api:` |
+
+### 5b. Open
+
+**C20, reopened. Favourites.**
+- Ruled 23 September: each favourited message becomes a pinned highlight of that message. `src/lib/migrations/v6Plan.js` does this today.
+- AB §7 (Proposed): "Favorites migrate into a collection called Favorites, in their existing order, rather than becoming pinned highlights. Replaces ruling C20."
+- **Suggestion:** the collection. It keeps their order, loses nothing, and does not fill the table with highlights of whole messages. It needs the collections store to exist in version 6. Rule on it before the dry run, since the planner changes with it.
+
+**C37. Is the bar the only composer in a room?**
+- L7: messages and input are two blocks every room must have (`rm:` refuses them). "Input can sit in any column", with settings for send key and height. AB §2 (Proposed): every room has one messages block and one input block.
+- B "The field": "The resting mode follows the surface: search on the Almanac and the welcome page, prompt in a room." The prompt field carries the marginalia "collab: none · to 201a · all three". E "Reflection": "In the mockup the reflection's input sits inside the board. In the product it is the field, addressed to the board like any other."
+- Code: the composer is `InputArea.jsx` through `input-render.jsx`, and it takes its chat from the address bar.
+- **Suggestion:** the bar is the composer. A room's input block becomes the place the bar docks and the holder of the input features (web search, file attach, voice input), shown as marginalia in the prompt field the way `collab:` and `to:` are. This decides what happens to `InputArea.jsx` (retirement R25).
+
+**C38. Lab v6 or v7.**
+- AB names `parliament_lab_v6.html` as the current mockup. It has not been supplied.
+- L7: "An alternative to parliament_lab_v6.html, not a replacement. Compare the two." It adds a third board, Blocks, and moves a selected block's settings from the room line to that board.
+- AB §5 (Decided): "Clicks that change a room write the command and wait for Enter."
+- L7 (proposed rule): "reversible, local changes apply at once and are echoed; anything that moves, removes, spends or cannot be undone waits for Enter."
+- The Lab audit adds: 15 of the 33 settings that blocks declare are read by nothing, so a Blocks board built as drawn would show settings that do nothing.
+- **Suggestion:** none until v6 can be read beside v7. If v7: the Blocks board lists only settings that work.
+
+**C39. Removing one thing for good.**
+- AB §4: "`delete:` | Destroys it | Decided". AB §7: "`delete:` is universal: ids, ranges, branches, dockets, rooms." D and v12 use `delete:` for steps and branches. L7 has `delete:"Essay room"`.
+- B "Decisions": "`delete:` stays out of the vocabulary so nobody tries `delete:207` on a chat. Sent work is archived, never deleted." `drop:` removes things not yet sent.
+- B is newer, but it leaves no way to remove one chat, note, room or docket for good except "Delete everything" in Settings. The app can delete one chat and one message today.
+- This is a privacy question as much as a naming one. Someone who pastes something they should not have needs a way to make it gone.
+- **Suggestion:** permanent removal of one item exists. It is a deliberate act with its own word, it names what will be destroyed on the Enter line, and `archive:` stays the everyday verb. The word, and whether it lives in the field or only on the item, is your call.
+
+**C40. `name:` or `rename:`.**
+- AB §4: "Decided. `name:` replaces `rename:` everywhere." W §10: "`name:` names the room, following Lab v6. `rename:` is not used."
+- B's inventory lists `rename:` as current for items and `name:` for collections, and lists "Naming a room" as open.
+- **Suggestion:** `name:` everywhere. `rename:` answers "That verb is now name:".
+
+**C41. `inspect:` or `peek:`.**
+- AB §4: "Decided. `inspect:` replaces `peek:` and its alias `read:`. One word, no alias."
+- B's inventory lists `peek:` (`read:`) as current.
+- **Suggestion:** `inspect:`.
+
+**C42. `close:` and `open:`, or `hide:` and `show:`.**
+- AB §4 (Proposed): "`hide:` and `show:` retire; `close:` and `open:` do their job." L7 and W §8 use `close:`.
+- B's inventory lists `swap:`, `hide:`, `show:`, `cols:` and `move:` as current for panels and columns.
+- **Suggestion:** `close:` and `open:` for boards, `cols:` for columns. `hide:` and `show:` answer with the new verb.
+
+**C43. Where the bar sits, and the word for it.**
+- St §7: `bar:top` (the default), `bar:bottom`, `bar:left` and `bar:right` (a square in its own column), `bar:pop` (its own window), `bar:dock`.
+- W §5 and §11: `pop:command` lifts the field out and docks it at the foot of the screen, and "must dock the field on every surface".
+- B and BR (9 Oct): editing a reply minimises the field to a hexagon at the centre. "`pop:left` and `pop:right` move where it lands, and `pop:center` returns it."
+- B's inventory: only `bar:top` and `bar:bottom` are current; `pop:command` is listed under "own window".
+- So `pop:` means three things: a board in its own window, docking the field at the foot, and where the minimised field lands. A §4 says a scheme may differ in vocabulary across surfaces but not in kind.
+- **Suggestion:** `pop:` keeps one meaning, its own window. `bar:` says where the field sits, open or minimised (`bar:top`, `bar:bottom`, `bar:left`, `bar:right`, `bar:center`). The default is top on the Almanac and Settings and bottom in a room. Welcome step 2 becomes `bar:bottom`. This renames two things you chose recently, so it needs your yes.
+
+**C44. The Escape ladder.**
+- A §1: Escape goes back to search, and the text is still there.
+- W §6: "Escape steps back one mode: prompt → command line → search. Backspace on an empty prompt does the same."
+- BR ("this comment wins"): "Escape: command → prompt; prompt with text → clears; empty prompt → back to editing. Backspace never changes mode in prompt."
+- D §5: opening a docket enters command mode, and Escape goes to prompt, where the docket rests.
+- **Suggestion:** one rule. Escape steps toward the resting mode of the surface (search on the Almanac and the welcome page, prompt in a room and a docket). At rest with text, it clears the text. At rest and empty, it returns focus to what you were doing. Backspace never changes mode. Welcome step 4 ("esc, then `alm:`") is reworded.
+
+**C45. `hold:` has three meanings.**
+- D and v12: `hold:` parks a branch, and the same command lets it go.
+- AB §4: "`hold:` is dropped", meaning the Lab's holding tray.
+- E: `hold:242` keeps an edit from going to the model; `hold:off 242` lets it go.
+- **Suggestion:** one act, "keep this from going until I say". `hold:` and `hold:off` for branches and edits alike. The Lab meaning stays dropped.
+
+**C46. `import:` or `restore:`.**
+- A, St and AB §7 (Decided): "`backup:` and `restore:` open their modals."
+- W §8 and B's inventory: `import:` opens import (a backup file). B lists `backup:` as proposed and does not list `restore:`.
+- **Suggestion:** `restore:`, paired with `backup:` as Settings has it. `import:` answers with the new verb, and stays free for bringing in a room file later.
+
+**C47. `tour:`.**
+- AB §7: "Decided. `tour:` tours the current arrangement; `tour:docket` tours one board."
+- W §10 (two days later): "The tour card and its `tour:` verb are replaced by the steps."
+- B's inventory lists `tour:` as current.
+- **Suggestion:** no `tour:`. `list:` brings the welcome steps back. The tooltip tours in the code go with it (retirement R15).
+
+**C48. `strain:`.**
+- B's inventory: "`strain:` | Settings | context and storage | Sep 20 | Current". No other document defines it.
+- **Suggestion:** not built until you say what it shows. If it means the context meter and the storage estimate, it can open Settings at those two rows.
+
+**C49. Branch letters: `201B` or `201a`.**
+- D, A and the September rulings write capitals. Every October document writes lower case.
+- `src/lib/addresses.js` reads either and prints capitals.
+- **Suggestion:** read either, print lower case, store one case. Rule on it before the migration, since letters are written into stored data.
+
+**C50. Gold at rest: the focus ring and marginalia under the pointer.**
+- B "Decisions": "Gold only on the `api:` ignition." B "Minimising": the hexagon edge turns gold on hover, "the only gold at rest".
+- E "Legibility": "Keyboard focus is always visible: a 2px ink outline on anything focused." v5 draws it in ink, and marginalia buttons go to ink with an underline on hover.
+- The bar reference file itself (9 Oct), welcome v9, Lab v7 and Settings v1 all draw the focus ring in gold-deep. Welcome v9 and Lab v7 turn a card's marginalia gold-deep when the card is hovered; Settings v1 turns marginalia buttons gold-deep.
+- The earlier suggestion on C4 (marginalia stays ink) was never ruled.
+- **Suggestion:** ink for both. It follows the two newest decisions documents and keeps gold for the ignition. The gold focus ring in the bar reference file is treated as left over from the shared stylesheet.
+
+**C51. One token sheet.**
+- `--ink-2` is #787774 (welcome v9), #5F5E59 (E "Legibility") and #45433f (bar reference). `--ink-3` is #9B9A97, #6F6E69 and #6b6964. Marginalia is ink at 46% (welcome v9, Lab v7, Settings v1) or 62% (v5, bar reference).
+- **Suggestion:** take the bar reference where it defines a value and E's legibility table otherwise, and show you one sheet to approve before any chrome is built.
+
+**C52. Is the table board called History?**
+- AB §2 (Proposed): the Almanac is an arrangement whose middle board is History.
+- E "Focus" (newer): the board strip shows "Sym:, Col:, Ref:, Alm:, Lib:, Dkt:".
+- **Suggestion:** keep "Almanac" for the board until you decide. Board names live in the copy table, so the rename is one line whenever it comes.
+
+**C53. Boards editable in the Lab** (changes ruling C21).
+- C21, ruled: the Almanac is an app surface, not composed from parts.
+- AB §2 (Decided): the Library, Collection and Docket "ship prebuilt and are editable in the Lab like any room".
+- L7, "Not built here": `open:` and `edit:` on the Almanac and Docket boards.
+- **Suggestion:** build boards on the block system so they can be edited, ship them prebuilt, and add `edit:` for boards after the rooms work in the Lab.
+
+**C54. Welcome steps 9 and 10.**
+- W9 §3: step 10 is "Leave the AI a note", done with "Note for the AI".
+- E, which says it wins: edits go to the model by default, and B renames the note for the AI to `tell:`.
+- **Suggestion:** step 9 stays (strike through a line). Step 10 becomes "Send it with your next prompt", crossed off when a prompt goes out carrying an edit, so the count line under the field is what teaches it. The other candidate is `tell:"…"`.
+
+**C55. The advanced list needs two keyless sources on day one.**
+- W §13: "Wikipedia and arXiv are both keyless sources."
+- arXiv sends no cross-origin headers and cannot be called from a browser (checked 23 September; see `change-plan.md`). You dropped it.
+- **Suggestion:** Wikipedia with Hacker News. OpenAlex is the third, with its keyless budget of about 100 searches a day stated where it is picked.
+
+**C56. What gets a number, a row and a pill** (extends ruling C17).
+- C17, ruled: four kinds take a number (chats, notes, highlights, dockets), and those are the four pills.
+- E and W9 give ids from the same counter to edits, asks, Ripple suggestions and sweep suggestions ("ask 241", "edit 242", "ripple 244", "sweep 245"). B adds `type:edit` as a filter.
+- Heavy editing will use numbers quickly.
+- **Suggestion:** they take numbers from the shared counter, as drawn, so `jump:242` and `undo:242` work. They are rows only under their own `type:` filter, never in the default table. Pill colours wait for the collection board mockup.
+
+**C57. A highlight: a term or a passage?**
+- Code (`research/editing-code.md`): a highlight is a term, matched everywhere it occurs in the conversation.
+- E: the Highlight card shows "the passage", and anchors point to a block id and an offset.
+- **Suggestion:** both, as two kinds in one store. Existing highlights stay terms and are not converted. New ones made by selecting text are passages. Rule on it before the migration, since highlights take numbers.
+
+**C58. Rich content inside editable replies.**
+- E: block types are text, three headings, two lists, checklist, quote, code block and divider. "Bold and italic shortcuts do nothing."
+- Model replies today also hold bold, italics, inline code, links, citations, tables and charts. No document says how these are shown, stored or anchored once a reply is editable.
+- **Suggestion:** inline formatting from the model is kept and shown as marks on the text, and is not something you can apply. Tables and charts are whole blocks that can be struck or asked about as a unit but not edited inside, at first. This has to be answered before the editing engine is chosen.
+
+**C59. Lab v7 lists a Collaboration block.**
+- L7's catalogue describes it as "someone else in the room with you, and what they are looking at", needing the network. That would need a server, which the hard constraints forbid.
+- Code: the block is the system-prompt presets (Collaboration mode).
+- **Suggestion:** it is the old Collaboration mode under a misleading description. It goes, replaced by `collab:`.
+
+**C60. Small ones.** Each is a suggestion; say if any is wrong.
+- `duplicate:` has no alias (B, against AB §7's `dup:`). `api:` has no alias (B, against W §11's `key:`).
+- After a command runs the field resets to `>` and keeps focus, on every surface (B; settles W §11).
+- `open:201a summary` is today's compressed-summary branch and `open:201a` the full-history one. To confirm when the branch slider mockup arrives.
+- "Send to branch" and "Pin for reference" on a message have no place in the new documents. Kept until you say.
+- The `?` panel in the docket was built as `help:`. Suggest `?` and `help` everywhere, with no colon.
+- `new:api` as an alias for `api:new`: suggest no, for the same one-syntax reason B gives.
+- B's test of whether the moon in the hexagon reads as dark mode stays owed.
+
+**C61. Is the prompt of a step locked, or editable?**
+- D §1 and `docketModel.js`: a step that has produced a turn is locked, "because a transcript exists and rewriting the prompt would make the record a lie".
+- E "Editing prompts": every prompt is editable in place, struck and blue, per branch.
+- **Suggestion:** both hold. An edit to a prompt is a marking on the transcript, with the original visible and struck. The step in the run does not change. "Ask again as 201d" makes a new branch from the edited wording.
+
+**C62. Three model calls nobody asks for.**
+- Code (`research/request-path.md`): after the first exchange of every chat, a title, a summary and tags are requested on Haiku. No setting turns them off and nothing says so beforehand.
+- A §2 and E: the Enter line names what will go before it goes. `summarize:` exists as a verb. A reader with no key has no model to make these calls.
+- **Suggestion:** keep the title, since an untitled table is unusable, and name it once on the Enter line of a first prompt ("and one small call for a title"). Summary and tags become `summarize:` and a tagging verb, on request. With a keyless source, the title is the first words of the prompt and no call is made.
+
+**C63. Does the Lab save on every command?**
+- Code: saving is explicit, with an unsaved-changes flag and a first-time "Build" step.
+- L7 applies settings on click and shows no save.
+- **Suggestion:** every command saves, and `undo:` is the way back. Also to rule: may a room hold two of the same block, given that commands address blocks by name? Suggest no, for now.
+
+**C64. Theme scope.**
+- AB §2 (Proposed): "A room's theme applies inside its edges only."
+- Code (`research/lab-code.md`): in a chat the theme is set on `<html>` and recolours the whole page.
+- No ruling needed. It is work that comes before the new chrome can sit beside a room, and hard-coded colours inside blocks limit how true it can be made at first.
+
+**C65. Three commits on `refactor/main` that never reached `main`.**
+- All from 6 April: `974d659` (the space bar hijacked in comment and chat inputs), `50ecd25` (revision suggestions missing in scanned chats), `c2ed12a` (the update banner for the service worker moved to the app level).
+- **Suggestion:** bring `c2ed12a` onto this branch, since a new version, a security fix included, is never offered to an open tab today. Leave the two Secretarybird fixes until the editing engine is decided.
+
+**C66. What "web search on" means.**
+- Code: offered to the model on each message while the toggle is on.
+- L7's guide: "Yes, when I ask."
+- **Suggestion:** a feature of input set with `set:input web search on`, shown as marginalia in the prompt field, and named on the Enter line of every prompt it goes with.
+
+**C67. Personas are not what the spec describes.**
+- E "Carried forward": Parrots are saved personas with a system prompt, an optional default model and tool preferences, their own store, a `parrotId` on each conversation, and a "My Parrots" section in Settings. Your own collabs "are written in Settings, where My Parrots was".
+- Code (`research/request-path.md`): personas are `{ id, title, instruction }` in one settings value, edited only inside the Collaboration window. Ticking one has never changed what is sent to the model. Only the five presets and the custom text go.
+- So after the move to `collab:`, a ticked persona would take effect for the first time. Two of the five preset ids differ from the built-in collabs, and the existing "challenge" text asks the model to critique its own output, where E says "question what it is given".
+- **Suggestion:** personas become "yours" collabs, all switched off, listed in the dry run. The five built-ins take E's wording. Where your own are written (Settings, or the picker in the field) waits for the collab mockup.
+
+### 5c. Open in the documents themselves
+
+Not repeated here, and still open: AB §10 (Symposium as a word, the collection's
+purpose, the docket pin, two boards of one kind on a screen), W §12 (the licence
+wording, the two links, step 8, small screens), W9 §7, E "Open questions"
+(prompt edits and the model, version history, Ripple's reach, collab scope, sweep
+reach, calm by default, focus per room), B "Still open" (quill colour, shared
+docs).
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
