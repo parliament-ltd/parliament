@@ -102,7 +102,7 @@ written. None is built until its stage. Strike any you disagree with.
 | A8 | The second keyless source for the advanced list is Hacker News (C55) | Stage 7 |
 | A9 | A prompt that has been answered stays locked as a record; editing it marks it up and "ask again" makes a new branch (C61) | Stage 11 |
 | A10 | The Lab saves on every command, with `undo:` as the way back. A room holds one of each block (C63) | Stage 13 |
-| A11 | Of the three commits stranded on `refactor/main`, the update banner is brought over now and the two editor fixes wait (C65) | Stage 1 |
+| A11 | The notice that a new version of the app is ready is built fresh. The three commits stranded on `refactor/main` change files that no longer exist, so nothing can be brought over (C65) | Stage 1 |
 | A12 | Web search is a feature of input, shown in the prompt field and named on the Enter line each time it goes (C66) | Stage 4 |
 | A13 | Personas become "yours" collabs, all switched off, listed in the dry run (C67) | Stages 2, 7 |
 | A14 | The picker follows the branch slider: two groups, Models and Sources (C75) | Stage 7 |
@@ -206,7 +206,7 @@ how the app looks.
   - The spreadsheet library: the fixed version vendored into the repository, loaded only when a spreadsheet is opened, parsed in a worker with a size limit and a timeout.
   - Voice: the microphone appears only where the browser can transcribe on the device, with the note beside it.
 - **Added**
-  - The update notice for a new version of the app, brought over from `refactor/main` (A11). A security fix can otherwise never reach an open tab.
+  - A notice that a new version of the app is ready, as one line of marginalia with a reload (A11). The app already knows when an update is waiting and shows nothing, so a security fix can sit unused in an open tab.
   - One command that runs tests, lint and build (A22). It becomes a check on every pull request at stage 15: GitHub now refuses pushes of this branch, because its older commits carry the private address.
 - **Salvaged:** everything; these are repairs.
 - **Security and privacy:** this stage closes audit findings T1 (spreadsheets), T3 (voice), T7 (headers) and T10 (dependencies).
@@ -463,7 +463,7 @@ Built to Lab v7 (A2). Can run beside the others once stage 3 exists.
   - Each release saved as a zip with a checksum.
   - Accounts: two-factor and stored recovery codes for GitHub, Netlify and the registrar.
 - **You can try:** the public repository, and the site served from the standby.
-- **Needs from you:** where the domain's DNS should live (it is with Netlify today, which ties the address to the host); a mailbox at `parliament.ltd`; a yes before the public push, which cannot be taken back. R31 is put to you here.
+- **Needs from you:** where the domain's DNS should live (it is with Netlify today, which ties the address to the host); the mailbox `support@parliament.ltd`; a yes before the public push, which cannot be taken back. R31 is put to you here.
 
 ## 6. Retirement proposals
 

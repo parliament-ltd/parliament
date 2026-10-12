@@ -100,6 +100,11 @@ Line numbers are approximate.
 - **C46. Both `restore:` and `import:`.** `restore:` brings a backup back. `import:` brings in something made elsewhere, and later, things other people have built.
 - **C47. `tour:` stays,** so someone who forgets a step can come back to it.
 
+- **One address for now: `support@parliament.ltd`,** for security reports and everything else.
+- **The registrar account is secured:** two-factor, domain lock, auto-renew and WHOIS privacy are all on (Stefan, 12 October).
+- **Sequence.** The assumptions in `refactor-plan.md` section 3 are gone through with Stefan first. The CLAUDE.md update and stage 1 follow once that is done.
+- **C65, corrected.** The three commits on `refactor/main` change files under `src/adapters/`, which the earlier refactor removed. Nothing can be brought over. The update notice is built fresh in stage 1; one of the two editor fixes already exists in today's code in another form, and the other is checked at stage 11.
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it

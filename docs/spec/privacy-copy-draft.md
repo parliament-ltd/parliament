@@ -107,8 +107,8 @@ The one list everything else points to.
 **9. Reporting a vulnerability (L63)**
 - Today: "please open a GitHub issue or contact us directly."
 - Problem: the repository is private, and a public issue is the wrong place for a vulnerability anyway.
-- Draft: "Report a vulnerability privately: use 'Report a vulnerability' on the repository's Security tab, or write to security@parliament.ltd. Please do not open a public issue for it."
-- Needs: private vulnerability reporting switched on in GitHub, and that mailbox to exist.
+- Draft: "Report a vulnerability privately: use 'Report a vulnerability' on the repository's Security tab, or write to support@parliament.ltd. Please do not open a public issue for it."
+- Needs: private vulnerability reporting switched on in GitHub, and that mailbox to exist. One address, support@, for everything for now (ruled 12 Oct).
 
 ### Settings
 
@@ -189,4 +189,4 @@ Each of these makes a sentence above honest. All are part of the refactor.
 | "grouped by host" in the log | The log records who made each request and drops query strings |
 | "the backup window says so" | The password choice made visible instead of an unticked box |
 | "Open source under the MIT licence" | The public repository |
-| Reporting a vulnerability | GitHub's private reporting switched on; a mailbox at parliament.ltd |
+| Reporting a vulnerability | GitHub's private reporting switched on; the mailbox support@parliament.ltd |
