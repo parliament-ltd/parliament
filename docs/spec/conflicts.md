@@ -86,6 +86,20 @@ Line numbers are approximate.
 - **C50. Ink,** for the focus ring and for marginalia under the pointer. Gold stays for the `api:` ignition and the edge of the hexagon.
 - **C57. Both kinds of highlight are kept,** and each must be clearly shown for what it is. How they are named and drawn is still open.
 
+**Ruled 12 October 2026:**
+
+- **Privacy copy names no provider in a sentence.** It has to read true for Mistral, Ollama and providers that do not exist yet. `privacy-copy-draft.md` is revised to match.
+- **C71, progress.** Stefan switched on GitHub's email privacy. This repository now commits with the no-reply address. GitHub will refuse a push of the older commits, which still carry the private address, so this branch cannot be pushed as it stands: the bundle is the backup until the history is rewritten.
+- **The domain** is registered with Squarespace Domains. Its DNS is run by Netlify (found by lookup on 12 October). A mailbox at the domain is wanted.
+- **C43, completed.** Welcome step 2 is `bar:bottom`. The welcome steps still introduce `pop:`. `bar:left`, `bar:center` and `bar:right` belong to the bar. `pop:left` and `pop:right` are for boards that have been popped.
+- **C62. One request, not three.** Title, summary and tags come from a single call after the first answer, named on the Enter line, with a switch in Settings. "That follows Parliament's ethos."
+- **C57 and C78. Three names.** A **highlight** is one passage marked where it sits. A **term** is a word or phrase lit wherever it appears in a chat; today's highlights carry over as terms. A **quote** is a passage kept beside the chat that the model never sees.
+- **C56. Edits and asks take numbers,** are rows in the table only when filtered for, and are always cards in the Collection. To be tried and looked at again.
+- **C70. Voice on the device only,** with a note beside the microphone about what the alternative would mean for privacy.
+- **C40. `name:`. C41. `inspect:`. C42. `close:` and `open:`. C49. Lower-case branch letters.**
+- **C46. Both `restore:` and `import:`.** `restore:` brings a backup back. `import:` brings in something made elsewhere, and later, things other people have built.
+- **C47. `tour:` stays,** so someone who forgets a step can come back to it.
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it

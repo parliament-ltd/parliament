@@ -33,9 +33,10 @@ the dates are worked out from what cites them.
 | 28 Sep | `parliament_screens_v1.html` | The map that bare `arrange:` shows across screens | The arrangements document §7a. `arrange:` is deferred |
 
 Working files written during the refactor: `inventory.md`, `conflicts.md`,
-`change-plan.md` (the 24 September plan, due to be replaced by
-`refactor-plan.md`), `plan-brief.md` (the analysis the new plan is built from),
-and `research/` (code audits).
+`refactor-plan.md` (the plan, written 12 October), `change-plan.md` (the
+24 September plan it replaces, kept for the record), `plan-brief.md` (the
+analysis the plan is built from), `privacy-copy-draft.md` (replacement wording
+for the app's privacy claims, not yet applied), and `research/` (code audits).
 
 ## What wins
 

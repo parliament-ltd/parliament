@@ -5,7 +5,7 @@ statements listed in `research/security-audit.md`, item 11, and is written for
 the app as it will be when the refactor is finished and the repository is
 public: several providers, keyless sources, the address `parliament.ltd`.
 
-Three rules behind the wording:
+Four rules behind the wording:
 
 1. **No "never", "only" or "nothing" unless a test or the browser enforces it.**
    Where the old copy made a promise the app did not keep, the draft either
@@ -17,8 +17,14 @@ Three rules behind the wording:
    is protected; a key in a running page is not. A provider keeps what it is
    sent under its own terms.
 
-Text in [square brackets] waits on a ruling and is marked with its entry in
-`conflicts.md`.
+4. **No provider is named in a sentence.** The copy says "the provider", "a
+   model on your own machine" or "a source", and takes names from the list of
+   providers. Adding Mistral, Ollama or one that does not exist yet changes the
+   list, not the sentences. Where a line sits on one provider's row, the name is
+   filled in from that row, shown below as {provider}.
+
+Revised 12 October 2026 after Stefan's review: wording made neutral across
+providers, and the title and voice lines settled (C62, C70).
 
 ## What leaves your device
 
@@ -27,23 +33,30 @@ The one list everything else points to.
 > - **Your prompt.** When you press Enter, your prompt, the conversation it
 >   continues and anything you attached go straight from your browser to the
 >   provider or source named on the line under the field. Nowhere else.
-> - **Your key.** The key for that provider travels with the request, to that
->   provider only. A source such as Wikipedia gets no key.
+> - **A model on your own machine.** If that is what you chose, the prompt goes
+>   no further than your computer.
+> - **Your key.** The key for a provider travels with the request, to that
+>   provider only. A model on your own machine and a source such as Wikipedia
+>   get no key.
 > - **A key check.** Saving or checking a key sends one very small test request
 >   to that provider.
-> - [**A title.** After the first answer in a new chat, one small request asks
+> - **A title.** After the first answer in a new chat, one small request asks
 >   a model for a title, a summary and tags. The line under the field says so
->   before you send, and Settings can turn it off.] (C62)
-> - **Web search, if you switch it on.** Anthropic runs the searches on its
+>   before you send, and Settings can turn it off.
+> - **Web search, if you switch it on.** The provider runs the searches on its
 >   side, so search terms drawn from your chat reach the search service it
 >   uses.
-> - [**Voice, if you use it.** Speech is turned into text on this device. No
->   audio leaves it.] (C70)
+> - **Voice, if you use it.** Speech is turned into text on this device. No
+>   audio leaves it. Where a browser can only do this by sending audio to its
+>   maker, Parliament does not offer voice.
 > - **The app itself.** Your browser fetches Parliament's files from
 >   `parliament.ltd`, hosted by Netlify. Like any web host it sees your IP
 >   address and browser type. It never receives your chats or keys.
 > - **Nothing else.** No analytics, no tracking, no advertising, and no code
 >   loaded from any other site.
+>
+> Settings lists every provider and source Parliament can reach. A new one
+> appears there and in the published policy before it can be used.
 
 ## The nineteen, old and new
 
@@ -52,7 +65,7 @@ The one list everything else points to.
 **1. Opening lines (L3 to 5)**
 - Today: "runs entirely in your browser. Bring your own API key — there is no backend, no account, and nothing leaves your machine except API calls to Anthropic."
 - Problem: more leaves than "API calls" suggests, and soon not only to Anthropic.
-- Draft: "Parliament runs in your browser. There is no backend and no account, and you bring your own API keys. What you write stays on your device until you press Enter. Then it goes straight to the provider or source you chose, and nowhere else."
+- Draft: "Parliament runs in your browser. There is no backend and no account. You bring your own keys, or run a model on your own machine. What you write stays on your device until you press Enter. Then it goes straight to the provider or source you chose, and nowhere else."
 
 ### SECURITY.md
 
@@ -102,12 +115,13 @@ The one list everything else points to.
 **10. First-visit hint (SettingsView.jsx L45)**
 - Today: "Start by adding your Anthropic API key. It is encrypted with AES-GCM and stored only in your browser."
 - Problem: "stored only in your browser" is fine; the key is also sent.
-- Draft, for the `api:` panel that replaces this hint: "Add a key to use a model. It is encrypted, kept in this browser, and sent only to its own provider."
+- Draft, for the `api:` panel that replaces this hint: "Add a key to use a provider's models, or connect a model running on your own machine. A key is encrypted, kept in this browser, and sent only to its own provider."
 
 **11. Under the key field (L476)**
 - Today: "Your API key is encrypted using the Web Crypto API (AES-GCM) before being stored. It never leaves your browser."
 - Problem: it leaves with every request.
-- Draft: "Encrypted before it is stored. Sent only to Anthropic, with each request you make." The provider's name changes with the row.
+- Draft, on a provider's row: "Encrypted before it is stored. Sent only to {provider}, with each request you make to it."
+- Draft, on the row of a model on your own machine: "No key needed. It runs on your machine, and nothing you send it leaves."
 
 **12. About (L1196)**
 - Today: "A power-user chat interface for AI. Built with React, Framer Motion, and Tailwind CSS. Open source and community-driven."
@@ -146,6 +160,11 @@ The one list everything else points to.
 - Today: "A power-user chat interface for Claude. Bring your own API key — no accounts, no servers, all data stays in your browser."
 - Draft: "A place to work with AI on your own terms. No accounts, no servers. Your work is stored in your browser."
 
+### Beside the microphone (new)
+
+- Where the browser can do it on the device: "Transcribed on this device. No audio leaves it."
+- Where it cannot: "Voice is off in this browser. Here it would mean sending your audio to the browser's maker."
+
 ### One more: the welcome letter
 
 Not among the nineteen, but the welcome spec says every claim in it must stay true.
@@ -161,8 +180,9 @@ Each of these makes a sentence above honest. All are part of the refactor.
 | Sentence | Needs |
 |---|---|
 | "stays on your device until you press Enter" | No connection to a provider opened on page load. Today the page preconnects to Anthropic on every load |
-| The title line | One announced request in place of three silent ones, or none (C62) |
-| The voice line | On-device recognition only, or voice removed (C70) |
+| The title line | One announced request in place of three silent ones, with a switch in Settings (ruled 12 Oct, C62) |
+| The voice line | On-device recognition only, the microphone allowed in the site's header, and the note shown beside the microphone (ruled 12 Oct, C70) |
+| "{provider}" and the list in Settings | One registry of providers and sources that the copy, the policy and the network log all read from |
 | "Don't save" | The key module that holds a key in memory. Saving stays the default (ruled 11 Oct) |
 | "sent only to its own provider" | One gateway for requests, with each key bound to its provider's address |
 | The policy block | A script that writes it from `netlify.toml`, and a test |

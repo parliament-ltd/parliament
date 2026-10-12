@@ -223,3 +223,53 @@ pop-outs and cross-tab messaging all came back empty. Every record id is a UUID.
 | Section navy rule | Mockup | v1; St §3 | |
 | Warn before a costly run | Mockup | v1; St §9 | Run cost (area 8) |
 | Desks on this device | Mockup | v1; St §12 | `arrange:` (out of scope) |
+
+## The October documents (added 12 October 2026)
+
+Rows for what the thirteen later spec files add. Rulings 3 and 11 above are
+changed by them: the Lab is now in scope, and the flow between rooms is partly
+designed. Later rulings are in `conflicts.md`; the plan is `refactor-plan.md`.
+
+| What it is | State | Where | Blocks |
+|---|---|---|---|
+| Arrangements, boards, rooms, blocks as the model | Specced | `arrangements-boards-blocks-decisions.md` §1, §2. Code has pages and routes | The shell (plan stage 3) |
+| The board strip (`Alm:`, `Sym:`, `Col:`, `Ref:`, `Lib:`, `Dkt:`) | Mockup | Inline editing v5; branch slider v9 | Boards registry |
+| The bar: 40px field, fills that wipe, marginalia in the prompt field | Mockup | `parliament-bar-reference.html` | Stage 3 |
+| The bar minimised to a hexagon; `bar:left`, `bar:center`, `bar:right` | Mockup | Bar reference; ruled 12 Oct | Stage 3 |
+| `pop:command`: the bar in its own window | Specced | Ruled 11 Oct. The welcome mockup draws it docking at the foot | Pop-out prototype |
+| The bar as the only composer in a room | Specced | Ruled 11 Oct (C37). Code: `InputArea.jsx`, `input-render.jsx` are Live | Stage 4 |
+| Renamed-verb answers ("That verb is now …") | Mockup | Bar reference | Verb registry |
+| The welcome page: letter, steps, ending, footer | Mockup | `parliament_welcome_v9.html` | Stages 2 to 5 |
+| `tour:` and the advanced list | Specced | Welcome spec §13; ruled 12 Oct | Stage 5 |
+| Tooltip tours and the first-run gate | Live, to be replaced | `TourTooltip.jsx`, `tourCompleted_*` | Retirement R15 |
+| Several sources answering one prompt, as tabs | Mockup | `parliament-branch-slider-v9.html` | Stage 8 |
+| The numbered picker, grouped into Models and Sources | Mockup | Branch slider v9 | Stage 7 |
+| "One after another" with a condition per source | Mockup | Branch slider v9 | Docket running (stage 10) |
+| `open:201a` and `open:201a summary` | Mockup | Branch slider v9. Code: the compressed-summary branch is Live | Stage 8 |
+| Reply to one branch or all (`to:`) | Mockup | Branch slider v9; editing spec | Stage 8 |
+| The Collection as cards, with headings and a source picker | Mockup | `parliament-collection-board-v3.html` | Stage 6 |
+| Highlight (a passage) | Mockup | Collection board v3; editing spec | Stage 6 |
+| Term (a phrase lit everywhere in a chat) | Live, as "highlights" | `AnnotationsContext`, the Highlights block | Renamed in stage 2 |
+| Quote (kept beside the chat, never sent) | Mockup | Collection board v3. Code: "Pin for reference" is Live | Stage 6 |
+| Editing replies and prompts in place: strike, add, one id per edit | Mockup | `parliament-inline-editing-v5.html`. Code: Secretarybird is Live and is not this | The engine spike (stage 11) |
+| Edits sent with the next prompt; hold back; the count line | Mockup | Editing spec | Stage 11 |
+| Asks | Mockup | Editing spec | Stage 11 |
+| The `/` menu and blocks inside a reply | Mockup. Live in the document canvas only | Editing spec; `DocumentParagraph.jsx` | Stage 11 |
+| `markup:`, `tell:`, `strikethrough:`, `again:`, `drop:`, `jump:` | Mockup | Bar decisions; editing spec | Their stages |
+| Ripple across branches | Mockup. Code: `RippleAnalysis` is Live and checks documents across chats | Editing spec | Stage 12 |
+| Sweeps | Mockup | Editing spec | Stage 12 |
+| The Reflection board | Mockup. Code: the Review modal is Live and stays for now | Editing spec | Stage 12 |
+| `collab:` standing instructions | Mockup. Code: Collaboration mode and personas are Live | Editing spec | Stage 7 |
+| `helper:` for text from a keyless source | Mockup | Editing spec | Stage 7 |
+| `focus:` sets and `calm:` | Mockup | Editing spec; welcome v9 | Stages 5 and 14 |
+| The Lab as boards: Library, Canvas, Blocks | Mockup | `parliament_lab_v6.html`, `parliament_lab_v7_blocks.html`. Code: the editor is Live | Stage 13 (C38) |
+| The guide in the Lab (`new:room guided`) | Mockup. Code: the wizard is Live | Lab v6 and v7; `buildWizard.js` | Stage 13 |
+| Web search, voice input and file attach as features of input | Specced. Live as separate blocks | Arrangements doc §2 | Stage 13 |
+| The screens map (`arrange:`) | Mockup | `parliament_screens_v1.html` | Stage 14 |
+| `erase:` for one item | Specced | Ruled 11 Oct (C39). Code can delete one chat or message today | Stage 6 |
+| "Delete everything" that deletes everything | Specced. Live and incomplete | Ruled 11 Oct (C73); `db.js` `clearAllData` | Stage 9 |
+| `restore:` and `import:` | Specced | Ruled 12 Oct (C46) | Stage 9 |
+| One call for title, summary and tags | Specced. Live as three silent calls | Ruled 12 Oct (C62); `ChatContext.jsx` | Stage 4 |
+| The gateway for every outbound request | Specced | `refactor-plan.md` section 4. Code: 17 places fetch a provider | Stage 4 |
+| The key module with a working "Don't save" | Specced. Live and broken | Ruled 11 Oct; `crypto.js` | Stage 4 |
+| The privacy copy | Draft | `privacy-copy-draft.md` | Stage 15 |

@@ -1,5 +1,7 @@
 # Change plan
 
+**Replaced on 12 October 2026 by `refactor-plan.md`.** Areas 0 and 1 below are built; the rest is kept for the record.
+
 Phase 2 of the Almanac, Docket and command line refactor. Drafted 23 September 2026.
 
 Built on the rulings in `docs/spec/inventory.md` and `docs/spec/conflicts.md`.
