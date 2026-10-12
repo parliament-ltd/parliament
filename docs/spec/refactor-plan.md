@@ -113,7 +113,7 @@ written. None is built until its stage. Strike any you disagree with.
 | A19 | Terms and quotes take numbers like edits do, and are rows only when filtered for | Stage 2 |
 | A20 | `tour:` takes over from `list:`: `tour:` shows the steps, `tour:off` puts them away, `tour:advanced` shows the second list. `list:` answers "That verb is now tour:" | Stage 5 |
 | A21 | `import:` opens a file and says what it is before anything happens. A backup is handed to `restore:`. A room file, when those exist, adds a room | Stage 9 |
-| A22 | A check runs tests, lint and build on every pull request, and the new core modules carry JSDoc types | Stage 1 |
+| A22 | One command runs tests, lint and build. The same check runs on every pull request once there is a repository it can be pushed to. The new core modules carry JSDoc types | Stages 1, 15 |
 | A23 | Existing "Pin for reference" records are shown as quotes of a whole message. Nothing is converted or lost | Stage 6 |
 
 ## 4. What gets built once
@@ -207,11 +207,11 @@ how the app looks.
   - Voice: the microphone appears only where the browser can transcribe on the device, with the note beside it.
 - **Added**
   - The update notice for a new version of the app, brought over from `refactor/main` (A11). A security fix can otherwise never reach an open tab.
-  - A check that runs tests, lint and build on every pull request (A22).
+  - One command that runs tests, lint and build (A22). It becomes a check on every pull request at stage 15: GitHub now refuses pushes of this branch, because its older commits carry the private address.
 - **Salvaged:** everything; these are repairs.
 - **Security and privacy:** this stage closes audit findings T1 (spreadsheets), T3 (voice), T7 (headers) and T10 (dependencies).
 - **You can try:** upload a spreadsheet; the microphone in Chrome on desktop and in another browser.
-- **Needs from you:** a yes to fetch the spreadsheet package from the vendor's site (I will name the file and its size first), and a yes or no on A22.
+- **Needs from you:** a yes to fetch the spreadsheet package from the vendor's site (I will name the file and its size first).
 
 ### Stage 2. Stored data, version 6
 
@@ -517,7 +517,7 @@ Rewritten rather than retired, because they will no longer be true: `README.md`,
 
 ## 7. What I need from you, in order
 
-1. **Strike anything in the "Assumed" table you disagree with.** A2 (Lab v7), A19 (terms and quotes numbered), A20 (`tour:` in place of `list:`) and A22 (a check on every pull request) are the ones I am least sure you would choose.
+1. **Strike anything in the "Assumed" table you disagree with.** A2 (Lab v7), A19 (terms and quotes numbered), A20 (`tour:` in place of `list:`) and A21 (what `import:` does) are the ones I am least sure you would choose.
 2. **Stage 1:** a yes to fetch the spreadsheet package.
 3. **Stage 2:** the dry run on your real data.
 4. **Stage 3:** the token sheet, and your verdict on the pop-out prototype.
