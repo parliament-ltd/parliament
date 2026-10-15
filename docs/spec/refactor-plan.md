@@ -463,7 +463,8 @@ Built to Lab v7 (A2). Can run beside the others once stage 3 exists.
   - Each release saved as a zip with a checksum.
   - Accounts: two-factor and stored recovery codes for GitHub, Netlify and the registrar.
 - **You can try:** the public repository, and the site served from the standby.
-- **Needs from you:** where the domain's DNS should live (it is with Netlify today, which ties the address to the host); the mailbox `support@parliament.ltd`; a yes before the public push, which cannot be taken back. R31 is put to you here.
+- **Done early, on 15 October:** DNS moved to deSEC with DNSSEC, and mail set up at Proton. The records are in `docs/hosting.md`.
+- **Needs from you:** a yes before the public push, which cannot be taken back. R31 is put to you here.
 
 ## 6. Retirement proposals
 
