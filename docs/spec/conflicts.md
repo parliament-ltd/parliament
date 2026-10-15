@@ -107,7 +107,7 @@ Line numbers are approximate.
 
 **15 October 2026:**
 
-- **DNS is with deSEC,** signed with DNSSEC, and no longer tied to Netlify. Mail is with Proton Mail, which holds `sef@parliament.ltd`. Whether `support@` is added as a second address is still to be confirmed. Records are in `docs/hosting.md`.
+- **DNS is with deSEC,** signed with DNSSEC, and no longer tied to Netlify. Mail is with Proton Mail, which holds `stef@parliament.ltd`. Whether `support@` is added as a second address is still to be confirmed. Records are in `docs/hosting.md`.
 
 ## Part 1. Settled by precedence
 
