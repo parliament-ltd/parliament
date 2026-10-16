@@ -97,22 +97,22 @@ written. None is built until its stage. Strike any you disagree with.
 | A3 | **Ruled 15 Oct, as revised.** Escape never deletes text. It takes the field to the mode the screen rests in, keeping what you typed in the mode you left; in the resting mode it returns you to what you were doing. Backspace leaves a mode only by deleting a leader you can see: deleting the `>` leaves command mode (C44) | Stage 3 |
 | A4 | `hold:` and `hold:off` mean "keep this from going until I say", for branches and for edits (C45) | Stages 10, 11 |
 | A5 | `strain:` is not built until you say what it shows (C48) | none |
-| A6 | The table board is called Almanac, not History, until you decide (C52) | Stage 5 |
+| A6 | **Ruled 15 Oct: yes for now, to be looked at again,** with a plain-language pass on names before stage 5. The table board is called Almanac, not History, until you decide (C52) | Stage 5 |
 | A7 | Welcome step 10 becomes "Send it with your next prompt" (C54) | Stage 11 |
-| A8 | The second keyless source for the advanced list is Hacker News (C55) | Stage 7 |
+| A8 | **Ruled 15 Oct: all three ship** (Wikipedia, Hacker News, OpenAlex), and people pick any two. The second keyless source for the advanced list is Hacker News (C55) | Stage 7 |
 | A9 | A prompt that has been answered stays locked as a record; editing it marks it up and "ask again" makes a new branch (C61) | Stage 11 |
 | A10 | The Lab saves on every command, with `undo:` as the way back. A room holds one of each block (C63) | Stage 13 |
 | A11 | **Ruled 15 Oct: yes.** The notice that a new version of the app is ready is built fresh. The three commits stranded on `refactor/main` change files that no longer exist, so nothing can be brought over (C65) | Stage 1 |
-| A12 | Web search is a feature of input, shown in the prompt field and named on the Enter line each time it goes (C66) | Stage 4 |
+| A12 | **Ruled 15 Oct: on for the next prompt only, to be looked at again after other changes.** Web search is a feature of input, shown in the prompt field and named on the Enter line each time it goes (C66) | Stage 4 |
 | A13 | **Ruled 15 Oct: yes, and to be looked at again at stage 7.** Personas become "yours" collabs, all switched off, listed in the dry run (C67) | Stages 2, 7 |
-| A14 | The picker follows the branch slider: two groups, Models and Sources (C75) | Stage 7 |
+| A14 | **Ruled 15 Oct: three groups** (Models; On your machine; Sources, no tokens), with the branch slider's sub-labels for sources, numbered boxes, cost marks and one line of description per row (C27, C75) | Stage 7 |
 | A15 | **Ruled 15 Oct: yes.** "One after another" with conditions comes after the docket can run; the step record gets its condition field in the one upgrade (C76) | Stages 2, 10 |
-| A16 | Collection tabs: All, Highlights, Terms, Quotes, Notes, Edits, Asks, Suggestions, each shown only when it holds something (C77) | Stage 6 |
-| A17 | A row's summary line can be rewritten with `summarize:`; a summary note in a collection is dated and fixed (C79) | Stage 6 |
+| A16 | **Ruled 15 Oct: yes.** Collection tabs: All, Highlights, Terms, Quotes, Notes, Edits, Asks, Suggestions, each shown only when it holds something (C77) | Stage 6 |
+| A17 | **Ruled 15 Oct: yes.** A row's summary line can be rewritten with `summarize:`; a summary note in a collection is dated and fixed (C79) | Stage 6 |
 | A18 | `heading:` in a collection; `erase:201c` and `erase:201c all`; `forget:` for a saved arrangement (C80) | Stages 6, 14 |
 | A19 | **Ruled 15 Oct: yes, to be looked at again later.** Terms and quotes take numbers like edits do, and are rows only when filtered for. Terms must still be found by search in the Almanac | Stage 2 |
-| A20 | `tour:` takes over from `list:`: `tour:` shows the steps, `tour:off` puts them away, `tour:advanced` shows the second list. `list:` answers "That verb is now tour:" | Stage 5 |
-| A21 | `import:` opens a file and says what it is before anything happens. A backup is handed to `restore:`. A room file, when those exist, adds a room | Stage 9 |
+| A20 | **Ruled 15 Oct.** `tour:` shows the steps, `tour:off` puts them away, `tour:advanced` shows the second list. `list:` is kept free for another use, such as making a bulleted list | Stage 5 |
+| A21 | **Ruled 15 Oct: yes.** `import:` opens a file and says what it is before anything happens. A backup is handed to `restore:`. A room file, when those exist, adds a room | Stage 9 |
 | A22 | **Ruled 15 Oct: yes.** One command runs tests, lint and build. The same check runs on every pull request once there is a repository it can be pushed to. The new core modules carry JSDoc types | Stages 1, 15 |
 | A23 | **Ruled 15 Oct: yes.** Existing "Pin for reference" records are shown as quotes of a whole message. Nothing is converted or lost | Stage 6 |
 
@@ -308,6 +308,7 @@ Your first target. The page is the lesson: every step is a real command.
   - `focus:` and `focus:off` in their first form: the chat alone, and back.
   - `tour:`, `tour:off` (A20).
   - One line on small or touch-only screens: "built for a computer for now; the phone comes later".
+  - Before this stage ships: a plain-language pass over every name a newcomer meets (Almanac, Docket, Collection, collab, term, quote, the short board titles in the strip), made in the copy table, with you (A6).
 - **Changed:** `/` shows the welcome page to someone new and the Almanac to someone with work. Links carry numbers (`/207`); old links still resolve.
 - **Salvaged:** `IgnitionStep.jsx`'s key check and `useShimmer.js`; the pin-first ordering and search from `SelectorLayout.jsx`; `LibraryCard`, `LayoutSilhouette` and the pure helpers in `EditorLibraryMode.jsx`. **Rebuilt:** the catalogue read layer.
 - **Security and privacy:** no key is ever typed into the bar; `api:` opens a panel with a password field that password managers are told to leave alone, and a line that looks like a key is refused before Enter. The footer says "MIT licensed. Source published at launch" until the repository is public (C71). The letter's sentence about where requests go reads true for every provider.
