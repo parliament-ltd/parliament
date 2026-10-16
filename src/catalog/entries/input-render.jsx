@@ -48,6 +48,7 @@ import { getProvider } from '../../providers'
 import { loadApiKey } from '../../lib/crypto'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
 import { useIsNarrow } from '../../lib/useViewportWidth'
+import { checkOnDeviceVoice } from '../../hooks/useVoiceInput'
 import {
   attachmentToContentBlock,
   formatTextAttachmentForMessage,
@@ -85,11 +86,23 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
   // Recomputes when the mode (and therefore the list) changes — hostAPI
   // is keyed off mode.id in RoomShell so the identity is stable for
   // the duration of a room view.
+  // The voice block's microphone shows only where the browser can transcribe
+  // on the device (ruling C70). Hidden until the browser says it can.
+  const [voiceOk, setVoiceOk] = useState(false)
+  useEffect(() => {
+    const offersVoice = (hostAPI?.getInputActions?.() || []).some(a => a.id === 'voice-toggle')
+    if (!offersVoice) return
+    let cancelled = false
+    checkOnDeviceVoice().then(s => { if (!cancelled) setVoiceOk(s !== 'unavailable') })
+    return () => { cancelled = true }
+  }, [hostAPI])
+
   const { rightPrimaryAction, overflowActions } = useMemo(() => {
     const list = hostAPI?.getInputActions?.() || []
     let primary = null
     const overflow = []
     for (const action of list) {
+      if (action.id === 'voice-toggle' && !voiceOk) continue
       if (action.primary === 'right' && primary === null) {
         primary = action
       } else if (!action.primary) {
@@ -97,7 +110,7 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
       }
     }
     return { rightPrimaryAction: primary, overflowActions: overflow }
-  }, [hostAPI])
+  }, [hostAPI, voiceOk])
 
   // PR-18b: when InputArea invokes a contributed action, publish on the
   // hostAPI bus so the contributing component (e.g. voice-input@1.0

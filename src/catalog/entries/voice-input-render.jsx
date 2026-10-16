@@ -20,6 +20,10 @@
 // gate this behind its consent flow (per refactor/tier-classification.md
 // voice-transcription note).
 //
+// On the device only (ruling C70, refactor plan stage 1): useVoiceInput asks
+// the browser to transcribe locally and reports 'unavailable' where it can
+// only do so by sending audio away. The button says which, in its title.
+//
 // NQ-6 (audit §5.1) calls for an empty state when no input subscriber
 // is mounted. Detection requires the bus to expose subscriber counts;
 // hostAPI doesn't surface that today, so this component silently
@@ -34,12 +38,14 @@ import { PHASE_1_EVENTS } from '../../lib/hostAPI'
 import { SPRING_SNAPPY } from '../../lib/constants'
 import { useIsNarrow } from '../../lib/useViewportWidth'
 
+const VOICE_OFF_NOTE = 'Voice is off in this browser. Here it would mean sending your audio to the browser\'s maker.'
+
 export default function VoiceInputRender({ config = {}, hostAPI } = {}) {
   const lang = config.lang ?? 'en-US'
 
   const [lastError, setLastError] = useState(null)
 
-  const { isListening, isSupported, error, start, stop } = useVoiceInput({
+  const { status, isListening, isSupported, error, start, stop } = useVoiceInput({
     lang,
     onTranscript: (text, isFinal) => {
       if (!text) return
@@ -64,7 +70,7 @@ export default function VoiceInputRender({ config = {}, hostAPI } = {}) {
     const unsubscribe = hostAPI.subscribe('input-action:voice-toggle', toggle)
     return unsubscribe
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hostAPI, isSupported, isListening])
+  }, [hostAPI, isSupported, isListening, status])
 
   // PR-18b: on narrow viewports (<768px) input@1.0 renders the mic
   // button itself inside its card layout (driven by this component's
@@ -83,7 +89,7 @@ export default function VoiceInputRender({ config = {}, hostAPI } = {}) {
     return (
       <div
         className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-[var(--p-border)] text-[var(--p-text-muted)] bg-white"
-        title="Voice input not supported in this browser"
+        title={status === 'checking' ? 'Checking voice input' : VOICE_OFF_NOTE}
         aria-disabled="true"
       >
         <MicOff className="w-4 h-4" />
@@ -105,11 +111,17 @@ export default function VoiceInputRender({ config = {}, hostAPI } = {}) {
             : 'border-[var(--p-border)] text-[var(--p-text-secondary)] bg-white hover:border-[var(--p-accent-gold,#B8A070)] hover:text-[var(--p-text-primary)]'
         }`}
         title={
-          lastError
-            ? `Mic error: ${lastError}`
-            : isListening
-              ? 'Stop listening'
-              : 'Start voice input'
+          lastError === 'install-failed'
+            ? 'Could not set up voice input. Try again later.'
+            : lastError
+              ? `Mic error: ${lastError}`
+              : isListening
+                ? 'Stop listening'
+                : status === 'downloadable'
+                  ? 'Set up voice input: your browser downloads a language pack once, then speech stays on this device'
+                  : status === 'downloading'
+                    ? 'Downloading the language pack for voice input'
+                    : 'Start voice input. Transcribed on this device; no audio leaves it.'
         }
         aria-pressed={isListening}
         aria-label={isListening ? 'Stop voice input' : 'Start voice input'}
