@@ -196,7 +196,7 @@ still at version 5.
 
 ### Stage 1. Groundwork
 
-**Status, 15 October:** done except the spreadsheet library, which waits for a yes to fetch `xlsx-0.20.3.tgz` (2.4 MB, the newest version) from the vendor. `npm run check` passes: 37 tests, no lint errors (29 Fast Refresh warnings), build. Known lint findings in components the plan reworks are marked at the line with their stage.
+**Status, 15 October: done.** `npm run check` passes: 41 tests, no lint errors (29 Fast Refresh warnings), build. Known lint findings in components the plan reworks are marked at the line with their stage. The production audit is clean.
 
 Small, independent fixes that everything later leans on. Nothing here changes
 how the app looks.
