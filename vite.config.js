@@ -86,6 +86,11 @@ export default defineConfig({
   // The deployed policy, applied to `vite preview` so a production build is
   // tried under it before deploy. Not applied to the dev server (see
   // src/lib/securityHeaders.js).
+  // Workers are built as ES modules (the spreadsheet reader imports SheetJS).
+  worker: {
+    format: 'es',
+  },
+
   preview: {
     headers: SECURITY_HEADERS,
   },

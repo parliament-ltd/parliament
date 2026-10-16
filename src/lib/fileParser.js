@@ -16,7 +16,6 @@
  */
 
 import Papa from 'papaparse'
-import * as XLSX from 'xlsx'
 
 // ─── Type Inference ───────────────────────────────────────
 
@@ -72,22 +71,46 @@ function parseCSVText(text, delimiter = ',') {
 }
 
 // ─── XLSX Parsing ─────────────────────────────────────────
+//
+// SheetJS (vendored 0.20.3, see vendor/README.md) runs in a worker made for
+// one file and then thrown away. It is never loaded into the page, a file over
+// the size limit is refused before it is read, and a read that takes too long
+// is stopped. Restored backups reach this path too, so it must hold up against
+// a crafted file.
 
-function parseXLSXBuffer(arrayBuffer) {
-  const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true })
-  const sheetName = workbook.SheetNames[0]
-  const sheet = workbook.Sheets[sheetName]
+const MAX_SPREADSHEET_BYTES = 20 * 1024 * 1024
+const SPREADSHEET_TIMEOUT_MS = 20000
 
-  const json = XLSX.utils.sheet_to_json(sheet, { defval: null, raw: false })
-  if (json.length === 0) return { headers: [], rows: [], columnTypes: {} }
-
-  const headers = Object.keys(json[0]).map(h => String(h).trim())
-  const rows = json.map(row => {
-    const clean = {}
-    for (const h of headers) clean[h] = row[h] ?? null
-    return clean
+function readSpreadsheet(arrayBuffer) {
+  if (arrayBuffer.byteLength > MAX_SPREADSHEET_BYTES) {
+    return Promise.reject(new Error('This spreadsheet is larger than 20 MB, which is the limit for now.'))
+  }
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(new URL('./spreadsheetWorker.js', import.meta.url), { type: 'module' })
+    const timer = setTimeout(() => {
+      worker.terminate()
+      reject(new Error('Reading this spreadsheet took too long, so it was stopped.'))
+    }, SPREADSHEET_TIMEOUT_MS)
+    const finish = () => { clearTimeout(timer); worker.terminate() }
+    worker.onmessage = (event) => {
+      finish()
+      const { ok, headers, rows, error } = event.data || {}
+      if (ok) resolve({ headers, rows })
+      else reject(new Error(error || 'This spreadsheet could not be read.'))
+    }
+    worker.onerror = () => {
+      finish()
+      reject(new Error('This spreadsheet could not be read.'))
+    }
+    // A copy is handed over, so the caller's buffer stays usable.
+    const copy = arrayBuffer.slice(0)
+    worker.postMessage({ buffer: copy }, [copy])
   })
+}
 
+async function parseXLSXBuffer(arrayBuffer) {
+  const { headers, rows } = await readSpreadsheet(arrayBuffer)
+  if (rows.length === 0) return { headers: [], rows: [], columnTypes: {} }
   const columnTypes = inferColumnTypes(headers, rows)
   return { headers, rows, columnTypes }
 }
@@ -100,11 +123,8 @@ function parseJSONText(text) {
   if (arr.length === 0) return { headers: [], rows: [], columnTypes: {} }
 
   const headers = Object.keys(arr[0]).map(h => String(h).trim())
-  const rows = arr.map(row => {
-    const clean = {}
-    for (const h of headers) clean[h] = row[h] ?? null
-    return clean
-  })
+  // Own properties only, so a key named "__proto__" stays a column.
+  const rows = arr.map(row => Object.fromEntries(headers.map(h => [h, row[h] ?? null])))
 
   const columnTypes = inferColumnTypes(headers, rows)
   return { headers, rows, columnTypes }
@@ -125,7 +145,7 @@ export async function parseFile(file) {
 
   if (ext === 'xlsx' || ext === 'xls') {
     const buffer = await file.arrayBuffer()
-    parsed = parseXLSXBuffer(buffer)
+    parsed = await parseXLSXBuffer(buffer)
   } else if (ext === 'tsv') {
     const text = await file.text()
     parsed = parseCSVText(text, '\t')
@@ -207,7 +227,7 @@ export async function compressForStorage(file) {
  */
 export async function decompressFromStorage(storedBuffer, type) {
   if (type === 'xlsx' || type === 'xls') {
-    return parseXLSXBuffer(storedBuffer)
+    return await parseXLSXBuffer(storedBuffer)
   }
 
   // Decompress gzip → text
