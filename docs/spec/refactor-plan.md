@@ -92,9 +92,9 @@ written. None is built until its stage. Strike any you disagree with.
 
 | # | Assumption | Affects |
 |---|---|---|
-| A1 | The ten changes by date in `conflicts.md` table 5a hold (no dotted borders, `api:` everywhere, every board opens by name, and so on) | Stages 3 to 5 |
+| A1 | The ten changes by date in `conflicts.md` table 5a hold. **Ruled 15 Oct for 1 to 5 and 10:** follow the newest HTML mockups; `open:` takes a chat's number or its name; `key:` is kept free for a possible sharing feature. 6 to 9 still open | Stages 3 to 5 |
 | A2 | The Lab is built to v7: the Blocks board, with small reversible changes applied on click (C38) | Stage 13 |
-| A3 | One Escape rule: it steps toward the mode a screen rests in, then clears, then returns you to what you were doing (C44) | Stage 3 |
+| A3 | **Revised 15 Oct after Stefan's review, not yet ruled.** Escape never deletes text. It takes the field to the mode the screen rests in, keeping what you typed in the mode you left; in the resting mode it returns you to what you were doing. Backspace leaves a mode only by deleting a leader you can see: deleting the `>` leaves command mode (C44) | Stage 3 |
 | A4 | `hold:` and `hold:off` mean "keep this from going until I say", for branches and for edits (C45) | Stages 10, 11 |
 | A5 | `strain:` is not built until you say what it shows (C48) | none |
 | A6 | The table board is called Almanac, not History, until you decide (C52) | Stage 5 |
@@ -102,19 +102,19 @@ written. None is built until its stage. Strike any you disagree with.
 | A8 | The second keyless source for the advanced list is Hacker News (C55) | Stage 7 |
 | A9 | A prompt that has been answered stays locked as a record; editing it marks it up and "ask again" makes a new branch (C61) | Stage 11 |
 | A10 | The Lab saves on every command, with `undo:` as the way back. A room holds one of each block (C63) | Stage 13 |
-| A11 | The notice that a new version of the app is ready is built fresh. The three commits stranded on `refactor/main` change files that no longer exist, so nothing can be brought over (C65) | Stage 1 |
+| A11 | **Ruled 15 Oct: yes.** The notice that a new version of the app is ready is built fresh. The three commits stranded on `refactor/main` change files that no longer exist, so nothing can be brought over (C65) | Stage 1 |
 | A12 | Web search is a feature of input, shown in the prompt field and named on the Enter line each time it goes (C66) | Stage 4 |
-| A13 | Personas become "yours" collabs, all switched off, listed in the dry run (C67) | Stages 2, 7 |
+| A13 | **Ruled 15 Oct: yes, and to be looked at again at stage 7.** Personas become "yours" collabs, all switched off, listed in the dry run (C67) | Stages 2, 7 |
 | A14 | The picker follows the branch slider: two groups, Models and Sources (C75) | Stage 7 |
-| A15 | "One after another" with conditions comes after the docket can run; the step record gets its condition field in the one upgrade (C76) | Stages 2, 10 |
+| A15 | **Ruled 15 Oct: yes.** "One after another" with conditions comes after the docket can run; the step record gets its condition field in the one upgrade (C76) | Stages 2, 10 |
 | A16 | Collection tabs: All, Highlights, Terms, Quotes, Notes, Edits, Asks, Suggestions, each shown only when it holds something (C77) | Stage 6 |
 | A17 | A row's summary line can be rewritten with `summarize:`; a summary note in a collection is dated and fixed (C79) | Stage 6 |
 | A18 | `heading:` in a collection; `erase:201c` and `erase:201c all`; `forget:` for a saved arrangement (C80) | Stages 6, 14 |
-| A19 | Terms and quotes take numbers like edits do, and are rows only when filtered for | Stage 2 |
+| A19 | **Ruled 15 Oct: yes, to be looked at again later.** Terms and quotes take numbers like edits do, and are rows only when filtered for. Terms must still be found by search in the Almanac | Stage 2 |
 | A20 | `tour:` takes over from `list:`: `tour:` shows the steps, `tour:off` puts them away, `tour:advanced` shows the second list. `list:` answers "That verb is now tour:" | Stage 5 |
 | A21 | `import:` opens a file and says what it is before anything happens. A backup is handed to `restore:`. A room file, when those exist, adds a room | Stage 9 |
-| A22 | One command runs tests, lint and build. The same check runs on every pull request once there is a repository it can be pushed to. The new core modules carry JSDoc types | Stages 1, 15 |
-| A23 | Existing "Pin for reference" records are shown as quotes of a whole message. Nothing is converted or lost | Stage 6 |
+| A22 | **Ruled 15 Oct: yes.** One command runs tests, lint and build. The same check runs on every pull request once there is a repository it can be pushed to. The new core modules carry JSDoc types | Stages 1, 15 |
+| A23 | **Ruled 15 Oct: yes.** Existing "Pin for reference" records are shown as quotes of a whole message. Nothing is converted or lost | Stage 6 |
 
 ## 4. What gets built once
 
@@ -343,7 +343,7 @@ Can start as soon as stage 4 is done, beside stages 5 and 6.
 - **Salvaged:** the five presets and `buildSystemPrompt`'s join from Collaboration mode. **New:** stored collabs and the record on each reply.
 - **Security and privacy:** each key goes only to its own provider's fixed address. The policy lists each host exactly, and localhost by exact port. The page connects only to providers you have set up. Settings tells people to allow Parliament's own address in Ollama, not every site. Collabs and personas that arrive in a restored file are shown before they are applied.
 - **You can try:** the same question to Mistral, a local model and Hacker News; `collab:pushback`.
-- **Needs from you:** the cost marks for the newer models (C34), and A8, A13, A14. R22 and R23 are put to you here.
+- **Needs from you:** the cost marks for the newer models (C34), A8 and A14, and a second look at how personas came across (A13). R22 and R23 are put to you here.
 
 ### Stage 8. Branches
 
