@@ -92,9 +92,9 @@ written. None is built until its stage. Strike any you disagree with.
 
 | # | Assumption | Affects |
 |---|---|---|
-| A1 | The ten changes by date in `conflicts.md` table 5a hold. **Ruled 15 Oct for 1 to 5 and 10:** follow the newest HTML mockups; `open:` takes a chat's number or its name; `key:` is kept free for a possible sharing feature. 6 to 9 still open | Stages 3 to 5 |
+| A1 | The ten changes by date in `conflicts.md` table 5a hold. **Ruled 15 Oct, all ten.** Follow the newest HTML mockups; `open:` takes a chat's number or its name; `key:` is kept free for a possible sharing feature | Stages 3 to 5 |
 | A2 | The Lab is built to v7: the Blocks board, with small reversible changes applied on click (C38) | Stage 13 |
-| A3 | **Revised 15 Oct after Stefan's review, not yet ruled.** Escape never deletes text. It takes the field to the mode the screen rests in, keeping what you typed in the mode you left; in the resting mode it returns you to what you were doing. Backspace leaves a mode only by deleting a leader you can see: deleting the `>` leaves command mode (C44) | Stage 3 |
+| A3 | **Ruled 15 Oct, as revised.** Escape never deletes text. It takes the field to the mode the screen rests in, keeping what you typed in the mode you left; in the resting mode it returns you to what you were doing. Backspace leaves a mode only by deleting a leader you can see: deleting the `>` leaves command mode (C44) | Stage 3 |
 | A4 | `hold:` and `hold:off` mean "keep this from going until I say", for branches and for edits (C45) | Stages 10, 11 |
 | A5 | `strain:` is not built until you say what it shows (C48) | none |
 | A6 | The table board is called Almanac, not History, until you decide (C52) | Stage 5 |

@@ -109,7 +109,8 @@ Line numbers are approximate.
 
 - **From the plan's assumptions:** A11, A13, A15, A19, A22 and A23 accepted as written. A13 (personas) and A19 (terms are numbered but not rows by default, and must still be found by search) are to be looked at again.
 - **A1, items 1 to 5 and 10.** Follow the newest HTML mockups. `open:` takes a chat's number or its name; a name that matches several chats makes the Enter line list them. `api:` everywhere; `key:` is kept free for a possible sharing feature if Parliament ever has several users.
-- **C44, Escape, still open.** Stefan: Escape should not delete text; it is a quick way to the resting mode and back. Backspace deleting the `>` should change the mode.
+- **C44. Escape and Backspace.** Escape never deletes text. It takes the field to the resting mode of the screen (search on the Almanac and the welcome page, prompt in a room and a docket), and what was typed stays with the mode that was left, so typing `>` again brings back an unfinished command. In the resting mode, Escape returns you to what you were doing. Backspace only deletes text; deleting the `>` leaves command mode. In prompt mode the `p>` is swallowed, so Backspace in an empty prompt does nothing.
+- **A1, items 6 to 9 (table 5a, P6, P7, P8, P9):** accepted as written. Part 5a is now ruled in full.
 
 - **DNS is with deSEC,** signed with DNSSEC, and no longer tied to Netlify. Mail is with Proton Mail, which holds `stef@parliament.ltd`. `support@parliament.ltd` is added as a second address for anything public; `stef@` stays the default. Records are in `docs/hosting.md`.
 
