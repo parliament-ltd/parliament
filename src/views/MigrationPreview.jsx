@@ -240,7 +240,7 @@ function Report({ report, source }) {
             never changed what the model was sent, so nothing should start behaving differently by itself.
           </Explain>
           {report.collabs.map((p, i) => (
-            <Line key={i}><span style={{ fontWeight: 500 }}>{p.name}</span> <span style={{ color: C.ink2 }}>{p.excerpt}</span></Line>
+            <Line key={i}><span style={{ fontWeight: 500 }}>{p.name ?? <Marg>untitled</Marg>}</span> <span style={{ color: C.ink2 }}>{p.excerpt}</span></Line>
           ))}
         </Card>
       )}
@@ -280,12 +280,12 @@ function DocketRows({ d }) {
     <>
       <tr style={{ borderTop: `.5px solid ${C.border}` }}>
         <td style={{ padding: '10px 12px 4px' }}><Mono>{d.num}</Mono></td>
-        <td colSpan={6} style={{ padding: '10px 12px 4px', fontWeight: 500 }}>{d.title}</td>
+        <td colSpan={6} style={{ padding: '10px 12px 4px', fontWeight: 500 }}>{d.title ?? <Marg>untitled</Marg>}</td>
       </tr>
       {d.branches.map((b) => (
         <tr key={b.address} style={{ color: C.ink }}>
           <td style={{ padding: '3px 12px 3px 24px' }}><Mono>{b.address}</Mono></td>
-          <td style={{ padding: '3px 12px' }}>{b.name}</td>
+          <td style={{ padding: '3px 12px' }}>{b.name ?? <Marg>untitled</Marg>}</td>
           <td style={{ padding: '3px 12px' }}><Mono>{b.chatNum}</Mono></td>
           <td style={{ padding: '3px 12px', font: `italic 400 12px ${C.serif}`, color: C.ink2 }}>{b.room || 'no room'}</td>
           <td style={{ padding: '3px 12px' }}>{b.steps}{b.paused ? <span style={{ color: C.ink3 }}>{`, ${b.paused} cut off`}</span> : null}</td>

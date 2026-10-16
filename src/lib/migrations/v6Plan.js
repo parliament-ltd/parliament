@@ -27,6 +27,11 @@
 //   8. Tags on chats were all written by the model, and are marked so.
 //   9. A saved API key moves out of the settings into the key store. Backups
 //      never contain keys, so this shows only when planning this browser.
+//
+// Stored data holds keys and ids, never words of the interface, so a backup
+// made in one language restores correctly in another (languages document
+// §5, 16 October). A built-in name is a key (builtIn: 'favorites'), and a
+// missing title or name is null for the interface to fill in.
 
 import { FIRST_NUM, letterAt } from '../addresses'
 import { STATUS, branchStatus } from '../docketModel'
@@ -96,7 +101,7 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
     dockets.push({
       id: docketId,
       num: null,
-      title: root.title || 'Untitled',
+      title: root.title || null,
       createdAt: root.createdAt,
       updatedAt: ordered.reduce((max, c) => (c.updatedAt > max ? c.updatedAt : max), root.updatedAt || root.createdAt),
       pinned: false,
@@ -132,7 +137,8 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
   const collections = favoriteItems.length
     ? [{
         id: newId(),
-        name: 'Favorites',
+        name: null,
+        builtIn: 'favorites',
         description: '',
         items: favoriteItems,
         headings: [],
@@ -236,7 +242,7 @@ function collabsFromPersonas(settings, { newId, now }) {
     }
     collabs.push({
       id: newId(),
-      name: String(p.title || 'Untitled').trim().slice(0, 120) || 'Untitled',
+      name: String(p.title || '').trim().slice(0, 120) || null,
       instruction,
       builtIn: false,
       on: false,
@@ -294,8 +300,8 @@ function pickRoot(members, convById) {
 }
 
 function branchName(c, isRoot) {
-  const title = c.title || 'Untitled'
-  return isRoot ? title : title.replace(BRANCH_PREFIX, '') || title
+  if (!c.title) return null
+  return isRoot ? c.title : c.title.replace(BRANCH_PREFIX, '') || c.title
 }
 
 // ── Steps ────────────────────────────────────────────────

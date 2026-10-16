@@ -683,6 +683,64 @@ wording, the two links, step 8, small screens), W9 §7, E "Open questions"
 reach, calm by default, focus per room), B "Still open" (quill colour, shared
 docs).
 
+## Part 6. Languages, providers and networks (added 16 October 2026)
+
+From `parliament-languages-providers-networks.md` (**LPN**), dated 16 October,
+the newest document. Its §0 records two decisions Stefan confirmed that day:
+multi-language support is part of this refactor (groundwork, choosing a
+language, reply language), and so are more providers, Mistral included.
+
+**C81. The document's frame.**
+- LPN is written against the old V2 plan: "Phase 1", and six V2 documents it says win over it (`parliament-v2-brief.md`, `parliament-v2-refactor-scope.md` and four more). None of the six is in the repository. CLAUDE.md says the old refactor is not a source of requirements.
+- **Suggestion:** read LPN as a current spec document. Its decisions map onto the plan's stages; its references to V2 documents, "Agent-tier consent", the "model-picker field type" and commands such as `spread:` and `map:` are read as the nearest thing in this plan (the Enter line as consent, the picker of A14, today's verbs).
+
+**C82. Mistral from the browser: allowed.**
+- LPN §7.1 calls browser access unverified and cites a third-party report that it is blocked, with a native shell or a server relay as fallbacks.
+- Tested on 16 October from origin `https://parliament.ltd`: `api.mistral.ai`, `api.eu.mistral.ai` and `api.us.mistral.ai` all answer the preflight with `access-control-allow-origin: *` and allow the `Authorization` header. The same was found on 23 September.
+- **Suggestion:** no fallback is needed. A streaming test with a real key still comes first in stage 7. The three hosts go into the policy when Mistral ships.
+
+**C83. Counting tokens before Enter.**
+- LPN §3: use Anthropic's counting endpoint before sending, for real counts.
+- Rule 1 of the plan: nothing leaves the device before Enter. The counting endpoint receives the whole prompt.
+- **Suggestion:** the Enter line shows a local estimate before Enter; real counts come from each reply's usage figures after, for every provider.
+
+**C84. The browser's own page translation.**
+- Stefan, 16 October: concerned that Google Translate works against Parliament's privacy. When someone uses Chrome's built-in "Translate", the page's text, chats included, is sent to Google to be translated.
+- LPN plans real translations of the interface, so nobody needs the browser's.
+- **Suggestion:** the app opts out of page translation (`<meta name="google" content="notranslate">`, and `translate="no"` on the page), from when the first real translation ships, so nobody is left without a way to read it meanwhile. Any translation inside Parliament (a source result, a query) uses, in order: the browser's on-device translation where it exists, a model on your machine, or the provider you chose with its cost on the Enter line. Never a translation service in the background.
+
+**C85. Consent for query translation.**
+- LPN §6 and open question 6: query translation is probably "Agent-tier" and needs the V2 consent flow.
+- In this plan the Enter line is the consent: it names every recipient and cost before anything goes.
+- **Suggestion:** translating a query is one more line on the Enter line ("and translates your query with {model}, one small call"), off unless chosen.
+
+**C86. Interface words in stored data.**
+- LPN §5: mode files and backups store keys and ids, never translated strings.
+- The migration planner wrote "Favorites" and "Untitled" into data.
+- **Done, 16 October:** the Favorites collection is stored as a built-in key (`builtIn: 'favorites'`), and a missing title or name is stored as empty for the interface to fill in. A test checks that no interface word is written.
+
+**C87. Where the language work goes in the plan.**
+- **Suggestion:**
+  - Stage 3 (shell and bar): the copy table is the translation catalogue from day one, with plurals that work in every language, dates and numbers through the browser's `Intl`, layout written to mirror for right-to-left scripts, `dir="auto"` on every message, a pseudo-language for testing, and a lint rule against hard-coded words.
+  - Stage 5 (welcome page): built and checked in the pseudo-language, so no word is left untranslatable; shipped in English first.
+  - Stage 7: "Reply in", added to the prompt for every provider and named on the Enter line; Mistral; language tags on models in the picker; English-only badges on sources.
+  - Stage 9: the language picker in Settings, defaulting to the browser's languages, never to the network address.
+  - First real languages (LPN suggests Arabic and Japanese, which test layouts hardest) once native reviewers are found.
+- The choice of translation library (react-i18next or Lingui) is made at stage 3.
+
+**C88. Safari can delete local data.**
+- LPN §9: Safari deletes a site's stored data after seven days of browser use without a visit, unless installed (unverified).
+- **Suggestion:** ask the browser to keep Parliament's storage (`navigator.storage.persist()`) once there is something to keep, show the answer in Settings, and nudge a backup after a few days without one. The request moves to stage 2, since it protects the data the upgrade produces.
+
+**C89. Smaller items from LPN, each placed in a stage.**
+- Chrome asks permission before a site reaches `localhost`, and a refusal is permanent until undone in site settings: an explanation before the first Ollama request and a recovery screen (stage 7).
+- Never infer language or location from the network address (all stages; no change needed today).
+- A stalled stream through a buffering proxy falls back to a request without streaming (stage 4).
+- "This source isn't reachable from your current network", for sources that refuse VPN addresses (stage 7).
+- The privacy list says which sources see the network address (`privacy-copy-draft.md`).
+- Feature detection, never the browser's name, and a fallback instead of a missing feature: pop-outs in Safari open as ordinary windows, and the Enter line says so (stage 3).
+- Kiwix: still later. Kiwix's own reader is GPL-3.0 and cannot be bundled with MIT code (LPN §7.4).
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

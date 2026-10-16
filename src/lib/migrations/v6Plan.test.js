@@ -68,9 +68,11 @@ describe('planV6Migration on the fixture', () => {
     for (const t of plan.termUpdates) expect(t).toMatchObject({ kind: 'term' })
   })
 
-  it('puts favourites into a collection called Favorites, and makes no highlights from them', () => {
+  it('puts favourites into the built-in Favorites collection, and makes no highlights from them', () => {
     expect(plan.collections).toHaveLength(1)
-    expect(plan.collections[0].name).toBe('Favorites')
+    // A key, not an English word, so the name follows the interface language.
+    expect(plan.collections[0].name).toBeNull()
+    expect(plan.collections[0].builtIn).toBe('favorites')
     expect(plan.collections[0].items).toEqual([
       { kind: 'message', conversationId: 'conv-fork', messageId: 'm4', addedAt: '2026-08-02T09:06:00.000Z', fromFavorite: 'f1' },
     ])
@@ -153,6 +155,13 @@ describe('planV6Migration edge cases', () => {
     const plan = planV6Migration({ settings: [{ key: 'parliament-api-key', value: { ciphertext: [1, 2, 3], iv: [4] } }] }, { newId: counter() })
     expect(plan.keyMove).toEqual({ provider: 'anthropic', fromSetting: 'parliament-api-key' })
     expect(JSON.stringify(plan.report)).not.toContain('ciphertext')
+  })
+
+  it('stores no interface words: a missing title stays empty for the interface to fill', () => {
+    const plan = planV6Migration({ conversations: [conv('a', '2026-01-01', { title: '' })] }, { newId: counter() })
+    expect(plan.dockets[0].title).toBeNull()
+    expect(plan.dockets[0].branches[0].name).toBeNull()
+    expect(JSON.stringify(plan)).not.toContain('Untitled')
   })
 
   it('does not touch anything when there is nothing to migrate', () => {

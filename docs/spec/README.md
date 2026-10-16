@@ -19,6 +19,7 @@ ones written inside each document.
 | 6 Oct | `welcome-inline-editing-spec.md` | Welcome v9: editable replies, strike, note for the AI, two more steps | `parliament_welcome_v9.html` |
 | 6 Oct | `editing-in-place-spec.md` | Editing replies and prompts, asks, Ripple, the Collection's cards, collab, Reflection, sweeps, focus, calm, legibility | `parliament-inline-editing-v5.html` |
 | 7 Oct, updated 9 Oct | `bar-and-commands-decisions.md` | The field, minimising to a hexagon, gold, seven renamed verbs, the command inventory | `parliament-bar-reference.html` |
+| 16 Oct | `parliament-languages-providers-networks.md` | Languages (interface, reply language, right-to-left and other scripts), sources by language, Mistral and its regional hosts, local models, the PWA or a native app, networks and VPNs, browser support. Written against the old V2 plan: see C81 | none |
 
 ### Mockups supplied later on 11 October
 
