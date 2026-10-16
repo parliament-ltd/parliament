@@ -107,6 +107,9 @@ Line numbers are approximate.
 
 **15 October 2026:**
 
+- **`delete:` points to `erase:`.** Typing `delete:207` removes nothing: it answers "To remove something for good, use erase:" and fills in `erase:207` for Enter. One word stays destructive.
+- **Found while testing the dry-run screen:** the start-up check that removes chats with no messages can remove a chat whose messages are still being written. A real restore writes chats and messages in separate steps, so another tab starting up in the middle of a restore could lose a restored chat. Fixed with the restore work in stage 2 (one write path, chats and their messages written together).
+
 - **From the plan's assumptions:** A11, A13, A15, A19, A22 and A23 accepted as written. A13 (personas) and A19 (terms are numbered but not rows by default, and must still be found by search) are to be looked at again.
 - **A1, items 1 to 5 and 10.** Follow the newest HTML mockups. `open:` takes a chat's number or its name; a name that matches several chats makes the Enter line list them. `api:` everywhere; `key:` is kept free for a possible sharing feature if Parliament ever has several users.
 - **Round three of the plan's assumptions.** A2: the Lab is built to v7 (settles C38). A4, A7, A9, A10, A18: accepted. A5: `strain:` is cut; it was about site performance (settles C48). Every assumption in `refactor-plan.md` section 3 is now ruled.
