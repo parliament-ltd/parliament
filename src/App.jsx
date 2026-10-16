@@ -21,6 +21,7 @@ import EditorView from './views/EditorView'
 import BuildView from './views/BuildView'
 import ErrorBoundary from './components/ErrorBoundary'
 import DbStateNotice from './components/DbStateNotice'
+import UpdateNotice from './components/UpdateNotice'
 
 // Dev-only catalog inspection surface (PR-2). Lazy-imported and registered
 // only when import.meta.env.DEV is true so production builds don't ship the
@@ -60,6 +61,7 @@ export default function App() {
                 <BranchShortcutHandler />
                 <BlueprintOverlay />
                 <DbStateNotice />
+                <UpdateNotice />
                 <Routes>
                   <Route path="/" element={<ErrorBoundary inline><HomepageView /></ErrorBoundary>} />
                   <Route path="/chats" element={<ErrorBoundary inline><SelectorView /></ErrorBoundary>} />

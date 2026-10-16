@@ -34,11 +34,19 @@ export function PWAProvider({ children }) {
   // exposes reactive state for the update flow.
   // needRefresh[0] becomes true when a new SW is waiting to activate.
   const {
-    needRefresh: [needRefresh, setNeedRefresh],
+    needRefresh: [needRefresh],
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
       console.log('[PWA] Service worker registered:', r?.scope ?? 'unknown scope')
+      // A tab that stays open never navigates, so the browser would not look
+      // for a new version on its own. Ask once an hour; the request goes to
+      // this site only.
+      if (r) {
+        setInterval(() => {
+          if (navigator.onLine) r.update().catch(() => {})
+        }, 60 * 60 * 1000)
+      }
     },
     onRegisterError(err) {
       console.warn('[PWA] Service worker registration failed:', err)
@@ -56,11 +64,6 @@ export function PWAProvider({ children }) {
     // true = reload the page after the new SW activates
     updateServiceWorker(true)
   }, [updateServiceWorker])
-
-  // Reset dismissed state whenever a fresh update arrives.
-  useEffect(() => {
-    if (needRefresh) setUpdateDismissed(false)
-  }, [needRefresh])
 
   // ── Install prompt ────────────────────────────────────────────────────────
   const installPromptRef  = useRef(null)
