@@ -249,6 +249,7 @@ until you have read the dry run and said go.**
   - Backups: format version 2, built from an allowlist of what may be exported. A file with no version reads as format 1 (C35).
   - One write path for records that announces each change, in this tab and across tabs.
 - **Salvaged:** the planner, the dry-run screen, the upgrade gate and the backup format chain from September. **New:** the lists above and the notifying write path.
+- **Also (16 October):** stored data holds keys and ids, never words of the interface, so a backup made in one language restores in another (C86, done in the planner). Branch letters skip i, l and o. Once there is data worth keeping, the browser is asked to keep Parliament's storage, which matters most in Safari (C88). A restore writes each chat together with its messages, so a tab starting up meanwhile cannot remove a half-written chat.
 - **Security and privacy:** keys can no longer reach a backup. Restore stops trusting the file: only known settings are written, each record is rebuilt from checked fields, and file size and the key-stretching count are capped (audit T6).
 - **You can try:** the dry run. Export a backup, open `/dev/migration`, load the file. It lists every docket it would make, every number, every favourite, persona and term it would move, and anything it could not place. Then, on your word, the upgrade, with a backup offered first.
 - **Needs from you:** the dry run on your real data, and your eye on A13, A15 and A19.
@@ -269,6 +270,8 @@ The spine. Built behind a flag, so today's screens keep working underneath.
   - `?` and `help`, generated from the registry.
   - A history of commands. Commands only: never a prompt, a search, or a line shaped like a key.
   - The first steps toward the new stores: each board is told which conversation it shows, instead of reading the address bar, and stream state moves into a store.
+  - **Languages, from day one (C87):** the copy table is the translation catalogue, with plurals that work in every language; dates, numbers and money through the browser's `Intl`; layout written with start and end rather than left and right, so it mirrors for right-to-left scripts; `dir="auto"` on every message; a pseudo-language (and a mirrored one) for testing; a lint rule against hard-coded words. The library (react-i18next or Lingui) is chosen here. Commands stay English.
+  - Feature detection, never the browser's name. Where a feature is missing the Enter line says what happens instead: in Safari a pop-out opens as an ordinary window that does not stay on top.
 - **Changed:** the double binding of Cmd/Ctrl+Shift+B.
 - **Salvaged:** `addresses.js`, `bus.js`, the ignition animations (for `api:` later). **Rebuilt:** everything else here is new; no command layer exists.
 - **Security and privacy:** the history never stores content. Window titles and addresses carry numbers and kinds only. A popped window is blank, same-origin and never navigated, and takes its styles from the built stylesheet, not copied text, so the policy can lose `'unsafe-inline'`.
@@ -293,6 +296,8 @@ source has to work before the page can.
   - "Answered from" in the prompt field, and the Enter line naming where a prompt will go.
   - `name:` for the room.
   - One shared Markdown component in place of six set-ups.
+  - Before Enter, the line under the field shows a local estimate of the tokens; real counts are taken from each reply afterwards. Nothing is sent to count (C83).
+  - A reply that stalls behind a proxy that holds streamed answers falls back to a request without streaming.
 - **Salvaged:** `InputArea.jsx`'s feature logic, `fileUpload.js`, the stream parser and error mapping in `anthropic.js`, `networkLog.js`. **Rebuilt:** how a request reaches a provider (13 places read the key and 17 fetch a provider today).
 - **Security and privacy:** a prompt to Wikipedia is a search sent to a third party, so it is named before Enter and never sent while typing. Source requests carry no credentials. Source text is shown as text, never as HTML, and can never run a command. What is sent finally matches what is shown: hidden and deleted messages stop going out. A reply cut off by a limit or an error is marked as cut off. This stage closes audit findings T4 ("Don't save") and T8 (Markdown).
 - **You can try:** in a private window with no key: `>`, `bar:bottom`, `p>` and a question. The answer comes from Wikipedia. Then `name:"…"`.
@@ -312,6 +317,7 @@ Your first target. The page is the lesson: every step is a real command.
   - `tour:`, `tour:off` (A20).
   - One line on small or touch-only screens: "built for a computer for now; the phone comes later".
   - Before this stage ships: a plain-language pass over every name a newcomer meets (Almanac, Docket, Collection, collab, term, quote, the short board titles in the strip), made in the copy table, with you (A6).
+  - Built ready for translation and checked in the pseudo-language; shipped in English first. How people switch language (a globe beside the language's own name, `language:`) is settled before this stage (see `conflicts.md`, 16 October).
 - **Changed:** `/` shows the welcome page to someone new and the Almanac to someone with work. Links carry numbers (`/207`); old links still resolve.
 - **Salvaged:** `IgnitionStep.jsx`'s key check and `useShimmer.js`; the pin-first ordering and search from `SelectorLayout.jsx`; `LibraryCard`, `LayoutSilhouette` and the pure helpers in `EditorLibraryMode.jsx`. **Rebuilt:** the catalogue read layer.
 - **Security and privacy:** no key is ever typed into the bar; `api:` opens a panel with a password field that password managers are told to leave alone, and a line that looks like a key is refused before Enter. The footer says "MIT licensed. Source published at launch" until the repository is public (C71). The letter's sentence about where requests go reads true for every provider.
@@ -343,6 +349,11 @@ Can start as soon as stage 4 is done, beside stages 5 and 6.
   - The current model lineup with cost marks, and the picker in two groups with numbered boxes (A14).
   - The network log grouped by host, each named by who called it, with no query strings.
   - `collab:`: five built in, your own, stacking in the order ticked, kept until turned off, and named on each reply. `helper:` for the model that reads keyless-source text.
+  - **Reply in:** a language for replies, separate from the interface, added to the prompt for every provider and named on the Enter line.
+  - Mistral's three addresses (global, EU, US), with a processing-region setting and its price; dated model ids in rooms, never `-latest`; which company made each model; language tags on models; "English only" badges on sources.
+  - Translating a query or a result is opt-in and named on the Enter line, by the browser's on-device translation, a local model or the chosen provider (C84, C85).
+  - Before the first request to a model on this machine, an explanation of the browser's permission prompt; if it was refused, how to allow it again.
+  - "This source isn't reachable from your current network" for sources that refuse a VPN's address.
 - **Changed:** the model list and prices; a stored default model is checked against the provider's list. Citations a provider returns with a web search are kept and shown; today they are dropped.
 - **Salvaged:** the five presets and `buildSystemPrompt`'s join from Collaboration mode. **New:** stored collabs and the record on each reply.
 - **Security and privacy:** each key goes only to its own provider's fixed address. The policy lists each host exactly, and localhost by exact port. The page connects only to providers you have set up. Settings tells people to allow Parliament's own address in Ollama, not every site. Collabs and personas that arrive in a restored file are shown before they are applied.
@@ -373,6 +384,8 @@ Built to Settings v1. Can run beside stages 5 to 8.
   - `backup:`, `restore:` and `import:` (A21).
   - "Delete everything" that removes everything: both databases, the caches and the service worker. Its confirmation lists what will go, is armed by typing a word, offers a backup first, and says what it cannot reach (files you saved, what providers already hold). Other open tabs are told to close.
   - The switch for the title call, the "Don't save" option, text size, and the room for new dockets.
+  - The language picker, defaulting to the browser's languages and never to the network address. Whether the browser keeps Parliament's storage, and the last backup, shown plainly.
+  - First real languages, reviewed by Stefan: Japanese, Chinese, Swedish, Finnish (C87). When the first one ships, the app opts out of the browser's page translation (C84).
   - About, with the new privacy copy and the network log.
 - **Changed:** backups say plainly when they are not encrypted, use one minimum password length, and stretch a password further in new files. A "replace" restore offers what it is about to replace as a download first.
 - **Salvaged:** the storage estimate, reminder, danger zone and key check from `SettingsView.jsx`; `BackupRestoreModal`. **New:** the layout and the verbs.
@@ -466,6 +479,7 @@ Built to Lab v7 (A2). Can run beside the others once stage 3 exists.
   - Headers moved into a file that a second static host also reads, and a standby copy of the site deployed there.
   - Each release saved as a zip with a checksum.
   - Accounts: two-factor and stored recovery codes for GitHub, Netlify and the registrar.
+- **Browser support:** a table on the site and in Settings, kept from feature detection: what works in Chromium, Firefox, Safari and on phones, and what happens instead where something does not.
 - **You can try:** the public repository, and the site served from the standby.
 - **Done early, on 15 October:** DNS moved to deSEC with DNSSEC, and mail set up at Proton. The records are in `docs/hosting.md`.
 - **Needs from you:** a yes before the public push, which cannot be taken back. R31 is put to you here.

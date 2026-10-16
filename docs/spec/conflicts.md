@@ -120,6 +120,18 @@ Line numbers are approximate.
 
 - **DNS is with deSEC,** signed with DNSSEC, and no longer tied to Netlify. Mail is with Proton Mail, which holds `stef@parliament.ltd`. `support@parliament.ltd` is added as a second address for anything public; `stef@` stays the default. Records are in `docs/hosting.md`.
 
+**16 October 2026:**
+
+- **C83. A local estimate before sending; real counts after.** Nothing is sent without the user's consent, which is Enter.
+- **C84. The app opts out of the browser's page translation when the first real translation ships.** In-app translation uses the browser's on-device translation, a local model, or the chosen provider with its cost on the Enter line.
+- **C87. Language work goes where suggested** (groundwork in stage 3, welcome page translation-ready in stage 5, reply language in stage 7, the picker in stage 9). **The first languages to test are Japanese, Chinese, Swedish and Finnish,** which Stefan can review. Right-to-left support is still built into the groundwork and checked with a mirrored pseudo-language until a right-to-left language has a reviewer.
+- **C88. Accepted:** ask the browser to keep Parliament's storage once there is something to keep, show the answer in Settings, nudge backups.
+- **C49, extended. Branch letters skip i, l and o** (23 letters), because each reads as a digit beside a number.
+- **Proposed by Stefan, not yet settled: how people switch language.** A globe that opens a menu of languages; `language:japanese`; perhaps a languages board shown on first load. My suggestion, for discussion in the next session:
+  - `language:` works from the bar, accepting a code or a name in English or in the language itself (`language:ja`, `language:japanese`, `language:日本語`). The verb stays English, like every command; the Enter line answers in the language chosen.
+  - The globe is worth having: someone faced with a language they cannot read needs a sign they recognise. It sits beside the current language's own name ("🌐 English ▾") as marginalia at the top of the welcome page and in Settings, and opens the numbered picker listing languages by their own names, never flags.
+  - No board, and nothing in the way on first load. The browser already says which languages its user reads, so most people land in theirs; anyone else sees the globe straight away. A board is something you open, move and pop; a list of languages is a picker.
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it

@@ -5,22 +5,22 @@
 // FIRST_NUM and never reused, so a number alone says what it points at.
 // Branches are addressed, not numbered: the docket's number plus a letter
 // (201b). Letters are lower case (C49) and read in either case. They are
-// assigned at creation, never reshuffled and never reissued. i and o are
-// skipped, and past z they double (aa, ab, ...) with no limit. Steps are
-// ordinals inside a branch; the address stops at two levels. A run is never
-// part of an address.
+// assigned at creation, never reshuffled and never reissued. i, l and o are
+// skipped, since beside digits they read as 1 and 0 (l ruled 16 October).
+// Past z they double (aa, ab, ...) with no limit. Steps are ordinals inside a
+// branch; the address stops at two levels. A run is never part of an address.
 
 export const FIRST_NUM = 201
 
-// 24 letters: a to z without i and o.
-export const LETTERS = 'abcdefghjklmnpqrstuvwxyz'
+// 23 letters: a to z without i, l and o.
+export const LETTERS = 'abcdefghjkmnpqrstuvwxyz'
 
 // Kinds that draw from the shared counter. Edits, asks and suggestions are
 // numbered but appear in the Almanac only when filtered for, and so do terms
 // and quotes (C56, A19).
 export const NUMBERED_KINDS = Object.freeze(['chat', 'note', 'highlight', 'term', 'quote', 'docket', 'edit', 'ask', 'suggestion'])
 
-/** 0 -> a, 23 -> z, 24 -> aa, 25 -> ab ... (bijective base 24). */
+/** 0 -> a, 22 -> z, 23 -> aa, 24 -> ab ... (bijective base 23). */
 export function letterAt(index) {
   if (!Number.isInteger(index) || index < 0) throw new Error(`Bad letter index ${index}`)
   let n = index + 1
@@ -47,8 +47,8 @@ export function letterIndex(letters) {
 }
 
 // A number of three or more digits, optionally followed by letters from the
-// 24-letter set. Case-insensitive. Nothing after the letters: no step, no run.
-const ADDRESS = /^(\d{3,})([a-hj-np-z]+)?$/i
+// 23-letter set. Case-insensitive. Nothing after the letters: no step, no run.
+const ADDRESS = /^(\d{3,})([a-hjkmnp-z]+)?$/i
 
 /** '201' -> { num: 201, letter: null }; '201B' -> { num: 201, letter: 'b' }; else null. */
 export function parseAddress(text) {
