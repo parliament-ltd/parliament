@@ -85,23 +85,24 @@ Security and privacy, part of every stage (from `plan-brief.md` section 8 and
 Earlier rulings still in force are in `conflicts.md` (Rulings) and
 `inventory.md` (rulings 1 to 11).
 
-### Assumed, not ruled
+### Assumed, then ruled
 
-I have taken the register's suggestion on each of these so the plan could be
-written. None is built until its stage. Strike any you disagree with.
+I took the register's suggestion on each of these so the plan could be written.
+Stefan went through all of them on 15 October; each row now says
+how it was ruled.
 
 | # | Assumption | Affects |
 |---|---|---|
 | A1 | The ten changes by date in `conflicts.md` table 5a hold. **Ruled 15 Oct, all ten.** Follow the newest HTML mockups; `open:` takes a chat's number or its name; `key:` is kept free for a possible sharing feature | Stages 3 to 5 |
-| A2 | The Lab is built to v7: the Blocks board, with small reversible changes applied on click (C38) | Stage 13 |
+| A2 | **Ruled 15 Oct: v7.** The Lab is built to v7: the Blocks board, with small reversible changes applied on click (C38) | Stage 13 |
 | A3 | **Ruled 15 Oct, as revised.** Escape never deletes text. It takes the field to the mode the screen rests in, keeping what you typed in the mode you left; in the resting mode it returns you to what you were doing. Backspace leaves a mode only by deleting a leader you can see: deleting the `>` leaves command mode (C44) | Stage 3 |
-| A4 | `hold:` and `hold:off` mean "keep this from going until I say", for branches and for edits (C45) | Stages 10, 11 |
-| A5 | `strain:` is not built until you say what it shows (C48) | none |
+| A4 | **Ruled 15 Oct: yes.** `hold:` and `hold:off` mean "keep this from going until I say", for branches and for edits (C45) | Stages 10, 11 |
+| A5 | **Ruled 15 Oct: cut.** `strain:` was about site performance and is not needed now (C48) | none |
 | A6 | **Ruled 15 Oct: yes for now, to be looked at again,** with a plain-language pass on names before stage 5. The table board is called Almanac, not History, until you decide (C52) | Stage 5 |
-| A7 | Welcome step 10 becomes "Send it with your next prompt" (C54) | Stage 11 |
+| A7 | **Ruled 15 Oct: yes.** Welcome step 10 becomes "Send it with your next prompt" (C54) | Stage 11 |
 | A8 | **Ruled 15 Oct: all three ship** (Wikipedia, Hacker News, OpenAlex), and people pick any two. The second keyless source for the advanced list is Hacker News (C55) | Stage 7 |
-| A9 | A prompt that has been answered stays locked as a record; editing it marks it up and "ask again" makes a new branch (C61) | Stage 11 |
-| A10 | The Lab saves on every command, with `undo:` as the way back. A room holds one of each block (C63) | Stage 13 |
+| A9 | **Ruled 15 Oct: yes.** A prompt that has been answered stays locked as a record; editing it marks it up and "ask again" makes a new branch (C61) | Stage 11 |
+| A10 | **Ruled 15 Oct: yes.** The Lab saves on every command, with `undo:` as the way back. A room holds one of each block (C63) | Stage 13 |
 | A11 | **Ruled 15 Oct: yes.** The notice that a new version of the app is ready is built fresh. The three commits stranded on `refactor/main` change files that no longer exist, so nothing can be brought over (C65) | Stage 1 |
 | A12 | **Ruled 15 Oct: on for the next prompt only, to be looked at again after other changes.** Web search is a feature of input, shown in the prompt field and named on the Enter line each time it goes (C66) | Stage 4 |
 | A13 | **Ruled 15 Oct: yes, and to be looked at again at stage 7.** Personas become "yours" collabs, all switched off, listed in the dry run (C67) | Stages 2, 7 |
@@ -109,7 +110,7 @@ written. None is built until its stage. Strike any you disagree with.
 | A15 | **Ruled 15 Oct: yes.** "One after another" with conditions comes after the docket can run; the step record gets its condition field in the one upgrade (C76) | Stages 2, 10 |
 | A16 | **Ruled 15 Oct: yes.** Collection tabs: All, Highlights, Terms, Quotes, Notes, Edits, Asks, Suggestions, each shown only when it holds something (C77) | Stage 6 |
 | A17 | **Ruled 15 Oct: yes.** A row's summary line can be rewritten with `summarize:`; a summary note in a collection is dated and fixed (C79) | Stage 6 |
-| A18 | `heading:` in a collection; `erase:201c` and `erase:201c all`; `forget:` for a saved arrangement (C80) | Stages 6, 14 |
+| A18 | **Ruled 15 Oct: yes.** `heading:` in a collection; `erase:201c` and `erase:201c all`; `forget:` for a saved arrangement (C80) | Stages 6, 14 |
 | A19 | **Ruled 15 Oct: yes, to be looked at again later.** Terms and quotes take numbers like edits do, and are rows only when filtered for. Terms must still be found by search in the Almanac | Stage 2 |
 | A20 | **Ruled 15 Oct.** `tour:` shows the steps, `tour:off` puts them away, `tour:advanced` shows the second list. `list:` is kept free for another use, such as making a bulleted list | Stage 5 |
 | A21 | **Ruled 15 Oct: yes.** `import:` opens a file and says what it is before anything happens. A backup is handed to `restore:`. A room file, when those exist, adds a room | Stage 9 |
