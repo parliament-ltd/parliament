@@ -52,7 +52,7 @@ export default function DocumentParagraph({
   onCommentTextChange,
   onAddComment,
   onCancelComment,
-  onStartAddComment,
+  onStartAddComment: _onStartAddComment,
   onSetActiveComment,
   onClearActiveComment,
   onToggleComment,

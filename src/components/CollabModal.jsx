@@ -80,7 +80,7 @@ export default function CollabModal({ onClose, onApply, activePresets, customIns
   useEffect(() => {
     getSetting(PERSONAS_SETTING_KEY).then(raw => {
       if (raw) {
-        try { setPersonas(JSON.parse(raw)) } catch {}
+        try { setPersonas(JSON.parse(raw)) } catch { /* unreadable: keep none */ }
       }
     })
   }, [])

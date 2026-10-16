@@ -43,6 +43,7 @@ export default function TableCanvas({ fileId, sortColumn: sortColumnProp, sortDi
 
   useEffect(() => {
     if (!fileId) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data blocks are reworked in stage 13
     setLoading(true)
     setVisibleRows(PAGE_SIZE)
     getParsedData(fileId).then(data => {

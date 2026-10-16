@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars -- interface stubs: the parameters document the contract */
 // Provider Interface
 // Every AI provider must implement these methods.
 // V1 only includes Anthropic — others can be added later

@@ -19,7 +19,6 @@
 // Visual chrome cribbed from EditorMigrationDialog.
 
 import { useEffect, useMemo, useState } from 'react'
-// eslint-disable-next-line no-unused-vars -- motion is used via <motion.div> JSX which the lint can't resolve
 import { motion, AnimatePresence } from 'framer-motion'
 import { Box } from 'lucide-react'
 import { planLayoutMigration } from '../../lib/layoutMigration'

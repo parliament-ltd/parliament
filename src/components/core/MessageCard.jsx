@@ -220,7 +220,7 @@ export default function MessageCard({
         </ReactMarkdown>
       </div>
     )
-  }, [id, displayContent, highlights, highlightTerms])
+  }, [id, displayContent, highlightTerms])
 
   return (
     <motion.div

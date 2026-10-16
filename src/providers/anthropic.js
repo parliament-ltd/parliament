@@ -254,7 +254,7 @@ export class AnthropicProvider extends BaseProvider {
         status: 'invalid',
         error: `Unexpected error (${response.status}). Please try again.`,
       }
-    } catch (error) {
+    } catch {
       return {
         valid: false,
         status: 'invalid',

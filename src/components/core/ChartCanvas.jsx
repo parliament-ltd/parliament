@@ -34,6 +34,7 @@ export default function ChartCanvas({ fileId, chartType, filters }) {
 
   useEffect(() => {
     if (!fileId) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data blocks are reworked in stage 13
     setLoading(true)
     getParsedData(fileId).then(data => {
       setParsed(data)

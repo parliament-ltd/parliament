@@ -39,6 +39,7 @@ export default function ColumnInspector() {
   // Load column stats whenever the active file changes.
   useEffect(() => {
     if (!activeFileId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- data blocks are reworked in stage 13
       setColumnStats([])
       setSelectedColumn(null)
       return

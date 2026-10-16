@@ -148,16 +148,16 @@ function PieChart({ labels, datasets }) {
   const cy = H / 2
   const r = Math.min(W, H) / 2 - 24
 
-  let cumAngle = -Math.PI / 2
+  const angles = values.map(v => (v / total) * 2 * Math.PI)
   const slices = values.map((v, i) => {
-    const angle = (v / total) * 2 * Math.PI
-    const start = cumAngle
-    cumAngle += angle
+    const angle = angles[i]
+    const start = -Math.PI / 2 + angles.slice(0, i).reduce((s, a) => s + a, 0)
+    const end = start + angle
     const mid = start + angle / 2
     const x1 = cx + r * Math.cos(start)
     const y1 = cy + r * Math.sin(start)
-    const x2 = cx + r * Math.cos(cumAngle)
-    const y2 = cy + r * Math.sin(cumAngle)
+    const x2 = cx + r * Math.cos(end)
+    const y2 = cy + r * Math.sin(end)
     const large = angle > Math.PI ? 1 : 0
     const lx = cx + (r + 20) * Math.cos(mid)
     const ly = cy + (r + 20) * Math.sin(mid)

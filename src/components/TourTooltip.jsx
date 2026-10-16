@@ -24,6 +24,7 @@ export default function TourTooltip({ steps, onDone }) {
   // Find and measure the target element whenever the step changes
   useEffect(() => {
     if (!step.target) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- tours retire in stage 5 (R15)
       setTargetRect(null)
       return
     }

@@ -215,13 +215,6 @@ export default function DocumentCanvas() {
     setShowExportMenu(false)
   }
 
-  // ── Deletion / insertion counts for submit modal ──────────────────
-  const deletionCount = paragraphs.filter(p =>
-    p.text !== p.baseline && wordDiff(p.baseline, p.text).some(d => d.type === 'deleted'),
-  ).length
-  const insertionCount = paragraphs.filter(p =>
-    p.text !== p.baseline && wordDiff(p.baseline, p.text).some(d => d.type === 'inserted'),
-  ).length
 
   return (
     <div

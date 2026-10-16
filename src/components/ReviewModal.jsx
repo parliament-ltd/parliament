@@ -21,9 +21,9 @@ export default function ReviewModal({
   highlights = [],
   notes = [],           // Array of { messageId, text }
   favorites = [],       // Array of message objects
-  branches = [],        // Array of branch conversations
+  branches: _branches = [],  // Array of branch conversations; not shown yet
   tokenUsage = {},      // { input, output }
-  contextUsage = 0,
+  contextUsage: _contextUsage = 0,  // not shown yet
   onGenerateSynthesis,  // async (options) => string — calls Claude
   onExportMarkdown,     // () => void — reuses existing export
 }) {

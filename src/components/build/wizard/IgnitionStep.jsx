@@ -319,7 +319,7 @@ export default function IgnitionStep({
         {/* Sweep bar — re-key forces the animation to restart on each
             successful validation (matches the void offsetWidth trick
             in the spec's ignite() function). */}
-        {phase !== 'idle' && phase !== 'connected' && (
+        {phase !== 'idle' && phase !== 'connected' && ( /* eslint-disable-next-line react-hooks/refs -- the wizard retires in stage 13 (R14) */
           <div key={sweepKey.current} className="wiz-sweep go" />
         )}
 

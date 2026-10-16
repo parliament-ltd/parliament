@@ -13,7 +13,6 @@ import { useSettings } from '../stores/SettingsContext'
 import { getProvider } from '../providers'
 import { loadApiKey } from '../lib/crypto'
 import {
-  getFavorites as dbGetAllFavorites,
   deleteFavorite as dbDeleteFavorite,
   getMessages,
   initDB,
@@ -944,7 +943,7 @@ export default function SelectorLayout() {
       try {
         const hydrated = await loadAllFavoritesHydrated(conversations)
         if (!cancelled) setFavorites(hydrated)
-      } catch {}
+      } catch { /* favourites failed to load: show none */ }
     }
     if (conversations && conversations.length > 0) {
       loadFavs()
@@ -1075,7 +1074,7 @@ export default function SelectorLayout() {
     try {
       await dbDeleteFavorite(favId)
       setFavorites(prev => prev.filter(f => f.id !== favId))
-    } catch {}
+    } catch { /* delete failed: keep the row */ }
   }, [])
 
   const handleSort = useCallback((field) => {

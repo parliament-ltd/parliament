@@ -68,6 +68,7 @@ export function CollabModeProvider({ children }) {
     const prev = lastConvRef.current
     lastConvRef.current = activeConversationId
     if (prev != null && prev !== activeConversationId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Collaboration mode retires in stage 7 (R22)
       setActivePresets(EMPTY_SET)
       setCustomInstruction('')
     }

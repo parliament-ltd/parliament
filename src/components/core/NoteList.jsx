@@ -3,7 +3,7 @@
  * Albatross manages notes inline on each MessageCard (per-message notes panel).
  * This component is reserved for modes that surface a dedicated notes panel.
  */
-export default function NoteList({ notes = [], onEdit, onDelete }) {
+export default function NoteList({ notes = [], onEdit: _onEdit, onDelete: _onDelete }) {
   if (notes.length === 0) return null
 
   return (

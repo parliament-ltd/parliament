@@ -81,7 +81,9 @@ export default function MessagesRender() {
   const [hiddenMessages, setHiddenMessages] = useState(new Set())
   const [pendingDeletes, setPendingDeletes] = useState([])
   const pendingDeletesRef = useRef([])
-  pendingDeletesRef.current = pendingDeletes
+  useEffect(() => {
+    pendingDeletesRef.current = pendingDeletes
+  })
 
   // Reset on conversation switch — V1 per-mount lifetime. Same guard
   // shape as CollabModeContext: ignore transient nulls so a quick trip
@@ -96,6 +98,7 @@ export default function MessagesRender() {
       // their messages are gone from view anyway and re-firing the
       // db.delete after a switch would surprise users.
       for (const p of pendingDeletesRef.current) clearTimeout(p.timeoutId)
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- messages move into the store in stage 4
       setPendingDeletes([])
       setHiddenMessages(new Set())
     }
@@ -159,6 +162,32 @@ export default function MessagesRender() {
     setTransferModal({ mode: 'send', message: msg })
   }, [])
 
+  // ─── Pinned references for the active conversation ────────
+  //
+  // Loaded on conversation switch + after any pin write that targets
+  // the active conversation. Renders as a collapsible list above the
+  // message stream.
+  const [pins, setPins] = useState([])
+  const refreshPins = useCallback(async () => {
+    if (!activeConversationId) {
+      setPins([])
+      return
+    }
+    try {
+      const list = await dbGetPins(activeConversationId)
+      setPins(list || [])
+    } catch {
+      setPins([])
+    }
+  }, [activeConversationId])
+
+  useEffect(() => {
+    let cancelled = false
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- messages move into the store in stage 4
+    refreshPins().catch(() => {})
+    void cancelled
+  }, [refreshPins])
+
   const handlePinForReference = useCallback((msg) => {
     setTransferModal({ mode: 'pin', message: msg })
   }, [])
@@ -195,7 +224,7 @@ export default function MessagesRender() {
       }
     }
     setTransferModal(null)
-  }, [transferModal, activeConversationId])
+  }, [transferModal, activeConversationId, refreshPins])
 
   const onTransferNewChat = useCallback(async () => {
     const t = transferModal
@@ -228,30 +257,6 @@ export default function MessagesRender() {
     setTransferModal(null)
   }, [transferModal, activeConversationId, settings.defaultModel, loadConversations])
 
-  // ─── Pinned references for the active conversation ────────
-  //
-  // Loaded on conversation switch + after any pin write that targets
-  // the active conversation. Renders as a collapsible list above the
-  // message stream.
-  const [pins, setPins] = useState([])
-  const refreshPins = useCallback(async () => {
-    if (!activeConversationId) {
-      setPins([])
-      return
-    }
-    try {
-      const list = await dbGetPins(activeConversationId)
-      setPins(list || [])
-    } catch {
-      setPins([])
-    }
-  }, [activeConversationId])
-
-  useEffect(() => {
-    let cancelled = false
-    refreshPins().catch(() => {})
-    void cancelled
-  }, [refreshPins])
 
   const handleRemovePin = useCallback(async (pinId) => {
     try { await dbDeletePin(pinId) } catch { /* tolerate */ }
