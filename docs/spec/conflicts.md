@@ -127,10 +127,16 @@ Line numbers are approximate.
 - **C87. Language work goes where suggested** (groundwork in stage 3, welcome page translation-ready in stage 5, reply language in stage 7, the picker in stage 9). **The first languages to test are Japanese, Chinese, Swedish and Finnish,** which Stefan can review. Right-to-left support is still built into the groundwork and checked with a mirrored pseudo-language until a right-to-left language has a reviewer.
 - **C88. Accepted:** ask the browser to keep Parliament's storage once there is something to keep, show the answer in Settings, nudge backups.
 - **C49, extended. Branch letters skip i, l and o** (23 letters), because each reads as a digit beside a number.
-- **Proposed by Stefan, not yet settled: how people switch language.** A globe that opens a menu of languages; `language:japanese`; perhaps a languages board shown on first load. My suggestion, for discussion in the next session:
+- **How people switch language: ruled as suggested** (Stefan proposed a globe, `language:japanese` and perhaps a languages board on first load; the suggestion below was put to him and accepted):
   - `language:` works from the bar, accepting a code or a name in English or in the language itself (`language:ja`, `language:japanese`, `language:日本語`). The verb stays English, like every command; the Enter line answers in the language chosen.
   - The globe is worth having: someone faced with a language they cannot read needs a sign they recognise. It sits beside the current language's own name ("🌐 English ▾") as marginalia at the top of the welcome page and in Settings, and opens the numbered picker listing languages by their own names, never flags.
   - No board, and nothing in the way on first load. The browser already says which languages its user reads, so most people land in theirs; anyone else sees the globe straight away. A board is something you open, move and pop; a list of languages is a picker.
+- **The globe means language.** Today a globe also marks web search: the room's input (`InputArea.jsx`) and the web-search glyph in Lab v6 and v7. Web search takes another mark wherever it is drawn next (first on the Library board, stage 5); which mark is open.
+- **Suggested, not yet ruled, for when their stages come** (put to Stefan on 16 October after the ruling above):
+  - Bare `language:` opens the picker. `language:browser` goes back to following the browser's languages.
+  - The globe appears once a second language ships (stage 9). Until then a list of one would be an option that does nothing, so `language:` answers that only English is available.
+  - Replies follow the interface language until "Reply in" is set (stage 7), so `language:japanese` alone gives Japanese replies too.
+  - The choice is a setting of the person's, not the device's, and goes in the backup allowlist when the setting is added.
 
 ## Part 1. Settled by precedence
 

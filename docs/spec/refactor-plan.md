@@ -317,7 +317,7 @@ Your first target. The page is the lesson: every step is a real command.
   - `tour:`, `tour:off` (A20).
   - One line on small or touch-only screens: "built for a computer for now; the phone comes later".
   - Before this stage ships: a plain-language pass over every name a newcomer meets (Almanac, Docket, Collection, collab, term, quote, the short board titles in the strip), made in the copy table, with you (A6).
-  - Built ready for translation and checked in the pseudo-language; shipped in English first. How people switch language (a globe beside the language's own name, `language:`) is settled before this stage (see `conflicts.md`, 16 October).
+  - Built ready for translation and checked in the pseudo-language; shipped in English first. How people switch language is ruled (`conflicts.md`, 16 October): `language:` in the bar, and the globe beside the language's own name as marginalia at the top of this page and in Settings. No languages board and nothing on first load.
 - **Changed:** `/` shows the welcome page to someone new and the Almanac to someone with work. Links carry numbers (`/207`); old links still resolve.
 - **Salvaged:** `IgnitionStep.jsx`'s key check and `useShimmer.js`; the pin-first ordering and search from `SelectorLayout.jsx`; `LibraryCard`, `LayoutSilhouette` and the pure helpers in `EditorLibraryMode.jsx`. **Rebuilt:** the catalogue read layer.
 - **Security and privacy:** no key is ever typed into the bar; `api:` opens a panel with a password field that password managers are told to leave alone, and a line that looks like a key is refused before Enter. The footer says "MIT licensed. Source published at launch" until the repository is public (C71). The letter's sentence about where requests go reads true for every provider.
@@ -384,7 +384,7 @@ Built to Settings v1. Can run beside stages 5 to 8.
   - `backup:`, `restore:` and `import:` (A21).
   - "Delete everything" that removes everything: both databases, the caches and the service worker. Its confirmation lists what will go, is armed by typing a word, offers a backup first, and says what it cannot reach (files you saved, what providers already hold). Other open tabs are told to close.
   - The switch for the title call, the "Don't save" option, text size, and the room for new dockets.
-  - The language picker, defaulting to the browser's languages and never to the network address. Whether the browser keeps Parliament's storage, and the last backup, shown plainly.
+  - The language picker, opened by the globe or `language:`, listing languages by their own names, defaulting to the browser's languages and never to the network address. Whether the browser keeps Parliament's storage, and the last backup, shown plainly.
   - First real languages, reviewed by Stefan: Japanese, Chinese, Swedish, Finnish (C87). When the first one ships, the app opts out of the browser's page translation (C84).
   - About, with the new privacy copy and the network log.
 - **Changed:** backups say plainly when they are not encrypted, use one minimum password length, and stretch a password further in new files. A "replace" restore offers what it is about to replace as a download first.
