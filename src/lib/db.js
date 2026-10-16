@@ -952,11 +952,18 @@ export async function getStorageEstimate() {
 
 // ─── Startup Integrity Check ─────────────────────────────
 
+// An empty chat younger than this is left alone: another tab may have just
+// made it, or it was opened a moment ago and is about to be used.
+const EMPTY_CHAT_GRACE_MS = 24 * 60 * 60 * 1000
+
 export async function runIntegrityCheck() {
   const db = await initDB()
   const conversations = await db.getAll('conversations')
+  const now = Date.now()
 
   for (const conv of conversations) {
+    const created = Date.parse(conv.createdAt)
+    if (!Number.isFinite(created) || now - created < EMPTY_CHAT_GRACE_MS) continue
     const messages = await db.getAllFromIndex('messages', 'conversationId', conv.id)
     if (messages.length === 0) {
       // Don't delete Secretarybird conversations — they store content in

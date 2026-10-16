@@ -112,6 +112,7 @@ export function DocumentProvider({ children }) {
   // ── Track the conversation we last loaded; ignore transient nulls ──
   const loadedFor = useRef(null)
   const saveTimerRef = useRef(null)
+  const seedRef = useRef(null)
 
   useEffect(() => {
     if (activeConversationId == null) return
@@ -148,7 +149,8 @@ export function DocumentProvider({ children }) {
       if (doc?.paragraphs?.length) {
         setParagraphs(doc.paragraphs.map(migrateParagraph))
       } else {
-        setParagraphs([makeSeedParagraph()])
+        seedRef.current = [makeSeedParagraph()]
+        setParagraphs(seedRef.current)
       }
       if (doc?.submittedReplies) setSubmittedReplies(doc.submittedReplies)
       setLoaded(true)
@@ -157,7 +159,8 @@ export function DocumentProvider({ children }) {
       if (import.meta.env.DEV) {
         console.warn('[DocumentContext] load failed:', err)
       }
-      setParagraphs([makeSeedParagraph()])
+      seedRef.current = [makeSeedParagraph()]
+      setParagraphs(seedRef.current)
       setLoaded(true)
     })
     return () => { cancelled = true }
@@ -169,6 +172,9 @@ export function DocumentProvider({ children }) {
   useEffect(() => {
     if (!loaded || activeConversationId == null) return
     if (paragraphs === EMPTY_PARAGRAPHS) return
+    // An untouched seed is not a document: nothing is written until the
+    // first edit, so opening a chat no longer leaves a record behind.
+    if (paragraphs === seedRef.current && submittedReplies === EMPTY_REPLIES) return
     clearTimeout(saveTimerRef.current)
     saveTimerRef.current = setTimeout(() => {
       saveSbrdDocument(activeConversationId, { paragraphs, submittedReplies }).catch((err) => {
