@@ -1,4 +1,4 @@
-// Schema v6 migration plan (change-plan.md 1.6).
+// Schema v6 migration plan (refactor-plan.md, stage 2).
 //
 // Pure: takes a snapshot of the v5 data and returns every record v6 would
 // write, plus a report for the dry run. Nothing here touches IndexedDB, so the
@@ -7,25 +7,35 @@
 //
 // What it does, per the rulings in docs/spec/conflicts.md:
 //   1. Every chat joins a docket (C18). A branch family (chats linked by
-//      parentId or familyId) becomes one docket: the root is branch A and each
+//      parentId or familyId) becomes one docket: the root is branch a and each
 //      fork takes the next letter by creation time, all in run 1. A chat with
-//      no family becomes a docket of its own with that chat as branch A.
-//   2. Numbers from 201, in creation order, across chats, notes, highlights
-//      and dockets (C17). A docket is numbered just before its first chat.
-//   3. Each user turn in a chat becomes a step of its branch in run 1
-//      (C19): done if it got a complete reply, paused if the reply was cut
-//      off or never came.
-//   4. Each favorited message becomes a pinned highlight of the whole
-//      message (C20). The favorites records are left in place.
-//   5. The homepage scratchpad text, if any, becomes a note.
+//      no family becomes a docket of its own with that chat as branch a.
+//      Letters are lower case (C49).
+//   2. Numbers from 201 in one counter, in creation order, across dockets,
+//      chats, notes, terms and quotes (C17, C56, A19). A docket is numbered
+//      just before its first chat.
+//   3. Each user turn in a chat becomes a step of its branch in run 1 (C19):
+//      done if it got a complete reply, paused if the reply was cut off or
+//      never came. Steps carry an empty condition (A15).
+//   4. Today's highlights are words or phrases lit wherever they appear, so
+//      they become terms, unchanged (C57). "Pin for reference" records become
+//      quotes of a whole message, unchanged (A23).
+//   5. Favourites become one collection called Favorites, in the order they
+//      were made (C20, ruled 11 October). The favourites records stay.
+//   6. The homepage scratchpad text, if any, becomes a note.
+//   7. Saved personas become collabs of your own, switched off (A13).
+//   8. Tags on chats were all written by the model, and are marked so.
+//   9. A saved API key moves out of the settings into the key store. Backups
+//      never contain keys, so this shows only when planning this browser.
 
 import { FIRST_NUM, letterAt } from '../addresses'
 import { STATUS, branchStatus } from '../docketModel'
 
 const BRANCH_PREFIX = /^(Branch|Summary):\s*/
+const API_KEY_SETTING = 'parliament-api-key'
 
 /**
- * @param {object} snap  { conversations, messages, notes, highlights, favorites, settings }
+ * @param {object} snap  { conversations, messages, notes, highlights, favorites, pins, settings }
  *   Arrays of v5 records, as read from IndexedDB or flattened from a backup.
  * @param {object} [opts]
  * @param {() => string} [opts.newId]  id generator, injectable for tests
@@ -34,6 +44,7 @@ const BRANCH_PREFIX = /^(Branch|Summary):\s*/
 export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now = new Date().toISOString() } = {}) {
   const conversations = [...(snap.conversations || [])]
   const messages = snap.messages || []
+  const settings = snap.settings || []
   const warnings = []
 
   const convById = new Map(conversations.map((c) => [c.id, c]))
@@ -54,7 +65,6 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
   const dockets = []
   const runs = []
   const convUpdates = new Map() // conv id -> { docketId, branch, run }
-  const docketOfConv = new Map()
 
   for (const members of families) {
     members.sort(byCreated)
@@ -81,10 +91,9 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
         steps,
       }
       convUpdates.set(c.id, { docketId, branch: letterOf.get(c.id), run: 1 })
-      docketOfConv.set(c.id, docketId)
     }
 
-    const docket = {
+    dockets.push({
       id: docketId,
       num: null,
       title: root.title || 'Untitled',
@@ -96,39 +105,47 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
       branches,
       order: branches.map((b) => b.letter),
       nextLetter: branches.length,
-    }
-    dockets.push(docket)
+    })
     runs.push({ id: newId(), docketId, n: 1, createdAt: root.createdAt, cost: null, branches: runBranches })
   }
 
-  // ── 4, 5. New highlights and notes ─────────────────────
+  // ── 5. Favourites become the Favorites collection ──────
   const msgById = new Map(messages.map((m) => [m.id, m]))
-  const newHighlights = []
   const favoritesSkipped = []
-  for (const f of snap.favorites || []) {
-    const m = msgById.get(f.messageId)
-    if (!m || !convById.has(f.conversationId)) {
+  const favoriteItems = []
+  for (const f of [...(snap.favorites || [])].sort(byCreated)) {
+    if (!msgById.has(f.messageId) || !convById.has(f.conversationId)) {
       favoritesSkipped.push(f.id)
       continue
     }
-    newHighlights.push({
-      id: newId(),
+    favoriteItems.push({
+      kind: 'message',
       conversationId: f.conversationId,
       messageId: f.messageId,
-      text: m.content,
-      color: '#B8A070',
-      pinned: true,
-      tags: [],
+      addedAt: f.createdAt,
       fromFavorite: f.id,
-      createdAt: f.createdAt,
     })
   }
   if (favoritesSkipped.length) {
-    warnings.push(`${favoritesSkipped.length} favorites point at a message that no longer exists and are not converted.`)
+    warnings.push(`${favoritesSkipped.length} favourites point at a message that no longer exists and are not carried into the collection.`)
   }
+  const collections = favoriteItems.length
+    ? [{
+        id: newId(),
+        name: 'Favorites',
+        description: '',
+        items: favoriteItems,
+        headings: [],
+        pinned: false,
+        createdAt: favoriteItems[0].addedAt,
+        updatedAt: now,
+        fromFavorites: true,
+      }]
+    : []
 
+  // ── 6. The scratchpad becomes a note ────────────────────
   const newNotes = []
-  const scratch = (snap.settings || []).find((s) => s.key === 'scratchpad-text')
+  const scratch = settings.find((s) => s.key === 'scratchpad-text')
   if (typeof scratch?.value === 'string' && scratch.value.trim()) {
     newNotes.push({
       id: newId(),
@@ -142,6 +159,17 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
     })
   }
 
+  // ── 7. Personas become collabs of your own, switched off ─
+  const { collabs, personasSkipped } = collabsFromPersonas(settings, { newId, now })
+  if (personasSkipped) {
+    warnings.push(`${personasSkipped} saved personas have no instruction text and are not carried over.`)
+  }
+
+  // ── 9. The key moves to the key store ───────────────────
+  const keyMove = settings.some((s) => s.key === API_KEY_SETTING)
+    ? { provider: 'anthropic', fromSetting: API_KEY_SETTING }
+    : null
+
   // ── 2. Numbers ─────────────────────────────────────────
   // One pass in creation order. A docket sorts just before its first chat,
   // so it is always the lower number of the two.
@@ -149,7 +177,8 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
   for (const d of dockets) rows.push({ kind: 'docket', id: d.id, createdAt: d.createdAt, tie: 0 })
   for (const c of conversations) rows.push({ kind: 'chat', id: c.id, createdAt: c.createdAt, tie: 1 })
   for (const n of [...(snap.notes || []), ...newNotes]) rows.push({ kind: 'note', id: n.id, createdAt: n.createdAt, tie: 2 })
-  for (const h of [...(snap.highlights || []), ...newHighlights]) rows.push({ kind: 'highlight', id: h.id, createdAt: h.createdAt, tie: 2 })
+  for (const h of snap.highlights || []) rows.push({ kind: 'term', id: h.id, createdAt: h.createdAt, tie: 2 })
+  for (const p of snap.pins || []) rows.push({ kind: 'quote', id: p.id, createdAt: p.createdAt, tie: 2 })
   rows.sort((a, b) =>
     a.createdAt < b.createdAt ? -1 : a.createdAt > b.createdAt ? 1
       : a.tie - b.tie || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
@@ -166,21 +195,56 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
     }
   }
 
-  const conversationUpdates = conversations.map((c) => ({
-    id: c.id,
-    num: numOf.get(`chat:${c.id}`),
-    ...convUpdates.get(c.id),
-  }))
+  const conversationUpdates = conversations.map((c) => {
+    const u = { id: c.id, num: numOf.get(`chat:${c.id}`), ...convUpdates.get(c.id) }
+    // ── 8. Every tag on a chat today came from the model.
+    if (Array.isArray(c.tags) && c.tags.length) u.tagsBy = 'model'
+    return u
+  })
   const noteUpdates = (snap.notes || []).map((n) => ({ id: n.id, num: numOf.get(`note:${n.id}`), pinned: false, tags: [] }))
-  const highlightUpdates = (snap.highlights || []).map((h) => ({ id: h.id, num: numOf.get(`highlight:${h.id}`), pinned: false, tags: [] }))
+  const termUpdates = (snap.highlights || []).map((h) => ({ id: h.id, num: numOf.get(`term:${h.id}`), kind: 'term', pinned: false, tags: [] }))
+  const quoteUpdates = (snap.pins || []).map((p) => ({ id: p.id, num: numOf.get(`quote:${p.id}`), kind: 'quote' }))
   for (const n of newNotes) n.num = numOf.get(`note:${n.id}`)
-  for (const h of newHighlights) h.num = numOf.get(`highlight:${h.id}`)
 
   const plan = {
-    dockets, runs, conversationUpdates, noteUpdates, highlightUpdates, newHighlights, newNotes, nextNum,
+    dockets, runs, conversationUpdates, noteUpdates, termUpdates, quoteUpdates,
+    collections, collabs, newNotes, keyMove, nextNum,
   }
-  plan.report = buildReport(plan, { conversations, convById, numOf, favoritesSkipped, warnings })
+  plan.report = buildReport(plan, { snap, conversations, convById, msgById, numOf, favoritesSkipped, warnings })
   return plan
+}
+
+// ── Personas ─────────────────────────────────────────────
+
+function collabsFromPersonas(settings, { newId, now }) {
+  const raw = settings.find((s) => s.key === 'parrotPersonas')?.value
+  let list = []
+  if (Array.isArray(raw)) list = raw
+  else if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed)) list = parsed
+    } catch { /* unreadable: nothing to carry over */ }
+  }
+  const collabs = []
+  let personasSkipped = 0
+  for (const p of list) {
+    const instruction = typeof p?.instruction === 'string' ? p.instruction.trim() : ''
+    if (!instruction) {
+      personasSkipped++
+      continue
+    }
+    collabs.push({
+      id: newId(),
+      name: String(p.title || 'Untitled').trim().slice(0, 120) || 'Untitled',
+      instruction,
+      builtIn: false,
+      on: false,
+      fromPersona: p.id ?? null,
+      createdAt: now,
+    })
+  }
+  return { collabs, personasSkipped }
 }
 
 // ── Families ─────────────────────────────────────────────
@@ -210,7 +274,7 @@ function groupFamilies(conversations, convById, warnings) {
     if (c.familyId && c.familyId !== c.id && convById.has(c.familyId)) union(c.id, c.familyId)
   }
   if (missingParents) {
-    warnings.push(`${missingParents} branches point at a parent chat that no longer exists. Each becomes branch A of its own docket.`)
+    warnings.push(`${missingParents} branches point at a parent chat that no longer exists. Each becomes branch a of its own docket.`)
   }
   const groups = new Map()
   for (const c of conversations) {
@@ -248,6 +312,7 @@ function stepsFromTurns(conv, msgs) {
       status: reply && !reply.incomplete ? STATUS.DONE : STATUS.PAUSED,
       model: conv.model || null,
       messageId: m.id,
+      condition: null,
     })
   }
   return steps
@@ -268,7 +333,7 @@ function byCreated(a, b) {
 
 // ── Report ───────────────────────────────────────────────
 
-function buildReport(plan, { conversations, convById, numOf, favoritesSkipped, warnings }) {
+function buildReport(plan, { snap, conversations, convById, msgById, numOf, favoritesSkipped, warnings }) {
   const runOf = new Map(plan.runs.map((r) => [r.docketId, r]))
   const statusCounts = {}
   const docketRows = plan.dockets
@@ -298,12 +363,13 @@ function buildReport(plan, { conversations, convById, numOf, favoritesSkipped, w
     })
 
   const noSteps = docketRows.flatMap((d) => d.branches).filter((b) => b.steps === 0).length
-  if (noSteps) warnings.push(`${noSteps} chats have no user turns (documents, or empty chats). Each becomes a branch with no steps, status ready.`)
+  if (noSteps) warnings.push(`${noSteps} chats have no prompts of yours (documents, or empty chats). Each becomes a branch with no steps, status ready.`)
   const models = new Set(conversations.map((c) => c.model).filter(Boolean))
   if (conversations.length) {
     warnings.push('Old chats do not record which model answered each turn, only the last one used. Every step takes its chat\'s last model.')
   }
 
+  const favorites = plan.collections[0]?.items || []
   return {
     counts: {
       chats: conversations.length,
@@ -312,10 +378,14 @@ function buildReport(plan, { conversations, convById, numOf, favoritesSkipped, w
       branches: plan.dockets.reduce((n, d) => n + d.branches.length, 0),
       steps: plan.runs.reduce((n, r) => n + Object.values(r.branches).reduce((m, b) => m + b.steps.length, 0), 0),
       notes: plan.noteUpdates.length,
-      highlights: plan.highlightUpdates.length,
-      favoritesToHighlights: plan.newHighlights.length,
+      terms: plan.termUpdates.length,
+      quotes: plan.quoteUpdates.length,
+      favoritesToCollection: favorites.length,
       favoritesSkipped: favoritesSkipped.length,
       scratchpadToNote: plan.newNotes.length,
+      collabs: plan.collabs.length,
+      chatsWithModelTags: plan.conversationUpdates.filter((u) => u.tagsBy === 'model').length,
+      keyMoves: plan.keyMove ? 1 : 0,
       firstNum: FIRST_NUM,
       lastNum: plan.nextNum - 1,
       nextNum: plan.nextNum,
@@ -323,12 +393,23 @@ function buildReport(plan, { conversations, convById, numOf, favoritesSkipped, w
       branchStatus: statusCounts,
     },
     dockets: docketRows,
-    favorites: plan.newHighlights.map((h) => ({
-      num: h.num,
-      chatNum: numOf.get(`chat:${h.conversationId}`),
-      chatTitle: convById.get(h.conversationId)?.title || '',
-      excerpt: excerpt(h.text),
+    favorites: favorites.map((item) => ({
+      chatNum: numOf.get(`chat:${item.conversationId}`),
+      chatTitle: convById.get(item.conversationId)?.title || '',
+      excerpt: excerpt(msgById.get(item.messageId)?.content),
     })),
+    terms: (snap.highlights || []).map((h) => ({
+      num: numOf.get(`term:${h.id}`),
+      chatNum: numOf.get(`chat:${h.conversationId}`),
+      text: excerpt(h.text, 60),
+    })),
+    quotes: (snap.pins || []).map((p) => ({
+      num: numOf.get(`quote:${p.id}`),
+      inChatNum: numOf.get(`chat:${p.targetConversationId}`),
+      fromChatNum: numOf.get(`chat:${p.sourceConversationId}`),
+      excerpt: excerpt(p.content),
+    })),
+    collabs: plan.collabs.map((c) => ({ name: c.name, excerpt: excerpt(c.instruction) })),
     newNotes: plan.newNotes.map((n) => ({ num: n.num, excerpt: excerpt(n.text), from: 'scratchpad' })),
     warnings,
   }

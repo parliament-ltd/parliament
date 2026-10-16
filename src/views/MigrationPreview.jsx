@@ -3,14 +3,14 @@ import { parseBackupFile, decryptBackup, contentsToFlatStores } from '../lib/bac
 import { initDB } from '../lib/db'
 import { planV6Migration } from '../lib/migrations/v6Plan'
 
-// Dry run of the schema v6 migration (change-plan.md 1.6). Dev only, at
-// /dev/migration. Reads a .parliament backup, or this browser's data, runs
+// Dry run of the one-time data upgrade (refactor-plan.md, stage 2). Dev only,
+// at /dev/migration. Reads a .parliament backup, or this browser's data, runs
 // the migration plan in memory, and shows what it would do. Writes nothing.
 //
-// Styled inline with the mockups' values until area 2 lands shared tokens.
+// Styled inline with the mockups' values until the shell lands shared tokens.
 
 const C = {
-  paper: '#FCFCFA', surface: '#FFFFFF', subtle: '#FAF9F5', ink: '#191919', ink2: '#787774', ink3: '#9B9A97',
+  paper: '#FCFCFA', surface: '#FFFFFF', subtle: '#FAF9F5', ink: '#191919', ink2: '#5F5E59', ink3: '#6F6E69',
   border: '#E9E9E7', border2: '#F1F1EF', wash: 'rgba(25,25,25,.045)',
   sans: '-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif',
   serif: '"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif',
@@ -24,6 +24,9 @@ const STATUS_STYLE = {
   running: { background: C.ink, color: C.paper },
 }
 
+// Lists longer than this show their first entries and a count of the rest.
+const LIST_LIMIT = 60
+
 async function readThisBrowser() {
   const db = await initDB()
   return {
@@ -32,6 +35,7 @@ async function readThisBrowser() {
     notes: await db.getAll('notes'),
     highlights: await db.getAll('highlights'),
     favorites: await db.getAll('favorites'),
+    pins: await db.getAll('pins'),
     settings: await db.getAll('settings'),
   }
 }
@@ -73,9 +77,10 @@ export default function MigrationPreview() {
   return (
     <div style={{ minHeight: '100vh', background: C.paper, color: C.ink, font: `400 14px ${C.sans}`, padding: '40px 16px 80px' }}>
       <div style={{ maxWidth: 1080, margin: '0 auto' }}>
-        <h1 style={{ font: `500 20px ${C.sans}`, margin: 0 }}>Migration dry run</h1>
-        <p style={{ margin: '6px 0 0', font: `italic 400 13px ${C.serif}`, color: C.ink2 }}>
-          What the schema v6 upgrade would do to this data. Nothing is written.
+        <h1 style={{ font: `500 20px ${C.sans}`, margin: 0 }}>Upgrade dry run</h1>
+        <p style={{ margin: '6px 0 0', font: `italic 400 13px ${C.serif}`, color: C.ink2, maxWidth: 720, lineHeight: 1.6 }}>
+          What the one-time upgrade would do to your data. This page only reads: nothing is written, here or
+          anywhere else. Read a backup file, or the data already in this browser.
         </p>
 
         <Card>
@@ -88,6 +93,7 @@ export default function MigrationPreview() {
             <label style={{ font: `500 12px ${C.sans}`, color: C.ink2 }}>
               Password, if encrypted
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="off"
+                data-1p-ignore data-lpignore="true"
                 style={{ display: 'block', marginTop: 6, padding: '6px 9px', font: `400 13px ${C.sans}`, border: `1px solid ${C.border}`, borderRadius: 6 }} />
             </label>
             <button type="button" style={btn} disabled={!file || working} onClick={fromFile}>Read the backup</button>
@@ -115,35 +121,42 @@ function Card({ children, style }) {
 }
 
 function H2({ children }) {
-  return <h2 style={{ font: `500 15px ${C.sans}`, margin: '0 0 10px' }}>{children}</h2>
+  return <h2 style={{ font: `500 15px ${C.sans}`, margin: '0 0 6px' }}>{children}</h2>
+}
+
+function Explain({ children }) {
+  return <p style={{ margin: '0 0 12px', font: `italic 400 13px ${C.serif}`, color: C.ink2, maxWidth: 760, lineHeight: 1.6 }}>{children}</p>
 }
 
 function Report({ report, source }) {
   const c = report.counts
   const facts = [
     [c.chats, 'chats'],
-    [c.dockets, 'dockets'],
-    [c.multiBranchDockets, 'dockets with more than one branch'],
-    [c.branches, 'branches'],
-    [c.steps, 'steps'],
-    [c.notes, 'notes numbered'],
-    [c.highlights, 'highlights numbered'],
-    [c.favoritesToHighlights, 'favorites become pinned highlights'],
-    [c.scratchpadToNote, 'scratchpad becomes a note'],
+    [c.dockets, 'dockets (plans) made'],
+    [c.multiBranchDockets, 'with more than one branch'],
+    [c.steps, 'prompts of yours, kept as steps'],
+    [c.notes, 'notes, numbered'],
+    [c.terms, 'highlights, now called terms'],
+    [c.quotes, 'pinned references, now quotes'],
+    [c.favoritesToCollection, 'favourites, into the Favorites collection'],
+    [c.scratchpadToNote, 'scratchpad, into a note'],
+    [c.collabs, 'personas, into collabs (switched off)'],
+    [c.chatsWithModelTags, 'chats whose tags are marked as the model\'s'],
   ]
   return (
     <>
       <Card>
         <H2>Summary</H2>
-        <p style={{ margin: '0 0 12px', font: `italic 400 13px ${C.serif}`, color: C.ink2 }}>From {source}.</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: '8px 24px' }}>
+        <Explain>From {source}.</Explain>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(230px,1fr))', gap: '8px 24px' }}>
           {facts.map(([n, label]) => (
             <div key={label}><span style={{ font: `500 16px ${C.sans}` }}>{n}</span> <span style={{ color: C.ink2 }}>{label}</span></div>
           ))}
         </div>
-        <p style={{ margin: '14px 0 0', color: C.ink2 }}>
-          Numbers run from <Mono>{c.firstNum}</Mono> to <Mono>{c.lastNum}</Mono>. The next new item takes <Mono>{c.nextNum}</Mono>.
-          Branch states: {Object.entries(c.branchStatus).map(([s, n]) => `${n} ${s}`).join(', ') || 'none'}.
+        <p style={{ margin: '14px 0 0', color: C.ink2, lineHeight: 1.6 }}>
+          Everything gets a number from one counter, in the order it was made: <Mono>{c.firstNum}</Mono> to <Mono>{c.lastNum}</Mono>.
+          The next new item takes <Mono>{c.nextNum}</Mono>.
+          {c.keyMoves ? ' Your saved key moves to a store of its own; its value is never shown or written anywhere else.' : ''}
         </p>
       </Card>
 
@@ -157,12 +170,19 @@ function Report({ report, source }) {
       )}
 
       <Card style={{ padding: 0, overflow: 'hidden' }}>
-        <div style={{ padding: '18px 20px 6px' }}><H2>Dockets</H2></div>
+        <div style={{ padding: '18px 20px 6px' }}>
+          <H2>Dockets</H2>
+          <Explain>
+            A docket is a plan that holds a chat and its branches. Every chat joins one. A chat with its branches becomes
+            one docket, with the first chat as branch a and each branch taking the next letter. Any other chat becomes a
+            docket of its own. Your prompts become the docket&apos;s steps. Nothing in the chats themselves changes.
+          </Explain>
+        </div>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', font: `400 13px ${C.sans}` }}>
             <thead>
               <tr style={{ background: C.subtle, color: C.ink2, textAlign: 'left' }}>
-                {['Address', 'Branch', 'Chat', 'Room', 'Steps', 'State', 'Forked from'].map((h) => (
+                {['Address', 'Branch', 'Chat', 'Room', 'Steps', 'State', 'Branched from'].map((h) => (
                   <th key={h} style={{ padding: '8px 12px', fontWeight: 500, whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
               </tr>
@@ -178,12 +198,49 @@ function Report({ report, source }) {
 
       {report.favorites.length > 0 && (
         <Card>
-          <H2>Favorites becoming pinned highlights</H2>
-          {report.favorites.map((f) => (
-            <div key={f.num} style={{ padding: '6px 0', borderTop: `.5px solid ${C.border2}` }}>
-              <Mono>{f.num}</Mono> <span style={{ color: C.ink2 }}>{f.excerpt}</span>{' '}
-              <span style={{ font: `italic 400 12px ${C.serif}`, color: C.ink3 }}>in chat {f.chatNum}, {f.chatTitle}</span>
-            </div>
+          <H2>Favourites, in the Favorites collection</H2>
+          <Explain>Each favourite becomes an item in one collection, in the order you made them. The messages are not copied or changed.</Explain>
+          <Limited items={report.favorites} render={(f, i) => (
+            <Line key={i}>
+              <span style={{ color: C.ink2 }}>{f.excerpt}</span>{' '}
+              <Marg>in chat {f.chatNum}, {f.chatTitle}</Marg>
+            </Line>
+          )} />
+        </Card>
+      )}
+
+      {report.terms.length > 0 && (
+        <Card>
+          <H2>Terms (today&apos;s highlights)</H2>
+          <Explain>
+            Today a highlight lights a word or phrase wherever it appears in a chat. That is now called a term. Each keeps
+            its word and colour and gains a number. A highlight will mean one passage you mark from now on.
+          </Explain>
+          <Limited items={report.terms} render={(t) => (
+            <Line key={t.num}><Mono>{t.num}</Mono> {t.text} <Marg>in chat {t.chatNum}</Marg></Line>
+          )} />
+        </Card>
+      )}
+
+      {report.quotes.length > 0 && (
+        <Card>
+          <H2>Quotes (today&apos;s pinned references)</H2>
+          <Explain>A message pinned into another chat for reference becomes a quote: kept for you, never sent to the model. Nothing about it changes except a number.</Explain>
+          <Limited items={report.quotes} render={(q) => (
+            <Line key={q.num}><Mono>{q.num}</Mono> <span style={{ color: C.ink2 }}>{q.excerpt}</span> <Marg>in chat {q.inChatNum}, from chat {q.fromChatNum}</Marg></Line>
+          )} />
+        </Card>
+      )}
+
+      {report.collabs.length > 0 && (
+        <Card>
+          <H2>Your personas, becoming collabs</H2>
+          <Explain>
+            Saved personas become standing instructions of your own. They come across switched off: until now ticking one
+            never changed what the model was sent, so nothing should start behaving differently by itself.
+          </Explain>
+          {report.collabs.map((p, i) => (
+            <Line key={i}><span style={{ fontWeight: 500 }}>{p.name}</span> <span style={{ color: C.ink2 }}>{p.excerpt}</span></Line>
           ))}
         </Card>
       )}
@@ -192,12 +249,30 @@ function Report({ report, source }) {
         <Card>
           <H2>New notes</H2>
           {report.newNotes.map((n) => (
-            <div key={n.num}><Mono>{n.num}</Mono> <span style={{ color: C.ink2 }}>{n.excerpt}</span> <span style={{ font: `italic 400 12px ${C.serif}`, color: C.ink3 }}>from the {n.from}</span></div>
+            <Line key={n.num}><Mono>{n.num}</Mono> <span style={{ color: C.ink2 }}>{n.excerpt}</span> <Marg>from the {n.from}</Marg></Line>
           ))}
         </Card>
       )}
     </>
   )
+}
+
+function Limited({ items, render }) {
+  const shown = items.slice(0, LIST_LIMIT)
+  return (
+    <>
+      {shown.map(render)}
+      {items.length > shown.length && <Line><Marg>and {items.length - shown.length} more</Marg></Line>}
+    </>
+  )
+}
+
+function Line({ children }) {
+  return <div style={{ padding: '6px 0', borderTop: `.5px solid ${C.border2}` }}>{children}</div>
+}
+
+function Marg({ children }) {
+  return <span style={{ font: `italic 400 12px ${C.serif}`, color: C.ink3 }}>{children}</span>
 }
 
 function DocketRows({ d }) {
@@ -213,10 +288,10 @@ function DocketRows({ d }) {
           <td style={{ padding: '3px 12px' }}>{b.name}</td>
           <td style={{ padding: '3px 12px' }}><Mono>{b.chatNum}</Mono></td>
           <td style={{ padding: '3px 12px', font: `italic 400 12px ${C.serif}`, color: C.ink2 }}>{b.room || 'no room'}</td>
-          <td style={{ padding: '3px 12px' }}>{b.steps}{b.paused ? <span style={{ color: C.ink3 }}>{`, ${b.paused} paused`}</span> : null}</td>
+          <td style={{ padding: '3px 12px' }}>{b.steps}{b.paused ? <span style={{ color: C.ink3 }}>{`, ${b.paused} cut off`}</span> : null}</td>
           <td style={{ padding: '3px 12px' }}>{b.status === 'ready' ? null : <Chip status={b.status} />}</td>
           <td style={{ padding: '3px 12px', font: `italic 400 12px ${C.serif}`, color: C.ink2 }}>
-            {b.forkedFrom ? `chat ${b.forkedFrom.chatNum}${b.forkedFrom.step ? `, at step ${b.forkedFrom.step}` : ''}` : ''}
+            {b.forkedFrom ? `chat ${b.forkedFrom.chatNum}${b.forkedFrom.step ? `, after prompt ${b.forkedFrom.step}` : ''}` : ''}
           </td>
         </tr>
       ))}
