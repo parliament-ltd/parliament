@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code worktrees: full copies of the code that tools must not scan
+.claude/worktrees/
