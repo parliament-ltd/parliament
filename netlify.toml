@@ -25,14 +25,16 @@
   to = "/index.html"
   status = 200
 
-# Security headers applied to all responses
+# Security headers applied to all responses.
+# Keep these identical to src/lib/securityHeaders.js, which vite preview uses;
+# src/lib/securityHeaders.test.js fails if the two differ.
 [[headers]]
   for = "/*"
   [headers.values]
-    # Only load scripts from same origin; only connect to Anthropic API.
-    # worker-src 'self' — allows the PWA service worker to register from the same origin.
-    # manifest-src 'self' — allows the web app manifest to be fetched from the same origin.
-    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; font-src 'self'; object-src 'none'; frame-ancestors 'none'; worker-src 'self'; manifest-src 'self';"
+    # Scripts from this site only; connections to this site and the providers
+    # and sources that have shipped. base-uri, form-action and frame-src are
+    # not covered by default-src, so each is closed explicitly.
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; frame-ancestors 'none'; worker-src 'self'; manifest-src 'self';"
     # Force HTTPS for 1 year
     Strict-Transport-Security = "max-age=31536000; includeSubDomains"
     # Prevent clickjacking
@@ -41,5 +43,9 @@
     X-Content-Type-Options = "nosniff"
     # No referrer information sent to external sites
     Referrer-Policy = "no-referrer"
-    # Restrict browser features
-    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+    # Browser features. The microphone is this site's only, for voice input
+    # transcribed on the device; everything Parliament does not use is off.
+    Permissions-Policy = "accelerometer=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), hid=(), magnetometer=(), microphone=(self), midi=(), payment=(), serial=(), usb=()"
+    # Keep other sites' windows and pages from reaching into this one.
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Resource-Policy = "same-origin"

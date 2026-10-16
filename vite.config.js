@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { SECURITY_HEADERS } from './src/lib/securityHeaders.js'
 
 export default defineConfig({
   plugins: [
@@ -81,6 +82,13 @@ export default defineConfig({
       },
     }),
   ],
+
+  // The deployed policy, applied to `vite preview` so a production build is
+  // tried under it before deploy. Not applied to the dev server (see
+  // src/lib/securityHeaders.js).
+  preview: {
+    headers: SECURITY_HEADERS,
+  },
 
   build: {
     rollupOptions: {
