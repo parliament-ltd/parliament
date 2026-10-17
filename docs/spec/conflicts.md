@@ -139,6 +139,8 @@ Line numbers are approximate.
   - The choice is a setting of the person's, not the device's, and goes in the backup allowlist when the setting is added.
 - **The dry run is approved.** Stefan read it on two backups of his own (one chat in one browser; 21 chats, 17 of them Secretarybird documents, in another) and on the sample. The version 6 upgrade is drafted next and shown to him before the database version goes up.
 - **C91. Secretarybird documents stay as they are,** comments and suggestions included. To come back to and check: that Drafting Desk still shows them after the upgrade, and what becomes of them at stage 11.
+- **C90, as revised: yes.** Rooms made from a built-in template record its key and keep their stored names; chat titles are not changed; the new screens treat template names, "Branch:" and "New conversation" as words of the interface.
+- **The database version goes up at the stage 2 checkpoint,** after the write path, restore and backups, with a backup offered first. Until the write path exists, today's screens would create chats, notes and highlights with no number or docket, and removing a chat would leave its docket pointing at nothing.
 
 ## Part 1. Settled by precedence
 
@@ -771,7 +773,7 @@ language, reply language), and so are more providers, Mistral included.
   - In Stefan's second backup (16 October): 19 rooms named "Drafting Desk", 2 "Writing Studio" and 1 "New room", all template words; 6 chats titled "New conversation".
 - Done in the planner: docket and branch names drop every "Branch:" and "Summary:", but only on chats that were forked, so a title someone wrote as "Summary: Q3" keeps it. "New conversation" is read as no title. The chats' own titles are untouched.
 - **First suggestion, withdrawn:** clear the template names and the title prefixes in the upgrade. Found while drafting it: today's screens read a room's stored name and a chat's stored title directly, and keep running until the new ones replace them. Clearing them would blank 19 room names in the app as it is now.
-- **Suggestion, revised 16 October** (drafted in `v6Plan.js` and `v6Upgrade.js`, for Stefan's yes):
+- **Suggestion, revised 16 October, and ruled yes the same day** (drafted in `v6Plan.js` and `v6Upgrade.js`):
   1. A room whose name is a built-in template's name records that template's key (`meta.template`). Its stored name stays. The new screens show the template's name in the reader's language while the stored name is still the template's English one, and the stored name once its owner renames it.
   2. Chat titles are not changed. The new screens read the "Branch:" and "Summary:" prefixes on a forked chat, and "New conversation", as no words of the person's, as the planner already does for dockets and branches.
   3. New rooms, chats and branches stop writing these words once the copy table exists (stage 3).
