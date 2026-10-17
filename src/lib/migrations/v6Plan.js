@@ -39,6 +39,9 @@ import { STATUS, branchStatus } from '../docketModel'
 // The old code titled a fork "Branch: <parent title>", so a fork of a fork
 // reads "Branch: Branch: …". All of them come off a branch's name.
 const BRANCH_PREFIX = /^(?:(?:Branch|Summary):\s*)+/
+// What the old code stored in place of a title (SelectorLayout's new chat).
+// It means "no title", so it is read as none (C86, C90).
+const NO_TITLE = new Set(['New conversation'])
 const API_KEY_SETTING = 'parliament-api-key'
 
 /**
@@ -316,7 +319,8 @@ function pickRoot(members, convById) {
 // "Summary: Q3" yourself keeps its title.
 function branchName(c) {
   if (!c.title) return null
-  return c.parentId ? c.title.replace(BRANCH_PREFIX, '') || c.title : c.title
+  const name = c.parentId ? c.title.replace(BRANCH_PREFIX, '') || c.title : c.title
+  return NO_TITLE.has(name.trim()) ? null : name
 }
 
 // ── Steps ────────────────────────────────────────────────
@@ -360,6 +364,14 @@ function buildReport(plan, { snap, conversations, convById, msgById, numOf, favo
   // keeps the id. A room missing from the data (a backup without rooms) has
   // no name to show.
   const roomName = new Map((snap.modes || []).map((m) => [m.id, m.meta?.name || null]))
+  // A chat with no prompts is a document (Secretarybird keeps its text in a
+  // document record, not in messages), an empty chat, or a chat holding only
+  // replies. The report tells them apart; the plan treats them alike.
+  const withMessages = new Set((snap.messages || []).map((m) => m.conversationId))
+  const withText = new Set((snap.sbrd_documents || [])
+    .filter((d) => Array.isArray(d.paragraphs) && d.paragraphs.some((p) => String(p?.text ?? '').trim()))
+    .map((d) => d.conversationId))
+  const noStepsKind = (chatId) => (withText.has(chatId) ? 'document' : withMessages.has(chatId) ? 'replies' : 'empty')
   const statusCounts = {}
   const docketRows = plan.dockets
     .slice()
@@ -380,6 +392,7 @@ function buildReport(plan, { snap, conversations, convById, msgById, numOf, favo
             room: rb.room,
             roomName: roomName.get(rb.room) ?? null,
             steps: rb.steps.length,
+            noSteps: rb.steps.length ? null : noStepsKind(rb.chatId),
             paused: rb.steps.filter((s) => s.status === STATUS.PAUSED).length,
             status: rb.status,
             forkedFrom: b.forkedFrom || null,
@@ -389,11 +402,40 @@ function buildReport(plan, { snap, conversations, convById, msgById, numOf, favo
       }
     })
 
-  const noSteps = docketRows.flatMap((d) => d.branches).filter((b) => b.steps === 0).length
-  if (noSteps) {
-    warnings.push(noSteps === 1
-      ? 'One chat has no prompts of yours (a document, or an empty chat). It becomes a branch with no steps, status ready.'
-      : `${noSteps} chats have no prompts of yours (documents, or empty chats). Each becomes a branch with no steps, status ready.`)
+  const noSteps = docketRows.flatMap((d) => d.branches).filter((b) => b.noSteps)
+  const tally = (kind) => noSteps.filter((b) => b.noSteps === kind).length
+  const documents = tally('document')
+  const emptyChats = tally('empty')
+  const repliesOnly = tally('replies')
+  // Comments (a passage, a question, the model's answer) and the model's
+  // suggestions live inside each document's paragraphs. They stay there.
+  let documentComments = 0
+  let documentSuggestions = 0
+  for (const d of snap.sbrd_documents || []) {
+    if (!convById.has(d.conversationId)) continue
+    for (const p of Array.isArray(d.paragraphs) ? d.paragraphs : []) {
+      if (Array.isArray(p?.comments)) documentComments += p.comments.length
+      if (Array.isArray(p?.claudeSuggestions)) documentSuggestions += p.claudeSuggestions.length
+    }
+  }
+  if (documents) {
+    const n = (k, one, many) => `${k} ${k === 1 ? one : many}`
+    const kept = documentComments || documentSuggestions
+      ? ` ${documents === 1 ? 'Its' : 'Their'} ${n(documentComments, 'comment', 'comments')} and ${n(documentSuggestions, 'suggestion', 'suggestions')} from the model stay in ${documents === 1 ? 'the document' : 'the documents'} too.`
+      : ''
+    warnings.push((documents === 1
+      ? 'One chat is a document: its text is kept in the document, not in messages, so it has no steps. The text is not touched.'
+      : `${documents} chats are documents: their text is kept in the document, not in messages, so they have no steps. The text is not touched.`) + kept)
+  }
+  if (emptyChats) {
+    warnings.push(emptyChats === 1
+      ? 'One chat is empty, with no messages and no text. It becomes a branch with no steps. Nothing is removed.'
+      : `${emptyChats} chats are empty, with no messages and no text. Each becomes a branch with no steps. Nothing is removed.`)
+  }
+  if (repliesOnly) {
+    warnings.push(repliesOnly === 1
+      ? 'One chat holds replies but no prompts of yours, so it has no steps.'
+      : `${repliesOnly} chats hold replies but no prompts of yours, so they have no steps.`)
   }
   const models = new Set(conversations.map((c) => c.model).filter(Boolean))
   if (docketRows.some((d) => d.branches.some((b) => b.steps > 0))) {
@@ -413,6 +455,10 @@ function buildReport(plan, { snap, conversations, convById, msgById, numOf, favo
       quotes: plan.quoteUpdates.length,
       favoritesToCollection: favorites.length,
       favoritesSkipped: favoritesSkipped.length,
+      documents,
+      documentComments,
+      documentSuggestions,
+      emptyChats,
       scratchpadToNote: plan.newNotes.length,
       collabs: plan.collabs.length,
       chatsWithModelTags: plan.conversationUpdates.filter((u) => u.tagsBy === 'model').length,

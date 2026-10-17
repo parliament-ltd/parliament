@@ -90,7 +90,7 @@ describe('planV6Migration on the sample backup', () => {
 
   it('fills every section of the report', () => {
     expect(r.counts).toMatchObject({
-      chats: 7, dockets: 5, multiBranchDockets: 1, branches: 7,
+      chats: 8, dockets: 6, multiBranchDockets: 1, branches: 8, documents: 1, documentComments: 1, documentSuggestions: 1, emptyChats: 1,
       notes: 2, terms: 3, quotes: 1, favoritesToCollection: 2, favoritesSkipped: 1,
       scratchpadToNote: 1, collabs: 1, chatsWithModelTags: 2,
     })
@@ -105,9 +105,9 @@ describe('planV6Migration on the sample backup', () => {
     expect(tower.branches[2]).toMatchObject({ status: 'paused', paused: 1, forkedFrom: { step: 3 } })
   })
 
-  it('names rooms, and warns about the missing parent, the missing favourite, the empty persona and the document', () => {
+  it('names rooms, and warns about the missing parent, the missing favourite, the empty persona, the document and the empty chat', () => {
     expect(new Set(r.dockets.flatMap((d) => d.branches.map((b) => b.roomName)))).toEqual(new Set(['Writing Studio', 'Essay room']))
-    for (const bit of ['no longer exists', 'message that no longer exists', 'no instruction', 'no prompts of yours', 'last model']) {
+    for (const bit of ['no longer exists', 'message that no longer exists', 'no instruction', 'is a document', 'Its 1 comment and 1 suggestion from the model stay in the document too', 'is empty', 'last model']) {
       expect(r.warnings.some((w) => w.includes(bit))).toBe(true)
     }
   })
@@ -150,6 +150,30 @@ describe('planV6Migration edge cases', () => {
     expect(plan.dockets[0].branches[0].forkedFrom).toBeUndefined()
     expect(plan.report.dockets[0].branches[0].parentGone).toBe(true)
     expect(plan.report.warnings).toContain('One branch points at a parent chat that no longer exists. It becomes branch a of its own docket.')
+  })
+
+  it('reads the old default title "New conversation" as no title', () => {
+    const plan = planV6Migration({ conversations: [conv('a', '2026-01-01', { title: 'New conversation' })] }, { newId: counter() })
+    expect(plan.dockets[0].title).toBeNull()
+    expect(plan.dockets[0].branches[0].name).toBeNull()
+  })
+
+  it('tells documents, empty chats and chats holding only replies apart, and removes none of them', () => {
+    const plan = planV6Migration({
+      conversations: [conv('doc', '2026-01-01'), conv('blank', '2026-01-02'), conv('reply', '2026-01-03')],
+      messages: [msg('r1', 'reply', 'assistant', '2026-01-03T00:00:01Z')],
+      sbrd_documents: [
+        { conversationId: 'doc', paragraphs: [{ id: 'p1', text: 'A draft.' }] },
+        { conversationId: 'blank', paragraphs: [{ id: 'p1', text: '  ' }] },
+      ],
+    }, { newId: counter() })
+    expect(plan.report.dockets.map((d) => d.branches[0].noSteps)).toEqual(['document', 'empty', 'replies'])
+    expect(plan.dockets).toHaveLength(3)
+    expect(plan.report.warnings).toEqual(expect.arrayContaining([
+      expect.stringContaining('One chat is a document'),
+      expect.stringContaining('One chat is empty'),
+      expect.stringContaining('One chat holds replies'),
+    ]))
   })
 
   it('keeps "Summary:" in a title you wrote yourself', () => {

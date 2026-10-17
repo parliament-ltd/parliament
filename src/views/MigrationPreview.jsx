@@ -24,6 +24,9 @@ const STATUS_STYLE = {
   running: { background: C.ink, color: C.paper },
 }
 
+// What a branch with no steps is, in the Steps column.
+const NO_STEPS = { document: 'a document', empty: 'empty', replies: 'replies only' }
+
 // Lists longer than this show their first entries and a count of the rest.
 const LIST_LIMIT = 60
 
@@ -38,6 +41,7 @@ async function readThisBrowser() {
     pins: await db.getAll('pins'),
     settings: await db.getAll('settings'),
     modes: await db.getAll('modes'),
+    sbrd_documents: await db.getAll('sbrd_documents'),
   }
 }
 
@@ -306,7 +310,10 @@ function DocketRows({ d }) {
           <td style={{ padding: '3px 12px', font: `italic 400 12px ${C.serif}`, color: C.ink2 }}>
             {b.roomName || (b.room ? 'a room missing from the data' : 'no room')}
           </td>
-          <td style={{ padding: '3px 12px' }}>{b.steps}{b.paused ? <span style={{ color: C.ink3 }}>{`, ${b.paused} without a full reply`}</span> : null}</td>
+          <td style={{ padding: '3px 12px' }}>
+            {b.noSteps ? <Marg>{NO_STEPS[b.noSteps]}</Marg> : b.steps}
+            {b.paused ? <span style={{ color: C.ink3 }}>{`, ${b.paused} without a full reply`}</span> : null}
+          </td>
           <td style={{ padding: '3px 12px' }}>{b.status === 'ready' ? null : <Chip status={b.status} />}</td>
           <td style={{ padding: '3px 12px', font: `italic 400 12px ${C.serif}`, color: C.ink2 }}>
             {b.forkedFrom

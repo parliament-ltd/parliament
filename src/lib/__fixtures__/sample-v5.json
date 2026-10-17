@@ -9,7 +9,7 @@
   "encrypted": false,
   "manifest": {
     "counts": {
-      "chats": 7
+      "chats": 8
     },
     "sizeBeforeCompression": 0
   },
@@ -342,10 +342,26 @@
           "paragraphs": [
             {
               "id": "p1",
-              "text": "Books on water towers."
+              "type": "paragraph",
+              "text": "Books on water towers.",
+              "baseline": "Books on water towers.",
+              "comments": [
+                {
+                  "id": "k1",
+                  "text": "Any in Swedish?",
+                  "selectedText": "Books",
+                  "claudeReply": "A few, mostly local histories."
+                }
+              ],
+              "claudeSuggestions": [
+                {
+                  "id": "s1",
+                  "text": "Books and articles on water towers."
+                }
+              ]
             }
           ],
-          "submittedReplies": [],
+          "submittedReplies": {},
           "updatedAt": "2026-06-01T12:03:00.000Z"
         }
       },
@@ -380,6 +396,30 @@
             "createdAt": "2026-06-15T16:00:10.000Z"
           }
         ]
+      },
+      {
+        "id": "c8",
+        "title": "New conversation",
+        "model": "claude-sonnet",
+        "parentId": null,
+        "branchPoint": null,
+        "room": "mode_ws",
+        "pinned": false,
+        "storageBytes": 0,
+        "createdAt": "2026-07-01T09:00:00.000Z",
+        "updatedAt": "2026-07-01T09:00:00.000Z",
+        "messages": [],
+        "sbrdDocument": {
+          "conversationId": "c8",
+          "paragraphs": [
+            {
+              "id": "p1",
+              "text": ""
+            }
+          ],
+          "submittedReplies": {},
+          "updatedAt": "2026-07-01T09:00:00.000Z"
+        }
       }
     ],
     "annotations": {
