@@ -36,12 +36,15 @@
 import { FIRST_NUM, letterAt } from '../addresses'
 import { STATUS, branchStatus } from '../docketModel'
 
-const BRANCH_PREFIX = /^(Branch|Summary):\s*/
+// The old code titled a fork "Branch: <parent title>", so a fork of a fork
+// reads "Branch: Branch: …". All of them come off a branch's name.
+const BRANCH_PREFIX = /^(?:(?:Branch|Summary):\s*)+/
 const API_KEY_SETTING = 'parliament-api-key'
 
 /**
- * @param {object} snap  { conversations, messages, notes, highlights, favorites, pins, settings }
+ * @param {object} snap  { conversations, messages, notes, highlights, favorites, pins, settings, modes }
  *   Arrays of v5 records, as read from IndexedDB or flattened from a backup.
+ *   `modes` is read only to name rooms in the report.
  * @param {object} [opts]
  * @param {() => string} [opts.newId]  id generator, injectable for tests
  * @param {string} [opts.now]          ISO time for records created by the migration
@@ -62,7 +65,9 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
   }
   for (const arr of msgsByConv.values()) arr.sort(byCreated)
   const orphanMessages = messages.filter((m) => !convById.has(m.conversationId)).length
-  if (orphanMessages) warnings.push(`${orphanMessages} messages belong to no chat and are left as they are.`)
+  if (orphanMessages) warnings.push(orphanMessages === 1
+    ? 'One message belongs to no chat and is left as it is.'
+    : `${orphanMessages} messages belong to no chat and are left as they are.`)
 
   // ── 1. Families ───────────────────────────────────────
   const families = groupFamilies(conversations, convById, warnings)
@@ -79,7 +84,7 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
     const letterOf = new Map(ordered.map((c, i) => [c.id, letterAt(i)]))
 
     const branches = ordered.map((c, i) => {
-      const b = { letter: letterAt(i), name: branchName(c, i === 0), createdAt: c.createdAt }
+      const b = { letter: letterAt(i), name: branchName(c), createdAt: c.createdAt }
       if (i > 0 && c.parentId && convById.has(c.parentId)) {
         b.forkedFrom = { chatId: c.parentId, step: forkStep(c, msgsByConv.get(c.parentId) || []) }
       }
@@ -101,7 +106,9 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
     dockets.push({
       id: docketId,
       num: null,
-      title: root.title || null,
+      // A root that was itself forked from a chat now gone still carries
+      // "Branch:" in its title; the docket's title does not.
+      title: branchName(root),
       createdAt: root.createdAt,
       updatedAt: ordered.reduce((max, c) => (c.updatedAt > max ? c.updatedAt : max), root.updatedAt || root.createdAt),
       pinned: false,
@@ -132,7 +139,9 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
     })
   }
   if (favoritesSkipped.length) {
-    warnings.push(`${favoritesSkipped.length} favourites point at a message that no longer exists and are not carried into the collection.`)
+    warnings.push(favoritesSkipped.length === 1
+      ? 'One favourite points at a message that no longer exists and is not carried into the collection.'
+      : `${favoritesSkipped.length} favourites point at a message that no longer exists and are not carried into the collection.`)
   }
   const collections = favoriteItems.length
     ? [{
@@ -168,7 +177,9 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
   // ── 7. Personas become collabs of your own, switched off ─
   const { collabs, personasSkipped } = collabsFromPersonas(settings, { newId, now })
   if (personasSkipped) {
-    warnings.push(`${personasSkipped} saved personas have no instruction text and are not carried over.`)
+    warnings.push(personasSkipped === 1
+      ? 'One saved persona has no instruction text and is not carried over.'
+      : `${personasSkipped} saved personas have no instruction text and are not carried over.`)
   }
 
   // ── 9. The key moves to the key store ───────────────────
@@ -280,7 +291,9 @@ function groupFamilies(conversations, convById, warnings) {
     if (c.familyId && c.familyId !== c.id && convById.has(c.familyId)) union(c.id, c.familyId)
   }
   if (missingParents) {
-    warnings.push(`${missingParents} branches point at a parent chat that no longer exists. Each becomes branch a of its own docket.`)
+    warnings.push(missingParents === 1
+      ? 'One branch points at a parent chat that no longer exists. It becomes branch a of its own docket.'
+      : `${missingParents} branches point at a parent chat that no longer exists. Each becomes branch a of its own docket.`)
   }
   const groups = new Map()
   for (const c of conversations) {
@@ -299,9 +312,11 @@ function pickRoot(members, convById) {
   return (roots.length ? roots : members)[0]
 }
 
-function branchName(c, isRoot) {
+// Only a chat that was forked has the prefix taken off, so a chat you titled
+// "Summary: Q3" yourself keeps its title.
+function branchName(c) {
   if (!c.title) return null
-  return isRoot ? c.title : c.title.replace(BRANCH_PREFIX, '') || c.title
+  return c.parentId ? c.title.replace(BRANCH_PREFIX, '') || c.title : c.title
 }
 
 // ── Steps ────────────────────────────────────────────────
@@ -341,6 +356,10 @@ function byCreated(a, b) {
 
 function buildReport(plan, { snap, conversations, convById, msgById, numOf, favoritesSkipped, warnings }) {
   const runOf = new Map(plan.runs.map((r) => [r.docketId, r]))
+  // A chat's room is a room record's id. The report shows its name; the plan
+  // keeps the id. A room missing from the data (a backup without rooms) has
+  // no name to show.
+  const roomName = new Map((snap.modes || []).map((m) => [m.id, m.meta?.name || null]))
   const statusCounts = {}
   const docketRows = plan.dockets
     .slice()
@@ -359,19 +378,25 @@ function buildReport(plan, { snap, conversations, convById, msgById, numOf, favo
             name: b.name,
             chatNum: numOf.get(`chat:${rb.chatId}`),
             room: rb.room,
+            roomName: roomName.get(rb.room) ?? null,
             steps: rb.steps.length,
             paused: rb.steps.filter((s) => s.status === STATUS.PAUSED).length,
             status: rb.status,
             forkedFrom: b.forkedFrom || null,
+            parentGone: Boolean(convById.get(rb.chatId)?.parentId && !convById.has(convById.get(rb.chatId).parentId)),
           }
         }),
       }
     })
 
   const noSteps = docketRows.flatMap((d) => d.branches).filter((b) => b.steps === 0).length
-  if (noSteps) warnings.push(`${noSteps} chats have no prompts of yours (documents, or empty chats). Each becomes a branch with no steps, status ready.`)
+  if (noSteps) {
+    warnings.push(noSteps === 1
+      ? 'One chat has no prompts of yours (a document, or an empty chat). It becomes a branch with no steps, status ready.'
+      : `${noSteps} chats have no prompts of yours (documents, or empty chats). Each becomes a branch with no steps, status ready.`)
+  }
   const models = new Set(conversations.map((c) => c.model).filter(Boolean))
-  if (conversations.length) {
+  if (docketRows.some((d) => d.branches.some((b) => b.steps > 0))) {
     warnings.push('Old chats do not record which model answered each turn, only the last one used. Every step takes its chat\'s last model.')
   }
 

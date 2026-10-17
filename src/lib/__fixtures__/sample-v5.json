@@ -1,0 +1,512 @@
+{
+  "format": "parliament-backup",
+  "version": 1,
+  "createdAt": "2026-10-16T12:00:00.000Z",
+  "parliamentVersion": "0.5.0",
+  "source": {
+    "browserFingerprint": "0000000000000000"
+  },
+  "encrypted": false,
+  "manifest": {
+    "counts": {
+      "chats": 7
+    },
+    "sizeBeforeCompression": 0
+  },
+  "contents": {
+    "chats": [
+      {
+        "id": "c1",
+        "title": "Water tower history",
+        "model": "claude-sonnet",
+        "parentId": null,
+        "branchPoint": null,
+        "room": "mode_ws",
+        "pinned": false,
+        "storageBytes": 0,
+        "createdAt": "2026-04-03T10:00:00.000Z",
+        "updatedAt": "2026-04-03T10:04:07.000Z",
+        "messages": [
+          {
+            "id": "m1",
+            "conversationId": "c1",
+            "role": "user",
+            "content": "When was the water tower on Hill Road built?",
+            "tokenCount": 11,
+            "incomplete": false,
+            "createdAt": "2026-04-03T10:00:00.000Z"
+          },
+          {
+            "id": "m2",
+            "conversationId": "c1",
+            "role": "assistant",
+            "content": "It was finished in 1931, in a stripped-down Bauhaus style, and renovated once since.",
+            "tokenCount": 21,
+            "incomplete": false,
+            "createdAt": "2026-04-03T10:00:08.000Z"
+          },
+          {
+            "id": "m3",
+            "conversationId": "c1",
+            "role": "user",
+            "content": "Who designed it?",
+            "tokenCount": 4,
+            "incomplete": false,
+            "createdAt": "2026-04-03T10:02:00.000Z"
+          },
+          {
+            "id": "m4",
+            "conversationId": "c1",
+            "role": "assistant",
+            "content": "The town engineer drew it, with a local architect for the facade.",
+            "tokenCount": 17,
+            "incomplete": false,
+            "createdAt": "2026-04-03T10:02:09.000Z"
+          },
+          {
+            "id": "m5",
+            "conversationId": "c1",
+            "role": "user",
+            "content": "What did it cost?",
+            "tokenCount": 5,
+            "incomplete": false,
+            "createdAt": "2026-04-03T10:04:00.000Z"
+          },
+          {
+            "id": "m6",
+            "conversationId": "c1",
+            "role": "assistant",
+            "content": "About a third of the town budget that year, paid partly with matching funds.",
+            "tokenCount": 19,
+            "incomplete": false,
+            "createdAt": "2026-04-03T10:04:07.000Z"
+          }
+        ],
+        "familyId": "c1",
+        "tags": [
+          "history",
+          "architecture"
+        ]
+      },
+      {
+        "id": "c2",
+        "title": "Branch: Water tower history",
+        "model": "claude-sonnet",
+        "parentId": "c1",
+        "branchPoint": "m4",
+        "room": "mode_ws",
+        "pinned": false,
+        "storageBytes": 0,
+        "createdAt": "2026-04-05T09:00:00.000Z",
+        "updatedAt": "2026-04-05T09:01:12.000Z",
+        "messages": [
+          {
+            "id": "m7",
+            "conversationId": "c2",
+            "role": "user",
+            "content": "When was the water tower on Hill Road built?",
+            "tokenCount": 11,
+            "incomplete": false,
+            "createdAt": "2026-04-03T10:00:00.000Z"
+          },
+          {
+            "id": "m8",
+            "conversationId": "c2",
+            "role": "assistant",
+            "content": "It was finished in 1931, in a stripped-down Bauhaus style, and renovated once since.",
+            "tokenCount": 21,
+            "incomplete": false,
+            "createdAt": "2026-04-03T10:00:08.000Z"
+          },
+          {
+            "id": "m9",
+            "conversationId": "c2",
+            "role": "user",
+            "content": "Who designed it?",
+            "tokenCount": 4,
+            "incomplete": false,
+            "createdAt": "2026-04-03T10:02:00.000Z"
+          },
+          {
+            "id": "m10",
+            "conversationId": "c2",
+            "role": "assistant",
+            "content": "The town engineer drew it, with a local architect for the facade.",
+            "tokenCount": 17,
+            "incomplete": false,
+            "createdAt": "2026-04-03T10:02:09.000Z"
+          },
+          {
+            "id": "m11",
+            "conversationId": "c2",
+            "role": "user",
+            "content": "Tell it as a story for a children's book instead.",
+            "tokenCount": 13,
+            "incomplete": false,
+            "createdAt": "2026-04-05T09:01:00.000Z"
+          },
+          {
+            "id": "m12",
+            "conversationId": "c2",
+            "role": "assistant",
+            "content": "Once, on a hill above a small town, the engineers raised a tall white tower.",
+            "tokenCount": 19,
+            "incomplete": false,
+            "createdAt": "2026-04-05T09:01:12.000Z"
+          }
+        ],
+        "parentTitle": "Water tower history",
+        "familyId": "c1"
+      },
+      {
+        "id": "c3",
+        "title": "Branch: Branch: Water tower history",
+        "model": "claude-sonnet",
+        "parentId": "c2",
+        "branchPoint": "m12",
+        "room": "mode_ws",
+        "pinned": false,
+        "storageBytes": 0,
+        "createdAt": "2026-04-06T07:59:00.000Z",
+        "updatedAt": "2026-04-06T08:00:04.000Z",
+        "messages": [
+          {
+            "id": "m13",
+            "conversationId": "c3",
+            "role": "user",
+            "content": "When was the water tower on Hill Road built?",
+            "tokenCount": 11,
+            "incomplete": false,
+            "createdAt": "2026-04-03T10:00:00.000Z"
+          },
+          {
+            "id": "m14",
+            "conversationId": "c3",
+            "role": "assistant",
+            "content": "It was finished in 1931, in a stripped-down Bauhaus style, and renovated once since.",
+            "tokenCount": 21,
+            "incomplete": false,
+            "createdAt": "2026-04-03T10:00:08.000Z"
+          },
+          {
+            "id": "m15",
+            "conversationId": "c3",
+            "role": "user",
+            "content": "Who designed it?",
+            "tokenCount": 4,
+            "incomplete": false,
+            "createdAt": "2026-04-03T10:02:00.000Z"
+          },
+          {
+            "id": "m16",
+            "conversationId": "c3",
+            "role": "assistant",
+            "content": "The town engineer drew it, with a local architect for the facade.",
+            "tokenCount": 17,
+            "incomplete": false,
+            "createdAt": "2026-04-03T10:02:09.000Z"
+          },
+          {
+            "id": "m17",
+            "conversationId": "c3",
+            "role": "user",
+            "content": "Tell it as a story for a children's book instead.",
+            "tokenCount": 13,
+            "incomplete": false,
+            "createdAt": "2026-04-05T09:01:00.000Z"
+          },
+          {
+            "id": "m18",
+            "conversationId": "c3",
+            "role": "assistant",
+            "content": "Once, on a hill above a small town, the engineers raised a tall white tower.",
+            "tokenCount": 19,
+            "incomplete": false,
+            "createdAt": "2026-04-05T09:01:12.000Z"
+          },
+          {
+            "id": "m19",
+            "conversationId": "c3",
+            "role": "user",
+            "content": "Make it rhyme.",
+            "tokenCount": 4,
+            "incomplete": false,
+            "createdAt": "2026-04-06T08:00:00.000Z"
+          },
+          {
+            "id": "m20",
+            "conversationId": "c3",
+            "role": "assistant",
+            "content": "Upon a hill, so white and tall,",
+            "tokenCount": 8,
+            "incomplete": true,
+            "createdAt": "2026-04-06T08:00:04.000Z"
+          }
+        ],
+        "parentTitle": "Branch: Water tower history",
+        "familyId": "c1"
+      },
+      {
+        "id": "c4",
+        "title": "Grant application",
+        "model": "claude-sonnet",
+        "parentId": null,
+        "branchPoint": null,
+        "room": "mode_essay",
+        "pinned": false,
+        "storageBytes": 0,
+        "createdAt": "2026-05-02T14:00:00.000Z",
+        "updatedAt": "2026-05-02T14:05:00.000Z",
+        "messages": [
+          {
+            "id": "m21",
+            "conversationId": "c4",
+            "role": "user",
+            "content": "Outline a grant application for restoring the tower.",
+            "tokenCount": 13,
+            "incomplete": false,
+            "createdAt": "2026-05-02T14:00:00.000Z"
+          },
+          {
+            "id": "m22",
+            "conversationId": "c4",
+            "role": "assistant",
+            "content": "Sections: need, history, plan, budget, matching funds, timeline.",
+            "tokenCount": 16,
+            "incomplete": false,
+            "createdAt": "2026-05-02T14:00:15.000Z"
+          },
+          {
+            "id": "m23",
+            "conversationId": "c4",
+            "role": "user",
+            "content": "Draft the budget section.",
+            "tokenCount": 7,
+            "incomplete": false,
+            "createdAt": "2026-05-02T14:05:00.000Z"
+          }
+        ],
+        "tags": [
+          "funding",
+          "writing"
+        ]
+      },
+      {
+        "id": "c5",
+        "title": "Branch: Tower, short version",
+        "model": "claude-sonnet",
+        "parentId": "c-deleted",
+        "branchPoint": "m-deleted",
+        "room": "mode_ws",
+        "pinned": false,
+        "storageBytes": 0,
+        "createdAt": "2026-05-10T10:59:00.000Z",
+        "updatedAt": "2026-05-10T11:00:03.000Z",
+        "messages": [
+          {
+            "id": "m24",
+            "conversationId": "c5",
+            "role": "user",
+            "content": "Shorter, please.",
+            "tokenCount": 4,
+            "incomplete": false,
+            "createdAt": "2026-05-10T11:00:00.000Z"
+          },
+          {
+            "id": "m25",
+            "conversationId": "c5",
+            "role": "assistant",
+            "content": "Built 1931. Bauhaus. Renovated once.",
+            "tokenCount": 9,
+            "incomplete": false,
+            "createdAt": "2026-05-10T11:00:03.000Z"
+          }
+        ],
+        "parentTitle": "Tower, short version",
+        "familyId": "c-deleted"
+      },
+      {
+        "id": "c6",
+        "title": "Reading list",
+        "model": "claude-sonnet",
+        "parentId": null,
+        "branchPoint": null,
+        "room": "mode_essay",
+        "pinned": false,
+        "storageBytes": 0,
+        "createdAt": "2026-06-01T12:00:00.000Z",
+        "updatedAt": "2026-06-01T12:00:00.000Z",
+        "messages": [],
+        "sbrdDocument": {
+          "conversationId": "c6",
+          "paragraphs": [
+            {
+              "id": "p1",
+              "text": "Books on water towers."
+            }
+          ],
+          "submittedReplies": [],
+          "updatedAt": "2026-06-01T12:03:00.000Z"
+        }
+      },
+      {
+        "id": "c7",
+        "title": "",
+        "model": "claude-sonnet",
+        "parentId": null,
+        "branchPoint": null,
+        "room": "mode_ws",
+        "pinned": false,
+        "storageBytes": 0,
+        "createdAt": "2026-06-15T16:00:00.000Z",
+        "updatedAt": "2026-06-15T16:00:10.000Z",
+        "messages": [
+          {
+            "id": "m26",
+            "conversationId": "c7",
+            "role": "user",
+            "content": "Is concrete or steel better for a water tower?",
+            "tokenCount": 12,
+            "incomplete": false,
+            "createdAt": "2026-06-15T16:00:00.000Z"
+          },
+          {
+            "id": "m27",
+            "conversationId": "c7",
+            "role": "assistant",
+            "content": "Both are used. Concrete lasts longer; steel is quicker to build.",
+            "tokenCount": 16,
+            "incomplete": false,
+            "createdAt": "2026-06-15T16:00:10.000Z"
+          }
+        ]
+      }
+    ],
+    "annotations": {
+      "notes": [
+        {
+          "id": "n1",
+          "conversationId": "c1",
+          "messageId": "m2",
+          "text": "Check the 1931 date against the town archive.",
+          "createdAt": "2026-04-03T10:06:00.000Z"
+        },
+        {
+          "id": "n2",
+          "conversationId": "c4",
+          "messageId": "m22",
+          "text": "Ask the council about matching funds.",
+          "createdAt": "2026-05-02T14:10:00.000Z"
+        }
+      ],
+      "highlights": [
+        {
+          "id": "h1",
+          "conversationId": "c1",
+          "messageId": "m2",
+          "text": "Bauhaus",
+          "color": "#B8A070",
+          "createdAt": "2026-04-03T10:05:00.000Z"
+        },
+        {
+          "id": "h2",
+          "conversationId": "c1",
+          "messageId": "m6",
+          "text": "matching funds",
+          "color": "#7FA6C9",
+          "createdAt": "2026-04-03T10:05:30.000Z"
+        },
+        {
+          "id": "h3",
+          "conversationId": "c4",
+          "messageId": "m22",
+          "text": "timeline",
+          "color": "#B8A070",
+          "createdAt": "2026-05-02T14:11:00.000Z"
+        }
+      ],
+      "favorites": [
+        {
+          "id": "f1",
+          "conversationId": "c2",
+          "messageId": "m12",
+          "createdAt": "2026-04-05T09:02:00.000Z"
+        },
+        {
+          "id": "f2",
+          "conversationId": "c1",
+          "messageId": "m2",
+          "createdAt": "2026-04-04T08:00:00.000Z"
+        },
+        {
+          "id": "f3",
+          "conversationId": "c1",
+          "messageId": "m-gone",
+          "createdAt": "2026-04-04T08:01:00.000Z"
+        }
+      ],
+      "pins": [
+        {
+          "id": "p1",
+          "targetConversationId": "c4",
+          "sourceConversationId": "c1",
+          "sourceMessageId": "m6",
+          "content": "About a third of the town budget that year, paid partly with matching funds.",
+          "createdAt": "2026-05-02T14:02:00.000Z"
+        }
+      ]
+    },
+    "rooms": [
+      {
+        "schema": 1,
+        "parliamentVersion": "0.5.0",
+        "id": "mode_ws",
+        "scope": "room",
+        "meta": {
+          "name": "Writing Studio",
+          "author": null,
+          "description": "A versatile chat with notes, highlights, and branches close at hand. For long-form writing where you go back and forth.",
+          "icon": null,
+          "preferredProvider": null,
+          "created": "2026-04-02T09:00:00.000Z",
+          "modified": "2026-04-02T09:00:00.000Z",
+          "builtAt": "2026-04-02T09:00:00.000Z"
+        },
+        "layout": {
+          "ref": "three-panel@^1.0"
+        },
+        "components": []
+      },
+      {
+        "schema": 1,
+        "parliamentVersion": "0.5.0",
+        "id": "mode_essay",
+        "scope": "room",
+        "meta": {
+          "name": "Essay room",
+          "author": null,
+          "description": "",
+          "icon": null,
+          "preferredProvider": null,
+          "created": "2026-04-20T09:00:00.000Z",
+          "modified": "2026-04-20T09:00:00.000Z",
+          "builtAt": "2026-04-20T09:00:00.000Z"
+        },
+        "layout": {
+          "ref": "two-column@^1.0"
+        },
+        "components": []
+      }
+    ],
+    "preferences": [
+      {
+        "key": "scratchpad-text",
+        "value": "Ask about the 1950s renovation."
+      },
+      {
+        "key": "parrotPersonas",
+        "value": "[{\"id\":\"persona-1\",\"title\":\"Skeptic\",\"instruction\":\"Question every claim and ask for a source.\"},{\"id\":\"persona-2\",\"title\":\"Draft\",\"instruction\":\"\"}]"
+      }
+    ]
+  }
+}

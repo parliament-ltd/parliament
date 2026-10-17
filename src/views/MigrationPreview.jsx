@@ -37,6 +37,7 @@ async function readThisBrowser() {
     favorites: await db.getAll('favorites'),
     pins: await db.getAll('pins'),
     settings: await db.getAll('settings'),
+    modes: await db.getAll('modes'),
   }
 }
 
@@ -63,10 +64,17 @@ export default function MigrationPreview() {
     }
   }
 
-  const fromFile = () => run(file.name, async () => {
-    const parsed = await parseBackupFile(file)
-    const contents = await decryptBackup(parsed, password || null)
+  const readFile = async (f, pw) => {
+    const parsed = await parseBackupFile(f)
+    const contents = await decryptBackup(parsed, pw)
     return contentsToFlatStores(contents)
+  }
+  const fromFile = () => run(file.name, () => readFile(file, password || null))
+  // An invented backup that reaches every part of the plan, read the same way
+  // as a real file. Loaded only when asked for, and only in development.
+  const fromSample = () => run('the sample backup (invented data)', async () => {
+    const { default: text } = await import('../lib/__fixtures__/sample-v5.json?raw')
+    return readFile(new File([text], 'sample-v5.parliament'), null)
   })
 
   const btn = {
@@ -101,6 +109,8 @@ export default function MigrationPreview() {
             <button type="button" style={btn} disabled={working} onClick={() => run("this browser's data", readThisBrowser)}>
               Read this browser&apos;s data
             </button>
+            <span style={{ font: `italic 400 13px ${C.serif}`, color: C.ink3 }}>or</span>
+            <button type="button" style={btn} disabled={working} onClick={fromSample}>Read the sample</button>
           </div>
           {error && <p style={{ margin: '12px 0 0', color: C.ink }}>{error}</p>}
           {working && <p style={{ margin: '12px 0 0', font: `italic 400 13px ${C.serif}`, color: C.ink2 }}>Reading…</p>}
@@ -130,18 +140,19 @@ function Explain({ children }) {
 
 function Report({ report, source }) {
   const c = report.counts
+  // [count, said of one, said of several]
   const facts = [
-    [c.chats, 'chats'],
-    [c.dockets, 'dockets (plans) made'],
-    [c.multiBranchDockets, 'with more than one branch'],
-    [c.steps, 'prompts of yours, kept as steps'],
-    [c.notes, 'notes, numbered'],
-    [c.terms, 'highlights, now called terms'],
-    [c.quotes, 'pinned references, now quotes'],
-    [c.favoritesToCollection, 'favourites, into the Favorites collection'],
-    [c.scratchpadToNote, 'scratchpad, into a note'],
-    [c.collabs, 'personas, into collabs (switched off)'],
-    [c.chatsWithModelTags, 'chats whose tags are marked as the model\'s'],
+    [c.chats, 'chat', 'chats'],
+    [c.dockets, 'docket (plan) made', 'dockets (plans) made'],
+    [c.multiBranchDockets, 'with more than one branch', 'with more than one branch'],
+    [c.steps, 'step, from your prompts', 'steps, from your prompts (a branch repeats those before its fork)'],
+    [c.notes, 'note, numbered', 'notes, numbered'],
+    [c.terms, 'highlight, now called a term', 'highlights, now called terms'],
+    [c.quotes, 'pinned reference, now a quote', 'pinned references, now quotes'],
+    [c.favoritesToCollection, 'favourite, into the Favorites collection', 'favourites, into the Favorites collection'],
+    [c.scratchpadToNote, 'scratchpad, into a note', 'scratchpad, into a note'],
+    [c.collabs, 'persona, into a collab (switched off)', 'personas, into collabs (switched off)'],
+    [c.chatsWithModelTags, 'chat whose tags are marked as the model\'s', 'chats whose tags are marked as the model\'s'],
   ]
   return (
     <>
@@ -149,12 +160,14 @@ function Report({ report, source }) {
         <H2>Summary</H2>
         <Explain>From {source}.</Explain>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(230px,1fr))', gap: '8px 24px' }}>
-          {facts.map(([n, label]) => (
-            <div key={label}><span style={{ font: `500 16px ${C.sans}` }}>{n}</span> <span style={{ color: C.ink2 }}>{label}</span></div>
+          {facts.map(([n, one, many]) => (
+            <div key={many}><span style={{ font: `500 16px ${C.sans}` }}>{n}</span> <span style={{ color: C.ink2 }}>{n === 1 ? one : many}</span></div>
           ))}
         </div>
         <p style={{ margin: '14px 0 0', color: C.ink2, lineHeight: 1.6 }}>
-          Everything gets a number from one counter, in the order it was made: <Mono>{c.firstNum}</Mono> to <Mono>{c.lastNum}</Mono>.
+          {c.lastNum >= c.firstNum
+            ? <>Everything gets a number from one counter, in the order it was made: <Mono>{c.firstNum}</Mono> to <Mono>{c.lastNum}</Mono>. </>
+            : 'Nothing to number yet. '}
           The next new item takes <Mono>{c.nextNum}</Mono>.
           {c.keyMoves ? ' Your saved key moves to a store of its own; its value is never shown or written anywhere else.' : ''}
         </p>
@@ -178,7 +191,10 @@ function Report({ report, source }) {
             docket of its own. Your prompts become the docket&apos;s steps. Nothing in the chats themselves changes.
           </Explain>
         </div>
-        <div style={{ overflowX: 'auto' }}>
+        {report.dockets.length === 0 && (
+          <p style={{ margin: 0, padding: '0 20px 18px', color: C.ink2 }}>No chats, so no dockets.</p>
+        )}
+        <div style={{ overflowX: 'auto', display: report.dockets.length ? undefined : 'none' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', font: `400 13px ${C.sans}` }}>
             <thead>
               <tr style={{ background: C.subtle, color: C.ink2, textAlign: 'left' }}>
@@ -287,11 +303,15 @@ function DocketRows({ d }) {
           <td style={{ padding: '3px 12px 3px 24px' }}><Mono>{b.address}</Mono></td>
           <td style={{ padding: '3px 12px' }}>{b.name ?? <Marg>untitled</Marg>}</td>
           <td style={{ padding: '3px 12px' }}><Mono>{b.chatNum}</Mono></td>
-          <td style={{ padding: '3px 12px', font: `italic 400 12px ${C.serif}`, color: C.ink2 }}>{b.room || 'no room'}</td>
-          <td style={{ padding: '3px 12px' }}>{b.steps}{b.paused ? <span style={{ color: C.ink3 }}>{`, ${b.paused} cut off`}</span> : null}</td>
+          <td style={{ padding: '3px 12px', font: `italic 400 12px ${C.serif}`, color: C.ink2 }}>
+            {b.roomName || (b.room ? 'a room missing from the data' : 'no room')}
+          </td>
+          <td style={{ padding: '3px 12px' }}>{b.steps}{b.paused ? <span style={{ color: C.ink3 }}>{`, ${b.paused} without a full reply`}</span> : null}</td>
           <td style={{ padding: '3px 12px' }}>{b.status === 'ready' ? null : <Chip status={b.status} />}</td>
           <td style={{ padding: '3px 12px', font: `italic 400 12px ${C.serif}`, color: C.ink2 }}>
-            {b.forkedFrom ? `chat ${b.forkedFrom.chatNum}${b.forkedFrom.step ? `, after prompt ${b.forkedFrom.step}` : ''}` : ''}
+            {b.forkedFrom
+              ? `chat ${b.forkedFrom.chatNum}${b.forkedFrom.step ? `, after prompt ${b.forkedFrom.step}` : ''}`
+              : b.parentGone ? 'a chat since deleted' : ''}
           </td>
         </tr>
       ))}

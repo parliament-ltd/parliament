@@ -81,6 +81,38 @@ describe('planV6Migration on the fixture', () => {
   })
 })
 
+describe('planV6Migration on the sample backup', () => {
+  // Invented data that reaches every part of the plan. The dry-run screen
+  // reads the same file with "Read the sample".
+  const sample = JSON.parse(readFileSync(new URL('../__fixtures__/sample-v5.json', import.meta.url), 'utf8'))
+  const plan = planV6Migration(contentsToFlatStores(sample.contents), { newId: counter(), now: '2026-10-16T12:00:00.000Z' })
+  const r = plan.report
+
+  it('fills every section of the report', () => {
+    expect(r.counts).toMatchObject({
+      chats: 7, dockets: 5, multiBranchDockets: 1, branches: 7,
+      notes: 2, terms: 3, quotes: 1, favoritesToCollection: 2, favoritesSkipped: 1,
+      scratchpadToNote: 1, collabs: 1, chatsWithModelTags: 2,
+    })
+    for (const section of ['favorites', 'terms', 'quotes', 'collabs', 'newNotes']) expect(r[section].length).toBeGreaterThan(0)
+  })
+
+  it('keeps a branch of a branch in its family\'s docket, named without any "Branch:"', () => {
+    const tower = r.dockets.find((d) => d.title === 'Water tower history')
+    expect(tower.branches.map((b) => [b.address.slice(-1), b.name])).toEqual([
+      ['a', 'Water tower history'], ['b', 'Water tower history'], ['c', 'Water tower history'],
+    ])
+    expect(tower.branches[2]).toMatchObject({ status: 'paused', paused: 1, forkedFrom: { step: 3 } })
+  })
+
+  it('names rooms, and warns about the missing parent, the missing favourite, the empty persona and the document', () => {
+    expect(new Set(r.dockets.flatMap((d) => d.branches.map((b) => b.roomName)))).toEqual(new Set(['Writing Studio', 'Essay room']))
+    for (const bit of ['no longer exists', 'message that no longer exists', 'no instruction', 'no prompts of yours', 'last model']) {
+      expect(r.warnings.some((w) => w.includes(bit))).toBe(true)
+    }
+  })
+})
+
 describe('planV6Migration edge cases', () => {
   it('gives a lone chat its own docket', () => {
     const plan = planV6Migration({ conversations: [conv('a', '2026-01-01')], messages: [] }, { newId: counter() })
@@ -110,11 +142,20 @@ describe('planV6Migration edge cases', () => {
     expect(plan.dockets[0].order).toEqual(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k'])
   })
 
-  it('makes a branch whose parent is gone the root of its own docket, and says so', () => {
-    const plan = planV6Migration({ conversations: [conv('x', '2026-01-01', { parentId: 'gone' })], messages: [] }, { newId: counter() })
+  it('makes a branch whose parent is gone the root of its own docket, without "Branch:", and says so', () => {
+    const plan = planV6Migration({ conversations: [conv('x', '2026-01-01', { parentId: 'gone', title: 'Branch: Short version' })], messages: [] }, { newId: counter() })
     expect(plan.dockets).toHaveLength(1)
+    expect(plan.dockets[0].title).toBe('Short version')
+    expect(plan.dockets[0].branches[0]).toMatchObject({ name: 'Short version' })
     expect(plan.dockets[0].branches[0].forkedFrom).toBeUndefined()
-    expect(plan.report.warnings.some((w) => w.includes('no longer exists'))).toBe(true)
+    expect(plan.report.dockets[0].branches[0].parentGone).toBe(true)
+    expect(plan.report.warnings).toContain('One branch points at a parent chat that no longer exists. It becomes branch a of its own docket.')
+  })
+
+  it('keeps "Summary:" in a title you wrote yourself', () => {
+    const plan = planV6Migration({ conversations: [conv('a', '2026-01-01', { title: 'Summary: Q3 results' })] }, { newId: counter() })
+    expect(plan.dockets[0].title).toBe('Summary: Q3 results')
+    expect(plan.dockets[0].branches[0].name).toBe('Summary: Q3 results')
   })
 
   it('turns the scratchpad into a note', () => {
@@ -162,6 +203,26 @@ describe('planV6Migration edge cases', () => {
     expect(plan.dockets[0].title).toBeNull()
     expect(plan.dockets[0].branches[0].name).toBeNull()
     expect(JSON.stringify(plan)).not.toContain('Untitled')
+  })
+
+  it('names each branch\'s room in the report, and keeps the room\'s id in the plan', () => {
+    const plan = planV6Migration({
+      conversations: [conv('a', '2026-01-01', { room: 'mode_1' }), conv('b', '2026-01-02', { room: 'mode_gone' })],
+      modes: [{ id: 'mode_1', scope: 'room', meta: { name: 'testing room' } }],
+    }, { newId: counter() })
+    const rows = plan.report.dockets.flatMap((d) => d.branches)
+    expect(rows.map((b) => [b.room, b.roomName])).toEqual([['mode_1', 'testing room'], ['mode_gone', null]])
+    expect(plan.runs[0].branches.a.room).toBe('mode_1')
+  })
+
+  it('warns that steps take the chat\'s last model only when there are steps', () => {
+    const empty = planV6Migration({ conversations: [conv('a', '2026-01-01')] }, { newId: counter() })
+    expect(empty.report.warnings.some((w) => w.includes('last model'))).toBe(false)
+    const withTurn = planV6Migration({
+      conversations: [conv('a', '2026-01-01')],
+      messages: [msg('u1', 'a', 'user', '2026-01-01T00:00:01Z'), msg('r1', 'a', 'assistant', '2026-01-01T00:00:02Z')],
+    }, { newId: counter() })
+    expect(withTurn.report.warnings.some((w) => w.includes('last model'))).toBe(true)
   })
 
   it('does not touch anything when there is nothing to migrate', () => {
