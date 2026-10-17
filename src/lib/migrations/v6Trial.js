@@ -7,11 +7,11 @@
 // can be inspected in the browser's storage tools meanwhile.
 
 import { openDB, deleteDB } from 'idb'
-import { upgradeSchema, DB_VERSION, DRAFT_DB_VERSION } from '../db'
+import { upgradeSchema, DB_VERSION, DRAFT_DB_VERSION, TRIAL_DB_NAME } from '../db'
 import { V6_NEW_STORES, V6_NEW_INDEXES } from './v6Upgrade'
 import { FIRST_NUM } from '../addresses'
 
-export const TRIAL_DB = 'parliament-v6-trial'
+export const TRIAL_DB = TRIAL_DB_NAME
 
 const V5_STORES = [
   'conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings', 'files', 'file_data',
@@ -27,7 +27,13 @@ const EMPTY = ['edits', 'asks', 'suggestions', 'arrangements', 'focusSets', 'sav
  * @returns {Promise<{ ms: number, counts: object, checks: Array<{ ok: boolean, label: string, detail?: string }> }>}
  */
 export async function runV6Trial(flat) {
-  await deleteDB(TRIAL_DB)
+  // A tab running the app on the copy holds it open, and the delete would
+  // wait for it forever, so say so instead.
+  await new Promise((resolve, reject) => {
+    deleteDB(TRIAL_DB, {
+      blocked: () => reject(new Error('the trial copy is open in the app in this tab; leave it from the line at the top of the page first')),
+    }).then(resolve, reject)
+  })
 
   // 1. A version 5 copy of the data.
   const v5 = await openDB(TRIAL_DB, DB_VERSION, { upgrade: upgradeSchema })

@@ -22,6 +22,7 @@ import BuildView from './views/BuildView'
 import ErrorBoundary from './components/ErrorBoundary'
 import DbStateNotice from './components/DbStateNotice'
 import UpdateNotice from './components/UpdateNotice'
+import { isTrialDb } from './lib/db'
 
 // Dev-only catalog inspection surface (PR-2). Lazy-imported and registered
 // only when import.meta.env.DEV is true so production builds don't ship the
@@ -33,6 +34,11 @@ const MigrationPreview = import.meta.env.DEV
 
 const CatalogDebugView = import.meta.env.DEV
   ? lazy(() => import('./views/CatalogDebugView'))
+  : null
+
+// Dev only: the line saying this tab runs on the version 6 trial copy.
+const TrialNotice = import.meta.env.DEV && isTrialDb()
+  ? lazy(() => import('./components/TrialNotice'))
   : null
 
 export default function App() {
@@ -62,6 +68,7 @@ export default function App() {
                 <BlueprintOverlay />
                 <DbStateNotice />
                 <UpdateNotice />
+                {TrialNotice && <Suspense fallback={null}><TrialNotice /></Suspense>}
                 <Routes>
                   <Route path="/" element={<ErrorBoundary inline><HomepageView /></ErrorBoundary>} />
                   <Route path="/chats" element={<ErrorBoundary inline><SelectorView /></ErrorBoundary>} />

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { parseBackupFile, decryptBackup, contentsToFlatStores } from '../lib/backup'
-import { initDB } from '../lib/db'
+import { initDB, TRIAL_FLAG } from '../lib/db'
 import { planV6Migration } from '../lib/migrations/v6Plan'
 import { runV6Trial, TRIAL_DB } from '../lib/migrations/v6Trial'
 
@@ -99,6 +99,11 @@ export default function MigrationPreview() {
     }
   }
 
+  const openOnCopy = () => {
+    sessionStorage.setItem(TRIAL_FLAG, 'trial')
+    window.location.assign('/chats')
+  }
+
   const btn = {
     font: `500 13px ${C.sans}`, padding: '7px 13px', borderRadius: 8, cursor: 'pointer',
     color: C.ink, background: C.surface, border: `1px solid ${C.ink3}`,
@@ -160,6 +165,12 @@ export default function MigrationPreview() {
                     <Mono>{c.ok ? 'passed' : 'failed'}</Mono> {c.label}{c.detail ? <Marg>{` ${c.detail}`}</Marg> : null}
                   </Line>
                 ))}
+                {trial.checks.every((c) => c.ok) && (
+                  <p style={{ margin: '14px 0 0' }}>
+                    <button type="button" style={btn} onClick={openOnCopy}>Open the app on this copy</button>{' '}
+                    <Marg>This tab only, with a line at the top saying so. Today&apos;s screens, on version 6 data.</Marg>
+                  </p>
+                )}
                 <p style={{ margin: '14px 0 6px', color: C.ink2 }}>Records in each list, before and after:</p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '2px 24px', font: `400 12px ${C.mono}`, color: C.ink2 }}>
                   {Object.entries(trial.counts).map(([name, [b, a]]) => (

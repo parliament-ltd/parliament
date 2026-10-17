@@ -11,6 +11,21 @@ export const DB_VERSION = 5
 // Stefan approves the upgrade; then DB_VERSION becomes this.
 export const DRAFT_DB_VERSION = 6
 
+// Dev only: /dev/migration can open the app on the trial copy of the upgrade
+// for one tab, so today's screens can be tried on version 6 data. The flag
+// lives in sessionStorage, so it ends with the tab; production never reads it.
+export const TRIAL_DB_NAME = 'parliament-v6-trial'
+export const TRIAL_FLAG = 'parliament-dev-db'
+
+export function isTrialDb() {
+  if (!import.meta.env.DEV) return false
+  try {
+    return sessionStorage.getItem(TRIAL_FLAG) === 'trial'
+  } catch {
+    return false
+  }
+}
+
 // Built-in library author shape, per refactor/parliament_v2_design_decisions.md §6.5
 // canonical metadata. Used to seed every Parliament-shipped library row.
 const BUILTIN_AUTHOR = Object.freeze({
@@ -153,7 +168,8 @@ export async function upgradeSchema(db, oldVersion, newVersion, transaction) {
 export async function initDB() {
   if (dbInstance) return dbInstance
 
-  dbInstance = await openDB(DB_NAME, DB_VERSION, {
+  const trial = isTrialDb()
+  dbInstance = await openDB(trial ? TRIAL_DB_NAME : DB_NAME, trial ? DRAFT_DB_VERSION : DB_VERSION, {
     upgrade: upgradeSchema,
 
     // Another tab is opening a newer schema. Close this connection so its
