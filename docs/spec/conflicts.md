@@ -399,6 +399,7 @@ Settings mockup.
 - **A merge restore that renames a conversation leaves broken references** (`backup.js:600-730`): `branchPoint`, child `parentId`, message ids on notes, highlights and favorites, and `pins.sourceMessageId` are not remapped. This matters before any migration.
 - **The older import path (`db.js` `importData`, L979) likely throws on `sbrd_documents`.** It keys on `item.id || item.key`, but those records are keyed on `conversationId`.
 - **The homepage Chats section loads the API key by a different setting than the rest of the app** (`settings.persistKey` against `settings.storageMode`, `chats-preview.jsx`).
+- **Settings that point at chats** (found in the dry run, 16 October). Secretarybird's Ripple stores `sbrd-ripple-scope-<chat id>` and `sbrd-ripple-manifest-<chat id>` (`RippleScopeModal.jsx`), and their values list other chats' ids. The backup allowlist (stage 2) has to carry these by pattern, and a restore that gives a chat a new id has to rewrite the key and the ids inside.
 
 ## Part 5. The October documents (added 11 October 2026)
 
@@ -764,12 +765,20 @@ language, reply language), and so are more providers, Mistral included.
   - A room made from a built-in template stores the template's English name and description as its own (`createModeFromTemplate` in `src/lib/modes.js`), for example "Writing Studio". Nothing records which template it came from, except `buildIntent.derivedFrom` on rooms the V2 migration made. A room made with no name is stored as "New room".
   - A fork is titled "Branch: <parent title>" in the chat's own title (`db.createBranch`), and a summary branch "Summary: …". A fork of a fork reads "Branch: Branch: …".
   - The homepage room is stored as "The Study" (`db.js`).
-- Done in the planner: docket and branch names drop every "Branch:" and "Summary:", but only on chats that were forked, so a title someone wrote as "Summary: Q3" keeps it. The chats' own titles are untouched.
+  - A chat made from `/chats` is stored with the title "New conversation" (`SelectorLayout.jsx`), and one made from the homepage takes its room's name as its title (`HomepageView.jsx`).
+  - In Stefan's second backup (16 October): 19 rooms named "Drafting Desk", 2 "Writing Studio" and 1 "New room", all template words; 6 chats titled "New conversation".
+- Done in the planner: docket and branch names drop every "Branch:" and "Summary:", but only on chats that were forked, so a title someone wrote as "Summary: Q3" keeps it. "New conversation" is read as no title. The chats' own titles are untouched.
 - **Suggestion,** to put to Stefan with the version 6 upgrade:
   1. A room whose name and description still match a template's word for word gets that template's key (`meta.template`) and an empty name, which the interface fills in from the copy table. A room its owner renamed or described keeps what they wrote.
-  2. The prefixes come off the titles of chats that were forked, since the branch letter now says what they said. The old title is kept on the record, so nothing is lost.
+  2. The prefixes come off the titles of chats that were forked, since the branch letter now says what they said, and a "New conversation" title is cleared. The old title is kept on the record, so nothing is lost.
   3. New rooms and new branches stop writing these words once the copy table exists (stage 3).
   4. "The Study" is left alone; it goes with the homepage (R3).
+
+**C91. Comments and suggestions inside Secretarybird documents** (found in the dry run of Stefan's second backup, 16 October).
+- Secretarybird, the Drafting Desk room, keeps a chat's text in a document record, not in messages. In the second backup 17 of 21 chats are such documents. Their paragraphs hold 9 comments (a selected passage, a question and the model's answer), 57 suggestions from the model, and Ripple data.
+- The new design has the same ideas under other names: an ask is typed, tied to a passage and answered in place (E), and suggestions come from Ripple and sweeps. The plan creates the lists of edits, asks and suggestions empty, filled from stage 11, and says Secretarybird's tracked-changes approach is not carried over. Nothing says what happens to the comments and suggestions already stored.
+- Converting them in the one upgrade means guessing how an ask points at its passage, which is settled only with the editing engine (stage 11, C58). Leaving them means a second, small upgrade later if they are ever to appear in the Collection.
+- **Suggestion:** the upgrade leaves documents exactly as they are, comments and suggestions included. Drafting Desk is a room, and rooms stay, so it goes on showing them as today. The dry run counts them, so nothing is out of sight. Whether they also become asks and suggestions in the Collection is decided at stage 11, with the engine.
 
 ## Proposed CLAUDE.md rewrite
 
