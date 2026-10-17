@@ -89,12 +89,13 @@ describe('planV6Migration on the sample backup', () => {
   const r = plan.report
 
   it('fills every section of the report', () => {
+    expect(plan.roomUpdates).toEqual([{ id: 'mode_ws', template: 'writing-studio@1.0' }])
     expect(r.counts).toMatchObject({
       chats: 8, dockets: 6, multiBranchDockets: 1, branches: 8, documents: 1, documentComments: 1, documentSuggestions: 1, emptyChats: 1,
       notes: 2, terms: 3, quotes: 1, favoritesToCollection: 2, favoritesSkipped: 1,
       scratchpadToNote: 1, collabs: 1, chatsWithModelTags: 2,
     })
-    for (const section of ['favorites', 'terms', 'quotes', 'collabs', 'newNotes']) expect(r[section].length).toBeGreaterThan(0)
+    for (const section of ['favorites', 'terms', 'quotes', 'collabs', 'newNotes', 'roomTemplates']) expect(r[section].length).toBeGreaterThan(0)
   })
 
   it('keeps a branch of a branch in its family\'s docket, named without any "Branch:"', () => {
@@ -150,6 +151,24 @@ describe('planV6Migration edge cases', () => {
     expect(plan.dockets[0].branches[0].forkedFrom).toBeUndefined()
     expect(plan.report.dockets[0].branches[0].parentGone).toBe(true)
     expect(plan.report.warnings).toContain('One branch points at a parent chat that no longer exists. It becomes branch a of its own docket.')
+  })
+
+  it('records the built-in template a room came from, and leaves its name and rooms named by you alone', () => {
+    const builtIn = { name: 'Parliament', handle: 'parliament', verified: true }
+    const plan = planV6Migration({
+      modes: [
+        { id: 'r1', scope: 'room', meta: { name: 'Drafting Desk' } },
+        { id: 'r2', scope: 'room', meta: { name: 'Essay room' } },
+        { id: 'r3', scope: 'room', meta: { name: 'Mine' } },
+        { id: 'home', scope: 'homepage', meta: { name: 'The Study' } },
+      ],
+      libraryRooms: [
+        { id: 'drafting-desk@1.0', displayName: 'Drafting Desk', author: builtIn },
+        { id: 'someone@1.0', displayName: 'Mine', author: { handle: 'someone' } },
+      ],
+    }, { newId: counter() })
+    expect(plan.roomUpdates).toEqual([{ id: 'r1', template: 'drafting-desk@1.0' }])
+    expect(plan.report.roomTemplates).toEqual([{ template: 'drafting-desk@1.0', name: 'Drafting Desk', rooms: 1 }])
   })
 
   it('reads the old default title "New conversation" as no title', () => {

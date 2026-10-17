@@ -538,6 +538,40 @@
         "components": []
       }
     ],
+    "library": {
+      "rooms": [
+        {
+          "id": "writing-studio@1.0",
+          "version": "1.0.0",
+          "status": "available",
+          "scope": "room",
+          "displayName": "Writing Studio",
+          "author": {
+            "name": "Parliament",
+            "handle": "parliament",
+            "verified": true
+          },
+          "installedCount": 0
+        },
+        {
+          "id": "drafting-desk@1.0",
+          "version": "1.0.0",
+          "status": "available",
+          "scope": "room",
+          "displayName": "Drafting Desk",
+          "author": {
+            "name": "Parliament",
+            "handle": "parliament",
+            "verified": true
+          },
+          "installedCount": 0
+        }
+      ],
+      "layouts": [],
+      "components": [],
+      "schemes": [],
+      "resources": []
+    },
     "preferences": [
       {
         "key": "scratchpad-text",

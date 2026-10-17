@@ -27,6 +27,8 @@
 //   8. Tags on chats were all written by the model, and are marked so.
 //   9. A saved API key moves out of the settings into the key store. Backups
 //      never contain keys, so this shows only when planning this browser.
+//  10. A room made from a built-in template records the template's key
+//      (C90). Its stored name stays, because today's screens read it.
 //
 // Stored data holds keys and ids, never words of the interface, so a backup
 // made in one language restores correctly in another (languages document
@@ -45,9 +47,11 @@ const NO_TITLE = new Set(['New conversation'])
 const API_KEY_SETTING = 'parliament-api-key'
 
 /**
- * @param {object} snap  { conversations, messages, notes, highlights, favorites, pins, settings, modes }
+ * @param {object} snap  { conversations, messages, notes, highlights, favorites, pins, settings,
+ *   modes, sbrd_documents, libraryRooms }
  *   Arrays of v5 records, as read from IndexedDB or flattened from a backup.
- *   `modes` is read only to name rooms in the report.
+ *   Rooms, documents and the template list are read to report and to record
+ *   each room's template; documents are never changed.
  * @param {object} [opts]
  * @param {() => string} [opts.newId]  id generator, injectable for tests
  * @param {string} [opts.now]          ISO time for records created by the migration
@@ -185,6 +189,18 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
       : `${personasSkipped} saved personas have no instruction text and are not carried over.`)
   }
 
+  // ── 10. Rooms record the built-in template they came from (C90) ──
+  // A room made from a template stores the template's English name as its
+  // own. Today's screens read that name, so it stays; the room also records
+  // the template's key, so the new screens can show the template's name in
+  // the reader's language while the stored name is still the template's.
+  const templateByName = new Map((snap.libraryRooms || [])
+    .filter((t) => t?.author?.handle === 'parliament' && t.displayName)
+    .map((t) => [t.displayName, t.id]))
+  const roomUpdates = (snap.modes || [])
+    .filter((m) => m.scope === 'room' && !m.meta?.template && templateByName.has(m.meta?.name))
+    .map((m) => ({ id: m.id, template: templateByName.get(m.meta.name) }))
+
   // ── 9. The key moves to the key store ───────────────────
   const keyMove = settings.some((s) => s.key === API_KEY_SETTING)
     ? { provider: 'anthropic', fromSetting: API_KEY_SETTING }
@@ -228,7 +244,7 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
 
   const plan = {
     dockets, runs, conversationUpdates, noteUpdates, termUpdates, quoteUpdates,
-    collections, collabs, newNotes, keyMove, nextNum,
+    collections, collabs, newNotes, roomUpdates, keyMove, nextNum,
   }
   plan.report = buildReport(plan, { snap, conversations, convById, msgById, numOf, favoritesSkipped, warnings })
   return plan
@@ -487,6 +503,10 @@ function buildReport(plan, { snap, conversations, convById, msgById, numOf, favo
       excerpt: excerpt(p.content),
     })),
     collabs: plan.collabs.map((c) => ({ name: c.name, excerpt: excerpt(c.instruction) })),
+    roomTemplates: Object.entries(plan.roomUpdates.reduce((acc, u) => {
+      acc[u.template] = (acc[u.template] || 0) + 1
+      return acc
+    }, {})).map(([template, rooms]) => ({ template, name: (snap.libraryRooms || []).find((t) => t.id === template)?.displayName || template, rooms })),
     newNotes: plan.newNotes.map((n) => ({ num: n.num, excerpt: excerpt(n.text), from: 'scratchpad' })),
     warnings,
   }

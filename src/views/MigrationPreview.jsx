@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { parseBackupFile, decryptBackup, contentsToFlatStores } from '../lib/backup'
 import { initDB } from '../lib/db'
 import { planV6Migration } from '../lib/migrations/v6Plan'
+import { runV6Trial, TRIAL_DB } from '../lib/migrations/v6Trial'
 
 // Dry run of the one-time data upgrade (refactor-plan.md, stage 2). Dev only,
 // at /dev/migration. Reads a .parliament backup, or this browser's data, runs
@@ -42,6 +43,7 @@ async function readThisBrowser() {
     settings: await db.getAll('settings'),
     modes: await db.getAll('modes'),
     sbrd_documents: await db.getAll('sbrd_documents'),
+    libraryRooms: await db.getAll('libraryRooms'),
   }
 }
 
@@ -52,14 +54,18 @@ export default function MigrationPreview() {
   const [report, setReport] = useState(null)
   const [error, setError] = useState('')
   const [working, setWorking] = useState(false)
+  const [snap, setSnap] = useState(null)
+  const [trial, setTrial] = useState(null)
 
   const run = async (label, loadSnap) => {
     setWorking(true)
     setError('')
     setReport(null)
+    setTrial(null)
     try {
-      const snap = await loadSnap()
-      setReport(planV6Migration(snap).report)
+      const loaded = await loadSnap()
+      setReport(planV6Migration(loaded).report)
+      setSnap(loaded)
       setSource(label)
     } catch (e) {
       setError(e?.message || 'Could not read that.')
@@ -80,6 +86,18 @@ export default function MigrationPreview() {
     const { default: text } = await import('../lib/__fixtures__/sample-v5.json?raw')
     return readFile(new File([text], 'sample-v5.parliament'), null)
   })
+
+  const tryUpgrade = async () => {
+    setWorking(true)
+    setTrial(null)
+    try {
+      setTrial(await runV6Trial(snap))
+    } catch (e) {
+      setTrial({ error: e?.message || String(e) })
+    } finally {
+      setWorking(false)
+    }
+  }
 
   const btn = {
     font: `500 13px ${C.sans}`, padding: '7px 13px', borderRadius: 8, cursor: 'pointer',
@@ -121,6 +139,37 @@ export default function MigrationPreview() {
         </Card>
 
         {report && <Report report={report} source={source} />}
+
+        {report && (
+          <Card>
+            <H2>Try the upgrade on a copy</H2>
+            <Explain>
+              Runs the real upgrade, the code the app will use, on a copy of the data above in a separate trial database
+              ({TRIAL_DB}), then checks the result. Parliament&apos;s own database is not opened. The next trial replaces the copy.
+            </Explain>
+            <button type="button" style={btn} disabled={working} onClick={tryUpgrade}>Try it on a copy</button>
+            {trial?.error && <p style={{ margin: '12px 0 0' }}>The upgrade stopped: {trial.error}. The copy was left at version 5.</p>}
+            {trial?.checks && (
+              <>
+                <p style={{ margin: '14px 0 6px', color: C.ink2 }}>
+                  {trial.checks.every((c) => c.ok) ? 'Every check passed.' : `${trial.checks.filter((c) => !c.ok).length} checks failed.`}{' '}
+                  The upgrade took {trial.ms} ms.
+                </p>
+                {trial.checks.map((c) => (
+                  <Line key={c.label}>
+                    <Mono>{c.ok ? 'passed' : 'failed'}</Mono> {c.label}{c.detail ? <Marg>{` ${c.detail}`}</Marg> : null}
+                  </Line>
+                ))}
+                <p style={{ margin: '14px 0 6px', color: C.ink2 }}>Records in each list, before and after:</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '2px 24px', font: `400 12px ${C.mono}`, color: C.ink2 }}>
+                  {Object.entries(trial.counts).map(([name, [b, a]]) => (
+                    <div key={name}>{name} {b === null ? `new, ${a}` : b === a ? a : `${b} → ${a}`}</div>
+                  ))}
+                </div>
+              </>
+            )}
+          </Card>
+        )}
       </div>
     </div>
   )
@@ -261,6 +310,19 @@ function Report({ report, source }) {
           </Explain>
           {report.collabs.map((p, i) => (
             <Line key={i}><span style={{ fontWeight: 500 }}>{p.name ?? <Marg>untitled</Marg>}</span> <span style={{ color: C.ink2 }}>{p.excerpt}</span></Line>
+          ))}
+        </Card>
+      )}
+
+      {report.roomTemplates.length > 0 && (
+        <Card>
+          <H2>Rooms made from a built-in template</H2>
+          <Explain>
+            Each room records which template it came from, so the new screens can show the template&apos;s name in the
+            language you read. The name stored in the room does not change, because today&apos;s screens read it.
+          </Explain>
+          {report.roomTemplates.map((t) => (
+            <Line key={t.template}>{t.rooms} {t.rooms === 1 ? 'room' : 'rooms'} from {t.name} <Marg>{t.template}</Marg></Line>
           ))}
         </Card>
       )}
