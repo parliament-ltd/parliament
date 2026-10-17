@@ -770,11 +770,12 @@ language, reply language), and so are more providers, Mistral included.
   - A chat made from `/chats` is stored with the title "New conversation" (`SelectorLayout.jsx`), and one made from the homepage takes its room's name as its title (`HomepageView.jsx`).
   - In Stefan's second backup (16 October): 19 rooms named "Drafting Desk", 2 "Writing Studio" and 1 "New room", all template words; 6 chats titled "New conversation".
 - Done in the planner: docket and branch names drop every "Branch:" and "Summary:", but only on chats that were forked, so a title someone wrote as "Summary: Q3" keeps it. "New conversation" is read as no title. The chats' own titles are untouched.
-- **Suggestion,** to put to Stefan with the version 6 upgrade:
-  1. A room whose name and description still match a template's word for word gets that template's key (`meta.template`) and an empty name, which the interface fills in from the copy table. A room its owner renamed or described keeps what they wrote.
-  2. The prefixes come off the titles of chats that were forked, since the branch letter now says what they said, and a "New conversation" title is cleared. The old title is kept on the record, so nothing is lost.
-  3. New rooms and new branches stop writing these words once the copy table exists (stage 3).
-  4. "The Study" is left alone; it goes with the homepage (R3).
+- **First suggestion, withdrawn:** clear the template names and the title prefixes in the upgrade. Found while drafting it: today's screens read a room's stored name and a chat's stored title directly, and keep running until the new ones replace them. Clearing them would blank 19 room names in the app as it is now.
+- **Suggestion, revised 16 October** (drafted in `v6Plan.js` and `v6Upgrade.js`, for Stefan's yes):
+  1. A room whose name is a built-in template's name records that template's key (`meta.template`). Its stored name stays. The new screens show the template's name in the reader's language while the stored name is still the template's English one, and the stored name once its owner renames it.
+  2. Chat titles are not changed. The new screens read the "Branch:" and "Summary:" prefixes on a forked chat, and "New conversation", as no words of the person's, as the planner already does for dockets and branches.
+  3. New rooms, chats and branches stop writing these words once the copy table exists (stage 3).
+  4. "The Study" and "New room" are left alone; the homepage goes with R3.
 
 **C91. Comments and suggestions inside Secretarybird documents** (found in the dry run of Stefan's second backup, 16 October).
 - Secretarybird, the Drafting Desk room, keeps a chat's text in a document record, not in messages. In the second backup 17 of 21 chats are such documents. Their paragraphs hold 9 comments (a selected passage, a question and the model's answer), 57 suggestions from the model, and Ripple data.
