@@ -222,6 +222,8 @@ The one upgrade. Every list and field the whole plan needs is created here, so
 later stages fill lists that already exist. **Nothing is written to your data
 until you have read the dry run and said go.**
 
+**Status, 16 October:** the planner follows every ruling, and the dry run is approved (on two of Stefan's backups and a sample that reaches every part of the plan). The upgrade itself is being drafted. The database is still at version 5.
+
 - **Kept:** the long ids that records are keyed by, so nothing that points at a record breaks. Messages are not rewritten: a reply keeps its original text, and its editable form is stored only the first time it is edited.
 - **Added, as lists**
   - Dockets and runs. A step can carry a condition (A15).
@@ -424,7 +426,7 @@ The piece with the most risk in it. It starts with a spike, not with building.
 - **Salvaged from Secretarybird:** the `/` menu's filtering and keys, the split and join of blocks as a pattern, two caret helpers, the cards after restyling. **Not carried over:** its tracked-changes approach, which compares against a baseline and cannot place a deletion among repeated words.
 - **Security and privacy:** pasting inserts plain text. A reply's blocks hold a type and text only, never markup. The count line is never hidden by `calm:`. Hidden file text inside a stored prompt survives an edit to that prompt.
 - **You can try:** strike a line, type a replacement, ask for a rewrite of a passage, send, and see the next reply say it read them.
-- **Needs from you:** an answer on C58, the choice of engine after the spike, and A7, A9.
+- **Needs from you:** an answer on C58, the choice of engine after the spike, and A7, A9. Also C91, ruled to be looked at again here: what becomes of the comments and suggestions inside Secretarybird documents.
 
 ### Stage 12. Ripple, sweeps, Reflection
 

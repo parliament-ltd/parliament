@@ -137,6 +137,8 @@ Line numbers are approximate.
   - The globe appears once a second language ships (stage 9). Until then a list of one would be an option that does nothing, so `language:` answers that only English is available.
   - Replies follow the interface language until "Reply in" is set (stage 7), so `language:japanese` alone gives Japanese replies too.
   - The choice is a setting of the person's, not the device's, and goes in the backup allowlist when the setting is added.
+- **The dry run is approved.** Stefan read it on two backups of his own (one chat in one browser; 21 chats, 17 of them Secretarybird documents, in another) and on the sample. The version 6 upgrade is drafted next and shown to him before the database version goes up.
+- **C91. Secretarybird documents stay as they are,** comments and suggestions included. To come back to and check: that Drafting Desk still shows them after the upgrade, and what becomes of them at stage 11.
 
 ## Part 1. Settled by precedence
 
@@ -779,6 +781,7 @@ language, reply language), and so are more providers, Mistral included.
 - The new design has the same ideas under other names: an ask is typed, tied to a passage and answered in place (E), and suggestions come from Ripple and sweeps. The plan creates the lists of edits, asks and suggestions empty, filled from stage 11, and says Secretarybird's tracked-changes approach is not carried over. Nothing says what happens to the comments and suggestions already stored.
 - Converting them in the one upgrade means guessing how an ask points at its passage, which is settled only with the editing engine (stage 11, C58). Leaving them means a second, small upgrade later if they are ever to appear in the Collection.
 - **Suggestion:** the upgrade leaves documents exactly as they are, comments and suggestions included. Drafting Desk is a room, and rooms stay, so it goes on showing them as today. The dry run counts them, so nothing is out of sight. Whether they also become asks and suggestions in the Collection is decided at stage 11, with the engine.
+- **Ruled 16 October: as suggested,** with a note to come back to it and check the behaviour: that Drafting Desk still shows every comment and suggestion after the upgrade (checked at the stage 2 checkpoint), and what becomes of them once the engine is chosen (stage 11).
 
 ## Proposed CLAUDE.md rewrite
 
