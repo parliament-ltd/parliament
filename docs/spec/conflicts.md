@@ -759,6 +759,18 @@ language, reply language), and so are more providers, Mistral included.
 - Feature detection, never the browser's name, and a fallback instead of a missing feature: pop-outs in Safari open as ordinary windows, and the Enter line says so (stage 3).
 - Kiwix: still later. Kiwix's own reader is GPL-3.0 and cannot be bundled with MIT code (LPN §7.4).
 
+**C90. Interface words already in stored data** (found in the dry run, 16 October; bears on C86).
+- C86: stored data holds keys and ids, never words of the interface, so a backup made in one language restores in another. The planner follows it. Records written before it do not:
+  - A room made from a built-in template stores the template's English name and description as its own (`createModeFromTemplate` in `src/lib/modes.js`), for example "Writing Studio". Nothing records which template it came from, except `buildIntent.derivedFrom` on rooms the V2 migration made. A room made with no name is stored as "New room".
+  - A fork is titled "Branch: <parent title>" in the chat's own title (`db.createBranch`), and a summary branch "Summary: …". A fork of a fork reads "Branch: Branch: …".
+  - The homepage room is stored as "The Study" (`db.js`).
+- Done in the planner: docket and branch names drop every "Branch:" and "Summary:", but only on chats that were forked, so a title someone wrote as "Summary: Q3" keeps it. The chats' own titles are untouched.
+- **Suggestion,** to put to Stefan with the version 6 upgrade:
+  1. A room whose name and description still match a template's word for word gets that template's key (`meta.template`) and an empty name, which the interface fills in from the copy table. A room its owner renamed or described keeps what they wrote.
+  2. The prefixes come off the titles of chats that were forked, since the branch letter now says what they said. The old title is kept on the record, so nothing is lost.
+  3. New rooms and new branches stop writing these words once the copy table exists (stage 3).
+  4. "The Study" is left alone; it goes with the homepage (R3).
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
