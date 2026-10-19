@@ -814,6 +814,9 @@ language, reply language), and so are more providers, Mistral included.
   5. **Restore stops trusting the file (T6):** only settings on the allowlist are written, including the Ripple settings named after a chat, rewritten when that chat's id changes. Each record is rebuilt from checked fields of the right type. The file size and the password-stretching count are capped.
   6. **A "replace" restore keeps the saved key,** as it keeps the browser's fingerprint, until the key moves to the key store.
   7. **Restore and backups format 2 are built together,** since one allowlist decides both what a backup may hold and what a restore accepts. The older JSON import goes through the same path (R10).
+- **Built 19 October** (`backupSchema.js`, `backupData.js`, `restorePlan.js`, `records.fileRestored`), with tests on an in-memory database and a run in the browser on the trial copy. Two points to know:
+  - **A merge rebuilds dockets from the chats it brings in.** Dockets hold nothing of their own yet: their names follow their chats, and their steps follow the messages. So a merge files each incoming chat by the write path's rules and ignores the file's dockets, and a "replace" of version 6 data keeps them as they are. Once dockets hold plans of their own (stage 10), a merge has to bring them in as well; to do then.
+  - **Found on the way:** today's validator refused whole backups that the app itself writes. It refused a branch whose parent chat had been deleted, a chat whose room had been deleted, a favourite or highlight of a deleted message, a pinned reference whose source had been deleted, and a note in no chat (the one the scratchpad becomes). Neither of Stefan's backups had any of these, so both validated. Now the first four of these come in (the favourite or highlight of a deleted message is left out and counted), and the note comes in too.
 
 ## Proposed CLAUDE.md rewrite
 

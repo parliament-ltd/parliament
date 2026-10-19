@@ -226,6 +226,8 @@ until you have read the dry run and said go.**
 
 **19 October:** the write path is built (`records.js`, `recordsModel.js`, choices in C92) and tried on both versions: at version 5 writes are as before and announced; on the trial copy at version 6 new chats, forks, messages, notes, terms, quotes and favourites keep numbers, dockets, steps and the Favorites collection true. Still to do in this stage: restore, backups, the key, keeping storage.
 
+**19 October, later:** restore and backups format 2 are built (C93). One allowlist decides what a backup holds and what a restore accepts; a restore is one transaction, skips identical items and brings changed ones in as copies, and at version 6 numbers and files what comes in by the write path's rules. Automated database tests run on fake-indexeddb (103 tests). Still to do in this stage: the key out of the settings list, asking the browser to keep storage (C88), then the checkpoint and the version going up.
+
 - **Kept:** the long ids that records are keyed by, so nothing that points at a record breaks. Messages are not rewritten: a reply keeps its original text, and its editable form is stored only the first time it is edited.
 - **Added, as lists**
   - Dockets and runs. A step can carry a condition (A15).
