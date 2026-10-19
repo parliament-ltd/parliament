@@ -799,6 +799,22 @@ language, reply language), and so are more providers, Mistral included.
 - **Two repairs found on the way:** opening a Secretarybird document no longer rewrites it (the editor saves only after an edit, and a save of unchanged content writes nothing); and a document save no longer drops the older `suggestionStates` field, which two of Stefan's documents carry.
 - **Not yet through the write path:** restore and the older JSON import still write records directly, so at version 6 what they bring in would have no numbers. Restore is the next piece; the older import goes with R10.
 
+**C93. Restore and backups: the plan** (19 October, for Stefan before it is built). From stage 2 of the plan, P6 (ruled 15 October), audit finding T6, C35, and the race found on 15 October.
+- **Today's restore,** read on 19 October (`backup.js` `restoreContents`, `restorePlan.js`):
+  - It writes each kind of record in its own transaction, so another tab starting up between them can remove a chat whose messages are not written yet (15 October).
+  - A chat whose id already exists comes in as a copy titled "… (from backup)": English written into data (C86), and the only sign that it is a copy.
+  - It writes any setting the file names, except the saved key: the file is trusted.
+  - A "replace" restore clears the settings, and the saved key with them.
+  - It knows nothing of version 6, so what it brings in would have no numbers and no dockets.
+- **Suggestion:**
+  1. **One transaction for the whole restore:** all of it is written, or none of it. Nothing half-written can be seen or removed by another tab, and if the browser runs out of space, nothing is left behind and the restore says so.
+  2. **Identical items are skipped (P6), compared on what the person can see:** a chat's title, its messages and their order, a note's text, a marking's text, a document's paragraphs and replies. Dates, sizes, numbers and fields the app keeps for itself are left out, so a document that was only opened since the backup counts as identical.
+  3. **An item with the same id and different content comes in as a copy:** a new id, every reference to it rewritten, and `restoredFrom` on the record, so the new screens can say "restored, was 207". Today's screens show only the title, so the copy keeps "(from backup)" until the Almanac shows the marginalia (stage 6), and `nameFromChat` leaves the suffix out of names.
+  4. **At version 6, what comes in is planned like the upgrade:** a format 1 file goes through the same planner, numbered from the counter, joining the existing Favorites collection. A format 2 file's numbers are remapped from the counter, keeping the old number in `restoredFrom`. A "replace" restore starts the counter again and keeps the file's numbers.
+  5. **Restore stops trusting the file (T6):** only settings on the allowlist are written, including the Ripple settings named after a chat, rewritten when that chat's id changes. Each record is rebuilt from checked fields of the right type. The file size and the password-stretching count are capped.
+  6. **A "replace" restore keeps the saved key,** as it keeps the browser's fingerprint, until the key moves to the key store.
+  7. **Restore and backups format 2 are built together,** since one allowlist decides both what a backup may hold and what a restore accepts. The older JSON import goes through the same path (R10).
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
