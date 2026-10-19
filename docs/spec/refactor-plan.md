@@ -224,6 +224,8 @@ until you have read the dry run and said go.**
 
 **Status, 16 October:** the planner follows every ruling, and the dry run is approved (on two of Stefan's backups and a sample that reaches every part of the plan). The upgrade is drafted (`migrations/v6Upgrade.js`) and can be tried on a throwaway copy from `/dev/migration`. The database is still at version 5. It goes to 6 only after the write path below gives every new chat, note and marking a number, since today's screens keep creating them until the new ones replace them. The key moves in its own step: it lives in a separate database, outside the upgrade's transaction.
 
+**19 October:** the write path is built (`records.js`, `recordsModel.js`, choices in C92) and tried on both versions: at version 5 writes are as before and announced; on the trial copy at version 6 new chats, forks, messages, notes, terms, quotes and favourites keep numbers, dockets, steps and the Favorites collection true. Still to do in this stage: restore, backups, the key, keeping storage.
+
 - **Kept:** the long ids that records are keyed by, so nothing that points at a record breaks. Messages are not rewritten: a reply keeps its original text, and its editable form is stored only the first time it is edited.
 - **Added, as lists**
   - Dockets and runs. A step can carry a condition (A15).

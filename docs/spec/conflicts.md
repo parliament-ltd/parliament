@@ -786,6 +786,17 @@ language, reply language), and so are more providers, Mistral included.
 - Converting them in the one upgrade means guessing how an ask points at its passage, which is settled only with the editing engine (stage 11, C58). Leaving them means a second, small upgrade later if they are ever to appear in the Collection.
 - **Suggestion:** the upgrade leaves documents exactly as they are, comments and suggestions included. Drafting Desk is a room, and rooms stay, so it goes on showing them as today. The dry run counts them, so nothing is out of sight. Whether they also become asks and suggestions in the Collection is decided at stage 11, with the engine.
 - **Ruled 16 October: as suggested,** with a note to come back to it and check the behaviour: that Drafting Desk still shows every comment and suggestion after the upgrade (checked at the stage 2 checkpoint), and what becomes of them once the engine is chosen (stage 11).
+- **Checked 16 October** on the trial copy of Stefan's second backup: Drafting Desk shows a document's 11 suggestions, its comment and its Ripple impact analysis after the upgrade. Stage 11 is still to come.
+
+**C92. Choices made in the write path** (19 October; built this way, for Stefan to confirm or overturn). The write path (`src/lib/records.js`, its rules in `recordsModel.js`) sits behind `db.js`'s functions, so today's screens use it unchanged. At version 5 a write does what it always did, and is announced. At version 6 it also keeps the following true, in the same transaction:
+- **A new chat starts a docket,** taking two numbers (ruled 23 September). A chat made from another (a fork, a document's branch, a summary branch) is the next letter in that chat's docket, in the same run, with where it was taken from.
+- **Removing a chat takes its branch out of the docket.** The letter is not given out again (C17). When the last branch goes, the docket and its run go too: deleting means deleted, and a docket's name is its chat's title. Numbers are never reissued.
+- **Steps follow the messages.** A prompt is a step; it reads "paused" while its reply streams and "done" once the reply completes, as the planner does. "Running" is shown from the stream itself, not stored, until the docket can run (stage 10).
+- **A docket and its first branch take their name from the chat,** and follow it when the title call or a rename changes it, unless they were named otherwise. "New conversation" and "Branch:" are not names (C90).
+- **New favourites also join the Favorites collection,** and leave it when unfavourited, while the heart exists (until R6).
+- **Tags written to a chat are marked as the model's,** since only the tagging call writes them today.
+- **Two repairs found on the way:** opening a Secretarybird document no longer rewrites it (the editor saves only after an edit, and a save of unchanged content writes nothing); and a document save no longer drops the older `suggestionStates` field, which two of Stefan's documents carry.
+- **Not yet through the write path:** restore and the older JSON import still write records directly, so at version 6 what they bring in would have no numbers. Restore is the next piece; the older import goes with R10.
 
 ## Proposed CLAUDE.md rewrite
 
