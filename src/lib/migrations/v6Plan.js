@@ -37,13 +37,8 @@
 
 import { FIRST_NUM, letterAt } from '../addresses'
 import { STATUS, branchStatus } from '../docketModel'
+import { nameFromChat } from '../chatTitles'
 
-// The old code titled a fork "Branch: <parent title>", so a fork of a fork
-// reads "Branch: Branch: …". All of them come off a branch's name.
-const BRANCH_PREFIX = /^(?:(?:Branch|Summary):\s*)+/
-// What the old code stored in place of a title (SelectorLayout's new chat).
-// It means "no title", so it is read as none (C86, C90).
-const NO_TITLE = new Set(['New conversation'])
 const API_KEY_SETTING = 'parliament-api-key'
 
 /**
@@ -91,7 +86,7 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
     const letterOf = new Map(ordered.map((c, i) => [c.id, letterAt(i)]))
 
     const branches = ordered.map((c, i) => {
-      const b = { letter: letterAt(i), name: branchName(c), createdAt: c.createdAt }
+      const b = { letter: letterAt(i), name: nameFromChat(c), createdAt: c.createdAt }
       if (i > 0 && c.parentId && convById.has(c.parentId)) {
         b.forkedFrom = { chatId: c.parentId, step: forkStep(c, msgsByConv.get(c.parentId) || []) }
       }
@@ -115,7 +110,7 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
       num: null,
       // A root that was itself forked from a chat now gone still carries
       // "Branch:" in its title; the docket's title does not.
-      title: branchName(root),
+      title: nameFromChat(root),
       createdAt: root.createdAt,
       updatedAt: ordered.reduce((max, c) => (c.updatedAt > max ? c.updatedAt : max), root.updatedAt || root.createdAt),
       pinned: false,
@@ -331,19 +326,11 @@ function pickRoot(members, convById) {
   return (roots.length ? roots : members)[0]
 }
 
-// Only a chat that was forked has the prefix taken off, so a chat you titled
-// "Summary: Q3" yourself keeps its title.
-function branchName(c) {
-  if (!c.title) return null
-  const name = c.parentId ? c.title.replace(BRANCH_PREFIX, '') || c.title : c.title
-  return NO_TITLE.has(name.trim()) ? null : name
-}
-
 // ── Steps ────────────────────────────────────────────────
 
 // One step per user message. Done when a complete reply follows; paused when
 // the reply is marked incomplete or never arrived.
-function stepsFromTurns(conv, msgs) {
+export function stepsFromTurns(conv, msgs) {
   const steps = []
   for (let i = 0; i < msgs.length; i++) {
     const m = msgs[i]
@@ -361,7 +348,7 @@ function stepsFromTurns(conv, msgs) {
 
 // The step a fork was taken at: the number of user turns in the parent up to
 // and including the branch-point message. Null if it cannot be found.
-function forkStep(child, parentMsgs) {
+export function forkStep(child, parentMsgs) {
   if (!child.branchPoint) return null
   const at = parentMsgs.findIndex((m) => m.id === child.branchPoint)
   if (at < 0) return null

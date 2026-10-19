@@ -3,7 +3,13 @@ import { validateBackup } from './validate'
 import { SCHEMES } from './schemes'
 import { seedLibraryRooms } from './seedTemplates'
 import { listEntries } from '../catalog'
-import { createV6Stores, migrateV6Data } from './migrations/v6Upgrade'
+import { createV6Stores, migrateV6Data, V6_NEW_STORES } from './migrations/v6Upgrade'
+import {
+  createChat, updateChat, removeChat, createBranchChat,
+  addMessageRecord, updateMessageRecord, removeMessage,
+  addNumbered, updateNumbered, removeNumbered,
+  addFavoriteRecord, removeFavoriteRecord, saveDocument,
+} from './records'
 
 export const DB_NAME = 'parliament'
 export const DB_VERSION = 5
@@ -499,13 +505,6 @@ function generateId() {
   return crypto.randomUUID()
 }
 
-// UTF-8-accurate byte size of a string. Used to keep per-conversation
-// storageBytes in sync as messages are added, edited, and deleted.
-function byteSize(str) {
-  if (!str) return 0
-  return new Blob([String(str)]).size
-}
-
 // ─── Conversations ───────────────────────────────────────
 
 export async function createConversation({ title = 'New Conversation', model = 'claude-sonnet', parentId = null, branchPoint = null, createdInMode = null, room = null } = {}) {
@@ -529,8 +528,8 @@ export async function createConversation({ title = 'New Conversation', model = '
     createdAt: now,
     updatedAt: now,
   }
-  await db.put('conversations', conversation)
-  return conversation
+  // At version 6 the chat gets its number and docket here (records.js).
+  return createChat(db, conversation)
 }
 
 export async function getConversation(id) {
@@ -545,49 +544,13 @@ export async function listConversations() {
 }
 
 export async function updateConversation(id, updates) {
-  const db = await initDB()
-  const existing = await db.get('conversations', id)
-  if (!existing) throw new Error(`Conversation not found: ${id}`)
-  const updated = { ...existing, ...updates, updatedAt: new Date().toISOString() }
-  await db.put('conversations', updated)
-  return updated
+  return updateChat(await initDB(), id, updates)
 }
 
 export async function deleteConversation(id) {
-  const db = await initDB()
-
-  // Delete all related data
-  const stores = ['messages', 'highlights', 'notes', 'favorites']
-  for (const storeName of stores) {
-    const items = await db.getAllFromIndex(storeName, 'conversationId', id)
-    const tx = db.transaction(storeName, 'readwrite')
-    for (const item of items) {
-      await tx.store.delete(item.id)
-    }
-    await tx.done
-  }
-
-  // Delete pins where this conversation is the target
-  const pins = await db.getAllFromIndex('pins', 'targetConversationId', id)
-  const pinTx = db.transaction('pins', 'readwrite')
-  for (const pin of pins) {
-    await pinTx.store.delete(pin.id)
-  }
-  await pinTx.done
-
-  // Delete Pelican staged files and their data
-  const files = await db.getAllFromIndex('files', 'conversationId', id)
-  const fileTx = db.transaction(['files', 'file_data'], 'readwrite')
-  for (const file of files) {
-    fileTx.objectStore('files').delete(file.id)
-    fileTx.objectStore('file_data').delete(file.id)
-  }
-  await fileTx.done
-
-  // Delete Secretarybird document if present
-  await db.delete('sbrd_documents', id)
-
-  await db.delete('conversations', id)
+  // The chat, its messages, notes, highlights, favourites, the pinned
+  // references kept in it, its files and its document, in one transaction.
+  return removeChat(await initDB(), id)
 }
 
 // ─── Branching ───────────────────────────────────────────
@@ -603,74 +566,14 @@ export async function deleteConversation(id) {
  * @returns {object} The new branch conversation record
  */
 export async function createBranch(sourceConversationId, branchAtMessageId, options = {}) {
-  const db = await initDB()
-
-  // Get source conversation for defaults
-  const source = await db.get('conversations', sourceConversationId)
-  if (!source) throw new Error(`Source conversation not found: ${sourceConversationId}`)
-
-  // Get all messages from source, sorted chronologically
-  const allMessages = await db.getAllFromIndex('messages', 'conversationId', sourceConversationId)
-  allMessages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-
-  // Find the branch point index
-  const branchIdx = allMessages.findIndex(m => m.id === branchAtMessageId)
-  if (branchIdx === -1) throw new Error(`Branch point message not found: ${branchAtMessageId}`)
-
-  // Messages to copy: everything up to and including the branch point
-  const messagesToCopy = allMessages.slice(0, branchIdx + 1)
-
-  // Backfill familyId on the source if missing, so parent + branches share it
-  const familyId = source.familyId || source.id
-  if (!source.familyId) {
-    await db.put('conversations', { ...source, familyId })
-  }
-
-  // Create the branch conversation
-  const now = new Date().toISOString()
-  const branchConv = {
-    id: generateId(),
-    title: options.title || `Branch: ${source.title}`,
-    model: options.model || source.model,
-    parentId: sourceConversationId,
-    parentTitle: source.title,
-    familyId,
-    branchPoint: branchAtMessageId,
-    // PR-10a.7: inherit the source's `room` so the new conversation
-    // routes through <RoomShell> like its parent. Pre-V2 sources have
-    // room: null and the new branch follows them — Albatross fallback
-    // stays consistent with the source's render path.
-    room: source.room ?? null,
-    pinned: false,
-    storageBytes: 0,
-    createdAt: now,
-    updatedAt: now,
-  }
-  await db.put('conversations', branchConv)
-
-  // Copy messages into the new conversation in a single transaction
-  const tx = db.transaction('messages', 'readwrite')
-  let totalBytes = 0
-  for (const msg of messagesToCopy) {
-    const newMsg = {
-      id: generateId(),
-      conversationId: branchConv.id,
-      role: msg.role,
-      content: msg.content,
-      tokenCount: msg.tokenCount || 0,
-      incomplete: false,
-      createdAt: msg.createdAt, // preserve original timestamps for ordering
-    }
-    await tx.store.put(newMsg)
-    totalBytes += byteSize(msg.content)
-  }
-  await tx.done
-
-  // Update storage estimate on the branch
-  await db.put('conversations', { ...branchConv, storageBytes: totalBytes })
-  branchConv.storageBytes = totalBytes
-
-  return branchConv
+  return createBranchChat(await initDB(), {
+    sourceId: sourceConversationId,
+    branchAtMessageId,
+    title: options.title,
+    model: options.model,
+    newId: generateId,
+    now: new Date().toISOString(),
+  })
 }
 
 /**
@@ -706,19 +609,8 @@ export async function addMessage({ conversationId, role, content, tokenCount = 0
       ? { attachmentMeta }
       : {}),
   }
-  await db.put('messages', message)
-
-  // Touch updatedAt and grow storageBytes by the new message's content size
-  const conv = await db.get('conversations', conversationId)
-  if (conv) {
-    await db.put('conversations', {
-      ...conv,
-      updatedAt: message.createdAt,
-      storageBytes: (conv.storageBytes || 0) + byteSize(content),
-    })
-  }
-
-  return message
+  // Touches the chat's updatedAt and size in the same transaction.
+  return addMessageRecord(db, message)
 }
 
 export async function getMessages(conversationId) {
@@ -728,58 +620,25 @@ export async function getMessages(conversationId) {
 }
 
 export async function updateMessage(id, updates) {
-  const db = await initDB()
-  const existing = await db.get('messages', id)
-  if (!existing) throw new Error(`Message not found: ${id}`)
-  const updated = { ...existing, ...updates }
-  await db.put('messages', updated)
-
-  // If content changed, apply the delta to the conversation's storageBytes
-  if ('content' in updates) {
-    const delta = byteSize(updated.content) - byteSize(existing.content)
-    if (delta !== 0) {
-      const conv = await db.get('conversations', existing.conversationId)
-      if (conv) {
-        await db.put('conversations', {
-          ...conv,
-          storageBytes: Math.max(0, (conv.storageBytes || 0) + delta),
-        })
-      }
-    }
-  }
-
-  return updated
+  return updateMessageRecord(await initDB(), id, updates)
 }
 
 export async function deleteMessage(id) {
-  const db = await initDB()
-  const existing = await db.get('messages', id)
-  await db.delete('messages', id)
-  if (existing) {
-    const conv = await db.get('conversations', existing.conversationId)
-    if (conv) {
-      await db.put('conversations', {
-        ...conv,
-        storageBytes: Math.max(0, (conv.storageBytes || 0) - byteSize(existing.content)),
-      })
-    }
-  }
+  return removeMessage(await initDB(), id)
 }
 
 // ─── Highlights ──────────────────────────────────────────
 
 export async function addHighlight({ conversationId, messageId, text, color = '#B8A070' }) {
   const db = await initDB()
-  const highlight = {
+  return addNumbered(db, 'highlights', {
     id: generateId(),
     conversationId,
     messageId,
     text,
     color,
     createdAt: new Date().toISOString(),
-  }
-  await db.put('highlights', highlight)
-  return highlight
+  })
 }
 
 export async function getHighlights(conversationId) {
@@ -788,23 +647,20 @@ export async function getHighlights(conversationId) {
 }
 
 export async function deleteHighlight(id) {
-  const db = await initDB()
-  await db.delete('highlights', id)
+  return removeNumbered(await initDB(), 'highlights', id)
 }
 
 // ─── Notes ───────────────────────────────────────────────
 
 export async function addNote({ conversationId, messageId, text }) {
   const db = await initDB()
-  const note = {
+  return addNumbered(db, 'notes', {
     id: generateId(),
     conversationId,
     messageId,
     text,
     createdAt: new Date().toISOString(),
-  }
-  await db.put('notes', note)
-  return note
+  })
 }
 
 export async function getNotes(conversationId) {
@@ -813,31 +669,23 @@ export async function getNotes(conversationId) {
 }
 
 export async function updateNote(id, text) {
-  const db = await initDB()
-  const existing = await db.get('notes', id)
-  if (!existing) throw new Error(`Note not found: ${id}`)
-  const updated = { ...existing, text }
-  await db.put('notes', updated)
-  return updated
+  return updateNumbered(await initDB(), 'notes', id, { text })
 }
 
 export async function deleteNote(id) {
-  const db = await initDB()
-  await db.delete('notes', id)
+  return removeNumbered(await initDB(), 'notes', id)
 }
 
 // ─── Favorites ───────────────────────────────────────────
 
 export async function addFavorite({ conversationId, messageId }) {
   const db = await initDB()
-  const favorite = {
+  return addFavoriteRecord(db, {
     id: generateId(),
     conversationId,
     messageId,
     createdAt: new Date().toISOString(),
-  }
-  await db.put('favorites', favorite)
-  return favorite
+  })
 }
 
 export async function getFavorites(conversationId) {
@@ -846,24 +694,21 @@ export async function getFavorites(conversationId) {
 }
 
 export async function deleteFavorite(id) {
-  const db = await initDB()
-  await db.delete('favorites', id)
+  return removeFavoriteRecord(await initDB(), id)
 }
 
 // ─── Pins (branch transfer references) ──────────────────
 
 export async function addPin({ targetConversationId, sourceConversationId, sourceMessageId, content }) {
   const db = await initDB()
-  const pin = {
+  return addNumbered(db, 'pins', {
     id: generateId(),
     targetConversationId,
     sourceConversationId,
     sourceMessageId,
     content,
     createdAt: new Date().toISOString(),
-  }
-  await db.put('pins', pin)
-  return pin
+  })
 }
 
 export async function getPins(targetConversationId) {
@@ -872,8 +717,7 @@ export async function getPins(targetConversationId) {
 }
 
 export async function deletePin(id) {
-  const db = await initDB()
-  await db.delete('pins', id)
+  return removeNumbered(await initDB(), 'pins', id)
 }
 
 // ─── Settings ────────────────────────────────────────────
@@ -966,14 +810,7 @@ export async function getSbrdDocument(conversationId) {
  * @param {{ paragraphs, suggestionStates, submittedReplies }} data
  */
 export async function saveSbrdDocument(conversationId, { paragraphs, suggestionStates, submittedReplies }) {
-  const db = await initDB()
-  await db.put('sbrd_documents', {
-    conversationId,
-    paragraphs,
-    suggestionStates,
-    submittedReplies,
-    updatedAt: new Date().toISOString(),
-  })
+  return saveDocument(await initDB(), conversationId, { paragraphs, suggestionStates, submittedReplies })
 }
 
 // ─── Storage Monitoring ──────────────────────────────────
@@ -1067,7 +904,9 @@ export async function clearAllData() {
   // Intentionally excludes the 'parliament-keystore' IndexedDB (separate database).
   // That database holds the non-extractable AES key used to encrypt the API key at rest.
   // Clearing it would make any stored encrypted API key permanently unreadable.
-  const stores = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings', 'files', 'file_data', 'sbrd_documents']
+  const stores = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings', 'files', 'file_data', 'sbrd_documents',
+    // Version 6 lists, where they exist. The counter goes too, so numbering starts again at 201.
+    ...Object.keys(V6_NEW_STORES).filter((name) => db.objectStoreNames.contains(name))]
   for (const storeName of stores) {
     await db.clear(storeName)
   }

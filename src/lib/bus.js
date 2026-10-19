@@ -18,12 +18,12 @@ export const CHANNEL_NAME = 'parliament'
 const SIGNALS = Object.freeze({
   hello: [],                          // a tab opened
   bye: [],                            // a tab is closing
-  changed: ['kind', 'num', 'id'],     // a record was written; re-read it
+  changed: ['kind', 'op', 'num', 'id'], // a record was written; re-read it
   stop: ['scope', 'num', 'letter'],   // halt runs: scope 'all' | 'docket' | 'branch'
 })
 
 const FIELD_TYPES = Object.freeze({
-  kind: 'string', num: 'number', id: 'string', scope: 'string', letter: 'string',
+  kind: 'string', op: 'string', num: 'number', id: 'string', scope: 'string', letter: 'string',
 })
 
 /** Returns a clean copy of a signal, or null if its type is unknown. */

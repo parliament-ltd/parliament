@@ -7,6 +7,11 @@ describe('sanitizeSignal', () => {
       .toEqual({ type: 'changed', kind: 'chat', num: 207 })
   })
 
+  it('carries what happened to a record, and nothing of its content', () => {
+    expect(sanitizeSignal({ type: 'changed', kind: 'note', op: 'created', id: 'n1', num: 226, text: 'my note' }))
+      .toEqual({ type: 'changed', kind: 'note', op: 'created', id: 'n1', num: 226 })
+  })
+
   it('drops wrongly typed and oversized values', () => {
     expect(sanitizeSignal({ type: 'changed', num: '207', id: 'x'.repeat(200) })).toEqual({ type: 'changed' })
   })
