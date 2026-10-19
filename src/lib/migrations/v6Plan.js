@@ -247,7 +247,8 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
 
 // ── Personas ─────────────────────────────────────────────
 
-function collabsFromPersonas(settings, { newId, now }) {
+// Shared with restore (records.js), which converts personas the same way.
+export function collabsFromPersonas(settings, { newId, now }) {
   const raw = settings.find((s) => s.key === 'parrotPersonas')?.value
   let list = []
   if (Array.isArray(raw)) list = raw

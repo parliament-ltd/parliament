@@ -498,7 +498,7 @@
     },
     "rooms": [
       {
-        "schema": 1,
+        "schema": "parliament-mode/1.0",
         "parliamentVersion": "0.5.0",
         "id": "mode_ws",
         "scope": "room",
@@ -518,7 +518,7 @@
         "components": []
       },
       {
-        "schema": 1,
+        "schema": "parliament-mode/1.0",
         "parliamentVersion": "0.5.0",
         "id": "mode_essay",
         "scope": "room",

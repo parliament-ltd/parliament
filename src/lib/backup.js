@@ -3,7 +3,7 @@
 // Spec: refactor/parliament_backup_restore_implementation.md
 //
 // File shape (unencrypted):
-//   { format: "parliament-backup", version: 1, createdAt, parliamentVersion,
+//   { format: "parliament-backup", version: 2, createdAt, parliamentVersion,
 //     source, encrypted: false, contents: { ... }, manifest: { ... } }
 //
 // File shape (encrypted):
@@ -25,11 +25,11 @@ import {
   decryptImport,
   PBKDF2_ITERATIONS_V2,
 } from './crypto'
-import { planRestore } from './restorePlan'
+import { gatherContents, restoreInto, CATEGORIES } from './backupData'
 import {
-  BACKUP_FORMAT, BACKUP_VERSION, SETTINGS_BLOCKLIST,
+  BACKUP_FORMAT, BACKUP_VERSION, MAX_KDF_ITERATIONS,
   bytesToBase64, base64ToBytes, arrayBufferToBase64, base64ToArrayBuffer,
-  flatV1ToContents, contentsToFlatStores, liftToCurrent,
+  flatV1ToContents, liftToCurrent,
 } from './backupFormat'
 
 // The file format itself (parsing, older exports, validation) lives in
@@ -41,10 +41,10 @@ export {
 
 const PARLIAMENT_VERSION = '0.5.0'
 
-// All possible top-level categories the user can include in a custom backup.
-// The "preferences" category is opt-out by default in the UI; the rest are
-// opt-in by default. Order here also drives display order in the modal.
-export const CATEGORIES = ['chats', 'annotations', 'rooms', 'homepage', 'library', 'preferences']
+// Every category a backup can hold (backupData.js). The "preferences"
+// category is off by default in the UI; the rest are on. Order here also
+// drives display order in the modal.
+export { CATEGORIES }
 
 // ─── Compression (native CompressionStream) ──────────────
 
@@ -78,101 +78,12 @@ async function getBrowserFingerprint(db = null) {
 // ─── Data gathering ──────────────────────────────────────
 
 /**
- * Walk IndexedDB and build the V2 contents object for the requested
- * categories. Each category is independent — passing only `chats` produces
- * a valid backup that omits `annotations`, `rooms`, etc. entirely.
- *
- * Files (the V1 gap fix) ride along with `chats` since file metadata is
- * keyed by conversationId. Sbrd documents likewise live with chats.
+ * Format 2 contents for the categories asked for, built from the allowlist
+ * (backupData.js, backupSchema.js): known fields only, allowed settings only,
+ * never the saved key. Each category stands alone.
  */
 export async function gatherBackupContents(categories = CATEGORIES, db = null) {
-  db = db || await initDB()
-  const want = new Set(categories)
-  const contents = {}
-
-  if (want.has('chats')) {
-    const conversations = await db.getAll('conversations')
-    const allMessages = await db.getAll('messages')
-    const messagesByConv = new Map()
-    for (const m of allMessages) {
-      let arr = messagesByConv.get(m.conversationId)
-      if (!arr) { arr = []; messagesByConv.set(m.conversationId, arr) }
-      arr.push(m)
-    }
-    for (const arr of messagesByConv.values()) {
-      arr.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-    }
-
-    const allFiles = await db.getAll('files')
-    const filesByConv = new Map()
-    for (const f of allFiles) {
-      let arr = filesByConv.get(f.conversationId)
-      if (!arr) { arr = []; filesByConv.set(f.conversationId, arr) }
-      arr.push(f)
-    }
-
-    // file_data is keyed by fileId; base64-encode the binary blob
-    const fileDataById = new Map()
-    for (const fd of await db.getAll('file_data')) {
-      fileDataById.set(fd.fileId, arrayBufferToBase64(fd.data))
-    }
-
-    const sbrdByConv = new Map()
-    for (const doc of await db.getAll('sbrd_documents')) {
-      sbrdByConv.set(doc.conversationId, doc)
-    }
-
-    contents.chats = conversations.map((c) => {
-      const chat = { ...c, messages: messagesByConv.get(c.id) || [] }
-      const files = filesByConv.get(c.id)
-      if (files && files.length) {
-        chat.files = files
-        chat.fileData = files.reduce((acc, f) => {
-          const b64 = fileDataById.get(f.id)
-          if (b64) acc[f.id] = b64
-          return acc
-        }, {})
-      }
-      const sbrd = sbrdByConv.get(c.id)
-      if (sbrd) chat.sbrdDocument = sbrd
-      return chat
-    })
-  }
-
-  if (want.has('annotations')) {
-    contents.annotations = {
-      notes: await db.getAll('notes'),
-      highlights: await db.getAll('highlights'),
-      favorites: await db.getAll('favorites'),
-      pins: await db.getAll('pins'),
-    }
-  }
-
-  if (want.has('rooms')) {
-    contents.rooms = await db.getAllFromIndex('modes', 'scope', 'room')
-  }
-
-  if (want.has('homepage')) {
-    const homes = await db.getAllFromIndex('modes', 'scope', 'homepage')
-    contents.homepage = homes[0] || null
-  }
-
-  if (want.has('library')) {
-    contents.library = {
-      layouts: await db.getAll('libraryLayouts'),
-      components: await db.getAll('libraryComponents'),
-      schemes: await db.getAll('librarySchemes'),
-      rooms: await db.getAll('libraryRooms'),
-      resources: await db.getAll('libraryResources'),
-    }
-  }
-
-  if (want.has('preferences')) {
-    const allSettings = await db.getAll('settings')
-    contents.preferences = allSettings.filter((s) => !SETTINGS_BLOCKLIST.has(s.key))
-  }
-
-  return contents
+  return gatherContents(db || await initDB(), categories)
 }
 
 // ─── Manifest + counts ───────────────────────────────────
@@ -294,6 +205,11 @@ async function readContents(parsed, password) {
     const salt = base64ToBytes(encryption.salt)
     const iv = base64ToBytes(encryption.iv)
     const iterations = encryption.iterations || PBKDF2_ITERATIONS_V2
+    // A file asking for more stretching than this could hold the tab for
+    // minutes (audit T6), so it is not opened.
+    if (!Number.isInteger(iterations) || iterations < 1 || iterations > MAX_KDF_ITERATIONS) {
+      throw new Error('This backup asks for an unusual amount of work to unlock, so it was not opened.')
+    }
     const key = await deriveKeyFromPassphrase(password, salt, iterations)
     let plain
     try {
@@ -330,163 +246,21 @@ async function readContents(parsed, password) {
 // ─── Restore ─────────────────────────────────────────────
 
 /**
- * Apply a contents object to IndexedDB.
+ * Apply a backup's contents to IndexedDB, in one transaction (backupData.js).
  *
- * strategy: 'merge' — insert items that don't already exist by id. For
- *   conversations with a colliding id, the imported version is renamed to
- *   keep both. For homepage, we only restore if the current homepage is
- *   the seeded default (untouched).
+ * strategy 'merge': an item already here with the same content is
+ *   skipped; one with the same id and different content comes in as a copy
+ *   under a new id, with every reference rewritten (restorePlan.js).
  *
- * strategy: 'replace' — wipe all stores first (except encryption keys),
- *   then write everything from the backup. Caller is responsible for the
- *   destructive-confirmation UX (REPLACE typed, etc.).
+ * strategy 'replace': everything is cleared first, except this browser's
+ *   fingerprint, its backup log and the saved key, then the backup is
+ *   written. Caller is responsible for the destructive-confirmation UX
+ *   (REPLACE typed, etc.).
  *
- * Returns a summary { added, skipped, total } broken down by category.
+ * Returns a summary of what was added, copied, skipped and left out.
  */
 export async function restoreContents(contents, { strategy = 'merge' } = {}) {
-  const flat = contentsToFlatStores(contents)
-  const db = await initDB()
-  const summary = {
-    chats: { added: 0, skipped: 0 },
-    messages: { added: 0, skipped: 0 },
-    annotations: { added: 0, skipped: 0 },
-    rooms: { added: 0, skipped: 0 },
-    homepage: { added: 0, skipped: 0 },
-    library: { added: 0, skipped: 0 },
-    files: { added: 0, skipped: 0 },
-    sbrdDocuments: { added: 0, skipped: 0 },
-    preferences: { added: 0, skipped: 0 },
-  }
-
-  if (strategy === 'replace') {
-    const stores = [
-      'conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins',
-      'settings', 'files', 'file_data', 'sbrd_documents', 'modes',
-      'libraryLayouts', 'libraryRooms', 'libraryComponents', 'librarySchemes', 'libraryResources',
-    ]
-    for (const s of stores) {
-      // settings: preserve a few non-user-data keys (browserFingerprint,
-      // backup metadata) so the next status check has continuity. We
-      // restore them after the wipe.
-      if (s === 'settings') {
-        const preserved = []
-        for (const key of ['browserFingerprint']) {
-          const entry = await db.get('settings', key)
-          if (entry) preserved.push(entry)
-        }
-        await db.clear('settings')
-        for (const e of preserved) await db.put('settings', e)
-      } else {
-        await db.clear(s)
-      }
-    }
-  }
-
-  // ── Conversations + messages + annotations + sbrd + files ─────
-  // planRestore() decides every write and keeps references intact when a
-  // merge renames a colliding conversation (see restorePlan.js).
-  if (flat.conversations.length) {
-    // Pre-read all existing ids outside any tx, so the write-side
-    // transactions are pure puts.
-    const existing = {
-      conversations: new Set(await db.getAllKeys('conversations')),
-      messages: new Set(await db.getAllKeys('messages')),
-      notes: new Set(await db.getAllKeys('notes')),
-      highlights: new Set(await db.getAllKeys('highlights')),
-      favorites: new Set(await db.getAllKeys('favorites')),
-      pins: new Set(await db.getAllKeys('pins')),
-      files: new Set(await db.getAllKeys('files')),
-    }
-    const { writes, skipped } = planRestore(flat, { strategy, existing })
-
-    const put = async (store, records) => {
-      if (!records.length) return
-      const tx = db.transaction(store, 'readwrite')
-      for (const r of records) await tx.store.put(r)
-      await tx.done
-    }
-
-    await put('conversations', writes.conversations)
-    summary.chats.added += writes.conversations.length
-
-    await put('messages', writes.messages)
-    summary.messages.added += writes.messages.length
-    summary.messages.skipped += skipped.messages
-
-    for (const store of ['notes', 'highlights', 'favorites', 'pins']) {
-      await put(store, writes[store])
-      summary.annotations.added += writes[store].length
-    }
-    summary.annotations.skipped += skipped.annotations
-
-    await put('sbrd_documents', writes.sbrd_documents)
-    summary.sbrdDocuments.added += writes.sbrd_documents.length
-
-    await put('files', writes.files)
-    summary.files.added += writes.files.length
-    summary.files.skipped += skipped.files
-    await put('file_data', writes.file_data)
-  }
-
-  // ── Modes (rooms + homepage) ────────────────────────────
-  const modes = flat.modes || []
-  if (modes.length) {
-    const existingModeIds = new Set(await db.getAllKeys('modes'))
-    const tx = db.transaction('modes', 'readwrite')
-    for (const m of modes) {
-      const isHomepage = m.scope === 'homepage'
-      if (existingModeIds.has(m.id) && strategy === 'merge') {
-        if (isHomepage) summary.homepage.skipped++
-        else summary.rooms.skipped++
-        continue
-      }
-      await tx.store.put(m)
-      if (isHomepage) summary.homepage.added++
-      else summary.rooms.added++
-    }
-    await tx.done
-  }
-
-  // ── Library tables ──────────────────────────────────────
-  const libraryStores = [
-    ['libraryLayouts', flat.libraryLayouts],
-    ['libraryRooms', flat.libraryRooms],
-    ['libraryComponents', flat.libraryComponents],
-    ['librarySchemes', flat.librarySchemes],
-    ['libraryResources', flat.libraryResources],
-  ]
-  for (const [name, items] of libraryStores) {
-    if (!items.length) continue
-    const existingIds = new Set(await db.getAllKeys(name))
-    const tx = db.transaction(name, 'readwrite')
-    for (const it of items) {
-      if (existingIds.has(it.id) && strategy === 'merge') {
-        summary.library.skipped++
-        continue
-      }
-      await tx.store.put(it)
-      summary.library.added++
-    }
-    await tx.done
-  }
-
-  // ── Preferences (settings) ──────────────────────────────
-  if (flat.settings.length) {
-    const existingKeys = new Set(await db.getAllKeys('settings'))
-    const tx = db.transaction('settings', 'readwrite')
-    for (const s of flat.settings) {
-      if (SETTINGS_BLOCKLIST.has(s.key)) continue
-      if (existingKeys.has(s.key) && strategy === 'merge') {
-        summary.preferences.skipped++
-        continue
-      }
-      await tx.store.put(s)
-      summary.preferences.added++
-    }
-    await tx.done
-  }
-
-  return summary
+  return restoreInto(await initDB(), contents, { strategy })
 }
 
 // ─── Backup metadata + status ────────────────────────────

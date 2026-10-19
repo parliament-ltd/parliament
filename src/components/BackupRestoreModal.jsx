@@ -221,12 +221,19 @@ export default function BackupRestoreModal({ initialTab = 'backup', onClose }) {
       }
       const summary = await restoreContents(restoreContentsState, { strategy: restoreMode })
       if (priorContents) armUndo(priorContents, summary)
-      const totalAdded = Object.values(summary).reduce((sum, s) => sum + (s.added || 0), 0)
-      const totalSkipped = Object.values(summary).reduce((sum, s) => sum + (s.skipped || 0), 0)
-      const skippedNote = totalSkipped > 0 ? ` (${totalSkipped} already existed, skipped)` : ''
+      const total = (k) => Object.values(summary).reduce((sum, s) => sum + (s?.[k] || 0), 0)
+      const copied = total('copied')
+      const totalAdded = total('added') + copied
+      const totalSkipped = total('skipped')
+      const leftOut = Object.values(summary.leftOut || {}).reduce((sum, n) => sum + n, 0)
+      const notes = [
+        copied > 0 && `${copied} as copies, since they differ from what is here`,
+        totalSkipped > 0 && `${totalSkipped} already here, skipped`,
+        leftOut > 0 && `${leftOut} left out, pointing at something not in the file`,
+      ].filter(Boolean)
       showToast(restoreMode === 'replace'
         ? `Replaced. Imported ${totalAdded} items.`
-        : `Imported ${totalAdded} items${skippedNote}.`)
+        : `Imported ${totalAdded} items${notes.length ? ` (${notes.join('; ')})` : ''}.`)
       setTimeout(() => {
         onClose()
         // Reload so React state and IndexedDB are back in sync

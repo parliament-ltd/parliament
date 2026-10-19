@@ -13,7 +13,7 @@
 
 import { FIRST_NUM } from './addresses'
 import { openBus } from './bus'
-import { stepsFromTurns, forkStep } from './migrations/v6Plan'
+import { stepsFromTurns, forkStep, collabsFromPersonas } from './migrations/v6Plan'
 import { newDocket, addBranch, removeBranch, renameInDocket, withSteps, favoritesWith, favoritesWithout } from './recordsModel'
 
 export const RECORDS_EVENT = 'parliament-records'
@@ -458,6 +458,85 @@ export async function saveDocument(db, conversationId, { paragraphs, suggestionS
     })
     return { result: true, changes: [{ kind: 'document', op: stored ? 'updated' : 'created', id: conversationId }] }
   })
+}
+
+// ── Restore ─────────────────────────────────────────────
+
+/**
+ * Inside a restore's transaction, once what came in is written without
+ * docket fields (restorePlan.js): numbers, dockets, steps and the Favorites
+ * collection for it, by the same rules as a live write (C93). Records are
+ * taken in the order they were made, so numbers follow creation, as in the
+ * upgrade; a fork finds its parent whether that came in too or was here.
+ * Personas and scratchpad text this restore wrote become collabs (switched
+ * off) and a note, and a room made from a built-in template records it, as
+ * the upgrade does. Returns the changes to announce.
+ */
+export async function fileRestored(tx, writes, { now, newId }) {
+  const changes = []
+  const convs = tx.objectStore('conversations')
+  const msgsByChat = new Map()
+  for (const m of writes.messages) {
+    if (!msgsByChat.has(m.conversationId)) msgsByChat.set(m.conversationId, [])
+    msgsByChat.get(m.conversationId).push(m)
+  }
+  for (const list of msgsByChat.values()) list.sort(byTime)
+
+  const items = [
+    ...writes.conversations.map((record) => ({ store: 'conversations', record, tie: 1 })),
+    ...['notes', 'highlights', 'pins'].flatMap((store) => writes[store].map((record) => ({ store, record, tie: 2 }))),
+  ].sort((a, b) => byTime(a.record, b.record) || a.tie - b.tie)
+
+  for (const { store, record } of items) {
+    if (store === 'conversations') {
+      const parent = record.parentId ? await convs.get(record.parentId) : null
+      const allParentMessages = parent ? (await tx.objectStore('messages').index('conversationId').getAll(parent.id)).sort(byTime) : null
+      const filed = await fileInDocket(tx, record, { parent, copiedMessages: msgsByChat.get(record.id) || [], allParentMessages })
+      const chat = filed.chat
+      if (Array.isArray(chat.tags) && chat.tags.length && !chat.tagsBy) chat.tagsBy = 'model'
+      await convs.put(chat)
+      changes.push(...filed.changes)
+    } else {
+      // What a numbered kind carries, where the restored record has nothing of its own.
+      const stored = { ...NUMBERED[store].fields, ...record, num: await takeNum(tx) }
+      await tx.objectStore(store).put(stored)
+    }
+  }
+
+  if (writes.favorites.length) {
+    let collection = await tx.objectStore('collections').index('builtIn').get('favorites')
+    for (const fav of [...writes.favorites].sort(byTime)) collection = favoritesWith(collection, fav, { id: newId(), now })
+    await tx.objectStore('collections').put(collection)
+    changes.push({ kind: 'collection', op: 'updated', id: collection.id })
+  }
+
+  const personas = writes.settings.find((s) => s.key === 'parrotPersonas')
+  if (personas) {
+    const here = await tx.objectStore('collabs').getAll()
+    const { collabs } = collabsFromPersonas([personas], { newId, now })
+    for (const c of collabs) {
+      if (c.fromPersona != null && here.some((h) => h.fromPersona === c.fromPersona)) continue
+      await tx.objectStore('collabs').put(c)
+    }
+  }
+  const scratch = writes.settings.find((s) => s.key === 'scratchpad-text')
+  if (typeof scratch?.value === 'string' && scratch.value.trim()) {
+    await tx.objectStore('notes').put({
+      id: newId(), conversationId: null, messageId: null, text: scratch.value,
+      pinned: false, tags: [], fromScratchpad: true, createdAt: now, num: await takeNum(tx),
+    })
+  }
+
+  const rooms = writes.modes.filter((m) => m.scope === 'room' && !m.meta?.template)
+  if (rooms.length) {
+    const templates = new Map((await tx.objectStore('libraryRooms').getAll())
+      .filter((t) => t?.author?.handle === 'parliament' && t.displayName)
+      .map((t) => [t.displayName, t.id]))
+    for (const m of rooms) {
+      if (templates.has(m.meta?.name)) await tx.objectStore('modes').put({ ...m, meta: { ...m.meta, template: templates.get(m.meta.name) } })
+    }
+  }
+  return changes
 }
 
 // UTF-8-accurate byte size of a string. Keeps each chat's storageBytes in

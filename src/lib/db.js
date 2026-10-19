@@ -1,5 +1,6 @@
 import { openDB } from 'idb'
-import { validateBackup } from './validate'
+import { restoreInto } from './backupData'
+import { flatV1ToContents } from './backupFormat'
 import { SCHEMES } from './schemes'
 import { seedLibraryRooms } from './seedTemplates'
 import { listEntries } from '../catalog'
@@ -741,30 +742,11 @@ export async function exportAllData() {
 }
 
 export async function importData(data) {
-  // Validate before touching IndexedDB
-  const check = validateBackup(data)
-  if (!check.valid) throw new Error(check.error)
-
-  const db = await initDB()
-  const stores = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings', 'sbrd_documents']
-  let imported = 0
-
-  for (const storeName of stores) {
-    if (!data[storeName]) continue
-    const tx = db.transaction(storeName, 'readwrite')
-    // Key by each store's own keyPath: sbrd_documents is keyed on
-    // conversationId, settings on key, everything else on id.
-    const keyPath = tx.store.keyPath
-    for (const item of data[storeName]) {
-      const existing = await tx.store.get(item[keyPath])
-      if (!existing) {
-        await tx.store.put(item)
-        imported++
-      }
-    }
-    await tx.done
-  }
-
+  // The older JSON export (R10) comes in through the same restore as a
+  // backup (backupData.js): cleaned to the allowlist, checked, written in one
+  // transaction, and numbered at version 6.
+  const summary = await restoreInto(await initDB(), flatV1ToContents(data), { strategy: 'merge' })
+  const imported = Object.values(summary).reduce((n, part) => n + (part?.added || 0) + (part?.copied || 0), 0)
   return { imported }
 }
 
