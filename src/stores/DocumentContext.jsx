@@ -112,7 +112,9 @@ export function DocumentProvider({ children }) {
   // ── Track the conversation we last loaded; ignore transient nulls ──
   const loadedFor = useRef(null)
   const saveTimerRef = useRef(null)
-  const seedRef = useRef(null)
+  // What was loaded (or the seed for a new document). Until the paragraphs
+  // or replies are replaced by an edit, there is nothing to save.
+  const untouchedRef = useRef({ paragraphs: null, replies: EMPTY_REPLIES })
 
   useEffect(() => {
     if (activeConversationId == null) return
@@ -146,21 +148,19 @@ export function DocumentProvider({ children }) {
       if (cancelled) return
       setConversationTitle(conv?.title || 'Untitled')
       setBranches(Array.isArray(branchList) ? branchList : [])
-      if (doc?.paragraphs?.length) {
-        setParagraphs(doc.paragraphs.map(migrateParagraph))
-      } else {
-        seedRef.current = [makeSeedParagraph()]
-        setParagraphs(seedRef.current)
-      }
-      if (doc?.submittedReplies) setSubmittedReplies(doc.submittedReplies)
+      const loadedParagraphs = doc?.paragraphs?.length ? doc.paragraphs.map(migrateParagraph) : [makeSeedParagraph()]
+      const loadedReplies = doc?.submittedReplies || EMPTY_REPLIES
+      untouchedRef.current = { paragraphs: loadedParagraphs, replies: loadedReplies }
+      setParagraphs(loadedParagraphs)
+      setSubmittedReplies(loadedReplies)
       setLoaded(true)
     }).catch((err) => {
       if (cancelled) return
       if (import.meta.env.DEV) {
         console.warn('[DocumentContext] load failed:', err)
       }
-      seedRef.current = [makeSeedParagraph()]
-      setParagraphs(seedRef.current)
+      untouchedRef.current = { paragraphs: [makeSeedParagraph()], replies: EMPTY_REPLIES }
+      setParagraphs(untouchedRef.current.paragraphs)
       setLoaded(true)
     })
     return () => { cancelled = true }
@@ -172,9 +172,9 @@ export function DocumentProvider({ children }) {
   useEffect(() => {
     if (!loaded || activeConversationId == null) return
     if (paragraphs === EMPTY_PARAGRAPHS) return
-    // An untouched seed is not a document: nothing is written until the
-    // first edit, so opening a chat no longer leaves a record behind.
-    if (paragraphs === seedRef.current && submittedReplies === EMPTY_REPLIES) return
+    // Nothing is written until the first edit: opening a chat leaves no
+    // record behind, and opening a document does not rewrite it.
+    if (paragraphs === untouchedRef.current.paragraphs && submittedReplies === untouchedRef.current.replies) return
     clearTimeout(saveTimerRef.current)
     saveTimerRef.current = setTimeout(() => {
       saveSbrdDocument(activeConversationId, { paragraphs, submittedReplies }).catch((err) => {
