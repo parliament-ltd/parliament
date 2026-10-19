@@ -16,10 +16,16 @@
 // Older V1 exports (.apb and plain JSON) are converted to version-1 contents
 // by flatV1ToContents() in backup.js and enter the chain at version 1.
 
-export const CURRENT_BACKUP_VERSION = 1
+export const CURRENT_BACKUP_VERSION = 2
 
 export const MIGRATIONS = Object.freeze({
-  // 1: (contents) => contents lifted to version 2
+  // 1 to 2 (19 October 2026, C93). Format 2 is written from an allowlist
+  // (backupSchema.js) and may also hold version 6 lists: dockets with their
+  // runs, collections and collabs. A format 1 file has none of them and
+  // every one of its fields is still readable, so its contents are already
+  // format 2 contents. Cleaning to the allowlist happens on restore, for
+  // every version alike.
+  1: (contents) => ({ ...contents }),
 })
 
 /**

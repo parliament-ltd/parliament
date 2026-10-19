@@ -68,7 +68,8 @@ function validateHighlight(item) {
 
 function validateNote(item) {
   if (!isId(item.id))                          return 'note.id invalid'
-  if (!isId(item.conversationId))              return 'note.conversationId invalid'
+  // A note in no chat stands on its own, like the one the scratchpad becomes.
+  if (!isStringOrNull(item.conversationId, 128)) return 'note.conversationId invalid'
   if (!isStringOrNull(item.messageId, 128))    return 'note.messageId invalid'
   if (!isString(item.text, 100_000))           return 'note.text invalid or too large'
   if (!isISODate(item.createdAt))              return 'note.createdAt invalid date'
@@ -210,6 +211,35 @@ function validateLibraryResource(item) {
   return null
 }
 
+// ─── Version 6 lists (C93) ───────────────────────────────
+
+function validateDocket(item) {
+  if (!isId(item.id))                       return 'docket.id invalid'
+  if (item.num !== undefined && !isNumber(item.num)) return 'docket.num must be a number'
+  if (!Array.isArray(item.branches))        return 'docket.branches must be an array'
+  if (!Array.isArray(item.order))           return 'docket.order must be an array'
+  return null
+}
+
+function validateRun(item) {
+  if (!isId(item.id))                       return 'run.id invalid'
+  if (!isId(item.docketId))                 return 'run.docketId invalid'
+  if (!item.branches || typeof item.branches !== 'object' || Array.isArray(item.branches)) return 'run.branches must be an object'
+  return null
+}
+
+function validateCollection(item) {
+  if (!isId(item.id))                       return 'collection.id invalid'
+  if (!Array.isArray(item.items))           return 'collection.items must be an array'
+  return null
+}
+
+function validateCollab(item) {
+  if (!isId(item.id))                       return 'collab.id invalid'
+  if (!isString(item.instruction, 100_000)) return 'collab.instruction invalid'
+  return null
+}
+
 const VALIDATORS = {
   conversations:     validateConversation,
   messages:          validateMessage,
@@ -227,6 +257,10 @@ const VALIDATORS = {
   libraryComponents: validateLibraryComponent,
   librarySchemes:    validateLibraryScheme,
   libraryResources:  validateLibraryResource,
+  dockets:           validateDocket,
+  runs:              validateRun,
+  collections:       validateCollection,
+  collabs:           validateCollab,
 }
 
 // ─── Top-level export ────────────────────────────────────
@@ -291,11 +325,10 @@ export function validateBackup(data) {
   const convIds = idSets.conversations || new Set()
   const msgIds  = idSets.messages      || new Set()
 
+  // A branch whose parent chat was deleted is kept: the app makes such
+  // branches itself, and the planner gives each a docket of its own.
   for (let i = 0; i < data.conversations.length; i++) {
     const c = data.conversations[i]
-    if (c.parentId && !convIds.has(c.parentId)) {
-      return { valid: false, error: `conversations[${i}].parentId references unknown conversation '${c.parentId}'.` }
-    }
     if (c.parentId === c.id) {
       return { valid: false, error: `conversations[${i}] has parentId equal to its own id (circular).` }
     }
@@ -331,8 +364,7 @@ export function validateBackup(data) {
     { store: 'favorites',  field: 'conversationId', target: convIds, targetName: 'conversations' },
     { store: 'favorites',  field: 'messageId',      target: msgIds,  targetName: 'messages' },
     { store: 'pins',       field: 'targetConversationId', target: convIds, targetName: 'conversations' },
-    { store: 'pins',       field: 'sourceConversationId', target: convIds, targetName: 'conversations' },
-    { store: 'pins',       field: 'sourceMessageId',      target: msgIds,  targetName: 'messages' },
+    // A pinned reference is a copy, so its source may be gone; only the chat it is kept in must exist.
     { store: 'sbrd_documents', field: 'conversationId',   target: convIds, targetName: 'conversations' },
     { store: 'files',      field: 'conversationId', target: convIds, targetName: 'conversations' },
     { store: 'file_data',  field: 'fileId',         target: fileIds, targetName: 'files' },
@@ -348,19 +380,8 @@ export function validateBackup(data) {
     }
   }
 
-  // Soft cross-ref: if the backup includes a modes table, every non-null
-  // conversation.room should resolve to a mode in this backup. Pre-V2 backups
-  // have no modes table — skip the check entirely in that case so V1 backups
-  // continue to validate cleanly.
-  if (Array.isArray(data.modes) && data.modes.length > 0) {
-    const modeIds = idSets.modes || new Set()
-    for (let i = 0; i < data.conversations.length; i++) {
-      const room = data.conversations[i].room
-      if (room && !modeIds.has(room)) {
-        return { valid: false, error: `conversations[${i}].room references unknown mode '${room}'.` }
-      }
-    }
-  }
+  // A chat whose room was deleted is kept: deleteMode leaves such chats, and
+  // they open with a placeholder (C93, 19 October).
 
   return { valid: true }
 }

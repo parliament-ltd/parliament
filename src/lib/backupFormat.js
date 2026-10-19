@@ -5,6 +5,7 @@
 
 import { validateBackup } from './validate'
 import { CURRENT_BACKUP_VERSION, migrateContents } from './backupMigrations'
+import { cleanFlat } from './backupSchema'
 
 export const BACKUP_FORMAT = 'parliament-backup'
 export const BACKUP_VERSION = CURRENT_BACKUP_VERSION
@@ -13,6 +14,12 @@ export const BACKUP_VERSION = CURRENT_BACKUP_VERSION
 // big one: it's encrypted with browser-specific crypto and shouldn't leave
 // this browser.
 export const SETTINGS_BLOCKLIST = new Set(['parliament-api-key'])
+
+// Limits on what a file may ask of this browser (audit T6). A backup larger
+// than this is not read; one whose password must be stretched more than this
+// many times is not opened, since it could hold the tab for minutes.
+export const MAX_BACKUP_BYTES = 512 * 1024 * 1024
+export const MAX_KDF_ITERATIONS = 5_000_000
 
 // ─── Base64 helpers ──────────────────────────────────────
 
@@ -50,6 +57,9 @@ export function base64ToArrayBuffer(b64) {
  * `contents` — call decryptBackup() with the user's password.
  */
 export async function parseBackupFile(file) {
+  if (typeof file?.size === 'number' && file.size > MAX_BACKUP_BYTES) {
+    throw new Error('This file is too large to be a Parliament backup.')
+  }
   let text
   try {
     text = await file.text()
@@ -65,7 +75,9 @@ export async function parseBackupFile(file) {
   }
 
   if (json && typeof json === 'object' && json.format === BACKUP_FORMAT) {
-    if (typeof json.version !== 'number' || json.version > BACKUP_VERSION) {
+    // A file with no version is format 1 (C35).
+    if (json.version === undefined) json.version = 1
+    if (!Number.isInteger(json.version) || json.version < 1 || json.version > BACKUP_VERSION) {
       throw new Error('This backup was created by a newer version of Parliament. Please update to restore it.')
     }
     return { kind: 'v2', envelope: json, raw: text }
@@ -166,6 +178,11 @@ export function contentsToFlatStores(contents) {
     libraryComponents: [],
     librarySchemes: [],
     libraryResources: [],
+    // Format 2, from version 6 data.
+    dockets: [],
+    runs: [],
+    collections: [],
+    collabs: [],
   }
 
   for (const chat of contents.chats || []) {
@@ -207,11 +224,21 @@ export function contentsToFlatStores(contents) {
     flat.settings = contents.preferences.filter((s) => !SETTINGS_BLOCKLIST.has(s.key))
   }
 
+  if (contents.dockets) {
+    flat.dockets = contents.dockets.dockets || []
+    flat.runs = contents.dockets.runs || []
+  }
+  if (Array.isArray(contents.collections)) flat.collections = contents.collections
+  if (Array.isArray(contents.collabs)) flat.collabs = contents.collabs
+
   return flat
 }
 
+// Checked after cleaning (backupSchema.js): what is left out is counted
+// there, so a record pointing at something missing is no reason to refuse
+// the whole file.
 export function validateContents(contents) {
-  const flat = contentsToFlatStores(contents)
+  const { flat } = cleanFlat(contentsToFlatStores(contents))
   // validateBackup requires a `conversations` array as a baseline. If the
   // backup is partial (only library, say), pass an empty array — that
   // satisfies the schema while letting the per-store validators catch
@@ -227,6 +254,6 @@ export function validateContents(contents) {
  * V1 exports (.apb and plain JSON) enter the chain at version 1.
  */
 export function liftToCurrent(parsed, contents) {
-  const fromVersion = parsed.kind === 'v2' ? parsed.envelope.version : 1
+  const fromVersion = parsed.kind === 'v2' ? (parsed.envelope.version ?? 1) : 1
   return migrateContents(contents, fromVersion).contents
 }

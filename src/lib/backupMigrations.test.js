@@ -34,6 +34,22 @@ describe('migrateContents', () => {
 
 // Every past format must stay restorable. Add a fixture per version.
 describe('past backup files', () => {
+  it('a file with no version reads as format 1 (C35)', async () => {
+    const text = readFileSync(new URL('./__fixtures__/backup-v1.json', import.meta.url), 'utf8')
+    const envelope = JSON.parse(text)
+    delete envelope.version
+    const parsed = await parseBackupFile({ text: async () => JSON.stringify(envelope) })
+    expect(parsed.envelope.version).toBe(1)
+    expect(liftToCurrent(parsed, parsed.envelope.contents).chats).toHaveLength(2)
+  })
+
+  it('refuses a file too large to be a backup without reading it', async () => {
+    let read = false
+    const huge = { size: 600 * 1024 * 1024, text: async () => { read = true; return '{}' } }
+    await expect(parseBackupFile(huge)).rejects.toThrow(/too large/)
+    expect(read).toBe(false)
+  })
+
   it('version 1 parses, lifts to the current version, and validates', async () => {
     const parsed = await parseBackupFile(fileFrom('backup-v1.json'))
     expect(parsed.kind).toBe('v2')
