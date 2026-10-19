@@ -799,7 +799,7 @@ language, reply language), and so are more providers, Mistral included.
 - **Two repairs found on the way:** opening a Secretarybird document no longer rewrites it (the editor saves only after an edit, and a save of unchanged content writes nothing); and a document save no longer drops the older `suggestionStates` field, which two of Stefan's documents carry.
 - **Not yet through the write path:** restore and the older JSON import still write records directly, so at version 6 what they bring in would have no numbers. Restore is the next piece; the older import goes with R10.
 
-**C93. Restore and backups: the plan** (19 October, for Stefan before it is built). From stage 2 of the plan, P6 (ruled 15 October), audit finding T6, C35, and the race found on 15 October.
+**C93. Restore and backups: the plan** (19 October; **ruled yes, as suggested,** the same day). From stage 2 of the plan, P6 (ruled 15 October), audit finding T6, C35, and the race found on 15 October.
 - **Today's restore,** read on 19 October (`backup.js` `restoreContents`, `restorePlan.js`):
   - It writes each kind of record in its own transaction, so another tab starting up between them can remove a chat whose messages are not written yet (15 October).
   - A chat whose id already exists comes in as a copy titled "… (from backup)": English written into data (C86), and the only sign that it is a copy.
