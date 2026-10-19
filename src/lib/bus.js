@@ -52,6 +52,8 @@ export function openBus({ channelName = CHANNEL_NAME, tabId = crypto.randomUUID(
     return { tabId, post() {}, on: () => () => {}, close() {} }
   }
   const channel = new BroadcastChannel(channelName)
+  // In Node (tests) an open channel would keep the process alive. Browsers have no unref.
+  channel.unref?.()
   const listeners = new Set()
   channel.onmessage = (e) => {
     const s = sanitizeSignal(e.data)

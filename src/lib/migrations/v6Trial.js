@@ -7,7 +7,7 @@
 // can be inspected in the browser's storage tools meanwhile.
 
 import { openDB, deleteDB } from 'idb'
-import { upgradeSchema, DB_VERSION, DRAFT_DB_VERSION, TRIAL_DB_NAME } from '../db'
+import { upgradeSchema, DB_VERSION, DRAFT_DB_VERSION, TRIAL_DB_NAME } from '../schema'
 import { V6_NEW_STORES, V6_NEW_INDEXES } from './v6Upgrade'
 import { FIRST_NUM } from '../addresses'
 
