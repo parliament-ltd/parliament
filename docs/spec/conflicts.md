@@ -859,6 +859,13 @@ Found while building the parser and the verb registry (stage 3: `src/commands/pa
 
 **C99. What may share a line.** No document says whether one line can hold several commands. Almanac v30 writes a filter with a minus to leave things out (`-tag:Research`). **Suggestion:** filters share a line (`type:chat -tag:essay`) and every other command runs alone; the Enter line says "One command at a time. Only filters share a line". The minus works on the filters that pick by kind or name (`type:` `room:` `tag:` `model:` `from:` `in:` `has:`), not on `cost:`, `since:`, `until:` or `sort:`.
 - **Ruled 20 October: commands combine** ("i like the ability to combine commands yes, that adds power to the command bar"). Filters combining is built. Whether other commands may share a line too, and with what limits, is put to Stefan the same day; until then the registry lets filters share a line and nothing else.
+- **Ruled 20 October, second answer: any commands may share a line, with the limits suggested** ("ok to let limits suggested, let's make a note to revisit this afterward once I can test out live"):
+  - They run left to right, and the Enter line lists each before Enter.
+  - If one fails, the rest do not run, and the Enter line says where it stopped.
+  - `undo:` takes back the whole line in one step.
+  - A command that sends something to a provider or source (`run:`, `summarize:` and the others marked as spending) stands alone, so its Enter line can name who receives it and what it costs; so does `erase:`, so it is plain what goes for good.
+  - A verb that keeps the rest of the line as text (`tell:`, `note:`) comes last, since what follows it is its text.
+  - **To revisit once Stefan can try it live** (stage 3's flag, then the welcome page): whether combining feels right, and whether the limits are the right ones.
 
 **C100. What counts as a line shaped like a key.** The settings spec (§6): the history never stores a line containing `sk-` or "a run of 28+ key-like characters", and such a line is refused before Enter. Read literally, `sk-` anywhere catches `risk-analysis` and `task-list`, and any long run catches hyphenated tags and dates. **Built:** `sk-` at the start of a word, or a run of 28 or more letters, digits, hyphens and underscores that mixes capitals, small letters and digits, or holds six or more digits with only small letters and no hyphen. Tags and dates pass; keys are caught. A 40-character commit hash in a command is caught too, which is the safe side. Checked only in command mode: what a prompt may contain is stage 4's question. **Suggestion:** keep as built.
 

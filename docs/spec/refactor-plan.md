@@ -288,7 +288,7 @@ The spine. Built behind a flag, so today's screens keep working underneath.
 - **Salvaged:** `addresses.js`, `bus.js`, the ignition animations (for `api:` later). **Rebuilt:** everything else here is new; no command layer exists.
 - **Security and privacy:** the history never stores content. Window titles and addresses carry numbers and kinds only. A popped window is blank, same-origin and never navigated, and takes its styles from the built stylesheet, not copied text, so the policy can lose `'unsafe-inline'`.
 - **You can try:** switch the flag on. Type `>`, then `?`. Move the bar with `bar:bottom`. Click away and watch it fold to the hexagon. Open and close a board. Pop one into a window.
-- **Needs from you:** approval of the token sheet; your verdict on the pop-out prototype; A1 and A3.
+- **Needs from you:** approval of the token sheet; your verdict on the pop-out prototype; A1 and A3. Once the flag is on, a second look at commands sharing a line and their limits (C99, to revisit live).
 
 ### Stage 4. A room in the shell, no key needed
 
