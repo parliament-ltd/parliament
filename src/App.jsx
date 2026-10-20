@@ -36,6 +36,13 @@ const CatalogDebugView = import.meta.env.DEV
   ? lazy(() => import('./views/CatalogDebugView'))
   : null
 
+// Throwaway stage 3 prototype: popping the bar into its own window. In
+// development, or in a production build made with VITE_PROTOTYPES=1 so it
+// can be tried under the real headers. Never in an ordinary build.
+const PopoutPrototype = import.meta.env.DEV || import.meta.env.VITE_PROTOTYPES === '1'
+  ? lazy(() => import('./views/PopoutPrototype'))
+  : null
+
 // Dev only: the line saying this tab runs on the version 6 trial copy.
 const TrialNotice = import.meta.env.DEV && isTrialDb()
   ? lazy(() => import('./components/TrialNotice'))
@@ -85,6 +92,18 @@ export default function App() {
                         <ErrorBoundary inline>
                           <Suspense fallback={null}>
                             <MigrationPreview />
+                          </Suspense>
+                        </ErrorBoundary>
+                      }
+                    />
+                  )}
+                  {PopoutPrototype && (
+                    <Route
+                      path="/dev/popout"
+                      element={
+                        <ErrorBoundary inline>
+                          <Suspense fallback={null}>
+                            <PopoutPrototype />
                           </Suspense>
                         </ErrorBoundary>
                       }
