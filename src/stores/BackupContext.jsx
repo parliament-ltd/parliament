@@ -50,8 +50,12 @@ export function BackupProvider({ children }) {
 
   // Global Cmd+Shift+B / Ctrl+Shift+B opens the modal directly to the
   // backup tab. Active everywhere — homepage, /chat/:id, /settings, etc.
+  // On a chat with messages the same keys open the branch panel instead:
+  // BranchShortcutHandler listens first and marks the key as taken, so the
+  // two never open at once (conflicts Part 4; refactor plan, stage 3).
   useEffect(() => {
     function handleKeyDown(e) {
+      if (e.defaultPrevented) return
       const mod = e.metaKey || e.ctrlKey
       if (mod && e.shiftKey && (e.key === 'b' || e.key === 'B')) {
         // Don't intercept while the user is typing in a contenteditable

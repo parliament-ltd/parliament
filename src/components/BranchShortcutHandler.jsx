@@ -56,8 +56,11 @@ export default function BranchShortcutHandler() {
       openBranchPanel(last.id)
     }
 
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
+    // Listen in the capture phase, ahead of the backup shortcut on the same
+    // keys (BackupContext), which skips a key already taken here. Without
+    // this both opened at once (conflicts Part 4).
+    window.addEventListener('keydown', onKeyDown, true)
+    return () => window.removeEventListener('keydown', onKeyDown, true)
   }, [location.pathname, messages, openBranchPanel])
 
   return null
