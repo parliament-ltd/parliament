@@ -1,7 +1,13 @@
 import { initDB } from './db'
+import {
+  KEY_DB_NAME, KEY_DB_VERSION, KEY_STORE, LEGACY_SETTING, upgradeKeyDb,
+  readSavedKey, writeSavedKey, removeSavedKey, moveLegacyKey,
+} from './keyStore'
 
-const ENCRYPTION_KEY_STORE = 'encryption-keys'
+const ENCRYPTION_KEY_STORE = KEY_STORE
 const KEY_ID = 'api-key-encryption'
+// The one provider with a key today; stage 7 adds others.
+const PROVIDER = 'anthropic'
 
 // ─── Internal: Key Storage ───────────────────────────────
 // The encryption key is stored in a separate IndexedDB database
@@ -12,13 +18,7 @@ let keyDB = null
 async function getKeyDB() {
   if (keyDB) return keyDB
 
-  keyDB = await (await import('idb')).openDB('parliament-keystore', 1, {
-    upgrade(db) {
-      if (!db.objectStoreNames.contains(ENCRYPTION_KEY_STORE)) {
-        db.createObjectStore(ENCRYPTION_KEY_STORE, { keyPath: 'id' })
-      }
-    }
-  })
+  keyDB = await (await import('idb')).openDB(KEY_DB_NAME, KEY_DB_VERSION, { upgrade: upgradeKeyDb })
 
   return keyDB
 }
@@ -78,21 +78,23 @@ export async function decryptApiKey(ciphertext, iv) {
 }
 
 // ─── API Key Storage Modes ──────────────────────────────
+//
+// A saved key is kept encrypted in the key database (keyStore.js), not in
+// the settings list (ruled 19 October). One saved the old way is moved the
+// first time keys are read.
 
-const STORAGE_KEY = 'parliament-api-key'
+const STORAGE_KEY = LEGACY_SETTING
 
 export async function saveApiKey(apiKey, mode = 'persistent') {
   switch (mode) {
     case 'persistent': {
       const { ciphertext, iv } = await encryptApiKey(apiKey)
-      const db = await initDB()
-      await db.put('settings', {
-        key: STORAGE_KEY,
-        value: {
-          ciphertext: Array.from(new Uint8Array(ciphertext)),
-          iv: Array.from(iv),
-        }
+      await writeSavedKey(await getKeyDB(), PROVIDER, {
+        ciphertext: Array.from(new Uint8Array(ciphertext)),
+        iv: Array.from(iv),
       })
+      // A key saved now replaces one saved the old way.
+      await (await initDB()).delete('settings', STORAGE_KEY)
       break
     }
     case 'memory': {
@@ -110,11 +112,20 @@ export async function saveApiKey(apiKey, mode = 'persistent') {
 export async function loadApiKey(mode = 'persistent') {
   switch (mode) {
     case 'persistent': {
-      const db = await initDB()
-      const entry = await db.get('settings', STORAGE_KEY)
-      if (!entry || !entry.value) return null
+      const appDb = await initDB()
+      const keyDb = await getKeyDB()
+      let saved = null
+      try {
+        await moveLegacyKey({ appDb, keyDb, provider: PROVIDER })
+        saved = await readSavedKey(keyDb, PROVIDER)
+      } catch (err) {
+        // The move failed: the key is still where it was, so read it there.
+        if (import.meta.env.DEV) console.warn('[crypto] Saved key not moved:', err?.message)
+        saved = (await appDb.get('settings', STORAGE_KEY))?.value || null
+      }
+      if (!saved) return null
 
-      const { ciphertext, iv } = entry.value
+      const { ciphertext, iv } = saved
       try {
         return await decryptApiKey(
           new Uint8Array(ciphertext).buffer,
@@ -138,6 +149,13 @@ export async function loadApiKey(mode = 'persistent') {
 }
 
 export async function deleteApiKey() {
+  try {
+    await removeSavedKey(await getKeyDB(), PROVIDER)
+  } catch (err) {
+    if (import.meta.env.DEV) {
+      console.warn('[crypto] Failed to delete the saved key:', err?.message)
+    }
+  }
   const db = await initDB()
   try {
     await db.delete('settings', STORAGE_KEY)
