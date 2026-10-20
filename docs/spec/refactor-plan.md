@@ -230,6 +230,8 @@ until you have read the dry run and said go.**
 
 **Checkpoint, 19 October:** everything in this stage is built and tested except raising the version. The saved key lives in the key database (moved on first read, the old copy removed once checked), and the browser is asked once, on the first prompt sent, to keep Parliament's storage, with the answer in Settings. Vitest 5 clears the last audit findings. 111 tests, including the database ones. The database is still at version 5: raising it is put to Stefan at this checkpoint, with the upgrade gate made to report a failed upgrade instead of loading the app on top of it.
 
+**Done, 19 October:** the version is 6 (approved at the checkpoint). The upgrade screen runs the upgrade itself; a failure leaves the data at its old version and the screen says why. Tried on a version 5 copy of Stefan's second backup in the trial database, failure and success both. parliament.ltd is unchanged until a deploy. **Stage 2 is done.**
+
 - **Kept:** the long ids that records are keyed by, so nothing that points at a record breaks. Messages are not rewritten: a reply keeps its original text, and its editable form is stored only the first time it is edited.
 - **Added, as lists**
   - Dockets and runs. A step can carry a condition (A15).
