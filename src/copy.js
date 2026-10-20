@@ -1,0 +1,66 @@
+// The copy table: the words of the new chrome, in one place (refactor-plan.md,
+// stage 3; C87). It is also the translation catalogue: `npm run i18n`
+// collects every entry marked /*i18n*/ into src/locales/, where translators
+// work, and compiles it for the app.
+//
+// Each entry keeps a fixed id, so rewording never breaks a translation or a
+// link. Wording follows the copy rules: sentence case, no em dashes, no
+// provider named in a sentence. Plurals use ICU, which works in every
+// language ("one" and "other" in English, more in others).
+//
+// The plain-language pass on names before the welcome page (A6) happens here:
+// changing a board's name is one line.
+//
+// Read an entry with i18n._(COPY.boards.almanac), or with useLingui() in a
+// component. Commands stay English (LPN §5); only what they say is
+// translated.
+
+export const COPY = {
+  // The bar's three modes (bar reference).
+  modes: {
+    search: /*i18n*/ { id: 'mode.search', message: 'Search', comment: "The bar's search mode" },
+    command: /*i18n*/ { id: 'mode.command', message: 'Command', comment: "The bar's command mode" },
+    prompt: /*i18n*/ { id: 'mode.prompt', message: 'Prompt', comment: "The bar's prompt mode" },
+  },
+
+  // The boards. Names to be looked at again before the welcome page (A6).
+  boards: {
+    almanac: /*i18n*/ { id: 'board.almanac', message: 'Almanac', comment: 'The table of everything you have made' },
+    collection: /*i18n*/ { id: 'board.collection', message: 'Collection', comment: 'Cards of highlights, terms, quotes and notes' },
+    library: /*i18n*/ { id: 'board.library', message: 'Library', comment: 'Rooms, layouts, blocks, themes and resources' },
+    docket: /*i18n*/ { id: 'board.docket', message: 'Docket', comment: 'A plan of branches and steps' },
+    reflection: /*i18n*/ { id: 'board.reflection', message: 'Reflection', comment: 'Reads a chat and its markings' },
+    settings: /*i18n*/ { id: 'board.settings', message: 'Settings' },
+  },
+
+  // The kinds that take a number (C17, C56, A19).
+  kinds: {
+    chat: /*i18n*/ { id: 'kind.chat', message: 'Chat' },
+    note: /*i18n*/ { id: 'kind.note', message: 'Note' },
+    highlight: /*i18n*/ { id: 'kind.highlight', message: 'Highlight', comment: 'One passage marked where it sits' },
+    term: /*i18n*/ { id: 'kind.term', message: 'Term', comment: 'A word or phrase lit wherever it appears' },
+    quote: /*i18n*/ { id: 'kind.quote', message: 'Quote', comment: 'A passage kept beside the chat, never sent' },
+    docket: /*i18n*/ { id: 'kind.docket', message: 'Docket' },
+    edit: /*i18n*/ { id: 'kind.edit', message: 'Edit' },
+    ask: /*i18n*/ { id: 'kind.ask', message: 'Ask' },
+    suggestion: /*i18n*/ { id: 'kind.suggestion', message: 'Suggestion' },
+  },
+
+  // Counts, with plurals that work in every language.
+  counts: {
+    chats: /*i18n*/ { id: 'count.chats', message: '{count, plural, one {# chat} other {# chats}}' },
+    dockets: /*i18n*/ { id: 'count.dockets', message: '{count, plural, one {# docket} other {# dockets}}' },
+    steps: /*i18n*/ { id: 'count.steps', message: '{count, plural, one {# step} other {# steps}}' },
+  },
+
+  // Keeping the data (C94): the browser is not named.
+  storage: {
+    kept: /*i18n*/ { id: 'storage.kept', message: "This browser keeps Parliament's data until you delete it." },
+    notKept: /*i18n*/ {
+      id: 'storage.notKept',
+      message: "This browser has not agreed to keep Parliament's data. Some browsers delete a site's data when they close or run short of space. To keep it, allow this site to keep its cookies and site data in your browser's privacy settings, and keep a backup.",
+    },
+    ask: /*i18n*/ { id: 'storage.ask', message: 'Ask it to keep the data' },
+    backup: /*i18n*/ { id: 'storage.backup', message: 'Save a backup' },
+  },
+}

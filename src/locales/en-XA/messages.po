@@ -1,0 +1,119 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-10-20 16:03-0500\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en-XA\n"
+
+#. The table of everything you have made
+#. js-lingui-explicit-id
+msgid "board.almanac"
+msgstr ""
+
+#. Cards of highlights, terms, quotes and notes
+#. js-lingui-explicit-id
+msgid "board.collection"
+msgstr ""
+
+#. A plan of branches and steps
+#. js-lingui-explicit-id
+msgid "board.docket"
+msgstr ""
+
+#. Rooms, layouts, blocks, themes and resources
+#. js-lingui-explicit-id
+msgid "board.library"
+msgstr ""
+
+#. Reads a chat and its markings
+#. js-lingui-explicit-id
+msgid "board.reflection"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "board.settings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "count.chats"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "count.dockets"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "count.steps"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "kind.ask"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "kind.chat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "kind.docket"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "kind.edit"
+msgstr ""
+
+#. One passage marked where it sits
+#. js-lingui-explicit-id
+msgid "kind.highlight"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "kind.note"
+msgstr ""
+
+#. A passage kept beside the chat, never sent
+#. js-lingui-explicit-id
+msgid "kind.quote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "kind.suggestion"
+msgstr ""
+
+#. A word or phrase lit wherever it appears
+#. js-lingui-explicit-id
+msgid "kind.term"
+msgstr ""
+
+#. The bar's command mode
+#. js-lingui-explicit-id
+msgid "mode.command"
+msgstr ""
+
+#. The bar's prompt mode
+#. js-lingui-explicit-id
+msgid "mode.prompt"
+msgstr ""
+
+#. The bar's search mode
+#. js-lingui-explicit-id
+msgid "mode.search"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "storage.ask"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "storage.backup"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "storage.kept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "storage.notKept"
+msgstr ""

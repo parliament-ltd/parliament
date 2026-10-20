@@ -6,7 +6,9 @@ import { SECURITY_HEADERS } from './src/lib/securityHeaders.js'
 
 export default defineConfig({
   plugins: [
-    react(),
+    // Lingui's macro turns wording written in a component (t`…`, <Trans>)
+    // into a lookup in the copy table's catalogue at build time (C87).
+    react({ babel: { plugins: ['@lingui/babel-plugin-lingui-macro'] } }),
     tailwindcss(),
     VitePWA({
       // 'prompt' — the new SW waits in the waiting state instead of activating

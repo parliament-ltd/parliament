@@ -15,6 +15,8 @@ import { getProvider } from '../providers'
 import { saveApiKey, deleteApiKey, encryptExport, decryptImport } from '../lib/crypto'
 import { exportAllData, importData, clearAllData, getSetting, setSetting } from '../lib/db'
 import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
+import { useLingui } from '@lingui/react'
+import { COPY } from '../copy'
 import TourTooltip from '../components/TourTooltip'
 import NetworkActivityCard from '../components/NetworkActivityCard'
 import { useBackup } from '../stores/BackupContext'
@@ -714,6 +716,7 @@ function passphraseStrength(pw) {
 // Whether the browser keeps Parliament's storage, and a way to ask (C88).
 // Says nothing in a browser that cannot tell.
 function StorageKeptLine() {
+  const { i18n } = useLingui()
   const [kept, setKept] = useState(null)
   const [asking, setAsking] = useState(false)
   const { openBackup } = useBackup()
@@ -733,16 +736,14 @@ function StorageKeptLine() {
   }
   return (
     <p className="text-xs mt-3 text-[var(--p-text-secondary)]">
-      {kept
-        ? "This browser keeps Parliament's data until you delete it."
-        : "This browser has not agreed to keep Parliament's data. Some browsers delete a site's data when they close or run short of space. To keep it, allow this site to keep its cookies and site data in your browser's privacy settings, and keep a backup."}
+      {i18n._(kept ? COPY.storage.kept : COPY.storage.notKept)}
       {!kept && (
         <>
           <button type="button" onClick={ask} disabled={asking} className="ml-2 underline underline-offset-2 text-[var(--p-text-primary)] disabled:opacity-50">
-            Ask it to keep the data
+            {i18n._(COPY.storage.ask)}
           </button>
           <button type="button" onClick={() => openBackup('backup')} className="ml-3 underline underline-offset-2 text-[var(--p-text-primary)]">
-            Save a backup
+            {i18n._(COPY.storage.backup)}
           </button>
         </>
       )}

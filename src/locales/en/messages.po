@@ -1,0 +1,119 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-10-20 16:03-0500\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+
+#. The table of everything you have made
+#. js-lingui-explicit-id
+msgid "board.almanac"
+msgstr "Almanac"
+
+#. Cards of highlights, terms, quotes and notes
+#. js-lingui-explicit-id
+msgid "board.collection"
+msgstr "Collection"
+
+#. A plan of branches and steps
+#. js-lingui-explicit-id
+msgid "board.docket"
+msgstr "Docket"
+
+#. Rooms, layouts, blocks, themes and resources
+#. js-lingui-explicit-id
+msgid "board.library"
+msgstr "Library"
+
+#. Reads a chat and its markings
+#. js-lingui-explicit-id
+msgid "board.reflection"
+msgstr "Reflection"
+
+#. js-lingui-explicit-id
+msgid "board.settings"
+msgstr "Settings"
+
+#. js-lingui-explicit-id
+msgid "count.chats"
+msgstr "{count, plural, one {# chat} other {# chats}}"
+
+#. js-lingui-explicit-id
+msgid "count.dockets"
+msgstr "{count, plural, one {# docket} other {# dockets}}"
+
+#. js-lingui-explicit-id
+msgid "count.steps"
+msgstr "{count, plural, one {# step} other {# steps}}"
+
+#. js-lingui-explicit-id
+msgid "kind.ask"
+msgstr "Ask"
+
+#. js-lingui-explicit-id
+msgid "kind.chat"
+msgstr "Chat"
+
+#. js-lingui-explicit-id
+msgid "kind.docket"
+msgstr "Docket"
+
+#. js-lingui-explicit-id
+msgid "kind.edit"
+msgstr "Edit"
+
+#. One passage marked where it sits
+#. js-lingui-explicit-id
+msgid "kind.highlight"
+msgstr "Highlight"
+
+#. js-lingui-explicit-id
+msgid "kind.note"
+msgstr "Note"
+
+#. A passage kept beside the chat, never sent
+#. js-lingui-explicit-id
+msgid "kind.quote"
+msgstr "Quote"
+
+#. js-lingui-explicit-id
+msgid "kind.suggestion"
+msgstr "Suggestion"
+
+#. A word or phrase lit wherever it appears
+#. js-lingui-explicit-id
+msgid "kind.term"
+msgstr "Term"
+
+#. The bar's command mode
+#. js-lingui-explicit-id
+msgid "mode.command"
+msgstr "Command"
+
+#. The bar's prompt mode
+#. js-lingui-explicit-id
+msgid "mode.prompt"
+msgstr "Prompt"
+
+#. The bar's search mode
+#. js-lingui-explicit-id
+msgid "mode.search"
+msgstr "Search"
+
+#. js-lingui-explicit-id
+msgid "storage.ask"
+msgstr "Ask it to keep the data"
+
+#. js-lingui-explicit-id
+msgid "storage.backup"
+msgstr "Save a backup"
+
+#. js-lingui-explicit-id
+msgid "storage.kept"
+msgstr "This browser keeps Parliament's data until you delete it."
+
+#. js-lingui-explicit-id
+msgid "storage.notKept"
+msgstr "This browser has not agreed to keep Parliament's data. Some browsers delete a site's data when they close or run short of space. To keep it, allow this site to keep its cookies and site data in your browser's privacy settings, and keep a backup."
