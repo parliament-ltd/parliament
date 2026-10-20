@@ -60,6 +60,27 @@ the window, and lists visibility changes.
 - `crossOriginIsolated` is false on the dev server, as expected; the headers
   apply under `vite preview`.
 
+## What Chrome showed (Stefan, 20 October, on the dev server)
+
+- **The ordinary window** (`pop:command`) opened from Enter, with no pop-up
+  blocker in the way, and could reach the tab. Styles arrived (three inline
+  style blocks on the dev server). It ran at 10 ticks and 60 frames a second
+  until it was covered by the main Chrome window, then fell to 1 tick and 0
+  frames a second: Chrome treats a fully covered window as hidden. Harmless,
+  since the bar cannot be seen then either.
+- **The always-on-top window** (`pop:pip`) ran at full speed, 10 ticks and 60
+  frames a second, for all 50 seconds the tab was hidden. Both dots kept
+  moving, the framer-motion one included: Chrome keeps the tab's frames
+  running while it has an always-on-top window on screen.
+- **So the riskiest item holds in Chrome:** a popped bar stays alive while its
+  tab is in the background.
+
+Still to check: keys and selection inside the popped window, closing either
+side, the real security headers (`vite preview`), and Safari and Firefox,
+which have no always-on-top window. An ordinary window left visible beside the
+tab (on a second screen, say) should behave like the always-on-top one, since
+Chrome slows windows by their own visibility; not yet seen.
+
 ## What to look for in a real browser
 
 Expectations from how browsers behave, **not yet seen**:

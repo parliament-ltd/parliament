@@ -96,10 +96,15 @@ function useClocks(win) {
       const now = win.performance.now()
       const secs = (now - last) / 1000
       last = now
-      const sample = { tps: Math.round(ticks / secs), fps: Math.round(frames / secs), secs: Math.round(secs * 10) / 10 }
+      const sample = {
+        tps: Math.round(ticks / secs), fps: Math.round(frames / secs), secs: Math.round(secs * 10) / 10,
+        // Whether the tab that opened it, and this window itself, were hidden.
+        tabHidden: document.visibilityState === 'hidden',
+        selfHidden: win.document.visibilityState === 'hidden',
+      }
       ticks = 0
       frames = 0
-      setSamples((prev) => [...prev.slice(-19), sample])
+      setSamples((prev) => [...prev.slice(-299), sample])
     }, 1000)
     return () => {
       win.clearInterval(tick)
@@ -237,9 +242,19 @@ export default function PopoutPrototype() {
     </div>
   )
   // Ticks per second (10 when on time) and frames per second, oldest first.
-  const rate = (list) => (list.length
-    ? `ticks/s ${list.map((x) => x.tps).join(' ')} · frames/s ${list.map((x) => x.fps).join(' ')} · seconds took ${list.map((x) => x.secs).join(' ')}`
-    : 'not running')
+  const rate = (all) => {
+    const list = all.slice(-20)
+    return list.length
+      ? `ticks/s ${list.map((x) => x.tps).join(' ')} · frames/s ${list.map((x) => x.fps).join(' ')} · seconds took ${list.map((x) => x.secs).join(' ')}`
+      : 'not running'
+  }
+  // The case that matters: the window on screen while this tab is hidden.
+  const average = (list, key) => Math.round(list.reduce((n, x) => n + x[key], 0) / list.length)
+  const whileHidden = () => {
+    const seen = popupClocks.filter((x) => x.tabHidden && !x.selfHidden)
+    if (!seen.length) return 'not seen yet: hide this tab while the window stays on screen'
+    return `${seen.length} s: ${average(seen, 'tps')} ticks/s (10 is on time), ${average(seen, 'fps')} frames/s`
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: C.paper, color: C.ink, font: `400 14px ${C.sans}`, padding: '32px 16px' }}>
@@ -269,6 +284,7 @@ export default function PopoutPrototype() {
           {row('Styles copied in', popped ? `${popped.styles.links} linked files, ${popped.styles.inline} inline` : '')}
           {row("This tab's timers and frames", rate(openerClocks))}
           {row("The window's timers and frames", popped ? rate(popupClocks) : '')}
+          {row('The window, on screen while this tab was hidden', popped ? whileHidden() : '')}
           {row('Window can reach this tab', popped ? String(popped.win.opener === window || popped.kind === 'pip') : '')}
           {row('Cross-origin isolated', String(window.crossOriginIsolated))}
           {row('Always-on-top window available', String(canPip()))}
