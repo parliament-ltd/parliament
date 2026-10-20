@@ -399,7 +399,7 @@ Settings mockup.
 
 ## Part 4. Code issues found on the way (not spec conflicts)
 
-- **Cmd/Ctrl+Shift+B is bound twice.** It opens the branch panel (`BranchShortcutHandler.jsx:41`) and the backup modal (`BackupContext.jsx:53`) at once on chat pages.
+- **Cmd/Ctrl+Shift+B is bound twice.** It opens the branch panel (`BranchShortcutHandler.jsx:41`) and the backup modal (`BackupContext.jsx:53`) at once on chat pages. **Fixed 20 October:** on a chat with messages it opens the branch panel only, and the backup window everywhere else; neither shortcut was removed. Which one a chat page should get is easy to swap if Stefan prefers the backup.
 - **A merge restore that renames a conversation leaves broken references** (`backup.js:600-730`): `branchPoint`, child `parentId`, message ids on notes, highlights and favorites, and `pins.sourceMessageId` are not remapped. This matters before any migration.
 - **The older import path (`db.js` `importData`, L979) likely throws on `sbrd_documents`.** It keys on `item.id || item.key`, but those records are keyed on `conversationId`.
 - **The homepage Chats section loads the API key by a different setting than the rest of the app** (`settings.persistKey` against `settings.storageMode`, `chats-preview.jsx`).
@@ -841,7 +841,7 @@ language, reply language), and so are more providers, Mistral included.
 
 ## Part 7. The command layer (added 20 October 2026)
 
-Found while building the parser and the verb registry (stage 3: `src/commands/parse.js`, `verbs.js`, `registry.js`). Every verb in the documents was listed, newest wins, rulings over documents. These are the points the documents leave open. Each is built as suggested, so a ruling either confirms it or changes one entry in `verbs.js`.
+Found while building the parser and the verb registry (stage 3: `src/commands/parse.js`, `verbs.js`, `registry.js`). Every verb in the documents was listed, newest wins, rulings over documents. These are the points the documents leave open (C95 to C101). Each is built as suggested, so a ruling either confirms it or changes one entry in `verbs.js`.
 
 **C95. Board names as verbs.**
 - The bar inventory (7 and 9 October, the newest) lists `alm:`, `lab:`, `sym:` and `library:` as current. The welcome steps teach `alm:` and `library:`.
@@ -868,6 +868,11 @@ Found while building the parser and the verb registry (stage 3: `src/commands/pa
   - **To revisit once Stefan can try it live** (stage 3's flag, then the welcome page): whether combining feels right, and whether the limits are the right ones.
 
 **C100. What counts as a line shaped like a key.** The settings spec (§6): the history never stores a line containing `sk-` or "a run of 28+ key-like characters", and such a line is refused before Enter. Read literally, `sk-` anywhere catches `risk-analysis` and `task-list`, and any long run catches hyphenated tags and dates. **Built:** `sk-` at the start of a word, or a run of 28 or more letters, digits, hyphens and underscores that mixes capitals, small letters and digits, or holds six or more digits with only small letters and no hyphen. Tags and dates pass; keys are caught. A 40-character commit hash in a command is caught too, which is the safe side. Checked only in command mode: what a prompt may contain is stage 4's question. **Suggestion:** keep as built.
+
+**C101. What the history of commands keeps.** The plan: commands only, never a prompt, a search or a line shaped like a key, and "the history never stores content". Two points it leaves open:
+- `note:` and `tell:` carry writing (a note for people, a note for the model). Kept, it would be content in the history. **Built:** a line holding either is not kept. Names in quotes (`name:"Q2 evidence"`, `room:"Code Lab"`) are kept, since they are part of the command and worth recalling.
+- How much is kept. **Built:** the last 500 lines, oldest dropped first, and a line run twice in a row kept once. Kept on this device only and never in a backup, as the version 6 list was made.
+- **Suggestion:** keep as built.
 
 **Also noted, for the stages that build them** (no question now):
 - `set:room` means two things: the Settings setter for the room new dockets use, and Lab v7's `set:room rails right`. To settle at stage 9 or 13.
