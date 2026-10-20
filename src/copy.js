@@ -31,6 +31,9 @@ export const COPY = {
     docket: /*i18n*/ { id: 'board.docket', message: 'Docket', comment: 'A plan of branches and steps' },
     reflection: /*i18n*/ { id: 'board.reflection', message: 'Reflection', comment: 'Reads a chat and its markings' },
     settings: /*i18n*/ { id: 'board.settings', message: 'Settings' },
+    lab: /*i18n*/ { id: 'board.lab', message: 'Lab', comment: 'Where rooms are built' },
+    room: /*i18n*/ { id: 'board.room', message: 'Rooms', comment: 'Every room, in a list of where a command works' },
+    welcome: /*i18n*/ { id: 'board.welcome', message: 'Welcome page' },
   },
 
   // The kinds that take a number (C17, C56, A19).
@@ -51,6 +54,35 @@ export const COPY = {
     chats: /*i18n*/ { id: 'count.chats', message: '{count, plural, one {# chat} other {# chats}}' },
     dockets: /*i18n*/ { id: 'count.dockets', message: '{count, plural, one {# docket} other {# dockets}}' },
     steps: /*i18n*/ { id: 'count.steps', message: '{count, plural, one {# step} other {# steps}}' },
+  },
+
+  // The Enter line: one row under the field saying what Enter will do before
+  // you press it (bar reference, "The field"). {verb}, {now} and {near} are
+  // commands with their colon, which stay English; {boards} and {words} are
+  // lists the bar joins in the reader's language.
+  enter: {
+    empty: /*i18n*/ { id: 'enter.empty', message: 'Type a command, or ? for every command' },
+    help: /*i18n*/ { id: 'enter.help', message: 'Enter shows every command that works here' },
+    helpVerb: /*i18n*/ { id: 'enter.helpVerb', message: 'Enter shows how {verb} works' },
+    unknownHelp: /*i18n*/ { id: 'enter.unknownHelp', message: 'No command called {verb}. Enter shows every command' },
+    notCommand: /*i18n*/ { id: 'enter.notCommand', message: 'A command starts with a verb and a colon, like open:201' },
+    unknown: /*i18n*/ { id: 'enter.unknown', message: 'No command called {verb}. Type ? for every command' },
+    didYouMean: /*i18n*/ { id: 'enter.didYouMean', message: 'No command called {verb}. Did you mean {near}?' },
+    renamed: /*i18n*/ { id: 'enter.renamed', message: 'That verb is now {now}. Enter writes it in', comment: 'Enter puts the new verb in the field; it does not run it' },
+    erase: /*i18n*/ { id: 'enter.erase', message: 'To remove something for good, use erase:. Enter writes it in', comment: 'The answer to delete:, ruled 15 October' },
+    retired: /*i18n*/ { id: 'enter.retired', message: '{verb} is no longer a command' },
+    retiredInstead: /*i18n*/ { id: 'enter.retiredInstead', message: '{verb} is no longer a command. Use {instead}' },
+    noMinus: /*i18n*/ { id: 'enter.noMinus', message: 'Only a filter takes a minus, like -tag:research' },
+    elsewhere: /*i18n*/ { id: 'enter.elsewhere', message: '{verb} works on {boards}' },
+    takesWords: /*i18n*/ { id: 'enter.takesWords', message: '{verb} takes {words}', comment: '{words} is a list joined with "or"' },
+    takesExample: /*i18n*/ { id: 'enter.takesExample', message: '{verb} does not take that. For example: {example}' },
+    later: /*i18n*/ { id: 'enter.later', message: '{verb} is not built yet', comment: 'While the new shell is behind its flag' },
+    ready: /*i18n*/ { id: 'enter.ready', message: 'Enter runs {verb}' },
+    several: /*i18n*/ { id: 'enter.several', message: 'One command at a time. Only filters share a line' },
+    filters: /*i18n*/ { id: 'enter.filters', message: '{count, plural, one {Enter applies # filter} other {Enter applies # filters}}' },
+    key: /*i18n*/ { id: 'enter.key', message: 'No keys in the command line, for security. Delete it, and api: opens the key field' },
+    leaveSearch: /*i18n*/ { id: 'enter.leaveSearch', message: 'Esc for search' },
+    leavePrompt: /*i18n*/ { id: 'enter.leavePrompt', message: 'Esc for prompt' },
   },
 
   // Keeping the data (C94): the browser is not named.

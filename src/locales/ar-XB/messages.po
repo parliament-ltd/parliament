@@ -22,6 +22,11 @@ msgstr ""
 msgid "board.docket"
 msgstr ""
 
+#. Where rooms are built
+#. js-lingui-explicit-id
+msgid "board.lab"
+msgstr ""
+
 #. Rooms, layouts, blocks, themes and resources
 #. js-lingui-explicit-id
 msgid "board.library"
@@ -32,8 +37,17 @@ msgstr ""
 msgid "board.reflection"
 msgstr ""
 
+#. Every room, in a list of where a command works
+#. js-lingui-explicit-id
+msgid "board.room"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "board.settings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "board.welcome"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -46,6 +60,147 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "count.steps"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.didYouMean"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.elsewhere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.empty"
+msgstr ""
+
+#. The answer to delete:, ruled 15 October
+#. js-lingui-explicit-id
+msgid "enter.erase"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.filters"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.help"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.helpVerb"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.key"
+msgstr ""
+
+#. While the new shell is behind its flag
+#. js-lingui-explicit-id
+msgid "enter.later"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.leavePrompt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.leaveSearch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noMinus"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.notCommand"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.ready"
+msgstr ""
+
+#. Enter puts the new verb in the field; it does not run it
+#. js-lingui-explicit-id
+msgid "enter.renamed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.retired"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.retiredInstead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.several"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.takesExample"
+msgstr ""
+
+#. {words} is a list joined with "or"
+#. js-lingui-explicit-id
+msgid "enter.takesWords"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.unknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.unknownHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.building"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.collection"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.editing"
+msgstr ""
+
+#. Several filters can share one line
+#. js-lingui-explicit-id
+msgid "group.filters"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.go"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.items"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.layout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.leaders"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.run"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.settings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.start"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.tags"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -87,6 +242,22 @@ msgstr ""
 msgid "kind.term"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "leader.command"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "leader.help"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "leader.prompt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "leader.search"
+msgstr ""
+
 #. The bar's command mode
 #. js-lingui-explicit-id
 msgid "mode.command"
@@ -116,4 +287,328 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "storage.notKept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.accept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.add"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.again"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.alm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.api"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.archive"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.arrange"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.backup"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.bar"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.calm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.clear"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.close"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.collab"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.cols"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.compare"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.copy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.cost"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.device"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.diff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.done"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.drop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.duplicate"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.edit"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.erase"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.export"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.focus"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.forget"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.from"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.has"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.heading"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.helper"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.hold"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.import"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.in"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.inspect"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.jump"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.lab"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.language"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.layout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.library"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.markup"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.model"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.move"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.name"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.new"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.note"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.open"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.pin"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.place"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.pop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.reflect"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.reject"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.reset"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.resources"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.restore"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.retag"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.rewrite"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.ripple"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.rm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.room"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.run"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.save"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.set"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.since"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.sort"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.stop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.strikethrough"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.summarize"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.swap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.sweep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.sym"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.tag"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.tagadd"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.tell"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.theme"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.to"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.tour"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.type"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.undo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.untag"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.until"
 msgstr ""

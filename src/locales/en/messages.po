@@ -22,6 +22,11 @@ msgstr "Collection"
 msgid "board.docket"
 msgstr "Docket"
 
+#. Where rooms are built
+#. js-lingui-explicit-id
+msgid "board.lab"
+msgstr "Lab"
+
 #. Rooms, layouts, blocks, themes and resources
 #. js-lingui-explicit-id
 msgid "board.library"
@@ -32,9 +37,18 @@ msgstr "Library"
 msgid "board.reflection"
 msgstr "Reflection"
 
+#. Every room, in a list of where a command works
+#. js-lingui-explicit-id
+msgid "board.room"
+msgstr "Rooms"
+
 #. js-lingui-explicit-id
 msgid "board.settings"
 msgstr "Settings"
+
+#. js-lingui-explicit-id
+msgid "board.welcome"
+msgstr "Welcome page"
 
 #. js-lingui-explicit-id
 msgid "count.chats"
@@ -47,6 +61,147 @@ msgstr "{count, plural, one {# docket} other {# dockets}}"
 #. js-lingui-explicit-id
 msgid "count.steps"
 msgstr "{count, plural, one {# step} other {# steps}}"
+
+#. js-lingui-explicit-id
+msgid "enter.didYouMean"
+msgstr "No command called {verb}. Did you mean {near}?"
+
+#. js-lingui-explicit-id
+msgid "enter.elsewhere"
+msgstr "{verb} works on {boards}"
+
+#. js-lingui-explicit-id
+msgid "enter.empty"
+msgstr "Type a command, or ? for every command"
+
+#. The answer to delete:, ruled 15 October
+#. js-lingui-explicit-id
+msgid "enter.erase"
+msgstr "To remove something for good, use erase:. Enter writes it in"
+
+#. js-lingui-explicit-id
+msgid "enter.filters"
+msgstr "{count, plural, one {Enter applies # filter} other {Enter applies # filters}}"
+
+#. js-lingui-explicit-id
+msgid "enter.help"
+msgstr "Enter shows every command that works here"
+
+#. js-lingui-explicit-id
+msgid "enter.helpVerb"
+msgstr "Enter shows how {verb} works"
+
+#. js-lingui-explicit-id
+msgid "enter.key"
+msgstr "No keys in the command line, for security. Delete it, and api: opens the key field"
+
+#. While the new shell is behind its flag
+#. js-lingui-explicit-id
+msgid "enter.later"
+msgstr "{verb} is not built yet"
+
+#. js-lingui-explicit-id
+msgid "enter.leavePrompt"
+msgstr "Esc for prompt"
+
+#. js-lingui-explicit-id
+msgid "enter.leaveSearch"
+msgstr "Esc for search"
+
+#. js-lingui-explicit-id
+msgid "enter.noMinus"
+msgstr "Only a filter takes a minus, like -tag:research"
+
+#. js-lingui-explicit-id
+msgid "enter.notCommand"
+msgstr "A command starts with a verb and a colon, like open:201"
+
+#. js-lingui-explicit-id
+msgid "enter.ready"
+msgstr "Enter runs {verb}"
+
+#. Enter puts the new verb in the field; it does not run it
+#. js-lingui-explicit-id
+msgid "enter.renamed"
+msgstr "That verb is now {now}. Enter writes it in"
+
+#. js-lingui-explicit-id
+msgid "enter.retired"
+msgstr "{verb} is no longer a command"
+
+#. js-lingui-explicit-id
+msgid "enter.retiredInstead"
+msgstr "{verb} is no longer a command. Use {instead}"
+
+#. js-lingui-explicit-id
+msgid "enter.several"
+msgstr "One command at a time. Only filters share a line"
+
+#. js-lingui-explicit-id
+msgid "enter.takesExample"
+msgstr "{verb} does not take that. For example: {example}"
+
+#. {words} is a list joined with "or"
+#. js-lingui-explicit-id
+msgid "enter.takesWords"
+msgstr "{verb} takes {words}"
+
+#. js-lingui-explicit-id
+msgid "enter.unknown"
+msgstr "No command called {verb}. Type ? for every command"
+
+#. js-lingui-explicit-id
+msgid "enter.unknownHelp"
+msgstr "No command called {verb}. Enter shows every command"
+
+#. js-lingui-explicit-id
+msgid "group.building"
+msgstr "Building rooms"
+
+#. js-lingui-explicit-id
+msgid "group.collection"
+msgstr "Collection"
+
+#. js-lingui-explicit-id
+msgid "group.editing"
+msgstr "Editing"
+
+#. Several filters can share one line
+#. js-lingui-explicit-id
+msgid "group.filters"
+msgstr "Filters"
+
+#. js-lingui-explicit-id
+msgid "group.go"
+msgstr "Go to"
+
+#. js-lingui-explicit-id
+msgid "group.items"
+msgstr "Items"
+
+#. js-lingui-explicit-id
+msgid "group.layout"
+msgstr "Layout"
+
+#. js-lingui-explicit-id
+msgid "group.leaders"
+msgstr "The bar"
+
+#. js-lingui-explicit-id
+msgid "group.run"
+msgstr "Run"
+
+#. js-lingui-explicit-id
+msgid "group.settings"
+msgstr "Settings and data"
+
+#. js-lingui-explicit-id
+msgid "group.start"
+msgstr "Start"
+
+#. js-lingui-explicit-id
+msgid "group.tags"
+msgstr "Tags"
 
 #. js-lingui-explicit-id
 msgid "kind.ask"
@@ -87,6 +242,22 @@ msgstr "Suggestion"
 msgid "kind.term"
 msgstr "Term"
 
+#. js-lingui-explicit-id
+msgid "leader.command"
+msgstr "Type a command. The > stays in the field"
+
+#. js-lingui-explicit-id
+msgid "leader.help"
+msgstr "Every command that works here, or how one works"
+
+#. js-lingui-explicit-id
+msgid "leader.prompt"
+msgstr "Write a prompt. Nothing is sent before Enter"
+
+#. js-lingui-explicit-id
+msgid "leader.search"
+msgstr "Search"
+
 #. The bar's command mode
 #. js-lingui-explicit-id
 msgid "mode.command"
@@ -117,3 +288,327 @@ msgstr "This browser keeps Parliament's data until you delete it."
 #. js-lingui-explicit-id
 msgid "storage.notKept"
 msgstr "This browser has not agreed to keep Parliament's data. Some browsers delete a site's data when they close or run short of space. To keep it, allow this site to keep its cookies and site data in your browser's privacy settings, and keep a backup."
+
+#. js-lingui-explicit-id
+msgid "verb.accept"
+msgstr "Accept a suggestion"
+
+#. js-lingui-explicit-id
+msgid "verb.add"
+msgstr "Put things into the collection, or blocks into a room"
+
+#. js-lingui-explicit-id
+msgid "verb.again"
+msgstr "Ask again from the edited prompt, as a new branch"
+
+#. js-lingui-explicit-id
+msgid "verb.alm"
+msgstr "Go to the Almanac, the same as open:almanac"
+
+#. js-lingui-explicit-id
+msgid "verb.api"
+msgstr "Add or replace a key, in its own field. Never type a key here"
+
+#. js-lingui-explicit-id
+msgid "verb.archive"
+msgstr "Put something away without deleting it"
+
+#. js-lingui-explicit-id
+msgid "verb.arrange"
+msgstr "Switch to or save a whole arrangement, windows included"
+
+#. js-lingui-explicit-id
+msgid "verb.backup"
+msgstr "Download a backup of everything but your keys"
+
+#. js-lingui-explicit-id
+msgid "verb.bar"
+msgstr "Move the bar on the page"
+
+#. js-lingui-explicit-id
+msgid "verb.calm"
+msgstr "Show less detail until you come near it, or all of it again"
+
+#. js-lingui-explicit-id
+msgid "verb.clear"
+msgstr "Empty the collection, or remove every filter"
+
+#. js-lingui-explicit-id
+msgid "verb.close"
+msgstr "Take a board off the screen. Nothing is lost"
+
+#. js-lingui-explicit-id
+msgid "verb.collab"
+msgstr "Choose the standing instructions that go with every prompt"
+
+#. js-lingui-explicit-id
+msgid "verb.cols"
+msgstr "Hide or show columns of the table"
+
+#. js-lingui-explicit-id
+msgid "verb.compare"
+msgstr "Set two or more side by side. Nothing is sent"
+
+#. js-lingui-explicit-id
+msgid "verb.copy"
+msgstr "Copy something as Markdown"
+
+#. js-lingui-explicit-id
+msgid "verb.cost"
+msgstr "Show dockets by what they cost"
+
+#. js-lingui-explicit-id
+msgid "verb.device"
+msgstr "Say what the room is built for"
+
+#. js-lingui-explicit-id
+msgid "verb.diff"
+msgstr "Mark what differs between the runs that are open"
+
+#. js-lingui-explicit-id
+msgid "verb.done"
+msgstr "Leave the Lab with your changes"
+
+#. js-lingui-explicit-id
+msgid "verb.drop"
+msgstr "Remove an ask, edit or step that has not been sent"
+
+#. js-lingui-explicit-id
+msgid "verb.duplicate"
+msgstr "Copy a room, collection or docket under a new name"
+
+#. js-lingui-explicit-id
+msgid "verb.edit"
+msgstr "Open a room in the Lab to change it"
+
+#. js-lingui-explicit-id
+msgid "verb.erase"
+msgstr "Remove one thing for good, by its number. Undo cannot bring it back"
+
+#. js-lingui-explicit-id
+msgid "verb.export"
+msgstr "Download as Markdown or JSONL to read elsewhere. It cannot be restored"
+
+#. js-lingui-explicit-id
+msgid "verb.focus"
+msgstr "Clear the screen to your chosen boards, keep that set, or come back"
+
+#. js-lingui-explicit-id
+msgid "verb.forget"
+msgstr "Remove a saved search, collection or arrangement"
+
+#. js-lingui-explicit-id
+msgid "verb.from"
+msgstr "Show what came from a chat, a branch or a run"
+
+#. js-lingui-explicit-id
+msgid "verb.has"
+msgstr "Show what holds notes or highlights"
+
+#. js-lingui-explicit-id
+msgid "verb.heading"
+msgstr "Add a heading to a collection in your own order"
+
+#. js-lingui-explicit-id
+msgid "verb.helper"
+msgstr "Choose the model that reads text from sources"
+
+#. js-lingui-explicit-id
+msgid "verb.hold"
+msgstr "Keep a branch or an edit from going until you say"
+
+#. js-lingui-explicit-id
+msgid "verb.import"
+msgstr "Open a file made elsewhere. It says what the file is before anything happens"
+
+#. js-lingui-explicit-id
+msgid "verb.in"
+msgstr "Show what is in a collection"
+
+#. js-lingui-explicit-id
+msgid "verb.inspect"
+msgstr "Look at one thing in detail, where you are"
+
+#. js-lingui-explicit-id
+msgid "verb.jump"
+msgstr "Scroll to a number on this board"
+
+#. js-lingui-explicit-id
+msgid "verb.lab"
+msgstr "Go to the Lab, where rooms are built"
+
+#. js-lingui-explicit-id
+msgid "verb.language"
+msgstr "Change the language, by its code or its name"
+
+#. js-lingui-explicit-id
+msgid "verb.layout"
+msgstr "Choose the shape of a room"
+
+#. js-lingui-explicit-id
+msgid "verb.library"
+msgstr "Go to the Library, or to one shelf of it"
+
+#. js-lingui-explicit-id
+msgid "verb.markup"
+msgstr "Show replies marked up, or clean"
+
+#. js-lingui-explicit-id
+msgid "verb.model"
+msgstr "Show what a model answered"
+
+#. js-lingui-explicit-id
+msgid "verb.move"
+msgstr "Move a board to the left, right or middle, or a branch in its docket"
+
+#. js-lingui-explicit-id
+msgid "verb.name"
+msgstr "Name what the bar is pointed at: a room, a collection or a chat"
+
+#. js-lingui-explicit-id
+msgid "verb.new"
+msgstr "Make a chat, docket, room, collection, branch, step, run or block"
+
+#. js-lingui-explicit-id
+msgid "verb.note"
+msgstr "Write a note for people. It is never sent"
+
+#. js-lingui-explicit-id
+msgid "verb.open"
+msgstr "Open a board, or anything by its number or name"
+
+#. js-lingui-explicit-id
+msgid "verb.pin"
+msgstr "Keep something at the top of its list"
+
+#. js-lingui-explicit-id
+msgid "verb.place"
+msgstr "Put a block in a slot of the room, or move it"
+
+#. js-lingui-explicit-id
+msgid "verb.pop"
+msgstr "Put a board or the bar in its own window, place it, or bring it back"
+
+#. js-lingui-explicit-id
+msgid "verb.reflect"
+msgstr "Ask for a synthesis of a chat and its markings, with questions"
+
+#. js-lingui-explicit-id
+msgid "verb.reject"
+msgstr "Turn down a suggestion"
+
+#. js-lingui-explicit-id
+msgid "verb.reset"
+msgstr "Put the boards back as shipped and close the windows"
+
+#. js-lingui-explicit-id
+msgid "verb.resources"
+msgstr "Open the guides and references, with every command in full"
+
+#. js-lingui-explicit-id
+msgid "verb.restore"
+msgstr "Bring a backup back"
+
+#. js-lingui-explicit-id
+msgid "verb.retag"
+msgstr "Rename a tag everywhere"
+
+#. js-lingui-explicit-id
+msgid "verb.rewrite"
+msgstr "Write a new dated summary beside the old one"
+
+#. js-lingui-explicit-id
+msgid "verb.ripple"
+msgstr "Carry edits across branches as suggestions. Each check is a model call"
+
+#. js-lingui-explicit-id
+msgid "verb.rm"
+msgstr "Take things out of the collection, or blocks out of a room"
+
+#. js-lingui-explicit-id
+msgid "verb.room"
+msgstr "Show what was made in a room"
+
+#. js-lingui-explicit-id
+msgid "verb.run"
+msgstr "Run one branch. The Enter line says which run and what it costs"
+
+#. js-lingui-explicit-id
+msgid "verb.save"
+msgstr "Keep this search under a name"
+
+#. js-lingui-explicit-id
+msgid "verb.set"
+msgstr "Change a setting of a block or of Parliament. The Enter line states the change in full"
+
+#. js-lingui-explicit-id
+msgid "verb.since"
+msgstr "Show what was made since a date"
+
+#. js-lingui-explicit-id
+msgid "verb.sort"
+msgstr "Order the table"
+
+#. js-lingui-explicit-id
+msgid "verb.stop"
+msgstr "Halt a run, or every run in every window"
+
+#. js-lingui-explicit-id
+msgid "verb.strikethrough"
+msgstr "Strike the selected passage"
+
+#. js-lingui-explicit-id
+msgid "verb.summarize"
+msgstr "Rewrite each row's summary line"
+
+#. js-lingui-explicit-id
+msgid "verb.swap"
+msgstr "Swap two boards"
+
+#. js-lingui-explicit-id
+msgid "verb.sweep"
+msgstr "Check a reply or branch against a collab's rule, one suggestion per sentence"
+
+#. js-lingui-explicit-id
+msgid "verb.sym"
+msgstr "Go back to the last room, or to a room by name"
+
+#. js-lingui-explicit-id
+msgid "verb.tag"
+msgstr "Show what carries a tag. A minus leaves it out"
+
+#. js-lingui-explicit-id
+msgid "verb.tagadd"
+msgstr "Tag things, or what is selected"
+
+#. js-lingui-explicit-id
+msgid "verb.tell"
+msgstr "Write a note the model reads with your next prompt"
+
+#. js-lingui-explicit-id
+msgid "verb.theme"
+msgstr "Choose a room's colours and type"
+
+#. js-lingui-explicit-id
+msgid "verb.to"
+msgstr "Send the next prompt to one branch, or to all"
+
+#. js-lingui-explicit-id
+msgid "verb.tour"
+msgstr "Show the welcome steps, put them away, or show the second list"
+
+#. js-lingui-explicit-id
+msgid "verb.type"
+msgstr "Show some kinds of thing"
+
+#. js-lingui-explicit-id
+msgid "verb.undo"
+msgstr "Take back the last command, or one edit. It stops at a run"
+
+#. js-lingui-explicit-id
+msgid "verb.untag"
+msgstr "Remove a tag from some things, or from everything"
+
+#. js-lingui-explicit-id
+msgid "verb.until"
+msgstr "Show what was made until a date"
