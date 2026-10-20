@@ -13,7 +13,7 @@ import {
   addFavoriteRecord, removeFavoriteRecord, saveDocument,
 } from './records'
 
-export { DB_NAME, DB_VERSION, DRAFT_DB_VERSION, TRIAL_DB_NAME } from './schema'
+export { DB_NAME, DB_VERSION, DRAFT_DB_VERSION, TRIAL_DB_NAME, lastUpgradeFailure } from './schema'
 
 // Dev only: /dev/migration can open the app on the trial copy of the upgrade
 // for one tab, so today's screens can be tried on version 6 data. The flag

@@ -6,9 +6,11 @@
 import { createV6Stores, migrateV6Data } from './migrations/v6Upgrade'
 
 export const DB_NAME = 'parliament'
-export const DB_VERSION = 5
-// Drafted, and run only on the trial database (migrations/v6Trial.js) until
-// Stefan approves the upgrade; then DB_VERSION becomes this.
+// Version 6, the one upgrade of the refactor, approved by Stefan at the
+// stage 2 checkpoint on 19 October.
+export const DB_VERSION = 6
+// The version the trial copy is upgraded to (migrations/v6Trial.js); the
+// same as DB_VERSION since the upgrade was approved.
 export const DRAFT_DB_VERSION = 6
 
 // Dev only: the throwaway copy the version 6 upgrade is tried on.
@@ -21,6 +23,21 @@ export const BUILTIN_AUTHOR = Object.freeze({
   handle: 'parliament',
   verified: true,
 })
+
+// Why the last upgrade in this tab failed, for the upgrade screen. The open
+// itself only reports that the browser abandoned the upgrade.
+export let lastUpgradeFailure = null
+
+// Dev only: make the version 6 upgrade fail on demand, to see the upgrade
+// screen report it. Set sessionStorage 'parliament-dev-fail-upgrade' to '1'.
+// Production builds drop this, and Node tests never set it.
+function failureAskedFor() {
+  try {
+    return Boolean(import.meta.env?.DEV) && globalThis.sessionStorage?.getItem('parliament-dev-fail-upgrade') === '1'
+  } catch {
+    return false
+  }
+}
 
 /**
  * Every schema step from nothing to `newVersion`, in order. Shared by
@@ -133,7 +150,7 @@ export async function upgradeSchema(db, oldVersion, newVersion, transaction) {
   // ── v6: the one upgrade of the refactor (refactor-plan.md, stage 2) ──
   // Every new list and index, then the data planned by v6Plan.js, in this
   // same transaction, so it happens whole or not at all. Runs only when
-  // asked for version 6: DB_VERSION stays 5 until Stefan approves.
+  // asked for version 6, which DB_VERSION has been since 19 October.
   //
   // The browser does not roll back by itself when this function fails: idb
   // does not wait for it, so a failure would leave the new lists in place
@@ -142,9 +159,11 @@ export async function upgradeSchema(db, oldVersion, newVersion, transaction) {
   // it was, and the open fails.
   if (oldVersion < 6 && newVersion >= 6) {
     try {
+      if (failureAskedFor()) throw new Error('A failure asked for in development, to show the upgrade screen reporting it.')
       createV6Stores(db, transaction)
       await migrateV6Data(transaction)
     } catch (err) {
+      lastUpgradeFailure = err
       // The open's own promise reports the failure; this one would only go unheard.
       transaction.done?.catch(() => {})
       try {

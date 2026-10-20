@@ -33,6 +33,9 @@ const LIST_LIMIT = 60
 
 async function readThisBrowser() {
   const db = await initDB()
+  if (db.version >= 6) {
+    throw new Error("This browser's data is already at version 6. The dry run reads version 5 data: load a backup file, or the sample.")
+  }
   return {
     conversations: await db.getAll('conversations'),
     messages: await db.getAll('messages'),

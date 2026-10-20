@@ -5,7 +5,11 @@
 // version so nothing is upgraded while it is being saved.
 
 import { openDB } from 'idb'
-import { DB_NAME, DB_VERSION } from './db'
+import { DB_NAME, DB_VERSION, TRIAL_DB_NAME, isTrialDb } from './db'
+
+// The database this tab uses: Parliament's own, or in development the trial
+// copy, so the upgrade screen can be tried on a copy as it would run for real.
+const activeDbName = () => (isTrialDb() ? TRIAL_DB_NAME : DB_NAME)
 import { CATEGORIES, gatherBackupContents, buildBackupFile } from './backup'
 
 /** Pure decision: an existing database older than this build needs the gate. */
@@ -22,7 +26,7 @@ export function readStoredVersion() {
   return new Promise((resolve) => {
     let req
     try {
-      req = indexedDB.open(DB_NAME)
+      req = indexedDB.open(activeDbName())
     } catch {
       resolve(0)
       return
@@ -44,7 +48,7 @@ export function readStoredVersion() {
  * are left out.
  */
 export async function buildPreUpgradeBackup(storedVersion, { password = null } = {}) {
-  const db = await openDB(DB_NAME, storedVersion)
+  const db = await openDB(activeDbName(), storedVersion)
   try {
     const names = db.objectStoreNames
     const categories = CATEGORIES.filter((c) => {

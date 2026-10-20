@@ -7,11 +7,13 @@
 // can be inspected in the browser's storage tools meanwhile.
 
 import { openDB, deleteDB } from 'idb'
-import { upgradeSchema, DB_VERSION, DRAFT_DB_VERSION, TRIAL_DB_NAME } from '../schema'
+import { upgradeSchema, DRAFT_DB_VERSION, TRIAL_DB_NAME } from '../schema'
 import { V6_NEW_STORES, V6_NEW_INDEXES } from './v6Upgrade'
 import { FIRST_NUM } from '../addresses'
 
 export const TRIAL_DB = TRIAL_DB_NAME
+// The version the data is copied in at, before the upgrade is tried on it.
+const BEFORE_VERSION = 5
 
 const V5_STORES = [
   'conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings', 'files', 'file_data',
@@ -36,7 +38,7 @@ export async function runV6Trial(flat) {
   })
 
   // 1. A version 5 copy of the data.
-  const v5 = await openDB(TRIAL_DB, DB_VERSION, { upgrade: upgradeSchema })
+  const v5 = await openDB(TRIAL_DB, BEFORE_VERSION, { upgrade: upgradeSchema })
   const before = {}
   try {
     for (const name of V5_STORES) {
