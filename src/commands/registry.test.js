@@ -55,6 +55,7 @@ describe('the verb list', () => {
     for (const v of VERBS.filter((x) => x.click === 'apply' && !x.undoable && x.group !== 'filters')) expect(SCREEN_ONLY, v.verb).toContain(v.verb)
     expect(verbEntry('erase').click).toBe('fill')
     expect(verbEntry('erase').undoable).toBe(false)
+    expect(VERBS.filter((x) => x.destructive).map((x) => x.verb)).toEqual(['erase'])
   })
 })
 
@@ -155,10 +156,39 @@ describe('the Enter line', () => {
     expect(line('>type:chat', { board: 'almanac' }).state).toBe('later')
   })
 
-  it('lets filters share a line, and nothing else', () => {
+  it('lets commands share a line, to run in turn (C99)', () => {
     const filters = new Set(['type', 'tag'])
     expect(line('>type:chat -tag:essay', { board: 'almanac', built: filters })).toMatchObject({ state: 'ready', message: 'filters', values: { count: 2 } })
-    expect(line('>bar:bottom open:207', { built })).toMatchObject({ state: 'several' })
+    const a = line('>bar:bottom open:207 pop:library', { built })
+    expect(a).toMatchObject({ state: 'ready', message: 'sequence', values: { count: 3, verbs: ['bar:', 'open:', 'pop:'] } })
+    expect(a.steps.map((s) => s.verb)).toEqual(['bar', 'open', 'pop'])
+    expect(a.steps[1].match.values[0]).toMatchObject({ kind: 'address', num: 207 })
+  })
+
+  it('says not built yet if any command on the line is not', () => {
+    expect(line('>bar:bottom tour:', { built })).toMatchObject({ state: 'later', values: { verb: 'tour:' } })
+  })
+
+  it('stops at the first command it cannot run, and says why', () => {
+    expect(line('>bar:bottom opne:207', { built })).toMatchObject({ state: 'unknown', values: { near: 'open:' } })
+    expect(line('>bar:sideways open:207', { built })).toMatchObject({ state: 'misfit', verb: 'bar' })
+  })
+
+  it('keeps a command that sends something, and erase:, on a line of its own', () => {
+    expect(line('>bar:bottom summarize:207', { board: 'almanac' })).toMatchObject({ state: 'alone', message: 'aloneSpends', values: { verb: 'summarize:' } })
+    expect(line('>pin:207 erase:208')).toMatchObject({ state: 'alone', message: 'aloneErase', values: { verb: 'erase:' } })
+    expect(line('>summarize:207', { board: 'almanac' }).state).toBe('later')
+    expect(line('>erase:207').state).toBe('later')
+  })
+
+  it('gives a verb that keeps the rest of the line everything after it', () => {
+    const a = line('>pin:207 note:207 "see type:chat"')
+    expect(a.steps.map((s) => s.verb)).toEqual(['pin', 'note'])
+  })
+
+  it('fixes a renamed verb in place, keeping the rest of the line', () => {
+    expect(line('>bar:bottom hide:library').fill).toBe('>bar:bottom close:library')
+    expect(line('>-source:201 type:chat', { board: 'almanac' }).fill).toBe('>-from:201 type:chat')
   })
 
   it('takes a minus on filters only', () => {
@@ -183,7 +213,7 @@ describe('the Enter line', () => {
   })
 
   it('has a sentence in the copy table for every answer it gives', () => {
-    const messages = ['empty', 'help', 'helpVerb', 'unknownHelp', 'notCommand', 'unknown', 'didYouMean', 'renamed', 'erase', 'retired', 'retiredInstead', 'noMinus', 'elsewhere', 'takesWords', 'takesExample', 'later', 'ready', 'several', 'filters', 'key']
+    const messages = ['empty', 'help', 'helpVerb', 'unknownHelp', 'notCommand', 'unknown', 'didYouMean', 'renamed', 'erase', 'retired', 'retiredInstead', 'noMinus', 'elsewhere', 'takesWords', 'takesExample', 'later', 'ready', 'sequence', 'aloneSpends', 'aloneErase', 'filters', 'key']
     for (const m of messages) expect(COPY.enter[m], m).toBeDefined()
     for (const r of Object.values(RENAMED)) if (r.message) expect(COPY.enter[r.message], r.message).toBeDefined()
   })

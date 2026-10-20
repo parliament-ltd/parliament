@@ -63,6 +63,14 @@ msgid "count.steps"
 msgstr "{count, plural, one {# step} other {# steps}}"
 
 #. js-lingui-explicit-id
+msgid "enter.aloneErase"
+msgstr "{verb} runs on a line of its own, so it is plain what goes for good"
+
+#. js-lingui-explicit-id
+msgid "enter.aloneSpends"
+msgstr "{verb} runs on a line of its own, so its Enter line can name who receives it and what it costs"
+
+#. js-lingui-explicit-id
 msgid "enter.didYouMean"
 msgstr "No command called {verb}. Did you mean {near}?"
 
@@ -133,9 +141,10 @@ msgstr "{verb} is no longer a command"
 msgid "enter.retiredInstead"
 msgstr "{verb} is no longer a command. Use {instead}"
 
+#. {verbs} lists the commands in the order they run; one that fails stops the rest
 #. js-lingui-explicit-id
-msgid "enter.several"
-msgstr "One command at a time. Only filters share a line"
+msgid "enter.sequence"
+msgstr "{count, plural, one {Enter runs # command: {verbs}} other {Enter runs # commands in turn: {verbs}}}"
 
 #. js-lingui-explicit-id
 msgid "enter.takesExample"

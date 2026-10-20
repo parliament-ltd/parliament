@@ -102,6 +102,10 @@ describe('a command line', () => {
     expect(parse('name: "Field notes" ').commands[0]).toMatchObject({ raw: '"Field notes"', text: 'Field notes' })
   })
 
+  it('starts a command at a mistyped verb too, so it can be answered', () => {
+    expect(parse('bar:bottom opne:207').commands.map((c) => c.verb)).toEqual(['bar', 'opne'])
+  })
+
   it('does not take a link for a verb', () => {
     const { commands } = parse('open:201 https://example.org')
     expect(commands).toHaveLength(1)

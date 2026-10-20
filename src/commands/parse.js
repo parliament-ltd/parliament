@@ -52,8 +52,8 @@ export function readField(value, mode = 'search') {
   return { mode: leader.mode, body: text.slice(leader.length), leader }
 }
 
-// A verb: letters, then a colon. `https:` is not a verb unless the registry
-// says so, which keeps a link inside an argument from starting a command. A
+// A verb: letters, then a colon. Any word shaped like one starts a command,
+// so a mistyped verb is answered as one, except a link (`https://…`). A
 // filter may carry a leading minus to leave things out: `-tag:research`.
 const VERB = /^(-?)([a-z]+):/i
 const SPACE = /\s/
@@ -136,8 +136,9 @@ const unquote = (text) => {
  *
  * `lookup(verb)` comes from the registry: it returns `{ rest: true }` for a
  * verb that keeps the rest of the line as text (`tell:`, `note:`), any object
- * for another verb it knows, and null otherwise. A known verb starts a new
- * command, so filters can share a line: `type:chat tag:research`.
+ * for another verb it knows, and null otherwise. Each verb starts a new
+ * command, so commands can share a line (C99): `bar:bottom open:207`. What
+ * follows a verb that keeps the rest is all its text.
  *
  * Returns `{ commands, help, loose }`:
  * - commands: `{ verb, minus, args, raw, text, start, end }`, verb in lower
@@ -174,7 +175,8 @@ export function parseCommand(body, lookup = () => null) {
     const head = VERB.exec(w.text)
     const verb = head ? head[2].toLowerCase() : null
     const known = verb ? lookup(verb) : null
-    if (head && (known || (!current && !commands.length))) {
+    const link = head && w.text.slice(head[0].length).startsWith('//')
+    if (head && (known || !link)) {
       finish(w.start)
       current = { verb, minus: head[1] === '-', start: w.start, argStart: w.start + head[0].length, rest: Boolean(known?.rest) }
       if (current.rest) break

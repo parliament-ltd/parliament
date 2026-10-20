@@ -126,15 +126,20 @@ const isFilter = (command) => BY_VERB.get(command.verb)?.group === 'filters'
  * renders through the copy table (COPY.enter). Never content: only verbs,
  * numbers, board keys and keys into the copy table.
  *
+ * Several commands may share a line (C99, ruled 20 October). They run left
+ * to right, and the first that fails stops the rest (runLine, run.js). A
+ * command that sends something, or erase:, runs on a line of its own.
+ *
  * @param {string} value the whole field, leader included
  * @param {{ mode?: string, board?: string|null, built?: Set<string> }} ctx
  *   mode: the field's mode now; board: the addressed board; built: the verbs
  *   whose actions exist
- * @returns {{ state: string, message: string, values?: object, verb?: string, fill?: string, entry?: object, match?: object }}
+ * @returns {{ state: string, message: string, values?: object, verb?: string, fill?: string, entry?: object, match?: object, steps?: object[] }}
  *   state: 'empty' | 'help' | 'ready' | 'later' | 'elsewhere' | 'misfit' |
- *   'renamed' | 'retired' | 'unknown' | 'several' | 'key' | 'mode';
+ *   'renamed' | 'retired' | 'unknown' | 'alone' | 'key' | 'mode';
  *   message: a key of COPY.enter, values its values; fill: what Enter writes
- *   into the field instead of running anything.
+ *   into the field instead of running anything; steps: each command's own
+ *   answer, in the order they run.
  */
 export function enterLine(value, ctx = {}) {
   const { mode = 'search', board = null, built = new Set() } = ctx
@@ -152,21 +157,31 @@ export function enterLine(value, ctx = {}) {
   if (loose) return { state: 'unknown', message: 'notCommand' }
   if (!commands.length) return { state: 'empty', message: 'empty' }
 
-  const answers = commands.map((c) => answer(c, board, built))
+  const answers = commands.map((c) => answer(c, board, built, field.body))
   const stop = answers.find((a) => a.state !== 'ready' && a.state !== 'later')
   if (stop) return stop
-  if (commands.length > 1 && !commands.every(isFilter)) return { state: 'several', message: 'several' }
+  if (commands.length > 1) {
+    const alone = answers.find((a) => a.entry.spends || a.entry.destructive)
+    if (alone) return { state: 'alone', message: alone.entry.spends ? 'aloneSpends' : 'aloneErase', values: alone.values, verb: alone.verb }
+  }
   const later = answers.find((a) => a.state === 'later')
-  if (later) return later
-  return commands.length > 1 ? { state: 'ready', message: 'filters', values: { count: commands.length } } : answers[0]
+  if (later) return { ...later, steps: answers }
+  if (commands.length === 1) return { ...answers[0], steps: answers }
+  return commands.every(isFilter)
+    ? { state: 'ready', message: 'filters', values: { count: commands.length }, steps: answers }
+    : { state: 'ready', message: 'sequence', values: { count: commands.length, verbs: answers.map((a) => a.values.verb) }, steps: answers }
 }
 
-function answer(command, board, built) {
+function answer(command, board, built, body) {
   const { verb } = command
   const said = `${command.minus ? '-' : ''}${verb}:`
   if (Object.hasOwn(RENAMED, verb)) {
+    // Enter writes the new verb in place of the old one, and keeps the rest
+    // of the line as it was.
     const now = RENAMED[verb]
-    return { state: 'renamed', message: now.message ?? 'renamed', values: { verb: said, now: `${now.to}:` }, verb, fill: `>${now.to}:${command.raw}` }
+    const after = command.start + said.length
+    const fill = `>${body.slice(0, command.start)}${command.minus ? '-' : ''}${now.to}:${body.slice(after)}`
+    return { state: 'renamed', message: now.message ?? 'renamed', values: { verb: said, now: `${now.to}:` }, verb, fill }
   }
   if (Object.hasOwn(RETIRED, verb)) {
     const instead = RETIRED[verb]

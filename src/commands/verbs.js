@@ -13,7 +13,10 @@
 //   minus        a filter that takes a leading minus: -tag:research
 //   on           'everywhere', or the boards it works on
 //   spends       it sends something to a provider or source, so its Enter
-//                line names every recipient and the cost before Enter
+//                line names every recipient and the cost before Enter, and
+//                it runs on a line of its own (C99)
+//   destructive  undo cannot bring back what it removes (erase: only); it
+//                also runs on a line of its own (C99)
 //   undoable     undo: can take it back
 //   click        what a click on it in the reference or in marginalia does:
 //                'apply' runs it at once (it only changes the screen, or is
@@ -68,7 +71,7 @@ export const LEADERS = Object.freeze({
   ],
 })
 
-const v = (entry) => Object.freeze({ forms: null, rest: false, minus: false, on: 'everywhere', spends: false, undoable: false, click: 'fill', retiredArgs: null, ...entry })
+const v = (entry) => Object.freeze({ forms: null, rest: false, minus: false, on: 'everywhere', spends: false, destructive: false, undoable: false, click: 'fill', retiredArgs: null, ...entry })
 
 export const VERBS = Object.freeze([
   // Go to
@@ -185,7 +188,7 @@ export const VERBS = Object.freeze([
   v({ verb: 'note', group: 'items', example: 'note:203 "Try it without the ending"', forms: ['note:203 "Try it without the ending"', 'note:"Check the dates"'],
     rest: true, takes: [['text']], stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.note', message: 'Write a note for people. It is never sent' } }),
-  v({ verb: 'erase', group: 'items', example: 'erase:207', forms: ['erase:207', 'erase:201c', 'erase:201c all'], takes: [['address', { opt: ['all'] }]], stage: 6,
+  v({ verb: 'erase', group: 'items', example: 'erase:207', forms: ['erase:207', 'erase:201c', 'erase:201c all'], takes: [['address', { opt: ['all'] }]], stage: 6, destructive: true,
     gloss: /*i18n*/ { id: 'verb.erase', message: 'Remove one thing for good, by its number. Undo cannot bring it back' } }),
   v({ verb: 'undo', group: 'items', example: 'undo:', forms: ['undo:', 'undo:242'], takes: [[], ['address']], stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.undo', message: 'Take back the last command, or one edit. It stops at a run' } }),

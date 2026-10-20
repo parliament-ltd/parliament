@@ -63,6 +63,14 @@ msgid "count.steps"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.aloneErase"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.aloneSpends"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.didYouMean"
 msgstr ""
 
@@ -133,8 +141,9 @@ msgstr ""
 msgid "enter.retiredInstead"
 msgstr ""
 
+#. {verbs} lists the commands in the order they run; one that fails stops the rest
 #. js-lingui-explicit-id
-msgid "enter.several"
+msgid "enter.sequence"
 msgstr ""
 
 #. js-lingui-explicit-id
