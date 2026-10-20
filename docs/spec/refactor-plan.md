@@ -228,6 +228,8 @@ until you have read the dry run and said go.**
 
 **19 October, later:** restore and backups format 2 are built (C93). One allowlist decides what a backup holds and what a restore accepts; a restore is one transaction, skips identical items and brings changed ones in as copies, and at version 6 numbers and files what comes in by the write path's rules. Automated database tests run on fake-indexeddb (103 tests). Still to do in this stage: the key out of the settings list, asking the browser to keep storage (C88), then the checkpoint and the version going up.
 
+**Checkpoint, 19 October:** everything in this stage is built and tested except raising the version. The saved key lives in the key database (moved on first read, the old copy removed once checked), and the browser is asked once, on the first prompt sent, to keep Parliament's storage, with the answer in Settings. Vitest 5 clears the last audit findings. 111 tests, including the database ones. The database is still at version 5: raising it is put to Stefan at this checkpoint, with the upgrade gate made to report a failed upgrade instead of loading the app on top of it.
+
 - **Kept:** the long ids that records are keyed by, so nothing that points at a record breaks. Messages are not rewritten: a reply keeps its original text, and its editable form is stored only the first time it is edited.
 - **Added, as lists**
   - Dockets and runs. A step can carry a condition (A15).
