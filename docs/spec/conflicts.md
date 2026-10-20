@@ -841,7 +841,7 @@ language, reply language), and so are more providers, Mistral included.
 
 ## Part 7. The command layer (added 20 October 2026)
 
-Found while building the parser and the verb registry (stage 3: `src/commands/parse.js`, `verbs.js`, `registry.js`). Every verb in the documents was listed, newest wins, rulings over documents. These are the points the documents leave open (C95 to C101). Each is built as suggested, so a ruling either confirms it or changes one entry in `verbs.js`.
+Found while building the parser and the verb registry (stage 3: `src/commands/parse.js`, `verbs.js`, `registry.js`). Every verb in the documents was listed, newest wins, rulings over documents. These are the points the documents leave open (C95 to C105). Each is built as suggested, so a ruling either confirms it or changes one entry in `verbs.js`.
 
 **C95. Board names as verbs.**
 - The bar inventory (7 and 9 October, the newest) lists `alm:`, `lab:`, `sym:` and `library:` as current. The welcome steps teach `alm:` and `library:`.
@@ -873,6 +873,26 @@ Found while building the parser and the verb registry (stage 3: `src/commands/pa
 - `note:` and `tell:` carry writing (a note for people, a note for the model). Kept, it would be content in the history. **Built:** a line holding either is not kept. Names in quotes (`name:"Q2 evidence"`, `room:"Code Lab"`) are kept, since they are part of the command and worth recalling.
 - How much is kept. **Built:** the last 500 lines, oldest dropped first, and a line run twice in a row kept once. Kept on this device only and never in a backup, as the version 6 list was made.
 - **Suggestion:** keep as built.
+
+**The boards registry and the arrangement** (20 October; `src/shell/boards.js`, `src/shell/arrangement.js`, `src/lib/arrangements.js`). The rulings settle that an arrangement includes popped windows, that every board opens by name, and that arrangements are kept as data from the start (P7); the mockups carry the behaviour and disagree in places. Built from Almanac v30 and Lab v7 where they agree; these are the points where nothing decides:
+
+**C102. Each arrangement keeps its own state.** No document says whether there is one arrangement per device or one per shipped arrangement. **Built:** one each, kept on this device: the Almanac, the Lab, Settings, the docket, the welcome page, and each room its own. Leaving the Lab and coming back finds it as it was, and `reset:` has a default to return to. **Suggestion:** keep as built.
+
+**C103. `move: … middle`.** Only welcome v9 glosses `move:` as "left, right or middle", for a verb the welcome page refuses; Almanac v30 and Lab v7 move to the left or right end. **Built:** left and right as the mockups do, the others shifting along; middle puts the board between the others. **Suggestion:** keep middle.
+
+**C104. Bare `pop:back`.** Almanac v30 and Lab v7 bring every window back; welcome v9 asks for a name. **Built:** every window back, each to where it stood, with the Enter line saying how many; `pop:back library` brings one. The welcome page may still refuse the bare form as its lesson needs (stage 5). **Suggestion:** keep as built.
+
+**C105. `pop:left` and `pop:right`.** Ruled only as being "for boards that have been popped" (C43); no document says what they do. **Built:** they place the window of the board the bar is pointed at on the left or the right of the screen. **Suggestion:** keep as built.
+
+**Also built from the mockups** (no question):
+- `open:` puts a board at the right end and points the bar at it; a board already here gets the bar, a popped one comes forward. No limit on how many; narrow windows stack (stage 14).
+- `close:` never leaves the page without a board, and the welcome card stays; the bar goes to the board before. `pop:` keeps the last board on the page for the same reason.
+- `reset:` closes the arrangement's windows and puts its boards and bar back; what each board shows stays ("your search and collection stay", Almanac v30).
+- The bar's place is part of each arrangement, since the defaults differ: top on the Almanac, Settings and the Lab, bottom in a room and the docket.
+- The board strip lists every board in the editing spec's order (Sym:, Col:, Ref:, Alm:, Lib:, Dkt:), marking open ones and the addressed one. What a click on a title does is drawn later: inline editing v5 toggles the board; the branch slider and the collection board write a shortcut. Suggested then: a click opens the board or points the bar at it, and never closes it, since a strip is easy to click by accident.
+- Settings, Canvas and Blocks have no short title in any document, so they are not on the strip and `focus:` cannot name them.
+- Stacked columns are in the data but nothing stacks yet: the Lab's Collection under Blocks comes with stage 13, the welcome page's right column with stage 5.
+- For stage 9: the arrangements spec (§7) made window arrangements an optional backup category, while the settings spec, the Almanac spec and version 6 keep them on the device only. Built: on the device only.
 
 **Also noted, for the stages that build them** (no question now):
 - `set:room` means two things: the Settings setter for the room new dockets use, and Lab v7's `set:room rails right`. To settle at stage 9 or 13.
