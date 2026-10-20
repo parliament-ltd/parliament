@@ -91,6 +91,14 @@ export const COPY = {
     leavePrompt: /*i18n*/ { id: 'enter.leavePrompt', message: 'Esc for prompt' },
   },
 
+  // The hint line: the keys that open the field where focus is (P2). {key}
+  // is the shortcut as this computer writes it: ⌘K or Ctrl+K.
+  hints: {
+    slashOrK: /*i18n*/ { id: 'hint.slashOrK', message: 'press / or {key}' },
+    kOnly: /*i18n*/ { id: 'hint.kOnly', message: 'press {key}' },
+    minimised: /*i18n*/ { id: 'hint.minimised', message: 'Minimised. Search, command or prompt', comment: 'The name of the folded field, read by screen readers' },
+  },
+
   // Keeping the data (C94): the browser is not named.
   storage: {
     kept: /*i18n*/ { id: 'storage.kept', message: "This browser keeps Parliament's data until you delete it." },

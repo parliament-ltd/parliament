@@ -213,6 +213,19 @@ msgid "group.tags"
 msgstr "Tags"
 
 #. js-lingui-explicit-id
+msgid "hint.kOnly"
+msgstr "press {key}"
+
+#. The name of the folded field, read by screen readers
+#. js-lingui-explicit-id
+msgid "hint.minimised"
+msgstr "Minimised. Search, command or prompt"
+
+#. js-lingui-explicit-id
+msgid "hint.slashOrK"
+msgstr "press / or {key}"
+
+#. js-lingui-explicit-id
 msgid "kind.ask"
 msgstr "Ask"
 
