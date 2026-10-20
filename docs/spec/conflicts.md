@@ -807,6 +807,16 @@ language, reply language), and so are more providers, Mistral included.
 - **Two repairs found on the way:** opening a Secretarybird document no longer rewrites it (the editor saves only after an edit, and a save of unchanged content writes nothing); and a document save no longer drops the older `suggestionStates` field, which two of Stefan's documents carry.
 - **Not yet through the write path:** restore and the older JSON import still write records directly, so at version 6 what they bring in would have no numbers. Restore is the next piece; the older import goes with R10.
 
+**C94. LibreWolf and Zen** (Stefan, 20 October: "can we also add librewolf and sen browsers and make sure we function with those?", "sen" taken to be Zen Browser. Safari is not a concern for now: his laptop runs Windows.)
+- Both are built on Firefox, so they share its engine and what it lacks: no always-on-top window (`pop:command` opens an ordinary window there), no on-device speech recognition (voice stays hidden, C70). What Parliament relies on is present in current Firefox: IndexedDB, Web Crypto, BroadcastChannel, Web Locks, CompressionStream.
+- **LibreWolf deletes cookies and website data whenever it closes** (its own features page, librewolf.net/docs/features). Website data includes IndexedDB, so by default everything a person makes in Parliament is gone the next time they open the browser, unless they allow parliament.ltd to keep its data (Firefox's Cookies and Site Data exceptions). Whether granting persistent storage (C88) protects a site from this is unverified. Nothing on the site survives the deletion, so Parliament cannot see afterwards that it happened, and it cannot read the setting beforehand.
+- **LibreWolf turns on fingerprint resistance:** the browser reports its language as US English whatever the person reads (so the globe and `language:` matter there), the time zone as UTC (times of day would show in UTC), and WebGL is off. Nothing in Parliament uses WebGL or reads pixels back from a canvas (checked 20 October). Fingerprint resistance is also known to report no preference for reduced motion; unverified here.
+- **Zen** leaves cookies, cache and privacy settings to Firefox's own (docs.zen-browser.app/security); fingerprint resistance appears to be off by default (not confirmed). It should behave as Firefox does.
+- **Suggestion:**
+  1. Test both with the list in `browsers.md`, alongside Chrome and Firefox. Safari waits.
+  2. Where the browser has not agreed to keep Parliament's storage, the welcome page and Settings say so plainly, with how to let the site keep its data, and the backup reminder is stronger. The wording names no browser, since the app cannot tell which one it is in, and it holds for every browser that may delete site data.
+  3. Find out in LibreWolf whether granting persistent storage survives closing the browser; the wording in 2 depends on it.
+
 **C93. Restore and backups: the plan** (19 October; **ruled yes, as suggested,** the same day). From stage 2 of the plan, P6 (ruled 15 October), audit finding T6, C35, and the race found on 15 October.
 - **Today's restore,** read on 19 October (`backup.js` `restoreContents`, `restorePlan.js`):
   - It writes each kind of record in its own transaction, so another tab starting up between them can remove a chat whose messages are not written yet (15 October).

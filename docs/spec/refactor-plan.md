@@ -283,7 +283,7 @@ The spine. Built behind a flag, so today's screens keep working underneath.
   - A history of commands. Commands only: never a prompt, a search, or a line shaped like a key.
   - The first steps toward the new stores: each board is told which conversation it shows, instead of reading the address bar, and stream state moves into a store.
   - **Languages, from day one (C87):** the copy table is the translation catalogue, with plurals that work in every language; dates, numbers and money through the browser's `Intl`; layout written with start and end rather than left and right, so it mirrors for right-to-left scripts; `dir="auto"` on every message; a pseudo-language (and a mirrored one) for testing; a lint rule against hard-coded words. The library (react-i18next or Lingui) is chosen here. Commands stay English.
-  - Feature detection, never the browser's name. Where a feature is missing the Enter line says what happens instead: in Safari a pop-out opens as an ordinary window that does not stay on top.
+  - Feature detection, never the browser's name. Where a feature is missing the Enter line says what happens instead: in Firefox, LibreWolf, Zen and Safari a pop-out opens as an ordinary window that does not stay on top.
 - **Changed:** the double binding of Cmd/Ctrl+Shift+B.
 - **Salvaged:** `addresses.js`, `bus.js`, the ignition animations (for `api:` later). **Rebuilt:** everything else here is new; no command layer exists.
 - **Security and privacy:** the history never stores content. Window titles and addresses carry numbers and kinds only. A popped window is blank, same-origin and never navigated, and takes its styles from the built stylesheet, not copied text, so the policy can lose `'unsafe-inline'`.
@@ -491,7 +491,7 @@ Built to Lab v7 (A2). Can run beside the others once stage 3 exists.
   - Headers moved into a file that a second static host also reads, and a standby copy of the site deployed there.
   - Each release saved as a zip with a checksum.
   - Accounts: two-factor and stored recovery codes for GitHub, Netlify and the registrar.
-- **Browser support:** a table on the site and in Settings, kept from feature detection: what works in Chromium, Firefox, Safari and on phones, and what happens instead where something does not.
+- **Browser support:** a table on the site and in Settings, kept from feature detection: what works in Chromium, Firefox and its forks LibreWolf and Zen, Safari and on phones, and what happens instead where something does not. Tested from `browsers.md` (C94); Safari waits, since it is not a concern for now.
 - **You can try:** the public repository, and the site served from the standby.
 - **Done early, on 15 October:** DNS moved to deSEC with DNSSEC, and mail set up at Proton. The records are in `docs/hosting.md`.
 - **Needs from you:** a yes before the public push, which cannot be taken back. R31 is put to you here.

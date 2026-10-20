@@ -76,8 +76,8 @@ the window, and lists visibility changes.
   tab is in the background.
 
 Still to check: keys and selection inside the popped window, closing either
-side, the real security headers (`vite preview`), and Safari and Firefox,
-which have no always-on-top window. An ordinary window left visible beside the
+side, the real security headers (`vite preview`), and Firefox, LibreWolf and
+Zen, which have no always-on-top window (`../browsers.md`). Safari waits. An ordinary window left visible beside the
 tab (on a second screen, say) should behave like the always-on-top one, since
 Chrome slows windows by their own visibility; not yet seen.
 
