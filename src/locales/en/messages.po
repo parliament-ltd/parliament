@@ -12,6 +12,16 @@ msgstr ""
 msgid "board.almanac"
 msgstr "Almanac"
 
+#. The pieces a room is built from, beside the Canvas in the Lab
+#. js-lingui-explicit-id
+msgid "board.blocks"
+msgstr "Blocks"
+
+#. The room being built, in the middle of the Lab
+#. js-lingui-explicit-id
+msgid "board.canvas"
+msgstr "Canvas"
+
 #. Cards of highlights, terms, quotes and notes
 #. js-lingui-explicit-id
 msgid "board.collection"
@@ -71,6 +81,38 @@ msgid "enter.aloneSpends"
 msgstr "{verb} runs on a line of its own, so its Enter line can name who receives it and what it costs"
 
 #. js-lingui-explicit-id
+msgid "enter.barMove"
+msgstr "{place, select, top {Enter moves the bar to the top} bottom {Enter moves the bar to the bottom} left {Enter moves the bar to the left} right {Enter moves the bar to the right} other {Enter moves the bar to the centre}}"
+
+#. js-lingui-explicit-id
+msgid "enter.barNotPopped"
+msgstr "The bar is on the page already"
+
+#. js-lingui-explicit-id
+msgid "enter.barPoppedAlready"
+msgstr "The bar is in its own window already"
+
+#. js-lingui-explicit-id
+msgid "enter.barThere"
+msgstr "{place, select, top {The bar is at the top already} bottom {The bar is at the bottom already} left {The bar is on the left already} right {The bar is on the right already} other {The bar is in the centre already}}"
+
+#. js-lingui-explicit-id
+msgid "enter.closeBoard"
+msgstr "Enter closes {board}. Nothing is lost"
+
+#. js-lingui-explicit-id
+msgid "enter.closeFixed"
+msgstr "{board} stays open here"
+
+#. js-lingui-explicit-id
+msgid "enter.closeLast"
+msgstr "The last board stays open"
+
+#. js-lingui-explicit-id
+msgid "enter.closeNotHere"
+msgstr "{board} is not open"
+
+#. js-lingui-explicit-id
 msgid "enter.didYouMean"
 msgstr "No command called {verb}. Did you mean {near}?"
 
@@ -117,6 +159,18 @@ msgid "enter.leaveSearch"
 msgstr "Esc for search"
 
 #. js-lingui-explicit-id
+msgid "enter.moveBoard"
+msgstr "{place, select, left {Enter moves {board} to the left} right {Enter moves {board} to the right} other {Enter moves {board} to the middle}}"
+
+#. js-lingui-explicit-id
+msgid "enter.moveIsPopped"
+msgstr "{board} is in its own window. pop:back brings it back first"
+
+#. js-lingui-explicit-id
+msgid "enter.moveThere"
+msgstr "{place, select, left {{board} is on the left already} right {{board} is on the right already} other {{board} is in the middle already}}"
+
+#. js-lingui-explicit-id
 msgid "enter.noMinus"
 msgstr "Only a filter takes a minus, like -tag:research"
 
@@ -124,10 +178,74 @@ msgstr "Only a filter takes a minus, like -tag:research"
 msgid "enter.notCommand"
 msgstr "A command starts with a verb and a colon, like open:201"
 
+#. js-lingui-explicit-id
+msgid "enter.openAddressed"
+msgstr "The bar is pointed at {board} already"
+
+#. js-lingui-explicit-id
+msgid "enter.openBoard"
+msgstr "Enter opens {board} on the right"
+
+#. js-lingui-explicit-id
+msgid "enter.openHere"
+msgstr "{board} is here. Enter points the bar at it"
+
+#. js-lingui-explicit-id
+msgid "enter.openPopped"
+msgstr "{board} is in its own window. Enter brings it forward"
+
+#. js-lingui-explicit-id
+msgid "enter.popAlready"
+msgstr "{board} is in its own window already"
+
+#. js-lingui-explicit-id
+msgid "enter.popBackAll"
+msgstr "{count, plural, one {Enter brings # window back to the page} other {Enter brings # windows back to the page}}"
+
+#. js-lingui-explicit-id
+msgid "enter.popBackCommand"
+msgstr "Enter brings the bar back to the page"
+
+#. js-lingui-explicit-id
+msgid "enter.popBackOne"
+msgstr "Enter brings {board} back to the page"
+
+#. js-lingui-explicit-id
+msgid "enter.popBoard"
+msgstr "Enter puts {board} in its own window"
+
+#. js-lingui-explicit-id
+msgid "enter.popCommand"
+msgstr "Enter puts the bar in its own window"
+
+#. js-lingui-explicit-id
+msgid "enter.popDisplay"
+msgstr "Enter puts {board} in its own window on screen {display}"
+
+#. js-lingui-explicit-id
+msgid "enter.popLast"
+msgstr "The last board stays on the page"
+
+#. js-lingui-explicit-id
+msgid "enter.popNothing"
+msgstr "No board is in its own window"
+
+#. js-lingui-explicit-id
+msgid "enter.popNotPopped"
+msgstr "{board} is not in its own window"
+
 #. Added to the Enter line for pop: where the always-on-top window is missing (C94)
 #. js-lingui-explicit-id
 msgid "enter.popOrdinary"
 msgstr "It opens as an ordinary window, since this browser cannot keep one on top"
+
+#. js-lingui-explicit-id
+msgid "enter.popSide"
+msgstr "{side, select, left {Enter places the window of {board} on the left} other {Enter places the window of {board} on the right}}"
+
+#. js-lingui-explicit-id
+msgid "enter.popSideThere"
+msgstr "{side, select, left {The window of {board} is on the left already} other {The window of {board} is on the right already}}"
 
 #. js-lingui-explicit-id
 msgid "enter.ready"
@@ -137,6 +255,14 @@ msgstr "Enter runs {verb}"
 #. js-lingui-explicit-id
 msgid "enter.renamed"
 msgstr "That verb is now {now}. Enter writes it in"
+
+#. js-lingui-explicit-id
+msgid "enter.resetAlready"
+msgstr "This screen is as shipped"
+
+#. js-lingui-explicit-id
+msgid "enter.resetArrangement"
+msgstr "{count, plural, =0 {Enter puts this screen back as shipped} one {Enter puts this screen back as shipped and closes # window} other {Enter puts this screen back as shipped and closes # windows}}"
 
 #. js-lingui-explicit-id
 msgid "enter.retired"
@@ -150,6 +276,14 @@ msgstr "{verb} is no longer a command. Use {instead}"
 #. js-lingui-explicit-id
 msgid "enter.sequence"
 msgstr "{count, plural, one {Enter runs # command: {verbs}} other {Enter runs # commands in turn: {verbs}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.swapBoards"
+msgstr "Enter swaps {first} and {second}"
+
+#. js-lingui-explicit-id
+msgid "enter.swapSame"
+msgstr "swap: takes two different boards"
 
 #. js-lingui-explicit-id
 msgid "enter.takesExample"

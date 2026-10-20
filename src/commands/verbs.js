@@ -38,8 +38,10 @@
 // Almanac v30, Docket v12, Lab v7 and welcome v9 mockups. Points they leave
 // open are in conflicts.md, C95 to C100.
 
-// Boards a command can name. Rooms are boards too, opened by number or name.
-export const BOARD_NAMES = Object.freeze(['almanac', 'collection', 'library', 'reflection', 'settings', 'lab'])
+// Boards a command can name (boards.js has them all). Rooms are boards too,
+// opened by number or name. The Lab is an arrangement, not a board (AB §4),
+// so only open: takes its name.
+export const BOARD_NAMES = Object.freeze(['almanac', 'collection', 'library', 'docket', 'reflection', 'settings', 'canvas', 'blocks'])
 const TABLES = ['almanac', 'collection']
 const EDITING = ['room', 'docket', 'reflection', 'collection']
 const BUILDING = ['lab', 'room']
@@ -98,7 +100,7 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, docket, room, collection, branch, step, run or block' } }),
   v({ verb: 'open', group: 'start', example: 'open:207',
     forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Writing Studio"', 'open:library', 'open:settings keys'],
-    takes: [[BOARD_NAMES, { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text']], stage: 3, click: 'apply',
+    takes: [[[...BOARD_NAMES, 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text']], stage: 3, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.open', message: 'Open a board, or anything by its number or name' } }),
   v({ verb: 'close', group: 'start', example: 'close:almanac', takes: [[], [BOARD_NAMES], ['address']], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.close', message: 'Take a board off the screen. Nothing is lost' } }),

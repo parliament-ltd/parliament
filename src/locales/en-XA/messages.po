@@ -12,6 +12,16 @@ msgstr ""
 msgid "board.almanac"
 msgstr ""
 
+#. The pieces a room is built from, beside the Canvas in the Lab
+#. js-lingui-explicit-id
+msgid "board.blocks"
+msgstr ""
+
+#. The room being built, in the middle of the Lab
+#. js-lingui-explicit-id
+msgid "board.canvas"
+msgstr ""
+
 #. Cards of highlights, terms, quotes and notes
 #. js-lingui-explicit-id
 msgid "board.collection"
@@ -71,6 +81,38 @@ msgid "enter.aloneSpends"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.barMove"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.barNotPopped"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.barPoppedAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.barThere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.closeBoard"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.closeFixed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.closeLast"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.closeNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.didYouMean"
 msgstr ""
 
@@ -117,6 +159,18 @@ msgid "enter.leaveSearch"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.moveBoard"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.moveIsPopped"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.moveThere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.noMinus"
 msgstr ""
 
@@ -124,9 +178,73 @@ msgstr ""
 msgid "enter.notCommand"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.openAddressed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openBoard"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openPopped"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popBackAll"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popBackCommand"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popBackOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popBoard"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popCommand"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popDisplay"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popLast"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popNotPopped"
+msgstr ""
+
 #. Added to the Enter line for pop: where the always-on-top window is missing (C94)
 #. js-lingui-explicit-id
 msgid "enter.popOrdinary"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popSide"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popSideThere"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -136,6 +254,14 @@ msgstr ""
 #. Enter puts the new verb in the field; it does not run it
 #. js-lingui-explicit-id
 msgid "enter.renamed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.resetAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.resetArrangement"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -149,6 +275,14 @@ msgstr ""
 #. {verbs} lists the commands in the order they run; one that fails stops the rest
 #. js-lingui-explicit-id
 msgid "enter.sequence"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.swapBoards"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.swapSame"
 msgstr ""
 
 #. js-lingui-explicit-id
