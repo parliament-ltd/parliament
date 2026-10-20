@@ -789,6 +789,11 @@ language, reply language), and so are more providers, Mistral included.
 - **Ruled 16 October: as suggested,** with a note to come back to it and check the behaviour: that Drafting Desk still shows every comment and suggestion after the upgrade (checked at the stage 2 checkpoint), and what becomes of them once the engine is chosen (stage 11).
 - **Checked 16 October** on the trial copy of Stefan's second backup: Drafting Desk shows a document's 11 suggestions, its comment and its Ripple impact analysis after the upgrade. Stage 11 is still to come.
 
+**Ruled 19 October, for the rest of stage 2:**
+- **The key moves to the key store,** and the old copy in the settings list is removed once the new one has been read back and checked.
+- **The browser is asked to keep Parliament's storage after the first chat exists, from a click** (C88).
+- **Vitest 5,** as its own step, to clear the advisories left in Vitest 3.
+
 **C92. Choices made in the write path** (19 October; built this way, and **confirmed by Stefan as built** the same day). The write path (`src/lib/records.js`, its rules in `recordsModel.js`) sits behind `db.js`'s functions, so today's screens use it unchanged. At version 5 a write does what it always did, and is announced. At version 6 it also keeps the following true, in the same transaction:
 - **A new chat starts a docket,** taking two numbers (ruled 23 September). A chat made from another (a fork, a document's branch, a summary branch) is the next letter in that chat's docket, in the same run, with where it was taken from.
 - **Removing a chat takes its branch out of the docket.** The letter is not given out again (C17). When the last branch goes, the docket and its run go too: deleting means deleted, and a docket's name is its chat's title. Numbers are never reissued.
