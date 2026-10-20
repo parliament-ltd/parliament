@@ -328,6 +328,7 @@ Your first target. The page is the lesson: every step is a real command.
   - `focus:` and `focus:off` in their first form: the chat alone, and back.
   - `tour:`, `tour:off` (A20).
   - One line on small or touch-only screens: "built for a computer for now; the phone comes later".
+  - Where the browser has not agreed to keep Parliament's data, the page says so plainly, with how to let the site keep it, and offers a backup (C94). It names no browser.
   - Before this stage ships: a plain-language pass over every name a newcomer meets (Almanac, Docket, Collection, collab, term, quote, the short board titles in the strip), made in the copy table, with you (A6).
   - Built ready for translation and checked in the pseudo-language; shipped in English first. How people switch language is ruled (`conflicts.md`, 16 October): `language:` in the bar, and the globe beside the language's own name as marginalia at the top of this page and in Settings. No languages board and nothing on first load.
 - **Changed:** `/` shows the welcome page to someone new and the Almanac to someone with work. Links carry numbers (`/207`); old links still resolve.
@@ -343,7 +344,7 @@ Your first target. The page is the lesson: every step is a real command.
   - Row verbs: `pin:`, `archive:`, `copy:`, `export:`, the tag verbs, and `erase:`.
   - The Collection, to collection board v3 and the editing spec: cards, not a table; highlights, terms, quotes and notes; the four acts (note, tag, summarize, prompt); headings; a numbered source picker; finding a marking from its card and its card from the marking.
   - `new:collection`, `add:`, `rm:`, `compare:`, `heading:`, `note:`.
-  - The backup reminder as one line of marginalia at the top, in ink, only when it is news.
+  - The backup reminder as one line of marginalia at the top, in ink, only when it is news; sooner and plainer where the browser has not agreed to keep the data (C94, `backupReminder.js`).
   - The Almanac export of selected rows as markdown or JSONL.
 - **Changed:** "Pin for reference" becomes a quote (A23).
 - **Salvaged:** bulk actions and family grouping from `SelectorLayout.jsx`; today's highlights, notes and annotations code. **New:** the Collection.

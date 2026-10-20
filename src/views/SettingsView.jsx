@@ -716,6 +716,7 @@ function passphraseStrength(pw) {
 function StorageKeptLine() {
   const [kept, setKept] = useState(null)
   const [asking, setAsking] = useState(false)
+  const { openBackup } = useBackup()
   useEffect(() => {
     let live = true
     isStorageKept().then((v) => { if (live) setKept(v) })
@@ -734,11 +735,16 @@ function StorageKeptLine() {
     <p className="text-xs mt-3 text-[var(--p-text-secondary)]">
       {kept
         ? "This browser keeps Parliament's data until you delete it."
-        : "This browser may clear Parliament's data when it runs short of space. A backup keeps a copy safe."}
+        : "This browser has not agreed to keep Parliament's data. Some browsers delete a site's data when they close or run short of space. To keep it, allow this site to keep its cookies and site data in your browser's privacy settings, and keep a backup."}
       {!kept && (
-        <button type="button" onClick={ask} disabled={asking} className="ml-2 underline underline-offset-2 text-[var(--p-text-primary)] disabled:opacity-50">
-          Ask it to keep the data
-        </button>
+        <>
+          <button type="button" onClick={ask} disabled={asking} className="ml-2 underline underline-offset-2 text-[var(--p-text-primary)] disabled:opacity-50">
+            Ask it to keep the data
+          </button>
+          <button type="button" onClick={() => openBackup('backup')} className="ml-3 underline underline-offset-2 text-[var(--p-text-primary)]">
+            Save a backup
+          </button>
+        </>
       )}
     </p>
   )

@@ -816,6 +816,7 @@ language, reply language), and so are more providers, Mistral included.
   1. Test both with the list in `browsers.md`, alongside Chrome and Firefox. Safari waits.
   2. Where the browser has not agreed to keep Parliament's storage, the welcome page and Settings say so plainly, with how to let the site keep its data, and the backup reminder is stronger. The wording names no browser, since the app cannot tell which one it is in, and it holds for every browser that may delete site data.
   3. Find out in LibreWolf whether granting persistent storage survives closing the browser; the wording in 2 depends on it.
+- **Ruled 20 October: yes.** When the browser has not agreed to keep the data, the welcome page and Settings say so plainly, with how to keep it, and backups are pushed harder. No browser is named.
 
 **C93. Restore and backups: the plan** (19 October; **ruled yes, as suggested,** the same day). From stage 2 of the plan, P6 (ruled 15 October), audit finding T6, C35, and the race found on 15 October.
 - **Today's restore,** read on 19 October (`backup.js` `restoreContents`, `restorePlan.js`):

@@ -26,6 +26,8 @@ import {
   PBKDF2_ITERATIONS_V2,
 } from './crypto'
 import { gatherContents, restoreInto, CATEGORIES } from './backupData'
+import { backupReminderDue } from './backupReminder'
+import { isStorageKept } from './storageKeep'
 import {
   BACKUP_FORMAT, BACKUP_VERSION, MAX_KDF_ITERATIONS,
   bytesToBase64, base64ToBytes, arrayBufferToBase64, base64ToArrayBuffer,
@@ -339,32 +341,26 @@ export async function getBackupStatus() {
 // ─── Reminder banner threshold logic ─────────────────────
 
 /**
- * Per spec §5.1:
- *   show iff (≥5 chats OR ≥2 rooms OR account >= 7 days)
- *        AND (last backup > 30 days ago OR never)
- *        AND (banner not dismissed in last 30 days)
+ * Whether the reminder shows, and whether the data is at risk because the
+ * browser has not agreed to keep it (backupReminder.js: spec §5.1, pushed
+ * harder when at risk, C94).
  */
-export async function shouldShowBackupBanner() {
+export async function backupReminderState() {
   const db = await initDB()
-
-  const chatCount = await db.count('conversations')
-  const roomCount = (await db.getAllFromIndex('modes', 'scope', 'room')).length
-  const accountCreatedAt = await getOrInitAccountCreatedAt()
-  const accountAgeDays = daysBetween(accountCreatedAt, new Date())
-
-  const thresholdMet = chatCount >= 5 || roomCount >= 2 || accountAgeDays >= 7
-  if (!thresholdMet) return false
-
-  const status = await getBackupStatus()
-  if (status.daysSinceLast !== null && status.daysSinceLast < 30) return false
-
   const dismissed = await db.get('settings', BANNER_DISMISSED_KEY)
-  if (dismissed?.value) {
-    const since = daysBetween(dismissed.value, new Date())
-    if (since < 30) return false
-  }
+  const status = await getBackupStatus()
+  return backupReminderDue({
+    chatCount: await db.count('conversations'),
+    roomCount: (await db.getAllFromIndex('modes', 'scope', 'room')).length,
+    accountAgeDays: daysBetween(await getOrInitAccountCreatedAt(), new Date()),
+    daysSinceLast: status.daysSinceLast,
+    daysSinceDismissed: dismissed?.value ? daysBetween(dismissed.value, new Date()) : null,
+    storageKept: await isStorageKept(),
+  })
+}
 
-  return true
+export async function shouldShowBackupBanner() {
+  return (await backupReminderState()).show
 }
 
 export async function dismissBackupBanner() {

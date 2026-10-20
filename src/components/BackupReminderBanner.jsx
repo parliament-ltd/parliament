@@ -1,25 +1,29 @@
 // BackupReminderBanner — proactive nudge on the homepage.
 //
-// Threshold logic lives in lib/backup.js (`shouldShowBackupBanner`).
-// Per spec §5.1: shows when (≥5 chats OR ≥2 rooms OR account ≥7 days old)
-// AND last backup was more than 30 days ago, AND not dismissed in last 30
-// days. Dismissal is persisted in IndexedDB.
+// When it shows lives in lib/backupReminder.js: per spec §5.1 after some
+// work and thirty days without a backup, and much sooner, with plainer
+// words, when the browser has not agreed to keep the data (C94). Dismissal
+// is persisted in IndexedDB.
 
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowDownToLine, X } from 'lucide-react'
-import { dismissBackupBanner, shouldShowBackupBanner } from '../lib/backup'
+import { dismissBackupBanner, backupReminderState } from '../lib/backup'
 import { useBackup } from '../stores/BackupContext'
 
 export default function BackupReminderBanner() {
   const [visible, setVisible] = useState(false)
+  const [atRisk, setAtRisk] = useState(false)
   const { openBackup, modalOpen } = useBackup()
 
   useEffect(() => {
     let cancelled = false
     async function check() {
-      const should = await shouldShowBackupBanner()
-      if (!cancelled) setVisible(should)
+      const state = await backupReminderState()
+      if (!cancelled) {
+        setVisible(state.show)
+        setAtRisk(state.atRisk)
+      }
     }
     check()
     return () => { cancelled = true }
@@ -30,8 +34,11 @@ export default function BackupReminderBanner() {
   useEffect(() => {
     if (modalOpen) return
     let cancelled = false
-    shouldShowBackupBanner().then((should) => {
-      if (!cancelled) setVisible(should)
+    backupReminderState().then((state) => {
+      if (!cancelled) {
+        setVisible(state.show)
+        setAtRisk(state.atRisk)
+      }
     })
     return () => { cancelled = true }
   }, [modalOpen])
@@ -65,10 +72,12 @@ export default function BackupReminderBanner() {
           </div>
           <div className="flex-1 leading-[1.5]">
             <div className="text-[13px] font-medium mb-px" style={{ color: '#8B6A10' }}>
-              Your Parliament lives in this browser
+              {atRisk ? 'This browser may delete your Parliament' : 'Your Parliament lives in this browser'}
             </div>
             <div className="text-xs text-[var(--p-text-secondary)]">
-              If you clear your data or switch devices, your rooms and chats are gone. Take a minute to back them up.
+              {atRisk
+                ? "It has not agreed to keep this site's data, and some browsers delete it when they close. Save a backup now, and allow this site to keep its cookies and site data in your browser's privacy settings."
+                : 'If you clear your data or switch devices, your rooms and chats are gone. Take a minute to back them up.'}
             </div>
           </div>
           <button
