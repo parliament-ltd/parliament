@@ -43,6 +43,11 @@ const PopoutPrototype = import.meta.env.DEV || import.meta.env.VITE_PROTOTYPES =
   ? lazy(() => import('./views/PopoutPrototype'))
   : null
 
+// Dev only: the token sheet, drawn for approval (stage 3, C51).
+const TokenSheet = import.meta.env.DEV
+  ? lazy(() => import('./views/TokenSheet'))
+  : null
+
 // Dev only: the line saying this tab runs on the version 6 trial copy.
 const TrialNotice = import.meta.env.DEV && isTrialDb()
   ? lazy(() => import('./components/TrialNotice'))
@@ -92,6 +97,18 @@ export default function App() {
                         <ErrorBoundary inline>
                           <Suspense fallback={null}>
                             <MigrationPreview />
+                          </Suspense>
+                        </ErrorBoundary>
+                      }
+                    />
+                  )}
+                  {TokenSheet && (
+                    <Route
+                      path="/dev/tokens"
+                      element={
+                        <ErrorBoundary inline>
+                          <Suspense fallback={null}>
+                            <TokenSheet />
                           </Suspense>
                         </ErrorBoundary>
                       }

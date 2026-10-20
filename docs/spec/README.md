@@ -37,7 +37,9 @@ Working files written during the refactor: `inventory.md`, `conflicts.md`,
 `refactor-plan.md` (the plan, written 12 October), `change-plan.md` (the
 24 September plan it replaces, kept for the record), `plan-brief.md` (the
 analysis the plan is built from), `privacy-copy-draft.md` (replacement wording
-for the app's privacy claims, not yet applied), and `research/` (code audits).
+for the app's privacy claims, not yet applied), `token-sheet.md` (the chrome's
+colours, type, shapes and motion, drafted 20 October for approval), and
+`research/` (code audits, and the pop-out prototype's results).
 
 ## What wins
 

@@ -1,0 +1,97 @@
+/*
+  Parliament chrome tokens. A proposal for Stefan's approval (refactor-plan.md,
+  stage 3; C51), drafted 20 October 2026. Not loaded by the app yet: only the
+  review page at /dev/tokens uses it. docs/spec/token-sheet.md gives each
+  value's source and contrast.
+
+  Rule (C51, A1): the newest mockup that defines a value wins. That is the bar
+  reference (9 October) where it defines one, then the editing spec's
+  legibility table and its mockup (6 October), then the rest.
+
+  The prefix --ch- keeps the chrome apart from the room themes, which use
+  --p-, so a room's theme cannot reach the chrome. Light mode only for now.
+*/
+
+:root {
+  /* Paper and surfaces */
+  --ch-paper: #FCFCFA;          /* the page */
+  --ch-surface: #FFFFFF;        /* cards, the open field */
+  --ch-subtle: #FAF9F5;         /* table heads, quiet fills */
+  --ch-tray: #F6F5F1;           /* trays in the Collection */
+
+  /* Ink. Ratios are against --ch-paper; small text needs 4.5 */
+  --ch-ink: #191919;            /* 17.1 */
+  --ch-ink-2: #45433F;          /* 9.6, secondary text */
+  --ch-ink-3: #6B6964;          /* 5.3, ids, struck words */
+  --ch-marg: rgba(25, 25, 25, .62);  /* 4.9, marginalia and the Enter line */
+  --ch-soft: rgba(25, 25, 25, .30);  /* dashed outlines; never text */
+  --ch-wash: rgba(25, 25, 25, .045); /* a selected row */
+  --ch-wash-2: rgba(25, 25, 25, .075); /* a done pill */
+  --ch-divider: rgba(25, 25, 25, .08);
+  --ch-rule: rgba(25, 25, 25, .08);
+  --ch-border: #E9E9E7;
+  --ch-border-2: #F1F1EF;
+  --ch-tri: rgba(122, 120, 114, .17); /* the prompt fill's mosaic */
+
+  /* Command mode and the navy rule, as r, g, b for use with alpha */
+  --ch-navy: 22, 38, 70;        /* the command fill, the navy rule */
+  --ch-navy-2: 38, 56, 92;
+
+  /* Gold: the api: ignition and the hexagon's edge, nowhere else (C50) */
+  --ch-gold: #C4A94D;
+  --ch-gold-deep: #8B6A10;
+  --ch-gold-glow: rgba(196, 169, 77, .35);
+
+  /* Marks in a reply (editing spec). Each has its own line, not colour alone */
+  --ch-you: #2B5CB8;            /* 6.1, your words, solid underline */
+  --ch-ai: #2E7458;             /* 5.4, an ask's answer or a sweep, dotted */
+  --ch-rust: #94491F;           /* 6.3, Ripple, dashed */
+  --ch-mark-edit: rgba(43, 92, 184, .45);
+  --ch-mark-ask: rgba(46, 116, 88, .45);
+  --ch-mark-note: rgba(124, 108, 212, .45);
+  --ch-mark-high: rgba(236, 72, 153, .40);
+  --ch-mark-quote: rgba(25, 25, 25, .28);
+
+  /* Kinds: text on a tint (Almanac v30), each 4.5 or more */
+  --ch-kind-chat: #2F5BC4;      --ch-kind-chat-bg: rgba(74, 122, 229, .11);
+  --ch-kind-note: #5A4AB0;      --ch-kind-note-bg: rgba(124, 108, 212, .12);
+  --ch-kind-high: #B63674;      --ch-kind-high-bg: rgba(236, 72, 153, .11);
+  --ch-kind-docket: #0E728D;    --ch-kind-docket-bg: rgba(13, 148, 136, .12);
+
+  /* Type */
+  --ch-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --ch-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --ch-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  --ch-t-id: 10.5px;            /* ids, mono; the smallest text allowed */
+  --ch-t-marg: 11.5px;          /* marginalia, the Enter line, legends */
+  --ch-t-small: 12.5px;
+  --ch-t-body: 14px;            /* the field, rows, body */
+  --ch-t-lead: 15.5px;
+  --ch-t-title: 18px;
+  --ch-t-display: 22px;
+  --ch-lh: 1.5;
+  --ch-lh-read: 1.6;
+
+  /* Shape */
+  --ch-r-sm: 4px;               /* the hexagon, chips */
+  --ch-r-md: 6px;               /* inputs */
+  --ch-r-btn: 8px;
+  --ch-r-field: 14px;           /* the open field */
+  --ch-r-card: 16px;
+  --ch-field-h: 40px;
+  --ch-lift: 0 1px 2px rgba(40, 36, 28, .035), 0 0 0 .5px rgba(25, 25, 25, .05);
+  --ch-focus: 2px solid var(--ch-ink);
+
+  /* Motion (bar reference) */
+  --ch-ease: cubic-bezier(.65, 0, .35, 1);
+  --ch-k: 1;                    /* every duration is multiplied by this */
+  --ch-dur-wipe: calc(280ms * var(--ch-k));    /* a mode's fill wipes in */
+  --ch-dur-slide: calc(360ms * var(--ch-k));   /* the field folds to the hexagon */
+  --ch-dur-morph: calc(460ms * var(--ch-k));   /* the chevron rolls into the moon */
+  --ch-hover-intent: 140ms;
+  --ch-hover-close: 600ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --ch-k: .001; }
+}

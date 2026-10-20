@@ -268,6 +268,8 @@ until you have read the dry run and said go.**
 
 The spine. Built behind a flag, so today's screens keep working underneath.
 
+**Status, 20 October:** the pop-out prototype is built and run in Chrome: a bar popped into the always-on-top window stays at full speed while its tab is hidden (`research/popout-prototype.md`); keys inside the window, closing, the real headers, Safari and Firefox are still to check before stage 5. The token sheet is drafted for approval (`token-sheet.md`, drawn at `/dev/tokens`).
+
 - **Before anything else: a pop-out prototype.** The audit found that in a popped window today there are no styles, no shortcuts and no working text selection, and that animations and timers stall when the tab that opened it is hidden. `pop:command` puts the thing everything is typed through into such a window. A throwaway prototype answers whether that can be made dependable before the welcome page promises it.
 - **Added**
   - One token sheet and the copy table. You approve the sheet before any chrome is drawn (C51).
