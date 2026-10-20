@@ -124,6 +124,11 @@ msgstr ""
 msgid "enter.notCommand"
 msgstr ""
 
+#. Added to the Enter line for pop: where the always-on-top window is missing (C94)
+#. js-lingui-explicit-id
+msgid "enter.popOrdinary"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.ready"
 msgstr ""

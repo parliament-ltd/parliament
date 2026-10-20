@@ -86,6 +86,7 @@ export const COPY = {
     aloneSpends: /*i18n*/ { id: 'enter.aloneSpends', message: '{verb} runs on a line of its own, so its Enter line can name who receives it and what it costs' },
     aloneErase: /*i18n*/ { id: 'enter.aloneErase', message: '{verb} runs on a line of its own, so it is plain what goes for good' },
     filters: /*i18n*/ { id: 'enter.filters', message: '{count, plural, one {Enter applies # filter} other {Enter applies # filters}}' },
+    popOrdinary: /*i18n*/ { id: 'enter.popOrdinary', message: 'It opens as an ordinary window, since this browser cannot keep one on top', comment: 'Added to the Enter line for pop: where the always-on-top window is missing (C94)' },
     key: /*i18n*/ { id: 'enter.key', message: 'No keys in the command line, for security. Delete it, and api: opens the key field' },
     leaveSearch: /*i18n*/ { id: 'enter.leaveSearch', message: 'Esc for search' },
     leavePrompt: /*i18n*/ { id: 'enter.leavePrompt', message: 'Esc for prompt' },

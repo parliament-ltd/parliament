@@ -124,6 +124,11 @@ msgstr "Only a filter takes a minus, like -tag:research"
 msgid "enter.notCommand"
 msgstr "A command starts with a verb and a colon, like open:201"
 
+#. Added to the Enter line for pop: where the always-on-top window is missing (C94)
+#. js-lingui-explicit-id
+msgid "enter.popOrdinary"
+msgstr "It opens as an ordinary window, since this browser cannot keep one on top"
+
 #. js-lingui-explicit-id
 msgid "enter.ready"
 msgstr "Enter runs {verb}"
