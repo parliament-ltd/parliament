@@ -839,6 +839,33 @@ language, reply language), and so are more providers, Mistral included.
   - **A merge rebuilds dockets from the chats it brings in.** Dockets hold nothing of their own yet: their names follow their chats, and their steps follow the messages. So a merge files each incoming chat by the write path's rules and ignores the file's dockets, and a "replace" of version 6 data keeps them as they are. Once dockets hold plans of their own (stage 10), a merge has to bring them in as well; to do then.
   - **Found on the way:** today's validator refused whole backups that the app itself writes. It refused a branch whose parent chat had been deleted, a chat whose room had been deleted, a favourite or highlight of a deleted message, a pinned reference whose source had been deleted, and a note in no chat (the one the scratchpad becomes). Neither of Stefan's backups had any of these, so both validated. Now the first four of these come in (the favourite or highlight of a deleted message is left out and counted), and the note comes in too.
 
+## Part 7. The command layer (added 20 October 2026)
+
+Found while building the parser and the verb registry (stage 3: `src/commands/parse.js`, `verbs.js`, `registry.js`). Every verb in the documents was listed, newest wins, rulings over documents. These are the points the documents leave open. Each is built as suggested, so a ruling either confirms it or changes one entry in `verbs.js`.
+
+**C95. Board names as verbs.**
+- The bar inventory (7 and 9 October, the newest) lists `alm:`, `lab:`, `sym:` and `library:` as current. The welcome steps teach `alm:` and `library:`.
+- The arrangements spec (§4, 28 September) proposed that `alm:`, `sym:` and `library:` become shortcuts for `open:` or go, and that `lab:` stays. P3 (ruled) lets every board open by name: `open:library`.
+- The editing spec and the branch slider draw short titles on the board strip (Sym:, Col:, Ref:, Alm:, Lib:, Dkt:), and `focus:sym col` takes them as words. The branch slider also writes `lib:` and `dkt:201` as if they were verbs.
+- The arrangements spec and Lab v7 also have `settings:` and `home:` / `home:set`. What `sym:` goes to is open (arrangements §10).
+- **Suggestion:** keep `alm:`, `lab:`, `library:` and `sym:` as verbs, each the same as `open:` for its board. `sym:` goes back to the last room. The short titles are words that `focus:` takes, not verbs. `settings:` and `home:` wait for their stages; `open:settings` works meanwhile.
+
+**C96. No ranges.** The arrangements spec says in prose that removal took "ranges", but no document gives a syntax, `erase:` takes explicit numbers only (C39), and `run:` refuses ranges. **Suggestion:** no ranges anywhere for now; several numbers go with commas (`add:207, 216`). `201-205` reads as a word, and the Enter line says what the verb takes.
+
+**C97. Second words for one act.** The bar inventory lists `reset:` (`refresh:`) and `from:` (`source:`). Its decisions keep one word per act, and `dup:` has no alias (C60). `help:` with a colon appears in Docket v12, Almanac v30 and the settings spec; C60 and stage 3 use `?` and `help`. **Suggestion:** `refresh:` and `source:` answer "That verb is now `reset:`" (or `from:`) and write it in. `help:` is read as well as `?` and `help`, since it can only ever mean help.
+
+**C98. The bar's old words after C43.** `bar:pop` and `bar:dock` (settings spec §7, Almanac §4, Docket v12), `bar:foot` (dropped for `bottom`), `pop:center` (the hexagon, bar reference 9 October) and `pop:back command` (welcome §5) are in no ruling. **Suggestion:** `bar:pop` answers "use `pop:command`", `bar:foot` answers "use `bar:bottom`", `bar:hide` and `bar:show` answer with `focus:` and `calm:`. `bar:dock` and `pop:center` are not kept: `bar:center` places the bar, and `pop:back command` brings a popped bar back.
+
+**C99. What may share a line.** No document says whether one line can hold several commands. Almanac v30 writes a filter with a minus to leave things out (`-tag:Research`). **Suggestion:** filters share a line (`type:chat -tag:essay`) and every other command runs alone; the Enter line says "One command at a time. Only filters share a line". The minus works on the filters that pick by kind or name (`type:` `room:` `tag:` `model:` `from:` `in:` `has:`), not on `cost:`, `since:`, `until:` or `sort:`.
+
+**C100. What counts as a line shaped like a key.** The settings spec (§6): the history never stores a line containing `sk-` or "a run of 28+ key-like characters", and such a line is refused before Enter. Read literally, `sk-` anywhere catches `risk-analysis` and `task-list`, and any long run catches hyphenated tags and dates. **Built:** `sk-` at the start of a word, or a run of 28 or more letters, digits, hyphens and underscores that mixes capitals, small letters and digits, or holds six or more digits with only small letters and no hyphen. Tags and dates pass; keys are caught. A 40-character commit hash in a command is caught too, which is the safe side. Checked only in command mode: what a prompt may contain is stage 4's question. **Suggestion:** keep as built.
+
+**Also noted, for the stages that build them** (no question now):
+- `set:room` means two things: the Settings setter for the room new dockets use, and Lab v7's `set:room rails right`. To settle at stage 9 or 13.
+- Left out of the registry until their stages define them: `tour:docket` (arrangements §7; A20 does not cover it), `apply:` (Lab v7's collection; not in stage 13's list), `theme:any` (not defined), `export:room` (room files come later, C74).
+- Rooms are addressed by name, not number, and `erase:` takes numbers only, so nothing says yet how a room is removed for good.
+- The editing spec still writes `go:242`, `view:` and `delete:241` (now `jump:`, `markup:` and `drop:`); the welcome spec and its v9 mockup still teach `list:` and `key:` (now `tour:` and `api:`). Their wording is updated when stages 5 and 11 build from them.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
