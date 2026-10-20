@@ -75,29 +75,39 @@ function useKeysIn(doc, onKey) {
   }, [doc, onKey])
 }
 
-// A clock driven by a given window's timers and frames, counting how many
-// ticks and frames arrived in each of the last seconds.
-function useClocks(win, label) {
-  const [stats, setStats] = useState({ ticks: 0, frames: 0, expectedTicks: 0 })
+// A clock driven by a given window's own timers and frames. Each second it
+// records how many 100 ms ticks and how many frames arrived, and how long the
+// "second" really took, keeping the last twenty.
+function useClocks(win) {
+  const [samples, setSamples] = useState([])
   useEffect(() => {
-    if (!win) return
+    if (!win) {
+      setSamples([])
+      return
+    }
     let ticks = 0
     let frames = 0
     let raf = 0
-    const started = win.performance.now()
+    let last = win.performance.now()
     const tick = win.setInterval(() => { ticks++ }, 100)
     const frame = () => { frames++; raf = win.requestAnimationFrame(frame) }
     raf = win.requestAnimationFrame(frame)
     const report = win.setInterval(() => {
-      setStats({ ticks, frames, expectedTicks: Math.round((win.performance.now() - started) / 100) })
+      const now = win.performance.now()
+      const secs = (now - last) / 1000
+      last = now
+      const sample = { tps: Math.round(ticks / secs), fps: Math.round(frames / secs), secs: Math.round(secs * 10) / 10 }
+      ticks = 0
+      frames = 0
+      setSamples((prev) => [...prev.slice(-19), sample])
     }, 1000)
     return () => {
       win.clearInterval(tick)
       win.clearInterval(report)
       win.cancelAnimationFrame(raf)
     }
-  }, [win, label])
-  return stats
+  }, [win])
+  return samples
 }
 
 function Bar({ doc, onCommand, docked }) {
@@ -171,8 +181,8 @@ export default function PopoutPrototype() {
   const [popped, setPopped] = useState(null) // { win, container, styles, kind }
   const [error, setError] = useState('')
   const [visibility, setVisibility] = useState([])
-  const openerClocks = useClocks(window, 'opener')
-  const popupClocks = useClocks(popped?.win || null, 'popup')
+  const openerClocks = useClocks(window)
+  const popupClocks = useClocks(popped?.win || null)
 
   useEffect(() => {
     const on = () => setVisibility((v) => [...v.slice(-5), `${new Date().toLocaleTimeString()} ${document.visibilityState}`])
@@ -209,6 +219,8 @@ export default function PopoutPrototype() {
       try {
         popped?.win.close()
         const opened = await openBarWindow(kind)
+        // Dev aid: lets the window be inspected from this tab's console.
+        window.__popout = opened.win
         setPopped({ ...opened, kind })
       } catch (e) {
         setError(e?.message || String(e))
@@ -224,7 +236,10 @@ export default function PopoutPrototype() {
       <span style={{ font: `400 12px ${C.mono}` }}>{value}</span>
     </div>
   )
-  const rate = (s) => (s.expectedTicks ? `${Math.round((100 * s.ticks) / s.expectedTicks)}% of ticks, ${s.frames} frames` : 'not running')
+  // Ticks per second (10 when on time) and frames per second, oldest first.
+  const rate = (list) => (list.length
+    ? `ticks/s ${list.map((x) => x.tps).join(' ')} · frames/s ${list.map((x) => x.fps).join(' ')} · seconds took ${list.map((x) => x.secs).join(' ')}`
+    : 'not running')
 
   return (
     <div style={{ minHeight: '100vh', background: C.paper, color: C.ink, font: `400 14px ${C.sans}`, padding: '32px 16px' }}>
