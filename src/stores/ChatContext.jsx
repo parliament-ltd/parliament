@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
-import { getMessages, addMessage, updateMessage } from '../lib/db'
+import { getMessages, addMessage, updateMessage, getSetting, setSetting } from '../lib/db'
+import { askToKeepStorage } from '../lib/storageKeep'
 import { useConversations } from './ConversationContext'
 import { executeClientTool } from '../providers/anthropic'
 
@@ -122,6 +123,10 @@ export function ChatProvider({ children }) {
   //   - meta is persisted alongside the user message so MessageCard can
   //     render attachment chips in history (a memory aid, not replay).
   const sendMessage = useCallback(async (apiKey, conversationId, userContent, model, provider, systemPrompt = '', tools = [], attachments = null) => {
+    // There is now a chat worth keeping, and a click led here: ask the
+    // browser, once, to keep Parliament's storage (C88).
+    askToKeepStorage({ getSetting, setSetting }).catch(() => {})
+
     // PR-16a: persist the model used on this turn back to the conversation
     // record. The semantic shift: `conversation.model` now means "the most
     // recently used model in this room," not "the model the room was

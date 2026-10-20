@@ -14,6 +14,7 @@ import { Button, Card, Input, Modal, Toggle, RadioGroup, SegmentedControl, Secti
 import { getProvider } from '../providers'
 import { saveApiKey, deleteApiKey, encryptExport, decryptImport } from '../lib/crypto'
 import { exportAllData, importData, clearAllData, getSetting, setSetting } from '../lib/db'
+import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
 import TourTooltip from '../components/TourTooltip'
 import NetworkActivityCard from '../components/NetworkActivityCard'
 import { useBackup } from '../stores/BackupContext'
@@ -710,6 +711,39 @@ function passphraseStrength(pw) {
   return { label: 'Strong', color: '#0F7B6C' }
 }
 
+// Whether the browser keeps Parliament's storage, and a way to ask (C88).
+// Says nothing in a browser that cannot tell.
+function StorageKeptLine() {
+  const [kept, setKept] = useState(null)
+  const [asking, setAsking] = useState(false)
+  useEffect(() => {
+    let live = true
+    isStorageKept().then((v) => { if (live) setKept(v) })
+    return () => { live = false }
+  }, [])
+  if (kept === null) return null
+  const ask = async () => {
+    setAsking(true)
+    try {
+      setKept((await askToKeepStorage({ getSetting, setSetting, again: true })) === 'kept')
+    } finally {
+      setAsking(false)
+    }
+  }
+  return (
+    <p className="text-xs mt-3 text-[var(--p-text-secondary)]">
+      {kept
+        ? "This browser keeps Parliament's data until you delete it."
+        : "This browser may clear Parliament's data when it runs short of space. A backup keeps a copy safe."}
+      {!kept && (
+        <button type="button" onClick={ask} disabled={asking} className="ml-2 underline underline-offset-2 text-[var(--p-text-primary)] disabled:opacity-50">
+          Ask it to keep the data
+        </button>
+      )}
+    </p>
+  )
+}
+
 // ─── Data & Backups ──────────────────────────────────────
 
 // Small entry point that opens the V2 Backup & Restore modal from
@@ -896,6 +930,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
           <div className="flex gap-6 mt-3 text-xs text-[var(--p-text-secondary)]">
             <span>{conversations.length} conversations</span>
           </div>
+          <StorageKeptLine />
           {storageWarning && (
             <motion.p
               initial={{ opacity: 0 }}
