@@ -876,6 +876,137 @@ msgstr ""
 msgid "leader.search"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "library.aboutAlmanac"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.aboutCollection"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.aboutDocket"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.aboutLibrary"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.aboutReflection"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.aboutSettings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.blocks"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.emptyShelf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.featureAttach"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.featureVoice"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.featureWebSearch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.groupMine"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.groupTemplates"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.inRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.loading"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.onScreen"
+msgstr ""
+
+#. Marginalia on a board: writes open:<board> in the bar
+#. js-lingui-explicit-id
+msgid "library.open"
+msgstr ""
+
+#. open: and the board stay English
+#. js-lingui-explicit-id
+msgid "library.openHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.pillMine"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.pillSoon"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.pillTemplate"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.places"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelfAll"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelfBlocks"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelfBoards"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelfLayouts"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelfResources"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelfRooms"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelfThemes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelves"
+msgstr ""
+
+#. How many items show while one shelf is chosen
+#. js-lingui-explicit-id
+msgid "library.shown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.themeFact"
+msgstr ""
+
 #. The bar's command mode
 #. js-lingui-explicit-id
 msgid "mode.command"

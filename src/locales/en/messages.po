@@ -876,6 +876,137 @@ msgstr "Write a prompt. Nothing is sent before Enter"
 msgid "leader.search"
 msgstr "Search"
 
+#. js-lingui-explicit-id
+msgid "library.aboutAlmanac"
+msgstr "Everything you have made, in one table, by number."
+
+#. js-lingui-explicit-id
+msgid "library.aboutCollection"
+msgstr "Things set side by side to compare, ask about, or apply."
+
+#. js-lingui-explicit-id
+msgid "library.aboutDocket"
+msgstr "A plan of prompts, run in branches."
+
+#. js-lingui-explicit-id
+msgid "library.aboutLibrary"
+msgstr "Rooms, layouts, blocks, themes and resources. The board you are reading now."
+
+#. js-lingui-explicit-id
+msgid "library.aboutReflection"
+msgstr "Reads a chat and its markings back to you."
+
+#. js-lingui-explicit-id
+msgid "library.aboutSettings"
+msgstr "Keys, languages, your data, and how things behave."
+
+#. js-lingui-explicit-id
+msgid "library.blocks"
+msgstr "{count, plural, one {# block} other {# blocks}}"
+
+#. js-lingui-explicit-id
+msgid "library.emptyShelf"
+msgstr "Nothing on this shelf yet."
+
+#. js-lingui-explicit-id
+msgid "library.featureAttach"
+msgstr "file attach"
+
+#. js-lingui-explicit-id
+msgid "library.featureVoice"
+msgstr "voice input"
+
+#. js-lingui-explicit-id
+msgid "library.featureWebSearch"
+msgstr "web search"
+
+#. js-lingui-explicit-id
+msgid "library.groupMine"
+msgstr "Your rooms"
+
+#. js-lingui-explicit-id
+msgid "library.groupTemplates"
+msgstr "Room templates"
+
+#. js-lingui-explicit-id
+msgid "library.inRoom"
+msgstr "goes in a room"
+
+#. js-lingui-explicit-id
+msgid "library.loading"
+msgstr "Reading the shelves"
+
+#. js-lingui-explicit-id
+msgid "library.onScreen"
+msgstr "goes on the screen, beside rooms"
+
+#. Marginalia on a board: writes open:<board> in the bar
+#. js-lingui-explicit-id
+msgid "library.open"
+msgstr "open"
+
+#. open: and the board stay English
+#. js-lingui-explicit-id
+msgid "library.openHelp"
+msgstr "Writes open:{board} in the bar"
+
+#. js-lingui-explicit-id
+msgid "library.pillMine"
+msgstr "yours"
+
+#. js-lingui-explicit-id
+msgid "library.pillSoon"
+msgstr "coming soon"
+
+#. js-lingui-explicit-id
+msgid "library.pillTemplate"
+msgstr "template"
+
+#. js-lingui-explicit-id
+msgid "library.places"
+msgstr "{count, plural, one {# place for blocks} other {# places for blocks}}"
+
+#. js-lingui-explicit-id
+msgid "library.shelfAll"
+msgstr "All"
+
+#. js-lingui-explicit-id
+msgid "library.shelfBlocks"
+msgstr "Blocks"
+
+#. js-lingui-explicit-id
+msgid "library.shelfBoards"
+msgstr "Boards"
+
+#. js-lingui-explicit-id
+msgid "library.shelfLayouts"
+msgstr "Layouts"
+
+#. js-lingui-explicit-id
+msgid "library.shelfResources"
+msgstr "Resources"
+
+#. js-lingui-explicit-id
+msgid "library.shelfRooms"
+msgstr "Rooms"
+
+#. js-lingui-explicit-id
+msgid "library.shelfThemes"
+msgstr "Themes"
+
+#. js-lingui-explicit-id
+msgid "library.shelves"
+msgstr "Shelves"
+
+#. How many items show while one shelf is chosen
+#. js-lingui-explicit-id
+msgid "library.shown"
+msgstr "{shown} of {all}"
+
+#. js-lingui-explicit-id
+msgid "library.themeFact"
+msgstr "colour and type for the inside of a room"
+
 #. The bar's command mode
 #. js-lingui-explicit-id
 msgid "mode.command"

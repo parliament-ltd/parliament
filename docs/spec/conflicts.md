@@ -1030,6 +1030,12 @@ Found while splitting stage 5 into pieces. The documents: `welcome-spec-decision
 - A term takes the highlight's pink (it is today's highlight, C57); a quote, which v30 does not colour, is ink.
 - **Suggestion:** keep as built. A ruling on dockets changes one line in `almanacRows.js`.
 
+**C128. The thin Library.** Lab v7 draws the Library with thumbnails, ticks, details in place and actions on rooms; stage 5 asks only for a read-only board.
+- **Built:** one read layer (`lib/catalogue.js`) over the code's own manifests: block manifests, the layout registry, the room templates and the themes. The stores give only your rooms, the layouts still to come and resources (none are stored yet, so that shelf says so). Web search, voice input and file attach show as features of the input block, not as blocks (AB §2), so no block in the list names a provider. Homepage blocks and the homepage layout are left out.
+- The board: shelves as italic words along the top (all, rooms, boards, layouts, blocks, themes, resources), which only change the view and so act at once; groups with counts; each item its name, what it is, and one line of facts. The one action is "open" on a board, which writes `open:<board>` in the bar. The boards listed are the six that ship prebuilt; their one-line descriptions are new copy, from v7's where it has them.
+- Names and descriptions of blocks, layouts and themes are the manifests' English words until the plain-language pass (A6) takes them into the copy table. Thumbnails (`LayoutSilhouette`), ticks and details come with the Lab (stage 13).
+- **Suggestion:** keep as built.
+
 ## Part 10. The security and privacy notes of 21 October (added 21 October 2026)
 
 Stefan's notes from a planning conversation, `parliament-security-privacy.md` (not in the repo), checked against the specs, the rulings and the code. Most of it agrees or is already built; these are the points that do not.

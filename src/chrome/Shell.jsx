@@ -30,6 +30,10 @@ import { boardName } from './say'
 import RoomBoard from './RoomBoard'
 import WelcomeBoard, { WelcomeFoot } from './WelcomeBoard'
 import AlmanacBoard from './AlmanacBoard'
+import LibraryBoard from './LibraryBoard'
+import { readCatalogue } from '../lib/catalogue'
+import { listEntries } from '../catalog'
+import { listLayoutEntries } from '../catalog/layouts'
 import { readAlmanac } from '../lib/almanacRows'
 import { onRecordsChanged } from '../lib/records'
 
@@ -326,6 +330,20 @@ export default function Shell() {
   }, [started, roomRev])
   const numbered = useMemo(() => new Map((almanacRows ?? []).map((r) => [r.num, r])), [almanacRows])
   const [inspected, setInspected] = useState(null) // the number inspect: shows under the bar
+
+  // ── The Library's catalogue (stage 5, piece 4) ────────
+  // Read while the Library is in the space, here or in a window, and again
+  // when a room is named.
+  const libraryHere = arrangement.columns.some((c) => c.includes('library')) || arrangement.popped.some((p) => p.board === 'library')
+  const [catalogue, setCatalogue] = useState(null)
+  useEffect(() => {
+    if (!started || !db.current || !libraryHere) return undefined
+    let live = true
+    readCatalogue(db.current, { blocks: listEntries(), layouts: listLayoutEntries() })
+      .then((items) => { if (live) setCatalogue(items) })
+      .catch(() => { if (live) setCatalogue([]) })
+    return () => { live = false }
+  }, [started, roomRev, libraryHere])
   const inspectedRow = inspected != null ? numbered.get(inspected) ?? null : null
   const [roomNameOf, setRoomNameOf] = useState(null) // { chatId, value }: what the room on screen is called
   const onRoomName = useCallback((chatId, value) => setRoomNameOf({ chatId, value }), [])
@@ -557,6 +575,9 @@ export default function Shell() {
     }
     if (board === 'almanac') {
       return <AlmanacBoard key="almanac" rows={almanacRows} addressed={arrangement.addressed === 'almanac'} onAddress={focusBoard} onWrite={writeField} />
+    }
+    if (board === 'library') {
+      return <LibraryBoard key="library" items={catalogue} addressed={arrangement.addressed === 'library'} onAddress={focusBoard} onWrite={writeField} />
     }
     if (board === 'welcome') {
       return <WelcomeBoard key="welcome" welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} />
