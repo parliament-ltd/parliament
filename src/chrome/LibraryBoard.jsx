@@ -24,15 +24,23 @@ const BOARD_WORDS = {
   docket: COPY.library.aboutDocket, reflection: COPY.library.aboutReflection, settings: COPY.library.aboutSettings,
 }
 
+// People's words for the catalogue, from the copy table (C131), by shelf;
+// the manifest's English where the table has none.
+const NAMES = { block: COPY.blocks, layout: COPY.layouts, theme: COPY.themes }
+const ABOUT = { block: COPY.blocksAbout, layout: COPY.layoutsAbout, theme: COPY.themesAbout }
+const own = (i18n, table, word, fallback) => (word && table && Object.hasOwn(table, word) ? i18n._(table[word]) : fallback)
+
 function Item({ item, onWrite }) {
   const { i18n } = useLingui()
   const name = item.shelf === 'room' ? roomLabel(i18n, item.name)
-    : item.shelf === 'board' ? i18n._(COPY.boards[item.board]) : item.name
-  const about = item.shelf === 'board' ? i18n._(BOARD_WORDS[item.board]) : item.description
+    : item.shelf === 'board' ? i18n._(COPY.boards[item.board]) : own(i18n, NAMES[item.shelf], item.word, item.name)
+  const about = item.shelf === 'board' ? i18n._(BOARD_WORDS[item.board])
+    : item.aboutTemplate ? own(i18n, COPY.templatesAbout, item.aboutTemplate, item.description)
+      : own(i18n, ABOUT[item.shelf], item.word, item.description)
   const facts = []
   if (item.shelf === 'room') {
-    if (item.layout) facts.push(item.layout)
-    if (item.theme) facts.push(item.theme)
+    if (item.layout) facts.push(own(i18n, COPY.layouts, item.layoutWord, item.layout))
+    if (item.theme) facts.push(own(i18n, COPY.themes, item.themeWord, item.theme))
     facts.push(i18n._(COPY.library.blocks, { count: item.blocks }))
   }
   if (item.shelf === 'layout' && item.places) facts.push(i18n._(COPY.library.places, { count: item.places }))

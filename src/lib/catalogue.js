@@ -14,9 +14,10 @@
 // passes their lists in (the shell has them loaded for rooms already); this
 // module stays plain data.
 //
-// catalogueItems is pure; readCatalogue reads the stores it needs. Names and
-// descriptions of blocks, layouts and themes are the manifests' English
-// words for now; they join the copy table with the plain-language pass (A6).
+// catalogueItems is pure; readCatalogue reads the stores it needs. Each
+// item carries `word`, its key in the copy table (COPY.blocks, layouts,
+// themes and their About groups, C131), where people's words for it are
+// kept and translated; the manifest's English is the fallback.
 
 import { TEMPLATES } from './seedTemplates'
 import { SCHEMES } from './schemes'
@@ -57,16 +58,24 @@ export function catalogueItems({
   const themeName = new Map(themes.map((t) => [bare(t.id), t.displayName]))
   const facts = (mode) => ({
     layout: layoutName.get(bare(mode?.layout?.ref)) ?? null,
+    layoutWord: bare(mode?.layout?.ref) || null,
     theme: themeName.get(bare(mode?.scheme?.ref)) ?? null,
+    themeWord: bare(mode?.scheme?.ref) || null,
     blocks: blockCount(mode?.components),
   })
+  // A room made from a template keeps the template's description until its
+  // owner writes another, so it reads in the reader's language too.
 
   // Your rooms, then the templates.
   for (const mode of modes.filter((m) => m?.scope === 'room')) {
-    items.push({ shelf: 'room', key: `room:${mode.id}`, mine: true, name: roomName(mode) ?? { unnamed: true }, description: mode.meta?.description || null, ...facts(mode) })
+    // Matched by the words themselves, since rooms made before C90 do not
+    // record their template.
+    const said = mode.meta?.description
+    const aboutTemplate = said ? templates.find((t) => t.description === said)?.id ?? null : null
+    items.push({ shelf: 'room', key: `room:${mode.id}`, mine: true, name: roomName(mode) ?? { unnamed: true }, description: mode.meta?.description || null, aboutTemplate, ...facts(mode) })
   }
   for (const t of templates.filter((x) => x.scope === 'room')) {
-    items.push({ shelf: 'room', key: `template:${t.id}`, template: t.id, name: { template: t.id }, description: t.description ?? null, soon: t.status === 'coming-soon', ...facts(t) })
+    items.push({ shelf: 'room', key: `template:${t.id}`, template: t.id, name: { template: t.id }, description: t.description ?? null, aboutTemplate: t.id, soon: t.status === 'coming-soon', ...facts(t) })
   }
 
   for (const board of LIBRARY_BOARDS) items.push({ shelf: 'board', key: `board:${board}`, board, name: board, description: null })
@@ -77,17 +86,17 @@ export function catalogueItems({
     built.add(l.name)
     const stored = storedLayouts.find((s) => bare(s.id) === l.name)
     const places = new Set((l.slots ?? []).map((s) => s.id)).size
-    items.push({ shelf: 'layout', key: `layout:${l.name}@${l.version}`, name: l.displayName, description: l.description ?? stored?.description ?? null, places })
+    items.push({ shelf: 'layout', key: `layout:${l.name}@${l.version}`, word: l.name, name: l.displayName, description: l.description ?? stored?.description ?? null, places })
   }
   for (const s of storedLayouts.filter((x) => x.status === 'coming-soon' && isRoomScope(x.scopes) && !built.has(bare(x.id)))) {
-    items.push({ shelf: 'layout', key: `layout:${s.id}`, name: s.displayName, description: s.description ?? null, soon: true })
+    items.push({ shelf: 'layout', key: `layout:${s.id}`, word: bare(s.id), name: s.displayName, description: s.description ?? null, soon: true })
   }
 
   for (const b of blocks.filter((x) => (x.surfaces ?? []).includes('room') && !FEATURES.includes(x.name))) {
-    items.push({ shelf: 'block', key: `block:${b.name}`, name: b.displayName, description: b.description ?? null, features: b.name === INPUT ? [...FEATURES] : [] })
+    items.push({ shelf: 'block', key: `block:${b.name}`, word: b.name, name: b.displayName, description: b.description ?? null, features: b.name === INPUT ? [...FEATURES] : [] })
   }
 
-  for (const t of themes) items.push({ shelf: 'theme', key: `theme:${t.id}`, name: t.displayName, description: t.description ?? null })
+  for (const t of themes) items.push({ shelf: 'theme', key: `theme:${t.id}`, word: bare(t.id), name: t.displayName, description: t.description ?? null })
 
   for (const r of resources) {
     items.push({ shelf: 'resource', key: `resource:${r.id}`, name: r.displayName ?? r.name ?? r.id, description: r.description ?? null, soon: r.status === 'coming-soon', format: r.format ?? null })

@@ -1,5 +1,9 @@
+import { readdirSync, readFileSync } from 'node:fs'
 import { describe, it, expect } from 'vitest'
 import { catalogueItems, SHELVES, LIBRARY_BOARDS } from './catalogue'
+import { COPY } from '../copy'
+import { SCHEMES } from './schemes'
+import { TEMPLATES } from './seedTemplates'
 
 const blocks = [
   { name: 'messages', displayName: 'Messages', description: 'The conversation.', surfaces: ['room'] },
@@ -66,5 +70,42 @@ describe('the catalogue, read in one place (stage 5, piece 4)', () => {
     expect(items.filter((i) => i.shelf === 'room' && i.template).length).toBeGreaterThan(3)
     expect(items.filter((i) => i.shelf === 'theme').length).toBeGreaterThan(3)
     expect(SHELVES).toHaveLength(6)
+  })
+})
+
+describe('the catalogue in the copy table (C131)', () => {
+  // The block and layout manifests hold React code, so they are read here as
+  // text: each one a person can place has its words in the copy table.
+  const manifests = (dir) => readdirSync(new URL(dir, import.meta.url))
+    .filter((f) => f.endsWith('.jsx') && !/-(render|preview)\.jsx$/.test(f))
+    .map((f) => readFileSync(new URL(dir + f, import.meta.url), 'utf8'))
+  const FEATURES = ['web-search', 'voice-input', 'file-attach']
+  // The manifest's own name: the first \`name:\` at the top level of its default export.
+  const nameOf = (text) => text.match(/export default \{[\s\S]*?\n {2}name:\s*'([^']+)'/)?.[1] ?? null
+
+  it('has words for every block a room takes, and every layout for rooms', () => {
+    for (const text of manifests('../catalog/entries/')) {
+      if (!/surfaces:\s*\[\s*'room'/.test(text)) continue
+      const name = nameOf(text)
+      expect(name).not.toBeNull()
+      if (FEATURES.includes(name)) continue
+      expect(COPY.blocks[name], name).toBeDefined()
+      expect(COPY.blocksAbout[name], name).toBeDefined()
+    }
+    for (const text of manifests('../catalog/layouts/')) {
+      const name = nameOf(text)
+      if (!name || !/scope:\s*'room'/.test(text)) continue
+      expect(COPY.layouts[name], name).toBeDefined()
+      expect(COPY.layoutsAbout[name], name).toBeDefined()
+    }
+  })
+
+  it('has words for every theme and room template', () => {
+    for (const t of SCHEMES) {
+      const word = t.id.split('@')[0]
+      expect(COPY.themes[word], word).toBeDefined()
+      expect(COPY.themesAbout[word], word).toBeDefined()
+    }
+    for (const t of TEMPLATES.filter((x) => x.scope === 'room')) expect(COPY.templatesAbout[t.id], t.id).toBeDefined()
   })
 })

@@ -58,6 +58,142 @@ msgstr "Writes open:{num} in the bar"
 msgid "almanac.untitled"
 msgstr "Untitled"
 
+#. js-lingui-explicit-id
+msgid "block.branches"
+msgstr "Branches"
+
+#. js-lingui-explicit-id
+msgid "block.chart-canvas"
+msgstr "Chart canvas"
+
+#. js-lingui-explicit-id
+msgid "block.claude-comments"
+msgstr "Comments"
+
+#. js-lingui-explicit-id
+msgid "block.collab-mode"
+msgstr "Frameworks"
+
+#. js-lingui-explicit-id
+msgid "block.column-inspector"
+msgstr "Column inspector"
+
+#. js-lingui-explicit-id
+msgid "block.context"
+msgstr "Context health"
+
+#. js-lingui-explicit-id
+msgid "block.document-canvas"
+msgstr "Document canvas"
+
+#. js-lingui-explicit-id
+msgid "block.file-shelf"
+msgstr "File shelf"
+
+#. js-lingui-explicit-id
+msgid "block.highlights"
+msgstr "Keywords"
+
+#. js-lingui-explicit-id
+msgid "block.input"
+msgstr "Input"
+
+#. js-lingui-explicit-id
+msgid "block.messages"
+msgstr "Messages"
+
+#. js-lingui-explicit-id
+msgid "block.notes"
+msgstr "Notes"
+
+#. js-lingui-explicit-id
+msgid "block.review"
+msgstr "Review"
+
+#. js-lingui-explicit-id
+msgid "block.ripple-analysis"
+msgstr "Ripple analysis"
+
+#. js-lingui-explicit-id
+msgid "block.summary-dashboard"
+msgstr "Summary dashboard"
+
+#. js-lingui-explicit-id
+msgid "block.table-canvas"
+msgstr "Table canvas"
+
+#. js-lingui-explicit-id
+msgid "block.toc"
+msgstr "Table of contents"
+
+#. js-lingui-explicit-id
+msgid "blockAbout.branches"
+msgstr "The ways a chat has forked, with where each began, and a place to start a new one."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.chart-canvas"
+msgstr "Charts drawn from the data you have open: bars, lines, areas, scatter and pie."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.claude-comments"
+msgstr "A thread of comments for each paragraph, in the margin. Select text to comment; the model answers when you submit the draft."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.collab-mode"
+msgstr "Standing instructions that shape how replies come back, sent with each prompt."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.column-inspector"
+msgstr "Each column of your data: its type, its empty cells, and sample values."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.context"
+msgstr "How much of the model’s context the chat has used, with a warning as it nears the limit."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.document-canvas"
+msgstr "A page to write on, with tracked changes and a menu on /. Submitting the draft starts a new branch and keeps this version."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.file-shelf"
+msgstr "Data files in this room, such as spreadsheets, and which of them the model may read."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.highlights"
+msgstr "Words and phrases lit wherever they appear in the chat, each in its colour. A click jumps between them."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.input"
+msgstr "The message box, with send and stop, attachments, and web search."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.messages"
+msgstr "The conversation, each message with its own actions."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.notes"
+msgstr "Notes on the chat, or on one message. They are never sent."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.review"
+msgstr "The chat drawn together from the highlights, notes, favourites and pins you choose."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.ripple-analysis"
+msgstr "Finds where one part of a draft no longer agrees with another, here and in other chats, when you submit it."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.summary-dashboard"
+msgstr "Headline figures, gaps in the data, and insights you ask for, about the data you have open."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.table-canvas"
+msgstr "The data you have open, as a table to sort and page through."
+
+#. js-lingui-explicit-id
+msgid "blockAbout.toc"
+msgstr "The conversation’s headings, to jump to any point in it."
+
 #. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
 msgid "board.almanac"
@@ -1015,6 +1151,54 @@ msgid "kind.term"
 msgstr "Keyword"
 
 #. js-lingui-explicit-id
+msgid "layout.canvas-centric"
+msgstr "Canvas in the middle"
+
+#. js-lingui-explicit-id
+msgid "layout.document-centric"
+msgstr "Document in the middle"
+
+#. js-lingui-explicit-id
+msgid "layout.reading-pane"
+msgstr "Reading pane"
+
+#. js-lingui-explicit-id
+msgid "layout.single-column-with-sheet"
+msgstr "One column and a sheet"
+
+#. js-lingui-explicit-id
+msgid "layout.split-view"
+msgstr "Split view"
+
+#. js-lingui-explicit-id
+msgid "layout.three-panel"
+msgstr "Three panels"
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.canvas-centric"
+msgstr "Charts, tables or a dashboard in the middle, with a side panel and the chat. For working with data and files."
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.document-centric"
+msgstr "A document you edit, with notes in its margin. For writing and editing."
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.reading-pane"
+msgstr "A wide reading area with a panel for notes beside it. For reading closely."
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.single-column-with-sheet"
+msgstr "One column, with a sheet that slides up for the rest. Made for phones and touch."
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.split-view"
+msgstr "Two panes side by side, to compare two chats or pair a chat with a document."
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.three-panel"
+msgstr "Two side panels with the conversation between them. For work where a lot stays in view."
+
+#. js-lingui-explicit-id
 msgid "leader.command"
 msgstr "Type a command. The > stays in the field"
 
@@ -1306,6 +1490,82 @@ msgstr "Starling"
 #. js-lingui-explicit-id
 msgid "template.writingStudio"
 msgstr "Writing studio"
+
+#. js-lingui-explicit-id
+msgid "templateAbout.data-workspace@1.0"
+msgstr "Charts and tables beside a chat for analysis. Bring in a spreadsheet and ask what is in it."
+
+#. js-lingui-explicit-id
+msgid "templateAbout.drafting-desk@1.0"
+msgstr "Write documents with tracked changes and comments in the margin, and find where a draft no longer agrees with itself."
+
+#. js-lingui-explicit-id
+msgid "templateAbout.kingfisher@1.0"
+msgstr "A wide reading surface for long documents and research, with room for notes down the side. For reading more than chatting."
+
+#. js-lingui-explicit-id
+msgid "templateAbout.pocket-chat@1.0"
+msgstr "A focused chat for phones, with keywords, branches and review in a sheet that slides up."
+
+#. js-lingui-explicit-id
+msgid "templateAbout.quiet-room@1.0"
+msgstr "Just a chat, with nothing else in the way. For when the work is the conversation."
+
+#. js-lingui-explicit-id
+msgid "templateAbout.starling@1.0"
+msgstr "Two equal panes side by side: two chats, or a chat and a document."
+
+#. js-lingui-explicit-id
+msgid "templateAbout.writing-studio@1.0"
+msgstr "A chat with notes, keywords and branches close at hand. For long writing that goes back and forth."
+
+#. js-lingui-explicit-id
+msgid "theme.amber-glow"
+msgstr "Amber glow"
+
+#. js-lingui-explicit-id
+msgid "theme.cool-bright"
+msgstr "Cool bright"
+
+#. js-lingui-explicit-id
+msgid "theme.deep-calm"
+msgstr "Deep calm"
+
+#. js-lingui-explicit-id
+msgid "theme.fresh-teal"
+msgstr "Fresh teal"
+
+#. js-lingui-explicit-id
+msgid "theme.parliament"
+msgstr "Parliament"
+
+#. js-lingui-explicit-id
+msgid "theme.soft-violet"
+msgstr "Soft violet"
+
+#. js-lingui-explicit-id
+msgid "themeAbout.amber-glow"
+msgstr "Warm cream with a rich amber accent."
+
+#. js-lingui-explicit-id
+msgid "themeAbout.cool-bright"
+msgstr "Cool whites with a vivid blue accent. Crisp, and high in contrast."
+
+#. js-lingui-explicit-id
+msgid "themeAbout.deep-calm"
+msgstr "Dark and quiet: calm slate with a sage blue accent."
+
+#. js-lingui-explicit-id
+msgid "themeAbout.fresh-teal"
+msgstr "Pale teal with a bright teal accent. Light and open."
+
+#. js-lingui-explicit-id
+msgid "themeAbout.parliament"
+msgstr "Warm white with dusty gold accents. Parliament's own."
+
+#. js-lingui-explicit-id
+msgid "themeAbout.soft-violet"
+msgstr "Pale lavender with a violet accent. Gentle."
 
 #. js-lingui-explicit-id
 msgid "verb.accept"

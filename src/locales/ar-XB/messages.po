@@ -58,6 +58,142 @@ msgstr ""
 msgid "almanac.untitled"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "block.branches"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.chart-canvas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.claude-comments"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.collab-mode"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.column-inspector"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.context"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.document-canvas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.file-shelf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.highlights"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.input"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.messages"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.notes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.review"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.ripple-analysis"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.summary-dashboard"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.table-canvas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.toc"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.branches"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.chart-canvas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.claude-comments"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.collab-mode"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.column-inspector"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.context"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.document-canvas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.file-shelf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.highlights"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.input"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.messages"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.notes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.review"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.ripple-analysis"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.summary-dashboard"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.table-canvas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.toc"
+msgstr ""
+
 #. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
 msgid "board.almanac"
@@ -1015,6 +1151,54 @@ msgid "kind.term"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "layout.canvas-centric"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layout.document-centric"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layout.reading-pane"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layout.single-column-with-sheet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layout.split-view"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layout.three-panel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.canvas-centric"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.document-centric"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.reading-pane"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.single-column-with-sheet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.split-view"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.three-panel"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "leader.command"
 msgstr ""
 
@@ -1305,6 +1489,82 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "template.writingStudio"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "templateAbout.data-workspace@1.0"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "templateAbout.drafting-desk@1.0"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "templateAbout.kingfisher@1.0"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "templateAbout.pocket-chat@1.0"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "templateAbout.quiet-room@1.0"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "templateAbout.starling@1.0"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "templateAbout.writing-studio@1.0"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "theme.amber-glow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "theme.cool-bright"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "theme.deep-calm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "theme.fresh-teal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "theme.parliament"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "theme.soft-violet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "themeAbout.amber-glow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "themeAbout.cool-bright"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "themeAbout.deep-calm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "themeAbout.fresh-teal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "themeAbout.parliament"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "themeAbout.soft-violet"
 msgstr ""
 
 #. js-lingui-explicit-id
