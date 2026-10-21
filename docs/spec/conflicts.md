@@ -882,6 +882,7 @@ Found while building the parser and the verb registry (stage 3: `src/commands/pa
 
 **C104. Bare `pop:back`.** Almanac v30 and Lab v7 bring every window back; welcome v9 asks for a name. **Built:** every window back, each to where it stood, with the Enter line saying how many; `pop:back library` brings one. The welcome page may still refuse the bare form as its lesson needs (stage 5). **Suggestion:** keep as built.
 - **20 October:** Stefan asked whether this overlaps with `reset:`. Only when popping is the one thing changed. Bare `pop:back` brings the windows back to the page and leaves everything else as it is: boards opened, moved or closed, and where the bar sits. `reset:` puts the whole screen back as shipped: it closes the windows and the boards you opened, brings back the ones you closed, and returns the bar to its place. Put to Stefan whether to keep both.
+- **Ruled 20 October: keep both `pop:back` and `reset:` as built.**
 
 **C105. `pop:left` and `pop:right`.** Ruled only as being "for boards that have been popped" (C43); no document says what they do. **Built:** they place the window of the board the bar is pointed at on the left or the right of the screen. **Suggestion:** keep as built. **Ruled 20 October: yes.**
 
