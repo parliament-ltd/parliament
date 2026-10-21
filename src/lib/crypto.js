@@ -6,7 +6,9 @@ import {
 
 const ENCRYPTION_KEY_STORE = KEY_STORE
 const KEY_ID = 'api-key-encryption'
-// The one provider with a key today; stage 7 adds others.
+// The provider a key belongs to, when a caller does not say: the one with a
+// key until stage 7. Keys are kept one per provider (keyStore.js), and the
+// gateway always says which (src/net, stage 4).
 const PROVIDER = 'anthropic'
 
 // ─── Internal: Key Storage ───────────────────────────────
@@ -85,43 +87,46 @@ export async function decryptApiKey(ciphertext, iv) {
 
 const STORAGE_KEY = LEGACY_SETTING
 
-export async function saveApiKey(apiKey, mode = 'persistent') {
+export async function saveApiKey(apiKey, mode = 'persistent', provider = PROVIDER) {
   switch (mode) {
     case 'persistent': {
       const { ciphertext, iv } = await encryptApiKey(apiKey)
-      await writeSavedKey(await getKeyDB(), PROVIDER, {
+      await writeSavedKey(await getKeyDB(), provider, {
         ciphertext: Array.from(new Uint8Array(ciphertext)),
         iv: Array.from(iv),
       })
       // A key saved now replaces one saved the old way.
-      await (await initDB()).delete('settings', STORAGE_KEY)
+      if (provider === PROVIDER) await (await initDB()).delete('settings', STORAGE_KEY)
       break
     }
     case 'memory': {
-      // Caller is responsible for holding this in React state
-      // Nothing to persist
+      // Held in memory by the key module (src/net/keyring.js), not here.
       break
     }
     default: {
       // Treat any unknown mode (including legacy 'session') as persistent
-      return saveApiKey(apiKey, 'persistent')
+      return saveApiKey(apiKey, 'persistent', provider)
     }
   }
 }
 
-export async function loadApiKey(mode = 'persistent') {
+export async function loadApiKey(mode = 'persistent', provider = PROVIDER) {
   switch (mode) {
     case 'persistent': {
-      const appDb = await initDB()
       const keyDb = await getKeyDB()
       let saved = null
-      try {
-        await moveLegacyKey({ appDb, keyDb, provider: PROVIDER })
-        saved = await readSavedKey(keyDb, PROVIDER)
-      } catch (err) {
-        // The move failed: the key is still where it was, so read it there.
-        if (import.meta.env.DEV) console.warn('[crypto] Saved key not moved:', err?.message)
-        saved = (await appDb.get('settings', STORAGE_KEY))?.value || null
+      if (provider !== PROVIDER) {
+        saved = await readSavedKey(keyDb, provider)
+      } else {
+        const appDb = await initDB()
+        try {
+          await moveLegacyKey({ appDb, keyDb, provider: PROVIDER })
+          saved = await readSavedKey(keyDb, PROVIDER)
+        } catch (err) {
+          // The move failed: the key is still where it was, so read it there.
+          if (import.meta.env.DEV) console.warn('[crypto] Saved key not moved:', err?.message)
+          saved = (await appDb.get('settings', STORAGE_KEY))?.value || null
+        }
       }
       if (!saved) return null
 
@@ -143,19 +148,32 @@ export async function loadApiKey(mode = 'persistent') {
     }
     default: {
       // Treat any unknown mode (including legacy 'session') as persistent
-      return loadApiKey('persistent')
+      return loadApiKey('persistent', provider)
     }
   }
 }
 
-export async function deleteApiKey() {
+/** Whether a key is saved for a provider, without decrypting it. */
+export async function hasSavedKey(provider = PROVIDER) {
   try {
-    await removeSavedKey(await getKeyDB(), PROVIDER)
+    if (await readSavedKey(await getKeyDB(), provider)) return true
+    // One saved the old way, not yet moved, counts too.
+    return provider === PROVIDER && Boolean((await (await initDB()).get('settings', STORAGE_KEY))?.value)
+  } catch {
+    return false
+  }
+}
+
+export async function deleteApiKey(provider = PROVIDER) {
+  try {
+    await removeSavedKey(await getKeyDB(), provider)
   } catch (err) {
     if (import.meta.env.DEV) {
       console.warn('[crypto] Failed to delete the saved key:', err?.message)
     }
   }
+  // The old places only ever held the first provider's key.
+  if (provider !== PROVIDER) return
   const db = await initDB()
   try {
     await db.delete('settings', STORAGE_KEY)

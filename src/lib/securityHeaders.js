@@ -6,14 +6,18 @@
 // `npm run dev` runs without them: the dev server injects inline scripts for
 // hot reload, which the policy forbids.
 //
-// A new host is added here, and in netlify.toml, only when its provider or
-// source ships (CLAUDE.md, hard constraints).
+// A new host is added only when its provider or source ships (CLAUDE.md,
+// hard constraints): connect-src is generated from the list of providers
+// and sources (src/net/list.js), where an entry is marked as shipped, and
+// netlify.toml must then say the same, which a test checks.
+
+import { connectOrigins } from '../net/list'
 
 export const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline'",
-  "connect-src 'self' https://api.anthropic.com",
+  ["connect-src 'self'", ...connectOrigins()].join(' '),
   "img-src 'self' data:",
   "font-src 'self'",
   "object-src 'none'",
