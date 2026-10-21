@@ -843,7 +843,7 @@ language, reply language), and so are more providers, Mistral included.
 
 ## Part 7. The command layer (added 20 October 2026)
 
-Found while building the parser and the verb registry (stage 3: `src/commands/parse.js`, `verbs.js`, `registry.js`). Every verb in the documents was listed, newest wins, rulings over documents. These are the points the documents leave open (C95 to C107; C108 and C109 are Stefan's own changes). Each is built as suggested, so a ruling either confirms it or changes one entry in `verbs.js`.
+Found while building the parser and the verb registry (stage 3: `src/commands/parse.js`, `verbs.js`, `registry.js`). Every verb in the documents was listed, newest wins, rulings over documents. These are the points the documents leave open (C95 to C107 and C110; C108, C109 and C111 are Stefan's own changes). Each is built as suggested, so a ruling either confirms it or changes one entry in `verbs.js`.
 
 **C95. Board names as verbs.**
 - The bar inventory (7 and 9 October, the newest) lists `alm:`, `lab:`, `sym:` and `library:` as current. The welcome steps teach `alm:` and `library:`.
@@ -901,6 +901,10 @@ Found while building the parser and the verb registry (stage 3: `src/commands/pa
 - **The setting** covers replies in a chat you are watching. Docket runs, started on purpose with `run:` (stage 10), keep going until `stop:`. It reads "Finish replies after I leave a chat", is the person's preference and goes in backups, and has a switch in today's Settings until stage 9.
 - **Ruled 20 October: yes, with those three details.**
 - **Built 20 October** with the chat store (stage 3). Leaving a chat in today's screens stops its reply, unless the setting is on; the reply is marked and the notice shows once at the top of the page landed on, naming the chat by number. A stopped reply's record carries `stopReason: 'left'`, a new optional field on messages, which backups carry and the restore check accepts; older records and older backups are unaffected. The setting `finishRepliesOnLeave` is off by default, travels in backups, and has its switch under Usage & Spending in today's Settings. Docket runs do not exist yet; when they do, they are not covered.
+
+**C110. Which Wikipedia addresses the site may reach.** Wikipedia ships as the first source (stage 4), so its address joins the connection policy, which held only Anthropic. Put to Stefan: every language edition (`https://*.wikipedia.org`), so answers come from the Wikipedia in the person's language, or English only for now. **Ruled 20 October: every language edition** (Stefan asked whether it slows anything; it does not, since the policy is a rule the browser checks and nothing is fetched until a prompt goes to Wikipedia).
+
+**C111. The bar's motion is slower.** **Ruled 20 October by Stefan:** "the animation for the search and command bar is too fast, we need to slow it down a bit". Slowed by half again: a mode's fill wipes in over 420ms (was 280), pills, glyphs and the Enter line fade over 240ms (was 160), the field folds to its circle over 540ms (was 360), the chevron rolls into the moon over 690ms (was 460). The bar decisions asked that frequent motion stay under 400ms; the wipe and the fold now go past that, by Stefan's word. Easy to tune: the tokens and `src/chrome/motion.js` hold every value, and a test keeps them together.
 
 **Also built from the mockups** (no question):
 - `open:` puts a board at the right end and points the bar at it; a board already here gets the bar, a popped one comes forward. No limit on how many; narrow windows stack (stage 14).
