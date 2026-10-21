@@ -147,6 +147,9 @@ Line numbers are approximate.
 - **C114. (b): offered, never automatic.** A reply that stalls is stopped, what arrived is kept and marked, and the Enter line offers to send it again without streaming, naming the cost. Nothing goes without Enter ("i'm fine with lean").
 - **C115. Answers from sources stay distinct unless the person acts on them.** Stefan: "if a user selects multiple sources to reply to a prompt, they should remain distinct and separate unless the user acts upon them." So an answer from Wikipedia is not sent to a model. The person's own prompts still go, and the Enter line says how many answers stay out. Bringing an answer into a prompt is an act on it, designed with branches in stage 8 for every source together. This replaces the first build, which sent such answers as quoted context.
 - **C62, default.** The one request after a chat's first answer is on by default ("that's fine").
+- **C116. Keep as built:** a reply that broke off or stalled spills too. **C117.** The focus ring at half its weight and tone.
+- **R25 approved, with a condition** ("yes ... and let's ensure the prompt bar still retains those features before retiring"). Today's composer, the input box drawn by `input-render.jsx`, is retired only when both hold: today's chat page is replaced by the room in the shell, and the bar in prompt mode carries what the composer holds today: web search, voice input and file attach (R24's "features of input"). Until then it stays exactly as it is. In the shell the room already draws without it.
+- **R32 approved, the rest of it.** The three silent calls were replaced under C62; the three provider methods they called (`generateTitle`, `generateSummary`, `generateTags`) move to `src/deprecated/`, unused.
 
 ## Part 1. Settled by precedence
 

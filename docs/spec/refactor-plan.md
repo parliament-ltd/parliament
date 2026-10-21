@@ -321,7 +321,7 @@ source has to work before the page can.
 - **Salvaged:** `InputArea.jsx`'s feature logic, `fileUpload.js`, the stream parser and error mapping in `anthropic.js`, `networkLog.js`. **Rebuilt:** how a request reaches a provider (13 places read the key and 17 fetch a provider today).
 - **Security and privacy:** a prompt to Wikipedia is a search sent to a third party, so it is named before Enter and never sent while typing. Source requests carry no credentials. Source text is shown as text, never as HTML, and can never run a command. What is sent finally matches what is shown: hidden and deleted messages stop going out. A reply cut off by a limit or an error is marked as cut off. This stage closes audit findings T4 ("Don't save") and T8 (Markdown).
 - **You can try:** in a private window with no key: `>`, `bar:bottom`, `p>` and a question. The answer comes from Wikipedia. Then `name:"…"`.
-- **Needs from you:** nothing new. R25 is put to you here.
+- **Needs from you:** nothing new. R25 is put to you here. **Ruled 21 October:** R25 approved, carried out only once the bar carries the composer's features (with R24); R32 approved.
 
 ### Stage 5. The welcome page
 
@@ -537,14 +537,14 @@ stay readable so every backup ever written still restores.
 | R21 | The layout-swap and apply-room dialogs | `EditorMigrationDialog.jsx`, `EditorApplyRoomDialog.jsx` | The Enter line stating the plan; `duplicate:` | 13 |
 | R22 | Collaboration mode's window and block | `CollabModal.jsx`, `collab-mode*.jsx`, `CollabModeContext` | The `collab:` picker in the field | 7 |
 | R23 | The persona editor inside that window | `CollabModal.jsx` | "Yours" collabs | 7 |
-| R24 | Web search, voice input and file attach as separate blocks | Nine files and three small registries | Features of input | 13 |
-| R25 | The room's own composer on screen | The composer drawn by `input-render.jsx`. `InputArea.jsx`'s logic is kept behind the bar | The bar in prompt mode | 4 |
+| R24 | Web search, voice input and file attach as separate blocks | Nine files and three small registries | Features of input, carried by the bar in prompt mode. R25 waits for this | 13 |
+| R25 | The room's own composer on screen | The composer drawn by `input-render.jsx`. `InputArea.jsx`'s logic is kept behind the bar | The bar in prompt mode. **Approved 21 October, on condition:** only once today's chat page is replaced and the bar carries web search, voice input and file attach (with R24) | 4, carried out with R24 |
 | R26 | The branch panel and its shortcut | `BranchCreationPanel.jsx`, `BranchPanelContext.jsx`, `BranchShortcutHandler.jsx` | `open:` with or without a summary, `again:` | 8 |
 | R27 | The backup status dot and banner | `BackupStatusIndicator.jsx`, `BackupReminderBanner.jsx` | One line of marginalia on the Almanac | 6 |
 | R28 | Settings options that go or do nothing | "Automatic" compression, the theme switch, session usage figures; the budget alert, summary depth and last-backup values, which nothing reads | Removed by the Settings spec. Stored values stay | 9 |
 | R30 | Files nothing uses today | `src/hooks/useMode.js`, `src/components/core/ToolToggles.jsx`, `src/components/core/CitedMarkdown.jsx`, `public/flight_logo.png` | Nothing | any |
 | R31 | Old process documents | `refactor/`, the `continuation-*.md` notes, `.pr-body.md` | An archive, if you want one. Decide what is published before going public | 15 |
-| R32 | The three silent calls after a first answer | `src/stores/ChatContext.jsx`: **done 21 October** under C62's ruling. Still to approve: the three provider methods they called (`generateTitle`, `generateSummary`, `generateTags` in `anthropic.js` and `base.js`), unused since | One named call (C62) | 4 |
+| R32 | The three silent calls after a first answer | `src/stores/ChatContext.jsx`: **done 21 October** under C62's ruling. The three provider methods they called (`generateTitle`, `generateSummary`, `generateTags`): **approved 21 October,** moved to `src/deprecated/` | One named call (C62) | 4 |
 | R33 | The Showcase, the room-source glow and connector lines in the editor | `src/components/editor/` | Nothing | 13 |
 | R34 | Reordering by drag in the stacked-sections layout | `stacked-sections.jsx`, `SectionCard.jsx` | Move up, move down. The layout itself stays | 13 |
 | R35 | The Inter font package | `@fontsource-variable/inter`, shipped and never applied | The system fonts already in use | 15 |
