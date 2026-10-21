@@ -189,3 +189,61 @@
 /* A reply's text, as the bar reference sets it. */
 .ch-reply { font: 400 var(--ch-t-lead)/1.68 var(--ch-serif); color: var(--ch-ink); margin: 10px 0 0; outline: none; caret-color: var(--ch-ink); border-radius: 4px; }
 .ch-reply:focus { box-shadow: 0 0 0 1px rgba(var(--ch-navy), .16); }
+
+/* The bar's holder: moved between its dock and the welcome card without
+   being drawn again, and taking no box of its own, so the dock sticks and
+   docks as it did. */
+.ch-bar-host { display: contents; }
+
+/* The welcome page (stage 5; welcome spec §2 to §4 and §9, welcome v9). One
+   large card almost the size of the screen, the footer below it outside the
+   card, and no board strip. Sizes are v9's; colours are the token sheet's. */
+.ch-shell.on-welcome { --welcome-foot: 40px; height: 100dvh; min-height: 0; overflow: hidden; }
+.ch-shell.on-welcome .ch-stage { min-height: 0; padding: 20px 20px calc(var(--welcome-foot) + 4px); }
+.ch-shell.on-welcome .ch-col { min-height: 0; overflow: auto; }
+.ch-shell.on-welcome.bar-bottom .ch-stage { padding-bottom: calc(var(--welcome-foot) + 96px); }
+.ch-shell.on-welcome .ch-dock.bottom { bottom: var(--welcome-foot); padding-bottom: 6px; }
+.ch-card.ch-welcome { flex: 1; min-height: 0; }
+/* With boards beside it, the card narrows to one column: steps, field,
+   then the letter (welcome spec §5). */
+.ch-shell.on-welcome.many .ch-col:has(.ch-welcome) { flex: 0 0 34%; }
+.ch-shell.on-welcome.many .ch-wgrid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "list" "bar" "letter"; max-width: 520px; }
+.ch-shell.on-welcome.many .ch-letter { margin-top: 26px; }
+.ch-wscroll { flex: 1; overflow: auto; display: flex; flex-direction: column; padding: 32px 28px; }
+.ch-wgrid { width: 100%; max-width: 960px; margin: auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 64px;
+  grid-template-areas: "top ." "list letter" "bar letter"; grid-template-rows: auto auto 1fr; align-items: start; }
+.ch-wh { grid-area: top; display: flex; flex-direction: column; margin: 0; padding: 0 2px; font: 400 16px/1.3 var(--ch-serif); color: var(--ch-ink); }
+.ch-wto { opacity: 0; transition: opacity 1.2s ease .3s; }
+.ch-welcome.finished .ch-wto { opacity: 1; }
+.ch-steps { grid-area: list; list-style: none; margin: 22px 0 0; padding: 0 2px; }
+.ch-steps li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 6px; padding: 2px 0; font: 400 13px/1.6 var(--ch-serif); color: var(--ch-ink); }
+.ch-steps .n { color: var(--ch-ink-3); }
+.ch-steps .t { text-decoration: line-through; text-decoration-color: transparent; transition: text-decoration-color .3s, color .3s; }
+.ch-shell .ch-steps .c { margin-inline-start: 8px; color: var(--ch-ink-3); }
+.ch-shell .ch-steps .c:hover { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+.ch-steps li.done .t { text-decoration-color: var(--ch-ink-3); color: var(--ch-ink-3); }
+.ch-steps li.done .c { opacity: .6; }
+.ch-steps li.next .n { color: var(--ch-ink); }
+.ch-wbar { grid-area: bar; margin-top: 22px; min-width: 0; }
+.ch-letter { grid-area: letter; margin: 22px 2px 0; max-width: 46ch; font: 400 13px/1.7 var(--ch-serif); color: var(--ch-ink-2); transition: opacity .6s; }
+.ch-letter p { margin: 0; }
+.ch-letter p + p { margin-top: 9px; }
+.ch-letter .sig { margin-top: 12px; }
+@media (max-width: 760px) {
+  .ch-wgrid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "list" "bar" "letter"; max-width: 520px; }
+}
+
+/* The field resting in the welcome card: no box, only a faint rule under it
+   (welcome spec §2). It takes its fills in command and prompt mode. */
+.ch-dock.card { position: static; padding: 0; background: transparent; }
+.ch-dock.card .ch-dock-in { max-width: none; margin: 0; }
+.ch-dock.card .ch-frow { justify-content: flex-start; }
+.ch-dock.card .ch-field.search { background: transparent; box-shadow: none; border-radius: 8px; }
+.ch-dock.card .ch-field.search::after { content: ""; position: absolute; inset-inline: 0; bottom: 0; height: 1px; background: rgba(25, 25, 25, .12); }
+.ch-dock.card .ch-field.search:focus-within { box-shadow: 0 0 0 1px var(--ch-focus-ink); }
+
+/* The foot of the welcome page, outside the card (W §9; C123). */
+.ch-foot { position: fixed; inset-inline: 0; bottom: 0; height: var(--welcome-foot, 40px); display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0 5px; padding: 0 16px; }
+.ch-foot .sep { opacity: .4; }
+.ch-shell .ch-foot a { color: inherit; text-decoration: none; }
+.ch-shell .ch-foot a:hover { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }

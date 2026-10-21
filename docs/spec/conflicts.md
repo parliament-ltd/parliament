@@ -987,6 +987,11 @@ Found while splitting stage 5 into pieces. The documents: `welcome-spec-decision
 
 **C123. The footer.** v9: "Created with Claude Code · Open source on GitHub · Looking for other builders", both links placeholders. C71: the repository goes public after the refactor, and until then the footer says "MIT licensed. Source published at launch". **Suggestion:** "Created with Claude Code · MIT licensed. Source published at launch · Looking for other builders", with no link on the second, and the third a mail link to support@parliament.ltd (the one address for now, 12 October) until a page for builders exists.
 
+**C124. What `alm:` does: open the Almanac here, or go to its screen.** C95 (ruled 20 October) kept `alm:`, `lab:`, `library:` and `sym:` "each the same as `open:` for its board", with `sym:` going back to the last room. Stage 4 built `alm:` as a jump to the Almanac's own screen, as the session's design had it, and `sym:` as a jump to the last room's screen. Welcome v9 (W §5) has `alm:`, `library:` and `api:` open on the right of the welcome card, stacked, which is `open:`.
+- **Built for now:** `library:` is the same as `open:library` everywhere (C95). On the welcome page `alm:` opens the Almanac on the right (both readings agree there). Elsewhere `alm:` still goes to the Almanac's screen, as stage 4 built it.
+- **The question:** away from the welcome page, should `alm:` open the Almanac beside what you are looking at (C95 as worded; the Almanac then sits beside a room, for instance), or take you to the Almanac's own screen (as built)? If it opens beside, going back to the Almanac's screen needs another way, which comes with screens (`arrange:`, stage 14).
+- **Suggestion:** `alm:` opens beside, as C95 says, everywhere; `sym:` keeps going to the last room's screen; until screens arrive, `reset:` on a room's screen and `alm:` together give the Almanac back. One entry in `preview.js` changes it.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

@@ -35,7 +35,7 @@ import Reference from './Reference'
 // whether it went ({ refused } or { done }), then once it is answered
 // (done resolves to a notice, or null).
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -49,6 +49,17 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   const win = doc?.defaultView ?? window
 
   useEffect(() => { dispatch({ type: 'surface', resting }) }, [resting])
+
+  // A command written into the field from outside, as a welcome step's when
+  // clicked (stage 5): it waits for Enter.
+  useEffect(() => {
+    if (!write) return
+    dispatch({ type: 'input', value: write.value })
+    input.current?.focus()
+  }, [write])
+
+  // The field's mode, for the welcome page's first step.
+  useEffect(() => { onMode?.(field.mode) }, [field.mode, onMode])
   useEffect(() => { if (autoFocus) input.current?.focus() }, [autoFocus])
 
   // `/` outside text fields, and Cmd/Ctrl+K from anywhere, in this document.
@@ -198,7 +209,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           onBlur={() => dispatch({ type: 'blur' })}
         />
         </div>
-        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} addressed={board} room={room} />
+        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} addressed={board} room={room} welcome={welcome} />
         {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
       </div>
     </div>

@@ -18,11 +18,12 @@ function Parts({ parts }) {
 
 /**
  * @param {{ mode: string, resting: string, empty: boolean, says: { message: string, values?: object }|null, addressed: string,
- *   room?: { chat: number|null, name?: string|null } }} props
+ *   room?: { chat: number|null, name?: string|null }, welcome?: { next: { shows: string }|null }|null }} props
+ *   welcome: set on the welcome page, with its next step (W §2, §6)
  *   room: the room on this screen, its chat's number, or null for an empty
  *   room; left out when the screen has no room. A prompt goes there.
  */
-export default function EnterLine({ mode, resting, empty, says, addressed, room, hidden = false }) {
+export default function EnterLine({ mode, resting, empty, says, addressed, room, welcome = null, hidden = false }) {
   const { i18n } = useLingui()
   const leave = { key: 'leave', text: i18n._(resting === 'prompt' ? COPY.enter.leavePrompt : COPY.enter.leaveSearch) }
   const toRoom = room && (mode === 'prompt' || addressed === 'room')
@@ -41,9 +42,20 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
   const also = (says?.also == null ? [] : [].concat(says.also))
     .map((a) => (typeof a === 'string' ? { message: a } : a))
     .map((a, i) => ({ key: `also${i}`, text: say(i18n, a.message, a.values) }))
-  if (mode === 'command') {
+  if (mode === 'command' && welcome?.next && says?.message === 'empty') {
+    // The welcome page's command line leads with the next step (W §6).
+    parts = [
+      { key: 'next', now: true, text: i18n._(COPY.enter.nextStep, { command: welcome.next.shows }) },
+      { key: 'p', text: i18n._(COPY.enter.restingPrompt) },
+      { key: 'h', text: i18n._(COPY.enter.restingHelp) },
+      leave,
+    ]
+  } else if (mode === 'command') {
     parts = [target, { key: 'does', now: true, text: say(i18n, says.message, says.values) }, ...also]
     parts.push(leave)
+  } else if (mode === 'search' && welcome && empty) {
+    // At rest on the welcome page, one line only (W §2).
+    parts = [{ key: 'begin', now: true, text: i18n._(COPY.enter.toBegin, { leader: '>' }) }]
   } else if (mode === 'search') {
     parts = empty
       ? [
@@ -57,6 +69,8 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
     // Who receives the prompt and what it costs, before Enter (C83).
     parts = [target]
     if (says?.message) parts.push({ key: 'does', now: true, text: say(i18n, says.message, says.values) }, ...also)
+    // On the welcome page, the way to the command line from a prompt (C119).
+    if (welcome) parts.push({ key: 'cmd', text: i18n._(COPY.enter.toCommand, { leader: '>' }) })
     if (resting !== 'prompt') parts.push(leave)
   }
   return (

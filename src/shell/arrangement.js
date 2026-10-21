@@ -16,7 +16,7 @@ import { boardEntry } from './boards'
 /**
  * @typedef {{ board: string, display: number|null, side: 'left'|'right'|null, from: number }} Popped
  * @typedef {{ id: string, columns: string[][], popped: Popped[], addressed: string,
- *   bar: { at: 'top'|'bottom', side: 'left'|'center'|'right', popped: boolean },
+ *   bar: { at: 'top'|'bottom'|'card', side: 'left'|'center'|'right', popped: boolean },
  *   resting: 'search'|'prompt'|null, context: Record<string, string|number> }} Arrangement
  * @typedef {{ message: string, values?: object }} Says
  * @typedef {{ next: Arrangement|null, says: Says }} Plan  next is null when Enter would do nothing
@@ -30,7 +30,9 @@ export const SHIPPED = Object.freeze({
   room: { columns: [['room']], addressed: 'room', bar: 'bottom', resting: null },
   docket: { columns: [['docket']], addressed: 'docket', bar: 'bottom', resting: null },
   settings: { columns: [['settings']], addressed: 'settings', bar: 'top', resting: null },
-  welcome: { columns: [['welcome']], addressed: 'welcome', bar: 'top', resting: null },
+  // The welcome page's field rests in its card, with no box, until bar:bottom
+  // docks it at the foot (welcome spec §2, §5; C43).
+  welcome: { columns: [['welcome']], addressed: 'welcome', bar: 'card', resting: null },
 })
 
 /** Which shipped arrangement an id comes from: 'room:mode_1' comes from 'room'. */
@@ -103,7 +105,11 @@ export function planOpen(a, board) {
   }
   if (isPopped(a, board)) return go({ ...copy(a), addressed: board }, 'openPopped', { board })
   const next = copy(a)
-  next.columns.push([board])
+  // On the welcome page, boards stack in one column on the right of the
+  // card and the chat (welcome spec §5).
+  const last = next.columns[next.columns.length - 1]
+  if (a.id === 'welcome' && next.columns.length > 1 && !last.includes('welcome') && !last.includes('room')) last.push(board)
+  else next.columns.push([board])
   next.addressed = board
   return go(next, 'openBoard', { board })
 }

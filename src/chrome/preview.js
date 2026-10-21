@@ -15,16 +15,45 @@
 // the shell knows: no request is made to find out (C83).
 
 import { enterLine } from '../commands/registry'
-import { plan, ARRANGEMENT_VERBS, NEW_ROOM, roomArrangementId, roomChat } from '../shell/arrangement'
+import { plan, planOpen, ARRANGEMENT_VERBS, NEW_ROOM, roomArrangementId, roomChat } from '../shell/arrangement'
 import { cleanRoomName, ROOM_NAME_MAX } from '../lib/roomNames'
 import { CHARS_PER_TOKEN, inputCost, describeCost } from '../shell/estimate'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
 const SWITCHES = Object.freeze(['alm', 'sym'])
-// Verbs that act on what the bar points at, rather than on the arrangement.
-const ACTS = Object.freeze(['name'])
-export const BUILT = new Set([...ARRANGEMENT_VERBS, ...SWITCHES, ...ACTS])
+// Verbs that act on what the bar points at, rather than on the arrangement,
+// or that go to the welcome page (tour:, A20).
+const ACTS = Object.freeze(['name', 'tour'])
+// Verbs that are the same as open: for their board (C95).
+const OPENS = Object.freeze(['library'])
+export const BUILT = new Set([...ARRANGEMENT_VERBS, ...SWITCHES, ...ACTS, ...OPENS])
+
+// On the welcome page alm: opens the Almanac on the right of the card (W §5)
+// rather than going to the Almanac's own screen (C124, to be ruled), and
+// library: is the same as open:library everywhere (C95).
+function opens(a, step) {
+  if (step.verb === 'library' && !step.match?.values?.length) return planOpen(a, 'library')
+  if (step.verb === 'alm' && a.id === 'welcome') return planOpen(a, 'almanac')
+  return null
+}
+
+/**
+ * tour: shows the welcome page with its steps, from anywhere; tour:off puts
+ * the steps away (A20). tour:advanced, the second list, comes later.
+ * screens.stepsOff says whether the steps are put away now.
+ */
+function planTour(a, step, screens = {}) {
+  const word = step.match?.values?.[0]?.value ?? null
+  if (word === 'advanced') return null
+  if (word === 'off') {
+    if (a.id !== 'welcome' || screens.stepsOff) return { says: { message: 'tourOffAlready' }, act: null }
+    return { says: { message: 'tourOff' }, act: { kind: 'tourOff' } }
+  }
+  if (a.id !== 'welcome') return { says: { message: 'goWelcome' }, go: { id: 'welcome', context: {}, show: true } }
+  if (screens.stepsOff) return { says: { message: 'tourOn' }, act: { kind: 'tourOn' } }
+  return { says: { message: 'tourHere' }, act: null }
+}
 
 // The words of an argument as typed: quoted text without its quotes, or a
 // word as written (the parser lower-cases words).
@@ -93,12 +122,13 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   const acts = answer.steps.filter((s) => ACTS.includes(s.verb))
   if (acts.length) {
     if (answer.steps.length > 1) return { answer, says: { message: 'aloneNow', values: { verb: `${acts[0].verb}:` } }, next: null }
-    const p = planName(arrangement, answer.steps[0], screens)
-    if (!p) return { answer, says: { message: 'later', values: { verb: `${answer.steps[0].verb}:` } }, next: null }
-    return { answer, says: p.says, next: null, act: p.act }
+    const step = answer.steps[0]
+    const p = step.verb === 'tour' ? planTour(arrangement, step, screens) : planName(arrangement, step, screens)
+    if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
+    return { answer, says: p.says, next: null, act: p.act ?? null, go: p.go ?? null }
   }
 
-  const switches = answer.steps.filter((s) => SWITCHES.includes(s.verb))
+  const switches = answer.steps.filter((s) => SWITCHES.includes(s.verb) && !opens(arrangement, s))
   if (switches.length) {
     if (answer.steps.length > 1) return { answer, says: { message: 'aloneSwitch', values: { verb: `${switches[0].verb}:` } }, next: null }
     const p = planSwitch(arrangement, answer.steps[0], screens)
@@ -109,7 +139,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   let a = arrangement
   let last = null
   for (const step of answer.steps) {
-    const p = plan(a, step)
+    const p = opens(a, step) ?? plan(a, step)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
     if (!p.next) return { answer, says: p.says, next: null }
     a = p.next

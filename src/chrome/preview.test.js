@@ -38,7 +38,7 @@ describe('what Enter would do', () => {
   it('says a verb is not built yet, including forms of built verbs that wait for later', () => {
     expect(words('>open:207').text).toBe('open: is not built yet')
     expect(words('>pop:settings keys').text).toBe('pop: is not built yet')
-    expect(words('>tour:').text).toBe('tour: is not built yet')
+    expect(words('>tour:advanced').text).toBe('tour: is not built yet')
   })
 
   it('plans pop:, which opens windows', () => {
@@ -231,5 +231,37 @@ describe('name: for the room (C40)', () => {
     expect(at('>name:"Owls" bar:top').text).toBe('name: runs on a line of its own for now')
     expect(at('>name:207 "New title"').text).toBe('name: is not built yet')
     expect(at('>name:"Q2"', shipped('almanac')).text).toMatch(/not built yet|works on/)
+  })
+})
+
+describe('the welcome page (stage 5)', () => {
+  const welcome = () => shipped('welcome')
+  const at = (value, a = welcome(), screens = {}) => {
+    const p = preview(value, { mode: 'command', arrangement: a, screens })
+    return { ...p, text: say(i18n, p.says.message, p.says.values) }
+  }
+
+  it('rests the field in its card', () => {
+    expect(welcome().bar.at).toBe('card')
+  })
+
+  it('opens the Almanac and the Library on the right of the card (W §5; C95)', () => {
+    const p = at('>alm:')
+    expect(p.go).toBeFalsy()
+    expect(p.next.columns).toEqual([['welcome'], ['almanac']])
+    expect(at('>library:').next.columns).toEqual([['welcome'], ['library']])
+    expect(at('>library:', shipped('almanac')).next.columns).toEqual([['almanac'], ['collection'], ['library']])
+    // Elsewhere alm: still goes to the Almanac's screen, until C124 is ruled.
+    expect(at('>alm:', shipped('room:c1')).go.id).toBe('almanac')
+  })
+
+  it('tour: shows the page and its steps; tour:off puts them away (A20)', () => {
+    const p = at('>tour:', shipped('almanac'))
+    expect(p.text).toBe('Enter shows the welcome page and its steps')
+    expect(p.go).toMatchObject({ id: 'welcome', show: true })
+    expect(at('>tour:').text).toBe('The steps are here already')
+    expect(at('>tour:', welcome(), { stepsOff: true }).act).toEqual({ kind: 'tourOn' })
+    expect(at('>tour:off').act).toEqual({ kind: 'tourOff' })
+    expect(at('>tour:off', welcome(), { stepsOff: true }).text).toBe('The steps are put away already')
   })
 })

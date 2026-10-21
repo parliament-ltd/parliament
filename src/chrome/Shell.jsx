@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLingui } from '@lingui/react'
 import './chrome.css'
 import { COPY } from '../copy'
-import { initDB, getConversation } from '../lib/db'
+import { initDB, getConversation, getSetting, setSetting } from '../lib/db'
 import { renameMode } from '../lib/modes'
 import { loadArrangement, saveArrangement } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
@@ -11,6 +11,7 @@ import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
 import { shipped, address, planOpen, planPopBack, planPopBar, roomChat, roomArrangementId } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
+import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
 import { hasKey, models, metadataModel, destination, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
@@ -26,6 +27,7 @@ import Bar from './Bar'
 import Strip from './Strip'
 import Board from './Board'
 import RoomBoard from './RoomBoard'
+import WelcomeBoard, { WelcomeFoot } from './WelcomeBoard'
 
 // The new shell (refactor-plan.md §4 and stages 3 and 4): the board strip,
 // the boards as the arrangement places them, the bar, and windows of their
@@ -100,6 +102,7 @@ export default function Shell() {
   const [arrangement, setArrangement] = useState(() => shipped(START))
   const [windows, setWindows] = useState({}) // board or 'command' -> { win, container }
   const [lines, setLines] = useState([])
+  const [started, setStarted] = useState(false)
   const current = useRef(arrangement)
   const handles = useRef({})
   const db = useRef(null)
@@ -111,18 +114,51 @@ export default function Shell() {
     if (db.current) saveArrangement(db.current, next).catch(() => {})
   }, [])
 
+  // The welcome page's progress, kept on this device only (C121).
+  const [welcome, setWelcomeState] = useState(freshWelcome)
+  const welcomeRef = useRef(welcome)
+  const updateWelcome = useCallback((change) => {
+    const next = change(welcomeRef.current)
+    if (next === welcomeRef.current) return
+    welcomeRef.current = next
+    setWelcomeState(next)
+    setSetting(WELCOME_SETTING, next).catch(() => {})
+  }, [])
+
   // This device's arrangement and history, once the database is open.
+  // Someone who has made nothing starts on the welcome page; anyone else on
+  // the Almanac (C118).
   useEffect(() => {
     let live = true
     initDB().then(async (handle) => {
       db.current = handle
-      const [kept, history] = await Promise.all([loadArrangement(handle, START), readCommands(handle)])
+      const [chats, history, stored] = await Promise.all([
+        handle.count('conversations'), readCommands(handle), getSetting(WELCOME_SETTING).catch(() => null),
+      ])
+      const start = chats ? START : 'welcome'
+      const kept = await loadArrangement(handle, start)
       if (!live) return
+      welcomeRef.current = cleanWelcome(stored)
+      setWelcomeState(welcomeRef.current)
       if (current.current.id === START) commit(backOnPage(kept))
       setLines(history)
-    }).catch(() => {})
+      setStarted(true)
+    }).catch(() => setStarted(true))
     return () => { live = false }
   }, [commit])
+
+  // Steps the welcome screen shows as done: the bar at the foot, a board in
+  // its own window, the Almanac, the Library, the key panel.
+  useEffect(() => {
+    if (arrangement.id !== 'welcome') return
+    for (const id of stepsShown(arrangement)) updateWelcome((w) => tick(w, id))
+  }, [arrangement, updateWelcome])
+  const onMode = useCallback((mode) => { if (mode === 'command') updateWelcome((w) => tick(w, 'command')) }, [updateWelcome])
+
+  // A step's command, clicked, is written into the field.
+  const [write, setWrite] = useState(null)
+  const writes = useRef(0)
+  const writeField = useCallback((value) => setWrite({ value, n: ++writes.current }), [])
 
   // Leaving the page closes every window it opened.
   useEffect(() => {
@@ -187,23 +223,33 @@ export default function Shell() {
     const back = backOnPage(kept)
     const next = { ...back, bar: { ...back.bar, popped: from.bar.popped } }
     if (waiting.current && roomArrangementId(waiting.current.chatId) !== go.id) { waiting.current.drop(); waiting.current = null }
+    if (go.show) updateWelcome((w) => showSteps(w, true))
     return run(next, body)
-  }, [run])
+  }, [run, updateWelcome])
 
   // name: (C40): the room's own name, kept on the room record. The room
   // board then reads its room again.
   const [roomRev, setRoomRev] = useState(0)
   const [roomNameOf, setRoomNameOf] = useState(null) // { chatId, value }: what the room on screen is called
   const onRoomName = useCallback((chatId, value) => setRoomNameOf({ chatId, value }), [])
+  const remember = useCallback((body) => {
+    if (db.current && body) keepCommand(db.current, body).then((kept) => (kept ? readCommands(db.current).then(setLines) : null)).catch(() => {})
+  }, [])
   const act = useCallback(async (what, body) => {
+    if (what.kind === 'tourOn' || what.kind === 'tourOff') {
+      updateWelcome((w) => showSteps(w, what.kind === 'tourOn'))
+      remember(body)
+      return null
+    }
     if (what.kind !== 'nameRoom') return 'later'
     const chat = await getConversation(what.chatId).catch(() => null)
     const saved = chat?.room ? await renameMode(chat.room, what.name).catch(() => null) : null
     if (!saved) return 'nameFailed'
     setRoomRev((n) => n + 1)
-    if (db.current && body) keepCommand(db.current, body).then((kept) => (kept ? readCommands(db.current).then(setLines) : null)).catch(() => {})
+    updateWelcome((w) => tick(w, 'name'))
+    remember(body)
     return null
-  }, [])
+  }, [remember, updateWelcome])
 
   const onRun = useCallback((next, body, go, what) => (what ? act(what, body) : go ? switchTo(go, body) : run(next, body)), [act, run, switchTo])
 
@@ -250,7 +296,7 @@ export default function Shell() {
     return latestChat ? { id: latestChat.id, num: latestChat.num ?? null } : null
   }, [conversations])
   const roomNameHere = roomId && roomNameOf?.chatId === roomId ? roomNameOf.value : null
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere }), [lastRoom, roomNameHere])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off }), [lastRoom, roomNameHere, welcome.off])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -320,6 +366,7 @@ export default function Shell() {
       return { done }
     }
     setStalledIn((was) => (was === chatId ? null : was))
+    updateWelcome((w) => tick(w, 'ask'))
 
     let id = chatId
     if (!id) {
@@ -356,7 +403,7 @@ export default function Shell() {
         return failure(err)
       })
     return { done }
-  }, [askSource, createConversation, loadConversations, resendWhole, sendMessage, switchTo])
+  }, [askSource, createConversation, loadConversations, resendWhole, sendMessage, switchTo, updateWelcome])
 
   function pickBoard(board) {
     const a = current.current
@@ -373,17 +420,47 @@ export default function Shell() {
   const focusBoard = (board) => { if (board !== current.current.addressed) commit(address(current.current, board)) }
   const bar = arrangement.bar
   const barWindow = windows[BAR]
-  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop }
-  const drawBoard = (board) => (board === 'room' && roomId !== undefined
-    ? <RoomBoard key={`room:${roomId ?? 'new'}`} chatId={roomId} rev={roomRev} addressed={arrangement.addressed === 'room'} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} />
-    : <Board key={board} board={board} addressed={arrangement.addressed === board} onAddress={focusBoard} />)
+  const onWelcome = arrangement.id === 'welcome'
+  const welcomeHint = useMemo(() => (onWelcome && !welcome.finished ? { next: nextStep(welcome) } : null), [onWelcome, welcome])
+  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint }
+  const drawBoard = (board) => {
+    if (board === 'room' && roomId !== undefined) {
+      return <RoomBoard key={`room:${roomId ?? 'new'}`} chatId={roomId} rev={roomRev} addressed={arrangement.addressed === 'room'} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} />
+    }
+    if (board === 'welcome') {
+      return <WelcomeBoard key="welcome" welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} />
+    }
+    return <Board key={board} board={board} addressed={arrangement.addressed === board} onAddress={focusBoard} />
+  }
+
+  // The bar is drawn once, into a holder moved between its dock and, on the
+  // welcome page at rest, the welcome card (welcome spec §2). Moving the
+  // holder keeps what is typed and where the caret was.
+  const [barHost] = useState(() => Object.assign(document.createElement('div'), { className: 'ch-bar-host' }))
+  const [cardSlot, setCardSlot] = useState(null)
+  const dockSlot = useRef(null)
+  const inCard = onWelcome && bar.at === 'card' && Boolean(cardSlot)
+  useLayoutEffect(() => {
+    const target = inCard ? cardSlot : dockSlot.current
+    if (!target || barHost.parentNode === target) return
+    const active = barHost.ownerDocument.activeElement
+    const had = barHost.contains(active)
+    target.appendChild(barHost)
+    if (had) active.focus()
+  }, [inCard, cardSlot, barHost, started])
+
+  if (!started) return <div className="ch-shell" />
 
   return (
-    <div className={`ch-shell bar-${bar.at}`}>
-      <Strip arrangement={arrangement} onPick={pickBoard} />
-      {/* One bar in one place, moved by its class, so moving it never loses
-          the field's focus or what is typed. */}
-      {!barWindow && <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} />}
+    <div className={`ch-shell bar-${bar.at}${onWelcome ? ` on-welcome${arrangement.columns.length > 1 ? ' many' : ''}` : ''}`}>
+      {!onWelcome && <Strip arrangement={arrangement} onPick={pickBoard} />}
+      {/* One bar in one place, moved by its class or its holder, so moving
+          it never loses the field's focus or what is typed. */}
+      <div ref={dockSlot} className="ch-bar-host" />
+      {!barWindow && createPortal(
+        <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} />,
+        barHost,
+      )}
       {barWindow && <p className="ch-away ch-marg">{i18n._(COPY.shell.barAway)}</p>}
       <main className="ch-stage">
         {arrangement.columns.map((column) => (
@@ -394,7 +471,7 @@ export default function Shell() {
       </main>
       {barWindow && createPortal(
         <div className="ch-shell ch-in-window">
-          <Bar {...shared} board={arrangement.addressed} doc={barWindow.win.document} className="ch-dock window" autoFocus />
+          <Bar {...shared} board={arrangement.addressed} doc={barWindow.win.document} className="ch-dock window" autoFocus write={write} onMode={onMode} />
         </div>,
         barWindow.container,
       )}
@@ -410,6 +487,7 @@ export default function Shell() {
         windows[p.board].container,
         p.board,
       ))}
+      {onWelcome && <WelcomeFoot />}
     </div>
   )
 }

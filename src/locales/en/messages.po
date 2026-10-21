@@ -216,6 +216,10 @@ msgid "enter.goRoom"
 msgstr "Enter goes back to the last room"
 
 #. js-lingui-explicit-id
+msgid "enter.goWelcome"
+msgstr "Enter shows the welcome page and its steps"
+
+#. js-lingui-explicit-id
 msgid "enter.help"
 msgstr "Enter shows every command that works here"
 
@@ -285,6 +289,11 @@ msgstr "This room has that name already"
 #. js-lingui-explicit-id
 msgid "enter.newRoomHere"
 msgstr "This room is empty. Its first prompt starts it"
+
+#. The next welcome step's command, which stays English
+#. js-lingui-explicit-id
+msgid "enter.nextStep"
+msgstr "next: {command}"
 
 #. js-lingui-explicit-id
 msgid "enter.noMinus"
@@ -544,9 +553,35 @@ msgstr "→ {chat} in {room}"
 msgid "enter.targetNewRoom"
 msgstr "→ a new room"
 
+#. {leader} is >, the command leader
+#. js-lingui-explicit-id
+msgid "enter.toBegin"
+msgstr "{leader} to begin"
+
+#. In prompt mode on the welcome page (C119)
+#. js-lingui-explicit-id
+msgid "enter.toCommand"
+msgstr "{leader} for the command line"
+
 #. js-lingui-explicit-id
 msgid "enter.tooMany"
 msgstr "Too many requests for now. Wait a moment, then send again"
+
+#. js-lingui-explicit-id
+msgid "enter.tourHere"
+msgstr "The steps are here already"
+
+#. js-lingui-explicit-id
+msgid "enter.tourOff"
+msgstr "Enter puts the steps away. tour: brings them back"
+
+#. js-lingui-explicit-id
+msgid "enter.tourOffAlready"
+msgstr "The steps are put away already"
+
+#. js-lingui-explicit-id
+msgid "enter.tourOn"
+msgstr "Enter shows the steps again"
 
 #. js-lingui-explicit-id
 msgid "enter.unknown"
@@ -1131,3 +1166,88 @@ msgstr "Remove a tag from some things, or from everything"
 #. js-lingui-explicit-id
 msgid "verb.until"
 msgstr "Show what was made until a date"
+
+#. js-lingui-explicit-id
+msgid "welcome.foot.builders"
+msgstr "Looking for other builders"
+
+#. Until the repository is public (C71, C123)
+#. js-lingui-explicit-id
+msgid "welcome.foot.licence"
+msgstr "MIT licensed. Source published at launch"
+
+#. js-lingui-explicit-id
+msgid "welcome.foot.made"
+msgstr "Created with Claude Code"
+
+#. js-lingui-explicit-id
+msgid "welcome.heading"
+msgstr "Welcome"
+
+#. The heading finishes its sentence when the steps are done: Welcome / to Parliament
+#. js-lingui-explicit-id
+msgid "welcome.headingTo"
+msgstr "to Parliament"
+
+#. js-lingui-explicit-id
+msgid "welcome.letter.1"
+msgstr "Parliament is a place to work with AI on your own terms. It is early, and still being built."
+
+#. js-lingui-explicit-id
+msgid "welcome.letter.2"
+msgstr "It runs in your browser, with no servers and no accounts. Your chats and keys stay on this computer, and each request goes straight to the provider you pick, to a model running on your own machine, or just Wikipedia. There are no ads."
+
+#. js-lingui-explicit-id
+msgid "welcome.letter.3"
+msgstr "With the goal of rethinking how we interact with AI, it is yours to shape. Rooms are built from blocks, layouts and themes. You create the space, you choose how to interact."
+
+#. js-lingui-explicit-id
+msgid "welcome.letter.4"
+msgstr "Most AI apps are built for passive consumption. You ask something, you receive a response. Here you steer from a command line: branch chats, highlight, add and combine notes across chats, plan a run of prompts, and more. Let's take back control."
+
+#. The letter is signed with this name after a dash
+#. js-lingui-explicit-id
+msgid "welcome.signature"
+msgstr "So Lov"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.almanac"
+msgstr "See what you have made"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.ask"
+msgstr "Ask something"
+
+#. {command} is p>, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.askHow"
+msgstr "{command} and a question"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.bar"
+msgstr "Move the bar to the bottom"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.command"
+msgstr "Open the command line"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.key"
+msgstr "Add an AI API key"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.library"
+msgstr "Browse tools to add and customize"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.name"
+msgstr "Name the room"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.pop"
+msgstr "Move it to another monitor"
+
+#. The name of the list of steps, read by screen readers
+#. js-lingui-explicit-id
+msgid "welcome.steps"
+msgstr "Eight things to try"

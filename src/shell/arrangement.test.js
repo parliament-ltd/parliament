@@ -101,6 +101,18 @@ describe('open:', () => {
   })
 })
 
+describe('open: on the welcome page (stage 5)', () => {
+  it('stacks boards in one column on the right of the card (W §5)', () => {
+    const a = keep(planOpen(shipped('welcome'), 'almanac'))
+    expect(a.columns).toEqual([['welcome'], ['almanac']])
+    const b = keep(planOpen(a, 'library'))
+    expect(b.columns).toEqual([['welcome'], ['almanac', 'library']])
+    expect(b.addressed).toBe('library')
+    const withChat = { ...shipped('welcome'), columns: [['welcome'], ['room']] }
+    expect(keep(planOpen(withChat, 'almanac')).columns).toEqual([['welcome'], ['room'], ['almanac']])
+  })
+})
+
 describe('close:', () => {
   it('takes the addressed board off the screen, and the bar goes to the one before', () => {
     const a = address(keep(planOpen(almanac(), 'library')), 'library')

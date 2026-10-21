@@ -216,6 +216,10 @@ msgid "enter.goRoom"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.goWelcome"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.help"
 msgstr ""
 
@@ -284,6 +288,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomHere"
+msgstr ""
+
+#. The next welcome step's command, which stays English
+#. js-lingui-explicit-id
+msgid "enter.nextStep"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -544,8 +553,34 @@ msgstr ""
 msgid "enter.targetNewRoom"
 msgstr ""
 
+#. {leader} is >, the command leader
+#. js-lingui-explicit-id
+msgid "enter.toBegin"
+msgstr ""
+
+#. In prompt mode on the welcome page (C119)
+#. js-lingui-explicit-id
+msgid "enter.toCommand"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.tooMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tourHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tourOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tourOffAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tourOn"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1130,4 +1165,89 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.until"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.foot.builders"
+msgstr ""
+
+#. Until the repository is public (C71, C123)
+#. js-lingui-explicit-id
+msgid "welcome.foot.licence"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.foot.made"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.heading"
+msgstr ""
+
+#. The heading finishes its sentence when the steps are done: Welcome / to Parliament
+#. js-lingui-explicit-id
+msgid "welcome.headingTo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.letter.1"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.letter.2"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.letter.3"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.letter.4"
+msgstr ""
+
+#. The letter is signed with this name after a dash
+#. js-lingui-explicit-id
+msgid "welcome.signature"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.almanac"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.ask"
+msgstr ""
+
+#. {command} is p>, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.askHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.bar"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.command"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.key"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.library"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.name"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.pop"
+msgstr ""
+
+#. The name of the list of steps, read by screen readers
+#. js-lingui-explicit-id
+msgid "welcome.steps"
 msgstr ""

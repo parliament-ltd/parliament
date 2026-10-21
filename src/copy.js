@@ -151,6 +151,17 @@ export const COPY = {
     restingCommand: /*i18n*/ { id: 'enter.restingCommand', message: 'type > for the command line', comment: 'The Enter line in search mode, before anything is typed' },
     restingPrompt: /*i18n*/ { id: 'enter.restingPrompt', message: 'p> for a prompt' },
     restingHelp: /*i18n*/ { id: 'enter.restingHelp', message: '? every command' },
+    // tour: and tour:off (A20).
+    goWelcome: /*i18n*/ { id: 'enter.goWelcome', message: 'Enter shows the welcome page and its steps' },
+    tourOn: /*i18n*/ { id: 'enter.tourOn', message: 'Enter shows the steps again' },
+    tourHere: /*i18n*/ { id: 'enter.tourHere', message: 'The steps are here already' },
+    tourOff: /*i18n*/ { id: 'enter.tourOff', message: 'Enter puts the steps away. tour: brings them back' },
+    tourOffAlready: /*i18n*/ { id: 'enter.tourOffAlready', message: 'The steps are put away already' },
+    // On the welcome page (W §2, §6): the one line at rest, and the next
+    // step's command leading the command line's.
+    toBegin: /*i18n*/ { id: 'enter.toBegin', message: '{leader} to begin', comment: '{leader} is >, the command leader' },
+    nextStep: /*i18n*/ { id: 'enter.nextStep', message: 'next: {command}', comment: 'The next welcome step\'s command, which stays English' },
+    toCommand: /*i18n*/ { id: 'enter.toCommand', message: '{leader} for the command line', comment: 'In prompt mode on the welcome page (C119)' },
     searchLater: /*i18n*/ { id: 'enter.searchLater', message: 'Search is not built yet' },
     // Going to another screen: alm: and sym: (C95, C102).
     goAlmanac: /*i18n*/ { id: 'enter.goAlmanac', message: 'Enter goes to {board}', comment: '{board} is the Almanac, from COPY.boards' },
@@ -237,6 +248,41 @@ export const COPY = {
   field: {
     answeredFrom: /*i18n*/ { id: 'field.answeredFrom', message: 'answered from {source}' },
     answeredBy: /*i18n*/ { id: 'field.answeredBy', message: 'answered by {model}' },
+  },
+
+  // The welcome page (stage 5; welcome spec, welcome v9). The letter is v9's,
+  // for Stefan to edit here (C122). The signature's dash is drawn by the
+  // page: the one em dash, a deliberate exception (W §3).
+  welcome: {
+    heading: /*i18n*/ { id: 'welcome.heading', message: 'Welcome' },
+    headingTo: /*i18n*/ { id: 'welcome.headingTo', message: 'to Parliament', comment: 'The heading finishes its sentence when the steps are done: Welcome / to Parliament' },
+    steps: /*i18n*/ { id: 'welcome.steps', message: 'Eight things to try', comment: 'The name of the list of steps, read by screen readers' },
+    stepCommand: /*i18n*/ { id: 'welcome.step.command', message: 'Open the command line' },
+    stepBar: /*i18n*/ { id: 'welcome.step.bar', message: 'Move the bar to the bottom' },
+    stepAsk: /*i18n*/ { id: 'welcome.step.ask', message: 'Ask something' },
+    stepAskHow: /*i18n*/ { id: 'welcome.step.askHow', message: '{command} and a question', comment: '{command} is p>, which stays English' },
+    stepAlmanac: /*i18n*/ { id: 'welcome.step.almanac', message: 'See what you have made' },
+    stepName: /*i18n*/ { id: 'welcome.step.name', message: 'Name the room' },
+    stepPop: /*i18n*/ { id: 'welcome.step.pop', message: 'Move it to another monitor' },
+    stepLibrary: /*i18n*/ { id: 'welcome.step.library', message: 'Browse tools to add and customize' },
+    stepKey: /*i18n*/ { id: 'welcome.step.key', message: 'Add an AI API key' },
+    letter1: /*i18n*/ { id: 'welcome.letter.1', message: 'Parliament is a place to work with AI on your own terms. It is early, and still being built.' },
+    letter2: /*i18n*/ {
+      id: 'welcome.letter.2',
+      message: 'It runs in your browser, with no servers and no accounts. Your chats and keys stay on this computer, and each request goes straight to the provider you pick, to a model running on your own machine, or just Wikipedia. There are no ads.',
+    },
+    letter3: /*i18n*/ {
+      id: 'welcome.letter.3',
+      message: 'With the goal of rethinking how we interact with AI, it is yours to shape. Rooms are built from blocks, layouts and themes. You create the space, you choose how to interact.',
+    },
+    letter4: /*i18n*/ {
+      id: 'welcome.letter.4',
+      message: 'Most AI apps are built for passive consumption. You ask something, you receive a response. Here you steer from a command line: branch chats, highlight, add and combine notes across chats, plan a run of prompts, and more. Let\'s take back control.',
+    },
+    signature: /*i18n*/ { id: 'welcome.signature', message: 'So Lov', comment: 'The letter is signed with this name after a dash' },
+    footMade: /*i18n*/ { id: 'welcome.foot.made', message: 'Created with Claude Code' },
+    footLicence: /*i18n*/ { id: 'welcome.foot.licence', message: 'MIT licensed. Source published at launch', comment: 'Until the repository is public (C71, C123)' },
+    footBuilders: /*i18n*/ { id: 'welcome.foot.builders', message: 'Looking for other builders' },
   },
 
   // The built-in rooms' names, shown until a room's owner names it (C90).
