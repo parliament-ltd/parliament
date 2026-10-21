@@ -1,8 +1,8 @@
 /*
-  Parliament chrome tokens. A proposal for Stefan's approval (refactor-plan.md,
-  stage 3; C51), drafted 20 October 2026. Not loaded by the app yet: only the
-  review page at /dev/tokens uses it. docs/spec/token-sheet.md gives each
-  value's source and contrast.
+  Parliament chrome tokens (refactor-plan.md, stage 3; C51), drafted and
+  approved "for now" on 20 October 2026. Loaded with the new chrome and drawn
+  at /dev/tokens. docs/spec/token-sheet.md gives each value's source and
+  contrast.
 
   Rule (C51, A1): the newest mockup that defines a value wins. That is the bar
   reference (9 October) where it defines one, then the editing spec's

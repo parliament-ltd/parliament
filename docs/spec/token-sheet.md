@@ -1,9 +1,10 @@
 # Token sheet
 
 Drafted 20 October 2026 for Stefan's approval (refactor-plan.md, stage 3;
-C51). One set of colours, type, shapes and motion for the new chrome, settled
-before any chrome is drawn. The values are in `src/styles/tokens.css`, not yet
-loaded by the app, and drawn at `/dev/tokens` in development.
+C51), and **approved by him the same day, "for now"**: chrome is drawn from
+it, and values can still change. One set of colours, type, shapes and motion for the new chrome, settled
+before any chrome is drawn. The values are in `src/styles/tokens.css`, loaded with the new
+chrome, and drawn at `/dev/tokens` in development.
 
 **Rule** (C51, A1): the newest mockup that defines a value wins. That is the
 bar reference (`parliament-bar-reference.html`, 9 October) where it defines
