@@ -898,6 +898,7 @@ Found while building the parser and the verb registry (stage 3: `src/commands/pa
 - **The notice** is on the reply ("Stopped when you left the chat. What arrived is kept.") and once on the page you land on ("The reply in 207 stopped when you left it."), saying that the tokens already written are still charged.
 - **The setting** covers replies in a chat you are watching. Docket runs, started on purpose with `run:` (stage 10), keep going until `stop:`. It reads "Finish replies after I leave a chat", is the person's preference and goes in backups, and has a switch in today's Settings until stage 9.
 - **Ruled 20 October: yes, with those three details.**
+- **Built 20 October** with the chat store (stage 3). Leaving a chat in today's screens stops its reply, unless the setting is on; the reply is marked and the notice shows once at the top of the page landed on, naming the chat by number. A stopped reply's record carries `stopReason: 'left'`, a new optional field on messages, which backups carry and the restore check accepts; older records and older backups are unaffected. The setting `finishRepliesOnLeave` is off by default, travels in backups, and has its switch under Usage & Spending in today's Settings. Docket runs do not exist yet; when they do, they are not covered.
 
 **Also built from the mockups** (no question):
 - `open:` puts a board at the right end and points the bar at it; a board already here gets the bar, a popped one comes forward. No limit on how many; narrow windows stack (stage 14).
