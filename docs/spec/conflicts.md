@@ -943,7 +943,7 @@ Found while building stage 4, pieces 4 and 5 (a room in the shell; sending by co
 - **(b) Offered:** after a stall (nothing at all for a set time, such as 30 seconds, when the provider otherwise sends a sign of life every few seconds), stop the stream, keep what arrived, and mark the reply cut off. The Enter line then offers "Enter sends it again without streaming, about N tokens, $X". Nothing goes without Enter.
 - **(c) Remembered:** as (b), and when a reply on this device comes in all at once at the end (the sign of a network that holds streams), later sends on this device go without streaming, saying so on the Enter line. No extra request.
 - **Suggestion:** (b) now, and (c) once there is a device on such a network to try it on.
-- **Ruled 21 October: (b).** (c) waits until there is a device on such a network to try it on.
+- **Ruled 21 October: (b).** (c) waits until there is a device on such a network to try it on. **Built 21 October:** silence of 45 seconds counts as a stall (kept generous, since a stall leads to a second send); the reply keeps its place, marked; with nothing typed, the Enter line offers "Enter sends it again without streaming, about N tokens, $X to send".
 
 **C115. What a model sees of an answer from a source.** A chat can now hold answers from Wikipedia (keyless prompts) followed by prompts to a model (once a key is added). Sent as they were, those answers went to the model as its own earlier replies: the model would take Wikipedia's words as things it had said.
 - **First built:** an answer from a source went on the person's side, introduced by a line naming where it came from, so the model read it as quoted context.
