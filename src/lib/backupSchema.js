@@ -16,7 +16,7 @@ export const FIELDS = Object.freeze({
   conversations: ['id', 'title', 'model', 'parentId', 'parentTitle', 'branchPoint', 'familyId', 'createdInMode', 'room',
     'pinned', 'storageBytes', 'createdAt', 'updatedAt', 'tags', 'tagsBy', 'aiSummary',
     'num', 'docketId', 'branch', 'run', 'restoredFrom'],
-  messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta', 'stopReason'],
+  messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta', 'stopReason', 'source'],
   notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom'],
   highlights: ['id', 'conversationId', 'messageId', 'text', 'color', 'createdAt', 'num', 'kind', 'pinned', 'tags', 'restoredFrom'],
   favorites: ['id', 'conversationId', 'messageId', 'createdAt'],

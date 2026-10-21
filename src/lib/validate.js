@@ -45,6 +45,17 @@ function validateConversation(item) {
   return null
 }
 
+// Where an answer from a source came from: short strings only, links to https.
+function isSourceNote(s) {
+  if (typeof s !== 'object' || Array.isArray(s)) return false
+  const text = (v, max) => v == null || (typeof v === 'string' && v.length <= max)
+  const link = (v) => v == null || (typeof v === 'string' && v.length <= 2000 && v.startsWith('https://'))
+  return typeof s.id === 'string' && /^[a-z]{1,40}$/.test(s.id)
+    && text(s.name, 100) && text(s.title, 300) && link(s.url) && text(s.revision, 40) && text(s.revisedAt, 40) && text(s.lang, 10)
+    && (s.found == null || typeof s.found === 'boolean')
+    && (s.licence == null || (typeof s.licence === 'object' && text(s.licence.name, 100) && link(s.licence.url)))
+}
+
 function validateMessage(item) {
   if (!isId(item.id))                          return 'message.id invalid'
   if (!isId(item.conversationId))              return 'message.conversationId invalid'
@@ -55,6 +66,8 @@ function validateMessage(item) {
   if (!isISODate(item.createdAt))              return 'message.createdAt invalid date'
   // C109: a reply stopped because its chat was left says so.
   if (item.stopReason != null && item.stopReason !== 'left') return 'message.stopReason invalid'
+  // Stage 4: an answer from a source says where it came from.
+  if (item.source != null && !isSourceNote(item.source)) return 'message.source invalid'
   return null
 }
 

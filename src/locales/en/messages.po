@@ -61,6 +61,10 @@ msgid "board.welcome"
 msgstr "Welcome page"
 
 #. js-lingui-explicit-id
+msgid "chat.answeredFrom"
+msgstr "Answered from {source}"
+
+#. js-lingui-explicit-id
 msgid "chat.close"
 msgstr "Close"
 
@@ -71,6 +75,14 @@ msgstr "Finish replies after I leave a chat"
 #. js-lingui-explicit-id
 msgid "chat.finishSettingHelp"
 msgstr "Off: when you leave a chat while a reply is being written, the reply stops and what arrived is kept. On: it finishes in the background and is saved to its chat."
+
+#. js-lingui-explicit-id
+msgid "chat.sourceNothing"
+msgstr "Nothing found on {source} for that. Try other words."
+
+#. js-lingui-explicit-id
+msgid "chat.sourceRevision"
+msgstr "revision {revision}"
 
 #. {chat} is the chat's number, or its title in quotation marks
 #. js-lingui-explicit-id

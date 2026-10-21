@@ -10,6 +10,8 @@ import {
 import { SPRING_SNAPPY, SPRING_GENTLE, DUSTY_GOLD, HIGHLIGHT_COLORS } from '../../lib/constants'
 import { indexOfWord } from '../../lib/textUtils'
 import { stripAttachedFileBlocks, formatSize } from '../../lib/fileUpload'
+import { useLingui } from '@lingui/react'
+import { COPY } from '../../copy'
 import CitationLink from './CitationLink'
 import ChartRenderer from './ChartRenderer'
 
@@ -35,6 +37,7 @@ export default function MessageCard({
   id, type, content, number, index = 0,
   isGhostText = false,
   stoppedNote = null, // why a cut-off reply stopped, when it was left (C109)
+  source = null, // where an answer from a source came from (stage 4)
   isFavorited = false, showNotes = false,
   savedNoteText = '',
   highlights = [],
@@ -124,6 +127,12 @@ export default function MessageCard({
 
   const renderContent = useMemo(() => {
     if (!displayContent) return null
+
+    // An answer from a source is plain text and is shown as text: never as
+    // HTML, and not read as Markdown either (stage 4).
+    if (source) {
+      return <p className="parliament-md text-[15px] whitespace-pre-wrap" dir="auto">{displayContent}</p>
+    }
 
     function highlightString(text) {
       const ranges = []
@@ -221,7 +230,7 @@ export default function MessageCard({
         </ReactMarkdown>
       </div>
     )
-  }, [id, displayContent, highlightTerms])
+  }, [id, displayContent, highlightTerms, source])
 
   return (
     <motion.div
@@ -419,6 +428,10 @@ export default function MessageCard({
         <p className="mt-2 text-xs italic text-[var(--p-text-secondary)]">{stoppedNote}</p>
       )}
 
+      {/* Where an answer from a source came from: the page, its revision and
+          its licence (stage 4). Words come from the copy table. */}
+      {source && <SourceLine source={source} />}
+
       {/* Ghost text continue button */}
       {isGhostText && content && onContinue && (
         <motion.button
@@ -435,6 +448,30 @@ export default function MessageCard({
 }
 
 /* ── Internal sub-components ────────────────────────────── */
+
+// "Answered from Wikipedia · Barn owl · revision 1381083335 · CC BY-SA 4.0",
+// each part a link where it has one; or that nothing was found (stage 4).
+function SourceLine({ source }) {
+  const { i18n } = useLingui()
+  const name = source.name || source.id
+  if (source.found === false) {
+    return <p className="mt-2 text-xs italic text-[var(--p-text-secondary)]">{i18n._(COPY.chat.sourceNothing, { source: name })}</p>
+  }
+  const link = (href, text) => (href && /^https:\/\//.test(href)
+    ? <a href={href} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{text}</a>
+    : <span>{text}</span>)
+  const parts = [
+    <span key="from">{i18n._(COPY.chat.answeredFrom, { source: name })}</span>,
+    source.title && <span key="title">{link(source.url, source.title)}</span>,
+    source.revision && <span key="rev">{i18n._(COPY.chat.sourceRevision, { revision: source.revision })}</span>,
+    source.licence?.name && <span key="lic">{link(source.licence.url, source.licence.name)}</span>,
+  ].filter(Boolean)
+  return (
+    <p className="mt-2 text-xs italic text-[var(--p-text-secondary)] flex flex-wrap gap-x-1.5">
+      {parts.flatMap((p, i) => (i ? [<span key={`s${i}`} aria-hidden="true">·</span>, p] : [p]))}
+    </p>
+  )
+}
 
 function MsgIconButton({ onClick, children, active = false, title }) {
   return (

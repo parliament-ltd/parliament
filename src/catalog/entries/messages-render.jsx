@@ -338,6 +338,7 @@ export default function MessagesRender() {
         index={idx}
         isGhostText={isGhost}
         stoppedNote={isGhost && msg.stopReason === 'left' ? i18n._(COPY.chat.stoppedOnReply) : null}
+        source={msg.source ?? null}
         isFavorited={isFav}
         showNotes={showNotes.has(msg.id)}
         savedNoteText={noteRecord?.text || ''}

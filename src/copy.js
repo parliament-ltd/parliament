@@ -187,6 +187,10 @@ export const COPY = {
     },
     stoppedNoticeEmpty: /*i18n*/ { id: 'chat.stoppedNoticeEmpty', message: 'The reply in {chat} stopped when you left it, before any of it arrived.' },
     close: /*i18n*/ { id: 'chat.close', message: 'Close' },
+    // An answer from a source (stage 4). {source} is its name, from the list.
+    answeredFrom: /*i18n*/ { id: 'chat.answeredFrom', message: 'Answered from {source}' },
+    sourceRevision: /*i18n*/ { id: 'chat.sourceRevision', message: 'revision {revision}' },
+    sourceNothing: /*i18n*/ { id: 'chat.sourceNothing', message: 'Nothing found on {source} for that. Try other words.' },
     finishSetting: /*i18n*/ { id: 'chat.finishSetting', message: 'Finish replies after I leave a chat' },
     finishSettingHelp: /*i18n*/ {
       id: 'chat.finishSettingHelp',
