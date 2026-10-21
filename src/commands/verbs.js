@@ -78,13 +78,13 @@ const v = (entry) => Object.freeze({ forms: null, rest: false, minus: false, on:
 export const VERBS = Object.freeze([
   // Go to
   v({ verb: 'alm', group: 'go', example: 'alm:', takes: [[]], stage: 5, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.alm', message: 'Go to the Almanac, the same as open:almanac' } }),
+    gloss: /*i18n*/ { id: 'verb.alm', message: 'Bring the Almanac and the Collection beside what is on screen' } }),
   v({ verb: 'library', group: 'go', example: 'library:', forms: ['library:', 'library:themes'], takes: [[], ['word']], stage: 5, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.library', message: 'Go to the Library, or to one shelf of it' } }),
+    gloss: /*i18n*/ { id: 'verb.library', message: 'Bring the Library beside what is on screen, or one shelf of it' } }),
   v({ verb: 'lab', group: 'go', example: 'lab:', takes: [[]], stage: 13, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.lab', message: 'Go to the Lab, where rooms are built' } }),
   v({ verb: 'sym', group: 'go', example: 'sym:', takes: [[], ['text']], stage: 4, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.sym', message: 'Go back to the last room, or to a room by name' } }),
+    gloss: /*i18n*/ { id: 'verb.sym', message: 'Bring the last room beside what is on screen, or a room by name' } }),
   v({ verb: 'jump', group: 'go', example: 'jump:242', takes: [['address']], stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.jump', message: 'Scroll to a number on this board' } }),
   v({ verb: 'tour', group: 'go', example: 'tour:', forms: ['tour:', 'tour:off', 'tour:advanced'], takes: [[], [['off', 'advanced']]], stage: 5, click: 'apply',
@@ -100,8 +100,9 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, docket, room, collection, branch, step, run or block' } }),
   v({ verb: 'open', group: 'start', example: 'open:207',
     forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Writing Studio"', 'open:library', 'open:alm', 'open:settings keys'],
-    // alm is the Almanac's short title: open:alm puts the Almanac beside
-    // what is on screen, where alm: goes to its own screen (C124).
+    // alm is the Almanac's short title: open:alm brings the Almanac alone,
+    // where alm: brings the Almanac arrangement, the Almanac and the
+    // Collection (C124, C125).
     takes: [[[...BOARD_NAMES, 'alm', 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text']], stage: 3, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.open', message: 'Open a board, or anything by its number or name' } }),
   v({ verb: 'close', group: 'start', example: 'close:almanac', takes: [[], [BOARD_NAMES], ['address']], stage: 3, undoable: true, click: 'apply',

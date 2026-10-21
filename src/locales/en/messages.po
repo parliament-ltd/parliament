@@ -130,10 +130,6 @@ msgid "count.steps"
 msgstr "{count, plural, one {# step} other {# steps}}"
 
 #. js-lingui-explicit-id
-msgid "enter.almHere"
-msgstr "You are on {board} already"
-
-#. js-lingui-explicit-id
 msgid "enter.aloneErase"
 msgstr "{verb} runs on a line of its own, so it is plain what goes for good"
 
@@ -144,10 +140,6 @@ msgstr "{verb} runs on a line of its own for now"
 #. js-lingui-explicit-id
 msgid "enter.aloneSpends"
 msgstr "{verb} runs on a line of its own, so its Enter line can name who receives it and what it costs"
-
-#. js-lingui-explicit-id
-msgid "enter.aloneSwitch"
-msgstr "{verb} goes to another screen, so it runs on a line of its own"
 
 #. js-lingui-explicit-id
 msgid "enter.barMove"
@@ -165,6 +157,15 @@ msgstr "The bar is in its own window already"
 msgid "enter.barThere"
 msgstr "{place, select, top {The bar is at the top already} bottom {The bar is at the bottom already} left {The bar is on the left already} right {The bar is on the right already} other {The bar is in the centre already}}"
 
+#. {boards} lists board names
+#. js-lingui-explicit-id
+msgid "enter.bringBoards"
+msgstr "Enter brings {boards} beside what is here"
+
+#. js-lingui-explicit-id
+msgid "enter.bringHere"
+msgstr "Everything it brings is here already"
+
 #. js-lingui-explicit-id
 msgid "enter.closeBoard"
 msgstr "Enter closes {board}. Nothing is lost"
@@ -180,6 +181,14 @@ msgstr "The last board stays open"
 #. js-lingui-explicit-id
 msgid "enter.closeNotHere"
 msgstr "{board} is not open"
+
+#. js-lingui-explicit-id
+msgid "enter.closeRoom"
+msgstr "Enter closes this room. Nothing is lost"
+
+#. js-lingui-explicit-id
+msgid "enter.closeWelcome"
+msgstr "Enter closes the welcome page. tour: brings it back"
 
 #. js-lingui-explicit-id
 msgid "enter.didYouMean"
@@ -202,22 +211,17 @@ msgstr "To remove something for good, use erase:. Enter writes it in"
 msgid "enter.filters"
 msgstr "{count, plural, one {Enter applies # filter} other {Enter applies # filters}}"
 
-#. {board} is the Almanac, from COPY.boards
-#. js-lingui-explicit-id
-msgid "enter.goAlmanac"
-msgstr "Enter goes to {board}"
-
 #. js-lingui-explicit-id
 msgid "enter.goNewRoom"
-msgstr "Enter opens an empty room. Its first prompt starts it"
+msgstr "Enter opens an empty room beside what is here. Its first prompt starts it"
 
 #. js-lingui-explicit-id
 msgid "enter.goRoom"
-msgstr "Enter goes back to the last room"
+msgstr "Enter brings the last room beside what is here"
 
 #. js-lingui-explicit-id
 msgid "enter.goWelcome"
-msgstr "Enter shows the welcome page and its steps"
+msgstr "Enter brings the welcome page and its steps beside what is here"
 
 #. js-lingui-explicit-id
 msgid "enter.help"
@@ -498,7 +502,7 @@ msgstr "{verb} is no longer a command. Use {instead}"
 
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
-msgstr "This is the last room already"
+msgstr "The last room is here already"
 
 #. js-lingui-explicit-id
 msgid "enter.searchLater"
@@ -508,6 +512,10 @@ msgstr "Search is not built yet"
 #. js-lingui-explicit-id
 msgid "enter.sequence"
 msgstr "{count, plural, one {Enter runs # command: {verbs}} other {Enter runs # commands in turn: {verbs}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.showRoom"
+msgstr "Enter shows the last room here"
 
 #. js-lingui-explicit-id
 msgid "enter.sourceRefused"
@@ -857,7 +865,7 @@ msgstr "Ask again from the edited prompt, as a new branch"
 
 #. js-lingui-explicit-id
 msgid "verb.alm"
-msgstr "Go to the Almanac, the same as open:almanac"
+msgstr "Bring the Almanac and the Collection beside what is on screen"
 
 #. js-lingui-explicit-id
 msgid "verb.api"
@@ -1001,7 +1009,7 @@ msgstr "Choose the shape of a room"
 
 #. js-lingui-explicit-id
 msgid "verb.library"
-msgstr "Go to the Library, or to one shelf of it"
+msgstr "Bring the Library beside what is on screen, or one shelf of it"
 
 #. js-lingui-explicit-id
 msgid "verb.markup"
@@ -1125,7 +1133,7 @@ msgstr "Check a reply or branch against a collab's rule, one suggestion per sent
 
 #. js-lingui-explicit-id
 msgid "verb.sym"
-msgstr "Go back to the last room, or to a room by name"
+msgstr "Bring the last room beside what is on screen, or a room by name"
 
 #. js-lingui-explicit-id
 msgid "verb.tag"

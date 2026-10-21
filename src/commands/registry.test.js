@@ -62,7 +62,7 @@ describe('the verb list', () => {
 describe('the glosses', () => {
   const glosses = [...VERBS.map((v) => ({ where: v.verb, ...v.gloss })), ...GROUPS.map((g) => ({ where: g.key, ...g.title })), { where: 'leaders', ...LEADERS.title }, ...LEADERS.rows.map((r) => ({ where: r.example, ...r.gloss }))]
   // Names that keep their capital in a sentence: boards, formats and a key.
-  const PROPER = new Set(['Parliament', 'Almanac', 'Library', 'Lab', 'Markdown', 'JSONL', 'Enter'])
+  const PROPER = new Set(['Parliament', 'Almanac', 'Collection', 'Library', 'Lab', 'Markdown', 'JSONL', 'Enter'])
 
   it('have unique ids and follow the copy rules', () => {
     const ids = glosses.map((g) => g.id)

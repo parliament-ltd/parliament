@@ -21,12 +21,11 @@ import { ConversationScope } from '../stores/ConversationScope'
 // - The room's input block is left out: the bar is the only place a prompt
 //   is typed (C37). Its input features stay in the room, for the bar to
 //   hold later.
-// Opening the board loads its chat's messages; closing it, or going to
-// another screen, leaves the chat, which stops a reply being written unless
-// the person chose to let replies finish (C109).
+// Opening the board loads its chat's messages; closing it, or showing
+// another chat in it, leaves the chat, which stops a reply being written
+// unless the person chose to let replies finish (C109).
 //
-// With no chat yet (`room:new`) it is an empty room: the first prompt
-// starts its chat.
+// With no chat yet it is an empty room: the first prompt starts its chat.
 
 const COMPOSER = 'input'
 const blockName = (ref) => String(ref ?? '').split('@')[0]

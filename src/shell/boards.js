@@ -31,8 +31,8 @@ export const BOARDS = Object.freeze({
   canvas: { title: null, resting: 'search', can: [], closable: true, strip: null },
   blocks: { title: null, resting: 'search', can: [], closable: true, strip: null },
   // The welcome page's card: not a board in the documents, but it sits in
-  // the welcome arrangement like one, and cannot be closed there.
-  welcome: { title: null, resting: 'search', can: [], closable: false, strip: null },
+  // the space like one. tour: brings it, close: takes it away (C125).
+  welcome: { title: null, resting: 'search', can: [], closable: true, strip: null },
 })
 
 /** The registered board, or null. */

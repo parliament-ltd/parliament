@@ -3,21 +3,23 @@
 // and settings spec §12: per device; in a backup only when the person
 // chooses it, ruled 20 October and built with backup: in stage 9).
 //
-// One record per arrangement in the version 6 list `arrangements`: each
-// shipped arrangement, and each room, keeps its own, so leaving the Lab and
-// coming back finds it as it was, and reset: has a default to return to
-// (C102). The list is not on the backup allowlist until stage 9 adds the
-// choice; a restore will check each record with cleanArrangement.
+// Records in the version 6 list `arrangements`. What is on screen is one
+// space (C125, superseding C102), kept under `space` as it is left. Records
+// kept under each arrangement's own key before C125 stay where they are,
+// unread; loadArrangement reads such a record, for when an arrangement can
+// be edited and kept (stage 14). The list is not on the backup allowlist
+// until stage 9 adds the choice; a restore will check each record with
+// cleanArrangement.
 //
 // What is read back is checked like anything from outside: unknown boards,
 // places and fields are dropped, and a record that cannot be made sense of
 // gives way to the shipped default.
 
 import { boardEntry } from '../shell/boards'
-import { shipped, shippedFor, SHIPPED } from '../shell/arrangement'
+import { shipped, shippedFor, SHIPPED, SPACE } from '../shell/arrangement'
 
 const STORE = 'arrangements'
-const BAR_PLACES = new Set(['top', 'bottom'])
+const BAR_PLACES = new Set(['top', 'bottom', 'card'])
 const BAR_SIDES = new Set(['left', 'center', 'right'])
 const SIDES = new Set(['left', 'right'])
 const ID = /^[a-z]+(?::[A-Za-z0-9_-]{1,128})?$/
@@ -70,6 +72,19 @@ export async function loadArrangement(db, id, context = {}) {
   if (!db.objectStoreNames.contains(STORE)) return shipped(id, context)
   const stored = cleanArrangement(await db.get(STORE, id))
   return stored ? { ...stored, context: { ...stored.context, ...context } } : shipped(id, context)
+}
+
+/**
+ * The space as this device left it (C125). With none kept yet, someone who
+ * has made nothing starts on the welcome page, anyone else on the Almanac
+ * (C118).
+ * @param {import('idb').IDBPDatabase} db
+ * @param {{ fresh: boolean }} who fresh: nothing made yet
+ */
+export async function loadSpace(db, { fresh }) {
+  const stored = db.objectStoreNames.contains(STORE) ? cleanArrangement(await db.get(STORE, SPACE)) : null
+  if (stored) return stored
+  return fresh ? { ...shipped('welcome'), id: SPACE } : shipped(SPACE)
 }
 
 /**

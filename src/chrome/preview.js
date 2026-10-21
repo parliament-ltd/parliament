@@ -6,50 +6,57 @@
 // refuse, the Enter line says why and Enter does nothing, so a line never
 // stops half done.
 //
-// alm: and sym: go to another screen (C95): each screen keeps its own
-// arrangement (C102), so a switch runs on a line of its own, and Enter
-// hands the shell the screen to go to instead of an arrangement.
+// What is on screen is one space (C125, ruled 21 October). alm:, sym: and
+// tour: bring their arrangement's boards into it beside what is there,
+// like open: brings one board; nothing switches to another screen. So they
+// share a line with the other layout commands (C99).
 //
-// A prompt goes to the room the screen shows (stage 4). Before Enter the
+// A prompt goes to the room in the space (stage 4). Before Enter the
 // line names who receives it and what it costs, worked out here from what
 // the shell knows: no request is made to find out (C83).
 
 import { enterLine } from '../commands/registry'
-import { plan, planOpen, ARRANGEMENT_VERBS, NEW_ROOM, roomArrangementId, roomChat } from '../shell/arrangement'
+import { plan, planOpen, planBring, planRoom, roomOnScreen, ARRANGEMENT_VERBS } from '../shell/arrangement'
 import { cleanRoomName, ROOM_NAME_MAX } from '../lib/roomNames'
 import { CHARS_PER_TOKEN, inputCost, describeCost } from '../shell/estimate'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
-const SWITCHES = Object.freeze(['alm', 'sym'])
-// Verbs that act on what the bar points at, rather than on the arrangement,
-// or that go to the welcome page (tour:, A20).
+// Verbs that bring an arrangement, or a board, into the space (C95, C125).
+const BRINGS = Object.freeze(['alm', 'sym', 'library'])
+// Verbs that act on what the bar points at, rather than only on the space:
+// name: (C40), and tour:, which also shows the welcome steps (A20).
 const ACTS = Object.freeze(['name', 'tour'])
-// Verbs that are the same as open: for their board (C95).
-const OPENS = Object.freeze(['library'])
-export const BUILT = new Set([...ARRANGEMENT_VERBS, ...SWITCHES, ...ACTS, ...OPENS])
+export const BUILT = new Set([...ARRANGEMENT_VERBS, ...BRINGS, ...ACTS])
 
-// library: is the same as open:library everywhere (C95). The Almanac is an
-// arrangement: alm: always goes to its screen, and only open:alm puts it
-// beside what is on screen (C124, ruled 21 October).
-function opens(a, step) {
-  if (step.verb === 'library' && !step.match?.values?.length) return planOpen(a, 'library')
+// alm: brings the Almanac arrangement, the Almanac and the Collection, or
+// whatever its owner has made it (C125). sym: brings the last room, or an
+// empty room when there is no chat yet. library: is open:library (C95).
+// A room or a shelf by name comes later.
+function bring(a, step, screens = {}) {
+  const named = Boolean(step.match?.values?.length)
+  if (step.verb === 'alm') return planBring(a, 'almanac')
+  if (step.verb === 'sym') return named ? null : planRoom(a, screens.lastRoom?.id ?? null)
+  if (step.verb === 'library') return named ? null : planOpen(a, 'library')
   return null
 }
 
+const hasWelcome = (a) => a.columns.some((c) => c.includes('welcome'))
+
 /**
- * tour: shows the welcome page with its steps, from anywhere; tour:off puts
- * the steps away (A20). tour:advanced, the second list, comes later.
- * screens.stepsOff says whether the steps are put away now.
+ * tour: brings the welcome card back and shows its steps, from anywhere;
+ * tour:off puts the steps away (A20). tour:advanced, the second list,
+ * comes later. screens.stepsOff says whether the steps are put away now.
+ * @returns {{ says: object, next?: object|null, act?: object|null }|null}
  */
 function planTour(a, step, screens = {}) {
   const word = step.match?.values?.[0]?.value ?? null
   if (word === 'advanced') return null
   if (word === 'off') {
-    if (a.id !== 'welcome' || screens.stepsOff) return { says: { message: 'tourOffAlready' }, act: null }
+    if (!hasWelcome(a) || screens.stepsOff) return { says: { message: 'tourOffAlready' }, act: null }
     return { says: { message: 'tourOff' }, act: { kind: 'tourOff' } }
   }
-  if (a.id !== 'welcome') return { says: { message: 'goWelcome' }, go: { id: 'welcome', context: {}, show: true } }
+  if (!hasWelcome(a)) return { says: { message: 'goWelcome' }, next: planBring(a, 'welcome').next, act: { kind: 'tourOn' } }
   if (screens.stepsOff) return { says: { message: 'tourOn' }, act: { kind: 'tourOn' } }
   return { says: { message: 'tourHere' }, act: null }
 }
@@ -68,7 +75,7 @@ const typed = (arg) => (arg?.kind === 'text' ? arg.value : arg?.text ?? '')
 function planName(a, step, screens = {}) {
   const args = step.match?.values ?? []
   if (args.length !== 1 || a.addressed !== 'room') return null
-  const chat = roomChat(a.id)
+  const chat = roomOnScreen(a)
   if (chat === undefined) return null
   if (chat === null) return { says: { message: 'nameNoChat' }, act: null }
   const clean = cleanRoomName(typed(args[0]))
@@ -79,40 +86,13 @@ function planName(a, step, screens = {}) {
 }
 
 /**
- * The screen a switch goes to, or a refusal. `sym:` goes back to the last
- * room, the chat most recently written in, or to an empty room when there
- * is none. A room by name comes with name: (stage 4, piece 6).
- * @returns {{ says: object, go: { id: string, context: object }|null }|null}
- */
-function planSwitch(a, step, screens = {}) {
-  if (step.verb === 'alm') {
-    const values = { board: 'almanac' }
-    return a.id === 'almanac'
-      ? { says: { message: 'almHere', values }, go: null }
-      : { says: { message: 'goAlmanac', values }, go: { id: 'almanac', context: {} } }
-  }
-  if (step.verb === 'sym') {
-    if (step.match?.values?.length) return null
-    const last = screens.lastRoom
-    if (last) {
-      const id = roomArrangementId(last.id)
-      if (a.id === id) return { says: { message: 'roomHere' }, go: null }
-      return { says: { message: 'goRoom' }, go: { id, context: last.num != null ? { room: last.num } : {} } }
-    }
-    if (a.id === NEW_ROOM) return { says: { message: 'newRoomHere' }, go: null }
-    return { says: { message: 'goNewRoom' }, go: { id: NEW_ROOM, context: {} } }
-  }
-  return null
-}
-
-/**
  * @param {string} value the whole field, leader included
  * @param {{ mode: string, arrangement: import('../shell/arrangement').Arrangement, built?: Set<string>,
- *   screens?: { lastRoom?: { id: string, num?: number|null }|null, roomName?: object|null } }} ctx
- * @returns {{ answer: object, says: { message: string, values?: object }, next: object|null, go?: object|null, act?: object|null }}
- *   next is the arrangement after Enter, or null when Enter runs nothing; go
- *   is the screen Enter goes to, for alm: and sym:; act is what Enter does
- *   to what the bar points at, for name:
+ *   screens?: { lastRoom?: { id: string, num?: number|null }|null, roomName?: object|null, stepsOff?: boolean } }} ctx
+ * @returns {{ answer: object, says: { message: string, values?: object }, next: object|null, act?: object|null }}
+ *   next is the space after Enter, or null when Enter changes none of it;
+ *   act is what Enter does besides, to what the bar points at (name:) or to
+ *   the welcome steps (tour:)
  */
 export function preview(value, { mode, arrangement, built = BUILT, screens = {} }) {
   const answer = enterLine(value, { mode, board: arrangement.addressed, built })
@@ -124,21 +104,13 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     const step = answer.steps[0]
     const p = step.verb === 'tour' ? planTour(arrangement, step, screens) : planName(arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
-    return { answer, says: p.says, next: null, act: p.act ?? null, go: p.go ?? null }
-  }
-
-  const switches = answer.steps.filter((s) => SWITCHES.includes(s.verb) && !opens(arrangement, s))
-  if (switches.length) {
-    if (answer.steps.length > 1) return { answer, says: { message: 'aloneSwitch', values: { verb: `${switches[0].verb}:` } }, next: null }
-    const p = planSwitch(arrangement, answer.steps[0], screens)
-    if (!p) return { answer, says: { message: 'later', values: { verb: `${answer.steps[0].verb}:` } }, next: null }
-    return { answer, says: p.says, next: null, go: p.go }
+    return { answer, says: p.says, next: p.next ?? null, act: p.act ?? null }
   }
 
   let a = arrangement
   let last = null
   for (const step of answer.steps) {
-    const p = opens(a, step) ?? plan(a, step)
+    const p = BRINGS.includes(step.verb) ? bring(a, step, screens) : plan(a, step)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
     if (!p.next) return { answer, says: p.says, next: null }
     a = p.next

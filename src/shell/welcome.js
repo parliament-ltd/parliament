@@ -23,9 +23,8 @@ export const STEPS = Object.freeze([
   { id: 'command', shows: '>', writes: '>' },
   { id: 'bar', shows: 'bar:bottom', writes: '>bar:bottom' }, // C43
   { id: 'ask', shows: 'p>', writes: 'p>' },
-  // open:alm puts the Almanac beside the card; alm: would leave the page for
-  // the Almanac's own screen (C119, C124).
-  { id: 'almanac', shows: 'open:alm', writes: '>open:alm' },
+  // alm: brings the Almanac arrangement beside the card (C119, C125).
+  { id: 'almanac', shows: 'alm:', writes: '>alm:' },
   { id: 'name', shows: 'name:"…"', writes: '>name:""' },
   { id: 'pop', shows: 'pop:almanac', writes: '>pop:almanac' },
   { id: 'library', shows: 'library:', writes: '>library:' },

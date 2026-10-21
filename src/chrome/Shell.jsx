@@ -5,11 +5,11 @@ import './chrome.css'
 import { COPY } from '../copy'
 import { initDB, getConversation, getSetting, setSetting } from '../lib/db'
 import { renameMode } from '../lib/modes'
-import { loadArrangement, saveArrangement } from '../lib/arrangements'
+import { loadSpace, saveArrangement } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
-import { shipped, address, planOpen, planPopBack, planPopBar, roomChat, roomArrangementId } from '../shell/arrangement'
+import { shipped, address, planOpen, planPopBack, planPopBar, planRoom, roomOnScreen, SPACE } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
@@ -50,7 +50,6 @@ import WelcomeBoard, { WelcomeFoot } from './WelcomeBoard'
 // A window cannot be reopened without a click, so on load what was popped
 // comes back to the page.
 
-const START = 'almanac'
 // The source a prompt goes to when there is no key (stage 4).
 const SOURCE = 'wikipedia'
 // The boards that take the wide column where they stand.
@@ -99,7 +98,7 @@ function backOnPage(a) {
 
 export default function Shell() {
   const { i18n } = useLingui()
-  const [arrangement, setArrangement] = useState(() => shipped(START))
+  const [arrangement, setArrangement] = useState(() => shipped(SPACE))
   const [windows, setWindows] = useState({}) // board or 'command' -> { win, container }
   const [lines, setLines] = useState([])
   const [started, setStarted] = useState(false)
@@ -125,9 +124,9 @@ export default function Shell() {
     setSetting(WELCOME_SETTING, next).catch(() => {})
   }, [])
 
-  // This device's arrangement and history, once the database is open.
-  // Someone who has made nothing starts on the welcome page; anyone else on
-  // the Almanac (C118).
+  // The space and the history this device kept, once the database is open.
+  // With no space kept yet, someone who has made nothing starts on the
+  // welcome page, anyone else on the Almanac (C118, C125).
   useEffect(() => {
     let live = true
     initDB().then(async (handle) => {
@@ -135,22 +134,20 @@ export default function Shell() {
       const [chats, history, stored] = await Promise.all([
         handle.count('conversations'), readCommands(handle), getSetting(WELCOME_SETTING).catch(() => null),
       ])
-      const start = chats ? START : 'welcome'
-      const kept = await loadArrangement(handle, start)
+      const kept = await loadSpace(handle, { fresh: !chats })
       if (!live) return
       welcomeRef.current = cleanWelcome(stored)
       setWelcomeState(welcomeRef.current)
-      if (current.current.id === START) commit(backOnPage(kept))
+      commit(backOnPage(kept))
       setLines(history)
       setStarted(true)
     }).catch(() => setStarted(true))
     return () => { live = false }
   }, [commit])
 
-  // Steps the welcome screen shows as done: the bar at the foot, a board in
-  // its own window, the Almanac, the Library, the key panel.
+  // Steps the space shows as done: the bar at the foot, a board in its own
+  // window, the Almanac, the Library, the key panel.
   useEffect(() => {
-    if (arrangement.id !== 'welcome') return
     for (const id of stepsShown(arrangement)) updateWelcome((w) => tick(w, id))
   }, [arrangement, updateWelcome])
   const onMode = useCallback((mode) => { if (mode === 'command') updateWelcome((w) => tick(w, 'command')) }, [updateWelcome])
@@ -182,6 +179,7 @@ export default function Shell() {
 
   /** Runs a planned arrangement: opens, closes and places its windows, then keeps it. */
   const run = useCallback(async (next, body) => {
+    if (waiting.current && roomOnScreen(next) !== waiting.current.chatId) { waiting.current.drop(); waiting.current = null }
     const changes = windowChanges(current.current, next)
     const opened = []
     for (const key of changes.open) {
@@ -210,25 +208,10 @@ export default function Shell() {
     return null
   }, [commit, i18n, watch])
 
-  // ── Screens: alm: and sym: (C95, C102) ────────────────
-  // Each screen keeps its own arrangement on this device. Going to another
-  // closes the windows of the screen left (on return they are back on the
-  // page, as after a reload) and keeps the bar in its window if it is in one.
+  // ── The room in the space (stage 4; C125) ─────────────
+  // The chat it shows, and a prompt waiting for a new room to load.
   const readyRoom = useRef(null) // the chat whose room has loaded its messages
   const waiting = useRef(null) // a prompt waiting for its new room to load
-
-  const switchTo = useCallback(async (go, body = null) => {
-    const from = current.current
-    const kept = db.current ? await loadArrangement(db.current, go.id, go.context) : shipped(go.id, go.context)
-    const back = backOnPage(kept)
-    const next = { ...back, bar: { ...back.bar, popped: from.bar.popped } }
-    if (waiting.current && roomArrangementId(waiting.current.chatId) !== go.id) { waiting.current.drop(); waiting.current = null }
-    if (go.show) updateWelcome((w) => showSteps(w, true))
-    // Going to the Almanac's screen shows what you have made, as open:alm
-    // does beside the welcome card (welcome step 4).
-    if (go.id === 'almanac') updateWelcome((w) => tick(w, 'almanac'))
-    return run(next, body)
-  }, [run, updateWelcome])
 
   // name: (C40): the room's own name, kept on the room record. The room
   // board then reads its room again.
@@ -238,8 +221,10 @@ export default function Shell() {
   const remember = useCallback((body) => {
     if (db.current && body) keepCommand(db.current, body).then((kept) => (kept ? readCommands(db.current).then(setLines) : null)).catch(() => {})
   }, [])
-  const act = useCallback(async (what, body) => {
+  const act = useCallback(async (what, body, next = null) => {
     if (what.kind === 'tourOn' || what.kind === 'tourOff') {
+      // tour: may bring the welcome card back into the space first.
+      if (next) { const refused = await run(next, null); if (refused) return refused }
       updateWelcome((w) => showSteps(w, what.kind === 'tourOn'))
       remember(body)
       return null
@@ -252,9 +237,9 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'name'))
     remember(body)
     return null
-  }, [remember, updateWelcome])
+  }, [remember, run, updateWelcome])
 
-  const onRun = useCallback((next, body, go, what) => (what ? act(what, body) : go ? switchTo(go, body) : run(next, body)), [act, run, switchTo])
+  const onRun = useCallback((next, body, go, what) => (what ? act(what, body, next) : run(next, body)), [act, run])
 
   const onRoomReady = useCallback((chatId) => {
     readyRoom.current = chatId
@@ -287,7 +272,7 @@ export default function Shell() {
     return () => { live = false; window.removeEventListener('focus', check) }
   }, [])
 
-  const roomId = roomChat(arrangement.id) // the chat on screen; null in an empty room; undefined with no room
+  const roomId = roomOnScreen(arrangement) // the chat in the space's room; null in an empty room; undefined with no room
   const streaming = useIsStreaming(roomId ?? '')
   // The ink pot in the prompt field: draining while a reply arrives, then
   // refilled, or spilt if the reply was stopped or broke off (C114).
@@ -324,8 +309,10 @@ export default function Shell() {
   const firstPrompt = roomId === null || (Boolean(roomId) && activeConversationId === roomId && messages.length === 0)
   const describes = Boolean(keyed && firstPrompt && settings.describeNewChats !== false)
   const describe = useMemo(() => (describes ? { price: describeModel?.cost ?? null } : null), [describes, describeModel])
+  // With no room in the space, a prompt starts a chat in a room beside
+  // what is here, so it is offered as going to a new room (C125).
   const prompt = useMemo(() => ({
-    room: roomId,
+    room: roomId ?? null,
     chat: roomRecord?.num ?? null,
     streaming,
     keyed,
@@ -344,14 +331,14 @@ export default function Shell() {
   }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, model, settings.defaultModel, along, hiddenOut, sourcesOut, describe, stalledIn, buildSystemPrompt])
 
   /**
-   * Sends a prompt to the room on screen: to the provider with a key, else
-   * to the source. In an empty room it first makes the chat (titled with the
-   * prompt's first words, sending nothing) and goes to its room. Answers at
-   * once whether the prompt went, and `done` once it is answered.
+   * Sends a prompt to the room in the space: to the provider with a key,
+   * else to the source. With an empty room, or no room at all, it first
+   * makes the chat (titled with the prompt's first words, sending nothing)
+   * and shows it in a room beside what is here (welcome spec §5; C125).
+   * Answers at once whether the prompt went, and `done` once it is answered.
    */
   const onPrompt = useCallback(async (text, shown) => {
-    const chatId = roomChat(current.current.id)
-    if (chatId === undefined) return { refused: 'promptNoRoom' }
+    const chatId = roomOnScreen(current.current) ?? null
     if (creating.current) return { refused: 'promptBusy' }
     // The line named a recipient; if that has changed since, say so first.
     const fresh = await hasKey().then(Boolean, () => false)
@@ -378,7 +365,8 @@ export default function Shell() {
         const chat = await createConversation({ title: titleFromPrompt(text), model: latest.current.settings.defaultModel })
         await assignDefaultRoom(chat.id)
         id = chat.id
-        await switchTo({ id: roomArrangementId(id), context: chat.num != null ? { room: chat.num } : {} })
+        const placed = planRoom(current.current, id)
+        if (placed.next) await run(placed.next, null)
       } catch {
         return { refused: 'promptFailed' }
       } finally {
@@ -406,14 +394,14 @@ export default function Shell() {
         return failure(err)
       })
     return { done }
-  }, [askSource, createConversation, loadConversations, resendWhole, sendMessage, switchTo, updateWelcome])
+  }, [askSource, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome])
 
   function pickBoard(board) {
     const a = current.current
-    // Sym: on the strip goes to a room as sym: does, from a screen without one.
-    if (board === 'room' && roomChat(a.id) === undefined) {
-      const { go } = preview('>sym:', { mode: 'command', arrangement: a, screens })
-      if (go) switchTo(go)
+    // Sym: on the strip brings a room as sym: does, when there is none here.
+    if (board === 'room' && roomOnScreen(a) === undefined) {
+      const { next } = preview('>sym:', { mode: 'command', arrangement: a, screens })
+      if (next) run(next, null)
       return
     }
     if (handles.current[board]) { handles.current[board].win.focus(); commit(address(a, board)); return }
@@ -423,7 +411,11 @@ export default function Shell() {
   const focusBoard = (board) => { if (board !== current.current.addressed) commit(address(current.current, board)) }
   const bar = arrangement.bar
   const barWindow = windows[BAR]
-  const onWelcome = arrangement.id === 'welcome'
+  const onWelcome = arrangement.columns.some((c) => c.includes('welcome'))
+  const stripArrangement = useMemo(
+    () => ({ ...arrangement, context: { ...arrangement.context, room: roomRecord?.num ?? undefined } }),
+    [arrangement, roomRecord],
+  )
   const welcomeHint = useMemo(() => (onWelcome && !welcome.finished ? { next: nextStep(welcome) } : null), [onWelcome, welcome])
   const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint }
   const drawBoard = (board) => {
@@ -456,7 +448,7 @@ export default function Shell() {
 
   return (
     <div className={`ch-shell bar-${bar.at}${onWelcome ? ` on-welcome${arrangement.columns.length > 1 ? ' many' : ''}` : ''}`}>
-      {!onWelcome && <Strip arrangement={arrangement} onPick={pickBoard} />}
+      {!onWelcome && <Strip arrangement={stripArrangement} onPick={pickBoard} />}
       {/* One bar in one place, moved by its class or its holder, so moving
           it never loses the field's focus or what is typed. */}
       <div ref={dockSlot} className="ch-bar-host" />

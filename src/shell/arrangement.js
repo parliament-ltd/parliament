@@ -22,9 +22,16 @@ import { boardEntry } from './boards'
  * @typedef {{ next: Arrangement|null, says: Says }} Plan  next is null when Enter would do nothing
  */
 
-// The shipped arrangements and their suggested defaults, which reset: puts
-// back. Rooms each keep their own, made from `room`.
+// The shipped arrangements and their suggested defaults. What is on screen
+// is one space, edited by commands (C125, ruled 21 October): an
+// arrangement's verb (alm:, sym:, tour:, lab:) brings its boards into the
+// space beside what is there, and nothing switches to another screen. The
+// space is kept on this device; reset: puts it back as shipped, which is
+// the Almanac. The arrangements here say which boards each brings, until
+// their owner edits them (the Lab, stage 13).
+export const SPACE = 'space'
 export const SHIPPED = Object.freeze({
+  space: { columns: [['almanac'], ['collection']], addressed: 'almanac', bar: 'top', resting: null },
   almanac: { columns: [['almanac'], ['collection']], addressed: 'almanac', bar: 'top', resting: null },
   lab: { columns: [['library'], ['canvas'], ['blocks']], addressed: 'canvas', bar: 'top', resting: 'search' },
   room: { columns: [['room']], addressed: 'room', bar: 'bottom', resting: null },
@@ -38,20 +45,22 @@ export const SHIPPED = Object.freeze({
 /** Which shipped arrangement an id comes from: 'room:mode_1' comes from 'room'. */
 export const shippedFor = (id) => String(id ?? '').split(':')[0]
 
-// A room's screen is named for the chat it is built around, `room:<chat
-// id>`; `room:new` is an empty room whose first prompt starts its chat.
-export const NEW_ROOM = 'room:new'
-export const roomArrangementId = (chatId) => `room:${chatId}`
+/** The boards an arrangement brings into the space, in order (C125). */
+export function arrangementBoards(id) {
+  const base = SHIPPED[shippedFor(id)]
+  return base ? base.columns.flat() : []
+}
 
 /**
- * The chat a screen's room shows: its id, null for an empty room, or
- * undefined when the screen is not a room.
+ * The chat the room board in the space shows: its id, null for an empty
+ * room whose first prompt starts its chat, or undefined when no room board
+ * is in the space (C125). The chat is kept in the space's context.
  */
-export function roomChat(id) {
-  const text = String(id ?? '')
-  if (shippedFor(text) !== 'room') return undefined
-  const chat = text.slice('room:'.length)
-  return chat && text !== NEW_ROOM ? chat : null
+export function roomOnScreen(a) {
+  const here = a.columns.some((c) => c.includes('room')) || a.popped.some((p) => p.board === 'room')
+  if (!here) return undefined
+  const chat = a.context?.room
+  return typeof chat === 'string' && chat ? chat : null
 }
 
 /**
@@ -97,7 +106,25 @@ function readdress(a, gone, oldColumn) {
 
 // ── The verbs ───────────────────────────────────────────
 
-/** open:<board>. Brings it onto this screen at the right, or points the bar at it if it is here. */
+// Where a board brought into the space goes (changes `next` in place). The
+// welcome card takes the left. A room goes beside the welcome card when it
+// is there, else on the right. Other boards go on the right; beside the
+// welcome card they stack in one column, on the right of the card and the
+// chat (welcome spec §5).
+function place(next, board) {
+  if (board === 'welcome') { next.columns.unshift([board]); return }
+  const withWelcome = next.columns.some((c) => c.includes('welcome'))
+  if (board === 'room') {
+    const at = withWelcome ? next.columns.findIndex((c) => c.includes('welcome')) + 1 : next.columns.length
+    next.columns.splice(at, 0, [board])
+    return
+  }
+  const last = next.columns[next.columns.length - 1]
+  if (withWelcome && next.columns.length > 1 && !last.includes('welcome') && !last.includes('room')) last.push(board)
+  else next.columns.push([board])
+}
+
+/** open:<board>. Brings it into the space on the right, or points the bar at it if it is here. */
 export function planOpen(a, board) {
   if (isOnPage(a, board)) {
     if (a.addressed === board) return refuse('openAddressed', { board })
@@ -105,13 +132,43 @@ export function planOpen(a, board) {
   }
   if (isPopped(a, board)) return go({ ...copy(a), addressed: board }, 'openPopped', { board })
   const next = copy(a)
-  // On the welcome page, boards stack in one column on the right of the
-  // card and the chat (welcome spec §5).
-  const last = next.columns[next.columns.length - 1]
-  if (a.id === 'welcome' && next.columns.length > 1 && !last.includes('welcome') && !last.includes('room')) last.push(board)
-  else next.columns.push([board])
+  place(next, board)
   next.addressed = board
   return go(next, 'openBoard', { board })
+}
+
+/**
+ * alm:, tour: (and lab: with the Lab). Brings an arrangement's boards into
+ * the space beside what is there: those not here already, in its order
+ * (C125). With all of them here, the bar points at the first.
+ */
+export function planBring(a, id) {
+  const boards = arrangementBoards(id)
+  const missing = boards.filter((b) => !isOnPage(a, b) && !isPopped(a, b))
+  if (!missing.length) {
+    if (!boards.length || a.addressed === boards[0]) return refuse('bringHere', { boards })
+    return go({ ...copy(a), addressed: boards[0] }, 'openHere', { board: boards[0] })
+  }
+  const next = copy(a)
+  for (const b of missing) place(next, b)
+  next.addressed = missing[0]
+  return go(next, 'bringBoards', { boards: missing })
+}
+
+/**
+ * sym:. Brings the last room into the space, or an empty room when there is
+ * no chat yet (`chat` null). With a room here already, it shows that chat.
+ */
+export function planRoom(a, chat) {
+  const here = roomOnScreen(a)
+  if (here !== undefined && here === chat) return refuse(chat ? 'roomHere' : 'newRoomHere')
+  const next = copy(a)
+  if (here === undefined) place(next, 'room')
+  if (chat) next.context.room = chat
+  else delete next.context.room
+  next.addressed = 'room'
+  if (here !== undefined && chat) return go(next, 'showRoom')
+  return go(next, chat ? 'goRoom' : 'goNewRoom')
 }
 
 /** close: or close:<board>. Takes it off the screen, window included; nothing is lost. */
@@ -125,7 +182,10 @@ export function planClose(a, board = a.addressed) {
   next.columns = without(next.columns, board)
   next.popped = next.popped.filter((p) => p.board !== board)
   next.addressed = readdress(next, board, oldColumn)
-  return go(next, 'closeBoard', { board })
+  // A room and the welcome card are named as what they are, not by the
+  // boards' list name (C125).
+  const said = board === 'room' ? 'closeRoom' : board === 'welcome' ? 'closeWelcome' : 'closeBoard'
+  return go(next, said, { board })
 }
 
 /** move:<board> left|right|middle. The board's column goes to that place; the others shift along. */

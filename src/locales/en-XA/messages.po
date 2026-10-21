@@ -130,10 +130,6 @@ msgid "count.steps"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "enter.almHere"
-msgstr ""
-
-#. js-lingui-explicit-id
 msgid "enter.aloneErase"
 msgstr ""
 
@@ -143,10 +139,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.aloneSpends"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "enter.aloneSwitch"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -165,6 +157,15 @@ msgstr ""
 msgid "enter.barThere"
 msgstr ""
 
+#. {boards} lists board names
+#. js-lingui-explicit-id
+msgid "enter.bringBoards"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.bringHere"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.closeBoard"
 msgstr ""
@@ -179,6 +180,14 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.closeNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.closeRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.closeWelcome"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -200,11 +209,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.filters"
-msgstr ""
-
-#. {board} is the Almanac, from COPY.boards
-#. js-lingui-explicit-id
-msgid "enter.goAlmanac"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -507,6 +511,10 @@ msgstr ""
 #. {verbs} lists the commands in the order they run; one that fails stops the rest
 #. js-lingui-explicit-id
 msgid "enter.sequence"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.showRoom"
 msgstr ""
 
 #. js-lingui-explicit-id

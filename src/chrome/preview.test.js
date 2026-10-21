@@ -2,9 +2,10 @@ import { describe, it, expect } from 'vitest'
 import { setupI18n } from '@lingui/core'
 import { preview, promptPreview, BUILT } from './preview'
 import { say } from './say'
-import { shipped } from '../shell/arrangement'
+import { shipped, planRoom, SPACE } from '../shell/arrangement'
 import { messages as en } from '../locales/en/messages.mjs'
 
+const keep = (p) => { if (!p.next) throw new Error(p.says.message); return p.next }
 const i18n = setupI18n({ locale: 'en', messages: { en } })
 i18n.activate('en')
 const almanac = () => shipped('almanac')
@@ -61,44 +62,46 @@ describe('what Enter would do', () => {
   })
 })
 
-describe('going to another screen (C95)', () => {
-  const room = (id) => shipped(`room:${id}`)
-  const at = (value, a, screens) => {
+describe('one space: alm: and sym: bring boards beside what is here (C125)', () => {
+  const space = () => shipped(SPACE)
+  const at = (value, a = space(), screens = {}) => {
     const p = preview(value, { mode: 'command', arrangement: a, screens })
     return { ...p, text: say(i18n, p.says.message, p.says.values) }
   }
 
-  it('alm: goes to the Almanac, from anywhere but the Almanac', () => {
+  it('alm: brings the Almanac and the Collection, and nothing switches screens', () => {
     expect(BUILT.has('alm')).toBe(true)
-    const p = at('>alm:', room('c1'))
-    expect(p.text).toBe('Enter goes to Almanac')
-    expect(p.go).toEqual({ id: 'almanac', context: {} })
-    expect(p.next).toBeNull()
-    const here = at('>alm:', almanac())
-    expect(here.text).toBe('You are on Almanac already')
-    expect(here.go).toBeNull()
+    const w = { ...shipped('welcome'), id: SPACE }
+    const p = at('>alm:', w)
+    expect(p.text).toBe('Enter brings Almanac and Collection beside what is here')
+    expect(p.next.columns).toEqual([['welcome'], ['almanac', 'collection']])
+    expect(p.go).toBeUndefined()
+    expect(at('>alm:').text).toBe('Everything it brings is here already')
+    // open:alm still opens the Almanac alone.
+    expect(at('>open:alm', w).next.columns).toEqual([['welcome'], ['almanac']])
   })
 
-  it('sym: goes back to the last room, naming its chat on the strip', () => {
+  it('sym: brings the last room beside what is here, and shows it there after', () => {
     const screens = { lastRoom: { id: 'c1', num: 202 } }
-    const p = at('>sym:', almanac(), screens)
-    expect(p.text).toBe('Enter goes back to the last room')
-    expect(p.go).toEqual({ id: 'room:c1', context: { room: 202 } })
-    expect(at('>sym:', room('c1'), screens).text).toBe('This is the last room already')
-    expect(at('>sym:', room('c2'), screens).go.id).toBe('room:c1')
+    const p = at('>sym:', space(), screens)
+    expect(p.text).toBe('Enter brings the last room beside what is here')
+    expect(p.next.columns).toEqual([['almanac'], ['collection'], ['room']])
+    expect(p.next.context.room).toBe('c1')
+    expect(at('>sym:', p.next, screens).text).toBe('The last room is here already')
+    expect(at('>sym:', p.next, { lastRoom: { id: 'c2' } }).text).toBe('Enter shows the last room here')
   })
 
-  it('sym: with no chat yet opens an empty room', () => {
-    const p = at('>sym:', almanac(), { lastRoom: null })
-    expect(p.text).toBe('Enter opens an empty room. Its first prompt starts it')
-    expect(p.go).toEqual({ id: 'room:new', context: {} })
-    expect(at('>sym:', shipped('room:new')).text).toBe('This room is empty. Its first prompt starts it')
+  it('sym: with no chat yet opens an empty room beside', () => {
+    const p = at('>sym:', space(), { lastRoom: null })
+    expect(p.text).toBe('Enter opens an empty room beside what is here. Its first prompt starts it')
+    expect(at('>sym:', p.next, { lastRoom: null }).text).toBe('This room is empty. Its first prompt starts it')
   })
 
-  it('a switch runs on a line of its own; a room by name waits for name:', () => {
-    expect(at('>alm: bar:bottom', room('c1')).text).toBe('alm: goes to another screen, so it runs on a line of its own')
-    expect(at('>bar:bottom sym:', almanac()).text).toBe('sym: goes to another screen, so it runs on a line of its own')
-    expect(at('>sym:"Barn owls"', almanac()).text).toBe('sym: is not built yet')
+  it('shares a line with other layout commands (C99), and a room by name waits for name:', () => {
+    const p = at('>alm: bar:bottom', { ...shipped('welcome'), id: SPACE })
+    expect(p.text).toBe('Enter runs 2 commands in turn: alm: and bar:')
+    expect(p.next.bar.at).toBe('bottom')
+    expect(at('>sym:"Barn owls"').text).toBe('sym: is not built yet')
   })
 })
 
@@ -206,13 +209,13 @@ describe('after a reply stalled (C114)', () => {
 })
 
 describe('name: for the room (C40)', () => {
-  const room = shipped('room:c1')
+  const room = keep(planRoom(shipped(SPACE), 'c1'))
   const at = (value, a = room, screens = {}) => {
     const p = preview(value, { mode: 'command', arrangement: a, screens })
     return { ...p, text: say(i18n, p.says.message, p.says.values) }
   }
 
-  it('names the room on screen with the words as typed', () => {
+  it('names the room in the space with the words as typed', () => {
     expect(BUILT.has('name')).toBe(true)
     const p = at('>name:"Barn owls"')
     expect(p.text).toBe('Enter names this room: Barn owls')
@@ -223,7 +226,8 @@ describe('name: for the room (C40)', () => {
   it('refuses an empty name, one it has already, and a room with no chat yet', () => {
     expect(at('>name:""').text).toBe('A name needs some words, like name:"Barn owls"')
     expect(at('>name:"Barn owls"', room, { roomName: { own: 'Barn owls' } }).act).toBeNull()
-    expect(at('>name:"Barn owls"', shipped('room:new')).text).toBe('This room has no chat yet. Its first prompt starts it, and then name: names it')
+    const empty = keep(planRoom(shipped(SPACE), null))
+    expect(at('>name:"Barn owls"', empty).text).toBe('This room has no chat yet. Its first prompt starts it, and then name: names it')
     expect(at(`>name:"${'x'.repeat(81)}"`).text).toBe("A room's name is at most 80 characters")
   })
 
@@ -235,7 +239,7 @@ describe('name: for the room (C40)', () => {
 })
 
 describe('the welcome page (stage 5)', () => {
-  const welcome = () => shipped('welcome')
+  const welcome = () => ({ ...shipped('welcome'), id: SPACE })
   const at = (value, a = welcome(), screens = {}) => {
     const p = preview(value, { mode: 'command', arrangement: a, screens })
     return { ...p, text: say(i18n, p.says.message, p.says.values) }
@@ -245,27 +249,22 @@ describe('the welcome page (stage 5)', () => {
     expect(welcome().bar.at).toBe('card')
   })
 
-  it('opens the Almanac beside the card only with open:alm; alm: goes to its screen (C124)', () => {
-    const p = at('>open:alm')
-    expect(p.text).toBe('Enter opens Almanac on the right')
-    expect(p.next.columns).toEqual([['welcome'], ['almanac']])
-    expect(at('>open:almanac').next.columns).toEqual([['welcome'], ['almanac']])
-    expect(at('>alm:').go.id).toBe('almanac')
-    expect(at('>alm:', shipped('room:c1')).go.id).toBe('almanac')
-  })
-
-  it('opens the Library on the right of the card, as library: does everywhere (W §5; C95)', () => {
+  it('brings the Almanac and the Library on the right of the card (W §5; C95, C125)', () => {
+    expect(at('>alm:').next.columns).toEqual([['welcome'], ['almanac', 'collection']])
     expect(at('>library:').next.columns).toEqual([['welcome'], ['library']])
     expect(at('>library:', shipped('almanac')).next.columns).toEqual([['almanac'], ['collection'], ['library']])
   })
 
-  it('tour: shows the page and its steps; tour:off puts them away (A20)', () => {
-    const p = at('>tour:', shipped('almanac'))
-    expect(p.text).toBe('Enter shows the welcome page and its steps')
-    expect(p.go).toMatchObject({ id: 'welcome', show: true })
+  it('tour: brings the page and its steps back; tour:off puts the steps away (A20)', () => {
+    const p = at('>tour:', shipped(SPACE))
+    expect(p.text).toBe('Enter brings the welcome page and its steps beside what is here')
+    expect(p.next.columns).toEqual([['welcome'], ['almanac'], ['collection']])
+    expect(p.act).toEqual({ kind: 'tourOn' })
     expect(at('>tour:').text).toBe('The steps are here already')
     expect(at('>tour:', welcome(), { stepsOff: true }).act).toEqual({ kind: 'tourOn' })
     expect(at('>tour:off').act).toEqual({ kind: 'tourOff' })
     expect(at('>tour:off', welcome(), { stepsOff: true }).text).toBe('The steps are put away already')
+    expect(at('>tour:off', shipped(SPACE)).text).toBe('The steps are put away already')
   })
 })
+

@@ -2,7 +2,8 @@ import { readFileSync } from 'node:fs'
 import { describe, it, expect } from 'vitest'
 import { BOARDS, boardEntry, boardByTitle, strip } from './boards'
 import {
-  SHIPPED, shipped, shippedFor, restingMode, address, plan, ARRANGEMENT_VERBS, NEW_ROOM, roomArrangementId, roomChat,
+  SHIPPED, shipped, shippedFor, restingMode, address, plan, ARRANGEMENT_VERBS,
+  SPACE, arrangementBoards, roomOnScreen, planBring, planRoom,
   planOpen, planClose, planMove, planSwap, planPop, planPopBack, planPopSide, planPopBar, planBar, planReset,
 } from './arrangement'
 import { enterLine } from '../commands/registry'
@@ -49,16 +50,6 @@ describe('shipped arrangements', () => {
     expect(shipped('room:mode_1', { room: 'mode_1' })).toMatchObject({ id: 'room:mode_1', columns: [['room']], bar: { at: 'bottom' }, context: { room: 'mode_1' } })
     expect(shippedFor('room:mode_1')).toBe('room')
     expect(() => shipped('nowhere')).toThrow()
-  })
-
-  it('name a room for its chat, and know an empty room (stage 4)', () => {
-    expect(roomArrangementId('c-1')).toBe('room:c-1')
-    expect(roomChat('room:c-1')).toBe('c-1')
-    expect(roomChat(NEW_ROOM)).toBeNull()
-    expect(roomChat('room:')).toBeNull()
-    expect(roomChat('almanac')).toBeUndefined()
-    expect(roomChat(undefined)).toBeUndefined()
-    expect(shipped(NEW_ROOM).columns).toEqual([['room']])
   })
 
   it('are fresh copies, so changing one leaves the default alone', () => {
@@ -113,6 +104,61 @@ describe('open: on the welcome page (stage 5)', () => {
   })
 })
 
+describe('one space (C125)', () => {
+  it('starts from the Almanac, and says which boards each arrangement brings', () => {
+    expect(shipped(SPACE).columns).toEqual([['almanac'], ['collection']])
+    expect(arrangementBoards('almanac')).toEqual(['almanac', 'collection'])
+    expect(arrangementBoards('welcome')).toEqual(['welcome'])
+    expect(arrangementBoards('nowhere')).toEqual([])
+  })
+
+  it('brings an arrangement\'s missing boards beside what is here: alm: brings the Almanac and the Collection', () => {
+    const w = { ...shipped('welcome'), id: SPACE }
+    const p = planBring(w, 'almanac')
+    expect(p.says).toEqual({ message: 'bringBoards', values: { boards: ['almanac', 'collection'] } })
+    expect(p.next.columns).toEqual([['welcome'], ['almanac', 'collection']])
+    expect(p.next.addressed).toBe('almanac')
+    // With one of them here, only the other comes.
+    const half = keep(planOpen(w, 'collection'))
+    expect(keep(planBring(half, 'almanac')).columns).toEqual([['welcome'], ['collection', 'almanac']])
+    // With all here, the bar points at the first; then there is nothing to do.
+    const all = { ...p.next, addressed: 'collection' }
+    expect(keep(planBring(all, 'almanac')).addressed).toBe('almanac')
+    expect(planBring(p.next, 'almanac')).toMatchObject({ next: null, says: { message: 'bringHere' } })
+  })
+
+  it('brings the welcome card back on the left (tour:)', () => {
+    expect(keep(planBring(shipped(SPACE), 'welcome')).columns).toEqual([['welcome'], ['almanac'], ['collection']])
+  })
+
+  it('brings the last room beside what is here (sym:), beside the welcome card when it is there', () => {
+    const a = keep(planRoom(shipped(SPACE), 'c1'))
+    expect(a.columns).toEqual([['almanac'], ['collection'], ['room']])
+    expect(roomOnScreen(a)).toBe('c1')
+    expect(planRoom(a, 'c1')).toMatchObject({ next: null, says: { message: 'roomHere' } })
+    const b = keep(planRoom(a, 'c2'))
+    expect(b.columns).toEqual(a.columns)
+    expect(roomOnScreen(b)).toBe('c2')
+    const w = keep(planBring({ ...shipped('welcome'), id: SPACE }, 'almanac'))
+    expect(keep(planRoom(w, 'c1')).columns).toEqual([['welcome'], ['room'], ['almanac', 'collection']])
+  })
+
+  it('knows an empty room, whose first prompt starts its chat, and no room at all', () => {
+    const empty = keep(planRoom(shipped(SPACE), null))
+    expect(roomOnScreen(empty)).toBeNull()
+    expect(planRoom(empty, null)).toMatchObject({ next: null, says: { message: 'newRoomHere' } })
+    expect(roomOnScreen(shipped(SPACE))).toBeUndefined()
+  })
+
+  it('closes a room or the welcome card by what it is, and a closed room is no room', () => {
+    const a = keep(planRoom({ ...shipped('welcome'), id: SPACE }, 'c1'))
+    const p = planClose(a, 'room')
+    expect(p.says.message).toBe('closeRoom')
+    expect(roomOnScreen(p.next)).toBeUndefined()
+    expect(planClose(a, 'welcome').says.message).toBe('closeWelcome')
+  })
+})
+
 describe('close:', () => {
   it('takes the addressed board off the screen, and the bar goes to the one before', () => {
     const a = address(keep(planOpen(almanac(), 'library')), 'library')
@@ -124,7 +170,9 @@ describe('close:', () => {
   it('keeps the last board open, and boards an arrangement cannot do without', () => {
     const one = keep(planClose(almanac(), 'collection'))
     expect(planClose(one)).toMatchObject({ next: null, says: { message: 'closeLast' } })
-    expect(planClose(shipped('welcome'))).toMatchObject({ next: null, says: { message: 'closeFixed' } })
+    // The welcome card can be closed in the space (C125), but not when it is the last board.
+    expect(planClose(shipped('welcome'))).toMatchObject({ next: null, says: { message: 'closeLast' } })
+    expect(keep(planClose({ ...shipped('welcome'), columns: [['welcome'], ['almanac']] }, 'welcome')).columns).toEqual([['almanac']])
     expect(planClose(almanac(), 'library')).toMatchObject({ next: null, says: { message: 'closeNotHere' } })
   })
 

@@ -98,6 +98,8 @@ export const COPY = {
     closeFixed: /*i18n*/ { id: 'enter.closeFixed', message: '{board} stays open here' },
     closeLast: /*i18n*/ { id: 'enter.closeLast', message: 'The last board stays open' },
     closeBoard: /*i18n*/ { id: 'enter.closeBoard', message: 'Enter closes {board}. Nothing is lost' },
+    closeRoom: /*i18n*/ { id: 'enter.closeRoom', message: 'Enter closes this room. Nothing is lost' },
+    closeWelcome: /*i18n*/ { id: 'enter.closeWelcome', message: 'Enter closes the welcome page. tour: brings it back' },
     moveIsPopped: /*i18n*/ { id: 'enter.moveIsPopped', message: '{board} is in its own window. pop:back brings it back first' },
     moveThere: /*i18n*/ {
       id: 'enter.moveThere',
@@ -152,7 +154,7 @@ export const COPY = {
     restingPrompt: /*i18n*/ { id: 'enter.restingPrompt', message: 'p> for a prompt' },
     restingHelp: /*i18n*/ { id: 'enter.restingHelp', message: '? every command' },
     // tour: and tour:off (A20).
-    goWelcome: /*i18n*/ { id: 'enter.goWelcome', message: 'Enter shows the welcome page and its steps' },
+    goWelcome: /*i18n*/ { id: 'enter.goWelcome', message: 'Enter brings the welcome page and its steps beside what is here' },
     tourOn: /*i18n*/ { id: 'enter.tourOn', message: 'Enter shows the steps again' },
     tourHere: /*i18n*/ { id: 'enter.tourHere', message: 'The steps are here already' },
     tourOff: /*i18n*/ { id: 'enter.tourOff', message: 'Enter puts the steps away. tour: brings them back' },
@@ -163,14 +165,15 @@ export const COPY = {
     nextStep: /*i18n*/ { id: 'enter.nextStep', message: 'next: {command}', comment: 'The next welcome step\'s command, which stays English' },
     toCommand: /*i18n*/ { id: 'enter.toCommand', message: '{leader} for the command line', comment: 'In prompt mode on the welcome page (C119)' },
     searchLater: /*i18n*/ { id: 'enter.searchLater', message: 'Search is not built yet' },
-    // Going to another screen: alm: and sym: (C95, C102).
-    goAlmanac: /*i18n*/ { id: 'enter.goAlmanac', message: 'Enter goes to {board}', comment: '{board} is the Almanac, from COPY.boards' },
-    almHere: /*i18n*/ { id: 'enter.almHere', message: 'You are on {board} already' },
-    goRoom: /*i18n*/ { id: 'enter.goRoom', message: 'Enter goes back to the last room' },
-    roomHere: /*i18n*/ { id: 'enter.roomHere', message: 'This is the last room already' },
-    goNewRoom: /*i18n*/ { id: 'enter.goNewRoom', message: 'Enter opens an empty room. Its first prompt starts it' },
+    // Bringing boards into the space: alm:, sym:, tour: (C95, C125).
+    // One space (C125): an arrangement's boards brought beside what is here.
+    bringBoards: /*i18n*/ { id: 'enter.bringBoards', message: 'Enter brings {boards} beside what is here', comment: '{boards} lists board names' },
+    bringHere: /*i18n*/ { id: 'enter.bringHere', message: 'Everything it brings is here already' },
+    goRoom: /*i18n*/ { id: 'enter.goRoom', message: 'Enter brings the last room beside what is here' },
+    showRoom: /*i18n*/ { id: 'enter.showRoom', message: 'Enter shows the last room here' },
+    roomHere: /*i18n*/ { id: 'enter.roomHere', message: 'The last room is here already' },
+    goNewRoom: /*i18n*/ { id: 'enter.goNewRoom', message: 'Enter opens an empty room beside what is here. Its first prompt starts it' },
     newRoomHere: /*i18n*/ { id: 'enter.newRoomHere', message: 'This room is empty. Its first prompt starts it' },
-    aloneSwitch: /*i18n*/ { id: 'enter.aloneSwitch', message: '{verb} goes to another screen, so it runs on a line of its own' },
     // A prompt (stage 4; C83). {provider} and {source} are names from the
     // list of providers and sources; {cost} is an amount the bar formats.
     targetChat: /*i18n*/ { id: 'enter.targetChat', message: '→ {chat}', comment: "The head of the Enter line in a room: the chat's number" },
