@@ -38,9 +38,9 @@
 // debug-route render.
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
 import InputArea from '../../components/core/InputArea'
 import { useChat } from '../../stores/ChatContext'
+import { useConversationId } from '../../stores/ConversationScope'
 import { useSettings } from '../../stores/SettingsContext'
 import { usePWA } from '../../stores/PWAContext'
 import { useCollabMode } from '../../stores/CollabModeContext'
@@ -57,7 +57,9 @@ import {
 const SEND_DEBOUNCE_MS = 500
 
 export default function InputRender({ config = {}, hostAPI } = {}) {
-  const { id: conversationId } = useParams()
+  // The conversation this board shows, told by the board (stage 3), not
+  // read from the address bar.
+  const conversationId = useConversationId()
   const { isStreaming, sendMessage, stopGenerating } = useChat()
   const { settings, refreshStorageEstimate } = useSettings()
   const { isOnline, trackMessageSent } = usePWA()

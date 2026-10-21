@@ -49,6 +49,7 @@ import { assignDefaultRoom } from '../lib/migration'
 import { useIsNarrow } from '../lib/useViewportWidth'
 import { useChat } from '../stores/ChatContext'
 import { schemeName } from '../lib/schemes'
+import { ConversationScope } from '../stores/ConversationScope'
 
 export default function ChatView() {
   const { id } = useParams()
@@ -198,7 +199,7 @@ function ConversationUnavailable({ conversationId, reason }) {
  * otherwise show between mount and the first ChatContext update.
  */
 function RoomShellChatHost({ conversationId, mode, roomId }) {
-  const { loadMessages, clearMessages, activeConversationId } = useChat()
+  const { loadMessages, clearMessages, leaveConversation, activeConversationId } = useChat()
   const [loadedFor, setLoadedFor] = useState(null)
   const isNarrow = useIsNarrow(768)
 
@@ -209,9 +210,12 @@ function RoomShellChatHost({ conversationId, mode, roomId }) {
     })
     return () => {
       cancelled = true
+      // Leaving the chat: a reply still being written stops, unless the
+      // person chose to let replies finish (C109).
+      leaveConversation(conversationId)
       clearMessages()
     }
-  }, [conversationId, loadMessages, clearMessages])
+  }, [conversationId, loadMessages, clearMessages, leaveConversation])
 
   // PR-23: apply the room's scheme to the document so the chat surface
   // tints to match the active room (background, surface, accent, etc.
@@ -249,7 +253,9 @@ function RoomShellChatHost({ conversationId, mode, roomId }) {
   if (isNarrow) {
     return (
       <ChatFrameProvider value={{ wrenchTarget }}>
-        <RoomShell mode={mode} />
+        <ConversationScope.Provider value={conversationId}>
+          <RoomShell mode={mode} />
+        </ConversationScope.Provider>
       </ChatFrameProvider>
     )
   }
@@ -264,7 +270,9 @@ function RoomShellChatHost({ conversationId, mode, roomId }) {
             same visual logic the editor canvas already uses. */}
         <div className="flex-1 min-h-0 chat-page-bg p-6">
           <div className="chat-room-frame">
-            <RoomShell mode={mode} />
+            <ConversationScope.Provider value={conversationId}>
+              <RoomShell mode={mode} />
+            </ConversationScope.Provider>
           </div>
         </div>
       </div>
