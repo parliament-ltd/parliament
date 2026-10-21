@@ -20,6 +20,9 @@ const DEFAULT_SETTINGS = {
   // landing surface. When set, `/` opens a fresh conversation in that
   // room instead of rendering The Study. null = fall back to The Study.
   chosenHomeRoomId: null,
+  // C109: when a chat is left while its reply is being written, finish the
+  // reply in the background instead of stopping it. Off unless chosen.
+  finishRepliesOnLeave: false,
 }
 
 export function SettingsProvider({ children }) {

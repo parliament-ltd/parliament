@@ -53,6 +53,8 @@ function validateMessage(item) {
   if (!isNumber(item.tokenCount))              return 'message.tokenCount must be a number'
   if (!isBoolean(item.incomplete))             return 'message.incomplete must be boolean'
   if (!isISODate(item.createdAt))              return 'message.createdAt invalid date'
+  // C109: a reply stopped because its chat was left says so.
+  if (item.stopReason != null && item.stopReason !== 'left') return 'message.stopReason invalid'
   return null
 }
 

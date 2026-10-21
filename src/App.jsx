@@ -22,6 +22,7 @@ import BuildView from './views/BuildView'
 import ErrorBoundary from './components/ErrorBoundary'
 import DbStateNotice from './components/DbStateNotice'
 import UpdateNotice from './components/UpdateNotice'
+import ReplyStoppedNotice from './components/ReplyStoppedNotice'
 import { isTrialDb } from './lib/db'
 
 // Dev-only catalog inspection surface (PR-2). Lazy-imported and registered
@@ -86,6 +87,7 @@ export default function App() {
                 <BlueprintOverlay />
                 <DbStateNotice />
                 <UpdateNotice />
+                <ReplyStoppedNotice />
                 {TrialNotice && <Suspense fallback={null}><TrialNotice /></Suspense>}
                 <Routes>
                   <Route path="/" element={<ErrorBoundary inline><HomepageView /></ErrorBoundary>} />

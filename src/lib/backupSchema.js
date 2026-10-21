@@ -16,7 +16,7 @@ export const FIELDS = Object.freeze({
   conversations: ['id', 'title', 'model', 'parentId', 'parentTitle', 'branchPoint', 'familyId', 'createdInMode', 'room',
     'pinned', 'storageBytes', 'createdAt', 'updatedAt', 'tags', 'tagsBy', 'aiSummary',
     'num', 'docketId', 'branch', 'run', 'restoredFrom'],
-  messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta'],
+  messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta', 'stopReason'],
   notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom'],
   highlights: ['id', 'conversationId', 'messageId', 'text', 'color', 'createdAt', 'num', 'kind', 'pinned', 'tags', 'restoredFrom'],
   favorites: ['id', 'conversationId', 'messageId', 'createdAt'],
@@ -74,6 +74,7 @@ const SETTINGS = Object.freeze({
   accountCreatedAt: either(str(40), num(0, Number.MAX_SAFE_INTEGER)),
   backupBannerDismissedAt: either(strOrNull(40), num(0, Number.MAX_SAFE_INTEGER)),
   installPromptDismissed: either(bool, str(40), num(0, Number.MAX_SAFE_INTEGER)),
+  finishRepliesOnLeave: bool, // C109
 })
 
 // Settings named after something. `chat` names the chat in the key, so a

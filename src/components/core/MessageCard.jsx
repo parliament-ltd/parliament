@@ -34,6 +34,7 @@ const messageVariants = {
 export default function MessageCard({
   id, type, content, number, index = 0,
   isGhostText = false,
+  stoppedNote = null, // why a cut-off reply stopped, when it was left (C109)
   isFavorited = false, showNotes = false,
   savedNoteText = '',
   highlights = [],
@@ -413,6 +414,10 @@ export default function MessageCard({
           )}
         </AnimatePresence>
       </motion.div>
+
+      {stoppedNote && (
+        <p className="mt-2 text-xs italic text-[var(--p-text-secondary)]">{stoppedNote}</p>
+      )}
 
       {/* Ghost text continue button */}
       {isGhostText && content && onContinue && (

@@ -29,13 +29,16 @@
 //     contributed actions is still deferred.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useLingui } from '@lingui/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, ChevronRight, Pin, X } from 'lucide-react'
 import MessageList from '../../components/core/MessageList'
 import MessageCard from '../../components/core/MessageCard'
 import SelectConversationModal from '../../components/SelectConversationModal'
 import { useChat } from '../../stores/ChatContext'
+import { useConversationId } from '../../stores/ConversationScope'
+import { useStreamText, useStreamMessageId } from '../../stores/chatHooks'
+import { COPY } from '../../copy'
 import { useSettings } from '../../stores/SettingsContext'
 import { useAnnotations } from '../../stores/AnnotationsContext'
 import { useBranchPanel } from '../../stores/BranchPanelContext'
@@ -57,8 +60,14 @@ const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
 const DELETE_UNDO_MS = 20_000
 
 export default function MessagesRender() {
-  const { id: conversationId } = useParams()
-  const { messages, isStreaming, streamingContent, continueMessage, activeConversationId } = useChat()
+  // The conversation this board shows, told by the board (stage 3).
+  const conversationId = useConversationId()
+  const { messages, isStreaming, continueMessage, activeConversationId } = useChat()
+  // The reply being written, read from the chat store, so only this list
+  // redraws while it streams; the rest of the page does not (stage 3).
+  const streamingContent = useStreamText(activeConversationId)
+  const streamingMessageId = useStreamMessageId(activeConversationId)
+  const { i18n } = useLingui()
   const { settings } = useSettings()
   const {
     favorites, notes, highlights, showNotes,
@@ -312,11 +321,8 @@ export default function MessagesRender() {
   }, [messages])
 
   const renderCard = useCallback((msg, idx) => {
-    const isLatestAssistantStreaming =
-      isStreaming &&
-      msg.role === 'assistant' &&
-      idx === visibleMessages.length - 1 &&
-      msg.content === ''
+    // The streaming card is the message the stream fills, by id.
+    const isLatestAssistantStreaming = isStreaming && msg.id === streamingMessageId
 
     const displayContent = isLatestAssistantStreaming ? streamingContent : msg.content
     const isGhost = msg.incomplete && !isLatestAssistantStreaming
@@ -333,6 +339,7 @@ export default function MessagesRender() {
         number={numberByMessageId.get(msg.id) || 0}
         index={idx}
         isGhostText={isGhost}
+        stoppedNote={isGhost && msg.stopReason === 'left' ? i18n._(COPY.chat.stoppedOnReply) : null}
         isFavorited={isFav}
         showNotes={showNotes.has(msg.id)}
         savedNoteText={noteRecord?.text || ''}
@@ -353,7 +360,7 @@ export default function MessagesRender() {
       />
     )
   }, [
-    visibleMessages.length, isStreaming, streamingContent,
+    isStreaming, streamingContent, streamingMessageId, i18n,
     numberByMessageId, activePopoverMsgId,
     favorites, notes, highlights, showNotes,
     handleContinue, handleCopyText,

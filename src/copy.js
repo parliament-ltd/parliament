@@ -177,6 +177,23 @@ export const COPY = {
     barAway: /*i18n*/ { id: 'shell.barAway', message: 'The bar is in its own window. pop:back command brings it back.' },
   },
 
+  // A reply being written when its chat is left (C109).
+  chat: {
+    stoppedOnReply: /*i18n*/ { id: 'chat.stoppedOnReply', message: 'Stopped when you left the chat. What arrived is kept.' },
+    stoppedNotice: /*i18n*/ {
+      id: 'chat.stoppedNotice',
+      message: 'The reply in {chat} stopped when you left it. What arrived is kept, and the tokens it used are charged.',
+      comment: "{chat} is the chat's number, or its title in quotation marks",
+    },
+    stoppedNoticeEmpty: /*i18n*/ { id: 'chat.stoppedNoticeEmpty', message: 'The reply in {chat} stopped when you left it, before any of it arrived.' },
+    close: /*i18n*/ { id: 'chat.close', message: 'Close' },
+    finishSetting: /*i18n*/ { id: 'chat.finishSetting', message: 'Finish replies after I leave a chat' },
+    finishSettingHelp: /*i18n*/ {
+      id: 'chat.finishSettingHelp',
+      message: 'Off: when you leave a chat while a reply is being written, the reply stops and what arrived is kept. On: it finishes in the background and is saved to its chat.',
+    },
+  },
+
   // Keeping the data (C94): the browser is not named.
   storage: {
     kept: /*i18n*/ { id: 'storage.kept', message: "This browser keeps Parliament's data until you delete it." },

@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { COPY } from './copy'
 
 const entries = Object.entries(COPY).flatMap(([group, items]) => Object.entries(items).map(([key, entry]) => ({ where: `${group}.${key}`, ...entry })))
-// Names that keep their capital in a sentence.
-const PROPER = new Set(['Parliament', "Parliament's"])
+// Names, and the pronoun I, keep their capital in a sentence.
+const PROPER = new Set(['Parliament', "Parliament's", 'I'])
 
 describe('the copy table', () => {
   it('gives every entry an id and a message, and no id twice', () => {

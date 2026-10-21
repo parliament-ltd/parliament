@@ -61,6 +61,31 @@ msgid "board.welcome"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.close"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.finishSetting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.finishSettingHelp"
+msgstr ""
+
+#. {chat} is the chat's number, or its title in quotation marks
+#. js-lingui-explicit-id
+msgid "chat.stoppedNotice"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.stoppedNoticeEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.stoppedOnReply"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "count.chats"
 msgstr ""
 
