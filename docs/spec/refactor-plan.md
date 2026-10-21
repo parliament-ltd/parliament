@@ -321,6 +321,11 @@ source has to work before the page can.
 - **Salvaged:** `InputArea.jsx`'s feature logic, `fileUpload.js`, the stream parser and error mapping in `anthropic.js`, `networkLog.js`. **Rebuilt:** how a request reaches a provider (13 places read the key and 17 fetch a provider today).
 - **Security and privacy:** a prompt to Wikipedia is a search sent to a third party, so it is named before Enter and never sent while typing. Source requests carry no credentials. Source text is shown as text, never as HTML, and can never run a command. What is sent finally matches what is shown: hidden and deleted messages stop going out. A reply cut off by a limit or an error is marked as cut off. This stage closes audit findings T4 ("Don't save") and T8 (Markdown).
 - **You can try:** in a private window with no key: `>`, `bar:bottom`, `p>` and a question. The answer comes from Wikipedia. Then `name:"…"`.
+- **To try once pushed to production** (Stefan, 21 October: tested there rather than now):
+  - In a private window with no key: `/shell`, `>sym:`, then `p>` and a question; the answer comes from Wikipedia with its page, revision and licence. Then `>name:"…"`, and `>alm:` and `>sym:` between screens. The ink pot drains and refills.
+  - With a key: the Enter line's cost before a send, and "After the answer, one short request for its title, summary and tags" on a chat's first prompt; the title, summary and tags arriving in the chat lists; hidden messages named as staying out; the switch "Name a new chat after its first answer" in Settings.
+  - A reply cut off by the length limit or an error, marked as cut off; a stalled reply (on a network that holds streamed replies) offered again without streaming, with its cost; the ink pot spilling.
+  - Under the real headers: the connection policy lets Wikipedia through in every language edition (C110).
 - **Needs from you:** nothing new. R25 is put to you here. **Ruled 21 October:** R25 approved, carried out only once the bar carries the composer's features (with R24); R32 approved.
 
 ### Stage 5. The welcome page
@@ -563,6 +568,7 @@ Rewritten rather than retired, because they will no longer be true: `README.md`,
 3. **Stage 2:** the dry run on your real data.
 4. **Stage 3:** the token sheet, and your verdict on the pop-out prototype.
 5. **Later, when their stage comes:** C58 and the engine choice (stage 11); the cost marks (stage 7); where DNS lives and a mailbox (stage 15).
+6. **Once pushed to production:** the stage 4 checks listed under "To try once pushed to production" in stage 4 (noted 21 October).
 
 ## Appendix. Proposed update to CLAUDE.md
 
