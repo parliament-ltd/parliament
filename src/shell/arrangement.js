@@ -165,7 +165,7 @@ export function planPopBar(a, popped) {
 
 /**
  * bar:<place>. Where the bar sits on the page: top or bottom, and on the
- * left, in the centre or on the right, which is also where its hexagon lands
+ * left, in the centre or on the right, which is also where it lands when it folds into a circle
  * (bar reference, 9 October; C43, C106). A popped bar comes back to the page.
  */
 export function planBar(a, place) {

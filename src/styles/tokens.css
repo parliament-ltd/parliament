@@ -37,7 +37,7 @@
   --ch-navy: 22, 38, 70;        /* the command fill, the navy rule */
   --ch-navy-2: 38, 56, 92;
 
-  /* Gold: the api: ignition and the hexagon's edge, nowhere else (C50) */
+  /* Gold: the api: ignition and the folded field's edge, nowhere else (C50) */
   --ch-gold: #C4A94D;
   --ch-gold-deep: #8B6A10;
   --ch-gold-glow: rgba(196, 169, 77, .35);
@@ -73,7 +73,7 @@
   --ch-lh-read: 1.6;
 
   /* Shape */
-  --ch-r-sm: 4px;               /* the hexagon, chips */
+  --ch-r-sm: 4px;               /* chips */
   --ch-r-md: 6px;               /* inputs */
   --ch-r-btn: 8px;
   --ch-r-field: 14px;           /* the open field */
@@ -86,7 +86,7 @@
   --ch-ease: cubic-bezier(.65, 0, .35, 1);
   --ch-k: 1;                    /* every duration is multiplied by this */
   --ch-dur-wipe: calc(280ms * var(--ch-k));    /* a mode's fill wipes in */
-  --ch-dur-slide: calc(360ms * var(--ch-k));   /* the field folds to the hexagon */
+  --ch-dur-slide: calc(360ms * var(--ch-k));   /* the field folds to a circle (C108) */
   --ch-dur-morph: calc(460ms * var(--ch-k));   /* the chevron rolls into the moon */
   --ch-hover-intent: 140ms;
   --ch-hover-close: 600ms;

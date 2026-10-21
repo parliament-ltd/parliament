@@ -183,7 +183,7 @@ describe('pop: and pop:back', () => {
 describe('bar: and reset:', () => {
   it('bar: moves the bar on the page, and brings it back from a window', () => {
     expect(keep(planBar(almanac(), 'bottom')).bar).toEqual({ at: 'bottom', side: 'center', popped: false })
-    // Left and right are the other axis: where the field and its hexagon sit (C106).
+    // Left and right are the other axis: where the field sits and folds (C106).
     expect(keep(planBar(keep(planBar(almanac(), 'bottom')), 'left')).bar).toEqual({ at: 'bottom', side: 'left', popped: false })
     expect(planBar(almanac(), 'center')).toMatchObject({ next: null, says: { message: 'barThere', values: { place: 'center' } } })
     expect(planBar(almanac(), 'top')).toMatchObject({ next: null, says: { message: 'barThere', values: { place: 'top' } } })

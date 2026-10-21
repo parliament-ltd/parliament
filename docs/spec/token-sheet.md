@@ -36,7 +36,7 @@ Contrast is against the paper colour `#FCFCFA`. Small text needs 4.5:1
 | `navy` | rgb 22, 38, 70 | 14.6 | Command mode, the navy rule | Bar reference |
 | `navy-2` | rgb 38, 56, 92 | 11.3 | Second navy | Bar reference |
 | `gold` | #C4A94D | 2.2 | The `api:` ignition only, never text | Bar reference (C50) |
-| `gold-deep` | #8B6A10 | 4.9 | The hexagon's edge on hover | Bar reference (C50) |
+| `gold-deep` | #8B6A10 | 4.9 | The folded field's edge on hover | Bar reference (C50) |
 | `gold-glow` | rgba(196,169,77,.35) | | The ignition's glint | Bar reference |
 | `you` | #2B5CB8 | 6.1 | Your words, solid underline | Bar reference |
 | `ai` | #2E7458 | 5.4 | An ask's answer or a sweep, dotted underline | Editing v5 |
@@ -71,13 +71,14 @@ Line height 1.5, and 1.6 for reading.
 
 ## Shape and motion
 
-- Corners: 4px (the hexagon, chips), 6px (inputs), 8px (buttons), 14px (the
-  open field), 16px (cards). The field is 40px tall.
+- Corners: 4px (chips), 6px (inputs), 8px (buttons), 14px (the open field),
+  16px (cards). The field is 40px tall, and folds into a circle 40px across
+  (C108, which replaced the hexagon).
 - Cards carry a faint lift (`0 1px 2px rgba(40,36,28,.035)` and a half-pixel
   ring at 5%), no borders or hatching (welcome spec §2).
 - Keyboard focus: a 2px ink outline on anything focused (editing spec).
 - Easing `cubic-bezier(.65,0,.35,1)`. A mode's fill wipes in over 280ms; the
-  field folds to the hexagon over 360ms; the chevron rolls into the moon over
+  field folds to a circle over 360ms; the chevron rolls into the moon over
   460ms; hover opens after 140ms and closes 600ms after leaving. With reduced
   motion every duration is multiplied by 0.001.
 
@@ -102,7 +103,7 @@ From mockups older than the welcome and editing decisions:
   `line-a`, `line-w`, `p-line-soft`, `paper-ink`): retired (welcome spec §2,
   P1).
 - Gold for selected and active states (`gold-light`, `gold-muted`, the gold
-  tints): gold is the ignition and the hexagon's edge only (C50).
+  tints): gold is the ignition and the folded field's edge only (C50).
 - Marginalia at 46% and the paler greys: the legibility table.
 
 ## Open

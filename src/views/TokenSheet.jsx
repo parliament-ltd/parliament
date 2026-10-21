@@ -26,7 +26,7 @@ const COLOURS = [
   ['ai', '#2E7458', "an ask's answer, a sweep · 5.4"],
   ['rust', '#94491F', 'Ripple · 6.3'],
   ['gold', '#C4A94D', 'the api: ignition only'],
-  ['gold-deep', '#8B6A10', "the hexagon's edge on hover"],
+  ['gold-deep', '#8B6A10', "the folded field's edge on hover"],
 ]
 
 const SIZES = [
