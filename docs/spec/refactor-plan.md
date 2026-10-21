@@ -332,6 +332,16 @@ source has to work before the page can.
 
 Your first target. The page is the lesson: every step is a real command.
 
+**Status, 21 October: started.** Built in six pieces, each committed and checked before the next. Where a point is open, it is built as suggested in `conflicts.md` (C118 to C123), so a ruling changes one entry.
+1. **The page:** the welcome screen in the shell: one large card with "Welcome", the eight steps as ruled (2 `bar:bottom`, 6 `pop:almanac`, 8 `api:`), the letter, the field in the card with no box at rest, and the footer. Steps cross off from what really happens, kept on this device. `tour:` and `tour:off` (A20). `/shell` opens on it for someone who has made nothing (C118).
+2. **The first prompt beside it:** `p>` starts a chat in its own card on the right of the welcome card, which narrows to one column; boards the steps open stack on the right.
+3. **A thin Almanac:** rows with their numbers, pinned first, `open:` by number, `inspect:`. Enough for steps 4 and 5.
+4. **A thin Library:** read-only, from one read layer of the catalogue. Enough for step 7.
+5. **The key panel:** `api:` opens a password field password managers leave alone, checked and kept through the key module, with the gold ignition once per new key. Enough for step 8.
+6. **The ending and the rest:** "Welcome / to Parliament", "Now, let's focus:", `focus:` and `focus:off`, the line for small screens, the storage notice (C94), the pseudo-language check; then the plain-language pass on names (A6) and R15 put to Stefan.
+
+Steps 9 and 10 of welcome v9 (strike a line, leave the AI a note) need editing in place and come with stage 11 (A7); the ending then moves after step 10.
+
 - **Added**
   - The page: one large card, the letter, the eight steps, the field with no box at rest, the footer, the ending ("Welcome / to Parliament"), and the line that offers `focus:`.
   - Steps as ruled: step 2 is `bar:bottom`; step 6, `pop:almanac`, is where `pop:` is introduced; step 8 is `api:`.

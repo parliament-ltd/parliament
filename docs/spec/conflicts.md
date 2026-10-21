@@ -968,6 +968,25 @@ Found while building stage 4, pieces 4 and 5 (a room in the shell; sending by co
 - Replies cut off by the length allowed for one reply, or broken off by an error, are stored as cut off (`stopReason` 'limit' or 'error', beside C109's 'left') and say so. This is a new value in an optional field: nothing existing changes, and older backups read as before.
 - C62 is built: one request after a chat's first answer, named on the Enter line, with its switch ("Name a new chat after its first answer") under Usage & Spending in today's Settings, on by default as the three calls were (ruled 21 October). The three old calls stay in the provider, unused; whether to retire them goes on the retirement list.
 
+## Part 9. The welcome page (added 21 October 2026)
+
+Found while splitting stage 5 into pieces. The documents: `welcome-spec-decisions.md` (30 September, eight steps), `welcome-inline-editing-spec.md` and `parliament_welcome_v9.html` (6 October, ten steps; they win where they differ), and the rulings since (C43, C44, A1, A6, A7, A20, C71, C94). Each is built as suggested, so a ruling changes one entry.
+
+**C118. Where the welcome page lives until the shell replaces today's screens.** The plan (stage 5) says `/` shows the welcome page to someone new and the Almanac to someone with work, and that links carry numbers (`/207`). But the new shell is behind a flag (`/shell`, in development and `VITE_PROTOTYPES=1` builds), and today's `/` is The Study. **Suggestion:** for now, `/shell` opens on the welcome page for someone who has made nothing, and on the Almanac otherwise; `tour:` brings the welcome page back. `/` and the numbered links change when the flag is switched on for everyone.
+
+**C119. Step 4 under the Escape rule.** Welcome v9's step 4 reads "esc, then `alm:`", from when Escape stepped back one mode at a time. C44 (ruled 15 October) took Escape straight to the resting mode, which on the welcome page is search, and suggested rewording step 4. After a prompt the field rests in prompt, where typing `>` at the start switches to the command line. **Suggestion:** step 4 reads "See what you have made · `alm:`" like the others, a click writes `>alm:`, and in prompt mode the line by the field says "`>` for the command line".
+
+**C120. When step 8 crosses off.** W §4 and §12: on seeing the key panel, since not everyone has a key on day one; the step's wording says "Add". **Suggestion:** on seeing the panel, as the spec decided. Saving a key there plays the gold ignition.
+
+**C121. Where the steps' progress is kept.** No document says. **Suggestion:** a setting kept on this device only (`welcomeSteps`), not in backups: which steps are done, whether the list is put away (`tour:off`) and whether the ending was reached. It is not a new list and changes no stored data.
+
+**C122. The letter.** The plan leaves its final wording to Stefan. W §3 and v9 give the text; two points meet later rules:
+- "each request goes straight to the provider you pick, to a model running on your own machine, or just Wikipedia": the privacy copy names no provider in a sentence (12 October). Wikipedia is a source, not a provider, and is what answers without a key, so naming it reads true. The sentence stays true for every provider as written.
+- The signature's em dash is W §3's one deliberate exception to the copy rule.
+- **Suggestion:** ship v9's letter as written, from the copy table, for Stefan to edit there. Built so.
+
+**C123. The footer.** v9: "Created with Claude Code · Open source on GitHub · Looking for other builders", both links placeholders. C71: the repository goes public after the refactor, and until then the footer says "MIT licensed. Source published at launch". **Suggestion:** "Created with Claude Code · MIT licensed. Source published at launch · Looking for other builders", with no link on the second, and the third a mail link to support@parliament.ltd (the one address for now, 12 October) until a page for builders exists.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
