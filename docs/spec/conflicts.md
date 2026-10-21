@@ -540,6 +540,7 @@ These look settled by date. "Part 5a: yes" confirms them all, or name a row.
 **C51. One token sheet.**
 - `--ink-2` is #787774 (welcome v9), #5F5E59 (E "Legibility") and #45433f (bar reference). `--ink-3` is #9B9A97, #6F6E69 and #6b6964. Marginalia is ink at 46% (welcome v9, Lab v7, Settings v1) or 62% (v5, bar reference).
 - **Suggestion:** take the bar reference where it defines a value and E's legibility table otherwise, and show you one sheet to approve before any chrome is built.
+- **Approved 20 October, "for now"** ("looks good for now"): the sheet in `token-sheet.md` and `src/styles/tokens.css`, drawn at `/dev/tokens`. Chrome is drawn from it; values can still change.
 
 **C52. Is the table board called History?**
 - AB §2 (Proposed): the Almanac is an arrangement whose middle board is History.
@@ -841,7 +842,7 @@ language, reply language), and so are more providers, Mistral included.
 
 ## Part 7. The command layer (added 20 October 2026)
 
-Found while building the parser and the verb registry (stage 3: `src/commands/parse.js`, `verbs.js`, `registry.js`). Every verb in the documents was listed, newest wins, rulings over documents. These are the points the documents leave open (C95 to C105). Each is built as suggested, so a ruling either confirms it or changes one entry in `verbs.js`.
+Found while building the parser and the verb registry (stage 3: `src/commands/parse.js`, `verbs.js`, `registry.js`). Every verb in the documents was listed, newest wins, rulings over documents. These are the points the documents leave open (C95 to C106). Each is built as suggested, so a ruling either confirms it or changes one entry in `verbs.js`.
 
 **C95. Board names as verbs.**
 - The bar inventory (7 and 9 October, the newest) lists `alm:`, `lab:`, `sym:` and `library:` as current. The welcome steps teach `alm:` and `library:`.
@@ -885,6 +886,8 @@ Found while building the parser and the verb registry (stage 3: `src/commands/pa
 - **Ruled 20 October: keep both `pop:back` and `reset:` as built.**
 
 **C105. `pop:left` and `pop:right`.** Ruled only as being "for boards that have been popped" (C43); no document says what they do. **Built:** they place the window of the board the bar is pointed at on the left or the right of the screen. **Suggestion:** keep as built. **Ruled 20 October: yes.**
+
+**C106. `bar:left`, `bar:center` and `bar:right`.** The settings spec (§7, 24 September): left and right make the field a square in a column of its own, with three lines kept for the Enter line, and `bar:bottom` puts the Enter line above the field. The bar reference (9 October, newer) used `pop:left`, `pop:right` and `pop:center` to move the field, and the hexagon it folds into, to that side; C43 (12 October) gave those words to `bar:`. **Built** as the newer: two separate choices, top or bottom, and left, centre or right, with the Enter line under the field either way. **Suggestion:** keep as built; the settings spec's square can come back once it can be seen beside this.
 
 **Also built from the mockups** (no question):
 - `open:` puts a board at the right end and points the bar at it; a board already here gets the bar, a popped one comes forward. No limit on how many; narrow windows stack (stage 14).
