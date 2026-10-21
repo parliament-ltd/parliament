@@ -1,0 +1,97 @@
+/*
+  The new chrome's styles (refactor-plan.md, stage 3; C51, C64).
+
+  Every value comes from the approved token sheet (src/styles/tokens.css),
+  whose --ch- variables room themes never set: themes write --p- only. The
+  chrome sets its own font, colour and spacing on everything it draws, with
+  class selectors that outrank today's element rules (Tailwind's base sits in
+  a lower layer), so neither a room's theme nor today's screens can restyle
+  it. Shapes and timings follow the bar reference (9 October). No inline
+  styles: everything is in this built stylesheet, so the policy can lose
+  'unsafe-inline' later.
+*/
+
+@import '../styles/tokens.css';
+
+.ch-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--ch-paper);
+  color: var(--ch-ink);
+  font: 400 var(--ch-t-body)/var(--ch-lh) var(--ch-sans);
+  -webkit-font-smoothing: antialiased;
+  text-align: start;
+}
+.ch-shell *, .ch-shell *::before, .ch-shell *::after { box-sizing: border-box; }
+.ch-shell button { font: inherit; color: inherit; background: none; border: none; padding: 0; margin: 0; cursor: pointer; text-align: inherit; }
+.ch-shell :focus-visible { outline: var(--ch-focus); outline-offset: 2px; border-radius: 3px; }
+.ch-code { font: 600 11px var(--ch-mono); color: var(--ch-ink); }
+.ch-marg { font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); }
+
+/* ── the board strip ── */
+.ch-strip { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 22px; padding: 12px clamp(16px, 4vw, 32px); border-bottom: .5px solid var(--ch-rule); background: var(--ch-surface); }
+.ch-btitle { font: 600 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink-3); padding: 2px 0; }
+.ch-btitle.here { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.ch-btitle .ch-ctx { font-weight: 400; color: var(--ch-ink-3); margin-inline-start: 4px; }
+.ch-btitle:hover { color: var(--ch-ink); }
+
+/* ── the boards ── */
+.ch-stage { flex: 1; display: flex; gap: 16px; align-items: stretch; padding: 16px clamp(16px, 4vw, 32px); min-height: 0; }
+.ch-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.ch-col.main { flex-grow: 2; }
+.ch-card { background: var(--ch-surface); border-radius: var(--ch-r-card); box-shadow: var(--ch-lift); min-height: 220px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+.ch-card.addressed::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; width: 2px; background: rgb(var(--ch-navy)); }
+.ch-chead { display: flex; align-items: baseline; gap: 8px; padding: 11px 16px 9px; border-bottom: 1px solid var(--ch-rule); }
+.ch-chead h2 { font: 600 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink); margin: 0; }
+.ch-chead .ch-marg { margin-inline-start: auto; white-space: nowrap; }
+.ch-cbody { padding: 14px 16px 16px; flex: 1; }
+@media (max-width: 900px) { .ch-stage { flex-direction: column; } }
+
+/* ── the dock: where the bar sits ── */
+.ch-dock { position: sticky; z-index: 30; padding: 12px 16px 6px; background: var(--ch-paper); }
+.ch-dock.top { top: 0; border-bottom: .5px solid var(--ch-rule); }
+.ch-dock.bottom { position: fixed; inset-inline: 0; bottom: 0; padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(to top, var(--ch-paper) 72%, rgba(252, 252, 250, 0)); }
+.ch-shell.bar-bottom .ch-stage { padding-bottom: 140px; }
+.ch-dock-in { max-width: 720px; margin: 0 auto; position: relative; }
+.ch-dock.left .ch-dock-in { margin-inline: 0 auto; }
+.ch-dock.right .ch-dock-in { margin-inline: auto 0; }
+
+/* ── the field ── */
+.ch-field { position: relative; display: flex; align-items: center; height: var(--ch-field-h); width: 100%; border-radius: var(--ch-r-field); background: var(--ch-surface); overflow: hidden; box-shadow: 0 1px 2px rgba(40, 36, 28, .035), 0 0 0 .5px rgba(25, 25, 25, .10); }
+.ch-fillwrap { position: absolute; inset: 0; pointer-events: none; z-index: 0; clip-path: inset(0 100% 0 0); transition: clip-path var(--ch-dur-wipe) cubic-bezier(.4, 0, .2, 1); }
+.ch-fillwrap.on { clip-path: inset(0 0 0 0); }
+.ch-fill { position: absolute; inset: 0; }
+.ch-fill svg { width: 100%; height: 100%; display: block; }
+.ch-fill.command { background: rgb(var(--ch-navy)); }
+.ch-fill.prompt { background: var(--ch-paper); }
+.ch-field input { position: relative; z-index: 1; flex: 1; min-width: 0; height: 100%; padding: 0 42px 0 72px; border: none; background: transparent; font: 400 13.5px var(--ch-sans); color: var(--ch-ink); outline: none; }
+.ch-field.command input { font-family: var(--ch-mono); font-size: 13px; color: #fff; padding-inline: 86px 14px; text-shadow: 0 0 3px rgba(12, 20, 40, .95), 0 1px 2px rgba(12, 20, 40, .85); caret-color: #fff; }
+.ch-field.prompt input { padding-inline-start: 78px; }
+.ch-field:focus-within { box-shadow: 0 1px 2px rgba(40, 36, 28, .035), 0 0 0 .5px rgba(25, 25, 25, .10), 0 0 0 2px var(--ch-ink); }
+.ch-chip { position: absolute; inset-inline-start: 12px; top: 50%; margin-top: -8px; z-index: 2; font: 600 8.5px var(--ch-sans); letter-spacing: .06em; text-transform: uppercase; padding: 3px 7px; border-radius: 9px; opacity: 0; transform: translateX(-4px); transition: opacity calc(160ms * var(--ch-k)) ease, transform calc(160ms * var(--ch-k)) ease; pointer-events: none; }
+.ch-chip.on { opacity: 1; transform: none; }
+.ch-chip.search { background: var(--ch-paper); color: var(--ch-ink); border: 1px solid var(--ch-ink); padding: 2px 6px; }
+.ch-chip.command { background: rgb(var(--ch-navy-2)); color: #fff; }
+.ch-chip.prompt { background: var(--ch-ink); color: var(--ch-paper); }
+.ch-gslot { position: absolute; inset-inline-end: 0; top: 0; z-index: 2; width: 40px; height: 40px; pointer-events: none; }
+.ch-glyph { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--ch-ink); opacity: 0; transition: opacity calc(160ms * var(--ch-k)) ease; }
+.ch-glyph.on { opacity: 1; }
+.ch-glyph.mag { width: 15px; height: 15px; }
+.ch-glyph.quill { width: 21px; height: 21px; }
+
+/* ── the Enter line: one reserved row that never pushes anything down ── */
+.ch-enter { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; min-height: 19px; padding: 6px 13px 0; font: italic 400 11px/1.6 var(--ch-serif); color: var(--ch-marg); }
+.ch-enter .now { color: var(--ch-ink); }
+.ch-enter .sep { opacity: .45; margin: 0 4px; }
+
+/* ── the ? reference, under the field ── */
+.ch-ref { margin-top: 8px; background: var(--ch-surface); border-radius: var(--ch-r-card); box-shadow: var(--ch-lift); max-height: 52vh; overflow: auto; padding: 6px 16px 14px; }
+.ch-ref h3 { font: 600 9px var(--ch-sans); letter-spacing: .055em; text-transform: uppercase; color: var(--ch-ink); margin: 14px 0 4px; }
+.ch-ref-row { display: flex; align-items: baseline; gap: 12px; width: 100%; padding: 5px 6px; border-radius: var(--ch-r-md); }
+.ch-ref-row:hover { background: var(--ch-wash); }
+.ch-ref-row .ch-code { flex: 0 0 auto; min-width: 150px; }
+.ch-ref-row .gloss { font: 400 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink-2); }
+.ch-ref-head { display: flex; align-items: baseline; justify-content: flex-end; padding-top: 8px; }
+/* With the bar at the bottom, the reference opens above the field. */
+.ch-dock.bottom .ch-ref { position: absolute; inset-inline: 0; bottom: 100%; margin: 0 0 10px; max-height: 60vh; }

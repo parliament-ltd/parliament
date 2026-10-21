@@ -152,11 +152,11 @@ msgstr "{verb} is not built yet"
 
 #. js-lingui-explicit-id
 msgid "enter.leavePrompt"
-msgstr "Esc for prompt"
+msgstr "Escape goes back to the prompt"
 
 #. js-lingui-explicit-id
 msgid "enter.leaveSearch"
-msgstr "Esc for search"
+msgstr "Escape goes back to search"
 
 #. js-lingui-explicit-id
 msgid "enter.moveBoard"
@@ -248,6 +248,10 @@ msgid "enter.popSideThere"
 msgstr "{side, select, left {The window of {board} is on the left already} other {The window of {board} is on the right already}}"
 
 #. js-lingui-explicit-id
+msgid "enter.promptLater"
+msgstr "Sending a prompt is not built yet"
+
+#. js-lingui-explicit-id
 msgid "enter.ready"
 msgstr "Enter runs {verb}"
 
@@ -264,6 +268,19 @@ msgstr "This screen is as shipped"
 msgid "enter.resetArrangement"
 msgstr "{count, plural, =0 {Enter puts this screen back as shipped} one {Enter puts this screen back as shipped and closes # window} other {Enter puts this screen back as shipped and closes # windows}}"
 
+#. The Enter line in search mode, before anything is typed
+#. js-lingui-explicit-id
+msgid "enter.restingCommand"
+msgstr "type > for the command line"
+
+#. js-lingui-explicit-id
+msgid "enter.restingHelp"
+msgstr "? every command"
+
+#. js-lingui-explicit-id
+msgid "enter.restingPrompt"
+msgstr "p> for a prompt"
+
 #. js-lingui-explicit-id
 msgid "enter.retired"
 msgstr "{verb} is no longer a command"
@@ -271,6 +288,10 @@ msgstr "{verb} is no longer a command"
 #. js-lingui-explicit-id
 msgid "enter.retiredInstead"
 msgstr "{verb} is no longer a command. Use {instead}"
+
+#. js-lingui-explicit-id
+msgid "enter.searchLater"
+msgstr "Search is not built yet"
 
 #. {verbs} lists the commands in the order they run; one that fails stops the rest
 #. js-lingui-explicit-id
@@ -293,6 +314,11 @@ msgstr "{verb} does not take that. For example: {example}"
 #. js-lingui-explicit-id
 msgid "enter.takesWords"
 msgstr "{verb} takes {words}"
+
+#. The head of the Enter line: where the command goes
+#. js-lingui-explicit-id
+msgid "enter.target"
+msgstr "→ {board}"
 
 #. js-lingui-explicit-id
 msgid "enter.unknown"
@@ -433,6 +459,34 @@ msgstr "Prompt"
 #. js-lingui-explicit-id
 msgid "mode.search"
 msgstr "Search"
+
+#. Marginalia on the board the navy rule is on
+#. js-lingui-explicit-id
+msgid "shell.addressed"
+msgstr "the bar points here"
+
+#. js-lingui-explicit-id
+msgid "shell.boardLater"
+msgstr "This board is drawn in a later stage."
+
+#. The name of the field, read by screen readers
+#. js-lingui-explicit-id
+msgid "shell.field"
+msgstr "Search, command or prompt"
+
+#. js-lingui-explicit-id
+msgid "shell.referenceClose"
+msgstr "Escape closes this"
+
+#. The name of the ? reference, read by screen readers
+#. js-lingui-explicit-id
+msgid "shell.referenceName"
+msgstr "Every command"
+
+#. The name of the board strip, read by screen readers
+#. js-lingui-explicit-id
+msgid "shell.strip"
+msgstr "Boards"
 
 #. js-lingui-explicit-id
 msgid "storage.ask"

@@ -1,4 +1,6 @@
+import { readFileSync } from 'node:fs'
 import { describe, it, expect } from 'vitest'
+import { VERBS } from './commands/verbs'
 import { setupI18n } from '@lingui/core'
 import { pickLanguage, directionOf } from './i18n'
 import { COPY } from './copy'
@@ -40,6 +42,13 @@ describe('the compiled catalogues', () => {
     expect(i18n._(COPY.counts.chats, { count: 2 })).toMatch(/^2/)
     i18n.activate('ar-XB')
     expect(i18n._(COPY.boards.almanac)).toMatch(/‮/) // written right to left
+  })
+
+  it('say in English exactly what the copy table says, so rewording reaches the app', () => {
+    const po = readFileSync(new URL('./locales/en/messages.po', import.meta.url), 'utf8')
+    const english = new Map([...po.matchAll(/msgid "([^"]+)"\nmsgstr "((?:[^"\\]|\\.)*)"/g)].map((m) => [m[1], m[2].replace(/\\"/g, '"')]))
+    const entries = [...Object.values(COPY).flatMap((group) => Object.values(group)), ...VERBS.map((v) => v.gloss)]
+    for (const e of entries) expect(english.get(e.id), e.id).toBe(e.message)
   })
 
   it('hold every entry of the copy table', () => {

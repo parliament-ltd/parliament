@@ -43,6 +43,12 @@ const PopoutPrototype = import.meta.env.DEV || import.meta.env.VITE_PROTOTYPES =
   ? lazy(() => import('./views/PopoutPrototype'))
   : null
 
+// The new shell (stage 3), beside today's screens until they are replaced:
+// in development, or in a build made with VITE_PROTOTYPES=1.
+const Shell = import.meta.env.DEV || import.meta.env.VITE_PROTOTYPES === '1'
+  ? lazy(() => import('./chrome/Shell'))
+  : null
+
 // Dev only: the token sheet, drawn for approval (stage 3, C51).
 const TokenSheet = import.meta.env.DEV
   ? lazy(() => import('./views/TokenSheet'))
@@ -97,6 +103,18 @@ export default function App() {
                         <ErrorBoundary inline>
                           <Suspense fallback={null}>
                             <MigrationPreview />
+                          </Suspense>
+                        </ErrorBoundary>
+                      }
+                    />
+                  )}
+                  {Shell && (
+                    <Route
+                      path="/shell"
+                      element={
+                        <ErrorBoundary inline>
+                          <Suspense fallback={null}>
+                            <Shell />
                           </Suspense>
                         </ErrorBoundary>
                       }

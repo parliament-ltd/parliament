@@ -248,6 +248,10 @@ msgid "enter.popSideThere"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.promptLater"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.ready"
 msgstr ""
 
@@ -264,12 +268,29 @@ msgstr ""
 msgid "enter.resetArrangement"
 msgstr ""
 
+#. The Enter line in search mode, before anything is typed
+#. js-lingui-explicit-id
+msgid "enter.restingCommand"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.restingHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.restingPrompt"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.retired"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.retiredInstead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.searchLater"
 msgstr ""
 
 #. {verbs} lists the commands in the order they run; one that fails stops the rest
@@ -292,6 +313,11 @@ msgstr ""
 #. {words} is a list joined with "or"
 #. js-lingui-explicit-id
 msgid "enter.takesWords"
+msgstr ""
+
+#. The head of the Enter line: where the command goes
+#. js-lingui-explicit-id
+msgid "enter.target"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -432,6 +458,34 @@ msgstr ""
 #. The bar's search mode
 #. js-lingui-explicit-id
 msgid "mode.search"
+msgstr ""
+
+#. Marginalia on the board the navy rule is on
+#. js-lingui-explicit-id
+msgid "shell.addressed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "shell.boardLater"
+msgstr ""
+
+#. The name of the field, read by screen readers
+#. js-lingui-explicit-id
+msgid "shell.field"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "shell.referenceClose"
+msgstr ""
+
+#. The name of the ? reference, read by screen readers
+#. js-lingui-explicit-id
+msgid "shell.referenceName"
+msgstr ""
+
+#. The name of the board strip, read by screen readers
+#. js-lingui-explicit-id
+msgid "shell.strip"
 msgstr ""
 
 #. js-lingui-explicit-id

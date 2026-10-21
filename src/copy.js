@@ -144,8 +144,14 @@ export const COPY = {
     },
     popOrdinary: /*i18n*/ { id: 'enter.popOrdinary', message: 'It opens as an ordinary window, since this browser cannot keep one on top', comment: 'Added to the Enter line for pop: where the always-on-top window is missing (C94)' },
     key: /*i18n*/ { id: 'enter.key', message: 'No keys in the command line, for security. Delete it, and api: opens the key field' },
-    leaveSearch: /*i18n*/ { id: 'enter.leaveSearch', message: 'Esc for search' },
-    leavePrompt: /*i18n*/ { id: 'enter.leavePrompt', message: 'Esc for prompt' },
+    leaveSearch: /*i18n*/ { id: 'enter.leaveSearch', message: 'Escape goes back to search' },
+    leavePrompt: /*i18n*/ { id: 'enter.leavePrompt', message: 'Escape goes back to the prompt' },
+    target: /*i18n*/ { id: 'enter.target', message: '→ {board}', comment: 'The head of the Enter line: where the command goes' },
+    restingCommand: /*i18n*/ { id: 'enter.restingCommand', message: 'type > for the command line', comment: 'The Enter line in search mode, before anything is typed' },
+    restingPrompt: /*i18n*/ { id: 'enter.restingPrompt', message: 'p> for a prompt' },
+    restingHelp: /*i18n*/ { id: 'enter.restingHelp', message: '? every command' },
+    searchLater: /*i18n*/ { id: 'enter.searchLater', message: 'Search is not built yet' },
+    promptLater: /*i18n*/ { id: 'enter.promptLater', message: 'Sending a prompt is not built yet' },
   },
 
   // The hint line: the keys that open the field where focus is (P2). {key}
@@ -154,6 +160,16 @@ export const COPY = {
     slashOrK: /*i18n*/ { id: 'hint.slashOrK', message: 'press / or {key}' },
     kOnly: /*i18n*/ { id: 'hint.kOnly', message: 'press {key}' },
     minimised: /*i18n*/ { id: 'hint.minimised', message: 'Minimised. Search, command or prompt', comment: 'The name of the folded field, read by screen readers' },
+  },
+
+  // The new shell (stage 3), while its boards are still placeholders.
+  shell: {
+    field: /*i18n*/ { id: 'shell.field', message: 'Search, command or prompt', comment: 'The name of the field, read by screen readers' },
+    strip: /*i18n*/ { id: 'shell.strip', message: 'Boards', comment: 'The name of the board strip, read by screen readers' },
+    boardLater: /*i18n*/ { id: 'shell.boardLater', message: 'This board is drawn in a later stage.' },
+    addressed: /*i18n*/ { id: 'shell.addressed', message: 'the bar points here', comment: 'Marginalia on the board the navy rule is on' },
+    referenceClose: /*i18n*/ { id: 'shell.referenceClose', message: 'Escape closes this' },
+    referenceName: /*i18n*/ { id: 'shell.referenceName', message: 'Every command', comment: 'The name of the ? reference, read by screen readers' },
   },
 
   // Keeping the data (C94): the browser is not named.
