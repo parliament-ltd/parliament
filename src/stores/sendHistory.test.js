@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { forModel } from './sendHistory'
+import { forModel, cutReason } from './sendHistory'
 
 const introduce = (s) => `[From ${s.name}: ${s.title}]`
 
@@ -35,5 +35,15 @@ describe('what a model receives of a chat', () => {
       null,
       { role: 'user', content: 'Again' },
     ], introduce)).toEqual([{ role: 'user', content: 'qxz\n\nAgain' }])
+  })
+})
+
+describe('a reply cut off', () => {
+  it('by the length limit, by an error, or not at all', () => {
+    expect(cutReason('max_tokens')).toBe('limit')
+    expect(cutReason(null)).toBe('error')
+    expect(cutReason(undefined)).toBe('error')
+    expect(cutReason('end_turn')).toBeNull()
+    expect(cutReason('stop_sequence')).toBeNull()
   })
 })

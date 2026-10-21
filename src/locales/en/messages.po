@@ -69,6 +69,14 @@ msgid "chat.close"
 msgstr "Close"
 
 #. js-lingui-explicit-id
+msgid "chat.cutError"
+msgstr "Cut off by an error part way through. What arrived is kept."
+
+#. js-lingui-explicit-id
+msgid "chat.cutLimit"
+msgstr "Cut off: the reply reached the length allowed for one reply. What arrived is kept."
+
+#. js-lingui-explicit-id
 msgid "chat.finishSetting"
 msgstr "Finish replies after I leave a chat"
 
@@ -369,6 +377,10 @@ msgstr "Enter runs {verb}"
 #. js-lingui-explicit-id
 msgid "enter.renamed"
 msgstr "That verb is now {now}. Enter writes it in"
+
+#. js-lingui-explicit-id
+msgid "enter.replyCut"
+msgstr "The reply broke off part way. What arrived is kept and marked as cut off"
 
 #. js-lingui-explicit-id
 msgid "enter.resetAlready"

@@ -56,6 +56,8 @@ function isSourceNote(s) {
     && (s.licence == null || (typeof s.licence === 'object' && text(s.licence.name, 100) && link(s.licence.url)))
 }
 
+const STOP_REASONS = new Set(['left', 'limit', 'error'])
+
 function validateMessage(item) {
   if (!isId(item.id))                          return 'message.id invalid'
   if (!isId(item.conversationId))              return 'message.conversationId invalid'
@@ -64,8 +66,9 @@ function validateMessage(item) {
   if (!isNumber(item.tokenCount))              return 'message.tokenCount must be a number'
   if (!isBoolean(item.incomplete))             return 'message.incomplete must be boolean'
   if (!isISODate(item.createdAt))              return 'message.createdAt invalid date'
-  // C109: a reply stopped because its chat was left says so.
-  if (item.stopReason != null && item.stopReason !== 'left') return 'message.stopReason invalid'
+  // Why a reply stopped short: its chat was left (C109), it reached the
+  // length allowed for one reply, or an error broke it off (stage 4).
+  if (item.stopReason != null && !STOP_REASONS.has(item.stopReason)) return 'message.stopReason invalid'
   // Stage 4: an answer from a source says where it came from.
   if (item.source != null && !isSourceNote(item.source)) return 'message.source invalid'
   return null

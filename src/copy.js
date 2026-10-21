@@ -193,6 +193,7 @@ export const COPY = {
     keyRefused: /*i18n*/ { id: 'enter.keyRefused', message: 'The key was refused. Update it in {board}, then send again', comment: '{board} is Settings, from COPY.boards' },
     tooMany: /*i18n*/ { id: 'enter.tooMany', message: 'Too many requests for now. Wait a moment, then send again' },
     promptFailed: /*i18n*/ { id: 'enter.promptFailed', message: 'The prompt did not go through. Try again' },
+    replyCut: /*i18n*/ { id: 'enter.replyCut', message: 'The reply broke off part way. What arrived is kept and marked as cut off' },
   },
 
   // Marginalia inside the prompt field: who answers a prompt here (bar
@@ -235,6 +236,9 @@ export const COPY = {
   // A reply being written when its chat is left (C109).
   chat: {
     stoppedOnReply: /*i18n*/ { id: 'chat.stoppedOnReply', message: 'Stopped when you left the chat. What arrived is kept.' },
+    // A reply cut off (stage 4), marked so it is never taken for a whole answer.
+    cutLimit: /*i18n*/ { id: 'chat.cutLimit', message: 'Cut off: the reply reached the length allowed for one reply. What arrived is kept.' },
+    cutError: /*i18n*/ { id: 'chat.cutError', message: 'Cut off by an error part way through. What arrived is kept.' },
     stoppedNotice: /*i18n*/ {
       id: 'chat.stoppedNotice',
       message: 'The reply in {chat} stopped when you left it. What arrived is kept, and the tokens it used are charged.',

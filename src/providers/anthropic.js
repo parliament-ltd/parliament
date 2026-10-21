@@ -349,8 +349,12 @@ export class AnthropicProvider extends BaseProvider {
     let stopReason = null
     const toolUses = []
     let currentToolUse = null
+    // An error sent inside the stream, as when the service is overloaded part
+    // way through a reply. It used to be skipped, and the reply stored as
+    // complete (request-path audit, item 9).
+    let streamError = null
 
-    while (true) {
+    while (!streamError) {
       const { done, value } = await reader.read()
       if (done) break
 
@@ -365,6 +369,11 @@ export class AnthropicProvider extends BaseProvider {
 
         try {
           const event = JSON.parse(data)
+
+          if (event.type === 'error') {
+            streamError = event.error ?? { type: 'error' }
+            break
+          }
 
           if (event.type === 'content_block_start') {
             if (event.content_block?.type === 'tool_use') {
@@ -413,6 +422,14 @@ export class AnthropicProvider extends BaseProvider {
           // Skip malformed JSON lines
         }
       }
+    }
+
+    if (streamError) {
+      reader.cancel().catch(() => {})
+      const error = new Error(streamError.message || 'The reply broke off.')
+      error.type = streamError.type
+      if (streamError.type === 'overloaded_error') error.status = 529
+      throw error
     }
 
     return {

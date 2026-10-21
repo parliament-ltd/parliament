@@ -69,6 +69,14 @@ msgid "chat.close"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.cutError"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.cutLimit"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.finishSetting"
 msgstr ""
 
@@ -368,6 +376,10 @@ msgstr ""
 #. Enter puts the new verb in the field; it does not run it
 #. js-lingui-explicit-id
 msgid "enter.renamed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replyCut"
 msgstr ""
 
 #. js-lingui-explicit-id

@@ -59,6 +59,9 @@ import {
 const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
 const DELETE_UNDO_MS = 20_000
 
+// Why a reply stopped short, said on the reply (C109; stage 4).
+const STOPPED = { left: COPY.chat.stoppedOnReply, limit: COPY.chat.cutLimit, error: COPY.chat.cutError }
+
 export default function MessagesRender() {
   // The conversation this board shows, told by the board (stage 3).
   const conversationId = useConversationId()
@@ -290,7 +293,7 @@ export default function MessagesRender() {
         number={numberByMessageId.get(msg.id) || 0}
         index={idx}
         isGhostText={isGhost}
-        stoppedNote={isGhost && msg.stopReason === 'left' ? i18n._(COPY.chat.stoppedOnReply) : null}
+        stoppedNote={isGhost && Object.hasOwn(STOPPED, msg.stopReason ?? '') ? i18n._(STOPPED[msg.stopReason]) : null}
         source={msg.source ?? null}
         isFavorited={isFav}
         showNotes={showNotes.has(msg.id)}

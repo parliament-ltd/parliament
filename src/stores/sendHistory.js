@@ -9,6 +9,10 @@
 //   model knows it as quoted context (C115, built as suggested).
 // - Turns of the same side next to each other are joined into one, so the
 //   turns alternate as providers expect.
+//
+// And whether a reply came back whole: cut off by the length allowed for
+// one reply, or by an error, is marked as cut off (request-path audit,
+// item 9: these were stored as complete).
 
 /**
  * @param {Array<{ role: string, content: string, source?: object }>} messages oldest first
@@ -29,3 +33,14 @@ export function forModel(messages, introduce) {
   return turns
 }
 
+/**
+ * Whether a reply was cut off, from the provider's reason for stopping:
+ * 'limit' when it reached the length allowed for one reply, 'error' when
+ * the stream ended without saying why (a connection or a proxy cut it), or
+ * null for a reply that finished.
+ */
+export function cutReason(stopReason) {
+  if (stopReason === 'max_tokens') return 'limit'
+  if (stopReason == null) return 'error'
+  return null
+}

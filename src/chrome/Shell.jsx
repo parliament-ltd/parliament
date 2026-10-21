@@ -64,6 +64,7 @@ const sourceLocale = (locale) => (/-(XA|XB)$/i.test(String(locale ?? '')) ? 'en'
 function failure(err) {
   if (err?.name === 'AbortError') return null
   if (err?.name === 'Refused') return 'promptChanged'
+  if (err?.kept) return 'replyCut'
   if (err?.name === 'SourceError') {
     return { message: err.reason === 'unreachable' ? 'sourceUnreachable' : 'sourceRefused', values: { source: destination(SOURCE)?.name } }
   }

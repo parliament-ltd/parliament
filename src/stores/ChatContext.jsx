@@ -11,7 +11,7 @@ import {
   getMessages as heldMessages, hasMessages, setMessages as holdMessages, updateMessages, releaseMessages, sendable,
 } from './chatStore'
 import { useIsStreaming, useMessages } from './chatHooks'
-import { forModel } from './sendHistory'
+import { forModel, cutReason } from './sendHistory'
 
 // The open chat, for today's screens (refactor-plan.md, stages 3 and 4;
 // state audit §11a; C109).
@@ -95,14 +95,17 @@ export function ChatProvider({ children }) {
     return () => clearInterval(timer)
   }, [])
 
-  // A reply that stopped part way: keep what arrived, and if it stopped
-  // because its chat was left, mark it and say so where the person lands.
-  const keepPartial = useCallback(async (conversationId, messageId, before = '') => {
+  // A reply that stopped part way: keep what arrived, and mark why it
+  // stopped: its chat was left (said once where the person lands, C109),
+  // or an error broke it off (`cut`). Returns whether anything was kept.
+  const keepPartial = useCallback(async (conversationId, messageId, before = '', cut = null) => {
     const stream = getStream(conversationId)
     const content = stream?.text ?? ''
     const left = stream?.stopReason === 'left'
-    if (content && content !== before) {
-      const updates = { content, incomplete: true, ...(left ? { stopReason: 'left' } : {}) }
+    const reason = left ? 'left' : cut
+    const kept = Boolean(content && content !== before)
+    if (kept) {
+      const updates = { content, incomplete: true, ...(reason ? { stopReason: reason } : {}) }
       await updateMessage(messageId, updates)
       updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, ...updates } : m)))
     } else if (!before) {
@@ -110,6 +113,7 @@ export function ChatProvider({ children }) {
       updateMessages(conversationId, (prev) => prev.filter((m) => m.id !== messageId))
     }
     if (left) addNotice({ conversationId, messageId, kept: Boolean(content) })
+    return kept
   }, [])
 
   // Auto-generate title, summary, and tags after the first user→assistant exchange.
@@ -231,6 +235,7 @@ export function ChatProvider({ children }) {
       let chartBlocks = '' // accumulated create_chart output across turns
       const clientSideTools = tools.filter(t => !t.serverSide)
       const MAX_TOOL_TURNS = 5 // prevent infinite loops
+      let last = null // the last turn's response: its stop reason says whether the reply came back whole
 
       for (let turn = 0; turn < MAX_TOOL_TURNS; turn++) {
         const response = await gateway.call(PROVIDER, 'sendMessage', [
@@ -241,6 +246,7 @@ export function ChatProvider({ children }) {
           systemPrompt || undefined,
           tools,
         ], { label: 'chat send' })
+        last = response
 
         totalInputTokens += response?.usage?.input_tokens || 0
         totalOutputTokens += response?.usage?.output_tokens || 0
@@ -288,18 +294,19 @@ export function ChatProvider({ children }) {
         resetStreamText(conversationId)
       }
 
-      // 5. Stream complete — final persist with incomplete: false
+      // 5. Stream complete. A reply cut off by the length allowed for one
+      //    reply, or one whose stream ended without saying why, stays
+      //    incomplete and is marked as cut off, so it is never taken for
+      //    a whole answer and Continue can ask for the rest.
       stopPersisting()
       // Prepend any chart blocks before Claude's explanatory text
       const finalContent = chartBlocks + (getStream(conversationId)?.text ?? '')
       const tokenCount = totalOutputTokens
+      const cut = finalContent ? cutReason(last?.stopReason) : null
+      const outcome = { content: finalContent, incomplete: Boolean(cut), tokenCount, ...(cut ? { stopReason: cut } : {}) }
 
-      await updateMessage(assistantMsg.id, {
-        content: finalContent,
-        incomplete: false,
-        tokenCount,
-      })
-      const finished = { ...assistantMsg, content: finalContent, incomplete: false, tokenCount }
+      await updateMessage(assistantMsg.id, outcome)
+      const finished = { ...assistantMsg, ...outcome }
       updateMessages(conversationId, prev => prev.map(m => (m.id === assistantMsg.id ? finished : m)))
 
       // Update cumulative token usage (accumulated across all tool loop turns)
@@ -315,10 +322,13 @@ export function ChatProvider({ children }) {
       generateMetadataIfNeeded(conversationId, [...history, finished])
     } catch (error) {
       stopPersisting()
-      await keepPartial(conversationId, assistantMsg.id)
+      // Stopped or left: kept as it was. Anything else broke the reply off.
+      const aborted = error.name === 'AbortError'
+      const kept = await keepPartial(conversationId, assistantMsg.id, '', aborted ? null : 'error')
 
       // Re-throw if not an abort (abort is expected from stopping or leaving)
-      if (error.name !== 'AbortError') {
+      if (!aborted) {
+        error.kept = kept
         throw error
       }
     } finally {
@@ -411,7 +421,8 @@ export function ChatProvider({ children }) {
       stopPersisting()
       const finalContent = getStream(conversationId)?.text ?? incompleteMsg.content
       const tokenCount = (incompleteMsg.tokenCount || 0) + (response?.usage?.output_tokens || 0)
-      const updates = { content: finalContent, incomplete: false, tokenCount, stopReason: null }
+      const cut = cutReason(response?.stopReason)
+      const updates = { content: finalContent, incomplete: Boolean(cut), tokenCount, stopReason: cut }
 
       await updateMessage(incompleteMsg.id, updates)
       updateMessages(conversationId, prev => prev.map(m => (m.id === incompleteMsg.id ? { ...m, ...updates } : m)))
@@ -425,9 +436,11 @@ export function ChatProvider({ children }) {
       }
     } catch (error) {
       stopPersisting()
-      await keepPartial(conversationId, incompleteMsg.id, incompleteMsg.content)
+      const aborted = error.name === 'AbortError'
+      const kept = await keepPartial(conversationId, incompleteMsg.id, incompleteMsg.content, aborted ? null : 'error')
 
-      if (error.name !== 'AbortError') {
+      if (!aborted) {
+        error.kept = kept
         throw error
       }
     } finally {
