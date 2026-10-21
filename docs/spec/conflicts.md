@@ -958,6 +958,8 @@ Found while building stage 4, pieces 4 and 5 (a room in the shell; sending by co
 - Moving to another room puts the pot back to rest. With reduced motion the quill and the surface keep still and only the slow drain shows.
 - In the shell nothing stops a reply by hand yet (`stop:` comes later), so for now the spill shows when a reply breaks off or stalls.
 
+**C117. A quieter focus ring.** **Ruled 21 October by Stefan:** "if items are selected, right now there's a dark outline, can we make this more discreet please? by at least half of its current tone/style". The ring round the selected field, and the keyboard focus outline in the new chrome, were 2px of full ink (editing spec, token sheet). Now 1px at half the ink's strength (`--ch-focus` and `--ch-focus-ink` in `tokens.css`). It stays ink, not gold (C50), and at about 3.3:1 against the paper it still meets the 3:1 asked of a focus mark. Rooms keep their own focus styles.
+
 **Also, for the record** (built in piece 5, no question):
 - Hidden messages, and messages waiting out their 20 seconds before being deleted, are no longer sent (request-path audit, item 5). The Enter line says how many stay out. A delete now completes after its 20 seconds even if the chat was left; before, leaving cancelled it silently.
 - Replies cut off by the length allowed for one reply, or broken off by an error, are stored as cut off (`stopReason` 'limit' or 'error', beside C109's 'left') and say so. This is a new value in an optional field: nothing existing changes, and older backups read as before.

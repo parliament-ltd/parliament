@@ -80,7 +80,11 @@
   --ch-r-card: 16px;
   --ch-field-h: 40px;
   --ch-lift: 0 1px 2px rgba(40, 36, 28, .035), 0 0 0 .5px rgba(25, 25, 25, .05);
-  --ch-focus: 2px solid var(--ch-ink);
+  /* Keyboard focus and the selected field: halved on Stefan's word (C117,
+     21 October), from 2px of full ink to 1px at half its strength, still
+     about 3.3:1 against the paper */
+  --ch-focus-ink: rgba(25, 25, 25, .5);
+  --ch-focus: 1px solid var(--ch-focus-ink);
 
   /* Motion (bar reference), slowed by half again on Stefan's word (C111,
      20 October): the bar's motion read as too fast */

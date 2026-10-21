@@ -76,7 +76,9 @@ Line height 1.5, and 1.6 for reading.
   (C108, which replaced the hexagon).
 - Cards carry a faint lift (`0 1px 2px rgba(40,36,28,.035)` and a half-pixel
   ring at 5%), no borders or hatching (welcome spec §2).
-- Keyboard focus: a 2px ink outline on anything focused (editing spec).
+- Keyboard focus, and the ring round the selected field: a 1px outline at half
+  the ink's strength (C117, 21 October, halved from the editing spec's 2px of
+  full ink at Stefan's request; about 3.3:1 against the paper).
 - Easing `cubic-bezier(.65,0,.35,1)`. A mode's fill wipes in over 420ms;
   pills, glyphs and the Enter line fade over 240ms; the field folds to a
   circle over 540ms, and unfolds over the same; the chevron travels from the

@@ -69,7 +69,7 @@
 .ch-field input { position: relative; z-index: 1; flex: 1; min-width: 0; height: 100%; padding: 0 42px 0 72px; border: none; background: transparent; font: 400 13.5px var(--ch-sans); color: var(--ch-ink); outline: none; }
 .ch-field.command input { font-family: var(--ch-mono); font-size: 13px; color: #fff; padding-inline: 86px 14px; text-shadow: 0 0 3px rgba(12, 20, 40, .95), 0 1px 2px rgba(12, 20, 40, .85); caret-color: #fff; }
 .ch-field.prompt input { padding-inline-start: 78px; }
-.ch-field:focus-within { box-shadow: 0 1px 2px rgba(40, 36, 28, .035), 0 0 0 .5px rgba(25, 25, 25, .10), 0 0 0 2px var(--ch-ink); }
+.ch-field:focus-within { box-shadow: 0 1px 2px rgba(40, 36, 28, .035), 0 0 0 .5px rgba(25, 25, 25, .10), 0 0 0 1px var(--ch-focus-ink); }
 .ch-chip { position: absolute; inset-inline-start: 12px; top: 50%; margin-top: -8px; z-index: 2; font: 600 8.5px var(--ch-sans); letter-spacing: .06em; text-transform: uppercase; padding: 3px 7px; border-radius: 9px; opacity: 0; transform: translateX(-4px); transition: opacity var(--ch-dur-fade) ease, transform var(--ch-dur-fade) ease; pointer-events: none; }
 .ch-chip.on { opacity: 1; transform: none; }
 .ch-chip.search { background: var(--ch-paper); color: var(--ch-ink); border: 1px solid var(--ch-ink); padding: 2px 6px; }
@@ -118,7 +118,7 @@
 /* The circle's edge turns gold on hover: the only gold at rest (C50). */
 .ch-field.min:hover { box-shadow: 0 0 0 1px var(--ch-gold-deep); }
 .ch-fold-button { position: absolute; inset: 0; z-index: 5; border-radius: 50%; }
-.ch-shell .ch-fold-button:focus-visible { outline: 2px solid var(--ch-ink); outline-offset: -3px; border-radius: 50%; }
+.ch-shell .ch-fold-button:focus-visible { outline: var(--ch-focus); outline-offset: -3px; border-radius: 50%; }
 /* The command mark: as the field folds, the chevron leaves the place of the
    typed > on the left and travels to the centre of the circle, becoming the
    moon on the way; opening, it goes back (C112). */
