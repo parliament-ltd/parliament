@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLingui } from '@lingui/react'
 import './chrome.css'
@@ -9,7 +9,7 @@ import { loadSpace, saveArrangement } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
-import { shipped, address, planOpen, planPopBack, planPopBar, planRoom, roomOnScreen, SPACE } from '../shell/arrangement'
+import { shipped, address, planOpen, planPopBack, planPopBar, planRoom, roomOnScreen, SPACE, columnShares, withShares, withUsualShares } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
@@ -26,6 +26,7 @@ import { preview } from './preview'
 import Bar from './Bar'
 import Strip from './Strip'
 import Board from './Board'
+import { boardName } from './say'
 import RoomBoard from './RoomBoard'
 import WelcomeBoard, { WelcomeFoot } from './WelcomeBoard'
 
@@ -36,11 +37,12 @@ import WelcomeBoard, { WelcomeFoot } from './WelcomeBoard'
 // are drawn (stage 4); the other boards are placeholders until their stages
 // draw them.
 //
-// Screens: the shell shows one arrangement at a time, starting at the
-// Almanac. alm: goes to the Almanac and sym: to the last room, or to an
-// empty room when there is none (C95); each keeps its own arrangement.
+// The space: what is on screen is one space, kept on this device (C125).
+// alm:, sym: and tour: bring their boards into it beside what is there.
+// Each column takes a share of the width, which the person can stretch at
+// the edge between two columns or set with width: (C126).
 //
-// Prompts: Enter in prompt mode sends to the room the screen shows. With a
+// Prompts: Enter in prompt mode sends to the room in the space. With a
 // key for the provider it goes there; without one it goes to Wikipedia,
 // which needs no key (stage 4). The Enter line names which before Enter.
 //
@@ -52,8 +54,20 @@ import WelcomeBoard, { WelcomeFoot } from './WelcomeBoard'
 
 // The source a prompt goes to when there is no key (stage 4).
 const SOURCE = 'wikipedia'
-// The boards that take the wide column where they stand.
-const MAIN = new Set(['almanac', 'canvas', 'room', 'docket', 'settings', 'welcome'])
+// How far an arrow key moves an edge: a part of the space's width.
+const EDGE_STEP = 0.02
+const EDGE_STEP_BIG = 0.1
+
+// The two shares beside an edge after moving it by dx pixels on screen,
+// from what was measured beside it: neither column goes below its least
+// width, and the two keep the share they had together.
+function split(m, dx) {
+  const total = m.wl + m.wr
+  if (total - m.leastR < m.leastL) return [m.sl, m.pair - m.sl]
+  const wl = Math.min(Math.max(m.wl + (m.rtl ? -dx : dx), m.leastL), total - m.leastR)
+  const sl = (m.pair * wl) / total
+  return [sl, m.pair - sl]
+}
 const BAR = 'command' // the popped bar's key among the windows
 const FEATURES = detectFeatures()
 const NONE = Object.freeze([])
@@ -112,6 +126,72 @@ export default function Shell() {
     setArrangement(next)
     if (db.current) saveArrangement(db.current, next).catch(() => {})
   }, [])
+
+  // ── The edges between columns (C126) ─────────────────
+  // Dragging an edge shares the width of the two columns beside it between
+  // them; the other columns keep theirs. While it moves, the two columns are
+  // drawn straight from the pointer; the space keeps the shares once it is
+  // let go. A double click puts both back; the arrow keys move it.
+  const stageRef = useRef(null)
+  const stretch = useRef(null)
+  const [stretching, setStretching] = useState(false)
+
+  // The two columns beside edge i, their widths and least widths, and their shares.
+  const measure = useCallback((i) => {
+    const cols = [...(stageRef.current?.children ?? [])].filter((el) => el.classList.contains('ch-col'))
+    const left = cols[i - 1]
+    const right = cols[i]
+    if (!left || !right) return null
+    const shares = columnShares(current.current)
+    const least = (el) => parseFloat(getComputedStyle(el).minWidth) || 0
+    const rtl = getComputedStyle(stageRef.current).direction === 'rtl'
+    return {
+      i, left, right, rtl,
+      wl: left.getBoundingClientRect().width, wr: right.getBoundingClientRect().width,
+      leastL: least(left), leastR: least(right),
+      pair: shares[i - 1] + shares[i], sl: shares[i - 1],
+    }
+  }, [])
+
+  const onEdgeDown = useCallback((i, e) => {
+    if (e.button !== 0) return
+    const m = measure(i)
+    if (!m) return
+    e.preventDefault()
+    e.currentTarget.setPointerCapture?.(e.pointerId)
+    stretch.current = { ...m, x: e.clientX, moved: null }
+    setStretching(i)
+  }, [measure])
+
+  const onEdgeMove = useCallback((e) => {
+    const s = stretch.current
+    if (!s) return
+    const [sl, sr] = split(s, e.clientX - s.x)
+    s.left.style.setProperty('--share', String(sl))
+    s.right.style.setProperty('--share', String(sr))
+    s.moved = [sl, sr]
+  }, [])
+
+  const onEdgeUp = useCallback(() => {
+    const s = stretch.current
+    stretch.current = null
+    setStretching(false)
+    if (s?.moved) commit(withShares(current.current, { [s.i - 1]: s.moved[0], [s.i]: s.moved[1] }))
+  }, [commit])
+
+  const onEdgeReset = useCallback((i) => commit(withUsualShares(current.current, [i - 1, i])), [commit])
+
+  const onEdgeKey = useCallback((i, e) => {
+    const toward = { ArrowRight: 1, ArrowLeft: -1 }[e.key]
+    if (!toward) return
+    const m = measure(i)
+    if (!m) return
+    e.preventDefault()
+    const width = stageRef.current.clientWidth * (e.shiftKey ? EDGE_STEP_BIG : EDGE_STEP)
+    // The arrow moves the edge that way on screen, as a drag would.
+    const [sl, sr] = split(m, toward * width)
+    commit(withShares(current.current, { [i - 1]: sl, [i]: sr }))
+  }, [commit, measure])
 
   // The welcome page's progress, kept on this device only (C121).
   const [welcome, setWelcomeState] = useState(freshWelcome)
@@ -289,7 +369,20 @@ export default function Shell() {
     return latestChat ? { id: latestChat.id, num: latestChat.num ?? null } : null
   }, [conversations])
   const roomNameHere = roomId && roomNameOf?.chatId === roomId ? roomNameOf.value : null
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off }), [lastRoom, roomNameHere, welcome.off])
+  // The space as drawn, read when the Enter line needs it (width:, C126).
+  const measureSpace = useCallback(() => {
+    const stage = stageRef.current
+    if (!stage) return null
+    const cols = [...stage.children].filter((el) => el.classList.contains('ch-col'))
+    if (cols.length !== current.current.columns.length) return null
+    return {
+      columns: current.current.columns,
+      widths: cols.map((el) => el.getBoundingClientRect().width),
+      least: cols.map((el) => parseFloat(getComputedStyle(el).minWidth) || 0),
+      stacked: getComputedStyle(stage).flexDirection === 'column',
+    }
+  }, [])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace }), [lastRoom, roomNameHere, welcome.off, measureSpace])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -417,6 +510,10 @@ export default function Shell() {
   const bar = arrangement.bar
   const barWindow = windows[BAR]
   const onWelcome = arrangement.columns.some((c) => c.includes('welcome'))
+  const shares = useMemo(() => columnShares(arrangement), [arrangement])
+  const shareTotal = shares.reduce((sum, x) => sum + x, 0) || 1
+  // What stands beside an edge, named in a sentence.
+  const edgeName = (board) => (board === 'room' ? i18n._(COPY.shell.edgeRoom) : board === 'welcome' ? i18n._(COPY.shell.edgeWelcome) : boardName(i18n, board))
   const stripArrangement = useMemo(
     () => ({ ...arrangement, context: { ...arrangement.context, room: roomRecord?.num ?? undefined } }),
     [arrangement, roomRecord],
@@ -452,7 +549,7 @@ export default function Shell() {
   if (!started) return <div className="ch-shell" />
 
   return (
-    <div className={`ch-shell bar-${bar.at}${onWelcome ? ` on-welcome${arrangement.columns.length > 1 ? ' many' : ''}` : ''}`}>
+    <div className={`ch-shell bar-${bar.at}${onWelcome ? ' on-welcome' : ''}${stretching !== false ? ' stretching' : ''}`}>
       {!onWelcome && <Strip arrangement={stripArrangement} onPick={pickBoard} />}
       {/* One bar in one place, moved by its class or its holder, so moving
           it never loses the field's focus or what is typed. */}
@@ -462,11 +559,32 @@ export default function Shell() {
         barHost,
       )}
       {barWindow && <p className="ch-away ch-marg">{i18n._(COPY.shell.barAway)}</p>}
-      <main className="ch-stage">
-        {arrangement.columns.map((column) => (
-          <div key={column.join(' ')} className={`ch-col${column.some((b) => MAIN.has(b)) ? ' main' : ''}`}>
-            {column.map(drawBoard)}
-          </div>
+      <main className="ch-stage space" ref={stageRef}>
+        {arrangement.columns.map((column, i) => (
+          <Fragment key={column.join(' ')}>
+            {i > 0 && (
+              <div
+                className={`ch-edge${stretching === i ? ' on' : ''}`}
+                role="separator"
+                aria-orientation="vertical"
+                aria-label={i18n._(COPY.shell.edge, { first: edgeName(arrangement.columns[i - 1][0]), second: edgeName(column[0]) })}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round((shares[i - 1] / shareTotal) * 100)}
+                title={i18n._(COPY.shell.edgeHelp)}
+                tabIndex={0}
+                onPointerDown={(e) => onEdgeDown(i, e)}
+                onPointerMove={onEdgeMove}
+                onPointerUp={onEdgeUp}
+                onPointerCancel={onEdgeUp}
+                onDoubleClick={() => onEdgeReset(i)}
+                onKeyDown={(e) => onEdgeKey(i, e)}
+              />
+            )}
+            <div className="ch-col" style={{ '--share': shares[i] }}>
+              {column.map(drawBoard)}
+            </div>
+          </Fragment>
         ))}
       </main>
       {barWindow && createPortal(

@@ -33,6 +33,8 @@ describe('arguments', () => {
     expect(readArg('201-205')).toMatchObject({ kind: 'word' }) // no ranges (C96)
     expect(readArg('3')).toMatchObject({ kind: 'number', value: 3 })
     expect(readArg('200')).toMatchObject({ kind: 'number', value: 200 })
+    expect(readArg('60%')).toMatchObject({ kind: 'percent', value: 60 })
+    expect(readArg('60%%')).toMatchObject({ kind: 'word' })
     expect(readArg('Bottom')).toMatchObject({ kind: 'word', value: 'bottom', text: 'Bottom' })
     expect(readArg('"Field notes"')).toMatchObject({ kind: 'text', value: 'Field notes', closed: true })
     expect(readArg('“Field notes”')).toMatchObject({ kind: 'text', value: 'Field notes' })

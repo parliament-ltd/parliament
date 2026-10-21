@@ -600,6 +600,51 @@ msgid "enter.unknownHelp"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.widthAlone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthEven"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthEvenAlready"
+msgstr ""
+
+#. It is the board the bar points at, named just before this line
+#. js-lingui-explicit-id
+msgid "enter.widthIt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthLeast"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthMost"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthPopped"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthRange"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthSet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthStacked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthThere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "field.answeredBy"
 msgstr ""
 
@@ -776,6 +821,25 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "shell.boardLater"
+msgstr ""
+
+#. Read aloud for the stretchable edge between two boards
+#. js-lingui-explicit-id
+msgid "shell.edge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "shell.edgeHelp"
+msgstr ""
+
+#. A room, named mid-sentence beside an edge
+#. js-lingui-explicit-id
+msgid "shell.edgeRoom"
+msgstr ""
+
+#. The welcome card, named mid-sentence beside an edge
+#. js-lingui-explicit-id
+msgid "shell.edgeWelcome"
 msgstr ""
 
 #. The name of the field, read by screen readers
@@ -1173,6 +1237,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.until"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.width"
 msgstr ""
 
 #. js-lingui-explicit-id

@@ -600,6 +600,51 @@ msgid "enter.unknownHelp"
 msgstr "No command called {verb}. Enter shows every command"
 
 #. js-lingui-explicit-id
+msgid "enter.widthAlone"
+msgstr "A board on its own has the whole width"
+
+#. js-lingui-explicit-id
+msgid "enter.widthEven"
+msgstr "Enter puts every board back to its usual width"
+
+#. js-lingui-explicit-id
+msgid "enter.widthEvenAlready"
+msgstr "Every board has its usual width already"
+
+#. It is the board the bar points at, named just before this line
+#. js-lingui-explicit-id
+msgid "enter.widthIt"
+msgstr "Enter gives it {percent} of the width"
+
+#. js-lingui-explicit-id
+msgid "enter.widthLeast"
+msgstr "It needs at least {percent} of the width"
+
+#. js-lingui-explicit-id
+msgid "enter.widthMost"
+msgstr "Beside the others it can have at most {percent} of the width"
+
+#. js-lingui-explicit-id
+msgid "enter.widthPopped"
+msgstr "A board in its own window takes the width of its window"
+
+#. js-lingui-explicit-id
+msgid "enter.widthRange"
+msgstr "A board takes from {low} to {high} of the width"
+
+#. js-lingui-explicit-id
+msgid "enter.widthSet"
+msgstr "Enter gives {board} {percent} of the width"
+
+#. js-lingui-explicit-id
+msgid "enter.widthStacked"
+msgstr "In a window this narrow the boards are stacked, each the whole width"
+
+#. js-lingui-explicit-id
+msgid "enter.widthThere"
+msgstr "That is its width already"
+
+#. js-lingui-explicit-id
 msgid "field.answeredBy"
 msgstr "answered by {model}"
 
@@ -777,6 +822,25 @@ msgstr "Parliament"
 #. js-lingui-explicit-id
 msgid "shell.boardLater"
 msgstr "This board is drawn in a later stage."
+
+#. Read aloud for the stretchable edge between two boards
+#. js-lingui-explicit-id
+msgid "shell.edge"
+msgstr "Width between {first} and {second}"
+
+#. js-lingui-explicit-id
+msgid "shell.edgeHelp"
+msgstr "Drag to share the width. A double click puts both back"
+
+#. A room, named mid-sentence beside an edge
+#. js-lingui-explicit-id
+msgid "shell.edgeRoom"
+msgstr "the room"
+
+#. The welcome card, named mid-sentence beside an edge
+#. js-lingui-explicit-id
+msgid "shell.edgeWelcome"
+msgstr "the welcome page"
 
 #. The name of the field, read by screen readers
 #. js-lingui-explicit-id
@@ -1174,6 +1238,10 @@ msgstr "Remove a tag from some things, or from everything"
 #. js-lingui-explicit-id
 msgid "verb.until"
 msgstr "Show what was made until a date"
+
+#. js-lingui-explicit-id
+msgid "verb.width"
+msgstr "Choose how much of the width a board takes, or put every width back"
 
 #. js-lingui-explicit-id
 msgid "welcome.foot.builders"

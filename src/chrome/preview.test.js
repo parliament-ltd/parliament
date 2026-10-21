@@ -208,6 +208,27 @@ describe('after a reply stalled (C114)', () => {
   })
 })
 
+describe('width: (C126)', () => {
+  const at = (value, a = shipped(SPACE)) => {
+    const p = preview(value, { mode: 'command', arrangement: a })
+    return { ...p, text: say(i18n, p.says.message, p.says.values) }
+  }
+
+  it('says what share the board will have, the way the language writes it', () => {
+    expect(BUILT.has('width')).toBe(true)
+    expect(at('>width:60%').text).toBe('Enter gives it 60% of the width')
+    expect(at('>width:collection 30%').text).toBe('Enter gives Collection 30% of the width')
+    expect(at('>width:5%').text).toBe('A board takes from 10% to 90% of the width')
+    expect(at('>width:even').text).toBe('Every board has its usual width already')
+    const sv = setupI18n({ locale: 'sv', messages: { sv: en } })
+    expect(say(sv, 'widthIt', { percent: 60 })).toMatch(/60\s%/)
+  })
+
+  it('shares a line with other layout commands', () => {
+    expect(at('>open:library width:50%').text).toBe('Enter runs 2 commands in turn: open: and width:')
+  })
+})
+
 describe('name: for the room (C40)', () => {
   const room = keep(planRoom(shipped(SPACE), 'c1'))
   const at = (value, a = room, screens = {}) => {

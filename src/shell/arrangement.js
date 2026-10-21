@@ -17,7 +17,8 @@ import { boardEntry } from './boards'
  * @typedef {{ board: string, display: number|null, side: 'left'|'right'|null, from: number }} Popped
  * @typedef {{ id: string, columns: string[][], popped: Popped[], addressed: string,
  *   bar: { at: 'top'|'bottom'|'card', side: 'left'|'center'|'right', popped: boolean },
- *   resting: 'search'|'prompt'|null, context: Record<string, string|number> }} Arrangement
+ *   resting: 'search'|'prompt'|null, context: Record<string, string|number>,
+ *   widths?: Record<string, number> }} Arrangement  widths: the shares the person has set, by board (C126)
  * @typedef {{ message: string, values?: object }} Says
  * @typedef {{ next: Arrangement|null, says: Says }} Plan  next is null when Enter would do nothing
  */
@@ -79,6 +80,7 @@ export function shipped(id, context = {}) {
     bar: { at: base.bar, side: 'center', popped: false },
     resting: base.resting,
     context: { ...context },
+    widths: {},
   }
 }
 
@@ -90,9 +92,10 @@ const isOnPage = (a, board) => onPage(a).includes(board)
 const isPopped = (a, board) => a.popped.some((p) => p.board === board)
 const columnOf = (a, board) => a.columns.findIndex((c) => c.includes(board))
 const without = (columns, board) => columns.map((c) => c.filter((b) => b !== board)).filter((c) => c.length)
-const copy = (a) => ({ ...a, columns: a.columns.map((c) => [...c]), popped: a.popped.map((p) => ({ ...p })), bar: { ...a.bar }, context: { ...a.context } })
-const sameLayout = (x, y) => JSON.stringify([x.columns, x.popped, x.addressed, x.bar.at, x.bar.side, x.bar.popped, x.resting])
-  === JSON.stringify([y.columns, y.popped, y.addressed, y.bar.at, y.bar.side, y.bar.popped, y.resting])
+const copy = (a) => ({ ...a, columns: a.columns.map((c) => [...c]), popped: a.popped.map((p) => ({ ...p })), bar: { ...a.bar }, context: { ...a.context }, widths: { ...a.widths } })
+const sortedWidths = (a) => Object.entries(a.widths ?? {}).sort(([x], [y]) => (x < y ? -1 : 1))
+const sameLayout = (x, y) => JSON.stringify([x.columns, x.popped, x.addressed, x.bar.at, x.bar.side, x.bar.popped, x.resting, sortedWidths(x)])
+  === JSON.stringify([y.columns, y.popped, y.addressed, y.bar.at, y.bar.side, y.bar.popped, y.resting, sortedWidths(y)])
 const refuse = (message, values) => ({ next: null, says: { message, values } })
 const go = (next, message, values) => ({ next, says: { message, values } })
 
@@ -256,6 +259,104 @@ export function planBar(a, place) {
   return go({ ...copy(a), bar: { ...a.bar, [axis]: place, popped: false } }, 'barMove', { place })
 }
 
+// ── Widths (C126) ───────────────────────────────────────
+// Each column takes a share of the width. A board's usual share is 1, a
+// main board's 2. The shares the person sets, by stretching an edge or with
+// width:, are kept by board, so a board keeps its width when it moves and
+// has it again when it comes back. A column's share is the largest of its
+// boards'.
+
+const MAIN = new Set(['almanac', 'canvas', 'room', 'docket', 'settings'])
+export const WIDTH_RANGE = Object.freeze({ low: 10, high: 90 })
+const round = (n) => Math.round(n * 1000) / 1000
+
+/** A board's usual share of the width. */
+export const usualShare = (board) => (MAIN.has(board) ? 2 : 1)
+
+/** Each column's share of the width, left to right. */
+export function columnShares(a) {
+  return a.columns.map((column) => {
+    const set = column.map((b) => a.widths?.[b]).filter((w) => typeof w === 'number')
+    return set.length ? Math.max(...set) : Math.max(...column.map(usualShare))
+  })
+}
+
+/** The space with the columns at these indexes given these shares, as a stretch makes it. */
+export function withShares(a, shares) {
+  const next = copy(a)
+  for (const [i, share] of Object.entries(shares)) for (const b of next.columns[i] ?? []) next.widths[b] = round(share)
+  return next
+}
+
+/** The space with the columns at these indexes back to their usual shares. */
+export function withUsualShares(a, indexes) {
+  const next = copy(a)
+  for (const i of indexes) for (const b of next.columns[i] ?? []) delete next.widths[b]
+  return next
+}
+
+/**
+ * The share column k needs for `target` pixels of `total`, the others
+ * keeping theirs, where a column below its least width is held there and
+ * the rest share what is left. Null when it cannot be had.
+ */
+function shareFor(shares, least, k, target, total) {
+  const held = new Set()
+  for (let round = 0; round <= shares.length; round += 1) {
+    const left = total - [...held].reduce((sum, i) => sum + least[i], 0)
+    const others = shares.reduce((sum, s, i) => (i === k || held.has(i) ? sum : sum + s), 0)
+    if (others <= 0 || left <= target) return null
+    const share = (target * others) / (left - target)
+    const unit = left / (share + others)
+    const below = shares.map((s, i) => i !== k && !held.has(i) && s * unit < least[i])
+    if (!below.some(Boolean)) return share
+    below.forEach((b, i) => { if (b) held.add(i) })
+  }
+  return null
+}
+
+/**
+ * width:60% (the board the bar points at) and width:library 30%. Gives the
+ * board's column that part of the width; the others keep their shares of
+ * the rest. `layout` is the space as drawn, when the shell has measured
+ * it: each column's width and least width in pixels, and whether the
+ * window is so narrow the boards are stacked. With it, a column held at
+ * its least width is counted as it is drawn.
+ * @param {{ columns: string[][], widths: number[], least: number[], stacked?: boolean }|null} [layout]
+ */
+export function planWidth(a, board, percent, named = false, layout = null) {
+  if (!isOnPage(a, board)) return refuse(isPopped(a, board) ? 'widthPopped' : 'closeNotHere', { board })
+  if (a.columns.length === 1) return refuse('widthAlone')
+  if (!(percent >= WIDTH_RANGE.low && percent <= WIDTH_RANGE.high)) return refuse('widthRange', WIDTH_RANGE)
+  const shares = columnShares(a)
+  const k = columnOf(a, board)
+  const drawn = layout && JSON.stringify(layout.columns) === JSON.stringify(a.columns) ? layout : null
+  if (drawn?.stacked) return refuse('widthStacked')
+  let share
+  if (drawn) {
+    const total = drawn.widths.reduce((sum, w) => sum + w, 0)
+    if (Math.abs((drawn.widths[k] / total) * 100 - percent) < 0.5) return refuse('widthThere')
+    const most = total - drawn.least.reduce((sum, w, i) => (i === k ? sum : sum + w), 0)
+    if ((percent / 100) * total > most) return refuse('widthMost', { percent: Math.floor((most / total) * 100) })
+    if ((percent / 100) * total < drawn.least[k]) return refuse('widthLeast', { percent: Math.ceil((drawn.least[k] / total) * 100) })
+    share = shareFor(shares, drawn.least, k, (percent / 100) * total, total)
+    if (share == null) return refuse('widthMost', { percent: Math.floor((most / total) * 100) })
+  } else {
+    const others = shares.reduce((sum, s, i) => (i === k ? sum : sum + s), 0)
+    if (Math.abs((shares[k] / (shares[k] + others)) * 100 - percent) < 0.5) return refuse('widthThere')
+    share = (percent / (100 - percent)) * others
+  }
+  const next = withShares(a, { [k]: share })
+  next.addressed = board
+  return go(next, named ? 'widthSet' : 'widthIt', { board, percent })
+}
+
+/** width:even. Every board back to its usual share. */
+export function planWidthEven(a) {
+  if (!Object.keys(a.widths ?? {}).length) return refuse('widthEvenAlready')
+  return go({ ...copy(a), widths: {} }, 'widthEven')
+}
+
 /** reset:. This arrangement as shipped, its windows closed; what boards show stays. */
 export function planReset(a) {
   const next = shipped(a.id, a.context)
@@ -272,7 +373,7 @@ export function address(a, board) {
 
 // The verbs this module answers. open: and pop: with a number wait for the
 // stages that build what numbers open.
-export const ARRANGEMENT_VERBS = Object.freeze(['open', 'close', 'move', 'swap', 'pop', 'reset', 'bar'])
+export const ARRANGEMENT_VERBS = Object.freeze(['open', 'close', 'move', 'swap', 'pop', 'reset', 'bar', 'width'])
 
 const word = (arg) => (arg?.kind === 'word' ? arg.value : null)
 
@@ -282,9 +383,10 @@ const word = (arg) => (arg?.kind === 'word' ? arg.value : null)
  * form yet. Board names have been checked by the registry.
  * @param {Arrangement} a
  * @param {{ verb: string, match: { values: Array<object> } }} step
+ * @param {object|null} [layout] the space as drawn, for width: (planWidth)
  * @returns {Plan|null}
  */
-export function plan(a, step) {
+export function plan(a, step, layout = null) {
   const args = step.match?.values ?? []
   const [first, second] = args.map(word)
   switch (step.verb) {
@@ -318,6 +420,13 @@ export function plan(a, step) {
       return planReset(a)
     case 'bar':
       return planBar(a, first)
+    case 'width': {
+      if (first === 'even') return planWidthEven(a)
+      const percent = args.find((arg) => arg?.kind === 'percent')?.value
+      if (percent == null) return null
+      if (args.length === 1) return planWidth(a, a.addressed, percent, false, layout)
+      return first && boardEntry(first) ? planWidth(a, first, percent, true, layout) : null
+    }
     default:
       return null
   }

@@ -13,11 +13,13 @@
 // scope (editor preview sheet, dev /catalog route) the wrench renders
 // as a hidden spacer, preserving alignment.
 
+import { useContext } from 'react'
 import { Menu, PanelRight, Wrench } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import IconButton from '../IconButton'
 import ParliamentMark from '../ParliamentMark'
 import { useChatFrame } from '../ChatFrameContext'
+import { RoomHost } from '../../lib/useViewportWidth'
 
 export default function NarrowChrome({
   onLeftClick,
@@ -28,6 +30,9 @@ export default function NarrowChrome({
   const navigate = useNavigate()
   const chatFrame = useChatFrame()
   const wrenchTarget = chatFrame?.wrenchTarget || null
+  // A room hosted on the shell keeps its top line to its own panels: the
+  // shell has its own way home (C126).
+  const hosted = useContext(RoomHost) != null
 
   return (
     <div className="flex justify-evenly items-center h-10 bg-white shrink-0">
@@ -42,15 +47,19 @@ export default function NarrowChrome({
         <span className="w-7 h-7" aria-hidden="true" />
       )}
 
-      <button
-        type="button"
-        onClick={() => navigate('/')}
-        aria-label="Go to The Study"
-        title="The Study"
-        className="inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--p-text-primary)] hover:text-[var(--p-gold-light)] transition-colors"
-      >
-        <ParliamentMark />
-      </button>
+      {hosted ? (
+        <span className="w-7 h-7" aria-hidden="true" />
+      ) : (
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          aria-label="Go to The Study"
+          title="The Study"
+          className="inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--p-text-primary)] hover:text-[var(--p-gold-light)] transition-colors"
+        >
+          <ParliamentMark />
+        </button>
+      )}
 
       {wrenchTarget ? (
         <button

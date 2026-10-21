@@ -28,6 +28,7 @@ describe('reading an arrangement back', () => {
       bar: { at: 'sideways', popped: 'yes' },
       resting: 'shout',
       context: { collection: 'Q2', library: { html: '<b>' }, nonsense: 'x' },
+      widths: { almanac: 2.5, collection: 'wide', nonsense: 1, library: -1, docket: 1e9 },
       extra: 'dropped',
     })
     expect(a).toEqual({
@@ -38,7 +39,14 @@ describe('reading an arrangement back', () => {
       bar: { at: 'top', side: 'center', popped: false },
       resting: null,
       context: { collection: 'Q2' },
+      widths: { almanac: 2.5 },
     })
+  })
+
+  it('reads a space kept before widths with the usual shares (C126)', () => {
+    const a = cleanArrangement({ id: 'space', columns: [['almanac'], ['collection']], popped: [], addressed: 'almanac', bar: { at: 'top' }, context: {} })
+    expect(a.widths).toEqual({})
+    expect(cleanArrangement({ ...a, widths: { almanac: 3.25 } }).widths).toEqual({ almanac: 3.25 })
   })
 
   it('gives up on what it cannot make sense of', () => {

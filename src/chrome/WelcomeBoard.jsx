@@ -1,6 +1,11 @@
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { STEPS, nextStep } from '../shell/welcome'
+import { useNarrower } from './useNarrower'
+
+// Below this width the card is one column: steps, field, then the letter
+// (welcome spec §5), however it got narrow (C126).
+const CARD_WIDE = 760
 
 // The welcome page's card (refactor-plan.md, stage 5; welcome spec §2 to
 // §4, welcome v9). One large card: "Welcome", the eight steps, the field
@@ -30,9 +35,11 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
   const { i18n } = useLingui()
   const next = nextStep(welcome)
   const steps = !welcome.off && !welcome.finished
+  const [cardRef, narrow] = useNarrower(CARD_WIDE)
   return (
     <article
-      className={`ch-card ch-welcome${addressed ? ' addressed' : ''}${welcome.finished ? ' finished' : ''}`}
+      ref={cardRef}
+      className={`ch-card ch-welcome${addressed ? ' addressed' : ''}${welcome.finished ? ' finished' : ''}${narrow ? ' narrow' : ''}`}
       aria-current={addressed ? 'true' : undefined}
       onMouseDown={() => onAddress('welcome')}
     >

@@ -4,6 +4,7 @@ import { BOARDS, boardEntry, boardByTitle, strip } from './boards'
 import {
   SHIPPED, shipped, shippedFor, restingMode, address, plan, ARRANGEMENT_VERBS,
   SPACE, arrangementBoards, roomOnScreen, planBring, planRoom,
+  usualShare, columnShares, withShares, withUsualShares, planWidth, planWidthEven, WIDTH_RANGE,
   planOpen, planClose, planMove, planSwap, planPop, planPopBack, planPopSide, planPopBar, planBar, planReset,
 } from './arrangement'
 import { enterLine } from '../commands/registry'
@@ -247,6 +248,103 @@ describe('pop: and pop:back', () => {
     expect(a.bar).toEqual({ at: 'top', side: 'center', popped: true })
     expect(planPopBar(a, true)).toMatchObject({ next: null, says: { message: 'barPoppedAlready' } })
     expect(keep(planPopBar(a, false)).bar.popped).toBe(false)
+  })
+})
+
+describe('widths (C126)', () => {
+  const share = (a, board) => {
+    const shares = columnShares(a)
+    const k = a.columns.findIndex((c) => c.includes(board))
+    return Math.round((shares[k] / shares.reduce((x, y) => x + y, 0)) * 100)
+  }
+
+  it('gives each column its usual share: 1, or 2 for a main board', () => {
+    expect(usualShare('room')).toBe(2)
+    expect(usualShare('almanac')).toBe(2)
+    expect(usualShare('collection')).toBe(1)
+    expect(usualShare('welcome')).toBe(1)
+    expect(columnShares(shipped(SPACE))).toEqual([2, 1])
+    // A column of stacked boards takes the largest share among them.
+    expect(columnShares({ ...shipped(SPACE), columns: [['welcome'], ['almanac', 'collection']] })).toEqual([1, 2])
+  })
+
+  it('keeps a stretch by board, so a board keeps its width when it moves and comes back', () => {
+    const a = withShares(shipped(SPACE), { 0: 3.25, 1: 0.75 })
+    expect(a.widths).toEqual({ almanac: 3.25, collection: 0.75 })
+    expect(columnShares(a)).toEqual([3.25, 0.75])
+    const moved = keep(planMove(a, 'almanac', 'right'))
+    expect(columnShares(moved)).toEqual([0.75, 3.25])
+    const back = keep(planOpen(keep(planClose(a, 'collection')), 'collection'))
+    expect(columnShares(back)).toEqual([3.25, 0.75])
+    expect(withUsualShares(a, [0]).widths).toEqual({ collection: 0.75 })
+  })
+
+  it('width:60% gives the board the bar points at that part of the width', () => {
+    const p = planWidth(shipped(SPACE), 'almanac', 60)
+    expect(p.says).toEqual({ message: 'widthIt', values: { board: 'almanac', percent: 60 } })
+    expect(share(p.next, 'almanac')).toBe(60)
+    expect(share(p.next, 'collection')).toBe(40)
+    const named = planWidth(shipped(SPACE), 'collection', 25, true)
+    expect(named.says.message).toBe('widthSet')
+    expect(share(named.next, 'collection')).toBe(25)
+    expect(named.next.addressed).toBe('collection')
+  })
+
+  it('refuses a width it cannot give', () => {
+    const a = shipped(SPACE)
+    expect(planWidth(a, 'almanac', 5).says).toEqual({ message: 'widthRange', values: WIDTH_RANGE })
+    expect(planWidth(a, 'almanac', 95).says.message).toBe('widthRange')
+    expect(planWidth(a, 'almanac', 67).says.message).toBe('widthThere')
+    expect(planWidth(a, 'library', 30).says.message).toBe('closeNotHere')
+    expect(planWidth(keep(planPop(a, 'collection')), 'collection', 30).says.message).toBe('widthPopped')
+    expect(planWidth(keep(planClose(a, 'collection')), 'almanac', 30).says.message).toBe('widthAlone')
+  })
+
+  it('counts a column held at its least width as it is drawn', () => {
+    // Columns share the width by share; one below its least width is held there.
+    const draw = (shares, least, total) => {
+      const held = new Set()
+      for (;;) {
+        const left = total - [...held].reduce((sum, i) => sum + least[i], 0)
+        const free = shares.reduce((sum, s, i) => (held.has(i) ? sum : sum + s), 0)
+        const px = shares.map((s, i) => (held.has(i) ? least[i] : (s / free) * left))
+        const below = px.findIndex((w, i) => !held.has(i) && w < least[i])
+        if (below < 0) return px
+        held.add(below)
+      }
+    }
+    const a = { ...shipped(SPACE), columns: [['welcome'], ['room'], ['almanac']], addressed: 'room', context: { room: 'c1' } }
+    const layout = { columns: a.columns, widths: [260, 346, 346], least: [260, 300, 180] }
+    const p = planWidth(a, 'room', 50, false, layout)
+    expect(p.says.message).toBe('widthIt')
+    expect(Math.round(draw(columnShares(p.next), layout.least, 952)[1])).toBe(476)
+    expect(planWidth(a, 'room', 60, false, layout).says).toEqual({ message: 'widthMost', values: { percent: 53 } })
+    expect(planWidth(a, 'room', 20, false, layout).says).toEqual({ message: 'widthLeast', values: { percent: 32 } })
+    expect(planWidth(a, 'almanac', 36, false, layout).says.message).toBe('widthThere')
+    expect(planWidth(a, 'room', 50, false, { ...layout, stacked: true }).says.message).toBe('widthStacked')
+    // Measured for another space, the layout is left aside.
+    expect(planWidth(a, 'room', 50, false, { ...layout, columns: [['almanac']] }).says.message).toBe('widthIt')
+  })
+
+  it('width:even and reset: put every width back', () => {
+    const a = keep(planWidth(shipped(SPACE), 'almanac', 70))
+    const even = planWidthEven(a)
+    expect(even.says.message).toBe('widthEven')
+    expect(even.next.widths).toEqual({})
+    expect(planWidthEven(even.next).says.message).toBe('widthEvenAlready')
+    expect(keep(planReset(a)).widths).toEqual({})
+  })
+
+  it('reads width: from the bar', () => {
+    const run = (a, line) => {
+      const answer = enterLine(line, { mode: 'command', built: new Set(ARRANGEMENT_VERBS), board: a.addressed })
+      expect(answer.state, `${line}: ${answer.message}`).toBe('ready')
+      return answer.steps.map((step) => plan(a, step))
+    }
+    const a = shipped(SPACE)
+    expect(run(a, '>width:60%')[0].says.message).toBe('widthIt')
+    expect(run(a, '>width:collection 30%')[0].says.message).toBe('widthSet')
+    expect(run(keep(planWidth(a, 'almanac', 70)), '>width:even')[0].says.message).toBe('widthEven')
   })
 })
 

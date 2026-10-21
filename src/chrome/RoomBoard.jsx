@@ -11,6 +11,8 @@ import { roomLabel } from './say'
 import { useChat } from '../stores/ChatContext'
 import { useConversations } from '../stores/ConversationContext'
 import { ConversationScope } from '../stores/ConversationScope'
+import { RoomHost } from '../lib/useViewportWidth'
+import { useNarrower } from './useNarrower'
 
 // A room as a board on the shell (refactor-plan.md, stage 4). The room is
 // drawn as today's chat page draws it: its chat is found, given the
@@ -26,6 +28,14 @@ import { ConversationScope } from '../stores/ConversationScope'
 // unless the person chose to let replies finish (C109).
 //
 // With no chat yet it is an empty room: the first prompt starts its chat.
+//
+// A room narrower than its two side panels and a conversation you can read
+// draws its layout's narrow form: the conversation, with the panels behind
+// the buttons at its top (C126). Its own width decides, not the window's.
+
+// Two side panels of 288px and a conversation of about 360px.
+const ROOM_WIDE = 940
+
 
 const COMPOSER = 'input'
 const blockName = (ref) => String(ref ?? '').split('@')[0]
@@ -66,6 +76,8 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
   const { conversations } = useConversations()
   const [found, setFound] = useState({ forId: null, chat: null, mode: null, error: null })
   const [loadedFor, setLoadedFor] = useState(null)
+  const [roomRef, narrow] = useNarrower(ROOM_WIDE)
+  const host = useMemo(() => ({ narrow }), [narrow])
 
   // The chat and its room, as ChatView finds them.
   useEffect(() => {
@@ -134,11 +146,13 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
     return card(<div className="ch-cbody"><p className="ch-marg">{i18n._(words)}</p></div>)
   }
   return card(
-    <div className="ch-room" data-scheme={scheme}>
+    <div className="ch-room" data-scheme={scheme} ref={roomRef}>
       {ready && (
-        <ConversationScope.Provider value={chatId}>
-          <RoomShell mode={found.mode} />
-        </ConversationScope.Provider>
+        <RoomHost.Provider value={host}>
+          <ConversationScope.Provider value={chatId}>
+            <RoomShell mode={found.mode} />
+          </ConversationScope.Provider>
+        </RoomHost.Provider>
       )}
     </div>,
   )

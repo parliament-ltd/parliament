@@ -80,7 +80,7 @@ function words(text) {
 // No ranges: no document gives a syntax for one, and erase: takes explicit
 // numbers only (C39). Lists use commas.
 
-/** One argument, typed: an address, a number, quoted text or a word. */
+/** One argument, typed: an address, a number, a percentage, quoted text or a word. */
 export function readArg(text) {
   const raw = String(text)
   const open = raw[0]
@@ -93,6 +93,8 @@ export function readArg(text) {
   const address = parseAddress(raw)
   if (address) return { kind: 'address', text: raw, ...address }
   if (/^\d+$/.test(raw)) return { kind: 'number', text: raw, value: Number(raw) }
+  // A share of the width, as width:60% takes it (C126).
+  if (/^\d{1,3}%$/.test(raw)) return { kind: 'percent', text: raw, value: Number(raw.slice(0, -1)) }
   return { kind: 'word', text: raw, value: raw.toLowerCase() }
 }
 

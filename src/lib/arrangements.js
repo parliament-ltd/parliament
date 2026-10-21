@@ -25,6 +25,8 @@ const SIDES = new Set(['left', 'right'])
 const ID = /^[a-z]+(?::[A-Za-z0-9_-]{1,128})?$/
 
 const contextValue = (v) => (typeof v === 'number' && Number.isFinite(v)) || (typeof v === 'string' && v.length <= 200)
+// A board's share of the width (C126): its usual share is 1 or 2.
+const shareValue = (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0.05 && v <= 50
 
 /**
  * A stored arrangement made safe to use, or null when it cannot be.
@@ -52,6 +54,11 @@ export function cleanArrangement(record) {
   for (const [k, v] of Object.entries(record.context && typeof record.context === 'object' ? record.context : {})) {
     if (boardEntry(k) && contextValue(v)) context[k] = v
   }
+  // Spaces kept before C126 have no widths, and read with the usual shares.
+  const widths = {}
+  for (const [k, v] of Object.entries(record.widths && typeof record.widths === 'object' ? record.widths : {})) {
+    if (boardEntry(k) && shareValue(v)) widths[k] = v
+  }
   return {
     id: record.id,
     columns,
@@ -60,6 +67,7 @@ export function cleanArrangement(record) {
     bar: { at: BAR_PLACES.has(bar.at) ? bar.at : SHIPPED[shippedFor(record.id)].bar, side: BAR_SIDES.has(bar.side) ? bar.side : 'center', popped: bar.popped === true },
     resting: record.resting === 'search' || record.resting === 'prompt' ? record.resting : null,
     context,
+    widths,
   }
 }
 

@@ -88,7 +88,8 @@ function planName(a, step, screens = {}) {
 /**
  * @param {string} value the whole field, leader included
  * @param {{ mode: string, arrangement: import('../shell/arrangement').Arrangement, built?: Set<string>,
- *   screens?: { lastRoom?: { id: string, num?: number|null }|null, roomName?: object|null, stepsOff?: boolean } }} ctx
+ *   screens?: { lastRoom?: { id: string, num?: number|null }|null, roomName?: object|null, stepsOff?: boolean,
+ *     measure?: () => object|null } }} ctx  measure: the space as drawn, for width: (C126)
  * @returns {{ answer: object, says: { message: string, values?: object }, next: object|null, act?: object|null }}
  *   next is the space after Enter, or null when Enter changes none of it;
  *   act is what Enter does besides, to what the bar points at (name:) or to
@@ -110,7 +111,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   let a = arrangement
   let last = null
   for (const step of answer.steps) {
-    const p = BRINGS.includes(step.verb) ? bring(a, step, screens) : plan(a, step)
+    const p = BRINGS.includes(step.verb) ? bring(a, step, screens) : plan(a, step, screens.measure?.() ?? null)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
     if (!p.next) return { answer, says: p.says, next: null }
     a = p.next

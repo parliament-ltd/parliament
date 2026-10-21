@@ -39,6 +39,7 @@ export const parse = (body) => parseCommand(body, lookup)
 //   'address'     201 or 201a
 //   'addresses'   one address, or several with commas: 201, 203
 //   'number'      a plain number
+//   'percent'     a percentage: 60%
 //   'text'        quoted text, or one word or number
 //   'word'        any one word
 //   ['a', 'b']    one of these words
@@ -48,7 +49,8 @@ export const parse = (body) => parseCommand(body, lookup)
 const fills = {
   address: (a) => a.kind === 'address',
   number: (a) => a.kind === 'number',
-  text: (a) => a.kind === 'text' || a.kind === 'word' || a.kind === 'address' || a.kind === 'number',
+  percent: (a) => a.kind === 'percent',
+  text: (a) => a.kind === 'text' || a.kind === 'word' || a.kind === 'address' || a.kind === 'number' || a.kind === 'percent',
   word: (a) => a.kind === 'word',
 }
 function fillsSlot(slot, arg) {

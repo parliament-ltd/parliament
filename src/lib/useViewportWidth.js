@@ -11,10 +11,19 @@
 // SSR-safe via the `typeof window` guard even though Parliament has no
 // SSR — costs nothing and keeps the hook portable if a renderer ever
 // shows up at build time.
+//
+// A room hosted as a board on the shell is often narrower than the window.
+// The board says so through RoomHost, and then the room's own width
+// decides, not the window's: a narrow room draws the narrow form its layout
+// has, the conversation first (C126).
 
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
+
+/** Set by a board that hosts a room: { narrow } from the room's own width. */
+export const RoomHost = createContext(null)
 
 export function useIsNarrow(threshold = 768) {
+  const host = useContext(RoomHost)
   const [isNarrow, setIsNarrow] = useState(() => {
     if (typeof window === 'undefined') return false
     return window.innerWidth < threshold
@@ -27,5 +36,5 @@ export function useIsNarrow(threshold = 768) {
     return () => window.removeEventListener('resize', onResize)
   }, [threshold])
 
-  return isNarrow
+  return host ? host.narrow : isNarrow
 }

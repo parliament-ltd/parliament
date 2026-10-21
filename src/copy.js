@@ -99,6 +99,18 @@ export const COPY = {
     closeLast: /*i18n*/ { id: 'enter.closeLast', message: 'The last board stays open' },
     closeBoard: /*i18n*/ { id: 'enter.closeBoard', message: 'Enter closes {board}. Nothing is lost' },
     closeRoom: /*i18n*/ { id: 'enter.closeRoom', message: 'Enter closes this room. Nothing is lost' },
+    // width: (C126). {percent}, {low} and {high} are shares of the width, written as the reader's language writes a percentage.
+    widthIt: /*i18n*/ { id: 'enter.widthIt', message: 'Enter gives it {percent} of the width', comment: 'It is the board the bar points at, named just before this line' },
+    widthSet: /*i18n*/ { id: 'enter.widthSet', message: 'Enter gives {board} {percent} of the width' },
+    widthThere: /*i18n*/ { id: 'enter.widthThere', message: 'That is its width already' },
+    widthAlone: /*i18n*/ { id: 'enter.widthAlone', message: 'A board on its own has the whole width' },
+    widthRange: /*i18n*/ { id: 'enter.widthRange', message: 'A board takes from {low} to {high} of the width' },
+    widthPopped: /*i18n*/ { id: 'enter.widthPopped', message: 'A board in its own window takes the width of its window' },
+    widthMost: /*i18n*/ { id: 'enter.widthMost', message: 'Beside the others it can have at most {percent} of the width' },
+    widthLeast: /*i18n*/ { id: 'enter.widthLeast', message: 'It needs at least {percent} of the width' },
+    widthStacked: /*i18n*/ { id: 'enter.widthStacked', message: 'In a window this narrow the boards are stacked, each the whole width' },
+    widthEven: /*i18n*/ { id: 'enter.widthEven', message: 'Enter puts every board back to its usual width' },
+    widthEvenAlready: /*i18n*/ { id: 'enter.widthEvenAlready', message: 'Every board has its usual width already' },
     closeWelcome: /*i18n*/ { id: 'enter.closeWelcome', message: 'Enter closes the welcome page. tour: brings it back' },
     moveIsPopped: /*i18n*/ { id: 'enter.moveIsPopped', message: '{board} is in its own window. pop:back brings it back first' },
     moveThere: /*i18n*/ {
@@ -329,6 +341,11 @@ export const COPY = {
     windowTitle: /*i18n*/ { id: 'shell.windowTitle', message: '{board} · Parliament', comment: "A popped window's title: a board name only, never anything someone wrote" },
     barWindow: /*i18n*/ { id: 'shell.barWindow', message: 'Parliament', comment: "The popped bar's window title" },
     barAway: /*i18n*/ { id: 'shell.barAway', message: 'The bar is in its own window. pop:back command brings it back.' },
+    // The edge between two columns (C126). {first} and {second} are what stands on either side.
+    edge: /*i18n*/ { id: 'shell.edge', message: 'Width between {first} and {second}', comment: 'Read aloud for the stretchable edge between two boards' },
+    edgeHelp: /*i18n*/ { id: 'shell.edgeHelp', message: 'Drag to share the width. A double click puts both back' },
+    edgeRoom: /*i18n*/ { id: 'shell.edgeRoom', message: 'the room', comment: 'A room, named mid-sentence beside an edge' },
+    edgeWelcome: /*i18n*/ { id: 'shell.edgeWelcome', message: 'the welcome page', comment: 'The welcome card, named mid-sentence beside an edge' },
   },
 
   // A reply being written when its chat is left (C109).
