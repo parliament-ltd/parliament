@@ -91,7 +91,7 @@ const CENT = 0.01
  * @param {string} text the prompt as typed
  * @param {{ room?: string|null, streaming?: boolean, keyed?: boolean|null, provider?: string, source?: string,
  *   historyChars?: number, systemChars?: number, perMillion?: number|null, hiddenOut?: number,
- *   sourcesOut?: { count: number, names: string[] },
+ *   sourcesOut?: { count: number, names: string[] }, resend?: boolean,
  *   describe?: { price: object|null }|null }} target
  *   room: the chat the screen's room shows, null for an empty room, undefined
  *   when no room is on the screen; keyed: whether there is a key for the
@@ -101,7 +101,9 @@ const CENT = 0.01
  *   that stay out, hidden or being deleted; sourcesOut: answers from
  *   sources that stay out, and the sources' names; describe: set when the first
  *   answer will be followed by the one request for its title, summary and
- *   tags (C62), with the price of the model it goes to
+ *   tags (C62), with the price of the model it goes to; resend: the last
+ *   reply here stalled, so an empty field offers to send it again without
+ *   streaming (C114)
  * @returns {{ ready: boolean, says: { message: string, values?: object }|null }}
  *   ready: whether Enter sends; says: the line's sentence, null for none
  */
@@ -109,7 +111,21 @@ export function promptPreview(text, target = {}) {
   if (target.room === undefined) return { ready: false, says: { message: 'promptNoRoom' } }
   if (target.streaming) return { ready: false, says: { message: 'promptBusy' } }
   const prompt = String(text ?? '').trim()
-  if (!prompt) return { ready: false, says: null }
+  if (!prompt) {
+    // The last reply here stalled: with nothing typed, Enter offers to send
+    // it again without streaming, naming the cost. Never sent unasked (C114).
+    if (target.resend && target.keyed) {
+      const tokens = Math.ceil(((target.historyChars ?? 0) + (target.systemChars ?? 0)) / CHARS_PER_TOKEN)
+      const cost = inputCost(tokens, target.perMillion)
+      const offer = cost == null
+        ? { message: 'promptResendUnpriced', values: { tokens } }
+        : cost < CENT
+          ? { message: 'promptResendCheap', values: { tokens, cost: CENT } }
+          : { message: 'promptResend', values: { tokens, cost } }
+      return { ready: true, resend: true, says: { message: 'promptStalled', also: [offer] } }
+    }
+    return { ready: false, says: null }
+  }
   if (target.keyed == null) return { ready: false, says: { message: 'promptChecking' } }
   if (!target.keyed) return { ready: true, says: { message: 'promptSource', values: { source: target.source } } }
 

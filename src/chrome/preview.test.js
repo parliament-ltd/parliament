@@ -186,3 +186,21 @@ describe('answers from sources stay out (C115)', () => {
     expect(promptPreview('x', { room: 'c1', keyed: false, source: 'Wikipedia', sourcesOut: { count: 2, names: ['Wikipedia'] } }).says.also).toBeUndefined()
   })
 })
+
+describe('after a reply stalled (C114)', () => {
+  const target = { room: 'c1', keyed: true, provider: 'Anthropic', perMillion: 3, historyChars: 400, resend: true }
+
+  it('offers, with nothing typed, to send it again without streaming, naming the cost', () => {
+    const p = promptPreview('', target)
+    expect(p.ready).toBe(true)
+    expect(p.resend).toBe(true)
+    expect(say(i18n, p.says.message)).toBe('The reply stalled, as happens on networks that hold streamed replies')
+    expect(say(i18n, p.says.also[0].message, p.says.also[0].values)).toBe('Enter sends it again without streaming, about 100 tokens, under $0.01 to send')
+  })
+
+  it('sends a new prompt as usual when one is typed, and offers nothing without a key or a stall', () => {
+    expect(promptPreview('Something else', target).resend).toBeUndefined()
+    expect(promptPreview('', { ...target, resend: false }).ready).toBe(false)
+    expect(promptPreview('', { ...target, keyed: false }).ready).toBe(false)
+  })
+})

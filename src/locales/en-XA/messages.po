@@ -73,6 +73,10 @@ msgid "chat.cutError"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.cutErrorEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.cutLimit"
 msgstr ""
 
@@ -372,6 +376,19 @@ msgstr ""
 msgid "enter.promptNoRoom"
 msgstr ""
 
+#. Sent only on Enter, never automatically (C114)
+#. js-lingui-explicit-id
+msgid "enter.promptResend"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptResendCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptResendUnpriced"
+msgstr ""
+
 #. A local estimate: nothing is sent to count (C83)
 #. js-lingui-explicit-id
 msgid "enter.promptSend"
@@ -393,6 +410,10 @@ msgstr ""
 #. C115: answers from sources are not sent to a model unless the person acts on them. {sources} lists their names
 #. js-lingui-explicit-id
 msgid "enter.promptSourcesOut"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptStalled"
 msgstr ""
 
 #. js-lingui-explicit-id

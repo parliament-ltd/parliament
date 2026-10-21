@@ -205,6 +205,21 @@ export const COPY = {
     keyRefused: /*i18n*/ { id: 'enter.keyRefused', message: 'The key was refused. Update it in {board}, then send again', comment: '{board} is Settings, from COPY.boards' },
     tooMany: /*i18n*/ { id: 'enter.tooMany', message: 'Too many requests for now. Wait a moment, then send again' },
     promptFailed: /*i18n*/ { id: 'enter.promptFailed', message: 'The prompt did not go through. Try again' },
+    // C114: a reply that stalled, and the offer to send it again.
+    promptStalled: /*i18n*/ { id: 'enter.promptStalled', message: 'The reply stalled, as happens on networks that hold streamed replies' },
+    promptResend: /*i18n*/ {
+      id: 'enter.promptResend',
+      message: '{tokens, plural, one {Enter sends it again without streaming, about # token, {cost} to send} other {Enter sends it again without streaming, about # tokens, {cost} to send}}',
+      comment: 'Sent only on Enter, never automatically (C114)',
+    },
+    promptResendCheap: /*i18n*/ {
+      id: 'enter.promptResendCheap',
+      message: '{tokens, plural, one {Enter sends it again without streaming, about # token, under {cost} to send} other {Enter sends it again without streaming, about # tokens, under {cost} to send}}',
+    },
+    promptResendUnpriced: /*i18n*/ {
+      id: 'enter.promptResendUnpriced',
+      message: '{tokens, plural, one {Enter sends it again without streaming, about # token} other {Enter sends it again without streaming, about # tokens}}',
+    },
     replyCut: /*i18n*/ { id: 'enter.replyCut', message: 'The reply broke off part way. What arrived is kept and marked as cut off' },
   },
 
@@ -251,6 +266,7 @@ export const COPY = {
     // A reply cut off (stage 4), marked so it is never taken for a whole answer.
     cutLimit: /*i18n*/ { id: 'chat.cutLimit', message: 'Cut off: the reply reached the length allowed for one reply. What arrived is kept.' },
     cutError: /*i18n*/ { id: 'chat.cutError', message: 'Cut off by an error part way through. What arrived is kept.' },
+    cutErrorEmpty: /*i18n*/ { id: 'chat.cutErrorEmpty', message: 'Stopped before any of it arrived.' },
     stoppedNotice: /*i18n*/ {
       id: 'chat.stoppedNotice',
       message: 'The reply in {chat} stopped when you left it. What arrived is kept, and the tokens it used are charged.',

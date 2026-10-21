@@ -293,7 +293,7 @@ export default function MessagesRender() {
         number={numberByMessageId.get(msg.id) || 0}
         index={idx}
         isGhostText={isGhost}
-        stoppedNote={isGhost && Object.hasOwn(STOPPED, msg.stopReason ?? '') ? i18n._(STOPPED[msg.stopReason]) : null}
+        stoppedNote={isGhost && Object.hasOwn(STOPPED, msg.stopReason ?? '') ? i18n._(msg.stopReason === 'error' && !msg.content ? COPY.chat.cutErrorEmpty : STOPPED[msg.stopReason]) : null}
         source={msg.source ?? null}
         isFavorited={isFav}
         showNotes={showNotes.has(msg.id)}

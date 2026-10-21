@@ -4,6 +4,18 @@ import { evalMath } from '../lib/mathEval'
 const API_BASE = 'https://api.anthropic.com/v1'
 const API_VERSION = '2023-06-01'
 
+// How long a stream may be silent before it counts as stalled (C114). The
+// provider sends pings while a reply is under way, so silence this long
+// means a network is holding the stream. Kept generous: a stall leads the
+// person to send again, which costs again.
+export const STALL_MS = 45_000
+
+function stalledError() {
+  const error = new Error('The reply stalled: nothing arrived for a while.')
+  error.name = 'Stalled'
+  return error
+}
+
 const TITLE_SYSTEM_PROMPT = `Generate a short title (2-6 words) for this conversation. Rules:
 - No quotes, no periods, no special characters
 - Capture the core topic or intent
@@ -299,59 +311,124 @@ export class AnthropicProvider extends BaseProvider {
       ...(toolDefs.length > 0 ? { tools: toolDefs } : {}),
     }
 
+    // A network that holds streamed replies shows as silence: nothing at
+    // all for STALL_MS, where the provider otherwise keeps the stream alive.
+    // The stream is then stopped and the reply said to have stalled, for the
+    // person to send again without streaming if they choose (C114). It is
+    // never sent again from here: that would spend without a second Enter.
+    const watch = new AbortController()
+    const stop = () => watch.abort()
+    if (signal?.aborted) watch.abort()
+    signal?.addEventListener('abort', stop)
+    let stalled = false
+    let timer = null
+    const alive = () => {
+      clearTimeout(timer)
+      timer = setTimeout(() => { stalled = true; watch.abort() }, STALL_MS)
+    }
+
+    try {
+      alive()
+      const response = await fetch(`${API_BASE}/messages`, {
+        method: 'POST',
+        headers: this._headers(apiKey),
+        body: JSON.stringify(body),
+        signal: watch.signal,
+      })
+      alive()
+      if (!response.ok) throw this._failure(response)
+      return await this._readStream(response, onChunk, onToolUse, alive)
+    } catch (err) {
+      if (stalled) throw stalledError()
+      throw err
+    } finally {
+      clearTimeout(timer)
+      signal?.removeEventListener('abort', stop)
+    }
+  }
+
+  /**
+   * The same request without streaming: the whole reply in one response,
+   * for a network that holds streamed replies (C114). Sent only when the
+   * person chooses it on the Enter line. Same return as sendMessage; the
+   * text reaches onChunk once.
+   */
+  async sendMessageWhole(apiKey, messages, model, onChunk, signal, systemPrompt, tools = []) {
+    const toolDefs = tools.map(t => t.definition ?? t)
     const response = await fetch(`${API_BASE}/messages`, {
       method: 'POST',
       headers: this._headers(apiKey),
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        model: this._resolveModel(model),
+        max_tokens: 8192,
+        messages,
+        ...(systemPrompt ? { system: systemPrompt } : {}),
+        ...(toolDefs.length > 0 ? { tools: toolDefs } : {}),
+      }),
       signal,
     })
+    if (!response.ok) throw this._failure(response)
+    const data = await response.json()
+    const blocks = Array.isArray(data?.content) ? data.content : []
+    const text = blocks.filter(b => b?.type === 'text' && typeof b.text === 'string').map(b => b.text).join('')
+    if (text) onChunk(text)
+    return {
+      usage: { input_tokens: data?.usage?.input_tokens ?? 0, output_tokens: data?.usage?.output_tokens ?? 0 },
+      stopReason: data?.stop_reason ?? null,
+      toolUses: blocks.filter(b => b?.type === 'tool_use').map(b => ({ id: b.id, name: b.name, input: b.input ?? {} })),
+    }
+  }
 
-    // Handle error responses before attempting to parse the stream
-    if (!response.ok) {
-      const status = response.status
+  // The error for a response the provider refused, with its status.
+  _failure(response) {
+    const status = response.status
 
-      if (status === 401) {
-        const error = new Error('API key is no longer valid.')
-        error.status = 401
-        throw error
-      }
-
-      if (status === 403) {
-        const error = new Error('Account billing issue. Please check your Anthropic dashboard.')
-        error.status = 403
-        throw error
-      }
-
-      if (status === 429) {
-        // Parse `retry-after` — spec allows seconds or HTTP-date, but
-        // Anthropic returns seconds. Defend against both.
-        const retryAfterHeader = response.headers.get('retry-after')
-        let retryAfterSeconds = null
-        if (retryAfterHeader) {
-          const asNum = Number(retryAfterHeader)
-          if (Number.isFinite(asNum) && asNum >= 0) {
-            retryAfterSeconds = Math.ceil(asNum)
-          } else {
-            const asDate = Date.parse(retryAfterHeader)
-            if (!Number.isNaN(asDate)) {
-              retryAfterSeconds = Math.max(0, Math.ceil((asDate - Date.now()) / 1000))
-            }
-          }
-        }
-        const message = retryAfterSeconds
-          ? `Rate limit reached. Please wait ~${retryAfterSeconds}s before sending.`
-          : 'Rate limit reached. Please wait a moment before sending.'
-        const error = new Error(message)
-        error.status = 429
-        error.retryAfterSeconds = retryAfterSeconds
-        throw error
-      }
-
-      const error = new Error(`API error (${status})`)
-      error.status = status
-      throw error
+    if (status === 401) {
+      const error = new Error('API key is no longer valid.')
+      error.status = 401
+      return error
     }
 
+    if (status === 403) {
+      const error = new Error('Account billing issue. Please check your Anthropic dashboard.')
+      error.status = 403
+      return error
+    }
+
+    if (status === 429) {
+      // Parse `retry-after` — spec allows seconds or HTTP-date, but
+      // Anthropic returns seconds. Defend against both.
+      const retryAfterHeader = response.headers.get('retry-after')
+      let retryAfterSeconds = null
+      if (retryAfterHeader) {
+        const asNum = Number(retryAfterHeader)
+        if (Number.isFinite(asNum) && asNum >= 0) {
+          retryAfterSeconds = Math.ceil(asNum)
+        } else {
+          const asDate = Date.parse(retryAfterHeader)
+          if (!Number.isNaN(asDate)) {
+            retryAfterSeconds = Math.max(0, Math.ceil((asDate - Date.now()) / 1000))
+          }
+        }
+      }
+      const message = retryAfterSeconds
+        ? `Rate limit reached. Please wait ~${retryAfterSeconds}s before sending.`
+        : 'Rate limit reached. Please wait a moment before sending.'
+      const error = new Error(message)
+      error.status = 429
+      error.retryAfterSeconds = retryAfterSeconds
+      return error
+    }
+
+    const error = new Error(`API error (${status})`)
+    error.status = status
+    return error
+  }
+
+  // Reads a streamed reply: text to onChunk as it arrives, tool calls, the
+  // reason it stopped and what it used. `alive` hears of every piece, so a
+  // stream that falls silent can be noticed.
+  async _readStream(response, onChunk, onToolUse, alive = () => {}) {
     // Parse SSE stream
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
@@ -367,6 +444,7 @@ export class AnthropicProvider extends BaseProvider {
 
     while (!streamError) {
       const { done, value } = await reader.read()
+      alive()
       if (done) break
 
       buffer += decoder.decode(value, { stream: true })

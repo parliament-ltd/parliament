@@ -21,6 +21,16 @@ export class BaseProvider {
     throw new Error('Not implemented')
   }
 
+  // The same request without streaming: the whole reply in one response,
+  // for a network that holds streamed replies (C114). Sent only when the
+  // person chooses it on the Enter line, never as an automatic retry.
+  // Same return as sendMessage; the text reaches onChunk once.
+  // A streamed send whose stream falls silent too long throws an error
+  // named 'Stalled', so the Enter line can offer this.
+  async sendMessageWhole(apiKey, messages, model, onChunk, signal, systemPrompt, tools = []) {
+    throw new Error('Not implemented')
+  }
+
   // Return available models with metadata.
   //
   // Returns [{ id, apiId, name, contextWindow, cost }]

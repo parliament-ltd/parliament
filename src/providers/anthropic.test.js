@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { AnthropicProvider } from './anthropic'
+import { AnthropicProvider, STALL_MS } from './anthropic'
 
 // A stand-in for the provider's streamed reply: server-sent events, read
 // piece by piece. No request leaves the test.
@@ -80,5 +80,64 @@ describe('one request for a title, summary and tags (C62)', () => {
 
   it('names the model it goes to, so the Enter line can price it', () => {
     expect(new AnthropicProvider().getMetadataModel()).toBe('claude-haiku')
+  })
+})
+
+describe('a stream that falls silent (C114)', () => {
+  // A response whose body sends message_start and then nothing, as behind
+  // a network that holds streamed replies. Stopping the request ends the
+  // body, as a real fetch does.
+  function silentAfterStart() {
+    return vi.fn(async (url, init) => {
+      let controller
+      const body = new ReadableStream({ start(c) { controller = c; c.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(start)}\n\n`)) } })
+      init.signal.addEventListener('abort', () => controller.error(new DOMException('Aborted', 'AbortError')))
+      return { ok: true, status: 200, body, headers: new Headers() }
+    })
+  }
+
+  it('says it stalled after STALL_MS of silence, and sends nothing again', async () => {
+    vi.useFakeTimers()
+    const fetch = silentAfterStart()
+    vi.stubGlobal('fetch', fetch)
+    const pending = new AnthropicProvider().sendMessage('test-key', [{ role: 'user', content: 'Hi' }], 'claude-haiku', () => {}).catch((e) => e)
+    await vi.advanceTimersByTimeAsync(STALL_MS + 10)
+    const err = await pending
+    expect(err.name).toBe('Stalled')
+    expect(fetch).toHaveBeenCalledTimes(1)
+    vi.useRealTimers()
+  })
+
+  it('a stop by the person is a stop, not a stall', async () => {
+    vi.useFakeTimers()
+    vi.stubGlobal('fetch', silentAfterStart())
+    const controller = new AbortController()
+    const pending = new AnthropicProvider().sendMessage('test-key', [{ role: 'user', content: 'Hi' }], 'claude-haiku', () => {}, controller.signal).catch((e) => e)
+    await vi.advanceTimersByTimeAsync(1000)
+    controller.abort()
+    const err = await pending
+    expect(err.name).toBe('AbortError')
+    vi.useRealTimers()
+  })
+})
+
+describe('the same request without streaming (C114)', () => {
+  it('sends stream: false and gives the whole text at once', async () => {
+    const fetch = vi.fn(async () => ({
+      ok: true, status: 200,
+      json: async () => ({ content: [{ type: 'text', text: 'Whole ' }, { type: 'text', text: 'reply' }], stop_reason: 'end_turn', usage: { input_tokens: 9, output_tokens: 2 } }),
+    }))
+    vi.stubGlobal('fetch', fetch)
+    const chunks = []
+    const r = await new AnthropicProvider().sendMessageWhole('test-key', [{ role: 'user', content: 'Hi' }], 'claude-haiku', (c) => chunks.push(c))
+    expect(chunks).toEqual(['Whole reply'])
+    expect(r).toEqual({ usage: { input_tokens: 9, output_tokens: 2 }, stopReason: 'end_turn', toolUses: [] })
+    expect(JSON.parse(fetch.mock.calls[0][1].body).stream).toBeUndefined()
+  })
+
+  it('reports a refused request with its status, as a streamed one does', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false, status: 401, headers: new Headers() })))
+    const err = await new AnthropicProvider().sendMessageWhole('test-key', [], 'claude-haiku', () => {}).catch((e) => e)
+    expect(err.status).toBe(401)
   })
 })

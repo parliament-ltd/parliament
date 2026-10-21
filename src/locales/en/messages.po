@@ -73,6 +73,10 @@ msgid "chat.cutError"
 msgstr "Cut off by an error part way through. What arrived is kept."
 
 #. js-lingui-explicit-id
+msgid "chat.cutErrorEmpty"
+msgstr "Stopped before any of it arrived."
+
+#. js-lingui-explicit-id
 msgid "chat.cutLimit"
 msgstr "Cut off: the reply reached the length allowed for one reply. What arrived is kept."
 
@@ -372,6 +376,19 @@ msgstr "{count, plural, one {# hidden message stays out} other {# hidden message
 msgid "enter.promptNoRoom"
 msgstr "Prompts go to a room. sym: opens one"
 
+#. Sent only on Enter, never automatically (C114)
+#. js-lingui-explicit-id
+msgid "enter.promptResend"
+msgstr "{tokens, plural, one {Enter sends it again without streaming, about # token, {cost} to send} other {Enter sends it again without streaming, about # tokens, {cost} to send}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptResendCheap"
+msgstr "{tokens, plural, one {Enter sends it again without streaming, about # token, under {cost} to send} other {Enter sends it again without streaming, about # tokens, under {cost} to send}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptResendUnpriced"
+msgstr "{tokens, plural, one {Enter sends it again without streaming, about # token} other {Enter sends it again without streaming, about # tokens}}"
+
 #. A local estimate: nothing is sent to count (C83)
 #. js-lingui-explicit-id
 msgid "enter.promptSend"
@@ -394,6 +411,10 @@ msgstr "Enter asks {source}, which needs no key and costs nothing"
 #. js-lingui-explicit-id
 msgid "enter.promptSourcesOut"
 msgstr "{count, plural, one {# answer from {sources} stays out} other {# answers from {sources} stay out}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptStalled"
+msgstr "The reply stalled, as happens on networks that hold streamed replies"
 
 #. js-lingui-explicit-id
 msgid "enter.ready"

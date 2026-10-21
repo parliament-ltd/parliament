@@ -199,11 +199,12 @@ export default function Shell() {
   const onRoomLeave = useCallback((chatId) => { if (readyRoom.current === chatId) readyRoom.current = null }, [])
 
   // ── Prompts from the bar (stage 4) ────────────────────
-  const { messages, activeConversationId, sendMessage, askSource } = useChat()
+  const { messages, activeConversationId, sendMessage, resendWhole, askSource } = useChat()
   const { conversations, createConversation, loadConversations } = useConversations()
   const { settings } = useSettings()
   const { buildSystemPrompt } = useCollabMode()
   const [keyed, setKeyed] = useState(null) // whether there is a key, without decrypting it; null until known
+  const [stalledIn, setStalledIn] = useState(null) // the chat whose last reply stalled (C114)
   const creating = useRef(false)
   const latest = useRef({})
   useEffect(() => { latest.current = { settings, buildSystemPrompt, locale: i18n.locale } })
@@ -267,7 +268,8 @@ export default function Shell() {
     hiddenOut,
     sourcesOut,
     describe,
-  }), [roomId, roomRecord, streaming, keyed, model, settings.defaultModel, along, hiddenOut, sourcesOut, describe, buildSystemPrompt])
+    resend: Boolean(roomId) && stalledIn === roomId,
+  }), [roomId, roomRecord, streaming, keyed, model, settings.defaultModel, along, hiddenOut, sourcesOut, describe, stalledIn, buildSystemPrompt])
 
   /**
    * Sends a prompt to the room on screen: to the provider with a key, else
@@ -282,6 +284,19 @@ export default function Shell() {
     // The line named a recipient; if that has changed since, say so first.
     const fresh = await hasKey().then(Boolean, () => false)
     if (fresh !== shown?.keyed) { setKeyed(fresh); return { refused: 'promptChanged' } }
+
+    // Nothing typed, and the last reply here stalled: send it again without
+    // streaming, as the Enter line offered (C114).
+    if (!text) {
+      if (!shown?.resend || !chatId || !fresh) return { refused: 'promptFailed' }
+      setStalledIn(null)
+      const { settings: s, buildSystemPrompt: system } = latest.current
+      const done = resendWhole(chatId, s.defaultModel, system())
+        .then(() => { loadConversations().catch(() => {}); return null })
+        .catch(failure)
+      return { done }
+    }
+    setStalledIn((was) => (was === chatId ? null : was))
 
     let id = chatId
     if (!id) {
@@ -313,10 +328,12 @@ export default function Shell() {
       .then(() => { loadConversations().catch(() => {}); return null })
       .catch((err) => {
         if (err?.name === 'Refused') hasKey().then((k) => setKeyed(Boolean(k)), () => {})
+        // A stall: the Enter line now offers to send it again (C114).
+        if (err?.name === 'Stalled') { setStalledIn(id); return null }
         return failure(err)
       })
     return { done }
-  }, [askSource, createConversation, loadConversations, sendMessage, switchTo])
+  }, [askSource, createConversation, loadConversations, resendWhole, sendMessage, switchTo])
 
   function pickBoard(board) {
     const a = current.current

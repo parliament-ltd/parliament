@@ -99,8 +99,10 @@ export function ChatProvider({ children }) {
 
   // A reply that stopped part way: keep what arrived, and mark why it
   // stopped: its chat was left (said once where the person lands, C109),
-  // or an error broke it off (`cut`). Returns whether anything was kept.
-  const keepPartial = useCallback(async (conversationId, messageId, before = '', cut = null) => {
+  // or an error broke it off (`cut`). A reply that stalled keeps its place
+  // even when nothing arrived (`keepEmpty`), so it can be sent again
+  // without streaming (C114). Returns whether any text was kept.
+  const keepPartial = useCallback(async (conversationId, messageId, before = '', cut = null, { keepEmpty = false } = {}) => {
     const stream = getStream(conversationId)
     const content = stream?.text ?? ''
     const left = stream?.stopReason === 'left'
@@ -108,6 +110,10 @@ export function ChatProvider({ children }) {
     const kept = Boolean(content && content !== before)
     if (kept) {
       const updates = { content, incomplete: true, ...(reason ? { stopReason: reason } : {}) }
+      await updateMessage(messageId, updates)
+      updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, ...updates } : m)))
+    } else if (!before && keepEmpty && reason) {
+      const updates = { incomplete: true, stopReason: reason }
       await updateMessage(messageId, updates)
       updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, ...updates } : m)))
     } else if (!before) {
@@ -326,9 +332,10 @@ export function ChatProvider({ children }) {
       if (first && finalContent) describeNewChat(conversationId, forModel([userMsg, finished]), userContent).catch(() => {})
     } catch (error) {
       stopPersisting()
-      // Stopped or left: kept as it was. Anything else broke the reply off.
+      // Stopped or left: kept as it was. Anything else broke the reply off;
+      // a stall keeps its place, to be sent again without streaming (C114).
       const aborted = error.name === 'AbortError'
-      const kept = await keepPartial(conversationId, assistantMsg.id, '', aborted ? null : 'error')
+      const kept = await keepPartial(conversationId, assistantMsg.id, '', aborted ? null : 'error', { keepEmpty: error.name === 'Stalled' })
 
       // Re-throw if not an abort (abort is expected from stopping or leaving)
       if (!aborted) {
@@ -339,6 +346,61 @@ export function ChatProvider({ children }) {
       endStream(conversationId)
     }
   }, [persistEvery, keepPartial, describeNewChat, updateConversation])
+
+  // Sends a chat's last prompt again without streaming, after its reply
+  // stalled behind a network that holds streamed replies (C114). Only on the
+  // person's Enter, which named it and its cost. A stalled reply with
+  // nothing in it is filled; if some text had arrived, a new reply follows
+  // it and the one cut off stays as it was.
+  const resendWhole = useCallback(async (conversationId, model, systemPrompt = '') => {
+    if (streamingIn(conversationId)) return
+    const held = hasMessages(conversationId) ? heldMessages(conversationId) : await getMessages(conversationId)
+    let at = -1
+    for (let i = held.length - 1; i >= 0; i--) if (held[i].role === 'user') { at = i; break }
+    if (at < 0) return
+    const prompt = held[at]
+    const history = forModel(sendable(conversationId, held.slice(0, at + 1)))
+    let reply = held.slice(at + 1).find((m) => m.role === 'assistant' && !m.content) ?? null
+    if (!reply) {
+      reply = await addMessage({ conversationId, role: 'assistant', content: '', incomplete: true })
+      updateMessages(conversationId, (prev) => [...prev, reply])
+    }
+
+    const controller = new AbortController()
+    startStream(conversationId, { messageId: reply.id, controller })
+    try {
+      const response = await gateway.call(PROVIDER, 'sendMessageWhole', [
+        history,
+        model,
+        (chunk) => appendStream(conversationId, chunk),
+        controller.signal,
+        systemPrompt || undefined,
+      ], { label: 'chat send without streaming' })
+      if (controller.signal.aborted) throw new DOMException('Stopped', 'AbortError')
+      const content = getStream(conversationId)?.text ?? ''
+      const cut = content ? cutReason(response?.stopReason) : null
+      const outcome = { content, incomplete: Boolean(cut) || !content, tokenCount: response?.usage?.output_tokens || 0, stopReason: cut }
+      await updateMessage(reply.id, outcome)
+      const finished = { ...reply, ...outcome }
+      updateMessages(conversationId, (prev) => prev.map((m) => (m.id === reply.id ? finished : m)))
+      if (activeRef.current === conversationId) {
+        setTokenUsage((prev) => ({
+          input: prev.input + (response?.usage?.input_tokens || 0),
+          output: prev.output + outcome.tokenCount,
+        }))
+      }
+      if (at === 0 && content) describeNewChat(conversationId, forModel([prompt, finished]), prompt.content).catch(() => {})
+    } catch (error) {
+      const aborted = error.name === 'AbortError'
+      const kept = await keepPartial(conversationId, reply.id, '', aborted ? null : 'error', { keepEmpty: !aborted })
+      if (!aborted) {
+        error.kept = kept
+        throw error
+      }
+    } finally {
+      endStream(conversationId)
+    }
+  }, [keepPartial, describeNewChat])
 
   // Ask a source instead of a model (stage 4): a prompt with no key goes to
   // Wikipedia. The person's words go as a search and nothing else; what
@@ -482,6 +544,7 @@ export function ChatProvider({ children }) {
       clearPersistError,
       loadMessages,
       sendMessage,
+      resendWhole,
       askSource,
       continueMessage,
       stopGenerating,
