@@ -91,13 +91,15 @@ const CENT = 0.01
  * @param {string} text the prompt as typed
  * @param {{ room?: string|null, streaming?: boolean, keyed?: boolean|null, provider?: string, source?: string,
  *   historyChars?: number, systemChars?: number, perMillion?: number|null, hiddenOut?: number,
+ *   sourcesOut?: { count: number, names: string[] },
  *   describe?: { price: object|null }|null }} target
  *   room: the chat the screen's room shows, null for an empty room, undefined
  *   when no room is on the screen; keyed: whether there is a key for the
  *   provider, null while that is being checked; provider and source: names
  *   from the list; historyChars and systemChars: what would go along;
  *   perMillion: the model's input price; hiddenOut: messages of the chat
- *   that stay out, hidden or being deleted; describe: set when the first
+ *   that stay out, hidden or being deleted; sourcesOut: answers from
+ *   sources that stay out, and the sources' names; describe: set when the first
  *   answer will be followed by the one request for its title, summary and
  *   tags (C62), with the price of the model it goes to
  * @returns {{ ready: boolean, says: { message: string, values?: object }|null }}
@@ -124,6 +126,10 @@ export function promptPreview(text, target = {}) {
       : extra < CENT
         ? { message: 'promptDescribeCheap', values: { cost: CENT } }
         : { message: 'promptDescribe', values: { cost: extra } })
+  }
+  // Answers from sources stay out unless the person acts on them (C115).
+  if (target.sourcesOut?.count > 0) {
+    also.push({ message: 'promptSourcesOut', values: { count: target.sourcesOut.count, sources: target.sourcesOut.names } })
   }
   // Hidden messages, and messages being deleted, stay out of what is sent.
   if (target.hiddenOut > 0) also.push({ message: 'promptHiddenOut', values: { count: target.hiddenOut } })

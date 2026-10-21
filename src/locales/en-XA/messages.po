@@ -390,6 +390,11 @@ msgstr ""
 msgid "enter.promptSource"
 msgstr ""
 
+#. C115: answers from sources are not sent to a model unless the person acts on them. {sources} lists their names
+#. js-lingui-explicit-id
+msgid "enter.promptSourcesOut"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.ready"
 msgstr ""

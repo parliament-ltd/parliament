@@ -6,7 +6,7 @@
 import { COPY } from '../copy'
 
 const BOARD_VALUES = new Set(['board', 'first', 'second'])
-const AND_LISTS = new Set(['boards', 'verbs'])
+const AND_LISTS = new Set(['boards', 'verbs', 'sources'])
 
 const boardName = (i18n, key) => (COPY.boards[key] ? i18n._(COPY.boards[key]) : key)
 

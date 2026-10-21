@@ -390,6 +390,11 @@ msgstr "{tokens, plural, one {Enter sends to {provider}, about # token} other {E
 msgid "enter.promptSource"
 msgstr "Enter asks {source}, which needs no key and costs nothing"
 
+#. C115: answers from sources are not sent to a model unless the person acts on them. {sources} lists their names
+#. js-lingui-explicit-id
+msgid "enter.promptSourcesOut"
+msgstr "{count, plural, one {# answer from {sources} stays out} other {# answers from {sources} stay out}}"
+
 #. js-lingui-explicit-id
 msgid "enter.ready"
 msgstr "Enter runs {verb}"

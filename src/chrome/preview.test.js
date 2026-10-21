@@ -171,3 +171,18 @@ describe('naming the one request after a first answer (C62)', () => {
     expect(promptPreview('x', { ...target, describe: null }).says.also).toBeUndefined()
   })
 })
+
+describe('answers from sources stay out (C115)', () => {
+  it('names how many, and from where, when the chat goes to a model', () => {
+    const p = promptPreview('How big are they?', { room: 'c1', keyed: true, provider: 'Anthropic', perMillion: 3, sourcesOut: { count: 2, names: ['Wikipedia'] } })
+    const also = p.says.also.find((a) => a.message === 'promptSourcesOut')
+    expect(say(i18n, also.message, also.values)).toBe('2 answers from Wikipedia stay out')
+    const one = promptPreview('x', { room: 'c1', keyed: true, provider: 'Anthropic', perMillion: 3, sourcesOut: { count: 1, names: ['Wikipedia', 'Hacker News'] } })
+    expect(say(i18n, one.says.also[0].message, one.says.also[0].values)).toBe('1 answer from Wikipedia and Hacker News stays out')
+  })
+
+  it('says nothing when there are none, or when the prompt goes to a source', () => {
+    expect(promptPreview('x', { room: 'c1', keyed: true, provider: 'Anthropic', perMillion: 3, sourcesOut: { count: 0, names: [] } }).says.also).toBeUndefined()
+    expect(promptPreview('x', { room: 'c1', keyed: false, source: 'Wikipedia', sourcesOut: { count: 2, names: ['Wikipedia'] } }).says.also).toBeUndefined()
+  })
+})

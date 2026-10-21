@@ -3,10 +3,11 @@
 //
 // The chat store has already left out what is hidden, waiting to be
 // deleted, or empty (chatStore.sendable). Here each message becomes a turn:
-// - An answer that came from a source (Wikipedia) was not written by the
-//   model, so it does not go as the model's own words. It goes on the
-//   person's side, introduced by a line saying where it came from, so the
-//   model knows it as quoted context (C115, built as suggested).
+// - An answer that came from a source (Wikipedia) stays out (C115, ruled
+//   21 October): answers from different sources stay distinct unless the
+//   person acts on them. The person's own prompts still go, so a follow-up
+//   makes sense. Bringing an answer into a prompt is designed with
+//   branches, for every source together (stage 8).
 // - Turns of the same side next to each other are joined into one, so the
 //   turns alternate as providers expect.
 //
@@ -14,21 +15,20 @@
 // one reply, or by an error, is marked as cut off (request-path audit,
 // item 9: these were stored as complete).
 
+/** Whether a message is an answer from a source, which a model is not sent (C115). */
+export const fromSource = (m) => Boolean(m?.source)
+
 /**
  * @param {Array<{ role: string, content: string, source?: object }>} messages oldest first
- * @param {(source: object) => string} introduce the line that introduces a source's answer
  * @returns {Array<{ role: 'user'|'assistant', content: string }>}
  */
-export function forModel(messages, introduce) {
+export function forModel(messages) {
   const turns = []
   for (const m of messages) {
-    if (!m || typeof m.content !== 'string' || !m.content) continue
-    const quoted = m.source && m.source.found !== false
-    const role = quoted ? 'user' : m.role
-    const content = quoted ? `${introduce(m.source)}\n\n${m.content}` : m.content
+    if (!m || typeof m.content !== 'string' || !m.content || fromSource(m)) continue
     const last = turns[turns.length - 1]
-    if (last && last.role === role) last.content = `${last.content}\n\n${content}`
-    else turns.push({ role, content })
+    if (last && last.role === m.role) last.content = `${last.content}\n\n${m.content}`
+    else turns.push({ role: m.role, content: m.content })
   }
   return turns
 }

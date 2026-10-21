@@ -19,6 +19,7 @@ import { useSettings } from '../stores/SettingsContext'
 import { useCollabMode } from '../stores/CollabModeContext'
 import { useIsStreaming, useHiddenIds, usePendingDeletes } from '../stores/chatHooks'
 import { sendableOf } from '../stores/chatStore'
+import { fromSource } from '../stores/sendHistory'
 import { preview } from './preview'
 import Bar from './Bar'
 import Strip from './Strip'
@@ -238,8 +239,14 @@ export default function Shell() {
   const shown = roomId && activeConversationId === roomId ? messages : NONE
   const hiddenHere = useHiddenIds(roomId ?? '')
   const deletingHere = usePendingDeletes(roomId ?? '')
-  const along = useMemo(() => sendableOf(shown, hiddenHere, deletingHere), [shown, hiddenHere, deletingHere])
-  const hiddenOut = shown.filter((m) => m.content).length - along.length
+  const kept = useMemo(() => sendableOf(shown, hiddenHere, deletingHere), [shown, hiddenHere, deletingHere])
+  const hiddenOut = shown.filter((m) => m.content).length - kept.length
+  // Answers from sources stay out too, unless the person acts on them (C115).
+  const along = useMemo(() => kept.filter((m) => !fromSource(m)), [kept])
+  const sourcesOut = useMemo(() => {
+    const answers = kept.filter(fromSource)
+    return { count: answers.length, names: [...new Set(answers.map((m) => m.source.name || m.source.id))] }
+  }, [kept])
   // A chat's first prompt is followed, with a key, by one request for its
   // title, summary and tags, unless turned off in Settings (C62).
   const describeModel = useMemo(() => models(PROVIDER).find((m) => m.id === metadataModel(PROVIDER)) ?? null, [])
@@ -258,8 +265,9 @@ export default function Shell() {
     systemChars: keyed ? buildSystemPrompt().length : 0,
     perMillion: model?.cost?.inputPerMillion ?? null,
     hiddenOut,
+    sourcesOut,
     describe,
-  }), [roomId, roomRecord, streaming, keyed, model, settings.defaultModel, along, hiddenOut, describe, buildSystemPrompt])
+  }), [roomId, roomRecord, streaming, keyed, model, settings.defaultModel, along, hiddenOut, sourcesOut, describe, buildSystemPrompt])
 
   /**
    * Sends a prompt to the room on screen: to the provider with a key, else

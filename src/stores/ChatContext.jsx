@@ -4,7 +4,7 @@ import { askToKeepStorage } from '../lib/storageKeep'
 import { nameFromChat, titleFromPrompt, fieldsFromDescription } from '../lib/chatTitles'
 import { useConversations } from './ConversationContext'
 import { useSettings } from './SettingsContext'
-import { gateway, destination, runClientTool, continueInstruction, introduceSource, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
+import { gateway, destination, runClientTool, continueInstruction, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
 import {
   startStream, appendStream, resetStreamText, stopStream, endStream, getStream,
   isStreaming as streamingIn, streamingIds, addNotice,
@@ -208,8 +208,8 @@ export function ChatProvider({ children }) {
     const history = [...before.filter(m => m.id !== userMsg.id && m.id !== assistantMsg.id), userMsg]
 
     try {
-      // Empty messages stay out; a source's answer goes as quoted context.
-      const baseHistory = forModel(history, (source) => introduceSource(source, PROVIDER))
+      // Empty messages and answers from sources stay out (C115).
+      const baseHistory = forModel(history)
 
       // PR-18e: for THIS turn only, fold binary attachment content
       // blocks into the user message's content array. The persisted
@@ -323,7 +323,7 @@ export function ChatProvider({ children }) {
 
       // 6. After a chat's first answer, its title, summary and tags, from
       //    this chat's own exchange (C62). Not awaited.
-      if (first && finalContent) describeNewChat(conversationId, forModel([userMsg, finished], (source) => introduceSource(source, PROVIDER)), userContent).catch(() => {})
+      if (first && finalContent) describeNewChat(conversationId, forModel([userMsg, finished]), userContent).catch(() => {})
     } catch (error) {
       stopPersisting()
       // Stopped or left: kept as it was. Anything else broke the reply off.
@@ -395,7 +395,7 @@ export function ChatProvider({ children }) {
 
     // What came before it, as a send would carry it.
     const msgIndex = currentMessages.indexOf(incompleteMsg)
-    const priorMessages = forModel(sendable(conversationId, currentMessages.slice(0, msgIndex)), (source) => introduceSource(source, PROVIDER))
+    const priorMessages = forModel(sendable(conversationId, currentMessages.slice(0, msgIndex)))
 
     // The continue instruction lives as a constant in the provider abstraction
     const history = [

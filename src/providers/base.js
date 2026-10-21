@@ -89,9 +89,11 @@ export class BaseProvider {
     return null
   }
 
-  // How an answer from a source (Wikipedia) is introduced when a later
-  // prompt sends it along (stage 4). The model did not write it, so it goes
-  // as quoted context on the person's side, saying where it came from.
+  // How an answer from a source (Wikipedia) is introduced when the person
+  // brings it into a prompt. The model did not write it, so it goes as
+  // quoted context on the person's side, saying where it came from. Not
+  // used yet: source answers stay out of what a model is sent unless the
+  // person acts on them (C115), and that act comes with branches (stage 8).
   // Shared by every provider.
   introduceSourceAnswer(source) {
     const name = source?.name || 'a source'

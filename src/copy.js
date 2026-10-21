@@ -189,6 +189,11 @@ export const COPY = {
     },
     promptDescribeCheap: /*i18n*/ { id: 'enter.promptDescribeCheap', message: 'After the answer, one short request for its title, summary and tags, under {cost}' },
     promptDescribeUnpriced: /*i18n*/ { id: 'enter.promptDescribeUnpriced', message: 'After the answer, one short request for its title, summary and tags' },
+    promptSourcesOut: /*i18n*/ {
+      id: 'enter.promptSourcesOut',
+      message: '{count, plural, one {# answer from {sources} stays out} other {# answers from {sources} stay out}}',
+      comment: 'C115: answers from sources are not sent to a model unless the person acts on them. {sources} lists their names',
+    },
     promptHiddenOut: /*i18n*/ {
       id: 'enter.promptHiddenOut',
       message: '{count, plural, one {# hidden message stays out} other {# hidden messages stay out}}',
