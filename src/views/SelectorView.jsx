@@ -9,7 +9,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import SelectorLayout from './SelectorLayout'
-import { loadApiKey } from '../lib/crypto'
+import { hasKey } from '../net'
 import { getSetting } from '../lib/db'
 
 export default function SelectorView() {
@@ -20,7 +20,7 @@ export default function SelectorView() {
     let cancelled = false
     async function check() {
       const [apiKey, tourDone] = await Promise.all([
-        loadApiKey('persistent'),
+        hasKey(),
         getSetting('tourCompleted_settings'),
       ])
       if (cancelled) return

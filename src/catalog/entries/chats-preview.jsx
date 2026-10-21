@@ -21,11 +21,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, Sparkles, StickyNote, Highlighter, GitBranch, Pin, RotateCw, Trash2 } from 'lucide-react'
 import { useConversations } from '../../stores/ConversationContext'
-import { useSettings } from '../../stores/SettingsContext'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
 import { getMessages, initDB } from '../../lib/db'
-import { loadApiKey } from '../../lib/crypto'
-import { getProvider } from '../../providers'
+import { gateway, hasKey, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../../net'
 import { useIsNarrow } from '../../lib/useViewportWidth'
 
 // ─── View toggle config ──────────────────────────────────────
@@ -85,7 +83,6 @@ function absoluteDate(iso) {
 
 export default function ChatsPreview({ config = {}, hostAPI } = {}) {
   const { conversations, deleteConversations, updateConversation } = useConversations()
-  const { settings } = useSettings()
   const navigate = useNavigate()
 
   const [view, setView]       = useState(config.defaultView || 'summary')
@@ -182,9 +179,9 @@ export default function ChatsPreview({ config = {}, hostAPI } = {}) {
 
   const onRegenerateSelected = async () => {
     if (selected.size === 0) return
-    const apiKey = await loadApiKey(settings?.persistKey ? 'persistent' : 'session')
-    if (!apiKey) return
-    const provider = getProvider('anthropic')
+    // The gateway picks the key (stage 4); this read a setting that never
+    // existed (conflicts Part 4) and fell back to the saved key anyway.
+    if (!(await hasKey(PROVIDER))) return
     const ids = [...selected]
     await Promise.allSettled(ids.map(async (convId) => {
       try {
@@ -192,9 +189,9 @@ export default function ChatsPreview({ config = {}, hostAPI } = {}) {
         if (msgs.length < 2) return
         const messagesToUse = msgs.slice(0, 6).map(m => ({ role: m.role, content: m.content }))
         await Promise.allSettled([
-          provider.generateTitle(apiKey, messagesToUse).then(title => updateConversation(convId, { title })),
-          provider.generateSummary(apiKey, messagesToUse).then(aiSummary => updateConversation(convId, { aiSummary })),
-          provider.generateTags(apiKey, messagesToUse).then(tags => updateConversation(convId, { tags })),
+          gateway.call(PROVIDER, 'generateTitle', [messagesToUse], { label: 'regenerate title' }).then(title => updateConversation(convId, { title })),
+          gateway.call(PROVIDER, 'generateSummary', [messagesToUse], { label: 'regenerate summary' }).then(aiSummary => updateConversation(convId, { aiSummary })),
+          gateway.call(PROVIDER, 'generateTags', [messagesToUse], { label: 'regenerate tags' }).then(tags => updateConversation(convId, { tags })),
         ])
       } catch (err) {
         if (import.meta.env.DEV) console.warn('regenerate failed for', convId, err)

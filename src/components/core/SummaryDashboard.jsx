@@ -3,8 +3,7 @@ import { motion } from 'framer-motion'
 import { TrendingUp, AlertCircle, CheckCircle, Sparkles, ArrowUpRight } from 'lucide-react'
 import { useFileShelf } from '../../stores/FileShelfContext'
 import { useSettings } from '../../stores/SettingsContext'
-import { getProvider } from '../../providers'
-import { loadApiKey } from '../../lib/crypto'
+import { gateway, hasKey, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../../net'
 import { buildDataSample } from '../../lib/fileParser'
 import { SPRING_SMOOTH, SPRING_GENTLE } from '../../lib/constants'
 
@@ -72,8 +71,8 @@ export default function SummaryDashboard({ fileId, conversationId, onAskAbout })
     setGenerating(true)
     setInsightError(null)
     try {
-      const apiKey = await loadApiKey()
-      if (!apiKey) throw new Error('No API key configured')
+      // The gateway picks the key (stage 4); here only whether there is one.
+      if (!(await hasKey(PROVIDER))) throw new Error('No API key configured')
 
       const sample = buildDataSample(data.headers, data.rows, 50)
       const schemaDesc = data.headers.map(h =>
@@ -114,16 +113,14 @@ Rules:
 - quality: estimate completeness from null counts, count exact duplicate rows
 - Return ONLY the JSON object, no markdown, no explanation`
 
-      const provider = getProvider('anthropic')
       let responseText = ''
-      await provider.sendMessage(
-        apiKey,
+      await gateway.call(PROVIDER, 'sendMessage', [
         [{ role: 'user', content: prompt }],
         settings.defaultModel,
         (chunk) => { responseText += chunk },
         null,
-        null
-      )
+        null,
+      ], { label: 'dashboard insights' })
 
       // Extract JSON from response (strip any accidental markdown fences)
       const jsonMatch = responseText.match(/\{[\s\S]*\}/)

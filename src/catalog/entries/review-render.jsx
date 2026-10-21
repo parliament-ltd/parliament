@@ -25,8 +25,7 @@ import { useChat } from '../../stores/ChatContext'
 import { useAnnotations } from '../../stores/AnnotationsContext'
 import { useConversations } from '../../stores/ConversationContext'
 import { useSettings } from '../../stores/SettingsContext'
-import { getProvider } from '../../providers'
-import { loadApiKey } from '../../lib/crypto'
+import { gateway, hasKey, models as providerModels, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../../net'
 
 const DEFAULT_CONTEXT_WINDOW = 200_000
 
@@ -66,8 +65,7 @@ export default function ReviewRender({ config = {} } = {}) {
   // and branches-render. Inlined here because review only needs the
   // number, not the meter UI.
   const contextUsage = useMemo(() => {
-    const provider = getProvider('anthropic')
-    const models = provider.getModels?.() || []
+    const models = providerModels(PROVIDER)
     const modelInfo = models.find(m => m.id === settings.defaultModel) || models[0]
     const contextWindow = modelInfo?.contextWindow || DEFAULT_CONTEXT_WINDOW
     const totalTokens = (tokenUsage?.input || 0) + (tokenUsage?.output || 0)
@@ -83,9 +81,8 @@ export default function ReviewRender({ config = {} } = {}) {
   // synthesize. We mirror it verbatim — diverging here would surprise V1
   // users carrying over their workflow.
   const handleGenerateSynthesis = useCallback(async (options) => {
-    const apiKey = await loadApiKey(settings.storageMode).catch(() => null)
-    if (!apiKey) throw new Error('No API key configured. Add one in Settings to generate a synthesis.')
-    const provider = getProvider('anthropic')
+    const keyed = await hasKey(PROVIDER).catch(() => false)
+    if (!keyed) throw new Error('No API key configured. Add one in Settings to generate a synthesis.')
     const depth = options.depth === 'detailed' ? 'detailed' : 'brief'
 
     let annotationContext = ''
@@ -113,17 +110,16 @@ export default function ReviewRender({ config = {} } = {}) {
     })
 
     let result = ''
-    await provider.sendMessage(
-      apiKey,
+    await gateway.call(PROVIDER, 'sendMessage', [
       synthMessages,
       'claude-haiku',
       (chunk) => { result += chunk },
-      new AbortController().signal
-    )
+      new AbortController().signal,
+    ], { label: 'review synthesis' })
     if (!result.trim()) throw new Error('Empty synthesis returned.')
     return result.trim()
   }, [
-    settings.storageMode, messages,
+    messages,
     highlights, notesArray, favoritedMessages,
   ])
 

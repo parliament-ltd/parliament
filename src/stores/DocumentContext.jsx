@@ -31,8 +31,7 @@ import {
   getSbrdDocument, saveSbrdDocument, getConversation, getBranches,
   createConversation, updateConversation,
 } from '../lib/db'
-import { getProvider } from '../providers'
-import { loadApiKey } from '../lib/crypto'
+import { gateway, hasKey, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
 import { useChat } from './ChatContext'
 
 const DocumentContext = createContext(null)
@@ -406,9 +405,8 @@ export function DocumentProvider({ children }) {
     let finalParagraphs = paragraphs
 
     try {
-      const apiKey = await loadApiKey()
-      if (apiKey) {
-        const provider = getProvider('anthropic')
+      // The gateway picks the key (stage 4); here only whether there is one.
+      if (await hasKey(PROVIDER)) {
 
         const docLines = paragraphs.map(p => {
           const prefix = p.type === 'heading' ? '# ' : ''
@@ -447,14 +445,13 @@ Reply to every comment helpfully and concisely. When a comment requests a text e
 
         let fullResponse = ''
         const abort = new AbortController()
-        await provider.sendMessage(
-          apiKey,
+        await gateway.call(PROVIDER, 'sendMessage', [
           [{ role: 'user', content: 'Please review the submission above.' }],
           'claude-sonnet',
           chunk => { fullResponse += chunk },
           abort.signal,
           systemPrompt,
-        )
+        ], { label: 'document review' })
 
         try {
           const jsonMatch = fullResponse.match(/\{[\s\S]*\}/)

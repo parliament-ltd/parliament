@@ -42,8 +42,7 @@ import { useChat } from '../../stores/ChatContext'
 import { useConversations } from '../../stores/ConversationContext'
 import { useSettings } from '../../stores/SettingsContext'
 import { useBranchPanel } from '../../stores/BranchPanelContext'
-import { getProvider } from '../../providers'
-import { loadApiKey } from '../../lib/crypto'
+import { gateway, hasKey, models as providerModels, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../../net'
 import {
   createBranch,
   createConversation,
@@ -87,8 +86,7 @@ export default function BranchesRender({ config = {} } = {}) {
   // calculation in context-render.jsx — we don't import it because the
   // panel needs the raw number, not the meter UI.
   const contextUsage = useMemo(() => {
-    const provider = getProvider('anthropic')
-    const models = provider.getModels?.() || []
+    const models = providerModels(PROVIDER)
     const modelInfo = models.find(m => m.id === settings.defaultModel) || models[0]
     const contextWindow = modelInfo?.contextWindow || DEFAULT_CONTEXT_WINDOW
     const totalTokens = (tokenUsage?.input || 0) + (tokenUsage?.output || 0)
@@ -124,22 +122,21 @@ export default function BranchesRender({ config = {} } = {}) {
 
   const handleBranchCompressed = useCallback(async () => {
     if (!anchorMessage || !activeConversationId) return
-    let apiKey
+    let keyed = false
     try {
-      apiKey = await loadApiKey(settings.storageMode)
+      keyed = await hasKey(PROVIDER)
     } catch {
-      apiKey = null
+      keyed = false
     }
     // Without a key we can't generate a summary. V1 silently fell back
     // to Full History on any compress error — preserve that behavior so
     // the user always lands in a valid branch.
-    if (!apiKey) {
+    if (!keyed) {
       await handleBranchFull()
       return
     }
 
     try {
-      const provider = getProvider('anthropic')
       const branchIdx = messages.findIndex(m => m.id === anchorMessage.id)
       const branchMessages = messages.slice(0, branchIdx + 1)
       const summaryMessages = branchMessages
@@ -147,13 +144,12 @@ export default function BranchesRender({ config = {} } = {}) {
       summaryMessages.push({ role: 'user', content: SUMMARY_PROMPT })
 
       let summaryText = ''
-      await provider.sendMessage(
-        apiKey,
+      await gateway.call(PROVIDER, 'sendMessage', [
         summaryMessages,
         'claude-haiku',
         (chunk) => { summaryText += chunk },
-        new AbortController().signal
-      )
+        new AbortController().signal,
+      ], { label: 'branch summary' })
       if (!summaryText.trim()) throw new Error('Empty summary generated')
 
       const parent = await getConversation(activeConversationId)
@@ -181,15 +177,14 @@ export default function BranchesRender({ config = {} } = {}) {
       await handleBranchFull()
     }
   }, [
-    anchorMessage, activeConversationId, messages, settings.storageMode,
+    anchorMessage, activeConversationId, messages,
     settings.defaultModel, loadConversations, closeBranchPanel, navigate,
     handleBranchFull,
   ])
 
   const handlePreviewSummary = useCallback(async (messageId) => {
-    const apiKey = await loadApiKey(settings.storageMode).catch(() => null)
-    if (!apiKey) throw new Error('No API key configured. Add one in Settings to preview a summary.')
-    const provider = getProvider('anthropic')
+    const keyed = await hasKey(PROVIDER).catch(() => false)
+    if (!keyed) throw new Error('No API key configured. Add one in Settings to preview a summary.')
     const branchIdx = messages.findIndex(m => m.id === messageId)
     if (branchIdx === -1) throw new Error('Message not found.')
     const branchMessages = messages.slice(0, branchIdx + 1)
@@ -198,16 +193,15 @@ export default function BranchesRender({ config = {} } = {}) {
     summaryMessages.push({ role: 'user', content: SUMMARY_PROMPT })
 
     let summaryText = ''
-    await provider.sendMessage(
-      apiKey,
+    await gateway.call(PROVIDER, 'sendMessage', [
       summaryMessages,
       'claude-haiku',
       (chunk) => { summaryText += chunk },
-      new AbortController().signal
-    )
+      new AbortController().signal,
+    ], { label: 'branch summary preview' })
     if (!summaryText.trim()) throw new Error('Empty summary generated.')
     return summaryText.trim()
-  }, [settings.storageMode, messages])
+  }, [messages])
 
   // ─── Compress Context action ───────────────────────────────
 

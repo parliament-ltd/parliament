@@ -44,8 +44,7 @@ import { useAnnotations } from '../../stores/AnnotationsContext'
 import { useBranchPanel } from '../../stores/BranchPanelContext'
 import { useCollabMode } from '../../stores/CollabModeContext'
 import { useConversations } from '../../stores/ConversationContext'
-import { getProvider } from '../../providers'
-import { loadApiKey } from '../../lib/crypto'
+import { hasKey } from '../../net'
 import {
   deleteMessage as dbDeleteMessage,
   addMessage as dbAddMessage,
@@ -279,17 +278,16 @@ export default function MessagesRender() {
 
   const handleContinue = useCallback(async (incompleteId) => {
     try {
-      const apiKey = await loadApiKey(settings.storageMode)
-      if (!apiKey) return
-      const provider = getProvider('anthropic')
+      // The gateway picks the key; here only whether there is one (stage 4).
+      if (!(await hasKey())) return
       const systemPrompt = buildSystemPrompt()
-      await continueMessage(apiKey, incompleteId, settings.defaultModel, provider, systemPrompt)
+      await continueMessage(incompleteId, settings.defaultModel, systemPrompt)
     } catch (err) {
       if (err?.name !== 'AbortError' && import.meta.env.DEV) {
         console.warn('[messages@1.0] continueMessage failed:', err)
       }
     }
-  }, [settings.storageMode, settings.defaultModel, continueMessage, buildSystemPrompt])
+  }, [settings.defaultModel, continueMessage, buildSystemPrompt])
 
   const handleCopyText = useCallback(async (content) => {
     try {

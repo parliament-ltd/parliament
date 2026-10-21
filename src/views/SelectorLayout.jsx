@@ -10,8 +10,7 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { useConversations } from '../stores/ConversationContext'
 import { useSettings } from '../stores/SettingsContext'
-import { getProvider } from '../providers'
-import { loadApiKey } from '../lib/crypto'
+import { gateway, hasKey, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
 import {
   deleteFavorite as dbDeleteFavorite,
   getMessages,
@@ -845,7 +844,7 @@ export default function SelectorLayout() {
     deleteConversations,
     loadConversations,
   } = useConversations()
-  const { storageUsage, settings } = useSettings()
+  const { storageUsage } = useSettings()
 
   // Refresh from IndexedDB on mount — picks up storageBytes/familyId/parentTitle
   // writes that happen outside the React context (addMessage, createBranch).
@@ -1161,12 +1160,11 @@ export default function SelectorLayout() {
     setSelected(new Set())
 
     try {
-      const apiKey = await loadApiKey(settings?.storageMode || 'session')
-      if (!apiKey) {
+      // The gateway picks the key (stage 4); here only whether there is one.
+      if (!(await hasKey(PROVIDER))) {
         console.warn('No API key available for regeneration')
         return
       }
-      const provider = getProvider('anthropic')
 
       // Process each selected conversation in parallel
       const promises = selectedIds.map(async (convId) => {
@@ -1183,11 +1181,11 @@ export default function SelectorLayout() {
 
           // Run title, summary, and tags in parallel
           const results = await Promise.allSettled([
-            provider.generateTitle(apiKey, messagesToUse)
+            gateway.call(PROVIDER, 'generateTitle', [messagesToUse], { label: 'regenerate title' })
               .then(title => updateConversation(convId, { title })),
-            provider.generateSummary(apiKey, messagesToUse)
+            gateway.call(PROVIDER, 'generateSummary', [messagesToUse], { label: 'regenerate summary' })
               .then(aiSummary => updateConversation(convId, { aiSummary })),
-            provider.generateTags(apiKey, messagesToUse)
+            gateway.call(PROVIDER, 'generateTags', [messagesToUse], { label: 'regenerate tags' })
               .then(tags => updateConversation(convId, { tags })),
           ])
 
@@ -1204,7 +1202,7 @@ export default function SelectorLayout() {
     } catch (err) {
       console.warn('Bulk regeneration failed:', err.message)
     }
-  }, [selected, settings, updateConversation])
+  }, [selected, updateConversation])
 
   const handleBulkDelete = useCallback(async () => {
     try {

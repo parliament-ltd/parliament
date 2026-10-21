@@ -10,8 +10,7 @@ import {
   listConversations, getSetting, setSetting, getSbrdDocument, getConversation,
   saveSbrdDocument,
 } from '../../../lib/db'
-import { getProvider } from '../../../providers'
-import { loadApiKey } from '../../../lib/crypto'
+import { gateway, hasKey, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../../../net'
 
 const GOLD = '#B8A070'
 const RIPPLE_WARN = '#E5A620'
@@ -33,8 +32,8 @@ async function runRippleScan({
   onProgress,
   setRipplesByParaId,
 }) {
-  const apiKey = await loadApiKey()
-  if (!apiKey) return 0
+  // The gateway picks the key (stage 4); here only whether there is one.
+  if (!(await hasKey(PROVIDER))) return 0
 
   const currentParaList = paragraphs.filter(p => p.text?.trim())
   if (!currentParaList.length) return 0
@@ -51,7 +50,6 @@ async function runRippleScan({
     : ''
 
   const validCurrentIds = new Set(currentParaList.map(p => p.id))
-  const provider = getProvider('anthropic')
   const sourceTitle = conversationTitle || 'Current document'
   let totalFlagCount = 0
   const manifestEntries = []
@@ -100,14 +98,13 @@ RULES:
     let resp = ''
     const abort = new AbortController()
     try {
-      await provider.sendMessage(
-        apiKey,
+      await gateway.call(PROVIDER, 'sendMessage', [
         [{ role: 'user', content: 'Check cross-document consistency.' }],
         'claude-haiku',
         chunk => { resp += chunk },
         abort.signal,
         systemPrompt,
-      )
+      ], { label: 'ripple scan' })
       const match = resp.match(/\{[\s\S]*\}/)
       if (!match) continue
       const parsed = JSON.parse(match[0])

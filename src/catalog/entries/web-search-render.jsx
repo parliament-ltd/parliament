@@ -25,7 +25,7 @@
 // chip because nothing armed.
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { getProvider } from '../../providers'
+import { availableTools, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../../net'
 
 export default function WebSearchRender({ hostAPI, componentId } = {}) {
   // The tool registration for the active provider. Looked up once per
@@ -33,8 +33,7 @@ export default function WebSearchRender({ hostAPI, componentId } = {}) {
   // Phase 1; revisit if a provider-picker lands in a room).
   const toolReg = useMemo(() => {
     try {
-      const provider = getProvider('anthropic')
-      const tools = provider?.getAvailableTools?.() || []
+      const tools = availableTools(PROVIDER)
       return tools.find(t => t.id === 'web_search') || null
     } catch {
       return null

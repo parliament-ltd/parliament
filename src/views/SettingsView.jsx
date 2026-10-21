@@ -11,8 +11,8 @@ import { useSettings } from '../stores/SettingsContext'
 import { useConversations } from '../stores/ConversationContext'
 import { useShimmer } from '../hooks/useShimmer'
 import { Button, Card, Input, Modal, Toggle, RadioGroup, SegmentedControl, SectionLabel, IconButton } from '../components'
-import { getProvider } from '../providers'
-import { saveApiKey, deleteApiKey, encryptExport, decryptImport } from '../lib/crypto'
+import { gateway, keys, models as providerModelsOf, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
+import { encryptExport, decryptImport } from '../lib/crypto'
 import { exportAllData, importData, clearAllData, getSetting, setSetting } from '../lib/db'
 import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
 import { useLingui } from '@lingui/react'
@@ -139,14 +139,15 @@ export default function SettingsView() {
     setKeyError('')
     setValidateCooldown(true)
     try {
-      const provider = getProvider('anthropic')
-      const result = await provider.validateKey(apiKey)
+      // The typed key goes only to its own provider, through the gateway.
+      const result = await gateway.check(PROVIDER, apiKey)
       setKeyStatus(result.status)
       if (!result.valid) {
         setKeyError(result.error)
       } else {
-        // Key is valid — save it with the chosen storage mode
-        await saveApiKey(apiKey, settings.storageMode)
+        // Key is valid: kept as the person chose, saved by default or held
+        // for this tab only with "Don't save" (the key module, stage 4).
+        await keys.put(PROVIDER, apiKey, { save: settings.storageMode !== 'memory' })
         triggerShimmer()
       }
     } catch {
@@ -157,13 +158,25 @@ export default function SettingsView() {
     }
   }
 
+  // Changing how the key is kept moves the key there: "Don't save" holds it
+  // for this tab and removes the saved copy; saving writes it back (stage 4).
+  const changeStorageMode = async (mode) => {
+    updateSetting('storageMode', mode)
+    try {
+      const key = await keys.get(PROVIDER)
+      if (key) await keys.put(PROVIDER, key, { save: mode !== 'memory' })
+    } catch (err) {
+      if (import.meta.env.DEV) console.warn('[settings] Could not move the key:', err?.message)
+    }
+  }
+
   // Per-section rendering closure — shared between desktop's single-pane
   // AnimatePresence and mobile's multi-open accordion so the section
   // components themselves stay identical across viewports.
   const sectionForId = (id) => {
     switch (id) {
       case 'api':
-        return <ApiSection key="api" apiKey={apiKey} setApiKey={(v) => { setApiKey(v); setKeyStatus(null) }} keyStatus={keyStatus} keyError={keyError} validateKey={validateKey} validateCooldown={validateCooldown} storageMode={settings.storageMode} setStorageMode={(v) => updateSetting('storageMode', v)} shimmerPhase={shimmerPhase} />
+        return <ApiSection key="api" apiKey={apiKey} setApiKey={(v) => { setApiKey(v); setKeyStatus(null) }} keyStatus={keyStatus} keyError={keyError} validateKey={validateKey} validateCooldown={validateCooldown} storageMode={settings.storageMode} setStorageMode={changeStorageMode} shimmerPhase={shimmerPhase} />
       case 'model':
         return <ModelSection key="model" selectedModel={settings.defaultModel} setSelectedModel={(v) => updateSetting('defaultModel', v)} />
       case 'usage':
@@ -492,7 +505,7 @@ function ApiSection({ apiKey, setApiKey, keyStatus, keyError, validateKey, valid
 // ─── Model Preferences ───────────────────────────────────
 
 function ModelSection({ selectedModel, setSelectedModel }) {
-  const providerModels = getProvider().getModels()
+  const providerModels = providerModelsOf(PROVIDER)
   return (
     <SettingsSection title="Model Preferences" subtitle="Choose your default model for new conversations">
       {providerModels.map((model) => {
@@ -890,7 +903,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
 
   const handleDeleteAll = async () => {
     await clearAllData()
-    await deleteApiKey()
+    await keys.remove(PROVIDER)
     setShowDeleteConfirm(false)
     window.location.reload()
   }

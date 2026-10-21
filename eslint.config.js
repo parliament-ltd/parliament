@@ -35,6 +35,38 @@ export default defineConfig([
     },
   },
   {
+    // One way out (refactor-plan.md, stage 4; CLAUDE.md, hard constraints).
+    // Requests to providers and sources, and keys, go through the gateway
+    // and the key module in src/net. Nothing else imports provider code,
+    // reads or writes a key, or calls the network itself.
+    files: ['src/**/*.{js,jsx}'],
+    ignores: ['src/net/**', 'src/providers/**', 'src/lib/crypto.js', 'src/lib/keyStore.js', 'src/lib/networkLog.js', 'src/**/*.test.js'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          { group: ['**/providers', '**/providers/*'], message: 'Provider code is reached through the gateway: import from src/net.' },
+          { group: ['**/lib/keyStore'], message: 'Keys are kept by the key module: import keys from src/net.' },
+          {
+            group: ['**/lib/crypto'],
+            importNames: ['loadApiKey', 'saveApiKey', 'deleteApiKey', 'hasSavedKey'],
+            message: 'Keys are read and kept by the key module: use keys or hasKey from src/net.',
+          },
+        ],
+      }],
+      'no-restricted-globals': ['error',
+        { name: 'fetch', message: 'Requests go through the gateway (src/net), which names where they go.' },
+        { name: 'XMLHttpRequest', message: 'Requests go through the gateway (src/net).' },
+        { name: 'WebSocket', message: 'Requests go through the gateway (src/net).' },
+        { name: 'EventSource', message: 'Requests go through the gateway (src/net).' },
+      ],
+      'no-restricted-properties': ['error',
+        { object: 'window', property: 'fetch', message: 'Requests go through the gateway (src/net).' },
+        { object: 'globalThis', property: 'fetch', message: 'Requests go through the gateway (src/net).' },
+        { object: 'navigator', property: 'sendBeacon', message: 'Requests go through the gateway (src/net).' },
+      ],
+    },
+  },
+  {
     // The new chrome speaks through the copy table (src/copy.js), so every
     // word can be translated (C87). Today's screens are replaced, not
     // translated, so the rule covers the new chrome's folders only.

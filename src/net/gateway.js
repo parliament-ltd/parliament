@@ -62,6 +62,21 @@ export function createGateway({ destination, keyring, implementation, now = () =
       return dest.key ? impl[method](key, ...args) : impl[method](...args)
     },
 
+    /**
+     * Checks a key the person has typed, before it is kept: it goes only to
+     * its own provider, and is not stored by this call.
+     */
+    async check(id, candidate, { label = 'check key' } = {}) {
+      const dest = destination(id)
+      if (!dest) throw new Refused('unknown', id)
+      if (!dest.ships) throw new Refused('not-shipped', id)
+      if (!dest.key) throw new Refused('no-method', id)
+      const impl = implementation(id)
+      if (!impl || typeof impl.validateKey !== 'function') throw new Refused('no-method', id)
+      note({ at: now(), to: id, method: 'validateKey', label })
+      return impl.validateKey(candidate)
+    },
+
     /** The requests made, oldest first: what made each, where it went. Never a key or content. */
     requests: () => log,
     subscribe(fn) {

@@ -21,7 +21,7 @@ import RoomShell from '../components/RoomShell'
 import HomepageTopBar from '../components/HomepageTopBar'
 import BackupReminderBanner from '../components/BackupReminderBanner'
 import { loadHomepageMode, loadMode } from '../lib/modes'
-import { loadApiKey } from '../lib/crypto'
+import { hasKey } from '../net'
 import { getSetting, setSetting, createConversation } from '../lib/db'
 
 export default function HomepageView() {
@@ -33,7 +33,7 @@ export default function HomepageView() {
     let cancelled = false
     async function init() {
       const [apiKey, wizardDone, tourDone, chosenHomeRoomId] = await Promise.all([
-        loadApiKey('persistent'),
+        hasKey(),
         getSetting('tourCompleted_wizard'),
         getSetting('tourCompleted_settings'),
         getSetting('chosenHomeRoomId'),

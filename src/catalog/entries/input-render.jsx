@@ -6,10 +6,10 @@
 // Wraps the existing src/components/core/InputArea.jsx without modifying
 // it — same component the V1 Albatross adapter renders, just driven by
 // useChat()/useSettings() hooks instead of props from a 1500-line
-// ChatLayout. The shape of sendMessage()'s call (apiKey, conversationId,
-// content, model, provider, systemPrompt, tools) mirrors Albatross
-// exactly, so streaming, tool-loop, ghost-text-on-failure all behave
-// the same.
+// ChatLayout. sendMessage() takes (conversationId, content, model,
+// systemPrompt, tools, attachments); the gateway picks the provider's key
+// itself (stage 4), so streaming, tool-loop and ghost-text-on-failure behave
+// as before without the key passing through here.
 //
 // What this slice wires:
 //   - Composing text into a local value state.
@@ -44,8 +44,7 @@ import { useConversationId } from '../../stores/ConversationScope'
 import { useSettings } from '../../stores/SettingsContext'
 import { usePWA } from '../../stores/PWAContext'
 import { useCollabMode } from '../../stores/CollabModeContext'
-import { getProvider } from '../../providers'
-import { loadApiKey } from '../../lib/crypto'
+import { hasKey } from '../../net'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
 import { useIsNarrow } from '../../lib/useViewportWidth'
 import { checkOnDeviceVoice } from '../../hooks/useVoiceInput'
@@ -211,20 +210,21 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
     if (now - lastSendAt < SEND_DEBOUNCE_MS) return
     setLastSendAt(now)
 
-    let apiKey
+    // The gateway picks and sends the key itself; here only whether there
+    // is one, without decrypting it (stage 4).
+    let keyed = false
     try {
-      apiKey = await loadApiKey(settings.storageMode)
+      keyed = await hasKey()
     } catch (err) {
       setError('Couldn\'t read your API key. Open Settings to re-enter it.')
-      if (import.meta.env.DEV) console.warn('[input@1.0] loadApiKey failed:', err)
+      if (import.meta.env.DEV) console.warn('[input@1.0] hasKey failed:', err)
       return
     }
-    if (!apiKey) {
+    if (!keyed) {
       setError('No API key configured. Add one in Settings to continue.')
       return
     }
 
-    const provider = getProvider('anthropic')
     const systemPrompt = buildSystemPrompt() // '' when collab-mode is inactive
     // PR-18d: read armed-tool registrations once at send time. Each
     // entry already carries `definition` + `serverSide` — the shape
@@ -268,11 +268,9 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
       // PR-18e: attachments arg carries binary parts (for THIS turn's
       // API call) + metadata (for the persisted user message).
       await sendMessage(
-        apiKey,
         conversationId,
         userContentForPersist,
         settings.defaultModel,
-        provider,
         systemPrompt,
         armedToolsAtSend,
         binaryParts.length > 0 || attachmentMeta.length > 0
@@ -297,7 +295,7 @@ export default function InputRender({ config = {}, hostAPI } = {}) {
     }
   }, [
     value, isStreaming, conversationId, isOnline, lastSendAt,
-    settings.storageMode, settings.defaultModel,
+    settings.defaultModel,
     sendMessage, refreshStorageEstimate, trackMessageSent,
     buildSystemPrompt, hostAPI,
   ])

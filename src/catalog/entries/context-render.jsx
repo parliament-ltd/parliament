@@ -16,7 +16,7 @@
 import ContextMeter from '../../components/core/ContextMeter'
 import { useChat } from '../../stores/ChatContext'
 import { useSettings } from '../../stores/SettingsContext'
-import { getProvider } from '../../providers'
+import { models as providerModels, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../../net'
 
 const DEFAULT_CONTEXT_WINDOW = 200_000
 
@@ -27,8 +27,7 @@ export default function ContextRender({ config = {} } = {}) {
   // Resolve the active model's context window via the provider's model
   // info. Falls back to a sane default if the model id isn't registered
   // — keeps the meter rendering rather than crashing on unknown ids.
-  const provider = getProvider('anthropic')
-  const models = provider.getModels?.() || []
+  const models = providerModels(PROVIDER)
   const modelInfo = models.find(m => m.id === settings.defaultModel) || models[0]
   const contextWindow = modelInfo?.contextWindow || DEFAULT_CONTEXT_WINDOW
 

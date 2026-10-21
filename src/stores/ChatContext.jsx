@@ -3,7 +3,7 @@ import { getMessages, addMessage, updateMessage, getSetting, setSetting } from '
 import { askToKeepStorage } from '../lib/storageKeep'
 import { useConversations } from './ConversationContext'
 import { useSettings } from './SettingsContext'
-import { executeClientTool } from '../providers/anthropic'
+import { gateway, runClientTool, continueInstruction, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
 import {
   startStream, appendStream, resetStreamText, stopStream, endStream, getStream,
   isStreaming as streamingIn, streamingIds, addNotice,
@@ -25,6 +25,9 @@ import { useIsStreaming } from './chatHooks'
 // messages, so a reply that ends after its chat was left can no longer title
 // the wrong chat. Leaving a chat stops its reply, and says so, unless the
 // person turned on "Finish replies after I leave a chat" (C109).
+//
+// Every request goes through the gateway (src/net, stage 4), which picks the
+// provider's key itself: callers no longer read or pass a key.
 
 const ChatContext = createContext(null)
 
@@ -112,21 +115,21 @@ export function ChatProvider({ children }) {
   // Auto-generate title, summary, and tags after the first user→assistant exchange.
   // All three are fire-and-forget: failures are silent.
   // They run in parallel to minimize latency.
-  const generateMetadataIfNeeded = useCallback(async (conversationId, currentMessages, apiKey, provider) => {
+  const generateMetadataIfNeeded = useCallback(async (conversationId, currentMessages) => {
     // Only trigger on exactly 2 messages (first user + first assistant)
     if (currentMessages.length !== 2) return
     if (currentMessages[0].role !== 'user' || currentMessages[1].role !== 'assistant') return
 
     // Run all three in parallel — each is independent and fire-and-forget
-    const titlePromise = provider.generateTitle(apiKey, currentMessages)
+    const titlePromise = gateway.call(PROVIDER, 'generateTitle', [currentMessages], { label: 'title' })
       .then(title => updateConversation(conversationId, { title }))
       .catch(err => console.warn('Auto-title generation failed:', err.message))
 
-    const summaryPromise = provider.generateSummary(apiKey, currentMessages)
+    const summaryPromise = gateway.call(PROVIDER, 'generateSummary', [currentMessages], { label: 'summary' })
       .then(aiSummary => updateConversation(conversationId, { aiSummary }))
       .catch(err => console.warn('Auto-summary generation failed:', err.message))
 
-    const tagsPromise = provider.generateTags(apiKey, currentMessages)
+    const tagsPromise = gateway.call(PROVIDER, 'generateTags', [currentMessages], { label: 'tags' })
       .then(tags => updateConversation(conversationId, { tags }))
       .catch(err => console.warn('Auto-tags generation failed:', err.message))
 
@@ -144,7 +147,7 @@ export function ChatProvider({ children }) {
   //     in memory only.
   //   - meta is persisted alongside the user message so MessageCard can
   //     render attachment chips in history (a memory aid, not replay).
-  const sendMessage = useCallback(async (apiKey, conversationId, userContent, model, provider, systemPrompt = '', tools = [], attachments = null) => {
+  const sendMessage = useCallback(async (conversationId, userContent, model, systemPrompt = '', tools = [], attachments = null) => {
     // One reply at a time in a chat; other chats are free.
     if (streamingIn(conversationId)) return
 
@@ -229,15 +232,14 @@ export function ChatProvider({ children }) {
       const MAX_TOOL_TURNS = 5 // prevent infinite loops
 
       for (let turn = 0; turn < MAX_TOOL_TURNS; turn++) {
-        const response = await provider.sendMessage(
-          apiKey,
+        const response = await gateway.call(PROVIDER, 'sendMessage', [
           toolLoopHistory,
           model,
           (chunk) => appendStream(conversationId, chunk),
           controller.signal,
           systemPrompt || undefined,
-          tools
-        )
+          tools,
+        ], { label: 'chat send' })
 
         totalInputTokens += response?.usage?.input_tokens || 0
         totalOutputTokens += response?.usage?.output_tokens || 0
@@ -260,7 +262,7 @@ export function ChatProvider({ children }) {
         const toolResults = clientToolUses.map(tu => ({
           type: 'tool_result',
           tool_use_id: tu.id,
-          content: executeClientTool(tu.name, tu.input),
+          content: runClientTool(tu.name, tu.input),
         }))
 
         // Build the assistant message content (text + tool_use blocks)
@@ -309,7 +311,7 @@ export function ChatProvider({ children }) {
 
       // 6. Auto-generate title, summary, and tags from this chat's own
       //    messages (fire and forget — not awaited)
-      generateMetadataIfNeeded(conversationId, [...history, finished], apiKey, provider)
+      generateMetadataIfNeeded(conversationId, [...history, finished])
     } catch (error) {
       stopPersisting()
       await keepPartial(conversationId, assistantMsg.id)
@@ -325,7 +327,7 @@ export function ChatProvider({ children }) {
 
   // Continue from an interrupted (ghost text) message in the open chat
   // systemPrompt: optional string from collaboration mode presets + custom instruction
-  const continueMessage = useCallback(async (apiKey, incompleteMessageId, model, provider, systemPrompt = '') => {
+  const continueMessage = useCallback(async (incompleteMessageId, model, systemPrompt = '') => {
     const conversationId = activeRef.current
     if (!conversationId || streamingIn(conversationId)) return
     const currentMessages = messagesRef.current
@@ -338,12 +340,10 @@ export function ChatProvider({ children }) {
       .map(m => ({ role: m.role, content: m.content }))
 
     // The continue instruction lives as a constant in the provider abstraction
-    const continueInstruction = provider.getContinueInstruction()
-
     const history = [
       ...priorMessages,
       { role: 'assistant', content: incompleteMsg.content },
-      { role: 'user', content: continueInstruction },
+      { role: 'user', content: continueInstruction(PROVIDER) },
     ]
 
     // Reuse the existing message record
@@ -352,14 +352,13 @@ export function ChatProvider({ children }) {
     const stopPersisting = persistEvery(conversationId, incompleteMsg.id)
 
     try {
-      const response = await provider.sendMessage(
-        apiKey,
+      const response = await gateway.call(PROVIDER, 'sendMessage', [
         history,
         model,
         (chunk) => appendStream(conversationId, chunk),
         controller.signal,
-        systemPrompt || undefined
-      )
+        systemPrompt || undefined,
+      ], { label: 'continue' })
 
       stopPersisting()
       const finalContent = getStream(conversationId)?.text ?? incompleteMsg.content

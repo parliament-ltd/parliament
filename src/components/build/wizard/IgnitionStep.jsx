@@ -22,7 +22,7 @@
 //                       Parliament).
 //
 // PR-19a refinements:
-//   - On mount, check loadApiKey() for an existing key. If present,
+//   - On mount, check hasKey() for an existing key. If present,
 //     show a "saved key on file" prompt with Continue (default) and a
 //     small "Add a different key" toggle. Continue runs the ignite
 //     chain WITHOUT a network re-validation (the user said: trust the
@@ -46,8 +46,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
-import { getProvider } from '../../../providers'
-import { saveApiKey, loadApiKey } from '../../../lib/crypto'
+import { gateway, keys, hasKey, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../../../net'
 import { getSetting } from '../../../lib/db'
 import { LAYOUT_META, SCHEMES, FEATURES } from '../../../lib/buildWizard'
 import { useIsNarrow } from '../../../lib/useViewportWidth'
@@ -100,7 +99,7 @@ export default function IgnitionStep({
   const [phase, setPhase] = useState('idle') // 'idle' | 'sweeping' | 'igniting' | 'lit' | 'connected'
   // PR-19a: 'has-saved-key' (prompt with Continue + Add-different) /
   // 'replace-key' (input visible, replacing the saved one) / 'no-key'
-  // (input visible, first-time setup). Set after the loadApiKey check.
+  // (input visible, first-time setup). Set after the hasKey check.
   const [keyMode, setKeyMode] = useState(null) // null | 'has-saved-key' | 'replace-key' | 'no-key'
   const [keyCheckDone, setKeyCheckDone] = useState(false)
   const [committedConvId, setCommittedConvId] = useState(null)
@@ -111,7 +110,8 @@ export default function IgnitionStep({
   // ── Mount: load any saved key to decide which flow to render ──
   useEffect(() => {
     let cancelled = false
-    loadApiKey('persistent').then((existing) => {
+    // Whether there is a key, without decrypting it (stage 4).
+    hasKey(PROVIDER).then((existing) => {
       if (cancelled) return
       setKeyMode(existing ? 'has-saved-key' : 'no-key')
       setKeyCheckDone(true)
@@ -235,7 +235,8 @@ export default function IgnitionStep({
 
     let result
     try {
-      result = await getProvider().validateKey(trimmed)
+      // The typed key goes only to its own provider, through the gateway.
+      result = await gateway.check(PROVIDER, trimmed)
     } catch {
       result = { valid: false, status: 'invalid', error: 'Could not reach the Anthropic API. Please check your connection.' }
     }
@@ -248,11 +249,11 @@ export default function IgnitionStep({
       return
     }
 
-    // Persist the key at the user's chosen storageMode (default
-    // 'persistent') so subsequent boots stay logged in.
+    // Keep the key as the person chose: saved by default, or held for this
+    // tab only with "Don't save" (the key module, stage 4).
     try {
       const storageMode = (await getSetting('storageMode')) || 'persistent'
-      await saveApiKey(trimmed, storageMode)
+      await keys.put(PROVIDER, trimmed, { save: storageMode !== 'memory' })
     } catch {
       // Soft non-blocker: the key validates, but we couldn't persist
       // it. Surface a status so the user knows.
