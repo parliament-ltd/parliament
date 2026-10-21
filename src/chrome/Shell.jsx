@@ -116,7 +116,9 @@ export default function Shell() {
   // The welcome page's progress, kept on this device only (C121).
   const [welcome, setWelcomeState] = useState(freshWelcome)
   const welcomeRef = useRef(welcome)
+  const welcomeRead = useRef(false) // nothing changes the progress until the kept one is read
   const updateWelcome = useCallback((change) => {
+    if (!welcomeRead.current) return
     const next = change(welcomeRef.current)
     if (next === welcomeRef.current) return
     welcomeRef.current = next
@@ -137,6 +139,7 @@ export default function Shell() {
       const kept = await loadSpace(handle, { fresh: !chats })
       if (!live) return
       welcomeRef.current = cleanWelcome(stored)
+      welcomeRead.current = true
       setWelcomeState(welcomeRef.current)
       commit(backOnPage(kept))
       setLines(history)
@@ -146,10 +149,12 @@ export default function Shell() {
   }, [commit])
 
   // Steps the space shows as done: the bar at the foot, a board in its own
-  // window, the Almanac, the Library, the key panel.
+  // window, the Almanac, the Library, the key panel. Only once the kept
+  // progress is read, so the space before it never writes over it.
   useEffect(() => {
+    if (!started) return
     for (const id of stepsShown(arrangement)) updateWelcome((w) => tick(w, id))
-  }, [arrangement, updateWelcome])
+  }, [arrangement, started, updateWelcome])
   const onMode = useCallback((mode) => { if (mode === 'command') updateWelcome((w) => tick(w, 'command')) }, [updateWelcome])
 
   // A step's command, clicked, is written into the field.
