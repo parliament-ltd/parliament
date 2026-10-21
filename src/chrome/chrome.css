@@ -95,3 +95,10 @@
 .ch-ref-head { display: flex; align-items: baseline; justify-content: flex-end; padding-top: 8px; }
 /* With the bar at the bottom, the reference opens above the field. */
 .ch-dock.bottom .ch-ref { position: absolute; inset-inline: 0; bottom: 100%; margin: 0 0 10px; max-height: 60vh; }
+
+/* ── windows of their own (pop:) ── */
+.ch-window { margin: 0; background: var(--ch-paper); }
+.ch-in-window { min-height: 100vh; }
+.ch-dock.window { position: static; padding: 12px 14px 6px; background: var(--ch-paper); border-bottom: .5px solid var(--ch-rule); }
+.ch-dock.window .ch-dock-in { max-width: none; }
+.ch-away { padding: 10px clamp(16px, 4vw, 32px) 0; }

@@ -25,7 +25,10 @@ export default function EnterLine({ mode, resting, empty, says, addressed }) {
   const target = { key: 'target', now: true, text: i18n._(COPY.enter.target, { board: boardName(i18n, addressed) }) }
   let parts
   if (mode === 'command') {
-    parts = [target, { key: 'does', now: true, text: say(i18n, says.message, says.values) }, leave]
+    parts = [target, { key: 'does', now: true, text: say(i18n, says.message, says.values) }]
+    // A second sentence, as where a window cannot stay on top (C94).
+    if (says.also) parts.push({ key: 'also', text: say(i18n, says.also) })
+    parts.push(leave)
   } else if (mode === 'search') {
     parts = empty
       ? [

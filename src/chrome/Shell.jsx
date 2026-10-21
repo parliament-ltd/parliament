@@ -1,39 +1,71 @@
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useLingui } from '@lingui/react'
 import './chrome.css'
+import { COPY } from '../copy'
 import { initDB } from '../lib/db'
 import { loadArrangement, saveArrangement } from '../lib/arrangements'
-import { keepCommand, readCommands, stepRecall } from '../lib/commandHistory'
-import { fieldReducer, initialField, fieldValue } from '../shell/field'
-import { barKey, isTextField } from '../shell/keys'
-import { shipped, restingMode, address, planOpen } from '../shell/arrangement'
-import { readField } from '../commands/parse'
-import { complete } from '../commands/registry'
-import { preview } from './preview'
-import Field from './Field'
-import EnterLine from './EnterLine'
-import Reference from './Reference'
+import { keepCommand, readCommands } from '../lib/commandHistory'
+import { shipped, address, planOpen, planPopBack, planPopBar } from '../shell/arrangement'
+import { detectFeatures } from '../shell/features'
+import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
+import Bar from './Bar'
 import Strip from './Strip'
 import Board from './Board'
 
 // The new shell (refactor-plan.md §4 and stage 3): the board strip, the
-// boards as the arrangement places them, and the bar. In development (and in
-// builds made with VITE_PROTOTYPES=1) it lives at /shell, beside today's
-// screens, until each of them is replaced. Its boards are placeholders until
-// their stages draw them; the field, the Enter line, `?`, and open:, close:,
-// move:, swap:, bar: and reset: work.
+// boards as the arrangement places them, the bar, and windows of their own.
+// In development (and in builds made with VITE_PROTOTYPES=1) it lives at
+// /shell, beside today's screens, until each of them is replaced. Its boards
+// are placeholders until their stages draw them.
+//
+// Windows: a popped board, and the popped bar, are drawn into blank windows
+// through portals (popout.js), each board's window with its own bar (C6).
+// Closing a window brings its board back; leaving the page closes them all.
+// A window cannot be reopened without a click, so on load what was popped
+// comes back to the page.
 
 const ARRANGEMENT = 'almanac'
 // The boards that take the wide column where they stand.
 const MAIN = new Set(['almanac', 'canvas', 'room', 'docket', 'settings', 'welcome'])
+const BAR = 'command' // the popped bar's key among the windows
+const FEATURES = detectFeatures()
+
+// Windows to open, close and place to go from one arrangement to the next.
+function windowChanges(from, to) {
+  const was = new Set(from.popped.map((p) => p.board))
+  const now = new Set(to.popped.map((p) => p.board))
+  const open = [...now].filter((b) => !was.has(b))
+  const close = [...was].filter((b) => !now.has(b))
+  if (to.bar.popped && !from.bar.popped) open.push(BAR)
+  if (!to.bar.popped && from.bar.popped) close.push(BAR)
+  const place = to.popped.filter((p) => p.side && from.popped.find((q) => q.board === p.board)?.side !== p.side)
+  return { open, close, place }
+}
+
+// What was popped comes back to the page: windows need a click to open.
+function backOnPage(a) {
+  let next = a
+  if (next.popped.length) next = planPopBack(next).next ?? next
+  if (next.bar.popped) next = planPopBar(next, false).next ?? next
+  return next
+}
 
 export default function Shell() {
+  const { i18n } = useLingui()
   const [arrangement, setArrangement] = useState(() => shipped(ARRANGEMENT))
-  const [field, dispatch] = useReducer(fieldReducer, 'search', initialField)
-  const [reference, setReference] = useState(null) // { topic } while ? is open
+  const [windows, setWindows] = useState({}) // board or 'command' -> { win, container }
   const [lines, setLines] = useState([])
-  const walk = useRef({ lines: [], index: -1, draft: '' })
-  const input = useRef(null)
+  const current = useRef(arrangement)
+  const handles = useRef({})
   const db = useRef(null)
+
+  const commit = useCallback((next) => {
+    if (!next || next === current.current) return
+    current.current = next
+    setArrangement(next)
+    if (db.current) saveArrangement(db.current, next).catch(() => {})
+  }, [])
 
   // This device's arrangement and history, once the database is open.
   useEffect(() => {
@@ -41,129 +73,108 @@ export default function Shell() {
     initDB().then(async (handle) => {
       db.current = handle
       const [kept, history] = await Promise.all([loadArrangement(handle, ARRANGEMENT), readCommands(handle)])
-      if (live) { setArrangement(kept); setLines(history) }
+      if (!live) return
+      commit(backOnPage(kept))
+      setLines(history)
     }).catch(() => {})
     return () => { live = false }
-  }, [])
+  }, [commit])
 
-  // The field rests where the addressed board rests (C44).
-  const resting = restingMode(arrangement)
-  useEffect(() => { dispatch({ type: 'surface', resting }) }, [resting])
-
-  const value = fieldValue(field)
-  const view = useMemo(() => preview(value, { mode: field.mode, arrangement }), [value, field.mode, arrangement])
-
-  const commit = useCallback((next) => {
-    if (!next) return
-    setArrangement(next)
-    if (db.current) saveArrangement(db.current, next).catch(() => {})
-  }, [])
-
-  // `/` outside text fields, and Cmd/Ctrl+K from anywhere, open the field.
+  // Leaving the page closes every window it opened.
   useEffect(() => {
-    function onKey(e) {
-      const active = document.activeElement
-      const inBar = active === input.current
-      const what = barKey(e, { inTextField: !inBar && isTextField(active), inBar })
-      if (what === 'focus' || what === 'open') {
-        e.preventDefault()
-        input.current?.focus()
-        dispatch({ type: 'open' })
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    const open = handles.current
+    const closeAll = () => Object.values(open).forEach(closePopout)
+    window.addEventListener('pagehide', closeAll)
+    return () => { window.removeEventListener('pagehide', closeAll); closeAll() }
   }, [])
 
-  function enter() {
-    if (field.mode !== 'command') return
-    const { answer, next } = view
-    if (answer.state === 'help') {
-      setReference({ topic: answer.values?.verb ? answer.values.verb.replace(/:$/, '') : null })
-      dispatch({ type: 'ran' })
-      return
-    }
-    if (answer.fill) { dispatch({ type: 'input', value: answer.fill }); return }
-    if (!next) return
-    commit(next)
-    setReference(null)
-    const body = readField(value, field.mode).body
-    if (db.current) {
-      keepCommand(db.current, body)
-        .then((kept) => (kept ? readCommands(db.current).then(setLines) : null))
-        .catch(() => {})
-    }
-    walk.current = { lines, index: -1, draft: '' }
-    dispatch({ type: 'ran' })
-  }
+  const forget = useCallback((key) => {
+    delete handles.current[key]
+    setWindows({ ...handles.current })
+  }, [])
 
-  function onKeyDown(e) {
-    if (e.nativeEvent.isComposing) return
-    if (e.key === 'Enter') { e.preventDefault(); enter(); return }
-    if (e.key === 'Escape') {
-      e.preventDefault()
-      if (reference) { setReference(null); return }
-      if (field.mode === field.resting) input.current?.blur()
-      dispatch({ type: 'escape' })
-      return
+  // A window closed by the person brings its board, or the bar, back.
+  const watch = useCallback((key, handle) => onPopoutClosed(handle, () => {
+    forget(key)
+    const a = current.current
+    commit(key === BAR ? planPopBar(a, false).next : planPopBack(a, key).next)
+  }), [commit, forget])
+
+  /** Runs a planned arrangement: opens, closes and places its windows, then keeps it. */
+  const run = useCallback(async (next, body) => {
+    const changes = windowChanges(current.current, next)
+    const opened = []
+    for (const key of changes.open) {
+      const title = key === BAR ? i18n._(COPY.shell.barWindow) : i18n._(COPY.shell.windowTitle, { board: i18n._(COPY.boards[key]) })
+      const handle = await openPopout({ what: key === BAR ? 'bar' : 'board', name: `parliament-${key}`, title, onTop: key === BAR && FEATURES.onTop })
+      if (!handle) { opened.forEach(([, h]) => closePopout(h)); return 'popBlocked' }
+      opened.push([key, handle])
     }
-    if (field.mode !== 'command') return
-    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-      e.preventDefault()
-      walk.current = stepRecall({ ...walk.current, lines }, e.key === 'ArrowUp' ? 'up' : 'down', field.text.command)
-      dispatch({ type: 'recall', value: walk.current.value })
-      return
+    for (const key of changes.close) {
+      const handle = handles.current[key]
+      delete handles.current[key]
+      handle?.unwatch?.()
+      closePopout(handle)
     }
-    if (e.key === 'Tab') {
-      const [first] = complete(field.text.command, arrangement.addressed)
-      if (first) { e.preventDefault(); dispatch({ type: 'recall', value: first }) }
+    for (const [key, handle] of opened) {
+      handle.unwatch = watch(key, handle)
+      if (key !== BAR) handle.win.addEventListener('focus', () => commit(address(current.current, key)))
+      handles.current[key] = handle
     }
-  }
+    for (const p of changes.place) if (handles.current[p.board]) placePopout(handles.current[p.board], p.side)
+    setWindows({ ...handles.current })
+    commit(next)
+    if (db.current && body) {
+      keepCommand(db.current, body).then((kept) => (kept ? readCommands(db.current).then(setLines) : null)).catch(() => {})
+    }
+    return null
+  }, [commit, i18n, watch])
 
   function pickBoard(board) {
-    const here = arrangement.columns.flat().includes(board) || arrangement.popped.some((p) => p.board === board)
-    commit(here ? address(arrangement, board) : planOpen(arrangement, board).next)
+    const a = current.current
+    if (handles.current[board]) { handles.current[board].win.focus(); commit(address(a, board)); return }
+    commit(a.columns.flat().includes(board) ? address(a, board) : planOpen(a, board).next)
   }
 
-  function pickCommand(form) {
-    dispatch({ type: 'input', value: `>${form}` })
-    setReference(null)
-    input.current?.focus()
-  }
-
+  const focusBoard = (board) => { if (board !== current.current.addressed) commit(address(current.current, board)) }
   const bar = arrangement.bar
-  const dock = (
-    <div className={`ch-dock ${bar.at} ${bar.side}`}>
-      <div className="ch-dock-in">
-        <Field
-          ref={input}
-          state={field}
-          onInput={(v) => { walk.current = { lines, index: -1, draft: '' }; dispatch({ type: 'input', value: v }) }}
-          onKeyDown={onKeyDown}
-          onFocus={() => dispatch({ type: 'focus' })}
-          onBlur={() => dispatch({ type: 'blur' })}
-        />
-        <EnterLine mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={view.says} addressed={arrangement.addressed} />
-        {reference && <Reference board={arrangement.addressed} topic={reference.topic} onPick={pickCommand} />}
-      </div>
-    </div>
-  )
+  const barWindow = windows[BAR]
+  const shared = { arrangement, lines, onRun: run, onTop: FEATURES.onTop }
 
   return (
     <div className={`ch-shell bar-${bar.at}`}>
       <Strip arrangement={arrangement} onPick={pickBoard} />
       {/* One bar in one place, moved by its class, so moving it never loses
           the field's focus or what is typed. */}
-      {dock}
+      {!barWindow && <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} />}
+      {barWindow && <p className="ch-away ch-marg">{i18n._(COPY.shell.barAway)}</p>}
       <main className="ch-stage">
         {arrangement.columns.map((column) => (
           <div key={column.join(' ')} className={`ch-col${column.some((b) => MAIN.has(b)) ? ' main' : ''}`}>
             {column.map((board) => (
-              <Board key={board} board={board} addressed={arrangement.addressed === board} onAddress={(b) => { if (b !== arrangement.addressed) commit(address(arrangement, b)) }} />
+              <Board key={board} board={board} addressed={arrangement.addressed === board} onAddress={focusBoard} />
             ))}
           </div>
         ))}
       </main>
+      {barWindow && createPortal(
+        <div className="ch-shell ch-in-window">
+          <Bar {...shared} board={arrangement.addressed} doc={barWindow.win.document} className="ch-dock window" autoFocus />
+        </div>,
+        barWindow.container,
+      )}
+      {arrangement.popped.filter((p) => windows[p.board]).map((p) => createPortal(
+        <div className="ch-shell ch-in-window">
+          <Bar {...shared} board={p.board} doc={windows[p.board].win.document} className="ch-dock window" onFocusBoard={focusBoard} />
+          <main className="ch-stage">
+            <div className="ch-col main">
+              <Board board={p.board} addressed={arrangement.addressed === p.board} onAddress={focusBoard} />
+            </div>
+          </main>
+        </div>,
+        windows[p.board].container,
+        p.board,
+      ))}
     </div>
   )
 }

@@ -211,6 +211,10 @@ msgid "enter.popBackOne"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.popBlocked"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.popBoard"
 msgstr ""
 
@@ -466,6 +470,15 @@ msgid "shell.addressed"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "shell.barAway"
+msgstr ""
+
+#. The popped bar's window title
+#. js-lingui-explicit-id
+msgid "shell.barWindow"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "shell.boardLater"
 msgstr ""
 
@@ -486,6 +499,11 @@ msgstr ""
 #. The name of the board strip, read by screen readers
 #. js-lingui-explicit-id
 msgid "shell.strip"
+msgstr ""
+
+#. A popped window's title: a board name only, never anything someone wrote
+#. js-lingui-explicit-id
+msgid "shell.windowTitle"
 msgstr ""
 
 #. js-lingui-explicit-id

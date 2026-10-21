@@ -211,6 +211,10 @@ msgid "enter.popBackOne"
 msgstr "Enter brings {board} back to the page"
 
 #. js-lingui-explicit-id
+msgid "enter.popBlocked"
+msgstr "The browser did not open the window. Allow pop-ups for this site, then try again"
+
+#. js-lingui-explicit-id
 msgid "enter.popBoard"
 msgstr "Enter puts {board} in its own window"
 
@@ -466,6 +470,15 @@ msgid "shell.addressed"
 msgstr "the bar points here"
 
 #. js-lingui-explicit-id
+msgid "shell.barAway"
+msgstr "The bar is in its own window. pop:back command brings it back."
+
+#. The popped bar's window title
+#. js-lingui-explicit-id
+msgid "shell.barWindow"
+msgstr "Parliament"
+
+#. js-lingui-explicit-id
 msgid "shell.boardLater"
 msgstr "This board is drawn in a later stage."
 
@@ -487,6 +500,11 @@ msgstr "Every command"
 #. js-lingui-explicit-id
 msgid "shell.strip"
 msgstr "Boards"
+
+#. A popped window's title: a board name only, never anything someone wrote
+#. js-lingui-explicit-id
+msgid "shell.windowTitle"
+msgstr "{board} · Parliament"
 
 #. js-lingui-explicit-id
 msgid "storage.ask"

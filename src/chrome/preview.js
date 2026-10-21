@@ -9,9 +9,9 @@
 import { enterLine } from '../commands/registry'
 import { plan, ARRANGEMENT_VERBS } from '../shell/arrangement'
 
-// Verbs whose actions exist in the shell so far. pop: waits for the windows
-// it opens; the rest come with their stages.
-export const BUILT = new Set(ARRANGEMENT_VERBS.filter((verb) => verb !== 'pop'))
+// Verbs whose actions exist in the shell so far; the rest come with their
+// stages.
+export const BUILT = new Set(ARRANGEMENT_VERBS)
 
 /**
  * @param {string} value the whole field, leader included

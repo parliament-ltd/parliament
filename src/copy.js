@@ -142,6 +142,7 @@ export const COPY = {
       id: 'enter.resetArrangement',
       message: '{count, plural, =0 {Enter puts this screen back as shipped} one {Enter puts this screen back as shipped and closes # window} other {Enter puts this screen back as shipped and closes # windows}}',
     },
+    popBlocked: /*i18n*/ { id: 'enter.popBlocked', message: 'The browser did not open the window. Allow pop-ups for this site, then try again' },
     popOrdinary: /*i18n*/ { id: 'enter.popOrdinary', message: 'It opens as an ordinary window, since this browser cannot keep one on top', comment: 'Added to the Enter line for pop: where the always-on-top window is missing (C94)' },
     key: /*i18n*/ { id: 'enter.key', message: 'No keys in the command line, for security. Delete it, and api: opens the key field' },
     leaveSearch: /*i18n*/ { id: 'enter.leaveSearch', message: 'Escape goes back to search' },
@@ -170,6 +171,9 @@ export const COPY = {
     addressed: /*i18n*/ { id: 'shell.addressed', message: 'the bar points here', comment: 'Marginalia on the board the navy rule is on' },
     referenceClose: /*i18n*/ { id: 'shell.referenceClose', message: 'Escape closes this' },
     referenceName: /*i18n*/ { id: 'shell.referenceName', message: 'Every command', comment: 'The name of the ? reference, read by screen readers' },
+    windowTitle: /*i18n*/ { id: 'shell.windowTitle', message: '{board} · Parliament', comment: "A popped window's title: a board name only, never anything someone wrote" },
+    barWindow: /*i18n*/ { id: 'shell.barWindow', message: 'Parliament', comment: "The popped bar's window title" },
+    barAway: /*i18n*/ { id: 'shell.barAway', message: 'The bar is in its own window. pop:back command brings it back.' },
   },
 
   // Keeping the data (C94): the browser is not named.

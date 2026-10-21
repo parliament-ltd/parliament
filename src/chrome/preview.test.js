@@ -36,9 +36,16 @@ describe('what Enter would do', () => {
   })
 
   it('says a verb is not built yet, including forms of built verbs that wait for later', () => {
-    expect(words('>pop:library').text).toBe('pop: is not built yet')
     expect(words('>open:207').text).toBe('open: is not built yet')
-    expect(BUILT.has('pop')).toBe(false)
+    expect(words('>pop:settings keys').text).toBe('pop: is not built yet')
+    expect(words('>tour:').text).toBe('tour: is not built yet')
+  })
+
+  it('plans pop:, which opens windows', () => {
+    expect(BUILT.has('pop')).toBe(true)
+    expect(words('>pop:library').text).toBe('Enter puts Library in its own window')
+    expect(words('>pop:command').text).toBe('Enter puts the bar in its own window')
+    expect(words('>pop:back').text).toBe('No board is in its own window')
   })
 
   it('answers renamed verbs, places and lists in words', () => {
