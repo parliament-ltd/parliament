@@ -23,3 +23,26 @@ export function nameFromChat(chat) {
   const name = chat.parentId ? unsuffixed.replace(BRANCH_PREFIX, '') || unsuffixed : unsuffixed
   return NO_TITLE.has(name.trim().toLowerCase()) ? null : name
 }
+
+// A title made on this device from the first words of a prompt, sending
+// nothing (refactor-plan.md, stage 4; C62). The person's own words, so no
+// word of the interface is stored. Counted in characters, not code units,
+// so a title never ends in half a character.
+const TITLE_WORDS = 8
+const TITLE_CHARS = 60
+
+/** The first words of a prompt as a chat title, with … when cut short; '' for none. */
+export function titleFromPrompt(text) {
+  const words = String(text ?? '').split(/\s+/).filter(Boolean)
+  if (!words.length) return ''
+  const length = (s) => Array.from(s).length
+  let title = ''
+  for (const word of words.slice(0, TITLE_WORDS)) {
+    const next = title ? `${title} ${word}` : word
+    if (length(next) > TITLE_CHARS) break
+    title = next
+  }
+  // One word longer than a title, as in a language written without spaces.
+  if (!title) title = Array.from(words[0]).slice(0, TITLE_CHARS).join('')
+  return length(title) < length(words.join(' ')) ? `${title}…` : title
+}

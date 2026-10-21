@@ -1,9 +1,10 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
-import { getMessages, addMessage, updateMessage, getSetting, setSetting } from '../lib/db'
+import { getMessages, addMessage, updateMessage, getSetting, setSetting, getConversation } from '../lib/db'
 import { askToKeepStorage } from '../lib/storageKeep'
+import { nameFromChat, titleFromPrompt } from '../lib/chatTitles'
 import { useConversations } from './ConversationContext'
 import { useSettings } from './SettingsContext'
-import { gateway, runClientTool, continueInstruction, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
+import { gateway, destination, runClientTool, continueInstruction, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
 import {
   startStream, appendStream, resetStreamText, stopStream, endStream, getStream,
   isStreaming as streamingIn, streamingIds, addNotice,
@@ -325,6 +326,54 @@ export function ChatProvider({ children }) {
     }
   }, [persistEvery, keepPartial, setOpenMessages, generateMetadataIfNeeded, updateConversation])
 
+  // Ask a source instead of a model (stage 4): a prompt with no key goes to
+  // Wikipedia. The person's words go as a search and nothing else; what
+  // comes back is plain text, kept with a note of where it came from (the
+  // page, its revision, its licence), or a note that nothing was found. The
+  // note holds no words of the interface (C86): the reply card words it.
+  // An untitled chat takes the prompt's first words as its title, made
+  // here, sending nothing (C62).
+  const askSource = useCallback(async (conversationId, question, { source = 'wikipedia', lang } = {}) => {
+    if (streamingIn(conversationId)) return
+    askToKeepStorage({ getSetting, setSetting }).catch(() => {})
+
+    const chat = await getConversation(conversationId)
+    if (chat && nameFromChat(chat) == null) {
+      const title = titleFromPrompt(question)
+      if (title) updateConversation(conversationId, { title }).catch(() => {})
+    }
+
+    const userMsg = await addMessage({ conversationId, role: 'user', content: question })
+    setOpenMessages(conversationId, prev => [...prev, userMsg])
+    const placeholder = await addMessage({ conversationId, role: 'assistant', content: '', incomplete: true })
+    setOpenMessages(conversationId, prev => [...prev, placeholder])
+
+    const controller = new AbortController()
+    startStream(conversationId, { messageId: placeholder.id, controller })
+    try {
+      const found = await gateway.call(source, 'answer', [question, { lang, signal: controller.signal }], { label: 'prompt' })
+      // A lookup that finished after its chat was left still stops there (C109).
+      if (controller.signal.aborted) throw new DOMException('Stopped', 'AbortError')
+      const updates = found
+        ? {
+          content: found.text,
+          incomplete: false,
+          source: {
+            id: found.source, name: found.name, title: found.title, url: found.url,
+            revision: found.revision, revisedAt: found.revisedAt, licence: found.licence, lang: found.lang,
+          },
+        }
+        : { content: '', incomplete: false, source: { id: source, name: destination(source)?.name ?? source, found: false } }
+      await updateMessage(placeholder.id, updates)
+      setOpenMessages(conversationId, prev => prev.map(m => (m.id === placeholder.id ? { ...m, ...updates } : m)))
+    } catch (error) {
+      await keepPartial(conversationId, placeholder.id)
+      if (error.name !== 'AbortError') throw error
+    } finally {
+      endStream(conversationId)
+    }
+  }, [keepPartial, setOpenMessages, updateConversation])
+
   // Continue from an interrupted (ghost text) message in the open chat
   // systemPrompt: optional string from collaboration mode presets + custom instruction
   const continueMessage = useCallback(async (incompleteMessageId, model, systemPrompt = '') => {
@@ -420,6 +469,7 @@ export function ChatProvider({ children }) {
       clearPersistError,
       loadMessages,
       sendMessage,
+      askSource,
       continueMessage,
       stopGenerating,
       leaveConversation,
