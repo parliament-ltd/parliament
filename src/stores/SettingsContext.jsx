@@ -23,6 +23,9 @@ const DEFAULT_SETTINGS = {
   // C109: when a chat is left while its reply is being written, finish the
   // reply in the background instead of stopping it. Off unless chosen.
   finishRepliesOnLeave: false,
+  // C62: after a chat's first answer, one request for its title, summary
+  // and tags, named on the Enter line. Off: titled from the first words.
+  describeNewChats: true,
 }
 
 export function SettingsProvider({ children }) {

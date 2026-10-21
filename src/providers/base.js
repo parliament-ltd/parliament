@@ -75,6 +75,20 @@ export class BaseProvider {
     throw new Error('Not implemented')
   }
 
+  // The one request after a chat's first answer (C62), in place of the
+  // three above: its title, a one-line summary and 1-3 tags, from a single
+  // lightweight call. Returns { title?, summary?, tags? }, whichever came
+  // back valid; throws when none did. Callers keep the chat as it was.
+  async generateMetadata(apiKey, messages) {
+    throw new Error('Not implemented')
+  }
+
+  // The model that request goes to, so the Enter line can price it before
+  // Enter (C83). null when not known.
+  getMetadataModel() {
+    return null
+  }
+
   // How an answer from a source (Wikipedia) is introduced when a later
   // prompt sends it along (stage 4). The model did not write it, so it goes
   // as quoted context on the person's side, saying where it came from.

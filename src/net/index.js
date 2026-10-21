@@ -49,7 +49,8 @@ export const DEFAULT_MODEL_PROVIDER = 'anthropic'
 export const models = (id = DEFAULT_MODEL_PROVIDER) => implementation(id)?.getModels?.() ?? []
 export const availableTools = (id = DEFAULT_MODEL_PROVIDER) => implementation(id)?.getAvailableTools?.() ?? []
 export const continueInstruction = (id = DEFAULT_MODEL_PROVIDER) => implementation(id)?.getContinueInstruction?.() ?? ''
-export const introduceSource = (source, id = DEFAULT_MODEL_PROVIDER) => implementation(id)?.introduceSourceAnswer?.(source) ?? ''
+export const metadataModel = (id = DEFAULT_MODEL_PROVIDER) => implementation(id)?.getMetadataModel?.() ?? null
+export const introduceSource =(source, id = DEFAULT_MODEL_PROVIDER) => implementation(id)?.introduceSourceAnswer?.(source) ?? ''
 export const runClientTool = (name, input) => executeClientTool(name, input)
 
 /** Whether there is a key for a provider, without decrypting it. */

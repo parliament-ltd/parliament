@@ -24,6 +24,19 @@ export function nameFromChat(chat) {
   return NO_TITLE.has(name.trim().toLowerCase()) ? null : name
 }
 
+/**
+ * The chat's fields from the one request after its first answer (C62):
+ * { title?, summary?, tags? } becomes { title?, aiSummary?, tags? }, with
+ * only what came back.
+ */
+export function fieldsFromDescription(d) {
+  const fields = {}
+  if (typeof d?.title === 'string' && d.title) fields.title = d.title
+  if (typeof d?.summary === 'string' && d.summary) fields.aiSummary = d.summary
+  if (Array.isArray(d?.tags) && d.tags.length) fields.tags = d.tags
+  return fields
+}
+
 // A title made on this device from the first words of a prompt, sending
 // nothing (refactor-plan.md, stage 4; C62). The person's own words, so no
 // word of the interface is stored. Counted in characters, not code units,

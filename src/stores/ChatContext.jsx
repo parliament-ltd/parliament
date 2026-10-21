@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
 import { getMessages, addMessage, updateMessage, getSetting, setSetting, getConversation } from '../lib/db'
 import { askToKeepStorage } from '../lib/storageKeep'
-import { nameFromChat, titleFromPrompt } from '../lib/chatTitles'
+import { nameFromChat, titleFromPrompt, fieldsFromDescription } from '../lib/chatTitles'
 import { useConversations } from './ConversationContext'
 import { useSettings } from './SettingsContext'
 import { gateway, destination, runClientTool, continueInstruction, introduceSource, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
@@ -55,8 +55,10 @@ export function ChatProvider({ children }) {
 
   const activeRef = useRef(null)
   const finishOnLeave = useRef(false)
+  const describeOn = useRef(true)
 
   useEffect(() => { finishOnLeave.current = Boolean(settings.finishRepliesOnLeave) }, [settings.finishRepliesOnLeave])
+  useEffect(() => { describeOn.current = settings.describeNewChats !== false }, [settings.describeNewChats])
 
   // Unmount cleanup: stop every reply this app was writing.
   useEffect(() => () => { for (const id of streamingIds()) stopStream(id, 'closed') }, [])
@@ -116,30 +118,31 @@ export function ChatProvider({ children }) {
     return kept
   }, [])
 
-  // Auto-generate title, summary, and tags after the first user→assistant exchange.
-  // All three are fire-and-forget: failures are silent.
-  // They run in parallel to minimize latency.
-  const generateMetadataIfNeeded = useCallback(async (conversationId, currentMessages) => {
-    // Only trigger on exactly 2 messages (first user + first assistant)
-    if (currentMessages.length !== 2) return
-    if (currentMessages[0].role !== 'user' || currentMessages[1].role !== 'assistant') return
-
-    // Run all three in parallel — each is independent and fire-and-forget
-    const titlePromise = gateway.call(PROVIDER, 'generateTitle', [currentMessages], { label: 'title' })
-      .then(title => updateConversation(conversationId, { title }))
-      .catch(err => console.warn('Auto-title generation failed:', err.message))
-
-    const summaryPromise = gateway.call(PROVIDER, 'generateSummary', [currentMessages], { label: 'summary' })
-      .then(aiSummary => updateConversation(conversationId, { aiSummary }))
-      .catch(err => console.warn('Auto-summary generation failed:', err.message))
-
-    const tagsPromise = gateway.call(PROVIDER, 'generateTags', [currentMessages], { label: 'tags' })
-      .then(tags => updateConversation(conversationId, { tags }))
-      .catch(err => console.warn('Auto-tags generation failed:', err.message))
-
-    // We don't await the combined result — this is background work
-    Promise.allSettled([titlePromise, summaryPromise, tagsPromise])
+  // An untitled chat takes the first words of its prompt as its title,
+  // made here and sending nothing (C62).
+  const titleIfUntitled = useCallback(async (conversationId, prompt) => {
+    const chat = await getConversation(conversationId)
+    if (!chat || nameFromChat(chat) != null) return
+    const title = titleFromPrompt(prompt)
+    if (title) await updateConversation(conversationId, { title }).catch(() => {})
   }, [updateConversation])
+
+  // After a chat's first answer (C62): one request for its title, summary
+  // and tags, in place of the three silent ones there were. The Enter line
+  // names it before Enter, and a switch in Settings turns it off. Off, or
+  // if the request fails, an untitled chat takes the first words of its
+  // prompt instead, and nothing more is sent.
+  const describeNewChat = useCallback(async (conversationId, exchange, prompt) => {
+    if (describeOn.current) {
+      try {
+        const fields = fieldsFromDescription(await gateway.call(PROVIDER, 'generateMetadata', [exchange], { label: 'title, summary and tags' }))
+        if (Object.keys(fields).length) { await updateConversation(conversationId, fields); return }
+      } catch (err) {
+        console.warn('Describing the chat failed:', err.message)
+      }
+    }
+    await titleIfUntitled(conversationId, prompt)
+  }, [updateConversation, titleIfUntitled])
 
   // Send a message and handle streaming response
   // systemPrompt: optional string from collaboration mode presets + custom instruction
@@ -173,6 +176,7 @@ export function ChatProvider({ children }) {
     // chat gets in, and leaving out what is hidden or being deleted.
     const held = hasMessages(conversationId) ? heldMessages(conversationId) : await getMessages(conversationId)
     const before = sendable(conversationId, held)
+    const first = held.length === 0 // the chat's first prompt
 
     // 1. Add user message to state and IndexedDB.
     //    PR-18e: `userContent` is already the text the user typed PLUS
@@ -317,9 +321,9 @@ export function ChatProvider({ children }) {
         }))
       }
 
-      // 6. Auto-generate title, summary, and tags from this chat's own
-      //    messages (fire and forget — not awaited)
-      generateMetadataIfNeeded(conversationId, [...history, finished])
+      // 6. After a chat's first answer, its title, summary and tags, from
+      //    this chat's own exchange (C62). Not awaited.
+      if (first && finalContent) describeNewChat(conversationId, forModel([userMsg, finished], (source) => introduceSource(source, PROVIDER)), userContent).catch(() => {})
     } catch (error) {
       stopPersisting()
       // Stopped or left: kept as it was. Anything else broke the reply off.
@@ -334,7 +338,7 @@ export function ChatProvider({ children }) {
     } finally {
       endStream(conversationId)
     }
-  }, [persistEvery, keepPartial, generateMetadataIfNeeded, updateConversation])
+  }, [persistEvery, keepPartial, describeNewChat, updateConversation])
 
   // Ask a source instead of a model (stage 4): a prompt with no key goes to
   // Wikipedia. The person's words go as a search and nothing else; what
@@ -347,11 +351,7 @@ export function ChatProvider({ children }) {
     if (streamingIn(conversationId)) return
     askToKeepStorage({ getSetting, setSetting }).catch(() => {})
 
-    const chat = await getConversation(conversationId)
-    if (chat && nameFromChat(chat) == null) {
-      const title = titleFromPrompt(question)
-      if (title) updateConversation(conversationId, { title }).catch(() => {})
-    }
+    titleIfUntitled(conversationId, question).catch(() => {})
 
     const userMsg = await addMessage({ conversationId, role: 'user', content: question })
     updateMessages(conversationId, prev => [...prev, userMsg])
@@ -382,7 +382,7 @@ export function ChatProvider({ children }) {
     } finally {
       endStream(conversationId)
     }
-  }, [keepPartial, updateConversation])
+  }, [keepPartial, titleIfUntitled])
 
   // Continue from an interrupted (ghost text) message in the open chat
   // systemPrompt: optional string from collaboration mode presets + custom instruction

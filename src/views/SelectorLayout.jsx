@@ -19,6 +19,7 @@ import {
   setSetting,
 } from '../lib/db'
 import { assignDefaultRoom } from '../lib/migration'
+import { fieldsFromDescription } from '../lib/chatTitles'
 import TourTooltip from '../components/TourTooltip'
 import { SPRING_SNAPPY, SPRING_SMOOTH } from '../lib/constants'
 
@@ -1179,20 +1180,9 @@ export default function SelectorLayout() {
             content: m.content,
           }))
 
-          // Run title, summary, and tags in parallel
-          const results = await Promise.allSettled([
-            gateway.call(PROVIDER, 'generateTitle', [messagesToUse], { label: 'regenerate title' })
-              .then(title => updateConversation(convId, { title })),
-            gateway.call(PROVIDER, 'generateSummary', [messagesToUse], { label: 'regenerate summary' })
-              .then(aiSummary => updateConversation(convId, { aiSummary })),
-            gateway.call(PROVIDER, 'generateTags', [messagesToUse], { label: 'regenerate tags' })
-              .then(tags => updateConversation(convId, { tags })),
-          ])
-
-          const failures = results.filter(r => r.status === 'rejected')
-          if (failures.length > 0) {
-            console.warn(`Regeneration partially failed for ${convId}:`, failures.map(f => f.reason?.message))
-          }
+          // One request per chat for its title, summary and tags (C62).
+          const fields = fieldsFromDescription(await gateway.call(PROVIDER, 'generateMetadata', [messagesToUse], { label: 'regenerate title, summary and tags' }))
+          if (Object.keys(fields).length) await updateConversation(convId, fields)
         } catch (err) {
           console.warn(`Regeneration failed for conversation ${convId}:`, err.message)
         }

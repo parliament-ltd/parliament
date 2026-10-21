@@ -12,7 +12,7 @@ import { shipped, address, planOpen, planPopBack, planPopBar, roomChat, roomArra
 import { historyChars } from '../shell/estimate'
 import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
-import { hasKey, models, destination, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
+import { hasKey, models, metadataModel, destination, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
 import { useChat } from '../stores/ChatContext'
 import { useConversations } from '../stores/ConversationContext'
 import { useSettings } from '../stores/SettingsContext'
@@ -240,6 +240,12 @@ export default function Shell() {
   const deletingHere = usePendingDeletes(roomId ?? '')
   const along = useMemo(() => sendableOf(shown, hiddenHere, deletingHere), [shown, hiddenHere, deletingHere])
   const hiddenOut = shown.filter((m) => m.content).length - along.length
+  // A chat's first prompt is followed, with a key, by one request for its
+  // title, summary and tags, unless turned off in Settings (C62).
+  const describeModel = useMemo(() => models(PROVIDER).find((m) => m.id === metadataModel(PROVIDER)) ?? null, [])
+  const firstPrompt = roomId === null || (Boolean(roomId) && activeConversationId === roomId && messages.length === 0)
+  const describes = Boolean(keyed && firstPrompt && settings.describeNewChats !== false)
+  const describe = useMemo(() => (describes ? { price: describeModel?.cost ?? null } : null), [describes, describeModel])
   const prompt = useMemo(() => ({
     room: roomId,
     chat: roomRecord?.num ?? null,
@@ -252,7 +258,8 @@ export default function Shell() {
     systemChars: keyed ? buildSystemPrompt().length : 0,
     perMillion: model?.cost?.inputPerMillion ?? null,
     hiddenOut,
-  }), [roomId, roomRecord, streaming, keyed, model, settings.defaultModel, along, hiddenOut, buildSystemPrompt])
+    describe,
+  }), [roomId, roomRecord, streaming, keyed, model, settings.defaultModel, along, hiddenOut, describe, buildSystemPrompt])
 
   /**
    * Sends a prompt to the room on screen: to the provider with a key, else

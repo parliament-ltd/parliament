@@ -77,6 +77,14 @@ msgid "chat.cutLimit"
 msgstr "Cut off: the reply reached the length allowed for one reply. What arrived is kept."
 
 #. js-lingui-explicit-id
+msgid "chat.describeSetting"
+msgstr "Name a new chat after its first answer"
+
+#. js-lingui-explicit-id
+msgid "chat.describeSettingHelp"
+msgstr "On: after a chat's first answer, one short request asks the model for its title, a one-line summary and tags. The line under the bar names it before you send. Off: a chat is titled with the first words of its prompt, and nothing more is sent."
+
+#. js-lingui-explicit-id
 msgid "chat.finishSetting"
 msgstr "Finish replies after I leave a chat"
 
@@ -337,6 +345,19 @@ msgstr "Where prompts go has changed. Read this line again before you send"
 #. js-lingui-explicit-id
 msgid "enter.promptChecking"
 msgstr "Looking for a key on this device"
+
+#. C62: named before Enter; a switch in Settings turns it off. {cost} is an amount
+#. js-lingui-explicit-id
+msgid "enter.promptDescribe"
+msgstr "After the answer, one short request for its title, summary and tags, {cost}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptDescribeCheap"
+msgstr "After the answer, one short request for its title, summary and tags, under {cost}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptDescribeUnpriced"
+msgstr "After the answer, one short request for its title, summary and tags"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"

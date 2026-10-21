@@ -180,7 +180,7 @@ export default function SettingsView() {
       case 'model':
         return <ModelSection key="model" selectedModel={settings.defaultModel} setSelectedModel={(v) => updateSetting('defaultModel', v)} />
       case 'usage':
-        return <UsageSection key="usage" finishReplies={settings.finishRepliesOnLeave} setFinishReplies={(v) => updateSetting('finishRepliesOnLeave', v)} budgetAlert={settings.budgetAlert} setBudgetAlert={(v) => updateSetting('budgetAlert', v)} budgetEnabled={settings.budgetEnabled} setBudgetEnabled={(v) => updateSetting('budgetEnabled', v)} spendingLimitDismissed={settings.spendingLimitDismissed} setSpendingLimitDismissed={(v) => updateSetting('spendingLimitDismissed', v)} />
+        return <UsageSection key="usage" finishReplies={settings.finishRepliesOnLeave} setFinishReplies={(v) => updateSetting('finishRepliesOnLeave', v)} describeChats={settings.describeNewChats !== false} setDescribeChats={(v) => updateSetting('describeNewChats', v)} budgetAlert={settings.budgetAlert} setBudgetAlert={(v) => updateSetting('budgetAlert', v)} budgetEnabled={settings.budgetEnabled} setBudgetEnabled={(v) => updateSetting('budgetEnabled', v)} spendingLimitDismissed={settings.spendingLimitDismissed} setSpendingLimitDismissed={(v) => updateSetting('spendingLimitDismissed', v)} />
       case 'context':
         return <ContextSection key="context" summaryDepth={settings.summaryDepth} setSummaryDepth={(v) => updateSetting('summaryDepth', v)} contextThreshold={settings.contextThreshold} setContextThreshold={(v) => updateSetting('contextThreshold', v)} autoCompress={settings.autoCompress} setAutoCompress={(v) => updateSetting('autoCompress', v)} />
       case 'data':
@@ -560,7 +560,7 @@ function ModelSection({ selectedModel, setSelectedModel }) {
 
 // ─── Usage & Spending ────────────────────────────────────
 
-function UsageSection({ finishReplies, setFinishReplies, budgetAlert, setBudgetAlert, budgetEnabled, setBudgetEnabled, spendingLimitDismissed, setSpendingLimitDismissed }) {
+function UsageSection({ finishReplies, setFinishReplies, describeChats, setDescribeChats, budgetAlert, setBudgetAlert, budgetEnabled, setBudgetEnabled, spendingLimitDismissed, setSpendingLimitDismissed }) {
   const { i18n } = useLingui()
   return (
     <SettingsSection title="Usage & Spending" subtitle="Monitor costs and set budget alerts">
@@ -572,6 +572,17 @@ function UsageSection({ finishReplies, setFinishReplies, budgetAlert, setBudgetA
             <Toggle enabled={Boolean(finishReplies)} onChange={setFinishReplies} />
           </div>
           <p className="text-xs text-[var(--p-text-secondary)] mt-2">{i18n._(COPY.chat.finishSettingHelp)}</p>
+        </Card>
+      </StaggerItem>
+
+      {/* C62: one request after a chat's first answer, named before Enter. */}
+      <StaggerItem>
+        <Card>
+          <div className="flex items-center justify-between gap-4">
+            <SectionLabel>{i18n._(COPY.chat.describeSetting)}</SectionLabel>
+            <Toggle enabled={Boolean(describeChats)} onChange={setDescribeChats} />
+          </div>
+          <p className="text-xs text-[var(--p-text-secondary)] mt-2">{i18n._(COPY.chat.describeSettingHelp)}</p>
         </Card>
       </StaggerItem>
 

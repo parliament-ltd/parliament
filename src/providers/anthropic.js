@@ -26,6 +26,17 @@ const TAGS_SYSTEM_PROMPT = `Generate 1-3 topic tags for this conversation. Rules
 - Return ONLY the tags as a comma-separated list, nothing else
 - Example: "design, api, performance"`
 
+// One request after a chat's first answer, in place of the three above
+// (C62): its title, a one-line summary and its tags, as JSON.
+const DESCRIBE_SYSTEM_PROMPT = `Describe this conversation for a list of conversations. Respond with JSON only, in exactly this shape:
+{"title": "...", "summary": "...", "tags": ["..."]}
+Rules:
+- title: 2-6 words, specific, in title case, with no quotes and no final period
+- summary: one sentence in the past tense, at most 120 characters, describing what was discussed
+- tags: 1-3 single lowercase words naming the main topics
+- Write the title and summary in the language of the conversation
+- Respond with the JSON only, nothing before or after it`
+
 /* ── Built-in Anthropic tools ─────────────────────────────── */
 
 // PR-18d: max_uses caps how many times the model can run a search per
@@ -516,5 +527,38 @@ export class AnthropicProvider extends BaseProvider {
     }
 
     return tags
+  }
+
+  // The one request after a chat's first answer (C62): title, summary and
+  // tags from a single call. Returns whichever of them came back valid.
+  async generateMetadata(apiKey, messages) {
+    const describeMessages = this._prepareMessages(messages, 4, 500)
+    describeMessages.push({ role: 'user', content: 'Describe the conversation above as JSON.' })
+
+    const raw = await this._lightweightCall(apiKey, DESCRIBE_SYSTEM_PROMPT, describeMessages, 200)
+    const start = raw.indexOf('{')
+    const end = raw.lastIndexOf('}')
+    let data = null
+    try { data = start >= 0 && end > start ? JSON.parse(raw.slice(start, end + 1)) : null } catch { data = null }
+    if (!data || typeof data !== 'object') throw new Error('No description came back')
+
+    const out = {}
+    const title = typeof data.title === 'string' ? this._stripPrefixes(data.title) : ''
+    if (title.length > 0 && title.length <= 60) out.title = title
+    const summary = typeof data.summary === 'string' ? this._stripPrefixes(data.summary) : ''
+    if (summary.length > 0 && summary.length <= 200) out.summary = summary
+    const tags = (Array.isArray(data.tags) ? data.tags : [])
+      .filter(t => typeof t === 'string')
+      .map(t => t.trim().toLowerCase().replace(/[^a-z0-9-]/g, ''))
+      .filter(t => t.length > 0 && t.length <= 20)
+      .slice(0, 3)
+    if (tags.length) out.tags = tags
+    if (!Object.keys(out).length) throw new Error('No valid description came back')
+    return out
+  }
+
+  // The model the request above goes to, so the Enter line can price it.
+  getMetadataModel() {
+    return 'claude-haiku'
   }
 }

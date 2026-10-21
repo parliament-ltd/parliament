@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { nameFromChat, titleFromPrompt } from './chatTitles'
+import { nameFromChat, titleFromPrompt, fieldsFromDescription } from './chatTitles'
 
 describe('a title from the first words of a prompt', () => {
   it('keeps a short prompt whole', () => {
@@ -35,5 +35,14 @@ describe('a name from a chat', () => {
     expect(nameFromChat({ title: 'New Conversation' })).toBeNull()
     expect(nameFromChat({ title: '' })).toBeNull()
     expect(nameFromChat({ title: 'Barn owls' })).toBe('Barn owls')
+  })
+})
+
+describe('a chat from its description (C62)', () => {
+  it('takes only what came back', () => {
+    expect(fieldsFromDescription({ title: 'Barn Owls', summary: 'Discussed owls', tags: ['birds'] })).toEqual({ title: 'Barn Owls', aiSummary: 'Discussed owls', tags: ['birds'] })
+    expect(fieldsFromDescription({ summary: 'Discussed owls' })).toEqual({ aiSummary: 'Discussed owls' })
+    expect(fieldsFromDescription({ title: '', tags: [] })).toEqual({})
+    expect(fieldsFromDescription(null)).toEqual({})
   })
 })

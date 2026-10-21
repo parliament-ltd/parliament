@@ -55,3 +55,30 @@ describe('reading a streamed reply', () => {
     expect(chunks.join('')).toBe('Part')
   })
 })
+
+describe('one request for a title, summary and tags (C62)', () => {
+  const answer = (text) => vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ content: [{ type: 'text', text }] }) }))
+  const exchange = [{ role: 'user', content: 'What is a barn owl?' }, { role: 'assistant', content: 'A bird.' }]
+
+  it('makes one call and keeps what came back valid', async () => {
+    const fetch = answer(`Here: {"title": "Barn Owl Basics", "summary": "Discussed what a barn owl is.", "tags": ["birds", "Owls!", "${'x'.repeat(30)}"]}`)
+    vi.stubGlobal('fetch', fetch)
+    const d = await new AnthropicProvider().generateMetadata('test-key', exchange)
+    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(d).toEqual({ title: 'Barn Owl Basics', summary: 'Discussed what a barn owl is', tags: ['birds', 'owls'] })
+    const body = JSON.parse(fetch.mock.calls[0][1].body)
+    expect(body.model).toMatch(/haiku/)
+    expect(body.messages.at(-1).content).toBe('Describe the conversation above as JSON.')
+  })
+
+  it('keeps part of an answer when the rest is not usable, and refuses an answer with nothing usable', async () => {
+    vi.stubGlobal('fetch', answer('{"title": "", "summary": "Talked about owls.", "tags": "birds"}'))
+    expect(await new AnthropicProvider().generateMetadata('test-key', exchange)).toEqual({ summary: 'Talked about owls' })
+    vi.stubGlobal('fetch', answer('Sorry, I cannot.'))
+    await expect(new AnthropicProvider().generateMetadata('test-key', exchange)).rejects.toThrow()
+  })
+
+  it('names the model it goes to, so the Enter line can price it', () => {
+    expect(new AnthropicProvider().getMetadataModel()).toBe('claude-haiku')
+  })
+})

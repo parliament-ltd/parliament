@@ -77,6 +77,14 @@ msgid "chat.cutLimit"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.describeSetting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.describeSettingHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.finishSetting"
 msgstr ""
 
@@ -336,6 +344,19 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptChecking"
+msgstr ""
+
+#. C62: named before Enter; a switch in Settings turns it off. {cost} is an amount
+#. js-lingui-explicit-id
+msgid "enter.promptDescribe"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptDescribeCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptDescribeUnpriced"
 msgstr ""
 
 #. js-lingui-explicit-id

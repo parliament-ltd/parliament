@@ -182,6 +182,13 @@ export const COPY = {
       id: 'enter.promptSendUnpriced',
       message: '{tokens, plural, one {Enter sends to {provider}, about # token} other {Enter sends to {provider}, about # tokens}}',
     },
+    promptDescribe: /*i18n*/ {
+      id: 'enter.promptDescribe',
+      message: 'After the answer, one short request for its title, summary and tags, {cost}',
+      comment: 'C62: named before Enter; a switch in Settings turns it off. {cost} is an amount',
+    },
+    promptDescribeCheap: /*i18n*/ { id: 'enter.promptDescribeCheap', message: 'After the answer, one short request for its title, summary and tags, under {cost}' },
+    promptDescribeUnpriced: /*i18n*/ { id: 'enter.promptDescribeUnpriced', message: 'After the answer, one short request for its title, summary and tags' },
     promptHiddenOut: /*i18n*/ {
       id: 'enter.promptHiddenOut',
       message: '{count, plural, one {# hidden message stays out} other {# hidden messages stay out}}',
@@ -250,6 +257,12 @@ export const COPY = {
     answeredFrom: /*i18n*/ { id: 'chat.answeredFrom', message: 'Answered from {source}' },
     sourceRevision: /*i18n*/ { id: 'chat.sourceRevision', message: 'revision {revision}' },
     sourceNothing: /*i18n*/ { id: 'chat.sourceNothing', message: 'Nothing found on {source} for that. Try other words.' },
+    // C62: the one request after a chat's first answer.
+    describeSetting: /*i18n*/ { id: 'chat.describeSetting', message: 'Name a new chat after its first answer' },
+    describeSettingHelp: /*i18n*/ {
+      id: 'chat.describeSettingHelp',
+      message: 'On: after a chat\'s first answer, one short request asks the model for its title, a one-line summary and tags. The line under the bar names it before you send. Off: a chat is titled with the first words of its prompt, and nothing more is sent.',
+    },
     finishSetting: /*i18n*/ { id: 'chat.finishSetting', message: 'Finish replies after I leave a chat' },
     finishSettingHelp: /*i18n*/ {
       id: 'chat.finishSettingHelp',

@@ -23,6 +23,7 @@ import { Search, Sparkles, StickyNote, Highlighter, GitBranch, Pin, RotateCw, Tr
 import { useConversations } from '../../stores/ConversationContext'
 import { PHASE_1_EVENTS } from '../../lib/hostAPI'
 import { getMessages, initDB } from '../../lib/db'
+import { fieldsFromDescription } from '../../lib/chatTitles'
 import { gateway, hasKey, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../../net'
 import { useIsNarrow } from '../../lib/useViewportWidth'
 
@@ -188,11 +189,9 @@ export default function ChatsPreview({ config = {}, hostAPI } = {}) {
         const msgs = await getMessages(convId)
         if (msgs.length < 2) return
         const messagesToUse = msgs.slice(0, 6).map(m => ({ role: m.role, content: m.content }))
-        await Promise.allSettled([
-          gateway.call(PROVIDER, 'generateTitle', [messagesToUse], { label: 'regenerate title' }).then(title => updateConversation(convId, { title })),
-          gateway.call(PROVIDER, 'generateSummary', [messagesToUse], { label: 'regenerate summary' }).then(aiSummary => updateConversation(convId, { aiSummary })),
-          gateway.call(PROVIDER, 'generateTags', [messagesToUse], { label: 'regenerate tags' }).then(tags => updateConversation(convId, { tags })),
-        ])
+        // One request per chat for its title, summary and tags (C62).
+        const fields = fieldsFromDescription(await gateway.call(PROVIDER, 'generateMetadata', [messagesToUse], { label: 'regenerate title, summary and tags' }))
+        if (Object.keys(fields).length) await updateConversation(convId, fields)
       } catch (err) {
         if (import.meta.env.DEV) console.warn('regenerate failed for', convId, err)
       }

@@ -155,3 +155,19 @@ describe('what stays out of a prompt (stage 4)', () => {
     expect(promptPreview('more', { room: 'c1', keyed: false, source: 'Wikipedia', hiddenOut: 2 }).says.also).toBeUndefined()
   })
 })
+
+describe('naming the one request after a first answer (C62)', () => {
+  const haiku = { inputPerMillion: 0.25, outputPerMillion: 1.25 }
+  const target = { room: null, keyed: true, provider: 'Anthropic', perMillion: 3 }
+
+  it('names it, and what it costs at most, on a chat\'s first prompt', () => {
+    const p = promptPreview('What is a barn owl?', { ...target, describe: { price: haiku } })
+    expect(p.says.also).toEqual([{ message: 'promptDescribeCheap', values: { cost: 0.01 } }])
+    expect(say(i18n, p.says.also[0].message, p.says.also[0].values)).toBe('After the answer, one short request for its title, summary and tags, under $0.01')
+    expect(promptPreview('x', { ...target, describe: { price: null } }).says.also[0].message).toBe('promptDescribeUnpriced')
+  })
+
+  it('says nothing of it when it will not go', () => {
+    expect(promptPreview('x', { ...target, describe: null }).says.also).toBeUndefined()
+  })
+})

@@ -16,7 +16,7 @@
 
 import { enterLine } from '../commands/registry'
 import { plan, ARRANGEMENT_VERBS, NEW_ROOM, roomArrangementId } from '../shell/arrangement'
-import { CHARS_PER_TOKEN, inputCost } from '../shell/estimate'
+import { CHARS_PER_TOKEN, inputCost, describeCost } from '../shell/estimate'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
@@ -90,13 +90,16 @@ const CENT = 0.01
  * What Enter would do with a prompt (stage 4; C83).
  * @param {string} text the prompt as typed
  * @param {{ room?: string|null, streaming?: boolean, keyed?: boolean|null, provider?: string, source?: string,
- *   historyChars?: number, systemChars?: number, perMillion?: number|null, hiddenOut?: number }} target
+ *   historyChars?: number, systemChars?: number, perMillion?: number|null, hiddenOut?: number,
+ *   describe?: { price: object|null }|null }} target
  *   room: the chat the screen's room shows, null for an empty room, undefined
  *   when no room is on the screen; keyed: whether there is a key for the
  *   provider, null while that is being checked; provider and source: names
  *   from the list; historyChars and systemChars: what would go along;
  *   perMillion: the model's input price; hiddenOut: messages of the chat
- *   that stay out, hidden or being deleted
+ *   that stay out, hidden or being deleted; describe: set when the first
+ *   answer will be followed by the one request for its title, summary and
+ *   tags (C62), with the price of the model it goes to
  * @returns {{ ready: boolean, says: { message: string, values?: object }|null }}
  *   ready: whether Enter sends; says: the line's sentence, null for none
  */
@@ -111,8 +114,19 @@ export function promptPreview(text, target = {}) {
   const tokens = Math.ceil((prompt.length + (target.historyChars ?? 0) + (target.systemChars ?? 0)) / CHARS_PER_TOKEN)
   const cost = inputCost(tokens, target.perMillion)
   const values = { provider: target.provider, tokens }
+  const also = []
+  // After a chat's first answer, one request for its title, summary and
+  // tags, unless turned off in Settings (C62).
+  if (target.describe) {
+    const extra = describeCost(prompt.length, target.describe.price)
+    also.push(extra == null
+      ? { message: 'promptDescribeUnpriced' }
+      : extra < CENT
+        ? { message: 'promptDescribeCheap', values: { cost: CENT } }
+        : { message: 'promptDescribe', values: { cost: extra } })
+  }
   // Hidden messages, and messages being deleted, stay out of what is sent.
-  const also = target.hiddenOut > 0 ? [{ message: 'promptHiddenOut', values: { count: target.hiddenOut } }] : []
+  if (target.hiddenOut > 0) also.push({ message: 'promptHiddenOut', values: { count: target.hiddenOut } })
   const says = cost == null
     ? { message: 'promptSendUnpriced', values }
     : cost < CENT

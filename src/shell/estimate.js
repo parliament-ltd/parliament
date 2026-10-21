@@ -26,3 +26,24 @@ export function inputCost(tokens, perMillion) {
 /** The characters of what would go along with a prompt: the messages with text. */
 export const historyChars = (messages = []) =>
   messages.reduce((n, m) => n + (typeof m?.content === 'string' ? m.content.length : 0), 0)
+
+// The one request after a chat's first answer (C62): the first prompt and
+// answer, each cut to 500 characters, with its instructions, and a short
+// answer back. Worked out before the answer exists, so the answer counts at
+// its most, 500 characters.
+const DESCRIBE_SIDE_CHARS = 500
+const DESCRIBE_INSTRUCTION_CHARS = 800
+const DESCRIBE_OUT_TOKENS = 200
+
+/**
+ * At most what that request costs, for a prompt of so many characters, at
+ * the price of the model it goes to; null when the price is not known.
+ * @param {number} promptChars
+ * @param {{ inputPerMillion?: number, outputPerMillion?: number }|null} price
+ */
+export function describeCost(promptChars, price) {
+  const input = Math.ceil((Math.min(promptChars, DESCRIBE_SIDE_CHARS) + DESCRIBE_SIDE_CHARS + DESCRIBE_INSTRUCTION_CHARS) / CHARS_PER_TOKEN)
+  const inCost = inputCost(input, price?.inputPerMillion)
+  const outCost = inputCost(DESCRIBE_OUT_TOKENS, price?.outputPerMillion)
+  return inCost == null || outCost == null ? null : inCost + outCost
+}

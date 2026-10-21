@@ -75,6 +75,7 @@ const SETTINGS = Object.freeze({
   backupBannerDismissedAt: either(strOrNull(40), num(0, Number.MAX_SAFE_INTEGER)),
   installPromptDismissed: either(bool, str(40), num(0, Number.MAX_SAFE_INTEGER)),
   finishRepliesOnLeave: bool, // C109
+  describeNewChats: bool, // C62
 })
 
 // Settings named after something. `chat` names the chat in the key, so a
