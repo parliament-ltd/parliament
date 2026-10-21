@@ -17,7 +17,8 @@ import { boardEntry } from '../shell/boards'
 import { shipped, shippedFor, SHIPPED } from '../shell/arrangement'
 
 const STORE = 'arrangements'
-const BAR_PLACES = new Set(['top', 'bottom', 'left', 'center', 'right'])
+const BAR_PLACES = new Set(['top', 'bottom'])
+const BAR_SIDES = new Set(['left', 'center', 'right'])
 const SIDES = new Set(['left', 'right'])
 const ID = /^[a-z]+(?::[A-Za-z0-9_-]{1,128})?$/
 
@@ -54,7 +55,7 @@ export function cleanArrangement(record) {
     columns,
     popped,
     addressed: here.includes(record.addressed) ? record.addressed : columns[0][0],
-    bar: { at: BAR_PLACES.has(bar.at) ? bar.at : SHIPPED[shippedFor(record.id)].bar, popped: bar.popped === true },
+    bar: { at: BAR_PLACES.has(bar.at) ? bar.at : SHIPPED[shippedFor(record.id)].bar, side: BAR_SIDES.has(bar.side) ? bar.side : 'center', popped: bar.popped === true },
     resting: record.resting === 'search' || record.resting === 'prompt' ? record.resting : null,
     context,
   }

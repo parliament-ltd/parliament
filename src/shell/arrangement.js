@@ -16,7 +16,7 @@ import { boardEntry } from './boards'
 /**
  * @typedef {{ board: string, display: number|null, side: 'left'|'right'|null, from: number }} Popped
  * @typedef {{ id: string, columns: string[][], popped: Popped[], addressed: string,
- *   bar: { at: 'top'|'bottom'|'left'|'center'|'right', popped: boolean },
+ *   bar: { at: 'top'|'bottom', side: 'left'|'center'|'right', popped: boolean },
  *   resting: 'search'|'prompt'|null, context: Record<string, string|number> }} Arrangement
  * @typedef {{ message: string, values?: object }} Says
  * @typedef {{ next: Arrangement|null, says: Says }} Plan  next is null when Enter would do nothing
@@ -49,7 +49,7 @@ export function shipped(id, context = {}) {
     columns: base.columns.map((c) => [...c]),
     popped: [],
     addressed: base.addressed,
-    bar: { at: base.bar, popped: false },
+    bar: { at: base.bar, side: 'center', popped: false },
     resting: base.resting,
     context: { ...context },
   }
@@ -64,8 +64,8 @@ const isPopped = (a, board) => a.popped.some((p) => p.board === board)
 const columnOf = (a, board) => a.columns.findIndex((c) => c.includes(board))
 const without = (columns, board) => columns.map((c) => c.filter((b) => b !== board)).filter((c) => c.length)
 const copy = (a) => ({ ...a, columns: a.columns.map((c) => [...c]), popped: a.popped.map((p) => ({ ...p })), bar: { ...a.bar }, context: { ...a.context } })
-const sameLayout = (x, y) => JSON.stringify([x.columns, x.popped, x.addressed, x.bar.at, x.bar.popped, x.resting])
-  === JSON.stringify([y.columns, y.popped, y.addressed, y.bar.at, y.bar.popped, y.resting])
+const sameLayout = (x, y) => JSON.stringify([x.columns, x.popped, x.addressed, x.bar.at, x.bar.side, x.bar.popped, x.resting])
+  === JSON.stringify([y.columns, y.popped, y.addressed, y.bar.at, y.bar.side, y.bar.popped, y.resting])
 const refuse = (message, values) => ({ next: null, says: { message, values } })
 const go = (next, message, values) => ({ next, says: { message, values } })
 
@@ -163,10 +163,15 @@ export function planPopBar(a, popped) {
   return go({ ...copy(a), bar: { ...a.bar, popped } }, popped ? 'popCommand' : 'popBackCommand')
 }
 
-/** bar:<place>. Where the bar sits on the page. */
-export function planBar(a, at) {
-  if (a.bar.at === at && !a.bar.popped) return refuse('barThere', { place: at })
-  return go({ ...copy(a), bar: { at, popped: false } }, 'barMove', { place: at })
+/**
+ * bar:<place>. Where the bar sits on the page: top or bottom, and on the
+ * left, in the centre or on the right, which is also where its hexagon lands
+ * (bar reference, 9 October; C43, C106). A popped bar comes back to the page.
+ */
+export function planBar(a, place) {
+  const axis = place === 'top' || place === 'bottom' ? 'at' : 'side'
+  if (a.bar[axis] === place && !a.bar.popped) return refuse('barThere', { place })
+  return go({ ...copy(a), bar: { ...a.bar, [axis]: place, popped: false } }, 'barMove', { place })
 }
 
 /** reset:. This arrangement as shipped, its windows closed; what boards show stays. */

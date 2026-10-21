@@ -35,7 +35,7 @@ describe('reading an arrangement back', () => {
       columns: [['almanac'], ['collection']],
       popped: [{ board: 'library', display: 2, side: null, from: 2 }],
       addressed: 'almanac',
-      bar: { at: 'top', popped: false },
+      bar: { at: 'top', side: 'center', popped: false },
       resting: null,
       context: { collection: 'Q2' },
     })

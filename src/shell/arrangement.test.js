@@ -44,7 +44,7 @@ describe('the boards registry', () => {
 
 describe('shipped arrangements', () => {
   it('each starts from its suggested default', () => {
-    expect(almanac()).toMatchObject({ columns: [['almanac'], ['collection']], addressed: 'almanac', bar: { at: 'top', popped: false }, popped: [] })
+    expect(almanac()).toMatchObject({ columns: [['almanac'], ['collection']], addressed: 'almanac', bar: { at: 'top', side: 'center', popped: false }, popped: [] })
     expect(shipped('lab').columns).toEqual([['library'], ['canvas'], ['blocks']])
     expect(shipped('room:mode_1', { room: 'mode_1' })).toMatchObject({ id: 'room:mode_1', columns: [['room']], bar: { at: 'bottom' }, context: { room: 'mode_1' } })
     expect(shippedFor('room:mode_1')).toBe('room')
@@ -174,7 +174,7 @@ describe('pop: and pop:back', () => {
 
   it('pop:command puts the bar in its own window, and pop:back command brings it back', () => {
     const a = keep(planPopBar(almanac(), true))
-    expect(a.bar).toEqual({ at: 'top', popped: true })
+    expect(a.bar).toEqual({ at: 'top', side: 'center', popped: true })
     expect(planPopBar(a, true)).toMatchObject({ next: null, says: { message: 'barPoppedAlready' } })
     expect(keep(planPopBar(a, false)).bar.popped).toBe(false)
   })
@@ -182,7 +182,10 @@ describe('pop: and pop:back', () => {
 
 describe('bar: and reset:', () => {
   it('bar: moves the bar on the page, and brings it back from a window', () => {
-    expect(keep(planBar(almanac(), 'bottom')).bar).toEqual({ at: 'bottom', popped: false })
+    expect(keep(planBar(almanac(), 'bottom')).bar).toEqual({ at: 'bottom', side: 'center', popped: false })
+    // Left and right are the other axis: where the field and its hexagon sit (C106).
+    expect(keep(planBar(keep(planBar(almanac(), 'bottom')), 'left')).bar).toEqual({ at: 'bottom', side: 'left', popped: false })
+    expect(planBar(almanac(), 'center')).toMatchObject({ next: null, says: { message: 'barThere', values: { place: 'center' } } })
     expect(planBar(almanac(), 'top')).toMatchObject({ next: null, says: { message: 'barThere', values: { place: 'top' } } })
     expect(keep(planBar(keep(planPopBar(almanac(), true)), 'top')).bar.popped).toBe(false)
   })
