@@ -7,6 +7,8 @@ import { createGateway } from './gateway'
 import { getProvider } from '../providers'
 import { executeClientTool } from '../providers/anthropic'
 import { saveApiKey, loadApiKey, deleteApiKey, hasSavedKey } from '../lib/crypto'
+import { createSource } from './sources'
+import wikipediaManifest from './sources/wikipedia.json'
 
 export { Refused } from './gateway'
 export { destination, shipped } from './list'
@@ -19,11 +21,18 @@ export const keys = createKeyring({
 })
 
 // The code behind each shipped entry. Models come from src/providers;
-// sources join as they ship (Wikipedia next, in this stage).
+// sources are manifests read by one runner (sources.js), each allowed only
+// the origins the list gives it.
+const MANIFESTS = { wikipedia: wikipediaManifest }
+const sources = new Map()
 function implementation(id) {
   const d = destination(id)
   if (!d) return null
   if (d.kind === 'model') return getProvider(id)
+  if (d.kind === 'source' && MANIFESTS[id]) {
+    if (!sources.has(id)) sources.set(id, createSource(MANIFESTS[id], { origins: d.origins, fetch: (...a) => window.fetch(...a) }))
+    return sources.get(id)
+  }
   return null
 }
 

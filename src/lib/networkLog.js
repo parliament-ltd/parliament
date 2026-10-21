@@ -25,10 +25,13 @@ function pushEntry(entry) {
   emit()
 }
 
+// Where a request went, without its query: a search sent to a source, or a
+// provider that puts a key in the address, never reaches the log (request
+// path audit, risk 8; stage 4).
 function hostAndPath(url) {
   try {
     const u = new URL(url, window.location.href)
-    return { host: u.host, path: u.pathname + (u.search || '') }
+    return { host: u.host, path: u.pathname }
   } catch {
     return { host: 'unknown', path: String(url) }
   }

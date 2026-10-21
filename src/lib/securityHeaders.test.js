@@ -20,10 +20,18 @@ describe('security headers', () => {
     expect(headersFromNetlifyToml()).toEqual(SECURITY_HEADERS)
   })
 
-  it('never allow a wildcard host or port', () => {
+  // No wildcard host or port, except one ruled by name: every language
+  // edition of Wikipedia (C110, 20 October). A new wildcard needs a ruling
+  // and a change here.
+  const RULED_WILDCARDS = new Set(['https://*.wikipedia.org'])
+
+  it('never allow a wildcard host or port, except the one ruled', () => {
     for (const value of Object.values(SECURITY_HEADERS)) {
-      expect(value).not.toMatch(/https?:\/\/[^\s;]*\*/)
+      for (const wild of value.match(/https?:\/\/[^\s;]*\*[^\s;]*/g) ?? []) {
+        expect(RULED_WILDCARDS.has(wild), wild).toBe(true)
+      }
       expect(value).not.toMatch(/:\*/)
+      expect(value).not.toMatch(/(^|[\s;])\*([\s;]|$)/)
     }
   })
 

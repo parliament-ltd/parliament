@@ -1,0 +1,41 @@
+{
+  "id": "wikipedia",
+  "name": "Wikipedia",
+  "licence": {
+    "name": "CC BY-SA 4.0",
+    "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  "language": {
+    "pattern": "^[a-z]{2,3}$",
+    "fallback": "en"
+  },
+  "request": {
+    "url": "https://{lang}.wikipedia.org/w/api.php",
+    "query": {
+      "action": "query",
+      "format": "json",
+      "formatversion": "2",
+      "origin": "*",
+      "generator": "search",
+      "gsrsearch": "{q}",
+      "gsrlimit": "1",
+      "prop": "extracts|info|revisions",
+      "exintro": "1",
+      "explaintext": "1",
+      "inprop": "url",
+      "rvprop": "ids|timestamp"
+    }
+  },
+  "result": {
+    "list": "query.pages",
+    "title": "title",
+    "text": "extract",
+    "url": "fullurl",
+    "revision": "revisions.0.revid",
+    "revisedAt": "revisions.0.timestamp"
+  },
+  "limits": {
+    "queryChars": 300,
+    "textChars": 6000
+  }
+}

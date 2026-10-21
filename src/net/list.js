@@ -21,7 +21,8 @@ export const DESTINATIONS = Object.freeze([
   { id: 'mistral', kind: 'model', name: 'Mistral', origins: ['https://api.mistral.ai'], key: true, ships: false, stage: 7 },
   // On this machine, by its exact port (CLAUDE.md, hard constraints).
   { id: 'ollama', kind: 'local', name: 'Ollama', origins: ['http://localhost:11434'], key: false, ships: false, stage: 7 },
-  { id: 'wikipedia', kind: 'source', name: 'Wikipedia', origins: ['https://*.wikipedia.org'], key: false, ships: false, stage: 4, licence: 'CC BY-SA 4.0' },
+  // Every language edition, so answers come from the person's language (C110).
+  { id: 'wikipedia', kind: 'source', name: 'Wikipedia', origins: ['https://*.wikipedia.org'], key: false, ships: true, stage: 4, licence: 'CC BY-SA 4.0' },
   { id: 'hackernews', kind: 'source', name: 'Hacker News', origins: ['https://hn.algolia.com'], key: false, ships: false, stage: 7 },
   { id: 'openalex', kind: 'source', name: 'OpenAlex', origins: ['https://api.openalex.org'], key: false, ships: false, stage: 7, licence: 'CC0' },
 ].map((d) => Object.freeze({ licence: null, ...d, origins: Object.freeze([...d.origins]) })))
