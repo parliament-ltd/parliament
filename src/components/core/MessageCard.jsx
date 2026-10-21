@@ -323,6 +323,8 @@ export default function MessageCard({
         <div className="px-4 py-4 overflow-hidden relative" ref={contentRef} onMouseUp={handleMouseUp}>
           <div className="text-sm leading-relaxed" style={{ color: 'var(--p-text-primary)' }}>
             {renderContent}
+            {/* A source that found nothing says so where its answer would be. */}
+            {source?.found === false && <SourceLine source={source} />}
           </div>
 
           {/* PR-18e: attachment chips on user messages — a memory aid
@@ -430,7 +432,7 @@ export default function MessageCard({
 
       {/* Where an answer from a source came from: the page, its revision and
           its licence (stage 4). Words come from the copy table. */}
-      {source && <SourceLine source={source} />}
+      {source && source.found !== false && <SourceLine source={source} />}
 
       {/* Ghost text continue button */}
       {isGhostText && content && onContinue && (
@@ -455,7 +457,7 @@ function SourceLine({ source }) {
   const { i18n } = useLingui()
   const name = source.name || source.id
   if (source.found === false) {
-    return <p className="mt-2 text-xs italic text-[var(--p-text-secondary)]">{i18n._(COPY.chat.sourceNothing, { source: name })}</p>
+    return <p className="italic text-[var(--p-text-secondary)]">{i18n._(COPY.chat.sourceNothing, { source: name })}</p>
   }
   const link = (href, text) => (href && /^https:\/\//.test(href)
     ? <a href={href} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{text}</a>
