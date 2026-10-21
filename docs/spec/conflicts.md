@@ -1023,6 +1023,45 @@ Found while splitting stage 5 into pieces. The documents: `welcome-spec-decision
 - A term takes the highlight's pink (it is today's highlight, C57); a quote, which v30 does not colour, is ink.
 - **Suggestion:** keep as built. A ruling on dockets changes one line in `almanacRows.js`.
 
+## Part 10. The security and privacy notes of 21 October (added 21 October 2026)
+
+Stefan's notes from a planning conversation, `parliament-security-privacy.md` (not in the repo), checked against the specs, the rulings and the code. Most of it agrees or is already built; these are the points that do not.
+
+**Contradicts the repo**
+- **Components "in the same context as the app", tiers, a consent flow, "community components", Phase 1 and 3** (§0, §1.2, §2, §6.5, §7). These are the V2 design. `mode-workshop-architecture.md` was never in the repo. The rule now is that other people's code does not run inside Parliament (CLAUDE.md; plan rule 9, ruled 11 October), and if runtime blocks ever come they go in a sandboxed frame on another origin (plan-brief, security audit). §1.2's second prompt ("Allow it to drive a model call?") meets plan rule 1, "Enter is the only confirmation"; its aim already holds, since outside text can never run a command or steer a run.
+- **The key vault on `keys.parliament.ltd`** (§2 step 1). It keeps the promise of no backend and of each key going only to its provider, but it meets four hard rules: the main site forbids frames (`frame-src 'none'`, `X-Frame-Options: DENY`); a host is added only with its provider or source; cross-window messages carry ids and signals, never content (the vault would carry prompts and replies); and the gateway and its network log would split across two sites. For it to help, the key panel of stage 5 piece 5 must live inside the vault: a password field on the main page can be read by any script there. It stops a key being copied, not misused through the vault.
+- **In-browser models** (§1.5 Prompt Guard, §4.1 "Patterns + names"). They need `'wasm-unsafe-eval'` in the strict CSP and a host to fetch weights from, both ruled out in writing by the audit unless reviewed. Through Ollama, already on the list, they need neither.
+- **"Brave, arXiv and others"** (§0). Only Wikipedia ships; Hacker News and OpenAlex come with stage 7. Brave is later (C28), and arXiv cannot be reached from a browser (C28).
+- **§1.4 "Convert HTML to plain text".** Sources already return plain text only; the plan says never to use a source's HTML.
+
+**Marked done in the notes, not in the repo**
+- §6.1's wording ("Your data never touches Parliament's servers") and §6.3's advice on extensions were written into `parliament-v2-brief.md`, which was never in the repo (C81). The wording also implies there are servers; the letter says "no servers and no accounts", and `privacy-copy-draft.md` names sources and local models too.
+
+**Corrections to the current state**
+- There is no "session only" mode keeping the key in sessionStorage. "Don't save" holds it in this tab's memory and removes any saved copy (stage 4, audit T4). Only the stale `SECURITY.md` still describes session-only.
+- Saved keys sit in their own database, not in settings; backups use an allowlist that never includes them.
+- The service worker waits for a reload and the update notice (it does not take over by itself), though a hostile deploy still runs on the next load.
+- No document has a training or retention table. Welcome §3 says the major APIs "do not train by default"; if Mistral's free tier trains, as the notes say, copy built on that line would be wrong.
+
+**Already built or planned:** sources kept out of model sends (C115); `img-src 'self' data:`; remote images never loaded, shown as links (T8); no `dangerouslySetInnerHTML` anywhere; links to web and mail only, opened with no opener; nothing fetched that is not on the list; keys out of backups; the backup password stretched further at stage 9; the unencrypted-backup warning at stage 9; the host's IP logs in the privacy draft; release checksums and two-factor at stage 15.
+
+**New work, and where it would sit**
+- Showing a link's full address before it opens: today the tooltip shows the host only. The shared Markdown component; small, could go with stage 6.
+- The source envelope (labelled blocks, JSON-wrapped, a system line, invisible characters stripped, a badge on injection phrases): stage 8, when an answer is brought into a prompt.
+- Training labels per provider, the Mistral checklist, retention badges: stage 7, on provider rows only, since copy names no provider in a sentence.
+- The privacy filter (§4.1, patterns only): stage 7 or 8, covering every request, the title request and the resend included, with the Enter line saying what was swapped out.
+- Local-only rooms: stage 7 (Ollama) and stage 13 (room settings); a new field in room files is a stored-data change.
+- Trusted Types, published hashes, downloadable builds, hardware keys, required review, tagged deploys: stage 15.
+- Lock Parliament (§6.2): encrypting chats is a second database upgrade after the one ruled "one schema upgrade", a new backup and restore path, and it meets the Almanac's indexes and search, docket runs under an idle lock, and "Web Crypto only" (passkeys use WebAuthn). Its own stage after stage 9.
+- A security review route (§6.6): the repository stays private until stage 15 (C71), which an NLnet review or published hashes would need open.
+
+**Questions (S1 to S5)**
+- **S1. The vault.** Decide before stage 5 piece 5 (the key panel). **Suggestion:** not now. Build piece 5 as planned through the key module, and take up the vault with stage 7 or 15 as its own scope review.
+- **S2. The V2 framing.** **Suggestion:** the repo's rules stand: no other people's code, Enter the only confirmation. The notes are corrected to match.
+- **S3. In-browser models.** **Suggestion:** none for now; the names filter and the classifier run through Ollama, with patterns in plain code.
+- **S4. Lock Parliament.** **Suggestion:** its own stage after stage 9, shown before it changes stored data.
+- **S5. The notes themselves.** **Suggestion:** a corrected copy goes into `docs/spec/` as `security-privacy-decisions.md`, so its approved parts are on record.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
