@@ -36,6 +36,22 @@ export const SHIPPED = Object.freeze({
 /** Which shipped arrangement an id comes from: 'room:mode_1' comes from 'room'. */
 export const shippedFor = (id) => String(id ?? '').split(':')[0]
 
+// A room's screen is named for the chat it is built around, `room:<chat
+// id>`; `room:new` is an empty room whose first prompt starts its chat.
+export const NEW_ROOM = 'room:new'
+export const roomArrangementId = (chatId) => `room:${chatId}`
+
+/**
+ * The chat a screen's room shows: its id, null for an empty room, or
+ * undefined when the screen is not a room.
+ */
+export function roomChat(id) {
+  const text = String(id ?? '')
+  if (shippedFor(text) !== 'room') return undefined
+  const chat = text.slice('room:'.length)
+  return chat && text !== NEW_ROOM ? chat : null
+}
+
 /**
  * A fresh copy of a shipped arrangement.
  * @param {string} id 'almanac', 'lab', 'room:<room id>' …

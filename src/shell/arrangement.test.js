@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, it, expect } from 'vitest'
 import { BOARDS, boardEntry, boardByTitle, strip } from './boards'
 import {
-  SHIPPED, shipped, shippedFor, restingMode, address, plan, ARRANGEMENT_VERBS,
+  SHIPPED, shipped, shippedFor, restingMode, address, plan, ARRANGEMENT_VERBS, NEW_ROOM, roomArrangementId, roomChat,
   planOpen, planClose, planMove, planSwap, planPop, planPopBack, planPopSide, planPopBar, planBar, planReset,
 } from './arrangement'
 import { enterLine } from '../commands/registry'
@@ -49,6 +49,16 @@ describe('shipped arrangements', () => {
     expect(shipped('room:mode_1', { room: 'mode_1' })).toMatchObject({ id: 'room:mode_1', columns: [['room']], bar: { at: 'bottom' }, context: { room: 'mode_1' } })
     expect(shippedFor('room:mode_1')).toBe('room')
     expect(() => shipped('nowhere')).toThrow()
+  })
+
+  it('name a room for its chat, and know an empty room (stage 4)', () => {
+    expect(roomArrangementId('c-1')).toBe('room:c-1')
+    expect(roomChat('room:c-1')).toBe('c-1')
+    expect(roomChat(NEW_ROOM)).toBeNull()
+    expect(roomChat('room:')).toBeNull()
+    expect(roomChat('almanac')).toBeUndefined()
+    expect(roomChat(undefined)).toBeUndefined()
+    expect(shipped(NEW_ROOM).columns).toEqual([['room']])
   })
 
   it('are fresh copies, so changing one leaves the default alone', () => {
