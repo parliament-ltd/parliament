@@ -24,8 +24,9 @@
   text-align: start;
 }
 .ch-shell *, .ch-shell *::before, .ch-shell *::after { box-sizing: border-box; }
-.ch-shell button { font: inherit; color: inherit; background: none; border: none; padding: 0; margin: 0; cursor: pointer; text-align: inherit; }
-.ch-shell :focus-visible { outline: var(--ch-focus); outline-offset: 2px; border-radius: 3px; }
+/* The chrome's own resets stop at a room, which draws itself (C64). */
+.ch-shell button:not(.ch-room *) { font: inherit; color: inherit; background: none; border: none; padding: 0; margin: 0; cursor: pointer; text-align: inherit; }
+.ch-shell :focus-visible:not(.ch-room *) { outline: var(--ch-focus); outline-offset: 2px; border-radius: 3px; }
 .ch-code { font: 600 11px var(--ch-mono); color: var(--ch-ink); }
 .ch-marg { font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); }
 
@@ -133,6 +134,28 @@
 .ch-mark path { fill: #fff; }
 .ch-enter { transition: opacity var(--ch-dur-fade); }
 .ch-enter.hide { opacity: 0; }
+
+/* Marginalia inside the prompt field: who answers here (bar reference;
+   stage 4). It sits before the quill, and hides in the other modes and
+   while the field is folded. */
+.ch-fmarg { position: relative; z-index: 2; display: none; flex-shrink: 0; padding-inline-start: 8px; margin-inline-end: 42px; white-space: nowrap; transition: opacity var(--ch-dur-fade); }
+.ch-field.prompt .ch-fmarg { display: block; }
+.ch-field.prompt.with-marg input { padding-inline-end: 6px; }
+/* The field draws the focus ring around itself; the input inside needs none. */
+.ch-shell .ch-field input:focus-visible { outline: none; }
+.ch-field.min .ch-fmarg { opacity: 0; pointer-events: none; }
+
+/* A room on the shell (stage 4). Inside .ch-room the room draws itself in
+   its own theme, set on this element and not on the page (C64): the room's
+   --p- colours, today's type, and the height its layout fills. The card
+   around it is chrome. */
+.ch-card.room { flex: none; }
+.ch-chead .ch-aside { margin-inline-start: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ch-shell { --room-chrome: 180px; }
+.ch-shell.bar-bottom { --room-chrome: 250px; }
+.ch-room { flex: none; height: max(480px, calc(100dvh - var(--room-chrome))); overflow: hidden; display: flex; flex-direction: column;
+  background: var(--p-bg-base); color: var(--p-text-primary); font: 400 16px/1.5 var(--font-sans, ui-sans-serif, system-ui, sans-serif); text-align: start; }
+.ch-room > * { flex: 1; min-height: 0; }
 
 /* A reply's text, as the bar reference sets it. */
 .ch-reply { font: 400 var(--ch-t-lead)/1.68 var(--ch-serif); color: var(--ch-ink); margin: 10px 0 0; outline: none; caret-color: var(--ch-ink); border-radius: 4px; }

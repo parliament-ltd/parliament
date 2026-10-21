@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
+import { useLingui } from '@lingui/react'
+import { COPY } from '../copy'
 import { fieldReducer, initialField, fieldValue } from '../shell/field'
 import { barKey, isTextField } from '../shell/keys'
 import { stepRecall } from '../lib/commandHistory'
 import { restingMode } from '../shell/arrangement'
 import { readField } from '../commands/parse'
 import { complete } from '../commands/registry'
-import { preview } from './preview'
+import { preview, promptPreview } from './preview'
 import Field from './Field'
 import EnterLine from './EnterLine'
 import Reference from './Reference'
@@ -21,16 +23,24 @@ import Reference from './Reference'
 // click or Cmd/Ctrl+K opens it; Escape folds it and puts the caret back in
 // the reply. Timers run on the clock of the window the bar is in.
 //
-// The bar plans; the shell runs. onRun gets the planned arrangement and
-// returns a promise of a notice key for the Enter line (say, a window the
-// browser would not open), or null.
+// The bar plans; the shell runs. onRun gets the planned arrangement, or the
+// screen alm: or sym: goes to, and returns a promise of a notice for the
+// Enter line (say, a window the browser would not open), or null.
+//
+// A prompt goes to the room the screen shows (stage 4). `prompt` is what
+// the shell knows about where it would go: the room, whether there is a
+// key, the names and the price. The Enter line says who receives it and
+// what it costs before Enter; onPrompt sends it, and answers at once
+// whether it went ({ refused } or { done }), then once it is answered
+// (done resolves to a notice, or null).
 
-export default function Bar({ arrangement, board, doc, lines, onRun, onFocusBoard, className, autoFocus = false, onTop = true }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true }) {
+  const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
   const [field, dispatch] = useReducer(fieldReducer, resting, initialField)
   const [reference, setReference] = useState(null) // { topic } while ? is open
-  const [notice, setNotice] = useState(null)
+  const [notice, setNotice] = useState(null) // a key of COPY.enter, or { message, values }
   const walk = useRef({ lines: [], index: -1, draft: '' })
   const input = useRef(null)
   const reply = useRef(null) // the reply being edited, to return the caret to
@@ -85,21 +95,43 @@ export default function Bar({ arrangement, board, doc, lines, onRun, onFocusBoar
   const folded = field.minimised
 
   const value = fieldValue(field)
-  const view = useMemo(() => preview(value, { mode: field.mode, arrangement: target }), [value, field.mode, target])
-  const says = notice ? { message: notice } : (view.says.message === 'popCommand' && !onTop ? { ...view.says, also: 'popOrdinary' } : view.says)
+  const view = useMemo(() => preview(value, { mode: field.mode, arrangement: target, screens }), [value, field.mode, target, screens])
+  const prompting = field.mode === 'prompt'
+  const promptView = useMemo(() => (prompting ? promptPreview(field.text.prompt, prompt) : null), [prompting, field.text.prompt, prompt])
+  const planned = prompting ? promptView.says : (view.says.message === 'popCommand' && !onTop ? { ...view.says, also: 'popOrdinary' } : view.says)
+  const says = notice ? (typeof notice === 'string' ? { message: notice } : notice) : planned
+
+  // Who answers a prompt here, inside the prompt field.
+  let marginalia = null
+  if (prompt && prompt.room !== undefined && prompt.keyed != null) {
+    marginalia = prompt.keyed
+      ? i18n._(COPY.field.answeredBy, { model: prompt.model })
+      : i18n._(COPY.field.answeredFrom, { source: prompt.source })
+  }
+  const room = prompt && prompt.room !== undefined ? { chat: prompt.chat ?? null } : undefined
+
+  async function send() {
+    if (!promptView?.ready || !onPrompt) return
+    const out = await onPrompt(field.text.prompt.trim(), prompt)
+    if (out?.refused) { setNotice(out.refused); return }
+    dispatch({ type: 'sent' })
+    const failed = await out?.done
+    if (failed) setNotice(failed)
+  }
 
   async function enter() {
+    if (prompting) { await send(); return }
     if (field.mode !== 'command') return
-    const { answer, next } = view
+    const { answer, next, go } = view
     if (answer.state === 'help') {
       setReference({ topic: answer.values?.verb ? answer.values.verb.replace(/:$/, '') : null })
       dispatch({ type: 'ran' })
       return
     }
     if (answer.fill) { dispatch({ type: 'input', value: answer.fill }); return }
-    if (!next) return
+    if (!next && !go) return
     const body = readField(value, field.mode).body
-    const refused = await onRun(next, body)
+    const refused = await onRun(next, body, go)
     if (refused) { setNotice(refused); return }
     setReference(null)
     walk.current = { lines, index: -1, draft: '' }
@@ -151,6 +183,7 @@ export default function Bar({ arrangement, board, doc, lines, onRun, onFocusBoar
           state={field}
           folded={folded}
           win={win}
+          marginalia={marginalia}
           onOpen={() => { dispatch({ type: 'open' }); input.current?.focus() }}
           onHover={() => { if (field.minimised || field.peek) hoverAfter(140, 'hover') }}
           onLeave={() => { if (field.minimised || field.peek) hoverAfter(600, 'leave') }}
@@ -160,7 +193,7 @@ export default function Bar({ arrangement, board, doc, lines, onRun, onFocusBoar
           onBlur={() => dispatch({ type: 'blur' })}
         />
         </div>
-        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} addressed={board} />
+        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} addressed={board} room={room} />
         {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
       </div>
     </div>

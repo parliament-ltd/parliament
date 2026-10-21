@@ -110,11 +110,19 @@ msgid "count.steps"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.almHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.aloneErase"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.aloneSpends"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.aloneSwitch"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -170,6 +178,19 @@ msgstr ""
 msgid "enter.filters"
 msgstr ""
 
+#. {board} is the Almanac, from COPY.boards
+#. js-lingui-explicit-id
+msgid "enter.goAlmanac"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.goNewRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.goRoom"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.help"
 msgstr ""
@@ -180,6 +201,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.key"
+msgstr ""
+
+#. {board} is Settings, from COPY.boards
+#. js-lingui-explicit-id
+msgid "enter.keyRefused"
 msgstr ""
 
 #. While the new shell is behind its flag
@@ -205,6 +231,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.moveThere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.newRoomHere"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -289,7 +319,41 @@ msgid "enter.popSideThere"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "enter.promptLater"
+msgid "enter.promptBusy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptChanged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptChecking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptNoRoom"
+msgstr ""
+
+#. A local estimate: nothing is sent to count (C83)
+#. js-lingui-explicit-id
+msgid "enter.promptSend"
+msgstr ""
+
+#. {cost} is the smallest amount shown, a cent
+#. js-lingui-explicit-id
+msgid "enter.promptSendCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptSendUnpriced"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptSource"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -331,12 +395,24 @@ msgid "enter.retiredInstead"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.roomHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.searchLater"
 msgstr ""
 
 #. {verbs} lists the commands in the order they run; one that fails stops the rest
 #. js-lingui-explicit-id
 msgid "enter.sequence"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sourceRefused"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sourceUnreachable"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -361,12 +437,33 @@ msgstr ""
 msgid "enter.target"
 msgstr ""
 
+#. The head of the Enter line in a room: the chat's number
+#. js-lingui-explicit-id
+msgid "enter.targetChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.targetNewRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tooMany"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.unknown"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.unknownHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.answeredBy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.answeredFrom"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -499,6 +596,22 @@ msgstr ""
 #. The bar's search mode
 #. js-lingui-explicit-id
 msgid "mode.search"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "room.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "room.newTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "room.notFound"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "room.unavailable"
 msgstr ""
 
 #. Marginalia on the board the navy rule is on

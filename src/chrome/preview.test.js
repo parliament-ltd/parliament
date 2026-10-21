@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { setupI18n } from '@lingui/core'
-import { preview, BUILT } from './preview'
+import { preview, promptPreview, BUILT } from './preview'
 import { say } from './say'
 import { shipped } from '../shell/arrangement'
 import { messages as en } from '../locales/en/messages.mjs'
@@ -58,5 +58,90 @@ describe('what Enter would do', () => {
   it('names where a verb works', () => {
     const p = preview('>type:chat', { mode: 'command', arrangement: shipped('settings') })
     expect(say(i18n, p.says.message, p.says.values)).toBe('type: works on Almanac and Collection')
+  })
+})
+
+describe('going to another screen (C95)', () => {
+  const room = (id) => shipped(`room:${id}`)
+  const at = (value, a, screens) => {
+    const p = preview(value, { mode: 'command', arrangement: a, screens })
+    return { ...p, text: say(i18n, p.says.message, p.says.values) }
+  }
+
+  it('alm: goes to the Almanac, from anywhere but the Almanac', () => {
+    expect(BUILT.has('alm')).toBe(true)
+    const p = at('>alm:', room('c1'))
+    expect(p.text).toBe('Enter goes to Almanac')
+    expect(p.go).toEqual({ id: 'almanac', context: {} })
+    expect(p.next).toBeNull()
+    const here = at('>alm:', almanac())
+    expect(here.text).toBe('You are on Almanac already')
+    expect(here.go).toBeNull()
+  })
+
+  it('sym: goes back to the last room, naming its chat on the strip', () => {
+    const screens = { lastRoom: { id: 'c1', num: 202 } }
+    const p = at('>sym:', almanac(), screens)
+    expect(p.text).toBe('Enter goes back to the last room')
+    expect(p.go).toEqual({ id: 'room:c1', context: { room: 202 } })
+    expect(at('>sym:', room('c1'), screens).text).toBe('This is the last room already')
+    expect(at('>sym:', room('c2'), screens).go.id).toBe('room:c1')
+  })
+
+  it('sym: with no chat yet opens an empty room', () => {
+    const p = at('>sym:', almanac(), { lastRoom: null })
+    expect(p.text).toBe('Enter opens an empty room. Its first prompt starts it')
+    expect(p.go).toEqual({ id: 'room:new', context: {} })
+    expect(at('>sym:', shipped('room:new')).text).toBe('This room is empty. Its first prompt starts it')
+  })
+
+  it('a switch runs on a line of its own; a room by name waits for name:', () => {
+    expect(at('>alm: bar:bottom', room('c1')).text).toBe('alm: goes to another screen, so it runs on a line of its own')
+    expect(at('>bar:bottom sym:', almanac()).text).toBe('sym: goes to another screen, so it runs on a line of its own')
+    expect(at('>sym:"Barn owls"', almanac()).text).toBe('sym: is not built yet')
+  })
+})
+
+describe('what Enter does with a prompt (stage 4; C83)', () => {
+  const line = (text, target) => {
+    const p = promptPreview(text, target)
+    return { ...p, text: p.says ? say(i18n, p.says.message, p.says.values) : null }
+  }
+  const room = { room: 'c1', streaming: false, provider: 'Anthropic', source: 'Wikipedia', historyChars: 0, systemChars: 0, perMillion: 3 }
+
+  it('needs a room on the screen', () => {
+    const p = line('hello', { room: undefined })
+    expect(p.ready).toBe(false)
+    expect(p.text).toBe('Prompts go to a room. sym: opens one')
+  })
+
+  it('without a key, asks the source and says it costs nothing', () => {
+    const p = line('barn owl', { ...room, keyed: false })
+    expect(p.ready).toBe(true)
+    expect(p.text).toBe('Enter asks Wikipedia, which needs no key and costs nothing')
+  })
+
+  it('with a key, names the provider, a local estimate of the tokens and the cost', () => {
+    const cheap = line('barn owl', { ...room, keyed: true })
+    expect(cheap.text).toBe('Enter sends to Anthropic, about 2 tokens, under $0.01 to send')
+    const long = line('x', { ...room, keyed: true, historyChars: 40_000 - 1 })
+    expect(long.text).toBe('Enter sends to Anthropic, about 10,000 tokens, $0.03 to send')
+    const one = line('owl', { ...room, keyed: true, perMillion: null })
+    expect(one.text).toBe('Enter sends to Anthropic, about 1 token')
+  })
+
+  it('counts what goes along: the chat and the standing instructions', () => {
+    const p = promptPreview('abcd', { ...room, keyed: true, historyChars: 8, systemChars: 4 })
+    expect(p.says.values.tokens).toBe(4)
+  })
+
+  it('waits while a reply arrives, while the key is looked for, and for words', () => {
+    expect(line('more', { ...room, keyed: true, streaming: true }).text).toBe('A reply is still arriving here. Send once it is done')
+    expect(line('more', { ...room, keyed: null }).ready).toBe(false)
+    expect(line('   ', { ...room, keyed: false })).toMatchObject({ ready: false, says: null })
+  })
+
+  it('works in an empty room too', () => {
+    expect(line('barn owl', { ...room, room: null, keyed: false }).ready).toBe(true)
   })
 })

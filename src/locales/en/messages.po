@@ -110,12 +110,20 @@ msgid "count.steps"
 msgstr "{count, plural, one {# step} other {# steps}}"
 
 #. js-lingui-explicit-id
+msgid "enter.almHere"
+msgstr "You are on {board} already"
+
+#. js-lingui-explicit-id
 msgid "enter.aloneErase"
 msgstr "{verb} runs on a line of its own, so it is plain what goes for good"
 
 #. js-lingui-explicit-id
 msgid "enter.aloneSpends"
 msgstr "{verb} runs on a line of its own, so its Enter line can name who receives it and what it costs"
+
+#. js-lingui-explicit-id
+msgid "enter.aloneSwitch"
+msgstr "{verb} goes to another screen, so it runs on a line of its own"
 
 #. js-lingui-explicit-id
 msgid "enter.barMove"
@@ -170,6 +178,19 @@ msgstr "To remove something for good, use erase:. Enter writes it in"
 msgid "enter.filters"
 msgstr "{count, plural, one {Enter applies # filter} other {Enter applies # filters}}"
 
+#. {board} is the Almanac, from COPY.boards
+#. js-lingui-explicit-id
+msgid "enter.goAlmanac"
+msgstr "Enter goes to {board}"
+
+#. js-lingui-explicit-id
+msgid "enter.goNewRoom"
+msgstr "Enter opens an empty room. Its first prompt starts it"
+
+#. js-lingui-explicit-id
+msgid "enter.goRoom"
+msgstr "Enter goes back to the last room"
+
 #. js-lingui-explicit-id
 msgid "enter.help"
 msgstr "Enter shows every command that works here"
@@ -181,6 +202,11 @@ msgstr "Enter shows how {verb} works"
 #. js-lingui-explicit-id
 msgid "enter.key"
 msgstr "No keys in the command line, for security. Delete it, and api: opens the key field"
+
+#. {board} is Settings, from COPY.boards
+#. js-lingui-explicit-id
+msgid "enter.keyRefused"
+msgstr "The key was refused. Update it in {board}, then send again"
 
 #. While the new shell is behind its flag
 #. js-lingui-explicit-id
@@ -206,6 +232,10 @@ msgstr "{board} is in its own window. pop:back brings it back first"
 #. js-lingui-explicit-id
 msgid "enter.moveThere"
 msgstr "{place, select, left {{board} is on the left already} right {{board} is on the right already} other {{board} is in the middle already}}"
+
+#. js-lingui-explicit-id
+msgid "enter.newRoomHere"
+msgstr "This room is empty. Its first prompt starts it"
 
 #. js-lingui-explicit-id
 msgid "enter.noMinus"
@@ -289,8 +319,42 @@ msgid "enter.popSideThere"
 msgstr "{side, select, left {The window of {board} is on the left already} other {The window of {board} is on the right already}}"
 
 #. js-lingui-explicit-id
-msgid "enter.promptLater"
-msgstr "Sending a prompt is not built yet"
+msgid "enter.promptBusy"
+msgstr "A reply is still arriving here. Send once it is done"
+
+#. js-lingui-explicit-id
+msgid "enter.promptChanged"
+msgstr "Where prompts go has changed. Read this line again before you send"
+
+#. js-lingui-explicit-id
+msgid "enter.promptChecking"
+msgstr "Looking for a key on this device"
+
+#. js-lingui-explicit-id
+msgid "enter.promptFailed"
+msgstr "The prompt did not go through. Try again"
+
+#. js-lingui-explicit-id
+msgid "enter.promptNoRoom"
+msgstr "Prompts go to a room. sym: opens one"
+
+#. A local estimate: nothing is sent to count (C83)
+#. js-lingui-explicit-id
+msgid "enter.promptSend"
+msgstr "{tokens, plural, one {Enter sends to {provider}, about # token, {cost} to send} other {Enter sends to {provider}, about # tokens, {cost} to send}}"
+
+#. {cost} is the smallest amount shown, a cent
+#. js-lingui-explicit-id
+msgid "enter.promptSendCheap"
+msgstr "{tokens, plural, one {Enter sends to {provider}, about # token, under {cost} to send} other {Enter sends to {provider}, about # tokens, under {cost} to send}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptSendUnpriced"
+msgstr "{tokens, plural, one {Enter sends to {provider}, about # token} other {Enter sends to {provider}, about # tokens}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptSource"
+msgstr "Enter asks {source}, which needs no key and costs nothing"
 
 #. js-lingui-explicit-id
 msgid "enter.ready"
@@ -331,6 +395,10 @@ msgid "enter.retiredInstead"
 msgstr "{verb} is no longer a command. Use {instead}"
 
 #. js-lingui-explicit-id
+msgid "enter.roomHere"
+msgstr "This is the last room already"
+
+#. js-lingui-explicit-id
 msgid "enter.searchLater"
 msgstr "Search is not built yet"
 
@@ -338,6 +406,14 @@ msgstr "Search is not built yet"
 #. js-lingui-explicit-id
 msgid "enter.sequence"
 msgstr "{count, plural, one {Enter runs # command: {verbs}} other {Enter runs # commands in turn: {verbs}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.sourceRefused"
+msgstr "{source} did not answer. Try again in a moment"
+
+#. js-lingui-explicit-id
+msgid "enter.sourceUnreachable"
+msgstr "{source} could not be reached. Check the connection, then try again"
 
 #. js-lingui-explicit-id
 msgid "enter.swapBoards"
@@ -361,6 +437,19 @@ msgstr "{verb} takes {words}"
 msgid "enter.target"
 msgstr "→ {board}"
 
+#. The head of the Enter line in a room: the chat's number
+#. js-lingui-explicit-id
+msgid "enter.targetChat"
+msgstr "→ {chat}"
+
+#. js-lingui-explicit-id
+msgid "enter.targetNewRoom"
+msgstr "→ a new room"
+
+#. js-lingui-explicit-id
+msgid "enter.tooMany"
+msgstr "Too many requests for now. Wait a moment, then send again"
+
 #. js-lingui-explicit-id
 msgid "enter.unknown"
 msgstr "No command called {verb}. Type ? for every command"
@@ -368,6 +457,14 @@ msgstr "No command called {verb}. Type ? for every command"
 #. js-lingui-explicit-id
 msgid "enter.unknownHelp"
 msgstr "No command called {verb}. Enter shows every command"
+
+#. js-lingui-explicit-id
+msgid "field.answeredBy"
+msgstr "answered by {model}"
+
+#. js-lingui-explicit-id
+msgid "field.answeredFrom"
+msgstr "answered from {source}"
 
 #. js-lingui-explicit-id
 msgid "group.building"
@@ -500,6 +597,22 @@ msgstr "Prompt"
 #. js-lingui-explicit-id
 msgid "mode.search"
 msgstr "Search"
+
+#. js-lingui-explicit-id
+msgid "room.empty"
+msgstr "An empty room. Its first prompt, written in the bar, starts its chat."
+
+#. js-lingui-explicit-id
+msgid "room.newTitle"
+msgstr "New room"
+
+#. js-lingui-explicit-id
+msgid "room.notFound"
+msgstr "This chat could not be found. It may have been removed."
+
+#. js-lingui-explicit-id
+msgid "room.unavailable"
+msgstr "This room could not be drawn. Its chat is kept as it was."
 
 #. Marginalia on the board the navy rule is on
 #. js-lingui-explicit-id

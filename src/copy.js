@@ -152,7 +152,57 @@ export const COPY = {
     restingPrompt: /*i18n*/ { id: 'enter.restingPrompt', message: 'p> for a prompt' },
     restingHelp: /*i18n*/ { id: 'enter.restingHelp', message: '? every command' },
     searchLater: /*i18n*/ { id: 'enter.searchLater', message: 'Search is not built yet' },
-    promptLater: /*i18n*/ { id: 'enter.promptLater', message: 'Sending a prompt is not built yet' },
+    // Going to another screen: alm: and sym: (C95, C102).
+    goAlmanac: /*i18n*/ { id: 'enter.goAlmanac', message: 'Enter goes to {board}', comment: '{board} is the Almanac, from COPY.boards' },
+    almHere: /*i18n*/ { id: 'enter.almHere', message: 'You are on {board} already' },
+    goRoom: /*i18n*/ { id: 'enter.goRoom', message: 'Enter goes back to the last room' },
+    roomHere: /*i18n*/ { id: 'enter.roomHere', message: 'This is the last room already' },
+    goNewRoom: /*i18n*/ { id: 'enter.goNewRoom', message: 'Enter opens an empty room. Its first prompt starts it' },
+    newRoomHere: /*i18n*/ { id: 'enter.newRoomHere', message: 'This room is empty. Its first prompt starts it' },
+    aloneSwitch: /*i18n*/ { id: 'enter.aloneSwitch', message: '{verb} goes to another screen, so it runs on a line of its own' },
+    // A prompt (stage 4; C83). {provider} and {source} are names from the
+    // list of providers and sources; {cost} is an amount the bar formats.
+    targetChat: /*i18n*/ { id: 'enter.targetChat', message: '→ {chat}', comment: "The head of the Enter line in a room: the chat's number" },
+    targetNewRoom: /*i18n*/ { id: 'enter.targetNewRoom', message: '→ a new room' },
+    promptNoRoom: /*i18n*/ { id: 'enter.promptNoRoom', message: 'Prompts go to a room. sym: opens one' },
+    promptBusy: /*i18n*/ { id: 'enter.promptBusy', message: 'A reply is still arriving here. Send once it is done' },
+    promptChecking: /*i18n*/ { id: 'enter.promptChecking', message: 'Looking for a key on this device' },
+    promptSource: /*i18n*/ { id: 'enter.promptSource', message: 'Enter asks {source}, which needs no key and costs nothing' },
+    promptSend: /*i18n*/ {
+      id: 'enter.promptSend',
+      message: '{tokens, plural, one {Enter sends to {provider}, about # token, {cost} to send} other {Enter sends to {provider}, about # tokens, {cost} to send}}',
+      comment: 'A local estimate: nothing is sent to count (C83)',
+    },
+    promptSendCheap: /*i18n*/ {
+      id: 'enter.promptSendCheap',
+      message: '{tokens, plural, one {Enter sends to {provider}, about # token, under {cost} to send} other {Enter sends to {provider}, about # tokens, under {cost} to send}}',
+      comment: '{cost} is the smallest amount shown, a cent',
+    },
+    promptSendUnpriced: /*i18n*/ {
+      id: 'enter.promptSendUnpriced',
+      message: '{tokens, plural, one {Enter sends to {provider}, about # token} other {Enter sends to {provider}, about # tokens}}',
+    },
+    promptChanged: /*i18n*/ { id: 'enter.promptChanged', message: 'Where prompts go has changed. Read this line again before you send' },
+    sourceUnreachable: /*i18n*/ { id: 'enter.sourceUnreachable', message: '{source} could not be reached. Check the connection, then try again' },
+    sourceRefused: /*i18n*/ { id: 'enter.sourceRefused', message: '{source} did not answer. Try again in a moment' },
+    keyRefused: /*i18n*/ { id: 'enter.keyRefused', message: 'The key was refused. Update it in {board}, then send again', comment: '{board} is Settings, from COPY.boards' },
+    tooMany: /*i18n*/ { id: 'enter.tooMany', message: 'Too many requests for now. Wait a moment, then send again' },
+    promptFailed: /*i18n*/ { id: 'enter.promptFailed', message: 'The prompt did not go through. Try again' },
+  },
+
+  // Marginalia inside the prompt field: who answers a prompt here (bar
+  // reference; stage 4). {source} and {model} are names from the lists.
+  field: {
+    answeredFrom: /*i18n*/ { id: 'field.answeredFrom', message: 'answered from {source}' },
+    answeredBy: /*i18n*/ { id: 'field.answeredBy', message: 'answered by {model}' },
+  },
+
+  // A room on the shell (stage 4).
+  room: {
+    newTitle: /*i18n*/ { id: 'room.newTitle', message: 'New room' },
+    empty: /*i18n*/ { id: 'room.empty', message: 'An empty room. Its first prompt, written in the bar, starts its chat.' },
+    notFound: /*i18n*/ { id: 'room.notFound', message: 'This chat could not be found. It may have been removed.' },
+    unavailable: /*i18n*/ { id: 'room.unavailable', message: 'This room could not be drawn. Its chat is kept as it was.' },
   },
 
   // The hint line: the keys that open the field where focus is (P2). {key}

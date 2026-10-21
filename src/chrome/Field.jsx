@@ -11,12 +11,15 @@ import { CommandFill, PromptFill, Magnifier, Quill, MoonMark } from './Fills'
 // the moon, or the quill. Folded, it is a button: Tab reaches it, Enter or
 // Space or a click opens it. Its behaviour is the reducer in
 // src/shell/field.js.
+//
+// In prompt mode, marginalia inside the field says who answers a prompt
+// here: "answered from Wikipedia", "answered by Claude Sonnet" (stage 4).
 
-const Field = forwardRef(function Field({ state, folded, win, onInput, onKeyDown, onFocus, onBlur, onOpen, onHover, onLeave }, ref) {
+const Field = forwardRef(function Field({ state, folded, win, marginalia = null, onInput, onKeyDown, onFocus, onBlur, onOpen, onHover, onLeave }, ref) {
   const { i18n } = useLingui()
   const { mode } = state
   return (
-    <div className={`ch-field ${mode}${folded ? ' min' : ''}`} role="search" onMouseEnter={onHover} onMouseLeave={onLeave}>
+    <div className={`ch-field ${mode}${folded ? ' min' : ''}${marginalia ? ' with-marg' : ''}`} role="search" onMouseEnter={onHover} onMouseLeave={onLeave}>
       <div className={`ch-fillwrap${mode === 'command' ? ' on' : ''}`}><div className="ch-fill command"><CommandFill /></div></div>
       <div className={`ch-fillwrap${mode === 'prompt' ? ' on' : ''}`}><div className="ch-fill prompt"><PromptFill /></div></div>
       <span className={`ch-chip search${mode === 'search' ? ' on' : ''}`} aria-hidden="true">{i18n._(COPY.modes.search)}</span>
@@ -37,6 +40,7 @@ const Field = forwardRef(function Field({ state, folded, win, onInput, onKeyDown
         spellCheck={false}
         dir="auto"
       />
+      {marginalia && <span className="ch-marg ch-fmarg">{marginalia}</span>}
       <div className="ch-gslot" aria-hidden="true">
         <Magnifier on={mode === 'search'} />
         <Quill on={mode === 'prompt'} />
