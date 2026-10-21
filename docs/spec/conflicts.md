@@ -897,6 +897,7 @@ Found while building the parser and the verb registry (stage 3: `src/commands/pa
 - **Leaving** is going to another chat or page, or closing the board that shows the chat. Switching browser tabs, or popping the board into a window, is not. Closing the browser tab always stops it.
 - **The notice** is on the reply ("Stopped when you left the chat. What arrived is kept.") and once on the page you land on ("The reply in 207 stopped when you left it."), saying that the tokens already written are still charged.
 - **The setting** covers replies in a chat you are watching. Docket runs, started on purpose with `run:` (stage 10), keep going until `stop:`. It reads "Finish replies after I leave a chat", is the person's preference and goes in backups, and has a switch in today's Settings until stage 9.
+- **Ruled 20 October: yes, with those three details.**
 
 **Also built from the mockups** (no question):
 - `open:` puts a board at the right end and points the bar at it; a board already here gets the bar, a popped one comes forward. No limit on how many; narrow windows stack (stage 14).
