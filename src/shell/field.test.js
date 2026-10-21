@@ -122,7 +122,7 @@ describe('the screen changes', () => {
   })
 })
 
-describe('the hexagon', () => {
+describe('the folded circle (C108)', () => {
   it('hovering opens it without focus, and it folds when the pointer leaves', () => {
     let s = act(initialField('prompt'), 'editReply', 'hover')
     expect(s).toMatchObject({ minimised: false, peek: true, focused: false })
@@ -141,5 +141,14 @@ describe('the hexagon', () => {
     let s = typing(room(), '>', '>pop:')
     s = act(s, 'editReply', 'open')
     expect(fieldValue(s)).toBe('>pop:')
+  })
+})
+
+describe('finishing an edit', () => {
+  it('opens the field again, and does nothing when no reply was being edited', () => {
+    const s = act(initialField('prompt'), 'editReply', 'doneEditing')
+    expect(s).toMatchObject({ editingReply: false, minimised: false })
+    const t = initialField('prompt')
+    expect(act(t, 'doneEditing')).toBe(t)
   })
 })

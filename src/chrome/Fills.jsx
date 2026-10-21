@@ -1,5 +1,6 @@
-import { useId } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef } from 'react'
 import { STARS, STAR_TILE } from './stars'
+import { shapeAt, turnAt, ease } from './moon'
 
 // The field's fills and glyphs, as the bar reference draws them (9 October):
 // navy with star dots for command, paper with a skewed mosaic for prompt, the
@@ -55,6 +56,48 @@ export function Quill({ on }) {
       <path d="M5.2 14.8h10.7" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
       <path d="M21.3 2.3c-5.7 1.2-9.1 5-9.8 10l3.1-1c3.9-1.4 6.4-4.6 6.7-9z" fill="currentColor" />
       <path d="M11.9 12.2 10.4 14.7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+// The command mark while the field is folded: the chevron rolls into the
+// crescent moon once the slide has landed (C108), and back as it opens.
+// Drawn straight onto the path, frame by frame, on the clock of the window
+// the bar is in; with reduced motion it shows the moon at once.
+export function MoonMark({ folded, win = window }) {
+  const path = useRef(null)
+  const turn = useRef(null)
+  const t = useRef(folded ? 1 : 0)
+  // The first shape, before anything moves.
+  useLayoutEffect(() => {
+    path.current?.setAttribute('d', shapeAt(t.current))
+    turn.current?.setAttribute('transform', `rotate(${turnAt(t.current).toFixed(2)} 12 12)`)
+  }, [])
+  useEffect(() => {
+    const draw = (v) => {
+      t.current = v
+      path.current?.setAttribute('d', shapeAt(v))
+      turn.current?.setAttribute('transform', `rotate(${turnAt(v).toFixed(2)} 12 12)`)
+    }
+    const target = folded ? 1 : 0
+    const from = t.current
+    if (from === target) { draw(target); return undefined }
+    if (win.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { draw(target); return undefined }
+    let raf = 0
+    let start = null
+    const duration = 460 * Math.abs(target - from)
+    const step = (now) => {
+      if (start === null) start = now
+      const u = Math.min(1, (now - start) / duration)
+      draw(from + (target - from) * ease(u))
+      if (u < 1) raf = win.requestAnimationFrame(step)
+    }
+    const wait = win.setTimeout(() => { raf = win.requestAnimationFrame(step) }, folded ? 360 : 0)
+    return () => { win.clearTimeout(wait); win.cancelAnimationFrame(raf) }
+  }, [folded, win])
+  return (
+    <svg className={`ch-glyph moon${folded ? ' on' : ''}`} viewBox="0 0 24 24" aria-hidden="true">
+      <g ref={turn}><path ref={path} /></g>
     </svg>
   )
 }

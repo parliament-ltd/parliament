@@ -102,3 +102,21 @@
 .ch-dock.window { position: static; padding: 12px 14px 6px; background: var(--ch-paper); border-bottom: .5px solid var(--ch-rule); }
 .ch-dock.window .ch-dock-in { max-width: none; }
 .ch-away { padding: 10px clamp(16px, 4vw, 32px) 0; }
+
+/* ── folding into a circle while a reply is edited (C108) ── */
+.ch-frow { display: flex; justify-content: center; }
+.ch-dock.left .ch-frow { justify-content: flex-start; }
+.ch-dock.right .ch-frow { justify-content: flex-end; }
+.ch-field { transition: width var(--ch-dur-slide) var(--ch-ease), border-radius var(--ch-dur-slide) var(--ch-ease), box-shadow .2s; }
+.ch-field.min { width: var(--ch-field-h); flex: 0 0 var(--ch-field-h); border-radius: 50%; cursor: pointer; }
+.ch-field.min input, .ch-field.min .ch-chip.on { opacity: 0; pointer-events: none; }
+.ch-field input { transition: opacity calc(140ms * var(--ch-k)); }
+.ch-field.min.command { box-shadow: 0 0 0 1px rgba(var(--ch-navy), .9); }
+/* The circle's edge turns gold on hover: the only gold at rest (C50). */
+.ch-field.min:hover { box-shadow: 0 0 0 1px var(--ch-gold-deep); }
+.ch-fold-button { position: absolute; inset: 0; z-index: 5; border-radius: 50%; }
+.ch-shell .ch-fold-button:focus-visible { outline: 2px solid var(--ch-ink); outline-offset: -3px; border-radius: 50%; }
+.ch-glyph.moon { width: 20px; height: 20px; }
+.ch-glyph.moon path { fill: #fff; }
+.ch-enter { transition: opacity calc(160ms * var(--ch-k)); }
+.ch-enter.hide { opacity: 0; }

@@ -19,7 +19,7 @@ function Parts({ parts }) {
 /**
  * @param {{ mode: string, resting: string, empty: boolean, says: { message: string, values?: object }, addressed: string }} props
  */
-export default function EnterLine({ mode, resting, empty, says, addressed }) {
+export default function EnterLine({ mode, resting, empty, says, addressed, hidden = false }) {
   const { i18n } = useLingui()
   const leave = { key: 'leave', text: i18n._(resting === 'prompt' ? COPY.enter.leavePrompt : COPY.enter.leaveSearch) }
   const target = { key: 'target', now: true, text: i18n._(COPY.enter.target, { board: boardName(i18n, addressed) }) }
@@ -44,7 +44,7 @@ export default function EnterLine({ mode, resting, empty, says, addressed }) {
     if (resting !== 'prompt') parts.push(leave)
   }
   return (
-    <div className="ch-enter" aria-live="polite">
+    <div className={`ch-enter${hidden ? ' hide' : ''}`} aria-live="polite" aria-hidden={hidden ? 'true' : undefined}>
       <Parts parts={parts} />
     </div>
   )

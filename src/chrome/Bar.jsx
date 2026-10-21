@@ -15,6 +15,12 @@ import Reference from './Reference'
 // keeps its own bar). Its keys are listened for on the document it is drawn
 // in, so a popped window answers / and Cmd/Ctrl+K itself.
 //
+// While a reply on a board is being edited, the field folds into a circle
+// (C108). Hovering opens it without taking focus, after 140ms of intent, and
+// it folds again 600ms after the pointer leaves if nothing was typed; a
+// click or Cmd/Ctrl+K opens it; Escape folds it and puts the caret back in
+// the reply. Timers run on the clock of the window the bar is in.
+//
 // The bar plans; the shell runs. onRun gets the planned arrangement and
 // returns a promise of a notice key for the Enter line (say, a window the
 // browser would not open), or null.
@@ -27,6 +33,9 @@ export default function Bar({ arrangement, board, doc, lines, onRun, onFocusBoar
   const [notice, setNotice] = useState(null)
   const walk = useRef({ lines: [], index: -1, draft: '' })
   const input = useRef(null)
+  const reply = useRef(null) // the reply being edited, to return the caret to
+  const hover = useRef(0)
+  const win = doc?.defaultView ?? window
 
   useEffect(() => { dispatch({ type: 'surface', resting }) }, [resting])
   useEffect(() => { if (autoFocus) input.current?.focus() }, [autoFocus])
@@ -47,6 +56,33 @@ export default function Bar({ arrangement, board, doc, lines, onRun, onFocusBoar
     doc.addEventListener('keydown', onKey)
     return () => doc.removeEventListener('keydown', onKey)
   }, [doc])
+
+  // Editing a reply on a board folds the field; leaving it opens the field.
+  useEffect(() => {
+    if (!doc) return undefined
+    const onBoard = (el) => isTextField(el) && el !== input.current && Boolean(el.closest?.('.ch-stage'))
+    function onFocusIn(e) {
+      if (onBoard(e.target)) { reply.current = e.target; dispatch({ type: 'editReply' }) }
+    }
+    function onFocusOut(e) {
+      if (e.target !== reply.current) return
+      const to = e.relatedTarget
+      if (to === input.current || onBoard(to) || to?.closest?.('.ch-field')) return
+      dispatch({ type: 'doneEditing' })
+    }
+    doc.addEventListener('focusin', onFocusIn)
+    doc.addEventListener('focusout', onFocusOut)
+    return () => { doc.removeEventListener('focusin', onFocusIn); doc.removeEventListener('focusout', onFocusOut) }
+  }, [doc])
+
+  // Hover opens the folded field after 140ms of intent, and lets it fold
+  // again 600ms after the pointer leaves.
+  const hoverAfter = (ms, type) => {
+    win.clearTimeout(hover.current)
+    hover.current = win.setTimeout(() => dispatch({ type }), ms)
+  }
+  useEffect(() => () => win.clearTimeout(hover.current), [win])
+  const folded = field.minimised
 
   const value = fieldValue(field)
   const view = useMemo(() => preview(value, { mode: field.mode, arrangement: target }), [value, field.mode, target])
@@ -76,8 +112,15 @@ export default function Bar({ arrangement, board, doc, lines, onRun, onFocusBoar
     if (e.key === 'Escape') {
       e.preventDefault()
       if (reference) { setReference(null); return }
-      if (field.mode === field.resting) input.current?.blur()
+      // The field's rule first, then the caret: moving the caret blurs the
+      // field, which would otherwise come before the Escape.
       dispatch({ type: 'escape' })
+      if (field.mode === field.resting) {
+        // In the resting mode, back to what you were doing: the reply, if
+        // one was being edited, with the field folded again.
+        if (field.editingReply && reply.current?.isConnected) reply.current.focus()
+        else input.current?.blur()
+      }
       return
     }
     if (field.mode !== 'command') return
@@ -102,15 +145,22 @@ export default function Bar({ arrangement, board, doc, lines, onRun, onFocusBoar
   return (
     <div className={className}>
       <div className="ch-dock-in">
+        <div className="ch-frow">
         <Field
           ref={input}
           state={field}
+          folded={folded}
+          win={win}
+          onOpen={() => { dispatch({ type: 'open' }); input.current?.focus() }}
+          onHover={() => { if (field.minimised || field.peek) hoverAfter(140, 'hover') }}
+          onLeave={() => { if (field.minimised || field.peek) hoverAfter(600, 'leave') }}
           onInput={(v) => { walk.current = { lines, index: -1, draft: '' }; setNotice(null); dispatch({ type: 'input', value: v }) }}
           onKeyDown={onKeyDown}
           onFocus={() => { dispatch({ type: 'focus' }); onFocusBoard?.(board) }}
           onBlur={() => dispatch({ type: 'blur' })}
         />
-        <EnterLine mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} addressed={board} />
+        </div>
+        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} addressed={board} />
         {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
       </div>
     </div>

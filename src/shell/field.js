@@ -1,5 +1,5 @@
 // The bar's field: what mode it is in, what is typed in each mode, and
-// whether it is open, folded to the hexagon or out of the way (bar
+// whether it is open, folded into a circle or out of the way (bar
 // reference, "The field" and "Minimising while editing in place"; C44 and
 // A3, ruled 15 October). Drawing comes later, to the token sheet; this is
 // the behaviour, as a reducer the bar will run.
@@ -18,7 +18,8 @@
 //   prompt and search the leader is gone already, so Backspace in an empty
 //   field does nothing.
 // - After a command runs the field resets to `>` and keeps focus.
-// - Clicking into a reply folds the field to the hexagon; Cmd/Ctrl+K or a
+// - Clicking into a reply folds the field into a circle (C108, which
+//   replaced the hexagon); Cmd/Ctrl+K or a
 //   click opens it in the mode it was left in. Hovering opens it without
 //   taking focus, and it folds again when the pointer leaves unless
 //   something was typed.
@@ -125,13 +126,13 @@ export function fieldReducer(state, action) {
     case 'blur':
       return { ...state, focused: false }
     case 'open':
-      // Cmd/Ctrl+K, or a click on the hexagon: open in the mode it was left in.
+      // Cmd/Ctrl+K, or a click on the circle: open in the mode it was left in.
       return { ...state, focused: true, minimised: false, peek: false }
 
     case 'editReply':
       return { ...state, editingReply: true, minimised: true, focused: false, peek: false }
     case 'doneEditing':
-      return { ...state, editingReply: false, minimised: false, peek: false }
+      return state.editingReply ? { ...state, editingReply: false, minimised: false, peek: false } : state
 
     case 'hover':
       return state.minimised ? { ...state, minimised: false, peek: true } : state
