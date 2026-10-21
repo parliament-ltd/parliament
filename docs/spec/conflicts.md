@@ -842,7 +842,7 @@ language, reply language), and so are more providers, Mistral included.
 
 ## Part 7. The command layer (added 20 October 2026)
 
-Found while building the parser and the verb registry (stage 3: `src/commands/parse.js`, `verbs.js`, `registry.js`). Every verb in the documents was listed, newest wins, rulings over documents. These are the points the documents leave open (C95 to C106). Each is built as suggested, so a ruling either confirms it or changes one entry in `verbs.js`.
+Found while building the parser and the verb registry (stage 3: `src/commands/parse.js`, `verbs.js`, `registry.js`). Every verb in the documents was listed, newest wins, rulings over documents. These are the points the documents leave open (C95 to C107). Each is built as suggested, so a ruling either confirms it or changes one entry in `verbs.js`.
 
 **C95. Board names as verbs.**
 - The bar inventory (7 and 9 October, the newest) lists `alm:`, `lab:`, `sym:` and `library:` as current. The welcome steps teach `alm:` and `library:`.
@@ -888,6 +888,8 @@ Found while building the parser and the verb registry (stage 3: `src/commands/pa
 **C105. `pop:left` and `pop:right`.** Ruled only as being "for boards that have been popped" (C43); no document says what they do. **Built:** they place the window of the board the bar is pointed at on the left or the right of the screen. **Suggestion:** keep as built. **Ruled 20 October: yes.**
 
 **C106. `bar:left`, `bar:center` and `bar:right`.** The settings spec (§7, 24 September): left and right make the field a square in a column of its own, with three lines kept for the Enter line, and `bar:bottom` puts the Enter line above the field. The bar reference (9 October, newer) used `pop:left`, `pop:right` and `pop:center` to move the field, and the hexagon it folds into, to that side; C43 (12 October) gave those words to `bar:`. **Built** as the newer: two separate choices, top or bottom, and left, centre or right, with the Enter line under the field either way. **Suggestion:** keep as built; the settings spec's square can come back once it can be seen beside this. **Ruled 20 October: keep `bar:left`, `bar:center` and `bar:right` as the side the field sits on.**
+
+**C107. Which window stays on top, and what a reload does to windows.** The Almanac spec (§4) allows one always-on-top window per tab, and the browser gives only one. Nothing says which pop gets it. **Built:** the bar (`pop:command`) takes it where the browser has one; boards open ordinary windows, since a board kept on top would cover what you work in. A browser opens a window only after a click or a key, so after a reload whatever was popped comes back to the page instead of reopening. Each board's window has its own bar (C6), pointed at that board. **Suggestion:** keep as built.
 
 **Also built from the mockups** (no question):
 - `open:` puts a board at the right end and points the bar at it; a board already here gets the bar, a popped one comes forward. No limit on how many; narrow windows stack (stage 14).
