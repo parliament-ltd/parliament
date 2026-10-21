@@ -197,6 +197,34 @@ msgid "enter.aloneSpends"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.apiAdd"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.apiAllKeyed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.apiList"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.apiNew"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.apiNoKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.apiReplace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.apiUnknown"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.barMove"
 msgstr ""
 
@@ -499,6 +527,10 @@ msgstr ""
 #. Hidden messages, and messages being deleted, are not sent (stage 4)
 #. js-lingui-explicit-id
 msgid "enter.promptHiddenOut"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptKey"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -819,6 +851,100 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "inspect.openChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.add"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.checking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.checkThenHold"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.checkThenKeep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.ends"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.endsHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.fieldLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.foot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.heading"
+msgstr ""
+
+#. A link to the page where the provider makes and revokes keys
+#. js-lingui-explicit-id
+msgid "keys.keysPage"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.needs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.noKeyNeeded"
+msgstr ""
+
+#. Follows the link to the key page, in one sentence
+#. js-lingui-explicit-id
+msgid "keys.ownKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.placeholder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.placeholderNew"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.problemBilling"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.problemEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.problemInvalid"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.problemUnreached"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.promise"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.replace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.save"
 msgstr ""
 
 #. js-lingui-explicit-id

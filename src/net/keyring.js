@@ -13,6 +13,32 @@
 // Pure: the saved store is passed in, so this runs in tests without the app.
 
 /**
+ * Checks a key the person typed with its own provider, then keeps it (stage
+ * 5, the key panel). Nothing is kept unless the provider accepts it.
+ * @param {{ check: (provider: string, key: string) => Promise<{ valid: boolean, status?: string }>,
+ *   keyring: ReturnType<typeof createKeyring> }} use
+ * @returns {Promise<{ ok: true, fresh: boolean }|{ ok: false, status: 'empty'|'invalid'|'billing'|'unreached' }>}
+ *   fresh: the key differs from the one kept before, so the ignition plays
+ */
+export async function checkAndKeep({ check, keyring }, provider, typed, { save = true } = {}) {
+  const key = String(typed ?? '').trim()
+  if (!key) return { ok: false, status: 'empty' }
+  let result
+  try {
+    result = await check(provider, key)
+  } catch {
+    result = { valid: false, status: 'unreached' }
+  }
+  if (!result?.valid) {
+    const status = result?.status === 'billing_error' ? 'billing' : result?.status === 'invalid' ? 'invalid' : 'unreached'
+    return { ok: false, status }
+  }
+  const before = await keyring.get(provider).catch(() => null)
+  await keyring.put(provider, key, { save })
+  return { ok: true, fresh: before !== key }
+}
+
+/**
  * @param {{ load: (provider: string) => Promise<string|null>, has: (provider: string) => Promise<boolean>,
  *   save: (provider: string, key: string) => Promise<void>, remove: (provider: string) => Promise<void> }} saved
  */

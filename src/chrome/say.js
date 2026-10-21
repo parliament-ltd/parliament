@@ -77,3 +77,6 @@ export function roomLabel(i18n, name) {
 }
 
 export { boardName }
+
+/** Items joined the way the reader's language joins a list with "and". */
+export const andList = (i18n, items) => joined(i18n, items, 'conjunction')

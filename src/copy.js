@@ -203,6 +203,15 @@ export const COPY = {
     openDocketHere: /*i18n*/ { id: 'enter.openDocketHere', message: 'Enter shows its first branch, {num}, in the room here' },
     openNotYet: /*i18n*/ { id: 'enter.openNotYet', message: 'Opening this comes later. inspect:{num} shows it now' },
     inspectOne: /*i18n*/ { id: 'enter.inspectOne', message: 'Enter shows {num} in detail, here' },
+    // api: (stage 5, piece 5; settings spec §6). {provider} is a name from the list of providers; {ending} a key's last four characters.
+    apiList: /*i18n*/ { id: 'enter.apiList', message: 'Enter shows your keys, here under the field' },
+    apiAdd: /*i18n*/ { id: 'enter.apiAdd', message: 'Enter opens the {provider} key field. Never type a key here' },
+    apiReplace: /*i18n*/ { id: 'enter.apiReplace', message: '{provider} has a key ending {ending}. Enter opens it for replacing' },
+    apiNew: /*i18n*/ { id: 'enter.apiNew', message: 'Enter opens the {provider} key field, the first without a key' },
+    apiAllKeyed: /*i18n*/ { id: 'enter.apiAllKeyed', message: 'Every provider has a key. {words} replaces one' },
+    apiNoKey: /*i18n*/ { id: 'enter.apiNoKey', message: '{provider} needs no key' },
+    apiUnknown: /*i18n*/ { id: 'enter.apiUnknown', message: 'No provider is called {word}. Try {words}' },
+    promptKey: /*i18n*/ { id: 'enter.promptKey', message: 'This looks like a key, which would be sent with the prompt. Delete it, and api: opens the key field' },
     nameEmpty: /*i18n*/ { id: 'enter.nameEmpty', message: 'A name needs some words, like name:"Barn owls"' },
     nameLong: /*i18n*/ { id: 'enter.nameLong', message: 'A room\'s name is at most {max} characters' },
     nameNoChat: /*i18n*/ { id: 'enter.nameNoChat', message: 'This room has no chat yet. Its first prompt starts it, and then name: names it' },
@@ -382,6 +391,35 @@ export const COPY = {
     shown: /*i18n*/ { id: 'library.shown', message: '{shown} of {all}', comment: 'How many items show while one shelf is chosen' },
     emptyShelf: /*i18n*/ { id: 'library.emptyShelf', message: 'Nothing on this shelf yet.' },
     loading: /*i18n*/ { id: 'library.loading', message: 'Reading the shelves' },
+  },
+
+  // The key panel api: opens under the bar (stage 5, piece 5; settings spec
+  // §6; Settings v1). {provider} is a name from the list of providers;
+  // {ending} a key's last four characters.
+  keys: {
+    label: /*i18n*/ { id: 'keys.label', message: 'Your keys' },
+    heading: /*i18n*/ { id: 'keys.heading', message: 'API keys' },
+    promise: /*i18n*/ { id: 'keys.promise', message: 'Encrypted in this browser. Each goes only to its own provider.' },
+    needs: /*i18n*/ { id: 'keys.needs', message: 'needs a key' },
+    ends: /*i18n*/ { id: 'keys.ends', message: 'key ends {ending}' },
+    endsHeld: /*i18n*/ { id: 'keys.endsHeld', message: 'key ends {ending}, for this tab only' },
+    replace: /*i18n*/ { id: 'keys.replace', message: 'replace' },
+    add: /*i18n*/ { id: 'keys.add', message: 'add one' },
+    fieldLabel: /*i18n*/ { id: 'keys.fieldLabel', message: '{provider} key' },
+    placeholder: /*i18n*/ { id: 'keys.placeholder', message: 'paste a key' },
+    placeholderNew: /*i18n*/ { id: 'keys.placeholderNew', message: 'paste the new key' },
+    save: /*i18n*/ { id: 'keys.save', message: 'Save' },
+    checking: /*i18n*/ { id: 'keys.checking', message: 'Checking' },
+    checkThenKeep: /*i18n*/ { id: 'keys.checkThenKeep', message: 'Save checks it with {provider} first, with one short request, then keeps it encrypted in this browser.' },
+    checkThenHold: /*i18n*/ { id: 'keys.checkThenHold', message: 'Save checks it with {provider} first, with one short request, then holds it for this tab only.' },
+    problemEmpty: /*i18n*/ { id: 'keys.problemEmpty', message: 'Paste the key first.' },
+    problemInvalid: /*i18n*/ { id: 'keys.problemInvalid', message: '{provider} did not accept this key. Check it, and paste it again.' },
+    problemBilling: /*i18n*/ { id: 'keys.problemBilling', message: '{provider} knows this key, but its account may be out of credit.' },
+    problemUnreached: /*i18n*/ { id: 'keys.problemUnreached', message: 'The check did not reach {provider}. Nothing was kept.' },
+    keysPage: /*i18n*/ { id: 'keys.keysPage', message: '{provider}\'s key page', comment: 'A link to the page where the provider makes and revokes keys' },
+    ownKey: /*i18n*/ { id: 'keys.ownKey', message: 'is where to make one for Parliament alone, with its own spending limit, and to revoke one that leaks.', comment: 'Follows the link to the key page, in one sentence' },
+    noKeyNeeded: /*i18n*/ { id: 'keys.noKeyNeeded', message: '{count, plural, one {{names} needs no key.} other {{names} need no key.}}' },
+    foot: /*i18n*/ { id: 'keys.foot', message: 'Escape goes back to the bar. If a key leaks, revoke it at its provider, and paste a new one here.' },
   },
 
   // inspect: one thing in detail, under the bar (stage 5, piece 3; v30's peek).

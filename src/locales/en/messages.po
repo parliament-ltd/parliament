@@ -197,6 +197,34 @@ msgid "enter.aloneSpends"
 msgstr "{verb} runs on a line of its own, so its Enter line can name who receives it and what it costs"
 
 #. js-lingui-explicit-id
+msgid "enter.apiAdd"
+msgstr "Enter opens the {provider} key field. Never type a key here"
+
+#. js-lingui-explicit-id
+msgid "enter.apiAllKeyed"
+msgstr "Every provider has a key. {words} replaces one"
+
+#. js-lingui-explicit-id
+msgid "enter.apiList"
+msgstr "Enter shows your keys, here under the field"
+
+#. js-lingui-explicit-id
+msgid "enter.apiNew"
+msgstr "Enter opens the {provider} key field, the first without a key"
+
+#. js-lingui-explicit-id
+msgid "enter.apiNoKey"
+msgstr "{provider} needs no key"
+
+#. js-lingui-explicit-id
+msgid "enter.apiReplace"
+msgstr "{provider} has a key ending {ending}. Enter opens it for replacing"
+
+#. js-lingui-explicit-id
+msgid "enter.apiUnknown"
+msgstr "No provider is called {word}. Try {words}"
+
+#. js-lingui-explicit-id
 msgid "enter.barMove"
 msgstr "{place, select, top {Enter moves the bar to the top} bottom {Enter moves the bar to the bottom} left {Enter moves the bar to the left} right {Enter moves the bar to the right} other {Enter moves the bar to the centre}}"
 
@@ -500,6 +528,10 @@ msgstr "The prompt did not go through. Try again"
 #. js-lingui-explicit-id
 msgid "enter.promptHiddenOut"
 msgstr "{count, plural, one {# hidden message stays out} other {# hidden messages stay out}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptKey"
+msgstr "This looks like a key, which would be sent with the prompt. Delete it, and api: opens the key field"
 
 #. js-lingui-explicit-id
 msgid "enter.promptNoRoom"
@@ -820,6 +852,100 @@ msgstr "{num} in detail"
 #. js-lingui-explicit-id
 msgid "inspect.openChat"
 msgstr "open:{num} brings it beside what is here. Escape closes this"
+
+#. js-lingui-explicit-id
+msgid "keys.add"
+msgstr "add one"
+
+#. js-lingui-explicit-id
+msgid "keys.checking"
+msgstr "Checking"
+
+#. js-lingui-explicit-id
+msgid "keys.checkThenHold"
+msgstr "Save checks it with {provider} first, with one short request, then holds it for this tab only."
+
+#. js-lingui-explicit-id
+msgid "keys.checkThenKeep"
+msgstr "Save checks it with {provider} first, with one short request, then keeps it encrypted in this browser."
+
+#. js-lingui-explicit-id
+msgid "keys.ends"
+msgstr "key ends {ending}"
+
+#. js-lingui-explicit-id
+msgid "keys.endsHeld"
+msgstr "key ends {ending}, for this tab only"
+
+#. js-lingui-explicit-id
+msgid "keys.fieldLabel"
+msgstr "{provider} key"
+
+#. js-lingui-explicit-id
+msgid "keys.foot"
+msgstr "Escape goes back to the bar. If a key leaks, revoke it at its provider, and paste a new one here."
+
+#. js-lingui-explicit-id
+msgid "keys.heading"
+msgstr "API keys"
+
+#. A link to the page where the provider makes and revokes keys
+#. js-lingui-explicit-id
+msgid "keys.keysPage"
+msgstr "{provider}'s key page"
+
+#. js-lingui-explicit-id
+msgid "keys.label"
+msgstr "Your keys"
+
+#. js-lingui-explicit-id
+msgid "keys.needs"
+msgstr "needs a key"
+
+#. js-lingui-explicit-id
+msgid "keys.noKeyNeeded"
+msgstr "{count, plural, one {{names} needs no key.} other {{names} need no key.}}"
+
+#. Follows the link to the key page, in one sentence
+#. js-lingui-explicit-id
+msgid "keys.ownKey"
+msgstr "is where to make one for Parliament alone, with its own spending limit, and to revoke one that leaks."
+
+#. js-lingui-explicit-id
+msgid "keys.placeholder"
+msgstr "paste a key"
+
+#. js-lingui-explicit-id
+msgid "keys.placeholderNew"
+msgstr "paste the new key"
+
+#. js-lingui-explicit-id
+msgid "keys.problemBilling"
+msgstr "{provider} knows this key, but its account may be out of credit."
+
+#. js-lingui-explicit-id
+msgid "keys.problemEmpty"
+msgstr "Paste the key first."
+
+#. js-lingui-explicit-id
+msgid "keys.problemInvalid"
+msgstr "{provider} did not accept this key. Check it, and paste it again."
+
+#. js-lingui-explicit-id
+msgid "keys.problemUnreached"
+msgstr "The check did not reach {provider}. Nothing was kept."
+
+#. js-lingui-explicit-id
+msgid "keys.promise"
+msgstr "Encrypted in this browser. Each goes only to its own provider."
+
+#. js-lingui-explicit-id
+msgid "keys.replace"
+msgstr "replace"
+
+#. js-lingui-explicit-id
+msgid "keys.save"
+msgstr "Save"
 
 #. js-lingui-explicit-id
 msgid "kind.ask"

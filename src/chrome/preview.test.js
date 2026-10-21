@@ -246,6 +246,37 @@ describe('open: and inspect: by number (stage 5, piece 3)', () => {
   })
 })
 
+describe('api: and the key panel (stage 5, piece 5)', () => {
+  const none = [{ id: 'anthropic', name: 'Anthropic', has: false, ending: null }]
+  const saved = [{ id: 'anthropic', name: 'Anthropic', has: true, ending: '4f2a' }]
+  const at = (value, keys = none) => {
+    const p = preview(value, { mode: 'command', arrangement: shipped(SPACE), screens: { keys, noKey: ['Wikipedia'] } })
+    return { ...p, text: say(i18n, p.says.message, p.says.values) }
+  }
+
+  it('opens the panel, at a provider\'s field when one is named', () => {
+    expect(BUILT.has('api')).toBe(true)
+    expect(at('>api:')).toMatchObject({ text: 'Enter shows your keys, here under the field', act: { kind: 'keys', focus: null } })
+    expect(at('>api:anthropic')).toMatchObject({ text: 'Enter opens the Anthropic key field. Never type a key here', act: { focus: 'anthropic' } })
+    expect(at('>api:anthropic', saved).text).toBe('Anthropic has a key ending 4f2a. Enter opens it for replacing')
+    expect(at('>api:new').text).toBe('Enter opens the Anthropic key field, the first without a key')
+    expect(at('>api:new', saved)).toMatchObject({ text: 'Every provider has a key. api:anthropic replaces one', act: null })
+  })
+
+  it('says which need no key, and refuses a provider it does not know', () => {
+    expect(at('>api:wikipedia').text).toBe('Wikipedia needs no key')
+    expect(at('>api:openai').text).toBe('No provider is called openai. Try api:anthropic or api:new')
+  })
+
+  it('never takes a key in the bar, and refuses a prompt that holds one (C129)', () => {
+    expect(at('>api:anthropic sk-ant-api03-abcdefgh').text).toBe('No keys in the command line, for security. Delete it, and api: opens the key field')
+    const p = promptPreview('is sk-ant-api03-abcdefghijklmnop right?', { room: 'c1', keyed: false, source: 'Wikipedia' })
+    expect(p.ready).toBe(false)
+    expect(say(i18n, p.says.message)).toBe('This looks like a key, which would be sent with the prompt. Delete it, and api: opens the key field')
+    expect(promptPreview('what changed in 3f9a1c7e5b2d4f6a8c0e1b3d5f7a9c2e4b6d8f0a?', { room: 'c1', keyed: false, source: 'Wikipedia' }).ready).toBe(true)
+  })
+})
+
 describe('width: (C126)', () => {
   const at = (value, a = shipped(SPACE)) => {
     const p = preview(value, { mode: 'command', arrangement: a })

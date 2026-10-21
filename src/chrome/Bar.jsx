@@ -13,6 +13,7 @@ import Field from './Field'
 import EnterLine from './EnterLine'
 import Reference from './Reference'
 import Inspect from './Inspect'
+import KeyPanel from './KeyPanel'
 
 // One bar: the field, its Enter line and the ? reference, pointed at one
 // board. The page has one, and so does every popped window (C6: each window
@@ -36,7 +37,7 @@ import Inspect from './Inspect'
 // whether it went ({ refused } or { done }), then once it is answered
 // (done resolves to a notice, or null).
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -160,6 +161,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       e.preventDefault()
       if (reference) { setReference(null); return }
       if (inspect) { onInspectClose?.(); return }
+      if (keyPanel) { onKeysClose?.(); return }
       // The field's rule first, then the caret: moving the caret blurs the
       // field, which would otherwise come before the Escape.
       dispatch({ type: 'escape' })
@@ -205,7 +207,13 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           onOpen={() => { dispatch({ type: 'open' }); input.current?.focus() }}
           onHover={() => { if (field.minimised || field.peek) hoverAfter(140, 'hover') }}
           onLeave={() => { if (field.minimised || field.peek) hoverAfter(600, 'leave') }}
-          onInput={(v) => { walk.current = { lines, index: -1, draft: '' }; setNotice(null); dispatch({ type: 'input', value: v }) }}
+          onInput={(v) => {
+            walk.current = { lines, index: -1, draft: '' }
+            setNotice(null)
+            // The key panel closes when the line turns to another command.
+            if (keyPanel && !/^>\s*api:/i.test(v)) onKeysClose?.()
+            dispatch({ type: 'input', value: v })
+          }}
           onKeyDown={onKeyDown}
           onFocus={() => { dispatch({ type: 'focus' }); onFocusBoard?.(board) }}
           onBlur={() => dispatch({ type: 'blur' })}
@@ -214,6 +222,17 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
         <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} addressed={board} room={room} welcome={welcome} />
         {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
         {!reference && inspect && <Inspect row={inspect} />}
+        {!reference && !inspect && keyPanel && (
+          <KeyPanel
+            keys={keyPanel.keys}
+            noKey={keyPanel.noKey}
+            focus={keyPanel.focus}
+            holdOnly={keyPanel.holdOnly}
+            onFocus={(id) => onKeyFocus?.(id)}
+            onSaved={(id, fresh) => { onKeySaved?.(id, fresh); input.current?.focus() }}
+            onClose={() => { onKeysClose?.(); input.current?.focus() }}
+          />
+        )}
       </div>
     </div>
   )

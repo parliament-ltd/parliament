@@ -1036,6 +1036,15 @@ Found while splitting stage 5 into pieces. The documents: `welcome-spec-decision
 - Names and descriptions of blocks, layouts and themes are the manifests' English words until the plain-language pass (A6) takes them into the copy table. Thumbnails (`LayoutSilhouette`), ticks and details come with the Lab (stage 13).
 - **Suggestion:** keep as built.
 
+**C129. The key panel, and a key in a prompt.** Built as settings spec §6 and Settings v1 draw it, with these choices:
+- **Who is listed:** each built provider that takes a key (Anthropic today), and one line naming the built sources that need none ("Wikipedia needs no key."). Mistral, OpenAlex's optional key and Ollama join with stage 7.
+- **What the panel knows:** whether each has a key and its last four characters, read inside `src/net`; the panel never holds a key. The password field is read once, on Save, and cleared. It carries the attributes password managers use to leave a field alone.
+- **Save checks first,** with one short request to the key's own provider, and the panel says so before Save is pressed. Nothing is kept unless the provider accepts it, and the panel tells apart a key that was not accepted, an account that may be out of credit, and a check that did not get through (the provider's check now says which). The key is then kept as Settings says: saved, or for this tab only.
+- **The ignition** plays once per new key: a key different from the one kept before. Saving the same key again does not play it; with reduced motion it does not play at all.
+- Step 8 crosses off on seeing the panel (C120). The panel links the provider's key page, with a line on keeping a key for Parliament alone with its own spending limit, and on revoking one that leaks (security notes §2).
+- **A key in a prompt** (new): the bar already refused a command line shaped like a key (stage 3); now a prompt that holds one is refused before Enter too, since it would be sent to the model, or to a source as a search. A prompt is held to a narrower test than a command, so people can still ask about a commit hash or the word "sk-": refused are `sk-` with a key's worth of characters after it, and a long run mixing capitals, small letters and digits.
+- **Suggestion:** keep as built.
+
 ## Part 10. The security and privacy notes of 21 October (added 21 October 2026)
 
 Stefan's notes from a planning conversation, `parliament-security-privacy.md` (not in the repo), checked against the specs, the rulings and the code. Most of it agrees or is already built; these are the points that do not.

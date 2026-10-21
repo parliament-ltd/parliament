@@ -14,7 +14,8 @@ import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
-import { hasKey, models, metadataModel, destination, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
+import { hasKey, models, metadataModel, destination, keyStatus, noKeyNeeded, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
+import { ignite } from './ignition'
 import { useChat } from '../stores/ChatContext'
 import { useConversations } from '../stores/ConversationContext'
 import { useSettings } from '../stores/SettingsContext'
@@ -272,6 +273,7 @@ export default function Shell() {
   /** Runs a planned arrangement: opens, closes and places its windows, then keeps it. */
   const run = useCallback(async (next, body) => {
     setInspected(null)
+    setKeyPanel(null)
     if (waiting.current && roomOnScreen(next) !== waiting.current.chatId) { waiting.current.drop(); waiting.current = null }
     const changes = windowChanges(current.current, next)
     const opened = []
@@ -345,6 +347,23 @@ export default function Shell() {
     return () => { live = false }
   }, [started, roomRev, libraryHere])
   const inspectedRow = inspected != null ? numbered.get(inspected) ?? null : null
+
+  // ── The key panel (stage 5, piece 5) ──────────────────
+  // api: opens it under the bar. What the shell knows of keys is whether
+  // each provider has one and its last four characters, read through the
+  // key module; never a key.
+  const [keyPanel, setKeyPanel] = useState(null) // { focus: provider id or null } while api: shows it
+  const [keyInfo, setKeyInfo] = useState(() => ({ keys: [], noKey: noKeyNeeded() }))
+  const [keysRev, setKeysRev] = useState(0) // changes when a key is kept, so prompts look again
+  const readKeys = useCallback(() => keyStatus().then((keys) => setKeyInfo({ keys, noKey: noKeyNeeded() }), () => {}), [])
+  useEffect(() => { if (started) readKeys() }, [started, readKeys])
+  const onKeySaved = useCallback((id, fresh) => {
+    readKeys()
+    setKeysRev((n) => n + 1)
+    setKeyPanel({ focus: null })
+    // The one gold moment, once per new key (C50).
+    if (fresh) ignite(document)
+  }, [readKeys])
   const [roomNameOf, setRoomNameOf] = useState(null) // { chatId, value }: what the room on screen is called
   const onRoomName = useCallback((chatId, value) => setRoomNameOf({ chatId, value }), [])
   const remember = useCallback((body) => {
@@ -363,6 +382,15 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'keys') {
+      setInspected(null)
+      setKeyPanel({ focus: what.focus ?? null })
+      readKeys()
+      // Step 8 crosses off on seeing the panel (C120).
+      updateWelcome((w) => tick(w, 'key'))
+      remember(body)
+      return null
+    }
     if (what.kind !== 'nameRoom') return 'later'
     const chat = await getConversation(what.chatId).catch(() => null)
     const saved = chat?.room ? await renameMode(chat.room, what.name).catch(() => null) : null
@@ -371,7 +399,7 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'name'))
     remember(body)
     return null
-  }, [remember, run, updateWelcome])
+  }, [readKeys, remember, run, updateWelcome])
 
   const onRun = useCallback((next, body, go, what) => (what ? act(what, body, next) : run(next, body)), [act, run])
 
@@ -404,7 +432,7 @@ export default function Shell() {
     check()
     window.addEventListener('focus', check)
     return () => { live = false; window.removeEventListener('focus', check) }
-  }, [])
+  }, [keysRev])
 
   const roomId = roomOnScreen(arrangement) // the chat in the space's room; null in an empty room; undefined with no room
   const streaming = useIsStreaming(roomId ?? '')
@@ -431,7 +459,7 @@ export default function Shell() {
       stacked: getComputedStyle(stage).flexDirection === 'column',
     }
   }, [])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -610,7 +638,9 @@ export default function Shell() {
           it never loses the field's focus or what is typed. */}
       <div ref={dockSlot} className="ch-bar-host" />
       {!barWindow && createPortal(
-        <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} inspect={inspectedRow} onInspectClose={() => setInspected(null)} />,
+        <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} inspect={inspectedRow} onInspectClose={() => setInspected(null)}
+          keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory' } : null}
+          onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)} />,
         barHost,
       )}
       {barWindow && <p className="ch-away ch-marg">{i18n._(COPY.shell.barAway)}</p>}

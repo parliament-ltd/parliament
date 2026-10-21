@@ -251,15 +251,17 @@ export class AnthropicProvider extends BaseProvider {
         }
       }
 
+      // Neither accepted nor refused: the check could not say (stage 5,
+      // the key panel tells this apart from a key that is wrong).
       return {
         valid: false,
-        status: 'invalid',
+        status: 'error',
         error: `Unexpected error (${response.status}). Please try again.`,
       }
     } catch {
       return {
         valid: false,
-        status: 'invalid',
+        status: 'unreached',
         error: 'Could not reach the Anthropic API. Please check your connection.',
       }
     }

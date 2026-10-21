@@ -198,6 +198,22 @@ export function parseCommand(body, lookup = () => null) {
 const SK = /(?<![A-Za-z0-9])sk-/
 const RUN = /[A-Za-z0-9_-]{28,}/g
 
+// A prompt is held to a narrower test (C129): `sk-` and a key's worth of
+// characters, or the mixed run. A long run of small letters and digits, like
+// a commit hash, is something people ask about, so a prompt may carry one;
+// the word "sk-" on its own may be asked about too.
+const SK_KEY = /(?<![A-Za-z0-9])sk-[A-Za-z0-9_-]{16,}/
+
+/** True for a prompt that holds an API key, which would go to the model with it. */
+export function holdsKey(text) {
+  const prompt = String(text ?? '')
+  if (SK_KEY.test(prompt)) return true
+  for (const [run] of prompt.matchAll(RUN)) {
+    if (/[A-Z]/.test(run) && /[a-z]/.test(run) && /\d/.test(run)) return true
+  }
+  return false
+}
+
 /** True for a line that looks like it holds an API key. */
 export function shapedLikeKey(line) {
   const text = String(line ?? '')

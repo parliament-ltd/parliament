@@ -117,6 +117,46 @@
 .ch-inspect p { margin: 6px 0; white-space: pre-wrap; }
 .ch-inspect .ch-inspect-foot { margin-top: 12px; }
 
+/* The key panel, under the bar like the reference (stage 5, piece 5;
+   Settings v1's key panel). Plain sans says what is so; italic marginalia
+   is what can be clicked. The field and Save carry the dotted border. */
+.ch-keys { margin-top: 8px; background: var(--ch-surface); border-radius: var(--ch-r-card); box-shadow: var(--ch-lift); max-height: 60vh; overflow: auto; padding: 13px 16px 12px; font: 400 var(--ch-t-small)/1.5 var(--ch-sans); color: var(--ch-ink); text-align: start; }
+.ch-keys-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding-bottom: 8px; margin-bottom: 4px; border-bottom: .5px solid var(--ch-border-2); }
+.ch-keys-lab { font: 600 9px var(--ch-sans); letter-spacing: .055em; text-transform: uppercase; }
+.ch-keys-note { margin: 5px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--ch-ink-2); }
+.ch-keys-head .ch-keys-note { margin: 0; margin-inline-start: auto; }
+.ch-keyrow { padding: 8px 0; border-bottom: .5px solid var(--ch-border-2); }
+.ch-keytop { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.ch-keyname { font: 600 12px var(--ch-sans); }
+.ch-keystate { margin-inline-start: auto; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-ink-2); }
+.ch-shell .ch-keyact { font: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.ch-shell .ch-keyact:hover, .ch-keys a.ch-marg:hover { color: var(--ch-ink); }
+.ch-keys a.ch-marg { text-decoration: underline; text-underline-offset: 2px; }
+.ch-keyopen { padding: 8px 0 2px; }
+.ch-keyfield { display: flex; gap: 8px; }
+.ch-keyfield input { flex: 1; min-width: 0; height: 32px; padding: 0 10px; border: 1px dotted var(--ch-soft); border-radius: var(--ch-r-btn); background: var(--ch-surface); font: 400 13px var(--ch-mono); color: var(--ch-ink); }
+.ch-shell .ch-keyfield input:focus-visible { outline: var(--ch-focus); outline-offset: 1px; }
+.ch-shell .ch-keysave { padding: 0 14px; border: 1px dotted var(--ch-soft); border-radius: var(--ch-r-btn); font: 500 12px var(--ch-sans); }
+.ch-shell .ch-keysave:hover { border-color: var(--ch-ink); }
+.ch-shell .ch-keysave:disabled { opacity: .55; cursor: wait; }
+.ch-keyprob { margin: 6px 0 0; padding-inline-start: 8px; border-inline-start: 2px solid var(--ch-ink); font-size: 11.5px; color: var(--ch-ink); }
+.ch-keys-foot { margin: 0; padding-top: 9px; }
+
+/* The api: ignition, the one gold moment (bar reference; C50): a sweep
+   across the field, then each board glints in turn, once per new key. Never
+   at rest; with reduced motion it does not play (ignition.js). */
+.ch-field.ignite::before { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(90deg, transparent, rgba(196, 169, 77, 0) 30%, rgba(196, 169, 77, .55) 50%, rgba(196, 169, 77, 0) 70%, transparent);
+  background-size: 300% 100%; animation: ch-sweep calc(700ms * var(--ch-k)) ease-out forwards; }
+@keyframes ch-sweep { from { background-position: 100% 0; } to { background-position: 0 0; } }
+.ch-card.glint { animation: ch-glint calc(900ms * var(--ch-k)) ease-out; }
+@keyframes ch-glint {
+  0% { box-shadow: var(--ch-lift), 0 0 0 0 rgba(196, 169, 77, 0); }
+  20% { box-shadow: var(--ch-lift), 0 0 0 1px var(--ch-gold), 0 0 14px var(--ch-gold-glow); }
+  55% { box-shadow: var(--ch-lift), 0 0 0 1px rgba(196, 169, 77, .6), 0 0 6px rgba(196, 169, 77, .15); }
+  100% { box-shadow: var(--ch-lift), 0 0 0 0 rgba(196, 169, 77, 0); }
+}
+
 /* The Almanac, thin (stage 5, piece 3): Almanac v30's table, in the
    chrome's tokens. Widths are v30's; the title takes the rest. */
 .ch-alm { overflow-x: auto; }

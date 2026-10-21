@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { leaderOf, readField, readArg, parseCommand, shapedLikeKey } from './parse'
+import { leaderOf, readField, readArg, parseCommand, shapedLikeKey, holdsKey } from './parse'
 
 // A small stand-in for the registry: the verbs these tests use.
 const KNOWN = { open: {}, type: {}, tag: {}, add: {}, name: {}, set: {}, bar: {}, tell: { rest: true }, note: { rest: true } }
@@ -150,5 +150,18 @@ describe('a line shaped like a key', () => {
     expect(shapedLikeKey('tagadd:2026-10-20-meeting-notes-for-the-team')).toBe(false)
     expect(shapedLikeKey('open:201a summary')).toBe(false)
     expect(shapedLikeKey('set:input web search on')).toBe(false)
+  })
+})
+
+describe('a prompt that holds a key (C129)', () => {
+  it('is caught: a key with its prefix, or a long mixed run', () => {
+    expect(holdsKey('my key is sk-ant-api03-abcdefghijklmnop, why does it fail?')).toBe(true)
+    expect(holdsKey('use 8fQ2kLmN0pR4sT6uV8wX0yZ2aB4cD6eF please')).toBe(true)
+  })
+
+  it('lets a prompt ask about hashes and the word sk- itself', () => {
+    expect(holdsKey('what changed in commit 3f9a1c7e5b2d4f6a8c0e1b3d5f7a9c2e4b6d8f0a?')).toBe(false)
+    expect(holdsKey('why do keys start with sk- at all?')).toBe(false)
+    expect(holdsKey('barn owls hunt by sound')).toBe(false)
   })
 })

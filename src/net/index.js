@@ -1,8 +1,8 @@
 // The gateway and the key module, wired to the app (stage 4). Everything
 // that talks to a provider or source, or handles a key, goes through here.
 
-import { destination } from './list'
-import { createKeyring } from './keyring'
+import { destination, shipped } from './list'
+import { createKeyring, checkAndKeep } from './keyring'
 import { createGateway } from './gateway'
 import { getProvider } from '../providers'
 import { executeClientTool } from '../providers/anthropic'
@@ -55,3 +55,23 @@ export const runClientTool = (name, input) => executeClientTool(name, input)
 
 /** Whether there is a key for a provider, without decrypting it. */
 export const hasKey = (id = DEFAULT_MODEL_PROVIDER) => keys.has(id)
+
+// ── For the key panel (stage 5) ─────────────────────────
+// The panel shows each key's last four characters and never holds a key:
+// the key is read here, cut, and let go.
+
+/** The built providers that take a key: whether each has one, and its last four characters. */
+export async function keyStatus() {
+  const out = []
+  for (const d of shipped().filter((x) => x.key)) {
+    const key = await keys.get(d.id).catch(() => null)
+    out.push({ id: d.id, name: d.name, has: Boolean(key), held: keys.isHeld(d.id), ending: key ? key.slice(-4) : null, keysPage: d.keysPage })
+  }
+  return out
+}
+
+/** Checks a typed key with its provider, then keeps it saved or for this tab only. */
+export const addKey = (id, typed, { save = true } = {}) => checkAndKeep({ check: gateway.check, keyring: keys }, id, typed, { save })
+
+/** The built sources and local models that need no key, by name. */
+export const noKeyNeeded = () => shipped().filter((d) => !d.key && d.kind !== 'model').map((d) => d.name)

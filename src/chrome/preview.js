@@ -19,6 +19,7 @@ import { enterLine } from '../commands/registry'
 import { plan, planOpen, planBring, planRoom, roomOnScreen, ARRANGEMENT_VERBS } from '../shell/arrangement'
 import { cleanRoomName, ROOM_NAME_MAX } from '../lib/roomNames'
 import { CHARS_PER_TOKEN, inputCost, describeCost } from '../shell/estimate'
+import { holdsKey } from '../commands/parse'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
@@ -26,8 +27,9 @@ import { CHARS_PER_TOKEN, inputCost, describeCost } from '../shell/estimate'
 const BRINGS = Object.freeze(['alm', 'sym', 'library'])
 // Verbs that act on what the bar points at, rather than only on the space:
 // name: (C40), tour:, which also shows the welcome steps (A20), and
-// inspect:, which shows one thing in detail under the bar (stage 5).
-const ACTS = Object.freeze(['name', 'tour', 'inspect'])
+// inspect:, which shows one thing in detail under the bar, and api:, which
+// opens the key panel there (stage 5).
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api'])
 export const BUILT = new Set([...ARRANGEMENT_VERBS, ...BRINGS, ...ACTS])
 
 // alm: brings the Almanac arrangement, the Almanac and the Collection, or
@@ -102,6 +104,36 @@ function planInspect(a, step, screens = {}) {
   return { says: { message: 'inspectOne', values: { num } }, act: { kind: 'inspect', num } }
 }
 
+/**
+ * api: opens the key panel under the field (settings spec §6; stage 5,
+ * piece 5). A key goes only into the panel's password field, never into the
+ * bar, so a key-shaped line is refused before this (registry). api:<provider>
+ * opens that provider's field, for adding or replacing; api:new the first
+ * without a key. screens.keys is each built provider that takes a key, with
+ * whether it has one and its last four characters; screens.noKey names the
+ * sources that need none.
+ */
+function planApi(a, step, screens = {}) {
+  const status = screens.keys ?? []
+  const [arg] = step.match?.values ?? []
+  if (!arg) return { says: { message: 'apiList' }, act: { kind: 'keys', focus: null } }
+  const word = String(arg.value ?? '').toLowerCase()
+  if (word === 'new') {
+    const free = status.find((k) => !k.has)
+    if (!free) return { says: { message: 'apiAllKeyed', values: { words: status.map((k) => `api:${k.id}`) } }, act: null }
+    return { says: { message: 'apiNew', values: { provider: free.name } }, act: { kind: 'keys', focus: free.id } }
+  }
+  const p = status.find((k) => k.id === word || k.name.toLowerCase() === word)
+  if (p) {
+    return p.has
+      ? { says: { message: 'apiReplace', values: { provider: p.name, ending: p.ending } }, act: { kind: 'keys', focus: p.id } }
+      : { says: { message: 'apiAdd', values: { provider: p.name } }, act: { kind: 'keys', focus: p.id } }
+  }
+  const keyless = (screens.noKey ?? []).find((n) => n.toLowerCase() === word)
+  if (keyless) return { says: { message: 'apiNoKey', values: { provider: keyless } }, act: null }
+  return { says: { message: 'apiUnknown', values: { word, words: [...status.map((k) => `api:${k.id}`), 'api:new'] } }, act: null }
+}
+
 // The words of an argument as typed: quoted text without its quotes, or a
 // word as written (the parser lower-cases words).
 const typed = (arg) => (arg?.kind === 'text' ? arg.value : arg?.text ?? '')
@@ -130,8 +162,9 @@ function planName(a, step, screens = {}) {
  * @param {string} value the whole field, leader included
  * @param {{ mode: string, arrangement: import('../shell/arrangement').Arrangement, built?: Set<string>,
  *   screens?: { lastRoom?: { id: string, num?: number|null }|null, roomName?: object|null, stepsOff?: boolean,
- *     measure?: () => object|null, numbered?: Map<number, object> } }} ctx  measure: the space as drawn, for
- *   width: (C126); numbered: the Almanac's rows by number, for open: and inspect:
+ *     measure?: () => object|null, numbered?: Map<number, object>, keys?: object[], noKey?: string[] } }} ctx
+ *   measure: the space as drawn, for width: (C126); numbered: the Almanac's rows by number, for open: and
+ *   inspect:; keys and noKey: for api: (planApi)
  * @returns {{ answer: object, says: { message: string, values?: object }, next: object|null, act?: object|null }}
  *   next is the space after Enter, or null when Enter changes none of it;
  *   act is what Enter does besides, to what the bar points at (name:) or to
@@ -145,7 +178,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   if (acts.length) {
     if (answer.steps.length > 1) return { answer, says: { message: 'aloneNow', values: { verb: `${acts[0].verb}:` } }, next: null }
     const step = answer.steps[0]
-    const plans = { tour: planTour, name: planName, inspect: planInspect }
+    const plans = { tour: planTour, name: planName, inspect: planInspect, api: planApi }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
     return { answer, says: p.says, next: p.next ?? null, act: p.act ?? null }
@@ -209,6 +242,8 @@ export function promptPreview(text, target = {}) {
     }
     return { ready: false, says: null }
   }
+  // A key in a prompt would go to the model, or to a source as a search.
+  if (holdsKey(prompt)) return { ready: false, says: { message: 'promptKey' } }
   if (target.keyed == null) return { ready: false, says: { message: 'promptChecking' } }
   if (!target.keyed) return { ready: true, says: { message: 'promptSource', values: { source: target.source } } }
 

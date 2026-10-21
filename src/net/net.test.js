@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { DESTINATIONS, destination, shipped, connectOrigins } from './list'
-import { createKeyring } from './keyring'
+import { createKeyring, checkAndKeep } from './keyring'
 import { createGateway, Refused } from './gateway'
 import { CONTENT_SECURITY_POLICY } from '../lib/securityHeaders'
 
@@ -79,6 +79,45 @@ describe('the key module', () => {
     await keys.put('anthropic', 'k', { save: false })
     await keys.remove('anthropic')
     expect(await keys.has('anthropic')).toBe(false)
+  })
+})
+
+describe('checking a key, then keeping it (stage 5, the key panel)', () => {
+  const ring = () => createKeyring(savedStore())
+
+  it('keeps a key its provider accepts, and says whether it is new', async () => {
+    const keyring = ring()
+    const check = vi.fn(async () => ({ valid: true }))
+    expect(await checkAndKeep({ check, keyring }, 'anthropic', '  sk-ant-one  ')).toEqual({ ok: true, fresh: true })
+    expect(check).toHaveBeenCalledWith('anthropic', 'sk-ant-one')
+    expect(await keyring.get('anthropic')).toBe('sk-ant-one')
+    expect(await checkAndKeep({ check, keyring }, 'anthropic', 'sk-ant-one')).toEqual({ ok: true, fresh: false })
+    expect(await checkAndKeep({ check, keyring }, 'anthropic', 'sk-ant-two', { save: false })).toEqual({ ok: true, fresh: true })
+    expect(keyring.isHeld('anthropic')).toBe(true)
+  })
+
+  it('keeps nothing when the provider refuses, cannot be reached, or nothing was typed', async () => {
+    const keyring = ring()
+    const answers = [
+      [{ valid: false, status: 'invalid' }, 'invalid'],
+      [{ valid: false, status: 'billing_error' }, 'billing'],
+      [{ valid: false, status: 'unreached' }, 'unreached'],
+      [{ valid: false, status: 'error' }, 'unreached'],
+    ]
+    for (const [answer, status] of answers) {
+      expect(await checkAndKeep({ check: async () => answer, keyring }, 'anthropic', 'sk-ant-x')).toEqual({ ok: false, status })
+    }
+    expect(await checkAndKeep({ check: async () => { throw new Error('offline') }, keyring }, 'anthropic', 'sk-ant-x')).toEqual({ ok: false, status: 'unreached' })
+    const check = vi.fn()
+    expect(await checkAndKeep({ check, keyring }, 'anthropic', '   ')).toEqual({ ok: false, status: 'empty' })
+    expect(check).not.toHaveBeenCalled()
+    expect(await keyring.has('anthropic')).toBe(false)
+  })
+
+  it('links each provider that takes a key to its key page, never fetched', () => {
+    expect(destination('anthropic').keysPage).toBe('https://console.anthropic.com/settings/keys')
+    expect(destination('wikipedia').keysPage).toBeNull()
+    expect(CONTENT_SECURITY_POLICY).not.toContain('console.anthropic.com')
   })
 })
 
