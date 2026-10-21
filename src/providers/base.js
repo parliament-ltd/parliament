@@ -61,30 +61,6 @@ export class BaseProvider {
     return []
   }
 
-  // Generate a short conversation title from the first exchange.
-  // Uses a lightweight non-streaming call to the cheapest available model.
-  // Returns a short title string (2-6 words).
-  // Callers should catch errors and handle silently (conversation keeps default title).
-  async generateTitle(apiKey, messages) {
-    throw new Error('Not implemented')
-  }
-
-  // Generate a one-line AI summary of the conversation so far.
-  // Uses a lightweight non-streaming call to the cheapest available model.
-  // Returns a summary string (one sentence, max ~120 characters).
-  // Callers should catch errors and handle silently (conversation keeps no summary).
-  async generateSummary(apiKey, messages) {
-    throw new Error('Not implemented')
-  }
-
-  // Generate topic tags for a conversation based on its content.
-  // Uses a lightweight non-streaming call to the cheapest available model.
-  // Returns an array of 1-3 lowercase tag strings.
-  // Callers should catch errors and handle silently (conversation keeps no tags).
-  async generateTags(apiKey, messages) {
-    throw new Error('Not implemented')
-  }
-
   // The one request after a chat's first answer (C62), in place of the
   // three above: its title, a one-line summary and 1-3 tags, from a single
   // lightweight call. Returns { title?, summary?, tags? }, whichever came

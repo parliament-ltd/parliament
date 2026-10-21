@@ -16,30 +16,9 @@ function stalledError() {
   return error
 }
 
-const TITLE_SYSTEM_PROMPT = `Generate a short title (2-6 words) for this conversation. Rules:
-- No quotes, no periods, no special characters
-- Capture the core topic or intent
-- Be specific, not generic (e.g. "React Router Migration" not "Coding Help")
-- Title case
-- Do NOT prefix with "Title:" or "Summary:" or any label
-- Respond with ONLY the title, nothing else`
-
-const SUMMARY_SYSTEM_PROMPT = `Summarize this conversation in one concise sentence. Rules:
-- Maximum 120 characters
-- Describe what was discussed or accomplished
-- Use past tense (e.g. "Designed a chat interface with branching and context metering")
-- Be specific, not generic
-- Do NOT prefix with "Summary:" or any label
-- Respond with ONLY the summary sentence, nothing else`
-
-const TAGS_SYSTEM_PROMPT = `Generate 1-3 topic tags for this conversation. Rules:
-- Each tag is a single lowercase word (e.g. "design", "api", "architecture")
-- Tags should capture the main topics or domains discussed
-- Return ONLY the tags as a comma-separated list, nothing else
-- Example: "design, api, performance"`
-
-// One request after a chat's first answer, in place of the three above
-// (C62): its title, a one-line summary and its tags, as JSON.
+// One request after a chat's first answer, in place of the three that
+// asked for a title, a summary and tags (C62; retired with R32 to
+// src/deprecated/): its title, a one-line summary and its tags, as JSON.
 const DESCRIBE_SYSTEM_PROMPT = `Describe this conversation for a list of conversations. Respond with JSON only, in exactly this shape:
 {"title": "...", "summary": "...", "tags": ["..."]}
 Rules:
@@ -544,67 +523,6 @@ export class AnthropicProvider extends BaseProvider {
 
     const data = await response.json()
     return { inputTokens: data.input_tokens }
-  }
-
-  async generateTitle(apiKey, messages) {
-    const titleMessages = this._prepareMessages(messages, 2, 500)
-
-    titleMessages.push({
-      role: 'user',
-      content: 'Based on our exchange above, generate a short title for this conversation.',
-    })
-
-    const rawTitle = await this._lightweightCall(apiKey, TITLE_SYSTEM_PROMPT, titleMessages, 30)
-    const cleanTitle = this._stripPrefixes(rawTitle)
-
-    if (cleanTitle.length === 0 || cleanTitle.length > 60) {
-      throw new Error('Generated title was empty or too long')
-    }
-
-    return cleanTitle
-  }
-
-  async generateSummary(apiKey, messages) {
-    const summaryMessages = this._prepareMessages(messages, 6, 400)
-
-    summaryMessages.push({
-      role: 'user',
-      content: 'Based on the conversation above, write a one-sentence summary of what was discussed.',
-    })
-
-    const rawSummary = await this._lightweightCall(apiKey, SUMMARY_SYSTEM_PROMPT, summaryMessages, 80)
-    const cleanSummary = this._stripPrefixes(rawSummary)
-
-    if (cleanSummary.length === 0 || cleanSummary.length > 200) {
-      throw new Error('Generated summary was empty or too long')
-    }
-
-    return cleanSummary
-  }
-
-  async generateTags(apiKey, messages) {
-    const tagMessages = this._prepareMessages(messages, 4, 400)
-
-    tagMessages.push({
-      role: 'user',
-      content: 'Based on the conversation above, generate topic tags.',
-    })
-
-    const rawTags = await this._lightweightCall(apiKey, TAGS_SYSTEM_PROMPT, tagMessages, 40)
-    const cleanTags = this._stripPrefixes(rawTags)
-
-    // Parse comma-separated tags, clean each one
-    const tags = cleanTags
-      .split(',')
-      .map(t => t.trim().toLowerCase().replace(/[^a-z0-9-]/g, ''))
-      .filter(t => t.length > 0 && t.length <= 20)
-      .slice(0, 3)
-
-    if (tags.length === 0) {
-      throw new Error('No valid tags generated')
-    }
-
-    return tags
   }
 
   // The one request after a chat's first answer (C62): title, summary and

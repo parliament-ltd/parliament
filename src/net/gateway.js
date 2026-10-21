@@ -42,7 +42,7 @@ export function createGateway({ destination, keyring, implementation, now = () =
     /**
      * Calls a method of a provider or source.
      * @param {string} id the provider or source, from the list
-     * @param {string} method its method: sendMessage, generateTitle, search…
+     * @param {string} method its method: sendMessage, generateMetadata, answer…
      * @param {Array} args the method's arguments, after the key
      * @param {{ label: string }} options what made the request, for the log
      */
