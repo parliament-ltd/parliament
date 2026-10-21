@@ -184,6 +184,8 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           folded={folded}
           win={win}
           marginalia={marginalia}
+          ink={prompt?.room !== undefined ? prompt?.ink ?? null : null}
+          inkKey={prompt?.room ?? null}
           onOpen={() => { dispatch({ type: 'open' }); input.current?.focus() }}
           onHover={() => { if (field.minimised || field.peek) hoverAfter(140, 'hover') }}
           onLeave={() => { if (field.minimised || field.peek) hoverAfter(600, 'leave') }}

@@ -13,9 +13,10 @@ import { CommandFill, PromptFill, Magnifier, Quill, MoonMark } from './Fills'
 // src/shell/field.js.
 //
 // In prompt mode, marginalia inside the field says who answers a prompt
-// here: "answered from Wikipedia", "answered by Claude Sonnet" (stage 4).
+// here: "answered from Wikipedia", "answered by Claude Sonnet" (stage 4),
+// and the ink pot shows a reply arriving, arrived, or stopped (C114).
 
-const Field = forwardRef(function Field({ state, folded, win, marginalia = null, onInput, onKeyDown, onFocus, onBlur, onOpen, onHover, onLeave }, ref) {
+const Field = forwardRef(function Field({ state, folded, win, marginalia = null, ink = null, inkKey = null, onInput, onKeyDown, onFocus, onBlur, onOpen, onHover, onLeave }, ref) {
   const { i18n } = useLingui()
   const { mode } = state
   return (
@@ -43,7 +44,7 @@ const Field = forwardRef(function Field({ state, folded, win, marginalia = null,
       {marginalia && <span className="ch-marg ch-fmarg">{marginalia}</span>}
       <div className="ch-gslot" aria-hidden="true">
         <Magnifier on={mode === 'search'} />
-        <Quill on={mode === 'prompt'} />
+        <Quill on={mode === 'prompt'} ink={ink} inkKey={inkKey} />
       </div>
       <MoonMark folded={folded && mode === 'command'} win={win} />
       {folded && (

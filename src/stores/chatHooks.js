@@ -1,5 +1,5 @@
 import { useCallback, useSyncExternalStore } from 'react'
-import { subscribe, streamText, streamMessageId, isStreaming, getNotices, getMessages, hiddenIds, pendingDeletes } from './chatStore'
+import { subscribe, streamText, streamMessageId, isStreaming, getNotices, getMessages, hiddenIds, pendingDeletes, streamEnd } from './chatStore'
 
 // Reading the chat store from a component (state audit §11a). Each hook
 // listens to one conversation's topic, so a reply streaming in one chat
@@ -23,6 +23,11 @@ export function useStreamMessageId(id) {
 /** Whether a reply is being written in a conversation. */
 export function useIsStreaming(id) {
   return useTopic(`status:${id}`, useCallback(() => isStreaming(id), [id]))
+}
+
+/** How a conversation's last reply ended: { how: 'done'|'stopped', at }, or null (C114). */
+export function useStreamEnd(id) {
+  return useTopic(`status:${id}`, useCallback(() => streamEnd(id), [id]))
 }
 
 /** A chat's messages while it is open (stage 4). */

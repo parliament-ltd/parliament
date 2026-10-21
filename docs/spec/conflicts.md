@@ -950,6 +950,14 @@ Found while building stage 4, pieces 4 and 5 (a room in the shell; sending by co
 - **The alternatives:** leave source answers out of what a model receives, or send them as before.
 - **Ruled 21 October: they stay out unless the person acts on them** (see Rulings). Built so (`src/stores/sendHistory.js`): the person's prompts go, the answers do not, and the Enter line says "2 answers from Wikipedia stay out". The introducing line stays in the provider abstraction (`base.js`) for when the person brings an answer in (stage 8).
 
+**C116. The ink pot.** **Given by Stefan on 21 October** (`parliament-inkpot.svg` and `.js`, with C114): the quill's ink pot in the prompt field is a quiet sign of a reply arriving. Built (`src/chrome/inkpot.js`, the drawing in `Fills.jsx`, the motion in `chrome.css`), with the file's own timings:
+- While a reply arrives in the room on screen, the ink drains and the quill re-dips, over and over. Wikipedia's answers count too.
+- When the reply has arrived, the quill dips once and the pot refills.
+- When it is stopped, the ink freezes and spills down the side, and stays spilt until the next prompt. **Built so that a reply that broke off (an error or a stall) spills too,** since it did not arrive whole; a reply cut at the length limit refills, since it arrived and its card says it was cut. One line in `chatStore.js` changes either.
+- At rest the pot now shows full of ink, as the drawing has it; before, the quill's pot was an outline.
+- Moving to another room puts the pot back to rest. With reduced motion the quill and the surface keep still and only the slow drain shows.
+- In the shell nothing stops a reply by hand yet (`stop:` comes later), so for now the spill shows when a reply breaks off or stalls.
+
 **Also, for the record** (built in piece 5, no question):
 - Hidden messages, and messages waiting out their 20 seconds before being deleted, are no longer sent (request-path audit, item 5). The Enter line says how many stay out. A delete now completes after its 20 seconds even if the chat was left; before, leaving cancelled it silently.
 - Replies cut off by the length allowed for one reply, or broken off by an error, are stored as cut off (`stopReason` 'limit' or 'error', beside C109's 'left') and say so. This is a new value in an optional field: nothing existing changes, and older backups read as before.

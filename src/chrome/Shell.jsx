@@ -17,7 +17,7 @@ import { useChat } from '../stores/ChatContext'
 import { useConversations } from '../stores/ConversationContext'
 import { useSettings } from '../stores/SettingsContext'
 import { useCollabMode } from '../stores/CollabModeContext'
-import { useIsStreaming, useHiddenIds, usePendingDeletes } from '../stores/chatHooks'
+import { useIsStreaming, useHiddenIds, usePendingDeletes, useStreamEnd } from '../stores/chatHooks'
 import { sendableOf } from '../stores/chatStore'
 import { fromSource } from '../stores/sendHistory'
 import { preview } from './preview'
@@ -224,6 +224,10 @@ export default function Shell() {
 
   const roomId = roomChat(arrangement.id) // the chat on screen; null in an empty room; undefined with no room
   const streaming = useIsStreaming(roomId ?? '')
+  // The ink pot in the prompt field: draining while a reply arrives, then
+  // refilled, or spilt if the reply was stopped or broke off (C114).
+  const ended = useStreamEnd(roomId ?? '')
+  const ink = streaming ? 'writing' : ended?.how ?? null
   const lastRoom = useMemo(() => {
     let latestChat = null
     for (const c of conversations) if (!latestChat || Date.parse(c.updatedAt) > Date.parse(latestChat.updatedAt)) latestChat = c
@@ -269,7 +273,8 @@ export default function Shell() {
     sourcesOut,
     describe,
     resend: Boolean(roomId) && stalledIn === roomId,
-  }), [roomId, roomRecord, streaming, keyed, model, settings.defaultModel, along, hiddenOut, sourcesOut, describe, stalledIn, buildSystemPrompt])
+    ink,
+  }), [roomId, roomRecord, streaming, ink, keyed, model, settings.defaultModel, along, hiddenOut, sourcesOut, describe, stalledIn, buildSystemPrompt])
 
   /**
    * Sends a prompt to the room on screen: to the provider with a key, else

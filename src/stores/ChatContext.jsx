@@ -7,7 +7,7 @@ import { useSettings } from './SettingsContext'
 import { gateway, destination, runClientTool, continueInstruction, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
 import {
   startStream, appendStream, resetStreamText, stopStream, endStream, getStream,
-  isStreaming as streamingIn, streamingIds, addNotice,
+  isStreaming as streamingIn, streamingIds, addNotice, noteCut,
   getMessages as heldMessages, hasMessages, setMessages as holdMessages, updateMessages, releaseMessages, sendable,
 } from './chatStore'
 import { useIsStreaming, useMessages } from './chatHooks'
@@ -335,6 +335,7 @@ export function ChatProvider({ children }) {
       // Stopped or left: kept as it was. Anything else broke the reply off;
       // a stall keeps its place, to be sent again without streaming (C114).
       const aborted = error.name === 'AbortError'
+      if (!aborted) noteCut(conversationId) // the ink pot spills (C114)
       const kept = await keepPartial(conversationId, assistantMsg.id, '', aborted ? null : 'error', { keepEmpty: error.name === 'Stalled' })
 
       // Re-throw if not an abort (abort is expected from stopping or leaving)
@@ -392,6 +393,7 @@ export function ChatProvider({ children }) {
       if (at === 0 && content) describeNewChat(conversationId, forModel([prompt, finished]), prompt.content).catch(() => {})
     } catch (error) {
       const aborted = error.name === 'AbortError'
+      if (!aborted) noteCut(conversationId) // the ink pot spills (C114)
       const kept = await keepPartial(conversationId, reply.id, '', aborted ? null : 'error', { keepEmpty: !aborted })
       if (!aborted) {
         error.kept = kept
@@ -439,6 +441,7 @@ export function ChatProvider({ children }) {
       await updateMessage(placeholder.id, updates)
       updateMessages(conversationId, prev => prev.map(m => (m.id === placeholder.id ? { ...m, ...updates } : m)))
     } catch (error) {
+      if (error.name !== 'AbortError') noteCut(conversationId)
       await keepPartial(conversationId, placeholder.id)
       if (error.name !== 'AbortError') throw error
     } finally {
@@ -499,6 +502,7 @@ export function ChatProvider({ children }) {
     } catch (error) {
       stopPersisting()
       const aborted = error.name === 'AbortError'
+      if (!aborted) noteCut(conversationId) // the ink pot spills (C114)
       const kept = await keepPartial(conversationId, incompleteMsg.id, incompleteMsg.content, aborted ? null : 'error')
 
       if (!aborted) {

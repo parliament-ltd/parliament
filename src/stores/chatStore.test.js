@@ -139,3 +139,28 @@ describe('messages, by chat (stage 4)', () => {
     expect(S.getMessages('a').map((x) => x.id)).toEqual(['1'])
   })
 })
+
+describe('how a reply ended, for the ink pot (C114)', () => {
+  it('arrived, stopped, or broke off', () => {
+    expect(S.streamEnd('a')).toBeNull()
+    S.startStream('a', { messageId: 'm1' })
+    S.endStream('a')
+    expect(S.streamEnd('a').how).toBe('done')
+    S.startStream('a', { messageId: 'm2' })
+    S.stopStream('a', 'stopped')
+    S.endStream('a')
+    expect(S.streamEnd('a').how).toBe('stopped')
+    S.startStream('a', { messageId: 'm3' })
+    S.noteCut('a')
+    S.endStream('a')
+    expect(S.streamEnd('a').how).toBe('stopped')
+  })
+
+  it('tells the status topic, so the pot hears it at once', () => {
+    const heard = vi.fn()
+    S.subscribe('status:a', heard)
+    S.startStream('a', { messageId: 'm1' })
+    S.endStream('a')
+    expect(heard).toHaveBeenCalledTimes(2)
+  })
+})

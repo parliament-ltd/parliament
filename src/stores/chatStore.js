@@ -55,9 +55,21 @@ export function subscribe(topic, fn) {
 
 /** A stream begins for a conversation, filling one message. */
 export function startStream(id, { messageId, text = '', controller = null, at = Date.now() }) {
-  streams.set(id, { messageId, text, startedAt: at, controller, stopReason: null })
+  streams.set(id, { messageId, text, startedAt: at, controller, stopReason: null, cut: false })
   now(`status:${id}`, `stream:${id}`)
 }
+
+/** The reply broke off: an error or a stall cut it short. */
+export function noteCut(id) {
+  const s = streams.get(id)
+  if (s) s.cut = true
+}
+
+// How each conversation's last stream ended, for the ink pot (C114):
+// 'done' when the reply arrived, 'stopped' when it was stopped, left, or
+// broke off. Read on the `status:<id>` topic.
+const ends = new Map()
+export const streamEnd = (id) => ends.get(id) ?? null
 
 /** A piece of the reply arrives. */
 export function appendStream(id, chunk) {
@@ -85,8 +97,9 @@ export function stopStream(id, reason = 'stopped') {
 }
 
 /** The stream is over, finished or stopped. Returns what it was. */
-export function endStream(id) {
+export function endStream(id, at = Date.now()) {
   const s = streams.get(id) ?? null
+  if (s) ends.set(id, Object.freeze({ how: s.stopReason || s.cut ? 'stopped' : 'done', at }))
   streams.delete(id)
   now(`status:${id}`, `stream:${id}`)
   return s
@@ -243,6 +256,7 @@ export function _reset() {
   if (timer) clearTimeout(timer)
   timer = null
   notices = []
+  ends.clear()
   lists.clear()
   hidden.clear()
   for (const map of deleting.values()) for (const d of map.values()) clearTimeout(d.timer)

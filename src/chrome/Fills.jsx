@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef } from 'react'
 import { STARS, STAR_TILE } from './stars'
 import { shapeAt, turnAt, ease } from './moon'
 import { MOTION } from './motion'
+import { inkPot } from './inkpot'
 
 // The field's fills and glyphs, as the bar reference draws them (9 October):
 // navy with star dots for command, paper with a skewed mosaic for prompt, the
@@ -50,13 +51,62 @@ export function Magnifier({ on }) {
   )
 }
 
-export function Quill({ on }) {
+// The quill in its ink pot, holding ink (Stefan's parliament-inkpot.svg,
+// 21 October; C114). At rest the pot is full and still. While a reply
+// arrives the ink drains and the quill re-dips; when it has arrived the pot
+// refills; when it is stopped the ink spills down the side (inkpot.js).
+// `ink` is 'writing', 'done', 'stopped' or null; `inkKey` names the chat the
+// field points at, and a new one puts the pot back to rest.
+const POT = 'M6.3 14.8h8.5l-.7 5.1a1.5 1.5 0 0 1-1.5 1.3H8.5a1.5 1.5 0 0 1-1.5-1.3z'
+
+// The pot's state lives on an inner group whose class React never changes,
+// so changing mode, which redraws the svg's class, cannot wipe it.
+export function Quill({ on, ink = null, inkKey = null }) {
+  const root = useRef(null)
+  const pot = useRef(null)
+  const was = useRef({ ink: null, key: inkKey })
+  const clip = `pq-in-${useId().replace(/[^A-Za-z0-9_-]/g, '')}`
+
+  useEffect(() => {
+    if (!root.current) return
+    if (!pot.current) pot.current = inkPot(root.current)
+    const p = pot.current
+    const prev = was.current
+    was.current = { ink, key: inkKey }
+    if (prev.key !== inkKey) {
+      p.reset()
+      if (ink === 'writing') p.start()
+      return
+    }
+    if (ink === prev.ink) return
+    if (ink === 'writing') p.start()
+    else if (prev.ink === 'writing' && ink === 'stopped') p.stop()
+    else if (prev.ink === 'writing' && ink === 'done') p.done()
+  }, [ink, inkKey])
+
   return (
     <svg className={`ch-glyph quill${on ? ' on' : ''}`} viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M6.3 14.8h8.5l-.7 5.1a1.5 1.5 0 0 1-1.5 1.3H8.5a1.5 1.5 0 0 1-1.5-1.3z" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+      <defs><clipPath id={clip}><path d={POT} /></clipPath></defs>
+      <g ref={root} className="pq">
+      <g clipPath={`url(#${clip})`}>
+        <g className="pq-lvl">
+          <g className="pq-ink">
+            <path className="pq-surf" d="M4 16.3q2.2-.45 4.4 0t4.4 0 4.4 0V24H4z" fill="currentColor" />
+          </g>
+        </g>
+      </g>
+      <g className="pq-spill">
+        <path className="pq-run" d="M15.6 15.2c.5 1.6-.1 3.6.4 6.6" fill="none" stroke="currentColor" strokeWidth="1.15" strokeLinecap="round" pathLength="8" />
+        <path className="pq-pud" d="M11.6 22.3c.9-.6 2.6-.75 4.2-.6 1.5.15 2.4.5 2.2.9-.2.45-1.6.65-3.2.65-1.7 0-3.6-.35-3.2-.95z" fill="currentColor" />
+        <circle className="pq-drop" cx="19.4" cy="22.5" r=".45" fill="currentColor" />
+      </g>
+      <path d={POT} fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
       <path d="M5.2 14.8h10.7" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-      <path d="M21.3 2.3c-5.7 1.2-9.1 5-9.8 10l3.1-1c3.9-1.4 6.4-4.6 6.7-9z" fill="currentColor" />
-      <path d="M11.9 12.2 10.4 14.7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <g className="pq-pen">
+        <path d="M21.3 2.3c-5.7 1.2-9.1 5-9.8 10l3.1-1c3.9-1.4 6.4-4.6 6.7-9z" fill="currentColor" />
+        <path d="M11.9 12.2 10.4 14.7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </g>
+      </g>
     </svg>
   )
 }

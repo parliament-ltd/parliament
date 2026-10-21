@@ -135,6 +135,34 @@
 .ch-enter { transition: opacity var(--ch-dur-fade); }
 .ch-enter.hide { opacity: 0; }
 
+/* The ink pot (C114; Stefan's parliament-inkpot.svg, 21 October): the quill
+   in its pot holds ink. While a reply arrives the ink drains and the quill
+   re-dips; when it has arrived the pot refills (inkpot.js); when it is
+   stopped the ink spills down the side. Timings are the drawing's own, and
+   are not scaled by --ch-k: with reduced motion the quill and the surface
+   keep still and only the slow drain shows. */
+.ch-glyph.quill { overflow: visible; }
+.pq .pq-ink { animation: pq-drain 9s cubic-bezier(.45, 0, .55, 1) infinite paused; }
+.pq .pq-pen { transform-box: view-box; transform-origin: 12px 13px; animation: pq-dip 9s ease-in-out infinite paused; }
+.pq .pq-surf { animation: pq-slosh 1.8s ease-in-out infinite alternate paused; }
+.pq.is-writing .pq-ink, .pq.is-writing .pq-pen, .pq.is-writing .pq-surf { animation-play-state: running; }
+.pq .pq-lvl { transition: transform 0s .45s; }
+.pq .pq-spill { opacity: 0; transition: opacity .4s; }
+.pq .pq-run { stroke-dasharray: 8; stroke-dashoffset: 8; transition: stroke-dashoffset 0s .45s; }
+.pq .pq-pud { transform-box: fill-box; transform-origin: 30% 50%; transform: scale(0, 0); transition: transform 0s .45s; }
+.pq .pq-drop { opacity: 0; transition: opacity 0s .45s; }
+.pq.is-stopped .pq-lvl { transform: translateY(.8px); transition: transform .9s .2s cubic-bezier(.3, .6, .4, 1); }
+.pq.is-stopped .pq-spill { opacity: 1; transition: none; }
+.pq.is-stopped .pq-run { stroke-dashoffset: 0; transition: stroke-dashoffset .8s .15s cubic-bezier(.5, 0, .7, 1); }
+.pq.is-stopped .pq-pud { transform: scale(1, 1); transition: transform 1.1s .8s cubic-bezier(.2, .8, .3, 1); }
+.pq.is-stopped .pq-drop { opacity: 1; transition: opacity .25s 1.5s; }
+.pq.is-stopped .pq-pen { animation: pq-flinch .5s ease-out 1 both; }
+@keyframes pq-drain { 0% { transform: translateY(0); } 82%, 88% { transform: translateY(4.6px); } 94%, 100% { transform: translateY(0); } }
+@keyframes pq-dip { 0%, 82% { transform: translate(0, 0); } 86%, 91% { transform: translate(-.5px, 1.1px); } 95%, 100% { transform: translate(0, 0); } }
+@keyframes pq-slosh { from { transform: translateX(-.6px); } to { transform: translateX(.6px); } }
+@keyframes pq-flinch { 0% { transform: translate(0, 0); } 35% { transform: translate(.5px, -1.2px) rotate(4deg); } 100% { transform: translate(.3px, -.7px) rotate(2deg); } }
+@media (prefers-reduced-motion: reduce) { .pq .pq-pen, .pq .pq-surf { animation: none; } }
+
 /* Marginalia inside the prompt field: who answers here (bar reference;
    stage 4). It sits before the quill, and hides in the other modes and
    while the field is folded. */
