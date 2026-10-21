@@ -108,7 +108,9 @@
 .ch-dock.left .ch-frow { justify-content: flex-start; }
 .ch-dock.right .ch-frow { justify-content: flex-end; }
 .ch-field { transition: width var(--ch-dur-slide) var(--ch-ease), border-radius var(--ch-dur-slide) var(--ch-ease), box-shadow .2s; }
-.ch-field.min { width: var(--ch-field-h); flex: 0 0 var(--ch-field-h); border-radius: 50%; cursor: pointer; }
+/* Width alone carries the fold, so folding animates exactly as unfolding
+   does (a flex-basis here used to snap the field shut, C112). */
+.ch-field.min { width: var(--ch-field-h); border-radius: 50%; cursor: pointer; }
 .ch-field.min input, .ch-field.min .ch-chip.on { opacity: 0; pointer-events: none; }
 .ch-field input { transition: opacity var(--ch-dur-fade); }
 .ch-field.min.command { box-shadow: 0 0 0 1px rgba(var(--ch-navy), .9); }
@@ -116,8 +118,15 @@
 .ch-field.min:hover { box-shadow: 0 0 0 1px var(--ch-gold-deep); }
 .ch-fold-button { position: absolute; inset: 0; z-index: 5; border-radius: 50%; }
 .ch-shell .ch-fold-button:focus-visible { outline: 2px solid var(--ch-ink); outline-offset: -3px; border-radius: 50%; }
-.ch-glyph.moon { width: 20px; height: 20px; }
-.ch-glyph.moon path { fill: #fff; }
+/* The command mark: as the field folds, the chevron leaves the place of the
+   typed > on the left and travels to the centre of the circle, becoming the
+   moon on the way; opening, it goes back (C112). */
+.ch-mark { position: absolute; top: 50%; left: 81px; width: 20px; height: 20px; z-index: 3; pointer-events: none; opacity: 0;
+  transform: translate(0, -50%) scale(.8);
+  transition: left var(--ch-dur-slide) var(--ch-ease), transform var(--ch-dur-slide) var(--ch-ease), opacity var(--ch-dur-fade); }
+.ch-mark.on, .ch-mark[data-moving] { opacity: 1; }
+.ch-field.min .ch-mark { left: 50%; transform: translate(-50%, -50%) scale(1); }
+.ch-mark path { fill: #fff; }
 .ch-enter { transition: opacity var(--ch-dur-fade); }
 .ch-enter.hide { opacity: 0; }
 

@@ -40,8 +40,8 @@ const Field = forwardRef(function Field({ state, folded, win, onInput, onKeyDown
       <div className="ch-gslot" aria-hidden="true">
         <Magnifier on={mode === 'search'} />
         <Quill on={mode === 'prompt'} />
-        <MoonMark folded={folded && mode === 'command'} win={win} />
       </div>
+      <MoonMark folded={folded && mode === 'command'} win={win} />
       {folded && (
         <button type="button" className="ch-fold-button" aria-label={i18n._(COPY.hints.minimised)} onClick={onOpen} />
       )}

@@ -7,5 +7,5 @@ export const MOTION = Object.freeze({
   wipe: 420, // a mode's fill wipes in
   fade: 240, // pills, glyphs and the Enter line
   slide: 540, // the field folds to a circle (C108)
-  morph: 690, // the chevron rolls into the moon
+  morph: 540, // the chevron becomes the moon as it travels, with the fold (C112)
 })

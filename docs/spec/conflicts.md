@@ -843,7 +843,7 @@ language, reply language), and so are more providers, Mistral included.
 
 ## Part 7. The command layer (added 20 October 2026)
 
-Found while building the parser and the verb registry (stage 3: `src/commands/parse.js`, `verbs.js`, `registry.js`). Every verb in the documents was listed, newest wins, rulings over documents. These are the points the documents leave open (C95 to C107 and C110; C108, C109 and C111 are Stefan's own changes). Each is built as suggested, so a ruling either confirms it or changes one entry in `verbs.js`.
+Found while building the parser and the verb registry (stage 3: `src/commands/parse.js`, `verbs.js`, `registry.js`). Every verb in the documents was listed, newest wins, rulings over documents. These are the points the documents leave open (C95 to C107 and C110; C108, C109, C111 and C112 are Stefan's own changes). Each is built as suggested, so a ruling either confirms it or changes one entry in `verbs.js`.
 
 **C95. Board names as verbs.**
 - The bar inventory (7 and 9 October, the newest) lists `alm:`, `lab:`, `sym:` and `library:` as current. The welcome steps teach `alm:` and `library:`.
@@ -905,6 +905,8 @@ Found while building the parser and the verb registry (stage 3: `src/commands/pa
 **C110. Which Wikipedia addresses the site may reach.** Wikipedia ships as the first source (stage 4), so its address joins the connection policy, which held only Anthropic. Put to Stefan: every language edition (`https://*.wikipedia.org`), so answers come from the Wikipedia in the person's language, or English only for now. **Ruled 20 October: every language edition** (Stefan asked whether it slows anything; it does not, since the policy is a rule the browser checks and nothing is fetched until a prompt goes to Wikipedia).
 
 **C111. The bar's motion is slower.** **Ruled 20 October by Stefan:** "the animation for the search and command bar is too fast, we need to slow it down a bit". Slowed by half again: a mode's fill wipes in over 420ms (was 280), pills, glyphs and the Enter line fade over 240ms (was 160), the field folds to its circle over 540ms (was 360), the chevron rolls into the moon over 690ms (was 460). The bar decisions asked that frequent motion stay under 400ms; the wipe and the fold now go past that, by Stefan's word. Easy to tune: the tokens and `src/chrome/motion.js` hold every value, and a test keeps them together.
+
+**C112. Folding matches unfolding, and the chevron travels as it becomes the moon.** **Ruled 20 October by Stefan:** "the speed to open the bar is good, but the speed to close the bar is still too fast. the bar close should be the same as open and the moon transition, moving from the chevron on the left to the center and transitioning into the moon as it does so". Found: a style that set the folded field's flex basis snapped it shut, so only unfolding animated. Now both take 540ms. In command mode the chevron leaves the place of the typed `>` on the left, travels to the centre of the circle and becomes the moon over the same 540ms, and goes back as the field opens. This replaces the bar reference's moon, which rolled in place after the slide had landed.
 
 **Also built from the mockups** (no question):
 - `open:` puts a board at the right end and points the bar at it; a board already here gets the bar, a popped one comes forward. No limit on how many; narrow windows stack (stage 14).

@@ -79,9 +79,11 @@ Line height 1.5, and 1.6 for reading.
 - Keyboard focus: a 2px ink outline on anything focused (editing spec).
 - Easing `cubic-bezier(.65,0,.35,1)`. A mode's fill wipes in over 420ms;
   pills, glyphs and the Enter line fade over 240ms; the field folds to a
-  circle over 540ms; the chevron rolls into the moon over 690ms; hover opens
-  after 140ms and closes 600ms after leaving. (Slowed by half again from the
-  bar reference's 280, 160, 360 and 460ms on Stefan's word, C111.) With reduced
+  circle over 540ms, and unfolds over the same; the chevron travels from the
+  typed > to the centre and becomes the moon over those same 540ms (C112);
+  hover opens after 140ms and closes 600ms after leaving. (Slowed by half
+  again from the bar reference's 280, 160, 360 and 460ms on Stefan's word,
+  C111.) With reduced
   motion every duration is multiplied by 0.001.
 
 ## Where the mockups differ

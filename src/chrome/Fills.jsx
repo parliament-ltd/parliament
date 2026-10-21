@@ -61,11 +61,14 @@ export function Quill({ on }) {
   )
 }
 
-// The command mark while the field is folded: the chevron rolls into the
-// crescent moon once the slide has landed (C108), and back as it opens.
-// Drawn straight onto the path, frame by frame, on the clock of the window
-// the bar is in; with reduced motion it shows the moon at once.
+// The command mark while the field folds: the chevron travels from the place
+// of the typed > to the centre of the circle and becomes the crescent moon on
+// the way, over the same time as the fold, and goes back as it opens (C108,
+// C112). The travel is CSS; the shape is drawn straight onto the path, frame
+// by frame, on the clock of the window the bar is in. With reduced motion it
+// shows the moon at once.
 export function MoonMark({ folded, win = window }) {
+  const mark = useRef(null)
   const path = useRef(null)
   const turn = useRef(null)
   const t = useRef(folded ? 1 : 0)
@@ -87,17 +90,21 @@ export function MoonMark({ folded, win = window }) {
     let raf = 0
     let start = null
     const duration = MOTION.morph * Math.abs(target - from)
+    // Seen while it moves either way, so the way back shows too.
+    const node = mark.current
+    node?.setAttribute('data-moving', '')
     const step = (now) => {
       if (start === null) start = now
       const u = Math.min(1, (now - start) / duration)
       draw(from + (target - from) * ease(u))
       if (u < 1) raf = win.requestAnimationFrame(step)
+      else node?.removeAttribute('data-moving')
     }
-    const wait = win.setTimeout(() => { raf = win.requestAnimationFrame(step) }, folded ? MOTION.slide : 0)
-    return () => { win.clearTimeout(wait); win.cancelAnimationFrame(raf) }
+    raf = win.requestAnimationFrame(step)
+    return () => { win.cancelAnimationFrame(raf); node?.removeAttribute('data-moving') }
   }, [folded, win])
   return (
-    <svg className={`ch-glyph moon${folded ? ' on' : ''}`} viewBox="0 0 24 24" aria-hidden="true">
+    <svg ref={mark} className={`ch-mark${folded ? ' on' : ''}`} viewBox="0 0 24 24" aria-hidden="true">
       <g ref={turn}><path ref={path} /></g>
     </svg>
   )

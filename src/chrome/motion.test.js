@@ -9,6 +9,8 @@ const ms = (name) => parseInt(tokens.split(`--ch-dur-${name}: calc(`)[1], 10)
 describe('the bar\'s motion', () => {
   it('matches the tokens, slowed by half again from the bar reference', () => {
     expect(MOTION).toEqual({ wipe: ms('wipe'), fade: ms('fade'), slide: ms('slide'), morph: ms('morph') })
-    expect(MOTION).toEqual({ wipe: 420, fade: 240, slide: 540, morph: 690 })
+    expect(MOTION).toEqual({ wipe: 420, fade: 240, slide: 540, morph: 540 })
+    // The chevron becomes the moon over the fold itself (C112).
+    expect(MOTION.morph).toBe(MOTION.slide)
   })
 })
