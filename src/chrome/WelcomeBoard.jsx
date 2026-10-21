@@ -2,6 +2,7 @@ import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { STEPS, nextStep } from '../shell/welcome'
 import { useNarrower } from './useNarrower'
+import BirdsMark from './BirdsMark'
 
 // Below this width the card is one column: steps, field, then the letter
 // (welcome spec §5), however it got narrow (C126).
@@ -46,6 +47,7 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
       <div className="ch-wscroll">
         <div className="ch-wgrid">
           <h1 className="ch-wh">
+            <BirdsMark className="ch-wlogo" />
             {i18n._(COPY.welcome.heading)}
             <span className="ch-wto">{i18n._(COPY.welcome.headingTo)}</span>
           </h1>

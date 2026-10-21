@@ -20,6 +20,7 @@ ones written inside each document.
 | 6 Oct | `editing-in-place-spec.md` | Editing replies and prompts, asks, Ripple, the Collection's cards, collab, Reflection, sweeps, focus, calm, legibility | `parliament-inline-editing-v5.html` |
 | 7 Oct, updated 9 Oct | `bar-and-commands-decisions.md` | The field, minimising to a hexagon, gold, seven renamed verbs, the command inventory | `parliament-bar-reference.html` |
 | 16 Oct | `parliament-languages-providers-networks.md` | Languages (interface, reply language, right-to-left and other scripts), sources by language, Mistral and its regional hosts, local models, the PWA or a native app, networks and VPNs, browser support. Written against the old V2 plan: see C81 | none |
+| 21 Oct | `parliament-birds.svg` | Parliament's mark: three birds, in ink. On the welcome page it hangs before "Welcome", which stays in line with the steps (Stefan, 21 October) | none |
 
 ### Mockups supplied later on 11 October
 
