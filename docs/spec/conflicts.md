@@ -928,6 +928,26 @@ Found while building the parser and the verb registry (stage 3: `src/commands/pa
 - Rooms are addressed by name, not number, and `erase:` takes numbers only, so nothing says yet how a room is removed for good.
 - The editing spec still writes `go:242`, `view:` and `delete:241` (now `jump:`, `markup:` and `drop:`); the welcome spec and its v9 mockup still teach `list:` and `key:` (now `tour:` and `api:`). Their wording is updated when stages 5 and 11 build from them.
 
+## Part 8. Sending (added 21 October 2026)
+
+Found while building stage 4, pieces 4 and 5 (a room in the shell; sending by conversation).
+
+**C114. The fallback when a network holds streamed replies.** The plan (stage 4) says a reply that stalls behind a proxy that holds streamed answers "falls back to a request without streaming". Some office and school networks hold a streamed reply until it has finished, or cut it off when it runs long. The rules it meets: Enter is the only confirmation, and the Enter line names every recipient and cost (plan, section 2, rules 1 and 2). By the time a stream looks stalled, the provider already has the request and is charging for it, so an automatic second request would spend again without a second Enter.
+- **(a) Automatic:** after a stall, stop the stream and send the same prompt again without streaming. Seamless, but it can charge twice without asking.
+- **(b) Offered:** after a stall (nothing at all for a set time, such as 30 seconds, when the provider otherwise sends a sign of life every few seconds), stop the stream, keep what arrived, and mark the reply cut off. The Enter line then offers "Enter sends it again without streaming, about N tokens, $X". Nothing goes without Enter.
+- **(c) Remembered:** as (b), and when a reply on this device comes in all at once at the end (the sign of a network that holds streams), later sends on this device go without streaming, saying so on the Enter line. No extra request.
+- **Suggestion:** (b) now, and (c) once there is a device on such a network to try it on. **Not built yet;** piece 5 is otherwise done.
+
+**C115. What a model sees of an answer from a source.** A chat can now hold answers from Wikipedia (keyless prompts) followed by prompts to a model (once a key is added). Sent as they were, those answers went to the model as its own earlier replies: the model would take Wikipedia's words as things it had said.
+- **Built as suggested** (`src/stores/sendHistory.js`): an answer from a source goes on the person's side, introduced by a line naming where it came from ("An answer from Wikipedia, the page 'Barn owl', shown to the person in place of a reply. You did not write it."), so the model reads it as quoted context. "Nothing found" answers send nothing.
+- **The alternatives:** leave source answers out of what a model receives (the model then sees questions with no answers between them), or send them as before.
+- **Suggestion:** keep as built. The introducing line is in the provider abstraction (`base.js`), so every provider sends the same.
+
+**Also, for the record** (built in piece 5, no question):
+- Hidden messages, and messages waiting out their 20 seconds before being deleted, are no longer sent (request-path audit, item 5). The Enter line says how many stay out. A delete now completes after its 20 seconds even if the chat was left; before, leaving cancelled it silently.
+- Replies cut off by the length allowed for one reply, or broken off by an error, are stored as cut off (`stopReason` 'limit' or 'error', beside C109's 'left') and say so. This is a new value in an optional field: nothing existing changes, and older backups read as before.
+- C62 is built: one request after a chat's first answer, named on the Enter line, with its switch ("Name a new chat after its first answer") under Usage & Spending in today's Settings, **on by default** as the three calls were. Say if it should be off by default. The three old calls stay in the provider, unused; whether to retire them goes on the retirement list.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
