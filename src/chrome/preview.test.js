@@ -145,3 +145,13 @@ describe('what Enter does with a prompt (stage 4; C83)', () => {
     expect(line('barn owl', { ...room, room: null, keyed: false }).ready).toBe(true)
   })
 })
+
+describe('what stays out of a prompt (stage 4)', () => {
+  it('says how many hidden messages stay out when the chat goes along', () => {
+    const p = promptPreview('more', { room: 'c1', keyed: true, provider: 'Anthropic', perMillion: 3, hiddenOut: 2 })
+    expect(p.says.also).toEqual([{ message: 'promptHiddenOut', values: { count: 2 } }])
+    expect(say(i18n, p.says.also[0].message, p.says.also[0].values)).toBe('2 hidden messages stay out')
+    expect(promptPreview('more', { room: 'c1', keyed: true, provider: 'Anthropic', perMillion: 3, hiddenOut: 0 }).says.also).toBeUndefined()
+    expect(promptPreview('more', { room: 'c1', keyed: false, source: 'Wikipedia', hiddenOut: 2 }).says.also).toBeUndefined()
+  })
+})

@@ -182,6 +182,11 @@ export const COPY = {
       id: 'enter.promptSendUnpriced',
       message: '{tokens, plural, one {Enter sends to {provider}, about # token} other {Enter sends to {provider}, about # tokens}}',
     },
+    promptHiddenOut: /*i18n*/ {
+      id: 'enter.promptHiddenOut',
+      message: '{count, plural, one {# hidden message stays out} other {# hidden messages stay out}}',
+      comment: 'Hidden messages, and messages being deleted, are not sent (stage 4)',
+    },
     promptChanged: /*i18n*/ { id: 'enter.promptChanged', message: 'Where prompts go has changed. Read this line again before you send' },
     sourceUnreachable: /*i18n*/ { id: 'enter.sourceUnreachable', message: '{source} could not be reached. Check the connection, then try again' },
     sourceRefused: /*i18n*/ { id: 'enter.sourceRefused', message: '{source} did not answer. Try again in a moment' },

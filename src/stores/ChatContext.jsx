@@ -4,28 +4,34 @@ import { askToKeepStorage } from '../lib/storageKeep'
 import { nameFromChat, titleFromPrompt } from '../lib/chatTitles'
 import { useConversations } from './ConversationContext'
 import { useSettings } from './SettingsContext'
-import { gateway, destination, runClientTool, continueInstruction, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
+import { gateway, destination, runClientTool, continueInstruction, introduceSource, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
 import {
   startStream, appendStream, resetStreamText, stopStream, endStream, getStream,
   isStreaming as streamingIn, streamingIds, addNotice,
+  getMessages as heldMessages, hasMessages, setMessages as holdMessages, updateMessages, releaseMessages, sendable,
 } from './chatStore'
-import { useIsStreaming } from './chatHooks'
+import { useIsStreaming, useMessages } from './chatHooks'
+import { forModel } from './sendHistory'
 
-// The open chat, for today's screens (refactor-plan.md, stage 3; state audit
-// §11a; C109).
+// The open chat, for today's screens (refactor-plan.md, stages 3 and 4;
+// state audit §11a; C109).
 //
-// The reply being written no longer lives here: it is in the chat store,
+// The reply being written and the chat's messages live in the chat store,
 // kept by conversation, so blocks that only need the messages do not redraw
-// for every piece of a reply, and each conversation can stream on its own.
-// This context keeps the open chat's messages and the commands, and reads
-// `isStreaming` for the open chat from the store. Read the reply's text with
-// useStreamText(id) (chatHooks.js).
+// for every piece of a reply, each conversation can stream on its own, and
+// what is sent is built from the chat it goes to, by its id. This context
+// is a facade over the store for the open chat: `messages` and
+// `isStreaming` are the open chat's, and the commands take a chat's id.
+// Read the reply's text with useStreamText(id) (chatHooks.js).
 //
-// Each send works on its own chat: it changes the open chat's state only
-// while that chat is open, and builds the title request from its own
-// messages, so a reply that ends after its chat was left can no longer title
-// the wrong chat. Leaving a chat stops its reply, and says so, unless the
-// person turned on "Finish replies after I leave a chat" (C109).
+// What is sent is what is shown: hidden messages and messages waiting to
+// be deleted stay out (chatStore.sendable), and an answer from a source
+// goes as quoted context, not as the model's own words (sendHistory.js).
+//
+// Each send works on its own chat, and builds the title request from its
+// own messages, so a reply that ends after its chat was left can no longer
+// title the wrong chat. Leaving a chat stops its reply, and says so, unless
+// the person turned on "Finish replies after I leave a chat" (C109).
 //
 // Every request goes through the gateway (src/net, stage 4), which picks the
 // provider's key itself: callers no longer read or pass a key.
@@ -38,7 +44,6 @@ const PERSIST_INTERVAL = 3000
 const isQuota = (err) => err?.name === 'QuotaExceededError' || err?.name === 'NS_ERROR_DOM_QUOTA_REACHED'
 
 export function ChatProvider({ children }) {
-  const [messages, setMessages] = useState([])
   const [tokenUsage, setTokenUsage] = useState({ input: 0, output: 0 })
   const [activeConversationId, setActiveConversationId] = useState(null)
   const [persistError, setPersistError] = useState(null) // 'quota' | null
@@ -46,28 +51,22 @@ export function ChatProvider({ children }) {
   const { updateConversation } = useConversations()
   const { settings } = useSettings()
   const isStreaming = useIsStreaming(activeConversationId)
+  const messages = useMessages(activeConversationId)
 
-  const messagesRef = useRef([])
   const activeRef = useRef(null)
   const finishOnLeave = useRef(false)
 
-  useEffect(() => { messagesRef.current = messages }, [messages])
   useEffect(() => { finishOnLeave.current = Boolean(settings.finishRepliesOnLeave) }, [settings.finishRepliesOnLeave])
-
-  // The open chat's state changes only for the open chat.
-  const setOpenMessages = useCallback((conversationId, update) => {
-    if (activeRef.current === conversationId) setMessages(update)
-  }, [])
 
   // Unmount cleanup: stop every reply this app was writing.
   useEffect(() => () => { for (const id of streamingIds()) stopStream(id, 'closed') }, [])
 
-  // Load messages for a conversation from IndexedDB
+  // Load messages for a conversation from IndexedDB into the store.
   const loadMessages = useCallback(async (conversationId) => {
     activeRef.current = conversationId
     const msgs = await getMessages(conversationId)
     if (activeRef.current !== conversationId) return
-    setMessages(msgs)
+    holdMessages(conversationId, msgs)
     setActiveConversationId(conversationId)
 
     // Calculate cumulative token usage from loaded messages
@@ -105,13 +104,13 @@ export function ChatProvider({ children }) {
     if (content && content !== before) {
       const updates = { content, incomplete: true, ...(left ? { stopReason: 'left' } : {}) }
       await updateMessage(messageId, updates)
-      setOpenMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, ...updates } : m)))
+      updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, ...updates } : m)))
     } else if (!before) {
       // No content received — remove the empty placeholder
-      setOpenMessages(conversationId, (prev) => prev.filter((m) => m.id !== messageId))
+      updateMessages(conversationId, (prev) => prev.filter((m) => m.id !== messageId))
     }
     if (left) addNotice({ conversationId, messageId, kept: Boolean(content) })
-  }, [setOpenMessages])
+  }, [])
 
   // Auto-generate title, summary, and tags after the first user→assistant exchange.
   // All three are fire-and-forget: failures are silent.
@@ -165,9 +164,11 @@ export function ChatProvider({ children }) {
       updateConversation(conversationId, { model }).catch(() => {})
     }
 
-    // This chat's messages as they stand: the history for this request, and
-    // later for its title. Read now, so nothing from another chat gets in.
-    const before = activeRef.current === conversationId ? messagesRef.current : await getMessages(conversationId)
+    // This chat's messages as they stand, by its id: the history for this
+    // request, and later for its title. Read now, so nothing from another
+    // chat gets in, and leaving out what is hidden or being deleted.
+    const held = hasMessages(conversationId) ? heldMessages(conversationId) : await getMessages(conversationId)
+    const before = sendable(conversationId, held)
 
     // 1. Add user message to state and IndexedDB.
     //    PR-18e: `userContent` is already the text the user typed PLUS
@@ -181,7 +182,7 @@ export function ChatProvider({ children }) {
       content: userContent,
       ...(attachments?.meta ? { attachmentMeta: attachments.meta } : {}),
     })
-    setOpenMessages(conversationId, prev => [...prev, userMsg])
+    updateMessages(conversationId, prev => [...prev, userMsg])
 
     // 2. Create a placeholder assistant message marked incomplete
     const assistantMsg = await addMessage({
@@ -190,7 +191,7 @@ export function ChatProvider({ children }) {
       content: '',
       incomplete: true,
     })
-    setOpenMessages(conversationId, prev => [...prev, assistantMsg])
+    updateMessages(conversationId, prev => [...prev, assistantMsg])
 
     // 3. The stream, kept by conversation, with its own controller and saving.
     const controller = new AbortController()
@@ -199,9 +200,8 @@ export function ChatProvider({ children }) {
     const history = [...before.filter(m => m.id !== userMsg.id && m.id !== assistantMsg.id), userMsg]
 
     try {
-      const baseHistory = history
-        .filter(m => m.content) // Exclude any empty messages
-        .map(m => ({ role: m.role, content: m.content }))
+      // Empty messages stay out; a source's answer goes as quoted context.
+      const baseHistory = forModel(history, (source) => introduceSource(source, PROVIDER))
 
       // PR-18e: for THIS turn only, fold binary attachment content
       // blocks into the user message's content array. The persisted
@@ -300,7 +300,7 @@ export function ChatProvider({ children }) {
         tokenCount,
       })
       const finished = { ...assistantMsg, content: finalContent, incomplete: false, tokenCount }
-      setOpenMessages(conversationId, prev => prev.map(m => (m.id === assistantMsg.id ? finished : m)))
+      updateMessages(conversationId, prev => prev.map(m => (m.id === assistantMsg.id ? finished : m)))
 
       // Update cumulative token usage (accumulated across all tool loop turns)
       if (activeRef.current === conversationId) {
@@ -324,7 +324,7 @@ export function ChatProvider({ children }) {
     } finally {
       endStream(conversationId)
     }
-  }, [persistEvery, keepPartial, setOpenMessages, generateMetadataIfNeeded, updateConversation])
+  }, [persistEvery, keepPartial, generateMetadataIfNeeded, updateConversation])
 
   // Ask a source instead of a model (stage 4): a prompt with no key goes to
   // Wikipedia. The person's words go as a search and nothing else; what
@@ -344,9 +344,9 @@ export function ChatProvider({ children }) {
     }
 
     const userMsg = await addMessage({ conversationId, role: 'user', content: question })
-    setOpenMessages(conversationId, prev => [...prev, userMsg])
+    updateMessages(conversationId, prev => [...prev, userMsg])
     const placeholder = await addMessage({ conversationId, role: 'assistant', content: '', incomplete: true })
-    setOpenMessages(conversationId, prev => [...prev, placeholder])
+    updateMessages(conversationId, prev => [...prev, placeholder])
 
     const controller = new AbortController()
     startStream(conversationId, { messageId: placeholder.id, controller })
@@ -365,28 +365,27 @@ export function ChatProvider({ children }) {
         }
         : { content: '', incomplete: false, source: { id: source, name: destination(source)?.name ?? source, found: false } }
       await updateMessage(placeholder.id, updates)
-      setOpenMessages(conversationId, prev => prev.map(m => (m.id === placeholder.id ? { ...m, ...updates } : m)))
+      updateMessages(conversationId, prev => prev.map(m => (m.id === placeholder.id ? { ...m, ...updates } : m)))
     } catch (error) {
       await keepPartial(conversationId, placeholder.id)
       if (error.name !== 'AbortError') throw error
     } finally {
       endStream(conversationId)
     }
-  }, [keepPartial, setOpenMessages, updateConversation])
+  }, [keepPartial, updateConversation])
 
   // Continue from an interrupted (ghost text) message in the open chat
   // systemPrompt: optional string from collaboration mode presets + custom instruction
   const continueMessage = useCallback(async (incompleteMessageId, model, systemPrompt = '') => {
     const conversationId = activeRef.current
     if (!conversationId || streamingIn(conversationId)) return
-    const currentMessages = messagesRef.current
+    const currentMessages = heldMessages(conversationId)
     const incompleteMsg = currentMessages.find(m => m.id === incompleteMessageId)
     if (!incompleteMsg) return
 
+    // What came before it, as a send would carry it.
     const msgIndex = currentMessages.indexOf(incompleteMsg)
-    const priorMessages = currentMessages.slice(0, msgIndex)
-      .filter(m => m.content)
-      .map(m => ({ role: m.role, content: m.content }))
+    const priorMessages = forModel(sendable(conversationId, currentMessages.slice(0, msgIndex)), (source) => introduceSource(source, PROVIDER))
 
     // The continue instruction lives as a constant in the provider abstraction
     const history = [
@@ -415,7 +414,7 @@ export function ChatProvider({ children }) {
       const updates = { content: finalContent, incomplete: false, tokenCount, stopReason: null }
 
       await updateMessage(incompleteMsg.id, updates)
-      setOpenMessages(conversationId, prev => prev.map(m => (m.id === incompleteMsg.id ? { ...m, ...updates } : m)))
+      updateMessages(conversationId, prev => prev.map(m => (m.id === incompleteMsg.id ? { ...m, ...updates } : m)))
 
       if (activeRef.current === conversationId) {
         const inputTokens = response?.usage?.input_tokens || 0
@@ -434,7 +433,7 @@ export function ChatProvider({ children }) {
     } finally {
       endStream(conversationId)
     }
-  }, [persistEvery, keepPartial, setOpenMessages])
+  }, [persistEvery, keepPartial])
 
   // Stop the open chat's reply
   const stopGenerating = useCallback(() => {
@@ -450,8 +449,9 @@ export function ChatProvider({ children }) {
 
   // Clear messages (when switching conversations)
   const clearMessages = useCallback(() => {
+    const left = activeRef.current
     activeRef.current = null
-    setMessages([])
+    if (left) releaseMessages(left)
     setTokenUsage({ input: 0, output: 0 })
     setActiveConversationId(null)
     setPersistError(null)

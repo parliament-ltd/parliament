@@ -75,6 +75,16 @@ export class BaseProvider {
     throw new Error('Not implemented')
   }
 
+  // How an answer from a source (Wikipedia) is introduced when a later
+  // prompt sends it along (stage 4). The model did not write it, so it goes
+  // as quoted context on the person's side, saying where it came from.
+  // Shared by every provider.
+  introduceSourceAnswer(source) {
+    const name = source?.name || 'a source'
+    const page = source?.title ? `, the page "${source.title}"` : ''
+    return `[An answer from ${name}${page}, shown to the person in place of a reply. You did not write it.]`
+  }
+
   // Continue instruction for resuming interrupted streams.
   // This is a constant — not provider-specific — but lives here
   // so all providers share the same phrasing.

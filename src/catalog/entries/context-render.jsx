@@ -16,12 +16,16 @@
 import ContextMeter from '../../components/core/ContextMeter'
 import { useChat } from '../../stores/ChatContext'
 import { useSettings } from '../../stores/SettingsContext'
+import { useHiddenIds } from '../../stores/chatHooks'
 import { models as providerModels, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../../net'
 
 const DEFAULT_CONTEXT_WINDOW = 200_000
 
 export default function ContextRender({ config = {} } = {}) {
-  const { messages, tokenUsage } = useChat()
+  const { messages, tokenUsage, activeConversationId } = useChat()
+  // Hidden messages are not sent, so the meter counts them apart (stage 4).
+  const hiddenIds = useHiddenIds(activeConversationId)
+  const hiddenCount = messages.filter(m => hiddenIds.has(m.id)).length
   const { settings } = useSettings()
 
   // Resolve the active model's context window via the provider's model
@@ -47,8 +51,8 @@ export default function ContextRender({ config = {} } = {}) {
       threshold={threshold}
       totalTokens={totalTokens}
       contextWindow={contextWindow}
-      messageCount={messages.length}
-      hiddenCount={0}
+      messageCount={messages.length - hiddenCount}
+      hiddenCount={hiddenCount}
       totalMessageCount={messages.length}
       displayMode={displayMode}
     />

@@ -34,10 +34,13 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
       : room.chat != null ? i18n._(COPY.enter.targetChat, { chat: room.chat }) : i18n._(COPY.enter.targetNewRoom),
   }
   let parts
+  // More sentences, as where a window cannot stay on top (C94), or what
+  // stays out of a prompt: a key of COPY.enter, or { message, values }.
+  const also = (says?.also == null ? [] : [].concat(says.also))
+    .map((a) => (typeof a === 'string' ? { message: a } : a))
+    .map((a, i) => ({ key: `also${i}`, text: say(i18n, a.message, a.values) }))
   if (mode === 'command') {
-    parts = [target, { key: 'does', now: true, text: say(i18n, says.message, says.values) }]
-    // A second sentence, as where a window cannot stay on top (C94).
-    if (says.also) parts.push({ key: 'also', text: say(i18n, says.also) })
+    parts = [target, { key: 'does', now: true, text: say(i18n, says.message, says.values) }, ...also]
     parts.push(leave)
   } else if (mode === 'search') {
     parts = empty
@@ -51,7 +54,7 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
   } else {
     // Who receives the prompt and what it costs, before Enter (C83).
     parts = [target]
-    if (says?.message) parts.push({ key: 'does', now: true, text: say(i18n, says.message, says.values) })
+    if (says?.message) parts.push({ key: 'does', now: true, text: say(i18n, says.message, says.values) }, ...also)
     if (resting !== 'prompt') parts.push(leave)
   }
   return (

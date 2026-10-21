@@ -6,11 +6,11 @@
 // PR-10a.9 threaded the collab-mode system prompt through send + continue.
 //
 // What this slice (PR-10a.10) wires:
-//   - Hide message (Eye menu): session-only Set; filters visibleMessages.
-//     V1 parity — refresh forgets the hide.
-//   - Delete message (trash icon): hides immediately, schedules an
-//     IndexedDB delete after 20s, surfaces an UndoBanner inline above
-//     the bottom of the message list. Undo clears the timer + unhides.
+//   - Hide message (Eye menu): kept in the chat store for this visit;
+//     a hidden message is not shown and not sent (stage 4).
+//   - Delete message (trash icon): leaves the chat at once and is not
+//     sent; the chat store deletes it after 20s unless Undo is pressed,
+//     even if the chat was left meanwhile (stage 4).
 //   - Send to branch (ArrowRightCircle menu, formerly "Move to branch"):
 //     opens SelectConversationModal; on select, copies the message
 //     content into the target conversation's messages.
@@ -23,7 +23,7 @@
 // What this slice intentionally does NOT wire (Phase 2 / future):
 //   - Multi-select "Send to branch" mode for bulk transfer (CLAUDE.md
 //     describes this as a selection mode in the parent's UI).
-//   - Persistent hide across reloads (V1 lifetime is per-mount).
+//   - Persistent hide across reloads (a hide lasts for this visit).
 //   - Per-message action menu items contributed by other components —
 //     contributions ARE aggregated by RoomShell, but the UI surface for
 //     contributed actions is still deferred.
@@ -37,7 +37,8 @@ import MessageCard from '../../components/core/MessageCard'
 import SelectConversationModal from '../../components/SelectConversationModal'
 import { useChat } from '../../stores/ChatContext'
 import { useConversationId } from '../../stores/ConversationScope'
-import { useStreamText, useStreamMessageId } from '../../stores/chatHooks'
+import { useStreamText, useStreamMessageId, useHiddenIds, usePendingDeletes } from '../../stores/chatHooks'
+import { hideMessage, showAllMessages, scheduleDelete, undoDelete } from '../../stores/chatStore'
 import { COPY } from '../../copy'
 import { useSettings } from '../../stores/SettingsContext'
 import { useAnnotations } from '../../stores/AnnotationsContext'
@@ -80,84 +81,36 @@ export default function MessagesRender() {
   const bottomRef = useRef(null)
   const [activePopoverMsgId, setActivePopoverMsgId] = useState(null)
 
-  // ─── Hide / delete state ─────────────────────────────────
+  // ─── Hide / delete, kept in the chat store (stage 4) ─────
   //
-  // hiddenMessages collects ids that should NOT render. V1 keeps this
-  // session-local (refresh forgets it); V2 mirrors that. pendingDeletes
-  // tracks the timeouts so Undo can cancel them — the timeout itself is
-  // the actual db.delete call.
-  const [hiddenMessages, setHiddenMessages] = useState(new Set())
-  const [pendingDeletes, setPendingDeletes] = useState([])
-  const pendingDeletesRef = useRef([])
-  useEffect(() => {
-    pendingDeletesRef.current = pendingDeletes
-  })
+  // Hidden messages and messages waiting to be deleted are kept by chat in
+  // the chat store, so a send leaves them out: what is sent is what is
+  // shown. A hide lasts for this visit to the app. A delete waits 20s for
+  // Undo and then happens, even if the chat was left meanwhile.
+  const hiddenIds = useHiddenIds(activeConversationId)
+  const pendingDeletes = usePendingDeletes(activeConversationId)
 
-  // Reset on conversation switch — V1 per-mount lifetime. Same guard
-  // shape as CollabModeContext: ignore transient nulls so a quick trip
-  // back to the same conversation preserves the hidden state.
-  const lastConvRef = useRef(activeConversationId)
-  useEffect(() => {
-    if (activeConversationId == null) return
-    const prev = lastConvRef.current
-    lastConvRef.current = activeConversationId
-    if (prev != null && prev !== activeConversationId) {
-      // Cancel any in-flight deletes from the old conversation —
-      // their messages are gone from view anyway and re-firing the
-      // db.delete after a switch would surprise users.
-      for (const p of pendingDeletesRef.current) clearTimeout(p.timeoutId)
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- messages move into the store in stage 4
-      setPendingDeletes([])
-      setHiddenMessages(new Set())
-    }
-  }, [activeConversationId])
-
-  // Cleanup any outstanding timers on unmount so the db.delete doesn't
-  // fire after we're gone.
-  useEffect(() => () => {
-    for (const p of pendingDeletesRef.current) clearTimeout(p.timeoutId)
-  }, [])
-
-  const visibleMessages = useMemo(
-    () => messages.filter(m => !hiddenMessages.has(m.id)),
-    [messages, hiddenMessages]
-  )
+  const visibleMessages = useMemo(() => {
+    const deleting = new Set(pendingDeletes.map(p => p.messageId))
+    return messages.filter(m => !hiddenIds.has(m.id) && !deleting.has(m.id))
+  }, [messages, hiddenIds, pendingDeletes])
 
   const handleHide = useCallback((msgId) => {
-    setHiddenMessages(prev => {
-      const next = new Set(prev)
-      next.add(msgId)
-      return next
-    })
-  }, [])
+    if (activeConversationId) hideMessage(activeConversationId, msgId)
+  }, [activeConversationId])
+
+  const handleShowHidden = useCallback(() => {
+    if (activeConversationId) showAllMessages(activeConversationId)
+  }, [activeConversationId])
 
   const handleDelete = useCallback((msgId) => {
-    // Hide immediately so the user sees the action take effect; the
-    // actual db.delete fires after the undo window.
-    setHiddenMessages(prev => {
-      const next = new Set(prev)
-      next.add(msgId)
-      return next
-    })
-    const timeoutId = setTimeout(async () => {
-      try { await dbDeleteMessage(msgId) } catch { /* tolerate */ }
-      setPendingDeletes(prev => prev.filter(p => p.msgId !== msgId))
-    }, DELETE_UNDO_MS)
-    setPendingDeletes(prev => [...prev, { msgId, timeoutId }])
-  }, [])
+    if (!activeConversationId) return
+    scheduleDelete(activeConversationId, msgId, { remove: dbDeleteMessage, ms: DELETE_UNDO_MS })
+  }, [activeConversationId])
 
   const handleUndoDelete = useCallback((msgId) => {
-    setPendingDeletes(prev => {
-      const entry = prev.find(p => p.msgId === msgId)
-      if (entry) clearTimeout(entry.timeoutId)
-      return prev.filter(p => p.msgId !== msgId)
-    })
-    setHiddenMessages(prev => {
-      const next = new Set(prev)
-      next.delete(msgId)
-      return next
-    })
-  }, [])
+    if (activeConversationId) undoDelete(activeConversationId, msgId)
+  }, [activeConversationId])
 
   // ─── Send to branch / Pin for reference state ─────────────
   //
@@ -379,7 +332,8 @@ export default function MessagesRender() {
       <MessageList
         messages={visibleMessages}
         renderCard={renderCard}
-        hiddenCount={messages.length - visibleMessages.length}
+        hiddenCount={messages.filter(m => hiddenIds.has(m.id)).length}
+        onShowHidden={handleShowHidden}
         isStreaming={isStreaming}
         containerRef={containerRef}
         bottomRef={bottomRef}
@@ -503,7 +457,7 @@ function UndoBanner({ pendingDeletes, onUndo }) {
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => onUndo(pendingDeletes[pendingDeletes.length - 1].msgId)}
+            onClick={() => onUndo(pendingDeletes[pendingDeletes.length - 1].messageId)}
             className="text-xs font-medium text-[#B8A070] hover:text-[var(--p-text-primary)] transition-colors shrink-0"
           >
             Undo

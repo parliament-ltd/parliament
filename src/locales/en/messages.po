@@ -334,6 +334,11 @@ msgstr "Looking for a key on this device"
 msgid "enter.promptFailed"
 msgstr "The prompt did not go through. Try again"
 
+#. Hidden messages, and messages being deleted, are not sent (stage 4)
+#. js-lingui-explicit-id
+msgid "enter.promptHiddenOut"
+msgstr "{count, plural, one {# hidden message stays out} other {# hidden messages stay out}}"
+
 #. js-lingui-explicit-id
 msgid "enter.promptNoRoom"
 msgstr "Prompts go to a room. sym: opens one"

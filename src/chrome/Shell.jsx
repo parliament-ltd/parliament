@@ -17,7 +17,8 @@ import { useChat } from '../stores/ChatContext'
 import { useConversations } from '../stores/ConversationContext'
 import { useSettings } from '../stores/SettingsContext'
 import { useCollabMode } from '../stores/CollabModeContext'
-import { useIsStreaming } from '../stores/chatHooks'
+import { useIsStreaming, useHiddenIds, usePendingDeletes } from '../stores/chatHooks'
+import { sendableOf } from '../stores/chatStore'
 import { preview } from './preview'
 import Bar from './Bar'
 import Strip from './Strip'
@@ -231,7 +232,13 @@ export default function Shell() {
   // nothing (C83).
   const model = useMemo(() => models(PROVIDER).find((m) => m.id === settings.defaultModel) ?? null, [settings.defaultModel])
   const roomRecord = roomId ? conversations.find((c) => c.id === roomId) ?? null : null
-  const along = roomId && activeConversationId === roomId ? messages : NONE
+  // What would go along: the chat's messages, less what is hidden or being
+  // deleted, which are not sent.
+  const shown = roomId && activeConversationId === roomId ? messages : NONE
+  const hiddenHere = useHiddenIds(roomId ?? '')
+  const deletingHere = usePendingDeletes(roomId ?? '')
+  const along = useMemo(() => sendableOf(shown, hiddenHere, deletingHere), [shown, hiddenHere, deletingHere])
+  const hiddenOut = shown.filter((m) => m.content).length - along.length
   const prompt = useMemo(() => ({
     room: roomId,
     chat: roomRecord?.num ?? null,
@@ -243,7 +250,8 @@ export default function Shell() {
     historyChars: historyChars(along),
     systemChars: keyed ? buildSystemPrompt().length : 0,
     perMillion: model?.cost?.inputPerMillion ?? null,
-  }), [roomId, roomRecord, streaming, keyed, model, settings.defaultModel, along, buildSystemPrompt])
+    hiddenOut,
+  }), [roomId, roomRecord, streaming, keyed, model, settings.defaultModel, along, hiddenOut, buildSystemPrompt])
 
   /**
    * Sends a prompt to the room on screen: to the provider with a key, else

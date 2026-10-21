@@ -1,5 +1,6 @@
-// Replies being written, kept by conversation (refactor-plan.md, stage 3;
-// state audit §11a; C109). No React here.
+// Replies being written, and the messages of open chats, kept by
+// conversation (refactor-plan.md, stages 3 and 4; state audit §11a; C109).
+// No React here.
 //
 // Before this, one shared place held the reply being written, so every
 // block on the page redrew for each piece of it, a second chat could not
@@ -108,6 +109,132 @@ export function dismissNotice(conversationId) {
   now('notices')
 }
 
+// ── Messages, by chat (refactor-plan.md, stage 4; state audit §11a, step 5) ──
+//
+// The messages of each chat that is open somewhere, kept here rather than
+// in one shared list for "the open chat", so what is sent is built from
+// the chat it goes to, by its id. Readers listen to `messages:<id>`.
+// The database stays the record: a chat's list is loaded from it, kept
+// while the chat is open, and let go when it closes.
+//
+// Hidden messages and messages waiting to be deleted are kept here too, so
+// that nothing hidden or deleted is sent (request-path audit, item 5).
+// A hide lasts for this visit to the app, as it always has. A delete waits
+// for its undo time and then happens, even if the chat was left meanwhile:
+// deleting means deleted.
+
+const NONE = Object.freeze([])
+const NO_IDS = Object.freeze(new Set())
+
+const lists = new Map() // chat id -> messages, oldest first
+const hidden = new Map() // chat id -> Set of message ids
+const deleting = new Map() // chat id -> Map of message id -> { timer, at }
+const deletingLists = new Map() // chat id -> cached array of pending deletes, for readers
+
+/** The chat's messages while it is open, or an empty list. */
+export const getMessages = (id) => lists.get(id) ?? NONE
+/** Whether the chat's messages are held here. */
+export const hasMessages = (id) => lists.has(id)
+
+/** Keeps a chat's messages, as loaded from the database. */
+export function setMessages(id, messages) {
+  lists.set(id, Object.freeze([...messages]))
+  now(`messages:${id}`)
+}
+
+/** Changes a chat's messages, if they are held here; a chat that is not open is left to the database. */
+export function updateMessages(id, change) {
+  const list = lists.get(id)
+  if (!list) return
+  const next = change(list)
+  if (next === list) return
+  lists.set(id, Object.freeze([...next]))
+  now(`messages:${id}`)
+}
+
+/** Lets a chat's messages go when it closes. Hides and deletes stay. */
+export function releaseMessages(id) {
+  if (!lists.delete(id)) return
+  now(`messages:${id}`)
+}
+
+/** The ids of a chat's hidden messages. */
+export const hiddenIds = (id) => hidden.get(id) ?? NO_IDS
+
+function setHidden(id, ids) {
+  if (ids.size) hidden.set(id, Object.freeze(ids))
+  else hidden.delete(id)
+  now(`hidden:${id}`)
+}
+export function hideMessage(id, messageId) {
+  const ids = new Set(hiddenIds(id))
+  ids.add(messageId)
+  setHidden(id, ids)
+}
+export function showMessage(id, messageId) {
+  const ids = new Set(hiddenIds(id))
+  if (!ids.delete(messageId)) return
+  setHidden(id, ids)
+}
+export function showAllMessages(id) {
+  if (hidden.has(id)) setHidden(id, new Set())
+}
+
+/** Messages waiting to be deleted in a chat, oldest first: [{ messageId, at }]. */
+export const pendingDeletes = (id) => deletingLists.get(id) ?? NONE
+
+function tellDeleting(id) {
+  const map = deleting.get(id)
+  if (map && map.size) deletingLists.set(id, Object.freeze([...map].map(([messageId, d]) => ({ messageId, at: d.at }))))
+  else { deleting.delete(id); deletingLists.delete(id) }
+  now(`deleting:${id}`)
+}
+
+/**
+ * A message leaves the chat now and is deleted after `ms`, unless undone.
+ * `remove` deletes it from the database; when it has, the message leaves
+ * the chat's list too.
+ */
+export function scheduleDelete(id, messageId, { remove, ms, at = Date.now() }) {
+  if (!deleting.has(id)) deleting.set(id, new Map())
+  const map = deleting.get(id)
+  if (map.has(messageId)) return
+  const timer = setTimeout(async () => {
+    try { await remove(messageId) } catch { /* the database keeps it; it shows again on the next load */ }
+    map.delete(messageId)
+    tellDeleting(id)
+    updateMessages(id, (list) => list.filter((m) => m.id !== messageId))
+    showMessage(id, messageId)
+  }, ms)
+  map.set(messageId, { timer, at })
+  tellDeleting(id)
+}
+
+/** Takes back a delete that has not happened yet. */
+export function undoDelete(id, messageId) {
+  const d = deleting.get(id)?.get(messageId)
+  if (!d) return false
+  clearTimeout(d.timer)
+  deleting.get(id).delete(messageId)
+  tellDeleting(id)
+  return true
+}
+
+/**
+ * What a chat sends of its messages: those with text, leaving out hidden
+ * messages and messages waiting to be deleted. What is sent is what is
+ * shown.
+ */
+export function sendable(id, messages = getMessages(id)) {
+  return sendableOf(messages, hiddenIds(id), pendingDeletes(id))
+}
+
+/** The same, from a chat's messages, hidden ids and pending deletes as a reader holds them. */
+export function sendableOf(messages, hiddenSet, pending = NONE) {
+  const gone = new Set(pending.map((p) => p.messageId))
+  return messages.filter((m) => m && m.content && !hiddenSet.has(m.id) && !gone.has(m.id))
+}
+
 /** For tests: forget everything. */
 export function _reset() {
   streams.clear()
@@ -116,4 +243,9 @@ export function _reset() {
   if (timer) clearTimeout(timer)
   timer = null
   notices = []
+  lists.clear()
+  hidden.clear()
+  for (const map of deleting.values()) for (const d of map.values()) clearTimeout(d.timer)
+  deleting.clear()
+  deletingLists.clear()
 }

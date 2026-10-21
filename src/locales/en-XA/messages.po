@@ -334,6 +334,11 @@ msgstr ""
 msgid "enter.promptFailed"
 msgstr ""
 
+#. Hidden messages, and messages being deleted, are not sent (stage 4)
+#. js-lingui-explicit-id
+msgid "enter.promptHiddenOut"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.promptNoRoom"
 msgstr ""

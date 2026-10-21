@@ -1,5 +1,5 @@
 import { useCallback, useSyncExternalStore } from 'react'
-import { subscribe, streamText, streamMessageId, isStreaming, getNotices } from './chatStore'
+import { subscribe, streamText, streamMessageId, isStreaming, getNotices, getMessages, hiddenIds, pendingDeletes } from './chatStore'
 
 // Reading the chat store from a component (state audit §11a). Each hook
 // listens to one conversation's topic, so a reply streaming in one chat
@@ -23,6 +23,21 @@ export function useStreamMessageId(id) {
 /** Whether a reply is being written in a conversation. */
 export function useIsStreaming(id) {
   return useTopic(`status:${id}`, useCallback(() => isStreaming(id), [id]))
+}
+
+/** A chat's messages while it is open (stage 4). */
+export function useMessages(id) {
+  return useTopic(`messages:${id}`, useCallback(() => getMessages(id), [id]))
+}
+
+/** The ids of a chat's hidden messages. */
+export function useHiddenIds(id) {
+  return useTopic(`hidden:${id}`, useCallback(() => hiddenIds(id), [id]))
+}
+
+/** A chat's messages waiting to be deleted: [{ messageId, at }]. */
+export function usePendingDeletes(id) {
+  return useTopic(`deleting:${id}`, useCallback(() => pendingDeletes(id), [id]))
 }
 
 /** Replies stopped because their chat was left, not yet shown (C109). */
