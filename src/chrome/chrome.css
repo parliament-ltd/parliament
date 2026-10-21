@@ -122,10 +122,14 @@
    typed > on the left and travels to the centre of the circle, becoming the
    moon on the way; opening, it goes back (C112). */
 .ch-mark { position: absolute; top: 50%; left: 81px; width: 20px; height: 20px; z-index: 3; pointer-events: none; opacity: 0;
-  transform: translate(0, -50%) scale(.8);
+  transform: translate(0, -50%) scale(.85);
   transition: left var(--ch-dur-slide) var(--ch-ease), transform var(--ch-dur-slide) var(--ch-ease), opacity var(--ch-dur-fade); }
 .ch-mark.on, .ch-mark[data-moving] { opacity: 1; }
-.ch-field.min .ch-mark { left: 50%; transform: translate(-50%, -50%) scale(1); }
+/* Folding, the chevron shows at once where the > was, holds, then travels
+   (C113). Opening, it travels back at once. */
+.ch-field.min .ch-mark { left: 50%; transform: translate(-50%, -50%) scale(1.05);
+  transition-duration: var(--ch-dur-slide), var(--ch-dur-slide), calc(120ms * var(--ch-k));
+  transition-delay: var(--ch-mark-hold), var(--ch-mark-hold), 0s; }
 .ch-mark path { fill: #fff; }
 .ch-enter { transition: opacity var(--ch-dur-fade); }
 .ch-enter.hide { opacity: 0; }

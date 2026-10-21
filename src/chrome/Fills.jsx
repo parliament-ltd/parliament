@@ -100,8 +100,10 @@ export function MoonMark({ folded, win = window }) {
       if (u < 1) raf = win.requestAnimationFrame(step)
       else node?.removeAttribute('data-moving')
     }
-    raf = win.requestAnimationFrame(step)
-    return () => { win.cancelAnimationFrame(raf); node?.removeAttribute('data-moving') }
+    // Folding, the chevron holds and travels a while before it changes (C113).
+    const wait = folded ? MOTION.hold + MOTION.morphAfter : 0
+    const timer = win.setTimeout(() => { raf = win.requestAnimationFrame(step) }, wait)
+    return () => { win.clearTimeout(timer); win.cancelAnimationFrame(raf); node?.removeAttribute('data-moving') }
   }, [folded, win])
   return (
     <svg ref={mark} className={`ch-mark${folded ? ' on' : ''}`} viewBox="0 0 24 24" aria-hidden="true">

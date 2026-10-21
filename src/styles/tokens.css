@@ -89,7 +89,8 @@
   --ch-dur-wipe: calc(420ms * var(--ch-k));    /* a mode's fill wipes in */
   --ch-dur-fade: calc(240ms * var(--ch-k));    /* pills, glyphs and the Enter line fade */
   --ch-dur-slide: calc(540ms * var(--ch-k));   /* the field folds to a circle (C108) */
-  --ch-dur-morph: calc(540ms * var(--ch-k));   /* the chevron becomes the moon, with the fold (C112) */
+  --ch-dur-morph: calc(540ms * var(--ch-k));   /* the chevron becomes the moon (C112) */
+  --ch-mark-hold: calc(160ms * var(--ch-k));   /* the chevron shows before it sets off (C113) */
   --ch-hover-intent: 140ms;
   --ch-hover-close: 600ms;
 }
