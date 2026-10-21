@@ -77,9 +77,11 @@ Line height 1.5, and 1.6 for reading.
 - Cards carry a faint lift (`0 1px 2px rgba(40,36,28,.035)` and a half-pixel
   ring at 5%), no borders or hatching (welcome spec §2).
 - Keyboard focus: a 2px ink outline on anything focused (editing spec).
-- Easing `cubic-bezier(.65,0,.35,1)`. A mode's fill wipes in over 280ms; the
-  field folds to a circle over 360ms; the chevron rolls into the moon over
-  460ms; hover opens after 140ms and closes 600ms after leaving. With reduced
+- Easing `cubic-bezier(.65,0,.35,1)`. A mode's fill wipes in over 420ms;
+  pills, glyphs and the Enter line fade over 240ms; the field folds to a
+  circle over 540ms; the chevron rolls into the moon over 690ms; hover opens
+  after 140ms and closes 600ms after leaving. (Slowed by half again from the
+  bar reference's 280, 160, 360 and 460ms on Stefan's word, C111.) With reduced
   motion every duration is multiplied by 0.001.
 
 ## Where the mockups differ

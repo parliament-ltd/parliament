@@ -69,13 +69,13 @@
 .ch-field.command input { font-family: var(--ch-mono); font-size: 13px; color: #fff; padding-inline: 86px 14px; text-shadow: 0 0 3px rgba(12, 20, 40, .95), 0 1px 2px rgba(12, 20, 40, .85); caret-color: #fff; }
 .ch-field.prompt input { padding-inline-start: 78px; }
 .ch-field:focus-within { box-shadow: 0 1px 2px rgba(40, 36, 28, .035), 0 0 0 .5px rgba(25, 25, 25, .10), 0 0 0 2px var(--ch-ink); }
-.ch-chip { position: absolute; inset-inline-start: 12px; top: 50%; margin-top: -8px; z-index: 2; font: 600 8.5px var(--ch-sans); letter-spacing: .06em; text-transform: uppercase; padding: 3px 7px; border-radius: 9px; opacity: 0; transform: translateX(-4px); transition: opacity calc(160ms * var(--ch-k)) ease, transform calc(160ms * var(--ch-k)) ease; pointer-events: none; }
+.ch-chip { position: absolute; inset-inline-start: 12px; top: 50%; margin-top: -8px; z-index: 2; font: 600 8.5px var(--ch-sans); letter-spacing: .06em; text-transform: uppercase; padding: 3px 7px; border-radius: 9px; opacity: 0; transform: translateX(-4px); transition: opacity var(--ch-dur-fade) ease, transform var(--ch-dur-fade) ease; pointer-events: none; }
 .ch-chip.on { opacity: 1; transform: none; }
 .ch-chip.search { background: var(--ch-paper); color: var(--ch-ink); border: 1px solid var(--ch-ink); padding: 2px 6px; }
 .ch-chip.command { background: rgb(var(--ch-navy-2)); color: #fff; }
 .ch-chip.prompt { background: var(--ch-ink); color: var(--ch-paper); }
 .ch-gslot { position: absolute; inset-inline-end: 0; top: 0; z-index: 2; width: 40px; height: 40px; pointer-events: none; }
-.ch-glyph { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--ch-ink); opacity: 0; transition: opacity calc(160ms * var(--ch-k)) ease; }
+.ch-glyph { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--ch-ink); opacity: 0; transition: opacity var(--ch-dur-fade) ease; }
 .ch-glyph.on { opacity: 1; }
 .ch-glyph.mag { width: 15px; height: 15px; }
 .ch-glyph.quill { width: 21px; height: 21px; }
@@ -110,7 +110,7 @@
 .ch-field { transition: width var(--ch-dur-slide) var(--ch-ease), border-radius var(--ch-dur-slide) var(--ch-ease), box-shadow .2s; }
 .ch-field.min { width: var(--ch-field-h); flex: 0 0 var(--ch-field-h); border-radius: 50%; cursor: pointer; }
 .ch-field.min input, .ch-field.min .ch-chip.on { opacity: 0; pointer-events: none; }
-.ch-field input { transition: opacity calc(140ms * var(--ch-k)); }
+.ch-field input { transition: opacity var(--ch-dur-fade); }
 .ch-field.min.command { box-shadow: 0 0 0 1px rgba(var(--ch-navy), .9); }
 /* The circle's edge turns gold on hover: the only gold at rest (C50). */
 .ch-field.min:hover { box-shadow: 0 0 0 1px var(--ch-gold-deep); }
@@ -118,7 +118,7 @@
 .ch-shell .ch-fold-button:focus-visible { outline: 2px solid var(--ch-ink); outline-offset: -3px; border-radius: 50%; }
 .ch-glyph.moon { width: 20px; height: 20px; }
 .ch-glyph.moon path { fill: #fff; }
-.ch-enter { transition: opacity calc(160ms * var(--ch-k)); }
+.ch-enter { transition: opacity var(--ch-dur-fade); }
 .ch-enter.hide { opacity: 0; }
 
 /* A reply's text, as the bar reference sets it. */

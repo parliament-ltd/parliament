@@ -1,6 +1,7 @@
 import { useEffect, useId, useLayoutEffect, useRef } from 'react'
 import { STARS, STAR_TILE } from './stars'
 import { shapeAt, turnAt, ease } from './moon'
+import { MOTION } from './motion'
 
 // The field's fills and glyphs, as the bar reference draws them (9 October):
 // navy with star dots for command, paper with a skewed mosaic for prompt, the
@@ -85,14 +86,14 @@ export function MoonMark({ folded, win = window }) {
     if (win.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { draw(target); return undefined }
     let raf = 0
     let start = null
-    const duration = 460 * Math.abs(target - from)
+    const duration = MOTION.morph * Math.abs(target - from)
     const step = (now) => {
       if (start === null) start = now
       const u = Math.min(1, (now - start) / duration)
       draw(from + (target - from) * ease(u))
       if (u < 1) raf = win.requestAnimationFrame(step)
     }
-    const wait = win.setTimeout(() => { raf = win.requestAnimationFrame(step) }, folded ? 360 : 0)
+    const wait = win.setTimeout(() => { raf = win.requestAnimationFrame(step) }, folded ? MOTION.slide : 0)
     return () => { win.clearTimeout(wait); win.cancelAnimationFrame(raf) }
   }, [folded, win])
   return (
