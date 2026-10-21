@@ -26,8 +26,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+import Markdown from './core/Markdown'
 import {
   GitBranch, Zap, Copy, Info, AlertCircle, ChevronRight, X,
 } from 'lucide-react'
@@ -265,7 +264,7 @@ export default function BranchCreationPanel({
                         <p className="text-[11px] text-[#D9730D] leading-relaxed">{previewError}</p>
                       ) : previewContent ? (
                         <div className="text-[11px] text-[var(--p-text-secondary)] leading-relaxed parliament-md">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{previewContent}</ReactMarkdown>
+                          <Markdown>{previewContent}</Markdown>
                         </div>
                       ) : null}
                     </div>

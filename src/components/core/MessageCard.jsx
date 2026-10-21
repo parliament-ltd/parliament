@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+import Markdown from './Markdown'
 import {
   Star, StickyNote, GitBranch, Trash2, MoreVertical,
   Eye, Copy, ArrowRightCircle, Pencil, Pin,
@@ -12,7 +11,6 @@ import { indexOfWord } from '../../lib/textUtils'
 import { stripAttachedFileBlocks, formatSize } from '../../lib/fileUpload'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../../copy'
-import CitationLink from './CitationLink'
 import ChartRenderer from './ChartRenderer'
 
 // PR-18e: chip-icon lookup for the attachmentMeta strip rendered under
@@ -225,9 +223,9 @@ export default function MessageCard({
 
     return (
       <div className="parliament-md text-[15px]">
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ ...highlightedComponents, a: CitationLink, code: chartCodeComponent }}>
+        <Markdown components={{ ...highlightedComponents, code: chartCodeComponent }}>
           {displayContent}
-        </ReactMarkdown>
+        </Markdown>
       </div>
     )
   }, [id, displayContent, highlightTerms, source])

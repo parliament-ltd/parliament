@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+import Markdown from '../components/core/Markdown'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Search, GitBranch, Plus, MessageSquare, ArrowUp, ArrowDown,
@@ -454,9 +453,9 @@ function FavoriteCard({ favorite, onRemove, onNavigate }) {
           overflow: 'hidden',
         }}
       >
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+        <Markdown>
           {favorite.snippet || favorite.text || favorite.content || ''}
-        </ReactMarkdown>
+        </Markdown>
       </div>
       <div className="flex items-center justify-between px-3 pb-2.5">
         <span className="text-[10px] text-[var(--p-text-secondary)] truncate flex-1 mr-2">{favorite.source || ''}</span>
