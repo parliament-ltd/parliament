@@ -92,7 +92,7 @@ describe('at version 5', () => {
 })
 
 describe('backups', () => {
-  it('never carry arrangements: they are not on the allowlist', () => {
+  it('do not carry arrangements yet: stage 9 adds them as a choice', () => {
     expect(Object.keys(FIELDS)).not.toContain('arrangements')
   })
 })

@@ -395,6 +395,7 @@ Built to Settings v1. Can run beside stages 5 to 8.
 - **Added**
   - One stacked card with a rail, sections you can address, `set:`, and search that narrows to matching rows.
   - `backup:`, `restore:` and `import:` (A21).
+  - Window layouts in a backup when the person ticks them (ruled 20 October), off unless chosen. A restore checks each arrangement as it does when reading one from the device, and a window on a screen this computer lacks opens on the main screen. The history of commands, focus sets and saved searches stay on the device.
   - "Delete everything" that removes everything: both databases, the caches and the service worker. Its confirmation lists what will go, is armed by typing a word, offers a backup first, and says what it cannot reach (files you saved, what providers already hold). Other open tabs are told to close.
   - The switch for the title call, the "Don't save" option, text size, and the room for new dockets.
   - The language picker, opened by the globe or `language:`, listing languages by their own names, defaulting to the browser's languages and never to the network address. Whether the browser keeps Parliament's storage, and the last backup, shown plainly.

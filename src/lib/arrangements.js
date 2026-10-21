@@ -1,11 +1,13 @@
 // Keeping arrangements on this device (refactor-plan.md §4 and stage 3; P7,
 // ruled: "arrangements are stored as data from the start"; Almanac spec §4
-// and settings spec §12: per device, never in a backup).
+// and settings spec §12: per device; in a backup only when the person
+// chooses it, ruled 20 October and built with backup: in stage 9).
 //
 // One record per arrangement in the version 6 list `arrangements`: each
 // shipped arrangement, and each room, keeps its own, so leaving the Lab and
 // coming back finds it as it was, and reset: has a default to return to
-// (C102). The list is not on the backup allowlist.
+// (C102). The list is not on the backup allowlist until stage 9 adds the
+// choice; a restore will check each record with cleanArrangement.
 //
 // What is read back is checked like anything from outside: unknown boards,
 // places and fields are dropped, and a record that cannot be made sense of

@@ -24,7 +24,8 @@ export const V6_NEW_STORES = {
   asks: { keyPath: 'id', indexes: [['num', 'num', { unique: true }], ['conversationId', 'conversationId']] },
   suggestions: { keyPath: 'id', indexes: [['num', 'num', { unique: true }], ['conversationId', 'conversationId']] },
   collabs: { keyPath: 'id' },
-  // Kept on this device; never in a backup.
+  // Kept on this device. Arrangements go in a backup only when the person
+  // chooses (stage 9); focus sets and saved searches never do.
   arrangements: { keyPath: 'id' },
   focusSets: { keyPath: 'id' },
   savedSearches: { keyPath: 'id' },
