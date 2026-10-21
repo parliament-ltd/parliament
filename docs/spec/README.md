@@ -20,6 +20,7 @@ ones written inside each document.
 | 6 Oct | `editing-in-place-spec.md` | Editing replies and prompts, asks, Ripple, the Collection's cards, collab, Reflection, sweeps, focus, calm, legibility | `parliament-inline-editing-v5.html` |
 | 7 Oct, updated 9 Oct | `bar-and-commands-decisions.md` | The field, minimising to a hexagon, gold, seven renamed verbs, the command inventory | `parliament-bar-reference.html` |
 | 16 Oct | `parliament-languages-providers-networks.md` | Languages (interface, reply language, right-to-left and other scripts), sources by language, Mistral and its regional hosts, local models, the PWA or a native app, networks and VPNs, browser support. Written against the old V2 plan: see C81 | none |
+| 21 Oct | `security-privacy-decisions.md` | Prompt injection, keys, training on API chats, privacy features, Lock Parliament, code integrity, a security review. Stefan's notes, corrected against the repo (`conflicts.md` Part 10, rulings S1 to S5) | none |
 | 21 Oct | `parliament-birds.svg` | Parliament's mark: three birds, in ink. On the welcome page it hangs before "Welcome", which stays in line with the steps (Stefan, 21 October) | none |
 
 ### Mockups supplied later on 11 October
@@ -54,6 +55,7 @@ colours, type, shapes and motion, drafted 20 October for approval),
    - **The first-run page**: `parliament_welcome_v9.html`, then `welcome-spec-decisions.md`, except where the two documents above override it.
    - **The model and the Lab**: `arrangements-boards-blocks-decisions.md`, 28 September.
    - **Docket, addresses, statuses, execution, sources**: the Almanac and docket documents, as ruled in `conflicts.md`.
+   - **Security and privacy**: `security-privacy-decisions.md`, 21 October, under CLAUDE.md's hard constraints.
 3. **Visual values come from the newest mockup that draws the thing.** The mockups do not share one token sheet: `--ink-2`, `--ink-3` and marginalia opacity differ between welcome v9, inline editing v5 and the bar reference. One sheet has to be settled before the new chrome is built.
 4. **Rulings in `conflicts.md` stand** unless a later document reverses them. The ones the new documents reverse are listed in `plan-brief.md`.
 

@@ -337,7 +337,7 @@ Your first target. The page is the lesson: every step is a real command.
 2. **The first prompt beside it:** `p>` starts a chat in its own card on the right of the welcome card, which narrows to one column; boards the steps open stack on the right. **Done, with C125 and C126 (ruled 21 October):** what is on screen is one space; `alm:`, `sym:` and `tour:` bring their boards into it, and a prompt with no room starts its chat in a room beside the card. A narrow room shows the conversation first, its side panels behind the buttons at its top. The edges between boards stretch (drag, double click, arrow keys), `width:` does the same from the bar, and the widths are kept with the space. The welcome card turns to one column by its own width.
 3. **A thin Almanac:** rows with their numbers, pinned first, `open:` by number, `inspect:`. Enough for steps 4 and 5. **Done:** the table of v30's columns, fewer as the board narrows; a click writes `open:<number>` in the bar; `open:` shows a chat in the room or brings one beside; `inspect:` shows one thing in detail under the bar. Which rows it shows is C127. The welcome page also shows Parliament's mark before "Welcome".
 4. **A thin Library:** read-only, from one read layer of the catalogue. Enough for step 7.
-5. **The key panel:** `api:` opens a password field password managers leave alone, checked and kept through the key module, with the gold ignition once per new key. Enough for step 8.
+5. **The key panel:** `api:` opens a password field password managers leave alone, checked and kept through the key module, with the gold ignition once per new key. Enough for step 8. It suggests a key for Parliament alone with a spending limit, and links a "revoke and replace" guide (security notes §2; the vault waits, S1).
 6. **The ending and the rest:** "Welcome / to Parliament", "Now, let's focus:", `focus:` and `focus:off`, the line for small screens, the storage notice (C94), the pseudo-language check; then the plain-language pass on names (A6) and R15 put to Stefan.
 
 Steps 9 and 10 of welcome v9 (strike a line, leave the AI a note) need editing in place and come with stage 11 (A7); the ending then moves after step 10.
@@ -520,6 +520,20 @@ Built to Lab v7 (A2). Can run beside the others once stage 3 exists.
 - **You can try:** the public repository, and the site served from the standby.
 - **Done early, on 15 October:** DNS moved to deSEC with DNSSEC, and mail set up at Proton. The records are in `docs/hosting.md`.
 - **Needs from you:** a yes before the public push, which cannot be taken back. R31 is put to you here.
+
+### Across stages: security and privacy (ruled 21 October)
+
+From `security-privacy-decisions.md` (rulings S1 to S5 in `conflicts.md`). Each item goes in with the stage named; none relaxes the security policy.
+
+- **Stage 5, piece 5:** the `api:` panel suggests a key for Parliament alone, in its own workspace with a spending limit, and links a short "revoke and replace" guide.
+- **Stage 6:** a link shows its full address before it opens (the shared Markdown component).
+- **Stage 7:** a training label and a retention mark on each provider's row; the Mistral checklist, with Labs and Preview models marked in the picker; the privacy filter for fixed formats (emails, phone numbers), plain code, for everyone; the names filter and the injection check through a local model only, offered when one is connected (S3); a hosted check, opt-in and named with its cost. The vault's scope review, with stage 7 or 15, where the most secure design wins (S1).
+- **Stage 8:** an answer brought into a prompt goes as labelled, untrusted data (`search_result` blocks, or JSON-wrapped), with invisible characters stripped and injection phrases marked, in a worker.
+- **Stage 9:** the settings copy stops overstating what encryption at rest protects (already planned, T2).
+- **After stage 9:** Lock Parliament, its own stage (S4): chats encrypted with a passkey or passphrase. A second database upgrade, shown before it runs, with every backup still readable.
+- **Stage 13:** local-only rooms, a room setting (a new field in room files, shown first).
+- **Stage 15:** Trusted Types and styles without `unsafe-inline`, trialled; exact dependency versions; hardware keys, review before merging and deploys from tagged builds; published file hashes and downloadable builds once the repository is public; a changelog in the update notice; advice on extensions in the browser support table; OpenSSF Scorecard.
+- **Open:** the privacy filter's default, and which security review route first.
 
 ## 6. Retirement proposals
 
