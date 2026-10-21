@@ -7,6 +7,57 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: en-XA\n"
 
+#. js-lingui-explicit-id
+msgid "almanac.colActive"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.colCreated"
+msgstr ""
+
+#. The number every row is addressed by
+#. js-lingui-explicit-id
+msgid "almanac.colId"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.colRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.colTags"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.colTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.colType"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.loading"
+msgstr ""
+
+#. Marginalia under a pinned row
+#. js-lingui-explicit-id
+msgid "almanac.pinned"
+msgstr ""
+
+#. What clicking a row does; open: stays English
+#. js-lingui-explicit-id
+msgid "almanac.rowHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.untitled"
+msgstr ""
+
 #. The table of everything you have made
 #. js-lingui-explicit-id
 msgid "board.almanac"
@@ -115,6 +166,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.stoppedOnReply"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "count.branches"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -232,6 +287,10 @@ msgid "enter.helpVerb"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.inspectOne"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.key"
 msgstr ""
 
@@ -308,6 +367,10 @@ msgid "enter.notCommand"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.numNone"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.openAddressed"
 msgstr ""
 
@@ -316,7 +379,31 @@ msgid "enter.openBoard"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.openChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openChatHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openChatThere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openDocket"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openDocketHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.openHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openNotYet"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -712,6 +799,26 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "hint.slashOrK"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "inspect.active"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "inspect.close"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "inspect.created"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "inspect.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "inspect.openChat"
 msgstr ""
 
 #. js-lingui-explicit-id

@@ -106,6 +106,54 @@
 .ch-ref h3 { font: 600 9px var(--ch-sans); letter-spacing: .055em; text-transform: uppercase; color: var(--ch-ink); margin: 14px 0 4px; }
 .ch-ref-row { display: flex; align-items: baseline; gap: 12px; width: 100%; padding: 5px 6px; border-radius: var(--ch-r-md); }
 .ch-ref-row:hover { background: var(--ch-wash); }
+
+/* inspect: one thing in detail under the bar, drawn like the reference
+   (stage 5, piece 3; Almanac v30's peek). */
+.ch-inspect { margin-top: 8px; background: var(--ch-surface); border-radius: var(--ch-r-card); box-shadow: var(--ch-lift); max-height: 52vh; overflow: auto; padding: 14px 18px; font: 400 var(--ch-t-small)/1.55 var(--ch-sans); color: var(--ch-ink); }
+.ch-inspect-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.ch-inspect-tags { margin-inline-start: auto; display: flex; gap: 4px; flex-wrap: wrap; }
+.ch-inspect h3 { font: 600 15px var(--ch-sans); margin: 0 0 4px; }
+.ch-inspect blockquote { margin: 0 0 6px; padding-inline-start: 10px; border-inline-start: 2px solid var(--ch-ink); font-style: italic; font-size: 14px; white-space: pre-wrap; }
+.ch-inspect p { margin: 6px 0; white-space: pre-wrap; }
+.ch-inspect .ch-inspect-foot { margin-top: 12px; }
+
+/* The Almanac, thin (stage 5, piece 3): Almanac v30's table, in the
+   chrome's tokens. Widths are v30's; the title takes the rest. */
+.ch-alm { overflow-x: auto; }
+.ch-alm-note { margin: 0; padding: 14px 16px; }
+.ch-atable { width: 100%; border-collapse: collapse; table-layout: fixed; font: 400 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink); }
+.ch-atable th { font: 500 10.5px var(--ch-sans); color: var(--ch-ink-3); text-align: center; padding: 9px 6px 8px; border-bottom: 1px solid var(--ch-divider); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ch-atable th.c-title { text-align: start; }
+.ch-atable th.c-type { width: 78px; }
+.ch-atable th.c-id { width: 46px; }
+.ch-atable th.c-room { width: 100px; }
+.ch-atable th.c-tags { width: 110px; }
+.ch-atable th.c-created { width: 70px; }
+.ch-atable th.c-active { width: 92px; }
+.ch-atable td { padding: 0 6px; border-bottom: .5px solid var(--ch-border-2); vertical-align: middle; height: 45px; }
+.ch-atable tbody tr { cursor: pointer; }
+.ch-atable tbody tr:hover { background: var(--ch-subtle); }
+.ch-shell .ch-atable tbody tr:focus-visible { outline: var(--ch-focus); outline-offset: -2px; }
+.ch-atable .c-type { text-align: center; }
+.c-id { font: 400 var(--ch-t-id) var(--ch-mono); color: var(--ch-ink-3); text-align: center; }
+.ch-atable .c-title { padding-block: 8px; overflow: hidden; }
+.ch-atable .c-room { font-size: 11px; color: var(--ch-ink-2); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ch-atable .c-tags { text-align: center; padding-block: 6px; }
+.ch-atable .c-when { font-size: 11px; color: var(--ch-ink-3); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t-t { font-size: var(--ch-t-small); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.t-s { font-size: 11px; color: var(--ch-ink-2); line-height: 1.4; margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.t-q { font-size: 11.5px; line-height: 1.4; font-style: italic; border-inline-start: 2px solid var(--ch-soft); padding-inline-start: 7px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.t-mk { font: italic 400 10px var(--ch-serif); color: var(--ch-marg); margin-top: 2px; }
+/* Kinds, text on a tint (token sheet). A term is today's highlight, so it
+   takes the highlight's pink; a quote, which has no colour of its own in
+   v30, is ink. */
+.ch-kpill { display: inline-flex; align-items: center; gap: 4px; font: 500 10px var(--ch-sans); padding: 2px 7px; border-radius: 9px; white-space: nowrap; }
+.k-chat { background: var(--ch-kind-chat-bg); color: var(--ch-kind-chat); }
+.k-note { background: var(--ch-kind-note-bg); color: var(--ch-kind-note); }
+.k-term { background: var(--ch-kind-high-bg); color: var(--ch-kind-high); }
+.k-quote { background: var(--ch-wash-2); color: var(--ch-ink-2); }
+.k-docket { background: var(--ch-kind-docket-bg); color: var(--ch-kind-docket); }
+.ch-tag { display: inline-block; max-width: 100%; margin: 1px 2px; padding: 2px 8px; border: .5px dashed var(--ch-soft); border-radius: 10px; font: 500 10px var(--ch-sans); color: var(--ch-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
 .ch-ref-row .ch-code { flex: 0 0 auto; min-width: 150px; }
 .ch-ref-row .gloss { font: 400 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink-2); }
 .ch-ref-head { display: flex; align-items: baseline; justify-content: flex-end; padding-top: 8px; }

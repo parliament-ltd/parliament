@@ -12,6 +12,7 @@ import { roomLabel } from './say'
 import Field from './Field'
 import EnterLine from './EnterLine'
 import Reference from './Reference'
+import Inspect from './Inspect'
 
 // One bar: the field, its Enter line and the ? reference, pointed at one
 // board. The page has one, and so does every popped window (C6: each window
@@ -35,7 +36,7 @@ import Reference from './Reference'
 // whether it went ({ refused } or { done }), then once it is answered
 // (done resolves to a notice, or null).
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -158,6 +159,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     if (e.key === 'Escape') {
       e.preventDefault()
       if (reference) { setReference(null); return }
+      if (inspect) { onInspectClose?.(); return }
       // The field's rule first, then the caret: moving the caret blurs the
       // field, which would otherwise come before the Escape.
       dispatch({ type: 'escape' })
@@ -211,6 +213,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
         </div>
         <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} addressed={board} room={room} welcome={welcome} />
         {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
+        {!reference && inspect && <Inspect row={inspect} />}
       </div>
     </div>
   )

@@ -7,6 +7,57 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
 
+#. js-lingui-explicit-id
+msgid "almanac.colActive"
+msgstr "Last active"
+
+#. js-lingui-explicit-id
+msgid "almanac.colCreated"
+msgstr "Created"
+
+#. The number every row is addressed by
+#. js-lingui-explicit-id
+msgid "almanac.colId"
+msgstr "ID"
+
+#. js-lingui-explicit-id
+msgid "almanac.colRoom"
+msgstr "Room"
+
+#. js-lingui-explicit-id
+msgid "almanac.colTags"
+msgstr "Tags"
+
+#. js-lingui-explicit-id
+msgid "almanac.colTitle"
+msgstr "Title"
+
+#. js-lingui-explicit-id
+msgid "almanac.colType"
+msgstr "Type"
+
+#. js-lingui-explicit-id
+msgid "almanac.empty"
+msgstr "Nothing made yet. p> starts your first chat, and it appears here."
+
+#. js-lingui-explicit-id
+msgid "almanac.loading"
+msgstr "Reading what you have made"
+
+#. Marginalia under a pinned row
+#. js-lingui-explicit-id
+msgid "almanac.pinned"
+msgstr "pinned"
+
+#. What clicking a row does; open: stays English
+#. js-lingui-explicit-id
+msgid "almanac.rowHelp"
+msgstr "Writes open:{num} in the bar"
+
+#. js-lingui-explicit-id
+msgid "almanac.untitled"
+msgstr "Untitled"
+
 #. The table of everything you have made
 #. js-lingui-explicit-id
 msgid "board.almanac"
@@ -116,6 +167,10 @@ msgstr "The reply in {chat} stopped when you left it, before any of it arrived."
 #. js-lingui-explicit-id
 msgid "chat.stoppedOnReply"
 msgstr "Stopped when you left the chat. What arrived is kept."
+
+#. js-lingui-explicit-id
+msgid "count.branches"
+msgstr "{count, plural, one {# branch} other {# branches}}"
 
 #. js-lingui-explicit-id
 msgid "count.chats"
@@ -232,6 +287,10 @@ msgid "enter.helpVerb"
 msgstr "Enter shows how {verb} works"
 
 #. js-lingui-explicit-id
+msgid "enter.inspectOne"
+msgstr "Enter shows {num} in detail, here"
+
+#. js-lingui-explicit-id
 msgid "enter.key"
 msgstr "No keys in the command line, for security. Delete it, and api: opens the key field"
 
@@ -308,6 +367,10 @@ msgid "enter.notCommand"
 msgstr "A command starts with a verb and a colon, like open:201"
 
 #. js-lingui-explicit-id
+msgid "enter.numNone"
+msgstr "Nothing here has the number {num}"
+
+#. js-lingui-explicit-id
 msgid "enter.openAddressed"
 msgstr "The bar is pointed at {board} already"
 
@@ -316,8 +379,32 @@ msgid "enter.openBoard"
 msgstr "Enter opens {board} on the right"
 
 #. js-lingui-explicit-id
+msgid "enter.openChat"
+msgstr "Enter opens {num} in a room beside what is here"
+
+#. js-lingui-explicit-id
+msgid "enter.openChatHere"
+msgstr "Enter shows {num} in the room here"
+
+#. js-lingui-explicit-id
+msgid "enter.openChatThere"
+msgstr "{num} is in the room here already"
+
+#. js-lingui-explicit-id
+msgid "enter.openDocket"
+msgstr "Enter opens its first branch, {num}, in a room beside what is here"
+
+#. js-lingui-explicit-id
+msgid "enter.openDocketHere"
+msgstr "Enter shows its first branch, {num}, in the room here"
+
+#. js-lingui-explicit-id
 msgid "enter.openHere"
 msgstr "{board} is here. Enter points the bar at it"
+
+#. js-lingui-explicit-id
+msgid "enter.openNotYet"
+msgstr "Opening this comes later. inspect:{num} shows it now"
 
 #. js-lingui-explicit-id
 msgid "enter.openPopped"
@@ -713,6 +800,26 @@ msgstr "Minimised. Search, command or prompt"
 #. js-lingui-explicit-id
 msgid "hint.slashOrK"
 msgstr "press / or {key}"
+
+#. js-lingui-explicit-id
+msgid "inspect.active"
+msgstr "last active {ago}"
+
+#. js-lingui-explicit-id
+msgid "inspect.close"
+msgstr "Escape closes this"
+
+#. js-lingui-explicit-id
+msgid "inspect.created"
+msgstr "created {day}"
+
+#. js-lingui-explicit-id
+msgid "inspect.label"
+msgstr "{num} in detail"
+
+#. js-lingui-explicit-id
+msgid "inspect.openChat"
+msgstr "open:{num} brings it beside what is here. Escape closes this"
 
 #. js-lingui-explicit-id
 msgid "kind.ask"

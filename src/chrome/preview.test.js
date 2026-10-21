@@ -37,7 +37,7 @@ describe('what Enter would do', () => {
   })
 
   it('says a verb is not built yet, including forms of built verbs that wait for later', () => {
-    expect(words('>open:207').text).toBe('open: is not built yet')
+    expect(words('>open:201a summary').text).toBe('open: is not built yet')
     expect(words('>pop:settings keys').text).toBe('pop: is not built yet')
     expect(words('>tour:advanced').text).toBe('tour: is not built yet')
   })
@@ -205,6 +205,44 @@ describe('after a reply stalled (C114)', () => {
     expect(promptPreview('Something else', target).resend).toBeUndefined()
     expect(promptPreview('', { ...target, resend: false }).ready).toBe(false)
     expect(promptPreview('', { ...target, keyed: false }).ready).toBe(false)
+  })
+})
+
+describe('open: and inspect: by number (stage 5, piece 3)', () => {
+  const numbered = new Map([
+    [202, { kind: 'chat', num: 202, chatId: 'c202' }],
+    [204, { kind: 'chat', num: 204, chatId: 'c204' }],
+    [203, { kind: 'docket', num: 203, chatId: 'c204', chatNum: 204 }],
+    [210, { kind: 'note', num: 210, chatId: 'c204' }],
+  ])
+  const at = (value, a = shipped(SPACE)) => {
+    const p = preview(value, { mode: 'command', arrangement: a, screens: { numbered } })
+    return { ...p, text: say(i18n, p.says.message, p.says.values) }
+  }
+
+  it('opens a chat in a room beside what is here, or in the room here', () => {
+    const p = at('>open:204')
+    expect(p.text).toBe('Enter opens 204 in a room beside what is here')
+    expect(p.next.columns).toEqual([['almanac'], ['collection'], ['room']])
+    expect(p.next.context.room).toBe('c204')
+    expect(at('>open:202', p.next).text).toBe('Enter shows 202 in the room here')
+    expect(at('>open:204', p.next).text).toBe('204 is in the room here already')
+  })
+
+  it('opens a docket\'s first branch, and says opening a marking comes later', () => {
+    expect(at('>open:203').text).toBe('Enter opens its first branch, 204, in a room beside what is here')
+    expect(at('>open:210').text).toBe('Opening this comes later. inspect:210 shows it now')
+    expect(at('>open:999').text).toBe('Nothing here has the number 999')
+    expect(at('>open:204a').text).toBe('open: is not built yet')
+  })
+
+  it('inspect: shows one thing in detail, on a line of its own', () => {
+    const p = at('>inspect:204')
+    expect(p.text).toBe('Enter shows 204 in detail, here')
+    expect(p.act).toEqual({ kind: 'inspect', num: 204 })
+    expect(p.next).toBeNull()
+    expect(at('>inspect:999').act).toBeNull()
+    expect(at('>inspect:204 bar:top').text).toBe('inspect: runs on a line of its own for now')
   })
 })
 

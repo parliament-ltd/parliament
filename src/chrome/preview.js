@@ -25,8 +25,9 @@ import { CHARS_PER_TOKEN, inputCost, describeCost } from '../shell/estimate'
 // Verbs that bring an arrangement, or a board, into the space (C95, C125).
 const BRINGS = Object.freeze(['alm', 'sym', 'library'])
 // Verbs that act on what the bar points at, rather than only on the space:
-// name: (C40), and tour:, which also shows the welcome steps (A20).
-const ACTS = Object.freeze(['name', 'tour'])
+// name: (C40), tour:, which also shows the welcome steps (A20), and
+// inspect:, which shows one thing in detail under the bar (stage 5).
+const ACTS = Object.freeze(['name', 'tour', 'inspect'])
 export const BUILT = new Set([...ARRANGEMENT_VERBS, ...BRINGS, ...ACTS])
 
 // alm: brings the Almanac arrangement, the Almanac and the Collection, or
@@ -61,6 +62,46 @@ function planTour(a, step, screens = {}) {
   return { says: { message: 'tourHere' }, act: null }
 }
 
+// open: and inspect: by number (stage 5, piece 3). screens.numbered holds
+// every numbered thing the Almanac lists, by number. A branch (201a) and a
+// thing by name come later.
+const numberOf = (step) => {
+  const [arg] = step.match?.values ?? []
+  return arg?.kind === 'address' && !arg.letter && (step.match.values.length === 1) ? arg.num : null
+}
+
+// What planRoom says, said of a numbered chat.
+const OPENED = {
+  goRoom: 'openChat', showRoom: 'openChatHere', roomHere: 'openChatThere',
+}
+const OPENED_DOCKET = { goRoom: 'openDocket', showRoom: 'openDocketHere', roomHere: 'openChatThere' }
+
+/**
+ * open:204. A chat opens in the space's room, or in a room brought beside
+ * what is here; a docket opens its first branch. Opening a note, a term or a
+ * quote (a chat about it) comes later; inspect: shows it now.
+ * @returns {{ next: object|null, says: object }|null}
+ */
+function openNumber(a, step, screens = {}) {
+  const num = numberOf(step)
+  if (num == null) return null
+  const row = screens.numbered?.get(num)
+  if (!row) return { next: null, says: { message: 'numNone', values: { num } } }
+  if ((row.kind !== 'chat' && row.kind !== 'docket') || !row.chatId) return { next: null, says: { message: 'openNotYet', values: { num } } }
+  const p = planRoom(a, row.chatId)
+  const words = row.kind === 'docket' ? OPENED_DOCKET : OPENED
+  const shown = row.kind === 'docket' ? row.chatNum ?? num : num
+  return { next: p.next, says: { message: words[p.says.message] ?? p.says.message, values: { num: shown } } }
+}
+
+/** inspect:204 shows it in detail under the bar. */
+function planInspect(a, step, screens = {}) {
+  const num = numberOf(step)
+  if (num == null) return null
+  if (!screens.numbered?.get(num)) return { says: { message: 'numNone', values: { num } }, act: null }
+  return { says: { message: 'inspectOne', values: { num } }, act: { kind: 'inspect', num } }
+}
+
 // The words of an argument as typed: quoted text without its quotes, or a
 // word as written (the parser lower-cases words).
 const typed = (arg) => (arg?.kind === 'text' ? arg.value : arg?.text ?? '')
@@ -89,7 +130,8 @@ function planName(a, step, screens = {}) {
  * @param {string} value the whole field, leader included
  * @param {{ mode: string, arrangement: import('../shell/arrangement').Arrangement, built?: Set<string>,
  *   screens?: { lastRoom?: { id: string, num?: number|null }|null, roomName?: object|null, stepsOff?: boolean,
- *     measure?: () => object|null } }} ctx  measure: the space as drawn, for width: (C126)
+ *     measure?: () => object|null, numbered?: Map<number, object> } }} ctx  measure: the space as drawn, for
+ *   width: (C126); numbered: the Almanac's rows by number, for open: and inspect:
  * @returns {{ answer: object, says: { message: string, values?: object }, next: object|null, act?: object|null }}
  *   next is the space after Enter, or null when Enter changes none of it;
  *   act is what Enter does besides, to what the bar points at (name:) or to
@@ -103,7 +145,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   if (acts.length) {
     if (answer.steps.length > 1) return { answer, says: { message: 'aloneNow', values: { verb: `${acts[0].verb}:` } }, next: null }
     const step = answer.steps[0]
-    const p = step.verb === 'tour' ? planTour(arrangement, step, screens) : planName(arrangement, step, screens)
+    const plans = { tour: planTour, name: planName, inspect: planInspect }
+    const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
     return { answer, says: p.says, next: p.next ?? null, act: p.act ?? null }
   }
@@ -111,7 +154,9 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   let a = arrangement
   let last = null
   for (const step of answer.steps) {
-    const p = BRINGS.includes(step.verb) ? bring(a, step, screens) : plan(a, step, screens.measure?.() ?? null)
+    const p = BRINGS.includes(step.verb) ? bring(a, step, screens)
+      : step.verb === 'open' && numberOf(step) != null ? openNumber(a, step, screens)
+        : plan(a, step, screens.measure?.() ?? null)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
     if (!p.next) return { answer, says: p.says, next: null }
     a = p.next

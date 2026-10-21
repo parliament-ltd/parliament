@@ -29,6 +29,9 @@ import Board from './Board'
 import { boardName } from './say'
 import RoomBoard from './RoomBoard'
 import WelcomeBoard, { WelcomeFoot } from './WelcomeBoard'
+import AlmanacBoard from './AlmanacBoard'
+import { readAlmanac } from '../lib/almanacRows'
+import { onRecordsChanged } from '../lib/records'
 
 // The new shell (refactor-plan.md §4 and stages 3 and 4): the board strip,
 // the boards as the arrangement places them, the bar, and windows of their
@@ -264,6 +267,7 @@ export default function Shell() {
 
   /** Runs a planned arrangement: opens, closes and places its windows, then keeps it. */
   const run = useCallback(async (next, body) => {
+    setInspected(null)
     if (waiting.current && roomOnScreen(next) !== waiting.current.chatId) { waiting.current.drop(); waiting.current = null }
     const changes = windowChanges(current.current, next)
     const opened = []
@@ -301,6 +305,28 @@ export default function Shell() {
   // name: (C40): the room's own name, kept on the room record. The room
   // board then reads its room again.
   const [roomRev, setRoomRev] = useState(0)
+
+  // ── The Almanac's rows (stage 5, piece 3) ─────────────
+  // Everything numbered, read once the database is open and again whenever
+  // something is stored, here or in another tab, or a room is named. They
+  // also answer open: and inspect: by number, from any board.
+  const [almanacRows, setAlmanacRows] = useState(null)
+  useEffect(() => {
+    if (!started || !db.current) return undefined
+    let live = true
+    let reading = null
+    const read = () => {
+      const now = readAlmanac(db.current).catch(() => [])
+      reading = now
+      now.then((rows) => { if (live && reading === now) setAlmanacRows(rows) })
+    }
+    read()
+    const off = onRecordsChanged(read)
+    return () => { live = false; off() }
+  }, [started, roomRev])
+  const numbered = useMemo(() => new Map((almanacRows ?? []).map((r) => [r.num, r])), [almanacRows])
+  const [inspected, setInspected] = useState(null) // the number inspect: shows under the bar
+  const inspectedRow = inspected != null ? numbered.get(inspected) ?? null : null
   const [roomNameOf, setRoomNameOf] = useState(null) // { chatId, value }: what the room on screen is called
   const onRoomName = useCallback((chatId, value) => setRoomNameOf({ chatId, value }), [])
   const remember = useCallback((body) => {
@@ -311,6 +337,11 @@ export default function Shell() {
       // tour: may bring the welcome card back into the space first.
       if (next) { const refused = await run(next, null); if (refused) return refused }
       updateWelcome((w) => showSteps(w, what.kind === 'tourOn'))
+      remember(body)
+      return null
+    }
+    if (what.kind === 'inspect') {
+      setInspected(what.num)
       remember(body)
       return null
     }
@@ -382,7 +413,7 @@ export default function Shell() {
       stacked: getComputedStyle(stage).flexDirection === 'column',
     }
   }, [])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace }), [lastRoom, roomNameHere, welcome.off, measureSpace])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -524,6 +555,9 @@ export default function Shell() {
     if (board === 'room' && roomId !== undefined) {
       return <RoomBoard key={`room:${roomId ?? 'new'}`} chatId={roomId} rev={roomRev} addressed={arrangement.addressed === 'room'} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} />
     }
+    if (board === 'almanac') {
+      return <AlmanacBoard key="almanac" rows={almanacRows} addressed={arrangement.addressed === 'almanac'} onAddress={focusBoard} onWrite={writeField} />
+    }
     if (board === 'welcome') {
       return <WelcomeBoard key="welcome" welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} />
     }
@@ -555,7 +589,7 @@ export default function Shell() {
           it never loses the field's focus or what is typed. */}
       <div ref={dockSlot} className="ch-bar-host" />
       {!barWindow && createPortal(
-        <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} />,
+        <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} inspect={inspectedRow} onInspectClose={() => setInspected(null)} />,
         barHost,
       )}
       {barWindow && <p className="ch-away ch-marg">{i18n._(COPY.shell.barAway)}</p>}

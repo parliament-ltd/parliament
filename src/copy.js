@@ -56,6 +56,7 @@ export const COPY = {
     chats: /*i18n*/ { id: 'count.chats', message: '{count, plural, one {# chat} other {# chats}}' },
     dockets: /*i18n*/ { id: 'count.dockets', message: '{count, plural, one {# docket} other {# dockets}}' },
     steps: /*i18n*/ { id: 'count.steps', message: '{count, plural, one {# step} other {# steps}}' },
+    branches: /*i18n*/ { id: 'count.branches', message: '{count, plural, one {# branch} other {# branches}}' },
   },
 
   // The Enter line: one row under the field saying what Enter will do before
@@ -193,6 +194,15 @@ export const COPY = {
     // name: for the room (C40).
     nameRoom: /*i18n*/ { id: 'enter.nameRoom', message: 'Enter names this room: {name}', comment: '{name} is the person\'s own words' },
     nameSame: /*i18n*/ { id: 'enter.nameSame', message: 'This room has that name already' },
+    // open: and inspect: by number (stage 5, piece 3). {num} is a number as typed.
+    numNone: /*i18n*/ { id: 'enter.numNone', message: 'Nothing here has the number {num}' },
+    openChat: /*i18n*/ { id: 'enter.openChat', message: 'Enter opens {num} in a room beside what is here' },
+    openChatHere: /*i18n*/ { id: 'enter.openChatHere', message: 'Enter shows {num} in the room here' },
+    openChatThere: /*i18n*/ { id: 'enter.openChatThere', message: '{num} is in the room here already' },
+    openDocket: /*i18n*/ { id: 'enter.openDocket', message: 'Enter opens its first branch, {num}, in a room beside what is here' },
+    openDocketHere: /*i18n*/ { id: 'enter.openDocketHere', message: 'Enter shows its first branch, {num}, in the room here' },
+    openNotYet: /*i18n*/ { id: 'enter.openNotYet', message: 'Opening this comes later. inspect:{num} shows it now' },
+    inspectOne: /*i18n*/ { id: 'enter.inspectOne', message: 'Enter shows {num} in detail, here' },
     nameEmpty: /*i18n*/ { id: 'enter.nameEmpty', message: 'A name needs some words, like name:"Barn owls"' },
     nameLong: /*i18n*/ { id: 'enter.nameLong', message: 'A room\'s name is at most {max} characters' },
     nameNoChat: /*i18n*/ { id: 'enter.nameNoChat', message: 'This room has no chat yet. Its first prompt starts it, and then name: names it' },
@@ -319,6 +329,32 @@ export const COPY = {
     empty: /*i18n*/ { id: 'room.empty', message: 'An empty room. Its first prompt, written in the bar, starts its chat.' },
     notFound: /*i18n*/ { id: 'room.notFound', message: 'This chat could not be found. It may have been removed.' },
     unavailable: /*i18n*/ { id: 'room.unavailable', message: 'This room could not be drawn. Its chat is kept as it was.' },
+  },
+
+  // The Almanac (stage 5, piece 3; Almanac v30): the table of everything
+  // made, by number.
+  almanac: {
+    colType: /*i18n*/ { id: 'almanac.colType', message: 'Type' },
+    colId: /*i18n*/ { id: 'almanac.colId', message: 'ID', comment: 'The number every row is addressed by' },
+    colTitle: /*i18n*/ { id: 'almanac.colTitle', message: 'Title' },
+    colRoom: /*i18n*/ { id: 'almanac.colRoom', message: 'Room' },
+    colTags: /*i18n*/ { id: 'almanac.colTags', message: 'Tags' },
+    colCreated: /*i18n*/ { id: 'almanac.colCreated', message: 'Created' },
+    colActive: /*i18n*/ { id: 'almanac.colActive', message: 'Last active' },
+    empty: /*i18n*/ { id: 'almanac.empty', message: 'Nothing made yet. p> starts your first chat, and it appears here.' },
+    pinned: /*i18n*/ { id: 'almanac.pinned', message: 'pinned', comment: 'Marginalia under a pinned row' },
+    untitled: /*i18n*/ { id: 'almanac.untitled', message: 'Untitled' },
+    rowHelp: /*i18n*/ { id: 'almanac.rowHelp', message: 'Writes open:{num} in the bar', comment: 'What clicking a row does; open: stays English' },
+    loading: /*i18n*/ { id: 'almanac.loading', message: 'Reading what you have made' },
+  },
+
+  // inspect: one thing in detail, under the bar (stage 5, piece 3; v30's peek).
+  inspect: {
+    created: /*i18n*/ { id: 'inspect.created', message: 'created {day}' },
+    active: /*i18n*/ { id: 'inspect.active', message: 'last active {ago}' },
+    openChat: /*i18n*/ { id: 'inspect.openChat', message: 'open:{num} brings it beside what is here. Escape closes this' },
+    close: /*i18n*/ { id: 'inspect.close', message: 'Escape closes this' },
+    label: /*i18n*/ { id: 'inspect.label', message: '{num} in detail' },
   },
 
   // The hint line: the keys that open the field where focus is (P2). {key}

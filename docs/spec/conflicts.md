@@ -1017,6 +1017,12 @@ Found while splitting stage 5 into pieces. The documents: `welcome-spec-decision
 - **Not built:** dragging a board to another place (the arrangements spec's "no drag and drop"; `move:` and `swap:` do it), and ready-made shapes, which come with saved arrangements and the screens map (`arrange:`, stage 14).
 - **Suggestion, built so:** the verb `width:` with percentages and `even`. A ruling on the name changes one entry in `verbs.js`.
 
+**C127. Which rows the thin Almanac shows, and what a click does.** Every chat starts a docket (C18), and the two take a number each, so a new chat is 204 in docket 203. Almanac v30 lists dockets and chats as rows of their own; no document says what happens to a docket of one branch.
+- **Built:** a row for every numbered chat, note, term and quote; a docket gets a row once it holds more than one branch (until then it is its one chat), and archived dockets stay out. Pinned rows first, then the most recently active (v30). Columns are v30's (type, id, title, room, tags, created, last active), fewer as the board narrows, the id always shown (almanac spec §3).
+- A click on a row (or Enter on it) writes `open:<number>` in the bar, and Enter opens it, so the bar stays the one actor (C125). `open:` on a chat shows it in the room here, or brings a room beside; on a docket, its first branch; on a note, term or quote it says that comes later and that `inspect:` shows it now. `inspect:<number>` shows one thing in detail under the bar, like v30's peek; Escape closes it.
+- A term takes the highlight's pink (it is today's highlight, C57); a quote, which v30 does not colour, is ink.
+- **Suggestion:** keep as built. A ruling on dockets changes one line in `almanacRows.js`.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
