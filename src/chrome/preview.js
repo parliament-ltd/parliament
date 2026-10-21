@@ -6,8 +6,8 @@
 // refuse, the Enter line says why and Enter does nothing, so a line never
 // stops half done.
 //
-// What is on screen is one space (C125, ruled 21 October). alm:, sym: and
-// tour: bring their arrangement's boards into it beside what is there,
+// What is on screen is one space (C125, ruled 21 October). records:, room:
+// and tour: bring their arrangement's boards into it beside what is there,
 // like open: brings one board; nothing switches to another screen. So they
 // share a line with the other layout commands (C99).
 //
@@ -24,7 +24,7 @@ import { holdsKey } from '../commands/parse'
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
 // Verbs that bring an arrangement, or a board, into the space (C95, C125).
-const BRINGS = Object.freeze(['alm', 'sym', 'library'])
+const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // Verbs that act on what the bar points at, rather than only on the space:
 // name: (C40), tour:, which also shows the welcome steps (A20), and
 // inspect:, which shows one thing in detail under the bar, and api:, which
@@ -42,15 +42,17 @@ function planFocusStep(a, step, screens = {}) {
   return null
 }
 
-// alm: brings the Almanac arrangement, the Almanac and the Collection, or
-// whatever its owner has made it (C125). sym: brings the last room, or an
-// empty room when there is no chat yet. library: is open:library (C95).
-// A room or a shelf by name comes later.
+// records: brings the Records arrangement, the Records board and the
+// Collection, or whatever its owner has made it (C125, C131). room: brings
+// the last room, or an empty room when there is no chat yet. library: and
+// plan: are open:library and open:plan (C95). A room or a shelf by name
+// comes later.
 function bring(a, step, screens = {}) {
   const named = Boolean(step.match?.values?.length)
-  if (step.verb === 'alm') return planBring(a, 'almanac')
-  if (step.verb === 'sym') return named ? null : planRoom(a, screens.lastRoom?.id ?? null)
+  if (step.verb === 'records') return planBring(a, 'almanac')
+  if (step.verb === 'room') return named ? null : planRoom(a, screens.lastRoom?.id ?? null)
   if (step.verb === 'library') return named ? null : planOpen(a, 'library')
+  if (step.verb === 'plan') return planOpen(a, 'docket')
   return null
 }
 

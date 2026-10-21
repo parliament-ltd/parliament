@@ -58,50 +58,59 @@ describe('what Enter would do', () => {
 
   it('names where a verb works', () => {
     const p = preview('>type:chat', { mode: 'command', arrangement: shipped('settings') })
-    expect(say(i18n, p.says.message, p.says.values)).toBe('type: works on Almanac and Collection')
+    expect(say(i18n, p.says.message, p.says.values)).toBe('type: works on Records and Collection')
   })
 })
 
-describe('one space: alm: and sym: bring boards beside what is here (C125)', () => {
+describe('one space: records: and room: bring boards beside what is here (C125, C131)', () => {
   const space = () => shipped(SPACE)
   const at = (value, a = space(), screens = {}) => {
     const p = preview(value, { mode: 'command', arrangement: a, screens })
     return { ...p, text: say(i18n, p.says.message, p.says.values) }
   }
 
-  it('alm: brings the Almanac and the Collection, and nothing switches screens', () => {
-    expect(BUILT.has('alm')).toBe(true)
+  it('records: brings Records and the Collection, and nothing switches screens', () => {
+    expect(BUILT.has('records')).toBe(true)
     const w = { ...shipped('welcome'), id: SPACE }
-    const p = at('>alm:', w)
-    expect(p.text).toBe('Enter brings Almanac and Collection beside what is here')
+    const p = at('>records:', w)
+    expect(p.text).toBe('Enter brings Records and Collection beside what is here')
     expect(p.next.columns).toEqual([['welcome'], ['almanac', 'collection']])
     expect(p.go).toBeUndefined()
-    expect(at('>alm:').text).toBe('Everything it brings is here already')
-    // open:alm still opens the Almanac alone.
-    expect(at('>open:alm', w).next.columns).toEqual([['welcome'], ['almanac']])
+    expect(at('>records:').text).toBe('Everything it brings is here already')
+    // open:records opens the Records board alone.
+    expect(at('>open:records', w).next.columns).toEqual([['welcome'], ['almanac']])
   })
 
-  it('sym: brings the last room beside what is here, and shows it there after', () => {
+  it('room: brings the last room beside what is here, and shows it there after', () => {
     const screens = { lastRoom: { id: 'c1', num: 202 } }
-    const p = at('>sym:', space(), screens)
+    const p = at('>room:', space(), screens)
     expect(p.text).toBe('Enter brings the last room beside what is here')
     expect(p.next.columns).toEqual([['almanac'], ['collection'], ['room']])
     expect(p.next.context.room).toBe('c1')
-    expect(at('>sym:', p.next, screens).text).toBe('The last room is here already')
-    expect(at('>sym:', p.next, { lastRoom: { id: 'c2' } }).text).toBe('Enter shows the last room here')
+    expect(at('>room:', p.next, screens).text).toBe('The last room is here already')
+    expect(at('>room:', p.next, { lastRoom: { id: 'c2' } }).text).toBe('Enter shows the last room here')
   })
 
-  it('sym: with no chat yet opens an empty room beside', () => {
-    const p = at('>sym:', space(), { lastRoom: null })
+  it('room: with no chat yet opens an empty room beside', () => {
+    const p = at('>room:', space(), { lastRoom: null })
     expect(p.text).toBe('Enter opens an empty room beside what is here. Its first prompt starts it')
-    expect(at('>sym:', p.next, { lastRoom: null }).text).toBe('This room is empty. Its first prompt starts it')
+    expect(at('>room:', p.next, { lastRoom: null }).text).toBe('This room is empty. Its first prompt starts it')
   })
 
   it('shares a line with other layout commands (C99), and a room by name waits for name:', () => {
-    const p = at('>alm: bar:bottom', { ...shipped('welcome'), id: SPACE })
-    expect(p.text).toBe('Enter runs 2 commands in turn: alm: and bar:')
+    const p = at('>records: bar:bottom', { ...shipped('welcome'), id: SPACE })
+    expect(p.text).toBe('Enter runs 2 commands in turn: records: and bar:')
     expect(p.next.bar.at).toBe('bottom')
-    expect(at('>sym:"Barn owls"').text).toBe('sym: is not built yet')
+    expect(at('>room:"Barn owls"').text).toBe('room: is not built yet')
+  })
+
+  it('takes the new words, and points the old verbs to them (C131)', () => {
+    expect(at('>alm:').text).toBe('That verb is now records:. Enter writes it in')
+    expect(at('>sym:').text).toBe('That verb is now room:. Enter writes it in')
+    expect(at('>collab:pushback').text).toBe('That verb is now framework:. Enter writes it in')
+    expect(at('>plan:').next.columns).toEqual([['almanac'], ['collection'], ['docket']])
+    expect(at('>close:records').text).toBe('Enter closes Records. Nothing is lost')
+    expect(at('>close:almanac').text).toBe('close: does not take that. For example: close:records')
   })
 })
 
@@ -115,7 +124,7 @@ describe('what Enter does with a prompt (stage 4; C83)', () => {
   it('needs a room on the screen', () => {
     const p = line('hello', { room: undefined })
     expect(p.ready).toBe(false)
-    expect(p.text).toBe('Prompts go to a room. sym: opens one')
+    expect(p.text).toBe('Prompts go to a room. room: opens one')
   })
 
   it('without a key, asks the source and says it costs nothing', () => {
@@ -357,8 +366,8 @@ describe('the welcome page (stage 5)', () => {
     expect(welcome().bar.at).toBe('card')
   })
 
-  it('brings the Almanac and the Library on the right of the card (W §5; C95, C125)', () => {
-    expect(at('>alm:').next.columns).toEqual([['welcome'], ['almanac', 'collection']])
+  it('brings Records and the Library on the right of the card (W §5; C95, C125)', () => {
+    expect(at('>records:').next.columns).toEqual([['welcome'], ['almanac', 'collection']])
     expect(at('>library:').next.columns).toEqual([['welcome'], ['library']])
     expect(at('>library:', shipped('almanac')).next.columns).toEqual([['almanac'], ['collection'], ['library']])
   })

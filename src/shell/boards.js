@@ -6,9 +6,10 @@
 // a board needs no placement of its own (that is a block's question).
 //
 // Each board registers:
-//   title     its short title on the board strip, also a word focus: takes
-//             (focus:sym col). Commands stay English, so titles do too.
-//             null where no document gives one.
+//   title     its name on the board strip, the word a command uses for it
+//             (C131, ruled 21 October: full names, and Records, Plan, Room).
+//             Commands stay English, so titles do too. null where no
+//             document gives one.
 //   resting   the field's resting mode while the board is addressed (C44)
 //   can       what it may do: 'execute' runs things (rooms, dockets, and the
 //             Almanac, which can run: C6, S11)
@@ -20,12 +21,12 @@
 // drawing.
 
 export const BOARDS = Object.freeze({
-  room: { title: 'Sym', resting: 'prompt', can: ['execute'], closable: true, strip: 1 },
-  collection: { title: 'Col', resting: 'search', can: [], closable: true, strip: 2 },
-  reflection: { title: 'Ref', resting: 'prompt', can: [], closable: true, strip: 3 },
-  almanac: { title: 'Alm', resting: 'search', can: ['execute'], closable: true, strip: 4 },
-  library: { title: 'Lib', resting: 'search', can: [], closable: true, strip: 5 },
-  docket: { title: 'Dkt', resting: 'prompt', can: ['execute'], closable: true, strip: 6 },
+  room: { title: 'Room', resting: 'prompt', can: ['execute'], closable: true, strip: 1 },
+  collection: { title: 'Collection', resting: 'search', can: [], closable: true, strip: 2 },
+  reflection: { title: 'Reflection', resting: 'prompt', can: [], closable: true, strip: 3 },
+  almanac: { title: 'Records', resting: 'search', can: ['execute'], closable: true, strip: 4 },
+  library: { title: 'Library', resting: 'search', can: [], closable: true, strip: 5 },
+  docket: { title: 'Plan', resting: 'prompt', can: ['execute'], closable: true, strip: 6 },
   settings: { title: null, resting: 'search', can: [], closable: true, strip: null },
   // The Lab's boards (Lab v7, A2).
   canvas: { title: null, resting: 'search', can: [], closable: true, strip: null },
@@ -38,10 +39,24 @@ export const BOARDS = Object.freeze({
 /** The registered board, or null. */
 export const boardEntry = (key) => (Object.hasOwn(BOARDS, key) ? BOARDS[key] : null)
 
-/** The board a short title names, for focus:sym col; null if none. */
+// The words commands take for boards, where they differ from the board's id
+// (C131): people read Records and Plan; inside the app, and in what is
+// stored, the boards keep their ids, so nothing kept changes.
+const WORDS = Object.freeze({ records: 'almanac', plan: 'docket' })
+
+/** The board a command's word names, or null. */
+export const boardFor = (word) => (word == null ? null : WORDS[word] ?? (boardEntry(word) ? word : null))
+
+/** The word a command uses for a board: records for the Almanac's board. */
+export const wordFor = (board) => Object.keys(WORDS).find((w) => WORDS[w] === board) ?? board
+
+// The strip's short titles before C131, still taken by focus: (stage 14).
+const OLD_TITLES = Object.freeze({ sym: 'room', col: 'collection', ref: 'reflection', alm: 'almanac', lib: 'library', dkt: 'docket' })
+
+/** The board a strip title names, for focus:room collection; null if none. */
 export function boardByTitle(word) {
   const w = String(word ?? '').toLowerCase().replace(/:$/, '')
-  return Object.keys(BOARDS).find((key) => BOARDS[key].title?.toLowerCase() === w) ?? null
+  return Object.keys(BOARDS).find((key) => BOARDS[key].title?.toLowerCase() === w) ?? OLD_TITLES[w] ?? null
 }
 
 /**

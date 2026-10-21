@@ -58,10 +58,10 @@ msgstr "Writes open:{num} in the bar"
 msgid "almanac.untitled"
 msgstr "Untitled"
 
-#. The table of everything you have made
+#. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
 msgid "board.almanac"
-msgstr "Almanac"
+msgstr "Records"
 
 #. The pieces a room is built from, beside the Canvas in the Lab
 #. js-lingui-explicit-id
@@ -78,10 +78,10 @@ msgstr "Canvas"
 msgid "board.collection"
 msgstr "Collection"
 
-#. A plan of branches and steps
+#. Prompts set out in branches and steps, to run (C131)
 #. js-lingui-explicit-id
 msgid "board.docket"
-msgstr "Docket"
+msgstr "Plan"
 
 #. Where rooms are built
 #. js-lingui-explicit-id
@@ -178,7 +178,7 @@ msgstr "{count, plural, one {# chat} other {# chats}}"
 
 #. js-lingui-explicit-id
 msgid "count.dockets"
-msgstr "{count, plural, one {# docket} other {# dockets}}"
+msgstr "{count, plural, one {# plan} other {# plans}}"
 
 #. js-lingui-explicit-id
 msgid "count.steps"
@@ -563,7 +563,7 @@ msgstr "This looks like a key, which would be sent with the prompt. Delete it, a
 
 #. js-lingui-explicit-id
 msgid "enter.promptNoRoom"
-msgstr "Prompts go to a room. sym: opens one"
+msgstr "Prompts go to a room. room: opens one"
 
 #. Sent only on Enter, never automatically (C114)
 #. js-lingui-explicit-id
@@ -985,7 +985,7 @@ msgstr "Chat"
 
 #. js-lingui-explicit-id
 msgid "kind.docket"
-msgstr "Docket"
+msgstr "Plan"
 
 #. js-lingui-explicit-id
 msgid "kind.edit"
@@ -1009,10 +1009,10 @@ msgstr "Quote"
 msgid "kind.suggestion"
 msgstr "Suggestion"
 
-#. A word or phrase lit wherever it appears
+#. A word or phrase lit wherever it appears in a chat (C131)
 #. js-lingui-explicit-id
 msgid "kind.term"
-msgstr "Term"
+msgstr "Keyword"
 
 #. js-lingui-explicit-id
 msgid "leader.command"
@@ -1040,7 +1040,7 @@ msgstr "Things set side by side to compare, ask about, or apply."
 
 #. js-lingui-explicit-id
 msgid "library.aboutDocket"
-msgstr "A plan of prompts, run in branches."
+msgstr "Prompts set out in branches and steps, to run together."
 
 #. js-lingui-explicit-id
 msgid "library.aboutLibrary"
@@ -1320,10 +1320,6 @@ msgid "verb.again"
 msgstr "Ask again from the edited prompt, as a new branch"
 
 #. js-lingui-explicit-id
-msgid "verb.alm"
-msgstr "Bring the Almanac and the Collection beside what is on screen"
-
-#. js-lingui-explicit-id
 msgid "verb.api"
 msgstr "Add or replace a key, in its own field. Never type a key here"
 
@@ -1356,10 +1352,6 @@ msgid "verb.close"
 msgstr "Take a board off the screen. Nothing is lost"
 
 #. js-lingui-explicit-id
-msgid "verb.collab"
-msgstr "Choose the standing instructions that go with every prompt"
-
-#. js-lingui-explicit-id
 msgid "verb.cols"
 msgstr "Hide or show columns of the table"
 
@@ -1373,7 +1365,7 @@ msgstr "Copy something as Markdown"
 
 #. js-lingui-explicit-id
 msgid "verb.cost"
-msgstr "Show dockets by what they cost"
+msgstr "Show plans by what they cost"
 
 #. js-lingui-explicit-id
 msgid "verb.device"
@@ -1393,7 +1385,7 @@ msgstr "Remove an ask, edit or step that has not been sent"
 
 #. js-lingui-explicit-id
 msgid "verb.duplicate"
-msgstr "Copy a room, collection or docket under a new name"
+msgstr "Copy a room, collection or plan under a new name"
 
 #. js-lingui-explicit-id
 msgid "verb.edit"
@@ -1414,6 +1406,10 @@ msgstr "Clear the screen to your chosen boards, keep that set, or come back"
 #. js-lingui-explicit-id
 msgid "verb.forget"
 msgstr "Remove a saved search, collection or arrangement"
+
+#. js-lingui-explicit-id
+msgid "verb.framework"
+msgstr "Choose the frameworks that shape every reply: standing instructions sent with each prompt"
 
 #. js-lingui-explicit-id
 msgid "verb.from"
@@ -1441,7 +1437,7 @@ msgstr "Open a file made elsewhere. It says what the file is before anything hap
 
 #. js-lingui-explicit-id
 msgid "verb.in"
-msgstr "Show what is in a collection"
+msgstr "Show what is in a collection, or was made in a room"
 
 #. js-lingui-explicit-id
 msgid "verb.inspect"
@@ -1477,7 +1473,7 @@ msgstr "Show what a model answered"
 
 #. js-lingui-explicit-id
 msgid "verb.move"
-msgstr "Move a board to the left, right or middle, or a branch in its docket"
+msgstr "Move a board to the left, right or middle, or a branch in its plan"
 
 #. js-lingui-explicit-id
 msgid "verb.name"
@@ -1485,7 +1481,7 @@ msgstr "Name what the bar is pointed at: a room, a collection or a chat"
 
 #. js-lingui-explicit-id
 msgid "verb.new"
-msgstr "Make a chat, docket, room, collection, branch, step, run or block"
+msgstr "Make a chat, plan, room, collection, branch, step, run or block"
 
 #. js-lingui-explicit-id
 msgid "verb.note"
@@ -1504,8 +1500,16 @@ msgid "verb.place"
 msgstr "Put a block in a slot of the room, or move it"
 
 #. js-lingui-explicit-id
+msgid "verb.plan"
+msgstr "Bring the Plan board beside what is on screen"
+
+#. js-lingui-explicit-id
 msgid "verb.pop"
 msgstr "Put a board or the bar in its own window, place it, or bring it back"
+
+#. js-lingui-explicit-id
+msgid "verb.records"
+msgstr "Bring Records and the Collection beside what is on screen"
 
 #. js-lingui-explicit-id
 msgid "verb.reflect"
@@ -1545,7 +1549,7 @@ msgstr "Take things out of the collection, or blocks out of a room"
 
 #. js-lingui-explicit-id
 msgid "verb.room"
-msgstr "Show what was made in a room"
+msgstr "Bring the last room beside what is on screen, or a room by name"
 
 #. js-lingui-explicit-id
 msgid "verb.run"
@@ -1585,11 +1589,7 @@ msgstr "Swap two boards"
 
 #. js-lingui-explicit-id
 msgid "verb.sweep"
-msgstr "Check a reply or branch against a collab's rule, one suggestion per sentence"
-
-#. js-lingui-explicit-id
-msgid "verb.sym"
-msgstr "Bring the last room beside what is on screen, or a room by name"
+msgstr "Check a reply or branch against a framework's rule, one suggestion per sentence"
 
 #. js-lingui-explicit-id
 msgid "verb.tag"

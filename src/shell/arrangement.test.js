@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, it, expect } from 'vitest'
-import { BOARDS, boardEntry, boardByTitle, strip } from './boards'
+import { BOARDS, boardEntry, boardByTitle, boardFor, wordFor, strip } from './boards'
 import {
   SHIPPED, shipped, shippedFor, restingMode, address, plan, ARRANGEMENT_VERBS,
   SPACE, arrangementBoards, roomOnScreen, planBring, planRoom,
@@ -18,14 +18,21 @@ const keep = (p) => { expect(p.next, p.says.message).not.toBeNull(); return p.ne
 describe('the boards registry', () => {
   it('knows every board a command can name, and its name in the copy table', () => {
     for (const name of BOARD_NAMES) {
-      expect(boardEntry(name), name).not.toBeNull()
-      expect(COPY.boards[name], name).toBeDefined()
+      expect(boardEntry(boardFor(name)), name).not.toBeNull()
+      expect(COPY.boards[boardFor(name)], name).toBeDefined()
     }
+    // People read Records and Plan; the boards keep their ids (C131).
+    expect(boardFor('records')).toBe('almanac')
+    expect(boardFor('plan')).toBe('docket')
+    expect(wordFor('almanac')).toBe('records')
+    expect(wordFor('library')).toBe('library')
     for (const key of Object.keys(BOARDS)) expect(COPY.boards[key], key).toBeDefined()
   })
 
   it('reads short titles in any case, with or without the colon', () => {
     expect(boardByTitle('sym')).toBe('room')
+    expect(boardByTitle('Records:')).toBe('almanac')
+    expect(boardByTitle('plan')).toBe('docket')
     expect(boardByTitle('Col:')).toBe('collection')
     expect(boardByTitle('xyz')).toBeNull()
   })
@@ -38,7 +45,7 @@ describe('the boards registry', () => {
   it('draws the strip in its fixed order, marking what is open and addressed', () => {
     const a = { ...almanac(), context: { collection: 'Q2 evidence' } }
     const s = strip(a)
-    expect(s.map((x) => x.title)).toEqual(['Sym:', 'Col:', 'Ref:', 'Alm:', 'Lib:', 'Dkt:'])
+    expect(s.map((x) => x.title)).toEqual(['Room:', 'Collection:', 'Reflection:', 'Records:', 'Library:', 'Plan:'])
     expect(s.find((x) => x.board === 'almanac')).toMatchObject({ here: true, addressed: true })
     expect(s.find((x) => x.board === 'collection')).toMatchObject({ here: true, addressed: false, context: 'Q2 evidence' })
     expect(s.find((x) => x.board === 'library').here).toBe(false)
@@ -420,7 +427,7 @@ describe('from a typed command', () => {
     expect(run(a, '>open:library')[0].says.message).toBe('openBoard')
     expect(run(a, '>close:collection')[0].says.message).toBe('closeBoard')
     expect(run(a, '>move:collection left')[0].says.message).toBe('moveBoard')
-    expect(run(a, '>swap:almanac collection')[0].says.message).toBe('swapBoards')
+    expect(run(a, '>swap:records collection')[0].says.message).toBe('swapBoards')
     expect(run(a, '>pop:collection')[0].says.message).toBe('popBoard')
     expect(run(a, '>pop:library display 2')[0].says).toMatchObject({ message: 'popDisplay', values: { display: 2 } })
     expect(run(a, '>pop:command')[0].says.message).toBe('popCommand')

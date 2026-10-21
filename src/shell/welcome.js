@@ -23,10 +23,10 @@ export const STEPS = Object.freeze([
   { id: 'command', shows: '>', writes: '>' },
   { id: 'bar', shows: 'bar:bottom', writes: '>bar:bottom' }, // C43
   { id: 'ask', shows: 'p>', writes: 'p>' },
-  // alm: brings the Almanac arrangement beside the card (C119, C125).
-  { id: 'almanac', shows: 'alm:', writes: '>alm:' },
+  // records: brings the Records arrangement beside the card (C119, C125, C131).
+  { id: 'almanac', shows: 'records:', writes: '>records:' },
   { id: 'name', shows: 'name:"…"', writes: '>name:""' },
-  { id: 'pop', shows: 'pop:almanac', writes: '>pop:almanac' },
+  { id: 'pop', shows: 'pop:records', writes: '>pop:records' },
   { id: 'library', shows: 'library:', writes: '>library:' },
   { id: 'key', shows: 'api:', writes: '>api:' }, // A1; crosses off on seeing the panel (C120)
 ].map((s) => Object.freeze(s)))

@@ -58,7 +58,7 @@ msgstr ""
 msgid "almanac.untitled"
 msgstr ""
 
-#. The table of everything you have made
+#. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
 msgid "board.almanac"
 msgstr ""
@@ -78,7 +78,7 @@ msgstr ""
 msgid "board.collection"
 msgstr ""
 
-#. A plan of branches and steps
+#. Prompts set out in branches and steps, to run (C131)
 #. js-lingui-explicit-id
 msgid "board.docket"
 msgstr ""
@@ -1009,7 +1009,7 @@ msgstr ""
 msgid "kind.suggestion"
 msgstr ""
 
-#. A word or phrase lit wherever it appears
+#. A word or phrase lit wherever it appears in a chat (C131)
 #. js-lingui-explicit-id
 msgid "kind.term"
 msgstr ""
@@ -1320,10 +1320,6 @@ msgid "verb.again"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "verb.alm"
-msgstr ""
-
-#. js-lingui-explicit-id
 msgid "verb.api"
 msgstr ""
 
@@ -1353,10 +1349,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.close"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "verb.collab"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1413,6 +1405,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.forget"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.framework"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1504,7 +1500,15 @@ msgid "verb.place"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "verb.plan"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.pop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.records"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1585,10 +1589,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.sweep"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "verb.sym"
 msgstr ""
 
 #. js-lingui-explicit-id

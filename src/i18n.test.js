@@ -29,7 +29,7 @@ describe('the compiled catalogues', () => {
 
   it('speak English from the copy table, with plurals', () => {
     i18n.activate('en')
-    expect(i18n._(COPY.boards.almanac)).toBe('Almanac')
+    expect(i18n._(COPY.boards.almanac)).toBe('Records') // C131
     expect(i18n._(COPY.counts.chats, { count: 1 })).toBe('1 chat')
     expect(i18n._(COPY.counts.chats, { count: 21 })).toBe('21 chats')
   })
@@ -37,7 +37,7 @@ describe('the compiled catalogues', () => {
   it('make every word different in the test languages, so a word left out stands out', () => {
     i18n.activate('en-XA')
     const almanac = i18n._(COPY.boards.almanac)
-    expect(almanac).not.toBe('Almanac')
+    expect(almanac).not.toBe('Records')
     expect(almanac).toMatch(/[À-ž]/)
     expect(i18n._(COPY.counts.chats, { count: 2 })).toMatch(/^2/)
     i18n.activate('ar-XB')

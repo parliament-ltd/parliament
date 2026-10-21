@@ -25,10 +25,10 @@ export const COPY = {
 
   // The boards. Names to be looked at again before the welcome page (A6).
   boards: {
-    almanac: /*i18n*/ { id: 'board.almanac', message: 'Almanac', comment: 'The table of everything you have made' },
+    almanac: /*i18n*/ { id: 'board.almanac', message: 'Records', comment: 'The table of everything you have made, by number (C131)' },
     collection: /*i18n*/ { id: 'board.collection', message: 'Collection', comment: 'Cards of highlights, terms, quotes and notes' },
     library: /*i18n*/ { id: 'board.library', message: 'Library', comment: 'Rooms, layouts, blocks, themes and resources' },
-    docket: /*i18n*/ { id: 'board.docket', message: 'Docket', comment: 'A plan of branches and steps' },
+    docket: /*i18n*/ { id: 'board.docket', message: 'Plan', comment: 'Prompts set out in branches and steps, to run (C131)' },
     reflection: /*i18n*/ { id: 'board.reflection', message: 'Reflection', comment: 'Reads a chat and its markings' },
     settings: /*i18n*/ { id: 'board.settings', message: 'Settings' },
     lab: /*i18n*/ { id: 'board.lab', message: 'Lab', comment: 'Where rooms are built' },
@@ -43,9 +43,9 @@ export const COPY = {
     chat: /*i18n*/ { id: 'kind.chat', message: 'Chat' },
     note: /*i18n*/ { id: 'kind.note', message: 'Note' },
     highlight: /*i18n*/ { id: 'kind.highlight', message: 'Highlight', comment: 'One passage marked where it sits' },
-    term: /*i18n*/ { id: 'kind.term', message: 'Term', comment: 'A word or phrase lit wherever it appears' },
+    term: /*i18n*/ { id: 'kind.term', message: 'Keyword', comment: 'A word or phrase lit wherever it appears in a chat (C131)' },
     quote: /*i18n*/ { id: 'kind.quote', message: 'Quote', comment: 'A passage kept beside the chat, never sent' },
-    docket: /*i18n*/ { id: 'kind.docket', message: 'Docket' },
+    docket: /*i18n*/ { id: 'kind.docket', message: 'Plan' },
     edit: /*i18n*/ { id: 'kind.edit', message: 'Edit' },
     ask: /*i18n*/ { id: 'kind.ask', message: 'Ask' },
     suggestion: /*i18n*/ { id: 'kind.suggestion', message: 'Suggestion' },
@@ -54,7 +54,7 @@ export const COPY = {
   // Counts, with plurals that work in every language.
   counts: {
     chats: /*i18n*/ { id: 'count.chats', message: '{count, plural, one {# chat} other {# chats}}' },
-    dockets: /*i18n*/ { id: 'count.dockets', message: '{count, plural, one {# docket} other {# dockets}}' },
+    dockets: /*i18n*/ { id: 'count.dockets', message: '{count, plural, one {# plan} other {# plans}}' },
     steps: /*i18n*/ { id: 'count.steps', message: '{count, plural, one {# step} other {# steps}}' },
     branches: /*i18n*/ { id: 'count.branches', message: '{count, plural, one {# branch} other {# branches}}' },
   },
@@ -178,7 +178,7 @@ export const COPY = {
     nextStep: /*i18n*/ { id: 'enter.nextStep', message: 'next: {command}', comment: 'The next welcome step\'s command, which stays English' },
     toCommand: /*i18n*/ { id: 'enter.toCommand', message: '{leader} for the command line', comment: 'In prompt mode on the welcome page (C119)' },
     searchLater: /*i18n*/ { id: 'enter.searchLater', message: 'Search is not built yet' },
-    // Bringing boards into the space: alm:, sym:, tour: (C95, C125).
+    // Bringing boards into the space: records:, room:, tour: (C95, C125, C131).
     // One space (C125): an arrangement's boards brought beside what is here.
     bringBoards: /*i18n*/ { id: 'enter.bringBoards', message: 'Enter brings {boards} beside what is here', comment: '{boards} lists board names' },
     bringHere: /*i18n*/ { id: 'enter.bringHere', message: 'Everything it brings is here already' },
@@ -226,7 +226,7 @@ export const COPY = {
     nameFailed: /*i18n*/ { id: 'enter.nameFailed', message: 'The name was not kept. Try again' },
     aloneNow: /*i18n*/ { id: 'enter.aloneNow', message: '{verb} runs on a line of its own for now' },
     targetNewRoom: /*i18n*/ { id: 'enter.targetNewRoom', message: '→ a new room' },
-    promptNoRoom: /*i18n*/ { id: 'enter.promptNoRoom', message: 'Prompts go to a room. sym: opens one' },
+    promptNoRoom: /*i18n*/ { id: 'enter.promptNoRoom', message: 'Prompts go to a room. room: opens one' },
     promptBusy: /*i18n*/ { id: 'enter.promptBusy', message: 'A reply is still arriving here. Send once it is done' },
     promptChecking: /*i18n*/ { id: 'enter.promptChecking', message: 'Looking for a key on this device' },
     promptSource: /*i18n*/ { id: 'enter.promptSource', message: 'Enter asks {source}, which needs no key and costs nothing' },
@@ -402,7 +402,7 @@ export const COPY = {
     aboutAlmanac: /*i18n*/ { id: 'library.aboutAlmanac', message: 'Everything you have made, in one table, by number.' },
     aboutCollection: /*i18n*/ { id: 'library.aboutCollection', message: 'Things set side by side to compare, ask about, or apply.' },
     aboutLibrary: /*i18n*/ { id: 'library.aboutLibrary', message: 'Rooms, layouts, blocks, themes and resources. The board you are reading now.' },
-    aboutDocket: /*i18n*/ { id: 'library.aboutDocket', message: 'A plan of prompts, run in branches.' },
+    aboutDocket: /*i18n*/ { id: 'library.aboutDocket', message: 'Prompts set out in branches and steps, to run together.' },
     aboutReflection: /*i18n*/ { id: 'library.aboutReflection', message: 'Reads a chat and its markings back to you.' },
     aboutSettings: /*i18n*/ { id: 'library.aboutSettings', message: 'Keys, languages, your data, and how things behave.' },
     shown: /*i18n*/ { id: 'library.shown', message: '{shown} of {all}', comment: 'How many items show while one shelf is chosen' },

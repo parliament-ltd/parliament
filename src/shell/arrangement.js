@@ -11,7 +11,7 @@
 // refusal with the reason, and changes nothing. Running a verb is keeping
 // the plan.
 
-import { boardEntry } from './boards'
+import { boardEntry, boardFor } from './boards'
 
 /**
  * @typedef {{ board: string, display: number|null, side: 'left'|'right'|null, from: number }} Popped
@@ -430,30 +430,31 @@ const word = (arg) => (arg?.kind === 'word' ? arg.value : null)
 export function plan(a, step, layout = null) {
   const args = step.match?.values ?? []
   const [first, second] = args.map(word)
+  // The boards the words name: records is the Almanac's board, plan the
+  // docket's (C131).
+  const one = boardFor(first)
+  const two = boardFor(second)
   switch (step.verb) {
-    case 'open': {
+    case 'open':
       if (first === 'lab') return null // the Lab is an arrangement: lab: and open:lab come with the Lab
-      // open:alm, by the Almanac's short title, is open:almanac (C124).
-      const board = first === 'alm' ? 'almanac' : first
-      return board && boardEntry(board) && args.length === 1 ? planOpen(a, board) : null
-    }
+      return one && args.length === 1 ? planOpen(a, one) : null
     case 'close':
       if (!args.length) return planClose(a)
-      return first && boardEntry(first) ? planClose(a, first) : null
+      return one ? planClose(a, one) : null
     case 'move':
-      return first && boardEntry(first) ? planMove(a, first, second) : null
+      return one ? planMove(a, one, second) : null
     case 'swap':
-      return planSwap(a, first, second)
+      return planSwap(a, one ?? first, two ?? second)
     case 'pop':
       if (first === 'command') return planPopBar(a, true)
       if (first === 'back') {
         if (second === 'command') return planPopBar(a, false)
-        return planPopBack(a, second ?? null)
+        return planPopBack(a, two ?? second ?? null)
       }
       if (first === 'left' || first === 'right') return planPopSide(a, first)
-      if (first && boardEntry(first)) {
-        if (args.length === 1) return planPop(a, first)
-        if (second === 'display' && args[2]?.kind === 'number') return planPop(a, first, args[2].value)
+      if (one) {
+        if (args.length === 1) return planPop(a, one)
+        if (second === 'display' && args[2]?.kind === 'number') return planPop(a, one, args[2].value)
         return null // pop:settings keys: sections come with Settings
       }
       return null
@@ -466,7 +467,7 @@ export function plan(a, step, layout = null) {
       const percent = args.find((arg) => arg?.kind === 'percent')?.value
       if (percent == null) return null
       if (args.length === 1) return planWidth(a, a.addressed, percent, false, layout)
-      return first && boardEntry(first) ? planWidth(a, first, percent, true, layout) : null
+      return one ? planWidth(a, one, percent, true, layout) : null
     }
     default:
       return null

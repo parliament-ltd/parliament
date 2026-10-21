@@ -595,7 +595,7 @@ export default function Shell() {
     const a = current.current
     // Sym: on the strip brings a room as sym: does, when there is none here.
     if (board === 'room' && roomOnScreen(a) === undefined) {
-      const { next } = preview('>sym:', { mode: 'command', arrangement: a, screens })
+      const { next } = preview('>room:', { mode: 'command', arrangement: a, screens })
       if (next) run(next, null)
       return
     }

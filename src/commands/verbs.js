@@ -41,12 +41,15 @@
 // Boards a command can name (boards.js has them all). Rooms are boards too,
 // opened by number or name. The Lab is an arrangement, not a board (AB §4),
 // so only open: takes its name.
-export const BOARD_NAMES = Object.freeze(['almanac', 'collection', 'library', 'docket', 'reflection', 'settings', 'canvas', 'blocks'])
+// The words for boards (C131): Records is the Almanac's board, Plan the
+// docket's (boards.js maps them to the boards' ids).
+export const BOARD_NAMES = Object.freeze(['records', 'collection', 'library', 'plan', 'reflection', 'settings', 'canvas', 'blocks'])
 const TABLES = ['almanac', 'collection']
 const EDITING = ['room', 'docket', 'reflection', 'collection']
 const BUILDING = ['lab', 'room']
-const KINDS = ['chat', 'note', 'highlight', 'term', 'quote', 'docket', 'edit', 'ask', 'suggestion']
-const COLLABS = ['challenge', 'reasoning', 'pushback', 'alts', 'uncertain']
+// The kinds as people name them (C131: a term is a keyword, a docket a plan).
+const KINDS = ['chat', 'note', 'highlight', 'keyword', 'quote', 'plan', 'edit', 'ask', 'suggestion']
+const FRAMEWORKS = ['challenge', 'reasoning', 'pushback', 'alts', 'uncertain']
 
 export const GROUPS = Object.freeze([
   { key: 'go', title: /*i18n*/ { id: 'group.go', message: 'Go to' } },
@@ -77,14 +80,16 @@ const v = (entry) => Object.freeze({ forms: null, rest: false, minus: false, on:
 
 export const VERBS = Object.freeze([
   // Go to
-  v({ verb: 'alm', group: 'go', example: 'alm:', takes: [[]], stage: 5, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.alm', message: 'Bring the Almanac and the Collection beside what is on screen' } }),
+  v({ verb: 'records', group: 'go', example: 'records:', takes: [[]], stage: 5, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.records', message: 'Bring Records and the Collection beside what is on screen' } }),
+  v({ verb: 'plan', group: 'go', example: 'plan:', takes: [[]], stage: 5, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.plan', message: 'Bring the Plan board beside what is on screen' } }),
   v({ verb: 'library', group: 'go', example: 'library:', forms: ['library:', 'library:themes'], takes: [[], ['word']], stage: 5, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.library', message: 'Bring the Library beside what is on screen, or one shelf of it' } }),
   v({ verb: 'lab', group: 'go', example: 'lab:', takes: [[]], stage: 13, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.lab', message: 'Go to the Lab, where rooms are built' } }),
-  v({ verb: 'sym', group: 'go', example: 'sym:', takes: [[], ['text']], stage: 4, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.sym', message: 'Bring the last room beside what is on screen, or a room by name' } }),
+  v({ verb: 'room', group: 'go', example: 'room:', takes: [[], ['text']], stage: 4, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.room', message: 'Bring the last room beside what is on screen, or a room by name' } }),
   v({ verb: 'jump', group: 'go', example: 'jump:242', takes: [['address']], stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.jump', message: 'Scroll to a number on this board' } }),
   v({ verb: 'tour', group: 'go', example: 'tour:', forms: ['tour:', 'tour:off', 'tour:advanced'], takes: [[], [['off', 'advanced']]], stage: 5, click: 'apply',
@@ -94,18 +99,17 @@ export const VERBS = Object.freeze([
 
   // Start
   v({ verb: 'new', group: 'start', example: 'new:chat',
-    forms: ['new:chat', 'new:docket', 'new:room', 'new:room guided', 'new:collection', 'new:branch 207', 'new:step', 'new:run', 'new:block'],
-    takes: [[['chat', 'docket', 'room', 'collection', 'branch', 'step', 'run', 'block']], [['room'], ['guided']], [['branch'], 'address']],
+    forms: ['new:chat', 'new:plan', 'new:room', 'new:room guided', 'new:collection', 'new:branch 207', 'new:step', 'new:run', 'new:block'],
+    takes: [[['chat', 'plan', 'room', 'collection', 'branch', 'step', 'run', 'block']], [['room'], ['guided']], [['branch'], 'address']],
     stage: 6, undoable: true,
-    gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, docket, room, collection, branch, step, run or block' } }),
+    gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, plan, room, collection, branch, step, run or block' } }),
   v({ verb: 'open', group: 'start', example: 'open:207',
-    forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Writing Studio"', 'open:library', 'open:alm', 'open:settings keys'],
-    // alm is the Almanac's short title: open:alm brings the Almanac alone,
-    // where alm: brings the Almanac arrangement, the Almanac and the
-    // Collection (C124, C125).
-    takes: [[[...BOARD_NAMES, 'alm', 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text']], stage: 3, click: 'apply',
+    forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Writing Studio"', 'open:library', 'open:records', 'open:settings keys'],
+    // open:records brings the Records board alone, where records: brings
+    // Records and the Collection together (C124, C125, C131).
+    takes: [[[...BOARD_NAMES, 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text']], stage: 3, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.open', message: 'Open a board, or anything by its number or name' } }),
-  v({ verb: 'close', group: 'start', example: 'close:almanac', takes: [[], [BOARD_NAMES], ['address']], stage: 3, undoable: true, click: 'apply',
+  v({ verb: 'close', group: 'start', example: 'close:records', takes: [[], [BOARD_NAMES], ['address']], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.close', message: 'Take a board off the screen. Nothing is lost' } }),
 
   // Run
@@ -121,20 +125,20 @@ export const VERBS = Object.freeze([
   // Filters: they narrow the table, and several can share a line.
   v({ verb: 'type', group: 'filters', example: 'type:chat', forms: ['type:chat', 'type:note,chat', 'type:edit'], takes: [[{ list: KINDS }]], minus: true, on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.type', message: 'Show some kinds of thing' } }),
-  v({ verb: 'room', group: 'filters', example: 'room:"Code Lab"', takes: [['text']], minus: true, on: TABLES, stage: 6, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.room', message: 'Show what was made in a room' } }),
   v({ verb: 'tag', group: 'filters', example: 'tag:research', forms: ['tag:research', '-tag:research'], takes: [['text']], minus: true, on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.tag', message: 'Show what carries a tag. A minus leaves it out' } }),
   v({ verb: 'model', group: 'filters', example: 'model:opus', takes: [['text']], minus: true, on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.model', message: 'Show what a model answered' } }),
   v({ verb: 'from', group: 'filters', example: 'from:201b', forms: ['from:203', 'from:201b', 'from:run 3'], takes: [['address'], [['run'], 'number']], minus: true, on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.from', message: 'Show what came from a chat, a branch or a run' } }),
-  v({ verb: 'in', group: 'filters', example: 'in:"Q2 evidence"', takes: [['text']], minus: true, on: TABLES, stage: 6, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.in', message: 'Show what is in a collection' } }),
+  // in: takes a collection or a room by name: the room filter folded into
+  // it when room: became the room's own verb (C131).
+  v({ verb: 'in', group: 'filters', example: 'in:"Q2 evidence"', forms: ['in:"Q2 evidence"', 'in:"Code Lab"'], takes: [['text']], minus: true, on: TABLES, stage: 6, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.in', message: 'Show what is in a collection, or was made in a room' } }),
   v({ verb: 'has', group: 'filters', example: 'has:highlight', takes: [['text']], minus: true, on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.has', message: 'Show what holds notes or highlights' } }),
   v({ verb: 'cost', group: 'filters', example: 'cost:>0.50', takes: [['text']], on: TABLES, stage: 6, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.cost', message: 'Show dockets by what they cost' } }),
+    gloss: /*i18n*/ { id: 'verb.cost', message: 'Show plans by what they cost' } }),
   v({ verb: 'since', group: 'filters', example: 'since:7d', forms: ['since:7d', 'since:3w', 'since:september', 'since:09/01/26'], takes: [['text']], on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.since', message: 'Show what was made since a date' } }),
   v({ verb: 'until', group: 'filters', example: 'until:09/10/26', takes: [['text']], on: TABLES, stage: 6, click: 'apply',
@@ -160,7 +164,7 @@ export const VERBS = Object.freeze([
     takes: [['text'], ['address', 'text']], stage: 4, undoable: true,
     gloss: /*i18n*/ { id: 'verb.name', message: 'Name what the bar is pointed at: a room, a collection or a chat' } }),
   v({ verb: 'duplicate', group: 'collection', example: 'duplicate:"Writing Studio"', takes: [[], ['text']], stage: 6, undoable: true,
-    gloss: /*i18n*/ { id: 'verb.duplicate', message: 'Copy a room, collection or docket under a new name' } }),
+    gloss: /*i18n*/ { id: 'verb.duplicate', message: 'Copy a room, collection or plan under a new name' } }),
   v({ verb: 'heading', group: 'collection', example: 'heading:"Sources"', takes: [['text']], on: ['collection'], stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.heading', message: 'Add a heading to a collection in your own order' } }),
   v({ verb: 'summarize', group: 'collection', example: 'summarize:207, 216', takes: [[], ['addresses']], on: TABLES, stage: 6, spends: true, undoable: true,
@@ -187,8 +191,8 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.archive', message: 'Put something away without deleting it' } }),
   v({ verb: 'copy', group: 'items', example: 'copy:207', takes: [['address']], stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.copy', message: 'Copy something as Markdown' } }),
-  v({ verb: 'export', group: 'items', example: 'export:md 201', forms: ['export:md 201', 'export:jsonl 207, 216', 'export:md alm'],
-    takes: [[], [['md', 'jsonl'], { opt: 'addresses' }], [['md', 'jsonl'], ['alm']]], on: TABLES, stage: 6,
+  v({ verb: 'export', group: 'items', example: 'export:md 201', forms: ['export:md 201', 'export:jsonl 207, 216', 'export:md records'],
+    takes: [[], [['md', 'jsonl'], { opt: 'addresses' }], [['md', 'jsonl'], ['records']]], on: TABLES, stage: 6,
     gloss: /*i18n*/ { id: 'verb.export', message: 'Download as Markdown or JSONL to read elsewhere. It cannot be restored' } }),
   v({ verb: 'note', group: 'items', example: 'note:203 "Try it without the ending"', forms: ['note:203 "Try it without the ending"', 'note:"Check the dates"'],
     rest: true, takes: [['text']], stage: 6, undoable: true,
@@ -215,15 +219,15 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.hold', message: 'Keep a branch or an edit from going until you say' } }),
   v({ verb: 'markup', group: 'editing', example: 'markup:off', forms: ['markup:on', 'markup:off'], takes: [[['on', 'off'], { opt: ['col'] }]], on: EDITING, stage: 11, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.markup', message: 'Show replies marked up, or clean' } }),
-  v({ verb: 'collab', group: 'editing', example: 'collab:pushback', forms: ['collab:pushback', 'collab:pushback, uncertain', 'collab:off'],
-    takes: [[['off']], [{ list: [...COLLABS, 'off'] }], [{ list: 'text' }]], on: ['room'], stage: 7, undoable: true, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.collab', message: 'Choose the standing instructions that go with every prompt' } }),
+  v({ verb: 'framework', group: 'editing', example: 'framework:pushback', forms: ['framework:pushback', 'framework:pushback, uncertain', 'framework:off'],
+    takes: [[['off']], [{ list: [...FRAMEWORKS, 'off'] }], [{ list: 'text' }]], on: ['room'], stage: 7, undoable: true, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.framework', message: 'Choose the frameworks that shape every reply: standing instructions sent with each prompt' } }),
   v({ verb: 'helper', group: 'editing', example: 'helper:haiku', takes: [['word']], on: ['room'], stage: 7, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.helper', message: 'Choose the model that reads text from sources' } }),
   v({ verb: 'ripple', group: 'editing', example: 'ripple:on', forms: ['ripple:on', 'ripple:off'], takes: [[['on', 'off']]], on: ['room'], stage: 12, spends: true, undoable: true,
     gloss: /*i18n*/ { id: 'verb.ripple', message: 'Carry edits across branches as suggestions. Each check is a model call' } }),
   v({ verb: 'sweep', group: 'editing', example: 'sweep:201a editor', takes: [[], ['address', { opt: 'word' }]], on: ['room', 'reflection'], stage: 12, spends: true,
-    gloss: /*i18n*/ { id: 'verb.sweep', message: "Check a reply or branch against a collab's rule, one suggestion per sentence" } }),
+    gloss: /*i18n*/ { id: 'verb.sweep', message: "Check a reply or branch against a framework's rule, one suggestion per sentence" } }),
   v({ verb: 'reflect', group: 'editing', example: 'reflect:', takes: [[]], on: ['reflection'], stage: 12, spends: true,
     gloss: /*i18n*/ { id: 'verb.reflect', message: 'Ask for a synthesis of a chat and its markings, with questions' } }),
 
@@ -232,15 +236,15 @@ export const VERBS = Object.freeze([
     takes: [[['top', 'bottom', 'left', 'center', 'right']]], stage: 3, undoable: true, click: 'apply',
     retiredArgs: { hide: 'focus: · calm:', show: 'focus:off · calm:off', foot: 'bar:bottom', pop: 'pop:command' },
     gloss: /*i18n*/ { id: 'verb.bar', message: 'Move the bar on the page' } }),
-  v({ verb: 'pop', group: 'layout', example: 'pop:almanac',
-    forms: ['pop:almanac', 'pop:201b', 'pop:settings keys', 'pop:library display 2', 'pop:command', 'pop:back', 'pop:back library', 'pop:left'],
+  v({ verb: 'pop', group: 'layout', example: 'pop:records',
+    forms: ['pop:records', 'pop:201b', 'pop:settings keys', 'pop:library display 2', 'pop:command', 'pop:back', 'pop:back library', 'pop:left'],
     takes: [[BOARD_NAMES, ['display'], 'number'], [BOARD_NAMES, { opt: 'word' }], ['address'], [['command']], [['back'], { opt: [...BOARD_NAMES, 'command'] }], [['left', 'right']]],
     stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.pop', message: 'Put a board or the bar in its own window, place it, or bring it back' } }),
   v({ verb: 'move', group: 'layout', example: 'move:library left', forms: ['move:library left', 'move:201c after 201a'],
     takes: [[BOARD_NAMES, ['left', 'right', 'middle']], ['address', ['after', 'before'], 'address']], stage: 3, undoable: true, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.move', message: 'Move a board to the left, right or middle, or a branch in its docket' } }),
-  v({ verb: 'swap', group: 'layout', example: 'swap:almanac collection', takes: [[BOARD_NAMES, BOARD_NAMES]], stage: 3, undoable: true, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.move', message: 'Move a board to the left, right or middle, or a branch in its plan' } }),
+  v({ verb: 'swap', group: 'layout', example: 'swap:records collection', takes: [[BOARD_NAMES, BOARD_NAMES]], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.swap', message: 'Swap two boards' } }),
   v({ verb: 'reset', group: 'layout', example: 'reset:', takes: [[]], stage: 3, undoable: true,
     gloss: /*i18n*/ { id: 'verb.reset', message: 'Put the boards back as shipped and close the windows' } }),
@@ -302,7 +306,9 @@ export const RENAMED = Object.freeze({
   strike: { to: 'strikethrough' }, // bar decisions
   view: { to: 'markup' }, // bar decisions
   scheme: { to: 'theme' }, // arrangements spec §4
-  plan: { to: 'layout' }, // Lab v2 notes
+  alm: { to: 'records' }, // C131
+  sym: { to: 'room' }, // C131
+  collab: { to: 'framework' }, // C131
   section: { to: 'heading' }, // C80, A18
   co: { to: 'add' }, // P9
   docs: { to: 'resources' }, // P8

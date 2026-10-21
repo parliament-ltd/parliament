@@ -3,9 +3,9 @@ import { STEPS, freshWelcome, cleanWelcome, tick, nextStep, isDone, showSteps, w
 import { shipped } from './arrangement'
 
 describe('the welcome steps (stage 5)', () => {
-  it('are the eight as ruled: bar:bottom second, pop:almanac sixth, api: last', () => {
-    expect(STEPS.map((s) => s.shows)).toEqual(['>', 'bar:bottom', 'p>', 'alm:', 'name:"…"', 'pop:almanac', 'library:', 'api:'])
-    expect(STEPS.find((s) => s.id === 'almanac').writes).toBe('>alm:')
+  it('are the eight as ruled: bar:bottom second, pop:records sixth, api: last (C131 names)', () => {
+    expect(STEPS.map((s) => s.shows)).toEqual(['>', 'bar:bottom', 'p>', 'records:', 'name:"…"', 'pop:records', 'library:', 'api:'])
+    expect(STEPS.find((s) => s.id === 'almanac').writes).toBe('>records:')
   })
 
   it('cross off in any order, and the last one finishes the page', () => {

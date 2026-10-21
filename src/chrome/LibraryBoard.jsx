@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { roomLabel } from './say'
+import { wordFor } from '../shell/boards'
 
 // The Library, thin (refactor-plan.md, stage 5, piece 4; Lab v7's Library;
 // arrangements spec §5): everything the catalogue holds, read-only, from the
@@ -56,7 +57,7 @@ function Item({ item, onWrite }) {
         {item.shelf === 'board' && !item.soon && (
           <>
             {' · '}
-            <button type="button" className="ch-lact" title={i18n._(COPY.library.openHelp, { board: item.board })} onClick={() => onWrite(`>open:${item.board}`)}>
+            <button type="button" className="ch-lact" title={i18n._(COPY.library.openHelp, { board: wordFor(item.board) })} onClick={() => onWrite(`>open:${wordFor(item.board)}`)}>
               {i18n._(COPY.library.open)}
             </button>
           </>
