@@ -29,12 +29,11 @@ const ACTS = Object.freeze(['name', 'tour'])
 const OPENS = Object.freeze(['library'])
 export const BUILT = new Set([...ARRANGEMENT_VERBS, ...SWITCHES, ...ACTS, ...OPENS])
 
-// On the welcome page alm: opens the Almanac on the right of the card (W §5)
-// rather than going to the Almanac's own screen (C124, to be ruled), and
-// library: is the same as open:library everywhere (C95).
+// library: is the same as open:library everywhere (C95). The Almanac is an
+// arrangement: alm: always goes to its screen, and only open:alm puts it
+// beside what is on screen (C124, ruled 21 October).
 function opens(a, step) {
   if (step.verb === 'library' && !step.match?.values?.length) return planOpen(a, 'library')
-  if (step.verb === 'alm' && a.id === 'welcome') return planOpen(a, 'almanac')
   return null
 }
 

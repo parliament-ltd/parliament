@@ -224,6 +224,9 @@ export default function Shell() {
     const next = { ...back, bar: { ...back.bar, popped: from.bar.popped } }
     if (waiting.current && roomArrangementId(waiting.current.chatId) !== go.id) { waiting.current.drop(); waiting.current = null }
     if (go.show) updateWelcome((w) => showSteps(w, true))
+    // Going to the Almanac's screen shows what you have made, as open:alm
+    // does beside the welcome card (welcome step 4).
+    if (go.id === 'almanac') updateWelcome((w) => tick(w, 'almanac'))
     return run(next, body)
   }, [run, updateWelcome])
 

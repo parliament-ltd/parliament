@@ -99,8 +99,10 @@ export const VERBS = Object.freeze([
     stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, docket, room, collection, branch, step, run or block' } }),
   v({ verb: 'open', group: 'start', example: 'open:207',
-    forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Writing Studio"', 'open:library', 'open:settings keys'],
-    takes: [[[...BOARD_NAMES, 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text']], stage: 3, click: 'apply',
+    forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Writing Studio"', 'open:library', 'open:alm', 'open:settings keys'],
+    // alm is the Almanac's short title: open:alm puts the Almanac beside
+    // what is on screen, where alm: goes to its own screen (C124).
+    takes: [[[...BOARD_NAMES, 'alm', 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text']], stage: 3, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.open', message: 'Open a board, or anything by its number or name' } }),
   v({ verb: 'close', group: 'start', example: 'close:almanac', takes: [[], [BOARD_NAMES], ['address']], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.close', message: 'Take a board off the screen. Nothing is lost' } }),

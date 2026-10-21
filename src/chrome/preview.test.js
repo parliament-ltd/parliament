@@ -245,14 +245,18 @@ describe('the welcome page (stage 5)', () => {
     expect(welcome().bar.at).toBe('card')
   })
 
-  it('opens the Almanac and the Library on the right of the card (W §5; C95)', () => {
-    const p = at('>alm:')
-    expect(p.go).toBeFalsy()
+  it('opens the Almanac beside the card only with open:alm; alm: goes to its screen (C124)', () => {
+    const p = at('>open:alm')
+    expect(p.text).toBe('Enter opens Almanac on the right')
     expect(p.next.columns).toEqual([['welcome'], ['almanac']])
+    expect(at('>open:almanac').next.columns).toEqual([['welcome'], ['almanac']])
+    expect(at('>alm:').go.id).toBe('almanac')
+    expect(at('>alm:', shipped('room:c1')).go.id).toBe('almanac')
+  })
+
+  it('opens the Library on the right of the card, as library: does everywhere (W §5; C95)', () => {
     expect(at('>library:').next.columns).toEqual([['welcome'], ['library']])
     expect(at('>library:', shipped('almanac')).next.columns).toEqual([['almanac'], ['collection'], ['library']])
-    // Elsewhere alm: still goes to the Almanac's screen, until C124 is ruled.
-    expect(at('>alm:', shipped('room:c1')).go.id).toBe('almanac')
   })
 
   it('tour: shows the page and its steps; tour:off puts them away (A20)', () => {

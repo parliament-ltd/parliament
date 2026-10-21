@@ -228,9 +228,12 @@ export function plan(a, step) {
   const args = step.match?.values ?? []
   const [first, second] = args.map(word)
   switch (step.verb) {
-    case 'open':
+    case 'open': {
       if (first === 'lab') return null // the Lab is an arrangement: lab: and open:lab come with the Lab
-      return first && boardEntry(first) && args.length === 1 ? planOpen(a, first) : null
+      // open:alm, by the Almanac's short title, is open:almanac (C124).
+      const board = first === 'alm' ? 'almanac' : first
+      return board && boardEntry(board) && args.length === 1 ? planOpen(a, board) : null
+    }
     case 'close':
       if (!args.length) return planClose(a)
       return first && boardEntry(first) ? planClose(a, first) : null

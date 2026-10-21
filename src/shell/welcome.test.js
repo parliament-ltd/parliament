@@ -4,8 +4,8 @@ import { shipped } from './arrangement'
 
 describe('the welcome steps (stage 5)', () => {
   it('are the eight as ruled: bar:bottom second, pop:almanac sixth, api: last', () => {
-    expect(STEPS.map((s) => s.shows)).toEqual(['>', 'bar:bottom', 'p>', 'alm:', 'name:"…"', 'pop:almanac', 'library:', 'api:'])
-    expect(STEPS.find((s) => s.id === 'almanac').writes).toBe('>alm:')
+    expect(STEPS.map((s) => s.shows)).toEqual(['>', 'bar:bottom', 'p>', 'open:alm', 'name:"…"', 'pop:almanac', 'library:', 'api:'])
+    expect(STEPS.find((s) => s.id === 'almanac').writes).toBe('>open:alm')
   })
 
   it('cross off in any order, and the last one finishes the page', () => {
