@@ -953,7 +953,7 @@ Found while building stage 4, pieces 4 and 5 (a room in the shell; sending by co
 **C116. The ink pot.** **Given by Stefan on 21 October** (`parliament-inkpot.svg` and `.js`, with C114): the quill's ink pot in the prompt field is a quiet sign of a reply arriving. Built (`src/chrome/inkpot.js`, the drawing in `Fills.jsx`, the motion in `chrome.css`), with the file's own timings:
 - While a reply arrives in the room on screen, the ink drains and the quill re-dips, over and over. Wikipedia's answers count too.
 - When the reply has arrived, the quill dips once and the pot refills.
-- When it is stopped, the ink freezes and spills down the side, and stays spilt until the next prompt. **Built so that a reply that broke off (an error or a stall) spills too,** since it did not arrive whole; a reply cut at the length limit refills, since it arrived and its card says it was cut. One line in `chatStore.js` changes either.
+- When it is stopped, the ink freezes and spills down the side, and stays spilt until the next prompt. **Built so that a reply that broke off (an error or a stall) spills too,** since it did not arrive whole; a reply cut at the length limit refills, since it arrived and its card says it was cut. One line in `chatStore.js` changes either. **Ruled 21 October: keep as built.**
 - At rest the pot now shows full of ink, as the drawing has it; before, the quill's pot was an outline.
 - Moving to another room puts the pot back to rest. With reduced motion the quill and the surface keep still and only the slow drain shows.
 - In the shell nothing stops a reply by hand yet (`stop:` comes later), so for now the spill shows when a reply breaks off or stalls.
