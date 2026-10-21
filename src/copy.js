@@ -168,6 +168,7 @@ export const COPY = {
     field: /*i18n*/ { id: 'shell.field', message: 'Search, command or prompt', comment: 'The name of the field, read by screen readers' },
     strip: /*i18n*/ { id: 'shell.strip', message: 'Boards', comment: 'The name of the board strip, read by screen readers' },
     boardLater: /*i18n*/ { id: 'shell.boardLater', message: 'This board is drawn in a later stage.' },
+    sampleReply: /*i18n*/ { id: 'shell.sampleReply', message: 'A stand-in reply until rooms arrive. Click into this line to edit it, and the bar folds into a circle.', comment: 'Editable text on a placeholder board; nothing typed here is kept' },
     addressed: /*i18n*/ { id: 'shell.addressed', message: 'the bar points here', comment: 'Marginalia on the board the navy rule is on' },
     referenceClose: /*i18n*/ { id: 'shell.referenceClose', message: 'Escape closes this' },
     referenceName: /*i18n*/ { id: 'shell.referenceName', message: 'Every command', comment: 'The name of the ? reference, read by screen readers' },

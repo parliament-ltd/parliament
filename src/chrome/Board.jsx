@@ -2,8 +2,10 @@ import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 
 // A board on the page. Until each board's own blocks are drawn (stages 4 to
-// 13) it shows its name and says so. The navy rule marks the one the bar
-// points at; a click points the bar at it.
+// 13) it shows its name and says so, with one line of stand-in reply to
+// edit, so folding the bar into a circle (C108) can be tried before rooms
+// arrive. What is typed there is kept nowhere. The navy rule marks the board
+// the bar points at; a click points the bar at it.
 
 export default function Board({ board, addressed, onAddress }) {
   const { i18n } = useLingui()
@@ -19,6 +21,9 @@ export default function Board({ board, addressed, onAddress }) {
       </header>
       <div className="ch-cbody">
         <p className="ch-marg">{i18n._(COPY.shell.boardLater)}</p>
+        <p className="ch-reply" contentEditable suppressContentEditableWarning spellCheck={false} dir="auto">
+          {i18n._(COPY.shell.sampleReply)}
+        </p>
       </div>
     </article>
   )

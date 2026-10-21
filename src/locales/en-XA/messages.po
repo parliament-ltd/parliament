@@ -496,6 +496,11 @@ msgstr ""
 msgid "shell.referenceName"
 msgstr ""
 
+#. Editable text on a placeholder board; nothing typed here is kept
+#. js-lingui-explicit-id
+msgid "shell.sampleReply"
+msgstr ""
+
 #. The name of the board strip, read by screen readers
 #. js-lingui-explicit-id
 msgid "shell.strip"

@@ -496,6 +496,11 @@ msgstr "Escape closes this"
 msgid "shell.referenceName"
 msgstr "Every command"
 
+#. Editable text on a placeholder board; nothing typed here is kept
+#. js-lingui-explicit-id
+msgid "shell.sampleReply"
+msgstr "A stand-in reply until rooms arrive. Click into this line to edit it, and the bar folds into a circle."
+
 #. The name of the board strip, read by screen readers
 #. js-lingui-explicit-id
 msgid "shell.strip"

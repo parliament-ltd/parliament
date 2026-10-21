@@ -120,3 +120,7 @@
 .ch-glyph.moon path { fill: #fff; }
 .ch-enter { transition: opacity calc(160ms * var(--ch-k)); }
 .ch-enter.hide { opacity: 0; }
+
+/* A reply's text, as the bar reference sets it. */
+.ch-reply { font: 400 var(--ch-t-lead)/1.68 var(--ch-serif); color: var(--ch-ink); margin: 10px 0 0; outline: none; caret-color: var(--ch-ink); border-radius: 4px; }
+.ch-reply:focus { box-shadow: 0 0 0 1px rgba(var(--ch-navy), .16); }
