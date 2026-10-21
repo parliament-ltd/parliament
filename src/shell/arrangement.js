@@ -18,7 +18,8 @@ import { boardEntry } from './boards'
  * @typedef {{ id: string, columns: string[][], popped: Popped[], addressed: string,
  *   bar: { at: 'top'|'bottom'|'card', side: 'left'|'center'|'right', popped: boolean },
  *   resting: 'search'|'prompt'|null, context: Record<string, string|number>,
- *   widths?: Record<string, number> }} Arrangement  widths: the shares the person has set, by board (C126)
+ *   widths?: Record<string, number>, focus?: object }} Arrangement  widths: the shares the person has set, by
+ *   board (C126); focus: while focus: holds, the space as it was before, for focus:off (stage 5)
  * @typedef {{ message: string, values?: object }} Says
  * @typedef {{ next: Arrangement|null, says: Says }} Plan  next is null when Enter would do nothing
  */
@@ -94,8 +95,8 @@ const columnOf = (a, board) => a.columns.findIndex((c) => c.includes(board))
 const without = (columns, board) => columns.map((c) => c.filter((b) => b !== board)).filter((c) => c.length)
 const copy = (a) => ({ ...a, columns: a.columns.map((c) => [...c]), popped: a.popped.map((p) => ({ ...p })), bar: { ...a.bar }, context: { ...a.context }, widths: { ...a.widths } })
 const sortedWidths = (a) => Object.entries(a.widths ?? {}).sort(([x], [y]) => (x < y ? -1 : 1))
-const sameLayout = (x, y) => JSON.stringify([x.columns, x.popped, x.addressed, x.bar.at, x.bar.side, x.bar.popped, x.resting, sortedWidths(x)])
-  === JSON.stringify([y.columns, y.popped, y.addressed, y.bar.at, y.bar.side, y.bar.popped, y.resting, sortedWidths(y)])
+const sameLayout = (x, y) => JSON.stringify([x.columns, x.popped, x.addressed, x.bar.at, x.bar.side, x.bar.popped, x.resting, sortedWidths(x), Boolean(x.focus)])
+  === JSON.stringify([y.columns, y.popped, y.addressed, y.bar.at, y.bar.side, y.bar.popped, y.resting, sortedWidths(y), Boolean(y.focus)])
 const refuse = (message, values) => ({ next: null, says: { message, values } })
 const go = (next, message, values) => ({ next, says: { message, values } })
 
@@ -355,6 +356,46 @@ export function planWidth(a, board, percent, named = false, layout = null) {
 export function planWidthEven(a) {
   if (!Object.keys(a.widths ?? {}).length) return refuse('widthEvenAlready')
   return go({ ...copy(a), widths: {} }, 'widthEven')
+}
+
+// ── focus: (welcome spec §7; stage 5, piece 6) ──────────
+// The first form: the chat alone, and back. focus: closes every board but
+// the room, windows included, docks the bar under it, and keeps the space
+// as it was, so focus:off brings it back; nothing is lost. Your own focus
+// sets (focus:sym col, focus:save) come with stage 14.
+
+/**
+ * focus:. The room alone: the chat in the space's room, or the last chat
+ * (`chat`) when the space has no room with a chat in it.
+ */
+export function planFocus(a, chat = null) {
+  if (a.focus) return refuse('focusAlready')
+  const here = roomOnScreen(a)
+  const target = typeof here === 'string' ? here : chat
+  if (!target) return refuse('focusNothing')
+  const closing = [...onPage(a), ...a.popped.map((p) => p.board)].filter((b) => b !== 'room')
+  const next = copy(a)
+  next.focus = { columns: a.columns.map((c) => [...c]), popped: a.popped.map((p) => ({ ...p })), addressed: a.addressed, bar: { ...a.bar } }
+  next.columns = [['room']]
+  next.popped = []
+  next.addressed = 'room'
+  next.bar = { ...a.bar, at: 'bottom', popped: false }
+  next.context.room = target
+  return go(next, closing.length ? 'focusClosing' : 'focusAlone', { boards: closing })
+}
+
+/** focus:off. The space as it was before focus:, windows and all. */
+export function planFocusOff(a) {
+  if (!a.focus) return refuse('focusOffNot')
+  const before = a.focus
+  const next = copy(a)
+  delete next.focus
+  next.columns = before.columns.map((c) => [...c])
+  next.popped = before.popped.map((p) => ({ ...p }))
+  next.addressed = before.addressed
+  next.bar = { ...before.bar }
+  const back = [...before.columns.flat(), ...before.popped.map((p) => p.board)].filter((b) => b !== 'room')
+  return go(next, back.length ? 'focusOff' : 'focusOffSame', { boards: back })
 }
 
 /** reset:. This arrangement as shipped, its windows closed; what boards show stays. */

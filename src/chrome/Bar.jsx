@@ -151,7 +151,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     if (refused) { setNotice(refused); return }
     setReference(null)
     walk.current = { lines, index: -1, draft: '' }
-    dispatch({ type: 'ran' })
+    dispatch({ type: 'ran', to: view.after ?? null })
   }
 
   function onKeyDown(e) {

@@ -16,6 +16,7 @@ import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
 import { hasKey, models, metadataModel, destination, keyStatus, noKeyNeeded, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
 import { ignite } from './ignition'
+import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
 import { useChat } from '../stores/ChatContext'
 import { useConversations } from '../stores/ConversationContext'
 import { useSettings } from '../stores/SettingsContext'
@@ -348,6 +349,25 @@ export default function Shell() {
   }, [started, roomRev, libraryHere])
   const inspectedRow = inspected != null ? numbered.get(inspected) ?? null : null
 
+  // ── Keeping what is made (C88, C94) ───────────────────
+  // Whether the browser has agreed to keep Parliament's data. The welcome
+  // page says so plainly when it has not and there is something to lose.
+  const [storageKept, setStorageKept] = useState(null)
+  const [askingKeep, setAskingKeep] = useState(false)
+  useEffect(() => {
+    if (!started) return undefined
+    let live = true
+    isStorageKept().then((kept) => { if (live) setStorageKept(kept) })
+    return () => { live = false }
+  }, [started])
+  const askKeep = useCallback(async () => {
+    setAskingKeep(true)
+    const answer = await askToKeepStorage({ getSetting, setSetting, again: true }).catch(() => 'not-kept')
+    setAskingKeep(false)
+    setStorageKept(answer === 'kept')
+  }, [])
+  const keepNotice = storageKept === false && (almanacRows?.length ?? 0) > 0 ? { asking: askingKeep, onAsk: askKeep } : null
+
   // ── The key panel (stage 5, piece 5) ──────────────────
   // api: opens it under the bar. What the shell knows of keys is whether
   // each provider has one and its last four characters, read through the
@@ -608,7 +628,7 @@ export default function Shell() {
       return <LibraryBoard key="library" items={catalogue} addressed={arrangement.addressed === 'library'} onAddress={focusBoard} onWrite={writeField} />
     }
     if (board === 'welcome') {
-      return <WelcomeBoard key="welcome" welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} />
+      return <WelcomeBoard key="welcome" welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} />
     }
     return <Board key={board} board={board} addressed={arrangement.addressed === board} onAddress={focusBoard} />
   }
@@ -632,7 +652,7 @@ export default function Shell() {
   if (!started) return <div className="ch-shell" />
 
   return (
-    <div className={`ch-shell bar-${bar.at}${onWelcome ? ' on-welcome' : ''}${stretching !== false ? ' stretching' : ''}`}>
+    <div className={`ch-shell bar-${bar.at}${onWelcome ? ' on-welcome' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}`}>
       {!onWelcome && <Strip arrangement={stripArrangement} onPick={pickBoard} />}
       {/* One bar in one place, moved by its class or its holder, so moving
           it never loses the field's focus or what is typed. */}

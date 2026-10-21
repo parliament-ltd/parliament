@@ -44,6 +44,9 @@
    from the space) and keeps a least width; when they do not fit, the space
    scrolls sideways rather than squeezing them. */
 .ch-stage.space { overflow-x: auto; }
+/* focus: the chat alone, centred at up to 820px (W §7). */
+.ch-shell.focused .ch-stage.space { justify-content: center; }
+.ch-shell.focused .ch-stage.space > .ch-col { flex: 0 1 820px; max-width: 820px; }
 .ch-stage.space > .ch-col { flex-grow: var(--share, 1); min-width: 180px; }
 .ch-stage.space > .ch-col:has(> .ch-welcome) { min-width: 260px; }
 .ch-stage.space > .ch-col:has(> .ch-card.room) { min-width: 300px; }
@@ -334,14 +337,33 @@
 .ch-card.ch-welcome { flex: 1; min-height: 0; }
 /* Narrow, by its own width, the card is one column: steps, field, then
    the letter (welcome spec §5; C126). */
-.ch-welcome.narrow .ch-wgrid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "list" "bar" "letter"; max-width: 520px; }
+.ch-welcome.narrow .ch-wgrid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "list" "bar" "letter" "keep"; max-width: 520px; }
 .ch-welcome.narrow .ch-letter { margin-top: 26px; }
+.ch-welcome.narrow .ch-wnow { margin-top: 26px; }
+/* One line under "Welcome" on narrow or touch-only screens (W §12.4). */
+.ch-wsmall { display: none; margin: 4px 2px 0; }
+@media (max-width: 760px), (hover: none) and (pointer: coarse) { .ch-wsmall { display: block; } }
+/* The ending (W §7): the letter gives way to one line, the size of the
+   heading, with focus: to click. */
+.ch-wnow { grid-area: letter; margin: 22px 2px 0; font: 400 16px/1.3 var(--ch-serif); color: var(--ch-ink); animation: ch-rise calc(600ms * var(--ch-k)) ease both; }
+.ch-shell .ch-wnow .c { font: inherit; color: var(--ch-ink); text-decoration: underline; text-decoration-color: var(--ch-soft); text-underline-offset: 4px; }
+.ch-shell .ch-wnow .c:hover { text-decoration-color: var(--ch-ink); }
+@keyframes ch-rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+/* When the browser has not agreed to keep what is made (C94): said plainly,
+   under everything else in the card. */
+.ch-wkeep { grid-area: keep; max-width: 640px; margin: 26px 2px 0; padding: 8px 12px; border-inline-start: 2px solid var(--ch-ink); font: 400 var(--ch-t-small)/1.55 var(--ch-sans); color: var(--ch-ink-2); }
+.ch-wkeep p { margin: 0; }
+.ch-wkeep .ch-marg { margin-top: 6px; }
+.ch-shell .ch-wkeep button, .ch-wkeep a { text-decoration: underline; text-underline-offset: 2px; color: var(--ch-marg); }
+.ch-shell .ch-wkeep button:hover, .ch-wkeep a:hover { color: var(--ch-ink); }
+.ch-shell .ch-wkeep button:disabled { cursor: wait; }
 .ch-welcome.narrow .ch-wscroll { padding: 28px 18px; padding-inline-start: 50px; }
 .ch-welcome.narrow .ch-wlogo { inset-inline-end: calc(100% + 10px); top: calc((1.3em - 19px) / 2); width: 22px; height: 19px; }
 .ch-wscroll { flex: 1; overflow: auto; display: flex; flex-direction: column; padding: 32px 28px; padding-inline-start: 66px; }
 .ch-wgrid { width: 100%; max-width: 960px; margin: auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 64px;
-  grid-template-areas: "top ." "list letter" "bar letter"; grid-template-rows: auto auto 1fr; align-items: start; }
-.ch-wh { grid-area: top; position: relative; display: flex; flex-direction: column; margin: 0; padding: 0 2px; font: 400 16px/1.3 var(--ch-serif); color: var(--ch-ink); }
+  grid-template-areas: "top ." "list letter" "bar letter" "keep keep"; grid-template-rows: auto auto 1fr auto; align-items: start; }
+.ch-wtop { grid-area: top; }
+.ch-wh { position: relative; display: flex; flex-direction: column; margin: 0; padding: 0 2px; font: 400 16px/1.3 var(--ch-serif); color: var(--ch-ink); }
 /* Parliament's mark hangs before "Welcome", in the card's margin, so the
    word stays in line with the steps below it. */
 .ch-wlogo { position: absolute; inset-inline-end: calc(100% + 12px); top: calc((1.3em - 22px) / 2); width: 26px; height: 22px; color: var(--ch-ink); }
@@ -362,7 +384,7 @@
 .ch-letter p + p { margin-top: 9px; }
 .ch-letter .sig { margin-top: 12px; }
 @media (max-width: 760px) {
-  .ch-wgrid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "list" "bar" "letter"; max-width: 520px; }
+  .ch-wgrid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "list" "bar" "letter" "keep"; max-width: 520px; }
 }
 
 /* The field resting in the welcome card: no box, only a faint rule under it

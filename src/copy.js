@@ -203,6 +203,14 @@ export const COPY = {
     openDocketHere: /*i18n*/ { id: 'enter.openDocketHere', message: 'Enter shows its first branch, {num}, in the room here' },
     openNotYet: /*i18n*/ { id: 'enter.openNotYet', message: 'Opening this comes later. inspect:{num} shows it now' },
     inspectOne: /*i18n*/ { id: 'enter.inspectOne', message: 'Enter shows {num} in detail, here' },
+    // focus: and focus:off, the first form (W §7; stage 5, piece 6). {boards} is a list of board names.
+    focusClosing: /*i18n*/ { id: 'enter.focusClosing', message: 'Enter clears the screen to the chat, closing {boards}. Nothing is lost, and focus:off brings them back' },
+    focusAlone: /*i18n*/ { id: 'enter.focusAlone', message: 'Enter leaves the chat alone here, with the bar under it' },
+    focusAlready: /*i18n*/ { id: 'enter.focusAlready', message: 'The chat is in focus already. focus:off brings back what was here' },
+    focusNothing: /*i18n*/ { id: 'enter.focusNothing', message: 'Nothing to focus on yet. p> starts a chat' },
+    focusOff: /*i18n*/ { id: 'enter.focusOff', message: 'Enter brings back {boards}' },
+    focusOffSame: /*i18n*/ { id: 'enter.focusOffSame', message: 'Enter brings the screen back as it was' },
+    focusOffNot: /*i18n*/ { id: 'enter.focusOffNot', message: 'Nothing is in focus' },
     // api: (stage 5, piece 5; settings spec §6). {provider} is a name from the list of providers; {ending} a key's last four characters.
     apiList: /*i18n*/ { id: 'enter.apiList', message: 'Enter shows your keys, here under the field' },
     apiAdd: /*i18n*/ { id: 'enter.apiAdd', message: 'Enter opens the {provider} key field. Never type a key here' },
@@ -314,6 +322,15 @@ export const COPY = {
       message: 'Most AI apps are built for passive consumption. You ask something, you receive a response. Here you steer from a command line: branch chats, highlight, add and combine notes across chats, plan a run of prompts, and more. Let\'s take back control.',
     },
     signature: /*i18n*/ { id: 'welcome.signature', message: 'So Lov', comment: 'The letter is signed with this name after a dash' },
+    // The ending (W §7): the letter gives way to one line. {command} is focus:, drawn as a link that writes it in the bar.
+    now: /*i18n*/ { id: 'welcome.now', message: 'Now, let’s {command}', comment: '{command} is focus:, which stays English' },
+    // On narrow or touch-only screens only (W §12.4).
+    small: /*i18n*/ { id: 'welcome.small', message: 'built for a computer for now; the phone comes later' },
+    // Where the browser has not agreed to keep Parliament's data (C94). Names no browser.
+    keepNot: /*i18n*/ { id: 'welcome.keepNot', message: 'This browser has not agreed to keep what you make here, so it may clear it to save space, or each time it closes. To keep it, let this site keep its data in the browser’s settings, and back up now and then.' },
+    keepAsk: /*i18n*/ { id: 'welcome.keepAsk', message: 'ask the browser again' },
+    keepBackup: /*i18n*/ { id: 'welcome.keepBackup', message: 'back up in {board}', comment: '{board} is Settings, from COPY.boards' },
+    keepAsking: /*i18n*/ { id: 'welcome.keepAsking', message: 'asking' },
     footMade: /*i18n*/ { id: 'welcome.foot.made', message: 'Created with Claude Code' },
     footLicence: /*i18n*/ { id: 'welcome.foot.licence', message: 'MIT licensed. Source published at launch', comment: 'Until the repository is public (C71, C123)' },
     footBuilders: /*i18n*/ { id: 'welcome.foot.builders', message: 'Looking for other builders' },

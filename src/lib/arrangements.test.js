@@ -43,6 +43,15 @@ describe('reading an arrangement back', () => {
     })
   })
 
+  it('keeps the space as it was before focus:, checked like the space itself', () => {
+    const a = cleanArrangement({
+      id: 'space', columns: [['room']], popped: [], addressed: 'room', bar: { at: 'bottom' }, context: { room: 'c1' },
+      focus: { columns: [['welcome'], ['almanac', 'nonsense']], popped: [], addressed: 'almanac', bar: { at: 'card' } },
+    })
+    expect(a.focus).toEqual({ columns: [['welcome'], ['almanac']], popped: [], addressed: 'almanac', bar: { at: 'card', side: 'center', popped: false } })
+    expect(cleanArrangement({ ...a, focus: { columns: [['nonsense']] } }).focus).toBeUndefined()
+  })
+
   it('reads a space kept before widths with the usual shares (C126)', () => {
     const a = cleanArrangement({ id: 'space', columns: [['almanac'], ['collection']], popped: [], addressed: 'almanac', bar: { at: 'top' }, context: {} })
     expect(a.widths).toEqual({})

@@ -88,7 +88,7 @@ function input(state, value) {
 /**
  * @param {FieldState} state
  * @param {{ type: string, value?: string, resting?: 'search'|'prompt' }} action
- *   input (value), escape, recall (value), ran, sent, surface (resting), focus, blur, open,
+ *   input (value), escape, recall (value), ran (to: 'prompt' after focus:), sent, surface (resting), focus, blur, open,
  *   editReply, doneEditing, hover, leave
  * @returns {FieldState}
  */
@@ -107,8 +107,9 @@ export function fieldReducer(state, action) {
       return { ...state, mode: 'command', text: { ...state.text, command: String(action.value ?? '') } }
 
     case 'ran':
-      // After a command runs, the field resets to `>` and keeps focus.
-      return { ...state, mode: 'command', text: { ...state.text, command: '' }, focused: true }
+      // After a command runs, the field resets to `>` and keeps focus, or
+      // turns to prompt mode where the command asks for it (focus:, W §7).
+      return { ...state, mode: action.to === 'prompt' ? 'prompt' : 'command', text: { ...state.text, command: '' }, focused: true }
 
     case 'sent':
       // A prompt went, or a search was done with: its text is cleared.

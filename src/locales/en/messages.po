@@ -295,6 +295,34 @@ msgid "enter.filters"
 msgstr "{count, plural, one {Enter applies # filter} other {Enter applies # filters}}"
 
 #. js-lingui-explicit-id
+msgid "enter.focusAlone"
+msgstr "Enter leaves the chat alone here, with the bar under it"
+
+#. js-lingui-explicit-id
+msgid "enter.focusAlready"
+msgstr "The chat is in focus already. focus:off brings back what was here"
+
+#. js-lingui-explicit-id
+msgid "enter.focusClosing"
+msgstr "Enter clears the screen to the chat, closing {boards}. Nothing is lost, and focus:off brings them back"
+
+#. js-lingui-explicit-id
+msgid "enter.focusNothing"
+msgstr "Nothing to focus on yet. p> starts a chat"
+
+#. js-lingui-explicit-id
+msgid "enter.focusOff"
+msgstr "Enter brings back {boards}"
+
+#. js-lingui-explicit-id
+msgid "enter.focusOffNot"
+msgstr "Nothing is in focus"
+
+#. js-lingui-explicit-id
+msgid "enter.focusOffSame"
+msgstr "Enter brings the screen back as it was"
+
+#. js-lingui-explicit-id
 msgid "enter.goNewRoom"
 msgstr "Enter opens an empty room beside what is here. Its first prompt starts it"
 
@@ -1630,6 +1658,23 @@ msgid "welcome.headingTo"
 msgstr "to Parliament"
 
 #. js-lingui-explicit-id
+msgid "welcome.keepAsk"
+msgstr "ask the browser again"
+
+#. js-lingui-explicit-id
+msgid "welcome.keepAsking"
+msgstr "asking"
+
+#. {board} is Settings, from COPY.boards
+#. js-lingui-explicit-id
+msgid "welcome.keepBackup"
+msgstr "back up in {board}"
+
+#. js-lingui-explicit-id
+msgid "welcome.keepNot"
+msgstr "This browser has not agreed to keep what you make here, so it may clear it to save space, or each time it closes. To keep it, let this site keep its data in the browser’s settings, and back up now and then."
+
+#. js-lingui-explicit-id
 msgid "welcome.letter.1"
 msgstr "Parliament is a place to work with AI on your own terms. It is early, and still being built."
 
@@ -1645,10 +1690,19 @@ msgstr "With the goal of rethinking how we interact with AI, it is yours to shap
 msgid "welcome.letter.4"
 msgstr "Most AI apps are built for passive consumption. You ask something, you receive a response. Here you steer from a command line: branch chats, highlight, add and combine notes across chats, plan a run of prompts, and more. Let's take back control."
 
+#. {command} is focus:, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.now"
+msgstr "Now, let’s {command}"
+
 #. The letter is signed with this name after a dash
 #. js-lingui-explicit-id
 msgid "welcome.signature"
 msgstr "So Lov"
+
+#. js-lingui-explicit-id
+msgid "welcome.small"
+msgstr "built for a computer for now; the phone comes later"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.almanac"

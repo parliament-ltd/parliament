@@ -295,6 +295,34 @@ msgid "enter.filters"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.focusAlone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusClosing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusOffNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusOffSame"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.goNewRoom"
 msgstr ""
 
@@ -1630,6 +1658,23 @@ msgid "welcome.headingTo"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "welcome.keepAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.keepAsking"
+msgstr ""
+
+#. {board} is Settings, from COPY.boards
+#. js-lingui-explicit-id
+msgid "welcome.keepBackup"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.keepNot"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "welcome.letter.1"
 msgstr ""
 
@@ -1645,9 +1690,18 @@ msgstr ""
 msgid "welcome.letter.4"
 msgstr ""
 
+#. {command} is focus:, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.now"
+msgstr ""
+
 #. The letter is signed with this name after a dash
 #. js-lingui-explicit-id
 msgid "welcome.signature"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.small"
 msgstr ""
 
 #. js-lingui-explicit-id

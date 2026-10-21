@@ -109,6 +109,12 @@ describe('after a command runs', () => {
     expect(fieldValue(s)).toBe('>')
     expect(s).toMatchObject({ mode: 'command', focused: true })
   })
+
+  it('turns to prompt mode where the command asks for it (focus:, W §7)', () => {
+    const s = fieldReducer(typing(almanac(), '>focus:'), { type: 'ran', to: 'prompt' })
+    expect(s).toMatchObject({ mode: 'prompt', focused: true })
+    expect(s.text.command).toBe('')
+  })
 })
 
 describe('the screen changes', () => {

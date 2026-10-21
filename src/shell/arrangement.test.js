@@ -5,6 +5,7 @@ import {
   SHIPPED, shipped, shippedFor, restingMode, address, plan, ARRANGEMENT_VERBS,
   SPACE, arrangementBoards, roomOnScreen, planBring, planRoom,
   usualShare, columnShares, withShares, withUsualShares, planWidth, planWidthEven, WIDTH_RANGE,
+  planFocus, planFocusOff,
   planOpen, planClose, planMove, planSwap, planPop, planPopBack, planPopSide, planPopBar, planBar, planReset,
 } from './arrangement'
 import { enterLine } from '../commands/registry'
@@ -248,6 +249,42 @@ describe('pop: and pop:back', () => {
     expect(a.bar).toEqual({ at: 'top', side: 'center', popped: true })
     expect(planPopBar(a, true)).toMatchObject({ next: null, says: { message: 'barPoppedAlready' } })
     expect(keep(planPopBar(a, false)).bar.popped).toBe(false)
+  })
+})
+
+describe('focus: (stage 5, piece 6; W §7)', () => {
+  const space = () => keep(planRoom(keep(planBring({ ...shipped('welcome'), id: SPACE }, 'almanac')), 'c1'))
+
+  it('clears the space to the chat alone, keeping what was there', () => {
+    const a = space()
+    const p = planFocus(a)
+    expect(p.says).toEqual({ message: 'focusClosing', values: { boards: ['welcome', 'almanac', 'collection'] } })
+    expect(p.next).toMatchObject({ columns: [['room']], popped: [], addressed: 'room', bar: { at: 'bottom', popped: false } })
+    expect(p.next.context.room).toBe('c1')
+    expect(p.next.focus.columns).toEqual(a.columns)
+    expect(planFocus(p.next).says.message).toBe('focusAlready')
+  })
+
+  it('closes windows too, and brings them back with focus:off', () => {
+    const a = keep(planPop(space(), 'almanac'))
+    const f = keep(planFocus(a))
+    expect(f.popped).toEqual([])
+    const back = planFocusOff(f)
+    expect(back.says).toEqual({ message: 'focusOff', values: { boards: ['welcome', 'collection', 'almanac'] } })
+    expect(back.next.columns).toEqual(a.columns)
+    expect(back.next.popped).toEqual(a.popped)
+    expect(back.next.focus).toBeUndefined()
+  })
+
+  it('takes the last chat when the space has no room, and refuses with nothing to focus on', () => {
+    const a = { ...shipped('welcome'), id: SPACE }
+    expect(planFocus(a, 'c9').next.context.room).toBe('c9')
+    expect(planFocus(a).says.message).toBe('focusNothing')
+    expect(planFocusOff(a).says.message).toBe('focusOffNot')
+  })
+
+  it('reset: ends focus', () => {
+    expect(keep(planReset(keep(planFocus(space())))).focus).toBeUndefined()
   })
 })
 

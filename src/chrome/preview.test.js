@@ -246,6 +246,24 @@ describe('open: and inspect: by number (stage 5, piece 3)', () => {
   })
 })
 
+describe('focus: (stage 5, piece 6)', () => {
+  const room = keep(planRoom({ ...shipped('welcome'), id: SPACE }, 'c1'))
+  const at = (value, a = room, screens = {}) => {
+    const p = preview(value, { mode: 'command', arrangement: a, screens })
+    return { ...p, text: say(i18n, p.says.message, p.says.values) }
+  }
+
+  it('names what closes, and turns the field to prompt mode after', () => {
+    expect(BUILT.has('focus')).toBe(true)
+    const p = at('>focus:')
+    expect(p.text).toBe('Enter clears the screen to the chat, closing Welcome page. Nothing is lost, and focus:off brings them back')
+    expect(p.after).toBe('prompt')
+    expect(at('>focus:off', p.next)).toMatchObject({ text: 'Enter brings back Welcome page', after: null })
+    expect(at('>focus:', shipped(SPACE)).text).toBe('Nothing to focus on yet. p> starts a chat')
+    expect(at('>focus:save').text).toBe('focus: is not built yet')
+  })
+})
+
 describe('api: and the key panel (stage 5, piece 5)', () => {
   const none = [{ id: 'anthropic', name: 'Anthropic', has: false, ending: null }]
   const saved = [{ id: 'anthropic', name: 'Anthropic', has: true, ending: '4f2a' }]

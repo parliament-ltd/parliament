@@ -1045,6 +1045,33 @@ Found while splitting stage 5 into pieces. The documents: `welcome-spec-decision
 - **A key in a prompt** (new): the bar already refused a command line shaped like a key (stage 3); now a prompt that holds one is refused before Enter too, since it would be sent to the model, or to a source as a search. A prompt is held to a narrower test than a command, so people can still ask about a commit hash or the word "sk-": refused are `sk-` with a key's worth of characters after it, and a long run mixing capitals, small letters and digits.
 - **Suggestion:** keep as built.
 
+**C130. The ending, `focus:`, the small-screen line and the storage notice** (stage 5, piece 6). Built as W §7, §12 and C94 say, with these choices:
+- **The ending:** when the eighth step crosses off, the steps go, "to Parliament" fades in under "Welcome", and the letter gives way to "Now, let’s focus:", where `focus:` writes itself in the bar. The sentence is translated whole and split where the command goes, so a language can put it anywhere.
+- **`focus:`, first form:** every board but the room closes, windows included; the bar docks under the chat, which centres at up to 820px (so the room shows its conversation, C126); the field turns to prompt mode. The Enter line names what closes. With no room in the space it takes the last chat; with no chat it says "p> starts a chat". **`focus:off`** brings the space back as it was, windows and the bar's place included. `reset:` also ends it. `focus:save` and `focus:sym col` come with stage 14.
+- **Stored:** the space's record gains an optional `focus`, the columns, windows, bar and addressed board from before, so `focus:off` works after a reload. It is checked like the space when read back; a space without it reads as before. No version change.
+- **The small-screen line** sits under "Welcome" on windows narrower than 760px or on touch-only screens: "built for a computer for now; the phone comes later" (W §12.4).
+- **The storage notice (C94):** on the welcome page, when the browser has not agreed to keep the data and there is something to lose (a chat). It names no browser, says how to keep the data, and offers "ask the browser again" (asked from the click) and "back up in Settings", today's Settings until `backup:` (stage 9). Settings already shows the answer (C88).
+- **The pseudo-language check:** in the accented test language, every word of the chrome on the welcome page, the Almanac, the Library, the key panel and the Enter lines comes from the copy table. What stays plain is right: provider names, from the list; the catalogue's names and descriptions, until C131; and "3 hours ago" in a test language the browser's date formatting does not know (real languages are written in their own words). In the right-to-left test language the page mirrors: "Welcome" lines up with the steps on the right, the mark beside it, the boards run right to left, and nothing scrolls sideways.
+- **Suggestion:** keep as built.
+
+**C131. The plain-language pass on names (A6).** A6 kept "Almanac" for now, with a pass over every name a newcomer meets before the welcome page ships. Nothing is renamed yet; these are the names on the page's path, with suggestions. A rename changes the copy table and, where a command uses the word, the command too, in one change.
+
+| Name today | What it is | Suggestion |
+|---|---|---|
+| Almanac | Everything you have made, in one table, by number | Keep. It is distinctive, and the board says what it is in one line |
+| Docket | A plan of prompts, run in branches | **Plan**, with `plan:` beside `docket:` for a while |
+| Collection | Things set side by side to compare or ask about | Keep |
+| Reflection | Reads a chat and its markings back to you | Keep |
+| Library, Lab, Room | | Keep |
+| Sym (the room on the board strip) | Short for Symposium, the old name for the conversation | **Room** on the strip. `sym:` stays as a short command |
+| The other strip titles: Col, Ref, Alm, Lib, Dkt | Short titles, also the words `focus:` takes | Full names on the strip, which has the room; the short words still work in commands |
+| Term | A word or phrase lit wherever it appears | **Keyword** |
+| Quote | A passage kept beside the chat, never sent | Keep |
+| collab | How the AI works with you: challenge, reasoning, pushback, alternatives, uncertainty | **Approach** as the word people read; the command waits for your choice |
+| Catalogue names | Themes ("Parliament Default", "Cool Bright"), layouts ("Three-panel", "Canvas-centric"), blocks ("Context health", "Ripple analysis") | Into the copy table in sentence case ("Cool bright", "Three panels"), with the renames above, so they translate |
+
+**R15, put to Stefan.** Today's app sends a new visitor through a build wizard before the homepage (the "first-run gate"), and shows one-time tooltip tours on a few screens, each remembered with a `tourCompleted_*` setting. The welcome page and `tour:` replace both. **Suggestion:** retire them when `/` shows the welcome page (the shell's flag switched on for everyone): the files go to `src/deprecated/`, and backups keep reading the old settings, so every backup stays readable.
+
 ## Part 10. The security and privacy notes of 21 October (added 21 October 2026)
 
 Stefan's notes from a planning conversation, `parliament-security-privacy.md` (not in the repo), checked against the specs, the rulings and the code. Most of it agrees or is already built; these are the points that do not.

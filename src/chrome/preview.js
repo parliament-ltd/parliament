@@ -16,7 +16,7 @@
 // the shell knows: no request is made to find out (C83).
 
 import { enterLine } from '../commands/registry'
-import { plan, planOpen, planBring, planRoom, roomOnScreen, ARRANGEMENT_VERBS } from '../shell/arrangement'
+import { plan, planOpen, planBring, planRoom, planFocus, planFocusOff, roomOnScreen, ARRANGEMENT_VERBS } from '../shell/arrangement'
 import { cleanRoomName, ROOM_NAME_MAX } from '../lib/roomNames'
 import { CHARS_PER_TOKEN, inputCost, describeCost } from '../shell/estimate'
 import { holdsKey } from '../commands/parse'
@@ -30,7 +30,17 @@ const BRINGS = Object.freeze(['alm', 'sym', 'library'])
 // inspect:, which shows one thing in detail under the bar, and api:, which
 // opens the key panel there (stage 5).
 const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api'])
-export const BUILT = new Set([...ARRANGEMENT_VERBS, ...BRINGS, ...ACTS])
+// focus: and focus:off, the first form (W §7; stage 5).
+const FOCUS = 'focus'
+export const BUILT = new Set([...ARRANGEMENT_VERBS, ...BRINGS, ...ACTS, FOCUS])
+
+/** focus: clears the space to the chat alone; focus:off brings it back. Your own sets come with stage 14. */
+function planFocusStep(a, step, screens = {}) {
+  const [arg, ...more] = step.match?.values ?? []
+  if (!arg) return planFocus(a, screens.lastRoom?.id ?? null)
+  if (arg.kind === 'word' && arg.value === 'off' && !more.length) return planFocusOff(a)
+  return null
+}
 
 // alm: brings the Almanac arrangement, the Almanac and the Collection, or
 // whatever its owner has made it (C125). sym: brings the last room, or an
@@ -189,14 +199,18 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   for (const step of answer.steps) {
     const p = BRINGS.includes(step.verb) ? bring(a, step, screens)
       : step.verb === 'open' && numberOf(step) != null ? openNumber(a, step, screens)
-        : plan(a, step, screens.measure?.() ?? null)
+        : step.verb === FOCUS ? planFocusStep(a, step, screens)
+          : plan(a, step, screens.measure?.() ?? null)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
     if (!p.next) return { answer, says: p.says, next: null }
     a = p.next
     last = p.says
   }
   const says = answer.steps.length > 1 ? { message: answer.message, values: answer.values } : last
-  return { answer, says, next: a }
+  // After focus: the field turns to prompt mode, under the chat (W §7).
+  const last1 = answer.steps[answer.steps.length - 1]
+  const after = last1?.verb === FOCUS && !(last1.match?.values ?? []).length ? 'prompt' : null
+  return { answer, says, next: a, after }
 }
 
 // Below a cent, the line says "under" a cent rather than a fraction of one.
