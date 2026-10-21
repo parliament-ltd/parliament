@@ -52,4 +52,15 @@ export function say(i18n, message, values = {}) {
   return i18n._(descriptor, words)
 }
 
+/**
+ * What a room is called, in words: its own name, a built-in room's name in
+ * the reader's language, or "unnamed room" (C90; roomNames.js).
+ * @param {{ own?: string, template?: string }|null} name
+ */
+export function roomLabel(i18n, name) {
+  if (name?.own) return name.own
+  if (name?.template && COPY.templates[name.template]) return i18n._(COPY.templates[name.template])
+  return i18n._(COPY.room.unnamed)
+}
+
 export { boardName }

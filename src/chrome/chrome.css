@@ -179,6 +179,7 @@
    around it is chrome. */
 .ch-card.room { flex: none; }
 .ch-chead .ch-aside { margin-inline-start: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ch-chead .ch-sep { flex-shrink: 0; opacity: .45; }
 .ch-shell { --room-chrome: 180px; }
 .ch-shell.bar-bottom { --room-chrome: 250px; }
 .ch-room { flex: none; height: max(480px, calc(100dvh - var(--room-chrome))); overflow: hidden; display: flex; flex-direction: column;

@@ -138,6 +138,10 @@ msgid "enter.aloneErase"
 msgstr "{verb} runs on a line of its own, so it is plain what goes for good"
 
 #. js-lingui-explicit-id
+msgid "enter.aloneNow"
+msgstr "{verb} runs on a line of its own for now"
+
+#. js-lingui-explicit-id
 msgid "enter.aloneSpends"
 msgstr "{verb} runs on a line of its own, so its Enter line can name who receives it and what it costs"
 
@@ -252,6 +256,31 @@ msgstr "{board} is in its own window. pop:back brings it back first"
 #. js-lingui-explicit-id
 msgid "enter.moveThere"
 msgstr "{place, select, left {{board} is on the left already} right {{board} is on the right already} other {{board} is in the middle already}}"
+
+#. js-lingui-explicit-id
+msgid "enter.nameEmpty"
+msgstr "A name needs some words, like name:\"Barn owls\""
+
+#. js-lingui-explicit-id
+msgid "enter.nameFailed"
+msgstr "The name was not kept. Try again"
+
+#. js-lingui-explicit-id
+msgid "enter.nameLong"
+msgstr "A room's name is at most {max} characters"
+
+#. js-lingui-explicit-id
+msgid "enter.nameNoChat"
+msgstr "This room has no chat yet. Its first prompt starts it, and then name: names it"
+
+#. {name} is the person's own words
+#. js-lingui-explicit-id
+msgid "enter.nameRoom"
+msgstr "Enter names this room: {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.nameSame"
+msgstr "This room has that name already"
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomHere"
@@ -506,6 +535,11 @@ msgstr "→ {board}"
 msgid "enter.targetChat"
 msgstr "→ {chat}"
 
+#. {chat} is the chat's number, {room} the room's name (bar reference: → 201a in unnamed room)
+#. js-lingui-explicit-id
+msgid "enter.targetChatIn"
+msgstr "→ {chat} in {room}"
+
 #. js-lingui-explicit-id
 msgid "enter.targetNewRoom"
 msgstr "→ a new room"
@@ -678,6 +712,11 @@ msgstr "This chat could not be found. It may have been removed."
 msgid "room.unavailable"
 msgstr "This room could not be drawn. Its chat is kept as it was."
 
+#. A room with no name of its own (bar reference)
+#. js-lingui-explicit-id
+msgid "room.unnamed"
+msgstr "unnamed room"
+
 #. Marginalia on the board the navy rule is on
 #. js-lingui-explicit-id
 msgid "shell.addressed"
@@ -740,6 +779,34 @@ msgstr "This browser keeps Parliament's data until you delete it."
 #. js-lingui-explicit-id
 msgid "storage.notKept"
 msgstr "This browser has not agreed to keep Parliament's data. Some browsers delete a site's data when they close or run short of space. To keep it, allow this site to keep its cookies and site data in your browser's privacy settings, and keep a backup."
+
+#. js-lingui-explicit-id
+msgid "template.dataWorkspace"
+msgstr "Data workspace"
+
+#. js-lingui-explicit-id
+msgid "template.draftingDesk"
+msgstr "Drafting desk"
+
+#. js-lingui-explicit-id
+msgid "template.kingfisher"
+msgstr "Kingfisher"
+
+#. js-lingui-explicit-id
+msgid "template.pocketChat"
+msgstr "Pocket chat"
+
+#. js-lingui-explicit-id
+msgid "template.quietRoom"
+msgstr "Quiet room"
+
+#. js-lingui-explicit-id
+msgid "template.starling"
+msgstr "Starling"
+
+#. js-lingui-explicit-id
+msgid "template.writingStudio"
+msgstr "Writing studio"
 
 #. js-lingui-explicit-id
 msgid "verb.accept"

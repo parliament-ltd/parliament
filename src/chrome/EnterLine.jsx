@@ -18,7 +18,7 @@ function Parts({ parts }) {
 
 /**
  * @param {{ mode: string, resting: string, empty: boolean, says: { message: string, values?: object }|null, addressed: string,
- *   room?: { chat: number|null } }} props
+ *   room?: { chat: number|null, name?: string|null } }} props
  *   room: the room on this screen, its chat's number, or null for an empty
  *   room; left out when the screen has no room. A prompt goes there.
  */
@@ -31,7 +31,9 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
     now: true,
     text: !toRoom
       ? i18n._(COPY.enter.target, { board: boardName(i18n, addressed) })
-      : room.chat != null ? i18n._(COPY.enter.targetChat, { chat: room.chat }) : i18n._(COPY.enter.targetNewRoom),
+      : room.chat == null
+        ? i18n._(COPY.enter.targetNewRoom)
+        : room.name ? i18n._(COPY.enter.targetChatIn, { chat: room.chat, room: room.name }) : i18n._(COPY.enter.targetChat, { chat: room.chat }),
   }
   let parts
   // More sentences, as where a window cannot stay on top (C94), or what

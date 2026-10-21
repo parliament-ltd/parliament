@@ -163,6 +163,15 @@ export const COPY = {
     // A prompt (stage 4; C83). {provider} and {source} are names from the
     // list of providers and sources; {cost} is an amount the bar formats.
     targetChat: /*i18n*/ { id: 'enter.targetChat', message: '→ {chat}', comment: "The head of the Enter line in a room: the chat's number" },
+    targetChatIn: /*i18n*/ { id: 'enter.targetChatIn', message: '→ {chat} in {room}', comment: "{chat} is the chat's number, {room} the room's name (bar reference: → 201a in unnamed room)" },
+    // name: for the room (C40).
+    nameRoom: /*i18n*/ { id: 'enter.nameRoom', message: 'Enter names this room: {name}', comment: '{name} is the person\'s own words' },
+    nameSame: /*i18n*/ { id: 'enter.nameSame', message: 'This room has that name already' },
+    nameEmpty: /*i18n*/ { id: 'enter.nameEmpty', message: 'A name needs some words, like name:"Barn owls"' },
+    nameLong: /*i18n*/ { id: 'enter.nameLong', message: 'A room\'s name is at most {max} characters' },
+    nameNoChat: /*i18n*/ { id: 'enter.nameNoChat', message: 'This room has no chat yet. Its first prompt starts it, and then name: names it' },
+    nameFailed: /*i18n*/ { id: 'enter.nameFailed', message: 'The name was not kept. Try again' },
+    aloneNow: /*i18n*/ { id: 'enter.aloneNow', message: '{verb} runs on a line of its own for now' },
     targetNewRoom: /*i18n*/ { id: 'enter.targetNewRoom', message: '→ a new room' },
     promptNoRoom: /*i18n*/ { id: 'enter.promptNoRoom', message: 'Prompts go to a room. sym: opens one' },
     promptBusy: /*i18n*/ { id: 'enter.promptBusy', message: 'A reply is still arriving here. Send once it is done' },
@@ -230,8 +239,21 @@ export const COPY = {
     answeredBy: /*i18n*/ { id: 'field.answeredBy', message: 'answered by {model}' },
   },
 
+  // The built-in rooms' names, shown until a room's owner names it (C90).
+  // Keyed by template.
+  templates: {
+    'writing-studio@1.0': /*i18n*/ { id: 'template.writingStudio', message: 'Writing studio' },
+    'data-workspace@1.0': /*i18n*/ { id: 'template.dataWorkspace', message: 'Data workspace' },
+    'drafting-desk@1.0': /*i18n*/ { id: 'template.draftingDesk', message: 'Drafting desk' },
+    'pocket-chat@1.0': /*i18n*/ { id: 'template.pocketChat', message: 'Pocket chat' },
+    'quiet-room@1.0': /*i18n*/ { id: 'template.quietRoom', message: 'Quiet room' },
+    'kingfisher@1.0': /*i18n*/ { id: 'template.kingfisher', message: 'Kingfisher' },
+    'starling@1.0': /*i18n*/ { id: 'template.starling', message: 'Starling' },
+  },
+
   // A room on the shell (stage 4).
   room: {
+    unnamed: /*i18n*/ { id: 'room.unnamed', message: 'unnamed room', comment: 'A room with no name of its own (bar reference)' },
     newTitle: /*i18n*/ { id: 'room.newTitle', message: 'New room' },
     empty: /*i18n*/ { id: 'room.empty', message: 'An empty room. Its first prompt, written in the bar, starts its chat.' },
     notFound: /*i18n*/ { id: 'room.notFound', message: 'This chat could not be found. It may have been removed.' },

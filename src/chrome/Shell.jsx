@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom'
 import { useLingui } from '@lingui/react'
 import './chrome.css'
 import { COPY } from '../copy'
-import { initDB } from '../lib/db'
+import { initDB, getConversation } from '../lib/db'
+import { renameMode } from '../lib/modes'
 import { loadArrangement, saveArrangement } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
@@ -189,7 +190,22 @@ export default function Shell() {
     return run(next, body)
   }, [run])
 
-  const onRun = useCallback((next, body, go) => (go ? switchTo(go, body) : run(next, body)), [run, switchTo])
+  // name: (C40): the room's own name, kept on the room record. The room
+  // board then reads its room again.
+  const [roomRev, setRoomRev] = useState(0)
+  const [roomNameOf, setRoomNameOf] = useState(null) // { chatId, value }: what the room on screen is called
+  const onRoomName = useCallback((chatId, value) => setRoomNameOf({ chatId, value }), [])
+  const act = useCallback(async (what, body) => {
+    if (what.kind !== 'nameRoom') return 'later'
+    const chat = await getConversation(what.chatId).catch(() => null)
+    const saved = chat?.room ? await renameMode(chat.room, what.name).catch(() => null) : null
+    if (!saved) return 'nameFailed'
+    setRoomRev((n) => n + 1)
+    if (db.current && body) keepCommand(db.current, body).then((kept) => (kept ? readCommands(db.current).then(setLines) : null)).catch(() => {})
+    return null
+  }, [])
+
+  const onRun = useCallback((next, body, go, what) => (what ? act(what, body) : go ? switchTo(go, body) : run(next, body)), [act, run, switchTo])
 
   const onRoomReady = useCallback((chatId) => {
     readyRoom.current = chatId
@@ -233,7 +249,8 @@ export default function Shell() {
     for (const c of conversations) if (!latestChat || Date.parse(c.updatedAt) > Date.parse(latestChat.updatedAt)) latestChat = c
     return latestChat ? { id: latestChat.id, num: latestChat.num ?? null } : null
   }, [conversations])
-  const screens = useMemo(() => ({ lastRoom }), [lastRoom])
+  const roomNameHere = roomId && roomNameOf?.chatId === roomId ? roomNameOf.value : null
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere }), [lastRoom, roomNameHere])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -274,7 +291,8 @@ export default function Shell() {
     describe,
     resend: Boolean(roomId) && stalledIn === roomId,
     ink,
-  }), [roomId, roomRecord, streaming, ink, keyed, model, settings.defaultModel, along, hiddenOut, sourcesOut, describe, stalledIn, buildSystemPrompt])
+    roomName: roomNameHere,
+  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, model, settings.defaultModel, along, hiddenOut, sourcesOut, describe, stalledIn, buildSystemPrompt])
 
   /**
    * Sends a prompt to the room on screen: to the provider with a key, else
@@ -357,7 +375,7 @@ export default function Shell() {
   const barWindow = windows[BAR]
   const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop }
   const drawBoard = (board) => (board === 'room' && roomId !== undefined
-    ? <RoomBoard key={`room:${roomId ?? 'new'}`} chatId={roomId} addressed={arrangement.addressed === 'room'} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} />
+    ? <RoomBoard key={`room:${roomId ?? 'new'}`} chatId={roomId} rev={roomRev} addressed={arrangement.addressed === 'room'} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} />
     : <Board key={board} board={board} addressed={arrangement.addressed === board} onAddress={focusBoard} />)
 
   return (

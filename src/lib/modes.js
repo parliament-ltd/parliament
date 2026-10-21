@@ -129,6 +129,17 @@ export async function saveMode(mode) {
 }
 
 /**
+ * Names a room, as name: does (stage 4; C40): the person's own words, kept
+ * as they typed them. The rest of the room is unchanged.
+ * @returns {Promise<object|null>} the saved mode, or null when there is no such room
+ */
+export async function renameMode(id, name) {
+  const mode = await loadMode(id)
+  if (!mode) return null
+  return saveMode({ ...mode, meta: { ...mode.meta, name } })
+}
+
+/**
  * Delete a mode. Use with care — this does not migrate any conversations
  * whose `room` field references the deleted mode (those will fall back to
  * placeholder rendering when loaded). Future PRs may add a guard.
@@ -172,6 +183,9 @@ export async function createModeFromTemplate(template, overrides = {}) {
     scope: template.scope || 'room',
     meta: {
       name: overrides.name || template.displayName || template.name || 'New room',
+      // Which template the room came from, so the new screens can show its
+      // name in the reader's language until the owner names it (C90).
+      ...(template.id && !overrides.name ? { template: template.id } : {}),
       author: overrides.author || null,
       description: template.description || '',
       icon: template.icon || null,

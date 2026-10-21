@@ -204,3 +204,32 @@ describe('after a reply stalled (C114)', () => {
     expect(promptPreview('', { ...target, keyed: false }).ready).toBe(false)
   })
 })
+
+describe('name: for the room (C40)', () => {
+  const room = shipped('room:c1')
+  const at = (value, a = room, screens = {}) => {
+    const p = preview(value, { mode: 'command', arrangement: a, screens })
+    return { ...p, text: say(i18n, p.says.message, p.says.values) }
+  }
+
+  it('names the room on screen with the words as typed', () => {
+    expect(BUILT.has('name')).toBe(true)
+    const p = at('>name:"Barn owls"')
+    expect(p.text).toBe('Enter names this room: Barn owls')
+    expect(p.act).toEqual({ kind: 'nameRoom', chatId: 'c1', name: 'Barn owls' })
+    expect(at('>name:Murano').act.name).toBe('Murano')
+  })
+
+  it('refuses an empty name, one it has already, and a room with no chat yet', () => {
+    expect(at('>name:""').text).toBe('A name needs some words, like name:"Barn owls"')
+    expect(at('>name:"Barn owls"', room, { roomName: { own: 'Barn owls' } }).act).toBeNull()
+    expect(at('>name:"Barn owls"', shipped('room:new')).text).toBe('This room has no chat yet. Its first prompt starts it, and then name: names it')
+    expect(at(`>name:"${'x'.repeat(81)}"`).text).toBe("A room's name is at most 80 characters")
+  })
+
+  it('runs alone, and waits for its stages elsewhere', () => {
+    expect(at('>name:"Owls" bar:top').text).toBe('name: runs on a line of its own for now')
+    expect(at('>name:207 "New title"').text).toBe('name: is not built yet')
+    expect(at('>name:"Q2"', shipped('almanac')).text).toMatch(/not built yet|works on/)
+  })
+})

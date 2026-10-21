@@ -8,6 +8,7 @@ import { restingMode } from '../shell/arrangement'
 import { readField } from '../commands/parse'
 import { complete } from '../commands/registry'
 import { preview, promptPreview } from './preview'
+import { roomLabel } from './say'
 import Field from './Field'
 import EnterLine from './EnterLine'
 import Reference from './Reference'
@@ -108,7 +109,9 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       ? i18n._(COPY.field.answeredBy, { model: prompt.model })
       : i18n._(COPY.field.answeredFrom, { source: prompt.source })
   }
-  const room = prompt && prompt.room !== undefined ? { chat: prompt.chat ?? null } : undefined
+  const room = prompt && prompt.room !== undefined
+    ? { chat: prompt.chat ?? null, name: prompt.room ? roomLabel(i18n, prompt.roomName ?? null) : null }
+    : undefined
 
   async function send() {
     if (!promptView?.ready || !onPrompt) return
@@ -122,16 +125,16 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   async function enter() {
     if (prompting) { await send(); return }
     if (field.mode !== 'command') return
-    const { answer, next, go } = view
+    const { answer, next, go, act } = view
     if (answer.state === 'help') {
       setReference({ topic: answer.values?.verb ? answer.values.verb.replace(/:$/, '') : null })
       dispatch({ type: 'ran' })
       return
     }
     if (answer.fill) { dispatch({ type: 'input', value: answer.fill }); return }
-    if (!next && !go) return
+    if (!next && !go && !act) return
     const body = readField(value, field.mode).body
-    const refused = await onRun(next, body, go)
+    const refused = await onRun(next, body, go, act)
     if (refused) { setNotice(refused); return }
     setReference(null)
     walk.current = { lines, index: -1, draft: '' }

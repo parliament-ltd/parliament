@@ -138,6 +138,10 @@ msgid "enter.aloneErase"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.aloneNow"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.aloneSpends"
 msgstr ""
 
@@ -251,6 +255,31 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.moveThere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameNoChat"
+msgstr ""
+
+#. {name} is the person's own words
+#. js-lingui-explicit-id
+msgid "enter.nameRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameSame"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -506,6 +535,11 @@ msgstr ""
 msgid "enter.targetChat"
 msgstr ""
 
+#. {chat} is the chat's number, {room} the room's name (bar reference: → 201a in unnamed room)
+#. js-lingui-explicit-id
+msgid "enter.targetChatIn"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.targetNewRoom"
 msgstr ""
@@ -678,6 +712,11 @@ msgstr ""
 msgid "room.unavailable"
 msgstr ""
 
+#. A room with no name of its own (bar reference)
+#. js-lingui-explicit-id
+msgid "room.unnamed"
+msgstr ""
+
 #. Marginalia on the board the navy rule is on
 #. js-lingui-explicit-id
 msgid "shell.addressed"
@@ -739,6 +778,34 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "storage.notKept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "template.dataWorkspace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "template.draftingDesk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "template.kingfisher"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "template.pocketChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "template.quietRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "template.starling"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "template.writingStudio"
 msgstr ""
 
 #. js-lingui-explicit-id

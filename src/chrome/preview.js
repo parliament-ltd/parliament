@@ -15,13 +15,40 @@
 // the shell knows: no request is made to find out (C83).
 
 import { enterLine } from '../commands/registry'
-import { plan, ARRANGEMENT_VERBS, NEW_ROOM, roomArrangementId } from '../shell/arrangement'
+import { plan, ARRANGEMENT_VERBS, NEW_ROOM, roomArrangementId, roomChat } from '../shell/arrangement'
+import { cleanRoomName, ROOM_NAME_MAX } from '../lib/roomNames'
 import { CHARS_PER_TOKEN, inputCost, describeCost } from '../shell/estimate'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
 const SWITCHES = Object.freeze(['alm', 'sym'])
-export const BUILT = new Set([...ARRANGEMENT_VERBS, ...SWITCHES])
+// Verbs that act on what the bar points at, rather than on the arrangement.
+const ACTS = Object.freeze(['name'])
+export const BUILT = new Set([...ARRANGEMENT_VERBS, ...SWITCHES, ...ACTS])
+
+// The words of an argument as typed: quoted text without its quotes, or a
+// word as written (the parser lower-cases words).
+const typed = (arg) => (arg?.kind === 'text' ? arg.value : arg?.text ?? '')
+
+/**
+ * name:"…" names what the bar points at (C40). Built for a room: its name
+ * is the person's own words, kept on the room. A chat by number
+ * (name:207 "…") and collections come with the Almanac and the Collection
+ * (stage 6). screens.roomName is what the room on screen is called now.
+ * @returns {{ says: object, act: object|null }|null}
+ */
+function planName(a, step, screens = {}) {
+  const args = step.match?.values ?? []
+  if (args.length !== 1 || a.addressed !== 'room') return null
+  const chat = roomChat(a.id)
+  if (chat === undefined) return null
+  if (chat === null) return { says: { message: 'nameNoChat' }, act: null }
+  const clean = cleanRoomName(typed(args[0]))
+  if (clean.error === 'empty') return { says: { message: 'nameEmpty' }, act: null }
+  if (clean.error === 'long') return { says: { message: 'nameLong', values: { max: ROOM_NAME_MAX } }, act: null }
+  if (screens.roomName?.own === clean.name) return { says: { message: 'nameSame' }, act: null }
+  return { says: { message: 'nameRoom', values: { name: clean.name } }, act: { kind: 'nameRoom', chatId: chat, name: clean.name } }
+}
 
 /**
  * The screen a switch goes to, or a refusal. `sym:` goes back to the last
@@ -53,14 +80,23 @@ function planSwitch(a, step, screens = {}) {
 /**
  * @param {string} value the whole field, leader included
  * @param {{ mode: string, arrangement: import('../shell/arrangement').Arrangement, built?: Set<string>,
- *   screens?: { lastRoom?: { id: string, num?: number|null }|null } }} ctx
- * @returns {{ answer: object, says: { message: string, values?: object }, next: object|null, go?: object|null }}
+ *   screens?: { lastRoom?: { id: string, num?: number|null }|null, roomName?: object|null } }} ctx
+ * @returns {{ answer: object, says: { message: string, values?: object }, next: object|null, go?: object|null, act?: object|null }}
  *   next is the arrangement after Enter, or null when Enter runs nothing; go
- *   is the screen Enter goes to, for alm: and sym:
+ *   is the screen Enter goes to, for alm: and sym:; act is what Enter does
+ *   to what the bar points at, for name:
  */
 export function preview(value, { mode, arrangement, built = BUILT, screens = {} }) {
   const answer = enterLine(value, { mode, board: arrangement.addressed, built })
   if (answer.state !== 'ready') return { answer, says: { message: answer.message, values: answer.values }, next: null }
+
+  const acts = answer.steps.filter((s) => ACTS.includes(s.verb))
+  if (acts.length) {
+    if (answer.steps.length > 1) return { answer, says: { message: 'aloneNow', values: { verb: `${acts[0].verb}:` } }, next: null }
+    const p = planName(arrangement, answer.steps[0], screens)
+    if (!p) return { answer, says: { message: 'later', values: { verb: `${answer.steps[0].verb}:` } }, next: null }
+    return { answer, says: p.says, next: null, act: p.act }
+  }
 
   const switches = answer.steps.filter((s) => SWITCHES.includes(s.verb))
   if (switches.length) {
