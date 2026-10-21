@@ -557,7 +557,7 @@ stay readable so every backup ever written still restores.
 | R12 | Old chrome styles | `index.css` rules for the Study, `/chats`, the top bar, old gold states | The chrome layer. Removed file by file, each listed in its commit | 6 onward |
 | R13 | "Pin for reference" as a label | `messages-render.jsx` | A quote. The stored pins stay | 6 |
 | R14 | The build wizard as a page | `/build`, `BuildView.jsx`, `src/components/build/**` | The guide in the Lab; templates in the Library | 13 |
-| R15 | Tooltip tours, the first-run gate and their flags | `TourTooltip.jsx`, `tourCompleted_*` | The welcome steps and `tour:` | 5 |
+| R15 | Tooltip tours, the first-run gate and their flags | `TourTooltip.jsx`, `tourCompleted_*` | The welcome steps and `tour:`. **Approved 21 October,** carried out when `/` shows the welcome page; old backups keep reading the flags | 5 |
 | R16 | Drag and drop in the editor, then `@dnd-kit` | Drag wiring in `EditorView.jsx` and the editor components | Commands | 13, 15 |
 | R17 | The holding tray | `EditorHoldingTray.jsx`, four reducer actions, its styles | `rm:` and `undo:` | 13 |
 | R18 | The inspector | `EditorRightRail.jsx` | The room line, the Blocks board, `inspect:` | 13 |
