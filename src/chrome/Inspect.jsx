@@ -18,6 +18,7 @@ export default function Inspect({ row }) {
     row.createdAt ? i18n._(COPY.inspect.created, { day: dayOf(i18n, row.createdAt) }) : null,
     row.activeAt ? i18n._(COPY.inspect.active, { ago: agoOf(i18n, row.activeAt) }) : null,
     row.pinned ? i18n._(COPY.almanac.pinned) : null,
+    row.erasedFrom != null ? i18n._(COPY.almanac.erasedFrom, { num: row.erasedFrom }) : null,
   ].filter(Boolean)
   const opens = row.kind === 'chat' || (row.kind === 'docket' && row.chatId)
   return (

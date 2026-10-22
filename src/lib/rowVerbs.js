@@ -225,6 +225,66 @@ export function planRowLine(steps, rows) {
   return { says: each[0], each, changes: [...merged.values()] }
 }
 
+// ── erase: (C137) ──────────────────────────────────────
+
+const MARKS = new Set(['note', 'term', 'quote'])
+const short = (text, max = 40) => {
+  const t = String(text ?? '').replace(/\s+/g, ' ').trim()
+  return [...t].length > max ? `${[...t].slice(0, max - 1).join('')}…` : t
+}
+
+/**
+ * erase:207, 216, or erase:207 all (C137). Numbers only. A plan's number
+ * takes every chat in it, a branch its chat (C137 (b)). A chat's notes,
+ * keywords and quotes stay, detached and marked, unless `all` takes them
+ * too (C137 (c)). The Enter line names everything that goes, says what
+ * stays, and that undo cannot bring it back.
+ * @returns {{ says: object, erase: { chats: object[], marks: object[], keepMarks: boolean, nums: number[] } }|{ bad: object }}
+ */
+export function planErase(args, rows) {
+  const all = args.length > 1 && args[args.length - 1].kind === 'word' && args[args.length - 1].value === 'all'
+  const named = flat(all ? args.slice(0, -1) : args)
+  const chats = []
+  const marks = []
+  const plans = []
+  const add = (list, row) => { if (!list.includes(row)) list.push(row) }
+  for (const a of named) {
+    if (a.kind !== 'address' && a.kind !== 'number') return { bad: { message: 'byNumber' } }
+    const num = a.kind === 'number' ? a.value : a.num
+    const plan = !a.letter && rows.find((r) => r.kind === 'docket' && r.num === num)
+    if (plan) {
+      add(plans, plan)
+      for (const r of rows.filter((x) => x.kind === 'chat' && x.docketNum === num)) add(chats, r)
+      continue
+    }
+    const t = targetsOf([a], rows)
+    if (t.bad) return t
+    const row = t.rows[0]
+    if (row.kind === 'chat') add(chats, row)
+    else if (MARKS.has(row.kind)) add(marks, row)
+  }
+  const chatIds = new Set(chats.map((c) => c.chatId))
+  // The notes, keywords and quotes inside what goes, other than those named.
+  const inside = rows.filter((r) => MARKS.has(r.kind) && chatIds.has(r.chatId) && !marks.includes(r))
+  // A plan goes with its last chat: say so for every plan left with none.
+  const planNums = [...new Set(chats.map((c) => c.docketNum).filter((n) => n != null))]
+    .filter((n) => rows.filter((r) => r.kind === 'chat' && r.docketNum === n).every((r) => chatIds.has(r.chatId)))
+  const going = [...chats, ...marks]
+  const also = []
+  if (inside.length) also.push({ message: all ? 'eraseMarksGo' : 'eraseMarksStay', values: { count: inside.length } })
+  if (planNums.length) also.push({ message: 'erasePlanGoes', values: { count: planNums.length, nums: planNums } })
+  also.push({ message: 'eraseUndo', values: { count: going.length } })
+  return {
+    says: { message: 'eraseItems', values: { erasing: going.map((r) => ({ num: r.num, title: short(r.kind === 'chat' ? r.title : r.text) })) }, also },
+    erase: {
+      chats: chats.map((c) => ({ id: c.chatId, num: c.num })),
+      marks: marks.map((m) => ({ store: m.store, id: m.id, num: m.num })),
+      keepMarks: !all,
+      nums: going.map((r) => r.num),
+    },
+  }
+}
+
 /** copy:207. One thing, whose markdown the shell builds (C143 (f)). */
 export function planCopy(args, rows) {
   const t = targetsOf(args, rows)

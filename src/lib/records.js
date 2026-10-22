@@ -241,53 +241,110 @@ export async function updateChat(db, id, updates) {
   })
 }
 
+const CHAT_STORES = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'files', 'file_data', 'sbrd_documents']
+
+// Inside a transaction: a chat and everything that is its own. Its notes,
+// keywords and quotes go with it, or with keepMarks stay as items of their
+// own: detached from it, their words kept, and marked with the number it
+// had (erase:, C137 (c)). Returns the changes to announce.
+async function removeChatIn(tx, id, { v6, keepMarks = false, now = new Date().toISOString() }) {
+  const chat = await tx.objectStore('conversations').get(id)
+  const changes = [{ kind: 'chat', op: 'removed', id, num: chat?.num }]
+  const erasedFrom = Number.isInteger(chat?.num) ? chat.num : null
+  for (const name of ['messages', 'favorites']) {
+    const store = tx.objectStore(name)
+    for (const key of await store.index('conversationId').getAllKeys(id)) await store.delete(key)
+  }
+  for (const [name, kind] of [['highlights', 'term'], ['notes', 'note']]) {
+    const store = tx.objectStore(name)
+    for (const record of await store.index('conversationId').getAll(id)) {
+      if (!keepMarks) { await store.delete(record.id); continue }
+      await store.put({ ...record, conversationId: null, messageId: null, erasedFrom })
+      changes.push({ kind, op: 'updated', id: record.id, num: record.num })
+    }
+  }
+  // Pinned references (quotes) kept in this chat. Ones taken from it into
+  // another chat stay there, as copies.
+  const pins = tx.objectStore('pins')
+  for (const p of await pins.index('targetConversationId').getAll(id)) {
+    if (!keepMarks) { await pins.delete(p.id); continue }
+    const fromHere = p.sourceConversationId === id
+    await pins.put({
+      ...p, targetConversationId: null, erasedFrom,
+      sourceConversationId: fromHere ? null : p.sourceConversationId, sourceMessageId: fromHere ? null : p.sourceMessageId,
+    })
+    changes.push({ kind: 'quote', op: 'updated', id: p.id, num: p.num })
+  }
+  const files = tx.objectStore('files')
+  for (const key of await files.index('conversationId').getAllKeys(id)) {
+    await files.delete(key)
+    await tx.objectStore('file_data').delete(key)
+  }
+  await tx.objectStore('sbrd_documents').delete(id)
+  await tx.objectStore('conversations').delete(id)
+
+  if (v6 && chat?.docketId) {
+    const docket = await tx.objectStore('dockets').get(chat.docketId)
+    if (docket) {
+      const runs = await tx.objectStore('runs').index('docketId').getAll(docket.id)
+      const left = removeBranch(docket, runs, chat.branch, now)
+      if (left.docket) {
+        await tx.objectStore('dockets').put(left.docket)
+        for (const r of left.runs) await tx.objectStore('runs').put(r)
+        changes.push({ kind: 'docket', op: 'updated', id: docket.id, num: docket.num })
+      } else {
+        await tx.objectStore('dockets').delete(docket.id)
+        for (const runId of left.removeRunIds) await tx.objectStore('runs').delete(runId)
+        changes.push({ kind: 'docket', op: 'removed', id: docket.id, num: docket.num })
+      }
+    }
+    const fav = await tx.objectStore('collections').index('builtIn').get('favorites')
+    const trimmed = favoritesWithout(fav, { conversationId: id }, now)
+    if (trimmed) {
+      await tx.objectStore('collections').put(trimmed)
+      changes.push({ kind: 'collection', op: 'updated', id: trimmed.id })
+    }
+  }
+  return changes
+}
+
 /** Remove a chat and everything that belongs to it. At version 6 its branch leaves its docket. */
 export async function removeChat(db, id) {
   const v6 = isV6(db)
-  const stores = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'files', 'file_data', 'sbrd_documents',
-    ...(v6 ? ['dockets', 'runs', 'collections'] : [])]
-  return write(db, stores, async (tx) => {
-    const chat = await tx.objectStore('conversations').get(id)
-    const changes = [{ kind: 'chat', op: 'removed', id, num: chat?.num }]
-    for (const name of ['messages', 'highlights', 'notes', 'favorites']) {
-      const store = tx.objectStore(name)
-      for (const key of await store.index('conversationId').getAllKeys(id)) await store.delete(key)
-    }
-    // Pinned references kept in this chat. Ones taken from it stay, as copies.
-    const pins = tx.objectStore('pins')
-    for (const key of await pins.index('targetConversationId').getAllKeys(id)) await pins.delete(key)
-    const files = tx.objectStore('files')
-    for (const key of await files.index('conversationId').getAllKeys(id)) {
-      await files.delete(key)
-      await tx.objectStore('file_data').delete(key)
-    }
-    await tx.objectStore('sbrd_documents').delete(id)
-    await tx.objectStore('conversations').delete(id)
+  const stores = [...CHAT_STORES, ...(v6 ? ['dockets', 'runs', 'collections'] : [])]
+  return write(db, stores, async (tx) => ({ result: undefined, changes: await removeChatIn(tx, id, { v6 }) }))
+}
 
-    if (v6 && chat?.docketId) {
-      const now = new Date().toISOString()
-      const docket = await tx.objectStore('dockets').get(chat.docketId)
-      if (docket) {
-        const runs = await tx.objectStore('runs').index('docketId').getAll(docket.id)
-        const left = removeBranch(docket, runs, chat.branch, now)
-        if (left.docket) {
-          await tx.objectStore('dockets').put(left.docket)
-          for (const r of left.runs) await tx.objectStore('runs').put(r)
-          changes.push({ kind: 'docket', op: 'updated', id: docket.id, num: docket.num })
-        } else {
-          await tx.objectStore('dockets').delete(docket.id)
-          for (const runId of left.removeRunIds) await tx.objectStore('runs').delete(runId)
-          changes.push({ kind: 'docket', op: 'removed', id: docket.id, num: docket.num })
-        }
-      }
-      const fav = await tx.objectStore('collections').index('builtIn').get('favorites')
-      const trimmed = favoritesWithout(fav, { conversationId: id }, now)
-      if (trimmed) {
-        await tx.objectStore('collections').put(trimmed)
-        changes.push({ kind: 'collection', op: 'updated', id: trimmed.id })
-      }
+const MARK_KINDS = Object.freeze({ notes: 'note', highlights: 'term', pins: 'quote' })
+
+/**
+ * erase: (C137), in one transaction or not at all. Chats go with their
+ * messages, files and documents; their notes, keywords and quotes stay as
+ * items of their own unless keepMarks is false. A plan goes with its last
+ * chat. Notes, keywords and quotes named go too. If anything named is gone
+ * already, nothing is erased and Changed says which.
+ * @param {import('idb').IDBPDatabase} db
+ * @param {{ chats?: Array<{ id: string, num?: number }>, marks?: Array<{ store: string, id: string, num?: number }>, keepMarks?: boolean }} what
+ */
+export async function eraseRecords(db, { chats = [], marks = [], keepMarks = true }) {
+  if (!isV6(db)) throw new Error('erase: needs version 6')
+  for (const m of marks) if (!MARK_KINDS[m.store]) throw new Error(`Not a marking's store: ${m.store}`)
+  return write(db, [...CHAT_STORES, 'dockets', 'runs', 'collections'], async (tx) => {
+    const missing = []
+    for (const c of chats) if (!(await tx.objectStore('conversations').get(c.id))) missing.push(c.num ?? c.id)
+    for (const m of marks) if (!(await tx.objectStore(m.store).get(m.id))) missing.push(m.num ?? m.id)
+    if (missing.length) throw new Changed(missing)
+    const now = new Date().toISOString()
+    const changes = []
+    for (const c of chats) changes.push(...await removeChatIn(tx, c.id, { v6: true, keepMarks, now }))
+    for (const m of marks) {
+      const store = tx.objectStore(m.store)
+      const record = await store.get(m.id) // gone already when its chat took it
+      if (!record) continue
+      await store.delete(m.id)
+      changes.push({ kind: MARK_KINDS[m.store], op: 'removed', id: m.id, num: record.num })
     }
-    return { result: undefined, changes }
+    return { result: { chats: chats.length, marks: marks.length }, changes }
   })
 }
 

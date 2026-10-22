@@ -40,6 +40,11 @@ msgstr "Type"
 msgid "almanac.empty"
 msgstr "Nothing made yet. p> starts your first chat, and it appears here."
 
+#. Marginalia on a note, keyword or quote kept when its chat was erased
+#. js-lingui-explicit-id
+msgid "almanac.erasedFrom"
+msgstr "from {num}, erased"
+
 #. js-lingui-explicit-id
 msgid "almanac.filtersLabel"
 msgstr "The search and filters in force"
@@ -360,6 +365,11 @@ msgstr "The document"
 msgid "copy.from"
 msgstr "from {num}"
 
+#. Where it came from: a chat that was erased
+#. js-lingui-explicit-id
+msgid "copy.fromErased"
+msgstr "from {num}, erased"
+
 #. js-lingui-explicit-id
 msgid "copy.keywords"
 msgstr "Keywords"
@@ -603,6 +613,44 @@ msgstr "Type a command, or ? for every command"
 #. js-lingui-explicit-id
 msgid "enter.erase"
 msgstr "To remove something for good, use erase:. Enter writes it in"
+
+#. js-lingui-explicit-id
+msgid "enter.eraseBusy"
+msgstr "A reply is still arriving in {nums}. Wait for it, or stop it, first"
+
+#. js-lingui-explicit-id
+msgid "enter.erased"
+msgstr "Erased {nums} for good"
+
+#. js-lingui-explicit-id
+msgid "enter.eraseFailed"
+msgstr "Nothing was erased. Try again"
+
+#. A number and the start of its title or words, in the language's quotation marks
+#. js-lingui-explicit-id
+msgid "enter.eraseItem"
+msgstr "{num} “{title}”"
+
+#. js-lingui-explicit-id
+msgid "enter.eraseItems"
+msgstr "Enter erases {erasing} for good"
+
+#. js-lingui-explicit-id
+msgid "enter.eraseMarksGo"
+msgstr "{count, plural, one {# note, keyword or quote goes too} other {# notes, keywords and quotes go too}}"
+
+#. all stays English: it is a word of the command
+#. js-lingui-explicit-id
+msgid "enter.eraseMarksStay"
+msgstr "{count, plural, one {# note, keyword or quote stays, marked as from an erased chat. Add all to erase it too} other {# notes, keywords and quotes stay, marked as from an erased chat. Add all to erase them too}}"
+
+#. js-lingui-explicit-id
+msgid "enter.erasePlanGoes"
+msgstr "{count, plural, one {Plan {nums} goes with its last chat} other {Plans {nums} go with their last chats}}"
+
+#. js-lingui-explicit-id
+msgid "enter.eraseUndo"
+msgstr "{count, plural, one {Undo cannot bring it back, and stops here} other {Undo cannot bring them back, and stops here}}"
 
 #. C132 (h): a cost is worked out from recorded tokens, never guessed
 #. js-lingui-explicit-id

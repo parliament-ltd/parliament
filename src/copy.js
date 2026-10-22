@@ -264,6 +264,29 @@ export const COPY = {
     undone: /*i18n*/ { id: 'enter.undone', message: 'Took back {line}' },
     undoChanged: /*i18n*/ { id: 'enter.undoChanged', message: '{nums} changed since, so undo: stops here' },
     undoFailed: /*i18n*/ { id: 'enter.undoFailed', message: 'Undo did not go through, so it stops here' },
+    // erase: (C137). {erasing} lists what goes, each as eraseItem; {nums} lists numbers.
+    eraseItems: /*i18n*/ { id: 'enter.eraseItems', message: 'Enter erases {erasing} for good' },
+    eraseItem: /*i18n*/ { id: 'enter.eraseItem', message: '{num} “{title}”', comment: "A number and the start of its title or words, in the language's quotation marks" },
+    eraseMarksStay: /*i18n*/ {
+      id: 'enter.eraseMarksStay',
+      message: '{count, plural, one {# note, keyword or quote stays, marked as from an erased chat. Add all to erase it too} other {# notes, keywords and quotes stay, marked as from an erased chat. Add all to erase them too}}',
+      comment: 'all stays English: it is a word of the command',
+    },
+    eraseMarksGo: /*i18n*/ {
+      id: 'enter.eraseMarksGo',
+      message: '{count, plural, one {# note, keyword or quote goes too} other {# notes, keywords and quotes go too}}',
+    },
+    erasePlanGoes: /*i18n*/ {
+      id: 'enter.erasePlanGoes',
+      message: '{count, plural, one {Plan {nums} goes with its last chat} other {Plans {nums} go with their last chats}}',
+    },
+    eraseUndo: /*i18n*/ {
+      id: 'enter.eraseUndo',
+      message: '{count, plural, one {Undo cannot bring it back, and stops here} other {Undo cannot bring them back, and stops here}}',
+    },
+    erased: /*i18n*/ { id: 'enter.erased', message: 'Erased {nums} for good' },
+    eraseBusy: /*i18n*/ { id: 'enter.eraseBusy', message: 'A reply is still arriving in {nums}. Wait for it, or stop it, first' },
+    eraseFailed: /*i18n*/ { id: 'enter.eraseFailed', message: 'Nothing was erased. Try again' },
     // cols: (C141). {cols} lists column names; {col} is one; {words} the words cols: takes, which stay English.
     colsNow: /*i18n*/ { id: 'enter.colsNow', message: '{board} shows {cols}. A minus hides one, a plus shows it again' },
     colsHide: /*i18n*/ { id: 'enter.colsHide', message: 'Enter hides {cols}' },
@@ -475,6 +498,7 @@ export const COPY = {
     saved: /*i18n*/ { id: 'almanac.saved', message: 'Saved searches' },
     openSavedHelp: /*i18n*/ { id: 'almanac.openSavedHelp', message: 'Shows it, as open:"{name}" does', comment: 'open: stays English; {name} is the person\'s words' },
     saveHelp: /*i18n*/ { id: 'almanac.saveHelp', message: 'Writes save: in the bar, to keep this search under a name', comment: 'save: stays English' },
+    erasedFrom: /*i18n*/ { id: 'almanac.erasedFrom', message: 'from {num}, erased', comment: 'Marginalia on a note, keyword or quote kept when its chat was erased' },
   },
 
   // What copy: writes around the person's words (C143 (f)): who spoke, the
@@ -486,6 +510,7 @@ export const COPY = {
     keywords: /*i18n*/ { id: 'copy.keywords', message: 'Keywords' },
     quotes: /*i18n*/ { id: 'copy.quotes', message: 'Quotes' },
     from: /*i18n*/ { id: 'copy.from', message: 'from {num}', comment: 'Where a note, keyword or quote came from: a chat number' },
+    fromErased: /*i18n*/ { id: 'copy.fromErased', message: 'from {num}, erased', comment: 'Where it came from: a chat that was erased' },
     revision: /*i18n*/ { id: 'copy.revision', message: 'revision {revision}', comment: "A source page's revision number" },
   },
 

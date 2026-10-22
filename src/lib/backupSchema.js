@@ -18,10 +18,10 @@ export const FIELDS = Object.freeze({
     'num', 'docketId', 'branch', 'run', 'restoredFrom', 'archived', 'tagsMine'],
   // model and usage: what a reply was made with and its tokens (C132 (h), stage 6).
   messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta', 'stopReason', 'source', 'model', 'usage'],
-  notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom', 'archived', 'tagsMine'],
-  highlights: ['id', 'conversationId', 'messageId', 'text', 'color', 'createdAt', 'num', 'kind', 'pinned', 'tags', 'restoredFrom', 'archived', 'tagsMine'],
+  notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom'],
+  highlights: ['id', 'conversationId', 'messageId', 'text', 'color', 'createdAt', 'num', 'kind', 'pinned', 'tags', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom'],
   favorites: ['id', 'conversationId', 'messageId', 'createdAt'],
-  pins: ['id', 'targetConversationId', 'sourceConversationId', 'sourceMessageId', 'content', 'createdAt', 'num', 'kind', 'restoredFrom', 'pinned', 'tags', 'archived', 'tagsMine'],
+  pins: ['id', 'targetConversationId', 'sourceConversationId', 'sourceMessageId', 'content', 'createdAt', 'num', 'kind', 'restoredFrom', 'pinned', 'tags', 'archived', 'tagsMine', 'erasedFrom'],
   files: ['id', 'conversationId', 'name', 'type', 'rows', 'cols', 'sizeBytes', 'inContext', 'uploadedAt'],
   file_data: ['fileId', 'data'],
   sbrd_documents: ['conversationId', 'paragraphs', 'suggestionStates', 'submittedReplies', 'updatedAt'],
@@ -150,10 +150,12 @@ export function cleanFlat(flat) {
   const onMessage = (a) => chats.has(a.conversationId) && (a.messageId == null || messages.has(a.messageId))
   // A note in no chat stands on its own (the scratchpad's, and free notes later).
   dropped.notes = keep('notes', (a) => (a.conversationId == null && a.messageId == null) || onMessage(a))
-  dropped.highlights = keep('highlights', onMessage)
+  // A keyword or quote kept when its chat was erased stands on its own (C137 (c)).
+  const detached = (a) => Number.isInteger(a.erasedFrom) && a.conversationId == null && a.messageId == null
+  dropped.highlights = keep('highlights', (a) => detached(a) || onMessage(a))
   dropped.favorites = keep('favorites', onMessage)
   // A pinned reference is a copy: its source may be gone, its chat may not.
-  dropped.pins = keep('pins', (p) => chats.has(p.targetConversationId))
+  dropped.pins = keep('pins', (p) => chats.has(p.targetConversationId) || (Number.isInteger(p.erasedFrom) && p.targetConversationId == null))
   dropped.documents = keep('sbrd_documents', (d) => chats.has(d.conversationId))
   dropped.files = keep('files', (f) => chats.has(f.conversationId))
   const files = new Set((out.files || []).map((f) => f.id))

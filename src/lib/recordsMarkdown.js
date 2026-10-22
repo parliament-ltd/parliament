@@ -69,9 +69,10 @@ export function planMarkdown(chats, words) {
 }
 
 /** A note, keyword or quote: its words, what it is, and where it came from. */
-export function markingMarkdown({ kind, num, text, chatNum }, words) {
+export function markingMarkdown({ kind, num, text, chatNum, erasedFrom = null }, words) {
   const body = String(text ?? '').trim()
   const words1 = kind === 'note' ? body : body.split('\n').map((line) => `> ${line}`).join('\n')
-  const facts = [`${words.kind(kind)} ${num}`, chatNum != null ? words.from(chatNum) : null].filter(Boolean)
+  const where = chatNum != null ? words.from(chatNum) : erasedFrom != null && words.fromErased ? words.fromErased(erasedFrom) : null
+  const facts = [`${words.kind(kind)} ${num}`, where].filter(Boolean)
   return `${words1}\n\n${facts.join(' · ')}`
 }

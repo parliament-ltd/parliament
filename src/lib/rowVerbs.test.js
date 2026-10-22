@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { targetsOf, planPin, planArchive, planTitle, planTagAdd, planUntag, planRetag, planRowLine, planCopy, cleanTag, TITLE_MAX, TAG_MAX } from './rowVerbs'
+import { targetsOf, planPin, planArchive, planTitle, planTagAdd, planUntag, planRetag, planRowLine, planCopy, planErase, cleanTag, TITLE_MAX, TAG_MAX } from './rowVerbs'
 import { enterLine } from '../commands/registry'
 import { BUILT } from '../chrome/preview'
 
@@ -104,5 +104,59 @@ describe('a line of row commands (C143 (g))', () => {
 describe('copy:', () => {
   it('names one thing to copy', () => {
     expect(planCopy(steps('copy:203b')[0].match.values, rows)).toMatchObject({ says: { message: 'copyOne', values: { num: 206 } }, row: { num: 206 } })
+  })
+})
+
+describe('erase: (C137)', () => {
+  const erows = [
+    row(204, 'chat', { chatId: 'c204', docketNum: 203, branch: 'a', title: 'barn owl' }),
+    row(206, 'chat', { chatId: 'c206', docketNum: 203, branch: 'b', title: 'Essay plan' }),
+    row(203, 'docket', { docketNum: 203 }),
+    row(202, 'chat', { chatId: 'c202', docketNum: 201, branch: 'a', title: 'Shortcut test' }),
+    row(210, 'note', { chatId: 'c204', text: 'Check the range map' }),
+    row(211, 'term', { chatId: 'c204', text: 'Tyto' }),
+  ]
+  const erase = (line) => {
+    const a = enterLine(`>${line}`, { mode: 'command', board: 'almanac', built: BUILT })
+    if (a.state !== 'ready') throw new Error(`${line}: ${a.message}`)
+    return planErase(a.steps[0].match.values, erows)
+  }
+
+  it('names what goes, what stays, and that undo cannot bring it back', () => {
+    const p = erase('erase:204')
+    expect(p.says).toEqual({
+      message: 'eraseItems', values: { erasing: [{ num: 204, title: 'barn owl' }] },
+      also: [{ message: 'eraseMarksStay', values: { count: 2 } }, { message: 'eraseUndo', values: { count: 1 } }],
+    })
+    expect(p.erase).toEqual({ chats: [{ id: 'c204', num: 204 }], marks: [], keepMarks: true, nums: [204] })
+  })
+
+  it('takes the markings too with all', () => {
+    const p = erase('erase:204 all')
+    expect(p.says.also[0]).toEqual({ message: 'eraseMarksGo', values: { count: 2 } })
+    expect(p.erase.keepMarks).toBe(false)
+  })
+
+  it('takes every chat of a plan by its number, and says the plan goes (C137 (b))', () => {
+    const p = erase('erase:203')
+    expect(p.erase.chats.map((c) => c.num)).toEqual([204, 206])
+    expect(p.says.also).toContainEqual({ message: 'erasePlanGoes', values: { count: 1, nums: [203] } })
+  })
+
+  it('takes a branch\'s chat, and a plan of one branch by its chat (C127)', () => {
+    expect(erase('erase:203b').erase.chats).toEqual([{ id: 'c206', num: 206 }])
+    const one = erase('erase:201')
+    expect(one.erase.chats).toEqual([{ id: 'c202', num: 202 }])
+    expect(one.says.also).toContainEqual({ message: 'erasePlanGoes', values: { count: 1, nums: [201] } })
+  })
+
+  it('erases a note or keyword by its number, and several at once', () => {
+    const p = erase('erase:210, 211')
+    expect(p.erase.marks).toEqual([{ store: 'notes', id: 'note210', num: 210 }, { store: 'highlights', id: 'term211', num: 211 }])
+    expect(p.says.values.erasing).toEqual([{ num: 210, title: 'Check the range map' }, { num: 211, title: 'Tyto' }])
+  })
+
+  it('refuses a number that is not here', () => {
+    expect(erase('erase:299')).toEqual({ bad: { message: 'numNone', values: { num: '299' } } })
   })
 })

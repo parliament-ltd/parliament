@@ -84,6 +84,10 @@ export function say(i18n, message, values = {}) {
     else if (key === 'day') words[key] = longDay(i18n, value)
     else if (key === 'cols' && Array.isArray(value)) words[key] = joined(i18n, value.map((c) => columnName(i18n, c)), 'conjunction')
     else if (key === 'col') words[key] = columnName(i18n, value)
+    // What erase: takes, each its number and its words (C137 (a)).
+    else if (key === 'erasing' && Array.isArray(value)) {
+      words[key] = joined(i18n, value.map((x) => (x.title ? i18n._(COPY.enter.eraseItem, { num: x.num, title: x.title }) : String(x.num))), 'conjunction')
+    }
     else words[key] = value
   }
   return i18n._(descriptor, words)

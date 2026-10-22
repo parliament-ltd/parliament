@@ -203,7 +203,7 @@ export const VERBS = Object.freeze([
   v({ verb: 'note', group: 'items', example: 'note:203 "Try it without the ending"', forms: ['note:203 "Try it without the ending"', 'note:"Check the dates"'],
     rest: true, takes: [['text']], stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.note', message: 'Write a note for people. It is never sent' } }),
-  v({ verb: 'erase', group: 'items', example: 'erase:207', forms: ['erase:207', 'erase:201c', 'erase:201c all'], takes: [['address', { opt: ['all'] }]], stage: 6, destructive: true,
+  v({ verb: 'erase', group: 'items', example: 'erase:207', forms: ['erase:207', 'erase:207, 216', 'erase:201c', 'erase:201c all'], takes: [['addresses', { opt: ['all'] }]], stage: 6, destructive: true,
     gloss: /*i18n*/ { id: 'verb.erase', message: 'Remove one thing for good, by its number. Undo cannot bring it back' } }),
   v({ verb: 'undo', group: 'items', example: 'undo:', forms: ['undo:', 'undo:242'], takes: [[], ['address']], stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.undo', message: 'Take back the last command, or one edit. It stops at a run' } }),

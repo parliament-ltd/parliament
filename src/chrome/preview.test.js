@@ -576,3 +576,25 @@ describe('the row verbs, copy: and undo: (stage 6, piece 3; C143, C134)', () => 
     expect(at('>undo:242', { undo: 'pin:202' }).text).toBe('undo: is not built yet')
   })
 })
+
+describe('erase: (stage 6, piece 4; C137)', () => {
+  const row = (num, kind, extra = {}) => ({ num, kind, id: `${kind}${num}`, chatId: kind === 'chat' ? `c${num}` : null, store: kind === 'chat' ? 'conversations' : 'notes', title: `${kind} ${num}`, tags: [], tagsMine: [], docketNum: null, ...extra })
+  const rows = [row(204, 'chat', { title: 'barn owl', docketNum: 203 }), row(206, 'chat', { title: 'Essay plan', docketNum: 205 }), row(210, 'note', { chatId: 'c204', text: 'Check the range map' })]
+  const at = (value) => {
+    const p = preview(value, { mode: 'command', arrangement: almanac(), screens: { records: { rows, view: { search: '', filters: [], sort: { by: 'active', asc: false } } } } })
+    const also = [].concat(p.says?.also ?? []).map((x) => say(i18n, x.message, x.values))
+    return { ...p, text: [say(i18n, p.says.message, p.says.values), ...also].join(' · ') }
+  }
+
+  it('names everything that goes, what stays, and that it is for good', () => {
+    expect(at('>erase:204').text).toBe('Enter erases 204 “barn owl” for good · 1 note, keyword or quote stays, marked as from an erased chat. Add all to erase it too · Plan 203 goes with its last chat · Undo cannot bring it back, and stops here')
+    expect(at('>erase:204, 206 all').text).toBe('Enter erases 204 “barn owl” and 206 “Essay plan” for good · 1 note, keyword or quote goes too · Plans 203 and 205 go with their last chats · Undo cannot bring them back, and stops here')
+    expect(at('>erase:204').act).toMatchObject({ kind: 'erase', chats: [{ id: 'c204', num: 204 }], keepMarks: true })
+  })
+
+  it('runs alone, takes numbers only, and answers delete: with itself', () => {
+    expect(at('>erase:204 pin:206').text).toBe('erase: runs on a line of its own, so it is plain what goes for good')
+    expect(at('>erase:all').text).toBe('erase: does not take that. For example: erase:207')
+    expect(at('>delete:204').text).toBe('To remove something for good, use erase:. Enter writes it in')
+  })
+})

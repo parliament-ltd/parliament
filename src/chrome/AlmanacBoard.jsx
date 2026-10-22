@@ -60,6 +60,7 @@ function Cell({ column, row }) {
             : <div className="t-t" dir="auto">{row.title || i18n._(COPY.almanac.untitled)}</div>}
           {sub && <div className="t-s" dir="auto">{sub}</div>}
           {row.pinned && <div className="t-mk">{i18n._(COPY.almanac.pinned)}</div>}
+          {row.erasedFrom != null && <div className="t-mk">{i18n._(COPY.almanac.erasedFrom, { num: row.erasedFrom })}</div>}
         </td>
       )
     }

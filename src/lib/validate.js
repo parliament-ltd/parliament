@@ -31,6 +31,9 @@ function isId(v)       { return typeof v === 'string' && v.length > 0 && v.lengt
 const TAGS_MAX = 200
 const isTagList = (v) => Array.isArray(v) && v.length <= TAGS_MAX && v.every((t) => typeof t === 'string' && t.length > 0 && t.length <= 100)
 function rowFields(item, kind) {
+  // The number of the chat a kept marking came from, when that chat was erased (C137 (c)).
+  if (item.erasedFrom != null && !(Number.isInteger(item.erasedFrom) && item.erasedFrom > 0)) return `${kind}.erasedFrom must be a number`
+
   if (item.pinned !== undefined && !isBoolean(item.pinned))     return `${kind}.pinned must be boolean`
   if (item.archived !== undefined && !isBoolean(item.archived)) return `${kind}.archived must be boolean`
   if (item.tags !== undefined && !isTagList(item.tags))         return `${kind}.tags invalid`
@@ -96,10 +99,15 @@ function isUsage(u) {
     && Object.keys(u).every((k) => k === 'input' || k === 'output')
 }
 
+// A keyword or quote kept when its chat was erased has no chat or message
+// of its own, and carries the number it came from instead (C137 (c)).
+const detached = (item, ...refs) => Number.isInteger(item.erasedFrom) && refs.every((r) => r == null)
+
 function validateHighlight(item) {
   if (!isId(item.id))                          return 'highlight.id invalid'
-  if (!isId(item.conversationId))              return 'highlight.conversationId invalid'
-  if (!isId(item.messageId))                   return 'highlight.messageId invalid'
+  const kept = detached(item, item.conversationId, item.messageId)
+  if (!kept && !isId(item.conversationId))     return 'highlight.conversationId invalid'
+  if (!kept && !isId(item.messageId))          return 'highlight.messageId invalid'
   if (!isString(item.text, 50_000))            return 'highlight.text invalid or too large'
   if (!isString(item.color, 50))               return 'highlight.color invalid'
   if (!isISODate(item.createdAt))              return 'highlight.createdAt invalid date'
@@ -126,9 +134,10 @@ function validateFavorite(item) {
 
 function validatePin(item) {
   if (!isId(item.id))                                  return 'pin.id invalid'
-  if (!isId(item.targetConversationId))                return 'pin.targetConversationId invalid'
-  if (!isId(item.sourceConversationId))                return 'pin.sourceConversationId invalid'
-  if (!isId(item.sourceMessageId))                     return 'pin.sourceMessageId invalid'
+  const kept = detached(item, item.targetConversationId)
+  if (!kept && !isId(item.targetConversationId))       return 'pin.targetConversationId invalid'
+  if (!isStringOrNull(item.sourceConversationId, 128) || (!kept && !isId(item.sourceConversationId))) return 'pin.sourceConversationId invalid'
+  if (!isStringOrNull(item.sourceMessageId, 128) || (!kept && !isId(item.sourceMessageId)))           return 'pin.sourceMessageId invalid'
   if (!isString(item.content))                         return 'pin.content invalid or too large'
   if (!isISODate(item.createdAt))                      return 'pin.createdAt invalid date'
   return rowFields(item, 'pin')

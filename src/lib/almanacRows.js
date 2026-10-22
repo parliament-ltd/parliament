@@ -141,6 +141,8 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
   const marking = (kind, store, r, text, chatId) => ({
     kind, num: r.num, id: r.id, chatId: chatId ?? null,
     store, archived: Boolean(r.archived), tagsMine: Array.isArray(r.tagsMine) ? r.tagsMine : [],
+    // Kept when its chat was erased: the number that chat had (C137 (c)).
+    erasedFrom: Number.isInteger(r.erasedFrom) ? r.erasedFrom : null,
     title: firstLine(text), text: String(text ?? ''), summary: null,
     room: roomOf(chatId), roomId: roomIdOf(chatId), tags: Array.isArray(r.tags) ? r.tags : [], pinned: Boolean(r.pinned),
     createdAt: r.createdAt ?? null, activeAt: r.createdAt ?? null,

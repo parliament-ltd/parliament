@@ -48,3 +48,15 @@ describe('a backup with pins, archive and tags on every kind (C143 (h))', () => 
     expect(c({ tags: [''] }).valid).toBe(false)
   })
 })
+
+describe('a backup with notes, keywords and quotes kept from an erased chat (C137 (c))', () => {
+  const term = { id: 'h1', conversationId: null, messageId: null, text: 'Tyto', color: '#B8A070', createdAt: at, erasedFrom: 204 }
+  const quote = { id: 'p1', targetConversationId: null, sourceConversationId: null, sourceMessageId: null, content: 'Hunts by sound', createdAt: at, erasedFrom: 204 }
+  it('accepts them detached, with the number they came from', () => {
+    expect(validateBackup({ conversations: [chat], highlights: [term], pins: [quote] })).toEqual({ valid: true })
+  })
+  it('refuses one detached without that number, or with a number that is not one', () => {
+    expect(validateBackup({ highlights: [{ ...term, erasedFrom: undefined }] }).valid).toBe(false)
+    expect(validateBackup({ pins: [{ ...quote, erasedFrom: 'x' }] }).valid).toBe(false)
+  })
+})

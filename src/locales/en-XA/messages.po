@@ -40,6 +40,11 @@ msgstr ""
 msgid "almanac.empty"
 msgstr ""
 
+#. Marginalia on a note, keyword or quote kept when its chat was erased
+#. js-lingui-explicit-id
+msgid "almanac.erasedFrom"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "almanac.filtersLabel"
 msgstr ""
@@ -360,6 +365,11 @@ msgstr ""
 msgid "copy.from"
 msgstr ""
 
+#. Where it came from: a chat that was erased
+#. js-lingui-explicit-id
+msgid "copy.fromErased"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "copy.keywords"
 msgstr ""
@@ -602,6 +612,44 @@ msgstr ""
 #. The answer to delete:, ruled 15 October
 #. js-lingui-explicit-id
 msgid "enter.erase"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.eraseBusy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.erased"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.eraseFailed"
+msgstr ""
+
+#. A number and the start of its title or words, in the language's quotation marks
+#. js-lingui-explicit-id
+msgid "enter.eraseItem"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.eraseItems"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.eraseMarksGo"
+msgstr ""
+
+#. all stays English: it is a word of the command
+#. js-lingui-explicit-id
+msgid "enter.eraseMarksStay"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.erasePlanGoes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.eraseUndo"
 msgstr ""
 
 #. C132 (h): a cost is worked out from recorded tokens, never guessed

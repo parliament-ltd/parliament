@@ -23,7 +23,7 @@ import { holdsKey } from '../commands/parse'
 import { BOARD_NAMES } from '../commands/verbs'
 import { FILTERS, EMPTY_VIEW, readFilter, readSort, nextView, clears, applyView, costUnknown, viewLine } from '../lib/recordsFilter'
 import { findSaved, cleanSearchName, SEARCH_NAME_MAX } from '../lib/savedSearches'
-import { ROW_VERBS, isRowStep, planRowLine, planCopy } from '../lib/rowVerbs'
+import { ROW_VERBS, isRowStep, planRowLine, planCopy, planErase } from '../lib/rowVerbs'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
@@ -36,7 +36,8 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // save: and forget: keep and remove saved searches on Records (stage 6,
 // piece 2; C140). copy: puts one thing on the clipboard as Markdown, and
 // undo: takes back the last command line (piece 3; C143 (f), C134).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo'])
+// erase: removes things for good, by number, on a line of its own (C137).
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -95,6 +96,13 @@ function planCopyStep(a, step, screens = {}) {
   const p = planCopy(step.match?.values ?? [], screens.records?.rows ?? [])
   if (p.bad) return { says: p.bad, act: null }
   return { says: p.says, act: { kind: 'copy', num: p.row.num } }
+}
+
+/** erase:207, 216 (all): what goes for good, named before Enter (C137). */
+function planEraseStep(a, step, screens = {}) {
+  const p = planErase(step.match?.values ?? [], screens.records?.rows ?? [])
+  if (p.bad) return { says: p.bad, act: null }
+  return { says: p.says, act: { kind: 'erase', ...p.erase } }
 }
 
 /** undo: takes back the last command line of this tab (C134). undo:242, one edit, comes with editing. */
@@ -330,7 +338,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   if (acts.length) {
     if (answer.steps.length > 1) return { answer, says: { message: 'aloneNow', values: { verb: `${acts[0].verb}:` } }, next: null }
     const step = answer.steps[0]
-    const plans = { tour: planTour, name: planName, inspect: planInspect, api: planApi, save: planSave, forget: planForget, copy: planCopyStep, undo: planUndo }
+    const plans = { tour: planTour, name: planName, inspect: planInspect, api: planApi, save: planSave, forget: planForget, copy: planCopyStep, undo: planUndo, erase: planEraseStep }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
     return { answer, says: p.says, next: p.next ?? null, act: p.act ?? null }

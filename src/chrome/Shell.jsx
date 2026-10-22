@@ -22,7 +22,7 @@ import { useConversations } from '../stores/ConversationContext'
 import { useSettings } from '../stores/SettingsContext'
 import { useCollabMode } from '../stores/CollabModeContext'
 import { useIsStreaming, useHiddenIds, usePendingDeletes, useStreamEnd } from '../stores/chatHooks'
-import { sendableOf, hiddenIds, pendingDeletes } from '../stores/chatStore'
+import { sendableOf, hiddenIds, pendingDeletes, isStreaming as replyArriving } from '../stores/chatStore'
 import { fromSource } from '../stores/sendHistory'
 import { preview, viewFromSaved, lineOf } from './preview'
 import Bar from './Bar'
@@ -39,7 +39,7 @@ import { listLayoutEntries } from '../catalog/layouts'
 import { readAlmanac } from '../lib/almanacRows'
 import { createFactsCache } from '../lib/chatFacts'
 import { readSaved, keepSearch, forgetSearch, putSaved } from '../lib/savedSearches'
-import { changeRecords } from '../lib/records'
+import { changeRecords, eraseRecords } from '../lib/records'
 import { chatMarkdown, planMarkdown, markingMarkdown } from '../lib/recordsMarkdown'
 import { dayOf } from './when'
 import { EMPTY_VIEW, applyView, nextView, viewLine, isAtRest } from '../lib/recordsFilter'
@@ -130,6 +130,8 @@ function backOnPage(a) {
 
 export default function Shell() {
   const { i18n } = useLingui()
+  // The chats as stored, read early: erase: (in act) reads them again.
+  const { conversations, createConversation, loadConversations } = useConversations()
   const [arrangement, setArrangement] = useState(() => shipped(SPACE))
   const [windows, setWindows] = useState({}) // board or 'command' -> { win, container }
   const [lines, setLines] = useState([])
@@ -427,6 +429,7 @@ export default function Shell() {
       heading: { note: i18n._(COPY.copy.notes), term: i18n._(COPY.copy.keywords), quote: i18n._(COPY.copy.quotes), document: i18n._(COPY.copy.document) },
       kind: (k) => i18n._(COPY.kinds[k]),
       from: (n) => i18n._(COPY.copy.from, { num: n }),
+      fromErased: (n) => i18n._(COPY.copy.fromErased, { num: n }),
       revision: (r) => i18n._(COPY.copy.revision, { revision: r }),
     }
     let hidden = 0
@@ -456,7 +459,7 @@ export default function Shell() {
     else if (row.kind === 'docket') {
       const chats = rows.filter((r) => r.kind === 'chat' && r.docketNum === row.num).sort((a, b) => String(a.branch).localeCompare(String(b.branch)))
       text = planMarkdown(await Promise.all(chats.map(withModel)), words)
-    } else text = markingMarkdown({ kind: row.kind, num: row.num, text: row.text, chatNum: row.chatNum }, words)
+    } else text = markingMarkdown({ kind: row.kind, num: row.num, text: row.text, chatNum: row.chatNum, erasedFrom: row.erasedFrom }, words)
     return { text, hidden }
   }, [i18n])
 
@@ -528,6 +531,25 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'erase') {
+      // erase: (C137): for good, all or nothing. Not while a reply arrives.
+      const busy = what.chats.filter((c) => replyArriving(c.id)).map((c) => c.num)
+      if (busy.length) return { message: 'eraseBusy', values: { nums: busy } }
+      try {
+        await eraseRecords(db.current, { chats: what.chats, marks: what.marks, keepMarks: what.keepMarks })
+      } catch (err) {
+        return err?.name === 'Changed' ? { message: 'rowsChanged', values: { nums: err.nums } } : 'eraseFailed'
+      }
+      if (touched.current) touched.current.erased = true
+      // A room that showed an erased chat is left empty; inspect: lets go of what is gone.
+      const gone = new Set(what.chats.map((c) => c.id))
+      const a = current.current
+      if (gone.has(roomOnScreen(a))) commit({ ...a, context: { ...a.context, room: null } })
+      setInspected((n) => (what.nums.includes(n) ? null : n))
+      loadConversations().catch(() => {})
+      remember(body)
+      return { done: true, says: { message: 'erased', values: { nums: what.nums } } }
+    }
     if (what.kind === 'copy') {
       // copy: (C143 (f)): one thing as Markdown, on the clipboard.
       const made = await markdownOf(what.num).catch(() => null)
@@ -592,7 +614,7 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'name'))
     remember(body)
     return null
-  }, [readKeys, remember, run, showView, updateWelcome, markdownOf])
+  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, commit, loadConversations])
 
   // ── undo: (C134, as built) ────────────────────────────
   // Each command line that changes something is kept with what it changed,
@@ -644,6 +666,13 @@ export default function Shell() {
     const t = touched.current
     touched.current = null
     if (out && !out.done) return out
+    // erase: is never taken back, and what came before may point at what
+    // it removed, so undo: stops here (C134, C137).
+    if (t.erased) {
+      undoStack.current = []
+      setUndoTop(null)
+      return out
+    }
     const entry = { line: body }
     if (current.current !== before.arrangement) entry.arrangement = before.arrangement
     if (viewNow.current !== before.view) entry.view = before.view
@@ -665,7 +694,6 @@ export default function Shell() {
 
   // ── Prompts from the bar (stage 4) ────────────────────
   const { messages, activeConversationId, sendMessage, resendWhole, askSource } = useChat()
-  const { conversations, createConversation, loadConversations } = useConversations()
   const { settings } = useSettings()
   const { buildSystemPrompt } = useCollabMode()
   const [keyed, setKeyed] = useState(null) // whether there is a key, without decrypting it; null until known
