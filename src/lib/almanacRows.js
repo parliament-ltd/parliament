@@ -8,7 +8,9 @@
 //   is the view's to say (recordsFilter.js; A19, C133);
 // - a plan (a docket, C131) once it holds more than one branch. Every chat
 //   starts a docket (C18), and a docket of one branch is that chat, so it has
-//   no row of its own until it is forked. Archived dockets stay out.
+//   no row of its own until it is forked.
+// Archived rows are rows too, marked; the view hides them unless asked for
+// with in:archive (C135, C143 (c)).
 // Pinned rows lead, whatever the order (v30); then the most recently active.
 //
 // Each row also carries what the filters read (stage 6, piece 1; C132): its
@@ -102,6 +104,7 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
     const row = {
       kind: 'chat', num: c.num, id: c.id, chatId: c.id,
       title: c.title ?? '', text: null, summary: c.aiSummary || null,
+      store: 'conversations', archived: Boolean(c.archived), tagsMine: Array.isArray(c.tagsMine) ? c.tagsMine : [],
       room: roomOf(c.id), roomId: roomIdOf(c.id), tags: Array.isArray(c.tags) ? c.tags : [], pinned: Boolean(c.pinned),
       createdAt: c.createdAt ?? null, activeAt: c.updatedAt ?? c.createdAt ?? null,
       ...placeOf(c.id),
@@ -114,7 +117,7 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
   }
   for (const d of dockets.filter(numbered)) {
     const branches = Array.isArray(d.branches) ? d.branches.length : 0
-    if (d.archived || branches < 2) continue
+    if (branches < 2) continue
     const first = Array.isArray(d.order) ? d.order[0] : null
     const chat = chats.find((c) => c.docketId === d.id && c.branch === first) ?? null
     // A plan holds its chats: what they hold, who answered them, and what
@@ -124,6 +127,7 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
     const costs = own.map((r) => r.cost)
     rows.push({
       kind: 'docket', num: d.num, id: d.id, chatId: chat?.id ?? null, chatNum: chat?.num ?? null,
+      store: 'dockets', archived: Boolean(d.archived), tagsMine: Array.isArray(d.tagsMine) ? d.tagsMine : [],
       title: d.title ?? '', text: null, summary: null,
       room: chat ? roomOf(chat.id) : null, roomId: chat ? roomIdOf(chat.id) : null,
       tags: Array.isArray(d.tags) ? d.tags : [], pinned: Boolean(d.pinned),
@@ -134,17 +138,18 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
       collections: union('collections'), words: '',
     })
   }
-  const marking = (kind, r, text, chatId) => ({
+  const marking = (kind, store, r, text, chatId) => ({
     kind, num: r.num, id: r.id, chatId: chatId ?? null,
+    store, archived: Boolean(r.archived), tagsMine: Array.isArray(r.tagsMine) ? r.tagsMine : [],
     title: firstLine(text), text: String(text ?? ''), summary: null,
     room: roomOf(chatId), roomId: roomIdOf(chatId), tags: Array.isArray(r.tags) ? r.tags : [], pinned: Boolean(r.pinned),
     createdAt: r.createdAt ?? null, activeAt: r.createdAt ?? null,
     ...placeOf(chatId),
     marks: [], models: [], sources: [], cost: null, collections: [], words: '',
   })
-  for (const n of notes.filter(numbered)) rows.push(marking('note', n, n.text, n.conversationId))
-  for (const h of highlights.filter(numbered)) rows.push(marking(h.kind === 'quote' ? 'quote' : 'term', h, h.text, h.conversationId))
-  for (const q of quotes.filter(numbered)) rows.push(marking('quote', q, q.content, q.targetConversationId))
+  for (const n of notes.filter(numbered)) rows.push(marking('note', 'notes', n, n.text, n.conversationId))
+  for (const h of highlights.filter(numbered)) rows.push(marking(h.kind === 'quote' ? 'quote' : 'term', 'highlights', h, h.text, h.conversationId))
+  for (const q of quotes.filter(numbered)) rows.push(marking('quote', 'pins', q, q.content, q.targetConversationId))
   return rows
 }
 

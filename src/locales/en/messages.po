@@ -350,6 +350,38 @@ msgstr "Favorites"
 msgid "collection.untitled"
 msgstr "Untitled collection"
 
+#. A heading over a document chat's text
+#. js-lingui-explicit-id
+msgid "copy.document"
+msgstr "The document"
+
+#. Where a note, keyword or quote came from: a chat number
+#. js-lingui-explicit-id
+msgid "copy.from"
+msgstr "from {num}"
+
+#. js-lingui-explicit-id
+msgid "copy.keywords"
+msgstr "Keywords"
+
+#. js-lingui-explicit-id
+msgid "copy.notes"
+msgstr "Notes"
+
+#. js-lingui-explicit-id
+msgid "copy.quotes"
+msgstr "Quotes"
+
+#. A source page's revision number
+#. js-lingui-explicit-id
+msgid "copy.revision"
+msgstr "revision {revision}"
+
+#. Who wrote a prompt, in copied Markdown
+#. js-lingui-explicit-id
+msgid "copy.you"
+msgstr "You"
+
 #. js-lingui-explicit-id
 msgid "count.branches"
 msgstr "{count, plural, one {# branch} other {# branches}}"
@@ -407,6 +439,22 @@ msgid "enter.apiUnknown"
 msgstr "No provider is called {word}. Try {words}"
 
 #. js-lingui-explicit-id
+msgid "enter.archiveAlready"
+msgstr "Those are archived already"
+
+#. js-lingui-explicit-id
+msgid "enter.archiveNot"
+msgstr "Those are not archived"
+
+#. js-lingui-explicit-id
+msgid "enter.archiveOff"
+msgstr "Enter brings {nums} back from the archive"
+
+#. js-lingui-explicit-id
+msgid "enter.archiveOn"
+msgstr "Enter archives {nums}. Nothing is deleted, and in:archive shows them"
+
+#. js-lingui-explicit-id
 msgid "enter.barMove"
 msgstr "{place, select, top {Enter moves the bar to the top} bottom {Enter moves the bar to the bottom} left {Enter moves the bar to the left} right {Enter moves the bar to the right} other {Enter moves the bar to the centre}}"
 
@@ -430,6 +478,10 @@ msgstr "Enter brings {boards} beside what is here"
 #. js-lingui-explicit-id
 msgid "enter.bringHere"
 msgstr "Everything it brings is here already"
+
+#. js-lingui-explicit-id
+msgid "enter.byNumber"
+msgstr "This takes numbers, like 207, 216 or 201b"
 
 #. js-lingui-explicit-id
 msgid "enter.clearFilter"
@@ -510,6 +562,22 @@ msgstr "{col} always shows"
 #. js-lingui-explicit-id
 msgid "enter.colsUnknown"
 msgstr "No column is called {word}. Try {words}"
+
+#. js-lingui-explicit-id
+msgid "enter.copied"
+msgstr "Copied {num} as Markdown"
+
+#. js-lingui-explicit-id
+msgid "enter.copyFailed"
+msgstr "The browser did not allow copying. Click into the page and try again"
+
+#. js-lingui-explicit-id
+msgid "enter.copyHidden"
+msgstr "{count, plural, one {# hidden message left out} other {# hidden messages left out}}"
+
+#. js-lingui-explicit-id
+msgid "enter.copyOne"
+msgstr "Enter copies {num} as Markdown"
 
 #. js-lingui-explicit-id
 msgid "enter.costBad"
@@ -692,6 +760,10 @@ msgstr "A room's name is at most {max} characters"
 msgid "enter.nameNoChat"
 msgstr "This room has no chat yet. Its first prompt starts it, and then name: names it"
 
+#. js-lingui-explicit-id
+msgid "enter.nameNoTitle"
+msgstr "{num} is its own words, so it takes no name"
+
 #. {name} is the person's own words
 #. js-lingui-explicit-id
 msgid "enter.nameRoom"
@@ -700,6 +772,18 @@ msgstr "Enter names this room: {name}"
 #. js-lingui-explicit-id
 msgid "enter.nameSame"
 msgstr "This room has that name already"
+
+#. js-lingui-explicit-id
+msgid "enter.nameSameTitle"
+msgstr "{num} has that name already"
+
+#. js-lingui-explicit-id
+msgid "enter.nameTitle"
+msgstr "Enter names {num}: {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.nameTitleLong"
+msgstr "A name is at most {max} characters"
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomHere"
@@ -769,6 +853,14 @@ msgstr "Enter shows the saved search {name}"
 #. js-lingui-explicit-id
 msgid "enter.openWhichSaved"
 msgstr "More than one saved search starts that way: {words}"
+
+#. js-lingui-explicit-id
+msgid "enter.pinOff"
+msgstr "Enter unpins {nums}"
+
+#. js-lingui-explicit-id
+msgid "enter.pinOn"
+msgstr "Enter pins {nums} at the top"
 
 #. js-lingui-explicit-id
 msgid "enter.popAlready"
@@ -944,6 +1036,18 @@ msgid "enter.restingPrompt"
 msgstr "p> for a prompt"
 
 #. js-lingui-explicit-id
+msgid "enter.retag"
+msgstr "{count, plural, one {Enter renames {from} to {to} on # thing} other {Enter renames {from} to {to} on # things}}"
+
+#. js-lingui-explicit-id
+msgid "enter.retagMerge"
+msgstr "{to} is a tag already, so the two become one"
+
+#. js-lingui-explicit-id
+msgid "enter.retagSame"
+msgstr "That is its name already"
+
+#. js-lingui-explicit-id
 msgid "enter.retired"
 msgstr "{verb} is no longer a command"
 
@@ -954,6 +1058,18 @@ msgstr "{verb} is no longer a command. Use {instead}"
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
 msgstr "The last room is here already"
+
+#. js-lingui-explicit-id
+msgid "enter.rowsChanged"
+msgstr "{nums} changed meanwhile, so nothing was written. Try again"
+
+#. js-lingui-explicit-id
+msgid "enter.rowsFailed"
+msgstr "The change was not kept. Try again"
+
+#. js-lingui-explicit-id
+msgid "enter.rowsTogether"
+msgstr "{verb} shares a line only with commands like it, for now"
 
 #. js-lingui-explicit-id
 msgid "enter.savedFailed"
@@ -1027,6 +1143,30 @@ msgid "enter.swapSame"
 msgstr "swap: takes two different boards"
 
 #. js-lingui-explicit-id
+msgid "enter.tagAdd"
+msgstr "Enter tags {nums} with {tag}"
+
+#. js-lingui-explicit-id
+msgid "enter.tagAlready"
+msgstr "Each of those carries {tag} already"
+
+#. js-lingui-explicit-id
+msgid "enter.tagLong"
+msgstr "A tag is at most {max} characters"
+
+#. js-lingui-explicit-id
+msgid "enter.tagNone"
+msgstr "None of those carries {tag}"
+
+#. js-lingui-explicit-id
+msgid "enter.tagNowhere"
+msgstr "Nothing carries {tag}"
+
+#. js-lingui-explicit-id
+msgid "enter.tagWhich"
+msgstr "Which numbers? For example: {example}"
+
+#. js-lingui-explicit-id
 msgid "enter.takesExample"
 msgstr "{verb} does not take that. For example: {example}"
 
@@ -1085,12 +1225,40 @@ msgid "enter.tourOn"
 msgstr "Enter shows the steps again"
 
 #. js-lingui-explicit-id
+msgid "enter.undoChanged"
+msgstr "{nums} changed since, so undo: stops here"
+
+#. js-lingui-explicit-id
+msgid "enter.undoFailed"
+msgstr "Undo did not go through, so it stops here"
+
+#. js-lingui-explicit-id
+msgid "enter.undoLine"
+msgstr "Enter takes back {line}"
+
+#. js-lingui-explicit-id
+msgid "enter.undone"
+msgstr "Took back {line}"
+
+#. js-lingui-explicit-id
+msgid "enter.undoNothing"
+msgstr "Nothing to take back in this tab"
+
+#. js-lingui-explicit-id
 msgid "enter.unknown"
 msgstr "No command called {verb}. Type ? for every command"
 
 #. js-lingui-explicit-id
 msgid "enter.unknownHelp"
 msgstr "No command called {verb}. Enter shows every command"
+
+#. js-lingui-explicit-id
+msgid "enter.untag"
+msgstr "Enter takes {tag} off {nums}"
+
+#. js-lingui-explicit-id
+msgid "enter.untagAll"
+msgstr "{count, plural, one {Enter takes {tag} off the one thing that carries it} other {Enter takes {tag} off all # things that carry it}}"
 
 #. js-lingui-explicit-id
 msgid "enter.widthAlone"

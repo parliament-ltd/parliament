@@ -193,7 +193,7 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.inspect', message: 'Look at one thing in detail, where you are' } }),
   v({ verb: 'pin', group: 'items', example: 'pin:207', forms: ['pin:207', 'pin:201b', 'pin:"Rail candidates"'], takes: [['addresses'], ['text']], stage: 6, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.pin', message: 'Keep something at the top of its list' } }),
-  v({ verb: 'archive', group: 'items', example: 'archive:209', takes: [['addresses']], stage: 6, undoable: true, click: 'apply',
+  v({ verb: 'archive', group: 'items', example: 'archive:209', forms: ['archive:209', 'archive:off 209'], takes: [['addresses'], [['off'], 'addresses']], stage: 6, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.archive', message: 'Put something away without deleting it' } }),
   v({ verb: 'copy', group: 'items', example: 'copy:207', takes: [['address']], stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.copy', message: 'Copy something as Markdown' } }),

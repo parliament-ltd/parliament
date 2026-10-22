@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useLingui } from '@lingui/react'
 import './chrome.css'
 import { COPY } from '../copy'
-import { initDB, getConversation, getSetting, setSetting } from '../lib/db'
+import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument } from '../lib/db'
 import { renameMode } from '../lib/modes'
 import { loadSpace, saveArrangement } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
@@ -22,7 +22,7 @@ import { useConversations } from '../stores/ConversationContext'
 import { useSettings } from '../stores/SettingsContext'
 import { useCollabMode } from '../stores/CollabModeContext'
 import { useIsStreaming, useHiddenIds, usePendingDeletes, useStreamEnd } from '../stores/chatHooks'
-import { sendableOf } from '../stores/chatStore'
+import { sendableOf, hiddenIds, pendingDeletes } from '../stores/chatStore'
 import { fromSource } from '../stores/sendHistory'
 import { preview, viewFromSaved, lineOf } from './preview'
 import Bar from './Bar'
@@ -38,7 +38,10 @@ import { listEntries } from '../catalog'
 import { listLayoutEntries } from '../catalog/layouts'
 import { readAlmanac } from '../lib/almanacRows'
 import { createFactsCache } from '../lib/chatFacts'
-import { readSaved, keepSearch, forgetSearch } from '../lib/savedSearches'
+import { readSaved, keepSearch, forgetSearch, putSaved } from '../lib/savedSearches'
+import { changeRecords } from '../lib/records'
+import { chatMarkdown, planMarkdown, markingMarkdown } from '../lib/recordsMarkdown'
+import { dayOf } from './when'
 import { EMPTY_VIEW, applyView, nextView, viewLine, isAtRest } from '../lib/recordsFilter'
 import { onRecordsChanged } from '../lib/records'
 
@@ -63,6 +66,9 @@ import { onRecordsChanged } from '../lib/records'
 // Closing a window brings its board back; leaving the page closes them all.
 // A window cannot be reopened without a click, so on load what was popped
 // comes back to the page.
+
+// How many command lines undo: can take back, in this tab (C134).
+const UNDO_MAX = 50
 
 // The source a prompt goes to when there is no key (stage 4).
 const SOURCE = 'wikipedia'
@@ -402,6 +408,57 @@ export default function Shell() {
   }, [saved, recordsView])
   const recordsSearch = useMemo(() => ({ count: shownRows?.length ?? 0 }), [shownRows])
   useEffect(() => { recordsRef.current = records }, [records])
+  const savedNow = useRef([])
+  useEffect(() => { savedNow.current = saved }, [saved])
+
+  // copy: (C143 (f)): one thing as Markdown, built from what is stored, in
+  // the reader's language around the person's words. Hidden messages and
+  // messages being deleted, known while their chat is open here, stay out.
+  const markdownOf = useCallback(async (num) => {
+    const rows = recordsRef.current?.rows ?? []
+    const row = rows.find((r) => r.num === num)
+    if (!row) return null
+    const modelName = (id) => models(PROVIDER).find((m) => m.id === id || m.apiId === id)?.name ?? id ?? ''
+    const words = {
+      you: i18n._(COPY.copy.you),
+      untitled: i18n._(COPY.almanac.untitled),
+      // A source's answer is named for its source; a model's for its model.
+      by: (m) => (m.source?.id ? m.source.name || destination(m.source.id)?.name || m.source.id : modelName(m.model)),
+      heading: { note: i18n._(COPY.copy.notes), term: i18n._(COPY.copy.keywords), quote: i18n._(COPY.copy.quotes), document: i18n._(COPY.copy.document) },
+      kind: (k) => i18n._(COPY.kinds[k]),
+      from: (n) => i18n._(COPY.copy.from, { num: n }),
+      revision: (r) => i18n._(COPY.copy.revision, { revision: r }),
+    }
+    let hidden = 0
+    const chatOf = async (chatRow) => {
+      const all = await getMessages(chatRow.chatId)
+      const out = new Set([...hiddenIds(chatRow.chatId), ...pendingDeletes(chatRow.chatId).map((d) => d.messageId)])
+      hidden += all.filter((m) => out.has(m.id) && m.content).length
+      const doc = await getSbrdDocument(chatRow.chatId).catch(() => null)
+      return {
+        num: chatRow.num,
+        title: chatRow.title,
+        facts: [String(chatRow.num), chatRow.room ? roomLabel(i18n, chatRow.room) : null, dayOf(i18n, chatRow.createdAt)].filter(Boolean),
+        messages: all.filter((m) => !out.has(m.id)).map((m) => ({ ...m, model: m.model ?? null })),
+        document: (doc?.paragraphs ?? []).map((p) => p?.text).filter(Boolean),
+        markings: rows.filter((r) => r.chatNum === chatRow.num && ['note', 'term', 'quote'].includes(r.kind)).map((r) => ({ kind: r.kind, num: r.num, text: r.text })),
+      }
+    }
+    // A reply that did not record its model is from its chat's last one (C132 (g)).
+    const withModel = async (chatRow) => {
+      const chat = await chatOf(chatRow)
+      const conv = await getConversation(chatRow.chatId).catch(() => null)
+      chat.messages = chat.messages.map((m) => (m.role === 'assistant' && !m.model && !m.source ? { ...m, model: conv?.model ?? null } : m))
+      return chat
+    }
+    let text
+    if (row.kind === 'chat') text = chatMarkdown(await withModel(row), words)
+    else if (row.kind === 'docket') {
+      const chats = rows.filter((r) => r.kind === 'chat' && r.docketNum === row.num).sort((a, b) => String(a.branch).localeCompare(String(b.branch)))
+      text = planMarkdown(await Promise.all(chats.map(withModel)), words)
+    } else text = markingMarkdown({ kind: row.kind, num: row.num, text: row.text, chatNum: row.chatNum }, words)
+    return { text, hidden }
+  }, [i18n])
 
   // ── The Library's catalogue (stage 5, piece 4) ────────
   // Read while the Library is in the space, here or in a window, and again
@@ -459,6 +516,31 @@ export default function Shell() {
     if (db.current && body) keepCommand(db.current, body).then((kept) => (kept ? readCommands(db.current).then(setLines) : null)).catch(() => {})
   }, [])
   const act = useCallback(async (what, body, next = null) => {
+    if (what.kind === 'rows') {
+      // pin:, archive:, name: and the tag verbs (C143), all or nothing.
+      let done
+      try {
+        done = await changeRecords(db.current, what.changes)
+      } catch (err) {
+        return err?.name === 'Changed' ? { message: 'rowsChanged', values: { nums: err.nums } } : 'rowsFailed'
+      }
+      touched.current?.records.push(...done)
+      remember(body)
+      return null
+    }
+    if (what.kind === 'copy') {
+      // copy: (C143 (f)): one thing as Markdown, on the clipboard.
+      const made = await markdownOf(what.num).catch(() => null)
+      if (!made) return 'copyFailed'
+      try {
+        await navigator.clipboard.writeText(made.text)
+      } catch {
+        return 'copyFailed'
+      }
+      remember(body)
+      const also = made.hidden ? [{ message: 'copyHidden', values: { count: made.hidden } }] : []
+      return { done: true, says: { message: 'copied', values: { num: what.num }, also } }
+    }
     if (what.kind === 'tourOn' || what.kind === 'tourOff') {
       // tour: may bring the welcome card back into the space first.
       if (next) { const refused = await run(next, null); if (refused) return refused }
@@ -473,9 +555,12 @@ export default function Shell() {
     }
     if (what.kind === 'saveSearch' || what.kind === 'forgetSearch') {
       // save: and forget: (C140). Kept on this device only.
+      const was = what.kind === 'saveSearch'
+        ? savedNow.current.find((x) => x.name.toLocaleLowerCase() === what.name.toLocaleLowerCase()) ?? null
+        : savedNow.current.find((x) => x.id === what.id) ?? null
       try {
-        if (what.kind === 'saveSearch') await keepSearch(db.current, what)
-        else await forgetSearch(db.current, what.id)
+        const kept = what.kind === 'saveSearch' ? await keepSearch(db.current, what) : (await forgetSearch(db.current, what.id), null)
+        touched.current?.saved.push({ before: was, after: kept })
       } catch {
         return 'savedFailed'
       }
@@ -507,9 +592,69 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'name'))
     remember(body)
     return null
-  }, [readKeys, remember, run, showView, updateWelcome])
+  }, [readKeys, remember, run, showView, updateWelcome, markdownOf])
 
-  const onRun = useCallback((next, body, go, what) => (what ? act(what, body, next) : run(next, body)), [act, run])
+  // ── undo: (C134, as built) ────────────────────────────
+  // Each command line that changes something is kept with what it changed,
+  // so undo: can take it back whole: rows, saved searches, the filters on
+  // Records and the space. The last 50 lines, for this tab. If something it
+  // changed has changed since, undo stops there rather than write over it.
+  const undoStack = useRef([])
+  const [undoTop, setUndoTop] = useState(null) // the line undo: would take back
+  const touched = useRef(null) // what the command running now changed in rows and saved searches
+
+  const undo = useCallback(async (body) => {
+    const entry = undoStack.current.at(-1)
+    if (!entry) return 'undoNothing'
+    const stop = (says) => { undoStack.current = []; setUndoTop(null); return says }
+    if (entry.records) {
+      try {
+        await changeRecords(db.current, entry.records.map((r) => ({ store: r.store, id: r.id, num: r.num, set: r.before, expect: r.after })))
+      } catch (err) {
+        return stop(err?.name === 'Changed' ? { message: 'undoChanged', values: { nums: err.nums } } : 'undoFailed')
+      }
+    }
+    if (entry.saved) {
+      try {
+        for (const s of [...entry.saved].reverse()) {
+          if (s.before) await putSaved(db.current, s.before)
+          else if (s.after) await forgetSearch(db.current, s.after.id)
+        }
+      } catch {
+        return stop('undoFailed')
+      }
+      setSaved(await readSaved(db.current).catch(() => []))
+    }
+    if (entry.view) showView(entry.view)
+    if (entry.arrangement) {
+      const refused = await run(entry.arrangement, null)
+      if (refused) return stop(refused)
+    }
+    undoStack.current = undoStack.current.slice(0, -1)
+    setUndoTop(undoStack.current.at(-1)?.line ?? null)
+    remember(body)
+    return { done: true, says: { message: 'undone', values: { line: entry.line } } }
+  }, [remember, run, showView])
+
+  const onRun = useCallback(async (next, body, go, what) => {
+    if (what?.kind === 'undo') return undo(body)
+    const before = { arrangement: current.current, view: viewNow.current }
+    touched.current = { records: [], saved: [] }
+    const out = what ? await act(what, body, next) : await run(next, body)
+    const t = touched.current
+    touched.current = null
+    if (out && !out.done) return out
+    const entry = { line: body }
+    if (current.current !== before.arrangement) entry.arrangement = before.arrangement
+    if (viewNow.current !== before.view) entry.view = before.view
+    if (t.records.length) entry.records = t.records
+    if (t.saved.length) entry.saved = t.saved
+    if (body && (entry.arrangement || entry.view || entry.records || entry.saved)) {
+      undoStack.current = [...undoStack.current, entry].slice(-UNDO_MAX)
+      setUndoTop(body)
+    }
+    return out
+  }, [act, run, undo])
 
   const onRoomReady = useCallback((chatId) => {
     readyRoom.current = chatId
@@ -567,7 +712,7 @@ export default function Shell() {
       stacked: getComputedStyle(stage).flexDirection === 'column',
     }
   }, [])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).

@@ -350,7 +350,8 @@ describe('name: for the room (C40)', () => {
 
   it('runs alone, and waits for its stages elsewhere', () => {
     expect(at('>name:"Owls" bar:top').text).toBe('name: runs on a line of its own for now')
-    expect(at('>name:207 "New title"').text).toBe('name: is not built yet')
+    // name: with a number names a chat or a plan on Records (stage 6, piece 3).
+    expect(at('>name:207 "New title"').text).toBe('Nothing here has the number 207')
     expect(at('>name:"Q2"', shipped('almanac')).text).toMatch(/not built yet|works on/)
   })
 })
@@ -529,5 +530,49 @@ describe('saved searches and columns (stage 6, piece 2; C140, C141)', () => {
     expect(at('>cols:').text).toBe('Records shows Type, ID, Title, Room, Tags, Created, and Last active. A minus hides one, a plus shows it again')
     expect(at('>cols:-id').text).toBe('ID always shows')
     expect(at('>cols:-colour').text).toBe('No column is called colour. Try type, id, title, room, tags, created, or active')
+  })
+})
+
+describe('the row verbs, copy: and undo: (stage 6, piece 3; C143, C134)', () => {
+  const row = (num, kind, extra = {}) => ({
+    num, kind, id: `${kind}${num}`, store: kind === 'chat' ? 'conversations' : 'notes', title: `${kind} ${num}`,
+    tags: [], tagsMine: [], pinned: false, archived: false, docketNum: null, branch: null, ...extra,
+  })
+  const rows = [row(202, 'chat', { tags: ['owls'] }), row(204, 'chat', { pinned: true, tags: ['owls'] }), row(210, 'note', { text: 'Range map' })]
+  const at = (value, screens = {}) => {
+    const p = preview(value, { mode: 'command', arrangement: almanac(), screens: { records: { rows, view: { search: '', filters: [], sort: { by: 'active', asc: false } } }, ...screens } })
+    const also = [].concat(p.says?.also ?? []).map((x) => say(i18n, x.message, x.values))
+    return { ...p, text: [say(i18n, p.says.message, p.says.values), ...also].join(' · ') }
+  }
+
+  it('says what each would change, before Enter', () => {
+    expect(at('>pin:202, 210').text).toBe('Enter pins 202 and 210 at the top')
+    expect(at('>pin:204').text).toBe('Enter unpins 204')
+    expect(at('>archive:202').text).toBe('Enter archives 202. Nothing is deleted, and in:archive shows them')
+    expect(at('>name:202 "Barn owls"').text).toBe('Enter names 202: Barn owls')
+    expect(at('>name:210 "x"').text).toBe('210 is its own words, so it takes no name')
+    expect(at('>tagadd:essay 202, 210').text).toBe('Enter tags 202 and 210 with essay')
+    expect(at('>untag:owls').text).toBe('Enter takes owls off all 2 things that carry it')
+    expect(at('>retag:owls to birds').text).toBe('Enter renames owls to birds on 2 things')
+  })
+
+  it('hands the shell the changes, all of a line together', () => {
+    const p = at('>pin:202 tagadd:essay 202')
+    expect(p.text).toBe('Enter runs 2 commands in turn: pin: and tagadd: · Enter pins 202 at the top · Enter tags 202 with essay')
+    expect(p.act).toEqual({ kind: 'rows', changes: [{ store: 'conversations', id: 'chat202', num: 202, set: { pinned: true, tags: ['owls', 'essay'], tagsMine: ['essay'] }, expect: { pinned: false, tags: ['owls'], tagsMine: [] } }] })
+    expect(at('>pin:202 bar:top').text).toBe('pin: shares a line only with commands like it, for now')
+  })
+
+  it('copy: names what it copies', () => {
+    expect(at('>copy:210').text).toBe('Enter copies 210 as Markdown')
+    expect(at('>copy:210').act).toEqual({ kind: 'copy', num: 210 })
+    expect(at('>copy:299').text).toBe('Nothing here has the number 299')
+  })
+
+  it('undo: names the line it takes back, or that there is none', () => {
+    expect(at('>undo:', { undo: 'pin:202' }).text).toBe('Enter takes back pin:202')
+    expect(at('>undo:', { undo: 'pin:202' }).act).toEqual({ kind: 'undo' })
+    expect(at('>undo:').text).toBe('Nothing to take back in this tab')
+    expect(at('>undo:242', { undo: 'pin:202' }).text).toBe('undo: is not built yet')
   })
 })

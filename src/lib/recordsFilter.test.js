@@ -221,3 +221,15 @@ describe('reading a filter checks it before Enter', () => {
     expect(parse('in:"Code Lab" room').commands[0].args).toHaveLength(2)
   })
 })
+
+describe('the archive (C135, C143 (c))', () => {
+  const archived = [...rows, row(214, 'chat', { title: 'Old owls', archived: true }), row(215, 'note', { title: 'Old note', text: 'Old note', archived: true })]
+  const at = (v) => applyView(archived, v, ctx).map((r) => r.num)
+  it('hides what is archived, and in:archive shows only that', () => {
+    expect(at(EMPTY_VIEW)).not.toContain(214)
+    expect(at({ ...EMPTY_VIEW, search: 'old' })).toEqual([])
+    const v = nextView(EMPTY_VIEW, [{ filter: readFilter(step('in:archive'), read).filter }])
+    expect(at(v)).toEqual([215, 214])
+    expect(readFilter(step('in:archive room'), read).bad).toEqual({ message: 'inNoRoom', values: { name: 'archive' } })
+  })
+})

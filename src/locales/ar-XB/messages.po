@@ -350,6 +350,38 @@ msgstr ""
 msgid "collection.untitled"
 msgstr ""
 
+#. A heading over a document chat's text
+#. js-lingui-explicit-id
+msgid "copy.document"
+msgstr ""
+
+#. Where a note, keyword or quote came from: a chat number
+#. js-lingui-explicit-id
+msgid "copy.from"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "copy.keywords"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "copy.notes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "copy.quotes"
+msgstr ""
+
+#. A source page's revision number
+#. js-lingui-explicit-id
+msgid "copy.revision"
+msgstr ""
+
+#. Who wrote a prompt, in copied Markdown
+#. js-lingui-explicit-id
+msgid "copy.you"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "count.branches"
 msgstr ""
@@ -407,6 +439,22 @@ msgid "enter.apiUnknown"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.archiveAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.archiveNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.archiveOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.archiveOn"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.barMove"
 msgstr ""
 
@@ -429,6 +477,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.bringHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.byNumber"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -509,6 +561,22 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.colsUnknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.copied"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.copyFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.copyHidden"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.copyOne"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -692,6 +760,10 @@ msgstr ""
 msgid "enter.nameNoChat"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.nameNoTitle"
+msgstr ""
+
 #. {name} is the person's own words
 #. js-lingui-explicit-id
 msgid "enter.nameRoom"
@@ -699,6 +771,18 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.nameSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameSameTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameTitleLong"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -768,6 +852,14 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.openWhichSaved"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.pinOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.pinOn"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -944,6 +1036,18 @@ msgid "enter.restingPrompt"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.retag"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.retagMerge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.retagSame"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.retired"
 msgstr ""
 
@@ -953,6 +1057,18 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rowsChanged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rowsFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rowsTogether"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1027,6 +1143,30 @@ msgid "enter.swapSame"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.tagAdd"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tagAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tagLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tagNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tagNowhere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tagWhich"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.takesExample"
 msgstr ""
 
@@ -1085,11 +1225,39 @@ msgid "enter.tourOn"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.undoChanged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.undoFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.undoLine"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.undone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.undoNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.unknown"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.unknownHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.untag"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.untagAll"
 msgstr ""
 
 #. js-lingui-explicit-id

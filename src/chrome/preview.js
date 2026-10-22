@@ -23,6 +23,7 @@ import { holdsKey } from '../commands/parse'
 import { BOARD_NAMES } from '../commands/verbs'
 import { FILTERS, EMPTY_VIEW, readFilter, readSort, nextView, clears, applyView, costUnknown, viewLine } from '../lib/recordsFilter'
 import { findSaved, cleanSearchName, SEARCH_NAME_MAX } from '../lib/savedSearches'
+import { ROW_VERBS, isRowStep, planRowLine, planCopy } from '../lib/rowVerbs'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
@@ -33,15 +34,17 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // inspect:, which shows one thing in detail under the bar, and api:, which
 // opens the key panel there (stage 5).
 // save: and forget: keep and remove saved searches on Records (stage 6,
-// piece 2; C140).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget'])
+// piece 2; C140). copy: puts one thing on the clipboard as Markdown, and
+// undo: takes back the last command line (piece 3; C143 (f), C134).
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
 // piece 1; C132). They share a line with each other and with layout
 // commands (C99).
 const VIEW_VERBS = Object.freeze([...FILTERS, 'sort', 'clear'])
-export const BUILT = new Set([...ARRANGEMENT_VERBS, ...BRINGS, ...ACTS, FOCUS, ...VIEW_VERBS])
+// pin:, archive:, name: with a number and the tag verbs change rows (C143).
+export const BUILT = new Set([...ARRANGEMENT_VERBS, ...BRINGS, ...ACTS, FOCUS, ...VIEW_VERBS, ...ROW_VERBS])
 
 /** A view as one line of commands, as a saved search keeps it (C140 (b)). */
 export const lineOf = (view) => viewLine(view).map((f) => f.text).join(' ')
@@ -85,6 +88,21 @@ function planSave(a, step, screens = {}) {
     says: { message: before ? 'saveReplace' : 'saveKeep', values: { name: named.name } },
     act: { kind: 'saveSearch', name: named.name, search, line },
   }
+}
+
+/** copy:207, one thing as Markdown (C143 (f)). The shell builds it from what is stored. */
+function planCopyStep(a, step, screens = {}) {
+  const p = planCopy(step.match?.values ?? [], screens.records?.rows ?? [])
+  if (p.bad) return { says: p.bad, act: null }
+  return { says: p.says, act: { kind: 'copy', num: p.row.num } }
+}
+
+/** undo: takes back the last command line of this tab (C134). undo:242, one edit, comes with editing. */
+function planUndo(a, step, screens = {}) {
+  if ((step.match?.values ?? []).length) return null
+  return screens.undo
+    ? { says: { message: 'undoLine', values: { line: screens.undo } }, act: { kind: 'undo' } }
+    : { says: { message: 'undoNothing' }, act: null }
 }
 
 /** forget:"…" removes a saved search; what it found is untouched (C140 (f)). */
@@ -297,11 +315,22 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   const answer = enterLine(value, { mode, board: arrangement.addressed, built })
   if (answer.state !== 'ready') return { answer, says: { message: answer.message, values: answer.values }, next: null }
 
+  // Row commands (C143): they share a line with each other (C99), and
+  // undo: takes the line back whole.
+  const rowSteps = answer.steps.filter(isRowStep)
+  if (rowSteps.length) {
+    if (rowSteps.length !== answer.steps.length) return { answer, says: { message: 'rowsTogether', values: { verb: `${rowSteps[0].verb}:` } }, next: null }
+    const p = planRowLine(answer.steps, screens.records?.rows ?? [])
+    if (p.bad) return { answer, says: p.bad, next: null }
+    const says = answer.steps.length > 1 ? { message: answer.message, values: answer.values, also: p.each } : p.says
+    return { answer, says, next: null, act: { kind: 'rows', changes: p.changes } }
+  }
+
   const acts = answer.steps.filter((s) => ACTS.includes(s.verb))
   if (acts.length) {
     if (answer.steps.length > 1) return { answer, says: { message: 'aloneNow', values: { verb: `${acts[0].verb}:` } }, next: null }
     const step = answer.steps[0]
-    const plans = { tour: planTour, name: planName, inspect: planInspect, api: planApi, save: planSave, forget: planForget }
+    const plans = { tour: planTour, name: planName, inspect: planInspect, api: planApi, save: planSave, forget: planForget, copy: planCopyStep, undo: planUndo }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
     return { answer, says: p.says, next: p.next ?? null, act: p.act ?? null }

@@ -38,3 +38,13 @@ describe('a backup with replies that recorded how they were made (C132 (h))', ()
     expect(check(reply({ model: 7 })).valid).toBe(false)
   })
 })
+
+describe('a backup with pins, archive and tags on every kind (C143 (h))', () => {
+  it('accepts them, and refuses what they cannot hold', () => {
+    const c = (extra) => validateBackup({ conversations: [{ ...chat, ...extra }] })
+    expect(c({ archived: true, tags: ['owls'], tagsMine: ['owls'] })).toEqual({ valid: true })
+    expect(c({ archived: 'yes' }).valid).toBe(false)
+    expect(c({ tagsMine: [7] }).valid).toBe(false)
+    expect(c({ tags: [''] }).valid).toBe(false)
+  })
+})

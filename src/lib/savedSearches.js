@@ -87,6 +87,14 @@ export async function keepSearch(db, { name, search = '', line = '', now = new D
   return record
 }
 
+/** Puts a saved search back exactly as it was, for undo: (C134). */
+export async function putSaved(db, record) {
+  const clean = cleanSaved(record)
+  if (!has(db) || !clean) return
+  await db.put(STORE, clean)
+  announce([{ kind: 'savedSearch', op: 'updated', id: clean.id }])
+}
+
 /** Removes a saved search. What it found is untouched. */
 export async function forgetSearch(db, id) {
   if (!has(db)) return

@@ -1168,6 +1168,19 @@ Found while splitting stage 6 into pieces. Read with C131 (Records, plan, keywor
 - **(c)** The board's width still decides what fits: a narrow Records drops columns as it does now, and a hidden column stays hidden at every width. v30's dragging of columns into another order is not built.
 - **Suggestion:** keep as built.
 
+**C143. The row verbs: the small choices** (piece 3). Almanac v30 has `pin:`, `archive:`, `copy:`, `rename:` (now `name:`), `tagadd:`, `retag:` and `untag:`; these are the points it leaves open. Built so:
+- **(a) `pin:`** pins what it names; when every one named is pinned already, it unpins them (v30 decides by the first one named). A branch (`201b`) pins its chat, and a plan of one branch its chat, which stands for it (C127).
+- **(b) Nothing here is activity.** Pinning, archiving, tagging and naming leave a row's "last active" time, so it keeps its place.
+- **(c) `archive:`** works row by row: archiving a plan hides its row, not its chats. `archive:off 209` brings one back; `in:archive` shows only what is archived (C135); a room or collection called Archive is reached with `in:"Archive" room`.
+- **(d) `name:207 "…"`** names a chat or a plan, up to 120 characters. A note, keyword or quote is its own words and takes no name (v30). A plan follows its first chat's name until it is named itself, as today.
+- **(e) Tags** keep the case they were typed in, up to 40 characters, and match in any case, so Essay and essay are one tag. `tagadd:` and `untag:` take numbers until the Collection can be their target (piece 6); `untag:essay` alone takes the tag off everything, the Enter line saying how many. `retag:` renames a tag everywhere, merging into one that exists, and the tag becomes yours. A later tagging by the model keeps your tags.
+- **(f) `copy:`** puts one thing on the clipboard as Markdown: a chat with who said what, sources as footnotes (page, revision, licence) and its notes, keywords and quotes; a plan as its chats in order; a note, keyword or quote as its words and where it came from. Hidden messages are known only while their chat is open in this tab; those are left out, and the line says how many.
+- **(g) Several row commands share a line** (C99), and `undo:` takes the line back whole; mixing them with other kinds of command waits.
+- **(h) New optional fields, shown at the checkpoint:** `archived` on chats, notes, keywords and quotes (plans have it); `tagsMine` (C136) on every kind; `pinned` and `tags` on quotes, which the upgrade gave the other kinds. Backups carry them; a restore checks them.
+- **Suggestion:** keep as built.
+
+**C134, as built (piece 3).** `undo:` takes back the last command line, whole: what it changed in rows, saved searches, the filters on Records and the space (boards, windows, the bar, columns). Kept for the tab, the last 50 lines. If something it changed has changed since (in another tab, say), undo stops there and says so rather than writing over it. Not taken back: a room's name (C40), what was sent or copied, and `erase:` (piece 4).
+
 **C142. Drawing only the rows on screen** (piece 2). Built: Records draws the rows in view and about a screen either side; the rest are blank space of the height they will take, measured once drawn, so the scroll bar stays true. Screen readers are told the whole count and each row's place. One trade: Tab moves through the rows that are drawn, and scrolling draws more. **Suggestion:** keep as built.
 
 ## Proposed CLAUDE.md rewrite

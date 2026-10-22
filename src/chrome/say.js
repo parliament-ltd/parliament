@@ -7,7 +7,7 @@
 import { COPY } from '../copy'
 
 const BOARD_VALUES = new Set(['board', 'first', 'second'])
-const AND_LISTS = new Set(['boards', 'verbs', 'sources', 'filters'])
+const AND_LISTS = new Set(['boards', 'verbs', 'sources', 'filters', 'nums'])
 const PERCENTS = new Set(['percent', 'low', 'high'])
 
 /** A day, given as 2026-09-01, the way the reader's language writes a date in full. */
@@ -77,7 +77,7 @@ export function say(i18n, message, values = {}) {
   for (const [key, value] of Object.entries(values ?? {})) {
     if (BOARD_VALUES.has(key)) words[key] = boardName(i18n, value)
     else if (key === 'boards') words[key] = joined(i18n, value.map((b) => boardName(i18n, b)), 'conjunction')
-    else if (AND_LISTS.has(key)) words[key] = joined(i18n, value, 'conjunction')
+    else if (AND_LISTS.has(key)) words[key] = joined(i18n, value.map(String), 'conjunction')
     else if (key === 'words') words[key] = joined(i18n, value, 'disjunction')
     else if (key === 'cost' && typeof value === 'number') words[key] = money(i18n, value)
     else if (PERCENTS.has(key) && typeof value === 'number') words[key] = percent(i18n, value)

@@ -25,6 +25,19 @@ function isNumber(v)   { return typeof v === 'number' && isFinite(v) }
 // UUID-ish check — must be a non-empty string (loose, for forward-compat)
 function isId(v)       { return typeof v === 'string' && v.length > 0 && v.length <= 128 }
 
+// Fields every numbered kind may carry (stage 6, piece 3; C143 (h)): pinned,
+// archived, tags and the tags the person added. Optional; older records have
+// some or none of them.
+const TAGS_MAX = 200
+const isTagList = (v) => Array.isArray(v) && v.length <= TAGS_MAX && v.every((t) => typeof t === 'string' && t.length > 0 && t.length <= 100)
+function rowFields(item, kind) {
+  if (item.pinned !== undefined && !isBoolean(item.pinned))     return `${kind}.pinned must be boolean`
+  if (item.archived !== undefined && !isBoolean(item.archived)) return `${kind}.archived must be boolean`
+  if (item.tags !== undefined && !isTagList(item.tags))         return `${kind}.tags invalid`
+  if (item.tagsMine !== undefined && !isTagList(item.tagsMine)) return `${kind}.tagsMine invalid`
+  return null
+}
+
 // ─── Per-store validators ────────────────────────────────
 
 function validateConversation(item) {
@@ -42,7 +55,7 @@ function validateConversation(item) {
   if (item.room !== undefined && !isStringOrNull(item.room, 128)) {
     return 'conversation.room invalid'
   }
-  return null
+  return rowFields(item, 'conversation')
 }
 
 // Where an answer from a source came from: short strings only, links to https.
@@ -90,7 +103,7 @@ function validateHighlight(item) {
   if (!isString(item.text, 50_000))            return 'highlight.text invalid or too large'
   if (!isString(item.color, 50))               return 'highlight.color invalid'
   if (!isISODate(item.createdAt))              return 'highlight.createdAt invalid date'
-  return null
+  return rowFields(item, 'highlight')
 }
 
 function validateNote(item) {
@@ -100,7 +113,7 @@ function validateNote(item) {
   if (!isStringOrNull(item.messageId, 128))    return 'note.messageId invalid'
   if (!isString(item.text, 100_000))           return 'note.text invalid or too large'
   if (!isISODate(item.createdAt))              return 'note.createdAt invalid date'
-  return null
+  return rowFields(item, 'note')
 }
 
 function validateFavorite(item) {
@@ -118,7 +131,7 @@ function validatePin(item) {
   if (!isId(item.sourceMessageId))                     return 'pin.sourceMessageId invalid'
   if (!isString(item.content))                         return 'pin.content invalid or too large'
   if (!isISODate(item.createdAt))                      return 'pin.createdAt invalid date'
-  return null
+  return rowFields(item, 'pin')
 }
 
 function validateSetting(item) {
@@ -245,7 +258,7 @@ function validateDocket(item) {
   if (item.num !== undefined && !isNumber(item.num)) return 'docket.num must be a number'
   if (!Array.isArray(item.branches))        return 'docket.branches must be an array'
   if (!Array.isArray(item.order))           return 'docket.order must be an array'
-  return null
+  return rowFields(item, 'docket')
 }
 
 function validateRun(item) {

@@ -221,6 +221,49 @@ export const COPY = {
     openSaved: /*i18n*/ { id: 'enter.openSaved', message: 'Enter shows the saved search {name}' },
     openWhichSaved: /*i18n*/ { id: 'enter.openWhichSaved', message: 'More than one saved search starts that way: {words}' },
     savedStale: /*i18n*/ { id: 'enter.savedStale', message: 'so the saved search {name} cannot open as it is. forget: removes it', comment: 'Follows the reason a filter in it no longer reads' },
+    // The row verbs (stage 6, piece 3; C143). {nums} lists numbers, joined
+    // with "and"; {tag}, {from}, {to} and {name} are the person's words;
+    // {line} is a command line as typed, which stays English.
+    byNumber: /*i18n*/ { id: 'enter.byNumber', message: 'This takes numbers, like 207, 216 or 201b' },
+    rowsTogether: /*i18n*/ { id: 'enter.rowsTogether', message: '{verb} shares a line only with commands like it, for now' },
+    pinOn: /*i18n*/ { id: 'enter.pinOn', message: 'Enter pins {nums} at the top' },
+    pinOff: /*i18n*/ { id: 'enter.pinOff', message: 'Enter unpins {nums}' },
+    archiveOn: /*i18n*/ { id: 'enter.archiveOn', message: 'Enter archives {nums}. Nothing is deleted, and in:archive shows them' },
+    archiveOff: /*i18n*/ { id: 'enter.archiveOff', message: 'Enter brings {nums} back from the archive' },
+    archiveAlready: /*i18n*/ { id: 'enter.archiveAlready', message: 'Those are archived already' },
+    archiveNot: /*i18n*/ { id: 'enter.archiveNot', message: 'Those are not archived' },
+    nameTitle: /*i18n*/ { id: 'enter.nameTitle', message: 'Enter names {num}: {name}' },
+    nameNoTitle: /*i18n*/ { id: 'enter.nameNoTitle', message: '{num} is its own words, so it takes no name' },
+    nameSameTitle: /*i18n*/ { id: 'enter.nameSameTitle', message: '{num} has that name already' },
+    nameTitleLong: /*i18n*/ { id: 'enter.nameTitleLong', message: 'A name is at most {max} characters' },
+    tagAdd: /*i18n*/ { id: 'enter.tagAdd', message: 'Enter tags {nums} with {tag}' },
+    tagAlready: /*i18n*/ { id: 'enter.tagAlready', message: 'Each of those carries {tag} already' },
+    tagNone: /*i18n*/ { id: 'enter.tagNone', message: 'None of those carries {tag}' },
+    tagNowhere: /*i18n*/ { id: 'enter.tagNowhere', message: 'Nothing carries {tag}' },
+    tagLong: /*i18n*/ { id: 'enter.tagLong', message: 'A tag is at most {max} characters' },
+    tagWhich: /*i18n*/ { id: 'enter.tagWhich', message: 'Which numbers? For example: {example}' },
+    untag: /*i18n*/ { id: 'enter.untag', message: 'Enter takes {tag} off {nums}' },
+    untagAll: /*i18n*/ {
+      id: 'enter.untagAll',
+      message: '{count, plural, one {Enter takes {tag} off the one thing that carries it} other {Enter takes {tag} off all # things that carry it}}',
+    },
+    retag: /*i18n*/ {
+      id: 'enter.retag',
+      message: '{count, plural, one {Enter renames {from} to {to} on # thing} other {Enter renames {from} to {to} on # things}}',
+    },
+    retagMerge: /*i18n*/ { id: 'enter.retagMerge', message: '{to} is a tag already, so the two become one' },
+    retagSame: /*i18n*/ { id: 'enter.retagSame', message: 'That is its name already' },
+    rowsChanged: /*i18n*/ { id: 'enter.rowsChanged', message: '{nums} changed meanwhile, so nothing was written. Try again' },
+    rowsFailed: /*i18n*/ { id: 'enter.rowsFailed', message: 'The change was not kept. Try again' },
+    copyOne: /*i18n*/ { id: 'enter.copyOne', message: 'Enter copies {num} as Markdown' },
+    copied: /*i18n*/ { id: 'enter.copied', message: 'Copied {num} as Markdown' },
+    copyHidden: /*i18n*/ { id: 'enter.copyHidden', message: '{count, plural, one {# hidden message left out} other {# hidden messages left out}}' },
+    copyFailed: /*i18n*/ { id: 'enter.copyFailed', message: 'The browser did not allow copying. Click into the page and try again' },
+    undoLine: /*i18n*/ { id: 'enter.undoLine', message: 'Enter takes back {line}' },
+    undoNothing: /*i18n*/ { id: 'enter.undoNothing', message: 'Nothing to take back in this tab' },
+    undone: /*i18n*/ { id: 'enter.undone', message: 'Took back {line}' },
+    undoChanged: /*i18n*/ { id: 'enter.undoChanged', message: '{nums} changed since, so undo: stops here' },
+    undoFailed: /*i18n*/ { id: 'enter.undoFailed', message: 'Undo did not go through, so it stops here' },
     // cols: (C141). {cols} lists column names; {col} is one; {words} the words cols: takes, which stay English.
     colsNow: /*i18n*/ { id: 'enter.colsNow', message: '{board} shows {cols}. A minus hides one, a plus shows it again' },
     colsHide: /*i18n*/ { id: 'enter.colsHide', message: 'Enter hides {cols}' },
@@ -432,6 +475,18 @@ export const COPY = {
     saved: /*i18n*/ { id: 'almanac.saved', message: 'Saved searches' },
     openSavedHelp: /*i18n*/ { id: 'almanac.openSavedHelp', message: 'Shows it, as open:"{name}" does', comment: 'open: stays English; {name} is the person\'s words' },
     saveHelp: /*i18n*/ { id: 'almanac.saveHelp', message: 'Writes save: in the bar, to keep this search under a name', comment: 'save: stays English' },
+  },
+
+  // What copy: writes around the person's words (C143 (f)): who spoke, the
+  // headings for a chat's markings, and a source's footnote.
+  copy: {
+    you: /*i18n*/ { id: 'copy.you', message: 'You', comment: 'Who wrote a prompt, in copied Markdown' },
+    document: /*i18n*/ { id: 'copy.document', message: 'The document', comment: "A heading over a document chat's text" },
+    notes: /*i18n*/ { id: 'copy.notes', message: 'Notes' },
+    keywords: /*i18n*/ { id: 'copy.keywords', message: 'Keywords' },
+    quotes: /*i18n*/ { id: 'copy.quotes', message: 'Quotes' },
+    from: /*i18n*/ { id: 'copy.from', message: 'from {num}', comment: 'Where a note, keyword or quote came from: a chat number' },
+    revision: /*i18n*/ { id: 'copy.revision', message: 'revision {revision}', comment: "A source page's revision number" },
   },
 
   // Collections by the words people read (C139). A collection's own name is

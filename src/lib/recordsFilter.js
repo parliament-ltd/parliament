@@ -9,7 +9,7 @@
 //
 // Keywords and quotes are rows only when filtered for, or when a search
 // finds their words (A19, C133): the table at rest shows chats, plans and
-// notes.
+// notes. Archived rows show only under in:archive (C135, C143 (c)).
 //
 // Pure: rows come from almanacRows.js, and the names people read (rooms,
 // collections, models, sources) come in through ctx, so nothing here needs
@@ -172,8 +172,11 @@ export function readFilter(step, ctx = {}) {
       const names = flat(which ? raw.slice(0, -1) : raw)
       const rooms = new Set()
       const collections = new Set()
+      let archive = false
       for (const a of names) {
         const name = typed(a)
+        // in:archive: what is archived, unless a room or collection is meant (C143 (c)).
+        if (!which && name.trim().toLocaleLowerCase() === 'archive') { archive = true; continue }
         const r = which === 'collection' ? [] : byName(name, ctx.rooms ?? [])
         const c = which === 'room' ? [] : byName(name, ctx.collections ?? [])
         if (r.length && c.length) return { bad: { message: 'inWhich', values: { name } } }
@@ -185,7 +188,7 @@ export function readFilter(step, ctx = {}) {
         c.forEach((x) => collections.add(x.id))
       }
       const shown = `${head}${names.map(written).join(',')}${which ? ` ${which}` : ''}`
-      return ok([{ rooms: [...rooms], collections: [...collections] }], shown)
+      return ok([{ rooms: [...rooms], collections: [...collections], archive }], shown)
     }
     case 'cost': {
       const v = args.map((a) => readCost(typed(a)))
@@ -308,7 +311,7 @@ export function passes(row, f, ctx = {}) {
       case 'tag': return (row.tags ?? []).some((t) => lower(t) === v || lower(t).startsWith(v))
       case 'model': return answeredBy(row, v, ctx)
       case 'has': return (row.marks ?? []).includes(v)
-      case 'in': return (row.roomId != null && v.rooms.includes(row.roomId)) || (row.collections ?? []).some((c) => v.collections.includes(c))
+      case 'in': return (v.archive && Boolean(row.archived)) || (row.roomId != null && v.rooms.includes(row.roomId)) || (row.collections ?? []).some((c) => v.collections.includes(c))
       case 'from':
         if (v.run != null) return row.run === v.run
         if (v.chat != null) return row.chatNum === v.chat && row.kind !== 'chat'
@@ -346,7 +349,9 @@ export function applyView(rows, view = EMPTY_VIEW, ctx = {}) {
   const terms = searchTerms(view.search)
   const filters = view.filters ?? []
   const asked = new Set(filters.filter((f) => f.k === 'type' && !f.neg).flatMap((f) => f.v))
+  const archive = filters.some((f) => f.k === 'in' && !f.neg && f.v.some((x) => x.archive))
   const shown = rows.filter((row) => {
+    if (row.archived && !archive) return false
     const found = terms.length > 0 && terms.every((t) => haystack(row, ctx).includes(t))
     if (terms.length && !found) return false
     if (ON_REQUEST.has(row.kind) && !asked.has(row.kind) && !found) return false

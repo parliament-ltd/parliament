@@ -18,12 +18,12 @@ describe('the Almanac rows (stage 5, piece 3)', () => {
     expect(rows.map((r) => r.room)).toEqual([{ unnamed: true }, null, null])
   })
 
-  it('shows a docket only once it holds more than one branch (C127)', () => {
+  it('shows a docket only once it holds more than one branch (C127), an archived one marked (C143 (c))', () => {
     const chats = [chat(204, { docketId: 'd203' }), chat(206, { docketId: 'd203', branch: 'b' })]
     const rows = toRows({ chats, dockets: [docket(203, ['a', 'b']), docket(205, ['a']), docket(207, ['a', 'b'], { archived: true })] })
     const dockets = rows.filter((r) => r.kind === 'docket')
-    expect(dockets).toHaveLength(1)
-    expect(dockets[0]).toMatchObject({ num: 203, branches: 2, chatId: 'c204', chatNum: 204 })
+    expect(dockets.map((d) => [d.num, d.archived])).toEqual([[203, false], [207, true]])
+    expect(dockets[0]).toMatchObject({ num: 203, branches: 2, chatId: 'c204', chatNum: 204, store: 'dockets' })
   })
 
   it('lists notes, terms and quotes with their text, in their chat\'s room', () => {

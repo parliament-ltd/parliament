@@ -219,8 +219,14 @@ export async function updateChat(db, id, updates) {
     const updated = { ...existing, ...updates, updatedAt: new Date().toISOString() }
     const changes = [{ kind: 'chat', op: 'updated', id, num: existing.num }]
     if (v6) {
-      // Every tag on a chat is written by the model's tagging call.
+      // Every tag on a chat is written by the model's tagging call. The
+      // person's own tags stay (C136, C143 (e)).
       if ('tags' in updates && !('tagsBy' in updates)) updated.tagsBy = 'model'
+      if ('tags' in updates && !('tagsMine' in updates) && Array.isArray(existing.tagsMine) && existing.tagsMine.length) {
+        const tags = Array.isArray(updated.tags) ? [...updated.tags] : []
+        for (const t of existing.tagsMine) if (!tags.some((x) => x.toLocaleLowerCase() === t.toLocaleLowerCase())) tags.push(t)
+        updated.tags = tags
+      }
       if ('title' in updates && existing.docketId) {
         const docket = await tx.objectStore('dockets').get(existing.docketId)
         const renamed = docket && renameInDocket(docket, existing.branch, existing, updated, updated.updatedAt)
@@ -346,6 +352,76 @@ export async function removeMessage(db, id) {
       }
     }
     return { result: undefined, changes }
+  })
+}
+
+// ── Row verbs (stage 6, piece 3; C143) ──────────────────
+
+// The stores a numbered row lives in, and the kind each announces.
+const ROW_STORES = Object.freeze({ conversations: 'chat', dockets: 'docket', notes: 'note', highlights: 'term', pins: 'quote' })
+
+/** A field as the row verbs read it: missing means false, empty or ''. */
+export function rowField(record, key) {
+  if (key === 'pinned' || key === 'archived') return Boolean(record?.[key])
+  if (key === 'tags' || key === 'tagsMine') return Array.isArray(record?.[key]) ? [...record[key]] : []
+  if (key === 'title') return typeof record?.title === 'string' ? record.title : ''
+  return record?.[key] ?? null
+}
+
+const same = (a, b) => JSON.stringify(a) === JSON.stringify(b)
+
+/** Something a change expected had changed meanwhile, so nothing was written. */
+export class Changed extends Error {
+  constructor(nums) {
+    super(`Changed since: ${nums.join(', ')}`)
+    this.name = 'Changed'
+    this.nums = nums
+  }
+}
+
+/**
+ * Changes fields on numbered records, all in one transaction or none:
+ * pins, archive, tags and names (C143). Each change says the fields it
+ * expects to find; if any record has changed since, nothing is written and
+ * Changed is thrown. A chat's "last active" time stays as it was (C143 (b));
+ * a chat's new title reaches its plan, as updateChat's does.
+ * Undo is the same call with before and after swapped.
+ * @param {import('idb').IDBPDatabase} db
+ * @param {Array<{ store: string, id: string, num?: number, set: object, expect: object }>} changes
+ * @returns {Promise<Array<{ store: string, id: string, num?: number, before: object, after: object }>>}
+ */
+export async function changeRecords(db, changes) {
+  if (!changes.length) return []
+  for (const c of changes) if (!ROW_STORES[c.store]) throw new Error(`Not a row's store: ${c.store}`)
+  const stores = [...new Set([...changes.map((c) => c.store), 'dockets'])]
+  return write(db, stores, async (tx) => {
+    const found = []
+    const moved = []
+    for (const c of changes) {
+      const record = await tx.objectStore(c.store).get(c.id)
+      if (!record || Object.entries(c.expect ?? {}).some(([k, v]) => !same(rowField(record, k), v))) moved.push(c.num ?? c.id)
+      found.push(record)
+    }
+    if (moved.length) throw new Changed(moved)
+    const done = []
+    const announced = []
+    for (const [i, c] of changes.entries()) {
+      const record = found[i]
+      const before = Object.fromEntries(Object.keys(c.set).map((k) => [k, rowField(record, k)]))
+      const next = { ...record, ...c.set }
+      await tx.objectStore(c.store).put(next)
+      announced.push({ kind: ROW_STORES[c.store], op: 'updated', id: c.id, num: record.num })
+      done.push({ store: c.store, id: c.id, num: record.num, before, after: { ...c.set } })
+      if (c.store === 'conversations' && 'title' in c.set && record.docketId) {
+        const docket = await tx.objectStore('dockets').get(record.docketId)
+        const renamed = docket && renameInDocket(docket, record.branch, record, next, docket.updatedAt)
+        if (renamed) {
+          await tx.objectStore('dockets').put(renamed)
+          announced.push({ kind: 'docket', op: 'updated', id: renamed.id, num: renamed.num })
+        }
+      }
+    }
+    return { result: done, changes: announced }
   })
 }
 

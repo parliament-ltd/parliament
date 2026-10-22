@@ -159,11 +159,13 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     if (answer.fill) { dispatch({ type: 'input', value: answer.fill }); return }
     if (!next && !go && !act) return
     const body = readField(value, field.mode).body
-    const refused = await onRun(next, body, go, act)
-    if (refused) { setNotice(refused); return }
+    const out = await onRun(next, body, go, act)
+    if (out && !out.done) { setNotice(out); return }
     setReference(null)
     walk.current = { lines, index: -1, draft: '' }
     dispatch({ type: 'ran', to: view.after ?? null })
+    // Done, with something to say: copy: and undo: say what they did.
+    if (out?.says) setNotice(out.says)
   }
 
   function onKeyDown(e) {

@@ -15,18 +15,18 @@
 export const FIELDS = Object.freeze({
   conversations: ['id', 'title', 'model', 'parentId', 'parentTitle', 'branchPoint', 'familyId', 'createdInMode', 'room',
     'pinned', 'storageBytes', 'createdAt', 'updatedAt', 'tags', 'tagsBy', 'aiSummary',
-    'num', 'docketId', 'branch', 'run', 'restoredFrom'],
+    'num', 'docketId', 'branch', 'run', 'restoredFrom', 'archived', 'tagsMine'],
   // model and usage: what a reply was made with and its tokens (C132 (h), stage 6).
   messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta', 'stopReason', 'source', 'model', 'usage'],
-  notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom'],
-  highlights: ['id', 'conversationId', 'messageId', 'text', 'color', 'createdAt', 'num', 'kind', 'pinned', 'tags', 'restoredFrom'],
+  notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom', 'archived', 'tagsMine'],
+  highlights: ['id', 'conversationId', 'messageId', 'text', 'color', 'createdAt', 'num', 'kind', 'pinned', 'tags', 'restoredFrom', 'archived', 'tagsMine'],
   favorites: ['id', 'conversationId', 'messageId', 'createdAt'],
-  pins: ['id', 'targetConversationId', 'sourceConversationId', 'sourceMessageId', 'content', 'createdAt', 'num', 'kind', 'restoredFrom'],
+  pins: ['id', 'targetConversationId', 'sourceConversationId', 'sourceMessageId', 'content', 'createdAt', 'num', 'kind', 'restoredFrom', 'pinned', 'tags', 'archived', 'tagsMine'],
   files: ['id', 'conversationId', 'name', 'type', 'rows', 'cols', 'sizeBytes', 'inContext', 'uploadedAt'],
   file_data: ['fileId', 'data'],
   sbrd_documents: ['conversationId', 'paragraphs', 'suggestionStates', 'submittedReplies', 'updatedAt'],
   // Version 6.
-  dockets: ['id', 'num', 'title', 'createdAt', 'updatedAt', 'pinned', 'tags', 'archived', 'branches', 'order', 'nextLetter', 'restoredFrom'],
+  dockets: ['id', 'num', 'title', 'createdAt', 'updatedAt', 'pinned', 'tags', 'archived', 'branches', 'order', 'nextLetter', 'restoredFrom', 'tagsMine'],
   runs: ['id', 'docketId', 'n', 'createdAt', 'cost', 'branches'],
   collections: ['id', 'name', 'builtIn', 'description', 'items', 'headings', 'pinned', 'createdAt', 'updatedAt', 'fromFavorites'],
   collabs: ['id', 'name', 'instruction', 'builtIn', 'on', 'fromPersona', 'createdAt'],
