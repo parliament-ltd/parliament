@@ -28,6 +28,9 @@ const DEFAULT_SETTINGS = {
   // C62: after a chat's first answer, one request for its title, summary
   // and tags, named on the Enter line. Off: titled from the first words.
   describeNewChats: true,
+  // Where Mistral processes prompts: 'global', or 'eu' or 'us' at 1.1 times
+  // the price (stage 7, piece 3; C159).
+  mistralRegion: 'global',
 }
 
 export function SettingsProvider({ children }) {

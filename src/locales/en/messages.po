@@ -1625,6 +1625,16 @@ msgstr "Prompts go to a room. room: opens one"
 msgid "enter.promptPerDay"
 msgstr "About {count} searches a day without a key, shared by everyone on your network"
 
+#. A model offered before general availability (security notes §3)
+#. js-lingui-explicit-id
+msgid "enter.promptPreviewModel"
+msgstr "{name} is a preview: its provider may change or withdraw it"
+
+#. Where Mistral processes the prompt, chosen in its key panel (C159)
+#. js-lingui-explicit-id
+msgid "enter.promptRegion"
+msgstr "{region, select, eu {Processed in the EU, at 1.1 times the price} us {Processed in the US, at 1.1 times the price} other {}}"
+
 #. Sent only on Enter, never automatically (C114)
 #. js-lingui-explicit-id
 msgid "enter.promptResend"
@@ -2252,6 +2262,27 @@ msgstr "The check did not reach {provider}. Nothing was kept."
 msgid "keys.promise"
 msgstr "Encrypted in this browser. Each goes only to its own provider."
 
+#. Where a provider processes prompts; three choices follow
+#. js-lingui-explicit-id
+msgid "keys.region"
+msgstr "Prompts processed:"
+
+#. js-lingui-explicit-id
+msgid "keys.regionEu"
+msgstr "in the EU, 1.1 times the price"
+
+#. js-lingui-explicit-id
+msgid "keys.regionGlobal"
+msgstr "anywhere, list price"
+
+#. js-lingui-explicit-id
+msgid "keys.regionNote"
+msgstr "Your key, account and billing may still be handled elsewhere."
+
+#. js-lingui-explicit-id
+msgid "keys.regionUs"
+msgstr "in the US, 1.1 times the price"
+
 #. js-lingui-explicit-id
 msgid "keys.replace"
 msgstr "replace"
@@ -2519,6 +2550,10 @@ msgid "picker.about.fable"
 msgstr "The costliest model here."
 
 #. js-lingui-explicit-id
+msgid "picker.about.glm"
+msgstr "One of the models this provider hosts for others."
+
+#. js-lingui-explicit-id
 msgid "picker.about.hackernews"
 msgstr "What people have said about something. Discussion, not answers."
 
@@ -2529,6 +2564,18 @@ msgstr "Quickest and cheapest. Good for short, plain questions."
 #. js-lingui-explicit-id
 msgid "picker.about.mistral"
 msgstr "Models with a choice of where your prompts are processed."
+
+#. js-lingui-explicit-id
+msgid "picker.about.mistralLarge"
+msgstr "A large model, in many languages."
+
+#. js-lingui-explicit-id
+msgid "picker.about.mistralMedium"
+msgstr "A mid-sized model."
+
+#. js-lingui-explicit-id
+msgid "picker.about.mistralSmall"
+msgstr "Quick and cheap. Good for short, plain questions."
 
 #. js-lingui-explicit-id
 msgid "picker.about.ollama"
@@ -2583,6 +2630,11 @@ msgstr "later"
 msgid "picker.local"
 msgstr "On your machine"
 
+#. A model its provider hosts but did not make (LPN §7.1). {maker} is a company name
+#. js-lingui-explicit-id
+msgid "picker.madeBy"
+msgstr "made by {maker}"
+
 #. {reference} is a model name, from the list
 #. js-lingui-explicit-id
 msgid "picker.marks"
@@ -2611,6 +2663,11 @@ msgstr "One answers at a time until branches come."
 #. js-lingui-explicit-id
 msgid "picker.perDay"
 msgstr "About {count} searches a day without a key, shared by everyone on your network."
+
+#. A model offered before general availability; it may change or go
+#. js-lingui-explicit-id
+msgid "picker.preview"
+msgstr "preview"
 
 #. Answers from public sources, with no model
 #. js-lingui-explicit-id

@@ -882,3 +882,25 @@ describe('by: and who answers (stage 7, piece 1; C149, C150)', () => {
     expect(line('owl', { ...room, answerer: { id: 'hackernews', group: 'source', name: 'Hacker News', later: true } }).text).toBe('Hacker News answers here and is not built yet. by: chooses another')
   })
 })
+
+describe('by: with a name of several words (stage 7, piece 3)', () => {
+  const rows = {
+    model: [{ id: 'mistral-small-4', group: 'model', name: 'Mistral Small 4', provider: 'mistral', providerName: 'Mistral', later: false, needsKey: false },
+      { id: 'mistral-large-3', group: 'model', name: 'Mistral Large 3', provider: 'mistral', providerName: 'Mistral', later: false, needsKey: false }],
+    local: [],
+    source: [{ id: 'wikipedia', group: 'source', name: 'Wikipedia', provider: 'wikipedia', providerName: 'Wikipedia', later: false, needsKey: false }],
+  }
+  const answering = { room: 'c1', num: 204, now: { id: 'wikipedia', group: 'source', name: 'Wikipedia', chosen: false }, rows, stored: null }
+  const at = (value) => {
+    const p = preview(value, { mode: 'command', arrangement: shipped('almanac'), screens: { answering } })
+    return { ...p, text: say(i18n, p.says.message, p.says.values) }
+  }
+  it('reads the words together as one name, quoted or not', () => {
+    expect(at('>by:mistral small').act).toMatchObject({ kind: 'answerer', id: 'mistral-small-4' })
+    expect(at('>by:mistral small 4').act).toMatchObject({ id: 'mistral-small-4' })
+    expect(at('>by:"Mistral Large 3"').act).toMatchObject({ id: 'mistral-large-3' })
+  })
+  it('still reads commas as several at once', () => {
+    expect(at('>by:mistral small, wikipedia').text).toBe('One prompt to several comes with branches. Choose one for now')
+  })
+})

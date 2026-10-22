@@ -1,0 +1,246 @@
+import { BaseProvider } from './base'
+import { findModel } from '../net/answerers'
+import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS } from './shared'
+
+// Mistral (refactor-plan.md, stage 7, piece 3; LPN §7.1; C82, C159).
+//
+// Its API answers a page in the browser (C82: every address allows any
+// origin and the Authorization header). Three addresses: the global one, and
+// one each in the EU and the US, which process prompts in that region and
+// cost 1.1 times as much (docs.mistral.ai/studio-api/regional-inference).
+// The address is chosen by the person's processing region, never by their
+// network address, and only these three are ever reached: the list of
+// providers names them for the connection policy.
+//
+// The chat API is shaped like OpenAI's: messages in, a stream of server-sent
+// events out ("data: {…}", ending "data: [DONE]"). Replies report why they
+// stopped in Anthropic's words here, so the chat reads every provider alike.
+
+export const HOSTS = Object.freeze({
+  global: 'https://api.mistral.ai',
+  eu: 'https://api.eu.mistral.ai',
+  us: 'https://api.us.mistral.ai',
+})
+export const REGIONS = Object.freeze(Object.keys(HOSTS))
+// The regional addresses cost this much more, on every price.
+export const REGION_FACTOR = 1.1
+
+// As Anthropic's: silence this long counts as a stall (C114).
+export const STALL_MS = 45_000
+
+/* ── The models (checked 22 October 2026, docs.mistral.ai/inference/pricing
+   and each model's page). Fixed versions, never a "-latest" alias, which
+   Mistral moves (LPN §7.1). Prices in US dollars per million tokens, at the
+   global address.
+     maker    who made it: Mistral hosts models by others too (LPN §7.1)
+     preview  offered before general availability; Mistral may change or
+              withdraw it, and its data terms may differ (security notes §3)
+   The ids are as the docs give them, to confirm with a key (C159). */
+const metered = (inputPerMillion, outputPerMillion) => ({ type: 'metered', inputPerMillion, outputPerMillion })
+const MODELS = Object.freeze([
+  { id: 'mistral-medium-3-5', apiId: 'mistral-medium-3-5', name: 'Mistral Medium 3.5', about: 'mistralMedium', contextWindow: 256_000, cost: metered(1.5, 7.5) },
+  { id: 'mistral-large-4', apiId: 'mistral-large-4-0', name: 'Mistral Large 4', about: 'mistralLarge', contextWindow: 1_000_000, cost: metered(1.36, 4.18), preview: true },
+  { id: 'mistral-large-3', apiId: 'mistral-large-2512', name: 'Mistral Large 3', about: 'mistralLarge', contextWindow: 256_000, cost: metered(0.5, 1.5) },
+  { id: 'mistral-small-4', apiId: 'mistral-small-2603', name: 'Mistral Small 4', about: 'mistralSmall', contextWindow: 256_000, cost: metered(0.15, 0.6) },
+  { id: 'zai-glm-5-3', apiId: 'zai-glm-5-3', name: 'GLM 5.3', about: 'glm', contextWindow: 1_000_000, cost: metered(1.4, 4.4), maker: 'Z.ai' },
+].map((m) => Object.freeze({ maker: 'Mistral', current: true, reference: false, preview: false, aliases: [], ...m })))
+
+// The small requests: a new chat's title, summary and tags (C62), and
+// summarize: (C145 (g)), when Mistral answered.
+const LIGHT_MODEL = 'mistral-small-4'
+
+// What Mistral's "finish_reason" says, in the words the chat reads.
+const STOPPED = { stop: 'end_turn', length: 'max_tokens', model_length: 'max_tokens', tool_calls: 'tool_use' }
+
+// A message's words. Parts this provider is not given here (images, files
+// in another provider's form) are left out, their text kept.
+function textOf(content) {
+  if (typeof content === 'string') return content
+  if (!Array.isArray(content)) return ''
+  return content.filter((p) => p?.type === 'text' && typeof p.text === 'string').map((p) => p.text).join('\n\n')
+}
+
+function stalledError() {
+  const error = new Error('The reply stalled: nothing arrived for a while.')
+  error.name = 'Stalled'
+  return error
+}
+
+export class MistralProvider extends BaseProvider {
+  constructor() {
+    super()
+    this.region = 'global'
+  }
+
+  /** The processing region: global, eu or us. Anything else is global. */
+  setRegion(region) {
+    this.region = REGIONS.includes(region) ? region : 'global'
+  }
+
+  _base() {
+    return `${HOSTS[this.region] ?? HOSTS.global}/v1`
+  }
+
+  getModels() {
+    if (this.region === 'global') return MODELS
+    // A regional address costs 1.1 times as much (C159).
+    return MODELS.map((m) => ({
+      ...m,
+      cost: { ...m.cost, inputPerMillion: m.cost.inputPerMillion * REGION_FACTOR, outputPerMillion: m.cost.outputPerMillion * REGION_FACTOR },
+    }))
+  }
+
+  _resolveModel(model) {
+    return findModel(MODELS, model)?.apiId ?? model
+  }
+
+  _headers(apiKey) {
+    return { 'Content-Type': 'application/json', Accept: 'application/json', Authorization: `Bearer ${apiKey}` }
+  }
+
+  _messages(messages, systemPrompt) {
+    const out = (messages ?? []).map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: textOf(m.content) }))
+    return systemPrompt ? [{ role: 'system', content: systemPrompt }, ...out] : out
+  }
+
+  async validateKey(apiKey) {
+    try {
+      // Lists the models the key may use; nothing is generated, nothing spent.
+      const response = await fetch(`${this._base()}/models`, { headers: this._headers(apiKey) })
+      if (response.ok) return { valid: true, status: 'valid' }
+      if (response.status === 401) return { valid: false, status: 'invalid', error: 'This key is not valid.' }
+      if (response.status === 402 || response.status === 403) return { valid: false, status: 'billing_error', error: 'This key was recognised, but the account may not allow it.' }
+      return { valid: false, status: 'error', error: `Unexpected error (${response.status}).` }
+    } catch {
+      return { valid: false, status: 'unreached', error: 'Could not reach the provider.' }
+    }
+  }
+
+  // The error for a response the provider refused, with its status.
+  _failure(response) {
+    const error = new Error(response.status === 401 ? 'API key is no longer valid.' : response.status === 429 ? 'Rate limit reached.' : `API error (${response.status})`)
+    error.status = response.status
+    return error
+  }
+
+  async sendMessage(apiKey, messages, model, onChunk, signal, systemPrompt) {
+    const body = { model: this._resolveModel(model), messages: this._messages(messages, systemPrompt), stream: true, max_tokens: 8192 }
+    // A stream that falls silent is stopped and said to have stalled, as
+    // with every provider (C114); never sent again from here.
+    const watch = new AbortController()
+    const stop = () => watch.abort()
+    if (signal?.aborted) watch.abort()
+    signal?.addEventListener('abort', stop)
+    let stalled = false
+    let timer = null
+    const alive = () => {
+      clearTimeout(timer)
+      timer = setTimeout(() => { stalled = true; watch.abort() }, STALL_MS)
+    }
+    try {
+      alive()
+      const response = await fetch(`${this._base()}/chat/completions`, { method: 'POST', headers: { ...this._headers(apiKey), Accept: 'text/event-stream' }, body: JSON.stringify(body), signal: watch.signal })
+      alive()
+      if (!response.ok) throw this._failure(response)
+      return await this._readStream(response, onChunk, alive)
+    } catch (err) {
+      if (stalled) throw stalledError()
+      throw err
+    } finally {
+      clearTimeout(timer)
+      signal?.removeEventListener('abort', stop)
+    }
+  }
+
+  // Reads the stream: text to onChunk as it arrives, why it stopped, and
+  // what it used, where a chunk carries it.
+  async _readStream(response, onChunk, alive = () => {}) {
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+    const usage = { input_tokens: 0, output_tokens: 0 }
+    let stopReason = null
+    let ended = false
+    while (!ended) {
+      const { done, value } = await reader.read()
+      alive()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      const lines = buffer.split('\n')
+      buffer = lines.pop() || ''
+      for (const line of lines) {
+        if (!line.startsWith('data:')) continue
+        const data = line.slice(5).trim()
+        if (data === '[DONE]') { ended = true; break }
+        let event
+        try { event = JSON.parse(data) } catch { continue }
+        if (event?.object === 'error' || event?.error) {
+          reader.cancel().catch(() => {})
+          const error = new Error(event.message || event.error?.message || 'The reply broke off.')
+          error.status = event.code ?? null
+          throw error
+        }
+        const choice = event?.choices?.[0]
+        const text = choice?.delta?.content
+        if (typeof text === 'string' && text) onChunk(text)
+        else if (Array.isArray(text)) {
+          const joined = text.filter((p) => p?.type === 'text').map((p) => p.text).join('')
+          if (joined) onChunk(joined)
+        }
+        if (choice?.finish_reason) stopReason = STOPPED[choice.finish_reason] ?? null
+        if (event?.usage) {
+          usage.input_tokens = event.usage.prompt_tokens ?? usage.input_tokens
+          usage.output_tokens = event.usage.completion_tokens ?? usage.output_tokens
+        }
+      }
+    }
+    return { usage, stopReason, toolUses: [] }
+  }
+
+  async sendMessageWhole(apiKey, messages, model, onChunk, signal, systemPrompt) {
+    const response = await fetch(`${this._base()}/chat/completions`, {
+      method: 'POST',
+      headers: this._headers(apiKey),
+      body: JSON.stringify({ model: this._resolveModel(model), messages: this._messages(messages, systemPrompt), stream: false, max_tokens: 8192 }),
+      signal,
+    })
+    if (!response.ok) throw this._failure(response)
+    const data = await response.json()
+    const choice = data?.choices?.[0]
+    const text = textOf(choice?.message?.content)
+    if (text) onChunk(text)
+    return {
+      usage: { input_tokens: data?.usage?.prompt_tokens ?? 0, output_tokens: data?.usage?.completion_tokens ?? 0 },
+      stopReason: STOPPED[choice?.finish_reason] ?? null,
+      toolUses: [],
+    }
+  }
+
+  // A short request without streaming, to the small model.
+  async _lightweightCall(apiKey, systemPrompt, messages, maxTokens) {
+    const response = await fetch(`${this._base()}/chat/completions`, {
+      method: 'POST',
+      headers: this._headers(apiKey),
+      body: JSON.stringify({ model: this._resolveModel(LIGHT_MODEL), messages: this._messages(messages, systemPrompt), stream: false, max_tokens: maxTokens }),
+    })
+    if (!response.ok) throw this._failure(response)
+    const data = await response.json()
+    return textOf(data?.choices?.[0]?.message?.content).trim()
+  }
+
+  async generateMetadata(apiKey, messages) {
+    const shown = (messages ?? []).slice(0, 4).map((m) => ({ role: m.role, content: textOf(m.content).slice(0, 500) }))
+    shown.push({ role: 'user', content: 'Describe the conversation above as JSON.' })
+    return readDescription(await this._lightweightCall(apiKey, DESCRIBE_SYSTEM_PROMPT, shown, 200))
+  }
+
+  getMetadataModel() {
+    return LIGHT_MODEL
+  }
+
+  async summarize(apiKey, items) {
+    const text = await this._lightweightCall(apiKey, SUMMARIZE_SYSTEM_PROMPT, [{ role: 'user', content: summaryItems(items) }], SUMMARY_MAX_TOKENS)
+    if (!text) throw new Error('No summary came back')
+    return text.slice(0, SUMMARY_MAX_CHARS)
+  }
+}

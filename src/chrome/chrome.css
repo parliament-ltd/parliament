@@ -144,6 +144,10 @@
 .ch-shell .ch-keysave:disabled { opacity: .55; cursor: wait; }
 .ch-keyprob { margin: 6px 0 0; padding-inline-start: 8px; border-inline-start: 2px solid var(--ch-ink); font-size: 11.5px; color: var(--ch-ink); }
 .ch-keys-foot { margin: 0; padding-top: 9px; }
+/* Mistral's processing region, chosen in its row (C159). */
+.ch-keyregion { margin: 2px 0 6px; }
+/* The region in force reads as plain ink; the others stay links. Not colour alone. */
+.ch-shell .ch-keyact.on { color: var(--ch-ink); text-decoration: none; cursor: default; }
 
 /* The api: ignition, the one gold moment (bar reference; C50): a sweep
    across the field, then each board glints in turn, once per new key. Never

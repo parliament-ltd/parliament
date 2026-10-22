@@ -1625,6 +1625,16 @@ msgstr ""
 msgid "enter.promptPerDay"
 msgstr ""
 
+#. A model offered before general availability (security notes §3)
+#. js-lingui-explicit-id
+msgid "enter.promptPreviewModel"
+msgstr ""
+
+#. Where Mistral processes the prompt, chosen in its key panel (C159)
+#. js-lingui-explicit-id
+msgid "enter.promptRegion"
+msgstr ""
+
 #. Sent only on Enter, never automatically (C114)
 #. js-lingui-explicit-id
 msgid "enter.promptResend"
@@ -2252,6 +2262,27 @@ msgstr ""
 msgid "keys.promise"
 msgstr ""
 
+#. Where a provider processes prompts; three choices follow
+#. js-lingui-explicit-id
+msgid "keys.region"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.regionEu"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.regionGlobal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.regionNote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.regionUs"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "keys.replace"
 msgstr ""
@@ -2519,6 +2550,10 @@ msgid "picker.about.fable"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "picker.about.glm"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "picker.about.hackernews"
 msgstr ""
 
@@ -2528,6 +2563,18 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "picker.about.mistral"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.mistralLarge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.mistralMedium"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.mistralSmall"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2583,6 +2630,11 @@ msgstr ""
 msgid "picker.local"
 msgstr ""
 
+#. A model its provider hosts but did not make (LPN §7.1). {maker} is a company name
+#. js-lingui-explicit-id
+msgid "picker.madeBy"
+msgstr ""
+
 #. {reference} is a model name, from the list
 #. js-lingui-explicit-id
 msgid "picker.marks"
@@ -2610,6 +2662,11 @@ msgstr ""
 #. OpenAlex's daily allowance (C156)
 #. js-lingui-explicit-id
 msgid "picker.perDay"
+msgstr ""
+
+#. A model offered before general availability; it may change or go
+#. js-lingui-explicit-id
+msgid "picker.preview"
 msgstr ""
 
 #. Answers from public sources, with no model

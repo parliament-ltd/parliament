@@ -151,3 +151,17 @@ describe('the readers a manifest may name', () => {
     expect(read(item, 'a')).toBeNull()
   })
 })
+
+describe('naming Parliament where a source asks (C160)', () => {
+  it('sends Api-User-Agent to Wikipedia, naming the app and never the person', async () => {
+    const fetch = vi.fn(async () => reply({ query: { pages: [page] } }))
+    await createSource(wikipedia, { origins, fetch, identity: 'Parliament/0.5 (https://parliament.ltd; support@parliament.ltd)' }).answer('barn owl')
+    expect(fetch.mock.calls[0][1].headers).toEqual({ Accept: 'application/json', 'Api-User-Agent': 'Parliament/0.5 (https://parliament.ltd; support@parliament.ltd)' })
+  })
+  it('sends no other header a manifest names, and none where it asks for none', async () => {
+    const fetch = vi.fn(async () => reply({ query: { pages: [page] } }))
+    await createSource({ ...wikipedia, identifyWith: 'Authorization' }, { origins, fetch, identity: 'x' }).answer('barn owl')
+    await createSource(hn, { origins: destination('hackernews').origins, fetch: vi.fn(async () => reply({ hits: [] })), identity: 'x' }).answer('x')
+    expect(fetch.mock.calls[0][1].headers).toEqual({ Accept: 'application/json' })
+  })
+})

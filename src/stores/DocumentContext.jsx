@@ -31,8 +31,9 @@ import {
   getSbrdDocument, saveSbrdDocument, getConversation, getBranches,
   createConversation, updateConversation,
 } from '../lib/db'
-import { gateway, hasKey, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
+import { gateway, hasKey, providerOf } from '../net'
 import { useChat } from './ChatContext'
+import { useSettings } from './SettingsContext'
 
 const DocumentContext = createContext(null)
 
@@ -72,6 +73,10 @@ function migrateParagraph(p) {
 
 export function DocumentProvider({ children }) {
   const { activeConversationId } = useChat()
+  // The review goes to the default model, as a new chat does (stage 7;
+  // Stefan, 22 October: "drafting desk can be default model").
+  const { settings } = useSettings()
+  const defaultModel = settings.defaultModel
 
   // ── Persistent document state (mirrors sbrd_documents) ───────────────
   const [paragraphs, setParagraphs] = useState(EMPTY_PARAGRAPHS)
@@ -406,7 +411,7 @@ export function DocumentProvider({ children }) {
 
     try {
       // The gateway picks the key (stage 4); here only whether there is one.
-      if (await hasKey(PROVIDER)) {
+      if (await hasKey(providerOf(defaultModel))) {
 
         const docLines = paragraphs.map(p => {
           const prefix = p.type === 'heading' ? '# ' : ''
@@ -445,9 +450,9 @@ Reply to every comment helpfully and concisely. When a comment requests a text e
 
         let fullResponse = ''
         const abort = new AbortController()
-        await gateway.call(PROVIDER, 'sendMessage', [
+        await gateway.call(providerOf(defaultModel), 'sendMessage', [
           [{ role: 'user', content: 'Please review the submission above.' }],
-          'claude-sonnet',
+          defaultModel,
           chunk => { fullResponse += chunk },
           abort.signal,
           systemPrompt,
@@ -551,7 +556,7 @@ Reply to every comment helpfully and concisely. When a comment requests a text e
       setSubmitting(false)
       setShowSubmitConfirm(false)
     }
-  }, [activeConversationId, paragraphs, submittedReplies, conversationTitle, rippleEnabled, showToast])
+  }, [activeConversationId, paragraphs, submittedReplies, conversationTitle, rippleEnabled, showToast, defaultModel])
 
   // ── Derived counts (memoized — read by sidebar tabs) ────────────────
   const counts = useMemo(() => {

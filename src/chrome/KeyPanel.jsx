@@ -30,7 +30,11 @@ const PROBLEM = {
  *   onSaved: (id: string, fresh: boolean) => void, onClose: () => void }} props
  *   holdOnly: Settings says "Don't save", so a key is held for this tab only
  */
-export default function KeyPanel({ keys, noKey, focus, holdOnly, onFocus, onSaved, onClose }) {
+// Where a provider processes prompts, for one that offers a choice (Mistral,
+// C159). Chosen by the person, never from their network address.
+const REGION_WORDS = { global: COPY.keys.regionGlobal, eu: COPY.keys.regionEu, us: COPY.keys.regionUs }
+
+export default function KeyPanel({ keys, noKey, focus, holdOnly, onFocus, onSaved, onClose, region = null, onRegion = null }) {
   const { i18n } = useLingui()
   const field = useRef(null)
   const [busy, setBusy] = useState(false)
@@ -77,6 +81,20 @@ export default function KeyPanel({ keys, noKey, focus, holdOnly, onFocus, onSave
               </button>
             </span>
           </div>
+          {p.id === 'mistral' && region && onRegion && (
+            <div className="ch-keys-note ch-keyregion" role="group" aria-label={i18n._(COPY.keys.region)}>
+              {i18n._(COPY.keys.region)}{' '}
+              {Object.keys(REGION_WORDS).map((r, i) => (
+                <span key={r}>
+                  {i > 0 && ' · '}
+                  <button type="button" className={`ch-marg ch-keyact${region === r ? ' on' : ''}`} aria-pressed={region === r} onClick={() => onRegion(r)}>
+                    {i18n._(REGION_WORDS[r])}
+                  </button>
+                </span>
+              ))}
+              {region !== 'global' && <span className="ch-keys-note ch-keyregion-note"> {i18n._(COPY.keys.regionNote)}</span>}
+            </div>
+          )}
           {focus === p.id && (
             <div className="ch-keyopen">
               <div className="ch-keyfield">

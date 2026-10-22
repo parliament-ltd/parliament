@@ -229,7 +229,8 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.markup', message: 'Show replies marked up, or clean' } }),
   // Who answers in the chat the room shows (C149): a model or a source.
   // Works from any board, as a prompt does. Several at once is branches.
-  v({ verb: 'by', group: 'editing', example: 'by:haiku', forms: ['by:', 'by:haiku', 'by:wikipedia'], takes: [[], [{ list: 'text' }]], stage: 7, undoable: true, click: 'apply',
+  // A name of several words needs no quotes: by:mistral small.
+  v({ verb: 'by', group: 'editing', example: 'by:haiku', forms: ['by:', 'by:haiku', 'by:mistral small', 'by:wikipedia'], takes: [[], [{ many: { list: 'text' } }]], stage: 7, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.by', message: 'Choose who answers in this chat: a model, or a source with no tokens' } }),
   v({ verb: 'framework', group: 'editing', example: 'framework:pushback', forms: ['framework:pushback', 'framework:pushback, uncertain', 'framework:off'],
     takes: [[['off']], [{ list: [...FRAMEWORKS, 'off'] }], [{ list: 'text' }]], on: ['room'], stage: 7, undoable: true, click: 'apply',

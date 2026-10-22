@@ -4,7 +4,7 @@ import { askToKeepStorage } from '../lib/storageKeep'
 import { nameFromChat, titleFromPrompt, fieldsFromDescription } from '../lib/chatTitles'
 import { useConversations } from './ConversationContext'
 import { useSettings } from './SettingsContext'
-import { gateway, destination, runClientTool, continueInstruction, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
+import { gateway, destination, runClientTool, continueInstruction, providerOf } from '../net'
 import {
   startStream, appendStream, resetStreamText, stopStream, endStream, getStream,
   isStreaming as streamingIn, streamingIds, addNotice, noteCut,
@@ -143,10 +143,11 @@ export function ChatProvider({ children }) {
   // names it before Enter, and a switch in Settings turns it off. Off, or
   // if the request fails, an untitled chat takes the first words of its
   // prompt instead, and nothing more is sent.
-  const describeNewChat = useCallback(async (conversationId, exchange, prompt) => {
+  // It goes to the provider that answered, with that provider's key.
+  const describeNewChat = useCallback(async (conversationId, exchange, prompt, model) => {
     if (describeOn.current) {
       try {
-        const fields = fieldsFromDescription(await gateway.call(PROVIDER, 'generateMetadata', [exchange], { label: 'title, summary and tags' }))
+        const fields = fieldsFromDescription(await gateway.call(providerOf(model), 'generateMetadata', [exchange], { label: 'title, summary and tags' }))
         if (Object.keys(fields).length) { await updateConversation(conversationId, fields); return }
       } catch (err) {
         console.warn('Describing the chat failed:', err.message)
@@ -253,7 +254,8 @@ export function ChatProvider({ children }) {
       let last = null // the last turn's response: its stop reason says whether the reply came back whole
 
       for (let turn = 0; turn < MAX_TOOL_TURNS; turn++) {
-        const response = await gateway.call(PROVIDER, 'sendMessage', [
+        // To the provider of the model that answers (stage 7, piece 3).
+        const response = await gateway.call(providerOf(model), 'sendMessage', [
           toolLoopHistory,
           model,
           (chunk) => appendStream(conversationId, chunk),
@@ -336,7 +338,7 @@ export function ChatProvider({ children }) {
 
       // 6. After a chat's first answer, its title, summary and tags, from
       //    this chat's own exchange (C62). Not awaited.
-      if (first && finalContent) describeNewChat(conversationId, forModel([userMsg, finished]), userContent).catch(() => {})
+      if (first && finalContent) describeNewChat(conversationId, forModel([userMsg, finished]), userContent, model).catch(() => {})
     } catch (error) {
       stopPersisting()
       // Stopped or left: kept as it was. Anything else broke the reply off;
@@ -377,7 +379,7 @@ export function ChatProvider({ children }) {
     const controller = new AbortController()
     startStream(conversationId, { messageId: reply.id, controller })
     try {
-      const response = await gateway.call(PROVIDER, 'sendMessageWhole', [
+      const response = await gateway.call(providerOf(model), 'sendMessageWhole', [
         history,
         model,
         (chunk) => appendStream(conversationId, chunk),
@@ -400,7 +402,7 @@ export function ChatProvider({ children }) {
           output: prev.output + outcome.tokenCount,
         }))
       }
-      if (at === 0 && content) describeNewChat(conversationId, forModel([prompt, finished]), prompt.content).catch(() => {})
+      if (at === 0 && content) describeNewChat(conversationId, forModel([prompt, finished]), prompt.content, model).catch(() => {})
     } catch (error) {
       const aborted = error.name === 'AbortError'
       if (!aborted) noteCut(conversationId) // the ink pot spills (C114)
@@ -484,7 +486,7 @@ export function ChatProvider({ children }) {
     const history = [
       ...priorMessages,
       { role: 'assistant', content: incompleteMsg.content },
-      { role: 'user', content: continueInstruction(PROVIDER) },
+      { role: 'user', content: continueInstruction(providerOf(model)) },
     ]
 
     // Reuse the existing message record
@@ -493,7 +495,7 @@ export function ChatProvider({ children }) {
     const stopPersisting = persistEvery(conversationId, incompleteMsg.id)
 
     try {
-      const response = await gateway.call(PROVIDER, 'sendMessage', [
+      const response = await gateway.call(providerOf(model), 'sendMessage', [
         history,
         model,
         (chunk) => appendStream(conversationId, chunk),

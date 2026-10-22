@@ -50,6 +50,12 @@ function allowed(url, origins) {
   })
 }
 
+// The one header a manifest may ask for: naming Parliament to a source that
+// asks automated clients to identify themselves, as Wikimedia does for
+// browser tools (its User-Agent policy; C160). It names the app, the same
+// for everyone, never the person.
+const IDENTIFY_HEADERS = new Set(['Api-User-Agent'])
+
 // Most results a list keeps, whatever a manifest asks.
 const MOST = 10
 
@@ -127,9 +133,11 @@ export function listText(items) {
 /**
  * A source from its manifest.
  * @param {object} manifest
- * @param {{ origins: string[], fetch: typeof fetch }} deps the origins the list gives it, and fetch
+ * @param {{ origins: string[], fetch: typeof fetch, identity?: string }} deps the origins the list gives it,
+ *   fetch, and how Parliament names itself where a source asks (C160)
  */
-export function createSource(manifest, { origins, fetch: request }) {
+export function createSource(manifest, { origins, fetch: request, identity = null }) {
+  const identify = identity && IDENTIFY_HEADERS.has(manifest.identifyWith) ? { [manifest.identifyWith]: identity } : {}
   const list = manifest.shape === 'list'
   return {
     /**
@@ -148,7 +156,7 @@ export function createSource(manifest, { origins, fetch: request }) {
 
       let res
       try {
-        res = await request(url.toString(), { credentials: 'omit', referrerPolicy: 'no-referrer', signal, headers: { Accept: 'application/json' } })
+        res = await request(url.toString(), { credentials: 'omit', referrerPolicy: 'no-referrer', signal, headers: { Accept: 'application/json', ...identify } })
       } catch (err) {
         if (err?.name === 'AbortError') throw err
         throw new SourceError('unreachable')

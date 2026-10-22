@@ -29,7 +29,9 @@
 
 export const DESTINATIONS = Object.freeze([
   { id: 'anthropic', kind: 'model', name: 'Anthropic', origins: ['https://api.anthropic.com'], key: true, ships: true, stage: 4, keysPage: 'https://console.anthropic.com/settings/keys' },
-  { id: 'mistral', kind: 'model', name: 'Mistral', origins: ['https://api.mistral.ai'], key: true, ships: false, stage: 7 },
+  // Its global address and the two that process prompts in one region,
+  // chosen by the person, never by their network (stage 7, piece 3; C159).
+  { id: 'mistral', kind: 'model', name: 'Mistral', origins: ['https://api.mistral.ai', 'https://api.eu.mistral.ai', 'https://api.us.mistral.ai'], key: true, ships: true, stage: 7, keysPage: 'https://console.mistral.ai/api-keys' },
   // On this machine, by its exact port (CLAUDE.md, hard constraints).
   { id: 'ollama', kind: 'local', name: 'Ollama', origins: ['http://localhost:11434'], key: false, ships: false, stage: 7 },
   // Every language edition, so answers come from the person's language (C110).

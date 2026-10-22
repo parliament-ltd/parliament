@@ -489,6 +489,12 @@ export const COPY = {
     // source's name, {provider} a provider's, both from the list.
     promptNeedsKey: /*i18n*/ { id: 'enter.promptNeedsKey', message: '{name} answers here and needs a key for {provider}. {command} adds one, by: chooses another', comment: 'Commands stay English' },
     promptGone: /*i18n*/ { id: 'enter.promptGone', message: '{name} is no longer offered. by: chooses who answers here', comment: 'C151: a chat or a default naming a model the list no longer has' },
+    promptRegion: /*i18n*/ {
+      id: 'enter.promptRegion',
+      message: '{region, select, eu {Processed in the EU, at 1.1 times the price} us {Processed in the US, at 1.1 times the price} other {}}',
+      comment: 'Where Mistral processes the prompt, chosen in its key panel (C159)',
+    },
+    promptPreviewModel: /*i18n*/ { id: 'enter.promptPreviewModel', message: '{name} is a preview: its provider may change or withdraw it', comment: 'A model offered before general availability (security notes §3)' },
     promptPerDay: /*i18n*/ { id: 'enter.promptPerDay', message: 'About {count} searches a day without a key, shared by everyone on your network', comment: 'Said when a source with a daily allowance answers (C156)' },
     sourceNetwork: /*i18n*/ { id: 'enter.sourceNetwork', message: '{source} is not answering from your current network. A VPN can cause this; try without it for this source', comment: 'A source refused the request (403), as some do for shared VPN addresses (LPN §8)' },
     sourceBusy: /*i18n*/ { id: 'enter.sourceBusy', message: '{source} says too many requests from your network for now. Try again later', comment: 'A source answered 429: its allowance for this network is used up, or it is busy' },
@@ -744,6 +750,13 @@ export const COPY = {
   // §6; Settings v1). {provider} is a name from the list of providers;
   // {ending} a key's last four characters.
   keys: {
+    // Mistral's processing region (C159; LPN §7.1: "processed in the EU" is
+    // true, "your data stays in the EU" is not).
+    region: /*i18n*/ { id: 'keys.region', message: 'Prompts processed:', comment: 'Where a provider processes prompts; three choices follow' },
+    regionGlobal: /*i18n*/ { id: 'keys.regionGlobal', message: 'anywhere, list price' },
+    regionEu: /*i18n*/ { id: 'keys.regionEu', message: 'in the EU, 1.1 times the price' },
+    regionUs: /*i18n*/ { id: 'keys.regionUs', message: 'in the US, 1.1 times the price' },
+    regionNote: /*i18n*/ { id: 'keys.regionNote', message: 'Your key, account and billing may still be handled elsewhere.' },
     label: /*i18n*/ { id: 'keys.label', message: 'Your keys' },
     heading: /*i18n*/ { id: 'keys.heading', message: 'API keys' },
     promise: /*i18n*/ { id: 'keys.promise', message: 'Encrypted in this browser. Each goes only to its own provider.' },
@@ -781,6 +794,8 @@ export const COPY = {
     sources: /*i18n*/ { id: 'picker.sources', message: 'Sources', comment: 'Answers from public sources, with no model' },
     noTokens: /*i18n*/ { id: 'picker.noTokens', message: 'no tokens, no key', comment: 'Beside the Sources group' },
     later: /*i18n*/ { id: 'picker.later', message: 'later', comment: 'A row not built yet' },
+    madeBy: /*i18n*/ { id: 'picker.madeBy', message: 'made by {maker}', comment: 'A model its provider hosts but did not make (LPN §7.1). {maker} is a company name' },
+    preview: /*i18n*/ { id: 'picker.preview', message: 'preview', comment: 'A model offered before general availability; it may change or go' },
     addKey: /*i18n*/ { id: 'picker.addKey', message: 'add a key', comment: 'A model whose provider has no key here; a click writes api:' },
     englishOnly: /*i18n*/ { id: 'picker.englishOnly', message: 'English only', comment: "A source whose answers are in English whatever the reader's language (LPN §6)" },
     mostlyEnglish: /*i18n*/ { id: 'picker.mostlyEnglish', message: 'mostly English', comment: 'A source whose answers are mostly in English' },
@@ -801,6 +816,10 @@ export const COPY = {
     opus: /*i18n*/ { id: 'picker.about.opus', message: 'Slow and costly. Worth it for hard reasoning, wasteful otherwise.' },
     sonnet: /*i18n*/ { id: 'picker.about.sonnet', message: 'Balanced for most work.' },
     haiku: /*i18n*/ { id: 'picker.about.haiku', message: 'Quickest and cheapest. Good for short, plain questions.' },
+    mistralMedium: /*i18n*/ { id: 'picker.about.mistralMedium', message: 'A mid-sized model.' },
+    mistralLarge: /*i18n*/ { id: 'picker.about.mistralLarge', message: 'A large model, in many languages.' },
+    mistralSmall: /*i18n*/ { id: 'picker.about.mistralSmall', message: 'Quick and cheap. Good for short, plain questions.' },
+    glm: /*i18n*/ { id: 'picker.about.glm', message: 'One of the models this provider hosts for others.' },
     mistral: /*i18n*/ { id: 'picker.about.mistral', message: 'Models with a choice of where your prompts are processed.' },
     ollama: /*i18n*/ { id: 'picker.about.ollama', message: 'Runs on your machine. No key, no network, costs electricity.' },
     wikipedia: /*i18n*/ { id: 'picker.about.wikipedia', message: 'Reads the article directly, in your language. No model, so nothing is spent.' },

@@ -1,7 +1,9 @@
 import { AnthropicProvider } from './anthropic'
+import { MistralProvider } from './mistral'
 
 const providers = {
   anthropic: new AnthropicProvider(),
+  mistral: new MistralProvider(),
 }
 
 export function getProvider(name = 'anthropic') {

@@ -14,7 +14,7 @@ import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
-import { hasKey, metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels } from '../net'
+import { metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion } from '../net'
 import AnswerPicker from './AnswerPicker'
 import { ignite } from './ignition'
 import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
@@ -1088,9 +1088,13 @@ export default function Shell() {
 
   // ── Prompts from the bar (stage 4) ────────────────────
   const { messages, activeConversationId, sendMessage, resendWhole, askSource } = useChat()
-  const { settings } = useSettings()
+  const { settings, updateSetting } = useSettings()
   const { buildSystemPrompt } = useCollabMode()
-  const [keyed, setKeyed] = useState(null) // whether there is a key, without decrypting it; null until known
+  // Which providers have a key here, without decrypting one; null until
+  // known (stage 7: a key per provider). keyed: whether the default
+  // provider has one, as stage 4 had it.
+  const [keyedBy, setKeyedBy] = useState(null)
+  const keyed = keyedBy == null ? null : Boolean(keyedBy[PROVIDER])
   const [stalledIn, setStalledIn] = useState(null) // the chat whose last reply stalled (C114)
   const creating = useRef(false)
   const latest = useRef({})
@@ -1099,15 +1103,20 @@ export default function Shell() {
   // The chats as they stand on disk, for "the last room".
   useEffect(() => { loadConversations().catch(() => {}) }, [loadConversations])
 
-  // Whether there is a key: on load, and on coming back to the page, since
-  // Settings may have changed it meanwhile.
+  // Which providers have a key: on load, and on coming back to the page,
+  // since Settings may have changed it meanwhile.
   useEffect(() => {
     let live = true
-    const check = () => hasKey().then((k) => { if (live) setKeyed(Boolean(k)) }, () => { if (live) setKeyed(false) })
+    const check = () => keyedProviders().then((k) => { if (live) setKeyedBy(k) }, () => { if (live) setKeyedBy({}) })
     check()
     window.addEventListener('focus', check)
     return () => { live = false; window.removeEventListener('focus', check) }
   }, [keysRev])
+
+  // Mistral's processing region, kept in Settings (C159). Set before who
+  // answers is worked out, so its prices are the region's.
+  const region = settings.mistralRegion ?? 'global'
+  useMemo(() => setRegion('mistral', region), [region])
 
   const roomId = roomOnScreen(arrangement) // the chat in the space's room; null in an empty room; undefined with no room
   const streaming = useIsStreaming(roomId ?? '')
@@ -1135,11 +1144,11 @@ export default function Shell() {
     }
   }, [])
   const roomRecord = roomId ? conversations.find((c) => c.id === roomId) ?? null : null
-  const keyedBy = useMemo(() => ({ [PROVIDER]: Boolean(keyed) }), [keyed])
+  const keys = useMemo(() => keyedBy ?? {}, [keyedBy])
   // The chat's own choice, or the one held for the chat the next prompt starts.
   const chosenHere = roomId ? roomRecord?.answerer ?? null : pendingAnswerer
-  const answerer = useMemo(() => answererOf({ chosen: chosenHere, keyed: keyedBy, defaultModel: settings.defaultModel }), [chosenHere, keyedBy, settings.defaultModel])
-  const answerRows = useMemo(() => pickerRows(keyedBy), [keyedBy])
+  const answerer = useMemo(() => answererOf({ chosen: chosenHere, keyed: keys, defaultModel: settings.defaultModel }), [chosenHere, keys, settings.defaultModel, region]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices
+  const answerRows = useMemo(() => pickerRows(keys), [keys, region]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices
   // The model cost marks compare with, named once in the picker (settings spec §8).
   const referenceName = useMemo(() => allModels().find((m) => m.reference)?.name ?? null, [])
   const answering = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: answerer, rows: answerRows, stored: chosenHere }), [roomId, roomRecord, answerer, answerRows, chosenHere])
@@ -1161,11 +1170,13 @@ export default function Shell() {
     const answers = kept.filter(fromSource)
     return { count: answers.length, names: [...new Set(answers.map((m) => m.source.name || m.source.id))] }
   }, [kept])
-  // A chat's first prompt is followed, with a key, by one request for its
-  // title, summary and tags, unless turned off in Settings (C62).
-  const describeModel = useMemo(() => modelFacts(metadataModel(PROVIDER)), [])
+  // A chat's first prompt is followed, when a model answers, by one request
+  // for its title, summary and tags to that model's provider, unless turned
+  // off in Settings (C62).
+  const byModel = answerer.group === 'model' && !answerer.needsKey && !answerer.gone && !answerer.later
+  const describeModel = useMemo(() => modelFacts(metadataModel(answerer.provider ?? PROVIDER)), [answerer.provider, region]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices
   const firstPrompt = roomId === null || (Boolean(roomId) && activeConversationId === roomId && messages.length === 0)
-  const describes = Boolean(keyed && firstPrompt && settings.describeNewChats !== false)
+  const describes = Boolean(byModel && firstPrompt && settings.describeNewChats !== false)
   const describe = useMemo(() => (describes ? { price: describeModel?.cost ?? null } : null), [describes, describeModel])
   // With cards selected on the Collection, a prompt starts a new chat about
   // them: their words first, quoted, then what is typed (C145 (h)).
@@ -1176,7 +1187,7 @@ export default function Shell() {
     const text = aboutText(rows, (r) => i18n._(COPY.chat.aboutCard, { kind: r.kind, num: r.num }))
     return { nums: rows.map((r) => r.num), quotes: rows.filter((r) => r.kind === 'quote').map((r) => r.num), chars: text.length, text }
   }, [arrangement.addressed, pickedHere, numbered, i18n])
-  const describeFresh = useMemo(() => (keyed && settings.describeNewChats !== false ? { price: describeModel?.cost ?? null } : null), [keyed, settings.describeNewChats, describeModel])
+  const describeFresh = useMemo(() => (byModel && settings.describeNewChats !== false ? { price: describeModel?.cost ?? null } : null), [byModel, settings.describeNewChats, describeModel])
   // With no room in the space, a prompt starts a chat in a room beside
   // what is here, so it is offered as going to a new room (C125).
   const prompt = useMemo(() => ({
@@ -1184,12 +1195,14 @@ export default function Shell() {
     chat: roomRecord?.num ?? null,
     streaming,
     keyed,
+    keyedBy,
+    region: answerer.provider === 'mistral' ? region : null,
     provider: destination(PROVIDER)?.name,
     source: destination(SOURCE)?.name,
     model: answerer.name,
     answerer,
     historyChars: about ? 0 : historyChars(along),
-    systemChars: keyed ? buildSystemPrompt().length : 0,
+    systemChars: byModel ? buildSystemPrompt().length : 0,
     perMillion: answerer.price?.inputPerMillion ?? null,
     hiddenOut: about ? 0 : hiddenOut,
     sourcesOut: about ? NO_SOURCES : sourcesOut,
@@ -1198,7 +1211,7 @@ export default function Shell() {
     ink,
     roomName: roomNameHere,
     about,
-  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, buildSystemPrompt, about])
+  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, buildSystemPrompt, about])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -1212,19 +1225,19 @@ export default function Shell() {
     const chatId = aboutNow ? null : roomOnScreen(current.current) ?? null
     if (creating.current) return { refused: 'promptBusy' }
     // The line named a recipient; if that has changed since, say so first.
-    const fresh = await hasKey().then(Boolean, () => false)
-    if (fresh !== shown?.keyed) { setKeyed(fresh); return { refused: 'promptChanged' } }
+    const fresh = await keyedProviders().catch(() => ({}))
+    if (JSON.stringify(fresh) !== JSON.stringify(shown?.keyedBy ?? null)) { setKeyedBy(fresh); return { refused: 'promptChanged' } }
     // Who answers, read again: the line named them, and no one else is sent
     // to (C150).
     const conv = chatId ? await getConversation(chatId).catch(() => null) : null
-    const who = answererOf({ chosen: chatId ? conv?.answerer ?? null : pendingNow.current, keyed: { [PROVIDER]: fresh }, defaultModel: latest.current.settings.defaultModel })
+    const who = answererOf({ chosen: chatId ? conv?.answerer ?? null : pendingNow.current, keyed: fresh, defaultModel: latest.current.settings.defaultModel })
     if (shown?.answerer && who.id !== shown.answerer.id) return { refused: 'promptChanged' }
     if (who.later || who.gone || who.needsKey) return { refused: 'promptChanged' }
 
     // Nothing typed, and the last reply here stalled: send it again without
     // streaming, as the Enter line offered (C114).
     if (!text) {
-      if (!shown?.resend || !chatId || !fresh || who.group !== 'model') return { refused: 'promptFailed' }
+      if (!shown?.resend || !chatId || !fresh[who.provider] || who.group !== 'model') return { refused: 'promptFailed' }
       setStalledIn(null)
       const { buildSystemPrompt: system } = latest.current
       const done = resendWhole(chatId, who.id, system())
@@ -1268,7 +1281,7 @@ export default function Shell() {
     const done = sending
       .then(() => { loadConversations().catch(() => {}); return null })
       .catch((err) => {
-        if (err?.name === 'Refused') hasKey().then((k) => setKeyed(Boolean(k)), () => {})
+        if (err?.name === 'Refused') keyedProviders().then(setKeyedBy, () => {})
         // A stall: the Enter line now offers to send it again (C114).
         if (err?.name === 'Stalled') { setStalledIn(id); return null }
         return failure(err, who.group === 'source' ? who.name : undefined)
@@ -1382,7 +1395,7 @@ export default function Shell() {
       <div ref={dockSlot} className="ch-bar-host" />
       {!barWindow && createPortal(
         <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)}
-          keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory' } : null}
+          keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory', region, onRegion: (r) => updateSetting('mistralRegion', r) } : null}
           onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)}
           picker={picking ? { rows: answerRows, now: answerer, reference: referenceName } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => setPicking(false)} />,
         barHost,

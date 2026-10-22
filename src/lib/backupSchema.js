@@ -82,6 +82,9 @@ const SETTINGS = Object.freeze({
   installPromptDismissed: either(bool, str(40), num(0, Number.MAX_SAFE_INTEGER)),
   finishRepliesOnLeave: bool, // C109
   describeNewChats: bool, // C62
+  // Where Mistral processes prompts: the person's choice, kept like their
+  // model (stage 7, piece 3; C159).
+  mistralRegion: (v) => v === 'global' || v === 'eu' || v === 'us',
 })
 
 // Settings named after something. `chat` names the chat in the key, so a

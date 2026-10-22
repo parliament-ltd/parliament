@@ -178,6 +178,7 @@ Line numbers are approximate.
 - **C154: yes.** The key check, the title request and `summarize:` go to Haiku 5.5.
 - **C149: yes.** `by:` chooses who answers.
 - **C147 (c): the conversion runs once on its own** ("once on its own is fine"), after the dry run on Stefan's backups found nothing to convert.
+- **Drafting Desk's review uses the default model** ("drafting desk can be default model"), not a fixed Sonnet 4.6, and goes to that model's provider.
 
 ## Part 1. Settled by precedence
 
@@ -1308,6 +1309,29 @@ Found while splitting stage 7 into pieces. Read with C131 (Records, Framework). 
 - **Suggestion:** keep as built.
 
 **C158. The welcome letter's sentence about where requests go.** The letter (C122) says each request goes "to the provider you pick, to a model running on your own machine, or just Wikipedia". With Hacker News and OpenAlex shipped, that is no longer the whole list, and every claim must stay true (W §3). **Built:** the privacy copy draft's wording, "or to a public source such as Wikipedia". The letter is Stefan's to edit in the copy table.
+
+**C159. Mistral, as built** (piece 3). LPN §7.1, C82, the security notes §3 and the settings spec §8. Prices checked on Mistral's pricing page on 22 October. Built so:
+- **(a) The provider** (`providers/mistral.js`) behind the same interface as Anthropic's: streaming, the whole reply without streaming (C114), the same stall after 45 seconds of silence, a key check that lists the key's models and spends nothing, and why a reply stopped in the words the chat already reads. Only a message's words go; images and files attached in another provider's form are left out (the bar attaches nothing yet).
+- **(b) The models,** fixed versions and never a `-latest` alias: Mistral Medium 3.5 ($1.50 / $7.50 per million tokens, ×2), Mistral Large 4 ($1.36 / $4.18, ×0.9, a **preview**), GLM 5.3 ($1.40 / $4.40, ×1, **made by Z.ai**), Mistral Large 3 ($0.50 / $1.50, ×0.3), Mistral Small 4 ($0.15 / $0.60, ×0.1). The picker says who made a model where that is not its provider, and marks a preview, as does the Enter line. **The API ids are as the docs give them, to confirm with a key:** a wrong one shows as an error on the first prompt to that model.
+- **(c) Three addresses,** all in the connection policy: global, EU and US. **Where prompts are processed** is chosen in Mistral's row of the key panel (`api:mistral`): anywhere at list price, or in the EU or the US at 1.1 times the price, with "Your key, account and billing may still be handled elsewhere" (LPN: "processed in the EU" is true, "your data stays in the EU" is not). Kept as a setting of the person's, `mistralRegion`, which backups carry. **New setting, shown at the checkpoint.** The Enter line says when a prompt is processed in a region and costs more. Never chosen from the network address.
+- **(d) Keys and sending by provider.** The shell knows which providers have a key; a prompt goes to the provider of the model that answers, with that provider's key, and so do continuing a reply and the whole-reply resend. A chat's one request for its title, summary and tags (C62) goes to the provider that answered, to its small model (Mistral Small 4 for Mistral), and the Enter line prices that. Settings' default model can still only be one of Anthropic's until Settings v1 (stage 9); Mistral is chosen per chat with `by:` or the picker.
+- **(e) Not built here:** `summarize:` stays with Anthropic's small model; the training label, retention mark and Mistral's checklist come with piece 7; no language tags, since Mistral publishes no list of first-tier languages (looked for on 22 October).
+- **Stefan's test first:** `api:mistral` and save a key; `by:mistral small` (or a click in the picker); one prompt. If it streams, the rest stands. If it fails, it comes back here before more is built on it.
+- **Suggestion:** keep as built.
+
+**C160. Naming Parliament to Wikipedia.** Asked by Stefan on 22 October: Wikimedia asks automated clients to identify themselves. Its User-Agent policy (now on foundation.wikimedia.org, edited March 2026) encourages, not requires, browser tools to send an `Api-User-Agent` header (a browser forbids pages to set `User-Agent`), as name, version and contact. Wikipedia's API accepts the header from any page (its answer to a browser's preflight lists it, checked 22 October). Since March 2026 Wikimedia rate-limits by how a client is identified (about 200 requests a minute for a browser without an account).
+- **Built:** every Wikipedia lookup sends `Api-User-Agent: Parliament/0.5 (https://parliament.ltd; support@parliament.ltd)`. It names the app, the same for everyone, never the person. A manifest may ask for this one header and no other.
+- **The cost:** a header of our own makes the browser ask Wikipedia first whether it may send it (one more short request before each lookup, carrying nothing of the person's). Links in answers are ordinary links and are not affected.
+- **Suggestion:** keep. A ruling to drop it removes one line from `wikipedia.json`.
+
+**C161. Anthropic's API version of 21 October.** Asked by Stefan on 22 October. Checked on the provider's migration guide that day: the new version (`2026-10-21`) refuses `temperature`, `top_p` and `top_k`, and two kinds of block, but only for requests that send that version. Parliament sends `2023-06-01`, which carries on with no end date published, and sends none of those fields: **not affected, nothing changed.** The new SDKs send the key as `Authorization: Bearer` instead of `x-api-key`; the API takes either, and calls `x-api-key` a "legacy fallback, still supported". Two notes for later:
+- **Suggestion:** move to `Authorization: Bearer` and the new version together, once there is a key to try it with, so nothing changes untested.
+- A key made without a workspace now needs an `anthropic-workspace-id` header, or every request is refused. Someone bringing such a key would see "The key was refused". **Suggestion:** say so in the key panel's guide to making a key (make it in a workspace), rather than ask for the id.
+
+**C162. Two local models, for piece 4** (asked by Stefan on 22 October; facts from the providers' pages and Ollama's library that day).
+- **Nemotron 3.5** (NVIDIA), chat models under the OpenMDW 1.1 licence, which allows commercial use and redistribution. The one to run on a computer is Lightning 30B-A3B (`nemotron-3.5-lightning` in Ollama, 19 to 25 GB to download). Its languages: English, Spanish, French, German, Italian and Japanese; not Swedish or Finnish. Bolt 74B-A9B needs about 25 GB; a small "E4B" (about 4 GB) is due on 23 October and is not in Ollama yet.
+- **EmbeddingGemma 2** (Google), Apache 2.0: not a chat model but an embedding model (it turns text into numbers for finding things by meaning). The text-only build is about 300 MB (`embeddinggemma-2:270m`), over 100 languages (which ones is not published), 768 numbers per text.
+- **Suggestion:** Parliament lists whatever models Ollama has on the machine (piece 4), so either works without being named in the code. Neither fits as a default to recommend: Lightning is large and misses Swedish and Finnish; the small Nemotron is not out. EmbeddingGemma 2 is not for answering prompts; it could later let Records find things by meaning on this machine, a new feature to put to Stefan on its own. The names filter and injection check (S3) need a small chat model; the E4B is worth a look once Ollama has it.
 
 ## Proposed CLAUDE.md rewrite
 

@@ -28,6 +28,9 @@ export const keys = createKeyring({
 // The code behind each shipped entry. Models come from src/providers;
 // sources are manifests read by one runner (sources.js), each allowed only
 // the origins the list gives it.
+// How Parliament names itself to a source that asks automated clients to
+// (Wikimedia's User-Agent policy: name, version, contact; C160).
+export const IDENTITY = 'Parliament/0.5 (https://parliament.ltd; support@parliament.ltd)'
 const MANIFESTS = { wikipedia: wikipediaManifest, hackernews: hackernewsManifest, openalex: openalexManifest }
 const sources = new Map()
 function implementation(id) {
@@ -35,7 +38,7 @@ function implementation(id) {
   if (!d) return null
   if (d.kind === 'model') return getProvider(id)
   if (d.kind === 'source' && MANIFESTS[id]) {
-    if (!sources.has(id)) sources.set(id, createSource(MANIFESTS[id], { origins: d.origins, fetch: (...a) => window.fetch(...a) }))
+    if (!sources.has(id)) sources.set(id, createSource(MANIFESTS[id], { origins: d.origins, fetch: (...a) => window.fetch(...a), identity: IDENTITY }))
     return sources.get(id)
   }
   return null
@@ -75,6 +78,28 @@ export const modelsOf = (id) => (destination(id)?.ships ? models(id) : [])
  */
 export const networkByHost = (entries, requests = gateway.requests()) =>
   requestsByHost({ entries, requests, destinations: DESTINATIONS, self: typeof location === 'undefined' ? null : location.host })
+
+/**
+ * The provider a model belongs to, by its id or an old short id (stage 7,
+ * piece 3): a reply goes to the provider of the model that answers, with
+ * that provider's key. A model no list knows is the default provider's.
+ */
+export function providerOf(modelId) {
+  for (const d of DESTINATIONS.filter((x) => x.ships && x.kind !== 'source')) {
+    if (findModel(modelsOf(d.id), modelId)) return d.id
+  }
+  return DEFAULT_MODEL_PROVIDER
+}
+
+/** Which built providers have a key here, without decrypting one: { anthropic: true, mistral: false }. */
+export async function keyedProviders() {
+  const out = {}
+  for (const d of shipped().filter((x) => x.key)) out[d.id] = Boolean(await keys.has(d.id).catch(() => false))
+  return out
+}
+
+/** A provider's processing region, where it has one (Mistral: global, eu or us; C159). */
+export const setRegion = (id, region) => implementation(id)?.setRegion?.(region)
 
 /** Every built provider's models, current and older, as the model: filter reads them. */
 export const allModels = () => DESTINATIONS.filter((d) => d.ships && d.kind !== 'source').flatMap((d) => modelsOf(d.id))

@@ -80,6 +80,9 @@ export function answererRows({ destinations, modelsOf, keys = {}, reference = nu
     }
     const rows = [...current].sort((a, b) => priceTotal(b) - priceTotal(a)).map((m) => ({
       id: m.id, group, name: m.name, provider: d.id, providerName: d.name, about: m.about ?? null,
+      // Who made it, where that is not its provider (LPN §7.1), and whether
+      // it is a preview (security notes §3).
+      maker: m.maker && m.maker !== d.name ? m.maker : null, preview: Boolean(m.preview),
       mark: costMark(m.cost, reference), later: false, needsKey: Boolean(d.key && !keys[d.id]),
     }))
     out[group].push(...rows)
@@ -126,12 +129,15 @@ export function answererFor({ chosen = null, keys = {}, defaultModel = null, des
       if (!m) continue
       return {
         id: m.id, group: p.kind === 'local' ? 'local' : 'model', name: m.name, provider: p.id, providerName: p.name, chosen: isChosen,
-        price: m.cost ?? null, needsKey: Boolean(p.key && !keys[p.id]), gone: Boolean(m.retired), later: !p.ships,
+        price: m.cost ?? null, needsKey: Boolean(p.key && !keys[p.id]), gone: Boolean(m.retired), later: !p.ships, preview: Boolean(m.preview),
       }
     }
     return { id, group: 'model', name: id, provider: null, providerName: null, chosen: isChosen, price: null, needsKey: false, gone: true, later: false }
   }
   if (chosen) return describe(chosen, true)
-  if (keys[defaultProvider]) return describe(defaultModel, false)
+  // The default model, when its provider has a key here (a model no list
+  // knows counts as the default provider's, and is said to be gone).
+  const d = describe(defaultModel, false)
+  if (keys[d.provider ?? defaultProvider]) return d
   return describe(KEYLESS_DEFAULT, false)
 }

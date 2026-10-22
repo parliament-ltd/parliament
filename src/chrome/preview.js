@@ -392,9 +392,10 @@ function planBy(a, step, screens = {}) {
   if (!ans || ans.room === undefined) return { says: { message: 'promptNoRoom' }, act: null }
   const args = step.match?.values ?? []
   if (!args.length) return { says: { message: 'byHere', values: { name: ans.now.name } }, act: { kind: 'picker' } }
-  const items = args[0].kind === 'list' ? args[0].items : args
-  if (items.length > 1) return { says: { message: 'bySeveral' }, act: null }
-  const word = typed(items[0])
+  // Several names with commas would be several answering at once; several
+  // words with spaces are one name (by:mistral small).
+  if (args.some((x) => x.kind === 'list')) return { says: { message: 'bySeveral' }, act: null }
+  const word = args.map((x) => (x.kind === 'text' ? x.value : x.text ?? String(x.value ?? ''))).join(' ')
   const found = findAnswerers(ans.rows, word)
   if (!found.length) return { says: { message: 'byNone', values: { word } }, act: null }
   if (found.length > 1) return { says: { message: 'byWhich', values: { word, names: found.map((r) => r.name), example: `by:"${found[0].name}"` } }, act: null }
@@ -640,6 +641,10 @@ export function promptPreview(text, target = {}) {
   const cost = inputCost(tokens, price?.inputPerMillion ?? target.perMillion)
   const values = { provider: who.name, tokens }
   const also = []
+  // Where it is processed, when that costs more (Mistral's regions, C159),
+  // and a model offered before general availability (security notes §3).
+  if (target.region && target.region !== 'global') also.push({ message: 'promptRegion', values: { region: target.region } })
+  if (who.preview) also.push({ message: 'promptPreviewModel', values: { name: who.name } })
   if (about) {
     also.push({ message: 'promptAbout', values: { count: about.nums.length } })
     if (about.quotes?.length) also.push({ message: 'promptAboutQuotes', values: { nums: about.quotes, count: about.quotes.length } })
