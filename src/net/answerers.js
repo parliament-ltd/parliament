@@ -86,6 +86,7 @@ export function answererRows({ destinations, modelsOf, keys = {}, reference = nu
       // Who made it, where that is not its provider (LPN §7.1), and whether
       // it is a preview (security notes §3).
       maker: m.maker && m.maker !== d.name ? m.maker : null, preview: Boolean(m.preview),
+      thinks: Boolean(m.thinks), // it can think before answering (C165)
       mark: costMark(m.cost, reference), later: false, needsKey: Boolean(d.key && !keys[d.id]),
     }))
     out[group].push(...rows)
@@ -137,7 +138,7 @@ export function answererFor({ chosen = null, keys = {}, defaultModel = null, des
       if (!m) continue
       return {
         id: m.id, group: p.kind === 'local' ? 'local' : 'model', name: m.name, provider: p.id, providerName: p.name, chosen: isChosen,
-        price: m.cost ?? null, needsKey: Boolean(p.key && !keys[p.id]), gone: Boolean(m.retired), later: !p.ships, preview: Boolean(m.preview),
+        price: m.cost ?? null, needsKey: Boolean(p.key && !keys[p.id]), gone: Boolean(m.retired), later: !p.ships, preview: Boolean(m.preview), thinks: Boolean(m.thinks),
       }
     }
     return { id, group: 'model', name: id, provider: null, providerName: null, chosen: isChosen, price: null, needsKey: false, gone: true, later: false }

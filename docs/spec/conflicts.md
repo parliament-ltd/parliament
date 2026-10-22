@@ -1360,6 +1360,15 @@ Found while splitting stage 7 into pieces. Read with C131 (Records, Framework). 
 - **(h) From a restored file,** frameworks of yours and the frameworks on a chat come in as they were; they go with a prompt only after the Enter line has named them, so nothing applies unseen.
 - **Suggestion:** keep as built.
 
+**C165. A model's thinking, shown as it goes; off by default.** Stefan, 22 October, after Bonsai 2 took about 11 minutes with nothing on screen: "if local models can take that long, it'd be kind of worth it to showcase the thinking so the user know the model is still performing ... some form of text that would showcase work and be clearly different from normal output"; "on by default with the option to turn it off". Built so:
+- **(a) Shown as it comes,** above where the answer will be, in its own quiet style (small italic, a dotted rule on its side, the latest lines only) under a label with a running clock, "thinking · 2:31". Not the old ghost text: that already means an interrupted reply with Continue, and two meanings in one look would mislead.
+- **(b) Folded once the answer starts,** to one line, "thought for 11 minutes · show", which opens it.
+- **(c) Kept with the reply,** folded: a new optional field on the message, `thinking` (up to 20,000 characters) and `thinkingMs`, so the work behind a long wait can be read later. **Shown at the checkpoint.** Never sent to a model again (only a reply's own words are), left out of search, copy and export, and shown as plain text, never formatted.
+- **(d) Off by default, ruled 22 October** (Stefan: "so with thinking off it runs faster? ... perhaps we have it default off, then if turned on we have the affordances we have designed"). `thinking:on` and `thinking:off` change it, a setting of the person's (`thinking`, carried by backups), and `undo:` takes it back. Off, Parliament asks a model that can think not to (Ollama's `think: false`), and only one that can, since Ollama refuses the request otherwise. Tried on 22 October with `bonsai-2:9b`: off, "Is a barn owl a raptor?" was answered in about 17 seconds (19 tokens); on, "Name one owl that lives in Sweden" thought for about 2½ minutes (shown live, then folded) before "Tawny owl".
+- **(e) Before Enter,** the line says a model on this computer will think first and that it can take minutes, or that it answers straight away and `thinking:on` lets it think; the picker marks such a model "can think". Which models think is what Ollama says of each.
+- **(f) For now only models on this computer** send their thinking: none of the hosted models is asked to think (that would cost tokens, and would be named with its cost when it comes).
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

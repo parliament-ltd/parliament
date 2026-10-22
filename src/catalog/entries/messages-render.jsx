@@ -37,7 +37,8 @@ import MessageCard from '../../components/core/MessageCard'
 import SelectConversationModal from '../../components/SelectConversationModal'
 import { useChat } from '../../stores/ChatContext'
 import { useConversationId } from '../../stores/ConversationScope'
-import { useStreamText, useStreamMessageId, useHiddenIds, usePendingDeletes } from '../../stores/chatHooks'
+import { useStreamText, useStreamMessageId, useHiddenIds, usePendingDeletes, useStreamThinking, useStreamAnswering } from '../../stores/chatHooks'
+import { getStream } from '../../stores/chatStore'
 import { hideMessage, showAllMessages, scheduleDelete, undoDelete } from '../../stores/chatStore'
 import { COPY } from '../../copy'
 import { useSettings } from '../../stores/SettingsContext'
@@ -74,6 +75,9 @@ export default function MessagesRender() {
   // redraws while it streams; the rest of the page does not (stage 3).
   const streamingContent = useStreamText(activeConversationId)
   const streamingMessageId = useStreamMessageId(activeConversationId)
+  // A model's thinking as it goes, and whether its answer has begun (C165).
+  const streamingThinking = useStreamThinking(activeConversationId)
+  const streamingAnswering = useStreamAnswering(activeConversationId)
   const { i18n } = useLingui()
   const { settings } = useSettings()
   const {
@@ -311,6 +315,10 @@ export default function MessagesRender() {
 
     const displayContent = isLatestAssistantStreaming ? streamingContent : msg.content
     const isGhost = msg.incomplete && !isLatestAssistantStreaming
+    // What it thought: live while it streams, kept with it after (C165).
+    const thinking = isLatestAssistantStreaming
+      ? (streamingThinking ? { text: streamingThinking, live: true, answering: streamingAnswering, since: getStream(activeConversationId)?.thinkingAt ?? null } : null)
+      : (msg.role === 'assistant' && msg.thinking ? { text: msg.thinking, ms: msg.thinkingMs ?? null } : null)
     const noteRecord = notes.get(msg.id)
     const isFav = favorites.has(msg.id)
 
@@ -327,6 +335,7 @@ export default function MessagesRender() {
         stoppedNote={isGhost && Object.hasOwn(STOPPED, msg.stopReason ?? '') ? i18n._(msg.stopReason === 'error' && !msg.content ? COPY.chat.cutErrorEmpty : STOPPED[msg.stopReason]) : null}
         source={msg.source ?? null}
         frameworks={msg.role === 'assistant' ? msg.frameworks ?? null : null}
+        thinking={thinking}
         isFavorited={isFav}
         showNotes={showNotes.has(msg.id)}
         savedNoteText={noteRecord?.text || ''}
@@ -349,7 +358,7 @@ export default function MessagesRender() {
       />
     )
   }, [
-    isStreaming, streamingContent, streamingMessageId, i18n,
+    isStreaming, streamingContent, streamingMessageId, streamingThinking, streamingAnswering, activeConversationId, i18n,
     numberByMessageId, activePopoverMsgId,
     favorites, notes, highlights, showNotes,
     handleContinue, handleCopyText,

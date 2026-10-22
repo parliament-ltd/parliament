@@ -1,5 +1,5 @@
 import { useCallback, useSyncExternalStore } from 'react'
-import { subscribe, streamText, streamMessageId, isStreaming, getNotices, getMessages, hiddenIds, pendingDeletes, streamEnd } from './chatStore'
+import { subscribe, streamText, streamMessageId, isStreaming, getNotices, getMessages, hiddenIds, pendingDeletes, streamEnd, streamThinking, streamAnswering } from './chatStore'
 
 // Reading the chat store from a component (state audit §11a). Each hook
 // listens to one conversation's topic, so a reply streaming in one chat
@@ -13,6 +13,16 @@ function useTopic(topic, read) {
 /** The text of the reply being written in a conversation, or ''. */
 export function useStreamText(id) {
   return useTopic(`stream:${id}`, useCallback(() => streamText(id), [id]))
+}
+
+/** The thinking of the reply being written, as it goes, or '' (C165). */
+export function useStreamThinking(id) {
+  return useTopic(`stream:${id}`, useCallback(() => streamThinking(id), [id]))
+}
+
+/** Whether the reply being written has begun to answer, past its thinking. */
+export function useStreamAnswering(id) {
+  return useTopic(`stream:${id}`, useCallback(() => streamAnswering(id), [id]))
 }
 
 /** The message a conversation's reply is filling, or null. */

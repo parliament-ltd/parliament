@@ -21,7 +21,8 @@ export const FIELDS = Object.freeze({
     'answerer', 'frameworks'],
   // model and usage: what a reply was made with and its tokens (C132 (h), stage 6).
   // frameworks: what a reply was written under (stage 7; C164).
-  messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta', 'stopReason', 'source', 'model', 'usage', 'frameworks'],
+  // thinking, thinkingMs: what a model thought before answering, and for how long (C165).
+  messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta', 'stopReason', 'source', 'model', 'usage', 'frameworks', 'thinking', 'thinkingMs'],
   // quotes: the numbers a note quotes beneath it; summary: a dated summary
   // note's numbers, day and model (stage 6, piece 7; C145 (e), (g)).
   notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom', 'quotes', 'summary'],
@@ -87,6 +88,7 @@ const SETTINGS = Object.freeze({
   // Where Mistral processes prompts: the person's choice, kept like their
   // model (stage 7, piece 3; C159).
   mistralRegion: (v) => v === 'global' || v === 'eu' || v === 'us',
+  thinking: bool, // C165
 })
 
 // Settings named after something. `chat` names the chat in the key, so a

@@ -62,6 +62,7 @@ export default function AnswerPicker({ rows, now, reference, onPick }) {
             <span className="nm" dir="auto">{r.name}</span>
             {r.maker && <span className="ch-marg">{i18n._(COPY.picker.madeBy, { maker: r.maker })}</span>}
             {r.preview && <span className="ch-marg">{i18n._(COPY.picker.preview)}</span>}
+            {r.thinks && <span className="ch-marg">{i18n._(COPY.picker.thinks)}</span>}
             {r.needsKey && <span className="ch-marg">{i18n._(COPY.picker.addKey)}</span>}
             {mark(r) && <span className="mk">{mark(r)}</span>}
           </span>

@@ -112,3 +112,12 @@ describe('a backup with frameworks on chats and replies (stage 7, piece 5; C164)
     expect(check(reply({ incomplete: false, frameworks: [{ id: 'own:e1', name: 7 }] })).valid).toBe(false)
   })
 })
+
+describe('a backup with what a model thought (stage 7; C165)', () => {
+  it('accepts its thinking as text and how long it took, and refuses anything else', () => {
+    expect(check(reply({ incomplete: false, thinking: 'First, owls.', thinkingMs: 4200 }))).toEqual({ valid: true })
+    expect(check(reply({ incomplete: false, thinking: 7 })).valid).toBe(false)
+    expect(check(reply({ incomplete: false, thinking: 'x'.repeat(20_001) })).valid).toBe(false)
+    expect(check(reply({ incomplete: false, thinkingMs: -1 })).valid).toBe(false)
+  })
+})

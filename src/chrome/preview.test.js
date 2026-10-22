@@ -971,3 +971,28 @@ describe('framework:, new:framework and forget: (stage 7, piece 5; C164)', () =>
     expect(p.says.also.map((x) => say(i18n, x.message, x.values))).toContain('Frameworks Push back on me and Editor go with it, in that order')
   })
 })
+
+describe('thinking: and the Enter line of a model that thinks (C165)', () => {
+  const at = (value, on = true) => {
+    const p = preview(value, { mode: 'command', arrangement: shipped('almanac'), screens: { thinking: { on } } })
+    return { ...p, text: say(i18n, p.says.message, p.says.values) }
+  }
+  it('is off unless turned on', () => {
+    const p = preview('>thinking:', { mode: 'command', arrangement: shipped('almanac'), screens: {} })
+    expect(say(i18n, p.says.message, p.says.values)).toBe('Thinking is off. thinking:on turns it back on')
+  })
+  it('turns thinking off and on, and says how it stands', () => {
+    expect(at('>thinking:off')).toMatchObject({ text: 'Enter turns thinking off: models that can think answer straight away, quicker and perhaps less careful', act: { kind: 'thinking', on: false, before: true } })
+    expect(at('>thinking:on', false).act).toEqual({ kind: 'thinking', on: true, before: false })
+    expect(at('>thinking:on').text).toBe('Thinking is on already')
+    expect(at('>thinking:').text).toBe('Models that can think do so first, shown as they go. thinking:off turns it off')
+  })
+  it('says before Enter that a local model will think first, or that it will not', () => {
+    const who = { id: 'ollama:bonsai-2:9b', group: 'local', name: 'bonsai-2:9b', provider: 'ollama', providerName: 'Ollama', thinks: true }
+    const room = { room: 'c1', streaming: false, keyed: false, provider: 'Anthropic', source: 'Wikipedia', historyChars: 0, systemChars: 0 }
+    const also = (thinking) => promptPreview('owls?', { ...room, answerer: who, thinking }).says.also.map((x) => say(i18n, x.message, x.values))
+    expect(also(true)[0]).toBe('bonsai-2:9b thinks before answering, shown as it goes. On this computer that can take minutes. thinking:off skips it')
+    expect(also(false)[0]).toBe('bonsai-2:9b answers straight away, without thinking first. thinking:on lets it, shown as it goes, which can take minutes on this computer')
+    expect(promptPreview('owls?', { ...room, answerer: who }).says.also.map((x) => x.message)[0]).toBe('promptThinksOff')
+  })
+})

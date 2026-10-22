@@ -81,3 +81,36 @@ describe('Ollama', () => {
     expect(JSON.parse(fetch.mock.calls.at(-1)[1].body).model).toBe('qwen3.5:9b')
   })
 })
+
+describe('thinking (C165)', () => {
+  const thinker = { name: 'bonsai-2:9b', capabilities: ['completion', 'thinking'] }
+  const plain = { name: 'plain:1b', capabilities: ['completion'] }
+  const stream = () => ndjson([
+    { message: { content: '', thinking: 'First, ' }, done: false },
+    { message: { content: '', thinking: 'owls.' }, done: false },
+    { message: { content: 'An owl.' }, done: false },
+    { message: { content: '' }, done: true, done_reason: 'stop', prompt_eval_count: 1, eval_count: 2 },
+  ])
+  it('passes its thinking out as it comes, apart from the answer', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => stream()))
+    const thought = []
+    const parts = []
+    await new OllamaProvider().sendMessage([], 'ollama:bonsai-2:9b', (c) => parts.push(c), undefined, '', [], null, { onThinking: (t) => thought.push(t) })
+    expect(thought.join('')).toBe('First, owls.')
+    expect(parts.join('')).toBe('An owl.')
+  })
+  it('asks a model not to think only when thinking is off and the model can', async () => {
+    const tags = vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ models: [thinker, plain] }) }))
+    vi.stubGlobal('fetch', tags)
+    const p = new OllamaProvider()
+    await p.listModels()
+    expect(p.getModels().map((m) => m.thinks)).toEqual([true, false])
+    const fetch = vi.fn(async () => stream())
+    vi.stubGlobal('fetch', fetch)
+    await p.sendMessage([], 'ollama:bonsai-2:9b', () => {}, undefined, '', [], null, { think: false })
+    await p.sendMessage([], 'ollama:plain:1b', () => {}, undefined, '', [], null, { think: false })
+    await p.sendMessage([], 'ollama:bonsai-2:9b', () => {}, undefined, '', [], null, { think: true })
+    const bodies = fetch.mock.calls.map((c) => JSON.parse(c[1].body))
+    expect(bodies.map((b) => b.think)).toEqual([false, undefined, undefined])
+  })
+})

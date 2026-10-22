@@ -533,6 +533,16 @@ export const COPY = {
     frameworkBuiltInName: /*i18n*/ { id: 'enter.frameworkBuiltInName', message: '“{name}” is a framework built in. Give yours another name' },
     frameworkForget: /*i18n*/ { id: 'enter.frameworkForget', message: 'Enter removes your framework “{name}”. Chats it is on go on without it' },
     frameworkFailed: /*i18n*/ { id: 'enter.frameworkFailed', message: 'The framework was not kept. Try again' },
+    // Thinking (C165).
+    promptThinks: /*i18n*/ { id: 'enter.promptThinks', message: '{name} thinks before answering, shown as it goes. On this computer that can take minutes. thinking:off skips it', comment: 'Commands stay English' },
+    promptThinksOff: /*i18n*/ { id: 'enter.promptThinksOff', message: '{name} answers straight away, without thinking first. thinking:on lets it, shown as it goes, which can take minutes on this computer' },
+    thinkingOn: /*i18n*/ { id: 'enter.thinkingOn', message: 'Enter lets models that can think do so before answering, shown as they go' },
+    thinkingOff: /*i18n*/ { id: 'enter.thinkingOff', message: 'Enter turns thinking off: models that can think answer straight away, quicker and perhaps less careful' },
+    thinkingSame: /*i18n*/ { id: 'enter.thinkingSame', message: '{on, select, on {Thinking is on already} other {Thinking is off already}}' },
+    thinkingNow: /*i18n*/ {
+      id: 'enter.thinkingNow',
+      message: '{on, select, on {Models that can think do so first, shown as they go. thinking:off turns it off} other {Thinking is off. thinking:on turns it back on}}',
+    },
     promptPerDay: /*i18n*/ { id: 'enter.promptPerDay', message: 'About {count} searches a day without a key, shared by everyone on your network', comment: 'Said when a source with a daily allowance answers (C156)' },
     sourceNetwork: /*i18n*/ { id: 'enter.sourceNetwork', message: '{source} is not answering from your current network. A VPN can cause this; try without it for this source', comment: 'A source refused the request (403), as some do for shared VPN addresses (LPN §8)' },
     sourceBusy: /*i18n*/ { id: 'enter.sourceBusy', message: '{source} says too many requests from your network for now. Try again later', comment: 'A source answered 429: its allowance for this network is used up, or it is busy' },
@@ -864,6 +874,7 @@ export const COPY = {
     noTokens: /*i18n*/ { id: 'picker.noTokens', message: 'no tokens, no key', comment: 'Beside the Sources group' },
     later: /*i18n*/ { id: 'picker.later', message: 'later', comment: 'A row not built yet' },
     madeBy: /*i18n*/ { id: 'picker.madeBy', message: 'made by {maker}', comment: 'A model its provider hosts but did not make (LPN §7.1). {maker} is a company name' },
+    thinks: /*i18n*/ { id: 'picker.thinks', message: 'can think', comment: 'A model that can think before it answers, when thinking:on is set (C165)' },
     preview: /*i18n*/ { id: 'picker.preview', message: 'preview', comment: 'A model offered before general availability; it may change or go' },
     unchecked: /*i18n*/ { id: 'picker.unchecked', message: 'not checked', comment: 'Models on this computer, before anyone has asked to look for them (C33)' },
     addKey: /*i18n*/ { id: 'picker.addKey', message: 'add a key', comment: 'A model whose provider has no key here; a click writes api:' },
@@ -1079,6 +1090,12 @@ export const COPY = {
     // An answer from a source (stage 4). {source} is its name, from the list.
     answeredFrom: /*i18n*/ { id: 'chat.answeredFrom', message: 'Answered from {source}' },
     sourceRevision: /*i18n*/ { id: 'chat.sourceRevision', message: 'revision {revision}' },
+    // A model's thinking (C165), set apart from its answer.
+    thinking: /*i18n*/ { id: 'chat.thinking', message: 'thinking · {time}', comment: 'While a model thinks before answering; {time} is minutes and seconds, 2:31' },
+    thought: /*i18n*/ { id: 'chat.thought', message: '{short, select, 1 {thought for under a minute} other {{minutes, plural, one {thought for # minute} other {thought for # minutes}}}}' },
+    thoughtUntimed: /*i18n*/ { id: 'chat.thoughtUntimed', message: 'thought first' },
+    thoughtShow: /*i18n*/ { id: 'chat.thoughtShow', message: 'show' },
+    thoughtHide: /*i18n*/ { id: 'chat.thoughtHide', message: 'hide' },
     writtenUnder: /*i18n*/ { id: 'chat.writtenUnder', message: 'Written under {names}', comment: 'Under a reply: the frameworks it was written under (C164). {names} is a list' },
     frameworkGone: /*i18n*/ { id: 'chat.frameworkGone', message: 'a framework since removed' },
     sourceNothing: /*i18n*/ { id: 'chat.sourceNothing', message: 'Nothing found on {source} for that. Try other words.' },

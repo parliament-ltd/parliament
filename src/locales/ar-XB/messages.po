@@ -420,6 +420,27 @@ msgstr ""
 msgid "chat.stoppedOnReply"
 msgstr ""
 
+#. While a model thinks before answering; {time} is minutes and seconds, 2:31
+#. js-lingui-explicit-id
+msgid "chat.thinking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.thought"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.thoughtHide"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.thoughtShow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.thoughtUntimed"
+msgstr ""
+
 #. Under a reply: the frameworks it was written under (C164). {names} is a list
 #. js-lingui-explicit-id
 msgid "chat.writtenUnder"
@@ -1773,6 +1794,15 @@ msgstr ""
 msgid "enter.promptStalled"
 msgstr ""
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptThinks"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptThinksOff"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.ready"
 msgstr ""
@@ -2057,6 +2087,22 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.targetNewRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.thinkingNow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.thinkingOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.thinkingOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.thinkingSame"
 msgstr ""
 
 #. {leader} is >, the command leader
@@ -2908,6 +2954,11 @@ msgstr ""
 msgid "picker.sources"
 msgstr ""
 
+#. A model that can think before it answers, when thinking:on is set (C165)
+#. js-lingui-explicit-id
+msgid "picker.thinks"
+msgstr ""
+
 #. Models on this computer, before anyone has asked to look for them (C33)
 #. js-lingui-explicit-id
 msgid "picker.unchecked"
@@ -3422,6 +3473,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.theme"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.thinking"
 msgstr ""
 
 #. js-lingui-explicit-id

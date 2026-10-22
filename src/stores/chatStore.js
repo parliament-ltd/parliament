@@ -55,7 +55,7 @@ export function subscribe(topic, fn) {
 
 /** A stream begins for a conversation, filling one message. */
 export function startStream(id, { messageId, text = '', controller = null, at = Date.now() }) {
-  streams.set(id, { messageId, text, startedAt: at, controller, stopReason: null, cut: false })
+  streams.set(id, { messageId, text, startedAt: at, controller, stopReason: null, cut: false, thinking: '', thinkingAt: null, answerAt: null })
   now(`status:${id}`, `stream:${id}`)
 }
 
@@ -75,6 +75,7 @@ export const streamEnd = (id) => ends.get(id) ?? null
 export function appendStream(id, chunk) {
   const s = streams.get(id)
   if (!s) return
+  if (chunk && s.answerAt == null) s.answerAt = Date.now()
   s.text += chunk
   soon(`stream:${id}`)
 }
@@ -105,7 +106,29 @@ export function endStream(id, at = Date.now()) {
   return s
 }
 
+/**
+ * A piece of a model's thinking arrives, shown as it goes so a long wait
+ * is seen to be work (C165). It is never the reply, and never sent back.
+ */
+export function appendThinking(id, chunk) {
+  const s = streams.get(id)
+  if (!s || !chunk) return
+  if (s.thinkingAt == null) s.thinkingAt = Date.now()
+  s.thinking += chunk
+  soon(`stream:${id}`)
+}
+
+/** What a finished stream thought, for its reply: { thinking, thinkingMs }, or {} when it did not think. */
+export function thoughtOf(s, at = Date.now()) {
+  if (!s?.thinking) return {}
+  return { thinking: s.thinking.slice(0, THINKING_MAX), thinkingMs: Math.max(0, (s.answerAt ?? at) - (s.thinkingAt ?? at)) }
+}
+// The most of a reply's thinking that is kept with it.
+export const THINKING_MAX = 20_000
+
 export const getStream = (id) => streams.get(id) ?? null
+export const streamThinking = (id) => streams.get(id)?.thinking ?? ''
+export const streamAnswering = (id) => streams.get(id)?.answerAt != null
 export const streamText = (id) => streams.get(id)?.text ?? ''
 export const streamMessageId = (id) => streams.get(id)?.messageId ?? null
 export const isStreaming = (id) => streams.has(id)

@@ -420,6 +420,27 @@ msgstr "The reply in {chat} stopped when you left it, before any of it arrived."
 msgid "chat.stoppedOnReply"
 msgstr "Stopped when you left the chat. What arrived is kept."
 
+#. While a model thinks before answering; {time} is minutes and seconds, 2:31
+#. js-lingui-explicit-id
+msgid "chat.thinking"
+msgstr "thinking · {time}"
+
+#. js-lingui-explicit-id
+msgid "chat.thought"
+msgstr "{short, select, 1 {thought for under a minute} other {{minutes, plural, one {thought for # minute} other {thought for # minutes}}}}"
+
+#. js-lingui-explicit-id
+msgid "chat.thoughtHide"
+msgstr "hide"
+
+#. js-lingui-explicit-id
+msgid "chat.thoughtShow"
+msgstr "show"
+
+#. js-lingui-explicit-id
+msgid "chat.thoughtUntimed"
+msgstr "thought first"
+
 #. Under a reply: the frameworks it was written under (C164). {names} is a list
 #. js-lingui-explicit-id
 msgid "chat.writtenUnder"
@@ -1773,6 +1794,15 @@ msgstr "{count, plural, one {# answer from {sources} stays out} other {# answers
 msgid "enter.promptStalled"
 msgstr "The reply stalled, as happens on networks that hold streamed replies"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptThinks"
+msgstr "{name} thinks before answering, shown as it goes. On this computer that can take minutes. thinking:off skips it"
+
+#. js-lingui-explicit-id
+msgid "enter.promptThinksOff"
+msgstr "{name} answers straight away, without thinking first. thinking:on lets it, shown as it goes, which can take minutes on this computer"
+
 #. js-lingui-explicit-id
 msgid "enter.ready"
 msgstr "Enter runs {verb}"
@@ -2058,6 +2088,22 @@ msgstr "→ a new chat"
 #. js-lingui-explicit-id
 msgid "enter.targetNewRoom"
 msgstr "→ a new room"
+
+#. js-lingui-explicit-id
+msgid "enter.thinkingNow"
+msgstr "{on, select, on {Models that can think do so first, shown as they go. thinking:off turns it off} other {Thinking is off. thinking:on turns it back on}}"
+
+#. js-lingui-explicit-id
+msgid "enter.thinkingOff"
+msgstr "Enter turns thinking off: models that can think answer straight away, quicker and perhaps less careful"
+
+#. js-lingui-explicit-id
+msgid "enter.thinkingOn"
+msgstr "Enter lets models that can think do so before answering, shown as they go"
+
+#. js-lingui-explicit-id
+msgid "enter.thinkingSame"
+msgstr "{on, select, on {Thinking is on already} other {Thinking is off already}}"
 
 #. {leader} is >, the command leader
 #. js-lingui-explicit-id
@@ -2908,6 +2954,11 @@ msgstr "preview"
 msgid "picker.sources"
 msgstr "Sources"
 
+#. A model that can think before it answers, when thinking:on is set (C165)
+#. js-lingui-explicit-id
+msgid "picker.thinks"
+msgstr "can think"
+
 #. Models on this computer, before anyone has asked to look for them (C33)
 #. js-lingui-explicit-id
 msgid "picker.unchecked"
@@ -3423,6 +3474,10 @@ msgstr "Write a note the model reads with your next prompt"
 #. js-lingui-explicit-id
 msgid "verb.theme"
 msgstr "Choose a room's colours and type"
+
+#. js-lingui-explicit-id
+msgid "verb.thinking"
+msgstr "Let models that can think do so before answering, shown as they go, or not"
 
 #. js-lingui-explicit-id
 msgid "verb.to"

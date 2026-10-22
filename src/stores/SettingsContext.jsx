@@ -31,6 +31,10 @@ const DEFAULT_SETTINGS = {
   // Where Mistral processes prompts: 'global', or 'eu' or 'us' at 1.1 times
   // the price (stage 7, piece 3; C159).
   mistralRegion: 'global',
+  // Whether models that can think do so before answering, shown as they go
+  // (C165). Off unless turned on with thinking:on (Stefan, 22 October:
+  // thinking off answers many times faster on a computer).
+  thinking: false,
 }
 
 export function SettingsProvider({ children }) {

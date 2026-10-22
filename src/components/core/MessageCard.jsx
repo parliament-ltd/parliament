@@ -40,6 +40,7 @@ export default function MessageCard({
   stoppedNote = null, // why a cut-off reply stopped, when it was left (C109)
   source = null, // where an answer from a source came from (stage 4)
   frameworks = null, // the frameworks a reply was written under (stage 7; C164)
+  thinking = null, // a model's thinking: { text, live, answering, since } while it streams, { text, ms } after (C165)
   isFavorited = false, showNotes = false,
   savedNoteText = '',
   highlights = [],
@@ -361,6 +362,7 @@ export default function MessageCard({
         {/* Content */}
         <div className="px-4 py-4 overflow-hidden relative" ref={contentRef} onMouseUp={handleMouseUp}>
           <div className="text-sm leading-relaxed" style={{ color: 'var(--p-text-primary)' }}>
+            {thinking?.text && <Thinking thinking={thinking} />}
             {renderContent}
             {/* A source that found nothing says so where its answer would be. */}
             {source?.found === false && <SourceLine source={source} />}
@@ -499,6 +501,58 @@ export default function MessageCard({
 }
 
 /* ── Internal sub-components ────────────────────────────── */
+
+// A minute and seconds: 2:31.
+const clock = (ms) => {
+  const s = Math.max(0, Math.round(ms / 1000))
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+}
+
+// A model's thinking (C165), set apart from the answer: its own label, a
+// quiet italic in a narrow column with a dotted rule, never formatted. While
+// it thinks, the last lines show and a clock runs, so a long wait is seen
+// to be work. Once the answer begins, or later, it folds to one line that
+// opens it.
+function Thinking({ thinking }) {
+  const { i18n } = useLingui()
+  const [open, setOpen] = useState(false)
+  const [now, setNow] = useState(() => Date.now())
+  const box = useRef(null)
+  const live = thinking.live && !thinking.answering
+  useEffect(() => {
+    if (!live) return undefined
+    const t = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(t)
+  }, [live])
+  useEffect(() => { if (live && box.current) box.current.scrollTop = box.current.scrollHeight }, [live, thinking.text])
+  const label = live
+    ? i18n._(COPY.chat.thinking, { time: clock(now - (thinking.since ?? now)) })
+    : thinking.ms != null ? i18n._(COPY.chat.thought, { minutes: Math.max(1, Math.round(thinking.ms / 60000)), short: thinking.ms < 60000 ? 1 : 0 }) : i18n._(COPY.chat.thoughtUntimed)
+  return (
+    <div className="parliament-thinking mb-3" aria-live={live ? 'polite' : undefined}>
+      <p className="text-xs italic text-[var(--p-text-secondary)] flex gap-1.5 items-baseline">
+        <span>{label}</span>
+        {!live && (
+          <>
+            <span aria-hidden="true">·</span>
+            <button type="button" className="underline underline-offset-2" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+              {i18n._(open ? COPY.chat.thoughtHide : COPY.chat.thoughtShow)}
+            </button>
+          </>
+        )}
+      </p>
+      {(live || open) && (
+        <div
+          ref={box}
+          className={`mt-1 ps-3 border-s border-dotted border-[var(--p-text-secondary)]/40 text-xs italic leading-relaxed text-[var(--p-text-secondary)] whitespace-pre-wrap ${live ? 'max-h-32 overflow-hidden' : 'max-h-80 overflow-y-auto'}`}
+          dir="auto"
+        >
+          {thinking.text}
+        </div>
+      )}
+    </div>
+  )
+}
 
 // "Written under Push back on me and Editor": the built in by their names in
 // the reader's language, the person's own by the name it had, and one of

@@ -60,6 +60,8 @@ export function modelFromTag(tag) {
     size: typeof tag?.size === 'number' ? tag.size : null,
     parameters: typeof d.parameter_size === 'string' ? d.parameter_size.slice(0, 20) : null,
     family: typeof d.family === 'string' ? d.family.slice(0, 40) : null,
+    // Whether it can think before answering, as Ollama says (C165).
+    thinks: Array.isArray(tag?.capabilities) && tag.capabilities.includes('thinking'),
   })
 }
 
@@ -108,7 +110,16 @@ export class OllamaProvider extends BaseProvider {
     return error
   }
 
-  async sendMessage(messages, model, onChunk, signal, systemPrompt) {
+  // Whether to ask a model not to think: only when thinking is off and the
+  // model can (asking one that cannot is refused by Ollama).
+  _think(model, think) {
+    const m = this.models.find((x) => x.id === model || x.apiId === model)
+    return think === false && m?.thinks ? { think: false } : {}
+  }
+
+  // options: { think, onThinking } (C165): whether to let it think, and
+  // where its thinking goes as it arrives, shown and never sent back.
+  async sendMessage(messages, model, onChunk, signal, systemPrompt, _tools = [], _onToolUse = null, options = {}) {
     this.last = model
     const watch = new AbortController()
     const stop = () => watch.abort()
@@ -127,12 +138,12 @@ export class OllamaProvider extends BaseProvider {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
-        body: JSON.stringify({ model: this._apiName(model), messages: this._messages(messages, systemPrompt), stream: true }),
+        body: JSON.stringify({ model: this._apiName(model), messages: this._messages(messages, systemPrompt), stream: true, ...this._think(model, options.think) }),
         signal: watch.signal,
       })
       alive()
       if (!response.ok) throw this._failure(response)
-      return await this._readStream(response, onChunk, alive)
+      return await this._readStream(response, onChunk, alive, options.onThinking)
     } catch (err) {
       if (stalled) throw stalledError()
       throw err
@@ -142,7 +153,7 @@ export class OllamaProvider extends BaseProvider {
     }
   }
 
-  async _readStream(response, onChunk, alive = () => {}) {
+  async _readStream(response, onChunk, alive = () => {}, onThinking = null) {
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
     let buffer = ''
@@ -157,6 +168,8 @@ export class OllamaProvider extends BaseProvider {
         error.status = null
         throw error
       }
+      const thought = event?.message?.thinking
+      if (typeof thought === 'string' && thought) onThinking?.(thought)
       const text = event?.message?.content
       if (typeof text === 'string' && text) onChunk(text)
       if (event?.done) {
@@ -181,18 +194,20 @@ export class OllamaProvider extends BaseProvider {
     return { usage, stopReason, toolUses: [] }
   }
 
-  async sendMessageWhole(messages, model, onChunk, signal, systemPrompt) {
+  async sendMessageWhole(messages, model, onChunk, signal, systemPrompt, _tools = [], options = {}) {
     this.last = model
     const response = await fetch(`${ORIGIN}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'omit',
       referrerPolicy: 'no-referrer',
-      body: JSON.stringify({ model: this._apiName(model), messages: this._messages(messages, systemPrompt), stream: false }),
+      body: JSON.stringify({ model: this._apiName(model), messages: this._messages(messages, systemPrompt), stream: false, ...this._think(model, options.think) }),
       signal,
     })
     if (!response.ok) throw this._failure(response)
     const data = await response.json()
+    const thought = data?.message?.thinking
+    if (typeof thought === 'string' && thought) options.onThinking?.(thought)
     const text = textOf(data?.message?.content)
     if (text) onChunk(text)
     return {

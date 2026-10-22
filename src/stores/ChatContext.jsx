@@ -6,7 +6,7 @@ import { useConversations } from './ConversationContext'
 import { useSettings } from './SettingsContext'
 import { gateway, destination, runClientTool, continueInstruction, providerOf } from '../net'
 import {
-  startStream, appendStream, resetStreamText, stopStream, endStream, getStream,
+  startStream, appendStream, resetStreamText, stopStream, endStream, getStream, appendThinking, thoughtOf,
   isStreaming as streamingIn, streamingIds, addNotice, noteCut,
   getMessages as heldMessages, hasMessages, setMessages as holdMessages, updateMessages, releaseMessages, sendable,
 } from './chatStore'
@@ -63,6 +63,11 @@ export function ChatProvider({ children }) {
   const activeRef = useRef(null)
   const finishOnLeave = useRef(false)
   const describeOn = useRef(true)
+  // Whether models that can think do, before answering (C165): off unless
+  // turned on with thinking:on.
+  const thinkOn = useRef(false)
+  useEffect(() => { thinkOn.current = settings.thinking === true }, [settings.thinking])
+  const thinkOptions = (conversationId) => ({ think: thinkOn.current, onThinking: (t) => appendThinking(conversationId, t) })
 
   useEffect(() => { finishOnLeave.current = Boolean(settings.finishRepliesOnLeave) }, [settings.finishRepliesOnLeave])
   useEffect(() => { describeOn.current = settings.describeNewChats !== false }, [settings.describeNewChats])
@@ -115,8 +120,14 @@ export function ChatProvider({ children }) {
     const left = stream?.stopReason === 'left'
     const reason = left ? 'left' : cut
     const kept = Boolean(content && content !== before)
+    // What it thought before it stopped is kept too (C165).
+    const thought = thoughtOf(stream)
     if (kept) {
-      const updates = { content, incomplete: true, ...(reason ? { stopReason: reason } : {}) }
+      const updates = { content, incomplete: true, ...(reason ? { stopReason: reason } : {}), ...thought }
+      await updateMessage(messageId, updates)
+      updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, ...updates } : m)))
+    } else if (!before && thought.thinking) {
+      const updates = { incomplete: true, ...(reason ? { stopReason: reason } : {}), ...thought }
       await updateMessage(messageId, updates)
       updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, ...updates } : m)))
     } else if (!before && keepEmpty && reason) {
@@ -265,6 +276,8 @@ export function ChatProvider({ children }) {
           controller.signal,
           systemPrompt || undefined,
           tools,
+          undefined,
+          thinkOptions(conversationId),
         ], { label: 'chat send' })
         last = response
 
@@ -325,7 +338,7 @@ export function ChatProvider({ children }) {
       const cut = finalContent ? cutReason(last?.stopReason) : null
       // The model that answered and the tokens it took, so what a chat cost
       // can be worked out later, never guessed (C132 (h)).
-      const outcome = { content: finalContent, incomplete: Boolean(cut), tokenCount, ...(cut ? { stopReason: cut } : {}), ...answeredWith(model, totalInputTokens, totalOutputTokens), ...underWith(frameworks) }
+      const outcome = { content: finalContent, incomplete: Boolean(cut), tokenCount, ...(cut ? { stopReason: cut } : {}), ...answeredWith(model, totalInputTokens, totalOutputTokens), ...underWith(frameworks), ...thoughtOf(getStream(conversationId)) }
 
       await updateMessage(assistantMsg.id, outcome)
       const finished = { ...assistantMsg, ...outcome }
@@ -388,6 +401,8 @@ export function ChatProvider({ children }) {
         (chunk) => appendStream(conversationId, chunk),
         controller.signal,
         systemPrompt || undefined,
+        [],
+        thinkOptions(conversationId),
       ], { label: 'chat send without streaming' })
       if (controller.signal.aborted) throw new DOMException('Stopped', 'AbortError')
       const content = getStream(conversationId)?.text ?? ''
@@ -396,6 +411,7 @@ export function ChatProvider({ children }) {
         content, incomplete: Boolean(cut) || !content, tokenCount: response?.usage?.output_tokens || 0, stopReason: cut,
         ...answeredWith(model, response?.usage?.input_tokens || 0, response?.usage?.output_tokens || 0),
         ...underWith(frameworks),
+        ...thoughtOf(getStream(conversationId)),
       }
       await updateMessage(reply.id, outcome)
       const finished = { ...reply, ...outcome }
@@ -505,6 +521,9 @@ export function ChatProvider({ children }) {
         (chunk) => appendStream(conversationId, chunk),
         controller.signal,
         systemPrompt || undefined,
+        [],
+        undefined,
+        thinkOptions(conversationId),
       ], { label: 'continue' })
 
       stopPersisting()

@@ -46,7 +46,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // new:collection, add:, rm: and heading: change a collection (piece 6; C144).
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -415,6 +415,16 @@ function planFramework(a, step, screens = {}) {
   return { says: { message: fw.room ? 'frameworkSet' : 'frameworkSetNext', values: { count: r.ids.length, frameworks: names(r.ids), num: fw.num ?? '' } }, act }
 }
 
+/** thinking:on / thinking:off: whether models that can think do so first (C165). screens.thinking: { on }, off by default. */
+function planThinking(a, step, screens = {}) {
+  const on = screens.thinking?.on === true
+  const word = step.match?.values?.[0]?.value ?? null
+  if (!word) return { says: { message: 'thinkingNow', values: { on: on ? 'on' : 'off' } }, act: null }
+  const want = word === 'on'
+  if (want === on) return { says: { message: 'thinkingSame', values: { on: on ? 'on' : 'off' } }, act: null }
+  return { says: { message: want ? 'thinkingOn' : 'thinkingOff' }, act: { kind: 'thinking', on: want, before: on } }
+}
+
 /** new:framework "Editor" "Make each sentence shorter": one of your own, or rewriting it (C164). */
 function planNewFramework(step, screens = {}) {
   const [, nameArg, textArg] = step.match?.values ?? []
@@ -557,6 +567,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       jump: (a1, s1, sc) => planJump(s1, sc, a1.addressed),
       by: planBy,
       framework: planFramework,
+      thinking: planThinking,
     }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
@@ -700,6 +711,7 @@ export function promptPreview(text, target = {}) {
     if (target.frameworks?.length) also.push({ message: 'promptFrameworks', values: { count: target.frameworks.length, frameworks: target.frameworks } })
     if (target.sourcesOut?.count > 0) also.push({ message: 'promptSourcesOut', values: { count: target.sourcesOut.count, sources: target.sourcesOut.names } })
     if (target.hiddenOut > 0) also.push({ message: 'promptHiddenOut', values: { count: target.hiddenOut } })
+    if (who.thinks) also.unshift(target.thinking ? { message: 'promptThinks', values: { name: who.name } } : { message: 'promptThinksOff', values: { name: who.name } })
     const says = { message: 'promptSendLocal', values: { provider: who.name, tokens } }
     return { ready: true, says: also.length ? { ...says, also } : says }
   }

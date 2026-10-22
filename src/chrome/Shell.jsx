@@ -695,6 +695,9 @@ export default function Shell() {
   // key module; never a key.
   const [keyPanel, setKeyPanel] = useState(null) // { focus: provider id or null } while api: shows it
 
+  // Settings' updater, for acts that change a setting (thinking:, C165).
+  const updateSettingNow = useRef(async () => {})
+
   // ── Models on this computer (stage 7, piece 4; C33, C163) ──
   // Ollama is looked for only when someone asks (the key panel's check).
   // Once a check has found it, it is looked for again on each start, since
@@ -998,6 +1001,13 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'thinking') {
+      // thinking:on / thinking:off (C165): a setting of the person's.
+      await updateSettingNow.current('thinking', what.on)
+      if (touched.current) touched.current.setting = { key: 'thinking', before: what.before }
+      remember(body)
+      return null
+    }
     if (what.kind === 'frameworkPicker') {
       setInspected(null)
       setCompared(null)
@@ -1143,6 +1153,7 @@ export default function Shell() {
     if (entry.view) showView(entry.view)
     if (entry.pending) setPendingAnswerer(entry.pending.before)
     if (entry.pendingFw) setPendingFrameworks(entry.pendingFw.before)
+    if (entry.setting) await updateSettingNow.current(entry.setting.key, entry.setting.before)
     if (entry.own) {
       try {
         for (const o of [...entry.own].reverse()) {
@@ -1167,7 +1178,7 @@ export default function Shell() {
   const onRun = useCallback(async (next, body, go, what) => {
     if (what?.kind === 'undo') return undo(body)
     const before = { arrangement: current.current, view: viewNow.current }
-    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [] }
+    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null }
     const out = what ? await act(what, body, next) : await run(next, body)
     const t = touched.current
     touched.current = null
@@ -1189,7 +1200,8 @@ export default function Shell() {
     if (t.pending) entry.pending = t.pending
     if (t.pendingFw) entry.pendingFw = t.pendingFw
     if (t.own.length) entry.own = t.own
-    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own)) {
+    if (t.setting) entry.setting = t.setting
+    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting)) {
       undoStack.current = [...undoStack.current, entry].slice(-UNDO_MAX)
       setUndoTop(body)
     }
@@ -1206,6 +1218,7 @@ export default function Shell() {
   // ── Prompts from the bar (stage 4) ────────────────────
   const { messages, activeConversationId, sendMessage, resendWhole, askSource } = useChat()
   const { settings, updateSetting } = useSettings()
+  useEffect(() => { updateSettingNow.current = updateSetting })
   // Which providers have a key here, without decrypting one; null until
   // known (stage 7: a key per provider). keyed: whether the default
   // provider has one, as stage 4 had it.
@@ -1272,7 +1285,7 @@ export default function Shell() {
   const fwHere = useMemo(() => frameworksOf(fwStored ?? [], fwList).map((fw) => fw.id), [fwStored, fwList])
   const frameworkScreens = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: fwHere, stored: fwStored, list: fwList, nameOf: nameOfFramework }), [roomId, roomRecord, fwHere, fwStored, fwList, nameOfFramework])
   const helper = useMemo(() => ({ keyed, provider: destination(PROVIDER)?.name, price: modelFacts(metadataModel(PROVIDER))?.cost ?? null }), [keyed])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true } }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -1325,6 +1338,7 @@ export default function Shell() {
     systemChars: byModel ? instructionsOf(fwHere, fwList).length : 0,
     // The frameworks on the chat, by name; the ones that go, when a model answers (C164).
     frameworkNames: frameworksOf(fwHere, fwList).map(nameOfFramework),
+    thinking: settings.thinking === true,
     frameworks: byModel ? frameworksOf(fwHere, fwList).map(nameOfFramework) : [],
     perMillion: answerer.price?.inputPerMillion ?? null,
     hiddenOut: about ? 0 : hiddenOut,
@@ -1334,7 +1348,7 @@ export default function Shell() {
     ink,
     roomName: roomNameHere,
     about,
-  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, about])
+  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
