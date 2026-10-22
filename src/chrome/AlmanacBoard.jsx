@@ -180,7 +180,7 @@ function useRowWindow(rows) {
  *   filters in force, null at rest; columns: the ones the person keeps (cols:); saved: the saved searches;
  *   currentSaved: the id of the one on screen
  */
-export default function AlmanacBoard({ rows, filtered = null, columns: kept = null, saved = [], currentSaved = null, addressed, onAddress, onWrite, onClear, onOpenSaved }) {
+export default function AlmanacBoard({ rows, filtered = null, columns: kept = null, saved = [], currentSaved = null, addressed, onAddress, onWrite, onClear, onOpenSaved, backup = null, onBackupLater }) {
   const { i18n } = useLingui()
   const [ref, band] = useBand([MEDIUM, WIDE])
   const columns = COLUMNS[band].filter((c) => !kept || kept.includes(c))
@@ -231,6 +231,14 @@ export default function AlmanacBoard({ rows, filtered = null, columns: kept = nu
         <h2>{i18n._(COPY.boards.almanac)}</h2>
         {addressed && <span className="ch-marg">{i18n._(COPY.shell.addressed)}</span>}
       </header>
+      {backup && (
+        // The backup reminder: one line, in ink, only when it is due (C146 (a), C94).
+        <p className="ch-marg ch-alm-backup" role="note">
+          <span>{backup.atRisk ? i18n._(COPY.almanac.backupAtRisk) : backup.days == null ? i18n._(COPY.almanac.backupNever) : i18n._(COPY.almanac.backupDays, { days: backup.days })}</span>
+          <a href="/settings">{i18n._(COPY.welcome.keepBackup, { board: i18n._(COPY.boards.settings) })}</a>
+          <button type="button" onClick={() => onBackupLater?.()}>{i18n._(COPY.almanac.backupLater)}</button>
+        </p>
+      )}
       {saved.length > 0 && <Saved saved={saved} current={currentSaved} onOpen={(s) => onOpenSaved?.(s)} />}
       {filtered && rows && (
         <InForce

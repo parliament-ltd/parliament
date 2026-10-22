@@ -8,6 +8,22 @@ msgstr ""
 "Language: en-XA\n"
 
 #. js-lingui-explicit-id
+msgid "almanac.backupAtRisk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.backupDays"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.backupLater"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.backupNever"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "almanac.colActive"
 msgstr ""
 
@@ -1613,6 +1629,15 @@ msgid "enter.roomHere"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.roomNumberNotChat"
+msgstr ""
+
+#. open: stays English
+#. js-lingui-explicit-id
+msgid "enter.roomNumberNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.rowsChanged"
 msgstr ""
 
@@ -1923,6 +1948,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.widthRange"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthRoom"
 msgstr ""
 
 #. js-lingui-explicit-id

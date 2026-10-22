@@ -353,6 +353,8 @@ export function planWidth(a, board, percent, named = false, layout = null) {
   }
   const next = withShares(a, { [k]: share })
   next.addressed = board
+  // A room is named as what it is, as close: names it (C125, C146 (c)).
+  if (named && board === 'room') return go(next, 'widthRoom', { board, percent })
   return go(next, named ? 'widthSet' : 'widthIt', { board, percent })
 }
 

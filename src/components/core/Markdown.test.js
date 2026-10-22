@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { createElement as h } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import Markdown from './Markdown'
-import { safeUrl } from '../../lib/safeUrl'
+import { safeUrl, shownAddress } from '../../lib/safeUrl'
 
 const html = (text, components) => renderToStaticMarkup(h(Markdown, { components }, text))
 
@@ -41,5 +41,14 @@ describe('the one Markdown component (T8)', () => {
     const out = html('# Title\n\n[x](https://example.org)', { h1: ({ children }) => h('h1', { id: 't' }, children), a: () => h('span', null, 'hijacked') })
     expect(out).toContain('<h1 id="t">Title</h1>')
     expect(out).not.toContain('hijacked')
+  })
+})
+
+describe("a link's whole address, before it opens (security notes §1.3; C146 (b))", () => {
+  it('is the address as the browser reads it, a look-alike name in its xn-- form', () => {
+    expect(shownAddress('https://example.com/a path?q=1')).toBe('https://example.com/a%20path?q=1')
+    expect(shownAddress('https://раураl.com/login')).toMatch(/^https:\/\/xn--[a-z0-9-]+\.com\/login$/)
+    expect(shownAddress('mailto:a@b.c')).toBeNull()
+    expect(shownAddress('/relative')).toBeNull()
   })
 })

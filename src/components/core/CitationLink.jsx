@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { SPRING_SNAPPY } from '../../lib/constants'
+import { shownAddress } from '../../lib/safeUrl'
 
 // Reject unsafe URL schemes (javascript:, data:, vbscript:, file:) — anything
 // that could execute code or exfiltrate via the renderer. Relative URLs and
@@ -13,15 +14,16 @@ function sanitizeHref(href) {
 }
 
 /**
- * Renders a markdown link as a highlighted inline citation with hover tooltip.
- * Used by MessageCard for assistant messages when web search is enabled.
+ * Renders a markdown link as a highlighted inline citation. Before it opens,
+ * it shows its whole address: on hover, on keyboard focus, and on a touch
+ * screen at the first tap, the second opening it (C146 (b)).
  *
- * External links → pale blue highlight + domain tooltip on hover.
- * Internal/relative links → plain styled link.
+ * Internal/relative links → plain styled link, its address as its title.
  */
 export default function CitationLink({ href, children }) {
   const [showTooltip, setShowTooltip] = useState(false)
   const hideTimeoutRef = useRef(null)
+  const touched = useRef(false) // the last press was a finger
 
   const safeHref = sanitizeHref(href)
   if (!safeHref) {
@@ -29,19 +31,11 @@ export default function CitationLink({ href, children }) {
     return <span>{children}</span>
   }
 
-  let domain = null
-  try {
-    const url = new URL(safeHref)
-    if (url.protocol === 'http:' || url.protocol === 'https:') {
-      domain = url.hostname.replace(/^www\./, '')
-    }
-  } catch {
-    // Relative or non-http URL — render as plain link
-  }
+  const address = shownAddress(safeHref)
 
-  if (!domain) {
+  if (!address) {
     return (
-      <a href={safeHref} target="_blank" rel="noopener noreferrer" className="text-[#B8A070] underline">
+      <a href={safeHref} target="_blank" rel="noopener noreferrer" className="text-[#B8A070] underline" title={safeHref}>
         {children}
       </a>
     )
@@ -62,8 +56,16 @@ export default function CitationLink({ href, children }) {
         href={safeHref}
         target="_blank"
         rel="noopener noreferrer"
+        aria-description={address}
         onMouseEnter={show}
         onMouseLeave={hide}
+        onFocus={show}
+        onBlur={hide}
+        onPointerDown={(e) => { touched.current = e.pointerType === 'touch' }}
+        onClick={(e) => {
+          // A finger has no hover: the first tap shows where it goes.
+          if (touched.current && !showTooltip) { e.preventDefault(); show() }
+        }}
         style={{
           backgroundColor: 'rgba(184, 160, 112, 0.14)',
           borderBottom: '1px solid rgba(184, 160, 112, 0.45)',
@@ -91,13 +93,13 @@ export default function CitationLink({ href, children }) {
             className="absolute bottom-full left-0 mb-1.5 z-50 pointer-events-auto"
           >
             <span
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap shadow-lg"
-              style={{ backgroundColor: '#1E2532', color: '#FFFFFF', maxWidth: 260 }}
+              className="flex items-start gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium shadow-lg"
+              style={{ backgroundColor: '#1E2532', color: '#FFFFFF', width: 'max-content', maxWidth: 'min(420px, 80vw)' }}
             >
               <span
-                className="w-2.5 h-2.5 rounded-sm flex-shrink-0 bg-[#B8A070] opacity-70"
+                className="w-2.5 h-2.5 mt-[3px] rounded-sm flex-shrink-0 bg-[#B8A070] opacity-70"
               />
-              <span className="truncate">{domain}</span>
+              <span dir="ltr" style={{ overflowWrap: 'anywhere', whiteSpace: 'normal' }}>{address}</span>
             </span>
           </motion.span>
         )}

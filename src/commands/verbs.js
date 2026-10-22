@@ -109,7 +109,8 @@ export const VERBS = Object.freeze([
     // Records and the Collection together (C124, C125, C131).
     takes: [[[...BOARD_NAMES, 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text'], ['text', ['search', 'collection']]], stage: 3, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.open', message: 'Open a board, or anything by its number or name' } }),
-  v({ verb: 'close', group: 'start', example: 'close:records', takes: [[], [BOARD_NAMES], ['address']], stage: 3, undoable: true, click: 'apply',
+  // close:204 closes the room showing chat 204; close:welcome the welcome card (C146 (c)).
+  v({ verb: 'close', group: 'start', example: 'close:records', forms: ['close:records', 'close:204', 'close:welcome'], takes: [[], [[...BOARD_NAMES, 'welcome']], ['address']], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.close', message: 'Take a board off the screen. Nothing is lost' } }),
 
   // Run
@@ -255,8 +256,8 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.swap', message: 'Swap two boards' } }),
   v({ verb: 'reset', group: 'layout', example: 'reset:', takes: [[]], stage: 3, undoable: true,
     gloss: /*i18n*/ { id: 'verb.reset', message: 'Put the boards back as shipped and close the windows' } }),
-  v({ verb: 'width', group: 'layout', example: 'width:60%', forms: ['width:60%', 'width:library 30%', 'width:even'],
-    takes: [['percent'], [BOARD_NAMES, 'percent'], [['even']]], stage: 5, undoable: true, click: 'apply',
+  v({ verb: 'width', group: 'layout', example: 'width:60%', forms: ['width:60%', 'width:library 30%', 'width:204 40%', 'width:even'],
+    takes: [['percent'], [BOARD_NAMES, 'percent'], ['address', 'percent'], [['even']]], stage: 5, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.width', message: 'Choose how much of the width a board takes, or put every width back' } }),
   v({ verb: 'cols', group: 'layout', example: 'cols:-room +created', forms: ['cols:-room +created', 'cols:'], takes: [[], [{ many: 'word' }]], on: ['almanac'], stage: 6, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.cols', message: 'Hide or show columns of the table' } }),

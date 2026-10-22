@@ -454,6 +454,10 @@
 .ch-collection > * { flex: none; }
 .ch-collection > .ch-col-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 .ch-col-list { padding: 4px 16px 14px; }
+/* The backup reminder on Records (C146 (a)): marginalia, in ink. */
+.ch-alm-backup { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin: 0; padding: 6px 16px 2px; }
+.ch-alm-backup a, .ch-shell .ch-alm-backup button { color: inherit; padding: 0; text-decoration: underline; text-underline-offset: 2px; }
+.ch-alm-backup a:hover, .ch-shell .ch-alm-backup button:hover { color: var(--ch-ink); }
 .ch-mk { display: flex; gap: 10px; padding: 10px 0 9px; border-bottom: .5px solid var(--ch-border-2); }
 .ch-mk-body { flex: 1; min-width: 0; }
 .ch-mk .t { font: 400 var(--ch-t-small)/1.5 var(--ch-sans); color: var(--ch-ink); white-space: pre-wrap; }

@@ -1208,6 +1208,12 @@ Found while splitting stage 6 into pieces. Read with C131 (Records, plan, keywor
 - **(i) `compare:218 231`** sets two notes, keywords or quotes side by side under the bar, as `inspect:` shows one, with what changed word by word. No model call. Comparing chats or runs waits.
 - **Suggestion:** keep as built.
 
+**C146. The rest of stage 6** (piece 8). The plan names three things; these are the points the documents leave open:
+- **(a) The backup reminder on Records** (C94, R27). One line of marginalia at the top of Records, in ink, shown when `backupReminder.js` says it is due: after some work and thirty days without a backup, or from the first chat and after a day where the browser has not agreed to keep the data, in plainer words there. It offers "back up in Settings" (today's Settings, until `backup:` in stage 9) and "not now", which waits as long as the reminder does. The old banner stays on the old homepage until R27 is ruled. The line's command comes with `backup:`.
+- **(b) A link's full address** (security notes §1.3). A link in a reply shows its whole address before it opens: on hover, and on keyboard focus. The address is shown as the browser reads it, so a look-alike name shows in its `xn--` form, and long ones wrap rather than being cut. On a touch screen the first tap shows the address and a second opens it.
+- **(c) `close:` and `width:` by number** (C125). `close:204` and `width:204 40%` act on the room showing chat 204 (or plan 204's chat); if no room here shows it, the Enter line says so and how to show it. `close:welcome` closes the welcome card from wherever the bar points; `tour:` brings it back.
+- **Suggestion:** keep as built.
+
 **C134, as built (piece 3).** `undo:` takes back the last command line, whole: what it changed in rows, saved searches, the filters on Records and the space (boards, windows, the bar, columns). Kept for the tab, the last 50 lines. If something it changed has changed since (in another tab, say), undo stops there and says so rather than writing over it. Not taken back: a room's name (C40), what was sent or copied, and `erase:` (piece 4).
 
 **C142. Drawing only the rows on screen** (piece 2). Built: Records draws the rows in view and about a screen either side; the rest are blank space of the height they will take, measured once drawn, so the scroll bar stays true. Screen readers are told the whole count and each row's place. One trade: Tab moves through the rows that are drawn, and scrolling draws more. **Suggestion:** keep as built.

@@ -97,11 +97,14 @@ export const COPY = {
     openPopped: /*i18n*/ { id: 'enter.openPopped', message: '{board} is in its own window. Enter brings it forward' },
     openBoard: /*i18n*/ { id: 'enter.openBoard', message: 'Enter opens {board} on the right' },
     closeNotHere: /*i18n*/ { id: 'enter.closeNotHere', message: '{board} is not open' },
+    roomNumberNotHere: /*i18n*/ { id: 'enter.roomNumberNotHere', message: 'No room here shows {num}. open:{num} shows it', comment: 'open: stays English' },
+    roomNumberNotChat: /*i18n*/ { id: 'enter.roomNumberNotChat', message: '{num} is not a chat, so no room shows it' },
     closeFixed: /*i18n*/ { id: 'enter.closeFixed', message: '{board} stays open here' },
     closeLast: /*i18n*/ { id: 'enter.closeLast', message: 'The last board stays open' },
     closeBoard: /*i18n*/ { id: 'enter.closeBoard', message: 'Enter closes {board}. Nothing is lost' },
     closeRoom: /*i18n*/ { id: 'enter.closeRoom', message: 'Enter closes this room. Nothing is lost' },
     // width: (C126). {percent}, {low} and {high} are shares of the width, written as the reader's language writes a percentage.
+    widthRoom: /*i18n*/ { id: 'enter.widthRoom', message: 'Enter gives this room {percent} of the width' },
     widthIt: /*i18n*/ { id: 'enter.widthIt', message: 'Enter gives it {percent} of the width', comment: 'It is the board the bar points at, named just before this line' },
     widthSet: /*i18n*/ { id: 'enter.widthSet', message: 'Enter gives {board} {percent} of the width' },
     widthThere: /*i18n*/ { id: 'enter.widthThere', message: 'That is its width already' },
@@ -576,6 +579,14 @@ export const COPY = {
   // The Almanac (stage 5, piece 3; Almanac v30): the table of everything
   // made, by number.
   almanac: {
+    // The backup reminder, one line at the top of Records (C146 (a), C94).
+    backupNever: /*i18n*/ { id: 'almanac.backupNever', message: 'Nothing here has been backed up yet, and it lives only in this browser.' },
+    backupDays: /*i18n*/ {
+      id: 'almanac.backupDays',
+      message: '{days, plural, one {The last backup was # day ago. What came since lives only in this browser.} other {The last backup was # days ago. What came since lives only in this browser.}}',
+    },
+    backupAtRisk: /*i18n*/ { id: 'almanac.backupAtRisk', message: 'This browser has not agreed to keep what you make here, and may delete it. Keep a backup.' },
+    backupLater: /*i18n*/ { id: 'almanac.backupLater', message: 'not now' },
     colType: /*i18n*/ { id: 'almanac.colType', message: 'Type' },
     colId: /*i18n*/ { id: 'almanac.colId', message: 'ID', comment: 'The number every row is addressed by' },
     colTitle: /*i18n*/ { id: 'almanac.colTitle', message: 'Title' },

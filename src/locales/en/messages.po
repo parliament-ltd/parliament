@@ -8,6 +8,22 @@ msgstr ""
 "Language: en\n"
 
 #. js-lingui-explicit-id
+msgid "almanac.backupAtRisk"
+msgstr "This browser has not agreed to keep what you make here, and may delete it. Keep a backup."
+
+#. js-lingui-explicit-id
+msgid "almanac.backupDays"
+msgstr "{days, plural, one {The last backup was # day ago. What came since lives only in this browser.} other {The last backup was # days ago. What came since lives only in this browser.}}"
+
+#. js-lingui-explicit-id
+msgid "almanac.backupLater"
+msgstr "not now"
+
+#. js-lingui-explicit-id
+msgid "almanac.backupNever"
+msgstr "Nothing here has been backed up yet, and it lives only in this browser."
+
+#. js-lingui-explicit-id
 msgid "almanac.colActive"
 msgstr "Last active"
 
@@ -1613,6 +1629,15 @@ msgid "enter.roomHere"
 msgstr "The last room is here already"
 
 #. js-lingui-explicit-id
+msgid "enter.roomNumberNotChat"
+msgstr "{num} is not a chat, so no room shows it"
+
+#. open: stays English
+#. js-lingui-explicit-id
+msgid "enter.roomNumberNotHere"
+msgstr "No room here shows {num}. open:{num} shows it"
+
+#. js-lingui-explicit-id
 msgid "enter.rowsChanged"
 msgstr "{nums} changed meanwhile, so nothing was written. Try again"
 
@@ -1924,6 +1949,10 @@ msgstr "A board in its own window takes the width of its window"
 #. js-lingui-explicit-id
 msgid "enter.widthRange"
 msgstr "A board takes from {low} to {high} of the width"
+
+#. js-lingui-explicit-id
+msgid "enter.widthRoom"
+msgstr "Enter gives this room {percent} of the width"
 
 #. js-lingui-explicit-id
 msgid "enter.widthSet"

@@ -37,6 +37,7 @@ import { readCatalogue } from '../lib/catalogue'
 import { listEntries } from '../catalog'
 import { listLayoutEntries } from '../catalog/layouts'
 import { readAlmanac } from '../lib/almanacRows'
+import { backupReminderState, getBackupStatus, dismissBackupBanner } from '../lib/backup'
 import { createFactsCache } from '../lib/chatFacts'
 import { readSaved, keepSearch, forgetSearch, putSaved } from '../lib/savedSearches'
 import { readCollections, writeCollection, newCollection, withRows } from '../lib/collections'
@@ -648,6 +649,21 @@ export default function Shell() {
   }, [])
   const keepNotice = storageKept === false && (almanacRows?.length ?? 0) > 0 ? { asking: askingKeep, onAsk: askKeep } : null
 
+  // ── The backup reminder (stage 6, piece 8; C146 (a), C94) ──
+  // One line at the top of Records while backupReminder.js says it is due:
+  // read on start and on coming back to the page, since a backup may have
+  // been made meanwhile.
+  const [backupDue, setBackupDue] = useState(null) // { atRisk, days } while due
+  const readBackupDue = useCallback(() => Promise.all([backupReminderState(), getBackupStatus()])
+    .then(([due, status]) => setBackupDue(due.show ? { atRisk: due.atRisk, days: status.daysSinceLast } : null), () => {}), [])
+  useEffect(() => {
+    if (!started) return undefined
+    readBackupDue()
+    window.addEventListener('focus', readBackupDue)
+    return () => window.removeEventListener('focus', readBackupDue)
+  }, [started, readBackupDue])
+  const backupLater = useCallback(() => { dismissBackupBanner().then(() => setBackupDue(null), () => {}) }, [])
+
   // ── The key panel (stage 5, piece 5) ──────────────────
   // api: opens it under the bar. What the shell knows of keys is whether
   // each provider has one and its last four characters, read through the
@@ -1237,6 +1253,7 @@ export default function Shell() {
           key="almanac" rows={shownRows} filtered={filtered} columns={arrangement.recordsCols ? recordsColumns(arrangement) : null}
           saved={saved} currentSaved={currentSaved} addressed={arrangement.addressed === 'almanac'}
           onAddress={focusBoard} onWrite={writeField} onClear={onRecordsClear} onOpenSaved={onOpenSaved}
+          backup={backupDue} onBackupLater={backupLater}
         />
       )
     }

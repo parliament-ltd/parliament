@@ -317,6 +317,23 @@ function openNumber(a, step, screens = {}) {
   return { next: p.next, says: { message: words[p.says.message] ?? p.says.message, values: { num: shown } } }
 }
 
+/**
+ * close:204 and width:204 40% name a room by the chat it shows (C146 (c)):
+ * the step again with the room for the number, or why it cannot be.
+ * @returns {{ step: object }|{ bad: object }|null} null when no number is given
+ */
+function roomByNumber(a, step, screens = {}) {
+  const [arg, ...rest] = step.match?.values ?? []
+  if (arg?.kind !== 'address') return null
+  const t = targetsOf([arg], screens.records?.rows ?? [])
+  if (t.bad) return { bad: t.bad }
+  const row = t.rows[0]
+  const chatId = row.kind === 'chat' || row.kind === 'docket' ? row.chatId : null
+  if (!chatId) return { bad: { message: 'roomNumberNotChat', values: { num: arg.text ?? row.num } } }
+  if (roomOnScreen(a) !== chatId) return { bad: { message: 'roomNumberNotHere', values: { num: arg.text ?? row.num } } }
+  return { step: { ...step, match: { ...step.match, values: [{ kind: 'word', value: 'room' }, ...rest] } } }
+}
+
 /** inspect:204 shows it in detail under the bar. */
 function planInspect(a, step, screens = {}) {
   const num = numberOf(step)
@@ -483,10 +500,14 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       viewAlso.push(...(p.also ?? []))
       continue
     }
+    // close:204 and width:204 40%: the room showing that chat (C146 (c)).
+    const byRoom = (step.verb === 'close' || step.verb === 'width') ? roomByNumber(a, step, screens) : null
+    if (byRoom?.bad) return { answer, says: byRoom.bad, next: null }
+    const planned = byRoom?.step ?? step
     const p = BRINGS.includes(step.verb) ? bring(a, step, screens)
       : step.verb === 'open' && numberOf(step) != null ? openNumber(a, step, screens)
         : step.verb === FOCUS ? planFocusStep(a, step, screens)
-          : plan(a, step, screens.measure?.() ?? null)
+          : plan(a, planned, screens.measure?.() ?? null)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
     if (!p.next) return { answer, says: p.says, next: null }
     a = p.next

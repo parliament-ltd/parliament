@@ -775,3 +775,35 @@ describe('a prompt about selected cards (C145 (h))', () => {
     expect(words(promptPreview('Why?', { ...target, keyed: false, source: 'Wikipedia', about }))).toBe('A chat about cards needs a key for Anthropic. api: adds one')
   })
 })
+
+describe('close: and width: by a room\'s number, and close:welcome (stage 6, piece 8; C146 (c))', () => {
+  const room = keep(planRoom(shipped(SPACE), 'c204'))
+  const rows = [
+    { num: 204, kind: 'chat', chatId: 'c204', docketNum: 203, branch: 'a' },
+    { num: 203, kind: 'docket', chatId: 'c204', chatNum: 204 },
+    { num: 206, kind: 'chat', chatId: 'c206', docketNum: null },
+    { num: 210, kind: 'note', chatId: 'c204' },
+  ]
+  const at = (value, a = room) => {
+    const p = preview(value, { mode: 'command', arrangement: a, screens: { records: { rows } } })
+    return { ...p, text: say(i18n, p.says.message, p.says.values) }
+  }
+
+  it('closes or widens the room showing that chat, and nothing else', () => {
+    expect(at('>close:204').text).toBe('Enter closes this room. Nothing is lost')
+    expect(at('>close:204').next.columns.flat()).not.toContain('room')
+    expect(at('>close:203').text).toBe('Enter closes this room. Nothing is lost')
+    expect(at('>close:206').text).toBe('No room here shows 206. open:206 shows it')
+    expect(at('>close:210').text).toBe('210 is not a chat, so no room shows it')
+    expect(at('>close:299').text).toBe('Nothing here has the number 299')
+    expect(at('>width:204 60%').text).toBe('Enter gives this room 60% of the width')
+  })
+
+  it('closes the welcome card from wherever the bar points', () => {
+    const both = keep(planRoom(shipped('welcome'), 'c204'))
+    expect(both.addressed).not.toBe('welcome')
+    expect(at('>close:welcome', both).text).toBe('Enter closes the welcome page. tour: brings it back')
+    expect(at('>close:welcome', both).next.columns.flat()).not.toContain('welcome')
+    expect(at('>close:welcome').text).toBe('Welcome page is not open')
+  })
+})
