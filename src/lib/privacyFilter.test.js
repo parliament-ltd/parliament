@@ -44,7 +44,7 @@ describe('swapping out and back', () => {
     const veil = createVeil()
     expect(veil.out('Mail a@b.se, then c@d.se, then a@b.se again.')).toBe('Mail [EMAIL_1], then [EMAIL_2], then [EMAIL_1] again.')
     expect(veil.out('Call +46 70 123 45 67')).toBe('Call [PHONE_1]')
-    expect(veil.found()).toEqual({ email: 2, phone: 1, iban: 0, card: 0 })
+    expect(veil.found()).toEqual({ email: 2, phone: 1, iban: 0, card: 0, name: 0 })
   })
 
   it('puts them back in the reply, and leaves placeholders it never made', () => {

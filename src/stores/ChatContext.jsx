@@ -4,7 +4,7 @@ import { askToKeepStorage } from '../lib/storageKeep'
 import { nameFromChat, titleFromPrompt, fieldsFromDescription } from '../lib/chatTitles'
 import { useConversations } from './ConversationContext'
 import { useSettings } from './SettingsContext'
-import { gateway, destination, runClientTool, continueInstruction, providerOf } from '../net'
+import { gateway, destination, runClientTool, continueInstruction, providerOf, modelsOf } from '../net'
 import {
   startStream, appendStream, showStreamText, resetStreamText, stopStream, endStream, getStream, appendThinking, thoughtOf,
   isStreaming as streamingIn, streamingIds, addNotice, noteCut,
@@ -12,7 +12,7 @@ import {
 } from './chatStore'
 import { useIsStreaming, useMessages } from './chatHooks'
 import { forModel, cutReason } from './sendHistory'
-import { veilRequest } from '../lib/privacyFilter'
+import { veilRequest, createVeil } from '../lib/privacyFilter'
 
 // The open chat, for today's screens (refactor-plan.md, stages 3 and 4;
 // state audit §11a; C109).
@@ -67,6 +67,16 @@ function citedWith(citations) {
 }
 // Whether a provider runs on this computer: nothing it is sent leaves it.
 const onThisComputer = (provider) => destination(provider)?.kind === 'local'
+// Names a model on this computer found, by the text it found them in, for
+// this page: a chat's history is read once, not with every prompt (C169).
+const namesCache = new Map()
+const NAMES_CACHE_MOST = 500
+const textOf = (content) => (typeof content === 'string' ? content : Array.isArray(content) ? content.filter((p) => p?.type === 'text').map((p) => p.text ?? '').join('\n') : '')
+function namesUnchecked() {
+  const error = new Error('Names could not be found on this computer, so nothing was sent.')
+  error.name = 'NamesUnchecked'
+  return error
+}
 
 export function ChatProvider({ children }) {
   const [tokenUsage, setTokenUsage] = useState({ input: 0, output: 0 })
@@ -86,18 +96,44 @@ export function ChatProvider({ children }) {
   const thinkOn = useRef(false)
   useEffect(() => { thinkOn.current = settings.thinking === true }, [settings.thinking])
   const thinkOptions = (conversationId) => ({ think: thinkOn.current, onThinking: (t) => appendThinking(conversationId, t) })
-  // The privacy filter (C167): off unless turned on with privacy:on.
-  const privacyOn = useRef(false)
-  useEffect(() => { privacyOn.current = settings.privacyFilter === 'patterns' }, [settings.privacyFilter])
+  // The privacy filter (C167): off unless turned on with privacy:on, or
+  // privacy:names, which also swaps people's names (C169).
+  const privacyMode = useRef('off')
+  useEffect(() => { privacyMode.current = settings.privacyFilter ?? 'off' }, [settings.privacyFilter])
+  const helperModel = useRef(null)
+  useEffect(() => { helperModel.current = settings.helper ?? null }, [settings.helper])
+  // The names of people in what a request carries, found first by a model
+  // on this computer (S3: never in the browser, never by a provider): the
+  // helper when it is one, else the first listed. Done before anything is
+  // added or sent; if they cannot be found, nothing goes.
+  const namesFor = async (model, texts) => {
+    if (privacyMode.current !== 'names' || onThisComputer(providerOf(model))) return []
+    const listed = modelsOf('ollama')
+    const checker = listed.find((m) => m.id === helperModel.current)?.id ?? listed[0]?.id ?? null
+    if (!checker) throw namesUnchecked()
+    const all = texts.map((t) => String(t ?? '')).filter(Boolean)
+    const fresh = all.filter((t) => !namesCache.has(t))
+    if (fresh.length) {
+      let found
+      try {
+        found = await gateway.call('ollama', 'findNames', [fresh, { model: checker }], { label: 'find names' })
+      } catch {
+        throw namesUnchecked()
+      }
+      if (namesCache.size > NAMES_CACHE_MOST) namesCache.clear()
+      for (const t of fresh) namesCache.set(t, (found ?? []).filter((n) => t.includes(n)))
+    }
+    return [...new Set(all.flatMap((t) => namesCache.get(t) ?? []))]
+  }
   // A request as it goes: for a provider off this computer, with the
   // filter on, its fixed formats swapped for placeholders, and the reply
   // shown and kept with them swapped back. prefix: what the reply already
   // holds (continuing a reply). Off, or on this computer, as it was.
-  const veiling = (conversationId, model, messages, system, prefix = '') => {
-    if (!privacyOn.current || onThisComputer(providerOf(model))) {
+  const veiling = (conversationId, model, messages, system, prefix = '', names = []) => {
+    if (privacyMode.current === 'off' || onThisComputer(providerOf(model))) {
       return { messages, system: system || undefined, onChunk: (c) => appendStream(conversationId, c), out: (t) => t, back: (t) => t, reset: () => {} }
     }
-    const r = veilRequest({ messages, system: system || null })
+    const r = veilRequest({ messages, system: system || null }, createVeil({ names }))
     let raw = ''
     return {
       messages: r.messages,
@@ -200,7 +236,8 @@ export function ChatProvider({ children }) {
   const describeNewChat = useCallback(async (conversationId, exchange, prompt, model) => {
     if (describeOn.current) {
       try {
-        const v = veiling(conversationId, model, exchange, null)
+        const names = await namesFor(model, exchange.map((m) => textOf(m.content)))
+        const v = veiling(conversationId, model, exchange, null, '', names)
         const said = await gateway.call(providerOf(model), 'generateMetadata', [v.messages], { label: 'title, summary and tags' })
         const fields = fieldsFromDescription({ ...said, ...(said?.title ? { title: v.back(said.title) } : {}), ...(said?.summary ? { summary: v.back(said.summary) } : {}) })
         if (Object.keys(fields).length) { await updateConversation(conversationId, fields); return }
@@ -245,6 +282,9 @@ export function ChatProvider({ children }) {
     const held = hasMessages(conversationId) ? heldMessages(conversationId) : await getMessages(conversationId)
     const before = sendable(conversationId, held)
     const first = held.length === 0 // the chat's first prompt
+    // With privacy:names, the names in what goes, found on this computer
+    // first; if that fails, the prompt is not added and nothing is sent.
+    const names = await namesFor(model, [...forModel(before).map((m) => textOf(m.content)), userContent, systemPrompt])
 
     // 1. Add user message to state and IndexedDB.
     //    PR-18e: `userContent` is already the text the user typed PLUS
@@ -303,7 +343,7 @@ export function ChatProvider({ children }) {
       // 4. Call provider with streaming — handle client-side tool loop
       let totalInputTokens = 0
       let totalOutputTokens = 0
-      const v = veiling(conversationId, model, baseHistory, systemPrompt)
+      const v = veiling(conversationId, model, baseHistory, systemPrompt, '', names)
       let toolLoopHistory = [...v.messages]
       let chartBlocks = '' // accumulated create_chart output across turns
       const cited = [] // what a web search found and the reply cited
@@ -432,6 +472,7 @@ export function ChatProvider({ children }) {
     if (at < 0) return
     const prompt = held[at]
     const history = forModel(sendable(conversationId, held.slice(0, at + 1)))
+    const names = await namesFor(model, [...history.map((m) => textOf(m.content)), systemPrompt])
     let reply = held.slice(at + 1).find((m) => m.role === 'assistant' && !m.content) ?? null
     if (!reply) {
       reply = await addMessage({ conversationId, role: 'assistant', content: '', incomplete: true })
@@ -440,7 +481,7 @@ export function ChatProvider({ children }) {
 
     const controller = new AbortController()
     startStream(conversationId, { messageId: reply.id, controller })
-    const v = veiling(conversationId, model, history, systemPrompt)
+    const v = veiling(conversationId, model, history, systemPrompt, '', names)
     try {
       const response = await gateway.call(providerOf(model), 'sendMessageWhole', [
         v.messages,
@@ -572,11 +613,13 @@ export function ChatProvider({ children }) {
       { role: 'user', content: continueInstruction(providerOf(model)) },
     ]
 
+    const names = await namesFor(model, [...history.map((m) => textOf(m.content)), systemPrompt])
+
     // Reuse the existing message record
     const controller = new AbortController()
     startStream(conversationId, { messageId: incompleteMsg.id, text: incompleteMsg.content, controller })
     const stopPersisting = persistEvery(conversationId, incompleteMsg.id)
-    const v = veiling(conversationId, model, history, systemPrompt, incompleteMsg.content)
+    const v = veiling(conversationId, model, history, systemPrompt, incompleteMsg.content, names)
 
     try {
       const response = await gateway.call(providerOf(model), 'sendMessage', [

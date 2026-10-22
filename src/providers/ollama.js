@@ -1,5 +1,9 @@
 import { BaseProvider } from './base'
 import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens } from './shared'
+import { NAMES_SYSTEM_PROMPT, CHECK_SYSTEM_PROMPT, readNames, readCheck } from '../lib/injection'
+
+// Text for one of the checks below, in its tag, any such tag inside taken out.
+const asText = (t) => `<text>\n${String(t ?? '').replace(/<\/?text\b[^>]*>/gi, '').slice(0, 12_000)}\n</text>`
 
 // Ollama: models on this computer (refactor-plan.md, stage 7, piece 4;
 // LPN §7.2 and §7.5; C33, C163).
@@ -270,6 +274,24 @@ export class OllamaProvider extends BaseProvider {
     const text = await this._lightweightCall(SUMMARIZE_SYSTEM_PROMPT, [{ role: 'user', content: summaryItems(items) }], SUMMARY_MAX_TOKENS)
     if (!text) throw new Error('No summary came back')
     return text.slice(0, SUMMARY_MAX_CHARS)
+  }
+
+  // The names of people in some texts, for the privacy filter (S3; C169):
+  // only through a model here, so nothing leaves the computer to find them.
+  async findNames(texts, { model } = {}) {
+    const list = (texts ?? []).map((t) => String(t ?? '')).filter(Boolean)
+    if (!list.length) return []
+    const raw = await this._lightweightCall(NAMES_SYSTEM_PROMPT, [{ role: 'user', content: asText(list.join('\n\n')) }], 400, model)
+    return readNames(raw, list)
+  }
+
+  // Whether text from a source tries to instruct a model (security notes
+  // §1.5; S3; C169): a yes or no from a model here, a warning, never a guarantee.
+  async checkText(text, { model } = {}) {
+    const raw = await this._lightweightCall(CHECK_SYSTEM_PROMPT, [{ role: 'user', content: asText(text) }], 200, model)
+    const said = readCheck(raw)
+    if (!said) throw new Error('The check came back unreadable')
+    return said
   }
 
   // translate: (C166) by a model on this computer: free, and nothing leaves it.

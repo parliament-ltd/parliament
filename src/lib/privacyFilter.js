@@ -18,7 +18,7 @@
 // Pure.
 
 export const KINDS = Object.freeze(['email', 'phone', 'iban', 'card'])
-const LABEL = { email: 'EMAIL', phone: 'PHONE', iban: 'IBAN', card: 'CARD' }
+const LABEL = { email: 'EMAIL', phone: 'PHONE', iban: 'IBAN', card: 'CARD', name: 'NAME' }
 
 const EMAIL = /(?<![\w.%+-])[A-Za-z0-9._%+-]{1,64}@[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,62}[A-Za-z0-9])?)*\.[A-Za-z]{2,24}(?![\w-])/g
 // International: a plus, a country code, and groups with spaces, hyphens,
@@ -102,17 +102,31 @@ export const anyFound = (found) => Boolean(found) && KINDS.some((k) => (found[k]
 
 // The line a model is told when something was swapped, so it keeps the
 // placeholders as they are.
-export const SWAP_NOTE = 'Some details in this conversation are replaced by placeholders such as [EMAIL_1] or [PHONE_1]. Keep each placeholder exactly as written wherever you need it, and do not guess what it stands for.'
+export const SWAP_NOTE = 'Some details in this conversation are replaced by placeholders such as [EMAIL_1], [PHONE_1] or [NAME_1]. Keep each placeholder exactly as written wherever you need it, and do not guess what it stands for.'
 
 /**
  * A veil for one request: swaps what it finds for placeholders on the way
- * out, and back on the way in.
+ * out, and back on the way in. names: people's names a model on this
+ * computer found ("patterns and names", S3), swapped wherever they appear
+ * as whole words.
  * @returns {{ out: (text: string) => string, back: (text: string) => string, found: () => object, swapped: () => boolean }}
  */
-export function createVeil() {
+export function createVeil({ names = [] } = {}) {
+  const escape = (n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const nameRes = [...names].sort((a, b) => b.length - a.length)
+    .map((n) => ({ value: n, re: new RegExp(`(?<![\\p{L}\\p{N}])${escape(n)}(?![\\p{L}\\p{N}])`, 'gu') }))
+  const found = (t) => {
+    const all = findPrivate(t)
+    const taken = (s, e) => all.some((f) => s < f.end && e > f.start)
+    for (const { value, re } of nameRes) {
+      re.lastIndex = 0
+      for (const m of t.matchAll(re)) if (!taken(m.index, m.index + value.length)) all.push({ kind: 'name', value, start: m.index, end: m.index + value.length })
+    }
+    return all.sort((a, b) => a.start - b.start)
+  }
   const byValue = new Map() // value -> placeholder
   const byPlace = new Map() // placeholder -> value
-  const counts = Object.fromEntries(KINDS.map((k) => [k, 0]))
+  const counts = Object.fromEntries([...KINDS, 'name'].map((k) => [k, 0]))
   const placeFor = (kind, value) => {
     let p = byValue.get(value)
     if (!p) {
@@ -126,11 +140,11 @@ export function createVeil() {
   return {
     out(text) {
       const t = String(text ?? '')
-      const found = findPrivate(t)
-      if (!found.length) return t
+      const here = found(t)
+      if (!here.length) return t
       let s = ''
       let at = 0
-      for (const f of found) {
+      for (const f of here) {
         s += t.slice(at, f.start) + placeFor(f.kind, f.value)
         at = f.end
       }
@@ -138,7 +152,7 @@ export function createVeil() {
     },
     back(text) {
       if (!byPlace.size) return String(text ?? '')
-      return String(text ?? '').replace(/\[(EMAIL|PHONE|IBAN|CARD)_(\d{1,4})\]/g, (p) => byPlace.get(p) ?? p)
+      return String(text ?? '').replace(/\[(EMAIL|PHONE|IBAN|CARD|NAME)_(\d{1,4})\]/g, (p) => byPlace.get(p) ?? p)
     },
     found: () => ({ ...counts }),
     swapped: () => byPlace.size > 0,

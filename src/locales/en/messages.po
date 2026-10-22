@@ -353,6 +353,11 @@ msgstr "Off: when you leave a chat while a reply is being written, the reply sto
 msgid "chat.frameworkGone"
 msgstr "a framework since removed"
 
+#. Under an answer from a source (C169)
+#. js-lingui-explicit-id
+msgid "chat.instructionLike"
+msgstr "Holds words that read like instructions to a model: {phrases}. Shown as text, never followed"
+
 #. js-lingui-explicit-id
 msgid "chat.quote"
 msgstr "Quote"
@@ -388,6 +393,11 @@ msgstr "Quotes"
 #. js-lingui-explicit-id
 msgid "chat.quoteWhichChat"
 msgstr "Quote it beside which chat?"
+
+#. A question to a source, sent as a search without its question words (C168)
+#. js-lingui-explicit-id
+msgid "chat.searchedFor"
+msgstr "Searched for “{text}”"
 
 #. js-lingui-explicit-id
 msgid "chat.showOriginal"
@@ -899,6 +909,43 @@ msgstr "One prompt to several comes with branches. Choose one for now"
 #. js-lingui-explicit-id
 msgid "enter.byWhich"
 msgstr "{word} could be {names}. Say which, like {example}"
+
+#. js-lingui-explicit-id
+msgid "enter.checkClean"
+msgstr "{name} finds nothing in it that tries to instruct a model. A check is a warning, never a guarantee"
+
+#. js-lingui-explicit-id
+msgid "enter.checkFailed"
+msgstr "The check did not come back. Try again"
+
+#. js-lingui-explicit-id
+msgid "enter.checkFound"
+msgstr "{name} finds words in it that try to instruct a model: “{quote}”. They stay text, never followed"
+
+#. js-lingui-explicit-id
+msgid "enter.checkFoundUnquoted"
+msgstr "{name} finds something in it that tries to instruct a model. It stays text, never followed"
+
+#. js-lingui-explicit-id
+msgid "enter.checkFree"
+msgstr "{count, plural, =0 {Nothing in the answer from {source} reads like instructions to a model} one {The answer from {source} holds words that read like instructions to a model: {phrases}} other {The answer from {source} holds words that read like instructions to a model: {phrases}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.checkLocal"
+msgstr "Enter has {name} on this computer look more closely. Free, and nothing leaves it. A check is a warning, never a guarantee"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.checkNoLocal"
+msgstr "A model on this computer can look more closely. {command} looks for one"
+
+#. js-lingui-explicit-id
+msgid "enter.checkNothing"
+msgstr "No answer from a source here to check"
+
+#. js-lingui-explicit-id
+msgid "enter.checkWorking"
+msgstr "Checking on this computer. The bar is free meanwhile"
 
 #. js-lingui-explicit-id
 msgid "enter.clearFilter"
@@ -1542,6 +1589,11 @@ msgstr "This room has that name already"
 msgid "enter.nameSameTitle"
 msgstr "{num} has that name already"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.namesUnchecked"
+msgstr "Names could not be found on this computer, so nothing was sent. privacy:on swaps the fixed formats only"
+
 #. js-lingui-explicit-id
 msgid "enter.nameTitle"
 msgstr "Enter names {num}: {name}"
@@ -1725,10 +1777,19 @@ msgstr "{side, select, left {Enter places the window of {board} on the left} oth
 msgid "enter.popSideThere"
 msgstr "{side, select, left {The window of {board} is on the left already} other {The window of {board} is on the right already}}"
 
+#. js-lingui-explicit-id
+msgid "enter.privacyNames"
+msgstr "Enter also has {name} on this computer find people’s names first, and swaps them too. That takes a while with each prompt; nothing leaves the computer to find them"
+
+#. Commands stay English. S3: never in the browser, never by a provider
+#. js-lingui-explicit-id
+msgid "enter.privacyNamesNeedsLocal"
+msgstr "Finding names needs a model on this computer, so nothing leaves it to find them. {command} looks for one"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.privacyNow"
-msgstr "{on, select, on {Email addresses, phone numbers, and bank and card numbers are swapped for placeholders before a prompt goes. privacy:off stops it} other {The privacy filter is off. privacy:on swaps email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes}}"
+msgstr "{mode, select, patterns {Email addresses, phone numbers, and bank and card numbers are swapped for placeholders before a prompt goes. privacy:off stops it} names {Names are swapped too, found first by {name} on this computer, with email addresses, phone numbers, and bank and card numbers. privacy:off stops it} other {The privacy filter is off. privacy:on swaps email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes}}"
 
 #. js-lingui-explicit-id
 msgid "enter.privacyOff"
@@ -1737,6 +1798,10 @@ msgstr "Enter stops swapping: prompts go as you type them"
 #. js-lingui-explicit-id
 msgid "enter.privacyOn"
 msgstr "Enter swaps email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes to a model off this computer, and puts them back in the reply. This line names what is swapped each time"
+
+#. js-lingui-explicit-id
+msgid "enter.privacySameNames"
+msgstr "Names are swapped too already"
 
 #. js-lingui-explicit-id
 msgid "enter.privacySameOff"
@@ -1847,6 +1912,10 @@ msgstr "{name} is a preview: its provider trains on what you send it, whatever y
 msgid "enter.promptPrivacy"
 msgstr "Swapped for placeholders before it goes: {found}. The reply puts them back"
 
+#. js-lingui-explicit-id
+msgid "enter.promptPrivacyNames"
+msgstr "Names are found first by {name} on this computer and swapped too, which takes a while. A small model can miss some"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptPrivacyOffer"
@@ -1882,6 +1951,11 @@ msgstr "{tokens, plural, one {Enter sends it again without streaming, about # to
 #. js-lingui-explicit-id
 msgid "enter.promptResendUnpriced"
 msgstr "{tokens, plural, one {Enter sends it again without streaming, about # token} other {Enter sends it again without streaming, about # tokens}}"
+
+#. A source answers a search; a leading question phrase is left out (C168)
+#. js-lingui-explicit-id
+msgid "enter.promptSearchFor"
+msgstr "It goes as a search for “{search}”"
 
 #. A local estimate: nothing is sent to count (C83)
 #. js-lingui-explicit-id
@@ -2344,6 +2418,10 @@ msgstr "The answer from {source} is translated into {language} already"
 #. js-lingui-explicit-id
 msgid "enter.translateFailed"
 msgstr "The translation did not come back whole, so nothing was kept. Try again"
+
+#. js-lingui-explicit-id
+msgid "enter.translateInstructions"
+msgstr "It holds words that read like instructions to a model ({phrases}). They go as text to translate, never to follow"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3537,6 +3615,10 @@ msgid "verb.calm"
 msgstr "Show less detail until you come near it, or all of it again"
 
 #. js-lingui-explicit-id
+msgid "verb.check"
+msgstr "Check the last answer from a source for words that try to instruct a model"
+
+#. js-lingui-explicit-id
 msgid "verb.clear"
 msgstr "Empty the collection, remove every filter, or one kind of filter"
 
@@ -3702,7 +3784,7 @@ msgstr "Put a board or the bar in its own window, place it, or bring it back"
 
 #. js-lingui-explicit-id
 msgid "verb.privacy"
-msgstr "Swap email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes, or not"
+msgstr "Swap email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes, names too, or not"
 
 #. js-lingui-explicit-id
 msgid "verb.records"

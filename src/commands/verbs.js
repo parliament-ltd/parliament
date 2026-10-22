@@ -251,8 +251,14 @@ export const VERBS = Object.freeze([
   // The privacy filter for fixed formats (security notes §4.1; C167):
   // email addresses, phone numbers, bank and card numbers swapped for
   // placeholders before a prompt goes to a model off this computer.
-  v({ verb: 'privacy', group: 'editing', example: 'privacy:on', forms: ['privacy:', 'privacy:on', 'privacy:off'], takes: [[], [['on', 'off']]], stage: 7, undoable: true, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.privacy', message: 'Swap email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes, or not' } }),
+  // names: people's names too, found by a model on this computer (S3; C169).
+  v({ verb: 'privacy', group: 'editing', example: 'privacy:on', forms: ['privacy:', 'privacy:on', 'privacy:names', 'privacy:off'], takes: [[], [['on', 'off', 'names']]], stage: 7, undoable: true, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.privacy', message: 'Swap email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes, names too, or not' } }),
+  // The injection check (security notes §1.4, §1.5; S3; C169): words in the
+  // last answer from a source that read like instructions to a model; a
+  // closer look by a model on this computer, when one is connected.
+  v({ verb: 'check', group: 'editing', example: 'check:', takes: [[]], stage: 7, click: 'fill',
+    gloss: /*i18n*/ { id: 'verb.check', message: 'Check the last answer from a source for words that try to instruct a model' } }),
   // Translating (C84, C85, C166): alone, the last answer from a source,
   // into your language; on and off, whether a question to a source that
   // reads only English is translated before it goes.

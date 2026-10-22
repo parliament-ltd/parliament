@@ -575,6 +575,7 @@ export const COPY = {
     // Reply language and translation (stage 7, piece 6; C166). {language} is
     // a language's name in the reader's language, from the browser.
     promptReplyIn: /*i18n*/ { id: 'enter.promptReplyIn', message: 'Replies come in {language}. reply: changes it', comment: 'Commands stay English' },
+    promptSearchFor: /*i18n*/ { id: 'enter.promptSearchFor', message: 'It goes as a search for “{search}”', comment: 'A source answers a search; a leading question phrase is left out (C168)' },
     promptEdition: /*i18n*/ { id: 'enter.promptEdition', message: 'From its {language} edition, or the English one if nothing is found there' },
     promptQueryTranslated: /*i18n*/ { id: 'enter.promptQueryTranslated', message: 'Your question goes translated into {language}, which it reads best, unless it is in {language} already' },
     promptQueryUntranslated: /*i18n*/ { id: 'enter.promptQueryUntranslated', message: 'It reads {language} best, and nothing here can translate your question, so it goes as typed' },
@@ -637,9 +638,28 @@ export const COPY = {
     privacySameOff: /*i18n*/ { id: 'enter.privacySameOff', message: 'The privacy filter is off already' },
     privacyNow: /*i18n*/ {
       id: 'enter.privacyNow',
-      message: '{on, select, on {Email addresses, phone numbers, and bank and card numbers are swapped for placeholders before a prompt goes. privacy:off stops it} other {The privacy filter is off. privacy:on swaps email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes}}',
+      message: '{mode, select, patterns {Email addresses, phone numbers, and bank and card numbers are swapped for placeholders before a prompt goes. privacy:off stops it} names {Names are swapped too, found first by {name} on this computer, with email addresses, phone numbers, and bank and card numbers. privacy:off stops it} other {The privacy filter is off. privacy:on swaps email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes}}',
       comment: 'Commands stay English',
     },
+    privacyNames: /*i18n*/ { id: 'enter.privacyNames', message: 'Enter also has {name} on this computer find people’s names first, and swaps them too. That takes a while with each prompt; nothing leaves the computer to find them' },
+    privacySameNames: /*i18n*/ { id: 'enter.privacySameNames', message: 'Names are swapped too already' },
+    privacyNamesNeedsLocal: /*i18n*/ { id: 'enter.privacyNamesNeedsLocal', message: 'Finding names needs a model on this computer, so nothing leaves it to find them. {command} looks for one', comment: 'Commands stay English. S3: never in the browser, never by a provider' },
+    promptPrivacyNames: /*i18n*/ { id: 'enter.promptPrivacyNames', message: 'Names are found first by {name} on this computer and swapped too, which takes a while. A small model can miss some' },
+    namesUnchecked: /*i18n*/ { id: 'enter.namesUnchecked', message: 'Names could not be found on this computer, so nothing was sent. privacy:on swaps the fixed formats only', comment: 'Commands stay English' },
+    // The injection check (C169). {phrases} is a list of quoted phrases.
+    checkFree: /*i18n*/ {
+      id: 'enter.checkFree',
+      message: '{count, plural, =0 {Nothing in the answer from {source} reads like instructions to a model} one {The answer from {source} holds words that read like instructions to a model: {phrases}} other {The answer from {source} holds words that read like instructions to a model: {phrases}}}',
+    },
+    checkLocal: /*i18n*/ { id: 'enter.checkLocal', message: 'Enter has {name} on this computer look more closely. Free, and nothing leaves it. A check is a warning, never a guarantee' },
+    checkNoLocal: /*i18n*/ { id: 'enter.checkNoLocal', message: 'A model on this computer can look more closely. {command} looks for one', comment: 'Commands stay English' },
+    checkNothing: /*i18n*/ { id: 'enter.checkNothing', message: 'No answer from a source here to check' },
+    checkWorking: /*i18n*/ { id: 'enter.checkWorking', message: 'Checking on this computer. The bar is free meanwhile' },
+    checkClean: /*i18n*/ { id: 'enter.checkClean', message: '{name} finds nothing in it that tries to instruct a model. A check is a warning, never a guarantee' },
+    checkFound: /*i18n*/ { id: 'enter.checkFound', message: '{name} finds words in it that try to instruct a model: “{quote}”. They stay text, never followed' },
+    checkFoundUnquoted: /*i18n*/ { id: 'enter.checkFoundUnquoted', message: '{name} finds something in it that tries to instruct a model. It stays text, never followed' },
+    checkFailed: /*i18n*/ { id: 'enter.checkFailed', message: 'The check did not come back. Try again' },
+    translateInstructions: /*i18n*/ { id: 'enter.translateInstructions', message: 'It holds words that read like instructions to a model ({phrases}). They go as text to translate, never to follow' },
     replyCut: /*i18n*/ { id: 'enter.replyCut', message: 'The reply broke off part way. What arrived is kept and marked as cut off' },
   },
 
@@ -1210,6 +1230,8 @@ export const COPY = {
     showOriginal: /*i18n*/ { id: 'chat.showOriginal', message: 'show the original' },
     showTranslation: /*i18n*/ { id: 'chat.showTranslation', message: 'show the translation' },
     askedAs: /*i18n*/ { id: 'chat.askedAs', message: 'Asked in {language} as “{text}”' },
+    instructionLike: /*i18n*/ { id: 'chat.instructionLike', message: 'Holds words that read like instructions to a model: {phrases}. Shown as text, never followed', comment: 'Under an answer from a source (C169)' },
+    searchedFor: /*i18n*/ { id: 'chat.searchedFor', message: 'Searched for “{text}”', comment: 'A question to a source, sent as a search without its question words (C168)' },
     sourceNothing: /*i18n*/ { id: 'chat.sourceNothing', message: 'Nothing found on {source} for that. Try other words.' },
     // A list of results from a source (stage 7, piece 2).
     sourcePoints: /*i18n*/ { id: 'chat.sourcePoints', message: '{count, plural, one {# point} other {# points}}', comment: 'A Hacker News story\'s points' },

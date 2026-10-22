@@ -18,6 +18,8 @@ import { metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as
 import { replyLanguageOf, withReplyLanguage, sourceAskLanguage, translateInto, nameOf, baseOf } from '../lib/languages'
 import { piecesOfAnswer, translationOf, lastSourceAnswer, BY_BROWSER } from '../lib/translations'
 import { findPrivate } from '../lib/privacyFilter'
+import { searchWords } from '../lib/searchWords'
+import { instructionLike } from '../lib/injection'
 import AnswerPicker from './AnswerPicker'
 import { ignite } from './ignition'
 import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
@@ -132,6 +134,8 @@ async function localBlocked() {
 function failure(err, source = destination(SOURCE)?.name) {
   if (err?.name === 'AbortError') return null
   if (err?.name === 'Refused') return 'promptChanged'
+  // privacy:names could not find names on this computer: nothing was sent (C169).
+  if (err?.name === 'NamesUnchecked') return 'namesUnchecked'
   if (err?.kept) return 'replyCut'
   if (err?.name === 'SourceError') {
     // A source that turns away the network (some do for shared VPN
@@ -1037,6 +1041,24 @@ export default function Shell() {
       remember(body)
       return { done: true, says: 'translateWorking', later }
     }
+    if (what.kind === 'check') {
+      // check: (C169): a closer look by a model on this computer at the last
+      // answer from a source, free; a warning, never a guarantee.
+      const later = (async () => {
+        const message = (await getMessages(what.chatId).catch(() => [])).find((m) => m.id === what.messageId)
+        if (!message?.content) return 'checkFailed'
+        let said
+        try {
+          said = await gateway.call('ollama', 'checkText', [message.content, { model: what.model }], { label: 'check text' })
+        } catch {
+          return 'checkFailed'
+        }
+        if (!said.instructions) return { message: 'checkClean', values: { name: what.name } }
+        return said.quote ? { message: 'checkFound', values: { name: what.name, quote: said.quote } } : { message: 'checkFoundUnquoted', values: { name: what.name } }
+      })()
+      remember(body)
+      return { done: true, says: 'checkWorking', later }
+    }
     if (what.kind === 'thinking') {
       // thinking:on / thinking:off (C165): a setting of the person's.
       await updateSettingNow.current('thinking', what.on)
@@ -1346,8 +1368,16 @@ export default function Shell() {
       messageId: l.message.id, source: l.message.source.name ?? l.message.source.id,
       question: q.length > 60 ? `${q.slice(0, 59)}…` : q,
       chars: parts.chars, from: parts.from, translated: l.message.translation?.lang ?? null,
+      // Its words, for check:, and those that read like instructions to a model (C169).
+      text: l.message.content, phrases: instructionLike(l.message.content),
     }
   }, [shown])
+  // The model on this computer that finds names and checks text (S3; C169):
+  // the helper when it is one, else the first a check listed.
+  const localChecker = useMemo(() => {
+    const rows = answerRows.local.filter((r) => !r.unchecked && !r.later)
+    return rows.find((r) => r.id === settings.helper) ?? rows[0] ?? null
+  }, [answerRows, settings.helper])
   // Questions to sources that read only English are translated first, when
   // turned on and the person's language is another (C85). The person is
   // taken to write in the reply language; the browser checks on Enter.
@@ -1375,8 +1405,9 @@ export default function Shell() {
     reply: { setting: settings.replyLanguage ?? null, now: reply, locale: i18n.locale, nameOf: languageName },
     helping: { now: helperNow, rows: answerRows, stored: settings.helper ?? null },
     translating: { room: roomId, num: roomRecord?.num ?? null, last: lastAnswer, to: translateTo, who: translator, queries: settings.translateQueries === true, nameOf: languageName },
-    privacy: { on: settings.privacyFilter === 'patterns' },
-  }), [settings.privacyFilter, settings.replyLanguage, settings.helper, settings.translateQueries, reply, i18n.locale, languageName, helperNow, answerRows, roomId, roomRecord, lastAnswer, translateTo, translator])
+    privacy: { mode: settings.privacyFilter ?? 'off', local: localChecker?.name ?? null },
+    checking: { room: roomId, num: roomRecord?.num ?? null, last: lastAnswer && { messageId: lastAnswer.messageId, source: lastAnswer.source, text: lastAnswer.text }, local: localChecker && { id: localChecker.id, name: localChecker.name } },
+  }), [settings.privacyFilter, localChecker, settings.replyLanguage, settings.helper, settings.translateQueries, reply, i18n.locale, languageName, helperNow, answerRows, roomId, roomRecord, lastAnswer, translateTo, translator])
   const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
@@ -1447,9 +1478,11 @@ export default function Shell() {
     edition,
     query,
     translateLater: (reads === 'english' || reads === 'mostlyEnglish') && baseOf(translateTo) !== 'en' ? languageName(translateTo) : null,
+    // The language a source's search is read in, for what it searches for (C168).
+    searchLang: answerer.group === 'source' ? (reads === 'yours' ? sourceAskLanguage(reply, sourceLocale(i18n.locale)) : 'en') : null,
     nameOf: languageName,
     // The privacy filter, for a model off this computer (C167).
-    privacy: answerer.group === 'model' ? { on: settings.privacyFilter === 'patterns', along: about ? [] : alongPrivate } : null,
+    privacy: answerer.group === 'model' ? { on: (settings.privacyFilter ?? 'off') !== 'off', names: settings.privacyFilter === 'names' ? localChecker?.name ?? null : null, along: about ? [] : alongPrivate } : null,
     // The frameworks on the chat, by name; the ones that go, when a model answers (C164).
     frameworkNames: frameworksOf(fwHere, fwList).map(nameOfFramework),
     thinking: settings.thinking === true,
@@ -1462,7 +1495,7 @@ export default function Shell() {
     ink,
     roomName: roomNameHere,
     about,
-  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter])
+  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -1548,13 +1581,19 @@ export default function Shell() {
       const { locale } = latest.current
       return who.group !== 'source'
         ? sendMessage(id, full, who.id, system(), [], null, under)
-        : askSource(id, text, {
-          source: who.id,
-          lang: sourceAskLanguage(replyNow.current, sourceLocale(locale)),
-          // Nothing in that edition: the English one (LPN §6).
-          fallbackLang: destination(who.id)?.answersIn === 'yours' ? 'en' : null,
-          asked,
-        })
+        : askSource(id, text, { source: who.id, lang: askIn(locale), fallbackLang: destination(who.id)?.answersIn === 'yours' ? 'en' : null, asked: searched(locale) })
+    }
+    // The edition a source with one in each language is asked in (C166 (e));
+    // nothing found there, the English one (LPN §6).
+    const askIn = (locale) => sourceAskLanguage(replyNow.current, sourceLocale(locale))
+    // A source answers a search: a leading question phrase is left out, as
+    // the Enter line said, and the search kept with the prompt (C168).
+    const searched = (locale) => {
+      const said = asked?.text ?? text
+      const lang = asked ? 'en' : destination(who.id)?.answersIn === 'yours' ? askIn(locale) : 'en'
+      const words = searchWords(said, lang)
+      if (words === said.trim().replace(/[?？!.]+$/u, '').trim()) return asked
+      return { text: words.slice(0, 300), lang: baseOf(lang), by: asked?.by ?? 'search', at: new Date().toISOString() }
     }
     // A new room sends once its messages are loaded, so nothing is lost
     // between the two.

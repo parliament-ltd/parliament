@@ -7,7 +7,7 @@
 import { COPY } from '../copy'
 
 const BOARD_VALUES = new Set(['board', 'first', 'second'])
-const AND_LISTS = new Set(['boards', 'verbs', 'sources', 'filters', 'nums', 'frameworks'])
+const AND_LISTS = new Set(['boards', 'verbs', 'sources', 'filters', 'nums', 'frameworks', 'phrases'])
 const PERCENTS = new Set(['percent', 'low', 'high'])
 
 /** A day, given as 2026-09-01, the way the reader's language writes a date in full. */

@@ -14,6 +14,7 @@ import { COPY } from '../../copy'
 import ChartRenderer from './ChartRenderer'
 import CitationLink from './CitationLink'
 import { modelFacts } from '../../net'
+import { instructionLike } from '../../lib/injection'
 
 const NO_QUOTES = Object.freeze([])
 
@@ -496,6 +497,8 @@ export default function MessageCard({
       {/* Where an answer from a source came from: the page, its revision and
           its licence (stage 4). Words come from the copy table. */}
       {source && source.found !== false && <SourceLine source={source} />}
+      {/* Words that read like instructions to a model, marked, never blocked (C169). */}
+      {source && source.found !== false && <InstructionLine text={displayContent} />}
       {/* Its translation, by whom, and the source's own words a click away (C166 (f)). */}
       {source && translation && <TranslationLine translation={translation} original={original} onToggle={() => setOriginal((o) => !o)} />}
       {/* The question as it went, when it was translated first (C85). */}
@@ -594,6 +597,16 @@ function CitedSources({ citations }) {
   )
 }
 
+// A warning under an answer from a source whose words read like
+// instructions to a model (security notes §1.4; C169).
+function InstructionLine({ text }) {
+  const { i18n } = useLingui()
+  const phrases = useMemo(() => instructionLike(text), [text])
+  if (!phrases.length) return null
+  const list = new Intl.ListFormat(i18n.locale, { type: 'conjunction' }).format(phrases.map((p) => `“${p}”`))
+  return <p className="mt-1 text-xs italic text-[var(--p-text-primary)]" dir="auto">{i18n._(COPY.chat.instructionLike, { phrases: list })}</p>
+}
+
 // A language's name in the reader's language, from the browser.
 function languageName(locale, tag) {
   try {
@@ -624,7 +637,8 @@ function TranslationLine({ translation, original, onToggle }) {
 // "Asked in English as “barn owls”" (C85).
 function AskedLine({ asked }) {
   const { i18n } = useLingui()
-  return <p className="mt-1 text-xs italic text-[var(--p-text-secondary)]" dir="auto">{i18n._(COPY.chat.askedAs, { language: languageName(i18n.locale, asked.lang), text: asked.text })}</p>
+  const words = asked.by === 'search' ? i18n._(COPY.chat.searchedFor, { text: asked.text }) : i18n._(COPY.chat.askedAs, { language: languageName(i18n.locale, asked.lang), text: asked.text })
+  return <p className="mt-1 text-xs italic text-[var(--p-text-secondary)]" dir="auto">{words}</p>
 }
 
 // "Written under Push back on me and Editor": the built in by their names in

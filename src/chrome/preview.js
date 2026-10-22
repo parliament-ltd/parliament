@@ -29,8 +29,9 @@ import { planNote, planSummarize, planCompare, planJump } from '../lib/cardActs'
 import { exportItems, chatsOf, exportName } from '../lib/recordsExport'
 import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
-import { planReply, planHelper, planTranslate, planPrivacy, queryLines } from '../lib/languageVerbs'
+import { planReply, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
 import { findPrivate, KINDS as PRIVATE_KINDS } from '../lib/privacyFilter'
+import { searchWords } from '../lib/searchWords'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
@@ -49,7 +50,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate', 'privacy'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate', 'privacy', 'check'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -575,6 +576,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       helper: (a1, s1, sc) => planHelper(s1, sc),
       translate: (a1, s1, sc) => planTranslate(s1, sc),
       privacy: (a1, s1, sc) => planPrivacy(s1, sc),
+      check: (a1, s1, sc) => planCheck(s1, sc),
     }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
@@ -742,6 +744,11 @@ export function promptPreview(text, target = {}) {
   if (who.group === 'source') {
     const says = { message: 'promptSource', values: { source: who.name } }
     const also = []
+    // What it searches for, when that is not the question as typed (C168).
+    if (!target.query && target.searchLang) {
+      const words = searchWords(prompt, target.searchLang)
+      if (words !== prompt.replace(/[?？!.]+$/u, '').trim()) also.push({ message: 'promptSearchFor', values: { search: words } })
+    }
     // The edition asked, when it is the reply language's (C166 (e)).
     if (target.edition) also.push({ message: 'promptEdition', values: { language: target.edition } })
     // A question to a source that reads only English, translated first (C85).
@@ -765,10 +772,10 @@ export function promptPreview(text, target = {}) {
   // A preview, and one whose provider trains on all it is sent (C167).
   if (who.preview) also.push({ message: who.training === 'always' ? 'promptPreviewTrains' : 'promptPreviewModel', values: { name: who.name } })
   // The privacy filter: what it swaps, or what it would (C167).
-  const veiled = privacyLine(about ? `${about.text}
-
-${prompt}` : prompt, target.privacy)
+  const veiled = privacyLine(about ? `${about.text}\n\n${prompt}` : prompt, target.privacy)
   if (veiled) also.push(veiled)
+  // Names found first on this computer, and swapped too (C169).
+  if (target.privacy?.names) also.push({ message: 'promptPrivacyNames', values: { name: target.privacy.names } })
   // The frameworks that go with it, in their order (C164). target.frameworks: their names.
   if (target.frameworks?.length) also.push({ message: 'promptFrameworks', values: { count: target.frameworks.length, frameworks: target.frameworks } })
   // The language replies come in, sent as a line of the system prompt (C166).

@@ -99,7 +99,7 @@ const SETTINGS = Object.freeze({
   helper: (v) => v === null || typeof v === 'string' && /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$/.test(v),
   translateQueries: bool,
   // The privacy filter (C167).
-  privacyFilter: (v) => v === 'off' || v === 'patterns',
+  privacyFilter: (v) => v === 'off' || v === 'patterns' || v === 'names',
 })
 
 // Settings named after something. `chat` names the chat in the key, so a

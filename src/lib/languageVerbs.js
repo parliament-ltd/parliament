@@ -12,6 +12,7 @@
 import { findLanguage, OFF } from './languages'
 import { findAnswerers } from '../net/answerers'
 import { translateCost, translateTokens } from '../shell/estimate'
+import { instructionLike } from './injection'
 
 const CENT = 0.01
 const said = (args) => args.map((x) => (x.kind === 'text' ? x.value : x.text ?? String(x.value ?? ''))).join(' ').trim()
@@ -130,18 +131,48 @@ export function planTranslate(step, screens = {}) {
   // Without the language it is in, the browser's own translation cannot
   // start, and a model is told to work it out.
   if (t.who.kind === 'browser' && !last.from) return { says: noOne(null), act: null }
-  const says = { message: 'translate', values: { source: last.source, question: last.question ?? '', language }, also: [byWhom(t.who, last.chars)] }
+  const also = [byWhom(t.who, last.chars)]
+  // Words that read like instructions to a model, going to one (C169).
+  if (t.who.kind === 'model' && last.phrases?.length) also.push({ message: 'translateInstructions', values: { phrases: last.phrases.map((p) => `“${p}”`) } })
+  const says = { message: 'translate', values: { source: last.source, question: last.question ?? '', language }, also }
   return { says, act: { kind: 'translate', chatId: t.room, messageId: last.messageId, from: last.from ?? null, to: t.to, who: t.who } }
 }
 
-/** privacy:on / privacy:off (C167). screens.privacy: { on }: whether the filter is on, off by default. */
+/**
+ * privacy:on, privacy:names, privacy:off (C167, C169). screens.privacy:
+ * { mode, local }: the filter as set ('off', 'patterns' or 'names'), and the
+ * model on this computer that would find names, by name, or null.
+ */
 export function planPrivacy(step, screens = {}) {
-  const on = screens.privacy?.on === true
+  const mode = screens.privacy?.mode ?? 'off'
+  const local = screens.privacy?.local ?? null
   const word = step.match?.values?.[0]?.value ?? null
-  if (!word) return { says: { message: 'privacyNow', values: { on: on ? 'on' : 'off' } }, act: null }
-  const want = word === 'on'
-  if (want === on) return { says: { message: want ? 'privacySameOn' : 'privacySameOff' }, act: null }
-  return { says: { message: want ? 'privacyOn' : 'privacyOff' }, act: { kind: 'setting', key: 'privacyFilter', value: want ? 'patterns' : 'off', before: on ? 'patterns' : 'off' } }
+  if (!word) return { says: { message: 'privacyNow', values: { mode, name: local ?? '' } }, act: null }
+  const want = word === 'on' ? 'patterns' : word
+  if (want === 'names' && !local) return { says: { message: 'privacyNamesNeedsLocal', values: { command: 'api:ollama' } }, act: null }
+  if (want === mode) return { says: { message: want === 'names' ? 'privacySameNames' : want === 'patterns' ? 'privacySameOn' : 'privacySameOff' }, act: null }
+  const message = want === 'names' ? 'privacyNames' : want === 'patterns' ? 'privacyOn' : 'privacyOff'
+  return { says: { message, values: { name: local ?? '' } }, act: { kind: 'setting', key: 'privacyFilter', value: want, before: mode } }
+}
+
+/**
+ * check: (security notes §1.4 and §1.5; S3; C169): whether the last answer
+ * from a source holds words that read like instructions to a model. The
+ * free check, in plain code, says so before Enter; Enter asks a model on
+ * this computer for a closer look, offered only when one is connected.
+ * screens.checking: { room, num, last: { messageId, source, text }, local }.
+ */
+export function planCheck(step, screens = {}) {
+  const c = screens.checking
+  if (!c || c.room === undefined) return { says: { message: 'translateNoRoom' }, act: null }
+  if (!c.last) return { says: { message: 'checkNothing' }, act: null }
+  const phrases = instructionLike(c.last.text)
+  const free = { message: 'checkFree', values: { count: phrases.length, source: c.last.source, phrases: phrases.map((p) => `“${p}”`) } }
+  if (!c.local) return { says: { ...free, also: [{ message: 'checkNoLocal', values: { command: 'api:ollama' } }] }, act: null }
+  return {
+    says: { ...free, also: [{ message: 'checkLocal', values: { name: c.local.name } }] },
+    act: { kind: 'check', chatId: c.room, messageId: c.last.messageId, model: c.local.id, name: c.local.name },
+  }
 }
 
 /**

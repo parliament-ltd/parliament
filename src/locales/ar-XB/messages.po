@@ -353,6 +353,11 @@ msgstr ""
 msgid "chat.frameworkGone"
 msgstr ""
 
+#. Under an answer from a source (C169)
+#. js-lingui-explicit-id
+msgid "chat.instructionLike"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "chat.quote"
 msgstr ""
@@ -387,6 +392,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.quoteWhichChat"
+msgstr ""
+
+#. A question to a source, sent as a search without its question words (C168)
+#. js-lingui-explicit-id
+msgid "chat.searchedFor"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -898,6 +908,43 @@ msgstr ""
 #. {names} is a list joined with "or"
 #. js-lingui-explicit-id
 msgid "enter.byWhich"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkClean"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkFound"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkFoundUnquoted"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkFree"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkLocal"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.checkNoLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkWorking"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1542,6 +1589,11 @@ msgstr ""
 msgid "enter.nameSameTitle"
 msgstr ""
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.namesUnchecked"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.nameTitle"
 msgstr ""
@@ -1725,6 +1777,15 @@ msgstr ""
 msgid "enter.popSideThere"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.privacyNames"
+msgstr ""
+
+#. Commands stay English. S3: never in the browser, never by a provider
+#. js-lingui-explicit-id
+msgid "enter.privacyNamesNeedsLocal"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.privacyNow"
@@ -1736,6 +1797,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.privacyOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.privacySameNames"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1847,6 +1912,10 @@ msgstr ""
 msgid "enter.promptPrivacy"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.promptPrivacyNames"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptPrivacyOffer"
@@ -1881,6 +1950,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptResendUnpriced"
+msgstr ""
+
+#. A source answers a search; a leading question phrase is left out (C168)
+#. js-lingui-explicit-id
+msgid "enter.promptSearchFor"
 msgstr ""
 
 #. A local estimate: nothing is sent to count (C83)
@@ -2343,6 +2417,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.translateFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateInstructions"
 msgstr ""
 
 #. Commands stay English
@@ -3534,6 +3612,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.calm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.check"
 msgstr ""
 
 #. js-lingui-explicit-id

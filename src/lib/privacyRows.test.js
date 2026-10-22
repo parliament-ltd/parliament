@@ -66,7 +66,7 @@ describe('the privacy filter on the Enter line (C167)', () => {
   })
 
   it('turns on and off, a setting', () => {
-    const line = (v, on) => preview(v, { mode: 'command', arrangement: shipped('almanac'), screens: { privacy: { on } } })
+    const line = (v, on) => preview(v, { mode: 'command', arrangement: shipped('almanac'), screens: { privacy: { mode: on ? 'patterns' : 'off', local: null } } })
     expect(line('>privacy:on', false).act).toEqual({ kind: 'setting', key: 'privacyFilter', value: 'patterns', before: 'off' })
     expect(line('>privacy:off', true).act).toEqual({ kind: 'setting', key: 'privacyFilter', value: 'off', before: 'patterns' })
     expect(say(i18n, line('>privacy:', false).says.message, line('>privacy:', false).says.values)).toMatch(/^The privacy filter is off/)
