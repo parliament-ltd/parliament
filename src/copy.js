@@ -489,6 +489,9 @@ export const COPY = {
     // source's name, {provider} a provider's, both from the list.
     promptNeedsKey: /*i18n*/ { id: 'enter.promptNeedsKey', message: '{name} answers here and needs a key for {provider}. {command} adds one, by: chooses another', comment: 'Commands stay English' },
     promptGone: /*i18n*/ { id: 'enter.promptGone', message: '{name} is no longer offered. by: chooses who answers here', comment: 'C151: a chat or a default naming a model the list no longer has' },
+    promptPerDay: /*i18n*/ { id: 'enter.promptPerDay', message: 'About {count} searches a day without a key, shared by everyone on your network', comment: 'Said when a source with a daily allowance answers (C156)' },
+    sourceNetwork: /*i18n*/ { id: 'enter.sourceNetwork', message: '{source} is not answering from your current network. A VPN can cause this; try without it for this source', comment: 'A source refused the request (403), as some do for shared VPN addresses (LPN §8)' },
+    sourceBusy: /*i18n*/ { id: 'enter.sourceBusy', message: '{source} says too many requests from your network for now. Try again later', comment: 'A source answered 429: its allowance for this network is used up, or it is busy' },
     promptLater: /*i18n*/ { id: 'enter.promptLater', message: '{name} answers here and is not built yet. by: chooses another' },
     byHere: /*i18n*/ { id: 'enter.byHere', message: '{name} answers here. Enter shows who else can' },
     byChat: /*i18n*/ { id: 'enter.byChat', message: 'Enter has {name} answer in {num}' },
@@ -545,7 +548,7 @@ export const COPY = {
     letter1: /*i18n*/ { id: 'welcome.letter.1', message: 'Parliament is a place to work with AI on your own terms. It is early, and still being built.' },
     letter2: /*i18n*/ {
       id: 'welcome.letter.2',
-      message: 'It runs in your browser, with no servers and no accounts. Your chats and keys stay on this computer, and each request goes straight to the provider you pick, to a model running on your own machine, or just Wikipedia. There are no ads.',
+      message: 'It runs in your browser, with no servers and no accounts. Your chats and keys stay on this computer, and each request goes straight to the provider you pick, to a model running on your own machine, or to a public source such as Wikipedia. There are no ads.',
     },
     letter3: /*i18n*/ {
       id: 'welcome.letter.3',
@@ -779,6 +782,9 @@ export const COPY = {
     noTokens: /*i18n*/ { id: 'picker.noTokens', message: 'no tokens, no key', comment: 'Beside the Sources group' },
     later: /*i18n*/ { id: 'picker.later', message: 'later', comment: 'A row not built yet' },
     addKey: /*i18n*/ { id: 'picker.addKey', message: 'add a key', comment: 'A model whose provider has no key here; a click writes api:' },
+    englishOnly: /*i18n*/ { id: 'picker.englishOnly', message: 'English only', comment: "A source whose answers are in English whatever the reader's language (LPN §6)" },
+    mostlyEnglish: /*i18n*/ { id: 'picker.mostlyEnglish', message: 'mostly English', comment: 'A source whose answers are mostly in English' },
+    perDay: /*i18n*/ { id: 'picker.perDay', message: 'About {count} searches a day without a key, shared by everyone on your network.', comment: "OpenAlex's daily allowance (C156)" },
     marks: /*i18n*/ { id: 'picker.marks', message: 'Marks compare cost per token with {reference}.', comment: '{reference} is a model name, from the list' },
     oneAtATime: /*i18n*/ { id: 'picker.oneAtATime', message: 'One answers at a time until branches come.' },
   },
@@ -959,6 +965,10 @@ export const COPY = {
     answeredFrom: /*i18n*/ { id: 'chat.answeredFrom', message: 'Answered from {source}' },
     sourceRevision: /*i18n*/ { id: 'chat.sourceRevision', message: 'revision {revision}' },
     sourceNothing: /*i18n*/ { id: 'chat.sourceNothing', message: 'Nothing found on {source} for that. Try other words.' },
+    // A list of results from a source (stage 7, piece 2).
+    sourcePoints: /*i18n*/ { id: 'chat.sourcePoints', message: '{count, plural, one {# point} other {# points}}', comment: 'A Hacker News story\'s points' },
+    sourceComments: /*i18n*/ { id: 'chat.sourceComments', message: '{count, plural, one {# comment} other {# comments}}' },
+    sourceDiscussion: /*i18n*/ { id: 'chat.sourceDiscussion', message: 'discussion', comment: 'A link to where people discussed a result' },
     // C62: the one request after a chat's first answer.
     describeSetting: /*i18n*/ { id: 'chat.describeSetting', message: 'Name a new chat after its first answer' },
     describeSettingHelp: /*i18n*/ {

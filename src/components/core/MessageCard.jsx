@@ -12,6 +12,7 @@ import { stripAttachedFileBlocks, formatSize } from '../../lib/fileUpload'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../../copy'
 import ChartRenderer from './ChartRenderer'
+import CitationLink from './CitationLink'
 
 const NO_QUOTES = Object.freeze([])
 
@@ -140,7 +141,9 @@ export default function MessageCard({
     if (!displayContent) return null
 
     // An answer from a source is plain text and is shown as text: never as
-    // HTML, and not read as Markdown either (stage 4).
+    // HTML, and not read as Markdown either (stage 4). A list of results
+    // (stage 7) is drawn from its note, each result's words as text.
+    if (source?.shape === 'list' && Array.isArray(source.items)) return <SourceResults items={source.items} />
     if (source) {
       return <p className="parliament-md text-[15px] whitespace-pre-wrap" dir="auto">{displayContent}</p>
     }
@@ -493,6 +496,52 @@ export default function MessageCard({
 }
 
 /* ── Internal sub-components ────────────────────────────── */
+
+// A date as a source gives it: a year stays a year; a full date is written
+// the way the reader's language writes one.
+function sourceDate(locale, date) {
+  if (!date || /^\d{1,4}$/.test(date)) return date || null
+  const d = new Date(date)
+  if (Number.isNaN(d.getTime())) return date
+  try {
+    return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(d)
+  } catch {
+    return date.slice(0, 10)
+  }
+}
+
+// The results of a source that answers with a list (Hacker News, OpenAlex;
+// stage 7, piece 2): each its title as a link that shows its whole address
+// before it opens (C146 (b)), then its date and facts, then any passage.
+// Every word of the source is text; the facts' words come from the copy table.
+function SourceResults({ items }) {
+  const { i18n } = useLingui()
+  const facts = (it) => [
+    sourceDate(i18n.locale, it.date),
+    it.facts?.authors,
+    it.facts?.points != null && i18n._(COPY.chat.sourcePoints, { count: Number(it.facts.points) || 0 }),
+    it.facts?.comments != null && i18n._(COPY.chat.sourceComments, { count: Number(it.facts.comments) || 0 }),
+  ].filter(Boolean)
+  return (
+    <ol className="parliament-md text-[15px] space-y-3 list-none p-0 m-0">
+      {items.map((it, i) => (
+        <li key={i} dir="auto">
+          {it.url || it.discussion ? <CitationLink href={it.url ?? it.discussion}>{it.title}</CitationLink> : <span>{it.title}</span>}
+          <span className="block text-xs italic text-[var(--p-text-secondary)]">
+            {facts(it).join(' · ')}
+            {it.discussion && it.url && (
+              <>
+                {facts(it).length ? ' · ' : ''}
+                <CitationLink href={it.discussion}>{i18n._(COPY.chat.sourceDiscussion)}</CitationLink>
+              </>
+            )}
+          </span>
+          {it.text && <span className="block mt-1 whitespace-pre-wrap">{it.text}</span>}
+        </li>
+      ))}
+    </ol>
+  )
+}
 
 // "Answered from Wikipedia · Barn owl · revision 1381083335 · CC BY-SA 4.0",
 // each part a link where it has one; or that nothing was found (stage 4).

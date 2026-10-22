@@ -33,8 +33,14 @@ export default function AnswerPicker({ rows, now, reference, onPick }) {
     return line ? i18n._(line) : null
   }
   // The cost mark stays on a model with no key, since it helps decide
-  // whether to add one.
-  const mark = (r) => (r.later ? i18n._(COPY.picker.later) : r.mark)
+  // whether to add one. A source has no cost; it says what language its
+  // answers come in where that is not yours (LPN §6).
+  const IN = { english: COPY.picker.englishOnly, mostlyEnglish: COPY.picker.mostlyEnglish }
+  const mark = (r) => {
+    if (r.later) return i18n._(COPY.picker.later)
+    if (r.group === 'source') return IN[r.answersIn] ? i18n._(IN[r.answersIn]) : null
+    return r.mark
+  }
   const row = (r) => {
     const on = r.id === now?.id
     const help = r.later ? null : r.needsKey ? `api:${r.provider}` : `by:${r.id}`
@@ -57,6 +63,7 @@ export default function AnswerPicker({ rows, now, reference, onPick }) {
             {mark(r) && <span className="mk">{mark(r)}</span>}
           </span>
           {about(r) && <span className="ch-ans-about">{about(r)}</span>}
+          {r.perDay && !r.later && <span className="ch-ans-about">{i18n._(COPY.picker.perDay, { count: r.perDay })}</span>}
         </span>
       </button>
     )

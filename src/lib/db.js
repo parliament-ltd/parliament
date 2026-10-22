@@ -267,7 +267,7 @@ function generateId() {
 
 // answerer: who answers in this chat, when someone chose before its first
 // prompt (stage 7; C150). Left out when no one chose, so the default answers.
-export async function createConversation({ title = 'New Conversation', model = 'claude-sonnet', parentId = null, branchPoint = null, createdInMode = null, room = null, answerer = null } = {}) {
+export async function createConversation({ title = 'New Conversation', model = 'claude-sonnet-5-5', parentId = null, branchPoint = null, createdInMode = null, room = null, answerer = null } = {}) {
   const db = await initDB()
   const now = new Date().toISOString()
   const conversation = {

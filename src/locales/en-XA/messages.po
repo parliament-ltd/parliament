@@ -382,7 +382,21 @@ msgid "chat.quoteWhichChat"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.sourceComments"
+msgstr ""
+
+#. A link to where people discussed a result
+#. js-lingui-explicit-id
+msgid "chat.sourceDiscussion"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.sourceNothing"
+msgstr ""
+
+#. A Hacker News story's points
+#. js-lingui-explicit-id
+msgid "chat.sourcePoints"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1606,6 +1620,11 @@ msgstr ""
 msgid "enter.promptNoRoom"
 msgstr ""
 
+#. Said when a source with a daily allowance answers (C156)
+#. js-lingui-explicit-id
+msgid "enter.promptPerDay"
+msgstr ""
+
 #. Sent only on Enter, never automatically (C114)
 #. js-lingui-explicit-id
 msgid "enter.promptResend"
@@ -1792,6 +1811,16 @@ msgstr ""
 #. The words stay English
 #. js-lingui-explicit-id
 msgid "enter.sortRecords"
+msgstr ""
+
+#. A source answered 429: its allowance for this network is used up, or it is busy
+#. js-lingui-explicit-id
+msgid "enter.sourceBusy"
+msgstr ""
+
+#. A source refused the request (403), as some do for shared VPN addresses (LPN §8)
+#. js-lingui-explicit-id
+msgid "enter.sourceNetwork"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2526,6 +2555,11 @@ msgstr ""
 msgid "picker.addKey"
 msgstr ""
 
+#. A source whose answers are in English whatever the reader's language (LPN §6)
+#. js-lingui-explicit-id
+msgid "picker.englishOnly"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "picker.kind.discussion"
 msgstr ""
@@ -2559,6 +2593,11 @@ msgstr ""
 msgid "picker.models"
 msgstr ""
 
+#. A source whose answers are mostly in English
+#. js-lingui-explicit-id
+msgid "picker.mostlyEnglish"
+msgstr ""
+
 #. Beside the Sources group
 #. js-lingui-explicit-id
 msgid "picker.noTokens"
@@ -2566,6 +2605,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "picker.oneAtATime"
+msgstr ""
+
+#. OpenAlex's daily allowance (C156)
+#. js-lingui-explicit-id
+msgid "picker.perDay"
 msgstr ""
 
 #. Answers from public sources, with no model

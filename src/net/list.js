@@ -20,6 +20,12 @@
 //   sourceKind for sources, the kind of question it answers, which groups it
 //             in the picker: reference, research or discussion (branch
 //             slider v9; stage 7)
+//   answersIn for sources, the language its answers come in: 'yours' (an
+//             edition in the reader's language), 'english', or
+//             'mostlyEnglish' (LPN §6; stage 7)
+//   perDay    for a source with a daily allowance without a key, about how
+//             many searches it allows a day, shared by everyone on the same
+//             network (OpenAlex; checked 22 October 2026)
 
 export const DESTINATIONS = Object.freeze([
   { id: 'anthropic', kind: 'model', name: 'Anthropic', origins: ['https://api.anthropic.com'], key: true, ships: true, stage: 4, keysPage: 'https://console.anthropic.com/settings/keys' },
@@ -27,10 +33,11 @@ export const DESTINATIONS = Object.freeze([
   // On this machine, by its exact port (CLAUDE.md, hard constraints).
   { id: 'ollama', kind: 'local', name: 'Ollama', origins: ['http://localhost:11434'], key: false, ships: false, stage: 7 },
   // Every language edition, so answers come from the person's language (C110).
-  { id: 'wikipedia', kind: 'source', name: 'Wikipedia', origins: ['https://*.wikipedia.org'], key: false, ships: true, stage: 4, licence: 'CC BY-SA 4.0', sourceKind: 'reference' },
-  { id: 'hackernews', kind: 'source', name: 'Hacker News', origins: ['https://hn.algolia.com'], key: false, ships: false, stage: 7, sourceKind: 'discussion' },
-  { id: 'openalex', kind: 'source', name: 'OpenAlex', origins: ['https://api.openalex.org'], key: false, ships: false, stage: 7, licence: 'CC0', sourceKind: 'research' },
-].map((d) => Object.freeze({ licence: null, keysPage: null, sourceKind: null, ...d, origins: Object.freeze([...d.origins]) })))
+  { id: 'wikipedia', kind: 'source', name: 'Wikipedia', origins: ['https://*.wikipedia.org'], key: false, ships: true, stage: 4, licence: 'CC BY-SA 4.0', sourceKind: 'reference', answersIn: 'yours' },
+  // Hacker News through its search service, Algolia (stage 7, piece 2).
+  { id: 'hackernews', kind: 'source', name: 'Hacker News', origins: ['https://hn.algolia.com'], key: false, ships: true, stage: 7, sourceKind: 'discussion', answersIn: 'english' },
+  { id: 'openalex', kind: 'source', name: 'OpenAlex', origins: ['https://api.openalex.org'], key: false, ships: true, stage: 7, licence: 'CC0', sourceKind: 'research', answersIn: 'mostlyEnglish', perDay: 100 },
+].map((d) => Object.freeze({ licence: null, keysPage: null, sourceKind: null, answersIn: null, perDay: null, ...d, origins: Object.freeze([...d.origins]) })))
 
 const BY_ID = new Map(DESTINATIONS.map((d) => [d.id, d]))
 

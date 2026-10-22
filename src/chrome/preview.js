@@ -628,7 +628,11 @@ export function promptPreview(text, target = {}) {
   if (who.later) return { ready: false, says: { message: 'promptLater', values: { name: who.name } } }
   if (who.gone) return { ready: false, says: { message: 'promptGone', values: { name: who.name } } }
   if (who.needsKey) return { ready: false, says: { message: 'promptNeedsKey', values: { name: who.name, provider: who.providerName, command: `api:${who.provider}` } } }
-  if (who.group === 'source') return { ready: true, says: { message: 'promptSource', values: { source: who.name } } }
+  if (who.group === 'source') {
+    const says = { message: 'promptSource', values: { source: who.name } }
+    // A source with a daily allowance says so before Enter (C156).
+    return { ready: true, says: who.perDay ? { ...says, also: [{ message: 'promptPerDay', values: { count: who.perDay } }] } : says }
+  }
 
   const tokens = Math.ceil((prompt.length + (about?.chars ?? 0) + (target.historyChars ?? 0) + (target.systemChars ?? 0)) / CHARS_PER_TOKEN)
   // A model priced higher for a long prompt (Haiku 5.5 above 100,000 tokens).

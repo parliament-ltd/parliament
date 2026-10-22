@@ -5,7 +5,7 @@ const entries = Object.entries(COPY).flatMap(([group, items]) => Object.entries(
 // Names, and the pronoun I, keep their capital in a sentence.
 // The welcome page's letter and footer name a few more (stage 5).
 // Names, and the name of a format (Markdown, as the verb glosses allow).
-const PROPER = new Set(['Parliament', "Parliament's", 'I', 'AI', 'API', 'Wikipedia', 'Claude', 'Code', 'MIT', 'Lov', 'Markdown'])
+const PROPER = new Set(['Parliament', "Parliament's", 'I', 'AI', 'API', 'Wikipedia', 'Claude', 'Code', 'MIT', 'Lov', 'Markdown', 'English'])
 
 describe('the copy table', () => {
   it('gives every entry an id and a message, and no id twice', () => {

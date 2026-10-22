@@ -58,7 +58,8 @@ const priceTotal = (m) => (m.cost?.type === 'metered' ? m.cost.inputPerMillion +
  *   reference?: object|null }} input
  *   keys: which providers have a key here; reference: the price marks compare with
  * @returns {{ model: object[], local: object[], source: object[] }}
- *   each row { id, group, name, provider, providerName, mark, later, needsKey, about?, kind? (a source's) };
+ *   each row { id, group, name, provider, providerName, mark, later, needsKey, about?, and a source's kind,
+ *   answersIn and perDay (list.js) };
  *   about: which line of the copy table says what a model is good for
  */
 export function answererRows({ destinations, modelsOf, keys = {}, reference = null }) {
@@ -66,7 +67,10 @@ export function answererRows({ destinations, modelsOf, keys = {}, reference = nu
   for (const d of destinations) {
     const group = d.kind === 'local' ? 'local' : d.kind === 'source' ? 'source' : 'model'
     if (group === 'source') {
-      out.source.push({ id: d.id, group, name: d.name, provider: d.id, providerName: d.name, kind: d.sourceKind ?? null, mark: null, later: !d.ships, needsKey: false })
+      out.source.push({
+        id: d.id, group, name: d.name, provider: d.id, providerName: d.name, kind: d.sourceKind ?? null, mark: null, later: !d.ships, needsKey: false,
+        answersIn: d.answersIn ?? null, perDay: d.perDay ?? null,
+      })
       continue
     }
     const current = d.ships ? (modelsOf(d.id) ?? []).filter((m) => m.current !== false) : []
@@ -115,7 +119,7 @@ export function answererFor({ chosen = null, keys = {}, defaultModel = null, des
   const describe = (id, isChosen) => {
     const d = byId.get(id)
     if (d && d.kind === 'source') {
-      return { id, group: 'source', name: d.name, provider: id, providerName: d.name, chosen: isChosen, price: null, needsKey: false, gone: false, later: !d.ships }
+      return { id, group: 'source', name: d.name, provider: id, providerName: d.name, chosen: isChosen, price: null, needsKey: false, gone: false, later: !d.ships, perDay: d.perDay ?? null }
     }
     for (const p of destinations.filter((x) => x.kind !== 'source')) {
       const m = findModel(modelsOf(p.id) ?? [], id)

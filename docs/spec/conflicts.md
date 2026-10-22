@@ -171,6 +171,14 @@ Line numbers are approximate.
 - **The new stored fields of stage 6 are approved:** `model` and `usage` on replies, `recordsCols` in the space, saved searches, `archived` and `tagsMine` on every kind, `pinned` and `tags` on quotes, `erasedFrom`, a collection's `order` and items of kind chat, plan and marking, and a note's `quotes` and `summary`.
 - **R6, reopened (C20): "let's make favorite a tag."** Ruled the same day: yes, as C147 suggests ("agree with lean on favorites"). The homepage's favourites list is retired with the homepage; the heart stays and keeps a tagged quote.
 
+**22 October 2026, after stage 7, piece 1:**
+
+- **C153: yes.** Cost marks compare with Haiku 4.5's price, kept after Haiku 4.5 is retired.
+- **C155: update.** Sonnet 5.5 is the default for whoever has not chosen a model. A model chosen in Settings stays as chosen.
+- **C154: yes.** The key check, the title request and `summarize:` go to Haiku 5.5.
+- **C149: yes.** `by:` chooses who answers.
+- **C147 (c): the conversion runs once on its own** ("once on its own is fine"), after the dry run on Stefan's backups found nothing to convert.
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it
@@ -1246,6 +1254,7 @@ Found while splitting stage 7 into pieces. Read with C131 (Records, Framework). 
 **C149. A command for choosing who answers.** Every marginalia has a command (editing spec), and "answered by" in the prompt field opens the picker, but no document gives its command. The nearby words are taken: `model:` narrows Records (C132 (g)), and a word may not narrow on one board and act on another (almanac spec §4); `ask:` would read as the editing spec's asks; `set:default haiku` (settings spec) changes the default for new chats, not this one.
 - **Suggestion:** `by:`, read as "answered by": `by:sonnet`, `by:wikipedia`, `by:hackernews`. It takes any part of a model's or a source's name, as `model:` does; where several match, the Enter line lists them. Bare `by:` says who answers here. A click on a row of the picker does the same at once, since it sends nothing and can be put back.
 - Several names (`by:sonnet, wikipedia`) would send one prompt to several, which is branches (stage 8). Until then the Enter line says so, and the picker's boxes take one tick at a time.
+- **Ruled 22 October: yes.**
 
 **C150. Where the choice is kept.** A chat already keeps a `model` (since PR-16a: the model most recently used in it), and new chats take Settings' default. But the room in the shell sends every prompt with Settings' default whatever the chat says, and to Wikipedia whenever there is no key.
 - `model` cannot carry the choice: every chat is made with Settings' model in it, even one Wikipedia answers because there is no key, so it would read as chosen when it was not.
@@ -1275,10 +1284,30 @@ Found while splitting stage 7 into pieces. Read with C131 (Records, Framework). 
 - Haiku 5.5's higher price for a long prompt is used by the Enter line, and by the costs on Records for each reply by its own input.
 - **Found and corrected:** the old list priced Haiku 4.5 at $0.25 and $1.25 (it is $1 and $5) and Opus 4.6 and 4.7 at $15 and $75 (they are $5 and $25), so the costs Records showed for replies from those models since stage 6 were wrong.
 - Not reflected: the provider's US-only processing (1.1×), cached input, and that its models from 4.7 on count about 30% more tokens for the same text, so the local estimate before Enter stays rough.
+- **Ruled 22 October: yes,** Haiku 4.5's price is the yardstick.
 
-**C154. The small requests move to Haiku 5.5.** A key's check, a new chat's one request for its title, summary and tags (C62), and `summarize:` went to Haiku 4.5, which the provider keeps "not sooner than October 15, 2026": it can be retired at any time, and those requests would then fail. **Built:** they go to Haiku 5.5, the newest and cheapest (a tenth of the price). The Enter line names their cost as before. A ruling for another model changes one line (`LIGHT_MODEL` in `providers/anthropic.js`).
+**C154. The small requests move to Haiku 5.5.** A key's check, a new chat's one request for its title, summary and tags (C62), and `summarize:` went to Haiku 4.5, which the provider keeps "not sooner than October 15, 2026": it can be retired at any time, and those requests would then fail. **Built:** they go to Haiku 5.5, the newest and cheapest (a tenth of the price). The Enter line names their cost as before. A ruling for another model changes one line (`LIGHT_MODEL` in `providers/anthropic.js`). **Ruled 22 October: yes.**
 
 **C155. The default for new chats.** Settings' default model is read as stored. With none stored, the code's default is `claude-sonnet`, which C151 reads as Sonnet 4.6 ($3 in, $15 out); Sonnet 5.5 is newer and costs less ($2, $10). Changing the code's default would move anyone who never chose, Stefan perhaps included, without asking. **Suggestion:** leave it until ruled. Either choose Sonnet 5.5 (today's Settings, or `by:sonnet` for one chat), or make Sonnet 5.5 the default for whoever has not chosen.
+- **Ruled 22 October: update.** The code's default is Sonnet 5.5 (`claude-sonnet-5-5`), so whoever never chose a model gets it. Settings are stored only when changed, so a model someone chose in Settings stays theirs.
+
+**C156. Hacker News and OpenAlex, as lists of results** (piece 2). The almanac spec (§8) gives sources three shapes (an article, a list of results, a record) and declarative manifests; LPN §6 and §8 give the language marks and the refusal from a network. Checked on 22 October (the research notes behind C153): both send the headers a browser needs; Hacker News is searched through Algolia, which allows 10,000 requests an hour from one address; OpenAlex allows about 100 searches a day without a key, shared by everyone on the same network, and its data is CC0. Built so:
+- **(a) A list, up to five results,** each its title, a link, a date, a few facts and perhaps a passage: a Hacker News story with its points, comments and a link to its discussion; an OpenAlex work with its year, first three authors and its abstract. Hacker News's own text for a post is HTML and is never used (plan rule: no source HTML). A result with no title is left out.
+- **(b) Still no code in a manifest.** Where a part is not at one path, the manifest names one of four readers the runner knows: the first path with a value, a link made from a template (the discussion's address), text rebuilt from an index of words (OpenAlex keeps abstracts so), and a few names from a list (authors). A reader the runner does not know reads nothing.
+- **(c) Stored:** the chat keeps the list as plain text (titles, dates, passages, links: the source's words only, no words of the interface, C86) and, in the answer's note, `shape: 'list'` and `items`, each with short text, web links only and up to ten facts. **New optional fields in a message's source note, shown at the checkpoint;** backups carry them and a restore checks them.
+- **(d) Drawn** as a numbered list in the chat: each title a link that shows its whole address before it opens (C146 (b)), then the date, facts and passage as text.
+- **(e) In the picker:** "English only" beside Hacker News, "mostly English" beside OpenAlex (its records keep the language a work was written in), nothing beside Wikipedia, which answers in the reader's language; OpenAlex's row and its Enter line state the daily allowance.
+- **(f) When a source turns the request away:** a 403 says the source is not answering from this network and that a VPN can cause this (LPN §8: never suggest a VPN as a way round, only turning one off for that source); a 429 says too many requests from this network for now.
+- **(g) Not built:** OpenAlex's optional key (a tenfold allowance). It would go in the key panel and be sent in a header, never in an address. **Suggestion:** leave it out unless a hundred searches a day proves short.
+- No licence is shown for Hacker News: none is published for its data (looked for on 22 October).
+- **Suggestion:** keep as built.
+
+**C157. The network log, grouped by host** (piece 2). The plan: "grouped by host, each named by who called it, with no query strings"; the privacy copy draft (item 17) words the card. Two records meet: the page's own log (every request it makes, host and path, never the query) and the gateway's (what made each request: a prompt, a key's check, the title request). Built so:
+- Each host once, the busiest first: how many requests, how many failed, the last one's time, the provider or source it belongs to by the list (every Wikipedia language edition counts as Wikipedia), and what made its requests. A host on no list says so, and the page's own host is marked as this page.
+- Where: the card in today's Settings until Settings v1 (stage 9), with the draft's wording (items 16 and 17) in place of the old claims, on the card and in "Check it yourself" above it, that only one provider's address should appear. What made a request is still the code's English word ("prompt", "check key") until the log moves to the new chrome and the copy table.
+- **Suggestion:** keep as built.
+
+**C158. The welcome letter's sentence about where requests go.** The letter (C122) says each request goes "to the provider you pick, to a model running on your own machine, or just Wikipedia". With Hacker News and OpenAlex shipped, that is no longer the whole list, and every claim must stay true (W §3). **Built:** the privacy copy draft's wording, "or to a public source such as Wikipedia". The letter is Stefan's to edit in the copy table.
 
 ## Proposed CLAUDE.md rewrite
 

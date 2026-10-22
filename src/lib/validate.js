@@ -78,6 +78,13 @@ function isSourceNote(s) {
     && text(s.name, 100) && text(s.title, 300) && link(s.url) && text(s.revision, 40) && text(s.revisedAt, 40) && text(s.lang, 10)
     && (s.found == null || typeof s.found === 'boolean')
     && (s.licence == null || (typeof s.licence === 'object' && text(s.licence.name, 100) && link(s.licence.url)))
+    // A list of results (Hacker News, OpenAlex; stage 7, C156): short text
+    // and web links only, and a few facts as short text.
+    && (s.shape == null || s.shape === 'list')
+    && (s.items == null || (Array.isArray(s.items) && s.items.length <= 10 && s.items.every((it) => it && typeof it === 'object' && !Array.isArray(it)
+      && typeof it.title === 'string' && it.title.length <= 301 && link(it.url) && link(it.discussion) && text(it.date, 41) && text(it.text, 2001)
+      && (it.facts == null || (typeof it.facts === 'object' && !Array.isArray(it.facts) && Object.keys(it.facts).length <= 10
+        && Object.entries(it.facts).every(([k, v]) => /^[a-z]{1,20}$/.test(k) && typeof v === 'string' && v.length <= 201))))))
 }
 
 const STOP_REASONS = new Set(['left', 'limit', 'error'])

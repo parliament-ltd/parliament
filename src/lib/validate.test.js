@@ -86,3 +86,18 @@ describe('a backup with who answers each chat (stage 7; C150)', () => {
     expect(c({ answerer: 7 }).valid).toBe(false)
   })
 })
+
+describe('a backup with a list of results from a source (stage 7, piece 2; C156 (c))', () => {
+  const list = (items, extra = {}) => check(reply({ incomplete: false, source: { id: 'hackernews', name: 'Hacker News', shape: 'list', items, ...extra } }))
+  const item = { title: 'Barn owls', url: 'https://example.org/o', discussion: 'https://news.ycombinator.com/item?id=1', date: '2024-05-01T12:00:00Z', text: null, facts: { points: '12' } }
+  it('accepts short text, web links and a few facts', () => {
+    expect(list([item])).toEqual({ valid: true })
+  })
+  it('refuses anything else in a result', () => {
+    expect(list([{ ...item, url: 'javascript:alert(1)' }]).valid).toBe(false)
+    expect(list([{ ...item, facts: { points: 12 } }]).valid).toBe(false)
+    expect(list([{ ...item, title: 7 }]).valid).toBe(false)
+    expect(list(Array(11).fill(item)).valid).toBe(false)
+    expect(list([item], { shape: 'record' }).valid).toBe(false)
+  })
+})

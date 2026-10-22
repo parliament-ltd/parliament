@@ -2,6 +2,20 @@ import { useEffect, useState } from 'react'
 import { DB_VERSION, DB_STATE_EVENT, initDB, lastUpgradeFailure } from '../lib/db'
 import { needsBackupGate, readStoredVersion, buildPreUpgradeBackup } from '../lib/upgradeCheck'
 import { downloadBlob } from '../lib/backup'
+import { convertFavoritesOnce } from '../lib/favoriteTags'
+
+// Work that runs once per database after it opens, before the app draws:
+// old favourites become tagged quotes (C147 (c), ruled 22 October). A
+// failure lets the app open as before; it is tried again next time.
+const lock = (name, fn) => (navigator.locks?.request ? navigator.locks.request(name, fn) : fn())
+async function afterOpen() {
+  try {
+    const db = await initDB()
+    await convertFavoritesOnce(db, { now: new Date().toISOString(), newId: () => crypto.randomUUID(), lock })
+  } catch {
+    // The heart keeps reading the old favourites until it has run.
+  }
+}
 
 // Holds the app back before a schema upgrade and offers a backup of the data
 // as it is (change plan 0.6). Renders children straight through when no
@@ -49,7 +63,8 @@ export default function UpgradeGate({ children }) {
     readStoredVersion().then((stored) => {
       if (!live) return
       const pending = needsBackupGate(stored) || (forcePreview() && stored > 0)
-      setState({ phase: pending ? 'pending' : 'clear', stored })
+      if (pending) { setState({ phase: 'pending', stored }); return }
+      afterOpen().then(() => { if (live) setState({ phase: 'clear', stored }) })
     })
     return () => { live = false }
   }, [])
@@ -76,6 +91,7 @@ export default function UpgradeGate({ children }) {
     setBlocked(false)
     try {
       await initDB()
+      await afterOpen()
       setState((s) => ({ ...s, phase: 'clear' }))
     } catch (e) {
       // The real reason, where the upgrade recorded one; the open only says it was abandoned.

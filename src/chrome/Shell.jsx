@@ -105,12 +105,16 @@ const sourceLocale = (locale) => (/-(XA|XB)$/i.test(String(locale ?? '')) ? 'en'
 
 // What the Enter line says when a prompt did not go through: a key of
 // COPY.enter, or one with its values. Never the error's own text.
-function failure(err) {
+// source: the name of the source asked, when one was.
+function failure(err, source = destination(SOURCE)?.name) {
   if (err?.name === 'AbortError') return null
   if (err?.name === 'Refused') return 'promptChanged'
   if (err?.kept) return 'replyCut'
   if (err?.name === 'SourceError') {
-    return { message: err.reason === 'unreachable' ? 'sourceUnreachable' : 'sourceRefused', values: { source: destination(SOURCE)?.name } }
+    // A source that turns away the network (some do for shared VPN
+    // addresses), or whose allowance for it is used up (LPN §8; C156).
+    const message = err.reason === 'unreachable' ? 'sourceUnreachable' : err.status === 403 ? 'sourceNetwork' : err.status === 429 ? 'sourceBusy' : 'sourceRefused'
+    return { message, values: { source } }
   }
   if (err?.status === 401 || err?.status === 403) return { message: 'keyRefused', values: { board: 'settings' } }
   if (err?.status === 429) return 'tooMany'
@@ -1267,7 +1271,7 @@ export default function Shell() {
         if (err?.name === 'Refused') hasKey().then((k) => setKeyed(Boolean(k)), () => {})
         // A stall: the Enter line now offers to send it again (C114).
         if (err?.name === 'Stalled') { setStalledIn(id); return null }
-        return failure(err)
+        return failure(err, who.group === 'source' ? who.name : undefined)
       })
     return { done }
   }, [askSource, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked])

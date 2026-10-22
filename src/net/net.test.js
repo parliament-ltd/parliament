@@ -20,10 +20,10 @@ describe('the list of providers and sources', () => {
     for (const d of DESTINATIONS.filter((x) => x.kind === 'source')) expect(d.key, d.id).toBe(false)
   })
 
-  it('lets only shipped entries into the connection policy: Anthropic, and every Wikipedia (C110)', () => {
-    expect(shipped().map((d) => d.id)).toEqual(['anthropic', 'wikipedia'])
-    expect(connectOrigins()).toEqual(['https://api.anthropic.com', 'https://*.wikipedia.org'])
-    expect(CONTENT_SECURITY_POLICY).toContain("connect-src 'self' https://api.anthropic.com https://*.wikipedia.org;")
+  it('lets only shipped entries into the connection policy: Anthropic, every Wikipedia (C110), Hacker News and OpenAlex (stage 7)', () => {
+    expect(shipped().map((d) => d.id)).toEqual(['anthropic', 'wikipedia', 'hackernews', 'openalex'])
+    expect(connectOrigins()).toEqual(['https://api.anthropic.com', 'https://*.wikipedia.org', 'https://hn.algolia.com', 'https://api.openalex.org'])
+    expect(CONTENT_SECURITY_POLICY).toContain("connect-src 'self' https://api.anthropic.com https://*.wikipedia.org https://hn.algolia.com https://api.openalex.org;")
   })
 })
 

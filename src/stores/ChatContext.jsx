@@ -438,7 +438,15 @@ export function ChatProvider({ children }) {
       const found = await gateway.call(source, 'answer', [question, { lang, signal: controller.signal }], { label: 'prompt' })
       // A lookup that finished after its chat was left still stops there (C109).
       if (controller.signal.aborted) throw new DOMException('Stopped', 'AbortError')
-      const updates = found
+      // A list of results (Hacker News, OpenAlex; stage 7) keeps each one's
+      // title, link, date, text and facts in the note, for the card to draw.
+      const updates = found?.shape === 'list'
+        ? {
+          content: found.text,
+          incomplete: false,
+          source: { id: found.source, name: found.name, shape: 'list', items: found.items, licence: found.licence, lang: found.lang },
+        }
+        : found
         ? {
           content: found.text,
           incomplete: false,

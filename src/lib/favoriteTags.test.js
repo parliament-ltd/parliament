@@ -4,7 +4,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { openDB } from 'idb'
 import { upgradeSchema } from './schema'
 import * as R from './records'
-import { favoritesOf, wholeQuoteOf, withFavorite, planFavoritesToTags, applyFavoritesToTags, readFavoritesSnapshot, FAVORITES_TAGGED_SETTING } from './favoriteTags'
+import { favoritesOf, wholeQuoteOf, withFavorite, planFavoritesToTags, applyFavoritesToTags, readFavoritesSnapshot, convertFavoritesOnce, FAVORITES_TAGGED_SETTING } from './favoriteTags'
 
 // Favourites as a tag (stage 6 checkpoint; C147).
 
@@ -75,5 +75,21 @@ describe('the conversion, on a version 6 database', () => {
 
     const again = planFavoritesToTags(await readFavoritesSnapshot(db))
     expect([again.create.length, again.tag.length, again.already.length]).toEqual([0, 0, 2])
+  })
+
+  it('runs once on its own: notes that it ran even with nothing to convert, and never again', async () => {
+    expect(await convertFavoritesOnce(db, { now: at, newId: () => `once-${++n}` })).toEqual({ created: [], tagged: [] })
+    expect((await db.get('settings', FAVORITES_TAGGED_SETTING)).value).toBe(at)
+    const c = await R.createChat(db, { id: 'c2', title: 'Owls', model: 'claude-sonnet', parentId: null, branchPoint: null, room: null, pinned: false, storageBytes: 0, createdAt: at, updatedAt: at })
+    await R.addMessageRecord(db, { id: 'm9', conversationId: c.id, role: 'assistant', content: 'Later.', createdAt: at })
+    await R.addFavoriteRecord(db, { id: 'f9', conversationId: c.id, messageId: 'm9', createdAt: at })
+    expect(await convertFavoritesOnce(db, { now: at, newId: () => `once-${++n}` })).toBeNull()
+    expect(await db.count('pins')).toBe(0)
+  })
+
+  it('runs inside the lock it is given', async () => {
+    const names = []
+    await convertFavoritesOnce(db, { now: at, newId: () => `lock-${++n}`, lock: (name, fn) => { names.push(name); return fn() } })
+    expect(names).toEqual(['parliament-favorites-to-tags'])
   })
 })

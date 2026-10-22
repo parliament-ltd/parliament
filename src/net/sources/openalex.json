@@ -1,0 +1,36 @@
+{
+  "id": "openalex",
+  "name": "OpenAlex",
+  "shape": "list",
+  "licence": {
+    "name": "CC0",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "language": {
+    "fallback": "en"
+  },
+  "request": {
+    "url": "https://api.openalex.org/works",
+    "query": {
+      "search": "{q}",
+      "per_page": "5"
+    }
+  },
+  "result": {
+    "list": "results",
+    "max": 5,
+    "item": {
+      "title": "display_name",
+      "url": { "first": ["doi", "primary_location.landing_page_url"] },
+      "date": "publication_year",
+      "text": { "wordIndex": "abstract_inverted_index" },
+      "facts": {
+        "authors": { "names": "authorships", "path": "author.display_name", "max": 3 }
+      }
+    }
+  },
+  "limits": {
+    "queryChars": 300,
+    "itemChars": 600
+  }
+}

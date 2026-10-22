@@ -382,8 +382,22 @@ msgid "chat.quoteWhichChat"
 msgstr "Quote it beside which chat?"
 
 #. js-lingui-explicit-id
+msgid "chat.sourceComments"
+msgstr "{count, plural, one {# comment} other {# comments}}"
+
+#. A link to where people discussed a result
+#. js-lingui-explicit-id
+msgid "chat.sourceDiscussion"
+msgstr "discussion"
+
+#. js-lingui-explicit-id
 msgid "chat.sourceNothing"
 msgstr "Nothing found on {source} for that. Try other words."
+
+#. A Hacker News story's points
+#. js-lingui-explicit-id
+msgid "chat.sourcePoints"
+msgstr "{count, plural, one {# point} other {# points}}"
 
 #. js-lingui-explicit-id
 msgid "chat.sourceRevision"
@@ -1606,6 +1620,11 @@ msgstr "{name} answers here and needs a key for {provider}. {command} adds one, 
 msgid "enter.promptNoRoom"
 msgstr "Prompts go to a room. room: opens one"
 
+#. Said when a source with a daily allowance answers (C156)
+#. js-lingui-explicit-id
+msgid "enter.promptPerDay"
+msgstr "About {count} searches a day without a key, shared by everyone on your network"
+
 #. Sent only on Enter, never automatically (C114)
 #. js-lingui-explicit-id
 msgid "enter.promptResend"
@@ -1793,6 +1812,16 @@ msgstr "On {board}, sort: takes yours, source, newest or oldest"
 #. js-lingui-explicit-id
 msgid "enter.sortRecords"
 msgstr "On {board}, sort: takes created, active, oldest or newest"
+
+#. A source answered 429: its allowance for this network is used up, or it is busy
+#. js-lingui-explicit-id
+msgid "enter.sourceBusy"
+msgstr "{source} says too many requests from your network for now. Try again later"
+
+#. A source refused the request (403), as some do for shared VPN addresses (LPN §8)
+#. js-lingui-explicit-id
+msgid "enter.sourceNetwork"
+msgstr "{source} is not answering from your current network. A VPN can cause this; try without it for this source"
 
 #. js-lingui-explicit-id
 msgid "enter.sourceRefused"
@@ -2526,6 +2555,11 @@ msgstr "Reads the article directly, in your language. No model, so nothing is sp
 msgid "picker.addKey"
 msgstr "add a key"
 
+#. A source whose answers are in English whatever the reader's language (LPN §6)
+#. js-lingui-explicit-id
+msgid "picker.englishOnly"
+msgstr "English only"
+
 #. js-lingui-explicit-id
 msgid "picker.kind.discussion"
 msgstr "Web and discussion"
@@ -2559,6 +2593,11 @@ msgstr "Marks compare cost per token with {reference}."
 msgid "picker.models"
 msgstr "Models"
 
+#. A source whose answers are mostly in English
+#. js-lingui-explicit-id
+msgid "picker.mostlyEnglish"
+msgstr "mostly English"
+
 #. Beside the Sources group
 #. js-lingui-explicit-id
 msgid "picker.noTokens"
@@ -2567,6 +2606,11 @@ msgstr "no tokens, no key"
 #. js-lingui-explicit-id
 msgid "picker.oneAtATime"
 msgstr "One answers at a time until branches come."
+
+#. OpenAlex's daily allowance (C156)
+#. js-lingui-explicit-id
+msgid "picker.perDay"
+msgstr "About {count} searches a day without a key, shared by everyone on your network."
 
 #. Answers from public sources, with no model
 #. js-lingui-explicit-id
@@ -3157,7 +3201,7 @@ msgstr "Parliament is a place to work with AI on your own terms. It is early, an
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.2"
-msgstr "It runs in your browser, with no servers and no accounts. Your chats and keys stay on this computer, and each request goes straight to the provider you pick, to a model running on your own machine, or just Wikipedia. There are no ads."
+msgstr "It runs in your browser, with no servers and no accounts. Your chats and keys stay on this computer, and each request goes straight to the provider you pick, to a model running on your own machine, or to a public source such as Wikipedia. There are no ads."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.3"

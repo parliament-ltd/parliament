@@ -3,6 +3,7 @@
 
 import { destination, shipped, DESTINATIONS } from './list'
 import { answererRows, answererFor, findModel } from './answerers'
+import { requestsByHost } from './requestLog'
 import { createKeyring, checkAndKeep } from './keyring'
 import { createGateway } from './gateway'
 import { getProvider } from '../providers'
@@ -10,6 +11,8 @@ import { executeClientTool } from '../providers/anthropic'
 import { saveApiKey, loadApiKey, deleteApiKey, hasSavedKey } from '../lib/crypto'
 import { createSource } from './sources'
 import wikipediaManifest from './sources/wikipedia.json'
+import hackernewsManifest from './sources/hackernews.json'
+import openalexManifest from './sources/openalex.json'
 
 export { Refused } from './gateway'
 export { destination, shipped, DESTINATIONS } from './list'
@@ -25,7 +28,7 @@ export const keys = createKeyring({
 // The code behind each shipped entry. Models come from src/providers;
 // sources are manifests read by one runner (sources.js), each allowed only
 // the origins the list gives it.
-const MANIFESTS = { wikipedia: wikipediaManifest }
+const MANIFESTS = { wikipedia: wikipediaManifest, hackernews: hackernewsManifest, openalex: openalexManifest }
 const sources = new Map()
 function implementation(id) {
   const d = destination(id)
@@ -64,6 +67,14 @@ export const hasKey = (id = DEFAULT_MODEL_PROVIDER) => keys.has(id)
 
 /** A provider's models, or none when it is not built yet. */
 export const modelsOf = (id) => (destination(id)?.ships ? models(id) : [])
+
+/**
+ * The page's requests grouped by host, each named by the provider or source
+ * it belongs to, with what made them (stage 7, piece 2). entries: the page's
+ * own log; requests: the gateway's.
+ */
+export const networkByHost = (entries, requests = gateway.requests()) =>
+  requestsByHost({ entries, requests, destinations: DESTINATIONS, self: typeof location === 'undefined' ? null : location.host })
 
 /** Every built provider's models, current and older, as the model: filter reads them. */
 export const allModels = () => DESTINATIONS.filter((d) => d.ships && d.kind !== 'source').flatMap((d) => modelsOf(d.id))

@@ -2,6 +2,12 @@ import { useSyncExternalStore } from 'react'
 import { Trash2, Activity } from 'lucide-react'
 import { Card, SectionLabel } from './index'
 import { getEntries, subscribe, clearLog } from '../lib/networkLog'
+import { gateway, networkByHost } from '../net'
+
+// The network log in today's Settings, grouped by host (stage 7, piece 2;
+// privacy copy draft, item 17). Each host is named by the provider or source
+// it belongs to on the list, with what made its requests; a host on no list
+// says so. Settings v1 replaces this card at stage 9.
 
 function formatTime(ts) {
   const d = new Date(ts)
@@ -11,23 +17,17 @@ function formatTime(ts) {
   return `${h}:${m}:${s}`
 }
 
-function statusColor(entry) {
-  if (entry.error || entry.status === 0) return '#E03E3E'
-  if (entry.status >= 200 && entry.status < 300) return '#0F7B6C'
-  if (entry.status >= 400) return '#E03E3E'
-  return '#D9730D'
-}
-
 export default function NetworkActivityCard() {
   const entries = useSyncExternalStore(subscribe, getEntries, getEntries)
-  const reversed = [...entries].reverse()
+  const requests = useSyncExternalStore(gateway.subscribe, gateway.requests, gateway.requests)
+  const groups = networkByHost(entries, requests)
 
   return (
     <Card>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Activity className="w-3.5 h-3.5 text-[var(--p-text-secondary)]" />
-          <SectionLabel>Network Activity</SectionLabel>
+          <SectionLabel>Network activity</SectionLabel>
         </div>
         {entries.length > 0 && (
           <button
@@ -41,39 +41,32 @@ export default function NetworkActivityCard() {
         )}
       </div>
       <p className="text-xs text-[var(--p-text-secondary)] leading-relaxed mt-2 mb-3">
-        Every outbound network request this app makes is recorded here. The log resets when you reload the page. Only requests to api.anthropic.com should appear.
+        Requests made by this page, grouped by host. Every host should be a provider or source you use. The list is kept in memory and clears when you reload.
       </p>
-      {entries.length === 0 ? (
+      {groups.length === 0 ? (
         <div className="text-xs text-[var(--p-text-muted)] py-6 text-center border border-dashed border-[var(--p-border)] rounded-md">
-          No requests yet. Requests will appear here when you send a message.
+          No requests yet.
         </div>
       ) : (
         <div className="max-h-64 overflow-y-auto border border-[var(--p-border)] rounded-md divide-y divide-[var(--p-border-subtle)]">
-          {reversed.map(entry => (
-            <div key={entry.id} className="flex items-center gap-2 px-3 py-1.5 text-[11px]">
-              <span
-                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                style={{ backgroundColor: statusColor(entry) }}
-                title={entry.error || `Status ${entry.status}`}
-              />
-              <span className="text-[var(--p-text-muted)] tabular-nums w-[62px] flex-shrink-0">
-                {formatTime(entry.timestamp)}
-              </span>
-              <span className="font-medium text-[var(--p-text-primary)] w-[42px] flex-shrink-0">
-                {entry.method}
-              </span>
-              <span className="text-[var(--p-text-primary)] flex-shrink-0">
-                {entry.host}
-              </span>
-              <span className="text-[var(--p-text-secondary)] truncate flex-1" title={entry.path}>
-                {entry.path}
-              </span>
-              <span className="text-[var(--p-text-muted)] tabular-nums flex-shrink-0">
-                {entry.status === 0 ? 'err' : entry.status}
-              </span>
-              <span className="text-[var(--p-text-muted)] tabular-nums w-[42px] text-right flex-shrink-0">
-                {entry.durationMs != null ? `${entry.durationMs}ms` : ''}
-              </span>
+          {groups.map((g) => (
+            <div key={g.host} className="px-3 py-2 text-[11px]">
+              <div className="flex items-baseline gap-2">
+                <span className="font-medium text-[var(--p-text-primary)]">{g.host}</span>
+                <span className="italic text-[var(--p-text-secondary)]">
+                  {g.name ?? (g.self ? 'this page' : 'not a provider or source on the list')}
+                </span>
+                <span className="ml-auto text-[var(--p-text-muted)] tabular-nums">
+                  {g.count === 1 ? '1 request' : `${g.count} requests`}
+                  {g.failed ? `, ${g.failed} failed` : ''}
+                  {` · last ${formatTime(g.last)}`}
+                </span>
+              </div>
+              {g.labels.length > 0 && (
+                <div className="mt-0.5 text-[var(--p-text-secondary)]">
+                  {g.labels.map((l) => (l.count > 1 ? `${l.label} ×${l.count}` : l.label)).join(' · ')}
+                </div>
+              )}
             </div>
           ))}
         </div>

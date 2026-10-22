@@ -1,0 +1,35 @@
+{
+  "id": "hackernews",
+  "name": "Hacker News",
+  "shape": "list",
+  "licence": null,
+  "language": {
+    "fallback": "en"
+  },
+  "request": {
+    "url": "https://hn.algolia.com/api/v1/search",
+    "query": {
+      "query": "{q}",
+      "tags": "story",
+      "hitsPerPage": "5"
+    }
+  },
+  "result": {
+    "list": "hits",
+    "max": 5,
+    "item": {
+      "title": "title",
+      "url": "url",
+      "discussion": { "template": "https://news.ycombinator.com/item?id={objectID}" },
+      "date": "created_at",
+      "facts": {
+        "points": "points",
+        "comments": "num_comments"
+      }
+    }
+  },
+  "limits": {
+    "queryChars": 300,
+    "itemChars": 600
+  }
+}

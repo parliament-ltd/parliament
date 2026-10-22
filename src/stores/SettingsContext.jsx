@@ -5,7 +5,9 @@ const SettingsContext = createContext(null)
 
 const DEFAULT_SETTINGS = {
   storageMode: 'persistent',
-  defaultModel: 'claude-sonnet',
+  // The model for whoever has not chosen one (C155, ruled 22 October).
+  // Settings are stored only when changed, so a chosen model stays.
+  defaultModel: 'claude-sonnet-5-5',
   theme: 'light',
   fontSize: 'default',
   contextThreshold: 80,

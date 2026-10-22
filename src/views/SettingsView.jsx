@@ -47,10 +47,10 @@ const NAV_ITEMS = [
 // abstraction at render time — see ModelSection below. Keys must match
 // AnthropicProvider.getModels() ids.
 const MODEL_DISPLAY_META = {
-  'claude-haiku':    { description: 'Fast & affordable',     speed: 'Fastest',  badge: 'Budget-friendly' },
-  'claude-sonnet':   { description: 'Balanced performance',  speed: 'Fast',     badge: 'Recommended' },
-  'claude-opus':     { description: 'Maximum capability',    speed: 'Moderate', badge: 'Most powerful' },
-  'claude-opus-4-7': { description: 'Latest frontier model', speed: 'Moderate', badge: 'Newest' },
+  'claude-haiku-5-5':  { description: 'Fast & affordable',    speed: 'Fastest',  badge: 'Budget-friendly' },
+  'claude-sonnet-5-5': { description: 'Balanced performance', speed: 'Fast',     badge: 'Recommended' },
+  'claude-opus-5-5':   { description: 'For hard reasoning',   speed: 'Moderate', badge: '' },
+  'claude-fable-5-1':  { description: 'The costliest',        speed: 'Moderate', badge: '' },
 }
 
 // Render `cost` from provider.getModels() as a per-million-tokens dollar
@@ -1267,8 +1267,9 @@ function AboutSection() {
                 text: "All conversation data (messages, branches, highlights, notes) lives in your browser's IndexedDB. We have no way to see, access, or recover it."
               },
               {
-                title: 'Verify it yourself',
-                text: 'The Network Activity log below records every outbound request this app makes. You can confirm only Anthropic\u2019s API ever receives data. When the app launches publicly, the full source will be on GitHub for line-by-line review.'
+                title: 'Check it yourself',
+                // Privacy copy draft, item 16, applied with the log grouped by host (stage 7, piece 2).
+                text: 'The log below lists the requests this page makes, grouped by host. Every host should be a provider or source you use; if one is not, something is wrong. It cannot show what your browser does by itself, such as fetching the app’s own files. When the app launches publicly, the full source will be on GitHub for line-by-line review.'
               },
             ].map((item, i) => (
               <div key={i}>

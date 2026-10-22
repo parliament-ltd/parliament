@@ -114,3 +114,20 @@ export async function readFavoritesSnapshot(db) {
   const pins = await db.getAll('pins')
   return { favorites, messages, pins }
 }
+
+/**
+ * Runs the conversion once for a database, on its own (C147 (c), ruled 22
+ * October after the dry run on Stefan's backups): at version 6, when it has
+ * not run yet. Nothing to convert still notes that it ran. Within one lock,
+ * so two tabs opening together cannot both make the quotes.
+ * @param {{ lock?: (name: string, fn: () => Promise<any>) => Promise<any> }} [opts]
+ *   lock: the browser's lock (navigator.locks.request), or none in tests
+ * @returns {Promise<{ created: number[], tagged: number[] }|null>} null when it had run already
+ */
+export async function convertFavoritesOnce(db, { now, newId, lock = (name, fn) => fn() }) {
+  if (db.version < 6 || !db.objectStoreNames.contains('favorites')) return null
+  return lock('parliament-favorites-to-tags', async () => {
+    if (await db.get('settings', FAVORITES_TAGGED_SETTING)) return null
+    return applyFavoritesToTags(db, planFavoritesToTags(await readFavoritesSnapshot(db)), { now, newId })
+  })
+}
