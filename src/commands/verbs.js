@@ -99,10 +99,11 @@ export const VERBS = Object.freeze([
 
   // Start
   v({ verb: 'new', group: 'start', example: 'new:chat',
-    forms: ['new:chat', 'new:plan', 'new:room', 'new:room guided', 'new:collection', 'new:branch 207', 'new:step', 'new:run', 'new:block'],
-    takes: [[['chat', 'plan', 'room', 'collection', 'branch', 'step', 'run', 'block']], [['room'], ['guided']], [['branch'], 'address']],
+    forms: ['new:chat', 'new:plan', 'new:room', 'new:room guided', 'new:collection', 'new:framework "Editor" "Make each sentence shorter"', 'new:branch 207', 'new:step', 'new:run', 'new:block'],
+    // new:framework "Name" "What it asks": a framework of your own (C164).
+    takes: [[['chat', 'plan', 'room', 'collection', 'framework', 'branch', 'step', 'run', 'block']], [['room'], ['guided']], [['branch'], 'address'], [['framework'], 'text', 'text']],
     stage: 6, undoable: true,
-    gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, plan, room, collection, branch, step, run or block' } }),
+    gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, plan, room, collection, framework, branch, step, run or block' } }),
   v({ verb: 'open', group: 'start', example: 'open:207',
     forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Writing Studio"', 'open:library', 'open:records', 'open:settings keys'],
     // open:records brings the Records board alone, where records: brings
@@ -179,8 +180,8 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.summarize', message: 'Write a dated summary of some cards as a note. One model call' } }),
   v({ verb: 'rewrite', group: 'collection', example: 'rewrite:234', takes: [['address']], on: ['collection'], stage: 6, spends: true, undoable: true,
     gloss: /*i18n*/ { id: 'verb.rewrite', message: 'Write a new dated summary beside the old one' } }),
-  v({ verb: 'forget', group: 'collection', example: 'forget:"Surprised me"', forms: ['forget:"Surprised me"', 'forget:"Q2" collection'], takes: [['text'], ['text', ['search', 'collection']]], stage: 6, undoable: true,
-    gloss: /*i18n*/ { id: 'verb.forget', message: 'Remove a saved search, collection or arrangement' } }),
+  v({ verb: 'forget', group: 'collection', example: 'forget:"Surprised me"', forms: ['forget:"Surprised me"', 'forget:"Q2" collection', 'forget:"Editor" framework'], takes: [['text'], ['text', ['search', 'collection', 'framework']]], stage: 6, undoable: true,
+    gloss: /*i18n*/ { id: 'verb.forget', message: 'Remove a saved search, collection, framework of yours or arrangement' } }),
 
   // Tags
   v({ verb: 'tagadd', group: 'tags', example: 'tagadd:essay 207, 216', takes: [['text', { opt: 'addresses' }]], on: TABLES, stage: 6, undoable: true,
@@ -233,7 +234,8 @@ export const VERBS = Object.freeze([
   v({ verb: 'by', group: 'editing', example: 'by:haiku', forms: ['by:', 'by:haiku', 'by:mistral small', 'by:wikipedia'], takes: [[], [{ many: { list: 'text' } }]], stage: 7, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.by', message: 'Choose who answers in this chat: a model, or a source with no tokens' } }),
   v({ verb: 'framework', group: 'editing', example: 'framework:pushback', forms: ['framework:pushback', 'framework:pushback, uncertain', 'framework:off'],
-    takes: [[['off']], [{ list: [...FRAMEWORKS, 'off'] }], [{ list: 'text' }]], on: ['room'], stage: 7, undoable: true, click: 'apply',
+    // Alone, it shows them; names of several words need no quotes (C164).
+    takes: [[], [{ list: [...FRAMEWORKS, 'off'] }], [{ many: { list: 'text' } }]], stage: 7, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.framework', message: 'Choose the frameworks that shape every reply: standing instructions sent with each prompt' } }),
   v({ verb: 'helper', group: 'editing', example: 'helper:haiku', takes: [['word']], on: ['room'], stage: 7, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.helper', message: 'Choose the model that reads text from sources' } }),

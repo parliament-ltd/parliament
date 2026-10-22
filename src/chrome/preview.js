@@ -28,6 +28,7 @@ import { ROW_VERBS, isRowStep, planRowLine, planCopy, planErase, targetsOf } fro
 import { planNote, planSummarize, planCompare, planJump } from '../lib/cardActs'
 import { exportItems, chatsOf, exportName } from '../lib/recordsExport'
 import { findAnswerers } from '../net/answerers'
+import { readFrameworks, frameworksOf, cleanOwn, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
@@ -43,8 +44,9 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // erase: removes things for good, by number, on a line of its own (C137).
 // export: downloads rows as Markdown or JSONL (piece 5; C138).
 // new:collection, add:, rm: and heading: change a collection (piece 6; C144).
-// by: chooses who answers in the chat the room shows (stage 7; C149).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by'])
+// by: chooses who answers in the chat the room shows (stage 7; C149), and
+// framework: the standing instructions that go with it (C164).
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -159,13 +161,19 @@ function planUndo(a, step, screens = {}) {
     : { says: { message: 'undoNothing' }, act: null }
 }
 
-/** forget:"…" removes a saved search; what it found is untouched (C140 (f)). */
+/** forget:"…" removes a saved search; what it found is untouched (C140 (f)). Or a framework of yours (C164). */
 function planForget(a, step, screens = {}) {
   const [arg, which] = step.match?.values ?? []
   const name = typed(arg)
+  const own = which && which.value !== 'framework' ? null
+    : (screens.frameworks?.list ?? []).find((f) => !f.builtIn && (f.name ?? '').toLocaleLowerCase() === name.toLocaleLowerCase()) ?? null
+  if (which?.value === 'framework') {
+    return own ? planForgetFramework(own) : { says: { message: 'frameworkNone', values: { word: name } }, act: null }
+  }
   const search = which?.value === 'collection' ? { found: null, several: [] } : findSaved(screens.records?.saved ?? [], name)
   const coll = which?.value === 'search' ? { found: null, several: [] } : collectionNamed(screens, name)
-  if (search.found && coll.found) return { says: { message: 'nameWhichKind', values: { name, verb: 'forget:' } }, act: null }
+  if ([search.found, coll.found, own].filter(Boolean).length > 1) return { says: { message: 'nameWhichKind', values: { name, verb: 'forget:' } }, act: null }
+  if (own) return planForgetFramework(own)
   if (coll.found) return planForgetCollection(coll.found, screens)
   const several = [...search.several, ...coll.several]
   if (several.length) return { says: { message: 'forgetWhich', values: { words: several } }, act: null }
@@ -183,7 +191,7 @@ function showCollection(a, id) {
 const addStep = (a, step, screens) => planAdd(step, screens)
 const rmStep = (a, step, screens) => planRm(step, screens)
 const headingStep = (a, step, screens) => planHeading(step, screens)
-const newStep = (a, step) => planNew(step)
+const newStep = (a, step, screens) => (step.match?.values?.[0]?.value === 'framework' ? planNewFramework(step, screens) : planNew(step))
 
 // open:"Water tower": a saved search by name (C140 (e)), or null when the
 // name is no saved search's, for open: to answer otherwise.
@@ -383,6 +391,55 @@ function planApi(a, step, screens = {}) {
 const typed = (arg) => (arg?.kind === 'text' ? arg.value : arg?.text ?? '')
 
 /**
+ * framework: the standing instructions that go with every prompt in the
+ * chat the room shows, stacked in the order given (stage 7, piece 5; C164).
+ * Alone, it says which are on and shows the picker. screens.frameworks:
+ * { room, num, now, stored, list, nameOf }: the chat the room shows (null in
+ * an empty room, held for the chat its next prompt starts; undefined with
+ * no room), its number, its frameworks now, as stored, every framework
+ * there is (lib/frameworks.frameworkList) and how each is named.
+ */
+function planFramework(a, step, screens = {}) {
+  const fw = screens.frameworks
+  if (!fw || fw.room === undefined) return { says: { message: 'promptNoRoom' }, act: null }
+  const r = readFrameworks(step.match?.values ?? [], { list: fw.list, nameOf: fw.nameOf, now: fw.now })
+  if (r.bad) {
+    const values = r.bad.message === 'frameworkWhich' ? { ...r.bad.values, example: `framework:"${r.bad.values.names[0]}"` } : r.bad.values
+    return { says: { message: r.bad.message, values }, act: null }
+  }
+  const names = (ids) => frameworksOf(ids, fw.list).map(fw.nameOf)
+  if (r.show) return { says: { message: 'frameworkShow', values: { count: fw.now.length, frameworks: names(fw.now) } }, act: { kind: 'frameworkPicker' } }
+  if (r.same) return { says: { message: 'frameworkSame' }, act: null }
+  const act = { kind: 'frameworks', chatId: fw.room, ids: r.ids, before: fw.stored ?? null }
+  if (!r.ids.length) return { says: { message: fw.room ? 'frameworkOff' : 'frameworkOffNext', values: { num: fw.num ?? '' } }, act }
+  return { says: { message: fw.room ? 'frameworkSet' : 'frameworkSetNext', values: { count: r.ids.length, frameworks: names(r.ids), num: fw.num ?? '' } }, act }
+}
+
+/** new:framework "Editor" "Make each sentence shorter": one of your own, or rewriting it (C164). */
+function planNewFramework(step, screens = {}) {
+  const [, nameArg, textArg] = step.match?.values ?? []
+  if (!nameArg || !textArg) return { says: { message: 'frameworkNeeds' }, act: null }
+  const c = cleanOwn(typed(nameArg), typed(textArg))
+  if (c.error === 'name' || c.error === 'instruction') return { says: { message: 'frameworkNeeds' }, act: null }
+  if (c.error) return { says: { message: 'frameworkLong', values: { name: NAME_MAX, instruction: INSTRUCTION_MAX } }, act: null }
+  const list = screens.frameworks?.list ?? []
+  const nameOf = screens.frameworks?.nameOf ?? ((f) => f.name ?? f.id)
+  const same = (f) => String(nameOf(f) ?? '').toLocaleLowerCase() === c.name.toLocaleLowerCase()
+  if (list.some((f) => f.builtIn && same(f))) return { says: { message: 'frameworkBuiltInName', values: { name: c.name } }, act: null }
+  const before = list.find((f) => !f.builtIn && same(f)) ?? null
+  if (before && before.instruction === c.instruction) return { says: { message: 'frameworkSameWords', values: { name: c.name } }, act: null }
+  return {
+    says: { message: before ? 'frameworkReplace' : 'frameworkKeep', values: { name: c.name } },
+    act: { kind: 'ownFramework', name: c.name, instruction: c.instruction, before: before?.record ?? null },
+  }
+}
+
+/** forget:"Editor": one of your own goes; chats it was on go on without it (C164). */
+function planForgetFramework(f) {
+  return { says: { message: 'frameworkForget', values: { name: f.name } }, act: { kind: 'forgetFramework', record: f.record } }
+}
+
+/**
  * by: chooses who answers in the chat the room shows (stage 7, piece 1;
  * C149, C150). Bare, it says who answers and shows the picker. One name at
  * a time: several at once is branches (stage 8). A model that needs a key
@@ -499,6 +556,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       compare: (a1, s1, sc) => planCompare(s1, sc),
       jump: (a1, s1, sc) => planJump(s1, sc, a1.addressed),
       by: planBy,
+      framework: planFramework,
     }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
@@ -639,6 +697,7 @@ export function promptPreview(text, target = {}) {
     if (who.unchecked) return { ready: false, says: { message: 'promptLocalUnchecked', values: { name: who.name, provider: who.providerName, command: `api:${who.provider}` } } }
     const tokens = Math.ceil((prompt.length + (about?.chars ?? 0) + (target.historyChars ?? 0) + (target.systemChars ?? 0)) / CHARS_PER_TOKEN)
     const also = []
+    if (target.frameworks?.length) also.push({ message: 'promptFrameworks', values: { count: target.frameworks.length, frameworks: target.frameworks } })
     if (target.sourcesOut?.count > 0) also.push({ message: 'promptSourcesOut', values: { count: target.sourcesOut.count, sources: target.sourcesOut.names } })
     if (target.hiddenOut > 0) also.push({ message: 'promptHiddenOut', values: { count: target.hiddenOut } })
     const says = { message: 'promptSendLocal', values: { provider: who.name, tokens } }
@@ -660,6 +719,8 @@ export function promptPreview(text, target = {}) {
   // and a model offered before general availability (security notes §3).
   if (target.region && target.region !== 'global') also.push({ message: 'promptRegion', values: { region: target.region } })
   if (who.preview) also.push({ message: 'promptPreviewModel', values: { name: who.name } })
+  // The frameworks that go with it, in their order (C164). target.frameworks: their names.
+  if (target.frameworks?.length) also.push({ message: 'promptFrameworks', values: { count: target.frameworks.length, frameworks: target.frameworks } })
   if (about) {
     also.push({ message: 'promptAbout', values: { count: about.nums.length } })
     if (about.quotes?.length) also.push({ message: 'promptAboutQuotes', values: { nums: about.quotes, count: about.quotes.length } })

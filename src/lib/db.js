@@ -267,7 +267,7 @@ function generateId() {
 
 // answerer: who answers in this chat, when someone chose before its first
 // prompt (stage 7; C150). Left out when no one chose, so the default answers.
-export async function createConversation({ title = 'New Conversation', model = 'claude-sonnet-5-5', parentId = null, branchPoint = null, createdInMode = null, room = null, answerer = null } = {}) {
+export async function createConversation({ title = 'New Conversation', model = 'claude-sonnet-5-5', parentId = null, branchPoint = null, createdInMode = null, room = null, answerer = null, frameworks = null } = {}) {
   const db = await initDB()
   const now = new Date().toISOString()
   const conversation = {
@@ -284,6 +284,8 @@ export async function createConversation({ title = 'New Conversation', model = '
     // pre-V2 callers.
     room,
     ...(answerer ? { answerer } : {}),
+    // The frameworks chosen before its first prompt (stage 7; C164).
+    ...(Array.isArray(frameworks) && frameworks.length ? { frameworks } : {}),
     pinned: false,
     storageBytes: 0,
     createdAt: now,

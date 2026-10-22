@@ -346,6 +346,10 @@ msgid "chat.finishSettingHelp"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.frameworkGone"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.quote"
 msgstr ""
 
@@ -414,6 +418,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.stoppedOnReply"
+msgstr ""
+
+#. Under a reply: the frameworks it was written under (C164). {names} is a list
+#. js-lingui-explicit-id
+msgid "chat.writtenUnder"
 msgstr ""
 
 #. {command} is a command, which stays English
@@ -1190,6 +1199,77 @@ msgid "enter.forgetWhich"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.frameworkBuiltInName"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkForget"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkKeep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkMost"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.frameworkNeeds"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.frameworkNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkOffNext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkReplace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkSameWords"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkSet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkSetNext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkShow"
+msgstr ""
+
+#. {names} is a list joined with "or"
+#. js-lingui-explicit-id
+msgid "enter.frameworkWhich"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.fromWhat"
 msgstr ""
 
@@ -1595,6 +1675,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptFrameworks"
 msgstr ""
 
 #. C151: a chat or a default naming a model the list no longer has
@@ -2106,6 +2190,82 @@ msgstr ""
 #. Shown on hover over who answers, in the prompt field
 #. js-lingui-explicit-id
 msgid "field.answeredHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.frameworkHelp"
+msgstr ""
+
+#. Marginalia in the prompt field; framework: is the command, kept English
+#. js-lingui-explicit-id
+msgid "field.frameworkNone"
+msgstr ""
+
+#. The first framework on this chat, and how many more
+#. js-lingui-explicit-id
+msgid "field.frameworkSome"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.about.alts"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.about.challenge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.about.pushback"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.about.reasoning"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.about.uncertain"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.alts"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.challenge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.pushback"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.reasoning"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.uncertain"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "frameworkPicker.builtIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "frameworkPicker.foot"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "frameworkPicker.noneYet"
+msgstr ""
+
+#. A framework of your own with no name, as a persona could be
+#. js-lingui-explicit-id
+msgid "frameworkPicker.unnamed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "frameworkPicker.yours"
 msgstr ""
 
 #. js-lingui-explicit-id

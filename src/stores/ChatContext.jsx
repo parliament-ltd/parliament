@@ -47,6 +47,8 @@ const isQuota = (err) => err?.name === 'QuotaExceededError' || err?.name === 'NS
 // that answered, and the tokens it took in and gave out, as the provider
 // reported them. Optional fields on the message; older replies have none.
 const answeredWith = (model, input, output) => (model ? { model, usage: { input, output } } : {})
+// The frameworks a reply was written under (stage 7, piece 5; C164).
+const underWith = (frameworks) => (Array.isArray(frameworks) && frameworks.length ? { frameworks } : {})
 
 export function ChatProvider({ children }) {
   const [tokenUsage, setTokenUsage] = useState({ input: 0, output: 0 })
@@ -166,7 +168,8 @@ export function ChatProvider({ children }) {
   //     in memory only.
   //   - meta is persisted alongside the user message so MessageCard can
   //     render attachment chips in history (a memory aid, not replay).
-  const sendMessage = useCallback(async (conversationId, userContent, model, systemPrompt = '', tools = [], attachments = null) => {
+  // frameworks: what the reply records it was written under (C164).
+  const sendMessage = useCallback(async (conversationId, userContent, model, systemPrompt = '', tools = [], attachments = null, { frameworks = null } = {}) => {
     // One reply at a time in a chat; other chats are free.
     if (streamingIn(conversationId)) return
 
@@ -322,7 +325,7 @@ export function ChatProvider({ children }) {
       const cut = finalContent ? cutReason(last?.stopReason) : null
       // The model that answered and the tokens it took, so what a chat cost
       // can be worked out later, never guessed (C132 (h)).
-      const outcome = { content: finalContent, incomplete: Boolean(cut), tokenCount, ...(cut ? { stopReason: cut } : {}), ...answeredWith(model, totalInputTokens, totalOutputTokens) }
+      const outcome = { content: finalContent, incomplete: Boolean(cut), tokenCount, ...(cut ? { stopReason: cut } : {}), ...answeredWith(model, totalInputTokens, totalOutputTokens), ...underWith(frameworks) }
 
       await updateMessage(assistantMsg.id, outcome)
       const finished = { ...assistantMsg, ...outcome }
@@ -362,7 +365,7 @@ export function ChatProvider({ children }) {
   // person's Enter, which named it and its cost. A stalled reply with
   // nothing in it is filled; if some text had arrived, a new reply follows
   // it and the one cut off stays as it was.
-  const resendWhole = useCallback(async (conversationId, model, systemPrompt = '') => {
+  const resendWhole = useCallback(async (conversationId, model, systemPrompt = '', { frameworks = null } = {}) => {
     if (streamingIn(conversationId)) return
     const held = hasMessages(conversationId) ? heldMessages(conversationId) : await getMessages(conversationId)
     let at = -1
@@ -392,6 +395,7 @@ export function ChatProvider({ children }) {
       const outcome = {
         content, incomplete: Boolean(cut) || !content, tokenCount: response?.usage?.output_tokens || 0, stopReason: cut,
         ...answeredWith(model, response?.usage?.input_tokens || 0, response?.usage?.output_tokens || 0),
+        ...underWith(frameworks),
       }
       await updateMessage(reply.id, outcome)
       const finished = { ...reply, ...outcome }

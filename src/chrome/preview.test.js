@@ -4,6 +4,7 @@ import { preview, promptPreview, BUILT } from './preview'
 import { say } from './say'
 import { shipped, planRoom, SPACE } from '../shell/arrangement'
 import { messages as en } from '../locales/en/messages.mjs'
+import { frameworkList } from '../lib/frameworks'
 
 const keep = (p) => { if (!p.next) throw new Error(p.says.message); return p.next }
 const i18n = setupI18n({ locale: 'en', messages: { en } })
@@ -922,5 +923,51 @@ describe('models on this computer (stage 7, piece 4; C163)', () => {
     const p = preview('>api:ollama', { mode: 'command', arrangement: shipped('almanac'), screens: { keys: [], noKey: ['Wikipedia'], local: { id: 'ollama', name: 'Ollama' } } })
     expect(say(i18n, p.says.message, p.says.values)).toBe('Enter shows Ollama on this computer, and how to check for it')
     expect(p.act).toEqual({ kind: 'keys', focus: 'ollama' })
+  })
+})
+
+describe('framework:, new:framework and forget: (stage 7, piece 5; C164)', () => {
+  const NAMES = { challenge: 'Challenge artifacts', reasoning: 'Show reasoning', pushback: 'Push back on me', alts: 'Offer alternatives', uncertain: 'Flag uncertainty' }
+  const nameOf = (f) => (f.builtIn ? NAMES[f.id] : f.name)
+  const list = frameworkList([{ id: 'e1', name: 'Editor', instruction: 'Make each sentence shorter.' }])
+  const frameworks = (more = {}) => ({ room: 'c1', num: 204, now: [], stored: null, list, nameOf, ...more })
+  const at = (value, more) => {
+    const p = preview(value, { mode: 'command', arrangement: shipped('almanac'), screens: { frameworks: frameworks(more) } })
+    return { ...p, text: say(i18n, p.says.message, p.says.values) }
+  }
+
+  it('sets frameworks on the chat the room shows, in the order given', () => {
+    const p = at('>framework:pushback, editor')
+    expect(p.text).toBe('Enter sets frameworks Push back on me and Editor for every prompt in 204, in that order, until turned off')
+    expect(p.act).toEqual({ kind: 'frameworks', chatId: 'c1', ids: ['pushback', 'own:e1'], before: null })
+  })
+  it('reads a name of several words, and holds them for a new chat in an empty room', () => {
+    expect(at('>framework:push back on me').act.ids).toEqual(['pushback'])
+    expect(at('>framework:flag uncertainty, push back on me').act.ids).toEqual(['uncertain', 'pushback'])
+    expect(at('>framework:uncertain', { room: null, num: null }).text).toBe('Enter sets framework Flag uncertainty for the chat your next prompt starts')
+  })
+  it('turns them off, says when nothing changes, and shows them alone', () => {
+    expect(at('>framework:off', { now: ['pushback'], stored: ['pushback'] })).toMatchObject({ text: 'Enter turns off the frameworks in 204', act: { ids: [], before: ['pushback'] } })
+    expect(at('>framework:pushback', { now: ['pushback'] }).text).toBe('That is how the frameworks stand here already')
+    expect(at('>framework:', { now: ['pushback'] })).toMatchObject({ text: 'Framework Push back on me is on here. Enter shows them all', act: { kind: 'frameworkPicker' } })
+  })
+  it('refuses a name it does not know, and asks which when several fit', () => {
+    expect(at('>framework:nope').text).toBe('No framework is called nope. framework: shows them')
+    expect(at('>framework:nope').act).toBeNull()
+  })
+  it('keeps a framework of your own, or rewrites one, and refuses a built-in name', () => {
+    expect(at('>new:framework "Skeptic" "Doubt everything I say."')).toMatchObject({ text: 'Enter keeps “Skeptic” as a framework of yours. framework: puts it on a chat', act: { kind: 'ownFramework', name: 'Skeptic', before: null } })
+    expect(at('>new:framework "editor" "Shorter still."').act.before.id).toBe('e1')
+    expect(at('>new:framework "Push back on me" "x"').text).toBe('“Push back on me” is a framework built in. Give yours another name')
+    expect(at('>new:framework').text).toBe('A framework needs a name and what it asks: new:framework "brief" "keep each answer short"')
+  })
+  it('forgets one of your own by name', () => {
+    expect(at('>forget:"Editor"')).toMatchObject({ text: 'Enter removes your framework “Editor”. Chats it is on go on without it', act: { kind: 'forgetFramework' } })
+    expect(at('>forget:"Editor" framework').act.record.id).toBe('e1')
+  })
+  it('names the frameworks that go with a prompt', () => {
+    const p = promptPreview('owls?', { room: 'c1', streaming: false, keyed: true, provider: 'Anthropic', source: 'Wikipedia', historyChars: 0, systemChars: 0,
+      answerer: { id: 'm', group: 'model', name: 'Haiku 9', price: null }, frameworks: ['Push back on me', 'Editor'] })
+    expect(p.says.also.map((x) => say(i18n, x.message, x.values))).toContain('Frameworks Push back on me and Editor go with it, in that order')
   })
 })

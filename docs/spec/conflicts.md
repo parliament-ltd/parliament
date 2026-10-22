@@ -1347,6 +1347,19 @@ Found while splitting stage 7 into pieces. Read with C131 (Records, Framework). 
   - **Qwen 3.5** (Alibaba): `qwen3.5` is the 9B, about 6.6 GB; 0.8B, 2B and 4B are smaller. Thinks by default.
 - **Suggestion:** keep as built, with (e) to look at once Stefan has tried a model.
 
+- **Tried with Ollama itself, 22 October** (Stefan's machine, Ollama 0.40.8, `bonsai-2:9b`): Ollama allowed the dev server's address with nothing set; the check found the model; one prompt ("In one sentence, what is a barn owl?") answered after about 11 minutes, with 1,178 tokens out, nearly all thinking, on the processor with a 4,096-token context. Nothing showed while it thought. This bears on (e): **suggestion, thinking off by default for models on this computer,** with a way to turn it on, both named on the Enter line.
+
+**C164. Frameworks, as built** (piece 5). The editing spec's `collab:` (renamed by C131), C67, A13, and the spec's open question on scope. Built so:
+- **(a) The five built in,** with the spec's names (Challenge artifacts, Show reasoning, Push back on me, Offer alternatives, Flag uncertainty) and glosses. Their instructions to the model are new, following the glosses (C67: "challenge" now asks the model to question what it is given, not to critique its own work). They are in English, as instructions to a model, not words of the interface.
+- **(b) They belong to a chat** (the spec's open question; its mockup sets them for the whole chat), in the order chosen, until turned off: a new optional field on the chat, `frameworks`, its ids in order. In a room with no chat yet they are held for the chat the next prompt starts. **Shown at the checkpoint.**
+- **(c) In the field,** before who answers: "framework: none", or "framework: Push back on me +1"; a click opens their picker under the field, Built in and Yours, a ticked box carrying its place in the stack; a click adds one at the end or takes it off, as `framework:` does. `framework:pushback, uncertain`, `framework:push back on me` (no quotes needed), `framework:off`, and bare `framework:` to see them. The Enter line of a prompt names them when a model answers (a source does not read them).
+- **(d) A reply records what it was written under** and says so under it ("Written under Push back on me and Skeptic"): a new optional field on the message, `frameworks`, the ids and, for one of yours, its name at the time, so a reply can still name one later removed. **Shown at the checkpoint.**
+- **(e) Your own, from the bar until Settings v1 (stage 9):** `new:framework "skeptic" "Doubt what I say, and ask for evidence."`; the same name again rewrites it (the Enter line says so first), and chats it is on use the new words from their next prompt; `forget:"skeptic"` removes it, chats it was on carry on without it; `undo:` takes either back. A built-in's name is refused for one of yours. Kept in the version 6 list `collabs`.
+- **(f) Personas (A13):** the upgrade made each one of yours, switched off; none of Stefan's three backups has any, so nothing of his came across. Any that do appear under Yours, used only when chosen.
+- **(g) Today's Collaboration mode** (its window and block, R22 and R23) no longer shapes prompts sent from the bar; it still works on today's chat page until retired. Its "on for this conversation" was kept in memory only, so nothing stored is lost.
+- **(h) From a restored file,** frameworks of yours and the frameworks on a chat come in as they were; they go with a prompt only after the Enter line has named them, so nothing applies unseen.
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

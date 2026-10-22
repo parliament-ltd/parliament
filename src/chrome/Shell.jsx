@@ -21,7 +21,8 @@ import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
 import { useChat } from '../stores/ChatContext'
 import { useConversations } from '../stores/ConversationContext'
 import { useSettings } from '../stores/SettingsContext'
-import { useCollabMode } from '../stores/CollabModeContext'
+import { frameworkList, frameworksOf, instructionsOf, recordOf } from '../lib/frameworks'
+import { readOwnFrameworks, keepOwnFramework, removeOwnFramework, restoreOwnFramework } from '../lib/frameworkStore'
 import { useIsStreaming, useHiddenIds, usePendingDeletes, useStreamEnd } from '../stores/chatHooks'
 import { sendableOf, hiddenIds, pendingDeletes, isStreaming as replyArriving } from '../stores/chatStore'
 import { fromSource } from '../stores/sendHistory'
@@ -723,6 +724,21 @@ export default function Shell() {
   // the chat its next prompt starts.
   const [picking, setPicking] = useState(false) // the picker under the bar
   const [pendingAnswerer, setPendingAnswerer] = useState(null)
+
+  // ── Frameworks (stage 7, piece 5; C164) ───────────────
+  // On a chat, in order; held for a new chat as who answers is. The
+  // person's own are read from the collabs list.
+  const [ownFrameworks, setOwnFrameworks] = useState([])
+  const readOwn = useCallback(() => readOwnFrameworks(db.current).then(setOwnFrameworks, () => {}), [])
+  useEffect(() => { if (started) readOwn() }, [started, readOwn])
+  const [pendingFrameworks, setPendingFrameworks] = useState(null)
+  const pendingFwNow = useRef(null)
+  useEffect(() => { pendingFwNow.current = pendingFrameworks }, [pendingFrameworks])
+  const [fwPicking, setFwPicking] = useState(false)
+  const fwList = useMemo(() => frameworkList(ownFrameworks), [ownFrameworks])
+  const fwListNow = useRef(fwList)
+  useEffect(() => { fwListNow.current = fwList }, [fwList])
+  const nameOfFramework = useCallback((fw) => (fw.builtIn ? i18n._(COPY.frameworks[fw.id]) : fw.name || i18n._(COPY.frameworkPicker.unnamed)), [i18n])
   const pendingNow = useRef(null)
   useEffect(() => { pendingNow.current = pendingAnswerer }, [pendingAnswerer])
   const [keyInfo, setKeyInfo] = useState(() => ({ keys: [], noKey: noKeyNeeded() }))
@@ -982,7 +998,52 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'frameworkPicker') {
+      setInspected(null)
+      setCompared(null)
+      setKeyPanel(null)
+      setPicking(false)
+      setFwPicking(true)
+      remember(body)
+      return null
+    }
+    if (what.kind === 'frameworks') {
+      // framework: (C164): the chat's own, or held for the next chat.
+      if (what.chatId) {
+        let done
+        try {
+          done = await changeRecords(db.current, [{ store: 'conversations', id: what.chatId, set: { frameworks: what.ids }, expect: { frameworks: what.before } }])
+        } catch (err) {
+          return err?.name === 'Changed' ? { message: 'rowsChanged', values: { nums: err.nums } } : 'frameworkFailed'
+        }
+        touched.current?.records.push(...done)
+        loadConversations().catch(() => {})
+      } else {
+        if (touched.current) touched.current.pendingFw = { before: pendingFwNow.current }
+        setPendingFrameworks(what.ids)
+      }
+      remember(body)
+      return null
+    }
+    if (what.kind === 'ownFramework' || what.kind === 'forgetFramework') {
+      // new:framework and forget: for one of your own (C164).
+      try {
+        if (what.kind === 'ownFramework') {
+          const kept = await keepOwnFramework(db.current, { name: what.name, instruction: what.instruction, before: what.before, newId: () => crypto.randomUUID(), now: new Date().toISOString() })
+          touched.current?.own.push({ before: what.before, after: kept })
+        } else {
+          await removeOwnFramework(db.current, what.record.id)
+          touched.current?.own.push({ before: what.record, after: null })
+        }
+      } catch {
+        return 'frameworkFailed'
+      }
+      await readOwn()
+      remember(body)
+      return null
+    }
     if (what.kind === 'picker') {
+      setFwPicking(false)
       // Bare by: shows who can answer, under the bar.
       setInspected(null)
       setCompared(null)
@@ -1028,7 +1089,7 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'name'))
     remember(body)
     return null
-  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, exportFile, commit, loadConversations, findCard, findPassage, findRow, holdNote, clearPicked, i18n])
+  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, exportFile, commit, loadConversations, findCard, findPassage, findRow, holdNote, clearPicked, i18n, readOwn])
 
   // ── undo: (C134, as built) ────────────────────────────
   // Each command line that changes something is kept with what it changed,
@@ -1081,6 +1142,18 @@ export default function Shell() {
     }
     if (entry.view) showView(entry.view)
     if (entry.pending) setPendingAnswerer(entry.pending.before)
+    if (entry.pendingFw) setPendingFrameworks(entry.pendingFw.before)
+    if (entry.own) {
+      try {
+        for (const o of [...entry.own].reverse()) {
+          if (o.before) await restoreOwnFramework(db.current, o.before)
+          else if (o.after) await removeOwnFramework(db.current, o.after.id)
+        }
+      } catch {
+        return stop('undoFailed')
+      }
+      readOwn()
+    }
     if (entry.arrangement) {
       const refused = await run(entry.arrangement, null)
       if (refused) return stop(refused)
@@ -1089,12 +1162,12 @@ export default function Shell() {
     setUndoTop(undoStack.current.at(-1)?.line ?? null)
     remember(body)
     return { done: true, says: { message: 'undone', values: { line: entry.line } } }
-  }, [remember, run, showView, loadConversations])
+  }, [remember, run, showView, loadConversations, readOwn])
 
   const onRun = useCallback(async (next, body, go, what) => {
     if (what?.kind === 'undo') return undo(body)
     const before = { arrangement: current.current, view: viewNow.current }
-    touched.current = { records: [], saved: [], collections: [], created: [], pending: null }
+    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [] }
     const out = what ? await act(what, body, next) : await run(next, body)
     const t = touched.current
     touched.current = null
@@ -1114,7 +1187,9 @@ export default function Shell() {
     if (t.collections.length) entry.collections = t.collections
     if (t.created.length) entry.created = t.created
     if (t.pending) entry.pending = t.pending
-    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections || entry.created || entry.pending)) {
+    if (t.pendingFw) entry.pendingFw = t.pendingFw
+    if (t.own.length) entry.own = t.own
+    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own)) {
       undoStack.current = [...undoStack.current, entry].slice(-UNDO_MAX)
       setUndoTop(body)
     }
@@ -1131,7 +1206,6 @@ export default function Shell() {
   // ── Prompts from the bar (stage 4) ────────────────────
   const { messages, activeConversationId, sendMessage, resendWhole, askSource } = useChat()
   const { settings, updateSetting } = useSettings()
-  const { buildSystemPrompt } = useCollabMode()
   // Which providers have a key here, without decrypting one; null until
   // known (stage 7: a key per provider). keyed: whether the default
   // provider has one, as stage 4 had it.
@@ -1140,7 +1214,7 @@ export default function Shell() {
   const [stalledIn, setStalledIn] = useState(null) // the chat whose last reply stalled (C114)
   const creating = useRef(false)
   const latest = useRef({})
-  useEffect(() => { latest.current = { settings, buildSystemPrompt, locale: i18n.locale } })
+  useEffect(() => { latest.current = { settings, locale: i18n.locale } })
 
   // The chats as they stand on disk, for "the last room".
   useEffect(() => { loadConversations().catch(() => {}) }, [loadConversations])
@@ -1194,8 +1268,11 @@ export default function Shell() {
   // The model cost marks compare with, named once in the picker (settings spec §8).
   const referenceName = useMemo(() => allModels().find((m) => m.reference)?.name ?? null, [])
   const answering = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: answerer, rows: answerRows, stored: chosenHere }), [roomId, roomRecord, answerer, answerRows, chosenHere])
+  const fwStored = roomId ? roomRecord?.frameworks ?? null : pendingFrameworks
+  const fwHere = useMemo(() => frameworksOf(fwStored ?? [], fwList).map((fw) => fw.id), [fwStored, fwList])
+  const frameworkScreens = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: fwHere, stored: fwStored, list: fwList, nameOf: nameOfFramework }), [roomId, roomRecord, fwHere, fwStored, fwList, nameOfFramework])
   const helper = useMemo(() => ({ keyed, provider: destination(PROVIDER)?.name, price: modelFacts(metadataModel(PROVIDER))?.cost ?? null }), [keyed])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -1245,7 +1322,10 @@ export default function Shell() {
     model: answerer.name,
     answerer,
     historyChars: about ? 0 : historyChars(along),
-    systemChars: byModel ? buildSystemPrompt().length : 0,
+    systemChars: byModel ? instructionsOf(fwHere, fwList).length : 0,
+    // The frameworks on the chat, by name; the ones that go, when a model answers (C164).
+    frameworkNames: frameworksOf(fwHere, fwList).map(nameOfFramework),
+    frameworks: byModel ? frameworksOf(fwHere, fwList).map(nameOfFramework) : [],
     perMillion: answerer.price?.inputPerMillion ?? null,
     hiddenOut: about ? 0 : hiddenOut,
     sourcesOut: about ? NO_SOURCES : sourcesOut,
@@ -1254,7 +1334,7 @@ export default function Shell() {
     ink,
     roomName: roomNameHere,
     about,
-  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, buildSystemPrompt, about])
+  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, about])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -1273,6 +1353,9 @@ export default function Shell() {
     // Who answers, read again: the line named them, and no one else is sent
     // to (C150).
     const conv = chatId ? await getConversation(chatId).catch(() => null) : null
+    const fwIds = frameworksOf((chatId ? conv?.frameworks : pendingFwNow.current) ?? [], fwListNow.current).map((fw) => fw.id)
+    const system = () => instructionsOf(fwIds, fwListNow.current)
+    const under = { frameworks: recordOf(fwIds, fwListNow.current) }
     const who = answererOf({ chosen: chatId ? conv?.answerer ?? null : pendingNow.current, keyed: fresh, defaultModel: latest.current.settings.defaultModel })
     if (shown?.answerer && who.id !== shown.answerer.id) return { refused: 'promptChanged' }
     if (who.later || who.gone || who.needsKey || who.unchecked) return { refused: 'promptChanged' }
@@ -1282,8 +1365,7 @@ export default function Shell() {
     if (!text) {
       if (!shown?.resend || !chatId || who.group === 'source' || (who.group === 'model' && !fresh[who.provider])) return { refused: 'promptFailed' }
       setStalledIn(null)
-      const { buildSystemPrompt: system } = latest.current
-      const done = resendWhole(chatId, who.id, system())
+      const done = resendWhole(chatId, who.id, system(), under)
         .then(() => { loadConversations().catch(() => {}); return null })
         .catch(failure)
       return { done }
@@ -1295,8 +1377,9 @@ export default function Shell() {
     if (!id) {
       creating.current = true
       try {
-        const chat = await createConversation({ title: titleFromPrompt(text), model: latest.current.settings.defaultModel, answerer: who.chosen ? who.id : null })
+        const chat = await createConversation({ title: titleFromPrompt(text), model: latest.current.settings.defaultModel, answerer: who.chosen ? who.id : null, frameworks: fwIds })
         setPendingAnswerer(null)
+        setPendingFrameworks(null)
         await assignDefaultRoom(chat.id)
         id = chat.id
         const placed = planRoom(current.current, id)
@@ -1311,9 +1394,9 @@ export default function Shell() {
     const full = aboutNow ? `${aboutNow.text}\n\n${text}` : text
     if (aboutNow) clearPicked()
     const send = () => {
-      const { buildSystemPrompt: system, locale } = latest.current
+      const { locale } = latest.current
       return who.group !== 'source'
-        ? sendMessage(id, full, who.id, system())
+        ? sendMessage(id, full, who.id, system(), [], null, under)
         : askSource(id, text, { source: who.id, lang: sourceLocale(locale) })
     }
     // A new room sends once its messages are loaded, so nothing is lost
@@ -1341,7 +1424,35 @@ export default function Shell() {
     if (!p.act) { setPicking(false); return }
     await onRun(p.next ?? null, `by:${row.id}`, null, p.act)
   }, [onRun, writeField])
+  const toggleFramework = useCallback(async (id) => {
+    const fw = frameworkScreens
+    const ids = fw.now.includes(id) ? fw.now.filter((x) => x !== id) : [...fw.now, id]
+    const word = (x) => {
+      const it = fw.list.find((f) => f.id === x)
+      return it?.builtIn ? it.id : `"${(it?.name ?? '').replace(/"/g, '')}"`
+    }
+    const line = ids.length ? `>framework:${ids.map(word).join(', ')}` : '>framework:off'
+    const p = preview(line, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
+    if (!p.act) return
+    await onRun(p.next ?? null, line.slice(1), null, p.act)
+  }, [frameworkScreens, onRun])
+  const frameworkItems = useMemo(() => fwList.map((fw) => ({
+    id: fw.id,
+    builtIn: fw.builtIn,
+    name: nameOfFramework(fw),
+    about: fw.builtIn ? i18n._(COPY.frameworksAbout[fw.id]) : fw.instruction.slice(0, 120),
+    at: fwHere.includes(fw.id) ? fwHere.indexOf(fw.id) + 1 : null,
+  })), [fwList, fwHere, nameOfFramework, i18n])
+  const toggleFwPicker = useCallback(() => {
+    setInspected(null)
+    setCompared(null)
+    setKeyPanel(null)
+    setPicking(false)
+    setFwPicking((was) => !was)
+  }, [])
+
   const togglePicker = useCallback(() => {
+    setFwPicking(false)
     setInspected(null)
     setCompared(null)
     setKeyPanel(null)
@@ -1441,7 +1552,8 @@ export default function Shell() {
           keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory', region, onRegion: (r) => updateSetting('mistralRegion', r),
             local: { ...LOCAL_ENTRY, origin: window.location.origin, status: local.status, models: local.models, onCheck: () => runLocalCheck() } } : null}
           onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)}
-          picker={picking ? { rows: answerRows, now: answerer, reference: referenceName } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => setPicking(false)} />,
+          picker={picking ? { rows: answerRows, now: answerer, reference: referenceName } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => setPicking(false)}
+          frameworkPicker={fwPicking ? { items: frameworkItems } : null} onFrameworkPicker={toggleFwPicker} onToggleFramework={toggleFramework} onFrameworkPickerClose={() => setFwPicking(false)} />,
         barHost,
       )}
       {barWindow && <p className="ch-away ch-marg">{i18n._(COPY.shell.barAway)}</p>}

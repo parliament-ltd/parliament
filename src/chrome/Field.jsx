@@ -17,7 +17,7 @@ import { CommandFill, PromptFill, Magnifier, Quill, MoonMark } from './Fills'
 // the ink pot shows a reply arriving, arrived, or stopped (C114). A click on
 // the marginalia opens the picker of who can answer (stage 7; C149).
 
-const Field = forwardRef(function Field({ state, folded, win, marginalia = null, onMarginalia = null, marginaliaOpen = false, ink = null, inkKey = null, onInput, onKeyDown, onFocus, onBlur, onOpen, onHover, onLeave }, ref) {
+const Field = forwardRef(function Field({ state, folded, win, marginalia = null, onMarginalia = null, marginaliaOpen = false, frameworks = null, onFrameworks = null, frameworksOpen = false, ink = null, inkKey = null, onInput, onKeyDown, onFocus, onBlur, onOpen, onHover, onLeave }, ref) {
   const { i18n } = useLingui()
   const { mode } = state
   return (
@@ -42,6 +42,10 @@ const Field = forwardRef(function Field({ state, folded, win, marginalia = null,
         spellCheck={false}
         dir="auto"
       />
+      {/* The frameworks on this chat, before who answers (C164). */}
+      {marginalia && frameworks && onFrameworks && (
+        <button type="button" className="ch-marg ch-fmarg pick fw" aria-expanded={frameworksOpen} title={i18n._(COPY.field.frameworkHelp)} onMouseDown={(e) => e.preventDefault()} onClick={onFrameworks}>{frameworks}</button>
+      )}
       {marginalia && (onMarginalia
         ? <button type="button" className="ch-marg ch-fmarg pick" aria-expanded={marginaliaOpen} title={i18n._(COPY.field.answeredHelp)} onMouseDown={(e) => e.preventDefault()} onClick={onMarginalia}>{marginalia}</button>
         : <span className="ch-marg ch-fmarg">{marginalia}</span>)}

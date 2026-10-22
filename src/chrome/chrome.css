@@ -324,6 +324,10 @@
 .ch-shell .ch-fmarg.pick:hover, .ch-shell .ch-fmarg.pick[aria-expanded="true"] { color: var(--ch-ink); }
 .ch-fmarg.pick::after { content: "\25BE"; font-style: normal; font-size: 7px; margin-inline-start: 3px; opacity: 0; transition: opacity var(--ch-dur-fade); }
 .ch-fmarg.pick:hover::after, .ch-fmarg.pick[aria-expanded="true"]::after { opacity: .5; }
+/* The frameworks sit before who answers, a dot between (C164). */
+.ch-fmarg.fw { margin-inline-end: 0; padding-inline-end: 0; }
+.ch-fmarg.fw + .ch-fmarg { padding-inline-start: 10px; }
+.ch-fmarg.fw + .ch-fmarg::before { content: "\00B7"; position: absolute; inset-inline-start: 3px; opacity: .6; }
 
 /* Who can answer: the picker under the field (stage 7, piece 1; A14,
    C148). Branch slider v9's picker: groups, numbered boxes, a cost mark

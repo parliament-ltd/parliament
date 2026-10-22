@@ -39,6 +39,7 @@ export default function MessageCard({
   isGhostText = false,
   stoppedNote = null, // why a cut-off reply stopped, when it was left (C109)
   source = null, // where an answer from a source came from (stage 4)
+  frameworks = null, // the frameworks a reply was written under (stage 7; C164)
   isFavorited = false, showNotes = false,
   savedNoteText = '',
   highlights = [],
@@ -479,6 +480,8 @@ export default function MessageCard({
       {/* Where an answer from a source came from: the page, its revision and
           its licence (stage 4). Words come from the copy table. */}
       {source && source.found !== false && <SourceLine source={source} />}
+      {/* The frameworks it was written under (C164). */}
+      {Array.isArray(frameworks) && frameworks.length > 0 && <FrameworkLine frameworks={frameworks} />}
 
       {/* Ghost text continue button */}
       {isGhostText && content && onContinue && (
@@ -496,6 +499,15 @@ export default function MessageCard({
 }
 
 /* ── Internal sub-components ────────────────────────────── */
+
+// "Written under Push back on me and Editor": the built in by their names in
+// the reader's language, the person's own by the name it had, and one of
+// those since removed with no name kept, said so (C164).
+function FrameworkLine({ frameworks }) {
+  const { i18n } = useLingui()
+  const names = frameworks.map((f) => (COPY.frameworks[f?.id] ? i18n._(COPY.frameworks[f.id]) : f?.name || i18n._(COPY.chat.frameworkGone)))
+  return <p className="mt-2 text-xs italic text-[var(--p-text-secondary)]">{i18n._(COPY.chat.writtenUnder, { names: new Intl.ListFormat(i18n.locale, { type: 'conjunction' }).format(names) })}</p>
+}
 
 // A date as a source gives it: a year stays a year; a full date is written
 // the way the reader's language writes one.

@@ -67,8 +67,17 @@ function validateConversation(item) {
   if (item.answerer != null && !(typeof item.answerer === 'string' && /^[a-z0-9][a-z0-9._:/-]{0,119}$/.test(item.answerer))) {
     return 'conversation.answerer invalid'
   }
+  // The frameworks on the chat, in order: a built-in's id or own:<id> (C164).
+  if (item.frameworks != null && !isFrameworkIds(item.frameworks)) return 'conversation.frameworks invalid'
   return rowFields(item, 'conversation')
 }
+
+// Frameworks (stage 7; C164): ids, and on a reply the name one of the
+// person's own had.
+const FRAMEWORK_ID = /^(own:[A-Za-z0-9_-]{1,128}|[a-z]{1,20})$/
+const isFrameworkIds = (v) => Array.isArray(v) && v.length <= 10 && v.every((id) => typeof id === 'string' && FRAMEWORK_ID.test(id))
+const isFrameworkRecord = (v) => Array.isArray(v) && v.length <= 10 && v.every((f) => f && typeof f === 'object' && !Array.isArray(f)
+  && typeof f.id === 'string' && FRAMEWORK_ID.test(f.id) && (f.name == null || (typeof f.name === 'string' && f.name.length <= 60)))
 
 // Where an answer from a source came from: short strings only, links to https.
 function isSourceNote(s) {
@@ -103,6 +112,7 @@ function validateMessage(item) {
   if (item.stopReason != null && !STOP_REASONS.has(item.stopReason)) return 'message.stopReason invalid'
   // Stage 4: an answer from a source says where it came from.
   if (item.source != null && !isSourceNote(item.source)) return 'message.source invalid'
+  if (item.frameworks != null && !isFrameworkRecord(item.frameworks)) return 'message.frameworks invalid'
   // Stage 6: the model a reply came from, and the tokens it took (C132 (h)).
   if (item.model != null && !isString(item.model, 200)) return 'message.model invalid'
   if (item.usage != null && !isUsage(item.usage)) return 'message.usage invalid'

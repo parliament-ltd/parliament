@@ -346,6 +346,10 @@ msgid "chat.finishSettingHelp"
 msgstr "Off: when you leave a chat while a reply is being written, the reply stops and what arrived is kept. On: it finishes in the background and is saved to its chat."
 
 #. js-lingui-explicit-id
+msgid "chat.frameworkGone"
+msgstr "a framework since removed"
+
+#. js-lingui-explicit-id
 msgid "chat.quote"
 msgstr "Quote"
 
@@ -415,6 +419,11 @@ msgstr "The reply in {chat} stopped when you left it, before any of it arrived."
 #. js-lingui-explicit-id
 msgid "chat.stoppedOnReply"
 msgstr "Stopped when you left the chat. What arrived is kept."
+
+#. Under a reply: the frameworks it was written under (C164). {names} is a list
+#. js-lingui-explicit-id
+msgid "chat.writtenUnder"
+msgstr "Written under {names}"
 
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
@@ -1190,6 +1199,77 @@ msgid "enter.forgetWhich"
 msgstr "More than one saved search starts that way: {words}"
 
 #. js-lingui-explicit-id
+msgid "enter.frameworkBuiltInName"
+msgstr "“{name}” is a framework built in. Give yours another name"
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkFailed"
+msgstr "The framework was not kept. Try again"
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkForget"
+msgstr "Enter removes your framework “{name}”. Chats it is on go on without it"
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkKeep"
+msgstr "Enter keeps “{name}” as a framework of yours. framework: puts it on a chat"
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkLong"
+msgstr "A name is at most {name} characters, and what it asks at most {instruction}"
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkMost"
+msgstr "At most {count} frameworks on one chat"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.frameworkNeeds"
+msgstr "A framework needs a name and what it asks: new:framework \"brief\" \"keep each answer short\""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.frameworkNone"
+msgstr "No framework is called {word}. framework: shows them"
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkOff"
+msgstr "Enter turns off the frameworks in {num}"
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkOffNext"
+msgstr "Enter starts the next chat with no framework"
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkReplace"
+msgstr "Enter rewrites your framework “{name}”. Chats it is on use the new words from their next prompt"
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkSame"
+msgstr "That is how the frameworks stand here already"
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkSameWords"
+msgstr "Your framework “{name}” says that already"
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkSet"
+msgstr "{count, plural, one {Enter sets framework {frameworks} for every prompt in {num}, until turned off} other {Enter sets frameworks {frameworks} for every prompt in {num}, in that order, until turned off}}"
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkSetNext"
+msgstr "{count, plural, one {Enter sets framework {frameworks} for the chat your next prompt starts} other {Enter sets frameworks {frameworks} for the chat your next prompt starts, in that order}}"
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkShow"
+msgstr "{count, plural, =0 {No framework is on here. Enter shows them} one {Framework {frameworks} is on here. Enter shows them all} other {Frameworks {frameworks} are on here. Enter shows them all}}"
+
+#. {names} is a list joined with "or"
+#. js-lingui-explicit-id
+msgid "enter.frameworkWhich"
+msgstr "{word} could be {names}. Say which, like {example}"
+
+#. js-lingui-explicit-id
 msgid "enter.fromWhat"
 msgstr "Nothing comes from {num}. from: takes a chat, a plan, a branch or a run"
 
@@ -1596,6 +1676,10 @@ msgstr "After the answer, one short request for its title, summary and tags"
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"
 msgstr "The prompt did not go through. Try again"
+
+#. js-lingui-explicit-id
+msgid "enter.promptFrameworks"
+msgstr "{count, plural, one {Framework {frameworks} goes with it} other {Frameworks {frameworks} go with it, in that order}}"
 
 #. C151: a chat or a default naming a model the list no longer has
 #. js-lingui-explicit-id
@@ -2107,6 +2191,82 @@ msgstr "answered from {source}"
 #. js-lingui-explicit-id
 msgid "field.answeredHelp"
 msgstr "Choose who answers here (by:)"
+
+#. js-lingui-explicit-id
+msgid "field.frameworkHelp"
+msgstr "Choose the frameworks for this chat (framework:)"
+
+#. Marginalia in the prompt field; framework: is the command, kept English
+#. js-lingui-explicit-id
+msgid "field.frameworkNone"
+msgstr "framework: none"
+
+#. The first framework on this chat, and how many more
+#. js-lingui-explicit-id
+msgid "field.frameworkSome"
+msgstr "{more, plural, =0 {framework: {first}} other {framework: {first} +#}}"
+
+#. js-lingui-explicit-id
+msgid "framework.about.alts"
+msgstr "Give two or three ways, not one."
+
+#. js-lingui-explicit-id
+msgid "framework.about.challenge"
+msgstr "Question what it is given instead of taking it as settled."
+
+#. js-lingui-explicit-id
+msgid "framework.about.pushback"
+msgstr "Disagree when it thinks you are wrong."
+
+#. js-lingui-explicit-id
+msgid "framework.about.reasoning"
+msgstr "Lay out the steps before the answer."
+
+#. js-lingui-explicit-id
+msgid "framework.about.uncertain"
+msgstr "Say how sure it is, and where it is guessing."
+
+#. js-lingui-explicit-id
+msgid "framework.alts"
+msgstr "Offer alternatives"
+
+#. js-lingui-explicit-id
+msgid "framework.challenge"
+msgstr "Challenge artifacts"
+
+#. js-lingui-explicit-id
+msgid "framework.pushback"
+msgstr "Push back on me"
+
+#. js-lingui-explicit-id
+msgid "framework.reasoning"
+msgstr "Show reasoning"
+
+#. js-lingui-explicit-id
+msgid "framework.uncertain"
+msgstr "Flag uncertainty"
+
+#. js-lingui-explicit-id
+msgid "frameworkPicker.builtIn"
+msgstr "Built in"
+
+#. js-lingui-explicit-id
+msgid "frameworkPicker.foot"
+msgstr "They go with every prompt in this chat, in the order ticked, until turned off."
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "frameworkPicker.noneYet"
+msgstr "None of your own yet. new:framework \"name\" \"what it asks\" writes one."
+
+#. A framework of your own with no name, as a persona could be
+#. js-lingui-explicit-id
+msgid "frameworkPicker.unnamed"
+msgstr "unnamed"
+
+#. js-lingui-explicit-id
+msgid "frameworkPicker.yours"
+msgstr "Yours"
 
 #. js-lingui-explicit-id
 msgid "group.building"
@@ -3062,7 +3222,7 @@ msgstr "Clear the screen to your chosen boards, keep that set, or come back"
 
 #. js-lingui-explicit-id
 msgid "verb.forget"
-msgstr "Remove a saved search, collection or arrangement"
+msgstr "Remove a saved search, collection, framework of yours or arrangement"
 
 #. js-lingui-explicit-id
 msgid "verb.framework"
@@ -3138,7 +3298,7 @@ msgstr "Name what the bar is pointed at: a room, a collection or a chat"
 
 #. js-lingui-explicit-id
 msgid "verb.new"
-msgstr "Make a chat, plan, room, collection, branch, step, run or block"
+msgstr "Make a chat, plan, room, collection, framework, branch, step, run or block"
 
 #. js-lingui-explicit-id
 msgid "verb.note"

@@ -502,6 +502,37 @@ export const COPY = {
     },
     promptLocalUnchecked: /*i18n*/ { id: 'enter.promptLocalUnchecked', message: '{name} is on this computer, but {provider} has not listed it since this page opened. {command} checks', comment: 'Commands stay English' },
     apiLocal: /*i18n*/ { id: 'enter.apiLocal', message: 'Enter shows {provider} on this computer, and how to check for it' },
+    // Frameworks (C164). {frameworks} is a list joined with "and"; {num} a chat.
+    promptFrameworks: /*i18n*/ {
+      id: 'enter.promptFrameworks',
+      message: '{count, plural, one {Framework {frameworks} goes with it} other {Frameworks {frameworks} go with it, in that order}}',
+    },
+    frameworkSet: /*i18n*/ {
+      id: 'enter.frameworkSet',
+      message: '{count, plural, one {Enter sets framework {frameworks} for every prompt in {num}, until turned off} other {Enter sets frameworks {frameworks} for every prompt in {num}, in that order, until turned off}}',
+    },
+    frameworkSetNext: /*i18n*/ {
+      id: 'enter.frameworkSetNext',
+      message: '{count, plural, one {Enter sets framework {frameworks} for the chat your next prompt starts} other {Enter sets frameworks {frameworks} for the chat your next prompt starts, in that order}}',
+    },
+    frameworkOff: /*i18n*/ { id: 'enter.frameworkOff', message: 'Enter turns off the frameworks in {num}' },
+    frameworkOffNext: /*i18n*/ { id: 'enter.frameworkOffNext', message: 'Enter starts the next chat with no framework' },
+    frameworkSame: /*i18n*/ { id: 'enter.frameworkSame', message: 'That is how the frameworks stand here already' },
+    frameworkShow: /*i18n*/ {
+      id: 'enter.frameworkShow',
+      message: '{count, plural, =0 {No framework is on here. Enter shows them} one {Framework {frameworks} is on here. Enter shows them all} other {Frameworks {frameworks} are on here. Enter shows them all}}',
+    },
+    frameworkNone: /*i18n*/ { id: 'enter.frameworkNone', message: 'No framework is called {word}. framework: shows them', comment: 'Commands stay English' },
+    frameworkWhich: /*i18n*/ { id: 'enter.frameworkWhich', message: '{word} could be {names}. Say which, like {example}', comment: '{names} is a list joined with "or"' },
+    frameworkMost: /*i18n*/ { id: 'enter.frameworkMost', message: 'At most {count} frameworks on one chat' },
+    frameworkKeep: /*i18n*/ { id: 'enter.frameworkKeep', message: 'Enter keeps “{name}” as a framework of yours. framework: puts it on a chat' },
+    frameworkReplace: /*i18n*/ { id: 'enter.frameworkReplace', message: 'Enter rewrites your framework “{name}”. Chats it is on use the new words from their next prompt' },
+    frameworkSameWords: /*i18n*/ { id: 'enter.frameworkSameWords', message: 'Your framework “{name}” says that already' },
+    frameworkNeeds: /*i18n*/ { id: 'enter.frameworkNeeds', message: 'A framework needs a name and what it asks: new:framework "brief" "keep each answer short"', comment: 'Commands stay English' },
+    frameworkLong: /*i18n*/ { id: 'enter.frameworkLong', message: 'A name is at most {name} characters, and what it asks at most {instruction}' },
+    frameworkBuiltInName: /*i18n*/ { id: 'enter.frameworkBuiltInName', message: '“{name}” is a framework built in. Give yours another name' },
+    frameworkForget: /*i18n*/ { id: 'enter.frameworkForget', message: 'Enter removes your framework “{name}”. Chats it is on go on without it' },
+    frameworkFailed: /*i18n*/ { id: 'enter.frameworkFailed', message: 'The framework was not kept. Try again' },
     promptPerDay: /*i18n*/ { id: 'enter.promptPerDay', message: 'About {count} searches a day without a key, shared by everyone on your network', comment: 'Said when a source with a daily allowance answers (C156)' },
     sourceNetwork: /*i18n*/ { id: 'enter.sourceNetwork', message: '{source} is not answering from your current network. A VPN can cause this; try without it for this source', comment: 'A source refused the request (403), as some do for shared VPN addresses (LPN §8)' },
     sourceBusy: /*i18n*/ { id: 'enter.sourceBusy', message: '{source} says too many requests from your network for now. Try again later', comment: 'A source answered 429: its allowance for this network is used up, or it is busy' },
@@ -539,6 +570,9 @@ export const COPY = {
   field: {
     answeredFrom: /*i18n*/ { id: 'field.answeredFrom', message: 'answered from {source}' },
     answeredBy: /*i18n*/ { id: 'field.answeredBy', message: 'answered by {model}' },
+    frameworkNone: /*i18n*/ { id: 'field.frameworkNone', message: 'framework: none', comment: 'Marginalia in the prompt field; framework: is the command, kept English' },
+    frameworkSome: /*i18n*/ { id: 'field.frameworkSome', message: '{more, plural, =0 {framework: {first}} other {framework: {first} +#}}', comment: 'The first framework on this chat, and how many more' },
+    frameworkHelp: /*i18n*/ { id: 'field.frameworkHelp', message: 'Choose the frameworks for this chat (framework:)' },
     answeredHelp: /*i18n*/ { id: 'field.answeredHelp', message: 'Choose who answers here (by:)', comment: 'Shown on hover over who answers, in the prompt field' },
   },
 
@@ -839,6 +873,32 @@ export const COPY = {
     marks: /*i18n*/ { id: 'picker.marks', message: 'Marks compare cost per token with {reference}.', comment: '{reference} is a model name, from the list' },
     oneAtATime: /*i18n*/ { id: 'picker.oneAtATime', message: 'One answers at a time until branches come.' },
   },
+  // The five frameworks built in (the editing spec's collab:, renamed by
+  // C131), by id. The instructions sent to a model are in lib/frameworks.js.
+  frameworks: {
+    challenge: /*i18n*/ { id: 'framework.challenge', message: 'Challenge artifacts' },
+    reasoning: /*i18n*/ { id: 'framework.reasoning', message: 'Show reasoning' },
+    pushback: /*i18n*/ { id: 'framework.pushback', message: 'Push back on me' },
+    alts: /*i18n*/ { id: 'framework.alts', message: 'Offer alternatives' },
+    uncertain: /*i18n*/ { id: 'framework.uncertain', message: 'Flag uncertainty' },
+  },
+  // What each asks, from the editing spec's table.
+  frameworksAbout: {
+    challenge: /*i18n*/ { id: 'framework.about.challenge', message: 'Question what it is given instead of taking it as settled.' },
+    reasoning: /*i18n*/ { id: 'framework.about.reasoning', message: 'Lay out the steps before the answer.' },
+    pushback: /*i18n*/ { id: 'framework.about.pushback', message: 'Disagree when it thinks you are wrong.' },
+    alts: /*i18n*/ { id: 'framework.about.alts', message: 'Give two or three ways, not one.' },
+    uncertain: /*i18n*/ { id: 'framework.about.uncertain', message: 'Say how sure it is, and where it is guessing.' },
+  },
+  // The frameworks' picker under the field (C164).
+  frameworkPicker: {
+    builtIn: /*i18n*/ { id: 'frameworkPicker.builtIn', message: 'Built in' },
+    yours: /*i18n*/ { id: 'frameworkPicker.yours', message: 'Yours' },
+    noneYet: /*i18n*/ { id: 'frameworkPicker.noneYet', message: 'None of your own yet. new:framework "name" "what it asks" writes one.', comment: 'Commands stay English' },
+    unnamed: /*i18n*/ { id: 'frameworkPicker.unnamed', message: 'unnamed', comment: 'A framework of your own with no name, as a persona could be' },
+    foot: /*i18n*/ { id: 'frameworkPicker.foot', message: 'They go with every prompt in this chat, in the order ticked, until turned off.' },
+  },
+
   // Sources in the picker by the kind of question they answer.
   pickerKinds: {
     reference: /*i18n*/ { id: 'picker.kind.reference', message: 'Reference', comment: 'Sources by the kind of question they answer (branch slider v9)' },
@@ -1019,6 +1079,8 @@ export const COPY = {
     // An answer from a source (stage 4). {source} is its name, from the list.
     answeredFrom: /*i18n*/ { id: 'chat.answeredFrom', message: 'Answered from {source}' },
     sourceRevision: /*i18n*/ { id: 'chat.sourceRevision', message: 'revision {revision}' },
+    writtenUnder: /*i18n*/ { id: 'chat.writtenUnder', message: 'Written under {names}', comment: 'Under a reply: the frameworks it was written under (C164). {names} is a list' },
+    frameworkGone: /*i18n*/ { id: 'chat.frameworkGone', message: 'a framework since removed' },
     sourceNothing: /*i18n*/ { id: 'chat.sourceNothing', message: 'Nothing found on {source} for that. Try other words.' },
     // A list of results from a source (stage 7, piece 2).
     sourcePoints: /*i18n*/ { id: 'chat.sourcePoints', message: '{count, plural, one {# point} other {# points}}', comment: 'A Hacker News story\'s points' },

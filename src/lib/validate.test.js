@@ -101,3 +101,14 @@ describe('a backup with a list of results from a source (stage 7, piece 2; C156 
     expect(list([item], { shape: 'record' }).valid).toBe(false)
   })
 })
+
+describe('a backup with frameworks on chats and replies (stage 7, piece 5; C164)', () => {
+  it('accepts ids and names, and refuses anything else', () => {
+    const c = (extra) => validateBackup({ conversations: [{ ...chat, ...extra }] })
+    expect(c({ frameworks: ['pushback', 'own:e1'] })).toEqual({ valid: true })
+    expect(c({ frameworks: ['<b>'] }).valid).toBe(false)
+    expect(c({ frameworks: Array(11).fill('pushback') }).valid).toBe(false)
+    expect(check(reply({ incomplete: false, frameworks: [{ id: 'pushback' }, { id: 'own:e1', name: 'Editor' }] }))).toEqual({ valid: true })
+    expect(check(reply({ incomplete: false, frameworks: [{ id: 'own:e1', name: 7 }] })).valid).toBe(false)
+  })
+})

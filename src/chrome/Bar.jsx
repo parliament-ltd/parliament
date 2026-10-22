@@ -16,6 +16,7 @@ import Inspect from './Inspect'
 import Compare from './Compare'
 import KeyPanel from './KeyPanel'
 import AnswerPicker from './AnswerPicker'
+import FrameworkPicker from './FrameworkPicker'
 
 // One bar: the field, its Enter line and the ? reference, pointed at one
 // board. The page has one, and so does every popped window (C6: each window
@@ -47,7 +48,7 @@ import AnswerPicker from './AnswerPicker'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, picker = null, onPicker = null, onPickAnswerer, onPickerClose, onSearch, searches = {}, searchCounts = {} }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, onSearch, searches = {}, searchCounts = {} }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -172,6 +173,11 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       ? i18n._(COPY.field.answeredFrom, { source: who.name })
       : i18n._(COPY.field.answeredBy, { model: who.name })
   }
+  // The frameworks on this chat: "framework: none", or the first and how many more (C164).
+  const names = prompt?.frameworkNames ?? []
+  const frameworksMarg = marginalia
+    ? (names.length ? i18n._(COPY.field.frameworkSome, { first: names[0], more: names.length - 1 }) : i18n._(COPY.field.frameworkNone))
+    : null
   const room = prompt && prompt.room !== undefined
     ? { chat: prompt.chat ?? null, name: prompt.room ? roomLabel(i18n, prompt.roomName ?? null) : null, fresh: Boolean(prompt.about) }
     : undefined
@@ -218,6 +224,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       if (compare) { onCompareClose?.(); return }
       if (keyPanel) { onKeysClose?.(); return }
       if (picker) { onPickerClose?.(); return }
+      if (frameworkPicker) { onFrameworkPickerClose?.(); return }
       // The field's rule first, then the caret: moving the caret blurs the
       // field, which would otherwise come before the Escape.
       dispatch({ type: 'escape' })
@@ -260,6 +267,9 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           marginalia={marginalia}
           onMarginalia={onPicker}
           marginaliaOpen={Boolean(picker)}
+          frameworks={frameworksMarg}
+          onFrameworks={onFrameworkPicker}
+          frameworksOpen={Boolean(frameworkPicker)}
           ink={prompt?.room !== undefined ? prompt?.ink ?? null : null}
           inkKey={prompt?.room ?? null}
           onOpen={() => { dispatch({ type: 'open' }); input.current?.focus() }}
@@ -281,6 +291,9 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
         {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
         {!reference && inspect && <Inspect row={inspect} />}
         {!reference && !inspect && compare && <Compare a={compare.a} b={compare.b} />}
+        {!reference && !inspect && !compare && !keyPanel && !picker && frameworkPicker && (
+          <FrameworkPicker items={frameworkPicker.items} onToggle={onToggleFramework} />
+        )}
         {!reference && !inspect && !compare && !keyPanel && picker && (
           <AnswerPicker rows={picker.rows} now={picker.now} reference={picker.reference} onPick={onPickAnswerer} />
         )}

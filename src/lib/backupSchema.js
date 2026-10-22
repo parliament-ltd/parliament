@@ -17,9 +17,11 @@ export const FIELDS = Object.freeze({
     'pinned', 'storageBytes', 'createdAt', 'updatedAt', 'tags', 'tagsBy', 'aiSummary',
     'num', 'docketId', 'branch', 'run', 'restoredFrom', 'archived', 'tagsMine',
     // answerer: who answers in the chat, when someone chose (stage 7; C150).
-    'answerer'],
+    // frameworks: the standing instructions on the chat, in order (C164).
+    'answerer', 'frameworks'],
   // model and usage: what a reply was made with and its tokens (C132 (h), stage 6).
-  messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta', 'stopReason', 'source', 'model', 'usage'],
+  // frameworks: what a reply was written under (stage 7; C164).
+  messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta', 'stopReason', 'source', 'model', 'usage', 'frameworks'],
   // quotes: the numbers a note quotes beneath it; summary: a dated summary
   // note's numbers, day and model (stage 6, piece 7; C145 (e), (g)).
   notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom', 'quotes', 'summary'],
