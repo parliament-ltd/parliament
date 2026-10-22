@@ -37,14 +37,15 @@ import KeyPanel from './KeyPanel'
 // whether it went ({ refused } or { done }), then once it is answered
 // (done resolves to a notice, or null).
 
-// Search narrows the board the bar points at as it is typed (C132 (a)): for
-// now Records. While the bar points at Records it reports what is typed in
-// search (onSearch), and `search` is how many rows that leaves, for the
-// Enter line. searchTo ({ text, n }) changes when the search is set from
-// elsewhere: emptied by clear:filters or clear:search, or a saved search's
-// words when one is opened (C140).
+// Search narrows the board the bar points at as it is typed (C132 (a)):
+// Records and the Collection, each keeping its own (C144 (h)). `searches`
+// holds each one's search: the field shows the one of the board it points
+// at, and follows when it is set from elsewhere (clear:filters, a saved
+// search opened). What is typed goes back through onSearch(board, text).
+// `searchCounts` says what each search leaves, for the Enter line.
+const SEARCHABLE = new Set(['almanac', 'collection'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, onSearch, search = null, searchTo = null }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, onSearch, searches = {}, searchCounts = {} }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -66,14 +67,42 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     dispatch({ type: 'input', value: write.value })
     input.current?.focus()
   }, [write])
+  // What the last command did gives way to what the written one would do.
+  const [wrote, setWrote] = useState(write)
+  if (wrote !== write) {
+    setWrote(write)
+    setNotice(null)
+  }
 
   // The field's mode, for the welcome page's first step.
   useEffect(() => { onMode?.(field.mode) }, [field.mode, onMode])
 
-  // What is searched for on Records, as it is typed.
+  // The search of the board the bar points at (C144 (h)).
   const searched = field.text.search
-  useEffect(() => { if (board === 'almanac') onSearch?.(searched) }, [board, searched, onSearch])
-  useEffect(() => { if (searchTo) dispatch({ type: 'setSearch', value: searchTo.text }) }, [searchTo])
+  const own = SEARCHABLE.has(board) ? searches[board] ?? '' : null
+  const sent = useRef(own)
+  const pointedAt = useRef(board)
+  useEffect(() => {
+    if (pointedAt.current !== board) {
+      // Pointed at another board: the field shows that board's search.
+      pointedAt.current = board
+      sent.current = own ?? ''
+      if (own != null && searched !== own) dispatch({ type: 'setSearch', value: own })
+      return
+    }
+    if (own == null) return
+    if (own !== sent.current) {
+      // Set from elsewhere: emptied, or a saved search's words.
+      sent.current = own
+      if (searched !== own) dispatch({ type: 'setSearch', value: own })
+      return
+    }
+    if (searched !== sent.current) {
+      // Typed here.
+      sent.current = searched
+      onSearch?.(board, searched)
+    }
+  }, [board, own, searched, onSearch])
   useEffect(() => { if (autoFocus) input.current?.focus() }, [autoFocus])
 
   // `/` outside text fields, and Cmd/Ctrl+K from anywhere, in this document.
@@ -233,7 +262,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           onBlur={() => dispatch({ type: 'blur' })}
         />
         </div>
-        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} addressed={board} room={room} welcome={welcome} search={board === 'almanac' ? search : null} />
+        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} />
         {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
         {!reference && inspect && <Inspect row={inspect} />}
         {!reference && !inspect && keyPanel && (

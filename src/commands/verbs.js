@@ -107,7 +107,7 @@ export const VERBS = Object.freeze([
     forms: ['open:207', 'open:201a', 'open:201a summary', 'open:run 1', 'open:"Writing Studio"', 'open:library', 'open:records', 'open:settings keys'],
     // open:records brings the Records board alone, where records: brings
     // Records and the Collection together (C124, C125, C131).
-    takes: [[[...BOARD_NAMES, 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text']], stage: 3, click: 'apply',
+    takes: [[[...BOARD_NAMES, 'lab'], { opt: 'word' }], [['run'], 'number'], ['address', { opt: ['summary'] }], ['text'], ['text', ['search', 'collection']]], stage: 3, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.open', message: 'Open a board, or anything by its number or name' } }),
   v({ verb: 'close', group: 'start', example: 'close:records', takes: [[], [BOARD_NAMES], ['address']], stage: 3, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.close', message: 'Take a board off the screen. Nothing is lost' } }),
@@ -146,7 +146,8 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.since', message: 'Show what was made since a date' } }),
   v({ verb: 'until', group: 'filters', example: 'until:09/10/26', takes: [['text']], on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.until', message: 'Show what was made until a date' } }),
-  v({ verb: 'sort', group: 'filters', example: 'sort:active', takes: [[['created', 'active', 'oldest', 'newest']]], on: TABLES, stage: 6, click: 'apply',
+  // On the Collection, sort: also takes yours and source (C144 (e)).
+  v({ verb: 'sort', group: 'filters', example: 'sort:active', forms: ['sort:active', 'sort:oldest', 'sort:yours'], takes: [[['created', 'active', 'oldest', 'newest', 'yours', 'source']]], on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.sort', message: 'Order the table' } }),
   v({ verb: 'save', group: 'filters', example: 'save:"Water tower"', takes: [['text']], on: ['almanac'], stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.save', message: 'Keep this search under a name' } }),
@@ -171,13 +172,13 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.name', message: 'Name what the bar is pointed at: a room, a collection or a chat' } }),
   v({ verb: 'duplicate', group: 'collection', example: 'duplicate:"Writing Studio"', takes: [[], ['text']], stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.duplicate', message: 'Copy a room, collection or plan under a new name' } }),
-  v({ verb: 'heading', group: 'collection', example: 'heading:"Sources"', takes: [['text']], on: ['collection'], stage: 6, undoable: true,
+  v({ verb: 'heading', group: 'collection', example: 'heading:"Sources"', forms: ['heading:"Sources"', 'heading:"Sources" before 215'], takes: [['text'], ['text', ['before', 'after'], 'address']], on: ['collection'], stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.heading', message: 'Add a heading to a collection in your own order' } }),
   v({ verb: 'summarize', group: 'collection', example: 'summarize:207, 216', takes: [[], ['addresses']], on: TABLES, stage: 6, spends: true, undoable: true,
     gloss: /*i18n*/ { id: 'verb.summarize', message: "Rewrite each row's summary line" } }),
   v({ verb: 'rewrite', group: 'collection', example: 'rewrite:234', takes: [['address']], on: ['collection'], stage: 6, spends: true, undoable: true,
     gloss: /*i18n*/ { id: 'verb.rewrite', message: 'Write a new dated summary beside the old one' } }),
-  v({ verb: 'forget', group: 'collection', example: 'forget:"Surprised me"', takes: [['text']], stage: 6, undoable: true,
+  v({ verb: 'forget', group: 'collection', example: 'forget:"Surprised me"', forms: ['forget:"Surprised me"', 'forget:"Q2" collection'], takes: [['text'], ['text', ['search', 'collection']]], stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.forget', message: 'Remove a saved search, collection or arrangement' } }),
 
   // Tags

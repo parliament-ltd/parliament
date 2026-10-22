@@ -39,6 +39,10 @@ import { listLayoutEntries } from '../catalog/layouts'
 import { readAlmanac } from '../lib/almanacRows'
 import { createFactsCache } from '../lib/chatFacts'
 import { readSaved, keepSearch, forgetSearch, putSaved } from '../lib/savedSearches'
+import { readCollections, writeCollection, newCollection } from '../lib/collections'
+import { cardsOf, tabCounts, sequenceOf } from '../lib/collectionCards'
+import { searchTerms } from '../lib/recordsFilter'
+import CollectionBoard from './CollectionBoard'
 import { changeRecords, eraseRecords } from '../lib/records'
 import { exportItems, gatherExport, itemsMarkdown, exportMarkdown, exportJsonl, exportType } from '../lib/recordsExport'
 import { dayOf } from './when'
@@ -346,13 +350,15 @@ export default function Shell() {
       const now = Promise.all([
         readAlmanac(db.current, { facts: factsCache.current, priceOf }).catch(() => ({ rows: [], collections: [], rooms: [] })),
         readSaved(db.current).catch(() => []),
+        readCollections(db.current).catch(() => []),
       ])
       reading = now
-      now.then(([{ rows, collections, rooms }, kept]) => {
+      now.then(([{ rows, collections, rooms }, kept, kept2]) => {
         if (!live || reading !== now) return
         setAlmanacRows(rows)
         setRecordsNames({ collections, rooms })
         setSaved(kept)
+        setCollections(kept2)
       })
     }
     read()
@@ -368,12 +374,14 @@ export default function Shell() {
   const [recordsView, setRecordsView] = useState(EMPTY_VIEW)
   const viewNow = useRef(EMPTY_VIEW)
   useEffect(() => { viewNow.current = recordsView }, [recordsView])
-  const [searchTo, setSearchTo] = useState(null) // { text, n }: the bar's search, set from here
-  const searchSets = useRef(0)
-  const onSearch = useCallback((text) => setRecordsView((v) => (v.search === text ? v : { ...v, search: text })), [])
+  // Search follows the board the bar points at (C144 (h)): Records and the
+  // Collection each keep their own, and the field shows the one it points at.
+  const [collectionSearch, setCollectionSearch] = useState('')
+  const onSearch = useCallback((board, text) => {
+    if (board === 'almanac') setRecordsView((v) => (v.search === text ? v : { ...v, search: text }))
+    if (board === 'collection') setCollectionSearch(text)
+  }, [])
   const showView = useCallback((view) => {
-    // The bar's search follows: emptied, or a saved search's words (C140).
-    if ((viewNow.current.search ?? '') !== (view.search ?? '')) setSearchTo({ text: view.search ?? '', n: ++searchSets.current })
     viewNow.current = view
     setRecordsView(view)
   }, [])
@@ -402,7 +410,10 @@ export default function Shell() {
     }
   }, [recordsNames, i18n])
   const shownRows = useMemo(() => (almanacRows ? applyView(almanacRows, recordsView, recordsCtx.ctx) : null), [almanacRows, recordsView, recordsCtx])
-  const records = useMemo(() => ({ ...recordsCtx, rows: almanacRows ?? [], view: recordsView, saved, now: Date.now() }), [recordsCtx, almanacRows, recordsView, saved])
+  const records = useMemo(() => {
+    const now = Date.now()
+    return { ...recordsCtx, rows: almanacRows ?? [], view: recordsView, saved, now, nowIso: new Date(now).toISOString() }
+  }, [recordsCtx, almanacRows, recordsView, saved])
   // The saved search on screen: the one whose search and filters are the view's (C140 (a)).
   const currentSaved = useMemo(() => {
     const line = lineOf(recordsView)
@@ -413,6 +424,50 @@ export default function Shell() {
   useEffect(() => { recordsRef.current = records }, [records])
   const savedNow = useRef([])
   useEffect(() => { savedNow.current = saved }, [saved])
+
+  // ── The Collection (stage 6, piece 6; C144) ───────────
+  // Every collection, the one the space shows (else the one changed last),
+  // the messages it holds, and its cards as the tab, the search and the order
+  // have them. Tab, order and search are kept for the tab.
+  const [collections, setCollections] = useState([])
+  const [collectionView, setCollectionView] = useState({ tab: 'all', sort: 'yours', asc: false })
+  const collectionLabel = useCallback((c) => c?.name || (c?.builtIn && COPY.collections[c.builtIn] ? i18n._(COPY.collections[c.builtIn]) : i18n._(COPY.collections.untitled)), [i18n])
+  const shownCollection = useMemo(() => {
+    const id = arrangement.context?.collection
+    return collections.find((c) => c.id === id) ?? collections[0] ?? null
+  }, [collections, arrangement.context])
+  const [collectionMessages, setCollectionMessages] = useState(new Map())
+  useEffect(() => {
+    if (!db.current || !shownCollection) return undefined
+    let live = true
+    const ids = shownCollection.items.filter((i) => i.kind === 'message').map((i) => i.messageId)
+    Promise.all(ids.map((id) => db.current.get('messages', id).catch(() => null)))
+      .then((found) => { if (live) setCollectionMessages(new Map(found.filter(Boolean).map((m) => [m.id, m]))) })
+    return () => { live = false }
+  }, [shownCollection, almanacRows])
+  const collectionAll = useMemo(() => cardsOf(shownCollection, almanacRows ?? [], collectionMessages), [shownCollection, almanacRows, collectionMessages])
+  const collectionShown = useMemo(() => {
+    const terms = searchTerms(collectionSearch)
+    const tab = collectionView.tab
+    const counts = tabCounts(collectionAll.cards)
+    const inTab = tab === 'all' || !counts[tab] ? collectionAll.cards : collectionAll.cards.filter((c) => c.kind === tab)
+    const cards = terms.length ? inTab.filter((c) => terms.every((t) => c.text.toLocaleLowerCase().includes(t))) : inTab
+    const view = { ...collectionView, tab: tab !== 'all' && !counts[tab] ? 'all' : tab }
+    return { cards, counts, view, entries: shownCollection ? sequenceOf(cards, shownCollection, view.sort, { asc: view.asc, sources: collectionAll.sources }) : [] }
+  }, [collectionAll, collectionSearch, collectionView, shownCollection])
+  // What the picker offers to hold: plans and chats, the ones it holds and the most recently active.
+  const pickable = useMemo(() => {
+    const held = new Set(collectionAll.sources.map((x) => `${x.kind === 'plan' ? 'docket' : 'chat'}:${x.num}`))
+    const rows = (almanacRows ?? []).filter((r) => (r.kind === 'chat' || r.kind === 'docket') && !r.archived)
+    return rows.filter((r, i) => i < 30 || held.has(`${r.kind}:${r.num}`))
+  }, [almanacRows, collectionAll])
+  const collectionScreens = useMemo(() => ({
+    shown: shownCollection, all: collections, cards: collectionAll.cards, label: collectionLabel, view: collectionView,
+  }), [shownCollection, collections, collectionAll, collectionLabel, collectionView])
+  const onShowCollection = useCallback((c) => {
+    const a = current.current
+    commit({ ...a, context: { ...a.context, collection: c.id } })
+  }, [commit])
 
   // copy: and export: (C143 (f), C138): built from what is stored, in the
   // reader's language around the person's words. Hidden messages and
@@ -595,6 +650,34 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'collectionWrite' || what.kind === 'newCollection') {
+      // new:collection, add:, rm:, clear:, heading:, move:, name:, forget: (C144).
+      const change = what.kind === 'newCollection'
+        ? { id: crypto.randomUUID(), before: null, after: null }
+        : { id: what.id, before: what.before, after: what.after }
+      if (what.kind === 'newCollection') change.after = newCollection({ id: change.id, now: new Date().toISOString() })
+      try {
+        await writeCollection(db.current, change)
+      } catch (err) {
+        return err?.name === 'Changed' ? 'collectionChanged' : 'savedFailed'
+      }
+      touched.current?.collections.push(change)
+      setCollections(await readCollections(db.current).catch(() => []))
+      // A new collection is shown, the Collection brought here if need be.
+      if (what.kind === 'newCollection') {
+        const a = current.current
+        const here = a.columns.flat().includes('collection') || a.popped.some((p) => p.board === 'collection')
+        const next = here ? address(a, 'collection') : planOpen(a, 'collection').next ?? a
+        commit({ ...next, context: { ...next.context, collection: change.id } })
+      }
+      remember(body)
+      return null
+    }
+    if (what.kind === 'collectionView') {
+      setCollectionView(what.view)
+      remember(body)
+      return null
+    }
     if (what.kind === 'saveSearch' || what.kind === 'forgetSearch') {
       // save: and forget: (C140). Kept on this device only.
       const was = what.kind === 'saveSearch'
@@ -667,6 +750,14 @@ export default function Shell() {
       }
       setSaved(await readSaved(db.current).catch(() => []))
     }
+    if (entry.collections) {
+      try {
+        for (const c of [...entry.collections].reverse()) await writeCollection(db.current, { id: c.id, before: c.after, after: c.before })
+      } catch (err) {
+        return stop(err?.name === 'Changed' ? 'collectionChanged' : 'undoFailed')
+      }
+      setCollections(await readCollections(db.current).catch(() => []))
+    }
     if (entry.view) showView(entry.view)
     if (entry.arrangement) {
       const refused = await run(entry.arrangement, null)
@@ -681,7 +772,7 @@ export default function Shell() {
   const onRun = useCallback(async (next, body, go, what) => {
     if (what?.kind === 'undo') return undo(body)
     const before = { arrangement: current.current, view: viewNow.current }
-    touched.current = { records: [], saved: [] }
+    touched.current = { records: [], saved: [], collections: [] }
     const out = what ? await act(what, body, next) : await run(next, body)
     const t = touched.current
     touched.current = null
@@ -698,7 +789,8 @@ export default function Shell() {
     if (viewNow.current !== before.view) entry.view = before.view
     if (t.records.length) entry.records = t.records
     if (t.saved.length) entry.saved = t.saved
-    if (body && (entry.arrangement || entry.view || entry.records || entry.saved)) {
+    if (t.collections.length) entry.collections = t.collections
+    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections)) {
       undoStack.current = [...undoStack.current, entry].slice(-UNDO_MAX)
       setUndoTop(body)
     }
@@ -760,7 +852,7 @@ export default function Shell() {
       stacked: getComputedStyle(stage).flexDirection === 'column',
     }
   }, [])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -897,7 +989,9 @@ export default function Shell() {
     [arrangement, roomRecord],
   )
   const welcomeHint = useMemo(() => (onWelcome && !welcome.finished ? { next: nextStep(welcome) } : null), [onWelcome, welcome])
-  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, search: recordsSearch, searchTo }
+  const searches = { almanac: recordsView.search, collection: collectionSearch }
+  const searchCounts = { almanac: recordsSearch, collection: { count: collectionShown.cards.length, cards: true } }
+  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, searches, searchCounts }
   const filtered = isAtRest(recordsView) ? null : { search: recordsView.search.trim(), line: viewLine(recordsView) }
   const drawBoard = (board) => {
     if (board === 'room' && roomId !== undefined) {
@@ -917,6 +1011,16 @@ export default function Shell() {
     }
     if (board === 'welcome') {
       return <WelcomeBoard key="welcome" welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} />
+    }
+    if (board === 'collection') {
+      return (
+        <CollectionBoard
+          key="collection" collection={shownCollection} collections={collections} label={collectionLabel}
+          entries={collectionShown.entries} counts={collectionShown.counts} view={collectionShown.view} sources={collectionAll.sources}
+          pickable={pickable} searching={Boolean(collectionSearch.trim())} addressed={arrangement.addressed === 'collection'}
+          onAddress={focusBoard} onWrite={writeField} onView={(change) => setCollectionView((v) => ({ ...v, ...change }))} onShow={onShowCollection}
+        />
+      )
     }
     return <Board key={board} board={board} addressed={arrangement.addressed === board} onAddress={focusBoard} />
   }

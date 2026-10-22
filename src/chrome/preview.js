@@ -23,6 +23,7 @@ import { holdsKey } from '../commands/parse'
 import { BOARD_NAMES } from '../commands/verbs'
 import { FILTERS, EMPTY_VIEW, readFilter, readSort, nextView, clears, applyView, costUnknown, viewLine } from '../lib/recordsFilter'
 import { findSaved, cleanSearchName, SEARCH_NAME_MAX } from '../lib/savedSearches'
+import { planNew, planAdd, planRm, planClear, planHeading, planMoveCard, planNameCollection, planForgetCollection, collectionNamed, planCollectionView } from '../lib/collectionVerbs'
 import { ROW_VERBS, isRowStep, planRowLine, planCopy, planErase, targetsOf } from '../lib/rowVerbs'
 import { exportItems, chatsOf, exportName } from '../lib/recordsExport'
 
@@ -39,7 +40,8 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // undo: takes back the last command line (piece 3; C143 (f), C134).
 // erase: removes things for good, by number, on a line of its own (C137).
 // export: downloads rows as Markdown or JSONL (piece 5; C138).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export'])
+// new:collection, add:, rm: and heading: change a collection (piece 6; C144).
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -156,22 +158,49 @@ function planUndo(a, step, screens = {}) {
 
 /** forget:"…" removes a saved search; what it found is untouched (C140 (f)). */
 function planForget(a, step, screens = {}) {
-  const { found, several } = findSaved(screens.records?.saved ?? [], typed(step.match?.values?.[0]))
+  const [arg, which] = step.match?.values ?? []
+  const name = typed(arg)
+  const search = which?.value === 'collection' ? { found: null, several: [] } : findSaved(screens.records?.saved ?? [], name)
+  const coll = which?.value === 'search' ? { found: null, several: [] } : collectionNamed(screens, name)
+  if (search.found && coll.found) return { says: { message: 'nameWhichKind', values: { name, verb: 'forget:' } }, act: null }
+  if (coll.found) return planForgetCollection(coll.found, screens)
+  const several = [...search.several, ...coll.several]
   if (several.length) return { says: { message: 'forgetWhich', values: { words: several } }, act: null }
-  if (!found) return { says: { message: 'forgetNone', values: { name: typed(step.match?.values?.[0]) } }, act: null }
-  return { says: { message: 'forgetSearch', values: { name: found.name } }, act: { kind: 'forgetSearch', id: found.id } }
+  if (!search.found) return { says: { message: 'forgetNone', values: { name } }, act: null }
+  return { says: { message: 'forgetSearch', values: { name: search.found.name } }, act: { kind: 'forgetSearch', id: search.found.id } }
 }
+
+// The Collection, brought here or pointed at, showing a collection (C144 (a)).
+function showCollection(a, id) {
+  const here = a.columns.flat().includes('collection') || a.popped.some((p) => p.board === 'collection')
+  const next = here ? address(a, 'collection') : planOpen(a, 'collection').next
+  return { ...next, context: { ...next.context, collection: id } }
+}
+
+const addStep = (a, step, screens) => planAdd(step, screens)
+const rmStep = (a, step, screens) => planRm(step, screens)
+const headingStep = (a, step, screens) => planHeading(step, screens)
+const newStep = (a, step) => planNew(step)
 
 // open:"Water tower": a saved search by name (C140 (e)), or null when the
 // name is no saved search's, for open: to answer otherwise.
 function openSaved(a, step, screens = {}) {
   const args = step.match?.values ?? []
-  if (args.length !== 1 || (args[0].kind !== 'text' && args[0].kind !== 'word')) return null
+  const which = args.length === 2 && args[1].kind === 'word' ? args[1].value : null
+  if (!(args.length === 1 || which) || (args[0].kind !== 'text' && args[0].kind !== 'word')) return null
   // A board's name opens the board, whatever a saved search is called.
   if (args[0].kind === 'word' && (BOARD_NAMES.includes(args[0].value) || args[0].value === 'lab')) return null
   const records = screens.records ?? {}
-  const { found, several } = findSaved(records.saved ?? [], typed(args[0]))
+  const name = typed(args[0])
+  const search = which === 'collection' ? { found: null, several: [] } : findSaved(records.saved ?? [], name)
+  const coll = which === 'search' ? { found: null, several: [] } : collectionNamed(screens, name)
+  if (search.found && coll.found) return { bad: { message: 'nameWhichKind', values: { name, verb: 'open:' } } }
+  if (coll.found) {
+    return { next: showCollection(a, coll.found.id), says: { message: 'openCollection', values: { name: screens.collection.label(coll.found) } } }
+  }
+  const several = [...search.several, ...coll.several]
   if (several.length) return { bad: { message: 'openWhichSaved', values: { words: several } } }
+  const found = search.found
   if (!found) return null
   const r = viewFromSaved(found, records)
   if (r.bad) return { bad: { ...r.bad, also: [{ message: 'savedStale', values: { name: found.name } }] } }
@@ -199,7 +228,10 @@ function planViewStep(view, step, records = {}) {
       : { message: { filters: 'clearFilters', search: 'clearSearch', sort: 'clearSort' }[gone.what] }
     return { change: { clear: word }, says }
   }
-  if (step.verb === 'sort') return { change: { sort: readSort(arg.value, view.sort) } }
+  if (step.verb === 'sort') {
+    if (arg.value === 'yours' || arg.value === 'source') return { bad: { message: 'sortRecords', values: { board: 'almanac' } } }
+    return { change: { sort: readSort(arg.value, view.sort) } }
+  }
   const read = readFilter(step, records)
   if (read.bad) return { bad: read.bad }
   const { filter } = read
@@ -364,6 +396,29 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   const answer = enterLine(value, { mode, board: arrangement.addressed, built })
   if (answer.state !== 'ready') return { answer, says: { message: answer.message, values: answer.values }, next: null }
 
+  // On the Collection (C144): clear: alone empties it, move: places a card,
+  // sort: and type: pick its order and tab.
+  const only = answer.steps.length === 1 ? answer.steps[0] : null
+  if (only?.verb === 'clear' && arrangement.addressed === 'collection' && !(only.match?.values ?? []).length) {
+    const p = planClear(screens)
+    return { answer, says: p.says, next: null, act: p.act }
+  }
+  if (only?.verb === 'move' && arrangement.addressed === 'collection' && only.match?.values?.[0]?.kind === 'address') {
+    const p = planMoveCard(only, screens)
+    return { answer, says: p.says, next: null, act: p.act }
+  }
+  if (arrangement.addressed === 'collection' && answer.steps.every((s) => s.verb === 'sort' || s.verb === 'type')) {
+    let view = screens.collection?.view ?? {}
+    let says = null
+    for (const s of answer.steps) {
+      const p = planCollectionView(s, view)
+      if (!p.act) return { answer, says: p.says, next: null }
+      view = p.act.view
+      says = says ?? p.says
+    }
+    return { answer, says, next: null, act: { kind: 'collectionView', view } }
+  }
+
   // Row commands (C143): they share a line with each other (C99), and
   // undo: takes the line back whole.
   const rowSteps = answer.steps.filter(isRowStep)
@@ -379,7 +434,11 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   if (acts.length) {
     if (answer.steps.length > 1) return { answer, says: { message: 'aloneNow', values: { verb: `${acts[0].verb}:` } }, next: null }
     const step = answer.steps[0]
-    const plans = { tour: planTour, name: planName, inspect: planInspect, api: planApi, save: planSave, forget: planForget, copy: planCopyStep, undo: planUndo, erase: planEraseStep, export: planExportStep }
+    const nameIt = (a1, s1, sc) => (a1.addressed === 'collection' ? planNameCollection(s1, sc) : planName(a1, s1, sc))
+    const plans = {
+      tour: planTour, name: nameIt, inspect: planInspect, api: planApi, save: planSave, forget: planForget, copy: planCopyStep, undo: planUndo,
+      erase: planEraseStep, export: planExportStep, new: newStep, add: addStep, rm: rmStep, heading: headingStep,
+    }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
     return { answer, says: p.says, next: p.next ?? null, act: p.act ?? null }
@@ -399,9 +458,11 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     const saved = step.verb === 'open' ? openSaved(a, step, screens) : null
     if (saved) {
       if (saved.bad) return { answer, says: saved.bad, next: null }
+      a = saved.next
+      // A collection: only the space changes.
+      if (!saved.view) { last = saved.says; continue }
       changes.push({ replace: saved.view })
       viewSays = viewSays ?? saved.says
-      a = saved.next
       opened = true
       continue
     }

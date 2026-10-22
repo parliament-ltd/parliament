@@ -630,3 +630,71 @@ describe('export: (stage 6, piece 5; C138)', () => {
     expect(at('>export:', { search: 'zzz', filters: [], sort: { by: 'active', asc: false } }).text).toBe('Nothing to export here')
   })
 })
+
+describe('the Collection (stage 6, piece 6; C144)', () => {
+  const STORE = { chat: 'conversations', docket: 'dockets', note: 'notes', term: 'highlights', quote: 'pins' }
+  const row = (num, kind, extra = {}) => ({
+    num, kind, id: `${kind}${num}`, store: STORE[kind], chatId: kind === 'chat' ? `chat-${num}` : null, title: `${kind} ${num}`,
+    tags: [], tagsMine: [], pinned: false, archived: false, docketNum: null, ...extra,
+  })
+  const rows = [row(202, 'chat'), row(204, 'chat'), row(210, 'note', { chatId: 'chat-202', text: 'Range map' }), row(211, 'term', { chatId: 'chat-202', text: 'tapetum' }), row(212, 'quote', { chatId: 'chat-204', text: 'Owls hunt by ear' })]
+  const q2 = {
+    id: 'q2', name: 'Q2', builtIn: null, createdAt: '2026-10-20T10:00:00Z', updatedAt: '2026-10-20T10:00:00Z',
+    items: [{ kind: 'chat', conversationId: 'chat-202', num: 202 }, { kind: 'marking', store: 'pins', id: 'quote212', num: 212 }],
+    headings: [{ id: 'h1', text: 'Causes' }], order: ['mark:pins:quote212', 'head:h1'],
+  }
+  const fav = { id: 'fav', name: null, builtIn: 'favorites', items: [], headings: [], order: [] }
+  const cards = [210, 211, 212].map((num) => { const r = rows.find((x) => x.num === num); return { key: `mark:${r.store}:${r.id}`, num, kind: r.kind } })
+  const label = (c) => c.name ?? (c.builtIn === 'favorites' ? 'Favorites' : 'Untitled collection')
+  const onCollection = () => ({ ...almanac(), addressed: 'collection' })
+  const at = (value, { shown = q2, a = onCollection() } = {}) => {
+    const collection = { shown, all: [q2, fav], cards: shown ? cards : [], label, view: { tab: 'all', sort: 'yours', asc: false } }
+    const p = preview(value, { mode: 'command', arrangement: a, screens: { records: { rows, nowIso: '2026-10-21T10:00:00Z', view: { search: '', filters: [], sort: { by: 'active', asc: false } } }, collection } })
+    const also = [].concat(p.says?.also ?? []).map((x) => say(i18n, x.message, x.values))
+    return { ...p, text: [say(i18n, p.says.message, p.says.values), ...also].join(' · ') }
+  }
+
+  it('new:collection makes one; add: and rm: say what goes in and out', () => {
+    expect(at('>new:collection')).toMatchObject({ text: 'Enter makes a new collection and shows it', act: { kind: 'newCollection' } })
+    expect(at('>add:204, 210').text).toBe('Enter puts 204 and 210 in Q2')
+    expect(at('>add:204').act).toMatchObject({ kind: 'collectionWrite', id: 'q2', before: q2, after: { items: [...q2.items, { kind: 'chat', conversationId: 'chat-204', num: 204 }] } })
+    expect(at('>add:212').text).toBe('Those are in Q2 already')
+    expect(at('>rm:212').text).toBe('Enter takes 212 out of Q2. The things themselves stay')
+    expect(at('>rm:211')).toMatchObject({ text: '211 is there because 202 is: rm:202 takes it out', act: null })
+    expect(at('>rm:204').text).toBe('204 is not in Q2')
+  })
+
+  it('says there is no collection yet, and how to make one', () => {
+    expect(at('>add:210', { shown: null }).text).toBe('No collection is on Collection yet. new:collection makes one')
+  })
+
+  it('places headings and cards in your order', () => {
+    expect(at('>heading:"Effects" before 210').text).toBe('Enter adds the heading Effects before 210')
+    expect(at('>heading:"Effects" before 210').act.after.order).toEqual(['mark:pins:quote212', 'head:h1', 'head:h2', 'mark:notes:note210', 'mark:highlights:term211'])
+    expect(at('>heading:"Effects"').text).toBe('Enter adds the heading Effects at the end of your order')
+    expect(at('>heading:"Effects" after 299').text).toBe('No card here has the number 299')
+    expect(at('>move:211 before 212').text).toBe('Enter moves 211 before 212 in your order')
+    expect(at('>move:211 before 211').text).toBe('A card cannot move beside itself')
+    expect(at('>rm:"causes"').text).toBe('Enter takes out the heading Causes. The cards under it stay')
+  })
+
+  it('clear: alone empties the collection, only on the Collection', () => {
+    expect(at('>clear:').text).toBe('Enter empties Q2 of 3 things. They stay where they are')
+    expect(at('>clear:', { a: almanac() }).text).toBe('clear: is not built yet')
+  })
+
+  it('name:, open: and forget: take a collection by name (C144 (i))', () => {
+    expect(at('>name:"Q3"').text).toBe('Enter names this collection: Q3')
+    expect(at('>name:"favorites"').text).toBe('Another collection is called favorites')
+    expect(at('>open:"Favorites"')).toMatchObject({ text: 'Enter shows the collection Favorites', next: { addressed: 'collection', context: { collection: 'fav' } } })
+    expect(at('>forget:"Q2"')).toMatchObject({ text: 'Enter forgets the collection Q2. What it held stays where it is', act: { kind: 'collectionWrite', id: 'q2', after: null } })
+    expect(at('>forget:"Favorites"').text).toBe('Favorites stays while the heart on messages fills it')
+  })
+
+  it('sort: and type: pick the order and the tab', () => {
+    expect(at('>sort:source')).toMatchObject({ text: 'Enter groups the cards by where they come from', act: { kind: 'collectionView', view: { sort: 'source', asc: false } } })
+    expect(at('>sort:oldest').text).toBe('Enter shows the oldest first')
+    expect(at('>sort:active').text).toBe('On Collection, sort: takes yours, source, newest or oldest')
+    expect(at('>type:keyword')).toMatchObject({ text: 'Enter shows the keywords', act: { view: { tab: 'term' } } })
+  })
+})

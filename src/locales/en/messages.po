@@ -346,14 +346,148 @@ msgstr "The reply in {chat} stopped when you left it, before any of it arrived."
 msgid "chat.stoppedOnReply"
 msgstr "Stopped when you left the chat. What arrived is kept."
 
+#. js-lingui-explicit-id
+msgid "collection.by"
+msgstr "by"
+
+#. js-lingui-explicit-id
+msgid "collection.cardFrom"
+msgstr "from {num}"
+
+#. js-lingui-explicit-id
+msgid "collection.chats"
+msgstr "Chats"
+
+#. js-lingui-explicit-id
+msgid "collection.count"
+msgstr "{count, plural, =0 {nothing} one {# card} other {# cards}}"
+
+#. js-lingui-explicit-id
+msgid "collection.date"
+msgstr "date"
+
+#. add: stays English
+#. js-lingui-explicit-id
+msgid "collection.empty"
+msgstr "Nothing here yet. add:207 puts something in, or pick a chat from the list above."
+
+#. js-lingui-explicit-id
+msgid "collection.emptyHeld"
+msgstr "What it holds has no notes, keywords or quotes yet. They show here as they are made."
+
+#. js-lingui-explicit-id
+msgid "collection.erased"
+msgstr "{what, select, chat {chat {num}, erased} plan {plan {num}, erased} message {a message, erased} other {{num}, erased}}"
+
+#. js-lingui-explicit-id
+msgid "collection.erasedFrom"
+msgstr "from {num}, erased"
+
 #. The collection favourites became (C20)
 #. js-lingui-explicit-id
 msgid "collection.favorites"
 msgstr "Favorites"
 
 #. js-lingui-explicit-id
+msgid "collection.from"
+msgstr "from"
+
+#. js-lingui-explicit-id
+msgid "collection.fromHelp"
+msgstr "The chats and plans it holds. A click lists them"
+
+#. js-lingui-explicit-id
+msgid "collection.fromNothing"
+msgstr "nothing yet"
+
+#. js-lingui-explicit-id
+msgid "collection.groupAdded"
+msgstr "Added one by one"
+
+#. js-lingui-explicit-id
+msgid "collection.groupChat"
+msgstr "Chat {num}"
+
+#. js-lingui-explicit-id
+msgid "collection.groupPlan"
+msgstr "Plan {num}"
+
+#. js-lingui-explicit-id
+msgid "collection.line"
+msgstr "Collections"
+
+#. new:collection stays English
+#. js-lingui-explicit-id
+msgid "collection.none"
+msgstr "No collection yet. new:collection makes one."
+
+#. js-lingui-explicit-id
+msgid "collection.noneMatch"
+msgstr "Nothing in this collection matches."
+
+#. open: stays English
+#. js-lingui-explicit-id
+msgid "collection.openHelp"
+msgstr "Writes open:{num} in the bar"
+
+#. add: and rm: stay English
+#. js-lingui-explicit-id
+msgid "collection.pickFoot"
+msgstr "A click writes add: or rm: in the bar. The numbers set the order by source; add:218 holds one note, keyword or quote."
+
+#. {command} is add: or rm: with a number
+#. js-lingui-explicit-id
+msgid "collection.pickHelp"
+msgstr "Writes {command} in the bar"
+
+#. js-lingui-explicit-id
+msgid "collection.plans"
+msgstr "Plans"
+
+#. open: stays English
+#. js-lingui-explicit-id
+msgid "collection.showHelp"
+msgstr "Shows it, as open:\"{name}\" does"
+
+#. js-lingui-explicit-id
+msgid "collection.source"
+msgstr "source"
+
+#. js-lingui-explicit-id
+msgid "collection.tabAll"
+msgstr "All"
+
+#. js-lingui-explicit-id
+msgid "collection.tabHighlight"
+msgstr "Highlights"
+
+#. js-lingui-explicit-id
+msgid "collection.tabMessage"
+msgstr "Messages"
+
+#. js-lingui-explicit-id
+msgid "collection.tabNote"
+msgstr "Notes"
+
+#. js-lingui-explicit-id
+msgid "collection.tabQuote"
+msgstr "Quotes"
+
+#. js-lingui-explicit-id
+msgid "collection.tabTerm"
+msgstr "Keywords"
+
+#. js-lingui-explicit-id
+msgid "collection.under"
+msgstr "under {heading}"
+
+#. js-lingui-explicit-id
 msgid "collection.untitled"
 msgstr "Untitled collection"
+
+#. js-lingui-explicit-id
+msgid "collection.yours"
+msgstr "your order"
 
 #. A message's attachments, by name only; {names} is a list
 #. js-lingui-explicit-id
@@ -560,6 +694,78 @@ msgid "enter.closeWelcome"
 msgstr "Enter closes the welcome page. tour: brings it back"
 
 #. js-lingui-explicit-id
+msgid "enter.collectionAdd"
+msgstr "Enter puts {nums} in {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionAlready"
+msgstr "Those are in {name} already"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionBuiltIn"
+msgstr "{name} stays while the heart on messages fills it"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionCardNone"
+msgstr "No card here has the number {num}"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionChanged"
+msgstr "The collection changed meanwhile, so nothing was written. Try again"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionClear"
+msgstr "{count, plural, one {Enter empties {name} of # thing. It stays where it is} other {Enter empties {name} of # things. They stay where they are}}"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionEmptyAlready"
+msgstr "{name} is empty already"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionForget"
+msgstr "Enter forgets the collection {name}. What it held stays where it is"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionHeld"
+msgstr "{num} is there because {by} is: rm:{by} takes it out"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionName"
+msgstr "Enter names this collection: {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionNameSame"
+msgstr "This collection has that name already"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionNameTaken"
+msgstr "Another collection is called {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionNew"
+msgstr "Enter makes a new collection and shows it"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionNone"
+msgstr "No collection is on {board} yet. new:collection makes one"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionNotIn"
+msgstr "{count, plural, one {{nums} is not in {name}} other {{nums} are not in {name}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionRm"
+msgstr "Enter takes {nums} out of {name}. The things themselves stay"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionSort"
+msgstr "{sort, select, yours {Enter shows your order} source {Enter groups the cards by where they come from} other {{asc, select, yes {Enter shows the oldest first} other {Enter shows the newest first}}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.collectionTab"
+msgstr "{kind, select, term {Enter shows the keywords} quote {Enter shows the quotes} note {Enter shows the notes} other {Enter shows the highlights}}"
+
+#. js-lingui-explicit-id
 msgid "enter.colsHide"
 msgstr "Enter hides {cols}"
 
@@ -764,6 +970,34 @@ msgid "enter.goWelcome"
 msgstr "Enter brings the welcome page and its steps beside what is here"
 
 #. js-lingui-explicit-id
+msgid "enter.headingAfter"
+msgstr "Enter adds the heading {heading} after {num}"
+
+#. js-lingui-explicit-id
+msgid "enter.headingBefore"
+msgstr "Enter adds the heading {heading} before {num}"
+
+#. js-lingui-explicit-id
+msgid "enter.headingEmpty"
+msgstr "A heading needs some words, like heading:\"Causes\""
+
+#. js-lingui-explicit-id
+msgid "enter.headingEnd"
+msgstr "Enter adds the heading {heading} at the end of your order"
+
+#. js-lingui-explicit-id
+msgid "enter.headingLong"
+msgstr "A heading is at most {max} characters"
+
+#. js-lingui-explicit-id
+msgid "enter.headingNone"
+msgstr "No heading here is called {heading}"
+
+#. js-lingui-explicit-id
+msgid "enter.headingRm"
+msgstr "Enter takes out the heading {heading}. The cards under it stay"
+
+#. js-lingui-explicit-id
 msgid "enter.help"
 msgstr "Enter shows every command that works here"
 
@@ -819,6 +1053,18 @@ msgid "enter.moveBoard"
 msgstr "{place, select, left {Enter moves {board} to the left} right {Enter moves {board} to the right} other {Enter moves {board} to the middle}}"
 
 #. js-lingui-explicit-id
+msgid "enter.moveCardAfter"
+msgstr "Enter moves {num} after {at} in your order"
+
+#. js-lingui-explicit-id
+msgid "enter.moveCardBefore"
+msgstr "Enter moves {num} before {at} in your order"
+
+#. js-lingui-explicit-id
+msgid "enter.moveCardSame"
+msgstr "A card cannot move beside itself"
+
+#. js-lingui-explicit-id
 msgid "enter.moveIsPopped"
 msgstr "{board} is in its own window. pop:back brings it back first"
 
@@ -867,6 +1113,11 @@ msgstr "Enter names {num}: {name}"
 msgid "enter.nameTitleLong"
 msgstr "A name is at most {max} characters"
 
+#. search and collection stay English: they are words of the command
+#. js-lingui-explicit-id
+msgid "enter.nameWhichKind"
+msgstr "{name} is a saved search and a collection. Add search or collection after it"
+
 #. js-lingui-explicit-id
 msgid "enter.newRoomHere"
 msgstr "This room is empty. Its first prompt starts it"
@@ -907,6 +1158,10 @@ msgstr "Enter shows {num} in the room here"
 #. js-lingui-explicit-id
 msgid "enter.openChatThere"
 msgstr "{num} is in the room here already"
+
+#. js-lingui-explicit-id
+msgid "enter.openCollection"
+msgstr "Enter shows the collection {name}"
 
 #. js-lingui-explicit-id
 msgid "enter.openDocket"
@@ -1190,10 +1445,14 @@ msgstr "Enter replaces the saved search {name} with this one"
 msgid "enter.saveSame"
 msgstr "{name} is saved as this search already"
 
-#. In search mode on a board search does not reach yet; {board} is Records
+#. js-lingui-explicit-id
+msgid "enter.searchCards"
+msgstr "{count, plural, =0 {No card matches} one {# card matches} other {# cards match}}"
+
+#. In search mode on a board search does not reach yet; {first} and {second} are board names
 #. js-lingui-explicit-id
 msgid "enter.searchRecords"
-msgstr "Search works on {board} for now"
+msgstr "Search works on {first} and {second} for now"
 
 #. js-lingui-explicit-id
 msgid "enter.searchShows"
@@ -1207,6 +1466,16 @@ msgstr "{count, plural, one {Enter runs # command: {verbs}} other {Enter runs # 
 #. js-lingui-explicit-id
 msgid "enter.showRoom"
 msgstr "Enter shows the last room here"
+
+#. The words stay English
+#. js-lingui-explicit-id
+msgid "enter.sortCollection"
+msgstr "On {board}, sort: takes yours, source, newest or oldest"
+
+#. The words stay English
+#. js-lingui-explicit-id
+msgid "enter.sortRecords"
+msgstr "On {board}, sort: takes created, active, oldest or newest"
 
 #. js-lingui-explicit-id
 msgid "enter.sourceRefused"
@@ -1305,6 +1574,11 @@ msgstr "The steps are put away already"
 #. js-lingui-explicit-id
 msgid "enter.tourOn"
 msgstr "Enter shows the steps again"
+
+#. The words stay English
+#. js-lingui-explicit-id
+msgid "enter.typeCollection"
+msgstr "On {board}, type: takes one of keyword, quote, note or highlight"
 
 #. js-lingui-explicit-id
 msgid "enter.undoChanged"
@@ -1591,6 +1865,11 @@ msgstr "Edit"
 #. js-lingui-explicit-id
 msgid "kind.highlight"
 msgstr "Highlight"
+
+#. A message held in a collection, as Favorites holds them
+#. js-lingui-explicit-id
+msgid "kind.message"
+msgstr "Message"
 
 #. js-lingui-explicit-id
 msgid "kind.note"

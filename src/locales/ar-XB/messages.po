@@ -346,13 +346,147 @@ msgstr ""
 msgid "chat.stoppedOnReply"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "collection.by"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.cardFrom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.chats"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.count"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.date"
+msgstr ""
+
+#. add: stays English
+#. js-lingui-explicit-id
+msgid "collection.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.emptyHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.erased"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.erasedFrom"
+msgstr ""
+
 #. The collection favourites became (C20)
 #. js-lingui-explicit-id
 msgid "collection.favorites"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "collection.from"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.fromHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.fromNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.groupAdded"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.groupChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.groupPlan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.line"
+msgstr ""
+
+#. new:collection stays English
+#. js-lingui-explicit-id
+msgid "collection.none"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.noneMatch"
+msgstr ""
+
+#. open: stays English
+#. js-lingui-explicit-id
+msgid "collection.openHelp"
+msgstr ""
+
+#. add: and rm: stay English
+#. js-lingui-explicit-id
+msgid "collection.pickFoot"
+msgstr ""
+
+#. {command} is add: or rm: with a number
+#. js-lingui-explicit-id
+msgid "collection.pickHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.plans"
+msgstr ""
+
+#. open: stays English
+#. js-lingui-explicit-id
+msgid "collection.showHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.source"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabAll"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabHighlight"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabMessage"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabNote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabQuote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabTerm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.under"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.untitled"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.yours"
 msgstr ""
 
 #. A message's attachments, by name only; {names} is a list
@@ -560,6 +694,78 @@ msgid "enter.closeWelcome"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.collectionAdd"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionBuiltIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionCardNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionChanged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionClear"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionEmptyAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionForget"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionName"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionNameSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionNameTaken"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionNew"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionNotIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionRm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionSort"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionTab"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.colsHide"
 msgstr ""
 
@@ -764,6 +970,34 @@ msgid "enter.goWelcome"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.headingAfter"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.headingBefore"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.headingEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.headingEnd"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.headingLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.headingNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.headingRm"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.help"
 msgstr ""
 
@@ -819,6 +1053,18 @@ msgid "enter.moveBoard"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.moveCardAfter"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.moveCardBefore"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.moveCardSame"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.moveIsPopped"
 msgstr ""
 
@@ -867,6 +1113,11 @@ msgstr ""
 msgid "enter.nameTitleLong"
 msgstr ""
 
+#. search and collection stay English: they are words of the command
+#. js-lingui-explicit-id
+msgid "enter.nameWhichKind"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.newRoomHere"
 msgstr ""
@@ -906,6 +1157,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.openChatThere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openCollection"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1190,7 +1445,11 @@ msgstr ""
 msgid "enter.saveSame"
 msgstr ""
 
-#. In search mode on a board search does not reach yet; {board} is Records
+#. js-lingui-explicit-id
+msgid "enter.searchCards"
+msgstr ""
+
+#. In search mode on a board search does not reach yet; {first} and {second} are board names
 #. js-lingui-explicit-id
 msgid "enter.searchRecords"
 msgstr ""
@@ -1206,6 +1465,16 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.showRoom"
+msgstr ""
+
+#. The words stay English
+#. js-lingui-explicit-id
+msgid "enter.sortCollection"
+msgstr ""
+
+#. The words stay English
+#. js-lingui-explicit-id
+msgid "enter.sortRecords"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1304,6 +1573,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.tourOn"
+msgstr ""
+
+#. The words stay English
+#. js-lingui-explicit-id
+msgid "enter.typeCollection"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1590,6 +1864,11 @@ msgstr ""
 #. One passage marked where it sits
 #. js-lingui-explicit-id
 msgid "kind.highlight"
+msgstr ""
+
+#. A message held in a collection, as Favorites holds them
+#. js-lingui-explicit-id
+msgid "kind.message"
 msgstr ""
 
 #. js-lingui-explicit-id

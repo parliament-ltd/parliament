@@ -34,16 +34,17 @@ const time = (iso) => {
 }
 const NO_FACTS = Object.freeze({ models: [], sources: [], usage: [], unpriced: 0, words: '' })
 
-// The chats each collection holds, by chat id: a collection holds a chat,
-// or a message or marking in one (C139), which counts as that chat's row.
-function collectionsByChat(collections) {
+// What each collection holds, by what it points at (C139, C144 (b)): a
+// chat, a plan, one note, keyword or quote, or a message, which counts as
+// its chat's row.
+function heldBy(collections) {
   const out = new Map()
+  const add = (key, id) => { if (!out.has(key)) out.set(key, new Set()); out.get(key).add(id) }
   for (const c of collections) {
     for (const item of Array.isArray(c?.items) ? c.items : []) {
-      const chatId = item?.conversationId
-      if (!chatId) continue
-      if (!out.has(chatId)) out.set(chatId, new Set())
-      out.get(chatId).add(c.id)
+      if ((item?.kind === 'chat' || item?.kind === 'message' || !item?.kind) && item?.conversationId) add(`chat:${item.conversationId}`, c.id)
+      else if (item?.kind === 'plan' && item.docketId) add(`plan:${item.docketId}`, c.id)
+      else if (item?.kind === 'marking' && item.store && item.id) add(`mark:${item.store}:${item.id}`, c.id)
     }
   }
   return out
@@ -61,7 +62,13 @@ function collectionsByChat(collections) {
 export function toRows({ chats = [], dockets = [], notes = [], highlights = [], quotes = [], rooms = {}, facts = new Map(), collections = [], priceOf = () => null }) {
   const chatById = new Map(chats.map((c) => [c.id, c]))
   const docketById = new Map(dockets.map((d) => [d.id, d]))
-  const held = collectionsByChat(collections)
+  const held = heldBy(collections)
+  // A chat is in what holds it, or holds its plan; a marking in what holds
+  // it, its chat or its chat's plan.
+  const chatIn = (chatId) => {
+    const chat = chatById.get(chatId)
+    return new Set([...(held.get(`chat:${chatId}`) ?? []), ...(chat?.docketId ? held.get(`plan:${chat.docketId}`) ?? [] : [])])
+  }
   // A chat's room by its name; a room with no name of its own is
   // { unnamed: true }, and a chat with no room file null.
   const roomOf = (chatId) => {
@@ -110,7 +117,7 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
       ...placeOf(c.id),
       // A chat whose insides were not read has no known cost.
       marks: [...(marks.get(c.id) ?? [])], models: f.models, sources: f.sources, cost: facts.has(c.id) ? costOf(f, priceOf) : null,
-      collections: [...(held.get(c.id) ?? [])], words: f.words,
+      collections: [...chatIn(c.id)], words: f.words,
     }
     rows.push(row)
     chatRows.set(c.id, row)
@@ -135,7 +142,7 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
       docketNum: d.num, branch: null, run: null, chatNums: own.map((r) => r.num),
       marks: union('marks'), models: union('models'), sources: union('sources'),
       cost: own.length && costs.every((x) => x != null) ? costs.reduce((a, b) => a + b, 0) : null,
-      collections: union('collections'), words: '',
+      collections: [...new Set([...union('collections'), ...(held.get(`plan:${d.id}`) ?? [])])], words: '',
     })
   }
   const marking = (kind, store, r, text, chatId) => ({
@@ -147,7 +154,8 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
     room: roomOf(chatId), roomId: roomIdOf(chatId), tags: Array.isArray(r.tags) ? r.tags : [], pinned: Boolean(r.pinned),
     createdAt: r.createdAt ?? null, activeAt: r.createdAt ?? null,
     ...placeOf(chatId),
-    marks: [], models: [], sources: [], cost: null, collections: [], words: '',
+    marks: [], models: [], sources: [], cost: null, words: '',
+    collections: [...new Set([...(held.get(`mark:${store}:${r.id}`) ?? []), ...(chatId ? chatIn(chatId) : [])])],
   })
   for (const n of notes.filter(numbered)) rows.push(marking('note', 'notes', n, n.text, n.conversationId))
   for (const h of highlights.filter(numbered)) rows.push(marking(h.kind === 'quote' ? 'quote' : 'term', 'highlights', h, h.text, h.conversationId))

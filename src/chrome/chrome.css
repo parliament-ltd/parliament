@@ -424,3 +424,45 @@
 .ch-atable tbody tr.ch-gap { cursor: default; }
 .ch-atable tbody tr.ch-gap:hover { background: none; }
 .ch-atable tr.ch-gap td { height: 0; padding: 0; border: 0; }
+
+/* The Collection (stage 6, piece 6; collection board v3; C144): cards, not a
+   table. A keyword, quote, highlight or message reads as a quotation; a
+   note as plain text. A card for something erased takes a dashed rule. */
+.ch-col-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 10px 16px 4px; }
+.ch-col-name { font: 600 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink); }
+.ch-shell .ch-col-from { padding: 0; color: var(--ch-ink-2); text-decoration: underline dotted; text-underline-offset: 3px; font: 400 var(--ch-t-id) var(--ch-mono); font-style: normal; }
+.ch-shell .ch-col-from:hover { color: var(--ch-ink); }
+.ch-col-count { margin-inline-start: 10px; }
+.ch-pk { margin: 4px 16px 6px; padding: 8px 10px; border: .5px solid var(--ch-border); border-radius: var(--ch-r-md); background: var(--ch-surface); max-height: 280px; overflow-y: auto; }
+.ch-pk-title { font: 600 9px var(--ch-sans); letter-spacing: .055em; text-transform: uppercase; color: var(--ch-ink-3); padding: 6px 2px 4px; }
+.ch-shell .ch-pk-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 4px 2px; text-align: start; color: var(--ch-ink); font: 400 var(--ch-t-small) var(--ch-sans); border-radius: var(--ch-r-sm); }
+.ch-shell .ch-pk-item:hover { background: var(--ch-subtle); }
+.ch-pk-item .box { flex: none; width: 15px; height: 15px; border: 1px solid var(--ch-soft); border-radius: 3px; font: 500 9.5px var(--ch-mono); display: inline-flex; align-items: center; justify-content: center; }
+.ch-pk-item.on .box { background: var(--ch-ink); border-color: var(--ch-ink); color: var(--ch-surface); }
+.ch-pk-item .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ch-pk-foot { margin: 6px 2px 2px; }
+.ch-col-tabs { display: flex; gap: 16px; padding: 6px 16px 0; border-bottom: 1px solid var(--ch-divider); overflow-x: auto; }
+.ch-shell .ch-col-tabs button { padding: 2px 0 7px; border-bottom: 2px solid transparent; color: var(--ch-ink-3); font: 500 12px var(--ch-sans); white-space: nowrap; }
+.ch-shell .ch-col-tabs button:hover, .ch-shell .ch-col-tabs button.on { color: var(--ch-ink); }
+.ch-shell .ch-col-tabs button.on { border-bottom-color: var(--ch-ink); }
+.ch-col-tabs .n { font: 500 10px var(--ch-mono); margin-inline-start: 4px; opacity: .8; }
+.ch-col-tools { display: flex; gap: 8px; justify-content: flex-end; padding: 6px 16px 2px; }
+.ch-shell .ch-col-tools button { padding: 0; }
+.ch-shell .ch-col-tools button:hover { color: var(--ch-ink); }
+.ch-shell .ch-col-tools button.on { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 3px; }
+/* Only the cards scroll; the head, tabs and orders stay in view. */
+.ch-collection > * { flex: none; }
+.ch-collection > .ch-col-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+.ch-col-list { padding: 4px 16px 14px; }
+.ch-mk { padding: 10px 0 9px; border-bottom: .5px solid var(--ch-border-2); }
+.ch-mk .t { font: 400 var(--ch-t-small)/1.5 var(--ch-sans); color: var(--ch-ink); white-space: pre-wrap; }
+.ch-mk .q { font: italic 400 var(--ch-t-small)/1.5 var(--ch-serif); color: var(--ch-ink); border-inline-start: 2px solid var(--ch-soft); padding-inline-start: 9px; white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 8; -webkit-box-orient: vertical; overflow: hidden; }
+.ch-mk.ck-term .q { border-inline-start-color: var(--ch-kind-high); }
+.ch-mk.gone { border-inline-start: 1px dashed var(--ch-soft); padding-inline-start: 9px; }
+.ch-mk .gonetext { color: var(--ch-ink-3); font-style: italic; }
+.ch-mk-marg { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin-top: 5px; }
+.ch-shell .ch-mk-marg button { padding: 0; color: var(--ch-marg); text-decoration: underline; text-underline-offset: 2px; }
+.ch-shell .ch-mk-marg button:hover { color: var(--ch-ink); }
+.ch-mk-head { display: flex; gap: 8px; padding: 14px 0 4px; font: 600 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink); }
+.ch-mk-head span { color: var(--ch-ink-3); font-weight: 400; }
+.ch-mk-group { padding: 12px 0 2px; font: 600 9px var(--ch-sans); letter-spacing: .055em; text-transform: uppercase; color: var(--ch-ink-3); }
