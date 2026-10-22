@@ -136,7 +136,7 @@ export function planNameCollection(step, screens) {
 
 /** forget:"Q2 evidence": the collection goes; what it held stays where it is. */
 export function planForgetCollection(found, screens) {
-  if (found.builtIn === 'favorites') return { says: { message: 'collectionBuiltIn', values: { name: screens.collection.label(found) } }, act: null }
+  // Favorites is an ordinary collection now: a favourite is a tag (C147 (d)).
   return { says: { message: 'collectionForget', values: { name: screens.collection.label(found) } }, act: write(found, null) }
 }
 

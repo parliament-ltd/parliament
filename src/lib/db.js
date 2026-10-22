@@ -10,8 +10,9 @@ import {
   createChat, updateChat, removeChat, createBranchChat,
   addMessageRecord, updateMessageRecord, removeMessage,
   addNumbered, updateNumbered, removeNumbered,
-  addFavoriteRecord, removeFavoriteRecord, saveDocument,
+  addFavoriteRecord, removeFavoriteRecord, saveDocument, changeRecords,
 } from './records'
+import { withFavorite } from './favoriteTags'
 
 export { DB_NAME, DB_VERSION, DRAFT_DB_VERSION, TRIAL_DB_NAME, lastUpgradeFailure } from './schema'
 
@@ -475,6 +476,29 @@ export async function getPins(targetConversationId) {
 
 export async function deletePin(id) {
   return removeNumbered(await initDB(), 'pins', id)
+}
+
+// The heart on a message (C147): a quote of the whole message, kept beside
+// its chat, tagged favorite.
+export async function addFavoriteQuote({ conversationId, messageId, content }) {
+  const db = await initDB()
+  return addNumbered(db, 'pins', {
+    id: generateId(),
+    targetConversationId: conversationId,
+    sourceConversationId: conversationId,
+    sourceMessageId: messageId,
+    content,
+    createdAt: new Date().toISOString(),
+    ...withFavorite({}, true),
+  })
+}
+
+/** The tag favorite put on a quote or taken off, as tagadd: and untag: write it. Returns the quote as it is now. */
+export async function setFavoriteTag(pin, on) {
+  const db = await initDB()
+  const set = withFavorite(pin, on)
+  await changeRecords(db, [{ store: 'pins', id: pin.id, num: pin.num, set, expect: { tags: pin.tags ?? [], tagsMine: pin.tagsMine ?? [] } }])
+  return { ...pin, ...set }
 }
 
 // ─── Settings ────────────────────────────────────────────

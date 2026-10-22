@@ -349,12 +349,15 @@ export function applyView(rows, view = EMPTY_VIEW, ctx = {}) {
   const terms = searchTerms(view.search)
   const filters = view.filters ?? []
   const asked = new Set(filters.filter((f) => f.k === 'type' && !f.neg).flatMap((f) => f.v))
+  // A tag: filter asks for what carries the tag, keywords and quotes too, so
+  // tag:favorite lists every favourite (A19, C147 (a)).
+  const byTag = filters.some((f) => f.k === 'tag' && !f.neg)
   const archive = filters.some((f) => f.k === 'in' && !f.neg && f.v.some((x) => x.archive))
   const shown = rows.filter((row) => {
     if (row.archived && !archive) return false
     const found = terms.length > 0 && terms.every((t) => haystack(row, ctx).includes(t))
     if (terms.length && !found) return false
-    if (ON_REQUEST.has(row.kind) && !asked.has(row.kind) && !found) return false
+    if (ON_REQUEST.has(row.kind) && !asked.has(row.kind) && !found && !byTag) return false
     return filters.every((f) => passes(row, f, ctx))
   })
   return order(shown, view.sort)

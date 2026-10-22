@@ -299,7 +299,6 @@ export const COPY = {
     collectionNameSame: /*i18n*/ { id: 'enter.collectionNameSame', message: 'This collection has that name already' },
     collectionNameTaken: /*i18n*/ { id: 'enter.collectionNameTaken', message: 'Another collection is called {name}' },
     collectionForget: /*i18n*/ { id: 'enter.collectionForget', message: 'Enter forgets the collection {name}. What it held stays where it is' },
-    collectionBuiltIn: /*i18n*/ { id: 'enter.collectionBuiltIn', message: '{name} stays while the heart on messages fills it' },
     collectionChanged: /*i18n*/ { id: 'enter.collectionChanged', message: 'The collection changed meanwhile, so nothing was written. Try again' },
     openCollection: /*i18n*/ { id: 'enter.openCollection', message: 'Enter shows the collection {name}' },
     nameWhichKind: /*i18n*/ { id: 'enter.nameWhichKind', message: '{name} is a saved search and a collection. Add search or collection after it', comment: 'search and collection stay English: they are words of the command' },
@@ -898,6 +897,14 @@ export const COPY = {
     quote: /*i18n*/ { id: 'chat.quote', message: 'Quote' },
     quoteHelp: /*i18n*/ { id: 'chat.quoteHelp', message: 'Keep these words beside the chat, numbered. They are never sent' },
     quoted: /*i18n*/ { id: 'chat.quoted', message: 'Quote {num}. A click finds its card' },
+    // "Pin for reference", renamed (R13): a whole message kept as a quote
+    // beside a chat; and the quotes kept beside this one.
+    quoteMessage: /*i18n*/ { id: 'chat.quoteMessage', message: 'Quote in a chat' },
+    quoteWhichChat: /*i18n*/ { id: 'chat.quoteWhichChat', message: 'Quote it beside which chat?' },
+    quoteNewChat: /*i18n*/ { id: 'chat.quoteNewChat', message: 'A new chat, with this quote beside it' },
+    quotesHere: /*i18n*/ { id: 'chat.quotesHere', message: 'Quotes' },
+    quotesHelp: /*i18n*/ { id: 'chat.quotesHelp', message: 'Kept beside this chat. They are never sent' },
+    quoteRemove: /*i18n*/ { id: 'chat.quoteRemove', message: 'Remove this quote' },
     // What a prompt about some cards says of each, for the model.
     aboutCard: /*i18n*/ { id: 'chat.aboutCard', message: '{kind, select, note {note {num}} term {keyword {num}} quote {quote {num}} highlight {highlight {num}} other {{num}}}, kept in Parliament' },
     // An answer from a source (stage 4). {source} is its name, from the list.

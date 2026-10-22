@@ -31,7 +31,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLingui } from '@lingui/react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, ChevronRight, Pin, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, Quote, X } from 'lucide-react'
 import MessageList from '../../components/core/MessageList'
 import MessageCard from '../../components/core/MessageCard'
 import SelectConversationModal from '../../components/SelectConversationModal'
@@ -58,6 +58,7 @@ import {
   createConversation as dbCreateConversation,
   getConversation as dbGetConversation,
 } from '../../lib/db'
+import { onRecordsChanged } from '../../lib/records'
 
 const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
 const DELETE_UNDO_MS = 20_000
@@ -154,6 +155,8 @@ export default function MessagesRender() {
     refreshPins().catch(() => {})
     void cancelled
   }, [refreshPins])
+  // A quote made or changed elsewhere (the heart, tagadd:, another tab) shows here too (C147).
+  useEffect(() => onRecordsChanged((c) => { if (c.kind === 'quote') refreshPins().catch(() => {}) }), [refreshPins])
 
   const handlePinForReference = useCallback((msg) => {
     setTransferModal({ mode: 'pin', message: msg })
@@ -383,10 +386,10 @@ export default function MessagesRender() {
           <SelectConversationModal
             conversations={conversations}
             currentId={activeConversationId}
-            title={transferModal.mode === 'pin' ? 'Pin to conversation' : 'Send to branch'}
+            title={transferModal.mode === 'pin' ? i18n._(COPY.chat.quoteWhichChat) : 'Send to branch'}
             newChatLabel={
               transferModal.mode === 'pin'
-                ? 'New conversation pinned with this reference'
+                ? i18n._(COPY.chat.quoteNewChat)
                 : 'New conversation with this message'
             }
             onClose={closeTransferModal}
@@ -407,6 +410,7 @@ export default function MessagesRender() {
 // are visual-only — Claude does not see them on subsequent sends.
 
 function PinnedReferences({ pins, onRemove }) {
+  const { i18n } = useLingui()
   const [expanded, setExpanded] = useState(true)
 
   return (
@@ -420,9 +424,9 @@ function PinnedReferences({ pins, onRemove }) {
           {expanded
             ? <ChevronDown className="w-3 h-3 text-[var(--p-text-secondary)]" />
             : <ChevronRight className="w-3 h-3 text-[var(--p-text-secondary)]" />}
-          <Pin className="w-3 h-3 text-[#7C6CD4]" />
-          <span className="text-[10px] font-medium text-[var(--p-text-secondary)] uppercase tracking-wider">
-            Pinned references
+          <Quote className="w-3 h-3 text-[#7C6CD4]" />
+          <span className="text-[10px] font-medium text-[var(--p-text-secondary)] uppercase tracking-wider" title={i18n._(COPY.chat.quotesHelp)}>
+            {i18n._(COPY.chat.quotesHere)}
           </span>
           <span className="text-[10px] text-[#7C6CD4]">({pins.length})</span>
         </div>
@@ -443,14 +447,19 @@ function PinnedReferences({ pins, onRemove }) {
                   key={pin.id}
                   className="group relative rounded-md border border-[var(--p-border)] bg-white px-3 py-2"
                 >
-                  <p className="text-[11px] text-[var(--p-text-primary)] leading-relaxed line-clamp-3">
+                  <p className="text-[11px] text-[var(--p-text-primary)] leading-relaxed line-clamp-3" dir="auto">
                     {pin.content}
                   </p>
+                  {pin.num != null && (
+                    <p className="mt-1 text-[10px] font-mono text-[var(--p-text-muted)]">
+                      {pin.num}{(pin.tags ?? []).length > 0 && ` · ${pin.tags.join(', ')}`}
+                    </p>
+                  )}
                   <button
                     type="button"
                     onClick={() => onRemove(pin.id)}
                     className="absolute top-1.5 right-1.5 p-0.5 rounded text-[var(--p-text-muted)] opacity-0 group-hover:opacity-100 hover:text-[var(--p-error,#E03E3E)] transition-all"
-                    title="Remove pin"
+                    title={i18n._(COPY.chat.quoteRemove)}
                   >
                     <X className="w-3 h-3" />
                   </button>

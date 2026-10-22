@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Markdown from './Markdown'
 import {
   Star, StickyNote, GitBranch, Trash2, MoreVertical,
-  Eye, Copy, ArrowRightCircle, Pencil, Pin,
+  Eye, Copy, ArrowRightCircle, Pencil, Quote,
   Image as ImageIcon, FileText,
 } from 'lucide-react'
 import { SPRING_SNAPPY, SPRING_GENTLE, DUSTY_GOLD, HIGHLIGHT_COLORS } from '../../lib/constants'
@@ -341,8 +341,8 @@ export default function MessageCard({
                     <MenuButton icon={ArrowRightCircle} onClick={() => { onMoveToBranch?.(); setShowMenu(false) }}>
                       Send to branch
                     </MenuButton>
-                    <MenuButton icon={Pin} onClick={() => { onPinForReference?.(); setShowMenu(false) }}>
-                      Pin for reference
+                    <MenuButton icon={Quote} onClick={() => { onPinForReference?.(); setShowMenu(false) }}>
+                      {i18n._(COPY.chat.quoteMessage)}
                     </MenuButton>
                     <MenuButton icon={Copy} onClick={() => { handleCopy(); setShowMenu(false) }}>
                       {copied ? 'Copied!' : 'Copy text'}

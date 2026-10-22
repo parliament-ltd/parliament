@@ -169,7 +169,7 @@ Line numbers are approximate.
 - **R13 approved:** "Pin for reference" is renamed so it says it makes a quote; what it does and the stored quotes stay.
 - **R27 approved:** the backup dot and banner go with the old homepage; Records' one line replaces them.
 - **The new stored fields of stage 6 are approved:** `model` and `usage` on replies, `recordsCols` in the space, saved searches, `archived` and `tagsMine` on every kind, `pinned` and `tags` on quotes, `erasedFrom`, a collection's `order` and items of kind chat, plan and marking, and a note's `quotes` and `summary`.
-- **R6, reopened (C20): "let's make favorite a tag."** Not settled: what the heart on a message does then, and what becomes of the Favorites collection. See C147.
+- **R6, reopened (C20): "let's make favorite a tag."** Ruled the same day: yes, as C147 suggests ("agree with lean on favorites"). The homepage's favourites list is retired with the homepage; the heart stays and keeps a tagged quote.
 
 ## Part 1. Settled by precedence
 
@@ -1224,12 +1224,13 @@ Found while splitting stage 6 into pieces. Read with C131 (Records, plan, keywor
 - **Suggestion:** keep as built.
 
 **C147. Favourites as a tag** (R6 reopened, 22 October: "let's make favorite a tag, I think we discussed that before"). The history: on 23 September C20 folded favourites into pins, with "users can tag a pin `favorite` themselves"; on 11 October C20 was reopened and favourites became the built-in Favorites collection, which is what the version 6 upgrade made of them and what the heart fills today. What a tag changes:
-- **(a) Anything with a number can carry it now:** `tagadd:favorite 204` on a chat, plan, note, keyword or quote, and `tag:favorite` on Records lists them. Nothing new is needed for that.
+- **(a) Anything with a number can carry it now:** `tagadd:favorite 204` on a chat, plan, note, keyword or quote, and `tag:favorite` on Records lists them. Built with one addition: a `tag:` filter counts as filtering for the keywords and quotes it names, so they are rows then (A19), and `tag:favorite` lists every favourite.
 - **(b) A single message has no number,** and only numbered things carry tags, so the heart has to make one: a quote of the whole message, kept beside its chat and never sent, tagged `favorite`. A second click on the heart takes the tag off (and the quote, if the heart made it and nothing else holds it).
 - **(c) The favourites you have** (messages in the Favorites collection) each become such a quote, tagged `favorite`. That changes stored data, so it is shown as a dry run first. The old `favorites` records stay, readable by old backups.
 - **(d) The Favorites collection** stops being built in: an ordinary collection that can be renamed or forgotten, with `save:"Favorites"` over `tag:favorite` offered in its place. Nothing is deleted.
 - **(e) The tag's word** is `favorite` in every language, so it matches across devices; it is shown as written, like any tag.
-- **Suggestion:** as above. Not built: it waits for a ruling.
+- **Suggestion:** as above.
+- **Ruled 22 October: yes** ("agree with lean on favorites"). **Built so,** with one change to (b): a second click takes the tag off and the quote stays, since the heart cannot tell a quote it made from one the person kept on purpose; `erase:` removes it. (c) is built (`lib/favoriteTags.js`) and has not run: its dry run is shown on Stefan's data first, and it runs on his yes. Until then the heart still shows the old favourites and a click takes one back as before.
 
 **C134, as built (piece 3).** `undo:` takes back the last command line, whole: what it changed in rows, saved searches, the filters on Records and the space (boards, windows, the bar, columns). Kept for the tab, the last 50 lines. If something it changed has changed since (in another tab, say), undo stops there and says so rather than writing over it. Not taken back: a room's name (C40), what was sent or copied, and `erase:` (piece 4).
 

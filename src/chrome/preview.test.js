@@ -688,7 +688,7 @@ describe('the Collection (stage 6, piece 6; C144)', () => {
     expect(at('>name:"favorites"').text).toBe('Another collection is called favorites')
     expect(at('>open:"Favorites"')).toMatchObject({ text: 'Enter shows the collection Favorites', next: { addressed: 'collection', context: { collection: 'fav' } } })
     expect(at('>forget:"Q2"')).toMatchObject({ text: 'Enter forgets the collection Q2. What it held stays where it is', act: { kind: 'collectionWrite', id: 'q2', after: null } })
-    expect(at('>forget:"Favorites"').text).toBe('Favorites stays while the heart on messages fills it')
+    expect(at('>forget:"Favorites"').text).toBe('Enter forgets the collection Favorites. What it held stays where it is')
   })
 
   it('sort: and type: pick the order and the tab', () => {

@@ -358,6 +358,30 @@ msgid "chat.quoteHelp"
 msgstr "Keep these words beside the chat, numbered. They are never sent"
 
 #. js-lingui-explicit-id
+msgid "chat.quoteMessage"
+msgstr "Quote in a chat"
+
+#. js-lingui-explicit-id
+msgid "chat.quoteNewChat"
+msgstr "A new chat, with this quote beside it"
+
+#. js-lingui-explicit-id
+msgid "chat.quoteRemove"
+msgstr "Remove this quote"
+
+#. js-lingui-explicit-id
+msgid "chat.quotesHelp"
+msgstr "Kept beside this chat. They are never sent"
+
+#. js-lingui-explicit-id
+msgid "chat.quotesHere"
+msgstr "Quotes"
+
+#. js-lingui-explicit-id
+msgid "chat.quoteWhichChat"
+msgstr "Quote it beside which chat?"
+
+#. js-lingui-explicit-id
 msgid "chat.sourceNothing"
 msgstr "Nothing found on {source} for that. Try other words."
 
@@ -825,10 +849,6 @@ msgstr "Enter puts {nums} in {name}"
 #. js-lingui-explicit-id
 msgid "enter.collectionAlready"
 msgstr "Those are in {name} already"
-
-#. js-lingui-explicit-id
-msgid "enter.collectionBuiltIn"
-msgstr "{name} stays while the heart on messages fills it"
 
 #. js-lingui-explicit-id
 msgid "enter.collectionCardNone"

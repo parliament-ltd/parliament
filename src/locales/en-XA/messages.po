@@ -358,6 +358,30 @@ msgid "chat.quoteHelp"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.quoteMessage"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quoteNewChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quoteRemove"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quotesHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quotesHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quoteWhichChat"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.sourceNothing"
 msgstr ""
 
@@ -824,10 +848,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.collectionAlready"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "enter.collectionBuiltIn"
 msgstr ""
 
 #. js-lingui-explicit-id

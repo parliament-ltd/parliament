@@ -65,6 +65,14 @@ describe('the table at rest (A19, C133)', () => {
   it('does not bring them with has: or from:', () => {
     expect(nums(view('from:202'))).toEqual([])
   })
+
+  it('shows the keywords and quotes a tag: names, so tag:favorite lists every favourite (C147)', () => {
+    const tagged = [...rows.slice(0, 6), { ...rows[6], tags: ['favorite'] }]
+    const shown = (v) => applyView(tagged, v, ctx).map((r) => r.num)
+    expect(shown(view('tag:favorite'))).toEqual([212])
+    expect(shown(EMPTY_VIEW)).not.toContain(212)
+    expect(shown(view('-tag:favorite'))).not.toContain(212)
+  })
 })
 
 describe('search (C132 (a))', () => {

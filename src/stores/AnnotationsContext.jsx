@@ -32,8 +32,11 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import {
   getFavorites,
-  addFavorite as dbAddFavorite,
   deleteFavorite as dbDeleteFavorite,
+  getPins,
+  getSetting,
+  addFavoriteQuote,
+  setFavoriteTag,
   getNotes,
   addNote as dbAddNote,
   updateNote as dbUpdateNote,
@@ -44,6 +47,7 @@ import {
 } from '../lib/db'
 import { useChat } from './ChatContext'
 import { includesWord } from '../lib/textUtils'
+import { favoritesOf, wholeQuoteOf, FAVORITES_TAGGED_SETTING } from '../lib/favoriteTags'
 
 const AnnotationsContext = createContext(null)
 
@@ -90,9 +94,13 @@ export function AnnotationsProvider({ children }) {
       getFavorites(activeConversationId),
       getNotes(activeConversationId),
       getHighlights(activeConversationId),
-    ]).then(([favs, ns, hls]) => {
+      getPins(activeConversationId),
+      getSetting(FAVORITES_TAGGED_SETTING),
+    ]).then(([favs, ns, hls, pins, converted]) => {
       if (cancelled) return
-      setFavorites(new Map(favs.map(f => [f.messageId, f])))
+      // A favourite is a quote tagged favorite; old favourite records count
+      // until they have been turned into such quotes (C147).
+      setFavorites(favoritesOf({ pins, oldFavorites: favs, conversationId: activeConversationId, converted: Boolean(converted) }))
       setNotes(new Map(ns.map(n => [n.messageId, n])))
       setHighlights(hls)
       setShowNotes(new Set())
@@ -113,19 +121,32 @@ export function AnnotationsProvider({ children }) {
   const loaded = activeConversationId != null && loadedFor === activeConversationId
 
   // ─── Favorites ───────────────────────────────────────────
+  // The heart (C147): a quote of the whole message, kept beside its chat and
+  // tagged favorite, or the tag on the whole-message quote already there. A
+  // second click takes the tag off; the quote stays, and erase: removes it.
+  // An old favourite record is taken back as before.
   const toggleFavorite = useCallback(async (messageId) => {
     if (!activeConversationId) return
     const existing = favorites.get(messageId)
-    if (existing) {
-      try { await dbDeleteFavorite(existing.id) } catch { /* tolerate */ }
-      setFavorites(prev => { const n = new Map(prev); n.delete(messageId); return n })
-    } else {
-      try {
-        const rec = await dbAddFavorite({ conversationId: activeConversationId, messageId })
-        setFavorites(prev => new Map(prev).set(messageId, rec))
-      } catch { /* tolerate */ }
-    }
-  }, [favorites, activeConversationId])
+    const drop = () => setFavorites(prev => { const n = new Map(prev); n.delete(messageId); return n })
+    try {
+      if (existing?.kind === 'tag') {
+        await setFavoriteTag(existing.pin, false)
+        drop()
+      } else if (existing?.kind === 'old') {
+        await dbDeleteFavorite(existing.record.id)
+        drop()
+      } else {
+        const message = messages.find(m => m.id === messageId)
+        if (!message?.content) return
+        const whole = wholeQuoteOf(await getPins(activeConversationId), activeConversationId, messageId, message.content)
+        const pin = whole
+          ? await setFavoriteTag(whole, true)
+          : await addFavoriteQuote({ conversationId: activeConversationId, messageId, content: message.content })
+        setFavorites(prev => new Map(prev).set(messageId, { kind: 'tag', pin }))
+      }
+    } catch { /* tolerate: the heart shows what is stored */ }
+  }, [favorites, activeConversationId, messages])
 
   // ─── Notes ───────────────────────────────────────────────
   const toggleNotePanel = useCallback((messageId) => {
