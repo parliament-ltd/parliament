@@ -22,8 +22,10 @@ function Parts({ parts }) {
  *   welcome: set on the welcome page, with its next step (W §2, §6)
  *   room: the room on this screen, its chat's number, or null for an empty
  *   room; left out when the screen has no room. A prompt goes there.
+ *   search: on Records, how many rows the search leaves ({ count }); null
+ *   where search does not reach yet (C132 (a))
  */
-export default function EnterLine({ mode, resting, empty, says, addressed, room, welcome = null, hidden = false }) {
+export default function EnterLine({ mode, resting, empty, says, addressed, room, welcome = null, hidden = false, search = null }) {
   const { i18n } = useLingui()
   const leave = { key: 'leave', text: i18n._(resting === 'prompt' ? COPY.enter.leavePrompt : COPY.enter.leaveSearch) }
   const toRoom = room && (mode === 'prompt' || addressed === 'room')
@@ -63,7 +65,11 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
         { key: 'p', text: i18n._(COPY.enter.restingPrompt) },
         { key: 'h', text: i18n._(COPY.enter.restingHelp) },
       ]
-      : [{ key: 'does', now: true, text: i18n._(COPY.enter.searchLater) }]
+      : [{
+        key: 'does',
+        now: true,
+        text: search ? i18n._(COPY.enter.searchShows, { count: search.count }) : i18n._(COPY.enter.searchRecords, { board: boardName(i18n, 'almanac') }),
+      }]
     if (resting !== 'search') parts.push(leave)
   } else {
     // Who receives the prompt and what it costs, before Enter (C83).

@@ -24,3 +24,17 @@ describe('a backup with replies that stopped short', () => {
     expect(check(reply({ incomplete: false, source: { ...source, url: 'javascript:alert(1)' } })).valid).toBe(false)
   })
 })
+
+describe('a backup with replies that recorded how they were made (C132 (h))', () => {
+  it('accepts the model and the tokens in and out', () => {
+    expect(check(reply({ model: 'claude-sonnet', usage: { input: 1200, output: 340 } }))).toEqual({ valid: true })
+  })
+
+  it('refuses tokens that are not counts, or anything else in usage', () => {
+    expect(check(reply({ usage: { input: -1, output: 2 } })).valid).toBe(false)
+    expect(check(reply({ usage: { input: 1.5, output: 2 } })).valid).toBe(false)
+    expect(check(reply({ usage: { input: 1, output: 2, cost: 9 } })).valid).toBe(false)
+    expect(check(reply({ usage: [1, 2] })).valid).toBe(false)
+    expect(check(reply({ model: 7 })).valid).toBe(false)
+  })
+})

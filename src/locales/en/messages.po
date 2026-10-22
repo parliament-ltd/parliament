@@ -41,18 +41,41 @@ msgid "almanac.empty"
 msgstr "Nothing made yet. p> starts your first chat, and it appears here."
 
 #. js-lingui-explicit-id
+msgid "almanac.filtersLabel"
+msgstr "The search and filters in force"
+
+#. js-lingui-explicit-id
 msgid "almanac.loading"
 msgstr "Reading what you have made"
+
+#. clear:filters stays English
+#. js-lingui-explicit-id
+msgid "almanac.noneMatch"
+msgstr "Nothing matches. clear:filters shows everything again."
 
 #. Marginalia under a pinned row
 #. js-lingui-explicit-id
 msgid "almanac.pinned"
 msgstr "pinned"
 
+#. {command} stays English
+#. js-lingui-explicit-id
+msgid "almanac.removes"
+msgstr "Removes it, as {command} does"
+
 #. What clicking a row does; open: stays English
 #. js-lingui-explicit-id
 msgid "almanac.rowHelp"
 msgstr "Writes open:{num} in the bar"
+
+#. What is searched for, in the quotation marks the language uses
+#. js-lingui-explicit-id
+msgid "almanac.searchFor"
+msgstr "“{text}”"
+
+#. js-lingui-explicit-id
+msgid "almanac.shown"
+msgstr "{count, plural, =0 {no rows} one {# row} other {# rows}}"
 
 #. js-lingui-explicit-id
 msgid "almanac.untitled"
@@ -304,6 +327,15 @@ msgstr "The reply in {chat} stopped when you left it, before any of it arrived."
 msgid "chat.stoppedOnReply"
 msgstr "Stopped when you left the chat. What arrived is kept."
 
+#. The collection favourites became (C20)
+#. js-lingui-explicit-id
+msgid "collection.favorites"
+msgstr "Favorites"
+
+#. js-lingui-explicit-id
+msgid "collection.untitled"
+msgstr "Untitled collection"
+
 #. js-lingui-explicit-id
 msgid "count.branches"
 msgstr "{count, plural, one {# branch} other {# branches}}"
@@ -386,6 +418,38 @@ msgid "enter.bringHere"
 msgstr "Everything it brings is here already"
 
 #. js-lingui-explicit-id
+msgid "enter.clearFilter"
+msgstr "Enter removes {filters}"
+
+#. js-lingui-explicit-id
+msgid "enter.clearFilters"
+msgstr "Enter clears the search and every filter"
+
+#. js-lingui-explicit-id
+msgid "enter.clearNoFilter"
+msgstr "No {verb} filter is in force"
+
+#. js-lingui-explicit-id
+msgid "enter.clearNoSearch"
+msgstr "Nothing is searched for"
+
+#. js-lingui-explicit-id
+msgid "enter.clearNoSort"
+msgstr "The table is in its usual order"
+
+#. js-lingui-explicit-id
+msgid "enter.clearNothing"
+msgstr "No search or filter is in force"
+
+#. js-lingui-explicit-id
+msgid "enter.clearSearch"
+msgstr "Enter clears the search"
+
+#. js-lingui-explicit-id
+msgid "enter.clearSort"
+msgstr "Enter puts the usual order back"
+
+#. js-lingui-explicit-id
 msgid "enter.closeBoard"
 msgstr "Enter closes {board}. Nothing is lost"
 
@@ -410,6 +474,14 @@ msgid "enter.closeWelcome"
 msgstr "Enter closes the welcome page. tour: brings it back"
 
 #. js-lingui-explicit-id
+msgid "enter.costBad"
+msgstr "cost: takes an amount, like >0.50, <1 or 0.18"
+
+#. js-lingui-explicit-id
+msgid "enter.dateBad"
+msgstr "{verb} takes 7d, 3w, a month, or a date like 2026-09-01"
+
+#. js-lingui-explicit-id
 msgid "enter.didYouMean"
 msgstr "No command called {verb}. Did you mean {near}?"
 
@@ -426,9 +498,26 @@ msgstr "Type a command, or ? for every command"
 msgid "enter.erase"
 msgstr "To remove something for good, use erase:. Enter writes it in"
 
+#. C132 (h): a cost is worked out from recorded tokens, never guessed
+#. js-lingui-explicit-id
+msgid "enter.filterCostUnknown"
+msgstr "{count, plural, one {# with no cost recorded is left out} other {# with no cost recorded are left out}}"
+
 #. js-lingui-explicit-id
 msgid "enter.filters"
 msgstr "{count, plural, one {Enter applies # filter} other {Enter applies # filters}}"
+
+#. js-lingui-explicit-id
+msgid "enter.filterShows"
+msgstr "{count, plural, =0 {Enter shows no rows} one {Enter shows # row} other {Enter shows # rows}}"
+
+#. js-lingui-explicit-id
+msgid "enter.filterSince"
+msgstr "made since {day}"
+
+#. js-lingui-explicit-id
+msgid "enter.filterUntil"
+msgstr "made until the end of {day}"
 
 #. js-lingui-explicit-id
 msgid "enter.focusAlone"
@@ -459,6 +548,10 @@ msgid "enter.focusOffSame"
 msgstr "Enter brings the screen back as it was"
 
 #. js-lingui-explicit-id
+msgid "enter.fromWhat"
+msgstr "Nothing comes from {num}. from: takes a chat, a plan, a branch or a run"
+
+#. js-lingui-explicit-id
 msgid "enter.goNewRoom"
 msgstr "Enter opens an empty room beside what is here. Its first prompt starts it"
 
@@ -479,8 +572,25 @@ msgid "enter.helpVerb"
 msgstr "Enter shows how {verb} works"
 
 #. js-lingui-explicit-id
+msgid "enter.inNoCollection"
+msgstr "No collection is called {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.inNone"
+msgstr "No room or collection is called {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.inNoRoom"
+msgstr "No room is called {name}"
+
+#. js-lingui-explicit-id
 msgid "enter.inspectOne"
 msgstr "Enter shows {num} in detail, here"
+
+#. room and collection stay English: they are words of the command
+#. js-lingui-explicit-id
+msgid "enter.inWhich"
+msgstr "{name} is a room and a collection. Add room or collection after it"
 
 #. js-lingui-explicit-id
 msgid "enter.key"
@@ -787,9 +897,14 @@ msgstr "{verb} is no longer a command. Use {instead}"
 msgid "enter.roomHere"
 msgstr "The last room is here already"
 
+#. In search mode on a board search does not reach yet; {board} is Records
 #. js-lingui-explicit-id
-msgid "enter.searchLater"
-msgstr "Search is not built yet"
+msgid "enter.searchRecords"
+msgstr "Search works on {board} for now"
+
+#. js-lingui-explicit-id
+msgid "enter.searchShows"
+msgstr "{count, plural, =0 {No row matches} one {# row matches} other {# rows match}}"
 
 #. {verbs} lists the commands in the order they run; one that fails stops the rest
 #. js-lingui-explicit-id
@@ -1605,7 +1720,7 @@ msgstr "Show less detail until you come near it, or all of it again"
 
 #. js-lingui-explicit-id
 msgid "verb.clear"
-msgstr "Empty the collection, or remove every filter"
+msgstr "Empty the collection, remove every filter, or one kind of filter"
 
 #. js-lingui-explicit-id
 msgid "verb.close"
@@ -1673,11 +1788,11 @@ msgstr "Choose the frameworks that shape every reply: standing instructions sent
 
 #. js-lingui-explicit-id
 msgid "verb.from"
-msgstr "Show what came from a chat, a branch or a run"
+msgstr "Show what came from a chat, a plan, a branch or a run"
 
 #. js-lingui-explicit-id
 msgid "verb.has"
-msgstr "Show what holds notes or highlights"
+msgstr "Show what holds notes, keywords, quotes or highlights"
 
 #. js-lingui-explicit-id
 msgid "verb.heading"
@@ -1729,7 +1844,7 @@ msgstr "Show replies marked up, or clean"
 
 #. js-lingui-explicit-id
 msgid "verb.model"
-msgstr "Show what a model answered"
+msgstr "Show what a model or a source answered"
 
 #. js-lingui-explicit-id
 msgid "verb.move"

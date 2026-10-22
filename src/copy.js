@@ -177,7 +177,34 @@ export const COPY = {
     toBegin: /*i18n*/ { id: 'enter.toBegin', message: '{leader} to begin', comment: '{leader} is >, the command leader' },
     nextStep: /*i18n*/ { id: 'enter.nextStep', message: 'next: {command}', comment: 'The next welcome step\'s command, which stays English' },
     toCommand: /*i18n*/ { id: 'enter.toCommand', message: '{leader} for the command line', comment: 'In prompt mode on the welcome page (C119)' },
-    searchLater: /*i18n*/ { id: 'enter.searchLater', message: 'Search is not built yet' },
+    // Search and filters on Records (stage 6, piece 1; C132). {verb} and
+    // {filters} are commands, which stay English; {day} is a date the bar
+    // writes as the reader's language does; {name} is the person's words.
+    searchShows: /*i18n*/ { id: 'enter.searchShows', message: '{count, plural, =0 {No row matches} one {# row matches} other {# rows match}}' },
+    searchRecords: /*i18n*/ { id: 'enter.searchRecords', message: 'Search works on {board} for now', comment: 'In search mode on a board search does not reach yet; {board} is Records' },
+    filterShows: /*i18n*/ { id: 'enter.filterShows', message: '{count, plural, =0 {Enter shows no rows} one {Enter shows # row} other {Enter shows # rows}}' },
+    filterSince: /*i18n*/ { id: 'enter.filterSince', message: 'made since {day}' },
+    filterUntil: /*i18n*/ { id: 'enter.filterUntil', message: 'made until the end of {day}' },
+    filterCostUnknown: /*i18n*/ {
+      id: 'enter.filterCostUnknown',
+      message: '{count, plural, one {# with no cost recorded is left out} other {# with no cost recorded are left out}}',
+      comment: 'C132 (h): a cost is worked out from recorded tokens, never guessed',
+    },
+    fromWhat: /*i18n*/ { id: 'enter.fromWhat', message: 'Nothing comes from {num}. from: takes a chat, a plan, a branch or a run' },
+    inNone: /*i18n*/ { id: 'enter.inNone', message: 'No room or collection is called {name}' },
+    inNoRoom: /*i18n*/ { id: 'enter.inNoRoom', message: 'No room is called {name}' },
+    inNoCollection: /*i18n*/ { id: 'enter.inNoCollection', message: 'No collection is called {name}' },
+    inWhich: /*i18n*/ { id: 'enter.inWhich', message: '{name} is a room and a collection. Add room or collection after it', comment: 'room and collection stay English: they are words of the command' },
+    costBad: /*i18n*/ { id: 'enter.costBad', message: 'cost: takes an amount, like >0.50, <1 or 0.18' },
+    dateBad: /*i18n*/ { id: 'enter.dateBad', message: '{verb} takes 7d, 3w, a month, or a date like 2026-09-01' },
+    clearFilters: /*i18n*/ { id: 'enter.clearFilters', message: 'Enter clears the search and every filter' },
+    clearSearch: /*i18n*/ { id: 'enter.clearSearch', message: 'Enter clears the search' },
+    clearSort: /*i18n*/ { id: 'enter.clearSort', message: 'Enter puts the usual order back' },
+    clearFilter: /*i18n*/ { id: 'enter.clearFilter', message: 'Enter removes {filters}' },
+    clearNothing: /*i18n*/ { id: 'enter.clearNothing', message: 'No search or filter is in force' },
+    clearNoSearch: /*i18n*/ { id: 'enter.clearNoSearch', message: 'Nothing is searched for' },
+    clearNoSort: /*i18n*/ { id: 'enter.clearNoSort', message: 'The table is in its usual order' },
+    clearNoFilter: /*i18n*/ { id: 'enter.clearNoFilter', message: 'No {verb} filter is in force' },
     // Bringing boards into the space: records:, room:, tour: (C95, C125, C131).
     // One space (C125): an arrangement's boards brought beside what is here.
     bringBoards: /*i18n*/ { id: 'enter.bringBoards', message: 'Enter brings {boards} beside what is here', comment: '{boards} lists board names' },
@@ -372,6 +399,19 @@ export const COPY = {
     untitled: /*i18n*/ { id: 'almanac.untitled', message: 'Untitled' },
     rowHelp: /*i18n*/ { id: 'almanac.rowHelp', message: 'Writes open:{num} in the bar', comment: 'What clicking a row does; open: stays English' },
     loading: /*i18n*/ { id: 'almanac.loading', message: 'Reading what you have made' },
+    // The search and filters in force, one line at the top (stage 6, piece 1; C132).
+    filtersLabel: /*i18n*/ { id: 'almanac.filtersLabel', message: 'The search and filters in force' },
+    searchFor: /*i18n*/ { id: 'almanac.searchFor', message: '“{text}”', comment: 'What is searched for, in the quotation marks the language uses' },
+    removes: /*i18n*/ { id: 'almanac.removes', message: 'Removes it, as {command} does', comment: '{command} stays English' },
+    shown: /*i18n*/ { id: 'almanac.shown', message: '{count, plural, =0 {no rows} one {# row} other {# rows}}' },
+    noneMatch: /*i18n*/ { id: 'almanac.noneMatch', message: 'Nothing matches. clear:filters shows everything again.', comment: 'clear:filters stays English' },
+  },
+
+  // Collections by the words people read (C139). A collection's own name is
+  // the person's words; Favorites is built in.
+  collections: {
+    favorites: /*i18n*/ { id: 'collection.favorites', message: 'Favorites', comment: 'The collection favourites became (C20)' },
+    untitled: /*i18n*/ { id: 'collection.untitled', message: 'Untitled collection' },
   },
 
   // The Library (stage 5, piece 4; Lab v7): the catalogue, read-only.

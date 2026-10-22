@@ -42,6 +42,33 @@ describe('the Almanac rows (stage 5, piece 3)', () => {
     expect(rows[1].text).toBe('Check the range\nmap later')
   })
 
+  it('carries what the filters read: room, plan, branch, markings, collections, who answered and cost (C132)', () => {
+    const facts = new Map([
+      ['c204', { models: ['claude-sonnet'], sources: [], usage: [{ model: 'claude-sonnet', input: 1_000_000, output: 0 }], unpriced: 0, words: 'tyto' }],
+      ['c206', { models: [], sources: ['wikipedia'], usage: [], unpriced: 0, words: '' }],
+    ])
+    const rows = toRows({
+      chats: [chat(204, { docketId: 'd203', run: 1 }), chat(206, { docketId: 'd203', branch: 'b', run: 1 })],
+      dockets: [docket(203, ['a', 'b'])],
+      highlights: [{ id: 'h1', num: 211, conversationId: 'c204', text: 'Tyto', kind: 'term', createdAt: '2026-10-21T08:00:00Z' }],
+      quotes: [{ id: 'q1', num: 212, targetConversationId: 'c206', content: 'Hunts by sound', createdAt: '2026-10-21T08:00:00Z' }],
+      collections: [{ id: 'fav', items: [{ kind: 'message', conversationId: 'c206', messageId: 'm1' }] }],
+      rooms: { mode_writing: { own: 'Owl desk' } },
+      facts,
+      priceOf: (id) => (id === 'claude-sonnet' ? { inputPerMillion: 3, outputPerMillion: 15 } : null),
+    })
+    const by = (num) => rows.find((r) => r.num === num)
+    expect(by(204)).toMatchObject({ roomId: 'mode_writing', docketNum: 203, branch: 'a', run: 1, chatNum: 204, marks: ['term'], models: ['claude-sonnet'], cost: 3, words: 'tyto' })
+    expect(by(206)).toMatchObject({ branch: 'b', marks: ['quote'], sources: ['wikipedia'], cost: 0, collections: ['fav'] })
+    expect(by(203)).toMatchObject({ kind: 'docket', docketNum: 203, chatNums: [204, 206], marks: ['term', 'quote'], cost: 3, collections: ['fav'] })
+    expect(by(211)).toMatchObject({ chatNum: 204, docketNum: 203, branch: 'a', roomId: 'mode_writing' })
+  })
+
+  it('knows a plan\'s cost only when every chat in it is known', () => {
+    const rows = toRows({ chats: [chat(204, { docketId: 'd203' }), chat(206, { docketId: 'd203', branch: 'b' })], dockets: [docket(203, ['a', 'b'])] })
+    expect(rows.find((r) => r.kind === 'docket').cost).toBeNull()
+  })
+
   it('leaves out what has no number yet', () => {
     expect(toRows({ chats: [{ id: 'old', title: 'Before version 6' }] })).toEqual([])
   })

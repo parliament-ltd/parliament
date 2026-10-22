@@ -125,18 +125,21 @@ export const VERBS = Object.freeze([
   // Filters: they narrow the table, and several can share a line.
   v({ verb: 'type', group: 'filters', example: 'type:chat', forms: ['type:chat', 'type:note,chat', 'type:edit'], takes: [[{ list: KINDS }]], minus: true, on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.type', message: 'Show some kinds of thing' } }),
-  v({ verb: 'tag', group: 'filters', example: 'tag:research', forms: ['tag:research', '-tag:research'], takes: [['text']], minus: true, on: TABLES, stage: 6, click: 'apply',
+  v({ verb: 'tag', group: 'filters', example: 'tag:research', forms: ['tag:research', '-tag:research', 'tag:essay,research'], takes: [[{ list: 'text' }]], minus: true, on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.tag', message: 'Show what carries a tag. A minus leaves it out' } }),
-  v({ verb: 'model', group: 'filters', example: 'model:opus', takes: [['text']], minus: true, on: TABLES, stage: 6, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.model', message: 'Show what a model answered' } }),
-  v({ verb: 'from', group: 'filters', example: 'from:201b', forms: ['from:203', 'from:201b', 'from:run 3'], takes: [['address'], [['run'], 'number']], minus: true, on: TABLES, stage: 6, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.from', message: 'Show what came from a chat, a branch or a run' } }),
+  v({ verb: 'model', group: 'filters', example: 'model:opus', forms: ['model:opus', 'model:wikipedia'], takes: [[{ list: 'text' }]], minus: true, on: TABLES, stage: 6, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.model', message: 'Show what a model or a source answered' } }),
+  v({ verb: 'from', group: 'filters', example: 'from:201b', forms: ['from:203', 'from:201b', 'from:run 3'], takes: [['addresses'], [['run'], 'number']], minus: true, on: TABLES, stage: 6, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.from', message: 'Show what came from a chat, a plan, a branch or a run' } }),
   // in: takes a collection or a room by name: the room filter folded into
-  // it when room: became the room's own verb (C131).
-  v({ verb: 'in', group: 'filters', example: 'in:"Q2 evidence"', forms: ['in:"Q2 evidence"', 'in:"Code Lab"'], takes: [['text']], minus: true, on: TABLES, stage: 6, click: 'apply',
+  // it when room: became the room's own verb (C131). Where a room and a
+  // collection share the name, a word after it says which (C132 (f)).
+  v({ verb: 'in', group: 'filters', example: 'in:"Q2 evidence"', forms: ['in:"Q2 evidence"', 'in:"Code Lab"', 'in:"Code Lab" room'],
+    takes: [[{ list: 'text' }, { opt: ['room', 'collection'] }]], minus: true, on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.in', message: 'Show what is in a collection, or was made in a room' } }),
-  v({ verb: 'has', group: 'filters', example: 'has:highlight', takes: [['text']], minus: true, on: TABLES, stage: 6, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.has', message: 'Show what holds notes or highlights' } }),
+  v({ verb: 'has', group: 'filters', example: 'has:keyword', forms: ['has:note', 'has:keyword', 'has:quote', 'has:highlight'],
+    takes: [[{ list: ['note', 'keyword', 'quote', 'highlight'] }]], minus: true, on: TABLES, stage: 6, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.has', message: 'Show what holds notes, keywords, quotes or highlights' } }),
   v({ verb: 'cost', group: 'filters', example: 'cost:>0.50', takes: [['text']], on: TABLES, stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.cost', message: 'Show plans by what they cost' } }),
   v({ verb: 'since', group: 'filters', example: 'since:7d', forms: ['since:7d', 'since:3w', 'since:september', 'since:09/01/26'], takes: [['text']], on: TABLES, stage: 6, click: 'apply',
@@ -155,8 +158,11 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.add', message: 'Put things into the collection, or blocks into a room' } }),
   v({ verb: 'rm', group: 'collection', example: 'rm:207', forms: ['rm:207', 'rm:notes'], takes: [['addresses'], [{ list: 'text' }]], on: [...TABLES, 'lab'], stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.rm', message: 'Take things out of the collection, or blocks out of a room' } }),
-  v({ verb: 'clear', group: 'collection', example: 'clear:', forms: ['clear:', 'clear:filters'], takes: [[], [['filters']]], on: TABLES, stage: 6, undoable: true,
-    gloss: /*i18n*/ { id: 'verb.clear', message: 'Empty the collection, or remove every filter' } }),
+  // clear:tag removes one kind of filter, as a click on it at the top of
+  // Records does (C132 (c)).
+  v({ verb: 'clear', group: 'collection', example: 'clear:', forms: ['clear:', 'clear:filters', 'clear:tag', 'clear:search'],
+    takes: [[], [['filters', 'search', 'sort', 'type', 'tag', 'in', 'has', 'from', 'model', 'cost', 'since', 'until']]], on: TABLES, stage: 6, undoable: true,
+    gloss: /*i18n*/ { id: 'verb.clear', message: 'Empty the collection, remove every filter, or one kind of filter' } }),
   v({ verb: 'compare', group: 'collection', example: 'compare:201a 201b', forms: ['compare:201a 201b', 'compare:201, 207'],
     takes: [[], [{ many: 'addresses' }]], on: [...TABLES, 'library', 'room'], stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.compare', message: 'Set two or more side by side. Nothing is sent' } }),

@@ -37,7 +37,13 @@ import KeyPanel from './KeyPanel'
 // whether it went ({ refused } or { done }), then once it is answered
 // (done resolves to a notice, or null).
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose }) {
+// Search narrows the board the bar points at as it is typed (C132 (a)): for
+// now Records. While the bar points at Records it reports what is typed in
+// search (onSearch), and `search` is how many rows that leaves, for the
+// Enter line. searchReset changes when clear:filters or clear:search empties
+// the search.
+
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, onSearch, search = null, searchReset = 0 }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -62,6 +68,11 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
 
   // The field's mode, for the welcome page's first step.
   useEffect(() => { onMode?.(field.mode) }, [field.mode, onMode])
+
+  // What is searched for on Records, as it is typed.
+  const searched = field.text.search
+  useEffect(() => { if (board === 'almanac') onSearch?.(searched) }, [board, searched, onSearch])
+  useEffect(() => { if (searchReset) dispatch({ type: 'clearSearch' }) }, [searchReset])
   useEffect(() => { if (autoFocus) input.current?.focus() }, [autoFocus])
 
   // `/` outside text fields, and Cmd/Ctrl+K from anywhere, in this document.
@@ -219,7 +230,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           onBlur={() => dispatch({ type: 'blur' })}
         />
         </div>
-        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} addressed={board} room={room} welcome={welcome} />
+        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} addressed={board} room={room} welcome={welcome} search={board === 'almanac' ? search : null} />
         {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
         {!reference && inspect && <Inspect row={inspect} />}
         {!reference && !inspect && keyPanel && (

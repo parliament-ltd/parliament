@@ -164,6 +164,17 @@
    chrome's tokens. Widths are v30's; the title takes the rest. */
 .ch-alm { overflow-x: auto; }
 .ch-alm-note { margin: 0; padding: 14px 16px; }
+/* The search and filters in force (stage 6, piece 1; C132 (c)): one line of
+   marginalia. Commands keep their mono face; a click removes one, and the
+   cross comes up to ink under the pointer. */
+.ch-alm-in { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; padding: 8px 16px 6px; border-bottom: .5px solid var(--ch-border-2); }
+.ch-shell .ch-alm-f { display: inline-flex; align-items: baseline; gap: 4px; padding: 2px 0; color: var(--ch-ink-2); }
+.ch-alm-f [dir='ltr'] { font: 400 var(--ch-t-id) var(--ch-mono); font-style: normal; }
+.ch-alm-f .x { color: var(--ch-marg); }
+.ch-shell .ch-alm-f:hover, .ch-shell .ch-alm-f:hover .x { color: var(--ch-ink); }
+.ch-alm-count { margin-inline-start: auto; }
+.ch-shell .ch-alm-clear { padding: 2px 0; font: 400 var(--ch-t-id) var(--ch-mono); color: var(--ch-marg); text-decoration: underline; text-underline-offset: 2px; }
+.ch-shell .ch-alm-clear:hover { color: var(--ch-ink); }
 .ch-atable { width: 100%; border-collapse: collapse; table-layout: fixed; font: 400 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink); }
 .ch-atable th { font: 500 10.5px var(--ch-sans); color: var(--ch-ink-3); text-align: center; padding: 9px 6px 8px; border-bottom: 1px solid var(--ch-divider); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ch-atable th.c-title { text-align: start; }

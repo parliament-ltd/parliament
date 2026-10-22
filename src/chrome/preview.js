@@ -20,6 +20,7 @@ import { plan, planOpen, planBring, planRoom, planFocus, planFocusOff, roomOnScr
 import { cleanRoomName, ROOM_NAME_MAX } from '../lib/roomNames'
 import { CHARS_PER_TOKEN, inputCost, describeCost } from '../shell/estimate'
 import { holdsKey } from '../commands/parse'
+import { FILTERS, EMPTY_VIEW, readFilter, readSort, nextView, clears, applyView, costUnknown } from '../lib/recordsFilter'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
@@ -32,7 +33,42 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
-export const BUILT = new Set([...ARRANGEMENT_VERBS, ...BRINGS, ...ACTS, FOCUS])
+// The filters, sort: and clear: change what Records shows (stage 6,
+// piece 1; C132). They share a line with each other and with layout
+// commands (C99).
+const VIEW_VERBS = Object.freeze([...FILTERS, 'sort', 'clear'])
+export const BUILT = new Set([...ARRANGEMENT_VERBS, ...BRINGS, ...ACTS, FOCUS, ...VIEW_VERBS])
+
+/**
+ * One filter, sort: or clear: on Records, against the view as the line has
+ * left it so far. clear: alone empties the collection, which comes with the
+ * Collection (piece 6).
+ * @returns {{ change: object, says?: object, also?: object[] }|{ bad: object }|null}
+ */
+function planViewStep(view, step, records = {}) {
+  const [arg] = step.match?.values ?? []
+  if (step.verb === 'clear') {
+    if (!arg) return null
+    const word = arg.value
+    const gone = clears(view, word)
+    if (!gone) {
+      const message = word === 'filters' ? 'clearNothing' : word === 'search' ? 'clearNoSearch' : word === 'sort' ? 'clearNoSort' : 'clearNoFilter'
+      return { bad: { message, values: { verb: `${word}:` } } }
+    }
+    const says = gone.what === 'filter' ? { message: 'clearFilter', values: { filters: gone.filters } }
+      : { message: { filters: 'clearFilters', search: 'clearSearch', sort: 'clearSort' }[gone.what] }
+    return { change: { clear: word }, says }
+  }
+  if (step.verb === 'sort') return { change: { sort: readSort(arg.value, view.sort) } }
+  const read = readFilter(step, records)
+  if (read.bad) return { bad: read.bad }
+  const { filter } = read
+  // The day a date was read as, so a misreading shows before Enter (C132 (e)).
+  const also = filter.k === 'since' || filter.k === 'until'
+    ? filter.v.map((d) => ({ message: filter.k === 'since' ? 'filterSince' : 'filterUntil', values: { day: d.day } }))
+    : []
+  return { change: { filter }, also }
+}
 
 /** focus: clears the space to the chat alone; focus:off brings it back. Your own sets come with stage 14. */
 function planFocusStep(a, step, screens = {}) {
@@ -174,13 +210,15 @@ function planName(a, step, screens = {}) {
  * @param {string} value the whole field, leader included
  * @param {{ mode: string, arrangement: import('../shell/arrangement').Arrangement, built?: Set<string>,
  *   screens?: { lastRoom?: { id: string, num?: number|null }|null, roomName?: object|null, stepsOff?: boolean,
- *     measure?: () => object|null, numbered?: Map<number, object>, keys?: object[], noKey?: string[] } }} ctx
+ *     measure?: () => object|null, numbered?: Map<number, object>, keys?: object[], noKey?: string[],
+ *     records?: { rows: object[], view: object, rooms?: object[], collections?: object[], now?: number, locale?: string, ctx?: object } } }} ctx
  *   measure: the space as drawn, for width: (C126); numbered: the Almanac's rows by number, for open: and
- *   inspect:; keys and noKey: for api: (planApi)
+ *   inspect:; keys and noKey: for api: (planApi); records: Records' rows, the view in force and the names
+ *   filters read (C132)
  * @returns {{ answer: object, says: { message: string, values?: object }, next: object|null, act?: object|null }}
  *   next is the space after Enter, or null when Enter changes none of it;
- *   act is what Enter does besides, to what the bar points at (name:) or to
- *   the welcome steps (tour:)
+ *   act is what Enter does besides, to what the bar points at (name:), to
+ *   the welcome steps (tour:), or to what Records shows (filters)
  */
 export function preview(value, { mode, arrangement, built = BUILT, screens = {} }) {
   const answer = enterLine(value, { mode, board: arrangement.addressed, built })
@@ -198,7 +236,25 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
 
   let a = arrangement
   let last = null
+  // What the line does to Records: its filters, sort: and clear:, in order.
+  const records = screens.records ?? {}
+  const start = records.view ?? EMPTY_VIEW
+  const changes = []
+  const viewAlso = []
+  let viewSays = null
+  let onlyClears = true
   for (const step of answer.steps) {
+    if (VIEW_VERBS.includes(step.verb)) {
+      // The Collection's own search and filters come with it (piece 6).
+      const p = arrangement.addressed === 'almanac' ? planViewStep(nextView(start, changes), step, records) : null
+      if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
+      if (p.bad) return { answer, says: p.bad, next: null }
+      changes.push(p.change)
+      viewSays = viewSays ?? p.says ?? null
+      if (!p.change.clear) onlyClears = false
+      viewAlso.push(...(p.also ?? []))
+      continue
+    }
     const p = BRINGS.includes(step.verb) ? bring(a, step, screens)
       : step.verb === 'open' && numberOf(step) != null ? openNumber(a, step, screens)
         : step.verb === FOCUS ? planFocusStep(a, step, screens)
@@ -208,11 +264,29 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     a = p.next
     last = p.says
   }
-  const says = answer.steps.length > 1 ? { message: answer.message, values: answer.values } : last
+
+  // Records after the line: how many rows it will show, said before Enter.
+  let act = null
+  let viewWords = null
+  let viewParts = null
+  if (changes.length) {
+    const view = nextView(start, changes)
+    const rows = records.rows ?? []
+    const shows = { message: 'filterShows', values: { count: applyView(rows, view, records.ctx).length } }
+    const unknown = costUnknown(rows, view, records.ctx)
+    const also = [...viewAlso, ...(unknown ? [{ message: 'filterCostUnknown', values: { count: unknown } }] : [])]
+    viewParts = [shows, ...also]
+    viewWords = onlyClears && viewSays ? { ...viewSays, also: viewParts } : { ...shows, also }
+    act = { kind: 'records', view }
+  }
+  const layout = answer.steps.length - answer.steps.filter((s) => VIEW_VERBS.includes(s.verb)).length
+  const says = !layout ? viewWords
+    : answer.steps.length > 1 ? { message: answer.message, values: answer.values, ...(viewParts ? { also: viewParts } : {}) }
+      : last
   // After focus: the field turns to prompt mode, under the chat (W §7).
   const last1 = answer.steps[answer.steps.length - 1]
   const after = last1?.verb === FOCUS && !(last1.match?.values ?? []).length ? 'prompt' : null
-  return { answer, says, next: a, after }
+  return { answer, says, next: layout ? a : null, act, after }
 }
 
 // Below a cent, the line says "under" a cent rather than a fraction of one.

@@ -7,8 +7,21 @@
 import { COPY } from '../copy'
 
 const BOARD_VALUES = new Set(['board', 'first', 'second'])
-const AND_LISTS = new Set(['boards', 'verbs', 'sources'])
+const AND_LISTS = new Set(['boards', 'verbs', 'sources', 'filters'])
 const PERCENTS = new Set(['percent', 'low', 'high'])
+
+/** A day, given as 2026-09-01, the way the reader's language writes a date in full. */
+export function longDay(i18n, day) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(day ?? ''))
+  if (!m) return String(day ?? '')
+  const date = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+  const options = { day: 'numeric', month: 'long', year: 'numeric' }
+  try {
+    return new Intl.DateTimeFormat(i18n.locale, options).format(date)
+  } catch {
+    return new Intl.DateTimeFormat('en', options).format(date)
+  }
+}
 
 const boardName = (i18n, key) => (COPY.boards[key] ? i18n._(COPY.boards[key]) : key)
 
@@ -60,6 +73,7 @@ export function say(i18n, message, values = {}) {
     else if (key === 'words') words[key] = joined(i18n, value, 'disjunction')
     else if (key === 'cost' && typeof value === 'number') words[key] = money(i18n, value)
     else if (PERCENTS.has(key) && typeof value === 'number') words[key] = percent(i18n, value)
+    else if (key === 'day') words[key] = longDay(i18n, value)
     else words[key] = value
   }
   return i18n._(descriptor, words)

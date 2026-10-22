@@ -385,3 +385,80 @@ describe('the welcome page (stage 5)', () => {
   })
 })
 
+
+describe('search and filters on Records (stage 6, piece 1; C132)', () => {
+  const NOW = new Date(2026, 9, 21, 12).getTime()
+  const row = (num, kind, extra = {}) => ({
+    num, kind, title: `${kind} ${num}`, text: null, summary: null, tags: [], pinned: false, roomId: null,
+    createdAt: new Date(2026, 9, 1).toISOString(), activeAt: new Date(2026, 9, 1).toISOString(),
+    chatNum: kind === 'chat' ? num : null, docketNum: null, branch: null, run: null,
+    marks: [], models: [], sources: [], cost: null, collections: [], words: '', ...extra,
+  })
+  const rows = [
+    row(202, 'chat', { tags: ['owls'], roomId: 'mode_owl', cost: 0.42, createdAt: new Date(2026, 9, 20).toISOString() }),
+    row(204, 'chat', { tags: ['owls', 'essay'] }),
+    row(206, 'chat'),
+    row(211, 'term', { text: 'Tyto alba', chatNum: 202 }),
+  ]
+  const records = (view) => ({
+    rows, view, now: NOW, locale: 'en-US',
+    rooms: [{ id: 'mode_owl', label: 'Owl questions' }], collections: [{ id: 'fav', label: 'Favorites' }],
+    ctx: { roomLabel: () => '' },
+  })
+  const at = (value, view = undefined, a = almanac()) => {
+    const p = preview(value, { mode: 'command', arrangement: a, screens: { records: records(view) } })
+    const also = [].concat(p.says?.also ?? []).map((x) => say(i18n, x.message, x.values))
+    return { ...p, text: [say(i18n, p.says.message, p.says.values), ...also].join(' · ') }
+  }
+
+  it('says how many rows Enter will show, and hands the shell the view', () => {
+    const p = at('>tag:owls')
+    expect(p.text).toBe('Enter shows 2 rows')
+    expect(p.next).toBeNull()
+    expect(p.act.kind).toBe('records')
+    expect(p.act.view.filters.map((f) => f.text)).toEqual(['tag:owls'])
+    expect(at('>tag:owls -tag:essay').text).toBe('Enter shows 1 row')
+    expect(at('>tag:nothing').text).toBe('Enter shows no rows')
+  })
+
+  it('shows keywords only when asked for (A19, C133)', () => {
+    expect(at('>type:keyword').text).toBe('Enter shows 1 row')
+  })
+
+  it('spells out the day it read, so a misreading shows before Enter (C132 (e))', () => {
+    expect(at('>since:10/15/26').text).toBe('Enter shows 1 row · made since October 15, 2026')
+    expect(at('>until:yesterday').text).toBe('Enter shows 3 rows · made until the end of October 20, 2026')
+  })
+
+  it('says how many have no cost recorded (C132 (h))', () => {
+    expect(at('>cost:<1').text).toBe('Enter shows 1 row · 2 with no cost recorded are left out')
+  })
+
+  it('refuses what it cannot read, before Enter', () => {
+    expect(at('>in:attic').text).toBe('No room or collection is called attic')
+    expect(at('>cost:lots').text).toBe('cost: takes an amount, like >0.50, <1 or 0.18')
+    expect(at('>since:soon').text).toBe('since: takes 7d, 3w, a month, or a date like 2026-09-01')
+    expect(at('>from:299').text).toBe('Nothing here has the number 299')
+    expect(at('>from:211').text).toBe('Nothing comes from 211. from: takes a chat, a plan, a branch or a run')
+  })
+
+  it('clears one kind of filter, the search, or everything (C132 (c))', () => {
+    const view = { search: 'owl', filters: [{ k: 'tag', neg: false, v: ['owls'], text: 'tag:owls' }], sort: { by: 'active', asc: false } }
+    expect(at('>clear:tag', view).text).toBe('Enter removes tag:owls · Enter shows 2 rows')
+    expect(at('>clear:filters', view).text).toBe('Enter clears the search and every filter · Enter shows 3 rows')
+    expect(at('>clear:filters').text).toBe('No search or filter is in force')
+    expect(at('>clear:cost', view).text).toBe('No cost: filter is in force')
+    expect(at('>clear:').text).toBe('clear: is not built yet')
+  })
+
+  it('shares a line with layout commands (C99)', () => {
+    const p = at('>tag:owls open:library')
+    expect(p.text).toBe('Enter runs 2 commands in turn: tag: and open: · Enter shows 2 rows')
+    expect(p.next.columns).toEqual([['almanac'], ['collection'], ['library']])
+    expect(p.act.view.filters).toHaveLength(1)
+  })
+
+  it('waits for the Collection to filter it', () => {
+    expect(at('>tag:owls', undefined, { ...almanac(), addressed: 'collection' }).text).toBe('tag: is not built yet')
+  })
+})

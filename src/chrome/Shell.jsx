@@ -14,7 +14,7 @@ import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
-import { hasKey, models, metadataModel, destination, keyStatus, noKeyNeeded, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
+import { hasKey, models, metadataModel, destination, keyStatus, noKeyNeeded, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
 import { ignite } from './ignition'
 import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
 import { useChat } from '../stores/ChatContext'
@@ -28,7 +28,7 @@ import { preview } from './preview'
 import Bar from './Bar'
 import Strip from './Strip'
 import Board from './Board'
-import { boardName } from './say'
+import { boardName, roomLabel } from './say'
 import RoomBoard from './RoomBoard'
 import WelcomeBoard, { WelcomeFoot } from './WelcomeBoard'
 import AlmanacBoard from './AlmanacBoard'
@@ -37,6 +37,8 @@ import { readCatalogue } from '../lib/catalogue'
 import { listEntries } from '../catalog'
 import { listLayoutEntries } from '../catalog/layouts'
 import { readAlmanac } from '../lib/almanacRows'
+import { createFactsCache } from '../lib/chatFacts'
+import { EMPTY_VIEW, applyView, nextView, viewLine, isAtRest } from '../lib/recordsFilter'
 import { onRecordsChanged } from '../lib/records'
 
 // The new shell (refactor-plan.md §4 and stages 3 and 4): the board strip,
@@ -316,23 +318,67 @@ export default function Shell() {
   // ── The Almanac's rows (stage 5, piece 3) ─────────────
   // Everything numbered, read once the database is open and again whenever
   // something is stored, here or in another tab, or a room is named. They
-  // also answer open: and inspect: by number, from any board.
+  // also answer open: and inspect: by number, from any board. What is
+  // inside each chat (its words, who answered, what it cost) is read once
+  // and kept until the chat changes (chatFacts.js).
   const [almanacRows, setAlmanacRows] = useState(null)
+  const [recordsNames, setRecordsNames] = useState({ collections: [], rooms: [] })
+  const factsCache = useRef(null)
+  if (!factsCache.current) factsCache.current = createFactsCache()
+  const priceOf = useCallback((id) => models(PROVIDER).find((m) => m.id === id || m.apiId === id)?.cost ?? null, [])
   useEffect(() => {
     if (!started || !db.current) return undefined
     let live = true
     let reading = null
-    const read = () => {
-      const now = readAlmanac(db.current).catch(() => [])
+    const read = (change) => {
+      if (change) factsCache.current.forget(change)
+      const now = readAlmanac(db.current, { facts: factsCache.current, priceOf }).catch(() => ({ rows: [], collections: [], rooms: [] }))
       reading = now
-      now.then((rows) => { if (live && reading === now) setAlmanacRows(rows) })
+      now.then(({ rows, collections, rooms }) => {
+        if (!live || reading !== now) return
+        setAlmanacRows(rows)
+        setRecordsNames({ collections, rooms })
+      })
     }
     read()
     const off = onRecordsChanged(read)
     return () => { live = false; off() }
-  }, [started, roomRev])
+  }, [started, roomRev, priceOf])
   const numbered = useMemo(() => new Map((almanacRows ?? []).map((r) => [r.num, r])), [almanacRows])
   const [inspected, setInspected] = useState(null) // the number inspect: shows under the bar
+
+  // ── What Records shows (stage 6, piece 1; C132) ───────
+  // The search, typed in the bar while it points at Records, and the
+  // filters, applied on Enter. Kept for the tab (C132 (d)).
+  const [recordsView, setRecordsView] = useState(EMPTY_VIEW)
+  const viewNow = useRef(EMPTY_VIEW)
+  useEffect(() => { viewNow.current = recordsView }, [recordsView])
+  const [searchReset, setSearchReset] = useState(0) // changes when the bar's search is to be emptied
+  const onSearch = useCallback((text) => setRecordsView((v) => (v.search === text ? v : { ...v, search: text })), [])
+  const showView = useCallback((view) => {
+    if (viewNow.current.search && !view.search) setSearchReset((n) => n + 1)
+    viewNow.current = view
+    setRecordsView(view)
+  }, [])
+  const onRecordsClear = useCallback((k) => showView(nextView(viewNow.current, [{ clear: k }])), [showView])
+  // The names filters read, as people read them (C132 (f), (g)).
+  const recordsCtx = useMemo(() => {
+    const roomNames = new Map(recordsNames.rooms.map((r) => [r.id, roomLabel(i18n, r.name)]))
+    const collectionName = (c) => c.name || (c.builtIn && COPY.collections[c.builtIn] ? i18n._(COPY.collections[c.builtIn]) : i18n._(COPY.collections.untitled))
+    return {
+      rooms: recordsNames.rooms.map((r) => ({ id: r.id, label: roomNames.get(r.id) })),
+      collections: recordsNames.collections.map((c) => ({ id: c.id, label: collectionName(c) })),
+      locale: i18n.locale,
+      ctx: {
+        roomLabel: (row) => (row.roomId ? roomNames.get(row.roomId) ?? '' : ''),
+        models: models(PROVIDER),
+        sources: shippedEntries().filter((d) => d.kind === 'source').map((d) => ({ id: d.id, name: d.name })),
+      },
+    }
+  }, [recordsNames, i18n])
+  const shownRows = useMemo(() => (almanacRows ? applyView(almanacRows, recordsView, recordsCtx.ctx) : null), [almanacRows, recordsView, recordsCtx])
+  const records = useMemo(() => ({ ...recordsCtx, rows: almanacRows ?? [], view: recordsView, now: Date.now() }), [recordsCtx, almanacRows, recordsView])
+  const recordsSearch = useMemo(() => ({ count: shownRows?.length ?? 0 }), [shownRows])
 
   // ── The Library's catalogue (stage 5, piece 4) ────────
   // Read while the Library is in the space, here or in a window, and again
@@ -402,6 +448,13 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'records') {
+      // Filters, sort: and clear: (C132), after any layout command they share the line with.
+      if (next) { const refused = await run(next, null); if (refused) return refused }
+      showView(what.view)
+      remember(body)
+      return null
+    }
     if (what.kind === 'keys') {
       setInspected(null)
       setKeyPanel({ focus: what.focus ?? null })
@@ -419,7 +472,7 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'name'))
     remember(body)
     return null
-  }, [readKeys, remember, run, updateWelcome])
+  }, [readKeys, remember, run, showView, updateWelcome])
 
   const onRun = useCallback((next, body, go, what) => (what ? act(what, body, next) : run(next, body)), [act, run])
 
@@ -479,7 +532,7 @@ export default function Shell() {
       stacked: getComputedStyle(stage).flexDirection === 'column',
     }
   }, [])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -616,13 +669,14 @@ export default function Shell() {
     [arrangement, roomRecord],
   )
   const welcomeHint = useMemo(() => (onWelcome && !welcome.finished ? { next: nextStep(welcome) } : null), [onWelcome, welcome])
-  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint }
+  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, search: recordsSearch, searchReset }
+  const filtered = isAtRest(recordsView) ? null : { search: recordsView.search.trim(), line: viewLine(recordsView) }
   const drawBoard = (board) => {
     if (board === 'room' && roomId !== undefined) {
       return <RoomBoard key={`room:${roomId ?? 'new'}`} chatId={roomId} rev={roomRev} addressed={arrangement.addressed === 'room'} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} />
     }
     if (board === 'almanac') {
-      return <AlmanacBoard key="almanac" rows={almanacRows} addressed={arrangement.addressed === 'almanac'} onAddress={focusBoard} onWrite={writeField} />
+      return <AlmanacBoard key="almanac" rows={shownRows} filtered={filtered} addressed={arrangement.addressed === 'almanac'} onAddress={focusBoard} onWrite={writeField} onClear={onRecordsClear} />
     }
     if (board === 'library') {
       return <LibraryBoard key="library" items={catalogue} addressed={arrangement.addressed === 'library'} onAddress={focusBoard} onWrite={writeField} />

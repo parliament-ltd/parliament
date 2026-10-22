@@ -4,14 +4,20 @@ import { roomLabel } from './say'
 import { dayOf, agoOf } from './when'
 import { useBand } from './useNarrower'
 
-// The Almanac, thin (refactor-plan.md, stage 5, piece 3; Almanac v30):
+// Records (refactor-plan.md, stage 5, piece 3, and stage 6; Almanac v30):
 // everything made, one row each with its number, pinned rows first. A click
 // on a row writes open:<number> in the bar, and Enter opens it, so the bar
-// stays the one actor (C125). Filters, sorting, columns and pinning come
-// with the Almanac in full (stage 6).
+// stays the one actor (C125).
+//
+// The search and filters in force read as one line at the top (C132 (c)),
+// with how many rows they leave. A click on one removes it at once, as
+// clear:<its name> does from the bar; it only changes what is shown.
 //
 // The columns follow the board's own width: all of v30's at full width,
 // fewer as it narrows. The id column is always there (almanac spec §3).
+
+// Commands, which stay English.
+const CLEAR = (k) => `clear:${k}`
 
 const WIDE = 720
 const MEDIUM = 460
@@ -56,11 +62,32 @@ function Cell({ column, row }) {
   }
 }
 
+/** The search and filters in force, each a click that removes it. */
+function InForce({ search, line, count, onClear }) {
+  const { i18n } = useLingui()
+  const item = (k, label, isCommand) => (
+    <button key={`${k}:${label}`} type="button" className="ch-alm-f" title={i18n._(COPY.almanac.removes, { command: CLEAR(k) })} onClick={() => onClear(k)}>
+      <span dir={isCommand ? 'ltr' : 'auto'}>{label}</span>
+      <span className="x" aria-hidden="true">{'×'}</span>
+    </button>
+  )
+  return (
+    <div className="ch-alm-in ch-marg" role="group" aria-label={i18n._(COPY.almanac.filtersLabel)}>
+      {search && item('search', i18n._(COPY.almanac.searchFor, { text: search }), false)}
+      {line.map((f) => item(f.k, f.text, true))}
+      <span className="ch-alm-count">{i18n._(COPY.almanac.shown, { count })}</span>
+      <button type="button" className="ch-alm-clear" onClick={() => onClear('filters')}>{CLEAR('filters')}</button>
+    </div>
+  )
+}
+
 /**
- * @param {{ rows: object[]|null, addressed: boolean, onAddress: (board: string) => void,
- *   onWrite: (text: string) => void }} props rows: from almanacRows.js, null while they are read
+ * @param {{ rows: object[]|null, filtered?: { search: string, line: Array<{ k: string, text: string }> }|null,
+ *   addressed: boolean, onAddress: (board: string) => void, onWrite: (text: string) => void, onClear?: (k: string) => void }} props
+ *   rows: the rows the view shows (recordsFilter.js), null while they are read; filtered: the search and
+ *   filters in force, null at rest; onClear: removes one kind, or 'filters' for all of them
  */
-export default function AlmanacBoard({ rows, addressed, onAddress, onWrite }) {
+export default function AlmanacBoard({ rows, filtered = null, addressed, onAddress, onWrite, onClear }) {
   const { i18n } = useLingui()
   const [ref, band] = useBand([MEDIUM, WIDE])
   const columns = COLUMNS[band]
@@ -68,7 +95,7 @@ export default function AlmanacBoard({ rows, addressed, onAddress, onWrite }) {
 
   let body
   if (rows === null) body = <p className="ch-marg ch-alm-note">{i18n._(COPY.almanac.loading)}</p>
-  else if (!rows.length) body = <p className="ch-marg ch-alm-note">{i18n._(COPY.almanac.empty)}</p>
+  else if (!rows.length) body = <p className="ch-marg ch-alm-note">{i18n._(filtered ? COPY.almanac.noneMatch : COPY.almanac.empty)}</p>
   else {
     body = (
       <table className="ch-atable">
@@ -102,6 +129,7 @@ export default function AlmanacBoard({ rows, addressed, onAddress, onWrite }) {
         <h2>{i18n._(COPY.boards.almanac)}</h2>
         {addressed && <span className="ch-marg">{i18n._(COPY.shell.addressed)}</span>}
       </header>
+      {filtered && rows && <InForce search={filtered.search} line={filtered.line} count={rows.length} onClear={(k) => onClear?.(k)} />}
       <div className="ch-alm" ref={ref}>{body}</div>
     </article>
   )

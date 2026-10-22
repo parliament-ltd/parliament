@@ -158,3 +158,14 @@ describe('finishing an edit', () => {
     expect(act(t, 'doneEditing')).toBe(t)
   })
 })
+
+describe('clearing the search on Records (C132 (c))', () => {
+  it('empties the search and nothing else', () => {
+    let s = fieldReducer(initialField('search'), { type: 'input', value: 'barn owl' })
+    s = fieldReducer(s, { type: 'input', value: '>clear:filters' })
+    const t = act(s, 'clearSearch')
+    expect(t.text).toEqual({ search: '', command: 'clear:filters', prompt: '' })
+    expect(t.mode).toBe('command')
+    expect(act(t, 'clearSearch')).toBe(t)
+  })
+})

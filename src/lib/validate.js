@@ -71,7 +71,16 @@ function validateMessage(item) {
   if (item.stopReason != null && !STOP_REASONS.has(item.stopReason)) return 'message.stopReason invalid'
   // Stage 4: an answer from a source says where it came from.
   if (item.source != null && !isSourceNote(item.source)) return 'message.source invalid'
+  // Stage 6: the model a reply came from, and the tokens it took (C132 (h)).
+  if (item.model != null && !isString(item.model, 200)) return 'message.model invalid'
+  if (item.usage != null && !isUsage(item.usage)) return 'message.usage invalid'
   return null
+}
+
+const TOKENS = (n) => Number.isInteger(n) && n >= 0 && n <= 100_000_000
+function isUsage(u) {
+  return u !== null && typeof u === 'object' && !Array.isArray(u) && TOKENS(u.input) && TOKENS(u.output)
+    && Object.keys(u).every((k) => k === 'input' || k === 'output')
 }
 
 function validateHighlight(item) {

@@ -43,6 +43,11 @@ const PERSIST_INTERVAL = 3000
 
 const isQuota = (err) => err?.name === 'QuotaExceededError' || err?.name === 'NS_ERROR_DOM_QUOTA_REACHED'
 
+// What a finished reply records of how it was made (C132 (h)): the model
+// that answered, and the tokens it took in and gave out, as the provider
+// reported them. Optional fields on the message; older replies have none.
+const answeredWith = (model, input, output) => (model ? { model, usage: { input, output } } : {})
+
 export function ChatProvider({ children }) {
   const [tokenUsage, setTokenUsage] = useState({ input: 0, output: 0 })
   const [activeConversationId, setActiveConversationId] = useState(null)
@@ -313,7 +318,9 @@ export function ChatProvider({ children }) {
       const finalContent = chartBlocks + (getStream(conversationId)?.text ?? '')
       const tokenCount = totalOutputTokens
       const cut = finalContent ? cutReason(last?.stopReason) : null
-      const outcome = { content: finalContent, incomplete: Boolean(cut), tokenCount, ...(cut ? { stopReason: cut } : {}) }
+      // The model that answered and the tokens it took, so what a chat cost
+      // can be worked out later, never guessed (C132 (h)).
+      const outcome = { content: finalContent, incomplete: Boolean(cut), tokenCount, ...(cut ? { stopReason: cut } : {}), ...answeredWith(model, totalInputTokens, totalOutputTokens) }
 
       await updateMessage(assistantMsg.id, outcome)
       const finished = { ...assistantMsg, ...outcome }
@@ -380,7 +387,10 @@ export function ChatProvider({ children }) {
       if (controller.signal.aborted) throw new DOMException('Stopped', 'AbortError')
       const content = getStream(conversationId)?.text ?? ''
       const cut = content ? cutReason(response?.stopReason) : null
-      const outcome = { content, incomplete: Boolean(cut) || !content, tokenCount: response?.usage?.output_tokens || 0, stopReason: cut }
+      const outcome = {
+        content, incomplete: Boolean(cut) || !content, tokenCount: response?.usage?.output_tokens || 0, stopReason: cut,
+        ...answeredWith(model, response?.usage?.input_tokens || 0, response?.usage?.output_tokens || 0),
+      }
       await updateMessage(reply.id, outcome)
       const finished = { ...reply, ...outcome }
       updateMessages(conversationId, (prev) => prev.map((m) => (m.id === reply.id ? finished : m)))
@@ -487,7 +497,13 @@ export function ChatProvider({ children }) {
       const finalContent = getStream(conversationId)?.text ?? incompleteMsg.content
       const tokenCount = (incompleteMsg.tokenCount || 0) + (response?.usage?.output_tokens || 0)
       const cut = cutReason(response?.stopReason)
-      const updates = { content: finalContent, incomplete: Boolean(cut), tokenCount, stopReason: cut }
+      // Its tokens add to what the first part recorded, if that part recorded
+      // any with the same model; otherwise the whole is not known (C132 (h)).
+      const was = incompleteMsg.model === model ? incompleteMsg.usage : null
+      const answered = was
+        ? answeredWith(model, was.input + (response?.usage?.input_tokens || 0), was.output + (response?.usage?.output_tokens || 0))
+        : (model ? { model } : {})
+      const updates = { content: finalContent, incomplete: Boolean(cut), tokenCount, stopReason: cut, ...answered }
 
       await updateMessage(incompleteMsg.id, updates)
       updateMessages(conversationId, prev => prev.map(m => (m.id === incompleteMsg.id ? { ...m, ...updates } : m)))

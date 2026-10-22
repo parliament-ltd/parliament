@@ -41,7 +41,16 @@ msgid "almanac.empty"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "almanac.filtersLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "almanac.loading"
+msgstr ""
+
+#. clear:filters stays English
+#. js-lingui-explicit-id
+msgid "almanac.noneMatch"
 msgstr ""
 
 #. Marginalia under a pinned row
@@ -49,9 +58,23 @@ msgstr ""
 msgid "almanac.pinned"
 msgstr ""
 
+#. {command} stays English
+#. js-lingui-explicit-id
+msgid "almanac.removes"
+msgstr ""
+
 #. What clicking a row does; open: stays English
 #. js-lingui-explicit-id
 msgid "almanac.rowHelp"
+msgstr ""
+
+#. What is searched for, in the quotation marks the language uses
+#. js-lingui-explicit-id
+msgid "almanac.searchFor"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.shown"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -304,6 +327,15 @@ msgstr ""
 msgid "chat.stoppedOnReply"
 msgstr ""
 
+#. The collection favourites became (C20)
+#. js-lingui-explicit-id
+msgid "collection.favorites"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.untitled"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "count.branches"
 msgstr ""
@@ -386,6 +418,38 @@ msgid "enter.bringHere"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.clearFilter"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.clearFilters"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.clearNoFilter"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.clearNoSearch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.clearNoSort"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.clearNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.clearSearch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.clearSort"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.closeBoard"
 msgstr ""
 
@@ -410,6 +474,14 @@ msgid "enter.closeWelcome"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.costBad"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.dateBad"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.didYouMean"
 msgstr ""
 
@@ -426,8 +498,25 @@ msgstr ""
 msgid "enter.erase"
 msgstr ""
 
+#. C132 (h): a cost is worked out from recorded tokens, never guessed
+#. js-lingui-explicit-id
+msgid "enter.filterCostUnknown"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.filters"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.filterShows"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.filterSince"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.filterUntil"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -459,6 +548,10 @@ msgid "enter.focusOffSame"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.fromWhat"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.goNewRoom"
 msgstr ""
 
@@ -479,7 +572,24 @@ msgid "enter.helpVerb"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.inNoCollection"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.inNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.inNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.inspectOne"
+msgstr ""
+
+#. room and collection stay English: they are words of the command
+#. js-lingui-explicit-id
+msgid "enter.inWhich"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -787,8 +897,13 @@ msgstr ""
 msgid "enter.roomHere"
 msgstr ""
 
+#. In search mode on a board search does not reach yet; {board} is Records
 #. js-lingui-explicit-id
-msgid "enter.searchLater"
+msgid "enter.searchRecords"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.searchShows"
 msgstr ""
 
 #. {verbs} lists the commands in the order they run; one that fails stops the rest
