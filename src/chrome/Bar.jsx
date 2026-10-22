@@ -291,6 +291,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
             focus={keyPanel.focus}
             holdOnly={keyPanel.holdOnly}
             region={keyPanel.region ?? null}
+            local={keyPanel.local ?? null}
             onRegion={keyPanel.onRegion ?? null}
             onFocus={(id) => onKeyFocus?.(id)}
             onSaved={(id, fresh) => { onKeySaved?.(id, fresh); input.current?.focus() }}

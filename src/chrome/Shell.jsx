@@ -14,7 +14,7 @@ import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
-import { metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion } from '../net'
+import { metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal } from '../net'
 import AnswerPicker from './AnswerPicker'
 import { ignite } from './ignition'
 import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
@@ -105,6 +105,25 @@ const sourceLocale = (locale) => (/-(XA|XB)$/i.test(String(locale ?? '')) ? 'en'
 
 // What the Enter line says when a prompt did not go through: a key of
 // COPY.enter, or one with its values. Never the error's own text.
+// Ollama, from the list, for the key panel and api:ollama (C163).
+const LOCAL_ENTRY = { id: 'ollama', name: destination('ollama')?.name ?? 'Ollama' }
+
+// Whether the browser has been told not to let this site reach apps on the
+// device: its permission for the computer's own address, where the browser
+// has one (LPN §7.5). Unknown is not blocked.
+async function localBlocked() {
+  for (const name of ['loopback-network', 'local-network', 'local-network-access']) {
+    try {
+      const p = await navigator.permissions.query({ name })
+      if (p?.state === 'denied') return true
+      if (p) return false
+    } catch {
+      // This browser does not know that permission; try the next name.
+    }
+  }
+  return false
+}
+
 // source: the name of the source asked, when one was.
 function failure(err, source = destination(SOURCE)?.name) {
   if (err?.name === 'AbortError') return null
@@ -675,6 +694,29 @@ export default function Shell() {
   // key module; never a key.
   const [keyPanel, setKeyPanel] = useState(null) // { focus: provider id or null } while api: shows it
 
+  // ── Models on this computer (stage 7, piece 4; C33, C163) ──
+  // Ollama is looked for only when someone asks (the key panel's check).
+  // Once a check has found it, it is looked for again on each start, since
+  // the browser has then been told it may; a refusal since then is quiet.
+  const LOCAL = 'ollama'
+  const [local, setLocal] = useState({ status: 'unchecked', models: [] })
+  const [localRev, setLocalRev] = useState(0) // changes when the models found change
+  const runLocalCheck = useCallback(async ({ quiet = false } = {}) => {
+    setLocal((l) => ({ ...l, status: 'checking' }))
+    try {
+      const found = await checkLocal(LOCAL)
+      setLocal({ status: 'ok', models: found.map((m) => m.name) })
+      setSetting('localChecked', true).catch(() => {})
+    } catch {
+      setLocal({ status: quiet ? 'unchecked' : await localBlocked() ? 'denied' : 'unreached', models: [] })
+    }
+    setLocalRev((n) => n + 1)
+  }, [])
+  useEffect(() => {
+    if (!started) return
+    getSetting('localChecked').then((was) => { if (was) runLocalCheck({ quiet: true }) }, () => {})
+  }, [started, runLocalCheck])
+
   // ── Who answers (stage 7, piece 1; C149, C150) ────────
   // by:, or a click in the picker under the bar, chooses who answers in the
   // chat the room shows. In a room with no chat yet, the choice is held for
@@ -1147,13 +1189,13 @@ export default function Shell() {
   const keys = useMemo(() => keyedBy ?? {}, [keyedBy])
   // The chat's own choice, or the one held for the chat the next prompt starts.
   const chosenHere = roomId ? roomRecord?.answerer ?? null : pendingAnswerer
-  const answerer = useMemo(() => answererOf({ chosen: chosenHere, keyed: keys, defaultModel: settings.defaultModel }), [chosenHere, keys, settings.defaultModel, region]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices
-  const answerRows = useMemo(() => pickerRows(keys), [keys, region]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices
+  const answerer = useMemo(() => answererOf({ chosen: chosenHere, keyed: keys, defaultModel: settings.defaultModel }), [chosenHere, keys, settings.defaultModel, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
+  const answerRows = useMemo(() => pickerRows(keys), [keys, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
   // The model cost marks compare with, named once in the picker (settings spec §8).
   const referenceName = useMemo(() => allModels().find((m) => m.reference)?.name ?? null, [])
   const answering = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: answerer, rows: answerRows, stored: chosenHere }), [roomId, roomRecord, answerer, answerRows, chosenHere])
   const helper = useMemo(() => ({ keyed, provider: destination(PROVIDER)?.name, price: modelFacts(metadataModel(PROVIDER))?.cost ?? null }), [keyed])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -1173,7 +1215,8 @@ export default function Shell() {
   // A chat's first prompt is followed, when a model answers, by one request
   // for its title, summary and tags to that model's provider, unless turned
   // off in Settings (C62).
-  const byModel = answerer.group === 'model' && !answerer.needsKey && !answerer.gone && !answerer.later
+  // A model answers, hosted or on this computer (not a source).
+  const byModel = answerer.group !== 'source' && !answerer.needsKey && !answerer.gone && !answerer.later && !answerer.unchecked
   const describeModel = useMemo(() => modelFacts(metadataModel(answerer.provider ?? PROVIDER)), [answerer.provider, region]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices
   const firstPrompt = roomId === null || (Boolean(roomId) && activeConversationId === roomId && messages.length === 0)
   const describes = Boolean(byModel && firstPrompt && settings.describeNewChats !== false)
@@ -1232,12 +1275,12 @@ export default function Shell() {
     const conv = chatId ? await getConversation(chatId).catch(() => null) : null
     const who = answererOf({ chosen: chatId ? conv?.answerer ?? null : pendingNow.current, keyed: fresh, defaultModel: latest.current.settings.defaultModel })
     if (shown?.answerer && who.id !== shown.answerer.id) return { refused: 'promptChanged' }
-    if (who.later || who.gone || who.needsKey) return { refused: 'promptChanged' }
+    if (who.later || who.gone || who.needsKey || who.unchecked) return { refused: 'promptChanged' }
 
     // Nothing typed, and the last reply here stalled: send it again without
     // streaming, as the Enter line offered (C114).
     if (!text) {
-      if (!shown?.resend || !chatId || !fresh[who.provider] || who.group !== 'model') return { refused: 'promptFailed' }
+      if (!shown?.resend || !chatId || who.group === 'source' || (who.group === 'model' && !fresh[who.provider])) return { refused: 'promptFailed' }
       setStalledIn(null)
       const { buildSystemPrompt: system } = latest.current
       const done = resendWhole(chatId, who.id, system())
@@ -1269,7 +1312,7 @@ export default function Shell() {
     if (aboutNow) clearPicked()
     const send = () => {
       const { buildSystemPrompt: system, locale } = latest.current
-      return who.group === 'model'
+      return who.group !== 'source'
         ? sendMessage(id, full, who.id, system())
         : askSource(id, text, { source: who.id, lang: sourceLocale(locale) })
     }
@@ -1293,7 +1336,7 @@ export default function Shell() {
   useEffect(() => { screensNow.current = screens }, [screens])
   const pickAnswerer = useCallback(async (row) => {
     if (row.later) return
-    if (row.needsKey) { setPicking(false); writeField(`>api:${row.provider}`); return }
+    if (row.needsKey || row.unchecked) { setPicking(false); writeField(`>api:${row.provider}`); return }
     const p = preview(`>by:${row.id}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
     if (!p.act) { setPicking(false); return }
     await onRun(p.next ?? null, `by:${row.id}`, null, p.act)
@@ -1395,7 +1438,8 @@ export default function Shell() {
       <div ref={dockSlot} className="ch-bar-host" />
       {!barWindow && createPortal(
         <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)}
-          keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory', region, onRegion: (r) => updateSetting('mistralRegion', r) } : null}
+          keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory', region, onRegion: (r) => updateSetting('mistralRegion', r),
+            local: { ...LOCAL_ENTRY, origin: window.location.origin, status: local.status, models: local.models, onCheck: () => runLocalCheck() } } : null}
           onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)}
           picker={picking ? { rows: answerRows, now: answerer, reference: referenceName } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => setPicking(false)} />,
         barHost,

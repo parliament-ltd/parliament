@@ -64,6 +64,8 @@ export function costOf(facts, priceOf) {
     // input (stage 7; Haiku 5.5 above 100,000 tokens).
     const base = priceOf?.(u.model)
     const price = base?.over && u.input > base.over.promptTokens ? base.over : base
+    // A model on this computer costs nothing (C163).
+    if (price?.type === 'free-local') continue
     if (typeof price?.inputPerMillion !== 'number' || typeof price?.outputPerMillion !== 'number') return null
     total += (u.input * price.inputPerMillion + u.output * price.outputPerMillion) / 1_000_000
   }

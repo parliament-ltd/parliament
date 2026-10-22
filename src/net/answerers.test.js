@@ -114,3 +114,23 @@ describe('answererFor', () => {
     expect(answererFor({ ...base, chosen: 'hackernews' })).toMatchObject({ id: 'hackernews', later: true })
   })
 })
+
+describe('models on this computer (stage 7, piece 4; C33, C163)', () => {
+  const local = [{ id: 'ollama', kind: 'local', name: 'Ollama', key: false, ships: true }, ...DESTS.filter((d) => d.id !== 'ollama')]
+  const found = [{ id: 'ollama:qwen3.5:9b', apiId: 'qwen3.5:9b', name: 'qwen3.5:9b', cost: { type: 'free-local' } }]
+  const base = { destinations: local, defaultProvider: 'anthropic' }
+
+  it('shows one row that says it is not checked, until a check lists the models', () => {
+    const before = answererRows({ destinations: local, modelsOf: (id) => (id === 'ollama' ? [] : modelsOf(id)), reference: HAIKU })
+    expect(before.local).toEqual([expect.objectContaining({ id: 'ollama', unchecked: true, later: false })])
+    const after = answererRows({ destinations: local, modelsOf: (id) => (id === 'ollama' ? found : modelsOf(id)), reference: HAIKU })
+    expect(after.local).toEqual([expect.objectContaining({ id: 'ollama:qwen3.5:9b', mark: 'free', needsKey: false })])
+  })
+  it('knows a chosen local model before a check lists it, and says it is unchecked', () => {
+    const none = answererFor({ ...base, modelsOf: (id) => (id === 'ollama' ? [] : modelsOf(id)), chosen: 'ollama:qwen3.5:9b' })
+    expect(none).toMatchObject({ group: 'local', name: 'qwen3.5:9b', provider: 'ollama', unchecked: true, gone: false })
+    const listed = answererFor({ ...base, modelsOf: (id) => (id === 'ollama' ? found : modelsOf(id)), chosen: 'ollama:qwen3.5:9b' })
+    expect(listed).toMatchObject({ group: 'local', name: 'qwen3.5:9b', needsKey: false })
+    expect(listed.unchecked).toBeUndefined()
+  })
+})

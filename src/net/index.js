@@ -36,7 +36,7 @@ const sources = new Map()
 function implementation(id) {
   const d = destination(id)
   if (!d) return null
-  if (d.kind === 'model') return getProvider(id)
+  if (d.kind === 'model' || d.kind === 'local') return getProvider(id)
   if (d.kind === 'source' && MANIFESTS[id]) {
     if (!sources.has(id)) sources.set(id, createSource(MANIFESTS[id], { origins: d.origins, fetch: (...a) => window.fetch(...a), identity: IDENTITY }))
     return sources.get(id)
@@ -87,6 +87,8 @@ export const networkByHost = (entries, requests = gateway.requests()) =>
 export function providerOf(modelId) {
   for (const d of DESTINATIONS.filter((x) => x.ships && x.kind !== 'source')) {
     if (findModel(modelsOf(d.id), modelId)) return d.id
+    // A model on this computer, named by its id before any check (C163).
+    if (d.kind === 'local' && String(modelId ?? '').startsWith(`${d.id}:`)) return d.id
   }
   return DEFAULT_MODEL_PROVIDER
 }
@@ -120,6 +122,8 @@ export function modelFacts(id) {
   for (const d of DESTINATIONS.filter((x) => x.ships && x.kind !== 'source')) {
     const m = findModel(modelsOf(d.id), id)
     if (m) return { id: m.id, name: m.name, provider: d.id, cost: m.cost ?? null }
+    // A model on this computer answered: free, named from its id (C163).
+    if (d.kind === 'local' && String(id).startsWith(`${d.id}:`)) return { id, name: String(id).slice(d.id.length + 1), provider: d.id, cost: { type: 'free-local' } }
   }
   return null
 }
@@ -141,5 +145,13 @@ export async function keyStatus() {
 /** Checks a typed key with its provider, then keeps it saved or for this tab only. */
 export const addKey = (id, typed, { save = true } = {}) => checkAndKeep({ check: gateway.check, keyring: keys }, id, typed, { save })
 
-/** The built sources and local models that need no key, by name. */
-export const noKeyNeeded = () => shipped().filter((d) => !d.key && d.kind !== 'model').map((d) => d.name)
+/** The built sources that need no key, by name. Models on this computer have their own place in the panel. */
+export const noKeyNeeded = () => shipped().filter((d) => !d.key && d.kind === 'source').map((d) => d.name)
+
+/**
+ * Asks Ollama on this computer which models it has (C33, C163): only when
+ * the person asks, or on start once they have. Through the gateway like
+ * every request, labelled for the network log.
+ * @returns {Promise<object[]>} the models
+ */
+export const checkLocal = (id = 'ollama') => gateway.call(id, 'listModels', [], { label: 'check Ollama' })

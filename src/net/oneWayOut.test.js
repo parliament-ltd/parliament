@@ -6,6 +6,8 @@ import { ESLint } from 'eslint'
 // functions, or call the network itself.
 
 const eslint = new ESLint() // from the project folder, where vitest runs
+// Starting the linter is slow when every test file runs at once.
+const SLOW = 30_000
 const problems = async (code, filePath) => {
   const [result] = await eslint.lintText(code, { filePath })
   return result.messages.filter((m) => m.severity === 2).map((m) => m.ruleId)
@@ -19,15 +21,15 @@ describe('one way out', () => {
     expect(await problems("import { readSavedKey } from '../../lib/keyStore'\nexport const a = readSavedKey", block)).toContain('no-restricted-imports')
     expect(await problems("export const a = () => fetch('https://example.org')", block)).toContain('no-restricted-globals')
     expect(await problems("export const a = () => window.fetch('https://example.org')", block)).toContain('no-restricted-properties')
-  })
+  }, SLOW)
 
   it('allows the gateway, and backup encryption from crypto', async () => {
     const block = 'src/catalog/entries/example.jsx'
     expect(await problems("import { gateway, hasKey } from '../../net'\nexport const a = [gateway, hasKey]", block)).toEqual([])
     expect(await problems("import { encryptExport } from '../../lib/crypto'\nexport const a = encryptExport", block)).toEqual([])
-  })
+  }, SLOW)
 
   it('lets src/net itself reach providers and keys', async () => {
     expect(await problems("import { getProvider } from '../providers'\nexport const a = getProvider", 'src/net/example.js')).toEqual([])
-  })
+  }, SLOW)
 })

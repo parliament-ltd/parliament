@@ -20,10 +20,10 @@ describe('the list of providers and sources', () => {
     for (const d of DESTINATIONS.filter((x) => x.kind === 'source')) expect(d.key, d.id).toBe(false)
   })
 
-  it('lets only shipped entries into the connection policy: Anthropic, the three Mistral addresses, every Wikipedia (C110), Hacker News and OpenAlex (stage 7)', () => {
-    expect(shipped().map((d) => d.id)).toEqual(['anthropic', 'mistral', 'wikipedia', 'hackernews', 'openalex'])
-    expect(connectOrigins()).toEqual(['https://api.anthropic.com', 'https://api.mistral.ai', 'https://api.eu.mistral.ai', 'https://api.us.mistral.ai', 'https://*.wikipedia.org', 'https://hn.algolia.com', 'https://api.openalex.org'])
-    expect(CONTENT_SECURITY_POLICY).toContain("connect-src 'self' https://api.anthropic.com https://api.mistral.ai https://api.eu.mistral.ai https://api.us.mistral.ai https://*.wikipedia.org https://hn.algolia.com https://api.openalex.org;")
+  it('lets only shipped entries into the connection policy: Anthropic, the three Mistral addresses, Ollama on its exact port, every Wikipedia (C110), Hacker News and OpenAlex (stage 7)', () => {
+    expect(shipped().map((d) => d.id)).toEqual(['anthropic', 'mistral', 'ollama', 'wikipedia', 'hackernews', 'openalex'])
+    expect(connectOrigins()).toEqual(['https://api.anthropic.com', 'https://api.mistral.ai', 'https://api.eu.mistral.ai', 'https://api.us.mistral.ai', 'http://localhost:11434', 'https://*.wikipedia.org', 'https://hn.algolia.com', 'https://api.openalex.org'])
+    expect(CONTENT_SECURITY_POLICY).toContain("connect-src 'self' https://api.anthropic.com https://api.mistral.ai https://api.eu.mistral.ai https://api.us.mistral.ai http://localhost:11434 https://*.wikipedia.org https://hn.algolia.com https://api.openalex.org;")
   })
 })
 

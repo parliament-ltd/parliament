@@ -38,12 +38,13 @@ export default function AnswerPicker({ rows, now, reference, onPick }) {
   const IN = { english: COPY.picker.englishOnly, mostlyEnglish: COPY.picker.mostlyEnglish }
   const mark = (r) => {
     if (r.later) return i18n._(COPY.picker.later)
+    if (r.unchecked) return i18n._(COPY.picker.unchecked)
     if (r.group === 'source') return IN[r.answersIn] ? i18n._(IN[r.answersIn]) : null
     return r.mark
   }
   const row = (r) => {
     const on = r.id === now?.id
-    const help = r.later ? null : r.needsKey ? `api:${r.provider}` : `by:${r.id}`
+    const help = r.later ? null : r.needsKey || r.unchecked ? `api:${r.provider}` : `by:${r.id}`
     return (
       <button
         key={r.id}

@@ -744,6 +744,10 @@ msgid "enter.apiList"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.apiLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.apiNew"
 msgstr ""
 
@@ -1613,6 +1617,11 @@ msgstr ""
 
 #. Commands stay English
 #. js-lingui-explicit-id
+msgid "enter.promptLocalUnchecked"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
 msgid "enter.promptNeedsKey"
 msgstr ""
 
@@ -1656,6 +1665,11 @@ msgstr ""
 #. {cost} is the smallest amount shown, a cent
 #. js-lingui-explicit-id
 msgid "enter.promptSendCheap"
+msgstr ""
+
+#. A model running on this computer through Ollama (C163)
+#. js-lingui-explicit-id
+msgid "enter.promptSendLocal"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2222,6 +2236,66 @@ msgid "keys.label"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "keys.localBlocked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localCheck"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localCheckAgain"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localChecking"
+msgstr ""
+
+#. Names no browser (C94)
+#. js-lingui-explicit-id
+msgid "keys.localDenied"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localFound"
+msgstr ""
+
+#. As the picker names the group (A14)
+#. js-lingui-explicit-id
+msgid "keys.localHeading"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localMissing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localModels"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localNone"
+msgstr ""
+
+#. OLLAMA_ORIGINS is the name of a setting and stays as written
+#. js-lingui-explicit-id
+msgid "keys.localOrigins"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localUnchecked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localUnreached"
+msgstr ""
+
+#. Shown before the browser asks for permission to reach this computer (LPN §7.5)
+#. js-lingui-explicit-id
+msgid "keys.localWhy"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "keys.needs"
 msgstr ""
 
@@ -2672,6 +2746,11 @@ msgstr ""
 #. Answers from public sources, with no model
 #. js-lingui-explicit-id
 msgid "picker.sources"
+msgstr ""
+
+#. Models on this computer, before anyone has asked to look for them (C33)
+#. js-lingui-explicit-id
+msgid "picker.unchecked"
 msgstr ""
 
 #. js-lingui-explicit-id

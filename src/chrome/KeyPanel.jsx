@@ -34,7 +34,20 @@ const PROBLEM = {
 // C159). Chosen by the person, never from their network address.
 const REGION_WORDS = { global: COPY.keys.regionGlobal, eu: COPY.keys.regionEu, us: COPY.keys.regionUs }
 
-export default function KeyPanel({ keys, noKey, focus, holdOnly, onFocus, onSaved, onClose, region = null, onRegion = null }) {
+// What a check of the models on this computer found (C163).
+const LOCAL_STATE = {
+  unchecked: COPY.keys.localUnchecked,
+  checking: COPY.keys.localChecking,
+  unreached: COPY.keys.localMissing,
+  denied: COPY.keys.localBlocked,
+}
+
+/**
+ * local: models on this computer (stage 7, piece 4): { id, name, origin,
+ * status: 'unchecked'|'checking'|'ok'|'unreached'|'denied', models: string[],
+ * onCheck }. Never checked unasked (C33); a click on check is the asking.
+ */
+export default function KeyPanel({ keys, noKey, focus, holdOnly, onFocus, onSaved, onClose, region = null, onRegion = null, local = null }) {
   const { i18n } = useLingui()
   const field = useRef(null)
   const [busy, setBusy] = useState(false)
@@ -134,6 +147,32 @@ export default function KeyPanel({ keys, noKey, focus, holdOnly, onFocus, onSave
           )}
         </div>
       ))}
+      {local && (
+        <div className={`ch-keyrow${focus === local.id ? ' on' : ''}`}>
+          <div className="ch-keytop">
+            <span className="ch-keyname">{local.name}</span>
+            <span className="ch-keys-lab ch-keylocal">{i18n._(COPY.keys.localHeading)}</span>
+            <span className="ch-keystate">
+              {local.status === 'ok' ? i18n._(COPY.keys.localFound, { count: local.models.length }) : i18n._(LOCAL_STATE[local.status] ?? COPY.keys.localUnchecked)}
+              {' · '}
+              {/* The first click says why, before the browser asks its own question (LPN §7.5); the next one looks. */}
+              <button type="button" className="ch-marg ch-keyact" disabled={local.status === 'checking'} onClick={() => { if (focus !== local.id && local.status === 'unchecked') onFocus(local.id); else local.onCheck() }}>
+                {i18n._(local.status === 'unchecked' ? COPY.keys.localCheck : COPY.keys.localCheckAgain)}
+              </button>
+            </span>
+          </div>
+          {(focus === local.id || local.status !== 'unchecked') && (
+            <div className="ch-keyopen">
+              {local.status === 'ok' && local.models.length > 0 && <p className="ch-keys-note">{i18n._(COPY.keys.localModels, { names: andList(i18n, local.models) })}</p>}
+              {local.status === 'ok' && !local.models.length && <p className="ch-keys-note">{i18n._(COPY.keys.localNone, { provider: local.name })}</p>}
+              {local.status === 'unreached' && <p className="ch-keyprob" role="alert">{i18n._(COPY.keys.localUnreached, { provider: local.name, origin: local.origin })}</p>}
+              {local.status === 'denied' && <p className="ch-keyprob" role="alert">{i18n._(COPY.keys.localDenied)}</p>}
+              {local.status !== 'ok' && <p className="ch-keys-note">{i18n._(COPY.keys.localWhy, { provider: local.name })}</p>}
+              <p className="ch-keys-note">{i18n._(COPY.keys.localOrigins, { provider: local.name, origin: local.origin })}</p>
+            </div>
+          )}
+        </div>
+      )}
       {noKey.length > 0 && (
         <div className="ch-keyrow"><span className="ch-keys-note">{i18n._(COPY.keys.noKeyNeeded, { count: noKey.length, names: andList(i18n, noKey) })}</span></div>
       )}

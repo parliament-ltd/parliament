@@ -33,7 +33,7 @@ export const DESTINATIONS = Object.freeze([
   // chosen by the person, never by their network (stage 7, piece 3; C159).
   { id: 'mistral', kind: 'model', name: 'Mistral', origins: ['https://api.mistral.ai', 'https://api.eu.mistral.ai', 'https://api.us.mistral.ai'], key: true, ships: true, stage: 7, keysPage: 'https://console.mistral.ai/api-keys' },
   // On this machine, by its exact port (CLAUDE.md, hard constraints).
-  { id: 'ollama', kind: 'local', name: 'Ollama', origins: ['http://localhost:11434'], key: false, ships: false, stage: 7 },
+  { id: 'ollama', kind: 'local', name: 'Ollama', origins: ['http://localhost:11434'], key: false, ships: true, stage: 7 },
   // Every language edition, so answers come from the person's language (C110).
   { id: 'wikipedia', kind: 'source', name: 'Wikipedia', origins: ['https://*.wikipedia.org'], key: false, ships: true, stage: 4, licence: 'CC BY-SA 4.0', sourceKind: 'reference', answersIn: 'yours' },
   // Hacker News through its search service, Algolia (stage 7, piece 2).

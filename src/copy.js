@@ -495,6 +495,13 @@ export const COPY = {
       comment: 'Where Mistral processes the prompt, chosen in its key panel (C159)',
     },
     promptPreviewModel: /*i18n*/ { id: 'enter.promptPreviewModel', message: '{name} is a preview: its provider may change or withdraw it', comment: 'A model offered before general availability (security notes §3)' },
+    promptSendLocal: /*i18n*/ {
+      id: 'enter.promptSendLocal',
+      message: '{tokens, plural, one {Enter sends to {provider} on this computer, about # token. Nothing leaves it} other {Enter sends to {provider} on this computer, about # tokens. Nothing leaves it}}',
+      comment: 'A model running on this computer through Ollama (C163)',
+    },
+    promptLocalUnchecked: /*i18n*/ { id: 'enter.promptLocalUnchecked', message: '{name} is on this computer, but {provider} has not listed it since this page opened. {command} checks', comment: 'Commands stay English' },
+    apiLocal: /*i18n*/ { id: 'enter.apiLocal', message: 'Enter shows {provider} on this computer, and how to check for it' },
     promptPerDay: /*i18n*/ { id: 'enter.promptPerDay', message: 'About {count} searches a day without a key, shared by everyone on your network', comment: 'Said when a source with a daily allowance answers (C156)' },
     sourceNetwork: /*i18n*/ { id: 'enter.sourceNetwork', message: '{source} is not answering from your current network. A VPN can cause this; try without it for this source', comment: 'A source refused the request (403), as some do for shared VPN addresses (LPN §8)' },
     sourceBusy: /*i18n*/ { id: 'enter.sourceBusy', message: '{source} says too many requests from your network for now. Try again later', comment: 'A source answered 429: its allowance for this network is used up, or it is busy' },
@@ -750,6 +757,34 @@ export const COPY = {
   // §6; Settings v1). {provider} is a name from the list of providers;
   // {ending} a key's last four characters.
   keys: {
+    // Models on this computer (stage 7, piece 4; C33, C163; LPN §7.5).
+    // {provider} is Ollama, from the list; {origin} this page's address.
+    localHeading: /*i18n*/ { id: 'keys.localHeading', message: 'On your machine', comment: 'As the picker names the group (A14)' },
+    localUnchecked: /*i18n*/ { id: 'keys.localUnchecked', message: 'not checked' },
+    localChecking: /*i18n*/ { id: 'keys.localChecking', message: 'looking for it' },
+    localFound: /*i18n*/ { id: 'keys.localFound', message: '{count, plural, one {# model} other {# models}}' },
+    localMissing: /*i18n*/ { id: 'keys.localMissing', message: 'not found' },
+    localBlocked: /*i18n*/ { id: 'keys.localBlocked', message: 'blocked' },
+    localCheck: /*i18n*/ { id: 'keys.localCheck', message: 'check' },
+    localCheckAgain: /*i18n*/ { id: 'keys.localCheckAgain', message: 'check again' },
+    localWhy: /*i18n*/ {
+      id: 'keys.localWhy',
+      message: 'Parliament looks for {provider} on this computer only when you ask. This browser may then ask whether this site may reach apps on your device: allow it to use the models here. Nothing leaves this computer.',
+      comment: 'Shown before the browser asks for permission to reach this computer (LPN §7.5)',
+    },
+    localOrigins: /*i18n*/ {
+      id: 'keys.localOrigins',
+      message: '{provider} answers only the sites it is told to. Set OLLAMA_ORIGINS to {origin} and restart it. Not *, which would let every site use it.',
+      comment: 'OLLAMA_ORIGINS is the name of a setting and stays as written',
+    },
+    localModels: /*i18n*/ { id: 'keys.localModels', message: 'Found: {names}. Choose one with by: or in the picker.' },
+    localNone: /*i18n*/ { id: 'keys.localNone', message: '{provider} answered, but has no models yet. Add one with {provider} first.' },
+    localUnreached: /*i18n*/ { id: 'keys.localUnreached', message: '{provider} did not answer. Is it running, and is {origin} in OLLAMA_ORIGINS?' },
+    localDenied: /*i18n*/ {
+      id: 'keys.localDenied',
+      message: 'This browser is blocking this site from reaching apps on your device. To allow it, open this site\'s settings from the icon by the address bar, allow apps on this device, then reload.',
+      comment: 'Names no browser (C94)',
+    },
     // Mistral's processing region (C159; LPN §7.1: "processed in the EU" is
     // true, "your data stays in the EU" is not).
     region: /*i18n*/ { id: 'keys.region', message: 'Prompts processed:', comment: 'Where a provider processes prompts; three choices follow' },
@@ -796,6 +831,7 @@ export const COPY = {
     later: /*i18n*/ { id: 'picker.later', message: 'later', comment: 'A row not built yet' },
     madeBy: /*i18n*/ { id: 'picker.madeBy', message: 'made by {maker}', comment: 'A model its provider hosts but did not make (LPN §7.1). {maker} is a company name' },
     preview: /*i18n*/ { id: 'picker.preview', message: 'preview', comment: 'A model offered before general availability; it may change or go' },
+    unchecked: /*i18n*/ { id: 'picker.unchecked', message: 'not checked', comment: 'Models on this computer, before anyone has asked to look for them (C33)' },
     addKey: /*i18n*/ { id: 'picker.addKey', message: 'add a key', comment: 'A model whose provider has no key here; a click writes api:' },
     englishOnly: /*i18n*/ { id: 'picker.englishOnly', message: 'English only', comment: "A source whose answers are in English whatever the reader's language (LPN §6)" },
     mostlyEnglish: /*i18n*/ { id: 'picker.mostlyEnglish', message: 'mostly English', comment: 'A source whose answers are mostly in English' },

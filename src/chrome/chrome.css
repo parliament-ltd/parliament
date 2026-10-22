@@ -144,6 +144,8 @@
 .ch-shell .ch-keysave:disabled { opacity: .55; cursor: wait; }
 .ch-keyprob { margin: 6px 0 0; padding-inline-start: 8px; border-inline-start: 2px solid var(--ch-ink); font-size: 11.5px; color: var(--ch-ink); }
 .ch-keys-foot { margin: 0; padding-top: 9px; }
+/* Models on this computer, beside the keys (C163). */
+.ch-keylocal { margin-inline-start: 6px; color: var(--ch-ink-3); }
 /* Mistral's processing region, chosen in its row (C159). */
 .ch-keyregion { margin: 2px 0 6px; }
 /* The region in force reads as plain ink; the others stay links. Not colour alone. */

@@ -744,6 +744,10 @@ msgid "enter.apiList"
 msgstr "Enter shows your keys, here under the field"
 
 #. js-lingui-explicit-id
+msgid "enter.apiLocal"
+msgstr "Enter shows {provider} on this computer, and how to check for it"
+
+#. js-lingui-explicit-id
 msgid "enter.apiNew"
 msgstr "Enter opens the {provider} key field, the first without a key"
 
@@ -1613,6 +1617,11 @@ msgstr "{name} answers here and is not built yet. by: chooses another"
 
 #. Commands stay English
 #. js-lingui-explicit-id
+msgid "enter.promptLocalUnchecked"
+msgstr "{name} is on this computer, but {provider} has not listed it since this page opened. {command} checks"
+
+#. Commands stay English
+#. js-lingui-explicit-id
 msgid "enter.promptNeedsKey"
 msgstr "{name} answers here and needs a key for {provider}. {command} adds one, by: chooses another"
 
@@ -1657,6 +1666,11 @@ msgstr "{tokens, plural, one {Enter sends to {provider}, about # token, {cost} t
 #. js-lingui-explicit-id
 msgid "enter.promptSendCheap"
 msgstr "{tokens, plural, one {Enter sends to {provider}, about # token, under {cost} to send} other {Enter sends to {provider}, about # tokens, under {cost} to send}}"
+
+#. A model running on this computer through Ollama (C163)
+#. js-lingui-explicit-id
+msgid "enter.promptSendLocal"
+msgstr "{tokens, plural, one {Enter sends to {provider} on this computer, about # token. Nothing leaves it} other {Enter sends to {provider} on this computer, about # tokens. Nothing leaves it}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptSendUnpriced"
@@ -2222,6 +2236,66 @@ msgid "keys.label"
 msgstr "Your keys"
 
 #. js-lingui-explicit-id
+msgid "keys.localBlocked"
+msgstr "blocked"
+
+#. js-lingui-explicit-id
+msgid "keys.localCheck"
+msgstr "check"
+
+#. js-lingui-explicit-id
+msgid "keys.localCheckAgain"
+msgstr "check again"
+
+#. js-lingui-explicit-id
+msgid "keys.localChecking"
+msgstr "looking for it"
+
+#. Names no browser (C94)
+#. js-lingui-explicit-id
+msgid "keys.localDenied"
+msgstr "This browser is blocking this site from reaching apps on your device. To allow it, open this site's settings from the icon by the address bar, allow apps on this device, then reload."
+
+#. js-lingui-explicit-id
+msgid "keys.localFound"
+msgstr "{count, plural, one {# model} other {# models}}"
+
+#. As the picker names the group (A14)
+#. js-lingui-explicit-id
+msgid "keys.localHeading"
+msgstr "On your machine"
+
+#. js-lingui-explicit-id
+msgid "keys.localMissing"
+msgstr "not found"
+
+#. js-lingui-explicit-id
+msgid "keys.localModels"
+msgstr "Found: {names}. Choose one with by: or in the picker."
+
+#. js-lingui-explicit-id
+msgid "keys.localNone"
+msgstr "{provider} answered, but has no models yet. Add one with {provider} first."
+
+#. OLLAMA_ORIGINS is the name of a setting and stays as written
+#. js-lingui-explicit-id
+msgid "keys.localOrigins"
+msgstr "{provider} answers only the sites it is told to. Set OLLAMA_ORIGINS to {origin} and restart it. Not *, which would let every site use it."
+
+#. js-lingui-explicit-id
+msgid "keys.localUnchecked"
+msgstr "not checked"
+
+#. js-lingui-explicit-id
+msgid "keys.localUnreached"
+msgstr "{provider} did not answer. Is it running, and is {origin} in OLLAMA_ORIGINS?"
+
+#. Shown before the browser asks for permission to reach this computer (LPN §7.5)
+#. js-lingui-explicit-id
+msgid "keys.localWhy"
+msgstr "Parliament looks for {provider} on this computer only when you ask. This browser may then ask whether this site may reach apps on your device: allow it to use the models here. Nothing leaves this computer."
+
+#. js-lingui-explicit-id
 msgid "keys.needs"
 msgstr "needs a key"
 
@@ -2673,6 +2747,11 @@ msgstr "preview"
 #. js-lingui-explicit-id
 msgid "picker.sources"
 msgstr "Sources"
+
+#. Models on this computer, before anyone has asked to look for them (C33)
+#. js-lingui-explicit-id
+msgid "picker.unchecked"
+msgstr "not checked"
 
 #. js-lingui-explicit-id
 msgid "room.empty"

@@ -369,6 +369,10 @@ function planApi(a, step, screens = {}) {
       ? { says: { message: 'apiReplace', values: { provider: p.name, ending: p.ending } }, act: { kind: 'keys', focus: p.id } }
       : { says: { message: 'apiAdd', values: { provider: p.name } }, act: { kind: 'keys', focus: p.id } }
   }
+  // Models on this computer: the panel shows them and how to check (C163).
+  if (screens.local && (word === screens.local.id || word === screens.local.name.toLowerCase())) {
+    return { says: { message: 'apiLocal', values: { provider: screens.local.name } }, act: { kind: 'keys', focus: screens.local.id } }
+  }
   const keyless = (screens.noKey ?? []).find((n) => n.toLowerCase() === word)
   if (keyless) return { says: { message: 'apiNoKey', values: { provider: keyless } }, act: null }
   return { says: { message: 'apiUnknown', values: { word, words: [...status.map((k) => `api:${k.id}`), 'api:new'] } }, act: null }
@@ -629,6 +633,17 @@ export function promptPreview(text, target = {}) {
   if (who.later) return { ready: false, says: { message: 'promptLater', values: { name: who.name } } }
   if (who.gone) return { ready: false, says: { message: 'promptGone', values: { name: who.name } } }
   if (who.needsKey) return { ready: false, says: { message: 'promptNeedsKey', values: { name: who.name, provider: who.providerName, command: `api:${who.provider}` } } }
+  // A model on this computer: free, and nothing leaves it (C163). Until a
+  // check has listed it, it is not sent to.
+  if (who.group === 'local') {
+    if (who.unchecked) return { ready: false, says: { message: 'promptLocalUnchecked', values: { name: who.name, provider: who.providerName, command: `api:${who.provider}` } } }
+    const tokens = Math.ceil((prompt.length + (about?.chars ?? 0) + (target.historyChars ?? 0) + (target.systemChars ?? 0)) / CHARS_PER_TOKEN)
+    const also = []
+    if (target.sourcesOut?.count > 0) also.push({ message: 'promptSourcesOut', values: { count: target.sourcesOut.count, sources: target.sourcesOut.names } })
+    if (target.hiddenOut > 0) also.push({ message: 'promptHiddenOut', values: { count: target.hiddenOut } })
+    const says = { message: 'promptSendLocal', values: { provider: who.name, tokens } }
+    return { ready: true, says: also.length ? { ...says, also } : says }
+  }
   if (who.group === 'source') {
     const says = { message: 'promptSource', values: { source: who.name } }
     // A source with a daily allowance says so before Enter (C156).

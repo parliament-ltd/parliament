@@ -904,3 +904,23 @@ describe('by: with a name of several words (stage 7, piece 3)', () => {
     expect(at('>by:mistral small, wikipedia').text).toBe('One prompt to several comes with branches. Choose one for now')
   })
 })
+
+describe('models on this computer (stage 7, piece 4; C163)', () => {
+  const line = (text, target) => {
+    const p = promptPreview(text, target)
+    return { ...p, text: p.says ? say(i18n, p.says.message, p.says.values) : null }
+  }
+  const room = { room: 'c1', streaming: false, keyed: false, provider: 'Anthropic', source: 'Wikipedia', historyChars: 0, systemChars: 0 }
+  const model = { id: 'ollama:qwen3.5:9b', group: 'local', name: 'qwen3.5:9b', provider: 'ollama', providerName: 'Ollama', price: { type: 'free-local' } }
+  it('says a prompt stays on this computer, with no cost', () => {
+    expect(line('owls?', { ...room, answerer: model }).text).toBe('Enter sends to qwen3.5:9b on this computer, about 2 tokens. Nothing leaves it')
+  })
+  it('sends nothing to a model no check has listed since the page opened', () => {
+    expect(line('owls?', { ...room, answerer: { ...model, unchecked: true } })).toMatchObject({ ready: false, text: 'qwen3.5:9b is on this computer, but Ollama has not listed it since this page opened. api:ollama checks' })
+  })
+  it('api:ollama shows the panel at Ollama, which needs no key but a check', () => {
+    const p = preview('>api:ollama', { mode: 'command', arrangement: shipped('almanac'), screens: { keys: [], noKey: ['Wikipedia'], local: { id: 'ollama', name: 'Ollama' } } })
+    expect(say(i18n, p.says.message, p.says.values)).toBe('Enter shows Ollama on this computer, and how to check for it')
+    expect(p.act).toEqual({ kind: 'keys', focus: 'ollama' })
+  })
+})

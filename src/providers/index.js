@@ -1,9 +1,11 @@
 import { AnthropicProvider } from './anthropic'
 import { MistralProvider } from './mistral'
+import { OllamaProvider } from './ollama'
 
 const providers = {
   anthropic: new AnthropicProvider(),
   mistral: new MistralProvider(),
+  ollama: new OllamaProvider(),
 }
 
 export function getProvider(name = 'anthropic') {

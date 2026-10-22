@@ -75,7 +75,10 @@ export function answererRows({ destinations, modelsOf, keys = {}, reference = nu
     }
     const current = d.ships ? (modelsOf(d.id) ?? []).filter((m) => m.current !== false) : []
     if (!current.length) {
-      out[group].push({ id: d.id, group, name: d.name, provider: d.id, providerName: d.name, mark: null, later: true, needsKey: false })
+      // Models on this computer are known only once someone asks Ollama
+      // for them (C33): until then, one row that says so.
+      const unchecked = d.ships && group === 'local'
+      out[group].push({ id: d.id, group, name: d.name, provider: d.id, providerName: d.name, mark: null, later: !d.ships, unchecked, needsKey: false })
       continue
     }
     const rows = [...current].sort((a, b) => priceTotal(b) - priceTotal(a)).map((m) => ({
@@ -126,6 +129,11 @@ export function answererFor({ chosen = null, keys = {}, defaultModel = null, des
     }
     for (const p of destinations.filter((x) => x.kind !== 'source')) {
       const m = findModel(modelsOf(p.id) ?? [], id)
+      // A model on this computer that the last check did not list (or no
+      // check yet this time): named from its id, said to be unchecked.
+      if (!m && p.kind === 'local' && String(id).startsWith(`${p.id}:`)) {
+        return { id, group: 'local', name: String(id).slice(p.id.length + 1), provider: p.id, providerName: p.name, chosen: isChosen, price: { type: 'free-local' }, needsKey: false, gone: false, later: !p.ships, unchecked: true }
+      }
       if (!m) continue
       return {
         id: m.id, group: p.kind === 'local' ? 'local' : 'model', name: m.name, provider: p.id, providerName: p.name, chosen: isChosen,
