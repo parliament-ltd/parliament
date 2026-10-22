@@ -101,6 +101,11 @@ function isSourceNote(s) {
 
 const STOP_REASONS = new Set(['left', 'limit', 'error'])
 
+const isCitations = (v) => Array.isArray(v) && v.length <= 20 && v.every((c) => c && typeof c === 'object' && !Array.isArray(c)
+  && typeof c.url === 'string' && c.url.length <= 2000 && c.url.startsWith('https://')
+  && (c.title == null || (typeof c.title === 'string' && c.title.length <= 300))
+  && Array.isArray(c.quoted) && c.quoted.length <= 3 && c.quoted.every((q) => typeof q === 'string' && q.length <= 300))
+
 function validateMessage(item) {
   if (!isId(item.id))                          return 'message.id invalid'
   if (!isId(item.conversationId))              return 'message.conversationId invalid'
@@ -121,6 +126,8 @@ function validateMessage(item) {
   // An answer from a source translated on request, and a question translated before it went (C166).
   if (item.translation != null && !isTranslation(item.translation)) return 'message.translation invalid'
   if (item.asked != null && !isAsked(item.asked)) return 'message.asked invalid'
+  // The sources a reply cited from a web search (C167): web addresses and short text only.
+  if (item.citations != null && !isCitations(item.citations)) return 'message.citations invalid'
   // Stage 6: the model a reply came from, and the tokens it took (C132 (h)).
   if (item.model != null && !isString(item.model, 200)) return 'message.model invalid'
   if (item.usage != null && !isUsage(item.usage)) return 'message.usage invalid'

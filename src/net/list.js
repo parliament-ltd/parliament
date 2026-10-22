@@ -26,20 +26,40 @@
 //   perDay    for a source with a daily allowance without a key, about how
 //             many searches it allows a day, shared by everyone on the same
 //             network (OpenAlex; checked 22 October 2026)
+//   data      for providers, what they do with what they are sent (security
+//             notes §3; stage 7, piece 7; C167), shown on their rows only:
+//               training  'no' (not trained on), 'optOut' (may be trained on
+//                         unless the person opts out), 'always' (trained on
+//                         whatever is chosen); a model can say otherwise
+//               kept      how long it is kept: 'upTo30' (deleted within 30
+//                         days), 'days30' (kept 30 days), 'atLeast30' (30 days
+//                         or more), 'device' (on this computer only)
+//               checked   the day it was read on the provider's own pages
+//               page      the page that says so: a link the person opens,
+//                         never fetched
 
 export const DESTINATIONS = Object.freeze([
-  { id: 'anthropic', kind: 'model', name: 'Anthropic', origins: ['https://api.anthropic.com'], key: true, ships: true, stage: 4, keysPage: 'https://console.anthropic.com/settings/keys' },
+  // Its commercial terms: not trained on. How long it keeps what is sent:
+  // its privacy pages say deleted within 30 days, its API pages "not
+  // retained by default" beside a "30-day retention" setting (C167 (b)), so
+  // the longer is shown. Some models keep 30 days or more (their own data).
+  { id: 'anthropic', kind: 'model', name: 'Anthropic', origins: ['https://api.anthropic.com'], key: true, ships: true, stage: 4, keysPage: 'https://console.anthropic.com/settings/keys',
+    data: { training: 'no', kept: 'upTo30', flagged: true, checked: '2026-10-22', page: 'https://privacy.claude.com/en/articles/7996866' } },
   // Its global address and the two that process prompts in one region,
   // chosen by the person, never by their network (stage 7, piece 3; C159).
-  { id: 'mistral', kind: 'model', name: 'Mistral', origins: ['https://api.mistral.ai', 'https://api.eu.mistral.ai', 'https://api.us.mistral.ai'], key: true, ships: true, stage: 7, keysPage: 'https://console.mistral.ai/api-keys' },
+  // Its free mode may train on what is sent unless the person opts out; its
+  // paid use leaves it to the person. Preview models are trained on
+  // whatever is chosen. Kept 30 days to watch for misuse (C167 (c)).
+  { id: 'mistral', kind: 'model', name: 'Mistral', origins: ['https://api.mistral.ai', 'https://api.eu.mistral.ai', 'https://api.us.mistral.ai'], key: true, ships: true, stage: 7, keysPage: 'https://console.mistral.ai/api-keys',
+    data: { training: 'optOut', kept: 'days30', checked: '2026-10-22', page: 'https://help.mistral.ai/en/articles/455207' } },
   // On this machine, by its exact port (CLAUDE.md, hard constraints).
-  { id: 'ollama', kind: 'local', name: 'Ollama', origins: ['http://localhost:11434'], key: false, ships: true, stage: 7 },
+  { id: 'ollama', kind: 'local', name: 'Ollama', origins: ['http://localhost:11434'], key: false, ships: true, stage: 7, data: { training: 'no', kept: 'device', checked: '2026-10-22', page: null } },
   // Every language edition, so answers come from the person's language (C110).
   { id: 'wikipedia', kind: 'source', name: 'Wikipedia', origins: ['https://*.wikipedia.org'], key: false, ships: true, stage: 4, licence: 'CC BY-SA 4.0', sourceKind: 'reference', answersIn: 'yours' },
   // Hacker News through its search service, Algolia (stage 7, piece 2).
   { id: 'hackernews', kind: 'source', name: 'Hacker News', origins: ['https://hn.algolia.com'], key: false, ships: true, stage: 7, sourceKind: 'discussion', answersIn: 'english' },
   { id: 'openalex', kind: 'source', name: 'OpenAlex', origins: ['https://api.openalex.org'], key: false, ships: true, stage: 7, licence: 'CC0', sourceKind: 'research', answersIn: 'mostlyEnglish', perDay: 100 },
-].map((d) => Object.freeze({ licence: null, keysPage: null, sourceKind: null, answersIn: null, perDay: null, ...d, origins: Object.freeze([...d.origins]) })))
+].map((d) => Object.freeze({ licence: null, keysPage: null, sourceKind: null, answersIn: null, perDay: null, data: null, ...d, origins: Object.freeze([...d.origins]) })))
 
 const BY_ID = new Map(DESTINATIONS.map((d) => [d.id, d]))
 

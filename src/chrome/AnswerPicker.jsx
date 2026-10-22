@@ -15,6 +15,11 @@ import { COPY } from '../copy'
 // here is greyed, and a click writes api: for it. A row not built yet is
 // marked later and does nothing.
 
+// What a provider does with what it is sent, on its rows only (security
+// notes §3; C167): whether it trains on it, and how long it keeps it.
+const TRAINING = { no: COPY.picker.trainNo, optOut: COPY.picker.trainOptOut, always: COPY.picker.trainAlways }
+const KEPT = { upTo30: COPY.picker.keptUpTo30, days30: COPY.picker.kept30, atLeast30: COPY.picker.keptAtLeast30, device: COPY.picker.keptDevice }
+
 const GROUP_TITLES = {
   model: COPY.picker.models,
   local: COPY.picker.local,
@@ -42,6 +47,12 @@ export default function AnswerPicker({ rows, now, reference, onPick }) {
     if (r.group === 'source') return IN[r.answersIn] ? i18n._(IN[r.answersIn]) : null
     return r.mark
   }
+  const data = (r) => {
+    if (r.later || r.group === 'source') return null
+    if (r.kept === 'device') return i18n._(KEPT.device)
+    const parts = [TRAINING[r.training], KEPT[r.kept]].filter(Boolean).map((d) => i18n._(d))
+    return parts.length ? parts.join(' · ') : null
+  }
   const row = (r) => {
     const on = r.id === now?.id
     const help = r.later ? null : r.needsKey || r.unchecked ? `api:${r.provider}` : `by:${r.id}`
@@ -67,6 +78,7 @@ export default function AnswerPicker({ rows, now, reference, onPick }) {
             {mark(r) && <span className="mk">{mark(r)}</span>}
           </span>
           {about(r) && <span className="ch-ans-about">{about(r)}</span>}
+          {data(r) && <span className={`ch-ans-about ch-ans-data${r.training === 'always' ? ' warn' : ''}`}>{data(r)}</span>}
           {r.perDay && !r.later && <span className="ch-ans-about">{i18n._(COPY.picker.perDay, { count: r.perDay })}</span>}
         </span>
       </button>

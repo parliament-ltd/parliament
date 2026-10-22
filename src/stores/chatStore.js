@@ -80,6 +80,19 @@ export function appendStream(id, chunk) {
   soon(`stream:${id}`)
 }
 
+/**
+ * The reply as it should be shown, all of it so far: as appendStream, for a
+ * reply whose text is changed on the way in (the privacy filter's
+ * placeholders swapped back, C167).
+ */
+export function showStreamText(id, text) {
+  const s = streams.get(id)
+  if (!s) return
+  if (text && s.answerAt == null) s.answerAt = Date.now()
+  s.text = text
+  soon(`stream:${id}`)
+}
+
 /** The text starts again, as between the turns of a tool call. */
 export function resetStreamText(id, text = '') {
   const s = streams.get(id)

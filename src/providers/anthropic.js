@@ -12,6 +12,15 @@ const API_VERSION = '2023-06-01'
 // person to send again, which costs again.
 export const STALL_MS = 45_000
 
+// A citation from a web search, as kept: its address (web addresses only),
+// its title and the passage it quoted (the provider sends at most 150
+// characters). Other kinds of citation are left out.
+export function citationOf(c) {
+  if (c?.type !== 'web_search_result_location') return null
+  if (typeof c.url !== 'string' || !c.url.startsWith('https://')) return null
+  return { url: c.url, title: typeof c.title === 'string' ? c.title : null, cited: typeof c.cited_text === 'string' ? c.cited_text : null }
+}
+
 function stalledError() {
   const error = new Error('The reply stalled: nothing arrived for a while.')
   error.name = 'Stalled'
@@ -127,7 +136,9 @@ export function executeClientTool(toolName, toolInput) {
      over       a higher price for a request whose prompt passes promptTokens */
 const metered = (inputPerMillion, outputPerMillion, over = null) => ({ type: 'metered', inputPerMillion, outputPerMillion, ...(over ? { over } : {}) })
 const MODELS = Object.freeze([
-  { id: 'claude-fable-5-1', apiId: 'claude-fable-5-1', name: 'Fable 5.1', about: 'fable', contextWindow: 1_000_000, cost: metered(10, 50) },
+  // Kept 30 days or more, checked by the provider's safety systems
+  // (support.claude.com/en/articles/15425695, 1 September 2026; C167 (b)).
+  { id: 'claude-fable-5-1', apiId: 'claude-fable-5-1', name: 'Fable 5.1', about: 'fable', contextWindow: 1_000_000, cost: metered(10, 50), data: { kept: 'atLeast30' } },
   { id: 'claude-opus-5-5', apiId: 'claude-opus-5-5', name: 'Opus 5.5', about: 'opus', contextWindow: 1_000_000, cost: metered(4, 20) },
   { id: 'claude-sonnet-5-5', apiId: 'claude-sonnet-5-5', name: 'Sonnet 5.5', about: 'sonnet', contextWindow: 1_000_000, cost: metered(2, 10) },
   { id: 'claude-haiku-5-5', apiId: 'claude-haiku-5-5', name: 'Haiku 5.5', about: 'haiku', contextWindow: 1_000_000,
@@ -369,6 +380,7 @@ export class AnthropicProvider extends BaseProvider {
       usage: { input_tokens: data?.usage?.input_tokens ?? 0, output_tokens: data?.usage?.output_tokens ?? 0 },
       stopReason: data?.stop_reason ?? null,
       toolUses: blocks.filter(b => b?.type === 'tool_use').map(b => ({ id: b.id, name: b.name, input: b.input ?? {} })),
+      citations: blocks.flatMap(b => (b?.type === 'text' && Array.isArray(b.citations) ? b.citations : [])).map(citationOf).filter(Boolean),
     }
   }
 
@@ -430,6 +442,10 @@ export class AnthropicProvider extends BaseProvider {
     let stopReason = null
     const toolUses = []
     let currentToolUse = null
+    // What a web search found and the reply cited, each { url, title, cited }:
+    // kept and shown under the reply (stage 7, piece 7; the provider asks that
+    // citations be shown to whoever reads the reply).
+    const citations = []
     // An error sent inside the stream, as when the service is overloaded part
     // way through a reply. It used to be skipped, and the reply stored as
     // complete (request-path audit, item 9).
@@ -470,6 +486,10 @@ export class AnthropicProvider extends BaseProvider {
           if (event.type === 'content_block_delta') {
             if (event.delta?.type === 'text_delta') {
               onChunk(event.delta.text)
+            }
+            if (event.delta?.type === 'citations_delta') {
+              const c = citationOf(event.delta.citation)
+              if (c) citations.push(c)
             }
             if (event.delta?.type === 'input_json_delta' && currentToolUse) {
               currentToolUse.inputRaw += event.delta.partial_json
@@ -518,6 +538,7 @@ export class AnthropicProvider extends BaseProvider {
       usage,
       stopReason,
       toolUses,
+      citations,
     }
   }
 

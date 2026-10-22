@@ -24,7 +24,9 @@ export const FIELDS = Object.freeze({
   // thinking, thinkingMs: what a model thought before answering, and for how long (C165).
   // translation, asked: an answer from a source translated on request, and a
   // question translated before it went to a source (stage 7, piece 6; C166).
-  messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta', 'stopReason', 'source', 'model', 'usage', 'frameworks', 'thinking', 'thinkingMs', 'translation', 'asked'],
+  messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta', 'stopReason', 'source', 'model', 'usage', 'frameworks', 'thinking', 'thinkingMs', 'translation', 'asked',
+    // citations: the sources a reply cited from a web search (piece 7; C167).
+    'citations'],
   // quotes: the numbers a note quotes beneath it; summary: a dated summary
   // note's numbers, day and model (stage 6, piece 7; C145 (e), (g)).
   notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom', 'quotes', 'summary'],
@@ -96,6 +98,8 @@ const SETTINGS = Object.freeze({
   replyLanguage: (v) => v === null || typeof v === 'string' && /^(off|[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?)$/.test(v),
   helper: (v) => v === null || typeof v === 'string' && /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$/.test(v),
   translateQueries: bool,
+  // The privacy filter (C167).
+  privacyFilter: (v) => v === 'off' || v === 'patterns',
 })
 
 // Settings named after something. `chat` names the chat in the key, so a

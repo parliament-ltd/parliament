@@ -42,6 +42,7 @@ export default function MessageCard({
   source = null, // where an answer from a source came from (stage 4)
   frameworks = null, // the frameworks a reply was written under (stage 7; C164)
   translation = null, // an answer from a source translated on request (C166 (f))
+  citations = null, // the sources a reply cited from a web search (C167 (f))
   asked = null, // a question translated before it went to a source (C85, C166 (g))
   thinking = null, // a model's thinking: { text, live, answering, since } while it streams, { text, ms } after (C165)
   isFavorited = false, showNotes = false,
@@ -501,6 +502,8 @@ export default function MessageCard({
       {type === 'user' && asked && <AskedLine asked={asked} />}
       {/* The frameworks it was written under (C164). */}
       {Array.isArray(frameworks) && frameworks.length > 0 && <FrameworkLine frameworks={frameworks} />}
+      {/* The sources a web search found and the reply cited, kept and shown (C167 (f)). */}
+      {Array.isArray(citations) && citations.length > 0 && <CitedSources citations={citations} />}
 
       {/* Ghost text continue button */}
       {isGhostText && content && onContinue && (
@@ -567,6 +570,26 @@ function Thinking({ thinking }) {
           {thinking.text}
         </div>
       )}
+    </div>
+  )
+}
+
+// The sources a reply cited from a web search (C167 (f)): each a link that
+// shows its whole address before it opens (C146 (b)), with the passages it
+// quoted, as text.
+function CitedSources({ citations }) {
+  const { i18n } = useLingui()
+  return (
+    <div className="mt-2 text-xs text-[var(--p-text-secondary)]">
+      <p className="italic">{i18n._(COPY.cited.heading)}</p>
+      <ol className="mt-1 space-y-1 list-decimal ps-5">
+        {citations.map((c, i) => (
+          <li key={i} dir="auto">
+            <CitationLink href={c.url}>{c.title || c.url}</CitationLink>
+            {(c.quoted ?? []).map((q, j) => <span key={j} className="block italic">“{q}”</span>)}
+          </li>
+        ))}
+      </ol>
     </div>
   )
 }

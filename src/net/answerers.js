@@ -48,6 +48,17 @@ export function findModel(models, id) {
   return models.find((m) => m.id === id) ?? models.find((m) => m.apiId === id) ?? models.find((m) => (m.aliases ?? []).includes(id)) ?? null
 }
 
+/**
+ * What a provider does with what it is sent, for a model of its (security
+ * notes §3; C167): { training, kept }, the model's own where it has them.
+ * {} for a source, or a provider the list says nothing of.
+ */
+export function dataOf(provider, model) {
+  const d = provider?.data
+  if (!d) return {}
+  return { training: model?.data?.training ?? d.training ?? null, kept: model?.data?.kept ?? d.kept ?? null }
+}
+
 const priceTotal = (m) => (m.cost?.type === 'metered' ? m.cost.inputPerMillion + m.cost.outputPerMillion : 0)
 
 /**
@@ -78,7 +89,7 @@ export function answererRows({ destinations, modelsOf, keys = {}, reference = nu
       // Models on this computer are known only once someone asks Ollama
       // for them (C33): until then, one row that says so.
       const unchecked = d.ships && group === 'local'
-      out[group].push({ id: d.id, group, name: d.name, provider: d.id, providerName: d.name, mark: null, later: !d.ships, unchecked, needsKey: false })
+      out[group].push({ id: d.id, group, name: d.name, provider: d.id, providerName: d.name, mark: null, later: !d.ships, unchecked, needsKey: false, ...dataOf(d, null) })
       continue
     }
     const rows = [...current].sort((a, b) => priceTotal(b) - priceTotal(a)).map((m) => ({
@@ -88,6 +99,7 @@ export function answererRows({ destinations, modelsOf, keys = {}, reference = nu
       maker: m.maker && m.maker !== d.name ? m.maker : null, preview: Boolean(m.preview),
       thinks: Boolean(m.thinks), // it can think before answering (C165)
       mark: costMark(m.cost, reference), later: false, needsKey: Boolean(d.key && !keys[d.id]),
+      ...dataOf(d, m), // what is done with what it is sent (C167)
     }))
     out[group].push(...rows)
   }
@@ -139,6 +151,7 @@ export function answererFor({ chosen = null, keys = {}, defaultModel = null, des
       return {
         id: m.id, group: p.kind === 'local' ? 'local' : 'model', name: m.name, provider: p.id, providerName: p.name, chosen: isChosen,
         price: m.cost ?? null, needsKey: Boolean(p.key && !keys[p.id]), gone: Boolean(m.retired), later: !p.ships, preview: Boolean(m.preview), thinks: Boolean(m.thinks),
+        ...dataOf(p, m),
       }
     }
     return { id, group: 'model', name: id, provider: null, providerName: null, chosen: isChosen, price: null, needsKey: false, gone: true, later: false }

@@ -163,7 +163,10 @@ export async function keyStatus() {
   const out = []
   for (const d of shipped().filter((x) => x.key)) {
     const key = await keys.get(d.id).catch(() => null)
-    out.push({ id: d.id, name: d.name, has: Boolean(key), held: keys.isHeld(d.id), ending: key ? key.slice(-4) : null, keysPage: d.keysPage })
+    // What it does with what it is sent, and the models that differ (C167).
+    const current = modelsOf(d.id).filter((m) => m.current !== false)
+    const data = d.data ? { ...d.data, longer: current.filter((m) => m.data?.kept === 'atLeast30').map((m) => m.name), trainsAll: current.filter((m) => m.data?.training === 'always').map((m) => m.name) } : null
+    out.push({ id: d.id, name: d.name, has: Boolean(key), held: keys.isHeld(d.id), ending: key ? key.slice(-4) : null, keysPage: d.keysPage, data })
   }
   return out
 }
@@ -181,3 +184,6 @@ export const noKeyNeeded = () => shipped().filter((d) => !d.key && d.kind === 's
  * @returns {Promise<object[]>} the models
  */
 export const checkLocal = (id = 'ollama') => gateway.call(id, 'listModels', [], { label: 'check Ollama' })
+
+/** The models that check found that run on the provider's own servers, and so are left out (C167 (d)). */
+export const localAway = (id = 'ollama') => implementation(id)?.awayModels?.() ?? []

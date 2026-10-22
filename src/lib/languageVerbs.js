@@ -134,6 +134,16 @@ export function planTranslate(step, screens = {}) {
   return { says, act: { kind: 'translate', chatId: t.room, messageId: last.messageId, from: last.from ?? null, to: t.to, who: t.who } }
 }
 
+/** privacy:on / privacy:off (C167). screens.privacy: { on }: whether the filter is on, off by default. */
+export function planPrivacy(step, screens = {}) {
+  const on = screens.privacy?.on === true
+  const word = step.match?.values?.[0]?.value ?? null
+  if (!word) return { says: { message: 'privacyNow', values: { on: on ? 'on' : 'off' } }, act: null }
+  const want = word === 'on'
+  if (want === on) return { says: { message: want ? 'privacySameOn' : 'privacySameOff' }, act: null }
+  return { says: { message: want ? 'privacyOn' : 'privacyOff' }, act: { kind: 'setting', key: 'privacyFilter', value: want ? 'patterns' : 'off', before: on ? 'patterns' : 'off' } }
+}
+
 /**
  * The lines for a question that goes translated to a source (C85): that it
  * is translated, and by whom at what cost. [] when it goes as typed.

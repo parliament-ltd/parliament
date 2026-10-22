@@ -142,6 +142,8 @@
 .ch-shell .ch-keysave { padding: 0 14px; border: 1px dotted var(--ch-soft); border-radius: var(--ch-r-btn); font: 500 12px var(--ch-sans); }
 .ch-shell .ch-keysave:hover { border-color: var(--ch-ink); }
 .ch-shell .ch-keysave:disabled { opacity: .55; cursor: wait; }
+.ch-keydata p { margin: 2px 0 0; }
+.ch-keydata p:first-child { font-style: italic; }
 .ch-keyprob { margin: 6px 0 0; padding-inline-start: 8px; border-inline-start: 2px solid var(--ch-ink); font-size: 11.5px; color: var(--ch-ink); }
 .ch-keys-foot { margin: 0; padding-top: 9px; }
 /* Models on this computer, beside the keys (C163). */
@@ -348,6 +350,9 @@
 .ch-ans .nm { font: 400 12.5px var(--ch-sans); }
 .ch-ans .mk { margin-inline-start: auto; font: 400 11px var(--ch-sans); color: var(--ch-ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .ch-ans-about { display: block; margin-top: 2px; font: 400 11px/1.45 var(--ch-sans); color: var(--ch-ink-3); }
+/* What a provider does with what it is sent (C167); one that trains on all of it in ink. */
+.ch-ans-data { font-style: italic; }
+.ch-ans-data.warn { color: var(--ch-ink); }
 .ch-ans.later .nm, .ch-ans.later .mk, .ch-ans.keyless .nm { color: var(--ch-ink-3); }
 .ch-ans.later .box { border-style: dashed; }
 .ch-shell .ch-ans.later { cursor: default; }

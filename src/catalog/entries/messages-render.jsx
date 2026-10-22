@@ -336,6 +336,7 @@ export default function MessagesRender() {
         source={msg.source ?? null}
         frameworks={msg.role === 'assistant' ? msg.frameworks ?? null : null}
         translation={msg.role === 'assistant' ? msg.translation ?? null : null}
+        citations={msg.role === 'assistant' ? msg.citations ?? null : null}
         asked={msg.role === 'user' ? msg.asked ?? null : null}
         thinking={thinking}
         isFavorited={isFav}

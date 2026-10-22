@@ -14,9 +14,10 @@ import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
-import { metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal, helperOf, translatorFor, translateText, browserTranslation } from '../net'
+import { metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal, localAway, helperOf, translatorFor, translateText, browserTranslation } from '../net'
 import { replyLanguageOf, withReplyLanguage, sourceAskLanguage, translateInto, nameOf, baseOf } from '../lib/languages'
 import { piecesOfAnswer, translationOf, lastSourceAnswer, BY_BROWSER } from '../lib/translations'
+import { findPrivate } from '../lib/privacyFilter'
 import AnswerPicker from './AnswerPicker'
 import { ignite } from './ignition'
 import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
@@ -713,7 +714,7 @@ export default function Shell() {
     setLocal((l) => ({ ...l, status: 'checking' }))
     try {
       const found = await checkLocal(LOCAL)
-      setLocal({ status: 'ok', models: found.map((m) => m.name) })
+      setLocal({ status: 'ok', models: found.map((m) => m.name), away: localAway(LOCAL) })
       setSetting('localChecked', true).catch(() => {})
     } catch {
       setLocal({ status: quiet ? 'unchecked' : await localBlocked() ? 'denied' : 'unreached', models: [] })
@@ -1374,7 +1375,8 @@ export default function Shell() {
     reply: { setting: settings.replyLanguage ?? null, now: reply, locale: i18n.locale, nameOf: languageName },
     helping: { now: helperNow, rows: answerRows, stored: settings.helper ?? null },
     translating: { room: roomId, num: roomRecord?.num ?? null, last: lastAnswer, to: translateTo, who: translator, queries: settings.translateQueries === true, nameOf: languageName },
-  }), [settings.replyLanguage, settings.helper, settings.translateQueries, reply, i18n.locale, languageName, helperNow, answerRows, roomId, roomRecord, lastAnswer, translateTo, translator])
+    privacy: { on: settings.privacyFilter === 'patterns' },
+  }), [settings.privacyFilter, settings.replyLanguage, settings.helper, settings.translateQueries, reply, i18n.locale, languageName, helperNow, answerRows, roomId, roomRecord, lastAnswer, translateTo, translator])
   const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
@@ -1410,6 +1412,13 @@ export default function Shell() {
     const text = aboutText(rows, (r) => i18n._(COPY.chat.aboutCard, { kind: r.kind, num: r.num }))
     return { nums: rows.map((r) => r.num), quotes: rows.filter((r) => r.kind === 'quote').map((r) => r.num), chars: text.length, text }
   }, [arrangement.addressed, pickedHere, numbered, i18n])
+  // The fixed formats in what goes along with a prompt, found once for the
+  // Enter line: the privacy filter swaps them, or could (C167).
+  const alongPrivate = useMemo(() => {
+    const seen = new Set()
+    for (const t of [...along.map((m) => (typeof m.content === 'string' ? m.content : '')), instructionsOf(fwHere, fwList)]) for (const f of findPrivate(t)) seen.add(`${f.kind}:${f.value}`)
+    return [...seen]
+  }, [along, fwHere, fwList])
   const describeFresh = useMemo(() => (byModel && settings.describeNewChats !== false ? { price: describeModel?.cost ?? null } : null), [byModel, settings.describeNewChats, describeModel])
   // A source with an edition in each language is asked in the reply
   // language's, when the person chose one (C166 (e)).
@@ -1439,6 +1448,8 @@ export default function Shell() {
     query,
     translateLater: (reads === 'english' || reads === 'mostlyEnglish') && baseOf(translateTo) !== 'en' ? languageName(translateTo) : null,
     nameOf: languageName,
+    // The privacy filter, for a model off this computer (C167).
+    privacy: answerer.group === 'model' ? { on: settings.privacyFilter === 'patterns', along: about ? [] : alongPrivate } : null,
     // The frameworks on the chat, by name; the ones that go, when a model answers (C164).
     frameworkNames: frameworksOf(fwHere, fwList).map(nameOfFramework),
     thinking: settings.thinking === true,
@@ -1451,7 +1462,7 @@ export default function Shell() {
     ink,
     roomName: roomNameHere,
     about,
-  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo])
+  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -1696,7 +1707,7 @@ export default function Shell() {
       {!barWindow && createPortal(
         <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)}
           keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory', region, onRegion: (r) => updateSetting('mistralRegion', r),
-            local: { ...LOCAL_ENTRY, origin: window.location.origin, status: local.status, models: local.models, onCheck: () => runLocalCheck() } } : null}
+            local: { ...LOCAL_ENTRY, origin: window.location.origin, status: local.status, models: local.models, away: local.away ?? [], onCheck: () => runLocalCheck() } } : null}
           onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)}
           picker={picking ? { rows: answerRows, now: answerer, reference: referenceName } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => setPicking(false)}
           frameworkPicker={fwPicking ? { items: frameworkItems } : null} onFrameworkPicker={toggleFwPicker} onToggleFramework={toggleFramework} onFrameworkPickerClose={() => setFwPicking(false)} />,

@@ -6,12 +6,13 @@ import { useConversations } from './ConversationContext'
 import { useSettings } from './SettingsContext'
 import { gateway, destination, runClientTool, continueInstruction, providerOf } from '../net'
 import {
-  startStream, appendStream, resetStreamText, stopStream, endStream, getStream, appendThinking, thoughtOf,
+  startStream, appendStream, showStreamText, resetStreamText, stopStream, endStream, getStream, appendThinking, thoughtOf,
   isStreaming as streamingIn, streamingIds, addNotice, noteCut,
   getMessages as heldMessages, hasMessages, setMessages as holdMessages, updateMessages, releaseMessages, sendable,
 } from './chatStore'
 import { useIsStreaming, useMessages } from './chatHooks'
 import { forModel, cutReason } from './sendHistory'
+import { veilRequest } from '../lib/privacyFilter'
 
 // The open chat, for today's screens (refactor-plan.md, stages 3 and 4;
 // state audit §11a; C109).
@@ -49,6 +50,23 @@ const isQuota = (err) => err?.name === 'QuotaExceededError' || err?.name === 'NS
 const answeredWith = (model, input, output) => (model ? { model, usage: { input, output } } : {})
 // The frameworks a reply was written under (stage 7, piece 5; C164).
 const underWith = (frameworks) => (Array.isArray(frameworks) && frameworks.length ? { frameworks } : {})
+// The sources a reply cited from a web search, kept and shown (stage 7,
+// piece 7): each address once, with up to three passages it quoted.
+const CITED_MOST = 20
+function citedWith(citations) {
+  const byUrl = new Map()
+  for (const c of citations ?? []) {
+    if (!c || typeof c.url !== 'string' || !/^https:\/\//.test(c.url) || c.url.length > 2000) continue
+    const had = byUrl.get(c.url) ?? { url: c.url, title: typeof c.title === 'string' ? c.title.slice(0, 300) : null, quoted: [] }
+    const q = typeof c.cited === 'string' ? c.cited.trim().slice(0, 300) : ''
+    if (q && had.quoted.length < 3 && !had.quoted.includes(q)) had.quoted.push(q)
+    byUrl.set(c.url, had)
+  }
+  const list = [...byUrl.values()].slice(0, CITED_MOST)
+  return list.length ? { citations: list } : {}
+}
+// Whether a provider runs on this computer: nothing it is sent leaves it.
+const onThisComputer = (provider) => destination(provider)?.kind === 'local'
 
 export function ChatProvider({ children }) {
   const [tokenUsage, setTokenUsage] = useState({ input: 0, output: 0 })
@@ -68,6 +86,28 @@ export function ChatProvider({ children }) {
   const thinkOn = useRef(false)
   useEffect(() => { thinkOn.current = settings.thinking === true }, [settings.thinking])
   const thinkOptions = (conversationId) => ({ think: thinkOn.current, onThinking: (t) => appendThinking(conversationId, t) })
+  // The privacy filter (C167): off unless turned on with privacy:on.
+  const privacyOn = useRef(false)
+  useEffect(() => { privacyOn.current = settings.privacyFilter === 'patterns' }, [settings.privacyFilter])
+  // A request as it goes: for a provider off this computer, with the
+  // filter on, its fixed formats swapped for placeholders, and the reply
+  // shown and kept with them swapped back. prefix: what the reply already
+  // holds (continuing a reply). Off, or on this computer, as it was.
+  const veiling = (conversationId, model, messages, system, prefix = '') => {
+    if (!privacyOn.current || onThisComputer(providerOf(model))) {
+      return { messages, system: system || undefined, onChunk: (c) => appendStream(conversationId, c), out: (t) => t, back: (t) => t, reset: () => {} }
+    }
+    const r = veilRequest({ messages, system: system || null })
+    let raw = ''
+    return {
+      messages: r.messages,
+      system: r.system || undefined,
+      onChunk: (c) => { raw += c; showStreamText(conversationId, prefix + r.veil.back(raw)) },
+      out: r.veil.out,
+      back: r.veil.back,
+      reset: () => { raw = '' },
+    }
+  }
 
   useEffect(() => { finishOnLeave.current = Boolean(settings.finishRepliesOnLeave) }, [settings.finishRepliesOnLeave])
   useEffect(() => { describeOn.current = settings.describeNewChats !== false }, [settings.describeNewChats])
@@ -160,7 +200,9 @@ export function ChatProvider({ children }) {
   const describeNewChat = useCallback(async (conversationId, exchange, prompt, model) => {
     if (describeOn.current) {
       try {
-        const fields = fieldsFromDescription(await gateway.call(providerOf(model), 'generateMetadata', [exchange], { label: 'title, summary and tags' }))
+        const v = veiling(conversationId, model, exchange, null)
+        const said = await gateway.call(providerOf(model), 'generateMetadata', [v.messages], { label: 'title, summary and tags' })
+        const fields = fieldsFromDescription({ ...said, ...(said?.title ? { title: v.back(said.title) } : {}), ...(said?.summary ? { summary: v.back(said.summary) } : {}) })
         if (Object.keys(fields).length) { await updateConversation(conversationId, fields); return }
       } catch (err) {
         console.warn('Describing the chat failed:', err.message)
@@ -261,8 +303,10 @@ export function ChatProvider({ children }) {
       // 4. Call provider with streaming — handle client-side tool loop
       let totalInputTokens = 0
       let totalOutputTokens = 0
-      let toolLoopHistory = [...baseHistory]
+      const v = veiling(conversationId, model, baseHistory, systemPrompt)
+      let toolLoopHistory = [...v.messages]
       let chartBlocks = '' // accumulated create_chart output across turns
+      const cited = [] // what a web search found and the reply cited
       const clientSideTools = tools.filter(t => !t.serverSide)
       const MAX_TOOL_TURNS = 5 // prevent infinite loops
       let last = null // the last turn's response: its stop reason says whether the reply came back whole
@@ -272,14 +316,15 @@ export function ChatProvider({ children }) {
         const response = await gateway.call(providerOf(model), 'sendMessage', [
           toolLoopHistory,
           model,
-          (chunk) => appendStream(conversationId, chunk),
+          v.onChunk,
           controller.signal,
-          systemPrompt || undefined,
+          v.system,
           tools,
           undefined,
           thinkOptions(conversationId),
         ], { label: 'chat send' })
         last = response
+        if (Array.isArray(response?.citations)) cited.push(...response.citations)
 
         totalInputTokens += response?.usage?.input_tokens || 0
         totalOutputTokens += response?.usage?.output_tokens || 0
@@ -306,7 +351,7 @@ export function ChatProvider({ children }) {
         }))
 
         // Build the assistant message content (text + tool_use blocks)
-        const soFar = getStream(conversationId)?.text ?? ''
+        const soFar = v.out(getStream(conversationId)?.text ?? '')
         const assistantContent = [
           ...(soFar ? [{ type: 'text', text: soFar }] : []),
           ...clientToolUses.map(tu => ({
@@ -325,6 +370,7 @@ export function ChatProvider({ children }) {
 
         // Reset streaming content for the next turn's text
         resetStreamText(conversationId)
+        v.reset()
       }
 
       // 5. Stream complete. A reply cut off by the length allowed for one
@@ -338,7 +384,7 @@ export function ChatProvider({ children }) {
       const cut = finalContent ? cutReason(last?.stopReason) : null
       // The model that answered and the tokens it took, so what a chat cost
       // can be worked out later, never guessed (C132 (h)).
-      const outcome = { content: finalContent, incomplete: Boolean(cut), tokenCount, ...(cut ? { stopReason: cut } : {}), ...answeredWith(model, totalInputTokens, totalOutputTokens), ...underWith(frameworks), ...thoughtOf(getStream(conversationId)) }
+      const outcome = { content: finalContent, incomplete: Boolean(cut), tokenCount, ...(cut ? { stopReason: cut } : {}), ...answeredWith(model, totalInputTokens, totalOutputTokens), ...underWith(frameworks), ...thoughtOf(getStream(conversationId)), ...citedWith(cited) }
 
       await updateMessage(assistantMsg.id, outcome)
       const finished = { ...assistantMsg, ...outcome }
@@ -394,13 +440,14 @@ export function ChatProvider({ children }) {
 
     const controller = new AbortController()
     startStream(conversationId, { messageId: reply.id, controller })
+    const v = veiling(conversationId, model, history, systemPrompt)
     try {
       const response = await gateway.call(providerOf(model), 'sendMessageWhole', [
-        history,
+        v.messages,
         model,
-        (chunk) => appendStream(conversationId, chunk),
+        v.onChunk,
         controller.signal,
-        systemPrompt || undefined,
+        v.system,
         [],
         thinkOptions(conversationId),
       ], { label: 'chat send without streaming' })
@@ -412,6 +459,7 @@ export function ChatProvider({ children }) {
         ...answeredWith(model, response?.usage?.input_tokens || 0, response?.usage?.output_tokens || 0),
         ...underWith(frameworks),
         ...thoughtOf(getStream(conversationId)),
+        ...citedWith(response?.citations),
       }
       await updateMessage(reply.id, outcome)
       const finished = { ...reply, ...outcome }
@@ -528,14 +576,15 @@ export function ChatProvider({ children }) {
     const controller = new AbortController()
     startStream(conversationId, { messageId: incompleteMsg.id, text: incompleteMsg.content, controller })
     const stopPersisting = persistEvery(conversationId, incompleteMsg.id)
+    const v = veiling(conversationId, model, history, systemPrompt, incompleteMsg.content)
 
     try {
       const response = await gateway.call(providerOf(model), 'sendMessage', [
-        history,
+        v.messages,
         model,
-        (chunk) => appendStream(conversationId, chunk),
+        v.onChunk,
         controller.signal,
-        systemPrompt || undefined,
+        v.system,
         [],
         undefined,
         thinkOptions(conversationId),

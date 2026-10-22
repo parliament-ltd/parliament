@@ -152,7 +152,7 @@ describe('the same request without streaming (C114)', () => {
     const chunks = []
     const r = await new AnthropicProvider().sendMessageWhole('test-key', [{ role: 'user', content: 'Hi' }], 'claude-haiku', (c) => chunks.push(c))
     expect(chunks).toEqual(['Whole reply'])
-    expect(r).toEqual({ usage: { input_tokens: 9, output_tokens: 2 }, stopReason: 'end_turn', toolUses: [] })
+    expect(r).toEqual({ usage: { input_tokens: 9, output_tokens: 2 }, stopReason: 'end_turn', toolUses: [], citations: [] })
     expect(JSON.parse(fetch.mock.calls[0][1].body).stream).toBeUndefined()
   })
 

@@ -41,6 +41,8 @@ const DEFAULT_SETTINGS = {
   replyLanguage: null,
   helper: null,
   translateQueries: false,
+  // The privacy filter for fixed formats: 'off' or 'patterns' (stage 7, piece 7; C167).
+  privacyFilter: 'off',
 }
 
 export function SettingsProvider({ children }) {

@@ -466,6 +466,10 @@ msgstr ""
 msgid "chat.writtenUnder"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "cited.heading"
+msgstr ""
+
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
 msgid "collection.actHelp"
@@ -1721,6 +1725,27 @@ msgstr ""
 msgid "enter.popSideThere"
 msgstr ""
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.privacyNow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.privacyOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.privacyOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.privacySameOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.privacySameOn"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.promptAbout"
 msgstr ""
@@ -1811,6 +1836,20 @@ msgstr ""
 #. A model offered before general availability (security notes §3)
 #. js-lingui-explicit-id
 msgid "enter.promptPreviewModel"
+msgstr ""
+
+#. Commands stay English. A model whose provider trains on everything sent to it (security notes §3)
+#. js-lingui-explicit-id
+msgid "enter.promptPreviewTrains"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptPrivacy"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptPrivacyOffer"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2777,6 +2816,43 @@ msgid "keys.save"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "keysData.cannotSee"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keysData.checked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keysData.flagged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keysData.localAway"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keysData.longer"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keysData.optOut"
+msgstr ""
+
+#. A link to the provider's own page
+#. js-lingui-explicit-id
+msgid "keysData.page"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keysData.regionKept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keysData.trainsAll"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "kind.ask"
 msgstr ""
 
@@ -3093,6 +3169,22 @@ msgid "picker.englishOnly"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "picker.kept30"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.keptAtLeast30"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.keptDevice"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.keptUpTo30"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "picker.kind.discussion"
 msgstr ""
 
@@ -3164,9 +3256,37 @@ msgstr ""
 msgid "picker.thinks"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "picker.trainAlways"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.trainNo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.trainOptOut"
+msgstr ""
+
 #. Models on this computer, before anyone has asked to look for them (C33)
 #. js-lingui-explicit-id
 msgid "picker.unchecked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "privacy.card"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "privacy.email"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "privacy.iban"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "privacy.phone"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3578,6 +3698,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.pop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.privacy"
 msgstr ""
 
 #. js-lingui-explicit-id

@@ -466,6 +466,10 @@ msgstr "Translated into {language} by this browser"
 msgid "chat.writtenUnder"
 msgstr "Written under {names}"
 
+#. js-lingui-explicit-id
+msgid "cited.heading"
+msgstr "Sources it cited"
+
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
 msgid "collection.actHelp"
@@ -1721,6 +1725,27 @@ msgstr "{side, select, left {Enter places the window of {board} on the left} oth
 msgid "enter.popSideThere"
 msgstr "{side, select, left {The window of {board} is on the left already} other {The window of {board} is on the right already}}"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.privacyNow"
+msgstr "{on, select, on {Email addresses, phone numbers, and bank and card numbers are swapped for placeholders before a prompt goes. privacy:off stops it} other {The privacy filter is off. privacy:on swaps email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes}}"
+
+#. js-lingui-explicit-id
+msgid "enter.privacyOff"
+msgstr "Enter stops swapping: prompts go as you type them"
+
+#. js-lingui-explicit-id
+msgid "enter.privacyOn"
+msgstr "Enter swaps email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes to a model off this computer, and puts them back in the reply. This line names what is swapped each time"
+
+#. js-lingui-explicit-id
+msgid "enter.privacySameOff"
+msgstr "The privacy filter is off already"
+
+#. js-lingui-explicit-id
+msgid "enter.privacySameOn"
+msgstr "The privacy filter is on already"
+
 #. js-lingui-explicit-id
 msgid "enter.promptAbout"
 msgstr "{count, plural, one {A new chat: the words of # card go first} other {A new chat: the words of # cards go first}}"
@@ -1812,6 +1837,20 @@ msgstr "About {count} searches a day without a key, shared by everyone on your n
 #. js-lingui-explicit-id
 msgid "enter.promptPreviewModel"
 msgstr "{name} is a preview: its provider may change or withdraw it"
+
+#. Commands stay English. A model whose provider trains on everything sent to it (security notes §3)
+#. js-lingui-explicit-id
+msgid "enter.promptPreviewTrains"
+msgstr "{name} is a preview: its provider trains on what you send it, whatever you chose. by: chooses another"
+
+#. js-lingui-explicit-id
+msgid "enter.promptPrivacy"
+msgstr "Swapped for placeholders before it goes: {found}. The reply puts them back"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptPrivacyOffer"
+msgstr "It holds {found}. privacy:on swaps such things for placeholders before they go"
 
 #. js-lingui-explicit-id
 msgid "enter.promptQueryTranslated"
@@ -2777,6 +2816,43 @@ msgid "keys.save"
 msgstr "Save"
 
 #. js-lingui-explicit-id
+msgid "keysData.cannotSee"
+msgstr "Parliament cannot see your settings there. This is what its own pages say."
+
+#. js-lingui-explicit-id
+msgid "keysData.checked"
+msgstr "checked {date}"
+
+#. js-lingui-explicit-id
+msgid "keysData.flagged"
+msgstr "Kept longer when flagged under its usage policy, up to two years."
+
+#. js-lingui-explicit-id
+msgid "keysData.localAway"
+msgstr "{count, plural, one {It also lists # model that runs on its own servers, left out here: a prompt to it would leave this computer.} other {It also lists # models that run on its own servers, left out here: a prompt to them would leave this computer.}}"
+
+#. js-lingui-explicit-id
+msgid "keysData.longer"
+msgstr "{count, plural, one {{names} is kept 30 days or more, read by its safety systems.} other {{names} are kept 30 days or more, read by its safety systems.}}"
+
+#. js-lingui-explicit-id
+msgid "keysData.optOut"
+msgstr "On its free plan it may train on what you send unless you opt out: in its admin panel, Privacy, then Anonymous improvement data. The switch for the API is separate from its others."
+
+#. A link to the provider's own page
+#. js-lingui-explicit-id
+msgid "keysData.page"
+msgstr "where it says so"
+
+#. js-lingui-explicit-id
+msgid "keysData.regionKept"
+msgstr "A region changes where prompts are processed, not how long they are kept."
+
+#. js-lingui-explicit-id
+msgid "keysData.trainsAll"
+msgstr "{count, plural, one {{names} is a preview, trained on whatever you choose. If that matters, choose another.} other {{names} are previews, trained on whatever you choose. If that matters, choose another.}}"
+
+#. js-lingui-explicit-id
 msgid "kind.ask"
 msgstr "Ask"
 
@@ -3093,6 +3169,22 @@ msgid "picker.englishOnly"
 msgstr "English only"
 
 #. js-lingui-explicit-id
+msgid "picker.kept30"
+msgstr "kept 30 days"
+
+#. js-lingui-explicit-id
+msgid "picker.keptAtLeast30"
+msgstr "kept 30 days or more"
+
+#. js-lingui-explicit-id
+msgid "picker.keptDevice"
+msgstr "stays on this computer"
+
+#. js-lingui-explicit-id
+msgid "picker.keptUpTo30"
+msgstr "kept up to 30 days"
+
+#. js-lingui-explicit-id
 msgid "picker.kind.discussion"
 msgstr "Web and discussion"
 
@@ -3164,10 +3256,38 @@ msgstr "Sources"
 msgid "picker.thinks"
 msgstr "can think"
 
+#. js-lingui-explicit-id
+msgid "picker.trainAlways"
+msgstr "trained on, whatever you choose"
+
+#. js-lingui-explicit-id
+msgid "picker.trainNo"
+msgstr "not trained on"
+
+#. js-lingui-explicit-id
+msgid "picker.trainOptOut"
+msgstr "may be trained on unless you opt out"
+
 #. Models on this computer, before anyone has asked to look for them (C33)
 #. js-lingui-explicit-id
 msgid "picker.unchecked"
 msgstr "not checked"
+
+#. js-lingui-explicit-id
+msgid "privacy.card"
+msgstr "{count, plural, one {a card number} other {# card numbers}}"
+
+#. js-lingui-explicit-id
+msgid "privacy.email"
+msgstr "{count, plural, one {an email address} other {# email addresses}}"
+
+#. js-lingui-explicit-id
+msgid "privacy.iban"
+msgstr "{count, plural, one {a bank account number} other {# bank account numbers}}"
+
+#. js-lingui-explicit-id
+msgid "privacy.phone"
+msgstr "{count, plural, one {a phone number} other {# phone numbers}}"
 
 #. js-lingui-explicit-id
 msgid "room.empty"
@@ -3579,6 +3699,10 @@ msgstr "Bring the Plan board beside what is on screen"
 #. js-lingui-explicit-id
 msgid "verb.pop"
 msgstr "Put a board or the bar in its own window, place it, or bring it back"
+
+#. js-lingui-explicit-id
+msgid "verb.privacy"
+msgstr "Swap email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes, or not"
 
 #. js-lingui-explicit-id
 msgid "verb.records"

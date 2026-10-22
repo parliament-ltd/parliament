@@ -41,6 +41,17 @@ function stalledError() {
   return error
 }
 
+/**
+ * Whether a model Ollama lists runs elsewhere: its cloud models run on its
+ * own servers when asked through this computer, so a prompt to one leaves
+ * the computer. /api/tags names their host (remote_host, remote_model), and
+ * their tags end in cloud (docs.ollama.com, 22 October 2026; C167 (d)).
+ */
+export function runsElsewhere(tag) {
+  const name = String(tag?.name ?? tag?.model ?? '')
+  return Boolean(tag?.remote_host || tag?.remote_model) || /[:-]cloud$/i.test(name)
+}
+
 /** A model as Parliament lists it, from what /api/tags says of it. */
 export function modelFromTag(tag) {
   const name = String(tag?.name ?? tag?.model ?? '')
@@ -76,6 +87,11 @@ export class OllamaProvider extends BaseProvider {
     return this.models
   }
 
+  /** The models the last check found that run elsewhere, left out (C167 (d)). */
+  awayModels() {
+    return this.away ?? []
+  }
+
   _apiName(model) {
     const id = String(model ?? '')
     const found = this.models.find((m) => m.id === id || m.apiId === id)
@@ -95,7 +111,11 @@ export class OllamaProvider extends BaseProvider {
       throw error
     }
     const data = await response.json()
-    this.models = (Array.isArray(data?.models) ? data.models : []).map(modelFromTag).filter(Boolean).slice(0, 200)
+    const tags = Array.isArray(data?.models) ? data.models : []
+    // Models that run elsewhere are left out, so nothing sent to a model
+    // listed here leaves this computer; the key panel says how many.
+    this.away = tags.filter(runsElsewhere).map((t) => String(t?.name ?? t?.model ?? '').slice(0, 96)).filter(Boolean).slice(0, 50)
+    this.models = tags.filter((t) => !runsElsewhere(t)).map(modelFromTag).filter(Boolean).slice(0, 200)
     return this.models
   }
 

@@ -248,6 +248,11 @@ export const VERBS = Object.freeze([
   // name, in English or in the language itself. off asks for none.
   v({ verb: 'reply', group: 'editing', example: 'reply:swedish', forms: ['reply:', 'reply:sv', 'reply:swedish', 'reply:svenska', 'reply:off'], takes: [[], [{ many: 'text' }]], stage: 7, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.reply', message: 'Choose the language replies come in, by its code or its name' } }),
+  // The privacy filter for fixed formats (security notes §4.1; C167):
+  // email addresses, phone numbers, bank and card numbers swapped for
+  // placeholders before a prompt goes to a model off this computer.
+  v({ verb: 'privacy', group: 'editing', example: 'privacy:on', forms: ['privacy:', 'privacy:on', 'privacy:off'], takes: [[], [['on', 'off']]], stage: 7, undoable: true, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.privacy', message: 'Swap email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes, or not' } }),
   // Translating (C84, C85, C166): alone, the last answer from a source,
   // into your language; on and off, whether a question to a source that
   // reads only English is translated before it goes.

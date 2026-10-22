@@ -626,7 +626,29 @@ export const COPY = {
     translateQueriesOff: /*i18n*/ { id: 'enter.translateQueriesOff', message: 'Enter sends questions to sources as you type them' },
     translateQueriesSameOn: /*i18n*/ { id: 'enter.translateQueriesSameOn', message: 'Questions to sources that read only English are translated already' },
     translateQueriesSameOff: /*i18n*/ { id: 'enter.translateQueriesSameOff', message: 'Questions go to sources as typed already' },
+    // Privacy on every row (stage 7, piece 7; C167). {found} is a list of
+    // what was found ("an email address and 2 phone numbers").
+    promptPreviewTrains: /*i18n*/ { id: 'enter.promptPreviewTrains', message: '{name} is a preview: its provider trains on what you send it, whatever you chose. by: chooses another', comment: 'Commands stay English. A model whose provider trains on everything sent to it (security notes §3)' },
+    promptPrivacy: /*i18n*/ { id: 'enter.promptPrivacy', message: 'Swapped for placeholders before it goes: {found}. The reply puts them back' },
+    promptPrivacyOffer: /*i18n*/ { id: 'enter.promptPrivacyOffer', message: 'It holds {found}. privacy:on swaps such things for placeholders before they go', comment: 'Commands stay English' },
+    privacyOn: /*i18n*/ { id: 'enter.privacyOn', message: 'Enter swaps email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes to a model off this computer, and puts them back in the reply. This line names what is swapped each time' },
+    privacyOff: /*i18n*/ { id: 'enter.privacyOff', message: 'Enter stops swapping: prompts go as you type them' },
+    privacySameOn: /*i18n*/ { id: 'enter.privacySameOn', message: 'The privacy filter is on already' },
+    privacySameOff: /*i18n*/ { id: 'enter.privacySameOff', message: 'The privacy filter is off already' },
+    privacyNow: /*i18n*/ {
+      id: 'enter.privacyNow',
+      message: '{on, select, on {Email addresses, phone numbers, and bank and card numbers are swapped for placeholders before a prompt goes. privacy:off stops it} other {The privacy filter is off. privacy:on swaps email addresses, phone numbers, and bank and card numbers for placeholders before a prompt goes}}',
+      comment: 'Commands stay English',
+    },
     replyCut: /*i18n*/ { id: 'enter.replyCut', message: 'The reply broke off part way. What arrived is kept and marked as cut off' },
+  },
+
+  // What the privacy filter finds, by kind (C167), joined into {found}.
+  privacyFound: {
+    email: /*i18n*/ { id: 'privacy.email', message: '{count, plural, one {an email address} other {# email addresses}}' },
+    phone: /*i18n*/ { id: 'privacy.phone', message: '{count, plural, one {a phone number} other {# phone numbers}}' },
+    iban: /*i18n*/ { id: 'privacy.iban', message: '{count, plural, one {a bank account number} other {# bank account numbers}}' },
+    card: /*i18n*/ { id: 'privacy.card', message: '{count, plural, one {a card number} other {# card numbers}}' },
   },
 
   // Marginalia inside the prompt field: who answers a prompt here (bar
@@ -919,6 +941,25 @@ export const COPY = {
   // calls each block, layout and theme, and what it says about each, keyed
   // by the name in its manifest. The manifests keep their own English for
   // the code; these are what people read, and what is translated.
+  // In the key panel, what each provider does with what it is sent
+  // (security notes §3; C167): the facts as its own pages give them, and
+  // the checklist for a provider that may train. {names} are model names.
+  keysData: {
+    checked: /*i18n*/ { id: 'keysData.checked', message: 'checked {date}' },
+    page: /*i18n*/ { id: 'keysData.page', message: 'where it says so', comment: 'A link to the provider\'s own page' },
+    flagged: /*i18n*/ { id: 'keysData.flagged', message: 'Kept longer when flagged under its usage policy, up to two years.' },
+    longer: /*i18n*/ { id: 'keysData.longer', message: '{count, plural, one {{names} is kept 30 days or more, read by its safety systems.} other {{names} are kept 30 days or more, read by its safety systems.}}' },
+    optOut: /*i18n*/ { id: 'keysData.optOut', message: 'On its free plan it may train on what you send unless you opt out: in its admin panel, Privacy, then Anonymous improvement data. The switch for the API is separate from its others.' },
+    trainsAll: /*i18n*/ { id: 'keysData.trainsAll', message: '{count, plural, one {{names} is a preview, trained on whatever you choose. If that matters, choose another.} other {{names} are previews, trained on whatever you choose. If that matters, choose another.}}' },
+    regionKept: /*i18n*/ { id: 'keysData.regionKept', message: 'A region changes where prompts are processed, not how long they are kept.' },
+    cannotSee: /*i18n*/ { id: 'keysData.cannotSee', message: 'Parliament cannot see your settings there. This is what its own pages say.' },
+    localAway: /*i18n*/ { id: 'keysData.localAway', message: '{count, plural, one {It also lists # model that runs on its own servers, left out here: a prompt to it would leave this computer.} other {It also lists # models that run on its own servers, left out here: a prompt to them would leave this computer.}}' },
+  },
+  // Under a reply that searched the web: the sources it cited (C167 (f)).
+  cited: {
+    heading: /*i18n*/ { id: 'cited.heading', message: 'Sources it cited' },
+  },
+
   // Who can answer: the picker under the field (stage 7, piece 1; A14,
   // C148, C149). Model and source names come from the list, never here.
   picker: {
@@ -932,6 +973,15 @@ export const COPY = {
     preview: /*i18n*/ { id: 'picker.preview', message: 'preview', comment: 'A model offered before general availability; it may change or go' },
     unchecked: /*i18n*/ { id: 'picker.unchecked', message: 'not checked', comment: 'Models on this computer, before anyone has asked to look for them (C33)' },
     addKey: /*i18n*/ { id: 'picker.addKey', message: 'add a key', comment: 'A model whose provider has no key here; a click writes api:' },
+    // What a provider does with what it is sent (security notes §3; C167),
+    // on its rows only: copy names no provider in a sentence.
+    trainNo: /*i18n*/ { id: 'picker.trainNo', message: 'not trained on' },
+    trainOptOut: /*i18n*/ { id: 'picker.trainOptOut', message: 'may be trained on unless you opt out' },
+    trainAlways: /*i18n*/ { id: 'picker.trainAlways', message: 'trained on, whatever you choose' },
+    keptUpTo30: /*i18n*/ { id: 'picker.keptUpTo30', message: 'kept up to 30 days' },
+    kept30: /*i18n*/ { id: 'picker.kept30', message: 'kept 30 days' },
+    keptAtLeast30: /*i18n*/ { id: 'picker.keptAtLeast30', message: 'kept 30 days or more' },
+    keptDevice: /*i18n*/ { id: 'picker.keptDevice', message: 'stays on this computer' },
     englishOnly: /*i18n*/ { id: 'picker.englishOnly', message: 'English only', comment: "A source whose answers are in English whatever the reader's language (LPN §6)" },
     mostlyEnglish: /*i18n*/ { id: 'picker.mostlyEnglish', message: 'mostly English', comment: 'A source whose answers are mostly in English' },
     perDay: /*i18n*/ { id: 'picker.perDay', message: 'About {count} searches a day without a key, shared by everyone on your network.', comment: "OpenAlex's daily allowance (C156)" },

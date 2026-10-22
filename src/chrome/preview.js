@@ -29,7 +29,8 @@ import { planNote, planSummarize, planCompare, planJump } from '../lib/cardActs'
 import { exportItems, chatsOf, exportName } from '../lib/recordsExport'
 import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
-import { planReply, planHelper, planTranslate, queryLines } from '../lib/languageVerbs'
+import { planReply, planHelper, planTranslate, planPrivacy, queryLines } from '../lib/languageVerbs'
+import { findPrivate, KINDS as PRIVATE_KINDS } from '../lib/privacyFilter'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
@@ -48,7 +49,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate', 'privacy'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -573,6 +574,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       reply: (a1, s1, sc) => planReply(s1, sc),
       helper: (a1, s1, sc) => planHelper(s1, sc),
       translate: (a1, s1, sc) => planTranslate(s1, sc),
+      privacy: (a1, s1, sc) => planPrivacy(s1, sc),
     }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
@@ -648,6 +650,22 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   const last1 = answer.steps[answer.steps.length - 1]
   const after = last1?.verb === FOCUS && !(last1.match?.values ?? []).length ? 'prompt' : null
   return { answer, says, next: layout ? a : null, act, after }
+}
+
+/**
+ * What the privacy filter would swap in a prompt to a model off this
+ * computer, said before Enter (C167): the prompt's fixed formats with what
+ * goes along (privacy.along: the history's, found once by the shell), each
+ * value once. On, it says what is swapped; off, that it could be.
+ */
+function privacyLine(prompt, privacy) {
+  if (!privacy) return null
+  const seen = new Set(privacy.along ?? [])
+  for (const f of findPrivate(prompt)) seen.add(`${f.kind}:${f.value}`)
+  if (!seen.size) return null
+  const found = Object.fromEntries(PRIVATE_KINDS.map((k) => [k, 0]))
+  for (const key of seen) found[key.slice(0, key.indexOf(':'))] += 1
+  return { message: privacy.on ? 'promptPrivacy' : 'promptPrivacyOffer', values: { found } }
 }
 
 // Below a cent, the line says "under" a cent rather than a fraction of one.
@@ -744,7 +762,13 @@ export function promptPreview(text, target = {}) {
   // Where it is processed, when that costs more (Mistral's regions, C159),
   // and a model offered before general availability (security notes §3).
   if (target.region && target.region !== 'global') also.push({ message: 'promptRegion', values: { region: target.region } })
-  if (who.preview) also.push({ message: 'promptPreviewModel', values: { name: who.name } })
+  // A preview, and one whose provider trains on all it is sent (C167).
+  if (who.preview) also.push({ message: who.training === 'always' ? 'promptPreviewTrains' : 'promptPreviewModel', values: { name: who.name } })
+  // The privacy filter: what it swaps, or what it would (C167).
+  const veiled = privacyLine(about ? `${about.text}
+
+${prompt}` : prompt, target.privacy)
+  if (veiled) also.push(veiled)
   // The frameworks that go with it, in their order (C164). target.frameworks: their names.
   if (target.frameworks?.length) also.push({ message: 'promptFrameworks', values: { count: target.frameworks.length, frameworks: target.frameworks } })
   // The language replies come in, sent as a line of the system prompt (C166).

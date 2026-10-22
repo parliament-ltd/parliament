@@ -39,7 +39,9 @@ export const STALL_MS = 45_000
 const metered = (inputPerMillion, outputPerMillion) => ({ type: 'metered', inputPerMillion, outputPerMillion })
 const MODELS = Object.freeze([
   { id: 'mistral-medium-3-5', apiId: 'mistral-medium-3-5', name: 'Mistral Medium 3.5', about: 'mistralMedium', contextWindow: 256_000, cost: metered(1.5, 7.5) },
-  { id: 'mistral-large-4', apiId: 'mistral-large-4-0', name: 'Mistral Large 4', about: 'mistralLarge', contextWindow: 1_000_000, cost: metered(1.36, 4.18), preview: true },
+  // A preview: trained on whatever is chosen (commercial terms §4.3, 25
+  // September 2026; C167 (c)).
+  { id: 'mistral-large-4', apiId: 'mistral-large-4-0', name: 'Mistral Large 4', about: 'mistralLarge', contextWindow: 1_000_000, cost: metered(1.36, 4.18), preview: true, data: { training: 'always' } },
   { id: 'mistral-large-3', apiId: 'mistral-large-2512', name: 'Mistral Large 3', about: 'mistralLarge', contextWindow: 256_000, cost: metered(0.5, 1.5) },
   { id: 'mistral-small-4', apiId: 'mistral-small-2603', name: 'Mistral Small 4', about: 'mistralSmall', contextWindow: 256_000, cost: metered(0.15, 0.6) },
   { id: 'zai-glm-5-3', apiId: 'zai-glm-5-3', name: 'GLM 5.3', about: 'glm', contextWindow: 1_000_000, cost: metered(1.4, 4.4), maker: 'Z.ai' },

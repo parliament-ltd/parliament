@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { addKey } from '../net'
-import { andList } from './say'
+import { andList, longDay } from './say'
 
 // The key panel (refactor-plan.md, stage 5, piece 5; settings spec §6;
 // Settings v1): api: opens it under the field, wherever you are. Each built
@@ -33,6 +33,33 @@ const PROBLEM = {
 // Where a provider processes prompts, for one that offers a choice (Mistral,
 // C159). Chosen by the person, never from their network address.
 const REGION_WORDS = { global: COPY.keys.regionGlobal, eu: COPY.keys.regionEu, us: COPY.keys.regionUs }
+
+// What a provider does with what it is sent (security notes §3; C167).
+const TRAINING = { no: COPY.picker.trainNo, optOut: COPY.picker.trainOptOut, always: COPY.picker.trainAlways }
+const KEPT = { upTo30: COPY.picker.keptUpTo30, days30: COPY.picker.kept30, atLeast30: COPY.picker.keptAtLeast30, device: COPY.picker.keptDevice }
+
+// Its facts as its own pages give them, dated, with the page; for one that
+// may train, the checklist: where to opt out, and the models trained on
+// whatever is chosen. Parliament cannot see a person's settings there.
+function DataLines({ data, regions }) {
+  const { i18n } = useLingui()
+  const first = [TRAINING[data.training], KEPT[data.kept]].filter(Boolean).map((d) => i18n._(d))
+  return (
+    <div className="ch-keys-note ch-keydata">
+      <p>
+        {first.join(' · ')}
+        {data.checked && <> · {i18n._(COPY.keysData.checked, { date: longDay(i18n, data.checked) })}</>}
+        {data.page && <> · <a className="ch-marg" href={data.page} target="_blank" rel="noopener noreferrer">{i18n._(COPY.keysData.page)}</a></>}
+      </p>
+      {data.flagged && <p>{i18n._(COPY.keysData.flagged)}</p>}
+      {data.longer?.length > 0 && <p>{i18n._(COPY.keysData.longer, { count: data.longer.length, names: andList(i18n, data.longer) })}</p>}
+      {data.training === 'optOut' && <p>{i18n._(COPY.keysData.optOut)}</p>}
+      {data.trainsAll?.length > 0 && <p>{i18n._(COPY.keysData.trainsAll, { count: data.trainsAll.length, names: andList(i18n, data.trainsAll) })}</p>}
+      {regions && <p>{i18n._(COPY.keysData.regionKept)}</p>}
+      {data.training === 'optOut' && <p>{i18n._(COPY.keysData.cannotSee)}</p>}
+    </div>
+  )
+}
 
 // What a check of the models on this computer found (C163).
 const LOCAL_STATE = {
@@ -108,6 +135,7 @@ export default function KeyPanel({ keys, noKey, focus, holdOnly, onFocus, onSave
               {region !== 'global' && <span className="ch-keys-note ch-keyregion-note"> {i18n._(COPY.keys.regionNote)}</span>}
             </div>
           )}
+          {p.data && <DataLines data={p.data} regions={p.id === 'mistral' && Boolean(region)} />}
           {focus === p.id && (
             <div className="ch-keyopen">
               <div className="ch-keyfield">
@@ -165,6 +193,8 @@ export default function KeyPanel({ keys, noKey, focus, holdOnly, onFocus, onSave
             <div className="ch-keyopen">
               {local.status === 'ok' && local.models.length > 0 && <p className="ch-keys-note">{i18n._(COPY.keys.localModels, { names: andList(i18n, local.models) })}</p>}
               {local.status === 'ok' && !local.models.length && <p className="ch-keys-note">{i18n._(COPY.keys.localNone, { provider: local.name })}</p>}
+              {/* Its models that run on its own servers are left out (C167 (d)). */}
+              {local.status === 'ok' && local.away?.length > 0 && <p className="ch-keys-note">{i18n._(COPY.keysData.localAway, { count: local.away.length })}</p>}
               {local.status === 'unreached' && <p className="ch-keyprob" role="alert">{i18n._(COPY.keys.localUnreached, { provider: local.name, origin: local.origin })}</p>}
               {local.status === 'denied' && <p className="ch-keyprob" role="alert">{i18n._(COPY.keys.localDenied)}</p>}
               {local.status !== 'ok' && <p className="ch-keys-note">{i18n._(COPY.keys.localWhy, { provider: local.name })}</p>}
