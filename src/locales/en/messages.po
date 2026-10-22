@@ -355,10 +355,20 @@ msgstr "Favorites"
 msgid "collection.untitled"
 msgstr "Untitled collection"
 
+#. A message's attachments, by name only; {names} is a list
+#. js-lingui-explicit-id
+msgid "copy.attached"
+msgstr "Attached: {names}"
+
 #. A heading over a document chat's text
 #. js-lingui-explicit-id
 msgid "copy.document"
 msgstr "The document"
+
+#. The first line of an exported Markdown file
+#. js-lingui-explicit-id
+msgid "copy.exportedOn"
+msgstr "Exported from Parliament on {day}. For reading elsewhere: it cannot be brought back in."
 
 #. Where a note, keyword or quote came from: a chat number
 #. js-lingui-explicit-id
@@ -651,6 +661,30 @@ msgstr "{count, plural, one {Plan {nums} goes with its last chat} other {Plans {
 #. js-lingui-explicit-id
 msgid "enter.eraseUndo"
 msgstr "{count, plural, one {Undo cannot bring it back, and stops here} other {Undo cannot bring them back, and stops here}}"
+
+#. js-lingui-explicit-id
+msgid "enter.exported"
+msgstr "Downloaded {file}"
+
+#. js-lingui-explicit-id
+msgid "enter.exportFailed"
+msgstr "The file was not made. Try again"
+
+#. js-lingui-explicit-id
+msgid "enter.exportHidden"
+msgstr "{count, plural, one {# hidden message stays out} other {# hidden messages stay out}}"
+
+#. js-lingui-explicit-id
+msgid "enter.exportItems"
+msgstr "{count, plural, one {Enter downloads # thing as {format}: {file}} other {Enter downloads # things as {format}: {file}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.exportNoRestore"
+msgstr "It is for reading elsewhere, and cannot be brought back in"
+
+#. js-lingui-explicit-id
+msgid "enter.exportNothing"
+msgstr "Nothing to export here"
 
 #. C132 (h): a cost is worked out from recorded tokens, never guessed
 #. js-lingui-explicit-id

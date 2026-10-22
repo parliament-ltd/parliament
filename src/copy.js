@@ -264,6 +264,16 @@ export const COPY = {
     undone: /*i18n*/ { id: 'enter.undone', message: 'Took back {line}' },
     undoChanged: /*i18n*/ { id: 'enter.undoChanged', message: '{nums} changed since, so undo: stops here' },
     undoFailed: /*i18n*/ { id: 'enter.undoFailed', message: 'Undo did not go through, so it stops here' },
+    // export: (C138). {format} is Markdown or JSONL; {file} the file's name, numbers and a day.
+    exportItems: /*i18n*/ {
+      id: 'enter.exportItems',
+      message: '{count, plural, one {Enter downloads # thing as {format}: {file}} other {Enter downloads # things as {format}: {file}}}',
+    },
+    exportHidden: /*i18n*/ { id: 'enter.exportHidden', message: '{count, plural, one {# hidden message stays out} other {# hidden messages stay out}}' },
+    exportNoRestore: /*i18n*/ { id: 'enter.exportNoRestore', message: 'It is for reading elsewhere, and cannot be brought back in' },
+    exportNothing: /*i18n*/ { id: 'enter.exportNothing', message: 'Nothing to export here' },
+    exported: /*i18n*/ { id: 'enter.exported', message: 'Downloaded {file}' },
+    exportFailed: /*i18n*/ { id: 'enter.exportFailed', message: 'The file was not made. Try again' },
     // erase: (C137). {erasing} lists what goes, each as eraseItem; {nums} lists numbers.
     eraseItems: /*i18n*/ { id: 'enter.eraseItems', message: 'Enter erases {erasing} for good' },
     eraseItem: /*i18n*/ { id: 'enter.eraseItem', message: '{num} “{title}”', comment: "A number and the start of its title or words, in the language's quotation marks" },
@@ -511,6 +521,8 @@ export const COPY = {
     quotes: /*i18n*/ { id: 'copy.quotes', message: 'Quotes' },
     from: /*i18n*/ { id: 'copy.from', message: 'from {num}', comment: 'Where a note, keyword or quote came from: a chat number' },
     fromErased: /*i18n*/ { id: 'copy.fromErased', message: 'from {num}, erased', comment: 'Where it came from: a chat that was erased' },
+    attached: /*i18n*/ { id: 'copy.attached', message: 'Attached: {names}', comment: "A message's attachments, by name only; {names} is a list" },
+    exportedOn: /*i18n*/ { id: 'copy.exportedOn', message: 'Exported from Parliament on {day}. For reading elsewhere: it cannot be brought back in.', comment: 'The first line of an exported Markdown file' },
     revision: /*i18n*/ { id: 'copy.revision', message: 'revision {revision}', comment: "A source page's revision number" },
   },
 

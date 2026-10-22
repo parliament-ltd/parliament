@@ -28,7 +28,7 @@ import { preview, viewFromSaved, lineOf } from './preview'
 import Bar from './Bar'
 import Strip from './Strip'
 import Board from './Board'
-import { boardName, roomLabel } from './say'
+import { boardName, roomLabel, andList } from './say'
 import RoomBoard from './RoomBoard'
 import WelcomeBoard, { WelcomeFoot } from './WelcomeBoard'
 import AlmanacBoard from './AlmanacBoard'
@@ -40,8 +40,9 @@ import { readAlmanac } from '../lib/almanacRows'
 import { createFactsCache } from '../lib/chatFacts'
 import { readSaved, keepSearch, forgetSearch, putSaved } from '../lib/savedSearches'
 import { changeRecords, eraseRecords } from '../lib/records'
-import { chatMarkdown, planMarkdown, markingMarkdown } from '../lib/recordsMarkdown'
+import { exportItems, gatherExport, itemsMarkdown, exportMarkdown, exportJsonl, exportType } from '../lib/recordsExport'
 import { dayOf } from './when'
+import { longDay } from './say'
 import { EMPTY_VIEW, applyView, nextView, viewLine, isAtRest } from '../lib/recordsFilter'
 import { onRecordsChanged } from '../lib/records'
 
@@ -413,15 +414,15 @@ export default function Shell() {
   const savedNow = useRef([])
   useEffect(() => { savedNow.current = saved }, [saved])
 
-  // copy: (C143 (f)): one thing as Markdown, built from what is stored, in
-  // the reader's language around the person's words. Hidden messages and
+  // copy: and export: (C143 (f), C138): built from what is stored, in the
+  // reader's language around the person's words. Hidden messages and
   // messages being deleted, known while their chat is open here, stay out.
-  const markdownOf = useCallback(async (num) => {
-    const rows = recordsRef.current?.rows ?? []
-    const row = rows.find((r) => r.num === num)
-    if (!row) return null
+  const hiddenOf = useCallback((chatId) => new Set([...hiddenIds(chatId), ...pendingDeletes(chatId).map((d) => d.messageId)]), [])
+  const exportWords = useCallback(() => {
     const modelName = (id) => models(PROVIDER).find((m) => m.id === id || m.apiId === id)?.name ?? id ?? ''
-    const words = {
+    const today = new Date()
+    const day = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+    return {
       you: i18n._(COPY.copy.you),
       untitled: i18n._(COPY.almanac.untitled),
       // A source's answer is named for its source; a model's for its model.
@@ -431,37 +432,48 @@ export default function Shell() {
       from: (n) => i18n._(COPY.copy.from, { num: n }),
       fromErased: (n) => i18n._(COPY.copy.fromErased, { num: n }),
       revision: (r) => i18n._(COPY.copy.revision, { revision: r }),
+      attached: (names) => i18n._(COPY.copy.attached, { names: andList(i18n, names) }),
+      facts: (row) => (row.kind === 'docket'
+        ? [`${i18n._(COPY.kinds.docket)} ${row.num}`, i18n._(COPY.counts.branches, { count: row.branches ?? 0 })]
+        : [String(row.num), row.room ? roomLabel(i18n, row.room) : null, dayOf(i18n, row.createdAt)].filter(Boolean)),
+      exported: i18n._(COPY.copy.exportedOn, { day: longDay(i18n, day) }),
+      room: (row) => (row.room ? roomLabel(i18n, row.room) : ''),
     }
-    let hidden = 0
-    const chatOf = async (chatRow) => {
-      const all = await getMessages(chatRow.chatId)
-      const out = new Set([...hiddenIds(chatRow.chatId), ...pendingDeletes(chatRow.chatId).map((d) => d.messageId)])
-      hidden += all.filter((m) => out.has(m.id) && m.content).length
-      const doc = await getSbrdDocument(chatRow.chatId).catch(() => null)
-      return {
-        num: chatRow.num,
-        title: chatRow.title,
-        facts: [String(chatRow.num), chatRow.room ? roomLabel(i18n, chatRow.room) : null, dayOf(i18n, chatRow.createdAt)].filter(Boolean),
-        messages: all.filter((m) => !out.has(m.id)).map((m) => ({ ...m, model: m.model ?? null })),
-        document: (doc?.paragraphs ?? []).map((p) => p?.text).filter(Boolean),
-        markings: rows.filter((r) => r.chatNum === chatRow.num && ['note', 'term', 'quote'].includes(r.kind)).map((r) => ({ kind: r.kind, num: r.num, text: r.text })),
-      }
-    }
-    // A reply that did not record its model is from its chat's last one (C132 (g)).
-    const withModel = async (chatRow) => {
-      const chat = await chatOf(chatRow)
-      const conv = await getConversation(chatRow.chatId).catch(() => null)
-      chat.messages = chat.messages.map((m) => (m.role === 'assistant' && !m.model && !m.source ? { ...m, model: conv?.model ?? null } : m))
-      return chat
-    }
-    let text
-    if (row.kind === 'chat') text = chatMarkdown(await withModel(row), words)
-    else if (row.kind === 'docket') {
-      const chats = rows.filter((r) => r.kind === 'chat' && r.docketNum === row.num).sort((a, b) => String(a.branch).localeCompare(String(b.branch)))
-      text = planMarkdown(await Promise.all(chats.map(withModel)), words)
-    } else text = markingMarkdown({ kind: row.kind, num: row.num, text: row.text, chatNum: row.chatNum, erasedFrom: row.erasedFrom }, words)
-    return { text, hidden }
   }, [i18n])
+  // A chat's messages, in order; a reply that did not record its model is
+  // from its chat's last one (C132 (g)).
+  const messagesOf = useCallback(async (chatId) => {
+    const [all, conv] = await Promise.all([getMessages(chatId), getConversation(chatId).catch(() => null)])
+    return all.map((m) => (m.role === 'assistant' && !m.model && !m.source ? { ...m, model: conv?.model ?? null } : m))
+  }, [])
+  const documentOf = useCallback((chatId) => getSbrdDocument(chatId).catch(() => null), [])
+  const gather = useCallback(async (nums) => {
+    const rows = recordsRef.current?.rows ?? []
+    const picked = nums.map((n) => rows.find((r) => r.num === n)).filter(Boolean)
+    return gatherExport(exportItems(picked, rows), rows, { messagesOf, documentOf, hiddenOf })
+  }, [messagesOf, documentOf, hiddenOf])
+
+  /** copy:207. One thing as Markdown. */
+  const markdownOf = useCallback(async (num) => {
+    const { data, hidden } = await gather([num])
+    if (!data.length) return null
+    return { text: itemsMarkdown(data, exportWords()), hidden }
+  }, [gather, exportWords])
+
+  /** export:md 204, 216. A file to read elsewhere, downloaded from this page (C138). */
+  const exportFile = useCallback(async ({ format, picked, file }) => {
+    const { data, hidden } = await gather(picked)
+    if (!data.length) return null
+    const words = exportWords()
+    const text = format === 'jsonl' ? exportJsonl(data, words) : exportMarkdown(data, words)
+    const url = URL.createObjectURL(new Blob([text], { type: exportType(format) }))
+    const link = Object.assign(document.createElement('a'), { href: url, download: file, rel: 'noopener' })
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 10_000)
+    return { hidden }
+  }, [gather, exportWords])
 
   // ── The Library's catalogue (stage 5, piece 4) ────────
   // Read while the Library is in the space, here or in a window, and again
@@ -550,6 +562,14 @@ export default function Shell() {
       remember(body)
       return { done: true, says: { message: 'erased', values: { nums: what.nums } } }
     }
+    if (what.kind === 'export') {
+      // export: (C138): to read elsewhere; nothing stored changes.
+      const made = await exportFile(what).catch(() => null)
+      if (!made) return 'exportFailed'
+      remember(body)
+      const also = made.hidden ? [{ message: 'exportHidden', values: { count: made.hidden } }] : []
+      return { done: true, says: { message: 'exported', values: { file: what.file }, also } }
+    }
     if (what.kind === 'copy') {
       // copy: (C143 (f)): one thing as Markdown, on the clipboard.
       const made = await markdownOf(what.num).catch(() => null)
@@ -614,7 +634,7 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'name'))
     remember(body)
     return null
-  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, commit, loadConversations])
+  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, exportFile, commit, loadConversations])
 
   // ── undo: (C134, as built) ────────────────────────────
   // Each command line that changes something is kept with what it changed,
@@ -740,7 +760,7 @@ export default function Shell() {
       stacked: getComputedStyle(stage).flexDirection === 'column',
     }
   }, [])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).

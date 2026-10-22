@@ -598,3 +598,35 @@ describe('erase: (stage 6, piece 4; C137)', () => {
     expect(at('>delete:204').text).toBe('To remove something for good, use erase:. Enter writes it in')
   })
 })
+
+describe('export: (stage 6, piece 5; C138)', () => {
+  const row = (num, kind, extra = {}) => ({ num, kind, id: `${kind}${num}`, chatId: kind === 'chat' ? `c${num}` : null, title: `${kind} ${num}`, tags: [], docketNum: null, pinned: false, archived: false, activeAt: '2026-10-21T10:00:00Z', ...extra })
+  const rows = [row(204, 'chat'), row(206, 'chat', { tags: ['essay'] }), row(210, 'note', { chatId: 'c204', text: 'Range map' })]
+  const NOW = new Date(2026, 9, 21, 12).getTime()
+  const at = (value, view = { search: '', filters: [], sort: { by: 'active', asc: false } }, hidden = new Set()) => {
+    const p = preview(value, { mode: 'command', arrangement: almanac(), screens: { records: { rows, view, now: NOW, ctx: {} }, hiddenOf: () => hidden } })
+    const also = [].concat(p.says?.also ?? []).map((x) => say(i18n, x.message, x.values))
+    return { ...p, text: [say(i18n, p.says.message, p.says.values), ...also].join(' · ') }
+  }
+
+  it('names the file it downloads, and that it cannot be brought back in', () => {
+    expect(at('>export:md 204').text).toBe('Enter downloads 1 thing as Markdown: parliament-204-2026-10-21.md · It is for reading elsewhere, and cannot be brought back in')
+    expect(at('>export:md 204').act).toEqual({ kind: 'export', format: 'md', picked: [204], file: 'parliament-204-2026-10-21.md' })
+    // The note goes inside its chat's section, so the file holds two things.
+    expect(at('>export:jsonl records').text).toBe('Enter downloads 2 things as JSONL: parliament-records-2026-10-21.jsonl · It is for reading elsewhere, and cannot be brought back in')
+  })
+
+  it('takes the table as it is shown when no numbers are given', () => {
+    const view = { search: '', filters: [{ k: 'tag', neg: false, v: ['essay'], text: 'tag:essay' }], sort: { by: 'active', asc: false } }
+    expect(at('>export:', view).text).toBe('Enter downloads 1 thing as Markdown: parliament-records-shown-2026-10-21.md · It is for reading elsewhere, and cannot be brought back in')
+  })
+
+  it('says how many hidden messages stay out', () => {
+    expect(at('>export:md 204', undefined, new Set(['m1', 'm2'])).text).toContain('2 hidden messages stay out')
+  })
+
+  it('refuses a number that is not here, or nothing to export', () => {
+    expect(at('>export:md 299').text).toBe('Nothing here has the number 299')
+    expect(at('>export:', { search: 'zzz', filters: [], sort: { by: 'active', asc: false } }).text).toBe('Nothing to export here')
+  })
+})

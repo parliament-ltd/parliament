@@ -23,7 +23,8 @@ import { holdsKey } from '../commands/parse'
 import { BOARD_NAMES } from '../commands/verbs'
 import { FILTERS, EMPTY_VIEW, readFilter, readSort, nextView, clears, applyView, costUnknown, viewLine } from '../lib/recordsFilter'
 import { findSaved, cleanSearchName, SEARCH_NAME_MAX } from '../lib/savedSearches'
-import { ROW_VERBS, isRowStep, planRowLine, planCopy, planErase } from '../lib/rowVerbs'
+import { ROW_VERBS, isRowStep, planRowLine, planCopy, planErase, targetsOf } from '../lib/rowVerbs'
+import { exportItems, chatsOf, exportName } from '../lib/recordsExport'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
@@ -37,7 +38,8 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // piece 2; C140). copy: puts one thing on the clipboard as Markdown, and
 // undo: takes back the last command line (piece 3; C143 (f), C134).
 // erase: removes things for good, by number, on a line of its own (C137).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase'])
+// export: downloads rows as Markdown or JSONL (piece 5; C138).
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -96,6 +98,45 @@ function planCopyStep(a, step, screens = {}) {
   const p = planCopy(step.match?.values ?? [], screens.records?.rows ?? [])
   if (p.bad) return { says: p.bad, act: null }
   return { says: p.says, act: { kind: 'copy', num: p.row.num } }
+}
+
+// The day, as a file name carries it: 2026-10-21, on this device's clock.
+const dayStamp = (now = Date.now()) => {
+  const d = new Date(now)
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+
+/**
+ * export:md 204, 216, export:jsonl records, or export: alone for the table
+ * as it is shown (C138). The Enter line names the file it will download;
+ * the shell builds it on Enter. The Collection's export comes with it.
+ */
+function planExportStep(a, step, screens = {}) {
+  if (a.addressed !== 'almanac') return null
+  const records = screens.records ?? {}
+  const rows = records.rows ?? []
+  const args = step.match?.values ?? []
+  const format = args[0]?.kind === 'word' && args[0].value === 'jsonl' ? 'jsonl' : 'md'
+  const rest = args.slice(1)
+  let picked
+  let scope
+  if (rest[0]?.kind === 'word' && rest[0].value === 'records') { picked = rows; scope = 'records' }
+  else if (rest.length) {
+    const t = targetsOf(rest, rows)
+    if (t.bad) return { says: t.bad, act: null }
+    picked = t.rows
+    scope = 'numbers'
+  } else { picked = applyView(rows, records.view ?? EMPTY_VIEW, records.ctx); scope = 'shown' }
+  const items = exportItems(picked, rows)
+  if (!items.length) return { says: { message: 'exportNothing' }, act: null }
+  const hidden = chatsOf(items).reduce((n, c) => n + (screens.hiddenOf?.(c.chatId)?.size ?? 0), 0)
+  const file = exportName({ format, nums: items.map((i) => i.row.num), scope, day: dayStamp(records.now) })
+  const also = [...(hidden ? [{ message: 'exportHidden', values: { count: hidden } }] : []), { message: 'exportNoRestore' }]
+  return {
+    says: { message: 'exportItems', values: { count: items.length, format: format === 'jsonl' ? 'JSONL' : 'Markdown', file }, also },
+    act: { kind: 'export', format, picked: picked.map((r) => r.num), file },
+  }
 }
 
 /** erase:207, 216 (all): what goes for good, named before Enter (C137). */
@@ -338,7 +379,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   if (acts.length) {
     if (answer.steps.length > 1) return { answer, says: { message: 'aloneNow', values: { verb: `${acts[0].verb}:` } }, next: null }
     const step = answer.steps[0]
-    const plans = { tour: planTour, name: planName, inspect: planInspect, api: planApi, save: planSave, forget: planForget, copy: planCopyStep, undo: planUndo, erase: planEraseStep }
+    const plans = { tour: planTour, name: planName, inspect: planInspect, api: planApi, save: planSave, forget: planForget, copy: planCopyStep, undo: planUndo, erase: planEraseStep, export: planExportStep }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
     return { answer, says: p.says, next: p.next ?? null, act: p.act ?? null }

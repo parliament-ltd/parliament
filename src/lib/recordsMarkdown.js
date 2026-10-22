@@ -15,7 +15,8 @@ const oneLine = (text) => String(text ?? '').replace(/\s+/g, ' ').trim()
 /**
  * @typedef {{ you: string, untitled: string, by: (message: object) => string,
  *   heading: Record<'note'|'term'|'quote'|'document', string>, kind: (kind: string) => string,
- *   from: (num: number) => string, revision: (revision: string) => string }} Words
+ *   from: (num: number) => string, revision: (revision: string) => string,
+ *   attached?: (names: string[]) => string }} Words  attached: a line naming a message's attachments
  */
 
 // A source's footnote: its name, its page, revision and licence, and where
@@ -36,10 +37,12 @@ function footnote(n, source, words) {
  *   markings?: Array<{ kind: string, num: number|null, text: string }> }} chat
  *   facts: worded already (its number, room, day); messages in order, hidden ones left out by the caller
  * @param {Words} words
- * @param {{ next: number }} [notes] footnote numbering, shared across the chats of a plan
+ * @param {{ next: number }} [notes] footnote numbering, shared across the chats of a plan or an export
+ * @param {number} [level] the heading level of its title: 2 for a chat inside a plan
  */
-export function chatMarkdown(chat, words, notes = { next: 1 }) {
-  const out = [`# ${oneLine(chat.title) || words.untitled}`]
+export function chatMarkdown(chat, words, notes = { next: 1 }, level = 1) {
+  const h = (n) => '#'.repeat(Math.min(n, 6))
+  const out = [`${h(level)} ${oneLine(chat.title) || words.untitled}`]
   if (chat.facts?.length) out.push(chat.facts.join(' · '))
   const foot = []
   for (const m of chat.messages ?? []) {
@@ -51,12 +54,15 @@ export function chatMarkdown(chat, words, notes = { next: 1 }) {
       foot.push(footnote(n, m.source, words))
     }
     out.push(`**${who}**`, String(m.content).trim())
+    // Attachments by name only: their contents are never kept (C138).
+    const names = Array.isArray(m.attachmentMeta) ? m.attachmentMeta.map((a) => a?.name).filter(Boolean) : []
+    if (names.length && words.attached) out.push(`*${words.attached(names)}*`)
   }
-  if (chat.document?.length) out.push(`## ${words.heading.document}`, chat.document.map((p) => String(p).trim()).filter(Boolean).join('\n\n'))
+  if (chat.document?.length) out.push(`${h(level + 1)} ${words.heading.document}`, chat.document.map((p) => String(p).trim()).filter(Boolean).join('\n\n'))
   for (const kind of ['note', 'term', 'quote']) {
     const marks = (chat.markings ?? []).filter((m) => m.kind === kind && m.text)
     if (!marks.length) continue
-    out.push(`## ${words.heading[kind]}`, marks.map((m) => `- ${m.num != null ? `${m.num}: ` : ''}${oneLine(m.text)}`).join('\n'))
+    out.push(`${h(level + 1)} ${words.heading[kind]}`, marks.map((m) => `- ${m.num != null ? `${m.num}: ` : ''}${oneLine(m.text)}`).join('\n'))
   }
   if (foot.length) out.push(foot.join('\n'))
   return out.join('\n\n')

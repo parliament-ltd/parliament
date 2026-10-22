@@ -355,9 +355,19 @@ msgstr ""
 msgid "collection.untitled"
 msgstr ""
 
+#. A message's attachments, by name only; {names} is a list
+#. js-lingui-explicit-id
+msgid "copy.attached"
+msgstr ""
+
 #. A heading over a document chat's text
 #. js-lingui-explicit-id
 msgid "copy.document"
+msgstr ""
+
+#. The first line of an exported Markdown file
+#. js-lingui-explicit-id
+msgid "copy.exportedOn"
 msgstr ""
 
 #. Where a note, keyword or quote came from: a chat number
@@ -650,6 +660,30 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.eraseUndo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.exported"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.exportFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.exportHidden"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.exportItems"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.exportNoRestore"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.exportNothing"
 msgstr ""
 
 #. C132 (h): a cost is worked out from recorded tokens, never guessed
