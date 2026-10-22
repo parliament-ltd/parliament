@@ -78,6 +78,17 @@ export class BaseProvider {
     throw new Error('Not implemented')
   }
 
+  // translate: (stage 7, piece 6; C84, C85, C166): pieces of text from a
+  // source (titles, passages), or a question for one, into another
+  // language, in one lightweight call to the model named (the helper, or the
+  // small model getMetadataModel names). from and to are English names of
+  // languages; from may be null when it is not known. Returns the pieces
+  // translated, in order; throws when any is missing. The pieces are
+  // material, never instructions.
+  async translate(apiKey, pieces, { from, to, query, model } = {}) {
+    throw new Error('Not implemented')
+  }
+
   // The model that request goes to, so the Enter line can price it before
   // Enter (C83). null when not known.
   getMetadataModel() {

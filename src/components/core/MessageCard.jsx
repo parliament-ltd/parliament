@@ -13,6 +13,7 @@ import { useLingui } from '@lingui/react'
 import { COPY } from '../../copy'
 import ChartRenderer from './ChartRenderer'
 import CitationLink from './CitationLink'
+import { modelFacts } from '../../net'
 
 const NO_QUOTES = Object.freeze([])
 
@@ -40,6 +41,8 @@ export default function MessageCard({
   stoppedNote = null, // why a cut-off reply stopped, when it was left (C109)
   source = null, // where an answer from a source came from (stage 4)
   frameworks = null, // the frameworks a reply was written under (stage 7; C164)
+  translation = null, // an answer from a source translated on request (C166 (f))
+  asked = null, // a question translated before it went to a source (C85, C166 (g))
   thinking = null, // a model's thinking: { text, live, answering, since } while it streams, { text, ms } after (C165)
   isFavorited = false, showNotes = false,
   savedNoteText = '',
@@ -67,6 +70,9 @@ export default function MessageCard({
   const [copied, setCopied] = useState(false)
   const [popoverPos, setPopoverPos] = useState(null)
   const contentRef = useRef(null)
+  // A translated answer shows its translation; one click shows the source's own words.
+  const [original, setOriginal] = useState(false)
+  const translated = Boolean(source && translation && !original)
 
   useEffect(() => {
     setNoteText(savedNoteText)
@@ -145,9 +151,16 @@ export default function MessageCard({
     // An answer from a source is plain text and is shown as text: never as
     // HTML, and not read as Markdown either (stage 4). A list of results
     // (stage 7) is drawn from its note, each result's words as text.
-    if (source?.shape === 'list' && Array.isArray(source.items)) return <SourceResults items={source.items} />
+    // A translation (C166 (f)) is text from outside too, and drawn the same way.
+    if (source?.shape === 'list' && Array.isArray(source.items)) {
+      const items = translated && Array.isArray(translation.items)
+        ? source.items.map((it, i) => ({ ...it, title: translation.items[i]?.title || it.title, text: translation.items[i]?.text ?? it.text }))
+        : source.items
+      return <SourceResults items={items} />
+    }
     if (source) {
-      return <p className="parliament-md text-[15px] whitespace-pre-wrap" dir="auto">{displayContent}</p>
+      const text = translated && typeof translation.text === 'string' ? translation.text : displayContent
+      return <p className="parliament-md text-[15px] whitespace-pre-wrap" dir="auto" lang={translated ? translation.lang : undefined}>{text}</p>
     }
 
     function highlightString(text) {
@@ -270,7 +283,7 @@ export default function MessageCard({
         </Markdown>
       </div>
     )
-  }, [id, displayContent, highlightTerms, quotes, source, i18n])
+  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation])
 
   return (
     <motion.div
@@ -482,6 +495,10 @@ export default function MessageCard({
       {/* Where an answer from a source came from: the page, its revision and
           its licence (stage 4). Words come from the copy table. */}
       {source && source.found !== false && <SourceLine source={source} />}
+      {/* Its translation, by whom, and the source's own words a click away (C166 (f)). */}
+      {source && translation && <TranslationLine translation={translation} original={original} onToggle={() => setOriginal((o) => !o)} />}
+      {/* The question as it went, when it was translated first (C85). */}
+      {type === 'user' && asked && <AskedLine asked={asked} />}
       {/* The frameworks it was written under (C164). */}
       {Array.isArray(frameworks) && frameworks.length > 0 && <FrameworkLine frameworks={frameworks} />}
 
@@ -552,6 +569,39 @@ function Thinking({ thinking }) {
       )}
     </div>
   )
+}
+
+// A language's name in the reader's language, from the browser.
+function languageName(locale, tag) {
+  try {
+    return new Intl.DisplayNames([locale], { type: 'language', fallback: 'code' }).of(tag) ?? tag
+  } catch {
+    return tag
+  }
+}
+
+// "Translated into Swedish by Haiku 5.5 · show the original" (C166 (f)).
+function TranslationLine({ translation, original, onToggle }) {
+  const { i18n } = useLingui()
+  const language = languageName(i18n.locale, translation.lang)
+  const words = translation.by === 'browser'
+    ? i18n._(COPY.chat.translatedByBrowser, { language })
+    : i18n._(COPY.chat.translatedBy, { language, by: modelFacts(translation.by)?.name ?? translation.by })
+  return (
+    <p className="mt-1 text-xs italic text-[var(--p-text-secondary)]">
+      {words}
+      <span aria-hidden="true"> · </span>
+      <button type="button" onClick={onToggle} className="underline underline-offset-2 italic">
+        {i18n._(original ? COPY.chat.showTranslation : COPY.chat.showOriginal)}
+      </button>
+    </p>
+  )
+}
+
+// "Asked in English as “barn owls”" (C85).
+function AskedLine({ asked }) {
+  const { i18n } = useLingui()
+  return <p className="mt-1 text-xs italic text-[var(--p-text-secondary)]" dir="auto">{i18n._(COPY.chat.askedAs, { language: languageName(i18n.locale, asked.lang), text: asked.text })}</p>
 }
 
 // "Written under Push back on me and Editor": the built in by their names in

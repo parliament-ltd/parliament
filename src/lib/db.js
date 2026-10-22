@@ -353,7 +353,7 @@ export async function getBranches(parentConversationId) {
 
 // ─── Messages ────────────────────────────────────────────
 
-export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false, attachmentMeta }) {
+export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false, attachmentMeta, asked }) {
   const db = await initDB()
   const message = {
     id: generateId(),
@@ -371,6 +371,8 @@ export async function addMessage({ conversationId, role, content, tokenCount = 0
     ...(Array.isArray(attachmentMeta) && attachmentMeta.length > 0
       ? { attachmentMeta }
       : {}),
+    // A question translated before it went to a source (stage 7; C166 (g)).
+    ...(asked ? { asked } : {}),
   }
   // Touches the chat's updatedAt and size in the same transaction.
   return addMessageRecord(db, message)

@@ -443,13 +443,17 @@ export function ChatProvider({ children }) {
   // note holds no words of the interface (C86): the reply card words it.
   // An untitled chat takes the prompt's first words as its title, made
   // here, sending nothing (C62).
-  const askSource = useCallback(async (conversationId, question, { source = 'wikipedia', lang } = {}) => {
+  // asked: the question as it went, when it was translated first (C85,
+  // C166 (g)): { text, lang, by, at }, kept on the person's message beside
+  // what they typed. fallbackLang: the edition to ask when nothing is found
+  // in the first (Wikipedia: the English one, LPN §6).
+  const askSource = useCallback(async (conversationId, question, { source = 'wikipedia', lang, asked = null, fallbackLang = null } = {}) => {
     if (streamingIn(conversationId)) return
     askToKeepStorage({ getSetting, setSetting }).catch(() => {})
 
     titleIfUntitled(conversationId, question).catch(() => {})
 
-    const userMsg = await addMessage({ conversationId, role: 'user', content: question })
+    const userMsg = await addMessage({ conversationId, role: 'user', content: question, ...(asked ? { asked } : {}) })
     updateMessages(conversationId, prev => [...prev, userMsg])
     const placeholder = await addMessage({ conversationId, role: 'assistant', content: '', incomplete: true })
     updateMessages(conversationId, prev => [...prev, placeholder])
@@ -457,7 +461,11 @@ export function ChatProvider({ children }) {
     const controller = new AbortController()
     startStream(conversationId, { messageId: placeholder.id, controller })
     try {
-      const found = await gateway.call(source, 'answer', [question, { lang, signal: controller.signal }], { label: 'prompt' })
+      const sent = asked?.text ?? question
+      let found = await gateway.call(source, 'answer', [sent, { lang, signal: controller.signal }], { label: 'prompt' })
+      if (!found && fallbackLang && fallbackLang !== lang && !controller.signal.aborted) {
+        found = await gateway.call(source, 'answer', [sent, { lang: fallbackLang, signal: controller.signal }], { label: 'prompt' })
+      }
       // A lookup that finished after its chat was left still stops there (C109).
       if (controller.signal.aborted) throw new DOMException('Stopped', 'AbortError')
       // A list of results (Hacker News, OpenAlex; stage 7) keeps each one's
@@ -488,6 +496,13 @@ export function ChatProvider({ children }) {
       endStream(conversationId)
     }
   }, [keepPartial, titleIfUntitled])
+
+  // A translation of an answer from a source (C166 (f)), kept on its
+  // message beside the source's own words, which stay as they came.
+  const keepTranslation = useCallback(async (conversationId, messageId, translation) => {
+    await updateMessage(messageId, { translation })
+    updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, translation } : m)))
+  }, [])
 
   // Continue from an interrupted (ghost text) message in the open chat
   // systemPrompt: optional string from collaboration mode presets + custom instruction
@@ -599,6 +614,7 @@ export function ChatProvider({ children }) {
       sendMessage,
       resendWhole,
       askSource,
+      keepTranslation,
       continueMessage,
       stopGenerating,
       leaveConversation,

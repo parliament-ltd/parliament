@@ -1,6 +1,6 @@
 import { BaseProvider } from './base'
 import { findModel } from '../net/answerers'
-import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS } from './shared'
+import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens } from './shared'
 
 // Mistral (refactor-plan.md, stage 7, piece 3; LPN §7.1; C82, C159).
 //
@@ -216,12 +216,12 @@ export class MistralProvider extends BaseProvider {
     }
   }
 
-  // A short request without streaming, to the small model.
-  async _lightweightCall(apiKey, systemPrompt, messages, maxTokens) {
+  // A short request without streaming, to the small model unless another is named.
+  async _lightweightCall(apiKey, systemPrompt, messages, maxTokens, model = LIGHT_MODEL) {
     const response = await fetch(`${this._base()}/chat/completions`, {
       method: 'POST',
       headers: this._headers(apiKey),
-      body: JSON.stringify({ model: this._resolveModel(LIGHT_MODEL), messages: this._messages(messages, systemPrompt), stream: false, max_tokens: maxTokens }),
+      body: JSON.stringify({ model: this._resolveModel(model), messages: this._messages(messages, systemPrompt), stream: false, max_tokens: maxTokens }),
     })
     if (!response.ok) throw this._failure(response)
     const data = await response.json()
@@ -242,5 +242,11 @@ export class MistralProvider extends BaseProvider {
     const text = await this._lightweightCall(apiKey, SUMMARIZE_SYSTEM_PROMPT, [{ role: 'user', content: summaryItems(items) }], SUMMARY_MAX_TOKENS)
     if (!text) throw new Error('No summary came back')
     return text.slice(0, SUMMARY_MAX_CHARS)
+  }
+
+  // translate: (C166), as Anthropic's.
+  async translate(apiKey, pieces, { from = null, to, query = false, model = LIGHT_MODEL } = {}) {
+    const raw = await this._lightweightCall(apiKey, translateSystemPrompt({ from, to, query }), [{ role: 'user', content: translatePieces(pieces) }], translateMaxTokens(pieces), model)
+    return readPieces(raw, pieces.length)
   }
 }

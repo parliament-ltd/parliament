@@ -14,7 +14,9 @@ import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
-import { metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal } from '../net'
+import { metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal, helperOf, translatorFor, translateText, browserTranslation } from '../net'
+import { replyLanguageOf, withReplyLanguage, sourceAskLanguage, translateInto, nameOf, baseOf } from '../lib/languages'
+import { piecesOfAnswer, translationOf, lastSourceAnswer, BY_BROWSER } from '../lib/translations'
 import AnswerPicker from './AnswerPicker'
 import { ignite } from './ignition'
 import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
@@ -697,6 +699,8 @@ export default function Shell() {
 
   // Settings' updater, for acts that change a setting (thinking:, C165).
   const updateSettingNow = useRef(async () => {})
+  // Keeps a translation on its message (translate:, C166).
+  const keepTranslationNow = useRef(async () => {})
 
   // ── Models on this computer (stage 7, piece 4; C33, C163) ──
   // Ollama is looked for only when someone asks (the key panel's check).
@@ -1001,6 +1005,37 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'setting') {
+      // reply:, helper: and translate:on / off (C166): settings of the person's.
+      await updateSettingNow.current(what.key, what.value)
+      if (touched.current) touched.current.setting = { key: what.key, before: what.before }
+      remember(body)
+      return null
+    }
+    if (what.kind === 'translate') {
+      // translate: (C166 (f)): the last answer from a source, into the reply
+      // language, by whom the Enter line named. The original stays as it came.
+      const later = (async () => {
+        const message = (await getMessages(what.chatId).catch(() => [])).find((m) => m.id === what.messageId)
+        const parts = message ? piecesOfAnswer(message) : null
+        if (!parts) return 'translateFailed'
+        let out
+        try {
+          out = await translateText(parts.pieces, { who: what.who, from: what.from, to: what.to })
+        } catch {
+          return 'translateFailed'
+        }
+        const by = what.who.kind === 'browser' ? BY_BROWSER : what.who.helper.id
+        try {
+          await keepTranslationNow.current(what.chatId, what.messageId, translationOf(parts, out, { lang: what.to, by }))
+        } catch {
+          return 'translateFailed'
+        }
+        return { message: 'translated', values: { language: nameOf(what.to, i18n.locale) } }
+      })()
+      remember(body)
+      return { done: true, says: 'translateWorking', later }
+    }
     if (what.kind === 'thinking') {
       // thinking:on / thinking:off (C165): a setting of the person's.
       await updateSettingNow.current('thinking', what.on)
@@ -1216,7 +1251,8 @@ export default function Shell() {
   const onRoomLeave = useCallback((chatId) => { if (readyRoom.current === chatId) readyRoom.current = null }, [])
 
   // ── Prompts from the bar (stage 4) ────────────────────
-  const { messages, activeConversationId, sendMessage, resendWhole, askSource } = useChat()
+  const { messages, activeConversationId, sendMessage, resendWhole, askSource, keepTranslation } = useChat()
+  useEffect(() => { keepTranslationNow.current = keepTranslation }, [keepTranslation])
   const { settings, updateSetting } = useSettings()
   useEffect(() => { updateSettingNow.current = updateSetting })
   // Which providers have a key here, without decrypting one; null until
@@ -1227,6 +1263,7 @@ export default function Shell() {
   const [stalledIn, setStalledIn] = useState(null) // the chat whose last reply stalled (C114)
   const creating = useRef(false)
   const latest = useRef({})
+  const replyNow = useRef(null) // what replies are in, for the send (C166)
   useEffect(() => { latest.current = { settings, locale: i18n.locale } })
 
   // The chats as they stand on disk, for "the last room".
@@ -1285,13 +1322,65 @@ export default function Shell() {
   const fwHere = useMemo(() => frameworksOf(fwStored ?? [], fwList).map((fw) => fw.id), [fwStored, fwList])
   const frameworkScreens = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: fwHere, stored: fwStored, list: fwList, nameOf: nameOfFramework }), [roomId, roomRecord, fwHere, fwStored, fwList, nameOfFramework])
   const helper = useMemo(() => ({ keyed, provider: destination(PROVIDER)?.name, price: modelFacts(metadataModel(PROVIDER))?.cost ?? null }), [keyed])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true } }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking])
+
+  // ── Reply language, the helper and translating (stage 7, piece 6; C166) ──
+  // What replies are in: the person's choice, else the interface's language
+  // where the browser lists it. Sent to every model as one line of the
+  // system prompt, and named on the Enter line.
+  const browserLanguages = useMemo(() => (typeof navigator === 'undefined' ? [] : [...(navigator.languages ?? [])]), [])
+  const reply = useMemo(() => replyLanguageOf({ setting: settings.replyLanguage ?? null, locale: i18n.locale, browser: browserLanguages }), [settings.replyLanguage, i18n.locale, browserLanguages])
+  useEffect(() => { replyNow.current = reply }, [reply])
+  const languageName = useCallback((tag) => nameOf(tag, i18n.locale), [i18n.locale])
+  // The model that reads text from sources, and translates it.
+  const helperNow = useMemo(() => helperOf({ chosen: settings.helper ?? null, keyed: keys }), [settings.helper, keys, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- a check changes the models
+  const translateTo = translateInto(reply, i18n.locale)
+  // The chat on screen's messages, and its last answer from a source.
+  const shown = roomId && activeConversationId === roomId ? messages : NONE
+  const lastAnswer = useMemo(() => {
+    const l = lastSourceAnswer(shown)
+    const parts = l ? piecesOfAnswer(l.message) : null
+    if (!parts) return null
+    const q = String(l.question ?? '').trim()
+    return {
+      messageId: l.message.id, source: l.message.source.name ?? l.message.source.id,
+      question: q.length > 60 ? `${q.slice(0, 59)}…` : q,
+      chars: parts.chars, from: parts.from, translated: l.message.translation?.lang ?? null,
+    }
+  }, [shown])
+  // Questions to sources that read only English are translated first, when
+  // turned on and the person's language is another (C85). The person is
+  // taken to write in the reply language; the browser checks on Enter.
+  const queryFrom = reply.tag ?? baseOf(i18n.locale)
+  const queriesOn = settings.translateQueries === true && baseOf(queryFrom) !== 'en'
+  // What the browser's own translation can do for the pairs in question,
+  // asked of the browser (nothing is sent), and kept for the page.
+  const [browserCan, setBrowserCan] = useState({})
+  const askedPairs = useRef(new Set())
+  useEffect(() => {
+    const bt = browserTranslation()
+    if (!bt.has) return
+    const pairs = []
+    if (lastAnswer?.from) pairs.push([lastAnswer.from, translateTo])
+    if (queriesOn) pairs.push([queryFrom, 'en'])
+    for (const [from, to] of pairs) {
+      const k = `${from}>${to}`
+      if (askedPairs.current.has(k)) continue
+      askedPairs.current.add(k)
+      bt.can(from, to).then((a) => setBrowserCan((was) => ({ ...was, [k]: a })), () => {})
+    }
+  }, [lastAnswer, translateTo, queriesOn, queryFrom])
+  const translator = useMemo(() => translatorFor({ browser: lastAnswer?.from ? browserCan[`${lastAnswer.from}>${translateTo}`] ?? null : null, helper: helperNow }), [lastAnswer, translateTo, browserCan, helperNow])
+  const languageScreens = useMemo(() => ({
+    reply: { setting: settings.replyLanguage ?? null, now: reply, locale: i18n.locale, nameOf: languageName },
+    helping: { now: helperNow, rows: answerRows, stored: settings.helper ?? null },
+    translating: { room: roomId, num: roomRecord?.num ?? null, last: lastAnswer, to: translateTo, who: translator, queries: settings.translateQueries === true, nameOf: languageName },
+  }), [settings.replyLanguage, settings.helper, settings.translateQueries, reply, i18n.locale, languageName, helperNow, answerRows, roomId, roomRecord, lastAnswer, translateTo, translator])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
   // What would go along: the chat's messages, less what is hidden or being
   // deleted, which are not sent.
-  const shown = roomId && activeConversationId === roomId ? messages : NONE
   const hiddenHere = useHiddenIds(roomId ?? '')
   const deletingHere = usePendingDeletes(roomId ?? '')
   const kept = useMemo(() => sendableOf(shown, hiddenHere, deletingHere), [shown, hiddenHere, deletingHere])
@@ -1308,7 +1397,8 @@ export default function Shell() {
   // A model answers, hosted or on this computer (not a source).
   const byModel = answerer.group !== 'source' && !answerer.needsKey && !answerer.gone && !answerer.later && !answerer.unchecked
   const describeModel = useMemo(() => modelFacts(metadataModel(answerer.provider ?? PROVIDER)), [answerer.provider, region]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices
-  const firstPrompt = roomId === null || (Boolean(roomId) && activeConversationId === roomId && messages.length === 0)
+  // With no room in the space, or an empty one, the prompt starts a chat.
+  const firstPrompt = roomId == null || (Boolean(roomId) && activeConversationId === roomId && messages.length === 0)
   const describes = Boolean(byModel && firstPrompt && settings.describeNewChats !== false)
   const describe = useMemo(() => (describes ? { price: describeModel?.cost ?? null } : null), [describes, describeModel])
   // With cards selected on the Collection, a prompt starts a new chat about
@@ -1321,6 +1411,13 @@ export default function Shell() {
     return { nums: rows.map((r) => r.num), quotes: rows.filter((r) => r.kind === 'quote').map((r) => r.num), chars: text.length, text }
   }, [arrangement.addressed, pickedHere, numbered, i18n])
   const describeFresh = useMemo(() => (byModel && settings.describeNewChats !== false ? { price: describeModel?.cost ?? null } : null), [byModel, settings.describeNewChats, describeModel])
+  // A source with an edition in each language is asked in the reply
+  // language's, when the person chose one (C166 (e)).
+  const edition = answerer.group === 'source' && destination(answerer.id)?.answersIn === 'yours' && reply.how === 'set' && baseOf(reply.tag) !== baseOf(i18n.locale) ? languageName(reply.tag) : null
+  const reads = answerer.group === 'source' ? destination(answerer.id)?.answersIn : null
+  const query = useMemo(() => (queriesOn && (reads === 'english' || reads === 'mostlyEnglish')
+    ? { from: queryFrom, to: 'en', who: translatorFor({ browser: browserCan[`${queryFrom}>en`] ?? null, helper: helperNow }) }
+    : null), [queriesOn, reads, queryFrom, browserCan, helperNow])
   // With no room in the space, a prompt starts a chat in a room beside
   // what is here, so it is offered as going to a new room (C125).
   const prompt = useMemo(() => ({
@@ -1335,7 +1432,13 @@ export default function Shell() {
     model: answerer.name,
     answerer,
     historyChars: about ? 0 : historyChars(along),
-    systemChars: byModel ? instructionsOf(fwHere, fwList).length : 0,
+    systemChars: byModel ? withReplyLanguage(instructionsOf(fwHere, fwList), reply.tag).length : 0,
+    // The language replies come in, when one is asked for (C166).
+    replyIn: byModel && reply.tag ? languageName(reply.tag) : null,
+    edition,
+    query,
+    translateLater: (reads === 'english' || reads === 'mostlyEnglish') && baseOf(translateTo) !== 'en' ? languageName(translateTo) : null,
+    nameOf: languageName,
     // The frameworks on the chat, by name; the ones that go, when a model answers (C164).
     frameworkNames: frameworksOf(fwHere, fwList).map(nameOfFramework),
     thinking: settings.thinking === true,
@@ -1348,7 +1451,7 @@ export default function Shell() {
     ink,
     roomName: roomNameHere,
     about,
-  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about])
+  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -1368,11 +1471,34 @@ export default function Shell() {
     // to (C150).
     const conv = chatId ? await getConversation(chatId).catch(() => null) : null
     const fwIds = frameworksOf((chatId ? conv?.frameworks : pendingFwNow.current) ?? [], fwListNow.current).map((fw) => fw.id)
-    const system = () => instructionsOf(fwIds, fwListNow.current)
+    const system = () => withReplyLanguage(instructionsOf(fwIds, fwListNow.current), replyNow.current?.tag ?? null)
     const under = { frameworks: recordOf(fwIds, fwListNow.current) }
     const who = answererOf({ chosen: chatId ? conv?.answerer ?? null : pendingNow.current, keyed: fresh, defaultModel: latest.current.settings.defaultModel })
     if (shown?.answerer && who.id !== shown.answerer.id) return { refused: 'promptChanged' }
     if (who.later || who.gone || who.needsKey || who.unchecked) return { refused: 'promptChanged' }
+
+    // A question to a source that reads only English goes translated, as the
+    // line said (C85), unless the browser finds it is English already. If
+    // the translation fails, nothing is sent.
+    let asked = null
+    const q = text && who.group === 'source' ? shown?.query ?? null : null
+    if (q && q.who.kind !== 'none') {
+      const bt = browserTranslation()
+      const found = await bt.detect(text)
+      const from = found ?? q.from
+      if (baseOf(from) !== 'en') {
+        try {
+          const by = q.who.kind === 'browser' && found && found !== q.from && !(await bt.can(from, 'en')) ? translatorFor({ helper: q.who.helper ?? null }) : q.who
+          if (by.kind === 'none') return { refused: 'queryFailed' }
+          const [out] = await translateText([text], { who: by, from, to: 'en', query: true })
+          const sent = String(out ?? '').trim().slice(0, 300)
+          if (!sent) return { refused: 'queryFailed' }
+          asked = { text: sent, lang: 'en', by: by.kind === 'browser' ? BY_BROWSER : by.helper.id, at: new Date().toISOString() }
+        } catch {
+          return { refused: 'queryFailed' }
+        }
+      }
+    }
 
     // Nothing typed, and the last reply here stalled: send it again without
     // streaming, as the Enter line offered (C114).
@@ -1411,7 +1537,13 @@ export default function Shell() {
       const { locale } = latest.current
       return who.group !== 'source'
         ? sendMessage(id, full, who.id, system(), [], null, under)
-        : askSource(id, text, { source: who.id, lang: sourceLocale(locale) })
+        : askSource(id, text, {
+          source: who.id,
+          lang: sourceAskLanguage(replyNow.current, sourceLocale(locale)),
+          // Nothing in that edition: the English one (LPN §6).
+          fallbackLang: destination(who.id)?.answersIn === 'yours' ? 'en' : null,
+          asked,
+        })
     }
     // A new room sends once its messages are loaded, so nothing is lost
     // between the two.

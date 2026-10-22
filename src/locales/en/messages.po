@@ -314,6 +314,10 @@ msgid "chat.answeredFrom"
 msgstr "Answered from {source}"
 
 #. js-lingui-explicit-id
+msgid "chat.askedAs"
+msgstr "Asked in {language} as “{text}”"
+
+#. js-lingui-explicit-id
 msgid "chat.close"
 msgstr "Close"
 
@@ -386,6 +390,14 @@ msgid "chat.quoteWhichChat"
 msgstr "Quote it beside which chat?"
 
 #. js-lingui-explicit-id
+msgid "chat.showOriginal"
+msgstr "show the original"
+
+#. js-lingui-explicit-id
+msgid "chat.showTranslation"
+msgstr "show the translation"
+
+#. js-lingui-explicit-id
 msgid "chat.sourceComments"
 msgstr "{count, plural, one {# comment} other {# comments}}"
 
@@ -440,6 +452,14 @@ msgstr "show"
 #. js-lingui-explicit-id
 msgid "chat.thoughtUntimed"
 msgstr "thought first"
+
+#. js-lingui-explicit-id
+msgid "chat.translatedBy"
+msgstr "Translated into {language} by {by}"
+
+#. js-lingui-explicit-id
+msgid "chat.translatedByBrowser"
+msgstr "Translated into {language} by this browser"
 
 #. Under a reply: the frameworks it was written under (C164). {names} is a list
 #. js-lingui-explicit-id
@@ -1338,6 +1358,51 @@ msgstr "Enter takes out the heading {heading}. The cards under it stay"
 msgid "enter.help"
 msgstr "Enter shows every command that works here"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.helperNoModel"
+msgstr "No model called {word}. by: shows who can answer"
+
+#. js-lingui-explicit-id
+msgid "enter.helperNone"
+msgstr "No model here can read text from sources yet. A key, or a model on this computer, makes one"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.helperNow"
+msgstr "{name} reads and translates text from sources here, as no other is chosen. helper: and a model chooses one"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.helperNowChosen"
+msgstr "{name} reads and translates text from sources. helper:off goes back to the usual"
+
+#. js-lingui-explicit-id
+msgid "enter.helperOff"
+msgstr "Enter goes back to the usual: a model on this computer if there is one, else the cheapest with a key"
+
+#. js-lingui-explicit-id
+msgid "enter.helperSame"
+msgstr "{name} does that already"
+
+#. js-lingui-explicit-id
+msgid "enter.helperSameOff"
+msgstr "No helper is chosen already"
+
+#. js-lingui-explicit-id
+msgid "enter.helperSet"
+msgstr "Enter has {name} read and translate text from sources"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.helperSource"
+msgstr "{word} is a source. The helper is a model: helper: and a model's name"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.helperUnchecked"
+msgstr "{name} is on this computer, but has not been listed since this page opened. {command} checks"
+
 #. js-lingui-explicit-id
 msgid "enter.helpVerb"
 msgstr "Enter shows how {verb} works"
@@ -1695,6 +1760,10 @@ msgid "enter.promptDescribeUnpriced"
 msgstr "After the answer, one short request for its title, summary and tags"
 
 #. js-lingui-explicit-id
+msgid "enter.promptEdition"
+msgstr "From its {language} edition, or the English one if nothing is found there"
+
+#. js-lingui-explicit-id
 msgid "enter.promptFailed"
 msgstr "The prompt did not go through. Try again"
 
@@ -1744,10 +1813,23 @@ msgstr "About {count} searches a day without a key, shared by everyone on your n
 msgid "enter.promptPreviewModel"
 msgstr "{name} is a preview: its provider may change or withdraw it"
 
+#. js-lingui-explicit-id
+msgid "enter.promptQueryTranslated"
+msgstr "Your question goes translated into {language}, which it reads best, unless it is in {language} already"
+
+#. js-lingui-explicit-id
+msgid "enter.promptQueryUntranslated"
+msgstr "It reads {language} best, and nothing here can translate your question, so it goes as typed"
+
 #. Where Mistral processes the prompt, chosen in its key panel (C159)
 #. js-lingui-explicit-id
 msgid "enter.promptRegion"
 msgstr "{region, select, eu {Processed in the EU, at 1.1 times the price} us {Processed in the US, at 1.1 times the price} other {}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptReplyIn"
+msgstr "Replies come in {language}. reply: changes it"
 
 #. Sent only on Enter, never automatically (C114)
 #. js-lingui-explicit-id
@@ -1803,6 +1885,16 @@ msgstr "{name} thinks before answering, shown as it goes. On this computer that 
 msgid "enter.promptThinksOff"
 msgstr "{name} answers straight away, without thinking first. thinking:on lets it, shown as it goes, which can take minutes on this computer"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptTranslateLater"
+msgstr "Its answer comes in English. translate: puts it in {language} afterwards"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.queryFailed"
+msgstr "Your question could not be translated, so nothing was sent. Try again, or translate:off sends it as typed"
+
 #. js-lingui-explicit-id
 msgid "enter.ready"
 msgstr "Enter runs {verb}"
@@ -1815,6 +1907,41 @@ msgstr "That verb is now {now}. Enter writes it in"
 #. js-lingui-explicit-id
 msgid "enter.replyCut"
 msgstr "The reply broke off part way. What arrived is kept and marked as cut off"
+
+#. js-lingui-explicit-id
+msgid "enter.replyNone"
+msgstr "No language called {word} is known here. Try its name in English, or a code like sv"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.replyNowNone"
+msgstr "No language is asked for: models answer in the language you write to them in. reply: and a language asks for one"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.replyNowPage"
+msgstr "Replies come in {language}, the language of this page. reply: and a language changes it"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.replyNowSet"
+msgstr "Replies come in {language}, whatever language you write in. reply:off asks for none"
+
+#. js-lingui-explicit-id
+msgid "enter.replyOff"
+msgstr "Enter stops asking for a language: models answer in the language you write to them in"
+
+#. js-lingui-explicit-id
+msgid "enter.replySame"
+msgstr "Replies come in {language} already"
+
+#. js-lingui-explicit-id
+msgid "enter.replySameOff"
+msgstr "No language is asked for already"
+
+#. js-lingui-explicit-id
+msgid "enter.replySet"
+msgstr "Enter has replies come in {language}, whatever language you write in, from every model"
 
 #. js-lingui-explicit-id
 msgid "enter.resetAlready"
@@ -2134,6 +2261,84 @@ msgstr "The steps are put away already"
 #. js-lingui-explicit-id
 msgid "enter.tourOn"
 msgstr "Enter shows the steps again"
+
+#. js-lingui-explicit-id
+msgid "enter.translate"
+msgstr "Enter translates the answer from {source} to “{question}” into {language}. The original stays"
+
+#. js-lingui-explicit-id
+msgid "enter.translateAlready"
+msgstr "The answer from {source} is in {language} already"
+
+#. js-lingui-explicit-id
+msgid "enter.translateByBrowser"
+msgstr "By this browser’s own translation, which its maker says runs on this device. Nothing is sent"
+
+#. js-lingui-explicit-id
+msgid "enter.translateByBrowserDownload"
+msgstr "By this browser’s own translation, which fetches the language first and, its maker says, runs on this device. Nothing of yours is sent"
+
+#. js-lingui-explicit-id
+msgid "enter.translateByLocal"
+msgstr "By {name} on this computer. Nothing leaves it"
+
+#. js-lingui-explicit-id
+msgid "enter.translateByModel"
+msgstr "{tokens, plural, one {By {name}, which is sent the text: about # token, {cost}} other {By {name}, which is sent the text: about # tokens, {cost}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.translateByModelCheap"
+msgstr "{tokens, plural, one {By {name}, which is sent the text: about # token, under {cost}} other {By {name}, which is sent the text: about # tokens, under {cost}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.translateByModelUnpriced"
+msgstr "{tokens, plural, one {By {name}, which is sent the text: about # token} other {By {name}, which is sent the text: about # tokens}}"
+
+#. js-lingui-explicit-id
+msgid "enter.translated"
+msgstr "Translated into {language}. The original is one click away under it"
+
+#. js-lingui-explicit-id
+msgid "enter.translateDone"
+msgstr "The answer from {source} is translated into {language} already"
+
+#. js-lingui-explicit-id
+msgid "enter.translateFailed"
+msgstr "The translation did not come back whole, so nothing was kept. Try again"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.translateNoOne"
+msgstr "Nothing here can translate it: this browser has no translation of its own for it, and no model is set up. api: adds a key or finds a model on this computer"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.translateNoRoom"
+msgstr "translate: works on the chat in a room. room: brings one"
+
+#. js-lingui-explicit-id
+msgid "enter.translateNothing"
+msgstr "No answer from a source here to translate"
+
+#. js-lingui-explicit-id
+msgid "enter.translateQueriesOff"
+msgstr "Enter sends questions to sources as you type them"
+
+#. js-lingui-explicit-id
+msgid "enter.translateQueriesOn"
+msgstr "Enter translates what you ask a source that reads only English before it goes, named here each time with who translates it"
+
+#. js-lingui-explicit-id
+msgid "enter.translateQueriesSameOff"
+msgstr "Questions go to sources as typed already"
+
+#. js-lingui-explicit-id
+msgid "enter.translateQueriesSameOn"
+msgstr "Questions to sources that read only English are translated already"
+
+#. js-lingui-explicit-id
+msgid "enter.translateWorking"
+msgstr "Translating. The bar is free meanwhile"
 
 #. The words stay English
 #. js-lingui-explicit-id
@@ -3293,7 +3498,7 @@ msgstr "Add a heading to a collection in your own order"
 
 #. js-lingui-explicit-id
 msgid "verb.helper"
-msgstr "Choose the model that reads text from sources"
+msgstr "Choose the model that reads text from sources, and translates it"
 
 #. js-lingui-explicit-id
 msgid "verb.hold"
@@ -3386,6 +3591,10 @@ msgstr "Ask for a synthesis of a chat and its markings, with questions"
 #. js-lingui-explicit-id
 msgid "verb.reject"
 msgstr "Turn down a suggestion"
+
+#. js-lingui-explicit-id
+msgid "verb.reply"
+msgstr "Choose the language replies come in, by its code or its name"
 
 #. js-lingui-explicit-id
 msgid "verb.reset"
@@ -3486,6 +3695,10 @@ msgstr "Send the next prompt to one branch, or to all"
 #. js-lingui-explicit-id
 msgid "verb.tour"
 msgstr "Show the welcome steps, put them away, or show the second list"
+
+#. js-lingui-explicit-id
+msgid "verb.translate"
+msgstr "Translate the last answer from a source into your language. On or off: translate what you ask sources that read only English"
 
 #. js-lingui-explicit-id
 msgid "verb.type"

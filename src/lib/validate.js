@@ -2,6 +2,8 @@
 // Validates imported backup data before writing to IndexedDB.
 // Returns { valid: true } or { valid: false, error: string }.
 
+import { isTranslation, isAsked } from './translations'
+
 const MAX_STRING_LENGTH = 1_000_000  // 1 MB per field
 const MAX_IMPORT_ITEMS  = 50_000     // across all stores
 
@@ -116,6 +118,9 @@ function validateMessage(item) {
   // What a model thought before answering, kept as text, and for how long (C165).
   if (item.thinking != null && !(typeof item.thinking === 'string' && item.thinking.length <= 20_000)) return 'message.thinking invalid'
   if (item.thinkingMs != null && !(Number.isFinite(item.thinkingMs) && item.thinkingMs >= 0)) return 'message.thinkingMs invalid'
+  // An answer from a source translated on request, and a question translated before it went (C166).
+  if (item.translation != null && !isTranslation(item.translation)) return 'message.translation invalid'
+  if (item.asked != null && !isAsked(item.asked)) return 'message.asked invalid'
   // Stage 6: the model a reply came from, and the tokens it took (C132 (h)).
   if (item.model != null && !isString(item.model, 200)) return 'message.model invalid'
   if (item.usage != null && !isUsage(item.usage)) return 'message.usage invalid'

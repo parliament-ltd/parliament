@@ -240,8 +240,19 @@ export const VERBS = Object.freeze([
     // Alone, it shows them; names of several words need no quotes (C164).
     takes: [[], [{ list: [...FRAMEWORKS, 'off'] }], [{ many: { list: 'text' } }]], stage: 7, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.framework', message: 'Choose the frameworks that shape every reply: standing instructions sent with each prompt' } }),
-  v({ verb: 'helper', group: 'editing', example: 'helper:haiku', takes: [['word']], on: ['room'], stage: 7, undoable: true, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.helper', message: 'Choose the model that reads text from sources' } }),
+  // The model that reads text from sources (the editing spec's helper:):
+  // today it translates (C166 (d)). Works from any board, as by: does.
+  v({ verb: 'helper', group: 'editing', example: 'helper:haiku', forms: ['helper:', 'helper:haiku', 'helper:off'], takes: [[], [{ many: 'text' }]], stage: 7, undoable: true, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.helper', message: 'Choose the model that reads text from sources, and translates it' } }),
+  // The language replies come in (stage 7, piece 6; C166): a code or a
+  // name, in English or in the language itself. off asks for none.
+  v({ verb: 'reply', group: 'editing', example: 'reply:swedish', forms: ['reply:', 'reply:sv', 'reply:swedish', 'reply:svenska', 'reply:off'], takes: [[], [{ many: 'text' }]], stage: 7, undoable: true, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.reply', message: 'Choose the language replies come in, by its code or its name' } }),
+  // Translating (C84, C85, C166): alone, the last answer from a source,
+  // into your language; on and off, whether a question to a source that
+  // reads only English is translated before it goes.
+  v({ verb: 'translate', group: 'editing', example: 'translate:', forms: ['translate:', 'translate:on', 'translate:off'], takes: [[], [['on', 'off']]], stage: 7, spends: true, click: 'fill',
+    gloss: /*i18n*/ { id: 'verb.translate', message: 'Translate the last answer from a source into your language. On or off: translate what you ask sources that read only English' } }),
   v({ verb: 'ripple', group: 'editing', example: 'ripple:on', forms: ['ripple:on', 'ripple:off'], takes: [[['on', 'off']]], on: ['room'], stage: 12, spends: true, undoable: true,
     gloss: /*i18n*/ { id: 'verb.ripple', message: 'Carry edits across branches as suggestions. Each check is a model call' } }),
   v({ verb: 'sweep', group: 'editing', example: 'sweep:201a editor', takes: [[], ['address', { opt: 'word' }]], on: ['room', 'reflection'], stage: 12, spends: true,

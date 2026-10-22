@@ -1,5 +1,5 @@
 import { BaseProvider } from './base'
-import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS } from './shared'
+import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens } from './shared'
 
 // Ollama: models on this computer (refactor-plan.md, stage 7, piece 4;
 // LPN §7.2 and §7.5; C33, C163).
@@ -217,15 +217,17 @@ export class OllamaProvider extends BaseProvider {
     }
   }
 
-  // The small requests go to the model that answered last, on this computer.
-  async _lightweightCall(systemPrompt, messages, maxTokens) {
-    if (!this.last) throw new Error('No model on this computer has answered yet')
+  // The small requests go to the model that answered last, on this computer,
+  // or the one named; never thinking first, since a model that thinks would
+  // spend the few tokens allowed on its thinking and answer nothing.
+  async _lightweightCall(systemPrompt, messages, maxTokens, model = this.last) {
+    if (!model) throw new Error('No model on this computer has answered yet')
     const response = await fetch(`${ORIGIN}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'omit',
       referrerPolicy: 'no-referrer',
-      body: JSON.stringify({ model: this._apiName(this.last), messages: this._messages(messages, systemPrompt), stream: false, options: { num_predict: maxTokens } }),
+      body: JSON.stringify({ model: this._apiName(model), messages: this._messages(messages, systemPrompt), stream: false, options: { num_predict: maxTokens }, ...this._think(model, false) }),
     })
     if (!response.ok) throw this._failure(response)
     const data = await response.json()
@@ -248,5 +250,11 @@ export class OllamaProvider extends BaseProvider {
     const text = await this._lightweightCall(SUMMARIZE_SYSTEM_PROMPT, [{ role: 'user', content: summaryItems(items) }], SUMMARY_MAX_TOKENS)
     if (!text) throw new Error('No summary came back')
     return text.slice(0, SUMMARY_MAX_CHARS)
+  }
+
+  // translate: (C166) by a model on this computer: free, and nothing leaves it.
+  async translate(pieces, { from = null, to, query = false, model } = {}) {
+    const raw = await this._lightweightCall(translateSystemPrompt({ from, to, query }), [{ role: 'user', content: translatePieces(pieces) }], translateMaxTokens(pieces), model)
+    return readPieces(raw, pieces.length)
   }
 }

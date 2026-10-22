@@ -1,7 +1,7 @@
 import { BaseProvider } from './base'
 import { evalMath } from '../lib/mathEval'
 import { findModel } from '../net/answerers'
-import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, readDescription, summaryItems, stripPrefixes } from './shared'
+import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, readDescription, summaryItems, stripPrefixes, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens } from './shared'
 
 const API_BASE = 'https://api.anthropic.com/v1'
 const API_VERSION = '2023-06-01'
@@ -191,13 +191,14 @@ export class AnthropicProvider extends BaseProvider {
     }
   }
 
-  // Shared helper for lightweight non-streaming calls (title, summary, tags)
-  async _lightweightCall(apiKey, systemPrompt, messages, maxTokens = 60) {
+  // Shared helper for lightweight non-streaming calls (title, summary, tags,
+  // a translation), to the small model unless another is named.
+  async _lightweightCall(apiKey, systemPrompt, messages, maxTokens = 60, model = LIGHT_MODEL) {
     const response = await fetch(`${API_BASE}/messages`, {
       method: 'POST',
       headers: this._headers(apiKey),
       body: JSON.stringify({
-        model: this._resolveModel(LIGHT_MODEL),
+        model: this._resolveModel(model),
         max_tokens: maxTokens,
         system: systemPrompt,
         messages,
@@ -557,5 +558,13 @@ export class AnthropicProvider extends BaseProvider {
     const text = String(raw ?? '').trim()
     if (!text) throw new Error('No summary came back')
     return text.slice(0, SUMMARY_MAX_CHARS)
+  }
+
+  // translate: (stage 7, piece 6; C166): pieces of text from a source, or a
+  // question for one, into another language, by the model named (the
+  // helper) or the small one. from and to are English names of languages.
+  async translate(apiKey, pieces, { from = null, to, query = false, model = LIGHT_MODEL } = {}) {
+    const raw = await this._lightweightCall(apiKey, translateSystemPrompt({ from, to, query }), [{ role: 'user', content: translatePieces(pieces) }], translateMaxTokens(pieces), model)
+    return readPieces(raw, pieces.length)
   }
 }

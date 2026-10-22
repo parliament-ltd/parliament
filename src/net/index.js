@@ -2,7 +2,9 @@
 // that talks to a provider or source, or handles a key, goes through here.
 
 import { destination, shipped, DESTINATIONS } from './list'
-import { answererRows, answererFor, findModel } from './answerers'
+import { answererRows, answererFor, helperFor, findModel } from './answerers'
+import { onDevice } from './translate'
+import { englishNameOf } from '../lib/languages'
 import { requestsByHost } from './requestLog'
 import { createKeyring, checkAndKeep } from './keyring'
 import { createGateway } from './gateway'
@@ -17,6 +19,7 @@ import openalexManifest from './sources/openalex.json'
 export { Refused } from './gateway'
 export { destination, shipped, DESTINATIONS } from './list'
 export { findAnswerers, findModel, costMark, GROUPS as ANSWER_GROUPS, SOURCE_KINDS } from './answerers'
+export { translatorFor } from './translate'
 
 export const keys = createKeyring({
   load: (provider) => loadApiKey('persistent', provider),
@@ -115,6 +118,29 @@ export const pickerRows = (keyed = {}) => answererRows({ destinations: DESTINATI
 /** Who answers a chat: its own choice, or the default (C150). */
 export const answererOf = ({ chosen = null, keyed = {}, defaultModel = null } = {}) =>
   answererFor({ chosen, keys: keyed, defaultModel, destinations: DESTINATIONS, modelsOf, defaultProvider: DEFAULT_MODEL_PROVIDER })
+
+// ── Translation and the helper (stage 7, piece 6; C84, C85, C166) ──
+
+/** The model that reads text from sources: chosen with helper:, else as helperFor says. */
+export const helperOf = ({ chosen = null, keyed = {} } = {}) =>
+  helperFor({ chosen, keys: keyed, destinations: DESTINATIONS, modelsOf, lightModelOf: (id) => metadataModel(id), defaultProvider: DEFAULT_MODEL_PROVIDER })
+
+/** The browser's own translation, where it has one (feature detection). */
+export const browserTranslation = () => onDevice(typeof window === 'undefined' ? null : window)
+
+/**
+ * Translates pieces of text, by whom translatorFor chose: the browser, on
+ * this device, or the helper, through the gateway, with its own provider's
+ * key. from and to are language tags; from may be null.
+ * @returns {Promise<string[]>}
+ */
+export async function translateText(pieces, { who, from = null, to, query = false, signal } = {}) {
+  if (who?.kind === 'browser') return browserTranslation().translate(pieces, { from, to, signal })
+  if (who?.kind !== 'model') throw new Error('Nothing here can translate')
+  const h = who.helper
+  const options = { from: from ? englishNameOf(from) : null, to: englishNameOf(to), query, model: h.id }
+  return gateway.call(h.provider, 'translate', [pieces, options], { label: query ? 'translate question' : 'translate answer' })
+}
 
 /** A model's or a source's name and price by its id, old ids included (C151), for naming and pricing what it answered. */
 export function modelFacts(id) {

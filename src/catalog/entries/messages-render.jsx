@@ -335,6 +335,8 @@ export default function MessagesRender() {
         stoppedNote={isGhost && Object.hasOwn(STOPPED, msg.stopReason ?? '') ? i18n._(msg.stopReason === 'error' && !msg.content ? COPY.chat.cutErrorEmpty : STOPPED[msg.stopReason]) : null}
         source={msg.source ?? null}
         frameworks={msg.role === 'assistant' ? msg.frameworks ?? null : null}
+        translation={msg.role === 'assistant' ? msg.translation ?? null : null}
+        asked={msg.role === 'user' ? msg.asked ?? null : null}
         thinking={thinking}
         isFavorited={isFav}
         showNotes={showNotes.has(msg.id)}

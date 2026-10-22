@@ -45,7 +45,7 @@ describe('the verb list', () => {
 
   it('marks every verb that sends something, so its Enter line names who and what it costs', () => {
     const spends = VERBS.filter((v) => v.spends).map((v) => v.verb).sort()
-    expect(spends).toEqual(['again', 'reflect', 'rewrite', 'ripple', 'run', 'summarize', 'sweep'])
+    expect(spends).toEqual(['again', 'reflect', 'rewrite', 'ripple', 'run', 'summarize', 'sweep', 'translate'])
     // Nothing that sends is applied on a click: it waits for Enter.
     for (const v of VERBS.filter((x) => x.spends)) expect(v.click, v.verb).toBe('fill')
   })
@@ -63,7 +63,7 @@ describe('the verb list', () => {
 describe('the glosses', () => {
   const glosses = [...VERBS.map((v) => ({ where: v.verb, ...v.gloss })), ...GROUPS.map((g) => ({ where: g.key, ...g.title })), { where: 'leaders', ...LEADERS.title }, ...LEADERS.rows.map((r) => ({ where: r.example, ...r.gloss }))]
   // Names that keep their capital in a sentence: boards, formats and a key.
-  const PROPER = new Set(['Parliament', 'Records', 'Plan', 'Collection', 'Library', 'Lab', 'Markdown', 'JSONL', 'Enter'])
+  const PROPER = new Set(['Parliament', 'Records', 'Plan', 'Collection', 'Library', 'Lab', 'Markdown', 'JSONL', 'Enter', 'English'])
 
   it('have unique ids and follow the copy rules', () => {
     const ids = glosses.map((g) => g.id)

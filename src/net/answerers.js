@@ -150,3 +150,34 @@ export function answererFor({ chosen = null, keys = {}, defaultModel = null, des
   if (keys[d.provider ?? defaultProvider]) return d
   return describe(KEYLESS_DEFAULT, false)
 }
+
+/**
+ * The helper: the model that reads text from sources (editing spec,
+ * `helper:haiku`; stage 7, piece 6; C166 (d)). Today it translates answers
+ * from sources and questions for them; edits and asks on a source's text
+ * join it with stage 11.
+ * Chosen with helper:, it is that model. Unchosen, it is a model on this
+ * computer once a check has listed one (nothing leaves the computer, C84),
+ * else the small model of a provider with a key, the default provider
+ * first; else null.
+ * @param {{ chosen?: string|null, keys?: Record<string, boolean>, destinations: object[],
+ *   modelsOf: (id: string) => object[], lightModelOf: (id: string) => string|null, defaultProvider: string }} input
+ * @returns {object|null} as answererFor describes a model
+ */
+export function helperFor({ chosen = null, keys = {}, destinations, modelsOf, lightModelOf, defaultProvider }) {
+  const of = (id, isChosen) => {
+    const h = answererFor({ chosen: id, keys, destinations, modelsOf, defaultProvider })
+    return h.group === 'source' ? null : { ...h, chosen: isChosen }
+  }
+  if (chosen) return of(chosen, true)
+  for (const d of destinations.filter((x) => x.kind === 'local' && x.ships)) {
+    const m = (modelsOf(d.id) ?? []).find((x) => x.current !== false)
+    if (m) return of(m.id, false)
+  }
+  const providers = [defaultProvider, ...destinations.filter((x) => x.kind === 'model' && x.ships && x.id !== defaultProvider).map((x) => x.id)]
+  for (const id of providers) {
+    const light = keys[id] ? lightModelOf(id) : null
+    if (light) return of(light, false)
+  }
+  return null
+}

@@ -29,6 +29,7 @@ import { planNote, planSummarize, planCompare, planJump } from '../lib/cardActs'
 import { exportItems, chatsOf, exportName } from '../lib/recordsExport'
 import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
+import { planReply, planHelper, planTranslate, queryLines } from '../lib/languageVerbs'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
@@ -46,7 +47,8 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // new:collection, add:, rm: and heading: change a collection (piece 6; C144).
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking'])
+// reply:, helper: and translate: (piece 6; C166).
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -568,6 +570,9 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       by: planBy,
       framework: planFramework,
       thinking: planThinking,
+      reply: (a1, s1, sc) => planReply(s1, sc),
+      helper: (a1, s1, sc) => planHelper(s1, sc),
+      translate: (a1, s1, sc) => planTranslate(s1, sc),
     }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
@@ -709,6 +714,7 @@ export function promptPreview(text, target = {}) {
     const tokens = Math.ceil((prompt.length + (about?.chars ?? 0) + (target.historyChars ?? 0) + (target.systemChars ?? 0)) / CHARS_PER_TOKEN)
     const also = []
     if (target.frameworks?.length) also.push({ message: 'promptFrameworks', values: { count: target.frameworks.length, frameworks: target.frameworks } })
+    if (target.replyIn) also.push({ message: 'promptReplyIn', values: { language: target.replyIn } })
     if (target.sourcesOut?.count > 0) also.push({ message: 'promptSourcesOut', values: { count: target.sourcesOut.count, sources: target.sourcesOut.names } })
     if (target.hiddenOut > 0) also.push({ message: 'promptHiddenOut', values: { count: target.hiddenOut } })
     if (who.thinks) also.unshift(target.thinking ? { message: 'promptThinks', values: { name: who.name } } : { message: 'promptThinksOff', values: { name: who.name } })
@@ -717,8 +723,16 @@ export function promptPreview(text, target = {}) {
   }
   if (who.group === 'source') {
     const says = { message: 'promptSource', values: { source: who.name } }
+    const also = []
+    // The edition asked, when it is the reply language's (C166 (e)).
+    if (target.edition) also.push({ message: 'promptEdition', values: { language: target.edition } })
+    // A question to a source that reads only English, translated first (C85).
+    also.push(...queryLines(target.query ?? null, prompt.length, target.nameOf ?? ((t) => t)))
+    // An answer in English for someone who reads another language: translate: comes after (C166 (f)).
+    if (!target.query && target.translateLater) also.push({ message: 'promptTranslateLater', values: { language: target.translateLater } })
     // A source with a daily allowance says so before Enter (C156).
-    return { ready: true, says: who.perDay ? { ...says, also: [{ message: 'promptPerDay', values: { count: who.perDay } }] } : says }
+    if (who.perDay) also.push({ message: 'promptPerDay', values: { count: who.perDay } })
+    return { ready: true, says: also.length ? { ...says, also } : says }
   }
 
   const tokens = Math.ceil((prompt.length + (about?.chars ?? 0) + (target.historyChars ?? 0) + (target.systemChars ?? 0)) / CHARS_PER_TOKEN)
@@ -733,6 +747,8 @@ export function promptPreview(text, target = {}) {
   if (who.preview) also.push({ message: 'promptPreviewModel', values: { name: who.name } })
   // The frameworks that go with it, in their order (C164). target.frameworks: their names.
   if (target.frameworks?.length) also.push({ message: 'promptFrameworks', values: { count: target.frameworks.length, frameworks: target.frameworks } })
+  // The language replies come in, sent as a line of the system prompt (C166).
+  if (target.replyIn) also.push({ message: 'promptReplyIn', values: { language: target.replyIn } })
   if (about) {
     also.push({ message: 'promptAbout', values: { count: about.nums.length } })
     if (about.quotes?.length) also.push({ message: 'promptAboutQuotes', values: { nums: about.quotes, count: about.quotes.length } })

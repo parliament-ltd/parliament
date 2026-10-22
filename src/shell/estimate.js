@@ -65,3 +65,28 @@ export function summaryCost(chars, price) {
   const outCost = inputCost(SUMMARY_OUT_TOKENS, price?.outputPerMillion)
   return inCost == null || outCost == null ? null : inCost + outCost
 }
+
+// translate: (stage 7, piece 6; C166): the pieces translated, with their
+// instructions, and about as much back, a little more since some languages
+// run longer.
+const TRANSLATE_INSTRUCTION_CHARS = 900
+const TRANSLATE_GROWTH = 1.3
+
+/**
+ * At most what a translation of so many characters costs at the price of
+ * the model that translates; null when the price is not known, 0 when it is
+ * free (a model on this computer).
+ * @param {number} chars
+ * @param {{ type?: string, inputPerMillion?: number, outputPerMillion?: number }|null} price
+ */
+export function translateCost(chars, price) {
+  if (price?.type === 'free-local') return 0
+  const input = Math.ceil((chars + TRANSLATE_INSTRUCTION_CHARS) / CHARS_PER_TOKEN)
+  const output = Math.ceil((chars * TRANSLATE_GROWTH) / CHARS_PER_TOKEN)
+  const inCost = inputCost(input, price?.inputPerMillion)
+  const outCost = inputCost(output, price?.outputPerMillion)
+  return inCost == null || outCost == null ? null : inCost + outCost
+}
+
+/** Roughly how many tokens a translation of so many characters takes, there and back. */
+export const translateTokens = (chars) => Math.ceil((chars + TRANSLATE_INSTRUCTION_CHARS + chars * TRANSLATE_GROWTH) / CHARS_PER_TOKEN)

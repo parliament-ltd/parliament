@@ -314,6 +314,10 @@ msgid "chat.answeredFrom"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.askedAs"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.close"
 msgstr ""
 
@@ -386,6 +390,14 @@ msgid "chat.quoteWhichChat"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.showOriginal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.showTranslation"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.sourceComments"
 msgstr ""
 
@@ -439,6 +451,14 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.thoughtUntimed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.translatedBy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.translatedByBrowser"
 msgstr ""
 
 #. Under a reply: the frameworks it was written under (C164). {names} is a list
@@ -1338,6 +1358,51 @@ msgstr ""
 msgid "enter.help"
 msgstr ""
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.helperNoModel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.helperNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.helperNow"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.helperNowChosen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.helperOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.helperSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.helperSameOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.helperSet"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.helperSource"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.helperUnchecked"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.helpVerb"
 msgstr ""
@@ -1695,6 +1760,10 @@ msgid "enter.promptDescribeUnpriced"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.promptEdition"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.promptFailed"
 msgstr ""
 
@@ -1744,9 +1813,22 @@ msgstr ""
 msgid "enter.promptPreviewModel"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.promptQueryTranslated"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptQueryUntranslated"
+msgstr ""
+
 #. Where Mistral processes the prompt, chosen in its key panel (C159)
 #. js-lingui-explicit-id
 msgid "enter.promptRegion"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptReplyIn"
 msgstr ""
 
 #. Sent only on Enter, never automatically (C114)
@@ -1803,6 +1885,16 @@ msgstr ""
 msgid "enter.promptThinksOff"
 msgstr ""
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptTranslateLater"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.queryFailed"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.ready"
 msgstr ""
@@ -1814,6 +1906,41 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.replyCut"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replyNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.replyNowNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.replyNowPage"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.replyNowSet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replyOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replySame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replySameOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replySet"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2133,6 +2260,84 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.tourOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translate"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateByBrowser"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateByBrowserDownload"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateByLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateByModel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateByModelCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateByModelUnpriced"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translated"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateFailed"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.translateNoOne"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.translateNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateQueriesOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateQueriesOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateQueriesSameOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateQueriesSameOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateWorking"
 msgstr ""
 
 #. The words stay English
@@ -3388,6 +3593,10 @@ msgid "verb.reject"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "verb.reply"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.reset"
 msgstr ""
 
@@ -3485,6 +3694,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.tour"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.translate"
 msgstr ""
 
 #. js-lingui-explicit-id
