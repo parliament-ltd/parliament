@@ -83,3 +83,15 @@ describe('the Almanac rows (stage 5, piece 3)', () => {
     expect(rows.map((r) => r.num)).toEqual([202, 203, 201, 204])
   })
 })
+
+describe('notes of their own on Records (C145)', () => {
+  it('carry what they quote and what they summarize, beside the summary line', () => {
+    const at = '2026-10-21T10:00:00Z'
+    const rows = toRows({ notes: [
+      { id: 'n1', num: 231, conversationId: null, text: 'Thread', quotes: [214, 217], createdAt: at },
+      { id: 'n2', num: 234, conversationId: null, text: 'In short', summary: { from: [214], at, model: 'claude-haiku' }, createdAt: at },
+    ] })
+    expect(rows.find((r) => r.num === 231)).toMatchObject({ quotes: [214, 217], summarized: null, summary: null, chatId: null })
+    expect(rows.find((r) => r.num === 234)).toMatchObject({ quotes: [], summarized: { from: [214], at, model: 'claude-haiku' } })
+  })
+})

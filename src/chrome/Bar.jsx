@@ -13,6 +13,7 @@ import Field from './Field'
 import EnterLine from './EnterLine'
 import Reference from './Reference'
 import Inspect from './Inspect'
+import Compare from './Compare'
 import KeyPanel from './KeyPanel'
 
 // One bar: the field, its Enter line and the ? reference, pointed at one
@@ -45,7 +46,7 @@ import KeyPanel from './KeyPanel'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, onSearch, searches = {}, searchCounts = {} }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, onSearch, searches = {}, searchCounts = {} }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -64,8 +65,13 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   // clicked (stage 5): it waits for Enter.
   useEffect(() => {
     if (!write) return
-    dispatch({ type: 'input', value: write.value })
     input.current?.focus()
+    // The bar turned to a prompt, as the Collection's Prompt act does (C145 (h)).
+    if (write.mode === 'prompt') { dispatch({ type: 'ran', to: 'prompt' }); return }
+    dispatch({ type: 'input', value: write.value })
+    // An act that wants words writes "" for them: the caret goes between (C145 (d)).
+    const at = write.value.indexOf('""')
+    if (at >= 0) setTimeout(() => input.current?.setSelectionRange(at + 1, at + 1), 0)
   }, [write])
   // What the last command did gives way to what the written one would do.
   const [wrote, setWrote] = useState(write)
@@ -164,7 +170,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       : i18n._(COPY.field.answeredFrom, { source: prompt.source })
   }
   const room = prompt && prompt.room !== undefined
-    ? { chat: prompt.chat ?? null, name: prompt.room ? roomLabel(i18n, prompt.roomName ?? null) : null }
+    ? { chat: prompt.chat ?? null, name: prompt.room ? roomLabel(i18n, prompt.roomName ?? null) : null, fresh: Boolean(prompt.about) }
     : undefined
 
   async function send() {
@@ -195,6 +201,8 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     dispatch({ type: 'ran', to: view.after ?? null })
     // Done, with something to say: copy: and undo: say what they did.
     if (out?.says) setNotice(out.says)
+    // Something that finishes later says so then: a summary written (C145 (g)).
+    if (out?.later) out.later.then((n) => { if (n) setNotice(n) }, () => {})
   }
 
   function onKeyDown(e) {
@@ -204,6 +212,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       e.preventDefault()
       if (reference) { setReference(null); return }
       if (inspect) { onInspectClose?.(); return }
+      if (compare) { onCompareClose?.(); return }
       if (keyPanel) { onKeysClose?.(); return }
       // The field's rule first, then the caret: moving the caret blurs the
       // field, which would otherwise come before the Escape.
@@ -265,7 +274,8 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
         <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} />
         {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
         {!reference && inspect && <Inspect row={inspect} />}
-        {!reference && !inspect && keyPanel && (
+        {!reference && !inspect && compare && <Compare a={compare.a} b={compare.b} />}
+        {!reference && !inspect && !compare && keyPanel && (
           <KeyPanel
             keys={keyPanel.keys}
             noKey={keyPanel.noKey}

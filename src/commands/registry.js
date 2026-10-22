@@ -211,7 +211,8 @@ function answer(command, board, built, body) {
   }
   if (!built.has(verb)) return { state: 'later', message: 'later', values: { verb: said }, verb, entry }
   // minus: a filter that leaves out what it names (-tag:essay).
-  return { state: 'ready', message: 'ready', values: { verb: said }, verb, minus: command.minus, entry, match }
+  // args: as read, even for a verb that keeps the rest of the line (note:214 "…").
+  return { state: 'ready', message: 'ready', values: { verb: said }, verb, minus: command.minus, entry, match, args: command.args }
 }
 
 /**

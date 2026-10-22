@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { estimateTokens, inputCost, historyChars, describeCost } from './estimate'
+import { estimateTokens, inputCost, historyChars, describeCost, summaryCost } from './estimate'
 
 describe('the estimate before Enter (C83)', () => {
   it('counts characters over four, rounding up', () => {
@@ -28,5 +28,13 @@ describe('the one request after a first answer (C62)', () => {
     expect(describeCost(10_000, { inputPerMillion: 0.25, outputPerMillion: 1.25 })).toBeCloseTo(450 * 0.25e-6 + 200 * 1.25e-6, 12)
     expect(describeCost(20, { inputPerMillion: 1, outputPerMillion: 1 })).toBeCloseTo((Math.ceil(1320 / 4) + 200) * 1e-6, 12)
     expect(describeCost(20, null)).toBeNull()
+  })
+})
+
+describe('summaryCost (C145 (g))', () => {
+  it('is the words in and a paragraph out at the model price, or null without one', () => {
+    // (400 + 600) / 4 = 250 tokens in at $1 a million, 400 out at $5.
+    expect(summaryCost(400, { inputPerMillion: 1, outputPerMillion: 5 })).toBeCloseTo(0.00025 + 0.002, 8)
+    expect(summaryCost(400, null)).toBeNull()
   })
 })

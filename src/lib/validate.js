@@ -30,6 +30,9 @@ function isId(v)       { return typeof v === 'string' && v.length > 0 && v.lengt
 // some or none of them.
 const TAGS_MAX = 200
 const isTagList = (v) => Array.isArray(v) && v.length <= TAGS_MAX && v.every((t) => typeof t === 'string' && t.length > 0 && t.length <= 100)
+// A list of numbers, as a note's quotes are.
+const isNumList = (v) => Array.isArray(v) && v.length <= 1000 && v.every((n) => Number.isInteger(n) && n > 0)
+
 function rowFields(item, kind) {
   // The number of the chat a kept marking came from, when that chat was erased (C137 (c)).
   if (item.erasedFrom != null && !(Number.isInteger(item.erasedFrom) && item.erasedFrom > 0)) return `${kind}.erasedFrom must be a number`
@@ -121,6 +124,12 @@ function validateNote(item) {
   if (!isStringOrNull(item.messageId, 128))    return 'note.messageId invalid'
   if (!isString(item.text, 100_000))           return 'note.text invalid or too large'
   if (!isISODate(item.createdAt))              return 'note.createdAt invalid date'
+  // The numbers a note quotes, and a summary's numbers, day and model (C145).
+  if (item.quotes !== undefined && !isNumList(item.quotes)) return 'note.quotes must be a list of numbers'
+  if (item.summary !== undefined && item.summary !== null) {
+    const s = item.summary
+    if (typeof s !== 'object' || !isNumList(s.from) || !isISODate(s.at) || !isStringOrNull(s.model ?? null, 200)) return 'note.summary invalid'
+  }
   return rowFields(item, 'note')
 }
 
@@ -280,6 +289,7 @@ function validateRun(item) {
 function validateCollection(item) {
   if (!isId(item.id))                       return 'collection.id invalid'
   if (!Array.isArray(item.items))           return 'collection.items must be an array'
+  if (item.order !== undefined && !(Array.isArray(item.order) && item.order.every((k) => isString(k, 300)))) return 'collection.order must be a list of keys'
   return null
 }
 

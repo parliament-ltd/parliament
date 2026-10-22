@@ -13,6 +13,8 @@ import { useLingui } from '@lingui/react'
 import { COPY } from '../../copy'
 import ChartRenderer from './ChartRenderer'
 
+const NO_QUOTES = Object.freeze([])
+
 // PR-18e: chip-icon lookup for the attachmentMeta strip rendered under
 // user messages in history. Icons only (no thumbnails) — base64 isn't
 // persisted, and the chips are a memory aid not a thumbnail gallery.
@@ -39,11 +41,14 @@ export default function MessageCard({
   isFavorited = false, showNotes = false,
   savedNoteText = '',
   highlights = [],
+  // Passages of this message kept as quotes, each { num, text } (C145 (a), (b)).
+  quotes = NO_QUOTES,
   isPopoverActive = false, onPopoverChange,
   onNote, onFavorite, onNoteSave, onHighlight, onContinue, onDelete, onBranch,
-  onHide, onCopyText, onMoveToBranch, onPinForReference,
+  onHide, onCopyText, onMoveToBranch, onPinForReference, onQuote,
   attachmentMeta,
 }) {
+  const { i18n } = useLingui()
   // PR-18e: strip persisted `<attached_file>...</attached_file>` boundary
   // blocks from the display text so the user sees only their prose. The
   // wrapped form stays in the persisted message so Claude still has the
@@ -108,6 +113,14 @@ export default function MessageCard({
     window.getSelection()?.removeAllRanges()
   }
 
+  // Quote: the selected words kept beside the chat, numbered, never sent (C145 (a)).
+  const handleQuote = () => {
+    if (popoverPos?.text) onQuote?.(popoverPos.text)
+    setPopoverPos(null)
+    onPopoverChange?.(false)
+    window.getSelection()?.removeAllRanges()
+  }
+
   /* ── Render content with highlights + Markdown ──────────── */
 
   const highlightTerms = useMemo(() => {
@@ -134,6 +147,13 @@ export default function MessageCard({
 
     function highlightString(text) {
       const ranges = []
+      // A quoted passage, where it sits, in ink; a click finds its card (C145 (b)).
+      for (const q of quotes) {
+        // A pinned copy of the whole message is not a passage.
+        if (!q.text || q.text === displayContent) continue
+        const idx = text.indexOf(q.text)
+        if (idx >= 0) ranges.push({ start: idx, end: idx + q.text.length, quote: q.num })
+      }
       for (const hl of highlightTerms) {
         let startIndex = 0
         while (startIndex < text.length) {
@@ -156,6 +176,22 @@ export default function MessageCard({
       let cursor = 0
       for (const r of merged) {
         if (cursor < r.start) fragments.push(text.slice(cursor, r.start))
+        if (r.quote != null) {
+          const num = r.quote
+          fragments.push(
+            <mark
+              key={`q-${r.start}`}
+              className="p-quoted"
+              data-quote-num={num}
+              title={i18n._(COPY.chat.quoted, { num })}
+              onClick={() => { if (window.getSelection()?.isCollapsed !== false) window.dispatchEvent(new CustomEvent('parliament-find-card', { detail: { num } })) }}
+            >
+              {text.slice(r.start, r.end)}
+            </mark>
+          )
+          cursor = r.end
+          continue
+        }
         fragments.push(
           <mark
             key={`hl-${r.start}`}
@@ -171,7 +207,7 @@ export default function MessageCard({
     }
 
     function applyHighlights(children) {
-      if (!highlightTerms.length) return children
+      if (!highlightTerms.length && !quotes.length) return children
       return React.Children.map(children, (child) => {
         if (typeof child === 'string') return highlightString(child)
         if (child && child.props && child.props.children) {
@@ -194,7 +230,8 @@ export default function MessageCard({
     let headingIdx = 0
     const headingId = () => `msg-${id}-h-${headingIdx++}`
 
-    const maybeHL = highlightTerms.length > 0 ? applyHighlights : (c) => c
+    const marked = highlightTerms.length > 0 || quotes.length > 0
+    const maybeHL = marked ? applyHighlights : (c) => c
     const baseComponents = {
       h1: ({ children, ...props }) => <h1 {...props} id={headingId()}>{maybeHL(children)}</h1>,
       h2: ({ children, ...props }) => <h2 {...props} id={headingId()}>{maybeHL(children)}</h2>,
@@ -202,7 +239,7 @@ export default function MessageCard({
       h4: ({ children, ...props }) => <h4 {...props} id={headingId()}>{maybeHL(children)}</h4>,
     }
 
-    const highlightedComponents = highlightTerms.length > 0 ? {
+    const highlightedComponents = marked ? {
       ...baseComponents,
       p:          ({ children, ...props }) => <p          {...props}>{applyHighlights(children)}</p>,
       li:         ({ children, ...props }) => <li         {...props}>{applyHighlights(children)}</li>,
@@ -228,7 +265,7 @@ export default function MessageCard({
         </Markdown>
       </div>
     )
-  }, [id, displayContent, highlightTerms, source])
+  }, [id, displayContent, highlightTerms, quotes, source, i18n])
 
   return (
     <motion.div
@@ -387,6 +424,14 @@ export default function MessageCard({
                       title={c.id}
                     />
                   ))}
+                  {onQuote && !source && (
+                    <>
+                      <span className="mx-1 text-[var(--p-text-muted)]" aria-hidden="true">·</span>
+                      <button type="button" onClick={handleQuote} className="p-quote-btn" title={i18n._(COPY.chat.quoteHelp)}>
+                        {i18n._(COPY.chat.quote)}
+                      </button>
+                    </>
+                  )}
                 </motion.div>
               )
             })()}

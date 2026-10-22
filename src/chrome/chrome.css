@@ -454,7 +454,8 @@
 .ch-collection > * { flex: none; }
 .ch-collection > .ch-col-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 .ch-col-list { padding: 4px 16px 14px; }
-.ch-mk { padding: 10px 0 9px; border-bottom: .5px solid var(--ch-border-2); }
+.ch-mk { display: flex; gap: 10px; padding: 10px 0 9px; border-bottom: .5px solid var(--ch-border-2); }
+.ch-mk-body { flex: 1; min-width: 0; }
 .ch-mk .t { font: 400 var(--ch-t-small)/1.5 var(--ch-sans); color: var(--ch-ink); white-space: pre-wrap; }
 .ch-mk .q { font: italic 400 var(--ch-t-small)/1.5 var(--ch-serif); color: var(--ch-ink); border-inline-start: 2px solid var(--ch-soft); padding-inline-start: 9px; white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 8; -webkit-box-orient: vertical; overflow: hidden; }
 .ch-mk.ck-term .q { border-inline-start-color: var(--ch-kind-high); }
@@ -466,3 +467,41 @@
 .ch-mk-head { display: flex; gap: 8px; padding: 14px 0 4px; font: 600 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink); }
 .ch-mk-head span { color: var(--ch-ink-3); font-weight: 400; }
 .ch-mk-group { padding: 12px 0 2px; font: 600 9px var(--ch-sans); letter-spacing: .055em; text-transform: uppercase; color: var(--ch-ink-3); }
+
+/* Piece 7 (C145): selecting cards, the four acts, quotes beneath a note,
+   finding, compare:. Ink throughout: gold stays for the ignition and the
+   minimised bar (C50). */
+.ch-shell .ch-mk-box { flex: none; width: 15px; height: 15px; margin-top: 3px; padding: 0; border: 1px solid var(--ch-soft); border-radius: 3px; font: 600 10px/13px var(--ch-sans); color: var(--ch-surface); text-align: center; }
+.ch-shell .ch-mk-box[aria-pressed="true"] { background: var(--ch-ink); border-color: var(--ch-ink); }
+.ch-mk-box.none { border-color: transparent; }
+.ch-mk.sel { background: var(--ch-subtle); }
+.ch-shell .ch-mk-marg button.c-id { text-decoration: underline dotted; }
+.ch-mk-qs { margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+.ch-mk-qs > div { font: italic 400 12px/1.45 var(--ch-serif); color: var(--ch-ink-2); padding-inline-start: 8px; border-inline-start: 1.5px solid var(--ch-soft); white-space: pre-wrap; }
+.ch-mk-qs > div.ck-term { border-inline-start-color: var(--ch-kind-high); }
+.ch-mk-qs > div.gone { border-inline-start-style: dashed; }
+.ch-mk-qs .c-id { margin-inline-start: 6px; font-style: normal; }
+.ch-collection > .ch-col-acts { border-top: 1px solid var(--ch-divider); padding: 8px 16px 10px; }
+.ch-col-scope { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; min-height: 18px; }
+.ch-col-scope b { font-weight: 600; color: var(--ch-ink); }
+.ch-shell .ch-col-scope button { padding: 0; text-decoration: underline; text-underline-offset: 2px; }
+.ch-shell .ch-col-scope button:hover { color: var(--ch-ink); }
+.ch-col-actrow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.ch-shell .ch-act { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 10px; border: .5px solid var(--ch-border); border-radius: var(--ch-r-sm); color: var(--ch-ink); font: 500 12px var(--ch-sans); }
+.ch-shell .ch-act small { color: var(--ch-ink-3); font: 400 10.5px var(--ch-sans); }
+.ch-shell .ch-act:hover:not(:disabled) { border-color: var(--ch-ink); }
+.ch-shell .ch-act:disabled { opacity: .45; cursor: default; }
+/* Found: the spot a jump: or a click lands on, for a moment. */
+.ch-flash { box-shadow: 0 0 0 2px var(--ch-ink, currentColor); border-radius: 4px; transition: box-shadow .25s; }
+@media (prefers-reduced-motion: reduce) { .ch-flash { transition: none; } }
+/* A quoted passage where it sits in a chat (C145 (b)). */
+mark.p-quoted { background: none; color: inherit; cursor: pointer; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; text-decoration-color: var(--p-text-primary, currentColor); }
+mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
+.p-quote-btn { font: 500 12px var(--p-font-sans, inherit); color: var(--p-text-primary, inherit); padding: 0 2px; }
+.p-quote-btn:hover { text-decoration: underline; }
+/* compare: under the bar. */
+/* Side by side where there is room, one above the other where not. */
+.ch-compare-sides { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 14px; }
+.ch-compare-diff { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--ch-divider); white-space: pre-wrap; }
+.ch-compare-diff del { color: var(--ch-ink-3); text-decoration: line-through; }
+.ch-compare-diff ins { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }

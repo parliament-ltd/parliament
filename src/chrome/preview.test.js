@@ -698,3 +698,80 @@ describe('the Collection (stage 6, piece 6; C144)', () => {
     expect(at('>type:keyword')).toMatchObject({ text: 'Enter shows the keywords', act: { view: { tab: 'term' } } })
   })
 })
+
+describe('the four acts, compare: and jump: (stage 6, piece 7; C145)', () => {
+  const STORE = { chat: 'conversations', note: 'notes', term: 'highlights', quote: 'pins' }
+  const row = (num, kind, extra = {}) => ({
+    num, kind, id: `${kind}${num}`, store: STORE[kind], chatId: kind === 'chat' ? `chat-${num}` : 'chat-202', title: `${kind} ${num}`,
+    tags: [], tagsMine: [], pinned: false, archived: false, docketNum: null, ...extra,
+  })
+  const rows = [row(202, 'chat'), row(214, 'term', { text: 'tapetum' }), row(217, 'quote', { text: 'The atmosphere did a good share of the carrying.' }), row(219, 'note', { text: 'Check the range map' })]
+  const q2 = { id: 'q2', name: 'Q2', items: [], headings: [], order: [] }
+  const cards = [214, 217, 219].map((num) => ({ num, kind: rows.find((r) => r.num === num).kind, key: `k${num}` }))
+  const at = (value, { addressed = 'collection', helper = { keyed: true, provider: 'Anthropic', price: { inputPerMillion: 1, outputPerMillion: 5 } }, shown = q2 } = {}) => {
+    const collection = { shown, all: [q2], cards, label: (c) => c.name, view: { tab: 'all', sort: 'yours' } }
+    const p = preview(value, { mode: 'command', arrangement: { ...almanac(), addressed }, screens: { records: { rows, view: { search: '', filters: [], sort: { by: 'active', asc: false } } }, collection, helper } })
+    const also = [].concat(p.says?.also ?? []).map((x) => say(i18n, x.message, x.values))
+    return { ...p, text: [say(i18n, p.says.message, p.says.values), ...also].join(' · ') }
+  }
+
+  it('note: writes a note quoting what it names, or nothing, and never sends it', () => {
+    expect(at('>note:214, 217 "Thread for the essay"')).toMatchObject({
+      text: 'Enter writes a note in Q2, quoting 214 and 217 beneath it · A note is for people and is never sent',
+      act: { kind: 'note', text: 'Thread for the essay', quotes: [214, 217], collection: 'q2' },
+    })
+    expect(at('>note:"Check the dates"').act).toEqual({ kind: 'note', text: 'Check the dates', quotes: [], collection: 'q2' })
+    expect(at('>note:Check the dates', { addressed: 'almanac' })).toMatchObject({ text: 'Enter writes a note of its own in Records · A note is for people and is never sent', act: { collection: null } })
+    expect(at('>note:214 ""').text).toBe('A note needs some words, like note:214 "…"')
+    expect(at('>note:214').text).toBe('A note needs some words, like note:214 "…"')
+    expect(at('>note:299 "x"').text).toBe('Nothing here has the number 299')
+  })
+
+  it('summarize: names its one call and its cost first, and any quote that goes', () => {
+    expect(at('>summarize:214, 217')).toMatchObject({
+      text: 'Enter writes a summary of 214 and 217 in Q2, dated today: one call to Anthropic, under $0.01 · 217 is a quote, kept from models until now: its words go in this call',
+      act: { kind: 'summarize', nums: [214, 217], collection: 'q2' },
+    })
+    expect(at('>summarize:').act.nums).toEqual([214, 217, 219])
+    expect(at('>summarize:202').text).toBe('202 is not a note, keyword or quote, which are what summarize: takes for now')
+    expect(at('>summarize:214', { helper: { keyed: false, provider: 'Anthropic' } }).text).toBe('A summary needs a key for Anthropic. api: adds one')
+    expect(at('>summarize:214', { addressed: 'almanac' }).text).toBe('summarize: writes a summary note on Collection. Rewriting a summary line here comes later')
+  })
+
+  it('compare: takes two with words, and sends nothing', () => {
+    expect(at('>compare:214 219')).toMatchObject({ text: 'Enter sets 214 and 219 side by side, word by word · Nothing is sent', act: { kind: 'compare', nums: [214, 219] } })
+    expect(at('>compare:214, 219').act.nums).toEqual([214, 219])
+    expect(at('>compare:214').text).toBe('compare: takes two numbers, like compare:218 231')
+    expect(at('>compare:214 202').text).toBe('202 is not a note, keyword or quote, which are what compare: takes for now')
+  })
+
+  it('jump: finds a number on the board the bar points at', () => {
+    expect(at('>jump:217')).toMatchObject({ text: 'Enter finds 217 here', act: { kind: 'find', num: 217, to: 'card' } })
+    expect(at('>jump:202').text).toBe('202 is not in Q2. add:202 puts it there')
+    expect(at('>jump:217', { addressed: 'room' })).toMatchObject({ text: 'Enter finds 217 in its chat', act: { to: 'chat' } })
+    expect(at('>jump:202', { addressed: 'room' }).text).toBe('202 is not a passage. open:202 shows it')
+    expect(at('>jump:217', { addressed: 'almanac' })).toMatchObject({ text: 'Enter scrolls to 217', act: { to: 'row' } })
+    expect(at('>go:217').text).toContain('jump:')
+  })
+
+  it('the Tag act writes tagadd: with the numbers, and asks for the word first', () => {
+    expect(at('>tagadd:"" 214, 217').text).toBe('A tag needs a word, like tagadd:essay 214, 217')
+    expect(at('>tagadd:"essay" 214, 217').text).toBe('Enter tags 214 and 217 with essay')
+  })
+})
+
+describe('a prompt about selected cards (C145 (h))', () => {
+  const target = { room: 'chat-202', keyed: true, provider: 'Anthropic', perMillion: 3, historyChars: 0, systemChars: 0 }
+  const about = { nums: [214, 217], quotes: [217], chars: 400, text: '…' }
+  const words = (p) => [say(i18n, p.says.message, p.says.values), ...[].concat(p.says.also ?? []).map((x) => say(i18n, x.message, x.values))].join(' · ')
+
+  it('counts their words, says they go first, and names a quote going along', () => {
+    const p = promptPreview('Why so far?', { ...target, about })
+    expect(p.ready).toBe(true)
+    expect(words(p)).toBe('Enter sends to Anthropic, about 103 tokens, under $0.01 to send · A new chat: the words of 2 cards go first · 217 is a quote, kept from models until now: its words go along this once')
+  })
+
+  it('needs a key, since a model reads them', () => {
+    expect(words(promptPreview('Why?', { ...target, keyed: false, source: 'Wikipedia', about }))).toBe('A chat about cards needs a key for Anthropic. api: adds one')
+  })
+})

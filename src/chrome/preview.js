@@ -25,6 +25,7 @@ import { FILTERS, EMPTY_VIEW, readFilter, readSort, nextView, clears, applyView,
 import { findSaved, cleanSearchName, SEARCH_NAME_MAX } from '../lib/savedSearches'
 import { planNew, planAdd, planRm, planClear, planHeading, planMoveCard, planNameCollection, planForgetCollection, collectionNamed, planCollectionView } from '../lib/collectionVerbs'
 import { ROW_VERBS, isRowStep, planRowLine, planCopy, planErase, targetsOf } from '../lib/rowVerbs'
+import { planNote, planSummarize, planCompare, planJump } from '../lib/cardActs'
 import { exportItems, chatsOf, exportName } from '../lib/recordsExport'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
@@ -41,7 +42,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // erase: removes things for good, by number, on a line of its own (C137).
 // export: downloads rows as Markdown or JSONL (piece 5; C138).
 // new:collection, add:, rm: and heading: change a collection (piece 6; C144).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -438,6 +439,11 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     const plans = {
       tour: planTour, name: nameIt, inspect: planInspect, api: planApi, save: planSave, forget: planForget, copy: planCopyStep, undo: planUndo,
       erase: planEraseStep, export: planExportStep, new: newStep, add: addStep, rm: rmStep, heading: headingStep,
+      // The four acts, compare: and jump: (piece 7; C145).
+      note: (a1, s1, sc) => planNote(s1, sc, a1.addressed),
+      summarize: (a1, s1, sc) => planSummarize(s1, sc, a1.addressed),
+      compare: (a1, s1, sc) => planCompare(s1, sc),
+      jump: (a1, s1, sc) => planJump(s1, sc, a1.addressed),
     }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
@@ -557,12 +563,19 @@ export function promptPreview(text, target = {}) {
   // A key in a prompt would go to the model, or to a source as a search.
   if (holdsKey(prompt)) return { ready: false, says: { message: 'promptKey' } }
   if (target.keyed == null) return { ready: false, says: { message: 'promptChecking' } }
+  // About selected cards (C145 (h)): a model reads them, so a key is needed.
+  const about = target.about ?? null
+  if (about && !target.keyed) return { ready: false, says: { message: 'promptAboutNoKey', values: { provider: target.provider } } }
   if (!target.keyed) return { ready: true, says: { message: 'promptSource', values: { source: target.source } } }
 
-  const tokens = Math.ceil((prompt.length + (target.historyChars ?? 0) + (target.systemChars ?? 0)) / CHARS_PER_TOKEN)
+  const tokens = Math.ceil((prompt.length + (about?.chars ?? 0) + (target.historyChars ?? 0) + (target.systemChars ?? 0)) / CHARS_PER_TOKEN)
   const cost = inputCost(tokens, target.perMillion)
   const values = { provider: target.provider, tokens }
   const also = []
+  if (about) {
+    also.push({ message: 'promptAbout', values: { count: about.nums.length } })
+    if (about.quotes?.length) also.push({ message: 'promptAboutQuotes', values: { nums: about.quotes, count: about.quotes.length } })
+  }
   // After a chat's first answer, one request for its title, summary and
   // tags, unless turned off in Settings (C62).
   if (target.describe) {

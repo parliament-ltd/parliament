@@ -60,3 +60,18 @@ describe('a backup with notes, keywords and quotes kept from an erased chat (C13
     expect(validateBackup({ pins: [{ ...quote, erasedFrom: 'x' }] }).valid).toBe(false)
   })
 })
+
+describe('a backup with notes of their own and ordered collections (C144 (j), C145)', () => {
+  const note = (extra) => ({ id: 'n1', conversationId: null, messageId: null, text: 'Thread for the essay', createdAt: at, ...extra })
+  it('accepts what a note quotes and a dated summary, and a collection in your order', () => {
+    expect(validateBackup({ conversations: [], notes: [note({ quotes: [214, 217] })] })).toEqual({ valid: true })
+    expect(validateBackup({ conversations: [], notes: [note({ summary: { from: [214, 217], at, model: 'claude-haiku' } })] })).toEqual({ valid: true })
+    expect(validateBackup({ conversations: [], collections: [{ id: 'q2', items: [], order: ['mark:notes:n1', 'head:h1'] }] })).toEqual({ valid: true })
+  })
+  it('refuses quotes that are not numbers, a summary without its numbers or day, and an order that is not keys', () => {
+    expect(validateBackup({ conversations: [], notes: [note({ quotes: ['214'] })] }).valid).toBe(false)
+    expect(validateBackup({ conversations: [], notes: [note({ summary: { from: [214], at: 'yesterday' } })] }).valid).toBe(false)
+    expect(validateBackup({ conversations: [], notes: [note({ summary: { at } })] }).valid).toBe(false)
+    expect(validateBackup({ conversations: [], collections: [{ id: 'q2', items: [], order: [7] }] }).valid).toBe(false)
+  })
+})

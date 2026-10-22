@@ -29,15 +29,13 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
   const { i18n } = useLingui()
   const leave = { key: 'leave', text: i18n._(resting === 'prompt' ? COPY.enter.leavePrompt : COPY.enter.leaveSearch) }
   const toRoom = room && (mode === 'prompt' || addressed === 'room')
-  const target = {
-    key: 'target',
-    now: true,
-    text: !toRoom
-      ? i18n._(COPY.enter.target, { board: boardName(i18n, addressed) })
-      : room.chat == null
-        ? i18n._(COPY.enter.targetNewRoom)
-        : room.name ? i18n._(COPY.enter.targetChatIn, { chat: room.chat, room: room.name }) : i18n._(COPY.enter.targetChat, { chat: room.chat }),
-  }
+  let targetText
+  if (!toRoom) targetText = i18n._(COPY.enter.target, { board: boardName(i18n, addressed) })
+  // A prompt about selected cards starts a chat of its own (C145 (h)).
+  else if (room.fresh && mode === 'prompt') targetText = i18n._(COPY.enter.targetNewChat)
+  else if (room.chat == null) targetText = i18n._(COPY.enter.targetNewRoom)
+  else targetText = room.name ? i18n._(COPY.enter.targetChatIn, { chat: room.chat, room: room.name }) : i18n._(COPY.enter.targetChat, { chat: room.chat })
+  const target = { key: 'target', now: true, text: targetText }
   let parts
   // More sentences, as where a window cannot stay on top (C94), or what
   // stays out of a prompt: a key of COPY.enter, or { message, values }.

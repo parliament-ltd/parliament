@@ -290,6 +290,10 @@ msgid "board.welcome"
 msgstr "Welcome page"
 
 #. js-lingui-explicit-id
+msgid "chat.aboutCard"
+msgstr "{kind, select, note {note {num}} term {keyword {num}} quote {quote {num}} highlight {highlight {num}} other {{num}}}, kept in Parliament"
+
+#. js-lingui-explicit-id
 msgid "chat.answeredFrom"
 msgstr "Answered from {source}"
 
@@ -326,6 +330,18 @@ msgid "chat.finishSettingHelp"
 msgstr "Off: when you leave a chat while a reply is being written, the reply stops and what arrived is kept. On: it finishes in the background and is saved to its chat."
 
 #. js-lingui-explicit-id
+msgid "chat.quote"
+msgstr "Quote"
+
+#. js-lingui-explicit-id
+msgid "chat.quoted"
+msgstr "Quote {num}. A click finds its card"
+
+#. js-lingui-explicit-id
+msgid "chat.quoteHelp"
+msgstr "Keep these words beside the chat, numbered. They are never sent"
+
+#. js-lingui-explicit-id
 msgid "chat.sourceNothing"
 msgstr "Nothing found on {source} for that. Try other words."
 
@@ -346,9 +362,50 @@ msgstr "The reply in {chat} stopped when you left it, before any of it arrived."
 msgid "chat.stoppedOnReply"
 msgstr "Stopped when you left the chat. What arrived is kept."
 
+#. {command} is a command, which stays English
+#. js-lingui-explicit-id
+msgid "collection.actHelp"
+msgstr "Writes {command} in the bar"
+
+#. js-lingui-explicit-id
+msgid "collection.actNewChat"
+msgstr "new chat"
+
+#. js-lingui-explicit-id
+msgid "collection.actNote"
+msgstr "Note"
+
+#. js-lingui-explicit-id
+msgid "collection.actNoteQuoting"
+msgstr "quoting {count}"
+
+#. js-lingui-explicit-id
+msgid "collection.actOneCall"
+msgstr "1 call"
+
+#. js-lingui-explicit-id
+msgid "collection.actPrompt"
+msgstr "Prompt"
+
+#. js-lingui-explicit-id
+msgid "collection.actPromptHelp"
+msgstr "Turns the bar to a prompt about what is selected"
+
+#. js-lingui-explicit-id
+msgid "collection.actSummarize"
+msgstr "Summarize"
+
+#. js-lingui-explicit-id
+msgid "collection.actTag"
+msgstr "Tag"
+
 #. js-lingui-explicit-id
 msgid "collection.by"
 msgstr "by"
+
+#. js-lingui-explicit-id
+msgid "collection.card"
+msgstr "{kind, select, note {note {num}} term {keyword {num}} quote {quote {num}} highlight {highlight {num}} chat {chat {num}} docket {plan {num}} other {{num}}}"
 
 #. js-lingui-explicit-id
 msgid "collection.cardFrom"
@@ -387,6 +444,10 @@ msgstr "from {num}, erased"
 #. js-lingui-explicit-id
 msgid "collection.favorites"
 msgstr "Favorites"
+
+#. js-lingui-explicit-id
+msgid "collection.findHelp"
+msgstr "Finds it in its chat"
 
 #. js-lingui-explicit-id
 msgid "collection.from"
@@ -444,6 +505,26 @@ msgstr "Writes {command} in the bar"
 msgid "collection.plans"
 msgstr "Plans"
 
+#. js-lingui-explicit-id
+msgid "collection.quotedGone"
+msgstr "{num}, no longer here"
+
+#. js-lingui-explicit-id
+msgid "collection.select"
+msgstr "Select {card}"
+
+#. js-lingui-explicit-id
+msgid "collection.selectClear"
+msgstr "clear"
+
+#. js-lingui-explicit-id
+msgid "collection.selected"
+msgstr "{count} selected"
+
+#. js-lingui-explicit-id
+msgid "collection.selectNone"
+msgstr "Select cards to act on them, or act on the whole collection."
+
 #. open: stays English
 #. js-lingui-explicit-id
 msgid "collection.showHelp"
@@ -452,6 +533,10 @@ msgstr "Shows it, as open:\"{name}\" does"
 #. js-lingui-explicit-id
 msgid "collection.source"
 msgstr "source"
+
+#. js-lingui-explicit-id
+msgid "collection.summaryOf"
+msgstr "summary, written {day} from {nums}"
 
 #. js-lingui-explicit-id
 msgid "collection.tabAll"
@@ -486,8 +571,32 @@ msgid "collection.untitled"
 msgstr "Untitled collection"
 
 #. js-lingui-explicit-id
+msgid "collection.writtenHere"
+msgstr "written here"
+
+#. js-lingui-explicit-id
 msgid "collection.yours"
 msgstr "your order"
+
+#. js-lingui-explicit-id
+msgid "compare.close"
+msgstr "Nothing was sent. Escape closes this"
+
+#. js-lingui-explicit-id
+msgid "compare.counts"
+msgstr "{gone, plural, one {# word out} other {# words out}}, {added, plural, one {# word in} other {# words in}}"
+
+#. js-lingui-explicit-id
+msgid "compare.label"
+msgstr "{a} and {b} side by side"
+
+#. js-lingui-explicit-id
+msgid "compare.legend"
+msgstr "struck: only in {a} · underlined: only in {b}"
+
+#. js-lingui-explicit-id
+msgid "compare.same"
+msgstr "The same words"
 
 #. A message's attachments, by name only; {names} is a list
 #. js-lingui-explicit-id
@@ -790,6 +899,28 @@ msgid "enter.colsUnknown"
 msgstr "No column is called {word}. Try {words}"
 
 #. js-lingui-explicit-id
+msgid "enter.compare"
+msgstr "Enter sets {a} and {b} side by side, word by word"
+
+#. compare: stays English
+#. js-lingui-explicit-id
+msgid "enter.compareKinds"
+msgstr "{num} is not a note, keyword or quote, which are what compare: takes for now"
+
+#. js-lingui-explicit-id
+msgid "enter.compareNothingSent"
+msgstr "Nothing is sent"
+
+#. js-lingui-explicit-id
+msgid "enter.compareSame"
+msgstr "Those are the same thing twice"
+
+#. compare: stays English
+#. js-lingui-explicit-id
+msgid "enter.compareTwo"
+msgstr "compare: takes two numbers, like compare:218 231"
+
+#. js-lingui-explicit-id
 msgid "enter.copied"
 msgstr "Copied {num} as Markdown"
 
@@ -914,6 +1045,15 @@ msgid "enter.filterUntil"
 msgstr "made until the end of {day}"
 
 #. js-lingui-explicit-id
+msgid "enter.findGone"
+msgstr "Its words are no longer in the chat"
+
+#. clear:filters stays English
+#. js-lingui-explicit-id
+msgid "enter.findHidden"
+msgstr "{num} is not shown. clear:filters shows everything"
+
+#. js-lingui-explicit-id
 msgid "enter.focusAlone"
 msgstr "Enter leaves the chat alone here, with the bar under it"
 
@@ -1027,6 +1167,37 @@ msgid "enter.inWhich"
 msgstr "{name} is a room and a collection. Add room or collection after it"
 
 #. js-lingui-explicit-id
+msgid "enter.jumpCard"
+msgstr "Enter finds {num} here"
+
+#. js-lingui-explicit-id
+msgid "enter.jumpNoChat"
+msgstr "{num} has no chat to find it in"
+
+#. add: stays English
+#. js-lingui-explicit-id
+msgid "enter.jumpNotHeld"
+msgstr "{num} is not in {name}. add:{num} puts it there"
+
+#. open: stays English
+#. js-lingui-explicit-id
+msgid "enter.jumpOpen"
+msgstr "{num} is not a passage. open:{num} shows it"
+
+#. js-lingui-explicit-id
+msgid "enter.jumpPassage"
+msgstr "Enter finds {num} in its chat"
+
+#. js-lingui-explicit-id
+msgid "enter.jumpRow"
+msgstr "Enter scrolls to {num}"
+
+#. jump: stays English
+#. js-lingui-explicit-id
+msgid "enter.jumpWhere"
+msgstr "jump: works on {first}, on {second} and in a room"
+
+#. js-lingui-explicit-id
 msgid "enter.key"
 msgstr "No keys in the command line, for security. Delete it, and api: opens the key field"
 
@@ -1134,6 +1305,38 @@ msgstr "Only a filter takes a minus, like -tag:research"
 #. js-lingui-explicit-id
 msgid "enter.notCommand"
 msgstr "A command starts with a verb and a colon, like open:201"
+
+#. js-lingui-explicit-id
+msgid "enter.noteAlone"
+msgstr "Enter writes a note of its own in {board}"
+
+#. js-lingui-explicit-id
+msgid "enter.noteAloneQuoting"
+msgstr "Enter writes a note of its own in {board}, quoting {nums} beneath it"
+
+#. js-lingui-explicit-id
+msgid "enter.noteDone"
+msgstr "Wrote {num}"
+
+#. js-lingui-explicit-id
+msgid "enter.noteIn"
+msgstr "Enter writes a note in {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.noteInQuoting"
+msgstr "Enter writes a note in {name}, quoting {nums} beneath it"
+
+#. js-lingui-explicit-id
+msgid "enter.noteLong"
+msgstr "A note is at most {max} characters"
+
+#. js-lingui-explicit-id
+msgid "enter.noteNeverSent"
+msgstr "A note is for people and is never sent"
+
+#. js-lingui-explicit-id
+msgid "enter.noteWords"
+msgstr "A note needs some words, like {example}"
 
 #. js-lingui-explicit-id
 msgid "enter.numNone"
@@ -1255,6 +1458,19 @@ msgstr "{side, select, left {Enter places the window of {board} on the left} oth
 #. js-lingui-explicit-id
 msgid "enter.popSideThere"
 msgstr "{side, select, left {The window of {board} is on the left already} other {The window of {board} is on the right already}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptAbout"
+msgstr "{count, plural, one {A new chat: the words of # card go first} other {A new chat: the words of # cards go first}}"
+
+#. api: stays English
+#. js-lingui-explicit-id
+msgid "enter.promptAboutNoKey"
+msgstr "A chat about cards needs a key for {provider}. api: adds one"
+
+#. js-lingui-explicit-id
+msgid "enter.promptAboutQuotes"
+msgstr "{count, plural, one {{nums} is a quote, kept from models until now: its words go along this once} other {{nums} are quotes, kept from models until now: their words go along this once}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptBusy"
@@ -1486,6 +1702,58 @@ msgid "enter.sourceUnreachable"
 msgstr "{source} could not be reached. Check the connection, then try again"
 
 #. js-lingui-explicit-id
+msgid "enter.summarize"
+msgstr "Enter writes a summary of {nums} in {name}, dated today: one call to {provider}, at most {cost}"
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeCheap"
+msgstr "Enter writes a summary of {nums} in {name}, dated today: one call to {provider}, under {cost}"
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeDone"
+msgstr "Wrote the summary as {num}"
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeFailed"
+msgstr "No summary came back, so nothing was written"
+
+#. summarize: stays English
+#. js-lingui-explicit-id
+msgid "enter.summarizeKinds"
+msgstr "{num} is not a note, keyword or quote, which are what summarize: takes for now"
+
+#. summarize: stays English
+#. js-lingui-explicit-id
+msgid "enter.summarizeMany"
+msgstr "summarize: takes at most {max} at a time"
+
+#. api: stays English
+#. js-lingui-explicit-id
+msgid "enter.summarizeNoKey"
+msgstr "A summary needs a key for {provider}. api: adds one"
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeNothing"
+msgstr "Nothing here to summarize yet"
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeQuotes"
+msgstr "{count, plural, one {{nums} is a quote, kept from models until now: its words go in this call} other {{nums} are quotes, kept from models until now: their words go in this call}}"
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeUnpriced"
+msgstr "Enter writes a summary of {nums} in {name}, dated today: one call to {provider}"
+
+#. summarize: stays English
+#. js-lingui-explicit-id
+msgid "enter.summarizeWhere"
+msgstr "summarize: writes a summary note on {board}. Rewriting a summary line here comes later"
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeWriting"
+msgstr "Writing the summary"
+
+#. js-lingui-explicit-id
 msgid "enter.swapBoards"
 msgstr "Enter swaps {first} and {second}"
 
@@ -1518,6 +1786,10 @@ msgid "enter.tagWhich"
 msgstr "Which numbers? For example: {example}"
 
 #. js-lingui-explicit-id
+msgid "enter.tagWords"
+msgstr "A tag needs a word, like {example}"
+
+#. js-lingui-explicit-id
 msgid "enter.takesExample"
 msgstr "{verb} does not take that. For example: {example}"
 
@@ -1540,6 +1812,10 @@ msgstr "→ {chat}"
 #. js-lingui-explicit-id
 msgid "enter.targetChatIn"
 msgstr "→ {chat} in {room}"
+
+#. js-lingui-explicit-id
+msgid "enter.targetNewChat"
+msgstr "→ a new chat"
 
 #. js-lingui-explicit-id
 msgid "enter.targetNewRoom"
@@ -2580,7 +2856,7 @@ msgstr "Strike the selected passage"
 
 #. js-lingui-explicit-id
 msgid "verb.summarize"
-msgstr "Rewrite each row's summary line"
+msgstr "Write a dated summary of some cards as a note. One model call"
 
 #. js-lingui-explicit-id
 msgid "verb.swap"

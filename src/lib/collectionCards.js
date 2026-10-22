@@ -42,6 +42,8 @@ export function cardsOf(collection, rows, messages = new Map()) {
   const markCard = (r, via) => ({
     key: markKey(r), kind: r.kind, num: r.num, text: r.text ?? '', chatNum: r.chatNum ?? null, erasedFrom: r.erasedFrom ?? null,
     createdAt: r.createdAt ?? null, tags: r.tags ?? [], via, gone: r.erasedFrom != null,
+    // A note of its own: what it quotes beneath it, or what it summarizes (C145).
+    quotes: r.quotes ?? [], summary: r.summarized ?? null, own: r.kind === 'note' && !r.chatId && r.erasedFrom == null,
   })
   const goneCard = (key, what, num, via = null) => ({ key, kind: 'gone', what, num, text: '', chatNum: null, erasedFrom: null, createdAt: null, tags: [], via, gone: true })
   const sources = []

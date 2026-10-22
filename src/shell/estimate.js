@@ -47,3 +47,21 @@ export function describeCost(promptChars, price) {
   const outCost = inputCost(DESCRIBE_OUT_TOKENS, price?.outputPerMillion)
   return inCost == null || outCost == null ? null : inCost + outCost
 }
+
+// summarize: on the Collection (stage 6, piece 7; C145 (g)): the words of
+// what is summarized, with its instructions, and a paragraph back.
+const SUMMARY_INSTRUCTION_CHARS = 600
+export const SUMMARY_OUT_TOKENS = 400
+
+/**
+ * At most what one summary costs, for so many characters summarized, at the
+ * price of the model it goes to; null when the price is not known.
+ * @param {number} chars
+ * @param {{ inputPerMillion?: number, outputPerMillion?: number }|null} price
+ */
+export function summaryCost(chars, price) {
+  const input = Math.ceil((chars + SUMMARY_INSTRUCTION_CHARS) / CHARS_PER_TOKEN)
+  const inCost = inputCost(input, price?.inputPerMillion)
+  const outCost = inputCost(SUMMARY_OUT_TOKENS, price?.outputPerMillion)
+  return inCost == null || outCost == null ? null : inCost + outCost
+}

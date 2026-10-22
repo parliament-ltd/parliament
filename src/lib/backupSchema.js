@@ -18,7 +18,9 @@ export const FIELDS = Object.freeze({
     'num', 'docketId', 'branch', 'run', 'restoredFrom', 'archived', 'tagsMine'],
   // model and usage: what a reply was made with and its tokens (C132 (h), stage 6).
   messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta', 'stopReason', 'source', 'model', 'usage'],
-  notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom'],
+  // quotes: the numbers a note quotes beneath it; summary: a dated summary
+  // note's numbers, day and model (stage 6, piece 7; C145 (e), (g)).
+  notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom', 'quotes', 'summary'],
   highlights: ['id', 'conversationId', 'messageId', 'text', 'color', 'createdAt', 'num', 'kind', 'pinned', 'tags', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom'],
   favorites: ['id', 'conversationId', 'messageId', 'createdAt'],
   pins: ['id', 'targetConversationId', 'sourceConversationId', 'sourceMessageId', 'content', 'createdAt', 'num', 'kind', 'restoredFrom', 'pinned', 'tags', 'archived', 'tagsMine', 'erasedFrom'],
@@ -28,7 +30,8 @@ export const FIELDS = Object.freeze({
   // Version 6.
   dockets: ['id', 'num', 'title', 'createdAt', 'updatedAt', 'pinned', 'tags', 'archived', 'branches', 'order', 'nextLetter', 'restoredFrom', 'tagsMine'],
   runs: ['id', 'docketId', 'n', 'createdAt', 'cost', 'branches'],
-  collections: ['id', 'name', 'builtIn', 'description', 'items', 'headings', 'pinned', 'createdAt', 'updatedAt', 'fromFavorites'],
+  // order: the cards and headings in the person's own order (C144 (j)).
+  collections: ['id', 'name', 'builtIn', 'description', 'items', 'headings', 'order', 'pinned', 'createdAt', 'updatedAt', 'fromFavorites'],
   collabs: ['id', 'name', 'instruction', 'builtIn', 'on', 'fromPersona', 'createdAt'],
 })
 

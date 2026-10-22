@@ -177,7 +177,11 @@ function planStep(step, rows) {
     case 'untag': {
       const clean = cleanTag(typed(args[0]))
       if (clean.error === 'long') return { bad: { message: 'tagLong', values: { max: TAG_MAX } } }
-      if (clean.error) return { bad: { message: 'tagWhich', values: { example: 'tagadd:essay 207, 216' } } }
+      if (clean.error) {
+        // The words are missing, as when the Tag act wrote tagadd:"" 207 (C145 (f)).
+        const nums = args.length > 1 ? flat(args.slice(1)).map((a) => a.num ?? a.value).filter((n) => n != null).join(', ') : '207, 216'
+        return { bad: { message: 'tagWords', values: { example: `${step.verb}:essay ${nums}` } } }
+      }
       if (args.length < 2) {
         if (step.verb === 'tagadd') return { bad: { message: 'tagWhich', values: { example: `tagadd:${args[0].text} 207, 216` } } }
         return planUntag(clean.tag, null, rows)

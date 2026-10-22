@@ -175,7 +175,7 @@ export const VERBS = Object.freeze([
   v({ verb: 'heading', group: 'collection', example: 'heading:"Sources"', forms: ['heading:"Sources"', 'heading:"Sources" before 215'], takes: [['text'], ['text', ['before', 'after'], 'address']], on: ['collection'], stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.heading', message: 'Add a heading to a collection in your own order' } }),
   v({ verb: 'summarize', group: 'collection', example: 'summarize:207, 216', takes: [[], ['addresses']], on: TABLES, stage: 6, spends: true, undoable: true,
-    gloss: /*i18n*/ { id: 'verb.summarize', message: "Rewrite each row's summary line" } }),
+    gloss: /*i18n*/ { id: 'verb.summarize', message: 'Write a dated summary of some cards as a note. One model call' } }),
   v({ verb: 'rewrite', group: 'collection', example: 'rewrite:234', takes: [['address']], on: ['collection'], stage: 6, spends: true, undoable: true,
     gloss: /*i18n*/ { id: 'verb.rewrite', message: 'Write a new dated summary beside the old one' } }),
   v({ verb: 'forget', group: 'collection', example: 'forget:"Surprised me"', forms: ['forget:"Surprised me"', 'forget:"Q2" collection'], takes: [['text'], ['text', ['search', 'collection']]], stage: 6, undoable: true,

@@ -205,6 +205,7 @@ export default function AlmanacBoard({ rows, filtered = null, columns: kept = nu
             <tr
               key={keyOf(row)}
               data-k={keyOf(row)}
+              data-num={row.num}
               aria-rowindex={start + i + 2}
               tabIndex={0}
               title={i18n._(COPY.almanac.rowHelp, { num: row.num })}

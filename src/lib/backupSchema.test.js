@@ -68,3 +68,12 @@ describe('cleanFlat', () => {
     expect(out.pins).toHaveLength(1)
   })
 })
+
+describe('what a backup keeps of collections and notes (C144 (j), C145)', () => {
+  it('keeps a collection in your order, and what a note quotes or summarizes', () => {
+    expect(rebuildRecord('collections', { id: 'q2', items: [], order: ['head:h1'] }).order).toEqual(['head:h1'])
+    const note = rebuildRecord('notes', { id: 'n1', text: 'x', createdAt: 't', quotes: [214], summary: { from: [214], at: 't', model: 'claude-haiku' } })
+    expect(note.quotes).toEqual([214])
+    expect(note.summary).toEqual({ from: [214], at: 't', model: 'claude-haiku' })
+  })
+})

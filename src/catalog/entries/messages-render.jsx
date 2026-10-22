@@ -42,6 +42,9 @@ import { hideMessage, showAllMessages, scheduleDelete, undoDelete } from '../../
 import { COPY } from '../../copy'
 import { useSettings } from '../../stores/SettingsContext'
 import { useAnnotations } from '../../stores/AnnotationsContext'
+
+// No quoted passages: one list, so a message without any draws once.
+const NO_QUOTES = Object.freeze([])
 import { useBranchPanel } from '../../stores/BranchPanelContext'
 import { useCollabMode } from '../../stores/CollabModeContext'
 import { useConversations } from '../../stores/ConversationContext'
@@ -222,6 +225,31 @@ export default function MessagesRender() {
   }, [transferModal, activeConversationId, settings.defaultModel, loadConversations])
 
 
+  // Quote (C145 (a)): a passage kept beside its own chat, numbered, never
+  // sent. Stored with the quotes "Pin for reference" makes (A23).
+  const handleQuote = useCallback(async (msg, text) => {
+    const words = String(text ?? '').trim()
+    if (!activeConversationId || !words) return
+    try {
+      await dbAddPin({ targetConversationId: activeConversationId, sourceConversationId: activeConversationId, sourceMessageId: msg.id, content: words })
+      await refreshPins()
+    } catch (err) {
+      if (import.meta.env.DEV) console.warn('[messages@1.0] quote failed:', err)
+    }
+  }, [activeConversationId, refreshPins])
+
+  // Each message's quoted passages, to mark where they sit (C145 (b)). A
+  // pinned copy of a whole message is not a passage.
+  const quotesByMessage = useMemo(() => {
+    const out = new Map()
+    for (const p of pins) {
+      if (p.num == null || p.sourceConversationId !== activeConversationId || !p.sourceMessageId || !p.content) continue
+      if (!out.has(p.sourceMessageId)) out.set(p.sourceMessageId, [])
+      out.get(p.sourceMessageId).push({ num: p.num, text: p.content })
+    }
+    return out
+  }, [pins, activeConversationId])
+
   const handleRemovePin = useCallback(async (pinId) => {
     try { await dbDeletePin(pinId) } catch { /* tolerate */ }
     setPins(prev => prev.filter(p => p.id !== pinId))
@@ -299,6 +327,7 @@ export default function MessagesRender() {
         showNotes={showNotes.has(msg.id)}
         savedNoteText={noteRecord?.text || ''}
         highlights={highlights}
+        quotes={quotesByMessage.get(msg.id) ?? NO_QUOTES}
         isPopoverActive={activePopoverMsgId === msg.id}
         onPopoverChange={(active) => setActivePopoverMsgId(active ? msg.id : null)}
         onContinue={isGhost ? () => handleContinue(msg.id) : undefined}
@@ -312,6 +341,7 @@ export default function MessagesRender() {
         onDelete={() => handleDelete(msg.id)}
         onMoveToBranch={() => handleSendToBranch(msg)}
         onPinForReference={() => handlePinForReference(msg)}
+        onQuote={(text) => handleQuote(msg, text)}
       />
     )
   }, [
@@ -322,6 +352,7 @@ export default function MessagesRender() {
     toggleFavorite, toggleNotePanel, saveNote, addHighlight,
     openBranchPanel,
     handleHide, handleDelete, handleSendToBranch, handlePinForReference,
+    handleQuote, quotesByMessage,
   ])
 
   void conversationId

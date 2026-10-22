@@ -14,7 +14,7 @@ import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
-import { hasKey, models, metadataModel, destination, keyStatus, noKeyNeeded, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
+import { hasKey, models, metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
 import { ignite } from './ignition'
 import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
 import { useChat } from '../stores/ChatContext'
@@ -39,11 +39,13 @@ import { listLayoutEntries } from '../catalog/layouts'
 import { readAlmanac } from '../lib/almanacRows'
 import { createFactsCache } from '../lib/chatFacts'
 import { readSaved, keepSearch, forgetSearch, putSaved } from '../lib/savedSearches'
-import { readCollections, writeCollection, newCollection } from '../lib/collections'
+import { readCollections, writeCollection, newCollection, withRows } from '../lib/collections'
+import { aboutText, WORDED } from '../lib/cardActs'
+import { ROW_GUESS } from './rowWindow'
 import { cardsOf, tabCounts, sequenceOf } from '../lib/collectionCards'
 import { searchTerms } from '../lib/recordsFilter'
 import CollectionBoard from './CollectionBoard'
-import { changeRecords, eraseRecords } from '../lib/records'
+import { changeRecords, eraseRecords, addOwnNote, removeOwnNote } from '../lib/records'
 import { exportItems, gatherExport, itemsMarkdown, exportMarkdown, exportJsonl, exportType } from '../lib/recordsExport'
 import { dayOf } from './when'
 import { longDay } from './say'
@@ -132,6 +134,35 @@ function backOnPage(a) {
   if (next.bar.popped) next = planPopBar(next, false).next ?? next
   return next
 }
+
+// Finds what a selector names once it is drawn (a chat being opened, rows
+// being placed), brings it into view and marks it for a moment (C145 (c)).
+// Looks for the first selector for about two seconds, then takes any of
+// the others: a passage's marks can draw a moment after its message.
+function flashWhenDrawn(selectors, tries = 60) {
+  const list = [].concat(selectors).filter(Boolean)
+  let n = 0
+  const look = () => {
+    const el = (n < 40 ? list.slice(0, 1) : list).map((q) => document.querySelector(q)).find(Boolean)
+    if (!el) { if (++n < tries) setTimeout(look, 50); return }
+    const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    el.scrollIntoView({ block: 'center', behavior: still ? 'auto' : 'smooth' })
+    el.classList.add('ch-flash')
+    setTimeout(() => el.classList.remove('ch-flash'), 1600)
+  }
+  look()
+}
+
+// The nearest box that scrolls, for bringing a row of Records into view.
+function scrollerOf(el) {
+  for (let x = el?.parentElement; x; x = x.parentElement) {
+    const { overflowY } = getComputedStyle(x)
+    if ((overflowY === 'auto' || overflowY === 'scroll') && x.scrollHeight > x.clientHeight) return x
+  }
+  return document.scrollingElement
+}
+const NO_NUMS = Object.freeze([])
+const NO_SOURCES = Object.freeze({ count: 0, names: [] })
 
 export default function Shell() {
   const { i18n } = useLingui()
@@ -266,6 +297,8 @@ export default function Shell() {
   const [write, setWrite] = useState(null)
   const writes = useRef(0)
   const writeField = useCallback((value) => setWrite({ value, n: ++writes.current }), [])
+  // Turns the bar to a prompt, writing nothing (C145 (h)).
+  const toPrompt = useCallback(() => setWrite({ value: '', mode: 'prompt', n: ++writes.current }), [])
 
   // Leaving the page closes every window it opened.
   useEffect(() => {
@@ -367,6 +400,7 @@ export default function Shell() {
   }, [started, roomRev, priceOf])
   const numbered = useMemo(() => new Map((almanacRows ?? []).map((r) => [r.num, r])), [almanacRows])
   const [inspected, setInspected] = useState(null) // the number inspect: shows under the bar
+  const [compared, setCompared] = useState(null) // the two numbers compare: shows under the bar
 
   // ── What Records shows (stage 6, piece 1; C132) ───────
   // The search, typed in the bar while it points at Records, and the
@@ -410,6 +444,8 @@ export default function Shell() {
     }
   }, [recordsNames, i18n])
   const shownRows = useMemo(() => (almanacRows ? applyView(almanacRows, recordsView, recordsCtx.ctx) : null), [almanacRows, recordsView, recordsCtx])
+  const shownRowsNow = useRef(null)
+  useEffect(() => { shownRowsNow.current = shownRows }, [shownRows])
   const records = useMemo(() => {
     const now = Date.now()
     return { ...recordsCtx, rows: almanacRows ?? [], view: recordsView, saved, now, nowIso: new Date(now).toISOString() }
@@ -453,7 +489,9 @@ export default function Shell() {
     const inTab = tab === 'all' || !counts[tab] ? collectionAll.cards : collectionAll.cards.filter((c) => c.kind === tab)
     const cards = terms.length ? inTab.filter((c) => terms.every((t) => c.text.toLocaleLowerCase().includes(t))) : inTab
     const view = { ...collectionView, tab: tab !== 'all' && !counts[tab] ? 'all' : tab }
-    return { cards, counts, view, entries: shownCollection ? sequenceOf(cards, shownCollection, view.sort, { asc: view.asc, sources: collectionAll.sources }) : [] }
+    const entries = shownCollection ? sequenceOf(cards, shownCollection, view.sort, { asc: view.asc, sources: collectionAll.sources }) : []
+    // While a search narrows the cards, headings wait (collection board v3).
+    return { cards, counts, view, entries: terms.length ? entries.filter((e) => !e.head) : entries }
   }, [collectionAll, collectionSearch, collectionView, shownCollection])
   // What the picker offers to hold: plans and chats, the ones it holds and the most recently active.
   const pickable = useMemo(() => {
@@ -468,6 +506,48 @@ export default function Shell() {
     const a = current.current
     commit({ ...a, context: { ...a.context, collection: c.id } })
   }, [commit])
+
+  // ── Selecting cards, and finding (piece 7; C145) ──────
+  // The selection lasts for the tab and is not stored. It belongs to the
+  // collection shown and lets go when another is shown.
+  const shownId = shownCollection?.id ?? null
+  const [pickedIn, setPickedIn] = useState({ id: null, nums: NO_NUMS })
+  const pickedHere = useMemo(() => (pickedIn.id === shownId ? pickedIn.nums.filter((n) => collectionAll.cards.some((c) => c.num === n)) : NO_NUMS), [pickedIn, shownId, collectionAll])
+  const onPick = useCallback((num) => setPickedIn((was) => {
+    const nums = was.id === shownId ? was.nums : []
+    return { id: shownId, nums: nums.includes(num) ? nums.filter((n) => n !== num) : [...nums, num] }
+  }), [shownId])
+  const clearPicked = useCallback(() => setPickedIn({ id: null, nums: NO_NUMS }), [])
+  const cardsNow = useRef([])
+  useEffect(() => { cardsNow.current = collectionAll.cards }, [collectionAll])
+  const numberedNow = useRef(new Map())
+  useEffect(() => { numberedNow.current = numbered }, [numbered])
+  const collectionsNow = useRef([])
+  useEffect(() => { collectionsNow.current = collections }, [collections])
+
+  /** Its card on the Collection, the board brought here if need be. */
+  const findCard = useCallback((num) => {
+    const a = current.current
+    const here = a.columns.flat().includes('collection') || a.popped.some((x) => x.board === 'collection')
+    const next = here ? address(a, 'collection') : planOpen(a, 'collection').next ?? a
+    if (next !== a) commit(next)
+    const card = cardsNow.current.find((c) => c.num === num)
+    if (card) setCollectionView((v) => (v.tab === 'all' || v.tab === card.kind ? v : { ...v, tab: 'all' }))
+    flashWhenDrawn(`.ch-collection [data-num="${num}"]`)
+  }, [commit])
+
+  // A click on a quoted passage in a chat finds its card; one the collection
+  // shown does not hold is offered to it, as add: (C145 (b), (c)).
+  useEffect(() => {
+    const onFindCard = (e) => {
+      const num = e.detail?.num
+      if (!Number.isInteger(num)) return
+      findCard(num)
+      if (!cardsNow.current.some((c) => c.num === num)) writeField(`>add:${num}`)
+    }
+    window.addEventListener('parliament-find-card', onFindCard)
+    return () => window.removeEventListener('parliament-find-card', onFindCard)
+  }, [findCard, writeField])
 
   // copy: and export: (C143 (f), C138): built from what is stored, in the
   // reader's language around the person's words. Hidden messages and
@@ -544,6 +624,10 @@ export default function Shell() {
     return () => { live = false }
   }, [started, roomRev, libraryHere])
   const inspectedRow = inspected != null ? numbered.get(inspected) ?? null : null
+  const comparedRows = useMemo(() => {
+    const [a, b] = (compared ?? []).map((n) => numbered.get(n))
+    return a && b ? { a, b } : null
+  }, [compared, numbered])
 
   // ── Keeping what is made (C88, C94) ───────────────────
   // Whether the browser has agreed to keep Parliament's data. The welcome
@@ -585,6 +669,69 @@ export default function Shell() {
   const remember = useCallback((body) => {
     if (db.current && body) keepCommand(db.current, body).then((kept) => (kept ? readCommands(db.current).then(setLines) : null)).catch(() => {})
   }, [])
+  // A new note goes into the collection it was written in, at the end of
+  // your order. Returns the change, for undo:, or null.
+  const holdNote = useCallback(async (collectionId, note, now) => {
+    const c = collectionsNow.current.find((x) => x.id === collectionId)
+    if (!c) return null
+    const after = withRows(c, [{ kind: 'note', store: 'notes', id: note.id, num: note.num }], now).next
+    try {
+      await writeCollection(db.current, { id: c.id, before: c, after })
+    } catch {
+      return null // the note stands on its own in Records
+    }
+    setCollections(await readCollections(db.current).catch(() => []))
+    return { id: c.id, before: c, after }
+  }, [])
+
+  /** Its passage in its chat, the chat brought into the room if need be (C145 (c)). */
+  const findPassage = useCallback(async (num) => {
+    const row = numberedNow.current.get(num)
+    if (!row?.chatId) return { message: 'jumpNoChat', values: { num } }
+    const a = current.current
+    if (roomOnScreen(a) !== row.chatId) {
+      const placed = planRoom(a, row.chatId)
+      if (placed.next) { const refused = await run(placed.next, null); if (refused) return refused }
+    }
+    flashWhenDrawn([`[data-quote-num="${num}"]`, row.messageId ? `[id="msg-${row.messageId}"]` : null])
+    return null
+  }, [run])
+
+  /** Its row on Records, scrolled to where the rows are drawn (C142). */
+  const findRow = useCallback((num) => {
+    const rows = shownRowsNow.current ?? []
+    const at = rows.findIndex((r) => r.num === num)
+    if (at < 0) return { message: 'findHidden', values: { num } }
+    const a = current.current
+    if (a.addressed !== 'almanac') commit(address(a, 'almanac'))
+    const q = `.ch-almanac tr[data-num="${num}"]`
+    // Rows differ in height, so the first scroll is a guess: each step
+    // measures the rows drawn and comes closer, until the row is drawn.
+    const seek = (left) => {
+      if (document.querySelector(q)) { flashWhenDrawn(q); return }
+      const body = document.querySelector('.ch-almanac tbody')
+      const box = body && scrollerOf(body)
+      if (!box || !left) return
+      const drawn = [...body.querySelectorAll('tr[data-num]')]
+      let y = body.getBoundingClientRect().top + at * ROW_GUESS
+      if (drawn.length) {
+        const first = drawn[0]
+        const last = drawn[drawn.length - 1]
+        const fi = Number(first.getAttribute('aria-rowindex')) - 2
+        const li = Number(last.getAttribute('aria-rowindex')) - 2
+        const per = (last.getBoundingClientRect().bottom - first.getBoundingClientRect().top) / Math.max(1, li - fi + 1)
+        y = first.getBoundingClientRect().top + (at - fi) * per
+      }
+      const top = box === document.scrollingElement ? 0 : box.getBoundingClientRect().top
+      box.scrollTop += y - top - box.clientHeight / 2
+      // Rows are placed on scroll; say so now, as a page not on screen waits to.
+      box.dispatchEvent(new Event('scroll'))
+      setTimeout(() => seek(left - 1), 60)
+    }
+    seek(15)
+    return null
+  }, [commit])
+
   const act = useCallback(async (what, body, next = null) => {
     if (what.kind === 'rows') {
       // pin:, archive:, name: and the tag verbs (C143), all or nothing.
@@ -646,9 +793,72 @@ export default function Shell() {
       return null
     }
     if (what.kind === 'inspect') {
+      setCompared(null)
       setInspected(what.num)
       remember(body)
       return null
+    }
+    if (what.kind === 'compare') {
+      // compare: (C145 (i)): under the bar, word by word; nothing is sent.
+      setInspected(null)
+      setCompared(what.nums)
+      remember(body)
+      return null
+    }
+    if (what.kind === 'find') {
+      // jump: (C145 (c)): its card, its passage or its row.
+      const out = what.to === 'card' ? (findCard(what.num), null) : what.to === 'chat' ? await findPassage(what.num) : findRow(what.num)
+      if (out) return out
+      remember(body)
+      return null
+    }
+    if (what.kind === 'note') {
+      // note: (C145 (e)): a note of its own, quoting what it names.
+      const now = new Date().toISOString()
+      let note
+      try {
+        note = await addOwnNote(db.current, { id: crypto.randomUUID(), text: what.text, quotes: what.quotes, now })
+      } catch {
+        return 'noteFailed'
+      }
+      touched.current?.created.push({ store: 'notes', id: note.id, num: note.num, text: note.text })
+      const change = await holdNote(what.collection, note, now)
+      if (change) touched.current?.collections.push(change)
+      clearPicked()
+      if (what.collection) flashWhenDrawn(`.ch-collection [data-num="${note.num}"]`)
+      remember(body)
+      return { done: true, says: { message: 'noteDone', values: { num: note.num } } }
+    }
+    if (what.kind === 'summarize') {
+      // summarize: (C145 (g)): one call, then a dated note. The bar is free
+      // meanwhile, and says when it is written.
+      const rows = what.nums.map((n) => numberedNow.current.get(n)).filter(Boolean)
+      const items = rows.map((r) => ({ label: i18n._(COPY.collections.card, { kind: r.kind, num: r.num }), text: r.text ?? '' }))
+      const later = (async () => {
+        let text
+        try {
+          text = await gateway.call(PROVIDER, 'summarize', [items], { label: 'summary' })
+        } catch {
+          return 'summarizeFailed'
+        }
+        const now = new Date().toISOString()
+        let note
+        try {
+          note = await addOwnNote(db.current, { id: crypto.randomUUID(), text, summary: { from: what.nums, at: now, model: metadataModel(PROVIDER) }, now })
+        } catch {
+          return 'summarizeFailed'
+        }
+        const entry = { line: body, created: [{ store: 'notes', id: note.id, num: note.num, text: note.text }] }
+        const change = await holdNote(what.collection, note, now)
+        if (change) entry.collections = [change]
+        undoStack.current = [...undoStack.current, entry].slice(-UNDO_MAX)
+        setUndoTop(body)
+        flashWhenDrawn(`.ch-collection [data-num="${note.num}"]`)
+        return { message: 'summarizeDone', values: { num: note.num } }
+      })()
+      clearPicked()
+      remember(body)
+      return { done: true, says: 'summarizeWriting', later }
     }
     if (what.kind === 'collectionWrite' || what.kind === 'newCollection') {
       // new:collection, add:, rm:, clear:, heading:, move:, name:, forget: (C144).
@@ -717,7 +927,7 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'name'))
     remember(body)
     return null
-  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, exportFile, commit, loadConversations])
+  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, exportFile, commit, loadConversations, findCard, findPassage, findRow, holdNote, clearPicked, i18n])
 
   // ── undo: (C134, as built) ────────────────────────────
   // Each command line that changes something is kept with what it changed,
@@ -758,6 +968,14 @@ export default function Shell() {
       }
       setCollections(await readCollections(db.current).catch(() => []))
     }
+    if (entry.created) {
+      // A note written by note: or summarize: (C145): taken out, unless changed since.
+      try {
+        for (const c of [...entry.created].reverse()) await removeOwnNote(db.current, c)
+      } catch (err) {
+        return stop(err?.name === 'Changed' ? { message: 'undoChanged', values: { nums: err.nums } } : 'undoFailed')
+      }
+    }
     if (entry.view) showView(entry.view)
     if (entry.arrangement) {
       const refused = await run(entry.arrangement, null)
@@ -772,7 +990,7 @@ export default function Shell() {
   const onRun = useCallback(async (next, body, go, what) => {
     if (what?.kind === 'undo') return undo(body)
     const before = { arrangement: current.current, view: viewNow.current }
-    touched.current = { records: [], saved: [], collections: [] }
+    touched.current = { records: [], saved: [], collections: [], created: [] }
     const out = what ? await act(what, body, next) : await run(next, body)
     const t = touched.current
     touched.current = null
@@ -790,7 +1008,8 @@ export default function Shell() {
     if (t.records.length) entry.records = t.records
     if (t.saved.length) entry.saved = t.saved
     if (t.collections.length) entry.collections = t.collections
-    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections)) {
+    if (t.created.length) entry.created = t.created
+    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections || entry.created)) {
       undoStack.current = [...undoStack.current, entry].slice(-UNDO_MAX)
       setUndoTop(body)
     }
@@ -852,7 +1071,8 @@ export default function Shell() {
       stacked: getComputedStyle(stage).flexDirection === 'column',
     }
   }, [])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens])
+  const helper = useMemo(() => ({ keyed, provider: destination(PROVIDER)?.name, price: models(PROVIDER).find((m) => m.id === metadataModel(PROVIDER))?.cost ?? null }), [keyed])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -877,6 +1097,16 @@ export default function Shell() {
   const firstPrompt = roomId === null || (Boolean(roomId) && activeConversationId === roomId && messages.length === 0)
   const describes = Boolean(keyed && firstPrompt && settings.describeNewChats !== false)
   const describe = useMemo(() => (describes ? { price: describeModel?.cost ?? null } : null), [describes, describeModel])
+  // With cards selected on the Collection, a prompt starts a new chat about
+  // them: their words first, quoted, then what is typed (C145 (h)).
+  const about = useMemo(() => {
+    if (arrangement.addressed !== 'collection' || !pickedHere.length) return null
+    const rows = pickedHere.map((n) => numbered.get(n)).filter((r) => r && WORDED.has(r.kind))
+    if (!rows.length) return null
+    const text = aboutText(rows, (r) => i18n._(COPY.chat.aboutCard, { kind: r.kind, num: r.num }))
+    return { nums: rows.map((r) => r.num), quotes: rows.filter((r) => r.kind === 'quote').map((r) => r.num), chars: text.length, text }
+  }, [arrangement.addressed, pickedHere, numbered, i18n])
+  const describeFresh = useMemo(() => (keyed && settings.describeNewChats !== false ? { price: describeModel?.cost ?? null } : null), [keyed, settings.describeNewChats, describeModel])
   // With no room in the space, a prompt starts a chat in a room beside
   // what is here, so it is offered as going to a new room (C125).
   const prompt = useMemo(() => ({
@@ -887,16 +1117,17 @@ export default function Shell() {
     provider: destination(PROVIDER)?.name,
     source: destination(SOURCE)?.name,
     model: model?.name ?? settings.defaultModel,
-    historyChars: historyChars(along),
+    historyChars: about ? 0 : historyChars(along),
     systemChars: keyed ? buildSystemPrompt().length : 0,
     perMillion: model?.cost?.inputPerMillion ?? null,
-    hiddenOut,
-    sourcesOut,
-    describe,
-    resend: Boolean(roomId) && stalledIn === roomId,
+    hiddenOut: about ? 0 : hiddenOut,
+    sourcesOut: about ? NO_SOURCES : sourcesOut,
+    describe: about ? describeFresh : describe,
+    resend: !about && Boolean(roomId) && stalledIn === roomId,
     ink,
     roomName: roomNameHere,
-  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, model, settings.defaultModel, along, hiddenOut, sourcesOut, describe, stalledIn, buildSystemPrompt])
+    about,
+  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, model, settings.defaultModel, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, buildSystemPrompt, about])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -906,7 +1137,8 @@ export default function Shell() {
    * Answers at once whether the prompt went, and `done` once it is answered.
    */
   const onPrompt = useCallback(async (text, shown) => {
-    const chatId = roomOnScreen(current.current) ?? null
+    const aboutNow = shown?.about ?? null
+    const chatId = aboutNow ? null : roomOnScreen(current.current) ?? null
     if (creating.current) return { refused: 'promptBusy' }
     // The line named a recipient; if that has changed since, say so first.
     const fresh = await hasKey().then(Boolean, () => false)
@@ -942,10 +1174,12 @@ export default function Shell() {
       }
     }
 
+    const full = aboutNow ? `${aboutNow.text}\n\n${text}` : text
+    if (aboutNow) clearPicked()
     const send = () => {
       const { settings: s, buildSystemPrompt: system, locale } = latest.current
       return fresh
-        ? sendMessage(id, text, s.defaultModel, system())
+        ? sendMessage(id, full, s.defaultModel, system())
         : askSource(id, text, { source: SOURCE, lang: sourceLocale(locale) })
     }
     // A new room sends once its messages are loaded, so nothing is lost
@@ -962,7 +1196,7 @@ export default function Shell() {
         return failure(err)
       })
     return { done }
-  }, [askSource, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome])
+  }, [askSource, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked])
 
   function pickBoard(board) {
     const a = current.current
@@ -1019,6 +1253,8 @@ export default function Shell() {
           entries={collectionShown.entries} counts={collectionShown.counts} view={collectionShown.view} sources={collectionAll.sources}
           pickable={pickable} searching={Boolean(collectionSearch.trim())} addressed={arrangement.addressed === 'collection'}
           onAddress={focusBoard} onWrite={writeField} onView={(change) => setCollectionView((v) => ({ ...v, ...change }))} onShow={onShowCollection}
+          cards={collectionAll.cards} picked={pickedHere} onPick={onPick} onClearPicked={clearPicked}
+          onFind={(num) => { findPassage(num) }} onPrompt={toPrompt} rowOf={(n) => numbered.get(n) ?? null}
         />
       )
     }
@@ -1050,7 +1286,7 @@ export default function Shell() {
           it never loses the field's focus or what is typed. */}
       <div ref={dockSlot} className="ch-bar-host" />
       {!barWindow && createPortal(
-        <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} inspect={inspectedRow} onInspectClose={() => setInspected(null)}
+        <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)}
           keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory' } : null}
           onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)} />,
         barHost,

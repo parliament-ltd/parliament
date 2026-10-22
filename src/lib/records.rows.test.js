@@ -83,3 +83,18 @@ describe('the model\'s tagging (C136, C143 (e))', () => {
     expect((await db.get('conversations', a.id)).tags).toEqual(['birds', 'Essay'])
   })
 })
+
+describe('notes of their own (stage 6, piece 7; C145 (e), (g))', () => {
+  it('writes one with no chat, numbered, quoting what it names, and takes it back', async () => {
+    const note = await R.addOwnNote(db, { id: 'own-1', text: 'Thread', quotes: [201], now: at })
+    expect(note).toMatchObject({ conversationId: null, messageId: null, text: 'Thread', quotes: [201] })
+    expect(Number.isInteger(note.num)).toBe(true)
+    const summary = await R.addOwnNote(db, { id: 'own-2', text: 'In short', summary: { from: [201], at, model: 'claude-haiku' }, now: at })
+    expect((await db.get('notes', 'own-2')).summary).toEqual({ from: [201], at, model: 'claude-haiku' })
+    await R.removeOwnNote(db, { id: 'own-1', num: note.num, text: 'Thread' })
+    expect(await db.get('notes', 'own-1')).toBeUndefined()
+    // Changed since (tagged): undo stops rather than remove it.
+    await db.put('notes', { ...(await db.get('notes', 'own-2')), tags: ['essay'] })
+    await expect(R.removeOwnNote(db, { id: 'own-2', num: summary.num, text: 'In short' })).rejects.toMatchObject({ name: 'Changed' })
+  })
+})

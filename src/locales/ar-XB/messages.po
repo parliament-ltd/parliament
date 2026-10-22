@@ -290,6 +290,10 @@ msgid "board.welcome"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.aboutCard"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.answeredFrom"
 msgstr ""
 
@@ -326,6 +330,18 @@ msgid "chat.finishSettingHelp"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.quote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quoted"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quoteHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.sourceNothing"
 msgstr ""
 
@@ -346,8 +362,49 @@ msgstr ""
 msgid "chat.stoppedOnReply"
 msgstr ""
 
+#. {command} is a command, which stays English
+#. js-lingui-explicit-id
+msgid "collection.actHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actNewChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actNote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actNoteQuoting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actOneCall"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actPrompt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actPromptHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actSummarize"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actTag"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "collection.by"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.card"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -386,6 +443,10 @@ msgstr ""
 #. The collection favourites became (C20)
 #. js-lingui-explicit-id
 msgid "collection.favorites"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.findHelp"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -444,6 +505,26 @@ msgstr ""
 msgid "collection.plans"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "collection.quotedGone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.select"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.selectClear"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.selected"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.selectNone"
+msgstr ""
+
 #. open: stays English
 #. js-lingui-explicit-id
 msgid "collection.showHelp"
@@ -451,6 +532,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.source"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.summaryOf"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -486,7 +571,31 @@ msgid "collection.untitled"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "collection.writtenHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.yours"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "compare.close"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "compare.counts"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "compare.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "compare.legend"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "compare.same"
 msgstr ""
 
 #. A message's attachments, by name only; {names} is a list
@@ -790,6 +899,28 @@ msgid "enter.colsUnknown"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.compare"
+msgstr ""
+
+#. compare: stays English
+#. js-lingui-explicit-id
+msgid "enter.compareKinds"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.compareNothingSent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.compareSame"
+msgstr ""
+
+#. compare: stays English
+#. js-lingui-explicit-id
+msgid "enter.compareTwo"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.copied"
 msgstr ""
 
@@ -914,6 +1045,15 @@ msgid "enter.filterUntil"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.findGone"
+msgstr ""
+
+#. clear:filters stays English
+#. js-lingui-explicit-id
+msgid "enter.findHidden"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.focusAlone"
 msgstr ""
 
@@ -1027,6 +1167,37 @@ msgid "enter.inWhich"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.jumpCard"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.jumpNoChat"
+msgstr ""
+
+#. add: stays English
+#. js-lingui-explicit-id
+msgid "enter.jumpNotHeld"
+msgstr ""
+
+#. open: stays English
+#. js-lingui-explicit-id
+msgid "enter.jumpOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.jumpPassage"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.jumpRow"
+msgstr ""
+
+#. jump: stays English
+#. js-lingui-explicit-id
+msgid "enter.jumpWhere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.key"
 msgstr ""
 
@@ -1133,6 +1304,38 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.notCommand"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteAlone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteAloneQuoting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteInQuoting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteNeverSent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteWords"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1254,6 +1457,19 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.popSideThere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptAbout"
+msgstr ""
+
+#. api: stays English
+#. js-lingui-explicit-id
+msgid "enter.promptAboutNoKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptAboutQuotes"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1486,6 +1702,58 @@ msgid "enter.sourceUnreachable"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.summarize"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeFailed"
+msgstr ""
+
+#. summarize: stays English
+#. js-lingui-explicit-id
+msgid "enter.summarizeKinds"
+msgstr ""
+
+#. summarize: stays English
+#. js-lingui-explicit-id
+msgid "enter.summarizeMany"
+msgstr ""
+
+#. api: stays English
+#. js-lingui-explicit-id
+msgid "enter.summarizeNoKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeQuotes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeUnpriced"
+msgstr ""
+
+#. summarize: stays English
+#. js-lingui-explicit-id
+msgid "enter.summarizeWhere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeWriting"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.swapBoards"
 msgstr ""
 
@@ -1518,6 +1786,10 @@ msgid "enter.tagWhich"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.tagWords"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.takesExample"
 msgstr ""
 
@@ -1539,6 +1811,10 @@ msgstr ""
 #. {chat} is the chat's number, {room} the room's name (bar reference: → 201a in unnamed room)
 #. js-lingui-explicit-id
 msgid "enter.targetChatIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.targetNewChat"
 msgstr ""
 
 #. js-lingui-explicit-id

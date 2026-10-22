@@ -678,3 +678,32 @@ function byteSize(str) {
   if (!str) return 0
   return new Blob([String(str)]).size
 }
+
+// ── Notes of their own (stage 6, piece 7; C145 (e), (g)) ──
+
+/**
+ * A note written in the Collection or the bar, with no chat: in the person's
+ * words, quoting some numbers beneath it, or a dated summary of them.
+ * @param {{ id: string, text: string, quotes?: number[], summary?: { from: number[], at: string, model: string|null }|null, now: string }} note
+ * @returns {Promise<object>} the note as stored, with its number
+ */
+export async function addOwnNote(db, { id, text, quotes = [], summary = null, now }) {
+  const record = { id, conversationId: null, messageId: null, text, quotes, createdAt: now }
+  if (summary) record.summary = summary
+  return addNumbered(db, 'notes', record)
+}
+
+/**
+ * Takes back a note addOwnNote made, for undo:. If it has changed since
+ * (its words, its tags), nothing is removed and Changed is thrown.
+ */
+export async function removeOwnNote(db, { id, num, text }) {
+  return write(db, ['notes'], async (tx) => {
+    const store = tx.objectStore('notes')
+    const now = await store.get(id)
+    if (!now) return { result: null, changes: [] }
+    if (now.num !== num || now.text !== text || (now.tags ?? []).length) throw new Changed([num])
+    await store.delete(id)
+    return { result: null, changes: [{ kind: 'note', op: 'removed', id, num }] }
+  })
+}

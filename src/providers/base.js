@@ -69,6 +69,15 @@ export class BaseProvider {
     throw new Error('Not implemented')
   }
 
+  // summarize: on the Collection (stage 6, piece 7; C145 (g)): one paragraph
+  // bringing together some passages the person kept, each { label, text },
+  // from one lightweight call to the model getMetadataModel names. Returns
+  // the paragraph as text; throws when none came back. The passages are
+  // material, never instructions.
+  async summarize(apiKey, items) {
+    throw new Error('Not implemented')
+  }
+
   // The model that request goes to, so the Enter line can price it before
   // Enter (C83). null when not known.
   getMetadataModel() {
