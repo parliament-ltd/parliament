@@ -807,3 +807,78 @@ describe('close: and width: by a room\'s number, and close:welcome (stage 6, pie
     expect(at('>close:welcome').text).toBe('Welcome page is not open')
   })
 })
+
+describe('by: and who answers (stage 7, piece 1; C149, C150)', () => {
+  const metered = (i, o) => ({ type: 'metered', inputPerMillion: i, outputPerMillion: o })
+  const rows = {
+    model: [
+      { id: 'claude-opus-9', group: 'model', name: 'Opus 9', provider: 'anthropic', providerName: 'Anthropic', mark: '×5', later: false, needsKey: false },
+      { id: 'claude-haiku-9', group: 'model', name: 'Haiku 9', provider: 'anthropic', providerName: 'Anthropic', mark: '×1', later: false, needsKey: false },
+      { id: 'mistral', group: 'model', name: 'Mistral', provider: 'mistral', providerName: 'Mistral', mark: null, later: true, needsKey: false },
+    ],
+    local: [],
+    source: [
+      { id: 'wikipedia', group: 'source', name: 'Wikipedia', provider: 'wikipedia', providerName: 'Wikipedia', later: false, needsKey: false },
+      { id: 'hackernews', group: 'source', name: 'Hacker News', provider: 'hackernews', providerName: 'Hacker News', later: true, needsKey: false },
+    ],
+  }
+  const keyless = { ...rows, model: rows.model.map((r) => (r.later ? r : { ...r, needsKey: true })) }
+  const now = { id: 'wikipedia', group: 'source', name: 'Wikipedia', chosen: false }
+  const answering = (more = {}) => ({ room: 'c1', num: 204, now, rows, stored: null, ...more })
+  const at = (value, screens) => {
+    const p = preview(value, { mode: 'command', arrangement: shipped('almanac'), screens })
+    return { ...p, text: say(i18n, p.says.message, p.says.values) }
+  }
+
+  it('chooses one by any part of its name, for the chat the room shows', () => {
+    const p = at('>by:haiku', { answering: answering() })
+    expect(p.text).toBe('Enter has Haiku 9 answer in 204')
+    expect(p.act).toEqual({ kind: 'answerer', chatId: 'c1', id: 'claude-haiku-9', before: null })
+  })
+  it('holds a choice for the chat the next prompt starts, in a room with no chat yet', () => {
+    const p = at('>by:opus', { answering: answering({ room: null, num: null }) })
+    expect(p.text).toBe('Enter has Opus 9 answer the chat your next prompt starts')
+    expect(p.act).toMatchObject({ kind: 'answerer', chatId: null, id: 'claude-opus-9' })
+  })
+  it('alone, says who answers and shows who else can', () => {
+    const p = at('>by:', { answering: answering() })
+    expect(p.text).toBe('Wikipedia answers here. Enter shows who else can')
+    expect(p.act).toEqual({ kind: 'picker' })
+  })
+  it('refuses before Enter: a model with no key, one not built, several, none, or no room', () => {
+    expect(at('>by:haiku', { answering: answering({ rows: keyless }) }).text).toBe('Haiku 9 needs a key for Anthropic. api:anthropic adds one')
+    expect(at('>by:hacker', { answering: answering() }).text).toBe('Hacker News is not built yet')
+    expect(at('>by:haiku, wikipedia', { answering: answering() }).text).toBe('One prompt to several comes with branches. Choose one for now')
+    expect(at('>by:anthropic', { answering: answering() }).text).toBe('anthropic could be Opus 9 or Haiku 9. Say which, like by:"Opus 9"')
+    expect(at('>by:gpt', { answering: answering() }).text).toBe('Nothing called gpt can answer. by: shows who can')
+    expect(at('>by:haiku', { answering: answering({ room: undefined }) }).text).toBe('Prompts go to a room. room: opens one')
+    for (const v of ['>by:haiku, wikipedia', '>by:gpt']) expect(at(v, { answering: answering() }).act).toBeNull()
+  })
+  it('says when the one chosen answers already, and names what it replaces for undo:', () => {
+    const chosen = { id: 'claude-haiku-9', group: 'model', name: 'Haiku 9', chosen: true }
+    expect(at('>by:haiku', { answering: answering({ now: chosen, stored: 'claude-haiku-9' }) }).text).toBe('Haiku 9 answers here already')
+    expect(at('>by:wikipedia', { answering: answering({ now: chosen, stored: 'claude-haiku-9' }) }).act.before).toBe('claude-haiku-9')
+  })
+
+  const line = (text, target) => {
+    const p = promptPreview(text, target)
+    return { ...p, text: p.says ? say(i18n, p.says.message, p.says.values) : null }
+  }
+  const room = { room: 'c1', streaming: false, keyed: true, provider: 'Anthropic', source: 'Wikipedia', historyChars: 0, systemChars: 0 }
+  const model = { id: 'claude-haiku-9', group: 'model', name: 'Haiku 9', provider: 'anthropic', providerName: 'Anthropic', price: metered(1, 5) }
+
+  it('the Enter line names who answers, and prices it by that model', () => {
+    expect(line('x', { ...room, historyChars: 40_000 - 1, answerer: model }).text).toBe('Enter sends to Haiku 9, about 10,000 tokens, $0.01 to send')
+    expect(line('barn owl', { ...room, answerer: { id: 'wikipedia', group: 'source', name: 'Wikipedia' } }).text).toBe('Enter asks Wikipedia, which needs no key and costs nothing')
+  })
+  it('prices a long prompt at the higher price where a model has one', () => {
+    const tiered = { ...model, price: { ...metered(0.1, 0.5), over: { promptTokens: 100_000, inputPerMillion: 0.5, outputPerMillion: 2.5 } } }
+    expect(line('x', { ...room, historyChars: 40_000 - 1, answerer: tiered }).text).toBe('Enter sends to Haiku 9, about 10,000 tokens, under $0.01 to send')
+    expect(line('x', { ...room, historyChars: 800_000 - 1, answerer: tiered }).text).toBe('Enter sends to Haiku 9, about 200,000 tokens, $0.10 to send')
+  })
+  it('sends to no one else: a model with no key, one gone or one not built is refused', () => {
+    expect(line('owl', { ...room, keyed: false, answerer: { ...model, needsKey: true } })).toMatchObject({ ready: false, text: 'Haiku 9 answers here and needs a key for Anthropic. api:anthropic adds one, by: chooses another' })
+    expect(line('owl', { ...room, answerer: { ...model, gone: true } }).text).toBe('Haiku 9 is no longer offered. by: chooses who answers here')
+    expect(line('owl', { ...room, answerer: { id: 'hackernews', group: 'source', name: 'Hacker News', later: true } }).text).toBe('Hacker News answers here and is not built yet. by: chooses another')
+  })
+})

@@ -78,7 +78,7 @@ export function say(i18n, message, values = {}) {
     if (BOARD_VALUES.has(key)) words[key] = boardName(i18n, value)
     else if (key === 'boards') words[key] = joined(i18n, value.map((b) => boardName(i18n, b)), 'conjunction')
     else if (AND_LISTS.has(key)) words[key] = joined(i18n, value.map(String), 'conjunction')
-    else if (key === 'words') words[key] = joined(i18n, value, 'disjunction')
+    else if (key === 'words' || key === 'names') words[key] = joined(i18n, value, 'disjunction')
     else if (key === 'cost' && typeof value === 'number') words[key] = money(i18n, value)
     else if (PERCENTS.has(key) && typeof value === 'number') words[key] = percent(i18n, value)
     else if (key === 'day') words[key] = longDay(i18n, value)

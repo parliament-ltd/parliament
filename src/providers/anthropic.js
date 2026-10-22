@@ -1,5 +1,6 @@
 import { BaseProvider } from './base'
 import { evalMath } from '../lib/mathEval'
+import { findModel } from '../net/answerers'
 
 const API_BASE = 'https://api.anthropic.com/v1'
 const API_VERSION = '2023-06-01'
@@ -133,14 +134,38 @@ export function executeClientTool(toolName, toolInput) {
   return 'Unknown tool'
 }
 
+/* ── The models (stage 7, piece 1; C34, C151, C153) ──────────
+   Prices in US dollars per million tokens, from the provider's pricing page,
+   checked 22 October 2026 (platform.claude.com/docs/en/about-claude/pricing).
+   Every id here is a fixed snapshot, never an alias that moves.
+     current    in the picker. Older models stay in the list only to name and
+                price what they answered, and to read old short ids (aliases)
+                as the model they stood for when they were written
+     about      which line of the copy table says what it is good for
+     reference  the model cost marks compare with (settings spec §8: Haiku)
+     over       a higher price for a request whose prompt passes promptTokens */
+const metered = (inputPerMillion, outputPerMillion, over = null) => ({ type: 'metered', inputPerMillion, outputPerMillion, ...(over ? { over } : {}) })
+const MODELS = Object.freeze([
+  { id: 'claude-fable-5-1', apiId: 'claude-fable-5-1', name: 'Fable 5.1', about: 'fable', contextWindow: 1_000_000, cost: metered(10, 50) },
+  { id: 'claude-opus-5-5', apiId: 'claude-opus-5-5', name: 'Opus 5.5', about: 'opus', contextWindow: 1_000_000, cost: metered(4, 20) },
+  { id: 'claude-sonnet-5-5', apiId: 'claude-sonnet-5-5', name: 'Sonnet 5.5', about: 'sonnet', contextWindow: 1_000_000, cost: metered(2, 10) },
+  { id: 'claude-haiku-5-5', apiId: 'claude-haiku-5-5', name: 'Haiku 5.5', about: 'haiku', contextWindow: 1_000_000,
+    cost: metered(0.1, 0.5, { promptTokens: 100_000, inputPerMillion: 0.5, outputPerMillion: 2.5 }) },
+  // Older, still served: chats and Settings name them by the short ids of before.
+  { id: 'claude-haiku-4-5', apiId: 'claude-haiku-4-5-20251001', name: 'Haiku 4.5', about: 'haiku', contextWindow: 200_000, cost: metered(1, 5), current: false, reference: true, aliases: ['claude-haiku'] },
+  { id: 'claude-sonnet-4-6', apiId: 'claude-sonnet-4-6', name: 'Sonnet 4.6', about: 'sonnet', contextWindow: 1_000_000, cost: metered(3, 15), current: false, aliases: ['claude-sonnet'] },
+  { id: 'claude-opus-4-6', apiId: 'claude-opus-4-6', name: 'Opus 4.6', about: 'opus', contextWindow: 1_000_000, cost: metered(5, 25), current: false, aliases: ['claude-opus'] },
+  { id: 'claude-opus-4-7', apiId: 'claude-opus-4-7', name: 'Opus 4.7', about: 'opus', contextWindow: 1_000_000, cost: metered(5, 25), current: false },
+].map((m) => Object.freeze({ maker: 'Anthropic', current: true, reference: false, aliases: [], ...m })))
+
+// The model for the small requests: a key's check, a new chat's title,
+// summary and tags (C62), and summarize: (C145 (g)). The cheapest current
+// one (C154).
+const LIGHT_MODEL = 'claude-haiku-5-5'
+
 export class AnthropicProvider extends BaseProvider {
   getModels() {
-    return [
-      { id: 'claude-haiku',     apiId: 'claude-haiku-4-5-20251001', name: 'Claude Haiku',     contextWindow: 200000, cost: { type: 'metered', inputPerMillion: 0.25,  outputPerMillion: 1.25  } },
-      { id: 'claude-sonnet',    apiId: 'claude-sonnet-4-6',         name: 'Claude Sonnet',    contextWindow: 200000, cost: { type: 'metered', inputPerMillion: 3.00,  outputPerMillion: 15.00 } },
-      { id: 'claude-opus',      apiId: 'claude-opus-4-6',           name: 'Claude Opus 4.6',  contextWindow: 200000, cost: { type: 'metered', inputPerMillion: 15.00, outputPerMillion: 75.00 } },
-      { id: 'claude-opus-4-7',  apiId: 'claude-opus-4-7',           name: 'Claude Opus 4.7',  contextWindow: 200000, cost: { type: 'metered', inputPerMillion: 15.00, outputPerMillion: 75.00 } },
-    ]
+    return MODELS
   }
 
   /** Return tool definitions this provider supports. */
@@ -170,10 +195,9 @@ export class AnthropicProvider extends BaseProvider {
     ]
   }
 
-  // Resolve a short model ID (e.g. 'claude-sonnet') to the API model string
+  // The API's id for a model, by its id here or an old short id (C151).
   _resolveModel(model) {
-    const found = this.getModels().find(m => m.id === model || m.apiId === model)
-    return found ? found.apiId : model
+    return findModel(this.getModels(), model)?.apiId ?? model
   }
 
   // Common headers for all Anthropic API requests
@@ -192,7 +216,7 @@ export class AnthropicProvider extends BaseProvider {
       method: 'POST',
       headers: this._headers(apiKey),
       body: JSON.stringify({
-        model: this._resolveModel('claude-haiku'),
+        model: this._resolveModel(LIGHT_MODEL),
         max_tokens: maxTokens,
         system: systemPrompt,
         messages,
@@ -232,7 +256,7 @@ export class AnthropicProvider extends BaseProvider {
         method: 'POST',
         headers: this._headers(apiKey),
         body: JSON.stringify({
-          model: this._resolveModel('claude-haiku'),
+          model: this._resolveModel(LIGHT_MODEL),
           max_tokens: 1,
           messages: [{ role: 'user', content: 'hi' }],
         }),
@@ -568,7 +592,7 @@ export class AnthropicProvider extends BaseProvider {
 
   // The model the request above goes to, so the Enter line can price it.
   getMetadataModel() {
-    return 'claude-haiku'
+    return LIGHT_MODEL
   }
 
   async summarize(apiKey, items) {

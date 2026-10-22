@@ -471,11 +471,15 @@ function ApiSection({ apiKey, setApiKey, keyStatus, keyError, validateKey, valid
 // ─── Model Preferences ───────────────────────────────────
 
 function ModelSection({ selectedModel, setSelectedModel }) {
-  const providerModels = providerModelsOf(PROVIDER)
+  // The current lineup, and the model the default names when it is an older
+  // one: an old short id names the model it stood for (stage 7; C151).
+  const all = providerModelsOf(PROVIDER)
+  const selected = all.find((m) => m.id === selectedModel || m.apiId === selectedModel || (m.aliases ?? []).includes(selectedModel)) ?? null
+  const providerModels = all.filter((m) => m.current !== false || m === selected)
   return (
     <SettingsSection title="Model Preferences" subtitle="Choose your default model for new conversations">
       {providerModels.map((model) => {
-        const active = selectedModel === model.id
+        const active = selected?.id === model.id
         const meta = MODEL_DISPLAY_META[model.id] ?? { description: '', speed: '', badge: '' }
         const inputCost = formatModelCost(model.cost, 'input')
         const outputCost = formatModelCost(model.cost, 'output')

@@ -1231,10 +1231,54 @@ Found while splitting stage 6 into pieces. Read with C131 (Records, plan, keywor
 - **(e) The tag's word** is `favorite` in every language, so it matches across devices; it is shown as written, like any tag.
 - **Suggestion:** as above.
 - **Ruled 22 October: yes** ("agree with lean on favorites"). **Built so,** with one change to (b): a second click takes the tag off and the quote stays, since the heart cannot tell a quote it made from one the person kept on purpose; `erase:` removes it. (c) is built (`lib/favoriteTags.js`) and has not run: its dry run is shown on Stefan's data first, and it runs on his yes. Until then the heart still shows the old favourites and a click takes one back as before.
+- **Dry run, 22 October,** on the three backups of Stefan's on this machine (16 and 17 October, one of them the 21-chat backup the version 6 dry run used): none holds a favourite or a quote, so the conversion would change nothing in them. Favourites made since then would show only in a newer backup.
 
 **C134, as built (piece 3).** `undo:` takes back the last command line, whole: what it changed in rows, saved searches, the filters on Records and the space (boards, windows, the bar, columns). Kept for the tab, the last 50 lines. If something it changed has changed since (in another tab, say), undo stops there and says so rather than writing over it. Not taken back: a room's name (C40), what was sent or copied, and `erase:` (piece 4).
 
 **C142. Drawing only the rows on screen** (piece 2). Built: Records draws the rows in view and about a screen either side; the rest are blank space of the height they will take, measured once drawn, so the scroll bar stays true. Screen readers are told the whole count and each row's place. One trade: Tab moves through the rows that are drawn, and scrolling draws more. **Suggestion:** keep as built.
+
+## Part 12. Providers, sources and frameworks (added 22 October 2026)
+
+Found while splitting stage 7 into pieces. Read with C131 (Records, Framework). The documents: the plan's stage 7, the languages, providers and networks notes (LPN, C81), the security notes (§1 to §4), branch slider v9 (the picker), the settings spec (§8, keys and models), the editing spec (`collab:`, now `framework:`, and `helper:`), and the rulings since (C15, C27, C28, C33, C34, A8, A13, A14, C82 to C89, S1 to S3). Each is built as suggested, so a ruling changes one entry.
+
+**C148. Two groups in the picker, or three.** The plan's stage 7 (12 October) says "the picker in two groups (A14)", as branch slider v9 draws it: Models, with the local model among them marked free, and Sources, no tokens. A14 was ruled on 15 October as three groups: Models; On your machine; Sources, no tokens. A ruling beats the plan. **Built:** three groups, as ruled, and the plan's line corrected. A ruling for two moves the local models into Models, one entry in the picker.
+
+**C149. A command for choosing who answers.** Every marginalia has a command (editing spec), and "answered by" in the prompt field opens the picker, but no document gives its command. The nearby words are taken: `model:` narrows Records (C132 (g)), and a word may not narrow on one board and act on another (almanac spec §4); `ask:` would read as the editing spec's asks; `set:default haiku` (settings spec) changes the default for new chats, not this one.
+- **Suggestion:** `by:`, read as "answered by": `by:sonnet`, `by:wikipedia`, `by:hackernews`. It takes any part of a model's or a source's name, as `model:` does; where several match, the Enter line lists them. Bare `by:` says who answers here. A click on a row of the picker does the same at once, since it sends nothing and can be put back.
+- Several names (`by:sonnet, wikipedia`) would send one prompt to several, which is branches (stage 8). Until then the Enter line says so, and the picker's boxes take one tick at a time.
+
+**C150. Where the choice is kept.** A chat already keeps a `model` (since PR-16a: the model most recently used in it), and new chats take Settings' default. But the room in the shell sends every prompt with Settings' default whatever the chat says, and to Wikipedia whenever there is no key.
+- `model` cannot carry the choice: every chat is made with Settings' model in it, even one Wikipedia answers because there is no key, so it would read as chosen when it was not.
+- **Suggestion:** the choice belongs to the chat, in a new optional field, `answerer`: an id from the list, a model's (`claude-haiku-4-5`) or a source's (`wikipedia`), written only by `by:` or a click in the picker. A prompt goes to the chat's choice; a chat with none takes the default as today (Settings' model with a key, Wikipedia without), so nothing changes for a chat until someone chooses. In a room with no chat yet, the choice is held for the chat its next prompt starts. `model` keeps its meaning (the model last used). **The new field is shown at the checkpoint;** backups carry it and a restore checks it.
+- If the chosen model needs a key that is not there, the Enter line says so and nothing goes. A prompt is never sent to someone other than the one the line names.
+- `undo:` takes a choice back, as it does a pin.
+
+**C151. Old model ids, and a model the list no longer offers.** Chats, replies and Settings hold short ids from before (`claude-sonnet`, `claude-opus`, `claude-haiku`), each standing for one model when it was written (Sonnet 4.6, Opus 4.6, Haiku 4.5). The plan: "a stored default model is checked against the provider's list".
+- **Suggestion:** each old id is read as the model it stood for, never as the newest of its family, since a newer model is priced differently; nothing is rewritten. The picker lists the current lineup; older models stay in the list only to name and price what they answered.
+- A chat or a default naming a model the list no longer offers is named on the Enter line with what to do (`by:` to choose another), and nothing is changed or sent in its place.
+
+**C152. Auto.** The settings spec (§8) makes "Auto" the default: lookups go to a source at no cost, everything else to a named model. The almanac spec (§8) has the reference answer "already there when you stop typing", which breaks plan rule 1 (nothing is looked up while typing); Auto at Enter would still need a guess at what a prompt is.
+- **Suggestion:** no Auto in this stage. Who answers is chosen; with no choice, the default answers as today. Auto can come later as a row of the picker, named on the Enter line before anything goes.
+
+**C153. Cost marks, and which Haiku they compare with (C34).** The settings spec marks each model by its price per token beside Haiku's (Opus ×15, Sonnet ×3, Haiku 4.5 ×1). Prices checked on the provider's pricing page on 22 October, in US dollars per million tokens:
+
+| Model | In / out | Mark beside Haiku 4.5 |
+|---|---|---|
+| Fable 5.1 | 10 / 50 | ×10 |
+| Opus 5.5 | 4 / 20 | ×4 |
+| Sonnet 5.5 | 2 / 10 | ×2 |
+| Haiku 5.5 | 0.10 / 0.50; 0.50 / 2.50 for a prompt over 100,000 tokens | ×0.1 |
+| Haiku 4.5, older | 1 / 5 | ×1 |
+
+- The newest Haiku costs a tenth of Haiku 4.5, so beside it every other mark would grow tenfold (Fable ×100).
+- **Suggestion, built so:** marks keep comparing with Haiku 4.5's price, the yardstick every document draws, and keep it after Haiku 4.5 is retired, so marks do not move when the lineup does. The picker says so once, at its foot. Input and output prices are added into one mark, since the two stand in another ratio at other providers. Below ×1, one figure (×0.1).
+- Haiku 5.5's higher price for a long prompt is used by the Enter line, and by the costs on Records for each reply by its own input.
+- **Found and corrected:** the old list priced Haiku 4.5 at $0.25 and $1.25 (it is $1 and $5) and Opus 4.6 and 4.7 at $15 and $75 (they are $5 and $25), so the costs Records showed for replies from those models since stage 6 were wrong.
+- Not reflected: the provider's US-only processing (1.1×), cached input, and that its models from 4.7 on count about 30% more tokens for the same text, so the local estimate before Enter stays rough.
+
+**C154. The small requests move to Haiku 5.5.** A key's check, a new chat's one request for its title, summary and tags (C62), and `summarize:` went to Haiku 4.5, which the provider keeps "not sooner than October 15, 2026": it can be retired at any time, and those requests would then fail. **Built:** they go to Haiku 5.5, the newest and cheapest (a tenth of the price). The Enter line names their cost as before. A ruling for another model changes one line (`LIGHT_MODEL` in `providers/anthropic.js`).
+
+**C155. The default for new chats.** Settings' default model is read as stored. With none stored, the code's default is `claude-sonnet`, which C151 reads as Sonnet 4.6 ($3 in, $15 out); Sonnet 5.5 is newer and costs less ($2, $10). Changing the code's default would move anyone who never chose, Stefan perhaps included, without asking. **Suggestion:** leave it until ruled. Either choose Sonnet 5.5 (today's Settings, or `by:sonnet` for one chat), or make Sonnet 5.5 the default for whoever has not chosen.
 
 ## Proposed CLAUDE.md rewrite
 

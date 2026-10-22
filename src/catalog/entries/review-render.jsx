@@ -25,7 +25,7 @@ import { useChat } from '../../stores/ChatContext'
 import { useAnnotations } from '../../stores/AnnotationsContext'
 import { useConversations } from '../../stores/ConversationContext'
 import { useSettings } from '../../stores/SettingsContext'
-import { gateway, hasKey, models as providerModels, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../../net'
+import { gateway, hasKey, models as providerModels, findModel, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../../net'
 
 const DEFAULT_CONTEXT_WINDOW = 200_000
 
@@ -66,7 +66,7 @@ export default function ReviewRender({ config = {} } = {}) {
   // number, not the meter UI.
   const contextUsage = useMemo(() => {
     const models = providerModels(PROVIDER)
-    const modelInfo = models.find(m => m.id === settings.defaultModel) || models[0]
+    const modelInfo = findModel(models, settings.defaultModel) || models[0]
     const contextWindow = modelInfo?.contextWindow || DEFAULT_CONTEXT_WINDOW
     const totalTokens = (tokenUsage?.input || 0) + (tokenUsage?.output || 0)
     return contextWindow > 0

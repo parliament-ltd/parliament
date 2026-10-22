@@ -27,6 +27,7 @@ import { planNew, planAdd, planRm, planClear, planHeading, planMoveCard, planNam
 import { ROW_VERBS, isRowStep, planRowLine, planCopy, planErase, targetsOf } from '../lib/rowVerbs'
 import { planNote, planSummarize, planCompare, planJump } from '../lib/cardActs'
 import { exportItems, chatsOf, exportName } from '../lib/recordsExport'
+import { findAnswerers } from '../net/answerers'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
@@ -42,7 +43,8 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // erase: removes things for good, by number, on a line of its own (C137).
 // export: downloads rows as Markdown or JSONL (piece 5; C138).
 // new:collection, add:, rm: and heading: change a collection (piece 6; C144).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump'])
+// by: chooses who answers in the chat the room shows (stage 7; C149).
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -377,6 +379,36 @@ function planApi(a, step, screens = {}) {
 const typed = (arg) => (arg?.kind === 'text' ? arg.value : arg?.text ?? '')
 
 /**
+ * by: chooses who answers in the chat the room shows (stage 7, piece 1;
+ * C149, C150). Bare, it says who answers and shows the picker. One name at
+ * a time: several at once is branches (stage 8). A model that needs a key
+ * that is not here, or one not built yet, is refused before Enter.
+ * screens.answering: { room, num, now, rows }: the chat the room shows (null
+ * in an empty room, undefined with no room), its number, who answers it now
+ * (answerers.answererFor) and the picker's rows (answerers.answererRows).
+ */
+function planBy(a, step, screens = {}) {
+  const ans = screens.answering
+  if (!ans || ans.room === undefined) return { says: { message: 'promptNoRoom' }, act: null }
+  const args = step.match?.values ?? []
+  if (!args.length) return { says: { message: 'byHere', values: { name: ans.now.name } }, act: { kind: 'picker' } }
+  const items = args[0].kind === 'list' ? args[0].items : args
+  if (items.length > 1) return { says: { message: 'bySeveral' }, act: null }
+  const word = typed(items[0])
+  const found = findAnswerers(ans.rows, word)
+  if (!found.length) return { says: { message: 'byNone', values: { word } }, act: null }
+  if (found.length > 1) return { says: { message: 'byWhich', values: { word, names: found.map((r) => r.name), example: `by:"${found[0].name}"` } }, act: null }
+  const r = found[0]
+  if (r.later) return { says: { message: 'byLater', values: { name: r.name } }, act: null }
+  if (r.needsKey) return { says: { message: 'byNeedsKey', values: { name: r.name, provider: r.providerName, command: `api:${r.provider}` } }, act: null }
+  if (ans.now.chosen && ans.now.id === r.id) return { says: { message: 'bySame', values: { name: r.name } }, act: null }
+  return {
+    says: ans.room ? { message: 'byChat', values: { name: r.name, num: ans.num ?? '' } } : { message: 'byNext', values: { name: r.name } },
+    act: { kind: 'answerer', chatId: ans.room, id: r.id, before: ans.now.chosen ? ans.now.id : null },
+  }
+}
+
+/**
  * name:"…" names what the bar points at (C40). Built for a room: its name
  * is the person's own words, kept on the room. A chat by number
  * (name:207 "…") and collections come with the Almanac and the Collection
@@ -461,6 +493,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       summarize: (a1, s1, sc) => planSummarize(s1, sc, a1.addressed),
       compare: (a1, s1, sc) => planCompare(s1, sc),
       jump: (a1, s1, sc) => planJump(s1, sc, a1.addressed),
+      by: planBy,
     }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
@@ -584,14 +617,24 @@ export function promptPreview(text, target = {}) {
   // A key in a prompt would go to the model, or to a source as a search.
   if (holdsKey(prompt)) return { ready: false, says: { message: 'promptKey' } }
   if (target.keyed == null) return { ready: false, says: { message: 'promptChecking' } }
+  // Who answers (stage 7; C150): the chat's choice, or the default. Without
+  // one given, the default as stage 4 had it: the provider with a key, the
+  // source without.
+  const who = target.answerer ?? (target.keyed ? { group: 'model', name: target.provider } : { group: 'source', name: target.source })
   // About selected cards (C145 (h)): a model reads them, so a key is needed.
   const about = target.about ?? null
-  if (about && !target.keyed) return { ready: false, says: { message: 'promptAboutNoKey', values: { provider: target.provider } } }
-  if (!target.keyed) return { ready: true, says: { message: 'promptSource', values: { source: target.source } } }
+  if (about && (who.group === 'source' || who.needsKey)) return { ready: false, says: { message: 'promptAboutNoKey', values: { provider: target.provider } } }
+  // Never sent to someone other than the line names (C150, C151).
+  if (who.later) return { ready: false, says: { message: 'promptLater', values: { name: who.name } } }
+  if (who.gone) return { ready: false, says: { message: 'promptGone', values: { name: who.name } } }
+  if (who.needsKey) return { ready: false, says: { message: 'promptNeedsKey', values: { name: who.name, provider: who.providerName, command: `api:${who.provider}` } } }
+  if (who.group === 'source') return { ready: true, says: { message: 'promptSource', values: { source: who.name } } }
 
   const tokens = Math.ceil((prompt.length + (about?.chars ?? 0) + (target.historyChars ?? 0) + (target.systemChars ?? 0)) / CHARS_PER_TOKEN)
-  const cost = inputCost(tokens, target.perMillion)
-  const values = { provider: target.provider, tokens }
+  // A model priced higher for a long prompt (Haiku 5.5 above 100,000 tokens).
+  const price = who.price?.over && tokens > who.price.over.promptTokens ? who.price.over : who.price
+  const cost = inputCost(tokens, price?.inputPerMillion ?? target.perMillion)
+  const values = { provider: who.name, tokens }
   const also = []
   if (about) {
     also.push({ message: 'promptAbout', values: { count: about.nums.length } })

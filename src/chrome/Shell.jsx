@@ -14,7 +14,8 @@ import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
-import { hasKey, models, metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
+import { hasKey, metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels } from '../net'
+import AnswerPicker from './AnswerPicker'
 import { ignite } from './ignition'
 import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
 import { useChat } from '../stores/ChatContext'
@@ -374,7 +375,7 @@ export default function Shell() {
   const [saved, setSaved] = useState([]) // the saved searches (C140)
   const factsCache = useRef(null)
   if (!factsCache.current) factsCache.current = createFactsCache()
-  const priceOf = useCallback((id) => models(PROVIDER).find((m) => m.id === id || m.apiId === id)?.cost ?? null, [])
+  const priceOf = useCallback((id) => modelFacts(id)?.cost ?? null, [])
   useEffect(() => {
     if (!started || !db.current) return undefined
     let live = true
@@ -439,7 +440,7 @@ export default function Shell() {
       locale: i18n.locale,
       ctx: {
         roomLabel: (row) => (row.roomId ? roomNames.get(row.roomId) ?? '' : ''),
-        models: models(PROVIDER),
+        models: allModels(),
         sources: shippedEntries().filter((d) => d.kind === 'source').map((d) => ({ id: d.id, name: d.name })),
       },
     }
@@ -555,7 +556,7 @@ export default function Shell() {
   // messages being deleted, known while their chat is open here, stay out.
   const hiddenOf = useCallback((chatId) => new Set([...hiddenIds(chatId), ...pendingDeletes(chatId).map((d) => d.messageId)]), [])
   const exportWords = useCallback(() => {
-    const modelName = (id) => models(PROVIDER).find((m) => m.id === id || m.apiId === id)?.name ?? id ?? ''
+    const modelName = (id) => modelFacts(id)?.name ?? id ?? ''
     const today = new Date()
     const day = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
     return {
@@ -669,6 +670,15 @@ export default function Shell() {
   // each provider has one and its last four characters, read through the
   // key module; never a key.
   const [keyPanel, setKeyPanel] = useState(null) // { focus: provider id or null } while api: shows it
+
+  // ── Who answers (stage 7, piece 1; C149, C150) ────────
+  // by:, or a click in the picker under the bar, chooses who answers in the
+  // chat the room shows. In a room with no chat yet, the choice is held for
+  // the chat its next prompt starts.
+  const [picking, setPicking] = useState(false) // the picker under the bar
+  const [pendingAnswerer, setPendingAnswerer] = useState(null)
+  const pendingNow = useRef(null)
+  useEffect(() => { pendingNow.current = pendingAnswerer }, [pendingAnswerer])
   const [keyInfo, setKeyInfo] = useState(() => ({ keys: [], noKey: noKeyNeeded() }))
   const [keysRev, setKeysRev] = useState(0) // changes when a key is kept, so prompts look again
   const readKeys = useCallback(() => keyStatus().then((keys) => setKeyInfo({ keys, noKey: noKeyNeeded() }), () => {}), [])
@@ -926,8 +936,37 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'picker') {
+      // Bare by: shows who can answer, under the bar.
+      setInspected(null)
+      setCompared(null)
+      setKeyPanel(null)
+      setPicking(true)
+      remember(body)
+      return null
+    }
+    if (what.kind === 'answerer') {
+      // by: (C150): the chat's own choice, or held for the next chat.
+      if (what.chatId) {
+        let done
+        try {
+          done = await changeRecords(db.current, [{ store: 'conversations', id: what.chatId, set: { answerer: what.id }, expect: { answerer: what.before } }])
+        } catch (err) {
+          return err?.name === 'Changed' ? { message: 'rowsChanged', values: { nums: err.nums } } : 'answererFailed'
+        }
+        touched.current?.records.push(...done)
+        loadConversations().catch(() => {})
+      } else {
+        if (touched.current) touched.current.pending = { before: pendingNow.current }
+        setPendingAnswerer(what.id)
+      }
+      setPicking(false)
+      remember(body)
+      return null
+    }
     if (what.kind === 'keys') {
       setInspected(null)
+      setPicking(false)
       setKeyPanel({ focus: what.focus ?? null })
       readKeys()
       // Step 8 crosses off on seeing the panel (C120).
@@ -964,6 +1003,8 @@ export default function Shell() {
       } catch (err) {
         return stop(err?.name === 'Changed' ? { message: 'undoChanged', values: { nums: err.nums } } : 'undoFailed')
       }
+      // A chat's own fields (who answers it) are read from the chat list.
+      if (entry.records.some((r) => r.store === 'conversations')) loadConversations().catch(() => {})
     }
     if (entry.saved) {
       try {
@@ -993,6 +1034,7 @@ export default function Shell() {
       }
     }
     if (entry.view) showView(entry.view)
+    if (entry.pending) setPendingAnswerer(entry.pending.before)
     if (entry.arrangement) {
       const refused = await run(entry.arrangement, null)
       if (refused) return stop(refused)
@@ -1001,12 +1043,12 @@ export default function Shell() {
     setUndoTop(undoStack.current.at(-1)?.line ?? null)
     remember(body)
     return { done: true, says: { message: 'undone', values: { line: entry.line } } }
-  }, [remember, run, showView])
+  }, [remember, run, showView, loadConversations])
 
   const onRun = useCallback(async (next, body, go, what) => {
     if (what?.kind === 'undo') return undo(body)
     const before = { arrangement: current.current, view: viewNow.current }
-    touched.current = { records: [], saved: [], collections: [], created: [] }
+    touched.current = { records: [], saved: [], collections: [], created: [], pending: null }
     const out = what ? await act(what, body, next) : await run(next, body)
     const t = touched.current
     touched.current = null
@@ -1025,7 +1067,8 @@ export default function Shell() {
     if (t.saved.length) entry.saved = t.saved
     if (t.collections.length) entry.collections = t.collections
     if (t.created.length) entry.created = t.created
-    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections || entry.created)) {
+    if (t.pending) entry.pending = t.pending
+    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections || entry.created || entry.pending)) {
       undoStack.current = [...undoStack.current, entry].slice(-UNDO_MAX)
       setUndoTop(body)
     }
@@ -1087,13 +1130,20 @@ export default function Shell() {
       stacked: getComputedStyle(stage).flexDirection === 'column',
     }
   }, [])
-  const helper = useMemo(() => ({ keyed, provider: destination(PROVIDER)?.name, price: models(PROVIDER).find((m) => m.id === metadataModel(PROVIDER))?.cost ?? null }), [keyed])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper])
+  const roomRecord = roomId ? conversations.find((c) => c.id === roomId) ?? null : null
+  const keyedBy = useMemo(() => ({ [PROVIDER]: Boolean(keyed) }), [keyed])
+  // The chat's own choice, or the one held for the chat the next prompt starts.
+  const chosenHere = roomId ? roomRecord?.answerer ?? null : pendingAnswerer
+  const answerer = useMemo(() => answererOf({ chosen: chosenHere, keyed: keyedBy, defaultModel: settings.defaultModel }), [chosenHere, keyedBy, settings.defaultModel])
+  const answerRows = useMemo(() => pickerRows(keyedBy), [keyedBy])
+  // The model cost marks compare with, named once in the picker (settings spec §8).
+  const referenceName = useMemo(() => allModels().find((m) => m.reference)?.name ?? null, [])
+  const answering = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: answerer, rows: answerRows, stored: chosenHere }), [roomId, roomRecord, answerer, answerRows, chosenHere])
+  const helper = useMemo(() => ({ keyed, provider: destination(PROVIDER)?.name, price: modelFacts(metadataModel(PROVIDER))?.cost ?? null }), [keyed])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
-  const model = useMemo(() => models(PROVIDER).find((m) => m.id === settings.defaultModel) ?? null, [settings.defaultModel])
-  const roomRecord = roomId ? conversations.find((c) => c.id === roomId) ?? null : null
   // What would go along: the chat's messages, less what is hidden or being
   // deleted, which are not sent.
   const shown = roomId && activeConversationId === roomId ? messages : NONE
@@ -1109,7 +1159,7 @@ export default function Shell() {
   }, [kept])
   // A chat's first prompt is followed, with a key, by one request for its
   // title, summary and tags, unless turned off in Settings (C62).
-  const describeModel = useMemo(() => models(PROVIDER).find((m) => m.id === metadataModel(PROVIDER)) ?? null, [])
+  const describeModel = useMemo(() => modelFacts(metadataModel(PROVIDER)), [])
   const firstPrompt = roomId === null || (Boolean(roomId) && activeConversationId === roomId && messages.length === 0)
   const describes = Boolean(keyed && firstPrompt && settings.describeNewChats !== false)
   const describe = useMemo(() => (describes ? { price: describeModel?.cost ?? null } : null), [describes, describeModel])
@@ -1132,10 +1182,11 @@ export default function Shell() {
     keyed,
     provider: destination(PROVIDER)?.name,
     source: destination(SOURCE)?.name,
-    model: model?.name ?? settings.defaultModel,
+    model: answerer.name,
+    answerer,
     historyChars: about ? 0 : historyChars(along),
     systemChars: keyed ? buildSystemPrompt().length : 0,
-    perMillion: model?.cost?.inputPerMillion ?? null,
+    perMillion: answerer.price?.inputPerMillion ?? null,
     hiddenOut: about ? 0 : hiddenOut,
     sourcesOut: about ? NO_SOURCES : sourcesOut,
     describe: about ? describeFresh : describe,
@@ -1143,7 +1194,7 @@ export default function Shell() {
     ink,
     roomName: roomNameHere,
     about,
-  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, model, settings.defaultModel, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, buildSystemPrompt, about])
+  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, buildSystemPrompt, about])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -1159,14 +1210,20 @@ export default function Shell() {
     // The line named a recipient; if that has changed since, say so first.
     const fresh = await hasKey().then(Boolean, () => false)
     if (fresh !== shown?.keyed) { setKeyed(fresh); return { refused: 'promptChanged' } }
+    // Who answers, read again: the line named them, and no one else is sent
+    // to (C150).
+    const conv = chatId ? await getConversation(chatId).catch(() => null) : null
+    const who = answererOf({ chosen: chatId ? conv?.answerer ?? null : pendingNow.current, keyed: { [PROVIDER]: fresh }, defaultModel: latest.current.settings.defaultModel })
+    if (shown?.answerer && who.id !== shown.answerer.id) return { refused: 'promptChanged' }
+    if (who.later || who.gone || who.needsKey) return { refused: 'promptChanged' }
 
     // Nothing typed, and the last reply here stalled: send it again without
     // streaming, as the Enter line offered (C114).
     if (!text) {
-      if (!shown?.resend || !chatId || !fresh) return { refused: 'promptFailed' }
+      if (!shown?.resend || !chatId || !fresh || who.group !== 'model') return { refused: 'promptFailed' }
       setStalledIn(null)
-      const { settings: s, buildSystemPrompt: system } = latest.current
-      const done = resendWhole(chatId, s.defaultModel, system())
+      const { buildSystemPrompt: system } = latest.current
+      const done = resendWhole(chatId, who.id, system())
         .then(() => { loadConversations().catch(() => {}); return null })
         .catch(failure)
       return { done }
@@ -1178,7 +1235,8 @@ export default function Shell() {
     if (!id) {
       creating.current = true
       try {
-        const chat = await createConversation({ title: titleFromPrompt(text), model: latest.current.settings.defaultModel })
+        const chat = await createConversation({ title: titleFromPrompt(text), model: latest.current.settings.defaultModel, answerer: who.chosen ? who.id : null })
+        setPendingAnswerer(null)
         await assignDefaultRoom(chat.id)
         id = chat.id
         const placed = planRoom(current.current, id)
@@ -1193,10 +1251,10 @@ export default function Shell() {
     const full = aboutNow ? `${aboutNow.text}\n\n${text}` : text
     if (aboutNow) clearPicked()
     const send = () => {
-      const { settings: s, buildSystemPrompt: system, locale } = latest.current
-      return fresh
-        ? sendMessage(id, full, s.defaultModel, system())
-        : askSource(id, text, { source: SOURCE, lang: sourceLocale(locale) })
+      const { buildSystemPrompt: system, locale } = latest.current
+      return who.group === 'model'
+        ? sendMessage(id, full, who.id, system())
+        : askSource(id, text, { source: who.id, lang: sourceLocale(locale) })
     }
     // A new room sends once its messages are loaded, so nothing is lost
     // between the two.
@@ -1213,6 +1271,22 @@ export default function Shell() {
       })
     return { done }
   }, [askSource, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked])
+
+  const screensNow = useRef(null)
+  useEffect(() => { screensNow.current = screens }, [screens])
+  const pickAnswerer = useCallback(async (row) => {
+    if (row.later) return
+    if (row.needsKey) { setPicking(false); writeField(`>api:${row.provider}`); return }
+    const p = preview(`>by:${row.id}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
+    if (!p.act) { setPicking(false); return }
+    await onRun(p.next ?? null, `by:${row.id}`, null, p.act)
+  }, [onRun, writeField])
+  const togglePicker = useCallback(() => {
+    setInspected(null)
+    setCompared(null)
+    setKeyPanel(null)
+    setPicking((was) => !was)
+  }, [])
 
   function pickBoard(board) {
     const a = current.current
@@ -1305,7 +1379,8 @@ export default function Shell() {
       {!barWindow && createPortal(
         <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)}
           keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory' } : null}
-          onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)} />,
+          onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)}
+          picker={picking ? { rows: answerRows, now: answerer, reference: referenceName } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => setPicking(false)} />,
         barHost,
       )}
       {barWindow && <p className="ch-away ch-marg">{i18n._(COPY.shell.barAway)}</p>}

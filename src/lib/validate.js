@@ -61,6 +61,11 @@ function validateConversation(item) {
   if (item.room !== undefined && !isStringOrNull(item.room, 128)) {
     return 'conversation.room invalid'
   }
+  // Who answers in the chat, an id from the list of models and sources
+  // (stage 7; C150). Optional; null or missing means the default answers.
+  if (item.answerer != null && !(typeof item.answerer === 'string' && /^[a-z0-9][a-z0-9._:-]{0,99}$/.test(item.answerer))) {
+    return 'conversation.answerer invalid'
+  }
   return rowFields(item, 'conversation')
 }
 

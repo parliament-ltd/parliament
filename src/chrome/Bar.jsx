@@ -15,6 +15,7 @@ import Reference from './Reference'
 import Inspect from './Inspect'
 import Compare from './Compare'
 import KeyPanel from './KeyPanel'
+import AnswerPicker from './AnswerPicker'
 
 // One bar: the field, its Enter line and the ? reference, pointed at one
 // board. The page has one, and so does every popped window (C6: each window
@@ -46,7 +47,7 @@ import KeyPanel from './KeyPanel'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, onSearch, searches = {}, searchCounts = {} }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, picker = null, onPicker = null, onPickAnswerer, onPickerClose, onSearch, searches = {}, searchCounts = {} }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -162,12 +163,14 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   const planned = prompting ? promptView.says : (view.says.message === 'popCommand' && !onTop ? { ...view.says, also: 'popOrdinary' } : view.says)
   const says = notice ? (typeof notice === 'string' ? { message: notice } : notice) : planned
 
-  // Who answers a prompt here, inside the prompt field.
+  // Who answers a prompt here, inside the prompt field: the chat's choice
+  // or the default (stage 7; C150). A click shows who else can.
   let marginalia = null
   if (prompt && prompt.room !== undefined && prompt.keyed != null) {
-    marginalia = prompt.keyed
-      ? i18n._(COPY.field.answeredBy, { model: prompt.model })
-      : i18n._(COPY.field.answeredFrom, { source: prompt.source })
+    const who = prompt.answerer ?? (prompt.keyed ? { group: 'model', name: prompt.model } : { group: 'source', name: prompt.source })
+    marginalia = who.group === 'source'
+      ? i18n._(COPY.field.answeredFrom, { source: who.name })
+      : i18n._(COPY.field.answeredBy, { model: who.name })
   }
   const room = prompt && prompt.room !== undefined
     ? { chat: prompt.chat ?? null, name: prompt.room ? roomLabel(i18n, prompt.roomName ?? null) : null, fresh: Boolean(prompt.about) }
@@ -214,6 +217,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       if (inspect) { onInspectClose?.(); return }
       if (compare) { onCompareClose?.(); return }
       if (keyPanel) { onKeysClose?.(); return }
+      if (picker) { onPickerClose?.(); return }
       // The field's rule first, then the caret: moving the caret blurs the
       // field, which would otherwise come before the Escape.
       dispatch({ type: 'escape' })
@@ -254,6 +258,8 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           folded={folded}
           win={win}
           marginalia={marginalia}
+          onMarginalia={onPicker}
+          marginaliaOpen={Boolean(picker)}
           ink={prompt?.room !== undefined ? prompt?.ink ?? null : null}
           inkKey={prompt?.room ?? null}
           onOpen={() => { dispatch({ type: 'open' }); input.current?.focus() }}
@@ -275,6 +281,9 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
         {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
         {!reference && inspect && <Inspect row={inspect} />}
         {!reference && !inspect && compare && <Compare a={compare.a} b={compare.b} />}
+        {!reference && !inspect && !compare && !keyPanel && picker && (
+          <AnswerPicker rows={picker.rows} now={picker.now} reference={picker.reference} onPick={onPickAnswerer} />
+        )}
         {!reference && !inspect && !compare && keyPanel && (
           <KeyPanel
             keys={keyPanel.keys}

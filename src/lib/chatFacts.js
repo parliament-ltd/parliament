@@ -60,7 +60,10 @@ export function costOf(facts, priceOf) {
   if (!facts || facts.unpriced > 0) return null
   let total = 0
   for (const u of facts.usage) {
-    const price = priceOf?.(u.model)
+    // A model priced higher for a long prompt is priced by each reply's own
+    // input (stage 7; Haiku 5.5 above 100,000 tokens).
+    const base = priceOf?.(u.model)
+    const price = base?.over && u.input > base.over.promptTokens ? base.over : base
     if (typeof price?.inputPerMillion !== 'number' || typeof price?.outputPerMillion !== 'number') return null
     total += (u.input * price.inputPerMillion + u.output * price.outputPerMillion) / 1_000_000
   }

@@ -15,7 +15,9 @@
 export const FIELDS = Object.freeze({
   conversations: ['id', 'title', 'model', 'parentId', 'parentTitle', 'branchPoint', 'familyId', 'createdInMode', 'room',
     'pinned', 'storageBytes', 'createdAt', 'updatedAt', 'tags', 'tagsBy', 'aiSummary',
-    'num', 'docketId', 'branch', 'run', 'restoredFrom', 'archived', 'tagsMine'],
+    'num', 'docketId', 'branch', 'run', 'restoredFrom', 'archived', 'tagsMine',
+    // answerer: who answers in the chat, when someone chose (stage 7; C150).
+    'answerer'],
   // model and usage: what a reply was made with and its tokens (C132 (h), stage 6).
   messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta', 'stopReason', 'source', 'model', 'usage'],
   // quotes: the numbers a note quotes beneath it; summary: a dated summary

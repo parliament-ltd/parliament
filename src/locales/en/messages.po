@@ -714,6 +714,10 @@ msgid "enter.aloneSpends"
 msgstr "{verb} runs on a line of its own, so its Enter line can name who receives it and what it costs"
 
 #. js-lingui-explicit-id
+msgid "enter.answererFailed"
+msgstr "The choice was not kept. Try again"
+
+#. js-lingui-explicit-id
 msgid "enter.apiAdd"
 msgstr "Enter opens the {provider} key field. Never type a key here"
 
@@ -783,8 +787,46 @@ msgid "enter.bringHere"
 msgstr "Everything it brings is here already"
 
 #. js-lingui-explicit-id
+msgid "enter.byChat"
+msgstr "Enter has {name} answer in {num}"
+
+#. js-lingui-explicit-id
+msgid "enter.byHere"
+msgstr "{name} answers here. Enter shows who else can"
+
+#. js-lingui-explicit-id
+msgid "enter.byLater"
+msgstr "{name} is not built yet"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.byNeedsKey"
+msgstr "{name} needs a key for {provider}. {command} adds one"
+
+#. js-lingui-explicit-id
+msgid "enter.byNext"
+msgstr "Enter has {name} answer the chat your next prompt starts"
+
+#. js-lingui-explicit-id
+msgid "enter.byNone"
+msgstr "Nothing called {word} can answer. by: shows who can"
+
+#. js-lingui-explicit-id
 msgid "enter.byNumber"
 msgstr "This takes numbers, like 207, 216 or 201b"
+
+#. js-lingui-explicit-id
+msgid "enter.bySame"
+msgstr "{name} answers here already"
+
+#. js-lingui-explicit-id
+msgid "enter.bySeveral"
+msgstr "One prompt to several comes with branches. Choose one for now"
+
+#. {names} is a list joined with "or"
+#. js-lingui-explicit-id
+msgid "enter.byWhich"
+msgstr "{word} could be {names}. Say which, like {example}"
 
 #. js-lingui-explicit-id
 msgid "enter.clearFilter"
@@ -1537,6 +1579,11 @@ msgstr "After the answer, one short request for its title, summary and tags"
 msgid "enter.promptFailed"
 msgstr "The prompt did not go through. Try again"
 
+#. C151: a chat or a default naming a model the list no longer has
+#. js-lingui-explicit-id
+msgid "enter.promptGone"
+msgstr "{name} is no longer offered. by: chooses who answers here"
+
 #. Hidden messages, and messages being deleted, are not sent (stage 4)
 #. js-lingui-explicit-id
 msgid "enter.promptHiddenOut"
@@ -1545,6 +1592,15 @@ msgstr "{count, plural, one {# hidden message stays out} other {# hidden message
 #. js-lingui-explicit-id
 msgid "enter.promptKey"
 msgstr "This looks like a key, which would be sent with the prompt. Delete it, and api: opens the key field"
+
+#. js-lingui-explicit-id
+msgid "enter.promptLater"
+msgstr "{name} answers here and is not built yet. by: chooses another"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptNeedsKey"
+msgstr "{name} answers here and needs a key for {provider}. {command} adds one, by: chooses another"
 
 #. js-lingui-explicit-id
 msgid "enter.promptNoRoom"
@@ -1994,6 +2050,11 @@ msgstr "answered by {model}"
 msgid "field.answeredFrom"
 msgstr "answered from {source}"
 
+#. Shown on hover over who answers, in the prompt field
+#. js-lingui-explicit-id
+msgid "field.answeredHelp"
+msgstr "Choose who answers here (by:)"
+
 #. js-lingui-explicit-id
 msgid "group.building"
 msgstr "Building rooms"
@@ -2425,6 +2486,94 @@ msgid "mode.search"
 msgstr "Search"
 
 #. js-lingui-explicit-id
+msgid "picker.about.fable"
+msgstr "The costliest model here."
+
+#. js-lingui-explicit-id
+msgid "picker.about.hackernews"
+msgstr "What people have said about something. Discussion, not answers."
+
+#. js-lingui-explicit-id
+msgid "picker.about.haiku"
+msgstr "Quickest and cheapest. Good for short, plain questions."
+
+#. js-lingui-explicit-id
+msgid "picker.about.mistral"
+msgstr "Models with a choice of where your prompts are processed."
+
+#. js-lingui-explicit-id
+msgid "picker.about.ollama"
+msgstr "Runs on your machine. No key, no network, costs electricity."
+
+#. js-lingui-explicit-id
+msgid "picker.about.openalex"
+msgstr "Scholarly papers: titles, authors, years and abstracts."
+
+#. js-lingui-explicit-id
+msgid "picker.about.opus"
+msgstr "Slow and costly. Worth it for hard reasoning, wasteful otherwise."
+
+#. js-lingui-explicit-id
+msgid "picker.about.sonnet"
+msgstr "Balanced for most work."
+
+#. js-lingui-explicit-id
+msgid "picker.about.wikipedia"
+msgstr "Reads the article directly, in your language. No model, so nothing is spent."
+
+#. A model whose provider has no key here; a click writes api:
+#. js-lingui-explicit-id
+msgid "picker.addKey"
+msgstr "add a key"
+
+#. js-lingui-explicit-id
+msgid "picker.kind.discussion"
+msgstr "Web and discussion"
+
+#. Sources by the kind of question they answer (branch slider v9)
+#. js-lingui-explicit-id
+msgid "picker.kind.reference"
+msgstr "Reference"
+
+#. js-lingui-explicit-id
+msgid "picker.kind.research"
+msgstr "Research"
+
+#. A row not built yet
+#. js-lingui-explicit-id
+msgid "picker.later"
+msgstr "later"
+
+#. Models that run on this computer (A14)
+#. js-lingui-explicit-id
+msgid "picker.local"
+msgstr "On your machine"
+
+#. {reference} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "picker.marks"
+msgstr "Marks compare cost per token with {reference}."
+
+#. A group in the picker of who answers
+#. js-lingui-explicit-id
+msgid "picker.models"
+msgstr "Models"
+
+#. Beside the Sources group
+#. js-lingui-explicit-id
+msgid "picker.noTokens"
+msgstr "no tokens, no key"
+
+#. js-lingui-explicit-id
+msgid "picker.oneAtATime"
+msgstr "One answers at a time until branches come."
+
+#. Answers from public sources, with no model
+#. js-lingui-explicit-id
+msgid "picker.sources"
+msgstr "Sources"
+
+#. js-lingui-explicit-id
 msgid "room.empty"
 msgstr "An empty room. Its first prompt, written in the bar, starts its chat."
 
@@ -2662,6 +2811,10 @@ msgstr "Download a backup of everything but your keys"
 #. js-lingui-explicit-id
 msgid "verb.bar"
 msgstr "Move the bar on the page"
+
+#. js-lingui-explicit-id
+msgid "verb.by"
+msgstr "Choose who answers in this chat: a model, or a source with no tokens"
 
 #. js-lingui-explicit-id
 msgid "verb.calm"

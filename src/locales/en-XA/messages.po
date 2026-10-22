@@ -714,6 +714,10 @@ msgid "enter.aloneSpends"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.answererFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.apiAdd"
 msgstr ""
 
@@ -783,7 +787,45 @@ msgid "enter.bringHere"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.byChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.byHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.byLater"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.byNeedsKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.byNext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.byNone"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.byNumber"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.bySame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.bySeveral"
+msgstr ""
+
+#. {names} is a list joined with "or"
+#. js-lingui-explicit-id
+msgid "enter.byWhich"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1537,6 +1579,11 @@ msgstr ""
 msgid "enter.promptFailed"
 msgstr ""
 
+#. C151: a chat or a default naming a model the list no longer has
+#. js-lingui-explicit-id
+msgid "enter.promptGone"
+msgstr ""
+
 #. Hidden messages, and messages being deleted, are not sent (stage 4)
 #. js-lingui-explicit-id
 msgid "enter.promptHiddenOut"
@@ -1544,6 +1591,15 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptLater"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptNeedsKey"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1994,6 +2050,11 @@ msgstr ""
 msgid "field.answeredFrom"
 msgstr ""
 
+#. Shown on hover over who answers, in the prompt field
+#. js-lingui-explicit-id
+msgid "field.answeredHelp"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "group.building"
 msgstr ""
@@ -2425,6 +2486,94 @@ msgid "mode.search"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "picker.about.fable"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.hackernews"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.haiku"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.mistral"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.ollama"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.openalex"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.opus"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.sonnet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.wikipedia"
+msgstr ""
+
+#. A model whose provider has no key here; a click writes api:
+#. js-lingui-explicit-id
+msgid "picker.addKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.kind.discussion"
+msgstr ""
+
+#. Sources by the kind of question they answer (branch slider v9)
+#. js-lingui-explicit-id
+msgid "picker.kind.reference"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.kind.research"
+msgstr ""
+
+#. A row not built yet
+#. js-lingui-explicit-id
+msgid "picker.later"
+msgstr ""
+
+#. Models that run on this computer (A14)
+#. js-lingui-explicit-id
+msgid "picker.local"
+msgstr ""
+
+#. {reference} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "picker.marks"
+msgstr ""
+
+#. A group in the picker of who answers
+#. js-lingui-explicit-id
+msgid "picker.models"
+msgstr ""
+
+#. Beside the Sources group
+#. js-lingui-explicit-id
+msgid "picker.noTokens"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.oneAtATime"
+msgstr ""
+
+#. Answers from public sources, with no model
+#. js-lingui-explicit-id
+msgid "picker.sources"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "room.empty"
 msgstr ""
 
@@ -2661,6 +2810,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.bar"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.by"
 msgstr ""
 
 #. js-lingui-explicit-id

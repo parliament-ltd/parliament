@@ -485,6 +485,21 @@ export const COPY = {
     keyRefused: /*i18n*/ { id: 'enter.keyRefused', message: 'The key was refused. Update it in {board}, then send again', comment: '{board} is Settings, from COPY.boards' },
     tooMany: /*i18n*/ { id: 'enter.tooMany', message: 'Too many requests for now. Wait a moment, then send again' },
     promptFailed: /*i18n*/ { id: 'enter.promptFailed', message: 'The prompt did not go through. Try again' },
+    // Who answers (stage 7, piece 1; C149 to C151). {name} is a model's or a
+    // source's name, {provider} a provider's, both from the list.
+    promptNeedsKey: /*i18n*/ { id: 'enter.promptNeedsKey', message: '{name} answers here and needs a key for {provider}. {command} adds one, by: chooses another', comment: 'Commands stay English' },
+    promptGone: /*i18n*/ { id: 'enter.promptGone', message: '{name} is no longer offered. by: chooses who answers here', comment: 'C151: a chat or a default naming a model the list no longer has' },
+    promptLater: /*i18n*/ { id: 'enter.promptLater', message: '{name} answers here and is not built yet. by: chooses another' },
+    byHere: /*i18n*/ { id: 'enter.byHere', message: '{name} answers here. Enter shows who else can' },
+    byChat: /*i18n*/ { id: 'enter.byChat', message: 'Enter has {name} answer in {num}' },
+    byNext: /*i18n*/ { id: 'enter.byNext', message: 'Enter has {name} answer the chat your next prompt starts' },
+    bySame: /*i18n*/ { id: 'enter.bySame', message: '{name} answers here already' },
+    byNeedsKey: /*i18n*/ { id: 'enter.byNeedsKey', message: '{name} needs a key for {provider}. {command} adds one', comment: 'Commands stay English' },
+    byLater: /*i18n*/ { id: 'enter.byLater', message: '{name} is not built yet' },
+    byNone: /*i18n*/ { id: 'enter.byNone', message: 'Nothing called {word} can answer. by: shows who can' },
+    byWhich: /*i18n*/ { id: 'enter.byWhich', message: '{word} could be {names}. Say which, like {example}', comment: '{names} is a list joined with "or"' },
+    bySeveral: /*i18n*/ { id: 'enter.bySeveral', message: 'One prompt to several comes with branches. Choose one for now' },
+    answererFailed: /*i18n*/ { id: 'enter.answererFailed', message: 'The choice was not kept. Try again' },
     // C114: a reply that stalled, and the offer to send it again.
     promptStalled: /*i18n*/ { id: 'enter.promptStalled', message: 'The reply stalled, as happens on networks that hold streamed replies' },
     promptResend: /*i18n*/ {
@@ -508,6 +523,7 @@ export const COPY = {
   field: {
     answeredFrom: /*i18n*/ { id: 'field.answeredFrom', message: 'answered from {source}' },
     answeredBy: /*i18n*/ { id: 'field.answeredBy', message: 'answered by {model}' },
+    answeredHelp: /*i18n*/ { id: 'field.answeredHelp', message: 'Choose who answers here (by:)', comment: 'Shown on hover over who answers, in the prompt field' },
   },
 
   // The welcome page (stage 5; welcome spec, welcome v9). The letter is v9's,
@@ -754,6 +770,38 @@ export const COPY = {
   // calls each block, layout and theme, and what it says about each, keyed
   // by the name in its manifest. The manifests keep their own English for
   // the code; these are what people read, and what is translated.
+  // Who can answer: the picker under the field (stage 7, piece 1; A14,
+  // C148, C149). Model and source names come from the list, never here.
+  picker: {
+    models: /*i18n*/ { id: 'picker.models', message: 'Models', comment: 'A group in the picker of who answers' },
+    local: /*i18n*/ { id: 'picker.local', message: 'On your machine', comment: 'Models that run on this computer (A14)' },
+    sources: /*i18n*/ { id: 'picker.sources', message: 'Sources', comment: 'Answers from public sources, with no model' },
+    noTokens: /*i18n*/ { id: 'picker.noTokens', message: 'no tokens, no key', comment: 'Beside the Sources group' },
+    later: /*i18n*/ { id: 'picker.later', message: 'later', comment: 'A row not built yet' },
+    addKey: /*i18n*/ { id: 'picker.addKey', message: 'add a key', comment: 'A model whose provider has no key here; a click writes api:' },
+    marks: /*i18n*/ { id: 'picker.marks', message: 'Marks compare cost per token with {reference}.', comment: '{reference} is a model name, from the list' },
+    oneAtATime: /*i18n*/ { id: 'picker.oneAtATime', message: 'One answers at a time until branches come.' },
+  },
+  // Sources in the picker by the kind of question they answer.
+  pickerKinds: {
+    reference: /*i18n*/ { id: 'picker.kind.reference', message: 'Reference', comment: 'Sources by the kind of question they answer (branch slider v9)' },
+    research: /*i18n*/ { id: 'picker.kind.research', message: 'Research' },
+    discussion: /*i18n*/ { id: 'picker.kind.discussion', message: 'Web and discussion' },
+  },
+  // One line in the picker on what each is good for. Models by family, so a
+  // new version keeps its line; providers not built yet and sources by id.
+  pickerAbout: {
+    fable: /*i18n*/ { id: 'picker.about.fable', message: 'The costliest model here.' },
+    opus: /*i18n*/ { id: 'picker.about.opus', message: 'Slow and costly. Worth it for hard reasoning, wasteful otherwise.' },
+    sonnet: /*i18n*/ { id: 'picker.about.sonnet', message: 'Balanced for most work.' },
+    haiku: /*i18n*/ { id: 'picker.about.haiku', message: 'Quickest and cheapest. Good for short, plain questions.' },
+    mistral: /*i18n*/ { id: 'picker.about.mistral', message: 'Models with a choice of where your prompts are processed.' },
+    ollama: /*i18n*/ { id: 'picker.about.ollama', message: 'Runs on your machine. No key, no network, costs electricity.' },
+    wikipedia: /*i18n*/ { id: 'picker.about.wikipedia', message: 'Reads the article directly, in your language. No model, so nothing is spent.' },
+    openalex: /*i18n*/ { id: 'picker.about.openalex', message: 'Scholarly papers: titles, authors, years and abstracts.' },
+    hackernews: /*i18n*/ { id: 'picker.about.hackernews', message: 'What people have said about something. Discussion, not answers.' },
+  },
+
   blocks: {
     'messages': /*i18n*/ { id: 'block.messages', message: "Messages" },
     'input': /*i18n*/ { id: 'block.input', message: "Input" },

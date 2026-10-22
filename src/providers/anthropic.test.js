@@ -79,7 +79,28 @@ describe('one request for a title, summary and tags (C62)', () => {
   })
 
   it('names the model it goes to, so the Enter line can price it', () => {
-    expect(new AnthropicProvider().getMetadataModel()).toBe('claude-haiku')
+    expect(new AnthropicProvider().getMetadataModel()).toBe('claude-haiku-5-5')
+  })
+})
+
+describe('the models (stage 7, piece 1; C151)', () => {
+  const p = new AnthropicProvider()
+  it('lists the current lineup, each a fixed snapshot with a price', () => {
+    const current = p.getModels().filter((m) => m.current)
+    expect(current.map((m) => m.name)).toEqual(['Fable 5.1', 'Opus 5.5', 'Sonnet 5.5', 'Haiku 5.5'])
+    for (const m of p.getModels()) {
+      expect(m.apiId).not.toMatch(/latest/)
+      expect(m.cost.type).toBe('metered')
+    }
+  })
+  it('reads an old short id as the model it stood for, never the newest of its family', () => {
+    expect(p._resolveModel('claude-sonnet')).toBe('claude-sonnet-4-6')
+    expect(p._resolveModel('claude-haiku')).toBe('claude-haiku-4-5-20251001')
+    expect(p._resolveModel('claude-opus')).toBe('claude-opus-4-6')
+    expect(p._resolveModel('claude-sonnet-5-5')).toBe('claude-sonnet-5-5')
+  })
+  it('marks one model as what cost marks compare with', () => {
+    expect(p.getModels().filter((m) => m.reference).map((m) => m.name)).toEqual(['Haiku 4.5'])
   })
 })
 

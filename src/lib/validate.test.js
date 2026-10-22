@@ -75,3 +75,14 @@ describe('a backup with notes of their own and ordered collections (C144 (j), C1
     expect(validateBackup({ conversations: [], collections: [{ id: 'q2', items: [], order: [7] }] }).valid).toBe(false)
   })
 })
+
+describe('a backup with who answers each chat (stage 7; C150)', () => {
+  it('accepts an id from the list, or none, and refuses anything else', () => {
+    const c = (extra) => validateBackup({ conversations: [{ ...chat, ...extra }] })
+    expect(c({ answerer: 'claude-haiku-5-5' })).toEqual({ valid: true })
+    expect(c({ answerer: 'wikipedia' })).toEqual({ valid: true })
+    expect(c({ answerer: null })).toEqual({ valid: true })
+    expect(c({ answerer: 'Haiku <b>' }).valid).toBe(false)
+    expect(c({ answerer: 7 }).valid).toBe(false)
+  })
+})

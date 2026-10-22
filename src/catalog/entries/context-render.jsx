@@ -17,7 +17,7 @@ import ContextMeter from '../../components/core/ContextMeter'
 import { useChat } from '../../stores/ChatContext'
 import { useSettings } from '../../stores/SettingsContext'
 import { useHiddenIds } from '../../stores/chatHooks'
-import { models as providerModels, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../../net'
+import { models as providerModels, findModel, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../../net'
 
 const DEFAULT_CONTEXT_WINDOW = 200_000
 
@@ -32,7 +32,7 @@ export default function ContextRender({ config = {} } = {}) {
   // info. Falls back to a sane default if the model id isn't registered
   // — keeps the meter rendering rather than crashing on unknown ids.
   const models = providerModels(PROVIDER)
-  const modelInfo = models.find(m => m.id === settings.defaultModel) || models[0]
+  const modelInfo = findModel(models, settings.defaultModel) || models[0]
   const contextWindow = modelInfo?.contextWindow || DEFAULT_CONTEXT_WINDOW
 
   const totalTokens = (tokenUsage?.input || 0) + (tokenUsage?.output || 0)

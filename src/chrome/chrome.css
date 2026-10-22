@@ -312,6 +312,38 @@
 /* The field draws the focus ring around itself; the input inside needs none. */
 .ch-shell .ch-field input:focus-visible { outline: none; }
 .ch-field.min .ch-fmarg { opacity: 0; pointer-events: none; }
+/* Who answers is marginalia that opens a picker: a caret on hover
+   (almanac spec §9; stage 7, C149). */
+.ch-shell .ch-fmarg.pick { font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); }
+.ch-shell .ch-fmarg.pick:hover, .ch-shell .ch-fmarg.pick[aria-expanded="true"] { color: var(--ch-ink); }
+.ch-fmarg.pick::after { content: "\25BE"; font-style: normal; font-size: 7px; margin-inline-start: 3px; opacity: 0; transition: opacity var(--ch-dur-fade); }
+.ch-fmarg.pick:hover::after, .ch-fmarg.pick[aria-expanded="true"]::after { opacity: .5; }
+
+/* Who can answer: the picker under the field (stage 7, piece 1; A14,
+   C148). Branch slider v9's picker: groups, numbered boxes, a cost mark
+   and one line on each row; the one answering here is the ink wash. */
+.ch-answers { margin-top: 8px; background: var(--ch-surface); border-radius: var(--ch-r-card); box-shadow: var(--ch-lift); max-height: 60vh; overflow: auto; padding: 2px 0 8px; text-align: start; }
+.ch-ans-group + .ch-ans-group { border-top: .5px solid var(--ch-border-2); }
+.ch-ans-title { display: flex; align-items: baseline; gap: 8px; padding: 9px 14px 5px; font: 600 9px var(--ch-sans); letter-spacing: .055em; text-transform: uppercase; color: var(--ch-ink-3); }
+.ch-ans-title .ch-marg { margin-inline-start: auto; text-transform: none; letter-spacing: 0; }
+.ch-ans-sub { padding: 6px 14px 2px 39px; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); }
+.ch-shell .ch-ans { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: 7px 14px; text-align: start; color: var(--ch-ink); }
+.ch-shell .ch-ans:hover { background: var(--ch-subtle); }
+.ch-shell .ch-ans.on { background: var(--ch-wash); }
+.ch-ans .box { flex: none; width: 15px; height: 15px; margin-top: 1px; border: 1px solid var(--ch-soft); border-radius: 3px; font: 500 9.5px var(--ch-mono); display: inline-flex; align-items: center; justify-content: center; }
+.ch-ans:hover .box { border-color: var(--ch-ink); }
+.ch-ans.on .box { background: var(--ch-ink); border-color: var(--ch-ink); color: var(--ch-surface); }
+.ch-ans-body { flex: 1; min-width: 0; }
+.ch-ans-top { display: flex; align-items: baseline; gap: 8px; }
+.ch-ans .nm { font: 400 12.5px var(--ch-sans); }
+.ch-ans .mk { margin-inline-start: auto; font: 400 11px var(--ch-sans); color: var(--ch-ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ch-ans-about { display: block; margin-top: 2px; font: 400 11px/1.45 var(--ch-sans); color: var(--ch-ink-3); }
+.ch-ans.later .nm, .ch-ans.later .mk, .ch-ans.keyless .nm { color: var(--ch-ink-3); }
+.ch-ans.later .box { border-style: dashed; }
+.ch-shell .ch-ans.later { cursor: default; }
+.ch-shell .ch-ans.later:hover { background: none; }
+.ch-shell .ch-ans.later:hover .box { border-color: var(--ch-soft); }
+.ch-ans-foot { margin: 6px 14px 0; }
 
 /* A room on the shell (stage 4). Inside .ch-room the room draws itself in
    its own theme, set on this element and not on the page (C64): the room's
