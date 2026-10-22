@@ -670,6 +670,11 @@ function privacyLine(prompt, privacy) {
   return { message: privacy.on ? 'promptPrivacy' : 'promptPrivacyOffer', values: { found } }
 }
 
+// How much of a chat a model on this computer reads by default where the
+// computer has under 24 GB of graphics memory: Ollama drops the start of a
+// longer one without saying so (C163 (e), ruled 22 October).
+export const LOCAL_READS = 4000
+
 // Below a cent, the line says "under" a cent rather than a fraction of one.
 const CENT = 0.01
 
@@ -738,6 +743,8 @@ export function promptPreview(text, target = {}) {
     if (target.sourcesOut?.count > 0) also.push({ message: 'promptSourcesOut', values: { count: target.sourcesOut.count, sources: target.sourcesOut.names } })
     if (target.hiddenOut > 0) also.push({ message: 'promptHiddenOut', values: { count: target.hiddenOut } })
     if (who.thinks) also.unshift(target.thinking ? { message: 'promptThinks', values: { name: who.name } } : { message: 'promptThinksOff', values: { name: who.name } })
+    // Longer than it is likely to read (C163 (e)).
+    if (tokens > LOCAL_READS) also.push({ message: 'promptLocalLong', values: { name: who.name, tokens, reads: LOCAL_READS, provider: who.providerName ?? 'Ollama' } })
     const says = { message: 'promptSendLocal', values: { provider: who.name, tokens } }
     return { ready: true, says: also.length ? { ...says, also } : says }
   }

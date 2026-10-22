@@ -500,6 +500,7 @@ export const COPY = {
       message: '{tokens, plural, one {Enter sends to {provider} on this computer, about # token. Nothing leaves it} other {Enter sends to {provider} on this computer, about # tokens. Nothing leaves it}}',
       comment: 'A model running on this computer through Ollama (C163)',
     },
+    promptLocalLong: /*i18n*/ { id: 'enter.promptLocalLong', message: 'This chat is about {tokens, number} tokens. {name} may read only the last {reads, number} or so, unless {provider} is set to read more', comment: 'A model on this computer reads about 4,000 tokens by default on most computers (C163 (e))' },
     promptLocalUnchecked: /*i18n*/ { id: 'enter.promptLocalUnchecked', message: '{name} is on this computer, but {provider} has not listed it since this page opened. {command} checks', comment: 'Commands stay English' },
     apiLocal: /*i18n*/ { id: 'enter.apiLocal', message: 'Enter shows {provider} on this computer, and how to check for it' },
     // Frameworks (C164). {frameworks} is a list joined with "and"; {num} a chat.
@@ -660,6 +661,11 @@ export const COPY = {
     checkFoundUnquoted: /*i18n*/ { id: 'enter.checkFoundUnquoted', message: '{name} finds something in it that tries to instruct a model. It stays text, never followed' },
     checkFailed: /*i18n*/ { id: 'enter.checkFailed', message: 'The check did not come back. Try again' },
     translateInstructions: /*i18n*/ { id: 'enter.translateInstructions', message: 'It holds words that read like instructions to a model ({phrases}). They go as text to translate, never to follow' },
+    replyEmpty: /*i18n*/ {
+      id: 'enter.replyEmpty',
+      message: '{reason, select, limit {The reply ran out of room before it said anything, perhaps spent reasoning first. Nothing was kept. Try again, or another model with by:} other {The reply came back empty, with no error from the provider. Nothing was kept. Try again, or another model with by:}}',
+      comment: 'Commands stay English (C171)',
+    },
     replyCut: /*i18n*/ { id: 'enter.replyCut', message: 'The reply broke off part way. What arrived is kept and marked as cut off' },
   },
 

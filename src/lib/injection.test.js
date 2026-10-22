@@ -95,3 +95,13 @@ describe('check: (C169)', () => {
     expect(await new OllamaProvider().findNames(['Ask Anna Berg in Lund'], { model: 'ollama:bonsai-2:9b' })).toEqual(['Anna Berg', 'Lund'])
   })
 })
+
+describe('a chat longer than a model on this computer reads (C163 (e))', () => {
+  it('says so before Enter', () => {
+    const who = { id: 'ollama:bonsai-2:9b', group: 'local', name: 'bonsai-2:9b', provider: 'ollama', providerName: 'Ollama' }
+    const room = { room: 'c1', keyed: false, answerer: who, systemChars: 0 }
+    const also = (historyChars) => (promptPreview('More?', { ...room, historyChars }).says.also ?? []).map((x) => say(i18n, x.message, x.values))
+    expect(also(1000)).toEqual([])
+    expect(also(20_000)).toEqual(['This chat is about 5,002 tokens. bonsai-2:9b may read only the last 4,000 or so, unless Ollama is set to read more'])
+  })
+})

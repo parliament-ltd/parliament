@@ -1879,6 +1879,11 @@ msgstr "This looks like a key, which would be sent with the prompt. Delete it, a
 msgid "enter.promptLater"
 msgstr "{name} answers here and is not built yet. by: chooses another"
 
+#. A model on this computer reads about 4,000 tokens by default on most computers (C163 (e))
+#. js-lingui-explicit-id
+msgid "enter.promptLocalLong"
+msgstr "This chat is about {tokens, number} tokens. {name} may read only the last {reads, number} or so, unless {provider} is set to read more"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptLocalUnchecked"
@@ -2020,6 +2025,11 @@ msgstr "That verb is now {now}. Enter writes it in"
 #. js-lingui-explicit-id
 msgid "enter.replyCut"
 msgstr "The reply broke off part way. What arrived is kept and marked as cut off"
+
+#. Commands stay English (C171)
+#. js-lingui-explicit-id
+msgid "enter.replyEmpty"
+msgstr "{reason, select, limit {The reply ran out of room before it said anything, perhaps spent reasoning first. Nothing was kept. Try again, or another model with by:} other {The reply came back empty, with no error from the provider. Nothing was kept. Try again, or another model with by:}}"
 
 #. js-lingui-explicit-id
 msgid "enter.replyNone"

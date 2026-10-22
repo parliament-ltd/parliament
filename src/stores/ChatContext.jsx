@@ -72,6 +72,13 @@ const onThisComputer = (provider) => destination(provider)?.kind === 'local'
 const namesCache = new Map()
 const NAMES_CACHE_MOST = 500
 const textOf = (content) => (typeof content === 'string' ? content : Array.isArray(content) ? content.filter((p) => p?.type === 'text').map((p) => p.text ?? '').join('\n') : '')
+// A reply that came back with no words and no error: said, never kept silent (C171).
+function emptyReply(stopReason) {
+  const error = new Error('The reply came back empty.')
+  error.name = 'EmptyReply'
+  error.stopReason = stopReason ?? null
+  return error
+}
 function namesUnchecked() {
   const error = new Error('Names could not be found on this computer, so nothing was sent.')
   error.name = 'NamesUnchecked'
@@ -420,6 +427,7 @@ export function ChatProvider({ children }) {
       stopPersisting()
       // Prepend any chart blocks before Claude's explanatory text
       const finalContent = chartBlocks + (getStream(conversationId)?.text ?? '')
+      if (!finalContent && !controller.signal.aborted) throw emptyReply(last?.stopReason)
       const tokenCount = totalOutputTokens
       const cut = finalContent ? cutReason(last?.stopReason) : null
       // The model that answered and the tokens it took, so what a chat cost
@@ -494,6 +502,7 @@ export function ChatProvider({ children }) {
       ], { label: 'chat send without streaming' })
       if (controller.signal.aborted) throw new DOMException('Stopped', 'AbortError')
       const content = getStream(conversationId)?.text ?? ''
+      if (!content) throw emptyReply(response?.stopReason)
       const cut = content ? cutReason(response?.stopReason) : null
       const outcome = {
         content, incomplete: Boolean(cut) || !content, tokenCount: response?.usage?.output_tokens || 0, stopReason: cut,

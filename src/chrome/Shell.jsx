@@ -134,6 +134,8 @@ async function localBlocked() {
 function failure(err, source = destination(SOURCE)?.name) {
   if (err?.name === 'AbortError') return null
   if (err?.name === 'Refused') return 'promptChanged'
+  // A reply with no words and no error (C171): said, with why it stopped where known.
+  if (err?.name === 'EmptyReply') return { message: 'replyEmpty', values: { reason: err.stopReason === 'max_tokens' ? 'limit' : 'none' } }
   // privacy:names could not find names on this computer: nothing was sent (C169).
   if (err?.name === 'NamesUnchecked') return 'namesUnchecked'
   if (err?.kept) return 'replyCut'

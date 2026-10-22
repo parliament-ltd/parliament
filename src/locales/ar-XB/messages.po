@@ -1879,6 +1879,11 @@ msgstr ""
 msgid "enter.promptLater"
 msgstr ""
 
+#. A model on this computer reads about 4,000 tokens by default on most computers (C163 (e))
+#. js-lingui-explicit-id
+msgid "enter.promptLocalLong"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptLocalUnchecked"
@@ -2019,6 +2024,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.replyCut"
+msgstr ""
+
+#. Commands stay English (C171)
+#. js-lingui-explicit-id
+msgid "enter.replyEmpty"
 msgstr ""
 
 #. js-lingui-explicit-id
