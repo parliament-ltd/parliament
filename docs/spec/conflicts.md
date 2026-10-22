@@ -162,6 +162,15 @@ Line numbers are approximate.
 - **C137. `erase:` as suggested** ("Go on with stage 6, piece 4: erase:, as C137 suggests"): numbers only, a plan by its number with every chat in it, markings kept unless `all`, collections keeping a card. Built in piece 4; see Part 11.
 - **R32 approved, the rest of it.** The three silent calls were replaced under C62; the three provider methods they called (`generateTitle`, `generateSummary`, `generateTags`) move to `src/deprecated/`, unused.
 
+**22 October 2026, at the stage 6 checkpoint:**
+
+- **A19, looked at again: keep.** Keywords and quotes are rows on Records only when filtered for or found by a search; they are always cards in the Collection.
+- **R1 to R5, R7 to R9, R11 and R12 approved** (the blueprint section and overlay, the Study, `/chats`, the homepage's Chats, stats, scratchpad and Library sections, its top bar, homepage room files, the old styles). They move to `src/deprecated/` with their routes unhooked, nothing deleted, when `/` shows the new screens, as R15 is; the old styles go file by file.
+- **R13 approved:** "Pin for reference" is renamed so it says it makes a quote; what it does and the stored quotes stay.
+- **R27 approved:** the backup dot and banner go with the old homepage; Records' one line replaces them.
+- **The new stored fields of stage 6 are approved:** `model` and `usage` on replies, `recordsCols` in the space, saved searches, `archived` and `tagsMine` on every kind, `pinned` and `tags` on quotes, `erasedFrom`, a collection's `order` and items of kind chat, plan and marking, and a note's `quotes` and `summary`.
+- **R6, reopened (C20): "let's make favorite a tag."** Not settled: what the heart on a message does then, and what becomes of the Favorites collection. See C147.
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it
@@ -1213,6 +1222,14 @@ Found while splitting stage 6 into pieces. Read with C131 (Records, plan, keywor
 - **(b) A link's full address** (security notes §1.3). A link in a reply shows its whole address before it opens: on hover, and on keyboard focus. The address is shown as the browser reads it, so a look-alike name shows in its `xn--` form, and long ones wrap rather than being cut. On a touch screen the first tap shows the address and a second opens it.
 - **(c) `close:` and `width:` by number** (C125). `close:204` and `width:204 40%` act on the room showing chat 204 (or plan 204's chat); if no room here shows it, the Enter line says so and how to show it. `close:welcome` closes the welcome card from wherever the bar points; `tour:` brings it back.
 - **Suggestion:** keep as built.
+
+**C147. Favourites as a tag** (R6 reopened, 22 October: "let's make favorite a tag, I think we discussed that before"). The history: on 23 September C20 folded favourites into pins, with "users can tag a pin `favorite` themselves"; on 11 October C20 was reopened and favourites became the built-in Favorites collection, which is what the version 6 upgrade made of them and what the heart fills today. What a tag changes:
+- **(a) Anything with a number can carry it now:** `tagadd:favorite 204` on a chat, plan, note, keyword or quote, and `tag:favorite` on Records lists them. Nothing new is needed for that.
+- **(b) A single message has no number,** and only numbered things carry tags, so the heart has to make one: a quote of the whole message, kept beside its chat and never sent, tagged `favorite`. A second click on the heart takes the tag off (and the quote, if the heart made it and nothing else holds it).
+- **(c) The favourites you have** (messages in the Favorites collection) each become such a quote, tagged `favorite`. That changes stored data, so it is shown as a dry run first. The old `favorites` records stay, readable by old backups.
+- **(d) The Favorites collection** stops being built in: an ordinary collection that can be renamed or forgotten, with `save:"Favorites"` over `tag:favorite` offered in its place. Nothing is deleted.
+- **(e) The tag's word** is `favorite` in every language, so it matches across devices; it is shown as written, like any tag.
+- **Suggestion:** as above. Not built: it waits for a ruling.
 
 **C134, as built (piece 3).** `undo:` takes back the last command line, whole: what it changed in rows, saved searches, the filters on Records and the space (boards, windows, the bar, columns). Kept for the tab, the last 50 lines. If something it changed has changed since (in another tab, say), undo stops there and says so rather than writing over it. Not taken back: a room's name (C40), what was sent or copied, and `erase:` (piece 4).
 
