@@ -1,3 +1,7 @@
+// Retired with R7, approved by Stefan on 22 October 2026: The homepage's quick stats.
+// Was src/catalog/entries/quick-stats.jsx. Nothing imports it and it is not built. To restore:
+// Move it back with quick-stats-render.jsx and register it in src/catalog/index.js.
+
 // quick-stats@1.0 — small homepage tile showing aggregate counts.
 //
 // Reader tier — reads conversation/message/highlight/note counts from

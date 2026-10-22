@@ -1,3 +1,7 @@
+// Retired with R1, approved by Stefan on 22 October 2026: The homepage's Blueprint section, drawn.
+// Was src/catalog/entries/blueprint-render.jsx. Nothing imports it and it is not built. To restore:
+// Move it back with blueprint.jsx.
+
 // blueprint@1.0 — homepage SVG floor-plan renderer.
 //
 // Renders every user-built room as an irregular path on a single SVG

@@ -1,3 +1,7 @@
+// Retired with R7, approved by Stefan on 22 October 2026: The homepage's scratchpad.
+// Was src/catalog/entries/scratchpad.jsx. Nothing imports it and it is not built. To restore:
+// Move it back with scratchpad-render.jsx and register it in src/catalog/index.js.
+
 // scratchpad@1.0 — homepage tile holding a single free-form note.
 //
 // Utility tier — no model calls, no conversation reads. State persists

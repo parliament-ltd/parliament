@@ -1,3 +1,7 @@
+// Retired with R7, approved by Stefan on 22 October 2026: The homepage's recent activity.
+// Was src/catalog/entries/recent-activity.jsx. Nothing imports it and it is not built. To restore:
+// Move it back with recent-activity-render.jsx and register it in src/catalog/index.js.
+
 // recent-activity@1.0 — homepage section listing the user's last few
 // active conversations.
 //

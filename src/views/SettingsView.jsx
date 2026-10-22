@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import {
@@ -17,7 +17,6 @@ import { exportAllData, importData, clearAllData, getSetting, setSetting } from 
 import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
-import TourTooltip from '../components/TourTooltip'
 import NetworkActivityCard from '../components/NetworkActivityCard'
 import { useBackup } from '../stores/BackupContext'
 import { useIsNarrow } from '../lib/useViewportWidth'
@@ -42,26 +41,6 @@ const NAV_ITEMS = [
   { id: 'about', label: 'About & Security', icon: Shield },
 ]
 
-const SETTINGS_TOUR_STEPS = [
-  {
-    title: 'Add your API key',
-    desc: 'Start by adding your Anthropic API key. It is encrypted with AES-GCM and stored only in your browser. The rest of the settings are optional; you can circle back anytime.',
-    target: '[data-tour="settings-api"]',
-    placement: 'right',
-  },
-  {
-    title: 'Context & Defaults',
-    desc: 'Set your context threshold and compression preferences to keep conversations flowing smoothly.',
-    target: '[data-tour="settings-context"]',
-    placement: 'right',
-  },
-  {
-    title: 'Data & Backups',
-    desc: 'Export encrypted backups of all your conversations or import a previous backup to restore your history.',
-    target: '[data-tour="settings-data"]',
-    placement: 'right',
-  },
-]
 
 // PR-12: presentational metadata only (description / speed / badge). The
 // model list itself, plus cost and contextWindow, comes from the provider
@@ -101,17 +80,6 @@ export default function SettingsView() {
   const { triggerShimmer, shimmerPhase, shimmerDone } = useShimmer()
   const isNarrow = useIsNarrow(768)
 
-  // Onboarding tour
-  const [showTour, setShowTour] = useState(false)
-  useEffect(() => {
-    getSetting('tourCompleted_settings').then(done => {
-      if (!done) setShowTour(true)
-    })
-  }, [])
-  const handleTourDone = useCallback(async () => {
-    setShowTour(false)
-    await setSetting('tourCompleted_settings', true)
-  }, [])
 
   // Local state for API key (not persisted until validated)
   const [apiKey, setApiKey] = useState('')
@@ -198,7 +166,6 @@ export default function SettingsView() {
     return (
       <>
         <MobileSettings navigate={navigate} sectionForId={sectionForId} />
-        {showTour && <TourTooltip steps={SETTINGS_TOUR_STEPS} onDone={handleTourDone} />}
       </>
     )
   }
@@ -304,7 +271,6 @@ export default function SettingsView() {
       </div>
 
       {/* Onboarding Tour */}
-      {showTour && <TourTooltip steps={SETTINGS_TOUR_STEPS} onDone={handleTourDone} />}
     </div>
   )
 }

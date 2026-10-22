@@ -1,3 +1,7 @@
+// Retired with R27, approved by Stefan on 22 October 2026: The backup status dot in the top bar.
+// Was src/components/BackupStatusIndicator.jsx. Nothing imports it and it is not built. To restore:
+// Move it back and draw it in src/components/HomepageTopBar.jsx.
+
 // BackupStatusIndicator — colored dot in the top bar showing backup age.
 //
 // Per spec §5.2:

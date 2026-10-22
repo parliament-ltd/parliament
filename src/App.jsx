@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { MotionConfig } from 'framer-motion'
 import { SettingsProvider } from './stores/SettingsContext'
 import { ConversationProvider } from './stores/ConversationContext'
@@ -10,13 +10,10 @@ import { CollabModeProvider } from './stores/CollabModeContext'
 import { FileShelfProvider } from './stores/FileShelfContext'
 import { DocumentProvider } from './stores/DocumentContext'
 import BranchShortcutHandler from './components/BranchShortcutHandler'
-import BlueprintOverlay from './components/BlueprintOverlay'
 import { PWAProvider } from './stores/PWAContext'
 import { BackupProvider } from './stores/BackupContext'
 import ChatView from './views/ChatView'
-import SelectorView from './views/SelectorView'
 import SettingsView from './views/SettingsView'
-import HomepageView from './views/HomepageView'
 import EditorView from './views/EditorView'
 import BuildView from './views/BuildView'
 import ErrorBoundary from './components/ErrorBoundary'
@@ -44,11 +41,11 @@ const PopoutPrototype = import.meta.env.DEV || import.meta.env.VITE_PROTOTYPES =
   ? lazy(() => import('./views/PopoutPrototype'))
   : null
 
-// The new shell (stage 3), beside today's screens until they are replaced:
-// in development, or in a build made with VITE_PROTOTYPES=1.
-const Shell = import.meta.env.DEV || import.meta.env.VITE_PROTOTYPES === '1'
-  ? lazy(() => import('./chrome/Shell'))
-  : null
+// The new shell is the app at / (stage 6 checkpoint, 22 October): the welcome
+// page for someone new, Records and the Collection for someone with work
+// (C118, C125). The old homepage, /chats and /edit-home are retired (R3, R4,
+// R11) and lead here.
+const Shell = lazy(() => import('./chrome/Shell'))
 
 // Dev only: the token sheet, drawn for approval (stage 3, C51).
 const TokenSheet = import.meta.env.DEV
@@ -84,19 +81,28 @@ export default function App() {
               <BrowserRouter>
                 <BackupProvider>
                 <BranchShortcutHandler />
-                <BlueprintOverlay />
                 <DbStateNotice />
                 <UpdateNotice />
                 <ReplyStoppedNotice />
                 {TrialNotice && <Suspense fallback={null}><TrialNotice /></Suspense>}
                 <Routes>
-                  <Route path="/" element={<ErrorBoundary inline><HomepageView /></ErrorBoundary>} />
-                  <Route path="/chats" element={<ErrorBoundary inline><SelectorView /></ErrorBoundary>} />
+                  <Route
+                    path="/"
+                    element={
+                      <ErrorBoundary inline>
+                        <Suspense fallback={null}>
+                          <Shell />
+                        </Suspense>
+                      </ErrorBoundary>
+                    }
+                  />
+                  <Route path="/chats" element={<Navigate to="/" replace />} />
+                  <Route path="/shell" element={<Navigate to="/" replace />} />
                   <Route path="/chat/:id" element={<ErrorBoundary inline><ChatView /></ErrorBoundary>} />
                   <Route path="/settings" element={<ErrorBoundary inline><SettingsView /></ErrorBoundary>} />
                   <Route path="/edit" element={<ErrorBoundary inline><EditorView scope="room" blank /></ErrorBoundary>} />
                   <Route path="/edit/:roomId" element={<ErrorBoundary inline><EditorView scope="room" /></ErrorBoundary>} />
-                  <Route path="/edit-home" element={<ErrorBoundary inline><EditorView scope="homepage" /></ErrorBoundary>} />
+                  <Route path="/edit-home" element={<Navigate to="/" replace />} />
                   <Route path="/build" element={<ErrorBoundary inline><BuildView /></ErrorBoundary>} />
                   {MigrationPreview && (
                     <Route
@@ -105,18 +111,6 @@ export default function App() {
                         <ErrorBoundary inline>
                           <Suspense fallback={null}>
                             <MigrationPreview />
-                          </Suspense>
-                        </ErrorBoundary>
-                      }
-                    />
-                  )}
-                  {Shell && (
-                    <Route
-                      path="/shell"
-                      element={
-                        <ErrorBoundary inline>
-                          <Suspense fallback={null}>
-                            <Shell />
                           </Suspense>
                         </ErrorBoundary>
                       }

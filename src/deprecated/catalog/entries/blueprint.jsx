@@ -1,3 +1,7 @@
+// Retired with R1, approved by Stefan on 22 October 2026: The homepage's Blueprint section.
+// Was src/catalog/entries/blueprint.jsx. Nothing imports it and it is not built. To restore:
+// Move it back with blueprint-render.jsx and lib/blueprintShapes.js, and register it in src/catalog/index.js.
+
 // blueprint@1.0 — homepage SVG floor-plan section.
 //
 // Reader tier — no model calls. Loads the user's room list from

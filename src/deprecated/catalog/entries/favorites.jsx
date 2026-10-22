@@ -1,3 +1,7 @@
+// Retired with R6, approved by Stefan on 22 October 2026: The homepage's Favorites section.
+// Was src/catalog/entries/favorites.jsx. Nothing imports it and it is not built. To restore:
+// Move it back with favorites-preview.jsx and register it in src/catalog/index.js.
+
 // favorites@1.0 — homepage section showing every saved-favorite message
 // across every conversation, with click-to-jump back to the source.
 //

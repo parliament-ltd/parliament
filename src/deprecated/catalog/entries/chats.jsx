@@ -1,3 +1,7 @@
+// Retired with R5, approved by Stefan on 22 October 2026: The homepage's Chats section.
+// Was src/catalog/entries/chats.jsx. Nothing imports it and it is not built. To restore:
+// Move it back with chats-preview.jsx and register it in src/catalog/index.js.
+
 // chats@1.0 — homepage section that lists conversations across rooms.
 //
 // Composer tier — bulk delete writes to IndexedDB and the row click

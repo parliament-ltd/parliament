@@ -1,3 +1,7 @@
+// Retired with R4, approved by Stefan on 22 October 2026: The /chats page.
+// Was src/views/SelectorView.jsx. Nothing imports it and it is not built. To restore:
+// Move it back with SelectorLayout.jsx and route /chats to it in src/App.jsx.
+
 // SelectorView — `/chats` route shell.
 //
 // PR-10b deletes adapter directories; with no `mode` driving routing

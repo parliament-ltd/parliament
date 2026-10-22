@@ -1,3 +1,7 @@
+// Retired with R7, approved by Stefan on 22 October 2026: The homepage's quick stats, drawn.
+// Was src/catalog/entries/quick-stats-render.jsx. Nothing imports it and it is not built. To restore:
+// Move it back with quick-stats.jsx.
+
 // Render component for quick-stats@1.0. Lives in its own file so the
 // manifest entry stays a clean default-export.
 

@@ -31,13 +31,9 @@ import contextEntry        from './entries/context'
 import collabModeEntry     from './entries/collab-mode'
 import reviewEntry         from './entries/review'
 import voiceInputEntry     from './entries/voice-input'
-import blueprintEntry      from './entries/blueprint'
-import chatsEntry          from './entries/chats'
-import libraryEntry        from './entries/library'
-import favoritesEntry      from './entries/favorites'
-import quickStatsEntry     from './entries/quick-stats'
-import recentActivityEntry from './entries/recent-activity'
-import scratchpadEntry     from './entries/scratchpad'
+// The homepage's blocks (blueprint, chats, library, favorites, quick-stats,
+// recent-activity, scratchpad) were retired with the homepage on 22 October
+// 2026 (R1, R5 to R8) and live in src/deprecated/catalog/entries.
 import fileShelfEntry        from './entries/file-shelf'
 import chartCanvasEntry      from './entries/chart-canvas'
 import tableCanvasEntry      from './entries/table-canvas'
@@ -78,13 +74,6 @@ register(contextEntry)
 register(collabModeEntry)
 register(reviewEntry)
 register(voiceInputEntry)
-register(blueprintEntry)
-register(chatsEntry)
-register(libraryEntry)
-register(favoritesEntry)
-register(quickStatsEntry)
-register(recentActivityEntry)
-register(scratchpadEntry)
 // PR-11a — Pelican decomposition.
 register(fileShelfEntry)
 register(chartCanvasEntry)

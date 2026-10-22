@@ -1,3 +1,7 @@
+// Retired with R4, approved by Stefan on 22 October 2026: The /chats layout, with its tooltip tour (R15).
+// Was src/views/SelectorLayout.jsx. Nothing imports it and it is not built. To restore:
+// Move it back with SelectorView.jsx.
+
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import Markdown from '../components/core/Markdown'
 import { motion, AnimatePresence } from 'framer-motion'

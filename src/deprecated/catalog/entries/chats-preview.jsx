@@ -1,3 +1,7 @@
+// Retired with R5, approved by Stefan on 22 October 2026: The homepage's Chats section, its preview.
+// Was src/catalog/entries/chats-preview.jsx. Nothing imports it and it is not built. To restore:
+// Move it back with chats.jsx.
+
 // Self-contained render wrapper for chats@1.0 (PR-14 rewrite to spec).
 //
 // Spec source: refactor/parliament_homepage_v2 (2).html, the section

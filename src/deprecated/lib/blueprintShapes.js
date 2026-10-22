@@ -1,3 +1,7 @@
+// Retired with R1, approved by Stefan on 22 October 2026: The Blueprint section's shapes and packing.
+// Was src/lib/blueprintShapes.js. Nothing imports it and it is not built. To restore:
+// Move it back with blueprint.jsx.
+
 // Blueprint shape system (PR-14, expanded in PR-16a).
 //
 // Pure functions that pack N user rooms into a fixed viewBox and produce

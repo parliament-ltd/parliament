@@ -1,3 +1,7 @@
+// Retired with R27, approved by Stefan on 22 October 2026: The backup banner on the homepage (its rules stay in lib/backupReminder.js, which Records' line uses).
+// Was src/components/BackupReminderBanner.jsx. Nothing imports it and it is not built. To restore:
+// Move it back with the homepage.
+
 // BackupReminderBanner — proactive nudge on the homepage.
 //
 // When it shows lives in lib/backupReminder.js: per spec §5.1 after some

@@ -1,3 +1,7 @@
+// Retired with R6, approved by Stefan on 22 October 2026: The homepage's Favorites section, its preview.
+// Was src/catalog/entries/favorites-preview.jsx. Nothing imports it and it is not built. To restore:
+// Move it back with favorites.jsx.
+
 // Self-contained render wrapper for favorites@1.0 (PR-14 rewrite to spec).
 //
 // Spec source: refactor/parliament_homepage_v2 (2).html, the section

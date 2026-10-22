@@ -1,3 +1,7 @@
+// Retired with R8, approved by Stefan on 22 October 2026: The homepage's Library section, its preview.
+// Was src/catalog/entries/library-preview.jsx. Nothing imports it and it is not built. To restore:
+// Move it back with library.jsx.
+
 // Self-contained render wrapper for library@1.0 (PR-14 rewrite to spec).
 //
 // Filter-chip browsing across Rooms / Layouts / Components / Schemes /

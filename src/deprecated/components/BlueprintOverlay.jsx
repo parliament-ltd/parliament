@@ -1,3 +1,7 @@
+// Retired with R2, approved by Stefan on 22 October 2026: The Blueprint overlay and its Cmd/Ctrl+. shortcut.
+// Was src/components/BlueprintOverlay.jsx. Nothing imports it and it is not built. To restore:
+// Move it back and draw it in src/App.jsx.
+
 // BlueprintOverlay (PR-19e) — global Cmd/Ctrl+. modal that surfaces the
 // blueprint from any route.
 //

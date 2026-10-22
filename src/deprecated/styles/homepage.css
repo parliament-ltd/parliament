@@ -1,0 +1,943 @@
+/* Retired with R12, approved by Stefan on 22 October 2026.
+   The rules from src/index.css that only the retired homepage used: its
+   Blueprint section and room modal, its Chats section and bulk toolbar, and
+   its Favorites section (each class checked against every file still in the
+   app). Not built. To restore: paste a rule back into src/index.css with the
+   file that uses it. */
+
+/* ── Blueprint section ────────────────────────────────────── */
+
+/* PR-40 polish: bp-wrap carries the cream bg fallback. The dark
+   border is drawn by the SVG `wallBox` stroke instead, so we don't
+   double-frame the blueprint with an outer CSS border AND an inner
+   SVG wall stroke. The 14px radius matches the SectionCard
+   container so the dotted canvas reads as a concentric inset
+   inside the section card. */
+
+.bp-wrap {
+  position: relative;
+  padding: 0;
+  background-color: #EDE6D8;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.bp-svg {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.bp-room-fill { transition: fill 0.2s ease; }
+
+/* PR-41 — Phone blueprint: lock the SVG to its natural viewBox width
+   (passed in as --bp-natural-width via inline style on .bp-wrap) and
+   let .bp-wrap scroll horizontally. Keeps every room at its packed
+   desktop dimensions instead of shrinking to phone width. The modal
+   continues to centre on the viewport (position:fixed) so a tapped
+   room that's scrolled half-off-screen still produces a centred
+   dialog. */
+
+@media (max-width: 640px) {
+  .bp-wrap {
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .bp-wrap .bp-svg {
+    width: var(--bp-natural-width);
+    max-width: none;
+  }
+  .bp-wrap::-webkit-scrollbar { height: 4px; }
+  .bp-wrap::-webkit-scrollbar-track { background: transparent; }
+  .bp-wrap::-webkit-scrollbar-thumb {
+    background: rgba(168, 162, 152, 0.6);
+    border-radius: 2px;
+  }
+}
+
+/* ── Chats section ────────────────────────────────────────── */
+
+.chats-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.chats-search {
+  width: 280px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.chats-search input {
+  width: 100%;
+  padding: 7px 10px 7px 30px;
+  font-size: 12.5px;
+  border: 0.5px solid var(--p-border);
+  border-radius: 6px;
+  background: var(--p-bg-surface);
+  color: var(--p-text-primary);
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color 0.12s;
+}
+
+.chats-search input:focus { border-color: var(--p-gold-light); }
+
+.chat-table {
+  border: 0.5px solid var(--p-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.chat-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 180px 90px 90px;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 0.5px solid var(--p-border-subtle);
+  cursor: pointer;
+  transition: background 0.1s;
+  gap: 8px;
+}
+
+.chat-row:last-child { border-bottom: none; }
+
+.chat-row:hover { background: var(--p-bg-subtle); }
+
+.chat-row.selected { background: rgba(196, 169, 77, 0.08); }
+
+.chat-row.selected:hover { background: rgba(196, 169, 77, 0.14); }
+
+.chat-checkbox {
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--p-text-light);
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  background: transparent;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.chat-checkbox:hover { border-color: var(--p-gold-light); }
+
+.chat-checkbox.checked {
+  background: var(--p-gold-light);
+  border-color: var(--p-gold-light);
+  color: white;
+}
+
+.chat-checkbox svg {
+  width: 10px;
+  height: 10px;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.chat-checkbox.checked svg { opacity: 1; }
+
+.chat-text { min-width: 0; }
+
+.chat-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--p-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.chat-title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-summary {
+  font-size: 11.5px;
+  color: var(--p-text-secondary);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-topics {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.topic-chip {
+  font-size: 10px;
+  padding: 1.5px 7px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.chat-date {
+  font-size: 11px;
+  color: var(--p-text-muted);
+  text-align: right;
+}
+
+.chat-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-top: 0.5px solid var(--p-border-subtle);
+  font-size: 11px;
+  color: var(--p-text-muted);
+}
+
+/* ── Bulk toolbar (shared by chats + favorites edit modes) ── */
+
+.bulk-toolbar {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 0.5px solid var(--p-gold-light);
+  background: rgba(196, 169, 77, 0.08);
+  border-radius: 6px;
+  width: 100%;
+  animation: bulk-in 0.18s ease;
+}
+
+.bulk-toolbar.show { display: flex; }
+
+.bulk-count {
+  font-size: 12px;
+  color: var(--p-gold-deep, #8B6A10);
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.bulk-btn {
+  width: 28px;
+  height: 28px;
+  border: 0.5px solid transparent;
+  background: transparent;
+  border-radius: 4px;
+  color: var(--p-gold-deep, #8B6A10);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  position: relative;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.bulk-btn:hover {
+  background: rgba(196, 169, 77, 0.14);
+  border-color: var(--p-gold-light);
+}
+
+.bulk-btn.danger:hover {
+  background: rgba(224, 62, 62, 0.08);
+  border-color: #E03E3E;
+  color: #E03E3E;
+}
+
+.bulk-btn .bulk-tip {
+  position: absolute;
+  bottom: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--p-text-primary);
+  color: white;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  z-index: 10;
+}
+
+.bulk-btn:hover .bulk-tip { opacity: 1; }
+
+.bulk-clear {
+  margin-left: auto;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--p-text-secondary);
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: var(--font-sans);
+  transition: color 0.12s, background 0.12s;
+}
+
+.bulk-clear:hover {
+  color: var(--p-text-primary);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* PR-40 polish: room modal — two side-by-side cards each wrapped in
+   a translucent "trim" frame. Left card = THE / Name + LayoutSilhouette
+   preview + circular icon actions. Right card = metadata rows +
+   device pill + bulleted Includes list. Mirrors the mockup at
+   refactor/blueprint_matched_feature_list.html. */
+
+.bp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(58, 53, 48, 0.45);
+  padding: 20px;
+  animation: bp-modal-fade-in 200ms ease;
+  font-family: var(--font-sans);
+}
+
+.bp-modal-assembly {
+  display: flex;
+  /* PR-41: 18px gap between the two trim-wrapped cards — same width
+     as a blueprint hallway, so the spacing reads as a corridor between
+     the room (left) and its inventory (right). */
+  gap: 18px;
+  align-items: flex-start;
+  animation: bp-modal-pop-in 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bp-modal-overlay,
+  .bp-modal-assembly { animation: none; }
+}
+
+/* Trim — 6px translucent padding around each card; reads as a
+   ribbon/frame holding the card. */
+
+.bp-trim-wrap {
+  background: rgba(214, 206, 190, 0.42);
+  border-radius: 16px;
+  padding: 6px;
+}
+
+/* Left card — room snapshot. */
+
+.bp-card-room {
+  background: rgba(245, 239, 228, 0.96);
+  border-radius: 10px;
+  padding: 18px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 165px;
+}
+
+.bp-card-room-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.bp-card-room-label {
+  font-size: 7px;
+  letter-spacing: 0.1em;
+  color: #B8B0A4;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.bp-card-room-name {
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: #5A5550;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+  margin-top: 2px;
+}
+
+.bp-card-room-wireframe {
+  width: 125px;
+  height: 78px;
+  border: 0.75px solid #C8C0B2;
+  border-radius: 6px;
+  background: rgba(255, 253, 248, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+/* LayoutSilhouette uses .lib-preview for its own sizing rules.
+   Strip those so it fills the modal's bordered slot cleanly. */
+
+.bp-card-room-wireframe .lib-preview {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 4px;
+}
+
+.bp-card-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+.bp-action-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 0.5px solid #C8C0B2;
+  background: rgba(255, 253, 248, 0.85);
+  color: #8B8578;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  position: relative;
+  padding: 0;
+  font-family: inherit;
+}
+
+.bp-action-btn:hover {
+  border-color: #B8A070;
+  color: #8B6A10;
+  background: rgba(255, 253, 248, 1);
+}
+
+.bp-action-btn-delete:hover {
+  border-color: #C05040;
+  color: #C05040;
+  background: rgba(192, 80, 64, 0.04);
+}
+
+.bp-action-btn-enter {
+  width: 42px;
+  background: rgba(196, 169, 77, 0.15);
+  border-color: rgba(196, 169, 77, 0.4);
+  color: #C4A94D;
+}
+
+.bp-action-btn-enter:hover {
+  background: rgba(196, 169, 77, 0.25);
+  border-color: #C4A94D;
+  color: #8B6A10;
+}
+
+.bp-action-tooltip {
+  position: absolute;
+  bottom: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #3A3530;
+  color: #F5F0E8;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.12s;
+  pointer-events: none;
+}
+
+.bp-action-tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 3px solid transparent;
+  border-bottom-color: #3A3530;
+}
+
+.bp-action-btn:hover .bp-action-tooltip { opacity: 1; }
+
+/* Right card — features. PR-40h: split into an outer rounded
+   container that clips the scrollbar to the rounded corners, plus
+   an inner scrolling wrapper that holds the padding. Without this
+   split the webkit scrollbar's flat top edge poked out past the
+   card's rounded top-right corner. */
+
+.bp-card-features {
+  background: rgba(255, 253, 248, 0.96);
+  border-radius: 10px;
+  width: 290px;
+  max-height: 340px;
+  overflow: hidden;
+}
+
+.bp-card-features-scroll {
+  padding: 20px 14px 24px 22px;
+  max-height: 340px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.bp-card-features-scroll::-webkit-scrollbar { width: 4px; }
+
+.bp-card-features-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 14px 0;
+}
+
+.bp-card-features-scroll::-webkit-scrollbar-thumb {
+  background: #D0C8BA;
+  border-radius: 2px;
+}
+
+.bp-meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  margin-bottom: 5px;
+}
+
+.bp-meta-label {
+  font-size: 12px;
+  color: #9A9490;
+  min-width: 110px;
+}
+
+.bp-meta-value {
+  font-size: 12px;
+  color: #3A3530;
+  font-weight: 500;
+}
+
+/* Device pill — pill-shape rounded corners (999px) to match the
+   other pills on the homepage (lib-card-type / lib-card-status). */
+
+.bp-device-chip {
+  display: inline-block;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8B6A10;
+  background: rgba(196, 169, 77, 0.12);
+  border: 0.5px solid rgba(196, 169, 77, 0.25);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+.bp-section-label {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9A9490;
+  margin: 14px 0 14px;
+  font-weight: 400;
+}
+
+.bp-feat-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bp-feat-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.bp-feat-dot {
+  width: 6px;
+  height: 6px;
+  min-width: 6px;
+  border-radius: 50%;
+  background: #C4A94D;
+  margin-top: 6px;
+}
+
+.bp-feat-content { flex: 1; min-width: 0; }
+
+.bp-feat-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2A2520;
+  display: block;
+  margin-bottom: 3px;
+  line-height: 1.3;
+}
+
+.bp-feat-desc {
+  font-size: 12px;
+  color: #8B8578;
+  line-height: 1.55;
+}
+
+.bp-modal-empty {
+  font-size: 12px;
+  color: #9A9490;
+  opacity: 0.85;
+}
+
+@media (max-width: 560px) {
+  /* Stack the two trim-wrapped cards vertically on phone widths. */
+  .bp-modal-assembly {
+    flex-direction: column;
+    align-items: center;
+  }
+  .bp-card-room { width: 200px; }
+  .bp-card-features { width: 280px; }
+}
+
+/* PR-29: brief confirmation toast after a "Copy as Is" succeeds.
+   Fixed-position pill at the bottom of the viewport. Fades in,
+   stays for ~2.5s, fades out (the JS clears the message). */
+
+.bp-copy-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 18px;
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-border);
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  font-size: 12px;
+  color: var(--p-text-primary);
+  z-index: 170;
+  animation: bp-copy-toast-in 220ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bp-copy-toast { animation: none; }
+}
+
+/* ── Favorites section ────────────────────────────────────── */
+
+.favs-toolbar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  min-height: 28px;
+}
+
+.favs-edit-btn {
+  margin-left: auto;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--p-text-secondary);
+  background: transparent;
+  border: 0.5px solid var(--p-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.favs-edit-btn:hover {
+  border-color: var(--p-gold-light);
+  color: var(--p-gold-light);
+}
+
+.favs-edit-btn.active {
+  border-color: var(--p-gold-light);
+  color: var(--p-gold-deep, #8B6A10);
+  background: rgba(196, 169, 77, 0.08);
+}
+
+.favs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.fav-card {
+  border: 0.5px solid var(--p-border);
+  border-radius: 6px;
+  background: var(--p-bg-surface);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+  position: relative;
+}
+
+.fav-card:hover { border-color: var(--p-gold-light); }
+
+.fav-card.editing { cursor: default; }
+
+.fav-card.selected {
+  background: rgba(196, 169, 77, 0.08);
+  border-color: var(--p-gold-light);
+}
+
+.fav-copy {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border: 0.5px solid var(--p-border);
+  background: var(--p-bg-surface);
+  border-radius: 4px;
+  color: var(--p-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity 0.14s ease, transform 0.14s ease, color 0.12s, border-color 0.12s;
+  font-family: var(--font-sans);
+  padding: 0;
+}
+
+.fav-card:hover .fav-copy {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fav-copy:hover {
+  color: var(--p-gold-light);
+  border-color: var(--p-gold-light);
+}
+
+.fav-copy.copied {
+  color: var(--p-gold-deep, #8B6A10);
+  border-color: var(--p-gold-light);
+  background: rgba(196, 169, 77, 0.08);
+  opacity: 1;
+}
+
+.fav-checkbox {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--p-text-light);
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  background: var(--p-bg-surface);
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  padding: 0;
+}
+
+.fav-checkbox:hover { border-color: var(--p-gold-light); }
+
+.fav-checkbox.checked {
+  background: var(--p-gold-light);
+  border-color: var(--p-gold-light);
+  color: white;
+}
+
+.fav-checkbox svg {
+  width: 12px;
+  height: 12px;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.fav-checkbox.checked svg { opacity: 1; }
+
+.fav-snippet {
+  font-size: 11.5px;
+  color: var(--p-text-primary);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* PR-29: tight markdown rendering inside the 3-line snippet clamp.
+   The snippet is a 240-char slice of a chat message; we want the
+   formatting (bold, code, lists, links) to show through, but
+   without the default browser margins blowing past the 3-line
+   visual bound. */
+
+.fav-snippet-md > * {
+  margin: 0;
+}
+
+.fav-snippet-md > * + * {
+  margin-top: 2px;
+}
+
+.fav-snippet-md strong { font-weight: 600; }
+
+.fav-snippet-md em { font-style: italic; }
+
+.fav-snippet-md code {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.95em;
+  background: var(--p-bg-subtle);
+  padding: 0 4px;
+  border-radius: 3px;
+}
+
+.fav-snippet-md pre {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.95em;
+  background: var(--p-bg-subtle);
+  padding: 4px 6px;
+  border-radius: 3px;
+  white-space: pre-wrap;
+  overflow: hidden;
+}
+
+.fav-snippet-md a {
+  color: var(--p-gold-deep, #8B6A10);
+  text-decoration: underline;
+}
+
+.fav-snippet-md ul,
+.fav-snippet-md ol {
+  padding-left: 1.1em;
+}
+
+.fav-snippet-md h1,
+.fav-snippet-md h2,
+.fav-snippet-md h3,
+.fav-snippet-md h4,
+.fav-snippet-md h5,
+.fav-snippet-md h6 {
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.fav-snippet-md blockquote {
+  border-left: 2px solid var(--p-border);
+  padding-left: 6px;
+  color: var(--p-text-secondary);
+}
+
+.fav-meta {
+  font-size: 10px;
+  color: var(--p-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fav-star {
+  color: var(--p-gold-light);
+  fill: var(--p-gold-light);
+}
+
+.fav-source {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bp-pawn-ring { animation: none; }
+
+.bulk-toolbar.show { animation: none; }
+
+/* ── PR-15: Mobile responsive overrides ─────────────────────
+   Breakpoints align with the existing library-grid steps at
+   640/480/420 so the layout shifts feel coordinated; 600/520
+   are added for the chats toolbar where the existing 280px
+   search width forces a slightly different crossover.
+
+   Cosmetic responsiveness lives here as media queries so the
+   CSS bundle is self-contained — components don't need JS-side
+   viewport awareness for these. The editor gate (route-level
+   decision) is the one exception and goes through useIsNarrow. */
+
+/* Chats toolbar: search loses its fixed 280px width and stretches
+   to share the row with the view-toggle pill. The view-toggle
+   keeps its labels until ~520px where it collapses to icon-only
+   (titles preserved on the buttons for tooltip a11y).
+
+   PR-18a: below 768px the view-toggle moves out of the toolbar
+   entirely (rendered inside .chat-footer via a JS narrow branch
+   in chats-preview.jsx). When it's not present, .chats-search
+   gets the full width of the toolbar. */
+
+@media (max-width: 600px) {
+  .chats-search { width: auto; flex: 1 1 0; min-width: 0; }
+}
+
+/* PR-18a — Chats footer narrow layout: when the view-toggle moves
+   into the footer (chats-preview.jsx narrow branch), the count
+   sits on the left and the toggle pill sits on the right. On the
+   smallest viewports the footer wraps so the toggle drops below
+   the count rather than crowding it. */
+
+@media (max-width: 480px) {
+  .chat-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chat-footer .view-toggle { margin-left: 0; }
+}
+
+/* Chat row column priority — drop the absolute date first
+   (relative date carries the same info more compactly), then
+   topics second. Title + summary + relative date always stay. */
+
+@media (max-width: 640px) {
+  .chat-row {
+    grid-template-columns: 28px 1fr 180px 70px;
+    gap: 6px;
+  }
+  .chat-row .chat-date + .chat-date { display: none; }
+}
+
+@media (max-width: 480px) {
+  .chat-row {
+    grid-template-columns: 28px 1fr 70px;
+    padding: 10px 10px;
+  }
+  .chat-topics { display: none; }
+}
+
+/* Bulk toolbar: lets controls wrap to a second line on very narrow
+   screens so the Clear button and per-action tooltips don't overflow. */
+
+@media (max-width: 480px) {
+  .bulk-toolbar {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+}

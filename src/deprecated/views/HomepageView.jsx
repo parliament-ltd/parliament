@@ -1,3 +1,7 @@
+// Retired with R3, approved by Stefan on 22 October 2026: The Study, the homepage view at /, with its first-run gate (R15).
+// Was src/views/HomepageView.jsx. Nothing imports it and it is not built. To restore:
+// Move it back and route / to it in src/App.jsx.
+
 // HomepageView (PR-6) — `/` route, framed as **The Study** (PR-19e).
 //
 // Loads the homepage mode from IndexedDB and renders it via

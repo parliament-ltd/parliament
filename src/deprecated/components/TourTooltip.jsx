@@ -1,3 +1,7 @@
+// Retired with R15, approved by Stefan on 22 October 2026: The tooltip tours of the homepage, /chats and Settings.
+// Was src/components/TourTooltip.jsx. Nothing imports it and it is not built. To restore:
+// Move it back and draw it in src/views/SettingsView.jsx again.
+
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'

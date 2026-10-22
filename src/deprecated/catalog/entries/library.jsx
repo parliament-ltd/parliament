@@ -1,3 +1,7 @@
+// Retired with R8, approved by Stefan on 22 October 2026: The homepage's Library section.
+// Was src/catalog/entries/library.jsx. Nothing imports it and it is not built. To restore:
+// Move it back with library-preview.jsx and register it in src/catalog/index.js.
+
 // library@1.0 — homepage section browsing the Parliament library.
 //
 // Five visible tabs: Rooms, Layouts, Components, Schemes, Resources.

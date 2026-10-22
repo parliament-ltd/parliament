@@ -15,7 +15,6 @@
 import { Settings as SettingsIcon, Database, Wand2, Wrench } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useBackup } from '../stores/BackupContext'
-import BackupStatusIndicator from './BackupStatusIndicator'
 import ParliamentMark from './ParliamentMark'
 
 const ICON_BTN = 'inline-flex items-center justify-center w-8 h-8 rounded-md text-[var(--p-text-secondary)] hover:text-[var(--p-gold-light)] transition-colors'
@@ -54,8 +53,6 @@ export default function HomepageTopBar({ breadcrumb }) {
       )}
 
       <div className="flex-1" />
-
-      <BackupStatusIndicator />
 
       <button
         type="button"
