@@ -362,6 +362,18 @@ Steps 9 and 10 of welcome v9 (strike a line, leave the AI a note) need editing i
 
 ### Stage 6. Almanac and Collection in full
 
+Read with C131: the Almanac is **Records**, a docket a **plan**, a term a **keyword**, and the `room:` filter is folded into `in:`.
+
+**Status, 21 October: split into eight pieces**, each committed and checked before the next. Points the documents leave open are C132 to C139, each built as suggested so a ruling changes one entry. A19 and retirements R1 to R9, R11 to R13 and R27 are put to Stefan at the stage's checkpoint, after piece 8.
+1. **Search and every filter.** On Records the bar's search narrows the table as you type: titles, summaries, tags, rooms, notes, keywords, quotes, and the words inside chats and documents. Every filter (`type:`, `tag:`, `model:`, `from:`, `in:`, `has:`, `cost:`, `since:`, `until:`, `sort:`), commas for "or" and a minus to leave out, with the Enter line saying how many rows will show. The filters in force are one line at the top of Records; a click on one removes it (`clear:tag`), and `clear:filters` removes them all. Keywords and quotes are rows when filtered for or found by a search (A19). From now on each reply keeps the model that answered and its tokens, so `cost:` can be worked out (C132). *Try:* type a word in the bar on Records; `>type:chat`; `>tag:x -tag:y`; `>since:7d sort:oldest`; `>type:keyword`; `>clear:filters`.
+2. **Saved searches, columns and long tables.** `save:"…"` and `forget:`, the saved searches at the top of Records; `cols:-room +created`, kept on this device; rows drawn only when on screen. *Try:* save a search, reload, run it again, forget it; hide a column; a table of thousands of rows.
+3. **Row verbs and undo.** `pin:`, `archive:` (C135), `copy:`, `name:207 "…"`, `tagadd:`, `retag:`, `untag:` (C136), each saying before Enter what it changes, and `undo:` for them (C134). *Try:* pin a chat, tag three things, rename a tag, archive one and bring it back, undo each.
+4. **`erase:`.** One thing or more for good, by number: the Enter line names what goes, what happens to its markings, and that undo cannot bring it back (C137). *Try:* erase a test chat that has a keyword; then one with `all`.
+5. **Export.** `export:md` and `export:jsonl` of rows by number, of the table as filtered, or of a collection, with sources footnoted (C138). *Try:* export two chats as Markdown and read the file.
+6. **The Collection, as cards.** To collection board v3 and the editing spec: cards, tabs by kind shown only when they hold something (A16), three orders and `heading:`, the numbered source picker; `new:collection`, `add:`, `rm:`, `name:`, `clear:`, `forget:`; Favorites is the first collection; "Pin for reference" shows as a quote (A23) (C139). *Try:* `new:collection`, add three things, a heading, name it, reload.
+7. **The four acts, and finding.** Note, tag, summarize and prompt over selected cards (`summarize:` names its one model call and cost first); quoting a passage from a chat; `compare:` with no model call; a card's number finds its passage in the chat, and a marked passage finds its card. *Try:* quote a passage, write a note quoting two cards, compare two.
+8. **The rest.** The backup reminder as one line of marginalia at the top of Records (C94); a link's full address before it opens (security notes §1.3); `close:` and `width:` by a room's number, and `close:welcome` (C125). Then the checkpoint.
+
 - **Added**
   - Every filter (`type:`, `room:`, `tag:`, `model:`, `from:`, `in:`, `has:`, `cost:`, `since:`, `until:`, `sort:`), saved searches, `cols:`, and rows drawn only when on screen.
   - Row verbs: `pin:`, `archive:`, `copy:`, `export:`, the tag verbs, and `erase:`.
