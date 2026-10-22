@@ -205,6 +205,29 @@ export const COPY = {
     clearNoSearch: /*i18n*/ { id: 'enter.clearNoSearch', message: 'Nothing is searched for' },
     clearNoSort: /*i18n*/ { id: 'enter.clearNoSort', message: 'The table is in its usual order' },
     clearNoFilter: /*i18n*/ { id: 'enter.clearNoFilter', message: 'No {verb} filter is in force' },
+    // Saved searches (stage 6, piece 2; C140). {name} is the person's words;
+    // {words} lists names, joined with "or".
+    saveKeep: /*i18n*/ { id: 'enter.saveKeep', message: 'Enter keeps this search as {name}. Opening it works it out again' },
+    saveReplace: /*i18n*/ { id: 'enter.saveReplace', message: 'Enter replaces the saved search {name} with this one' },
+    saveSame: /*i18n*/ { id: 'enter.saveSame', message: '{name} is saved as this search already' },
+    saveNothing: /*i18n*/ { id: 'enter.saveNothing', message: 'Nothing to save yet. Search or filter first' },
+    saveName: /*i18n*/ { id: 'enter.saveName', message: 'A saved search needs a name, like save:"Owls this week"' },
+    saveLong: /*i18n*/ { id: 'enter.saveLong', message: 'A name is at most {max} characters' },
+    saveKey: /*i18n*/ { id: 'enter.saveKey', message: 'This search looks like it holds a key, so it is not kept' },
+    savedFailed: /*i18n*/ { id: 'enter.savedFailed', message: 'The saved searches did not change. Try again' },
+    forgetSearch: /*i18n*/ { id: 'enter.forgetSearch', message: 'Enter forgets the saved search {name}. Nothing it finds is touched' },
+    forgetNone: /*i18n*/ { id: 'enter.forgetNone', message: 'Nothing is saved as {name}' },
+    forgetWhich: /*i18n*/ { id: 'enter.forgetWhich', message: 'More than one saved search starts that way: {words}' },
+    openSaved: /*i18n*/ { id: 'enter.openSaved', message: 'Enter shows the saved search {name}' },
+    openWhichSaved: /*i18n*/ { id: 'enter.openWhichSaved', message: 'More than one saved search starts that way: {words}' },
+    savedStale: /*i18n*/ { id: 'enter.savedStale', message: 'so the saved search {name} cannot open as it is. forget: removes it', comment: 'Follows the reason a filter in it no longer reads' },
+    // cols: (C141). {cols} lists column names; {col} is one; {words} the words cols: takes, which stay English.
+    colsNow: /*i18n*/ { id: 'enter.colsNow', message: '{board} shows {cols}. A minus hides one, a plus shows it again' },
+    colsHide: /*i18n*/ { id: 'enter.colsHide', message: 'Enter hides {cols}' },
+    colsShow: /*i18n*/ { id: 'enter.colsShow', message: 'Enter shows {cols}' },
+    colsSame: /*i18n*/ { id: 'enter.colsSame', message: 'The columns are as you ask already' },
+    colsStays: /*i18n*/ { id: 'enter.colsStays', message: '{col} always shows' },
+    colsUnknown: /*i18n*/ { id: 'enter.colsUnknown', message: 'No column is called {word}. Try {words}' },
     // Bringing boards into the space: records:, room:, tour: (C95, C125, C131).
     // One space (C125): an arrangement's boards brought beside what is here.
     bringBoards: /*i18n*/ { id: 'enter.bringBoards', message: 'Enter brings {boards} beside what is here', comment: '{boards} lists board names' },
@@ -405,6 +428,10 @@ export const COPY = {
     removes: /*i18n*/ { id: 'almanac.removes', message: 'Removes it, as {command} does', comment: '{command} stays English' },
     shown: /*i18n*/ { id: 'almanac.shown', message: '{count, plural, =0 {no rows} one {# row} other {# rows}}' },
     noneMatch: /*i18n*/ { id: 'almanac.noneMatch', message: 'Nothing matches. clear:filters shows everything again.', comment: 'clear:filters stays English' },
+    // Saved searches, one line at the top (stage 6, piece 2; C140).
+    saved: /*i18n*/ { id: 'almanac.saved', message: 'Saved searches' },
+    openSavedHelp: /*i18n*/ { id: 'almanac.openSavedHelp', message: 'Shows it, as open:"{name}" does', comment: 'open: stays English; {name} is the person\'s words' },
+    saveHelp: /*i18n*/ { id: 'almanac.saveHelp', message: 'Writes save: in the bar, to keep this search under a name', comment: 'save: stays English' },
   },
 
   // Collections by the words people read (C139). A collection's own name is

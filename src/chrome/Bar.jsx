@@ -40,10 +40,11 @@ import KeyPanel from './KeyPanel'
 // Search narrows the board the bar points at as it is typed (C132 (a)): for
 // now Records. While the bar points at Records it reports what is typed in
 // search (onSearch), and `search` is how many rows that leaves, for the
-// Enter line. searchReset changes when clear:filters or clear:search empties
-// the search.
+// Enter line. searchTo ({ text, n }) changes when the search is set from
+// elsewhere: emptied by clear:filters or clear:search, or a saved search's
+// words when one is opened (C140).
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, onSearch, search = null, searchReset = 0 }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, onSearch, search = null, searchTo = null }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -72,7 +73,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   // What is searched for on Records, as it is typed.
   const searched = field.text.search
   useEffect(() => { if (board === 'almanac') onSearch?.(searched) }, [board, searched, onSearch])
-  useEffect(() => { if (searchReset) dispatch({ type: 'clearSearch' }) }, [searchReset])
+  useEffect(() => { if (searchTo) dispatch({ type: 'setSearch', value: searchTo.text }) }, [searchTo])
   useEffect(() => { if (autoFocus) input.current?.focus() }, [autoFocus])
 
   // `/` outside text fields, and Cmd/Ctrl+K from anywhere, in this document.

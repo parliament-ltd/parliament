@@ -18,8 +18,9 @@ import { boardEntry, boardFor } from './boards'
  * @typedef {{ id: string, columns: string[][], popped: Popped[], addressed: string,
  *   bar: { at: 'top'|'bottom'|'card', side: 'left'|'center'|'right', popped: boolean },
  *   resting: 'search'|'prompt'|null, context: Record<string, string|number>,
- *   widths?: Record<string, number>, focus?: object }} Arrangement  widths: the shares the person has set, by
- *   board (C126); focus: while focus: holds, the space as it was before, for focus:off (stage 5)
+ *   widths?: Record<string, number>, focus?: object, recordsCols?: string[] }} Arrangement  widths: the shares the
+ *   person has set, by board (C126); focus: while focus: holds, the space as it was before, for focus:off (stage 5);
+ *   recordsCols: the columns Records shows, when the person has chosen (cols:, C141)
  * @typedef {{ message: string, values?: object }} Says
  * @typedef {{ next: Arrangement|null, says: Says }} Plan  next is null when Enter would do nothing
  */
@@ -93,10 +94,13 @@ const isOnPage = (a, board) => onPage(a).includes(board)
 const isPopped = (a, board) => a.popped.some((p) => p.board === board)
 const columnOf = (a, board) => a.columns.findIndex((c) => c.includes(board))
 const without = (columns, board) => columns.map((c) => c.filter((b) => b !== board)).filter((c) => c.length)
-const copy = (a) => ({ ...a, columns: a.columns.map((c) => [...c]), popped: a.popped.map((p) => ({ ...p })), bar: { ...a.bar }, context: { ...a.context }, widths: { ...a.widths } })
+const copy = (a) => ({
+  ...a, columns: a.columns.map((c) => [...c]), popped: a.popped.map((p) => ({ ...p })), bar: { ...a.bar }, context: { ...a.context }, widths: { ...a.widths },
+  ...(a.recordsCols ? { recordsCols: [...a.recordsCols] } : {}),
+})
 const sortedWidths = (a) => Object.entries(a.widths ?? {}).sort(([x], [y]) => (x < y ? -1 : 1))
-const sameLayout = (x, y) => JSON.stringify([x.columns, x.popped, x.addressed, x.bar.at, x.bar.side, x.bar.popped, x.resting, sortedWidths(x), Boolean(x.focus)])
-  === JSON.stringify([y.columns, y.popped, y.addressed, y.bar.at, y.bar.side, y.bar.popped, y.resting, sortedWidths(y), Boolean(y.focus)])
+const sameLayout = (x, y) => JSON.stringify([x.columns, x.popped, x.addressed, x.bar.at, x.bar.side, x.bar.popped, x.resting, sortedWidths(x), Boolean(x.focus), recordsColumns(x)])
+  === JSON.stringify([y.columns, y.popped, y.addressed, y.bar.at, y.bar.side, y.bar.popped, y.resting, sortedWidths(y), Boolean(y.focus), recordsColumns(y)])
 const refuse = (message, values) => ({ next: null, says: { message, values } })
 const go = (next, message, values) => ({ next, says: { message, values } })
 
@@ -398,6 +402,53 @@ export function planFocusOff(a) {
   return go(next, back.length ? 'focusOff' : 'focusOffSame', { boards: back })
 }
 
+// ── cols: (Almanac v30; stage 6, piece 2; C141) ─────────
+// Which columns Records shows. The title and the number always show
+// (almanac spec §3); the board's width still drops what does not fit.
+// Kept with the space, so reset: puts them back (v30).
+
+/** Records' columns, in their order. */
+export const RECORDS_COLUMNS = Object.freeze(['type', 'id', 'title', 'room', 'tags', 'created', 'active'])
+const STAYING = new Set(['id', 'title'])
+// The words cols: takes for each, v30's included (date, last).
+const COLUMN_WORDS = Object.freeze({ type: 'type', id: 'id', title: 'title', room: 'room', tags: 'tags', tag: 'tags', created: 'created', date: 'created', active: 'active', last: 'active' })
+
+/** The columns Records shows here, in order. */
+export const recordsColumns = (a) => (Array.isArray(a?.recordsCols) ? a.recordsCols : RECORDS_COLUMNS)
+
+/**
+ * cols:-room +created. Bare cols: says which show. A minus hides a column,
+ * a plus (or nothing) shows it again.
+ * @param {Arrangement} a
+ * @param {string[]} words as typed, in lower case
+ */
+export function planCols(a, words = []) {
+  const now = recordsColumns(a)
+  if (!words.length) return refuse('colsNow', { board: 'almanac', cols: now })
+  let next = [...now]
+  const hid = []
+  const shown = []
+  for (const w of words) {
+    const name = w.replace(/^[-+]/, '')
+    const col = COLUMN_WORDS[name]
+    if (!col) return refuse('colsUnknown', { word: name, words: RECORDS_COLUMNS })
+    if (w.startsWith('-')) {
+      if (STAYING.has(col)) return refuse('colsStays', { col })
+      if (next.includes(col)) { next = next.filter((c) => c !== col); hid.push(col) }
+    } else if (!next.includes(col)) {
+      next = RECORDS_COLUMNS.filter((c) => next.includes(c) || c === col)
+      shown.push(col)
+    }
+  }
+  if (!hid.length && !shown.length) return refuse('colsSame')
+  const out = copy(a)
+  if (next.length === RECORDS_COLUMNS.length) delete out.recordsCols
+  else out.recordsCols = next
+  const plan = go(out, hid.length ? 'colsHide' : 'colsShow', { cols: hid.length ? hid : shown })
+  if (hid.length && shown.length) plan.says.also = [{ message: 'colsShow', values: { cols: shown } }]
+  return plan
+}
+
 /** reset:. This arrangement as shipped, its windows closed; what boards show stays. */
 export function planReset(a) {
   const next = shipped(a.id, a.context)
@@ -414,7 +465,7 @@ export function address(a, board) {
 
 // The verbs this module answers. open: and pop: with a number wait for the
 // stages that build what numbers open.
-export const ARRANGEMENT_VERBS = Object.freeze(['open', 'close', 'move', 'swap', 'pop', 'reset', 'bar', 'width'])
+export const ARRANGEMENT_VERBS = Object.freeze(['open', 'close', 'move', 'swap', 'pop', 'reset', 'bar', 'width', 'cols'])
 
 const word = (arg) => (arg?.kind === 'word' ? arg.value : null)
 
@@ -462,6 +513,8 @@ export function plan(a, step, layout = null) {
       return planReset(a)
     case 'bar':
       return planBar(a, first)
+    case 'cols':
+      return planCols(a, args.map((arg) => String(arg.value ?? arg.text ?? '').toLowerCase()))
     case 'width': {
       if (first === 'even') return planWidthEven(a)
       const percent = args.find((arg) => arg?.kind === 'percent')?.value

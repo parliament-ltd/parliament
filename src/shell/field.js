@@ -88,7 +88,7 @@ function input(state, value) {
 /**
  * @param {FieldState} state
  * @param {{ type: string, value?: string, resting?: 'search'|'prompt' }} action
- *   input (value), escape, recall (value), ran (to: 'prompt' after focus:), sent, clearSearch, surface (resting), focus, blur, open,
+ *   input (value), escape, recall (value), ran (to: 'prompt' after focus:), sent, clearSearch, setSearch (value), surface (resting), focus, blur, open,
  *   editReply, doneEditing, hover, leave
  * @returns {FieldState}
  */
@@ -119,6 +119,13 @@ export function fieldReducer(state, action) {
       // clear:filters or clear:search on Records (C132 (c)): the search goes,
       // and nothing else changes.
       return state.text.search ? { ...state, text: { ...state.text, search: '' } } : state
+
+    case 'setSearch': {
+      // A saved search opened on Records (C140): the field holds its words,
+      // and nothing else changes.
+      const value = String(action.value ?? '')
+      return state.text.search === value ? state : { ...state, text: { ...state.text, search: value } }
+    }
 
     case 'surface': {
       // The addressed screen changed, and with it the resting mode.

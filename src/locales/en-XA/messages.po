@@ -53,6 +53,11 @@ msgstr ""
 msgid "almanac.noneMatch"
 msgstr ""
 
+#. open: stays English; {name} is the person's words
+#. js-lingui-explicit-id
+msgid "almanac.openSavedHelp"
+msgstr ""
+
 #. Marginalia under a pinned row
 #. js-lingui-explicit-id
 msgid "almanac.pinned"
@@ -66,6 +71,15 @@ msgstr ""
 #. What clicking a row does; open: stays English
 #. js-lingui-explicit-id
 msgid "almanac.rowHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.saved"
+msgstr ""
+
+#. save: stays English
+#. js-lingui-explicit-id
+msgid "almanac.saveHelp"
 msgstr ""
 
 #. What is searched for, in the quotation marks the language uses
@@ -474,6 +488,30 @@ msgid "enter.closeWelcome"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.colsHide"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.colsNow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.colsSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.colsShow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.colsStays"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.colsUnknown"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.costBad"
 msgstr ""
 
@@ -545,6 +583,18 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.focusOffSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.forgetNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.forgetSearch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.forgetWhich"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -710,6 +760,14 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.openPopped"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSaved"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openWhichSaved"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -895,6 +953,43 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.savedFailed"
+msgstr ""
+
+#. Follows the reason a filter in it no longer reads
+#. js-lingui-explicit-id
+msgid "enter.savedStale"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.saveKeep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.saveKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.saveLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.saveName"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.saveNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.saveReplace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.saveSame"
 msgstr ""
 
 #. In search mode on a board search does not reach yet; {board} is Records

@@ -173,8 +173,6 @@
 .ch-alm-f .x { color: var(--ch-marg); }
 .ch-shell .ch-alm-f:hover, .ch-shell .ch-alm-f:hover .x { color: var(--ch-ink); }
 .ch-alm-count { margin-inline-start: auto; }
-.ch-shell .ch-alm-clear { padding: 2px 0; font: 400 var(--ch-t-id) var(--ch-mono); color: var(--ch-marg); text-decoration: underline; text-underline-offset: 2px; }
-.ch-shell .ch-alm-clear:hover { color: var(--ch-ink); }
 .ch-atable { width: 100%; border-collapse: collapse; table-layout: fixed; font: 400 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink); }
 .ch-atable th { font: 500 10.5px var(--ch-sans); color: var(--ch-ink-3); text-align: center; padding: 9px 6px 8px; border-bottom: 1px solid var(--ch-divider); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ch-atable th.c-title { text-align: start; }
@@ -412,3 +410,17 @@
 .ch-foot .sep { opacity: .4; }
 .ch-shell .ch-foot a { color: inherit; text-decoration: none; }
 .ch-shell .ch-foot a:hover { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+
+/* Records in full (stage 6, piece 2). The saved searches, one line at the
+   top (C140); the one on screen underlined, as a chosen shelf is. Rows not
+   in view are blank space of their height (C142). */
+.ch-alm-saved { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; padding: 8px 16px 0; }
+.ch-alm-saved .k { font: 600 9px var(--ch-sans); font-style: normal; letter-spacing: .055em; text-transform: uppercase; color: var(--ch-ink-3); }
+.ch-shell .ch-alm-saved button { padding: 2px 0; color: var(--ch-ink-2); }
+.ch-shell .ch-alm-saved button:hover { color: var(--ch-ink); }
+.ch-shell .ch-alm-saved button.on { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 3px; }
+.ch-shell .ch-alm-cmd { padding: 2px 0; font: 400 var(--ch-t-id) var(--ch-mono); color: var(--ch-marg); text-decoration: underline; text-underline-offset: 2px; }
+.ch-shell .ch-alm-cmd:hover { color: var(--ch-ink); }
+.ch-atable tbody tr.ch-gap { cursor: default; }
+.ch-atable tbody tr.ch-gap:hover { background: none; }
+.ch-atable tr.ch-gap td { height: 0; padding: 0; border: 0; }

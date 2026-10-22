@@ -213,7 +213,8 @@ export function readSort(word, sort = DEFAULT_SORT) {
 
 /**
  * The view after one line of commands, in the order they were typed: each
- * `{ filter }`, `{ sort }` or `{ clear }`. A filter typed on this line
+ * `{ filter }`, `{ sort }`, `{ clear }`, or `{ replace }` for a whole view
+ * (a saved search, C140). A filter typed on this line
  * replaces the ones of its kind from before; two of one kind on this line
  * must both hold.
  * @returns {object} the new view
@@ -222,7 +223,10 @@ export function nextView(view = EMPTY_VIEW, steps = []) {
   let next = { search: view.search ?? '', filters: [...(view.filters ?? [])], sort: view.sort ?? DEFAULT_SORT }
   const named = new Set()
   for (const s of steps) {
-    if (s.clear) {
+    if (s.replace) {
+      next = { search: s.replace.search ?? '', filters: [...(s.replace.filters ?? [])], sort: s.replace.sort ?? DEFAULT_SORT }
+      named.clear()
+    } else if (s.clear) {
       if (s.clear === 'filters') next = { search: '', filters: [], sort: DEFAULT_SORT }
       else if (s.clear === 'search') next = { ...next, search: '' }
       else if (s.clear === 'sort') next = { ...next, sort: DEFAULT_SORT }

@@ -169,3 +169,13 @@ describe('clearing the search on Records (C132 (c))', () => {
     expect(act(t, 'clearSearch')).toBe(t)
   })
 })
+
+describe('a saved search opened on Records (C140)', () => {
+  it('puts its words in the search and changes nothing else', () => {
+    const s = fieldReducer(initialField('search'), { type: 'input', value: '>save:"x"' })
+    const t = fieldReducer(s, { type: 'setSearch', value: 'barn owl' })
+    expect(t.text).toEqual({ search: 'barn owl', command: 'save:"x"', prompt: '' })
+    expect(t.mode).toBe('command')
+    expect(fieldReducer(t, { type: 'setSearch', value: 'barn owl' })).toBe(t)
+  })
+})

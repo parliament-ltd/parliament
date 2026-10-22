@@ -5,7 +5,7 @@ import {
   SHIPPED, shipped, shippedFor, restingMode, address, plan, ARRANGEMENT_VERBS,
   SPACE, arrangementBoards, roomOnScreen, planBring, planRoom,
   usualShare, columnShares, withShares, withUsualShares, planWidth, planWidthEven, WIDTH_RANGE,
-  planFocus, planFocusOff,
+  planFocus, planFocusOff, planCols, recordsColumns, RECORDS_COLUMNS,
   planOpen, planClose, planMove, planSwap, planPop, planPopBack, planPopSide, planPopBar, planBar, planReset,
 } from './arrangement'
 import { enterLine } from '../commands/registry'
@@ -457,5 +457,45 @@ describe('the copy table', () => {
     const messages = [...source.matchAll(/(?:refuse|go)\([^'`]*'([a-zA-Z]+)'/g)].map((m) => m[1])
     expect(messages.length).toBeGreaterThan(20)
     for (const m of new Set(messages)) expect(COPY.enter[m], m).toBeDefined()
+  })
+})
+
+describe('cols: (stage 6, piece 2; C141)', () => {
+  const space = () => shipped(SPACE)
+  it('hides and shows columns, in their order, and says which', () => {
+    let a = space()
+    const p = planCols(a, ['-room', '-tags'])
+    expect(p.says).toEqual({ message: 'colsHide', values: { cols: ['room', 'tags'] } })
+    a = keep(p)
+    expect(recordsColumns(a)).toEqual(['type', 'id', 'title', 'created', 'active'])
+    const q = planCols(a, ['+tags', '-created'])
+    expect(q.says).toEqual({ message: 'colsHide', values: { cols: ['created'] }, also: [{ message: 'colsShow', values: { cols: ['tags'] } }] })
+    expect(recordsColumns(keep(q))).toEqual(['type', 'id', 'title', 'tags', 'active'])
+  })
+
+  it('keeps nothing once every column shows again', () => {
+    const a = keep(planCols(space(), ['-room']))
+    expect(keep(planCols(a, ['room'])).recordsCols).toBeUndefined()
+  })
+
+  it('takes v30 words, keeps the title and number, and says which show', () => {
+    expect(recordsColumns(keep(planCols(space(), ['-date', '-last'])))).toEqual(['type', 'id', 'title', 'room', 'tags'])
+    expect(planCols(space(), ['-id']).says).toEqual({ message: 'colsStays', values: { col: 'id' } })
+    expect(planCols(space(), ['-title']).next).toBeNull()
+    expect(planCols(space(), ['-colour']).says).toEqual({ message: 'colsUnknown', values: { word: 'colour', words: RECORDS_COLUMNS } })
+    expect(planCols(space(), ['+room']).says.message).toBe('colsSame')
+    expect(planCols(space(), []).says).toEqual({ message: 'colsNow', values: { board: 'almanac', cols: RECORDS_COLUMNS } })
+  })
+
+  it('is read from a typed line', () => {
+    const answer = enterLine('>cols:-room +created', { mode: 'command', built: new Set(ARRANGEMENT_VERBS), board: 'almanac' })
+    expect(plan(space(), answer.steps[0]).says).toEqual({ message: 'colsHide', values: { cols: ['room'] } })
+  })
+
+  it('is put back by reset:, which counts it as a change', () => {
+    const a = keep(planCols(space(), ['-room']))
+    const p = planReset(a)
+    expect(p.says.message).toBe('resetArrangement')
+    expect(p.next.recordsCols).toBeUndefined()
   })
 })

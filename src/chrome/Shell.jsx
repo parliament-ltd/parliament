@@ -9,7 +9,7 @@ import { loadSpace, saveArrangement } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
-import { shipped, address, planOpen, planPopBack, planPopBar, planRoom, roomOnScreen, SPACE, columnShares, withShares, withUsualShares } from '../shell/arrangement'
+import { shipped, address, planOpen, planPopBack, planPopBar, planRoom, roomOnScreen, SPACE, columnShares, withShares, withUsualShares, recordsColumns } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
@@ -24,7 +24,7 @@ import { useCollabMode } from '../stores/CollabModeContext'
 import { useIsStreaming, useHiddenIds, usePendingDeletes, useStreamEnd } from '../stores/chatHooks'
 import { sendableOf } from '../stores/chatStore'
 import { fromSource } from '../stores/sendHistory'
-import { preview } from './preview'
+import { preview, viewFromSaved, lineOf } from './preview'
 import Bar from './Bar'
 import Strip from './Strip'
 import Board from './Board'
@@ -38,6 +38,7 @@ import { listEntries } from '../catalog'
 import { listLayoutEntries } from '../catalog/layouts'
 import { readAlmanac } from '../lib/almanacRows'
 import { createFactsCache } from '../lib/chatFacts'
+import { readSaved, keepSearch, forgetSearch } from '../lib/savedSearches'
 import { EMPTY_VIEW, applyView, nextView, viewLine, isAtRest } from '../lib/recordsFilter'
 import { onRecordsChanged } from '../lib/records'
 
@@ -323,6 +324,7 @@ export default function Shell() {
   // and kept until the chat changes (chatFacts.js).
   const [almanacRows, setAlmanacRows] = useState(null)
   const [recordsNames, setRecordsNames] = useState({ collections: [], rooms: [] })
+  const [saved, setSaved] = useState([]) // the saved searches (C140)
   const factsCache = useRef(null)
   if (!factsCache.current) factsCache.current = createFactsCache()
   const priceOf = useCallback((id) => models(PROVIDER).find((m) => m.id === id || m.apiId === id)?.cost ?? null, [])
@@ -332,12 +334,16 @@ export default function Shell() {
     let reading = null
     const read = (change) => {
       if (change) factsCache.current.forget(change)
-      const now = readAlmanac(db.current, { facts: factsCache.current, priceOf }).catch(() => ({ rows: [], collections: [], rooms: [] }))
+      const now = Promise.all([
+        readAlmanac(db.current, { facts: factsCache.current, priceOf }).catch(() => ({ rows: [], collections: [], rooms: [] })),
+        readSaved(db.current).catch(() => []),
+      ])
       reading = now
-      now.then(({ rows, collections, rooms }) => {
+      now.then(([{ rows, collections, rooms }, kept]) => {
         if (!live || reading !== now) return
         setAlmanacRows(rows)
         setRecordsNames({ collections, rooms })
+        setSaved(kept)
       })
     }
     read()
@@ -353,14 +359,24 @@ export default function Shell() {
   const [recordsView, setRecordsView] = useState(EMPTY_VIEW)
   const viewNow = useRef(EMPTY_VIEW)
   useEffect(() => { viewNow.current = recordsView }, [recordsView])
-  const [searchReset, setSearchReset] = useState(0) // changes when the bar's search is to be emptied
+  const [searchTo, setSearchTo] = useState(null) // { text, n }: the bar's search, set from here
+  const searchSets = useRef(0)
   const onSearch = useCallback((text) => setRecordsView((v) => (v.search === text ? v : { ...v, search: text })), [])
   const showView = useCallback((view) => {
-    if (viewNow.current.search && !view.search) setSearchReset((n) => n + 1)
+    // The bar's search follows: emptied, or a saved search's words (C140).
+    if ((viewNow.current.search ?? '') !== (view.search ?? '')) setSearchTo({ text: view.search ?? '', n: ++searchSets.current })
     viewNow.current = view
     setRecordsView(view)
   }, [])
   const onRecordsClear = useCallback((k) => showView(nextView(viewNow.current, [{ clear: k }])), [showView])
+  // A click on a saved search shows it at once (C140 (a)); one that no
+  // longer reads is written into the bar, where the Enter line says why.
+  const recordsRef = useRef(null)
+  const onOpenSaved = useCallback((s) => {
+    const r = viewFromSaved(s, recordsRef.current ?? {})
+    if (r.view) showView(r.view)
+    else writeField(`>open:"${s.name}"`)
+  }, [showView, writeField])
   // The names filters read, as people read them (C132 (f), (g)).
   const recordsCtx = useMemo(() => {
     const roomNames = new Map(recordsNames.rooms.map((r) => [r.id, roomLabel(i18n, r.name)]))
@@ -377,8 +393,15 @@ export default function Shell() {
     }
   }, [recordsNames, i18n])
   const shownRows = useMemo(() => (almanacRows ? applyView(almanacRows, recordsView, recordsCtx.ctx) : null), [almanacRows, recordsView, recordsCtx])
-  const records = useMemo(() => ({ ...recordsCtx, rows: almanacRows ?? [], view: recordsView, now: Date.now() }), [recordsCtx, almanacRows, recordsView])
+  const records = useMemo(() => ({ ...recordsCtx, rows: almanacRows ?? [], view: recordsView, saved, now: Date.now() }), [recordsCtx, almanacRows, recordsView, saved])
+  // The saved search on screen: the one whose search and filters are the view's (C140 (a)).
+  const currentSaved = useMemo(() => {
+    const line = lineOf(recordsView)
+    const search = recordsView.search.trim()
+    return saved.find((x) => x.line === line && x.search === search)?.id ?? null
+  }, [saved, recordsView])
   const recordsSearch = useMemo(() => ({ count: shownRows?.length ?? 0 }), [shownRows])
+  useEffect(() => { recordsRef.current = records }, [records])
 
   // ── The Library's catalogue (stage 5, piece 4) ────────
   // Read while the Library is in the space, here or in a window, and again
@@ -445,6 +468,18 @@ export default function Shell() {
     }
     if (what.kind === 'inspect') {
       setInspected(what.num)
+      remember(body)
+      return null
+    }
+    if (what.kind === 'saveSearch' || what.kind === 'forgetSearch') {
+      // save: and forget: (C140). Kept on this device only.
+      try {
+        if (what.kind === 'saveSearch') await keepSearch(db.current, what)
+        else await forgetSearch(db.current, what.id)
+      } catch {
+        return 'savedFailed'
+      }
+      setSaved(await readSaved(db.current).catch(() => []))
       remember(body)
       return null
     }
@@ -669,14 +704,20 @@ export default function Shell() {
     [arrangement, roomRecord],
   )
   const welcomeHint = useMemo(() => (onWelcome && !welcome.finished ? { next: nextStep(welcome) } : null), [onWelcome, welcome])
-  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, search: recordsSearch, searchReset }
+  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, search: recordsSearch, searchTo }
   const filtered = isAtRest(recordsView) ? null : { search: recordsView.search.trim(), line: viewLine(recordsView) }
   const drawBoard = (board) => {
     if (board === 'room' && roomId !== undefined) {
       return <RoomBoard key={`room:${roomId ?? 'new'}`} chatId={roomId} rev={roomRev} addressed={arrangement.addressed === 'room'} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} />
     }
     if (board === 'almanac') {
-      return <AlmanacBoard key="almanac" rows={shownRows} filtered={filtered} addressed={arrangement.addressed === 'almanac'} onAddress={focusBoard} onWrite={writeField} onClear={onRecordsClear} />
+      return (
+        <AlmanacBoard
+          key="almanac" rows={shownRows} filtered={filtered} columns={arrangement.recordsCols ? recordsColumns(arrangement) : null}
+          saved={saved} currentSaved={currentSaved} addressed={arrangement.addressed === 'almanac'}
+          onAddress={focusBoard} onWrite={writeField} onClear={onRecordsClear} onOpenSaved={onOpenSaved}
+        />
+      )
     }
     if (board === 'library') {
       return <LibraryBoard key="library" items={catalogue} addressed={arrangement.addressed === 'library'} onAddress={focusBoard} onWrite={writeField} />

@@ -4,7 +4,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { openDB } from 'idb'
 import { upgradeSchema } from './schema'
 import { cleanArrangement, loadArrangement, saveArrangement } from './arrangements'
-import { shipped, planOpen, planPop, planBar } from '../shell/arrangement'
+import { shipped, planOpen, planPop, planBar, planCols, SPACE } from '../shell/arrangement'
 import { FIELDS } from './backupSchema'
 
 const open = (version) => openDB('arrangements-test', version, { upgrade: upgradeSchema })
@@ -111,5 +111,19 @@ describe('at version 5', () => {
 describe('backups', () => {
   it('do not carry arrangements yet: stage 9 adds them as a choice', () => {
     expect(Object.keys(FIELDS)).not.toContain('arrangements')
+  })
+})
+
+describe('the columns Records keeps (C141)', () => {
+  it('reads them back, checked: known columns once each, in order, with the title and number', () => {
+    const a = planCols(shipped(SPACE), ['-room']).next
+    expect(cleanArrangement(a).recordsCols).toEqual(['type', 'id', 'title', 'tags', 'created', 'active'])
+    expect(cleanArrangement({ ...a, recordsCols: ['active', 'title', 'id', 'title', 'colour'] }).recordsCols).toEqual(['id', 'title', 'active'])
+    expect(cleanArrangement({ ...a, recordsCols: ['type', 'active'] }).recordsCols).toBeUndefined()
+    expect(cleanArrangement({ ...a, recordsCols: 'room' }).recordsCols).toBeUndefined()
+  })
+
+  it('reads a space kept without them as before', () => {
+    expect(cleanArrangement(shipped(SPACE)).recordsCols).toBeUndefined()
   })
 })

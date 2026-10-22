@@ -16,11 +16,13 @@
 // the shell knows: no request is made to find out (C83).
 
 import { enterLine } from '../commands/registry'
-import { plan, planOpen, planBring, planRoom, planFocus, planFocusOff, roomOnScreen, ARRANGEMENT_VERBS } from '../shell/arrangement'
+import { plan, planOpen, planBring, planRoom, planFocus, planFocusOff, roomOnScreen, address, ARRANGEMENT_VERBS } from '../shell/arrangement'
 import { cleanRoomName, ROOM_NAME_MAX } from '../lib/roomNames'
 import { CHARS_PER_TOKEN, inputCost, describeCost } from '../shell/estimate'
 import { holdsKey } from '../commands/parse'
-import { FILTERS, EMPTY_VIEW, readFilter, readSort, nextView, clears, applyView, costUnknown } from '../lib/recordsFilter'
+import { BOARD_NAMES } from '../commands/verbs'
+import { FILTERS, EMPTY_VIEW, readFilter, readSort, nextView, clears, applyView, costUnknown, viewLine } from '../lib/recordsFilter'
+import { findSaved, cleanSearchName, SEARCH_NAME_MAX } from '../lib/savedSearches'
 
 // Verbs whose actions exist in the shell so far; the rest come with their
 // stages.
@@ -30,7 +32,9 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // name: (C40), tour:, which also shows the welcome steps (A20), and
 // inspect:, which shows one thing in detail under the bar, and api:, which
 // opens the key panel there (stage 5).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api'])
+// save: and forget: keep and remove saved searches on Records (stage 6,
+// piece 2; C140).
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -38,6 +42,75 @@ const FOCUS = 'focus'
 // commands (C99).
 const VIEW_VERBS = Object.freeze([...FILTERS, 'sort', 'clear'])
 export const BUILT = new Set([...ARRANGEMENT_VERBS, ...BRINGS, ...ACTS, FOCUS, ...VIEW_VERBS])
+
+/** A view as one line of commands, as a saved search keeps it (C140 (b)). */
+export const lineOf = (view) => viewLine(view).map((f) => f.text).join(' ')
+
+/**
+ * The view a saved search makes today: its filters read again, so since:7d
+ * is the last seven days now, and a name is found again (C140 (b), (d)).
+ * @returns {{ view: object }|{ bad: { message: string, values?: object } }}
+ */
+export function viewFromSaved(saved, records = {}) {
+  const changes = []
+  if (saved.line) {
+    const answer = enterLine(`>${saved.line}`, { mode: 'command', board: 'almanac', built: BUILT })
+    if (answer.state !== 'ready') return { bad: { message: answer.message, values: answer.values } }
+    for (const step of answer.steps) {
+      const p = VIEW_VERBS.includes(step.verb) && step.verb !== 'clear' ? planViewStep(nextView(EMPTY_VIEW, changes), step, records) : null
+      if (!p) return { bad: { message: 'later', values: { verb: `${step.verb}:` } } }
+      if (p.bad) return { bad: p.bad }
+      changes.push(p.change)
+    }
+  }
+  return { view: { ...nextView(EMPTY_VIEW, changes), search: saved.search ?? '' } }
+}
+
+/** save:"…" keeps the search and filters on Records under a name (C140 (c)). */
+function planSave(a, step, screens = {}) {
+  if (a.addressed !== 'almanac') return null
+  const records = screens.records ?? {}
+  const view = records.view ?? EMPTY_VIEW
+  const search = String(view.search ?? '').trim()
+  const line = lineOf(view)
+  if (!search && !line) return { says: { message: 'saveNothing' }, act: null }
+  // A search can hold anything typed; one that holds a key is never kept.
+  if (holdsKey(search)) return { says: { message: 'saveKey' }, act: null }
+  const named = cleanSearchName(typed(step.match?.values?.[0]))
+  if (named.error === 'empty') return { says: { message: 'saveName' }, act: null }
+  if (named.error === 'long') return { says: { message: 'saveLong', values: { max: SEARCH_NAME_MAX } }, act: null }
+  const before = (records.saved ?? []).find((x) => x.name.toLocaleLowerCase() === named.name.toLocaleLowerCase())
+  if (before && before.line === line && before.search === search) return { says: { message: 'saveSame', values: { name: before.name } }, act: null }
+  return {
+    says: { message: before ? 'saveReplace' : 'saveKeep', values: { name: named.name } },
+    act: { kind: 'saveSearch', name: named.name, search, line },
+  }
+}
+
+/** forget:"…" removes a saved search; what it found is untouched (C140 (f)). */
+function planForget(a, step, screens = {}) {
+  const { found, several } = findSaved(screens.records?.saved ?? [], typed(step.match?.values?.[0]))
+  if (several.length) return { says: { message: 'forgetWhich', values: { words: several } }, act: null }
+  if (!found) return { says: { message: 'forgetNone', values: { name: typed(step.match?.values?.[0]) } }, act: null }
+  return { says: { message: 'forgetSearch', values: { name: found.name } }, act: { kind: 'forgetSearch', id: found.id } }
+}
+
+// open:"Water tower": a saved search by name (C140 (e)), or null when the
+// name is no saved search's, for open: to answer otherwise.
+function openSaved(a, step, screens = {}) {
+  const args = step.match?.values ?? []
+  if (args.length !== 1 || (args[0].kind !== 'text' && args[0].kind !== 'word')) return null
+  // A board's name opens the board, whatever a saved search is called.
+  if (args[0].kind === 'word' && (BOARD_NAMES.includes(args[0].value) || args[0].value === 'lab')) return null
+  const records = screens.records ?? {}
+  const { found, several } = findSaved(records.saved ?? [], typed(args[0]))
+  if (several.length) return { bad: { message: 'openWhichSaved', values: { words: several } } }
+  if (!found) return null
+  const r = viewFromSaved(found, records)
+  if (r.bad) return { bad: { ...r.bad, also: [{ message: 'savedStale', values: { name: found.name } }] } }
+  const here = a.columns.flat().includes('almanac') || a.popped.some((p) => p.board === 'almanac')
+  return { next: here ? address(a, 'almanac') : planOpen(a, 'almanac').next, view: r.view, says: { message: 'openSaved', values: { name: found.name } } }
+}
 
 /**
  * One filter, sort: or clear: on Records, against the view as the line has
@@ -228,7 +301,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   if (acts.length) {
     if (answer.steps.length > 1) return { answer, says: { message: 'aloneNow', values: { verb: `${acts[0].verb}:` } }, next: null }
     const step = answer.steps[0]
-    const plans = { tour: planTour, name: planName, inspect: planInspect, api: planApi }
+    const plans = { tour: planTour, name: planName, inspect: planInspect, api: planApi, save: planSave, forget: planForget }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
     return { answer, says: p.says, next: p.next ?? null, act: p.act ?? null }
@@ -243,7 +316,17 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   const viewAlso = []
   let viewSays = null
   let onlyClears = true
+  let opened = false // open:"…" showed a saved search
   for (const step of answer.steps) {
+    const saved = step.verb === 'open' ? openSaved(a, step, screens) : null
+    if (saved) {
+      if (saved.bad) return { answer, says: saved.bad, next: null }
+      changes.push({ replace: saved.view })
+      viewSays = viewSays ?? saved.says
+      a = saved.next
+      opened = true
+      continue
+    }
     if (VIEW_VERBS.includes(step.verb)) {
       // The Collection's own search and filters come with it (piece 6).
       const p = arrangement.addressed === 'almanac' ? planViewStep(nextView(start, changes), step, records) : null
@@ -280,7 +363,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     act = { kind: 'records', view }
   }
   const layout = answer.steps.length - answer.steps.filter((s) => VIEW_VERBS.includes(s.verb)).length
-  const says = !layout ? viewWords
+  const says = !layout || (opened && answer.steps.length === 1) ? viewWords
     : answer.steps.length > 1 ? { message: answer.message, values: answer.values, ...(viewParts ? { also: viewParts } : {}) }
       : last
   // After focus: the field turns to prompt mode, under the chat (W §7).

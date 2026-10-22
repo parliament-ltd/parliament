@@ -257,7 +257,7 @@ export const VERBS = Object.freeze([
   v({ verb: 'width', group: 'layout', example: 'width:60%', forms: ['width:60%', 'width:library 30%', 'width:even'],
     takes: [['percent'], [BOARD_NAMES, 'percent'], [['even']]], stage: 5, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.width', message: 'Choose how much of the width a board takes, or put every width back' } }),
-  v({ verb: 'cols', group: 'layout', example: 'cols:-room +created', takes: [[{ many: 'word' }]], on: ['almanac'], stage: 6, undoable: true, click: 'apply',
+  v({ verb: 'cols', group: 'layout', example: 'cols:-room +created', forms: ['cols:-room +created', 'cols:'], takes: [[], [{ many: 'word' }]], on: ['almanac'], stage: 6, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.cols', message: 'Hide or show columns of the table' } }),
   v({ verb: 'focus', group: 'layout', example: 'focus:', forms: ['focus:', 'focus:sym col', 'focus:save', 'focus:off'], takes: [[], [['save', 'off']], [{ many: 'word' }]], stage: 5, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.focus', message: 'Clear the screen to your chosen boards, keep that set, or come back' } }),

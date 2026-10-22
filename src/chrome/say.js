@@ -25,6 +25,14 @@ export function longDay(i18n, day) {
 
 const boardName = (i18n, key) => (COPY.boards[key] ? i18n._(COPY.boards[key]) : key)
 
+// Records' columns by the names their headings carry (cols:, C141).
+const COLUMN_NAMES = {
+  type: COPY.almanac.colType, id: COPY.almanac.colId, title: COPY.almanac.colTitle, room: COPY.almanac.colRoom,
+  tags: COPY.almanac.colTags, created: COPY.almanac.colCreated, active: COPY.almanac.colActive,
+}
+/** A column of Records by the name its heading carries. */
+export const columnName = (i18n, key) => (COLUMN_NAMES[key] ? i18n._(COLUMN_NAMES[key]) : key)
+
 function joined(i18n, items, type) {
   try {
     return new Intl.ListFormat(i18n.locale, { type }).format(items)
@@ -74,6 +82,8 @@ export function say(i18n, message, values = {}) {
     else if (key === 'cost' && typeof value === 'number') words[key] = money(i18n, value)
     else if (PERCENTS.has(key) && typeof value === 'number') words[key] = percent(i18n, value)
     else if (key === 'day') words[key] = longDay(i18n, value)
+    else if (key === 'cols' && Array.isArray(value)) words[key] = joined(i18n, value.map((c) => columnName(i18n, c)), 'conjunction')
+    else if (key === 'col') words[key] = columnName(i18n, value)
     else words[key] = value
   }
   return i18n._(descriptor, words)

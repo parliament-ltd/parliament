@@ -462,3 +462,72 @@ describe('search and filters on Records (stage 6, piece 1; C132)', () => {
     expect(at('>tag:owls', undefined, { ...almanac(), addressed: 'collection' }).text).toBe('tag: is not built yet')
   })
 })
+
+describe('saved searches and columns (stage 6, piece 2; C140, C141)', () => {
+  const NOW = new Date(2026, 9, 21, 12).getTime()
+  const row = (num, extra = {}) => ({
+    num, kind: 'chat', title: `chat ${num}`, text: null, summary: null, tags: [], pinned: false, roomId: null,
+    createdAt: new Date(2026, 9, 1).toISOString(), activeAt: new Date(2026, 9, 1).toISOString(),
+    chatNum: num, docketNum: null, branch: null, run: null, marks: [], models: [], sources: [], cost: null, collections: [], words: '', ...extra,
+  })
+  const rows = [row(202, { tags: ['owls'], createdAt: new Date(2026, 9, 20).toISOString() }), row(204, { tags: ['owls', 'essay'] }), row(206)]
+  const saved = [
+    { id: 's1', name: 'Owls', search: '', line: 'tag:owls' },
+    { id: 's2', name: 'This week', search: '', line: 'since:7d sort:oldest' },
+    { id: 's3', name: 'Old room', search: '', line: 'in:"Attic"' },
+  ]
+  const view = (filters = [], search = '') => ({ search, filters, sort: { by: 'active', asc: false } })
+  const records = (v = view()) => ({ rows, view: v, saved, now: NOW, locale: 'en-US', rooms: [], collections: [], ctx: { roomLabel: () => '' } })
+  const at = (value, v, a = almanac()) => {
+    const p = preview(value, { mode: 'command', arrangement: a, screens: { records: records(v) } })
+    const also = [].concat(p.says?.also ?? []).map((x) => say(i18n, x.message, x.values))
+    return { ...p, text: [say(i18n, p.says.message, p.says.values), ...also].join(' · ') }
+  }
+  const tagOwls = { k: 'tag', neg: false, v: ['owls'], text: 'tag:owls' }
+
+  it('save: keeps the search and filters as commands, and says if it replaces one', () => {
+    const p = at('>save:"Owl chats"', view([tagOwls, { k: 'type', neg: false, v: ['chat'], text: 'type:chat' }], 'barn'))
+    expect(p.text).toBe('Enter keeps this search as Owl chats. Opening it works it out again')
+    expect(p.act).toEqual({ kind: 'saveSearch', name: 'Owl chats', search: 'barn', line: 'type:chat tag:owls' })
+    expect(at('>save:owls', view([{ k: 'type', neg: false, v: ['chat'], text: 'type:chat' }])).text).toBe('Enter replaces the saved search owls with this one')
+    expect(at('>save:owls', view([tagOwls])).text).toBe('Owls is saved as this search already')
+  })
+
+  it('save: needs something to save, a name, and no key in the search', () => {
+    expect(at('>save:x', view()).text).toBe('Nothing to save yet. Search or filter first')
+    expect(at('>save:""', view([tagOwls])).text).toBe('A saved search needs a name, like save:"Owls this week"')
+    expect(at('>save:x', view([], 'sk-ant-api03-abcdefghijklmnop')).text).toBe('This search looks like it holds a key, so it is not kept')
+    expect(at('>save:x bar:top', view([tagOwls])).text).toBe('save: runs on a line of its own for now')
+  })
+
+  it('forget: removes one by name, and says when the name is not enough', () => {
+    expect(at('>forget:"this week"').act).toEqual({ kind: 'forgetSearch', id: 's2' })
+    expect(at('>forget:"this week"').text).toBe('Enter forgets the saved search This week. Nothing it finds is touched')
+    expect(at('>forget:attic').text).toBe('Nothing is saved as attic')
+  })
+
+  it('open:"…" shows a saved search, worked out again today', () => {
+    const p = at('>open:"This week"')
+    expect(p.text).toBe('Enter shows the saved search This week · Enter shows 1 row')
+    expect(p.act.view.filters.map((f) => f.text)).toEqual(['since:7d'])
+    expect(p.act.view.sort).toEqual({ by: 'active', asc: true })
+    expect(p.next.addressed).toBe('almanac')
+  })
+
+  it('open:"…" brings Records when it is not here, and never takes a board for a saved search', () => {
+    const p = at('>open:owls', undefined, shipped('settings'))
+    expect(p.next.columns.flat()).toContain('almanac')
+    expect(at('>open:records', undefined, shipped('settings')).act ?? null).toBeNull()
+  })
+
+  it('says why a saved search cannot open as it is', () => {
+    expect(at('>open:"Old room"').text).toBe('No room or collection is called Attic · so the saved search Old room cannot open as it is. forget: removes it')
+  })
+
+  it('cols: says what it hides or shows, by the columns\' names', () => {
+    expect(at('>cols:-room +created').text).toBe('Enter hides Room')
+    expect(at('>cols:').text).toBe('Records shows Type, ID, Title, Room, Tags, Created, and Last active. A minus hides one, a plus shows it again')
+    expect(at('>cols:-id').text).toBe('ID always shows')
+    expect(at('>cols:-colour').text).toBe('No column is called colour. Try type, id, title, room, tags, created, or active')
+  })
+})

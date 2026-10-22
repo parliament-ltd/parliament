@@ -53,6 +53,11 @@ msgstr "Reading what you have made"
 msgid "almanac.noneMatch"
 msgstr "Nothing matches. clear:filters shows everything again."
 
+#. open: stays English; {name} is the person's words
+#. js-lingui-explicit-id
+msgid "almanac.openSavedHelp"
+msgstr "Shows it, as open:\"{name}\" does"
+
 #. Marginalia under a pinned row
 #. js-lingui-explicit-id
 msgid "almanac.pinned"
@@ -67,6 +72,15 @@ msgstr "Removes it, as {command} does"
 #. js-lingui-explicit-id
 msgid "almanac.rowHelp"
 msgstr "Writes open:{num} in the bar"
+
+#. js-lingui-explicit-id
+msgid "almanac.saved"
+msgstr "Saved searches"
+
+#. save: stays English
+#. js-lingui-explicit-id
+msgid "almanac.saveHelp"
+msgstr "Writes save: in the bar, to keep this search under a name"
 
 #. What is searched for, in the quotation marks the language uses
 #. js-lingui-explicit-id
@@ -474,6 +488,30 @@ msgid "enter.closeWelcome"
 msgstr "Enter closes the welcome page. tour: brings it back"
 
 #. js-lingui-explicit-id
+msgid "enter.colsHide"
+msgstr "Enter hides {cols}"
+
+#. js-lingui-explicit-id
+msgid "enter.colsNow"
+msgstr "{board} shows {cols}. A minus hides one, a plus shows it again"
+
+#. js-lingui-explicit-id
+msgid "enter.colsSame"
+msgstr "The columns are as you ask already"
+
+#. js-lingui-explicit-id
+msgid "enter.colsShow"
+msgstr "Enter shows {cols}"
+
+#. js-lingui-explicit-id
+msgid "enter.colsStays"
+msgstr "{col} always shows"
+
+#. js-lingui-explicit-id
+msgid "enter.colsUnknown"
+msgstr "No column is called {word}. Try {words}"
+
+#. js-lingui-explicit-id
 msgid "enter.costBad"
 msgstr "cost: takes an amount, like >0.50, <1 or 0.18"
 
@@ -546,6 +584,18 @@ msgstr "Nothing is in focus"
 #. js-lingui-explicit-id
 msgid "enter.focusOffSame"
 msgstr "Enter brings the screen back as it was"
+
+#. js-lingui-explicit-id
+msgid "enter.forgetNone"
+msgstr "Nothing is saved as {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.forgetSearch"
+msgstr "Enter forgets the saved search {name}. Nothing it finds is touched"
+
+#. js-lingui-explicit-id
+msgid "enter.forgetWhich"
+msgstr "More than one saved search starts that way: {words}"
 
 #. js-lingui-explicit-id
 msgid "enter.fromWhat"
@@ -711,6 +761,14 @@ msgstr "Opening this comes later. inspect:{num} shows it now"
 #. js-lingui-explicit-id
 msgid "enter.openPopped"
 msgstr "{board} is in its own window. Enter brings it forward"
+
+#. js-lingui-explicit-id
+msgid "enter.openSaved"
+msgstr "Enter shows the saved search {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.openWhichSaved"
+msgstr "More than one saved search starts that way: {words}"
 
 #. js-lingui-explicit-id
 msgid "enter.popAlready"
@@ -896,6 +954,43 @@ msgstr "{verb} is no longer a command. Use {instead}"
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
 msgstr "The last room is here already"
+
+#. js-lingui-explicit-id
+msgid "enter.savedFailed"
+msgstr "The saved searches did not change. Try again"
+
+#. Follows the reason a filter in it no longer reads
+#. js-lingui-explicit-id
+msgid "enter.savedStale"
+msgstr "so the saved search {name} cannot open as it is. forget: removes it"
+
+#. js-lingui-explicit-id
+msgid "enter.saveKeep"
+msgstr "Enter keeps this search as {name}. Opening it works it out again"
+
+#. js-lingui-explicit-id
+msgid "enter.saveKey"
+msgstr "This search looks like it holds a key, so it is not kept"
+
+#. js-lingui-explicit-id
+msgid "enter.saveLong"
+msgstr "A name is at most {max} characters"
+
+#. js-lingui-explicit-id
+msgid "enter.saveName"
+msgstr "A saved search needs a name, like save:\"Owls this week\""
+
+#. js-lingui-explicit-id
+msgid "enter.saveNothing"
+msgstr "Nothing to save yet. Search or filter first"
+
+#. js-lingui-explicit-id
+msgid "enter.saveReplace"
+msgstr "Enter replaces the saved search {name} with this one"
+
+#. js-lingui-explicit-id
+msgid "enter.saveSame"
+msgstr "{name} is saved as this search already"
 
 #. In search mode on a board search does not reach yet; {board} is Records
 #. js-lingui-explicit-id

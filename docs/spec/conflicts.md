@@ -1153,6 +1153,23 @@ Found while splitting stage 6 into pieces. Read with C131 (Records, plan, keywor
 
 **C139. One collection at a time, kept as it is made.** v30 has an unsaved working collection that `name:` keeps; collection board v3 has `new:collection`; the Lab saves on every command (A10). **Suggestion:** the Collection board shows one collection. `new:collection` makes an empty one, kept at once with no name (the copy table words it); `add:`, `rm:`, `heading:` and `name:` change the one shown; `open:"Q2 evidence"` shows another; `forget:` removes one (its items stay). Collections take no number (C17). Favorites is the first, built in. A collection holds a chat (live: everything marked in it) or one marking or message (collection board v3), and an item counts as the row it belongs to for `in:`.
 
+**C140. Saved searches** (piece 2). Almanac v30 draws them in a rail beside the table, each a name and a description; a click opens one, and it "recomputes every time you open it". Built so:
+- **(a) Where they show.** The space has no rail board, so they are one line at the top of Records, above the filters in force, shown only when one exists. A click shows one at once, since it only changes the view; `open:"Water tower"` does the same from the bar. The one on screen is marked while the view is still its own.
+- **(b) What is kept.** The search words and the filters as commands (`type:chat since:7d`), not the rows they found, so a saved search is worked out again when opened: `since:7d` is the last seven days on the day it is opened. Kept on this device in the version 6 list `savedSearches`, never in a backup, as that list was made. Each record holds an id, the name, the search, the line of filters and two dates: **shown at the checkpoint.**
+- **(c)** `save:"…"` with a name already saved replaces it, and the Enter line says so first. A search shaped like a key is refused, as the bar refuses one. Nothing searched or filtered: nothing to save.
+- **(d)** A saved search whose filter no longer reads (a room renamed, a number erased) says which before Enter and does not open; `forget:` removes it.
+- **(e)** `open:` takes a saved search's name (A1 lets `open:` take a name). Chats, rooms and collections by name join with their pieces; where names meet, the Enter line will ask which.
+- **(f)** `forget:` removes a saved search now; collections (piece 6) and arrangements (stage 14) join it. Until `undo:` (piece 3) the Enter line does not offer one.
+- **Suggestion:** keep as built.
+
+**C141. Columns** (piece 2). v30: `cols:-room +created`, the title and the id always shown, `reset:` restoring the columns. Built so:
+- **(a)** `cols:` with names takes columns away or brings them back; bare `cols:` says which show. Names: type, id, title, room, tags, created, active (v30's, with `date` for created and `last` for active). The title and the number stay (almanac spec §3).
+- **(b)** Kept with the space, as an optional field (`recordsCols`) beside the widths (C126): on this device, read back with the same checks, and `reset:` puts them back. A space kept without it reads as before; **shown at the checkpoint.**
+- **(c)** The board's width still decides what fits: a narrow Records drops columns as it does now, and a hidden column stays hidden at every width. v30's dragging of columns into another order is not built.
+- **Suggestion:** keep as built.
+
+**C142. Drawing only the rows on screen** (piece 2). Built: Records draws the rows in view and about a screen either side; the rest are blank space of the height they will take, measured once drawn, so the scroll bar stays true. Screen readers are told the whole count and each row's place. One trade: Tab moves through the rows that are drawn, and scrolling draws more. **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

@@ -16,7 +16,7 @@
 // gives way to the shipped default.
 
 import { boardEntry } from '../shell/boards'
-import { shipped, shippedFor, SHIPPED, SPACE } from '../shell/arrangement'
+import { shipped, shippedFor, SHIPPED, SPACE, RECORDS_COLUMNS } from '../shell/arrangement'
 
 const STORE = 'arrangements'
 const BAR_PLACES = new Set(['top', 'bottom', 'card'])
@@ -63,6 +63,10 @@ export function cleanArrangement(record) {
   for (const [k, v] of Object.entries(record.widths && typeof record.widths === 'object' ? record.widths : {})) {
     if (boardEntry(k) && shareValue(v)) widths[k] = v
   }
+  // Records' columns, when the person has chosen (cols:, C141): known
+  // columns only, once each, in their order, the title and number among them.
+  const cols = Array.isArray(record.recordsCols) ? RECORDS_COLUMNS.filter((c) => record.recordsCols.includes(c)) : null
+  const recordsCols = cols && cols.includes('id') && cols.includes('title') && cols.length < RECORDS_COLUMNS.length ? cols : null
   return {
     id: record.id,
     columns,
@@ -73,6 +77,7 @@ export function cleanArrangement(record) {
     context,
     widths,
     ...(before ? { focus: { columns: before.columns, popped: before.popped, addressed: before.addressed, bar: before.bar } } : {}),
+    ...(recordsCols ? { recordsCols } : {}),
   }
 }
 
