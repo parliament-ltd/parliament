@@ -42,6 +42,7 @@ export function planBoardOf(plan, { run = null, textOf = () => undefined, chatOf
       model: s.model ?? null,
       room: s.room ?? null,
       condition: s.condition ?? null,
+      ended: s.ended ?? null,
       // One pip per run: whether that run reached this step (Docket v12).
       reached: runs.map((r) => ({ n: r.n, yes: (r.branches?.[letter]?.steps?.length ?? 0) > i })),
     }))

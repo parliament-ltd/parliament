@@ -167,6 +167,7 @@ function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete
                 : <div className="ch-pl-text ro" dir="auto" title={s.planned ? undefined : i18n._(COPY.plan.fixed, { run: plan.n })}>{s.text}</div>}
               <div className="ch-marg ch-pl-marg">
                 <span>{s.model ? nameOf(s.model) : i18n._(COPY.plan.asBranch)}</span>
+                {s.status === 'paused' && <><Sep /><span>{i18n._(COPY.plan.ended, { why: s.ended ?? 'other' })}</span></>}
               </div>
             </div>
             <div className="ch-pl-end">

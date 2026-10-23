@@ -2722,6 +2722,11 @@ msgstr "Korteista käytävä keskustelu tarvitsee avaimen palveluun {provider}. 
 msgid "enter.promptAboutQuotes"
 msgstr "{count, plural, one {{nums} on lainaus, joka on tähän asti pidetty malleilta piilossa: sen sanat lähtevät mukaan tämän kerran} other {{nums} ovat lainauksia, jotka on tähän asti pidetty malleilta piilossa: niiden sanat lähtevät mukaan tämän kerran}}"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptBranchRunning"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.promptBusy"
 msgstr "Vastaus on vielä tulossa tänne. Lähetä, kun se on valmis"
@@ -3133,6 +3138,114 @@ msgid "enter.rowsTogether"
 msgstr "{verb} jakaa rivin toistaiseksi vain samankaltaisten komentojen kanssa"
 
 #. js-lingui-explicit-id
+msgid "enter.runChanged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runCost"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runCostCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runCostUnpriced"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runElsewhere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runGone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runHead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runHeadMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runHeadNew"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runLater"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runLocal"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runNeedsKey"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runNoSteps"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runPaused"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runPausedOnly"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runRunning"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runSkipped"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runStarted"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runTo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runUnchecked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runUndo"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.savedFailed"
 msgstr "Tallennetut haut eivät muuttuneet. Yritä uudelleen"
 
@@ -3328,6 +3441,34 @@ msgstr "{source} ei vastannut. Yritä hetken päästä uudelleen"
 #. js-lingui-explicit-id
 msgid "enter.sourceUnreachable"
 msgstr "Lähteeseen {source} ei saatu yhteyttä. Tarkista yhteys ja yritä uudelleen"
+
+#. js-lingui-explicit-id
+msgid "enter.stopAll"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.stopBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.stopDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.stopNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.stopNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.stopPlan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.stopReply"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.summarize"
@@ -3610,6 +3751,11 @@ msgstr "Käännetään. Palkki on sillä aikaa vapaa"
 #. js-lingui-explicit-id
 msgid "enter.typeCollection"
 msgstr "Taulussa {board} type: hyväksyy yhden näistä: keyword, quote, note tai highlight"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoAtRun"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.undoChanged"
@@ -4922,6 +5068,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "plan.deleteStep"
+msgstr ""
+
+#. Why a paused step stopped
+#. js-lingui-explicit-id
+msgid "plan.ended"
 msgstr ""
 
 #. Commands stay English

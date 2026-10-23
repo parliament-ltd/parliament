@@ -331,6 +331,7 @@ function validateDocket(item) {
 }
 
 const STEP_STATUSES = new Set(['ready', 'running', 'done', 'waiting', 'paused'])
+const ENDED_REASONS = new Set(['stopped', 'failed', 'stalled', 'left']) // C196 (d)
 const STEP_CONDITIONS = new Set(['finished', 'failed', 'always', 'nothing'])
 function validateRun(item) {
   if (!isId(item.id))                       return 'run.id invalid'
@@ -346,6 +347,7 @@ function validateRun(item) {
       if (s.prompt !== undefined && !isString(s.prompt, 100000)) return 'run.step.prompt invalid'
       if (s.messageId !== undefined && s.messageId !== null && !isId(s.messageId)) return 'run.step.messageId invalid'
       if (s.id !== undefined && !isId(s.id)) return 'run.step.id invalid'
+      if (s.ended !== undefined && !ENDED_REASONS.has(s.ended)) return 'run.step.ended invalid'
       if (s.model != null && !isString(s.model, 200)) return 'run.step.model invalid'
       if (s.condition != null && !STEP_CONDITIONS.has(s.condition)) return 'run.step.condition invalid'
     }

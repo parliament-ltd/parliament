@@ -106,6 +106,12 @@ describe('open: on plans (C196 (g))', () => {
     expect(run('>open:run 2', { plan: plan({ n: 2, latest: 2 }) }).text[0]).toBe('Run 2 is on the Plan board already')
   })
 
+  it('opens a plan of one chat by its number, though Records lists only the chat', () => {
+    const p = run('>open:205', { numbered: new Map(), records: { rows: [{ kind: 'chat', num: 206, chatId: 'c206', docketNum: 205, branch: 'a' }] } }, shipped('almanac'))
+    expect(p.text[0]).toBe('Enter opens plan 205 on the Plan board')
+    expect(p.next.context.docket).toBe('205')
+  })
+
   it('shows a branch that has not run on the Plan board', () => {
     expect(run('>open:201b', { plan: plan(), records: { rows: [] } }).text[0]).toBe('201b has not run yet. Enter shows its steps on the Plan board')
   })
@@ -147,5 +153,52 @@ describe('delete: of what has not been sent (C199)', () => {
     expect(run('>delete:201a', { plan: plan(), records: { rows: [{ kind: 'chat', num: 202, chatId: 'c1', docketNum: 201, branch: 'a', title: 'Tower' }] } }).act).toMatchObject({ kind: 'erase', confirm: true })
     expect(run('>delete:230', { records: { rows: [...rows, { kind: 'chat', num: 231, chatId: 'c231', docketNum: 230, branch: 'a', title: 'x' }] } }, shipped('almanac')).act).toMatchObject({ kind: 'erase', confirm: true })
     expect(run('>delete:201b, 202', { plan: plan(), records: { rows: [] } }).text[0]).toBe('Delete what has not been sent on a line of its own')
+  })
+})
+
+describe('run: and stop: (stage 10, piece 3; C200)', () => {
+  const sonnet = { id: 'claude-sonnet-5-5', name: 'Sonnet 5.5', group: 'model', provider: 'anthropic', providerName: 'Anthropic', price: { inputPerMillion: 3 } }
+  const wiki = { id: 'wikipedia', name: 'Wikipedia', group: 'source' }
+  const facts = (over = {}) => ({ keyed: { anthropic: true }, whoOf: (model) => (model === 'wikipedia' ? wiki : sonnet), charsOf: () => 4000, here: [], ...over })
+  const ready = (stepId, text, model = null) => ({ id: stepId, stepId, status: 'ready', planned: true, text, model })
+  const runPlan = (over = {}) => plan({
+    branches: [
+      { letter: 'a', address: '201a', name: 'Tower', status: 'ready', chatId: 'c1', steps: [{ id: 's1', stepId: 's1', status: 'done', planned: false, text: 'Built?' }, ready('s2', 'Who designed it?')] },
+      { letter: 'b', address: '201b', name: 'Shorter', status: 'ready', chatId: null, steps: [ready('s3', 'Water tower', 'wikipedia'), ready('s4', '')] },
+    ],
+    ...over,
+  })
+
+  it('names every step, who answers, what it costs before any reply, and that undo stops at a run', () => {
+    const p = run('>run:', { plan: runPlan(), runFacts: facts() })
+    expect(p.text).toEqual([
+      'Enter runs 2 steps of 201a and 201b, in run 1: the branches side by side, each one step after another',
+      'They go to Sonnet 5.5 and Wikipedia',
+      'At least 1,004 tokens to send, under $0.01. Each step also sends the replies before it',
+      'One empty step is skipped',
+      'Undo stops at a run: what it writes stays',
+    ])
+    expect(p.act).toMatchObject({ kind: 'run', docketId: 'd1', num: 201, n: 1, letters: ['a', 'b'], newRun: false })
+  })
+
+  it('runs one branch, or makes the next run for it, and refuses what cannot go', () => {
+    expect(run('>run:201b', { plan: runPlan(), runFacts: facts() }).text[0]).toBe('Enter runs one step of 201b, in run 1')
+    const done = runPlan()
+    done.branches[0].steps = [{ id: 's1', stepId: 's1', status: 'done', planned: false, text: 'Built?' }]
+    expect(run('>run:201a', { plan: done, runFacts: facts() })).toMatchObject({ text: ['Enter makes run 2 and runs one step of 201a in it. The other branches wait', 'They go to Sonnet 5.5', 'At least 2 tokens to send, under $0.01. Each step also sends the replies before it', 'Undo stops at a run: what it writes stays'], act: { newRun: true, letters: ['a'] } })
+    expect(run('>run:', { plan: runPlan(), runFacts: facts({ whoOf: () => ({ ...sonnet, needsKey: true }) }) }).text[0]).toBe('Step 1 of 201a goes to Sonnet 5.5, which needs a key for Anthropic. api:anthropic adds one')
+    expect(run('>run:', { plan: runPlan(), runFacts: facts({ keyed: null }) }).text[0]).toBe('Looking for a key on this device')
+    expect(run('>run:', { plan: runPlan({ latest: 2 }), runFacts: facts() }).text[0]).toBe('Run 1 is an earlier run, kept as it was. open:run 2 to change the plan')
+  })
+
+  it('stops a branch, a plan, every run, or the reply in a room', () => {
+    const busy = runPlan()
+    busy.branches[0].status = 'running'
+    expect(run('>stop:201a', { plan: busy, runFacts: facts() })).toMatchObject({ text: ['Enter stops 201a. What is done stays done and paid for; the step running now stops where it is'], act: { kind: 'stop', scope: 'branch', num: 201, letter: 'a' } })
+    expect(run('>stop:201b', { plan: busy, runFacts: facts() }).text[0]).toBe('Nothing is running in 201b')
+    expect(run('>stop:', { plan: busy, runFacts: facts() }).act).toMatchObject({ kind: 'stop', scope: 'docket', num: 201 })
+    expect(run('>stop:all', {}).act).toEqual({ kind: 'stop', scope: 'all' })
+    expect(run('>stop:', { runFacts: { room: { chatId: 'c9', num: 209, streaming: true } } }, shipped('almanac')).act).toEqual({ kind: 'stopReply', chatId: 'c9' })
+    expect(run('>stop:', {}, shipped('almanac')).text[0]).toBe('Nothing is running here')
   })
 })

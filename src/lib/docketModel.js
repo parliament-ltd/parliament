@@ -36,6 +36,10 @@ export const STATUS = Object.freeze({
 
 export const STATUSES = Object.freeze(Object.values(STATUS))
 
+// Why a paused step stopped (C196 (d)): stopped by stop:, failed, stalled
+// (the network held the reply), or left running by a tab that closed.
+export const ENDED = Object.freeze(['stopped', 'failed', 'stalled', 'left'])
+
 // What may hold a later step back (A15; C196 (e)); null: none.
 export const CONDITIONS = Object.freeze(['finished', 'failed', 'always', 'nothing'])
 

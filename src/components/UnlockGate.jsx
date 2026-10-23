@@ -6,6 +6,7 @@ import { readPreferenceQuietly } from '../lib/db'
 import { switchLanguage, languageFor } from '../i18n'
 import { tabBus } from '../lib/bus'
 import { streamingIds } from '../stores/chatStore'
+import { runsActive } from '../lib/runner'
 import './lock.css'
 
 // The lock in front of everything (Lock Parliament, stage S4, piece 3; C188,
@@ -71,7 +72,7 @@ function IdleLock() {
     const timer = setInterval(() => {
       if (Date.now() - last < ms) return
       // A reply arriving keeps the tab open until it ends.
-      if (streamingIds().length) return
+      if (streamingIds().length || runsActive()) return
       lockHere()
       window.location.reload()
     }, CHECK_EVERY)

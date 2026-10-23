@@ -31,7 +31,7 @@ import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, namesFrom, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
 import { planReply, planLanguage, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
 import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
-import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent } from '../lib/planVerbs'
+import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
 import { planSet } from '../lib/settingVerbs'
@@ -55,7 +55,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -177,9 +177,10 @@ function planDeleteStep(a, step, screens = {}) {
 /** undo: takes back the last command line of this tab (C134). undo:242, one edit, comes with editing. */
 function planUndo(a, step, screens = {}) {
   if ((step.match?.values ?? []).length) return null
-  return screens.undo
-    ? { says: { message: 'undoLine', values: { line: screens.undo } }, act: { kind: 'undo' } }
-    : { says: { message: 'undoNothing' }, act: null }
+  if (screens.undo) return { says: { message: 'undoLine', values: { line: screens.undo } }, act: { kind: 'undo' } }
+  // Nothing left to take back since a run started: undo stops there (almanac spec §5).
+  if (screens.undoFence) return { says: { message: 'undoAtRun', values: screens.undoFence }, act: null }
+  return { says: { message: 'undoNothing' }, act: null }
 }
 
 /** forget:"…" removes a saved search; what it found is untouched (C140 (f)). Or a framework of yours (C164). */
@@ -354,6 +355,8 @@ function openNumber(a, step, screens = {}) {
   const num = numberOf(step)
   if (num == null) return null
   const row = screens.numbered?.get(num)
+  // A plan of one chat is no row of its own; its number still opens it (C200).
+  if (!row && (screens.records?.rows ?? []).some((r) => r.kind === 'chat' && r.docketNum === num)) return planOpenPlan(a, num, screens)
   if (!row) return { next: null, says: { message: 'numNone', values: { num } } }
   if (row.kind === 'docket') return planOpenPlan(a, num, screens)
   if (row.kind !== 'chat' || !row.chatId) return { next: null, says: { message: 'openNotYet', values: { num } } }
@@ -705,6 +708,9 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       set: (a1, s1, sc) => (a1.addressed === 'settings' ? planSet(s1, sc) : null),
       // hold: and hold:off for a plan's branches (stage 10, piece 2; C198).
       hold: (a1, s1, sc) => planHold(s1, sc),
+      // run: and stop: (stage 10, piece 3; C200).
+      run: (a1, s1, sc) => planRun(s1, sc),
+      stop: (a1, s1, sc) => planStop(s1, sc, a1.addressed),
       // Backups from the bar (stage 9, piece 2; A21; C182): a panel under the
       // field, or a file picker first. Nothing changes before a choice there.
       backup: () => ({ says: { message: 'backupOpen' }, act: { kind: 'backupPanel' } }),
@@ -886,6 +892,8 @@ const CENT = 0.01
 export function promptPreview(text, target = {}) {
   // With the Plan board addressed, a prompt is a step planned; nothing is sent (C198).
   if (target.plan) return planPromptPreview(text, target.plan)
+  // A branch a run is sending to takes no prompt by hand until it ends (C196 (f)).
+  if (target.branchRunning) return { ready: false, says: { message: 'promptBranchRunning', values: { address: target.branchRunning } } }
   if (target.room === undefined) return { ready: false, says: { message: 'promptNoRoom' } }
   const p = Array.isArray(target.many) && target.many.length > 1 ? manyPreview(text, target) : onePreview(text, target)
   // Among a prompt's branches (C174): which one it carries on, and that the

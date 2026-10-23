@@ -12,6 +12,8 @@
 
 import { planOpen, address } from '../shell/arrangement'
 import { STATUS } from './docketModel'
+import { runScope } from './runner'
+import { CHARS_PER_TOKEN, inputCost } from '../shell/estimate'
 
 const typed = (arg) => (arg?.kind === 'text' ? arg.value : arg?.text ?? '')
 const BOARD = 'docket' // the Plan board, by name in what is said
@@ -297,4 +299,105 @@ function unsentOf(a, screens, rows) {
   if (!empty) return null
   const docketId = row?.id ?? p.docketId
   return { says: { message: 'deletePlan', values: { num: a.num } }, act: { kind: 'planDelete', what: 'plan', docketId, num: a.num } }
+}
+
+// ── run: and stop: (stage 10, piece 3; almanac spec §5; C200) ──
+
+const CENT = 0.01
+
+/**
+ * run:, run:201b (almanac spec §5). Names every step that goes, who answers
+ * each, and what it costs before any reply; each later step also sends the
+ * replies before it, so the line says the cost is at least this. A run
+ * cannot be taken back. screens.runFacts: { keyed, whoOf(model, chatId),
+ * charsOf(chatId) }: what is known of keys, who answers a step (as
+ * net.answererOf describes them), and how long a chat already is.
+ */
+export function planRun(step, screens = {}) {
+  const [arg] = step.match?.values ?? []
+  const s = shown(screens, arg?.num ?? null)
+  if (s.bad) return { says: s.bad, act: null }
+  const p = s.plan
+  const old = record(p)
+  if (old) return { says: old, act: null }
+  const f = screens.runFacts
+  if (!f) return null
+  if (f.keyed == null) return { says: { message: 'promptChecking' }, act: null }
+  const scope = runScope(p, { letter: arg?.letter ?? null })
+  if (scope.bad) return { says: scope.bad, act: null }
+  let count = 0
+  let tokens = 0
+  let total = 0
+  let priced = true
+  let local = false
+  const names = []
+  for (const b of scope.branches) {
+    let chars = b.chatId ? f.charsOf(b.chatId) : 0
+    for (const [i, st] of b.steps.entries()) {
+      const who = f.whoOf(st.model, b.chatId)
+      const at = { index: i + 1, address: b.address, name: who.name }
+      if (who.later) return { says: { message: 'runLater', values: at }, act: null }
+      if (who.gone) return { says: { message: 'runGone', values: at }, act: null }
+      if (who.needsKey) return { says: { message: 'runNeedsKey', values: { ...at, provider: who.providerName, command: `api:${who.provider}` } }, act: null }
+      if (who.unchecked) return { says: { message: 'runUnchecked', values: { ...at, provider: who.providerName, command: `api:${who.provider}` } }, act: null }
+      count += 1
+      chars += String(st.text ?? '').length
+      if (!names.includes(who.name)) names.push(who.name)
+      if (who.group === 'source') continue
+      if (who.group === 'local') { local = true; continue }
+      const t = Math.ceil(chars / CHARS_PER_TOKEN)
+      tokens += t
+      const price = who.price?.over && t > who.price.over.promptTokens ? who.price.over : who.price
+      const cost = inputCost(t, price?.inputPerMillion)
+      if (cost == null) priced = false
+      else total += cost
+    }
+  }
+  const nums = scope.branches.map((b) => b.address)
+  const also = [{ message: 'runTo', values: { answering: names } }]
+  if (tokens) also.push(!priced ? { message: 'runCostUnpriced', values: { tokens } } : total < CENT ? { message: 'runCostCheap', values: { tokens, cost: CENT } } : { message: 'runCost', values: { tokens, cost: total } })
+  if (local) also.push({ message: 'runLocal' })
+  if (scope.skipped) also.push({ message: 'runSkipped', values: { count: scope.skipped } })
+  also.push({ message: 'runUndo' })
+  return {
+    says: scope.newRun
+      ? { message: 'runHeadNew', values: { count, run: scope.run, address: nums[0] }, also }
+      : { message: nums.length > 1 ? 'runHeadMany' : 'runHead', values: { count, run: scope.run, nums, num: p.num }, also },
+    act: { kind: 'run', docketId: p.docketId, num: p.num, n: p.latest, letter: arg?.letter ?? null, letters: scope.branches.map((b) => b.letter), newRun: scope.newRun },
+  }
+}
+
+/**
+ * stop:, stop:201b, stop:201, stop:all (almanac spec §5). Stopping is not
+ * undoing: what is done stays done and paid for, and the step running now
+ * stops where it is. stop:all reaches every window. Alone, on the Plan
+ * board, the plan; in a room, the reply arriving there. screens.runFacts:
+ * { here: what runs in this tab, room: { chatId, num, streaming } }.
+ */
+export function planStop(step, screens = {}, addressed = null) {
+  const [arg] = step.match?.values ?? []
+  const f = screens.runFacts ?? {}
+  if (arg?.kind === 'word' && arg.value === 'all') return { says: { message: 'stopAll' }, act: { kind: 'stop', scope: 'all' } }
+  const p = screens.plan ?? null
+  const runningIn = (num, letter = null) => {
+    const here = (f.here ?? []).some((x) => x.num === num && (!letter || x.letter === letter))
+    const stored = p && p.num === num && p.branches.some((b) => (!letter || b.letter === letter) && b.status === STATUS.RUNNING)
+    return here || stored || !(p && p.num === num) // a plan not on the board may run in another tab
+  }
+  if (arg?.kind === 'address') {
+    if (arg.letter) {
+      const address = `${arg.num}${arg.letter}`
+      if (!runningIn(arg.num, arg.letter)) return { says: { message: 'stopNothing', values: { what: address } }, act: null }
+      return { says: { message: 'stopBranch', values: { address } }, act: { kind: 'stop', scope: 'branch', num: arg.num, letter: arg.letter } }
+    }
+    if (!runningIn(arg.num)) return { says: { message: 'stopNothing', values: { what: String(arg.num) } }, act: null }
+    return { says: { message: 'stopPlan', values: { num: arg.num } }, act: { kind: 'stop', scope: 'docket', num: arg.num } }
+  }
+  if (addressed === 'docket' && p) {
+    if (!runningIn(p.num)) return { says: { message: 'stopNothing', values: { what: String(p.num) } }, act: null }
+    return { says: { message: 'stopPlan', values: { num: p.num } }, act: { kind: 'stop', scope: 'docket', num: p.num } }
+  }
+  const room = f.room ?? null
+  if (room?.streaming) return { says: { message: 'stopReply', values: { num: room.num ?? '' } }, act: { kind: 'stopReply', chatId: room.chatId } }
+  return { says: { message: 'stopNone' }, act: null }
 }

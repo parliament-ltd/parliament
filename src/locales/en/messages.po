@@ -2722,6 +2722,11 @@ msgstr "A chat about cards needs a key for {provider}. api: adds one"
 msgid "enter.promptAboutQuotes"
 msgstr "{count, plural, one {{nums} is a quote, kept from models until now: its words go along this once} other {{nums} are quotes, kept from models until now: their words go along this once}}"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptBranchRunning"
+msgstr "{address} is running. stop:{address}, or wait"
+
 #. js-lingui-explicit-id
 msgid "enter.promptBusy"
 msgstr "A reply is still arriving here. Send once it is done"
@@ -3133,6 +3138,114 @@ msgid "enter.rowsTogether"
 msgstr "{verb} shares a line only with commands like it, for now"
 
 #. js-lingui-explicit-id
+msgid "enter.runChanged"
+msgstr "The plan changed meanwhile. Look again, then Enter"
+
+#. js-lingui-explicit-id
+msgid "enter.runCost"
+msgstr "At least {tokens, number} tokens to send, {cost}. Each step also sends the replies before it"
+
+#. js-lingui-explicit-id
+msgid "enter.runCostCheap"
+msgstr "At least {tokens, number} tokens to send, under {cost}. Each step also sends the replies before it"
+
+#. js-lingui-explicit-id
+msgid "enter.runCostUnpriced"
+msgstr "At least {tokens, number} tokens to send. Each step also sends the replies before it"
+
+#. js-lingui-explicit-id
+msgid "enter.runDone"
+msgstr "Run {run} of plan {num} is done"
+
+#. js-lingui-explicit-id
+msgid "enter.runElsewhere"
+msgstr "Plan {num} is running in another tab"
+
+#. js-lingui-explicit-id
+msgid "enter.runFailed"
+msgstr "The run could not start"
+
+#. js-lingui-explicit-id
+msgid "enter.runGone"
+msgstr "Step {index} of {address} goes to {name}, which is no longer offered"
+
+#. js-lingui-explicit-id
+msgid "enter.runHead"
+msgstr "{count, plural, one {Enter runs one step of {nums}, in run {run}} other {Enter runs # steps of {nums}, in run {run}, one after another}}"
+
+#. js-lingui-explicit-id
+msgid "enter.runHeadMany"
+msgstr "Enter runs {count, number} steps of {nums}, in run {run}: the branches side by side, each one step after another"
+
+#. js-lingui-explicit-id
+msgid "enter.runHeadNew"
+msgstr "{count, plural, one {Enter makes run {run} and runs one step of {address} in it. The other branches wait} other {Enter makes run {run} and runs # steps of {address} in it, one after another. The other branches wait}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runHeld"
+msgstr "{address} is held. hold:off {address} lets it go"
+
+#. js-lingui-explicit-id
+msgid "enter.runLater"
+msgstr "Step {index} of {address} goes to {name}, which is not built yet"
+
+#. js-lingui-explicit-id
+msgid "enter.runLocal"
+msgstr "Steps answered on this computer send nothing out"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runNeedsKey"
+msgstr "Step {index} of {address} goes to {name}, which needs a key for {provider}. {command} adds one"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runNoSteps"
+msgstr "{address} has no steps to run. new:step {address} plans one"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runNothing"
+msgstr "Nothing in run {run} is ready to run. new:step plans one"
+
+#. js-lingui-explicit-id
+msgid "enter.runPaused"
+msgstr "Run {run} of plan {num} ended. {nums} paused; the {board} board says why"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runPausedOnly"
+msgstr "{count, plural, one {{nums} paused, so run: alone leaves it. run:{example} carries on from where it stopped} other {{nums} paused, so run: alone leaves them. run:{example} carries on from where one stopped}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runRunning"
+msgstr "{address} is running. stop:{address} halts it"
+
+#. js-lingui-explicit-id
+msgid "enter.runSkipped"
+msgstr "{count, plural, one {One empty step is skipped} other {# empty steps are skipped}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runStarted"
+msgstr "Run {run} of plan {num} has started. stop: halts it"
+
+#. js-lingui-explicit-id
+msgid "enter.runTo"
+msgstr "They go to {answering}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.runUnchecked"
+msgstr "Step {index} of {address} goes to {name} on this computer, which {provider} has not listed since this page opened. {command} checks"
+
+#. js-lingui-explicit-id
+msgid "enter.runUndo"
+msgstr "Undo stops at a run: what it writes stays"
+
+#. js-lingui-explicit-id
 msgid "enter.savedFailed"
 msgstr "The saved searches did not change. Try again"
 
@@ -3328,6 +3441,34 @@ msgstr "{source} did not answer. Try again in a moment"
 #. js-lingui-explicit-id
 msgid "enter.sourceUnreachable"
 msgstr "{source} could not be reached. Check the connection, then try again"
+
+#. js-lingui-explicit-id
+msgid "enter.stopAll"
+msgstr "Enter stops every run and reply, in every window. What is done stays done and paid for"
+
+#. js-lingui-explicit-id
+msgid "enter.stopBranch"
+msgstr "Enter stops {address}. What is done stays done and paid for; the step running now stops where it is"
+
+#. js-lingui-explicit-id
+msgid "enter.stopDone"
+msgstr "Stopped. What was done stays done"
+
+#. js-lingui-explicit-id
+msgid "enter.stopNone"
+msgstr "Nothing is running here"
+
+#. js-lingui-explicit-id
+msgid "enter.stopNothing"
+msgstr "Nothing is running in {what}"
+
+#. js-lingui-explicit-id
+msgid "enter.stopPlan"
+msgstr "Enter stops plan {num}. What is done stays done and paid for; the steps running now stop where they are"
+
+#. js-lingui-explicit-id
+msgid "enter.stopReply"
+msgstr "Enter stops the reply arriving in {num}. What has arrived is kept"
 
 #. js-lingui-explicit-id
 msgid "enter.summarize"
@@ -3610,6 +3751,11 @@ msgstr "Translating. The bar is free meanwhile"
 #. js-lingui-explicit-id
 msgid "enter.typeCollection"
 msgstr "On {board}, type: takes one of keyword, quote, note or highlight"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoAtRun"
+msgstr "Run {run} of plan {num} has started, and undo stops there. The plan is still yours to change: new:run plans it again"
 
 #. js-lingui-explicit-id
 msgid "enter.undoChanged"
@@ -4923,6 +5069,11 @@ msgstr "Delete {address}"
 #. js-lingui-explicit-id
 msgid "plan.deleteStep"
 msgstr "Delete step {index} of {address}"
+
+#. Why a paused step stopped
+#. js-lingui-explicit-id
+msgid "plan.ended"
+msgstr "{why, select, stopped {stopped} failed {it failed} stalled {the network held the reply} left {its tab closed} other {paused}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id

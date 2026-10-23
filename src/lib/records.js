@@ -15,7 +15,7 @@ import { FIRST_NUM } from './addresses'
 import { tabBus } from './bus'
 import { stepsFromTurns, storedSteps, forkStep, collabsFromPersonas } from './migrations/v6Plan'
 import { newDocket, addBranch, removeBranch, renameInDocket, withSteps, favoritesWith, favoritesWithout, startedCount, runFromRun, emptyPlan, plannedBranch } from './recordsModel'
-import { STATUS, branchStatus, plannedStep, isFixed, CONDITIONS } from './docketModel'
+import { STATUS, branchStatus, plannedStep, isFixed, CONDITIONS, ENDED } from './docketModel'
 
 export const RECORDS_EVENT = 'parliament-records'
 
@@ -1070,6 +1070,89 @@ export async function removePlan(db, { docketId }) {
       result: { back: backOf({ dockets: [[docket, null]], runs: runs.map((r) => [r, null]) }) },
       changes: [{ kind: 'docket', op: 'removed', id: docket.id, num: docket.num }],
     }
+  })
+}
+
+// ── Running a plan (stage 10, piece 3; C196 (d); C200) ──
+// The runner (runner.js) marks a step running as it starts and says how it
+// ended; its messages fill in the rest, as a typed prompt's do.
+
+/**
+ * A branch's chat, made when it first runs in a run: numbered, filed in the
+ * plan, the run and the branch. Refused if the branch has one already.
+ */
+export async function createPlanChat(db, { docketId, n, letter, conversation }) {
+  return write(db, ['conversations', ...DOCKET_STORES], async (tx) => {
+    const { docket, run } = await planAt(tx, docketId, n)
+    const branch = run.branches[letter]
+    if (!branch) throw new PlanError('noBranch')
+    if (branch.chatId) throw new PlanError('ran')
+    const num = await takeNum(tx)
+    const chat = { ...conversation, num, docketId: docket.id, branch: letter, run: run.n }
+    await tx.objectStore('conversations').put(chat)
+    await tx.objectStore('runs').put({ ...run, branches: { ...run.branches, [letter]: { ...branch, chatId: chat.id } } })
+    await tx.objectStore('dockets').put({ ...docket, updatedAt: conversation.createdAt ?? docket.updatedAt })
+    return {
+      result: chat,
+      changes: [{ kind: 'chat', op: 'created', id: chat.id, num }, { kind: 'run', op: 'updated', id: run.id }, { kind: 'docket', op: 'updated', id: docket.id, num: docket.num }],
+    }
+  })
+}
+
+/**
+ * How a step stands, as the runner says: running as it starts (only a step
+ * planned and ready), then done, or paused with why (ENDED).
+ */
+export async function markStep(db, { docketId, n, letter, stepId, status, ended = null, now = new Date().toISOString() }) {
+  return write(db, ['dockets', 'runs'], async (tx) => {
+    const { docket, run } = await planAt(tx, docketId, n)
+    const branch = run.branches[letter]
+    if (!branch) throw new PlanError('noBranch')
+    const i = branch.steps.findIndex((s) => s.id === stepId)
+    if (i < 0) throw new PlanError('noStep')
+    const was = branch.steps[i]
+    if (status === STATUS.RUNNING && (was.status !== STATUS.READY || was.messageId)) throw new PlanError('fixed')
+    if (status !== STATUS.RUNNING && status !== STATUS.DONE && status !== STATUS.PAUSED) throw new PlanError('fixed')
+    const next = { ...was, status }
+    if (status === STATUS.PAUSED && ENDED.includes(ended)) next.ended = ended
+    else delete next.ended
+    const steps = branch.steps.map((s, k) => (k === i ? next : s))
+    const changes = []
+    await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
+    return { result: next, changes }
+  })
+}
+
+/**
+ * Steps left running by a tab that closed read as paused, "left", once no
+ * tab runs the plan (C196 (d)). Returns how many.
+ */
+export async function settleLeft(db, { docketId, now = new Date().toISOString() }) {
+  return write(db, ['dockets', 'runs'], async (tx) => {
+    const { docket, runs } = await planAt(tx, docketId, null)
+    let count = 0
+    const changes = []
+    for (const run of runs) {
+      let touched = false
+      const branches = {}
+      for (const [letter, b] of Object.entries(run.branches || {})) {
+        const steps = (b.steps || []).map((s) => {
+          if (s.status !== STATUS.RUNNING) return s
+          count += 1
+          touched = true
+          return { ...s, status: STATUS.PAUSED, ended: 'left' }
+        })
+        branches[letter] = { ...b, steps, status: branchStatus(steps) }
+      }
+      if (!touched) continue
+      await tx.objectStore('runs').put({ ...run, branches })
+      changes.push({ kind: 'run', op: 'updated', id: run.id })
+    }
+    if (count) {
+      await tx.objectStore('dockets').put({ ...docket, updatedAt: now })
+      changes.push({ kind: 'docket', op: 'updated', id: docket.id, num: docket.num })
+    }
+    return { result: count, changes }
   })
 }
 

@@ -466,7 +466,7 @@ export async function getBranches(parentConversationId) {
 
 // ─── Messages ────────────────────────────────────────────
 
-export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false, attachmentMeta, asked, group, included }) {
+export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false, attachmentMeta, asked, group, included, step }) {
   const db = await initDB()
   const message = {
     id: generateId(),
@@ -490,6 +490,8 @@ export async function addMessage({ conversationId, role, content, tokenCount = 0
     ...(group ? { group } : {}),
     // Answers from sources the person brought into this prompt, as checked (C176).
     ...(Array.isArray(included) && included.length ? { included } : {}),
+    // The planned step a run sent this prompt for (stage 10; C196 (j)).
+    ...(typeof step === 'string' && step ? { step } : {}),
   }
   // Touches the chat's updatedAt and size in the same transaction.
   return addMessageRecord(db, message)

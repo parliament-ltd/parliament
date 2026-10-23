@@ -278,7 +278,7 @@ export function ChatProvider({ children }) {
   // group: the branches a prompt to several went to (C172 (b)); describe:
   // whether a first answer asks for the chat's title (C62), once per prompt
   // to several, not once per branch (C172 (e)).
-  const sendMessage = useCallback(async (conversationId, userContent, model, systemPrompt = '', tools = [], attachments = null, { frameworks = null, group = null, describe = true, included = null } = {}) => {
+  const sendMessage = useCallback(async (conversationId, userContent, model, systemPrompt = '', tools = [], attachments = null, { frameworks = null, group = null, describe = true, included = null, step = null } = {}) => {
     // One reply at a time in a chat; other chats are free.
     if (streamingIn(conversationId)) return
 
@@ -319,6 +319,8 @@ export function ChatProvider({ children }) {
       ...(group ? { group } : {}),
       // Answers from sources brought into it, as checked (C176).
       ...(Array.isArray(included) && included.length ? { included } : {}),
+      // The planned step a run sends this for (stage 10; C196 (j)).
+      ...(step ? { step } : {}),
     })
     updateMessages(conversationId, prev => [...prev, userMsg])
 
@@ -561,7 +563,7 @@ export function ChatProvider({ children }) {
   // C166 (g)): { text, lang, by, at }, kept on the person's message beside
   // what they typed. fallbackLang: the edition to ask when nothing is found
   // in the first (Wikipedia: the English one, LPN §6).
-  const askSource = useCallback(async (conversationId, question, { source = 'wikipedia', lang, asked = null, fallbackLang = null, group = null } = {}) => {
+  const askSource = useCallback(async (conversationId, question, { source = 'wikipedia', lang, asked = null, fallbackLang = null, group = null, step = null } = {}) => {
     if (streamingIn(conversationId)) return
     askToKeepStorage({ getSetting, setSetting }).catch(() => {})
 
@@ -579,7 +581,7 @@ export function ChatProvider({ children }) {
 
     titleIfUntitled(conversationId, question).catch(() => {})
 
-    const userMsg = await addMessage({ conversationId, role: 'user', content: question, ...(asked ? { asked } : {}), ...(group ? { group } : {}) })
+    const userMsg = await addMessage({ conversationId, role: 'user', content: question, ...(asked ? { asked } : {}), ...(group ? { group } : {}), ...(step ? { step } : {}) })
     updateMessages(conversationId, prev => [...prev, userMsg])
     const placeholder = await addMessage({ conversationId, role: 'assistant', content: '', incomplete: true })
     updateMessages(conversationId, prev => [...prev, placeholder])

@@ -224,6 +224,60 @@ describe('delete: of what has not been sent (C199)', () => {
   })
 })
 
+describe('what the runner writes (stage 10, piece 3; C200)', () => {
+  let db
+  beforeEach(async () => { db = await open() })
+  afterEach(() => db.close())
+
+  it('makes a branch’s chat when it first runs, filed in the plan and the run', async () => {
+    const { docket } = await R.newPlan(db, { title: 'Grant application', newId, now: at() })
+    const now = at()
+    const made = await R.createPlanChat(db, { docketId: docket.id, n: 1, letter: 'a', conversation: { id: newId(), title: 'Grant application', model: null, parentId: null, room: null, pinned: false, storageBytes: 0, createdAt: now, updatedAt: now } })
+    expect(made).toMatchObject({ docketId: docket.id, branch: 'a', run: 1 })
+    expect(Number.isInteger(made.num)).toBe(true)
+    const [run] = await runsOf(db, docket.id)
+    expect(run.branches.a.chatId).toBe(made.id)
+    expect(await code(R.createPlanChat(db, { docketId: docket.id, n: 1, letter: 'a', conversation: { id: newId(), createdAt: now } }))).toBe('ran')
+  })
+
+  it('marks a step running, keeps it running while its reply arrives, and ends it done or paused', async () => {
+    const c = await R.createChat(db, chat())
+    const { step } = await R.planStep(db, { docketId: c.docketId, letter: 'a', prompt: 'Who built it?', newId, now: at() })
+    await R.markStep(db, { docketId: c.docketId, n: 1, letter: 'a', stepId: step.id, status: STATUS.RUNNING, now: at() })
+    await R.addMessageRecord(db, message(c.id, 'user', 'Who built it?', { step: step.id }))
+    const reply = message(c.id, 'assistant', '', { incomplete: true })
+    await R.addMessageRecord(db, reply)
+    let [run] = await runsOf(db, c.docketId)
+    expect(run.branches.a.steps[0]).toMatchObject({ id: step.id, status: STATUS.RUNNING })
+    await R.updateMessageRecord(db, reply.id, { content: 'The city', incomplete: false })
+    ;[run] = await runsOf(db, c.docketId)
+    expect(run.branches.a.steps[0].status).toBe(STATUS.DONE)
+    // Running again is refused once it has started; paused says why.
+    expect(await code(R.markStep(db, { docketId: c.docketId, n: 1, letter: 'a', stepId: step.id, status: STATUS.RUNNING }))).toBe('fixed')
+    await R.markStep(db, { docketId: c.docketId, n: 1, letter: 'a', stepId: step.id, status: STATUS.PAUSED, ended: 'stopped' })
+    ;[run] = await runsOf(db, c.docketId)
+    expect(run.branches.a.steps[0]).toMatchObject({ status: STATUS.PAUSED, ended: 'stopped' })
+  })
+
+  it('reads a step left running by a closed tab as paused, left', async () => {
+    const c = await R.createChat(db, chat())
+    const { step } = await R.planStep(db, { docketId: c.docketId, letter: 'a', prompt: 'One', newId, now: at() })
+    await R.markStep(db, { docketId: c.docketId, n: 1, letter: 'a', stepId: step.id, status: STATUS.RUNNING })
+    expect(await R.settleLeft(db, { docketId: c.docketId, now: at() })).toBe(1)
+    const [run] = await runsOf(db, c.docketId)
+    expect(run.branches.a.steps[0]).toMatchObject({ status: STATUS.PAUSED, ended: 'left' })
+    expect(run.branches.a.status).toBe(STATUS.PAUSED)
+    expect(await R.settleLeft(db, { docketId: c.docketId })).toBe(0)
+  })
+
+  it('checks why a step paused, in a backup', () => {
+    const base = { dockets: [], conversations: [], messages: [] }
+    const run = (s) => ({ ...base, runs: [{ id: 'r', docketId: 'd', n: 1, branches: { a: { status: 'paused', chatId: null, steps: [s] } } }] })
+    expect(validateBackup(run({ status: 'paused', ended: 'left' })).valid).toBe(true)
+    expect(validateBackup(run({ status: 'paused', ended: 'exploded' })).valid).toBe(false)
+  })
+})
+
 describe('a merge restore (C196 (i))', () => {
   it('brings a plan with steps of its own in whole, as its own plan', async () => {
     const source = await open('source')
