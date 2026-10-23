@@ -99,10 +99,13 @@ export const VERBS = Object.freeze([
 
   // Start
   v({ verb: 'new', group: 'start', example: 'new:chat',
-    forms: ['new:chat', 'new:plan', 'new:room', 'new:room guided', 'new:collection', 'new:framework "Editor" "Make each sentence shorter"', 'new:branch 207', 'new:branch 201a 2', 'new:step', 'new:run', 'new:block'],
+    forms: ['new:chat', 'new:plan', 'new:plan "Grant application"', 'new:room', 'new:room guided', 'new:collection', 'new:framework "Editor" "Make each sentence shorter"', 'new:branch 207', 'new:branch 201a 2', 'new:branch "Shorter"', 'new:step', 'new:step 201b "Who built it?"', 'new:run', 'new:block'],
     // new:framework "Name" "What it asks": a framework of your own (C164).
     // new:branch 201a 2: a fork after step 2 of 201a (C178).
-    takes: [[['chat', 'plan', 'room', 'collection', 'framework', 'branch', 'step', 'run', 'block']], [['room'], ['guided']], [['branch'], 'address'], [['branch'], 'address', 'number'], [['framework'], 'text', 'text']],
+    // new:step 201b "…", new:plan "…" and new:branch "…" (C198): an address
+    // is read before text, which an address would also fill.
+    takes: [[['chat', 'plan', 'room', 'collection', 'framework', 'branch', 'step', 'run', 'block']], [['room'], ['guided']], [['branch'], 'address'], [['branch'], 'address', 'number'], [['branch'], 'text'], [['framework'], 'text', 'text'],
+      [['step'], 'address'], [['step'], 'text'], [['step'], 'address', 'text'], [['plan'], 'text']],
     stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.new', message: 'Make a chat, plan, room, collection, framework, branch, step, run or block' } }),
   v({ verb: 'open', group: 'start', example: 'open:207',

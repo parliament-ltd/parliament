@@ -18,11 +18,13 @@ describe('the Almanac rows (stage 5, piece 3)', () => {
     expect(rows.map((r) => r.room)).toEqual([{ unnamed: true }, null, null])
   })
 
-  it('shows a docket only once it holds more than one branch (C127), an archived one marked (C143 (c))', () => {
-    const chats = [chat(204, { docketId: 'd203' }), chat(206, { docketId: 'd203', branch: 'b' })]
-    const rows = toRows({ chats, dockets: [docket(203, ['a', 'b']), docket(205, ['a']), docket(207, ['a', 'b'], { archived: true })] })
+  it('shows a docket once it holds more than one branch (C127), or no chat yet (C198), an archived one marked (C143 (c))', () => {
+    const chats = [chat(204, { docketId: 'd203' }), chat(206, { docketId: 'd203', branch: 'b' }), chat(208, { docketId: 'd205' })]
+    const rows = toRows({ chats, dockets: [docket(203, ['a', 'b']), docket(205, ['a']), docket(207, ['a', 'b'], { archived: true }), docket(209, ['a'])] })
     const dockets = rows.filter((r) => r.kind === 'docket')
-    expect(dockets.map((d) => [d.num, d.archived])).toEqual([[203, false], [207, true]])
+    // 205 is one chat's plan, so the chat stands for it; 209 has no chat yet.
+    expect(dockets.map((d) => [d.num, d.archived])).toEqual([[203, false], [207, true], [209, false]])
+    expect(dockets[2]).toMatchObject({ num: 209, chatId: null, chatNums: [] })
     expect(dockets[0]).toMatchObject({ num: 203, branches: 2, chatId: 'c204', chatNum: 204, store: 'dockets' })
   })
 

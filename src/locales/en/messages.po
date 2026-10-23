@@ -2244,6 +2244,10 @@ msgid "enter.openBranchHere"
 msgstr "Enter shows {address} in the room here, with its whole history. No call, and it keeps its letter"
 
 #. js-lingui-explicit-id
+msgid "enter.openBranchUnrun"
+msgstr "{address} has not run yet. Enter shows its steps on the {board} board"
+
+#. js-lingui-explicit-id
 msgid "enter.openChat"
 msgstr "Enter opens {num} in a room beside what is here"
 
@@ -2278,6 +2282,14 @@ msgstr "{board} is here. Enter points the bar at it"
 #. js-lingui-explicit-id
 msgid "enter.openNotYet"
 msgstr "Opening this comes later. inspect:{num} shows it now"
+
+#. js-lingui-explicit-id
+msgid "enter.openPlan"
+msgstr "Enter opens plan {num} on the {board} board"
+
+#. js-lingui-explicit-id
+msgid "enter.openPlanHere"
+msgstr "Plan {num} is on the {board} board. Enter points the bar at it"
 
 #. js-lingui-explicit-id
 msgid "enter.openPopped"
@@ -2394,6 +2406,154 @@ msgstr "Enter unpins {nums}"
 #. js-lingui-explicit-id
 msgid "enter.pinOn"
 msgstr "Enter pins {nums} at the top"
+
+#. js-lingui-explicit-id
+msgid "enter.planBranchDone"
+msgstr "{address} is added, with no chat until it runs"
+
+#. js-lingui-explicit-id
+msgid "enter.planBranchNew"
+msgstr "Enter adds {address} to plan {num}, with no chat until it runs. Nothing is sent"
+
+#. js-lingui-explicit-id
+msgid "enter.planChanged"
+msgstr "The plan changed meanwhile. Look again, then Enter"
+
+#. js-lingui-explicit-id
+msgid "enter.planFailed"
+msgstr "The plan could not be changed"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planFixed"
+msgstr "That step has started, so it is fixed now. new:run plans it again"
+
+#. js-lingui-explicit-id
+msgid "enter.planHoldAlready"
+msgstr "Held already: {nums}"
+
+#. js-lingui-explicit-id
+msgid "enter.planHoldEmpty"
+msgstr "{address} has nothing planned to hold"
+
+#. js-lingui-explicit-id
+msgid "enter.planHoldNot"
+msgstr "Not held: {nums}"
+
+#. js-lingui-explicit-id
+msgid "enter.planHoldOff"
+msgstr "Enter lets {nums} go again in run {run}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planHoldOn"
+msgstr "Enter holds {nums} in run {run}. Their steps wait until hold:off"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planHoldRunning"
+msgstr "{address} is running. stop:{address} halts it"
+
+#. js-lingui-explicit-id
+msgid "enter.planMove"
+msgstr "Enter moves {address} {where, select, after {after} other {before}} {other}. It keeps its letter"
+
+#. js-lingui-explicit-id
+msgid "enter.planMoveSame"
+msgstr "{address} cannot move beside itself"
+
+#. js-lingui-explicit-id
+msgid "enter.planMoveThere"
+msgstr "{address} is {where, select, after {after} other {before}} {other} already"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planMoveWhich"
+msgstr "Name two branches of one plan, as move:201c after 201a"
+
+#. js-lingui-explicit-id
+msgid "enter.planNew"
+msgstr "Enter makes a plan with nothing in it and opens it on the {board} board. Nothing is sent"
+
+#. js-lingui-explicit-id
+msgid "enter.planNewDone"
+msgstr "Plan {num} is made, with nothing in it yet"
+
+#. js-lingui-explicit-id
+msgid "enter.planNewTitled"
+msgstr "Enter makes the plan “{title}”, with nothing in it, and opens it on the {board} board. Nothing is sent"
+
+#. js-lingui-explicit-id
+msgid "enter.planNoBranch"
+msgstr "{address} is not in run {run}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planNone"
+msgstr "No plan is on the {board} board. open: and a plan’s number shows one, or new:plan makes one"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planNotShown"
+msgstr "Plan {num} is not on the {board} board. open:{num} shows it"
+
+#. js-lingui-explicit-id
+msgid "enter.planOnePlan"
+msgstr "Name branches of one plan at a time"
+
+#. js-lingui-explicit-id
+msgid "enter.planPromptEmpty"
+msgstr "Write the step. Enter adds it as step {index} of {address}. Nothing is sent"
+
+#. js-lingui-explicit-id
+msgid "enter.planPromptStep"
+msgstr "Enter adds this as step {index} of {address} in run {run}. Nothing is sent"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planRecord"
+msgstr "Run {run} is an earlier run, kept as it was. open:run {latest} to change the plan"
+
+#. js-lingui-explicit-id
+msgid "enter.planRunDone"
+msgstr "Run {n} is made. Nothing has started"
+
+#. js-lingui-explicit-id
+msgid "enter.planRunHere"
+msgstr "Run {run} is on the {board} board already"
+
+#. js-lingui-explicit-id
+msgid "enter.planRunNew"
+msgstr "Enter makes run {next} of plan {num} from run {from}: every step planned again, nothing started. Nothing is sent"
+
+#. js-lingui-explicit-id
+msgid "enter.planRunNone"
+msgstr "{runs, plural, one {Plan {num} has one run} other {Plan {num} has # runs}}"
+
+#. js-lingui-explicit-id
+msgid "enter.planRunOpen"
+msgstr "Enter shows run {run} of plan {num}"
+
+#. js-lingui-explicit-id
+msgid "enter.planStepAdd"
+msgstr "Enter adds step {index} to {address} in run {run}. Nothing is sent"
+
+#. js-lingui-explicit-id
+msgid "enter.planStepDone"
+msgstr "Step {index} is planned in {address}. Nothing was sent"
+
+#. js-lingui-explicit-id
+msgid "enter.planStepEmpty"
+msgstr "Enter adds an empty step {index} to {address} in run {run}, to write on the board. Nothing is sent"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planStepHeld"
+msgstr "{address} is held, so the step waits too. hold:off {address} lets them go"
+
+#. js-lingui-explicit-id
+msgid "enter.planWhichBranch"
+msgstr "Which branch? Pick one on the {board} board, or name it, as {example}"
 
 #. js-lingui-explicit-id
 msgid "enter.popAlready"
@@ -4674,6 +4834,120 @@ msgstr "may be trained on unless you opt out"
 #. js-lingui-explicit-id
 msgid "picker.unchecked"
 msgstr "not checked"
+
+#. js-lingui-explicit-id
+msgid "plan.addBranch"
+msgstr "add a branch"
+
+#. js-lingui-explicit-id
+msgid "plan.addStep"
+msgstr "add a step to {address}"
+
+#. A step’s model or room, when it is the branch’s own
+#. js-lingui-explicit-id
+msgid "plan.asBranch"
+msgstr "as the branch"
+
+#. js-lingui-explicit-id
+msgid "plan.chat"
+msgstr "chat {num}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "plan.chatHelp"
+msgstr "open:{num} opens it"
+
+#. js-lingui-explicit-id
+msgid "plan.counts"
+msgstr "{branches, plural, one {one branch} other {# branches}}, {steps, plural, =0 {no steps} one {one step} other {# steps}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "plan.fixed"
+msgstr "This step started in run {run}, so its prompt is fixed. new:run plans it again"
+
+#. js-lingui-explicit-id
+msgid "plan.held"
+msgstr "{count, plural, one {one held} other {# held}}"
+
+#. The plan’s number, at the top of the Plan board
+#. js-lingui-explicit-id
+msgid "plan.label"
+msgstr "Plan {num}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "plan.latest"
+msgstr "open:run {run} to change the plan"
+
+#. js-lingui-explicit-id
+msgid "plan.newInRun"
+msgstr "new in run {run}"
+
+#. js-lingui-explicit-id
+msgid "plan.noChat"
+msgstr "no chat until it runs"
+
+#. js-lingui-explicit-id
+msgid "plan.none"
+msgstr "No plan here yet"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "plan.noneHow"
+msgstr "open: and a plan’s number shows one here. new:plan makes one"
+
+#. js-lingui-explicit-id
+msgid "plan.pip"
+msgstr "{reached, select, yes {run {run}} other {run {run}, which did not reach this step}}"
+
+#. js-lingui-explicit-id
+msgid "plan.pipHelp"
+msgstr "Show run {run}"
+
+#. js-lingui-explicit-id
+msgid "plan.record"
+msgstr "an earlier run, kept as it was"
+
+#. js-lingui-explicit-id
+msgid "plan.runOf"
+msgstr "run {run} of {runs}"
+
+#. js-lingui-explicit-id
+msgid "plan.statusDone"
+msgstr "done"
+
+#. js-lingui-explicit-id
+msgid "plan.statusPaused"
+msgstr "paused"
+
+#. js-lingui-explicit-id
+msgid "plan.statusRunning"
+msgstr "running"
+
+#. js-lingui-explicit-id
+msgid "plan.statusWaiting"
+msgstr "waiting"
+
+#. js-lingui-explicit-id
+msgid "plan.step"
+msgstr "Step {index} of {address}"
+
+#. js-lingui-explicit-id
+msgid "plan.steps"
+msgstr "{count, plural, =0 {no steps yet} one {one step} other {# steps}}"
+
+#. js-lingui-explicit-id
+msgid "plan.untitled"
+msgstr "Untitled plan"
+
+#. js-lingui-explicit-id
+msgid "plan.untitledBranch"
+msgstr "Untitled branch"
+
+#. js-lingui-explicit-id
+msgid "plan.write"
+msgstr "Write the step"
 
 #. js-lingui-explicit-id
 msgid "privacy.card"

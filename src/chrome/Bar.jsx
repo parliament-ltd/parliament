@@ -170,8 +170,9 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
 
   // Who answers a prompt here, inside the prompt field: the chat's choice
   // or the default (stage 7; C150). A click shows who else can.
+  // With the Plan board addressed, a prompt is a step planned (C198): no one answers it.
   let marginalia = null
-  if (prompt && prompt.room !== undefined && prompt.keyed != null) {
+  if (prompt && !prompt.plan && prompt.room !== undefined && prompt.keyed != null) {
     const who = prompt.answerer ?? (prompt.keyed ? { group: 'model', name: prompt.model } : { group: 'source', name: prompt.source })
     const to = prompt.toLabel
     // Among a prompt's branches, where it goes (C174): "to 201a · Sonnet 5.5".
@@ -186,7 +187,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   const frameworksMarg = marginalia
     ? (names.length ? i18n._(COPY.field.frameworkSome, { first: names[0], more: names.length - 1 }) : i18n._(COPY.field.frameworkNone))
     : null
-  const room = prompt && prompt.room !== undefined
+  const room = prompt && !prompt.plan && prompt.room !== undefined
     ? { chat: prompt.chat ?? null, name: prompt.room ? roomLabel(i18n, prompt.roomName ?? null) : null, fresh: Boolean(prompt.about) }
     : undefined
 

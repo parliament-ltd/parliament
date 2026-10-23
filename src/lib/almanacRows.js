@@ -130,7 +130,8 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
   }
   for (const d of dockets.filter(numbered)) {
     const branches = Array.isArray(d.branches) ? d.branches.length : 0
-    if (branches < 2) continue
+    // A plan of one chat is that chat; a plan with no chat yet shows (C198).
+    if (branches < 2 && chats.some((c) => c.docketId === d.id)) continue
     const first = Array.isArray(d.order) ? d.order[0] : null
     const chat = chats.find((c) => c.docketId === d.id && c.branch === first) ?? null
     // A plan holds its chats: what they hold, who answered them, and what

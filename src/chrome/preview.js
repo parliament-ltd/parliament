@@ -31,6 +31,7 @@ import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, namesFrom, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
 import { planReply, planLanguage, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
 import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
+import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
 import { planSet } from '../lib/settingVerbs'
@@ -54,7 +55,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -200,10 +201,19 @@ const addStep = (a, step, screens) => planAdd(step, screens)
 const rmStep = (a, step, screens) => planRm(step, screens)
 const headingStep = (a, step, screens) => planHeading(step, screens)
 const newStep = (a, step, screens) => {
-  const what = step.match?.values?.[0]?.value
+  const [first, second] = step.match?.values ?? []
+  const what = first?.value
   if (what === 'framework') return planNewFramework(step, screens)
-  // new:branch: a fork, the plan's next letter (C178).
-  if (what === 'branch') return planNewBranch(step, screens)
+  if (what === 'branch') {
+    // On the Plan board, or with a name: a branch with no chat until it
+    // runs (C198). Otherwise a fork, the plan's next letter (C178).
+    if (second ? second.kind !== 'address' : a.addressed === 'docket') return planNewPlanBranch(step, screens)
+    return planNewBranch(step, screens)
+  }
+  // A plan, a step and a run, on this device; nothing is sent (C198).
+  if (what === 'plan') return planNewPlan(step)
+  if (what === 'step') return planNewStep(step, screens)
+  if (what === 'run') return planNewRun(screens)
   return planNew(step)
 }
 
@@ -321,12 +331,11 @@ const numberOf = (step) => {
 const OPENED = {
   goRoom: 'openChat', showRoom: 'openChatHere', roomHere: 'openChatThere', roomThere: 'openChatAddressed',
 }
-const OPENED_DOCKET = { goRoom: 'openDocket', showRoom: 'openDocketHere', roomHere: 'openChatThere', roomThere: 'openChatAddressed' }
 
 /**
  * open:204. A chat opens in the space's room, or in a room brought beside
- * what is here; a docket opens its first branch. Opening a note, a term or a
- * quote (a chat about it) comes later; inspect: shows it now.
+ * what is here; a plan opens on the Plan board (C196 (g)). Opening a note, a
+ * term or a quote (a chat about it) comes later; inspect: shows it now.
  * @returns {{ next: object|null, says: object }|null}
  */
 function openNumber(a, step, screens = {}) {
@@ -334,11 +343,10 @@ function openNumber(a, step, screens = {}) {
   if (num == null) return null
   const row = screens.numbered?.get(num)
   if (!row) return { next: null, says: { message: 'numNone', values: { num } } }
-  if ((row.kind !== 'chat' && row.kind !== 'docket') || !row.chatId) return { next: null, says: { message: 'openNotYet', values: { num } } }
+  if (row.kind === 'docket') return planOpenPlan(a, num, screens)
+  if (row.kind !== 'chat' || !row.chatId) return { next: null, says: { message: 'openNotYet', values: { num } } }
   const p = planRoom(a, row.chatId)
-  const words = row.kind === 'docket' ? OPENED_DOCKET : OPENED
-  const shown = row.kind === 'docket' ? row.chatNum ?? num : num
-  return { next: p.next, says: { message: words[p.says.message] ?? p.says.message, values: { num: shown } } }
+  return { next: p.next, says: { message: OPENED[p.says.message] ?? p.says.message, values: { num } } }
 }
 
 // open:203b, a branch by its plan and letter (stage 8, piece 4; C175).
@@ -361,9 +369,13 @@ function openBranch(a, step, screens = {}) {
   const arg = branchOf(step)
   const address = `${arg.num}${arg.letter}`
   const t = targetsOf([arg], screens.records?.rows ?? [])
-  if (t.bad) return { next: null, says: t.bad }
-  const row = t.rows[0]
-  if (!row?.chatId) return { next: null, says: { message: 'numNone', values: { num: address } } }
+  const row = t.bad ? null : t.rows[0]
+  if (!row?.chatId) {
+    // A branch that has not run yet: its steps, on the Plan board (C198).
+    const unrun = planOpenUnrun(a, arg, screens)
+    if (unrun) return unrun
+    return { next: null, says: t.bad ?? { message: 'numNone', values: { num: address } } }
+  }
   const p = planRoom(a, row.chatId)
   return { next: p.next, says: { message: OPENED_BRANCH[p.says.message] ?? p.says.message, values: { num: address, address } } }
 }
@@ -609,6 +621,11 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     const p = planClear(screens)
     return { answer, says: p.says, next: null, act: p.act }
   }
+  // move:201c after 201a: a branch's place in its plan (C198).
+  if (only?.verb === 'move' && only.match?.values?.[0]?.letter && ['after', 'before'].includes(only.match.values[1]?.value)) {
+    const p = planMoveBranch(only, screens)
+    return { answer, says: p.says, next: null, act: p.act }
+  }
   if (only?.verb === 'move' && arrangement.addressed === 'collection' && only.match?.values?.[0]?.kind === 'address') {
     const p = planMoveCard(only, screens)
     return { answer, says: p.says, next: null, act: p.act }
@@ -674,6 +691,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       again: (a1, s1, sc) => planAgain(s1, sc),
       // set: on Settings (stage 9; C181); a block's settings come with the Lab.
       set: (a1, s1, sc) => (a1.addressed === 'settings' ? planSet(s1, sc) : null),
+      // hold: and hold:off for a plan's branches (stage 10, piece 2; C198).
+      hold: (a1, s1, sc) => planHold(s1, sc),
       // Backups from the bar (stage 9, piece 2; A21; C182): a panel under the
       // field, or a file picker first. Nothing changes before a choice there.
       backup: () => ({ says: { message: 'backupOpen' }, act: { kind: 'backupPanel' } }),
@@ -723,6 +742,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     if (byRoom?.bad) return { answer, says: byRoom.bad, next: null }
     const planned = byRoom?.step ?? step
     const p = BRINGS.includes(step.verb) ? bring(a, step, screens)
+      : step.verb === 'open' && step.match?.values?.[0]?.value === 'run' ? planOpenRun(a, step, screens)
       : step.verb === 'open' && numberOf(step) != null ? openNumber(a, step, screens)
         : step.verb === 'open' && branchOf(step) ? openBranch(a, step, screens)
         : step.verb === FOCUS ? planFocusStep(a, step, screens)
@@ -852,6 +872,8 @@ const CENT = 0.01
  *   ready: whether Enter sends; says: the line's sentence, null for none
  */
 export function promptPreview(text, target = {}) {
+  // With the Plan board addressed, a prompt is a step planned; nothing is sent (C198).
+  if (target.plan) return planPromptPreview(text, target.plan)
   if (target.room === undefined) return { ready: false, says: { message: 'promptNoRoom' } }
   const p = Array.isArray(target.many) && target.many.length > 1 ? manyPreview(text, target) : onePreview(text, target)
   // Among a prompt's branches (C174): which one it carries on, and that the

@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useLingui } from '@lingui/react'
 import './chrome.css'
 import { COPY } from '../copy'
-import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch, getStorageEstimate } from '../lib/db'
+import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch, getStorageEstimate, getPlan } from '../lib/db'
 import { renameMode } from '../lib/modes'
 import { loadSpace, saveArrangement } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
@@ -42,6 +42,7 @@ import Strip from './Strip'
 import Board from './Board'
 import { boardName, roomLabel, andList } from './say'
 import RoomBoard from './RoomBoard'
+import PlanBoard from './PlanBoard'
 import WelcomeBoard, { WelcomeFoot } from './WelcomeBoard'
 import AlmanacBoard from './AlmanacBoard'
 import LibraryBoard from './LibraryBoard'
@@ -62,7 +63,9 @@ import { ROW_GUESS } from './rowWindow'
 import { cardsOf, tabCounts, sequenceOf } from '../lib/collectionCards'
 import { searchTerms } from '../lib/recordsFilter'
 import CollectionBoard from './CollectionBoard'
-import { changeRecords, eraseRecords, addOwnNote, removeOwnNote } from '../lib/records'
+import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, planStep, changeStep, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack } from '../lib/records'
+import { showPlan, planKey, planPromptPreview } from '../lib/planVerbs'
+import { planBoardOf, latestPlan } from '../lib/planBoard'
 import { exportItems, gatherExport, itemsMarkdown, exportMarkdown, exportJsonl, exportType } from '../lib/recordsExport'
 import { dayOf } from './when'
 import { longDay } from './say'
@@ -115,6 +118,8 @@ function split(m, dx) {
 const BAR = 'command' // the popped bar's key among the windows
 const FEATURES = detectFeatures()
 const NONE = Object.freeze([])
+// What the plan commands do, carried out by planAct (stage 10, piece 2; C198).
+const PLAN_ACTS = new Set(['newPlan', 'planStep', 'planRun', 'planBranch', 'planHold', 'planMove'])
 
 // The interface language a source answers in. The test languages (en-XA,
 // ar-XB) stand for English.
@@ -210,6 +215,7 @@ function scrollerOf(el) {
 }
 const NO_NUMS = Object.freeze([])
 const NO_SOURCES = Object.freeze({ count: 0, names: [] })
+const NO_PLAN = Object.freeze({ none: true }) // the Plan board, showing no plan
 
 export default function Shell() {
   const { i18n } = useLingui()
@@ -750,6 +756,8 @@ export default function Shell() {
 
   // Settings' updater, for acts that change a setting (thinking:, C165).
   const updateSettingNow = useRef(async () => {})
+  // The plan commands' acts (C198), defined with the Plan board below.
+  const planActNow = useRef(async () => 'later')
   // Keeps a translation on its message (translate:, C166).
   const keepTranslationNow = useRef(async () => {})
   // Has the helper summarize a chat (open:203b summary, C175).
@@ -902,6 +910,7 @@ export default function Shell() {
   }, [commit])
 
   const act = useCallback(async (what, body, next = null) => {
+    if (PLAN_ACTS.has(what.kind)) return planActNow.current(what, body)
     if (what.kind === 'rows') {
       // pin:, archive:, name: and the tag verbs (C143), all or nothing.
       let done
@@ -1413,6 +1422,14 @@ export default function Shell() {
       }
       setCollections(await readCollections(db.current).catch(() => []))
     }
+    if (entry.plans) {
+      // A change to a plan (C198): each record as it was, unless changed since.
+      try {
+        for (const back of [...entry.plans].reverse()) await putPlanBack(db.current, back)
+      } catch (err) {
+        return stop(err?.name === 'Changed' ? { message: 'undoChanged', values: { nums: err.nums } } : 'undoFailed')
+      }
+    }
     if (entry.created) {
       // A note written by note: or summarize: (C145): taken out, unless changed since.
       try {
@@ -1451,7 +1468,7 @@ export default function Shell() {
   const onRun = useCallback(async (next, body, go, what) => {
     if (what?.kind === 'undo') return undo(body)
     const before = { arrangement: current.current, view: viewNow.current }
-    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null, many: null, heldTo: null }
+    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null, many: null, heldTo: null, plans: [] }
     const out = what ? await act(what, body, next) : await run(next, body)
     const t = touched.current
     touched.current = null
@@ -1476,7 +1493,8 @@ export default function Shell() {
     if (t.setting) entry.setting = t.setting
     if (t.many) entry.many = t.many
     if (t.heldTo) entry.heldTo = t.heldTo
-    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting || entry.many || entry.heldTo)) {
+    if (t.plans.length) entry.plans = t.plans
+    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting || entry.many || entry.heldTo || entry.plans)) {
       undoStack.current = [...undoStack.current, entry].slice(-UNDO_MAX)
       setUndoTop(body)
     }
@@ -1683,6 +1701,122 @@ export default function Shell() {
   // sources that answered in it, and who answers the new branch, with how
   // much that model reads at once.
   const chatRowsById = useMemo(() => new Map((almanacRows ?? []).filter((r) => r.kind === 'chat').map((r) => [r.chatId, r])), [almanacRows])
+
+  // ── The Plan board (stage 10, piece 2; C196 (a); C198) ─
+  // One plan at one run: the one its context names (open:201, open:run 2),
+  // else the plan changed last. Read while the board is on the screen, and
+  // again whenever something is stored, here or in another tab.
+  const planOnScreen = arrangement.columns.flat().includes('docket') || arrangement.popped.some((p) => p.board === 'docket')
+  const planAsked = planKey(arrangement.context?.docket)
+  const planNum = planAsked?.num ?? latestPlan(almanacRows)
+  const planRun = planAsked?.run ?? null
+  const [planRead, setPlanRead] = useState(null) // { num, run, plan, texts }
+  const [planPick, setPlanPick] = useState(null) // { num, letter }: the branch picked on the board
+  useEffect(() => {
+    if (!started || !planOnScreen || planNum == null) return undefined
+    let live = true
+    const read = async () => {
+      const plan = await getPlan({ num: planNum }).catch(() => null)
+      const texts = new Map()
+      const shownRun = plan?.runs.find((r) => r.n === planRun) ?? plan?.runs.at(-1)
+      for (const b of Object.values(shownRun?.branches ?? {})) {
+        if (!b?.chatId || !(b.steps ?? []).some((s) => s.messageId)) continue
+        for (const m of await getMessages(b.chatId).catch(() => [])) if (m.role === 'user') texts.set(m.id, typeof m.content === 'string' ? m.content : '')
+      }
+      if (live) setPlanRead({ num: planNum, run: planRun, plan, texts })
+    }
+    read()
+    const off = onRecordsChanged(() => { read() })
+    return () => { live = false; off() }
+  }, [started, planOnScreen, planNum, planRun])
+  const planBoard = useMemo(() => {
+    if (!planOnScreen || !planRead?.plan || planRead.num !== planNum || planRead.run !== planRun) return null
+    const chatOf = (id) => {
+      const r = chatRowsById.get(id)
+      return r ? { num: r.num, roomId: r.roomId ?? null, title: r.title ?? '' } : null
+    }
+    const rooms = new Map(recordsNames.rooms.map((r) => [r.id, roomLabel(i18n, r.name)]))
+    return planBoardOf(planRead.plan, { run: planRun, textOf: (id) => planRead.texts.get(id), chatOf, roomName: (id) => rooms.get(id) ?? null, selected: planPick?.num === planNum ? planPick.letter : null })
+  }, [planOnScreen, planRead, planNum, planRun, chatRowsById, recordsNames, i18n, planPick])
+  const planBoardNow = useRef(null)
+  useEffect(() => { planBoardNow.current = planBoard }, [planBoard])
+  // What the plan commands do (C198): all on this device, nothing sent;
+  // each kept with what it changed, so undo: takes it back.
+  const planAct = useCallback(async (what, body) => {
+    const newId = () => crypto.randomUUID()
+    const now = new Date().toISOString()
+    const keep = (back) => { if (back) touched.current?.plans.push(back) }
+    const said = () => { if (!what.fromPrompt) remember(body) }
+    try {
+      if (what.kind === 'newPlan') {
+        const made = await newPlan(db.current, { title: what.title ?? '', newId, now })
+        keep(made.back)
+        await run(showPlan(current.current, made.docket.num), null)
+        said()
+        return { done: true, says: { message: 'planNewDone', values: { num: made.docket.num } } }
+      }
+      if (what.kind === 'planStep') {
+        const out = await planStep(db.current, { docketId: what.docketId, n: what.n, letter: what.letter, prompt: what.prompt ?? '', newId, now })
+        keep(out.back)
+        setPlanPick({ num: what.num, letter: what.letter })
+        said()
+        return { done: true, says: { message: 'planStepDone', values: { index: out.index, address: what.address } } }
+      }
+      if (what.kind === 'planRun') {
+        const made = await newRun(db.current, { docketId: what.docketId, newId, now })
+        keep(made.back)
+        await run(showPlan(current.current, what.num), null)
+        said()
+        return { done: true, says: { message: 'planRunDone', values: { n: made.n } } }
+      }
+      if (what.kind === 'planBranch') {
+        const out = await newPlanBranch(db.current, { docketId: what.docketId, n: what.n, name: what.name ?? '', now })
+        keep(out.back)
+        setPlanPick({ num: what.num, letter: out.letter })
+        said()
+        return { done: true, says: { message: 'planBranchDone', values: { address: `${what.num}${out.letter}` } } }
+      }
+      if (what.kind === 'planHold') {
+        for (const letter of what.letters) keep((await holdBranch(db.current, { docketId: what.docketId, n: what.n, letter, on: what.on, now })).back)
+        said()
+        return null
+      }
+      if (what.kind === 'planMove') {
+        const out = await moveBranch(db.current, { docketId: what.docketId, letter: what.letter, after: what.after ?? null, before: what.before ?? null, now })
+        keep(out.back)
+        said()
+        return null
+      }
+    } catch (err) {
+      if (err?.code === 'fixed') return 'planFixed'
+      if (err?.code === 'running') return { message: 'planHoldRunning', values: { address: `${what.num}${what.letters?.[0] ?? ''}` } }
+      return err?.name === 'PlanError' ? 'planChanged' : 'planFailed'
+    }
+    return 'later'
+  }, [run, remember])
+  useEffect(() => { planActNow.current = planAct }, [planAct])
+  // A prompt with the Plan board addressed: a step planned, nothing sent.
+  // Where it goes is read again; if that has changed since, say so first.
+  const promptToPlan = useCallback(async (text, shown) => {
+    const now = planBoardNow.current
+    const p = now ? planPromptPreview(text, now) : null
+    const was = shown?.plan ? planPromptPreview(text, shown.plan) : null
+    if (!p?.ready || !was?.ready || p.act.address !== was.act.address || p.act.n !== was.act.n) return { refused: 'promptChanged' }
+    const out = await onRun(null, `new:step ${p.act.address}`, null, { ...p.act, prompt: text, fromPrompt: true })
+    if (out && !out.done) return { refused: out }
+    return { done: Promise.resolve(out?.says ?? null) }
+  }, [onRun])
+  // A planned step's words, written on the board (C197 (d)): kept as typed.
+  const onPlanText = useCallback((letter, stepId, text) => {
+    const p = planBoardNow.current
+    if (!p || p.n !== p.latest || !db.current) return
+    changeStep(db.current, { docketId: p.docketId, n: p.n, letter, stepId, set: { prompt: text } }).catch(() => {})
+  }, [])
+  const planModelName = useCallback((id) => modelFacts(id)?.name ?? id, [])
+  const onPlanPick = useCallback((letter) => {
+    const p = planBoardNow.current
+    if (p) setPlanPick((was) => (was?.num === p.num && was.letter === letter ? null : { num: p.num, letter }))
+  }, [])
   const summarizing = useMemo(() => ({
     helper: helperNow,
     privacy: settings.privacyFilter ?? 'off',
@@ -1792,7 +1926,7 @@ export default function Shell() {
   }, [settings, keyInfo, answerRows, referenceName, local, roomTemplates, reply, languageName, helperNow, almanacRows, i18n.locale, settingsStored])
   // What set: reads (lib/settingVerbs.js).
   const settingScreen = useMemo(() => ({ values: settingsFacts.values, rows: answerRows, rooms: roomTemplates, regionProvider: settingsFacts.region?.provider ?? null }), [settingsFacts, answerRows, roomTemplates])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens, branching, summarizing, including, again, setting: settingScreen }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens, branching, summarizing, including, again, settingScreen])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens, branching, summarizing, including, again, setting: settingScreen, plan: planBoard }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens, branching, summarizing, including, again, settingScreen, planBoard])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -1847,6 +1981,8 @@ export default function Shell() {
   // With no room in the space, a prompt starts a chat in a room beside
   // what is here, so it is offered as going to a new room (C125).
   const prompt = useMemo(() => ({
+    // With the Plan board addressed, a prompt is a step planned (C198).
+    plan: arrangement.addressed === 'docket' ? planBoard ?? NO_PLAN : null,
     room: roomId ?? null,
     chat: roomRecord?.num ?? null,
     streaming,
@@ -1894,7 +2030,7 @@ export default function Shell() {
     ink,
     roomName: roomNameHere,
     about,
-  }), [includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf])
+  }), [arrangement.addressed, planBoard, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -1904,6 +2040,7 @@ export default function Shell() {
    * Answers at once whether the prompt went, and `done` once it is answered.
    */
   const onPrompt = useCallback(async (text, shown) => {
+    if (shown?.plan) return promptToPlan(text, shown)
     const aboutNow = shown?.about ?? null
     const roomChat = aboutNow ? null : roomOnScreen(current.current) ?? null
     // Among a prompt's branches (C174): where the line said it goes, read
@@ -2134,7 +2271,7 @@ export default function Shell() {
         return failure(err, who.group === 'source' ? who.name : undefined)
       })
     return { done }
-  }, [askSource, askSourceAs, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked])
+  }, [askSource, askSourceAs, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked, promptToPlan])
 
   // again:203a (editing spec; C177): the branch's last prompt, read again,
   // asked as a new branch of its plan, the next letter, by who answers that
@@ -2347,6 +2484,14 @@ export default function Shell() {
           onAddress={focusBoard} onWrite={writeField} onView={(change) => setCollectionView((v) => ({ ...v, ...change }))} onShow={onShowCollection}
           cards={collectionAll.cards} picked={pickedHere} onPick={onPick} onClearPicked={clearPicked}
           onFind={(num) => { findPassage(num) }} onPrompt={toPrompt} rowOf={(n) => numbered.get(n) ?? null}
+        />
+      )
+    }
+    if (board === 'docket') {
+      return (
+        <PlanBoard
+          key="docket" plan={planBoard} loading={planOnScreen && planNum != null && !planBoard} addressed={arrangement.addressed === 'docket'}
+          nameOf={planModelName} onAddress={focusBoard} onWrite={writeField} onPick={onPlanPick} onText={onPlanText} onRun={(n) => runCommand(`open:run ${n}`)}
         />
       )
     }

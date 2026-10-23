@@ -858,9 +858,58 @@ async function planAt(tx, docketId, n) {
 }
 
 async function keepRunBranch(tx, docket, run, letter, branch, now, changes) {
-  await tx.objectStore('runs').put({ ...run, branches: { ...run.branches, [letter]: { ...branch, status: branchStatus(branch.steps) } } })
-  await tx.objectStore('dockets').put({ ...docket, updatedAt: now })
+  const nextRun = { ...run, branches: { ...run.branches, [letter]: { ...branch, status: branchStatus(branch.steps) } } }
+  const nextDocket = { ...docket, updatedAt: now }
+  await tx.objectStore('runs').put(nextRun)
+  await tx.objectStore('dockets').put(nextDocket)
   changes.push({ kind: 'run', op: 'updated', id: run.id }, { kind: 'docket', op: 'updated', id: docket.id, num: docket.num })
+  return backOf({ dockets: [[docket, nextDocket]], runs: [[run, nextRun]] })
+}
+
+// What a change to a plan was, for undo: each record before and after it
+// (null before: it was made; null after: it went).
+const backOf = ({ dockets = [], runs = [] }) => {
+  const pair = ([before, after]) => ({ id: (before ?? after).id, before: before ?? null, after: after ?? null })
+  return { dockets: dockets.map(pair), runs: runs.map(pair) }
+}
+// The same record, whatever order its fields were read back in.
+const sameRecord = (a, b) => JSON.stringify(a, sorted) === JSON.stringify(b, sorted)
+function sorted(key, value) {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? Object.fromEntries(Object.keys(value).sort().map((k) => [k, value[k]]))
+    : value
+}
+
+/**
+ * undo: of a change to a plan: each record as it was before, if it is still
+ * as the change left it; a record the change made goes. Changed otherwise,
+ * and nothing is written.
+ * @param {{ dockets: Array<{ id, before, after }>, runs: Array<{ id, before, after }> }} back
+ */
+export async function putPlanBack(db, back) {
+  return write(db, ['dockets', 'runs'], async (tx) => {
+    const moved = []
+    const plan = back.dockets?.[0]
+    const planNum = (plan?.after ?? plan?.before)?.num ?? null
+    for (const store of ['dockets', 'runs']) {
+      for (const r of back[store] ?? []) {
+        const now = await tx.objectStore(store).get(r.id)
+        if (!sameRecord(now ?? null, r.after ?? null)) moved.push(planNum ?? r.id)
+      }
+    }
+    if (moved.length) throw new Changed([...new Set(moved)])
+    const changes = []
+    for (const store of ['dockets', 'runs']) {
+      for (const r of back[store] ?? []) {
+        if (r.before) await tx.objectStore(store).put(r.before)
+        else await tx.objectStore(store).delete(r.id)
+        const kind = store === 'dockets' ? 'docket' : 'run'
+        const op = !r.before ? 'removed' : r.after ? 'updated' : 'created'
+        changes.push({ kind, op, id: r.id, ...(kind === 'docket' ? { num: (r.before ?? r.after).num } : {}) })
+      }
+    }
+    return { result: null, changes }
+  })
 }
 
 /**
@@ -877,8 +926,8 @@ export async function planStep(db, { docketId, n = null, letter, prompt, model =
     const step = plannedStep({ id: newId(), prompt, model, room, waiting: steps.length > 0 && steps.every((s) => s.status === STATUS.WAITING), now })
     steps.splice(at, 0, step)
     const changes = []
-    await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
-    return { result: { step, index: at + 1, n: run.n }, changes }
+    const back = await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
+    return { result: { step, index: at + 1, n: run.n, back }, changes }
   })
 }
 
@@ -917,8 +966,8 @@ export async function holdBranch(db, { docketId, n = null, letter, on, now = new
     const to = on ? STATUS.WAITING : STATUS.READY
     const steps = branch.steps.map((s) => (!s.messageId && s.status === from ? { ...s, status: to } : s))
     const changes = []
-    await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
-    return { result: { n: run.n, changed: steps.filter((s, k) => s !== branch.steps[k]).length }, changes }
+    const back = await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
+    return { result: { n: run.n, changed: steps.filter((s, k) => s !== branch.steps[k]).length, back }, changes }
   })
 }
 
@@ -932,9 +981,11 @@ export async function newRun(db, { docketId, newId = () => crypto.randomUUID(), 
       for (const s of b.steps || []) if (s.messageId) texts.set(s.messageId, (await tx.objectStore('messages').get(s.messageId))?.content ?? s.prompt ?? '')
     }
     const run = runFromRun(prev, { id: newId(), n: prev.n + 1, now, newId, promptOf: (id) => texts.get(id), order: docket.order })
+    const nextDocket = { ...docket, updatedAt: now }
     await tx.objectStore('runs').put(run)
-    await tx.objectStore('dockets').put({ ...docket, updatedAt: now })
-    return { result: run, changes: [{ kind: 'run', op: 'created', id: run.id }, { kind: 'docket', op: 'updated', id: docket.id, num: docket.num }] }
+    await tx.objectStore('dockets').put(nextDocket)
+    const back = backOf({ dockets: [[docket, nextDocket]], runs: [[null, run]] })
+    return { result: { ...run, back }, changes: [{ kind: 'run', op: 'created', id: run.id }, { kind: 'docket', op: 'updated', id: docket.id, num: docket.num }] }
   })
 }
 
@@ -945,7 +996,8 @@ export async function newPlan(db, { title = '', newId = () => crypto.randomUUID(
     const { docket, run } = emptyPlan({ id: newId(), runId: newId(), num, title, now })
     await tx.objectStore('dockets').put(docket)
     await tx.objectStore('runs').put(run)
-    return { result: { docket, run }, changes: [{ kind: 'docket', op: 'created', id: docket.id, num }] }
+    const back = backOf({ dockets: [[null, docket]], runs: [[null, run]] })
+    return { result: { docket, run, back }, changes: [{ kind: 'docket', op: 'created', id: docket.id, num }] }
   })
 }
 
@@ -956,7 +1008,8 @@ export async function newPlanBranch(db, { docketId, n = null, name = '', room = 
     const added = plannedBranch(docket, run, { name, room, now })
     await tx.objectStore('dockets').put(added.docket)
     await tx.objectStore('runs').put(added.run)
-    return { result: { letter: added.letter, n: run.n }, changes: [{ kind: 'docket', op: 'updated', id: docket.id, num: docket.num }, { kind: 'run', op: 'updated', id: run.id }] }
+    const back = backOf({ dockets: [[docket, added.docket]], runs: [[run, added.run]] })
+    return { result: { letter: added.letter, n: run.n, back }, changes: [{ kind: 'docket', op: 'updated', id: docket.id, num: docket.num }, { kind: 'run', op: 'updated', id: run.id }] }
   })
 }
 
@@ -971,7 +1024,8 @@ export async function moveBranch(db, { docketId, letter, after = null, before = 
     const at = rest.indexOf(anchor)
     if (at < 0) throw new PlanError('noBranch')
     rest.splice(after ? at + 1 : at, 0, letter)
-    await tx.objectStore('dockets').put({ ...docket, order: rest, updatedAt: now })
-    return { result: rest, changes: [{ kind: 'docket', op: 'updated', id: docket.id, num: docket.num }] }
+    const next = { ...docket, order: rest, updatedAt: now }
+    await tx.objectStore('dockets').put(next)
+    return { result: { order: rest, back: backOf({ dockets: [[docket, next]] }) }, changes: [{ kind: 'docket', op: 'updated', id: docket.id, num: docket.num }] }
   })
 }

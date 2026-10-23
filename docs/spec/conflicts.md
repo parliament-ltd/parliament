@@ -1668,6 +1668,22 @@ Found while splitting stage 10 into pieces, after a read of every document on pl
 - **(i) Tested** plain and through the lock: planned steps through messages, a message naming its step, places, changes, holds, runs, empty plans, moves, the restore, and the checks.
 - **Suggestion:** keep as built.
 
+**C198. The Plan board, as built** (stage 10, piece 2).
+- **(a) The board** shows one plan at one run (C196 (a)): the one `open:` named, kept in the space's context (`docket: '201'`, or `'201:2'` for an earlier run), else the plan changed last. Its head: the number, the title, "run 1 of 2", branches and steps, how many held. Each branch: its address, its name (a click picks it), how many steps, its room, its chat's number (a click writes `open:204`) or "no chat until it runs", and a status only when there is something to know. Each step: its number, one pip per run (filled where that run reached the step; a click shows that run), its words, its model or "as the branch", its status. An add row under each branch writes `new:step 201a` into the bar; one at the end writes `new:branch`. Hover and focus are ink: the mockup's gold hovers are not followed (CLAUDE.md, conventions).
+- **(b) Only the last run changes.** An earlier run shows as "an earlier run, kept as it was", with no fields and no add rows; a change there is refused, pointing at `open:run 2`. v12 calls it "a record", which assumes it ran; an earlier run may never have started.
+- **(c) A step not yet started is written on the board,** kept as typed (a moment after typing stops, and on leaving the field); one that has started shows the words that were sent, fixed. Writing in place is not a command line, so `undo:` does not take it back, as elsewhere.
+- **(d) The commands,** each saying before Enter that nothing is sent: `new:plan`, `new:plan "Grant application"`; `new:step`, `new:step 201b`, `new:step "…"`, `new:step 201b "…"` (at the end of the branch picked on the board, the one named, or the only one; a chat's own number names its branch); `new:run`; `new:branch` with the Plan board addressed, or `new:branch "Shorter"` anywhere: a branch with no chat until it runs (`new:branch 201a` still forks, C178); `hold:201c`, `hold:201b,201c`, `hold:off 201c`, and `hold:` or `hold:off` alone for the picked branch, refused while it runs; `move:201c after 201a` and `before`; `open:201` opens the Plan board (C196 (g)); `open:run 2`; `open:201b` for a branch that has not run shows its steps there. A step added to a held branch waits too, and the line says so.
+- **(e) A prompt with the Plan board addressed** is a step at the end of the picked branch in the last run: "Enter adds this as step 3 of 201a in run 1. Nothing is sent". The field names no one who answers. Where it goes is read again at Enter.
+- **(f) `undo:` takes each back:** a step, a run, a plan (it goes; its number is not given out again), a branch, a hold, a move. Refused, with nothing written, if the plan changed since.
+- **(g) Records shows a plan with no chat yet.** Before, only plans of two or more branches; a plan of one chat is still that chat.
+- **(h) Copy:** the board is named as `{board}` in a sentence ("on the {board} board"), so its name comes from the strip, as C185 did for Settings. `open:` no longer says "its first branch"; those two messages are unused (R38).
+- **(i) Open points,** built the cautious way until ruled:
+  1. Removing a planned step, or a branch with no chat, has no command yet (v12 has `delete:201d` for a branch; removing a step is not drawn). **Suggestion:** the runner skips a step left empty (piece 3); removal waits for stage 11's editing, unless you want `rm:` on the Plan board now.
+  2. Branch and plan names are not edited on the board (v12 has fields); `name:` renames a plan from Records. **Suggestion:** with stage 11.
+  3. The branch picked on the board is per tab and not kept.
+- **(j) Tested:** the commands' Enter lines; undo plain and through the lock; Records; `open:`. Tried on a trial copy made from the sample: `open:201`, `new:plan`, a prompt planned as a step (nothing on the network), a step rewritten in place, `new:branch`, `new:step`, `hold:`, `move:`, `new:run`, a pip to the earlier run, `open:224b`, and `undo:` of `hold:off`, a step, a run and a plan; phone width. The trial copy was erased.
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

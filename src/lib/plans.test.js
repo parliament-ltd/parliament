@@ -128,10 +128,48 @@ describe('hold:, runs, empty plans and moves', () => {
     const b = await R.newPlanBranch(db, { docketId: docket.id, name: 'Shorter', now: at() })
     const c2 = await R.newPlanBranch(db, { docketId: docket.id, name: 'Longer', now: at() })
     expect([b.letter, c2.letter]).toEqual(['b', 'c'])
-    await R.moveBranch(db, { docketId: docket.id, letter: 'c', before: 'b' })
+    const moved = await R.moveBranch(db, { docketId: docket.id, letter: 'c', before: 'b' })
+    expect(moved.order).toEqual(['a', 'c', 'b'])
     expect((await db.get('dockets', docket.id)).order).toEqual(['a', 'c', 'b'])
     const [run] = await runsOf(db, docket.id)
     expect(Object.values(run.branches).every((x) => x.chatId === null)).toBe(true)
+  })
+})
+
+describe('undo: of a change to a plan (C198)', () => {
+  let db
+  beforeEach(async () => { db = await open() })
+  afterEach(() => db.close())
+
+  it('puts a step, a run, a branch, a move and a plan back as they were', async () => {
+    const c = await R.createChat(db, chat())
+    const before = (await runsOf(db, c.docketId))[0]
+    const added = await R.planStep(db, { docketId: c.docketId, letter: 'a', prompt: 'Who built it?', newId, now: at() })
+    await R.putPlanBack(db, added.back)
+    expect((await runsOf(db, c.docketId))[0]).toEqual(before)
+
+    const second = await R.newRun(db, { docketId: c.docketId, newId, now: at() })
+    await R.putPlanBack(db, second.back)
+    expect((await runsOf(db, c.docketId)).map((r) => r.n)).toEqual([1])
+
+    const { docket, back } = await R.newPlan(db, { title: 'Grant application', newId, now: at() })
+    const b = await R.newPlanBranch(db, { docketId: docket.id, name: 'Shorter', now: at() })
+    const moved = await R.moveBranch(db, { docketId: docket.id, letter: 'b', before: 'a' })
+    await R.putPlanBack(db, moved.back)
+    expect((await db.get('dockets', docket.id)).order).toEqual(['a', 'b'])
+    await R.putPlanBack(db, b.back)
+    expect((await db.get('dockets', docket.id)).order).toEqual(['a'])
+    await R.putPlanBack(db, back)
+    expect(await db.get('dockets', docket.id)).toBeUndefined()
+    expect(await runsOf(db, docket.id)).toEqual([])
+  })
+
+  it('refuses when the plan changed since, and writes nothing', async () => {
+    const c = await R.createChat(db, chat())
+    const { step, back } = await R.planStep(db, { docketId: c.docketId, letter: 'a', prompt: 'Draft', newId, now: at() })
+    await R.changeStep(db, { docketId: c.docketId, letter: 'a', stepId: step.id, set: { prompt: 'Better' } })
+    expect(await code(R.putPlanBack(db, back))).toBe('Changed')
+    expect((await runsOf(db, c.docketId))[0].branches.a.steps[0].prompt).toBe('Better')
   })
 })
 

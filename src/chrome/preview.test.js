@@ -249,8 +249,12 @@ describe('open: and inspect: by number (stage 5, piece 3)', () => {
     expect(r.next.addressed).toBe('room')
   })
 
-  it('opens a docket\'s first branch, and says opening a marking comes later', () => {
-    expect(at('>open:203').text).toBe('Enter opens its first branch, 204, in a room beside what is here')
+  it('opens a plan on the Plan board, and says opening a marking comes later', () => {
+    // Its first branch until the board was built (C127); the board now (C196 (g)).
+    const plan = at('>open:203')
+    expect(plan.text).toBe('Enter opens plan 203 on the Plan board')
+    expect(plan.next.addressed).toBe('docket')
+    expect(plan.next.context.docket).toBe('203')
     expect(at('>open:210').text).toBe('Opening this comes later. inspect:210 shows it now')
     expect(at('>open:999').text).toBe('Nothing here has the number 999')
     // A branch by its letter is built with stage 8 (C175): none here has this address.

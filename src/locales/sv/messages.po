@@ -2244,6 +2244,10 @@ msgid "enter.openBranchHere"
 msgstr "Enter visar {address} i rummet här, med hela sin historik. Inget anrop, och den behåller sin bokstav"
 
 #. js-lingui-explicit-id
+msgid "enter.openBranchUnrun"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.openChat"
 msgstr "Enter öppnar {num} i ett rum bredvid det som visas"
 
@@ -2278,6 +2282,14 @@ msgstr "{board} finns här. Enter riktar fältet mot den"
 #. js-lingui-explicit-id
 msgid "enter.openNotYet"
 msgstr "Att öppna den här kommer senare. inspect:{num} visar den nu"
+
+#. js-lingui-explicit-id
+msgid "enter.openPlan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openPlanHere"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.openPopped"
@@ -2394,6 +2406,154 @@ msgstr "Enter lossar {nums}"
 #. js-lingui-explicit-id
 msgid "enter.pinOn"
 msgstr "Enter fäster {nums} överst"
+
+#. js-lingui-explicit-id
+msgid "enter.planBranchDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planBranchNew"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planChanged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planFailed"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planFixed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planHoldAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planHoldEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planHoldNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planHoldOff"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planHoldOn"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planHoldRunning"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planMove"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planMoveSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planMoveThere"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planMoveWhich"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planNew"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planNewDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planNewTitled"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planNoBranch"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planNotShown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planOnePlan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planPromptEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planPromptStep"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planRecord"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planRunDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planRunHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planRunNew"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planRunNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planRunOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planStepAdd"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planStepDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planStepEmpty"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.planStepHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planWhichBranch"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.popAlready"
@@ -4674,6 +4834,120 @@ msgstr "kan tränas på om du inte avböjer"
 #. js-lingui-explicit-id
 msgid "picker.unchecked"
 msgstr "inte kontrollerat"
+
+#. js-lingui-explicit-id
+msgid "plan.addBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.addStep"
+msgstr ""
+
+#. A step’s model or room, when it is the branch’s own
+#. js-lingui-explicit-id
+msgid "plan.asBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.chat"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "plan.chatHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.counts"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "plan.fixed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.held"
+msgstr ""
+
+#. The plan’s number, at the top of the Plan board
+#. js-lingui-explicit-id
+msgid "plan.label"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "plan.latest"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.newInRun"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.noChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.none"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "plan.noneHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.pip"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.pipHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.record"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.runOf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.statusDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.statusPaused"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.statusRunning"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.statusWaiting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.step"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.steps"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.untitled"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.untitledBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.write"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "privacy.card"
