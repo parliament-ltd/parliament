@@ -13,7 +13,6 @@ import BranchShortcutHandler from './components/BranchShortcutHandler'
 import { PWAProvider } from './stores/PWAContext'
 import { BackupProvider } from './stores/BackupContext'
 import ChatView from './views/ChatView'
-import SettingsView from './views/SettingsView'
 import EditorView from './views/EditorView'
 import BuildView from './views/BuildView'
 import ErrorBoundary from './components/ErrorBoundary'
@@ -101,7 +100,8 @@ export default function App() {
                   <Route path="/chats" element={<Navigate to="/" replace />} />
                   <Route path="/shell" element={<Navigate to="/" replace />} />
                   <Route path="/chat/:id" element={<ErrorBoundary inline><ChatView /></ErrorBoundary>} />
-                  <Route path="/settings" element={<ErrorBoundary inline><SettingsView /></ErrorBoundary>} />
+                  {/* The old Settings page is retired (R37): its address opens the Settings board. */}
+                  <Route path="/settings" element={<Navigate to="/" replace state={{ open: 'settings' }} />} />
                   <Route path="/edit" element={<ErrorBoundary inline><EditorView scope="room" blank /></ErrorBoundary>} />
                   <Route path="/edit/:roomId" element={<ErrorBoundary inline><EditorView scope="room" /></ErrorBoundary>} />
                   <Route path="/edit-home" element={<Navigate to="/" replace />} />

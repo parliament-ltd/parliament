@@ -1736,7 +1736,7 @@ msgstr "一个对话最多使用 {count} 个框架"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.frameworkNeeds"
-msgstr "框架需要名称和要求：new:framework \"brief\" \"keep each answer short\""
+msgstr "框架需要名称和要求：new:framework \"简短\" \"每个回答都要简短\""
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -1806,7 +1806,7 @@ msgstr "按 Enter 在 {num} 之前添加标题“{heading}”"
 
 #. js-lingui-explicit-id
 msgid "enter.headingEmpty"
-msgstr "标题需要文字，例如 heading:\"Causes\""
+msgstr "标题需要文字，例如 heading:\"原因\""
 
 #. js-lingui-explicit-id
 msgid "enter.headingEnd"
@@ -2092,7 +2092,7 @@ msgstr "{place, select, left {{board}已经在左侧} right {{board}已经在右
 
 #. js-lingui-explicit-id
 msgid "enter.nameEmpty"
-msgstr "名称需要文字，例如 name:\"Barn owls\""
+msgstr "名称需要文字，例如 name:\"仓鸮\""
 
 #. js-lingui-explicit-id
 msgid "enter.nameFailed"
@@ -2940,7 +2940,7 @@ msgstr "名称最多 {max} 个字符"
 
 #. js-lingui-explicit-id
 msgid "enter.saveName"
-msgstr "保存搜索需要一个名称，例如 save:\"Owls this week\""
+msgstr "保存搜索需要一个名称，例如 save:\"本周的猫头鹰\""
 
 #. js-lingui-explicit-id
 msgid "enter.saveNothing"

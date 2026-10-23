@@ -201,6 +201,15 @@ Line numbers are approximate.
 - **C172 to C179, built as suggested:** listed at the checkpoint, each point in a line. Stefan: "5. C172. yes." Read as confirming the list, C172 to C179.
 - "all good for build piece 7": piece 7, any number of rooms, goes ahead, with the change to the space kept on this device as shown.
 
+**23 October 2026, at the stage 9 checkpoint:** Stefan: "approve all six as recommended."
+
+- **R10 approved:** the older `.apb` and JSON export buttons go. `.parliament` only; reading old files stays for good (`restore:` reads `.apb` and JSON). Carried out with R37.
+- **R28 approved:** the settings that do nothing go (automatic compression, the theme switch, session usage figures, the budget alert, summary depth, the context warning). The new Settings board never showed them; their stored values stay. Carried out with R37.
+- **R37 approved (new):** the old Settings page at `/settings`, which duplicated the Settings board and still asked for no typed word before deleting everything, moves to `src/deprecated/`, nothing deleted. `/settings` opens the Settings board. Checked first that everything on it is on the board, or is R10 or R28 (C186).
+- **The new settings are approved:** `newChatRoom` (C181 (i)) and `interfaceLanguage` (C184 (d)), both carried by backups; and the backup reminder's choice, stored by the old page and never read before, is read (C182 (e)).
+- **Example words inside commands are translated:** the verbs and the command's form stay English in every language; the quoted words stand for the person's own text, so they are translated (`name:"Tornugglor"`). Japanese and Chinese brought in line (C184).
+- **Window layouts on a merge:** "Add it to what is here" keeps this device's layouts; only a replace brings the file's (C182 (d)), kept.
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it
@@ -1569,6 +1578,13 @@ Found while splitting stage 9 into pieces. The documents: the plan's stage 9, th
 - **(e) Translated with the rest:** the four drafters drafted these entries too, held to the English claim for claim.
 - **(f) Not yet applied:** the README, SECURITY.md, the manifest, the old `/settings` page and the welcome letter keep their words until stage 15 applies the draft everywhere (plan, stage 15).
 - **Suggestion:** keep as built.
+
+**C186. The old Settings page retired, as carried out** (R10, R28, R37; ruled 23 October).
+- **(a) Checked first, section by section,** that the old page held nothing the Settings board lacks: the key and its check (the key panel, `api:`), the default model (`set:default`), finishing replies and naming new chats (`set:finish`, `set:title`), backups and restore (`backup:`, `restore:`, which reads `.apb` and JSON too), storage, the reminder, Delete everything, text size, and About with the network log. What it had beyond those is R10 (the export buttons) and R28 (the options nothing read).
+- **(b) The page** moved to `src/deprecated/views/SettingsView.jsx`, with a note saying how to put it back; nothing deleted. `/settings` now goes to the shell, which opens the Settings board once the space is loaded and puts the address back to `/`.
+- **(c) Two links pointed at the old page,** "back up in Settings" on Records' backup line and on the welcome page; each now writes `>open:settings data` into the bar, as marginalia do.
+- **(d) Left as they are:** `db.js` `exportAllData` and `importData` (the old export and import) and `NetworkActivityCard`, which nothing built uses now; nothing is deleted without approval. The old backup window (`BackupRestoreModal`) is still opened by Cmd/Ctrl+Shift+B and by the Build page's top bar; it takes the same shortest password as `backup:` and offers window layouts, off unless ticked (C182).
+- **Suggestion:** keep as carried out.
 
 ## Proposed CLAUDE.md rewrite
 

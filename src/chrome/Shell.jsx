@@ -52,6 +52,7 @@ import { readAlmanac } from '../lib/almanacRows'
 import { backupReminderState, getBackupStatus, dismissBackupBanner, getBackupLog } from '../lib/backup'
 import SettingsBoard from './SettingsBoard'
 import { parseBackupFile, BACKUP_VERSION } from '../lib/backup'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { offeredLanguages, isDraft, startingLanguage } from '../i18n'
 import { createFactsCache } from '../lib/chatFacts'
 import { readSaved, keepSearch, forgetSearch, putSaved } from '../lib/savedSearches'
@@ -2188,8 +2189,19 @@ export default function Shell() {
   // globe's language: and the picker's choices (C184).
   const runCommand = useCallback(async (line) => {
     const p = preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
-    if (p.act) await onRun(p.next ?? null, line, null, p.act)
+    // An act, or a change to the space (open:settings), as Enter would run it.
+    if (p.act || p.next) await onRun(p.next ?? null, line, null, p.act ?? null)
   }, [onRun])
+  // An address that asks for a board (/settings, the old page's; R37; C186)
+  // opens it once the space is loaded, and the address goes back to /.
+  const location = useLocation()
+  const goTo = useNavigate()
+  const askedOpen = typeof location.state?.open === 'string' ? location.state.open : null
+  useEffect(() => {
+    if (!started || !askedOpen) return
+    goTo('/', { replace: true, state: null })
+    runCommand(`open:${askedOpen}`)
+  }, [started, askedOpen, goTo, runCommand])
   const pickAnswerer = useCallback(async (row) => {
     if (row.later) return
     if (row.needsKey || row.unchecked) { setPicking(false); writeField(`>api:${row.provider}`); return }

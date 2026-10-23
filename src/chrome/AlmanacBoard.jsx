@@ -235,7 +235,7 @@ export default function AlmanacBoard({ rows, filtered = null, columns: kept = nu
         // The backup reminder: one line, in ink, only when it is due (C146 (a), C94).
         <p className="ch-marg ch-alm-backup" role="note">
           <span>{backup.atRisk ? i18n._(COPY.almanac.backupAtRisk) : backup.days == null ? i18n._(COPY.almanac.backupNever) : i18n._(COPY.almanac.backupDays, { days: backup.days })}</span>
-          <a href="/settings">{i18n._(COPY.welcome.keepBackup, { board: i18n._(COPY.boards.settings) })}</a>
+          <button type="button" onClick={() => onWrite?.('>open:settings data')}>{i18n._(COPY.welcome.keepBackup, { board: i18n._(COPY.boards.settings) })}</button>
           <button type="button" onClick={() => onBackupLater?.()}>{i18n._(COPY.almanac.backupLater)}</button>
         </p>
       )}

@@ -40,16 +40,15 @@ cannot judge the language itself; that is the review.
   English word. It is now ersätt, korvaa and 替换; Japanese keeps
   `replace` and `delete`, as its drafter chose (typing them needs no input
   method).
+- **Example words inside commands** are translated in all four (ruled 23
+  October): the verbs and the command's form stay English, the quoted words
+  are the person's own text (`name:"Tornugglor"`).
 - **Commands the checker flagged as missing** (14 per language) are English
   prose that happens to put a verb before a colon ("instructions to a model:
   …"); none is a command.
 
 ## Open across languages
 
-- **Example words inside commands:** Swedish and Finnish translated the
-  person's own example text (`name:"Tornugglor"`); Japanese and Chinese kept
-  it English. The verbs stay English in all four. One rule for all is yours
-  to choose.
 - **Sentences joined on screen from two entries** (the key page's link and
   the sentence after it, the sort labels) cannot be reordered by a
   translation. They should become one entry with a placeholder.

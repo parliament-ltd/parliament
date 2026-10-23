@@ -17,10 +17,13 @@ Each: id, the English, my draft, why I was unsure.
    - ja: 次：{command}
    - Read "next:" as a label and translated it; only {command} stays English. If "next:" is meant to look like a command, it should stay as typed.
 
-4. Example words inside commands: enter.nameEmpty, enter.headingEmpty, enter.saveName, enter.frameworkNeeds, frameworkPicker.noneYet
-   - en: like name:"Barn owls" / heading:"Causes" / save:"Owls this week" / new:framework "brief" "keep each answer short" / new:framework "name" "what it asks"
-   - ja: kept exactly, e.g. 例：name:"Barn owls"; for frameworkPicker.noneYet I added a gloss: new:framework "name" "what it asks"（名前と指示の内容）
-   - Rule 2 keeps commands character for character "including in examples", so the quoted words stay English. Japanese users will type Japanese names; examples such as name:"メンフクロウ" would show that it works. Your call.
+4. Settled (Stefan's ruling): example words inside commands are the person's own text and go into Japanese; the verbs, the command's form and the ASCII quotes stay exact.
+   - enter.nameEmpty: name:"メンフクロウ"
+   - enter.headingEmpty: heading:"原因"
+   - enter.saveName: save:"今週のフクロウ"
+   - enter.frameworkNeeds: new:framework "簡潔" "回答はどれも短くまとめる"
+   - frameworkPicker.noneYet: new:framework "名前" "指示の内容" (the bracketed gloss is gone, no longer needed)
+   - Left as is: enter.noMinus keeps -tag:research. The tag is the person's word too, but it is not in quotes and sits inside the command as typed, so the ruling does not cover it.
 
 5. field.frameworkNone
    - en: framework: none

@@ -32,5 +32,6 @@ retirement line approved it, and how to put it back.
 | `components/TourTooltip.jsx` | R15 | 22 October 2026 | The tooltip tours of the homepage, /chats and Settings |
 | `lib/homepageSeed.js` | R3, R11 | 22 October 2026 | The seed that gave every install the Study, the homepage room |
 | `styles/homepage.css` | R12 (first part) | 22 October 2026 | The rules of `src/index.css` that only the homepage used: Blueprint, Chats, its bulk toolbar, Favorites |
+| `views/SettingsView.jsx` | R37, with R10 and R28 | 23 October 2026 | The old Settings page at /settings, with its `.apb` and JSON export buttons and the options nothing read; /settings now opens the Settings board |
 
 Files keep their old path under `src/deprecated/`, so putting one back is a move. Their imports point where they used to and are not resolved here.

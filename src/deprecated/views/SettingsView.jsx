@@ -1,3 +1,8 @@
+// Retired with R37 (and R10, R28), approved by Stefan on 23 October 2026: the old
+// Settings page at /settings. Was src/views/SettingsView.jsx. Nothing imports it and it
+// is not built; /settings now opens the Settings board (C186). To restore: move it back
+// and route /settings to it in src/App.jsx.
+
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'

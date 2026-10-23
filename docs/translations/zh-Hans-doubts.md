@@ -14,10 +14,10 @@ Lines drafted but not sure of. Each gives the id, the English, the draft, and wh
    - ZH: 删除
    - Why: Chinese has no lower-case word. 删除 is natural, but it is typed through an input method, and the field must accept the composed text. The alternative is to keep `delete`, which any keyboard types directly. erase.typeWord shows it as 输入“{word}”以继续 either way.
 
-3. **enter.nameEmpty, enter.headingEmpty, enter.saveName, enter.frameworkNeeds** (examples), and **frameworkPicker.noneYet** (slots)
+3. **enter.nameEmpty, enter.headingEmpty, enter.saveName, enter.frameworkNeeds** (examples), and **frameworkPicker.noneYet** (slots) (settled)
    - EN: name:"Barn owls", heading:"Causes", save:"Owls this week", new:framework "brief" "keep each answer short"; and new:framework "name" "what it asks"
-   - ZH: the examples kept character for character in English; the two slot names in noneYet translated: new:framework "名称" "要求"
-   - Why: rule 2 keeps commands and their examples in ASCII, so the examples stay. But a Chinese reader would type Chinese arguments (name:"仓鸮"), and "name" and "what it asks" are descriptions of slots, not words to type, so I translated those two. Worth deciding whether example arguments may be Chinese.
+   - ZH: name:"仓鸮", heading:"原因", save:"本周的猫头鹰", new:framework "简短" "每个回答都要简短"; and new:framework "名称" "要求"
+   - Why: settled by Stefan's ruling. The words inside the quotes are the person's own text, so they are translated. The verb, the command's form and the ASCII double quotes stay exactly as the bar reads them. Unquoted example values that the checker reads as part of the command, such as -tag:research in enter.noMinus, stay as typed.
 
 ## Meaning I had to guess
 

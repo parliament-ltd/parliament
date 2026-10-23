@@ -109,7 +109,7 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
               <p className="ch-marg">
                 <button type="button" disabled={keep.asking} onClick={keep.onAsk}>{i18n._(keep.asking ? COPY.welcome.keepAsking : COPY.welcome.keepAsk)}</button>
                 <span className="sep" aria-hidden="true"> · </span>
-                <a href="/settings">{i18n._(COPY.welcome.keepBackup, { board: i18n._(COPY.boards.settings) })}</a>
+                <button type="button" onClick={() => onWrite('>open:settings data')}>{i18n._(COPY.welcome.keepBackup, { board: i18n._(COPY.boards.settings) })}</button>
               </p>
             </div>
           )}

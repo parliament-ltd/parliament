@@ -1736,7 +1736,7 @@ msgstr "1つのチャットに設定できる方針は{count}件までです"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.frameworkNeeds"
-msgstr "方針には名前と指示の内容が必要です：new:framework \"brief\" \"keep each answer short\""
+msgstr "方針には名前と指示の内容が必要です：new:framework \"簡潔\" \"回答はどれも短くまとめる\""
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -1806,7 +1806,7 @@ msgstr "Enterで、{heading}という見出しを{num}の前に追加します"
 
 #. js-lingui-explicit-id
 msgid "enter.headingEmpty"
-msgstr "見出しには言葉が必要です。例：heading:\"Causes\""
+msgstr "見出しには言葉が必要です。例：heading:\"原因\""
 
 #. js-lingui-explicit-id
 msgid "enter.headingEnd"
@@ -2092,7 +2092,7 @@ msgstr "{place, select, left {{board}はすでに左にあります} right {{boa
 
 #. js-lingui-explicit-id
 msgid "enter.nameEmpty"
-msgstr "名前には言葉が必要です。例：name:\"Barn owls\""
+msgstr "名前には言葉が必要です。例：name:\"メンフクロウ\""
 
 #. js-lingui-explicit-id
 msgid "enter.nameFailed"
@@ -2940,7 +2940,7 @@ msgstr "名前は{max}文字までです"
 
 #. js-lingui-explicit-id
 msgid "enter.saveName"
-msgstr "保存する検索には名前が必要です。例：save:\"Owls this week\""
+msgstr "保存する検索には名前が必要です。例：save:\"今週のフクロウ\""
 
 #. js-lingui-explicit-id
 msgid "enter.saveNothing"
@@ -3668,7 +3668,7 @@ msgstr "オフにするまで、チェックした順に、このチャットの
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "frameworkPicker.noneYet"
-msgstr "自分の方針はまだありません。new:framework \"name\" \"what it asks\"（名前と指示の内容）で作れます。"
+msgstr "自分の方針はまだありません。new:framework \"名前\" \"指示の内容\" で作れます。"
 
 #. A framework of your own with no name, as a persona could be
 #. js-lingui-explicit-id
