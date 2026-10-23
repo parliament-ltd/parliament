@@ -3,6 +3,7 @@
 // Returns { valid: true } or { valid: false, error: string }.
 
 import { isTranslation, isAsked } from './translations'
+import { isSummaryNote } from './branchSummary'
 
 const MAX_STRING_LENGTH = 1_000_000  // 1 MB per field
 const MAX_IMPORT_ITEMS  = 50_000     // across all stores
@@ -133,6 +134,8 @@ function validateMessage(item) {
   // A branch's copy keeps the message it came from; a prompt to several, its branches (C172).
   if (item.from != null && !isId(item.from)) return 'message.from invalid'
   if (item.group != null && !isGroup(item.group)) return 'message.group invalid'
+  // A summary a branch starts from: the chat it summarizes and the last message it read (C175).
+  if (item.summary != null && !isSummaryNote(item.summary)) return 'message.summary invalid'
   // Stage 6: the model a reply came from, and the tokens it took (C132 (h)).
   if (item.model != null && !isString(item.model, 200)) return 'message.model invalid'
   if (item.usage != null && !isUsage(item.usage)) return 'message.usage invalid'

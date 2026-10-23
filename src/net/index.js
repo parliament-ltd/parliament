@@ -147,9 +147,9 @@ export function modelFacts(id) {
   if (!id) return null
   for (const d of DESTINATIONS.filter((x) => x.ships && x.kind !== 'source')) {
     const m = findModel(modelsOf(d.id), id)
-    if (m) return { id: m.id, name: m.name, provider: d.id, cost: m.cost ?? null }
+    if (m) return { id: m.id, name: m.name, provider: d.id, cost: m.cost ?? null, contextWindow: m.contextWindow ?? null }
     // A model on this computer answered: free, named from its id (C163).
-    if (d.kind === 'local' && String(id).startsWith(`${d.id}:`)) return { id, name: String(id).slice(d.id.length + 1), provider: d.id, cost: { type: 'free-local' } }
+    if (d.kind === 'local' && String(id).startsWith(`${d.id}:`)) return { id, name: String(id).slice(d.id.length + 1), provider: d.id, cost: { type: 'free-local' }, contextWindow: null }
   }
   return null
 }

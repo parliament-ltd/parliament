@@ -1,7 +1,7 @@
 import { BaseProvider } from './base'
 import { evalMath } from '../lib/mathEval'
 import { findModel } from '../net/answerers'
-import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, readDescription, summaryItems, stripPrefixes, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens } from './shared'
+import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, readDescription, summaryItems, stripPrefixes, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary } from './shared'
 
 const API_BASE = 'https://api.anthropic.com/v1'
 const API_VERSION = '2023-06-01'
@@ -579,6 +579,12 @@ export class AnthropicProvider extends BaseProvider {
     const text = String(raw ?? '').trim()
     if (!text) throw new Error('No summary came back')
     return text.slice(0, SUMMARY_MAX_CHARS)
+  }
+
+  // open:203b summary (stage 8, piece 4; C175): a chat's turns, each
+  // { label, text }, summarized by the model named (the helper).
+  async summarizeChat(apiKey, turns, { model = LIGHT_MODEL } = {}) {
+    return readChatSummary(await this._lightweightCall(apiKey, CHAT_SUMMARY_SYSTEM_PROMPT, [{ role: 'user', content: summaryItems(turns) }], CHAT_SUMMARY_MAX_TOKENS, model))
   }
 
   // translate: (stage 7, piece 6; C166): pieces of text from a source, or a

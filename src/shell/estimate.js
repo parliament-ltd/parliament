@@ -6,6 +6,11 @@
 
 export const CHARS_PER_TOKEN = 4
 
+// How much of a chat a model on this computer reads by default where the
+// computer has under 24 GB of graphics memory: Ollama drops the start of a
+// longer one without saying so (C163 (e), ruled 22 October).
+export const LOCAL_READS = 4000
+
 /** Roughly how many tokens some texts come to: their characters over four. */
 export function estimateTokens(...texts) {
   const chars = texts.reduce((n, t) => n + (typeof t === 'string' ? t.length : 0), 0)

@@ -315,6 +315,18 @@ msgid "branches.carriesOn"
 msgstr "The chat carries on from {address}; carrying this one on gives it a room of its own"
 
 #. js-lingui-explicit-id
+msgid "branches.context"
+msgstr "context {share, number, percent} → {low, number, percent}"
+
+#. js-lingui-explicit-id
+msgid "branches.contextSmall"
+msgstr "context under {share, number, percent}"
+
+#. js-lingui-explicit-id
+msgid "branches.contextUnder"
+msgstr "context {share, number, percent} → under {low, number, percent}"
+
+#. js-lingui-explicit-id
 msgid "branches.label"
 msgstr "{count, plural, other {The replies of # branches}}"
 
@@ -486,6 +498,18 @@ msgstr "The reply in {chat} stopped when you left it, before any of it arrived."
 #. js-lingui-explicit-id
 msgid "chat.stoppedOnReply"
 msgstr "Stopped when you left the chat. What arrived is kept."
+
+#. js-lingui-explicit-id
+msgid "chat.summaryBy"
+msgstr "a model"
+
+#. js-lingui-explicit-id
+msgid "chat.summaryOf"
+msgstr "A summary of {address}, written by {name}. This branch carries on from it in place of that history"
+
+#. js-lingui-explicit-id
+msgid "chat.summaryOfGone"
+msgstr "A summary of an earlier branch, written by {name}. This branch carries on from it in place of that history"
 
 #. While a model thinks before answering; {time} is minutes and seconds, 2:31
 #. js-lingui-explicit-id
@@ -1734,6 +1758,14 @@ msgid "enter.openBoard"
 msgstr "Enter opens {board} on the right"
 
 #. js-lingui-explicit-id
+msgid "enter.openBranch"
+msgstr "Enter opens {address} in a room beside what is here, with its whole history. No call, and it keeps its letter"
+
+#. js-lingui-explicit-id
+msgid "enter.openBranchHere"
+msgstr "Enter shows {address} in the room here, with its whole history. No call, and it keeps its letter"
+
+#. js-lingui-explicit-id
 msgid "enter.openChat"
 msgstr "Enter opens {num} in a room beside what is here"
 
@@ -1772,6 +1804,93 @@ msgstr "{board} is in its own window. Enter brings it forward"
 #. js-lingui-explicit-id
 msgid "enter.openSaved"
 msgstr "Enter shows the saved search {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummary"
+msgstr "Enter starts {next} from a summary of {address}: one call to {name}, about {tokens, number} tokens, {cost}"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryCheap"
+msgstr "Enter starts {next} from a summary of {address}: one call to {name}, about {tokens, number} tokens, under {cost}"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryCheapNext"
+msgstr "Enter starts a new branch from a summary of {address}: one call to {name}, about {tokens, number} tokens, under {cost}"
+
+#. {share} is how much of it the branch fills now, {low} about what the summary will
+#. js-lingui-explicit-id
+msgid "enter.openSummaryContext"
+msgstr "Context {share} → {low} of what {model} reads at once"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryContextOver"
+msgstr "It is longer than {model} reads at once. From a summary, about {low}"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryContextSmall"
+msgstr "Context under {share} of what {model} reads at once, so a summary frees little"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryContextUnder"
+msgstr "Context {share} → under {low} of what {model} reads at once"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryDone"
+msgstr "{next} starts from a summary of {address}, in the room"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryEmpty"
+msgstr "{address} has nothing in it to summarize"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryFailed"
+msgstr "The summary of {address} could not be written, so no branch was made"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryLocal"
+msgstr "Enter starts {next} from a summary of {address}, written by {name} on this computer. Nothing leaves it"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryLocalNext"
+msgstr "Enter starts a new branch from a summary of {address}, written by {name} on this computer. Nothing leaves it"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryLong"
+msgstr "It is long, so the summary reads the latest {reads, number} tokens or so"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryNext"
+msgstr "Enter starts a new branch from a summary of {address}: one call to {name}, about {tokens, number} tokens, {cost}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.openSummaryNoOne"
+msgstr "Nothing here can write a summary of {address}. A model on this computer, or a key for a provider, would: api: adds one"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.openSummaryNotChat"
+msgstr "open:{num} summary works on a chat or a branch"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryPrivacy"
+msgstr "The privacy filter swaps what it finds for placeholders before it goes"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummarySources"
+msgstr "The answers from {sources} go into it too, marked as from a source"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryUnpriced"
+msgstr "Enter starts {next} from a summary of {address}: one call to {name}, about {tokens, number} tokens"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryUnpricedNext"
+msgstr "Enter starts a new branch from a summary of {address}: one call to {name}, about {tokens, number} tokens"
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryWriting"
+msgstr "Writing a summary of {address}. The bar is free meanwhile"
 
 #. js-lingui-explicit-id
 msgid "enter.openWhichSaved"

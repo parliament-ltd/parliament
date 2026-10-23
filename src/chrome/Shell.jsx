@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useLingui } from '@lingui/react'
 import './chrome.css'
 import { COPY } from '../copy'
-import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch } from '../lib/db'
+import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch } from '../lib/db'
 import { renameMode } from '../lib/modes'
 import { loadSpace, saveArrangement } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
@@ -33,7 +33,7 @@ import { readOwnFrameworks, keepOwnFramework, removeOwnFramework, restoreOwnFram
 import { useIsStreaming, useHiddenIds, usePendingDeletes, useStreamEnd } from '../stores/chatHooks'
 import { sendableOf, hiddenIds, pendingDeletes, isStreaming as replyArriving } from '../stores/chatStore'
 import { fromSource } from '../stores/sendHistory'
-import { preview, viewFromSaved, lineOf } from './preview'
+import { preview, viewFromSaved, lineOf, LOCAL_READS } from './preview'
 import Bar from './Bar'
 import Strip from './Strip'
 import Board from './Board'
@@ -725,6 +725,8 @@ export default function Shell() {
   const updateSettingNow = useRef(async () => {})
   // Keeps a translation on its message (translate:, C166).
   const keepTranslationNow = useRef(async () => {})
+  // Has the helper summarize a chat (open:203b summary, C175).
+  const summarizeChatNow = useRef(async () => { throw new Error('Not ready') })
 
   // ── Models on this computer (stage 7, piece 4; C33, C163) ──
   // Ollama is looked for only when someone asks (the key panel's check).
@@ -1071,6 +1073,34 @@ export default function Shell() {
       remember(body)
       return { done: true, says: 'translateWorking', later }
     }
+    if (what.kind === 'branchSummary') {
+      // open:203b summary (C175): the helper writes a summary of the branch,
+      // then the plan's next letter starts from it, with who answers it and
+      // its frameworks, and the room shows it. The bar is free meanwhile.
+      const failed = { message: 'openSummaryFailed', values: { address: what.address } }
+      const later = (async () => {
+        let text
+        try {
+          text = await summarizeChatNow.current(what.chatId, what.helper)
+        } catch (err) {
+          return err?.name === 'NamesUnchecked' ? 'namesUnchecked' : failed
+        }
+        let made
+        try {
+          const base = await getConversation(what.chatId)
+          made = await createSummaryBranch(what.chatId, { text, by: what.helper.id, title: base?.title, model: base?.model, answerer: base?.answerer ?? null, frameworks: base?.frameworks ?? null })
+        } catch {
+          return failed
+        }
+        await loadConversations().catch(() => {})
+        const placed = planRoom(current.current, made.id)
+        if (placed.next) await run(placed.next, null)
+        const address = what.plan != null && made.branch ? `${what.plan}${made.branch}` : String(made.num ?? '')
+        return { message: 'openSummaryDone', values: { address: what.address, next: address } }
+      })()
+      remember(body)
+      return { done: true, says: { message: 'openSummaryWriting', values: { address: what.address } }, later }
+    }
     if (what.kind === 'check') {
       // check: (C169): a closer look by a model on this computer at the last
       // answer from a source, free; a warning, never a guarantee.
@@ -1328,8 +1358,9 @@ export default function Shell() {
   const onRoomLeave = useCallback((chatId) => { if (readyRoom.current === chatId) readyRoom.current = null }, [])
 
   // ── Prompts from the bar (stage 4) ────────────────────
-  const { messages, activeConversationId, sendMessage, resendWhole, askSource, keepTranslation } = useChat()
+  const { messages, activeConversationId, sendMessage, resendWhole, askSource, keepTranslation, summarizeChat } = useChat()
   useEffect(() => { keepTranslationNow.current = keepTranslation }, [keepTranslation])
+  useEffect(() => { summarizeChatNow.current = summarizeChat }, [summarizeChat])
   const { settings, updateSetting } = useSettings()
   useEffect(() => { updateSettingNow.current = updateSetting })
   // Which providers have a key here, without decrypting one; null until
@@ -1482,7 +1513,31 @@ export default function Shell() {
     privacy: { mode: settings.privacyFilter ?? 'off', local: localChecker?.name ?? null },
     checking: { room: roomId, num: roomRecord?.num ?? null, last: lastAnswer && { messageId: lastAnswer.messageId, source: lastAnswer.source, text: lastAnswer.text }, local: localChecker && { id: localChecker.id, name: localChecker.name } },
   }), [settings.privacyFilter, localChecker, settings.replyLanguage, settings.helper, settings.translateQueries, reply, i18n.locale, languageName, helperNow, answerRows, roomId, roomRecord, lastAnswer, translateTo, translator])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens, branching }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens, branching])
+  // open:203b summary (C175): what the Enter line needs of a chat, read
+  // from Records: its address and the next branch's, what it holds, the
+  // sources that answered in it, and who answers the new branch, with how
+  // much that model reads at once.
+  const chatRowsById = useMemo(() => new Map((almanacRows ?? []).filter((r) => r.kind === 'chat').map((r) => [r.chatId, r])), [almanacRows])
+  const summarizing = useMemo(() => ({
+    helper: helperNow,
+    privacy: settings.privacyFilter ?? 'off',
+    factsOf: (chatId) => {
+      const row = chatRowsById.get(chatId)
+      if (!row) return null
+      const chat = conversations.find((c) => c.id === chatId)
+      const who = answererOf({ chosen: chat?.answerer ?? null, keyed: keys, defaultModel: settings.defaultModel })
+      const plan = row.docketNum ?? null
+      return {
+        address: plan != null && row.branch ? `${plan}${row.branch}` : String(row.num),
+        plan,
+        next: plan != null && row.planNext ? `${plan}${row.planNext}` : null,
+        chars: String(row.words ?? '').length,
+        sources: (row.sources ?? []).map((id) => destination(id)?.name ?? id),
+        answerer: { name: who.name, group: who.group, window: who.group === 'local' ? LOCAL_READS : modelFacts(who.id)?.contextWindow ?? null },
+      }
+    },
+  }), [helperNow, settings.privacyFilter, settings.defaultModel, chatRowsById, conversations, keys])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens, branching, summarizing }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens, branching, summarizing])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).

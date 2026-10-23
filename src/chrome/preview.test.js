@@ -38,7 +38,6 @@ describe('what Enter would do', () => {
   })
 
   it('says a verb is not built yet, including forms of built verbs that wait for later', () => {
-    expect(words('>open:201a summary').text).toBe('open: is not built yet')
     expect(words('>pop:settings keys').text).toBe('pop: is not built yet')
     expect(words('>tour:advanced').text).toBe('tour: is not built yet')
   })
@@ -243,7 +242,8 @@ describe('open: and inspect: by number (stage 5, piece 3)', () => {
     expect(at('>open:203').text).toBe('Enter opens its first branch, 204, in a room beside what is here')
     expect(at('>open:210').text).toBe('Opening this comes later. inspect:210 shows it now')
     expect(at('>open:999').text).toBe('Nothing here has the number 999')
-    expect(at('>open:204a').text).toBe('open: is not built yet')
+    // A branch by its letter is built with stage 8 (C175): none here has this address.
+    expect(at('>open:204a').text).toBe('Nothing here has the number 204a')
   })
 
   it('inspect: shows one thing in detail, on a line of its own', () => {

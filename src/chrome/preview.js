@@ -18,7 +18,7 @@
 import { enterLine } from '../commands/registry'
 import { plan, planOpen, planBring, planRoom, planFocus, planFocusOff, roomOnScreen, address, ARRANGEMENT_VERBS } from '../shell/arrangement'
 import { cleanRoomName, ROOM_NAME_MAX } from '../lib/roomNames'
-import { CHARS_PER_TOKEN, inputCost, describeCost } from '../shell/estimate'
+import { CHARS_PER_TOKEN, inputCost, describeCost, LOCAL_READS } from '../shell/estimate'
 import { holdsKey } from '../commands/parse'
 import { BOARD_NAMES } from '../commands/verbs'
 import { FILTERS, EMPTY_VIEW, readFilter, readSort, nextView, clears, applyView, costUnknown, viewLine } from '../lib/recordsFilter'
@@ -31,6 +31,7 @@ import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, namesFrom, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
 import { planReply, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
 import { planTo } from '../lib/branchVerbs'
+import { planBranchSummary } from '../lib/branchSummary'
 import { findPrivate, KINDS as PRIVATE_KINDS } from '../lib/privacyFilter'
 import { searchWords } from '../lib/searchWords'
 
@@ -332,6 +333,55 @@ function openNumber(a, step, screens = {}) {
   return { next: p.next, says: { message: words[p.says.message] ?? p.says.message, values: { num: shown } } }
 }
 
+// open:203b, a branch by its plan and letter (stage 8, piece 4; C175).
+const branchOf = (step) => {
+  const vals = step.match?.values ?? []
+  return vals.length === 1 && vals[0]?.kind === 'address' && vals[0].letter ? vals[0] : null
+}
+// open:203b summary, or open:205 summary by the chat's own number.
+const isSummaryOpen = (step) => {
+  const vals = step.verb === 'open' ? step.match?.values ?? [] : []
+  return vals.length === 2 && vals[0]?.kind === 'address' && vals[1]?.value === 'summary'
+}
+const OPENED_BRANCH = { goRoom: 'openBranch', showRoom: 'openBranchHere', roomHere: 'openChatThere' }
+
+/**
+ * open:203b. The branch shows in the room here, or in a room brought
+ * beside, with its whole history, keeping its letter. No call.
+ */
+function openBranch(a, step, screens = {}) {
+  const arg = branchOf(step)
+  const address = `${arg.num}${arg.letter}`
+  const t = targetsOf([arg], screens.records?.rows ?? [])
+  if (t.bad) return { next: null, says: t.bad }
+  const row = t.rows[0]
+  if (!row?.chatId) return { next: null, says: { message: 'numNone', values: { num: address } } }
+  const p = planRoom(a, row.chatId)
+  return { next: p.next, says: { message: OPENED_BRANCH[p.says.message] ?? p.says.message, values: { num: address, address } } }
+}
+
+/**
+ * open:203b summary (C175): a new branch, the plan's next letter, from a
+ * summary of this one, written by the helper. screens.summarizing:
+ * { helper, privacy, factsOf(chatId) }: who writes it (net.helperOf), the
+ * privacy filter as set, and, for a chat, its address, the next branch's,
+ * how much it holds, the sources that answered in it, and who answers the
+ * new branch with how much it reads at once.
+ */
+function openSummary(step, screens = {}) {
+  const [arg] = step.match.values
+  const said = arg.letter ? `${arg.num}${arg.letter}` : String(arg.num)
+  const t = targetsOf([arg], screens.records?.rows ?? [])
+  if (t.bad) return { says: t.bad, act: null }
+  const row = t.rows[0]
+  const chatId = row?.kind === 'chat' || row?.kind === 'docket' ? row.chatId : null
+  if (!chatId) return { says: { message: 'openSummaryNotChat', values: { num: said } }, act: null }
+  const s = screens.summarizing
+  const f = s?.factsOf?.(chatId) ?? null
+  if (!f) return { says: { message: 'later', values: { verb: 'open:' } }, act: null }
+  return planBranchSummary({ ...f, chatId, helper: s.helper ?? null, privacy: s.privacy ?? 'off', localReads: LOCAL_READS })
+}
+
 /**
  * close:204 and width:204 40% name a room by the chat it shows (C146 (c)):
  * the step again with the room for the number, or why it cannot be.
@@ -576,6 +626,17 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     return { answer, says, next: null, act: { kind: 'rows', changes: p.changes } }
   }
 
+  // open:203b summary spends one call, so it goes alone on its line (C175).
+  const summaryStep = answer.steps.find(isSummaryOpen)
+  if (summaryStep) {
+    if (answer.steps.length > 1) {
+      const [arg] = summaryStep.match.values
+      return { answer, says: { message: 'aloneSpends', values: { verb: `open:${arg.num}${arg.letter ?? ''} summary` } }, next: null }
+    }
+    const p = openSummary(summaryStep, screens)
+    return { answer, says: p.says, next: null, act: p.act }
+  }
+
   const acts = answer.steps.filter((s) => ACTS.includes(s.verb))
   if (acts.length) {
     if (answer.steps.length > 1) return { answer, says: { message: 'aloneNow', values: { verb: `${acts[0].verb}:` } }, next: null }
@@ -643,6 +704,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     const planned = byRoom?.step ?? step
     const p = BRINGS.includes(step.verb) ? bring(a, step, screens)
       : step.verb === 'open' && numberOf(step) != null ? openNumber(a, step, screens)
+        : step.verb === 'open' && branchOf(step) ? openBranch(a, step, screens)
         : step.verb === FOCUS ? planFocusStep(a, step, screens)
           : plan(a, planned, screens.measure?.() ?? null)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
@@ -739,10 +801,8 @@ function manyPreview(text, target) {
   return { ready: true, says: { ...head, also } }
 }
 
-// How much of a chat a model on this computer reads by default where the
-// computer has under 24 GB of graphics memory: Ollama drops the start of a
-// longer one without saying so (C163 (e), ruled 22 October).
-export const LOCAL_READS = 4000
+// How much of a chat a model on this computer reads (C163 (e)): in estimate.js.
+export { LOCAL_READS }
 
 // Below a cent, the line says "under" a cent rather than a fraction of one.
 const CENT = 0.01

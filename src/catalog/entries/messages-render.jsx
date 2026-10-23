@@ -36,6 +36,8 @@ import MessageList from '../../components/core/MessageList'
 import MessageCard from '../../components/core/MessageCard'
 import BranchSlider from '../../components/core/BranchSlider'
 import { lineItems, membersOf } from '../../lib/branchGroups'
+import { contextShare } from '../../lib/branchSummary'
+import { LOCAL_READS } from '../../shell/estimate'
 import { subscribe as onChatStore } from '../../stores/chatStore'
 import SelectConversationModal from '../../components/SelectConversationModal'
 import { useChat } from '../../stores/ChatContext'
@@ -345,6 +347,28 @@ export default function MessagesRender() {
     return m
   }, [messages])
 
+  // ── Branches (stage 8, piece 2; C173) ────────────────────
+  // Where a prompt here went to several, its replies are a slider of tabs.
+  const memberIds = useMemo(() => membersOf(visibleMessages, activeConversationId), [visibleMessages, activeConversationId])
+  const members = useBranchMembers(memberIds, watchConversation)
+  const items = useMemo(() => lineItems(visibleMessages, activeConversationId, members), [visibleMessages, activeConversationId, members])
+  const startsFromSummary = visibleMessages.some((m) => m.summary)
+  const lineChat = useMemo(() => conversations.find((c) => c.id === activeConversationId) ?? null, [conversations, activeConversationId])
+  const [planNum, setPlanNum] = useState(null)
+  useEffect(() => {
+    let live = true
+    if (!lineChat?.docketId || (!memberIds.length && !startsFromSummary)) return undefined
+    dbGetDocket(lineChat.docketId).then((d) => { if (live) setPlanNum(d?.num ?? null) }, () => {})
+    return () => { live = false }
+  }, [lineChat?.docketId, memberIds.length, startsFromSummary])
+  // The summary a branch starts from: the branch it summarizes and who wrote it (C175).
+  const summaryInfo = useCallback((msg) => {
+    if (msg.role !== 'assistant' || !msg.summary) return null
+    const of = conversations.find((c) => c.id === msg.summary.of)
+    const address = planNum != null && of?.branch && of.docketId === lineChat?.docketId ? `${planNum}${of.branch}` : null
+    return { address, name: modelFacts(msg.model)?.name ?? null }
+  }, [conversations, planNum, lineChat?.docketId])
+
   const renderCard = useCallback((msg, idx) => {
     // The streaming card is the message the stream fills, by id.
     const isLatestAssistantStreaming = isStreaming && msg.id === streamingMessageId
@@ -374,6 +398,7 @@ export default function MessagesRender() {
         translation={msg.role === 'assistant' ? msg.translation ?? null : null}
         citations={msg.role === 'assistant' ? msg.citations ?? null : null}
         asked={msg.role === 'user' ? msg.asked ?? null : null}
+        summary={summaryInfo(msg)}
         thinking={thinking}
         isFavorited={isFav}
         showNotes={showNotes.has(msg.id)}
@@ -404,30 +429,24 @@ export default function MessagesRender() {
     toggleFavorite, toggleNotePanel, saveNote, addHighlight,
     openBranchPanel,
     handleHide, handleDelete, handleSendToBranch, handlePinForReference,
-    handleQuote, quotesByMessage,
+    handleQuote, quotesByMessage, summaryInfo,
   ])
 
-  // ── Branches (stage 8, piece 2; C173) ────────────────────
-  // Where a prompt here went to several, its replies are a slider of tabs.
-  const memberIds = useMemo(() => membersOf(visibleMessages, activeConversationId), [visibleMessages, activeConversationId])
-  const members = useBranchMembers(memberIds, watchConversation)
-  const items = useMemo(() => lineItems(visibleMessages, activeConversationId, members), [visibleMessages, activeConversationId, members])
-  const lineChat = useMemo(() => conversations.find((c) => c.id === activeConversationId) ?? null, [conversations, activeConversationId])
-  const [planNum, setPlanNum] = useState(null)
-  useEffect(() => {
-    let live = true
-    if (!lineChat?.docketId || !memberIds.length) return undefined
-    dbGetDocket(lineChat.docketId).then((d) => { if (live) setPlanNum(d?.num ?? null) }, () => {})
-    return () => { live = false }
-  }, [lineChat?.docketId, memberIds.length])
   // A tab's letter, who answered, and the branch's address (203b).
   const infoOf = useCallback((chatId, tab) => {
     const chat = conversations.find((c) => c.id === chatId)
     const reply = tab.reply.find((m) => m.role === 'assistant')
     const name = reply?.source?.name ?? modelFacts(reply?.model)?.name ?? modelFacts(chat?.answerer)?.name ?? destination(chat?.answerer)?.name ?? i18n._(COPY.branches.unknown)
     const letter = chat?.branch ?? null
-    return { letter, name, address: planNum != null && letter ? `${planNum}${letter}` : null }
-  }, [conversations, planNum, i18n])
+    // How much of what its model reads at once the branch fills, and about
+    // what a summary would, worked out here (slider v9; C175).
+    const whoId = chat?.answerer ?? chat?.model ?? null
+    const facts = modelFacts(whoId)
+    const window = facts ? (destination(facts.provider)?.kind === 'local' ? LOCAL_READS : facts.contextWindow) : null
+    const list = chatId === activeConversationId ? visibleMessages : members.get(chatId) ?? []
+    const chars = list.reduce((n, m) => n + (m.content && !m.source ? m.content.length : 0), 0)
+    return { letter, name, address: planNum != null && letter ? `${planNum}${letter}` : null, context: contextShare(chars, window) }
+  }, [conversations, planNum, i18n, activeConversationId, visibleMessages, members])
   // A message of another branch is numbered as in its own chat.
   const numberOf = useCallback((chatId, msg) => {
     const list = members.get(chatId) ?? []

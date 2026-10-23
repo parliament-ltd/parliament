@@ -7,7 +7,7 @@ import { listEntries } from '../catalog'
 import { V6_NEW_STORES } from './migrations/v6Upgrade'
 import { DB_NAME, DB_VERSION, DRAFT_DB_VERSION, TRIAL_DB_NAME, BUILTIN_AUTHOR, upgradeSchema } from './schema'
 import {
-  createChat, updateChat, removeChat, createBranchChat,
+  createChat, updateChat, removeChat, createBranchChat, createSummaryChat,
   addMessageRecord, updateMessageRecord, removeMessage,
   addNumbered, updateNumbered, removeNumbered,
   addFavoriteRecord, removeFavoriteRecord, saveDocument, changeRecords,
@@ -340,6 +340,24 @@ export async function createBranch(sourceConversationId, branchAtMessageId, opti
   return createBranchChat(await initDB(), {
     sourceId: sourceConversationId,
     branchAtMessageId,
+    title: options.title,
+    model: options.model,
+    answerer: options.answerer ?? null,
+    frameworks: options.frameworks ?? null,
+    newId: generateId,
+    now: new Date().toISOString(),
+  })
+}
+
+/**
+ * open:203b summary (C175): the next branch of a chat's plan, starting from
+ * a summary of it the helper wrote (by: its model id).
+ */
+export async function createSummaryBranch(sourceConversationId, { text, by = null, ...options } = {}) {
+  return createSummaryChat(await initDB(), {
+    sourceId: sourceConversationId,
+    text,
+    by,
     title: options.title,
     model: options.model,
     answerer: options.answerer ?? null,

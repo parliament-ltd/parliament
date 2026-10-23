@@ -45,6 +45,7 @@ export default function MessageCard({
   translation = null, // an answer from a source translated on request (C166 (f))
   citations = null, // the sources a reply cited from a web search (C167 (f))
   asked = null, // a question translated before it went to a source (C85, C166 (g))
+  summary = null, // the summary a branch starts from: { address, name }, either null when not known (C175)
   thinking = null, // a model's thinking: { text, live, answering, since } while it streams, { text, ms } after (C165)
   isFavorited = false, showNotes = false,
   savedNoteText = '',
@@ -503,6 +504,8 @@ export default function MessageCard({
       {source && translation && <TranslationLine translation={translation} original={original} onToggle={() => setOriginal((o) => !o)} />}
       {/* The question as it went, when it was translated first (C85). */}
       {type === 'user' && asked && <AskedLine asked={asked} />}
+      {/* The summary a branch starts from, said to be one, and by whom (C175). */}
+      {summary && <SummaryLine summary={summary} />}
       {/* The frameworks it was written under (C164). */}
       {Array.isArray(frameworks) && frameworks.length > 0 && <FrameworkLine frameworks={frameworks} />}
       {/* The sources a web search found and the reply cited, kept and shown (C167 (f)). */}
@@ -639,6 +642,15 @@ function AskedLine({ asked }) {
   const { i18n } = useLingui()
   const words = asked.by === 'search' ? i18n._(COPY.chat.searchedFor, { text: asked.text }) : i18n._(COPY.chat.askedAs, { language: languageName(i18n.locale, asked.lang), text: asked.text })
   return <p className="mt-1 text-xs italic text-[var(--p-text-secondary)]" dir="auto">{words}</p>
+}
+
+// "A summary of 203b, written by Haiku 5.5": a branch started from a summary
+// carries on from it, and models are sent it as what came before (C175).
+function SummaryLine({ summary }) {
+  const { i18n } = useLingui()
+  const name = summary.name || i18n._(COPY.chat.summaryBy)
+  const words = summary.address ? i18n._(COPY.chat.summaryOf, { address: summary.address, name }) : i18n._(COPY.chat.summaryOfGone, { name })
+  return <p className="mt-2 text-xs italic text-[var(--p-text-secondary)]" dir="auto">{words}</p>
 }
 
 // "Written under Push back on me and Editor": the built in by their names in

@@ -78,6 +78,15 @@ export class BaseProvider {
     throw new Error('Not implemented')
   }
 
+  // open:203b summary (stage 8, piece 4; C175): a chat's turns, each
+  // { label, text } (the person, a model, a source), summarized in one
+  // lightweight call to the model named (the helper), so a new branch can
+  // carry the chat on from it. Returns the summary as text; throws when
+  // none came back. The turns are material, never instructions.
+  async summarizeChat(apiKey, turns, { model } = {}) {
+    throw new Error('Not implemented')
+  }
+
   // translate: (stage 7, piece 6; C84, C85, C166): pieces of text from a
   // source (titles, passages), or a question for one, into another
   // language, in one lightweight call to the model named (the helper, or the

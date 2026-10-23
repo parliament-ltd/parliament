@@ -22,6 +22,14 @@ import { stepFrom } from '../../lib/branchGroups'
 
 const write = (value) => window.dispatchEvent(new CustomEvent('parliament-write', { detail: { value } }))
 
+// "context 41% → 7%" beside open:203b summary (slider v9; C175), from
+// whole percentages; below one, "under 1%".
+function contextWords(i18n, c) {
+  if (c.share < 1) return i18n._(COPY.branches.contextSmall, { share: 0.01 })
+  const share = Math.round(c.share) / 100
+  return c.after < 1 ? i18n._(COPY.branches.contextUnder, { share, low: 0.01 }) : i18n._(COPY.branches.context, { share, low: Math.round(c.after) / 100 })
+}
+
 function useViewed(groupId) {
   return useSyncExternalStore(onViewChange, () => viewedIn(groupId), () => viewedIn(groupId))
 }
@@ -123,6 +131,7 @@ export default function BranchSlider({ item, line, infoOf, renderLine, numberOf 
                   <span> {i18n._(COPY.branches.withHistory)}</span>
                   <span aria-hidden="true"> · </span>
                   <button type="button" onClick={() => write(`>open:${info.address} summary`)}>open:{info.address} summary</button>
+                  {info.context && <span> {contextWords(i18n, info.context)}</span>}
                 </>
               )}
             </p>

@@ -315,6 +315,18 @@ msgid "branches.carriesOn"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "branches.context"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.contextSmall"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.contextUnder"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "branches.label"
 msgstr ""
 
@@ -485,6 +497,18 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.stoppedOnReply"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.summaryBy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.summaryOf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.summaryOfGone"
 msgstr ""
 
 #. While a model thinks before answering; {time} is minutes and seconds, 2:31
@@ -1734,6 +1758,14 @@ msgid "enter.openBoard"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.openBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openBranchHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.openChat"
 msgstr ""
 
@@ -1771,6 +1803,93 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.openSaved"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummary"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryCheapNext"
+msgstr ""
+
+#. {share} is how much of it the branch fills now, {low} about what the summary will
+#. js-lingui-explicit-id
+msgid "enter.openSummaryContext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryContextOver"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryContextSmall"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryContextUnder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryLocalNext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryNext"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.openSummaryNoOne"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.openSummaryNotChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryPrivacy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummarySources"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryUnpriced"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryUnpricedNext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryWriting"
 msgstr ""
 
 #. js-lingui-explicit-id

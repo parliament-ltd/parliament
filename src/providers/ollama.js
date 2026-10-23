@@ -1,5 +1,5 @@
 import { BaseProvider } from './base'
-import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens } from './shared'
+import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary } from './shared'
 import { NAMES_SYSTEM_PROMPT, CHECK_SYSTEM_PROMPT, readNames, readCheck } from '../lib/injection'
 
 // Text for one of the checks below, in its tag, any such tag inside taken out.
@@ -292,6 +292,11 @@ export class OllamaProvider extends BaseProvider {
     const said = readCheck(raw)
     if (!said) throw new Error('The check came back unreadable')
     return said
+  }
+
+  // open:203b summary (C175) by a model on this computer: free, and nothing leaves it.
+  async summarizeChat(turns, { model } = {}) {
+    return readChatSummary(await this._lightweightCall(CHAT_SUMMARY_SYSTEM_PROMPT, [{ role: 'user', content: summaryItems(turns) }], CHAT_SUMMARY_MAX_TOKENS, model))
   }
 
   // translate: (C166) by a model on this computer: free, and nothing leaves it.

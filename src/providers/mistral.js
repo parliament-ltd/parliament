@@ -1,6 +1,6 @@
 import { BaseProvider } from './base'
 import { findModel } from '../net/answerers'
-import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens } from './shared'
+import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary } from './shared'
 
 // Mistral (refactor-plan.md, stage 7, piece 3; LPN §7.1; C82, C159).
 //
@@ -279,6 +279,11 @@ export class MistralProvider extends BaseProvider {
     const text = await this._lightweightCall(apiKey, SUMMARIZE_SYSTEM_PROMPT, [{ role: 'user', content: summaryItems(items) }], SUMMARY_MAX_TOKENS)
     if (!text) throw new Error('No summary came back')
     return text.slice(0, SUMMARY_MAX_CHARS)
+  }
+
+  // open:203b summary (C175), as Anthropic's.
+  async summarizeChat(apiKey, turns, { model = LIGHT_MODEL } = {}) {
+    return readChatSummary(await this._lightweightCall(apiKey, CHAT_SUMMARY_SYSTEM_PROMPT, [{ role: 'user', content: summaryItems(turns) }], CHAT_SUMMARY_MAX_TOKENS, model))
   }
 
   // translate: (C166), as Anthropic's.

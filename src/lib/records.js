@@ -217,6 +217,64 @@ export async function createBranchChat(db, { sourceId, branchAtMessageId, title,
   })
 }
 
+/**
+ * open:203b summary (stage 8, piece 4; C175): a new branch of a chat's plan,
+ * the next letter, that starts from a summary of the chat instead of copies
+ * of its messages. Its one message is the summary, kept as the helper wrote
+ * it, with `summary`: the chat it summarizes and the last message it read.
+ * One transaction, so no tab sees the branch without it.
+ */
+export async function createSummaryChat(db, { sourceId, text, by, title, model, answerer = null, frameworks = null, newId, now }) {
+  const v6 = isV6(db)
+  return write(db, ['conversations', 'messages', ...(v6 ? DOCKET_STORES : [])], async (tx) => {
+    const convs = tx.objectStore('conversations')
+    const msgStore = tx.objectStore('messages')
+    const source = await convs.get(sourceId)
+    if (!source) throw new Error(`Source conversation not found: ${sourceId}`)
+    const all = (await msgStore.index('conversationId').getAll(sourceId)).sort(byTime)
+    const upTo = all[all.length - 1]
+    if (!upTo) throw new Error(`Nothing to summarize in ${sourceId}`)
+
+    const familyId = source.familyId || source.id
+    if (!source.familyId) await convs.put({ ...source, familyId })
+
+    let branch = {
+      id: newId(),
+      title: title || source.title,
+      model: model || source.model,
+      parentId: sourceId,
+      parentTitle: source.title,
+      familyId,
+      branchPoint: upTo.id,
+      room: source.room ?? null,
+      ...(answerer ? { answerer } : {}),
+      ...(Array.isArray(frameworks) && frameworks.length ? { frameworks } : {}),
+      pinned: false,
+      storageBytes: 0,
+      createdAt: now,
+      updatedAt: now,
+    }
+    const summary = {
+      id: newId(),
+      conversationId: branch.id,
+      role: 'assistant',
+      content: text,
+      tokenCount: 0,
+      incomplete: false,
+      createdAt: now,
+      ...(by ? { model: by } : {}),
+      summary: { of: sourceId, upTo: upTo.id },
+    }
+    await msgStore.put(summary)
+    branch.storageBytes = byteSize(summary.content)
+
+    let changes = []
+    if (v6) ({ chat: branch, changes } = await fileInDocket(tx, branch, { parent: source, copiedMessages: [], allParentMessages: all }))
+    await convs.put(branch)
+    return { result: branch, changes: [{ kind: 'chat', op: 'created', id: branch.id, num: branch.num }, ...changes] }
+  })
+}
+
 /** Change fields on a chat. At version 6 a rename reaches its docket, and tags are marked as the model's. */
 export async function updateChat(db, id, updates) {
   const v6 = isV6(db)

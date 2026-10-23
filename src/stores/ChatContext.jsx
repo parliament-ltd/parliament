@@ -4,7 +4,7 @@ import { askToKeepStorage } from '../lib/storageKeep'
 import { nameFromChat, titleFromPrompt, fieldsFromDescription } from '../lib/chatTitles'
 import { useConversations } from './ConversationContext'
 import { useSettings } from './SettingsContext'
-import { gateway, destination, runClientTool, continueInstruction, providerOf, modelsOf } from '../net'
+import { gateway, destination, runClientTool, continueInstruction, providerOf, modelsOf, modelFacts } from '../net'
 import {
   startStream, appendStream, showStreamText, resetStreamText, stopStream, endStream, getStream, appendThinking, thoughtOf,
   isStreaming as streamingIn, streamingIds, addNotice, noteCut, watch, watched,
@@ -13,6 +13,7 @@ import {
 import { useIsStreaming, useMessages } from './chatHooks'
 import { forModel, cutReason } from './sendHistory'
 import { veilRequest, createVeil } from '../lib/privacyFilter'
+import { summaryTurns } from '../lib/branchSummary'
 
 // The open chat, for today's screens (refactor-plan.md, stages 3 and 4;
 // state audit §11a; C109).
@@ -599,6 +600,26 @@ export function ChatProvider({ children }) {
     }
   }, [keepPartial, titleIfUntitled])
 
+  // open:203b summary (stage 8, piece 4; C175): a chat's turns as they
+  // would go to a model (hidden messages and those being deleted stay out),
+  // each labelled with who wrote it, summarized by the helper in one call.
+  // With the privacy filter on and the helper off this computer, what it
+  // finds is swapped for placeholders first and back in the summary.
+  const summarizeChat = useCallback(async (chatId, helper) => {
+    const list = sendable(chatId, hasMessages(chatId) ? heldMessages(chatId) : await getMessages(chatId))
+    const { turns } = summaryTurns(list, { modelName: (id) => modelFacts(id)?.name ?? null })
+    if (!turns.length) throw new Error('Nothing to summarize')
+    let send = turns
+    let back = (t) => t
+    if (privacyMode.current !== 'off' && !onThisComputer(helper.provider)) {
+      const veil = createVeil({ names: await namesFor(helper.id, turns.map((t) => t.text)) })
+      send = turns.map((t) => ({ ...t, text: veil.out(t.text) }))
+      back = veil.back
+    }
+    const text = await gateway.call(helper.provider, 'summarizeChat', [send, { model: helper.id }], { label: 'branch summary' })
+    return back(text)
+  }, [])
+
   // A translation of an answer from a source (C166 (f)), kept on its
   // message beside the source's own words, which stay as they came.
   const keepTranslation = useCallback(async (conversationId, messageId, translation) => {
@@ -731,6 +752,7 @@ export function ChatProvider({ children }) {
       sendMessage,
       resendWhole,
       askSource,
+      summarizeChat,
       keepTranslation,
       continueMessage,
       stopGenerating,

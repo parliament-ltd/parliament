@@ -23,6 +23,7 @@
 import { isV6 } from './records'
 import { roomName } from './roomNames'
 import { costOf } from './chatFacts'
+import { letterAt } from './addresses'
 
 /** The kinds of row, in the order the type filter lists them. */
 export const ROW_KINDS = Object.freeze(['chat', 'docket', 'note', 'term', 'quote'])
@@ -83,12 +84,15 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
   // Where a chat sits: its number, its plan's number, its branch and run.
   const placeOf = (chatId) => {
     const chat = chatById.get(chatId)
-    if (!chat) return { chatNum: null, docketNum: null, branch: null, run: null }
+    if (!chat) return { chatNum: null, docketNum: null, branch: null, run: null, planNext: null }
+    const docket = docketById.get(chat.docketId)
     return {
       chatNum: Number.isInteger(chat.num) ? chat.num : null,
-      docketNum: docketById.get(chat.docketId)?.num ?? null,
+      docketNum: docket?.num ?? null,
       branch: chat.branch ?? null,
       run: Number.isInteger(chat.run) ? chat.run : null,
+      // The letter the plan's next branch will have (open:203b summary, C175).
+      planNext: Number.isInteger(docket?.nextLetter) && docket.nextLetter >= 0 ? letterAt(docket.nextLetter) : null,
     }
   }
   const numbered = (r) => Number.isInteger(r?.num)
