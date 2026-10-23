@@ -18,9 +18,9 @@ const run = (value, screens = {}, arrangement = onPlan) => {
   return { ...p, text: p.says ? words(p.says) : [] }
 }
 const plan = (over = {}) => ({
-  num: 201, docketId: 'd1', title: 'Water tower', n: 1, latest: 1, next: 'c', selected: null, order: ['a', 'b'],
+  num: 201, docketId: 'd1', title: 'Water tower', n: 1, latest: 1, next: 'c', selected: null, order: ['a', 'b'], neverRan: ['b'], branchCount: 2,
   branches: [
-    { letter: 'a', address: '201a', name: 'Water tower', status: 'ready', chatId: 'c1', steps: [{ id: 's1', status: 'done', planned: false }, { id: 's2', status: 'ready', planned: true }] },
+    { letter: 'a', address: '201a', name: 'Water tower', status: 'ready', chatId: 'c1', steps: [{ id: 's1', stepId: 's1', status: 'done', planned: false }, { id: 's2', stepId: 's2', status: 'ready', planned: true }] },
     { letter: 'b', address: '201b', name: 'Shorter', status: 'ready', chatId: null, steps: [] },
   ],
   ...over,
@@ -117,5 +117,35 @@ describe('a prompt with the Plan board addressed (C198)', () => {
     expect(words(promptPreview('Who built it?', { plan: plan({ selected: 'b' }) }).says)).toEqual(['Enter adds this as step 1 of 201b in run 1. Nothing is sent'])
     expect(words(promptPreview('', { plan: plan({ selected: 'b' }) }).says)).toEqual(['Write the step. Enter adds it as step 1 of 201b. Nothing is sent'])
     expect(promptPreview('x', { plan: plan() }).ready).toBe(false)
+  })
+})
+
+describe('delete: of what has not been sent (C199)', () => {
+  it('deletes a step not yet started, in the last run, and says undo brings it back', () => {
+    expect(run('>delete:201a 2', { plan: plan() })).toMatchObject({
+      text: ['Enter deletes step 2 of 201a in run 1. undo: brings it back'],
+      act: { kind: 'planDelete', what: 'step', letter: 'a', stepId: 's2', index: 2 },
+    })
+    expect(run('>delete:201a 1', { plan: plan() }).text[0]).toBe('Step 1 of 201a has started, so it stays with its chat')
+    expect(run('>delete:201a 5', { plan: plan() }).text[0]).toBe('201a has no step 5 in run 1')
+    expect(run('>delete:201a 2', { plan: plan({ latest: 2 }) }).text[0]).toBe('Run 1 is an earlier run, kept as it was. open:run 2 to change the plan')
+    expect(run('>delete:203a 1', { plan: plan() }).text[0]).toBe('Plan 203 is not on the Plan board. open:203 shows it')
+  })
+
+  it('deletes a branch that has never run, from every run, and a plan with no chat', () => {
+    expect(run('>delete:201b', { plan: plan() })).toMatchObject({
+      text: ['Enter deletes 201b, which has never run, from every run of plan 201. undo: brings it back'],
+      act: { kind: 'planDelete', what: 'branch', letter: 'b' },
+    })
+    expect(run('>delete:201b', { plan: plan({ branchCount: 1 }) }).text[1]).toBe('It is the plan’s last branch, so plan 201 goes too')
+    const rows = [{ kind: 'docket', num: 224, id: 'd224', chatNums: [] }, { kind: 'docket', num: 230, id: 'd230', chatNums: [231] }]
+    expect(run('>delete:224', { records: { rows } }, shipped('almanac'))).toMatchObject({
+      text: ['Enter deletes plan 224, which has no chat yet. undo: brings it back'],
+      act: { kind: 'planDelete', what: 'plan', docketId: 'd224' },
+    })
+    // A branch that has run, and a plan with chats, go for good after a second Enter.
+    expect(run('>delete:201a', { plan: plan(), records: { rows: [{ kind: 'chat', num: 202, chatId: 'c1', docketNum: 201, branch: 'a', title: 'Tower' }] } }).act).toMatchObject({ kind: 'erase', confirm: true })
+    expect(run('>delete:230', { records: { rows: [...rows, { kind: 'chat', num: 231, chatId: 'c231', docketNum: 230, branch: 'a', title: 'x' }] } }, shipped('almanac')).act).toMatchObject({ kind: 'erase', confirm: true })
+    expect(run('>delete:201b, 202', { plan: plan(), records: { rows: [] } }).text[0]).toBe('Delete what has not been sent on a line of its own')
   })
 })

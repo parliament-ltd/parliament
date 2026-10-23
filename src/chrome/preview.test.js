@@ -593,7 +593,7 @@ describe('the row verbs, copy: and undo: (stage 6, piece 3; C143, C134)', () => 
   })
 })
 
-describe('erase: (stage 6, piece 4; C137)', () => {
+describe('delete: of what has been sent (stage 6, piece 4; C137; C199)', () => {
   const row = (num, kind, extra = {}) => ({ num, kind, id: `${kind}${num}`, chatId: kind === 'chat' ? `c${num}` : null, store: kind === 'chat' ? 'conversations' : 'notes', title: `${kind} ${num}`, tags: [], tagsMine: [], docketNum: null, ...extra })
   const rows = [row(204, 'chat', { title: 'barn owl', docketNum: 203 }), row(206, 'chat', { title: 'Essay plan', docketNum: 205 }), row(210, 'note', { chatId: 'c204', text: 'Check the range map' })]
   const at = (value) => {
@@ -602,16 +602,24 @@ describe('erase: (stage 6, piece 4; C137)', () => {
     return { ...p, text: [say(i18n, p.says.message, p.says.values), ...also].join(' · ') }
   }
 
-  it('names everything that goes, what stays, and that it is for good', () => {
-    expect(at('>erase:204').text).toBe('Enter erases 204 “barn owl” for good · 1 note, keyword or quote stays, marked as from an erased chat. Add all to erase it too · Plan 203 goes with its last chat · Undo cannot bring it back, and stops here')
-    expect(at('>erase:204, 206 all').text).toBe('Enter erases 204 “barn owl” and 206 “Essay plan” for good · 1 note, keyword or quote goes too · Plans 203 and 205 go with their last chats · Undo cannot bring them back, and stops here')
-    expect(at('>erase:204').act).toMatchObject({ kind: 'erase', chats: [{ id: 'c204', num: 204 }], keepMarks: true })
+  it('names everything that goes, what stays, that it is for good, and asks for a second Enter', () => {
+    expect(at('>delete:204').text).toBe('Enter, then Enter again, deletes 204 “barn owl” for good · 1 note, keyword or quote stays, marked as from a deleted chat. Add all to delete it too · Plan 203 goes with its last chat · Undo cannot bring it back, and stops here')
+    expect(at('>delete:204, 206 all').text).toBe('Enter, then Enter again, deletes 204 “barn owl” and 206 “Essay plan” for good · 1 note, keyword or quote goes too · Plans 203 and 205 go with their last chats · Undo cannot bring them back, and stops here')
+    expect(at('>delete:204').act).toMatchObject({ kind: 'erase', confirm: true, chats: [{ id: 'c204', num: 204 }], keepMarks: true })
   })
 
-  it('runs alone, takes numbers only, and answers delete: with itself', () => {
-    expect(at('>erase:204 pin:206').text).toBe('erase: runs on a line of its own, so it is plain what goes for good')
-    expect(at('>erase:all').text).toBe('erase: does not take that. For example: erase:207')
-    expect(at('>delete:204').text).toBe('To remove something for good, use erase:. Enter writes it in')
+  it('runs alone, takes numbers only, and answers erase: with delete:', () => {
+    expect(at('>delete:204 pin:206').text).toBe('delete: runs on a line of its own, so it is plain what goes for good')
+    expect(at('>delete:all').text).toBe('delete: does not take that. For example: delete:207')
+    expect(at('>erase:204').text).toBe('That verb is now delete:. Enter writes it in')
+  })
+
+  it('points delete: alone to Delete everything in Settings (C199)', () => {
+    const p = at('>delete:')
+    expect(p.text).toBe('Delete everything is a button at the foot of Settings. Enter opens it there')
+    expect(p.next.addressed).toBe('settings')
+    expect(p.next.context.settings).toBeTruthy()
+    expect(at('>delete:everything').text).toBe('Delete everything is a button at the foot of Settings. Enter opens it there')
   })
 })
 

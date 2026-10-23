@@ -56,7 +56,7 @@ msgstr "Tyyppi"
 msgid "almanac.empty"
 msgstr "Mitään ei ole vielä tehty. p> aloittaa ensimmäisen keskustelusi, ja se näkyy täällä."
 
-#. Marginalia on a note, keyword or quote kept when its chat was erased
+#. Marginalia on a note, keyword or quote kept when its chat was deleted for good
 #. js-lingui-explicit-id
 msgid "almanac.erasedFrom"
 msgstr "keskustelusta {num}, pyyhitty"
@@ -1026,7 +1026,7 @@ msgstr "Viety Parliamentista {day}. Luettavaksi muualla: sitä ei voi tuoda taka
 msgid "copy.from"
 msgstr "keskustelusta {num}"
 
-#. Where it came from: a chat that was erased
+#. Where it came from: a chat that was deleted for good
 #. js-lingui-explicit-id
 msgid "copy.fromErased"
 msgstr "keskustelusta {num}, pyyhitty"
@@ -1556,6 +1556,57 @@ msgstr "cost: tarvitsee summan, esimerkiksi >0.50, <1 tai 0.18"
 msgid "enter.dateBad"
 msgstr "{verb} hyväksyy esimerkiksi 7d, 3w, kuukauden tai päivämäärän muodossa 2026-09-01"
 
+#. After the first Enter of a delete undo cannot take back (C199)
+#. js-lingui-explicit-id
+msgid "enter.deleteAgain"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deleteApart"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteBranch"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletedBranch"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletedPlan"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletedStep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deleteEverything"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletePlan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deletePlanToo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteStep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deleteStepStarted"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.didYouMean"
 msgstr "Komentoa {verb} ei ole. Tarkoititko {near}?"
@@ -1568,7 +1619,7 @@ msgstr "{verb} toimii tauluissa: {boards}"
 msgid "enter.empty"
 msgstr "Kirjoita komento, tai ? näyttää kaikki komennot"
 
-#. The answer to delete:, ruled 15 October
+#. Unused since C199 (R38): delete: is the word now
 #. js-lingui-explicit-id
 msgid "enter.erase"
 msgstr "Jos haluat poistaa jotain pysyvästi, käytä komentoa erase:. Enter kirjoittaa sen kenttään"
@@ -2490,6 +2541,10 @@ msgstr ""
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planNoStep"
 msgstr ""
 
 #. Commands stay English
@@ -4861,6 +4916,14 @@ msgstr ""
 msgid "plan.counts"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "plan.deleteBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.deleteStep"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.fixed"
@@ -5801,6 +5864,10 @@ msgid "verb.cost"
 msgstr "Näytä suunnitelmat hinnan mukaan"
 
 #. js-lingui-explicit-id
+msgid "verb.delete"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.device"
 msgstr "Kerro, mille laitteelle huone on tehty"
 
@@ -5813,20 +5880,12 @@ msgid "verb.done"
 msgstr "Poistu Pajasta muutoksinesi"
 
 #. js-lingui-explicit-id
-msgid "verb.drop"
-msgstr "Poista kysymys, muokkaus tai vaihe, jota ei ole lähetetty"
-
-#. js-lingui-explicit-id
 msgid "verb.duplicate"
 msgstr "Kopioi huone, kokoelma tai suunnitelma uudella nimellä"
 
 #. js-lingui-explicit-id
 msgid "verb.edit"
 msgstr "Avaa huone Pajassa muuttaaksesi sitä"
-
-#. js-lingui-explicit-id
-msgid "verb.erase"
-msgstr "Pyyhi yksi kohde pysyvästi sen numerolla. Kumoaminen ei voi palauttaa sitä"
 
 #. js-lingui-explicit-id
 msgid "verb.export"

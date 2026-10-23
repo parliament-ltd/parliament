@@ -217,6 +217,17 @@ Line numbers are approximate.
 
 **23 October 2026, at the Lock Parliament checkpoint:** Stefan: "let's continue. ill do test of passkey later along with test of language". C193 to C195 kept as built. Trying a real passkey, and the four languages, is Stefan's, later; the stage stays open for what those tries find.
 
+**23 October 2026, on the Plan board (C198 (i)):**
+- **A step left empty is skipped** when its run comes (piece 3). "skip is fine."
+- **Names edited on the board come later,** "as long as it's added later": with stage 11's editing.
+- **Removing a step is wanted now.** Stefan: "people are more used to saying delete … i think delete is a stronger word", like "plan" for "docket".
+
+**23 October 2026, one word for removing (C199):** Stefan: "Yes: delete: for everything, a second Enter for anything undo can't bring back, erase: and drop: point to delete:, × marks on steps and never-run branches, delete: alone points to the Settings button, no wipe:."
+- **`delete:` is the word for removing anything.** This replaces the ruling of 15 October (`delete:` pointed to `erase:`, "one word stays destructive") and the bar decisions' `drop:` (7 October). `erase:` and `drop:` now answer "That verb is now delete:" and write it in.
+- **A second Enter for anything undo cannot bring back:** a chat, a branch that has run, a plan with chats, a note, a keyword, a quote. The Enter line names each; the first Enter arms it, the second deletes. What has not been sent (a planned step, a branch that has never run, a plan with no chat) goes on one Enter, and `undo:` brings it back.
+- **× marks** on a step not yet started and on a branch that has never run delete it at once. An exception to the Lab's rule that a click which removes waits for Enter (L7, C38): nothing has been sent, and `undo:` brings it back.
+- **`delete:` alone** (or `delete:everything`) points to Delete everything, the button in Settings, and Enter opens Settings there. **No `wipe:` command:** Delete everything stays a button, never a command (C73, 11 October).
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it
@@ -1682,6 +1693,15 @@ Found while splitting stage 10 into pieces, after a read of every document on pl
   2. Branch and plan names are not edited on the board (v12 has fields); `name:` renames a plan from Records. **Suggestion:** with stage 11.
   3. The branch picked on the board is per tab and not kept.
 - **(j) Tested:** the commands' Enter lines; undo plain and through the lock; Records; `open:`. Tried on a trial copy made from the sample: `open:201`, `new:plan`, a prompt planned as a step (nothing on the network), a step rewritten in place, `new:branch`, `new:step`, `hold:`, `move:`, `new:run`, a pip to the earlier run, `open:224b`, and `undo:` of `hold:off`, a step, a run and a plan; phone width. The trial copy was erased.
+- **Suggestion:** keep as built.
+
+**C199. `delete:`, as built** (ruled 23 October, in the Rulings section; replaces the ruling of 15 October and the bar decisions' `drop:`).
+- **(a) The word.** `delete:` takes the place of `erase:` in the registry, with the same forms and `delete:201a 2` for a step. `erase:` and `drop:` answer "That verb is now delete:" and write it in. It still runs on a line of its own (C99). Copy that said "erased" says "deleted"; the copy ids keep the old word.
+- **(b) What has not been sent goes on one Enter,** and `undo:` brings it back: a step not yet started, in the last run ("Enter deletes step 2 of 201a in run 1. undo: brings it back"); a branch that has never run, in any run, out of every run, its letter not given out again (the plan goes with its last branch, and the line says so); a plan with no chat. A step that has started stays with its chat. Several things on one line with any of these is refused: "Delete what has not been sent on a line of its own".
+- **(c) What has been sent asks for a second Enter:** the line reads "Enter, then Enter again, deletes 207 “Water tower” for good", names what stays and what goes too (C137), and says undo cannot bring it back. The first Enter arms it ("Enter again deletes it for good. Escape keeps it"); any typing disarms it, so an edited line asks for both Enters again.
+- **(d) The ×** on a step not yet started, and on a branch that has never run, in the last run: it runs the `delete:` it stands for at once, and the bar says what it did, with undo. It shows when the line is under the pointer or holds focus, and always where nothing hovers. No × on anything sent.
+- **(e) `delete:` alone** (or `delete:everything`): "Delete everything is a button at the foot of Settings. Enter opens it there." No `wipe:`.
+- **(f) Tested:** each path's Enter line and act; the records side plain and through the lock (a step, a branch, a plan, the refusals, undo). Tried on a trial copy made from the sample: × on a step and on a branch, undo, `delete:` on an empty plan and undo, a chat deleted with two Enters, an edited line disarmed, Escape, `delete:` alone, `erase:` and `drop:`. The trial copy was erased.
 - **Suggestion:** keep as built.
 
 ## Proposed CLAUDE.md rewrite

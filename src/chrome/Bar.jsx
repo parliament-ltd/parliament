@@ -52,7 +52,7 @@ import { step as stepBranch } from '../stores/branchView'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection', 'settings'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {} }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {} }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -85,6 +85,15 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     setWrote(write)
     setNotice(null)
   }
+  // What a click elsewhere did, said here (a × on the Plan board, C199).
+  const [heard, setHeard] = useState(said)
+  if (heard !== said) {
+    setHeard(said)
+    if (said?.says) setNotice(said.says)
+  }
+  // A delete undo cannot take back waits for a second Enter on the same
+  // line (C199): the line the first Enter armed.
+  const [armed, setArmed] = useState(null)
 
   // The field's mode, for the welcome page's first step.
   useEffect(() => { onMode?.(field.mode) }, [field.mode, onMode])
@@ -211,6 +220,12 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     }
     if (answer.fill) { dispatch({ type: 'input', value: answer.fill }); return }
     if (!next && !go && !act) return
+    if (act?.confirm && armed !== value) {
+      setArmed(value)
+      setNotice({ message: 'deleteAgain', values: { count: act.nums?.length ?? 1 } })
+      return
+    }
+    setArmed(null)
     const body = readField(value, field.mode).body
     const out = await onRun(next, body, go, act)
     if (out && !out.done) { setNotice(out); return }
@@ -300,6 +315,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           onInput={(v) => {
             walk.current = { lines, index: -1, draft: '' }
             setNotice(null)
+            setArmed(null) // any typing asks for both Enters again (C199)
             // The key panel closes when the line turns to another command.
             if (keyPanel && !/^>\s*api:/i.test(v)) onKeysClose?.()
             dispatch({ type: 'input', value: v })

@@ -173,6 +173,57 @@ describe('undo: of a change to a plan (C198)', () => {
   })
 })
 
+describe('delete: of what has not been sent (C199)', () => {
+  let db
+  beforeEach(async () => { db = await open() })
+  afterEach(() => db.close())
+
+  it('deletes a planned step, refuses a started one, and undo puts it back', async () => {
+    const c = await R.createChat(db, chat())
+    await R.addMessageRecord(db, message(c.id, 'user', 'What is it made of?'))
+    const { step } = await R.planStep(db, { docketId: c.docketId, letter: 'a', prompt: 'Who built it?', newId, now: at() })
+    const before = (await runsOf(db, c.docketId))[0]
+    const out = await R.removeStep(db, { docketId: c.docketId, letter: 'a', stepId: step.id, now: at() })
+    expect(out.index).toBe(2)
+    expect((await runsOf(db, c.docketId))[0].branches.a.steps).toHaveLength(1)
+    await R.putPlanBack(db, out.back)
+    expect((await runsOf(db, c.docketId))[0]).toEqual(before)
+    const started = before.branches.a.steps[0]
+    expect(await code(R.removeStep(db, { docketId: c.docketId, letter: 'a', stepId: started.id ?? 'none', now: at() }))).not.toBe('ok')
+  })
+
+  it('deletes a branch that never ran from every run, keeps its letter used, and refuses one that ran', async () => {
+    const c = await R.createChat(db, chat())
+    const b = await R.newPlanBranch(db, { docketId: c.docketId, name: 'Shorter', now: at() })
+    await R.newRun(db, { docketId: c.docketId, newId, now: at() })
+    const out = await R.removePlanBranch(db, { docketId: c.docketId, letter: b.letter, now: at() })
+    expect(out.planGone).toBe(false)
+    const docket = await db.get('dockets', c.docketId)
+    expect(docket.order).toEqual(['a'])
+    expect(docket.nextLetter).toBe(2) // b is not given out again
+    expect((await runsOf(db, c.docketId)).every((r) => !r.branches.b)).toBe(true)
+    await R.putPlanBack(db, out.back)
+    expect((await db.get('dockets', c.docketId)).order).toEqual(['a', 'b'])
+    expect(await code(R.removePlanBranch(db, { docketId: c.docketId, letter: 'a', now: at() }))).toBe('ran')
+  })
+
+  it('deletes a plan with no chat, and its last branch takes the plan with it', async () => {
+    const { docket, run } = await R.newPlan(db, { title: 'Grant application', newId, now: at() })
+    const out = await R.removePlanBranch(db, { docketId: docket.id, letter: 'a', now: at() })
+    expect(out.planGone).toBe(true)
+    expect(await db.get('dockets', docket.id)).toBeUndefined()
+    await R.putPlanBack(db, out.back)
+    expect((await db.get('dockets', docket.id)).num).toBe(docket.num)
+    expect((await db.get('runs', run.id)).n).toBe(1)
+    const gone = await R.removePlan(db, { docketId: docket.id })
+    expect(await db.get('runs', run.id)).toBeUndefined()
+    await R.putPlanBack(db, gone.back)
+    expect(await db.get('dockets', docket.id)).toBeTruthy()
+    const c = await R.createChat(db, chat())
+    expect(await code(R.removePlan(db, { docketId: c.docketId }))).toBe('ran')
+  })
+})
+
 describe('a merge restore (C196 (i))', () => {
   it('brings a plan with steps of its own in whole, as its own plan', async () => {
     const source = await open('source')

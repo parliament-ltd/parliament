@@ -16,7 +16,7 @@
 // the shell knows: no request is made to find out (C83).
 
 import { enterLine } from '../commands/registry'
-import { plan, planOpen, planBring, planRoom, planFocus, planFocusOff, roomOnScreen, roomShowing, isRoom, address, ARRANGEMENT_VERBS } from '../shell/arrangement'
+import { plan, planOpen, planOpenSettings, planBring, planRoom, planFocus, planFocusOff, roomOnScreen, roomShowing, isRoom, address, ARRANGEMENT_VERBS } from '../shell/arrangement'
 import { cleanRoomName, ROOM_NAME_MAX } from '../lib/roomNames'
 import { CHARS_PER_TOKEN, inputCost, describeCost, LOCAL_READS } from '../shell/estimate'
 import { holdsKey } from '../commands/parse'
@@ -31,7 +31,7 @@ import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, namesFrom, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
 import { planReply, planLanguage, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
 import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
-import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview } from '../lib/planVerbs'
+import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
 import { planSet } from '../lib/settingVerbs'
@@ -49,13 +49,13 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // save: and forget: keep and remove saved searches on Records (stage 6,
 // piece 2; C140). copy: puts one thing on the clipboard as Markdown, and
 // undo: takes back the last command line (piece 3; C143 (f), C134).
-// erase: removes things for good, by number, on a line of its own (C137).
+// delete: removes things, by number, on a line of its own (C137; C199).
 // export: downloads rows as Markdown or JSONL (piece 5; C138).
 // new:collection, add:, rm: and heading: change a collection (piece 6; C144).
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -155,11 +155,23 @@ function planExportStep(a, step, screens = {}) {
   }
 }
 
-/** erase:207, 216 (all): what goes for good, named before Enter (C137). */
-function planEraseStep(a, step, screens = {}) {
-  const p = planErase(step.match?.values ?? [], screens.records?.rows ?? [])
+/**
+ * delete: (C199). Alone, or delete:everything: Delete everything is a button
+ * in Settings, and Enter opens Settings there. What has not been sent goes on
+ * one Enter, and undo: brings it back (planVerbs.planDeleteUnsent). What has
+ * been sent, delete:207, 216 (all), goes for good, named before Enter
+ * (C137), and the act asks for a second Enter (confirm).
+ */
+function planDeleteStep(a, step, screens = {}) {
+  const vals = step.match?.values ?? []
+  if (!vals.length || (vals.length === 1 && vals[0].kind === 'word' && vals[0].value === 'everything')) {
+    return { says: { message: 'deleteEverything', values: { board: 'settings' } }, next: planOpenSettings(a, 'data').next }
+  }
+  const unsent = planDeleteUnsent(step, screens)
+  if (unsent) return unsent
+  const p = planErase(vals, screens.records?.rows ?? [])
   if (p.bad) return { says: p.bad, act: null }
-  return { says: p.says, act: { kind: 'erase', ...p.erase } }
+  return { says: p.says, act: { kind: 'erase', confirm: true, ...p.erase } }
 }
 
 /** undo: takes back the last command line of this tab (C134). undo:242, one edit, comes with editing. */
@@ -671,7 +683,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     const nameIt = (a1, s1, sc) => (a1.addressed === 'collection' ? planNameCollection(s1, sc) : planName(a1, s1, sc))
     const plans = {
       tour: planTour, name: nameIt, inspect: planInspect, api: planApi, save: planSave, forget: planForget, copy: planCopyStep, undo: planUndo,
-      erase: planEraseStep, export: planExportStep, new: newStep, add: addStep, rm: rmStep, heading: headingStep,
+      delete: planDeleteStep, export: planExportStep, new: newStep, add: addStep, rm: rmStep, heading: headingStep,
       // The four acts, compare: and jump: (piece 7; C145).
       note: (a1, s1, sc) => planNote(s1, sc, a1.addressed),
       summarize: (a1, s1, sc) => planSummarize(s1, sc, a1.addressed),

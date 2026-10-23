@@ -837,7 +837,7 @@ export async function removeOwnNote(db, { id, num, text }) {
 // the one before (new:run) and a plan from nothing (new:plan). A step that
 // has started is fixed: these change only steps planned ahead.
 
-/** Why a change to a plan was refused. code: noPlan, noRun, noBranch, noStep, fixed, running. */
+/** Why a change to a plan was refused. code: noPlan, noRun, noBranch, noStep, fixed, running, ran. */
 export class PlanError extends Error {
   constructor(code) {
     super(code)
@@ -1010,6 +1010,66 @@ export async function newPlanBranch(db, { docketId, n = null, name = '', room = 
     await tx.objectStore('runs').put(added.run)
     const back = backOf({ dockets: [[docket, added.docket]], runs: [[run, added.run]] })
     return { result: { letter: added.letter, n: run.n, back }, changes: [{ kind: 'docket', op: 'updated', id: docket.id, num: docket.num }, { kind: 'run', op: 'updated', id: run.id }] }
+  })
+}
+
+// ── delete: of what has not been sent (C199) ────────────
+// A planned step, a branch that has never run, a plan with no chat: nothing
+// of these was sent, so each goes on one Enter and undo: brings it back.
+// What has been sent is deleted by eraseRecords, for good.
+
+const hasRun = (runs, letter = null) => runs.some((r) => Object.entries(r.branches || {})
+  .some(([l, b]) => (letter == null || l === letter) && (b?.chatId || (b?.steps || []).some((s) => s.messageId))))
+
+/** delete:201a 2: a step not yet started, out of the last run (or run n). */
+export async function removeStep(db, { docketId, n = null, letter, stepId, now = new Date().toISOString() }) {
+  return write(db, ['dockets', 'runs'], async (tx) => {
+    const { docket, run } = await planAt(tx, docketId, n)
+    const branch = run.branches[letter]
+    if (!branch) throw new PlanError('noBranch')
+    const i = branch.steps.findIndex((s) => s.id === stepId)
+    if (i < 0) throw new PlanError('noStep')
+    if (isFixed(branch.steps[i].status) || branch.steps[i].messageId) throw new PlanError('fixed')
+    const steps = branch.steps.filter((_, k) => k !== i)
+    const changes = []
+    const back = await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
+    return { result: { index: i + 1, back }, changes }
+  })
+}
+
+/** delete:201c: a branch that has never run, out of the plan and every run; its letter is not given out again. */
+export async function removePlanBranch(db, { docketId, letter, now = new Date().toISOString() }) {
+  return write(db, ['dockets', 'runs'], async (tx) => {
+    const { docket, runs } = await planAt(tx, docketId, null)
+    if (!docket.branches.some((b) => b.letter === letter)) throw new PlanError('noBranch')
+    if (hasRun(runs, letter)) throw new PlanError('ran')
+    const left = removeBranch(docket, runs, letter, now)
+    const changes = []
+    if (!left.docket) {
+      // The last branch: the plan goes with it.
+      await tx.objectStore('dockets').delete(docket.id)
+      for (const r of runs) await tx.objectStore('runs').delete(r.id)
+      changes.push({ kind: 'docket', op: 'removed', id: docket.id, num: docket.num })
+      return { result: { planGone: true, back: backOf({ dockets: [[docket, null]], runs: runs.map((r) => [r, null]) }) }, changes }
+    }
+    await tx.objectStore('dockets').put(left.docket)
+    for (const r of left.runs) await tx.objectStore('runs').put(r)
+    changes.push({ kind: 'docket', op: 'updated', id: docket.id, num: docket.num }, ...left.runs.map((r) => ({ kind: 'run', op: 'updated', id: r.id })))
+    return { result: { planGone: false, back: backOf({ dockets: [[docket, left.docket]], runs: runs.map((r, k) => [r, left.runs[k]]) }) }, changes }
+  })
+}
+
+/** delete:224: a plan with no chat, and its runs. */
+export async function removePlan(db, { docketId }) {
+  return write(db, ['dockets', 'runs'], async (tx) => {
+    const { docket, runs } = await planAt(tx, docketId, null)
+    if (hasRun(runs)) throw new PlanError('ran')
+    await tx.objectStore('dockets').delete(docket.id)
+    for (const r of runs) await tx.objectStore('runs').delete(r.id)
+    return {
+      result: { back: backOf({ dockets: [[docket, null]], runs: runs.map((r) => [r, null]) }) },
+      changes: [{ kind: 'docket', op: 'removed', id: docket.id, num: docket.num }],
+    }
   })
 }
 

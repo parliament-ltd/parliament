@@ -54,9 +54,9 @@ describe('the verb list', () => {
     const SCREEN_ONLY = ['records', 'plan', 'library', 'lab', 'room', 'jump', 'tour', 'resources', 'open', 'inspect', 'copy', 'stop', 'diff', 'compare', 'undo', 'done', 'api']
     // Filters only change the view, and clear:filters puts it back.
     for (const v of VERBS.filter((x) => x.click === 'apply' && !x.undoable && x.group !== 'filters')) expect(SCREEN_ONLY, v.verb).toContain(v.verb)
-    expect(verbEntry('erase').click).toBe('fill')
-    expect(verbEntry('erase').undoable).toBe(false)
-    expect(VERBS.filter((x) => x.destructive).map((x) => x.verb)).toEqual(['erase'])
+    expect(verbEntry('delete').click).toBe('fill')
+    expect(verbEntry('delete').undoable).toBe(false)
+    expect(VERBS.filter((x) => x.destructive).map((x) => x.verb)).toEqual(['delete'])
   })
 })
 
@@ -126,8 +126,9 @@ describe('the Enter line', () => {
     expect(line('>hide:library').fill).toBe('>close:library')
   })
 
-  it('answers delete: with erase:, as ruled on 15 October', () => {
-    expect(line('>delete:207')).toMatchObject({ state: 'renamed', message: 'erase', fill: '>erase:207' })
+  it('answers erase: and drop: with delete:, as ruled on 23 October (C199)', () => {
+    expect(line('>erase:207')).toMatchObject({ state: 'renamed', message: 'renamed', fill: '>delete:207' })
+    expect(line('>drop:241')).toMatchObject({ state: 'renamed', fill: '>delete:241' })
   })
 
   it('says a retired verb is gone, with what to use', () => {
@@ -148,8 +149,8 @@ describe('the Enter line', () => {
 
   it('says what a verb takes when the command does not fit', () => {
     expect(line('>bar:sideways')).toMatchObject({ state: 'misfit', message: 'takesWords', values: { words: ['top', 'bottom', 'left', 'center', 'right'] } })
-    expect(line('>erase:all')).toMatchObject({ state: 'misfit', message: 'takesExample', values: { example: 'erase:207' } })
-    expect(line('>erase:201-205')).toMatchObject({ state: 'misfit' })
+    expect(line('>delete:all')).toMatchObject({ state: 'misfit', message: 'takesExample', values: { example: 'delete:207' } })
+    expect(line('>delete:201-205')).toMatchObject({ state: 'misfit' })
   })
 
   it('says where a verb works when it does not work here', () => {
@@ -175,11 +176,11 @@ describe('the Enter line', () => {
     expect(line('>bar:sideways open:207', { built })).toMatchObject({ state: 'misfit', verb: 'bar' })
   })
 
-  it('keeps a command that sends something, and erase:, on a line of its own', () => {
+  it('keeps a command that sends something, and delete:, on a line of its own', () => {
     expect(line('>bar:bottom summarize:207', { board: 'almanac' })).toMatchObject({ state: 'alone', message: 'aloneSpends', values: { verb: 'summarize:' } })
-    expect(line('>pin:207 erase:208')).toMatchObject({ state: 'alone', message: 'aloneErase', values: { verb: 'erase:' } })
+    expect(line('>pin:207 delete:208')).toMatchObject({ state: 'alone', message: 'aloneErase', values: { verb: 'delete:' } })
     expect(line('>summarize:207', { board: 'almanac' }).state).toBe('later')
-    expect(line('>erase:207').state).toBe('later')
+    expect(line('>delete:207').state).toBe('later')
   })
 
   it('gives a verb that keeps the rest of the line everything after it', () => {

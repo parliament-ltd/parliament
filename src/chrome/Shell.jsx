@@ -63,7 +63,7 @@ import { ROW_GUESS } from './rowWindow'
 import { cardsOf, tabCounts, sequenceOf } from '../lib/collectionCards'
 import { searchTerms } from '../lib/recordsFilter'
 import CollectionBoard from './CollectionBoard'
-import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, planStep, changeStep, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack } from '../lib/records'
+import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, planStep, changeStep, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack, removeStep, removePlanBranch, removePlan } from '../lib/records'
 import { showPlan, planKey, planPromptPreview } from '../lib/planVerbs'
 import { planBoardOf, latestPlan } from '../lib/planBoard'
 import { exportItems, gatherExport, itemsMarkdown, exportMarkdown, exportJsonl, exportType } from '../lib/recordsExport'
@@ -119,7 +119,7 @@ const BAR = 'command' // the popped bar's key among the windows
 const FEATURES = detectFeatures()
 const NONE = Object.freeze([])
 // What the plan commands do, carried out by planAct (stage 10, piece 2; C198).
-const PLAN_ACTS = new Set(['newPlan', 'planStep', 'planRun', 'planBranch', 'planHold', 'planMove'])
+const PLAN_ACTS = new Set(['newPlan', 'planStep', 'planRun', 'planBranch', 'planHold', 'planMove', 'planDelete'])
 
 // The interface language a source answers in. The test languages (en-XA,
 // ar-XB) stand for English.
@@ -1787,6 +1787,25 @@ export default function Shell() {
         said()
         return null
       }
+      if (what.kind === 'planDelete') {
+        // delete: of what has not been sent (C199): undo: brings it back.
+        if (what.what === 'step') {
+          const out = await removeStep(db.current, { docketId: what.docketId, n: what.n, letter: what.letter, stepId: what.stepId, now })
+          keep(out.back)
+          said()
+          return { done: true, says: { message: 'deletedStep', values: { index: what.index, address: what.address } } }
+        }
+        if (what.what === 'branch') {
+          const out = await removePlanBranch(db.current, { docketId: what.docketId, letter: what.letter, now })
+          keep(out.back)
+          said()
+          return { done: true, says: out.planGone ? { message: 'deletedPlan', values: { num: what.num } } : { message: 'deletedBranch', values: { address: what.address } } }
+        }
+        const out = await removePlan(db.current, { docketId: what.docketId })
+        keep(out.back)
+        said()
+        return { done: true, says: { message: 'deletedPlan', values: { num: what.num } } }
+      }
     } catch (err) {
       if (err?.code === 'fixed') return 'planFixed'
       if (err?.code === 'running') return { message: 'planHoldRunning', values: { address: `${what.num}${what.letters?.[0] ?? ''}` } }
@@ -1813,6 +1832,16 @@ export default function Shell() {
     changeStep(db.current, { docketId: p.docketId, n: p.n, letter, stepId, set: { prompt: text } }).catch(() => {})
   }, [])
   const planModelName = useCallback((id) => modelFacts(id)?.name ?? id, [])
+  // A × on the board (C199): the delete: it stands for, run at once, and
+  // what it did said under the bar.
+  const [barSaid, setBarSaid] = useState(null)
+  const onPlanDelete = useCallback(async (line) => {
+    const p = preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
+    if (!p.act || p.act.confirm) { setBarSaid({ says: p.says ?? null }); return }
+    const out = await onRun(p.next ?? null, line, null, p.act)
+    const says = out && !out.done ? (typeof out === 'string' ? { message: out } : out) : out?.says ?? null
+    setBarSaid({ says })
+  }, [onRun])
   const onPlanPick = useCallback((letter) => {
     const p = planBoardNow.current
     if (p) setPlanPick((was) => (was?.num === p.num && was.letter === letter ? null : { num: p.num, letter }))
@@ -2442,7 +2471,7 @@ export default function Shell() {
   const welcomeHint = useMemo(() => (onWelcome && !welcome.finished ? { next: nextStep(welcome) } : null), [onWelcome, welcome])
   const searches = { almanac: recordsView.search, collection: collectionSearch, settings: settingsSearch }
   const searchCounts = { almanac: recordsSearch, collection: { count: collectionShown.cards.length, cards: true }, settings: { count: settingsCount, settings: true } }
-  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, searches, searchCounts }
+  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, searches, searchCounts, said: barSaid }
   const filtered = isAtRest(recordsView) ? null : { search: recordsView.search.trim(), line: viewLine(recordsView) }
   const drawBoard = (board) => {
     // Each room with its own chat (C175 (a)).
@@ -2490,8 +2519,8 @@ export default function Shell() {
     if (board === 'docket') {
       return (
         <PlanBoard
-          key="docket" plan={planBoard} loading={planOnScreen && planNum != null && !planBoard} addressed={arrangement.addressed === 'docket'}
-          nameOf={planModelName} onAddress={focusBoard} onWrite={writeField} onPick={onPlanPick} onText={onPlanText} onRun={(n) => runCommand(`open:run ${n}`)}
+          key="docket" plan={planBoard} loading={planOnScreen && planNum != null && !planBoard && !(planRead?.num === planNum && planRead?.run === planRun && !planRead?.plan)} addressed={arrangement.addressed === 'docket'}
+          nameOf={planModelName} onAddress={focusBoard} onWrite={writeField} onPick={onPlanPick} onText={onPlanText} onDelete={onPlanDelete} onRun={(n) => runCommand(`open:run ${n}`)}
         />
       )
     }

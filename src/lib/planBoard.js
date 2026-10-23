@@ -21,6 +21,12 @@ export function planBoardOf(plan, { run = null, textOf = () => undefined, chatOf
   const shown = runs.find((r) => r.n === run) ?? runs.at(-1) ?? null
   const n = shown?.n ?? latest
   const named = new Map((docket.branches ?? []).filter((b) => !b.deletedAt).map((b) => [b.letter, b]))
+  // A branch that has never run, in any run: nothing of it was sent (C199).
+  const ran = (letter) => runs.some((r) => {
+    const b = r.branches?.[letter]
+    return Boolean(b?.chatId) || (b?.steps ?? []).some((s) => s.messageId)
+  })
+  const neverRan = [...named.keys()].filter((l) => !ran(l))
   const letters = (docket.order ?? []).filter((l) => named.has(l) && shown?.branches?.[l])
   const branches = letters.map((letter) => {
     const b = shown.branches[letter]
@@ -46,6 +52,7 @@ export function planBoardOf(plan, { run = null, textOf = () => undefined, chatOf
       status: b.status ?? STATUS.READY,
       chatId: b.chatId ?? null,
       chatNum: chat?.num ?? null,
+      everRan: ran(letter),
       room: (b.room ?? chat?.roomId) ? roomName(b.room ?? chat.roomId) || null : null,
       firstRun,
       steps,
@@ -61,6 +68,8 @@ export function planBoardOf(plan, { run = null, textOf = () => undefined, chatOf
     runNums: runs.map((r) => r.n),
     next: Number.isInteger(docket.nextLetter) && docket.nextLetter >= 0 ? letterAt(docket.nextLetter) : null,
     order: [...(docket.order ?? [])],
+    neverRan,
+    branchCount: named.size,
     selected: letters.includes(selected) ? selected : null,
     branches,
     counts: {

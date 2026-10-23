@@ -236,3 +236,65 @@ export function planPromptPreview(text, p) {
     act: { kind: 'planStep', docketId: p.docketId, num: p.num, n: p.n, letter: b.branch.letter, address: b.branch.address },
   }
 }
+
+/**
+ * delete: of what has not been sent (C199): delete:201a 2, a step not yet
+ * started, in the last run; delete:201c, a branch that has never run, out of
+ * every run; delete:224, a plan with no chat. One Enter, and undo: brings it
+ * back. null when the line names only what has been sent, which goes for
+ * good after a second Enter (C137).
+ */
+export function planDeleteUnsent(step, screens = {}) {
+  const vals = step.match?.values ?? []
+  const rows = screens.records?.rows ?? []
+  if (vals.length === 2 && vals[0].kind === 'address' && vals[1].kind === 'number') {
+    const arg = vals[0]
+    const s = shown(screens, arg.num)
+    if (s.bad) return { says: s.bad, act: null }
+    const p = s.plan
+    const old = record(p)
+    if (old) return { says: old, act: null }
+    const b = branchOf(p, arg, rows)
+    if (b.bad) return { says: b.bad, act: null }
+    const index = Number(vals[1].value)
+    const one = b.branch.steps[index - 1]
+    const values = { index, address: b.branch.address, run: p.n }
+    if (!one) return { says: { message: 'planNoStep', values }, act: null }
+    if (!one.planned || (one.status !== STATUS.READY && one.status !== STATUS.WAITING)) return { says: { message: 'deleteStepStarted', values }, act: null }
+    return {
+      says: { message: 'deleteStep', values },
+      act: { kind: 'planDelete', what: 'step', docketId: p.docketId, num: p.num, n: p.n, letter: b.branch.letter, stepId: one.stepId, index, address: b.branch.address },
+    }
+  }
+  const named = vals.filter((v) => !(v.kind === 'word' && v.value === 'all')).flatMap((v) => (v.kind === 'list' ? v.items : [v]))
+  const each = named.map((a) => unsentOf(a, screens, rows))
+  if (!each.some(Boolean)) return null
+  if (named.length > 1) return { says: { message: 'deleteApart' }, act: null }
+  return each[0]
+}
+
+// One thing named to delete:, when it has not been sent; else null.
+function unsentOf(a, screens, rows) {
+  if (a.kind !== 'address') return null
+  const p = screens.plan ?? null
+  if (a.letter) {
+    const address = `${a.num}${a.letter}`
+    if (p && p.num === a.num) {
+      if (!p.neverRan.includes(a.letter)) return null
+      const last = p.branchCount <= 1
+      return {
+        says: { message: 'deleteBranch', values: { address, num: p.num }, ...(last ? { also: [{ message: 'deletePlanToo', values: { num: p.num } }] } : {}) },
+        act: { kind: 'planDelete', what: 'branch', docketId: p.docketId, num: p.num, letter: a.letter, address },
+      }
+    }
+    // Off the board: a plan's branch with no chat in Records has not run.
+    const plan = rows.find((r) => r.kind === 'docket' && r.num === a.num)
+    const chat = rows.find((r) => r.kind === 'chat' && r.docketNum === a.num && r.branch === a.letter)
+    return plan && !chat ? { says: { message: 'planNotShown', values: { num: a.num, board: BOARD } }, act: null } : null
+  }
+  const row = rows.find((r) => r.kind === 'docket' && r.num === a.num)
+  const empty = row ? !(row.chatNums ?? []).length : p?.num === a.num && p.neverRan.length === p.branchCount
+  if (!empty) return null
+  const docketId = row?.id ?? p.docketId
+  return { says: { message: 'deletePlan', values: { num: a.num } }, act: { kind: 'planDelete', what: 'plan', docketId, num: a.num } }
+}

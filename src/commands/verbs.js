@@ -15,8 +15,8 @@
 //   spends       it sends something to a provider or source, so its Enter
 //                line names every recipient and the cost before Enter, and
 //                it runs on a line of its own (C99)
-//   destructive  undo cannot bring back what it removes (erase: only); it
-//                also runs on a line of its own (C99)
+//   destructive  it can remove for good what has been sent (delete: only;
+//                C199), so it runs on a line of its own (C99)
 //   undoable     undo: can take it back
 //   click        what a click on it in the reference or in marginalia does:
 //                'apply' runs it at once (it only changes the screen, or is
@@ -210,16 +210,19 @@ export const VERBS = Object.freeze([
   v({ verb: 'note', group: 'items', example: 'note:203 "Try it without the ending"', forms: ['note:203 "Try it without the ending"', 'note:"Check the dates"'],
     rest: true, takes: [['text']], stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.note', message: 'Write a note for people. It is never sent' } }),
-  v({ verb: 'erase', group: 'items', example: 'erase:207', forms: ['erase:207', 'erase:207, 216', 'erase:201c', 'erase:201c all'], takes: [['addresses', { opt: ['all'] }]], stage: 6, destructive: true,
-    gloss: /*i18n*/ { id: 'verb.erase', message: 'Remove one thing for good, by its number. Undo cannot bring it back' } }),
+  // delete: (C199): the one word for removing. What has been sent goes for
+  // good after a second Enter (C137); what has not (a planned step, a branch
+  // that never ran, a plan with no chat) goes on one Enter, and undo: brings
+  // it back. Alone, it points to Delete everything in Settings.
+  v({ verb: 'delete', group: 'items', example: 'delete:207', forms: ['delete:207', 'delete:207, 216', 'delete:201c', 'delete:201c all', 'delete:201a 2'],
+    takes: [[], [['everything']], ['addresses', { opt: ['all'] }], ['address', 'number']], stage: 6, destructive: true,
+    gloss: /*i18n*/ { id: 'verb.delete', message: 'Delete something by its number. What has been sent goes for good, after a second Enter' } }),
   v({ verb: 'undo', group: 'items', example: 'undo:', forms: ['undo:', 'undo:242'], takes: [[], ['address']], stage: 6, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.undo', message: 'Take back the last command, or one edit. It stops at a run' } }),
 
   // Editing in place
   v({ verb: 'tell', group: 'editing', example: 'tell:"Keep it under a page"', rest: true, takes: [['text']], on: ['room'], stage: 11, undoable: true,
     gloss: /*i18n*/ { id: 'verb.tell', message: 'Write a note the model reads with your next prompt' } }),
-  v({ verb: 'drop', group: 'editing', example: 'drop:241', takes: [['addresses']], on: EDITING, stage: 11, undoable: true, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.drop', message: 'Remove an ask, edit or step that has not been sent' } }),
   v({ verb: 'strikethrough', group: 'editing', example: 'strikethrough:', takes: [[]], on: EDITING, stage: 11, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.strikethrough', message: 'Strike the selected passage' } }),
   // Where the next prompt goes among a prompt's branches (stage 8; C174);
@@ -364,7 +367,8 @@ export const RENAMED = Object.freeze({
   docs: { to: 'resources' }, // P8
   refresh: { to: 'reset' }, // one word per act (C97)
   source: { to: 'from' }, // one word per act (C97)
-  delete: { to: 'erase', message: 'erase' }, // ruled 15 October: one word stays destructive
+  erase: { to: 'delete' }, // C199, replacing the ruling of 15 October
+  drop: { to: 'delete' }, // C199, replacing the bar decisions' drop: (7 October)
 })
 
 // Verbs that are gone, with what to use instead, or null. What to use is a

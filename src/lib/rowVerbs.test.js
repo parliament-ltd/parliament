@@ -107,7 +107,7 @@ describe('copy:', () => {
   })
 })
 
-describe('erase: (C137)', () => {
+describe('delete: of what has been sent (C137; C199)', () => {
   const erows = [
     row(204, 'chat', { chatId: 'c204', docketNum: 203, branch: 'a', title: 'barn owl' }),
     row(206, 'chat', { chatId: 'c206', docketNum: 203, branch: 'b', title: 'Essay plan' }),
@@ -123,7 +123,7 @@ describe('erase: (C137)', () => {
   }
 
   it('names what goes, what stays, and that undo cannot bring it back', () => {
-    const p = erase('erase:204')
+    const p = erase('delete:204')
     expect(p.says).toEqual({
       message: 'eraseItems', values: { erasing: [{ num: 204, title: 'barn owl' }] },
       also: [{ message: 'eraseMarksStay', values: { count: 2 } }, { message: 'eraseUndo', values: { count: 1 } }],
@@ -132,31 +132,31 @@ describe('erase: (C137)', () => {
   })
 
   it('takes the markings too with all', () => {
-    const p = erase('erase:204 all')
+    const p = erase('delete:204 all')
     expect(p.says.also[0]).toEqual({ message: 'eraseMarksGo', values: { count: 2 } })
     expect(p.erase.keepMarks).toBe(false)
   })
 
   it('takes every chat of a plan by its number, and says the plan goes (C137 (b))', () => {
-    const p = erase('erase:203')
+    const p = erase('delete:203')
     expect(p.erase.chats.map((c) => c.num)).toEqual([204, 206])
     expect(p.says.also).toContainEqual({ message: 'erasePlanGoes', values: { count: 1, nums: [203] } })
   })
 
   it('takes a branch\'s chat, and a plan of one branch by its chat (C127)', () => {
-    expect(erase('erase:203b').erase.chats).toEqual([{ id: 'c206', num: 206 }])
-    const one = erase('erase:201')
+    expect(erase('delete:203b').erase.chats).toEqual([{ id: 'c206', num: 206 }])
+    const one = erase('delete:201')
     expect(one.erase.chats).toEqual([{ id: 'c202', num: 202 }])
     expect(one.says.also).toContainEqual({ message: 'erasePlanGoes', values: { count: 1, nums: [201] } })
   })
 
   it('erases a note or keyword by its number, and several at once', () => {
-    const p = erase('erase:210, 211')
+    const p = erase('delete:210, 211')
     expect(p.erase.marks).toEqual([{ store: 'notes', id: 'note210', num: 210 }, { store: 'highlights', id: 'term211', num: 211 }])
     expect(p.says.values.erasing).toEqual([{ num: 210, title: 'Check the range map' }, { num: 211, title: 'Tyto' }])
   })
 
   it('refuses a number that is not here', () => {
-    expect(erase('erase:299')).toEqual({ bad: { message: 'numNone', values: { num: '299' } } })
+    expect(erase('delete:299')).toEqual({ bad: { message: 'numNone', values: { num: '299' } } })
   })
 })

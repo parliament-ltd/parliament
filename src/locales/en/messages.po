@@ -56,10 +56,10 @@ msgstr "Type"
 msgid "almanac.empty"
 msgstr "Nothing made yet. p> starts your first chat, and it appears here."
 
-#. Marginalia on a note, keyword or quote kept when its chat was erased
+#. Marginalia on a note, keyword or quote kept when its chat was deleted for good
 #. js-lingui-explicit-id
 msgid "almanac.erasedFrom"
-msgstr "from {num}, erased"
+msgstr "from {num}, deleted"
 
 #. js-lingui-explicit-id
 msgid "almanac.filtersLabel"
@@ -842,11 +842,11 @@ msgstr "What it holds has no notes, keywords or quotes yet. They show here as th
 
 #. js-lingui-explicit-id
 msgid "collection.erased"
-msgstr "{what, select, chat {chat {num}, erased} plan {plan {num}, erased} message {a message, erased} other {{num}, erased}}"
+msgstr "{what, select, chat {chat {num}, deleted} plan {plan {num}, deleted} message {a message, deleted} other {{num}, deleted}}"
 
 #. js-lingui-explicit-id
 msgid "collection.erasedFrom"
-msgstr "from {num}, erased"
+msgstr "from {num}, deleted"
 
 #. The collection favourites became (C20)
 #. js-lingui-explicit-id
@@ -1026,10 +1026,10 @@ msgstr "Exported from Parliament on {day}. For reading elsewhere: it cannot be b
 msgid "copy.from"
 msgstr "from {num}"
 
-#. Where it came from: a chat that was erased
+#. Where it came from: a chat that was deleted for good
 #. js-lingui-explicit-id
 msgid "copy.fromErased"
-msgstr "from {num}, erased"
+msgstr "from {num}, deleted"
 
 #. js-lingui-explicit-id
 msgid "copy.keywords"
@@ -1556,6 +1556,57 @@ msgstr "cost: takes an amount, like >0.50, <1 or 0.18"
 msgid "enter.dateBad"
 msgstr "{verb} takes 7d, 3w, a month, or a date like 2026-09-01"
 
+#. After the first Enter of a delete undo cannot take back (C199)
+#. js-lingui-explicit-id
+msgid "enter.deleteAgain"
+msgstr "{count, plural, one {Enter again deletes it for good. Escape keeps it} other {Enter again deletes them for good. Escape keeps them}}"
+
+#. js-lingui-explicit-id
+msgid "enter.deleteApart"
+msgstr "Delete what has not been sent on a line of its own"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteBranch"
+msgstr "Enter deletes {address}, which has never run, from every run of plan {num}. undo: brings it back"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletedBranch"
+msgstr "{address} is deleted. undo: brings it back"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletedPlan"
+msgstr "Plan {num} is deleted. undo: brings it back"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletedStep"
+msgstr "Step {index} of {address} is deleted. undo: brings it back"
+
+#. js-lingui-explicit-id
+msgid "enter.deleteEverything"
+msgstr "Delete everything is a button at the foot of {board}. Enter opens it there"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletePlan"
+msgstr "Enter deletes plan {num}, which has no chat yet. undo: brings it back"
+
+#. js-lingui-explicit-id
+msgid "enter.deletePlanToo"
+msgstr "It is the plan’s last branch, so plan {num} goes too"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteStep"
+msgstr "Enter deletes step {index} of {address} in run {run}. undo: brings it back"
+
+#. js-lingui-explicit-id
+msgid "enter.deleteStepStarted"
+msgstr "Step {index} of {address} has started, so it stays with its chat"
+
 #. js-lingui-explicit-id
 msgid "enter.didYouMean"
 msgstr "No command called {verb}. Did you mean {near}?"
@@ -1568,7 +1619,7 @@ msgstr "{verb} works on {boards}"
 msgid "enter.empty"
 msgstr "Type a command, or ? for every command"
 
-#. The answer to delete:, ruled 15 October
+#. Unused since C199 (R38): delete: is the word now
 #. js-lingui-explicit-id
 msgid "enter.erase"
 msgstr "To remove something for good, use erase:. Enter writes it in"
@@ -1579,11 +1630,11 @@ msgstr "A reply is still arriving in {nums}. Wait for it, or stop it, first"
 
 #. js-lingui-explicit-id
 msgid "enter.erased"
-msgstr "Erased {nums} for good"
+msgstr "Deleted {nums} for good"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseFailed"
-msgstr "Nothing was erased. Try again"
+msgstr "Nothing was deleted. Try again"
 
 #. A number and the start of its title or words, in the language's quotation marks
 #. js-lingui-explicit-id
@@ -1592,7 +1643,7 @@ msgstr "{num} “{title}”"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseItems"
-msgstr "Enter erases {erasing} for good"
+msgstr "Enter, then Enter again, deletes {erasing} for good"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksGo"
@@ -1601,7 +1652,7 @@ msgstr "{count, plural, one {# note, keyword or quote goes too} other {# notes, 
 #. all stays English: it is a word of the command
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksStay"
-msgstr "{count, plural, one {# note, keyword or quote stays, marked as from an erased chat. Add all to erase it too} other {# notes, keywords and quotes stay, marked as from an erased chat. Add all to erase them too}}"
+msgstr "{count, plural, one {# note, keyword or quote stays, marked as from a deleted chat. Add all to delete it too} other {# notes, keywords and quotes stay, marked as from a deleted chat. Add all to delete them too}}"
 
 #. js-lingui-explicit-id
 msgid "enter.erasePlanGoes"
@@ -2491,6 +2542,10 @@ msgstr "{address} is not in run {run}"
 #. js-lingui-explicit-id
 msgid "enter.planNone"
 msgstr "No plan is on the {board} board. open: and a plan’s number shows one, or new:plan makes one"
+
+#. js-lingui-explicit-id
+msgid "enter.planNoStep"
+msgstr "{address} has no step {index} in run {run}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4861,6 +4916,14 @@ msgstr "open:{num} opens it"
 msgid "plan.counts"
 msgstr "{branches, plural, one {one branch} other {# branches}}, {steps, plural, =0 {no steps} one {one step} other {# steps}}"
 
+#. js-lingui-explicit-id
+msgid "plan.deleteBranch"
+msgstr "Delete {address}"
+
+#. js-lingui-explicit-id
+msgid "plan.deleteStep"
+msgstr "Delete step {index} of {address}"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.fixed"
@@ -5801,6 +5864,10 @@ msgid "verb.cost"
 msgstr "Show plans by what they cost"
 
 #. js-lingui-explicit-id
+msgid "verb.delete"
+msgstr "Delete something by its number. What has been sent goes for good, after a second Enter"
+
+#. js-lingui-explicit-id
 msgid "verb.device"
 msgstr "Say what the room is built for"
 
@@ -5813,20 +5880,12 @@ msgid "verb.done"
 msgstr "Leave the Lab with your changes"
 
 #. js-lingui-explicit-id
-msgid "verb.drop"
-msgstr "Remove an ask, edit or step that has not been sent"
-
-#. js-lingui-explicit-id
 msgid "verb.duplicate"
 msgstr "Copy a room, collection or plan under a new name"
 
 #. js-lingui-explicit-id
 msgid "verb.edit"
 msgstr "Open a room in the Lab to change it"
-
-#. js-lingui-explicit-id
-msgid "verb.erase"
-msgstr "Remove one thing for good, by its number. Undo cannot bring it back"
 
 #. js-lingui-explicit-id
 msgid "verb.export"

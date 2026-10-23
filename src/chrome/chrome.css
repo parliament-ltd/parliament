@@ -786,9 +786,18 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-pl-add:hover .ch-pl-plus, .ch-pl-add:hover .ch-marg { color: var(--ch-ink); }
 .ch-pl-add:focus-visible { outline: var(--ch-focus); outline-offset: -1px; border-radius: var(--ch-r-sm); }
 .ch-pl-addbranch { padding-top: 12px; }
+/* The × (C199): quiet until the line is under the pointer or holds focus;
+   always there where nothing hovers. */
+.ch-pl-end { display: flex; align-items: flex-start; gap: 6px; }
+.ch-pl-x { width: 18px; height: 18px; margin-top: 1px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: var(--ch-r-sm); background: transparent; color: var(--ch-ink-3); cursor: pointer; opacity: 0; }
+.ch-pl-line:hover .ch-pl-x, .ch-pl-line:focus-within .ch-pl-x { opacity: 1; }
+.ch-pl-x:hover { color: var(--ch-ink); background: var(--ch-wash); }
+.ch-pl-x:focus-visible { opacity: 1; outline: var(--ch-focus); outline-offset: 1px; }
+@media (hover: none) { .ch-pl-x { opacity: 1; } }
 .ch-pl-none p { margin: 0 0 4px; }
 .ch-pl-none p:first-child { font: 400 var(--ch-t-lead) var(--ch-serif); color: var(--ch-ink); }
 @container (max-width: 420px) {
-  .ch-pl-line, .ch-pl-add { grid-template-columns: 40px minmax(0, 1fr); row-gap: 4px; }
-  .ch-pl-line > :last-child { grid-column: 2; }
+  .ch-pl-line { grid-template-columns: 36px minmax(0, 1fr) auto; column-gap: 8px; }
+  .ch-pl-add { grid-template-columns: 36px minmax(0, 1fr); column-gap: 8px; }
+  .ch-pl-end { flex-direction: column-reverse; align-items: flex-end; gap: 4px; }
 }

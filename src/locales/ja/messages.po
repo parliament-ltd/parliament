@@ -56,7 +56,7 @@ msgstr "種類"
 msgid "almanac.empty"
 msgstr "まだ何も作っていません。p> で最初のチャットを始めると、ここに表示されます。"
 
-#. Marginalia on a note, keyword or quote kept when its chat was erased
+#. Marginalia on a note, keyword or quote kept when its chat was deleted for good
 #. js-lingui-explicit-id
 msgid "almanac.erasedFrom"
 msgstr "{num}より（消去済み）"
@@ -1026,7 +1026,7 @@ msgstr "{day}にParliamentから書き出しました。ほかの場所で読む
 msgid "copy.from"
 msgstr "{num}より"
 
-#. Where it came from: a chat that was erased
+#. Where it came from: a chat that was deleted for good
 #. js-lingui-explicit-id
 msgid "copy.fromErased"
 msgstr "{num}より（消去済み）"
@@ -1556,6 +1556,57 @@ msgstr "cost: には >0.50、<1、0.18 のように金額を指定します"
 msgid "enter.dateBad"
 msgstr "{verb} には 7d や 3w のような期間、月、または 2026-09-01 のような日付を指定します"
 
+#. After the first Enter of a delete undo cannot take back (C199)
+#. js-lingui-explicit-id
+msgid "enter.deleteAgain"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deleteApart"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteBranch"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletedBranch"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletedPlan"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletedStep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deleteEverything"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletePlan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deletePlanToo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteStep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deleteStepStarted"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.didYouMean"
 msgstr "{verb} というコマンドはありません。{near} のことですか？"
@@ -1568,7 +1619,7 @@ msgstr "{verb} は{boards}で使えます"
 msgid "enter.empty"
 msgstr "コマンドを入力してください。? ですべてのコマンドを表示します"
 
-#. The answer to delete:, ruled 15 October
+#. Unused since C199 (R38): delete: is the word now
 #. js-lingui-explicit-id
 msgid "enter.erase"
 msgstr "完全に消去するには erase: を使います。Enterで入力欄に書き込みます"
@@ -2490,6 +2541,10 @@ msgstr ""
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planNoStep"
 msgstr ""
 
 #. Commands stay English
@@ -4861,6 +4916,14 @@ msgstr ""
 msgid "plan.counts"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "plan.deleteBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.deleteStep"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.fixed"
@@ -5801,6 +5864,10 @@ msgid "verb.cost"
 msgstr "プランを費用で表示する"
 
 #. js-lingui-explicit-id
+msgid "verb.delete"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.device"
 msgstr "ルームを何向けに作るかを指定する"
 
@@ -5813,20 +5880,12 @@ msgid "verb.done"
 msgstr "変更を保ってラボを出る"
 
 #. js-lingui-explicit-id
-msgid "verb.drop"
-msgstr "まだ送っていない質問、編集、ステップを削除する"
-
-#. js-lingui-explicit-id
 msgid "verb.duplicate"
 msgstr "ルーム、コレクション、プランを新しい名前で複製する"
 
 #. js-lingui-explicit-id
 msgid "verb.edit"
 msgstr "ルームをラボで開いて変更する"
-
-#. js-lingui-explicit-id
-msgid "verb.erase"
-msgstr "番号で指定した1つを完全に消去する。取り消しでは戻せません"
 
 #. js-lingui-explicit-id
 msgid "verb.export"

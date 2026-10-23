@@ -56,7 +56,7 @@ msgstr ""
 msgid "almanac.empty"
 msgstr ""
 
-#. Marginalia on a note, keyword or quote kept when its chat was erased
+#. Marginalia on a note, keyword or quote kept when its chat was deleted for good
 #. js-lingui-explicit-id
 msgid "almanac.erasedFrom"
 msgstr ""
@@ -1026,7 +1026,7 @@ msgstr ""
 msgid "copy.from"
 msgstr ""
 
-#. Where it came from: a chat that was erased
+#. Where it came from: a chat that was deleted for good
 #. js-lingui-explicit-id
 msgid "copy.fromErased"
 msgstr ""
@@ -1556,6 +1556,57 @@ msgstr ""
 msgid "enter.dateBad"
 msgstr ""
 
+#. After the first Enter of a delete undo cannot take back (C199)
+#. js-lingui-explicit-id
+msgid "enter.deleteAgain"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deleteApart"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteBranch"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletedBranch"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletedPlan"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletedStep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deleteEverything"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletePlan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deletePlanToo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteStep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deleteStepStarted"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.didYouMean"
 msgstr ""
@@ -1568,7 +1619,7 @@ msgstr ""
 msgid "enter.empty"
 msgstr ""
 
-#. The answer to delete:, ruled 15 October
+#. Unused since C199 (R38): delete: is the word now
 #. js-lingui-explicit-id
 msgid "enter.erase"
 msgstr ""
@@ -2490,6 +2541,10 @@ msgstr ""
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planNoStep"
 msgstr ""
 
 #. Commands stay English
@@ -4861,6 +4916,14 @@ msgstr ""
 msgid "plan.counts"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "plan.deleteBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.deleteStep"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.fixed"
@@ -5801,6 +5864,10 @@ msgid "verb.cost"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "verb.delete"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.device"
 msgstr ""
 
@@ -5813,19 +5880,11 @@ msgid "verb.done"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "verb.drop"
-msgstr ""
-
-#. js-lingui-explicit-id
 msgid "verb.duplicate"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.edit"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "verb.erase"
 msgstr ""
 
 #. js-lingui-explicit-id

@@ -56,7 +56,7 @@ msgstr "Typ"
 msgid "almanac.empty"
 msgstr "Inget skapat än. p> startar din första chatt, och den visas här."
 
-#. Marginalia on a note, keyword or quote kept when its chat was erased
+#. Marginalia on a note, keyword or quote kept when its chat was deleted for good
 #. js-lingui-explicit-id
 msgid "almanac.erasedFrom"
 msgstr "från {num}, raderad"
@@ -1026,7 +1026,7 @@ msgstr "Exporterad från Parliament {day}. För läsning på annat håll: den g�
 msgid "copy.from"
 msgstr "från {num}"
 
-#. Where it came from: a chat that was erased
+#. Where it came from: a chat that was deleted for good
 #. js-lingui-explicit-id
 msgid "copy.fromErased"
 msgstr "från {num}, raderad"
@@ -1556,6 +1556,57 @@ msgstr "cost: tar ett belopp, som >0.50, <1 eller 0.18"
 msgid "enter.dateBad"
 msgstr "{verb} tar 7d, 3w, en månad eller ett datum som 2026-09-01"
 
+#. After the first Enter of a delete undo cannot take back (C199)
+#. js-lingui-explicit-id
+msgid "enter.deleteAgain"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deleteApart"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteBranch"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletedBranch"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletedPlan"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletedStep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deleteEverything"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deletePlan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deletePlanToo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteStep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deleteStepStarted"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.didYouMean"
 msgstr "Inget kommando heter {verb}. Menade du {near}?"
@@ -1568,7 +1619,7 @@ msgstr "{verb} fungerar i {boards}"
 msgid "enter.empty"
 msgstr "Skriv ett kommando, eller ? för alla kommandon"
 
-#. The answer to delete:, ruled 15 October
+#. Unused since C199 (R38): delete: is the word now
 #. js-lingui-explicit-id
 msgid "enter.erase"
 msgstr "Använd erase: för att ta bort något för gott. Enter skriver in det"
@@ -2490,6 +2541,10 @@ msgstr ""
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.planNoStep"
 msgstr ""
 
 #. Commands stay English
@@ -4861,6 +4916,14 @@ msgstr ""
 msgid "plan.counts"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "plan.deleteBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.deleteStep"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.fixed"
@@ -5801,6 +5864,10 @@ msgid "verb.cost"
 msgstr "Visa planer efter vad de kostar"
 
 #. js-lingui-explicit-id
+msgid "verb.delete"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.device"
 msgstr "Ange vad rummet är byggt för"
 
@@ -5813,20 +5880,12 @@ msgid "verb.done"
 msgstr "Lämna Labbet med dina ändringar"
 
 #. js-lingui-explicit-id
-msgid "verb.drop"
-msgstr "Ta bort en fråga, en redigering eller ett steg som inte har skickats"
-
-#. js-lingui-explicit-id
 msgid "verb.duplicate"
 msgstr "Kopiera ett rum, en samling eller en plan under ett nytt namn"
 
 #. js-lingui-explicit-id
 msgid "verb.edit"
 msgstr "Öppna ett rum i Labbet för att ändra det"
-
-#. js-lingui-explicit-id
-msgid "verb.erase"
-msgstr "Ta bort en sak för gott, med dess nummer. Det går inte att ångra"
 
 #. js-lingui-explicit-id
 msgid "verb.export"

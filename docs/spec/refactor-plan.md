@@ -478,7 +478,7 @@ Built to docket v12.
 
 **Status, 23 October: split into six pieces**, each committed and checked before the next; the points the documents leave open are C196 (`conflicts.md` Part 16), each built as suggested so a ruling changes one entry.
 1. **Steps that can be planned.** A step written ahead of any run keeps its prompt through later messages; the runner's message binds to its step; runs past the first; a branch with no chat until it runs; readers for runs; a merge restore that keeps plans' own steps (C93). **Done, 23 October (C197):** planned steps in `docketModel.js` and `recordsModel.js` (they survive a chat's messages; a run's message binds to its step; running stays running), `records.js` (`planStep`, `changeStep`, `holdBranch`, `newRun`, `newPlan`, `newPlanBranch`, `moveBranch`), `db.getPlan`, a merge restore bringing whole plans, and runs' steps checked and cleaned in backups. Tested plain and through the lock.
-2. **The plan board.** One plan at one run: branch lines, steps, status chips, pips, the add row; `new:step`, `new:run`, `new:plan`, editing a ready step, `hold:` and `hold:off`, `move:`; `open:` with a plan's number opens it. **Done, 23 October (C198):** `chrome/PlanBoard.jsx` from `lib/planBoard.js`; the commands in `lib/planVerbs.js`, a prompt on the board planned as a step, `undo:` for each through `records.putPlanBack`, and plans with no chat in Records. Tried on a trial copy.
+2. **The plan board.** One plan at one run: branch lines, steps, status chips, pips, the add row; `new:step`, `new:run`, `new:plan`, editing a ready step, `hold:` and `hold:off`, `move:`; `open:` with a plan's number opens it. **Done, 23 October (C198):** `chrome/PlanBoard.jsx` from `lib/planBoard.js`; the commands in `lib/planVerbs.js`, a prompt on the board planned as a step, `undo:` for each through `records.putPlanBack`, and plans with no chat in Records. Tried on a trial copy. Then `delete:` as the one word for removing (C199): what has not been sent goes on one Enter or an ×, with undo; what has been sent asks for a second Enter.
 3. **The runner.** `run:` (A §5.2's policy; the Enter line naming steps, rooms, models and cost), steps sent in order, `stop:`, `stop:201b`, `stop:all` across tabs, one tab per plan (Web Locks), the lock's idle clock waiting, and `undo:` stopping at a run.
 4. **One after another,** with conditions read from status (A15).
 5. **`diff:` and the step list block.**
@@ -629,7 +629,7 @@ stay readable so every backup ever written still restores.
 | R35 | The Inter font package | `@fontsource-variable/inter`, shipped and never applied | The system fonts already in use | 15 |
 | R36 | The old slot tables and fallback rule | `SLOT_FALLBACKS` and the three copies of slot data | The layout manifest | 13 |
 | R37 | The old Settings page | `src/views/SettingsView.jsx`, the `/settings` route | The Settings board; `/settings` opens it. **Approved 23 October,** moved to `src/deprecated/` (C186) | 9 |
-| R38 | Two Enter-line messages `open:` no longer says | `enter.openDocket`, `enter.openDocketHere` in `src/copy.js` ("Enter opens its first branch…") | `open:` with a plan's number opens the Plan board (C198) | 10 |
+| R38 | Three Enter-line messages nothing says any more | `enter.openDocket`, `enter.openDocketHere` ("Enter opens its first branch…") and `enter.erase` (the old answer to `delete:`) in `src/copy.js` | `open:` with a plan's number opens the Plan board (C198); `delete:` is the word (C199) | 10 |
 
 R29 (install and update state that nothing displays) is withdrawn: stage 1
 displays it.

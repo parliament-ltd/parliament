@@ -25,6 +25,11 @@ const NEW_STEP = (address) => `>new:step ${address}`
 const NEW_BRANCH = '>new:branch'
 const OPEN = (num) => `>open:${num}`
 
+const DELETE_STEP = (address, index) => `delete:${address} ${index}`
+const DELETE_BRANCH = (address) => `delete:${address}`
+const CROSS = (
+  <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /></svg>
+)
 const PLUS = (
   <svg viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><path d="M6 1.5v9M1.5 6h9" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /></svg>
 )
@@ -104,7 +109,13 @@ function StepText({ step, address, onText, onFocus }) {
   )
 }
 
-function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun }) {
+// The × on a step not yet started, or a branch that has never run (C199):
+// it deletes at once, and undo: brings it back.
+function Cross({ label, onClick }) {
+  return <button type="button" className="ch-pl-x" aria-label={label} title={label} onClick={onClick}>{CROSS}</button>
+}
+
+function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete }) {
   const { i18n } = useLingui()
   const changes = plan.n === plan.latest
   const picked = plan.selected === branch.letter
@@ -127,7 +138,10 @@ function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun }) {
               : <span>{i18n._(COPY.plan.noChat)}</span>}
           </div>
         </div>
-        <div><Status status={branch.status} /></div>
+        <div className="ch-pl-end">
+          <Status status={branch.status} />
+          {changes && !branch.everRan && <Cross label={i18n._(COPY.plan.deleteBranch, { address: branch.address })} onClick={() => onDelete(DELETE_BRANCH(branch.address))} />}
+        </div>
       </div>
       {branch.steps.map((s) => {
         const open = changes && s.planned && (s.status === 'ready' || s.status === 'waiting')
@@ -155,7 +169,10 @@ function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun }) {
                 <span>{s.model ? nameOf(s.model) : i18n._(COPY.plan.asBranch)}</span>
               </div>
             </div>
-            <div><Status status={s.status} /></div>
+            <div className="ch-pl-end">
+              <Status status={s.status} />
+              {open && <Cross label={i18n._(COPY.plan.deleteStep, { index: s.index, address: branch.address })} onClick={() => onDelete(DELETE_STEP(branch.address, s.index))} />}
+            </div>
           </div>
         )
       })}
@@ -169,7 +186,7 @@ function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun }) {
   )
 }
 
-export default function PlanBoard({ plan, loading = false, addressed, nameOf = (id) => id, onAddress, onWrite, onPick, onText, onRun }) {
+export default function PlanBoard({ plan, loading = false, addressed, nameOf = (id) => id, onAddress, onWrite, onPick, onText, onRun, onDelete }) {
   const { i18n } = useLingui()
   return (
     <article
@@ -208,7 +225,7 @@ export default function PlanBoard({ plan, loading = false, addressed, nameOf = (
             <div className="ch-pl-doc">
               {plan.branches.map((b) => (
                 <Fragment key={b.letter}>
-                  <Branch plan={plan} branch={b} nameOf={nameOf} onWrite={onWrite} onPick={onPick} onText={onText} onRun={onRun} />
+                  <Branch plan={plan} branch={b} nameOf={nameOf} onWrite={onWrite} onPick={onPick} onText={onText} onRun={onRun} onDelete={onDelete} />
                 </Fragment>
               ))}
               {plan.n === plan.latest && (
