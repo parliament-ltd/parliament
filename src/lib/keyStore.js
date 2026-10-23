@@ -37,6 +37,24 @@ export async function removeSavedKey(keyDb, provider) {
   await keyDb.delete(KEY_STORE, recordId(provider))
 }
 
+// Lock Parliament's record (stage S4; C192): one more entry beside the saved
+// keys, so no new store and no new version. lockKeys.js makes and opens it.
+const LOCK_ID = 'lock'
+
+/** The lock's record, or null when the lock is off. */
+export async function readLock(keyDb) {
+  return (await keyDb.get(KEY_STORE, LOCK_ID)) ?? null
+}
+
+export async function writeLock(keyDb, record) {
+  if (record?.id !== LOCK_ID) throw new Error('not a lock record')
+  await keyDb.put(KEY_STORE, record)
+}
+
+export async function removeLock(keyDb) {
+  await keyDb.delete(KEY_STORE, LOCK_ID)
+}
+
 const sameBytes = (a, b) => Boolean(a && b) && a.length === b.length && a.every((x, i) => x === b[i])
 const sameKey = (a, b) => Boolean(a && b) && sameBytes([...a.ciphertext], [...b.ciphertext]) && sameBytes([...a.iv], [...b.iv])
 

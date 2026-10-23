@@ -25,8 +25,9 @@ there is no server to reset it, and setup says so plainly.
   - **Your passphrase:** stretched with PBKDF2-SHA256, 600,000 rounds, a random
     salt (as new backups are, C182). Web Crypto offers nothing slower to
     guess, such as Argon2.
-  - **The recovery code:** 128 random bits shown once as 26 letters and
-    digits in groups. It is random enough that no stretching is needed: HKDF.
+  - **The recovery code:** 120 random bits shown once as 24 letters and
+    digits in six groups of four, in an alphabet with no I, L, O or U so it
+    cannot be misread. It is random enough that no stretching is needed: HKDF.
   - **Each passkey,** where the browser and the passkey's maker support the
     WebAuthn PRF extension: the passkey gives 32 secret bytes for a random
     salt kept with it, and HKDF turns them into a key (the bytes are keying

@@ -210,6 +210,11 @@ Line numbers are approximate.
 - **Example words inside commands are translated:** the verbs and the command's form stay English in every language; the quoted words stand for the person's own text, so they are translated (`name:"Tornugglor"`). Japanese and Chinese brought in line (C184).
 - **Window layouts on a merge:** "Add it to what is here" keeps this device's layouts; only a replace brings the file's (C182 (d)), kept.
 
+**23 October 2026, on the Lock Parliament design (Part 15):** Stefan: "1. ok with lean. 2. ok. … 3. ok. 4. ok. 5. ok … 6. ok".
+
+- **C187 to C192 ruled as suggested:** built in four pieces; each tab and each reload unlocks for itself; sealed and readable as listed; a passphrase of at least 12 characters and an hour's idle lock by default; passkeys an extra way in, tested at setup; the change to stored data approved as shown.
+- **Stefan asked:** with one tab unlocked, what happens to a board that was in a window when its tab locked; should the window close? *Answered:* yes. A tab locks by reloading to the unlock screen, and a tab that reloads already closes every window it popped out (Shell.jsx, on `pagehide`), so no window goes on showing your words after its tab locks. After unlocking, those boards are back on the page in that tab, as after any reload today; `pop:` opens one in a window again. A window always belongs to the tab that opened it: another tab, locked or not, never draws it. Opening the windows again by themselves after an unlock is not proposed: a browser lets a page open a window only from a click, and an unlock by passkey may not count as one.
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it
