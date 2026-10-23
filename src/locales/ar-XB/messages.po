@@ -3441,6 +3441,99 @@ msgid "enter.widthThere"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "erase.about"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.backupFirst"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.cannot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.doneHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.doneNext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.doneThere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.failed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.go"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.goesChats"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.goesKeys"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.goesMarkings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.goesOffline"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.goesRooms"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.goesSettings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.keep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.listTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.reload"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.start"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.typeWord"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.waiting"
+msgstr ""
+
+#. The word typed to arm Delete everything: one lower-case word
+#. js-lingui-explicit-id
+msgid "erase.word"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.working"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "field.answeredBy"
 msgstr ""
 

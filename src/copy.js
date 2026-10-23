@@ -826,6 +826,34 @@ export const COPY = {
     replyCut: /*i18n*/ { id: 'enter.replyCut', message: 'The reply broke off part way. What arrived is kept and marked as cut off' },
   },
 
+  // Delete everything (stage 9, piece 3; settings spec §11; C73; T5; C183).
+  // The one red in the product. {names}: providers from the list of providers.
+  erase: {
+    title: /*i18n*/ { id: 'erase.title', message: 'Delete everything' },
+    about: /*i18n*/ { id: 'erase.about', message: 'Removes every chat, plan, marking, room you built, key and setting from this browser. Undo cannot reach it, and nothing is kept anywhere else.' },
+    backupFirst: /*i18n*/ { id: 'erase.backupFirst', message: 'Back up first:' },
+    start: /*i18n*/ { id: 'erase.start', message: 'Delete everything' },
+    listTitle: /*i18n*/ { id: 'erase.listTitle', message: 'What goes' },
+    goesChats: /*i18n*/ { id: 'erase.goesChats', message: '{chats, plural, one {# chat} other {# chats}} and {plans, plural, one {# plan} other {# plans}}, with their messages and files' },
+    goesMarkings: /*i18n*/ { id: 'erase.goesMarkings', message: '{markings, plural, one {# marking} other {# markings}}, and every note and collection' },
+    goesRooms: /*i18n*/ { id: 'erase.goesRooms', message: 'The rooms you built or changed, and what you added to the library' },
+    goesKeys: /*i18n*/ { id: 'erase.goesKeys', message: 'Your keys for {names}, and the key that encrypts them' },
+    goesSettings: /*i18n*/ { id: 'erase.goesSettings', message: 'Your settings, window layouts and the record of your backups' },
+    goesOffline: /*i18n*/ { id: 'erase.goesOffline', message: 'The copy kept for working offline' },
+    cannot: /*i18n*/ { id: 'erase.cannot', message: 'It cannot reach backups you downloaded, files you saved elsewhere, or what providers already received with your prompts.' },
+    word: /*i18n*/ { id: 'erase.word', message: 'delete', comment: 'The word typed to arm Delete everything: one lower-case word' },
+    typeWord: /*i18n*/ { id: 'erase.typeWord', message: 'Type {word} to go on' },
+    go: /*i18n*/ { id: 'erase.go', message: 'Delete it all' },
+    keep: /*i18n*/ { id: 'erase.keep', message: 'Keep it' },
+    working: /*i18n*/ { id: 'erase.working', message: 'Deleting' },
+    waiting: /*i18n*/ { id: 'erase.waiting', message: 'Waiting for your other Parliament tabs to close. Close them and this finishes.' },
+    failed: /*i18n*/ { id: 'erase.failed', message: 'Not everything could be deleted: {reason}. Reload and try again.' },
+    doneHere: /*i18n*/ { id: 'erase.doneHere', message: 'Everything is deleted from this browser.' },
+    doneThere: /*i18n*/ { id: 'erase.doneThere', message: 'Everything was deleted from this browser in another tab.' },
+    doneNext: /*i18n*/ { id: 'erase.doneNext', message: 'Close this tab, or reload to start again.' },
+    reload: /*i18n*/ { id: 'erase.reload', message: 'Reload' },
+  },
+
   // Backups from the bar (stage 9, piece 2; settings spec §11; T9, T13; C182).
   backup: {
     titleBackup: /*i18n*/ { id: 'backup.titleBackup', message: 'Back up' },

@@ -3441,6 +3441,99 @@ msgid "enter.widthThere"
 msgstr "That is its width already"
 
 #. js-lingui-explicit-id
+msgid "erase.about"
+msgstr "Removes every chat, plan, marking, room you built, key and setting from this browser. Undo cannot reach it, and nothing is kept anywhere else."
+
+#. js-lingui-explicit-id
+msgid "erase.backupFirst"
+msgstr "Back up first:"
+
+#. js-lingui-explicit-id
+msgid "erase.cannot"
+msgstr "It cannot reach backups you downloaded, files you saved elsewhere, or what providers already received with your prompts."
+
+#. js-lingui-explicit-id
+msgid "erase.doneHere"
+msgstr "Everything is deleted from this browser."
+
+#. js-lingui-explicit-id
+msgid "erase.doneNext"
+msgstr "Close this tab, or reload to start again."
+
+#. js-lingui-explicit-id
+msgid "erase.doneThere"
+msgstr "Everything was deleted from this browser in another tab."
+
+#. js-lingui-explicit-id
+msgid "erase.failed"
+msgstr "Not everything could be deleted: {reason}. Reload and try again."
+
+#. js-lingui-explicit-id
+msgid "erase.go"
+msgstr "Delete it all"
+
+#. js-lingui-explicit-id
+msgid "erase.goesChats"
+msgstr "{chats, plural, one {# chat} other {# chats}} and {plans, plural, one {# plan} other {# plans}}, with their messages and files"
+
+#. js-lingui-explicit-id
+msgid "erase.goesKeys"
+msgstr "Your keys for {names}, and the key that encrypts them"
+
+#. js-lingui-explicit-id
+msgid "erase.goesMarkings"
+msgstr "{markings, plural, one {# marking} other {# markings}}, and every note and collection"
+
+#. js-lingui-explicit-id
+msgid "erase.goesOffline"
+msgstr "The copy kept for working offline"
+
+#. js-lingui-explicit-id
+msgid "erase.goesRooms"
+msgstr "The rooms you built or changed, and what you added to the library"
+
+#. js-lingui-explicit-id
+msgid "erase.goesSettings"
+msgstr "Your settings, window layouts and the record of your backups"
+
+#. js-lingui-explicit-id
+msgid "erase.keep"
+msgstr "Keep it"
+
+#. js-lingui-explicit-id
+msgid "erase.listTitle"
+msgstr "What goes"
+
+#. js-lingui-explicit-id
+msgid "erase.reload"
+msgstr "Reload"
+
+#. js-lingui-explicit-id
+msgid "erase.start"
+msgstr "Delete everything"
+
+#. js-lingui-explicit-id
+msgid "erase.title"
+msgstr "Delete everything"
+
+#. js-lingui-explicit-id
+msgid "erase.typeWord"
+msgstr "Type {word} to go on"
+
+#. js-lingui-explicit-id
+msgid "erase.waiting"
+msgstr "Waiting for your other Parliament tabs to close. Close them and this finishes."
+
+#. The word typed to arm Delete everything: one lower-case word
+#. js-lingui-explicit-id
+msgid "erase.word"
+msgstr "delete"
+
+#. js-lingui-explicit-id
+msgid "erase.working"
+msgstr "Deleting"
+
+#. js-lingui-explicit-id
 msgid "field.answeredBy"
 msgstr "answered by {model}"
 

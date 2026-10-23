@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
+import DeleteEverything from './DeleteEverything'
 import { SECTIONS } from '../shell/boards'
 import { getEntries, subscribe as onLog } from '../lib/networkLog'
 import { gateway, networkByHost } from '../net'
@@ -294,6 +295,10 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
               </>}
             />
             <Row {...rowProps('data', 'last')} label={say(COPY.settings.lastLabel)} help={facts.lastBackup ? say(COPY.settings.lastOn, { day: longDay(i18n, facts.lastBackup.slice(0, 10)) }) : say(COPY.settings.lastNever)} />
+            {/* Delete everything: a button, never a command (C73; C183) */}
+            {shows('data', 'danger') && (
+              <DeleteEverything counts={facts.counts} keyNames={facts.providers.filter((p) => p.has).map((p) => p.name)} onWrite={onWrite} />
+            )}
           </section>
 
           {/* Appearance (settings spec §12) */}
@@ -367,6 +372,7 @@ function rowWords(facts) {
       reminder: 'reminder backup daily weekly monthly never remind',
       storage: 'storage space used browser kept keep persist',
       last: 'last backup backed up date',
+      danger: 'delete everything erase wipe remove all danger',
     },
     appearance: { text: 'text size font compact large zoom' },
     about: { parliament: 'parliament version about servers accounts', network: 'network activity requests log hosts' },

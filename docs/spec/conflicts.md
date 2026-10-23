@@ -1540,6 +1540,15 @@ Found while splitting stage 9 into pieces. The documents: the plan's stage 9, th
 - **(g) What "your settings" holds** is said truly (T13): the model for new chats, languages, the privacy filter, the scratchpad and personas, never keys. Keys live in their own database, which a replace does not touch.
 - **Suggestion:** keep as built.
 
+**C183. Delete everything, as built** (piece 3; C73, C39; audit T5).
+- **(a) A button in Settings, never a command** (ruled 11 October): the red block at the foot of Data and backups, the one red in the product. Its first click opens the confirmation; nothing else reaches it. Search finds it ("delete", "erase", "wipe").
+- **(b) The confirmation** lists what goes (the chats and plans counted, the markings counted, the rooms you built and the library, your keys by provider and the key that encrypts them, your settings, window layouts and the record of your backups, the copy kept for working offline), offers a backup first (`backup:` written into the bar), says what it cannot reach (backups you downloaded, files you saved elsewhere, what providers already received), and is armed only by typing `delete`. Enter in that field does nothing; the red button does it. Escape or "Keep it" closes it.
+- **(c) What goes:** every database of Parliament's in this browser (its own, the key database, the trial copy, and the offline worker's), all of Cache Storage, the service worker, and local and session storage, all for this site only. A database on this site under another name is left alone.
+- **(d) Other tabs:** the browser asks every tab holding a database to let go when it is deleted. Each Parliament tab now does, and covers its page with "Everything was deleted from this browser in another tab. Close this tab, or reload to start again." A tab that does not let go (an older build) is waited for: "Waiting for your other Parliament tabs to close."
+- **(e) Nothing written back:** a tab that let go does not open the databases again until it reloads, so nothing in it recreates them. This tab is covered too ("Everything is deleted from this browser"); reloading starts Parliament afresh, which makes an empty database again.
+- **(f) The old Settings page** (`/settings`) deletes everything the same way, and its warning now lists the rooms, the library, the keys and the offline copy. Its confirmation is still a plain "Delete Everything" button with no word to type, until the old page goes. Retiring `/settings` is not in section 6 yet; put to Stefan at the checkpoint.
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

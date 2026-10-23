@@ -41,6 +41,10 @@
   --ch-gold: #C4A94D;
   --ch-gold-deep: #8B6A10;
   --ch-gold-glow: rgba(196, 169, 77, .35);
+  /* Red, once: Delete everything (settings spec §4; Settings v1; C183). */
+  --ch-red: #E03E3E;            /* 5.3 under white text */
+  --ch-red-hover: #C5342A;
+  --ch-red-deep: #B42E2E;       /* its title */
 
   /* Marks in a reply (editing spec). Each has its own line, not colour alone */
   --ch-you: #2B5CB8;            /* 6.1, your words, solid underline */

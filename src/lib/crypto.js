@@ -16,13 +16,33 @@ const PROVIDER = 'anthropic'
 // from the app data, so clearAllData() doesn't destroy it
 
 let keyDB = null
+// Set once Delete everything has run (C183): the key database is not opened
+// again until the page reloads.
+let keysGone = false
 
 async function getKeyDB() {
   if (keyDB) return keyDB
+  if (keysGone) throw new Error('Parliament was deleted from this browser. Reload to start again.')
 
-  keyDB = await (await import('idb')).openDB(KEY_DB_NAME, KEY_DB_VERSION, { upgrade: upgradeKeyDb })
+  keyDB = await (await import('idb')).openDB(KEY_DB_NAME, KEY_DB_VERSION, {
+    upgrade: upgradeKeyDb,
+    // Another tab deleting everything (no version) or upgrading: let go,
+    // so it can finish (C183).
+    blocking(currentVersion, blockedVersion, event) {
+      event.target.close()
+      keyDB = null
+      if (blockedVersion == null) keysGone = true
+    },
+  })
 
   return keyDB
+}
+
+/** Let go of the key database for good in this tab, before Delete everything (C183). */
+export function closeKeyDB() {
+  keysGone = true
+  try { keyDB?.close() } catch { /* already closed */ }
+  keyDB = null
 }
 
 // ─── Encryption Key Management ───────────────────────────

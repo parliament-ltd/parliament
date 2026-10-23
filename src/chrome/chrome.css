@@ -681,3 +681,23 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-bk-replace { margin: 6px 0; padding: 8px 10px; border-radius: var(--ch-r-md); background: var(--ch-subtle); }
 .ch-bk-confirm { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: 12px; color: var(--ch-ink-2); }
 .ch-set-margs { display: inline-flex; gap: 14px; }
+
+/* ── Delete everything (stage 9, piece 3; Settings v1; C183): the one red.
+   Focus stays ink. */
+.ch-danger { margin: 18px 0 14px; padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(224, 62, 62, .3); background: rgba(224, 62, 62, .04); }
+.ch-danger-t { font: 600 var(--ch-t-small) var(--ch-sans); color: var(--ch-red-deep); }
+.ch-danger-h { font-size: 12px; color: var(--ch-ink-2); line-height: 1.55; margin: 4px 0 0; max-width: 64ch; }
+.ch-danger-h.warn { color: var(--ch-red-deep); }
+.ch-danger-lt { font: 500 12px var(--ch-sans); color: var(--ch-ink); margin: 12px 0 4px; }
+.ch-danger-list { margin: 0 0 8px; padding-left: 18px; font-size: 12px; color: var(--ch-ink-2); line-height: 1.6; list-style: disc; }
+.ch-danger-confirm { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+.ch-danger-confirm input { width: 200px; max-width: 100%; padding: 7px 10px; font: 400 12px var(--ch-mono); color: var(--ch-ink); border: 1px solid rgba(224, 62, 62, .35); border-radius: var(--ch-r-btn); background: var(--ch-surface); }
+.ch-danger-confirm input:focus { outline: none; border-color: var(--ch-ink); box-shadow: 0 0 0 1px var(--ch-ink); }
+.ch-shell .ch-settings button.ch-red-btn { margin-top: 10px; padding: 7px 13px; font: 500 11.5px var(--ch-sans); color: var(--ch-surface); background: var(--ch-red); border: none; border-radius: var(--ch-r-btn); cursor: pointer; }
+.ch-shell .ch-settings .ch-danger-confirm button.ch-red-btn { margin-top: 0; }
+.ch-shell .ch-settings button.ch-red-btn:hover { background: var(--ch-red-hover); }
+.ch-shell .ch-settings button.ch-red-btn:disabled { opacity: .45; cursor: default; background: var(--ch-red); }
+.ch-shell .ch-settings button.ch-red-btn:focus-visible, .ch-shell .ch-settings button.ch-plain-btn:focus-visible { outline: 2px solid var(--ch-ink); outline-offset: 2px; }
+.ch-shell .ch-settings button.ch-plain-btn { padding: 7px 13px; font: 500 11.5px var(--ch-sans); color: var(--ch-ink); background: var(--ch-surface); border: 1px dashed var(--ch-soft); border-radius: var(--ch-r-btn); cursor: pointer; }
+.ch-shell .ch-settings button.ch-plain-btn:hover { background: var(--ch-wash); }
+.ch-shell .ch-settings button.ch-plain-btn:disabled { opacity: .45; cursor: default; }

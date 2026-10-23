@@ -31,10 +31,15 @@ export function isTrialDb() {
 }
 
 let dbInstance = null
+// Set once Delete everything has run, here or in another tab (C183): the
+// database is not opened again until the page reloads, so nothing in this
+// tab writes it back.
+let erased = false
 
 // Database connection state, for DbStateNotice. 'superseded': another tab
 // upgraded the schema and this tab must reload. 'blocked': this tab's
-// upgrade is waiting for an older tab to close.
+// upgrade is waiting for an older tab to close. 'erased': another tab
+// deleted everything; 'erasedHere': this one did.
 export const DB_STATE_EVENT = 'parliament-db-state'
 
 function announceDbState(state) {
@@ -46,6 +51,7 @@ function announceDbState(state) {
 
 export async function initDB() {
   if (dbInstance) return dbInstance
+  if (erased) throw new Error('Parliament was deleted from this browser. Reload to start again.')
 
   const trial = isTrialDb()
   dbInstance = await openDB(trial ? TRIAL_DB_NAME : DB_NAME, trial ? DRAFT_DB_VERSION : DB_VERSION, {
@@ -53,11 +59,18 @@ export async function initDB() {
 
     // Another tab is opening a newer schema. Close this connection so its
     // upgrade can run, and tell the page, which can no longer write.
+    // A deletion asks the same, with no version (C183): everything was
+    // deleted in another tab.
     blocking(currentVersion, blockedVersion, event) {
       // The raw IDBDatabase is event.target; closing it lets the upgrade proceed.
       event.target.close()
       dbInstance = null
-      announceDbState('superseded')
+      if (blockedVersion == null) {
+        erased = true
+        announceDbState('erased')
+      } else {
+        announceDbState('superseded')
+      }
     },
 
     // This tab wants a newer schema but an older tab still holds the
@@ -72,6 +85,16 @@ export async function initDB() {
   await seedLibraryDefaults(dbInstance)
 
   return dbInstance
+}
+
+/**
+ * Let go of the database for good in this tab, before Delete everything
+ * (deleteEverything.js; C183). It is not opened again until the page reloads.
+ */
+export function closeDB() {
+  erased = true
+  try { dbInstance?.close() } catch { /* already closed */ }
+  dbInstance = null
 }
 
 // ─── Library seeding (v4 placeholders) ───────────────────

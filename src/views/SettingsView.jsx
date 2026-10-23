@@ -13,7 +13,8 @@ import { useShimmer } from '../hooks/useShimmer'
 import { Button, Card, Input, Modal, Toggle, RadioGroup, SegmentedControl, SectionLabel, IconButton } from '../components'
 import { gateway, keys, models as providerModelsOf, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
 import { encryptExport, decryptImport } from '../lib/crypto'
-import { exportAllData, importData, clearAllData, getSetting, setSetting } from '../lib/db'
+import { exportAllData, importData, getSetting, setSetting } from '../lib/db'
+import { deleteEverything } from '../lib/deleteEverything'
 import { BACKUP_PASSWORD_MIN } from '../lib/backup'
 import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
 import { useLingui } from '@lingui/react'
@@ -883,11 +884,11 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
     }
   }
 
+  // Deletes everything, as Settings does (C73; C183); the page is then
+  // covered by a notice saying so.
   const handleDeleteAll = async () => {
-    await clearAllData()
-    await keys.remove(PROVIDER)
     setShowDeleteConfirm(false)
-    window.location.reload()
+    await deleteEverything()
   }
 
   return (
@@ -1150,7 +1151,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
           <div>
             <p className="text-sm font-medium text-[var(--p-text-primary)] mb-1">This action cannot be undone.</p>
             <p className="text-xs text-[var(--p-text-secondary)] leading-relaxed">
-              All conversations, messages, highlights, notes, favorites, pinned references, and settings will be permanently deleted from this browser. Your Anthropic API key will also be removed.
+              All conversations, messages, highlights, notes, favorites, pinned references, settings, rooms you built, the library, your keys and the copy kept for working offline will be permanently deleted from this browser.
             </p>
           </div>
         </div>
