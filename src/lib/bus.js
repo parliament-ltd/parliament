@@ -20,6 +20,7 @@ const SIGNALS = Object.freeze({
   bye: [],                            // a tab is closing
   changed: ['kind', 'op', 'num', 'id'], // a record was written; re-read it
   stop: ['scope', 'num', 'letter'],   // halt runs: scope 'all' | 'docket' | 'branch'
+  locked: [],                         // the lock went on or off: reload (Lock Parliament)
 })
 
 const FIELD_TYPES = Object.freeze({
@@ -75,6 +76,15 @@ export function openBus({ channelName = CHANNEL_NAME, tabId = crypto.randomUUID(
       channel.close()
     },
   }
+}
+
+// One channel per tab, so a tab never hears its own signals (its id is the
+// same on every post), whichever module posts or listens.
+let shared = null
+/** This tab's channel. */
+export function tabBus() {
+  shared ??= openBus()
+  return shared
 }
 
 /**

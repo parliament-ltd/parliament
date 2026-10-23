@@ -23,14 +23,29 @@ export function upgradeKeyDb(db) {
 
 const recordId = (provider) => `saved-key:${provider}`
 
-/** The saved key for a provider, still encrypted: { ciphertext, iv } as arrays of bytes, or null. */
+/**
+ * The saved key for a provider, still encrypted: { ciphertext, iv } as arrays
+ * of bytes; with the lock on, { sealed } (crypto.js opens it); or null.
+ */
 export async function readSavedKey(keyDb, provider) {
   const record = await keyDb.get(KEY_STORE, recordId(provider))
-  return record ? { ciphertext: record.ciphertext, iv: record.iv } : null
+  if (!record) return null
+  return record.sealed ? { sealed: record.sealed } : { ciphertext: record.ciphertext, iv: record.iv }
 }
 
-export async function writeSavedKey(keyDb, provider, { ciphertext, iv }, now = new Date().toISOString()) {
-  await keyDb.put(KEY_STORE, { id: recordId(provider), provider, ciphertext: [...ciphertext], iv: [...iv], savedAt: now })
+export async function writeSavedKey(keyDb, provider, saved, now = new Date().toISOString()) {
+  const body = saved.sealed ? { sealed: saved.sealed } : { ciphertext: [...saved.ciphertext], iv: [...saved.iv] }
+  await keyDb.put(KEY_STORE, { id: recordId(provider), provider, ...body, savedAt: now })
+}
+
+/** Every saved key's record, for sealing them all or opening them all (Lock Parliament). */
+export async function listSavedKeys(keyDb) {
+  return (await keyDb.getAll(KEY_STORE)).filter((r) => String(r.id).startsWith('saved-key:'))
+}
+
+export async function putSavedKeyRecord(keyDb, record) {
+  if (!String(record?.id).startsWith('saved-key:')) throw new Error('not a saved key')
+  await keyDb.put(KEY_STORE, record)
 }
 
 export async function removeSavedKey(keyDb, provider) {
@@ -56,7 +71,7 @@ export async function removeLock(keyDb) {
 }
 
 const sameBytes = (a, b) => Boolean(a && b) && a.length === b.length && a.every((x, i) => x === b[i])
-const sameKey = (a, b) => Boolean(a && b) && sameBytes([...a.ciphertext], [...b.ciphertext]) && sameBytes([...a.iv], [...b.iv])
+const sameKey = (a, b) => Boolean(a?.ciphertext && b?.ciphertext) && sameBytes([...a.ciphertext], [...b.ciphertext]) && sameBytes([...a.iv], [...b.iv])
 
 /**
  * Move a key saved the old way, in the settings list, into the key database:

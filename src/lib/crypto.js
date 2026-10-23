@@ -1,7 +1,7 @@
 import { initDB } from './db'
 import {
   KEY_DB_NAME, KEY_DB_VERSION, KEY_STORE, LEGACY_SETTING, upgradeKeyDb,
-  readSavedKey, writeSavedKey, removeSavedKey, moveLegacyKey,
+  readSavedKey, writeSavedKey, removeSavedKey, moveLegacyKey, listSavedKeys, putSavedKeyRecord,
 } from './keyStore'
 
 const ENCRYPTION_KEY_STORE = KEY_STORE
@@ -36,6 +36,55 @@ async function getKeyDB() {
   })
 
   return keyDB
+}
+
+/** The key database, for Lock Parliament's record (lockSession.js). */
+export async function keyDatabase() {
+  return getKeyDB()
+}
+
+// ─── Saved keys under the lock (Lock Parliament, piece 3; C189) ───
+//
+// With the lock on, a saved key's encrypted bytes are sealed again with the
+// lock's data key, so a copied profile cannot use them: the device key that
+// encrypts them travels with the profile, the data key does not.
+
+let lockKey = null
+/** The lock's data key for this tab, once unlocked; null otherwise. */
+export function setSavedKeysLock(key) {
+  lockKey = key ?? null
+}
+
+const savedAad = (provider) => new TextEncoder().encode(`parliament seal v1\u0000saved-key\u0000${provider}`)
+
+async function sealSaved(provider, { ciphertext, iv }, key) {
+  const sealIv = crypto.getRandomValues(new Uint8Array(12))
+  const body = new TextEncoder().encode(JSON.stringify({ ciphertext: [...ciphertext], iv: [...iv] }))
+  const data = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: sealIv, additionalData: savedAad(provider) }, key, body))
+  return { sealed: { v: 1, iv: sealIv, data } }
+}
+
+async function openSaved(provider, sealed, key) {
+  const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: sealed.iv, additionalData: savedAad(provider) }, key, sealed.data)
+  return JSON.parse(new TextDecoder().decode(plain))
+}
+
+/** Seal every saved key with the lock's data key (turning the lock on). */
+export async function sealSavedKeys(key) {
+  const db = await getKeyDB()
+  for (const r of await listSavedKeys(db)) {
+    if (r.sealed) continue
+    await putSavedKeyRecord(db, { id: r.id, provider: r.provider, savedAt: r.savedAt, ...(await sealSaved(r.provider, r, key)) })
+  }
+}
+
+/** Open every saved key again (turning the lock off). */
+export async function openSavedKeys(key) {
+  const db = await getKeyDB()
+  for (const r of await listSavedKeys(db)) {
+    if (!r.sealed) continue
+    await putSavedKeyRecord(db, { id: r.id, provider: r.provider, savedAt: r.savedAt, ...(await openSaved(r.provider, r.sealed, key)) })
+  }
 }
 
 /** Let go of the key database for good in this tab, before Delete everything (C183). */
@@ -111,10 +160,9 @@ export async function saveApiKey(apiKey, mode = 'persistent', provider = PROVIDE
   switch (mode) {
     case 'persistent': {
       const { ciphertext, iv } = await encryptApiKey(apiKey)
-      await writeSavedKey(await getKeyDB(), provider, {
-        ciphertext: Array.from(new Uint8Array(ciphertext)),
-        iv: Array.from(iv),
-      })
+      const saved = { ciphertext: Array.from(new Uint8Array(ciphertext)), iv: Array.from(iv) }
+      // With the lock on, sealed again with its data key.
+      await writeSavedKey(await getKeyDB(), provider, lockKey ? await sealSaved(provider, saved, lockKey) : saved)
       // A key saved now replaces one saved the old way.
       if (provider === PROVIDER) await (await initDB()).delete('settings', STORAGE_KEY)
       break
@@ -149,6 +197,11 @@ export async function loadApiKey(mode = 'persistent', provider = PROVIDER) {
         }
       }
       if (!saved) return null
+      if (saved.sealed) {
+        // Sealed by the lock: readable only once this tab is unlocked.
+        if (!lockKey) return null
+        saved = await openSaved(provider, saved.sealed, lockKey)
+      }
 
       const { ciphertext, iv } = saved
       try {

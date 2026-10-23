@@ -4228,6 +4228,266 @@ msgstr ""
 msgid "library.themeFact"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "lock.addPasskey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.backupFirst"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.cancel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.cancelled"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.change"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.changed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.changePass"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.codeLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.confirmCode"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.confirmWrong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.currentPass"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.damaged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.differ"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.encrypt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.encrypting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.failed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.idle15m"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.idle1h"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.idle8h"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.idleLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.idleTab"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.lede"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.locked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.lockNow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.lost"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.newCode"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.newCodeShown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.newPass"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.next"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.noPrf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.offHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.onHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.opening"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.passAgain"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.passkey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.passkeyAdded"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.passkeyItem"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.passkeyNoPrf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.passkeyRemove"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.passphraseLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.passPlaceholder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.reload"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.setUp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.short"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.skip"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.step1Help"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.step1Title"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.step2Help"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.step2Title"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.step3Help"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.step3Title"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.step4Help"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.step4Title"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.turnedOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.turnOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.turnOffConfirm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.turnOffHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.unfinished"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.unlock"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.unreadable"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.useCode"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.usePassphrase"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "lock.wrong"
+msgstr ""
+
 #. The bar's command mode
 #. js-lingui-explicit-id
 msgid "mode.command"

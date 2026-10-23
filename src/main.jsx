@@ -4,6 +4,7 @@ import '@fontsource-variable/inter'
 import './index.css'
 import App from './App'
 import UpgradeGate from './components/UpgradeGate'
+import UnlockGate from './components/UnlockGate'
 import { installFetchLogger } from './lib/networkLog'
 import { I18nProvider } from '@lingui/react'
 import { i18n, startLanguage } from './i18n'
@@ -32,9 +33,12 @@ try {
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <I18nProvider i18n={i18n}>
-      <UpgradeGate>
-        <App />
-      </UpgradeGate>
+      {/* With the lock on, nothing is drawn or read until this tab is unlocked. */}
+      <UnlockGate>
+        <UpgradeGate>
+          <App />
+        </UpgradeGate>
+      </UnlockGate>
     </I18nProvider>
   </StrictMode>
 )

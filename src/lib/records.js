@@ -12,7 +12,7 @@
 // operation, an id and a number, never content.
 
 import { FIRST_NUM } from './addresses'
-import { openBus } from './bus'
+import { tabBus } from './bus'
 import { stepsFromTurns, forkStep, collabsFromPersonas } from './migrations/v6Plan'
 import { newDocket, addBranch, removeBranch, renameInDocket, withSteps, favoritesWith, favoritesWithout } from './recordsModel'
 
@@ -27,11 +27,7 @@ const DOCKET_STORES = ['counters', 'dockets', 'runs']
 
 // ── Announcing ──────────────────────────────────────────
 
-let bus = null
-function getBus() {
-  if (!bus) bus = openBus()
-  return bus
-}
+const getBus = () => tabBus()
 
 /** Tell this tab and the others what was stored. Each change: { kind, op, id, num }. */
 export function announce(changes) {

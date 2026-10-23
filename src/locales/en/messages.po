@@ -4228,6 +4228,266 @@ msgstr "{shown} of {all}"
 msgid "library.themeFact"
 msgstr "colour and type for the inside of a room"
 
+#. js-lingui-explicit-id
+msgid "lock.addPasskey"
+msgstr "Add a passkey"
+
+#. js-lingui-explicit-id
+msgid "lock.backupFirst"
+msgstr "Back up first:"
+
+#. js-lingui-explicit-id
+msgid "lock.cancel"
+msgstr "Cancel"
+
+#. js-lingui-explicit-id
+msgid "lock.cancelled"
+msgstr "The passkey was not used."
+
+#. js-lingui-explicit-id
+msgid "lock.change"
+msgstr "Change it"
+
+#. js-lingui-explicit-id
+msgid "lock.changed"
+msgstr "Changed."
+
+#. js-lingui-explicit-id
+msgid "lock.changePass"
+msgstr "Change the passphrase"
+
+#. js-lingui-explicit-id
+msgid "lock.codeLabel"
+msgstr "Recovery code"
+
+#. js-lingui-explicit-id
+msgid "lock.confirmCode"
+msgstr "Type its last four characters"
+
+#. js-lingui-explicit-id
+msgid "lock.confirmWrong"
+msgstr "Those are not its last four characters"
+
+#. js-lingui-explicit-id
+msgid "lock.currentPass"
+msgstr "The passphrase now"
+
+#. js-lingui-explicit-id
+msgid "lock.damaged"
+msgstr "The lock’s record is damaged, so it cannot be opened here."
+
+#. js-lingui-explicit-id
+msgid "lock.differ"
+msgstr "The two passphrases differ"
+
+#. js-lingui-explicit-id
+msgid "lock.encrypt"
+msgstr "Encrypt and lock"
+
+#. js-lingui-explicit-id
+msgid "lock.encrypting"
+msgstr "Encrypting"
+
+#. js-lingui-explicit-id
+msgid "lock.failed"
+msgstr "It could not be changed: {reason}. Nothing else was changed."
+
+#. js-lingui-explicit-id
+msgid "lock.idle15m"
+msgstr "15 minutes"
+
+#. js-lingui-explicit-id
+msgid "lock.idle1h"
+msgstr "1 hour"
+
+#. js-lingui-explicit-id
+msgid "lock.idle8h"
+msgstr "8 hours"
+
+#. js-lingui-explicit-id
+msgid "lock.idleLabel"
+msgstr "Locks when idle for"
+
+#. js-lingui-explicit-id
+msgid "lock.idleTab"
+msgstr "until the tab closes"
+
+#. js-lingui-explicit-id
+msgid "lock.label"
+msgstr "Lock"
+
+#. js-lingui-explicit-id
+msgid "lock.lede"
+msgstr "Everything here is encrypted. Unlock this tab to go on."
+
+#. js-lingui-explicit-id
+msgid "lock.locked"
+msgstr "Locked. The page reloads; unlock it with your passphrase."
+
+#. js-lingui-explicit-id
+msgid "lock.lockNow"
+msgstr "Lock now"
+
+#. js-lingui-explicit-id
+msgid "lock.lost"
+msgstr "Lost the passphrase, every passkey and the recovery code? Nothing can open it. Clearing this site’s data in the browser removes it all, and Parliament starts again."
+
+#. js-lingui-explicit-id
+msgid "lock.newCode"
+msgstr "New recovery code"
+
+#. js-lingui-explicit-id
+msgid "lock.newCodeShown"
+msgstr "The new recovery code, shown once. The old one no longer opens Parliament."
+
+#. js-lingui-explicit-id
+msgid "lock.newPass"
+msgstr "A new passphrase"
+
+#. js-lingui-explicit-id
+msgid "lock.next"
+msgstr "Next"
+
+#. js-lingui-explicit-id
+msgid "lock.noPrf"
+msgstr "This passkey cannot unlock Parliament. Use the passphrase or the recovery code."
+
+#. js-lingui-explicit-id
+msgid "lock.offHelp"
+msgstr "Off. Turned on, everything you wrote and your saved keys are encrypted in this browser, so a copy of it cannot be read. Each tab asks to be unlocked."
+
+#. js-lingui-explicit-id
+msgid "lock.onHelp"
+msgstr "{passkeys, plural, =0 {On. It unlocks with the passphrase or the recovery code.} one {On. It unlocks with the passphrase, the recovery code or # passkey.} other {On. It unlocks with the passphrase, the recovery code or # passkeys.}}"
+
+#. js-lingui-explicit-id
+msgid "lock.opening"
+msgstr "Opening"
+
+#. js-lingui-explicit-id
+msgid "lock.passAgain"
+msgstr "The same again"
+
+#. js-lingui-explicit-id
+msgid "lock.passkey"
+msgstr "Unlock with a passkey"
+
+#. js-lingui-explicit-id
+msgid "lock.passkeyAdded"
+msgstr "Added. This passkey unlocks Parliament."
+
+#. js-lingui-explicit-id
+msgid "lock.passkeyItem"
+msgstr "A passkey, added {day}"
+
+#. js-lingui-explicit-id
+msgid "lock.passkeyNoPrf"
+msgstr "This passkey cannot unlock Parliament, so it was not added. The passphrase still does."
+
+#. js-lingui-explicit-id
+msgid "lock.passkeyRemove"
+msgstr "remove it"
+
+#. js-lingui-explicit-id
+msgid "lock.passphraseLabel"
+msgstr "Passphrase"
+
+#. js-lingui-explicit-id
+msgid "lock.passPlaceholder"
+msgstr "{count, plural, other {# characters or more}}"
+
+#. js-lingui-explicit-id
+msgid "lock.reload"
+msgstr "Reload"
+
+#. js-lingui-explicit-id
+msgid "lock.setUp"
+msgstr "Set up the lock"
+
+#. js-lingui-explicit-id
+msgid "lock.short"
+msgstr "{count, plural, other {Use # characters or more}}"
+
+#. js-lingui-explicit-id
+msgid "lock.skip"
+msgstr "Not now"
+
+#. js-lingui-explicit-id
+msgid "lock.step1Help"
+msgstr "{count, plural, other {At least # characters. A few unrelated words are easy to remember and hard to guess.}}"
+
+#. js-lingui-explicit-id
+msgid "lock.step1Title"
+msgstr "Choose a passphrase"
+
+#. js-lingui-explicit-id
+msgid "lock.step2Help"
+msgstr "It opens Parliament if the passphrase is forgotten. Write it down or keep it in a password manager: it is shown once, here."
+
+#. js-lingui-explicit-id
+msgid "lock.step2Title"
+msgstr "Keep the recovery code"
+
+#. js-lingui-explicit-id
+msgid "lock.step3Help"
+msgstr "A passkey can unlock Parliament too: your fingerprint, your face, a PIN or a phone. The passphrase and the recovery code stay; deleting the passkey from a password manager removes only this way in."
+
+#. js-lingui-explicit-id
+msgid "lock.step3Title"
+msgstr "A passkey, if you like"
+
+#. js-lingui-explicit-id
+msgid "lock.step4Help"
+msgstr "Everything you wrote and your saved keys are encrypted in this browser. If the passphrase, every passkey and the recovery code are all lost, nothing can open it: there is no server to reset it."
+
+#. js-lingui-explicit-id
+msgid "lock.step4Title"
+msgstr "Lock it"
+
+#. js-lingui-explicit-id
+msgid "lock.title"
+msgstr "Parliament is locked"
+
+#. js-lingui-explicit-id
+msgid "lock.turnedOff"
+msgstr "The lock is off. The page reloads."
+
+#. js-lingui-explicit-id
+msgid "lock.turnOff"
+msgstr "Turn the lock off"
+
+#. js-lingui-explicit-id
+msgid "lock.turnOffConfirm"
+msgstr "Turn it off"
+
+#. js-lingui-explicit-id
+msgid "lock.turnOffHelp"
+msgstr "Everything is decrypted in this browser again, and the lock removed."
+
+#. js-lingui-explicit-id
+msgid "lock.unfinished"
+msgstr "Being set up. Unlock again to finish."
+
+#. js-lingui-explicit-id
+msgid "lock.unlock"
+msgstr "Unlock"
+
+#. js-lingui-explicit-id
+msgid "lock.unreadable"
+msgstr "The lock could not be read. Reload to try again."
+
+#. js-lingui-explicit-id
+msgid "lock.useCode"
+msgstr "Use the recovery code instead"
+
+#. js-lingui-explicit-id
+msgid "lock.usePassphrase"
+msgstr "Use the passphrase instead"
+
+#. js-lingui-explicit-id
+msgid "lock.wrong"
+msgstr "That does not open it."
+
 #. The bar's command mode
 #. js-lingui-explicit-id
 msgid "mode.command"

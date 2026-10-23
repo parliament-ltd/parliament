@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalS
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import DeleteEverything from './DeleteEverything'
+import LockPanel from './LockPanel'
 import Globe from './Globe'
 import { SECTIONS } from '../shell/boards'
 import { getEntries, subscribe as onLog } from '../lib/networkLog'
@@ -287,6 +288,8 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
             <Row {...rowProps('data', 'reminder')} label={say(COPY.settings.reminderLabel)} help={say(COPY.settings.reminderHelp)}>
               <Seg label={say(COPY.settings.reminderLabel)} value={v.backupReminder ?? 'monthly'} onPick={(x) => onSet(`set:reminder ${x}`)} options={[['daily', say(COPY.settings.reminderDaily)], ['weekly', say(COPY.settings.reminderWeekly)], ['monthly', say(COPY.settings.reminderMonthly)], ['never', say(COPY.settings.reminderNever)]]} />
             </Row>
+            {/* Lock Parliament (stage S4; C187 to C192): set up and kept here, never from the bar. */}
+            {shows('data', 'lock') && <LockPanel onWrite={onWrite} />}
             <Row {...rowProps('data', 'storage')} label={say(COPY.settings.storageLabel)} stack
               help={<>
                 {facts.storage.quota > 0 && <span className="ch-meter"><i style={{ width: `${Math.min(100, Math.max(1, (facts.storage.usage / facts.storage.quota) * 100))}%` }} /></span>}
@@ -399,6 +402,7 @@ function rowWords(facts) {
     data: {
       backup: 'backup restore export import parliament file format bring back',
       reminder: 'reminder backup daily weekly monthly never remind',
+      lock: 'lock encrypt encryption passphrase passkey recovery code unlock security',
       storage: 'storage space used browser kept keep persist',
       last: 'last backup backed up date',
       danger: 'delete everything erase wipe remove all danger',

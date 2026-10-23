@@ -716,3 +716,15 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-prose-p, .ch-leave { display: block; }
 .ch-prose-p b, .ch-leave b { font-weight: 600; color: var(--ch-ink); }
 .ch-prose-p b { display: block; margin-bottom: 1px; }
+
+/* ── The lock in Settings (Lock Parliament, stage S4, piece 3). Ink only. */
+.ch-lk-step { margin-top: 10px; padding: 12px 14px; border-radius: var(--ch-r-md); background: var(--ch-subtle); }
+.ch-lk-t { margin: 0 0 4px; font: 600 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink); }
+.ch-lk-fields { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.ch-lk-fields input { flex: 1; min-width: 180px; padding: 7px 10px; font: 400 12px var(--ch-mono); color: var(--ch-ink); border: 1px dashed var(--ch-soft); border-radius: var(--ch-r-btn); background: var(--ch-surface); }
+.ch-lk-fields input:focus { outline: none; border-style: solid; border-color: var(--ch-ink); box-shadow: 0 0 0 1px var(--ch-ink); }
+.ch-lk-buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 10px; }
+.ch-lk-code { margin: 8px 0; padding: 10px 12px; font: 500 16px var(--ch-mono); letter-spacing: .06em; color: var(--ch-ink); background: var(--ch-surface); border: 1px solid var(--ch-border); border-radius: var(--ch-r-md); user-select: all; word-break: break-all; }
+.ch-lk-list { display: flex; flex-direction: column; gap: 2px; margin: 6px 0; font-size: 12px; color: var(--ch-ink-2); }
+.ch-lk-problem { color: var(--ch-ink); font-weight: 500; }
+.ch-lk .ch-seg { margin-top: 4px; }

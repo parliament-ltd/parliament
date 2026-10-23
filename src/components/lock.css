@@ -1,0 +1,21 @@
+/* The unlock screen (Lock Parliament, stage S4, piece 3). Drawn before the
+   shell, so it brings the tokens itself. Focus is ink; no gold. */
+@import '../styles/tokens.css';
+
+.lk-cover { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--ch-paper); color: var(--ch-ink); font: 400 var(--ch-t-body) var(--ch-sans); }
+.lk-box { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; }
+.lk-title { margin: 0; font: 600 var(--ch-t-title) var(--ch-sans); }
+.lk-help { margin: 0; color: var(--ch-ink-2); line-height: var(--ch-lh); }
+.lk-field { display: flex; flex-direction: column; gap: 4px; font-size: var(--ch-t-small); color: var(--ch-ink-2); }
+.lk-field input { padding: 9px 11px; font: 400 var(--ch-t-body) var(--ch-mono); color: var(--ch-ink); background: var(--ch-surface); border: 1px dashed var(--ch-soft); border-radius: var(--ch-r-btn); }
+.lk-field input:focus { outline: none; border-style: solid; border-color: var(--ch-ink); box-shadow: 0 0 0 1px var(--ch-ink); }
+.lk-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.lk-btn { padding: 8px 14px; font: 500 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink); background: var(--ch-surface); border: 1px dashed var(--ch-soft); border-radius: var(--ch-r-btn); cursor: pointer; }
+.lk-btn:hover { background: var(--ch-wash); }
+.lk-btn.lk-primary { border-style: solid; border-color: var(--ch-ink); }
+.lk-btn:disabled { opacity: .5; cursor: default; }
+.lk-btn:focus-visible, .lk-link:focus-visible { outline: 2px solid var(--ch-ink); outline-offset: 2px; }
+.lk-link { padding: 0; border: none; background: none; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); cursor: pointer; text-align: start; }
+.lk-link:hover { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+.lk-problem { margin: 0; color: var(--ch-ink); font-weight: 500; }
+.lk-foot { margin: 8px 0 0; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); line-height: var(--ch-lh); }

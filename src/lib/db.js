@@ -61,6 +61,12 @@ export function setSealKey(key) {
 }
 const answer = () => (sealKey ? (sealedInstance ??= sealedDb(dbInstance, sealKey)) : dbInstance)
 
+/** fn(the database as stored, not through the lock), for the lock's rewrites. */
+export async function withRawDB(fn) {
+  await initDB()
+  return fn(dbInstance)
+}
+
 export async function initDB() {
   if (dbInstance) return answer()
   if (erased) throw new Error('Parliament was deleted from this browser. Reload to start again.')

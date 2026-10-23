@@ -1616,6 +1616,18 @@ Found while designing the stage after stage 9 (S4; `security-privacy-decisions.m
 - **(f) Nothing is sealed yet in the app:** `db.js` answers through the sealed database only once a tab has a data key, which only piece 3's unlock gives.
 - **Suggestion:** keep as built.
 
+**C194. Setup and unlock, as built** (piece 3).
+- **(a) Nothing before the unlock:** a gate in front of the whole app (`components/UnlockGate.jsx`) shows only the unlock screen while the lock is on and this tab holds no key; nothing of yours is read or drawn first. The screen speaks the language chosen (a preference kept readable), offers the passkey when the lock has one, the passphrase, and the recovery code typed any way (spaces, dashes, case), and says plainly what happens when all three are lost: clearing the site's data in the browser removes everything, and Parliament starts again.
+- **(b) Each tab for itself** (C188): a new tab or a reload asks; "Lock now" in Settings locks this tab at once. Setting the lock up and turning it off both end with the page reloading, so nothing read before stays in memory, and the new passphrase is tried at once.
+- **(c) Idle:** checked every 15 seconds against the last key press, click or scroll; at the time chosen the tab locks by reloading (closing the windows it popped out, C188), except while a reply is arriving, when it waits for the reply to end.
+- **(d) Setup, in Settings, Data and backups:** a passphrase of at least 12 characters, typed twice, and the idle time; the recovery code shown once and confirmed by typing its last four characters; a passkey if the browser does not rule it out, kept only if unlocking with it works (C191); then the warning and a backup offered first, and "Encrypt and lock". Once on: the idle time, Lock now, the passkeys (each removable), Change the passphrase, Add a passkey and New recovery code (each asking for the passphrase), and Turn the lock off (asking for it too).
+- **(e) Two databases, written in a safe order:** the lock's record first, marked unfinished, then everything sealed in one save and the saved keys sealed, then the record marked finished. A stop anywhere leaves data the lock opens, and an unfinished set-up is finished at the next unlock. Turning off opens everything first, then removes the record.
+- **(f) Saved keys** are sealed with the data key while the lock is on and can be read only once a tab is unlocked; a key saved while it is on is sealed as it is saved.
+- **(g) Other tabs** are told by a signal carrying nothing but its name, and reload.
+- **(h) Checked in the in-app browser** on the production build at an empty origin (the trial copy shares the key database with the pane's own data, so a test lock there would touch real saved keys): a short passphrase and a wrong confirmation refused; a saved search sealed on disk; the unlock screen after the reload; a wrong passphrase refused; the recovery code typed in lower case with spaces; Lock now; a second tab asking for itself; turning off, with the second tab reloading and opening, and everything readable again. The origin was cleared afterwards. **Not tried:** a real passkey, which needs Touch ID, Windows Hello or a phone (for Stefan, on `npm run dev` in his own browser, with no trial copy on); the idle wait itself.
+- **(i) New words** (the unlock screen and the lock in Settings) are not yet in the four drafts; they show in English there.
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
