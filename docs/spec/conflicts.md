@@ -192,6 +192,14 @@ Line numbers are approximate.
 - **Mistral, tried by Stefan:** "while the mistral key seemed to work with the animation, i never received a reply. no error came up either." See C171.
 - "good to go to next after these": stage 8 follows.
 
+**23 October 2026, at the stage 8 checkpoint:**
+
+- **C175 (a): any number of rooms.** Stefan: "the screen can open more than one room. the user can open any number of rooms." So `open:201b` opens the branch in a room of its own beside what is here, as slider v9 draws it ("its own card"), and the space holds as many rooms as the person opens. Today the space holds one room, and the room's parts read the one open chat; the work is planned as stage 8, piece 7, with the change to the space as kept on this device shown first.
+- **R26 approved** ("ok"): the branch panel and Cmd/Ctrl+Shift+B move to `src/deprecated/` when today's chat page is replaced by the room in the shell (as R22 and R25), nothing deleted. Until then today's chat page keeps them.
+- **The new optional fields are approved** ("ok"): `from` and `group` (C172), `summary` (C175), `included` (C176) on a message, and `again:` changing `group` on stored prompts (C177 (b)).
+- **C176 (a), the command's name:** Stefan asked for more context; given at the checkpoint. Not ruled yet.
+- **C172 to C179, built as suggested:** Stefan asked for them listed; listed at the checkpoint. Not confirmed yet.
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it
@@ -1456,7 +1464,7 @@ Found while splitting stage 8 into pieces. The documents: the plan's stage 8, br
 - **Suggestion:** keep as built.
 
 **C175. A branch in its own room, and from a summary, as built** (piece 4). Slider v9 and C60: `open:201a` is "its own card, full history, keeps its letter"; `open:201a summary` is "a new branch (next free letter) from a summary", one model call, with the context estimate worked out locally.
-- **(a) "Its own card":** the space holds one room (C125, C146 (c)), so `open:203b` shows the branch in the room here, with its whole history and its letter, or brings a room beside when none is on screen. The chat it replaces is one `open:` away. Two rooms side by side would need the space to hold several, which no stage plans. **Question for the checkpoint.**
+- **(a) "Its own card": ruled 23 October, any number of rooms (see Rulings; stage 8, piece 7).** As first built: the space holds one room (C125, C146 (c)), so `open:203b` shows the branch in the room here, with its whole history and its letter, or brings a room beside when none is on screen. The chat it replaces is one `open:` away. Two rooms side by side would need the space to hold several, which no stage plans. **Question for the checkpoint.**
 - **(b) Who writes the summary:** the helper (`helper:`, C166 (d)): a model on this computer when a check has listed one (free, nothing leaves it), else the small model of a provider with a key. The Enter line names it with the tokens and the cost: "Enter starts 203d from a summary of 203b: one call to Haiku 5.5, about 10,250 tokens, $0.01".
 - **(c) What it reads:** the branch as a model would be sent it (hidden messages and those being deleted stay out), each turn in a labelled tag: the person, a model by name, or a source. Answers from sources go in, marked as a source's, and the Enter line says so, since asking for the summary is acting on them (C115). Invisible characters are taken out, and the instructions say the turns are material, not instructions. A branch over about 100,000 tokens gives its latest part, and the Enter line says so. With the privacy filter on and the helper off this computer, what it finds is swapped for placeholders first and back in the summary.
 - **(d) The new branch:** the plan's next letter, holding one message, the summary as the helper wrote it, with the helper's model id and `summary: { of, upTo }`, the branch it summarizes and the last message there when it was written. Who answers it and its frameworks come from that branch, and the room moves to it. Nothing is copied. **New optional field `summary` on a message, shown at the checkpoint;** backups carry it, and a restore checks it and rewrites both ids.
