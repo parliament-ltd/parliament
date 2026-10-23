@@ -410,6 +410,14 @@ msgstr ""
 msgid "chat.frameworkGone"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "chat.includedFlagged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.includedWith"
+msgstr ""
+
 #. Under an answer from a source (C169)
 #. js-lingui-explicit-id
 msgid "chat.instructionLike"
@@ -846,6 +854,78 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "count.steps"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.again"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againAsking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againChanged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againIncluded"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againLocal"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.againNoOne"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.againNoRoom"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.againNotChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againNothing"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.againNotOnScreen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againSource"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againTabs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againUnpriced"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1544,6 +1624,73 @@ msgid "enter.helpVerb"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.includeFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeFlagged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeNoAnswer"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.includeNoBranches"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeNoneHeld"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.includeNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeNothing"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.includeNothingTry"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeOneFrom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeSome"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.inNoCollection"
 msgstr ""
 
@@ -2066,6 +2213,22 @@ msgstr ""
 #. Hidden messages, and messages being deleted, are not sent (stage 4)
 #. js-lingui-explicit-id
 msgid "enter.promptHiddenOut"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptIncluded"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptIncludedFlagged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptIncludedKept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptIncludedNotSources"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4051,6 +4214,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.in"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.include"
 msgstr ""
 
 #. js-lingui-explicit-id

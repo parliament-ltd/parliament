@@ -30,8 +30,9 @@ import { exportItems, chatsOf, exportName } from '../lib/recordsExport'
 import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, namesFrom, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
 import { planReply, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
-import { planTo } from '../lib/branchVerbs'
+import { planTo, planAgain } from '../lib/branchVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
+import { planInclude } from '../lib/included'
 import { findPrivate, KINDS as PRIVATE_KINDS } from '../lib/privacyFilter'
 import { searchWords } from '../lib/searchWords'
 
@@ -52,7 +53,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate', 'privacy', 'check', 'to'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -659,6 +660,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       privacy: (a1, s1, sc) => planPrivacy(s1, sc),
       check: (a1, s1, sc) => planCheck(s1, sc),
       to: (a1, s1, sc) => planTo(s1, sc),
+      include: (a1, s1, sc) => planInclude(s1, sc),
+      again: (a1, s1, sc) => planAgain(s1, sc),
     }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
@@ -837,6 +840,19 @@ export function promptPreview(text, target = {}) {
   const lines = []
   if (target.toBranch) lines.push({ message: 'promptToBranch', values: { address: target.toBranch } })
   if (target.carriesOn) lines.push({ message: 'promptCarriesOn', values: target.carriesOn })
+  // Answers from sources include: holds for this prompt (C176): to models
+  // only, as data; a source is sent the words alone.
+  const inc = target.included ?? null
+  if (inc?.count) {
+    const whos = Array.isArray(target.many) && target.many.length > 1 ? target.many : [target.answerer ?? { group: target.keyed ? 'model' : 'source' }]
+    if (whos.some((w) => w.group !== 'source')) {
+      lines.push({ message: 'promptIncluded', values: { count: inc.count, sources: inc.sources } })
+      if (inc.flagged) lines.push({ message: 'promptIncludedFlagged' })
+      if (whos.some((w) => w.group === 'source')) lines.push({ message: 'promptIncludedNotSources' })
+    } else {
+      lines.push({ message: 'promptIncludedKept', values: { count: inc.count } })
+    }
+  }
   return lines.length ? { ...p, says: { ...p.says, also: [...lines, ...(p.says.also ?? [])] } } : p
 }
 

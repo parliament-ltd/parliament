@@ -20,7 +20,7 @@ import { piecesOfAnswer, translationOf, lastSourceAnswer, BY_BROWSER } from '../
 import { findPrivate } from '../lib/privacyFilter'
 import { searchWords } from '../lib/searchWords'
 import { replyTargets } from '../lib/branchGroups'
-import { subscribe as subscribeBranches, lastShown, viewedIn } from '../stores/branchView'
+import { subscribe as subscribeBranches, lastShown, viewedIn, setViewed } from '../stores/branchView'
 import { instructionLike } from '../lib/injection'
 import AnswerPicker from './AnswerPicker'
 import { ignite } from './ignition'
@@ -34,6 +34,9 @@ import { useIsStreaming, useHiddenIds, usePendingDeletes, useStreamEnd } from '.
 import { sendableOf, hiddenIds, pendingDeletes, isStreaming as replyArriving } from '../stores/chatStore'
 import { fromSource } from '../stores/sendHistory'
 import { preview, viewFromSaved, lineOf, LOCAL_READS } from './preview'
+import { answerFor, includedOf } from '../lib/included'
+import { promptFacts } from '../lib/branchVerbs'
+import { checkSourceTexts } from '../lib/sourceCheck'
 import Bar from './Bar'
 import Strip from './Strip'
 import Board from './Board'
@@ -727,6 +730,8 @@ export default function Shell() {
   const keepTranslationNow = useRef(async () => {})
   // Has the helper summarize a chat (open:203b summary, C175).
   const summarizeChatNow = useRef(async () => { throw new Error('Not ready') })
+  // Asks a branch's last prompt again as a new branch (again:, C177).
+  const askAgainNow = useRef(async () => 'againFailed')
 
   // ── Models on this computer (stage 7, piece 4; C33, C163) ──
   // Ollama is looked for only when someone asks (the key panel's check).
@@ -767,6 +772,11 @@ export default function Shell() {
   const [heldTo, setHeldTo] = useState(null)
   const heldToNow = useRef(null)
   useEffect(() => { heldToNow.current = heldTo }, [heldTo])
+  // Answers from sources include: holds for the next prompt here (stage 8,
+  // piece 5; C176): { room, items }. For this tab only, not stored.
+  const [heldInclude, setHeldInclude] = useState(null)
+  const heldIncludeNow = useRef(null)
+  useEffect(() => { heldIncludeNow.current = heldInclude }, [heldInclude])
   const [replyPicking, setReplyPicking] = useState(false)
 
   // ── Frameworks (stage 7, piece 5; C164) ───────────────
@@ -1180,6 +1190,19 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'again') {
+      // again:203a (C177): the bar is free while the new branch writes.
+      const later = askAgainNow.current(what)
+      remember(body)
+      return { done: true, says: { message: 'againAsking', values: { next: what.next } }, later }
+    }
+    if (what.kind === 'include') {
+      // include: (C176): held for the next prompt here; nothing is stored
+      // until that prompt goes, and then with it.
+      setHeldInclude(what.items.length ? { room: what.room, items: what.items } : null)
+      remember(body)
+      return null
+    }
     if (what.kind === 'replyTo') {
       // to: (C174): held until changed; nothing is stored.
       if (touched.current) touched.current.heldTo = { before: heldToNow.current }
@@ -1358,7 +1381,16 @@ export default function Shell() {
   const onRoomLeave = useCallback((chatId) => { if (readyRoom.current === chatId) readyRoom.current = null }, [])
 
   // ── Prompts from the bar (stage 4) ────────────────────
-  const { messages, activeConversationId, sendMessage, resendWhole, askSource, keepTranslation, summarizeChat } = useChat()
+  const { messages, activeConversationId, sendMessage, resendWhole, askSource, keepTranslation, summarizeChat, regroupPrompt } = useChat()
+  // A source answers a search (C168), with its edition (C166 (e)).
+  const askSourceAs = useCallback((to, text, w, extra = {}) => {
+    const { locale } = latest.current
+    const lang = sourceAskLanguage(replyNow.current, sourceLocale(locale))
+    const yours = destination(w.id)?.answersIn === 'yours'
+    const words = searchWords(text, yours ? lang : 'en')
+    const searchedFor = words === text.trim().replace(/[?？!.]+$/u, '').trim() ? null : { text: words.slice(0, 300), lang: baseOf(yours ? lang : 'en'), by: 'search', at: new Date().toISOString() }
+    return askSource(to, text, { source: w.id, lang, fallbackLang: yours ? 'en' : null, asked: searchedFor, ...extra })
+  }, [askSource])
   useEffect(() => { keepTranslationNow.current = keepTranslation }, [keepTranslation])
   useEffect(() => { summarizeChatNow.current = summarizeChat }, [summarizeChat])
   const { settings, updateSetting } = useSettings()
@@ -1537,7 +1569,33 @@ export default function Shell() {
       }
     },
   }), [helperNow, settings.privacyFilter, settings.defaultModel, chatRowsById, conversations, keys])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens, branching, summarizing }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens, branching, summarizing])
+  // include: (C176): the room's last answer from a source, the branches on
+  // screen with theirs, and what is held.
+  const roomAnswer = useMemo(() => answerFor(shown), [shown])
+  const including = useMemo(() => ({ room: roomId, chatAnswer: roomAnswer, members: branchShown?.members ?? [], held: heldInclude }), [roomId, roomAnswer, branchShown, heldInclude])
+  // again: (C177): a chat's last prompt and who answers it, for the room's
+  // chat and the branches on screen; another chat is opened first.
+  const roomPrompt = useMemo(() => promptFacts(shown), [shown])
+  const again = useMemo(() => ({
+    room: roomId,
+    rows: almanacRows ?? [],
+    factsOf: (chatId) => {
+      const row = chatRowsById.get(chatId)
+      if (!row) return null
+      const chat = conversations.find((c) => c.id === chatId)
+      const member = branchShown?.members?.find((m) => m.chatId === chatId) ?? null
+      const plan = row.docketNum ?? null
+      return {
+        address: plan != null && row.branch ? `${plan}${row.branch}` : String(row.num),
+        plan,
+        next: plan != null && row.planNext ? `${plan}${row.planNext}` : null,
+        onScreen: chatId === roomId || Boolean(member),
+        prompt: chatId === roomId ? roomPrompt : member?.prompt ?? null,
+        answerer: answererOf({ chosen: chat?.answerer ?? null, keyed: keys, defaultModel: settings.defaultModel }),
+      }
+    },
+  }), [roomId, almanacRows, chatRowsById, conversations, branchShown, roomPrompt, keys, settings.defaultModel])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens, branching, summarizing, including, again }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens, branching, summarizing, including, again])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -1587,6 +1645,8 @@ export default function Shell() {
   const query = useMemo(() => (queriesOn && (reads === 'english' || reads === 'mostlyEnglish')
     ? { from: queryFrom, to: 'en', who: translatorFor({ browser: browserCan[`${queryFrom}>en`] ?? null, helper: helperNow }) }
     : null), [queriesOn, reads, queryFrom, browserCan, helperNow])
+  // What include: holds for a prompt in this room (C176).
+  const includeHere = heldInclude && roomId !== undefined && heldInclude.room === (roomId ?? null) ? heldInclude : null
   // With no room in the space, a prompt starts a chat in a room beside
   // what is here, so it is offered as going to a new room (C125).
   const prompt = useMemo(() => ({
@@ -1600,7 +1660,9 @@ export default function Shell() {
     source: destination(SOURCE)?.name,
     model: (branchTarget?.ids.length === 1 ? branchTarget.whos[0] : answerer).name,
     answerer: branchTarget?.ids.length === 1 ? branchTarget.whos[0] : answerer,
-    historyChars: about ? 0 : historyChars(along),
+    historyChars: about ? 0 : historyChars(along) + (includeHere && answerer.group !== 'source' ? includeHere.items.reduce((n, x) => n + (x.chars ?? 0), 0) : 0),
+    // Answers from sources held for this prompt (C176).
+    included: includeHere ? { count: includeHere.items.length, sources: [...new Set(includeHere.items.map((x) => x.source))], flagged: includeHere.items.some((x) => x.phrases?.length) } : null,
     systemChars: byModel ? withReplyLanguage(instructionsOf(fwHere, fwList), reply.tag).length : 0,
     // The language replies come in, when one is asked for (C166).
     replyIn: byModel && reply.tag ? languageName(reply.tag) : null,
@@ -1633,7 +1695,7 @@ export default function Shell() {
     ink,
     roomName: roomNameHere,
     about,
-  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf])
+  }), [includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -1671,16 +1733,28 @@ export default function Shell() {
     if (shown?.answerer && who.id !== shown.answerer.id) return { refused: 'promptChanged' }
     if (who.later || who.gone || who.needsKey || who.unchecked) return { refused: 'promptChanged' }
 
+    // Answers from sources include: held for this prompt (C176): as the line
+    // said, read again and checked on this device in a worker, then sent to
+    // the models among its recipients as data. A source gets the words only.
+    const heldInc = heldIncludeNow.current && heldIncludeNow.current.room === (roomChat ?? null) ? heldIncludeNow.current : null
+    if (!aboutNow && (heldInc?.items.length ?? 0) !== (shown?.included?.count ?? 0)) return { refused: 'promptChanged' }
+    let included = null
+    if (heldInc && text && !aboutNow) {
+      try {
+        const found = await Promise.all(heldInc.items.map(async (x) => (await getMessages(x.chatId)).find((m) => m.id === x.messageId && m.role === 'assistant' && m.source && m.content)))
+        if (found.some((m) => !m)) return { refused: 'includeFailed' }
+        const checked = await checkSourceTexts(found.map((m) => m.content))
+        included = found.map((m, i) => includedOf(m, checked[i]))
+      } catch {
+        return { refused: 'includeFailed' }
+      }
+    }
+    const withInc = (w) => (included && w.group !== 'source' ? { included } : {})
+    const spentInc = (whos) => { if (included && whos.some((w) => w.group !== 'source')) setHeldInclude(null) }
+
     // A source answers a search (C168), with its edition (C166 (e)): for a
     // prompt to several, each source on its own.
-    const askOne = (to, w, extra = {}) => {
-      const { locale } = latest.current
-      const lang = sourceAskLanguage(replyNow.current, sourceLocale(locale))
-      const yours = destination(w.id)?.answersIn === 'yours'
-      const words = searchWords(text, yours ? lang : 'en')
-      const searchedFor = words === text.trim().replace(/[?？!.]+$/u, '').trim() ? null : { text: words.slice(0, 300), lang: baseOf(yours ? lang : 'en'), by: 'search', at: new Date().toISOString() }
-      return askSource(to, text, { source: w.id, lang, fallbackLang: yours ? 'en' : null, asked: searchedFor, ...extra })
-    }
+    const askOne = (to, w, extra = {}) => askSourceAs(to, text, w, extra)
 
     // Several branches there already, each carrying its own on (C174): each
     // with who answers it and its own frameworks.
@@ -1694,8 +1768,9 @@ export default function Shell() {
       const sendOne = (c, w) => {
         const fw = frameworksOf(c.frameworks ?? [], fwListNow.current).map((x) => x.id)
         if (w.group === 'source') return askOne(c.id, w)
-        return sendMessage(c.id, text, w.id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), [], null, { frameworks: recordOf(fw, fwListNow.current) })
+        return sendMessage(c.id, text, w.id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), [], null, { frameworks: recordOf(fw, fwListNow.current), ...withInc(w) })
       }
+      spentInc(whos)
       const all = convs.map((c, i) => (c.id === roomChat && readyRoom.current !== roomChat
         ? new Promise((resolve, reject) => { waiting.current = { chatId: c.id, go: () => sendOne(c, whos[i]).then(resolve, reject), drop: () => resolve() } })
         : sendOne(c, whos[i])))
@@ -1750,8 +1825,9 @@ export default function Shell() {
       updateWelcome((w) => tick(w, 'ask'))
       const group = { id: crypto.randomUUID(), chats: [id, ...others] }
       const sendOne = (to, w, i) => (w.group !== 'source'
-        ? sendMessage(to, text, w.id, system(), [], null, { ...under, group, describe: i === 0 })
+        ? sendMessage(to, text, w.id, system(), [], null, { ...under, group, describe: i === 0, ...withInc(w) })
         : askOne(to, w, { group }))
+      spentInc(whos)
       const first = readyRoom.current === id
         ? sendOne(id, whos[0], 0)
         : new Promise((resolve, reject) => { waiting.current = { chatId: id, go: () => sendOne(id, whos[0], 0).then(resolve, reject), drop: () => resolve() } })
@@ -1827,7 +1903,7 @@ export default function Shell() {
     const send = () => {
       const { locale } = latest.current
       return who.group !== 'source'
-        ? sendMessage(id, full, who.id, system(), [], null, under)
+        ? sendMessage(id, full, who.id, system(), [], null, { ...under, ...withInc(who) })
         : askSource(id, text, { source: who.id, lang: askIn(locale), fallbackLang: destination(who.id)?.answersIn === 'yours' ? 'en' : null, asked: searched(locale) })
     }
     // The edition a source with one in each language is asked in (C166 (e));
@@ -1842,6 +1918,7 @@ export default function Shell() {
       if (words === said.trim().replace(/[?？!.]+$/u, '').trim()) return asked
       return { text: words.slice(0, 300), lang: baseOf(lang), by: asked?.by ?? 'search', at: new Date().toISOString() }
     }
+    spentInc([who])
     // A new room sends once its messages are loaded, so nothing is lost
     // between the two.
     const sending = readyRoom.current === id
@@ -1856,7 +1933,47 @@ export default function Shell() {
         return failure(err, who.group === 'source' ? who.name : undefined)
       })
     return { done }
-  }, [askSource, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked])
+  }, [askSource, askSourceAs, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked])
+
+  // again:203a (editing spec; C177): the branch's last prompt, read again,
+  // asked as a new branch of its plan, the next letter, by who answers that
+  // branch, with its frameworks and anything it brought in from sources.
+  // The new branch is a copy up to the prompt (C172 (a)), and joins the
+  // prompt's group, so its reply shows among the tabs, and is viewed.
+  const askAgain = useCallback(async (what) => {
+    if (creating.current) return 'promptBusy'
+    const conv = await getConversation(what.chatId).catch(() => null)
+    const msgs = await getMessages(what.chatId).catch(() => [])
+    const at = msgs.findIndex((m) => m.id === what.promptId)
+    if (!conv || at < 0) return 'againChanged'
+    const p = msgs[at]
+    const fresh = await keyedProviders().catch(() => ({}))
+    const w = answererOf({ chosen: conv.answerer ?? null, keyed: fresh, defaultModel: latest.current.settings.defaultModel })
+    if (w.id !== what.answerer.id || w.later || w.gone || w.needsKey || w.unchecked) return 'againChanged'
+    const fw = frameworksOf(conv.frameworks ?? [], fwListNow.current).map((x) => x.id)
+    creating.current = true
+    let made
+    try {
+      const opts = { title: conv.title, model: w.group === 'source' ? conv.model : w.id, answerer: conv.answerer ?? null, frameworks: fw }
+      made = at > 0 ? await createBranch(what.chatId, msgs[at - 1].id, opts) : await createConversation({ ...opts, parentId: what.chatId, room: conv.room ?? null })
+    } catch {
+      return { message: 'againFailed', values: { address: what.address } }
+    } finally {
+      creating.current = false
+    }
+    const group = { id: p.group?.id ?? crypto.randomUUID(), chats: [...(p.group?.chats ?? [what.chatId]), made.id] }
+    // The branch is made either way; without this it shows as a chat of its own.
+    await regroupPrompt(p.id, group).catch(() => {})
+    setViewed(group.id, made.id)
+    loadConversations().catch(() => {})
+    const next = what.plan != null && made.branch ? `${what.plan}${made.branch}` : String(made.num ?? '')
+    const sent = w.group === 'source'
+      ? askSourceAs(made.id, p.content, w, { group })
+      : sendMessage(made.id, p.content, w.id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), [], null,
+        { frameworks: recordOf(fw, fwListNow.current), group, describe: false, ...(Array.isArray(p.included) && p.included.length ? { included: p.included } : {}) })
+    return sent.then(() => ({ message: 'againDone', values: { next, address: what.address } }), (err) => failure(err, w.group === 'source' ? w.name : undefined))
+  }, [askSourceAs, createConversation, loadConversations, regroupPrompt, sendMessage])
+  useEffect(() => { askAgainNow.current = askAgain }, [askAgain])
 
   const screensNow = useRef(null)
   useEffect(() => { screensNow.current = screens }, [screens])

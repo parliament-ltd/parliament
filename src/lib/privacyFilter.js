@@ -174,7 +174,12 @@ function mapText(content, fn) {
  * @returns {{ messages: object[], system: string|null, veil: ReturnType<typeof createVeil> }}
  */
 export function veilRequest({ messages = [], system = null }, veil = createVeil()) {
-  const out = messages.map((m) => ({ ...m, content: mapText(m.content, veil.out) }))
+  // What a prompt brought in from sources is swapped too (C176).
+  const out = messages.map((m) => ({
+    ...m,
+    content: mapText(m.content, veil.out),
+    ...(Array.isArray(m.included) ? { included: m.included.map((i) => ({ ...i, text: veil.out(i.text) })) } : {}),
+  }))
   const sys = system ? veil.out(system) : null
   const withNote = veil.swapped() ? [sys, SWAP_NOTE].filter(Boolean).join('\n\n') : sys
   return { messages: out, system: withNote || null, veil }

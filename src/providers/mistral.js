@@ -1,6 +1,6 @@
 import { BaseProvider } from './base'
 import { findModel } from '../net/answerers'
-import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary } from './shared'
+import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary, withIncluded } from './shared'
 
 // Mistral (refactor-plan.md, stage 7, piece 3; LPN §7.1; C82, C159).
 //
@@ -112,9 +112,12 @@ export class MistralProvider extends BaseProvider {
     return { 'Content-Type': 'application/json', Accept: 'application/json', Authorization: `Bearer ${apiKey}` }
   }
 
+  // What a prompt brought in from sources goes as JSON before its words,
+  // with the system line saying it is data (C176).
   _messages(messages, systemPrompt) {
-    const out = (messages ?? []).map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: textOf(m.content) }))
-    return systemPrompt ? [{ role: 'system', content: systemPrompt }, ...out] : out
+    const w = withIncluded(messages, systemPrompt, 'json')
+    const out = (w.messages ?? []).map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: textOf(m.content) }))
+    return w.system ? [{ role: 'system', content: w.system }, ...out] : out
   }
 
   async validateKey(apiKey) {

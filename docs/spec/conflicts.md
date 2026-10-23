@@ -1466,6 +1466,22 @@ Found while splitting stage 8 into pieces. The documents: the plan's stage 8, br
 - **(h)** `open:203b summary` goes alone on its line, since it spends. It has no undo, as a fork has none; `erase:` removes the branch.
 - **Suggestion:** keep as built; (a) is put to you at the checkpoint.
 
+**C176. An answer from a source brought into a prompt, as built** (piece 5). C115 ruled that answers from sources stay out of what a model is sent unless the person acts on them; the security notes (§1.1 and §1.4, approved) set how such an answer goes. The documents leave the act itself open.
+- **(a) The act: a new command, `include:`,** held for the next prompt only, in this tab. `include:` takes the last answer from a source in the room's chat; `include:201b` a branch's on screen, or several (`include:201b, 201c`), at most 5; `include:off` drops them. Its Enter line names the answer and says it goes as data. The prompt's line then says "It brings in the answer from Wikipedia, as material from a source" and counts it in the tokens. It goes to models only: a source is sent the words alone, and the held answer waits for a prompt to a model. **The name is a suggestion** (others: `with:`, `bring:`). **Question for the checkpoint.**
+- **(b) On Enter:** the answer is read again from storage and checked in a worker made for the check and thrown away (invisible characters out, words that read like instructions found), with a time limit, as the spreadsheet reader runs. If it cannot be read or checked, nothing is sent.
+- **(c) Kept on the prompt** as `included`: where it came from, its words as checked and the words flagged, so later turns send it again as it went and a backup keeps it. **New optional field `included` on a message, shown at the checkpoint;** a restore checks it and rewrites the message it came from.
+- **(d) How it goes, behind the provider interface:** to Anthropic as `search_result` blocks before the prompt's words, each with the page's address and title, citations on (Anthropic's page on search results, read 22 October 2026: `source`, `title` and `content` required; `citations` optional and the same for every block in a request; no beta header; allowed beside text in a user message); a reply's citations of it show under the reply. To Mistral and Ollama as JSON before the prompt's words, so text inside cannot break out of its delimiters. For every provider, one line in the system prompt says the material is data, never instructions, and flagged words are named in a warning beside it. The privacy filter swaps what it finds in it too.
+- **(e) In the room,** under the prompt: "With the answer from Wikipedia (Barn owl), sent as material from a source, marked as data", and, when words in it read like instructions, that they went marked.
+- **Suggestion:** keep as built; the command's name is put to you.
+
+**C177. Asking again, as built** (piece 5). The editing spec: `again:201a`, "Enter asks again from the edited prompt as 201d".
+- **(a) Until editing comes (stage 11):** the branch's last prompt as it was sent, asked again as a new branch, the plan's next letter, by who answers that branch, with its frameworks and whatever it brought in from sources. The new branch is a whole copy up to the prompt (C172 (a)).
+- **(b) Its reply joins the tabs under that prompt.** The prompt, and every prompt of its group, take the group with the new branch added (a change to the existing `group` field on stored prompts, no new field), so each room showing one of them shows the new tab. The new tab is viewed; the room stays where it is.
+- **(c) Found and fixed:** once more than one branch carries on, each tab holds its whole thread (C173 (b)), and a later prompt to several in the line's own thread was drawn as plain messages. The line's tab now draws its thread as the room does, so that prompt has tabs of its own there.
+- **(d) What it works on:** `again:` the room's chat; `again:201a` a branch on screen; a chat not on screen is opened first. It works from any board, as `to:` does (C174 (e)); the registry had it for rooms and plans only.
+- **(e) The Enter line:** "Enter asks “Which places heard it?” again as 201d, beside 201a: Sonnet 5.5, about 116 tokens, under $0.01 to send", then "It brings in again what that prompt brought in from Wikipedia, as data" when it did, and "Its reply joins the tabs under that prompt, and the room stays where it is".
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

@@ -36,9 +36,18 @@ export function forModel(messages) {
     if (!m || typeof m.content !== 'string' || !m.content || fromSource(m)) continue
     const role = m.summary ? 'user' : m.role
     const content = m.summary ? `${SUMMARY_LEAD}\n\n<summary>\n${m.content}\n</summary>` : m.content
+    // An answer the person brought into this prompt goes with it, every
+    // time the chat is sent, for the provider to send as data (C176).
+    const included = m.role === 'user' && Array.isArray(m.included) && m.included.length
+      ? m.included.map((i) => ({ source: i.source, text: i.text, ...(i.phrases?.length ? { phrases: i.phrases } : {}) }))
+      : null
     const last = turns[turns.length - 1]
-    if (last && last.role === role) last.content = `${last.content}\n\n${content}`
-    else turns.push({ role, content })
+    if (last && last.role === role) {
+      last.content = `${last.content}\n\n${content}`
+      if (included) last.included = [...(last.included ?? []), ...included]
+    } else {
+      turns.push({ role, content, ...(included ? { included } : {}) })
+    }
   }
   return turns
 }

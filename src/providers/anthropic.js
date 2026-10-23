@@ -1,7 +1,7 @@
 import { BaseProvider } from './base'
 import { evalMath } from '../lib/mathEval'
 import { findModel } from '../net/answerers'
-import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, readDescription, summaryItems, stripPrefixes, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary } from './shared'
+import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, readDescription, summaryItems, stripPrefixes, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary, withIncluded } from './shared'
 
 const API_BASE = 'https://api.anthropic.com/v1'
 const API_VERSION = '2023-06-01'
@@ -16,9 +16,11 @@ export const STALL_MS = 45_000
 // its title and the passage it quoted (the provider sends at most 150
 // characters). Other kinds of citation are left out.
 export function citationOf(c) {
-  if (c?.type !== 'web_search_result_location') return null
-  if (typeof c.url !== 'string' || !c.url.startsWith('https://')) return null
-  return { url: c.url, title: typeof c.title === 'string' ? c.title : null, cited: typeof c.cited_text === 'string' ? c.cited_text : null }
+  // A web search's result, or an answer from a source the person brought
+  // into the prompt, sent as a search result (C176): kept only with a web address.
+  const url = c?.type === 'web_search_result_location' ? c.url : c?.type === 'search_result_location' ? c.source : null
+  if (typeof url !== 'string' || !url.startsWith('https://')) return null
+  return { url, title: typeof c.title === 'string' ? c.title : null, cited: typeof c.cited_text === 'string' ? c.cited_text : null }
 }
 
 function stalledError() {
@@ -305,13 +307,15 @@ export class AnthropicProvider extends BaseProvider {
    */
   async sendMessage(apiKey, messages, model, onChunk, signal, systemPrompt, tools = [], onToolUse) {
     const toolDefs = tools.map(t => t.definition ?? t)
+    // What a prompt brought in from sources, as search result blocks (C176).
+    const w = withIncluded(messages, systemPrompt, 'blocks')
 
     const body = {
       model: this._resolveModel(model),
       max_tokens: 8192,
       stream: true,
-      messages,
-      ...(systemPrompt ? { system: systemPrompt } : {}),
+      messages: w.messages,
+      ...(w.system ? { system: w.system } : {}),
       ...(toolDefs.length > 0 ? { tools: toolDefs } : {}),
     }
 
@@ -359,14 +363,15 @@ export class AnthropicProvider extends BaseProvider {
    */
   async sendMessageWhole(apiKey, messages, model, onChunk, signal, systemPrompt, tools = []) {
     const toolDefs = tools.map(t => t.definition ?? t)
+    const w = withIncluded(messages, systemPrompt, 'blocks')
     const response = await fetch(`${API_BASE}/messages`, {
       method: 'POST',
       headers: this._headers(apiKey),
       body: JSON.stringify({
         model: this._resolveModel(model),
         max_tokens: 8192,
-        messages,
-        ...(systemPrompt ? { system: systemPrompt } : {}),
+        messages: w.messages,
+        ...(w.system ? { system: w.system } : {}),
         ...(toolDefs.length > 0 ? { tools: toolDefs } : {}),
       }),
       signal,

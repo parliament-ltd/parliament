@@ -46,6 +46,7 @@ export default function MessageCard({
   citations = null, // the sources a reply cited from a web search (C167 (f))
   asked = null, // a question translated before it went to a source (C85, C166 (g))
   summary = null, // the summary a branch starts from: { address, name }, either null when not known (C175)
+  included = null, // answers from sources brought into this prompt (C176)
   thinking = null, // a model's thinking: { text, live, answering, since } while it streams, { text, ms } after (C165)
   isFavorited = false, showNotes = false,
   savedNoteText = '',
@@ -504,6 +505,8 @@ export default function MessageCard({
       {source && translation && <TranslationLine translation={translation} original={original} onToggle={() => setOriginal((o) => !o)} />}
       {/* The question as it went, when it was translated first (C85). */}
       {type === 'user' && asked && <AskedLine asked={asked} />}
+      {/* Answers from sources brought into this prompt, and how they went (C176). */}
+      {type === 'user' && Array.isArray(included) && included.length > 0 && <IncludedLine included={included} />}
       {/* The summary a branch starts from, said to be one, and by whom (C175). */}
       {summary && <SummaryLine summary={summary} />}
       {/* The frameworks it was written under (C164). */}
@@ -642,6 +645,20 @@ function AskedLine({ asked }) {
   const { i18n } = useLingui()
   const words = asked.by === 'search' ? i18n._(COPY.chat.searchedFor, { text: asked.text }) : i18n._(COPY.chat.askedAs, { language: languageName(i18n.locale, asked.lang), text: asked.text })
   return <p className="mt-1 text-xs italic text-[var(--p-text-secondary)]" dir="auto">{words}</p>
+}
+
+// "With the answer from Wikipedia (Barn owl), sent as material from a
+// source, marked as data" (C176), and when words in it read like instructions.
+function IncludedLine({ included }) {
+  const { i18n } = useLingui()
+  const names = included.map((x) => (x.source?.title ? `${x.source?.name ?? x.source?.id} (${x.source.title})` : x.source?.name ?? x.source?.id ?? ''))
+  const flagged = included.some((x) => x.phrases?.length)
+  return (
+    <p className="mt-1 text-xs italic text-[var(--p-text-secondary)]" dir="auto">
+      {i18n._(COPY.chat.includedWith, { count: included.length, sources: new Intl.ListFormat(i18n.locale, { type: 'conjunction' }).format(names) })}
+      {flagged && <> {i18n._(COPY.chat.includedFlagged)}</>}
+    </p>
+  )
 }
 
 // "A summary of 203b, written by Haiku 5.5": a branch started from a summary

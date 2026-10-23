@@ -55,7 +55,13 @@ export function lineItems(messages, lineId, members = new Map()) {
     const carried = tabs.filter((t) => t.continued)
     const mode = carried.length > 1 || (carried.length === 1 && !carried[0].line) ? 'tabs' : 'below'
     items.push({ kind: 'slider', key: `slider-${g.id}`, groupId: g.id, mode, tabs })
-    if (mode === 'tabs') break
+    if (mode === 'tabs') {
+      // Each tab holds its whole thread. A later prompt in the line's own
+      // thread that went to several (again:, C177) draws its tabs there.
+      const lineTab = tabs.find((t) => t.line)
+      if (lineTab && lineTab.after.length) lineTab.nested = lineItems(lineTab.after, lineId, members)
+      break
+    }
     // The line carries on below the slider.
     i += 1 + own.reply.length
   }

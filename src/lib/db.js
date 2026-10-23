@@ -7,7 +7,7 @@ import { listEntries } from '../catalog'
 import { V6_NEW_STORES } from './migrations/v6Upgrade'
 import { DB_NAME, DB_VERSION, DRAFT_DB_VERSION, TRIAL_DB_NAME, BUILTIN_AUTHOR, upgradeSchema } from './schema'
 import {
-  createChat, updateChat, removeChat, createBranchChat, createSummaryChat,
+  createChat, updateChat, removeChat, createBranchChat, createSummaryChat, setPromptGroup,
   addMessageRecord, updateMessageRecord, removeMessage,
   addNumbered, updateNumbered, removeNumbered,
   addFavoriteRecord, removeFavoriteRecord, saveDocument, changeRecords,
@@ -349,6 +349,11 @@ export async function createBranch(sourceConversationId, branchAtMessageId, opti
   })
 }
 
+/** again:203a (C177): the prompt asked again, and its group's prompts, take the group with the new branch. */
+export async function groupPrompt(messageId, group) {
+  return setPromptGroup(await initDB(), { first: messageId, group })
+}
+
 /**
  * open:203b summary (C175): the next branch of a chat's plan, starting from
  * a summary of it the helper wrote (by: its model id).
@@ -381,7 +386,7 @@ export async function getBranches(parentConversationId) {
 
 // ─── Messages ────────────────────────────────────────────
 
-export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false, attachmentMeta, asked, group }) {
+export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false, attachmentMeta, asked, group, included }) {
   const db = await initDB()
   const message = {
     id: generateId(),
@@ -403,6 +408,8 @@ export async function addMessage({ conversationId, role, content, tokenCount = 0
     ...(asked ? { asked } : {}),
     // A prompt sent to several at once: the branches it went to (stage 8; C172 (b)).
     ...(group ? { group } : {}),
+    // Answers from sources the person brought into this prompt, as checked (C176).
+    ...(Array.isArray(included) && included.length ? { included } : {}),
   }
   // Touches the chat's updatedAt and size in the same transaction.
   return addMessageRecord(db, message)

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
-import { getMessages, addMessage, updateMessage, getSetting, setSetting, getConversation } from '../lib/db'
+import { getMessages, addMessage, updateMessage, getSetting, setSetting, getConversation, groupPrompt } from '../lib/db'
 import { askToKeepStorage } from '../lib/storageKeep'
 import { nameFromChat, titleFromPrompt, fieldsFromDescription } from '../lib/chatTitles'
 import { useConversations } from './ConversationContext'
@@ -270,7 +270,7 @@ export function ChatProvider({ children }) {
   // group: the branches a prompt to several went to (C172 (b)); describe:
   // whether a first answer asks for the chat's title (C62), once per prompt
   // to several, not once per branch (C172 (e)).
-  const sendMessage = useCallback(async (conversationId, userContent, model, systemPrompt = '', tools = [], attachments = null, { frameworks = null, group = null, describe = true } = {}) => {
+  const sendMessage = useCallback(async (conversationId, userContent, model, systemPrompt = '', tools = [], attachments = null, { frameworks = null, group = null, describe = true, included = null } = {}) => {
     // One reply at a time in a chat; other chats are free.
     if (streamingIn(conversationId)) return
 
@@ -295,7 +295,7 @@ export function ChatProvider({ children }) {
     const first = held.length === 0 // the chat's first prompt
     // With privacy:names, the names in what goes, found on this computer
     // first; if that fails, the prompt is not added and nothing is sent.
-    const names = await namesFor(model, [...forModel(before).map((m) => textOf(m.content)), userContent, systemPrompt])
+    const names = await namesFor(model, [...forModel(before).flatMap((m) => [textOf(m.content), ...(m.included ?? []).map((i) => i.text)]), userContent, systemPrompt, ...(included ?? []).map((i) => i.text)])
 
     // 1. Add user message to state and IndexedDB.
     //    PR-18e: `userContent` is already the text the user typed PLUS
@@ -309,6 +309,8 @@ export function ChatProvider({ children }) {
       content: userContent,
       ...(attachments?.meta ? { attachmentMeta: attachments.meta } : {}),
       ...(group ? { group } : {}),
+      // Answers from sources brought into it, as checked (C176).
+      ...(Array.isArray(included) && included.length ? { included } : {}),
     })
     updateMessages(conversationId, prev => [...prev, userMsg])
 
@@ -343,6 +345,7 @@ export function ChatProvider({ children }) {
         const last = baseHistory[lastIdx]
         if (last.role === 'user') {
           baseHistory[lastIdx] = {
+            ...last,
             role: 'user',
             content: [
               { type: 'text', text: typeof last.content === 'string' ? last.content : '' },
@@ -620,6 +623,15 @@ export function ChatProvider({ children }) {
     return back(text)
   }, [])
 
+  // again:203a (C177): the prompt asked again joins the new branch to its
+  // group, stored and in the chats held here, so the tabs show it.
+  const regroupPrompt = useCallback(async (messageId, group) => {
+    const changed = await groupPrompt(messageId, group)
+    for (const m of changed) {
+      if (hasMessages(m.conversationId)) updateMessages(m.conversationId, (prev) => prev.map((x) => (x.id === m.id ? { ...x, group } : x)))
+    }
+  }, [])
+
   // A translation of an answer from a source (C166 (f)), kept on its
   // message beside the source's own words, which stay as they came.
   const keepTranslation = useCallback(async (conversationId, messageId, translation) => {
@@ -753,6 +765,7 @@ export function ChatProvider({ children }) {
       resendWhole,
       askSource,
       summarizeChat,
+      regroupPrompt,
       keepTranslation,
       continueMessage,
       stopGenerating,

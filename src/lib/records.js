@@ -275,6 +275,32 @@ export async function createSummaryChat(db, { sourceId, text, by, title, model, 
   })
 }
 
+/**
+ * again:203a (stage 8, piece 5; C177): a prompt asked again as a new branch
+ * joins the branches it went to, so each room showing one of them shows the
+ * new reply among the tabs. The prompt `first` and every prompt of its group
+ * (the same group id, in the chats the group names) take the group given.
+ * One transaction. Returns the messages changed.
+ */
+export async function setPromptGroup(db, { first, group }) {
+  return write(db, ['messages'], async (tx) => {
+    const store = tx.objectStore('messages')
+    const prompt = await store.get(first)
+    if (!prompt) throw new Error(`Message not found: ${first}`)
+    const oldId = prompt.group?.id ?? null
+    const changed = []
+    for (const chatId of group.chats) {
+      for (const m of await store.index('conversationId').getAll(chatId)) {
+        if (m.role !== 'user' || !(m.id === first || (oldId && m.group?.id === oldId))) continue
+        const next = { ...m, group }
+        await store.put(next)
+        changed.push(next)
+      }
+    }
+    return { result: changed, changes: changed.map((m) => ({ kind: 'message', op: 'updated', id: m.id })) }
+  })
+}
+
 /** Change fields on a chat. At version 6 a rename reaches its docket, and tags are marked as the model's. */
 export async function updateChat(db, id, updates) {
   const v6 = isV6(db)

@@ -17,7 +17,7 @@
 //         rewritten:
 //           conversations  parentId, familyId (a chat id), branchPoint (a message id)
 //           messages       from (the message a copy came from), group.chats (chat ids),
-//                          summary.of (a chat id) and summary.upTo (a message id)
+//                          summary.of (a chat id), summary.upTo and included[].from (message ids)
 //           notes, highlights, favorites  conversationId, messageId
 //           pins           targetConversationId, sourceConversationId, sourceMessageId
 //           files          conversationId; file_data follows the file id
@@ -165,6 +165,8 @@ export function planRestore(flat, {
       ...(m.group ? { group: { ...m.group, chats: (m.group.chats ?? []).map(conv) } } : {}),
       // A summary points at the chat it summarizes and the message it read to (C175).
       ...(m.summary ? { summary: { of: conv(m.summary.of), upTo: msg(m.summary.upTo) } } : {}),
+      // An answer brought into a prompt keeps the message it came from (C176).
+      ...(Array.isArray(m.included) ? { included: m.included.map((i) => ({ ...i, from: msg(i.from) })) } : {}),
     })
     summary.messages.added++
   }

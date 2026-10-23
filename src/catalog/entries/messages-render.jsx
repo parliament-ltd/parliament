@@ -37,6 +37,8 @@ import MessageCard from '../../components/core/MessageCard'
 import BranchSlider from '../../components/core/BranchSlider'
 import { lineItems, membersOf } from '../../lib/branchGroups'
 import { contextShare } from '../../lib/branchSummary'
+import { answerFor } from '../../lib/included'
+import { promptFacts } from '../../lib/branchVerbs'
 import { LOCAL_READS } from '../../shell/estimate'
 import { subscribe as onChatStore } from '../../stores/chatStore'
 import SelectConversationModal from '../../components/SelectConversationModal'
@@ -398,6 +400,7 @@ export default function MessagesRender() {
         translation={msg.role === 'assistant' ? msg.translation ?? null : null}
         citations={msg.role === 'assistant' ? msg.citations ?? null : null}
         asked={msg.role === 'user' ? msg.asked ?? null : null}
+        included={msg.role === 'user' ? msg.included ?? null : null}
         summary={summaryInfo(msg)}
         thinking={thinking}
         isFavorited={isFav}
@@ -445,7 +448,8 @@ export default function MessagesRender() {
     const window = facts ? (destination(facts.provider)?.kind === 'local' ? LOCAL_READS : facts.contextWindow) : null
     const list = chatId === activeConversationId ? visibleMessages : members.get(chatId) ?? []
     const chars = list.reduce((n, m) => n + (m.content && !m.source ? m.content.length : 0), 0)
-    return { letter, name, address: planNum != null && letter ? `${planNum}${letter}` : null, context: contextShare(chars, window) }
+    // Its last answer from a source, for include: (C176).
+    return { letter, name, address: planNum != null && letter ? `${planNum}${letter}` : null, context: contextShare(chars, window), answer: answerFor(list), prompt: promptFacts(list) }
   }, [conversations, planNum, i18n, activeConversationId, visibleMessages, members])
   // A message of another branch is numbered as in its own chat.
   const numberOf = useCallback((chatId, msg) => {
@@ -453,9 +457,14 @@ export default function MessagesRender() {
     const at = list.findIndex((x) => x.id === msg.id)
     return at < 0 ? 0 : list.slice(0, at + 1).filter((x) => x.role === msg.role).length
   }, [members])
-  const renderItem = useCallback((item, idx) => (item.kind === 'slider'
-    ? <BranchSlider key={item.key} item={item} line={activeConversationId} infoOf={infoOf} renderLine={renderCard} numberOf={numberOf} />
-    : renderCard(item, idx)), [activeConversationId, infoOf, renderCard, numberOf])
+  // A message, or the tabs of a prompt sent to several; the line's own tab
+  // draws its thread the same way, so a later prompt there to several gets
+  // tabs of its own (again:, C177).
+  function renderItem(item, idx) {
+    return item.kind === 'slider'
+      ? <BranchSlider key={item.key} item={item} line={activeConversationId} infoOf={infoOf} renderLine={renderItem} numberOf={numberOf} />
+      : renderCard(item, idx)
+  }
 
   void conversationId
 

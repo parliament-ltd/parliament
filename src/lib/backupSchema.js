@@ -29,7 +29,8 @@ export const FIELDS = Object.freeze({
     // from: the message a branch's copy came from; group: the branches a
     // prompt to several went to (stage 8; C172). summary: the chat a branch's
     // summary summarizes and the last message it read (C175).
-    'citations', 'from', 'group', 'summary'],
+    // included: answers from sources brought into a prompt (C176).
+    'citations', 'from', 'group', 'summary', 'included'],
   // quotes: the numbers a note quotes beneath it; summary: a dated summary
   // note's numbers, day and model (stage 6, piece 7; C145 (e), (g)).
   notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom', 'quotes', 'summary'],

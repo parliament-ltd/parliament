@@ -121,7 +121,7 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.stop', message: 'Halt a run, or every run in every window' } }),
   v({ verb: 'diff', group: 'run', example: 'diff:', forms: ['diff:', 'diff:off'], takes: [[], [['off']]], on: ['docket'], stage: 10, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.diff', message: 'Mark what differs between the runs that are open' } }),
-  v({ verb: 'again', group: 'run', example: 'again:201a', takes: [[], ['address']], on: ['room', 'docket'], stage: 8, spends: true,
+  v({ verb: 'again', group: 'run', example: 'again:201a', takes: [[], ['address']], stage: 8, spends: true,
     gloss: /*i18n*/ { id: 'verb.again', message: 'Ask again from the edited prompt, as a new branch' } }),
 
   // Filters: they narrow the table, and several can share a line.
@@ -261,6 +261,10 @@ export const VERBS = Object.freeze([
   // closer look by a model on this computer, when one is connected.
   v({ verb: 'check', group: 'editing', example: 'check:', takes: [[]], stage: 7, click: 'fill',
     gloss: /*i18n*/ { id: 'verb.check', message: 'Check the last answer from a source for words that try to instruct a model' } }),
+  // An answer from a source brought into the next prompt, on purpose (stage
+  // 8; C115, C176): alone, the room's last; by address, a branch's on screen.
+  v({ verb: 'include', group: 'editing', example: 'include:201b', forms: ['include:', 'include:201b', 'include:201b, 201c', 'include:off'], takes: [[], ['addresses'], [['off']]], stage: 8, click: 'fill',
+    gloss: /*i18n*/ { id: 'verb.include', message: 'Bring an answer from a source into your next prompt, sent as material marked as data' } }),
   // Translating (C84, C85, C166): alone, the last answer from a source,
   // into your language; on and off, whether a question to a source that
   // reads only English is translated before it goes.

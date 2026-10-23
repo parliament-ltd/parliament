@@ -4,6 +4,7 @@
 
 import { isTranslation, isAsked } from './translations'
 import { isSummaryNote } from './branchSummary'
+import { isIncluded } from './included'
 
 const MAX_STRING_LENGTH = 1_000_000  // 1 MB per field
 const MAX_IMPORT_ITEMS  = 50_000     // across all stores
@@ -136,6 +137,8 @@ function validateMessage(item) {
   if (item.group != null && !isGroup(item.group)) return 'message.group invalid'
   // A summary a branch starts from: the chat it summarizes and the last message it read (C175).
   if (item.summary != null && !isSummaryNote(item.summary)) return 'message.summary invalid'
+  // Answers from sources the person brought into a prompt (C176).
+  if (item.included != null && !isIncluded(item.included)) return 'message.included invalid'
   // Stage 6: the model a reply came from, and the tokens it took (C132 (h)).
   if (item.model != null && !isString(item.model, 200)) return 'message.model invalid'
   if (item.usage != null && !isUsage(item.usage)) return 'message.usage invalid'

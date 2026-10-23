@@ -410,6 +410,14 @@ msgstr "Off: when you leave a chat while a reply is being written, the reply sto
 msgid "chat.frameworkGone"
 msgstr "a framework since removed"
 
+#. js-lingui-explicit-id
+msgid "chat.includedFlagged"
+msgstr "Words in it read like instructions to a model, and went marked."
+
+#. js-lingui-explicit-id
+msgid "chat.includedWith"
+msgstr "{count, plural, one {With the answer from {sources}, sent as material from a source, marked as data} other {With the answers from {sources}, sent as material from sources, marked as data}}"
+
 #. Under an answer from a source (C169)
 #. js-lingui-explicit-id
 msgid "chat.instructionLike"
@@ -847,6 +855,78 @@ msgstr "{count, plural, one {# plan} other {# plans}}"
 #. js-lingui-explicit-id
 msgid "count.steps"
 msgstr "{count, plural, one {# step} other {# steps}}"
+
+#. js-lingui-explicit-id
+msgid "enter.again"
+msgstr "Enter asks “{prompt}” again as {next}, beside {address}: {name}, about {tokens, number} tokens, {cost} to send"
+
+#. js-lingui-explicit-id
+msgid "enter.againAsking"
+msgstr "Asking again as {next}. The bar is free meanwhile"
+
+#. js-lingui-explicit-id
+msgid "enter.againChanged"
+msgstr "That branch changed since the line was read, so nothing was sent"
+
+#. js-lingui-explicit-id
+msgid "enter.againCheap"
+msgstr "Enter asks “{prompt}” again as {next}, beside {address}: {name}, about {tokens, number} tokens, under {cost} to send"
+
+#. js-lingui-explicit-id
+msgid "enter.againDone"
+msgstr "{next} has its reply, beside {address}"
+
+#. js-lingui-explicit-id
+msgid "enter.againEmpty"
+msgstr "Nothing has been asked in this room yet"
+
+#. js-lingui-explicit-id
+msgid "enter.againFailed"
+msgstr "No new branch could be made from {address}, so nothing was sent"
+
+#. js-lingui-explicit-id
+msgid "enter.againIncluded"
+msgstr "It brings in again what that prompt brought in from {sources}, as data"
+
+#. js-lingui-explicit-id
+msgid "enter.againLocal"
+msgstr "Enter asks “{prompt}” again as {next}, beside {address}: {name} on this computer. Nothing leaves it"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.againNoOne"
+msgstr "{name} cannot answer in {address} now. by: there chooses another"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.againNoRoom"
+msgstr "again: works on the chat in a room, and again:201a on a branch on screen"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.againNotChat"
+msgstr "again:{num} takes a chat or a branch"
+
+#. js-lingui-explicit-id
+msgid "enter.againNothing"
+msgstr "{address} has no prompt to ask again"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.againNotOnScreen"
+msgstr "again:{address} works on a branch on screen. open:{address} shows it"
+
+#. js-lingui-explicit-id
+msgid "enter.againSource"
+msgstr "Enter asks {name} “{prompt}” again as {next}, beside {address}. No key and no cost"
+
+#. js-lingui-explicit-id
+msgid "enter.againTabs"
+msgstr "Its reply joins the tabs under that prompt, and the room stays where it is"
+
+#. js-lingui-explicit-id
+msgid "enter.againUnpriced"
+msgstr "Enter asks “{prompt}” again as {next}, beside {address}: {name}, about {tokens, number} tokens"
 
 #. js-lingui-explicit-id
 msgid "enter.aloneErase"
@@ -1544,6 +1624,73 @@ msgid "enter.helpVerb"
 msgstr "Enter shows how {verb} works"
 
 #. js-lingui-explicit-id
+msgid "enter.includeFailed"
+msgstr "The answer to bring in could not be read or checked, so nothing was sent"
+
+#. js-lingui-explicit-id
+msgid "enter.includeFlagged"
+msgstr "Words in it read like instructions to a model: {phrases}. They go marked, as data"
+
+#. js-lingui-explicit-id
+msgid "enter.includeHow"
+msgstr "It goes to models as material from a source, marked as data and never as instructions, and only with that prompt"
+
+#. js-lingui-explicit-id
+msgid "enter.includeMany"
+msgstr "At most {most} answers go with one prompt"
+
+#. js-lingui-explicit-id
+msgid "enter.includeNoAnswer"
+msgstr "{address} has no answer from a source. {name} answered there"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.includeNoBranches"
+msgstr "include:{address} takes a branch on screen, and there are none"
+
+#. js-lingui-explicit-id
+msgid "enter.includeNoneHeld"
+msgstr "No answer is held for your next prompt"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.includeNoRoom"
+msgstr "include: works on the chat in a room. room: brings one"
+
+#. js-lingui-explicit-id
+msgid "enter.includeNotHere"
+msgstr "No branch {address} on screen. The branches are {nums}"
+
+#. js-lingui-explicit-id
+msgid "enter.includeNothing"
+msgstr "No answer from a source here to bring in"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.includeNothingTry"
+msgstr "No answer from a source in this chat. {example} brings one in from a branch on screen"
+
+#. js-lingui-explicit-id
+msgid "enter.includeOff"
+msgstr "{count, plural, one {Enter drops the answer held for your next prompt} other {Enter drops the # answers held for your next prompt}}"
+
+#. js-lingui-explicit-id
+msgid "enter.includeOne"
+msgstr "Enter brings the answer from {source} to “{question}” into your next prompt here"
+
+#. js-lingui-explicit-id
+msgid "enter.includeOneFrom"
+msgstr "Enter brings the answer from {source} in {address}, to “{question}”, into your next prompt"
+
+#. js-lingui-explicit-id
+msgid "enter.includeSame"
+msgstr "That answer is held for your next prompt already"
+
+#. js-lingui-explicit-id
+msgid "enter.includeSome"
+msgstr "{count, plural, other {Enter brings # answers, from {sources}, into your next prompt}}"
+
+#. js-lingui-explicit-id
 msgid "enter.inNoCollection"
 msgstr "No collection is called {name}"
 
@@ -2067,6 +2214,22 @@ msgstr "{name} is no longer offered. by: chooses who answers here"
 #. js-lingui-explicit-id
 msgid "enter.promptHiddenOut"
 msgstr "{count, plural, one {# hidden message stays out} other {# hidden messages stay out}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptIncluded"
+msgstr "{count, plural, one {It brings in the answer from {sources}, as material from a source} other {It brings in # answers, from {sources}, as material from sources}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptIncludedFlagged"
+msgstr "Words in it read like instructions to a model; they go marked as data"
+
+#. js-lingui-explicit-id
+msgid "enter.promptIncludedKept"
+msgstr "{count, plural, one {A source is sent your words only, so the answer held waits for a prompt to a model} other {A source is sent your words only, so the answers held wait for a prompt to a model}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptIncludedNotSources"
+msgstr "Sources among them are sent your words only"
 
 #. js-lingui-explicit-id
 msgid "enter.promptKey"
@@ -4052,6 +4215,10 @@ msgstr "Open a file made elsewhere. It says what the file is before anything hap
 #. js-lingui-explicit-id
 msgid "verb.in"
 msgstr "Show what is in a collection, or was made in a room"
+
+#. js-lingui-explicit-id
+msgid "verb.include"
+msgstr "Bring an answer from a source into your next prompt, sent as material marked as data"
 
 #. js-lingui-explicit-id
 msgid "verb.inspect"

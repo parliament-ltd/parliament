@@ -76,6 +76,7 @@ function SiblingMessage({ chatId, msg, index, number }) {
       translation={msg.role === 'assistant' ? msg.translation ?? null : null}
       citations={msg.role === 'assistant' ? msg.citations ?? null : null}
       asked={msg.role === 'user' ? msg.asked ?? null : null}
+      included={msg.role === 'user' ? msg.included ?? null : null}
       thinking={msg.role === 'assistant' && msg.thinking ? { text: msg.thinking, ms: msg.thinkingMs ?? null } : null}
     />
   )
@@ -85,6 +86,7 @@ function SiblingMessage({ chatId, msg, index, number }) {
  * @param {{ item: { groupId: string, mode: 'below'|'tabs', tabs: object[] }, line: string,
  *   infoOf: (chatId: string, tab: object) => { letter: string|null, name: string, address: string|null },
  *   renderLine: (msg: object, idx: number) => import('react').ReactNode, numberOf: (chatId: string, msg: object) => number }} props
+ *   renderLine draws a message of the line, or the tabs of a later prompt in it
  */
 export default function BranchSlider({ item, line, infoOf, renderLine, numberOf }) {
   const { i18n } = useLingui()
@@ -104,7 +106,8 @@ export default function BranchSlider({ item, line, infoOf, renderLine, numberOf 
   // Carried on alone, below the tabs: the line. Its tab says so.
   const carriedHere = item.mode === 'below' && lineTab?.continued
   const go = (dir) => { const next = stepFrom(chats, now, dir); if (next) setViewed(item.groupId, next) }
-  const messages = item.mode === 'tabs' ? [...tab.reply, ...tab.after] : tab.reply
+  // In its own tab, the line's thread may hold tabs of a later prompt (C177).
+  const messages = item.mode === 'tabs' ? [...tab.reply, ...(tab.line && tab.nested ? tab.nested : tab.after)] : tab.reply
   const lineInfo = lineTab ? infoOf(lineTab.chatId, lineTab) : null
 
   return (

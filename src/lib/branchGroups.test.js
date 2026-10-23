@@ -48,6 +48,18 @@ describe('what a room draws for a prompt sent to several', () => {
     expect(items).toHaveLength(4)
   })
 
+  it('draws, in the line’s own tab, the tabs of a later prompt asked again there (C177)', () => {
+    const g2 = { id: 'g2', chats: ['a', 'd'] }
+    const more = [...line, m('5', 'user', 'And then?', { group: g2 }), m('6', 'assistant', 'Then A says')]
+    const bMore = [...b, m('5b', 'user', 'And then?'), m('6b', 'assistant', 'Then B says')]
+    const d = [...line, m('5d', 'user', 'And then?', { group: g2 }), m('6d', 'assistant', 'Then D says')]
+    expect(membersOf(more, 'a')).toEqual(['b', 'c', 'd'])
+    const items = lineItems(more, 'a', new Map([['b', bMore], ['c', c], ['d', d]]))
+    const lineTab = items[3].tabs[0]
+    expect(lineTab.nested.map((x) => x.id ?? x.kind)).toEqual(['5', 'slider'])
+    expect(lineTab.nested[1].tabs.map((t) => [t.chatId, t.reply.map((r) => r.id)])).toEqual([['a', ['6']], ['d', ['6d']]])
+  })
+
   it('draws an older group the line is not part of as plain messages', () => {
     const copy = [m('1', 'user', 'Why?', { group: { id: 'g0', chats: ['x', 'y'] } }), m('2', 'assistant', 'X says')]
     expect(lineItems(copy, 'z').map((x) => x.id)).toEqual(['1', '2'])
