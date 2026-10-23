@@ -19,12 +19,12 @@
 
 import { useCallback, useMemo } from 'react'
 import TOC from '../../components/core/TOC'
-import { useChat } from '../../stores/ChatContext'
+import { useRoomChat } from '../../stores/useRoomChat'
 
 const HEADING_RE = /^(#{1,4})\s+(.+?)\s*$/gm
 
 export default function TocRender({ config = {} } = {}) {
-  const { messages } = useChat()
+  const { messages } = useRoomChat()
 
   const mode = config.mode === 'response-headings' ? 'response-headings' : 'user-prompts'
   const truncateAt = typeof config.truncateAt === 'number' ? config.truncateAt : 60

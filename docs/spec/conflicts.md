@@ -197,8 +197,9 @@ Line numbers are approximate.
 - **C175 (a): any number of rooms.** Stefan: "the screen can open more than one room. the user can open any number of rooms." So `open:201b` opens the branch in a room of its own beside what is here, as slider v9 draws it ("its own card"), and the space holds as many rooms as the person opens. Today the space holds one room, and the room's parts read the one open chat; the work is planned as stage 8, piece 7, with the change to the space as kept on this device shown first.
 - **R26 approved** ("ok"): the branch panel and Cmd/Ctrl+Shift+B move to `src/deprecated/` when today's chat page is replaced by the room in the shell (as R22 and R25), nothing deleted. Until then today's chat page keeps them.
 - **The new optional fields are approved** ("ok"): `from` and `group` (C172), `summary` (C175), `included` (C176) on a message, and `again:` changing `group` on stored prompts (C177 (b)).
-- **C176 (a), the command's name:** Stefan asked for more context; given at the checkpoint. Not ruled yet.
-- **C172 to C179, built as suggested:** Stefan asked for them listed; listed at the checkpoint. Not confirmed yet.
+- **C176 (a), the command's name:** Stefan asked for more context; given at the checkpoint. Then: "include: is fine". **`include:` kept.**
+- **C172 to C179, built as suggested:** listed at the checkpoint, each point in a line. Stefan: "5. C172. yes." Read as confirming the list, C172 to C179.
+- "all good for build piece 7": piece 7, any number of rooms, goes ahead, with the change to the space kept on this device as shown.
 
 ## Part 1. Settled by precedence
 
@@ -1502,6 +1503,15 @@ Found while splitting stage 8 into pieces. The documents: the plan's stage 8, br
 - **(b) Translations by a hosted helper** (C166): what goes is swapped for placeholders first and back in the translation, for a question before it goes to a source as well as an answer from one. `translate:` says so on its Enter line.
 - **(c) The hosted check** (C169 (d); security notes §1.5): `check:` with no model on this computer and a hosted helper offers the helper, "Enter has Haiku 5.5 look more closely: one call, about 190 tokens, under $0.01. A check is a warning, never a guarantee", and says a model on this computer would do it free. It runs only on `check:` and Enter.
 - **(d) Covered with stage 8 as well:** a branch's summary (C175 (c)) and an answer brought into a prompt (C176 (d)).
+- **Suggestion:** keep as built.
+
+**C180. Any number of rooms, as built** (piece 7; ruled 23 October, C175 (a)).
+- **(a) Opening:** `open:204`, `open:201b`, `open:201b summary`, `new:branch` and `sym:` open a chat in a room of its own beside the room it came from. A chat open in a room already has the bar pointed at that room ("204 is open in a room already. Enter points the bar at it"); an empty room on screen takes the chat. No limit; the space scrolls sideways when the rooms outgrow the window.
+- **(b) Where a prompt goes:** to the room the bar points at, else the room it pointed at last, else the last room on screen. A click on a room points the bar at it, and the Enter line names it ("→ 225 in Writing studio"). `to:` a branch other than the room's still moves that room to it in place (C174 (b)).
+- **(c) Each room its own chat:** each room holds its chat's messages while it shows it, and its parts (messages, tabs, notes, keywords, favourites, the outline, the token counts, files) read that chat, not one open chat. A reply arriving in one room never redraws another, and leaving a room stops only its chat's reply (C109), unless another room or a slider shows it.
+- **(d) Closing and widths:** `close:204` and `width:204 40%` find the room showing that chat among several, and say so ("Enter closes the room showing 204"). The word `room` in a command names the room a prompt goes to. `focus:` keeps that room alone, and `focus:off` brings the others back.
+- **(e) Kept on this device, as shown at the checkpoint:** the first room is the board `room`, as before; others are `room-2`, `room-3` and so on, each with its chat in the space's context, and `lastRoom` names the room the bar pointed at last. A space kept before reads as it did; an older build reading the new space drops the extra rooms and keeps the first. Not in backups until stage 9 offers layouts.
+- **(f) Not yet per room:** a Secretarybird document room (DocumentContext) and Collaboration mode (R22) still follow the room a prompt goes to.
 - **Suggestion:** keep as built.
 
 ## Proposed CLAUDE.md rewrite

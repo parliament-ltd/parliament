@@ -13,6 +13,7 @@
 
 import { targetsOf } from './rowVerbs'
 import { summaryCost } from '../shell/estimate'
+import { isRoom } from '../shell/boards'
 
 export const NOTE_MAX = 20_000
 // What a summary or a prompt can take in one go, in cards.
@@ -132,7 +133,7 @@ export function planJump(step, screens = {}, addressed = null) {
     }
     return { says: { message: 'jumpCard', values: { num: row.num } }, act: { kind: 'find', num: row.num, to: 'card' } }
   }
-  if (addressed === 'room') {
+  if (isRoom(addressed)) {
     if (!WORDED.has(row.kind)) return { says: { message: 'jumpOpen', values: { num: row.num } }, act: null }
     if (!row.chatId) return { says: { message: 'jumpNoChat', values: { num: row.num } }, act: null }
     return { says: { message: 'jumpPassage', values: { num: row.num } }, act: { kind: 'find', num: row.num, to: 'chat' } }

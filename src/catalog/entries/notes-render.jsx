@@ -14,11 +14,11 @@ import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Trash2, StickyNote } from 'lucide-react'
 import { useAnnotations } from '../../stores/AnnotationsContext'
-import { useChat } from '../../stores/ChatContext'
+import { useRoomChat } from '../../stores/useRoomChat'
 
 export default function NotesRender({ config = {} } = {}) {
   const { notes, deleteNote, toggleNotePanel } = useAnnotations()
-  const { messages } = useChat()
+  const { messages } = useRoomChat()
 
   // Build the display list. Each note is keyed by its message id; we
   // hydrate with the message's content snippet for context.

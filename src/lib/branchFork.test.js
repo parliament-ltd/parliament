@@ -26,10 +26,10 @@ describe('new:branch (C178)', () => {
   const screens = (over = {}) => ({ again: { room: 'a', rows, factsOf, ...over } })
 
   it('forks the room’s chat from its end, or after a step, as the next letter', () => {
-    expect(run('>new:branch', screens())).toMatchObject({ text: ['Enter starts 201d from 201a, a copy of its whole history, in the room. No call'], act: { kind: 'fork', chatId: 'a', step: null, next: '201d', plan: 201 } })
-    expect(run('>new:branch 201a 2', screens())).toMatchObject({ text: ['Enter starts 201d from 201a after step 2, a copy up to there, in the room. No call'], act: { step: 2 } })
-    expect(run('>new:branch 201a 3', screens()).text[0]).toBe('Enter starts 201d from 201a, a copy of its whole history, in the room. No call')
-    expect(run('>new:branch 201a 0', screens()).text[0]).toBe('Enter starts 201d, an empty branch beside 201a, in the room. No call')
+    expect(run('>new:branch', screens())).toMatchObject({ text: ['Enter starts 201d from 201a, a copy of its whole history, in a room of its own. No call'], act: { kind: 'fork', chatId: 'a', step: null, next: '201d', plan: 201 } })
+    expect(run('>new:branch 201a 2', screens())).toMatchObject({ text: ['Enter starts 201d from 201a after step 2, a copy up to there, in a room of its own. No call'], act: { step: 2 } })
+    expect(run('>new:branch 201a 3', screens()).text[0]).toBe('Enter starts 201d from 201a, a copy of its whole history, in a room of its own. No call')
+    expect(run('>new:branch 201a 0', screens()).text[0]).toBe('Enter starts 201d, an empty branch beside 201a, in a room of its own. No call')
   })
 
   it('says how many steps there are, and forks a chat not on screen from its end', () => {

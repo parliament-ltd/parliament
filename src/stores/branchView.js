@@ -52,11 +52,23 @@ export function onScreen(groupId, chats, meta = {}) {
 export const lastShown = () => shown[shown.length - 1] ?? null
 
 /**
- * Steps the latest slider on screen one tab along. Returns whether there is
- * a slider to step (so the keys are taken), whether or not it moved.
+ * With several rooms open (C175 (a)): the latest slider drawn in the room
+ * showing `line`, the chat a prompt goes to; with `line` undefined, the
+ * latest anywhere.
  */
-export function step(dir) {
-  const s = lastShown()
+export function shownIn(line) {
+  if (line === undefined) return lastShown()
+  for (let i = shown.length - 1; i >= 0; i -= 1) if (shown[i].line === line) return shown[i]
+  return null
+}
+
+/**
+ * Steps the latest slider in the room showing `line` (or anywhere) one tab
+ * along. Returns whether there is a slider to step (so the keys are taken),
+ * whether or not it moved.
+ */
+export function step(dir, line = undefined) {
+  const s = shownIn(line)
   if (!s) return false
   const now = viewedIn(s.groupId) ?? s.chats[0]
   const next = stepFrom(s.chats, now, dir)

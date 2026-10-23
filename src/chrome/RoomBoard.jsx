@@ -11,6 +11,7 @@ import { roomLabel } from './say'
 import { useChat } from '../stores/ChatContext'
 import { useConversations } from '../stores/ConversationContext'
 import { ConversationScope } from '../stores/ConversationScope'
+import { AnnotationsProvider } from '../stores/AnnotationsContext'
 import { RoomHost } from '../lib/useViewportWidth'
 import { useNarrower } from './useNarrower'
 
@@ -41,13 +42,14 @@ const COMPOSER = 'input'
 const blockName = (ref) => String(ref ?? '').split('@')[0]
 const withoutComposer = (mode) => ({ ...mode, components: (mode.components ?? []).filter((c) => blockName(c?.ref) !== COMPOSER) })
 
-function Card({ addressed, onAddress, title, aside, room, children }) {
+function Card({ board, addressed, onAddress, title, aside, room, children }) {
   const { i18n } = useLingui()
   return (
     <article
       className={`ch-card room${addressed ? ' addressed' : ''}`}
       aria-current={addressed ? 'true' : undefined}
-      onMouseDown={() => onAddress('room')}
+      data-board={board}
+      onMouseDown={() => onAddress(board)}
     >
       <header className="ch-chead">
         <h2 dir="auto">{title}</h2>
@@ -64,15 +66,16 @@ function Card({ addressed, onAddress, title, aside, room, children }) {
 /**
  * @param {{ chatId: string|null, addressed: boolean, onAddress: (board: string) => void,
  *   onReady?: (chatId: string) => void, onLeave?: (chatId: string) => void,
- *   onName?: (chatId: string, name: object|null) => void, rev?: number }} props
+ *   onName?: (chatId: string, name: object|null) => void, rev?: number, board?: string }} props
+ *   board: which room board this is ('room', 'room-2' …), with several open (C175 (a));
  *   onReady: told once the chat's messages are loaded, so a prompt can go;
  *   onLeave: told when the board stops showing the chat; onName: told what
  *   the room is called (roomNames.js); rev: changes when the room was
  *   named, so it is read again
  */
-export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLeave, onName, rev = 0 }) {
+export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLeave, onName, rev = 0, board = 'room' }) {
   const { i18n } = useLingui()
-  const { loadMessages, clearMessages, watchConversation, activeConversationId } = useChat()
+  const { holdChat, watchConversation } = useChat()
   const { conversations } = useConversations()
   const [found, setFound] = useState({ forId: null, chat: null, mode: null, error: null })
   const [loadedFor, setLoadedFor] = useState(null)
@@ -103,22 +106,24 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
     return () => { cancelled = true }
   }, [chatId, rev])
 
-  // The chat's messages while the board is open.
+  // The chat's messages while the board is open, held by this room: with
+  // several rooms open, each holds its own (C175 (a)).
   useEffect(() => {
     if (!chatId) return undefined
     let cancelled = false
     // Shown here: left only when nothing else on screen shows it (C173).
     const unwatch = watchConversation(chatId)
-    loadMessages(chatId).finally(() => { if (!cancelled) setLoadedFor(chatId) })
+    const hold = holdChat(chatId)
+    hold.ready.finally(() => { if (!cancelled) setLoadedFor(chatId) })
     return () => {
       cancelled = true
       onLeave?.(chatId)
       unwatch()
-      clearMessages()
+      hold.release()
     }
-  }, [chatId, loadMessages, clearMessages, watchConversation, onLeave])
+  }, [chatId, holdChat, watchConversation, onLeave])
 
-  const ready = Boolean(chatId) && loadedFor === chatId && activeConversationId === chatId
+  const ready = Boolean(chatId) && loadedFor === chatId
   useEffect(() => { if (ready) onReady?.(chatId) }, [ready, chatId, onReady])
 
   // The title as it stands, renamed or not.
@@ -132,7 +137,7 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
 
   if (!chatId) {
     return (
-      <Card addressed={addressed} onAddress={onAddress} title={i18n._(COPY.room.newTitle)}>
+      <Card board={board} addressed={addressed} onAddress={onAddress} title={i18n._(COPY.room.newTitle)}>
         <div className="ch-cbody"><p className="ch-marg">{i18n._(COPY.room.empty)}</p></div>
       </Card>
     )
@@ -140,7 +145,7 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
 
   const title = chat?.num != null ? String(chat.num) : i18n._(COPY.boards.room)
   const room = found.forId === chatId && found.mode ? roomLabel(i18n, named) : null
-  const card = (body) => <Card addressed={addressed} onAddress={onAddress} title={title} aside={chat?.title || null} room={room}>{body}</Card>
+  const card = (body) => <Card board={board} addressed={addressed} onAddress={onAddress} title={title} aside={chat?.title || null} room={room}>{body}</Card>
 
   if (found.forId !== chatId) return card(null)
   if (found.error) {
@@ -152,7 +157,10 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
       {ready && (
         <RoomHost.Provider value={host}>
           <ConversationScope.Provider value={chatId}>
-            <RoomShell mode={found.mode} />
+            {/* Its notes, keywords and favourites: this room's chat's (C175 (a)). */}
+            <AnnotationsProvider conversationId={chatId}>
+              <RoomShell mode={found.mode} />
+            </AnnotationsProvider>
           </ConversationScope.Provider>
         </RoomHost.Provider>
       )}

@@ -26,7 +26,7 @@ import { SPRING_SMOOTH } from '../../lib/constants'
 import { RippleCard, SidebarSectionLabel } from './sbrd/cards'
 import RippleScopeModal from './sbrd/RippleScopeModal'
 import { useDocument } from '../../stores/DocumentContext'
-import { useChat } from '../../stores/ChatContext'
+import { useRoomChat } from '../../stores/useRoomChat'
 
 const SUGGESTION = '#22C55E'
 
@@ -46,7 +46,7 @@ export default function RippleAnalysis() {
     setHoveredRipple,
     conversationTitle,
   } = useDocument()
-  const { activeConversationId } = useChat()
+  const { activeConversationId } = useRoomChat()
   const [showScopeModal, setShowScopeModal] = useState(false)
 
   const { pendingRipples } = counts

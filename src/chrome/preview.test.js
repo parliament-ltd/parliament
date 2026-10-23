@@ -88,7 +88,10 @@ describe('one space: records: and room: bring boards beside what is here (C125, 
     expect(p.next.columns).toEqual([['almanac'], ['collection'], ['room']])
     expect(p.next.context.room).toBe('c1')
     expect(at('>room:', p.next, screens).text).toBe('The last room is here already')
-    expect(at('>room:', p.next, { lastRoom: { id: 'c2' } }).text).toBe('Enter shows the last room here')
+    // Another chat opens in a room of its own beside (C175 (a), ruled 23 October).
+    const q = at('>room:', p.next, { lastRoom: { id: 'c2' } })
+    expect(q.text).toBe('Enter brings the last room beside what is here')
+    expect(q.next.columns).toEqual([['almanac'], ['collection'], ['room'], ['room-2']])
   })
 
   it('room: with no chat yet opens an empty room beside', () => {
@@ -234,8 +237,16 @@ describe('open: and inspect: by number (stage 5, piece 3)', () => {
     expect(p.text).toBe('Enter opens 204 in a room beside what is here')
     expect(p.next.columns).toEqual([['almanac'], ['collection'], ['room']])
     expect(p.next.context.room).toBe('c204')
-    expect(at('>open:202', p.next).text).toBe('Enter shows 202 in the room here')
     expect(at('>open:204', p.next).text).toBe('204 is in the room here already')
+    // Any number of rooms (C175 (a)): another chat opens beside, and one
+    // open already has the bar pointed at it.
+    const q = at('>open:202', p.next)
+    expect(q.text).toBe('Enter opens 202 in a room beside what is here')
+    expect(q.next.columns).toEqual([['almanac'], ['collection'], ['room'], ['room-2']])
+    expect(q.next.context['room-2']).toBe('c202')
+    const r = at('>open:204', q.next)
+    expect(r.text).toBe('204 is open in a room already. Enter points the bar at it')
+    expect(r.next.addressed).toBe('room')
   })
 
   it('opens a docket\'s first branch, and says opening a marking comes later', () => {
@@ -791,13 +802,13 @@ describe('close: and width: by a room\'s number, and close:welcome (stage 6, pie
   }
 
   it('closes or widens the room showing that chat, and nothing else', () => {
-    expect(at('>close:204').text).toBe('Enter closes this room. Nothing is lost')
+    expect(at('>close:204').text).toBe('Enter closes the room showing 204. Nothing is lost')
     expect(at('>close:204').next.columns.flat()).not.toContain('room')
-    expect(at('>close:203').text).toBe('Enter closes this room. Nothing is lost')
+    expect(at('>close:203').text).toBe('Enter closes the room showing 203. Nothing is lost')
     expect(at('>close:206').text).toBe('No room here shows 206. open:206 shows it')
     expect(at('>close:210').text).toBe('210 is not a chat, so no room shows it')
     expect(at('>close:299').text).toBe('Nothing here has the number 299')
-    expect(at('>width:204 60%').text).toBe('Enter gives this room 60% of the width')
+    expect(at('>width:204 60%').text).toBe('Enter gives the room showing 204 60% of the width')
   })
 
   it('closes the welcome card from wherever the bar points', () => {

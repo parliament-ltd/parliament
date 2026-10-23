@@ -17,7 +17,7 @@
 import { useMemo } from 'react'
 import HighlightList from '../../components/core/HighlightList'
 import { useAnnotations } from '../../stores/AnnotationsContext'
-import { useChat } from '../../stores/ChatContext'
+import { useRoomChat } from '../../stores/useRoomChat'
 import { countWordOccurrences } from '../../lib/textUtils'
 
 export default function HighlightsRender({ config = {} } = {}) {
@@ -27,7 +27,7 @@ export default function HighlightsRender({ config = {} } = {}) {
     deleteHighlights,
     navigateHighlight,
   } = useAnnotations()
-  const { messages } = useChat()
+  const { messages } = useRoomChat()
 
   // Aggregate raw records into the per-term shape HighlightList expects.
   // Group by lowercase text so "Foo" and "foo" collapse to one row,

@@ -10,12 +10,12 @@
 // table-canvas.
 
 import { useFileShelf } from '../../stores/FileShelfContext'
-import { useChat } from '../../stores/ChatContext'
+import { useRoomChat } from '../../stores/useRoomChat'
 import SummaryDashboard from '../../components/core/SummaryDashboard'
 
 function SummaryDashboardRender({ config = {} }) {
   const { activeFileId } = useFileShelf()
-  const { activeConversationId } = useChat()
+  const { activeConversationId } = useRoomChat()
   void config
   return (
     <div className="px-5 py-4 border-t border-[var(--p-border)]">

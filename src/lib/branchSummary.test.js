@@ -106,9 +106,12 @@ describe('open: on a branch, from the bar', () => {
   it('shows the branch with its history, keeping its letter', () => {
     expect(line('>open:203b').text[0]).toBe('Enter opens 203b in a room beside what is here, with its whole history. No call, and it keeps its letter')
     const withRoom = planRoom(shipped('almanac'), 'c1').next
-    const here = line('>open:203b', withRoom)
-    expect(here.text[0]).toBe('Enter shows 203b in the room here, with its whole history. No call, and it keeps its letter')
-    expect(here.next.context.room).toBe('c2')
+    // In a room of its own beside the one here (C175 (a), ruled 23 October).
+    const beside = line('>open:203b', withRoom)
+    expect(beside.text[0]).toBe('Enter opens 203b in a room beside what is here, with its whole history. No call, and it keeps its letter')
+    expect(beside.next.context['room-2']).toBe('c2')
+    const empty = planRoom(shipped('almanac'), null).next
+    expect(line('>open:203b', empty).text[0]).toBe('Enter shows 203b in the room here, with its whole history. No call, and it keeps its letter')
     expect(line('>open:203a', withRoom).text[0]).toBe('203a is in the room here already')
     expect(line('>open:203c').text[0]).toBe('Nothing here has the number 203c')
   })

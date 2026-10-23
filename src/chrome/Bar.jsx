@@ -249,7 +249,8 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       if (e.altKey || empty) {
         const rtl = (e.currentTarget?.closest?.('[dir]')?.getAttribute('dir') ?? document.documentElement.dir) === 'rtl'
         const dir = (e.key === 'ArrowRight' ? 1 : -1) * (rtl ? -1 : 1)
-        if (stepBranch(dir)) { e.preventDefault(); return }
+        // The tabs in the room a prompt goes to (C175 (a)).
+        if (stepBranch(dir, prompt?.room ?? null)) { e.preventDefault(); return }
       }
     }
     if (field.mode !== 'command') return

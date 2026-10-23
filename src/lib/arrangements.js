@@ -15,7 +15,7 @@
 // places and fields are dropped, and a record that cannot be made sense of
 // gives way to the shipped default.
 
-import { boardEntry } from '../shell/boards'
+import { boardEntry, isRoom } from '../shell/boards'
 import { shipped, shippedFor, SHIPPED, SPACE, RECORDS_COLUMNS } from '../shell/arrangement'
 
 const STORE = 'arrangements'
@@ -67,6 +67,8 @@ export function cleanArrangement(record) {
   // columns only, once each, in their order, the title and number among them.
   const cols = Array.isArray(record.recordsCols) ? RECORDS_COLUMNS.filter((c) => record.recordsCols.includes(c)) : null
   const recordsCols = cols && cols.includes('id') && cols.includes('title') && cols.length < RECORDS_COLUMNS.length ? cols : null
+  // The room the bar pointed at last, when it is here (C175 (a)).
+  const lastRoom = isRoom(record.lastRoom) && here.includes(record.lastRoom) ? record.lastRoom : null
   return {
     id: record.id,
     columns,
@@ -78,6 +80,7 @@ export function cleanArrangement(record) {
     widths,
     ...(before ? { focus: { columns: before.columns, popped: before.popped, addressed: before.addressed, bar: before.bar } } : {}),
     ...(recordsCols ? { recordsCols } : {}),
+    ...(lastRoom ? { lastRoom } : {}),
   }
 }
 

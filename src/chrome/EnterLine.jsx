@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { say, boardName } from './say'
+import { isRoom } from '../shell/boards'
 
 // The Enter line: one reserved row under the field that changes wording and
 // never pushes anything down. It reads → target · what Enter will do · how
@@ -28,7 +29,7 @@ function Parts({ parts }) {
 export default function EnterLine({ mode, resting, empty, says, addressed, room, welcome = null, hidden = false, search = null }) {
   const { i18n } = useLingui()
   const leave = { key: 'leave', text: i18n._(resting === 'prompt' ? COPY.enter.leavePrompt : COPY.enter.leaveSearch) }
-  const toRoom = room && (mode === 'prompt' || addressed === 'room')
+  const toRoom = room && (mode === 'prompt' || isRoom(addressed))
   let targetText
   if (!toRoom) targetText = i18n._(COPY.enter.target, { board: boardName(i18n, addressed) })
   // A prompt about selected cards starts a chat of its own (C145 (h)).

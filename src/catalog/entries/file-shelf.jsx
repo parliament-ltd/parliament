@@ -24,11 +24,11 @@
 
 import { useEffect, useRef } from 'react'
 import FileShelf from '../../components/core/FileShelf'
-import { useChat } from '../../stores/ChatContext'
+import { useRoomChat } from '../../stores/useRoomChat'
 import { useFileShelf } from '../../stores/FileShelfContext'
 
 function FileShelfRender({ hostAPI }) {
-  const { activeConversationId } = useChat()
+  const { activeConversationId } = useRoomChat()
   const { contextFiles } = useFileShelf()
 
   // Publish file-context-changed whenever the context-files set

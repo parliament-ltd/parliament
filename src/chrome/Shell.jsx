@@ -9,7 +9,7 @@ import { loadSpace, saveArrangement } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
-import { shipped, address, planOpen, planPopBack, planPopBar, planRoom, roomOnScreen, SPACE, columnShares, withShares, withUsualShares, recordsColumns } from '../shell/arrangement'
+import { shipped, address, planOpen, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, columnShares, withShares, withUsualShares, recordsColumns } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
@@ -20,7 +20,7 @@ import { piecesOfAnswer, translationOf, lastSourceAnswer, BY_BROWSER } from '../
 import { findPrivate } from '../lib/privacyFilter'
 import { searchWords } from '../lib/searchWords'
 import { replyTargets } from '../lib/branchGroups'
-import { subscribe as subscribeBranches, lastShown, viewedIn, setViewed } from '../stores/branchView'
+import { subscribe as subscribeBranches, shownIn, viewedIn, setViewed } from '../stores/branchView'
 import { instructionLike } from '../lib/injection'
 import AnswerPicker from './AnswerPicker'
 import { ignite } from './ignition'
@@ -30,7 +30,7 @@ import { useConversations } from '../stores/ConversationContext'
 import { useSettings } from '../stores/SettingsContext'
 import { frameworkList, frameworksOf, instructionsOf, recordOf } from '../lib/frameworks'
 import { readOwnFrameworks, keepOwnFramework, removeOwnFramework, restoreOwnFramework } from '../lib/frameworkStore'
-import { useIsStreaming, useHiddenIds, usePendingDeletes, useStreamEnd } from '../stores/chatHooks'
+import { useIsStreaming, useHiddenIds, usePendingDeletes, useStreamEnd, useMessages } from '../stores/chatHooks'
 import { sendableOf, hiddenIds, pendingDeletes, isStreaming as replyArriving } from '../stores/chatStore'
 import { fromSource } from '../stores/sendHistory'
 import { preview, viewFromSaved, lineOf, LOCAL_READS } from './preview'
@@ -219,8 +219,10 @@ export default function Shell() {
   const handles = useRef({})
   const db = useRef(null)
 
-  const commit = useCallback((next) => {
-    if (!next || next === current.current) return
+  const commit = useCallback((raw) => {
+    if (!raw || raw === current.current) return
+    // The room the bar pointed at last, kept (C175 (a)).
+    const next = settle(raw)
     current.current = next
     setArrangement(next)
     if (db.current) saveArrangement(db.current, next).catch(() => {})
@@ -398,7 +400,8 @@ export default function Shell() {
 
   // ── The room in the space (stage 4; C125) ─────────────
   // The chat it shows, and a prompt waiting for a new room to load.
-  const readyRoom = useRef(null) // the chat whose room has loaded its messages
+  const readyRooms = useRef(new Set()) // the chats whose rooms have loaded their messages (C175 (a): several)
+  const isReady = (id) => readyRooms.current.has(id)
   const waiting = useRef(null) // a prompt waiting for its new room to load
 
   // name: (C40): the room's own name, kept on the room record. The room
@@ -809,8 +812,8 @@ export default function Shell() {
     // The one gold moment, once per new key (C50).
     if (fresh) ignite(document)
   }, [readKeys])
-  const [roomNameOf, setRoomNameOf] = useState(null) // { chatId, value }: what the room on screen is called
-  const onRoomName = useCallback((chatId, value) => setRoomNameOf({ chatId, value }), [])
+  const [roomNameOf, setRoomNameOf] = useState({}) // chat id -> what its room is called, for each room on screen (C175 (a))
+  const onRoomName = useCallback((chatId, value) => setRoomNameOf((was) => (was[chatId] === value ? was : { ...was, [chatId]: value })), [])
   const remember = useCallback((body) => {
     if (db.current && body) keepCommand(db.current, body).then((kept) => (kept ? readCommands(db.current).then(setLines) : null)).catch(() => {})
   }, [])
@@ -1404,14 +1407,14 @@ export default function Shell() {
   }, [act, run, undo])
 
   const onRoomReady = useCallback((chatId) => {
-    readyRoom.current = chatId
+    readyRooms.current.add(chatId)
     const w = waiting.current
     if (w && w.chatId === chatId) { waiting.current = null; w.go() }
   }, [])
-  const onRoomLeave = useCallback((chatId) => { if (readyRoom.current === chatId) readyRoom.current = null }, [])
+  const onRoomLeave = useCallback((chatId) => { readyRooms.current.delete(chatId) }, [])
 
   // ── Prompts from the bar (stage 4) ────────────────────
-  const { messages, activeConversationId, sendMessage, resendWhole, askSource, keepTranslation, summarizeChat, regroupPrompt, veilFor } = useChat()
+  const { sendMessage, resendWhole, askSource, keepTranslation, summarizeChat, regroupPrompt, veilFor, focusChat } = useChat()
   useEffect(() => { veilForNow.current = veilFor }, [veilFor])
   // A source answers a search (C168), with its edition (C166 (e)).
   const askSourceAs = useCallback((to, text, w, extra = {}) => {
@@ -1466,7 +1469,7 @@ export default function Shell() {
     for (const c of conversations) if (!latestChat || Date.parse(c.updatedAt) > Date.parse(latestChat.updatedAt)) latestChat = c
     return latestChat ? { id: latestChat.id, num: latestChat.num ?? null } : null
   }, [conversations])
-  const roomNameHere = roomId && roomNameOf?.chatId === roomId ? roomNameOf.value : null
+  const roomNameHere = roomId ? roomNameOf[roomId] ?? null : null
   // The space as drawn, read when the Enter line needs it (width:, C126).
   const measureSpace = useCallback(() => {
     const stage = stageRef.current
@@ -1489,7 +1492,9 @@ export default function Shell() {
   // The model cost marks compare with, named once in the picker (settings spec §8).
   const referenceName = useMemo(() => allModels().find((m) => m.reference)?.name ?? null, [])
   // The slider of branches on screen, and the tab viewed (C173, C174).
-  const branchShown = useSyncExternalStore(subscribeBranches, lastShown, lastShown)
+  // The tabs in the room a prompt goes to (C175 (a)).
+  const shownHere = useCallback(() => shownIn(roomId ?? null), [roomId])
+  const branchShown = useSyncExternalStore(subscribeBranches, shownHere, shownHere)
   const viewedNow = useCallback(() => (branchShown ? viewedIn(branchShown.groupId) : null), [branchShown])
   const branchViewed = useSyncExternalStore(subscribeBranches, viewedNow, viewedNow)
   const targets = useMemo(() => replyTargets({ shown: branchShown, viewed: branchViewed, held: heldTo }), [branchShown, branchViewed, heldTo])
@@ -1526,7 +1531,11 @@ export default function Shell() {
   const helperNow = useMemo(() => helperOf({ chosen: settings.helper ?? null, keyed: keys }), [settings.helper, keys, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- a check changes the models
   const translateTo = translateInto(reply, i18n.locale)
   // The chat on screen's messages, and its last answer from a source.
-  const shown = roomId && activeConversationId === roomId ? messages : NONE
+  // The room a prompt goes to: its chat's messages, held by its room (C175 (a)).
+  const roomMessages = useMessages(roomId ?? null)
+  // The open chat is the room a prompt goes to; the rooms hold their own.
+  useEffect(() => { focusChat(roomId ?? null) }, [roomId, focusChat])
+  const shown = roomId ? roomMessages : NONE
   const lastAnswer = useMemo(() => {
     const l = lastSourceAnswer(shown)
     const parts = l ? piecesOfAnswer(l.message) : null
@@ -1654,7 +1663,7 @@ export default function Shell() {
   const byModel = answerer.group !== 'source' && !answerer.needsKey && !answerer.gone && !answerer.later && !answerer.unchecked
   const describeModel = useMemo(() => modelFacts(metadataModel(answerer.provider ?? PROVIDER)), [answerer.provider, region]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices
   // With no room in the space, or an empty one, the prompt starts a chat.
-  const firstPrompt = roomId == null || (Boolean(roomId) && activeConversationId === roomId && messages.length === 0)
+  const firstPrompt = roomId == null || (Boolean(roomId) && isReady(roomId) && roomMessages.length === 0)
   const describes = Boolean(byModel && firstPrompt && settings.describeNewChats !== false)
   const describe = useMemo(() => (describes ? { price: describeModel?.cost ?? null } : null), [describes, describeModel])
   // With cards selected on the Collection, a prompt starts a new chat about
@@ -1747,7 +1756,7 @@ export default function Shell() {
     const roomChat = aboutNow ? null : roomOnScreen(current.current) ?? null
     // Among a prompt's branches (C174): where the line said it goes, read
     // again; if that has changed since, say so first.
-    const shownNow = lastShown()
+    const shownNow = shownIn(roomChat ?? null)
     const targetsNow = replyTargets({ shown: shownNow, viewed: shownNow ? viewedIn(shownNow.groupId) : null, held: heldToNow.current })
     // A new prompt to several (by: with several) is not among branches.
     const branchCase = !aboutNow && Boolean(text) && !(shown?.many?.length > 1 && !shown?.toMany)
@@ -1809,7 +1818,7 @@ export default function Shell() {
         return sendMessage(c.id, text, w.id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), [], null, { frameworks: recordOf(fw, fwListNow.current), ...withInc(w) })
       }
       spentInc(whos)
-      const all = convs.map((c, i) => (c.id === roomChat && readyRoom.current !== roomChat
+      const all = convs.map((c, i) => (c.id === roomChat && !isReady(roomChat)
         ? new Promise((resolve, reject) => { waiting.current = { chatId: c.id, go: () => sendOne(c, whos[i]).then(resolve, reject), drop: () => resolve() } })
         : sendOne(c, whos[i])))
       const done = Promise.allSettled(all).then((results) => {
@@ -1866,7 +1875,7 @@ export default function Shell() {
         ? sendMessage(to, text, w.id, system(), [], null, { ...under, group, describe: i === 0, ...withInc(w) })
         : askOne(to, w, { group }))
       spentInc(whos)
-      const first = readyRoom.current === id
+      const first = isReady(id)
         ? sendOne(id, whos[0], 0)
         : new Promise((resolve, reject) => { waiting.current = { chatId: id, go: () => sendOne(id, whos[0], 0).then(resolve, reject), drop: () => resolve() } })
       const all = [first, ...whos.slice(1).map((w, i) => sendOne(others[i], w, i + 1))]
@@ -1918,7 +1927,7 @@ export default function Shell() {
 
     let id = chatId
     if (moveTo) {
-      const placed = planRoom(current.current, moveTo)
+      const placed = planShowInRoom(current.current, moveTo)
       if (placed.next) await run(placed.next, null)
     }
     if (!id) {
@@ -1961,7 +1970,7 @@ export default function Shell() {
     spentInc([who])
     // A new room sends once its messages are loaded, so nothing is lost
     // between the two.
-    const sending = readyRoom.current === id
+    const sending = isReady(id)
       ? send()
       : new Promise((resolve, reject) => { waiting.current = { chatId: id, go: () => send().then(resolve, reject), drop: () => resolve() } })
     const done = sending
@@ -2066,13 +2075,13 @@ export default function Shell() {
     setInspected(null)
     setCompared(null)
     setKeyPanel(null)
-    if (lastShown()) { setPicking(false); setReplyPicking((was) => !was); return }
+    if (shownIn(roomOnScreen(current.current) ?? null)) { setPicking(false); setReplyPicking((was) => !was); return }
     setReplyPicking(false)
     setPicking((was) => !was)
   }, [])
   // A row of that picker ticks or unticks a branch, as to: does (C174).
   const toggleReplyTarget = useCallback(async (chatId) => {
-    const s = lastShown()
+    const s = shownIn(roomOnScreen(current.current) ?? null)
     if (!s) return
     const now = replyTargets({ shown: s, viewed: viewedIn(s.groupId), held: heldToNow.current })?.chats ?? []
     const next = now.includes(chatId) ? now.filter((x) => x !== chatId) : [...now, chatId]
@@ -2090,11 +2099,16 @@ export default function Shell() {
 
   function pickBoard(board) {
     const a = current.current
-    // Sym: on the strip brings a room as sym: does, when there is none here.
-    if (board === 'room' && roomOnScreen(a) === undefined) {
-      const { next } = preview('>room:', { mode: 'command', arrangement: a, screens })
-      if (next) run(next, null)
-      return
+    // Sym: on the strip brings a room as sym: does, when there is none
+    // here; with rooms here, it points the bar at the room a prompt goes to.
+    if (board === 'room') {
+      const here = currentRoom(a)
+      if (!here) {
+        const { next } = preview('>room:', { mode: 'command', arrangement: a, screens })
+        if (next) run(next, null)
+        return
+      }
+      board = here
     }
     if (handles.current[board]) { handles.current[board].win.focus(); commit(address(a, board)); return }
     commit(a.columns.flat().includes(board) ? address(a, board) : planOpen(a, board).next)
@@ -2107,7 +2121,7 @@ export default function Shell() {
   const shares = useMemo(() => columnShares(arrangement), [arrangement])
   const shareTotal = shares.reduce((sum, x) => sum + x, 0) || 1
   // What stands beside an edge, named in a sentence.
-  const edgeName = (board) => (board === 'room' ? i18n._(COPY.shell.edgeRoom) : board === 'welcome' ? i18n._(COPY.shell.edgeWelcome) : boardName(i18n, board))
+  const edgeName = (board) => (isRoom(board) ? i18n._(COPY.shell.edgeRoom) : board === 'welcome' ? i18n._(COPY.shell.edgeWelcome) : boardName(i18n, board))
   const stripArrangement = useMemo(
     () => ({ ...arrangement, context: { ...arrangement.context, room: roomRecord?.num ?? undefined } }),
     [arrangement, roomRecord],
@@ -2118,8 +2132,10 @@ export default function Shell() {
   const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, searches, searchCounts }
   const filtered = isAtRest(recordsView) ? null : { search: recordsView.search.trim(), line: viewLine(recordsView) }
   const drawBoard = (board) => {
-    if (board === 'room' && roomId !== undefined) {
-      return <RoomBoard key={`room:${roomId ?? 'new'}`} chatId={roomId} rev={roomRev} addressed={arrangement.addressed === 'room'} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} />
+    // Each room with its own chat (C175 (a)).
+    if (isRoom(board)) {
+      const chat = chatIn(arrangement, board)
+      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} />
     }
     if (board === 'almanac') {
       return (

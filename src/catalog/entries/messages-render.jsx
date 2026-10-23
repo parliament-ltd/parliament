@@ -42,7 +42,7 @@ import { promptFacts } from '../../lib/branchVerbs'
 import { LOCAL_READS } from '../../shell/estimate'
 import { subscribe as onChatStore } from '../../stores/chatStore'
 import SelectConversationModal from '../../components/SelectConversationModal'
-import { useChat } from '../../stores/ChatContext'
+import { useRoomChat } from '../../stores/useRoomChat'
 import { useConversationId } from '../../stores/ConversationScope'
 import { useStreamText, useStreamMessageId, useHiddenIds, usePendingDeletes, useStreamThinking, useStreamAnswering } from '../../stores/chatHooks'
 import { getStream } from '../../stores/chatStore'
@@ -111,7 +111,7 @@ const STOPPED = { left: COPY.chat.stoppedOnReply, limit: COPY.chat.cutLimit, err
 export default function MessagesRender() {
   // The conversation this board shows, told by the board (stage 3).
   const conversationId = useConversationId()
-  const { messages, isStreaming, continueMessage, activeConversationId, watchConversation } = useChat()
+  const { messages, isStreaming, continueMessage, activeConversationId, watchConversation } = useRoomChat()
   // The reply being written, read from the chat store, so only this list
   // redraws while it streams; the rest of the page does not (stage 3).
   const streamingContent = useStreamText(activeConversationId)

@@ -145,8 +145,9 @@ describe('one space (C125)', () => {
     expect(a.columns).toEqual([['almanac'], ['collection'], ['room']])
     expect(roomOnScreen(a)).toBe('c1')
     expect(planRoom(a, 'c1')).toMatchObject({ next: null, says: { message: 'roomHere' } })
+    // Another chat: a room of its own beside (C175 (a), ruled 23 October).
     const b = keep(planRoom(a, 'c2'))
-    expect(b.columns).toEqual(a.columns)
+    expect(b.columns).toEqual([['almanac'], ['collection'], ['room'], ['room-2']])
     expect(roomOnScreen(b)).toBe('c2')
     const w = keep(planBring({ ...shipped('welcome'), id: SPACE }, 'almanac'))
     expect(keep(planRoom(w, 'c1')).columns).toEqual([['welcome'], ['room'], ['almanac', 'collection']])

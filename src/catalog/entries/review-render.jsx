@@ -21,7 +21,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { BookOpen } from 'lucide-react'
 import ReviewModal from '../../components/ReviewModal'
-import { useChat } from '../../stores/ChatContext'
+import { useRoomChat } from '../../stores/useRoomChat'
 import { useAnnotations } from '../../stores/AnnotationsContext'
 import { useConversations } from '../../stores/ConversationContext'
 import { useSettings } from '../../stores/SettingsContext'
@@ -30,7 +30,7 @@ import { gateway, hasKey, models as providerModels, findModel, DEFAULT_MODEL_PRO
 const DEFAULT_CONTEXT_WINDOW = 200_000
 
 export default function ReviewRender({ config = {} } = {}) {
-  const { messages, tokenUsage, activeConversationId } = useChat()
+  const { messages, tokenUsage, activeConversationId } = useRoomChat()
   const { highlights, notes, favorites } = useAnnotations()
   const { conversations } = useConversations()
   const { settings } = useSettings()

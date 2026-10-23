@@ -14,7 +14,7 @@
 // is a pure read with no mutators or persistence.
 
 import ContextMeter from '../../components/core/ContextMeter'
-import { useChat } from '../../stores/ChatContext'
+import { useRoomChat } from '../../stores/useRoomChat'
 import { useSettings } from '../../stores/SettingsContext'
 import { useHiddenIds } from '../../stores/chatHooks'
 import { models as providerModels, findModel, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../../net'
@@ -22,7 +22,7 @@ import { models as providerModels, findModel, DEFAULT_MODEL_PROVIDER as PROVIDER
 const DEFAULT_CONTEXT_WINDOW = 200_000
 
 export default function ContextRender({ config = {} } = {}) {
-  const { messages, tokenUsage, activeConversationId } = useChat()
+  const { messages, tokenUsage, activeConversationId } = useRoomChat()
   // Hidden messages are not sent, so the meter counts them apart (stage 4).
   const hiddenIds = useHiddenIds(activeConversationId)
   const hiddenCount = messages.filter(m => hiddenIds.has(m.id)).length

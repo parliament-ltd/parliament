@@ -46,6 +46,7 @@ import {
   deleteHighlight as dbDeleteHighlight,
 } from '../lib/db'
 import { useChat } from './ChatContext'
+import { useMessages } from './chatHooks'
 import { includesWord } from '../lib/textUtils'
 import { favoritesOf, wholeQuoteOf, FAVORITES_TAGGED_SETTING } from '../lib/favoriteTags'
 
@@ -59,8 +60,12 @@ const EMPTY_MAP = new Map()
 const EMPTY_SET = new Set()
 const EMPTY_ARRAY = []
 
-export function AnnotationsProvider({ children }) {
-  const { activeConversationId, messages } = useChat()
+// conversationId: the chat of the room this serves, with several rooms
+// open (C175 (a)); without it, the open chat.
+export function AnnotationsProvider({ children, conversationId = null }) {
+  const chat = useChat()
+  const activeConversationId = conversationId ?? chat.activeConversationId
+  const messages = useMessages(activeConversationId)
 
   // favorites/notes are keyed by messageId → record. highlights is a
   // flat list because a highlight is identified by (term, message) and

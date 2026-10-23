@@ -1186,6 +1186,10 @@ msgid "enter.closeRoom"
 msgstr "Enter closes this room. Nothing is lost"
 
 #. js-lingui-explicit-id
+msgid "enter.closeRoomNum"
+msgstr "Enter closes the room showing {num}. Nothing is lost"
+
+#. js-lingui-explicit-id
 msgid "enter.closeWelcome"
 msgstr "Enter closes the welcome page. tour: brings it back"
 
@@ -1866,15 +1870,15 @@ msgstr "{name} is a saved search and a collection. Add search or collection afte
 
 #. js-lingui-explicit-id
 msgid "enter.newBranch"
-msgstr "Enter starts {next} from {address}, a copy of its whole history, in the room. No call"
+msgstr "Enter starts {next} from {address}, a copy of its whole history, in a room of its own. No call"
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchAt"
-msgstr "Enter starts {next} from {address} after step {step}, a copy up to there, in the room. No call"
+msgstr "Enter starts {next} from {address} after step {step}, a copy up to there, in a room of its own. No call"
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchDone"
-msgstr "{next} starts from {address}, in the room"
+msgstr "{next} starts from {address}, in a room of its own"
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchEmpty"
@@ -1891,7 +1895,7 @@ msgstr "new:branch alone works on the chat in a room. new:branch 201a names one"
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchStart"
-msgstr "Enter starts {next}, an empty branch beside {address}, in the room. No call"
+msgstr "Enter starts {next}, an empty branch beside {address}, in a room of its own. No call"
 
 #. js-lingui-explicit-id
 msgid "enter.newBranchSteps"
@@ -1971,6 +1975,10 @@ msgid "enter.openChat"
 msgstr "Enter opens {num} in a room beside what is here"
 
 #. js-lingui-explicit-id
+msgid "enter.openChatAddressed"
+msgstr "{num} is open in a room already. Enter points the bar at it"
+
+#. js-lingui-explicit-id
 msgid "enter.openChatHere"
 msgstr "Enter shows {num} in the room here"
 
@@ -2037,7 +2045,7 @@ msgstr "Context {share} → under {low} of what {model} reads at once"
 
 #. js-lingui-explicit-id
 msgid "enter.openSummaryDone"
-msgstr "{next} starts from a summary of {address}, in the room"
+msgstr "{next} starts from a summary of {address}, in a room of its own"
 
 #. js-lingui-explicit-id
 msgid "enter.openSummaryEmpty"
@@ -2600,6 +2608,10 @@ msgid "enter.roomNumberNotHere"
 msgstr "No room here shows {num}. open:{num} shows it"
 
 #. js-lingui-explicit-id
+msgid "enter.roomThere"
+msgstr "Enter points the bar at the room that shows it"
+
+#. js-lingui-explicit-id
 msgid "enter.rowsChanged"
 msgstr "{nums} changed meanwhile, so nothing was written. Try again"
 
@@ -3052,6 +3064,10 @@ msgstr "A board takes from {low} to {high} of the width"
 #. js-lingui-explicit-id
 msgid "enter.widthRoom"
 msgstr "Enter gives this room {percent} of the width"
+
+#. js-lingui-explicit-id
+msgid "enter.widthRoomNum"
+msgstr "Enter gives the room showing {num} {percent} of the width"
 
 #. js-lingui-explicit-id
 msgid "enter.widthSet"

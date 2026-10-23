@@ -669,8 +669,9 @@ export function ChatProvider({ children }) {
 
   // Continue from an interrupted (ghost text) message in the open chat
   // systemPrompt: optional string from collaboration mode presets + custom instruction
-  const continueMessage = useCallback(async (incompleteMessageId, model, systemPrompt = '') => {
-    const conversationId = activeRef.current
+  // With several rooms open, the room says which chat (C175 (a)); else the open chat.
+  const continueMessage = useCallback(async (incompleteMessageId, model, systemPrompt = '', inChat = null) => {
+    const conversationId = inChat ?? activeRef.current
     if (!conversationId || streamingIn(conversationId)) return
     const currentMessages = heldMessages(conversationId)
     const incompleteMsg = currentMessages.find(m => m.id === incompleteMessageId)
@@ -768,11 +769,42 @@ export function ChatProvider({ children }) {
     }
   }, [leaveConversation])
 
+  // Several rooms (C175 (a), ruled 23 October): each room holds its own
+  // chat's messages while it shows it, counted, so two rooms showing one
+  // chat share them, and they are let go when the last one closes. The
+  // open chat (activeConversationId) is the room a prompt goes to, which
+  // the shell says with focusChat.
+  const holds = useRef(new Map())
+  const holdChat = useCallback((id) => {
+    if (!id) return { ready: Promise.resolve(), release: () => {} }
+    holds.current.set(id, (holds.current.get(id) ?? 0) + 1)
+    const ready = hasMessages(id)
+      ? Promise.resolve()
+      : getMessages(id).then((msgs) => { if (holds.current.has(id) && !hasMessages(id)) holdMessages(id, msgs) })
+    let done = false
+    const release = () => {
+      if (done) return
+      done = true
+      const left = (holds.current.get(id) ?? 1) - 1
+      if (left > 0) { holds.current.set(id, left); return }
+      holds.current.delete(id)
+      if (activeRef.current !== id) releaseMessages(id)
+    }
+    return { ready, release }
+  }, [])
+  const focusChat = useCallback((id) => {
+    const was = activeRef.current
+    activeRef.current = id ?? null
+    setActiveConversationId(id ?? null)
+    // The chat it was on, held by no room now, is let go.
+    if (was && was !== id && !holds.current.has(was)) releaseMessages(was)
+  }, [])
+
   // Clear messages (when switching conversations)
   const clearMessages = useCallback(() => {
     const left = activeRef.current
     activeRef.current = null
-    if (left) releaseMessages(left)
+    if (left && !holds.current.has(left)) releaseMessages(left)
     setTokenUsage({ input: 0, output: 0 })
     setActiveConversationId(null)
     setPersistError(null)
@@ -800,6 +832,8 @@ export function ChatProvider({ children }) {
       stopGenerating,
       leaveConversation,
       watchConversation,
+      holdChat,
+      focusChat,
       clearMessages,
     }}>
       {children}

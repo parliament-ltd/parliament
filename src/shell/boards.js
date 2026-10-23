@@ -36,8 +36,17 @@ export const BOARDS = Object.freeze({
   welcome: { title: null, resting: 'search', can: [], closable: true, strip: null },
 })
 
-/** The registered board, or null. */
-export const boardEntry = (key) => (Object.hasOwn(BOARDS, key) ? BOARDS[key] : null)
+// Rooms (C175 (a), ruled 23 October: "the user can open any number of
+// rooms"). The first room in the space is the board 'room', as before; each
+// other is 'room-2', 'room-3' and so on, with its own chat. A space kept
+// before reads as it did.
+const MORE_ROOMS = /^room-([2-9]|[1-9]\d{1,2})$/
+
+/** Whether a board is a room: 'room', 'room-2', 'room-3' … */
+export const isRoom = (key) => key === 'room' || MORE_ROOMS.test(String(key ?? ''))
+
+/** The registered board, or null. Every room is a room board. */
+export const boardEntry = (key) => (Object.hasOwn(BOARDS, key) ? BOARDS[key] : MORE_ROOMS.test(String(key ?? '')) ? BOARDS.room : null)
 
 // The words commands take for boards, where they differ from the board's id
 // (C131): people read Records and Plan; inside the app, and in what is
@@ -67,9 +76,11 @@ export function boardByTitle(word) {
  * @param {{ columns: string[][], popped: Array<{ board: string }>, addressed: string, context?: object }} arrangement
  */
 export function strip(arrangement) {
-  const here = new Set([...arrangement.columns.flat(), ...arrangement.popped.map((p) => p.board)])
+  // Every room in the space counts as Room on the strip.
+  const kind = (b) => (isRoom(b) ? 'room' : b)
+  const here = new Set([...arrangement.columns.flat(), ...arrangement.popped.map((p) => p.board)].map(kind))
   return Object.entries(BOARDS)
     .filter(([, b]) => b.strip != null)
     .sort(([, a], [, b]) => a.strip - b.strip)
-    .map(([key, b]) => ({ board: key, title: `${b.title}:`, context: arrangement.context?.[key] ?? null, here: here.has(key), addressed: arrangement.addressed === key }))
+    .map(([key, b]) => ({ board: key, title: `${b.title}:`, context: arrangement.context?.[key] ?? null, here: here.has(key), addressed: kind(arrangement.addressed) === key }))
 }

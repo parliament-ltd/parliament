@@ -11,16 +11,19 @@
 // refusal with the reason, and changes nothing. Running a verb is keeping
 // the plan.
 
-import { boardEntry, boardFor } from './boards'
+import { boardEntry, boardFor, isRoom } from './boards'
+
+export { isRoom }
 
 /**
  * @typedef {{ board: string, display: number|null, side: 'left'|'right'|null, from: number }} Popped
  * @typedef {{ id: string, columns: string[][], popped: Popped[], addressed: string,
  *   bar: { at: 'top'|'bottom'|'card', side: 'left'|'center'|'right', popped: boolean },
  *   resting: 'search'|'prompt'|null, context: Record<string, string|number>,
- *   widths?: Record<string, number>, focus?: object, recordsCols?: string[] }} Arrangement  widths: the shares the
+ *   widths?: Record<string, number>, focus?: object, recordsCols?: string[], lastRoom?: string }} Arrangement  widths: the shares the
  *   person has set, by board (C126); focus: while focus: holds, the space as it was before, for focus:off (stage 5);
- *   recordsCols: the columns Records shows, when the person has chosen (cols:, C141)
+ *   recordsCols: the columns Records shows, when the person has chosen (cols:, C141);
+ *   lastRoom: the room the bar pointed at last, where a prompt goes while the bar points elsewhere (C175 (a))
  * @typedef {{ message: string, values?: object }} Says
  * @typedef {{ next: Arrangement|null, says: Says }} Plan  next is null when Enter would do nothing
  */
@@ -54,16 +57,63 @@ export function arrangementBoards(id) {
   return base ? base.columns.flat() : []
 }
 
+// ── Rooms (C125; C175 (a), ruled 23 October) ─────────────
+// The space holds any number of rooms, each showing a chat of its own, kept
+// in the space's context by board: context.room for the first, context
+// ['room-2'] for the next. A prompt goes to the current room: the one the
+// bar points at, else the one it pointed at last, else the last on screen.
+
+/** The rooms in the space, left to right, then those in windows. */
+export const roomsIn = (a) => [...a.columns.flat(), ...a.popped.map((p) => p.board)].filter(isRoom)
+
+/** The chat a room shows, or null for an empty room. */
+export function chatIn(a, board) {
+  const chat = a.context?.[board]
+  return typeof chat === 'string' && chat ? chat : null
+}
+
+/** The room a prompt goes to, or null when the space has none. */
+export function currentRoom(a) {
+  const rooms = roomsIn(a)
+  if (!rooms.length) return null
+  if (rooms.includes(a.addressed)) return a.addressed
+  if (rooms.includes(a.lastRoom)) return a.lastRoom
+  return rooms[rooms.length - 1]
+}
+
+/** The room showing a chat, or null. */
+export const roomShowing = (a, chat) => (chat ? roomsIn(a).find((b) => chatIn(a, b) === chat) ?? null : null)
+
+/** The board a new room takes: 'room' when free, else the first free 'room-n'. */
+function freeRoom(a) {
+  const taken = new Set(roomsIn(a))
+  if (!taken.has('room')) return 'room'
+  let n = 2
+  while (taken.has(`room-${n}`)) n += 1
+  return `room-${n}`
+}
+
 /**
- * The chat the room board in the space shows: its id, null for an empty
- * room whose first prompt starts its chat, or undefined when no room board
- * is in the space (C125). The chat is kept in the space's context.
+ * The space as kept after a change: the room the bar points at is the one
+ * it pointed at last, and a room no longer here is forgotten.
+ */
+export function settle(a) {
+  const rooms = roomsIn(a)
+  const last = isRoom(a.addressed) ? a.addressed : rooms.includes(a.lastRoom) ? a.lastRoom : null
+  if ((a.lastRoom ?? null) === last) return a
+  const next = { ...a }
+  if (last) next.lastRoom = last
+  else delete next.lastRoom
+  return next
+}
+
+/**
+ * The chat the current room shows: its id, null for an empty room whose
+ * first prompt starts its chat, or undefined when the space has no room.
  */
 export function roomOnScreen(a) {
-  const here = a.columns.some((c) => c.includes('room')) || a.popped.some((p) => p.board === 'room')
-  if (!here) return undefined
-  const chat = a.context?.room
-  return typeof chat === 'string' && chat ? chat : null
+  const room = currentRoom(a)
+  return room ? chatIn(a, room) : undefined
 }
 
 /**
@@ -98,6 +148,7 @@ const copy = (a) => ({
   ...a, columns: a.columns.map((c) => [...c]), popped: a.popped.map((p) => ({ ...p })), bar: { ...a.bar }, context: { ...a.context }, widths: { ...a.widths },
   ...(a.recordsCols ? { recordsCols: [...a.recordsCols] } : {}),
 })
+const go2 = (next, message, values) => ({ next: settle(next), says: { message, values } })
 const sortedWidths = (a) => Object.entries(a.widths ?? {}).sort(([x], [y]) => (x < y ? -1 : 1))
 const sameLayout = (x, y) => JSON.stringify([x.columns, x.popped, x.addressed, x.bar.at, x.bar.side, x.bar.popped, x.resting, sortedWidths(x), Boolean(x.focus), recordsColumns(x)])
   === JSON.stringify([y.columns, y.popped, y.addressed, y.bar.at, y.bar.side, y.bar.popped, y.resting, sortedWidths(y), Boolean(y.focus), recordsColumns(y)])
@@ -122,13 +173,17 @@ function readdress(a, gone, oldColumn) {
 function place(next, board) {
   if (board === 'welcome') { next.columns.unshift([board]); return }
   const withWelcome = next.columns.some((c) => c.includes('welcome'))
-  if (board === 'room') {
+  // Another room goes beside the room the prompt goes to (C175 (a)).
+  const beside = isRoom(board) ? currentRoom(next) : null
+  const at = beside ? next.columns.findIndex((c) => c.includes(beside)) : -1
+  if (at >= 0) { next.columns.splice(at + 1, 0, [board]); return }
+  if (isRoom(board)) {
     const at = withWelcome ? next.columns.findIndex((c) => c.includes('welcome')) + 1 : next.columns.length
     next.columns.splice(at, 0, [board])
     return
   }
   const last = next.columns[next.columns.length - 1]
-  if (withWelcome && next.columns.length > 1 && !last.includes('welcome') && !last.includes('room')) last.push(board)
+  if (withWelcome && next.columns.length > 1 && !last.includes('welcome') && !last.some(isRoom)) last.push(board)
   else next.columns.push([board])
 }
 
@@ -164,19 +219,53 @@ export function planBring(a, id) {
 }
 
 /**
- * sym:. Brings the last room into the space, or an empty room when there is
- * no chat yet (`chat` null). With a room here already, it shows that chat.
+ * open:204, sym:, a prompt with no room. A chat opens in a room of its own
+ * beside what is here (C175 (a)): in the room that shows it already, the
+ * bar points there; an empty room here takes it. With `chat` null, an
+ * empty room, the one here or a new one.
  */
 export function planRoom(a, chat) {
-  const here = roomOnScreen(a)
-  if (here !== undefined && here === chat) return refuse(chat ? 'roomHere' : 'newRoomHere')
+  if (chat) {
+    const shown = roomShowing(a, chat)
+    if (shown) return shown === a.addressed ? refuse('roomHere') : go2({ ...copy(a), addressed: shown }, 'roomThere')
+    const here = currentRoom(a)
+    if (here && !chatIn(a, here)) {
+      const next = copy(a)
+      next.context[here] = chat
+      next.addressed = here
+      return go2(next, 'showRoom')
+    }
+    const next = copy(a)
+    const board = freeRoom(a)
+    place(next, board)
+    next.context[board] = chat
+    next.addressed = board
+    return go2(next, 'goRoom')
+  }
+  const empty = roomsIn(a).find((b) => !chatIn(a, b))
+  if (empty) return empty === a.addressed ? refuse('newRoomHere') : go2({ ...copy(a), addressed: empty }, 'roomThere')
   const next = copy(a)
-  if (here === undefined) place(next, 'room')
-  if (chat) next.context.room = chat
-  else delete next.context.room
-  next.addressed = 'room'
-  if (here !== undefined && chat) return go(next, 'showRoom')
-  return go(next, chat ? 'goRoom' : 'goNewRoom')
+  const board = freeRoom(a)
+  place(next, board)
+  delete next.context[board]
+  next.addressed = board
+  return go2(next, 'goNewRoom')
+}
+
+/**
+ * The current room carries on with another chat, in place: to: a branch
+ * other than its own moves the room to it (C174 (b)). With no room, as
+ * planRoom.
+ */
+export function planShowInRoom(a, chat) {
+  const here = currentRoom(a)
+  if (!here) return planRoom(a, chat)
+  const shown = roomShowing(a, chat)
+  if (shown) return shown === a.addressed ? refuse('roomHere') : go2({ ...copy(a), addressed: shown }, 'roomThere')
+  const next = copy(a)
+  next.context[here] = chat
+  next.addressed = here
+  return go2(next, 'showRoom')
 }
 
 /** close: or close:<board>. Takes it off the screen, window included; nothing is lost. */
@@ -190,10 +279,12 @@ export function planClose(a, board = a.addressed) {
   next.columns = without(next.columns, board)
   next.popped = next.popped.filter((p) => p.board !== board)
   next.addressed = readdress(next, board, oldColumn)
+  // A room closed forgets its chat; the chat itself stays.
+  if (isRoom(board)) delete next.context[board]
   // A room and the welcome card are named as what they are, not by the
   // boards' list name (C125).
-  const said = board === 'room' ? 'closeRoom' : board === 'welcome' ? 'closeWelcome' : 'closeBoard'
-  return go(next, said, { board })
+  const said = isRoom(board) ? 'closeRoom' : board === 'welcome' ? 'closeWelcome' : 'closeBoard'
+  return go2(next, said, { board })
 }
 
 /** move:<board> left|right|middle. The board's column goes to that place; the others shift along. */
@@ -276,7 +367,7 @@ export const WIDTH_RANGE = Object.freeze({ low: 10, high: 90 })
 const round = (n) => Math.round(n * 1000) / 1000
 
 /** A board's usual share of the width. */
-export const usualShare = (board) => (MAIN.has(board) ? 2 : 1)
+export const usualShare = (board) => (MAIN.has(board) || isRoom(board) ? 2 : 1)
 
 /** Each column's share of the width, left to right. */
 export function columnShares(a) {
@@ -354,7 +445,7 @@ export function planWidth(a, board, percent, named = false, layout = null) {
   const next = withShares(a, { [k]: share })
   next.addressed = board
   // A room is named as what it is, as close: names it (C125, C146 (c)).
-  if (named && board === 'room') return go(next, 'widthRoom', { board, percent })
+  if (named && isRoom(board)) return go(next, 'widthRoom', { board, percent })
   return go(next, named ? 'widthSet' : 'widthIt', { board, percent })
 }
 
@@ -379,15 +470,17 @@ export function planFocus(a, chat = null) {
   const here = roomOnScreen(a)
   const target = typeof here === 'string' ? here : chat
   if (!target) return refuse('focusNothing')
-  const closing = [...onPage(a), ...a.popped.map((p) => p.board)].filter((b) => b !== 'room')
+  // The room the prompt goes to stays; every other board goes, other rooms too.
+  const room = currentRoom(a) ?? 'room'
+  const closing = [...onPage(a), ...a.popped.map((p) => p.board)].filter((b) => b !== room)
   const next = copy(a)
   next.focus = { columns: a.columns.map((c) => [...c]), popped: a.popped.map((p) => ({ ...p })), addressed: a.addressed, bar: { ...a.bar } }
-  next.columns = [['room']]
+  next.columns = [[room]]
   next.popped = []
-  next.addressed = 'room'
+  next.addressed = room
   next.bar = { ...a.bar, at: 'bottom', popped: false }
-  next.context.room = target
-  return go(next, closing.length ? 'focusClosing' : 'focusAlone', { boards: closing })
+  next.context[room] = target
+  return go2(next, closing.length ? 'focusClosing' : 'focusAlone', { boards: closing.map((b) => (isRoom(b) ? 'room' : b)) })
 }
 
 /** focus:off. The space as it was before focus:, windows and all. */
@@ -400,8 +493,9 @@ export function planFocusOff(a) {
   next.popped = before.popped.map((p) => ({ ...p }))
   next.addressed = before.addressed
   next.bar = { ...before.bar }
-  const back = [...before.columns.flat(), ...before.popped.map((p) => p.board)].filter((b) => b !== 'room')
-  return go(next, back.length ? 'focusOff' : 'focusOffSame', { boards: back })
+  const kept = a.columns.flat().find(isRoom)
+  const back = [...before.columns.flat(), ...before.popped.map((p) => p.board)].filter((b) => b !== kept)
+  return go2(next, back.length ? 'focusOff' : 'focusOffSame', { boards: back.map((b) => (isRoom(b) ? 'room' : b)) })
 }
 
 // ── cols: (Almanac v30; stage 6, piece 2; C141) ─────────
@@ -460,7 +554,7 @@ export function planReset(a) {
 
 /** Points the bar at a board on this screen or in a window, as a click on it does. */
 export function address(a, board) {
-  return isOnPage(a, board) || isPopped(a, board) ? { ...copy(a), addressed: board } : a
+  return isOnPage(a, board) || isPopped(a, board) ? settle({ ...copy(a), addressed: board }) : a
 }
 
 // ── From a command ──────────────────────────────────────
@@ -484,9 +578,11 @@ export function plan(a, step, layout = null) {
   const args = step.match?.values ?? []
   const [first, second] = args.map(word)
   // The boards the words name: records is the Almanac's board, plan the
-  // docket's (C131).
-  const one = boardFor(first)
-  const two = boardFor(second)
+  // docket's (C131). The word room names the room a prompt goes to; a room
+  // found by its chat (close:204) comes as its board, exactly.
+  const room = (b) => (b === 'room' && !step.exactBoard ? currentRoom(a) ?? 'room' : b)
+  const one = room(boardFor(first))
+  const two = room(boardFor(second))
   switch (step.verb) {
     case 'open':
       if (first === 'lab') return null // the Lab is an arrangement: lab: and open:lab come with the Lab

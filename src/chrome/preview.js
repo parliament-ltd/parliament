@@ -16,7 +16,7 @@
 // the shell knows: no request is made to find out (C83).
 
 import { enterLine } from '../commands/registry'
-import { plan, planOpen, planBring, planRoom, planFocus, planFocusOff, roomOnScreen, address, ARRANGEMENT_VERBS } from '../shell/arrangement'
+import { plan, planOpen, planBring, planRoom, planFocus, planFocusOff, roomOnScreen, roomShowing, isRoom, address, ARRANGEMENT_VERBS } from '../shell/arrangement'
 import { cleanRoomName, ROOM_NAME_MAX } from '../lib/roomNames'
 import { CHARS_PER_TOKEN, inputCost, describeCost, LOCAL_READS } from '../shell/estimate'
 import { holdsKey } from '../commands/parse'
@@ -318,9 +318,9 @@ const numberOf = (step) => {
 
 // What planRoom says, said of a numbered chat.
 const OPENED = {
-  goRoom: 'openChat', showRoom: 'openChatHere', roomHere: 'openChatThere',
+  goRoom: 'openChat', showRoom: 'openChatHere', roomHere: 'openChatThere', roomThere: 'openChatAddressed',
 }
-const OPENED_DOCKET = { goRoom: 'openDocket', showRoom: 'openDocketHere', roomHere: 'openChatThere' }
+const OPENED_DOCKET = { goRoom: 'openDocket', showRoom: 'openDocketHere', roomHere: 'openChatThere', roomThere: 'openChatAddressed' }
 
 /**
  * open:204. A chat opens in the space's room, or in a room brought beside
@@ -350,7 +350,7 @@ const isSummaryOpen = (step) => {
   const vals = step.verb === 'open' ? step.match?.values ?? [] : []
   return vals.length === 2 && vals[0]?.kind === 'address' && vals[1]?.value === 'summary'
 }
-const OPENED_BRANCH = { goRoom: 'openBranch', showRoom: 'openBranchHere', roomHere: 'openChatThere' }
+const OPENED_BRANCH = { goRoom: 'openBranch', showRoom: 'openBranchHere', roomHere: 'openChatThere', roomThere: 'openChatAddressed' }
 
 /**
  * open:203b. The branch shows in the room here, or in a room brought
@@ -402,8 +402,10 @@ function roomByNumber(a, step, screens = {}) {
   const row = t.rows[0]
   const chatId = row.kind === 'chat' || row.kind === 'docket' ? row.chatId : null
   if (!chatId) return { bad: { message: 'roomNumberNotChat', values: { num: arg.text ?? row.num } } }
-  if (roomOnScreen(a) !== chatId) return { bad: { message: 'roomNumberNotHere', values: { num: arg.text ?? row.num } } }
-  return { step: { ...step, match: { ...step.match, values: [{ kind: 'word', value: 'room' }, ...rest] } } }
+  // Any room showing it, with several rooms open (C175 (a)).
+  const board = roomShowing(a, chatId)
+  if (!board) return { bad: { message: 'roomNumberNotHere', values: { num: arg.text ?? row.num } } }
+  return { step: { ...step, exactBoard: true, match: { ...step.match, values: [{ kind: 'word', value: board }, ...rest] } } }
 }
 
 /** inspect:204 shows it in detail under the bar. */
@@ -570,7 +572,7 @@ function planBy(a, step, screens = {}) {
  */
 function planName(a, step, screens = {}) {
   const args = step.match?.values ?? []
-  if (args.length !== 1 || a.addressed !== 'room') return null
+  if (args.length !== 1 || !isRoom(a.addressed)) return null
   const chat = roomOnScreen(a)
   if (chat === undefined) return null
   if (chat === null) return { says: { message: 'nameNoChat' }, act: null }
@@ -719,7 +721,10 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
     if (!p.next) return { answer, says: p.says, next: null }
     a = p.next
-    last = p.says
+    // A room found by its chat is named by it, with several rooms open (C175 (a)).
+    const num = byRoom ? step.match.values[0].text ?? String(step.match.values[0].num ?? '') : null
+    last = byRoom && p.says.message === 'closeRoom' ? { message: 'closeRoomNum', values: { num } }
+      : byRoom && p.says.message === 'widthRoom' ? { message: 'widthRoomNum', values: { ...p.says.values, num } } : p.says
   }
 
   // Records after the line: how many rows it will show, said before Enter.

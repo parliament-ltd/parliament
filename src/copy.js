@@ -105,6 +105,9 @@ export const COPY = {
     closeRoom: /*i18n*/ { id: 'enter.closeRoom', message: 'Enter closes this room. Nothing is lost' },
     // width: (C126). {percent}, {low} and {high} are shares of the width, written as the reader's language writes a percentage.
     widthRoom: /*i18n*/ { id: 'enter.widthRoom', message: 'Enter gives this room {percent} of the width' },
+    // A room by the chat it shows, with several rooms open (C175 (a)).
+    closeRoomNum: /*i18n*/ { id: 'enter.closeRoomNum', message: 'Enter closes the room showing {num}. Nothing is lost' },
+    widthRoomNum: /*i18n*/ { id: 'enter.widthRoomNum', message: 'Enter gives the room showing {num} {percent} of the width' },
     widthIt: /*i18n*/ { id: 'enter.widthIt', message: 'Enter gives it {percent} of the width', comment: 'It is the board the bar points at, named just before this line' },
     widthSet: /*i18n*/ { id: 'enter.widthSet', message: 'Enter gives {board} {percent} of the width' },
     widthThere: /*i18n*/ { id: 'enter.widthThere', message: 'That is its width already' },
@@ -404,6 +407,8 @@ export const COPY = {
     roomHere: /*i18n*/ { id: 'enter.roomHere', message: 'The last room is here already' },
     goNewRoom: /*i18n*/ { id: 'enter.goNewRoom', message: 'Enter opens an empty room beside what is here. Its first prompt starts it' },
     newRoomHere: /*i18n*/ { id: 'enter.newRoomHere', message: 'This room is empty. Its first prompt starts it' },
+    // Several rooms open (C175 (a)): the room showing it is there already.
+    roomThere: /*i18n*/ { id: 'enter.roomThere', message: 'Enter points the bar at the room that shows it' },
     // A prompt (stage 4; C83). {provider} and {source} are names from the
     // list of providers and sources; {cost} is an amount the bar formats.
     targetChat: /*i18n*/ { id: 'enter.targetChat', message: '→ {chat}', comment: "The head of the Enter line in a room: the chat's number" },
@@ -416,17 +421,18 @@ export const COPY = {
     openChat: /*i18n*/ { id: 'enter.openChat', message: 'Enter opens {num} in a room beside what is here' },
     openChatHere: /*i18n*/ { id: 'enter.openChatHere', message: 'Enter shows {num} in the room here' },
     openChatThere: /*i18n*/ { id: 'enter.openChatThere', message: '{num} is in the room here already' },
+    openChatAddressed: /*i18n*/ { id: 'enter.openChatAddressed', message: '{num} is open in a room already. Enter points the bar at it' },
     openDocket: /*i18n*/ { id: 'enter.openDocket', message: 'Enter opens its first branch, {num}, in a room beside what is here' },
     openDocketHere: /*i18n*/ { id: 'enter.openDocketHere', message: 'Enter shows its first branch, {num}, in the room here' },
     openNotYet: /*i18n*/ { id: 'enter.openNotYet', message: 'Opening this comes later. inspect:{num} shows it now' },
     // new:branch, a fork (stage 8, piece 6; C8; C178). {step} counts the person's prompts.
-    newBranch: /*i18n*/ { id: 'enter.newBranch', message: 'Enter starts {next} from {address}, a copy of its whole history, in the room. No call' },
-    newBranchAt: /*i18n*/ { id: 'enter.newBranchAt', message: 'Enter starts {next} from {address} after step {step}, a copy up to there, in the room. No call' },
-    newBranchStart: /*i18n*/ { id: 'enter.newBranchStart', message: 'Enter starts {next}, an empty branch beside {address}, in the room. No call' },
+    newBranch: /*i18n*/ { id: 'enter.newBranch', message: 'Enter starts {next} from {address}, a copy of its whole history, in a room of its own. No call' },
+    newBranchAt: /*i18n*/ { id: 'enter.newBranchAt', message: 'Enter starts {next} from {address} after step {step}, a copy up to there, in a room of its own. No call' },
+    newBranchStart: /*i18n*/ { id: 'enter.newBranchStart', message: 'Enter starts {next}, an empty branch beside {address}, in a room of its own. No call' },
     newBranchSteps: /*i18n*/ { id: 'enter.newBranchSteps', message: '{count, plural, =0 {{address} has no steps yet} one {{address} has one step} other {{address} has # steps}}' },
     newBranchEmpty: /*i18n*/ { id: 'enter.newBranchEmpty', message: '{address} has nothing in it to branch from' },
     newBranchNoRoom: /*i18n*/ { id: 'enter.newBranchNoRoom', message: 'new:branch alone works on the chat in a room. new:branch 201a names one', comment: 'Commands stay English' },
-    newBranchDone: /*i18n*/ { id: 'enter.newBranchDone', message: '{next} starts from {address}, in the room' },
+    newBranchDone: /*i18n*/ { id: 'enter.newBranchDone', message: '{next} starts from {address}, in a room of its own' },
     newBranchFailed: /*i18n*/ { id: 'enter.newBranchFailed', message: 'No branch could be made from {address}' },
     // The privacy filter on searches and translations (C167 (e); C179).
     promptPrivacySearch: /*i18n*/ { id: 'enter.promptPrivacySearch', message: 'The privacy filter leaves {found} out of the search' },
@@ -500,7 +506,7 @@ export const COPY = {
     openSummaryEmpty: /*i18n*/ { id: 'enter.openSummaryEmpty', message: '{address} has nothing in it to summarize' },
     openSummaryNotChat: /*i18n*/ { id: 'enter.openSummaryNotChat', message: 'open:{num} summary works on a chat or a branch', comment: 'Commands stay English' },
     openSummaryWriting: /*i18n*/ { id: 'enter.openSummaryWriting', message: 'Writing a summary of {address}. The bar is free meanwhile' },
-    openSummaryDone: /*i18n*/ { id: 'enter.openSummaryDone', message: '{next} starts from a summary of {address}, in the room' },
+    openSummaryDone: /*i18n*/ { id: 'enter.openSummaryDone', message: '{next} starts from a summary of {address}, in a room of its own' },
     openSummaryFailed: /*i18n*/ { id: 'enter.openSummaryFailed', message: 'The summary of {address} could not be written, so no branch was made' },
     inspectOne: /*i18n*/ { id: 'enter.inspectOne', message: 'Enter shows {num} in detail, here' },
     // focus: and focus:off, the first form (W §7; stage 5, piece 6). {boards} is a list of board names.
