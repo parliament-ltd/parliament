@@ -61,6 +61,17 @@ One line per term: English → Swedish, with the reason where it was a hard choi
 - browser → webbläsare; tab → flik; device → enhet; site → webbplats.
 - the browser has agreed to keep it → webbläsaren har lovat att behålla det.
 
+## Lock Parliament
+- the lock → låset; lock (verb) → låsa; locked → låst; Lock now → Lås nu.
+- unlock → låsa upp; Unlock (button) → Lås upp.
+- passphrase → lösenfras (lösenfrasen, lösenfraser). The usual Swedish word, distinct from lösenord (the password on a backup).
+- recovery code → återställningskod. The word Swedish account screens use; "reservkod" (Google's word for backup codes) is the alternative. Here "återställa" means recovering access ("ingen server som kan återställa det"), not restoring a backup; putting the screen back as shipped stays "ställa tillbaka".
+- passkey → inloggningsnyckel (inloggningsnycklar). Apple's Swedish word, always written in full so it is never read as "nyckel", which is an API key.
+- password manager → lösenordshanterare.
+- idle → inaktivitet: "Låses efter inaktivitet i" followed by 15 minuter, 1 timme, 8 timmar, tills fliken stängs.
+- set up (the lock) → ställa in; turn off → stänga av; encrypt / decrypt → kryptera / dekryptera.
+- nothing can open it → ingenting kan öppna det; there is no server to reset it → det finns ingen server som kan återställa det.
+
 ## Conventions
 - Commands, their keyword arguments (all, room, collection, search, the sort and type words, the Settings section names) and leaders stay English, character for character.
 - Free-text example values inside commands are translated (name:"Tornugglor", heading:"Orsaker", save:"Ugglor i veckan"); see doubts.

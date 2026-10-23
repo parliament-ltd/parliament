@@ -4230,263 +4230,263 @@ msgstr "ルーム内の色と書体"
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
-msgstr ""
+msgstr "パスキーを追加"
 
 #. js-lingui-explicit-id
 msgid "lock.backupFirst"
-msgstr ""
+msgstr "先にバックアップ："
 
 #. js-lingui-explicit-id
 msgid "lock.cancel"
-msgstr ""
+msgstr "キャンセル"
 
 #. js-lingui-explicit-id
 msgid "lock.cancelled"
-msgstr ""
+msgstr "パスキーは使われませんでした。"
 
 #. js-lingui-explicit-id
 msgid "lock.change"
-msgstr ""
+msgstr "変更する"
 
 #. js-lingui-explicit-id
 msgid "lock.changed"
-msgstr ""
+msgstr "変更しました。"
 
 #. js-lingui-explicit-id
 msgid "lock.changePass"
-msgstr ""
+msgstr "パスフレーズを変更"
 
 #. js-lingui-explicit-id
 msgid "lock.codeLabel"
-msgstr ""
+msgstr "復旧コード"
 
 #. js-lingui-explicit-id
 msgid "lock.confirmCode"
-msgstr ""
+msgstr "末尾の4文字を入力してください"
 
 #. js-lingui-explicit-id
 msgid "lock.confirmWrong"
-msgstr ""
+msgstr "末尾の4文字と一致しません"
 
 #. js-lingui-explicit-id
 msgid "lock.currentPass"
-msgstr ""
+msgstr "現在のパスフレーズ"
 
 #. js-lingui-explicit-id
 msgid "lock.damaged"
-msgstr ""
+msgstr "ロックの記録が壊れているため、ここでは開けません。"
 
 #. js-lingui-explicit-id
 msgid "lock.differ"
-msgstr ""
+msgstr "2つのパスフレーズが一致しません"
 
 #. js-lingui-explicit-id
 msgid "lock.encrypt"
-msgstr ""
+msgstr "暗号化してロック"
 
 #. js-lingui-explicit-id
 msgid "lock.encrypting"
-msgstr ""
+msgstr "暗号化しています"
 
 #. js-lingui-explicit-id
 msgid "lock.failed"
-msgstr ""
+msgstr "変更できませんでした：{reason}。ほかは何も変更されていません。"
 
 #. js-lingui-explicit-id
 msgid "lock.idle15m"
-msgstr ""
+msgstr "15分"
 
 #. js-lingui-explicit-id
 msgid "lock.idle1h"
-msgstr ""
+msgstr "1時間"
 
 #. js-lingui-explicit-id
 msgid "lock.idle8h"
-msgstr ""
+msgstr "8時間"
 
 #. js-lingui-explicit-id
 msgid "lock.idleLabel"
-msgstr ""
+msgstr "ロックまでの無操作時間"
 
 #. js-lingui-explicit-id
 msgid "lock.idleTab"
-msgstr ""
+msgstr "タブを閉じるまで"
 
 #. js-lingui-explicit-id
 msgid "lock.label"
-msgstr ""
+msgstr "ロック"
 
 #. js-lingui-explicit-id
 msgid "lock.lede"
-msgstr ""
+msgstr "ここにあるものはすべて暗号化されています。続けるには、このタブのロックを解除してください。"
 
 #. js-lingui-explicit-id
 msgid "lock.locked"
-msgstr ""
+msgstr "ロックしました。ページを再読み込みします。パスフレーズでロックを解除してください。"
 
 #. js-lingui-explicit-id
 msgid "lock.lockNow"
-msgstr ""
+msgstr "今すぐロック"
 
 #. js-lingui-explicit-id
 msgid "lock.lost"
-msgstr ""
+msgstr "パスフレーズ、すべてのパスキー、復旧コードをなくしましたか？その場合、開く手段は何もありません。ブラウザでこのサイトのデータを消去すると、すべてが削除され、Parliamentは最初からになります。"
 
 #. js-lingui-explicit-id
 msgid "lock.newCode"
-msgstr ""
+msgstr "新しい復旧コード"
 
 #. js-lingui-explicit-id
 msgid "lock.newCodeShown"
-msgstr ""
+msgstr "新しい復旧コードです。表示されるのはこの一度だけです。古いコードでは、もうParliamentを開けません。"
 
 #. js-lingui-explicit-id
 msgid "lock.newPass"
-msgstr ""
+msgstr "新しいパスフレーズ"
 
 #. js-lingui-explicit-id
 msgid "lock.next"
-msgstr ""
+msgstr "次へ"
 
 #. js-lingui-explicit-id
 msgid "lock.noPrf"
-msgstr ""
+msgstr "このパスキーでは、Parliamentのロックを解除できません。パスフレーズか復旧コードを使ってください。"
 
 #. js-lingui-explicit-id
 msgid "lock.offHelp"
-msgstr ""
+msgstr "オフ。オンにすると、書いたものすべてと保存したキーがこのブラウザで暗号化されるため、そのコピーは読めません。タブごとにロックの解除を求めます。"
 
 #. js-lingui-explicit-id
 msgid "lock.onHelp"
-msgstr ""
+msgstr "{passkeys, plural, =0 {オン。パスフレーズか復旧コードでロックを解除できます。} other {オン。パスフレーズ、復旧コード、またはパスキー（#件）でロックを解除できます。}}"
 
 #. js-lingui-explicit-id
 msgid "lock.opening"
-msgstr ""
+msgstr "開いています"
 
 #. js-lingui-explicit-id
 msgid "lock.passAgain"
-msgstr ""
+msgstr "同じパスフレーズをもう一度"
 
 #. js-lingui-explicit-id
 msgid "lock.passkey"
-msgstr ""
+msgstr "パスキーでロックを解除"
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyAdded"
-msgstr ""
+msgstr "追加しました。このパスキーでParliamentのロックを解除できます。"
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyItem"
-msgstr ""
+msgstr "パスキー（{day}に追加）"
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyNoPrf"
-msgstr ""
+msgstr "このパスキーではParliamentのロックを解除できないため、追加していません。パスフレーズは引き続き使えます。"
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyRemove"
-msgstr ""
+msgstr "削除"
 
 #. js-lingui-explicit-id
 msgid "lock.passphraseLabel"
-msgstr ""
+msgstr "パスフレーズ"
 
 #. js-lingui-explicit-id
 msgid "lock.passPlaceholder"
-msgstr ""
+msgstr "{count, plural, other {#文字以上}}"
 
 #. js-lingui-explicit-id
 msgid "lock.reload"
-msgstr ""
+msgstr "再読み込み"
 
 #. js-lingui-explicit-id
 msgid "lock.setUp"
-msgstr ""
+msgstr "ロックを設定"
 
 #. js-lingui-explicit-id
 msgid "lock.short"
-msgstr ""
+msgstr "{count, plural, other {#文字以上にしてください}}"
 
 #. js-lingui-explicit-id
 msgid "lock.skip"
-msgstr ""
+msgstr "今はしない"
 
 #. js-lingui-explicit-id
 msgid "lock.step1Help"
-msgstr ""
+msgstr "{count, plural, other {#文字以上。関係のない単語をいくつか並べると、覚えやすく、推測されにくくなります。}}"
 
 #. js-lingui-explicit-id
 msgid "lock.step1Title"
-msgstr ""
+msgstr "パスフレーズを決める"
 
 #. js-lingui-explicit-id
 msgid "lock.step2Help"
-msgstr ""
+msgstr "パスフレーズを忘れたときは、これでParliamentを開けます。書き留めるか、パスワードマネージャに保存してください。表示されるのは、ここでの一度だけです。"
 
 #. js-lingui-explicit-id
 msgid "lock.step2Title"
-msgstr ""
+msgstr "復旧コードを保管する"
 
 #. js-lingui-explicit-id
 msgid "lock.step3Help"
-msgstr ""
+msgstr "パスキー（指紋、顔、PIN、スマートフォン）でも、Parliamentのロックを解除できます。パスフレーズと復旧コードはそのまま残ります。パスワードマネージャからパスキーを削除しても、なくなるのはこの解除方法だけです。"
 
 #. js-lingui-explicit-id
 msgid "lock.step3Title"
-msgstr ""
+msgstr "パスキー（任意）"
 
 #. js-lingui-explicit-id
 msgid "lock.step4Help"
-msgstr ""
+msgstr "書いたものすべてと保存したキーが、このブラウザで暗号化されます。パスフレーズ、すべてのパスキー、復旧コードをすべてなくすと、開く手段は何もありません。リセットできるサーバがないためです。"
 
 #. js-lingui-explicit-id
 msgid "lock.step4Title"
-msgstr ""
+msgstr "ロックする"
 
 #. js-lingui-explicit-id
 msgid "lock.title"
-msgstr ""
+msgstr "Parliamentはロックされています"
 
 #. js-lingui-explicit-id
 msgid "lock.turnedOff"
-msgstr ""
+msgstr "ロックをオフにしました。ページを再読み込みします。"
 
 #. js-lingui-explicit-id
 msgid "lock.turnOff"
-msgstr ""
+msgstr "ロックをオフにする"
 
 #. js-lingui-explicit-id
 msgid "lock.turnOffConfirm"
-msgstr ""
+msgstr "オフにする"
 
 #. js-lingui-explicit-id
 msgid "lock.turnOffHelp"
-msgstr ""
+msgstr "このブラウザ内のすべてを再び復号し、ロックを取り除きます。"
 
 #. js-lingui-explicit-id
 msgid "lock.unfinished"
-msgstr ""
+msgstr "設定の途中です。完了するには、もう一度ロックを解除してください。"
 
 #. js-lingui-explicit-id
 msgid "lock.unlock"
-msgstr ""
+msgstr "ロックを解除"
 
 #. js-lingui-explicit-id
 msgid "lock.unreadable"
-msgstr ""
+msgstr "ロックを読み込めませんでした。再読み込みして、もう一度お試しください。"
 
 #. js-lingui-explicit-id
 msgid "lock.useCode"
-msgstr ""
+msgstr "代わりに復旧コードを使う"
 
 #. js-lingui-explicit-id
 msgid "lock.usePassphrase"
-msgstr ""
+msgstr "代わりにパスフレーズを使う"
 
 #. js-lingui-explicit-id
 msgid "lock.wrong"
-msgstr ""
+msgstr "これでは開けません。"
 
 #. The bar's command mode
 #. js-lingui-explicit-id

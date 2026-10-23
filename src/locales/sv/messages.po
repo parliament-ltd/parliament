@@ -4230,263 +4230,263 @@ msgstr "färg och typsnitt för insidan av ett rum"
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
-msgstr ""
+msgstr "Lägg till en inloggningsnyckel"
 
 #. js-lingui-explicit-id
 msgid "lock.backupFirst"
-msgstr ""
+msgstr "Säkerhetskopiera först:"
 
 #. js-lingui-explicit-id
 msgid "lock.cancel"
-msgstr ""
+msgstr "Avbryt"
 
 #. js-lingui-explicit-id
 msgid "lock.cancelled"
-msgstr ""
+msgstr "Inloggningsnyckeln användes inte."
 
 #. js-lingui-explicit-id
 msgid "lock.change"
-msgstr ""
+msgstr "Ändra den"
 
 #. js-lingui-explicit-id
 msgid "lock.changed"
-msgstr ""
+msgstr "Ändrat."
 
 #. js-lingui-explicit-id
 msgid "lock.changePass"
-msgstr ""
+msgstr "Byt lösenfrasen"
 
 #. js-lingui-explicit-id
 msgid "lock.codeLabel"
-msgstr ""
+msgstr "Återställningskod"
 
 #. js-lingui-explicit-id
 msgid "lock.confirmCode"
-msgstr ""
+msgstr "Skriv kodens fyra sista tecken"
 
 #. js-lingui-explicit-id
 msgid "lock.confirmWrong"
-msgstr ""
+msgstr "Det är inte kodens fyra sista tecken"
 
 #. js-lingui-explicit-id
 msgid "lock.currentPass"
-msgstr ""
+msgstr "Nuvarande lösenfras"
 
 #. js-lingui-explicit-id
 msgid "lock.damaged"
-msgstr ""
+msgstr "Låsets uppgifter är skadade, så det går inte att öppna här."
 
 #. js-lingui-explicit-id
 msgid "lock.differ"
-msgstr ""
+msgstr "Lösenfraserna stämmer inte överens"
 
 #. js-lingui-explicit-id
 msgid "lock.encrypt"
-msgstr ""
+msgstr "Kryptera och lås"
 
 #. js-lingui-explicit-id
 msgid "lock.encrypting"
-msgstr ""
+msgstr "Krypterar"
 
 #. js-lingui-explicit-id
 msgid "lock.failed"
-msgstr ""
+msgstr "Det gick inte att ändra: {reason}. Inget annat ändrades."
 
 #. js-lingui-explicit-id
 msgid "lock.idle15m"
-msgstr ""
+msgstr "15 minuter"
 
 #. js-lingui-explicit-id
 msgid "lock.idle1h"
-msgstr ""
+msgstr "1 timme"
 
 #. js-lingui-explicit-id
 msgid "lock.idle8h"
-msgstr ""
+msgstr "8 timmar"
 
 #. js-lingui-explicit-id
 msgid "lock.idleLabel"
-msgstr ""
+msgstr "Låses efter inaktivitet i"
 
 #. js-lingui-explicit-id
 msgid "lock.idleTab"
-msgstr ""
+msgstr "tills fliken stängs"
 
 #. js-lingui-explicit-id
 msgid "lock.label"
-msgstr ""
+msgstr "Lås"
 
 #. js-lingui-explicit-id
 msgid "lock.lede"
-msgstr ""
+msgstr "Allt här är krypterat. Lås upp den här fliken för att fortsätta."
 
 #. js-lingui-explicit-id
 msgid "lock.locked"
-msgstr ""
+msgstr "Låst. Sidan läses in igen; lås upp den med din lösenfras."
 
 #. js-lingui-explicit-id
 msgid "lock.lockNow"
-msgstr ""
+msgstr "Lås nu"
 
 #. js-lingui-explicit-id
 msgid "lock.lost"
-msgstr ""
+msgstr "Har du tappat bort lösenfrasen, alla inloggningsnycklar och återställningskoden? Ingenting kan öppna det. Om du rensar webbplatsens data i webbläsaren tas allt bort, och Parliament börjar om."
 
 #. js-lingui-explicit-id
 msgid "lock.newCode"
-msgstr ""
+msgstr "Ny återställningskod"
 
 #. js-lingui-explicit-id
 msgid "lock.newCodeShown"
-msgstr ""
+msgstr "Den nya återställningskoden, som visas en gång. Den gamla öppnar inte längre Parliament."
 
 #. js-lingui-explicit-id
 msgid "lock.newPass"
-msgstr ""
+msgstr "Ny lösenfras"
 
 #. js-lingui-explicit-id
 msgid "lock.next"
-msgstr ""
+msgstr "Nästa"
 
 #. js-lingui-explicit-id
 msgid "lock.noPrf"
-msgstr ""
+msgstr "Den här inloggningsnyckeln kan inte låsa upp Parliament. Använd lösenfrasen eller återställningskoden."
 
 #. js-lingui-explicit-id
 msgid "lock.offHelp"
-msgstr ""
+msgstr "Av. När låset är på krypteras allt du har skrivit och dina sparade nycklar i den här webbläsaren, så att en kopia av det inte kan läsas. Varje flik ber om att låsas upp."
 
 #. js-lingui-explicit-id
 msgid "lock.onHelp"
-msgstr ""
+msgstr "{passkeys, plural, =0 {På. Det går att låsa upp med lösenfrasen eller återställningskoden.} one {På. Det går att låsa upp med lösenfrasen, återställningskoden eller # inloggningsnyckel.} other {På. Det går att låsa upp med lösenfrasen, återställningskoden eller # inloggningsnycklar.}}"
 
 #. js-lingui-explicit-id
 msgid "lock.opening"
-msgstr ""
+msgstr "Öppnar"
 
 #. js-lingui-explicit-id
 msgid "lock.passAgain"
-msgstr ""
+msgstr "Samma igen"
 
 #. js-lingui-explicit-id
 msgid "lock.passkey"
-msgstr ""
+msgstr "Lås upp med en inloggningsnyckel"
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyAdded"
-msgstr ""
+msgstr "Tillagd. Den här inloggningsnyckeln låser upp Parliament."
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyItem"
-msgstr ""
+msgstr "En inloggningsnyckel, tillagd {day}"
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyNoPrf"
-msgstr ""
+msgstr "Den här inloggningsnyckeln kan inte låsa upp Parliament, så den lades inte till. Lösenfrasen låser fortfarande upp Parliament."
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyRemove"
-msgstr ""
+msgstr "ta bort den"
 
 #. js-lingui-explicit-id
 msgid "lock.passphraseLabel"
-msgstr ""
+msgstr "Lösenfras"
 
 #. js-lingui-explicit-id
 msgid "lock.passPlaceholder"
-msgstr ""
+msgstr "{count, plural, other {minst # tecken}}"
 
 #. js-lingui-explicit-id
 msgid "lock.reload"
-msgstr ""
+msgstr "Läs in igen"
 
 #. js-lingui-explicit-id
 msgid "lock.setUp"
-msgstr ""
+msgstr "Ställ in låset"
 
 #. js-lingui-explicit-id
 msgid "lock.short"
-msgstr ""
+msgstr "{count, plural, other {Använd minst # tecken}}"
 
 #. js-lingui-explicit-id
 msgid "lock.skip"
-msgstr ""
+msgstr "Inte nu"
 
 #. js-lingui-explicit-id
 msgid "lock.step1Help"
-msgstr ""
+msgstr "{count, plural, other {Minst # tecken. Några ord som inte hör ihop är lätta att komma ihåg och svåra att gissa.}}"
 
 #. js-lingui-explicit-id
 msgid "lock.step1Title"
-msgstr ""
+msgstr "Välj en lösenfras"
 
 #. js-lingui-explicit-id
 msgid "lock.step2Help"
-msgstr ""
+msgstr "Den öppnar Parliament om lösenfrasen glöms bort. Skriv ned den eller spara den i en lösenordshanterare: den visas en gång, här."
 
 #. js-lingui-explicit-id
 msgid "lock.step2Title"
-msgstr ""
+msgstr "Spara återställningskoden"
 
 #. js-lingui-explicit-id
 msgid "lock.step3Help"
-msgstr ""
+msgstr "En inloggningsnyckel kan också låsa upp Parliament: ditt fingeravtryck, ditt ansikte, en PIN-kod eller en telefon. Lösenfrasen och återställningskoden finns kvar; om du tar bort inloggningsnyckeln från en lösenordshanterare försvinner bara den här vägen in."
 
 #. js-lingui-explicit-id
 msgid "lock.step3Title"
-msgstr ""
+msgstr "En inloggningsnyckel, om du vill"
 
 #. js-lingui-explicit-id
 msgid "lock.step4Help"
-msgstr ""
+msgstr "Allt du har skrivit och dina sparade nycklar krypteras i den här webbläsaren. Om lösenfrasen, alla inloggningsnycklar och återställningskoden går förlorade kan ingenting öppna det: det finns ingen server som kan återställa det."
 
 #. js-lingui-explicit-id
 msgid "lock.step4Title"
-msgstr ""
+msgstr "Lås det"
 
 #. js-lingui-explicit-id
 msgid "lock.title"
-msgstr ""
+msgstr "Parliament är låst"
 
 #. js-lingui-explicit-id
 msgid "lock.turnedOff"
-msgstr ""
+msgstr "Låset är av. Sidan läses in igen."
 
 #. js-lingui-explicit-id
 msgid "lock.turnOff"
-msgstr ""
+msgstr "Stäng av låset"
 
 #. js-lingui-explicit-id
 msgid "lock.turnOffConfirm"
-msgstr ""
+msgstr "Stäng av det"
 
 #. js-lingui-explicit-id
 msgid "lock.turnOffHelp"
-msgstr ""
+msgstr "Allt dekrypteras i den här webbläsaren igen, och låset tas bort."
 
 #. js-lingui-explicit-id
 msgid "lock.unfinished"
-msgstr ""
+msgstr "Håller på att ställas in. Lås upp igen för att slutföra."
 
 #. js-lingui-explicit-id
 msgid "lock.unlock"
-msgstr ""
+msgstr "Lås upp"
 
 #. js-lingui-explicit-id
 msgid "lock.unreadable"
-msgstr ""
+msgstr "Låset kunde inte läsas. Läs in sidan igen för att försöka på nytt."
 
 #. js-lingui-explicit-id
 msgid "lock.useCode"
-msgstr ""
+msgstr "Använd återställningskoden i stället"
 
 #. js-lingui-explicit-id
 msgid "lock.usePassphrase"
-msgstr ""
+msgstr "Använd lösenfrasen i stället"
 
 #. js-lingui-explicit-id
 msgid "lock.wrong"
-msgstr ""
+msgstr "Det öppnar inte låset."
 
 #. The bar's command mode
 #. js-lingui-explicit-id

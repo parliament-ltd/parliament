@@ -4230,263 +4230,263 @@ msgstr "värit ja kirjasimet huoneen sisälle"
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
-msgstr ""
+msgstr "Lisää pääsyavain"
 
 #. js-lingui-explicit-id
 msgid "lock.backupFirst"
-msgstr ""
+msgstr "Varmuuskopioi ensin:"
 
 #. js-lingui-explicit-id
 msgid "lock.cancel"
-msgstr ""
+msgstr "Peruuta"
 
 #. js-lingui-explicit-id
 msgid "lock.cancelled"
-msgstr ""
+msgstr "Pääsyavainta ei käytetty."
 
 #. js-lingui-explicit-id
 msgid "lock.change"
-msgstr ""
+msgstr "Vaihda"
 
 #. js-lingui-explicit-id
 msgid "lock.changed"
-msgstr ""
+msgstr "Vaihdettu."
 
 #. js-lingui-explicit-id
 msgid "lock.changePass"
-msgstr ""
+msgstr "Vaihda salalause"
 
 #. js-lingui-explicit-id
 msgid "lock.codeLabel"
-msgstr ""
+msgstr "Palautuskoodi"
 
 #. js-lingui-explicit-id
 msgid "lock.confirmCode"
-msgstr ""
+msgstr "Kirjoita sen neljä viimeistä merkkiä"
 
 #. js-lingui-explicit-id
 msgid "lock.confirmWrong"
-msgstr ""
+msgstr "Ne eivät ole sen neljä viimeistä merkkiä"
 
 #. js-lingui-explicit-id
 msgid "lock.currentPass"
-msgstr ""
+msgstr "Nykyinen salalause"
 
 #. js-lingui-explicit-id
 msgid "lock.damaged"
-msgstr ""
+msgstr "Lukituksen tiedot ovat vahingoittuneet, joten lukitusta ei voi avata täällä."
 
 #. js-lingui-explicit-id
 msgid "lock.differ"
-msgstr ""
+msgstr "Salalauseet eivät täsmää"
 
 #. js-lingui-explicit-id
 msgid "lock.encrypt"
-msgstr ""
+msgstr "Salaa ja lukitse"
 
 #. js-lingui-explicit-id
 msgid "lock.encrypting"
-msgstr ""
+msgstr "Salataan"
 
 #. js-lingui-explicit-id
 msgid "lock.failed"
-msgstr ""
+msgstr "Sitä ei voitu vaihtaa: {reason}. Mitään muuta ei muutettu."
 
 #. js-lingui-explicit-id
 msgid "lock.idle15m"
-msgstr ""
+msgstr "15 minuuttia"
 
 #. js-lingui-explicit-id
 msgid "lock.idle1h"
-msgstr ""
+msgstr "1 tunti"
 
 #. js-lingui-explicit-id
 msgid "lock.idle8h"
-msgstr ""
+msgstr "8 tuntia"
 
 #. js-lingui-explicit-id
 msgid "lock.idleLabel"
-msgstr ""
+msgstr "Lukittuu, kun käyttämättä on kulunut"
 
 #. js-lingui-explicit-id
 msgid "lock.idleTab"
-msgstr ""
+msgstr "kunnes välilehti suljetaan"
 
 #. js-lingui-explicit-id
 msgid "lock.label"
-msgstr ""
+msgstr "Lukitus"
 
 #. js-lingui-explicit-id
 msgid "lock.lede"
-msgstr ""
+msgstr "Kaikki täällä on salattu. Avaa tämän välilehden lukitus jatkaaksesi."
 
 #. js-lingui-explicit-id
 msgid "lock.locked"
-msgstr ""
+msgstr "Lukittu. Sivu latautuu uudelleen; avaa lukitus salalauseellasi."
 
 #. js-lingui-explicit-id
 msgid "lock.lockNow"
-msgstr ""
+msgstr "Lukitse nyt"
 
 #. js-lingui-explicit-id
 msgid "lock.lost"
-msgstr ""
+msgstr "Kadotitko salalauseen, kaikki pääsyavaimet ja palautuskoodin? Mikään ei voi avata sitä. Tämän sivuston tietojen tyhjentäminen selaimessa poistaa kaiken, ja Parliament alkaa alusta."
 
 #. js-lingui-explicit-id
 msgid "lock.newCode"
-msgstr ""
+msgstr "Uusi palautuskoodi"
 
 #. js-lingui-explicit-id
 msgid "lock.newCodeShown"
-msgstr ""
+msgstr "Uusi palautuskoodi, näytetään tämän kerran. Vanha ei enää avaa Parliamentia."
 
 #. js-lingui-explicit-id
 msgid "lock.newPass"
-msgstr ""
+msgstr "Uusi salalause"
 
 #. js-lingui-explicit-id
 msgid "lock.next"
-msgstr ""
+msgstr "Seuraava"
 
 #. js-lingui-explicit-id
 msgid "lock.noPrf"
-msgstr ""
+msgstr "Tämä pääsyavain ei voi avata Parliamentin lukitusta. Käytä salalausetta tai palautuskoodia."
 
 #. js-lingui-explicit-id
 msgid "lock.offHelp"
-msgstr ""
+msgstr "Pois päältä. Kun lukitus on päällä, kaikki kirjoittamasi ja tallennetut avaimesi salataan tässä selaimessa, joten niistä otettua kopiota ei voi lukea. Jokainen välilehti pyytää avaamaan lukituksen."
 
 #. js-lingui-explicit-id
 msgid "lock.onHelp"
-msgstr ""
+msgstr "{passkeys, plural, =0 {Päällä. Lukituksen voi avata salalauseella tai palautuskoodilla.} one {Päällä. Lukituksen voi avata salalauseella, palautuskoodilla tai # pääsyavaimella.} other {Päällä. Lukituksen voi avata salalauseella, palautuskoodilla tai # pääsyavaimella.}}"
 
 #. js-lingui-explicit-id
 msgid "lock.opening"
-msgstr ""
+msgstr "Avataan"
 
 #. js-lingui-explicit-id
 msgid "lock.passAgain"
-msgstr ""
+msgstr "Sama uudelleen"
 
 #. js-lingui-explicit-id
 msgid "lock.passkey"
-msgstr ""
+msgstr "Avaa pääsyavaimella"
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyAdded"
-msgstr ""
+msgstr "Lisätty. Tämä pääsyavain avaa Parliamentin lukituksen."
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyItem"
-msgstr ""
+msgstr "Pääsyavain, lisätty {day}"
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyNoPrf"
-msgstr ""
+msgstr "Tämä pääsyavain ei voi avata Parliamentin lukitusta, joten sitä ei lisätty. Salalause avaa sen yhä."
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyRemove"
-msgstr ""
+msgstr "poista"
 
 #. js-lingui-explicit-id
 msgid "lock.passphraseLabel"
-msgstr ""
+msgstr "Salalause"
 
 #. js-lingui-explicit-id
 msgid "lock.passPlaceholder"
-msgstr ""
+msgstr "{count, plural, other {Vähintään # merkkiä}}"
 
 #. js-lingui-explicit-id
 msgid "lock.reload"
-msgstr ""
+msgstr "Lataa uudelleen"
 
 #. js-lingui-explicit-id
 msgid "lock.setUp"
-msgstr ""
+msgstr "Ota lukitus käyttöön"
 
 #. js-lingui-explicit-id
 msgid "lock.short"
-msgstr ""
+msgstr "{count, plural, other {Käytä vähintään # merkkiä}}"
 
 #. js-lingui-explicit-id
 msgid "lock.skip"
-msgstr ""
+msgstr "Ei nyt"
 
 #. js-lingui-explicit-id
 msgid "lock.step1Help"
-msgstr ""
+msgstr "{count, plural, other {Vähintään # merkkiä. Muutama toisiinsa liittymätön sana on helppo muistaa ja vaikea arvata.}}"
 
 #. js-lingui-explicit-id
 msgid "lock.step1Title"
-msgstr ""
+msgstr "Valitse salalause"
 
 #. js-lingui-explicit-id
 msgid "lock.step2Help"
-msgstr ""
+msgstr "Se avaa Parliamentin, jos salalause unohtuu. Kirjoita se muistiin tai tallenna se salasanojen hallintaohjelmaan: se näytetään tämän kerran, tässä."
 
 #. js-lingui-explicit-id
 msgid "lock.step2Title"
-msgstr ""
+msgstr "Ota palautuskoodi talteen"
 
 #. js-lingui-explicit-id
 msgid "lock.step3Help"
-msgstr ""
+msgstr "Myös pääsyavain voi avata Parliamentin lukituksen: sormenjälkesi, kasvosi, PIN-koodi tai puhelin. Salalause ja palautuskoodi säilyvät; pääsyavaimen poistaminen salasanojen hallintaohjelmasta poistaa vain tämän tavan päästä sisään."
 
 #. js-lingui-explicit-id
 msgid "lock.step3Title"
-msgstr ""
+msgstr "Pääsyavain, jos haluat"
 
 #. js-lingui-explicit-id
 msgid "lock.step4Help"
-msgstr ""
+msgstr "Kaikki kirjoittamasi ja tallennetut avaimesi salataan tässä selaimessa. Jos salalause, kaikki pääsyavaimet ja palautuskoodi katoavat, mikään ei voi avata sitä: ei ole palvelinta, joka voisi nollata sen."
 
 #. js-lingui-explicit-id
 msgid "lock.step4Title"
-msgstr ""
+msgstr "Lukitse"
 
 #. js-lingui-explicit-id
 msgid "lock.title"
-msgstr ""
+msgstr "Parliament on lukittu"
 
 #. js-lingui-explicit-id
 msgid "lock.turnedOff"
-msgstr ""
+msgstr "Lukitus on pois päältä. Sivu latautuu uudelleen."
 
 #. js-lingui-explicit-id
 msgid "lock.turnOff"
-msgstr ""
+msgstr "Poista lukitus käytöstä"
 
 #. js-lingui-explicit-id
 msgid "lock.turnOffConfirm"
-msgstr ""
+msgstr "Poista käytöstä"
 
 #. js-lingui-explicit-id
 msgid "lock.turnOffHelp"
-msgstr ""
+msgstr "Kaiken salaus puretaan taas tässä selaimessa, ja lukitus poistetaan."
 
 #. js-lingui-explicit-id
 msgid "lock.unfinished"
-msgstr ""
+msgstr "Käyttöönotto on kesken. Avaa lukitus uudelleen viimeistelläksesi sen."
 
 #. js-lingui-explicit-id
 msgid "lock.unlock"
-msgstr ""
+msgstr "Avaa lukitus"
 
 #. js-lingui-explicit-id
 msgid "lock.unreadable"
-msgstr ""
+msgstr "Lukitusta ei voitu lukea. Lataa sivu uudelleen ja yritä taas."
 
 #. js-lingui-explicit-id
 msgid "lock.useCode"
-msgstr ""
+msgstr "Käytä sen sijaan palautuskoodia"
 
 #. js-lingui-explicit-id
 msgid "lock.usePassphrase"
-msgstr ""
+msgstr "Käytä sen sijaan salalausetta"
 
 #. js-lingui-explicit-id
 msgid "lock.wrong"
-msgstr ""
+msgstr "Tämä ei avaa lukitusta."
 
 #. The bar's command mode
 #. js-lingui-explicit-id

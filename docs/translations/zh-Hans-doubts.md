@@ -121,3 +121,20 @@ Lines drafted but not sure of. Each gives the id, the English, the draft, and wh
     - EN: Your work stays here
     - ZH: 你的内容留在这里
     - Why: "work" as 内容 (what you made); 你的工作成果 is closer but long for a lead-in.
+
+## The lock (chunk 15)
+
+23. **lock.idleLabel, lock.idleTab**
+    - EN: Locks when idle for / 15 minutes, 1 hour, 8 hours, until the tab closes
+    - ZH: 闲置多久后锁定 / 15 分钟、1 小时、8 小时、直到关闭标签页
+    - Why: a question-form label lets a bare duration answer it, as Chinese settings do (自动锁定：5 分钟). The last choice answers it less neatly. 关闭标签页前不锁定 would be plainer, but it states the meaning ("does not lock while the tab is open") rather than the English words, so I kept the literal one.
+
+24. **lock.wrong**
+    - EN: That does not open it.
+    - ZH: 输入的内容无法解锁。
+    - Why: "that" can be a passphrase or a recovery code, so it is 输入的内容 (what was typed) instead of naming one.
+
+25. **lock.step3Title**
+    - EN: A passkey, if you like
+    - ZH: 通行密钥（可选）
+    - Why: "if you like" as 可选 (optional), the usual short form for an optional setup step. 如果你愿意，可添加通行密钥 is the literal version, but it is long for a step title.

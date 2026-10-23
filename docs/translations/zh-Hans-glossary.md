@@ -80,6 +80,16 @@ One line per term: English → Chinese, with the reason where it was a hard choi
 - saved search → 保存的搜索
 - filter → 筛选条件; in force → 生效
 
+## The lock (Lock Parliament)
+- the lock (the feature, the Settings row) → 锁定 (锁定已关闭, 设置锁定); the lock's record → 锁定记录
+- passphrase → 密码短语 (kept apart from 密码, the backup password)
+- recovery code → 恢复码
+- passkey → 通行密钥 (as Apple and Google write it)
+- unlock → 解锁; locked → 已锁定; Lock now → 立即锁定
+- idle → 闲置; the idle label "Locks when idle for" → 闲置多久后锁定, so a bare duration (15 分钟, 1 小时) answers it
+- Nothing can open it → 没有任何办法能打开它
+- there is no server to reset it → 没有服务器可以重置它
+
 ## Places and devices
 - this computer / on your machine → 本机 (Nothing leaves it → 内容不会离开本机)
 - this browser → 此浏览器; this tab → 此标签页; this device → 本设备

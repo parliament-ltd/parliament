@@ -99,3 +99,24 @@ Each: id, the English, the draft, and why I was unsure.
     Draft: …En ny visas där och i den publicerade policyn innan den kan användas.
     Why: kept "policyn" as unspecific as the English. If it means the privacy policy, "integritetspolicyn" is the word a Swedish reader expects; I did not add it, since the English does not say so.
     Settled: the English now reads "the security policy the site publishes" (the Content-Security-Policy); the draft is now "i den säkerhetspolicy som webbplatsen publicerar".
+
+20. **Passkey → inloggningsnyckel** (lock.addPasskey, lock.passkey, lock.step3Help and others)
+    English: passkey
+    Draft: inloggningsnyckel
+    Why: it does not clash with "nyckel" (API key) and is Apple's Swedish word. But it is long, and it says "login" where Parliament means unlocking. The loanword "passkey" is also common in Swedish and shorter; if Stefan prefers it, it is a straight swap.
+
+21. **Recovery code → återställningskod** (lock.codeLabel, lock.step2Title and others)
+    English: recovery code; there is no server to reset it
+    Draft: återställningskod; det finns ingen server som kan återställa det
+    Why: the natural Swedish words, but they reuse "återställ", which elsewhere means restoring a backup. "reservkod" would keep the words apart; for "reset it", "nollställa" is possible but less natural.
+
+22. **"shown once"** (lock.newCodeShown, lock.step2Help)
+    English: The new recovery code, shown once. / it is shown once, here.
+    Draft: …som visas en gång. / …den visas en gång, här.
+    Why: natural Swedish would say "bara en gång", but that adds "only", which the English does not have. "visas en gång" is exact, and a little less emphatic to a Swedish ear.
+
+23. **lock.idleLabel with lock.idleTab**
+    English: Locks when idle for / until the tab closes
+    Draft: Låses efter inaktivitet i / tills fliken stängs
+    Why: the three time choices follow the label well ("Låses efter inaktivitet i 15 minuter"). "tills fliken stängs" fits as loosely as the English does; if the choices are read as one sentence, it may need its own wording.
+

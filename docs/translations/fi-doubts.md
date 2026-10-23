@@ -75,6 +75,11 @@ Each: id, the English, the draft, and why I was unsure.
     Why: Finnish "käytäntö" on its own reads as "practice", so I wrote "tietosuojakäytäntö" (privacy policy). That names which policy, which the English leaves to context. If the published policy is not the privacy policy, "julkaistussa käytännössä" is the literal form.
     Settled since: the English now says "the security policy the site publishes" (the site's Content-Security-Policy, the hosts the page may connect to). Draft: "sivuston julkaisemassa suojauskäytännössä". "Suojauskäytäntö" follows the Finnish name for Content Security Policy ("sisällön suojauskäytäntö"); "tietoturvakäytäntö" would read as an organisation's IT security rules.
 
+15. **lock.idleLabel with lock.idleTab** (chunk 15, Lock Parliament)
+    English: Locks when idle for / 15 minutes, 1 hour, 8 hours, until the tab closes
+    Draft: Lukittuu, kun käyttämättä on kulunut / 15 minuuttia, 1 tunti, 8 tuntia, kunnes välilehti suljetaan
+    Why: the three durations read as one sentence after the label ("…on kulunut 1 tunti"). The fourth choice does not, any more than it does in English. That is fine if the choices sit in a menu under the label, but not if the label and the chosen value are ever printed as one line.
+
 ## Checker warnings: all prose, not commands
 
 `node check.mjs fi` reports 14 command warnings. In each, the English uses a verb as an ordinary word before a colon, and the Finnish sentence rightly does not contain it. Every real command in these entries is kept as typed.

@@ -79,3 +79,16 @@
 - shelf → 棚
 - tracked changes → 変更履歴
 - marked as data → データとして明示
+
+## Lock Parliament (chunk 15)
+
+- lock (the feature, the row in Settings) → ロック; lock it → ロックする
+- passphrase → パスフレーズ
+- recovery code → 復旧コード. Chosen over リカバリーコード to match Apple's 復旧キー and 復旧用連絡先, and it is shorter.
+- passkey → パスキー, as Apple and Google write it
+- unlock → ロックを解除 (button), ロックの解除 (noun), as Apple has it
+- lock now → 今すぐロック
+- idle → 無操作. The label "Locks when idle for" is ロックまでの無操作時間, so a bare duration reads with it: 15分, 1時間, 8時間, タブを閉じるまで.
+- password manager → パスワードマネージャ (Apple's long-vowel practice)
+- encrypt / decrypt → 暗号化 / 復号
+- "nothing can open it" → 開く手段は何もありません; "there is no server to reset it" → リセットできるサーバがない

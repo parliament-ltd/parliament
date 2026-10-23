@@ -1625,7 +1625,7 @@ Found while designing the stage after stage 9 (S4; `security-privacy-decisions.m
 - **(f) Saved keys** are sealed with the data key while the lock is on and can be read only once a tab is unlocked; a key saved while it is on is sealed as it is saved.
 - **(g) Other tabs** are told by a signal carrying nothing but its name, and reload.
 - **(h) Checked in the in-app browser** on the production build at an empty origin (the trial copy shares the key database with the pane's own data, so a test lock there would touch real saved keys): a short passphrase and a wrong confirmation refused; a saved search sealed on disk; the unlock screen after the reload; a wrong passphrase refused; the recovery code typed in lower case with spaces; Lock now; a second tab asking for itself; turning off, with the second tab reloading and opening, and everything readable again. The origin was cleared afterwards. **Not tried:** a real passkey, which needs Touch ID, Windows Hello or a phone (for Stefan, on `npm run dev` in his own browser, with no trial copy on); the idle wait itself.
-- **(i) New words** (the unlock screen and the lock in Settings) are not yet in the four drafts; they show in English there.
+- **(i) New words** (the unlock screen and the lock in Settings) are drafted in the four languages too, with their terms in each glossary (passphrase, recovery code, passkey, unlock) and their doubts listed (`docs/translations/`).
 - **Suggestion:** keep as built.
 
 **C195. Backups, restore and Delete everything with the lock on, as built** (piece 4).

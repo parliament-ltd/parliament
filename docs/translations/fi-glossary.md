@@ -75,6 +75,19 @@ One line per term: English → Finnish, with the reason where it was a hard choi
 - network activity → verkkoliikenne; host → palvelin.
 - 1.1 times the price → 1,1-kertainen hinta.
 
+## Lock Parliament
+- the lock (the feature, the Settings row) → lukitus; to lock → lukita; locked → lukittu ("Parliament on lukittu").
+- Lock now → Lukitse nyt. Lock it (step 4) → Lukitse. Encrypt and lock → Salaa ja lukitse.
+- unlock → avata lukitus; Unlock (button) → Avaa lukitus; unlocks Parliament → avaa Parliamentin lukituksen. Where the English says "opens Parliament", the Finnish says "avaa Parliamentin".
+- passphrase → salalause. The usual Finnish word; kept apart from salasana, which stays for backup passwords.
+- recovery code → palautuskoodi.
+- passkey → pääsyavain. The term Apple and Google use in Finnish. Kept apart from API-avain: in lock copy the API keys are "tallennetut avaimesi", never "pääsyavain", and a passkey is never just "avain".
+- idle → käyttämättä. The label "Locks when idle for" → "Lukittuu, kun käyttämättä on kulunut", so the choices follow it in the nominative as the subject of "kulua": 15 minuuttia, 1 tunti, 8 tuntia. ("kestää" was ruled out: it would need the accusative, "tunnin".)
+- set up the lock → ottaa lukitus käyttöön; turn the lock off → poistaa lukitus käytöstä.
+- encrypt → salata; decrypt → purkaa salaus.
+- password manager → salasanojen hallintaohjelma.
+- shown once → näytetään tämän kerran (no "vain" added).
+
 ## Typography
 - Quotation marks ”…” (U+201D both sides). ASCII quotes only inside commands (open:"{name}", name:"…").
 - Decimal comma in prose (1,1). Values typed into commands stay ASCII (cost: >0.50, <1 or 0.18).

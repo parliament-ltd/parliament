@@ -4230,263 +4230,263 @@ msgstr "房间内部的配色和字体"
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
-msgstr ""
+msgstr "添加通行密钥"
 
 #. js-lingui-explicit-id
 msgid "lock.backupFirst"
-msgstr ""
+msgstr "请先备份："
 
 #. js-lingui-explicit-id
 msgid "lock.cancel"
-msgstr ""
+msgstr "取消"
 
 #. js-lingui-explicit-id
 msgid "lock.cancelled"
-msgstr ""
+msgstr "未使用通行密钥。"
 
 #. js-lingui-explicit-id
 msgid "lock.change"
-msgstr ""
+msgstr "更改"
 
 #. js-lingui-explicit-id
 msgid "lock.changed"
-msgstr ""
+msgstr "已更改。"
 
 #. js-lingui-explicit-id
 msgid "lock.changePass"
-msgstr ""
+msgstr "更改密码短语"
 
 #. js-lingui-explicit-id
 msgid "lock.codeLabel"
-msgstr ""
+msgstr "恢复码"
 
 #. js-lingui-explicit-id
 msgid "lock.confirmCode"
-msgstr ""
+msgstr "输入它的最后四个字符"
 
 #. js-lingui-explicit-id
 msgid "lock.confirmWrong"
-msgstr ""
+msgstr "这不是它的最后四个字符"
 
 #. js-lingui-explicit-id
 msgid "lock.currentPass"
-msgstr ""
+msgstr "当前的密码短语"
 
 #. js-lingui-explicit-id
 msgid "lock.damaged"
-msgstr ""
+msgstr "锁定记录已损坏，因此无法在这里打开。"
 
 #. js-lingui-explicit-id
 msgid "lock.differ"
-msgstr ""
+msgstr "两次输入的密码短语不一致"
 
 #. js-lingui-explicit-id
 msgid "lock.encrypt"
-msgstr ""
+msgstr "加密并锁定"
 
 #. js-lingui-explicit-id
 msgid "lock.encrypting"
-msgstr ""
+msgstr "正在加密"
 
 #. js-lingui-explicit-id
 msgid "lock.failed"
-msgstr ""
+msgstr "无法更改：{reason}。未做其他任何更改。"
 
 #. js-lingui-explicit-id
 msgid "lock.idle15m"
-msgstr ""
+msgstr "15 分钟"
 
 #. js-lingui-explicit-id
 msgid "lock.idle1h"
-msgstr ""
+msgstr "1 小时"
 
 #. js-lingui-explicit-id
 msgid "lock.idle8h"
-msgstr ""
+msgstr "8 小时"
 
 #. js-lingui-explicit-id
 msgid "lock.idleLabel"
-msgstr ""
+msgstr "闲置多久后锁定"
 
 #. js-lingui-explicit-id
 msgid "lock.idleTab"
-msgstr ""
+msgstr "直到关闭标签页"
 
 #. js-lingui-explicit-id
 msgid "lock.label"
-msgstr ""
+msgstr "锁定"
 
 #. js-lingui-explicit-id
 msgid "lock.lede"
-msgstr ""
+msgstr "这里的所有内容都已加密。请解锁此标签页以继续。"
 
 #. js-lingui-explicit-id
 msgid "lock.locked"
-msgstr ""
+msgstr "已锁定。页面将重新加载；请用你的密码短语解锁。"
 
 #. js-lingui-explicit-id
 msgid "lock.lockNow"
-msgstr ""
+msgstr "立即锁定"
 
 #. js-lingui-explicit-id
 msgid "lock.lost"
-msgstr ""
+msgstr "密码短语、所有通行密钥和恢复码都丢失了？那就没有任何办法能打开它。在浏览器中清除本网站的数据会删除全部内容，Parliament 将重新开始。"
 
 #. js-lingui-explicit-id
 msgid "lock.newCode"
-msgstr ""
+msgstr "新恢复码"
 
 #. js-lingui-explicit-id
 msgid "lock.newCodeShown"
-msgstr ""
+msgstr "新的恢复码，仅显示一次。旧的恢复码已无法再打开 Parliament。"
 
 #. js-lingui-explicit-id
 msgid "lock.newPass"
-msgstr ""
+msgstr "新的密码短语"
 
 #. js-lingui-explicit-id
 msgid "lock.next"
-msgstr ""
+msgstr "下一步"
 
 #. js-lingui-explicit-id
 msgid "lock.noPrf"
-msgstr ""
+msgstr "此通行密钥无法解锁 Parliament。请使用密码短语或恢复码。"
 
 #. js-lingui-explicit-id
 msgid "lock.offHelp"
-msgstr ""
+msgstr "关闭。开启后，你写下的所有内容和已保存的密钥都会在此浏览器中加密，因此复制出的副本无法读取。每个标签页都会要求解锁。"
 
 #. js-lingui-explicit-id
 msgid "lock.onHelp"
-msgstr ""
+msgstr "{passkeys, plural, =0 {开启。可用密码短语或恢复码解锁。} other {开启。可用密码短语、恢复码或 # 个通行密钥解锁。}}"
 
 #. js-lingui-explicit-id
 msgid "lock.opening"
-msgstr ""
+msgstr "正在打开"
 
 #. js-lingui-explicit-id
 msgid "lock.passAgain"
-msgstr ""
+msgstr "再输入一次"
 
 #. js-lingui-explicit-id
 msgid "lock.passkey"
-msgstr ""
+msgstr "使用通行密钥解锁"
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyAdded"
-msgstr ""
+msgstr "已添加。此通行密钥可以解锁 Parliament。"
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyItem"
-msgstr ""
+msgstr "通行密钥，添加于 {day}"
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyNoPrf"
-msgstr ""
+msgstr "此通行密钥无法解锁 Parliament，因此未添加。密码短语仍可解锁。"
 
 #. js-lingui-explicit-id
 msgid "lock.passkeyRemove"
-msgstr ""
+msgstr "移除"
 
 #. js-lingui-explicit-id
 msgid "lock.passphraseLabel"
-msgstr ""
+msgstr "密码短语"
 
 #. js-lingui-explicit-id
 msgid "lock.passPlaceholder"
-msgstr ""
+msgstr "{count, plural, other {至少 # 个字符}}"
 
 #. js-lingui-explicit-id
 msgid "lock.reload"
-msgstr ""
+msgstr "重新加载"
 
 #. js-lingui-explicit-id
 msgid "lock.setUp"
-msgstr ""
+msgstr "设置锁定"
 
 #. js-lingui-explicit-id
 msgid "lock.short"
-msgstr ""
+msgstr "{count, plural, other {请使用至少 # 个字符}}"
 
 #. js-lingui-explicit-id
 msgid "lock.skip"
-msgstr ""
+msgstr "暂不"
 
 #. js-lingui-explicit-id
 msgid "lock.step1Help"
-msgstr ""
+msgstr "{count, plural, other {至少 # 个字符。几个互不相关的词语容易记住，也难以猜到。}}"
 
 #. js-lingui-explicit-id
 msgid "lock.step1Title"
-msgstr ""
+msgstr "选择密码短语"
 
 #. js-lingui-explicit-id
 msgid "lock.step2Help"
-msgstr ""
+msgstr "忘记密码短语时，可以用它打开 Parliament。请把它写下来，或保存在密码管理器中：它只在这里显示一次。"
 
 #. js-lingui-explicit-id
 msgid "lock.step2Title"
-msgstr ""
+msgstr "保存恢复码"
 
 #. js-lingui-explicit-id
 msgid "lock.step3Help"
-msgstr ""
+msgstr "通行密钥也可以解锁 Parliament：用你的指纹、面容、PIN 码或手机。密码短语和恢复码依然有效；从密码管理器中删除通行密钥，只会去掉这一种解锁方式。"
 
 #. js-lingui-explicit-id
 msgid "lock.step3Title"
-msgstr ""
+msgstr "通行密钥（可选）"
 
 #. js-lingui-explicit-id
 msgid "lock.step4Help"
-msgstr ""
+msgstr "你写下的所有内容和已保存的密钥都会在此浏览器中加密。如果密码短语、所有通行密钥和恢复码全都丢失，就没有任何办法能打开它：没有服务器可以重置它。"
 
 #. js-lingui-explicit-id
 msgid "lock.step4Title"
-msgstr ""
+msgstr "锁定"
 
 #. js-lingui-explicit-id
 msgid "lock.title"
-msgstr ""
+msgstr "Parliament 已锁定"
 
 #. js-lingui-explicit-id
 msgid "lock.turnedOff"
-msgstr ""
+msgstr "锁定已关闭。页面将重新加载。"
 
 #. js-lingui-explicit-id
 msgid "lock.turnOff"
-msgstr ""
+msgstr "关闭锁定"
 
 #. js-lingui-explicit-id
 msgid "lock.turnOffConfirm"
-msgstr ""
+msgstr "关闭"
 
 #. js-lingui-explicit-id
 msgid "lock.turnOffHelp"
-msgstr ""
+msgstr "此浏览器中的所有内容会重新解密，锁定也会被移除。"
 
 #. js-lingui-explicit-id
 msgid "lock.unfinished"
-msgstr ""
+msgstr "正在设置中。请再次解锁以完成设置。"
 
 #. js-lingui-explicit-id
 msgid "lock.unlock"
-msgstr ""
+msgstr "解锁"
 
 #. js-lingui-explicit-id
 msgid "lock.unreadable"
-msgstr ""
+msgstr "无法读取锁定记录。请重新加载后重试。"
 
 #. js-lingui-explicit-id
 msgid "lock.useCode"
-msgstr ""
+msgstr "改用恢复码"
 
 #. js-lingui-explicit-id
 msgid "lock.usePassphrase"
-msgstr ""
+msgstr "改用密码短语"
 
 #. js-lingui-explicit-id
 msgid "lock.wrong"
-msgstr ""
+msgstr "输入的内容无法解锁。"
 
 #. The bar's command mode
 #. js-lingui-explicit-id

@@ -87,3 +87,15 @@ Each: id, the English, my draft, why I was unsure.
 17. Settled: settings.private3 keeps 私たち.
 
 18. Settled: settings.private2 now says keys are never put in a backup (バックアップに入れられることは決してありません), and encryption only protects a key on disk.
+
+## Chunk 15 (Lock Parliament)
+
+19. lock.idleLabel, lock.idleTab
+    - en: Locks when idle for / 15 minutes, 1 hour, 8 hours, until the tab closes
+    - ja: ロックまでの無操作時間 / 15分, 1時間, 8時間, タブを閉じるまで
+    - The label is a noun phrase ("idle time before it locks") so the bare durations read with it. タブを閉じるまで then reads as literally as the English does. If it should say plainly that there is no idle lock, しない（タブを閉じるまで） is clearer, but it says more than the English.
+
+20. lock.step4Help
+    - en: … nothing can open it: there is no server to reset it.
+    - ja: …開く手段は何もありません。リセットできるサーバがないためです。
+    - The colon becomes a sentence giving the reason (ためです), which is how a Japanese reader takes the colon. Neither claim is stronger or weaker; if the causal link is more than intended, 。リセットできるサーバはありません。 keeps them side by side.
