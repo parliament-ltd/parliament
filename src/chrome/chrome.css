@@ -744,6 +744,8 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-pl-marg button { font: inherit; color: inherit; border: none; background: none; padding: 0; cursor: pointer; }
 .ch-pl-marg button:hover { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
 .ch-pl-marg button:focus-visible { outline: var(--ch-focus); outline-offset: 2px; border-radius: 2px; }
+/* When a step runs: marginalia that changes on a click (C201). */
+.ch-pl-cond { text-decoration: underline dotted; text-underline-offset: 2px; text-decoration-color: var(--ch-soft); }
 .ch-pl-doc { margin-top: 12px; }
 .ch-pl-line { position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; column-gap: 12px; align-items: start; padding: 10px 0; border-top: .5px solid var(--ch-border-2); }
 .ch-pl-doc > .ch-pl-line:first-child { border-top: none; }

@@ -1111,10 +1111,12 @@ export async function markStep(db, { docketId, n, letter, stepId, status, ended 
     const i = branch.steps.findIndex((s) => s.id === stepId)
     if (i < 0) throw new PlanError('noStep')
     const was = branch.steps[i]
-    if (status === STATUS.RUNNING && (was.status !== STATUS.READY || was.messageId)) throw new PlanError('fixed')
-    if (status !== STATUS.RUNNING && status !== STATUS.DONE && status !== STATUS.PAUSED) throw new PlanError('fixed')
+    const fresh = was.status === STATUS.READY && !was.messageId
+    if ((status === STATUS.RUNNING || status === STATUS.WAITING) && !fresh) throw new PlanError('fixed')
+    if (![STATUS.RUNNING, STATUS.DONE, STATUS.PAUSED, STATUS.WAITING].includes(status)) throw new PlanError('fixed')
     const next = { ...was, status }
     if (status === STATUS.PAUSED && ENDED.includes(ended)) next.ended = ended
+    else if (status === STATUS.WAITING) next.ended = 'unmet'
     else delete next.ended
     const steps = branch.steps.map((s, k) => (k === i ? next : s))
     const changes = []

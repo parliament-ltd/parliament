@@ -3146,6 +3146,18 @@ msgid "enter.runCost"
 msgstr "At least {tokens, number} tokens to send, {cost}. Each step also sends the replies before it"
 
 #. js-lingui-explicit-id
+msgid "enter.runCostAll"
+msgstr "If every step runs, at least {tokens, number} tokens to send, {cost}. Each step also sends the replies before it"
+
+#. js-lingui-explicit-id
+msgid "enter.runCostAllCheap"
+msgstr "If every step runs, at least {tokens, number} tokens to send, under {cost}. Each step also sends the replies before it"
+
+#. js-lingui-explicit-id
+msgid "enter.runCostAllUnpriced"
+msgstr "If every step runs, at least {tokens, number} tokens to send. Each step also sends the replies before it"
+
+#. js-lingui-explicit-id
 msgid "enter.runCostCheap"
 msgstr "At least {tokens, number} tokens to send, under {cost}. Each step also sends the replies before it"
 
@@ -3185,6 +3197,10 @@ msgstr "{count, plural, one {Enter makes run {run} and runs one step of {address
 #. js-lingui-explicit-id
 msgid "enter.runHeld"
 msgstr "{address} is held. hold:off {address} lets it go"
+
+#. js-lingui-explicit-id
+msgid "enter.runIf"
+msgstr "{count, plural, one {One step runs only if the one before fails or finds nothing} other {# steps run only if the one before fails or finds nothing}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runLater"
@@ -5058,6 +5074,15 @@ msgstr "chat {num}"
 msgid "plan.chatHelp"
 msgstr "open:{num} opens it"
 
+#. When a step runs (C201)
+#. js-lingui-explicit-id
+msgid "plan.condition"
+msgstr "{condition, select, failed {runs if the step before fails} nothing {runs if nothing is found} always {runs whatever happens} other {runs once the step before finishes}}"
+
+#. js-lingui-explicit-id
+msgid "plan.conditionHelp"
+msgstr "When this step runs. A click changes it"
+
 #. js-lingui-explicit-id
 msgid "plan.counts"
 msgstr "{branches, plural, one {one branch} other {# branches}}, {steps, plural, =0 {no steps} one {one step} other {# steps}}"
@@ -5070,10 +5095,10 @@ msgstr "Delete {address}"
 msgid "plan.deleteStep"
 msgstr "Delete step {index} of {address}"
 
-#. Why a paused step stopped
+#. Why a paused step stopped, or a waiting one did not run
 #. js-lingui-explicit-id
 msgid "plan.ended"
-msgstr "{why, select, stopped {stopped} failed {it failed} stalled {the network held the reply} left {its tab closed} other {paused}}"
+msgstr "{why, select, stopped {stopped} failed {it failed} stalled {the network held the reply} left {its tab closed} unmet {its condition was not met} other {paused}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id

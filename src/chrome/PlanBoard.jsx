@@ -25,6 +25,10 @@ const NEW_STEP = (address) => `>new:step ${address}`
 const NEW_BRANCH = '>new:branch'
 const OPEN = (num) => `>open:${num}`
 
+// When a step runs, in the order a click goes through them (C201): once
+// the step before finishes (the default, kept as none), if it fails, if
+// nothing is found, whatever happens.
+const NEXT_CONDITION = { finished: 'failed', failed: 'nothing', nothing: 'always', always: null }
 const DELETE_STEP = (address, index) => `delete:${address} ${index}`
 const DELETE_BRANCH = (address) => `delete:${address}`
 const CROSS = (
@@ -115,7 +119,7 @@ function Cross({ label, onClick }) {
   return <button type="button" className="ch-pl-x" aria-label={label} title={label} onClick={onClick}>{CROSS}</button>
 }
 
-function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete }) {
+function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete, onCondition }) {
   const { i18n } = useLingui()
   const changes = plan.n === plan.latest
   const picked = plan.selected === branch.letter
@@ -167,7 +171,10 @@ function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete
                 : <div className="ch-pl-text ro" dir="auto" title={s.planned ? undefined : i18n._(COPY.plan.fixed, { run: plan.n })}>{s.text}</div>}
               <div className="ch-marg ch-pl-marg">
                 <span>{s.model ? nameOf(s.model) : i18n._(COPY.plan.asBranch)}</span>
-                {s.status === 'paused' && <><Sep /><span>{i18n._(COPY.plan.ended, { why: s.ended ?? 'other' })}</span></>}
+                {s.index > 1 && (open
+                  ? <><Sep /><button type="button" className="ch-pl-cond" title={i18n._(COPY.plan.conditionHelp)} onClick={() => onCondition(branch.letter, s.stepId, NEXT_CONDITION[s.condition ?? 'finished'])}>{i18n._(COPY.plan.condition, { condition: s.condition ?? 'finished' })}</button></>
+                  : s.condition && s.condition !== 'finished' && <><Sep /><span>{i18n._(COPY.plan.condition, { condition: s.condition })}</span></>)}
+                {(s.status === 'paused' || s.ended === 'unmet') && <><Sep /><span>{i18n._(COPY.plan.ended, { why: s.ended ?? 'other' })}</span></>}
               </div>
             </div>
             <div className="ch-pl-end">
@@ -187,7 +194,7 @@ function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete
   )
 }
 
-export default function PlanBoard({ plan, loading = false, addressed, nameOf = (id) => id, onAddress, onWrite, onPick, onText, onRun, onDelete }) {
+export default function PlanBoard({ plan, loading = false, addressed, nameOf = (id) => id, onAddress, onWrite, onPick, onText, onRun, onDelete, onCondition }) {
   const { i18n } = useLingui()
   return (
     <article
@@ -226,7 +233,7 @@ export default function PlanBoard({ plan, loading = false, addressed, nameOf = (
             <div className="ch-pl-doc">
               {plan.branches.map((b) => (
                 <Fragment key={b.letter}>
-                  <Branch plan={plan} branch={b} nameOf={nameOf} onWrite={onWrite} onPick={onPick} onText={onText} onRun={onRun} onDelete={onDelete} />
+                  <Branch plan={plan} branch={b} nameOf={nameOf} onWrite={onWrite} onPick={onPick} onText={onText} onRun={onRun} onDelete={onDelete} onCondition={onCondition} />
                 </Fragment>
               ))}
               {plan.n === plan.latest && (

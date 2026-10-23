@@ -59,7 +59,7 @@ export function planBoardOf(plan, { run = null, textOf = () => undefined, chatOf
       steps,
     }
   })
-  const open = (b) => b.steps.filter((s) => s.planned)
+  const open = (b) => b.steps.filter((s) => s.planned && s.ended !== 'unmet')
   return {
     num: docket.num,
     docketId: docket.id,

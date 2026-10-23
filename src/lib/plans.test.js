@@ -323,3 +323,36 @@ describe('what a backup may hold in a run (C196)', () => {
     expect(withSteps(b, [{ messageId: 'm', status: STATUS.DONE }]).steps[0].status).toBe(STATUS.DONE)
   })
 })
+
+describe('a step whose condition was not met (C201)', () => {
+  it('waits, saying why, and is not taken for held', async () => {
+    const db = await open('unmet')
+    const c = await R.createChat(db, chat())
+    const { step } = await R.planStep(db, { docketId: c.docketId, letter: 'a', prompt: 'Fallback', newId, now: at() })
+    await R.markStep(db, { docketId: c.docketId, n: 1, letter: 'a', stepId: step.id, status: STATUS.WAITING, ended: 'unmet' })
+    const [run] = await runsOf(db, c.docketId)
+    expect(run.branches.a.steps[0]).toMatchObject({ status: STATUS.WAITING, ended: 'unmet' })
+    expect(await code(R.markStep(db, { docketId: c.docketId, n: 1, letter: 'a', stepId: step.id, status: STATUS.WAITING }))).toBe('fixed')
+    const base = { dockets: [], conversations: [], messages: [] }
+    expect(validateBackup({ ...base, runs: [{ id: 'r', docketId: 'd', n: 1, branches: { a: { status: 'ready', chatId: null, steps: [{ status: 'waiting', ended: 'unmet' }] } } }] }).valid).toBe(true)
+    db.close()
+  })
+})
+
+describe('a step that waited on its condition keeps its place (C201)', () => {
+  it('stays between the steps that ran around it', async () => {
+    const db = await open('place')
+    const c = await R.createChat(db, chat())
+    const one = (await R.planStep(db, { docketId: c.docketId, letter: 'a', prompt: 'One', newId, now: at() })).step
+    const two = (await R.planStep(db, { docketId: c.docketId, letter: 'a', prompt: 'Sorry', newId, now: at() })).step
+    const three = (await R.planStep(db, { docketId: c.docketId, letter: 'a', prompt: 'Done', newId, now: at() })).step
+    await R.addMessageRecord(db, message(c.id, 'user', 'One', { step: one.id }))
+    await R.addMessageRecord(db, message(c.id, 'assistant', 'Word.'))
+    await R.markStep(db, { docketId: c.docketId, n: 1, letter: 'a', stepId: two.id, status: STATUS.WAITING, ended: 'unmet' })
+    await R.addMessageRecord(db, message(c.id, 'user', 'Done', { step: three.id }))
+    await R.addMessageRecord(db, message(c.id, 'assistant', 'Done.'))
+    const [run] = await runsOf(db, c.docketId)
+    expect(run.branches.a.steps.map((s) => [s.id, s.status])).toEqual([[one.id, STATUS.DONE], [two.id, STATUS.WAITING], [three.id, STATUS.DONE]])
+    db.close()
+  })
+})

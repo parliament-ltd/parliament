@@ -202,3 +202,27 @@ describe('run: and stop: (stage 10, piece 3; C200)', () => {
     expect(run('>stop:', {}, shipped('almanac')).text[0]).toBe('Nothing is running here')
   })
 })
+
+describe('run: with conditions (C201)', () => {
+  const sonnet = { id: 'claude-sonnet-5-5', name: 'Sonnet 5.5', group: 'model', provider: 'anthropic', providerName: 'Anthropic', price: { inputPerMillion: 3 } }
+  const alex = { id: 'openalex', name: 'OpenAlex', group: 'source' }
+  const ready = (stepId, text, model = null, condition = null) => ({ id: stepId, stepId, status: 'ready', planned: true, text, model, condition })
+  const p = plan({ branches: [{ letter: 'a', address: '201a', name: 'Tower', status: 'ready', chatId: null, steps: [ready('s1', 'Wassertürme Geschichte', 'openalex'), ready('s2', 'Then ask a model', null, 'nothing')] }] })
+  const facts = (over = {}) => ({ keyed: {}, whoOf: (model) => (model === 'openalex' ? alex : sonnet), charsOf: () => 0, here: [], nameOf: (t) => ({ en: 'English' }[t] ?? t), queryOf: () => null, ...over })
+
+  it('says what goes if every step runs, and how many run only on their condition', () => {
+    expect(run('>run:', { plan: p, runFacts: facts() }).text).toEqual([
+      'Enter runs 2 steps of 201a, in run 1, one after another',
+      'They go to OpenAlex and Sonnet 5.5',
+      'If every step runs, at least 10 tokens to send, under $0.01. Each step also sends the replies before it',
+      'One step runs only if the one before fails or finds nothing',
+      'Undo stops at a run: what it writes stays',
+    ])
+  })
+
+  it('says a question to a source that reads only English goes translated first', () => {
+    const q = { from: 'de', to: 'en', who: { kind: 'browser' } }
+    const text = run('>run:', { plan: p, runFacts: facts({ queryOf: (id) => (id === 'openalex' ? q : null) }) }).text
+    expect(text).toContain('Your question goes translated into English, which it reads best, unless it is in English already')
+  })
+})

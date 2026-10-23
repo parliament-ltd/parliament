@@ -331,7 +331,7 @@ function validateDocket(item) {
 }
 
 const STEP_STATUSES = new Set(['ready', 'running', 'done', 'waiting', 'paused'])
-const ENDED_REASONS = new Set(['stopped', 'failed', 'stalled', 'left']) // C196 (d)
+const ENDED_REASONS = new Set(['stopped', 'failed', 'stalled', 'left', 'unmet']) // C196 (d), C201
 const STEP_CONDITIONS = new Set(['finished', 'failed', 'always', 'nothing'])
 function validateRun(item) {
   if (!isId(item.id))                       return 'run.id invalid'

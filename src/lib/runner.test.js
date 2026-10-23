@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createRunner, nextStep, runScope, runsActive } from './runner'
+import { createRunner, nextStep, runScope, runsActive, meets } from './runner'
 import { STATUS } from './docketModel'
 
 // The runner (stage 10, piece 3; C200), with every effect faked: nothing is
@@ -143,5 +143,60 @@ describe('the runner', () => {
     expect(w.runOf(2).branches.a.steps[0].status).toBe(STATUS.DONE)
     expect(w.runOf(2).branches.b.steps[0].status).toBe(STATUS.WAITING)
     expect(w.log).toContainEqual(['chat', 'a'])
+  })
+})
+
+describe('conditions (C196 (e); C201)', () => {
+  it('reads how the last step that ran ended, never what it wrote', () => {
+    expect(meets(null, 'done')).toBe(true)
+    expect(meets('finished', 'nothing')).toBe(true)
+    expect(meets(null, 'failed')).toBe(false)
+    expect(meets('failed', 'stalled')).toBe(true)
+    expect(meets('failed', 'done')).toBe(false)
+    expect(meets('nothing', 'nothing')).toBe(true)
+    expect(meets('nothing', 'done')).toBe(false)
+    expect(meets('always', 'failed')).toBe(true)
+    expect(meets('always', 'stopped')).toBe(false)
+    expect(meets('failed', null)).toBe(true) // nothing ran before it
+  })
+
+  it('runs a fallback when nothing is found, skips one not needed, and carries on after it', async () => {
+    const w = world({
+      branches: { a: { chatId: 'c1', steps: [step('s1'), step('s2', STATUS.READY, 'Ask a model', { condition: 'nothing' }), step('s3', STATUS.READY, 'Ask another', { condition: 'failed' }), step('s4')] } },
+      send: (s) => (s.id === 's1' ? 'nothing' : 'done'),
+    })
+    const out = await createRunner(w.deps).start({ docketId: 'd', num: 201, n: 1, letters: ['a'] })
+    expect((await out.finished).ended).toEqual({ a: 'done' })
+    expect(w.runOf(1).branches.a.steps.map((x) => [x.id, x.status, x.ended ?? null])).toEqual([
+      ['s1', STATUS.DONE, null], ['s2', STATUS.DONE, null], ['s3', STATUS.WAITING, 'unmet'], ['s4', STATUS.DONE, null],
+    ])
+  })
+
+  it('stops a branch at a failure unless the next step runs if it fails', async () => {
+    const run = async (condition) => {
+      const w = world({ branches: { a: { chatId: 'c1', steps: [step('s1'), step('s2', STATUS.READY, 'Then', { condition })] } }, send: (s) => (s.id === 's1' ? 'failed' : 'done') })
+      const out = await createRunner(w.deps).start({ docketId: 'd', num: 201, n: 1, letters: ['a'] })
+      await out.finished
+      return w.runOf(1).branches.a.steps[1].status
+    }
+    expect(await run(null)).toBe(STATUS.READY)
+    expect(await run('failed')).toBe(STATUS.DONE)
+    expect(await run('always')).toBe(STATUS.DONE)
+  })
+
+  it('sends one prompt to several, one after another, each on its condition', async () => {
+    const w = world({
+      branches: {
+        a: { chatId: 'c1', steps: [step('a1', STATUS.READY, 'Krakatoa')] },
+        b: { chatId: 'c2', steps: [step('b1', STATUS.READY, 'Krakatoa', { condition: 'nothing' })] },
+        c: { chatId: 'c3', steps: [step('c1', STATUS.READY, 'Krakatoa', { condition: 'failed' })] },
+      },
+      send: (s) => (s.id === 'a1' ? 'nothing' : 'done'),
+    })
+    const group = { id: 'g', chats: ['c1', 'c2', 'c3'] }
+    const out = await createRunner(w.deps).start({ docketId: 'd', num: 201, n: 1, letters: ['a', 'b', 'c'], chain: [{ letter: 'a', stepId: 'a1' }, { letter: 'b', stepId: 'b1' }, { letter: 'c', stepId: 'c1' }], group })
+    expect((await out.finished).ended).toEqual({ a: 'done', b: 'done', c: 'unmet' })
+    expect(w.log.filter((x) => x[0] === 'send').map((x) => x[1])).toEqual(['a', 'b'])
+    expect(w.runOf(1).branches.c.steps[0]).toMatchObject({ status: STATUS.WAITING, ended: 'unmet' })
   })
 })

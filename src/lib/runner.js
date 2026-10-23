@@ -16,6 +16,35 @@
 
 import { STATUS, isPlanned } from './docketModel'
 
+// How a step ended, for the conditions of the steps after it (C196 (e);
+// C201): read from its status, never from what a model or source wrote.
+// 'done', 'nothing' (a source answered and found nothing), 'failed',
+// 'stalled', 'stopped'; 'unmet' when it did not run for its condition.
+const FAILED = new Set(['failed', 'stalled'])
+
+/**
+ * Whether a step runs, given how the last step before it that ran ended
+ * (null: none ran before it). After it finishes (the default): done or
+ * found nothing. If it fails: failed or stalled. If nothing is found: a
+ * source found nothing. Always: whatever it did. Nothing runs after a stop.
+ */
+export function meets(condition, before) {
+  if (before === 'stopped') return false
+  if (before == null) return true
+  if (condition === 'always') return true
+  if (condition === 'failed') return FAILED.has(before)
+  if (condition === 'nothing') return before === 'nothing'
+  return before === 'done' || before === 'nothing'
+}
+
+/** How a step already in the run ended, as far as its record says; null if it has not. */
+export function outcomeOf(step) {
+  if (!step) return null
+  if (step.status === STATUS.DONE) return 'done'
+  if (step.status === STATUS.PAUSED) return step.ended && step.ended !== 'left' ? step.ended : 'stopped'
+  return null
+}
+
 const hasWords = (s) => String(s?.text ?? s?.prompt ?? '').trim().length > 0
 const isReady = (s) => s.status === STATUS.READY && (s.planned ?? isPlanned(s))
 
@@ -31,8 +60,9 @@ export function nextStep(steps, after = -1) {
 
 const readyOf = (b) => b.steps.filter((s) => isReady(s) && hasWords(s))
 const emptyOf = (b) => b.steps.filter((s) => isReady(s) && !hasWords(s)).length
+// Held by hold:, not waiting because a condition was not met (C201).
 const heldOf = (b) => {
-  const open = b.steps.filter((s) => s.planned)
+  const open = b.steps.filter((s) => s.planned && s.ended !== 'unmet')
   return open.length > 0 && open.every((s) => s.status === STATUS.WAITING)
 }
 
@@ -83,7 +113,7 @@ export const runsActive = () => going
  *   readBranch({ docketId, n, letter })  -> { chatId, steps } as stored, or null
  *   ensureChat({ docketId, n, letter, step }) -> the branch's chat id, made if it has none
  *   markStep({ docketId, n, letter, stepId, status, ended })
- *   sendStep({ docketId, n, letter, chatId, step }) -> 'done' | 'stopped' | 'failed' | 'stalled'
+ *   sendStep({ docketId, n, letter, chatId, step, group }) -> 'done' | 'nothing' | 'stopped' | 'failed' | 'stalled'
  *   stopChat(chatId)  stops the reply arriving there
  *   lock(docketId, fn) -> fn's result, or null when another tab holds the plan
  *   newRunFor({ docketId, letters }) -> the new run's number, the other branches waiting
@@ -98,37 +128,91 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
   })))
   const changed = () => onChange(active())
 
+  // One step: its chat made if the branch has none, marked running, sent,
+  // and marked done or paused. Returns how it ended.
+  async function runStep(docketId, job, letter, chatId, step, group = null) {
+    try {
+      chatId = chatId ?? await ensureChat({ docketId, n: job.n, letter, step })
+      await markStep({ docketId, n: job.n, letter, stepId: step.id, status: STATUS.RUNNING })
+    } catch {
+      return 'failed'
+    }
+    job.current.set(letter, chatId)
+    changed()
+    let outcome
+    try {
+      outcome = job.stopping.has(letter) ? 'stopped' : await sendStep({ docketId, n: job.n, letter, chatId, step, group })
+    } catch (err) {
+      outcome = err?.name === 'Stalled' ? 'stalled' : err?.name === 'AbortError' ? 'stopped' : 'failed'
+    }
+    job.current.delete(letter)
+    const answered = outcome === 'done' || outcome === 'nothing'
+    if (!answered && job.stopping.has(letter)) outcome = 'stopped'
+    await markStep({ docketId, n: job.n, letter, stepId: step.id, status: answered ? STATUS.DONE : STATUS.PAUSED, ended: answered ? null : outcome }).catch(() => {})
+    changed()
+    return outcome
+  }
+
+  // A step whose condition is not met waits, and says so (C201).
+  const unmet = (docketId, job, letter, step) => markStep({ docketId, n: job.n, letter, stepId: step.id, status: STATUS.WAITING, ended: 'unmet' }).catch(() => {})
+
+  // A branch's steps in order. Each after the first runs on its condition,
+  // read from how the last step that ran ended. A step not needed (a
+  // fallback whose condition is not met) waits; one blocked by a failure
+  // stays ready, and the branch stops there.
   async function runBranch(docketId, job, letter) {
     let after = -1
+    let before
+    let ran = null
     for (;;) {
       if (job.stopping.has(letter)) return 'stopped'
       const branch = await readBranch({ docketId, n: job.n, letter })
       if (!branch) return 'gone'
       const next = nextStep(branch.steps, after)
-      if (!next) return 'done'
+      if (!next) return ran ?? 'done'
+      if (before === undefined) {
+        // Before the first step this run sends: the last that had ended.
+        const earlier = branch.steps.slice(0, next.index).reverse().find((s) => outcomeOf(s) != null)
+        before = earlier ? outcomeOf(earlier) : null
+      }
       after = next.index
       const step = next.step
-      let chatId = branch.chatId
-      try {
-        chatId = chatId ?? await ensureChat({ docketId, n: job.n, letter, step })
-        await markStep({ docketId, n: job.n, letter, stepId: step.id, status: STATUS.RUNNING })
-      } catch {
-        return 'failed'
+      if (!meets(step.condition, before)) {
+        if (FAILED.has(before)) return before
+        await unmet(docketId, job, letter, step)
+        changed()
+        continue
       }
-      job.current.set(letter, chatId)
-      changed()
-      let outcome
-      try {
-        outcome = job.stopping.has(letter) ? 'stopped' : await sendStep({ docketId, n: job.n, letter, chatId, step })
-      } catch (err) {
-        outcome = err?.name === 'Stalled' ? 'stalled' : err?.name === 'AbortError' ? 'stopped' : 'failed'
-      }
-      job.current.delete(letter)
-      if (outcome !== 'done' && job.stopping.has(letter)) outcome = 'stopped'
-      await markStep({ docketId, n: job.n, letter, stepId: step.id, status: outcome === 'done' ? STATUS.DONE : STATUS.PAUSED, ended: outcome === 'done' ? null : outcome }).catch(() => {})
-      changed()
-      if (outcome !== 'done') return outcome
+      const outcome = await runStep(docketId, job, letter, branch.chatId, step)
+      if (outcome === 'stopped') return 'stopped'
+      before = outcome
+      ran = outcome === 'nothing' ? 'done' : outcome
     }
+  }
+
+  // One prompt to several, one after another (branch slider v9; C201):
+  // each branch after the first runs on its step's condition, read from
+  // how the last branch that ran ended. A stop ends the chain.
+  async function runChain(docketId, job, chain, group) {
+    const ended = {}
+    let before = null
+    for (const [i, link] of chain.entries()) {
+      if (job.stopping.has(link.letter)) { ended[link.letter] = 'stopped'; break }
+      const branch = await readBranch({ docketId, n: job.n, letter: link.letter })
+      const step = branch?.steps.find((s) => s.id === link.stepId)
+      if (!step || step.status !== STATUS.READY) { ended[link.letter] = 'gone'; continue }
+      if (i > 0 && !meets(step.condition, before)) {
+        await unmet(docketId, job, link.letter, step)
+        ended[link.letter] = 'unmet'
+        changed()
+        continue
+      }
+      const outcome = await runStep(docketId, job, link.letter, branch.chatId, step, group)
+      ended[link.letter] = outcome === 'nothing' ? 'done' : outcome
+      if (outcome === 'stopped') break
+      before = outcome
+    }
+    return ended
   }
 
   /**
@@ -136,7 +220,7 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
    * begun, or could not: { started, n, reason, finished } where finished
    * resolves when every branch has ended.
    */
-  async function start({ docketId, num, n, letters, newRun = false }) {
+  async function start({ docketId, num, n, letters, newRun = false, chain = null, group = null }) {
     if (jobs.has(docketId)) return { started: false, reason: 'running' }
     let begun
     const head = new Promise((resolve) => { begun = resolve })
@@ -149,8 +233,11 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
         if (newRun) job.n = await newRunFor({ docketId, letters })
         begun({ started: true, n: job.n })
         changed()
-        const outcomes = await Promise.all(letters.map((l) => runBranch(docketId, job, l)))
-        letters.forEach((l, i) => { ended[l] = outcomes[i] })
+        if (chain) Object.assign(ended, await runChain(docketId, job, chain, group))
+        else {
+          const outcomes = await Promise.all(letters.map((l) => runBranch(docketId, job, l)))
+          letters.forEach((l, i) => { ended[l] = outcomes[i] })
+        }
         return { n: job.n, ended }
       } catch {
         begun({ started: false, reason: 'failed' })

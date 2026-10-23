@@ -3146,6 +3146,18 @@ msgid "enter.runCost"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.runCostAll"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runCostAllCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runCostAllUnpriced"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.runCostCheap"
 msgstr ""
 
@@ -3184,6 +3196,10 @@ msgstr ""
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.runIf"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5058,6 +5074,15 @@ msgstr ""
 msgid "plan.chatHelp"
 msgstr ""
 
+#. When a step runs (C201)
+#. js-lingui-explicit-id
+msgid "plan.condition"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.conditionHelp"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "plan.counts"
 msgstr ""
@@ -5070,7 +5095,7 @@ msgstr ""
 msgid "plan.deleteStep"
 msgstr ""
 
-#. Why a paused step stopped
+#. Why a paused step stopped, or a waiting one did not run
 #. js-lingui-explicit-id
 msgid "plan.ended"
 msgstr ""

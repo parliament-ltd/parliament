@@ -1715,6 +1715,36 @@ export default function Shell() {
   // much that model reads at once.
   const chatRowsById = useMemo(() => new Map((almanacRows ?? []).filter((r) => r.kind === 'chat').map((r) => [r.chatId, r])), [almanacRows])
 
+  // A question to a source that reads only English goes translated first,
+  // as the line said (C85), unless the browser finds it is English already.
+  // Returns what was asked ({ text, lang, by, at }), or null when it goes
+  // as written; throws when it cannot be translated, and nothing is sent.
+  const translateQuery = useCallback(async (text, q) => {
+    if (!q || q.who.kind === 'none') return null
+    const bt = browserTranslation()
+    const found = await bt.detect(text)
+    const from = found ?? q.from
+    if (baseOf(from) === 'en') return null
+    const by = q.who.kind === 'browser' && found && found !== q.from && !(await bt.can(from, 'en')) ? translatorFor({ helper: q.who.helper ?? null }) : q.who
+    if (by.kind === 'none') throw new Error('queryFailed')
+    const v = by.kind === 'model' ? await veilForNow.current(by.helper.provider, [text]) : null
+    const [raw] = await translateText([v ? v.out(text) : text], { who: by, from, to: 'en', query: true })
+    const out = v ? v.back(raw) : raw
+    const sent = String(out ?? '').trim().slice(0, 300)
+    if (!sent) throw new Error('queryFailed')
+    return { text: sent, lang: 'en', by: by.kind === 'browser' ? BY_BROWSER : by.helper.id, at: new Date().toISOString() }
+  }, [])
+  // For a source: whether a question to it goes translated, and by whom
+  // (C85), as a typed one would; null when it goes as written.
+  const queryOf = useCallback((id) => {
+    const reads = destination(id)?.answersIn
+    return queriesOn && (reads === 'english' || reads === 'mostlyEnglish')
+      ? { from: queryFrom, to: 'en', who: translatorFor({ browser: browserCan[`${queryFrom}>en`] ?? null, helper: helperNow }) }
+      : null
+  }, [queriesOn, queryFrom, browserCan, helperNow])
+  const queryOfNow = useRef(queryOf)
+  useEffect(() => { queryOfNow.current = queryOf }, [queryOf])
+
   // ── The runner (stage 10, piece 3; almanac spec §5; C196; C200) ─
   // Runs a plan's steps from this tab, one plan in one tab at a time (a Web
   // Lock per plan), each step sent as a prompt typed in its chat is, to who
@@ -1750,19 +1780,34 @@ export default function Shell() {
       // frameworks and reply language, through the privacy filter. No title
       // request follows: the chat is named for its branch. How it ended is
       // read from what was kept.
-      sendStep: async ({ chatId, step }) => {
+      sendStep: async ({ chatId, step, group = null }) => {
         if (replyArriving(chatId)) return 'failed'
         const conv = await getConversation(chatId).catch(() => null)
         const fresh = await keyedProviders().catch(() => ({}))
         const who = answererOf({ chosen: step.model ?? conv?.answerer ?? null, keyed: fresh, defaultModel: latest.current.settings.defaultModel })
         if (who.later || who.gone || who.needsKey || who.unchecked) return 'failed'
         const fw = frameworksOf(conv?.frameworks ?? [], fwListNow.current).map((x) => x.id)
-        if (who.group === 'source') await askSourceAs(chatId, step.prompt, who, { step: step.id })
-        else await sendMessage(chatId, step.prompt, who.id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), [], null, { frameworks: recordOf(fw, fwListNow.current), describe: false, step: step.id })
+        const together = group ? { group } : {}
+        if (who.group === 'source') {
+          // Translated first for a source that reads only English, as typed (C85; C201).
+          let asked = null
+          try {
+            asked = await translateQuery(step.prompt, queryOfNow.current(who.id))
+          } catch {
+            return 'failed'
+          }
+          const words = asked ? searchWords(asked.text, 'en') : null
+          const searched = asked ? (words === asked.text.trim().replace(/[?？!.]+$/u, '').trim() ? asked : { ...asked, text: words.slice(0, 300) }) : null
+          await askSourceAs(chatId, step.prompt, who, { step: step.id, ...together, ...(searched ? { asked: searched } : {}) })
+        } else {
+          await sendMessage(chatId, step.prompt, who.id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), [], null, { frameworks: recordOf(fw, fwListNow.current), describe: false, step: step.id, ...together })
+        }
         loadConversations().catch(() => {})
         const msgs = await getMessages(chatId).catch(() => [])
         const at = msgs.findIndex((m) => m.role === 'user' && m.step === step.id)
         const reply = at >= 0 ? msgs.slice(at + 1).find((m) => m.role === 'assistant') : null
+        // A source that answered and found nothing: an answer, not a stop (C196 (e)).
+        if (reply && !reply.incomplete && reply.source?.found === false) return 'nothing'
         return reply?.content && !reply.incomplete ? 'done' : 'stopped'
       },
       // The next run for one branch: the others wait in it.
@@ -1959,6 +2004,12 @@ export default function Shell() {
     if (out && !out.done) return { refused: out }
     return { done: Promise.resolve(out?.says ?? null) }
   }, [onRun])
+  // When a planned step runs, changed by a click on the board (C201).
+  const onPlanCondition = useCallback((letter, stepId, condition) => {
+    const p = planBoardNow.current
+    if (!p || p.n !== p.latest || !db.current) return
+    changeStep(db.current, { docketId: p.docketId, n: p.n, letter, stepId, set: { condition } }).catch(() => {})
+  }, [])
   // A planned step's words, written on the board (C197 (d)): kept as typed.
   const onPlanText = useCallback((letter, stepId, text) => {
     const p = planBoardNow.current
@@ -2097,7 +2148,9 @@ export default function Shell() {
     charsOf: (chatId) => String(chatRowsById.get(chatId)?.words ?? '').length,
     here: runningHere,
     room: roomId ? { chatId: roomId, num: roomRecord?.num ?? null, streaming: Boolean(streaming) } : null,
-  }), [keyedBy, conversations, settings.defaultModel, chatRowsById, runningHere, roomId, roomRecord, streaming, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
+    queryOf,
+    nameOf: languageName,
+  }), [keyedBy, conversations, settings.defaultModel, chatRowsById, runningHere, roomId, roomRecord, streaming, queryOf, languageName, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
   const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens, branching, summarizing, including, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens, branching, summarizing, including, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
@@ -2365,24 +2418,10 @@ export default function Shell() {
     // the translation fails, nothing is sent.
     let asked = null
     const q = text && who.group === 'source' ? shown?.query ?? null : null
-    if (q && q.who.kind !== 'none') {
-      const bt = browserTranslation()
-      const found = await bt.detect(text)
-      const from = found ?? q.from
-      if (baseOf(from) !== 'en') {
-        try {
-          const by = q.who.kind === 'browser' && found && found !== q.from && !(await bt.can(from, 'en')) ? translatorFor({ helper: q.who.helper ?? null }) : q.who
-          if (by.kind === 'none') return { refused: 'queryFailed' }
-          const v = by.kind === 'model' ? await veilForNow.current(by.helper.provider, [text]) : null
-          const [raw] = await translateText([v ? v.out(text) : text], { who: by, from, to: 'en', query: true })
-          const out = v ? v.back(raw) : raw
-          const sent = String(out ?? '').trim().slice(0, 300)
-          if (!sent) return { refused: 'queryFailed' }
-          asked = { text: sent, lang: 'en', by: by.kind === 'browser' ? BY_BROWSER : by.helper.id, at: new Date().toISOString() }
-        } catch {
-          return { refused: 'queryFailed' }
-        }
-      }
+    try {
+      asked = await translateQuery(text, q)
+    } catch {
+      return { refused: 'queryFailed' }
     }
 
     // Nothing typed, and the last reply here stalled: send it again without
@@ -2455,7 +2494,7 @@ export default function Shell() {
         return failure(err, who.group === 'source' ? who.name : undefined)
       })
     return { done }
-  }, [askSource, askSourceAs, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked, promptToPlan, planRuns])
+  }, [askSource, askSourceAs, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked, promptToPlan, planRuns, translateQuery])
 
   // again:203a (editing spec; C177): the branch's last prompt, read again,
   // asked as a new branch of its plan, the next letter, by who answers that
@@ -2675,7 +2714,7 @@ export default function Shell() {
       return (
         <PlanBoard
           key="docket" plan={planBoard} loading={planOnScreen && planNum != null && !planBoard && !(planRead?.num === planNum && planRead?.run === planRun && !planRead?.plan)} addressed={arrangement.addressed === 'docket'}
-          nameOf={planModelName} onAddress={focusBoard} onWrite={writeField} onPick={onPlanPick} onText={onPlanText} onDelete={onPlanDelete} onRun={(n) => runCommand(`open:run ${n}`)}
+          nameOf={planModelName} onAddress={focusBoard} onWrite={writeField} onPick={onPlanPick} onText={onPlanText} onDelete={onPlanDelete} onCondition={onPlanCondition} onRun={(n) => runCommand(`open:run ${n}`)}
         />
       )
     }

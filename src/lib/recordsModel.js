@@ -121,7 +121,21 @@ export function withSteps(runBranch, fresh) {
     // The model a reply names is the one that wrote it; until then, the one planned.
     return { ...was, messageId: turn.messageId, status, model: byReply ? turn.model : (was.model ?? turn.model ?? null) }
   })
-  const steps = [...ran, ...planned.filter((s) => !sent.has(s.id))]
+  const rest = planned.filter((s) => !sent.has(s.id))
+  // A step that waited because its condition was not met is settled: it
+  // keeps its place after the step before it that ran (C201). The others
+  // planned ahead follow every step that started.
+  const settled = (s) => s.status === STATUS.WAITING && s.ended === 'unmet'
+  const steps = [...ran]
+  for (const u of rest.filter(settled)) {
+    let at = -1
+    for (let k = old.indexOf(u) - 1; k >= 0 && at < 0; k--) {
+      const o = old[k]
+      at = steps.findIndex((s) => s !== u && ((o.messageId && s.messageId === o.messageId) || (o.id && s.id === o.id)))
+    }
+    steps.splice(at + 1, 0, u)
+  }
+  steps.push(...rest.filter((s) => !settled(s)))
   return { ...runBranch, steps, status: branchStatus(steps) }
 }
 

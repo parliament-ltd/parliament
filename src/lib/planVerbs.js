@@ -14,6 +14,7 @@ import { planOpen, address } from '../shell/arrangement'
 import { STATUS } from './docketModel'
 import { runScope } from './runner'
 import { CHARS_PER_TOKEN, inputCost } from '../shell/estimate'
+import { queryLines } from './languageVerbs'
 
 const typed = (arg) => (arg?.kind === 'text' ? arg.value : arg?.text ?? '')
 const BOARD = 'docket' // the Plan board, by name in what is said
@@ -66,8 +67,9 @@ function branchOf(p, arg, rows = []) {
   return { bad: { message: 'planWhichBranch', values: { example: p.branches[0]?.address ?? `${p.num}a`, board: BOARD } } }
 }
 
+// Held by hold:, not waiting because a condition was not met (C201).
 const held = (b) => {
-  const open = b.steps.filter((s) => s.planned)
+  const open = b.steps.filter((s) => s.planned && s.ended !== 'unmet')
   return open.length > 0 && open.every((s) => s.status === STATUS.WAITING)
 }
 
@@ -330,6 +332,9 @@ export function planRun(step, screens = {}) {
   let total = 0
   let priced = true
   let local = false
+  let iffy = 0
+  let asking = 0
+  let askingQuery = null
   const names = []
   for (const b of scope.branches) {
     let chars = b.chatId ? f.charsOf(b.chatId) : 0
@@ -343,7 +348,14 @@ export function planRun(step, screens = {}) {
       count += 1
       chars += String(st.text ?? '').length
       if (!names.includes(who.name)) names.push(who.name)
-      if (who.group === 'source') continue
+      // A step after the first that runs only on its condition (C201).
+      if (i > 0 && (st.condition === 'failed' || st.condition === 'nothing')) iffy += 1
+      if (who.group === 'source') {
+        // Translated first for a source that reads only English (C85; C201).
+        const q = f.queryOf?.(who.id) ?? null
+        if (q) { asking += String(st.text ?? '').length; askingQuery = askingQuery ?? q }
+        continue
+      }
       if (who.group === 'local') { local = true; continue }
       const t = Math.ceil(chars / CHARS_PER_TOKEN)
       tokens += t
@@ -355,7 +367,11 @@ export function planRun(step, screens = {}) {
   }
   const nums = scope.branches.map((b) => b.address)
   const also = [{ message: 'runTo', values: { answering: names } }]
-  if (tokens) also.push(!priced ? { message: 'runCostUnpriced', values: { tokens } } : total < CENT ? { message: 'runCostCheap', values: { tokens, cost: CENT } } : { message: 'runCost', values: { tokens, cost: total } })
+  // With steps that may not run, the cost is what goes if every one does.
+  const all = iffy ? 'All' : ''
+  if (tokens) also.push(!priced ? { message: `runCost${all}Unpriced`, values: { tokens } } : total < CENT ? { message: `runCost${all}Cheap`, values: { tokens, cost: CENT } } : { message: `runCost${all}`, values: { tokens, cost: total } })
+  if (iffy) also.push({ message: 'runIf', values: { count: iffy } })
+  if (askingQuery) also.push(...queryLines(askingQuery, asking, f.nameOf ?? ((t) => t)))
   if (local) also.push({ message: 'runLocal' })
   if (scope.skipped) also.push({ message: 'runSkipped', values: { count: scope.skipped } })
   also.push({ message: 'runUndo' })
