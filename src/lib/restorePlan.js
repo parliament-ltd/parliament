@@ -67,11 +67,13 @@ const SIGNATURES = {
  *   messages, files, modes, collabs: Set of ids;  settings: Set of keys
  *   library: { [store]: Set of ids }
  * @param {boolean} [opts.keepNumbers]  keep the file's numbers and dockets (a replace of version 6 data)
+ * @param {boolean} [opts.plans]  plans can be stored here (version 6): a plan that holds steps
+ *   of its own comes in whole, as its own plan with new numbers (stage 10; C196 (i))
  * @param {() => string} [opts.newId]
  * @param {string} [opts.now]
  */
 export function planRestore(flat, {
-  strategy = 'merge', existing = {}, keepNumbers = false,
+  strategy = 'merge', existing = {}, keepNumbers = false, plans = false,
   newId = () => crypto.randomUUID(), now = new Date().toISOString(),
 } = {}) {
   const merge = strategy === 'merge'
@@ -105,6 +107,41 @@ export function planRestore(flat, {
 
   const conv = (id) => (id == null ? id : renamedConvIds.get(id) || id)
   const msg = (id) => (id == null ? id : renamedMsgIds.get(id) || id)
+
+  // Plans that hold steps of their own (planned ahead, later runs, branches
+  // with no chat yet) would lose them if rebuilt from their chats; they come
+  // in whole, unless some of their chats are here already and the same, when
+  // they are filed from their chats as before (stage 10; C196 (i)).
+  const wholePlans = new Map() // docket id -> { docket, runs }
+  if (plans && !keepNumbers) {
+    const runsByDocket = new Map()
+    for (const r of flat.runs || []) {
+      if (!runsByDocket.has(r.docketId)) runsByDocket.set(r.docketId, [])
+      runsByDocket.get(r.docketId).push(r)
+    }
+    const chatsByDocket = new Map()
+    for (const c of flat.conversations || []) {
+      if (!c.docketId) continue
+      if (!chatsByDocket.has(c.docketId)) chatsByDocket.set(c.docketId, [])
+      chatsByDocket.get(c.docketId).push(c)
+    }
+    for (const d of flat.dockets || []) {
+      const runs = runsByDocket.get(d.id) || []
+      if (!holdsOwnSteps(runs)) continue
+      if ((chatsByDocket.get(d.id) || []).some((c) => decision.get(c.id) === 'same')) continue
+      wholePlans.set(d.id, {
+        docket: d,
+        runs: runs.map((r) => ({
+          ...r,
+          branches: Object.fromEntries(Object.entries(r.branches || {}).map(([letter, b]) => [letter, {
+            ...b,
+            chatId: conv(b.chatId ?? null),
+            steps: (b.steps || []).map((s) => (s.messageId ? { ...s, messageId: msg(s.messageId) } : s)),
+          }])),
+        })),
+      })
+    }
+  }
   const restoredFrom = (r) => ({ at: now, ...(Number.isInteger(r.num) ? { num: r.num } : {}) })
   // Docket fields come off unless the file's numbers are kept; a number they
   // had is remembered.
@@ -146,7 +183,12 @@ export function planRestore(flat, {
     if ('familyId' in c) out.familyId = conv(c.familyId)
     if ('branchPoint' in c) out.branchPoint = msg(c.branchPoint)
     if (d === 'copy') out.title = `${c.title || ''}${COPY_SUFFIX}`
-    writes.conversations.push(renumber(out, c, d === 'copy'))
+    const whole = c.docketId && wholePlans.has(c.docketId)
+    const renumbered = renumber(out, c, d === 'copy')
+    // A chat of a plan that comes in whole keeps its letter and run; its
+    // plan is filled in as it is written (records.js fileRestored).
+    if (whole) Object.assign(renumbered, { branch: c.branch, run: c.run, planOf: c.docketId })
+    writes.conversations.push(renumbered)
     summary.chats[d === 'copy' ? 'copied' : 'added']++
   }
 
@@ -272,6 +314,13 @@ export function planRestore(flat, {
     writes.runs = [...(flat.runs || [])]
     writes.collections = [...(flat.collections || [])]
   }
+  writes.plans = [...wholePlans.values()]
 
   return { writes, summary, renamedConvIds, renamedMsgIds, decision }
+}
+
+// Whether a plan's runs hold anything its chats' messages cannot give back:
+// a step planned ahead, a run past the first, or a branch with no chat.
+export function holdsOwnSteps(runs) {
+  return runs.some((r) => r.n > 1 || Object.values(r.branches || {}).some((b) => !b?.chatId || (b.steps || []).some((s) => !s.messageId)))
 }

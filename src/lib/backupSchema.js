@@ -30,7 +30,8 @@ export const FIELDS = Object.freeze({
     // prompt to several went to (stage 8; C172). summary: the chat a branch's
     // summary summarizes and the last message it read (C175).
     // included: answers from sources brought into a prompt (C176).
-    'citations', 'from', 'group', 'summary', 'included'],
+    // step: the planned step a run sent this message for (stage 10; C196 (j)).
+    'citations', 'from', 'group', 'summary', 'included', 'step'],
   // quotes: the numbers a note quotes beneath it; summary: a dated summary
   // note's numbers, day and model (stage 6, piece 7; C145 (e), (g)).
   notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom', 'quotes', 'summary'],
@@ -54,6 +55,24 @@ export function rebuildRecord(store, record) {
   if (!fields || !record || typeof record !== 'object') return record
   const out = {}
   for (const f of fields) if (record[f] !== undefined) out[f] = record[f]
+  // A run's branches and steps hold only what they are known to hold (C196).
+  if (store === 'runs' && out.branches && typeof out.branches === 'object' && !Array.isArray(out.branches)) {
+    out.branches = Object.fromEntries(Object.entries(out.branches).map(([letter, b]) => [letter, cleanRunBranch(b)]))
+  }
+  return out
+}
+
+const RUN_BRANCH_FIELDS = ['status', 'room', 'chatId', 'steps']
+const STEP_FIELDS = ['id', 'status', 'model', 'room', 'messageId', 'prompt', 'condition', 'addedAt', 'ended', 'tokens', 'cost']
+function pick(record, fields) {
+  const out = {}
+  for (const f of fields) if (record?.[f] !== undefined) out[f] = record[f]
+  return out
+}
+function cleanRunBranch(b) {
+  if (!b || typeof b !== 'object') return b
+  const out = pick(b, RUN_BRANCH_FIELDS)
+  if (Array.isArray(out.steps)) out.steps = out.steps.map((s) => pick(s, STEP_FIELDS))
   return out
 }
 

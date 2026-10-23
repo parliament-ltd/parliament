@@ -95,7 +95,7 @@ export function planV6Migration(snap, { newId = () => crypto.randomUUID(), now =
 
     const runBranches = {}
     for (const c of ordered) {
-      const steps = stepsFromTurns(c, msgsByConv.get(c.id) || [])
+      const steps = storedSteps(stepsFromTurns(c, msgsByConv.get(c.id) || []))
       runBranches[letterOf.get(c.id)] = {
         status: branchStatus(steps),
         room: c.room ?? null,
@@ -329,6 +329,9 @@ function pickRoot(members, convById) {
 
 // ── Steps ────────────────────────────────────────────────
 
+/** Steps as they are stored: without the two things only a merge reads (stepId, byReply). */
+export const storedSteps = (steps) => steps.map(({ stepId, byReply, ...step }) => (void stepId, void byReply, step))
+
 // One step per user message. Done when a complete reply follows; paused when
 // the reply is marked incomplete or never arrived.
 export function stepsFromTurns(conv, msgs) {
@@ -339,9 +342,14 @@ export function stepsFromTurns(conv, msgs) {
     const reply = msgs[i + 1]?.role === 'assistant' ? msgs[i + 1] : null
     steps.push({
       status: reply && !reply.incomplete ? STATUS.DONE : STATUS.PAUSED,
-      model: conv.model || null,
+      // The model that wrote the reply, where it says (stage 10, piece 1).
+      model: reply?.model || conv.model || null,
+      // Whether that model is the reply's own, which then wins (not stored).
+      ...(reply?.model ? { byReply: true } : {}),
       messageId: m.id,
       condition: null,
+      // A message a run sent names its planned step (C196 (j)).
+      ...(typeof m.step === 'string' ? { stepId: m.step } : {}),
     })
   }
   return steps

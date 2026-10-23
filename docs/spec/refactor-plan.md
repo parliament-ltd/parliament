@@ -476,6 +476,14 @@ Built to Settings v1. Can run beside stages 5 to 8.
 
 Built to docket v12.
 
+**Status, 23 October: split into six pieces**, each committed and checked before the next; the points the documents leave open are C196 (`conflicts.md` Part 16), each built as suggested so a ruling changes one entry.
+1. **Steps that can be planned.** A step written ahead of any run keeps its prompt through later messages; the runner's message binds to its step; runs past the first; a branch with no chat until it runs; readers for runs; a merge restore that keeps plans' own steps (C93). **Done, 23 October (C197):** planned steps in `docketModel.js` and `recordsModel.js` (they survive a chat's messages; a run's message binds to its step; running stays running), `records.js` (`planStep`, `changeStep`, `holdBranch`, `newRun`, `newPlan`, `newPlanBranch`, `moveBranch`), `db.getPlan`, a merge restore bringing whole plans, and runs' steps checked and cleaned in backups. Tested plain and through the lock.
+2. **The plan board.** One plan at one run: branch lines, steps, status chips, pips, the add row; `new:step`, `new:run`, `new:plan`, editing a ready step, `hold:` and `hold:off`, `move:`; `open:` with a plan's number opens it.
+3. **The runner.** `run:` (A §5.2's policy; the Enter line naming steps, rooms, models and cost), steps sent in order, `stop:`, `stop:201b`, `stop:all` across tabs, one tab per plan (Web Locks), the lock's idle clock waiting, and `undo:` stopping at a run.
+4. **One after another,** with conditions read from status (A15).
+5. **`diff:` and the step list block.**
+6. **Spending:** this month's runs, the costliest, the warning before a costly run (`set:warn`), then the checkpoint.
+
 - **Added**
   - The docket board, branch lines, steps, run pips and record cards; the step list as a block a room can carry.
   - `new:step`, `new:branch`, `new:run`, `hold:`, `move:`, `diff:`.

@@ -88,6 +88,16 @@ export function readPreferenceQuietly(key) {
   })
 }
 
+/** A plan and its runs, oldest first (stage 10). By the plan's id or its number. */
+export async function getPlan({ id = null, num = null } = {}) {
+  const db = await initDB()
+  if (!db.objectStoreNames.contains('dockets')) return null
+  const docket = id ? await db.get('dockets', id) : await db.getFromIndex('dockets', 'num', num)
+  if (!docket) return null
+  const runs = (await db.getAllFromIndex('runs', 'docketId', docket.id)).sort((a, b) => a.n - b.n)
+  return { docket, runs }
+}
+
 /** fn(the database as stored, not through the lock), for the lock's rewrites. */
 export async function withRawDB(fn) {
   await initDB()

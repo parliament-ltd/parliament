@@ -166,7 +166,7 @@ export async function restoreInto(db, contents, { strategy = 'merge', newId = ()
     }
 
     const existing = replace ? {} : await readExisting(tx, flat, v6)
-    plan = planRestore(flat, { strategy, existing, keepNumbers, newId, now })
+    plan = planRestore(flat, { strategy, existing, keepNumbers, plans: v6, newId, now })
     const { writes } = plan
 
     for (const store of V5_STORES) {

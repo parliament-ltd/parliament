@@ -17,9 +17,14 @@
 //
 //   run:    { id, docketId, n, createdAt, cost,
 //             branches: { [letter]: { status, room, chatId, steps: [step] } } }
-//   step:   { status, model, room?, messageId? , prompt?, tokens?, cost? }
+//   step:   { id?, status, model, room?, messageId?, prompt?, condition,
+//             addedAt?, ended? }
 //           A step that produced a turn points at its user message
-//           (messageId); a step not yet run carries its prompt text.
+//           (messageId); a step planned ahead carries its id and its prompt
+//           text, and the message a run sends for it carries the step's id
+//           (`step`), so the two are one step (stage 10, piece 1; C196 (j)).
+//           A branch in a run has chatId null until it runs. ended: why a
+//           paused step stopped (stopped, failed, stalled).
 
 export const STATUS = Object.freeze({
   READY: 'ready',     // has not run yet; silent
@@ -30,6 +35,20 @@ export const STATUS = Object.freeze({
 })
 
 export const STATUSES = Object.freeze(Object.values(STATUS))
+
+// What may hold a later step back (A15; C196 (e)); null: none.
+export const CONDITIONS = Object.freeze(['finished', 'failed', 'always', 'nothing'])
+
+/** A step written ahead of any run, ready unless held. */
+export function plannedStep({ id, prompt, model = null, room = null, condition = null, waiting = false, now }) {
+  return {
+    id, status: waiting ? STATUS.WAITING : STATUS.READY, prompt: String(prompt ?? ''), model,
+    ...(room ? { room } : {}), condition, addedAt: now,
+  }
+}
+
+/** Whether a step was planned ahead and has not been sent. */
+export const isPlanned = (step) => !step?.messageId
 
 /** A step is fixed once it has started: done, running and paused. */
 export function isFixed(status) {

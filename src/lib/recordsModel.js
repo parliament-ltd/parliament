@@ -97,16 +97,88 @@ export function renameInDocket(docket, letter, before, after, now) {
 
 /**
  * A run's branch with its steps brought up to date from the chat's turns
- * (v6Plan.stepsFromTurns). A step keeps what it already carried (its model,
- * its condition); only its status follows the messages.
+ * (v6Plan.stepsFromTurns). A step that produced a turn keeps what it already
+ * carried (its model, its condition); its status follows the messages. A
+ * step planned ahead becomes the turn whose message names it (`stepId`), and
+ * the ones not sent yet stay, after those that were (stage 10, piece 1;
+ * C196). A step the runner marked running stays so while its reply is still
+ * arriving; the runner says when it ended (C196 (d)).
  */
 export function withSteps(runBranch, fresh) {
-  const before = new Map((runBranch.steps || []).map((s) => [s.messageId, s]))
-  const steps = fresh.map((s) => {
-    const old = before.get(s.messageId)
-    return old ? { ...old, status: s.status } : s
+  const old = runBranch.steps || []
+  const byMessage = new Map(old.filter((s) => s.messageId).map((s) => [s.messageId, s]))
+  const planned = old.filter((s) => !s.messageId)
+  const plannedById = new Map(planned.filter((s) => s.id).map((s) => [s.id, s]))
+  const sent = new Set()
+  const ran = fresh.map(({ stepId, byReply, ...turn }) => {
+    let was = byMessage.get(turn.messageId)
+    if (!was && stepId && plannedById.has(stepId) && !sent.has(stepId)) {
+      was = plannedById.get(stepId)
+      sent.add(stepId)
+    }
+    if (!was) return turn
+    const status = was.status === STATUS.RUNNING && turn.status === STATUS.PAUSED ? STATUS.RUNNING : turn.status
+    // The model a reply names is the one that wrote it; until then, the one planned.
+    return { ...was, messageId: turn.messageId, status, model: byReply ? turn.model : (was.model ?? turn.model ?? null) }
   })
+  const steps = [...ran, ...planned.filter((s) => !sent.has(s.id))]
   return { ...runBranch, steps, status: branchStatus(steps) }
+}
+
+/** The number of a run's steps in a branch that have started, which planned ones come after. */
+export const startedCount = (steps) => steps.filter((s) => s.messageId).length
+
+/**
+ * A run of a plan made from the run before (`new:run`; docket spec §5,
+ * v12): each branch's steps copied forward as planned steps, ready unless
+ * held, with their prompts (a sent step's prompt is its message's text),
+ * models, rooms and conditions; no chat until the branch runs. promptOf:
+ * messageId -> the text that was sent.
+ */
+export function runFromRun(prev, { id, n, now, newId, promptOf, order }) {
+  const branches = {}
+  for (const letter of order ?? Object.keys(prev.branches)) {
+    const b = prev.branches[letter]
+    if (!b) continue
+    const steps = (b.steps || []).map((s) => ({
+      id: newId(),
+      status: s.status === STATUS.WAITING ? STATUS.WAITING : STATUS.READY,
+      prompt: s.messageId ? String(promptOf(s.messageId) ?? s.prompt ?? '') : String(s.prompt ?? ''),
+      model: s.model ?? null,
+      ...(s.room ? { room: s.room } : {}),
+      condition: s.condition ?? null,
+      addedAt: now,
+    }))
+    branches[letter] = { status: branchStatus(steps), room: b.room ?? null, chatId: null, steps }
+  }
+  return { id, docketId: prev.docketId, n, createdAt: now, cost: null, branches }
+}
+
+/** A plan with no chat yet: branch a, named for the plan, in run 1 (`new:plan`). */
+export function emptyPlan({ id, runId, num, title = '', now }) {
+  return {
+    docket: {
+      id, num, title, createdAt: now, updatedAt: now, pinned: false, tags: [], archived: false,
+      branches: [{ letter: 'a', name: title, createdAt: now }], order: ['a'], nextLetter: 1,
+    },
+    run: { id: runId, docketId: id, n: 1, createdAt: now, cost: null, branches: { a: { status: STATUS.READY, room: null, chatId: null, steps: [] } } },
+  }
+}
+
+/** A branch with no chat yet, added to a plan and to one of its runs. */
+export function plannedBranch(docket, run, { name = '', room = null, now }) {
+  const letter = letterAt(docket.nextLetter)
+  return {
+    letter,
+    docket: {
+      ...docket,
+      branches: [...docket.branches, { letter, name, createdAt: now }],
+      order: [...docket.order, letter],
+      nextLetter: docket.nextLetter + 1,
+      updatedAt: now,
+    },
+    run: { ...run, branches: { ...run.branches, [letter]: { status: STATUS.READY, room, chatId: null, steps: [] } } },
+  }
 }
 
 /** The Favorites collection with one more favourite, made if there is none. */

@@ -139,6 +139,8 @@ function validateMessage(item) {
   if (item.summary != null && !isSummaryNote(item.summary)) return 'message.summary invalid'
   // Answers from sources the person brought into a prompt (C176).
   if (item.included != null && !isIncluded(item.included)) return 'message.included invalid'
+  // The planned step a run sent this message for (stage 10; C196 (j)).
+  if (item.step != null && !isId(item.step)) return 'message.step invalid'
   // Stage 6: the model a reply came from, and the tokens it took (C132 (h)).
   if (item.model != null && !isString(item.model, 200)) return 'message.model invalid'
   if (item.usage != null && !isUsage(item.usage)) return 'message.usage invalid'
@@ -328,10 +330,26 @@ function validateDocket(item) {
   return rowFields(item, 'docket')
 }
 
+const STEP_STATUSES = new Set(['ready', 'running', 'done', 'waiting', 'paused'])
+const STEP_CONDITIONS = new Set(['finished', 'failed', 'always', 'nothing'])
 function validateRun(item) {
   if (!isId(item.id))                       return 'run.id invalid'
   if (!isId(item.docketId))                 return 'run.docketId invalid'
   if (!item.branches || typeof item.branches !== 'object' || Array.isArray(item.branches)) return 'run.branches must be an object'
+  // A run's steps carry text from outside: checked as data (stage 10; C196).
+  for (const b of Object.values(item.branches)) {
+    if (!b || typeof b !== 'object') return 'run.branch invalid'
+    if (b.chatId != null && !isId(b.chatId)) return 'run.branch.chatId invalid'
+    if (b.steps !== undefined && !Array.isArray(b.steps)) return 'run.branch.steps must be an array'
+    for (const s of b.steps ?? []) {
+      if (!s || typeof s !== 'object' || !STEP_STATUSES.has(s.status)) return 'run.step.status invalid'
+      if (s.prompt !== undefined && !isString(s.prompt, 100000)) return 'run.step.prompt invalid'
+      if (s.messageId !== undefined && s.messageId !== null && !isId(s.messageId)) return 'run.step.messageId invalid'
+      if (s.id !== undefined && !isId(s.id)) return 'run.step.id invalid'
+      if (s.model != null && !isString(s.model, 200)) return 'run.step.model invalid'
+      if (s.condition != null && !STEP_CONDITIONS.has(s.condition)) return 'run.step.condition invalid'
+    }
+  }
   return null
 }
 

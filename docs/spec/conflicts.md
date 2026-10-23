@@ -1639,6 +1639,35 @@ Found while designing the stage after stage 9 (S4; `security-privacy-decisions.m
 - **(f) One rare case left as it is:** a set-up cut short that meets a pending upgrade at the same unlock: finishing the set-up opens the database first, so the upgrade runs before its screen. Both are rare; together, rarer.
 - **Suggestion:** keep as built.
 
+## Part 16. Plans and running (added 23 October 2026)
+
+Found while splitting stage 10 into pieces, after a read of every document on plans and running (docket spec, docket v12's header, the Almanac spec, which wins on running, the boards decisions, the settings spec, the security notes) and a survey of the code stage 2 left (the `dockets` and `runs` stores, branches and letters, steps that follow a chat's messages, an unused stop signal and per-plan lock between tabs). On screen the docket is the plan (C131); stored names stay.
+
+**C196. Stage 10 in six pieces, and the points the documents leave open.** Pieces: (1) steps that can be planned, ahead of any run; (2) the plan board, with `new:step`, `new:run`, `new:plan`, `hold:`, `move:` and editing a step; (3) the runner: `run:`, `stop:`, `stop:all`, one tab per plan, and `undo:` stopping at a run; (4) one after another, with conditions (A15); (5) `diff:` and the step list block; (6) spending and the warning before a costly run, then the checkpoint. Each built as suggested below:
+- **(a) Cards side by side.** v12 caps a screen at three cards; the shell has no limit on boards (C180) and cannot yet address two boards of one kind (AB §10.5). **Suggestion:** the plan board shows one plan at one run; `open:run 2` changes the run, and `diff:` sets two runs side by side inside the board. Several plans side by side waits for two boards of one kind.
+- **(b) A run opens no tabs** (A §10 against A §4; C7, not ruled). **Suggestion:** as C7 suggests: steps run in the background, each branch's chat appears in Records and in any room showing it.
+- **(c) Which chat a branch address means once it has run more than once.** **Suggestion:** its chat in the latest run that has one; an older one by `open:run 2` on the board.
+- **(d) A step's status while its reply arrives, and after.** C92 stored a reply still arriving as `paused`. **Suggestion:** the runner marks the step `running` and keeps it so until the reply ends: `done` when it is whole, `paused` when it is stopped, fails or stalls (a resend is offered, never made by itself, C114). A step left `running` when its tab closes reads as `paused` once no tab holds that plan. A prompt typed into a chat by hand keeps C92's way until stage 11.
+- **(e) Conditions** (A15). **Suggestion:** read from the step before's status, never from any text a model or source wrote: "after it finishes" (done), "if it fails" (paused by failure), "always", and, for a source, "if nothing is found" (an answer that found nothing).
+- **(f) A prompt typed into a chat whose branch is running.** **Suggestion:** refused while it runs ("201b is running; stop:201b, or wait"); otherwise it becomes the branch's next step in that run, as D §3.2 has it.
+- **(g) `open:` with a plan's number** opened its first branch until the board existed (C127). **Suggestion:** it opens the plan board, as A §4 has it.
+- **(h) What a run costs:** its steps' replies, from the tokens each recorded; the naming request and summaries are counted where they always were (C132 (h)).
+- **(i) A merge restore** rebuilds plans from chats, so planned steps and later runs would be lost (C93). **Suggestion:** fixed with piece 1, before any plan holds steps of its own.
+- **(j) Stored data.** New optional fields, shown at the stage's checkpoint: on a step, `id`, `prompt` and `addedAt` for a step planned ahead, its model, and a room only where it overrides the branch's (C1); on the user message a run sends, `step` (the planned step's id); runs numbered past 1; a branch in a run with no chat until it runs. No new store and no version change.
+- **Suggestion:** build as above.
+
+**C197. Steps that can be planned, as built** (stage 10, piece 1).
+- **(a) A step planned ahead** carries an id, its prompt, a model, a room only where it overrides the branch's, a condition, and when it was added. It stays through the chat's own messages, after the steps that started: a prompt typed by hand takes the next place, and the planned steps follow it. A step is never planned before one that started.
+- **(b) The message a run sends names its step** (`step`), so the planned step and the turn are one step, keeping what it was planned with. The model a reply names is the one that wrote it; until a reply comes, the one planned.
+- **(c) Running stays running:** a step the runner marks running stays so while its reply arrives; the runner says how it ended (piece 3). A prompt typed by hand keeps C92's way.
+- **(d) Changes refused once a step has started:** its prompt, model, room and condition change only while it is planned. `hold:` turns a branch's planned steps to waiting in one run, and back; refused while the branch runs.
+- **(e) Runs past the first:** `new:run` copies the latest run forward, every step planned again with its prompt (a sent step's prompt is the text that was sent), waiting steps still waiting, no chat until the branch runs; the run before is untouched.
+- **(f) A plan with nothing in it** (`new:plan`): numbered, branch a named for the plan, no chat. A branch can be added with no chat, and a branch moved before or after another, keeping its letter.
+- **(g) A merge restore** brings a plan holding steps of its own in whole, as its own plan with new numbers, its chats and messages pointed at their new ids; a plan whose chats are partly here already and the same is filed from its chats as before. A run's steps from a file are checked (status, prompt as text, ids, model, condition) and cleaned to the fields a step has.
+- **(h) One change to the version 6 upgrade's plan:** a step's model now comes from its reply where the reply names one (before, from the chat). It touches only upgrades still to run (an old backup restored, a browser not yet upgraded), and only that field.
+- **(i) Tested** plain and through the lock: planned steps through messages, a message naming its step, places, changes, holds, runs, empty plans, moves, the restore, and the checks.
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

@@ -13,8 +13,9 @@
 
 import { FIRST_NUM } from './addresses'
 import { tabBus } from './bus'
-import { stepsFromTurns, forkStep, collabsFromPersonas } from './migrations/v6Plan'
-import { newDocket, addBranch, removeBranch, renameInDocket, withSteps, favoritesWith, favoritesWithout } from './recordsModel'
+import { stepsFromTurns, storedSteps, forkStep, collabsFromPersonas } from './migrations/v6Plan'
+import { newDocket, addBranch, removeBranch, renameInDocket, withSteps, favoritesWith, favoritesWithout, startedCount, runFromRun, emptyPlan, plannedBranch } from './recordsModel'
+import { STATUS, branchStatus, plannedStep, isFixed, CONDITIONS } from './docketModel'
 
 export const RECORDS_EVENT = 'parliament-records'
 
@@ -127,7 +128,7 @@ async function fileInDocket(tx, conversation, { parent = null, copiedMessages = 
     if (docket && run) {
       const num = await takeNum(tx)
       const chat = { ...conversation, num, docketId: docket.id, run: run.n }
-      const steps = copiedMessages ? stepsFromTurns(chat, copiedMessages) : []
+      const steps = copiedMessages ? storedSteps(stepsFromTurns(chat, copiedMessages)) : []
       const step = allParentMessages ? forkStep(chat, allParentMessages) : null
       const added = addBranch(docket, run, { chat, forkedFrom: { chatNum: parent.num ?? null, step }, steps, now })
       chat.branch = added.letter
@@ -708,6 +709,18 @@ export async function saveDocument(db, conversationId, { paragraphs, suggestionS
 export async function fileRestored(tx, writes, { now, newId }) {
   const changes = []
   const convs = tx.objectStore('conversations')
+  // Plans that hold steps of their own come in whole, numbered here, with
+  // new ids (stage 10; C196 (i)); their chats are filled in below.
+  const planIds = new Map()
+  for (const p of writes.plans || []) {
+    const id = newId()
+    const num = await takeNum(tx)
+    planIds.set(p.docket.id, id)
+    const { num: before, ...docket } = p.docket
+    await tx.objectStore('dockets').put({ ...docket, id, num, updatedAt: now, restoredFrom: { at: now, ...(Number.isInteger(before) ? { num: before } : {}) } })
+    for (const r of p.runs) await tx.objectStore('runs').put({ ...r, id: newId(), docketId: id })
+    changes.push({ kind: 'docket', op: 'created', id, num })
+  }
   const msgsByChat = new Map()
   for (const m of writes.messages) {
     if (!msgsByChat.has(m.conversationId)) msgsByChat.set(m.conversationId, [])
@@ -720,8 +733,18 @@ export async function fileRestored(tx, writes, { now, newId }) {
     ...['notes', 'highlights', 'pins'].flatMap((store) => writes[store].map((record) => ({ store, record, tie: 2 }))),
   ].sort((a, b) => byTime(a.record, b.record) || a.tie - b.tie)
 
-  for (const { store, record } of items) {
+  for (const item of items) {
+    const { store } = item
+    let { record } = item
+    if (store === 'conversations' && record.planOf && planIds.has(record.planOf)) {
+      const { planOf, ...chat } = record
+      await convs.put({ ...chat, num: await takeNum(tx), docketId: planIds.get(planOf) })
+      continue
+    }
     if (store === 'conversations') {
+      // A plan not brought in whole: filed from its chats, as before.
+      record = { ...record }
+      delete record.planOf
       const parent = record.parentId ? await convs.get(record.parentId) : null
       const allParentMessages = parent ? (await tx.objectStore('messages').index('conversationId').getAll(parent.id)).sort(byTime) : null
       const filed = await fileInDocket(tx, record, { parent, copiedMessages: msgsByChat.get(record.id) || [], allParentMessages })
@@ -805,5 +828,150 @@ export async function removeOwnNote(db, { id, num, text }) {
     if (now.num !== num || now.text !== text || (now.tags ?? []).length) throw new Changed([num])
     await store.delete(id)
     return { result: null, changes: [{ kind: 'note', op: 'removed', id, num }] }
+  })
+}
+
+// ── Plans ahead of a run (stage 10, piece 1; C196) ──────
+//
+// A plan's steps can be written before anything runs; a run can be made from
+// the one before (new:run) and a plan from nothing (new:plan). A step that
+// has started is fixed: these change only steps planned ahead.
+
+/** Why a change to a plan was refused. code: noPlan, noRun, noBranch, noStep, fixed, running. */
+export class PlanError extends Error {
+  constructor(code) {
+    super(code)
+    this.name = 'PlanError'
+    this.code = code
+  }
+}
+
+const latestRun = (runs) => runs.reduce((a, r) => (!a || r.n > a.n ? r : a), null)
+
+async function planAt(tx, docketId, n) {
+  const docket = await tx.objectStore('dockets').get(docketId)
+  if (!docket) throw new PlanError('noPlan')
+  const runs = await tx.objectStore('runs').index('docketId').getAll(docketId)
+  const run = n == null ? latestRun(runs) : runs.find((r) => r.n === n)
+  if (!run) throw new PlanError('noRun')
+  return { docket, run, runs }
+}
+
+async function keepRunBranch(tx, docket, run, letter, branch, now, changes) {
+  await tx.objectStore('runs').put({ ...run, branches: { ...run.branches, [letter]: { ...branch, status: branchStatus(branch.steps) } } })
+  await tx.objectStore('dockets').put({ ...docket, updatedAt: now })
+  changes.push({ kind: 'run', op: 'updated', id: run.id }, { kind: 'docket', op: 'updated', id: docket.id, num: docket.num })
+}
+
+/**
+ * A step planned ahead in one branch of a run (new:step), after the first
+ * `after` steps or at the end; never before a step that has started.
+ */
+export async function planStep(db, { docketId, n = null, letter, prompt, model = null, room = null, after = null, newId = () => crypto.randomUUID(), now = new Date().toISOString() }) {
+  return write(db, ['dockets', 'runs'], async (tx) => {
+    const { docket, run } = await planAt(tx, docketId, n)
+    const branch = run.branches[letter]
+    if (!branch) throw new PlanError('noBranch')
+    const steps = [...branch.steps]
+    const at = Math.max(startedCount(steps), Math.min(after ?? steps.length, steps.length))
+    const step = plannedStep({ id: newId(), prompt, model, room, waiting: steps.length > 0 && steps.every((s) => s.status === STATUS.WAITING), now })
+    steps.splice(at, 0, step)
+    const changes = []
+    await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
+    return { result: { step, index: at + 1, n: run.n }, changes }
+  })
+}
+
+/** A planned step's prompt, model, room or condition changed; refused once it has started. */
+export async function changeStep(db, { docketId, n = null, letter, stepId, set, now = new Date().toISOString() }) {
+  return write(db, ['dockets', 'runs'], async (tx) => {
+    const { docket, run } = await planAt(tx, docketId, n)
+    const branch = run.branches[letter]
+    if (!branch) throw new PlanError('noBranch')
+    const i = branch.steps.findIndex((s) => s.id === stepId)
+    if (i < 0) throw new PlanError('noStep')
+    if (isFixed(branch.steps[i].status) || branch.steps[i].messageId) throw new PlanError('fixed')
+    const next = { ...branch.steps[i] }
+    if (set.prompt !== undefined) next.prompt = String(set.prompt)
+    if (set.model !== undefined) next.model = set.model
+    if (set.room !== undefined) { if (set.room) next.room = set.room; else delete next.room }
+    if (set.condition !== undefined) next.condition = CONDITIONS.includes(set.condition) ? set.condition : null
+    const steps = branch.steps.map((s, k) => (k === i ? next : s))
+    const changes = []
+    await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
+    return { result: next, changes }
+  })
+}
+
+/**
+ * hold: and hold:off (A4; C45): a branch's steps not yet started wait, or are
+ * ready again, in one run. Refused while the branch runs.
+ */
+export async function holdBranch(db, { docketId, n = null, letter, on, now = new Date().toISOString() }) {
+  return write(db, ['dockets', 'runs'], async (tx) => {
+    const { docket, run } = await planAt(tx, docketId, n)
+    const branch = run.branches[letter]
+    if (!branch) throw new PlanError('noBranch')
+    if (branch.steps.some((s) => s.status === STATUS.RUNNING)) throw new PlanError('running')
+    const from = on ? STATUS.READY : STATUS.WAITING
+    const to = on ? STATUS.WAITING : STATUS.READY
+    const steps = branch.steps.map((s) => (!s.messageId && s.status === from ? { ...s, status: to } : s))
+    const changes = []
+    await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)
+    return { result: { n: run.n, changed: steps.filter((s, k) => s !== branch.steps[k]).length }, changes }
+  })
+}
+
+/** new:run: the next run, copying the latest forward, nothing started (docket spec §5). */
+export async function newRun(db, { docketId, newId = () => crypto.randomUUID(), now = new Date().toISOString() }) {
+  return write(db, ['dockets', 'runs', 'messages'], async (tx) => {
+    const { docket, runs } = await planAt(tx, docketId, null)
+    const prev = latestRun(runs)
+    const texts = new Map()
+    for (const b of Object.values(prev.branches)) {
+      for (const s of b.steps || []) if (s.messageId) texts.set(s.messageId, (await tx.objectStore('messages').get(s.messageId))?.content ?? s.prompt ?? '')
+    }
+    const run = runFromRun(prev, { id: newId(), n: prev.n + 1, now, newId, promptOf: (id) => texts.get(id), order: docket.order })
+    await tx.objectStore('runs').put(run)
+    await tx.objectStore('dockets').put({ ...docket, updatedAt: now })
+    return { result: run, changes: [{ kind: 'run', op: 'created', id: run.id }, { kind: 'docket', op: 'updated', id: docket.id, num: docket.num }] }
+  })
+}
+
+/** new:plan: a plan with nothing in it yet, numbered (docket spec §7). */
+export async function newPlan(db, { title = '', newId = () => crypto.randomUUID(), now = new Date().toISOString() } = {}) {
+  return write(db, ['dockets', 'runs', 'counters'], async (tx) => {
+    const num = await takeNum(tx)
+    const { docket, run } = emptyPlan({ id: newId(), runId: newId(), num, title, now })
+    await tx.objectStore('dockets').put(docket)
+    await tx.objectStore('runs').put(run)
+    return { result: { docket, run }, changes: [{ kind: 'docket', op: 'created', id: docket.id, num }] }
+  })
+}
+
+/** A branch with no chat yet, added to a plan in one run (new:branch on the plan board). */
+export async function newPlanBranch(db, { docketId, n = null, name = '', room = null, now = new Date().toISOString() }) {
+  return write(db, ['dockets', 'runs'], async (tx) => {
+    const { docket, run } = await planAt(tx, docketId, n)
+    const added = plannedBranch(docket, run, { name, room, now })
+    await tx.objectStore('dockets').put(added.docket)
+    await tx.objectStore('runs').put(added.run)
+    return { result: { letter: added.letter, n: run.n }, changes: [{ kind: 'docket', op: 'updated', id: docket.id, num: docket.num }, { kind: 'run', op: 'updated', id: run.id }] }
+  })
+}
+
+/** move:201c after 201a: a branch's place in the plan; its letter stays (docket spec §2). */
+export async function moveBranch(db, { docketId, letter, after = null, before = null, now = new Date().toISOString() }) {
+  return write(db, ['dockets'], async (tx) => {
+    const docket = await tx.objectStore('dockets').get(docketId)
+    if (!docket) throw new PlanError('noPlan')
+    if (!docket.order.includes(letter)) throw new PlanError('noBranch')
+    const rest = docket.order.filter((l) => l !== letter)
+    const anchor = after ?? before
+    const at = rest.indexOf(anchor)
+    if (at < 0) throw new PlanError('noBranch')
+    rest.splice(after ? at + 1 : at, 0, letter)
+    await tx.objectStore('dockets').put({ ...docket, order: rest, updatedAt: now })
+    return { result: rest, changes: [{ kind: 'docket', op: 'updated', id: docket.id, num: docket.num }] }
   })
 }
