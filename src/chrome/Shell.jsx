@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import { useLingui } from '@lingui/react'
 import './chrome.css'
@@ -19,6 +19,8 @@ import { replyLanguageOf, withReplyLanguage, sourceAskLanguage, translateInto, n
 import { piecesOfAnswer, translationOf, lastSourceAnswer, BY_BROWSER } from '../lib/translations'
 import { findPrivate } from '../lib/privacyFilter'
 import { searchWords } from '../lib/searchWords'
+import { replyTargets } from '../lib/branchGroups'
+import { subscribe as subscribeBranches, lastShown, viewedIn } from '../stores/branchView'
 import { instructionLike } from '../lib/injection'
 import AnswerPicker from './AnswerPicker'
 import { ignite } from './ignition'
@@ -758,6 +760,12 @@ export default function Shell() {
   const [heldMany, setHeldMany] = useState(null)
   const heldManyNow = useRef(null)
   useEffect(() => { heldManyNow.current = heldMany }, [heldMany])
+  // Where the next prompts go among a prompt's branches, held by to: until
+  // changed (stage 8, piece 3; C174): { groupId, chats }. For this tab only.
+  const [heldTo, setHeldTo] = useState(null)
+  const heldToNow = useRef(null)
+  useEffect(() => { heldToNow.current = heldTo }, [heldTo])
+  const [replyPicking, setReplyPicking] = useState(false)
 
   // ── Frameworks (stage 7, piece 5; C164) ───────────────
   // On a chat, in order; held for a new chat as who answers is. The
@@ -1142,6 +1150,13 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'replyTo') {
+      // to: (C174): held until changed; nothing is stored.
+      if (touched.current) touched.current.heldTo = { before: heldToNow.current }
+      setHeldTo({ groupId: what.groupId, chats: what.chats })
+      remember(body)
+      return null
+    }
     if (what.kind === 'answerers') {
       // by: with several (C172 (c)): held for the next prompt here; the
       // picker stays open, so more can be ticked.
@@ -1246,6 +1261,7 @@ export default function Shell() {
     if (entry.view) showView(entry.view)
     if (entry.pending) setPendingAnswerer(entry.pending.before)
     if (entry.many) setHeldMany(entry.many.before)
+    if (entry.heldTo) setHeldTo(entry.heldTo.before)
     if (entry.pendingFw) setPendingFrameworks(entry.pendingFw.before)
     if (entry.setting) await updateSettingNow.current(entry.setting.key, entry.setting.before)
     if (entry.own) {
@@ -1272,7 +1288,7 @@ export default function Shell() {
   const onRun = useCallback(async (next, body, go, what) => {
     if (what?.kind === 'undo') return undo(body)
     const before = { arrangement: current.current, view: viewNow.current }
-    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null, many: null }
+    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null, many: null, heldTo: null }
     const out = what ? await act(what, body, next) : await run(next, body)
     const t = touched.current
     touched.current = null
@@ -1296,7 +1312,8 @@ export default function Shell() {
     if (t.own.length) entry.own = t.own
     if (t.setting) entry.setting = t.setting
     if (t.many) entry.many = t.many
-    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting || entry.many)) {
+    if (t.heldTo) entry.heldTo = t.heldTo
+    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting || entry.many || entry.heldTo)) {
       undoStack.current = [...undoStack.current, entry].slice(-UNDO_MAX)
       setUndoTop(body)
     }
@@ -1377,10 +1394,27 @@ export default function Shell() {
   const answerRows = useMemo(() => pickerRows(keys), [keys, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
   // The model cost marks compare with, named once in the picker (settings spec §8).
   const referenceName = useMemo(() => allModels().find((m) => m.reference)?.name ?? null, [])
+  // The slider of branches on screen, and the tab viewed (C173, C174).
+  const branchShown = useSyncExternalStore(subscribeBranches, lastShown, lastShown)
+  const viewedNow = useCallback(() => (branchShown ? viewedIn(branchShown.groupId) : null), [branchShown])
+  const branchViewed = useSyncExternalStore(subscribeBranches, viewedNow, viewedNow)
+  const targets = useMemo(() => replyTargets({ shown: branchShown, viewed: branchViewed, held: heldTo }), [branchShown, branchViewed, heldTo])
+  const addressOf = useCallback((id) => branchShown?.members.find((m) => m.chatId === id)?.address ?? '', [branchShown])
   // Several held for the next prompt in this room (C172 (c)).
   const heldIds = heldMany && roomId !== undefined && heldMany.room === (roomId ?? NEW_ROOM) ? heldMany.ids : null
   const heldWho = useMemo(() => (heldIds ? heldIds.map((id) => answererOf({ chosen: id, keyed: keys, defaultModel: settings.defaultModel })) : null), [heldIds, keys, settings.defaultModel, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
   const answering = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: answerer, rows: answerRows, stored: chosenHere, held: heldWho }), [roomId, roomRecord, answerer, answerRows, chosenHere, heldWho])
+  // Among the branches (C174): who answers the one or more the next prompt
+  // carries on, when that is not the room's own line. A new prompt to
+  // several (by: with several) comes first.
+  const branchTarget = useMemo(() => {
+    if (!targets || (heldWho && heldWho.length > 1)) return null
+    const ids = targets.chats
+    if (ids.length === 1 && ids[0] === roomId) return null
+    const whos = ids.map((id) => answererOf({ chosen: conversations.find((c) => c.id === id)?.answerer ?? null, keyed: keys, defaultModel: settings.defaultModel }))
+    return { ids, whos, addresses: ids.map(addressOf) }
+  }, [targets, heldWho, roomId, conversations, keys, settings.defaultModel, addressOf, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
+  const branching = useMemo(() => ({ shown: branchShown, held: heldTo }), [branchShown, heldTo])
   const fwStored = roomId ? roomRecord?.frameworks ?? null : pendingFrameworks
   const fwHere = useMemo(() => frameworksOf(fwStored ?? [], fwList).map((fw) => fw.id), [fwStored, fwList])
   const frameworkScreens = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: fwHere, stored: fwStored, list: fwList, nameOf: nameOfFramework }), [roomId, roomRecord, fwHere, fwStored, fwList, nameOfFramework])
@@ -1448,7 +1482,7 @@ export default function Shell() {
     privacy: { mode: settings.privacyFilter ?? 'off', local: localChecker?.name ?? null },
     checking: { room: roomId, num: roomRecord?.num ?? null, last: lastAnswer && { messageId: lastAnswer.messageId, source: lastAnswer.source, text: lastAnswer.text }, local: localChecker && { id: localChecker.id, name: localChecker.name } },
   }), [settings.privacyFilter, localChecker, settings.replyLanguage, settings.helper, settings.translateQueries, reply, i18n.locale, languageName, helperNow, answerRows, roomId, roomRecord, lastAnswer, translateTo, translator])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens, branching }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens, branching])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -1509,8 +1543,8 @@ export default function Shell() {
     region: answerer.provider === 'mistral' ? region : null,
     provider: destination(PROVIDER)?.name,
     source: destination(SOURCE)?.name,
-    model: answerer.name,
-    answerer,
+    model: (branchTarget?.ids.length === 1 ? branchTarget.whos[0] : answerer).name,
+    answerer: branchTarget?.ids.length === 1 ? branchTarget.whos[0] : answerer,
     historyChars: about ? 0 : historyChars(along),
     systemChars: byModel ? withReplyLanguage(instructionsOf(fwHere, fwList), reply.tag).length : 0,
     // The language replies come in, when one is asked for (C166).
@@ -1521,8 +1555,15 @@ export default function Shell() {
     // The language a source's search is read in, for what it searches for (C168).
     searchLang: answerer.group === 'source' ? (reads === 'yours' ? sourceAskLanguage(reply, sourceLocale(i18n.locale)) : 'en') : null,
     nameOf: languageName,
-    // Several at once, each a branch of the plan (C172).
-    many: heldWho && heldWho.length > 1 ? heldWho : null,
+    // Several at once, each a branch of the plan (C172), or several branches
+    // there already, each carrying its own on (C174).
+    many: heldWho && heldWho.length > 1 ? heldWho : branchTarget?.ids.length > 1 ? branchTarget.whos : null,
+    toMany: !(heldWho && heldWho.length > 1) && branchTarget?.ids.length > 1 ? branchTarget.addresses : null,
+    toBranch: branchTarget?.ids.length === 1 ? branchTarget.addresses[0] : null,
+    targetIds: targets?.chats ?? null,
+    carriesOn: targets?.why === 'carried' && branchViewed && branchShown && branchViewed !== branchShown.line ? { line: addressOf(branchShown.line), viewed: addressOf(branchViewed) } : null,
+    // In the field: where the prompt goes among the branches (C174).
+    toLabel: targets && branchShown ? { chats: targets.chats.map(addressOf), all: targets.chats.length === branchShown.chats.length && targets.chats.length > 1, count: targets.chats.length, name: targets.chats.length === 1 ? branchShown.members.find((m) => m.chatId === targets.chats[0])?.name ?? '' : '' } : null,
     // The privacy filter, for a model off this computer (C167).
     privacy: answerer.group === 'model' ? { on: (settings.privacyFilter ?? 'off') !== 'off', names: settings.privacyFilter === 'names' ? localChecker?.name ?? null : null, along: about ? [] : alongPrivate } : null,
     // The frameworks on the chat, by name; the ones that go, when a model answers (C164).
@@ -1537,7 +1578,7 @@ export default function Shell() {
     ink,
     roomName: roomNameHere,
     about,
-  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho])
+  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -1548,7 +1589,19 @@ export default function Shell() {
    */
   const onPrompt = useCallback(async (text, shown) => {
     const aboutNow = shown?.about ?? null
-    const chatId = aboutNow ? null : roomOnScreen(current.current) ?? null
+    const roomChat = aboutNow ? null : roomOnScreen(current.current) ?? null
+    // Among a prompt's branches (C174): where the line said it goes, read
+    // again; if that has changed since, say so first.
+    const shownNow = lastShown()
+    const targetsNow = replyTargets({ shown: shownNow, viewed: shownNow ? viewedIn(shownNow.groupId) : null, held: heldToNow.current })
+    // A new prompt to several (by: with several) is not among branches.
+    const branchCase = !aboutNow && Boolean(text) && !(shown?.many?.length > 1 && !shown?.toMany)
+    const toIds = branchCase ? targetsNow?.chats ?? null : null
+    const shownIds = branchCase ? shown?.targetIds ?? null : null
+    if ((toIds ?? []).join('|') !== (shownIds ?? []).join('|')) return { refused: 'promptChanged' }
+    // One branch other than the room's: the room moves to it, and it carries on.
+    const moveTo = toIds && toIds.length === 1 && toIds[0] !== roomChat ? toIds[0] : null
+    const chatId = moveTo ?? roomChat
     if (creating.current) return { refused: 'promptBusy' }
     // The line named a recipient; if that has changed since, say so first.
     const fresh = await keyedProviders().catch(() => ({}))
@@ -1562,6 +1615,42 @@ export default function Shell() {
     const who = answererOf({ chosen: chatId ? conv?.answerer ?? null : pendingNow.current, keyed: fresh, defaultModel: latest.current.settings.defaultModel })
     if (shown?.answerer && who.id !== shown.answerer.id) return { refused: 'promptChanged' }
     if (who.later || who.gone || who.needsKey || who.unchecked) return { refused: 'promptChanged' }
+
+    // A source answers a search (C168), with its edition (C166 (e)): for a
+    // prompt to several, each source on its own.
+    const askOne = (to, w, extra = {}) => {
+      const { locale } = latest.current
+      const lang = sourceAskLanguage(replyNow.current, sourceLocale(locale))
+      const yours = destination(w.id)?.answersIn === 'yours'
+      const words = searchWords(text, yours ? lang : 'en')
+      const searchedFor = words === text.trim().replace(/[?？!.]+$/u, '').trim() ? null : { text: words.slice(0, 300), lang: baseOf(yours ? lang : 'en'), by: 'search', at: new Date().toISOString() }
+      return askSource(to, text, { source: w.id, lang, fallbackLang: yours ? 'en' : null, asked: searchedFor, ...extra })
+    }
+
+    // Several branches there already, each carrying its own on (C174): each
+    // with who answers it and its own frameworks.
+    if (toIds && toIds.length > 1) {
+      const convs = await Promise.all(toIds.map((x) => getConversation(x).catch(() => null)))
+      if (convs.some((c) => !c)) return { refused: 'promptChanged' }
+      const whos = convs.map((c) => answererOf({ chosen: c.answerer ?? null, keyed: fresh, defaultModel: latest.current.settings.defaultModel }))
+      if (whos.some((w) => w.later || w.gone || w.needsKey || w.unchecked)) return { refused: 'promptChanged' }
+      if (whos.map((w) => w.id).join('|') !== (shown?.many ?? []).map((w) => w.id).join('|')) return { refused: 'promptChanged' }
+      setStalledIn(null)
+      const sendOne = (c, w) => {
+        const fw = frameworksOf(c.frameworks ?? [], fwListNow.current).map((x) => x.id)
+        if (w.group === 'source') return askOne(c.id, w)
+        return sendMessage(c.id, text, w.id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), [], null, { frameworks: recordOf(fw, fwListNow.current) })
+      }
+      const all = convs.map((c, i) => (c.id === roomChat && readyRoom.current !== roomChat
+        ? new Promise((resolve, reject) => { waiting.current = { chatId: c.id, go: () => sendOne(c, whos[i]).then(resolve, reject), drop: () => resolve() } })
+        : sendOne(c, whos[i])))
+      const done = Promise.allSettled(all).then((results) => {
+        loadConversations().catch(() => {})
+        const bad = results.findIndex((r) => r.status === 'rejected' && r.reason?.name !== 'AbortError')
+        return bad < 0 ? null : failure(results[bad].reason, whos[bad].group === 'source' ? whos[bad].name : undefined)
+      })
+      return { done }
+    }
 
     // A prompt to several at once (stage 8; C172): the chat here answers
     // with the first, each other is a new branch of its plan from the same
@@ -1605,15 +1694,9 @@ export default function Shell() {
       setStalledIn((was) => (was === chatId ? null : was))
       updateWelcome((w) => tick(w, 'ask'))
       const group = { id: crypto.randomUUID(), chats: [id, ...others] }
-      const sendOne = (to, w, i) => {
-        const { locale } = latest.current
-        if (w.group !== 'source') return sendMessage(to, text, w.id, system(), [], null, { ...under, group, describe: i === 0 })
-        const lang = sourceAskLanguage(replyNow.current, sourceLocale(locale))
-        const yours = destination(w.id)?.answersIn === 'yours'
-        const words = searchWords(text, yours ? lang : 'en')
-        const searchedFor = words === text.trim().replace(/[?？!.]+$/u, '').trim() ? null : { text: words.slice(0, 300), lang: baseOf(yours ? lang : 'en'), by: 'search', at: new Date().toISOString() }
-        return askSource(to, text, { source: w.id, lang, fallbackLang: yours ? 'en' : null, asked: searchedFor, group })
-      }
+      const sendOne = (to, w, i) => (w.group !== 'source'
+        ? sendMessage(to, text, w.id, system(), [], null, { ...under, group, describe: i === 0 })
+        : askOne(to, w, { group }))
       const first = readyRoom.current === id
         ? sendOne(id, whos[0], 0)
         : new Promise((resolve, reject) => { waiting.current = { chatId: id, go: () => sendOne(id, whos[0], 0).then(resolve, reject), drop: () => resolve() } })
@@ -1663,6 +1746,10 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'ask'))
 
     let id = chatId
+    if (moveTo) {
+      const placed = planRoom(current.current, moveTo)
+      if (placed.next) await run(placed.next, null)
+    }
     if (!id) {
       creating.current = true
       try {
@@ -1760,13 +1847,34 @@ export default function Shell() {
     setFwPicking((was) => !was)
   }, [])
 
+  // From the field's marginalia: with branches on screen, where the prompt
+  // goes among them (C174); else who answers.
   const togglePicker = useCallback(() => {
     setFwPicking(false)
     setInspected(null)
     setCompared(null)
     setKeyPanel(null)
+    if (lastShown()) { setPicking(false); setReplyPicking((was) => !was); return }
+    setReplyPicking(false)
     setPicking((was) => !was)
   }, [])
+  // A row of that picker ticks or unticks a branch, as to: does (C174).
+  const toggleReplyTarget = useCallback(async (chatId) => {
+    const s = lastShown()
+    if (!s) return
+    const now = replyTargets({ shown: s, viewed: viewedIn(s.groupId), held: heldToNow.current })?.chats ?? []
+    const next = now.includes(chatId) ? now.filter((x) => x !== chatId) : [...now, chatId]
+    if (!next.length) return
+    const addr = (id) => s.members.find((m) => m.chatId === id)?.address
+    if (next.some((id) => !addr(id))) return
+    const body = next.length === s.chats.length && next.length > 1 ? 'to:all' : `to:${next.map(addr).join(', ')}`
+    const p = preview(`>${body}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
+    if (p.act) await onRun(p.next ?? null, body, null, p.act)
+  }, [onRun])
+  const allReplyTargets = useCallback(async () => {
+    const p = preview('>to:all', { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
+    if (p.act) await onRun(p.next ?? null, 'to:all', null, p.act)
+  }, [onRun])
 
   function pickBoard(board) {
     const a = current.current
@@ -1861,7 +1969,9 @@ export default function Shell() {
           keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory', region, onRegion: (r) => updateSetting('mistralRegion', r),
             local: { ...LOCAL_ENTRY, origin: window.location.origin, status: local.status, models: local.models, away: local.away ?? [], onCheck: () => runLocalCheck() } } : null}
           onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)}
-          picker={picking ? { rows: answerRows, now: answerer, picked: heldIds && heldIds.length > 1 ? heldIds : null, reference: referenceName } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => setPicking(false)}
+          picker={replyPicking && branchShown && targets
+            ? { kind: 'reply', members: branchShown.members, targets, line: branchShown.line, onToggle: toggleReplyTarget, onAll: allReplyTargets }
+            : picking ? { rows: answerRows, now: answerer, picked: heldIds && heldIds.length > 1 ? heldIds : null, reference: referenceName } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => { setPicking(false); setReplyPicking(false) }}
           frameworkPicker={fwPicking ? { items: frameworkItems } : null} onFrameworkPicker={toggleFwPicker} onToggleFramework={toggleFramework} onFrameworkPickerClose={() => setFwPicking(false)} />,
         barHost,
       )}

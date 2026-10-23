@@ -1897,6 +1897,11 @@ msgstr "{count, plural, one {{nums} is a quote, kept from models until now: its 
 msgid "enter.promptBusy"
 msgstr "A reply is still arriving here. Send once it is done"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptCarriesOn"
+msgstr "It carries {line} on, not the reply you are viewing. open:{viewed} carries that one on in a room of its own"
+
 #. js-lingui-explicit-id
 msgid "enter.promptChanged"
 msgstr "Where prompts go has changed. Read this line again before you send"
@@ -2108,6 +2113,22 @@ msgstr "{name} thinks before answering, shown as it goes. On this computer that 
 msgid "enter.promptThinksOff"
 msgstr "{name} answers straight away, without thinking first. thinking:on lets it, shown as it goes, which can take minutes on this computer"
 
+#. js-lingui-explicit-id
+msgid "enter.promptToBranch"
+msgstr "It carries {address} on, and the room moves to it"
+
+#. js-lingui-explicit-id
+msgid "enter.promptToMany"
+msgstr "{count, plural, other {Enter sends this to {nums}, each carrying its own branch on}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptToManyCheap"
+msgstr "{count, plural, other {Enter sends this to {nums}, each carrying its own branch on: under {cost} in all to send}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptToManyTotal"
+msgstr "{count, plural, other {Enter sends this to {nums}, each carrying its own branch on: {cost} in all to send}}"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptTranslateLater"
@@ -2170,6 +2191,10 @@ msgstr "No language is asked for already"
 #. js-lingui-explicit-id
 msgid "enter.replySet"
 msgstr "Enter has replies come in {language}, whatever language you write in, from every model"
+
+#. js-lingui-explicit-id
+msgid "enter.replyToFailed"
+msgstr "The choice was not kept. Try again"
 
 #. js-lingui-explicit-id
 msgid "enter.resetAlready"
@@ -2460,6 +2485,10 @@ msgstr "Enter lets models that can think do so before answering, shown as they g
 msgid "enter.thinkingSame"
 msgstr "{on, select, on {Thinking is on already} other {Thinking is off already}}"
 
+#. js-lingui-explicit-id
+msgid "enter.toAll"
+msgstr "{count, plural, other {Enter sends your next prompts to all # branches, each carrying its own on, until changed}}"
+
 #. {leader} is >, the command leader
 #. js-lingui-explicit-id
 msgid "enter.toBegin"
@@ -2470,9 +2499,30 @@ msgstr "{leader} to begin"
 msgid "enter.toCommand"
 msgstr "{leader} for the command line"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.toNone"
+msgstr "to: chooses among the branches of a prompt sent to several, and there are none on screen"
+
+#. js-lingui-explicit-id
+msgid "enter.toNotHere"
+msgstr "No branch {address} here. The branches are {nums}"
+
 #. js-lingui-explicit-id
 msgid "enter.tooMany"
 msgstr "Too many requests for now. Wait a moment, then send again"
+
+#. js-lingui-explicit-id
+msgid "enter.toOne"
+msgstr "Enter sends your next prompts to {address}, carrying on {name}’s branch, until changed"
+
+#. js-lingui-explicit-id
+msgid "enter.toSame"
+msgstr "Your prompts go there already"
+
+#. js-lingui-explicit-id
+msgid "enter.toSome"
+msgstr "Enter sends your next prompts to {nums}, each carrying its own branch on, until changed"
 
 #. js-lingui-explicit-id
 msgid "enter.tourHere"
@@ -2688,6 +2738,18 @@ msgstr "framework: none"
 #. js-lingui-explicit-id
 msgid "field.frameworkSome"
 msgstr "{more, plural, =0 {framework: {first}} other {framework: {first} +#}}"
+
+#. js-lingui-explicit-id
+msgid "field.toAll"
+msgstr "{count, plural, other {to all #}}"
+
+#. js-lingui-explicit-id
+msgid "field.toOne"
+msgstr "to {address} · {name}"
+
+#. js-lingui-explicit-id
+msgid "field.toSome"
+msgstr "to {nums}"
 
 #. js-lingui-explicit-id
 msgid "framework.about.alts"
@@ -3486,6 +3548,44 @@ msgstr "{count, plural, one {a bank account number} other {# bank account number
 #. js-lingui-explicit-id
 msgid "privacy.phone"
 msgstr "{count, plural, one {a phone number} other {# phone numbers}}"
+
+#. js-lingui-explicit-id
+msgid "replyPicker.all"
+msgstr "{count, plural, other {all #}}"
+
+#. js-lingui-explicit-id
+msgid "replyPicker.carried"
+msgstr "The line this chat carries on."
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "replyPicker.follows"
+msgstr "Follows the reply you view until you tick one. A new prompt to new sources: by: and their names."
+
+#. js-lingui-explicit-id
+msgid "replyPicker.footCarried"
+msgstr "The chat carries one line on. Tick others to carry them on too, each in its own tab."
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "replyPicker.held"
+msgstr "Held until you change it. A new prompt to new sources: by: and their names."
+
+#. js-lingui-explicit-id
+msgid "replyPicker.ownRoom"
+msgstr "The chat carries on from another. Ticked, this one carries on too, in its tab."
+
+#. js-lingui-explicit-id
+msgid "replyPicker.thread"
+msgstr "Its own thread, under this prompt."
+
+#. js-lingui-explicit-id
+msgid "replyPicker.title"
+msgstr "Reply to"
+
+#. js-lingui-explicit-id
+msgid "replyPicker.viewed"
+msgstr "The reply you are viewing. Your prompt follows it as you move between them."
 
 #. js-lingui-explicit-id
 msgid "room.empty"

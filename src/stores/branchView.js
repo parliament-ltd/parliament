@@ -32,9 +32,13 @@ export function setViewed(groupId, chatId) {
   tell()
 }
 
-/** A slider is on screen; returns the function that takes it off. */
-export function onScreen(groupId, chats) {
-  const entry = { groupId, chats: [...chats] }
+/**
+ * A slider is on screen; returns the function that takes it off. meta:
+ * what the bar needs to send to its branches (piece 3): { line, carried,
+ * members: [{ chatId, letter, address, name }] }.
+ */
+export function onScreen(groupId, chats, meta = {}) {
+  const entry = { groupId, chats: [...chats], line: meta.line ?? chats[0], carried: Boolean(meta.carried), members: meta.members ?? [] }
   shown.push(entry)
   tell()
   return () => {

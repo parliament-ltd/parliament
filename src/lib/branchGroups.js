@@ -72,6 +72,28 @@ export function membersOf(messages, lineId) {
   return [...out]
 }
 
+/**
+ * Where the next prompt goes, among the branches of the slider on screen
+ * (stage 8, piece 3; slider v9; C174).
+ * - Held with to: (or a click in its picker): those, until changed.
+ * - One branch carried on alone below the tabs: that line, whatever tab is
+ *   viewed; another is carried on in a room of its own (open:201b).
+ * - Otherwise: the tab being viewed, or the room's line.
+ * @param {{ shown: { groupId: string, chats: string[], line: string, carried: boolean }|null,
+ *   viewed: string|null, held: { groupId: string, chats: string[] }|null }} input
+ * @returns {{ chats: string[], why: 'held'|'carried'|'viewed'|'line' }|null} null with no slider
+ */
+export function replyTargets({ shown, viewed = null, held = null }) {
+  if (!shown) return null
+  if (held && held.groupId === shown.groupId) {
+    const chats = held.chats.filter((c) => shown.chats.includes(c))
+    if (chats.length) return { chats, why: 'held' }
+  }
+  if (shown.carried) return { chats: [shown.line], why: 'carried' }
+  const v = viewed && shown.chats.includes(viewed) ? viewed : shown.line
+  return { chats: [v], why: v === shown.line ? 'line' : 'viewed' }
+}
+
 /** The tab one step along, or null at either end. */
 export function stepFrom(chats, now, dir) {
   const at = Math.max(0, chats.indexOf(now))

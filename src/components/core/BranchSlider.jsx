@@ -82,7 +82,11 @@ export default function BranchSlider({ item, line, infoOf, renderLine, numberOf 
   const { i18n } = useLingui()
   const chats = item.tabs.map((t) => t.chatId)
   const chatsKey = chats.join('|')
-  useEffect(() => onScreen(item.groupId, chatsKey.split('|')), [item.groupId, chatsKey])
+  // What the bar needs to send to these branches (piece 3; C174): the line,
+  // whether it alone is carried on, and each branch's letter, address and name.
+  const carriedLine = item.mode === 'below' && Boolean(item.tabs.find((t) => t.line)?.continued)
+  const membersKey = JSON.stringify(item.tabs.map((t) => ({ chatId: t.chatId, ...infoOf(t.chatId, t) })))
+  useEffect(() => onScreen(item.groupId, chatsKey.split('|'), { line, carried: carriedLine, members: JSON.parse(membersKey) }), [item.groupId, chatsKey, line, carriedLine, membersKey])
   const viewed = useViewed(item.groupId)
   const now = chats.includes(viewed) ? viewed : chats.includes(line) ? line : chats[0]
   const at = chats.indexOf(now)

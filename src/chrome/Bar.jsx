@@ -16,6 +16,7 @@ import Inspect from './Inspect'
 import Compare from './Compare'
 import KeyPanel from './KeyPanel'
 import AnswerPicker from './AnswerPicker'
+import ReplyPicker from './ReplyPicker'
 import FrameworkPicker from './FrameworkPicker'
 import { step as stepBranch } from '../stores/branchView'
 
@@ -170,9 +171,13 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   let marginalia = null
   if (prompt && prompt.room !== undefined && prompt.keyed != null) {
     const who = prompt.answerer ?? (prompt.keyed ? { group: 'model', name: prompt.model } : { group: 'source', name: prompt.source })
-    marginalia = who.group === 'source'
-      ? i18n._(COPY.field.answeredFrom, { source: who.name })
-      : i18n._(COPY.field.answeredBy, { model: who.name })
+    const to = prompt.toLabel
+    // Among a prompt's branches, where it goes (C174): "to 201a · Sonnet 5.5".
+    marginalia = to && !(prompt.many?.length > 1 && !prompt.toMany)
+      ? (to.all ? i18n._(COPY.field.toAll, { count: to.count }) : to.count > 1 ? i18n._(COPY.field.toSome, { nums: to.chats.join(', ') }) : i18n._(COPY.field.toOne, { address: to.chats[0], name: to.name }))
+      : who.group === 'source'
+        ? i18n._(COPY.field.answeredFrom, { source: who.name })
+        : i18n._(COPY.field.answeredBy, { model: who.name })
   }
   // The frameworks on this chat: "framework: none", or the first and how many more (C164).
   const names = prompt?.frameworkNames ?? []
@@ -306,7 +311,9 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           <FrameworkPicker items={frameworkPicker.items} onToggle={onToggleFramework} />
         )}
         {!reference && !inspect && !compare && !keyPanel && picker && (
-          <AnswerPicker rows={picker.rows} now={picker.now} reference={picker.reference} onPick={onPickAnswerer} />
+          picker.kind === 'reply'
+            ? <ReplyPicker members={picker.members} targets={picker.targets} line={picker.line} onToggle={picker.onToggle} onAll={picker.onAll} />
+            : <AnswerPicker rows={picker.rows} now={picker.now} picked={picker.picked} reference={picker.reference} onPick={onPickAnswerer} />
         )}
         {!reference && !inspect && !compare && keyPanel && (
           <KeyPanel

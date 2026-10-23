@@ -218,7 +218,9 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.drop', message: 'Remove an ask, edit or step that has not been sent' } }),
   v({ verb: 'strikethrough', group: 'editing', example: 'strikethrough:', takes: [[]], on: EDITING, stage: 11, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.strikethrough', message: 'Strike the selected passage' } }),
-  v({ verb: 'to', group: 'editing', example: 'to:201a', forms: ['to:201a', 'to:all'], takes: [['address'], [['all']]], on: ['room'], stage: 8, undoable: true, click: 'apply',
+  // Where the next prompt goes among a prompt's branches (stage 8; C174);
+  // several with commas: to:201a, 201c.
+  v({ verb: 'to', group: 'editing', example: 'to:201a', forms: ['to:201a', 'to:201a, 201c', 'to:all'], takes: [['addresses'], [['all']]], stage: 8, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.to', message: 'Send the next prompt to one branch, or to all' } }),
   v({ verb: 'accept', group: 'editing', example: 'accept:244', forms: ['accept:244', 'accept:all'], takes: [['addresses'], [['all']]], on: EDITING, stage: 11, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.accept', message: 'Accept a suggestion' } }),

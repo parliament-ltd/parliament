@@ -573,6 +573,20 @@ export const COPY = {
     promptManyLocal: /*i18n*/ { id: 'enter.promptManyLocal', message: '{n}. {name}, on this computer: nothing leaves it' },
     promptDescribeOnce: /*i18n*/ { id: 'enter.promptDescribeOnce', message: 'After the first answer, one small request names the chat, once for all of them' },
     promptAboutMany: /*i18n*/ { id: 'enter.promptAboutMany', message: 'A prompt about cards goes to one at a time. by: chooses one' },
+    // Where the next prompt goes among a prompt's branches (C174). {address}
+    // is a branch's address, 201b; {nums} a list of them.
+    toNone: /*i18n*/ { id: 'enter.toNone', message: 'to: chooses among the branches of a prompt sent to several, and there are none on screen', comment: 'Commands stay English' },
+    toNotHere: /*i18n*/ { id: 'enter.toNotHere', message: 'No branch {address} here. The branches are {nums}' },
+    toOne: /*i18n*/ { id: 'enter.toOne', message: 'Enter sends your next prompts to {address}, carrying on {name}’s branch, until changed' },
+    toSome: /*i18n*/ { id: 'enter.toSome', message: 'Enter sends your next prompts to {nums}, each carrying its own branch on, until changed' },
+    toAll: /*i18n*/ { id: 'enter.toAll', message: '{count, plural, other {Enter sends your next prompts to all # branches, each carrying its own on, until changed}}' },
+    toSame: /*i18n*/ { id: 'enter.toSame', message: 'Your prompts go there already' },
+    promptToBranch: /*i18n*/ { id: 'enter.promptToBranch', message: 'It carries {address} on, and the room moves to it' },
+    promptCarriesOn: /*i18n*/ { id: 'enter.promptCarriesOn', message: 'It carries {line} on, not the reply you are viewing. open:{viewed} carries that one on in a room of its own', comment: 'Commands stay English' },
+    promptToMany: /*i18n*/ { id: 'enter.promptToMany', message: '{count, plural, other {Enter sends this to {nums}, each carrying its own branch on}}' },
+    promptToManyTotal: /*i18n*/ { id: 'enter.promptToManyTotal', message: '{count, plural, other {Enter sends this to {nums}, each carrying its own branch on: {cost} in all to send}}' },
+    promptToManyCheap: /*i18n*/ { id: 'enter.promptToManyCheap', message: '{count, plural, other {Enter sends this to {nums}, each carrying its own branch on: under {cost} in all to send}}' },
+    replyToFailed: /*i18n*/ { id: 'enter.replyToFailed', message: 'The choice was not kept. Try again' },
     manyFailed: /*i18n*/ { id: 'enter.manyFailed', message: 'The branches could not all be made, so nothing was sent. Try again' },
     answererFailed: /*i18n*/ { id: 'enter.answererFailed', message: 'The choice was not kept. Try again' },
     // C114: a reply that stalled, and the offer to send it again.
@@ -686,6 +700,19 @@ export const COPY = {
     replyCut: /*i18n*/ { id: 'enter.replyCut', message: 'The reply broke off part way. What arrived is kept and marked as cut off' },
   },
 
+  // Where the next prompt goes among a prompt's branches (stage 8; C174).
+  replyPicker: {
+    title: /*i18n*/ { id: 'replyPicker.title', message: 'Reply to' },
+    all: /*i18n*/ { id: 'replyPicker.all', message: '{count, plural, other {all #}}' },
+    viewed: /*i18n*/ { id: 'replyPicker.viewed', message: 'The reply you are viewing. Your prompt follows it as you move between them.' },
+    carried: /*i18n*/ { id: 'replyPicker.carried', message: 'The line this chat carries on.' },
+    ownRoom: /*i18n*/ { id: 'replyPicker.ownRoom', message: 'The chat carries on from another. Ticked, this one carries on too, in its tab.' },
+    thread: /*i18n*/ { id: 'replyPicker.thread', message: 'Its own thread, under this prompt.' },
+    held: /*i18n*/ { id: 'replyPicker.held', message: 'Held until you change it. A new prompt to new sources: by: and their names.', comment: 'Commands stay English' },
+    follows: /*i18n*/ { id: 'replyPicker.follows', message: 'Follows the reply you view until you tick one. A new prompt to new sources: by: and their names.', comment: 'Commands stay English' },
+    footCarried: /*i18n*/ { id: 'replyPicker.footCarried', message: 'The chat carries one line on. Tick others to carry them on too, each in its own tab.' },
+  },
+
   // The replies to a prompt sent to several, as tabs (stage 8; C173).
   branches: {
     label: /*i18n*/ { id: 'branches.label', message: '{count, plural, other {The replies of # branches}}' },
@@ -714,6 +741,10 @@ export const COPY = {
   field: {
     answeredFrom: /*i18n*/ { id: 'field.answeredFrom', message: 'answered from {source}' },
     answeredBy: /*i18n*/ { id: 'field.answeredBy', message: 'answered by {model}' },
+    // Among a prompt's branches, where the next prompt goes (C174).
+    toOne: /*i18n*/ { id: 'field.toOne', message: 'to {address} · {name}' },
+    toSome: /*i18n*/ { id: 'field.toSome', message: 'to {nums}' },
+    toAll: /*i18n*/ { id: 'field.toAll', message: '{count, plural, other {to all #}}' },
     frameworkNone: /*i18n*/ { id: 'field.frameworkNone', message: 'framework: none', comment: 'Marginalia in the prompt field; framework: is the command, kept English' },
     frameworkSome: /*i18n*/ { id: 'field.frameworkSome', message: '{more, plural, =0 {framework: {first}} other {framework: {first} +#}}', comment: 'The first framework on this chat, and how many more' },
     frameworkHelp: /*i18n*/ { id: 'field.frameworkHelp', message: 'Choose the frameworks for this chat (framework:)' },

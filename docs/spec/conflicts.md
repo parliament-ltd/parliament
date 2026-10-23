@@ -1447,6 +1447,14 @@ Found while splitting stage 8 into pieces. The documents: the plan's stage 8, br
 - **(f) A room's contents write into the bar** through one event that takes only a command line (it starts with `>`), so text from a room can never run one.
 - **Suggestion:** keep as built.
 
+**C174. Where the next prompt goes among branches, as built** (piece 3). Slider v9: "Unticked, it follows the slide being viewed; once ticked it holds", and its proposed rules: "Replying from a branch makes it the line the chat continues on"; "Carrying on a sibling after that starts its own card". Built so:
+- **(a) The rule:** before any branch is carried on, the prompt goes to the tab viewed. Once one is carried on alone, it goes to that line whatever tab is viewed, and the Enter line says so ("It carries 201b on, not the reply you are viewing. open:201c carries that one on in a room of its own"). `to:` holds one, several or all until changed; a held choice belongs to its prompt's branches and lapses with them.
+- **(b) The room moves with the line:** a prompt to one branch other than the room's makes that branch the room's chat, and it carries on there ("It carries 201b on, and the room moves to it"). Nothing writing is stopped by the move (C173 (d)).
+- **(c) Several at once:** each branch carries its own thread on, with its own answerer and its own frameworks; the Enter line names each and its cost ("Enter sends this to 201a, 201b and 201c, each carrying its own branch on"). The estimate uses the room's own history for each, so it is rough where the threads differ.
+- **(d) In the field:** "to 201b · Wikipedia", "to 201a, 201c" or "to all 3" in place of "answered by" while a slider is on screen; a click opens **Reply to**, the branches with numbered boxes, where a click ticks or unticks one as `to:` does, and "all 3". The answer picker still opens with `by:`, for a new prompt to several, which comes before the branches.
+- **(e)** `to:` takes addresses with commas (`to:201a, 201c`) as well as one and `all`, and works from any board, as `by:` does; the registry had it for rooms only.
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

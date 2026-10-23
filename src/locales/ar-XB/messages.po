@@ -1897,6 +1897,11 @@ msgstr ""
 msgid "enter.promptBusy"
 msgstr ""
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptCarriesOn"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.promptChanged"
 msgstr ""
@@ -2108,6 +2113,22 @@ msgstr ""
 msgid "enter.promptThinksOff"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.promptToBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptToMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptToManyCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptToManyTotal"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptTranslateLater"
@@ -2169,6 +2190,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.replySet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replyToFailed"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2460,6 +2485,10 @@ msgstr ""
 msgid "enter.thinkingSame"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.toAll"
+msgstr ""
+
 #. {leader} is >, the command leader
 #. js-lingui-explicit-id
 msgid "enter.toBegin"
@@ -2470,8 +2499,29 @@ msgstr ""
 msgid "enter.toCommand"
 msgstr ""
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.toNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.toNotHere"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.tooMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.toOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.toSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.toSome"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2687,6 +2737,18 @@ msgstr ""
 #. The first framework on this chat, and how many more
 #. js-lingui-explicit-id
 msgid "field.frameworkSome"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.toAll"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.toOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.toSome"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3485,6 +3547,44 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "privacy.phone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "replyPicker.all"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "replyPicker.carried"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "replyPicker.follows"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "replyPicker.footCarried"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "replyPicker.held"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "replyPicker.ownRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "replyPicker.thread"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "replyPicker.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "replyPicker.viewed"
 msgstr ""
 
 #. js-lingui-explicit-id
