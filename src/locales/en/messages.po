@@ -1096,6 +1096,18 @@ msgid "enter.checkFree"
 msgstr "{count, plural, =0 {Nothing in the answer from {source} reads like instructions to a model} one {The answer from {source} holds words that read like instructions to a model: {phrases}} other {The answer from {source} holds words that read like instructions to a model: {phrases}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.checkHosted"
+msgstr "Enter has {name} look more closely: one call, about {tokens, number} tokens, {cost}. A check is a warning, never a guarantee"
+
+#. js-lingui-explicit-id
+msgid "enter.checkHostedCheap"
+msgstr "Enter has {name} look more closely: one call, about {tokens, number} tokens, under {cost}. A check is a warning, never a guarantee"
+
+#. js-lingui-explicit-id
+msgid "enter.checkHostedUnpriced"
+msgstr "Enter has {name} look more closely: one call, about {tokens, number} tokens. A check is a warning, never a guarantee"
+
+#. js-lingui-explicit-id
 msgid "enter.checkLocal"
 msgstr "Enter has {name} on this computer look more closely. Free, and nothing leaves it. A check is a warning, never a guarantee"
 
@@ -1108,9 +1120,18 @@ msgstr "A model on this computer can look more closely. {command} looks for one"
 msgid "enter.checkNothing"
 msgstr "No answer from a source here to check"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.checkOrLocal"
+msgstr "A model on this computer would do it free, with nothing leaving it. {command} looks for one"
+
 #. js-lingui-explicit-id
 msgid "enter.checkWorking"
 msgstr "Checking on this computer. The bar is free meanwhile"
+
+#. js-lingui-explicit-id
+msgid "enter.checkWorkingHosted"
+msgstr "Checking with {name}. The bar is free meanwhile"
 
 #. js-lingui-explicit-id
 msgid "enter.clearFilter"
@@ -1844,6 +1865,39 @@ msgid "enter.nameWhichKind"
 msgstr "{name} is a saved search and a collection. Add search or collection after it"
 
 #. js-lingui-explicit-id
+msgid "enter.newBranch"
+msgstr "Enter starts {next} from {address}, a copy of its whole history, in the room. No call"
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchAt"
+msgstr "Enter starts {next} from {address} after step {step}, a copy up to there, in the room. No call"
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchDone"
+msgstr "{next} starts from {address}, in the room"
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchEmpty"
+msgstr "{address} has nothing in it to branch from"
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchFailed"
+msgstr "No branch could be made from {address}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.newBranchNoRoom"
+msgstr "new:branch alone works on the chat in a room. new:branch 201a names one"
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchStart"
+msgstr "Enter starts {next}, an empty branch beside {address}, in the room. No call"
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchSteps"
+msgstr "{count, plural, =0 {{address} has no steps yet} one {{address} has one step} other {{address} has # steps}}"
+
+#. js-lingui-explicit-id
 msgid "enter.newRoomHere"
 msgstr "This room is empty. Its first prompt starts it"
 
@@ -2143,6 +2197,10 @@ msgid "enter.privacySameOn"
 msgstr "The privacy filter is on already"
 
 #. js-lingui-explicit-id
+msgid "enter.privacySearchEmpty"
+msgstr "With what the privacy filter leaves out, nothing is left to search for"
+
+#. js-lingui-explicit-id
 msgid "enter.promptAbout"
 msgstr "{count, plural, one {A new chat: the words of # card go first} other {A new chat: the words of # cards go first}}"
 
@@ -2317,6 +2375,15 @@ msgstr "Names are found first by {name} on this computer and swapped too, which 
 #. js-lingui-explicit-id
 msgid "enter.promptPrivacyOffer"
 msgstr "It holds {found}. privacy:on swaps such things for placeholders before they go"
+
+#. js-lingui-explicit-id
+msgid "enter.promptPrivacySearch"
+msgstr "The privacy filter leaves {found} out of the search"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptPrivacySearchOffer"
+msgstr "It holds {found}, which a search sends as typed. privacy:on leaves such out"
 
 #. js-lingui-explicit-id
 msgid "enter.promptQueryTranslated"
@@ -2883,6 +2950,10 @@ msgstr "translate: works on the chat in a room. room: brings one"
 #. js-lingui-explicit-id
 msgid "enter.translateNothing"
 msgstr "No answer from a source here to translate"
+
+#. js-lingui-explicit-id
+msgid "enter.translatePrivacy"
+msgstr "The privacy filter swaps what it finds for placeholders before it goes"
 
 #. js-lingui-explicit-id
 msgid "enter.translateQueriesOff"

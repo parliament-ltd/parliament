@@ -1482,6 +1482,20 @@ Found while splitting stage 8 into pieces. The documents: the plan's stage 8, br
 - **(e) The Enter line:** "Enter asks “Which places heard it?” again as 201d, beside 201a: Sonnet 5.5, about 116 tokens, under $0.01 to send", then "It brings in again what that prompt brought in from Wikipedia, as data" when it did, and "Its reply joins the tabs under that prompt, and the room stays where it is".
 - **Suggestion:** keep as built.
 
+**C178. Forking, as built** (piece 6). The docket spec (§3): forking writes a lettered branch into the chat's plan, from a message. C8, not ruled, suggested `new:branch 207` from the end, and forking mid-chat from the message itself in the room, "no extra syntax".
+- **(a) The command:** `new:branch` forks the room's chat from its end; `new:branch 201a` (or `207`) a chat by its address; `new:branch 201a 2` after step 2, the person's second prompt and its reply, as the docket spec counts a fork point; `new:branch 201a 0` an empty branch of the plan. Each is the plan's next letter, a whole copy (C172 (a)), shown in the room. No call, no cost.
+- **(b) From a message:** "Branch from here" on a message, in a room on the shell, writes that line into the bar for Enter, so the bar stays the one actor (C125, C173 (f)). From a reply, the fork ends with it; from a prompt, it ends before it, so it can be asked differently. On today's chat page it opens the branch panel as before, until R26 is ruled.
+- **(c) The step number** is the one word more than C8 wanted: a click has to say in words where the fork is.
+- **(d) R26** (the branch panel, and Cmd/Ctrl+Shift+B that opens it) is put to you: what it did is now `new:branch`, `open:… summary` and `again:`. Its summary sent each message cut to 500 characters to one fixed model and kept the summary as that model's own words, which C175 (e) fixes.
+- **Suggestion:** keep as built.
+
+**C179. The privacy filter on searches and translations, and the hosted check, as built** (piece 6).
+- **(a) Searches** (C167 (e)): a source searches for words, and a search for a placeholder finds nothing, so with the filter on, what it finds is left out of the search instead: the fixed formats, and with `privacy:names` the names a model on this computer finds. The Enter line says so ("The privacy filter leaves an email address out of the search"), and with the filter off offers it ("It holds an email address, which a search sends as typed. privacy:on leaves such out"). The question shows the search as sent ("Searched for “Barn owl”"). A question with nothing else in it is not sent.
+- **(b) Translations by a hosted helper** (C166): what goes is swapped for placeholders first and back in the translation, for a question before it goes to a source as well as an answer from one. `translate:` says so on its Enter line.
+- **(c) The hosted check** (C169 (d); security notes §1.5): `check:` with no model on this computer and a hosted helper offers the helper, "Enter has Haiku 5.5 look more closely: one call, about 190 tokens, under $0.01. A check is a warning, never a guarantee", and says a model on this computer would do it free. It runs only on `check:` and Enter.
+- **(d) Covered with stage 8 as well:** a branch's summary (C175 (c)) and an answer brought into a prompt (C176 (d)).
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

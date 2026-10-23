@@ -33,6 +33,42 @@ export function promptFacts(messages = []) {
 }
 
 /**
+ * new:branch, new:branch 203a, new:branch 203a 2 (docket spec §3; C8; stage
+ * 8, piece 6; C178): a fork, the plan's next letter, a whole copy of the
+ * chat to its end, or to the end of a step (a prompt of the person's and
+ * its reply). No call. screens.again as again: reads it; a chat's facts
+ * there also say how many steps it has, when it is on screen.
+ */
+export function planNewBranch(step, screens = {}) {
+  const g = screens.again
+  if (!g) return { says: { message: 'later', values: { verb: 'new:' } }, act: null }
+  const [, arg, n] = step.match?.values ?? []
+  let chatId
+  if (!arg) {
+    if (g.room === undefined) return { says: { message: 'newBranchNoRoom' }, act: null }
+    if (!g.room) return { says: { message: 'againEmpty' }, act: null }
+    chatId = g.room
+  } else {
+    const t = targetsOf([arg], g.rows ?? [])
+    if (t.bad) return { says: t.bad, act: null }
+    const row = t.rows[0]
+    chatId = row.kind === 'chat' || row.kind === 'docket' ? row.chatId : null
+    if (!chatId) return { says: { message: 'againNotChat', values: { num: arg.text ?? String(row.num) } }, act: null }
+  }
+  const f = g.factsOf?.(chatId) ?? null
+  if (!f || !f.next) return { says: { message: 'againNotChat', values: { num: f?.address ?? arg?.text ?? '' } }, act: null }
+  const at = n ? Number(n.value ?? n.text) : null
+  if (at != null && (!Number.isInteger(at) || at < 0)) return { says: { message: 'newBranchSteps', values: { address: f.address, count: f.steps ?? 0 } }, act: null }
+  if (f.onScreen && f.steps === 0) return { says: { message: 'newBranchEmpty', values: { address: f.address } }, act: null }
+  if (at != null && f.onScreen && at > f.steps) return { says: { message: 'newBranchSteps', values: { address: f.address, count: f.steps } }, act: null }
+  const values = { next: f.next, address: f.address, step: at ?? 0 }
+  return {
+    says: { message: at === 0 ? 'newBranchStart' : at != null && !(f.onScreen && at === f.steps) ? 'newBranchAt' : 'newBranch', values },
+    act: { kind: 'fork', chatId, address: f.address, plan: f.plan ?? null, next: f.next, step: at },
+  }
+}
+
+/**
  * again:, again:203a (editing spec; stage 8, piece 5; C177): a branch's last
  * prompt asked again as a new branch, the plan's next letter, by who answers
  * that branch; its reply joins the tabs under that prompt. From the edited

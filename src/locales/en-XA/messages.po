@@ -1096,6 +1096,18 @@ msgid "enter.checkFree"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.checkHosted"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkHostedCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkHostedUnpriced"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.checkLocal"
 msgstr ""
 
@@ -1108,8 +1120,17 @@ msgstr ""
 msgid "enter.checkNothing"
 msgstr ""
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.checkOrLocal"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.checkWorking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkWorkingHosted"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1844,6 +1865,39 @@ msgid "enter.nameWhichKind"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.newBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchAt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchFailed"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.newBranchNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchStart"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchSteps"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.newRoomHere"
 msgstr ""
 
@@ -2143,6 +2197,10 @@ msgid "enter.privacySameOn"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.privacySearchEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.promptAbout"
 msgstr ""
 
@@ -2316,6 +2374,15 @@ msgstr ""
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptPrivacyOffer"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptPrivacySearch"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptPrivacySearchOffer"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2882,6 +2949,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.translateNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translatePrivacy"
 msgstr ""
 
 #. js-lingui-explicit-id

@@ -173,6 +173,22 @@ function mapText(content, fn) {
  * @param {{ messages: Array<{ role: string, content: any }>, system?: string|null }} request
  * @returns {{ messages: object[], system: string|null, veil: ReturnType<typeof createVeil> }}
  */
+/**
+ * A search with what the filter finds left out (C167 (e); C179): a source
+ * searches for words, and a search for a placeholder finds nothing, so the
+ * fixed formats, and the names given, are taken out instead.
+ * @returns {{ text: string, cut: number }} the search, and how many values were taken out
+ */
+export function withoutPrivate(text, names = []) {
+  const t = String(text ?? '')
+  const veil = createVeil({ names })
+  const swapped = veil.out(t)
+  if (swapped === t) return { text: t, cut: 0 }
+  const places = new RegExp(`\\[(${Object.values(LABEL).join('|')})_\\d+\\]`, 'g')
+  const cut = (swapped.match(places) ?? []).length
+  return { text: swapped.replace(places, ' ').replace(/\s{2,}/g, ' ').trim(), cut }
+}
+
 export function veilRequest({ messages = [], system = null }, veil = createVeil()) {
   // What a prompt brought in from sources is swapped too (C176).
   const out = messages.map((m) => ({

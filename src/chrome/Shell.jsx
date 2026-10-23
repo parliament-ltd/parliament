@@ -145,6 +145,7 @@ function failure(err, source = destination(SOURCE)?.name) {
   if (err?.name === 'EmptyReply') return { message: 'replyEmpty', values: { reason: err.stopReason === 'max_tokens' ? 'limit' : 'none' } }
   // privacy:names could not find names on this computer: nothing was sent (C169).
   if (err?.name === 'NamesUnchecked') return 'namesUnchecked'
+  if (err?.name === 'PrivateOnly') return 'privacySearchEmpty'
   if (err?.kept) return 'replyCut'
   if (err?.name === 'SourceError') {
     // A source that turns away the network (some do for shared VPN
@@ -730,6 +731,8 @@ export default function Shell() {
   const keepTranslationNow = useRef(async () => {})
   // Has the helper summarize a chat (open:203b summary, C175).
   const summarizeChatNow = useRef(async () => { throw new Error('Not ready') })
+  // A veil for what goes to a hosted helper, with the privacy filter on (C179).
+  const veilForNow = useRef(async () => null)
   // Asks a branch's last prompt again as a new branch (again:, C177).
   const askAgainNow = useRef(async () => 'againFailed')
 
@@ -1068,9 +1071,12 @@ export default function Shell() {
         if (!parts) return 'translateFailed'
         let out
         try {
-          out = await translateText(parts.pieces, { who: what.who, from: what.from, to: what.to })
-        } catch {
-          return 'translateFailed'
+          // To a hosted helper with the privacy filter on, swapped first (C179).
+          const v = what.who.kind === 'model' ? await veilForNow.current(what.who.helper.provider, parts.pieces) : null
+          out = await translateText(v ? parts.pieces.map(v.out) : parts.pieces, { who: what.who, from: what.from, to: what.to })
+          if (v) out = out.map(v.back)
+        } catch (err) {
+          return err?.name === 'NamesUnchecked' ? 'namesUnchecked' : 'translateFailed'
         }
         const by = what.who.kind === 'browser' ? BY_BROWSER : what.who.helper.id
         try {
@@ -1119,7 +1125,7 @@ export default function Shell() {
         if (!message?.content) return 'checkFailed'
         let said
         try {
-          said = await gateway.call('ollama', 'checkText', [message.content, { model: what.model }], { label: 'check text' })
+          said = await gateway.call(what.provider ?? 'ollama', 'checkText', [message.content, { model: what.model }], { label: 'check text' })
         } catch {
           return 'checkFailed'
         }
@@ -1127,7 +1133,7 @@ export default function Shell() {
         return said.quote ? { message: 'checkFound', values: { name: what.name, quote: said.quote } } : { message: 'checkFoundUnquoted', values: { name: what.name } }
       })()
       remember(body)
-      return { done: true, says: 'checkWorking', later }
+      return { done: true, says: what.provider && what.provider !== 'ollama' ? { message: 'checkWorkingHosted', values: { name: what.name } } : 'checkWorking', later }
     }
     if (what.kind === 'thinking') {
       // thinking:on / thinking:off (C165): a setting of the person's.
@@ -1189,6 +1195,30 @@ export default function Shell() {
       setPicking(true)
       remember(body)
       return null
+    }
+    if (what.kind === 'fork') {
+      // new:branch (C178): a whole copy to the chat's end, or to the end of
+      // a step, as the next letter of its plan; the room shows it.
+      const msgs = await getMessages(what.chatId).catch(() => [])
+      const prompts = msgs.map((m, i) => (m.role === 'user' ? i : -1)).filter((i) => i >= 0)
+      if (!msgs.length && what.step !== 0) return { message: 'newBranchEmpty', values: { address: what.address } }
+      if (what.step != null && what.step > prompts.length) return { message: 'newBranchSteps', values: { address: what.address, count: prompts.length } }
+      const point = what.step == null || what.step === prompts.length ? msgs.length - 1 : prompts[what.step] - 1
+      const conv = await getConversation(what.chatId).catch(() => null)
+      const opts = { title: conv?.title, model: conv?.model, answerer: conv?.answerer ?? null, frameworks: conv?.frameworks ?? null }
+      let made
+      try {
+        // Before the first prompt: an empty branch of the plan.
+        made = point >= 0 ? await createBranch(what.chatId, msgs[point].id, opts) : await createConversation({ ...opts, parentId: what.chatId, room: conv?.room ?? null })
+      } catch {
+        return { message: 'newBranchFailed', values: { address: what.address } }
+      }
+      await loadConversations().catch(() => {})
+      const placed = planRoom(current.current, made.id)
+      if (placed.next) await run(placed.next, null)
+      remember(body)
+      const next = what.plan != null && made.branch ? `${what.plan}${made.branch}` : String(made.num ?? '')
+      return { done: true, says: { message: 'newBranchDone', values: { next, address: what.address } } }
     }
     if (what.kind === 'again') {
       // again:203a (C177): the bar is free while the new branch writes.
@@ -1260,7 +1290,7 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'name'))
     remember(body)
     return null
-  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, exportFile, commit, loadConversations, findCard, findPassage, findRow, holdNote, clearPicked, i18n, readOwn])
+  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, exportFile, commit, loadConversations, createConversation, findCard, findPassage, findRow, holdNote, clearPicked, i18n, readOwn])
 
   // ── undo: (C134, as built) ────────────────────────────
   // Each command line that changes something is kept with what it changed,
@@ -1381,7 +1411,8 @@ export default function Shell() {
   const onRoomLeave = useCallback((chatId) => { if (readyRoom.current === chatId) readyRoom.current = null }, [])
 
   // ── Prompts from the bar (stage 4) ────────────────────
-  const { messages, activeConversationId, sendMessage, resendWhole, askSource, keepTranslation, summarizeChat, regroupPrompt } = useChat()
+  const { messages, activeConversationId, sendMessage, resendWhole, askSource, keepTranslation, summarizeChat, regroupPrompt, veilFor } = useChat()
+  useEffect(() => { veilForNow.current = veilFor }, [veilFor])
   // A source answers a search (C168), with its edition (C166 (e)).
   const askSourceAs = useCallback((to, text, w, extra = {}) => {
     const { locale } = latest.current
@@ -1541,9 +1572,11 @@ export default function Shell() {
   const languageScreens = useMemo(() => ({
     reply: { setting: settings.replyLanguage ?? null, now: reply, locale: i18n.locale, nameOf: languageName },
     helping: { now: helperNow, rows: answerRows, stored: settings.helper ?? null },
-    translating: { room: roomId, num: roomRecord?.num ?? null, last: lastAnswer, to: translateTo, who: translator, queries: settings.translateQueries === true, nameOf: languageName },
+    translating: { room: roomId, num: roomRecord?.num ?? null, last: lastAnswer, to: translateTo, who: translator, queries: settings.translateQueries === true, nameOf: languageName, privacy: settings.privacyFilter ?? 'off' },
     privacy: { mode: settings.privacyFilter ?? 'off', local: localChecker?.name ?? null },
-    checking: { room: roomId, num: roomRecord?.num ?? null, last: lastAnswer && { messageId: lastAnswer.messageId, source: lastAnswer.source, text: lastAnswer.text }, local: localChecker && { id: localChecker.id, name: localChecker.name } },
+    checking: { room: roomId, num: roomRecord?.num ?? null, last: lastAnswer && { messageId: lastAnswer.messageId, source: lastAnswer.source, text: lastAnswer.text }, local: localChecker && { id: localChecker.id, name: localChecker.name },
+      // With none on this computer, the helper when it is a hosted model (C179).
+      hosted: helperNow && helperNow.group === 'model' && !helperNow.needsKey && !helperNow.later && !helperNow.gone ? { id: helperNow.id, name: helperNow.name, provider: helperNow.provider, price: helperNow.price ?? null } : null },
   }), [settings.privacyFilter, localChecker, settings.replyLanguage, settings.helper, settings.translateQueries, reply, i18n.locale, languageName, helperNow, answerRows, roomId, roomRecord, lastAnswer, translateTo, translator])
   // open:203b summary (C175): what the Enter line needs of a chat, read
   // from Records: its address and the next branch's, what it holds, the
@@ -1576,6 +1609,7 @@ export default function Shell() {
   // again: (C177): a chat's last prompt and who answers it, for the room's
   // chat and the branches on screen; another chat is opened first.
   const roomPrompt = useMemo(() => promptFacts(shown), [shown])
+  const roomSteps = useMemo(() => shown.filter((m) => m.role === 'user').length, [shown])
   const again = useMemo(() => ({
     room: roomId,
     rows: almanacRows ?? [],
@@ -1591,10 +1625,12 @@ export default function Shell() {
         next: plan != null && row.planNext ? `${plan}${row.planNext}` : null,
         onScreen: chatId === roomId || Boolean(member),
         prompt: chatId === roomId ? roomPrompt : member?.prompt ?? null,
+        // Its steps, the person's prompts, for new:branch 201a 2 (C178).
+        steps: chatId === roomId ? roomSteps : member?.steps ?? null,
         answerer: answererOf({ chosen: chat?.answerer ?? null, keyed: keys, defaultModel: settings.defaultModel }),
       }
     },
-  }), [roomId, almanacRows, chatRowsById, conversations, branchShown, roomPrompt, keys, settings.defaultModel])
+  }), [roomId, almanacRows, chatRowsById, conversations, branchShown, roomPrompt, roomSteps, keys, settings.defaultModel])
   const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens, branching, summarizing, including, again }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens, branching, summarizing, including, again])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
@@ -1661,6 +1697,8 @@ export default function Shell() {
     model: (branchTarget?.ids.length === 1 ? branchTarget.whos[0] : answerer).name,
     answerer: branchTarget?.ids.length === 1 ? branchTarget.whos[0] : answerer,
     historyChars: about ? 0 : historyChars(along) + (includeHere && answerer.group !== 'source' ? includeHere.items.reduce((n, x) => n + (x.chars ?? 0), 0) : 0),
+    // The privacy filter on a search, as it is set (C179).
+    privacySearch: { on: (settings.privacyFilter ?? 'off') !== 'off' },
     // Answers from sources held for this prompt (C176).
     included: includeHere ? { count: includeHere.items.length, sources: [...new Set(includeHere.items.map((x) => x.source))], flagged: includeHere.items.some((x) => x.phrases?.length) } : null,
     systemChars: byModel ? withReplyLanguage(instructionsOf(fwHere, fwList), reply.tag).length : 0,
@@ -1853,7 +1891,9 @@ export default function Shell() {
         try {
           const by = q.who.kind === 'browser' && found && found !== q.from && !(await bt.can(from, 'en')) ? translatorFor({ helper: q.who.helper ?? null }) : q.who
           if (by.kind === 'none') return { refused: 'queryFailed' }
-          const [out] = await translateText([text], { who: by, from, to: 'en', query: true })
+          const v = by.kind === 'model' ? await veilForNow.current(by.helper.provider, [text]) : null
+          const [raw] = await translateText([v ? v.out(text) : text], { who: by, from, to: 'en', query: true })
+          const out = v ? v.back(raw) : raw
           const sent = String(out ?? '').trim().slice(0, 300)
           if (!sent) return { refused: 'queryFailed' }
           asked = { text: sent, lang: 'en', by: by.kind === 'browser' ? BY_BROWSER : by.helper.id, at: new Date().toISOString() }

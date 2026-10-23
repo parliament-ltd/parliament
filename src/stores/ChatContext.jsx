@@ -12,7 +12,7 @@ import {
 } from './chatStore'
 import { useIsStreaming, useMessages } from './chatHooks'
 import { forModel, cutReason } from './sendHistory'
-import { veilRequest, createVeil } from '../lib/privacyFilter'
+import { veilRequest, createVeil, withoutPrivate } from '../lib/privacyFilter'
 import { summaryTurns } from '../lib/branchSummary'
 
 // The open chat, for today's screens (refactor-plan.md, stages 3 and 4;
@@ -80,6 +80,14 @@ function emptyReply(stopReason) {
   error.stopReason = stopReason ?? null
   return error
 }
+// With the privacy filter on, a question to a source that was nothing but
+// what the filter leaves out (C179).
+function privateOnly() {
+  const error = new Error('With what the privacy filter leaves out, nothing is left to search for.')
+  error.name = 'PrivateOnly'
+  return error
+}
+
 function namesUnchecked() {
   const error = new Error('Names could not be found on this computer, so nothing was sent.')
   error.name = 'NamesUnchecked'
@@ -114,8 +122,8 @@ export function ChatProvider({ children }) {
   // on this computer (S3: never in the browser, never by a provider): the
   // helper when it is one, else the first listed. Done before anything is
   // added or sent; if they cannot be found, nothing goes.
-  const namesFor = async (model, texts) => {
-    if (privacyMode.current !== 'names' || onThisComputer(providerOf(model))) return []
+  const namesFor = async (model, texts, provider = providerOf(model)) => {
+    if (privacyMode.current !== 'names' || onThisComputer(provider)) return []
     const listed = modelsOf('ollama')
     const checker = listed.find((m) => m.id === helperModel.current)?.id ?? listed[0]?.id ?? null
     if (!checker) throw namesUnchecked()
@@ -557,6 +565,18 @@ export function ChatProvider({ children }) {
     if (streamingIn(conversationId)) return
     askToKeepStorage({ getSetting, setSetting }).catch(() => {})
 
+    // The privacy filter (C167 (e); C179): a search for a placeholder finds
+    // nothing, so what the filter finds is left out of what the source is
+    // sent, and the search as sent is kept with the question, to show.
+    if (privacyMode.current !== 'off') {
+      const said = asked?.text ?? question
+      const kept = withoutPrivate(said, await namesFor(null, [said], source))
+      if (kept.cut) {
+        if (!kept.text) throw privateOnly()
+        asked = { text: kept.text.slice(0, 300), lang: asked?.lang ?? String(lang ?? 'en').split('-')[0], by: asked?.by ?? 'search', at: new Date().toISOString() }
+      }
+    }
+
     titleIfUntitled(conversationId, question).catch(() => {})
 
     const userMsg = await addMessage({ conversationId, role: 'user', content: question, ...(asked ? { asked } : {}), ...(group ? { group } : {}) })
@@ -602,6 +622,14 @@ export function ChatProvider({ children }) {
       endStream(conversationId)
     }
   }, [keepPartial, titleIfUntitled])
+
+  // A veil for a request to a provider off this computer with the filter
+  // on (C167 (e); C179): its fixed formats, and with privacy:names the names
+  // a model on this computer finds. null when off, or on this computer.
+  const veilFor = useCallback(async (provider, texts) => {
+    if (privacyMode.current === 'off' || onThisComputer(provider)) return null
+    return createVeil({ names: await namesFor(null, texts, provider) })
+  }, [])
 
   // open:203b summary (stage 8, piece 4; C175): a chat's turns as they
   // would go to a model (hidden messages and those being deleted stay out),
@@ -766,6 +794,7 @@ export function ChatProvider({ children }) {
       askSource,
       summarizeChat,
       regroupPrompt,
+      veilFor,
       keepTranslation,
       continueMessage,
       stopGenerating,

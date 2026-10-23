@@ -98,6 +98,11 @@ export function withIncluded(messages, system, form) {
   return { messages: out, system: [system, INCLUDED_NOTE].filter(Boolean).join('\n\n') }
 }
 
+// check: by a hosted model (security notes §1.5; C169 (d); C179): the text
+// in a tag it cannot close, cut to what the check reads.
+export const CHECK_READS = 12_000
+export const asCheckText = (t) => `<text>\n${String(t ?? '').replace(/<\/?text\b[^>]*>/gi, '').slice(0, CHECK_READS)}\n</text>`
+
 /** What came back as a chat's summary, or a throw when nothing did. */
 export function readChatSummary(raw) {
   const text = String(raw ?? '').trim()

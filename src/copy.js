@@ -419,6 +419,26 @@ export const COPY = {
     openDocket: /*i18n*/ { id: 'enter.openDocket', message: 'Enter opens its first branch, {num}, in a room beside what is here' },
     openDocketHere: /*i18n*/ { id: 'enter.openDocketHere', message: 'Enter shows its first branch, {num}, in the room here' },
     openNotYet: /*i18n*/ { id: 'enter.openNotYet', message: 'Opening this comes later. inspect:{num} shows it now' },
+    // new:branch, a fork (stage 8, piece 6; C8; C178). {step} counts the person's prompts.
+    newBranch: /*i18n*/ { id: 'enter.newBranch', message: 'Enter starts {next} from {address}, a copy of its whole history, in the room. No call' },
+    newBranchAt: /*i18n*/ { id: 'enter.newBranchAt', message: 'Enter starts {next} from {address} after step {step}, a copy up to there, in the room. No call' },
+    newBranchStart: /*i18n*/ { id: 'enter.newBranchStart', message: 'Enter starts {next}, an empty branch beside {address}, in the room. No call' },
+    newBranchSteps: /*i18n*/ { id: 'enter.newBranchSteps', message: '{count, plural, =0 {{address} has no steps yet} one {{address} has one step} other {{address} has # steps}}' },
+    newBranchEmpty: /*i18n*/ { id: 'enter.newBranchEmpty', message: '{address} has nothing in it to branch from' },
+    newBranchNoRoom: /*i18n*/ { id: 'enter.newBranchNoRoom', message: 'new:branch alone works on the chat in a room. new:branch 201a names one', comment: 'Commands stay English' },
+    newBranchDone: /*i18n*/ { id: 'enter.newBranchDone', message: '{next} starts from {address}, in the room' },
+    newBranchFailed: /*i18n*/ { id: 'enter.newBranchFailed', message: 'No branch could be made from {address}' },
+    // The privacy filter on searches and translations (C167 (e); C179).
+    promptPrivacySearch: /*i18n*/ { id: 'enter.promptPrivacySearch', message: 'The privacy filter leaves {found} out of the search' },
+    promptPrivacySearchOffer: /*i18n*/ { id: 'enter.promptPrivacySearchOffer', message: 'It holds {found}, which a search sends as typed. privacy:on leaves such out', comment: 'Commands stay English' },
+    privacySearchEmpty: /*i18n*/ { id: 'enter.privacySearchEmpty', message: 'With what the privacy filter leaves out, nothing is left to search for' },
+    translatePrivacy: /*i18n*/ { id: 'enter.translatePrivacy', message: 'The privacy filter swaps what it finds for placeholders before it goes' },
+    // check: by a hosted model (C169 (d); C179).
+    checkHosted: /*i18n*/ { id: 'enter.checkHosted', message: 'Enter has {name} look more closely: one call, about {tokens, number} tokens, {cost}. A check is a warning, never a guarantee' },
+    checkHostedCheap: /*i18n*/ { id: 'enter.checkHostedCheap', message: 'Enter has {name} look more closely: one call, about {tokens, number} tokens, under {cost}. A check is a warning, never a guarantee' },
+    checkHostedUnpriced: /*i18n*/ { id: 'enter.checkHostedUnpriced', message: 'Enter has {name} look more closely: one call, about {tokens, number} tokens. A check is a warning, never a guarantee' },
+    checkOrLocal: /*i18n*/ { id: 'enter.checkOrLocal', message: 'A model on this computer would do it free, with nothing leaving it. {command} looks for one', comment: 'Commands stay English' },
+    checkWorkingHosted: /*i18n*/ { id: 'enter.checkWorkingHosted', message: 'Checking with {name}. The bar is free meanwhile' },
     // again: a branch's last prompt asked again as a new branch (stage 8, piece 5; C177). {next} is the new branch's address.
     againNoRoom: /*i18n*/ { id: 'enter.againNoRoom', message: 'again: works on the chat in a room, and again:201a on a branch on screen', comment: 'Commands stay English' },
     againEmpty: /*i18n*/ { id: 'enter.againEmpty', message: 'Nothing has been asked in this room yet' },

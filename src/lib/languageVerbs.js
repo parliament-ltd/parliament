@@ -11,7 +11,7 @@
 
 import { findLanguage, OFF } from './languages'
 import { findAnswerers } from '../net/answerers'
-import { translateCost, translateTokens } from '../shell/estimate'
+import { translateCost, translateTokens, inputCost, CHARS_PER_TOKEN } from '../shell/estimate'
 import { instructionLike } from './injection'
 
 const CENT = 0.01
@@ -132,6 +132,8 @@ export function planTranslate(step, screens = {}) {
   // start, and a model is told to work it out.
   if (t.who.kind === 'browser' && !last.from) return { says: noOne(null), act: null }
   const also = [byWhom(t.who, last.chars)]
+  // To a hosted helper, the privacy filter swaps first (C179).
+  if (t.who.kind === 'model' && t.who.helper?.group !== 'local' && t.privacy && t.privacy !== 'off') also.push({ message: 'translatePrivacy' })
   // Words that read like instructions to a model, going to one (C169).
   if (t.who.kind === 'model' && last.phrases?.length) also.push({ message: 'translateInstructions', values: { phrases: last.phrases.map((p) => `“${p}”`) } })
   const says = { message: 'translate', values: { source: last.source, question: last.question ?? '', language }, also }
@@ -162,13 +164,35 @@ export function planPrivacy(step, screens = {}) {
  * this computer for a closer look, offered only when one is connected.
  * screens.checking: { room, num, last: { messageId, source, text }, local }.
  */
+// What a hosted check reads and writes (C179): the text, cut as the check
+// cuts it, with its instructions, and a short JSON answer.
+const CHECK_READS = 12_000
+const CHECK_INSTRUCTION_CHARS = 700
+const CHECK_OUT_TOKENS = 60
+
 export function planCheck(step, screens = {}) {
   const c = screens.checking
   if (!c || c.room === undefined) return { says: { message: 'translateNoRoom' }, act: null }
   if (!c.last) return { says: { message: 'checkNothing' }, act: null }
   const phrases = instructionLike(c.last.text)
   const free = { message: 'checkFree', values: { count: phrases.length, source: c.last.source, phrases: phrases.map((p) => `“${p}”`) } }
-  if (!c.local) return { says: { ...free, also: [{ message: 'checkNoLocal', values: { command: 'api:ollama' } }] }, act: null }
+  if (!c.local) {
+    // A hosted model, the helper, when there is no model on this computer
+    // (security notes §1.5; C169 (d); C179): one call, named with its cost.
+    const h = c.hosted
+    if (!h) return { says: { ...free, also: [{ message: 'checkNoLocal', values: { command: 'api:ollama' } }] }, act: null }
+    const tokens = Math.ceil((Math.min(String(c.last.text ?? '').length, CHECK_READS) + CHECK_INSTRUCTION_CHARS) / CHARS_PER_TOKEN)
+    const inCost = inputCost(tokens, h.price?.inputPerMillion)
+    const outCost = inputCost(CHECK_OUT_TOKENS, h.price?.outputPerMillion)
+    const cost = inCost == null || outCost == null ? null : inCost + outCost
+    const values = { name: h.name, tokens }
+    const hosted = cost == null ? { message: 'checkHostedUnpriced', values }
+      : cost < CENT ? { message: 'checkHostedCheap', values: { ...values, cost: CENT } } : { message: 'checkHosted', values: { ...values, cost } }
+    return {
+      says: { ...free, also: [hosted, { message: 'checkOrLocal', values: { command: 'api:ollama' } }] },
+      act: { kind: 'check', chatId: c.room, messageId: c.last.messageId, model: h.id, provider: h.provider, name: h.name },
+    }
+  }
   return {
     says: { ...free, also: [{ message: 'checkLocal', values: { name: c.local.name } }] },
     act: { kind: 'check', chatId: c.room, messageId: c.last.messageId, model: c.local.id, name: c.local.name },

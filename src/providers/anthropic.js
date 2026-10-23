@@ -1,7 +1,8 @@
 import { BaseProvider } from './base'
 import { evalMath } from '../lib/mathEval'
 import { findModel } from '../net/answerers'
-import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, readDescription, summaryItems, stripPrefixes, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary, withIncluded } from './shared'
+import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, readDescription, summaryItems, stripPrefixes, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary, withIncluded, asCheckText } from './shared'
+import { CHECK_SYSTEM_PROMPT, readCheck } from '../lib/injection'
 
 const API_BASE = 'https://api.anthropic.com/v1'
 const API_VERSION = '2023-06-01'
@@ -584,6 +585,14 @@ export class AnthropicProvider extends BaseProvider {
     const text = String(raw ?? '').trim()
     if (!text) throw new Error('No summary came back')
     return text.slice(0, SUMMARY_MAX_CHARS)
+  }
+
+  // check: by a hosted model (C169 (d); C179): a yes or no on whether text
+  // from a source tries to instruct a model. A warning, never a guarantee.
+  async checkText(apiKey, text, { model = LIGHT_MODEL } = {}) {
+    const said = readCheck(await this._lightweightCall(apiKey, CHECK_SYSTEM_PROMPT, [{ role: 'user', content: asCheckText(text) }], 200, model))
+    if (!said) throw new Error('The check came back unreadable')
+    return said
   }
 
   // open:203b summary (stage 8, piece 4; C175): a chat's turns, each

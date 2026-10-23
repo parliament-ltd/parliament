@@ -30,7 +30,7 @@ import { exportItems, chatsOf, exportName } from '../lib/recordsExport'
 import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, namesFrom, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
 import { planReply, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
-import { planTo, planAgain } from '../lib/branchVerbs'
+import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
 import { findPrivate, KINDS as PRIVATE_KINDS } from '../lib/privacyFilter'
@@ -198,7 +198,13 @@ function showCollection(a, id) {
 const addStep = (a, step, screens) => planAdd(step, screens)
 const rmStep = (a, step, screens) => planRm(step, screens)
 const headingStep = (a, step, screens) => planHeading(step, screens)
-const newStep = (a, step, screens) => (step.match?.values?.[0]?.value === 'framework' ? planNewFramework(step, screens) : planNew(step))
+const newStep = (a, step, screens) => {
+  const what = step.match?.values?.[0]?.value
+  if (what === 'framework') return planNewFramework(step, screens)
+  // new:branch: a fork, the plan's next letter (C178).
+  if (what === 'branch') return planNewBranch(step, screens)
+  return planNew(step)
+}
 
 // open:"Water tower": a saved search by name (C140 (e)), or null when the
 // name is no saved search's, for open: to answer otherwise.
@@ -840,11 +846,23 @@ export function promptPreview(text, target = {}) {
   const lines = []
   if (target.toBranch) lines.push({ message: 'promptToBranch', values: { address: target.toBranch } })
   if (target.carriesOn) lines.push({ message: 'promptCarriesOn', values: target.carriesOn })
+  const whos = Array.isArray(target.many) && target.many.length > 1 ? target.many : [target.answerer ?? { group: target.keyed ? 'model' : 'source' }]
+  // The privacy filter on a search (C179): a source searches for words, so
+  // what the filter finds is left out, or could be.
+  const toSources = whos.filter((w) => w.group === 'source')
+  if (target.privacySearch && toSources.length) {
+    const seen = new Map()
+    for (const f of findPrivate(String(text ?? ''))) seen.set(`${f.kind}:${f.value}`, f.kind)
+    if (seen.size) {
+      const found = Object.fromEntries(PRIVATE_KINDS.map((k) => [k, 0]))
+      for (const k of seen.values()) found[k] += 1
+      lines.push(target.privacySearch.on ? { message: 'promptPrivacySearch', values: { found } } : { message: 'promptPrivacySearchOffer', values: { found } })
+    }
+  }
   // Answers from sources include: holds for this prompt (C176): to models
   // only, as data; a source is sent the words alone.
   const inc = target.included ?? null
   if (inc?.count) {
-    const whos = Array.isArray(target.many) && target.many.length > 1 ? target.many : [target.answerer ?? { group: target.keyed ? 'model' : 'source' }]
     if (whos.some((w) => w.group !== 'source')) {
       lines.push({ message: 'promptIncluded', values: { count: inc.count, sources: inc.sources } })
       if (inc.flagged) lines.push({ message: 'promptIncludedFlagged' })

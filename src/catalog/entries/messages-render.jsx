@@ -28,7 +28,7 @@
 //     contributions ARE aggregated by RoomShell, but the UI surface for
 //     contributed actions is still deferred.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useLingui } from '@lingui/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, ChevronRight, Quote, X } from 'lucide-react'
@@ -57,6 +57,7 @@ import { useBranchPanel } from '../../stores/BranchPanelContext'
 import { useCollabMode } from '../../stores/CollabModeContext'
 import { useConversations } from '../../stores/ConversationContext'
 import { hasKey, modelFacts, destination } from '../../net'
+import { RoomHost } from '../../lib/useViewportWidth'
 import {
   deleteMessage as dbDeleteMessage,
   addMessage as dbAddMessage,
@@ -354,15 +355,25 @@ export default function MessagesRender() {
   const memberIds = useMemo(() => membersOf(visibleMessages, activeConversationId), [visibleMessages, activeConversationId])
   const members = useBranchMembers(memberIds, watchConversation)
   const items = useMemo(() => lineItems(visibleMessages, activeConversationId, members), [visibleMessages, activeConversationId, members])
-  const startsFromSummary = visibleMessages.some((m) => m.summary)
   const lineChat = useMemo(() => conversations.find((c) => c.id === activeConversationId) ?? null, [conversations, activeConversationId])
   const [planNum, setPlanNum] = useState(null)
   useEffect(() => {
     let live = true
-    if (!lineChat?.docketId || (!memberIds.length && !startsFromSummary)) return undefined
+    if (!lineChat?.docketId) return undefined
     dbGetDocket(lineChat.docketId).then((d) => { if (live) setPlanNum(d?.num ?? null) }, () => {})
     return () => { live = false }
-  }, [lineChat?.docketId, memberIds.length, startsFromSummary])
+  }, [lineChat?.docketId])
+  // A fork from a message (C178): in the shell, new:branch with the step it
+  // ends, written into the bar for Enter; on today's chat page, the panel.
+  // From a prompt, the fork ends before it, so it can be asked differently.
+  const hosted = useContext(RoomHost) != null
+  const branchFrom = useCallback((msg) => {
+    const at = messages.findIndex((m) => m.id === msg.id)
+    const address = planNum != null && lineChat?.branch ? `${planNum}${lineChat.branch}` : null
+    if (!hosted || at < 0 || !address) { openBranchPanel(msg.id); return }
+    const step = messages.slice(0, at + 1).filter((m) => m.role === 'user').length - (msg.role === 'user' ? 1 : 0)
+    window.dispatchEvent(new CustomEvent('parliament-write', { detail: { value: `>new:branch ${address} ${step}` } }))
+  }, [hosted, messages, planNum, lineChat?.branch, openBranchPanel])
   // The summary a branch starts from: the branch it summarizes and who wrote it (C175).
   const summaryInfo = useCallback((msg) => {
     if (msg.role !== 'assistant' || !msg.summary) return null
@@ -416,7 +427,7 @@ export default function MessagesRender() {
         onNote={() => toggleNotePanel(msg.id)}
         onNoteSave={(text) => saveNote(msg.id, text)}
         onHighlight={(text, color) => addHighlight(msg.id, text, color)}
-        onBranch={() => openBranchPanel(msg.id)}
+        onBranch={() => branchFrom(msg)}
         onHide={() => handleHide(msg.id)}
         onDelete={() => handleDelete(msg.id)}
         onMoveToBranch={() => handleSendToBranch(msg)}
@@ -430,9 +441,8 @@ export default function MessagesRender() {
     favorites, notes, highlights, showNotes,
     handleContinue, handleCopyText,
     toggleFavorite, toggleNotePanel, saveNote, addHighlight,
-    openBranchPanel,
     handleHide, handleDelete, handleSendToBranch, handlePinForReference,
-    handleQuote, quotesByMessage, summaryInfo,
+    handleQuote, quotesByMessage, summaryInfo, branchFrom,
   ])
 
   // A tab's letter, who answered, and the branch's address (203b).
@@ -449,7 +459,7 @@ export default function MessagesRender() {
     const list = chatId === activeConversationId ? visibleMessages : members.get(chatId) ?? []
     const chars = list.reduce((n, m) => n + (m.content && !m.source ? m.content.length : 0), 0)
     // Its last answer from a source, for include: (C176).
-    return { letter, name, address: planNum != null && letter ? `${planNum}${letter}` : null, context: contextShare(chars, window), answer: answerFor(list), prompt: promptFacts(list) }
+    return { letter, name, address: planNum != null && letter ? `${planNum}${letter}` : null, context: contextShare(chars, window), answer: answerFor(list), prompt: promptFacts(list), steps: list.filter((m) => m.role === 'user').length }
   }, [conversations, planNum, i18n, activeConversationId, visibleMessages, members])
   // A message of another branch is numbered as in its own chat.
   const numberOf = useCallback((chatId, msg) => {
