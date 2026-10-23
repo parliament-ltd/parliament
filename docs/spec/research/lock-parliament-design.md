@@ -63,7 +63,7 @@ store without failing to open.
 
 As built (piece 2): only each record's key and the fields the database's own
 lookups read stay readable; everything else is sealed, the record's kind and
-dates included unless a lookup needs them ().
+dates included unless a lookup needs them (`src/lib/seal.js`).
 
 | Store | Stays readable | Sealed |
 |---|---|---|
