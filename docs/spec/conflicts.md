@@ -215,6 +215,8 @@ Line numbers are approximate.
 - **C187 to C192 ruled as suggested:** built in four pieces; each tab and each reload unlocks for itself; sealed and readable as listed; a passphrase of at least 12 characters and an hour's idle lock by default; passkeys an extra way in, tested at setup; the change to stored data approved as shown.
 - **Stefan asked:** with one tab unlocked, what happens to a board that was in a window when its tab locked; should the window close? *Answered:* yes. A tab locks by reloading to the unlock screen, and a tab that reloads already closes every window it popped out (Shell.jsx, on `pagehide`), so no window goes on showing your words after its tab locks. After unlocking, those boards are back on the page in that tab, as after any reload today; `pop:` opens one in a window again. A window always belongs to the tab that opened it: another tab, locked or not, never draws it. Opening the windows again by themselves after an unlock is not proposed: a browser lets a page open a window only from a click, and an unlock by passkey may not count as one.
 
+**23 October 2026, at the Lock Parliament checkpoint:** Stefan: "let's continue. ill do test of passkey later along with test of language". C193 to C195 kept as built. Trying a real passkey, and the four languages, is Stefan's, later; the stage stays open for what those tries find.
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it
