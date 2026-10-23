@@ -9,6 +9,7 @@
 // Kept free of app imports so it can be tested in Node. backup.js wraps both
 // with the app's database.
 
+import { cleanArrangement } from './arrangements'
 import { arrayBufferToBase64, contentsToFlatStores } from './backupFormat'
 import { rebuildRecord, settingAllowed, cleanFlat } from './backupSchema'
 import { validateBackup } from './validate'
@@ -17,7 +18,15 @@ import { isV6, fileRestored, announce } from './records'
 import { FIRST_NUM } from './addresses'
 
 // Every category a backup can hold, in the order the backup window lists them.
-export const CATEGORIES = ['chats', 'annotations', 'rooms', 'homepage', 'library', 'preferences']
+export const CATEGORIES = ['chats', 'annotations', 'rooms', 'homepage', 'library', 'preferences', 'layouts']
+
+// Window layouts kept on this device (ruled 20 October): in a backup only
+// when ticked, off unless chosen (stage 9, piece 2; C182).
+export const OFF_UNLESS_CHOSEN = Object.freeze(['preferences', 'layouts'])
+
+// What a backup holds when nobody chose: everything but the window layouts,
+// which go only when ticked (the upgrade copy, "back up everything").
+export const UNASKED = Object.freeze(CATEGORIES.filter((c) => c !== 'layouts'))
 
 const V5_STORES = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings', 'files', 'file_data',
   'sbrd_documents', 'modes', 'libraryLayouts', 'libraryRooms', 'libraryComponents', 'librarySchemes', 'libraryResources']
@@ -35,7 +44,7 @@ const rebuildAll = (store, records) => records.map((r) => rebuildRecord(store, r
  * alone. Dockets and their runs travel with chats; collections and collabs
  * with annotations.
  */
-export async function gatherContents(db, categories = CATEGORIES) {
+export async function gatherContents(db, categories = UNASKED) {
   const want = new Set(categories)
   const v6 = isV6(db)
   const contents = {}
@@ -91,6 +100,10 @@ export async function gatherContents(db, categories = CATEGORIES) {
   }
 
   if (want.has('rooms')) contents.rooms = await db.getAllFromIndex('modes', 'scope', 'room')
+  // Window layouts, each checked as when read from this device.
+  if (want.has('layouts') && db.objectStoreNames.contains('arrangements')) {
+    contents.layouts = (await db.getAll('arrangements')).map(cleanArrangement).filter(Boolean)
+  }
   if (want.has('homepage')) contents.homepage = (await db.getAllFromIndex('modes', 'scope', 'homepage'))[0] || null
   if (want.has('library')) {
     contents.library = {
@@ -130,10 +143,17 @@ export async function restoreInto(db, contents, { strategy = 'merge', newId = ()
   // A replace of version 6 data keeps its numbers and dockets, if they hang together.
   const keepNumbers = v6 && replace && hasConsistentDockets(flat)
 
-  const stores = [...V5_STORES, ...(v6 ? V6_STORES : [])]
+  // Window layouts in the file, each checked as when read from this device
+  // (C182); a window on a screen this computer lacks opens on its main one,
+  // since windows are not placed by screen yet.
+  const layouts = Array.isArray(contents.layouts) && db.objectStoreNames.contains('arrangements')
+    ? contents.layouts.map(cleanArrangement).filter(Boolean)
+    : []
+  const stores = [...V5_STORES, ...(v6 ? V6_STORES : []), ...(layouts.length ? ['arrangements'] : [])]
   const tx = db.transaction(stores, 'readwrite')
   const done = tx.done
   let plan
+  const layoutsDone = { added: 0, copied: 0, skipped: 0 }
   try {
     if (replace) {
       const kept = []
@@ -165,6 +185,13 @@ export async function restoreInto(db, contents, { strategy = 'merge', newId = ()
         await fileRestored(tx, writes, { now, newId })
       }
     }
+    // Adding to what is here keeps this device's layouts; a replace brings
+    // the file's (C182).
+    for (const layout of layouts) {
+      if (!replace && (await tx.objectStore('arrangements').getKey(layout.id)) !== undefined) { layoutsDone.skipped += 1; continue }
+      await tx.objectStore('arrangements').put({ ...layout, updatedAt: now })
+      layoutsDone.added += 1
+    }
     await done
   } catch (err) {
     try {
@@ -175,7 +202,7 @@ export async function restoreInto(db, contents, { strategy = 'merge', newId = ()
   }
   // Other tabs re-read everything; nothing of the content travels.
   announce([{ kind: 'all', op: 'restored' }])
-  return { ...plan.summary, leftOut: dropped }
+  return { ...plan.summary, ...(layouts.length ? { layouts: layoutsDone } : {}), leftOut: dropped }
 }
 
 // What a merge needs to know about what is here: the chats and records the

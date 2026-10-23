@@ -14,6 +14,7 @@ import { Button, Card, Input, Modal, Toggle, RadioGroup, SegmentedControl, Secti
 import { gateway, keys, models as providerModelsOf, DEFAULT_MODEL_PROVIDER as PROVIDER } from '../net'
 import { encryptExport, decryptImport } from '../lib/crypto'
 import { exportAllData, importData, clearAllData, getSetting, setSetting } from '../lib/db'
+import { BACKUP_PASSWORD_MIN } from '../lib/backup'
 import { isStorageKept, askToKeepStorage } from '../lib/storageKeep'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
@@ -707,7 +708,7 @@ function formatBytes(bytes) {
 // ─── Passphrase Strength ─────────────────────────────────
 
 function passphraseStrength(pw) {
-  if (!pw || pw.length < 8) return null
+  if (!pw || pw.length < BACKUP_PASSWORD_MIN) return null
   let score = 0
   if (/[a-z]/.test(pw)) score++
   if (/[A-Z]/.test(pw)) score++
@@ -1021,7 +1022,7 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
               Cancel
             </Button>
             <Button
-              disabled={!exportPassphrase || exportPassphrase.length < 8 || exportPassphrase !== exportConfirmPassphrase || exportLoading}
+              disabled={!exportPassphrase || exportPassphrase.length < BACKUP_PASSWORD_MIN || exportPassphrase !== exportConfirmPassphrase || exportLoading}
               onClick={handleExportEncrypted}
             >
               {exportLoading ? 'Exporting…' : 'Export'}
@@ -1029,13 +1030,13 @@ function DataSection({ backupReminder, setBackupReminder, showExportModal, setSh
           </>
         }
       >
-        <p className="text-xs text-[var(--p-text-secondary)] mb-4">Choose a passphrase to encrypt your backup. You'll need this to import it later. Minimum 8 characters.</p>
+        <p className="text-xs text-[var(--p-text-secondary)] mb-4">Choose a passphrase to encrypt your backup. You'll need this to import it later. Minimum {BACKUP_PASSWORD_MIN} characters.</p>
         <div className="space-y-3">
           <div>
             <Input label="Passphrase" value={exportPassphrase} onChange={setExportPassphrase} secret placeholder="Enter a passphrase" />
             {exportPassphrase && (
               <div className="mt-1.5 flex items-center gap-2">
-                {exportPassphrase.length < 8 ? (
+                {exportPassphrase.length < BACKUP_PASSWORD_MIN ? (
                   <span className="text-xs text-[#E03E3E]">Minimum 8 characters</span>
                 ) : (() => {
                   const s = passphraseStrength(exportPassphrase)

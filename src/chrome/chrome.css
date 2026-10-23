@@ -607,7 +607,7 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-sctl { display: flex; align-items: center; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
 .ch-srow.stack .ch-sctl { justify-content: flex-start; }
 .ch-shell .ch-settings button.ch-smarg { padding: 0; border: none; background: none; cursor: pointer; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); text-align: start; }
-.ch-shell .ch-settings button.ch-smarg:hover, .ch-shell .ch-settings button.ch-smarg:focus-visible { color: var(--ch-gold-deep); text-decoration: underline; text-underline-offset: 2px; }
+.ch-shell .ch-settings button.ch-smarg:hover, .ch-shell .ch-settings button.ch-smarg:focus-visible { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
 .ch-seg { display: inline-flex; gap: 2px; padding: 2px; border-radius: var(--ch-r-btn); background: var(--ch-subtle); }
 .ch-shell .ch-settings .ch-seg button { padding: 5px 11px; font: 500 11px var(--ch-sans); color: var(--ch-ink-3); border-radius: 6px; white-space: nowrap; }
 .ch-shell .ch-settings .ch-seg button:hover { color: var(--ch-ink); }
@@ -654,3 +654,30 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
    the rooms' relative sizes, scale together; the layout does not zoom. */
 :root[data-text="compact"] { font-size: 93.75%; --ch-t-id: 10px; --ch-t-marg: 10.5px; --ch-t-small: 11.5px; --ch-t-body: 13px; --ch-t-lead: 14.5px; --ch-t-title: 17px; --ch-t-display: 20px; }
 :root[data-text="large"] { font-size: 112.5%; --ch-t-id: 11.5px; --ch-t-marg: 13px; --ch-t-small: 14px; --ch-t-body: 15.5px; --ch-t-lead: 17.5px; --ch-t-title: 20px; --ch-t-display: 25px; }
+
+/* ── Backups from the bar (stage 9, piece 2; C182) ── the key panel's place
+   and look; choices as Settings draws them. */
+.ch-sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ch-backup .ch-picks { display: flex; flex-direction: column; margin: 6px 0; }
+.ch-backup .ch-pick { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 0 8px; align-items: start; padding: 8px 10px; border-radius: var(--ch-r-md); cursor: pointer; }
+.ch-backup .ch-pick:hover { background: var(--ch-subtle); }
+.ch-backup .ch-pick.on { background: var(--ch-wash); }
+.ch-backup .ch-pick:focus-within { box-shadow: 0 0 0 1.5px var(--ch-ink); }
+.ch-backup .ch-pick .dot { width: 11px; height: 11px; margin-top: 3px; border-radius: 50%; border: 1.2px solid var(--ch-soft); }
+.ch-backup .ch-pick.on .dot { border-color: var(--ch-ink); box-shadow: inset 0 0 0 2px var(--ch-surface); background: var(--ch-ink); }
+.ch-backup .pl { display: block; font: 500 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink); }
+.ch-backup .ph { display: block; font-size: 11.5px; color: var(--ch-ink-2); margin-top: 2px; line-height: 1.45; }
+.ch-bk-cats { display: flex; flex-direction: column; gap: 2px; margin: 6px 0 8px; }
+.ch-bk-cat { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 0 8px; align-items: start; padding: 6px 10px; border-radius: var(--ch-r-md); cursor: pointer; }
+.ch-bk-cat:hover { background: var(--ch-subtle); }
+.ch-bk-cat input { margin-top: 3px; accent-color: var(--ch-ink); }
+.ch-bk-pw { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0; }
+.ch-bk-pw input, .ch-bk-confirm input { flex: 1; min-width: 160px; padding: 7px 10px; font: 400 12px var(--ch-mono); color: var(--ch-ink); border: 1px dashed var(--ch-soft); border-radius: var(--ch-r-btn); background: var(--ch-surface); }
+.ch-bk-pw input:focus, .ch-bk-confirm input:focus { outline: none; border-style: solid; border-color: var(--ch-ink); box-shadow: 0 0 0 1px var(--ch-ink); }
+.ch-bk-act { display: flex; justify-content: flex-end; margin-top: 8px; }
+.ch-shell .ch-backup .ch-bk-btn { padding: 7px 13px; font: 500 11.5px var(--ch-sans); color: var(--ch-ink); background: var(--ch-surface); border: 1px dashed var(--ch-soft); border-radius: var(--ch-r-btn); }
+.ch-shell .ch-backup .ch-bk-btn:hover { background: var(--ch-wash); }
+.ch-shell .ch-backup .ch-bk-btn:disabled { opacity: .4; cursor: default; }
+.ch-bk-replace { margin: 6px 0; padding: 8px 10px; border-radius: var(--ch-r-md); background: var(--ch-subtle); }
+.ch-bk-confirm { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: 12px; color: var(--ch-ink-2); }
+.ch-set-margs { display: inline-flex; gap: 14px; }

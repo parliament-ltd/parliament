@@ -144,3 +144,42 @@ describe('restoring at version 5', () => {
     db.close()
   })
 })
+
+describe('window layouts in a backup (stage 9, piece 2; C182)', () => {
+  const layout = { id: 'space', columns: [['almanac'], ['settings']], popped: [], context: { settings: 'data' } }
+
+  it('go only when ticked, and come back checked', async () => {
+    const source = await open('layouts-source')
+    await source.put('arrangements', layout)
+    expect((await gatherContents(source)).layouts).toBeUndefined()
+    expect((await gatherContents(source, ['chats'])).layouts).toBeUndefined()
+    const contents = await gatherContents(source, ['layouts'])
+    source.close()
+    expect(contents.layouts).toHaveLength(1)
+    expect(contents.layouts[0].columns).toEqual([['almanac'], ['settings']])
+
+    const target = await open('layouts-target')
+    const summary = await restoreInto(target, { layouts: [...contents.layouts, { id: 'space', columns: [['nowhere']] }, { id: 'NOT AN ID', columns: [['almanac']] }] }, { strategy: 'replace', newId, now })
+    expect(summary.layouts).toEqual({ added: 1, copied: 0, skipped: 0 })
+    const back = await target.getAll('arrangements')
+    expect(back.map((r) => [r.id, r.columns])).toEqual([['space', [['almanac'], ['settings']]]])
+    target.close()
+  })
+
+  it('leave the layouts on this device when added to what is here', async () => {
+    const db = await open('layouts-merge')
+    await db.put('arrangements', { ...layout, columns: [['library']] })
+    const summary = await restoreInto(db, { layouts: [layout] }, { strategy: 'merge', newId, now })
+    expect(summary.layouts).toEqual({ added: 0, copied: 0, skipped: 1 })
+    expect((await db.get('arrangements', 'space')).columns).toEqual([['library']])
+    db.close()
+  })
+
+  it('leave this device alone on a replace from a file without them', async () => {
+    const db = await open('layouts-kept')
+    await db.put('arrangements', layout)
+    await restoreInto(db, sample.contents, { strategy: 'replace', newId, now })
+    expect(await db.get('arrangements', 'space')).toBeTruthy()
+    db.close()
+  })
+})

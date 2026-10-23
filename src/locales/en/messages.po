@@ -117,6 +117,214 @@ msgid "almanac.untitled"
 msgstr "Untitled"
 
 #. js-lingui-explicit-id
+msgid "backup.catAnnotations"
+msgstr "Notes and markings"
+
+#. js-lingui-explicit-id
+msgid "backup.catAnnotationsAbout"
+msgstr "Notes, keywords, quotes, favourites and collections"
+
+#. js-lingui-explicit-id
+msgid "backup.catChats"
+msgstr "Chats and plans"
+
+#. js-lingui-explicit-id
+msgid "backup.catChatsAbout"
+msgstr "Every chat with its messages and files, and the plans they belong to"
+
+#. js-lingui-explicit-id
+msgid "backup.catLayouts"
+msgstr "Window layouts on this device"
+
+#. js-lingui-explicit-id
+msgid "backup.catLayoutsAbout"
+msgstr "Which boards are on screen and in windows. Off unless you tick it"
+
+#. js-lingui-explicit-id
+msgid "backup.catLibrary"
+msgstr "Library"
+
+#. js-lingui-explicit-id
+msgid "backup.catLibraryAbout"
+msgstr "Layouts, blocks and themes you added"
+
+#. js-lingui-explicit-id
+msgid "backup.catPreferences"
+msgstr "Your settings"
+
+#. js-lingui-explicit-id
+msgid "backup.catPreferencesAbout"
+msgstr "The model for new chats, languages, the privacy filter and the like. Never your keys"
+
+#. js-lingui-explicit-id
+msgid "backup.catRooms"
+msgstr "Rooms"
+
+#. js-lingui-explicit-id
+msgid "backup.catRoomsAbout"
+msgstr "Rooms you have built or changed"
+
+#. js-lingui-explicit-id
+msgid "backup.close"
+msgstr "Escape goes back to the bar"
+
+#. js-lingui-explicit-id
+msgid "backup.doMerge"
+msgstr "Bring it back"
+
+#. js-lingui-explicit-id
+msgid "backup.doReplace"
+msgstr "Replace what is here"
+
+#. js-lingui-explicit-id
+msgid "backup.downloadLocked"
+msgstr "Download it, encrypted"
+
+#. js-lingui-explicit-id
+msgid "backup.downloadOpen"
+msgstr "Download it, not encrypted"
+
+#. js-lingui-explicit-id
+msgid "backup.fileHolds"
+msgstr "{chats, plural, one {# chat} other {# chats}}, {rooms, plural, one {# room} other {# rooms}}, {notes, plural, one {# note} other {# notes}}, {highlights, plural, one {# marking} other {# markings}}, {pins, plural, one {# quote} other {# quotes}}."
+
+#. js-lingui-explicit-id
+msgid "backup.fileInvalid"
+msgstr "It cannot be brought back: {reason}"
+
+#. js-lingui-explicit-id
+msgid "backup.fileIs"
+msgstr "{dated, select, yes {{name} is a Parliament backup from {day}.} other {{name} is a Parliament backup.}}"
+
+#. js-lingui-explicit-id
+msgid "backup.fileLocked"
+msgstr "It is encrypted: its password opens it."
+
+#. js-lingui-explicit-id
+msgid "backup.fileOpen"
+msgstr "It is not encrypted."
+
+#. js-lingui-explicit-id
+msgid "backup.fileOther"
+msgstr "{name} is not a file Parliament can bring back. Backups end in .parliament; older ones in .apb or .json"
+
+#. js-lingui-explicit-id
+msgid "backup.fileUnreadable"
+msgstr "{name} could not be read: {reason}"
+
+#. js-lingui-explicit-id
+msgid "backup.howTitle"
+msgstr "How it comes back"
+
+#. js-lingui-explicit-id
+msgid "backup.keepDownload"
+msgstr "Download what is here"
+
+#. js-lingui-explicit-id
+msgid "backup.keepFirst"
+msgstr "First, keep what is here: a backup of it, to bring back if this goes wrong."
+
+#. js-lingui-explicit-id
+msgid "backup.keptHere"
+msgstr "What is here is kept in {filename}."
+
+#. js-lingui-explicit-id
+msgid "backup.lede"
+msgstr "One file of what you choose, to keep somewhere else. Your keys are never in it."
+
+#. js-lingui-explicit-id
+msgid "backup.merge"
+msgstr "Add it to what is here"
+
+#. js-lingui-explicit-id
+msgid "backup.mergeAbout"
+msgstr "What is here stays. Anything the same is skipped; anything that differs comes in as a copy"
+
+#. js-lingui-explicit-id
+msgid "backup.noPassword"
+msgstr "Without a password"
+
+#. js-lingui-explicit-id
+msgid "backup.noPasswordAbout"
+msgstr "The file is not encrypted: anyone who opens it can read your chats"
+
+#. js-lingui-explicit-id
+msgid "backup.passwordAgain"
+msgstr "The same password again"
+
+#. js-lingui-explicit-id
+msgid "backup.passwordPlaceholder"
+msgstr "{count, plural, other {A password of # characters or more}}"
+
+#. js-lingui-explicit-id
+msgid "backup.passwordTitle"
+msgstr "A password"
+
+#. js-lingui-explicit-id
+msgid "backup.problemDiffer"
+msgstr "The two passwords differ"
+
+#. js-lingui-explicit-id
+msgid "backup.problemFailed"
+msgstr "The backup could not be made. Nothing was downloaded"
+
+#. js-lingui-explicit-id
+msgid "backup.problemNeedPassword"
+msgstr "Type its password first"
+
+#. js-lingui-explicit-id
+msgid "backup.problemNothing"
+msgstr "Tick at least one thing to back up"
+
+#. js-lingui-explicit-id
+msgid "backup.problemRestore"
+msgstr "It could not be brought back. Nothing was changed"
+
+#. js-lingui-explicit-id
+msgid "backup.problemShort"
+msgstr "{count, plural, other {Use a password of # characters or more}}"
+
+#. js-lingui-explicit-id
+msgid "backup.problemUnlock"
+msgstr "That password does not open it"
+
+#. js-lingui-explicit-id
+msgid "backup.replace"
+msgstr "Replace what is here"
+
+#. js-lingui-explicit-id
+msgid "backup.replaceAbout"
+msgstr "This browser is cleared first, then the backup is written. Your keys stay"
+
+#. js-lingui-explicit-id
+msgid "backup.titleBackup"
+msgstr "Back up"
+
+#. js-lingui-explicit-id
+msgid "backup.titleRestore"
+msgstr "Bring a backup back"
+
+#. js-lingui-explicit-id
+msgid "backup.typeReplace"
+msgstr "Type replace to go on"
+
+#. js-lingui-explicit-id
+msgid "backup.unlock"
+msgstr "Open it"
+
+#. js-lingui-explicit-id
+msgid "backup.unlockLabel"
+msgstr "Its password"
+
+#. js-lingui-explicit-id
+msgid "backup.withPassword"
+msgstr "With a password"
+
+#. js-lingui-explicit-id
+msgid "backup.withPasswordAbout"
+msgstr "The file is encrypted. You need the password to bring it back, and nobody can help if it is lost"
+
+#. js-lingui-explicit-id
 msgid "block.branches"
 msgstr "Branches"
 
@@ -993,6 +1201,18 @@ msgid "enter.archiveOn"
 msgstr "Enter archives {nums}. Nothing is deleted, and in:archive shows them"
 
 #. js-lingui-explicit-id
+msgid "enter.backupDoneLocked"
+msgstr "Backed up, encrypted, to {filename}"
+
+#. js-lingui-explicit-id
+msgid "enter.backupDoneOpen"
+msgstr "Backed up to {filename}. It is not encrypted"
+
+#. js-lingui-explicit-id
+msgid "enter.backupOpen"
+msgstr "Enter opens the backup: what goes in, and whether it has a password"
+
+#. js-lingui-explicit-id
 msgid "enter.barMove"
 msgstr "{place, select, top {Enter moves the bar to the top} bottom {Enter moves the bar to the bottom} left {Enter moves the bar to the left} right {Enter moves the bar to the right} other {Enter moves the bar to the centre}}"
 
@@ -1410,6 +1630,10 @@ msgstr "It is for reading elsewhere, and cannot be brought back in"
 msgid "enter.exportNothing"
 msgstr "Nothing to export here"
 
+#. js-lingui-explicit-id
+msgid "enter.filePicking"
+msgstr "Choose a file. Nothing changes until you say how to bring it back"
+
 #. C132 (h): a cost is worked out from recorded tokens, never guessed
 #. js-lingui-explicit-id
 msgid "enter.filterCostUnknown"
@@ -1647,6 +1871,10 @@ msgstr "{name} is on this computer, but has not been listed since this page open
 #. js-lingui-explicit-id
 msgid "enter.helpVerb"
 msgstr "Enter shows how {verb} works"
+
+#. js-lingui-explicit-id
+msgid "enter.importOpen"
+msgstr "Enter opens a file and says what it is before anything happens"
 
 #. js-lingui-explicit-id
 msgid "enter.includeFailed"
@@ -2584,6 +2812,18 @@ msgid "enter.restingPrompt"
 msgstr "p> for a prompt"
 
 #. js-lingui-explicit-id
+msgid "enter.restoreMerged"
+msgstr "{count, plural, =0 {Nothing new to bring back. The page reads it all again} one {Brought back # item. The page reads it all again} other {Brought back # items. The page reads it all again}}"
+
+#. js-lingui-explicit-id
+msgid "enter.restoreOpen"
+msgstr "Enter opens a file to bring back. Nothing changes until you say how"
+
+#. js-lingui-explicit-id
+msgid "enter.restoreReplaced"
+msgstr "{count, plural, one {Replaced: # item brought back. The page reads it all again} other {Replaced: # items brought back. The page reads it all again}}"
+
+#. js-lingui-explicit-id
 msgid "enter.retag"
 msgstr "{count, plural, one {Enter renames {from} to {to} on # thing} other {Enter renames {from} to {to} on # things}}"
 
@@ -2754,6 +2994,10 @@ msgstr "set:{name} changes nothing in Parliament today, so it is not offered"
 #. js-lingui-explicit-id
 msgid "enter.setRegion"
 msgstr "{where, select, eu {Enter has {provider} process your prompts in the EU, at 1.1 times the price} us {Enter has {provider} process your prompts in the US, at 1.1 times the price} other {Enter lets {provider} process your prompts anywhere, at its usual price}}"
+
+#. js-lingui-explicit-id
+msgid "enter.setReminder"
+msgstr "{every, select, daily {Enter reminds you to back up every day, counted from the last backup} weekly {Enter reminds you to back up every week, counted from the last backup} monthly {Enter reminds you to back up every month, counted from the last backup} other {Enter stops the reminders to back up}}"
 
 #. js-lingui-explicit-id
 msgid "enter.setRoom"
@@ -4127,6 +4371,14 @@ msgid "settings.appearanceTitle"
 msgstr "Appearance"
 
 #. js-lingui-explicit-id
+msgid "settings.backupHelp"
+msgstr "Chats, plans, rooms, the library and every marking, in one .parliament file. Backups are format {version}. Any older backup restores; one from a newer Parliament asks you to update first."
+
+#. js-lingui-explicit-id
+msgid "settings.backupLabel"
+msgstr "Backup and restore"
+
+#. js-lingui-explicit-id
 msgid "settings.contextDesc"
 msgstr "How a new chat starts"
 
@@ -4345,6 +4597,30 @@ msgstr "Where {provider} processes prompts"
 #. js-lingui-explicit-id
 msgid "settings.regionUs"
 msgstr "US"
+
+#. js-lingui-explicit-id
+msgid "settings.reminderDaily"
+msgstr "Daily"
+
+#. js-lingui-explicit-id
+msgid "settings.reminderHelp"
+msgstr "How often to remind you, counted from the last backup."
+
+#. js-lingui-explicit-id
+msgid "settings.reminderLabel"
+msgstr "Backup reminder"
+
+#. js-lingui-explicit-id
+msgid "settings.reminderMonthly"
+msgstr "Monthly"
+
+#. js-lingui-explicit-id
+msgid "settings.reminderNever"
+msgstr "Never"
+
+#. js-lingui-explicit-id
+msgid "settings.reminderWeekly"
+msgstr "Weekly"
 
 #. js-lingui-explicit-id
 msgid "settings.replyAny"

@@ -10,7 +10,7 @@ import { DB_NAME, DB_VERSION, TRIAL_DB_NAME, isTrialDb } from './db'
 // The database this tab uses: Parliament's own, or in development the trial
 // copy, so the upgrade screen can be tried on a copy as it would run for real.
 const activeDbName = () => (isTrialDb() ? TRIAL_DB_NAME : DB_NAME)
-import { CATEGORIES, gatherBackupContents, buildBackupFile } from './backup'
+import { UNASKED, gatherBackupContents, buildBackupFile } from './backup'
 
 /** Pure decision: an existing database older than this build needs the gate. */
 export function needsBackupGate(storedVersion, targetVersion = DB_VERSION) {
@@ -51,7 +51,8 @@ export async function buildPreUpgradeBackup(storedVersion, { password = null } =
   const db = await openDB(activeDbName(), storedVersion)
   try {
     const names = db.objectStoreNames
-    const categories = CATEGORIES.filter((c) => {
+    // Window layouts go only when ticked (C182).
+    const categories = UNASKED.filter((c) => {
       if (c === 'rooms' || c === 'homepage') return names.contains('modes')
       if (c === 'library') return names.contains('libraryLayouts')
       if (c === 'chats') return names.contains('files') && names.contains('sbrd_documents')

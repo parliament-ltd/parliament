@@ -1530,6 +1530,16 @@ Found while splitting stage 9 into pieces. The documents: the plan's stage 9, th
 - **(i) New setting:** `newChatRoom`, the room a new chat starts in (`set:room`), a library template; none is the Writing Studio. **Shown at the checkpoint;** backups carry it.
 - **Suggestion:** keep as built.
 
+**C182. Backups from the bar, as built** (piece 2).
+- **(a) `backup:`** opens a panel under the bar: what goes in (chats and plans, notes and markings, rooms, the library, your settings, window layouts; the last two off unless ticked), then a choice said plainly: with a password (encrypted; nobody can help if it is lost) or without (not encrypted: anyone who opens it can read your chats). Afterwards the bar names the file and says whether it is encrypted.
+- **(b) `restore:` and `import:`** open a file picker first, and the panel says what the file is (its date, whether it is encrypted, what it holds) before anything happens (A21). `import:` of a file that is not a backup says so; room files come when they exist. An encrypted file asks for its password. Then: add it to what is here, or replace what is here. A replace first offers what is here as a download (with or without a password) and is armed by typing `replace` (T13). After a restore the page reads everything again.
+- **(c) One minimum password length, 8 characters,** in the panel, the old backup window and the old Settings page. New files are stretched 600,000 times (T9); the count is in each file's header, so files made at 210,000 and 100,000 still open. The older `.apb` export on the old Settings page still writes its own format at 100,000 until R10 retires it.
+- **(d) Window layouts** (ruled 20 October): in a backup only when ticked; the copy made before a database upgrade and the old window's "back up everything" leave them out. A restore checks each one as when reading it from this device. Adding to what is here keeps this device's layouts, since the layout here is what is on screen; a replace brings the file's; a replace from a file without layouts leaves this device's alone. Windows are not placed by screen yet, so a screen this computer lacks does not arise.
+- **(e) The reminder:** `set:reminder daily|weekly|monthly|never` and its control in Settings, counted from the last backup. Monthly is the default, the rule the reminder always had; the old Settings page stored a choice that the reminder never read, and it is read now. Never means no reminder, even when the browser may clear the data; Storage in Settings still says so.
+- **(f) Data and backups in Settings:** Backup and restore (writing `backup:` and `restore:` into the bar), with the format line the spec asks for, showing the real number ("Backups are format 2"): a file with no version is format 1, a newer one is refused with a message, and each migration is tested against a fixture. Then the reminder, storage and the last backup, read again when the panel closes.
+- **(g) What "your settings" holds** is said truly (T13): the model for new chats, languages, the privacy filter, the scratchpad and personas, never keys. Keys live in their own database, which a replace does not touch.
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

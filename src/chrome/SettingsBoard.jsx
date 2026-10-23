@@ -279,6 +279,12 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
           <section data-sec="data" className={`ch-sec${visible('data') ? '' : ' hidden'}`} aria-labelledby="sec-data">
             <SecHead id="data" title={say(TITLE.data)} />
             {!query && <p className="ch-sec-lede">{say(COPY.settings.dataLede)}</p>}
+            <Row {...rowProps('data', 'backup')} label={say(COPY.settings.backupLabel)} help={say(COPY.settings.backupHelp, { version: facts.backupVersion })}>
+              <span className="ch-set-margs"><Marg line="backup:" onWrite={onWrite} /><Marg line="restore:" onWrite={onWrite} /></span>
+            </Row>
+            <Row {...rowProps('data', 'reminder')} label={say(COPY.settings.reminderLabel)} help={say(COPY.settings.reminderHelp)}>
+              <Seg label={say(COPY.settings.reminderLabel)} value={v.backupReminder ?? 'monthly'} onPick={(x) => onSet(`set:reminder ${x}`)} options={[['daily', say(COPY.settings.reminderDaily)], ['weekly', say(COPY.settings.reminderWeekly)], ['monthly', say(COPY.settings.reminderMonthly)], ['never', say(COPY.settings.reminderNever)]]} />
+            </Row>
             <Row {...rowProps('data', 'storage')} label={say(COPY.settings.storageLabel)} stack
               help={<>
                 {facts.storage.quota > 0 && <span className="ch-meter"><i style={{ width: `${Math.min(100, Math.max(1, (facts.storage.usage / facts.storage.quota) * 100))}%` }} /></span>}
@@ -356,7 +362,12 @@ function rowWords(facts) {
     keys,
     spending: { month: 'this month spent chats cost dollars' },
     context,
-    data: { storage: 'storage space used browser kept keep persist', last: 'last backup backed up date' },
+    data: {
+      backup: 'backup restore export import parliament file format bring back',
+      reminder: 'reminder backup daily weekly monthly never remind',
+      storage: 'storage space used browser kept keep persist',
+      last: 'last backup backed up date',
+    },
     appearance: { text: 'text size font compact large zoom' },
     about: { parliament: 'parliament version about servers accounts', network: 'network activity requests log hosts' },
   }

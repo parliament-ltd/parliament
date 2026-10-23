@@ -14,7 +14,9 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Database, Upload, Lock, AlertTriangle, ArrowDownToLine, Check, ArrowRight } from 'lucide-react'
 import {
+  BACKUP_PASSWORD_MIN,
   CATEGORIES,
+  UNASKED,
   buildBackupFile,
   buildManifest,
   decryptBackup,
@@ -33,14 +35,16 @@ import { useBackup } from '../stores/BackupContext'
 const SPRING_SMOOTH = { type: 'spring', stiffness: 300, damping: 28 }
 
 // Display metadata for each category. Order here drives the order in the
-// UI. The "preferences" category is the only one off by default.
+// UI. "preferences" and "layouts" are off unless ticked (C182).
 const CATEGORY_META = {
   chats:       { label: 'Chats',                  desc: 'Conversations with full message history' },
   annotations: { label: 'Annotations',            desc: 'Notes, highlights, favorites, pinned references' },
   rooms:       { label: 'Rooms',                  desc: 'Rooms you\'ve built or customized' },
   homepage:    { label: 'Homepage configuration', desc: 'Section order, per-section settings' },
   library:     { label: 'Library items',          desc: 'Installed layouts, components, schemes, resources' },
-  preferences: { label: 'Preferences and settings', desc: 'Tour state, UI preferences. Not required for most users.' },
+  // What this category holds (audit T13): the allowed settings, never the key.
+  preferences: { label: 'Preferences and settings', desc: 'The model for new chats, languages, the privacy filter, scratchpad text and personas. Never your keys.' },
+  layouts:     { label: 'Window layouts on this device', desc: 'Which boards are on screen and in windows.' },
 }
 
 const DEFAULT_CHECKED = {
@@ -50,6 +54,7 @@ const DEFAULT_CHECKED = {
   homepage: true,
   library: true,
   preferences: false,
+  layouts: false,
 }
 
 function formatBytes(b) {
@@ -116,14 +121,14 @@ export default function BackupRestoreModal({ initialTab = 'backup', onClose }) {
   async function runBackup({ allCategories = false } = {}) {
     if (working) return
     const cats = allCategories
-      ? [...CATEGORIES]
+      ? [...UNASKED]
       : CATEGORIES.filter((c) => checked[c])
     if (cats.length === 0) {
       showToast('Select at least one category to back up.')
       return
     }
-    if (passwordOn && password.length < 8) {
-      showToast('Use a password of at least 8 characters.')
+    if (passwordOn && password.length < BACKUP_PASSWORD_MIN) {
+      showToast(`Use a password of at least ${BACKUP_PASSWORD_MIN} characters.`)
       return
     }
     setWorking(true)
@@ -217,7 +222,7 @@ export default function BackupRestoreModal({ initialTab = 'backup', onClose }) {
       // For replace: capture current state for undo
       let priorContents = null
       if (restoreMode === 'replace') {
-        priorContents = await gatherBackupContents([...CATEGORIES])
+        priorContents = await gatherBackupContents([...UNASKED])
       }
       const summary = await restoreContents(restoreContentsState, { strategy: restoreMode })
       if (priorContents) armUndo(priorContents, summary)

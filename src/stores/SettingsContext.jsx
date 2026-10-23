@@ -15,7 +15,9 @@ const DEFAULT_SETTINGS = {
   summaryDepth: 'brief',
   budgetAlert: 20,
   budgetEnabled: true,
-  backupReminder: 'weekly',
+  // How often to remind about backups (set:reminder; C182). Monthly is the
+  // rule the reminder always had.
+  backupReminder: 'monthly',
   lastBackup: null,
   spendingLimitDismissed: false,
   // PR-19e: pointer to a room mode the user wants to use as their

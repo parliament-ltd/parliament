@@ -117,6 +117,214 @@ msgid "almanac.untitled"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "backup.catAnnotations"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catAnnotationsAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catChats"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catChatsAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catLayouts"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catLayoutsAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catLibrary"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catLibraryAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catPreferences"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catPreferencesAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catRooms"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catRoomsAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.close"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.doMerge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.doReplace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.downloadLocked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.downloadOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.fileHolds"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.fileInvalid"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.fileIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.fileLocked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.fileOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.fileOther"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.fileUnreadable"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.howTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.keepDownload"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.keepFirst"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.keptHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.lede"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.merge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.mergeAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.noPassword"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.noPasswordAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.passwordAgain"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.passwordPlaceholder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.passwordTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.problemDiffer"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.problemFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.problemNeedPassword"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.problemNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.problemRestore"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.problemShort"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.problemUnlock"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.replace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.replaceAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.titleBackup"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.titleRestore"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.typeReplace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.unlock"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.unlockLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.withPassword"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.withPasswordAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "block.branches"
 msgstr ""
 
@@ -993,6 +1201,18 @@ msgid "enter.archiveOn"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.backupDoneLocked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.backupDoneOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.backupOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.barMove"
 msgstr ""
 
@@ -1410,6 +1630,10 @@ msgstr ""
 msgid "enter.exportNothing"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.filePicking"
+msgstr ""
+
 #. C132 (h): a cost is worked out from recorded tokens, never guessed
 #. js-lingui-explicit-id
 msgid "enter.filterCostUnknown"
@@ -1646,6 +1870,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.helpVerb"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.importOpen"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2584,6 +2812,18 @@ msgid "enter.restingPrompt"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.restoreMerged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.restoreOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.restoreReplaced"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.retag"
 msgstr ""
 
@@ -2753,6 +2993,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.setRegion"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setReminder"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4127,6 +4371,14 @@ msgid "settings.appearanceTitle"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "settings.backupHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.backupLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "settings.contextDesc"
 msgstr ""
 
@@ -4344,6 +4596,30 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "settings.regionUs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.reminderDaily"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.reminderHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.reminderLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.reminderMonthly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.reminderNever"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.reminderWeekly"
 msgstr ""
 
 #. js-lingui-explicit-id

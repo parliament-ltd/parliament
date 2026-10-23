@@ -49,9 +49,9 @@ describe('the sections', () => {
 
 describe('set:', () => {
   it('lists what it takes, and says what it does not know', () => {
-    expect(SETTER_NAMES).toEqual(['default', 'keys', 'title', 'finish', 'text', 'region', 'room'])
-    expect(line('>set:').text).toBe('set: changes a setting: set:default, set:keys, set:title, set:finish, set:text, set:region, or set:room')
-    expect(line('>set:colour blue').text).toBe('No setting called colour. set: takes set:default, set:keys, set:title, set:finish, set:text, set:region, or set:room')
+    expect(SETTER_NAMES).toEqual(['default', 'keys', 'title', 'finish', 'text', 'region', 'room', 'reminder'])
+    expect(line('>set:').text).toBe('set: changes a setting: set:default, set:keys, set:title, set:finish, set:text, set:region, set:room, or set:reminder')
+    expect(line('>set:colour blue').text).toBe('No setting called colour. set: takes set:default, set:keys, set:title, set:finish, set:text, set:region, set:room, or set:reminder')
   })
 
   it('makes a model the one for new chats, by name, and refuses what cannot be', () => {
@@ -69,6 +69,9 @@ describe('set:', () => {
     expect(line('>set:region eu').text).toBe('Enter has Mistral process your prompts in the EU, at 1.1 times the price')
     expect(line('>set:room code lab')).toMatchObject({ text: 'Enter starts new chats in Code lab', act: { key: 'newChatRoom', value: 'code-lab@1.0' } })
     expect(line('>set:text huge').text).toBe('set:text takes set:text compact, set:text default, or set:text large')
+    expect(line('>set:reminder weekly', { values: { ...values, backupReminder: 'monthly' } })).toMatchObject({ text: 'Enter reminds you to back up every week, counted from the last backup', act: { key: 'backupReminder', value: 'weekly', before: 'monthly' } })
+    expect(line('>set:reminder never').text).toBe('Enter stops the reminders to back up')
+    expect(line('>set:reminder hourly').text).toBe('set:reminder takes set:reminder daily, set:reminder weekly, set:reminder monthly, or set:reminder never')
   })
 
   it('explains what it will not do', () => {

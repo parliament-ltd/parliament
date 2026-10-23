@@ -24,8 +24,9 @@ import {
   deriveKeyFromPassphrase,
   decryptImport,
   PBKDF2_ITERATIONS_V2,
+  PBKDF2_ITERATIONS_V3,
 } from './crypto'
-import { gatherContents, restoreInto, CATEGORIES } from './backupData'
+import { gatherContents, restoreInto, CATEGORIES, UNASKED } from './backupData'
 import { backupReminderDue } from './backupReminder'
 import { isStorageKept } from './storageKeep'
 import {
@@ -43,10 +44,14 @@ export {
 
 const PARLIAMENT_VERSION = '0.5.0'
 
+// The one shortest password a backup takes, everywhere one is asked for
+// (audit T9; stage 9, piece 2; C182).
+export const BACKUP_PASSWORD_MIN = 8
+
 // Every category a backup can hold (backupData.js). The "preferences"
 // category is off by default in the UI; the rest are on. Order here also
 // drives display order in the modal.
-export { CATEGORIES }
+export { CATEGORIES, UNASKED }
 
 // ─── Compression (native CompressionStream) ──────────────
 
@@ -84,7 +89,7 @@ async function getBrowserFingerprint(db = null) {
  * (backupData.js, backupSchema.js): known fields only, allowed settings only,
  * never the saved key. Each category stands alone.
  */
-export async function gatherBackupContents(categories = CATEGORIES, db = null) {
+export async function gatherBackupContents(categories = UNASKED, db = null) {
   return gatherContents(db || await initDB(), categories)
 }
 
@@ -137,7 +142,8 @@ export async function buildBackupFile({ contents, password = null, db = null }) 
   if (password) {
     const salt = crypto.getRandomValues(new Uint8Array(16))
     const iv = crypto.getRandomValues(new Uint8Array(12))
-    const key = await deriveKeyFromPassphrase(password, salt, PBKDF2_ITERATIONS_V2)
+    // New files are stretched further (T9); the count goes in the header.
+    const key = await deriveKeyFromPassphrase(password, salt, PBKDF2_ITERATIONS_V3)
     const compressed = await gzipString(JSON.stringify(contents))
     const ciphertext = await crypto.subtle.encrypt(
       { name: 'AES-GCM', iv },
@@ -154,7 +160,7 @@ export async function buildBackupFile({ contents, password = null, db = null }) 
       encryption: {
         algorithm: 'AES-GCM',
         kdf: 'PBKDF2-SHA256',
-        iterations: PBKDF2_ITERATIONS_V2,
+        iterations: PBKDF2_ITERATIONS_V3,
         salt: bytesToBase64(salt),
         iv: bytesToBase64(iv),
       },
@@ -349,7 +355,11 @@ export async function backupReminderState() {
   const db = await initDB()
   const dismissed = await db.get('settings', BANNER_DISMISSED_KEY)
   const status = await getBackupStatus()
+  // How often, as chosen in Settings (set:reminder; C182); unset keeps the
+  // rule as it was.
+  const every = (await db.get('settings', 'backupReminder'))?.value ?? null
   return backupReminderDue({
+    every,
     chatCount: await db.count('conversations'),
     roomCount: (await db.getAllFromIndex('modes', 'scope', 'room')).length,
     accountAgeDays: daysBetween(await getOrInitAccountCreatedAt(), new Date()),

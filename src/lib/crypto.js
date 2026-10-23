@@ -200,6 +200,11 @@ export async function deleteApiKey(provider = PROVIDER) {
 // decrypt.
 export const PBKDF2_ITERATIONS_V2 = 210000
 
+// Iteration count for backups written from stage 9 on (audit T9; OWASP's
+// guidance for PBKDF2 with SHA-256 is 600,000). The count is written in each
+// file's header, so files made at 210,000 or 100,000 still open.
+export const PBKDF2_ITERATIONS_V3 = 600000
+
 // Legacy V1 default. Used only when a V1 .apb file lacks an iterations
 // field (which is always — V1 didn't write one).
 export const PBKDF2_ITERATIONS_V1 = 100000

@@ -24,3 +24,18 @@ describe('the backup reminder', () => {
     expect(backupReminderDue({ ...base, storageKept: null, chatCount: 1 })).toEqual({ show: false, atRisk: false })
   })
 })
+
+describe('how often, as chosen in Settings (set:reminder; C182)', () => {
+  const working = { ...base, chatCount: 5 }
+  it('counts from the last backup', () => {
+    expect(backupReminderDue({ ...working, every: 'daily', daysSinceLast: 1 }).show).toBe(true)
+    expect(backupReminderDue({ ...working, every: 'weekly', daysSinceLast: 6 }).show).toBe(false)
+    expect(backupReminderDue({ ...working, every: 'weekly', daysSinceLast: 7 }).show).toBe(true)
+    expect(backupReminderDue({ ...working, every: 'monthly', daysSinceLast: 29 }).show).toBe(false)
+    expect(backupReminderDue({ ...working, daysSinceLast: 30 }).show).toBe(true)
+  })
+  it('never means never, even when the browser may clear the data', () => {
+    expect(backupReminderDue({ ...working, every: 'never' })).toEqual({ show: false, atRisk: false })
+    expect(backupReminderDue({ ...working, every: 'never', storageKept: false })).toEqual({ show: false, atRisk: true })
+  })
+})

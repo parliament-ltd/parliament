@@ -51,6 +51,7 @@ import { listLayoutEntries } from '../catalog/layouts'
 import { readAlmanac } from '../lib/almanacRows'
 import { backupReminderState, getBackupStatus, dismissBackupBanner, getBackupLog } from '../lib/backup'
 import SettingsBoard from './SettingsBoard'
+import { parseBackupFile, BACKUP_VERSION } from '../lib/backup'
 import { createFactsCache } from '../lib/chatFacts'
 import { readSaved, keepSearch, forgetSearch, putSaved } from '../lib/savedSearches'
 import { readCollections, writeCollection, newCollection, withRows } from '../lib/collections'
@@ -732,6 +733,18 @@ export default function Shell() {
   // each provider has one and its last four characters, read through the
   // key module; never a key.
   const [keyPanel, setKeyPanel] = useState(null) // { focus: provider id or null } while api: shows it
+  // backup:, restore:, import: (stage 9, piece 2; C182): the panel under the
+  // field, { mode, file }, and the notice it ends with, for the bar.
+  const [backupPanel, setBackupPanel] = useState(null)
+  const backupEnd = useRef(null)
+  const endBackup = useCallback((says) => {
+    setBackupPanel(null)
+    const end = backupEnd.current
+    backupEnd.current = null
+    end?.(says ?? null)
+    // A restore changed what is stored: the page reads it all again.
+    if (says?.reload) setTimeout(() => window.location.reload(), 1600)
+  }, [])
 
   // Settings' updater, for acts that change a setting (thinking:, C165).
   const updateSettingNow = useRef(async () => {})
@@ -1204,6 +1217,36 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'backupPanel' || what.kind === 'filePick') {
+      // backup: opens the panel; restore: and import: a file picker first,
+      // and the panel says what the file is before anything happens (A21).
+      setKeyPanel(null)
+      setPicking(false)
+      setInspected(null)
+      backupEnd.current?.(null)
+      const later = new Promise((resolve) => { backupEnd.current = resolve })
+      if (what.kind === 'backupPanel') {
+        setBackupPanel({ mode: 'backup', file: null })
+      } else {
+        const input = document.createElement('input')
+        input.type = 'file'
+        input.accept = '.parliament,.apb,.json,application/json'
+        input.onchange = async () => {
+          const file = input.files?.[0]
+          if (!file) { endBackup(null); return }
+          try {
+            setBackupPanel({ mode: what.then, file: { name: file.name, parsed: await parseBackupFile(file) } })
+          } catch (err) {
+            // Not a backup: import: says it is not a file Parliament reads yet.
+            const other = what.then === 'import' && /not a valid Parliament backup/.test(String(err?.message))
+            setBackupPanel({ mode: what.then, file: { name: file.name, ...(other ? { other: true } : { error: String(err?.message || '') }) } })
+          }
+        }
+        input.click()
+      }
+      remember(body)
+      return { done: true, says: what.kind === 'backupPanel' ? null : { message: 'filePicking' }, later }
+    }
     if (what.kind === 'fork') {
       // new:branch (C178): a whole copy to the chat's end, or to the end of
       // a step, as the next letter of its plan; the room shows it.
@@ -1666,7 +1709,8 @@ export default function Shell() {
     Promise.all([getStorageEstimate().catch(() => ({ usage: 0, quota: 0 })), isStorageKept().catch(() => null), getBackupLog().catch(() => [])])
       .then(([est, kept, log]) => { if (live) setSettingsStored({ storage: { usage: est.usage ?? 0, quota: est.quota ?? 0, kept }, lastBackup: log.length ? log[log.length - 1].backedUpAt ?? null : null }) })
     return () => { live = false }
-  }, [settingsOpen, almanacRows])
+    // Read again when the backup panel closes: a backup changes the last date.
+  }, [settingsOpen, almanacRows, backupPanel])
   const roomTemplates = useMemo(() => (catalogue ?? [])
     .filter((i) => i.shelf === 'room' && i.template && !i.soon)
     .map((i) => ({ id: i.template, name: roomLabel(i18n, i.name) })), [catalogue, i18n])
@@ -1683,7 +1727,7 @@ export default function Shell() {
         defaultModel: settings.defaultModel, storageMode: settings.storageMode, describeNewChats: settings.describeNewChats !== false,
         finishRepliesOnLeave: Boolean(settings.finishRepliesOnLeave), fontSize: settings.fontSize ?? 'default', mistralRegion: settings.mistralRegion ?? 'global',
         thinking: settings.thinking === true, privacyFilter: settings.privacyFilter ?? 'off', translateQueries: settings.translateQueries === true,
-        newChatRoom: settings.newChatRoom ?? null,
+        newChatRoom: settings.newChatRoom ?? null, backupReminder: settings.backupReminder ?? 'monthly',
       },
       providers: keyInfo.keys,
       rows: answerRows,
@@ -1707,6 +1751,7 @@ export default function Shell() {
       },
       storage: settingsStored.storage,
       lastBackup: settingsStored.lastBackup,
+      backupVersion: BACKUP_VERSION,
     }
   }, [settings, keyInfo, answerRows, referenceName, local, roomTemplates, reply, languageName, helperNow, almanacRows, i18n.locale, settingsStored])
   // What set: reads (lib/settingVerbs.js).
@@ -2284,6 +2329,7 @@ export default function Shell() {
           keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory', region, onRegion: (r) => updateSetting('mistralRegion', r),
             local: { ...LOCAL_ENTRY, origin: window.location.origin, status: local.status, models: local.models, away: local.away ?? [], onCheck: () => runLocalCheck() } } : null}
           onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)}
+          backupPanel={backupPanel} onBackupDone={endBackup}
           picker={replyPicking && branchShown && targets
             ? { kind: 'reply', members: branchShown.members, targets, line: branchShown.line, onToggle: toggleReplyTarget, onAll: allReplyTargets }
             : picking ? { rows: answerRows, now: answerer, picked: heldIds && heldIds.length > 1 ? heldIds : null, reference: referenceName } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => { setPicking(false); setReplyPicking(false) }}

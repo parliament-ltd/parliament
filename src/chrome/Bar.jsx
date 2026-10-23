@@ -15,6 +15,7 @@ import Reference from './Reference'
 import Inspect from './Inspect'
 import Compare from './Compare'
 import KeyPanel from './KeyPanel'
+import BackupPanel from './BackupPanel'
 import AnswerPicker from './AnswerPicker'
 import ReplyPicker from './ReplyPicker'
 import FrameworkPicker from './FrameworkPicker'
@@ -50,7 +51,7 @@ import { step as stepBranch } from '../stores/branchView'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection', 'settings'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, onSearch, searches = {}, searchCounts = {} }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, onSearch, searches = {}, searchCounts = {} }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -229,6 +230,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       if (inspect) { onInspectClose?.(); return }
       if (compare) { onCompareClose?.(); return }
       if (keyPanel) { onKeysClose?.(); return }
+      if (backupPanel) { onBackupDone?.(null); return }
       if (picker) { onPickerClose?.(); return }
       if (frameworkPicker) { onFrameworkPickerClose?.(); return }
       // The field's rule first, then the caret: moving the caret blurs the
@@ -308,13 +310,20 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
         {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
         {!reference && inspect && <Inspect row={inspect} />}
         {!reference && !inspect && compare && <Compare a={compare.a} b={compare.b} />}
-        {!reference && !inspect && !compare && !keyPanel && !picker && frameworkPicker && (
+        {!reference && !inspect && !compare && !keyPanel && !backupPanel && !picker && frameworkPicker && (
           <FrameworkPicker items={frameworkPicker.items} onToggle={onToggleFramework} />
         )}
-        {!reference && !inspect && !compare && !keyPanel && picker && (
+        {!reference && !inspect && !compare && !keyPanel && !backupPanel && picker && (
           picker.kind === 'reply'
             ? <ReplyPicker members={picker.members} targets={picker.targets} line={picker.line} onToggle={picker.onToggle} onAll={picker.onAll} />
             : <AnswerPicker rows={picker.rows} now={picker.now} picked={picker.picked} reference={picker.reference} onPick={onPickAnswerer} />
+        )}
+        {!reference && !inspect && !compare && !keyPanel && backupPanel && (
+          <BackupPanel
+            mode={backupPanel.mode} file={backupPanel.file}
+            onClose={() => { onBackupDone?.(null); input.current?.focus() }}
+            onDone={(says) => { onBackupDone?.(says); input.current?.focus() }}
+          />
         )}
         {!reference && !inspect && !compare && keyPanel && (
           <KeyPanel

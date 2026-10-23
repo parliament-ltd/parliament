@@ -7,9 +7,9 @@
 // space (C125, superseding C102), kept under `space` as it is left. Records
 // kept under each arrangement's own key before C125 stay where they are,
 // unread; loadArrangement reads such a record, for when an arrangement can
-// be edited and kept (stage 14). The list is not on the backup allowlist
-// until stage 9 adds the choice; a restore will check each record with
-// cleanArrangement.
+// be edited and kept (stage 14). A backup holds the list only when the
+// layouts category is ticked (stage 9; C182), and a restore checks each
+// record with cleanArrangement.
 //
 // What is read back is checked like anything from outside: unknown boards,
 // places and fields are dropped, and a record that cannot be made sense of

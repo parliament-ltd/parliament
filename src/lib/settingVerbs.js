@@ -95,6 +95,16 @@ const SETTERS = {
     },
     says: () => 'setRoom',
   },
+  // How often to remind about backups, counted from the last one (settings
+  // spec §11; stage 9, piece 2; C182).
+  reminder: {
+    key: 'backupReminder',
+    read([w]) {
+      if (w === 'daily' || w === 'weekly' || w === 'monthly' || w === 'never') return { value: w }
+      return { bad: { message: 'setChoose', values: { name: 'reminder', words: ['set:reminder daily', 'set:reminder weekly', 'set:reminder monthly', 'set:reminder never'] } } }
+    },
+    says: () => 'setReminder',
+  },
 }
 
 // Names that set: answers with a reason rather than a change.
@@ -138,7 +148,7 @@ export function planSet(step, screens = {}) {
   const before = ctx.values?.[setter.key] ?? null
   if (before === r.value) return { says: { message: 'setSame' }, act: null }
   return {
-    says: { message: setter.says(r.value), values: { ...(r.values ?? {}), size: r.value, where: r.value } },
+    says: { message: setter.says(r.value), values: { ...(r.values ?? {}), size: r.value, where: r.value, every: r.value } },
     act: { kind: 'setting', key: setter.key, value: r.value, before },
   }
 }
