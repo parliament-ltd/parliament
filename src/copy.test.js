@@ -6,7 +6,10 @@ const entries = Object.entries(COPY).flatMap(([group, items]) => Object.entries(
 // The welcome page's letter and footer name a few more (stage 5).
 // Names, and the name of a format (Markdown, as the verb glosses allow).
 // Privacy and Anonymous: a provider's own menu names, quoted so a person can find them (C167).
-const PROPER = new Set(['Parliament', "Parliament's", 'I', 'AI', 'API', 'Wikipedia', 'Claude', 'Code', 'MIT', 'Lov', 'Markdown', 'English', 'EU', 'US', 'Privacy', 'Anonymous'])
+const PROPER = new Set(['Parliament', "Parliament's", 'I', 'AI', 'API', 'Wikipedia', 'Claude', 'Code', 'MIT', 'Lov', 'Markdown', 'English', 'EU', 'US', 'Privacy', 'Anonymous',
+  // The key's name, as the keyboard writes it ("when you press Enter"), the
+  // web host the privacy copy names, and an IP address (About; C185).
+  'Enter', 'Parliament’s', 'Netlify', 'IP'])
 
 describe('the copy table', () => {
   it('gives every entry an id and a message, and no id twice', () => {

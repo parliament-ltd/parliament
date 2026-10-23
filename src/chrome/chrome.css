@@ -710,3 +710,9 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-shell button.ch-globe { padding: 0; border: none; background: none; cursor: pointer; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); text-align: start; }
 .ch-shell button.ch-globe:hover, .ch-shell button.ch-globe:focus-visible { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
 .ch-wtop .ch-globe { margin-top: 6px; }
+
+/* ── About: the privacy copy and what leaves the device (stage 9, piece 5; C185). */
+.ch-prose, .ch-leaves { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 8px; max-width: 64ch; }
+.ch-prose-p, .ch-leave { display: block; }
+.ch-prose-p b, .ch-leave b { font-weight: 600; color: var(--ch-ink); }
+.ch-prose-p b { display: block; margin-bottom: 1px; }

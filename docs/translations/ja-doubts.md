@@ -76,3 +76,11 @@ Each: id, the English, my draft, why I was unsure.
     - en: Enter sets {a} and {b} side by side, word by word / # words out, # words in
     - ja: 語ごとに比較します / #語削除、#語追加
     - Japanese is written without spaces between words. If the comparison splits on spaces, a Japanese note compares as a few long "words", and the counts will look odd. The wording is fine; the behaviour may need a look.
+
+## Chunk 14 (Settings, About: privacy copy)
+
+16. Settled: the English now says "the line under the bar" in settings.private1, settings.leavePrompt and settings.leaveTitle; the Japanese uses バーの下の行, as everywhere else.
+
+17. Settled: settings.private3 keeps 私たち.
+
+18. Settled: settings.private2 now says keys are never put in a backup (バックアップに入れられることは決してありません), and encryption only protects a key on disk.

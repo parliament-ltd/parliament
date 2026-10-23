@@ -6,6 +6,7 @@ Each: id, the English, the draft, and why I was unsure.
    English: Type replace to go on
    Draft: Skriv replace för att fortsätta
    Why: the typed word is in the sentence, with no id of its own (erase has erase.word, translated "radera"). I kept "replace" in case the code compares against the English word. If the word can be translated, it should become "ersätt" here and in the code.
+   Settled: chunk 13 added backup.replaceWord, drafted "ersätt", and backup.typeReplace is now "Skriv {word} för att fortsätta".
 
 2. **Example values inside commands** (enter.nameEmpty, enter.headingEmpty, enter.saveName, enter.frameworkNeeds, frameworkPicker.noneYet)
    English: name:"Barn owls", heading:"Causes", save:"Owls this week", new:framework "brief" "keep each answer short", new:framework "name" "what it asks"
@@ -86,3 +87,15 @@ Each: id, the English, the draft, and why I was unsure.
     English: Written under {names}
     Draft: Skrivet enligt {names}
     Why: the inserted names are imperatives ("Visa resonemang", "Säg emot mig"). "Skrivet enligt Visa resonemang" reads a little oddly unless the names are set off on screen.
+
+18. **settings.leaveApp**
+    English: Your browser fetches Parliament’s files from parliament.ltd, hosted by Netlify. Like any web host it sees your IP address and browser type. It never receives your chats or keys.
+    Draft: Din webbläsare hämtar Parliaments filer från parliament.ltd, som ligger hos Netlify. Som alla webbhotell ser Netlify din IP-adress och typ av webbläsare. Det får aldrig dina chattar eller nycklar.
+    Why: the English "it" is the web host. Swedish needed a clear subject, so I named Netlify in the second sentence, and "Det" in the third refers back to it. The claim is unchanged, but please confirm that "it" means Netlify and not parliament.ltd in general.
+    Settled: "it" is the web host, Netlify; the draft stands.
+
+19. **settings.leavesFoot**
+    English: …A new one appears there and in the published policy before it can be used.
+    Draft: …En ny visas där och i den publicerade policyn innan den kan användas.
+    Why: kept "policyn" as unspecific as the English. If it means the privacy policy, "integritetspolicyn" is the word a Swedish reader expects; I did not add it, since the English does not say so.
+    Settled: the English now reads "the security policy the site publishes" (the Content-Security-Policy); the draft is now "i den säkerhetspolicy som webbplatsen publicerar".

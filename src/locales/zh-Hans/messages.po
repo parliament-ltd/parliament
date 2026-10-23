@@ -4494,10 +4494,6 @@ msgstr "未命名房间"
 msgid "settings.aboutDesc"
 msgstr "隐私和网络日志"
 
-#. js-lingui-explicit-id
-msgid "settings.aboutLine"
-msgstr "在你的浏览器中运行：没有服务器，没有账户。请求直接发往你使用的服务商和来源。"
-
 #. The name of the app
 #. js-lingui-explicit-id
 msgid "settings.aboutName"
@@ -4506,6 +4502,10 @@ msgstr "Parliament"
 #. js-lingui-explicit-id
 msgid "settings.aboutTitle"
 msgstr "关于与安全"
+
+#. js-lingui-explicit-id
+msgid "settings.aboutWhat"
+msgstr "一个让你按自己的方式与 AI 协作的地方。MIT 许可证。源代码将在正式发布时公开。"
 
 #. js-lingui-explicit-id
 msgid "settings.addKey"
@@ -4669,6 +4669,86 @@ msgid "settings.lastOn"
 msgstr "{day}。"
 
 #. js-lingui-explicit-id
+msgid "settings.leaveApp"
+msgstr "你的浏览器从 parliament.ltd 获取 Parliament 的文件，该网站由 Netlify 托管。和任何网站托管方一样，它能看到你的 IP 地址和浏览器类型。它从不会收到你的对话或密钥。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveAppHead"
+msgstr "应用本身。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveCheck"
+msgstr "保存或检查密钥时，会向对应的服务商发送一个很小的测试请求。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveCheckHead"
+msgstr "密钥检查。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveKey"
+msgstr "服务商的密钥随请求一起发送，且只发给该服务商。本机上的模型，以及 Wikipedia 这样的来源，都不会收到密钥。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveKeyHead"
+msgstr "你的密钥。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveLocal"
+msgstr "如果你选的是它，提示词就不会离开你的电脑。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveLocalHead"
+msgstr "本机上的模型。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveNothing"
+msgstr "没有数据分析，没有跟踪，没有广告，也不从其他任何网站加载代码。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveNothingHead"
+msgstr "别无其他。"
+
+#. js-lingui-explicit-id
+msgid "settings.leavePrompt"
+msgstr "按下 Enter 时，你的提示词、它所延续的对话以及你附上的任何内容，会从你的浏览器直接发往输入栏下方那一行写明的服务商或来源。不会发往别处。摘要、翻译或检查在发出之前，也会以同样的方式在那一行写明。"
+
+#. js-lingui-explicit-id
+msgid "settings.leavePromptHead"
+msgstr "你的提示词。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveSearch"
+msgstr "搜索由服务商在它那一端执行，因此从你的对话中提取的搜索词会到达它所使用的搜索服务。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveSearchHead"
+msgstr "网页搜索（如果你开启）。"
+
+#. js-lingui-explicit-id
+msgid "settings.leavesFoot"
+msgstr "设置中的“API 密钥”下列出了 Parliament 能访问的每个服务商和来源。新的服务商或来源会先出现在那里，以及本网站公布的安全策略中，然后才能使用。"
+
+#. js-lingui-explicit-id
+msgid "settings.leavesLabel"
+msgstr "哪些内容会离开你的设备"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveTitle"
+msgstr "新对话收到首个回答后，会发一个小请求，让模型生成标题、摘要和标签。发送前，输入栏下方的那一行会说明这一点；也可以在{board}中关闭此功能。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveTitleHead"
+msgstr "新对话的名称。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveVoice"
+msgstr "语音在本设备上转为文字。音频不会离开本设备。如果某个浏览器只能把音频发给其厂商才能做到这一点，Parliament 就不提供语音功能。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveVoiceHead"
+msgstr "语音（如果你使用）。"
+
+#. js-lingui-explicit-id
 msgid "settings.localBlocked"
 msgstr "此浏览器未获准访问它"
 
@@ -4735,6 +4815,42 @@ msgstr "开启：任何内容离开本机之前，电子邮件地址、电话号
 #. js-lingui-explicit-id
 msgid "settings.privacyLabel"
 msgstr "隐私过滤"
+
+#. js-lingui-explicit-id
+msgid "settings.private1"
+msgstr "Parliament 在你的浏览器中运行。你按下 Enter 时，请求会从这里直接发往你使用的服务商和来源。每个请求发送之前，输入栏下方的那一行会写明它的去向。"
+
+#. js-lingui-explicit-id
+msgid "settings.private1Head"
+msgstr "没有服务器，没有账户"
+
+#. js-lingui-explicit-id
+msgid "settings.private2"
+msgstr "每个密钥在保存前都会加密，只会发给它自己的服务商，并且绝不会写入备份。加密能保护磁盘上的密钥。加密无法防范在页面内部运行的代码，因此 Parliament 不从其他任何地方加载代码。"
+
+#. js-lingui-explicit-id
+msgid "settings.private2Head"
+msgstr "密钥在本设备上加密"
+
+#. js-lingui-explicit-id
+msgid "settings.private3"
+msgstr "对话、笔记、高亮和房间都保存在此浏览器中。我们看不到它们，也无法恢复它们，所以请保留一份备份。你发送给服务商的内容，由该服务商按其自己的条款保存。"
+
+#. js-lingui-explicit-id
+msgid "settings.private3Head"
+msgstr "你的内容留在这里"
+
+#. js-lingui-explicit-id
+msgid "settings.private4"
+msgstr "下方的日志按主机分组，列出此页面发出的请求。每个主机都应是你使用的服务商或来源；如果有一个不是，就说明出了问题。它无法显示浏览器自行进行的操作，例如获取应用本身的文件。"
+
+#. js-lingui-explicit-id
+msgid "settings.private4Head"
+msgstr "自己核实"
+
+#. js-lingui-explicit-id
+msgid "settings.privateLabel"
+msgstr "你的数据如何保持私密"
 
 #. js-lingui-explicit-id
 msgid "settings.rail"

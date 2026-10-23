@@ -4494,10 +4494,6 @@ msgstr "nimetön huone"
 msgid "settings.aboutDesc"
 msgstr "Tietosuoja ja verkkoloki"
 
-#. js-lingui-explicit-id
-msgid "settings.aboutLine"
-msgstr "Toimii selaimessasi: ei palvelimia, ei tilejä. Pyynnöt menevät suoraan käyttämillesi palveluntarjoajille ja lähteille."
-
 #. The name of the app
 #. js-lingui-explicit-id
 msgid "settings.aboutName"
@@ -4506,6 +4502,10 @@ msgstr "Parliament"
 #. js-lingui-explicit-id
 msgid "settings.aboutTitle"
 msgstr "Tietoja ja turvallisuus"
+
+#. js-lingui-explicit-id
+msgid "settings.aboutWhat"
+msgstr "Paikka, jossa voit työskennellä tekoälyn kanssa omilla ehdoillasi. MIT-lisenssi. Lähdekoodi julkaistaan lanseerauksessa."
 
 #. js-lingui-explicit-id
 msgid "settings.addKey"
@@ -4669,6 +4669,86 @@ msgid "settings.lastOn"
 msgstr "{day}."
 
 #. js-lingui-explicit-id
+msgid "settings.leaveApp"
+msgstr "Selaimesi hakee Parliamentin tiedostot osoitteesta parliament.ltd, jota Netlify isännöi. Kuten mikä tahansa sivustoja isännöivä palvelu, se näkee IP-osoitteesi ja selaimesi tyypin. Se ei koskaan saa keskustelujasi eikä avaimiasi."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveAppHead"
+msgstr "Itse sovellus."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveCheck"
+msgstr "Avaimen tallentaminen tai tarkistaminen lähettää yhden hyvin pienen testipyynnön kyseiselle palveluntarjoajalle."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveCheckHead"
+msgstr "Avaimen tarkistus."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveKey"
+msgstr "Palveluntarjoajan avain kulkee pyynnön mukana, ja vain kyseiselle palveluntarjoajalle. Omalla koneellasi toimiva malli ja lähde, kuten Wikipedia, eivät saa avainta."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveKeyHead"
+msgstr "Avaimesi."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveLocal"
+msgstr "Jos valitsit sen, kehote ei mene koneesi ulkopuolelle."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveLocalHead"
+msgstr "Malli omalla koneellasi."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveNothing"
+msgstr "Ei analytiikkaa, ei seurantaa, ei mainontaa eikä miltään muulta sivustolta ladattua koodia."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveNothingHead"
+msgstr "Ei mitään muuta."
+
+#. js-lingui-explicit-id
+msgid "settings.leavePrompt"
+msgstr "Kun painat Enter-näppäintä, kehotteesi, keskustelu, jota se jatkaa, ja kaikki liittämäsi menevät selaimestasi suoraan sille palveluntarjoajalle tai lähteelle, joka on nimetty palkin alla olevalla rivillä. Ei minnekään muualle. Yhteenveto, käännös tai tarkistus nimetään tuolla rivillä samalla tavalla ennen kuin se lähtee."
+
+#. js-lingui-explicit-id
+msgid "settings.leavePromptHead"
+msgstr "Kehotteesi."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveSearch"
+msgstr "Palveluntarjoaja tekee haut omalla puolellaan, joten keskustelustasi poimitut hakusanat päätyvät sen käyttämään hakupalveluun."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveSearchHead"
+msgstr "Verkkohaku, jos otat sen käyttöön."
+
+#. js-lingui-explicit-id
+msgid "settings.leavesFoot"
+msgstr "Asetuksissa on kohdassa API-avaimet lueteltu jokainen palveluntarjoaja ja lähde, jonka Parliament voi tavoittaa. Uusi näkyy siellä ja sivuston julkaisemassa suojauskäytännössä ennen kuin sitä voi käyttää."
+
+#. js-lingui-explicit-id
+msgid "settings.leavesLabel"
+msgstr "Mitä laitteeltasi lähtee"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveTitle"
+msgstr "Uuden keskustelun ensimmäisen vastauksen jälkeen yksi pieni pyyntö kysyy mallilta otsikon, yhteenvedon ja tunnisteet. Palkin alla oleva rivi kertoo siitä ennen lähettämistä, ja sen voi poistaa käytöstä kohdassa {board}."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveTitleHead"
+msgstr "Nimi uudelle keskustelulle."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveVoice"
+msgstr "Puhe muutetaan tekstiksi tällä laitteella. Mitään ääntä ei lähde laitteelta. Jos selain pystyy tähän vain lähettämällä äänen valmistajalleen, Parliament ei tarjoa puhesyötettä."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveVoiceHead"
+msgstr "Puhesyöte, jos käytät sitä."
+
+#. js-lingui-explicit-id
 msgid "settings.localBlocked"
 msgstr "Tämä selain ei saanut lupaa tavoittaa sitä"
 
@@ -4735,6 +4815,42 @@ msgstr "Päällä: sähköpostiosoitteet, puhelinnumerot sekä tili- ja korttinu
 #. js-lingui-explicit-id
 msgid "settings.privacyLabel"
 msgstr "Tietosuojasuodatin"
+
+#. js-lingui-explicit-id
+msgid "settings.private1"
+msgstr "Parliament toimii selaimessasi. Pyynnöt menevät täältä suoraan käyttämillesi palveluntarjoajille ja lähteille, kun painat Enter-näppäintä. Palkin alla oleva rivi kertoo ennen lähettämistä, minne kukin pyyntö menee."
+
+#. js-lingui-explicit-id
+msgid "settings.private1Head"
+msgstr "Ei palvelimia, ei tilejä"
+
+#. js-lingui-explicit-id
+msgid "settings.private2"
+msgstr "Jokainen avain salataan ennen tallentamista ja lähetetään vain omalle palveluntarjoajalleen, eikä sitä koskaan tallenneta varmuuskopioon. Salaus suojaa avaimen levyllä. Se ei voi suojata sivun sisällä toimivalta koodilta, joten Parliament ei lataa mitään koodia mistään muualta."
+
+#. js-lingui-explicit-id
+msgid "settings.private2Head"
+msgstr "Avaimet salataan tällä laitteella"
+
+#. js-lingui-explicit-id
+msgid "settings.private3"
+msgstr "Keskustelut, muistiinpanot, korostukset ja huoneet tallennetaan tähän selaimeen. Emme näe niitä emmekä voi palauttaa niitä, joten ota varmuuskopio. Palveluntarjoajalle lähettämäsi on kyseisen palveluntarjoajan hallussa sen omien ehtojen mukaisesti."
+
+#. js-lingui-explicit-id
+msgid "settings.private3Head"
+msgstr "Työsi pysyy täällä"
+
+#. js-lingui-explicit-id
+msgid "settings.private4"
+msgstr "Alla oleva loki luettelee tämän sivun tekemät pyynnöt palvelimen mukaan ryhmiteltyinä. Jokaisen palvelimen pitäisi olla käyttämäsi palveluntarjoaja tai lähde; jos jokin ei ole, jokin on vialla. Se ei voi näyttää sitä, mitä selaimesi tekee omatoimisesti, kuten sovelluksen omien tiedostojen hakemista."
+
+#. js-lingui-explicit-id
+msgid "settings.private4Head"
+msgstr "Tarkista itse"
+
+#. js-lingui-explicit-id
+msgid "settings.privateLabel"
+msgstr "Miten tietosi pysyvät yksityisinä"
 
 #. js-lingui-explicit-id
 msgid "settings.rail"

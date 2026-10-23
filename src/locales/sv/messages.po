@@ -4494,10 +4494,6 @@ msgstr "namnlöst rum"
 msgid "settings.aboutDesc"
 msgstr "Integritet och nätverkslogg"
 
-#. js-lingui-explicit-id
-msgid "settings.aboutLine"
-msgstr "Körs i din webbläsare: inga servrar, inga konton. Förfrågningar går direkt till de leverantörer och källor du använder."
-
 #. The name of the app
 #. js-lingui-explicit-id
 msgid "settings.aboutName"
@@ -4506,6 +4502,10 @@ msgstr "Parliament"
 #. js-lingui-explicit-id
 msgid "settings.aboutTitle"
 msgstr "Om och säkerhet"
+
+#. js-lingui-explicit-id
+msgid "settings.aboutWhat"
+msgstr "En plats där du arbetar med AI på dina egna villkor. MIT-licens. Källkoden publiceras vid lanseringen."
 
 #. js-lingui-explicit-id
 msgid "settings.addKey"
@@ -4669,6 +4669,86 @@ msgid "settings.lastOn"
 msgstr "{day}."
 
 #. js-lingui-explicit-id
+msgid "settings.leaveApp"
+msgstr "Din webbläsare hämtar Parliaments filer från parliament.ltd, som ligger hos Netlify. Som alla webbhotell ser Netlify din IP-adress och typ av webbläsare. Det får aldrig dina chattar eller nycklar."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveAppHead"
+msgstr "Själva appen."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveCheck"
+msgstr "När du sparar eller kontrollerar en nyckel skickas en mycket liten testförfrågan till nyckelns leverantör."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveCheckHead"
+msgstr "En nyckelkontroll."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveKey"
+msgstr "Nyckeln för en leverantör följer med förfrågan, bara till den leverantören. En modell på din egen dator och en källa som Wikipedia får ingen nyckel."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveKeyHead"
+msgstr "Din nyckel."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveLocal"
+msgstr "Om det är vad du har valt går prompten inte längre än till din dator."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveLocalHead"
+msgstr "En modell på din egen dator."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveNothing"
+msgstr "Ingen analys, ingen spårning, ingen reklam och ingen kod som läses in från någon annan webbplats."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveNothingHead"
+msgstr "Inget annat."
+
+#. js-lingui-explicit-id
+msgid "settings.leavePrompt"
+msgstr "När du trycker på Enter går din prompt, konversationen den fortsätter och allt du har bifogat direkt från din webbläsare till den leverantör eller källa som nämns på raden under fältet. Ingen annanstans. En sammanfattning, en översättning eller en kontroll nämns på samma sätt på den raden innan den skickas."
+
+#. js-lingui-explicit-id
+msgid "settings.leavePromptHead"
+msgstr "Din prompt."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveSearch"
+msgstr "Leverantören gör sökningarna på sin sida, så sökord som hämtas ur din chatt når den söktjänst som leverantören använder."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveSearchHead"
+msgstr "Webbsökning, om du slår på den."
+
+#. js-lingui-explicit-id
+msgid "settings.leavesFoot"
+msgstr "Inställningar listar alla leverantörer och källor som Parliament kan nå, under API-nycklar. En ny visas där, och i den säkerhetspolicy som webbplatsen publicerar, innan den kan användas."
+
+#. js-lingui-explicit-id
+msgid "settings.leavesLabel"
+msgstr "Vad som lämnar din enhet"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveTitle"
+msgstr "Efter det första svaret i en ny chatt ber en liten förfrågan en modell om en titel, en sammanfattning och taggar. Raden under fältet säger det innan du skickar, och det kan stängas av i {board}."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveTitleHead"
+msgstr "Ett namn på en ny chatt."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveVoice"
+msgstr "Tal omvandlas till text på den här enheten. Inget ljud lämnar den. Där en webbläsare bara kan göra det genom att skicka ljud till sin tillverkare erbjuder Parliament inte röstinmatning."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveVoiceHead"
+msgstr "Röstinmatning, om du använder den."
+
+#. js-lingui-explicit-id
 msgid "settings.localBlocked"
 msgstr "Den här webbläsaren fick inte nå det"
 
@@ -4735,6 +4815,42 @@ msgstr "På: e-postadresser, telefonnummer samt bank- och kortnummer byts ut mot
 #. js-lingui-explicit-id
 msgid "settings.privacyLabel"
 msgstr "Integritetsfilter"
+
+#. js-lingui-explicit-id
+msgid "settings.private1"
+msgstr "Parliament körs i din webbläsare. Förfrågningar går härifrån direkt till de leverantörer och källor du använder, när du trycker på Enter. Raden under fältet anger vart varje förfrågan går innan den skickas."
+
+#. js-lingui-explicit-id
+msgid "settings.private1Head"
+msgstr "Inga servrar, inga konton"
+
+#. js-lingui-explicit-id
+msgid "settings.private2"
+msgstr "Varje nyckel krypteras innan den sparas, skickas bara till sin egen leverantör och läggs aldrig i en säkerhetskopia. Krypteringen skyddar en nyckel på disken. Den kan inte skydda mot kod som körs i själva sidan, så Parliament läser inte in någon kod från något annat ställe."
+
+#. js-lingui-explicit-id
+msgid "settings.private2Head"
+msgstr "Nycklarna är krypterade på den här enheten"
+
+#. js-lingui-explicit-id
+msgid "settings.private3"
+msgstr "Chattar, anteckningar, markeringar och rum sparas i den här webbläsaren. Vi kan inte se dem och vi kan inte få tillbaka dem, så gör en säkerhetskopia. Det du skickar till en leverantör förvaras av den leverantören enligt dess egna villkor."
+
+#. js-lingui-explicit-id
+msgid "settings.private3Head"
+msgstr "Ditt arbete stannar här"
+
+#. js-lingui-explicit-id
+msgid "settings.private4"
+msgstr "Loggen nedan listar förfrågningarna som den här sidan gör, grupperade efter värd. Varje värd ska vara en leverantör eller källa du använder; om någon inte är det är något fel. Den kan inte visa vad din webbläsare gör på egen hand, till exempel när den hämtar appens egna filer."
+
+#. js-lingui-explicit-id
+msgid "settings.private4Head"
+msgstr "Kontrollera själv"
+
+#. js-lingui-explicit-id
+msgid "settings.privateLabel"
+msgstr "Hur dina data förblir privata"
 
 #. js-lingui-explicit-id
 msgid "settings.rail"

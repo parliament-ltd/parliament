@@ -4494,10 +4494,6 @@ msgstr ""
 msgid "settings.aboutDesc"
 msgstr ""
 
-#. js-lingui-explicit-id
-msgid "settings.aboutLine"
-msgstr ""
-
 #. The name of the app
 #. js-lingui-explicit-id
 msgid "settings.aboutName"
@@ -4505,6 +4501,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "settings.aboutTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.aboutWhat"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4669,6 +4669,86 @@ msgid "settings.lastOn"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "settings.leaveApp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leaveAppHead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leaveCheck"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leaveCheckHead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leaveKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leaveKeyHead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leaveLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leaveLocalHead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leaveNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leaveNothingHead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leavePrompt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leavePromptHead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leaveSearch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leaveSearchHead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leavesFoot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leavesLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leaveTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leaveTitleHead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leaveVoice"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.leaveVoiceHead"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "settings.localBlocked"
 msgstr ""
 
@@ -4734,6 +4814,42 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "settings.privacyLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.private1"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.private1Head"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.private2"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.private2Head"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.private3"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.private3Head"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.private4"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.private4Head"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.privateLabel"
 msgstr ""
 
 #. js-lingui-explicit-id

@@ -6,6 +6,7 @@ Each: id, the English, the draft, and why I was unsure.
    English: Type replace to go on
    Draft: Jatka kirjoittamalla sana replace
    Why: the typed word sits in the sentence with no id of its own, while Delete everything has erase.word (drafted "poista"). I kept "replace" in case the code compares against the English word. If the word can be translated, it should become "korvaa" here and in the code.
+   Settled since: chunk 13 gives the word its own id (backup.replaceWord, "korvaa") and backup.typeReplace now reads "Jatka kirjoittamalla {word}".
 
 2. **Example values inside commands** (enter.nameEmpty, enter.headingEmpty, enter.saveName, enter.frameworkNeeds, frameworkPicker.noneYet)
    English: name:"Barn owls", heading:"Causes", save:"Owls this week", new:framework "brief" "keep each answer short", new:framework "name" "what it asks"
@@ -61,6 +62,18 @@ Each: id, the English, the draft, and why I was unsure.
     English: → {chat} in {room}   (bar reference: → 201a in unnamed room)
     Draft: → {chat}, {room}
     Why: "huoneessa {room}" would read "huoneessa nimetön huone" for an unnamed room, so I dropped the word for "in". It relies on the room name reading as a room.
+
+13. **settings.leavePrompt, settings.leaveTitle, settings.private1** (chunk 14, privacy copy)
+    English: …named on the line under the field.
+    Draft: …nimetty palkin alla olevalla rivillä.
+    Why: the privacy copy says "field" where the rest of the interface says "the bar". The field is the bar, so I kept the glossary's "palkki" so readers meet one name for one thing. If "field" was chosen on purpose for newcomers, "kentän alla oleva rivi" would follow the English word for word.
+    Settled since: the English now says "the line under the bar" too.
+
+14. **settings.leavesFoot** (chunk 14, privacy copy)
+    English: A new one appears there and in the published policy before it can be used.
+    Draft: Uusi näkyy siellä ja julkaistussa tietosuojakäytännössä ennen kuin sitä voi käyttää.
+    Why: Finnish "käytäntö" on its own reads as "practice", so I wrote "tietosuojakäytäntö" (privacy policy). That names which policy, which the English leaves to context. If the published policy is not the privacy policy, "julkaistussa käytännössä" is the literal form.
+    Settled since: the English now says "the security policy the site publishes" (the site's Content-Security-Policy, the hosts the page may connect to). Draft: "sivuston julkaisemassa suojauskäytännössä". "Suojauskäytäntö" follows the Finnish name for Content Security Policy ("sisällön suojauskäytäntö"); "tietoturvakäytäntö" would read as an organisation's IT security rules.
 
 ## Checker warnings: all prose, not commands
 

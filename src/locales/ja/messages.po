@@ -4494,10 +4494,6 @@ msgstr "名前のないルーム"
 msgid "settings.aboutDesc"
 msgstr "プライバシーとネットワークの記録"
 
-#. js-lingui-explicit-id
-msgid "settings.aboutLine"
-msgstr "ブラウザの中で動きます。サーバもアカウントもありません。リクエストは、使っているプロバイダと情報源へ直接送られます。"
-
 #. The name of the app
 #. js-lingui-explicit-id
 msgid "settings.aboutName"
@@ -4506,6 +4502,10 @@ msgstr "Parliament"
 #. js-lingui-explicit-id
 msgid "settings.aboutTitle"
 msgstr "概要とセキュリティ"
+
+#. js-lingui-explicit-id
+msgid "settings.aboutWhat"
+msgstr "自分のやり方でAIと仕事をするための場所。MITライセンス。ソースコードはリリース時に公開します。"
 
 #. js-lingui-explicit-id
 msgid "settings.addKey"
@@ -4669,6 +4669,86 @@ msgid "settings.lastOn"
 msgstr "{day}。"
 
 #. js-lingui-explicit-id
+msgid "settings.leaveApp"
+msgstr "ブラウザは、Netlifyがホストするparliament.ltdから、Parliamentのファイルを取得します。ほかのウェブホストと同じく、ホストにはIPアドレスとブラウザの種類が見えます。チャットやキーをホストが受け取ることは決してありません。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveAppHead"
+msgstr "アプリ本体。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveCheck"
+msgstr "キーを保存または確認すると、そのプロバイダに、ごく小さなテスト用のリクエストを1回送ります。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveCheckHead"
+msgstr "キーの確認。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveKey"
+msgstr "プロバイダのキーはリクエストと一緒に送られ、送り先はそのプロバイダだけです。お使いのコンピュータ上のモデルや、Wikipediaのような情報源には、キーは送られません。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveKeyHead"
+msgstr "キー。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveLocal"
+msgstr "それを選んだ場合、プロンプトはお使いのコンピュータの外には出ません。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveLocalHead"
+msgstr "お使いのコンピュータ上のモデル。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveNothing"
+msgstr "アクセス解析、トラッキング、広告はなく、ほかのサイトから読み込むコードもありません。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveNothingHead"
+msgstr "ほかには何もありません。"
+
+#. js-lingui-explicit-id
+msgid "settings.leavePrompt"
+msgstr "Enterを押すと、プロンプト、それが続ける会話、添付したものが、ブラウザから、バーの下の行に示されたプロバイダか情報源へ直接送られます。ほかへは送られません。要約、翻訳、確認も、送る前に同じようにその行に示されます。"
+
+#. js-lingui-explicit-id
+msgid "settings.leavePromptHead"
+msgstr "プロンプト。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveSearch"
+msgstr "検索はプロバイダ側で行われるため、チャットから取り出された検索語は、プロバイダが使う検索サービスに届きます。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveSearchHead"
+msgstr "ウェブ検索（オンにした場合）。"
+
+#. js-lingui-explicit-id
+msgid "settings.leavesFoot"
+msgstr "設定のAPIキーの欄には、Parliamentが接続できるプロバイダと情報源がすべて載っています。新しいものは、使えるようになる前に、そこと、サイトが公開しているセキュリティポリシーに載ります。"
+
+#. js-lingui-explicit-id
+msgid "settings.leavesLabel"
+msgstr "デバイスの外に出るもの"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveTitle"
+msgstr "新しいチャットの最初の回答のあと、小さなリクエストを1回送り、タイトル、要約、タグをモデルに求めます。送信前にバーの下の行でそのことを示し、{board}でオフにできます。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveTitleHead"
+msgstr "新しいチャットの名前。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveVoice"
+msgstr "音声は、このデバイス上で文字に変換されます。音声がデバイスの外に出ることはありません。音声を開発元に送らなければ変換できないブラウザでは、Parliamentは音声入力を提供しません。"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveVoiceHead"
+msgstr "音声入力（使う場合）。"
+
+#. js-lingui-explicit-id
 msgid "settings.localBlocked"
 msgstr "このブラウザから接続が許可されませんでした"
 
@@ -4735,6 +4815,42 @@ msgstr "オン：このコンピュータの外に何かを送る前に、メー
 #. js-lingui-explicit-id
 msgid "settings.privacyLabel"
 msgstr "プライバシーフィルタ"
+
+#. js-lingui-explicit-id
+msgid "settings.private1"
+msgstr "Parliamentはブラウザの中で動きます。リクエストは、Enterを押したときに、ここから使っているプロバイダと情報源へ直接送られます。送る前に、それぞれの送り先をバーの下の行に示します。"
+
+#. js-lingui-explicit-id
+msgid "settings.private1Head"
+msgstr "サーバもアカウントもなし"
+
+#. js-lingui-explicit-id
+msgid "settings.private2"
+msgstr "各キーは保存される前に暗号化され、それぞれのプロバイダにだけ送られ、バックアップに入れられることは決してありません。暗号化は、ディスク上のキーを守ります。ページ内で動くコードからは守れないため、Parliamentはほかの場所からコードを読み込みません。"
+
+#. js-lingui-explicit-id
+msgid "settings.private2Head"
+msgstr "キーはこのデバイスで暗号化されます"
+
+#. js-lingui-explicit-id
+msgid "settings.private3"
+msgstr "チャット、メモ、ハイライト、ルームは、このブラウザに保存されます。私たちはそれを見ることも復元することもできないため、バックアップを取っておいてください。プロバイダに送った内容は、そのプロバイダが独自の規約に基づいて保持します。"
+
+#. js-lingui-explicit-id
+msgid "settings.private3Head"
+msgstr "作ったものはここに残ります"
+
+#. js-lingui-explicit-id
+msgid "settings.private4"
+msgstr "下の記録には、このページが送るリクエストがホストごとに表示されます。どのホストも、使っているプロバイダか情報源のはずです。そうでないものがあれば、何かがおかしいということです。アプリ自身のファイルの取得など、ブラウザが独自に行うことは表示できません。"
+
+#. js-lingui-explicit-id
+msgid "settings.private4Head"
+msgstr "自分で確かめる"
+
+#. js-lingui-explicit-id
+msgid "settings.privateLabel"
+msgstr "データのプライバシーを保つ仕組み"
 
 #. js-lingui-explicit-id
 msgid "settings.rail"

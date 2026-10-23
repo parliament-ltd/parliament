@@ -4494,10 +4494,6 @@ msgstr "unnamed room"
 msgid "settings.aboutDesc"
 msgstr "Privacy and the network log"
 
-#. js-lingui-explicit-id
-msgid "settings.aboutLine"
-msgstr "Runs in your browser: no servers, no accounts. Requests go straight to the providers and sources you use."
-
 #. The name of the app
 #. js-lingui-explicit-id
 msgid "settings.aboutName"
@@ -4506,6 +4502,10 @@ msgstr "Parliament"
 #. js-lingui-explicit-id
 msgid "settings.aboutTitle"
 msgstr "About and security"
+
+#. js-lingui-explicit-id
+msgid "settings.aboutWhat"
+msgstr "A place to work with AI on your own terms. MIT licensed. Source published at launch."
 
 #. js-lingui-explicit-id
 msgid "settings.addKey"
@@ -4669,6 +4669,86 @@ msgid "settings.lastOn"
 msgstr "{day}."
 
 #. js-lingui-explicit-id
+msgid "settings.leaveApp"
+msgstr "Your browser fetches Parliament’s files from parliament.ltd, hosted by Netlify. Like any web host it sees your IP address and browser type. It never receives your chats or keys."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveAppHead"
+msgstr "The app itself."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveCheck"
+msgstr "Saving or checking a key sends one very small test request to that provider."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveCheckHead"
+msgstr "A key check."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveKey"
+msgstr "The key for a provider travels with the request, to that provider only. A model on your own machine and a source such as Wikipedia get no key."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveKeyHead"
+msgstr "Your key."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveLocal"
+msgstr "If that is what you chose, the prompt goes no further than your computer."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveLocalHead"
+msgstr "A model on your own machine."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveNothing"
+msgstr "No analytics, no tracking, no advertising, and no code loaded from any other site."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveNothingHead"
+msgstr "Nothing else."
+
+#. js-lingui-explicit-id
+msgid "settings.leavePrompt"
+msgstr "When you press Enter, your prompt, the conversation it continues and anything you attached go straight from your browser to the provider or source named on the line under the bar. Nowhere else. A summary, a translation or a check is named on that line the same way before it goes."
+
+#. js-lingui-explicit-id
+msgid "settings.leavePromptHead"
+msgstr "Your prompt."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveSearch"
+msgstr "The provider runs the searches on its side, so search terms drawn from your chat reach the search service it uses."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveSearchHead"
+msgstr "Web search, if you switch it on."
+
+#. js-lingui-explicit-id
+msgid "settings.leavesFoot"
+msgstr "Settings lists every provider and source Parliament can reach, under API keys. A new one appears there, and in the security policy the site publishes, before it can be used."
+
+#. js-lingui-explicit-id
+msgid "settings.leavesLabel"
+msgstr "What leaves your device"
+
+#. js-lingui-explicit-id
+msgid "settings.leaveTitle"
+msgstr "After the first answer in a new chat, one small request asks a model for a title, a summary and tags. The line under the bar says so before you send, and {board} can turn it off."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveTitleHead"
+msgstr "A name for a new chat."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveVoice"
+msgstr "Speech is turned into text on this device. No audio leaves it. Where a browser can only do this by sending audio to its maker, Parliament does not offer voice."
+
+#. js-lingui-explicit-id
+msgid "settings.leaveVoiceHead"
+msgstr "Voice, if you use it."
+
+#. js-lingui-explicit-id
 msgid "settings.localBlocked"
 msgstr "This browser was not allowed to reach it"
 
@@ -4735,6 +4815,42 @@ msgstr "On: email addresses, phone numbers, bank and card numbers are swapped fo
 #. js-lingui-explicit-id
 msgid "settings.privacyLabel"
 msgstr "Privacy filter"
+
+#. js-lingui-explicit-id
+msgid "settings.private1"
+msgstr "Parliament runs in your browser. Requests go from here straight to the providers and sources you use, when you press Enter. The line under the bar names where each one goes before it is sent."
+
+#. js-lingui-explicit-id
+msgid "settings.private1Head"
+msgstr "No servers, no accounts"
+
+#. js-lingui-explicit-id
+msgid "settings.private2"
+msgstr "Each key is encrypted before it is stored, is sent only to its own provider, and is never put in a backup. Encryption protects a key on disk. It cannot protect against code running inside the page, so Parliament loads no code from anywhere else."
+
+#. js-lingui-explicit-id
+msgid "settings.private2Head"
+msgstr "Keys are encrypted on this device"
+
+#. js-lingui-explicit-id
+msgid "settings.private3"
+msgstr "Chats, notes, highlights and rooms are stored in this browser. We cannot see them and we cannot recover them, so keep a backup. What you send to a provider is held by that provider under its own terms."
+
+#. js-lingui-explicit-id
+msgid "settings.private3Head"
+msgstr "Your work stays here"
+
+#. js-lingui-explicit-id
+msgid "settings.private4"
+msgstr "The log below lists the requests this page makes, grouped by host. Every host should be a provider or source you use; if one is not, something is wrong. It cannot show what your browser does by itself, such as fetching the app’s own files."
+
+#. js-lingui-explicit-id
+msgid "settings.private4Head"
+msgstr "Check it yourself"
+
+#. js-lingui-explicit-id
+msgid "settings.privateLabel"
+msgstr "How your data stays private"
 
 #. js-lingui-explicit-id
 msgid "settings.rail"

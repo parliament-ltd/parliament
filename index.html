@@ -20,8 +20,8 @@
     <meta name="apple-mobile-web-app-title" content="Parliament" />
     <link rel="apple-touch-icon" href="/parliament_logo.png" />
 
-    <!-- Reduce first-API-call latency; already permitted by CSP connect-src -->
-    <link rel="preconnect" href="https://api.anthropic.com" />
+    <!-- No connection to a provider is opened on load: nothing reaches one
+         before Enter (privacy-copy-draft.md; plan-brief rule 4; C185). -->
   </head>
   <body>
     <div id="root"></div>

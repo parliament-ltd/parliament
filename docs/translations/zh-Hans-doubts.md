@@ -104,3 +104,20 @@ Lines drafted but not sure of. Each gives the id, the English, the draft, and wh
     - EN: One column and a sheet
     - ZH: 单栏加底部抽屉
     - Why: mobile "bottom sheet" has no settled Chinese name; 底部抽屉 and 底部弹层 are both used. 面板 was avoided because it means board here.
+
+## Privacy copy (chunk 14)
+
+20. **settings.leaveApp** (settled)
+    - EN: … It never receives your chats or keys.
+    - ZH: … 它从不会收到你的对话或密钥。
+    - Why: was 绝不. Changed to 从不, the plainer equal for a statement of fact about the web host, after the coordinator left it to my judgement. Promises elsewhere keep 绝不 (绝不包含你的密钥).
+
+21. **settings.leavesFoot** (settled)
+    - EN: … A new one appears there, and in the security policy the site publishes, before it can be used.
+    - ZH: … 新的服务商或来源会先出现在那里，以及本网站公布的安全策略中，然后才能使用。
+    - Why: the English now names the security policy (the Content-Security-Policy, the list of hosts the page may connect to), so 安全策略 replaces the earlier 已公布的政策. Left open: 内容安全策略 is the standard term for CSP if the exact name is wanted.
+
+22. **settings.private3Head**
+    - EN: Your work stays here
+    - ZH: 你的内容留在这里
+    - Why: "work" as 内容 (what you made); 你的工作成果 is closer but long for a lead-in.

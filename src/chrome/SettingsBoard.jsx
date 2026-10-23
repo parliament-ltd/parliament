@@ -318,7 +318,21 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
           {/* About (settings spec §13) */}
           <section data-sec="about" className={`ch-sec${visible('about') ? '' : ' hidden'}`} aria-labelledby="sec-about">
             <SecHead id="about" title={say(TITLE.about)} />
-            <Row {...rowProps('about', 'parliament')} label={say(COPY.settings.aboutName)} help={say(COPY.settings.aboutLine)} />
+            <Row {...rowProps('about', 'parliament')} label={say(COPY.settings.aboutName)} help={say(COPY.settings.aboutWhat)} />
+            {/* The privacy copy (T2; privacy-copy-draft.md; C185). */}
+            <Row {...rowProps('about', 'private')} label={say(COPY.settings.privateLabel)} stack
+              help={<span className="ch-prose">{PRIVATE.map(([head, text]) => (
+                <span key={head} className="ch-prose-p"><b>{say(COPY.settings[head])}</b> {say(COPY.settings[text])}</span>
+              ))}</span>}
+            />
+            <Row {...rowProps('about', 'leaves')} label={say(COPY.settings.leavesLabel)} stack
+              help={<>
+                <span className="ch-leaves">{LEAVES.map(([head, text]) => (
+                  <span key={head} className="ch-leave"><b>{say(COPY.settings[head])}</b> {say(COPY.settings[text], { board: say(COPY.boards.settings) })}</span>
+                ))}</span>
+                {say(COPY.settings.leavesFoot)}
+              </>}
+            />
             <Row {...rowProps('about', 'network')} label={say(COPY.settings.networkLabel)} stack
               help={<>
                 {say(COPY.settings.networkHelp)}
@@ -343,6 +357,15 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
     </article>
   )
 }
+
+// The privacy copy's paragraphs and the one list of what leaves the device,
+// in order (privacy-copy-draft.md; C185): each a heading and its words.
+const PRIVATE = [['private1Head', 'private1'], ['private2Head', 'private2'], ['private3Head', 'private3'], ['private4Head', 'private4']]
+const LEAVES = [
+  ['leavePromptHead', 'leavePrompt'], ['leaveLocalHead', 'leaveLocal'], ['leaveKeyHead', 'leaveKey'], ['leaveCheckHead', 'leaveCheck'],
+  ['leaveTitleHead', 'leaveTitle'], ['leaveSearchHead', 'leaveSearch'], ['leaveVoiceHead', 'leaveVoice'], ['leaveAppHead', 'leaveApp'],
+  ['leaveNothingHead', 'leaveNothing'],
+]
 
 // A section's head: its title, and its alias, the word typed after
 // open:settings, shown the way ids are (settings spec §2).
@@ -381,7 +404,12 @@ function rowWords(facts) {
       danger: 'delete everything erase wipe remove all danger',
     },
     appearance: { ...(facts.languages ? { language: 'language languages translate translation interface page globe' } : {}), text: 'text size font compact large zoom' },
-    about: { parliament: 'parliament version about servers accounts', network: 'network activity requests log hosts' },
+    about: {
+      parliament: 'parliament version about licence license source',
+      private: 'privacy private data security servers accounts local encrypted keys',
+      leaves: 'leaves device sent send network prompt key title search voice host analytics tracking',
+      network: 'network activity requests log hosts',
+    },
   }
 }
 
