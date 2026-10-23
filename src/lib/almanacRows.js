@@ -22,7 +22,7 @@
 
 import { isV6 } from './records'
 import { roomName } from './roomNames'
-import { costOf } from './chatFacts'
+import { costOf, costsByMonth } from './chatFacts'
 import { letterAt } from './addresses'
 
 /** The kinds of row, in the order the type filter lists them. */
@@ -121,6 +121,8 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
       ...placeOf(c.id),
       // A chat whose insides were not read has no known cost.
       marks: [...(marks.get(c.id) ?? [])], models: f.models, sources: f.sources, cost: facts.has(c.id) ? costOf(f, priceOf) : null,
+      // Its cost by month, for Settings' spending (stage 9; C181).
+      monthCosts: facts.has(c.id) ? costsByMonth(f, priceOf) : null,
       collections: [...chatIn(c.id)], words: f.words,
     }
     rows.push(row)

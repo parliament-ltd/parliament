@@ -2015,6 +2015,15 @@ msgid "enter.openSaved"
 msgstr "Enter shows the saved search {name}"
 
 #. js-lingui-explicit-id
+msgid "enter.openSettingsAt"
+msgstr "Enter opens {board} at {section}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.openSettingsNone"
+msgstr "Settings has no section called {word}. The sections are keys, spending, context, data, appearance and about"
+
+#. js-lingui-explicit-id
 msgid "enter.openSummary"
 msgstr "Enter starts {next} from a summary of {address}: one call to {name}, about {tokens, number} tokens, {cost}"
 
@@ -2670,6 +2679,10 @@ msgid "enter.searchRecords"
 msgstr "Search works on {first} and {second} for now"
 
 #. js-lingui-explicit-id
+msgid "enter.searchSettings"
+msgstr "{count, plural, =0 {No setting matches} one {# setting matches} other {# settings match}}"
+
+#. js-lingui-explicit-id
 msgid "enter.searchShows"
 msgstr "{count, plural, =0 {No row matches} one {# row matches} other {# rows match}}"
 
@@ -2677,6 +2690,108 @@ msgstr "{count, plural, =0 {No row matches} one {# row matches} other {# rows ma
 #. js-lingui-explicit-id
 msgid "enter.sequence"
 msgstr "{count, plural, one {Enter runs # command: {verbs}} other {Enter runs # commands in turn: {verbs}}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setChoose"
+msgstr "set:{name} takes {words}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setCompress"
+msgstr "Automatic compression is gone: it would write a branch without asking. open:201a summary makes one when you ask"
+
+#. js-lingui-explicit-id
+msgid "enter.setDefault"
+msgstr "Enter makes {name} the model for new chats, and for chats that have not chosen one"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setDefaultNone"
+msgstr "No model called {word}. by: shows who can answer"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setDefaultSource"
+msgstr "{name} is a source. The model for new chats is a model; by: chooses a source for one chat"
+
+#. js-lingui-explicit-id
+msgid "enter.setFinishOff"
+msgstr "Enter stops a reply when you leave its chat, and says so"
+
+#. js-lingui-explicit-id
+msgid "enter.setFinishOn"
+msgstr "Enter lets a reply finish when you leave its chat"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setKey"
+msgstr "Keys go in their own field, never the bar, which keeps a history. api: opens it"
+
+#. js-lingui-explicit-id
+msgid "enter.setKeysForget"
+msgstr "Enter holds your keys for this tab only and removes the saved copies. You enter them again each visit"
+
+#. js-lingui-explicit-id
+msgid "enter.setKeysRemember"
+msgstr "Enter keeps your keys in this browser, encrypted, until you remove them"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setList"
+msgstr "set: changes a setting: {words}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setNeeds"
+msgstr "set:{name} needs a value. For example: {example}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setNothing"
+msgstr "set:{name} changes nothing in Parliament today, so it is not offered"
+
+#. js-lingui-explicit-id
+msgid "enter.setRegion"
+msgstr "{where, select, eu {Enter has {provider} process your prompts in the EU, at 1.1 times the price} us {Enter has {provider} process your prompts in the US, at 1.1 times the price} other {Enter lets {provider} process your prompts anywhere, at its usual price}}"
+
+#. js-lingui-explicit-id
+msgid "enter.setRoom"
+msgstr "Enter starts new chats in {room}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setRoomList"
+msgstr "set:room takes a room from the library: {names}"
+
+#. js-lingui-explicit-id
+msgid "enter.setRoomNone"
+msgstr "No room called {word} in the library. The rooms are {names}"
+
+#. js-lingui-explicit-id
+msgid "enter.setRoomWhich"
+msgstr "More than one room is called {word}: {names}"
+
+#. js-lingui-explicit-id
+msgid "enter.setSame"
+msgstr "That is the setting already"
+
+#. js-lingui-explicit-id
+msgid "enter.setText"
+msgstr "{size, select, compact {Enter makes the text compact} large {Enter makes the text large} other {Enter puts the text back to its usual size}}"
+
+#. js-lingui-explicit-id
+msgid "enter.setTitleOff"
+msgstr "Enter turns off naming new chats: a new chat is named from its first words, with no request"
+
+#. js-lingui-explicit-id
+msgid "enter.setTitleOn"
+msgstr "Enter turns on naming new chats: after a chat’s first answer, one small request names it"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setUnknown"
+msgstr "No setting called {word}. set: takes {words}"
 
 #. js-lingui-explicit-id
 msgid "enter.showRoom"
@@ -3976,6 +4091,372 @@ msgstr "This room could not be drawn. Its chat is kept as it was."
 #. js-lingui-explicit-id
 msgid "room.unnamed"
 msgstr "unnamed room"
+
+#. js-lingui-explicit-id
+msgid "settings.aboutDesc"
+msgstr "Privacy and the network log"
+
+#. js-lingui-explicit-id
+msgid "settings.aboutLine"
+msgstr "Runs in your browser: no servers, no accounts. Requests go straight to the providers and sources you use."
+
+#. The name of the app
+#. js-lingui-explicit-id
+msgid "settings.aboutName"
+msgstr "Parliament"
+
+#. js-lingui-explicit-id
+msgid "settings.aboutTitle"
+msgstr "About and security"
+
+#. js-lingui-explicit-id
+msgid "settings.addKey"
+msgstr "add a key to use it"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "settings.apiFrom"
+msgstr "{command} opens its key field from anywhere"
+
+#. js-lingui-explicit-id
+msgid "settings.appearanceDesc"
+msgstr "Text size"
+
+#. js-lingui-explicit-id
+msgid "settings.appearanceTitle"
+msgstr "Appearance"
+
+#. js-lingui-explicit-id
+msgid "settings.contextDesc"
+msgstr "How a new chat starts"
+
+#. js-lingui-explicit-id
+msgid "settings.contextLede"
+msgstr "How a new chat starts, and what goes along with your prompts."
+
+#. js-lingui-explicit-id
+msgid "settings.contextTitle"
+msgstr "Context and defaults"
+
+#. js-lingui-explicit-id
+msgid "settings.dataDesc"
+msgstr "What this browser keeps"
+
+#. js-lingui-explicit-id
+msgid "settings.dataLede"
+msgstr "Everything lives in this browser. A backup is the only copy anywhere else."
+
+#. js-lingui-explicit-id
+msgid "settings.dataTitle"
+msgstr "Data and backups"
+
+#. js-lingui-explicit-id
+msgid "settings.defaultLabel"
+msgstr "The model for new chats"
+
+#. js-lingui-explicit-id
+msgid "settings.finishLabel"
+msgstr "Finish replies when I leave a chat"
+
+#. js-lingui-explicit-id
+msgid "settings.finishOff"
+msgstr "Leaving a chat stops its reply, and says so."
+
+#. js-lingui-explicit-id
+msgid "settings.finishOn"
+msgstr "A reply goes on writing after you leave its chat."
+
+#. js-lingui-explicit-id
+msgid "settings.helperIs"
+msgstr "{name} reads text from sources: translations, summaries and checks."
+
+#. js-lingui-explicit-id
+msgid "settings.helperLabel"
+msgstr "Helper"
+
+#. js-lingui-explicit-id
+msgid "settings.helperNone"
+msgstr "None yet: a model on this computer, or a key, would give one."
+
+#. js-lingui-explicit-id
+msgid "settings.isDefault"
+msgstr "the model for new chats"
+
+#. js-lingui-explicit-id
+msgid "settings.keepForget"
+msgstr "Don’t save"
+
+#. js-lingui-explicit-id
+msgid "settings.keepForgetHelp"
+msgstr "Held for this tab only. You enter them again each visit"
+
+#. js-lingui-explicit-id
+msgid "settings.keepingHelp"
+msgstr "Keys are encrypted by this browser before they are kept, and each goes only to the provider it belongs to. They never pass through the bar, which keeps a history."
+
+#. js-lingui-explicit-id
+msgid "settings.keepingLabel"
+msgstr "Keeping keys"
+
+#. js-lingui-explicit-id
+msgid "settings.keepRemember"
+msgstr "Remember my keys"
+
+#. js-lingui-explicit-id
+msgid "settings.keepRememberHelp"
+msgstr "Kept in this browser, encrypted, until you remove them"
+
+#. js-lingui-explicit-id
+msgid "settings.keptNo"
+msgstr "This browser may clear it when space runs low; a backup keeps a copy."
+
+#. js-lingui-explicit-id
+msgid "settings.keptUnknown"
+msgstr "This browser does not say whether it keeps it."
+
+#. js-lingui-explicit-id
+msgid "settings.keptYes"
+msgstr "This browser has agreed to keep it."
+
+#. js-lingui-explicit-id
+msgid "settings.keyHas"
+msgstr "Key ends {ending}"
+
+#. js-lingui-explicit-id
+msgid "settings.keyHeld"
+msgstr "Key ends {ending}, kept for this tab only"
+
+#. js-lingui-explicit-id
+msgid "settings.keyNone"
+msgstr "Needs a key"
+
+#. js-lingui-explicit-id
+msgid "settings.keysDesc"
+msgstr "Providers, keys and models"
+
+#. js-lingui-explicit-id
+msgid "settings.keysLede"
+msgstr "Each provider’s key sits with the models it unlocks. Pick one as the model for new chats. Marks compare cost against {model}: ×15 costs fifteen times as much per token."
+
+#. js-lingui-explicit-id
+msgid "settings.keysTitle"
+msgstr "API keys"
+
+#. js-lingui-explicit-id
+msgid "settings.lastLabel"
+msgstr "Last backup"
+
+#. js-lingui-explicit-id
+msgid "settings.lastNever"
+msgstr "None yet."
+
+#. js-lingui-explicit-id
+msgid "settings.lastOn"
+msgstr "{day}."
+
+#. js-lingui-explicit-id
+msgid "settings.localBlocked"
+msgstr "This browser was not allowed to reach it"
+
+#. js-lingui-explicit-id
+msgid "settings.localChecking"
+msgstr "Checking"
+
+#. js-lingui-explicit-id
+msgid "settings.localFound"
+msgstr "{count, plural, =0 {Found, with no models} one {Found, with # model} other {Found, with # models}}"
+
+#. js-lingui-explicit-id
+msgid "settings.localMissing"
+msgstr "Not found on this computer"
+
+#. js-lingui-explicit-id
+msgid "settings.localUnchecked"
+msgstr "Not checked yet. Nothing is asked of this computer until you check"
+
+#. js-lingui-explicit-id
+msgid "settings.monthLabel"
+msgstr "This month"
+
+#. js-lingui-explicit-id
+msgid "settings.monthSpent"
+msgstr "{count, plural, =0 {Nothing spent in {month} yet.} one {{cost} spent in {month}, in # chat. Estimated from token counts; your provider’s bill is the record.} other {{cost} spent in {month}, across # chats. Estimated from token counts; your provider’s bill is the record.}}"
+
+#. js-lingui-explicit-id
+msgid "settings.monthUnknown"
+msgstr "{count, plural, one {The cost of # chat is not known: a reply recorded no tokens.} other {The cost of # chats is not known: some replies recorded no tokens.}}"
+
+#. js-lingui-explicit-id
+msgid "settings.networkHelp"
+msgstr "Requests made by this page since it loaded, grouped by host and named by who called them. Every host should be a provider or source you use; if one is not, something is wrong."
+
+#. js-lingui-explicit-id
+msgid "settings.networkLabel"
+msgstr "Network activity"
+
+#. js-lingui-explicit-id
+msgid "settings.networkNone"
+msgstr "No requests yet."
+
+#. js-lingui-explicit-id
+msgid "settings.networkSelf"
+msgstr "this page"
+
+#. js-lingui-explicit-id
+msgid "settings.networkUnknown"
+msgstr "not a provider or source on the list"
+
+#. js-lingui-explicit-id
+msgid "settings.privacy_names"
+msgstr "On, with names: people’s names are swapped too, found by a model on this computer."
+
+#. js-lingui-explicit-id
+msgid "settings.privacy_off"
+msgstr "Off. The line under the bar offers it when a prompt holds an email address, a phone number or similar."
+
+#. js-lingui-explicit-id
+msgid "settings.privacy_patterns"
+msgstr "On: email addresses, phone numbers, bank and card numbers are swapped for placeholders before anything leaves this computer."
+
+#. js-lingui-explicit-id
+msgid "settings.privacyLabel"
+msgstr "Privacy filter"
+
+#. js-lingui-explicit-id
+msgid "settings.rail"
+msgstr "Settings, by section"
+
+#. js-lingui-explicit-id
+msgid "settings.regionEu"
+msgstr "EU"
+
+#. js-lingui-explicit-id
+msgid "settings.regionGlobal"
+msgstr "Anywhere"
+
+#. js-lingui-explicit-id
+msgid "settings.regionHelp"
+msgstr "Chosen by you, never from your network address. Keeping to a region costs 1.1 times as much."
+
+#. js-lingui-explicit-id
+msgid "settings.regionLabel"
+msgstr "Where {provider} processes prompts"
+
+#. js-lingui-explicit-id
+msgid "settings.regionUs"
+msgstr "US"
+
+#. js-lingui-explicit-id
+msgid "settings.replyAny"
+msgstr "Replies come in the language you write in."
+
+#. js-lingui-explicit-id
+msgid "settings.replyIn"
+msgstr "Replies come in {language}."
+
+#. js-lingui-explicit-id
+msgid "settings.replyLabel"
+msgstr "Reply language"
+
+#. js-lingui-explicit-id
+msgid "settings.roomHelp"
+msgstr "The room a new chat, and its plan, start in."
+
+#. js-lingui-explicit-id
+msgid "settings.roomLabel"
+msgstr "Room for new chats"
+
+#. js-lingui-explicit-id
+msgid "settings.sources"
+msgstr "Sources"
+
+#. js-lingui-explicit-id
+msgid "settings.sourcesHelp"
+msgstr "No key needed. A source is asked a search and answers with what it finds, so it costs nothing."
+
+#. js-lingui-explicit-id
+msgid "settings.spendingDesc"
+msgstr "This month, in dollars"
+
+#. js-lingui-explicit-id
+msgid "settings.spendingLede"
+msgstr "Marks are for choosing; this section is in dollars, because it is the bill."
+
+#. js-lingui-explicit-id
+msgid "settings.spendingTitle"
+msgstr "Spending"
+
+#. js-lingui-explicit-id
+msgid "settings.storageCounts"
+msgstr "{chats, plural, one {# chat} other {# chats}}, {plans, plural, one {# plan} other {# plans}}, {markings, plural, one {# marking} other {# markings}}."
+
+#. js-lingui-explicit-id
+msgid "settings.storageLabel"
+msgstr "Storage"
+
+#. js-lingui-explicit-id
+msgid "settings.storageUsed"
+msgstr "{used} used of about {quota} this browser allows."
+
+#. js-lingui-explicit-id
+msgid "settings.textCompact"
+msgstr "Compact"
+
+#. js-lingui-explicit-id
+msgid "settings.textDefault"
+msgstr "Default"
+
+#. js-lingui-explicit-id
+msgid "settings.textHelp"
+msgstr "Every board, and the rooms, follow it."
+
+#. js-lingui-explicit-id
+msgid "settings.textLabel"
+msgstr "Text size"
+
+#. js-lingui-explicit-id
+msgid "settings.textLarge"
+msgstr "Large"
+
+#. js-lingui-explicit-id
+msgid "settings.thinkingLabel"
+msgstr "Thinking first"
+
+#. js-lingui-explicit-id
+msgid "settings.thinkingOff"
+msgstr "Off: models answer straight away, which is many times faster on a computer."
+
+#. js-lingui-explicit-id
+msgid "settings.thinkingOn"
+msgstr "Models that can think do so before answering, shown as they go."
+
+#. js-lingui-explicit-id
+msgid "settings.titleLabel"
+msgstr "Name new chats"
+
+#. js-lingui-explicit-id
+msgid "settings.titleOff"
+msgstr "A new chat is named from its first words, with no request."
+
+#. js-lingui-explicit-id
+msgid "settings.titleOn"
+msgstr "After a chat’s first answer, one small request names it, said first under the bar."
+
+#. js-lingui-explicit-id
+msgid "settings.translateLabel"
+msgstr "Translate questions to sources"
+
+#. js-lingui-explicit-id
+msgid "settings.translateOff"
+msgstr "Questions go to sources as you write them."
+
+#. js-lingui-explicit-id
+msgid "settings.translateOn"
+msgstr "A question to a source that reads only English goes translated first."
+
+#. js-lingui-explicit-id
+msgid "settings.untitled"
+msgstr "Untitled"
 
 #. Marginalia on the board the navy rule is on
 #. js-lingui-explicit-id

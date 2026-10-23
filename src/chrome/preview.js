@@ -33,6 +33,7 @@ import { planReply, planHelper, planTranslate, planPrivacy, planCheck, queryLine
 import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
+import { planSet } from '../lib/settingVerbs'
 import { findPrivate, KINDS as PRIVATE_KINDS } from '../lib/privacyFilter'
 import { searchWords } from '../lib/searchWords'
 
@@ -53,7 +54,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'erase', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -670,6 +671,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       to: (a1, s1, sc) => planTo(s1, sc),
       include: (a1, s1, sc) => planInclude(s1, sc),
       again: (a1, s1, sc) => planAgain(s1, sc),
+      // set: on Settings (stage 9; C181); a block's settings come with the Lab.
+      set: (a1, s1, sc) => (a1.addressed === 'settings' ? planSet(s1, sc) : null),
     }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }

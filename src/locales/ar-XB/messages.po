@@ -2015,6 +2015,15 @@ msgid "enter.openSaved"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.openSettingsAt"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.openSettingsNone"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.openSummary"
 msgstr ""
 
@@ -2670,12 +2679,118 @@ msgid "enter.searchRecords"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.searchSettings"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.searchShows"
 msgstr ""
 
 #. {verbs} lists the commands in the order they run; one that fails stops the rest
 #. js-lingui-explicit-id
 msgid "enter.sequence"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setChoose"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setCompress"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setDefault"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setDefaultNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setDefaultSource"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setFinishOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setFinishOn"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setKeysForget"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setKeysRemember"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setList"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setNeeds"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setRegion"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setRoom"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setRoomList"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setRoomNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setRoomWhich"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setText"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setTitleOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setTitleOn"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setUnknown"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3975,6 +4090,372 @@ msgstr ""
 #. A room with no name of its own (bar reference)
 #. js-lingui-explicit-id
 msgid "room.unnamed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.aboutDesc"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.aboutLine"
+msgstr ""
+
+#. The name of the app
+#. js-lingui-explicit-id
+msgid "settings.aboutName"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.aboutTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.addKey"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "settings.apiFrom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.appearanceDesc"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.appearanceTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.contextDesc"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.contextLede"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.contextTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.dataDesc"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.dataLede"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.dataTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.defaultLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.finishLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.finishOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.finishOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.helperIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.helperLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.helperNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.isDefault"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keepForget"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keepForgetHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keepingHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keepingLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keepRemember"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keepRememberHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keptNo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keptUnknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keptYes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keyHas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keyHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keyNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keysDesc"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keysLede"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keysTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.lastLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.lastNever"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.lastOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.localBlocked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.localChecking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.localFound"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.localMissing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.localUnchecked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.monthLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.monthSpent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.monthUnknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.networkHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.networkLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.networkNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.networkSelf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.networkUnknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.privacy_names"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.privacy_off"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.privacy_patterns"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.privacyLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.rail"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.regionEu"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.regionGlobal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.regionHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.regionLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.regionUs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.replyAny"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.replyIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.replyLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.roomHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.roomLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.sources"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.sourcesHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.spendingDesc"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.spendingLede"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.spendingTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.storageCounts"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.storageLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.storageUsed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.textCompact"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.textDefault"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.textHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.textLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.textLarge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.thinkingLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.thinkingOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.thinkingOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.titleLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.titleOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.titleOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.translateLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.translateOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.translateOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.untitled"
 msgstr ""
 
 #. Marginalia on the board the navy rule is on

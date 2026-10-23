@@ -33,6 +33,10 @@ export function factsOf(chat, messages = [], document = null) {
   const sources = new Set()
   const usage = []
   let unpriced = 0
+  // The month of each reply, for Settings' spending (stage 9; C181).
+  const months = {}
+  const monthOf = (m) => (typeof m.createdAt === 'string' ? m.createdAt.slice(0, 7) : 'unknown')
+  const inMonth = (m) => (months[monthOf(m)] ??= { usage: [], unpriced: 0 })
   const words = []
   for (const m of messages) {
     if (m?.content) words.push(lower(m.content))
@@ -40,13 +44,30 @@ export function factsOf(chat, messages = [], document = null) {
     if (m.source?.id) { sources.add(m.source.id); continue } // a source costs nothing
     const model = m.model || chat?.model || null
     if (model) models.add(model)
-    if (m.model && m.usage) usage.push({ model: m.model, input: count(m.usage.input), output: count(m.usage.output) })
-    else unpriced += 1
+    if (m.model && m.usage) {
+      const u = { model: m.model, input: count(m.usage.input), output: count(m.usage.output) }
+      usage.push(u)
+      inMonth(m).usage.push(u)
+    } else {
+      unpriced += 1
+      inMonth(m).unpriced += 1
+    }
   }
   for (const p of Array.isArray(document?.paragraphs) ? document.paragraphs : []) {
     if (p?.text) words.push(lower(p.text))
   }
-  return { models: [...models], sources: [...sources], usage, unpriced, words: words.join('\n') }
+  return { models: [...models], sources: [...sources], usage, unpriced, words: words.join('\n'), months }
+}
+
+/**
+ * A chat's cost in each month it had replies ('2026-10'), priced as costOf
+ * prices the whole, null for a month whose cost cannot be known.
+ * @returns {Record<string, number|null>}
+ */
+export function costsByMonth(facts, priceOf) {
+  const out = {}
+  for (const [month, f] of Object.entries(facts?.months ?? {})) out[month] = costOf(f, priceOf)
+  return out
 }
 
 /**

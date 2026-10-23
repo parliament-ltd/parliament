@@ -11,7 +11,7 @@
 // refusal with the reason, and changes nothing. Running a verb is keeping
 // the plan.
 
-import { boardEntry, boardFor, isRoom } from './boards'
+import { boardEntry, boardFor, isRoom, sectionOf } from './boards'
 
 export { isRoom }
 
@@ -198,6 +198,21 @@ export function planOpen(a, board) {
   place(next, board)
   next.addressed = board
   return go(next, 'openBoard', { board })
+}
+
+/**
+ * open:settings keys (settings spec §5; stage 9; C181). Settings in the
+ * space, the bar pointed at it, and the section kept in the space's
+ * context, which the board scrolls to.
+ */
+export function planOpenSettings(a, word) {
+  const section = sectionOf(word)
+  if (!section) return refuse('openSettingsNone', { word })
+  const opened = planOpen(a, 'settings').next
+  const next = copy(opened ?? a)
+  next.addressed = 'settings'
+  next.context.settings = section
+  return go2(next, 'openSettingsAt', { board: 'settings', section })
 }
 
 /**
@@ -586,6 +601,8 @@ export function plan(a, step, layout = null) {
   switch (step.verb) {
     case 'open':
       if (first === 'lab') return null // the Lab is an arrangement: lab: and open:lab come with the Lab
+      // open:settings keys: a section of Settings (C181).
+      if (one === 'settings' && args.length === 2) return planOpenSettings(a, second ?? args[1]?.text)
       return one && args.length === 1 ? planOpen(a, one) : null
     case 'close':
       if (!args.length) return planClose(a)

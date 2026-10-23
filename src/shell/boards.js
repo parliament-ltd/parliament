@@ -36,6 +36,25 @@ export const BOARDS = Object.freeze({
   welcome: { title: null, resting: 'search', can: [], closable: true, strip: null },
 })
 
+/**
+ * Settings' sections, in order, with the alias typed after open:settings
+ * and the other words that name them (settings spec §2; stage 9; C181).
+ */
+export const SECTIONS = Object.freeze([
+  { id: 'keys', words: ['key', 'api', 'models', 'model', 'providers'] },
+  { id: 'spending', words: ['spend', 'cost', 'budget', 'usage'] },
+  { id: 'context', words: ['defaults', 'default'] },
+  { id: 'data', words: ['backup', 'backups', 'storage'] },
+  { id: 'appearance', words: ['look', 'text', 'desks'] },
+  { id: 'about', words: ['security', 'network', 'privacy'] },
+])
+
+/** The Settings section a word names, or null. */
+export function sectionOf(word) {
+  const w = String(word ?? '').trim().toLowerCase()
+  return SECTIONS.find((s) => s.id === w || s.words.includes(w))?.id ?? null
+}
+
 // Rooms (C175 (a), ruled 23 October: "the user can open any number of
 // rooms"). The first room in the space is the board 'room', as before; each
 // other is 'room-2', 'room-3' and so on, with its own chat. A space kept

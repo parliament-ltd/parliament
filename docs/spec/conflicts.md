@@ -1514,6 +1514,22 @@ Found while splitting stage 8 into pieces. The documents: the plan's stage 8, br
 - **(f) Not yet per room:** a Secretarybird document room (DocumentContext) and Collaboration mode (R22) still follow the room a prompt goes to.
 - **Suggestion:** keep as built.
 
+## Part 14. Settings and your data (added 23 October 2026)
+
+Found while splitting stage 9 into pieces. The documents: the plan's stage 9, the settings spec (`settings-spec-decisions.md`) and Settings v1 (its header comment is the record for what it draws), with the rulings since (C27 to C36, C84, C87, C88, A21, the language ruling of 16 October, C166 (b)). Each is built as suggested, so a ruling changes one entry.
+
+**C181. Settings as a board, as built** (piece 1).
+- **(a) A board in the space** (C125): `open:settings` brings it beside what is here; `open:settings keys` (or any word in the spec's table: `backups`, `cost`, `privacy`…) points the bar at it and scrolls to that section, kept with the space. The rail folds away when the board is narrow.
+- **(b) Every control runs its `set:` line**, as if typed and entered: the same words, the same `undo:`. Marginalia write a command into the bar for Enter (`api:anthropic`, `thinking:on`, `reply:`, `privacy:on`). No key is typed on Settings: each provider's field is the key panel under the bar (`api:`), as the spec's §6 asks.
+- **(c) `set:` names:** `default`, `keys`, `title`, `finish`, `text`, `region`, `room`. Refused with a reason: `key` (keys never go in the bar), `compress` (it would write a branch unasked), and `summary`, `threshold`, `budget`, `theme` (nothing reads them; R28). `warn` comes with `run:` (stage 10).
+- **(d) Only settings that do something are shown.** Not shown yet: the budget alert, summary depth, the context warning and automatic compression (R28, put to Stefan at the checkpoint); the warning before a costly run and the costliest runs (stage 10 records runs and their cost; this month's costliest chats stand in); hard limits (with stage 10, once each provider's own limits page is checked); desks (C32). The spec's "Auto" default is not built: the default is a model (Sonnet 5.5, C155), and with no key Wikipedia answers (C150).
+- **(e) Spending:** this month in dollars, from the tokens each reply recorded, by the month it came (chat facts now keep it). Chats whose cost is not known are counted and said, never guessed.
+- **(f) Text size:** the chrome's type sizes and the rooms' relative sizes scale together; the layout does not zoom, so stretching and measuring stay as they are.
+- **(g) "Keeping keys"** moves every provider's key when it changes (the old page moved Anthropic's only).
+- **(h) The rule** sits on the section the bar points at and slides as the card scrolls (C31); while a search hides it, on the first section still shown.
+- **(i) New setting:** `newChatRoom`, the room a new chat starts in (`set:room`), a library template; none is the Writing Studio. **Shown at the checkpoint;** backups carry it.
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useLingui } from '@lingui/react'
 import './chrome.css'
 import { COPY } from '../copy'
-import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch } from '../lib/db'
+import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch, getStorageEstimate } from '../lib/db'
 import { renameMode } from '../lib/modes'
 import { loadSpace, saveArrangement } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
@@ -14,7 +14,7 @@ import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
-import { metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal, localAway, helperOf, translatorFor, translateText, browserTranslation } from '../net'
+import { keepKeys, metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal, localAway, helperOf, translatorFor, translateText, browserTranslation } from '../net'
 import { replyLanguageOf, withReplyLanguage, sourceAskLanguage, translateInto, nameOf, baseOf } from '../lib/languages'
 import { piecesOfAnswer, translationOf, lastSourceAnswer, BY_BROWSER } from '../lib/translations'
 import { findPrivate } from '../lib/privacyFilter'
@@ -49,7 +49,8 @@ import { readCatalogue } from '../lib/catalogue'
 import { listEntries } from '../catalog'
 import { listLayoutEntries } from '../catalog/layouts'
 import { readAlmanac } from '../lib/almanacRows'
-import { backupReminderState, getBackupStatus, dismissBackupBanner } from '../lib/backup'
+import { backupReminderState, getBackupStatus, dismissBackupBanner, getBackupLog } from '../lib/backup'
+import SettingsBoard from './SettingsBoard'
 import { createFactsCache } from '../lib/chatFacts'
 import { readSaved, keepSearch, forgetSearch, putSaved } from '../lib/savedSearches'
 import { readCollections, writeCollection, newCollection, withRows } from '../lib/collections'
@@ -460,7 +461,11 @@ export default function Shell() {
   const onSearch = useCallback((board, text) => {
     if (board === 'almanac') setRecordsView((v) => (v.search === text ? v : { ...v, search: text }))
     if (board === 'collection') setCollectionSearch(text)
+    // Settings: search narrows the card to the rows that match (C181).
+    if (board === 'settings') setSettingsSearch(text)
   }, [])
+  const [settingsSearch, setSettingsSearch] = useState('')
+  const [settingsCount, setSettingsCount] = useState(0)
   const showView = useCallback((view) => {
     viewNow.current = view
     setRecordsView(view)
@@ -1428,7 +1433,16 @@ export default function Shell() {
   useEffect(() => { keepTranslationNow.current = keepTranslation }, [keepTranslation])
   useEffect(() => { summarizeChatNow.current = summarizeChat }, [summarizeChat])
   const { settings, updateSetting } = useSettings()
-  useEffect(() => { updateSettingNow.current = updateSetting })
+  // A setting changed by set:, a click on Settings, or undo:. How keys are
+  // kept moves them there: "Don't save" holds them for this tab and removes
+  // the saved copies (settings spec §8).
+  const changeSetting = useCallback(async (key, value) => {
+    await updateSetting(key, value)
+    if (key === 'storageMode') await keepKeys(value !== 'memory').catch(() => {})
+  }, [updateSetting])
+  useEffect(() => { updateSettingNow.current = changeSetting })
+  // Text size (set:text): the chrome's type and the rooms' together.
+  useEffect(() => { document.documentElement.dataset.text = settings.fontSize ?? 'default' }, [settings.fontSize])
   // Which providers have a key here, without decrypting one; null until
   // known (stage 7: a key per provider). keyed: whether the default
   // provider has one, as stage 4 had it.
@@ -1640,7 +1654,64 @@ export default function Shell() {
       }
     },
   }), [roomId, almanacRows, chatRowsById, conversations, branchShown, roomPrompt, roomSteps, keys, settings.defaultModel])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens, branching, summarizing, including, again }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens, branching, summarizing, including, again])
+  // ── Settings as a board (stage 9, piece 1; C181) ──────
+  // What its sections show: the settings now, the providers and their keys,
+  // the models with their marks, this month's spending from Records, the
+  // storage and the last backup (read while Settings is on screen).
+  const settingsOpen = arrangement.columns.some((c) => c.includes('settings')) || arrangement.popped.some((p) => p.board === 'settings')
+  const [settingsStored, setSettingsStored] = useState({ storage: { usage: 0, quota: 0, kept: null }, lastBackup: null })
+  useEffect(() => {
+    if (!settingsOpen) return undefined
+    let live = true
+    Promise.all([getStorageEstimate().catch(() => ({ usage: 0, quota: 0 })), isStorageKept().catch(() => null), getBackupLog().catch(() => [])])
+      .then(([est, kept, log]) => { if (live) setSettingsStored({ storage: { usage: est.usage ?? 0, quota: est.quota ?? 0, kept }, lastBackup: log.length ? log[log.length - 1].backedUpAt ?? null : null }) })
+    return () => { live = false }
+  }, [settingsOpen, almanacRows])
+  const roomTemplates = useMemo(() => (catalogue ?? [])
+    .filter((i) => i.shelf === 'room' && i.template && !i.soon)
+    .map((i) => ({ id: i.template, name: roomLabel(i18n, i.name) })), [catalogue, i18n])
+  const settingsFacts = useMemo(() => {
+    const rows = almanacRows ?? []
+    const now = new Date()
+    const month = now.toISOString().slice(0, 7)
+    const thisMonth = rows.filter((r) => r.kind === 'chat' && r.monthCosts && Object.hasOwn(r.monthCosts, month))
+    const known = thisMonth.filter((r) => typeof r.monthCosts[month] === 'number')
+    const spent = known.filter((r) => r.monthCosts[month] > 0)
+    const chats = rows.filter((r) => r.kind === 'chat')
+    return {
+      values: {
+        defaultModel: settings.defaultModel, storageMode: settings.storageMode, describeNewChats: settings.describeNewChats !== false,
+        finishRepliesOnLeave: Boolean(settings.finishRepliesOnLeave), fontSize: settings.fontSize ?? 'default', mistralRegion: settings.mistralRegion ?? 'global',
+        thinking: settings.thinking === true, privacyFilter: settings.privacyFilter ?? 'off', translateQueries: settings.translateQueries === true,
+        newChatRoom: settings.newChatRoom ?? null,
+      },
+      providers: keyInfo.keys,
+      rows: answerRows,
+      reference: referenceName,
+      local: { ...LOCAL_ENTRY, status: local.status, models: local.models ?? [] },
+      region: destination('mistral')?.ships ? { provider: destination('mistral').name } : null,
+      rooms: roomTemplates,
+      replyIn: reply.tag ? languageName(reply.tag) : null,
+      helperName: helperNow?.name ?? null,
+      spending: {
+        total: known.reduce((n, r) => n + r.monthCosts[month], 0),
+        chats: spent.length,
+        unknown: thisMonth.length - known.length,
+        top: [...spent].sort((a, b) => b.monthCosts[month] - a.monthCosts[month]).slice(0, 4).map((r) => ({ num: r.num, title: r.title, cost: r.monthCosts[month] })),
+        monthName: new Intl.DateTimeFormat(i18n.locale, { month: 'long' }).format(now),
+      },
+      counts: {
+        chats: chats.length,
+        plans: new Set(chats.map((r) => r.docketNum).filter((n) => n != null)).size,
+        markings: rows.filter((r) => r.kind === 'note' || r.kind === 'highlight' || r.kind === 'term' || r.kind === 'quote').length,
+      },
+      storage: settingsStored.storage,
+      lastBackup: settingsStored.lastBackup,
+    }
+  }, [settings, keyInfo, answerRows, referenceName, local, roomTemplates, reply, languageName, helperNow, almanacRows, i18n.locale, settingsStored])
+  // What set: reads (lib/settingVerbs.js).
+  const settingScreen = useMemo(() => ({ values: settingsFacts.values, rows: answerRows, rooms: roomTemplates, regionProvider: settingsFacts.region?.provider ?? null }), [settingsFacts, answerRows, roomTemplates])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens, branching, summarizing, including, again, setting: settingScreen }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens, branching, summarizing, including, again, settingScreen])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -1847,7 +1918,7 @@ export default function Shell() {
           const chat = await createConversation({ title: titleFromPrompt(text), model: latest.current.settings.defaultModel, answerer: whos[0].id, frameworks: fwIds })
           setPendingAnswerer(null)
           setPendingFrameworks(null)
-          await assignDefaultRoom(chat.id)
+          await assignDefaultRoom(chat.id, latest.current.settings.newChatRoom ?? undefined)
           id = chat.id
           const placed = planRoom(current.current, id)
           if (placed.next) await run(placed.next, null)
@@ -1936,7 +2007,7 @@ export default function Shell() {
         const chat = await createConversation({ title: titleFromPrompt(text), model: latest.current.settings.defaultModel, answerer: who.chosen ? who.id : null, frameworks: fwIds })
         setPendingAnswerer(null)
         setPendingFrameworks(null)
-        await assignDefaultRoom(chat.id)
+        await assignDefaultRoom(chat.id, latest.current.settings.newChatRoom ?? undefined)
         id = chat.id
         const placed = planRoom(current.current, id)
         if (placed.next) await run(placed.next, null)
@@ -2026,6 +2097,13 @@ export default function Shell() {
 
   const screensNow = useRef(null)
   useEffect(() => { screensNow.current = screens }, [screens])
+  // A control on Settings runs its set: line, as if typed and entered: the
+  // same change, said the same way, and the same undo: (C181).
+  const runSetting = useCallback(async (line) => {
+    if (current.current.addressed !== 'settings') commit(address(current.current, 'settings'))
+    const p = preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
+    if (p.act) await onRun(p.next ?? null, line, null, p.act)
+  }, [onRun, commit])
   const pickAnswerer = useCallback(async (row) => {
     if (row.later) return
     if (row.needsKey || row.unchecked) { setPicking(false); writeField(`>api:${row.provider}`); return }
@@ -2127,8 +2205,8 @@ export default function Shell() {
     [arrangement, roomRecord],
   )
   const welcomeHint = useMemo(() => (onWelcome && !welcome.finished ? { next: nextStep(welcome) } : null), [onWelcome, welcome])
-  const searches = { almanac: recordsView.search, collection: collectionSearch }
-  const searchCounts = { almanac: recordsSearch, collection: { count: collectionShown.cards.length, cards: true } }
+  const searches = { almanac: recordsView.search, collection: collectionSearch, settings: settingsSearch }
+  const searchCounts = { almanac: recordsSearch, collection: { count: collectionShown.cards.length, cards: true }, settings: { count: settingsCount, settings: true } }
   const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, searches, searchCounts }
   const filtered = isAtRest(recordsView) ? null : { search: recordsView.search.trim(), line: viewLine(recordsView) }
   const drawBoard = (board) => {
@@ -2144,6 +2222,15 @@ export default function Shell() {
           saved={saved} currentSaved={currentSaved} addressed={arrangement.addressed === 'almanac'}
           onAddress={focusBoard} onWrite={writeField} onClear={onRecordsClear} onOpenSaved={onOpenSaved}
           backup={backupDue} onBackupLater={backupLater}
+        />
+      )
+    }
+    if (board === 'settings') {
+      return (
+        <SettingsBoard
+          key="settings" addressed={arrangement.addressed === 'settings'} onAddress={focusBoard}
+          section={arrangement.context?.settings ?? null} query={settingsSearch} facts={settingsFacts}
+          onSet={runSetting} onWrite={writeField} onCount={setSettingsCount}
         />
       )
     }

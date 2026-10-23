@@ -253,13 +253,17 @@ export async function migrateChatRoomAssignments() {
  * @param {string} conversationId
  * @returns {Promise<string | null>}
  */
-export async function assignDefaultRoom(conversationId) {
+// templateId: the room a new chat starts in, as chosen in Settings
+// (set:room; stage 9; C181); the Writing Studio when none is, or when the
+// one chosen is no longer in the library.
+export async function assignDefaultRoom(conversationId, templateId = DEFAULT_TEMPLATE_ID) {
   const db = await initDB()
   const conv = await db.get('conversations', conversationId)
   if (!conv) return null
   if (conv.room) return conv.room
 
-  const template = await db.get('libraryRooms', DEFAULT_TEMPLATE_ID)
+  const template = (templateId && templateId !== DEFAULT_TEMPLATE_ID ? await db.get('libraryRooms', templateId) : null)
+    ?? await db.get('libraryRooms', DEFAULT_TEMPLATE_ID)
   if (!template) {
     if (import.meta.env.DEV) {
       console.warn(

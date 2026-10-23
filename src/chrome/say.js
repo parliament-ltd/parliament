@@ -84,6 +84,8 @@ export function say(i18n, message, values = {}) {
     else if (key === 'cost' && typeof value === 'number') words[key] = money(i18n, value)
     else if (PERCENTS.has(key) && typeof value === 'number') words[key] = percent(i18n, value)
     else if (key === 'day') words[key] = longDay(i18n, value)
+    // A section of Settings, by its title (open:settings keys; C181).
+    else if (key === 'section' && COPY.settings?.[`${value}Title`]) words[key] = i18n._(COPY.settings[`${value}Title`])
     else if (key === 'cols' && Array.isArray(value)) words[key] = joined(i18n, value.map((c) => columnName(i18n, c)), 'conjunction')
     else if (key === 'col') words[key] = columnName(i18n, value)
     // What erase: takes, each its number and its words (C137 (a)).

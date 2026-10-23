@@ -28,6 +28,18 @@ export const keys = createKeyring({
   remove: (provider) => deleteApiKey(provider),
 })
 
+/**
+ * How every key is kept, when the choice changes (settings spec §8; stage
+ * 9; C181): saved, encrypted, in this browser, or held for this tab only with
+ * the saved copy removed. Each key stays with its own provider.
+ */
+export async function keepKeys(save) {
+  for (const d of DESTINATIONS.filter((x) => x.key)) {
+    const k = await keys.get(d.id).catch(() => null)
+    if (k) await keys.put(d.id, k, { save })
+  }
+}
+
 // The code behind each shipped entry. Models come from src/providers;
 // sources are manifests read by one runner (sources.js), each allowed only
 // the origins the list gives it.

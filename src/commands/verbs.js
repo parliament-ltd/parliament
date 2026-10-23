@@ -323,7 +323,7 @@ export const VERBS = Object.freeze([
   v({ verb: 'device', group: 'building', example: 'device:desktop', forms: ['device:desktop', 'device:mobile'], takes: [[['desktop', 'mobile']]], on: BUILDING, stage: 13, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.device', message: 'Say what the room is built for' } }),
   v({ verb: 'set', group: 'building', example: 'set:input web search on', forms: ['set:input web search on', 'set:highlights colour yellow', 'set:default haiku'],
-    takes: [['word', { many: 'text' }]], on: [...BUILDING, 'settings'], stage: 9, undoable: true, click: 'apply',
+    takes: [[], ['word', { many: 'text' }]], on: [...BUILDING, 'settings'], stage: 9, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.set', message: 'Change a setting of a block or of Parliament. The Enter line states the change in full' } }),
 
   // Settings and data

@@ -43,6 +43,9 @@ const DEFAULT_SETTINGS = {
   translateQueries: false,
   // The privacy filter for fixed formats: 'off' or 'patterns' (stage 7, piece 7; C167).
   privacyFilter: 'off',
+  // The room a new chat starts in, a library template's id; none is the
+  // Writing Studio (set:room; stage 9; C181).
+  newChatRoom: null,
 }
 
 export function SettingsProvider({ children }) {

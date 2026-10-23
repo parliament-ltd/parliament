@@ -104,6 +104,8 @@ const SETTINGS = Object.freeze({
   translateQueries: bool,
   // The privacy filter (C167).
   privacyFilter: (v) => v === 'off' || v === 'patterns' || v === 'names',
+  // The room a new chat starts in, a library template's id (stage 9; C181).
+  newChatRoom: (v) => v === null || typeof v === 'string' && /^[A-Za-z0-9][A-Za-z0-9._@-]{0,127}$/.test(v),
 })
 
 // Settings named after something. `chat` names the chat in the key, so a
