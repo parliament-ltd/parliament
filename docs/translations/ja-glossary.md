@@ -1,0 +1,81 @@
+# Japanese (ja) glossary
+
+## Conventions
+
+- Spacing: no space between Japanese and Latin text or numbers (APIキー, Enterで, チャット201, 30日間). One exception: a command, or a placeholder that holds command text ({command}, {verb}, {verbs}, {example}, {words}, {word}, {near}, {instead}, {line}, {leader}, {filters}), has a half-width space on each side where it meets Japanese letters, so it is plain where what you type ends (open:201 で表示). No space next to full-width punctuation (、。：「」).
+- Long vowel mark: Apple's practice, dropped at the end of longer -er/-or words: コンピュータ, ブラウザ, プロバイダ, フィルタ, サーバ, インスペクタ. Short words keep it: キー, バー, エラー. "Monitor" is ディスプレイ, as Apple has it.
+- Window is ウインドウ (Apple's spelling).
+- Quotation marks: 「…」, nested 『…』. Commands keep their ASCII quotes (open:"{name}").
+- Sentences in です・ます. Buttons, labels, headings and command descriptions as short noun phrases or plain verbs (保存, 閉じる, 提案を受け入れる).
+- Final 。 follows the English: where the English line ends without a full stop (most Enter lines and hints), the Japanese ends without 。; where it has one, 。.
+- Counters: 件 for most things (チャット3件, メモ2件), 枚 for cards, 行 for table rows, 文字 for characters, 語 for words, ステップ for steps, トークン for tokens, 回 for calls and searches.
+- Plurals collapse to other. Where the English one and other cases differ in more than number (for example "in that order" or "in turn" only with several), the difference is kept with =1 {…}, since Japanese plural rules never pick one. Used in: enter.frameworkSet, enter.frameworkSetNext, enter.promptFrameworks, enter.sequence, enter.untagAll.
+- US is 米国, EU stays EU.
+- The 14 "command warnings" check.mjs reports for ja are all English prose that happens to start with a verb word ("to a model: …", "the backup: what goes in", "this room: {name}"); none is a command. They are listed in checker-false-positives.txt.
+- "Enter does X" lines: Enterで、Xします.
+- User words placed in a sentence (headings, saved search names) take という where the sentence needs a seam: {heading}という見出し.
+
+## Terms
+
+- chat → チャット
+- plan (docket) → プラン. Short and the usual UI word; 計画 reads as an abstract intention.
+- branch (201a) → ブランチ. 分岐 reads as the act of forking; ブランチ names the lettered thing you open and address. The act stays 分岐する where English says "branch from".
+- room → ルーム. 部屋 would be literal; ルーム is the UI word (as in Zoom's ブレイクアウトルーム).
+- board → ボード
+- the bar → バー. Read alone, in context, the way アドレスバー and 検索バー are; no qualifier, since the bar is search, command and prompt at once.
+- prompt → プロンプト
+- reply → 返答. What a model writes back in a chat.
+- answer → 回答 (verb 答える). What a model or a source gives to a question: 情報源からの回答, 最初の回答. Kept apart from 返答 because the English keeps the two apart.
+- marking → マーキング. The study word for marking passages; マーク alone is too vague, and 倍率 already takes the cost "marks".
+- note → メモ. As Apple's Notes (メモ).
+- keyword (term) → キーワード
+- highlight → ハイライト
+- quote → 引用. "Cited" sources become 参照した情報源, to keep 引用 for quotes.
+- favourite → お気に入り
+- collection → コレクション
+- card → カード (counted 枚)
+- model → モデル
+- provider → プロバイダ
+- source (Wikipedia and the like) → 情報源. ソース is ambiguous (source code, sauce); 情報源 is plain.
+- key (API key) → キー; the heading and first mention APIキー.
+- helper → 補助モデル. ヘルパー is understood but vague; 補助モデル says it is a model and what it is for.
+- backup / back up → バックアップ / バックアップする
+- restore, bring back → 復元 / 復元する. The English "bring back" wording becomes the standard Japanese word.
+- undo / take back → 取り消し / 取り消す (Apple's word for Undo).
+- the Enter line → Enter行. Kept as a name, built like the English; "the line under the bar" stays バーの下の行 where the English says that.
+- the privacy filter → プライバシーフィルタ
+- placeholder (what the privacy filter swaps in) → 仮の文字列. プレースホルダ is jargon.
+- framework (a stance a reply is written under) → 方針. フレームワーク reads as software or business-school frameworks; 方針 is the standing approach a reply follows. The command stays framework:.
+- marks (×15, cost against a reference model) → 倍率
+- spending → 利用額
+- erase (for good) → 消去 (完全に消去); delete → 削除. Kept apart as the English keeps them apart.
+- forget (a saved search, collection, framework) → 削除, with what stays said next to it.
+- archive → アーカイブ
+- pin → ピン留め
+- export → 書き出し; import → 読み込み
+- its own window (pop:) → 別ウインドウ
+- beside what is here → 今の画面の横に
+- in a room of its own → 専用のルームで
+- carry on (a branch) → 続ける; the label "carried on" → 継続中
+- point the bar at → バーの対象にする; "the bar points here" → バーの対象
+- the last room → 最後に使ったルーム; the last board (the only one left) → 最後のボード
+- not built yet → まだ準備中
+- your order (in a collection) → 自分の並び順
+- this computer / your machine → このコンピュータ / お使いのコンピュータ
+- thinking → 思考
+- call (one model call) → 呼び出し
+- run (of a plan) → 実行; step → ステップ
+- arrangement → 配置
+- Records (the Almanac) → 記録
+- Collection → コレクション
+- Library → ライブラリ
+- Plan (the Docket board) → プラン
+- Reflection → 振り返り
+- Settings → 設定
+- Lab → ラボ
+- Canvas → キャンバス
+- Blocks → ブロック
+- the welcome page → ようこそページ
+- shelf → 棚
+- tracked changes → 変更履歴
+- marked as data → データとして明示

@@ -296,6 +296,11 @@ msgstr ""
 msgid "backup.replaceAbout"
 msgstr ""
 
+#. The word typed to arm a replace: one lower-case word
+#. js-lingui-explicit-id
+msgid "backup.replaceWord"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "backup.titleBackup"
 msgstr ""

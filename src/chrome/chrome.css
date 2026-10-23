@@ -649,6 +649,10 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-netrow .n { text-align: end; font-variant-numeric: tabular-nums; color: var(--ch-ink-2); }
 .ch-net-empty { display: block; margin-top: 6px; color: var(--ch-ink-3); }
 @container (max-width: 560px) { .ch-set { grid-template-columns: minmax(0, 1fr); } .ch-set-rail { display: none; } }
+/* A narrow card puts each control under its words, and long choices wrap
+   (longer languages, C184). */
+@container (max-width: 560px) { .ch-srow { grid-template-columns: minmax(0, 1fr); } .ch-srow .ch-sctl { justify-content: flex-start; } }
+.ch-seg { flex-wrap: wrap; }
 
 /* Text size (set:text; settings spec §12): the chrome's type tokens, and
    the rooms' relative sizes, scale together; the layout does not zoom. */

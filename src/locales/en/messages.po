@@ -296,6 +296,11 @@ msgstr "Replace what is here"
 msgid "backup.replaceAbout"
 msgstr "This browser is cleared first, then the backup is written. Your keys stay"
 
+#. The word typed to arm a replace: one lower-case word
+#. js-lingui-explicit-id
+msgid "backup.replaceWord"
+msgstr "replace"
+
 #. js-lingui-explicit-id
 msgid "backup.titleBackup"
 msgstr "Back up"
@@ -306,7 +311,7 @@ msgstr "Bring a backup back"
 
 #. js-lingui-explicit-id
 msgid "backup.typeReplace"
-msgstr "Type replace to go on"
+msgstr "Type {word} to go on"
 
 #. js-lingui-explicit-id
 msgid "backup.unlock"

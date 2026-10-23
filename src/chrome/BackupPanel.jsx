@@ -269,9 +269,9 @@ export default function BackupPanel({ mode, file = null, onClose, onDone }) {
                         </>
                       )}
                       <label className="ch-bk-confirm">
-                        <span>{say(COPY.backup.typeReplace)}</span>
-                        <input ref={confirmField} type="text" autoComplete="off" spellCheck={false} aria-label={say(COPY.backup.typeReplace)}
-                          onChange={(e) => setArmed(e.target.value.trim().toLowerCase() === 'replace')} />
+                        <span>{say(COPY.backup.typeReplace, { word: say(COPY.backup.replaceWord) })}</span>
+                        <input ref={confirmField} type="text" autoComplete="off" spellCheck={false} aria-label={say(COPY.backup.typeReplace, { word: say(COPY.backup.replaceWord) })}
+                          onChange={(e) => setArmed(e.target.value.trim().toLowerCase() === say(COPY.backup.replaceWord).toLowerCase())} />
                       </label>
                     </div>
                   )}
