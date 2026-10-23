@@ -17,6 +17,7 @@ import Compare from './Compare'
 import KeyPanel from './KeyPanel'
 import AnswerPicker from './AnswerPicker'
 import FrameworkPicker from './FrameworkPicker'
+import { step as stepBranch } from '../stores/branchView'
 
 // One bar: the field, its Enter line and the ? reference, pointed at one
 // board. The page has one, and so does every popped window (C6: each window
@@ -235,6 +236,16 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
         else input.current?.blur()
       }
       return
+    }
+    // The slider of branches on screen: ⌥← ⌥→ from the field, ← → when it is
+    // empty (slider v9; C173). Mirrored where the page reads right to left.
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+      const empty = !fieldValue(field).replace(/^(p>|>)/, '').trim()
+      if (e.altKey || empty) {
+        const rtl = (e.currentTarget?.closest?.('[dir]')?.getAttribute('dir') ?? document.documentElement.dir) === 'rtl'
+        const dir = (e.key === 'ArrowRight' ? 1 : -1) * (rtl ? -1 : 1)
+        if (stepBranch(dir)) { e.preventDefault(); return }
+      }
     }
     if (field.mode !== 'command') return
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {

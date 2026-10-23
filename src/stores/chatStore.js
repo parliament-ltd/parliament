@@ -147,6 +147,31 @@ export const streamMessageId = (id) => streams.get(id)?.messageId ?? null
 export const isStreaming = (id) => streams.has(id)
 export const streamingIds = () => [...streams.keys()]
 
+// ── Who shows a chat (stage 8, piece 2; C109, C173) ──
+//
+// A chat is left, and a reply being written in it stopped (C109), when
+// nothing on screen shows it any more: not its room, and not a slider that
+// shows it as a branch. Each shows a chat by watching it; the last to stop
+// watching leaves it. So looking at another branch in a slider, or the room
+// moving to the branch it carries on, never stops a branch still writing.
+const watchers = new Map() // chat id -> how many show it
+
+/** Something on screen shows a chat; returns the function for when it stops. */
+export function watch(id) {
+  watchers.set(id, (watchers.get(id) ?? 0) + 1)
+  let done = false
+  return () => {
+    if (done) return
+    done = true
+    const n = (watchers.get(id) ?? 1) - 1
+    if (n > 0) watchers.set(id, n)
+    else watchers.delete(id)
+  }
+}
+
+/** Whether anything on screen shows a chat. */
+export const watched = (id) => (watchers.get(id) ?? 0) > 0
+
 /** A reply stopped because its chat was left, to be said once where the person lands. */
 export function addNotice(notice) {
   notices = [...notices, { ...notice, at: notice.at ?? Date.now() }]
@@ -286,6 +311,7 @@ export function sendableOf(messages, hiddenSet, pending = NONE) {
 
 /** For tests: forget everything. */
 export function _reset() {
+  watchers.clear()
   streams.clear()
   listeners.clear()
   waiting.clear()

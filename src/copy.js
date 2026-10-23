@@ -686,6 +686,21 @@ export const COPY = {
     replyCut: /*i18n*/ { id: 'enter.replyCut', message: 'The reply broke off part way. What arrived is kept and marked as cut off' },
   },
 
+  // The replies to a prompt sent to several, as tabs (stage 8; C173).
+  branches: {
+    label: /*i18n*/ { id: 'branches.label', message: '{count, plural, other {The replies of # branches}}' },
+    writing: /*i18n*/ { id: 'branches.writing', message: 'writing' },
+    stopped: /*i18n*/ { id: 'branches.stopped', message: 'stopped' },
+    carried: /*i18n*/ { id: 'branches.carried', message: 'carried on', comment: 'The branch the chat carries on from, below the tabs' },
+    stoppedNote: /*i18n*/ { id: 'branches.stoppedNote', message: 'Stopped part way. What arrived is kept.' },
+    loading: /*i18n*/ { id: 'branches.loading', message: 'Reading this branch…' },
+    previous: /*i18n*/ { id: 'branches.previous', message: 'The reply before' },
+    next: /*i18n*/ { id: 'branches.next', message: 'The reply after' },
+    carriesOn: /*i18n*/ { id: 'branches.carriesOn', message: 'The chat carries on from {address}; carrying this one on gives it a room of its own' },
+    withHistory: /*i18n*/ { id: 'branches.withHistory', message: 'with its history' },
+    unknown: /*i18n*/ { id: 'branches.unknown', message: 'a branch' },
+  },
+
   // What the privacy filter finds, by kind (C167), joined into {found}.
   privacyFound: {
     email: /*i18n*/ { id: 'privacy.email', message: '{count, plural, one {an email address} other {# email addresses}}' },

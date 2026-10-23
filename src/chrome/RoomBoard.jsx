@@ -72,7 +72,7 @@ function Card({ addressed, onAddress, title, aside, room, children }) {
  */
 export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLeave, onName, rev = 0 }) {
   const { i18n } = useLingui()
-  const { loadMessages, clearMessages, leaveConversation, activeConversationId } = useChat()
+  const { loadMessages, clearMessages, watchConversation, activeConversationId } = useChat()
   const { conversations } = useConversations()
   const [found, setFound] = useState({ forId: null, chat: null, mode: null, error: null })
   const [loadedFor, setLoadedFor] = useState(null)
@@ -107,14 +107,16 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
   useEffect(() => {
     if (!chatId) return undefined
     let cancelled = false
+    // Shown here: left only when nothing else on screen shows it (C173).
+    const unwatch = watchConversation(chatId)
     loadMessages(chatId).finally(() => { if (!cancelled) setLoadedFor(chatId) })
     return () => {
       cancelled = true
       onLeave?.(chatId)
-      leaveConversation(chatId)
+      unwatch()
       clearMessages()
     }
-  }, [chatId, loadMessages, clearMessages, leaveConversation, onLeave])
+  }, [chatId, loadMessages, clearMessages, watchConversation, onLeave])
 
   const ready = Boolean(chatId) && loadedFor === chatId && activeConversationId === chatId
   useEffect(() => { if (ready) onReady?.(chatId) }, [ready, chatId, onReady])

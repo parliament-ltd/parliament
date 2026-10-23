@@ -1,0 +1,131 @@
+import { useEffect, useSyncExternalStore } from 'react'
+import { useLingui } from '@lingui/react'
+import { COPY } from '../../copy'
+import MessageCard from './MessageCard'
+import { useIsStreaming, useStreamText, useStreamMessageId } from '../../stores/chatHooks'
+import { subscribe as onViewChange, viewedIn, setViewed, onScreen } from '../../stores/branchView'
+import { stepFrom } from '../../lib/branchGroups'
+
+// The replies to one prompt sent to several, as tabs in a slider
+// (refactor-plan.md, stage 8, piece 2; branch slider v9; C173).
+//
+// One tab per branch, in the order chosen: its letter, who answered, and
+// whether it is still writing, stopped, or carried on. Arrows either side
+// step through them, as do ⌥← ⌥→ in the bar, or ← → when the bar is empty
+// (branchView.js). Under each reply, its two ways on, both commands, which a
+// click writes into the bar: open:203b, its own room with its history, and
+// open:203b summary, a new branch from a summary of it.
+//
+// The line the room carries on is drawn with the room's own message cards;
+// the other branches with plain cards fed from their own chats and streams,
+// so each writes into its own tab without redrawing the others.
+
+const write = (value) => window.dispatchEvent(new CustomEvent('parliament-write', { detail: { value } }))
+
+function useViewed(groupId) {
+  return useSyncExternalStore(onViewChange, () => viewedIn(groupId), () => viewedIn(groupId))
+}
+
+function Tab({ tab, info, on, carried, onPick }) {
+  const { i18n } = useLingui()
+  const writing = useIsStreaming(tab.chatId)
+  const last = tab.reply[tab.reply.length - 1]
+  const stopped = !writing && last?.incomplete
+  const state = writing ? COPY.branches.writing : stopped ? COPY.branches.stopped : carried ? COPY.branches.carried : null
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={on}
+      className={`ch-btab${on ? ' on' : ''}`}
+      onClick={onPick}
+    >
+      <span className="ch-btab-id">{info.letter ?? '·'}</span>
+      <span dir="auto">{info.name}</span>
+      {state && <span className="ch-btab-st">{i18n._(state)}</span>}
+    </button>
+  )
+}
+
+// One message of a branch the room does not carry on, with its stream.
+function SiblingMessage({ chatId, msg, index, number }) {
+  const { i18n } = useLingui()
+  const writing = useIsStreaming(chatId)
+  const streamId = useStreamMessageId(chatId)
+  const live = useStreamText(chatId)
+  const isLive = writing && msg.id === streamId
+  return (
+    <MessageCard
+      id={msg.id}
+      type={msg.role === 'user' ? 'user' : 'assistant'}
+      content={isLive ? live : msg.content}
+      number={number}
+      index={index}
+      isGhostText={Boolean(msg.incomplete) && !isLive}
+      stoppedNote={msg.incomplete && !isLive && msg.stopReason ? i18n._(COPY.branches.stoppedNote) : null}
+      source={msg.source ?? null}
+      frameworks={msg.role === 'assistant' ? msg.frameworks ?? null : null}
+      translation={msg.role === 'assistant' ? msg.translation ?? null : null}
+      citations={msg.role === 'assistant' ? msg.citations ?? null : null}
+      asked={msg.role === 'user' ? msg.asked ?? null : null}
+      thinking={msg.role === 'assistant' && msg.thinking ? { text: msg.thinking, ms: msg.thinkingMs ?? null } : null}
+    />
+  )
+}
+
+/**
+ * @param {{ item: { groupId: string, mode: 'below'|'tabs', tabs: object[] }, line: string,
+ *   infoOf: (chatId: string, tab: object) => { letter: string|null, name: string, address: string|null },
+ *   renderLine: (msg: object, idx: number) => import('react').ReactNode, numberOf: (chatId: string, msg: object) => number }} props
+ */
+export default function BranchSlider({ item, line, infoOf, renderLine, numberOf }) {
+  const { i18n } = useLingui()
+  const chats = item.tabs.map((t) => t.chatId)
+  const chatsKey = chats.join('|')
+  useEffect(() => onScreen(item.groupId, chatsKey.split('|')), [item.groupId, chatsKey])
+  const viewed = useViewed(item.groupId)
+  const now = chats.includes(viewed) ? viewed : chats.includes(line) ? line : chats[0]
+  const at = chats.indexOf(now)
+  const tab = item.tabs[at]
+  const info = infoOf(tab.chatId, tab)
+  const lineTab = item.tabs.find((t) => t.line)
+  // Carried on alone, below the tabs: the line. Its tab says so.
+  const carriedHere = item.mode === 'below' && lineTab?.continued
+  const go = (dir) => { const next = stepFrom(chats, now, dir); if (next) setViewed(item.groupId, next) }
+  const messages = item.mode === 'tabs' ? [...tab.reply, ...tab.after] : tab.reply
+  const lineInfo = lineTab ? infoOf(lineTab.chatId, lineTab) : null
+
+  return (
+    <section className="ch-branches" aria-label={i18n._(COPY.branches.label, { count: chats.length })}>
+      <div className="ch-btabs" role="tablist">
+        {item.tabs.map((t) => (
+          <Tab key={t.chatId} tab={t} info={infoOf(t.chatId, t)} on={t.chatId === now} carried={carriedHere && t.line} onPick={() => setViewed(item.groupId, t.chatId)} />
+        ))}
+      </div>
+      <div className="ch-bslider">
+        <button type="button" className="ch-barrow" aria-label={i18n._(COPY.branches.previous)} disabled={at <= 0} onClick={() => go(-1)}>‹</button>
+        <div className="ch-bslide" role="tabpanel">
+          {!tab.loaded && <p className="ch-marg">{i18n._(COPY.branches.loading)}</p>}
+          {tab.loaded && messages.map((m, i) => (tab.line ? renderLine(m, i) : <SiblingMessage key={m.id} chatId={tab.chatId} msg={m} index={i} number={numberOf(tab.chatId, m)} />))}
+          {tab.loaded && (
+            <p className="ch-marg ch-bmarg">
+              {/* The chat carries on from another branch: this one carries on in a room of its own (slider v9). */}
+              {carriedHere && !tab.line && lineInfo?.address && (
+                <><span>{i18n._(COPY.branches.carriesOn, { address: lineInfo.address })}</span><span aria-hidden="true"> · </span></>
+              )}
+              {info.address && (
+                <>
+                  <button type="button" onClick={() => write(`>open:${info.address}`)}>open:{info.address}</button>
+                  <span> {i18n._(COPY.branches.withHistory)}</span>
+                  <span aria-hidden="true"> · </span>
+                  <button type="button" onClick={() => write(`>open:${info.address} summary`)}>open:{info.address} summary</button>
+                </>
+              )}
+            </p>
+          )}
+        </div>
+        <button type="button" className="ch-barrow" aria-label={i18n._(COPY.branches.next)} disabled={at >= chats.length - 1} onClick={() => go(1)}>›</button>
+      </div>
+    </section>
+  )
+}

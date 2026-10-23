@@ -34,6 +34,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, ChevronRight, Quote, X } from 'lucide-react'
 import MessageList from '../../components/core/MessageList'
 import MessageCard from '../../components/core/MessageCard'
+import BranchSlider from '../../components/core/BranchSlider'
+import { lineItems, membersOf } from '../../lib/branchGroups'
+import { subscribe as onChatStore } from '../../stores/chatStore'
 import SelectConversationModal from '../../components/SelectConversationModal'
 import { useChat } from '../../stores/ChatContext'
 import { useConversationId } from '../../stores/ConversationScope'
@@ -49,7 +52,7 @@ const NO_QUOTES = Object.freeze([])
 import { useBranchPanel } from '../../stores/BranchPanelContext'
 import { useCollabMode } from '../../stores/CollabModeContext'
 import { useConversations } from '../../stores/ConversationContext'
-import { hasKey } from '../../net'
+import { hasKey, modelFacts, destination } from '../../net'
 import {
   deleteMessage as dbDeleteMessage,
   addMessage as dbAddMessage,
@@ -58,10 +61,43 @@ import {
   deletePin as dbDeletePin,
   createConversation as dbCreateConversation,
   getConversation as dbGetConversation,
+  getMessages as dbGetMessages,
+  getDocket as dbGetDocket,
 } from '../../lib/db'
 import { onRecordsChanged } from '../../lib/records'
 
 const SPRING_SNAPPY = { type: 'spring', stiffness: 500, damping: 30 }
+
+const byTime = (a, b) => (a.createdAt < b.createdAt ? -1 : a.createdAt > b.createdAt ? 1 : 0)
+
+// The other branches of the prompts this chat sent to several (stage 8,
+// piece 2; C173): read from their own chats, again whenever one starts or
+// stops writing, and watched while shown, so leaving one tab for another,
+// or the room moving to a branch, never stops one still writing.
+function useBranchMembers(ids, watchConversation) {
+  const [members, setMembers] = useState(() => new Map())
+  const key = ids.join('|')
+  useEffect(() => {
+    if (!key) return undefined
+    const list = key.split('|')
+    let live = true
+    const load = async (id) => {
+      const msgs = await dbGetMessages(id).catch(() => null)
+      if (!live) return
+      setMembers((prev) => {
+        const next = new Map(prev)
+        if (msgs) next.set(id, [...msgs].sort(byTime))
+        else next.delete(id)
+        return next
+      })
+    }
+    list.forEach(load)
+    const offs = list.map((id) => onChatStore(`status:${id}`, () => load(id)))
+    const unwatch = list.map((id) => watchConversation(id))
+    return () => { live = false; offs.forEach((f) => f()); unwatch.forEach((f) => f()) }
+  }, [key, watchConversation])
+  return members
+}
 const DELETE_UNDO_MS = 20_000
 
 // Why a reply stopped short, said on the reply (C109; stage 4).
@@ -70,7 +106,7 @@ const STOPPED = { left: COPY.chat.stoppedOnReply, limit: COPY.chat.cutLimit, err
 export default function MessagesRender() {
   // The conversation this board shows, told by the board (stage 3).
   const conversationId = useConversationId()
-  const { messages, isStreaming, continueMessage, activeConversationId } = useChat()
+  const { messages, isStreaming, continueMessage, activeConversationId, watchConversation } = useChat()
   // The reply being written, read from the chat store, so only this list
   // redraws while it streams; the rest of the page does not (stage 3).
   const streamingContent = useStreamText(activeConversationId)
@@ -371,6 +407,37 @@ export default function MessagesRender() {
     handleQuote, quotesByMessage,
   ])
 
+  // ── Branches (stage 8, piece 2; C173) ────────────────────
+  // Where a prompt here went to several, its replies are a slider of tabs.
+  const memberIds = useMemo(() => membersOf(visibleMessages, activeConversationId), [visibleMessages, activeConversationId])
+  const members = useBranchMembers(memberIds, watchConversation)
+  const items = useMemo(() => lineItems(visibleMessages, activeConversationId, members), [visibleMessages, activeConversationId, members])
+  const lineChat = useMemo(() => conversations.find((c) => c.id === activeConversationId) ?? null, [conversations, activeConversationId])
+  const [planNum, setPlanNum] = useState(null)
+  useEffect(() => {
+    let live = true
+    if (!lineChat?.docketId || !memberIds.length) return undefined
+    dbGetDocket(lineChat.docketId).then((d) => { if (live) setPlanNum(d?.num ?? null) }, () => {})
+    return () => { live = false }
+  }, [lineChat?.docketId, memberIds.length])
+  // A tab's letter, who answered, and the branch's address (203b).
+  const infoOf = useCallback((chatId, tab) => {
+    const chat = conversations.find((c) => c.id === chatId)
+    const reply = tab.reply.find((m) => m.role === 'assistant')
+    const name = reply?.source?.name ?? modelFacts(reply?.model)?.name ?? modelFacts(chat?.answerer)?.name ?? destination(chat?.answerer)?.name ?? i18n._(COPY.branches.unknown)
+    const letter = chat?.branch ?? null
+    return { letter, name, address: planNum != null && letter ? `${planNum}${letter}` : null }
+  }, [conversations, planNum, i18n])
+  // A message of another branch is numbered as in its own chat.
+  const numberOf = useCallback((chatId, msg) => {
+    const list = members.get(chatId) ?? []
+    const at = list.findIndex((x) => x.id === msg.id)
+    return at < 0 ? 0 : list.slice(0, at + 1).filter((x) => x.role === msg.role).length
+  }, [members])
+  const renderItem = useCallback((item, idx) => (item.kind === 'slider'
+    ? <BranchSlider key={item.key} item={item} line={activeConversationId} infoOf={infoOf} renderLine={renderCard} numberOf={numberOf} />
+    : renderCard(item, idx)), [activeConversationId, infoOf, renderCard, numberOf])
+
   void conversationId
 
   return (
@@ -380,8 +447,8 @@ export default function MessagesRender() {
       )}
 
       <MessageList
-        messages={visibleMessages}
-        renderCard={renderCard}
+        messages={items}
+        renderCard={renderItem}
         hiddenCount={messages.filter(m => hiddenIds.has(m.id)).length}
         onShowHidden={handleShowHidden}
         isStreaming={isStreaming}

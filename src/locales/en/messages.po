@@ -305,6 +305,51 @@ msgstr "Settings"
 msgid "board.welcome"
 msgstr "Welcome page"
 
+#. The branch the chat carries on from, below the tabs
+#. js-lingui-explicit-id
+msgid "branches.carried"
+msgstr "carried on"
+
+#. js-lingui-explicit-id
+msgid "branches.carriesOn"
+msgstr "The chat carries on from {address}; carrying this one on gives it a room of its own"
+
+#. js-lingui-explicit-id
+msgid "branches.label"
+msgstr "{count, plural, other {The replies of # branches}}"
+
+#. js-lingui-explicit-id
+msgid "branches.loading"
+msgstr "Reading this branch…"
+
+#. js-lingui-explicit-id
+msgid "branches.next"
+msgstr "The reply after"
+
+#. js-lingui-explicit-id
+msgid "branches.previous"
+msgstr "The reply before"
+
+#. js-lingui-explicit-id
+msgid "branches.stopped"
+msgstr "stopped"
+
+#. js-lingui-explicit-id
+msgid "branches.stoppedNote"
+msgstr "Stopped part way. What arrived is kept."
+
+#. js-lingui-explicit-id
+msgid "branches.unknown"
+msgstr "a branch"
+
+#. js-lingui-explicit-id
+msgid "branches.withHistory"
+msgstr "with its history"
+
+#. js-lingui-explicit-id
+msgid "branches.writing"
+msgstr "writing"
+
 #. js-lingui-explicit-id
 msgid "chat.aboutCard"
 msgstr "{kind, select, note {note {num}} term {keyword {num}} quote {quote {num}} highlight {highlight {num}} other {{num}}}, kept in Parliament"

@@ -556,3 +556,21 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-compare-diff { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--ch-divider); white-space: pre-wrap; }
 .ch-compare-diff del { color: var(--ch-ink-3); text-decoration: line-through; }
 .ch-compare-diff ins { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+
+/* The replies to a prompt sent to several, as tabs (stage 8; slider v9; C173). */
+.ch-branches { margin: 4px 0 8px; }
+.ch-btabs { position: sticky; top: 0; z-index: 2; display: flex; justify-content: center; gap: 16px; padding: 6px 4px 0; margin: 0 36px 12px; border-bottom: 1px solid var(--ch-rule, rgba(25, 25, 25, .08)); background: inherit; overflow-x: auto; }
+.ch-btab { display: flex; align-items: baseline; gap: 6px; padding: 2px 0 8px; border: none; border-bottom: 2px solid transparent; background: none; cursor: pointer; white-space: nowrap; font: 500 12px var(--ch-sans); color: var(--ch-ink-3); }
+.ch-btab:hover, .ch-btab.on { color: var(--ch-ink); }
+.ch-btab.on { border-bottom-color: var(--ch-ink); }
+.ch-btab-id { font: 500 10.5px var(--ch-mono, ui-monospace, monospace); }
+.ch-btab-st { font: italic 11px var(--ch-serif); }
+.ch-bslider { display: grid; grid-template-columns: 36px minmax(0, 1fr) 36px; align-items: start; }
+.ch-barrow { position: sticky; top: 40vh; width: 30px; height: 30px; margin: 0 auto; border: none; border-radius: 50%; background: transparent; color: var(--ch-ink-3); font: 400 18px/1 var(--ch-sans); cursor: pointer; }
+.ch-barrow:hover:not(:disabled) { color: var(--ch-ink); background: rgba(25, 25, 25, .045); }
+.ch-barrow:disabled { opacity: .25; cursor: default; }
+[dir="rtl"] .ch-barrow { transform: scaleX(-1); }
+.ch-bslide { min-width: 0; }
+.ch-bmarg { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 4px; margin-top: 10px; }
+.ch-bmarg button { border: none; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+.ch-bmarg button:hover, .ch-bmarg button:focus-visible { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }

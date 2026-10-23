@@ -586,6 +586,19 @@ export default function Shell() {
     return () => window.removeEventListener('parliament-find-card', onFindCard)
   }, [findCard, writeField])
 
+  // Marginalia inside a room write their command into the bar, which waits
+  // for Enter (every marginalia has a command; the slider's open:203b, C173).
+  // Only a command line is written: text from a room never runs one.
+  useEffect(() => {
+    const onWrite = (e) => {
+      const value = e.detail?.value
+      if (typeof value !== 'string' || !value.startsWith('>') || value.length > 200) return
+      writeField(value)
+    }
+    window.addEventListener('parliament-write', onWrite)
+    return () => window.removeEventListener('parliament-write', onWrite)
+  }, [writeField])
+
   // copy: and export: (C143 (f), C138): built from what is stored, in the
   // reader's language around the person's words. Hidden messages and
   // messages being deleted, known while their chat is open here, stay out.

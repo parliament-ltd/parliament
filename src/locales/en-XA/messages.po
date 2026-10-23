@@ -305,6 +305,51 @@ msgstr ""
 msgid "board.welcome"
 msgstr ""
 
+#. The branch the chat carries on from, below the tabs
+#. js-lingui-explicit-id
+msgid "branches.carried"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.carriesOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.loading"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.next"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.previous"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.stopped"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.stoppedNote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.unknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.withHistory"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.writing"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "chat.aboutCard"
 msgstr ""

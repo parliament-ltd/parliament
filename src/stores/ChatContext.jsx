@@ -7,7 +7,7 @@ import { useSettings } from './SettingsContext'
 import { gateway, destination, runClientTool, continueInstruction, providerOf, modelsOf } from '../net'
 import {
   startStream, appendStream, showStreamText, resetStreamText, stopStream, endStream, getStream, appendThinking, thoughtOf,
-  isStreaming as streamingIn, streamingIds, addNotice, noteCut,
+  isStreaming as streamingIn, streamingIds, addNotice, noteCut, watch, watched,
   getMessages as heldMessages, hasMessages, setMessages as holdMessages, updateMessages, releaseMessages, sendable,
 } from './chatStore'
 import { useIsStreaming, useMessages } from './chatHooks'
@@ -695,6 +695,18 @@ export function ChatProvider({ children }) {
     stopStream(conversationId, 'left')
   }, [])
 
+  // A room or a slider shows a chat (C173): the chat is left only when the
+  // last that shows it stops, a moment later, so one taking over from
+  // another (the room moving to a branch the slider showed) leaves nothing.
+  const watchConversation = useCallback((conversationId) => {
+    if (!conversationId) return () => {}
+    const unwatch = watch(conversationId)
+    return () => {
+      unwatch()
+      setTimeout(() => { if (!watched(conversationId)) leaveConversation(conversationId) }, 0)
+    }
+  }, [leaveConversation])
+
   // Clear messages (when switching conversations)
   const clearMessages = useCallback(() => {
     const left = activeRef.current
@@ -723,6 +735,7 @@ export function ChatProvider({ children }) {
       continueMessage,
       stopGenerating,
       leaveConversation,
+      watchConversation,
       clearMessages,
     }}>
       {children}

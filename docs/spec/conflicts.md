@@ -1438,6 +1438,15 @@ Found while splitting stage 8 into pieces. The documents: the plan's stage 8, br
 - **(f) The Enter line** names each recipient with its cost and the total: "Enter sends this one prompt to 3, each a branch of 203: Sonnet 5.5, about 120 tokens, under $0.01; Wikipedia, no cost; Opus 5.5, about 120 tokens, under $0.01".
 - **Suggestion:** keep as built.
 
+**C173. The slider, as built** (piece 2). Branch slider v9 draws the behaviour; these are the points it leaves open.
+- **(a) Where it sits:** in the room, in place of the replies to a prompt sent to several, under the prompt. One tab per branch in the order chosen: its letter, who answered (the model or source that wrote the reply, else the branch's choice), and "writing", "stopped" or "carried on". Arrows either side; ⌥← ⌥→ from the bar, and ← → when the bar is empty, step through the latest slider on screen, mirrored where the page reads right to left. The tab shown is kept for the page only.
+- **(b) What a tab holds:** its branch's reply; with only the room's line carried on, the line goes on below the tabs (v9, state 4); once more than one is carried on, each tab holds its branch's whole thread from that prompt, and nothing goes below (v9, state 5). An older group the line is not part of (a copy made before it was asked) is drawn as plain messages.
+- **(c) Under each reply:** `open:201b` "with its history" and `open:201b summary`, each a command a click writes into the bar, which waits for Enter. Where the chat carries on from another branch, the line says so (v9's proposed rule). The estimate of the room a summary frees comes with piece 4.
+- **(d) Leaving, with branches (C109):** a chat is left, and a reply being written in it stopped, only when nothing on screen shows it: not its room and not a slider. So looking at another tab, or the room moving to the branch it carries on, never stops a branch still writing; leaving the room stops them all, unless replies are let finish.
+- **(e) Another branch's messages** are drawn with plain cards fed from that chat and its stream (no notes, keywords or favourites on them in the slider; `open:` shows a branch with all of it).
+- **(f) A room's contents write into the bar** through one event that takes only a command line (it starts with `>`), so text from a room can never run one.
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

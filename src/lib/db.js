@@ -295,6 +295,14 @@ export async function createConversation({ title = 'New Conversation', model = '
   return createChat(db, conversation)
 }
 
+/** A plan (docket) by its id, or undefined: its number names its branches (203b; stage 8). */
+export async function getDocket(id) {
+  if (!id) return undefined
+  const db = await initDB()
+  if (!db.objectStoreNames.contains('dockets')) return undefined
+  return db.get('dockets', id)
+}
+
 export async function getConversation(id) {
   const db = await initDB()
   return db.get('conversations', id)
