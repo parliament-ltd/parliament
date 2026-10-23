@@ -2004,6 +2004,46 @@ msgstr ""
 msgid "enter.keyRefused"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.languageBrowser"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageBrowserSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageDraft"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageEndsReply"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageNotYet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languagePick"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageSet"
+msgstr ""
+
 #. While the new shell is behind its flag
 #. js-lingui-explicit-id
 msgid "enter.later"
@@ -3973,6 +4013,22 @@ msgid "kind.term"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "languagePicker.draft"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "languagePicker.foot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "languagePicker.globe"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "languagePicker.title"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "layout.canvas-centric"
 msgstr ""
 
@@ -4585,6 +4641,14 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "settings.keysTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.languageHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.languageLabel"
 msgstr ""
 
 #. js-lingui-explicit-id

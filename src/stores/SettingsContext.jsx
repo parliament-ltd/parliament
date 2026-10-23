@@ -41,6 +41,9 @@ const DEFAULT_SETTINGS = {
   // helper (a model's id; none takes the usual), and whether questions to
   // sources that read only English go translated (stage 7, piece 6; C166).
   replyLanguage: null,
+  // The page's language, chosen with language: or the globe (C184); null
+  // follows the browser's languages.
+  interfaceLanguage: null,
   helper: null,
   translateQueries: false,
   // The privacy filter for fixed formats: 'off' or 'patterns' (stage 7, piece 7; C167).

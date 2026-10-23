@@ -102,22 +102,24 @@ export function findLanguage(words, locale = 'en') {
 
 /**
  * What replies are in, and why (C166).
- * @param {{ setting?: string|null, locale?: string, browser?: readonly string[] }} input
+ * @param {{ setting?: string|null, locale?: string, browser?: readonly string[], chosen?: boolean }} input
  *   setting: the person's choice (a tag, 'off', or none); locale: the
  *   interface's language; browser: the languages the browser says its
- *   person reads (navigator.languages)
+ *   person reads (navigator.languages); chosen: the interface's language was
+ *   chosen with language:, so replies follow it whatever the browser lists
+ *   (C166 (b); C184)
  * @returns {{ tag: string|null, how: 'set'|'interface'|'off'|'unread' }}
  *   set: chosen with reply:; interface: following the interface's language;
  *   off: nothing asked (reply:off); unread: following the interface, but the
  *   browser does not list its language, so nothing is asked
  */
-export function replyLanguageOf({ setting = null, locale = 'en', browser = [] } = {}) {
+export function replyLanguageOf({ setting = null, locale = 'en', browser = [], chosen: pageChosen = false } = {}) {
   if (setting === OFF) return { tag: null, how: 'off' }
   const chosen = setting ? keptTag(setting) : null
   if (chosen) return { tag: chosen, how: 'set' }
   const page = baseOf(locale)
-  const read = (browser ?? []).some((b) => baseOf(b) === page) || TEST.test(String(locale ?? ''))
-  return read ? { tag: keptTag(page) ?? page, how: 'interface' } : { tag: null, how: 'unread' }
+  const read = pageChosen || (browser ?? []).some((b) => baseOf(b) === page) || TEST.test(String(locale ?? ''))
+  return read ? { tag: keptTag(locale) ?? keptTag(page) ?? page, how: 'interface' } : { tag: null, how: 'unread' }
 }
 
 /**

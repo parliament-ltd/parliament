@@ -9,7 +9,7 @@
 //   translate:      the last answer from a source, into your language
 //   translate:on    questions to sources that read only English go translated
 
-import { findLanguage, OFF } from './languages'
+import { findLanguage, OFF, ownNameOf, nameOf } from './languages'
 import { findAnswerers } from '../net/answerers'
 import { translateCost, translateTokens, inputCost, CHARS_PER_TOKEN } from '../shell/estimate'
 import { instructionLike } from './injection'
@@ -43,6 +43,63 @@ export function planReply(step, screens = {}) {
   if (!tag) return { says: { message: 'replyNone', values: { word } }, act: null }
   if (before === tag) return { says: { message: 'replySame', values: { language: name(tag) } }, act: null }
   return { says: { message: 'replySet', values: { language: name(tag) } }, act: { kind: 'setting', key: 'replyLanguage', value: tag, before } }
+}
+
+// The offered language a found one means: the same tag, or, for a plain
+// language with no script or region, the one offered of that language
+// (Chinese finds Simplified Chinese; Traditional does not).
+function offeredFor(tag, offered) {
+  const exact = offered.find((t) => t.toLowerCase() === tag.toLowerCase())
+  if (exact) return exact
+  if (tag.includes('-')) return null
+  return offered.find((t) => t.split('-')[0].toLowerCase() === tag.toLowerCase()) ?? null
+}
+
+/**
+ * language: (ruled 16 October; C166 (b); stage 9, piece 4; C184). One
+ * choice sets the page's language, and replies and searches follow it: a
+ * separate reply: choice ends, and the Enter line says so. The Enter line
+ * speaks the language chosen (says.locale). screens.language: { offered:
+ * [{ tag, draft }], chosen, locale, reply, browserTag }: the languages the
+ * picker offers, the setting (a tag, or null to follow the browser), the
+ * page's language now, the reply setting as stored, and the language
+ * following the browser gives.
+ */
+export function planLanguage(step, screens = {}) {
+  const l = screens.language
+  if (!l) return { says: { message: 'later', values: { verb: 'language:' } }, act: null }
+  const args = step.match?.values ?? []
+  const offered = l.offered.map((o) => o.tag)
+  if (!args.length) {
+    if (offered.length < 2) return { says: { message: 'languageOnly', values: { language: ownNameOf(offered[0] ?? 'en') } }, act: null }
+    return { says: { message: 'languagePick' }, act: { kind: 'languagePicker' } }
+  }
+  const word = said(args)
+  const before = { interfaceLanguage: l.chosen ?? null, replyLanguage: l.reply ?? null }
+  const endsReply = before.replyLanguage != null
+  const also = (tag) => [
+    ...(endsReply ? [{ message: 'languageEndsReply' }] : []),
+    ...(l.offered.find((o) => o.tag === tag)?.draft ? [{ message: 'languageDraft' }] : []),
+  ]
+  if (word.toLocaleLowerCase() === 'browser') {
+    if (before.interfaceLanguage == null && !endsReply) return { says: { message: 'languageBrowserSame' }, act: null }
+    const tag = l.browserTag ?? 'en'
+    return {
+      says: { message: 'languageBrowser', values: { language: ownNameOf(tag) }, locale: tag, also: also(null) },
+      act: { kind: 'language', tag: null, before },
+    }
+  }
+  const asked = findLanguage(word, l.locale)
+  const tag = asked ? offeredFor(asked, offered) : null
+  if (!tag) {
+    if (!asked) return { says: { message: 'languageNone', values: { word } }, act: null }
+    return { says: { message: 'languageNotYet', values: { language: nameOf(asked, l.locale), names: offered.map(ownNameOf) } }, act: null }
+  }
+  if (before.interfaceLanguage === tag && !endsReply) return { says: { message: 'languageSame', values: { language: ownNameOf(tag) } }, act: null }
+  return {
+    says: { message: 'languageSet', values: { language: ownNameOf(tag) }, locale: tag, also: also(tag) },
+    act: { kind: 'language', tag, before },
+  }
 }
 
 /**

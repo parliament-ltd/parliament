@@ -100,6 +100,7 @@ const SETTINGS = Object.freeze({
   // The reply language, a tag or 'off'; the helper, a model's id; whether
   // questions to sources that read only English are translated first (C166).
   replyLanguage: (v) => v === null || typeof v === 'string' && /^(off|[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?)$/.test(v),
+  interfaceLanguage: (v) => v === null || typeof v === 'string' && /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/.test(v),
   helper: (v) => v === null || typeof v === 'string' && /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$/.test(v),
   translateQueries: bool,
   // The privacy filter (C167).

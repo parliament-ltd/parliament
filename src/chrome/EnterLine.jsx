@@ -1,5 +1,6 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect, useSyncExternalStore } from 'react'
 import { useLingui } from '@lingui/react'
+import { preloadLanguage, speakerOf, onLanguageLoaded, languageLoads } from '../i18n'
 import { COPY } from '../copy'
 import { say, boardName } from './say'
 import { isRoom } from '../shell/boards'
@@ -12,7 +13,7 @@ function Parts({ parts }) {
   return parts.map((part, i) => (
     <Fragment key={part.key}>
       {i > 0 && <span className="sep" aria-hidden="true">{'·'}</span>}
-      <span className={part.now ? 'now' : undefined}>{part.text}</span>
+      <span className={part.now ? 'now' : undefined} lang={part.lang}>{part.text}</span>
     </Fragment>
   ))
 }
@@ -28,6 +29,13 @@ function Parts({ parts }) {
  */
 export default function EnterLine({ mode, resting, empty, says, addressed, room, welcome = null, hidden = false, search = null }) {
   const { i18n } = useLingui()
+  // What Enter will do, in the language a language: line names, once its
+  // words are loaded (C184); until then, in the page's.
+  const speaks = says?.locale ?? null
+  useEffect(() => { preloadLanguage(speaks) }, [speaks])
+  useSyncExternalStore(onLanguageLoaded, languageLoads, languageLoads)
+  const speaker = (speaks && speakerOf(speaks)) || i18n
+  const lang = speaker === i18n ? undefined : speaks
   const leave = { key: 'leave', text: i18n._(resting === 'prompt' ? COPY.enter.leavePrompt : COPY.enter.leaveSearch) }
   const toRoom = room && (mode === 'prompt' || isRoom(addressed))
   let targetText
@@ -42,7 +50,7 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
   // stays out of a prompt: a key of COPY.enter, or { message, values }.
   const also = (says?.also == null ? [] : [].concat(says.also))
     .map((a) => (typeof a === 'string' ? { message: a } : a))
-    .map((a, i) => ({ key: `also${i}`, text: say(i18n, a.message, a.values) }))
+    .map((a, i) => ({ key: `also${i}`, text: say(speaker, a.message, a.values), lang }))
   if (mode === 'command' && welcome?.next && says?.message === 'empty') {
     // The welcome page's command line leads with the next step (W §6).
     parts = [
@@ -52,7 +60,7 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
       leave,
     ]
   } else if (mode === 'command') {
-    parts = [target, { key: 'does', now: true, text: say(i18n, says.message, says.values) }, ...also]
+    parts = [target, { key: 'does', now: true, text: say(speaker, says.message, says.values), lang }, ...also]
     parts.push(leave)
   } else if (mode === 'search' && welcome && empty) {
     // At rest on the welcome page, one line only (W §2).

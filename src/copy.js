@@ -484,6 +484,18 @@ export const COPY = {
     promptIncludedFlagged: /*i18n*/ { id: 'enter.promptIncludedFlagged', message: 'Words in it read like instructions to a model; they go marked as data' },
     promptIncludedNotSources: /*i18n*/ { id: 'enter.promptIncludedNotSources', message: 'Sources among them are sent your words only' },
     promptIncludedKept: /*i18n*/ { id: 'enter.promptIncludedKept', message: '{count, plural, one {A source is sent your words only, so the answer held waits for a prompt to a model} other {A source is sent your words only, so the answers held wait for a prompt to a model}}' },
+    // language: (ruled 16 October; C166 (b); stage 9, piece 4; C184). Said in
+    // the language chosen. {language}: a language by its own name.
+    languagePick: /*i18n*/ { id: 'enter.languagePick', message: 'Enter opens the list of languages' },
+    languageOnly: /*i18n*/ { id: 'enter.languageOnly', message: 'Only {language} so far. Other languages come once they are translated and read' },
+    languageSet: /*i18n*/ { id: 'enter.languageSet', message: 'Enter puts the page in {language}, and your replies and searches follow it' },
+    languageDraft: /*i18n*/ { id: 'enter.languageDraft', message: 'This translation is a draft, waiting to be read' },
+    languageEndsReply: /*i18n*/ { id: 'enter.languageEndsReply', message: 'Replies stop keeping a language of their own' },
+    languageSame: /*i18n*/ { id: 'enter.languageSame', message: 'The page is in {language} already' },
+    languageBrowser: /*i18n*/ { id: 'enter.languageBrowser', message: 'Enter has the page follow your browser again: {language}' },
+    languageBrowserSame: /*i18n*/ { id: 'enter.languageBrowserSame', message: 'The page follows your browser already' },
+    languageNotYet: /*i18n*/ { id: 'enter.languageNotYet', message: '{language} is not here yet. language: takes {names}' },
+    languageNone: /*i18n*/ { id: 'enter.languageNone', message: 'No language called {word}. language: takes a code or a name, as in language:sv or language:svenska' },
     // backup:, restore:, import: (stage 9, piece 2; A21; C182).
     backupOpen: /*i18n*/ { id: 'enter.backupOpen', message: 'Enter opens the backup: what goes in, and whether it has a password' },
     restoreOpen: /*i18n*/ { id: 'enter.restoreOpen', message: 'Enter opens a file to bring back. Nothing changes until you say how' },
@@ -826,6 +838,14 @@ export const COPY = {
     replyCut: /*i18n*/ { id: 'enter.replyCut', message: 'The reply broke off part way. What arrived is kept and marked as cut off' },
   },
 
+  // The languages' picker (stage 9, piece 4; C184).
+  languagePicker: {
+    title: /*i18n*/ { id: 'languagePicker.title', message: 'Languages' },
+    draft: /*i18n*/ { id: 'languagePicker.draft', message: 'draft' },
+    foot: /*i18n*/ { id: 'languagePicker.foot', message: 'Replies and searches follow the page. reply: gives replies a language of their own' },
+    globe: /*i18n*/ { id: 'languagePicker.globe', message: 'Language: {language}' },
+  },
+
   // Delete everything (stage 9, piece 3; settings spec §11; C73; T5; C183).
   // The one red in the product. {names}: providers from the list of providers.
   erase: {
@@ -997,6 +1017,8 @@ export const COPY = {
     reminderMonthly: /*i18n*/ { id: 'settings.reminderMonthly', message: 'Monthly' },
     reminderNever: /*i18n*/ { id: 'settings.reminderNever', message: 'Never' },
     lastLabel: /*i18n*/ { id: 'settings.lastLabel', message: 'Last backup' },
+    languageLabel: /*i18n*/ { id: 'settings.languageLabel', message: 'Language' },
+    languageHelp: /*i18n*/ { id: 'settings.languageHelp', message: 'The page’s language. Replies and searches follow it, unless reply: gives replies their own.' },
     lastOn: /*i18n*/ { id: 'settings.lastOn', message: '{day}.' },
     lastNever: /*i18n*/ { id: 'settings.lastNever', message: 'None yet.' },
     textLabel: /*i18n*/ { id: 'settings.textLabel', message: 'Text size' },

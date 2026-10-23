@@ -52,6 +52,7 @@ import { readAlmanac } from '../lib/almanacRows'
 import { backupReminderState, getBackupStatus, dismissBackupBanner, getBackupLog } from '../lib/backup'
 import SettingsBoard from './SettingsBoard'
 import { parseBackupFile, BACKUP_VERSION } from '../lib/backup'
+import { offeredLanguages, isDraft, startingLanguage } from '../i18n'
 import { createFactsCache } from '../lib/chatFacts'
 import { readSaved, keepSearch, forgetSearch, putSaved } from '../lib/savedSearches'
 import { readCollections, writeCollection, newCollection, withRows } from '../lib/collections'
@@ -813,6 +814,7 @@ export default function Shell() {
   const pendingFwNow = useRef(null)
   useEffect(() => { pendingFwNow.current = pendingFrameworks }, [pendingFrameworks])
   const [fwPicking, setFwPicking] = useState(false)
+  const [langPicking, setLangPicking] = useState(false) // language:'s picker (C184)
   const fwList = useMemo(() => frameworkList(ownFrameworks), [ownFrameworks])
   const fwListNow = useRef(fwList)
   useEffect(() => { fwListNow.current = fwList }, [fwList])
@@ -1163,6 +1165,32 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'languagePicker') {
+      // A bare language: or the globe (C184): the picker under the field.
+      setInspected(null)
+      setCompared(null)
+      setKeyPanel(null)
+      setPicking(false)
+      setFwPicking(false)
+      setLangPicking(true)
+      remember(body)
+      return null
+    }
+    if (what.kind === 'language') {
+      // language: (C166 (b); C184): the page's language, and replies and
+      // searches follow it; a reply language of their own ends. One undo:
+      // puts both back.
+      setLangPicking(false)
+      await updateSettingNow.current('interfaceLanguage', what.tag)
+      const back = [{ key: 'interfaceLanguage', before: what.before.interfaceLanguage }]
+      if (what.before.replyLanguage != null) {
+        await updateSettingNow.current('replyLanguage', null)
+        back.push({ key: 'replyLanguage', before: what.before.replyLanguage })
+      }
+      if (touched.current) touched.current.setting = back
+      remember(body)
+      return null
+    }
     if (what.kind === 'frameworkPicker') {
       setInspected(null)
       setCompared(null)
@@ -1397,7 +1425,7 @@ export default function Shell() {
     if (entry.many) setHeldMany(entry.many.before)
     if (entry.heldTo) setHeldTo(entry.heldTo.before)
     if (entry.pendingFw) setPendingFrameworks(entry.pendingFw.before)
-    if (entry.setting) await updateSettingNow.current(entry.setting.key, entry.setting.before)
+    if (entry.setting) for (const s of [].concat(entry.setting)) await updateSettingNow.current(s.key, s.before)
     if (entry.own) {
       try {
         for (const o of [...entry.own].reverse()) {
@@ -1581,7 +1609,9 @@ export default function Shell() {
   // where the browser lists it. Sent to every model as one line of the
   // system prompt, and named on the Enter line.
   const browserLanguages = useMemo(() => (typeof navigator === 'undefined' ? [] : [...(navigator.languages ?? [])]), [])
-  const reply = useMemo(() => replyLanguageOf({ setting: settings.replyLanguage ?? null, locale: i18n.locale, browser: browserLanguages }), [settings.replyLanguage, i18n.locale, browserLanguages])
+  // A language chosen with language: is read, whatever the browser lists (C184).
+  const pageChosen = Boolean(settings.interfaceLanguage) && offeredLanguages().includes(settings.interfaceLanguage)
+  const reply = useMemo(() => replyLanguageOf({ setting: settings.replyLanguage ?? null, locale: i18n.locale, browser: browserLanguages, chosen: pageChosen }), [settings.replyLanguage, i18n.locale, browserLanguages, pageChosen])
   useEffect(() => { replyNow.current = reply }, [reply])
   const languageName = useCallback((tag) => nameOf(tag, i18n.locale), [i18n.locale])
   // The model that reads text from sources, and translates it.
@@ -1637,13 +1667,16 @@ export default function Shell() {
   const translator = useMemo(() => translatorFor({ browser: lastAnswer?.from ? browserCan[`${lastAnswer.from}>${translateTo}`] ?? null : null, helper: helperNow }), [lastAnswer, translateTo, browserCan, helperNow])
   const languageScreens = useMemo(() => ({
     reply: { setting: settings.replyLanguage ?? null, now: reply, locale: i18n.locale, nameOf: languageName },
+    // language: (C184): what the picker offers, the choice, and what
+    // following the browser gives.
+    language: { offered: offeredLanguages().map((tag) => ({ tag, draft: isDraft(tag) })), chosen: settings.interfaceLanguage ?? null, locale: i18n.locale, reply: settings.replyLanguage ?? null, browserTag: startingLanguage() },
     helping: { now: helperNow, rows: answerRows, stored: settings.helper ?? null },
     translating: { room: roomId, num: roomRecord?.num ?? null, last: lastAnswer, to: translateTo, who: translator, queries: settings.translateQueries === true, nameOf: languageName, privacy: settings.privacyFilter ?? 'off' },
     privacy: { mode: settings.privacyFilter ?? 'off', local: localChecker?.name ?? null },
     checking: { room: roomId, num: roomRecord?.num ?? null, last: lastAnswer && { messageId: lastAnswer.messageId, source: lastAnswer.source, text: lastAnswer.text }, local: localChecker && { id: localChecker.id, name: localChecker.name },
       // With none on this computer, the helper when it is a hosted model (C179).
       hosted: helperNow && helperNow.group === 'model' && !helperNow.needsKey && !helperNow.later && !helperNow.gone ? { id: helperNow.id, name: helperNow.name, provider: helperNow.provider, price: helperNow.price ?? null } : null },
-  }), [settings.privacyFilter, localChecker, settings.replyLanguage, settings.helper, settings.translateQueries, reply, i18n.locale, languageName, helperNow, answerRows, roomId, roomRecord, lastAnswer, translateTo, translator])
+  }), [settings.privacyFilter, localChecker, settings.replyLanguage, settings.interfaceLanguage, settings.helper, settings.translateQueries, reply, i18n.locale, languageName, helperNow, answerRows, roomId, roomRecord, lastAnswer, translateTo, translator])
   // open:203b summary (C175): what the Enter line needs of a chat, read
   // from Records: its address and the next branch's, what it holds, the
   // sources that answered in it, and who answers the new branch, with how
@@ -1727,7 +1760,7 @@ export default function Shell() {
         defaultModel: settings.defaultModel, storageMode: settings.storageMode, describeNewChats: settings.describeNewChats !== false,
         finishRepliesOnLeave: Boolean(settings.finishRepliesOnLeave), fontSize: settings.fontSize ?? 'default', mistralRegion: settings.mistralRegion ?? 'global',
         thinking: settings.thinking === true, privacyFilter: settings.privacyFilter ?? 'off', translateQueries: settings.translateQueries === true,
-        newChatRoom: settings.newChatRoom ?? null, backupReminder: settings.backupReminder ?? 'monthly',
+        newChatRoom: settings.newChatRoom ?? null, backupReminder: settings.backupReminder ?? 'monthly', interfaceLanguage: settings.interfaceLanguage ?? null,
       },
       providers: keyInfo.keys,
       rows: answerRows,
@@ -1752,6 +1785,8 @@ export default function Shell() {
       storage: settingsStored.storage,
       lastBackup: settingsStored.lastBackup,
       backupVersion: BACKUP_VERSION,
+      // The globe in Appearance, once more than one language is offered (C184).
+      languages: offeredLanguages().length > 1 ? { now: i18n.locale } : null,
     }
   }, [settings, keyInfo, answerRows, referenceName, local, roomTemplates, reply, languageName, helperNow, almanacRows, i18n.locale, settingsStored])
   // What set: reads (lib/settingVerbs.js).
@@ -2149,6 +2184,12 @@ export default function Shell() {
     const p = preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
     if (p.act) await onRun(p.next ?? null, line, null, p.act)
   }, [onRun, commit])
+  // A line run as if typed and entered, wherever the bar points: the
+  // globe's language: and the picker's choices (C184).
+  const runCommand = useCallback(async (line) => {
+    const p = preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
+    if (p.act) await onRun(p.next ?? null, line, null, p.act)
+  }, [onRun])
   const pickAnswerer = useCallback(async (row) => {
     if (row.later) return
     if (row.needsKey || row.unchecked) { setPicking(false); writeField(`>api:${row.provider}`); return }
@@ -2283,7 +2324,7 @@ export default function Shell() {
       return <LibraryBoard key="library" items={catalogue} addressed={arrangement.addressed === 'library'} onAddress={focusBoard} onWrite={writeField} />
     }
     if (board === 'welcome') {
-      return <WelcomeBoard key="welcome" welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} />
+      return <WelcomeBoard key="welcome" welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={() => runCommand('language:')} />
     }
     if (board === 'collection') {
       return (
@@ -2333,7 +2374,8 @@ export default function Shell() {
           picker={replyPicking && branchShown && targets
             ? { kind: 'reply', members: branchShown.members, targets, line: branchShown.line, onToggle: toggleReplyTarget, onAll: allReplyTargets }
             : picking ? { rows: answerRows, now: answerer, picked: heldIds && heldIds.length > 1 ? heldIds : null, reference: referenceName } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => { setPicking(false); setReplyPicking(false) }}
-          frameworkPicker={fwPicking ? { items: frameworkItems } : null} onFrameworkPicker={toggleFwPicker} onToggleFramework={toggleFramework} onFrameworkPickerClose={() => setFwPicking(false)} />,
+          frameworkPicker={fwPicking ? { items: frameworkItems } : null} onFrameworkPicker={toggleFwPicker} onToggleFramework={toggleFramework} onFrameworkPickerClose={() => setFwPicking(false)}
+          languagePicker={langPicking ? { items: offeredLanguages().map((tag) => ({ tag, draft: isDraft(tag) })), now: i18n.locale } : null} onPickLanguage={(tag) => runCommand(`language:${tag}`)} onLanguagePickerClose={() => setLangPicking(false)} />,
         barHost,
       )}
       {barWindow && <p className="ch-away ch-marg">{i18n._(COPY.shell.barAway)}</p>}

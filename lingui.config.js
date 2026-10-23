@@ -5,8 +5,9 @@
 // compile, never translated by hand: en-XA, every word accented and 40%
 // longer, to catch words left out of the table and text that overflows; and
 // ar-XB, the same text written right to left, to catch layouts that do not
-// mirror. Real languages (Japanese, Chinese, Swedish, Finnish first, C87)
-// are added here when they ship.
+// mirror. Real languages: Japanese, Simplified Chinese, Swedish and Finnish
+// first (C87), drafted for Stefan's review and offered in development only
+// until he has read them (i18n.js, DRAFT_LANGUAGES; C184).
 //
 // `npm run i18n` collects the wording from the code into
 // src/locales/{locale}/messages.po and compiles each into messages.js.
@@ -16,7 +17,7 @@ import { formatter } from '@lingui/format-po'
 
 export default defineConfig({
   sourceLocale: 'en',
-  locales: ['en', 'en-XA', 'ar-XB'],
+  locales: ['en', 'en-XA', 'ar-XB', 'ja', 'zh-Hans', 'sv', 'fi'],
   pseudoLocale: [
     { locale: 'en-XA', prepend: '[', append: ']', extend: 0.4 },
     { locale: 'ar-XB', rightToLeft: true },

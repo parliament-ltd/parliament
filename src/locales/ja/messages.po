@@ -1,0 +1,5545 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-10-23 10:14-0500\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: ja\n"
+
+#. js-lingui-explicit-id
+msgid "almanac.backupAtRisk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.backupDays"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.backupLater"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.backupNever"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.colActive"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.colCreated"
+msgstr ""
+
+#. The number every row is addressed by
+#. js-lingui-explicit-id
+msgid "almanac.colId"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.colRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.colTags"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.colTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.colType"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.empty"
+msgstr ""
+
+#. Marginalia on a note, keyword or quote kept when its chat was erased
+#. js-lingui-explicit-id
+msgid "almanac.erasedFrom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.filtersLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.loading"
+msgstr ""
+
+#. clear:filters stays English
+#. js-lingui-explicit-id
+msgid "almanac.noneMatch"
+msgstr ""
+
+#. open: stays English; {name} is the person's words
+#. js-lingui-explicit-id
+msgid "almanac.openSavedHelp"
+msgstr ""
+
+#. Marginalia under a pinned row
+#. js-lingui-explicit-id
+msgid "almanac.pinned"
+msgstr ""
+
+#. {command} stays English
+#. js-lingui-explicit-id
+msgid "almanac.removes"
+msgstr ""
+
+#. What clicking a row does; open: stays English
+#. js-lingui-explicit-id
+msgid "almanac.rowHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.saved"
+msgstr ""
+
+#. save: stays English
+#. js-lingui-explicit-id
+msgid "almanac.saveHelp"
+msgstr ""
+
+#. What is searched for, in the quotation marks the language uses
+#. js-lingui-explicit-id
+msgid "almanac.searchFor"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.shown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "almanac.untitled"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catAnnotations"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catAnnotationsAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catChats"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catChatsAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catLayouts"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catLayoutsAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catLibrary"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catLibraryAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catPreferences"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catPreferencesAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catRooms"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.catRoomsAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.close"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.doMerge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.doReplace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.downloadLocked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.downloadOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.fileHolds"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.fileInvalid"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.fileIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.fileLocked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.fileOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.fileOther"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.fileUnreadable"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.howTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.keepDownload"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.keepFirst"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.keptHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.lede"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.merge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.mergeAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.noPassword"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.noPasswordAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.passwordAgain"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.passwordPlaceholder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.passwordTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.problemDiffer"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.problemFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.problemNeedPassword"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.problemNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.problemRestore"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.problemShort"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.problemUnlock"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.replace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.replaceAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.titleBackup"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.titleRestore"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.typeReplace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.unlock"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.unlockLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.withPassword"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "backup.withPasswordAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.branches"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.chart-canvas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.claude-comments"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.collab-mode"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.column-inspector"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.context"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.document-canvas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.file-shelf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.highlights"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.input"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.messages"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.notes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.review"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.ripple-analysis"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.summary-dashboard"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.table-canvas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "block.toc"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.branches"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.chart-canvas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.claude-comments"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.collab-mode"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.column-inspector"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.context"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.document-canvas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.file-shelf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.highlights"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.input"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.messages"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.notes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.review"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.ripple-analysis"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.summary-dashboard"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.table-canvas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blockAbout.toc"
+msgstr ""
+
+#. The table of everything you have made, by number (C131)
+#. js-lingui-explicit-id
+msgid "board.almanac"
+msgstr ""
+
+#. The pieces a room is built from, beside the Canvas in the Lab
+#. js-lingui-explicit-id
+msgid "board.blocks"
+msgstr ""
+
+#. The room being built, in the middle of the Lab
+#. js-lingui-explicit-id
+msgid "board.canvas"
+msgstr ""
+
+#. Cards of highlights, terms, quotes and notes
+#. js-lingui-explicit-id
+msgid "board.collection"
+msgstr ""
+
+#. Prompts set out in branches and steps, to run (C131)
+#. js-lingui-explicit-id
+msgid "board.docket"
+msgstr ""
+
+#. Where rooms are built
+#. js-lingui-explicit-id
+msgid "board.lab"
+msgstr ""
+
+#. Rooms, layouts, blocks, themes and resources
+#. js-lingui-explicit-id
+msgid "board.library"
+msgstr ""
+
+#. Reads a chat and its markings
+#. js-lingui-explicit-id
+msgid "board.reflection"
+msgstr ""
+
+#. Every room, in a list of where a command works
+#. js-lingui-explicit-id
+msgid "board.room"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "board.settings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "board.welcome"
+msgstr ""
+
+#. The branch the chat carries on from, below the tabs
+#. js-lingui-explicit-id
+msgid "branches.carried"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.carriesOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.context"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.contextSmall"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.contextUnder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.loading"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.next"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.previous"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.stopped"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.stoppedNote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.unknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.withHistory"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.writing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.aboutCard"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.answeredFrom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.askedAs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.close"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.cutError"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.cutErrorEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.cutLimit"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.describeSetting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.describeSettingHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.finishSetting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.finishSettingHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.frameworkGone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.includedFlagged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.includedWith"
+msgstr ""
+
+#. Under an answer from a source (C169)
+#. js-lingui-explicit-id
+msgid "chat.instructionLike"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quoted"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quoteHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quoteMessage"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quoteNewChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quoteRemove"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quotesHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quotesHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.quoteWhichChat"
+msgstr ""
+
+#. A question to a source, sent as a search without its question words (C168)
+#. js-lingui-explicit-id
+msgid "chat.searchedFor"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.showOriginal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.showTranslation"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.sourceComments"
+msgstr ""
+
+#. A link to where people discussed a result
+#. js-lingui-explicit-id
+msgid "chat.sourceDiscussion"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.sourceNothing"
+msgstr ""
+
+#. A Hacker News story's points
+#. js-lingui-explicit-id
+msgid "chat.sourcePoints"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.sourceRevision"
+msgstr ""
+
+#. {chat} is the chat's number, or its title in quotation marks
+#. js-lingui-explicit-id
+msgid "chat.stoppedNotice"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.stoppedNoticeEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.stoppedOnReply"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.summaryBy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.summaryOf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.summaryOfGone"
+msgstr ""
+
+#. While a model thinks before answering; {time} is minutes and seconds, 2:31
+#. js-lingui-explicit-id
+msgid "chat.thinking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.thought"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.thoughtHide"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.thoughtShow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.thoughtUntimed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.translatedBy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.translatedByBrowser"
+msgstr ""
+
+#. Under a reply: the frameworks it was written under (C164). {names} is a list
+#. js-lingui-explicit-id
+msgid "chat.writtenUnder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "cited.heading"
+msgstr ""
+
+#. {command} is a command, which stays English
+#. js-lingui-explicit-id
+msgid "collection.actHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actNewChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actNote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actNoteQuoting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actOneCall"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actPrompt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actPromptHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actSummarize"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.actTag"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.by"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.card"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.cardFrom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.chats"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.count"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.date"
+msgstr ""
+
+#. add: stays English
+#. js-lingui-explicit-id
+msgid "collection.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.emptyHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.erased"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.erasedFrom"
+msgstr ""
+
+#. The collection favourites became (C20)
+#. js-lingui-explicit-id
+msgid "collection.favorites"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.findHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.from"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.fromHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.fromNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.groupAdded"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.groupChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.groupPlan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.line"
+msgstr ""
+
+#. new:collection stays English
+#. js-lingui-explicit-id
+msgid "collection.none"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.noneMatch"
+msgstr ""
+
+#. open: stays English
+#. js-lingui-explicit-id
+msgid "collection.openHelp"
+msgstr ""
+
+#. add: and rm: stay English
+#. js-lingui-explicit-id
+msgid "collection.pickFoot"
+msgstr ""
+
+#. {command} is add: or rm: with a number
+#. js-lingui-explicit-id
+msgid "collection.pickHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.plans"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.quotedGone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.select"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.selectClear"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.selected"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.selectNone"
+msgstr ""
+
+#. open: stays English
+#. js-lingui-explicit-id
+msgid "collection.showHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.source"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.summaryOf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabAll"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabHighlight"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabMessage"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabNote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabQuote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabTerm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.under"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.untitled"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.writtenHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.yours"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "compare.close"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "compare.counts"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "compare.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "compare.legend"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "compare.same"
+msgstr ""
+
+#. A message's attachments, by name only; {names} is a list
+#. js-lingui-explicit-id
+msgid "copy.attached"
+msgstr ""
+
+#. A heading over a document chat's text
+#. js-lingui-explicit-id
+msgid "copy.document"
+msgstr ""
+
+#. The first line of an exported Markdown file
+#. js-lingui-explicit-id
+msgid "copy.exportedOn"
+msgstr ""
+
+#. Where a note, keyword or quote came from: a chat number
+#. js-lingui-explicit-id
+msgid "copy.from"
+msgstr ""
+
+#. Where it came from: a chat that was erased
+#. js-lingui-explicit-id
+msgid "copy.fromErased"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "copy.keywords"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "copy.notes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "copy.quotes"
+msgstr ""
+
+#. A source page's revision number
+#. js-lingui-explicit-id
+msgid "copy.revision"
+msgstr ""
+
+#. Who wrote a prompt, in copied Markdown
+#. js-lingui-explicit-id
+msgid "copy.you"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "count.branches"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "count.chats"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "count.dockets"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "count.steps"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.again"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againAsking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againChanged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againIncluded"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againLocal"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.againNoOne"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.againNoRoom"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.againNotChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againNothing"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.againNotOnScreen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againSource"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againTabs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.againUnpriced"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.aloneErase"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.aloneNow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.aloneSpends"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.answererFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.apiAdd"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.apiAllKeyed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.apiList"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.apiLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.apiNew"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.apiNoKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.apiReplace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.apiUnknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.archiveAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.archiveNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.archiveOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.archiveOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.backupDoneLocked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.backupDoneOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.backupOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.barMove"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.barNotPopped"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.barPoppedAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.barThere"
+msgstr ""
+
+#. {boards} lists board names
+#. js-lingui-explicit-id
+msgid "enter.bringBoards"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.bringHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.byChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.byHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.byHereMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.byLater"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.byMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.byMost"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.byNeedsKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.byNext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.byNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.byNumber"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.bySame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.bySameMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.bySeveral"
+msgstr ""
+
+#. {names} is a list joined with "or"
+#. js-lingui-explicit-id
+msgid "enter.byWhich"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkClean"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkFound"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkFoundUnquoted"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkFree"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkHosted"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkHostedCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkHostedUnpriced"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkLocal"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.checkNoLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkNothing"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.checkOrLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkWorking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.checkWorkingHosted"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.clearFilter"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.clearFilters"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.clearNoFilter"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.clearNoSearch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.clearNoSort"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.clearNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.clearSearch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.clearSort"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.closeBoard"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.closeFixed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.closeLast"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.closeNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.closeRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.closeRoomNum"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.closeWelcome"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionAdd"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionCardNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionChanged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionClear"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionEmptyAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionForget"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionName"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionNameSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionNameTaken"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionNew"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionNotIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionRm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionSort"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.collectionTab"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.colsHide"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.colsNow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.colsSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.colsShow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.colsStays"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.colsUnknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.compare"
+msgstr ""
+
+#. compare: stays English
+#. js-lingui-explicit-id
+msgid "enter.compareKinds"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.compareNothingSent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.compareSame"
+msgstr ""
+
+#. compare: stays English
+#. js-lingui-explicit-id
+msgid "enter.compareTwo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.copied"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.copyFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.copyHidden"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.copyOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.costBad"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.dateBad"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.didYouMean"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.elsewhere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.empty"
+msgstr ""
+
+#. The answer to delete:, ruled 15 October
+#. js-lingui-explicit-id
+msgid "enter.erase"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.eraseBusy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.erased"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.eraseFailed"
+msgstr ""
+
+#. A number and the start of its title or words, in the language's quotation marks
+#. js-lingui-explicit-id
+msgid "enter.eraseItem"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.eraseItems"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.eraseMarksGo"
+msgstr ""
+
+#. all stays English: it is a word of the command
+#. js-lingui-explicit-id
+msgid "enter.eraseMarksStay"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.erasePlanGoes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.eraseUndo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.exported"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.exportFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.exportHidden"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.exportItems"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.exportNoRestore"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.exportNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.filePicking"
+msgstr ""
+
+#. C132 (h): a cost is worked out from recorded tokens, never guessed
+#. js-lingui-explicit-id
+msgid "enter.filterCostUnknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.filters"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.filterShows"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.filterSince"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.filterUntil"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.findGone"
+msgstr ""
+
+#. clear:filters stays English
+#. js-lingui-explicit-id
+msgid "enter.findHidden"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusAlone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusClosing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusOffNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusOffSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.forgetNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.forgetSearch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.forgetWhich"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkBuiltInName"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkForget"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkKeep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkMost"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.frameworkNeeds"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.frameworkNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkOffNext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkReplace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkSameWords"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkSet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkSetNext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.frameworkShow"
+msgstr ""
+
+#. {names} is a list joined with "or"
+#. js-lingui-explicit-id
+msgid "enter.frameworkWhich"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.fromWhat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.goNewRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.goRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.goWelcome"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.headingAfter"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.headingBefore"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.headingEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.headingEnd"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.headingLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.headingNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.headingRm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.help"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.helperNoModel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.helperNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.helperNow"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.helperNowChosen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.helperOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.helperSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.helperSameOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.helperSet"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.helperSource"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.helperUnchecked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.helpVerb"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.importOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeFlagged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeNoAnswer"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.includeNoBranches"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeNoneHeld"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.includeNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeNothing"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.includeNothingTry"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeOneFrom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.includeSome"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.inNoCollection"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.inNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.inNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.inspectOne"
+msgstr ""
+
+#. room and collection stay English: they are words of the command
+#. js-lingui-explicit-id
+msgid "enter.inWhich"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.jumpCard"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.jumpNoChat"
+msgstr ""
+
+#. add: stays English
+#. js-lingui-explicit-id
+msgid "enter.jumpNotHeld"
+msgstr ""
+
+#. open: stays English
+#. js-lingui-explicit-id
+msgid "enter.jumpOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.jumpPassage"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.jumpRow"
+msgstr ""
+
+#. jump: stays English
+#. js-lingui-explicit-id
+msgid "enter.jumpWhere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.key"
+msgstr ""
+
+#. {board} is Settings, from COPY.boards
+#. js-lingui-explicit-id
+msgid "enter.keyRefused"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageBrowser"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageBrowserSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageDraft"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageEndsReply"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageNotYet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languagePick"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.languageSet"
+msgstr ""
+
+#. While the new shell is behind its flag
+#. js-lingui-explicit-id
+msgid "enter.later"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.leavePrompt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.leaveSearch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.manyFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.moveBoard"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.moveCardAfter"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.moveCardBefore"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.moveCardSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.moveIsPopped"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.moveThere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameNoChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameNoTitle"
+msgstr ""
+
+#. {name} is the person's own words
+#. js-lingui-explicit-id
+msgid "enter.nameRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameSameTitle"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.namesUnchecked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.nameTitleLong"
+msgstr ""
+
+#. search and collection stay English: they are words of the command
+#. js-lingui-explicit-id
+msgid "enter.nameWhichKind"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.newBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchAt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchFailed"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.newBranchNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchStart"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.newBranchSteps"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.newRoomHere"
+msgstr ""
+
+#. The next welcome step's command, which stays English
+#. js-lingui-explicit-id
+msgid "enter.nextStep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noMinus"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.notCommand"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteAlone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteAloneQuoting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteInQuoting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteNeverSent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.noteWords"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.numNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openAddressed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openBoard"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openBranchHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openChatAddressed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openChatHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openChatThere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openCollection"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openDocket"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openDocketHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openNotYet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openPopped"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSaved"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSettingsAt"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.openSettingsNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummary"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryCheapNext"
+msgstr ""
+
+#. {share} is how much of it the branch fills now, {low} about what the summary will
+#. js-lingui-explicit-id
+msgid "enter.openSummaryContext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryContextOver"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryContextSmall"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryContextUnder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryLocalNext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryNext"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.openSummaryNoOne"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.openSummaryNotChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryPrivacy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummarySources"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryUnpriced"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryUnpricedNext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openSummaryWriting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.openWhichSaved"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.pinOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.pinOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popBackAll"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popBackCommand"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popBackOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popBlocked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popBoard"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popCommand"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popDisplay"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popLast"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popNotPopped"
+msgstr ""
+
+#. Added to the Enter line for pop: where the always-on-top window is missing (C94)
+#. js-lingui-explicit-id
+msgid "enter.popOrdinary"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popSide"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popSideThere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.privacyNames"
+msgstr ""
+
+#. Commands stay English. S3: never in the browser, never by a provider
+#. js-lingui-explicit-id
+msgid "enter.privacyNamesNeedsLocal"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.privacyNow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.privacyOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.privacyOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.privacySameNames"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.privacySameOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.privacySameOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.privacySearchEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptAboutMany"
+msgstr ""
+
+#. api: stays English
+#. js-lingui-explicit-id
+msgid "enter.promptAboutNoKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptAboutQuotes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptBusy"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptCarriesOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptChanged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptChecking"
+msgstr ""
+
+#. C62: named before Enter; a switch in Settings turns it off. {cost} is an amount
+#. js-lingui-explicit-id
+msgid "enter.promptDescribe"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptDescribeCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptDescribeOnce"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptDescribeUnpriced"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptEdition"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptFrameworks"
+msgstr ""
+
+#. C151: a chat or a default naming a model the list no longer has
+#. js-lingui-explicit-id
+msgid "enter.promptGone"
+msgstr ""
+
+#. Hidden messages, and messages being deleted, are not sent (stage 4)
+#. js-lingui-explicit-id
+msgid "enter.promptHiddenOut"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptIncluded"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptIncludedFlagged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptIncludedKept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptIncludedNotSources"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptLater"
+msgstr ""
+
+#. A model on this computer reads about 4,000 tokens by default on most computers (C163 (e))
+#. js-lingui-explicit-id
+msgid "enter.promptLocalLong"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptLocalUnchecked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyModel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManySource"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyTotal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyTotalCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyUnpriced"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptNeedsKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptNoRoom"
+msgstr ""
+
+#. Said when a source with a daily allowance answers (C156)
+#. js-lingui-explicit-id
+msgid "enter.promptPerDay"
+msgstr ""
+
+#. A model offered before general availability (security notes §3)
+#. js-lingui-explicit-id
+msgid "enter.promptPreviewModel"
+msgstr ""
+
+#. Commands stay English. A model whose provider trains on everything sent to it (security notes §3)
+#. js-lingui-explicit-id
+msgid "enter.promptPreviewTrains"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptPrivacy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptPrivacyNames"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptPrivacyOffer"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptPrivacySearch"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptPrivacySearchOffer"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptQueryTranslated"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptQueryUntranslated"
+msgstr ""
+
+#. Where Mistral processes the prompt, chosen in its key panel (C159)
+#. js-lingui-explicit-id
+msgid "enter.promptRegion"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptReplyIn"
+msgstr ""
+
+#. Sent only on Enter, never automatically (C114)
+#. js-lingui-explicit-id
+msgid "enter.promptResend"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptResendCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptResendUnpriced"
+msgstr ""
+
+#. A source answers a search; a leading question phrase is left out (C168)
+#. js-lingui-explicit-id
+msgid "enter.promptSearchFor"
+msgstr ""
+
+#. A local estimate: nothing is sent to count (C83)
+#. js-lingui-explicit-id
+msgid "enter.promptSend"
+msgstr ""
+
+#. {cost} is the smallest amount shown, a cent
+#. js-lingui-explicit-id
+msgid "enter.promptSendCheap"
+msgstr ""
+
+#. A model running on this computer through Ollama (C163)
+#. js-lingui-explicit-id
+msgid "enter.promptSendLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptSendUnpriced"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptSource"
+msgstr ""
+
+#. C115: answers from sources are not sent to a model unless the person acts on them. {sources} lists their names
+#. js-lingui-explicit-id
+msgid "enter.promptSourcesOut"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptStalled"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptThinks"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptThinksOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptToBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptToMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptToManyCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptToManyTotal"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptTranslateLater"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.queryFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.ready"
+msgstr ""
+
+#. Enter puts the new verb in the field; it does not run it
+#. js-lingui-explicit-id
+msgid "enter.renamed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replyCut"
+msgstr ""
+
+#. Commands stay English (C171)
+#. js-lingui-explicit-id
+msgid "enter.replyEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replyNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.replyNowNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.replyNowPage"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.replyNowSet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replyOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replySame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replySameOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replySet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.replyToFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.resetAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.resetArrangement"
+msgstr ""
+
+#. The Enter line in search mode, before anything is typed
+#. js-lingui-explicit-id
+msgid "enter.restingCommand"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.restingHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.restingPrompt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.restoreMerged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.restoreOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.restoreReplaced"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.retag"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.retagMerge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.retagSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.retired"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.retiredInstead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.roomHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.roomNumberNotChat"
+msgstr ""
+
+#. open: stays English
+#. js-lingui-explicit-id
+msgid "enter.roomNumberNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.roomThere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rowsChanged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rowsFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rowsTogether"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.savedFailed"
+msgstr ""
+
+#. Follows the reason a filter in it no longer reads
+#. js-lingui-explicit-id
+msgid "enter.savedStale"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.saveKeep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.saveKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.saveLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.saveName"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.saveNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.saveReplace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.saveSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.searchCards"
+msgstr ""
+
+#. In search mode on a board search does not reach yet; {first} and {second} are board names
+#. js-lingui-explicit-id
+msgid "enter.searchRecords"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.searchSettings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.searchShows"
+msgstr ""
+
+#. {verbs} lists the commands in the order they run; one that fails stops the rest
+#. js-lingui-explicit-id
+msgid "enter.sequence"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setChoose"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setCompress"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setDefault"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setDefaultNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setDefaultSource"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setFinishOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setFinishOn"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setKeysForget"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setKeysRemember"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setList"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setNeeds"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setRegion"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setReminder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setRoom"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setRoomList"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setRoomNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setRoomWhich"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setText"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setTitleOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setTitleOn"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setUnknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.showRoom"
+msgstr ""
+
+#. The words stay English
+#. js-lingui-explicit-id
+msgid "enter.sortCollection"
+msgstr ""
+
+#. The words stay English
+#. js-lingui-explicit-id
+msgid "enter.sortRecords"
+msgstr ""
+
+#. A source answered 429: its allowance for this network is used up, or it is busy
+#. js-lingui-explicit-id
+msgid "enter.sourceBusy"
+msgstr ""
+
+#. A source refused the request (403), as some do for shared VPN addresses (LPN §8)
+#. js-lingui-explicit-id
+msgid "enter.sourceNetwork"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sourceRefused"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sourceUnreachable"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarize"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeFailed"
+msgstr ""
+
+#. summarize: stays English
+#. js-lingui-explicit-id
+msgid "enter.summarizeKinds"
+msgstr ""
+
+#. summarize: stays English
+#. js-lingui-explicit-id
+msgid "enter.summarizeMany"
+msgstr ""
+
+#. api: stays English
+#. js-lingui-explicit-id
+msgid "enter.summarizeNoKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeQuotes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeUnpriced"
+msgstr ""
+
+#. summarize: stays English
+#. js-lingui-explicit-id
+msgid "enter.summarizeWhere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.summarizeWriting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.swapBoards"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.swapSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tagAdd"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tagAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tagLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tagNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tagNowhere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tagWhich"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tagWords"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.takesExample"
+msgstr ""
+
+#. {words} is a list joined with "or"
+#. js-lingui-explicit-id
+msgid "enter.takesWords"
+msgstr ""
+
+#. The head of the Enter line: where the command goes
+#. js-lingui-explicit-id
+msgid "enter.target"
+msgstr ""
+
+#. The head of the Enter line in a room: the chat's number
+#. js-lingui-explicit-id
+msgid "enter.targetChat"
+msgstr ""
+
+#. {chat} is the chat's number, {room} the room's name (bar reference: → 201a in unnamed room)
+#. js-lingui-explicit-id
+msgid "enter.targetChatIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.targetNewChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.targetNewRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.thinkingNow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.thinkingOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.thinkingOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.thinkingSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.toAll"
+msgstr ""
+
+#. {leader} is >, the command leader
+#. js-lingui-explicit-id
+msgid "enter.toBegin"
+msgstr ""
+
+#. In prompt mode on the welcome page (C119)
+#. js-lingui-explicit-id
+msgid "enter.toCommand"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.toNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.toNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tooMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.toOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.toSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.toSome"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tourHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tourOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tourOffAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tourOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translate"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateByBrowser"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateByBrowserDownload"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateByLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateByModel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateByModelCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateByModelUnpriced"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translated"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateInstructions"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.translateNoOne"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.translateNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translatePrivacy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateQueriesOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateQueriesOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateQueriesSameOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateQueriesSameOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.translateWorking"
+msgstr ""
+
+#. The words stay English
+#. js-lingui-explicit-id
+msgid "enter.typeCollection"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.undoChanged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.undoFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.undoLine"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.undone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.undoNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.unknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.unknownHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.untag"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.untagAll"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthAlone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthEven"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthEvenAlready"
+msgstr ""
+
+#. It is the board the bar points at, named just before this line
+#. js-lingui-explicit-id
+msgid "enter.widthIt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthLeast"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthMost"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthPopped"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthRange"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthRoomNum"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthSet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthStacked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.widthThere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.about"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.backupFirst"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.cannot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.doneHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.doneNext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.doneThere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.failed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.go"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.goesChats"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.goesKeys"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.goesMarkings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.goesOffline"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.goesRooms"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.goesSettings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.keep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.listTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.reload"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.start"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.typeWord"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.waiting"
+msgstr ""
+
+#. The word typed to arm Delete everything: one lower-case word
+#. js-lingui-explicit-id
+msgid "erase.word"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "erase.working"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.answeredBy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.answeredFrom"
+msgstr ""
+
+#. Shown on hover over who answers, in the prompt field
+#. js-lingui-explicit-id
+msgid "field.answeredHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.frameworkHelp"
+msgstr ""
+
+#. Marginalia in the prompt field; framework: is the command, kept English
+#. js-lingui-explicit-id
+msgid "field.frameworkNone"
+msgstr ""
+
+#. The first framework on this chat, and how many more
+#. js-lingui-explicit-id
+msgid "field.frameworkSome"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.toAll"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.toOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.toSome"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.about.alts"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.about.challenge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.about.pushback"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.about.reasoning"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.about.uncertain"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.alts"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.challenge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.pushback"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.reasoning"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "framework.uncertain"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "frameworkPicker.builtIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "frameworkPicker.foot"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "frameworkPicker.noneYet"
+msgstr ""
+
+#. A framework of your own with no name, as a persona could be
+#. js-lingui-explicit-id
+msgid "frameworkPicker.unnamed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "frameworkPicker.yours"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.building"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.collection"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.editing"
+msgstr ""
+
+#. Several filters can share one line
+#. js-lingui-explicit-id
+msgid "group.filters"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.go"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.items"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.layout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.leaders"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.run"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.settings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.start"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "group.tags"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "hint.kOnly"
+msgstr ""
+
+#. The name of the folded field, read by screen readers
+#. js-lingui-explicit-id
+msgid "hint.minimised"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "hint.slashOrK"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "inspect.active"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "inspect.close"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "inspect.created"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "inspect.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "inspect.openChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.add"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.checking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.checkThenHold"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.checkThenKeep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.ends"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.endsHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.fieldLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.foot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.heading"
+msgstr ""
+
+#. A link to the page where the provider makes and revokes keys
+#. js-lingui-explicit-id
+msgid "keys.keysPage"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localBlocked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localCheck"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localCheckAgain"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localChecking"
+msgstr ""
+
+#. Names no browser (C94)
+#. js-lingui-explicit-id
+msgid "keys.localDenied"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localFound"
+msgstr ""
+
+#. As the picker names the group (A14)
+#. js-lingui-explicit-id
+msgid "keys.localHeading"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localMissing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localModels"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localNone"
+msgstr ""
+
+#. OLLAMA_ORIGINS is the name of a setting and stays as written
+#. js-lingui-explicit-id
+msgid "keys.localOrigins"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localUnchecked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.localUnreached"
+msgstr ""
+
+#. Shown before the browser asks for permission to reach this computer (LPN §7.5)
+#. js-lingui-explicit-id
+msgid "keys.localWhy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.needs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.noKeyNeeded"
+msgstr ""
+
+#. Follows the link to the key page, in one sentence
+#. js-lingui-explicit-id
+msgid "keys.ownKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.placeholder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.placeholderNew"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.problemBilling"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.problemEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.problemInvalid"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.problemUnreached"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.promise"
+msgstr ""
+
+#. Where a provider processes prompts; three choices follow
+#. js-lingui-explicit-id
+msgid "keys.region"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.regionEu"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.regionGlobal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.regionNote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.regionUs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.replace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keys.save"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keysData.cannotSee"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keysData.checked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keysData.flagged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keysData.localAway"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keysData.longer"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keysData.optOut"
+msgstr ""
+
+#. A link to the provider's own page
+#. js-lingui-explicit-id
+msgid "keysData.page"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keysData.regionKept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "keysData.trainsAll"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "kind.ask"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "kind.chat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "kind.docket"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "kind.edit"
+msgstr ""
+
+#. One passage marked where it sits
+#. js-lingui-explicit-id
+msgid "kind.highlight"
+msgstr ""
+
+#. A message held in a collection, as Favorites holds them
+#. js-lingui-explicit-id
+msgid "kind.message"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "kind.note"
+msgstr ""
+
+#. A passage kept beside the chat, never sent
+#. js-lingui-explicit-id
+msgid "kind.quote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "kind.suggestion"
+msgstr ""
+
+#. A word or phrase lit wherever it appears in a chat (C131)
+#. js-lingui-explicit-id
+msgid "kind.term"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "languagePicker.draft"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "languagePicker.foot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "languagePicker.globe"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "languagePicker.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layout.canvas-centric"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layout.document-centric"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layout.reading-pane"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layout.single-column-with-sheet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layout.split-view"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layout.three-panel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.canvas-centric"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.document-centric"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.reading-pane"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.single-column-with-sheet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.split-view"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "layoutAbout.three-panel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "leader.command"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "leader.help"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "leader.prompt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "leader.search"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.aboutAlmanac"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.aboutCollection"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.aboutDocket"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.aboutLibrary"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.aboutReflection"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.aboutSettings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.blocks"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.emptyShelf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.featureAttach"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.featureVoice"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.featureWebSearch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.groupMine"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.groupTemplates"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.inRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.loading"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.onScreen"
+msgstr ""
+
+#. Marginalia on a board: writes open:<board> in the bar
+#. js-lingui-explicit-id
+msgid "library.open"
+msgstr ""
+
+#. open: and the board stay English
+#. js-lingui-explicit-id
+msgid "library.openHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.pillMine"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.pillSoon"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.pillTemplate"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.places"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelfAll"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelfBlocks"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelfBoards"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelfLayouts"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelfResources"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelfRooms"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelfThemes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.shelves"
+msgstr ""
+
+#. How many items show while one shelf is chosen
+#. js-lingui-explicit-id
+msgid "library.shown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.themeFact"
+msgstr ""
+
+#. The bar's command mode
+#. js-lingui-explicit-id
+msgid "mode.command"
+msgstr ""
+
+#. The bar's prompt mode
+#. js-lingui-explicit-id
+msgid "mode.prompt"
+msgstr ""
+
+#. The bar's search mode
+#. js-lingui-explicit-id
+msgid "mode.search"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.fable"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.glm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.hackernews"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.haiku"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.mistral"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.mistralLarge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.mistralMedium"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.mistralSmall"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.ollama"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.openalex"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.opus"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.sonnet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.about.wikipedia"
+msgstr ""
+
+#. A model whose provider has no key here; a click writes api:
+#. js-lingui-explicit-id
+msgid "picker.addKey"
+msgstr ""
+
+#. A source whose answers are in English whatever the reader's language (LPN §6)
+#. js-lingui-explicit-id
+msgid "picker.englishOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.kept30"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.keptAtLeast30"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.keptDevice"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.keptUpTo30"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.kind.discussion"
+msgstr ""
+
+#. Sources by the kind of question they answer (branch slider v9)
+#. js-lingui-explicit-id
+msgid "picker.kind.reference"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.kind.research"
+msgstr ""
+
+#. A row not built yet
+#. js-lingui-explicit-id
+msgid "picker.later"
+msgstr ""
+
+#. Models that run on this computer (A14)
+#. js-lingui-explicit-id
+msgid "picker.local"
+msgstr ""
+
+#. A model its provider hosts but did not make (LPN §7.1). {maker} is a company name
+#. js-lingui-explicit-id
+msgid "picker.madeBy"
+msgstr ""
+
+#. {reference} is a model name, from the list
+#. js-lingui-explicit-id
+msgid "picker.marks"
+msgstr ""
+
+#. A group in the picker of who answers
+#. js-lingui-explicit-id
+msgid "picker.models"
+msgstr ""
+
+#. A source whose answers are mostly in English
+#. js-lingui-explicit-id
+msgid "picker.mostlyEnglish"
+msgstr ""
+
+#. Beside the Sources group
+#. js-lingui-explicit-id
+msgid "picker.noTokens"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.oneAtATime"
+msgstr ""
+
+#. OpenAlex's daily allowance (C156)
+#. js-lingui-explicit-id
+msgid "picker.perDay"
+msgstr ""
+
+#. A model offered before general availability; it may change or go
+#. js-lingui-explicit-id
+msgid "picker.preview"
+msgstr ""
+
+#. Stage 8 (C172 (c))
+#. js-lingui-explicit-id
+msgid "picker.several"
+msgstr ""
+
+#. Answers from public sources, with no model
+#. js-lingui-explicit-id
+msgid "picker.sources"
+msgstr ""
+
+#. A model that can think before it answers, when thinking:on is set (C165)
+#. js-lingui-explicit-id
+msgid "picker.thinks"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.trainAlways"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.trainNo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.trainOptOut"
+msgstr ""
+
+#. Models on this computer, before anyone has asked to look for them (C33)
+#. js-lingui-explicit-id
+msgid "picker.unchecked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "privacy.card"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "privacy.email"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "privacy.iban"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "privacy.phone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "replyPicker.all"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "replyPicker.carried"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "replyPicker.follows"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "replyPicker.footCarried"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "replyPicker.held"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "replyPicker.ownRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "replyPicker.thread"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "replyPicker.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "replyPicker.viewed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "room.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "room.newTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "room.notFound"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "room.unavailable"
+msgstr ""
+
+#. A room with no name of its own (bar reference)
+#. js-lingui-explicit-id
+msgid "room.unnamed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.aboutDesc"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.aboutLine"
+msgstr ""
+
+#. The name of the app
+#. js-lingui-explicit-id
+msgid "settings.aboutName"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.aboutTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.addKey"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "settings.apiFrom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.appearanceDesc"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.appearanceTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.backupHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.backupLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.contextDesc"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.contextLede"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.contextTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.dataDesc"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.dataLede"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.dataTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.defaultLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.finishLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.finishOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.finishOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.helperIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.helperLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.helperNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.isDefault"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keepForget"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keepForgetHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keepingHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keepingLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keepRemember"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keepRememberHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keptNo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keptUnknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keptYes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keyHas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keyHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keyNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keysDesc"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keysLede"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.keysTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.languageHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.languageLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.lastLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.lastNever"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.lastOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.localBlocked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.localChecking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.localFound"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.localMissing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.localUnchecked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.monthLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.monthSpent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.monthUnknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.networkHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.networkLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.networkNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.networkSelf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.networkUnknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.privacy_names"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.privacy_off"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.privacy_patterns"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.privacyLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.rail"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.regionEu"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.regionGlobal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.regionHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.regionLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.regionUs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.reminderDaily"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.reminderHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.reminderLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.reminderMonthly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.reminderNever"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.reminderWeekly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.replyAny"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.replyIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.replyLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.roomHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.roomLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.sources"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.sourcesHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.spendingDesc"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.spendingLede"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.spendingTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.storageCounts"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.storageLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.storageUsed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.textCompact"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.textDefault"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.textHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.textLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.textLarge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.thinkingLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.thinkingOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.thinkingOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.titleLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.titleOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.titleOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.translateLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.translateOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.translateOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.untitled"
+msgstr ""
+
+#. Marginalia on the board the navy rule is on
+#. js-lingui-explicit-id
+msgid "shell.addressed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "shell.barAway"
+msgstr ""
+
+#. The popped bar's window title
+#. js-lingui-explicit-id
+msgid "shell.barWindow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "shell.boardLater"
+msgstr ""
+
+#. Read aloud for the stretchable edge between two boards
+#. js-lingui-explicit-id
+msgid "shell.edge"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "shell.edgeHelp"
+msgstr ""
+
+#. A room, named mid-sentence beside an edge
+#. js-lingui-explicit-id
+msgid "shell.edgeRoom"
+msgstr ""
+
+#. The welcome card, named mid-sentence beside an edge
+#. js-lingui-explicit-id
+msgid "shell.edgeWelcome"
+msgstr ""
+
+#. The name of the field, read by screen readers
+#. js-lingui-explicit-id
+msgid "shell.field"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "shell.referenceClose"
+msgstr ""
+
+#. The name of the ? reference, read by screen readers
+#. js-lingui-explicit-id
+msgid "shell.referenceName"
+msgstr ""
+
+#. Editable text on a placeholder board; nothing typed here is kept
+#. js-lingui-explicit-id
+msgid "shell.sampleReply"
+msgstr ""
+
+#. The name of the board strip, read by screen readers
+#. js-lingui-explicit-id
+msgid "shell.strip"
+msgstr ""
+
+#. A popped window's title: a board name only, never anything someone wrote
+#. js-lingui-explicit-id
+msgid "shell.windowTitle"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "storage.ask"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "storage.backup"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "storage.kept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "storage.notKept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "template.dataWorkspace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "template.draftingDesk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "template.kingfisher"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "template.pocketChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "template.quietRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "template.starling"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "template.writingStudio"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "templateAbout.data-workspace@1.0"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "templateAbout.drafting-desk@1.0"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "templateAbout.kingfisher@1.0"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "templateAbout.pocket-chat@1.0"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "templateAbout.quiet-room@1.0"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "templateAbout.starling@1.0"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "templateAbout.writing-studio@1.0"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "theme.amber-glow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "theme.cool-bright"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "theme.deep-calm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "theme.fresh-teal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "theme.parliament"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "theme.soft-violet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "themeAbout.amber-glow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "themeAbout.cool-bright"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "themeAbout.deep-calm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "themeAbout.fresh-teal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "themeAbout.parliament"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "themeAbout.soft-violet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.accept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.add"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.again"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.api"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.archive"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.arrange"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.backup"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.bar"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.by"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.calm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.check"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.clear"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.close"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.cols"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.compare"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.copy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.cost"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.device"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.diff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.done"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.drop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.duplicate"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.edit"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.erase"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.export"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.focus"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.forget"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.framework"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.from"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.has"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.heading"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.helper"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.hold"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.import"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.in"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.include"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.inspect"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.jump"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.lab"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.language"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.layout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.library"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.markup"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.model"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.move"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.name"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.new"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.note"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.open"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.pin"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.place"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.plan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.pop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.privacy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.records"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.reflect"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.reject"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.reply"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.reset"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.resources"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.restore"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.retag"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.rewrite"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.ripple"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.rm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.room"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.run"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.save"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.set"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.since"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.sort"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.stop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.strikethrough"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.summarize"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.swap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.sweep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.tag"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.tagadd"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.tell"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.theme"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.thinking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.to"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.tour"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.translate"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.type"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.undo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.untag"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.until"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.width"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.foot.builders"
+msgstr ""
+
+#. Until the repository is public (C71, C123)
+#. js-lingui-explicit-id
+msgid "welcome.foot.licence"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.foot.made"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.heading"
+msgstr ""
+
+#. The heading finishes its sentence when the steps are done: Welcome / to Parliament
+#. js-lingui-explicit-id
+msgid "welcome.headingTo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.keepAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.keepAsking"
+msgstr ""
+
+#. {board} is Settings, from COPY.boards
+#. js-lingui-explicit-id
+msgid "welcome.keepBackup"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.keepNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.letter.1"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.letter.2"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.letter.3"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.letter.4"
+msgstr ""
+
+#. {command} is focus:, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.now"
+msgstr ""
+
+#. The letter is signed with this name after a dash
+#. js-lingui-explicit-id
+msgid "welcome.signature"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.small"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.almanac"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.ask"
+msgstr ""
+
+#. {command} is p>, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.askHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.bar"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.command"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.key"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.library"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.name"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.pop"
+msgstr ""
+
+#. The name of the list of steps, read by screen readers
+#. js-lingui-explicit-id
+msgid "welcome.steps"
+msgstr ""

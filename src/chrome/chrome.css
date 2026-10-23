@@ -701,3 +701,8 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-shell .ch-settings button.ch-plain-btn { padding: 7px 13px; font: 500 11.5px var(--ch-sans); color: var(--ch-ink); background: var(--ch-surface); border: 1px dashed var(--ch-soft); border-radius: var(--ch-r-btn); cursor: pointer; }
 .ch-shell .ch-settings button.ch-plain-btn:hover { background: var(--ch-wash); }
 .ch-shell .ch-settings button.ch-plain-btn:disabled { opacity: .45; cursor: default; }
+
+/* ── The globe (stage 9, piece 4; C184): marginalia that opens the languages. */
+.ch-shell button.ch-globe { padding: 0; border: none; background: none; cursor: pointer; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); text-align: start; }
+.ch-shell button.ch-globe:hover, .ch-shell button.ch-globe:focus-visible { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+.ch-wtop .ch-globe { margin-top: 6px; }

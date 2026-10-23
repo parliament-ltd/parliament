@@ -2004,6 +2004,46 @@ msgstr "No keys in the command line, for security. Delete it, and api: opens the
 msgid "enter.keyRefused"
 msgstr "The key was refused. Update it in {board}, then send again"
 
+#. js-lingui-explicit-id
+msgid "enter.languageBrowser"
+msgstr "Enter has the page follow your browser again: {language}"
+
+#. js-lingui-explicit-id
+msgid "enter.languageBrowserSame"
+msgstr "The page follows your browser already"
+
+#. js-lingui-explicit-id
+msgid "enter.languageDraft"
+msgstr "This translation is a draft, waiting to be read"
+
+#. js-lingui-explicit-id
+msgid "enter.languageEndsReply"
+msgstr "Replies stop keeping a language of their own"
+
+#. js-lingui-explicit-id
+msgid "enter.languageNone"
+msgstr "No language called {word}. language: takes a code or a name, as in language:sv or language:svenska"
+
+#. js-lingui-explicit-id
+msgid "enter.languageNotYet"
+msgstr "{language} is not here yet. language: takes {names}"
+
+#. js-lingui-explicit-id
+msgid "enter.languageOnly"
+msgstr "Only {language} so far. Other languages come once they are translated and read"
+
+#. js-lingui-explicit-id
+msgid "enter.languagePick"
+msgstr "Enter opens the list of languages"
+
+#. js-lingui-explicit-id
+msgid "enter.languageSame"
+msgstr "The page is in {language} already"
+
+#. js-lingui-explicit-id
+msgid "enter.languageSet"
+msgstr "Enter puts the page in {language}, and your replies and searches follow it"
+
 #. While the new shell is behind its flag
 #. js-lingui-explicit-id
 msgid "enter.later"
@@ -3973,6 +4013,22 @@ msgid "kind.term"
 msgstr "Keyword"
 
 #. js-lingui-explicit-id
+msgid "languagePicker.draft"
+msgstr "draft"
+
+#. js-lingui-explicit-id
+msgid "languagePicker.foot"
+msgstr "Replies and searches follow the page. reply: gives replies a language of their own"
+
+#. js-lingui-explicit-id
+msgid "languagePicker.globe"
+msgstr "Language: {language}"
+
+#. js-lingui-explicit-id
+msgid "languagePicker.title"
+msgstr "Languages"
+
+#. js-lingui-explicit-id
 msgid "layout.canvas-centric"
 msgstr "Canvas in the middle"
 
@@ -4586,6 +4642,14 @@ msgstr "Each provider’s key sits with the models it unlocks. Pick one as the m
 #. js-lingui-explicit-id
 msgid "settings.keysTitle"
 msgstr "API keys"
+
+#. js-lingui-explicit-id
+msgid "settings.languageHelp"
+msgstr "The page’s language. Replies and searches follow it, unless reply: gives replies their own."
+
+#. js-lingui-explicit-id
+msgid "settings.languageLabel"
+msgstr "Language"
 
 #. js-lingui-explicit-id
 msgid "settings.lastLabel"

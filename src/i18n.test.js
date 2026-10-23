@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, it, expect } from 'vitest'
 import { VERBS } from './commands/verbs'
 import { setupI18n } from '@lingui/core'
-import { pickLanguage, directionOf } from './i18n'
+import { pickLanguage, directionOf, offeredLanguages, isDraft, languageFor, optOutOfPageTranslation, DRAFT_LANGUAGES, SHIPPED_LANGUAGES } from './i18n'
 import { COPY } from './copy'
 import { messages as en } from './locales/en/messages.mjs'
 import { messages as accented } from './locales/en-XA/messages.mjs'
@@ -58,5 +58,26 @@ describe('the compiled catalogues', () => {
       expect(accented[id], id).toBeDefined()
       expect(mirrored[id], id).toBeDefined()
     }
+  })
+})
+
+describe('the languages offered (C184)', () => {
+  it('are English, and in development the drafts, marked as such', () => {
+    expect(SHIPPED_LANGUAGES).toEqual(['en'])
+    expect(offeredLanguages(false)).toEqual(['en'])
+    expect(offeredLanguages(true)).toEqual(['en', ...DRAFT_LANGUAGES])
+    expect(DRAFT_LANGUAGES).toEqual(['ja', 'zh-Hans', 'sv', 'fi'])
+    expect(isDraft('sv')).toBe(true)
+    expect(isDraft('en')).toBe(false)
+  })
+
+  it('give the page the language chosen, while it is offered', () => {
+    expect(languageFor('sv', ['en', 'sv'])).toBe('sv')
+    expect(languageFor('sv', ['en'])).toBe('en')
+    expect(languageFor(null, ['en', 'sv'])).toBe('en')
+  })
+
+  it("leave the browser's own translation alone until a second language ships (C84)", () => {
+    expect(optOutOfPageTranslation(['en'])).toBe(false)
   })
 })

@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalS
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import DeleteEverything from './DeleteEverything'
+import Globe from './Globe'
 import { SECTIONS } from '../shell/boards'
 import { getEntries, subscribe as onLog } from '../lib/networkLog'
 import { gateway, networkByHost } from '../net'
@@ -304,6 +305,11 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
           {/* Appearance (settings spec §12) */}
           <section data-sec="appearance" className={`ch-sec${visible('appearance') ? '' : ' hidden'}`} aria-labelledby="sec-appearance">
             <SecHead id="appearance" title={say(TITLE.appearance)} />
+            {facts.languages && (
+              <Row {...rowProps('appearance', 'language')} label={say(COPY.settings.languageLabel)} help={say(COPY.settings.languageHelp)}>
+                <Globe now={facts.languages.now} onOpen={() => onSet('language:')} />
+              </Row>
+            )}
             <Row {...rowProps('appearance', 'text')} label={say(COPY.settings.textLabel)} help={say(COPY.settings.textHelp)}>
               <Seg label={say(COPY.settings.textLabel)} value={v.fontSize ?? 'default'} onPick={(x) => onSet(`set:text ${x}`)} options={[['compact', say(COPY.settings.textCompact)], ['default', say(COPY.settings.textDefault)], ['large', say(COPY.settings.textLarge)]]} />
             </Row>
@@ -374,7 +380,7 @@ function rowWords(facts) {
       last: 'last backup backed up date',
       danger: 'delete everything erase wipe remove all danger',
     },
-    appearance: { text: 'text size font compact large zoom' },
+    appearance: { ...(facts.languages ? { language: 'language languages translate translation interface page globe' } : {}), text: 'text size font compact large zoom' },
     about: { parliament: 'parliament version about servers accounts', network: 'network activity requests log hosts' },
   }
 }

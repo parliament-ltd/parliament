@@ -1,4 +1,5 @@
 import { useLingui } from '@lingui/react'
+import Globe from './Globe'
 import { COPY } from '../copy'
 import { STEPS, nextStep } from '../shell/welcome'
 import { useNarrower } from './useNarrower'
@@ -49,7 +50,7 @@ function withCommand(i18n, descriptor, command, onWrite) {
  *   keep?: { asking: boolean, onAsk: () => void }|null }} props
  *   keep: when the browser has not agreed to keep Parliament's data and there is something to lose (C94)
  */
-export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, barSlot, keep = null }) {
+export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, barSlot, keep = null, languages = null, onLanguage }) {
   const { i18n } = useLingui()
   const next = nextStep(welcome)
   const steps = !welcome.off && !welcome.finished
@@ -70,6 +71,7 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
               <span className="ch-wto">{i18n._(COPY.welcome.headingTo)}</span>
             </h1>
             <p className="ch-wsmall ch-marg">{i18n._(COPY.welcome.small)}</p>
+            {languages && <Globe now={languages.now} onOpen={onLanguage} />}
           </div>
           {steps && (
             <ol className="ch-steps" aria-label={i18n._(COPY.welcome.steps)}>

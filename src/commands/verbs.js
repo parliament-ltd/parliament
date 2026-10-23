@@ -335,7 +335,7 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.restore', message: 'Bring a backup back' } }),
   v({ verb: 'import', group: 'settings', example: 'import:', takes: [[]], stage: 9,
     gloss: /*i18n*/ { id: 'verb.import', message: 'Open a file made elsewhere. It says what the file is before anything happens' } }),
-  v({ verb: 'language', group: 'settings', example: 'language:ja', forms: ['language:', 'language:ja', 'language:japanese', 'language:日本語'], takes: [[], ['text']], stage: 9, undoable: true, click: 'apply',
+  v({ verb: 'language', group: 'settings', example: 'language:ja', forms: ['language:', 'language:ja', 'language:japanese', 'language:日本語', 'language:browser'], takes: [[], [{ many: 'text' }]], stage: 9, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.language', message: 'Change the language, by its code or its name' } }),
 ])
 

@@ -135,3 +135,45 @@ describe('the prompt’s Enter line (C166)', () => {
     expect(also({ answerer: hn, translateLater: 'Swedish' })).toEqual(['Its answer comes in English. translate: puts it in Swedish afterwards'])
   })
 })
+
+describe('language: (ruled 16 October; C166 (b); C184)', () => {
+  const offered = [{ tag: 'en', draft: false }, { tag: 'ja', draft: true }, { tag: 'zh-Hans', draft: true }, { tag: 'sv', draft: true }, { tag: 'fi', draft: true }]
+  const screens = (over = {}) => ({ language: { offered, chosen: null, locale: 'en', reply: null, browserTag: 'en', ...over } })
+
+  it('takes a code or a name, in English or in the language itself, and says what follows', () => {
+    for (const v of ['>language:sv', '>language:swedish', '>language:svenska', '>language:Swedish']) {
+      const p = line(v, screens())
+      expect(p.text).toBe('Enter puts the page in svenska, and your replies and searches follow it')
+      expect(p.says.locale).toBe('sv')
+      expect(p.act).toEqual({ kind: 'language', tag: 'sv', before: { interfaceLanguage: null, replyLanguage: null } })
+      expect(p.also).toEqual(['This translation is a draft, waiting to be read'])
+    }
+    expect(line('>language:日本語', screens()).act.tag).toBe('ja')
+    expect(line('>language:chinese', screens()).act.tag).toBe('zh-Hans')
+    expect(line('>language:simplified chinese', screens()).act.tag).toBe('zh-Hans')
+  })
+
+  it('ends a reply language of its own, and one undo: puts both back', () => {
+    const p = line('>language:fi', screens({ reply: 'de' }))
+    expect(p.act).toEqual({ kind: 'language', tag: 'fi', before: { interfaceLanguage: null, replyLanguage: 'de' } })
+    expect(p.also[0]).toBe('Replies stop keeping a language of their own')
+  })
+
+  it('opens the picker bare, or says only one language is here', () => {
+    expect(line('>language:', screens())).toMatchObject({ text: 'Enter opens the list of languages', act: { kind: 'languagePicker' } })
+    const only = line('>language:', screens({ offered: [{ tag: 'en', draft: false }] }))
+    expect(only.text).toBe('Only English so far. Other languages come once they are translated and read')
+    expect(only.act ?? null).toBeNull()
+  })
+
+  it('goes back to the browser, and refuses what is not here', () => {
+    const back = line('>language:browser', screens({ chosen: 'sv' }))
+    expect(back.text).toBe('Enter has the page follow your browser again: English')
+    expect(back.act).toEqual({ kind: 'language', tag: null, before: { interfaceLanguage: 'sv', replyLanguage: null } })
+    expect(line('>language:browser', screens()).text).toBe('The page follows your browser already')
+    expect(line('>language:german', screens()).text).toBe('German is not here yet. language: takes English, 日本語, 简体中文, svenska, or suomi')
+    expect(line('>language:traditional chinese', screens()).act ?? null).toBeNull()
+    expect(line('>language:klingonese', screens()).text).toBe('No language called klingonese. language: takes a code or a name, as in language:sv or language:svenska')
+    expect(line('>language:sv', screens({ chosen: 'sv', locale: 'sv' })).text).toBe('The page is in svenska already')
+  })
+})

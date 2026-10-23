@@ -85,3 +85,12 @@ describe('sources and translations', () => {
     expect(translateInto({ tag: null, how: 'off' }, 'en')).toBe('en')
   })
 })
+
+describe('replies follow a language chosen with language: (C184)', () => {
+  it('whatever the browser lists, and keep its script', () => {
+    expect(replyLanguageOf({ locale: 'sv', browser: ['en-US'] })).toEqual({ tag: null, how: 'unread' })
+    expect(replyLanguageOf({ locale: 'sv', browser: ['en-US'], chosen: true })).toEqual({ tag: 'sv', how: 'interface' })
+    expect(replyLanguageOf({ locale: 'zh-Hans', browser: [], chosen: true })).toEqual({ tag: 'zh-Hans', how: 'interface' })
+    expect(replyLanguageOf({ setting: 'off', locale: 'sv', chosen: true })).toEqual({ tag: null, how: 'off' })
+  })
+})

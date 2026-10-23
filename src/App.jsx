@@ -18,6 +18,7 @@ import EditorView from './views/EditorView'
 import BuildView from './views/BuildView'
 import ErrorBoundary from './components/ErrorBoundary'
 import DbStateNotice from './components/DbStateNotice'
+import InterfaceLanguage from './components/InterfaceLanguage'
 import UpdateNotice from './components/UpdateNotice'
 import ReplyStoppedNotice from './components/ReplyStoppedNotice'
 import { isTrialDb } from './lib/db'
@@ -82,6 +83,7 @@ export default function App() {
                 <BackupProvider>
                 <BranchShortcutHandler />
                 <DbStateNotice />
+                <InterfaceLanguage />
                 <UpdateNotice />
                 <ReplyStoppedNotice />
                 {TrialNotice && <Suspense fallback={null}><TrialNotice /></Suspense>}

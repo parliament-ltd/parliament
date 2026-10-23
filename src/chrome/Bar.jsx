@@ -16,6 +16,7 @@ import Inspect from './Inspect'
 import Compare from './Compare'
 import KeyPanel from './KeyPanel'
 import BackupPanel from './BackupPanel'
+import LanguagePicker from './LanguagePicker'
 import AnswerPicker from './AnswerPicker'
 import ReplyPicker from './ReplyPicker'
 import FrameworkPicker from './FrameworkPicker'
@@ -51,7 +52,7 @@ import { step as stepBranch } from '../stores/branchView'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection', 'settings'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, onSearch, searches = {}, searchCounts = {} }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {} }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -233,6 +234,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       if (backupPanel) { onBackupDone?.(null); return }
       if (picker) { onPickerClose?.(); return }
       if (frameworkPicker) { onFrameworkPickerClose?.(); return }
+      if (languagePicker) { onLanguagePickerClose?.(); return }
       // The field's rule first, then the caret: moving the caret blurs the
       // field, which would otherwise come before the Escape.
       dispatch({ type: 'escape' })
@@ -317,6 +319,9 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           picker.kind === 'reply'
             ? <ReplyPicker members={picker.members} targets={picker.targets} line={picker.line} onToggle={picker.onToggle} onAll={picker.onAll} />
             : <AnswerPicker rows={picker.rows} now={picker.now} picked={picker.picked} reference={picker.reference} onPick={onPickAnswerer} />
+        )}
+        {!reference && !inspect && !compare && !keyPanel && !backupPanel && !picker && !frameworkPicker && languagePicker && (
+          <LanguagePicker items={languagePicker.items} now={languagePicker.now} onPick={onPickLanguage} />
         )}
         {!reference && !inspect && !compare && !keyPanel && backupPanel && (
           <BackupPanel
