@@ -162,7 +162,7 @@ export async function createChat(db, conversation) {
  * and including it. One transaction, so no tab can see the chat without its
  * messages (found 15 October).
  */
-export async function createBranchChat(db, { sourceId, branchAtMessageId, title, model, newId, now }) {
+export async function createBranchChat(db, { sourceId, branchAtMessageId, title, model, answerer = null, frameworks = null, newId, now }) {
   const v6 = isV6(db)
   return write(db, ['conversations', 'messages', ...(v6 ? DOCKET_STORES : [])], async (tx) => {
     const convs = tx.objectStore('conversations')
@@ -186,19 +186,26 @@ export async function createBranchChat(db, { sourceId, branchAtMessageId, title,
       familyId,
       branchPoint: branchAtMessageId,
       room: source.room ?? null,
+      // Who answers it and its frameworks, when a prompt to several made
+      // it (stage 8; C172 (a)).
+      ...(answerer ? { answerer } : {}),
+      ...(Array.isArray(frameworks) && frameworks.length ? { frameworks } : {}),
       pinned: false,
       storageBytes: 0,
       createdAt: now,
       updatedAt: now,
     }
+    // Whole copies: an answer from a source stays one, with its note, so it
+    // is never sent to a model as the model's own words (C115); each keeps
+    // the message it was copied from (C172 (a)).
     const copies = all.slice(0, at + 1).map((m) => ({
+      ...m,
       id: newId(),
       conversationId: branch.id,
-      role: m.role,
-      content: m.content,
       tokenCount: m.tokenCount || 0,
-      incomplete: false,
+      incomplete: Boolean(m.incomplete),
       createdAt: m.createdAt, // the original times keep the order
+      from: m.id,
     }))
     for (const m of copies) await msgStore.put(m)
     branch.storageBytes = copies.reduce((n, m) => n + byteSize(m.content), 0)

@@ -334,6 +334,8 @@ export async function createBranch(sourceConversationId, branchAtMessageId, opti
     branchAtMessageId,
     title: options.title,
     model: options.model,
+    answerer: options.answerer ?? null,
+    frameworks: options.frameworks ?? null,
     newId: generateId,
     now: new Date().toISOString(),
   })
@@ -353,7 +355,7 @@ export async function getBranches(parentConversationId) {
 
 // ─── Messages ────────────────────────────────────────────
 
-export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false, attachmentMeta, asked }) {
+export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false, attachmentMeta, asked, group }) {
   const db = await initDB()
   const message = {
     id: generateId(),
@@ -373,6 +375,8 @@ export async function addMessage({ conversationId, role, content, tokenCount = 0
       : {}),
     // A question translated before it went to a source (stage 7; C166 (g)).
     ...(asked ? { asked } : {}),
+    // A prompt sent to several at once: the branches it went to (stage 8; C172 (b)).
+    ...(group ? { group } : {}),
   }
   // Touches the chat's updatedAt and size in the same transaction.
   return addMessageRecord(db, message)

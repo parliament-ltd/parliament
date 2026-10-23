@@ -16,6 +16,7 @@
 //         files and document follow it, and every record pointing at it is
 //         rewritten:
 //           conversations  parentId, familyId (a chat id), branchPoint (a message id)
+//           messages       from (the message a copy came from), group.chats (chat ids)
 //           notes, highlights, favorites  conversationId, messageId
 //           pins           targetConversationId, sourceConversationId, sourceMessageId
 //           files          conversationId; file_data follows the file id
@@ -156,7 +157,12 @@ export function planRestore(flat, {
       summary.messages.skipped++
       continue
     }
-    writes.messages.push({ ...m, id, conversationId: conv(m.conversationId) })
+    writes.messages.push({
+      ...m, id, conversationId: conv(m.conversationId),
+      // A branch's copy and a prompt to several point at other records (C172).
+      ...(m.from ? { from: msg(m.from) } : {}),
+      ...(m.group ? { group: { ...m.group, chats: (m.group.chats ?? []).map(conv) } } : {}),
+    })
     summary.messages.added++
   }
 

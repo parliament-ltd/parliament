@@ -877,8 +877,20 @@ msgid "enter.byHere"
 msgstr "{name} answers here. Enter shows who else can"
 
 #. js-lingui-explicit-id
+msgid "enter.byHereMany"
+msgstr "{count, plural, other {{answering} answer the next prompt here, each a branch. Enter shows who else can}}"
+
+#. js-lingui-explicit-id
 msgid "enter.byLater"
 msgstr "{name} is not built yet"
+
+#. js-lingui-explicit-id
+msgid "enter.byMany"
+msgstr "{count, plural, other {Enter has {answering} answer your next prompt here, in that order, each a branch of its own}}"
+
+#. js-lingui-explicit-id
+msgid "enter.byMost"
+msgstr "{count, plural, other {At most # can answer one prompt at once}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -900,6 +912,10 @@ msgstr "This takes numbers, like 207, 216 or 201b"
 #. js-lingui-explicit-id
 msgid "enter.bySame"
 msgstr "{name} answers here already"
+
+#. js-lingui-explicit-id
+msgid "enter.bySameMany"
+msgstr "They answer the next prompt here already, in that order"
 
 #. js-lingui-explicit-id
 msgid "enter.bySeveral"
@@ -1533,6 +1549,10 @@ msgid "enter.leaveSearch"
 msgstr "Escape goes back to search"
 
 #. js-lingui-explicit-id
+msgid "enter.manyFailed"
+msgstr "The branches could not all be made, so nothing was sent. Try again"
+
+#. js-lingui-explicit-id
 msgid "enter.moveBoard"
 msgstr "{place, select, left {Enter moves {board} to the left} right {Enter moves {board} to the right} other {Enter moves {board} to the middle}}"
 
@@ -1815,6 +1835,10 @@ msgstr "The privacy filter is on already"
 msgid "enter.promptAbout"
 msgstr "{count, plural, one {A new chat: the words of # card go first} other {A new chat: the words of # cards go first}}"
 
+#. js-lingui-explicit-id
+msgid "enter.promptAboutMany"
+msgstr "A prompt about cards goes to one at a time. by: chooses one"
+
 #. api: stays English
 #. js-lingui-explicit-id
 msgid "enter.promptAboutNoKey"
@@ -1844,6 +1868,10 @@ msgstr "After the answer, one short request for its title, summary and tags, {co
 #. js-lingui-explicit-id
 msgid "enter.promptDescribeCheap"
 msgstr "After the answer, one short request for its title, summary and tags, under {cost}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptDescribeOnce"
+msgstr "After the first answer, one small request names the chat, once for all of them"
 
 #. js-lingui-explicit-id
 msgid "enter.promptDescribeUnpriced"
@@ -1888,6 +1916,38 @@ msgstr "This chat is about {tokens, number} tokens. {name} may read only the las
 #. js-lingui-explicit-id
 msgid "enter.promptLocalUnchecked"
 msgstr "{name} is on this computer, but {provider} has not listed it since this page opened. {command} checks"
+
+#. js-lingui-explicit-id
+msgid "enter.promptMany"
+msgstr "{count, plural, other {Enter sends this one prompt to #, each a branch of its own, side by side}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyCheap"
+msgstr "{tokens, plural, one {{n}. {name}, about # token, under {cost}} other {{n}. {name}, about # tokens, under {cost}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyLocal"
+msgstr "{n}. {name}, on this computer: nothing leaves it"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyModel"
+msgstr "{tokens, plural, one {{n}. {name}, about # token, {cost}} other {{n}. {name}, about # tokens, {cost}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManySource"
+msgstr "{n}. {name}, no key and no cost"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyTotal"
+msgstr "{count, plural, other {Enter sends this one prompt to #, each a branch of its own, side by side: {cost} in all to send}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyTotalCheap"
+msgstr "{count, plural, other {Enter sends this one prompt to #, each a branch of its own, side by side: under {cost} in all to send}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyUnpriced"
+msgstr "{tokens, plural, one {{n}. {name}, about # token} other {{n}. {name}, about # tokens}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3333,6 +3393,11 @@ msgstr "About {count} searches a day without a key, shared by everyone on your n
 #. js-lingui-explicit-id
 msgid "picker.preview"
 msgstr "preview"
+
+#. Stage 8 (C172 (c))
+#. js-lingui-explicit-id
+msgid "picker.several"
+msgstr "Tick more than one and your next prompt goes to each, in the order ticked, each a branch of its own."
 
 #. Answers from public sources, with no model
 #. js-lingui-explicit-id

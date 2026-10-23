@@ -28,10 +28,13 @@ const GROUP_TITLES = {
 
 /**
  * @param {{ rows: { model: object[], local: object[], source: object[] }, now: { id: string },
- *   reference: string|null, onPick: (row: object) => void }} props
- *   rows: answerers.answererRows; now: who answers here (answerers.answererFor)
+ *   picked?: string[]|null, reference: string|null, onPick: (row: object) => void }} props
+ *   rows: answerers.answererRows; now: who answers here (answerers.answererFor);
+ *   picked: several ticked for the next prompt, in order (stage 8; C172 (c))
  */
-export default function AnswerPicker({ rows, now, reference, onPick }) {
+export default function AnswerPicker({ rows, now, picked = null, reference, onPick }) {
+  // The ticked boxes, in order: each shows its place, the order of the tabs.
+  const order = picked?.length ? picked : [now?.id].filter(Boolean)
   const { i18n } = useLingui()
   const about = (r) => {
     const line = COPY.pickerAbout[r.about ?? r.id]
@@ -54,7 +57,8 @@ export default function AnswerPicker({ rows, now, reference, onPick }) {
     return parts.length ? parts.join(' · ') : null
   }
   const row = (r) => {
-    const on = r.id === now?.id
+    const at = order.indexOf(r.id)
+    const on = at >= 0
     const help = r.later ? null : r.needsKey || r.unchecked ? `api:${r.provider}` : `by:${r.id}`
     return (
       <button
@@ -67,7 +71,7 @@ export default function AnswerPicker({ rows, now, reference, onPick }) {
         onMouseDown={(e) => e.preventDefault()}
         onClick={() => onPick(r)}
       >
-        <span className="box" aria-hidden="true">{on ? '1' : ''}</span>
+        <span className="box" aria-hidden="true">{on ? String(at + 1) : ''}</span>
         <span className="ch-ans-body">
           <span className="ch-ans-top">
             <span className="nm" dir="auto">{r.name}</span>
@@ -114,7 +118,7 @@ export default function AnswerPicker({ rows, now, reference, onPick }) {
       <p className="ch-marg ch-ans-foot">
         {reference ? i18n._(COPY.picker.marks, { reference }) : null}
         {reference ? ' ' : null}
-        {i18n._(COPY.picker.oneAtATime)}
+        {i18n._(COPY.picker.several)}
       </p>
     </div>
   )

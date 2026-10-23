@@ -1424,6 +1424,20 @@ Found while splitting stage 7 into pieces. Read with C131 (Records, Framework). 
 - **Still to try, with the key:** `by:mistral small`, a prompt; then `by:mistral medium`, a prompt. Each should now give a reply or a sentence saying why not. If Mistral Small 4 still comes back empty, the next step is to read what its fixed id answers, in the browser's network panel or with Stefan.
 - **Suggestion:** keep as built.
 
+## Part 13. Branches (added 22 October 2026)
+
+Found while splitting stage 8 into pieces. The documents: the plan's stage 8, branch slider v9 (its header's changes and proposed rules carry the behaviour), the editing spec (`again:`, `to:`, `helper:`), the docket spec (branches and addresses), and the rulings since (C17, C18, C49, C115, C127, C149). Read with C131: the slider's "chat 201" with branches 201a to 201c is, in the data, plan 203 whose branches are chats of their own (204 is 203a, 205 is 203b), so a branch's address is the plan's number and a letter. Each is built as suggested, so a ruling changes one entry.
+
+**C172. What a prompt to several makes** (piece 1).
+- **(a) Branches are chats.** The data already has it so (C17, C18): each branch of a plan is a chat with its own number and letter. A prompt to three makes the chat on screen answer with the first, and two new chats, the next letters of its plan, answer with the others. Each new one starts from the same point: copies of the messages before the prompt, each copy keeping `from`, the message it was copied from (plan: "a branch copy keeps a link to the message it came from, which Ripple needs later"). Each keeps who answers it (`answerer`, C150) and the chat's frameworks.
+- **(b) The prompt carries its group.** The person's message in each branch keeps `group`: an id and the chats it went to, in the order chosen, so a room showing any of them finds the others. **New optional fields on a message, `from` and `group`, shown at the checkpoint;** backups carry them and a restore checks them.
+- **(c) Choosing several.** `by:sonnet, wikipedia, opus` (C149 left it for branches), or ticking boxes in the picker: each ticked box shows its number, the order of the tabs (slider v9 changes from v6); unticking closes the gap. With one, it is the chat's choice as before; with more, the choice is **held for the next prompt only**, in this tab, not stored: after it goes, each branch keeps its own. A reload before sending forgets it.
+- **(d) All at once only.** "One after another" with a condition (slider v9, A15) is the plan's stage 10.
+- **(e) The title request** (C62) goes once, for the chat on screen, not once per branch: the branches are one conversation.
+- **(g) Found and fixed:** a branch made by forking copied a message's words only, so a copied answer from a source lost its note and would have been sent to a model as the model's own words (against C115). Copies are now whole.
+- **(f) The Enter line** names each recipient with its cost and the total: "Enter sends this one prompt to 3, each a branch of 203: Sonnet 5.5, about 120 tokens, under $0.01; Wikipedia, no cost; Opus 5.5, about 120 tokens, under $0.01".
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

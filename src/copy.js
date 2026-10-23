@@ -557,6 +557,23 @@ export const COPY = {
     byNone: /*i18n*/ { id: 'enter.byNone', message: 'Nothing called {word} can answer. by: shows who can' },
     byWhich: /*i18n*/ { id: 'enter.byWhich', message: '{word} could be {names}. Say which, like {example}', comment: '{names} is a list joined with "or"' },
     bySeveral: /*i18n*/ { id: 'enter.bySeveral', message: 'One prompt to several comes with branches. Choose one for now' },
+    // A prompt to several at once (stage 8; C172). {answering} is a list of
+    // names joined with "and"; {n} the place of one in the order chosen.
+    byMany: /*i18n*/ { id: 'enter.byMany', message: '{count, plural, other {Enter has {answering} answer your next prompt here, in that order, each a branch of its own}}' },
+    byHereMany: /*i18n*/ { id: 'enter.byHereMany', message: '{count, plural, other {{answering} answer the next prompt here, each a branch. Enter shows who else can}}' },
+    bySameMany: /*i18n*/ { id: 'enter.bySameMany', message: 'They answer the next prompt here already, in that order' },
+    byMost: /*i18n*/ { id: 'enter.byMost', message: '{count, plural, other {At most # can answer one prompt at once}}' },
+    promptMany: /*i18n*/ { id: 'enter.promptMany', message: '{count, plural, other {Enter sends this one prompt to #, each a branch of its own, side by side}}' },
+    promptManyTotal: /*i18n*/ { id: 'enter.promptManyTotal', message: '{count, plural, other {Enter sends this one prompt to #, each a branch of its own, side by side: {cost} in all to send}}' },
+    promptManyTotalCheap: /*i18n*/ { id: 'enter.promptManyTotalCheap', message: '{count, plural, other {Enter sends this one prompt to #, each a branch of its own, side by side: under {cost} in all to send}}' },
+    promptManyModel: /*i18n*/ { id: 'enter.promptManyModel', message: '{tokens, plural, one {{n}. {name}, about # token, {cost}} other {{n}. {name}, about # tokens, {cost}}}' },
+    promptManyCheap: /*i18n*/ { id: 'enter.promptManyCheap', message: '{tokens, plural, one {{n}. {name}, about # token, under {cost}} other {{n}. {name}, about # tokens, under {cost}}}' },
+    promptManyUnpriced: /*i18n*/ { id: 'enter.promptManyUnpriced', message: '{tokens, plural, one {{n}. {name}, about # token} other {{n}. {name}, about # tokens}}' },
+    promptManySource: /*i18n*/ { id: 'enter.promptManySource', message: '{n}. {name}, no key and no cost' },
+    promptManyLocal: /*i18n*/ { id: 'enter.promptManyLocal', message: '{n}. {name}, on this computer: nothing leaves it' },
+    promptDescribeOnce: /*i18n*/ { id: 'enter.promptDescribeOnce', message: 'After the first answer, one small request names the chat, once for all of them' },
+    promptAboutMany: /*i18n*/ { id: 'enter.promptAboutMany', message: 'A prompt about cards goes to one at a time. by: chooses one' },
+    manyFailed: /*i18n*/ { id: 'enter.manyFailed', message: 'The branches could not all be made, so nothing was sent. Try again' },
     answererFailed: /*i18n*/ { id: 'enter.answererFailed', message: 'The choice was not kept. Try again' },
     // C114: a reply that stalled, and the offer to send it again.
     promptStalled: /*i18n*/ { id: 'enter.promptStalled', message: 'The reply stalled, as happens on networks that hold streamed replies' },
@@ -1013,6 +1030,7 @@ export const COPY = {
     perDay: /*i18n*/ { id: 'picker.perDay', message: 'About {count} searches a day without a key, shared by everyone on your network.', comment: "OpenAlex's daily allowance (C156)" },
     marks: /*i18n*/ { id: 'picker.marks', message: 'Marks compare cost per token with {reference}.', comment: '{reference} is a model name, from the list' },
     oneAtATime: /*i18n*/ { id: 'picker.oneAtATime', message: 'One answers at a time until branches come.' },
+    several: /*i18n*/ { id: 'picker.several', message: 'Tick more than one and your next prompt goes to each, in the order ticked, each a branch of its own.', comment: 'Stage 8 (C172 (c))' },
   },
   // The five frameworks built in (the editing spec's collab:, renamed by
   // C131), by id. The instructions sent to a model are in lib/frameworks.js.

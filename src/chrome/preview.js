@@ -28,7 +28,7 @@ import { ROW_VERBS, isRowStep, planRowLine, planCopy, planErase, targetsOf } fro
 import { planNote, planSummarize, planCompare, planJump } from '../lib/cardActs'
 import { exportItems, chatsOf, exportName } from '../lib/recordsExport'
 import { findAnswerers } from '../net/answerers'
-import { readFrameworks, frameworksOf, cleanOwn, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
+import { readFrameworks, frameworksOf, cleanOwn, namesFrom, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
 import { planReply, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
 import { findPrivate, KINDS as PRIVATE_KINDS } from '../lib/privacyFilter'
 import { searchWords } from '../lib/searchWords'
@@ -462,22 +462,41 @@ function planForgetFramework(f) {
  * in an empty room, undefined with no room), its number, who answers it now
  * (answerers.answererFor) and the picker's rows (answerers.answererRows).
  */
+// Most who can answer one prompt at once: each is a branch, a tab and a cost (C172).
+export const MOST_AT_ONCE = 5
+
 function planBy(a, step, screens = {}) {
   const ans = screens.answering
   if (!ans || ans.room === undefined) return { says: { message: 'promptNoRoom' }, act: null }
   const args = step.match?.values ?? []
-  if (!args.length) return { says: { message: 'byHere', values: { name: ans.now.name } }, act: { kind: 'picker' } }
-  // Several names with commas would be several answering at once; several
-  // words with spaces are one name (by:mistral small).
-  if (args.some((x) => x.kind === 'list')) return { says: { message: 'bySeveral' }, act: null }
-  const word = args.map((x) => (x.kind === 'text' ? x.value : x.text ?? String(x.value ?? ''))).join(' ')
-  const found = findAnswerers(ans.rows, word)
-  if (!found.length) return { says: { message: 'byNone', values: { word } }, act: null }
-  if (found.length > 1) return { says: { message: 'byWhich', values: { word, names: found.map((r) => r.name), example: `by:"${found[0].name}"` } }, act: null }
-  const r = found[0]
-  if (r.later) return { says: { message: 'byLater', values: { name: r.name } }, act: null }
-  if (r.needsKey) return { says: { message: 'byNeedsKey', values: { name: r.name, provider: r.providerName, command: `api:${r.provider}` } }, act: null }
-  if (ans.now.chosen && ans.now.id === r.id) return { says: { message: 'bySame', values: { name: r.name } }, act: null }
+  const held = ans.held?.length > 1 ? ans.held : null
+  if (!args.length) {
+    if (held) return { says: { message: 'byHereMany', values: { count: held.length, answering: held.map((h) => h.name) } }, act: { kind: 'picker' } }
+    return { says: { message: 'byHere', values: { name: ans.now.name } }, act: { kind: 'picker' } }
+  }
+  // Names with commas between them are several answering at once, each a
+  // branch (stage 8; C172 (c)); words with spaces are one name (by:mistral small).
+  const rows = []
+  for (const word of namesFrom(args)) {
+    const found = findAnswerers(ans.rows, word)
+    if (!found.length) return { says: { message: 'byNone', values: { word } }, act: null }
+    if (found.length > 1) return { says: { message: 'byWhich', values: { word, names: found.map((r) => r.name), example: `by:"${found[0].name}"` } }, act: null }
+    const r = found[0]
+    if (r.later) return { says: { message: 'byLater', values: { name: r.name } }, act: null }
+    if (r.needsKey) return { says: { message: 'byNeedsKey', values: { name: r.name, provider: r.providerName, command: `api:${r.provider}` } }, act: null }
+    if (!rows.includes(r)) rows.push(r)
+  }
+  if (rows.length > MOST_AT_ONCE) return { says: { message: 'byMost', values: { count: MOST_AT_ONCE } }, act: null }
+  if (rows.length > 1) {
+    const ids = rows.map((r) => r.id)
+    if (held && held.length === ids.length && held.every((h, i) => h.id === ids[i])) return { says: { message: 'bySameMany' }, act: null }
+    return {
+      says: { message: 'byMany', values: { count: rows.length, answering: rows.map((r) => r.name) } },
+      act: { kind: 'answerers', room: ans.room, ids, before: held?.map((h) => h.id) ?? null },
+    }
+  }
+  const r = rows[0]
+  if (!held && ans.now.chosen && ans.now.id === r.id) return { says: { message: 'bySame', values: { name: r.name } }, act: null }
   return {
     says: ans.room ? { message: 'byChat', values: { name: r.name, num: ans.num ?? '' } } : { message: 'byNext', values: { name: r.name } },
     act: { kind: 'answerer', chatId: ans.room, id: r.id, before: ans.now.chosen ? ans.now.id : null },
@@ -670,6 +689,52 @@ function privacyLine(prompt, privacy) {
   return { message: privacy.on ? 'promptPrivacy' : 'promptPrivacyOffer', values: { found } }
 }
 
+/**
+ * What Enter would do with a prompt to several at once (stage 8; C172):
+ * each recipient, in the order chosen, with its cost, and the total. Every
+ * one must be able to answer, or nothing goes.
+ */
+function manyPreview(text, target) {
+  if (target.streaming) return { ready: false, says: { message: 'promptBusy' } }
+  const prompt = String(text ?? '').trim()
+  if (!prompt) return { ready: false, says: null }
+  if (holdsKey(prompt)) return { ready: false, says: { message: 'promptKey' } }
+  if (target.keyed == null) return { ready: false, says: { message: 'promptChecking' } }
+  if (target.about) return { ready: false, says: { message: 'promptAboutMany' } }
+  const tokens = Math.ceil((prompt.length + (target.historyChars ?? 0) + (target.systemChars ?? 0)) / CHARS_PER_TOKEN)
+  let total = 0
+  let priced = true
+  const each = []
+  for (const [i, who] of target.many.entries()) {
+    const n = i + 1
+    if (who.later) return { ready: false, says: { message: 'promptLater', values: { name: who.name } } }
+    if (who.gone) return { ready: false, says: { message: 'promptGone', values: { name: who.name } } }
+    if (who.needsKey) return { ready: false, says: { message: 'promptNeedsKey', values: { name: who.name, provider: who.providerName, command: `api:${who.provider}` } } }
+    if (who.unchecked) return { ready: false, says: { message: 'promptLocalUnchecked', values: { name: who.name, provider: who.providerName, command: `api:${who.provider}` } } }
+    if (who.group === 'source') { each.push({ message: 'promptManySource', values: { n, name: who.name } }); continue }
+    if (who.group === 'local') { each.push({ message: 'promptManyLocal', values: { n, name: who.name } }); continue }
+    const price = who.price?.over && tokens > who.price.over.promptTokens ? who.price.over : who.price
+    const cost = inputCost(tokens, price?.inputPerMillion)
+    if (cost == null) { priced = false; each.push({ message: 'promptManyUnpriced', values: { n, name: who.name, tokens } }); continue }
+    total += cost
+    each.push(cost < CENT
+      ? { message: 'promptManyCheap', values: { n, name: who.name, tokens, cost: CENT } }
+      : { message: 'promptManyModel', values: { n, name: who.name, tokens, cost } })
+  }
+  const also = [...each]
+  if (target.frameworks?.length) also.push({ message: 'promptFrameworks', values: { count: target.frameworks.length, frameworks: target.frameworks } })
+  if (target.replyIn) also.push({ message: 'promptReplyIn', values: { language: target.replyIn } })
+  if (target.describe) also.push({ message: 'promptDescribeOnce' })
+  if (target.sourcesOut?.count > 0) also.push({ message: 'promptSourcesOut', values: { count: target.sourcesOut.count, sources: target.sourcesOut.names } })
+  if (target.hiddenOut > 0) also.push({ message: 'promptHiddenOut', values: { count: target.hiddenOut } })
+  const head = !priced || total === 0
+    ? { message: 'promptMany', values: { count: target.many.length, plan: target.plan ?? '' } }
+    : total < CENT
+      ? { message: 'promptManyTotalCheap', values: { count: target.many.length, plan: target.plan ?? '', cost: CENT } }
+      : { message: 'promptManyTotal', values: { count: target.many.length, plan: target.plan ?? '', cost: total } }
+  return { ready: true, says: { ...head, also } }
+}
+
 // How much of a chat a model on this computer reads by default where the
 // computer has under 24 GB of graphics memory: Ollama drops the start of a
 // longer one without saying so (C163 (e), ruled 22 October).
@@ -701,6 +766,7 @@ const CENT = 0.01
  */
 export function promptPreview(text, target = {}) {
   if (target.room === undefined) return { ready: false, says: { message: 'promptNoRoom' } }
+  if (Array.isArray(target.many) && target.many.length > 1) return manyPreview(text, target)
   if (target.streaming) return { ready: false, says: { message: 'promptBusy' } }
   const prompt = String(text ?? '').trim()
   if (!prompt) {

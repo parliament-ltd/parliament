@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useLingui } from '@lingui/react'
 import './chrome.css'
 import { COPY } from '../copy'
-import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument } from '../lib/db'
+import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch } from '../lib/db'
 import { renameMode } from '../lib/modes'
 import { loadSpace, saveArrangement } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
@@ -84,6 +84,8 @@ import { onRecordsChanged } from '../lib/records'
 
 // How many command lines undo: can take back, in this tab (C134).
 const UNDO_MAX = 50
+// The key several are held under before a room has its chat (C172 (c)).
+const NEW_ROOM = 'new'
 
 // The source a prompt goes to when there is no key (stage 4).
 const SOURCE = 'wikipedia'
@@ -738,6 +740,11 @@ export default function Shell() {
   // the chat its next prompt starts.
   const [picking, setPicking] = useState(false) // the picker under the bar
   const [pendingAnswerer, setPendingAnswerer] = useState(null)
+  // Several chosen at once (stage 8; C172 (c)): held for the next prompt in
+  // this room only, in this tab, not stored. { room: chat id or NEW_ROOM, ids }.
+  const [heldMany, setHeldMany] = useState(null)
+  const heldManyNow = useRef(null)
+  useEffect(() => { heldManyNow.current = heldMany }, [heldMany])
 
   // ── Frameworks (stage 7, piece 5; C164) ───────────────
   // On a chat, in order; held for a new chat as who answers is. The
@@ -1122,7 +1129,20 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'answerers') {
+      // by: with several (C172 (c)): held for the next prompt here; the
+      // picker stays open, so more can be ticked.
+      if (touched.current) touched.current.many = { before: heldManyNow.current }
+      setHeldMany({ room: what.room ?? NEW_ROOM, ids: what.ids })
+      remember(body)
+      return null
+    }
     if (what.kind === 'answerer') {
+      // One chosen again: a list held for several goes (C172 (c)).
+      if (heldManyNow.current) {
+        if (touched.current) touched.current.many = { before: heldManyNow.current }
+        setHeldMany(null)
+      }
       // by: (C150): the chat's own choice, or held for the next chat.
       if (what.chatId) {
         let done
@@ -1212,6 +1232,7 @@ export default function Shell() {
     }
     if (entry.view) showView(entry.view)
     if (entry.pending) setPendingAnswerer(entry.pending.before)
+    if (entry.many) setHeldMany(entry.many.before)
     if (entry.pendingFw) setPendingFrameworks(entry.pendingFw.before)
     if (entry.setting) await updateSettingNow.current(entry.setting.key, entry.setting.before)
     if (entry.own) {
@@ -1238,7 +1259,7 @@ export default function Shell() {
   const onRun = useCallback(async (next, body, go, what) => {
     if (what?.kind === 'undo') return undo(body)
     const before = { arrangement: current.current, view: viewNow.current }
-    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null }
+    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null, many: null }
     const out = what ? await act(what, body, next) : await run(next, body)
     const t = touched.current
     touched.current = null
@@ -1261,7 +1282,8 @@ export default function Shell() {
     if (t.pendingFw) entry.pendingFw = t.pendingFw
     if (t.own.length) entry.own = t.own
     if (t.setting) entry.setting = t.setting
-    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting)) {
+    if (t.many) entry.many = t.many
+    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting || entry.many)) {
       undoStack.current = [...undoStack.current, entry].slice(-UNDO_MAX)
       setUndoTop(body)
     }
@@ -1342,7 +1364,10 @@ export default function Shell() {
   const answerRows = useMemo(() => pickerRows(keys), [keys, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
   // The model cost marks compare with, named once in the picker (settings spec §8).
   const referenceName = useMemo(() => allModels().find((m) => m.reference)?.name ?? null, [])
-  const answering = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: answerer, rows: answerRows, stored: chosenHere }), [roomId, roomRecord, answerer, answerRows, chosenHere])
+  // Several held for the next prompt in this room (C172 (c)).
+  const heldIds = heldMany && roomId !== undefined && heldMany.room === (roomId ?? NEW_ROOM) ? heldMany.ids : null
+  const heldWho = useMemo(() => (heldIds ? heldIds.map((id) => answererOf({ chosen: id, keyed: keys, defaultModel: settings.defaultModel })) : null), [heldIds, keys, settings.defaultModel, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
+  const answering = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: answerer, rows: answerRows, stored: chosenHere, held: heldWho }), [roomId, roomRecord, answerer, answerRows, chosenHere, heldWho])
   const fwStored = roomId ? roomRecord?.frameworks ?? null : pendingFrameworks
   const fwHere = useMemo(() => frameworksOf(fwStored ?? [], fwList).map((fw) => fw.id), [fwStored, fwList])
   const frameworkScreens = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: fwHere, stored: fwStored, list: fwList, nameOf: nameOfFramework }), [roomId, roomRecord, fwHere, fwStored, fwList, nameOfFramework])
@@ -1483,6 +1508,8 @@ export default function Shell() {
     // The language a source's search is read in, for what it searches for (C168).
     searchLang: answerer.group === 'source' ? (reads === 'yours' ? sourceAskLanguage(reply, sourceLocale(i18n.locale)) : 'en') : null,
     nameOf: languageName,
+    // Several at once, each a branch of the plan (C172).
+    many: heldWho && heldWho.length > 1 ? heldWho : null,
     // The privacy filter, for a model off this computer (C167).
     privacy: answerer.group === 'model' ? { on: (settings.privacyFilter ?? 'off') !== 'off', names: settings.privacyFilter === 'names' ? localChecker?.name ?? null : null, along: about ? [] : alongPrivate } : null,
     // The frameworks on the chat, by name; the ones that go, when a model answers (C164).
@@ -1497,7 +1524,7 @@ export default function Shell() {
     ink,
     roomName: roomNameHere,
     about,
-  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale])
+  }), [roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -1522,6 +1549,69 @@ export default function Shell() {
     const who = answererOf({ chosen: chatId ? conv?.answerer ?? null : pendingNow.current, keyed: fresh, defaultModel: latest.current.settings.defaultModel })
     if (shown?.answerer && who.id !== shown.answerer.id) return { refused: 'promptChanged' }
     if (who.later || who.gone || who.needsKey || who.unchecked) return { refused: 'promptChanged' }
+
+    // A prompt to several at once (stage 8; C172): the chat here answers
+    // with the first, each other is a new branch of its plan from the same
+    // point, and all write at once. Every one must be able to answer.
+    if (text && !aboutNow && shown?.many?.length > 1) {
+      const held = heldManyNow.current
+      const ids = held && held.room === (chatId ?? NEW_ROOM) ? held.ids : null
+      if (!ids || ids.join('|') !== shown.many.map((w) => w.id).join('|')) return { refused: 'promptChanged' }
+      const whos = ids.map((x) => answererOf({ chosen: x, keyed: fresh, defaultModel: latest.current.settings.defaultModel }))
+      if (whos.some((w) => w.later || w.gone || w.needsKey || w.unchecked)) return { refused: 'promptChanged' }
+      if (creating.current) return { refused: 'promptBusy' }
+      creating.current = true
+      let id = chatId
+      const others = []
+      try {
+        if (!id) {
+          const chat = await createConversation({ title: titleFromPrompt(text), model: latest.current.settings.defaultModel, answerer: whos[0].id, frameworks: fwIds })
+          setPendingAnswerer(null)
+          setPendingFrameworks(null)
+          await assignDefaultRoom(chat.id)
+          id = chat.id
+          const placed = planRoom(current.current, id)
+          if (placed.next) await run(placed.next, null)
+        } else if ((conv?.answerer ?? null) !== whos[0].id) {
+          await changeRecords(db.current, [{ store: 'conversations', id, set: { answerer: whos[0].id }, expect: { answerer: conv?.answerer ?? null } }])
+        }
+        const base = await getConversation(id)
+        const before = await getMessages(id)
+        const last = before.length ? before[before.length - 1] : null
+        for (const w of whos.slice(1)) {
+          const opts = { title: base?.title ?? titleFromPrompt(text), model: w.group === 'model' ? w.id : base?.model, answerer: w.id, frameworks: fwIds }
+          const made = last ? await createBranch(id, last.id, opts) : await createConversation({ ...opts, parentId: id, room: base?.room ?? null })
+          others.push(made.id)
+        }
+      } catch {
+        return { refused: 'manyFailed' }
+      } finally {
+        creating.current = false
+      }
+      setHeldMany(null)
+      setStalledIn((was) => (was === chatId ? null : was))
+      updateWelcome((w) => tick(w, 'ask'))
+      const group = { id: crypto.randomUUID(), chats: [id, ...others] }
+      const sendOne = (to, w, i) => {
+        const { locale } = latest.current
+        if (w.group !== 'source') return sendMessage(to, text, w.id, system(), [], null, { ...under, group, describe: i === 0 })
+        const lang = sourceAskLanguage(replyNow.current, sourceLocale(locale))
+        const yours = destination(w.id)?.answersIn === 'yours'
+        const words = searchWords(text, yours ? lang : 'en')
+        const searchedFor = words === text.trim().replace(/[?？!.]+$/u, '').trim() ? null : { text: words.slice(0, 300), lang: baseOf(yours ? lang : 'en'), by: 'search', at: new Date().toISOString() }
+        return askSource(to, text, { source: w.id, lang, fallbackLang: yours ? 'en' : null, asked: searchedFor, group })
+      }
+      const first = readyRoom.current === id
+        ? sendOne(id, whos[0], 0)
+        : new Promise((resolve, reject) => { waiting.current = { chatId: id, go: () => sendOne(id, whos[0], 0).then(resolve, reject), drop: () => resolve() } })
+      const all = [first, ...whos.slice(1).map((w, i) => sendOne(others[i], w, i + 1))]
+      const done = Promise.allSettled(all).then((results) => {
+        loadConversations().catch(() => {})
+        const bad = results.findIndex((r) => r.status === 'rejected' && r.reason?.name !== 'AbortError')
+        return bad < 0 ? null : failure(results[bad].reason, whos[bad].group === 'source' ? whos[bad].name : undefined)
+      })
+      return { done }
+    }
 
     // A question to a source that reads only English goes translated, as the
     // line said (C85), unless the browser finds it is English already. If
@@ -1618,9 +1708,17 @@ export default function Shell() {
   const pickAnswerer = useCallback(async (row) => {
     if (row.later) return
     if (row.needsKey || row.unchecked) { setPicking(false); writeField(`>api:${row.provider}`); return }
-    const p = preview(`>by:${row.id}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
-    if (!p.act) { setPicking(false); return }
-    await onRun(p.next ?? null, `by:${row.id}`, null, p.act)
+    // A box ticked joins the ones ticked before, in that order; unticked, it
+    // leaves the gap closed (slider v9; C172 (c)). One left is one choice.
+    const ans = screensNow.current?.answering
+    const now = ans?.held?.length > 1 ? ans.held.map((h) => h.id) : [ans?.now?.id].filter(Boolean)
+    const next = now.includes(row.id) ? now.filter((x) => x !== row.id) : [...now, row.id]
+    if (!next.length) return
+    const nameOf = (x) => [...(ans?.rows?.model ?? []), ...(ans?.rows?.local ?? []), ...(ans?.rows?.source ?? [])].find((r) => r.id === x)?.name ?? x
+    const body = next.length === 1 ? `by:${next[0]}` : `by:${next.map((x) => `"${String(nameOf(x)).replace(/"/g, '')}"`).join(', ')}`
+    const p = preview(`>${body}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
+    if (!p.act) { if (next.length === 1) setPicking(false); return }
+    await onRun(p.next ?? null, body, null, p.act)
   }, [onRun, writeField])
   const toggleFramework = useCallback(async (id) => {
     const fw = frameworkScreens
@@ -1750,7 +1848,7 @@ export default function Shell() {
           keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory', region, onRegion: (r) => updateSetting('mistralRegion', r),
             local: { ...LOCAL_ENTRY, origin: window.location.origin, status: local.status, models: local.models, away: local.away ?? [], onCheck: () => runLocalCheck() } } : null}
           onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)}
-          picker={picking ? { rows: answerRows, now: answerer, reference: referenceName } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => setPicking(false)}
+          picker={picking ? { rows: answerRows, now: answerer, picked: heldIds && heldIds.length > 1 ? heldIds : null, reference: referenceName } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => setPicking(false)}
           frameworkPicker={fwPicking ? { items: frameworkItems } : null} onFrameworkPicker={toggleFwPicker} onToggleFramework={toggleFramework} onFrameworkPickerClose={() => setFwPicking(false)} />,
         barHost,
       )}

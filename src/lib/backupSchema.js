@@ -26,7 +26,9 @@ export const FIELDS = Object.freeze({
   // question translated before it went to a source (stage 7, piece 6; C166).
   messages: ['id', 'conversationId', 'role', 'content', 'tokenCount', 'incomplete', 'createdAt', 'attachmentMeta', 'stopReason', 'source', 'model', 'usage', 'frameworks', 'thinking', 'thinkingMs', 'translation', 'asked',
     // citations: the sources a reply cited from a web search (piece 7; C167).
-    'citations'],
+    // from: the message a branch's copy came from; group: the branches a
+    // prompt to several went to (stage 8; C172).
+    'citations', 'from', 'group'],
   // quotes: the numbers a note quotes beneath it; summary: a dated summary
   // note's numbers, day and model (stage 6, piece 7; C145 (e), (g)).
   notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom', 'quotes', 'summary'],

@@ -849,11 +849,13 @@ describe('by: and who answers (stage 7, piece 1; C149, C150)', () => {
   it('refuses before Enter: a model with no key, one not built, several, none, or no room', () => {
     expect(at('>by:haiku', { answering: answering({ rows: keyless }) }).text).toBe('Haiku 9 needs a key for Anthropic. api:anthropic adds one')
     expect(at('>by:hacker', { answering: answering() }).text).toBe('Hacker News is not built yet')
-    expect(at('>by:haiku, wikipedia', { answering: answering() }).text).toBe('One prompt to several comes with branches. Choose one for now')
+    expect(at('>by:haiku, wikipedia', { answering: answering() }).text).toBe('Enter has Haiku 9 and Wikipedia answer your next prompt here, in that order, each a branch of its own')
     expect(at('>by:anthropic', { answering: answering() }).text).toBe('anthropic could be Opus 9 or Haiku 9. Say which, like by:"Opus 9"')
     expect(at('>by:gpt', { answering: answering() }).text).toBe('Nothing called gpt can answer. by: shows who can')
     expect(at('>by:haiku', { answering: answering({ room: undefined }) }).text).toBe('Prompts go to a room. room: opens one')
-    for (const v of ['>by:haiku, wikipedia', '>by:gpt']) expect(at(v, { answering: answering() }).act).toBeNull()
+    expect(at('>by:gpt', { answering: answering() }).act).toBeNull()
+    // Several are held for the next prompt (C172 (c)).
+    expect(at('>by:haiku, wikipedia', { answering: answering() }).act).toEqual({ kind: 'answerers', room: 'c1', ids: ['claude-haiku-9', 'wikipedia'], before: null })
   })
   it('says when the one chosen answers already, and names what it replaces for undo:', () => {
     const chosen = { id: 'claude-haiku-9', group: 'model', name: 'Haiku 9', chosen: true }
@@ -901,8 +903,8 @@ describe('by: with a name of several words (stage 7, piece 3)', () => {
     expect(at('>by:mistral small 4').act).toMatchObject({ id: 'mistral-small-4' })
     expect(at('>by:"Mistral Large 3"').act).toMatchObject({ id: 'mistral-large-3' })
   })
-  it('still reads commas as several at once', () => {
-    expect(at('>by:mistral small, wikipedia').text).toBe('One prompt to several comes with branches. Choose one for now')
+  it('reads commas as several at once, each a branch (C172 (c))', () => {
+    expect(at('>by:mistral small, wikipedia').text).toBe('Enter has Mistral Small 4 and Wikipedia answer your next prompt here, in that order, each a branch of its own')
   })
 })
 
