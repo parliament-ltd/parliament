@@ -1,4 +1,5 @@
 import { openDB } from 'idb'
+import { sealedDb } from './sealedDb'
 import { restoreInto } from './backupData'
 import { flatV1ToContents } from './backupFormat'
 import { SCHEMES } from './schemes'
@@ -49,8 +50,19 @@ function announceDbState(state) {
 }
 
 
+// Lock Parliament (stage S4, piece 2): once this tab is unlocked, the app
+// reads and writes through sealedDb.js with the data key; until a key is set,
+// the database answers as it always has.
+let sealKey = null
+let sealedInstance = null
+export function setSealKey(key) {
+  sealKey = key ?? null
+  sealedInstance = null
+}
+const answer = () => (sealKey ? (sealedInstance ??= sealedDb(dbInstance, sealKey)) : dbInstance)
+
 export async function initDB() {
-  if (dbInstance) return dbInstance
+  if (dbInstance) return answer()
   if (erased) throw new Error('Parliament was deleted from this browser. Reload to start again.')
 
   const trial = isTrialDb()
@@ -65,6 +77,7 @@ export async function initDB() {
       // The raw IDBDatabase is event.target; closing it lets the upgrade proceed.
       event.target.close()
       dbInstance = null
+      sealedInstance = null
       if (blockedVersion == null) {
         erased = true
         announceDbState('erased')
@@ -84,7 +97,7 @@ export async function initDB() {
   // Runs every initDB() call; the empty-check makes it cheap on subsequent calls.
   await seedLibraryDefaults(dbInstance)
 
-  return dbInstance
+  return answer()
 }
 
 /**
@@ -95,6 +108,7 @@ export function closeDB() {
   erased = true
   try { dbInstance?.close() } catch { /* already closed */ }
   dbInstance = null
+  sealedInstance = null
 }
 
 // ─── Library seeding (v4 placeholders) ───────────────────

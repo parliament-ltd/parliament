@@ -43,18 +43,16 @@ export function keepable(body) {
 export async function keepCommand(db, body, { now = new Date().toISOString(), limit = HISTORY_LIMIT } = {}) {
   const line = keepable(body)
   if (!line || !db.objectStoreNames.contains(STORE)) return null
+  // Whole reads rather than cursors, so the same code runs with the lock on,
+  // where a transaction is staged (sealedDb.js).
   const tx = db.transaction(STORE, 'readwrite')
   const store = tx.objectStore(STORE)
-  const last = await store.openCursor(null, 'prev')
-  if (last && last.value.line === line) await last.update({ ...last.value, at: now })
+  const kept = await store.getAll() // oldest first: the keys count up
+  const last = kept[kept.length - 1]
+  if (last && last.line === line) await store.put({ ...last, at: now })
   else await store.add({ line, at: now })
-  let extra = (await store.count()) - limit
-  let cursor = extra > 0 ? await store.openCursor() : null
-  while (cursor && extra > 0) {
-    await cursor.delete()
-    extra -= 1
-    cursor = await cursor.continue()
-  }
+  const extra = kept.length + (last && last.line === line ? 0 : 1) - limit
+  for (const old of kept.slice(0, Math.max(0, extra))) await store.delete(old.id)
   await tx.done
   return line
 }
@@ -65,13 +63,8 @@ export async function keepCommand(db, body, { now = new Date().toISOString(), li
  */
 export async function readCommands(db, { limit = HISTORY_LIMIT } = {}) {
   if (!db.objectStoreNames.contains(STORE)) return []
-  const lines = []
-  let cursor = await db.transaction(STORE).objectStore(STORE).openCursor(null, 'prev')
-  while (cursor && lines.length < limit) {
-    lines.push(cursor.value.line)
-    cursor = await cursor.continue()
-  }
-  return lines
+  const kept = await db.getAll(STORE)
+  return kept.reverse().slice(0, limit).map((c) => c.line)
 }
 
 /**

@@ -62,6 +62,19 @@ export function onRecordsChanged(fn) {
 // in `changes`. If fn throws, the transaction is abandoned and nothing is
 // stored or announced.
 async function write(db, stores, fn) {
+  // With the lock on a transaction is staged, and fails with StagedConflict
+  // when something it read changed before it could write (sealedDb.js); the
+  // change is then worked out again from what is stored now.
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      return await writeOnce(db, stores, fn)
+    } catch (err) {
+      if (err?.name !== 'StagedConflict' || attempt >= 4) throw err
+    }
+  }
+}
+
+async function writeOnce(db, stores, fn) {
   const tx = db.transaction(stores, 'readwrite')
   const done = tx.done
   let out

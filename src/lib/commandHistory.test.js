@@ -1,4 +1,5 @@
 import 'fake-indexeddb/auto'
+import { maybeSealed } from './__fixtures__/sealedHarness'
 import { IDBFactory } from 'fake-indexeddb'
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { openDB } from 'idb'
@@ -6,7 +7,7 @@ import { upgradeSchema } from './schema'
 import { keepable, keepCommand, readCommands, stepRecall } from './commandHistory'
 import { FIELDS } from './backupSchema'
 
-const open = (version) => openDB('history-test', version, { upgrade: upgradeSchema })
+const open = async (version) => maybeSealed(await openDB('history-test', version, { upgrade: upgradeSchema }))
 let clock = 0
 const at = () => new Date(Date.UTC(2026, 9, 20, 12, 0, clock++)).toISOString()
 

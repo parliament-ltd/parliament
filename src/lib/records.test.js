@@ -1,4 +1,5 @@
 import 'fake-indexeddb/auto'
+import { maybeSealed } from './__fixtures__/sealedHarness'
 import { IDBFactory } from 'fake-indexeddb'
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { openDB } from 'idb'
@@ -13,7 +14,7 @@ const newId = () => `id-${++n}`
 let clock = 0
 const at = () => new Date(Date.UTC(2026, 9, 19, 10, 0, clock++)).toISOString()
 
-const open = (version) => openDB('records-test', version, { upgrade: upgradeSchema })
+const open = async (version) => maybeSealed(await openDB('records-test', version, { upgrade: upgradeSchema }))
 const chat = (extra = {}) => {
   const now = at()
   return {

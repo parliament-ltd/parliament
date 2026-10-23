@@ -1,4 +1,5 @@
 import 'fake-indexeddb/auto'
+import { maybeSealed } from './__fixtures__/sealedHarness'
 import { IDBFactory } from 'fake-indexeddb'
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { readFileSync } from 'node:fs'
@@ -14,7 +15,7 @@ const sample = JSON.parse(readFileSync(new URL('./__fixtures__/sample-v5.json', 
 const now = '2026-10-19T12:00:00.000Z'
 let n = 0
 const newId = () => `r-${++n}`
-const open = (name, version = 6) => openDB(name, version, { upgrade: upgradeSchema })
+const open = async (name, version = 6) => maybeSealed(await openDB(name, version, { upgrade: upgradeSchema }))
 const count = async (db, store) => db.count(store)
 
 beforeEach(() => {

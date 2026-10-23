@@ -1,4 +1,5 @@
 import 'fake-indexeddb/auto'
+import { maybeSealed } from './__fixtures__/sealedHarness'
 import { IDBFactory } from 'fake-indexeddb'
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { openDB } from 'idb'
@@ -16,7 +17,7 @@ const chat = (extra = {}) => ({ id: newId(), title: 'Owls', model: 'claude-sonne
 beforeEach(async () => {
   globalThis.indexedDB = new IDBFactory()
   n = 0
-  db = await openDB('rows-test', 6, { upgrade: upgradeSchema })
+  db = await maybeSealed(await openDB('rows-test', 6, { upgrade: upgradeSchema }))
 })
 afterEach(() => db.close())
 

@@ -61,18 +61,24 @@ key. The store's name and the record's id are bound into it (AES-GCM's
 additional data), so a sealed record cannot be moved to another record or
 store without failing to open.
 
+As built (piece 2): only each record's key and the fields the database's own
+lookups read stay readable; everything else is sealed, the record's kind and
+dates included unless a lookup needs them ().
+
 | Store | Stays readable | Sealed |
 |---|---|---|
-| conversations | id, num, docketId, branch, run, parentId, familyId, branchPoint, room, createdAt, updatedAt, pinned, archived | title, summary, tags, the rest |
-| messages | id, conversationId, role, createdAt, incomplete, group id | content, thinking, citations, sources, translations, attachments' names, the rest |
-| files, file_data | id, conversationId, fileId, createdAt | names; the file's bytes |
+| conversations | id, num, docketId, room, createdAt, updatedAt | title, summary, tags, model, branch, everything else |
+| messages | id, conversationId | role, content, thinking, citations, sources, translations, attachments, dates, everything else |
+| files, file_data | id and conversationId; fileId | names and details; the file's bytes |
 | sbrd_documents | conversationId | the document |
-| highlights, notes, pins, favorites | id, num, conversationId or targetConversationId, kind, createdAt | text, quotes, tags, summary |
-| dockets, runs | id, num, docketId, createdAt, updatedAt | titles, branch names, tags, steps' details |
-| collections | id, builtIn, createdAt, updatedAt | name, description, headings, items |
-| collabs (frameworks) | id, builtIn, createdAt | name, instruction |
-| savedSearches, commandHistory | id, at | the search, the command line |
-| settings | the key; values of preferences | text-bearing values: personas, the old scratchpad, a document's ripple notes, the backup log's file names |
+| highlights | id, conversationId, num, kind | text, tags, the rest |
+| notes | id, conversationId, num, createdAt | text, quotes, summary, tags, the rest |
+| pins, favorites | id, targetConversationId or conversationId, num | the quote, tags, the rest |
+| dockets, runs | id, num, updatedAt; id, docketId | titles, branch names, tags, steps |
+| collections | id, builtIn, updatedAt | name, description, headings, items |
+| collabs (frameworks), saved searches, focus sets | id | everything else |
+| commandHistory | id, at | the command line |
+| settings | the key, and the value of preferences | personas, the old scratchpad, documents' ripple notes, the backup log |
 
 **Not sealed:** rooms and the library (layouts you built, not your words),
 window layouts, and preferences such as the language and text size, which the

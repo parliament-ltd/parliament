@@ -1,4 +1,5 @@
 import 'fake-indexeddb/auto'
+import { maybeSealed } from './__fixtures__/sealedHarness'
 import { IDBFactory } from 'fake-indexeddb'
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { openDB } from 'idb'
@@ -23,7 +24,7 @@ beforeEach(async () => {
   globalThis.indexedDB = new IDBFactory()
   n = 0
   clock = 0
-  db = await openDB('erase-test', 6, { upgrade: upgradeSchema })
+  db = await maybeSealed(await openDB('erase-test', 6, { upgrade: upgradeSchema }))
 })
 afterEach(() => db.close())
 
@@ -90,7 +91,7 @@ describe('erase:', () => {
     await R.eraseRecords(db, { chats: [{ id: c.id, num: c.num }] })
     const contents = await gatherContents(db)
     globalThis.indexedDB = new IDBFactory()
-    const other = await openDB('erase-restore', 6, { upgrade: upgradeSchema })
+    const other = await maybeSealed(await openDB('erase-restore', 6, { upgrade: upgradeSchema }))
     try {
       const summary = await restoreInto(other, contents, { strategy: 'merge', newId })
       expect(summary.dropped ?? {}).not.toMatchObject({ highlights: 1 })
