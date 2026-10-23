@@ -1628,6 +1628,15 @@ Found while designing the stage after stage 9 (S4; `security-privacy-decisions.m
 - **(i) New words** (the unlock screen and the lock in Settings) are not yet in the four drafts; they show in English there.
 - **Suggestion:** keep as built.
 
+**C195. Backups, restore and Delete everything with the lock on, as built** (piece 4).
+- **(a) Backups** are made through the lock, so a file holds your words as you wrote them, encrypted by its own password or not, as always; the lock adds nothing to the file and needs nothing from it. A restore with the lock on seals what it writes. Every backup ever written still restores. The tests of making and restoring backups run again through the sealed database.
+- **(b) The copy before a database upgrade** opened the database on its own, and with the lock on would have copied sealed bytes; it now reads through the lock, as this tab is unlocked by then.
+- **(c) The unlock screen** reads its language without opening the database for an upgrade, so the upgrade screen is still first to see a pending upgrade and offer its backup.
+- **(d) Delete everything** removes the lock with the key database (C183); nothing else was needed.
+- **(e) For any later upgrade of stored records:** with the lock on, the database's own upgrade step runs before anything is unlocked and can wait for nothing, so it cannot open sealed records. An upgrade that changes them must run after the unlock, as a pass that can be resumed, as the lock's own finishing does. Recorded here for the next version.
+- **(f) One rare case left as it is:** a set-up cut short that meets a pending upgrade at the same unlock: finishing the set-up opens the database first, so the upgrade runs before its screen. Both are rare; together, rarer.
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

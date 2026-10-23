@@ -61,6 +61,33 @@ export function setSealKey(key) {
 }
 const answer = () => (sealKey ? (sealedInstance ??= sealedDb(dbInstance, sealKey)) : dbInstance)
 
+/**
+ * One readable preference, read without opening the database for an upgrade
+ * or creating it: the unlock screen's language, before the upgrade screen
+ * may offer its backup (Lock Parliament). null when there is none.
+ */
+export function readPreferenceQuietly(key) {
+  return new Promise((resolve) => {
+    let req
+    try {
+      req = indexedDB.open(isTrialDb() ? TRIAL_DB_NAME : DB_NAME)
+    } catch {
+      resolve(null)
+      return
+    }
+    req.onupgradeneeded = () => req.transaction.abort()
+    req.onerror = () => resolve(null)
+    req.onblocked = () => resolve(null)
+    req.onsuccess = () => {
+      const db = req.result
+      if (!db.objectStoreNames.contains('settings')) { db.close(); resolve(null); return }
+      const get = db.transaction('settings').objectStore('settings').get(key)
+      get.onsuccess = () => { db.close(); resolve(get.result?.value ?? null) }
+      get.onerror = () => { db.close(); resolve(null) }
+    }
+  })
+}
+
 /** fn(the database as stored, not through the lock), for the lock's rewrites. */
 export async function withRawDB(fn) {
   await initDB()

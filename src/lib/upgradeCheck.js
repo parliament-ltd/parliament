@@ -11,6 +11,7 @@ import { DB_NAME, DB_VERSION, TRIAL_DB_NAME, isTrialDb } from './db'
 // copy, so the upgrade screen can be tried on a copy as it would run for real.
 const activeDbName = () => (isTrialDb() ? TRIAL_DB_NAME : DB_NAME)
 import { UNASKED, gatherBackupContents, buildBackupFile } from './backup'
+import { throughLock } from './lockSession'
 
 /** Pure decision: an existing database older than this build needs the gate. */
 export function needsBackupGate(storedVersion, targetVersion = DB_VERSION) {
@@ -48,7 +49,8 @@ export function readStoredVersion() {
  * are left out.
  */
 export async function buildPreUpgradeBackup(storedVersion, { password = null } = {}) {
-  const db = await openDB(activeDbName(), storedVersion)
+  // With the lock on, read through it, so the copy holds your words and not sealed bytes.
+  const db = throughLock(await openDB(activeDbName(), storedVersion))
   try {
     const names = db.objectStoreNames
     // Window layouts go only when ticked (C182).

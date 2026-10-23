@@ -15,7 +15,7 @@
 import { withRawDB, setSealKey } from './db'
 import { keyDatabase, setSavedKeysLock, sealSavedKeys, openSavedKeys } from './crypto'
 import { readLock, writeLock, removeLock } from './keyStore'
-import { sealEverything, openEverything } from './sealedDb'
+import { sealEverything, openEverything, sealedDb } from './sealedDb'
 import { tabBus } from './bus'
 import * as K from './lockKeys'
 import { passkeyBytes, makePasskey } from './lockPasskey'
@@ -46,6 +46,11 @@ export async function lockStatus() {
   if (!r) return { on: false }
   const passkeys = r.passkeys.map((p) => ({ id: p.credentialId, addedAt: p.addedAt }))
   return { on: true, open: key != null, idle: r.idle, passkeys, createdAt: r.createdAt, finished: r.sealing !== 'started' }
+}
+
+/** A database opened on its own (the copy before an upgrade), read through the lock when this tab is unlocked. */
+export function throughLock(db) {
+  return key ? sealedDb(db, key) : db
 }
 
 /** Whether this tab holds the data key. */

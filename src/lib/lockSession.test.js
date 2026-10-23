@@ -52,6 +52,15 @@ describe('turning the lock on', () => {
     // Through the lock, all as it was.
     expect((await (await db.initDB()).get('conversations', 'c1')).title).toBe('Barn owls of the river')
     expect(await crypto.loadApiKey('persistent', 'anthropic')).toBe('sk-test-not-a-real-key')
+    // A database opened on its own (the copy before an upgrade) reads through the lock too.
+    const own = await raw()
+    expect((await session.throughLock(own).get('conversations', 'c1')).title).toBe('Barn owls of the river')
+    session.lockHere()
+    expect((await session.throughLock(own).get('conversations', 'c1')).title).toBeUndefined()
+    own.close()
+    // The unlock screen's language, read without opening the database for an upgrade.
+    await (await db.initDB()).put('settings', { key: 'interfaceLanguage', value: 'sv' })
+    expect(await db.readPreferenceQuietly('interfaceLanguage')).toBe('sv')
   })
 })
 

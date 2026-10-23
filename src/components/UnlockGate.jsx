@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { lockStatus, unlock, lockHere, idleMs, LOCK_EVENT } from '../lib/lockSession'
-import { getSetting } from '../lib/db'
+import { readPreferenceQuietly } from '../lib/db'
 import { switchLanguage, languageFor } from '../i18n'
 import { tabBus } from '../lib/bus'
 import { streamingIds } from '../stores/chatStore'
@@ -28,7 +28,9 @@ export default function UnlockGate({ children }) {
         if (!live) return
         if (!s.on || s.open) { setState({ phase: 'open', status: s }); return }
         // The unlock screen speaks the language chosen, a preference kept readable.
-        const chosen = (await getSetting('interfaceLanguage').catch(() => null)) ?? null
+        // Read without opening the database for an upgrade, which the upgrade
+        // screen must be first to see.
+        const chosen = await readPreferenceQuietly('interfaceLanguage')
         await switchLanguage(languageFor(chosen)).catch(() => {})
         if (live) setState({ phase: 'locked', status: s })
       })
