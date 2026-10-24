@@ -104,6 +104,18 @@ describe('the Enter line of a prompt to several (C172 (f))', () => {
     ])
   })
 
+  it('names when each after the first runs, one after another, and what goes if every one does (C201)', () => {
+    const p = line({ many: [wiki, sonnet, opus], manyOrder: 'sequence', manyConds: [null, 'nothing', 'failed'], describe: { price: null } })
+    expect(p.ready).toBe(true)
+    expect(p.text).toBe('Enter sends this one prompt to 3, one after another, each a branch of its own: under $0.01 in all, if every one runs')
+    expect(p.also).toEqual([
+      '1. Wikipedia, no key and no cost',
+      '2. Sonnet 5.5, if nothing is found: about 10 tokens, under $0.01',
+      '3. Opus 5.5, if the one before fails: about 10 tokens, under $0.01',
+    ])
+    expect(line({ many: [wiki, sonnet], manyOrder: 'sequence', manyConds: [null, 'nothing'], included: { count: 1, sources: ['Wikipedia'] } }).text).toBe('One after another sends nothing include: holds, yet. All at once does')
+  })
+
   it('sends to none unless each can answer', () => {
     const p = line({ many: [sonnet, { ...opus, needsKey: true, providerName: 'Anthropic' }] })
     expect(p.ready).toBe(false)

@@ -2118,6 +2118,15 @@ msgid "enter.manyFailed"
 msgstr "Alla grenar kunde inte skapas, så inget skickades. Försök igen"
 
 #. js-lingui-explicit-id
+msgid "enter.manyUnmet"
+msgstr ""
+
+#. When one of several sent one after another runs
+#. js-lingui-explicit-id
+msgid "enter.manyWhen"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.moveBoard"
 msgstr "{place, select, left {Enter flyttar {board} till vänster} right {Enter flyttar {board} till höger} other {Enter flyttar {board} till mitten}}"
 
@@ -2834,8 +2843,45 @@ msgid "enter.promptManyModel"
 msgstr "{tokens, plural, one {{n}. {name}, cirka # token, {cost}} other {{n}. {name}, cirka # tokens, {cost}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.promptManyOrder"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptManyOrderInclude"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOrderTotal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOrderTotalCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.promptManySource"
 msgstr "{n}. {name}, ingen nyckel och ingen kostnad"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenModel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenSource"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenUnpriced"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyTotal"
@@ -4937,6 +4983,14 @@ msgstr "Läser artikeln direkt, på ditt språk. Ingen modell, så inget kostar.
 msgid "picker.addKey"
 msgstr "lägg till en nyckel"
 
+#. js-lingui-explicit-id
+msgid "picker.cond"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.condHelp"
+msgstr ""
+
 #. A source whose answers are in English whatever the reader's language (LPN §6)
 #. js-lingui-explicit-id
 msgid "picker.englishOnly"
@@ -5010,6 +5064,10 @@ msgstr "inga tokens, ingen nyckel"
 msgid "picker.oneAtATime"
 msgstr "En svarar åt gången tills grenar finns."
 
+#. js-lingui-explicit-id
+msgid "picker.order"
+msgstr ""
+
 #. OpenAlex's daily allowance (C156)
 #. js-lingui-explicit-id
 msgid "picker.perDay"
@@ -5019,6 +5077,14 @@ msgstr "Cirka {count} sökningar om dagen utan nyckel, delade av alla i ditt nä
 #. js-lingui-explicit-id
 msgid "picker.preview"
 msgstr "förhandsversion"
+
+#. js-lingui-explicit-id
+msgid "picker.sequence"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.sequenceHelp"
+msgstr ""
 
 #. Stage 8 (C172 (c))
 #. js-lingui-explicit-id
@@ -5034,6 +5100,14 @@ msgstr "Källor"
 #. js-lingui-explicit-id
 msgid "picker.thinks"
 msgstr "kan tänka"
+
+#. js-lingui-explicit-id
+msgid "picker.together"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.togetherHelp"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "picker.trainAlways"

@@ -28,11 +28,14 @@ const GROUP_TITLES = {
 
 /**
  * @param {{ rows: { model: object[], local: object[], source: object[] }, now: { id: string },
- *   picked?: string[]|null, reference: string|null, onPick: (row: object) => void }} props
+ *   picked?: string[]|null, reference: string|null, onPick: (row: object) => void,
+ *   order?: 'together'|'sequence', conds?: Array<string|null>, onOrder?: (order: string) => void, onCond?: (id: string) => void }} props
  *   rows: answerers.answererRows; now: who answers here (answerers.answererFor);
- *   picked: several ticked for the next prompt, in order (stage 8; C172 (c))
+ *   picked: several ticked for the next prompt, in order (stage 8; C172 (c));
+ *   order and conds: all at once, or one after another with when each after
+ *   the first runs, aligned with picked (branch slider v9; C201)
  */
-export default function AnswerPicker({ rows, now, picked = null, reference, onPick }) {
+export default function AnswerPicker({ rows, now, picked = null, reference, onPick, order: sending = 'together', conds = [], onOrder = null, onCond = null }) {
   // The ticked boxes, in order: each shows its place, the order of the tabs.
   const order = picked?.length ? picked : [now?.id].filter(Boolean)
   const { i18n } = useLingui()
@@ -56,7 +59,17 @@ export default function AnswerPicker({ rows, now, picked = null, reference, onPi
     const parts = [TRAINING[r.training], KEPT[r.kept]].filter(Boolean).map((d) => i18n._(d))
     return parts.length ? parts.join(' · ') : null
   }
-  const row = (r) => {
+  // One after another: under each ticked after the first, when it runs; a click changes it.
+  const chained = Boolean(picked?.length > 1 && sending === 'sequence' && onCond)
+  const when = (r, at) => (chained && at > 0
+    ? (
+      <button key={`${r.id}-when`} type="button" className="ch-ans-when" title={i18n._(COPY.picker.condHelp, { name: r.name })} onMouseDown={(e) => e.preventDefault()} onClick={() => onCond(r.id)}>
+        {`${at + 1}. `}{i18n._(COPY.picker.cond, { cond: conds[at] ?? 'finished' })}
+      </button>
+    )
+    : null)
+  const row = (r) => [rowOf(r), when(r, order.indexOf(r.id))]
+  const rowOf = (r) => {
     const at = order.indexOf(r.id)
     const on = at >= 0
     const help = r.later ? null : r.needsKey || r.unchecked ? `api:${r.provider}` : `by:${r.id}`
@@ -99,7 +112,7 @@ export default function AnswerPicker({ rows, now, picked = null, reference, onPi
           {row(r)}
         </div>
       ))
-      : list.map(row)
+      : list.flatMap(row)
     return (
       <div key={key} className="ch-ans-group" role="group" aria-label={i18n._(GROUP_TITLES[key])}>
         <div className="ch-ans-title">
@@ -110,11 +123,29 @@ export default function AnswerPicker({ rows, now, picked = null, reference, onPi
       </div>
     )
   }
+  // With several ticked: all at once, or one after another (branch slider v9; C201).
+  const orderGroup = picked?.length > 1 && onOrder
+    ? (
+      <div className="ch-ans-group" role="group" aria-label={i18n._(COPY.picker.order)}>
+        <div className="ch-ans-title"><span>{i18n._(COPY.picker.order)}</span></div>
+        {[['together', COPY.picker.together, COPY.picker.togetherHelp], ['sequence', COPY.picker.sequence, COPY.picker.sequenceHelp]].map(([key, name, help]) => (
+          <button key={key} type="button" className={`ch-ans ch-ans-radio${sending === key ? ' on' : ''}`} aria-pressed={sending === key} onMouseDown={(e) => e.preventDefault()} onClick={() => onOrder(key)}>
+            <span className="box" aria-hidden="true" />
+            <span className="ch-ans-body">
+              <span className="ch-ans-top"><span className="nm">{i18n._(name)}</span></span>
+              <span className="ch-ans-about">{i18n._(help)}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+    )
+    : null
   return (
     <div className="ch-answers">
       {group('model')}
       {group('local')}
       {group('source')}
+      {orderGroup}
       <p className="ch-marg ch-ans-foot">
         {reference ? i18n._(COPY.picker.marks, { reference }) : null}
         {reference ? ' ' : null}

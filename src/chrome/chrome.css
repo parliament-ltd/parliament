@@ -345,6 +345,12 @@
 .ch-ans .box { flex: none; width: 15px; height: 15px; margin-top: 1px; border: 1px solid var(--ch-soft); border-radius: 3px; font: 500 9.5px var(--ch-mono); display: inline-flex; align-items: center; justify-content: center; }
 .ch-ans:hover .box { border-color: var(--ch-ink); }
 .ch-ans.on .box { background: var(--ch-ink); border-color: var(--ch-ink); color: var(--ch-surface); }
+/* One after another (C201): the order is a choice of two; when each after
+   the first runs sits under it, and a click changes it. */
+.ch-ans-radio .box { border-radius: 50%; }
+.ch-shell button.ch-ans-when { display: block; width: 100%; padding: 0 14px 6px 39px; margin-top: -3px; text-align: start; font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); background: var(--ch-wash); border: none; cursor: pointer; }
+.ch-shell button.ch-ans-when:hover { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+.ch-shell button.ch-ans-when:focus-visible { outline: var(--ch-focus); outline-offset: -1px; }
 .ch-ans-body { flex: 1; min-width: 0; }
 .ch-ans-top { display: flex; align-items: baseline; gap: 8px; }
 .ch-ans .nm { font: 400 12.5px var(--ch-sans); }
@@ -757,7 +763,7 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-pl-line.step .ch-pl-gut { align-items: flex-end; padding-inline-end: 6px; }
 .ch-pl-ord { font: 400 var(--ch-t-id) var(--ch-mono); color: var(--ch-ink-3); }
 .ch-pl-main { min-width: 0; }
-.ch-pl-pick { display: block; width: 100%; text-align: start; border: none; background: transparent; padding: 0; font: 500 13.5px var(--ch-sans); color: var(--ch-ink); cursor: pointer; overflow-wrap: anywhere; }
+.ch-shell button.ch-pl-pick { display: block; width: 100%; text-align: start; border: none; background: transparent; padding: 0; font: 500 13.5px var(--ch-sans); color: var(--ch-ink); cursor: pointer; overflow-wrap: anywhere; }
 .ch-pl-pick:focus-visible { outline: var(--ch-focus); outline-offset: 2px; border-radius: 2px; }
 .ch-pl-text { width: 100%; border: none; background: transparent; padding: 0; margin: 0; resize: none; overflow: hidden; font: 400 var(--ch-t-body)/1.55 var(--ch-sans); color: var(--ch-ink); display: block; }
 .ch-pl-text::placeholder { color: var(--ch-ink-3); }
@@ -766,11 +772,11 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 /* One pip per run: filled where that run reached the step, ringed in ink
    for the run on the board. */
 .ch-pl-pips { display: flex; gap: 3px; }
-.ch-pl-pip { width: 7px; height: 7px; padding: 0; border-radius: 50%; border: 1px solid var(--ch-soft); background: transparent; cursor: pointer; }
-.ch-pl-pip.has { background: var(--ch-soft); }
-.ch-pl-pip.now { border-color: var(--ch-ink); }
-.ch-pl-pip.now.has { background: var(--ch-ink); }
-.ch-pl-pip:hover { border-color: var(--ch-ink); }
+.ch-shell button.ch-pl-pip { width: 7px; height: 7px; padding: 0; border-radius: 50%; border: 1px solid var(--ch-soft); background: transparent; cursor: pointer; }
+.ch-shell button.ch-pl-pip.has { background: var(--ch-soft); }
+.ch-shell button.ch-pl-pip.now { border-color: var(--ch-ink); }
+.ch-shell button.ch-pl-pip.now.has { background: var(--ch-ink); }
+.ch-shell button.ch-pl-pip:hover { border-color: var(--ch-ink); }
 .ch-pl-pip:focus-visible { outline: var(--ch-focus); outline-offset: 2px; }
 /* A status is a pill, never a control. Waiting and paused share the dashed
    outline; paused is one step quieter. */
@@ -782,18 +788,18 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-pl-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--ch-surface); animation: ch-pl-pulse calc(1400ms * var(--ch-k)) ease-in-out infinite; }
 @keyframes ch-pl-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
 @media (prefers-reduced-motion: reduce) { .ch-pl-dot { animation: none; } }
-.ch-pl-add { display: grid; grid-template-columns: 56px minmax(0, 1fr); column-gap: 12px; width: 100%; padding: 6px 0 10px; border: none; border-top: .5px solid var(--ch-border-2); background: transparent; text-align: start; cursor: pointer; font: inherit; }
+.ch-shell button.ch-pl-add { display: grid; grid-template-columns: 56px minmax(0, 1fr); column-gap: 12px; width: 100%; padding: 6px 0 10px; border: none; border-top: .5px solid var(--ch-border-2); background: transparent; text-align: start; cursor: pointer; font: inherit; }
 .ch-pl-plus { justify-self: end; margin-inline-end: 6px; width: 17px; height: 17px; display: flex; align-items: center; justify-content: center; color: var(--ch-ink-3); }
 .ch-pl-add .ch-marg { align-self: center; }
 .ch-pl-add:hover .ch-pl-plus, .ch-pl-add:hover .ch-marg { color: var(--ch-ink); }
 .ch-pl-add:focus-visible { outline: var(--ch-focus); outline-offset: -1px; border-radius: var(--ch-r-sm); }
-.ch-pl-addbranch { padding-top: 12px; }
+.ch-shell button.ch-pl-addbranch { padding-top: 12px; }
 /* The × (C199): quiet until the line is under the pointer or holds focus;
    always there where nothing hovers. */
 .ch-pl-end { display: flex; align-items: flex-start; gap: 6px; }
-.ch-pl-x { width: 18px; height: 18px; margin-top: 1px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: var(--ch-r-sm); background: transparent; color: var(--ch-ink-3); cursor: pointer; opacity: 0; }
+.ch-shell button.ch-pl-x { width: 18px; height: 18px; margin-top: 1px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: var(--ch-r-sm); background: transparent; color: var(--ch-ink-3); cursor: pointer; opacity: 0; }
 .ch-pl-line:hover .ch-pl-x, .ch-pl-line:focus-within .ch-pl-x { opacity: 1; }
-.ch-pl-x:hover { color: var(--ch-ink); background: var(--ch-wash); }
+.ch-shell button.ch-pl-x:hover { color: var(--ch-ink); background: var(--ch-wash); }
 .ch-pl-x:focus-visible { opacity: 1; outline: var(--ch-focus); outline-offset: 1px; }
 @media (hover: none) { .ch-pl-x { opacity: 1; } }
 .ch-pl-none p { margin: 0 0 4px; }

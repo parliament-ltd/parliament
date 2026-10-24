@@ -1335,7 +1335,9 @@ export default function Shell() {
       // by: with several (C172 (c)): held for the next prompt here; the
       // picker stays open, so more can be ticked.
       if (touched.current) touched.current.many = { before: heldManyNow.current }
-      setHeldMany({ room: what.room ?? NEW_ROOM, ids: what.ids })
+      const was = heldManyNow.current
+      const kept = was && was.room === (what.room ?? NEW_ROOM) ? { order: was.order ?? 'together', conds: was.conds ?? {} } : {}
+      setHeldMany({ room: what.room ?? NEW_ROOM, ids: what.ids, ...kept })
       remember(body)
       return null
     }
@@ -1619,6 +1621,20 @@ export default function Shell() {
   // Several held for the next prompt in this room (C172 (c)).
   const heldIds = heldMany && roomId !== undefined && heldMany.room === (roomId ?? NEW_ROOM) ? heldMany.ids : null
   const heldWho = useMemo(() => (heldIds ? heldIds.map((id) => answererOf({ chosen: id, keyed: keys, defaultModel: settings.defaultModel })) : null), [heldIds, keys, settings.defaultModel, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
+  // All at once, or one after another (branch slider v9; C201). Each after
+  // the first runs on its condition: as chosen, else if nothing is found
+  // after a source, and if it fails after a model.
+  const heldOrder = heldIds && heldIds.length > 1 && heldMany?.order === 'sequence' ? 'sequence' : 'together'
+  const heldConds = useMemo(() => (heldWho ? heldWho.map((w, i) => (i === 0 ? null : heldMany?.conds?.[w.id] ?? (heldWho[i - 1].group === 'source' ? 'nothing' : 'failed'))) : null), [heldWho, heldMany])
+  const heldCondsNow = useRef(null)
+  useEffect(() => { heldCondsNow.current = heldConds }, [heldConds])
+  const onPickOrder = useCallback((order) => setHeldMany((h) => (h ? { ...h, order } : h)), [])
+  const onPickCond = useCallback((id) => setHeldMany((h) => {
+    const at = h?.ids.indexOf(id) ?? -1
+    if (at < 1) return h
+    const NEXT = { nothing: 'failed', failed: 'finished', finished: 'always', always: 'nothing' }
+    return { ...h, conds: { ...(h.conds ?? {}), [id]: NEXT[heldCondsNow.current?.[at] ?? 'finished'] ?? 'nothing' } }
+  }), [])
   const answering = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: answerer, rows: answerRows, stored: chosenHere, held: heldWho }), [roomId, roomRecord, answerer, answerRows, chosenHere, heldWho])
   // Among the branches (C174): who answers the one or more the next prompt
   // carries on, when that is not the room's own line. A new prompt to
@@ -2240,6 +2256,8 @@ export default function Shell() {
     // Several at once, each a branch of the plan (C172), or several branches
     // there already, each carrying its own on (C174).
     many: heldWho && heldWho.length > 1 ? heldWho : branchTarget?.ids.length > 1 ? branchTarget.whos : null,
+    manyOrder: heldWho && heldWho.length > 1 ? heldOrder : 'together',
+    manyConds: heldWho && heldWho.length > 1 ? heldConds : null,
     toMany: !(heldWho && heldWho.length > 1) && branchTarget?.ids.length > 1 ? branchTarget.addresses : null,
     toBranch: branchTarget?.ids.length === 1 ? branchTarget.addresses[0] : null,
     targetIds: targets?.chats ?? null,
@@ -2260,7 +2278,7 @@ export default function Shell() {
     ink,
     roomName: roomNameHere,
     about,
-  }), [arrangement.addressed, planBoard, runningHere, chatRowsById, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf])
+  }), [arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -2397,6 +2415,41 @@ export default function Shell() {
       setStalledIn((was) => (was === chatId ? null : was))
       updateWelcome((w) => tick(w, 'ask'))
       const group = { id: crypto.randomUUID(), chats: [id, ...others] }
+      // One after another (branch slider v9; C201): the prompt is planned as
+      // a step in each branch, each after the first on its condition, and
+      // the runner sends them in turn, as a run of the plan.
+      if (shown?.manyOrder === 'sequence') {
+        const chats = [id, ...others]
+        const convs = await Promise.all(chats.map((x) => getConversation(x).catch(() => null)))
+        if (convs.some((c) => !c?.docketId || !c.branch)) return { refused: 'manyFailed' }
+        const docketId = convs[0].docketId
+        const n = convs[0].run || 1
+        const at = new Date().toISOString()
+        const chain = []
+        try {
+          for (const [i, c] of convs.entries()) {
+            const { step } = await planStep(db.current, { docketId, n, letter: c.branch, prompt: text, model: whos[i].id, condition: i ? shown.manyConds?.[i] ?? 'finished' : null, newId: () => crypto.randomUUID(), now: at })
+            chain.push({ letter: c.branch, stepId: step.id })
+          }
+        } catch {
+          return { refused: 'manyFailed' }
+        }
+        const num = (await getPlan({ id: docketId }).catch(() => null))?.docket.num ?? null
+        // The room's chat sends once its messages are loaded, as a typed prompt does.
+        if (!isReady(id)) await new Promise((resolve) => { waiting.current = { chatId: id, go: resolve, drop: resolve } })
+        const out = await runnerRef.current.start({ docketId, num, n, letters: chain.map((l) => l.letter), chain, group })
+        if (!out.started) return { refused: out.reason === 'elsewhere' ? { message: 'runElsewhere', values: { num } } : 'runFailed' }
+        const done = out.finished.then((res) => {
+          loadConversations().catch(() => {})
+          if (!res) return null
+          const which = (keep) => Object.entries(res.ended).filter(([, o]) => keep(o)).map(([l]) => `${num}${l}`)
+          const paused = which((o) => o !== 'done' && o !== 'unmet' && o !== 'gone')
+          if (paused.length) return { message: 'runPaused', values: { run: res.n, num, nums: paused, board: 'docket' } }
+          const unmet = which((o) => o === 'unmet')
+          return unmet.length ? { message: 'manyUnmet', values: { count: unmet.length, nums: unmet } } : null
+        })
+        return { done }
+      }
       const sendOne = (to, w, i) => (w.group !== 'source'
         ? sendMessage(to, text, w.id, system(), [], null, { ...under, group, describe: i === 0, ...withInc(w) })
         : askOne(to, w, { group }))
@@ -2753,7 +2806,7 @@ export default function Shell() {
           backupPanel={backupPanel} onBackupDone={endBackup}
           picker={replyPicking && branchShown && targets
             ? { kind: 'reply', members: branchShown.members, targets, line: branchShown.line, onToggle: toggleReplyTarget, onAll: allReplyTargets }
-            : picking ? { rows: answerRows, now: answerer, picked: heldIds && heldIds.length > 1 ? heldIds : null, reference: referenceName } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => { setPicking(false); setReplyPicking(false) }}
+            : picking ? { rows: answerRows, now: answerer, picked: heldIds && heldIds.length > 1 ? heldIds : null, reference: referenceName, order: heldOrder, conds: heldConds ?? [], onOrder: onPickOrder, onCond: onPickCond } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => { setPicking(false); setReplyPicking(false) }}
           frameworkPicker={fwPicking ? { items: frameworkItems } : null} onFrameworkPicker={toggleFwPicker} onToggleFramework={toggleFramework} onFrameworkPickerClose={() => setFwPicking(false)}
           languagePicker={langPicking ? { items: offeredLanguages().map((tag) => ({ tag, draft: isDraft(tag) })), now: i18n.locale } : null} onPickLanguage={(tag) => runCommand(`language:${tag}`)} onLanguagePickerClose={() => setLangPicking(false)} />,
         barHost,

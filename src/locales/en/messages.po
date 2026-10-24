@@ -2118,6 +2118,15 @@ msgid "enter.manyFailed"
 msgstr "The branches could not all be made, so nothing was sent. Try again"
 
 #. js-lingui-explicit-id
+msgid "enter.manyUnmet"
+msgstr "{count, plural, one {{nums} did not run: its condition was not met} other {{nums} did not run: their conditions were not met}}"
+
+#. When one of several sent one after another runs
+#. js-lingui-explicit-id
+msgid "enter.manyWhen"
+msgstr "{cond, select, nothing {if nothing is found} failed {if the one before fails} always {whatever the one before does} other {once the one before finishes}}"
+
+#. js-lingui-explicit-id
 msgid "enter.moveBoard"
 msgstr "{place, select, left {Enter moves {board} to the left} right {Enter moves {board} to the right} other {Enter moves {board} to the middle}}"
 
@@ -2834,8 +2843,45 @@ msgid "enter.promptManyModel"
 msgstr "{tokens, plural, one {{n}. {name}, about # token, {cost}} other {{n}. {name}, about # tokens, {cost}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.promptManyOrder"
+msgstr "{count, plural, other {Enter sends this one prompt to #, one after another, each a branch of its own. Each after the first runs only if its condition is met}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptManyOrderInclude"
+msgstr "One after another sends nothing include: holds, yet. All at once does"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOrderTotal"
+msgstr "{count, plural, other {Enter sends this one prompt to #, one after another, each a branch of its own: at most {cost} in all, if every one runs}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOrderTotalCheap"
+msgstr "{count, plural, other {Enter sends this one prompt to #, one after another, each a branch of its own: under {cost} in all, if every one runs}}"
+
+#. js-lingui-explicit-id
 msgid "enter.promptManySource"
 msgstr "{n}. {name}, no key and no cost"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenCheap"
+msgstr "{tokens, plural, one {{n}. {name}, {when}: about # token, under {cost}} other {{n}. {name}, {when}: about # tokens, under {cost}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenLocal"
+msgstr "{n}. {name}, {when}: on this computer, nothing leaves it"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenModel"
+msgstr "{tokens, plural, one {{n}. {name}, {when}: about # token, {cost}} other {{n}. {name}, {when}: about # tokens, {cost}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenSource"
+msgstr "{n}. {name}, {when}: no key and no cost"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenUnpriced"
+msgstr "{tokens, plural, one {{n}. {name}, {when}: about # token} other {{n}. {name}, {when}: about # tokens}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyTotal"
@@ -4937,6 +4983,14 @@ msgstr "Reads the article directly, in your language. No model, so nothing is sp
 msgid "picker.addKey"
 msgstr "add a key"
 
+#. js-lingui-explicit-id
+msgid "picker.cond"
+msgstr "{cond, select, nothing {runs if nothing is found} failed {runs if the one before fails} always {runs whatever happens} other {runs once the one before finishes}}"
+
+#. js-lingui-explicit-id
+msgid "picker.condHelp"
+msgstr "When {name} runs. A click changes it"
+
 #. A source whose answers are in English whatever the reader's language (LPN §6)
 #. js-lingui-explicit-id
 msgid "picker.englishOnly"
@@ -5010,6 +5064,10 @@ msgstr "no tokens, no key"
 msgid "picker.oneAtATime"
 msgstr "One answers at a time until branches come."
 
+#. js-lingui-explicit-id
+msgid "picker.order"
+msgstr "Order"
+
 #. OpenAlex's daily allowance (C156)
 #. js-lingui-explicit-id
 msgid "picker.perDay"
@@ -5019,6 +5077,14 @@ msgstr "About {count} searches a day without a key, shared by everyone on your n
 #. js-lingui-explicit-id
 msgid "picker.preview"
 msgstr "preview"
+
+#. js-lingui-explicit-id
+msgid "picker.sequence"
+msgstr "One after another"
+
+#. js-lingui-explicit-id
+msgid "picker.sequenceHelp"
+msgstr "Each waits for the one before it, and runs only if its condition is met."
 
 #. Stage 8 (C172 (c))
 #. js-lingui-explicit-id
@@ -5034,6 +5100,14 @@ msgstr "Sources"
 #. js-lingui-explicit-id
 msgid "picker.thinks"
 msgstr "can think"
+
+#. js-lingui-explicit-id
+msgid "picker.together"
+msgstr "All at once"
+
+#. js-lingui-explicit-id
+msgid "picker.togetherHelp"
+msgstr "One reply from each, in a slider, in the numbered order."
 
 #. js-lingui-explicit-id
 msgid "picker.trainAlways"

@@ -2118,6 +2118,15 @@ msgid "enter.manyFailed"
 msgstr "一部のブランチを作れなかったため、何も送信していません。もう一度お試しください"
 
 #. js-lingui-explicit-id
+msgid "enter.manyUnmet"
+msgstr ""
+
+#. When one of several sent one after another runs
+#. js-lingui-explicit-id
+msgid "enter.manyWhen"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.moveBoard"
 msgstr "{place, select, left {Enterで{board}を左に移動します} right {Enterで{board}を右に移動します} other {Enterで{board}を中央に移動します}}"
 
@@ -2834,8 +2843,45 @@ msgid "enter.promptManyModel"
 msgstr "{tokens, plural, other {{n}. {name}、約#トークン、{cost}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.promptManyOrder"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptManyOrderInclude"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOrderTotal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOrderTotalCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.promptManySource"
 msgstr "{n}. {name}、キー不要、費用なし"
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenModel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenSource"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenUnpriced"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyTotal"
@@ -4937,6 +4983,14 @@ msgstr "記事を、お使いの言語で直接読みます。モデルを使わ
 msgid "picker.addKey"
 msgstr "キーを追加"
 
+#. js-lingui-explicit-id
+msgid "picker.cond"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.condHelp"
+msgstr ""
+
 #. A source whose answers are in English whatever the reader's language (LPN §6)
 #. js-lingui-explicit-id
 msgid "picker.englishOnly"
@@ -5010,6 +5064,10 @@ msgstr "トークンなし、キー不要"
 msgid "picker.oneAtATime"
 msgstr "ブランチが使えるようになるまで、答えるのは一度に1つです。"
 
+#. js-lingui-explicit-id
+msgid "picker.order"
+msgstr ""
+
 #. OpenAlex's daily allowance (C156)
 #. js-lingui-explicit-id
 msgid "picker.perDay"
@@ -5019,6 +5077,14 @@ msgstr "キーなしで1日約{count}回まで検索できます。この回数�
 #. js-lingui-explicit-id
 msgid "picker.preview"
 msgstr "プレビュー"
+
+#. js-lingui-explicit-id
+msgid "picker.sequence"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.sequenceHelp"
+msgstr ""
 
 #. Stage 8 (C172 (c))
 #. js-lingui-explicit-id
@@ -5034,6 +5100,14 @@ msgstr "情報源"
 #. js-lingui-explicit-id
 msgid "picker.thinks"
 msgstr "思考できる"
+
+#. js-lingui-explicit-id
+msgid "picker.together"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.togetherHelp"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "picker.trainAlways"

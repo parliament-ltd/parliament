@@ -764,6 +764,18 @@ export const COPY = {
     promptManyCheap: /*i18n*/ { id: 'enter.promptManyCheap', message: '{tokens, plural, one {{n}. {name}, about # token, under {cost}} other {{n}. {name}, about # tokens, under {cost}}}' },
     promptManyUnpriced: /*i18n*/ { id: 'enter.promptManyUnpriced', message: '{tokens, plural, one {{n}. {name}, about # token} other {{n}. {name}, about # tokens}}' },
     promptManySource: /*i18n*/ { id: 'enter.promptManySource', message: '{n}. {name}, no key and no cost' },
+    // One after another (C201): {when} is manyWhen, said for each after the first.
+    promptManyOrderInclude: /*i18n*/ { id: 'enter.promptManyOrderInclude', message: 'One after another sends nothing include: holds, yet. All at once does', comment: 'Commands stay English' },
+    manyWhen: /*i18n*/ { id: 'enter.manyWhen', message: '{cond, select, nothing {if nothing is found} failed {if the one before fails} always {whatever the one before does} other {once the one before finishes}}', comment: 'When one of several sent one after another runs' },
+    promptManyOrder: /*i18n*/ { id: 'enter.promptManyOrder', message: '{count, plural, other {Enter sends this one prompt to #, one after another, each a branch of its own. Each after the first runs only if its condition is met}}' },
+    promptManyOrderTotal: /*i18n*/ { id: 'enter.promptManyOrderTotal', message: '{count, plural, other {Enter sends this one prompt to #, one after another, each a branch of its own: at most {cost} in all, if every one runs}}' },
+    promptManyOrderTotalCheap: /*i18n*/ { id: 'enter.promptManyOrderTotalCheap', message: '{count, plural, other {Enter sends this one prompt to #, one after another, each a branch of its own: under {cost} in all, if every one runs}}' },
+    promptManyThenModel: /*i18n*/ { id: 'enter.promptManyThenModel', message: '{tokens, plural, one {{n}. {name}, {when}: about # token, {cost}} other {{n}. {name}, {when}: about # tokens, {cost}}}' },
+    promptManyThenCheap: /*i18n*/ { id: 'enter.promptManyThenCheap', message: '{tokens, plural, one {{n}. {name}, {when}: about # token, under {cost}} other {{n}. {name}, {when}: about # tokens, under {cost}}}' },
+    promptManyThenUnpriced: /*i18n*/ { id: 'enter.promptManyThenUnpriced', message: '{tokens, plural, one {{n}. {name}, {when}: about # token} other {{n}. {name}, {when}: about # tokens}}' },
+    promptManyThenSource: /*i18n*/ { id: 'enter.promptManyThenSource', message: '{n}. {name}, {when}: no key and no cost' },
+    promptManyThenLocal: /*i18n*/ { id: 'enter.promptManyThenLocal', message: '{n}. {name}, {when}: on this computer, nothing leaves it' },
+    manyUnmet: /*i18n*/ { id: 'enter.manyUnmet', message: '{count, plural, one {{nums} did not run: its condition was not met} other {{nums} did not run: their conditions were not met}}' },
     promptManyLocal: /*i18n*/ { id: 'enter.promptManyLocal', message: '{n}. {name}, on this computer: nothing leaves it' },
     promptDescribeOnce: /*i18n*/ { id: 'enter.promptDescribeOnce', message: 'After the first answer, one small request names the chat, once for all of them' },
     promptAboutMany: /*i18n*/ { id: 'enter.promptAboutMany', message: 'A prompt about cards goes to one at a time. by: chooses one' },
@@ -1628,6 +1640,14 @@ export const COPY = {
   // Who can answer: the picker under the field (stage 7, piece 1; A14,
   // C148, C149). Model and source names come from the list, never here.
   picker: {
+    // One after another (branch slider v9; C201).
+    order: /*i18n*/ { id: 'picker.order', message: 'Order' },
+    together: /*i18n*/ { id: 'picker.together', message: 'All at once' },
+    togetherHelp: /*i18n*/ { id: 'picker.togetherHelp', message: 'One reply from each, in a slider, in the numbered order.' },
+    sequence: /*i18n*/ { id: 'picker.sequence', message: 'One after another' },
+    sequenceHelp: /*i18n*/ { id: 'picker.sequenceHelp', message: 'Each waits for the one before it, and runs only if its condition is met.' },
+    cond: /*i18n*/ { id: 'picker.cond', message: '{cond, select, nothing {runs if nothing is found} failed {runs if the one before fails} always {runs whatever happens} other {runs once the one before finishes}}' },
+    condHelp: /*i18n*/ { id: 'picker.condHelp', message: 'When {name} runs. A click changes it' },
     models: /*i18n*/ { id: 'picker.models', message: 'Models', comment: 'A group in the picker of who answers' },
     local: /*i18n*/ { id: 'picker.local', message: 'On your machine', comment: 'Models that run on this computer (A14)' },
     sources: /*i18n*/ { id: 'picker.sources', message: 'Sources', comment: 'Answers from public sources, with no model' },

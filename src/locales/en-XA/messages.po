@@ -2118,6 +2118,15 @@ msgid "enter.manyFailed"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.manyUnmet"
+msgstr ""
+
+#. When one of several sent one after another runs
+#. js-lingui-explicit-id
+msgid "enter.manyWhen"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.moveBoard"
 msgstr ""
 
@@ -2834,7 +2843,44 @@ msgid "enter.promptManyModel"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.promptManyOrder"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptManyOrderInclude"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOrderTotal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyOrderTotalCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.promptManySource"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenLocal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenModel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenSource"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptManyThenUnpriced"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4937,6 +4983,14 @@ msgstr ""
 msgid "picker.addKey"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "picker.cond"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.condHelp"
+msgstr ""
+
 #. A source whose answers are in English whatever the reader's language (LPN §6)
 #. js-lingui-explicit-id
 msgid "picker.englishOnly"
@@ -5010,6 +5064,10 @@ msgstr ""
 msgid "picker.oneAtATime"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "picker.order"
+msgstr ""
+
 #. OpenAlex's daily allowance (C156)
 #. js-lingui-explicit-id
 msgid "picker.perDay"
@@ -5018,6 +5076,14 @@ msgstr ""
 #. A model offered before general availability; it may change or go
 #. js-lingui-explicit-id
 msgid "picker.preview"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.sequence"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.sequenceHelp"
 msgstr ""
 
 #. Stage 8 (C172 (c))
@@ -5033,6 +5099,14 @@ msgstr ""
 #. A model that can think before it answers, when thinking:on is set (C165)
 #. js-lingui-explicit-id
 msgid "picker.thinks"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.together"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.togetherHelp"
 msgstr ""
 
 #. js-lingui-explicit-id

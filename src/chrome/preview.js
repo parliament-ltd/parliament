@@ -821,6 +821,8 @@ function privacyLine(prompt, privacy) {
  */
 function manyPreview(text, target) {
   if (target.streaming) return { ready: false, says: { message: 'promptBusy' } }
+  // One after another (C201): each after the first named with when it runs.
+  const then = target.manyOrder === 'sequence' && !Array.isArray(target.toMany) ? target.manyConds ?? [] : null
   const prompt = String(text ?? '').trim()
   if (!prompt) return { ready: false, says: null }
   if (holdsKey(prompt)) return { ready: false, says: { message: 'promptKey' } }
@@ -836,24 +838,32 @@ function manyPreview(text, target) {
     if (who.gone) return { ready: false, says: { message: 'promptGone', values: { name: who.name } } }
     if (who.needsKey) return { ready: false, says: { message: 'promptNeedsKey', values: { name: who.name, provider: who.providerName, command: `api:${who.provider}` } } }
     if (who.unchecked) return { ready: false, says: { message: 'promptLocalUnchecked', values: { name: who.name, provider: who.providerName, command: `api:${who.provider}` } } }
-    if (who.group === 'source') { each.push({ message: 'promptManySource', values: { n, name: who.name } }); continue }
-    if (who.group === 'local') { each.push({ message: 'promptManyLocal', values: { n, name: who.name } }); continue }
+    const when = then && i > 0 ? then[i] ?? 'finished' : null
+    const as = (plain, chained) => (when ? chained : plain)
+    if (who.group === 'source') { each.push({ message: as('promptManySource', 'promptManyThenSource'), values: { n, name: who.name, ...(when ? { when } : {}) } }); continue }
+    if (who.group === 'local') { each.push({ message: as('promptManyLocal', 'promptManyThenLocal'), values: { n, name: who.name, ...(when ? { when } : {}) } }); continue }
     const price = who.price?.over && tokens > who.price.over.promptTokens ? who.price.over : who.price
     const cost = inputCost(tokens, price?.inputPerMillion)
-    if (cost == null) { priced = false; each.push({ message: 'promptManyUnpriced', values: { n, name: who.name, tokens } }); continue }
+    if (cost == null) { priced = false; each.push({ message: as('promptManyUnpriced', 'promptManyThenUnpriced'), values: { n, name: who.name, tokens, ...(when ? { when } : {}) } }); continue }
     total += cost
     each.push(cost < CENT
-      ? { message: 'promptManyCheap', values: { n, name: who.name, tokens, cost: CENT } }
-      : { message: 'promptManyModel', values: { n, name: who.name, tokens, cost } })
+      ? { message: as('promptManyCheap', 'promptManyThenCheap'), values: { n, name: who.name, tokens, cost: CENT, ...(when ? { when } : {}) } }
+      : { message: as('promptManyModel', 'promptManyThenModel'), values: { n, name: who.name, tokens, cost, ...(when ? { when } : {}) } })
   }
   const also = [...each]
   if (target.frameworks?.length) also.push({ message: 'promptFrameworks', values: { count: target.frameworks.length, frameworks: target.frameworks } })
   if (target.replyIn) also.push({ message: 'promptReplyIn', values: { language: target.replyIn } })
-  if (target.describe) also.push({ message: 'promptDescribeOnce' })
+  if (target.describe && !then) also.push({ message: 'promptDescribeOnce' })
   if (target.sourcesOut?.count > 0) also.push({ message: 'promptSourcesOut', values: { count: target.sourcesOut.count, sources: target.sourcesOut.names } })
   if (target.hiddenOut > 0) also.push({ message: 'promptHiddenOut', values: { count: target.hiddenOut } })
   // To branches there already, each carrying its own on (C174); else new branches (C172).
   const to = Array.isArray(target.toMany) ? { nums: target.toMany } : null
+  if (then) {
+    const head = !priced || total === 0
+      ? { message: 'promptManyOrder', values: { count: target.many.length } }
+      : { message: total < CENT ? 'promptManyOrderTotalCheap' : 'promptManyOrderTotal', values: { count: target.many.length, cost: total < CENT ? CENT : total } }
+    return { ready: true, says: { ...head, also } }
+  }
   const head = !priced || total === 0
     ? { message: to ? 'promptToMany' : 'promptMany', values: { count: target.many.length, ...to } }
     : total < CENT
@@ -918,6 +928,10 @@ export function promptPreview(text, target = {}) {
   // Answers from sources include: holds for this prompt (C176): to models
   // only, as data; a source is sent the words alone.
   const inc = target.included ?? null
+  // One after another sends answers held by include: with none yet (C201).
+  if (inc?.count && Array.isArray(target.many) && target.many.length > 1 && target.manyOrder === 'sequence' && !Array.isArray(target.toMany)) {
+    return { ready: false, says: { message: 'promptManyOrderInclude' } }
+  }
   if (inc?.count) {
     if (whos.some((w) => w.group !== 'source')) {
       lines.push({ message: 'promptIncluded', values: { count: inc.count, sources: inc.sources } })
