@@ -500,7 +500,7 @@ Built to docket v12.
 
 The piece with the most risk in it. It starts with a spike, not with building.
 
-**Status, 24 October: the spike is planned, not started** (C205, `conflicts.md` Part 17): two prototypes on `/dev/editing` (the browser edits and Parliament keeps the record; ProseMirror), one checklist, a report in `research/editing-spike.md`. Waiting on C58, a yes to fetch ProseMirror, and your hands for input methods, Android and a screen reader.
+**Status, 24 October: the spike is planned, not started** (C205, `conflicts.md` Part 17): two prototypes on `/dev/editing` (the browser edits and Parliament keeps the record; ProseMirror), one checklist, a report in `research/editing-spike.md`. C58 ruled 24 October. Revised the same day (C205 (h)): the spike on ProseMirror alone, the hand-built engine only if it fails a check; waiting on a yes to fetch it, and on your hands for an input method and a screen reader (Android untried for now).
 
 - **First: the engine spike.** Two small prototypes, one letting the browser edit and reconciling each change against a model of the reply, one on an editor framework. Both are run against one checklist: languages typed by composing, Android keyboards, selection across blocks, paste, undo, screen readers. You choose after seeing both. C58 (how tables, charts, bold and links in a reply are shown and stored) has to be answered first.
 - **Added, after the spike**
@@ -513,7 +513,9 @@ The piece with the most risk in it. It starts with a spike, not with building.
 - **Salvaged from Secretarybird:** the `/` menu's filtering and keys, the split and join of blocks as a pattern, two caret helpers, the cards after restyling. **Not carried over:** its tracked-changes approach, which compares against a baseline and cannot place a deletion among repeated words.
 - **Security and privacy:** pasting inserts plain text. A reply's blocks hold a type and text only, never markup. The count line is never hidden by `calm:`. Hidden file text inside a stored prompt survives an edit to that prompt.
 - **You can try:** strike a line, type a replacement, ask for a rewrite of a passage, send, and see the next reply say it read them.
-- **Needs from you:** an answer on C58, the choice of engine after the spike, and A7, A9. Also C91, ruled to be looked at again here: what becomes of the comments and suggestions inside Secretarybird documents.
+- **Later in the stage, after its first pieces (C58, ruled 24 October):** editing inside tables, then charts. Until then each is a whole block, struck or asked about as a unit.
+- **Rooms (C207):** in-line editing is built into the messages block, so every room has it; Writing Studio is the room it is built and tried in first. Drafting Desk is proposed for merging into it once stages 11 and 12 do what Secretarybird does.
+- **Needs from you:** the choice of engine after the spike, and A7, A9 (C58 was ruled on 24 October). Also C91, ruled to be looked at again here: what becomes of the comments and suggestions inside Secretarybird documents.
 
 ### Stage 12. Ripple, sweeps, Reflection
 
