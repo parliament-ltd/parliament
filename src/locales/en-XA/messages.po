@@ -3296,6 +3296,10 @@ msgid "enter.runCostCheap"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.runCostly"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.runCostUnpriced"
 msgstr ""
 
@@ -3558,6 +3562,15 @@ msgstr ""
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.setUnknown"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setWarn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setWarnOff"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5741,6 +5754,10 @@ msgid "settings.monthSpent"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "settings.monthSpentRuns"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "settings.monthUnknown"
 msgstr ""
 
@@ -5885,6 +5902,14 @@ msgid "settings.roomLabel"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "settings.runRow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.runRowHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "settings.sources"
 msgstr ""
 
@@ -5974,6 +5999,18 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "settings.untitled"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.warnHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.warnLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.warnOff"
 msgstr ""
 
 #. Marginalia on the board the navy rule is on

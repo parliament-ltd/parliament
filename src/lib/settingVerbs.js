@@ -105,6 +105,19 @@ const SETTERS = {
     },
     says: () => 'setReminder',
   },
+  // Warn before a costly run (settings spec §9; stage 10, piece 6; C203):
+  // above this, run:'s Enter line leads with what the run costs.
+  warn: {
+    key: 'runWarn',
+    read([w]) {
+      const s = String(w ?? '').replace(/^\$/, '')
+      if (s === 'off') return { value: null }
+      const n = Number(s)
+      if (n === 0.5 || n === 1 || n === 5) return { value: n }
+      return { bad: { message: 'setChoose', values: { name: 'warn', words: ['set:warn off', 'set:warn 0.50', 'set:warn 1', 'set:warn 5'] } } }
+    },
+    says: (v) => (v == null ? 'setWarnOff' : 'setWarn'),
+  },
 }
 
 // Names that set: answers with a reason rather than a change.
@@ -118,8 +131,6 @@ const REFUSED = {
   threshold: { message: 'setNothing', values: { name: 'threshold' } },
   budget: { message: 'setNothing', values: { name: 'budget' } },
   theme: { message: 'setNothing', values: { name: 'theme' } },
-  // Read by run:, which comes with stage 10.
-  warn: { message: 'later', values: { verb: 'set:warn' } },
 }
 
 /** The names set: takes, in the order the Enter line lists them. */
@@ -148,7 +159,7 @@ export function planSet(step, screens = {}) {
   const before = ctx.values?.[setter.key] ?? null
   if (before === r.value) return { says: { message: 'setSame' }, act: null }
   return {
-    says: { message: setter.says(r.value), values: { ...(r.values ?? {}), size: r.value, where: r.value, every: r.value } },
+    says: { message: setter.says(r.value), values: { ...(r.values ?? {}), size: r.value, where: r.value, every: r.value, ...(typeof r.value === 'number' ? { cost: r.value } : {}) } },
     act: { kind: 'setting', key: setter.key, value: r.value, before },
   }
 }

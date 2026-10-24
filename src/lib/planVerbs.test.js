@@ -248,3 +248,17 @@ describe('diff: (stage 10, piece 5; C202)', () => {
     expect(run('>diff:off', { plan: plan({ n: 3, latest: 3 }) }).text[0]).toBe('Nothing is being compared. diff: sets two runs side by side')
   })
 })
+
+describe('the warning before a costly run (C203)', () => {
+  it('leads with the cost when a run costs the amount set or more', () => {
+    const sonnet = { id: 'claude-sonnet-5-5', name: 'Sonnet 5.5', group: 'model', provider: 'anthropic', providerName: 'Anthropic', price: { inputPerMillion: 3 } }
+    const facts = (warn) => ({ keyed: { anthropic: true }, whoOf: () => sonnet, charsOf: () => 4_000_000, here: [], warn })
+    const p = plan({ branches: [{ letter: 'a', address: '201a', name: 'Tower', status: 'ready', chatId: 'c1', steps: [{ id: 's', stepId: 's', status: 'ready', planned: true, text: 'Summarise it all.' }] }] })
+    expect(run('>run:', { plan: p, runFacts: facts(1) }).text.slice(0, 2)).toEqual([
+      'At least $3.00 to send: more than the $1.00 you asked to be warned at. Enter runs it all the same',
+      'Enter runs one step of 201a, in run 1',
+    ])
+    expect(run('>run:', { plan: p, runFacts: facts(5) }).text[0]).toBe('Enter runs one step of 201a, in run 1')
+    expect(run('>run:', { plan: p, runFacts: facts(null) }).text[0]).toBe('Enter runs one step of 201a, in run 1')
+  })
+})

@@ -68,6 +68,7 @@ import { createRunner, runScope } from '../lib/runner'
 import { tabBus, withDocketLock } from '../lib/bus'
 import { showPlan, planKey, planPromptPreview } from '../lib/planVerbs'
 import { planBoardOf, latestPlan, compareRuns } from '../lib/planBoard'
+import { spendingOf } from '../lib/spending'
 import { exportItems, gatherExport, itemsMarkdown, exportMarkdown, exportJsonl, exportType } from '../lib/recordsExport'
 import { dayOf } from './when'
 import { longDay } from './say'
@@ -2146,9 +2147,8 @@ export default function Shell() {
     const rows = almanacRows ?? []
     const now = new Date()
     const month = now.toISOString().slice(0, 7)
-    const thisMonth = rows.filter((r) => r.kind === 'chat' && r.monthCosts && Object.hasOwn(r.monthCosts, month))
-    const known = thisMonth.filter((r) => typeof r.monthCosts[month] === 'number')
-    const spent = known.filter((r) => r.monthCosts[month] > 0)
+    // This month by runs of plans and chats on their own (settings spec §9; C203).
+    const spending = spendingOf(rows, month)
     const chats = rows.filter((r) => r.kind === 'chat')
     return {
       values: {
@@ -2156,6 +2156,7 @@ export default function Shell() {
         finishRepliesOnLeave: Boolean(settings.finishRepliesOnLeave), fontSize: settings.fontSize ?? 'default', mistralRegion: settings.mistralRegion ?? 'global',
         thinking: settings.thinking === true, privacyFilter: settings.privacyFilter ?? 'off', translateQueries: settings.translateQueries === true,
         newChatRoom: settings.newChatRoom ?? null, backupReminder: settings.backupReminder ?? 'monthly', interfaceLanguage: settings.interfaceLanguage ?? null,
+        runWarn: settings.runWarn ?? null,
       },
       providers: keyInfo.keys,
       rows: answerRows,
@@ -2166,10 +2167,12 @@ export default function Shell() {
       replyIn: reply.tag ? languageName(reply.tag) : null,
       helperName: helperNow?.name ?? null,
       spending: {
-        total: known.reduce((n, r) => n + r.monthCosts[month], 0),
-        chats: spent.length,
-        unknown: thisMonth.length - known.length,
-        top: [...spent].sort((a, b) => b.monthCosts[month] - a.monthCosts[month]).slice(0, 4).map((r) => ({ num: r.num, title: r.title, cost: r.monthCosts[month] })),
+        total: spending.total,
+        chats: spending.chats,
+        runs: spending.runs.length,
+        unknown: spending.unknown,
+        // The four costliest: runs where there are any, else chats.
+        top: (spending.runs.length ? spending.runs : spending.solo).slice(0, 4),
         monthName: new Intl.DateTimeFormat(i18n.locale, { month: 'long' }).format(now),
       },
       counts: {
@@ -2196,7 +2199,8 @@ export default function Shell() {
     room: roomId ? { chatId: roomId, num: roomRecord?.num ?? null, streaming: Boolean(streaming) } : null,
     queryOf,
     nameOf: languageName,
-  }), [keyedBy, conversations, settings.defaultModel, chatRowsById, runningHere, roomId, roomRecord, streaming, queryOf, languageName, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
+    warn: typeof settings.runWarn === 'number' ? settings.runWarn : null,
+  }), [settings.runWarn, keyedBy, conversations, settings.defaultModel, chatRowsById, runningHere, roomId, roomRecord, streaming, queryOf, languageName, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
   const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, ...languageScreens, branching, summarizing, including, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, languageScreens, branching, summarizing, including, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
@@ -2785,6 +2789,7 @@ export default function Shell() {
           key="settings" addressed={arrangement.addressed === 'settings'} onAddress={focusBoard}
           section={arrangement.context?.settings ?? null} query={settingsSearch} facts={settingsFacts}
           onSet={runSetting} onWrite={writeField} onCount={setSettingsCount}
+          onOpenRun={(num, n) => { run(showPlan(current.current, num, n), null) }}
         />
       )
     }

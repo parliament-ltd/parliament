@@ -71,7 +71,7 @@ const LOCAL_STATE = { unchecked: COPY.settings.localUnchecked, checking: COPY.se
  *   facts: object, onSet: (line: string) => void, onWrite: (line: string) => void, onCount?: (n: number) => void }} props
  *   facts: the settings now and what the sections show (Shell.jsx, settingsFacts)
  */
-export default function SettingsBoard({ addressed, onAddress, section, query, facts, onSet, onWrite, onCount }) {
+export default function SettingsBoard({ addressed, onAddress, section, query, facts, onSet, onWrite, onCount, onOpenRun = null }) {
   const { i18n } = useLingui()
   const body = useRef(null)
   const [current, setCurrent] = useState(section ?? 'keys')
@@ -231,19 +231,31 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
             {!query && <p className="ch-sec-lede">{say(COPY.settings.spendingLede)}</p>}
             <Row {...rowProps('spending', 'month')} label={say(COPY.settings.monthLabel)} stack
               help={<>
-                <span className="ch-spent">{say(COPY.settings.monthSpent, { cost: money(i18n, facts.spending.total), month: facts.spending.monthName, count: facts.spending.chats })}</span>
+                <span className="ch-spent">{facts.spending.runs > 0
+                  ? say(COPY.settings.monthSpentRuns, { cost: money(i18n, facts.spending.total), month: facts.spending.monthName, runs: facts.spending.runs, count: facts.spending.chats })
+                  : say(COPY.settings.monthSpent, { cost: money(i18n, facts.spending.total), month: facts.spending.monthName, count: facts.spending.chats })}</span>
                 {facts.spending.unknown > 0 && <> {say(COPY.settings.monthUnknown, { count: facts.spending.unknown })}</>}
                 {facts.spending.top.length > 0 && (
                   <span className="ch-runs">
-                    {facts.spending.top.map((c) => (
-                      <button key={c.num} type="button" className="ch-runrow" onMouseDown={(e) => e.preventDefault()} onClick={() => onWrite(`>open:${c.num}`)}>
-                        <span className="ch-code">{c.num}</span><span className="rt" dir="auto">{c.title || say(COPY.settings.untitled)}</span><span className="rc">{money(i18n, c.cost)}</span>
-                      </button>
-                    ))}
+                    {facts.spending.top.map((c) => (c.run != null
+                      // A run: its plan, title, run and cost; a click shows that run (settings spec §9; C203).
+                      ? (
+                        <button key={`${c.num}:${c.run}`} type="button" className="ch-runrow" title={say(COPY.settings.runRowHelp, { run: c.run, num: c.num, board: say(COPY.boards.docket) })} onMouseDown={(e) => e.preventDefault()} onClick={() => (onOpenRun ? onOpenRun(c.num, c.run) : onWrite(`>open:${c.num}`))}>
+                          <span className="ch-code">{c.num}</span><span className="rt" dir="auto">{c.title || say(COPY.settings.untitled)} <span className="ch-marg">{say(COPY.settings.runRow, { run: c.run })}</span></span><span className="rc">{money(i18n, c.cost)}</span>
+                        </button>
+                      )
+                      : (
+                        <button key={c.num} type="button" className="ch-runrow" onMouseDown={(e) => e.preventDefault()} onClick={() => onWrite(`>open:${c.num}`)}>
+                          <span className="ch-code">{c.num}</span><span className="rt" dir="auto">{c.title || say(COPY.settings.untitled)}</span><span className="rc">{money(i18n, c.cost)}</span>
+                        </button>
+                      )))}
                   </span>
                 )}
               </>}
             />
+            <Row {...rowProps('spending', 'warn')} label={say(COPY.settings.warnLabel)} help={say(COPY.settings.warnHelp)}>
+              <Seg label={say(COPY.settings.warnLabel)} value={v.runWarn ?? 'off'} onPick={(x) => onSet(`set:warn ${x === 'off' ? 'off' : x}`)} options={[['off', say(COPY.settings.warnOff)], [0.5, money(i18n, 0.5)], [1, money(i18n, 1)], [5, money(i18n, 5)]]} />
+            </Row>
           </section>
 
           {/* Context and defaults (settings spec §10) */}
@@ -397,7 +409,7 @@ function rowWords(facts) {
   }
   return {
     keys,
-    spending: { month: 'this month spent chats cost dollars' },
+    spending: { month: 'this month spent chats runs cost dollars', warn: 'warn warning costly run budget limit cost' },
     context,
     data: {
       backup: 'backup restore export import parliament file format bring back',

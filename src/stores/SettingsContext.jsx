@@ -18,6 +18,8 @@ const DEFAULT_SETTINGS = {
   // How often to remind about backups (set:reminder; C182). Monthly is the
   // rule the reminder always had.
   backupReminder: 'monthly',
+  // Warn before a costly run (set:warn; C203): an amount in dollars, or null for off.
+  runWarn: null,
   lastBackup: null,
   spendingLimitDismissed: false,
   // PR-19e: pointer to a room mode the user wants to use as their

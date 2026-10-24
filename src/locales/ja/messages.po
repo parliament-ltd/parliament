@@ -3296,6 +3296,10 @@ msgid "enter.runCostCheap"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.runCostly"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.runCostUnpriced"
 msgstr ""
 
@@ -3559,6 +3563,15 @@ msgstr "Enterで、新しいチャットの名前付けをオンにします。�
 #. js-lingui-explicit-id
 msgid "enter.setUnknown"
 msgstr "{word} という設定はありません。set: で指定できるのは {words} です"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setWarn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setWarnOff"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.showRoom"
@@ -5741,6 +5754,10 @@ msgid "settings.monthSpent"
 msgstr "{count, plural, =0 {{month}の利用はまだありません。} other {{month}の利用額は{cost}（チャット#件）です。トークン数からの概算で、正式な額はプロバイダの請求書で確認できます。}}"
 
 #. js-lingui-explicit-id
+msgid "settings.monthSpentRuns"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "settings.monthUnknown"
 msgstr "{count, plural, other {チャット#件の費用は不明です：トークン数が記録されていない返答があります。}}"
 
@@ -5885,6 +5902,14 @@ msgid "settings.roomLabel"
 msgstr "新しいチャットのルーム"
 
 #. js-lingui-explicit-id
+msgid "settings.runRow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.runRowHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "settings.sources"
 msgstr "情報源"
 
@@ -5975,6 +6000,18 @@ msgstr "英語しか読めない情報源への質問は、先に翻訳して送
 #. js-lingui-explicit-id
 msgid "settings.untitled"
 msgstr "無題"
+
+#. js-lingui-explicit-id
+msgid "settings.warnHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.warnLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.warnOff"
+msgstr ""
 
 #. Marginalia on the board the navy rule is on
 #. js-lingui-explicit-id

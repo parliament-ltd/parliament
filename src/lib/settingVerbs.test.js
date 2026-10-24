@@ -49,9 +49,9 @@ describe('the sections', () => {
 
 describe('set:', () => {
   it('lists what it takes, and says what it does not know', () => {
-    expect(SETTER_NAMES).toEqual(['default', 'keys', 'title', 'finish', 'text', 'region', 'room', 'reminder'])
-    expect(line('>set:').text).toBe('set: changes a setting: set:default, set:keys, set:title, set:finish, set:text, set:region, set:room, or set:reminder')
-    expect(line('>set:colour blue').text).toBe('No setting called colour. set: takes set:default, set:keys, set:title, set:finish, set:text, set:region, set:room, or set:reminder')
+    expect(SETTER_NAMES).toEqual(['default', 'keys', 'title', 'finish', 'text', 'region', 'room', 'reminder', 'warn'])
+    expect(line('>set:').text).toBe('set: changes a setting: set:default, set:keys, set:title, set:finish, set:text, set:region, set:room, set:reminder, or set:warn')
+    expect(line('>set:colour blue').text).toBe('No setting called colour. set: takes set:default, set:keys, set:title, set:finish, set:text, set:region, set:room, set:reminder, or set:warn')
   })
 
   it('makes a model the one for new chats, by name, and refuses what cannot be', () => {
@@ -94,5 +94,14 @@ describe('spending by month', () => {
       { role: 'assistant', content: 'c', createdAt: '2026-08-01T10:00:00Z' },
     ])
     expect(costsByMonth(f, () => ({ inputPerMillion: 2, outputPerMillion: 10 }))).toEqual({ '2026-09': 2, '2026-10': 10, '2026-08': null })
+  })
+})
+
+describe('set:warn (settings spec §9; stage 10, piece 6; C203)', () => {
+  it('sets the amount above which run: leads with its cost, or turns it off', () => {
+    expect(line('>set:warn 1')).toMatchObject({ text: 'Enter has run: lead with what a run costs when it is $1.00 or more', act: { kind: 'setting', key: 'runWarn', value: 1, before: null } })
+    expect(line('>set:warn 0.50').act).toMatchObject({ value: 0.5 })
+    expect(line('>set:warn off', { values: { ...values, runWarn: 5 } })).toMatchObject({ text: 'Enter stops warning before a costly run', act: { value: null, before: 5 } })
+    expect(line('>set:warn 3').text).toMatch(/set:warn off/)
   })
 })

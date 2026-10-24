@@ -381,10 +381,14 @@ export function planRun(step, screens = {}) {
   if (local) also.push({ message: 'runLocal' })
   if (scope.skipped) also.push({ message: 'runSkipped', values: { count: scope.skipped } })
   also.push({ message: 'runUndo' })
+  const head = scope.newRun
+    ? { message: 'runHeadNew', values: { count, run: scope.run, address: nums[0] } }
+    : { message: nums.length > 1 ? 'runHeadMany' : 'runHead', values: { count, run: scope.run, nums, num: p.num } }
+  // Warn before a costly run (settings spec §9; C203): above the amount set,
+  // the line leads with what it costs.
+  const costly = f.warn != null && priced && total >= f.warn
   return {
-    says: scope.newRun
-      ? { message: 'runHeadNew', values: { count, run: scope.run, address: nums[0] }, also }
-      : { message: nums.length > 1 ? 'runHeadMany' : 'runHead', values: { count, run: scope.run, nums, num: p.num }, also },
+    says: costly ? { message: 'runCostly', values: { cost: total, warn: f.warn }, also: [head, ...also] } : { ...head, also },
     act: { kind: 'run', docketId: p.docketId, num: p.num, n: p.latest, letter: arg?.letter ?? null, letters: scope.branches.map((b) => b.letter), newRun: scope.newRun },
   }
 }

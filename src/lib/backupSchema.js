@@ -102,6 +102,7 @@ const SETTINGS = Object.freeze({
   budgetAlert: num(0, 1_000_000),
   budgetEnabled: bool,
   backupReminder: str(20),
+  runWarn: (v) => v === null || v === 0.5 || v === 1 || v === 5, // C203
   lastBackup: either(strOrNull(40), num(0, Number.MAX_SAFE_INTEGER)),
   spendingLimitDismissed: bool,
   chosenHomeRoomId: strOrNull(128),

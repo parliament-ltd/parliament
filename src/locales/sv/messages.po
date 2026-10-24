@@ -3296,6 +3296,10 @@ msgid "enter.runCostCheap"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.runCostly"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.runCostUnpriced"
 msgstr ""
 
@@ -3559,6 +3563,15 @@ msgstr "Enter slår på namngivning av nya chattar: efter en chatts första svar
 #. js-lingui-explicit-id
 msgid "enter.setUnknown"
 msgstr "Ingen inställning heter {word}. set: tar {words}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setWarn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setWarnOff"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.showRoom"
@@ -5741,6 +5754,10 @@ msgid "settings.monthSpent"
 msgstr "{count, plural, =0 {Inga kostnader i {month} än.} one {{cost} har gått åt i {month}, i # chatt. Uppskattat från antal tokens; leverantörens faktura är det som gäller.} other {{cost} har gått åt i {month}, i # chattar. Uppskattat från antal tokens; leverantörens faktura är det som gäller.}}"
 
 #. js-lingui-explicit-id
+msgid "settings.monthSpentRuns"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "settings.monthUnknown"
 msgstr "{count, plural, one {Kostnaden för # chatt är okänd: ett svar registrerade inga tokens.} other {Kostnaden för # chattar är okänd: några svar registrerade inga tokens.}}"
 
@@ -5885,6 +5902,14 @@ msgid "settings.roomLabel"
 msgstr "Rum för nya chattar"
 
 #. js-lingui-explicit-id
+msgid "settings.runRow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.runRowHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "settings.sources"
 msgstr "Källor"
 
@@ -5975,6 +6000,18 @@ msgstr "En fråga till en källa som bara läser engelska översätts först."
 #. js-lingui-explicit-id
 msgid "settings.untitled"
 msgstr "Utan titel"
+
+#. js-lingui-explicit-id
+msgid "settings.warnHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.warnLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.warnOff"
+msgstr ""
 
 #. Marginalia on the board the navy rule is on
 #. js-lingui-explicit-id

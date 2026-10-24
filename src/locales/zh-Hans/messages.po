@@ -3296,6 +3296,10 @@ msgid "enter.runCostCheap"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.runCostly"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.runCostUnpriced"
 msgstr ""
 
@@ -3559,6 +3563,15 @@ msgstr "按 Enter 开启新对话命名：对话收到首个回答后，会发�
 #. js-lingui-explicit-id
 msgid "enter.setUnknown"
 msgstr "没有名为 {word} 的设置。set: 可接 {words}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setWarn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setWarnOff"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.showRoom"
@@ -5741,6 +5754,10 @@ msgid "settings.monthSpent"
 msgstr "{count, plural, =0 {{month}还没有花费。} other {{month}共花费 {cost}，涉及 # 个对话。按 token 数估算，以服务商账单为准。}}"
 
 #. js-lingui-explicit-id
+msgid "settings.monthSpentRuns"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "settings.monthUnknown"
 msgstr "{count, plural, other {有 # 个对话的费用未知：其中有回复没有记录 token 数。}}"
 
@@ -5885,6 +5902,14 @@ msgid "settings.roomLabel"
 msgstr "新对话使用的房间"
 
 #. js-lingui-explicit-id
+msgid "settings.runRow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.runRowHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "settings.sources"
 msgstr "来源"
 
@@ -5975,6 +6000,18 @@ msgstr "向只读英文的来源提问时，问题会先翻译再发送。"
 #. js-lingui-explicit-id
 msgid "settings.untitled"
 msgstr "未命名"
+
+#. js-lingui-explicit-id
+msgid "settings.warnHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.warnLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.warnOff"
+msgstr ""
 
 #. Marginalia on the board the navy rule is on
 #. js-lingui-explicit-id

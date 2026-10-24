@@ -1755,6 +1755,16 @@ Found while splitting stage 10 into pieces, after a read of every document on pl
 - **(i) Tested:** the comparison both ways; `diff:`, `by:` with `then`, the waiting tab, a step's group; the include line for one after another. Tried on a trial copy with a model on this computer: two runs side by side; a step's answerer chosen and let go; `by:bonsai then wikipedia` with Wikipedia "if nothing is found" (the model answered, the slider showed Wikipedia "did not run", nothing went out); the step list in the room's sheet, its link writing `open:219`. Found and fixed there: the step list's class name was the welcome page's, so its look was the welcome list's; `by:` alone opened the picker still choosing for a step; a source showed by its id on the board; with no answerer of its own a step showed two rows ticked. The trial copy was erased.
 - **Suggestion:** keep as built.
 
+**C203. Spending, as built** (stage 10, piece 6; settings spec §9; C181 (d) and (e)).
+- **(a) This month** in Settings: one sentence of what was spent, in how many runs of plans and how many chats on their own, from the tokens each reply recorded, by the month it came. A run is a plan's chats in one run, where the plan has several branches or began with no chat, and any run past the first; a chat that is its own plan, run once, is a chat. Chats whose cost is not known are counted and said, never guessed (as C181 (e)).
+- **(b) The four costliest runs** this month, each as its plan's number, title, run and cost; a click shows that run on the Plan board. With no run this month, the costliest chats stand in, as before.
+- **(c) Warn before a costly run:** Off, $0.50, $1, $5, in Settings and as `set:warn off`, `set:warn 0.50`, `set:warn 1`, `set:warn 5`. At or above it, `run:`'s Enter line leads with what the run costs before any reply ("At least $3.00 to send: more than the $1.00 you asked to be warned at. Enter runs it all the same"). It warns; it stops nothing, as the spec has it. Stored as the setting `runWarn` and carried in backups.
+- **(d) Open points:**
+  1. **Hard limits:** each provider sets its own; the spec has Settings link to each provider's limits page rather than pretend to enforce one, and C181 (d) left it for stage 10, once each page is checked. Not built: the pages have not been checked. **Suggestion:** add the links once you confirm I may look them up (one page per provider, read only).
+  2. **The monthly budget alert** stays off the board with R28.
+- **(e) Tested:** the run and chat counts, a month's edges, `set:warn`, the line leading with the cost. Tried on a trial copy: the Settings row sets and shows the amount. The trial copy was erased.
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

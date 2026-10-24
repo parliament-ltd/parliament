@@ -3296,6 +3296,10 @@ msgid "enter.runCostCheap"
 msgstr "At least {tokens, number} tokens to send, under {cost}. Each step also sends the replies before it"
 
 #. js-lingui-explicit-id
+msgid "enter.runCostly"
+msgstr "At least {cost} to send: more than the {warn} you asked to be warned at. Enter runs it all the same"
+
+#. js-lingui-explicit-id
 msgid "enter.runCostUnpriced"
 msgstr "At least {tokens, number} tokens to send. Each step also sends the replies before it"
 
@@ -3559,6 +3563,15 @@ msgstr "Enter turns on naming new chats: after a chat’s first answer, one smal
 #. js-lingui-explicit-id
 msgid "enter.setUnknown"
 msgstr "No setting called {word}. set: takes {words}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.setWarn"
+msgstr "Enter has run: lead with what a run costs when it is {cost} or more"
+
+#. js-lingui-explicit-id
+msgid "enter.setWarnOff"
+msgstr "Enter stops warning before a costly run"
 
 #. js-lingui-explicit-id
 msgid "enter.showRoom"
@@ -5741,6 +5754,10 @@ msgid "settings.monthSpent"
 msgstr "{count, plural, =0 {Nothing spent in {month} yet.} one {{cost} spent in {month}, in # chat. Estimated from token counts; your provider’s bill is the record.} other {{cost} spent in {month}, across # chats. Estimated from token counts; your provider’s bill is the record.}}"
 
 #. js-lingui-explicit-id
+msgid "settings.monthSpentRuns"
+msgstr "{cost} spent in {month}: {runs, plural, one {# run of a plan} other {# runs of plans}} and {count, plural, =0 {no chat on its own} one {# chat on its own} other {# chats on their own}}. Estimated from token counts; your provider’s bill is the record."
+
+#. js-lingui-explicit-id
 msgid "settings.monthUnknown"
 msgstr "{count, plural, one {The cost of # chat is not known: a reply recorded no tokens.} other {The cost of # chats is not known: some replies recorded no tokens.}}"
 
@@ -5885,6 +5902,14 @@ msgid "settings.roomLabel"
 msgstr "Room for new chats"
 
 #. js-lingui-explicit-id
+msgid "settings.runRow"
+msgstr "run {run}"
+
+#. js-lingui-explicit-id
+msgid "settings.runRowHelp"
+msgstr "Shows run {run} of plan {num} on the {board} board"
+
+#. js-lingui-explicit-id
 msgid "settings.sources"
 msgstr "Sources"
 
@@ -5975,6 +6000,18 @@ msgstr "A question to a source that reads only English goes translated first."
 #. js-lingui-explicit-id
 msgid "settings.untitled"
 msgstr "Untitled"
+
+#. js-lingui-explicit-id
+msgid "settings.warnHelp"
+msgstr "Above this, the line under the bar leads with what a run costs, before Enter."
+
+#. js-lingui-explicit-id
+msgid "settings.warnLabel"
+msgstr "Warn before a costly run"
+
+#. js-lingui-explicit-id
+msgid "settings.warnOff"
+msgstr "Off"
 
 #. Marginalia on the board the navy rule is on
 #. js-lingui-explicit-id
