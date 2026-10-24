@@ -67,7 +67,7 @@ import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, planSt
 import { createRunner, runScope } from '../lib/runner'
 import { tabBus, withDocketLock } from '../lib/bus'
 import { showPlan, planKey, planPromptPreview } from '../lib/planVerbs'
-import { planBoardOf, latestPlan } from '../lib/planBoard'
+import { planBoardOf, latestPlan, compareRuns } from '../lib/planBoard'
 import { exportItems, gatherExport, itemsMarkdown, exportMarkdown, exportJsonl, exportType } from '../lib/recordsExport'
 import { dayOf } from './when'
 import { longDay } from './say'
@@ -1871,7 +1871,8 @@ export default function Shell() {
   const planAsked = planKey(arrangement.context?.docket)
   const planNum = planAsked?.num ?? (roomId ? chatRowsById.get(roomId)?.docketNum : null) ?? latestPlan(almanacRows)
   const planRun = planAsked?.run ?? null
-  const [planRead, setPlanRead] = useState(null) // { num, run, plan, texts }
+  const planAgainst = planAsked?.against ?? null // diff: the run beside it (C202)
+  const [planRead, setPlanRead] = useState(null) // { num, run, against, plan, texts }
   const [planPick, setPlanPick] = useState(null) // { num, letter }: the branch picked on the board
   useEffect(() => {
     if (!started || !planOnScreen || planNum == null) return undefined
@@ -1884,25 +1885,34 @@ export default function Shell() {
       }
       const texts = new Map()
       const shownRun = plan?.runs.find((r) => r.n === planRun) ?? plan?.runs.at(-1)
-      for (const b of Object.values(shownRun?.branches ?? {})) {
-        if (!b?.chatId || !(b.steps ?? []).some((s) => s.messageId)) continue
-        for (const m of await getMessages(b.chatId).catch(() => [])) if (m.role === 'user') texts.set(m.id, typeof m.content === 'string' ? m.content : '')
+      const besideRun = planAgainst ? plan?.runs.find((r) => r.n === planAgainst) : null
+      const chats = new Set()
+      for (const run of [shownRun, besideRun]) {
+        for (const b of Object.values(run?.branches ?? {})) if (b?.chatId && (b.steps ?? []).some((s) => s.messageId)) chats.add(b.chatId)
       }
-      if (live) setPlanRead({ num: planNum, run: planRun, plan, texts })
+      for (const id of chats) {
+        for (const m of await getMessages(id).catch(() => [])) if (m.role === 'user') texts.set(m.id, typeof m.content === 'string' ? m.content : '')
+      }
+      if (live) setPlanRead({ num: planNum, run: planRun, against: planAgainst, plan, texts })
     }
     read()
     const off = onRecordsChanged(() => { read() })
     return () => { live = false; off() }
-  }, [started, planOnScreen, planNum, planRun, planRuns])
+  }, [started, planOnScreen, planNum, planRun, planAgainst, planRuns])
   const planBoard = useMemo(() => {
-    if (!planOnScreen || !planRead?.plan || planRead.num !== planNum || planRead.run !== planRun) return null
+    if (!planOnScreen || !planRead?.plan || planRead.num !== planNum || planRead.run !== planRun || planRead.against !== planAgainst) return null
     const chatOf = (id) => {
       const r = chatRowsById.get(id)
       return r ? { num: r.num, roomId: r.roomId ?? null, title: r.title ?? '' } : null
     }
     const rooms = new Map(recordsNames.rooms.map((r) => [r.id, roomLabel(i18n, r.name)]))
-    return planBoardOf(planRead.plan, { run: planRun, textOf: (id) => planRead.texts.get(id), chatOf, roomName: (id) => rooms.get(id) ?? null, selected: planPick?.num === planNum ? planPick.letter : null })
-  }, [planOnScreen, planRead, planNum, planRun, chatRowsById, recordsNames, i18n, planPick])
+    const opts = { textOf: (id) => planRead.texts.get(id), chatOf, roomName: (id) => rooms.get(id) ?? null, selected: planPick?.num === planNum ? planPick.letter : null }
+    const board = planBoardOf(planRead.plan, { ...opts, run: planRun })
+    // diff: the other run beside it, what differs marked on both (C202).
+    if (!planAgainst || !planRead.plan.runs.some((r) => r.n === planAgainst) || planAgainst === board.n) return board
+    const beside = planBoardOf(planRead.plan, { ...opts, run: planAgainst })
+    return { ...board, against: planAgainst, beside, marks: compareRuns(board, beside), besideMarks: compareRuns(beside, board) }
+  }, [planOnScreen, planRead, planNum, planRun, planAgainst, chatRowsById, recordsNames, i18n, planPick])
   const planBoardNow = useRef(null)
   useEffect(() => { planBoardNow.current = planBoard }, [planBoard])
   // What the plan commands do (C198): all on this device, nothing sent;

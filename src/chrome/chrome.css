@@ -802,6 +802,13 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-shell button.ch-pl-x:hover { color: var(--ch-ink); background: var(--ch-wash); }
 .ch-pl-x:focus-visible { opacity: 1; outline: var(--ch-focus); outline-offset: 1px; }
 @media (hover: none) { .ch-pl-x { opacity: 1; } }
+/* diff: two runs side by side, what differs marked in ink (docket v12; C202):
+   a bar beside each line that differs, a pale wash on the words. No new hue. */
+.ch-pl-runs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
+.ch-pl-runhead { margin: 12px 0 0; font: 600 var(--ch-t-small) var(--ch-sans); color: var(--ch-ink-2); }
+.ch-pl-line.chg::before { content: ""; position: absolute; inset-inline-start: -10px; top: 9px; bottom: 9px; width: 2px; border-radius: 1px; background: var(--ch-soft); }
+.ch-pl-dw { background: var(--ch-wash-2); border-radius: 2px; padding: 0 1px; margin: 0 -1px; }
+@container (max-width: 640px) { .ch-pl-runs { grid-template-columns: minmax(0, 1fr); } }
 .ch-pl-none p { margin: 0 0 4px; }
 .ch-pl-none p:first-child { font: 400 var(--ch-t-lead) var(--ch-serif); color: var(--ch-ink); }
 @container (max-width: 420px) {

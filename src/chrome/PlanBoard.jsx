@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useLayoutEffect, useRef } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
+import { wordDiff } from '../lib/wordDiff'
 
 // The Plan board (refactor-plan.md, stage 10, piece 2; Docket v12; C196
 // (a); C198): one plan at one run. Its head names the plan and the run; then
@@ -119,14 +120,21 @@ function Cross({ label, onClick }) {
   return <button type="button" className="ch-pl-x" aria-label={label} title={label} onClick={onClick}>{CROSS}</button>
 }
 
-function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete, onCondition }) {
+// A started step's words, those the other run does not have washed (C202).
+function Washed({ text, other }) {
+  return wordDiff(other ?? '', text).filter((p) => p.op !== 'gone').map((p, i) => (p.op === 'added' ? <span key={i} className="ch-pl-dw">{p.text}</span> : p.text))
+}
+
+function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete, onCondition, marks = null, otherRun = null, still = false }) {
   const { i18n } = useLingui()
-  const changes = plan.n === plan.latest
+  const changes = plan.n === plan.latest && !still
+  const markOf = (s) => marks?.get(`${branch.letter}:${s.index}`) ?? null
+  const onlyHere = marks?.get(branch.letter)?.only
   const picked = plan.selected === branch.letter
   const pips = plan.runNums.length > 1
   return (
     <>
-      <div className={`ch-pl-line branch${branch.status === 'waiting' ? ' waiting' : ''}${picked ? ' sel' : ''}`}>
+      <div className={`ch-pl-line branch${branch.status === 'waiting' ? ' waiting' : ''}${picked && !still ? ' sel' : ''}${onlyHere ? ' chg' : ''}`}>
         <div className="ch-pl-gut"><span className="ch-pl-addr">{branch.address}</span></div>
         <div className="ch-pl-main">
           <button type="button" className="ch-pl-pick" aria-pressed={picked} onClick={() => onPick(branch.letter)}>
@@ -134,6 +142,7 @@ function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete
           </button>
           <div className="ch-marg ch-pl-marg">
             <span>{i18n._(COPY.plan.steps, { count: branch.steps.length })}</span>
+            {onlyHere && <><Sep /><span className="ch-pl-dw">{i18n._(COPY.plan.onlyIn, { run: otherRun })}</span></>}
             {branch.firstRun > 1 && <><Sep /><span>{i18n._(COPY.plan.newInRun, { run: branch.firstRun })}</span></>}
             {branch.room && <><Sep /><span>{branch.room}</span></>}
             <Sep />
@@ -144,13 +153,14 @@ function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete
         </div>
         <div className="ch-pl-end">
           <Status status={branch.status} />
-          {changes && !branch.everRan && <Cross label={i18n._(COPY.plan.deleteBranch, { address: branch.address })} onClick={() => onDelete(DELETE_BRANCH(branch.address))} />}
+          {changes && !still && !branch.everRan && <Cross label={i18n._(COPY.plan.deleteBranch, { address: branch.address })} onClick={() => onDelete(DELETE_BRANCH(branch.address))} />}
         </div>
       </div>
       {branch.steps.map((s) => {
         const open = changes && s.planned && (s.status === 'ready' || s.status === 'waiting')
+        const mark = markOf(s)
         return (
-          <div key={s.id} className={`ch-pl-line step${s.status === 'waiting' ? ' waiting' : ''}`}>
+          <div key={s.id} className={`ch-pl-line step${s.status === 'waiting' ? ' waiting' : ''}${mark?.chg ? ' chg' : ''}`}>
             <div className="ch-pl-gut">
               <span className="ch-pl-ord">{s.index}</span>
               {pips && (
@@ -168,18 +178,19 @@ function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete
             <div className="ch-pl-main">
               {open
                 ? <StepText step={s} address={branch.address} onText={(text) => onText(branch.letter, s.stepId, text)} onFocus={() => { if (!picked) onPick(branch.letter) }} />
-                : <div className="ch-pl-text ro" dir="auto" title={s.planned ? undefined : i18n._(COPY.plan.fixed, { run: plan.n })}>{s.text}</div>}
+                : <div className="ch-pl-text ro" dir="auto" title={s.planned ? undefined : i18n._(COPY.plan.fixed, { run: plan.n })}>{mark?.txt ? <Washed text={s.text} other={mark.other} /> : s.text}</div>}
               <div className="ch-marg ch-pl-marg">
-                <span>{s.model ? nameOf(s.model) : i18n._(COPY.plan.asBranch)}</span>
+                <span className={mark?.model ? 'ch-pl-dw' : undefined}>{s.model ? nameOf(s.model) : i18n._(COPY.plan.asBranch)}</span>
+                {mark?.only && <><Sep /><span className="ch-pl-dw">{i18n._(COPY.plan.onlyIn, { run: otherRun })}</span></>}
                 {s.index > 1 && (open
                   ? <><Sep /><button type="button" className="ch-pl-cond" title={i18n._(COPY.plan.conditionHelp)} onClick={() => onCondition(branch.letter, s.stepId, NEXT_CONDITION[s.condition ?? 'finished'])}>{i18n._(COPY.plan.condition, { condition: s.condition ?? 'finished' })}</button></>
-                  : s.condition && s.condition !== 'finished' && <><Sep /><span>{i18n._(COPY.plan.condition, { condition: s.condition })}</span></>)}
+                  : s.condition && s.condition !== 'finished' && <><Sep /><span className={mark?.condition ? 'ch-pl-dw' : undefined}>{i18n._(COPY.plan.condition, { condition: s.condition })}</span></>)}
                 {(s.status === 'paused' || s.ended === 'unmet') && <><Sep /><span>{i18n._(COPY.plan.ended, { why: s.ended ?? 'other' })}</span></>}
               </div>
             </div>
             <div className="ch-pl-end">
               <Status status={s.status} />
-              {open && <Cross label={i18n._(COPY.plan.deleteStep, { index: s.index, address: branch.address })} onClick={() => onDelete(DELETE_STEP(branch.address, s.index))} />}
+              {open && !still && <Cross label={i18n._(COPY.plan.deleteStep, { index: s.index, address: branch.address })} onClick={() => onDelete(DELETE_STEP(branch.address, s.index))} />}
             </div>
           </div>
         )
@@ -230,10 +241,18 @@ export default function PlanBoard({ plan, loading = false, addressed, nameOf = (
                 </>
               )}
             </div>
+            {plan.beside && (
+              <div className="ch-marg ch-pl-marg ch-pl-dmarg">
+                <span>{i18n._(COPY.plan.beside, { run: plan.n, other: plan.beside.n })}</span>
+                <Sep /><button type="button" onClick={() => onWrite('>diff:off')}>{i18n._(COPY.plan.besideOff)}</button>
+              </div>
+            )}
+            <div className={plan.beside ? 'ch-pl-runs' : undefined}>
             <div className="ch-pl-doc">
+              {plan.beside && <p className="ch-pl-runhead">{i18n._(COPY.plan.runHead, { run: plan.n })}</p>}
               {plan.branches.map((b) => (
                 <Fragment key={b.letter}>
-                  <Branch plan={plan} branch={b} nameOf={nameOf} onWrite={onWrite} onPick={onPick} onText={onText} onRun={onRun} onDelete={onDelete} onCondition={onCondition} />
+                  <Branch plan={plan} branch={b} nameOf={nameOf} onWrite={onWrite} onPick={onPick} onText={onText} onRun={onRun} onDelete={onDelete} onCondition={onCondition} marks={plan.marks ?? null} otherRun={plan.beside?.n ?? null} />
                 </Fragment>
               ))}
               {plan.n === plan.latest && (
@@ -242,6 +261,17 @@ export default function PlanBoard({ plan, loading = false, addressed, nameOf = (
                   <span className="ch-marg">{i18n._(COPY.plan.addBranch)}</span>
                 </button>
               )}
+            </div>
+            {plan.beside && (
+              <div className="ch-pl-doc">
+                <p className="ch-pl-runhead">{i18n._(COPY.plan.runHead, { run: plan.beside.n })}</p>
+                {plan.beside.branches.map((b) => (
+                  <Fragment key={b.letter}>
+                    <Branch plan={plan.beside} branch={b} nameOf={nameOf} onWrite={onWrite} onPick={onPick} onText={onText} onRun={onRun} onDelete={onDelete} onCondition={onCondition} marks={plan.besideMarks} otherRun={plan.n} still />
+                  </Fragment>
+                ))}
+              </div>
+            )}
             </div>
           </>
         )}

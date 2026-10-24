@@ -123,8 +123,8 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.run', message: 'Run one branch. The Enter line says which run and what it costs' } }),
   v({ verb: 'stop', group: 'run', example: 'stop:201b', forms: ['stop:', 'stop:201b', 'stop:all'], takes: [[], ['address'], [['all']]], stage: 10, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.stop', message: 'Halt a run, or every run in every window' } }),
-  v({ verb: 'diff', group: 'run', example: 'diff:', forms: ['diff:', 'diff:off'], takes: [[], [['off']]], on: ['docket'], stage: 10, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.diff', message: 'Mark what differs between the runs that are open' } }),
+  v({ verb: 'diff', group: 'run', example: 'diff:', forms: ['diff:', 'diff:1', 'diff:off'], takes: [[], [['off']], ['number']], on: ['docket'], stage: 10, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.diff', message: 'Set two runs of a plan side by side, and mark what differs' } }),
   v({ verb: 'again', group: 'run', example: 'again:201a', takes: [[], ['address']], stage: 8, spends: true,
     gloss: /*i18n*/ { id: 'verb.again', message: 'Ask again from the edited prompt, as a new branch' } }),
 

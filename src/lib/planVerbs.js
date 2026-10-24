@@ -20,19 +20,25 @@ const typed = (arg) => (arg?.kind === 'text' ? arg.value : arg?.text ?? '')
 const BOARD = 'docket' // the Plan board, by name in what is said
 const isWords = (arg) => arg && arg.kind !== 'address'
 
-/** The Plan board's context, '201' or '201:2', as { num, run }. */
+/**
+ * The Plan board's context, '201', '201:2', '201:3+2' (run 3 beside run 2,
+ * diff:), or '201:+2' (the last run beside run 2), as { num, run, against }.
+ */
 export function planKey(value) {
-  const m = /^(\d+)(?::(\d+))?$/.exec(String(value ?? ''))
-  return m ? { num: Number(m[1]), run: m[2] ? Number(m[2]) : null } : null
+  const m = /^(\d+)(?::(\d*))?(?:\+(\d+))?$/.exec(String(value ?? ''))
+  return m ? { num: Number(m[1]), run: m[2] ? Number(m[2]) : null, against: m[3] ? Number(m[3]) : null } : null
 }
-export const keyOf = (num, run = null) => (run ? `${num}:${run}` : String(num))
+export const keyOf = (num, run = null, against = null) => {
+  if (against) return `${num}:${run ?? ''}+${against}`
+  return run ? `${num}:${run}` : String(num)
+}
 
 const boardHere = (a) => a.columns.flat().includes('docket') || a.popped.some((p) => p.board === 'docket')
 
-/** The Plan board on the screen, the bar pointed at it, showing a plan. */
-export function showPlan(a, num, run = null) {
+/** The Plan board on the screen, the bar pointed at it, showing a plan (beside another of its runs). */
+export function showPlan(a, num, run = null, against = null) {
   const next = boardHere(a) ? address(a, 'docket') : planOpen(a, 'docket').next
-  return { ...next, context: { ...next.context, docket: keyOf(num, run) } }
+  return { ...next, context: { ...next.context, docket: keyOf(num, run, against) } }
 }
 
 // The plan a change goes to, or why there is none here.
@@ -416,4 +422,30 @@ export function planStop(step, screens = {}, addressed = null) {
   const room = f.room ?? null
   if (room?.streaming) return { says: { message: 'stopReply', values: { num: room.num ?? '' } }, act: { kind: 'stopReply', chatId: room.chatId } }
   return { says: { message: 'stopNone' }, act: null }
+}
+
+// ── diff: (stage 10, piece 5; docket v12; C196 (a); C202) ──
+
+/**
+ * diff:, diff:1, diff:off. Two runs of the plan on the board side by side,
+ * what differs marked in ink: a bar beside each line that differs, a wash
+ * on the words. diff: sets the run shown beside the one before it (run 1
+ * beside run 2); diff:1 beside run 1; diff:off shows one again.
+ */
+export function planDiff(a, step, screens = {}) {
+  const [arg] = step.match?.values ?? []
+  const s = shown(screens)
+  if (s.bad) return { says: s.bad, next: null }
+  const p = s.plan
+  const shownRun = p.n === p.latest ? null : p.n
+  if (arg?.kind === 'word' && arg.value === 'off') {
+    if (!p.against) return { says: { message: 'diffNone' }, next: null }
+    return { says: { message: 'diffOff', values: { run: p.n } }, next: showPlan(a, p.num, shownRun) }
+  }
+  if (p.latest < 2) return { says: { message: 'diffOneRun', values: { num: p.num } }, next: null }
+  const other = arg?.kind === 'number' ? Number(arg.value) : p.n > 1 ? p.n - 1 : 2
+  if (!Number.isInteger(other) || other < 1 || other > p.latest) return { says: { message: 'planRunNone', values: { run: arg?.value ?? '', runs: p.latest, num: p.num } }, next: null }
+  if (other === p.n) return { says: { message: 'diffSame', values: { run: other } }, next: null }
+  if (p.against === other) return { says: { message: 'diffHere', values: { run: p.n, other } }, next: null }
+  return { says: { message: 'diffOn', values: { run: p.n, other } }, next: showPlan(a, p.num, shownRun, other) }
 }

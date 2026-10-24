@@ -1612,6 +1612,33 @@ msgid "enter.didYouMean"
 msgstr "No command called {verb}. Did you mean {near}?"
 
 #. js-lingui-explicit-id
+msgid "enter.diffHere"
+msgstr "Run {other} is beside run {run} already"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.diffNone"
+msgstr "Nothing is being compared. diff: sets two runs side by side"
+
+#. js-lingui-explicit-id
+msgid "enter.diffOff"
+msgstr "Enter shows run {run} alone again"
+
+#. js-lingui-explicit-id
+msgid "enter.diffOn"
+msgstr "Enter sets run {other} beside run {run}, marking in ink what differs"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.diffOneRun"
+msgstr "Plan {num} has one run. new:run makes another to compare"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.diffSame"
+msgstr "That is run {run}, on the board already. diff: and another run compares them"
+
+#. js-lingui-explicit-id
 msgid "enter.elsewhere"
 msgstr "{verb} works on {boards}"
 
@@ -5140,6 +5167,15 @@ msgid "plan.asBranch"
 msgstr "as the branch"
 
 #. js-lingui-explicit-id
+msgid "plan.beside"
+msgstr "run {run} beside run {other}, what differs marked"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "plan.besideOff"
+msgstr "diff:off shows one"
+
+#. js-lingui-explicit-id
 msgid "plan.chat"
 msgstr "chat {num}"
 
@@ -5211,6 +5247,10 @@ msgid "plan.noneHow"
 msgstr "open: and a plan’s number shows one here. new:plan makes one"
 
 #. js-lingui-explicit-id
+msgid "plan.onlyIn"
+msgstr "not in run {run}"
+
+#. js-lingui-explicit-id
 msgid "plan.pip"
 msgstr "{reached, select, yes {run {run}} other {run {run}, which did not reach this step}}"
 
@@ -5221,6 +5261,10 @@ msgstr "Show run {run}"
 #. js-lingui-explicit-id
 msgid "plan.record"
 msgstr "an earlier run, kept as it was"
+
+#. js-lingui-explicit-id
+msgid "plan.runHead"
+msgstr "Run {run}"
 
 #. js-lingui-explicit-id
 msgid "plan.runOf"
@@ -6123,7 +6167,7 @@ msgstr "Say what the room is built for"
 
 #. js-lingui-explicit-id
 msgid "verb.diff"
-msgstr "Mark what differs between the runs that are open"
+msgstr "Set two runs of a plan side by side, and mark what differs"
 
 #. js-lingui-explicit-id
 msgid "verb.done"

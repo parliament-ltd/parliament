@@ -228,6 +228,11 @@ Line numbers are approximate.
 - **× marks** on a step not yet started and on a branch that has never run delete it at once. An exception to the Lab's rule that a click which removes waits for Enter (L7, C38): nothing has been sent, and `undo:` brings it back.
 - **`delete:` alone** (or `delete:everything`) points to Delete everything, the button in Settings, and Enter opens Settings there. **No `wipe:` command:** Delete everything stays a button, never a command (C73, 11 October).
 
+**23 October 2026, on C200 and C201:** C200 (j) kept as suggested ("Keep the C200 suggestions for the open points"). C201 (h): Stefan: "1. ok. 2. ok. 3. ok."
+- **The slider's waiting tab** for a branch not yet sent comes with piece 5.
+- **`by:wikipedia then sonnet`** sends one after another from the bar: each `then` "if nothing is found" after a source and "if it fails" after a model, changed in the picker.
+- **`include:` with one after another** comes with piece 5.
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it

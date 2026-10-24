@@ -98,7 +98,7 @@ describe('open: on plans (C196 (g))', () => {
     const p = run('>open:201', { numbered }, shipped('almanac'))
     expect(p.text[0]).toBe('Enter opens plan 201 on the Plan board')
     expect(p.next.addressed).toBe('docket')
-    expect(planKey(p.next.context.docket)).toEqual({ num: 201, run: null })
+    expect(planKey(p.next.context.docket)).toEqual({ num: 201, run: null, against: null })
     expect(run('>open:run 2', { plan: plan() }).text[0]).toBe('Plan 201 has one run')
     const two = run('>open:run 1', { plan: plan({ n: 2, latest: 2 }) })
     expect(two.text[0]).toBe('Enter shows run 1 of plan 201')
@@ -224,5 +224,27 @@ describe('run: with conditions (C201)', () => {
     const q = { from: 'de', to: 'en', who: { kind: 'browser' } }
     const text = run('>run:', { plan: p, runFacts: facts({ queryOf: (id) => (id === 'openalex' ? q : null) }) }).text
     expect(text).toContain('Your question goes translated into English, which it reads best, unless it is in English already')
+  })
+})
+
+describe('diff: (stage 10, piece 5; C202)', () => {
+  it('reads and writes the board’s context, with a run beside', () => {
+    expect(planKey('201:3+2')).toEqual({ num: 201, run: 3, against: 2 })
+    expect(planKey('201:+2')).toEqual({ num: 201, run: null, against: 2 })
+    expect(keyOf(201, null, 2)).toBe('201:+2')
+    expect(keyOf(201, 3, 2)).toBe('201:3+2')
+    expect(keyOf(201)).toBe('201')
+  })
+
+  it('sets the run before beside the one shown, or a run named, and takes it away', () => {
+    const p = run('>diff:', { plan: plan({ n: 3, latest: 3 }) })
+    expect(p.text[0]).toBe('Enter sets run 2 beside run 3, marking in ink what differs')
+    expect(p.next.context.docket).toBe('201:+2')
+    expect(run('>diff:1', { plan: plan({ n: 3, latest: 3 }) }).next.context.docket).toBe('201:+1')
+    expect(run('>diff:', { plan: plan({ n: 1, latest: 3 }) }).next.context.docket).toBe('201:1+2')
+    expect(run('>diff:3', { plan: plan({ n: 3, latest: 3 }) }).text[0]).toBe('That is run 3, on the board already. diff: and another run compares them')
+    expect(run('>diff:', { plan: plan() }).text[0]).toBe('Plan 201 has one run. new:run makes another to compare')
+    expect(run('>diff:off', { plan: plan({ n: 3, latest: 3, against: 2 }) })).toMatchObject({ text: ['Enter shows run 3 alone again'], next: { context: { docket: '201' } } })
+    expect(run('>diff:off', { plan: plan({ n: 3, latest: 3 }) }).text[0]).toBe('Nothing is being compared. diff: sets two runs side by side')
   })
 })

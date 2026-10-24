@@ -90,3 +90,32 @@ export function latestPlan(rows) {
   }
   return best?.num ?? null
 }
+
+const plainOf = (t) => String(t ?? '').replace(/\s+/g, ' ').trim()
+
+/**
+ * What differs between two runs of a plan, as the board draws them side by
+ * side (diff:, docket v12; C202). For each branch and step of `a`, keyed
+ * by letter or letter:index, how its line differs from the same place in
+ * `b`: { only } when `b` has no such place, else { chg, txt, model,
+ * room, condition, other }, other being `b`'s words there. Space never
+ * counts. Symmetric: compareRuns(b, a) marks the other side.
+ */
+export function compareRuns(a, b) {
+  const marks = new Map()
+  const theirs = new Map(b.branches.map((x) => [x.letter, x]))
+  for (const br of a.branches) {
+    const o = theirs.get(br.letter)
+    if (!o) { marks.set(br.letter, { only: true }); continue }
+    for (const s of br.steps) {
+      const t = o.steps[s.index - 1]
+      if (!t) { marks.set(`${br.letter}:${s.index}`, { only: true, chg: true }); continue }
+      const txt = plainOf(s.text) !== plainOf(t.text)
+      const model = (s.model ?? null) !== (t.model ?? null)
+      const room = (s.room ?? null) !== (t.room ?? null)
+      const condition = (s.condition ?? 'finished') !== (t.condition ?? 'finished')
+      if (txt || model || room || condition) marks.set(`${br.letter}:${s.index}`, { chg: true, txt, model, room, condition, other: t.text })
+    }
+  }
+  return marks
+}

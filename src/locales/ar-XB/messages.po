@@ -1612,6 +1612,33 @@ msgid "enter.didYouMean"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.diffHere"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.diffNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.diffOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.diffOn"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.diffOneRun"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.diffSame"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.elsewhere"
 msgstr ""
 
@@ -5140,6 +5167,15 @@ msgid "plan.asBranch"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "plan.beside"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "plan.besideOff"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "plan.chat"
 msgstr ""
 
@@ -5211,6 +5247,10 @@ msgid "plan.noneHow"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "plan.onlyIn"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "plan.pip"
 msgstr ""
 
@@ -5220,6 +5260,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "plan.record"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.runHead"
 msgstr ""
 
 #. js-lingui-explicit-id
