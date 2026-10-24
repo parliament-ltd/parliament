@@ -1248,6 +1248,7 @@ export default function Shell() {
       return null
     }
     if (what.kind === 'picker') {
+      setStepPick(null) // the room's own choice, not a step's (C202)
       setFwPicking(false)
       // Bare by: shows who can answer, under the bar.
       setInspected(null)
@@ -1335,9 +1336,12 @@ export default function Shell() {
       // by: with several (C172 (c)): held for the next prompt here; the
       // picker stays open, so more can be ticked.
       if (touched.current) touched.current.many = { before: heldManyNow.current }
+      // The order as by: says (then: one after another; C202); the conditions
+      // chosen in the picker stay while the order does.
       const was = heldManyNow.current
-      const kept = was && was.room === (what.room ?? NEW_ROOM) ? { order: was.order ?? 'together', conds: was.conds ?? {} } : {}
-      setHeldMany({ room: what.room ?? NEW_ROOM, ids: what.ids, ...kept })
+      const order = what.order ?? 'together'
+      const same = was && was.room === (what.room ?? NEW_ROOM) && (was.order ?? 'together') === order
+      setHeldMany({ room: what.room ?? NEW_ROOM, ids: what.ids, order, conds: same ? was.conds ?? {} : {} })
       remember(body)
       return null
     }
@@ -1628,14 +1632,20 @@ export default function Shell() {
   const heldConds = useMemo(() => (heldWho ? heldWho.map((w, i) => (i === 0 ? null : heldMany?.conds?.[w.id] ?? (heldWho[i - 1].group === 'source' ? 'nothing' : 'failed'))) : null), [heldWho, heldMany])
   const heldCondsNow = useRef(null)
   useEffect(() => { heldCondsNow.current = heldConds }, [heldConds])
-  const onPickOrder = useCallback((order) => setHeldMany((h) => (h ? { ...h, order } : h)), [])
+  // Who answers the step being chosen for: its own, else its chat's, else the default.
+  const [stepPick, setStepPick] = useState(null) // { letter, stepId, index, address, model, chatId }
+  const stepPickNow = useRef(null)
+  useEffect(() => { stepPickNow.current = stepPick }, [stepPick])
+  const stepBranchWho = useMemo(() => (stepPick ? answererOf({ chosen: (stepPick.chatId ? conversations.find((c) => c.id === stepPick.chatId)?.answerer : null) ?? null, keyed: keys, defaultModel: settings.defaultModel }) : null), [stepPick, conversations, keys, settings.defaultModel])
+  const stepWho = useMemo(() => (stepPick ? answererOf({ chosen: stepPick.model ?? (stepPick.chatId ? conversations.find((c) => c.id === stepPick.chatId)?.answerer : null) ?? null, keyed: keys, defaultModel: settings.defaultModel }) : null), [stepPick, conversations, keys, settings.defaultModel])
+  const onPickOrder = useCallback((order) => setHeldMany((h) => (h ? { ...h, order, conds: h.order === order ? h.conds : {} } : h)), [])
   const onPickCond = useCallback((id) => setHeldMany((h) => {
     const at = h?.ids.indexOf(id) ?? -1
     if (at < 1) return h
     const NEXT = { nothing: 'failed', failed: 'finished', finished: 'always', always: 'nothing' }
     return { ...h, conds: { ...(h.conds ?? {}), [id]: NEXT[heldCondsNow.current?.[at] ?? 'finished'] ?? 'nothing' } }
   }), [])
-  const answering = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: answerer, rows: answerRows, stored: chosenHere, held: heldWho }), [roomId, roomRecord, answerer, answerRows, chosenHere, heldWho])
+  const answering = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: answerer, rows: answerRows, stored: chosenHere, held: heldWho, order: heldOrder }), [roomId, roomRecord, answerer, answerRows, chosenHere, heldWho, heldOrder])
   // Among the branches (C174): who answers the one or more the next prompt
   // carries on, when that is not the room's own line. A new prompt to
   // several (by: with several) comes first.
@@ -1796,7 +1806,7 @@ export default function Shell() {
       // frameworks and reply language, through the privacy filter. No title
       // request follows: the chat is named for its branch. How it ended is
       // read from what was kept.
-      sendStep: async ({ chatId, step, group = null }) => {
+      sendStep: async ({ chatId, step, group = null, included = null }) => {
         if (replyArriving(chatId)) return 'failed'
         const conv = await getConversation(chatId).catch(() => null)
         const fresh = await keyedProviders().catch(() => ({}))
@@ -1816,7 +1826,8 @@ export default function Shell() {
           const searched = asked ? (words === asked.text.trim().replace(/[?？!.]+$/u, '').trim() ? asked : { ...asked, text: words.slice(0, 300) }) : null
           await askSourceAs(chatId, step.prompt, who, { step: step.id, ...together, ...(searched ? { asked: searched } : {}) })
         } else {
-          await sendMessage(chatId, step.prompt, who.id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), [], null, { frameworks: recordOf(fw, fwListNow.current), describe: false, step: step.id, ...together })
+          // Answers held by include: go to each model that runs, as data (C176; C202).
+          await sendMessage(chatId, step.prompt, who.id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), [], null, { frameworks: recordOf(fw, fwListNow.current), describe: false, step: step.id, ...together, ...(included?.length ? { included } : {}) })
         }
         loadConversations().catch(() => {})
         const msgs = await getMessages(chatId).catch(() => [])
@@ -2042,7 +2053,7 @@ export default function Shell() {
     if (!p || p.n !== p.latest || !db.current) return
     changeStep(db.current, { docketId: p.docketId, n: p.n, letter, stepId, set: { prompt: text } }).catch(() => {})
   }, [])
-  const planModelName = useCallback((id) => modelFacts(id)?.name ?? id, [])
+  const planModelName = useCallback((id) => modelFacts(id)?.name ?? destination(id)?.name ?? id, [])
   // A × on the board (C199): the delete: it stands for, run at once, and
   // what it did said under the bar.
   const [barSaid, setBarSaid] = useState(null)
@@ -2053,6 +2064,15 @@ export default function Shell() {
     const says = out && !out.done ? (typeof out === 'string' ? { message: out } : out) : out?.says ?? null
     setBarSaid({ says })
   }, [onRun])
+  // Who answers a step, chosen in the picker under the bar (C202).
+  const onPlanWho = useCallback((step) => {
+    setFwPicking(false)
+    setInspected(null)
+    setKeyPanel(null)
+    setReplyPicking(false)
+    setStepPick(step)
+    setPicking(true)
+  }, [])
   const onPlanPick = useCallback((letter) => {
     const p = planBoardNow.current
     if (p) setPlanPick((was) => (was?.num === p.num && was.letter === letter ? null : { num: p.num, letter }))
@@ -2438,7 +2458,7 @@ export default function Shell() {
         const chain = []
         try {
           for (const [i, c] of convs.entries()) {
-            const { step } = await planStep(db.current, { docketId, n, letter: c.branch, prompt: text, model: whos[i].id, condition: i ? shown.manyConds?.[i] ?? 'finished' : null, newId: () => crypto.randomUUID(), now: at })
+            const { step } = await planStep(db.current, { docketId, n, letter: c.branch, prompt: text, model: whos[i].id, condition: i ? shown.manyConds?.[i] ?? 'finished' : null, group: group.id, newId: () => crypto.randomUUID(), now: at })
             chain.push({ letter: c.branch, stepId: step.id })
           }
         } catch {
@@ -2447,8 +2467,9 @@ export default function Shell() {
         const num = (await getPlan({ id: docketId }).catch(() => null))?.docket.num ?? null
         // The room's chat sends once its messages are loaded, as a typed prompt does.
         if (!isReady(id)) await new Promise((resolve) => { waiting.current = { chatId: id, go: resolve, drop: resolve } })
-        const out = await runnerRef.current.start({ docketId, num, n, letters: chain.map((l) => l.letter), chain, group })
+        const out = await runnerRef.current.start({ docketId, num, n, letters: chain.map((l) => l.letter), chain, group, included })
         if (!out.started) return { refused: out.reason === 'elsewhere' ? { message: 'runElsewhere', values: { num } } : 'runFailed' }
+        spentInc(whos)
         const done = out.finished.then((res) => {
           loadConversations().catch(() => {})
           if (!res) return null
@@ -2627,6 +2648,16 @@ export default function Shell() {
   }, [started, askedOpen, goTo, runCommand])
   const pickAnswerer = useCallback(async (row) => {
     if (row.later) return
+    // For one step of a plan (C202): its model, or none for the branch's own.
+    const forStep = stepPickNow.current
+    if (forStep) {
+      if (row.needsKey || row.unchecked) { setPicking(false); setStepPick(null); writeField(`>api:${row.provider}`); return }
+      const p = planBoardNow.current
+      if (p && p.n === p.latest && db.current) await changeStep(db.current, { docketId: p.docketId, n: p.n, letter: forStep.letter, stepId: forStep.stepId, set: { model: row.id ?? null } }).catch(() => {})
+      setPicking(false)
+      setStepPick(null)
+      return
+    }
     if (row.needsKey || row.unchecked) { setPicking(false); writeField(`>api:${row.provider}`); return }
     // A box ticked joins the ones ticked before, in that order; unticked, it
     // leaves the gap closed (slider v9; C172 (c)). One left is one choice.
@@ -2635,7 +2666,8 @@ export default function Shell() {
     const next = now.includes(row.id) ? now.filter((x) => x !== row.id) : [...now, row.id]
     if (!next.length) return
     const nameOf = (x) => [...(ans?.rows?.model ?? []), ...(ans?.rows?.local ?? []), ...(ans?.rows?.source ?? [])].find((r) => r.id === x)?.name ?? x
-    const body = next.length === 1 ? `by:${next[0]}` : `by:${next.map((x) => `"${String(nameOf(x)).replace(/"/g, '')}"`).join(', ')}`
+    const joint = ans?.order === 'sequence' ? ' then ' : ', '
+    const body = next.length === 1 ? `by:${next[0]}` : `by:${next.map((x) => `"${String(nameOf(x)).replace(/"/g, '')}"`).join(joint)}`
     const p = preview(`>${body}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
     if (!p.act) { if (next.length === 1) setPicking(false); return }
     await onRun(p.next ?? null, body, null, p.act)
@@ -2670,6 +2702,7 @@ export default function Shell() {
   // From the field's marginalia: with branches on screen, where the prompt
   // goes among them (C174); else who answers.
   const togglePicker = useCallback(() => {
+    setStepPick(null)
     setFwPicking(false)
     setInspected(null)
     setCompared(null)
@@ -2777,7 +2810,7 @@ export default function Shell() {
       return (
         <PlanBoard
           key="docket" plan={planBoard} loading={planOnScreen && planNum != null && !planBoard && !(planRead?.num === planNum && planRead?.run === planRun && !planRead?.plan)} addressed={arrangement.addressed === 'docket'}
-          nameOf={planModelName} onAddress={focusBoard} onWrite={writeField} onPick={onPlanPick} onText={onPlanText} onDelete={onPlanDelete} onCondition={onPlanCondition} onRun={(n) => runCommand(`open:run ${n}`)}
+          nameOf={planModelName} onAddress={focusBoard} onWrite={writeField} onPick={onPlanPick} onText={onPlanText} onDelete={onPlanDelete} onCondition={onPlanCondition} onWho={onPlanWho} onRun={(n) => runCommand(`open:run ${n}`)}
         />
       )
     }
@@ -2816,7 +2849,8 @@ export default function Shell() {
           backupPanel={backupPanel} onBackupDone={endBackup}
           picker={replyPicking && branchShown && targets
             ? { kind: 'reply', members: branchShown.members, targets, line: branchShown.line, onToggle: toggleReplyTarget, onAll: allReplyTargets }
-            : picking ? { rows: answerRows, now: answerer, picked: heldIds && heldIds.length > 1 ? heldIds : null, reference: referenceName, order: heldOrder, conds: heldConds ?? [], onOrder: onPickOrder, onCond: onPickCond } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => { setPicking(false); setReplyPicking(false) }}
+            : picking && stepPick ? { rows: answerRows, now: stepPick.model ? stepWho : null, picked: null, reference: referenceName, forStep: { ...stepPick, branchName: stepBranchWho?.name ?? null } }
+            : picking ? { rows: answerRows, now: answerer, picked: heldIds && heldIds.length > 1 ? heldIds : null, reference: referenceName, order: heldOrder, conds: heldConds ?? [], onOrder: onPickOrder, onCond: onPickCond } : null} onPicker={togglePicker} onPickAnswerer={pickAnswerer} onPickerClose={() => { setPicking(false); setReplyPicking(false); setStepPick(null) }}
           frameworkPicker={fwPicking ? { items: frameworkItems } : null} onFrameworkPicker={toggleFwPicker} onToggleFramework={toggleFramework} onFrameworkPickerClose={() => setFwPicking(false)}
           languagePicker={langPicking ? { items: offeredLanguages().map((tag) => ({ tag, draft: isDraft(tag) })), now: i18n.locale } : null} onPickLanguage={(tag) => runCommand(`language:${tag}`)} onLanguagePickerClose={() => setLangPicking(false)} />,
         barHost,

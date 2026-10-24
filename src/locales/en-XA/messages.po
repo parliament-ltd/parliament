@@ -386,6 +386,10 @@ msgid "block.ripple-analysis"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "block.steps"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "block.summary-dashboard"
 msgstr ""
 
@@ -454,6 +458,10 @@ msgid "blockAbout.ripple-analysis"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "blockAbout.steps"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "blockAbout.summary-dashboard"
 msgstr ""
 
@@ -463,6 +471,34 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "blockAbout.toc"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsFollowing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsNoChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsNoPlan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsPinned"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsSent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsWhole"
 msgstr ""
 
 #. The table of everything you have made, by number (C131)
@@ -540,6 +576,10 @@ msgid "branches.contextUnder"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "branches.didNotRun"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "branches.label"
 msgstr ""
 
@@ -565,6 +605,18 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "branches.unknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.unmet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.waiting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.waitingRuns"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1263,6 +1315,10 @@ msgid "enter.byMany"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.byManyThen"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.byMost"
 msgstr ""
 
@@ -1293,6 +1349,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.bySeveral"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.byThen"
 msgstr ""
 
 #. {names} is a list joined with "or"
@@ -2873,7 +2934,7 @@ msgstr ""
 msgid "enter.promptManyOrder"
 msgstr ""
 
-#. Commands stay English
+#. Unused since C202 (R38): one after another sends them
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrderInclude"
 msgstr ""
@@ -5011,6 +5072,10 @@ msgid "picker.addKey"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "picker.asBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "picker.cond"
 msgstr ""
 
@@ -5021,6 +5086,10 @@ msgstr ""
 #. A source whose answers are in English whatever the reader's language (LPN §6)
 #. js-lingui-explicit-id
 msgid "picker.englishOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "picker.forStep"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5300,6 +5369,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "plan.untitledBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.whoHelp"
 msgstr ""
 
 #. js-lingui-explicit-id

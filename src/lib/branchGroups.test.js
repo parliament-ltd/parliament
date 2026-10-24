@@ -103,3 +103,16 @@ describe('a chat is left only when nothing shows it (C173)', () => {
     expect(watched('a')).toBe(false)
   })
 })
+
+describe('one after another: a branch whose turn has not come (C202)', () => {
+  it('shows as a waiting tab, or one that did not run', () => {
+    const prompt = { id: 'p', conversationId: 'line', role: 'user', content: 'Krakatoa', group: { id: 'g', chats: ['line', 'b2'] }, createdAt: '1' }
+    const reply = { id: 'r', conversationId: 'line', role: 'assistant', content: 'Loud.', createdAt: '2' }
+    const members = new Map([['b2', []]])
+    const none = lineItems([prompt, reply], 'line', members)
+    expect(none.find((x) => x.kind === 'slider').tabs.map((t) => t.chatId)).toEqual(['line'])
+    const items = lineItems([prompt, reply], 'line', members, (chatId, groupId) => (chatId === 'b2' && groupId === 'g' ? { condition: 'nothing', status: 'ready', ended: null } : null))
+    const tabs = items.find((x) => x.kind === 'slider').tabs
+    expect(tabs.map((t) => [t.chatId, t.waiting?.condition ?? null])).toEqual([['line', null], ['b2', 'nothing']])
+  })
+})

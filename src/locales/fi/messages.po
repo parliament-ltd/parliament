@@ -386,6 +386,10 @@ msgid "block.ripple-analysis"
 msgstr "Vaikutusanalyysi"
 
 #. js-lingui-explicit-id
+msgid "block.steps"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "block.summary-dashboard"
 msgstr "Yhteenvetonäkymä"
 
@@ -454,6 +458,10 @@ msgid "blockAbout.ripple-analysis"
 msgstr "Kun lähetät luonnoksen, etsii kohdat, joissa sen osat ovat ristiriidassa keskenään, täällä ja muissa keskusteluissa."
 
 #. js-lingui-explicit-id
+msgid "blockAbout.steps"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "blockAbout.summary-dashboard"
 msgstr "Avoinna olevien tietojen pääluvut, aukot ja pyytämäsi havainnot."
 
@@ -464,6 +472,34 @@ msgstr "Avoinna olevat tiedot taulukkona, jota voi lajitella ja selata."
 #. js-lingui-explicit-id
 msgid "blockAbout.toc"
 msgstr "Keskustelun otsikot, joiden avulla voit hypätä mihin tahansa kohtaan."
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsFollowing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsNoChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsNoPlan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsPinned"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsSent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsWhole"
+msgstr ""
 
 #. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
@@ -540,6 +576,10 @@ msgid "branches.contextUnder"
 msgstr "konteksti {share, number, percent} → alle {low, number, percent}"
 
 #. js-lingui-explicit-id
+msgid "branches.didNotRun"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "branches.label"
 msgstr "{count, plural, other {# haaran vastaukset}}"
 
@@ -566,6 +606,18 @@ msgstr "Pysähtyi kesken. Saapunut osa säilytetään."
 #. js-lingui-explicit-id
 msgid "branches.unknown"
 msgstr "haara"
+
+#. js-lingui-explicit-id
+msgid "branches.unmet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.waiting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.waitingRuns"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "branches.withHistory"
@@ -1263,6 +1315,10 @@ msgid "enter.byMany"
 msgstr "{count, plural, other {Enter valitsee täällä seuraavan kehotteesi vastaajiksi tässä järjestyksessä, kunkin omaksi haarakseen: {answering}}}"
 
 #. js-lingui-explicit-id
+msgid "enter.byManyThen"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.byMost"
 msgstr "{count, plural, other {Yhteen kehotteeseen voi vastata kerralla enintään #}}"
 
@@ -1294,6 +1350,11 @@ msgstr "Ne vastaavat jo täällä seuraavaan kehotteeseen, tässä järjestykses
 #. js-lingui-explicit-id
 msgid "enter.bySeveral"
 msgstr "Yksi kehote usealle vastaajalle tulee haarojen myötä. Valitse toistaiseksi yksi"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.byThen"
+msgstr ""
 
 #. {names} is a list joined with "or"
 #. js-lingui-explicit-id
@@ -2873,7 +2934,7 @@ msgstr "{tokens, plural, one {{n}. {name}, noin # tokeni, hinta {cost}} other {{
 msgid "enter.promptManyOrder"
 msgstr ""
 
-#. Commands stay English
+#. Unused since C202 (R38): one after another sends them
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrderInclude"
 msgstr ""
@@ -5011,6 +5072,10 @@ msgid "picker.addKey"
 msgstr "lisää avain"
 
 #. js-lingui-explicit-id
+msgid "picker.asBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "picker.cond"
 msgstr ""
 
@@ -5022,6 +5087,10 @@ msgstr ""
 #. js-lingui-explicit-id
 msgid "picker.englishOnly"
 msgstr "vain englanniksi"
+
+#. js-lingui-explicit-id
+msgid "picker.forStep"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "picker.kept30"
@@ -5300,6 +5369,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "plan.untitledBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.whoHelp"
 msgstr ""
 
 #. js-lingui-explicit-id

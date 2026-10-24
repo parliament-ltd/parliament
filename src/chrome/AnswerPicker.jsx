@@ -35,7 +35,7 @@ const GROUP_TITLES = {
  *   order and conds: all at once, or one after another with when each after
  *   the first runs, aligned with picked (branch slider v9; C201)
  */
-export default function AnswerPicker({ rows, now, picked = null, reference, onPick, order: sending = 'together', conds = [], onOrder = null, onCond = null }) {
+export default function AnswerPicker({ rows, now, picked = null, reference, onPick, order: sending = 'together', conds = [], onOrder = null, onCond = null, forStep = null }) {
   // The ticked boxes, in order: each shows its place, the order of the tabs.
   const order = picked?.length ? picked : [now?.id].filter(Boolean)
   const { i18n } = useLingui()
@@ -142,6 +142,16 @@ export default function AnswerPicker({ rows, now, picked = null, reference, onPi
     : null
   return (
     <div className="ch-answers">
+      {/* Choosing for one step of a plan (C202): one choice, or the branch's own. */}
+      {forStep && (
+        <div className="ch-ans-group">
+          <div className="ch-ans-title"><span>{i18n._(COPY.picker.forStep, { index: forStep.index, address: forStep.address })}</span></div>
+          <button type="button" className={`ch-ans${forStep.model ? '' : ' on'}`} aria-pressed={!forStep.model} onMouseDown={(e) => e.preventDefault()} onClick={() => onPick({ id: null })}>
+            <span className="box" aria-hidden="true" />
+            <span className="ch-ans-body"><span className="ch-ans-top"><span className="nm">{i18n._(COPY.picker.asBranch, { name: forStep.branchName ?? '' })}</span></span></span>
+          </button>
+        </div>
+      )}
       {group('model')}
       {group('local')}
       {group('source')}

@@ -750,6 +750,10 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-pl-marg button { font: inherit; color: inherit; border: none; background: none; padding: 0; cursor: pointer; }
 .ch-pl-marg button:hover { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
 .ch-pl-marg button:focus-visible { outline: var(--ch-focus); outline-offset: 2px; border-radius: 2px; }
+/* Who answers a step: marginalia that opens the picker grows a caret on
+   the line's hover (docket spec §8; C202). */
+.ch-pl-who::after { content: "\25BE"; font-style: normal; font-size: 8px; margin-inline-start: 3px; opacity: 0; vertical-align: .09em; }
+.ch-pl-line:hover .ch-pl-who::after, .ch-pl-who:focus-visible::after { opacity: .5; }
 /* When a step runs: marginalia that changes on a click (C201). */
 .ch-pl-cond { text-decoration: underline dotted; text-underline-offset: 2px; text-decoration-color: var(--ch-soft); }
 .ch-pl-doc { margin-top: 12px; }
@@ -816,3 +820,22 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
   .ch-pl-add { grid-template-columns: 36px minmax(0, 1fr); column-gap: 8px; }
   .ch-pl-end { flex-direction: column-reverse; align-items: flex-end; gap: 4px; }
 }
+
+/* A branch sent to one after another whose turn has not come (slider v9; C202). */
+.ch-bwait { margin: 10px 0; padding: 10px 12px; border: .5px dashed var(--ch-soft); border-radius: var(--ch-r-md); font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); }
+
+/* The step list, a block a room carries (stage 10, piece 5; C202).
+   ch-sl, apart from the welcome page's .ch-steps. */
+.ch-sl { padding: 4px 2px; font: 400 var(--ch-t-small)/1.5 var(--ch-sans); color: var(--ch-ink); }
+.ch-sl-head { margin: 0 0 6px; }
+.ch-sl-runhead { margin: 8px 0 2px; font: 600 var(--ch-t-id) var(--ch-sans); color: var(--ch-ink-2); text-transform: uppercase; letter-spacing: .05em; }
+.ch-sl-branch { margin: 6px 0 2px; font-weight: 500; }
+.ch-sl-addr { font: 500 var(--ch-t-id) var(--ch-mono); color: var(--ch-ink-3); }
+.ch-sl-list { list-style: none; margin: 0; padding: 0; }
+.ch-sl-step { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; column-gap: 6px; align-items: start; padding: 4px 0; border-top: .5px solid var(--ch-border-2); }
+.ch-sl-step:first-child { border-top: none; }
+.ch-sl-step.waiting .ch-sl-text { color: var(--ch-ink-3); }
+.ch-sl-ord { font: 400 var(--ch-t-id) var(--ch-mono); color: var(--ch-ink-3); padding-top: 2px; text-align: end; }
+.ch-sl-text { overflow-wrap: anywhere; }
+.ch-sl-foot { margin: 8px 0 0; }
+.ch-sl-foot button { font: inherit; color: inherit; background: none; border: none; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }

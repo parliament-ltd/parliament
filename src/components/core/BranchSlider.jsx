@@ -39,7 +39,9 @@ function Tab({ tab, info, on, carried, onPick }) {
   const writing = useIsStreaming(tab.chatId)
   const last = tab.reply[tab.reply.length - 1]
   const stopped = !writing && last?.incomplete
-  const state = writing ? COPY.branches.writing : stopped ? COPY.branches.stopped : carried ? COPY.branches.carried : null
+  // One after another (C202): its turn has not come, or it did not run.
+  const waits = tab.waiting ? (tab.waiting.ended === 'unmet' ? COPY.branches.didNotRun : COPY.branches.waiting) : null
+  const state = waits ?? (writing ? COPY.branches.writing : stopped ? COPY.branches.stopped : carried ? COPY.branches.carried : null)
   return (
     <button
       type="button"
@@ -121,6 +123,9 @@ export default function BranchSlider({ item, line, infoOf, renderLine, numberOf 
         <button type="button" className="ch-barrow" aria-label={i18n._(COPY.branches.previous)} disabled={at <= 0} onClick={() => go(-1)}>‹</button>
         <div className="ch-bslide" role="tabpanel">
           {!tab.loaded && <p className="ch-marg">{i18n._(COPY.branches.loading)}</p>}
+          {tab.loaded && tab.waiting && (
+            <p className="ch-bwait">{tab.waiting.ended === 'unmet' ? i18n._(COPY.branches.unmet) : i18n._(COPY.branches.waitingRuns, { cond: tab.waiting.condition })}</p>
+          )}
           {tab.loaded && messages.map((m, i) => (tab.line ? renderLine(m, i) : <SiblingMessage key={m.id} chatId={tab.chatId} msg={m} index={i} number={numberOf(tab.chatId, m)} />))}
           {tab.loaded && (
             <p className="ch-marg ch-bmarg">

@@ -125,7 +125,7 @@ function Washed({ text, other }) {
   return wordDiff(other ?? '', text).filter((p) => p.op !== 'gone').map((p, i) => (p.op === 'added' ? <span key={i} className="ch-pl-dw">{p.text}</span> : p.text))
 }
 
-function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete, onCondition, marks = null, otherRun = null, still = false }) {
+function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete, onCondition, onWho, marks = null, otherRun = null, still = false }) {
   const { i18n } = useLingui()
   const changes = plan.n === plan.latest && !still
   const markOf = (s) => marks?.get(`${branch.letter}:${s.index}`) ?? null
@@ -180,7 +180,9 @@ function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete
                 ? <StepText step={s} address={branch.address} onText={(text) => onText(branch.letter, s.stepId, text)} onFocus={() => { if (!picked) onPick(branch.letter) }} />
                 : <div className="ch-pl-text ro" dir="auto" title={s.planned ? undefined : i18n._(COPY.plan.fixed, { run: plan.n })}>{mark?.txt ? <Washed text={s.text} other={mark.other} /> : s.text}</div>}
               <div className="ch-marg ch-pl-marg">
-                <span className={mark?.model ? 'ch-pl-dw' : undefined}>{s.model ? nameOf(s.model) : i18n._(COPY.plan.asBranch)}</span>
+                {open && onWho
+                  ? <button type="button" className="ch-pl-who" title={i18n._(COPY.plan.whoHelp, { index: s.index, address: branch.address })} onClick={() => onWho({ letter: branch.letter, stepId: s.stepId, index: s.index, address: branch.address, model: s.model ?? null, chatId: branch.chatId })}>{s.model ? nameOf(s.model) : i18n._(COPY.plan.asBranch)}</button>
+                  : <span className={mark?.model ? 'ch-pl-dw' : undefined}>{s.model ? nameOf(s.model) : i18n._(COPY.plan.asBranch)}</span>}
                 {mark?.only && <><Sep /><span className="ch-pl-dw">{i18n._(COPY.plan.onlyIn, { run: otherRun })}</span></>}
                 {s.index > 1 && (open
                   ? <><Sep /><button type="button" className="ch-pl-cond" title={i18n._(COPY.plan.conditionHelp)} onClick={() => onCondition(branch.letter, s.stepId, NEXT_CONDITION[s.condition ?? 'finished'])}>{i18n._(COPY.plan.condition, { condition: s.condition ?? 'finished' })}</button></>
@@ -205,7 +207,7 @@ function Branch({ plan, branch, nameOf, onWrite, onPick, onText, onRun, onDelete
   )
 }
 
-export default function PlanBoard({ plan, loading = false, addressed, nameOf = (id) => id, onAddress, onWrite, onPick, onText, onRun, onDelete, onCondition }) {
+export default function PlanBoard({ plan, loading = false, addressed, nameOf = (id) => id, onAddress, onWrite, onPick, onText, onRun, onDelete, onCondition, onWho }) {
   const { i18n } = useLingui()
   return (
     <article
@@ -252,7 +254,7 @@ export default function PlanBoard({ plan, loading = false, addressed, nameOf = (
               {plan.beside && <p className="ch-pl-runhead">{i18n._(COPY.plan.runHead, { run: plan.n })}</p>}
               {plan.branches.map((b) => (
                 <Fragment key={b.letter}>
-                  <Branch plan={plan} branch={b} nameOf={nameOf} onWrite={onWrite} onPick={onPick} onText={onText} onRun={onRun} onDelete={onDelete} onCondition={onCondition} marks={plan.marks ?? null} otherRun={plan.beside?.n ?? null} />
+                  <Branch plan={plan} branch={b} nameOf={nameOf} onWrite={onWrite} onPick={onPick} onText={onText} onRun={onRun} onDelete={onDelete} onCondition={onCondition} onWho={onWho} marks={plan.marks ?? null} otherRun={plan.beside?.n ?? null} />
                 </Fragment>
               ))}
               {plan.n === plan.latest && (

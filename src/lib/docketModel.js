@@ -45,10 +45,12 @@ export const ENDED = Object.freeze(['stopped', 'failed', 'stalled', 'left', 'unm
 export const CONDITIONS = Object.freeze(['finished', 'failed', 'always', 'nothing'])
 
 /** A step written ahead of any run, ready unless held. */
-export function plannedStep({ id, prompt, model = null, room = null, condition = null, waiting = false, now }) {
+export function plannedStep({ id, prompt, model = null, room = null, condition = null, group = null, waiting = false, now }) {
   return {
     id, status: waiting ? STATUS.WAITING : STATUS.READY, prompt: String(prompt ?? ''), model,
     ...(room ? { room } : {}), condition, addedAt: now,
+    // The prompt to several, one after another, this step is one of (C202).
+    ...(group ? { group } : {}),
   }
 }
 

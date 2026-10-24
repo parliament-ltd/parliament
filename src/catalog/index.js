@@ -24,6 +24,7 @@
 import messagesEntry       from './entries/messages'
 import inputEntry          from './entries/input'
 import tocEntry            from './entries/toc'
+import stepsEntry          from './entries/steps'
 import highlightsEntry     from './entries/highlights'
 import notesEntry          from './entries/notes'
 import branchesEntry       from './entries/branches'
@@ -67,6 +68,7 @@ function register(entry) {
 register(messagesEntry)
 register(inputEntry)
 register(tocEntry)
+register(stepsEntry)
 register(highlightsEntry)
 register(notesEntry)
 register(branchesEntry)

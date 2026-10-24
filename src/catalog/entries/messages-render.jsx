@@ -36,6 +36,7 @@ import MessageList from '../../components/core/MessageList'
 import MessageCard from '../../components/core/MessageCard'
 import BranchSlider from '../../components/core/BranchSlider'
 import { lineItems, membersOf } from '../../lib/branchGroups'
+import { usePlanOf, waitingIn } from '../../stores/usePlanOf'
 import { contextShare } from '../../lib/branchSummary'
 import { answerFor } from '../../lib/included'
 import { promptFacts } from '../../lib/branchVerbs'
@@ -354,8 +355,10 @@ export default function MessagesRender() {
   // Where a prompt here went to several, its replies are a slider of tabs.
   const memberIds = useMemo(() => membersOf(visibleMessages, activeConversationId), [visibleMessages, activeConversationId])
   const members = useBranchMembers(memberIds, watchConversation)
-  const items = useMemo(() => lineItems(visibleMessages, activeConversationId, members), [visibleMessages, activeConversationId, members])
   const lineChat = useMemo(() => conversations.find((c) => c.id === activeConversationId) ?? null, [conversations, activeConversationId])
+  // Branches sent to one after another whose turn has not come (C202).
+  const linePlan = usePlanOf(lineChat?.docketId ?? null)
+  const items = useMemo(() => lineItems(visibleMessages, activeConversationId, members, (chatId, groupId) => waitingIn(linePlan, chatId, groupId)), [visibleMessages, activeConversationId, members, linePlan])
   const [planNum, setPlanNum] = useState(null)
   useEffect(() => {
     let live = true

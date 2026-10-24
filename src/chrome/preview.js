@@ -564,8 +564,25 @@ function planBy(a, step, screens = {}) {
   }
   // Names with commas between them are several answering at once, each a
   // branch (stage 8; C172 (c)); words with spaces are one name (by:mistral small).
+  // With then between them, one after another (ruled 23 October; C202).
+  const then = args.some((x) => x.kind === 'word' && x.value === 'then')
+  let names = namesFrom(args)
+  if (then) {
+    const parts = [[]]
+    for (const x of args) {
+      if (x.kind === 'word' && x.value === 'then') parts.push([])
+      else parts[parts.length - 1].push(x)
+    }
+    names = []
+    for (const part of parts) {
+      const one = namesFrom(part)
+      if (one.length !== 1) return { says: { message: 'byThen' }, act: null }
+      names.push(one[0])
+    }
+  }
+  const order = then ? 'sequence' : 'together'
   const rows = []
-  for (const word of namesFrom(args)) {
+  for (const word of names) {
     const found = findAnswerers(ans.rows, word)
     if (!found.length) return { says: { message: 'byNone', values: { word } }, act: null }
     if (found.length > 1) return { says: { message: 'byWhich', values: { word, names: found.map((r) => r.name), example: `by:"${found[0].name}"` } }, act: null }
@@ -577,10 +594,10 @@ function planBy(a, step, screens = {}) {
   if (rows.length > MOST_AT_ONCE) return { says: { message: 'byMost', values: { count: MOST_AT_ONCE } }, act: null }
   if (rows.length > 1) {
     const ids = rows.map((r) => r.id)
-    if (held && held.length === ids.length && held.every((h, i) => h.id === ids[i])) return { says: { message: 'bySameMany' }, act: null }
+    if (held && held.length === ids.length && held.every((h, i) => h.id === ids[i]) && (ans.order ?? 'together') === order) return { says: { message: 'bySameMany' }, act: null }
     return {
-      says: { message: 'byMany', values: { count: rows.length, answering: rows.map((r) => r.name) } },
-      act: { kind: 'answerers', room: ans.room, ids, before: held?.map((h) => h.id) ?? null },
+      says: { message: then ? 'byManyThen' : 'byMany', values: { count: rows.length, answering: rows.map((r) => r.name) } },
+      act: { kind: 'answerers', room: ans.room, ids, order, before: held?.map((h) => h.id) ?? null },
     }
   }
   const r = rows[0]
@@ -930,10 +947,6 @@ export function promptPreview(text, target = {}) {
   // Answers from sources include: holds for this prompt (C176): to models
   // only, as data; a source is sent the words alone.
   const inc = target.included ?? null
-  // One after another sends answers held by include: with none yet (C201).
-  if (inc?.count && Array.isArray(target.many) && target.many.length > 1 && target.manyOrder === 'sequence' && !Array.isArray(target.toMany)) {
-    return { ready: false, says: { message: 'promptManyOrderInclude' } }
-  }
   if (inc?.count) {
     if (whos.some((w) => w.group !== 'source')) {
       lines.push({ message: 'promptIncluded', values: { count: inc.count, sources: inc.sources } })

@@ -356,3 +356,20 @@ describe('a step that waited on its condition keeps its place (C201)', () => {
     db.close()
   })
 })
+
+describe('a step of a prompt sent one after another keeps its group (C202)', () => {
+  it('is stored, kept through its message, and checked in a backup', async () => {
+    const db = await open('group')
+    const c = await R.createChat(db, chat())
+    const { step } = await R.planStep(db, { docketId: c.docketId, letter: 'a', prompt: 'Krakatoa', condition: 'nothing', group: 'g-1', newId, now: at() })
+    expect(step).toMatchObject({ group: 'g-1', condition: 'nothing' })
+    await R.addMessageRecord(db, message(c.id, 'user', 'Krakatoa', { step: step.id }))
+    const [run] = await runsOf(db, c.docketId)
+    expect(run.branches.a.steps[0]).toMatchObject({ id: step.id, group: 'g-1' })
+    const base = { dockets: [], conversations: [], messages: [] }
+    const withStep = (s) => ({ ...base, runs: [{ id: 'r', docketId: 'd', n: 1, branches: { a: { status: 'ready', chatId: null, steps: [s] } } }] })
+    expect(validateBackup(withStep({ status: 'ready', group: 'g-1' })).valid).toBe(true)
+    expect(validateBackup(withStep({ status: 'ready', group: 42 })).valid).toBe(false)
+    db.close()
+  })
+})

@@ -386,6 +386,10 @@ msgid "block.ripple-analysis"
 msgstr "Ripple analysis"
 
 #. js-lingui-explicit-id
+msgid "block.steps"
+msgstr "Step list"
+
+#. js-lingui-explicit-id
 msgid "block.summary-dashboard"
 msgstr "Summary dashboard"
 
@@ -454,6 +458,10 @@ msgid "blockAbout.ripple-analysis"
 msgstr "Finds where one part of a draft no longer agrees with another, here and in other chats, when you submit it."
 
 #. js-lingui-explicit-id
+msgid "blockAbout.steps"
+msgstr "The plan’s steps, following this room’s conversation. The whole plan is a board of its own."
+
+#. js-lingui-explicit-id
 msgid "blockAbout.summary-dashboard"
 msgstr "Headline figures, gaps in the data, and insights you ask for, about the data you have open."
 
@@ -464,6 +472,34 @@ msgstr "The data you have open, as a table to sort and page through."
 #. js-lingui-explicit-id
 msgid "blockAbout.toc"
 msgstr "The conversation’s headings, to jump to any point in it."
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsEmpty"
+msgstr "a step not yet written"
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsFollowing"
+msgstr "following this chat, {address}"
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsNoChat"
+msgstr "No chat in this room yet, so no steps"
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsNoPlan"
+msgstr "No plan here has the number {num}"
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsPinned"
+msgstr "plan {num}, pinned"
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsSent"
+msgstr "sent, in its chat"
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsWhole"
+msgstr "shows the whole plan"
 
 #. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
@@ -540,6 +576,10 @@ msgid "branches.contextUnder"
 msgstr "context {share, number, percent} → under {low, number, percent}"
 
 #. js-lingui-explicit-id
+msgid "branches.didNotRun"
+msgstr "did not run"
+
+#. js-lingui-explicit-id
 msgid "branches.label"
 msgstr "{count, plural, other {The replies of # branches}}"
 
@@ -566,6 +606,18 @@ msgstr "Stopped part way. What arrived is kept."
 #. js-lingui-explicit-id
 msgid "branches.unknown"
 msgstr "a branch"
+
+#. js-lingui-explicit-id
+msgid "branches.unmet"
+msgstr "It did not run: its condition was not met."
+
+#. js-lingui-explicit-id
+msgid "branches.waiting"
+msgstr "waiting"
+
+#. js-lingui-explicit-id
+msgid "branches.waitingRuns"
+msgstr "{cond, select, nothing {Waiting. It runs if nothing is found before it.} failed {Waiting. It runs if the one before fails.} always {Waiting. It runs whatever the one before does.} other {Waiting. It runs once the one before finishes.}}"
 
 #. js-lingui-explicit-id
 msgid "branches.withHistory"
@@ -1263,6 +1315,10 @@ msgid "enter.byMany"
 msgstr "{count, plural, other {Enter has {answering} answer your next prompt here, in that order, each a branch of its own}}"
 
 #. js-lingui-explicit-id
+msgid "enter.byManyThen"
+msgstr "{count, plural, other {Enter has {answering} answer your next prompt here one after another, each a branch of its own, each after the first on its condition}}"
+
+#. js-lingui-explicit-id
 msgid "enter.byMost"
 msgstr "{count, plural, other {At most # can answer one prompt at once}}"
 
@@ -1294,6 +1350,11 @@ msgstr "They answer the next prompt here already, in that order"
 #. js-lingui-explicit-id
 msgid "enter.bySeveral"
 msgstr "One prompt to several comes with branches. Choose one for now"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.byThen"
+msgstr "Put then between each of them, as by:wikipedia then sonnet"
 
 #. {names} is a list joined with "or"
 #. js-lingui-explicit-id
@@ -2873,7 +2934,7 @@ msgstr "{tokens, plural, one {{n}. {name}, about # token, {cost}} other {{n}. {n
 msgid "enter.promptManyOrder"
 msgstr "{count, plural, other {Enter sends this one prompt to #, one after another, each a branch of its own. Each after the first runs only if its condition is met}}"
 
-#. Commands stay English
+#. Unused since C202 (R38): one after another sends them
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrderInclude"
 msgstr "One after another sends nothing include: holds, yet. All at once does"
@@ -5011,6 +5072,10 @@ msgid "picker.addKey"
 msgstr "add a key"
 
 #. js-lingui-explicit-id
+msgid "picker.asBranch"
+msgstr "As the branch, now {name}"
+
+#. js-lingui-explicit-id
 msgid "picker.cond"
 msgstr "{cond, select, nothing {runs if nothing is found} failed {runs if the one before fails} always {runs whatever happens} other {runs once the one before finishes}}"
 
@@ -5022,6 +5087,10 @@ msgstr "When {name} runs. A click changes it"
 #. js-lingui-explicit-id
 msgid "picker.englishOnly"
 msgstr "English only"
+
+#. js-lingui-explicit-id
+msgid "picker.forStep"
+msgstr "Who answers step {index} of {address}"
 
 #. js-lingui-explicit-id
 msgid "picker.kept30"
@@ -5301,6 +5370,10 @@ msgstr "Untitled plan"
 #. js-lingui-explicit-id
 msgid "plan.untitledBranch"
 msgstr "Untitled branch"
+
+#. js-lingui-explicit-id
+msgid "plan.whoHelp"
+msgstr "Who answers step {index} of {address}. A click shows who can"
 
 #. js-lingui-explicit-id
 msgid "plan.write"

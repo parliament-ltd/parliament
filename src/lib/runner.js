@@ -113,7 +113,7 @@ export const runsActive = () => going
  *   readBranch({ docketId, n, letter })  -> { chatId, steps } as stored, or null
  *   ensureChat({ docketId, n, letter, step }) -> the branch's chat id, made if it has none
  *   markStep({ docketId, n, letter, stepId, status, ended })
- *   sendStep({ docketId, n, letter, chatId, step, group }) -> 'done' | 'nothing' | 'stopped' | 'failed' | 'stalled'
+ *   sendStep({ docketId, n, letter, chatId, step, group, included }) -> 'done' | 'nothing' | 'stopped' | 'failed' | 'stalled'
  *   stopChat(chatId)  stops the reply arriving there
  *   lock(docketId, fn) -> fn's result, or null when another tab holds the plan
  *   newRunFor({ docketId, letters }) -> the new run's number, the other branches waiting
@@ -130,7 +130,7 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
 
   // One step: its chat made if the branch has none, marked running, sent,
   // and marked done or paused. Returns how it ended.
-  async function runStep(docketId, job, letter, chatId, step, group = null) {
+  async function runStep(docketId, job, letter, chatId, step, group = null, included = null) {
     try {
       chatId = chatId ?? await ensureChat({ docketId, n: job.n, letter, step })
       await markStep({ docketId, n: job.n, letter, stepId: step.id, status: STATUS.RUNNING })
@@ -141,7 +141,7 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
     changed()
     let outcome
     try {
-      outcome = job.stopping.has(letter) ? 'stopped' : await sendStep({ docketId, n: job.n, letter, chatId, step, group })
+      outcome = job.stopping.has(letter) ? 'stopped' : await sendStep({ docketId, n: job.n, letter, chatId, step, group, included })
     } catch (err) {
       outcome = err?.name === 'Stalled' ? 'stalled' : err?.name === 'AbortError' ? 'stopped' : 'failed'
     }
@@ -193,7 +193,7 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
   // One prompt to several, one after another (branch slider v9; C201):
   // each branch after the first runs on its step's condition, read from
   // how the last branch that ran ended. A stop ends the chain.
-  async function runChain(docketId, job, chain, group) {
+  async function runChain(docketId, job, chain, group, included = null) {
     const ended = {}
     let before = null
     for (const [i, link] of chain.entries()) {
@@ -207,7 +207,7 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
         changed()
         continue
       }
-      const outcome = await runStep(docketId, job, link.letter, branch.chatId, step, group)
+      const outcome = await runStep(docketId, job, link.letter, branch.chatId, step, group, included)
       ended[link.letter] = outcome === 'nothing' ? 'done' : outcome
       if (outcome === 'stopped') break
       before = outcome
@@ -220,7 +220,7 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
    * begun, or could not: { started, n, reason, finished } where finished
    * resolves when every branch has ended.
    */
-  async function start({ docketId, num, n, letters, newRun = false, chain = null, group = null }) {
+  async function start({ docketId, num, n, letters, newRun = false, chain = null, group = null, included = null }) {
     if (jobs.has(docketId)) return { started: false, reason: 'running' }
     let begun
     const head = new Promise((resolve) => { begun = resolve })
@@ -233,7 +233,7 @@ export function createRunner({ readBranch, ensureChat, markStep, sendStep, stopC
         if (newRun) job.n = await newRunFor({ docketId, letters })
         begun({ started: true, n: job.n })
         changed()
-        if (chain) Object.assign(ended, await runChain(docketId, job, chain, group))
+        if (chain) Object.assign(ended, await runChain(docketId, job, chain, group, included))
         else {
           const outcomes = await Promise.all(letters.map((l) => runBranch(docketId, job, l)))
           letters.forEach((l, i) => { ended[l] = outcomes[i] })

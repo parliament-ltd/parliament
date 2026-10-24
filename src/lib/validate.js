@@ -348,6 +348,7 @@ function validateRun(item) {
       if (s.messageId !== undefined && s.messageId !== null && !isId(s.messageId)) return 'run.step.messageId invalid'
       if (s.id !== undefined && !isId(s.id)) return 'run.step.id invalid'
       if (s.ended !== undefined && !ENDED_REASONS.has(s.ended)) return 'run.step.ended invalid'
+      if (s.group !== undefined && !isId(s.group)) return 'run.step.group invalid'
       if (s.model != null && !isString(s.model, 200)) return 'run.step.model invalid'
       if (s.condition != null && !STEP_CONDITIONS.has(s.condition)) return 'run.step.condition invalid'
     }

@@ -481,7 +481,7 @@ Built to docket v12.
 2. **The plan board.** One plan at one run: branch lines, steps, status chips, pips, the add row; `new:step`, `new:run`, `new:plan`, editing a ready step, `hold:` and `hold:off`, `move:`; `open:` with a plan's number opens it. **Done, 23 October (C198):** `chrome/PlanBoard.jsx` from `lib/planBoard.js`; the commands in `lib/planVerbs.js`, a prompt on the board planned as a step, `undo:` for each through `records.putPlanBack`, and plans with no chat in Records. Tried on a trial copy. Then `delete:` as the one word for removing (C199): what has not been sent goes on one Enter or an ×, with undo; what has been sent asks for a second Enter.
 3. **The runner.** `run:` (A §5.2's policy; the Enter line naming steps, rooms, models and cost), steps sent in order, `stop:`, `stop:201b`, `stop:all` across tabs, one tab per plan (Web Locks), the lock's idle clock waiting, and `undo:` stopping at a run. **Done, 23 October (C200):** `lib/runner.js` (what runs, and the loop, its effects passed in), `records.createPlanChat`, `markStep`, `settleLeft`, `run:` and `stop:` in `planVerbs.js`, wired in the Shell with a Web Lock per plan and stop signals on the bus. Tried with a model on this computer.
 4. **One after another,** with conditions read from status (A15). **Done, 23 October (C201):** conditions in the runner (a step runs on how the last step that ran ended; a fallback not needed waits in its place), set by a click on the Plan board; one prompt to several, one after another, from the picker, sent by the runner; steps to sources that read only English translated first. Tried with a model on this computer.
-5. **`diff:` and the step list block.**
+5. **`diff:` and the step list block.** **Done, 23 October (C202):** `diff:` sets two runs side by side on the Plan board with what differs marked in ink; the step list in the catalogue, placed with the room editor until the Lab; and the points folded in: who answers a step, `by:… then …`, `include:` with one after another, the slider's waiting tab.
 6. **Spending:** this month's runs, the costliest, the warning before a costly run (`set:warn`), then the checkpoint.
 
 - **Added**
@@ -629,7 +629,7 @@ stay readable so every backup ever written still restores.
 | R35 | The Inter font package | `@fontsource-variable/inter`, shipped and never applied | The system fonts already in use | 15 |
 | R36 | The old slot tables and fallback rule | `SLOT_FALLBACKS` and the three copies of slot data | The layout manifest | 13 |
 | R37 | The old Settings page | `src/views/SettingsView.jsx`, the `/settings` route | The Settings board; `/settings` opens it. **Approved 23 October,** moved to `src/deprecated/` (C186) | 9 |
-| R38 | Three Enter-line messages nothing says any more | `enter.openDocket`, `enter.openDocketHere` ("Enter opens its first branch…") and `enter.erase` (the old answer to `delete:`) in `src/copy.js` | `open:` with a plan's number opens the Plan board (C198); `delete:` is the word (C199) | 10 |
+| R38 | Four Enter-line messages nothing says any more | `enter.openDocket`, `enter.openDocketHere` ("Enter opens its first branch…"), `enter.erase` (the old answer to `delete:`) and `enter.promptManyOrderInclude` in `src/copy.js` | `open:` with a plan's number opens the Plan board (C198); `delete:` is the word (C199); `include:` goes with one after another (C202) | 10 |
 
 R29 (install and update state that nothing displays) is withdrawn: stage 1
 displays it.

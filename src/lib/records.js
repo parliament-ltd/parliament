@@ -916,14 +916,14 @@ export async function putPlanBack(db, back) {
  * A step planned ahead in one branch of a run (new:step), after the first
  * `after` steps or at the end; never before a step that has started.
  */
-export async function planStep(db, { docketId, n = null, letter, prompt, model = null, room = null, condition = null, after = null, newId = () => crypto.randomUUID(), now = new Date().toISOString() }) {
+export async function planStep(db, { docketId, n = null, letter, prompt, model = null, room = null, condition = null, group = null, after = null, newId = () => crypto.randomUUID(), now = new Date().toISOString() }) {
   return write(db, ['dockets', 'runs'], async (tx) => {
     const { docket, run } = await planAt(tx, docketId, n)
     const branch = run.branches[letter]
     if (!branch) throw new PlanError('noBranch')
     const steps = [...branch.steps]
     const at = Math.max(startedCount(steps), Math.min(after ?? steps.length, steps.length))
-    const step = plannedStep({ id: newId(), prompt, model, room, condition: CONDITIONS.includes(condition) ? condition : null, waiting: steps.length > 0 && steps.every((s) => s.status === STATUS.WAITING && s.ended !== 'unmet'), now })
+    const step = plannedStep({ id: newId(), prompt, model, room, condition: CONDITIONS.includes(condition) ? condition : null, group, waiting: steps.length > 0 && steps.every((s) => s.status === STATUS.WAITING && s.ended !== 'unmet'), now })
     steps.splice(at, 0, step)
     const changes = []
     const back = await keepRunBranch(tx, docket, run, letter, { ...branch, steps }, now, changes)

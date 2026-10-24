@@ -386,6 +386,10 @@ msgid "block.ripple-analysis"
 msgstr "波及分析"
 
 #. js-lingui-explicit-id
+msgid "block.steps"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "block.summary-dashboard"
 msgstr "概要ダッシュボード"
 
@@ -454,6 +458,10 @@ msgid "blockAbout.ripple-analysis"
 msgstr "下書きを送信すると、ある部分がほかの部分と食い違うようになった箇所を、このチャットとほかのチャットから探します。"
 
 #. js-lingui-explicit-id
+msgid "blockAbout.steps"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "blockAbout.summary-dashboard"
 msgstr "開いているデータの主な数値、欠けているデータ、頼んだ分析。"
 
@@ -464,6 +472,34 @@ msgstr "開いているデータを、並べ替えやページ送りができる
 #. js-lingui-explicit-id
 msgid "blockAbout.toc"
 msgstr "会話の見出し。好きな位置へ移動できます。"
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsFollowing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsNoChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsNoPlan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsPinned"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsSent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsWhole"
+msgstr ""
 
 #. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
@@ -540,6 +576,10 @@ msgid "branches.contextUnder"
 msgstr "コンテキスト{share, number, percent} → {low, number, percent}未満"
 
 #. js-lingui-explicit-id
+msgid "branches.didNotRun"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "branches.label"
 msgstr "{count, plural, other {#件のブランチの返答}}"
 
@@ -566,6 +606,18 @@ msgstr "途中で止まりました。届いた分は残してあります。"
 #. js-lingui-explicit-id
 msgid "branches.unknown"
 msgstr "あるブランチ"
+
+#. js-lingui-explicit-id
+msgid "branches.unmet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.waiting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.waitingRuns"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "branches.withHistory"
@@ -1263,6 +1315,10 @@ msgid "enter.byMany"
 msgstr "{count, plural, other {Enterで、ここでの次のプロンプトに{answering}がこの順に答え、それぞれが独立したブランチになります}}"
 
 #. js-lingui-explicit-id
+msgid "enter.byManyThen"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.byMost"
 msgstr "{count, plural, other {1つのプロンプトに同時に答えられるのは#件までです}}"
 
@@ -1294,6 +1350,11 @@ msgstr "ここではすでに、その順で次のプロンプトに答えます
 #. js-lingui-explicit-id
 msgid "enter.bySeveral"
 msgstr "1つのプロンプトを複数に送る機能は、ブランチと一緒に追加されます。今は1つを選んでください"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.byThen"
+msgstr ""
 
 #. {names} is a list joined with "or"
 #. js-lingui-explicit-id
@@ -2873,7 +2934,7 @@ msgstr "{tokens, plural, other {{n}. {name}、約#トークン、{cost}}}"
 msgid "enter.promptManyOrder"
 msgstr ""
 
-#. Commands stay English
+#. Unused since C202 (R38): one after another sends them
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrderInclude"
 msgstr ""
@@ -5011,6 +5072,10 @@ msgid "picker.addKey"
 msgstr "キーを追加"
 
 #. js-lingui-explicit-id
+msgid "picker.asBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "picker.cond"
 msgstr ""
 
@@ -5022,6 +5087,10 @@ msgstr ""
 #. js-lingui-explicit-id
 msgid "picker.englishOnly"
 msgstr "英語のみ"
+
+#. js-lingui-explicit-id
+msgid "picker.forStep"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "picker.kept30"
@@ -5300,6 +5369,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "plan.untitledBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.whoHelp"
 msgstr ""
 
 #. js-lingui-explicit-id

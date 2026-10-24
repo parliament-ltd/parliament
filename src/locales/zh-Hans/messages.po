@@ -386,6 +386,10 @@ msgid "block.ripple-analysis"
 msgstr "涟漪分析"
 
 #. js-lingui-explicit-id
+msgid "block.steps"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "block.summary-dashboard"
 msgstr "摘要看板"
 
@@ -454,6 +458,10 @@ msgid "blockAbout.ripple-analysis"
 msgstr "提交草稿时，找出其中前后不再一致的地方，范围包括这里和其他对话。"
 
 #. js-lingui-explicit-id
+msgid "blockAbout.steps"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "blockAbout.summary-dashboard"
 msgstr "关于已打开数据的关键数字、数据缺口，以及你要求的洞见。"
 
@@ -464,6 +472,34 @@ msgstr "以表格显示已打开的数据，可排序和翻页。"
 #. js-lingui-explicit-id
 msgid "blockAbout.toc"
 msgstr "对话中的各个标题，可跳转到任意位置。"
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsFollowing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsNoChat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsNoPlan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsPinned"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsSent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocks.stepsWhole"
+msgstr ""
 
 #. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
@@ -540,6 +576,10 @@ msgid "branches.contextUnder"
 msgstr "上下文 {share, number, percent} → 不到 {low, number, percent}"
 
 #. js-lingui-explicit-id
+msgid "branches.didNotRun"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "branches.label"
 msgstr "{count, plural, other {# 个分支的回复}}"
 
@@ -566,6 +606,18 @@ msgstr "中途停止。已收到的内容会保留。"
 #. js-lingui-explicit-id
 msgid "branches.unknown"
 msgstr "某个分支"
+
+#. js-lingui-explicit-id
+msgid "branches.unmet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.waiting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branches.waitingRuns"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "branches.withHistory"
@@ -1263,6 +1315,10 @@ msgid "enter.byMany"
 msgstr "{count, plural, other {按 Enter 让 {answering} 依次回答你在此处的下一条提示词，各自成为一个分支}}"
 
 #. js-lingui-explicit-id
+msgid "enter.byManyThen"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.byMost"
 msgstr "{count, plural, other {同一条提示词最多可同时由 # 个模型或来源回答}}"
 
@@ -1294,6 +1350,11 @@ msgstr "此处的下一条提示词已按这个顺序由它们回答"
 #. js-lingui-explicit-id
 msgid "enter.bySeveral"
 msgstr "同一条提示词发给多个回答者，要等分支功能推出。目前请选一个"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.byThen"
+msgstr ""
 
 #. {names} is a list joined with "or"
 #. js-lingui-explicit-id
@@ -2873,7 +2934,7 @@ msgstr "{tokens, plural, other {{n}. {name}，约 # 个 token，{cost}}}"
 msgid "enter.promptManyOrder"
 msgstr ""
 
-#. Commands stay English
+#. Unused since C202 (R38): one after another sends them
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrderInclude"
 msgstr ""
@@ -5011,6 +5072,10 @@ msgid "picker.addKey"
 msgstr "添加密钥"
 
 #. js-lingui-explicit-id
+msgid "picker.asBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "picker.cond"
 msgstr ""
 
@@ -5022,6 +5087,10 @@ msgstr ""
 #. js-lingui-explicit-id
 msgid "picker.englishOnly"
 msgstr "仅英文"
+
+#. js-lingui-explicit-id
+msgid "picker.forStep"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "picker.kept30"
@@ -5300,6 +5369,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "plan.untitledBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "plan.whoHelp"
 msgstr ""
 
 #. js-lingui-explicit-id

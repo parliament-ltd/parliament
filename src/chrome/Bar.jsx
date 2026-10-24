@@ -335,7 +335,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
         {!reference && !inspect && !compare && !keyPanel && !backupPanel && picker && (
           picker.kind === 'reply'
             ? <ReplyPicker members={picker.members} targets={picker.targets} line={picker.line} onToggle={picker.onToggle} onAll={picker.onAll} />
-            : <AnswerPicker rows={picker.rows} now={picker.now} picked={picker.picked} reference={picker.reference} onPick={onPickAnswerer} order={picker.order} conds={picker.conds} onOrder={picker.onOrder} onCond={picker.onCond} />
+            : <AnswerPicker rows={picker.rows} now={picker.now} picked={picker.picked} reference={picker.reference} onPick={onPickAnswerer} order={picker.order} conds={picker.conds} onOrder={picker.onOrder} onCond={picker.onCond} forStep={picker.forStep ?? null} />
         )}
         {!reference && !inspect && !compare && !keyPanel && !backupPanel && !picker && !frameworkPicker && languagePicker && (
           <LanguagePicker items={languagePicker.items} now={languagePicker.now} onPick={onPickLanguage} />

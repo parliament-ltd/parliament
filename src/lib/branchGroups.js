@@ -30,11 +30,13 @@ export function segmentOf(messages, groupId) {
  * @param {object[]} messages the line's messages, oldest first, as shown
  * @param {string} lineId the chat the room shows
  * @param {Map<string, object[]>} members the other branches' messages, by chat id, once loaded
+ * @param {(chatId: string, groupId: string) => object|null} [waitingOf] a branch sent to one after
+ *   another whose turn has not come, or whose condition was not met: { condition, status, ended } (C202)
  * @returns {Array<object>} each a message, or { kind: 'slider', key, groupId, mode, tabs }
- *   tabs: [{ chatId, line, loaded, reply, after, continued }] in the order chosen;
+ *   tabs: [{ chatId, line, loaded, reply, after, continued, waiting? }] in the order chosen;
  *   mode: 'below' (the line carries on below) or 'tabs' (each tab its whole thread)
  */
-export function lineItems(messages, lineId, members = new Map()) {
+export function lineItems(messages, lineId, members = new Map(), waitingOf = null) {
   const items = []
   let i = 0
   while (i < messages.length) {
@@ -48,8 +50,14 @@ export function lineItems(messages, lineId, members = new Map()) {
       const theirs = members.get(chatId)
       if (!theirs) return { chatId, line: false, loaded: false, reply: [], after: [], continued: false }
       const seg = segmentOf(theirs, g.id)
-      // A branch removed since, or one whose prompt is gone: no tab.
-      if (!seg) return null
+      if (!seg) {
+        // One after another (slider v9; C202): a branch whose turn has not
+        // come, or whose condition was not met, shows as waiting.
+        const waiting = waitingOf?.(chatId, g.id) ?? null
+        if (waiting) return { chatId, line: false, loaded: true, reply: [], after: [], continued: false, waiting }
+        // A branch removed since, or one whose prompt is gone: no tab.
+        return null
+      }
       return { chatId, line: false, loaded: true, reply: seg.reply, after: seg.after, continued: seg.after.length > 0 }
     }).filter(Boolean)
     const carried = tabs.filter((t) => t.continued)
@@ -59,7 +67,7 @@ export function lineItems(messages, lineId, members = new Map()) {
       // Each tab holds its whole thread. A later prompt in the line's own
       // thread that went to several (again:, C177) draws its tabs there.
       const lineTab = tabs.find((t) => t.line)
-      if (lineTab && lineTab.after.length) lineTab.nested = lineItems(lineTab.after, lineId, members)
+      if (lineTab && lineTab.after.length) lineTab.nested = lineItems(lineTab.after, lineId, members, waitingOf)
       break
     }
     // The line carries on below the slider.
