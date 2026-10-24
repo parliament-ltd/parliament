@@ -1707,11 +1707,6 @@ msgstr "{verb} fungerar i {boards}"
 msgid "enter.empty"
 msgstr "Skriv ett kommando, eller ? för alla kommandon"
 
-#. Unused since C199 (R38): delete: is the word now
-#. js-lingui-explicit-id
-msgid "enter.erase"
-msgstr "Använd erase: för att ta bort något för gott. Enter skriver in det"
-
 #. js-lingui-explicit-id
 msgid "enter.eraseBusy"
 msgstr "Ett svar kommer fortfarande in i {nums}. Vänta på det, eller stoppa det, först"
@@ -2416,14 +2411,6 @@ msgid "enter.openCollection"
 msgstr "Enter visar samlingen {name}"
 
 #. js-lingui-explicit-id
-msgid "enter.openDocket"
-msgstr "Enter öppnar dess första gren, {num}, i ett rum bredvid det som visas"
-
-#. js-lingui-explicit-id
-msgid "enter.openDocketHere"
-msgstr "Enter visar dess första gren, {num}, i rummet här"
-
-#. js-lingui-explicit-id
 msgid "enter.openHere"
 msgstr "{board} finns här. Enter riktar fältet mot den"
 
@@ -2932,11 +2919,6 @@ msgstr "{tokens, plural, one {{n}. {name}, cirka # token, {cost}} other {{n}. {n
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrder"
-msgstr ""
-
-#. Unused since C202 (R38): one after another sends them
-#. js-lingui-explicit-id
-msgid "enter.promptManyOrderInclude"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5724,6 +5706,19 @@ msgstr "Tal omvandlas till text på den här enheten. Inget ljud lämnar den. D�
 #. js-lingui-explicit-id
 msgid "settings.leaveVoiceHead"
 msgstr "Röstinmatning, om du använder den."
+
+#. js-lingui-explicit-id
+msgid "settings.limitsHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.limitsLabel"
+msgstr ""
+
+#. The hover text on a link to the page where the provider sets a spending limit
+#. js-lingui-explicit-id
+msgid "settings.limitsLink"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "settings.localBlocked"

@@ -1707,11 +1707,6 @@ msgstr "{verb} works on {boards}"
 msgid "enter.empty"
 msgstr "Type a command, or ? for every command"
 
-#. Unused since C199 (R38): delete: is the word now
-#. js-lingui-explicit-id
-msgid "enter.erase"
-msgstr "To remove something for good, use erase:. Enter writes it in"
-
 #. js-lingui-explicit-id
 msgid "enter.eraseBusy"
 msgstr "A reply is still arriving in {nums}. Wait for it, or stop it, first"
@@ -2416,14 +2411,6 @@ msgid "enter.openCollection"
 msgstr "Enter shows the collection {name}"
 
 #. js-lingui-explicit-id
-msgid "enter.openDocket"
-msgstr "Enter opens its first branch, {num}, in a room beside what is here"
-
-#. js-lingui-explicit-id
-msgid "enter.openDocketHere"
-msgstr "Enter shows its first branch, {num}, in the room here"
-
-#. js-lingui-explicit-id
 msgid "enter.openHere"
 msgstr "{board} is here. Enter points the bar at it"
 
@@ -2933,11 +2920,6 @@ msgstr "{tokens, plural, one {{n}. {name}, about # token, {cost}} other {{n}. {n
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrder"
 msgstr "{count, plural, other {Enter sends this one prompt to #, one after another, each a branch of its own. Each after the first runs only if its condition is met}}"
-
-#. Unused since C202 (R38): one after another sends them
-#. js-lingui-explicit-id
-msgid "enter.promptManyOrderInclude"
-msgstr "One after another sends nothing include: holds, yet. All at once does"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrderTotal"
@@ -5724,6 +5706,19 @@ msgstr "Speech is turned into text on this device. No audio leaves it. Where a b
 #. js-lingui-explicit-id
 msgid "settings.leaveVoiceHead"
 msgstr "Voice, if you use it."
+
+#. js-lingui-explicit-id
+msgid "settings.limitsHelp"
+msgstr "For a cap that actually stops spending, set a monthly limit with each provider."
+
+#. js-lingui-explicit-id
+msgid "settings.limitsLabel"
+msgstr "Hard limits"
+
+#. The hover text on a link to the page where the provider sets a spending limit
+#. js-lingui-explicit-id
+msgid "settings.limitsLink"
+msgstr "Opens {provider}’s page for a monthly limit, in a new tab"
 
 #. js-lingui-explicit-id
 msgid "settings.localBlocked"

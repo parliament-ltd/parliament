@@ -640,6 +640,11 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-shell .ch-settings .ch-mrow .mk { white-space: nowrap; font: 500 11px var(--ch-sans); color: var(--ch-ink-2); text-align: end; font-variant-numeric: tabular-nums; }
 .ch-shell .ch-settings .ch-mrow.off .mn, .ch-shell .ch-settings .ch-mrow.off .mk { color: var(--ch-ink-3); }
 .ch-shell .ch-settings .ch-mrow.src .dot { visibility: hidden; }
+.ch-slinks { white-space: nowrap; }
+.ch-slinks .sep { opacity: .45; margin: 0 5px 0 1px; }
+.ch-settings a.ch-slink { text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--ch-border); }
+.ch-settings a.ch-slink:hover, .ch-settings a.ch-slink:focus-visible { color: var(--ch-ink); text-decoration-color: currentColor; }
+.ch-settings a.ch-slink:focus-visible { outline: var(--ch-focus); outline-offset: 2px; border-radius: 2px; }
 .ch-spent { display: block; font: 400 13px var(--ch-sans); color: var(--ch-ink); line-height: 1.55; }
 .ch-runs { display: flex; flex-direction: column; margin-top: 6px; }
 .ch-shell .ch-settings .ch-runrow { display: grid; grid-template-columns: 42px minmax(0, 1fr) 64px; gap: 10px; align-items: baseline; padding: 5px 8px; margin: 0 -8px; border-radius: var(--ch-r-md); text-align: start; }

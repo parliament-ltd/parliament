@@ -1707,11 +1707,6 @@ msgstr ""
 msgid "enter.empty"
 msgstr ""
 
-#. Unused since C199 (R38): delete: is the word now
-#. js-lingui-explicit-id
-msgid "enter.erase"
-msgstr ""
-
 #. js-lingui-explicit-id
 msgid "enter.eraseBusy"
 msgstr ""
@@ -2416,14 +2411,6 @@ msgid "enter.openCollection"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "enter.openDocket"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "enter.openDocketHere"
-msgstr ""
-
-#. js-lingui-explicit-id
 msgid "enter.openHere"
 msgstr ""
 
@@ -2932,11 +2919,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrder"
-msgstr ""
-
-#. Unused since C202 (R38): one after another sends them
-#. js-lingui-explicit-id
-msgid "enter.promptManyOrderInclude"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5723,6 +5705,19 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "settings.leaveVoiceHead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.limitsHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.limitsLabel"
+msgstr ""
+
+#. The hover text on a link to the page where the provider sets a spending limit
+#. js-lingui-explicit-id
+msgid "settings.limitsLink"
 msgstr ""
 
 #. js-lingui-explicit-id

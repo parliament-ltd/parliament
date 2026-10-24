@@ -1707,11 +1707,6 @@ msgstr "{verb} は{boards}で使えます"
 msgid "enter.empty"
 msgstr "コマンドを入力してください。? ですべてのコマンドを表示します"
 
-#. Unused since C199 (R38): delete: is the word now
-#. js-lingui-explicit-id
-msgid "enter.erase"
-msgstr "完全に消去するには erase: を使います。Enterで入力欄に書き込みます"
-
 #. js-lingui-explicit-id
 msgid "enter.eraseBusy"
 msgstr "{nums}にはまだ返答が届いている途中です。先に届き終わるのを待つか、止めてください"
@@ -2416,14 +2411,6 @@ msgid "enter.openCollection"
 msgstr "Enterでコレクション{name}を表示します"
 
 #. js-lingui-explicit-id
-msgid "enter.openDocket"
-msgstr "Enterで、今の画面の横のルームに最初のブランチ{num}を開きます"
-
-#. js-lingui-explicit-id
-msgid "enter.openDocketHere"
-msgstr "Enterで、ここのルームに最初のブランチ{num}を表示します"
-
-#. js-lingui-explicit-id
 msgid "enter.openHere"
 msgstr "{board}はここにあります。Enterでバーの対象にします"
 
@@ -2932,11 +2919,6 @@ msgstr "{tokens, plural, other {{n}. {name}、約#トークン、{cost}}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrder"
-msgstr ""
-
-#. Unused since C202 (R38): one after another sends them
-#. js-lingui-explicit-id
-msgid "enter.promptManyOrderInclude"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5724,6 +5706,19 @@ msgstr "音声は、このデバイス上で文字に変換されます。音声
 #. js-lingui-explicit-id
 msgid "settings.leaveVoiceHead"
 msgstr "音声入力（使う場合）。"
+
+#. js-lingui-explicit-id
+msgid "settings.limitsHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.limitsLabel"
+msgstr ""
+
+#. The hover text on a link to the page where the provider sets a spending limit
+#. js-lingui-explicit-id
+msgid "settings.limitsLink"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "settings.localBlocked"

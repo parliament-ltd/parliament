@@ -73,7 +73,6 @@ export const COPY = {
     unknown: /*i18n*/ { id: 'enter.unknown', message: 'No command called {verb}. Type ? for every command' },
     didYouMean: /*i18n*/ { id: 'enter.didYouMean', message: 'No command called {verb}. Did you mean {near}?' },
     renamed: /*i18n*/ { id: 'enter.renamed', message: 'That verb is now {now}. Enter writes it in', comment: 'Enter puts the new verb in the field; it does not run it' },
-    erase: /*i18n*/ { id: 'enter.erase', message: 'To remove something for good, use erase:. Enter writes it in', comment: 'Unused since C199 (R38): delete: is the word now' },
     retired: /*i18n*/ { id: 'enter.retired', message: '{verb} is no longer a command' },
     retiredInstead: /*i18n*/ { id: 'enter.retiredInstead', message: '{verb} is no longer a command. Use {instead}' },
     noMinus: /*i18n*/ { id: 'enter.noMinus', message: 'Only a filter takes a minus, like -tag:research' },
@@ -488,8 +487,6 @@ export const COPY = {
     openChatHere: /*i18n*/ { id: 'enter.openChatHere', message: 'Enter shows {num} in the room here' },
     openChatThere: /*i18n*/ { id: 'enter.openChatThere', message: '{num} is in the room here already' },
     openChatAddressed: /*i18n*/ { id: 'enter.openChatAddressed', message: '{num} is open in a room already. Enter points the bar at it' },
-    openDocket: /*i18n*/ { id: 'enter.openDocket', message: 'Enter opens its first branch, {num}, in a room beside what is here' },
-    openDocketHere: /*i18n*/ { id: 'enter.openDocketHere', message: 'Enter shows its first branch, {num}, in the room here' },
     openNotYet: /*i18n*/ { id: 'enter.openNotYet', message: 'Opening this comes later. inspect:{num} shows it now' },
     // new:branch, a fork (stage 8, piece 6; C8; C178). {step} counts the person's prompts.
     newBranch: /*i18n*/ { id: 'enter.newBranch', message: 'Enter starts {next} from {address}, a copy of its whole history, in a room of its own. No call' },
@@ -777,7 +774,6 @@ export const COPY = {
     promptManyUnpriced: /*i18n*/ { id: 'enter.promptManyUnpriced', message: '{tokens, plural, one {{n}. {name}, about # token} other {{n}. {name}, about # tokens}}' },
     promptManySource: /*i18n*/ { id: 'enter.promptManySource', message: '{n}. {name}, no key and no cost' },
     // One after another (C201): {when} is manyWhen, said for each after the first.
-    promptManyOrderInclude: /*i18n*/ { id: 'enter.promptManyOrderInclude', message: 'One after another sends nothing include: holds, yet. All at once does', comment: 'Unused since C202 (R38): one after another sends them' },
     manyWhen: /*i18n*/ { id: 'enter.manyWhen', message: '{cond, select, nothing {if nothing is found} failed {if the one before fails} always {whatever the one before does} other {once the one before finishes}}', comment: 'When one of several sent one after another runs' },
     promptManyOrder: /*i18n*/ { id: 'enter.promptManyOrder', message: '{count, plural, other {Enter sends this one prompt to #, one after another, each a branch of its own. Each after the first runs only if its condition is met}}' },
     promptManyOrderTotal: /*i18n*/ { id: 'enter.promptManyOrderTotal', message: '{count, plural, other {Enter sends this one prompt to #, one after another, each a branch of its own: at most {cost} in all, if every one runs}}' },
@@ -1214,6 +1210,10 @@ export const COPY = {
     warnLabel: /*i18n*/ { id: 'settings.warnLabel', message: 'Warn before a costly run' },
     warnHelp: /*i18n*/ { id: 'settings.warnHelp', message: 'Above this, the line under the bar leads with what a run costs, before Enter.' },
     warnOff: /*i18n*/ { id: 'settings.warnOff', message: 'Off' },
+    // Hard limits (settings spec §9; C204): each provider's name follows as a link to its own page.
+    limitsLabel: /*i18n*/ { id: 'settings.limitsLabel', message: 'Hard limits' },
+    limitsHelp: /*i18n*/ { id: 'settings.limitsHelp', message: 'For a cap that actually stops spending, set a monthly limit with each provider.' },
+    limitsLink: /*i18n*/ { id: 'settings.limitsLink', message: 'Opens {provider}’s page for a monthly limit, in a new tab', comment: 'The hover text on a link to the page where the provider sets a spending limit' },
     monthUnknown: /*i18n*/ { id: 'settings.monthUnknown', message: '{count, plural, one {The cost of # chat is not known: a reply recorded no tokens.} other {The cost of # chats is not known: some replies recorded no tokens.}}' },
     untitled: /*i18n*/ { id: 'settings.untitled', message: 'Untitled' },
     contextLede: /*i18n*/ { id: 'settings.contextLede', message: 'How a new chat starts, and what goes along with your prompts.' },

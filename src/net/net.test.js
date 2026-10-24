@@ -119,6 +119,15 @@ describe('checking a key, then keeping it (stage 5, the key panel)', () => {
     expect(destination('wikipedia').keysPage).toBeNull()
     expect(CONTENT_SECURITY_POLICY).not.toContain('console.anthropic.com')
   })
+
+  it('links each provider that bills to its page for a monthly limit, never fetched (C204)', () => {
+    expect(destination('anthropic').limitsPage).toBe('https://platform.claude.com/settings/billing')
+    expect(destination('mistral').limitsPage).toBe('https://admin.mistral.ai/organization/billing')
+    // Nothing on this computer bills, and sources take no key.
+    expect(destination('ollama').limitsPage).toBeNull()
+    expect(destination('wikipedia').limitsPage).toBeNull()
+    for (const host of ['platform.claude.com', 'admin.mistral.ai']) expect(CONTENT_SECURITY_POLICY).not.toContain(host)
+  })
 })
 
 describe('the gateway', () => {

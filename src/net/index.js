@@ -178,7 +178,7 @@ export async function keyStatus() {
     // What it does with what it is sent, and the models that differ (C167).
     const current = modelsOf(d.id).filter((m) => m.current !== false)
     const data = d.data ? { ...d.data, longer: current.filter((m) => m.data?.kept === 'atLeast30').map((m) => m.name), trainsAll: current.filter((m) => m.data?.training === 'always').map((m) => m.name) } : null
-    out.push({ id: d.id, name: d.name, has: Boolean(key), held: keys.isHeld(d.id), ending: key ? key.slice(-4) : null, keysPage: d.keysPage, data })
+    out.push({ id: d.id, name: d.name, has: Boolean(key), held: keys.isHeld(d.id), ending: key ? key.slice(-4) : null, keysPage: d.keysPage, limitsPage: d.limitsPage, data })
   }
   return out
 }

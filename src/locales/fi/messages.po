@@ -1707,11 +1707,6 @@ msgstr "{verb} toimii tauluissa: {boards}"
 msgid "enter.empty"
 msgstr "Kirjoita komento, tai ? näyttää kaikki komennot"
 
-#. Unused since C199 (R38): delete: is the word now
-#. js-lingui-explicit-id
-msgid "enter.erase"
-msgstr "Jos haluat poistaa jotain pysyvästi, käytä komentoa erase:. Enter kirjoittaa sen kenttään"
-
 #. js-lingui-explicit-id
 msgid "enter.eraseBusy"
 msgstr "Vastaus on vielä tulossa: {nums}. Odota sitä tai pysäytä se ensin"
@@ -2416,14 +2411,6 @@ msgid "enter.openCollection"
 msgstr "Enter näyttää kokoelman {name}"
 
 #. js-lingui-explicit-id
-msgid "enter.openDocket"
-msgstr "Enter avaa sen ensimmäisen haaran, {num}, huoneeseen näkyvien rinnalle"
-
-#. js-lingui-explicit-id
-msgid "enter.openDocketHere"
-msgstr "Enter näyttää sen ensimmäisen haaran, {num}, tässä huoneessa"
-
-#. js-lingui-explicit-id
 msgid "enter.openHere"
 msgstr "{board} on täällä. Enter kohdistaa palkin siihen"
 
@@ -2932,11 +2919,6 @@ msgstr "{tokens, plural, one {{n}. {name}, noin # tokeni, hinta {cost}} other {{
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrder"
-msgstr ""
-
-#. Unused since C202 (R38): one after another sends them
-#. js-lingui-explicit-id
-msgid "enter.promptManyOrderInclude"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5724,6 +5706,19 @@ msgstr "Puhe muutetaan tekstiksi tällä laitteella. Mitään ääntä ei lähde
 #. js-lingui-explicit-id
 msgid "settings.leaveVoiceHead"
 msgstr "Puhesyöte, jos käytät sitä."
+
+#. js-lingui-explicit-id
+msgid "settings.limitsHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.limitsLabel"
+msgstr ""
+
+#. The hover text on a link to the page where the provider sets a spending limit
+#. js-lingui-explicit-id
+msgid "settings.limitsLink"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "settings.localBlocked"

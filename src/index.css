@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* The handoff notes in the project root are not code. Their Windows paths
+   read as broken CSS escapes and stop the style build (C204). */
+@source not "../continuation-*.md";
 
 /* ── Apollo Markdown Styles ──────────────────────────────── */
 /* Applied via className="apollo-md" on message content wrappers */

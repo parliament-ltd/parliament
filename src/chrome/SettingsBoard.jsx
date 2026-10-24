@@ -135,6 +135,9 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
     return { ...p, state, rows }
   })
 
+  // Providers whose own pages set a monthly limit (settings spec §9; C204).
+  const limits = facts.providers.filter((p) => p.limitsPage)
+
   const network = useNetwork()
 
   return (
@@ -256,6 +259,23 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
             <Row {...rowProps('spending', 'warn')} label={say(COPY.settings.warnLabel)} help={say(COPY.settings.warnHelp)}>
               <Seg label={say(COPY.settings.warnLabel)} value={v.runWarn ?? 'off'} onPick={(x) => onSet(`set:warn ${x === 'off' ? 'off' : x}`)} options={[['off', say(COPY.settings.warnOff)], [0.5, money(i18n, 0.5)], [1, money(i18n, 1)], [5, money(i18n, 5)]]} />
             </Row>
+            {/* Hard limits live with each provider (settings spec §9; C204). A link is
+                a page the person opens, not a connection: nothing is fetched. */}
+            {limits.length > 0 && (
+              <Row {...rowProps('spending', 'limits')} label={say(COPY.settings.limitsLabel)} stack
+                help={<>
+                  {say(COPY.settings.limitsHelp)}{' '}
+                  <span className="ch-slinks">
+                    {limits.map((p, i) => (
+                      <span key={p.id}>
+                        {i > 0 && <span className="sep" aria-hidden="true">;</span>}
+                        <a className="ch-marg ch-slink" href={p.limitsPage} target="_blank" rel="noopener noreferrer" title={say(COPY.settings.limitsLink, { provider: p.name })}>{p.name}</a>
+                      </span>
+                    ))}
+                  </span>
+                </>}
+              />
+            )}
           </section>
 
           {/* Context and defaults (settings spec §10) */}
@@ -409,7 +429,7 @@ function rowWords(facts) {
   }
   return {
     keys,
-    spending: { month: 'this month spent chats runs cost dollars', warn: 'warn warning costly run budget limit cost' },
+    spending: { month: 'this month spent chats runs cost dollars', warn: 'warn warning costly run budget limit cost', limits: `hard limits limit cap stop spending monthly provider console billing ${facts.providers.filter((p) => p.limitsPage).map((p) => p.name).join(' ')}` },
     context,
     data: {
       backup: 'backup restore export import parliament file format bring back',

@@ -1707,11 +1707,6 @@ msgstr "{verb} 只能在{boards}上使用"
 msgid "enter.empty"
 msgstr "输入命令，或输入 ? 查看所有命令"
 
-#. Unused since C199 (R38): delete: is the word now
-#. js-lingui-explicit-id
-msgid "enter.erase"
-msgstr "要永久删除内容，请用 erase:。按 Enter 将其写入"
-
 #. js-lingui-explicit-id
 msgid "enter.eraseBusy"
 msgstr "{nums} 中仍有回复正在传来。请先等它完成，或将其停止"
@@ -2416,14 +2411,6 @@ msgid "enter.openCollection"
 msgstr "按 Enter 显示合集“{name}”"
 
 #. js-lingui-explicit-id
-msgid "enter.openDocket"
-msgstr "按 Enter 在当前内容旁边的房间中打开它的第一个分支 {num}"
-
-#. js-lingui-explicit-id
-msgid "enter.openDocketHere"
-msgstr "按 Enter 在这里的房间中显示它的第一个分支 {num}"
-
-#. js-lingui-explicit-id
 msgid "enter.openHere"
 msgstr "{board}就在这里。按 Enter 让输入栏指向它"
 
@@ -2932,11 +2919,6 @@ msgstr "{tokens, plural, other {{n}. {name}，约 # 个 token，{cost}}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrder"
-msgstr ""
-
-#. Unused since C202 (R38): one after another sends them
-#. js-lingui-explicit-id
-msgid "enter.promptManyOrderInclude"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5724,6 +5706,19 @@ msgstr "语音在本设备上转为文字。音频不会离开本设备。如果
 #. js-lingui-explicit-id
 msgid "settings.leaveVoiceHead"
 msgstr "语音（如果你使用）。"
+
+#. js-lingui-explicit-id
+msgid "settings.limitsHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.limitsLabel"
+msgstr ""
+
+#. The hover text on a link to the page where the provider sets a spending limit
+#. js-lingui-explicit-id
+msgid "settings.limitsLink"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "settings.localBlocked"

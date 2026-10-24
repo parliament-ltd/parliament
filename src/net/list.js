@@ -17,6 +17,10 @@
 //   licence   for sources, the licence their text comes under
 //   keysPage  for providers that take a key, the page where the person makes
 //             and revokes keys: a link they open, never fetched
+//   limitsPage for providers that bill, the page where the person sets a
+//             monthly spending limit that the provider enforces (settings
+//             spec §9; C204): a link they open, never fetched. Read on each
+//             provider's own documentation on 24 October 2026
 //   sourceKind for sources, the kind of question it answers, which groups it
 //             in the picker: reference, research or discussion (branch
 //             slider v9; stage 7)
@@ -43,14 +47,14 @@ export const DESTINATIONS = Object.freeze([
   // its privacy pages say deleted within 30 days, its API pages "not
   // retained by default" beside a "30-day retention" setting (C167 (b)), so
   // the longer is shown. Some models keep 30 days or more (their own data).
-  { id: 'anthropic', kind: 'model', name: 'Anthropic', origins: ['https://api.anthropic.com'], key: true, ships: true, stage: 4, keysPage: 'https://console.anthropic.com/settings/keys',
+  { id: 'anthropic', kind: 'model', name: 'Anthropic', origins: ['https://api.anthropic.com'], key: true, ships: true, stage: 4, keysPage: 'https://console.anthropic.com/settings/keys', limitsPage: 'https://platform.claude.com/settings/billing',
     data: { training: 'no', kept: 'upTo30', flagged: true, checked: '2026-10-22', page: 'https://privacy.claude.com/en/articles/7996866' } },
   // Its global address and the two that process prompts in one region,
   // chosen by the person, never by their network (stage 7, piece 3; C159).
   // Its free mode may train on what is sent unless the person opts out; its
   // paid use leaves it to the person. Preview models are trained on
   // whatever is chosen. Kept 30 days to watch for misuse (C167 (c)).
-  { id: 'mistral', kind: 'model', name: 'Mistral', origins: ['https://api.mistral.ai', 'https://api.eu.mistral.ai', 'https://api.us.mistral.ai'], key: true, ships: true, stage: 7, keysPage: 'https://console.mistral.ai/api-keys',
+  { id: 'mistral', kind: 'model', name: 'Mistral', origins: ['https://api.mistral.ai', 'https://api.eu.mistral.ai', 'https://api.us.mistral.ai'], key: true, ships: true, stage: 7, keysPage: 'https://console.mistral.ai/api-keys', limitsPage: 'https://admin.mistral.ai/organization/billing',
     data: { training: 'optOut', kept: 'days30', checked: '2026-10-22', page: 'https://help.mistral.ai/en/articles/455207' } },
   // On this machine, by its exact port (CLAUDE.md, hard constraints).
   { id: 'ollama', kind: 'local', name: 'Ollama', origins: ['http://localhost:11434'], key: false, ships: true, stage: 7, data: { training: 'no', kept: 'device', checked: '2026-10-22', page: null } },
@@ -59,7 +63,7 @@ export const DESTINATIONS = Object.freeze([
   // Hacker News through its search service, Algolia (stage 7, piece 2).
   { id: 'hackernews', kind: 'source', name: 'Hacker News', origins: ['https://hn.algolia.com'], key: false, ships: true, stage: 7, sourceKind: 'discussion', answersIn: 'english' },
   { id: 'openalex', kind: 'source', name: 'OpenAlex', origins: ['https://api.openalex.org'], key: false, ships: true, stage: 7, licence: 'CC0', sourceKind: 'research', answersIn: 'mostlyEnglish', perDay: 100 },
-].map((d) => Object.freeze({ licence: null, keysPage: null, sourceKind: null, answersIn: null, perDay: null, data: null, ...d, origins: Object.freeze([...d.origins]) })))
+].map((d) => Object.freeze({ licence: null, keysPage: null, limitsPage: null, sourceKind: null, answersIn: null, perDay: null, data: null, ...d, origins: Object.freeze([...d.origins]) })))
 
 const BY_ID = new Map(DESTINATIONS.map((d) => [d.id, d]))
 

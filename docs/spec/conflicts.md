@@ -1771,6 +1771,21 @@ Found while splitting stage 10 into pieces, after a read of every document on pl
 - **(e) Tested:** the run and chat counts, a month's edges, `set:warn`, the line leading with the cost. Tried on a trial copy: the Settings row sets and shows the amount. The trial copy was erased.
 - **Suggestion:** keep as built.
 
+**C204. The stage 10 checkpoint's approved items, as carried out** (24 October; Rulings, 24 October).
+- **(a) R38.** The four Enter-line messages are out of `src/copy.js` (`enter.openDocket`, `enter.openDocketHere`, `enter.erase`, `enter.promptManyOrderInclude`), and `npm run i18n` took them out of every catalogue. Nothing said them. The registry's test still listed `erase` among the answers the registry gives, which it has not since C199; it no longer does.
+- **(b) The sample backup's rooms** (C202 (h) 1), in `src/lib/__fixtures__/sample-v5.json` only. Writing Studio (`mode_ws`, three panels) gets the messages and input blocks, in the conversation's place and the input's. The Essay room (`mode_essay`) gets the same, and its layout changes: `two-column@^1.0` was never one of Parliament's layouts, so the room drew only "Layout two-column@^1.0 is not registered". It is now `single-column-with-sheet@^1.0` (one column, with a sheet), so it draws, and a trial copy shows a second layout. What the tests expect of the sample held (its rooms' ids and names, the Writing Studio template, the counts). A new test checks that every room in the sample has a layout Parliament has, with the messages and input blocks in places that layout holds. Tried on a trial copy made from the sample: 209 in the Essay room and 202 in Writing studio both draw. The trial copy was erased.
+- **(c) Hard limits** (settings spec §9; C203 (d) 1). Each provider's page for a monthly spending limit, read on the provider's own documentation on 24 October 2026, nothing signed in to:
+  - Anthropic: the Billing page, `platform.claude.com/settings/billing`, its "Spend limits" part. A limit set there sits below the cap of the account's tier, and requests stop when it is reached.
+  - Mistral: `admin.mistral.ai/organization/billing`, the organization's limit (a lower one per workspace is set under its workspaces). Access stops until the next month, or until the limit is raised.
+  - Ollama runs on this computer and bills nothing, so it has none.
+  Each is a `limitsPage` in the list of providers (`src/net/list.js`), beside `keysPage`: a link the person opens, never fetched. Settings' Spending section gains the row Settings v1 draws: "Hard limits", "For a cap that actually stops spending, set a monthly limit with each provider.", then each provider's name, from the list, as a link that opens in a new tab. Searching "cap", "limit", "billing" or a provider's name finds it. **The connection policy is unchanged:** a link is a page the person goes to, not a connection the page makes, so no host is added to the policy (`src/net/list.js`'s origins, `netlify.toml`); a test checks that neither page's host is in it. Tried on the trial copy: the row, both links, the search.
+- **(d) The step list's settings** wait for the Lab (stage 13), as ruled. Nothing done.
+- **(e) Found on the way:** the dev server and the build stopped on a style error, "Invalid code point". Tailwind reads every file in the project that git does not ignore, looking for class names, and the new handoff note `continuation-after-stage-10.md` holds a Windows path whose `\cc1ddf…` reads as a CSS escape for a character that cannot exist. `src/index.css` now tells Tailwind to skip `continuation-*.md`. The notes are unchanged.
+- **(f) Open points:**
+  1. **Anthropic's key page.** The keys link still names `console.anthropic.com/settings/keys`, which now sends every visit on to `platform.claude.com/settings/keys` (checked 24 October, headers only). **Suggestion:** point the link at the new address, so it does not lean on the redirect.
+  2. **Currency.** Mistral's limit is in the organization's billing currency, which may be euros; the row names no currency. **Suggestion:** keep; the provider's page says.
+- **Suggestion:** keep as built.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

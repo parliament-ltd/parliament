@@ -215,7 +215,7 @@ describe('the Enter line', () => {
   })
 
   it('has a sentence in the copy table for every answer it gives', () => {
-    const messages = ['empty', 'help', 'helpVerb', 'unknownHelp', 'notCommand', 'unknown', 'didYouMean', 'renamed', 'erase', 'retired', 'retiredInstead', 'noMinus', 'elsewhere', 'takesWords', 'takesExample', 'later', 'ready', 'sequence', 'aloneSpends', 'aloneErase', 'filters', 'key']
+    const messages = ['empty', 'help', 'helpVerb', 'unknownHelp', 'notCommand', 'unknown', 'didYouMean', 'renamed', 'retired', 'retiredInstead', 'noMinus', 'elsewhere', 'takesWords', 'takesExample', 'later', 'ready', 'sequence', 'aloneSpends', 'aloneErase', 'filters', 'key']
     for (const m of messages) expect(COPY.enter[m], m).toBeDefined()
     for (const r of Object.values(RENAMED)) if (r.message) expect(COPY.enter[r.message], r.message).toBeDefined()
   })
