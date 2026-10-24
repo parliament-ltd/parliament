@@ -500,6 +500,8 @@ Built to docket v12.
 
 The piece with the most risk in it. It starts with a spike, not with building.
 
+**Status, 24 October: the spike is planned, not started** (C205, `conflicts.md` Part 17): two prototypes on `/dev/editing` (the browser edits and Parliament keeps the record; ProseMirror), one checklist, a report in `research/editing-spike.md`. Waiting on C58, a yes to fetch ProseMirror, and your hands for input methods, Android and a screen reader.
+
 - **First: the engine spike.** Two small prototypes, one letting the browser edit and reconciling each change against a model of the reply, one on an editor framework. Both are run against one checklist: languages typed by composing, Android keyboards, selection across blocks, paste, undo, screen readers. You choose after seeing both. C58 (how tables, charts, bold and links in a reply are shown and stored) has to be answered first.
 - **Added, after the spike**
   - A reply as blocks, stored the first time it is edited. Its original text stays beside them, because the model goes on reading the original.

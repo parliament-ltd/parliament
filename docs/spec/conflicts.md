@@ -1786,6 +1786,34 @@ Found while splitting stage 10 into pieces, after a read of every document on pl
   2. **Currency.** Mistral's limit is in the organization's billing currency, which may be euros; the row names no currency. **Suggestion:** keep; the provider's page says.
 - **Suggestion:** keep as built.
 
+## Part 17. Editing in place (added 24 October 2026)
+
+Read before planning stage 11: the editing spec (6 October), the welcome v9 spec, the plan's stage 11, the code audit `research/editing-code.md`, C54, C58, C61 and C91, and what stage 10 left (a step not yet sent is written on the Plan board; a sent one is fixed, C198 (c)).
+
+**C205. Stage 11 starts with a spike: the plan, and what it needs first.**
+- **(a) Why a spike.** Editing a reply means typing into text the browser draws, and the browser's own behaviour differs between browsers, input methods and phones. Striking instead of deleting is the hard part: every keystroke that would remove words must mark them instead, and the struck words must stay in the text, selectable and read out by a screen reader. Nothing in the code does this (the audit: Secretarybird compares against a saved copy and draws strikes in a layer above the text; the mockup stores HTML). So two small prototypes are built and tried against one checklist before anything is built for real.
+- **(b) The two prototypes,** on a throwaway page `/dev/editing`, like `/dev/popout`: in development only, and in a production build only when built with `VITE_PROTOTYPES=1`. Neither reads or writes stored data; both edit the same sample reply, held in memory.
+  - **A. The browser edits; Parliament keeps the record.** One editable area per reply. Each change the browser is about to make is announced first (the `beforeinput` event: typing, deleting a word, a new line, a paste); Parliament applies it to its own model of the reply (blocks of text with their marks) and draws the result, so a deletion becomes a strike there. Where the browser cannot announce a change ahead (text composed with an input method, some Android keyboards), Parliament reads what changed afterwards and reconciles. No new package.
+  - **B. An editor framework: ProseMirror** (MIT licence). It does A's reconciling already, with years of fixes for input methods and Android, and lets every change be looked at before it lands, so a deletion can be turned into a strike. A reply is held in a schema Parliament writes (the spec's block kinds and the marks C58 allows), so nothing else can get in. It would be a new package in the build, run as part of Parliament's own scripts: the connection policy is unchanged. One framework is enough to compare with A; ProseMirror is suggested because it is the base several well-known editors are built on (Tiptap among them) and has the longest record with input methods.
+  - **Both do the same things:** a sample reply with headings, a list, bold, a link, a table, a chart and a paragraph in Japanese; deleting strikes; typing adds words in blue; typing over a selection strikes and adds, as one edit; deleting your own added words removes them; Enter splits a block and Backspace at its start joins it to the one above; `/` at a line's start opens the block menu; beside the reply, each edit listed with its id, block and place, to see that it survives a split and a join; the browser's own undo off.
+- **(c) The checklist,** each item tried in each prototype and the result written down:
+  1. **Composing:** Japanese and Chinese typed with the Windows input method, including a conversion cancelled half way, and the Enter that confirms a conversion (it must not split the block).
+  2. **Android:** the phone's own keyboard and Gboard, with word suggestions and swipe typing.
+  3. **Selection across blocks:** from the middle of one block into the next; deleting it strikes both parts as one edit; typing over it.
+  4. **Paste:** text copied from a web page or a document arrives as plain text (the stage's security rule); a paste over a selection strikes the selection.
+  5. **Undo:** the browser's own undo does nothing in a reply; undo on an edit brings the words back exactly.
+  6. **Screen readers:** Narrator (built into Windows) and NVDA read struck words as removed and added words as added, not as one run of text.
+  7. **Also:** speed on a long reply (about 5,000 words); struck text still selectable and copied; how the model's own formatting looks once edited (C58).
+  Tried in Chrome and Firefox on this computer (Chromium and Gecko; LibreWolf and Zen are Gecko, `browsers.md`).
+- **(d) What comes out:** `research/editing-spike.md`: the checklist for both, the size each adds to the app, what each makes easy or hard later (asks, Ripple, sweeps), and a recommendation. You choose. The prototypes then move to `src/deprecated/` or go, on your approval.
+- **(e) Needs from you before it starts:**
+  1. **C58,** because it decides what a reply is made of in both prototypes. Suggestion as C58 has it: the model's bold, italics, inline code and links are kept and shown as marks on the words, never added or removed by you (formatting is not an edit); tables and charts are whole blocks that can be struck or asked about as a unit, not edited inside, at first. The reply's original text stays stored beside its blocks, unchanged, because the model goes on reading the original (spec, "When edits reach the model").
+  2. **A yes to fetch ProseMirror's packages** from the npm registry for prototype B, as the spreadsheet package was asked for in stage 1. They stay on the spike's branch of work until you choose.
+  3. **Your hands** for what a script cannot do: typing with a Japanese or Chinese input method, an Android phone, a screen reader. About twenty minutes per prototype. A phone reaches the dev server over the home network only while it is started for that (`vite --host`); an Android emulator on this computer is the other way.
+- **(f) After the spike:** the choice of engine; C91 (whether Secretarybird's stored comments and suggestions become asks and suggestions in the Collection, or stay in Drafting Desk as they are); and whether A7 and A9 still stand as ruled on 15 October (welcome step 10 becomes "Send it with your next prompt"; an answered prompt stays a record, and editing it marks it up, with "ask again" making a new branch).
+- **(g) Also waiting on stage 11, from earlier rulings:** plan and branch names edited on the Plan board (ruled 23 October, C198 (i) 2); the Secretarybird fix stranded on `refactor/main` to check (C65).
+- **Suggestion:** as above. Nothing is built until (e) is answered.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
