@@ -88,6 +88,34 @@ One line per term: English → Finnish, with the reason where it was a hard choi
 - password manager → salasanojen hallintaohjelma.
 - shown once → näytetään tämän kerran (no "vain" added).
 
+## Plans and running (stage 10, drafted 24 October 2026)
+- a step runs (intransitive) → ajetaan ("se ajetaan, jos edellinen epäonnistuu"). Keeps one verb for run throughout (ajo, ajaa, ajetaan); "käynnistyy" reads more naturally on its own but would split the term.
+- did not run → jäi ajamatta; has never run → ei ole koskaan ajettu; not in run 2 → ei ajossa 2.
+- step {index} of {address} → haaran {address} vaihe {index}; in run {run} → ajossa {run}; run {run} of plan {num} → suunnitelman {num} ajo {run}; run 1 of 2 → ajo 1/2.
+- has started (a run, a step) → on alkanut. Nothing has started → Mikään ei ole alkanut.
+- statuses: done → valmis; running → käynnissä; waiting → odottaa; paused → keskeytynyt (verb: keskeytyi). Paused covers failures and stalls as well as stops, so the intransitive "keskeytynyt" (it got interrupted), not "keskeytetty" (someone paused it). stopped → pysäytetty, as branches.stopped.
+- stop, halt → pysäyttää. What is done stays done and paid for → Tehty pysyy tehtynä ja maksettuna.
+- condition → ehto; its condition was not met → sen ehto ei täyttynyt.
+- the four conditions: once the one before finishes → kun edellinen (vaihe) on valmis; if the one before fails → jos edellinen epäonnistuu; if nothing is found → jos mitään ei löydy; whatever happens → joka tapauksessa; whatever the one before does → edellisestä riippumatta.
+- hold (hold:), held → pito: asettaa pitoon, pidossa, vapauttaa pidosta. Hard choice: from the phone's call on hold ("pidossa", "aseta pitoon"); "pidätetty" sounds like an arrest, "odottaa" is taken by the waiting status. Kept apart from "mukaan varattu", the answer held for the next prompt.
+- one after another → peräkkäin. All at once → Kaikki yhtä aikaa. Order (the picker's group) → Järjestys.
+- side by side → rinnakkain; beside run {run} → ajon {run} rinnalla.
+- compare, what differs → verrata, erot; in ink → musteella.
+- an earlier run, kept as it was (a record) → aiempi ajo, säilytetty ennallaan.
+- fixed (a step that has started) → sitä ei voi enää muuttaa. "Lukittu" is left to Lock Parliament.
+- plan it again → suunnitella uudelleen. with nothing in it → tyhjä ("tyhjä suunnitelma").
+- no chat until it runs → ei keskustelua ennen ajoa (label); in a sentence "Sillä ei ole keskustelua ennen kuin se ajetaan".
+- as the branch (a step's answerer) → sama kuin haaralla.
+- step list (the block) → Vaihelista. "Luettelo" is the Records board.
+- on the {board} board → taulussa {board}, by the placeholder rule; not "{board}-taululla".
+- then (in by:wikipedia then sonnet) → stays English, a word of the command ("Kirjoita sana then kunkin nimen väliin").
+- deleted (C199: delete: replaces erase:) → poistettu; deleted for good → poistettu pysyvästi. The redrafted lines no longer use pyyhkiä.
+- a second Enter → toinen Enter ("Toinen Enter poistaa sen pysyvästi"); after a second Enter → toisen Enter-painalluksen jälkeen.
+- spending (the Settings section) → kulut; spending (the act) → kulutus.
+- a costly run → kallis ajo. Warn before a costly run → Varoita ennen kallista ajoa. Off (its choice) → Pois.
+- hard limits → Ehdottomat rajat; cap → katto; monthly limit → kuukausiraja. "Kulukatot" was the alternative; "ehdoton" carries the contrast with the warning, which stops nothing.
+- run of a plan (in the month's count) → suunnitelma-ajo; chat on its own → erillinen keskustelu.
+
 ## Typography
 - Quotation marks ”…” (U+201D both sides). ASCII quotes only inside commands (open:"{name}", name:"…").
 - Decimal comma in prose (1,1). Values typed into commands stay ASCII (cost: >0.50, <1 or 0.18).

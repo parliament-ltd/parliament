@@ -138,3 +138,65 @@ Lines drafted but not sure of. Each gives the id, the English, the draft, and wh
     - EN: A passkey, if you like
     - ZH: 通行密钥（可选）
     - Why: "if you like" as 可选 (optional), the usual short form for an optional setup step. 如果你愿意，可添加通行密钥 is the literal version, but it is long for a step title.
+
+## Stage 10 words, drafted 24 October 2026
+
+26. **enter.planHoldOn, enter.planHoldOff, enter.runHeld, enter.planStepHeld, plan.held** (hold:)
+    - EN: Enter holds {nums} in run {run}. Their steps wait until hold:off / {address} is held. hold:off {address} lets it go
+    - ZH: 按 Enter 在第 {run} 次运行中搁置 {nums}。它们的步骤会一直等待，直到用 hold:off 取消 / {address} 已搁置。hold:off {address} 可取消搁置
+    - Why: "held" needs a word apart from paused (已暂停) and waiting (等待中). 搁置 (set aside) is plain; 挂起 is the programmers' word, and 暂缓 suggests a delay with an end. plan.held counts branches (those whose open steps all wait), so it says so: # 个分支已搁置.
+
+27. **picker.sequence, picker.together, and the older enter.byMany**
+    - EN: One after another / All at once; and enter.byMany "… answer your next prompt here, in that order, each a branch of its own"
+    - ZH: 依次进行 / 同时进行; enter.byMany (drafted 23 October): 按 Enter 让 {answering} 依次回答……
+    - Why: 依次 now means one after another (enter.byManyThen, enter.promptManyOrder, enter.runHead). enter.byMany is the all-at-once line, and its 依次 for "in that order" can now be misread as the other mode. Suggest changing it to 按此顺序 (not done: chunk 03 is not mine to change).
+
+28. **enter.runHead, enter.runHeadMany, enter.runHeadNew**
+    - EN: Enter runs # steps of {nums}, in run {run}, one after another
+    - ZH: 按 Enter 在第 {run} 次运行中依次执行 {nums} 的 # 个步骤
+    - Why: with 运行 for both the noun and the verb, the line would read 在第 2 次运行中运行. Steps are 执行 in these three lines only; everywhere else a step or branch 运行s.
+
+29. **blocks.stepsPinned**
+    - EN: plan {num}, pinned
+    - ZH: 计划 {num}，固定显示
+    - Why: here "pinned" means the step list shows one plan by its number instead of following the room's chat. The glossary's pin (置顶) is a list's top place, so it would mislead.
+
+30. **picker.asBranch, plan.asBranch**
+    - EN: As the branch, now {name} / as the branch
+    - ZH: 跟随分支，目前为 {name} / 跟随分支
+    - Why: read as "let the branch decide", so the step follows if the branch's answerer changes. 与分支相同 (the same as the branch) is the literal reading, but it hides that it follows.
+
+31. **enter.deleteEverything**
+    - EN: Delete everything is a button at the foot of {board}. Enter opens it there
+    - ZH: “删除全部内容”是{board}底部的一个按钮。按 Enter 打开{board}并转到那里
+    - Why: the code opens Settings at its data section, where the button is; it does not press the button. "Opens it there" is said as opening the board and going to that place, so no one reads it as starting the deletion.
+
+32. **enter.diffOn, plan.beside**
+    - EN: Enter sets run {other} beside run {run}, marking in ink what differs
+    - ZH: 按 Enter 将第 {other} 次运行放到第 {run} 次运行旁边，并用墨色标出差异
+    - Why: "ink" is the design's text colour. 墨色 is literal and fine for a reader who knows the page; 深色 (dark) is plainer if the colour name means nothing here.
+
+33. **settings.monthSpentRuns**
+    - EN: {cost} spent in {month}: # runs of plans and # chats on their own. …
+    - ZH: {month}共花费 {cost}：# 次计划运行，另有 # 个单独的对话。…
+    - Why: the "and" became ，另有 (and besides), because the second count begins with a digit in one case and with 没有 in the other, and a single spacing after 和 cannot suit both.
+
+34. **picker.togetherHelp**
+    - EN: One reply from each, in a slider, in the numbered order.
+    - ZH: 每个回答者各给一条回复，按编号顺序排列，可左右切换查看。
+    - Why: the branch slider has no settled Chinese name (轮播 is the web word for a carousel), so it is described by what it does.
+
+35. **enter.stopAll, enter.stopBranch, enter.stopPlan**
+    - EN: What is done stays done and paid for
+    - ZH: 已完成的部分会保留，并照常计费
+    - Why: "paid for" read as "is charged as usual", matching chat.stoppedNotice (已用的 token 照常计费). The English may also mean "you have paid for it, so it is yours".
+
+36. **enter.runCostly, settings.warnHelp**
+    - EN: more than the {warn} you asked to be warned at / Above this, …
+    - ZH: 超过了你设定的提醒金额 {warn} / 超过此金额时，…
+    - Why: translated as written. C203 and enter.setWarn ("{cost} or more") say it warns at or above the amount; if the English is changed to say so, these become 达到或超过.
+
+37. **enter.deleteApart**
+    - EN: Delete what has not been sent on a line of its own
+    - ZH: 尚未发送的内容请单独用一行删除
+    - Why: read, from C199 (b), as "give delete: of unsent things a line of its own, without sent things beside them". The English can also be read as "delete what has not been sent on its own line".

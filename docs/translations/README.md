@@ -6,6 +6,12 @@ Chinese (`zh-Hans`), Swedish (`sv`) and Finnish (`fi`), drafted by Claude on
 are offered in development only, marked "draft", and the production build
 leaves them out.
 
+**Stage 10's words** (about 180 lines, and 9 reworded when `delete:` became
+the one word for removing) were drafted the same way on 24 October 2026. Each
+glossary has a section for their terms, and each doubts file a section
+"Stage 10 words, drafted 24 October 2026". English lines the drafters found
+unclear are in `docs/spec/conflicts.md`, C206.
+
 ## What is here
 
 For each language:

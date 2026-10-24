@@ -48,7 +48,7 @@
 - framework (a stance a reply is written under) → 方針. フレームワーク reads as software or business-school frameworks; 方針 is the standing approach a reply follows. The command stays framework:.
 - marks (×15, cost against a reference model) → 倍率
 - spending → 利用額
-- erase (for good) → 消去 (完全に消去); delete → 削除. Kept apart as the English keeps them apart.
+- erase (for good) → 消去 (完全に消去); delete → 削除. Kept apart as the English keeps them apart. Superseded on 24 October: see "delete" under Plans and running (chunks 16 to 19).
 - forget (a saved search, collection, framework) → 削除, with what stays said next to it.
 - archive → アーカイブ
 - pin → ピン留め
@@ -92,3 +92,30 @@
 - password manager → パスワードマネージャ (Apple's long-vowel practice)
 - encrypt / decrypt → 暗号化 / 復号
 - "nothing can open it" → 開く手段は何もありません; "there is no server to reset it" → リセットできるサーバがない
+
+## Plans and running (chunks 16 to 19, 24 October)
+
+- delete (`delete:`, the one word for removing since C199) → 削除; for good → 完全に削除; deleted (a label) → 削除済み. The lines that said 消去 (erased) now say 削除. 消去 stays only where a browser clears its own data (settings.keptNo, welcome.keepNot, lock.lost, backup.replaceAbout).
+- Enter, then Enter again → Enter、もう一度Enter; Enter again → もう一度Enter
+- a run, by its number → 実行{run} (実行2), built as ステップ{index} and プラン{num} are, so it reads as a name and sits close to open:run 2. Counted 件 (実行#件), as GitHub's Japanese counts workflow runs; 回 would say it happened, and a run can exist before it starts. run {run} of {runs} → 実行{run}（全{runs}件）.
+- Where the verb 実行する would meet the name in one clause, the run goes in brackets after: Enterで、201aの3ステップを順番に実行します（実行1）.
+- an earlier run, kept as it was → 以前の実行（当時のまま）
+- the Plan board in a sentence ("on the {board} board") → {board}ボード (プランボード). Note: chunk 11's verb.plan has プランのボード.
+- to plan (a step) → 計画する; plan again → 計画し直す; planned → 計画済み. The noun stays プラン.
+- started (a step) → 開始済み; its prompt is fixed → プロンプトは変更できません
+- condition → 条件; met → 満たす; did not run → 実行されず (label), 実行されませんでした (sentence)
+- the four conditions: once the step before finishes → 前のステップが終わったら; if it fails → 前のステップが失敗したら; if nothing is found → 何も見つからなければ; whatever happens → 結果にかかわらず. "The one before" (the picker, the slider) → 前のもの, not 1つ前, since a condition reads the last one before it that ran (C201 (b)).
+- runs (a condition's label) → 〜実行 (何も見つからなければ実行)
+- hold / held → 保留にする / 保留中; let go (hold:off) → 保留を解除
+- waiting → 待機中; running → 実行中; done → 完了; stopped → 停止 (as branches.stopped)
+- paused → 中断. 一時停止 reads as a pause chosen on purpose; a paused step was stopped, failed, stalled or lost its tab, and run: carries it on.
+- one after another → 順番に; All at once → すべて同時に; Order (the choice between them) → 順序
+- side by side (branches in a run) → 並行して; (two runs, diff:) → 並べる; what differs, marked → 違うところに印
+- stop, halt → 止める; what is done stays done and paid for → 済んだものはそのまま残り、その分の料金はかかります
+- as the branch (a step's answerer) → ブランチと同じ; who answers → 答えるもの
+- with no chat until it runs → 実行するまでチャットはありません
+- step list (the block) → ステップ一覧
+- slider → スライダ (Apple's long-vowel practice)
+- costly run → 高額な実行; warn before → 前に警告
+- hard limits → 利用上限, the word keys.ownKey uses for a provider's spending limit; monthly limit → 月の上限
+- a chat on its own (not part of a plan of several) → 単独のチャット

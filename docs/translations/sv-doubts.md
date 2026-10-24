@@ -120,3 +120,65 @@ Each: id, the English, the draft, and why I was unsure.
     Draft: Låses efter inaktivitet i / tills fliken stängs
     Why: the three time choices follow the label well ("Låses efter inaktivitet i 15 minuter"). "tills fliken stängs" fits as loosely as the English does; if the choices are read as one sentence, it may need its own wording.
 
+## Stage 10 words, drafted 24 October 2026
+
+24. **"on the {board} board"** (enter.openPlan, enter.planNone, enter.runPaused, settings.runRowHelp and seven others)
+    English: Enter opens plan {num} on the {board} board
+    Draft: Enter öppnar plan {num} på tavlan {board}
+    Why: earlier lines put a board in a sentence as "i {board}" ("i Samlingen"). Here the English adds "board", and "plan 201 i Planen" sets plan and Planen side by side, so I followed the English with "på tavlan Planen". If "i {board}" reads better to you, it is a straight swap in every line.
+
+25. **The statuses** (plan.statusDone, plan.statusPaused, plan.ended)
+    English: done / paused / running / waiting; stopped
+    Draft: klart / pausat / körs / väntar; stoppat
+    Why: the same word sits beside a step (steg, neuter) and a branch (gren, common). The neuter fits the steps and reads as an impersonal "det är klart" beside a branch; "klar", "pausad" would suit the branch only. "körs" and "väntar" need no ending.
+
+26. **hold: and held** (enter.planHoldOn, enter.planHoldAlready, enter.planHoldNot, plan.held, enter.runHeld)
+    English: Enter holds {nums} in run {run}. / Held already: {nums} / {count} held
+    Draft: Enter håller kvar {nums} i körning {run}. / Hålls redan kvar: {nums} / # hålls kvar
+    Why: "hålla kvar" matches verb.hold from the first drafts, and the passive needs no agreement. "# hålls kvar" in the board's margin is a little wordy; "på vänt" ("2 på vänt", "Enter sätter 201c på vänt") is shorter and as clear, but would mean changing verb.hold too.
+
+27. **enter.diffOn**
+    English: Enter sets run {other} beside run {run}, marking in ink what differs
+    Draft: Enter ställer körning {other} bredvid körning {run} och markerar skillnaderna med bläck
+    Why: "med bläck" is literal. If "ink" names the page's colour rather than a manner, a Swedish reader may not catch it; "med mörk färg" or dropping the phrase are the alternatives.
+
+28. **picker.togetherHelp**
+    English: One reply from each, in a slider, in the numbered order.
+    Draft: Ett svar från var och en, att bläddra mellan, i den numrerade ordningen.
+    Why: no Swedish word for the slider was settled earlier; "karusell" is the web designer's word but reads oddly here. I described what it does instead.
+
+29. **enter.runPausedOnly**
+    English: {nums} paused, so run: alone leaves it. run:{example} carries on from where it stopped
+    Draft: {nums} pausade, så run: ensamt låter den vara. run:{example} fortsätter där den stannade
+    Why: "run: alone" has no settled wording; "ensamt" (agreeing with the command as neuter) is the shortest. "run: utan adress" would say what is meant, but adds a word the English does not use.
+
+30. **"one after another"** (picker.sequence, enter.promptManyOrder, enter.runHead, enter.runHeadMany)
+    English: One after another
+    Draft: En efter en (models and branches); ett i taget (steps)
+    Why: "en efter en" is the idiom for who answers, but "ett efter ett" for steps sounds stilted, so steps go "ett i taget". The picker label reads "En efter en" beside "Alla samtidigt".
+
+31. **settings.limitsLabel**
+    English: Hard limits
+    Draft: Hårda gränser
+    Why: literal and understood in a section called Kostnader. "Kostnadstak" or "Spärrgränser" are the alternatives; "kostnadsgräns" is already a key's own limit (keys.ownKey).
+
+32. **enter.deleteEverything**
+    English: Delete everything is a button at the foot of {board}. Enter opens it there
+    Draft: ”Radera allt” är en knapp längst ned i {board}. Enter öppnar den där
+    Why: without quotes "Radera allt är en knapp" reads as an imperative. The English has none; I followed keys.checkThenKeep, which quotes a button (”Spara”).
+
+33. **enter.deleteApart**
+    English: Delete what has not been sent on a line of its own
+    Draft: Det som inte har skickats raderas på en egen rad
+    Why: the English can be read as "what has not been sent on a line of its own". I made it a rule, not an instruction, so "på en egen rad" can only belong to the deleting.
+
+34. **plan.asBranch, picker.asBranch**
+    English: as the branch / As the branch, now {name}
+    Draft: samma som grenen / Samma som grenen, nu {name}
+    Why: "som grenen" alone reads as "like the branch". "samma som grenen" says the step takes the branch's own answerer.
+
+35. **verb.delete**
+    English: …What has been sent goes for good, after a second Enter
+    Draft: …Det som har skickats försvinner för gott, efter ett andra tryck på Enter
+    Why: "ett andra Enter" is how people say it, but which gender a key takes in Swedish is unsettled; "tryck på Enter" sidesteps it at the cost of three words.
+

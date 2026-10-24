@@ -59,7 +59,7 @@ msgstr "まだ何も作っていません。p> で最初のチャットを始め
 #. Marginalia on a note, keyword or quote kept when its chat was deleted for good
 #. js-lingui-explicit-id
 msgid "almanac.erasedFrom"
-msgstr "{num}より（消去済み）"
+msgstr "{num}より（削除済み）"
 
 #. js-lingui-explicit-id
 msgid "almanac.filtersLabel"
@@ -387,7 +387,7 @@ msgstr "波及分析"
 
 #. js-lingui-explicit-id
 msgid "block.steps"
-msgstr ""
+msgstr "ステップ一覧"
 
 #. js-lingui-explicit-id
 msgid "block.summary-dashboard"
@@ -459,7 +459,7 @@ msgstr "下書きを送信すると、ある部分がほかの部分と食い違
 
 #. js-lingui-explicit-id
 msgid "blockAbout.steps"
-msgstr ""
+msgstr "このルームの会話に合わせて表示する、プランのステップ。プラン全体には専用のボードがあります。"
 
 #. js-lingui-explicit-id
 msgid "blockAbout.summary-dashboard"
@@ -475,31 +475,31 @@ msgstr "会話の見出し。好きな位置へ移動できます。"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsEmpty"
-msgstr ""
+msgstr "まだ書かれていないステップ"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsFollowing"
-msgstr ""
+msgstr "このチャット（{address}）に連動"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsNoChat"
-msgstr ""
+msgstr "このルームにはまだチャットがないため、ステップもありません"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsNoPlan"
-msgstr ""
+msgstr "番号{num}のプランはここにはありません"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsPinned"
-msgstr ""
+msgstr "プラン{num}（ピン留め）"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsSent"
-msgstr ""
+msgstr "送信済み（そのチャットにあります）"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsWhole"
-msgstr ""
+msgstr "でプラン全体を表示します"
 
 #. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
@@ -577,7 +577,7 @@ msgstr "コンテキスト{share, number, percent} → {low, number, percent}未
 
 #. js-lingui-explicit-id
 msgid "branches.didNotRun"
-msgstr ""
+msgstr "実行されず"
 
 #. js-lingui-explicit-id
 msgid "branches.label"
@@ -609,15 +609,15 @@ msgstr "あるブランチ"
 
 #. js-lingui-explicit-id
 msgid "branches.unmet"
-msgstr ""
+msgstr "条件を満たさなかったため、実行されませんでした。"
 
 #. js-lingui-explicit-id
 msgid "branches.waiting"
-msgstr ""
+msgstr "待機中"
 
 #. js-lingui-explicit-id
 msgid "branches.waitingRuns"
-msgstr ""
+msgstr "{cond, select, nothing {待機中。それより前で何も見つからなければ実行します。} failed {待機中。前のものが失敗したら実行します。} always {待機中。前のものの結果にかかわらず実行します。} other {待機中。前のものが終わったら実行します。}}"
 
 #. js-lingui-explicit-id
 msgid "branches.withHistory"
@@ -894,11 +894,11 @@ msgstr "含まれているものには、まだメモもキーワードも引用
 
 #. js-lingui-explicit-id
 msgid "collection.erased"
-msgstr "{what, select, chat {チャット{num}（消去済み）} plan {プラン{num}（消去済み）} message {メッセージ（消去済み）} other {{num}（消去済み）}}"
+msgstr "{what, select, chat {チャット{num}（削除済み）} plan {プラン{num}（削除済み）} message {メッセージ（削除済み）} other {{num}（削除済み）}}"
 
 #. js-lingui-explicit-id
 msgid "collection.erasedFrom"
-msgstr "{num}より（消去済み）"
+msgstr "{num}より（削除済み）"
 
 #. The collection favourites became (C20)
 #. js-lingui-explicit-id
@@ -1081,7 +1081,7 @@ msgstr "{num}より"
 #. Where it came from: a chat that was deleted for good
 #. js-lingui-explicit-id
 msgid "copy.fromErased"
-msgstr "{num}より（消去済み）"
+msgstr "{num}より（削除済み）"
 
 #. js-lingui-explicit-id
 msgid "copy.keywords"
@@ -1316,7 +1316,7 @@ msgstr "{count, plural, other {Enterで、ここでの次のプロンプトに{a
 
 #. js-lingui-explicit-id
 msgid "enter.byManyThen"
-msgstr ""
+msgstr "{count, plural, other {Enterで、ここでの次のプロンプトに{answering}が順番に答え、それぞれが独立したブランチになります。2件目以降は、それぞれの条件に従って実行します}}"
 
 #. js-lingui-explicit-id
 msgid "enter.byMost"
@@ -1354,7 +1354,7 @@ msgstr "1つのプロンプトを複数に送る機能は、ブランチと一�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.byThen"
-msgstr ""
+msgstr "名前と名前の間に then を入れます。例：by:wikipedia then sonnet"
 
 #. {names} is a list joined with "or"
 #. js-lingui-explicit-id
@@ -1620,53 +1620,53 @@ msgstr "{verb} には 7d や 3w のような期間、月、または 2026-09-01 
 #. After the first Enter of a delete undo cannot take back (C199)
 #. js-lingui-explicit-id
 msgid "enter.deleteAgain"
-msgstr ""
+msgstr "{count, plural, other {もう一度Enterで完全に削除します。Escapeでそのまま残します}}"
 
 #. js-lingui-explicit-id
 msgid "enter.deleteApart"
-msgstr ""
+msgstr "まだ送信していないものは、単独の行で削除してください"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteBranch"
-msgstr ""
+msgstr "Enterで、一度も実行していない{address}を、プラン{num}のすべての実行から削除します。undo: で元に戻せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedBranch"
-msgstr ""
+msgstr "{address}を削除しました。undo: で元に戻せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedPlan"
-msgstr ""
+msgstr "プラン{num}を削除しました。undo: で元に戻せます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedStep"
-msgstr ""
+msgstr "{address}のステップ{index}を削除しました。undo: で元に戻せます"
 
 #. js-lingui-explicit-id
 msgid "enter.deleteEverything"
-msgstr ""
+msgstr "「すべて削除」は{board}の下部にあるボタンです。Enterでそこを開きます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletePlan"
-msgstr ""
+msgstr "Enterで、まだチャットのないプラン{num}を削除します。undo: で元に戻せます"
 
 #. js-lingui-explicit-id
 msgid "enter.deletePlanToo"
-msgstr ""
+msgstr "プランの最後のブランチなので、プラン{num}も消えます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteStep"
-msgstr ""
+msgstr "Enterで、{address}のステップ{index}を実行{run}から削除します。undo: で元に戻せます"
 
 #. js-lingui-explicit-id
 msgid "enter.deleteStepStarted"
-msgstr ""
+msgstr "{address}のステップ{index}は開始済みのため、チャットと一緒に残ります"
 
 #. js-lingui-explicit-id
 msgid "enter.didYouMean"
@@ -1674,30 +1674,30 @@ msgstr "{verb} というコマンドはありません。{near} のことです�
 
 #. js-lingui-explicit-id
 msgid "enter.diffHere"
-msgstr ""
+msgstr "実行{other}はすでに実行{run}の横にあります"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.diffNone"
-msgstr ""
+msgstr "比較しているものはありません。diff: で2つの実行を並べられます"
 
 #. js-lingui-explicit-id
 msgid "enter.diffOff"
-msgstr ""
+msgstr "Enterで、実行{run}だけの表示に戻します"
 
 #. js-lingui-explicit-id
 msgid "enter.diffOn"
-msgstr ""
+msgstr "Enterで、実行{run}の横に実行{other}を並べ、違うところに印を付けます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.diffOneRun"
-msgstr ""
+msgstr "プラン{num}の実行は1つだけです。new:run で比較用の実行をもう1つ作れます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.diffSame"
-msgstr ""
+msgstr "それはボードに表示中の実行{run}です。diff: と別の実行を指定すると比較できます"
 
 #. js-lingui-explicit-id
 msgid "enter.elsewhere"
@@ -1713,11 +1713,11 @@ msgstr "{nums}にはまだ返答が届いている途中です。先に届き終
 
 #. js-lingui-explicit-id
 msgid "enter.erased"
-msgstr "{nums}を完全に消去しました"
+msgstr "{nums}を完全に削除しました"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseFailed"
-msgstr "何も消去していません。もう一度お試しください"
+msgstr "何も削除していません。もう一度お試しください"
 
 #. A number and the start of its title or words, in the language's quotation marks
 #. js-lingui-explicit-id
@@ -1726,7 +1726,7 @@ msgstr "{num}「{title}」"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseItems"
-msgstr "Enterで{erasing}を完全に消去します"
+msgstr "Enter、もう一度Enterで、{erasing}を完全に削除します"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksGo"
@@ -1735,7 +1735,7 @@ msgstr "{count, plural, other {メモ、キーワード、引用#件も消えま
 #. all stays English: it is a word of the command
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksStay"
-msgstr "{count, plural, other {メモ、キーワード、引用#件は、消去されたチャットのものと表示して残ります。これらも消去するには all を付けます}}"
+msgstr "{count, plural, other {メモ、キーワード、引用#件は、削除されたチャットのものと表示して残ります。これらも削除するには all を付けます}}"
 
 #. js-lingui-explicit-id
 msgid "enter.erasePlanGoes"
@@ -2202,12 +2202,12 @@ msgstr "一部のブランチを作れなかったため、何も送信してい
 
 #. js-lingui-explicit-id
 msgid "enter.manyUnmet"
-msgstr ""
+msgstr "{count, plural, other {{nums}は、条件を満たさなかったため実行されませんでした}}"
 
 #. When one of several sent one after another runs
 #. js-lingui-explicit-id
 msgid "enter.manyWhen"
-msgstr ""
+msgstr "{cond, select, nothing {何も見つからなければ} failed {前のものが失敗したら} always {前のものの結果にかかわらず} other {前のものが終わったら}}"
 
 #. js-lingui-explicit-id
 msgid "enter.moveBoard"
@@ -2388,7 +2388,7 @@ msgstr "Enterで、ここのルームに{address}を履歴ごと表示します�
 
 #. js-lingui-explicit-id
 msgid "enter.openBranchUnrun"
-msgstr ""
+msgstr "{address}はまだ実行していません。Enterで、そのステップを{board}ボードに表示します"
 
 #. js-lingui-explicit-id
 msgid "enter.openChat"
@@ -2420,11 +2420,11 @@ msgstr "これを開く機能は後日追加します。今は inspect:{num} で
 
 #. js-lingui-explicit-id
 msgid "enter.openPlan"
-msgstr ""
+msgstr "Enterで、プラン{num}を{board}ボードで開きます"
 
 #. js-lingui-explicit-id
 msgid "enter.openPlanHere"
-msgstr ""
+msgstr "プラン{num}は{board}ボードにあります。Enterでバーの対象にします"
 
 #. js-lingui-explicit-id
 msgid "enter.openPopped"
@@ -2544,155 +2544,155 @@ msgstr "Enterで{nums}を一番上にピン留めします"
 
 #. js-lingui-explicit-id
 msgid "enter.planBranchDone"
-msgstr ""
+msgstr "{address}を追加しました。実行するまでチャットはありません"
 
 #. js-lingui-explicit-id
 msgid "enter.planBranchNew"
-msgstr ""
+msgstr "Enterで、プラン{num}に{address}を追加します。実行するまでチャットはありません。何も送信されません"
 
 #. js-lingui-explicit-id
 msgid "enter.planChanged"
-msgstr ""
+msgstr "その間にプランが変わりました。もう一度確認してから、Enterを押してください"
 
 #. js-lingui-explicit-id
 msgid "enter.planFailed"
-msgstr ""
+msgstr "プランを変更できませんでした"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planFixed"
-msgstr ""
+msgstr "そのステップは開始済みのため、もう変更できません。new:run で計画し直せます"
 
 #. js-lingui-explicit-id
 msgid "enter.planHoldAlready"
-msgstr ""
+msgstr "すでに保留中：{nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.planHoldEmpty"
-msgstr ""
+msgstr "{address}には、保留にできる計画済みのステップがありません"
 
 #. js-lingui-explicit-id
 msgid "enter.planHoldNot"
-msgstr ""
+msgstr "保留中ではありません：{nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.planHoldOff"
-msgstr ""
+msgstr "Enterで、実行{run}の{nums}の保留を解除します"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planHoldOn"
-msgstr ""
+msgstr "Enterで、実行{run}の{nums}を保留にします。hold:off まで、そのステップは待機します"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planHoldRunning"
-msgstr ""
+msgstr "{address}は実行中です。stop:{address} で止められます"
 
 #. js-lingui-explicit-id
 msgid "enter.planMove"
-msgstr ""
+msgstr "Enterで、{address}を{other}の{where, select, after {後ろ} other {前}}に移動します。末尾の文字は変わりません"
 
 #. js-lingui-explicit-id
 msgid "enter.planMoveSame"
-msgstr ""
+msgstr "{address}を自分自身の隣には移動できません"
 
 #. js-lingui-explicit-id
 msgid "enter.planMoveThere"
-msgstr ""
+msgstr "{address}はすでに{other}の{where, select, after {後ろ} other {前}}にあります"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planMoveWhich"
-msgstr ""
+msgstr "move:201c after 201a のように、同じプランのブランチを2つ指定してください"
 
 #. js-lingui-explicit-id
 msgid "enter.planNew"
-msgstr ""
+msgstr "Enterで、空のプランを作って{board}ボードで開きます。何も送信されません"
 
 #. js-lingui-explicit-id
 msgid "enter.planNewDone"
-msgstr ""
+msgstr "プラン{num}を作りました。中身はまだありません"
 
 #. js-lingui-explicit-id
 msgid "enter.planNewTitled"
-msgstr ""
+msgstr "Enterで、空のプラン「{title}」を作って{board}ボードで開きます。何も送信されません"
 
 #. js-lingui-explicit-id
 msgid "enter.planNoBranch"
-msgstr ""
+msgstr "{address}は実行{run}にありません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNone"
-msgstr ""
+msgstr "{board}ボードにプランはありません。open: とプランの番号で表示するか、new:plan で作れます"
 
 #. js-lingui-explicit-id
 msgid "enter.planNoStep"
-msgstr ""
+msgstr "実行{run}の{address}には、ステップ{index}がありません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNotShown"
-msgstr ""
+msgstr "プラン{num}は{board}ボードにありません。open:{num} で表示できます"
 
 #. js-lingui-explicit-id
 msgid "enter.planOnePlan"
-msgstr ""
+msgstr "一度に指定できるのは、1つのプランのブランチだけです"
 
 #. js-lingui-explicit-id
 msgid "enter.planPromptEmpty"
-msgstr ""
+msgstr "ステップを書いてください。Enterで、{address}のステップ{index}として追加します。何も送信されません"
 
 #. js-lingui-explicit-id
 msgid "enter.planPromptStep"
-msgstr ""
+msgstr "Enterで、これを実行{run}の{address}のステップ{index}として追加します。何も送信されません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planRecord"
-msgstr ""
+msgstr "実行{run}は以前の実行で、当時のまま残しています。プランを変更するには open:run {latest} を使います"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunDone"
-msgstr ""
+msgstr "実行{n}を作りました。まだ何も始まっていません"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunHere"
-msgstr ""
+msgstr "実行{run}はすでに{board}ボードにあります"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunNew"
-msgstr ""
+msgstr "Enterで、プラン{num}の実行{from}から実行{next}を作ります：すべてのステップを計画し直し、何も開始しません。何も送信されません"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunNone"
-msgstr ""
+msgstr "{runs, plural, other {プラン{num}の実行は#件です}}"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunOpen"
-msgstr ""
+msgstr "Enterで、プラン{num}の実行{run}を表示します"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepAdd"
-msgstr ""
+msgstr "Enterで、実行{run}の{address}にステップ{index}を追加します。何も送信されません"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepDone"
-msgstr ""
+msgstr "{address}にステップ{index}を計画しました。何も送信していません"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepEmpty"
-msgstr ""
+msgstr "Enterで、実行{run}の{address}に空のステップ{index}を追加します。内容はボードで書けます。何も送信されません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planStepHeld"
-msgstr ""
+msgstr "{address}は保留中なので、このステップも待機します。hold:off {address} で保留を解除できます"
 
 #. js-lingui-explicit-id
 msgid "enter.planWhichBranch"
-msgstr ""
+msgstr "どのブランチですか？{board}ボードで選ぶか、{example} のように指定してください"
 
 #. js-lingui-explicit-id
 msgid "enter.popAlready"
@@ -2809,7 +2809,7 @@ msgstr "{count, plural, other {{nums}は引用で、これまでモデルには�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptBranchRunning"
-msgstr ""
+msgstr "{address}は実行中です。stop:{address} で止めるか、終わるまで待ってください"
 
 #. js-lingui-explicit-id
 msgid "enter.promptBusy"
@@ -2919,15 +2919,15 @@ msgstr "{tokens, plural, other {{n}. {name}、約#トークン、{cost}}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrder"
-msgstr ""
+msgstr "{count, plural, other {Enterで、この1つのプロンプトを#件に順番に送ります。それぞれが独立したブランチになります。2件目以降は、条件を満たした場合にだけ実行します}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrderTotal"
-msgstr ""
+msgstr "{count, plural, other {Enterで、この1つのプロンプトを#件に順番に送ります。それぞれが独立したブランチになります：すべて実行された場合、合計で最大{cost}}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrderTotalCheap"
-msgstr ""
+msgstr "{count, plural, other {Enterで、この1つのプロンプトを#件に順番に送ります。それぞれが独立したブランチになります：すべて実行されても合計{cost}未満}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManySource"
@@ -2935,23 +2935,23 @@ msgstr "{n}. {name}、キー不要、費用なし"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyThenCheap"
-msgstr ""
+msgstr "{tokens, plural, other {{n}. {name}（{when}）：約#トークン、{cost}未満}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyThenLocal"
-msgstr ""
+msgstr "{n}. {name}（{when}）：このコンピュータ上、外には何も送られません"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyThenModel"
-msgstr ""
+msgstr "{tokens, plural, other {{n}. {name}（{when}）：約#トークン、{cost}}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyThenSource"
-msgstr ""
+msgstr "{n}. {name}（{when}）：キー不要、費用なし"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyThenUnpriced"
-msgstr ""
+msgstr "{tokens, plural, other {{n}. {name}（{when}）：約#トークン}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyTotal"
@@ -3255,131 +3255,131 @@ msgstr "今のところ、{verb} を同じ行に並べられるのは同じ種�
 
 #. js-lingui-explicit-id
 msgid "enter.runChanged"
-msgstr ""
+msgstr "その間にプランが変わりました。もう一度確認してから、Enterを押してください"
 
 #. js-lingui-explicit-id
 msgid "enter.runCost"
-msgstr ""
+msgstr "送信は少なくとも{tokens, number}トークン、{cost}です。各ステップは、それまでの返答もあわせて送ります"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAll"
-msgstr ""
+msgstr "すべてのステップが実行されると、送信は少なくとも{tokens, number}トークン、{cost}です。各ステップは、それまでの返答もあわせて送ります"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAllCheap"
-msgstr ""
+msgstr "すべてのステップが実行されると、送信は少なくとも{tokens, number}トークン、{cost}未満です。各ステップは、それまでの返答もあわせて送ります"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAllUnpriced"
-msgstr ""
+msgstr "すべてのステップが実行されると、送信は少なくとも{tokens, number}トークンです。各ステップは、それまでの返答もあわせて送ります"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostCheap"
-msgstr ""
+msgstr "送信は少なくとも{tokens, number}トークン、{cost}未満です。各ステップは、それまでの返答もあわせて送ります"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostly"
-msgstr ""
+msgstr "送信に少なくとも{cost}かかります。警告するよう指定した{warn}を超えています。Enterでそのまま実行します"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostUnpriced"
-msgstr ""
+msgstr "送信は少なくとも{tokens, number}トークンです。各ステップは、それまでの返答もあわせて送ります"
 
 #. js-lingui-explicit-id
 msgid "enter.runDone"
-msgstr ""
+msgstr "プラン{num}の実行{run}が完了しました"
 
 #. js-lingui-explicit-id
 msgid "enter.runElsewhere"
-msgstr ""
+msgstr "プラン{num}は別のタブで実行中です"
 
 #. js-lingui-explicit-id
 msgid "enter.runFailed"
-msgstr ""
+msgstr "実行を開始できませんでした"
 
 #. js-lingui-explicit-id
 msgid "enter.runGone"
-msgstr ""
+msgstr "{address}のステップ{index}の送り先{name}は、もう提供されていません"
 
 #. js-lingui-explicit-id
 msgid "enter.runHead"
-msgstr ""
+msgstr "{count, plural, =1 {Enterで、{nums}のステップを1つ実行します（実行{run}）} other {Enterで、{nums}の#ステップを順番に実行します（実行{run}）}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runHeadMany"
-msgstr ""
+msgstr "Enterで、{nums}の{count, number}ステップを実行します（実行{run}）：ブランチどうしは並行して進み、各ブランチの中では1ステップずつ順番に実行します"
 
 #. js-lingui-explicit-id
 msgid "enter.runHeadNew"
-msgstr ""
+msgstr "{count, plural, =1 {Enterで実行{run}を作り、そこで{address}のステップを1つ実行します。ほかのブランチは待機します} other {Enterで実行{run}を作り、そこで{address}の#ステップを順番に実行します。ほかのブランチは待機します}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runHeld"
-msgstr ""
+msgstr "{address}は保留中です。hold:off {address} で保留を解除できます"
 
 #. js-lingui-explicit-id
 msgid "enter.runIf"
-msgstr ""
+msgstr "{count, plural, other {#ステップは、前のステップが失敗するか何も見つからなかった場合にだけ実行します}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runLater"
-msgstr ""
+msgstr "{address}のステップ{index}の送り先{name}は、まだ準備中です"
 
 #. js-lingui-explicit-id
 msgid "enter.runLocal"
-msgstr ""
+msgstr "このコンピュータで答えるステップは、外に何も送りません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNeedsKey"
-msgstr ""
+msgstr "{address}のステップ{index}の送り先{name}には、{provider}のキーが必要です。{command} で追加できます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNoSteps"
-msgstr ""
+msgstr "{address}には実行するステップがありません。new:step {address} で計画できます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNothing"
-msgstr ""
+msgstr "実行{run}には、実行できるステップがありません。new:step で計画できます"
 
 #. js-lingui-explicit-id
 msgid "enter.runPaused"
-msgstr ""
+msgstr "プラン{num}の実行{run}が終わりました。{nums}は中断しています。理由は{board}ボードに表示されます"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runPausedOnly"
-msgstr ""
+msgstr "{count, plural, other {{nums}は中断しているため、run: だけでは実行されません。run:{example} で、そのブランチを止まったところから続けられます}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runRunning"
-msgstr ""
+msgstr "{address}は実行中です。stop:{address} で止められます"
 
 #. js-lingui-explicit-id
 msgid "enter.runSkipped"
-msgstr ""
+msgstr "{count, plural, other {空の#ステップは飛ばします}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runStarted"
-msgstr ""
+msgstr "プラン{num}の実行{run}を開始しました。stop: で止められます"
 
 #. js-lingui-explicit-id
 msgid "enter.runTo"
-msgstr ""
+msgstr "送り先は{answering}です"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runUnchecked"
-msgstr ""
+msgstr "{address}のステップ{index}の送り先は、このコンピュータ上の{name}ですが、このページを開いてから{provider}の一覧で確認されていません。{command} で確認できます"
 
 #. js-lingui-explicit-id
 msgid "enter.runUndo"
-msgstr ""
+msgstr "取り消しは実行のところで止まります。実行で書かれたものは残ります"
 
 #. js-lingui-explicit-id
 msgid "enter.savedFailed"
@@ -3549,11 +3549,11 @@ msgstr "{word} という設定はありません。set: で指定できるのは
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.setWarn"
-msgstr ""
+msgstr "Enterで、実行の費用が{cost}以上のときは、run: のEnter行の先頭にその費用を示すようにします"
 
 #. js-lingui-explicit-id
 msgid "enter.setWarnOff"
-msgstr ""
+msgstr "Enterで、高額な実行の前の警告をやめます"
 
 #. js-lingui-explicit-id
 msgid "enter.showRoom"
@@ -3589,31 +3589,31 @@ msgstr "{source}に接続できませんでした。接続を確認してから�
 
 #. js-lingui-explicit-id
 msgid "enter.stopAll"
-msgstr ""
+msgstr "Enterで、すべてのウインドウのすべての実行と返答を止めます。済んだものはそのまま残り、その分の料金はかかります"
 
 #. js-lingui-explicit-id
 msgid "enter.stopBranch"
-msgstr ""
+msgstr "Enterで{address}を止めます。済んだものはそのまま残り、その分の料金はかかります。実行中のステップは、その場で止まります"
 
 #. js-lingui-explicit-id
 msgid "enter.stopDone"
-msgstr ""
+msgstr "止めました。済んだものはそのまま残ります"
 
 #. js-lingui-explicit-id
 msgid "enter.stopNone"
-msgstr ""
+msgstr "ここで実行中のものはありません"
 
 #. js-lingui-explicit-id
 msgid "enter.stopNothing"
-msgstr ""
+msgstr "{what}で実行中のものはありません"
 
 #. js-lingui-explicit-id
 msgid "enter.stopPlan"
-msgstr ""
+msgstr "Enterでプラン{num}を止めます。済んだものはそのまま残り、その分の料金はかかります。実行中のステップは、その場で止まります"
 
 #. js-lingui-explicit-id
 msgid "enter.stopReply"
-msgstr ""
+msgstr "Enterで、{num}に届いている途中の返答を止めます。届いた分は残ります"
 
 #. js-lingui-explicit-id
 msgid "enter.summarize"
@@ -3900,7 +3900,7 @@ msgstr "{board}では、type: に keyword、quote、note、highlight のいず�
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAtRun"
-msgstr ""
+msgstr "プラン{num}の実行{run}は開始済みで、取り消しはそこで止まります。プランはまだ自由に変更できます：new:run で計画し直せます"
 
 #. js-lingui-explicit-id
 msgid "enter.undoChanged"
@@ -5068,15 +5068,15 @@ msgstr "キーを追加"
 
 #. js-lingui-explicit-id
 msgid "picker.asBranch"
-msgstr ""
+msgstr "ブランチと同じ（現在は{name}）"
 
 #. js-lingui-explicit-id
 msgid "picker.cond"
-msgstr ""
+msgstr "{cond, select, nothing {何も見つからなければ実行} failed {前のものが失敗したら実行} always {結果にかかわらず実行} other {前のものが終わったら実行}}"
 
 #. js-lingui-explicit-id
 msgid "picker.condHelp"
-msgstr ""
+msgstr "{name}の実行条件。クリックで変更します"
 
 #. A source whose answers are in English whatever the reader's language (LPN §6)
 #. js-lingui-explicit-id
@@ -5085,7 +5085,7 @@ msgstr "英語のみ"
 
 #. js-lingui-explicit-id
 msgid "picker.forStep"
-msgstr ""
+msgstr "{address}のステップ{index}に答えるもの"
 
 #. js-lingui-explicit-id
 msgid "picker.kept30"
@@ -5157,7 +5157,7 @@ msgstr "ブランチが使えるようになるまで、答えるのは一度に
 
 #. js-lingui-explicit-id
 msgid "picker.order"
-msgstr ""
+msgstr "順序"
 
 #. OpenAlex's daily allowance (C156)
 #. js-lingui-explicit-id
@@ -5171,11 +5171,11 @@ msgstr "プレビュー"
 
 #. js-lingui-explicit-id
 msgid "picker.sequence"
-msgstr ""
+msgstr "順番に"
 
 #. js-lingui-explicit-id
 msgid "picker.sequenceHelp"
-msgstr ""
+msgstr "それぞれ前のものを待ち、条件を満たした場合にだけ実行します。"
 
 #. Stage 8 (C172 (c))
 #. js-lingui-explicit-id
@@ -5194,11 +5194,11 @@ msgstr "思考できる"
 
 #. js-lingui-explicit-id
 msgid "picker.together"
-msgstr ""
+msgstr "すべて同時に"
 
 #. js-lingui-explicit-id
 msgid "picker.togetherHelp"
-msgstr ""
+msgstr "それぞれから返答が1つずつ届き、番号順にスライダに並びます。"
 
 #. js-lingui-explicit-id
 msgid "picker.trainAlways"
@@ -5219,160 +5219,160 @@ msgstr "未確認"
 
 #. js-lingui-explicit-id
 msgid "plan.addBranch"
-msgstr ""
+msgstr "ブランチを追加"
 
 #. js-lingui-explicit-id
 msgid "plan.addStep"
-msgstr ""
+msgstr "{address}にステップを追加"
 
 #. A step’s model or room, when it is the branch’s own
 #. js-lingui-explicit-id
 msgid "plan.asBranch"
-msgstr ""
+msgstr "ブランチと同じ"
 
 #. js-lingui-explicit-id
 msgid "plan.beside"
-msgstr ""
+msgstr "実行{run}と実行{other}を並べて表示、違うところに印"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.besideOff"
-msgstr ""
+msgstr "diff:off で1つだけ表示"
 
 #. js-lingui-explicit-id
 msgid "plan.chat"
-msgstr ""
+msgstr "チャット{num}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.chatHelp"
-msgstr ""
+msgstr "open:{num} で開きます"
 
 #. When a step runs (C201)
 #. js-lingui-explicit-id
 msgid "plan.condition"
-msgstr ""
+msgstr "{condition, select, failed {前のステップが失敗したら実行} nothing {何も見つからなければ実行} always {結果にかかわらず実行} other {前のステップが終わったら実行}}"
 
 #. js-lingui-explicit-id
 msgid "plan.conditionHelp"
-msgstr ""
+msgstr "このステップの実行条件。クリックで変更します"
 
 #. js-lingui-explicit-id
 msgid "plan.counts"
-msgstr ""
+msgstr "{branches, plural, other {ブランチ#件}}、{steps, plural, =0 {ステップなし} other {#ステップ}}"
 
 #. js-lingui-explicit-id
 msgid "plan.deleteBranch"
-msgstr ""
+msgstr "{address}を削除"
 
 #. js-lingui-explicit-id
 msgid "plan.deleteStep"
-msgstr ""
+msgstr "{address}のステップ{index}を削除"
 
 #. Why a paused step stopped, or a waiting one did not run
 #. js-lingui-explicit-id
 msgid "plan.ended"
-msgstr ""
+msgstr "{why, select, stopped {停止} failed {失敗} stalled {ネットワークが返答を溜めた} left {タブが閉じた} unmet {条件を満たさなかった} other {中断}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.fixed"
-msgstr ""
+msgstr "このステップは実行{run}で開始済みのため、プロンプトは変更できません。new:run で計画し直せます"
 
 #. js-lingui-explicit-id
 msgid "plan.held"
-msgstr ""
+msgstr "{count, plural, other {保留中#件}}"
 
 #. The plan’s number, at the top of the Plan board
 #. js-lingui-explicit-id
 msgid "plan.label"
-msgstr ""
+msgstr "プラン{num}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.latest"
-msgstr ""
+msgstr "open:run {run} でプランを変更"
 
 #. js-lingui-explicit-id
 msgid "plan.newInRun"
-msgstr ""
+msgstr "実行{run}で追加"
 
 #. js-lingui-explicit-id
 msgid "plan.noChat"
-msgstr ""
+msgstr "実行するまでチャットなし"
 
 #. js-lingui-explicit-id
 msgid "plan.none"
-msgstr ""
+msgstr "ここにはまだプランがありません"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.noneHow"
-msgstr ""
+msgstr "open: とプランの番号で、ここに表示できます。new:plan で作れます"
 
 #. js-lingui-explicit-id
 msgid "plan.onlyIn"
-msgstr ""
+msgstr "実行{run}にはない"
 
 #. js-lingui-explicit-id
 msgid "plan.pip"
-msgstr ""
+msgstr "{reached, select, yes {実行{run}} other {実行{run}（このステップまで進まなかった）}}"
 
 #. js-lingui-explicit-id
 msgid "plan.pipHelp"
-msgstr ""
+msgstr "実行{run}を表示"
 
 #. js-lingui-explicit-id
 msgid "plan.record"
-msgstr ""
+msgstr "以前の実行（当時のまま）"
 
 #. js-lingui-explicit-id
 msgid "plan.runHead"
-msgstr ""
+msgstr "実行{run}"
 
 #. js-lingui-explicit-id
 msgid "plan.runOf"
-msgstr ""
+msgstr "実行{run}（全{runs}件）"
 
 #. js-lingui-explicit-id
 msgid "plan.statusDone"
-msgstr ""
+msgstr "完了"
 
 #. js-lingui-explicit-id
 msgid "plan.statusPaused"
-msgstr ""
+msgstr "中断"
 
 #. js-lingui-explicit-id
 msgid "plan.statusRunning"
-msgstr ""
+msgstr "実行中"
 
 #. js-lingui-explicit-id
 msgid "plan.statusWaiting"
-msgstr ""
+msgstr "待機中"
 
 #. js-lingui-explicit-id
 msgid "plan.step"
-msgstr ""
+msgstr "{address}のステップ{index}"
 
 #. js-lingui-explicit-id
 msgid "plan.steps"
-msgstr ""
+msgstr "{count, plural, =0 {まだステップなし} other {#ステップ}}"
 
 #. js-lingui-explicit-id
 msgid "plan.untitled"
-msgstr ""
+msgstr "無題のプラン"
 
 #. js-lingui-explicit-id
 msgid "plan.untitledBranch"
-msgstr ""
+msgstr "無題のブランチ"
 
 #. js-lingui-explicit-id
 msgid "plan.whoHelp"
-msgstr ""
+msgstr "{address}のステップ{index}に答えるもの。クリックで、答えられるものを表示します"
 
 #. js-lingui-explicit-id
 msgid "plan.write"
-msgstr ""
+msgstr "ステップを書く"
 
 #. js-lingui-explicit-id
 msgid "privacy.card"
@@ -5709,16 +5709,16 @@ msgstr "音声入力（使う場合）。"
 
 #. js-lingui-explicit-id
 msgid "settings.limitsHelp"
-msgstr ""
+msgstr "実際に利用を止める上限が必要なら、プロバイダごとに月の上限を設定してください。"
 
 #. js-lingui-explicit-id
 msgid "settings.limitsLabel"
-msgstr ""
+msgstr "利用上限"
 
 #. The hover text on a link to the page where the provider sets a spending limit
 #. js-lingui-explicit-id
 msgid "settings.limitsLink"
-msgstr ""
+msgstr "{provider}で月の上限を設定するページを、新しいタブで開きます"
 
 #. js-lingui-explicit-id
 msgid "settings.localBlocked"
@@ -5750,7 +5750,7 @@ msgstr "{count, plural, =0 {{month}の利用はまだありません。} other {
 
 #. js-lingui-explicit-id
 msgid "settings.monthSpentRuns"
-msgstr ""
+msgstr "{month}の利用額は{cost}です。内訳は{runs, plural, other {プランの実行#件}}{count, plural, =0 {で、単独のチャットはありません} other {と単独のチャット#件です}}。トークン数からの概算で、正式な額はプロバイダの請求書で確認できます。"
 
 #. js-lingui-explicit-id
 msgid "settings.monthUnknown"
@@ -5898,11 +5898,11 @@ msgstr "新しいチャットのルーム"
 
 #. js-lingui-explicit-id
 msgid "settings.runRow"
-msgstr ""
+msgstr "実行{run}"
 
 #. js-lingui-explicit-id
 msgid "settings.runRowHelp"
-msgstr ""
+msgstr "プラン{num}の実行{run}を{board}ボードに表示します"
 
 #. js-lingui-explicit-id
 msgid "settings.sources"
@@ -5998,15 +5998,15 @@ msgstr "無題"
 
 #. js-lingui-explicit-id
 msgid "settings.warnHelp"
-msgstr ""
+msgstr "これを超えると、Enterを押す前に、バーの下の行の先頭に実行の費用を示します。"
 
 #. js-lingui-explicit-id
 msgid "settings.warnLabel"
-msgstr ""
+msgstr "高額な実行の前に警告"
 
 #. js-lingui-explicit-id
 msgid "settings.warnOff"
-msgstr ""
+msgstr "オフ"
 
 #. Marginalia on the board the navy rule is on
 #. js-lingui-explicit-id
@@ -6264,7 +6264,7 @@ msgstr "プランを費用で表示する"
 
 #. js-lingui-explicit-id
 msgid "verb.delete"
-msgstr ""
+msgstr "番号で指定したものを削除する。送信済みのものは、2回目のEnterで完全に削除されます"
 
 #. js-lingui-explicit-id
 msgid "verb.device"
@@ -6272,7 +6272,7 @@ msgstr "ルームを何向けに作るかを指定する"
 
 #. js-lingui-explicit-id
 msgid "verb.diff"
-msgstr "開いている実行の違いに印を付ける"
+msgstr "プランの2つの実行を並べ、違いに印を付ける"
 
 #. js-lingui-explicit-id
 msgid "verb.done"

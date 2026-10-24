@@ -59,7 +59,7 @@ msgstr "Mitään ei ole vielä tehty. p> aloittaa ensimmäisen keskustelusi, ja 
 #. Marginalia on a note, keyword or quote kept when its chat was deleted for good
 #. js-lingui-explicit-id
 msgid "almanac.erasedFrom"
-msgstr "keskustelusta {num}, pyyhitty"
+msgstr "keskustelusta {num}, poistettu"
 
 #. js-lingui-explicit-id
 msgid "almanac.filtersLabel"
@@ -387,7 +387,7 @@ msgstr "Vaikutusanalyysi"
 
 #. js-lingui-explicit-id
 msgid "block.steps"
-msgstr ""
+msgstr "Vaihelista"
 
 #. js-lingui-explicit-id
 msgid "block.summary-dashboard"
@@ -459,7 +459,7 @@ msgstr "Kun lähetät luonnoksen, etsii kohdat, joissa sen osat ovat ristiriidas
 
 #. js-lingui-explicit-id
 msgid "blockAbout.steps"
-msgstr ""
+msgstr "Suunnitelman vaiheet tämän huoneen keskustelua seuraten. Koko suunnitelmalla on oma taulunsa."
 
 #. js-lingui-explicit-id
 msgid "blockAbout.summary-dashboard"
@@ -475,31 +475,31 @@ msgstr "Keskustelun otsikot, joiden avulla voit hypätä mihin tahansa kohtaan."
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsEmpty"
-msgstr ""
+msgstr "vaihe, jota ei ole vielä kirjoitettu"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsFollowing"
-msgstr ""
+msgstr "seuraa tätä keskustelua, {address}"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsNoChat"
-msgstr ""
+msgstr "Tässä huoneessa ei ole vielä keskustelua, joten vaiheitakaan ei ole"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsNoPlan"
-msgstr ""
+msgstr "Täällä ei ole suunnitelmaa numerolla {num}"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsPinned"
-msgstr ""
+msgstr "suunnitelma {num}, kiinnitetty"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsSent"
-msgstr ""
+msgstr "lähetetty, näkyy keskustelussaan"
 
 #. js-lingui-explicit-id
 msgid "blocks.stepsWhole"
-msgstr ""
+msgstr "näyttää koko suunnitelman"
 
 #. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
@@ -577,7 +577,7 @@ msgstr "konteksti {share, number, percent} → alle {low, number, percent}"
 
 #. js-lingui-explicit-id
 msgid "branches.didNotRun"
-msgstr ""
+msgstr "jäi ajamatta"
 
 #. js-lingui-explicit-id
 msgid "branches.label"
@@ -609,15 +609,15 @@ msgstr "haara"
 
 #. js-lingui-explicit-id
 msgid "branches.unmet"
-msgstr ""
+msgstr "Se jäi ajamatta: sen ehto ei täyttynyt."
 
 #. js-lingui-explicit-id
 msgid "branches.waiting"
-msgstr ""
+msgstr "odottaa"
 
 #. js-lingui-explicit-id
 msgid "branches.waitingRuns"
-msgstr ""
+msgstr "{cond, select, nothing {Odottaa. Se ajetaan, jos ennen sitä ei löydy mitään.} failed {Odottaa. Se ajetaan, jos edellinen epäonnistuu.} always {Odottaa. Se ajetaan edellisestä riippumatta.} other {Odottaa. Se ajetaan, kun edellinen on valmis.}}"
 
 #. js-lingui-explicit-id
 msgid "branches.withHistory"
@@ -894,11 +894,11 @@ msgstr "Sen sisällössä ei ole vielä muistiinpanoja, avainsanoja eikä lainau
 
 #. js-lingui-explicit-id
 msgid "collection.erased"
-msgstr "{what, select, chat {keskustelu {num}, pyyhitty} plan {suunnitelma {num}, pyyhitty} message {viesti, pyyhitty} other {{num}, pyyhitty}}"
+msgstr "{what, select, chat {keskustelu {num}, poistettu} plan {suunnitelma {num}, poistettu} message {viesti, poistettu} other {{num}, poistettu}}"
 
 #. js-lingui-explicit-id
 msgid "collection.erasedFrom"
-msgstr "keskustelusta {num}, pyyhitty"
+msgstr "keskustelusta {num}, poistettu"
 
 #. The collection favourites became (C20)
 #. js-lingui-explicit-id
@@ -1081,7 +1081,7 @@ msgstr "keskustelusta {num}"
 #. Where it came from: a chat that was deleted for good
 #. js-lingui-explicit-id
 msgid "copy.fromErased"
-msgstr "keskustelusta {num}, pyyhitty"
+msgstr "keskustelusta {num}, poistettu"
 
 #. js-lingui-explicit-id
 msgid "copy.keywords"
@@ -1316,7 +1316,7 @@ msgstr "{count, plural, other {Enter valitsee täällä seuraavan kehotteesi vas
 
 #. js-lingui-explicit-id
 msgid "enter.byManyThen"
-msgstr ""
+msgstr "{count, plural, other {Enter valitsee täällä seuraavan kehotteesi vastaajiksi peräkkäin, kunkin omaksi haarakseen: {answering}. Ensimmäisen jälkeen kukin ajetaan vain, jos sen ehto täyttyy}}"
 
 #. js-lingui-explicit-id
 msgid "enter.byMost"
@@ -1354,7 +1354,7 @@ msgstr "Yksi kehote usealle vastaajalle tulee haarojen myötä. Valitse toistais
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.byThen"
-msgstr ""
+msgstr "Kirjoita sana then kunkin nimen väliin, esimerkiksi by:wikipedia then sonnet"
 
 #. {names} is a list joined with "or"
 #. js-lingui-explicit-id
@@ -1620,53 +1620,53 @@ msgstr "{verb} hyväksyy esimerkiksi 7d, 3w, kuukauden tai päivämäärän muod
 #. After the first Enter of a delete undo cannot take back (C199)
 #. js-lingui-explicit-id
 msgid "enter.deleteAgain"
-msgstr ""
+msgstr "{count, plural, one {Toinen Enter poistaa sen pysyvästi. Escape säilyttää sen} other {Toinen Enter poistaa ne pysyvästi. Escape säilyttää ne}}"
 
 #. js-lingui-explicit-id
 msgid "enter.deleteApart"
-msgstr ""
+msgstr "Poista se, mitä ei ole lähetetty, omalla rivillään"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteBranch"
-msgstr ""
+msgstr "Enter poistaa haaran {address}, jota ei ole koskaan ajettu, suunnitelman {num} kaikista ajoista. undo: tuo sen takaisin"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedBranch"
-msgstr ""
+msgstr "Haara {address} on poistettu. undo: tuo sen takaisin"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedPlan"
-msgstr ""
+msgstr "Suunnitelma {num} on poistettu. undo: tuo sen takaisin"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedStep"
-msgstr ""
+msgstr "Haaran {address} vaihe {index} on poistettu. undo: tuo sen takaisin"
 
 #. js-lingui-explicit-id
 msgid "enter.deleteEverything"
-msgstr ""
+msgstr "”Poista kaikki” on painike taulun {board} alaosassa. Enter avaa sen siellä"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletePlan"
-msgstr ""
+msgstr "Enter poistaa suunnitelman {num}, jossa ei ole vielä keskustelua. undo: tuo sen takaisin"
 
 #. js-lingui-explicit-id
 msgid "enter.deletePlanToo"
-msgstr ""
+msgstr "Se on suunnitelman viimeinen haara, joten myös suunnitelma {num} poistuu"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deleteStep"
-msgstr ""
+msgstr "Enter poistaa haaran {address} vaiheen {index} ajossa {run}. undo: tuo sen takaisin"
 
 #. js-lingui-explicit-id
 msgid "enter.deleteStepStarted"
-msgstr ""
+msgstr "Haaran {address} vaihe {index} on alkanut, joten se säilyy keskustelussaan"
 
 #. js-lingui-explicit-id
 msgid "enter.didYouMean"
@@ -1674,30 +1674,30 @@ msgstr "Komentoa {verb} ei ole. Tarkoititko {near}?"
 
 #. js-lingui-explicit-id
 msgid "enter.diffHere"
-msgstr ""
+msgstr "Ajo {other} on jo ajon {run} rinnalla"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.diffNone"
-msgstr ""
+msgstr "Mitään ei verrata. diff: asettaa kaksi ajoa rinnakkain"
 
 #. js-lingui-explicit-id
 msgid "enter.diffOff"
-msgstr ""
+msgstr "Enter näyttää taas pelkän ajon {run}"
 
 #. js-lingui-explicit-id
 msgid "enter.diffOn"
-msgstr ""
+msgstr "Enter asettaa ajon {other} ajon {run} rinnalle ja merkitsee erot musteella"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.diffOneRun"
-msgstr ""
+msgstr "Suunnitelmalla {num} on yksi ajo. new:run luo toisen vertailtavaksi"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.diffSame"
-msgstr ""
+msgstr "Se on ajo {run}, joka on jo taulussa. diff: ja toinen ajo vertaa niitä"
 
 #. js-lingui-explicit-id
 msgid "enter.elsewhere"
@@ -1713,11 +1713,11 @@ msgstr "Vastaus on vielä tulossa: {nums}. Odota sitä tai pysäytä se ensin"
 
 #. js-lingui-explicit-id
 msgid "enter.erased"
-msgstr "Pyyhitty pysyvästi: {nums}"
+msgstr "Poistettu pysyvästi: {nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseFailed"
-msgstr "Mitään ei pyyhitty. Yritä uudelleen"
+msgstr "Mitään ei poistettu. Yritä uudelleen"
 
 #. A number and the start of its title or words, in the language's quotation marks
 #. js-lingui-explicit-id
@@ -1726,7 +1726,7 @@ msgstr "{num} ”{title}”"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseItems"
-msgstr "Enter pyyhkii pysyvästi: {erasing}"
+msgstr "Enter ja sen jälkeen toinen Enter poistavat pysyvästi: {erasing}"
 
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksGo"
@@ -1735,7 +1735,7 @@ msgstr "{count, plural, one {Myös # muistiinpano, avainsana tai lainaus poistuu
 #. all stays English: it is a word of the command
 #. js-lingui-explicit-id
 msgid "enter.eraseMarksStay"
-msgstr "{count, plural, one {# muistiinpano, avainsana tai lainaus säilyy, merkittynä pyyhitystä keskustelusta peräisin olevaksi. Lisää all, niin sekin pyyhitään} other {# muistiinpanoa, avainsanaa ja lainausta säilyy, merkittyinä pyyhitystä keskustelusta peräisin oleviksi. Lisää all, niin nekin pyyhitään}}"
+msgstr "{count, plural, one {# muistiinpano, avainsana tai lainaus säilyy, merkittynä poistetusta keskustelusta peräisin olevaksi. Lisää all, niin sekin poistetaan} other {# muistiinpanoa, avainsanaa ja lainausta säilyy, merkittyinä poistetusta keskustelusta peräisin oleviksi. Lisää all, niin nekin poistetaan}}"
 
 #. js-lingui-explicit-id
 msgid "enter.erasePlanGoes"
@@ -2202,12 +2202,12 @@ msgstr "Kaikkia haaroja ei voitu tehdä, joten mitään ei lähetetty. Yritä uu
 
 #. js-lingui-explicit-id
 msgid "enter.manyUnmet"
-msgstr ""
+msgstr "{count, plural, one {{nums} jäi ajamatta: sen ehto ei täyttynyt} other {{nums} jäivät ajamatta: niiden ehdot eivät täyttyneet}}"
 
 #. When one of several sent one after another runs
 #. js-lingui-explicit-id
 msgid "enter.manyWhen"
-msgstr ""
+msgstr "{cond, select, nothing {jos mitään ei löydy} failed {jos edellinen epäonnistuu} always {edellisestä riippumatta} other {kun edellinen on valmis}}"
 
 #. js-lingui-explicit-id
 msgid "enter.moveBoard"
@@ -2388,7 +2388,7 @@ msgstr "Enter näyttää haaran {address} koko historioineen tässä huoneessa. 
 
 #. js-lingui-explicit-id
 msgid "enter.openBranchUnrun"
-msgstr ""
+msgstr "Haaraa {address} ei ole vielä ajettu. Enter näyttää sen vaiheet taulussa {board}"
 
 #. js-lingui-explicit-id
 msgid "enter.openChat"
@@ -2420,11 +2420,11 @@ msgstr "Tämän avaaminen tulee myöhemmin. inspect:{num} näyttää sen nyt"
 
 #. js-lingui-explicit-id
 msgid "enter.openPlan"
-msgstr ""
+msgstr "Enter avaa suunnitelman {num} taulussa {board}"
 
 #. js-lingui-explicit-id
 msgid "enter.openPlanHere"
-msgstr ""
+msgstr "Suunnitelma {num} on taulussa {board}. Enter kohdistaa palkin siihen"
 
 #. js-lingui-explicit-id
 msgid "enter.openPopped"
@@ -2544,155 +2544,155 @@ msgstr "Enter kiinnittää ylös: {nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.planBranchDone"
-msgstr ""
+msgstr "Haara {address} on lisätty. Sillä ei ole keskustelua ennen kuin se ajetaan"
 
 #. js-lingui-explicit-id
 msgid "enter.planBranchNew"
-msgstr ""
+msgstr "Enter lisää haaran {address} suunnitelmaan {num}. Sillä ei ole keskustelua ennen kuin se ajetaan. Mitään ei lähetetä"
 
 #. js-lingui-explicit-id
 msgid "enter.planChanged"
-msgstr ""
+msgstr "Suunnitelma muuttui sillä välin. Katso uudelleen ja paina sitten Enter"
 
 #. js-lingui-explicit-id
 msgid "enter.planFailed"
-msgstr ""
+msgstr "Suunnitelmaa ei voitu muuttaa"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planFixed"
-msgstr ""
+msgstr "Vaihe on alkanut, joten sitä ei voi enää muuttaa. new:run suunnittelee sen uudelleen"
 
 #. js-lingui-explicit-id
 msgid "enter.planHoldAlready"
-msgstr ""
+msgstr "Jo pidossa: {nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.planHoldEmpty"
-msgstr ""
+msgstr "Haarassa {address} ei ole suunniteltuja vaiheita, joita voisi asettaa pitoon"
 
 #. js-lingui-explicit-id
 msgid "enter.planHoldNot"
-msgstr ""
+msgstr "Ei pidossa: {nums}"
 
 #. js-lingui-explicit-id
 msgid "enter.planHoldOff"
-msgstr ""
+msgstr "Enter vapauttaa taas pidosta ajossa {run}: {nums}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planHoldOn"
-msgstr ""
+msgstr "Enter asettaa pitoon ajossa {run}: {nums}. Niiden vaiheet odottavat komentoon hold:off asti"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planHoldRunning"
-msgstr ""
+msgstr "{address} on käynnissä. stop:{address} pysäyttää sen"
 
 #. js-lingui-explicit-id
 msgid "enter.planMove"
-msgstr ""
+msgstr "{where, select, after {Enter siirtää haaran {address} haaran {other} jälkeen} other {Enter siirtää haaran {address} ennen haaraa {other}}}. Haara säilyttää kirjaimensa"
 
 #. js-lingui-explicit-id
 msgid "enter.planMoveSame"
-msgstr ""
+msgstr "Haaraa {address} ei voi siirtää itsensä viereen"
 
 #. js-lingui-explicit-id
 msgid "enter.planMoveThere"
-msgstr ""
+msgstr "{where, select, after {{address} on jo haaran {other} jälkeen} other {{address} on jo ennen haaraa {other}}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planMoveWhich"
-msgstr ""
+msgstr "Nimeä saman suunnitelman kaksi haaraa, esimerkiksi move:201c after 201a"
 
 #. js-lingui-explicit-id
 msgid "enter.planNew"
-msgstr ""
+msgstr "Enter luo tyhjän suunnitelman ja avaa sen taulussa {board}. Mitään ei lähetetä"
 
 #. js-lingui-explicit-id
 msgid "enter.planNewDone"
-msgstr ""
+msgstr "Suunnitelma {num} on luotu, eikä siinä ole vielä mitään"
 
 #. js-lingui-explicit-id
 msgid "enter.planNewTitled"
-msgstr ""
+msgstr "Enter luo tyhjän suunnitelman ”{title}” ja avaa sen taulussa {board}. Mitään ei lähetetä"
 
 #. js-lingui-explicit-id
 msgid "enter.planNoBranch"
-msgstr ""
+msgstr "Haaraa {address} ei ole ajossa {run}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNone"
-msgstr ""
+msgstr "Taulussa {board} ei ole suunnitelmaa. open: ja suunnitelman numero näyttää sellaisen, tai new:plan luo sellaisen"
 
 #. js-lingui-explicit-id
 msgid "enter.planNoStep"
-msgstr ""
+msgstr "Haarassa {address} ei ole vaihetta {index} ajossa {run}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planNotShown"
-msgstr ""
+msgstr "Suunnitelma {num} ei ole taulussa {board}. open:{num} näyttää sen"
 
 #. js-lingui-explicit-id
 msgid "enter.planOnePlan"
-msgstr ""
+msgstr "Nimeä kerralla vain yhden suunnitelman haaroja"
 
 #. js-lingui-explicit-id
 msgid "enter.planPromptEmpty"
-msgstr ""
+msgstr "Kirjoita vaihe. Enter lisää sen haaran {address} vaiheeksi {index}. Mitään ei lähetetä"
 
 #. js-lingui-explicit-id
 msgid "enter.planPromptStep"
-msgstr ""
+msgstr "Enter lisää tämän haaran {address} vaiheeksi {index} ajossa {run}. Mitään ei lähetetä"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planRecord"
-msgstr ""
+msgstr "Ajo {run} on aiempi ajo, joka säilytetään ennallaan. open:run {latest}, niin voit muuttaa suunnitelmaa"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunDone"
-msgstr ""
+msgstr "Ajo {n} on luotu. Mikään ei ole alkanut"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunHere"
-msgstr ""
+msgstr "Ajo {run} on jo taulussa {board}"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunNew"
-msgstr ""
+msgstr "Enter luo ajon {from} pohjalta suunnitelman {num} ajon {next}: kaikki vaiheet suunnitellaan uudelleen, eikä mikään ala. Mitään ei lähetetä"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunNone"
-msgstr ""
+msgstr "{runs, plural, one {Suunnitelmalla {num} on yksi ajo} other {Suunnitelmalla {num} on # ajoa}}"
 
 #. js-lingui-explicit-id
 msgid "enter.planRunOpen"
-msgstr ""
+msgstr "Enter näyttää suunnitelman {num} ajon {run}"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepAdd"
-msgstr ""
+msgstr "Enter lisää vaiheen {index} haaraan {address} ajossa {run}. Mitään ei lähetetä"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepDone"
-msgstr ""
+msgstr "Vaihe {index} on suunniteltu haaraan {address}. Mitään ei lähetetty"
 
 #. js-lingui-explicit-id
 msgid "enter.planStepEmpty"
-msgstr ""
+msgstr "Enter lisää tyhjän vaiheen {index} haaraan {address} ajossa {run}, kirjoitettavaksi taulussa. Mitään ei lähetetä"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.planStepHeld"
-msgstr ""
+msgstr "{address} on pidossa, joten vaihekin odottaa. hold:off {address} vapauttaa ne"
 
 #. js-lingui-explicit-id
 msgid "enter.planWhichBranch"
-msgstr ""
+msgstr "Mikä haara? Valitse se taulussa {board} tai nimeä se, esimerkiksi {example}"
 
 #. js-lingui-explicit-id
 msgid "enter.popAlready"
@@ -2809,7 +2809,7 @@ msgstr "{count, plural, one {{nums} on lainaus, joka on tähän asti pidetty mal
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptBranchRunning"
-msgstr ""
+msgstr "{address} on käynnissä. stop:{address} tai odota"
 
 #. js-lingui-explicit-id
 msgid "enter.promptBusy"
@@ -2919,15 +2919,15 @@ msgstr "{tokens, plural, one {{n}. {name}, noin # tokeni, hinta {cost}} other {{
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrder"
-msgstr ""
+msgstr "{count, plural, other {Enter lähettää tämän yhden kehotteen # vastaanottajalle peräkkäin, kunkin vastauksen omaksi haarakseen. Ensimmäisen jälkeen kukin ajetaan vain, jos sen ehto täyttyy}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrderTotal"
-msgstr ""
+msgstr "{count, plural, other {Enter lähettää tämän yhden kehotteen # vastaanottajalle peräkkäin, kunkin vastauksen omaksi haarakseen: yhteensä enintään {cost}, jos jokainen ajetaan}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyOrderTotalCheap"
-msgstr ""
+msgstr "{count, plural, other {Enter lähettää tämän yhden kehotteen # vastaanottajalle peräkkäin, kunkin vastauksen omaksi haarakseen: yhteensä alle {cost}, jos jokainen ajetaan}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManySource"
@@ -2935,23 +2935,23 @@ msgstr "{n}. {name}, ei avainta, ei kuluja"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyThenCheap"
-msgstr ""
+msgstr "{tokens, plural, one {{n}. {name}, {when}: noin # tokeni, hinta alle {cost}} other {{n}. {name}, {when}: noin # tokenia, hinta alle {cost}}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyThenLocal"
-msgstr ""
+msgstr "{n}. {name}, {when}: tällä koneella, mitään ei lähde koneelta"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyThenModel"
-msgstr ""
+msgstr "{tokens, plural, one {{n}. {name}, {when}: noin # tokeni, hinta {cost}} other {{n}. {name}, {when}: noin # tokenia, hinta {cost}}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyThenSource"
-msgstr ""
+msgstr "{n}. {name}, {when}: ei avainta, ei kuluja"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyThenUnpriced"
-msgstr ""
+msgstr "{tokens, plural, one {{n}. {name}, {when}: noin # tokeni} other {{n}. {name}, {when}: noin # tokenia}}"
 
 #. js-lingui-explicit-id
 msgid "enter.promptManyTotal"
@@ -3255,131 +3255,131 @@ msgstr "{verb} jakaa rivin toistaiseksi vain samankaltaisten komentojen kanssa"
 
 #. js-lingui-explicit-id
 msgid "enter.runChanged"
-msgstr ""
+msgstr "Suunnitelma muuttui sillä välin. Katso uudelleen ja paina sitten Enter"
 
 #. js-lingui-explicit-id
 msgid "enter.runCost"
-msgstr ""
+msgstr "Lähetetään vähintään {tokens, number} tokenia, hinta vähintään {cost}. Jokainen vaihe lähettää myös sitä edeltävät vastaukset"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAll"
-msgstr ""
+msgstr "Jos jokainen vaihe ajetaan, lähetetään vähintään {tokens, number} tokenia, hinta vähintään {cost}. Jokainen vaihe lähettää myös sitä edeltävät vastaukset"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAllCheap"
-msgstr ""
+msgstr "Jos jokainen vaihe ajetaan, lähetetään vähintään {tokens, number} tokenia, hinta alle {cost}. Jokainen vaihe lähettää myös sitä edeltävät vastaukset"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostAllUnpriced"
-msgstr ""
+msgstr "Jos jokainen vaihe ajetaan, lähetetään vähintään {tokens, number} tokenia. Jokainen vaihe lähettää myös sitä edeltävät vastaukset"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostCheap"
-msgstr ""
+msgstr "Lähetetään vähintään {tokens, number} tokenia, hinta alle {cost}. Jokainen vaihe lähettää myös sitä edeltävät vastaukset"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostly"
-msgstr ""
+msgstr "Lähettäminen maksaa vähintään {cost}: enemmän kuin {warn}, jonka kohdalla pyysit varoitusta. Enter ajaa sen silti"
 
 #. js-lingui-explicit-id
 msgid "enter.runCostUnpriced"
-msgstr ""
+msgstr "Lähetetään vähintään {tokens, number} tokenia. Jokainen vaihe lähettää myös sitä edeltävät vastaukset"
 
 #. js-lingui-explicit-id
 msgid "enter.runDone"
-msgstr ""
+msgstr "Suunnitelman {num} ajo {run} on valmis"
 
 #. js-lingui-explicit-id
 msgid "enter.runElsewhere"
-msgstr ""
+msgstr "Suunnitelma {num} on käynnissä toisessa välilehdessä"
 
 #. js-lingui-explicit-id
 msgid "enter.runFailed"
-msgstr ""
+msgstr "Ajoa ei voitu aloittaa"
 
 #. js-lingui-explicit-id
 msgid "enter.runGone"
-msgstr ""
+msgstr "Haaran {address} vaihe {index} menee vastaajalle {name}, joka ei ole enää tarjolla"
 
 #. js-lingui-explicit-id
 msgid "enter.runHead"
-msgstr ""
+msgstr "{count, plural, one {Enter ajaa yhden vaiheen haarasta {nums} ajossa {run}} other {Enter ajaa # vaihetta haarasta {nums} peräkkäin ajossa {run}}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runHeadMany"
-msgstr ""
+msgstr "Enter ajaa {count, number} vaihetta ajossa {run}: haarat {nums} rinnakkain, kunkin vaiheet peräkkäin"
 
 #. js-lingui-explicit-id
 msgid "enter.runHeadNew"
-msgstr ""
+msgstr "{count, plural, one {Enter luo ajon {run} ja ajaa siinä yhden vaiheen haarasta {address}. Muut haarat odottavat} other {Enter luo ajon {run} ja ajaa siinä # vaihetta haarasta {address} peräkkäin. Muut haarat odottavat}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runHeld"
-msgstr ""
+msgstr "{address} on pidossa. hold:off {address} vapauttaa sen"
 
 #. js-lingui-explicit-id
 msgid "enter.runIf"
-msgstr ""
+msgstr "{count, plural, one {Yksi vaihe ajetaan vain, jos edellinen epäonnistuu tai ei löydä mitään} other {# vaihetta ajetaan vain, jos edellinen epäonnistuu tai ei löydä mitään}}"
 
 #. js-lingui-explicit-id
 msgid "enter.runLater"
-msgstr ""
+msgstr "Haaran {address} vaihe {index} menee vastaajalle {name}, joka ei ole vielä valmis"
 
 #. js-lingui-explicit-id
 msgid "enter.runLocal"
-msgstr ""
+msgstr "Vaiheista, joihin vastataan tällä koneella, ei lähde mitään koneelta"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNeedsKey"
-msgstr ""
+msgstr "Haaran {address} vaihe {index} menee vastaajalle {name}, joka tarvitsee avaimen palveluun {provider}. {command} lisää sen"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNoSteps"
-msgstr ""
+msgstr "Haarassa {address} ei ole ajettavia vaiheita. new:step {address} suunnittelee sellaisen"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runNothing"
-msgstr ""
+msgstr "Ajossa {run} ei ole mitään valmiina ajettavaksi. new:step suunnittelee vaiheen"
 
 #. js-lingui-explicit-id
 msgid "enter.runPaused"
-msgstr ""
+msgstr "Suunnitelman {num} ajo {run} päättyi. Keskeytyi: {nums}; taulu {board} kertoo syyn"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runPausedOnly"
-msgstr ""
+msgstr "{count, plural, one {{nums} keskeytyi, joten pelkkä run: jättää sen väliin. run:{example} jatkaa siitä, mihin se pysähtyi} other {{nums} keskeytyivät, joten pelkkä run: jättää ne väliin. run:{example} jatkaa yhtä niistä siitä, mihin se pysähtyi}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runRunning"
-msgstr ""
+msgstr "{address} on käynnissä. stop:{address} pysäyttää sen"
 
 #. js-lingui-explicit-id
 msgid "enter.runSkipped"
-msgstr ""
+msgstr "{count, plural, one {Yksi tyhjä vaihe ohitetaan} other {# tyhjää vaihetta ohitetaan}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runStarted"
-msgstr ""
+msgstr "Suunnitelman {num} ajo {run} on alkanut. stop: pysäyttää sen"
 
 #. js-lingui-explicit-id
 msgid "enter.runTo"
-msgstr ""
+msgstr "Vastaajat: {answering}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.runUnchecked"
-msgstr ""
+msgstr "Haaran {address} vaihe {index} menee tällä koneella olevalle mallille {name}, jota {provider} ei ole listannut sivun avaamisen jälkeen. {command} tarkistaa"
 
 #. js-lingui-explicit-id
 msgid "enter.runUndo"
-msgstr ""
+msgstr "Kumoaminen pysähtyy ajoon: sen kirjoittama säilyy"
 
 #. js-lingui-explicit-id
 msgid "enter.savedFailed"
@@ -3549,11 +3549,11 @@ msgstr "Asetusta {word} ei ole. set: hyväksyy vaihtoehdot {words}"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.setWarn"
-msgstr ""
+msgstr "Enter saa komennon run: kertomaan ensin ajon hinnan, kun se on {cost} tai enemmän"
 
 #. js-lingui-explicit-id
 msgid "enter.setWarnOff"
-msgstr ""
+msgstr "Enter lopettaa varoittamisen ennen kallista ajoa"
 
 #. js-lingui-explicit-id
 msgid "enter.showRoom"
@@ -3589,31 +3589,31 @@ msgstr "Lähteeseen {source} ei saatu yhteyttä. Tarkista yhteys ja yritä uudel
 
 #. js-lingui-explicit-id
 msgid "enter.stopAll"
-msgstr ""
+msgstr "Enter pysäyttää kaikki ajot ja vastaukset kaikissa ikkunoissa. Tehty pysyy tehtynä ja maksettuna"
 
 #. js-lingui-explicit-id
 msgid "enter.stopBranch"
-msgstr ""
+msgstr "Enter pysäyttää haaran {address}. Tehty pysyy tehtynä ja maksettuna; nyt käynnissä oleva vaihe pysähtyy siihen, missä se on"
 
 #. js-lingui-explicit-id
 msgid "enter.stopDone"
-msgstr ""
+msgstr "Pysäytetty. Tehty pysyy tehtynä"
 
 #. js-lingui-explicit-id
 msgid "enter.stopNone"
-msgstr ""
+msgstr "Täällä ei ole mitään käynnissä"
 
 #. js-lingui-explicit-id
 msgid "enter.stopNothing"
-msgstr ""
+msgstr "Kohteessa {what} ei ole mitään käynnissä"
 
 #. js-lingui-explicit-id
 msgid "enter.stopPlan"
-msgstr ""
+msgstr "Enter pysäyttää suunnitelman {num}. Tehty pysyy tehtynä ja maksettuna; nyt käynnissä olevat vaiheet pysähtyvät siihen, missä ne ovat"
 
 #. js-lingui-explicit-id
 msgid "enter.stopReply"
-msgstr ""
+msgstr "Enter pysäyttää keskusteluun {num} saapuvan vastauksen. Saapunut osa säilytetään"
 
 #. js-lingui-explicit-id
 msgid "enter.summarize"
@@ -3900,7 +3900,7 @@ msgstr "Taulussa {board} type: hyväksyy yhden näistä: keyword, quote, note ta
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.undoAtRun"
-msgstr ""
+msgstr "Suunnitelman {num} ajo {run} on alkanut, ja kumoaminen pysähtyy siihen. Voit yhä muuttaa suunnitelmaa: new:run suunnittelee sen uudelleen"
 
 #. js-lingui-explicit-id
 msgid "enter.undoChanged"
@@ -5068,15 +5068,15 @@ msgstr "lisää avain"
 
 #. js-lingui-explicit-id
 msgid "picker.asBranch"
-msgstr ""
+msgstr "Sama kuin haaralla, nyt {name}"
 
 #. js-lingui-explicit-id
 msgid "picker.cond"
-msgstr ""
+msgstr "{cond, select, nothing {ajetaan, jos mitään ei löydy} failed {ajetaan, jos edellinen epäonnistuu} always {ajetaan joka tapauksessa} other {ajetaan, kun edellinen on valmis}}"
 
 #. js-lingui-explicit-id
 msgid "picker.condHelp"
-msgstr ""
+msgstr "Milloin {name} ajetaan. Napsautus vaihtaa sen"
 
 #. A source whose answers are in English whatever the reader's language (LPN §6)
 #. js-lingui-explicit-id
@@ -5085,7 +5085,7 @@ msgstr "vain englanniksi"
 
 #. js-lingui-explicit-id
 msgid "picker.forStep"
-msgstr ""
+msgstr "Kuka vastaa haaran {address} vaiheeseen {index}"
 
 #. js-lingui-explicit-id
 msgid "picker.kept30"
@@ -5157,7 +5157,7 @@ msgstr "Yksi vastaa kerrallaan, kunnes haarat ovat käytössä."
 
 #. js-lingui-explicit-id
 msgid "picker.order"
-msgstr ""
+msgstr "Järjestys"
 
 #. OpenAlex's daily allowance (C156)
 #. js-lingui-explicit-id
@@ -5171,11 +5171,11 @@ msgstr "esiversio"
 
 #. js-lingui-explicit-id
 msgid "picker.sequence"
-msgstr ""
+msgstr "Peräkkäin"
 
 #. js-lingui-explicit-id
 msgid "picker.sequenceHelp"
-msgstr ""
+msgstr "Kukin odottaa edellistä, ja se ajetaan vain, jos sen ehto täyttyy."
 
 #. Stage 8 (C172 (c))
 #. js-lingui-explicit-id
@@ -5194,11 +5194,11 @@ msgstr "osaa miettiä"
 
 #. js-lingui-explicit-id
 msgid "picker.together"
-msgstr ""
+msgstr "Kaikki yhtä aikaa"
 
 #. js-lingui-explicit-id
 msgid "picker.togetherHelp"
-msgstr ""
+msgstr "Yksi vastaus kultakin, selattavina välilehtinä numerojärjestyksessä."
 
 #. js-lingui-explicit-id
 msgid "picker.trainAlways"
@@ -5219,160 +5219,160 @@ msgstr "ei tarkistettu"
 
 #. js-lingui-explicit-id
 msgid "plan.addBranch"
-msgstr ""
+msgstr "lisää haara"
 
 #. js-lingui-explicit-id
 msgid "plan.addStep"
-msgstr ""
+msgstr "lisää vaihe haaraan {address}"
 
 #. A step’s model or room, when it is the branch’s own
 #. js-lingui-explicit-id
 msgid "plan.asBranch"
-msgstr ""
+msgstr "sama kuin haaralla"
 
 #. js-lingui-explicit-id
 msgid "plan.beside"
-msgstr ""
+msgstr "ajo {run} ajon {other} rinnalla, erot merkittyinä"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.besideOff"
-msgstr ""
+msgstr "diff:off näyttää yhden"
 
 #. js-lingui-explicit-id
 msgid "plan.chat"
-msgstr ""
+msgstr "keskustelu {num}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.chatHelp"
-msgstr ""
+msgstr "open:{num} avaa sen"
 
 #. When a step runs (C201)
 #. js-lingui-explicit-id
 msgid "plan.condition"
-msgstr ""
+msgstr "{condition, select, failed {ajetaan, jos edellinen vaihe epäonnistuu} nothing {ajetaan, jos mitään ei löydy} always {ajetaan joka tapauksessa} other {ajetaan, kun edellinen vaihe on valmis}}"
 
 #. js-lingui-explicit-id
 msgid "plan.conditionHelp"
-msgstr ""
+msgstr "Milloin tämä vaihe ajetaan. Napsautus vaihtaa sen"
 
 #. js-lingui-explicit-id
 msgid "plan.counts"
-msgstr ""
+msgstr "{branches, plural, one {yksi haara} other {# haaraa}}, {steps, plural, =0 {ei vaiheita} one {yksi vaihe} other {# vaihetta}}"
 
 #. js-lingui-explicit-id
 msgid "plan.deleteBranch"
-msgstr ""
+msgstr "Poista haara {address}"
 
 #. js-lingui-explicit-id
 msgid "plan.deleteStep"
-msgstr ""
+msgstr "Poista haaran {address} vaihe {index}"
 
 #. Why a paused step stopped, or a waiting one did not run
 #. js-lingui-explicit-id
 msgid "plan.ended"
-msgstr ""
+msgstr "{why, select, stopped {pysäytetty} failed {epäonnistui} stalled {verkko pidätti vastauksen} left {sen välilehti suljettiin} unmet {sen ehto ei täyttynyt} other {keskeytynyt}}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.fixed"
-msgstr ""
+msgstr "Tämä vaihe alkoi ajossa {run}, joten sen kehotetta ei voi enää muuttaa. new:run suunnittelee sen uudelleen"
 
 #. js-lingui-explicit-id
 msgid "plan.held"
-msgstr ""
+msgstr "{count, plural, one {yksi pidossa} other {# pidossa}}"
 
 #. The plan’s number, at the top of the Plan board
 #. js-lingui-explicit-id
 msgid "plan.label"
-msgstr ""
+msgstr "Suunnitelma {num}"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.latest"
-msgstr ""
+msgstr "open:run {run}, niin voit muuttaa suunnitelmaa"
 
 #. js-lingui-explicit-id
 msgid "plan.newInRun"
-msgstr ""
+msgstr "uusi ajossa {run}"
 
 #. js-lingui-explicit-id
 msgid "plan.noChat"
-msgstr ""
+msgstr "ei keskustelua ennen ajoa"
 
 #. js-lingui-explicit-id
 msgid "plan.none"
-msgstr ""
+msgstr "Täällä ei ole vielä suunnitelmaa"
 
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "plan.noneHow"
-msgstr ""
+msgstr "open: ja suunnitelman numero näyttää sellaisen täällä. new:plan luo sellaisen"
 
 #. js-lingui-explicit-id
 msgid "plan.onlyIn"
-msgstr ""
+msgstr "ei ajossa {run}"
 
 #. js-lingui-explicit-id
 msgid "plan.pip"
-msgstr ""
+msgstr "{reached, select, yes {ajo {run}} other {ajo {run}, joka ei edennyt tähän vaiheeseen}}"
 
 #. js-lingui-explicit-id
 msgid "plan.pipHelp"
-msgstr ""
+msgstr "Näytä ajo {run}"
 
 #. js-lingui-explicit-id
 msgid "plan.record"
-msgstr ""
+msgstr "aiempi ajo, säilytetty ennallaan"
 
 #. js-lingui-explicit-id
 msgid "plan.runHead"
-msgstr ""
+msgstr "Ajo {run}"
 
 #. js-lingui-explicit-id
 msgid "plan.runOf"
-msgstr ""
+msgstr "ajo {run}/{runs}"
 
 #. js-lingui-explicit-id
 msgid "plan.statusDone"
-msgstr ""
+msgstr "valmis"
 
 #. js-lingui-explicit-id
 msgid "plan.statusPaused"
-msgstr ""
+msgstr "keskeytynyt"
 
 #. js-lingui-explicit-id
 msgid "plan.statusRunning"
-msgstr ""
+msgstr "käynnissä"
 
 #. js-lingui-explicit-id
 msgid "plan.statusWaiting"
-msgstr ""
+msgstr "odottaa"
 
 #. js-lingui-explicit-id
 msgid "plan.step"
-msgstr ""
+msgstr "Haaran {address} vaihe {index}"
 
 #. js-lingui-explicit-id
 msgid "plan.steps"
-msgstr ""
+msgstr "{count, plural, =0 {ei vielä vaiheita} one {yksi vaihe} other {# vaihetta}}"
 
 #. js-lingui-explicit-id
 msgid "plan.untitled"
-msgstr ""
+msgstr "Nimetön suunnitelma"
 
 #. js-lingui-explicit-id
 msgid "plan.untitledBranch"
-msgstr ""
+msgstr "Nimetön haara"
 
 #. js-lingui-explicit-id
 msgid "plan.whoHelp"
-msgstr ""
+msgstr "Kuka vastaa haaran {address} vaiheeseen {index}. Napsautus näyttää, kuka voi vastata"
 
 #. js-lingui-explicit-id
 msgid "plan.write"
-msgstr ""
+msgstr "Kirjoita vaihe"
 
 #. js-lingui-explicit-id
 msgid "privacy.card"
@@ -5709,16 +5709,16 @@ msgstr "Puhesyöte, jos käytät sitä."
 
 #. js-lingui-explicit-id
 msgid "settings.limitsHelp"
-msgstr ""
+msgstr "Jos haluat katon, joka todella pysäyttää kulutuksen, aseta kuukausiraja kunkin palveluntarjoajan omilla sivuilla."
 
 #. js-lingui-explicit-id
 msgid "settings.limitsLabel"
-msgstr ""
+msgstr "Ehdottomat rajat"
 
 #. The hover text on a link to the page where the provider sets a spending limit
 #. js-lingui-explicit-id
 msgid "settings.limitsLink"
-msgstr ""
+msgstr "Avaa uuteen välilehteen palvelun {provider} sivun, jolla asetetaan kuukausiraja"
 
 #. js-lingui-explicit-id
 msgid "settings.localBlocked"
@@ -5750,7 +5750,7 @@ msgstr "{count, plural, =0 {Ei vielä kuluja ({month}).} one {Käytetty {cost} (
 
 #. js-lingui-explicit-id
 msgid "settings.monthSpentRuns"
-msgstr ""
+msgstr "Käytetty {cost} ({month}): {runs, plural, one {# suunnitelma-ajo} other {# suunnitelma-ajoa}} {count, plural, =0 {eikä yhtään erillistä keskustelua} one {ja # erillinen keskustelu} other {ja # erillistä keskustelua}}. Arvio perustuu tokenimääriin; palveluntarjoajasi lasku on virallinen tieto."
 
 #. js-lingui-explicit-id
 msgid "settings.monthUnknown"
@@ -5898,11 +5898,11 @@ msgstr "Uusien keskustelujen huone"
 
 #. js-lingui-explicit-id
 msgid "settings.runRow"
-msgstr ""
+msgstr "ajo {run}"
 
 #. js-lingui-explicit-id
 msgid "settings.runRowHelp"
-msgstr ""
+msgstr "Näyttää suunnitelman {num} ajon {run} taulussa {board}"
 
 #. js-lingui-explicit-id
 msgid "settings.sources"
@@ -5998,15 +5998,15 @@ msgstr "Nimetön"
 
 #. js-lingui-explicit-id
 msgid "settings.warnHelp"
-msgstr ""
+msgstr "Tätä kalliimmissa ajoissa palkin alla oleva rivi kertoo ensin ajon hinnan, jo ennen Enter-painallusta."
 
 #. js-lingui-explicit-id
 msgid "settings.warnLabel"
-msgstr ""
+msgstr "Varoita ennen kallista ajoa"
 
 #. js-lingui-explicit-id
 msgid "settings.warnOff"
-msgstr ""
+msgstr "Pois"
 
 #. Marginalia on the board the navy rule is on
 #. js-lingui-explicit-id
@@ -6264,7 +6264,7 @@ msgstr "Näytä suunnitelmat hinnan mukaan"
 
 #. js-lingui-explicit-id
 msgid "verb.delete"
-msgstr ""
+msgstr "Poista kohde sen numerolla. Lähetetty poistuu pysyvästi toisen Enter-painalluksen jälkeen"
 
 #. js-lingui-explicit-id
 msgid "verb.device"
@@ -6272,7 +6272,7 @@ msgstr "Kerro, mille laitteelle huone on tehty"
 
 #. js-lingui-explicit-id
 msgid "verb.diff"
-msgstr "Merkitse erot avoinna olevien ajojen välillä"
+msgstr "Aseta suunnitelman kaksi ajoa rinnakkain ja merkitse erot"
 
 #. js-lingui-explicit-id
 msgid "verb.done"

@@ -93,3 +93,57 @@ Each: id, the English, the draft, and why I was unsure.
 - enter.setRoomList, library: ("a room from the library: {names}"; the real set:room is kept)
 - keys.localWhy, device: ("apps on your device: allow it…")
 - verb.framework, reply: ("shape every reply: standing instructions…")
+
+## Stage 10 words, drafted 24 October 2026
+
+16. **picker.togetherHelp**
+    English: One reply from each, in a slider, in the numbered order.
+    Draft: Yksi vastaus kultakin, selattavina välilehtinä numerojärjestyksessä.
+    Why: Finnish has no settled word for a slider of replies ("liukusäädin" is a control for setting a value), so I described what it is: tabs you move between, as the earlier drafts call the reply tabs "välilehdet". If "slider" is meant as a name, a word for it should be chosen once and used everywhere.
+
+17. **Hold** (enter.planHoldOn, enter.planHoldOff, enter.planHoldAlready, enter.planHoldNot, enter.planHoldEmpty, enter.planStepHeld, enter.runHeld, plan.held)
+    English: Enter holds {nums} in run {run}. Their steps wait until hold:off / Held already: {nums} / {count} held
+    Draft: Enter asettaa pitoon ajossa {run}: {nums}. Niiden vaiheet odottavat komentoon hold:off asti / Jo pidossa: {nums} / # pidossa
+    Why: "pito" and "pidossa" come from a phone call on hold, which is the closest everyday sense. It is less common outside phones, and plan.ended says "verkko pidätti vastauksen" (the network held the reply) from the same root for something else. If it reads oddly, "odotustilassa" is the plainer choice, though it sits close to the waiting status (odottaa).
+
+18. **A step that runs** (picker.cond, plan.condition, picker.condHelp, plan.conditionHelp, picker.sequenceHelp, enter.promptManyOrder, enter.byManyThen)
+    English: runs if the one before fails / When {name} runs. A click changes it
+    Draft: ajetaan, jos edellinen epäonnistuu / Milloin {name} ajetaan. Napsautus vaihtaa sen
+    Why: the passive of ajaa keeps one verb for run everywhere, but "Milloin {name} ajetaan" makes a model's name the thing that is run. "käynnistyy" (starts) reads more naturally in these lines and could replace "ajetaan" wherever a step or an answerer runs on its own.
+
+19. **enter.runHead**
+    English: Enter runs # steps of {nums}, in run {run}, one after another
+    Draft: Enter ajaa # vaihetta haarasta {nums} peräkkäin ajossa {run}
+    Why: "haarasta" (from the branch) is singular, which is right because the code sends one branch here and uses enter.runHeadMany for more. If {nums} can ever hold several, it needs the colon form ("…ajossa {run}: {nums}").
+
+20. **enter.runCost, enter.runCostAll**
+    English: At least {tokens, number} tokens to send, {cost}
+    Draft: Lähetetään vähintään {tokens, number} tokenia, hinta vähintään {cost}
+    Why: in Finnish "vähintään" does not carry across the comma, so "hinta {cost}" would read as the exact price. I repeated it before the cost, as enter.runCostly says ("At least {cost} to send"). The Cheap lines keep "hinta alle {cost}".
+
+21. **settings.limitsLabel, settings.limitsHelp**
+    English: Hard limits / For a cap that actually stops spending, set a monthly limit with each provider.
+    Draft: Ehdottomat rajat / Jos haluat katon, joka todella pysäyttää kulutuksen, aseta kuukausiraja kunkin palveluntarjoajan omilla sivuilla.
+    Why: "Ehdottomat rajat" (absolute limits) keeps the contrast with the warning, which stops nothing; "Kulukatot" (spending caps) is shorter and more everyday. "with each provider" became "on each provider's own pages", since the row's links go there.
+
+22. **enter.diffOn**
+    English: Enter sets run {other} beside run {run}, marking in ink what differs
+    Draft: Enter asettaa ajon {other} ajon {run} rinnalle ja merkitsee erot musteella
+    Why: "ink" is the interface's dark text colour. "musteella" is literal and natural Finnish, but a reader may not connect it with a colour on screen. "tummalla" (in dark) is the alternative.
+
+23. **settings.monthSpentRuns**
+    English: {cost} spent in {month}: # runs of plans and # chats on their own.
+    Draft: Käytetty {cost} ({month}): # suunnitelma-ajoa ja # erillistä keskustelua.
+    Why: "suunnitelma-ajo" is a new compound, used because "3 suunnitelman ajoa" can read as "runs of 3 plans". The "and" moved inside the chat count's cases, because the zero case needs "eikä yhtään erillistä keskustelua" (Finnish cannot say "ja ei"). The month stays in brackets, as in doubt 11.
+
+24. **enter.runTo**
+    English: They go to {answering}
+    Draft: Vastaajat: {answering}
+    Why: the code joins the names with "and", and a Finnish case ending cannot attach to the list, so it follows a plural label and a colon, as the glossary does for lists. With one answerer the plural label reads a little oddly.
+
+25. **settings.warnOff**
+    English: Off
+    Draft: Pois
+    Why: the choice beside $0.50, $1 and $5. "Pois" matches the earlier "Pois:" in the Settings help; "Ei käytössä" or "Ei varoitusta" is clearer if the choice is ever shown on its own.
+
+The checker gives 4 command warnings for chunks 16 to 19 (branches.unmet, enter.manyUnmet twice, enter.runUndo). Each is prose ("did not run: its condition…", "stops at a run: what it writes stays"), not the command run:. Every real command in these entries is kept as typed.

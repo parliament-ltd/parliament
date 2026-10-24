@@ -72,6 +72,27 @@ One line per term: English → Swedish, with the reason where it was a hard choi
 - set up (the lock) → ställa in; turn off → stänga av; encrypt / decrypt → kryptera / dekryptera.
 - nothing can open it → ingenting kan öppna det; there is no server to reset it → det finns ingen server som kan återställa det.
 
+## Plans and running (stage 10, drafted 24 October 2026)
+- on the {board} board → på tavlan {board} ("Enter öppnar plan 201 på tavlan Planen"). Elsewhere a board in a sentence is just "i {board}", but these lines say "plan {num}" next to the board's name, and "plan 201 i Planen" blurs the two; the apposition keeps {board} in base form.
+- run {n} of plan {num} → körning {n} av plan {num}; run 1 of 2 → körning 1 av 2; step {i} of {address} → steg {i} i {address} (a branch holds its steps, so "i", not "av").
+- make (a plan, a run: new:) → skapa, as verb.new; with nothing in it → utan innehåll.
+- condition → villkor; met → uppfyllt ("om dess villkor är uppfyllt"); was not met → uppfylldes inte; did not run → kördes inte.
+- the one before (a model or source) → den föregående; the step before → föregående steg. finishes → är klar (klart for a step); fails → misslyckas; if nothing is found → om inget hittas; whatever happens → vad som än händer.
+- one after another → en efter en, for models and branches; for steps → ett i taget ("ett steg i taget" is the idiom). Picker labels: One after another → En efter en; All at once → Alla samtidigt (as "samtidigt" in enter.byMost); Order → Ordning.
+- hold (hold:) → hålla kvar; held → hålls kvar; let go → släppa. Matches verb.hold ("Håll kvar en gren") and the held answers of include: ("svaret som hålls kvar"); the passive "hålls kvar" needs no agreement with a placeholder ("Hålls redan kvar: {nums}", "2 hålls kvar"). "på vänt" was the alternative.
+- statuses → klart, pausat, körs, väntar. Neuter, since most sit beside a step (steg) and the neuter also reads as the impersonal "det är klart" beside a branch. In sentences, "paused" is the past tense: "{nums} pausade".
+- stop, halt (stop:) → stoppa; stopped (why a step paused) → stoppat. The older "avbrutet" (branches.stopped) stays for a reply cut off by leaving.
+- what is done stays done and paid for → det som är gjort förblir gjort och betalt.
+- fixed (a started step's prompt) → ligger fast. Not "låst", which is the lock's word.
+- an earlier run, kept as it was → en tidigare körning, bevarad som den var.
+- as the branch (who answers a step) → samma som grenen. "som grenen" alone reads as "like the branch".
+- step list (the block) → Steglista.
+- a second Enter → ett andra tryck på Enter; Enter again (arming a delete) → Enter en gång till; Enter, then Enter again → Enter och sedan Enter igen.
+- spending → kostnader, as the Settings section "Kostnader"; a chat on its own → fristående chatt (as "fristående anteckning").
+- warn before a costly run → varna före en dyr körning; costly → dyr.
+- hard limits → Hårda gränser; a monthly limit → en månadsgräns; a cap → ett tak. "kostnadsgräns" is taken by keys.ownKey for a key's own limit.
+- marked in ink (what differs) → markerat med bläck. Ink is the page's dark colour; see doubts.
+
 ## Conventions
 - Commands, their keyword arguments (all, room, collection, search, the sort and type words, the Settings section names) and leaders stay English, character for character.
 - Free-text example values inside commands are translated (name:"Tornugglor", heading:"Orsaker", save:"Ugglor i veckan"); see doubts.

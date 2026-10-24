@@ -90,6 +90,27 @@ One line per term: English → Chinese, with the reason where it was a hard choi
 - Nothing can open it → 没有任何办法能打开它
 - there is no server to reset it → 没有服务器可以重置它
 
+## Plans and running (stage 10, drafted 24 October 2026)
+- run N → 第 N 次运行; run N of plan 201 → 计划 201 的第 N 次运行; run 1 of 2 → 第 1 次运行，共 2 次
+- run (v.) → 运行; in the run: lines that also name the run (enter.runHead, enter.runHeadMany, enter.runHeadNew), steps are 执行, so a line never reads 在第 2 次运行中运行
+- step N of 201a → 201a 的第 N 步 (as enter.newBranchAt); an empty step → 空白步骤; skipped → 跳过
+- plan (v., a step planned ahead) → 安排; plans it again → 重新安排; new:run plans it again → new:run 可在新的一次运行中重新安排 (计划 stays the noun)
+- condition → 条件; standing alone, 运行条件 (运行条件未满足)
+- the four conditions → 前一个完成后运行, 前一个失败时运行, 前面没有找到内容时运行, 无论结果如何都运行; for steps on the Plan board, 前一步 in place of 前一个
+- statuses: done → 已完成; running → 运行中; waiting → 等待中; paused → 已暂停; stopped → 已停止 (as branches.stopped); did not run → 未运行
+- hold / held → 搁置 / 已搁置; hold:off lets it go → 取消搁置 (hard choice: it has to stay apart from 已暂停 and 等待中. 挂起 is programmers' jargon, and 暂缓 suggests a delay with an end)
+- one after another → 依次; the picker's choice → 依次进行. all at once → 同时进行. Order → 顺序
+- branches running side by side → 各分支同时进行; runs set side by side (diff:) → 并排
+- stop, halt → 停止; stops where it is → 就地停下; what is done stays done and paid for → 已完成的部分会保留，并照常计费
+- an earlier run, kept as it was → 较早的一次运行，保持原样
+- fixed (a started step's prompt) → 不能再改
+- as the branch (a step's answerer left to its branch) → 跟随分支 (it follows the branch's choice when that changes)
+- step list (block) → 步骤列表; following this chat → 跟随此对话; pinned (showing one plan by its number) → 固定显示 (not 置顶, which is the pin at the top of a list)
+- what differs (diff:) → 差异; marking in ink → 用墨色标出 (ink is the page's text colour, not a highlight)
+- spending (the Settings section) → 花费; a costly run → 高费用运行; Warn before a costly run → 高费用运行前提醒; the amount set → 提醒金额
+- hard limit → 硬性上限; monthly limit → 每月上限 (keys.ownKey's spending limit is 消费上限)
+- runs of plans, chats on their own (This month) → 计划运行, 单独的对话
+
 ## Places and devices
 - this computer / on your machine → 本机 (Nothing leaves it → 内容不会离开本机)
 - this browser → 此浏览器; this tab → 此标签页; this device → 本设备

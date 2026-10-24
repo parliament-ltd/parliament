@@ -99,3 +99,70 @@ Each: id, the English, my draft, why I was unsure.
     - en: … nothing can open it: there is no server to reset it.
     - ja: …開く手段は何もありません。リセットできるサーバがないためです。
     - The colon becomes a sentence giving the reason (ためです), which is how a Japanese reader takes the colon. Neither claim is stronger or weaker; if the causal link is more than intended, 。リセットできるサーバはありません。 keeps them side by side.
+
+## Stage 10 words, drafted 24 October 2026
+
+21. plan.runHead, settings.runRow, enter.planRunOpen and every "run {run}"
+    - en: Run {run} / run {run} of {runs} / Enter shows run {run} of plan {num}
+    - ja: 実行{run} / 実行{run}（全{runs}件） / Enterで、プラン{num}の実行{run}を表示します
+    - Built as a name, like ステップ{index}, so it sits close to open:run 2. {run}回目の実行 reads more naturally in a sentence, but less like a name, and says it happened, when a run can exist before it starts. 実行 is also the verb, so where both meet the run goes in brackets: Enterで、201aの3ステップを順番に実行します（実行1）.
+
+22. plan.statusPaused, plan.ended (other), enter.runPaused, enter.runPausedOnly
+    - en: paused / {nums} paused; the {board} board says why
+    - ja: 中断 / {nums}は中断しています。理由は{board}ボードに表示されます
+    - 中断 (broken off, can be resumed) rather than 一時停止, which reads as a pause chosen on purpose. A paused step was stopped, failed, stalled or lost its tab.
+
+23. enter.diffOn, plan.beside, verb.diff
+    - en: Enter sets run {other} beside run {run}, marking in ink what differs
+    - ja: Enterで、実行{run}の横に実行{other}を並べ、違うところに印を付けます
+    - "In ink" is left out: インクの色で and 墨色で both read oddly. If the colour should be said, 違うところを濃い色で示します.
+
+24. picker.cond, picker.sequenceHelp, enter.manyWhen, branches.waitingRuns
+    - en: runs if the one before fails / once the one before finishes
+    - ja: 前のものが失敗したら実行 / 前のものが終わったら
+    - 前のもの rather than 1つ前. 1つ前 is crisper in a numbered list, but says "the one just before", and a condition reads the last one before it that ran (C201 (b)).
+
+25. picker.cond, plan.condition (always)
+    - en: runs whatever happens
+    - ja: 結果にかかわらず実行
+    - "Whatever the step before ended with". 常に実行 is shorter but says more than is true: nothing runs after a stop.
+
+26. settings.warnHelp, enter.runCostly, enter.setWarn
+    - en: Above this, … / more than the {warn} you asked to be warned at / when it is {cost} or more
+    - ja: これを超えると、… / 警告するよう指定した{warn}を超えています / {cost}以上のときは
+    - Each follows its own English, and the English disagrees: two say "above", one says "or more", and the warning comes at or above the amount (C203 (c)). If the English is made one, the Japanese should be 以上 in all three.
+
+27. settings.limitsLabel
+    - en: Hard limits
+    - ja: 利用上限
+    - The word keys.ownKey already uses for a provider's spending limit. "Hard" is not rendered on its own; the help line says the cap stops spending. 強制的な上限 if it needs saying in the label.
+
+28. blocks.stepsWhole
+    - en: shows the whole plan
+    - ja: でプラン全体を表示します
+    - Starts with the particle で because the code puts it after the open:201 button and a space. Like doubt 6: the sentence is split across two entries and breaks if the order changes.
+
+29. enter.eraseItems
+    - en: Enter, then Enter again, deletes {erasing} for good
+    - ja: Enter、もう一度Enterで、{erasing}を完全に削除します
+    - Mirrors the English. Enterを2回押すと is plainer, but loses the pause between the two, where the line changes to "Enter again …".
+
+30. plan.ended
+    - en: stopped / it failed / the network held the reply / its tab closed / its condition was not met / paused
+    - ja: 停止 / 失敗 / ネットワークが返答を溜めた / タブが閉じた / 条件を満たさなかった / 中断
+    - Nouns and short clauses in one list, as the English has. 溜めた follows enter.promptStalled (溜めてしまうネットワーク).
+
+31. picker.order
+    - en: Order
+    - ja: 順序
+    - Heads the choice between すべて同時に and 順番に. "All at once" is not an order, so 送り方 ("how it is sent") may read better.
+
+32. enter.openPlan and every "on the {board} board"
+    - en: Enter opens plan {num} on the {board} board
+    - ja: Enterで、プラン{num}を{board}ボードで開きます
+    - {board}ボード reads as the board's name (プランボード). Chunk 11's verb.plan has プランのボード; one of the two should change to match, and I would change verb.plan.
+
+33. enter.runSkipped
+    - en: {count} empty steps are skipped
+    - ja: 空の#ステップは飛ばします
+    - The ステップ counter after an adjective is a little stiff; 空のステップ#件 reads more easily but breaks the glossary's counter for steps.
