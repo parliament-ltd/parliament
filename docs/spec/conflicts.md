@@ -233,6 +233,12 @@ Line numbers are approximate.
 - **`by:wikipedia then sonnet`** sends one after another from the bar: each `then` "if nothing is found" after a source and "if it fails" after a model, changed in the picker.
 - **`include:` with one after another** comes with piece 5.
 
+**24 October 2026, at the stage 10 checkpoint:** Stefan: "i'm good with lean. let's leave test to later when i have a moment."
+- **C197 to C203 kept as built.**
+- **The new optional stored fields approved:** on a step, `id`, `prompt`, `addedAt`, `model`, `room` (only where it overrides), `condition`, `ended` (stopped, failed, stalled, left, unmet) and `group`; on a message a run sends, `step`; runs past the first; a branch with no chat until it runs; the setting `runWarn`. No new store, no version change.
+- **The open points, as suggested:** the sample backup's rooms get the messages and input blocks (the sample file only, C202 (h) 1); each provider's spending-limits page is looked up, read only, and linked from Settings (C203 (d) 1); the step list's settings come with the Lab (C202 (h) 2); R38 approved (the four unused Enter-line messages go).
+- **Trying it is Stefan's, later:** a two-branch run with his own key, one branch stopped mid-step, `undo:` stopping at the run; with the passkey and the four languages from before.
+
 ## Part 1. Settled by precedence
 
 These look settled under the precedence rules (newer beats older; A wins where it
