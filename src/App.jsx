@@ -41,6 +41,13 @@ const PopoutPrototype = import.meta.env.DEV || import.meta.env.VITE_PROTOTYPES =
   ? lazy(() => import('./views/PopoutPrototype'))
   : null
 
+// Throwaway stage 11 spike: editing in place on ProseMirror (C205). The same
+// gate: development, or a build made with VITE_PROTOTYPES=1. Never in an
+// ordinary build, so ProseMirror is not in the app until it is chosen.
+const EditingSpike = import.meta.env.DEV || import.meta.env.VITE_PROTOTYPES === '1'
+  ? lazy(() => import('./views/EditingSpike'))
+  : null
+
 // The new shell is the app at / (stage 6 checkpoint, 22 October): the welcome
 // page for someone new, Records and the Collection for someone with work
 // (C118, C125). The old homepage, /chats and /edit-home are retired (R3, R4,
@@ -125,6 +132,18 @@ export default function App() {
                         <ErrorBoundary inline>
                           <Suspense fallback={null}>
                             <TokenSheet />
+                          </Suspense>
+                        </ErrorBoundary>
+                      }
+                    />
+                  )}
+                  {EditingSpike && (
+                    <Route
+                      path="/dev/editing"
+                      element={
+                        <ErrorBoundary inline>
+                          <Suspense fallback={null}>
+                            <EditingSpike />
                           </Suspense>
                         </ErrorBoundary>
                       }

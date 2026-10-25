@@ -1,0 +1,129 @@
+/* Stage 11 spike (C205): /dev/editing. Values from the token sheet
+   (src/styles/tokens.css) and parliament-inline-editing-v5.html. Light only. */
+
+.es { min-height: 100vh; background: var(--ch-paper); color: var(--ch-ink); font: 400 var(--ch-t-body)/1.5 var(--ch-sans); padding: 20px 16px 60px; }
+.es * { box-sizing: border-box; }
+.es-head { max-width: 1180px; margin: 0 auto 16px; }
+.es-head h1 { font: 600 17px var(--ch-sans); margin: 0 0 4px; }
+.es-head p { margin: 0; color: var(--ch-ink-2); font-size: 12.5px; max-width: 80ch; }
+.es-grid { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .es-grid { grid-template-columns: minmax(0, 1fr); } }
+
+.es-marg { font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); }
+.es button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.es button:focus-visible, .es [tabindex]:focus-visible { outline: var(--ch-focus); outline-offset: 2px; border-radius: 3px; }
+.es .es-link { font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--ch-border); }
+.es .es-link:hover { color: var(--ch-ink); text-decoration-color: currentColor; }
+
+/* The room: Writing studio's middle column */
+.es-room { background: var(--ch-surface); border: 1px solid var(--ch-border); border-radius: var(--ch-r-card); box-shadow: var(--ch-lift); }
+.es-roomhead { display: flex; align-items: baseline; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--ch-border); flex-wrap: wrap; }
+.es-roomhead b { font: 600 13px var(--ch-sans); }
+.es-tabs { display: flex; gap: 2px; padding: 8px 12px 0; border-bottom: 1px solid var(--ch-border); flex-wrap: wrap; }
+.es .es-tab { padding: 6px 10px 7px; font: 500 12px var(--ch-sans); color: var(--ch-ink-3); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.es .es-tab:hover { color: var(--ch-ink); }
+.es .es-tab.on { color: var(--ch-ink); border-bottom-color: var(--ch-ink); }
+.es-tab .src { font-weight: 400; color: var(--ch-ink-3); margin-inline-start: 4px; }
+.es-tab .cnt { color: var(--ch-you); margin-inline-start: 5px; font-variant-numeric: tabular-nums; }
+.es-tab.sep { margin-inline-start: 10px; }
+.es-body { padding: 16px 20px 18px; }
+.es-said { font-size: 12px; color: var(--ch-ink-2); margin: 0 0 12px; }
+
+/* The prompt bubble and the reply */
+.es-prompt { margin: 0 0 6px auto; max-width: 85%; background: var(--ch-subtle); border: 1px solid var(--ch-border); border-radius: 12px; padding: 8px 12px; }
+.es-under { text-align: end; margin: 0 0 16px; }
+.es-reply { position: relative; }
+.es .ProseMirror { outline: none; white-space: pre-wrap; word-wrap: break-word; font: 400 15px/var(--ch-lh-read) var(--ch-serif); border-radius: 6px; padding: 4px 6px; margin: -4px -6px; }
+.es .ProseMirror:hover { background: rgba(25, 25, 25, .02); }
+.es .ProseMirror:focus { box-shadow: 0 0 0 1px var(--ch-border); }
+.es-prompt .ProseMirror { font: 400 14px/1.5 var(--ch-sans); }
+.es .ProseMirror p { margin: 0 0 .75em; }
+.es .ProseMirror .pm-h1 { font: 600 20px/1.3 var(--ch-sans); margin: 1em 0 .4em; }
+.es .ProseMirror .pm-h2 { font: 600 17px/1.3 var(--ch-sans); margin: 1em 0 .4em; }
+.es .ProseMirror .pm-h3 { font: 600 15px/1.3 var(--ch-sans); margin: 1em 0 .3em; }
+.es .ProseMirror blockquote { margin: 0 0 .75em; padding-inline-start: 12px; border-inline-start: 2px solid var(--ch-border); color: var(--ch-ink-2); }
+.es .ProseMirror blockquote p { margin: 0; }
+.es .ProseMirror pre { font: 12.5px/1.5 var(--ch-mono); background: var(--ch-subtle); border: 1px solid var(--ch-border); border-radius: 6px; padding: 8px 10px; margin: 0 0 .75em; white-space: pre-wrap; }
+.es .ProseMirror code { font: .9em var(--ch-mono); }
+.es .ProseMirror a { color: inherit; text-decoration: underline; text-decoration-color: var(--ch-ink-3); }
+.es .ProseMirror hr { border: 0; border-top: 1px solid var(--ch-border); margin: 1em 0; }
+.es .ProseMirror .pm-li { position: relative; padding-inline-start: 22px; margin: 0 0 .3em; }
+.es .ProseMirror .pm-bullet::before { content: "•"; position: absolute; inset-inline-start: 6px; color: var(--ch-ink-3); }
+.es .ProseMirror { counter-reset: n; }
+.es .ProseMirror .pm-number { counter-increment: n; }
+.es .ProseMirror :not(.pm-number) + .pm-number { counter-set: n 1; }
+.es .ProseMirror .pm-number::before { content: counter(n) "."; position: absolute; inset-inline-start: 0; color: var(--ch-ink-3); font-variant-numeric: tabular-nums; }
+.es .ProseMirror .pm-box { position: absolute; inset-inline-start: 1px; top: .35em; width: 12px; height: 12px; border: 1.2px solid var(--ch-ink-3); border-radius: 3px; cursor: pointer; }
+.es .ProseMirror .pm-check[data-checked="true"] .pm-box { background: var(--ch-ink); border-color: var(--ch-ink); box-shadow: inset 0 0 0 2px var(--ch-surface); }
+.es .ProseMirror .pm-check[data-checked="true"] .pm-lt { color: var(--ch-ink-3); }
+.es .ProseMirror .pm-table { overflow-x: auto; margin: 0 0 .75em; }
+.es .ProseMirror table { border-collapse: collapse; font: 12.5px var(--ch-sans); }
+.es .ProseMirror th, .es .ProseMirror td { border: 1px solid var(--ch-border); padding: 4px 10px; text-align: start; }
+.es .ProseMirror th { background: var(--ch-subtle); font-weight: 600; }
+.es .ProseMirror .pm-chart { margin: 0 0 .75em; }
+.es .ProseMirror .pm-chart svg { width: 100%; max-width: 360px; height: auto; display: block; }
+.es .ProseMirror .pm-bar { fill: var(--ch-ink-3); }
+.es .ProseMirror figcaption { font: italic 12px var(--ch-serif); color: var(--ch-marg); }
+.es .ProseMirror .ProseMirror-selectednode { outline: 1px solid var(--ch-focus-ink); outline-offset: 2px; border-radius: 3px; }
+
+/* The marks an edit leaves: each with its own line, not colour alone */
+.es .ProseMirror del.pm-struck, .es .ProseMirror del.pm-blk { color: var(--ch-ink-3); text-decoration: line-through; text-decoration-color: var(--ch-ink-2); }
+.es .ProseMirror del.pm-blk { display: block; opacity: .6; }
+.es .ProseMirror del.pm-blk table, .es .ProseMirror del.pm-blk svg { text-decoration: line-through; }
+.es .ProseMirror ins.pm-added { color: var(--ch-you); text-decoration: underline; text-decoration-color: var(--ch-you); text-underline-offset: 3px; }
+/* A hair of space where struck and added words meet, drawn only: the text has none */
+.es .ProseMirror del.pm-struck + ins.pm-added, .es .ProseMirror ins.pm-added + del.pm-struck { margin-inline-start: .22em; }
+.es .ProseMirror .flash { animation: es-flash 1.2s ease-out; }
+@keyframes es-flash { from { background: var(--ch-mark-edit); } to { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { .es .ProseMirror .flash { animation: none; outline: 1px solid var(--ch-you); } }
+/* Said to a screen reader at the edges of a mark, unseen */
+.es.announce .ProseMirror del.pm-struck::before, .es.announce .ProseMirror del.pm-blk::before { content: " removed: "; }
+.es.announce .ProseMirror del.pm-struck::after, .es.announce .ProseMirror del.pm-blk::after { content: " end of removed "; }
+.es.announce .ProseMirror ins.pm-added::before { content: " added: "; }
+.es.announce .ProseMirror ins.pm-added::after { content: " end of added "; }
+.es.announce .ProseMirror :is(del, ins)::before, .es.announce .ProseMirror :is(del, ins)::after { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* clean: the result only, read-only (editing spec, markup · clean) */
+.es.clean .ProseMirror del { display: none; }
+.es.clean .ProseMirror ins.pm-added { color: inherit; text-decoration: none; }
+
+/* The line under the field */
+.es-line { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; padding: 10px 20px 12px; border-top: 1px solid var(--ch-border); background: var(--ch-subtle); border-radius: 0 0 var(--ch-r-card) var(--ch-r-card); }
+.es-line .cnt { color: var(--ch-you); }
+.es .es-send { font: 500 12px var(--ch-sans); padding: 4px 10px; border: 1px solid var(--ch-border); border-radius: var(--ch-r-btn); background: var(--ch-surface); }
+.es .es-send:hover { border-color: var(--ch-ink-3); }
+.es-toast { min-height: 18px; padding: 0 20px 10px; background: var(--ch-subtle); }
+
+/* The / menu */
+.es-menu { position: fixed; z-index: 30; min-width: 190px; background: var(--ch-surface); border: 1px solid var(--ch-border); border-radius: 8px; box-shadow: 0 6px 24px rgba(0, 0, 0, .08); padding: 4px; }
+.es-menu .f { padding: 4px 8px 6px; font: 12px var(--ch-mono); color: var(--ch-ink-3); }
+.es .es-menu button { display: block; width: 100%; text-align: start; padding: 5px 8px; border-radius: 5px; font-size: 13px; }
+.es .es-menu button.on { background: var(--ch-wash); }
+.es-menu .foot { padding: 6px 8px 2px; border-top: 1px solid var(--ch-border); margin-top: 4px; }
+
+/* The side: cards, the note, the checklist, the log */
+.es-side { display: flex; flex-direction: column; gap: 14px; }
+.es-panel { background: var(--ch-surface); border: 1px solid var(--ch-border); border-radius: var(--ch-r-card); padding: 12px 14px; }
+.es-panel h2 { font: 600 12.5px var(--ch-sans); margin: 0 0 8px; display: flex; gap: 8px; align-items: baseline; }
+.es-card { border-top: 1px solid var(--ch-border); padding: 8px 0; }
+.es-card:first-of-type { border-top: 0; }
+.es-card .ed { font: 13px/1.45 var(--ch-serif); }
+.es-card .ed del { color: var(--ch-ink-3); text-decoration-color: var(--ch-ink-2); }
+.es-card .ed ins { color: var(--ch-you); text-decoration: underline; text-underline-offset: 3px; }
+.es-card .arrow { color: var(--ch-ink-3); margin: 0 4px; }
+.es-card .acts { display: flex; gap: 10px; margin-top: 3px; flex-wrap: wrap; }
+.es-card.held .ed { opacity: .55; }
+.es-note { font: 12px/1.5 var(--ch-mono); white-space: pre-wrap; color: var(--ch-ink-2); background: var(--ch-subtle); border-radius: 6px; padding: 8px 10px; margin: 0; }
+.es-check { border-top: 1px solid var(--ch-border); padding: 7px 0; }
+.es-check:first-of-type { border-top: 0; }
+.es-check .q { font-size: 12.5px; }
+.es-check .how { font-size: 11.5px; color: var(--ch-ink-2); margin-top: 2px; }
+.es-check .pick { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
+.es .es-check .pick button { font: 500 11px var(--ch-sans); padding: 2px 8px; border: 1px solid var(--ch-border); border-radius: 10px; color: var(--ch-ink-2); }
+.es .es-check .pick button.on { background: var(--ch-ink); color: var(--ch-surface); border-color: var(--ch-ink); }
+.es-check textarea { width: 100%; margin-top: 5px; font: 12px var(--ch-sans); border: 1px solid var(--ch-border); border-radius: 6px; padding: 4px 6px; resize: vertical; min-height: 28px; }
+.es-log { font: 11px/1.45 var(--ch-mono); color: var(--ch-ink-2); max-height: 200px; overflow: auto; margin: 0; padding: 0; list-style: none; }
+.es-log li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.es-facts { font-size: 11.5px; color: var(--ch-ink-2); display: flex; flex-wrap: wrap; gap: 2px 12px; }
+.es-err { color: var(--ch-red-deep); font-size: 12px; }
+.es-toggles { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 6px; }
+.es-toggles label { font-size: 12px; color: var(--ch-ink-2); display: flex; gap: 5px; align-items: center; }
