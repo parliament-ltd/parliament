@@ -36,7 +36,11 @@ const SAVE_AFTER_MS = 500
  * }} props
  */
 // plain: a source's answer, read as plain text, never as Markdown (stage 4).
-export default function EditableReply({ id, content, blocks = null, plain = false, terms = [], quotes = [], quotedTitle, clean = false, onSave }) {
+const NO_CLOSED = new Set()
+// closedEdits: edits already told to a model; typing beside one starts a new edit (C216 (i)).
+export default function EditableReply({ id, content, blocks = null, plain = false, terms = [], quotes = [], quotedTitle, clean = false, onSave, closedEdits = NO_CLOSED }) {
+  const closedRef = useRef(closedEdits)
+  useEffect(() => { closedRef.current = closedEdits }, [closedEdits])
   const host = useRef(null)
   const view = useRef(null)
   const saved = useRef(null) // the stored form last saved, or the one first drawn, as text
@@ -73,6 +77,7 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
   // The editor, made once for this message.
   useEffect(() => {
     const ids = createEditIds()
+    ids.setClosed((edit) => closedRef.current.has(edit))
     idsRef.current = ids
     const doc = fromBlocks(blocks, ids.block) ?? (plain ? promptFromText(content, ids.block) : replyFromMarkdown(content, ids.block, { anchors: `msg-${id}` }))
     saved.current = JSON.stringify(toBlocks(doc))

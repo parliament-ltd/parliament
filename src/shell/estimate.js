@@ -31,7 +31,9 @@ export function inputCost(tokens, perMillion) {
 /** The characters of what would go along with a prompt: the messages with text, and the answers brought into them (C176). */
 export const historyChars = (messages = []) =>
   messages.reduce((n, m) => n + (typeof m?.content === 'string' ? m.content.length : 0)
-    + (Array.isArray(m?.included) ? m.included.reduce((k, i) => k + String(i?.text ?? '').length, 0) : 0), 0)
+    + (Array.isArray(m?.included) ? m.included.reduce((k, i) => k + String(i?.text ?? '').length, 0) : 0)
+    // The note of edits a prompt carried, sent with it every time (C216 (c)).
+    + (typeof m?.told === 'string' && m.told ? m.told.length + 2 : 0), 0)
 
 // The one request after a chat's first answer (C62): the first prompt and
 // answer, each cut to 500 characters, with its instructions, and a short

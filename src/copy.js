@@ -745,6 +745,10 @@ export const COPY = {
       id: 'enter.thinkingNow',
       message: '{on, select, on {Models that can think do so first, shown as they go. thinking:off turns it off} other {Thinking is off. thinking:on turns it back on}}',
     },
+    // Edits reaching the model (stage 11, piece 3; C216).
+    promptEditsGo: /*i18n*/ { id: 'enter.promptEditsGo', message: '{count, plural, one {# edit goes} other {# edits go}} with it, told once · {name} reads them' },
+    promptEditsWait: /*i18n*/ { id: 'enter.promptEditsWait', message: '{source} reads none of your {count, plural, one {# edit} other {# edits}}; they go when a model answers here (by:)' },
+    promptEditsOnly: /*i18n*/ { id: 'enter.promptEditsOnly', message: 'Nothing typed: just your {count, plural, one {# edit goes} other {# edits go}}, told to {name}' },
     // markup · clean (stage 11, piece 1; editing spec).
     markupOn: /*i18n*/ { id: 'enter.markupOn', message: 'Enter shows replies marked up: struck words and yours in blue, editable' },
     markupOff: /*i18n*/ { id: 'enter.markupOff', message: 'Enter shows replies clean: the result only, read-only until markup:on' },
@@ -941,6 +945,13 @@ export const COPY = {
     planHoldNot: /*i18n*/ { id: 'enter.planHoldNot', message: 'Not held: {nums}' },
     planHoldRunning: /*i18n*/ { id: 'enter.planHoldRunning', message: '{address} is running. stop:{address} halts it', comment: 'Commands stay English' },
     planHoldEmpty: /*i18n*/ { id: 'enter.planHoldEmpty', message: '{address} has nothing planned to hold' },
+    // hold: for edits (stage 11, piece 3; C216 (f)).
+    holdEditOn: /*i18n*/ { id: 'enter.holdEditOn', message: 'Enter holds back {nums}: yours, and not sent, until hold:off', comment: 'Commands stay English' },
+    holdEditOff: /*i18n*/ { id: 'enter.holdEditOff', message: 'Enter lets {nums} go with your next prompt' },
+    holdEditAlready: /*i18n*/ { id: 'enter.holdEditAlready', message: 'Held back already: {nums}' },
+    holdEditNot: /*i18n*/ { id: 'enter.holdEditNot', message: 'Not held back: {nums}' },
+    holdEditTold: /*i18n*/ { id: 'enter.holdEditTold', message: '{num} was told already, so it cannot be held back' },
+    holdEditNotHere: /*i18n*/ { id: 'enter.holdEditNotHere', message: '{num} is not an edit in the chat here' },
     planMove: /*i18n*/ { id: 'enter.planMove', message: 'Enter moves {address} {where, select, after {after} other {before}} {other}. It keeps its letter' },
     planMoveThere: /*i18n*/ { id: 'enter.planMoveThere', message: '{address} is {where, select, after {after} other {before}} {other} already' },
     planMoveSame: /*i18n*/ { id: 'enter.planMoveSame', message: '{address} cannot move beside itself' },
@@ -1917,6 +1928,8 @@ export const COPY = {
     askAgainAs: /*i18n*/ { id: 'chat.askAgainAs', message: 'ask again as {next}', comment: 'Writes again: into the bar; {next} is the new branch, like 201d' },
     askAgain: /*i18n*/ { id: 'chat.askAgain', message: 'ask again' },
     joinedToBar: /*i18n*/ { id: 'chat.joinedToBar', message: 'Your prompt and this reply, as they read now, are in the bar as your next prompt' },
+    editsWaitingTab: /*i18n*/ { id: 'chat.editsWaitingTab', message: '{count, plural, one {# edit waits} other {# edits wait}} to go with the next prompt to this branch' },
+    toldOnly: /*i18n*/ { id: 'chat.toldOnly', message: 'Your edits, told to {name}', comment: 'A prompt that sent only the edits of the person (C216 (e))' },
     pairLabel: /*i18n*/ { id: 'chat.pairLabel', message: 'Your prompt and its reply. Every word can be edited' },
     // "Pin for reference", renamed (R13): a whole message kept as a quote
     // beside a chat; and the quotes kept beside this one.

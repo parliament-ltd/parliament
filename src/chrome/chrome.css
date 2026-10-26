@@ -571,6 +571,8 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-btab.on { border-bottom-color: var(--ch-ink); }
 .ch-btab-id { font: 500 10.5px var(--ch-mono, ui-monospace, monospace); }
 .ch-btab-st { font: italic 11px var(--ch-serif); }
+/* Edits waiting to go with the branch's next prompt: a count in your blue (C216 (j)). */
+.ch-btab-wait { font: 500 11px var(--ch-sans); color: var(--ch-you); font-variant-numeric: tabular-nums; }
 .ch-bslider { display: grid; grid-template-columns: 36px minmax(0, 1fr) 36px; align-items: start; }
 .ch-barrow { position: sticky; top: 40vh; width: 30px; height: 30px; margin: 0 auto; border: none; border-radius: 50%; background: transparent; color: var(--ch-ink-3); font: 400 18px/1 var(--ch-sans); cursor: pointer; }
 .ch-barrow:hover:not(:disabled) { color: var(--ch-ink); background: rgba(25, 25, 25, .045); }

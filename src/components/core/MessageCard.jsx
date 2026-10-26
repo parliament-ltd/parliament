@@ -68,6 +68,9 @@ export default function MessageCard({
   // card's own and is never part of the text. editedLine: said under an
   // edited prompt.
   hostContent = null, editedLine = null,
+  // Edits already told to a model (C216 (i)); toldTo: who was told the
+  // edits this prompt carried, for a prompt that was only those (C216 (e)).
+  closedEdits, toldTo = null,
 }) {
   const fixed = hostContent ? { contentEditable: false, suppressContentEditableWarning: true } : {}
   const { i18n } = useLingui()
@@ -162,6 +165,8 @@ export default function MessageCard({
   }, [highlights])
 
   const renderContent = useMemo(() => {
+    // A prompt that was only the person's edits, told (C216 (e)).
+    if (!displayContent && type === 'user' && toldTo) return <p className="text-sm italic text-[var(--p-text-secondary)]">{i18n._(COPY.chat.toldOnly, { name: toldTo })}</p>
     if (!displayContent) return null
 
     // A finished reply edited in place, a source's answer too, as plain text (stage 11).
@@ -177,6 +182,7 @@ export default function MessageCard({
           quotedTitle={(num) => i18n._(COPY.chat.quoted, { num })}
           clean={clean}
           onSave={onSaveEdits}
+          closedEdits={closedEdits}
         />
       )
     }
@@ -316,7 +322,7 @@ export default function MessageCard({
         </Markdown>
       </div>
     )
-  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation, editable, type, blocks, clean, onSaveEdits])
+  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation, editable, type, blocks, clean, onSaveEdits, closedEdits, toldTo])
 
   return (
     <motion.div

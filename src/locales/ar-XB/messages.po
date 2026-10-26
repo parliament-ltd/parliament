@@ -673,6 +673,10 @@ msgid "chat.describeSettingHelp"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.editsWaitingTab"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.finishSetting"
 msgstr ""
 
@@ -829,6 +833,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.thoughtUntimed"
+msgstr ""
+
+#. A prompt that sent only the edits of the person (C216 (e))
+#. js-lingui-explicit-id
+msgid "chat.toldOnly"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2038,6 +2047,31 @@ msgid "enter.helpVerb"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.holdEditAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditOff"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.holdEditOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditTold"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.importOpen"
 msgstr ""
 
@@ -2885,6 +2919,18 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptEdition"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsWait"
 msgstr ""
 
 #. js-lingui-explicit-id

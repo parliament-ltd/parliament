@@ -1975,6 +1975,16 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **(i) An edit beside one already sent** starts a new edit, never joins it (C210 (d)).
 - **(j) Branch tabs** count the edits waiting in each branch, in your blue.
 - **Suggestion:** approve (a) to (j) as one, (c) with them.
+- **Ruled 26 October by Stefan:** "Approved, C216 (a) to (j), including the stored note. Build piece 3."
+
+**C217. Stage 11, piece 3, as built** (26 October; C216 as ruled). Each point as C216 has it, with these details.
+- **(a) The note** (`src/editing/told.js`): for each message with edits waiting, in the chat's order, the edits as the message's stored form has them: "The person edited your reply 2. Each change, told once: ...", "... their prompt 3 ...". An answer from a source never went to the model (C115), so a note of struck fragments would mean nothing to it: its words as the person left them go instead, marked as material from a source, not instructions.
+- **(b) Sent once:** when a prompt goes to a model, the waiting edits are written into its note, kept on it as `told`, and each marked sent (to which model, when, with which prompt). Every later turn sends a prompt with its note ahead of its words; what was edited still goes as written. Edits of messages joined into that prompt are marked as gone into it instead, if the words sent still hold the draft's opening.
+- **(c) The Enter line:** "3 edits go with it, told once · Haiku 5.5 reads them", the note counted in what is sent; on an empty field, "Nothing typed: just your 3 edits go, told to Haiku 5.5", and Enter sends a prompt of only the note, whose card reads "Your edits, told to Haiku 5.5"; with a source answering, "Wikipedia reads none of your 3 edits; they go when a model answers here (by:)".
+- **(d) hold:242, hold:off 242** for edits of the chat here: a record change `undo:` takes back; one already told cannot be held.
+- **(e) Closed:** what is typed or struck beside an edit already told starts a new edit.
+- **(f) Branch tabs** show how many edits wait in each branch, in your blue.
+- **Not tried in the browser:** a real send to a model, as the browser here has no key, and `hold:` there, as the bar stayed pointed at the welcome page in that layout. Tried: the Enter line with a source answering, "Wikipedia reads none of your 9 edits; they go when a model answers here (by:)". The note, what a model reads, holding, marking sent and closed edits are tested.
 
 ## Proposed CLAUDE.md rewrite
 

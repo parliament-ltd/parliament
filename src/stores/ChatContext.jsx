@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
-import { getMessages, addMessage, updateMessage, saveEditedMessage, getSetting, setSetting, getConversation, groupPrompt } from '../lib/db'
+import { getMessages, addMessage, updateMessage, saveEditedMessage, getEditsOfChat, markEditsSent, getSetting, setSetting, getConversation, groupPrompt } from '../lib/db'
+import { noteFor, waiting } from '../editing/told'
 import { askToKeepStorage } from '../lib/storageKeep'
 import { nameFromChat, titleFromPrompt, fieldsFromDescription } from '../lib/chatTitles'
 import { useConversations } from './ConversationContext'
@@ -278,7 +279,9 @@ export function ChatProvider({ children }) {
   // group: the branches a prompt to several went to (C172 (b)); describe:
   // whether a first answer asks for the chat's title (C62), once per prompt
   // to several, not once per branch (C172 (e)).
-  const sendMessage = useCallback(async (conversationId, userContent, model, systemPrompt = '', tools = [], attachments = null, { frameworks = null, group = null, describe = true, included = null, step = null } = {}) => {
+  const sendMessage = useCallback(async (conversationId, userContent, model, systemPrompt = '', tools = [], attachments = null, { frameworks = null, group = null, describe = true, included = null, step = null, into = null } = {}) => {
+    // into: the messages a prompt and reply were joined from, whose edits
+    // went into this prompt's words and are not told again (C214 (c)).
     // One reply at a time in a chat; other chats are free.
     if (streamingIn(conversationId)) return
 
@@ -301,9 +304,15 @@ export function ChatProvider({ children }) {
     const held = hasMessages(conversationId) ? heldMessages(conversationId) : await getMessages(conversationId)
     const before = sendable(conversationId, held)
     const first = held.length === 0 // the chat's first prompt
+    // The person's edits waiting in this chat go once, with this prompt, as
+    // a note ahead of its words, kept on it (stage 11, piece 3; C216).
+    const editRecords = await getEditsOfChat(conversationId).catch(() => [])
+    const joinedFrom = new Set(Array.isArray(into) ? into : [])
+    const note = noteFor(before, editRecords, { leaveOut: joinedFrom })
+    const joinedIds = editRecords.filter((r) => waiting(r) && joinedFrom.has(r.messageId)).map((r) => r.id)
     // With privacy:names, the names in what goes, found on this computer
     // first; if that fails, the prompt is not added and nothing is sent.
-    const names = await namesFor(model, [...forModel(before).flatMap((m) => [textOf(m.content), ...(m.included ?? []).map((i) => i.text)]), userContent, systemPrompt, ...(included ?? []).map((i) => i.text)])
+    const names = await namesFor(model, [...forModel(before).flatMap((m) => [textOf(m.content), ...(m.included ?? []).map((i) => i.text)]), userContent, note.text, systemPrompt, ...(included ?? []).map((i) => i.text)])
 
     // 1. Add user message to state and IndexedDB.
     //    PR-18e: `userContent` is already the text the user typed PLUS
@@ -321,8 +330,13 @@ export function ChatProvider({ children }) {
       ...(Array.isArray(included) && included.length ? { included } : {}),
       // The planned step a run sends this for (stage 10; C196 (j)).
       ...(step ? { step } : {}),
+      ...(note.text ? { told: note.text } : {}),
     })
     updateMessages(conversationId, prev => [...prev, userMsg])
+    // Told, or gone into this prompt: neither goes again.
+    const toldAt = new Date().toISOString()
+    if (note.ids.length) markEditsSent(note.ids, { to: model, at: toldAt, prompt: userMsg.id }).catch(() => {})
+    if (joinedIds.length) markEditsSent(joinedIds, { into: userMsg.id, at: toldAt }).catch(() => {})
 
     // 2. Create a placeholder assistant message marked incomplete
     const assistantMsg = await addMessage({

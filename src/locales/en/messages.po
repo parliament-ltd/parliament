@@ -673,6 +673,10 @@ msgid "chat.describeSettingHelp"
 msgstr "On: after a chat's first answer, one short request asks the model for its title, a one-line summary and tags. The line under the bar names it before you send. Off: a chat is titled with the first words of its prompt, and nothing more is sent."
 
 #. js-lingui-explicit-id
+msgid "chat.editsWaitingTab"
+msgstr "{count, plural, one {# edit waits} other {# edits wait}} to go with the next prompt to this branch"
+
+#. js-lingui-explicit-id
 msgid "chat.finishSetting"
 msgstr "Finish replies after I leave a chat"
 
@@ -830,6 +834,11 @@ msgstr "show"
 #. js-lingui-explicit-id
 msgid "chat.thoughtUntimed"
 msgstr "thought first"
+
+#. A prompt that sent only the edits of the person (C216 (e))
+#. js-lingui-explicit-id
+msgid "chat.toldOnly"
+msgstr "Your edits, told to {name}"
 
 #. js-lingui-explicit-id
 msgid "chat.translatedBy"
@@ -2038,6 +2047,31 @@ msgid "enter.helpVerb"
 msgstr "Enter shows how {verb} works"
 
 #. js-lingui-explicit-id
+msgid "enter.holdEditAlready"
+msgstr "Held back already: {nums}"
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditNot"
+msgstr "Not held back: {nums}"
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditNotHere"
+msgstr "{num} is not an edit in the chat here"
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditOff"
+msgstr "Enter lets {nums} go with your next prompt"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.holdEditOn"
+msgstr "Enter holds back {nums}: yours, and not sent, until hold:off"
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditTold"
+msgstr "{num} was told already, so it cannot be held back"
+
+#. js-lingui-explicit-id
 msgid "enter.importOpen"
 msgstr "Enter opens a file and says what it is before anything happens"
 
@@ -2886,6 +2920,18 @@ msgstr "After the answer, one short request for its title, summary and tags"
 #. js-lingui-explicit-id
 msgid "enter.promptEdition"
 msgstr "From its {language} edition, or the English one if nothing is found there"
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsGo"
+msgstr "{count, plural, one {# edit goes} other {# edits go}} with it, told once · {name} reads them"
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsOnly"
+msgstr "Nothing typed: just your {count, plural, one {# edit goes} other {# edits go}}, told to {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsWait"
+msgstr "{source} reads none of your {count, plural, one {# edit} other {# edits}}; they go when a model answers here (by:)"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"

@@ -15,9 +15,15 @@
 // - Turns of the same side next to each other are joined into one, so the
 //   turns alternate as providers expect.
 //
+// - A prompt that carried a note of the person's edits (stage 11, piece 3;
+//   C216) goes with that note ahead of its words, every time, where it was
+//   told; what was edited goes as written.
+//
 // And whether a reply came back whole: cut off by the length allowed for
 // one reply, or by an error, is marked as cut off (request-path audit,
 // item 9: these were stored as complete).
+
+import { withTold } from '../editing/told'
 
 /** Whether a message is an answer from a source, which a model is not sent (C115). */
 export const fromSource = (m) => Boolean(m?.source)
@@ -33,9 +39,11 @@ export const SUMMARY_LEAD = 'This conversation carries on from a summary of an e
 export function forModel(messages) {
   const turns = []
   for (const m of messages) {
-    if (!m || typeof m.content !== 'string' || !m.content || fromSource(m)) continue
+    // A prompt may be only the note of edits it carried (C216 (e)).
+    if (!m || typeof m.content !== 'string' || (!m.content && !m.told) || fromSource(m)) continue
     const role = m.summary ? 'user' : m.role
-    const content = m.summary ? `${SUMMARY_LEAD}\n\n<summary>\n${m.content}\n</summary>` : m.content
+    // A prompt goes with the note of edits it carried, where it was told (C216 (c)).
+    const content = m.summary ? `${SUMMARY_LEAD}\n\n<summary>\n${m.content}\n</summary>` : m.role === 'user' ? withTold(m) : m.content
     // An answer the person brought into this prompt goes with it, every
     // time the chat is sent, for the provider to send as data (C176).
     const included = m.role === 'user' && Array.isArray(m.included) && m.included.length

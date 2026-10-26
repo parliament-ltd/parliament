@@ -33,6 +33,8 @@ import { readOwnFrameworks, keepOwnFramework, removeOwnFramework, restoreOwnFram
 import { useIsStreaming, useHiddenIds, usePendingDeletes, useStreamEnd, useMessages } from '../stores/chatHooks'
 import { sendableOf, hiddenIds, pendingDeletes, isStreaming as replyArriving, stopStream, streamingIds } from '../stores/chatStore'
 import { fromSource } from '../stores/sendHistory'
+import { useChatEdits } from '../stores/useChatEdits'
+import { noteFor } from '../editing/told'
 import { preview, viewFromSaved, lineOf, LOCAL_READS } from './preview'
 import { answerFor, includedOf } from '../lib/included'
 import { promptFacts, promptNow } from '../lib/branchVerbs'
@@ -633,6 +635,10 @@ export default function Shell() {
     const onDraft = (e) => {
       const value = e.detail?.value
       if (typeof value !== 'string' || !value.trim()) return
+      // The messages joined: their edits go into this prompt when it is sent,
+      // not as a note (C214 (c), C216 (h)).
+      joinedDraft.current = Array.isArray(e.detail?.from) ? { value, from: e.detail.from.filter((x) => typeof x === 'string') } : null
+      setJoinedNow(joinedDraft.current)
       // Joined by typing, the cursor stays where the person is typing.
       setWrite({ value: value.slice(0, 200_000), mode: 'prompt', focus: e.detail?.focus !== false, n: ++writes.current })
     }
@@ -1193,6 +1199,13 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'holdEdits') {
+      // hold: and hold:off for edits (C216 (f)): a change undo: takes back.
+      const done = await changeRecords(db.current, what.edits.map((e) => ({ store: 'edits', id: e.id, num: e.num, set: { held: what.held }, expect: { held: !what.held } })))
+      if (touched.current) touched.current.records.push(...done)
+      remember(body)
+      return null
+    }
     if (what.kind === 'markup') {
       // markup:on / markup:off (stage 11, piece 1): replies marked up, or clean.
       await updateSettingNow.current('markup', what.on ? 'on' : 'off')
@@ -1701,6 +1714,9 @@ export default function Shell() {
   // The chat on screen's messages, and its last answer from a source.
   // The room a prompt goes to: its chat's messages, held by its room (C175 (a)).
   const roomMessages = useMessages(roomId ?? null)
+  // A prompt and reply joined into the bar (C216 (h)): what was drafted, and from which messages.
+  const joinedDraft = useRef(null)
+  const [joinedNow, setJoinedNow] = useState(null)
   // The open chat is the room a prompt goes to; the rooms hold their own.
   useEffect(() => { focusChat(roomId ?? null) }, [roomId, focusChat])
   const shown = roomId ? roomMessages : NONE
@@ -2223,7 +2239,13 @@ export default function Shell() {
     nameOf: languageName,
     warn: typeof settings.runWarn === 'number' ? settings.runWarn : null,
   }), [settings.runWarn, keyedBy, conversations, settings.defaultModel, chatRowsById, runningHere, roomId, roomRecord, streaming, queryOf, languageName, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, ...languageScreens, branching, summarizing, including, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, languageScreens, branching, summarizing, including, again, settingScreen, planBoard, runFacts])
+  // The edits of the room's chat (stage 11, piece 3; C216).
+  const roomEdits = useChatEdits(roomId ? [roomId] : [])
+  // The room's edits by number, for hold: (C216 (f)).
+  const heldEdits = useMemo(() => ({
+    byNum: new Map((roomEdits.get(roomId) ?? []).filter((r) => Number.isInteger(r.num)).map((r) => [r.num, { id: r.id, held: Boolean(r.held), sent: Boolean(r.sent) }])),
+  }), [roomEdits, roomId])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, heldEdits, ...languageScreens, branching, summarizing, including, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, heldEdits, languageScreens, branching, summarizing, including, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -2235,6 +2257,12 @@ export default function Shell() {
   const hiddenOut = shown.filter((m) => m.content).length - kept.length
   // Answers from sources stay out too, unless the person acts on them (C115).
   const along = useMemo(() => kept.filter((m) => !fromSource(m)), [kept])
+  // The edits waiting in the room's chat, and the note they would make (C216).
+  const editsHere = useMemo(() => {
+    // Edits of messages joined into the bar go into that prompt, not with it.
+    const note = noteFor(kept, roomEdits.get(roomId) ?? [], { leaveOut: new Set(joinedNow?.from ?? []) })
+    return note.ids.length ? { count: note.ids.length, chars: note.text.length } : null
+  }, [kept, roomEdits, roomId, joinedNow])
   const sourcesOut = useMemo(() => {
     const answers = kept.filter(fromSource)
     return { count: answers.length, names: [...new Set(answers.map((m) => m.source.name || m.source.id))] }
@@ -2331,10 +2359,12 @@ export default function Shell() {
     sourcesOut: about ? NO_SOURCES : sourcesOut,
     describe: about ? describeFresh : describe,
     resend: !about && Boolean(roomId) && stalledIn === roomId,
+    // The person's edits waiting here, and the size of their note (C216).
+    edits: about ? null : editsHere,
     ink,
     roomName: roomNameHere,
     about,
-  }), [arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf])
+  }), [arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -2534,6 +2564,15 @@ export default function Shell() {
       return { refused: 'queryFailed' }
     }
 
+    // Nothing typed, and edits waiting: just the edits go, told to the model
+    // that answers here (C216 (e)), as the Enter line said.
+    if (!text && shown?.edits?.count && chatId && who.group !== 'source' && !shown?.resend) {
+      if (who.group === 'model' && !fresh[who.provider]) return { refused: 'promptFailed' }
+      const done = sendMessage(chatId, '', who.id, system(), [], null, { ...under })
+        .then(() => { loadConversations().catch(() => {}); return null })
+        .catch(failure)
+      return { done }
+    }
     // Nothing typed, and the last reply here stalled: send it again without
     // streaming, as the Enter line offered (C114).
     if (!text) {
@@ -2570,11 +2609,20 @@ export default function Shell() {
     }
 
     const full = aboutNow ? `${aboutNow.text}\n\n${text}` : text
+    // A prompt drafted by joining (C216 (h)): its messages' edits went into
+    // its words. Only if the words sent still hold that draft's opening;
+    // otherwise its edits go as usual.
+    const joinedInto = (sent) => {
+      const d = joinedDraft.current
+      joinedDraft.current = null
+      setJoinedNow(null)
+      return d && sent && sent.includes(d.value.slice(0, 40)) ? { into: d.from } : {}
+    }
     if (aboutNow) clearPicked()
     const send = () => {
       const { locale } = latest.current
       return who.group !== 'source'
-        ? sendMessage(id, full, who.id, system(), [], null, { ...under, ...withInc(who) })
+        ? sendMessage(id, full, who.id, system(), [], null, { ...under, ...withInc(who), ...joinedInto(text) })
         : askSource(id, text, { source: who.id, lang: askIn(locale), fallbackLang: destination(who.id)?.answersIn === 'yours' ? 'en' : null, asked: searched(locale) })
     }
     // The edition a source with one in each language is asked in (C166 (e));

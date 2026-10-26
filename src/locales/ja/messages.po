@@ -673,6 +673,10 @@ msgid "chat.describeSettingHelp"
 msgstr "オン：チャットの最初の回答のあと、短いリクエストを1回送り、タイトル、1行の要約、タグをモデルに求めます。送信前に、バーの下の行でそのことを示します。オフ：チャットのタイトルはプロンプトの最初の言葉になり、それ以上は何も送りません。"
 
 #. js-lingui-explicit-id
+msgid "chat.editsWaitingTab"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.finishSetting"
 msgstr "チャットを離れたあとも返答を最後まで書く"
 
@@ -830,6 +834,11 @@ msgstr "表示"
 #. js-lingui-explicit-id
 msgid "chat.thoughtUntimed"
 msgstr "回答前に思考"
+
+#. A prompt that sent only the edits of the person (C216 (e))
+#. js-lingui-explicit-id
+msgid "chat.toldOnly"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.translatedBy"
@@ -2038,6 +2047,31 @@ msgid "enter.helpVerb"
 msgstr "Enterで {verb} の使い方を表示します"
 
 #. js-lingui-explicit-id
+msgid "enter.holdEditAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditOff"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.holdEditOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditTold"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.importOpen"
 msgstr "Enterでファイルを開き、何かが起きる前に、それが何のファイルかを示します"
 
@@ -2886,6 +2920,18 @@ msgstr "回答のあと、タイトル、要約、タグを求める短いリク
 #. js-lingui-explicit-id
 msgid "enter.promptEdition"
 msgstr "{language}版から。見つからなければ英語版から"
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsWait"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"

@@ -1042,3 +1042,35 @@ describe('thinking: and the Enter line of a model that thinks (C165)', () => {
     expect(promptPreview('owls?', { ...room, answerer: who }).says.also.map((x) => x.message)[0]).toBe('promptThinksOff')
   })
 })
+
+describe('edits on the Enter line (stage 11, piece 3; C216)', () => {
+  const room = { room: 'c1', streaming: false, keyed: true, provider: 'Anthropic', source: 'Wikipedia', historyChars: 0, systemChars: 0 }
+  const model = { id: 'm', group: 'model', name: 'Haiku 9', price: null }
+  const also = (p) => (p.says?.also ?? []).map((x) => say(i18n, x.message, x.values))
+  it('counts what goes with a prompt, and who reads it', () => {
+    const p = promptPreview('Go on.', { ...room, answerer: model, edits: { count: 3, chars: 120 } })
+    expect(p.ready).toBe(true)
+    expect(also(p)).toContain('3 edits go with it, told once · Haiku 9 reads them')
+  })
+  it('sends just the edits on an empty Enter', () => {
+    const p = promptPreview('', { ...room, answerer: model, edits: { count: 1, chars: 80 } })
+    expect(p).toMatchObject({ ready: true, editsOnly: true })
+    expect(also(p)[0]).toBe('Nothing typed: just your 1 edit goes, told to Haiku 9')
+  })
+  it('says a source reads none of them', () => {
+    const p = promptPreview('', { ...room, answerer: { id: 'wikipedia', group: 'source', name: 'Wikipedia' }, edits: { count: 2, chars: 80 } })
+    expect(p.ready).toBe(false)
+    expect(say(i18n, p.says.message, p.says.values)).toBe('Wikipedia reads none of your 2 edits; they go when a model answers here (by:)')
+  })
+  it('holds an edit here back, and lets it go (C216 (f))', () => {
+    const heldEdits = { byNum: new Map([[242, { id: 'm:e1', held: false, sent: false }], [243, { id: 'm:e2', held: true, sent: false }], [244, { id: 'm:e3', held: false, sent: true }]]) }
+    const at = (value) => {
+      const p = preview(value, { mode: 'command', arrangement: { ...shipped('almanac'), addressed: 'room' }, screens: { heldEdits } })
+      return { ...p, text: say(i18n, p.says.message, p.says.values) }
+    }
+    expect(at('>hold:242')).toMatchObject({ text: 'Enter holds back 242: yours, and not sent, until hold:off', act: { kind: 'holdEdits', edits: [{ num: 242, id: 'm:e1' }], held: true } })
+    expect(at('>hold:off 243').act).toEqual({ kind: 'holdEdits', edits: [{ num: 243, id: 'm:e2' }], held: false })
+    expect(at('>hold:243').text).toBe('Held back already: 243')
+    expect(at('>hold:244').text).toBe('244 was told already, so it cannot be held back')
+  })
+})

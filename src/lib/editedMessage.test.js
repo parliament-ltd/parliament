@@ -126,6 +126,24 @@ describe('saving an edited reply (C212)', () => {
     }
   })
 
+  it('marks edits told once, never twice, and keeps each record\'s number (C216)', async () => {
+    await R.saveEditedMessage(db, reply.id, { blocks, edits: new Map([['e1', said('eleven years', 'a century')]]), now: at() })
+    const [edit] = await R.editsOfChat(db, c.id)
+    expect(await R.markEditsSent(db, [edit.id], { to: 'claude-sonnet', at: 't1', prompt: 'p1' })).toBe(1)
+    expect(await R.markEditsSent(db, [edit.id], { to: 'other', at: 't2', prompt: 'p2' })).toBe(0)
+    const after = (await R.editsOfChat(db, c.id))[0]
+    expect(after.sent).toEqual({ to: 'claude-sonnet', at: 't1', prompt: 'p1' })
+    expect(after.num).toBe(edit.num)
+  })
+
+  it('holds an edit back, as undo: can take back (C216 (f))', async () => {
+    await R.saveEditedMessage(db, reply.id, { blocks, edits: new Map([['e1', said('eleven years', 'a century')]]), now: at() })
+    const [edit] = await R.editsOfChat(db, c.id)
+    const done = await R.changeRecords(db, [{ store: 'edits', id: edit.id, num: edit.num, set: { held: true }, expect: { held: false } }])
+    expect(done).toEqual([{ store: 'edits', id: edit.id, num: edit.num, before: { held: false }, after: { held: true } }])
+    expect((await R.editsOfChat(db, c.id))[0].held).toBe(true)
+  })
+
   it('counts the blocks in the chat\'s size', async () => {
     const before = (await db.get('conversations', c.id)).storageBytes
     await R.saveEditedMessage(db, reply.id, { blocks, edits: new Map(), now: at() })

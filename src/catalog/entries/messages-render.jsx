@@ -37,6 +37,8 @@ import MessageCard from '../../components/core/MessageCard'
 import EditableMessages from '../../components/core/EditableMessages'
 import { HIGHLIGHT_COLORS } from '../../lib/constants'
 import { stripAttachedFileBlocks } from '../../lib/fileUpload'
+import { useChatEdits } from '../../stores/useChatEdits'
+import { waiting as editWaits } from '../../editing/told'
 import BranchSlider from '../../components/core/BranchSlider'
 import { lineItems, membersOf } from '../../lib/branchGroups'
 import { usePlanOf, waitingIn } from '../../stores/usePlanOf'
@@ -368,6 +370,16 @@ export default function MessagesRender() {
   const lineChat = useMemo(() => conversations.find((c) => c.id === activeConversationId) ?? null, [conversations, activeConversationId])
   // Branches sent to one after another whose turn has not come (C202).
   const linePlan = usePlanOf(lineChat?.docketId ?? null)
+  // The edits of this chat and its branches on screen (stage 11, piece 3;
+  // C216): which were told and are closed, which wait, and who was told.
+  const chatEdits = useChatEdits([activeConversationId, ...memberIds])
+  const closedEdits = useMemo(() => new Set([...chatEdits.values()].flat().filter((r) => r.sent).map((r) => r.edit)), [chatEdits])
+  const toldToOf = useCallback((msg) => {
+    if (msg.role !== 'user' || !msg.told) return null
+    const r = [...chatEdits.values()].flat().find((e) => e.sent?.prompt === msg.id)
+    return r ? (modelFacts(r.sent.to)?.name ?? r.sent.to) : null
+  }, [chatEdits])
+  const editsWaitingIn = useCallback((chatId) => (chatEdits.get(chatId) ?? []).filter(editWaits).length, [chatEdits])
   const items = useMemo(() => lineItems(visibleMessages, activeConversationId, members, (chatId, groupId) => waitingIn(linePlan, chatId, groupId)), [visibleMessages, activeConversationId, members, linePlan])
   const [planNum, setPlanNum] = useState(null)
   useEffect(() => {
@@ -453,9 +465,11 @@ export default function MessagesRender() {
       blocks: msg.blocks ?? null,
       onSaveEdits: editable ? (saved) => saveEditedReply(activeConversationId, msg.id, saved) : undefined,
       clean: settings.markup === 'off',
+      closedEdits,
+      toldTo: toldToOf(msg),
     }
   }, [
-    saveEditedReply, settings.markup,
+    saveEditedReply, settings.markup, closedEdits, toldToOf,
     isStreaming, streamingContent, streamingMessageId, streamingThinking, streamingAnswering, activeConversationId, i18n,
     numberByMessageId, activePopoverMsgId,
     favorites, notes, highlights, showNotes,
@@ -535,9 +549,10 @@ export default function MessagesRender() {
         clean={settings.markup === 'off'}
         onSave={(messageId, saved) => saveEditedReply(activeConversationId, messageId, saved)}
         words={{ joined: i18n._(COPY.chat.joinedToBar), label: i18n._(COPY.chat.pairLabel) }}
+        closedEdits={closedEdits}
       />
     )
-  }, [cardPropsOf, quotesByMessage, editedLineOf, highlightTerms, i18n, settings.markup, saveEditedReply, activeConversationId])
+  }, [cardPropsOf, quotesByMessage, editedLineOf, highlightTerms, i18n, settings.markup, saveEditedReply, activeConversationId, closedEdits])
 
   // A tab's letter, who answered, and the branch's address (203b).
   const infoOf = useCallback((chatId, tab) => {
@@ -553,8 +568,8 @@ export default function MessagesRender() {
     const list = chatId === activeConversationId ? visibleMessages : members.get(chatId) ?? []
     const chars = list.reduce((n, m) => n + (m.content && !m.source ? m.content.length : 0), 0)
     // Its last answer from a source, for include: (C176).
-    return { letter, name, address: planNum != null && letter ? `${planNum}${letter}` : null, context: contextShare(chars, window), answer: answerFor(list), prompt: promptFacts(list), steps: list.filter((m) => m.role === 'user').length }
-  }, [conversations, planNum, i18n, activeConversationId, visibleMessages, members])
+    return { letter, name, address: planNum != null && letter ? `${planNum}${letter}` : null, context: contextShare(chars, window), answer: answerFor(list), prompt: promptFacts(list), steps: list.filter((m) => m.role === 'user').length, waiting: editsWaitingIn(chatId) }
+  }, [conversations, planNum, i18n, activeConversationId, visibleMessages, members, editsWaitingIn])
   // A message of another branch is numbered as in its own chat.
   const numberOf = useCallback((chatId, msg) => {
     const list = members.get(chatId) ?? []

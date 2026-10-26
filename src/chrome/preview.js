@@ -31,6 +31,7 @@ import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, namesFrom, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
 import { planReply, planLanguage, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
 import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
+import { planHoldEdits } from '../lib/editVerbs'
 import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
@@ -733,7 +734,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       // set: on Settings (stage 9; C181); a block's settings come with the Lab.
       set: (a1, s1, sc) => (a1.addressed === 'settings' ? planSet(s1, sc) : null),
       // hold: and hold:off for a plan's branches (stage 10, piece 2; C198).
-      hold: (a1, s1, sc) => planHold(s1, sc),
+      // Edits first, by their numbers (C216 (f)); else a plan's branches.
+      hold: (a1, s1, sc) => planHoldEdits(s1, sc) ?? planHold(s1, sc),
       // run: and stop: (stage 10, piece 3; C200).
       run: (a1, s1, sc) => planRun(s1, sc),
       stop: (a1, s1, sc) => planStop(s1, sc, a1.addressed),
@@ -933,11 +935,31 @@ export function promptPreview(text, target = {}) {
   // A branch a run is sending to takes no prompt by hand until it ends (C196 (f)).
   if (target.branchRunning) return { ready: false, says: { message: 'promptBranchRunning', values: { address: target.branchRunning } } }
   if (target.room === undefined) return { ready: false, says: { message: 'promptNoRoom' } }
-  const p = Array.isArray(target.many) && target.many.length > 1 ? manyPreview(text, target) : onePreview(text, target)
+  // The person's edits waiting here (stage 11, piece 3; C216): they go once
+  // with this prompt, to a model, as a note counted in what is sent; a
+  // source reads none of them. target.edits: { count, chars } of the note.
+  const edits = target.edits?.count > 0 ? target.edits : null
+  const toModel = (w) => w && w.group !== 'source'
+  if (edits && !String(text ?? '').trim() && !target.streaming && !(Array.isArray(target.many) && target.many.length > 1)) {
+    // Enter on an empty field sends just the edits (C216 (e)).
+    const who = target.answerer ?? { group: target.keyed ? 'model' : 'source', name: target.keyed ? target.provider : target.source }
+    if (!toModel(who)) return { ready: false, says: { message: 'promptEditsWait', values: { count: edits.count, source: who.name ?? target.source ?? '' } } }
+    const p = onePreview('·'.repeat(Math.max(1, edits.chars)), target)
+    if (!p.ready || !p.says) return p
+    return { ...p, editsOnly: true, says: { ...p.says, also: [{ message: 'promptEditsOnly', values: { count: edits.count, name: who.name ?? '' } }, ...(p.says.also ?? [])] } }
+  }
+  const counted = edits ? { ...target, historyChars: (target.historyChars ?? 0) + edits.chars } : target
+  const p = Array.isArray(target.many) && target.many.length > 1 ? manyPreview(text, counted) : onePreview(text, counted)
   // Among a prompt's branches (C174): which one it carries on, and that the
   // one being viewed is not it.
   if (!p.ready || !p.says) return p
   const lines = []
+  if (edits) {
+    const first = Array.isArray(target.many) && target.many.length > 1 ? target.many[0] : target.answerer ?? { group: target.keyed ? 'model' : 'source', name: target.keyed ? target.provider : target.source }
+    lines.push(toModel(first)
+      ? { message: 'promptEditsGo', values: { count: edits.count, name: first.name ?? '' } }
+      : { message: 'promptEditsWait', values: { count: edits.count, source: first.name ?? target.source ?? '' } })
+  }
   if (target.toBranch) lines.push({ message: 'promptToBranch', values: { address: target.toBranch } })
   if (target.carriesOn) lines.push({ message: 'promptCarriesOn', values: target.carriesOn })
   const whos = Array.isArray(target.many) && target.many.length > 1 ? target.many : [target.answerer ?? { group: target.keyed ? 'model' : 'source' }]

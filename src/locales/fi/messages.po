@@ -673,6 +673,10 @@ msgid "chat.describeSettingHelp"
 msgstr "Päällä: keskustelun ensimmäisen vastauksen jälkeen yksi lyhyt pyyntö kysyy mallilta otsikon, yhden rivin yhteenvedon ja tunnisteet. Palkin alla oleva rivi kertoo siitä ennen lähettämistä. Pois: keskustelun otsikoksi tulevat kehotteen ensimmäiset sanat, eikä mitään muuta lähetetä."
 
 #. js-lingui-explicit-id
+msgid "chat.editsWaitingTab"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.finishSetting"
 msgstr "Anna vastausten valmistua, kun poistun keskustelusta"
 
@@ -830,6 +834,11 @@ msgstr "näytä"
 #. js-lingui-explicit-id
 msgid "chat.thoughtUntimed"
 msgstr "mietti ensin"
+
+#. A prompt that sent only the edits of the person (C216 (e))
+#. js-lingui-explicit-id
+msgid "chat.toldOnly"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.translatedBy"
@@ -2038,6 +2047,31 @@ msgid "enter.helpVerb"
 msgstr "Enter näyttää, miten {verb} toimii"
 
 #. js-lingui-explicit-id
+msgid "enter.holdEditAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditOff"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.holdEditOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditTold"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.importOpen"
 msgstr "Enter avaa tiedoston ja kertoo, mikä se on, ennen kuin mitään tapahtuu"
 
@@ -2886,6 +2920,18 @@ msgstr "Vastauksen jälkeen yksi lyhyt pyyntö otsikosta, yhteenvedosta ja tunni
 #. js-lingui-explicit-id
 msgid "enter.promptEdition"
 msgstr "Kieliversiosta {language}, tai englanninkielisestä, jos sieltä ei löydy mitään"
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsWait"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"

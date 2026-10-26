@@ -53,6 +53,8 @@ function Tab({ tab, info, on, carried, onPick }) {
       <span className="ch-btab-id">{info.letter ?? '·'}</span>
       <span dir="auto">{info.name}</span>
       {state && <span className="ch-btab-st">{i18n._(state)}</span>}
+      {/* Edits waiting to go with the branch's next prompt, in the person's blue (C216 (j)). */}
+      {info.waiting > 0 && <span className="ch-btab-wait" title={i18n._(COPY.chat.editsWaitingTab, { count: info.waiting })}>{info.waiting}</span>}
     </button>
   )
 }

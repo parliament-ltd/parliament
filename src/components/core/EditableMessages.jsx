@@ -66,7 +66,11 @@ function crosses(sel) {
  *   words: { joined: string, label: string },
  * }} props
  */
-export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, onSave, words }) {
+const NO_CLOSED = new Set()
+export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, onSave, words, closedEdits = NO_CLOSED }) {
+  // Edits already told to a model: typing beside one starts a new edit (C216 (i)).
+  const closedRef = useRef(closedEdits)
+  useEffect(() => { closedRef.current = closedEdits }, [closedEdits])
   const host = useRef(null)
   const view = useRef(null)
   const idsRef = useRef(null)
@@ -123,7 +127,10 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
     // The bar holds one line: lines and paragraphs meet with a space.
     const value = parts.filter(Boolean).join('\n\n').replace(/\s*\n+\s*/g, ' ').trim()
     if (!value) return
-    window.dispatchEvent(new CustomEvent('parliament-prompt-draft', { detail: { value, focus } }))
+    // from: the messages joined, whose edits go into this prompt (C216 (h)).
+    const from = []
+    v.state.doc.forEach((sec) => { if (sec.type === schema.nodes.section && sec.attrs.message) from.push(sec.attrs.message) })
+    window.dispatchEvent(new CustomEvent('parliament-prompt-draft', { detail: { value, focus, from } }))
     setSaid(wordsRef.current?.joined ?? '')
   }, [])
   const joinSoon = useCallback(() => {
@@ -137,6 +144,7 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
   // under a prompt): its own saves must not draw it again.
   useEffect(() => {
     const ids = createEditIds()
+    ids.setClosed((edit) => closedRef.current.has(edit))
     idsRef.current = ids
     const made = sectionsRef.current.map((s) => {
       const m = s.message

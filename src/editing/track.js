@@ -36,10 +36,14 @@ export const REFUSED = 'editRefused'
 export function createEditIds() {
   const make = () => crypto.randomUUID().replace(/-/g, '').slice(0, 10)
   let next = make()
+  let closed = () => false
   return {
     peek: () => next,
     commit(id) { if (id === next) next = make() },
     block: () => `b${make()}`,
+    // Edits already told to a model (C216 (i)): the editor says which.
+    isClosed: (id) => closed(id),
+    setClosed(fn) { closed = typeof fn === 'function' ? fn : () => false },
   }
 }
 
@@ -58,6 +62,11 @@ const editOf = (marks) => {
   for (const m of marks) if (isEditMark(m)) return { kind: m.type === STRUCK ? 'struck' : 'added', id: m.attrs.edit }
   return null
 }
+
+// An edit already told to a model is closed: what is typed or struck beside
+// it starts a new edit, never joins it (C210 (d), C216 (i)). ids.isClosed
+// says which, where the editor knows.
+const open = (ids, id) => (id != null && !ids?.isClosed?.(id) ? id : null)
 
 /** The edit touching a position in a line: the text just before it, else just after. */
 export function editAt(doc, pos, prefer = 'before') {
@@ -238,7 +247,7 @@ function applyStep(out, given, ctx) {
       out.step(step)
       return { same: true, cursor: null }
     }
-    const id = d.added[0]?.id ?? editAt(doc, from) ?? ctx.ids.peek()
+    const id = open(ctx.ids, d.added[0]?.id) ?? open(ctx.ids, editAt(doc, from)) ?? ctx.ids.peek()
     ctx.ids.commit(id)
     if (alreadyMarked(slice.content, id)) {
       out.step(step)
@@ -252,8 +261,8 @@ function applyStep(out, given, ctx) {
   const first = out.steps.length
   let strikeId = null
   if (d.original.length || d.atoms.length) {
-    const near = ctx.intent === 'backspace' ? editAt(doc, to, 'after') ?? editAt(doc, from)
-      : ctx.intent === 'delete' ? editAt(doc, from) ?? editAt(doc, to, 'after')
+    const near = ctx.intent === 'backspace' ? open(ctx.ids, editAt(doc, to, 'after')) ?? open(ctx.ids, editAt(doc, from))
+      : ctx.intent === 'delete' ? open(ctx.ids, editAt(doc, from)) ?? open(ctx.ids, editAt(doc, to, 'after'))
         : null
     strikeId = near ?? ctx.ids.peek()
     ctx.ids.commit(strikeId)
@@ -268,7 +277,7 @@ function applyStep(out, given, ctx) {
   if (text) {
     // The new words go straight after what was struck, as one edit with it.
     const at = map.map(to, 1)
-    const id = strikeId ?? d.added[0]?.id ?? editAt(out.doc, at) ?? ctx.ids.peek()
+    const id = strikeId ?? open(ctx.ids, d.added[0]?.id) ?? open(ctx.ids, editAt(out.doc, at)) ?? ctx.ids.peek()
     ctx.ids.commit(id)
     const before = out.steps.length
     out.replace(at, at, markSlice(slice, id, out.doc.resolve(at)))
@@ -350,7 +359,7 @@ export function cursorMarks(state, ids) {
   if (!$pos.parent.inlineContent) return null
   const marks = $pos.marks()
   if (marks.some((m) => m.type === ADDED)) return null
-  const id = editAt(state.doc, $pos.pos) ?? ids.peek()
+  const id = open(ids, editAt(state.doc, $pos.pos)) ?? ids.peek()
   const kept = marks.filter((m) => !isEditMark(m) && $pos.parent.type.allowsMarkType(m.type))
   return ADDED.create({ edit: id }).addToSet(kept)
 }

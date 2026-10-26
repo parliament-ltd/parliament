@@ -538,6 +538,36 @@ export async function removeMessage(db, id) {
 
 const blocksSize = (blocks) => (Array.isArray(blocks) ? byteSize(JSON.stringify(blocks)) : 0)
 
+/** A chat's edit records (stage 11, piece 3). Empty before version 6. */
+export async function editsOfChat(db, conversationId) {
+  if (!isV6(db)) return []
+  return db.getAllFromIndex('edits', 'conversationId', conversationId)
+}
+
+/**
+ * Mark edits as gone (C216): told to a model with a prompt, sent { to, at,
+ * prompt }, or gone into a prompt by joining, sent { into, at } (C214 (c)).
+ * One sent already stays as it was. One transaction.
+ * @param {import('idb').IDBPDatabase} db
+ * @param {string[]} ids edit record ids
+ * @param {object} sent
+ */
+export async function markEditsSent(db, ids, sent) {
+  if (!isV6(db) || !ids?.length) return 0
+  return write(db, ['edits'], async (tx) => {
+    const store = tx.objectStore('edits')
+    const changes = []
+    for (const id of ids) {
+      const r = await store.get(id)
+      if (!r || r.sent) continue
+      await store.put({ ...r, sent, updatedAt: sent.at ?? new Date().toISOString() })
+      changes.push({ kind: 'edit', op: 'updated', id: r.id, num: r.num })
+    }
+    return { result: changes.length, changes }
+  })
+}
+
+
 /**
  * Save a reply's editable form and keep its edits in step (C212 (b), (c)),
  * in one transaction. Each edit is a record keyed by its message and its id
@@ -599,7 +629,8 @@ export async function saveEditedMessage(db, messageId, { blocks, edits, part = '
 // ── Row verbs (stage 6, piece 3; C143) ──────────────────
 
 // The stores a numbered row lives in, and the kind each announces.
-const ROW_STORES = Object.freeze({ conversations: 'chat', dockets: 'docket', notes: 'note', highlights: 'term', pins: 'quote' })
+// Edits too: hold: changes one, and undo: takes it back (stage 11, piece 3; C216 (f)).
+const ROW_STORES = Object.freeze({ conversations: 'chat', dockets: 'docket', notes: 'note', highlights: 'term', pins: 'quote', edits: 'edit' })
 
 /** A field as the row verbs read it: missing means false, empty or ''. */
 export function rowField(record, key) {

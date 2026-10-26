@@ -10,6 +10,7 @@ import { DB_NAME, DB_VERSION, DRAFT_DB_VERSION, TRIAL_DB_NAME, BUILTIN_AUTHOR, u
 import {
   createChat, updateChat, removeChat, createBranchChat, createSummaryChat, setPromptGroup,
   addMessageRecord, updateMessageRecord, removeMessage, saveEditedMessage as saveEditedMessageRecord,
+  editsOfChat, markEditsSent as markEditsSentRecord,
   addNumbered, updateNumbered, removeNumbered,
   addFavoriteRecord, removeFavoriteRecord, saveDocument, changeRecords,
 } from './records'
@@ -466,7 +467,7 @@ export async function getBranches(parentConversationId) {
 
 // ─── Messages ────────────────────────────────────────────
 
-export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false, attachmentMeta, asked, group, included, step }) {
+export async function addMessage({ conversationId, role, content, tokenCount = 0, incomplete = false, attachmentMeta, asked, group, included, step, told }) {
   const db = await initDB()
   const message = {
     id: generateId(),
@@ -492,6 +493,8 @@ export async function addMessage({ conversationId, role, content, tokenCount = 0
     ...(Array.isArray(included) && included.length ? { included } : {}),
     // The planned step a run sent this prompt for (stage 10; C196 (j)).
     ...(typeof step === 'string' && step ? { step } : {}),
+    // What the model was told of the person's edits, with this prompt (stage 11, piece 3; C216 (c)).
+    ...(typeof told === 'string' && told ? { told } : {}),
   }
   // Touches the chat's updatedAt and size in the same transaction.
   return addMessageRecord(db, message)
@@ -506,6 +509,17 @@ export async function getMessages(conversationId) {
 export async function updateMessage(id, updates) {
   return updateMessageRecord(await initDB(), id, updates)
 }
+
+/** A chat's edit records (stage 11, piece 3). */
+export async function getEditsOfChat(conversationId) {
+  return editsOfChat(await initDB(), conversationId)
+}
+
+/** Mark edits told, or gone into a prompt (C216). */
+export async function markEditsSent(ids, sent) {
+  return markEditsSentRecord(await initDB(), ids, sent)
+}
+
 
 /** Save a reply's editable form and its edits, in one transaction (C212). */
 export async function saveEditedMessage(id, saved) {

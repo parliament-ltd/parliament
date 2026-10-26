@@ -673,6 +673,10 @@ msgid "chat.describeSettingHelp"
 msgstr "På: efter en chatts första svar ber en kort förfrågan modellen om en titel, en sammanfattning på en rad och taggar. Raden under fältet nämner förfrågan innan du skickar. Av: en chatt får de första orden i sin prompt som titel, och inget mer skickas."
 
 #. js-lingui-explicit-id
+msgid "chat.editsWaitingTab"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.finishSetting"
 msgstr "Skriv klart svar när jag har lämnat en chatt"
 
@@ -830,6 +834,11 @@ msgstr "visa"
 #. js-lingui-explicit-id
 msgid "chat.thoughtUntimed"
 msgstr "tänkte först"
+
+#. A prompt that sent only the edits of the person (C216 (e))
+#. js-lingui-explicit-id
+msgid "chat.toldOnly"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.translatedBy"
@@ -2038,6 +2047,31 @@ msgid "enter.helpVerb"
 msgstr "Enter visar hur {verb} fungerar"
 
 #. js-lingui-explicit-id
+msgid "enter.holdEditAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditOff"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.holdEditOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditTold"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.importOpen"
 msgstr "Enter öppnar en fil och säger vad den är innan något händer"
 
@@ -2886,6 +2920,18 @@ msgstr "Efter svaret, en kort förfrågan om titel, sammanfattning och taggar"
 #. js-lingui-explicit-id
 msgid "enter.promptEdition"
 msgstr "Från språkversionen på {language}, eller den engelska om inget hittas där"
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsWait"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"

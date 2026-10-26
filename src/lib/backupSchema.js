@@ -32,7 +32,8 @@ export const FIELDS = Object.freeze({
     // included: answers from sources brought into a prompt (C176).
     // step: the planned step a run sent this message for (stage 10; C196 (j)).
     // blocks: a reply's editable form once it is edited in place (stage 11; C212 (b)).
-    'citations', 'from', 'group', 'summary', 'included', 'step', 'blocks'],
+    // told: what the model was told of the person's edits, with this prompt (C216 (c)).
+    'citations', 'from', 'group', 'summary', 'included', 'step', 'blocks', 'told'],
   // quotes: the numbers a note quotes beneath it; summary: a dated summary
   // note's numbers, day and model (stage 6, piece 7; C145 (e), (g)).
   notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom', 'quotes', 'summary'],

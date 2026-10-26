@@ -673,6 +673,10 @@ msgid "chat.describeSettingHelp"
 msgstr "开启：对话收到首个回答后，会向模型发一个简短请求，获取标题、一句话摘要和标签。发送前，输入栏下方的提示行会说明这一点。关闭：以提示词开头的几个字作为对话标题，不额外发送任何内容。"
 
 #. js-lingui-explicit-id
+msgid "chat.editsWaitingTab"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.finishSetting"
 msgstr "离开对话后继续完成回复"
 
@@ -830,6 +834,11 @@ msgstr "显示"
 #. js-lingui-explicit-id
 msgid "chat.thoughtUntimed"
 msgstr "已先思考"
+
+#. A prompt that sent only the edits of the person (C216 (e))
+#. js-lingui-explicit-id
+msgid "chat.toldOnly"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.translatedBy"
@@ -2038,6 +2047,31 @@ msgid "enter.helpVerb"
 msgstr "按 Enter 查看 {verb} 的用法"
 
 #. js-lingui-explicit-id
+msgid "enter.holdEditAlready"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditOff"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.holdEditOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.holdEditTold"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.importOpen"
 msgstr "按 Enter 打开一个文件，先说明它是什么，再做任何处理"
 
@@ -2886,6 +2920,18 @@ msgstr "回答之后，会再发一个简短请求以获取标题、摘要和标
 #. js-lingui-explicit-id
 msgid "enter.promptEdition"
 msgstr "来自其{language}版本；若那里找不到，则用英文版"
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsWait"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"
