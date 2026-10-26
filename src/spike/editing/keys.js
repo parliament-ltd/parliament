@@ -9,8 +9,11 @@
 //                  the person's own).
 //   Delete         the same, forwards.
 //   Mod-Shift-x    strikethrough: the selection, struck.
-//   Mod-z, Mod-y   nothing: undo is on each edit's card, because the
-//                  browser's undo does not understand struck words.
+//   Mod-z          Parliament's own undo: the last change, taken back
+//                  exactly, strikes and all (C209 (c), ruled 25 October).
+//                  The browser's own undo stays off: it does not know struck
+//                  words. Each card still undoes its whole edit.
+//   Mod-y, Mod-Shift-z  redo.
 //   Mod-b, -i, -u  nothing: formatting from the model is shown, not applied.
 //   paste          plain text only; over a selection it strikes the selection.
 //   drop, drag     off in the spike: moving words would be a strike and an
@@ -22,6 +25,7 @@ import { Decoration, DecorationSet } from 'prosemirror-view'
 import { Slice, Fragment } from 'prosemirror-model'
 import { schema, STRUCK, ADDED } from './schema'
 import { SKIP, INTENT } from './track'
+import { historyPlugin, undo, redo } from './history'
 
 const isBlockAtom = (sel) => sel instanceof NodeSelection && sel.node.isBlock && sel.node.isAtom
 
@@ -172,15 +176,11 @@ function enter(ids) {
 
 /**
  * The plugins for an editable reply (blocks: true) or prompt (blocks: false).
- * @param {{ ids: object, blocks?: boolean, onSlash?: (view: object) => boolean, onUndoKey?: () => void, onNote?: (text: string) => void, menuKey?: (event: KeyboardEvent) => boolean, menuText?: (text: string) => boolean, log?: (line: string) => void }} opts
+ * @param {{ ids: object, blocks?: boolean, onSlash?: (view: object) => boolean, onNote?: (text: string) => void, menuKey?: (event: KeyboardEvent) => boolean, menuText?: (text: string) => boolean, log?: (line: string) => void, now?: () => number }} opts
  */
-export function editingPlugins({ ids, blocks = true, onSlash, onUndoKey, onNote, menuKey, menuText, log }) {
+export function editingPlugins({ ids, blocks = true, onSlash, onNote, menuKey, menuText, log, now }) {
   const wholeBlock = (node) => onNote?.(`A ${node.type.name} is one block for now: Backspace strikes it whole, and editing inside it comes later.`)
   const nothing = () => true
-  const undoKey = () => {
-    onUndoKey?.()
-    return true
-  }
   const strike = (state, dispatch) => {
     if (state.selection.empty) return true
     dispatch(state.tr.delete(state.selection.from, state.selection.to).setMeta(INTENT, 'range'))
@@ -191,9 +191,9 @@ export function editingPlugins({ ids, blocks = true, onSlash, onUndoKey, onNote,
     'Shift-Enter': blocks ? enter(ids) : nothing,
     Backspace: backspace(blocks),
     Delete: del(),
-    'Mod-z': undoKey,
-    'Mod-y': undoKey,
-    'Shift-Mod-z': undoKey,
+    'Mod-z': undo,
+    'Mod-y': redo,
+    'Shift-Mod-z': redo,
     'Mod-b': nothing,
     'Mod-i': nothing,
     'Mod-u': nothing,
@@ -226,9 +226,10 @@ export function editingPlugins({ ids, blocks = true, onSlash, onUndoKey, onNote,
       handleDOMEvents: {
         beforeinput(view, event) {
           log?.(`beforeinput ${event.inputType}${event.data ? ` "${event.data}"` : ''}`)
-          if (['historyUndo', 'historyRedo'].includes(event.inputType)) {
+          // Undo from the browser's menu goes to Parliament's history too.
+          if (event.inputType === 'historyUndo' || event.inputType === 'historyRedo') {
             event.preventDefault()
-            onUndoKey?.()
+            ;(event.inputType === 'historyUndo' ? undo : redo)(view.state, view.dispatch)
             return true
           }
           if (/^format/.test(event.inputType)) {
@@ -321,7 +322,7 @@ export function editingPlugins({ ids, blocks = true, onSlash, onUndoKey, onNote,
       return tr
     },
   })
-  return [events, keys, uniqueIds]
+  return [events, keys, uniqueIds, historyPlugin(now ? { now } : {})]
 }
 
 /**
