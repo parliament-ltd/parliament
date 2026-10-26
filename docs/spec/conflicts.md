@@ -2009,6 +2009,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **(f) markup:off** hides answers not yet accepted and the ask markers.
 - **hold:203** and **hold:off 203** work on asks as on edits.
 - **Tried in the browser:** Ctrl+Shift+K on a word of a Wikipedia answer, the box, Enter keeping "ask 203" and its record; `ask:"…"` at a cursor point; `ask:` opening the box from the bar with the focus in it; the refusal after a reload; markers read back after a reload; the Enter line with no key. **Not tried:** an answer coming back, as this browser has no key (the note, reading the answer blocks and placing them are tested). **Known:** the box stays where it opened if the page scrolls under it.
+- **Confirmed 26 October by Stefan:** "Yes, ask: as built is right. Reflection stays for stage 12." So ask: is an ask on a spot in a reply, as Ctrl+Shift+K; discussing and reflecting on a whole chat is the Reflection board (stage 12). Still waiting: approval of the two stored fields in (c).
 
 ## Proposed CLAUDE.md rewrite
 
