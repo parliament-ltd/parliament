@@ -341,10 +341,11 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, menuKey, m
   return [events, keys, uniqueIds, ...(blocks ? [gapLines(ids)] : []), historyPlugin(now ? { now } : {})]
 }
 
-// The space between two blocks reads as a blank line. Moving into it with
-// the arrow keys, or clicking in it, opens an empty line there to write in
-// (Stefan's try of piece 1, 26 October). It is layout, not an edit: once
-// something is typed in it, it is an ordinary line; left empty, it goes.
+// The space between two blocks reads as a blank line. Clicking in it opens
+// an empty line there to write in (Stefan's try of piece 1, 26 October). The
+// arrow keys only move, as everywhere (Stefan, second try: opening a line
+// with them "throws me off"). It is layout, not an edit: once something is
+// typed in it, it is an ordinary line; left empty, it goes.
 function gapLines(ids) {
   const gap = () => schema.nodes.paragraph.create({ id: ids.block(), gap: true })
   const isGap = (node) => node?.type === schema.nodes.paragraph && node.attrs.gap
@@ -356,20 +357,6 @@ function gapLines(ids) {
   }
   return new Plugin({
     props: {
-      handleKeyDown(view, event) {
-        if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return false
-        if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) return false
-        const { selection } = view.state
-        if (!selection.empty || !(selection instanceof TextSelection)) return false
-        const $pos = selection.$from
-        if ($pos.depth !== 1 || isGap($pos.parent)) return false
-        const down = event.key === 'ArrowDown'
-        if (!view.endOfTextblock(down ? 'down' : 'up')) return false
-        const index = $pos.index(0)
-        const next = view.state.doc.maybeChild(down ? index + 1 : index - 1)
-        if (!next || isGap(next)) return false
-        return openAt(view, down ? $pos.after(1) : $pos.before(1))
-      },
       handleDOMEvents: {
         mousedown(view, event) {
           // Only a press on the space itself, not on a line.
