@@ -157,6 +157,7 @@ export function planRestore(flat, {
     sbrd_documents: [], files: [], file_data: [], settings: [], modes: [],
     libraryLayouts: [], libraryRooms: [], libraryComponents: [], librarySchemes: [], libraryResources: [],
     dockets: [], runs: [], collections: [], collabs: [],
+    edits: [], asks: [],
   }
   const summary = {
     chats: { added: 0, copied: 0, skipped: 0 },
@@ -258,6 +259,23 @@ export function planRestore(flat, {
       if (isCopy) out.id = newId()
       writes[store].push(store === 'favorites' ? out : renumber(out, a, isCopy))
       summary.annotations[isCopy ? 'copied' : 'added']++
+    }
+  }
+
+  // ── Edits and asks (stage 11; C212 (g)) ──
+  // They go where their chat goes: not at all when it is here already and
+  // the same, under its new message ids when it comes in as a copy. A record
+  // is keyed by its message and the id its marks carry, so a copy's records
+  // stay apart from the original's.
+  for (const store of ['edits', 'asks']) {
+    for (const e of flat[store] || []) {
+      const d = decision.get(e.conversationId)
+      if (!d || d === 'same') continue
+      const messageId = msg(e.messageId)
+      const out = { ...e, conversationId: conv(e.conversationId), messageId }
+      if (store === 'edits') out.id = `${messageId}:${e.edit}`
+      else if (d === 'copy') out.id = newId()
+      writes[store].push(renumber(out, e, d === 'copy'))
     }
   }
 

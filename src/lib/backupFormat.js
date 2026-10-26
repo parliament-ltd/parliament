@@ -183,11 +183,16 @@ export function contentsToFlatStores(contents) {
     runs: [],
     collections: [],
     collabs: [],
+    // Stage 11: a chat's edits and asks travel with it (C212 (g)).
+    edits: [],
+    asks: [],
   }
 
   for (const chat of contents.chats || []) {
-    const { messages, files, fileData, sbrdDocument, ...conv } = chat
+    const { messages, files, fileData, sbrdDocument, edits, asks, ...conv } = chat
     flat.conversations.push(conv)
+    if (Array.isArray(edits)) flat.edits.push(...edits)
+    if (Array.isArray(asks)) flat.asks.push(...asks)
     if (Array.isArray(messages)) {
       for (const m of messages) flat.messages.push(m)
     }

@@ -39,6 +39,9 @@ export const FIELDS = Object.freeze({
   highlights: ['id', 'conversationId', 'messageId', 'text', 'color', 'createdAt', 'num', 'kind', 'pinned', 'tags', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom'],
   favorites: ['id', 'conversationId', 'messageId', 'createdAt'],
   pins: ['id', 'targetConversationId', 'sourceConversationId', 'sourceMessageId', 'content', 'createdAt', 'num', 'kind', 'restoredFrom', 'pinned', 'tags', 'archived', 'tagsMine', 'erasedFrom'],
+  // Edits in a reply or a prompt, and asks: each with its chat (stage 11; C212 (c), (d)).
+  edits: ['id', 'edit', 'num', 'conversationId', 'messageId', 'part', 'struck', 'added', 'places', 'held', 'sent', 'createdAt', 'updatedAt', 'restoredFrom'],
+  asks: ['id', 'edit', 'num', 'conversationId', 'messageId', 'part', 'places', 'question', 'answer', 'state', 'held', 'sent', 'createdAt', 'updatedAt', 'restoredFrom'],
   files: ['id', 'conversationId', 'name', 'type', 'rows', 'cols', 'sizeBytes', 'inContext', 'uploadedAt'],
   file_data: ['fileId', 'data'],
   sbrd_documents: ['conversationId', 'paragraphs', 'suggestionStates', 'submittedReplies', 'updatedAt'],
@@ -185,7 +188,7 @@ export function cleanFlat(flat) {
   for (const [store, records] of Object.entries(flat)) {
     out[store] = Array.isArray(records) ? records.map((r) => rebuildRecord(store, r)) : records
   }
-  const dropped = { settings: 0, notes: 0, highlights: 0, favorites: 0, pins: 0, documents: 0, files: 0, messages: 0 }
+  const dropped = { settings: 0, notes: 0, highlights: 0, favorites: 0, pins: 0, documents: 0, files: 0, messages: 0, edits: 0 }
 
   const settings = out.settings || []
   out.settings = settings.filter(settingAllowed)
@@ -210,6 +213,11 @@ export function cleanFlat(flat) {
   dropped.pins = keep('pins', (p) => chats.has(p.targetConversationId) || (Number.isInteger(p.erasedFrom) && p.targetConversationId == null))
   dropped.documents = keep('sbrd_documents', (d) => chats.has(d.conversationId))
   dropped.files = keep('files', (f) => chats.has(f.conversationId))
+  // An edit or an ask means nothing without its reply (C212 (f)), and its
+  // mark there is found by its id: both are needed.
+  const onReply = (e) => chats.has(e.conversationId) && messages.has(e.messageId)
+  const markId = (e) => (typeof e.edit === 'string' && e.edit.length > 0 && e.edit.length <= 64) || Number.isInteger(e.edit)
+  dropped.edits = keep('edits', (e) => onReply(e) && markId(e)) + keep('asks', onReply)
   const files = new Set((out.files || []).map((f) => f.id))
   keep('file_data', (fd) => files.has(fd.fileId))
   return { flat: out, dropped }

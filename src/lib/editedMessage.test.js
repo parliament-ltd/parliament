@@ -5,6 +5,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { openDB } from 'idb'
 import { upgradeSchema } from './schema'
 import * as R from './records'
+import { gatherContents, restoreInto } from './backupData'
 
 // A reply's editable form and its edits, stored as C212 has them.
 
@@ -73,6 +74,56 @@ describe('saving an edited reply (C212)', () => {
     await R.saveEditedMessage(db, again.id, { blocks, edits: new Map([['e1', said('eleven years', 'a century')]]), now: at() })
     await R.removeChat(db, c.id)
     expect(await db.getAll('edits')).toEqual([])
+  })
+
+  it('carries a reply\'s blocks and edits in a backup, and brings them back', async () => {
+    await R.saveEditedMessage(db, reply.id, { blocks, edits: new Map([['e1', said('eleven years', 'a century')]]), now: at() })
+    const contents = await gatherContents(db, ['chats'])
+    const sent = contents.chats.find((x) => x.id === c.id)
+    expect(sent.edits).toHaveLength(1)
+    expect(sent.messages.find((m) => m.id === reply.id).blocks).toEqual(blocks)
+
+    // Into an empty database: the same records, numbered there.
+    const other = await maybeSealed(await openDB('edited-other', 6, { upgrade: upgradeSchema }))
+    try {
+      await restoreInto(other, JSON.parse(JSON.stringify(contents)), { strategy: 'merge', newId, now: at() })
+      const [edit] = await other.getAll('edits')
+      const chatThere = (await other.getAll('conversations'))[0]
+      expect(edit).toMatchObject({ id: `${reply.id}:e1`, edit: 'e1', messageId: reply.id, conversationId: chatThere.id, struck: 'eleven years', added: 'a century' })
+      expect(edit.num).toBeGreaterThan(chatThere.num)
+      expect((await other.get('messages', reply.id)).blocks).toEqual(blocks)
+    } finally {
+      other.close()
+    }
+  })
+
+  it('keeps a copy\'s edits apart, under its new message', async () => {
+    await R.saveEditedMessage(db, reply.id, { blocks, edits: new Map([['e1', said('eleven years', 'a century')]]), now: at() })
+    const contents = JSON.parse(JSON.stringify(await gatherContents(db, ['chats'])))
+    // Changed here since, so the file's chat comes in as a copy.
+    await R.saveEditedMessage(db, reply.id, { blocks, edits: new Map([['e1', said('eleven years', 'two centuries')]]), now: at() })
+    await R.updateMessageRecord(db, reply.id, { content: 'Changed since.' })
+    await restoreInto(db, contents, { strategy: 'merge', newId, now: at() })
+    const edits = await db.getAll('edits')
+    expect(edits).toHaveLength(2)
+    const copy = edits.find((e) => e.messageId !== reply.id)
+    expect(copy).toMatchObject({ edit: 'e1', added: 'a century', id: `${copy.messageId}:e1` })
+    expect((await db.get('messages', copy.messageId)).blocks).toEqual(blocks)
+  })
+
+  it('leaves out an edit whose reply is not in the file', async () => {
+    await R.saveEditedMessage(db, reply.id, { blocks, edits: new Map([['e1', said('eleven years', 'a century')]]), now: at() })
+    const contents = JSON.parse(JSON.stringify(await gatherContents(db, ['chats'])))
+    const chatIn = contents.chats[0]
+    chatIn.edits.push({ ...chatIn.edits[0], messageId: 'nowhere', edit: 'e9' })
+    const other = await maybeSealed(await openDB('edited-third', 6, { upgrade: upgradeSchema }))
+    try {
+      const summary = await restoreInto(other, contents, { strategy: 'merge', newId, now: at() })
+      expect(await other.count('edits')).toBe(1)
+      expect(summary.leftOut.edits).toBe(1)
+    } finally {
+      other.close()
+    }
   })
 
   it('counts the blocks in the chat\'s size', async () => {

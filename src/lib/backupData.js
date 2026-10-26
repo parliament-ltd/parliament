@@ -30,7 +30,7 @@ export const UNASKED = Object.freeze(CATEGORIES.filter((c) => c !== 'layouts'))
 
 const V5_STORES = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings', 'files', 'file_data',
   'sbrd_documents', 'modes', 'libraryLayouts', 'libraryRooms', 'libraryComponents', 'librarySchemes', 'libraryResources']
-const V6_STORES = ['dockets', 'runs', 'collections', 'collabs', 'counters']
+const V6_STORES = ['dockets', 'runs', 'collections', 'collabs', 'counters', 'edits', 'asks']
 // A "replace" restore keeps these settings, which belong to this browser.
 const KEPT_ON_REPLACE = ['browserFingerprint', 'parliament-api-key', 'backupLog']
 
@@ -66,9 +66,23 @@ export async function gatherContents(db, categories = UNASKED) {
     const fileDataById = new Map()
     for (const fd of await db.getAll('file_data')) fileDataById.set(fd.fileId, arrayBufferToBase64(fd.data))
     const docByConv = new Map(rebuildAll('sbrd_documents', await db.getAll('sbrd_documents')).map((d) => [d.conversationId, d]))
+    // A chat's edits and asks travel with it (stage 11; C212 (g)).
+    const byChat = async (store) => {
+      const out = new Map()
+      if (!v6) return out
+      for (const r of rebuildAll(store, await db.getAll(store))) {
+        if (!out.has(r.conversationId)) out.set(r.conversationId, [])
+        out.get(r.conversationId).push(r)
+      }
+      return out
+    }
+    const editsByConv = await byChat('edits')
+    const asksByConv = await byChat('asks')
 
     contents.chats = conversations.map((c) => {
       const chat = { ...c, messages: messagesByConv.get(c.id) || [] }
+      if (editsByConv.get(c.id)?.length) chat.edits = editsByConv.get(c.id)
+      if (asksByConv.get(c.id)?.length) chat.asks = asksByConv.get(c.id)
       const files = filesByConv.get(c.id)
       if (files?.length) {
         chat.files = files
@@ -175,10 +189,10 @@ export async function restoreInto(db, contents, { strategy = 'merge', newId = ()
     if (v6) {
       for (const c of writes.collabs) await tx.objectStore('collabs').put(c)
       if (keepNumbers) {
-        for (const store of ['dockets', 'runs', 'collections']) {
-          for (const record of writes[store]) await tx.objectStore(store).put(record)
+        for (const store of ['dockets', 'runs', 'collections', 'edits', 'asks']) {
+          for (const record of writes[store] ?? []) await tx.objectStore(store).put(record)
         }
-        const nums = [...writes.dockets, ...writes.conversations, ...writes.notes, ...writes.highlights, ...writes.pins]
+        const nums = [...writes.dockets, ...writes.conversations, ...writes.notes, ...writes.highlights, ...writes.pins, ...(writes.edits ?? []), ...(writes.asks ?? [])]
           .map((r) => r.num).filter(Number.isInteger)
         await tx.objectStore('counters').put({ name: 'num', next: nums.length ? Math.max(...nums) + 1 : FIRST_NUM })
       } else {

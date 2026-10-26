@@ -673,6 +673,9 @@ const NUMBERED = {
   notes: { kind: 'note', fields: { pinned: false, tags: [] } },
   highlights: { kind: 'term', fields: { kind: 'term', pinned: false, tags: [] } }, // today's highlights are terms (C57)
   pins: { kind: 'quote', fields: { kind: 'quote' } }, // pinned references are quotes (A23)
+  // Written by saveEditedMessage, numbered here only when restored (C212).
+  edits: { kind: 'edit', fields: { part: 'reply', held: false, sent: null } },
+  asks: { kind: 'ask', fields: { part: 'reply', held: false, sent: null } },
 }
 
 /** Store a new note, term (today's highlight) or quote (a pinned reference). */
@@ -814,6 +817,8 @@ export async function fileRestored(tx, writes, { now, newId }) {
   const items = [
     ...writes.conversations.map((record) => ({ store: 'conversations', record, tie: 1 })),
     ...['notes', 'highlights', 'pins'].flatMap((store) => writes[store].map((record) => ({ store, record, tie: 2 }))),
+    // Edits and asks, numbered after the chat they belong to (stage 11; C212 (g)).
+    ...['edits', 'asks'].flatMap((store) => (writes[store] ?? []).map((record) => ({ store, record, tie: 3 }))),
   ].sort((a, b) => byTime(a.record, b.record) || a.tie - b.tie)
 
   for (const item of items) {
