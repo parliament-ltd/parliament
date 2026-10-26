@@ -1901,7 +1901,8 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - **What the model is told** (C210 (c)): an edit that runs from the prompt into the reply would be told as one change in two places ("your prompt said … and your reply began …").
   - **Ask again** (C61, A9): an edit whose prompt part changed could still make 201d from the edited wording; the reply part would go with it as a note.
   - **Only the first prompt and its reply,** as asked, or every prompt with its reply in a room.
-- **The question:** should one selection run across the first prompt and its reply? **Suggestion:** yes, for the first prompt and its first reply, as you describe; one editor holding both; built as part of piece 1 rather than piece 2, so piece 2 keeps ask again and the branch copy. Tried in the spike before the engine is chosen, since it is the kind of thing ProseMirror should handle and the choice rests on it.
+- **Stefan, 26 October, widening it:** "the user should be able to mix and match anything from their prompt to editing and deleting replies from the model to make that into their next prompt within the branch. but we can return to this later." So the aim is larger than one selection: the person's prompt and the model's replies, struck, edited and combined, become the next prompt in the same branch. That touches C61 and A9 (an answered prompt stays a record; ask again makes a new branch), C210 (c) (prompt edits told as a change) and piece 2's plan, and the welcome's step 10 ("Send it with your next prompt").
+- **Deferred, by Stefan:** returned to later, before piece 2 of C210 is built. Nothing changes in the spike or the plan until then.
 
 ## Proposed CLAUDE.md rewrite
 
