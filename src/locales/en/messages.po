@@ -636,6 +636,10 @@ msgid "chat.answeredFrom"
 msgstr "Answered from {source}"
 
 #. js-lingui-explicit-id
+msgid "chat.askAccept"
+msgstr "accept"
+
+#. js-lingui-explicit-id
 msgid "chat.askAgain"
 msgstr "ask again"
 
@@ -647,6 +651,24 @@ msgstr "ask again as {next}"
 #. js-lingui-explicit-id
 msgid "chat.askedAs"
 msgstr "Asked in {language} as “{text}”"
+
+#. The label of the box an ask is written in
+#. js-lingui-explicit-id
+msgid "chat.askLabel"
+msgstr "ASK"
+
+#. Before an ask number in the text: ask 241
+#. js-lingui-explicit-id
+msgid "chat.askMarker"
+msgstr "ask"
+
+#. js-lingui-explicit-id
+msgid "chat.askPlaceholder"
+msgstr "Ask in your own words: make it shorter, or add the year it opened"
+
+#. js-lingui-explicit-id
+msgid "chat.askUndo"
+msgstr "undo"
 
 #. js-lingui-explicit-id
 msgid "chat.close"
@@ -1291,6 +1313,30 @@ msgstr "Enter brings {nums} back from the archive"
 #. js-lingui-explicit-id
 msgid "enter.archiveOn"
 msgstr "Enter archives {nums}. Nothing is deleted, and in:archive shows them"
+
+#. js-lingui-explicit-id
+msgid "enter.askKeep"
+msgstr "Enter keeps this ask on the words you selected in a reply, or where the cursor was. It goes with your next prompt"
+
+#. js-lingui-explicit-id
+msgid "enter.askKept"
+msgstr "Kept as an ask. It goes with your next prompt"
+
+#. js-lingui-explicit-id
+msgid "enter.askLong"
+msgstr "An ask holds up to {max} characters"
+
+#. js-lingui-explicit-id
+msgid "enter.askNoReply"
+msgstr "Click into a reply first, or select the words to ask about, then ask: again"
+
+#. js-lingui-explicit-id
+msgid "enter.askNotPrompt"
+msgstr "Asks are for replies. In your prompt, strike or type over it"
+
+#. js-lingui-explicit-id
+msgid "enter.askOpen"
+msgstr "Enter opens the ask box on the words you selected in a reply, or where the cursor was"
 
 #. js-lingui-explicit-id
 msgid "enter.backupDoneLocked"
@@ -2923,15 +2969,24 @@ msgstr "From its {language} edition, or the English one if nothing is found ther
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsGo"
-msgstr "{count, plural, one {# edit goes} other {# edits go}} with it, told once · {name} reads them"
+msgstr "With it, told once: {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# ask} other {# asks}} · {name} reads them"
 
 #. js-lingui-explicit-id
 msgid "enter.promptEditsOnly"
-msgstr "Nothing typed: just your {count, plural, one {# edit goes} other {# edits go}}, told to {name}"
+msgstr "Nothing typed: just your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# ask} other {# asks}}, told to {name}"
 
 #. js-lingui-explicit-id
+msgid "enter.promptEditsOnlyReader"
+msgstr "Enter sends just your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# ask} other {# asks}} to {name}, about {tokens} tokens · {source} reads none"
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsToReader"
+msgstr "Your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# ask} other {# asks}} {total, plural, one {goes} other {go}} to {name} at the same time, about {tokens} tokens · {source} reads none"
+
+#. Commands stay English
+#. js-lingui-explicit-id
 msgid "enter.promptEditsWait"
-msgstr "{source} reads none of your {count, plural, one {# edit} other {# edits}}; they go when a model answers here (by:)"
+msgstr "{source} reads none of your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# ask} other {# asks}}. A model reads them once it has a key: api:"
 
 #. js-lingui-explicit-id
 msgid "enter.promptFailed"
@@ -6301,6 +6356,10 @@ msgstr "Put something away without deleting it"
 #. js-lingui-explicit-id
 msgid "verb.arrange"
 msgstr "Switch to or save a whole arrangement, windows included"
+
+#. js-lingui-explicit-id
+msgid "verb.ask"
+msgstr "Ask about the selected words in a reply, in your own words. It goes with your next prompt"
 
 #. js-lingui-explicit-id
 msgid "verb.backup"

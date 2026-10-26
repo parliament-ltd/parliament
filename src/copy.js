@@ -746,9 +746,18 @@ export const COPY = {
       message: '{on, select, on {Models that can think do so first, shown as they go. thinking:off turns it off} other {Thinking is off. thinking:on turns it back on}}',
     },
     // Edits reaching the model (stage 11, piece 3; C216).
-    promptEditsGo: /*i18n*/ { id: 'enter.promptEditsGo', message: '{count, plural, one {# edit goes} other {# edits go}} with it, told once · {name} reads them' },
-    promptEditsWait: /*i18n*/ { id: 'enter.promptEditsWait', message: '{source} reads none of your {count, plural, one {# edit} other {# edits}}; they go when a model answers here (by:)' },
-    promptEditsOnly: /*i18n*/ { id: 'enter.promptEditsOnly', message: 'Nothing typed: just your {count, plural, one {# edit goes} other {# edits go}}, told to {name}' },
+    promptEditsGo: /*i18n*/ { id: 'enter.promptEditsGo', message: 'With it, told once: {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# ask} other {# asks}} · {name} reads them' },
+    promptEditsWait: /*i18n*/ { id: 'enter.promptEditsWait', message: '{source} reads none of your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# ask} other {# asks}}. A model reads them once it has a key: api:', comment: 'Commands stay English' },
+    promptEditsOnly: /*i18n*/ { id: 'enter.promptEditsOnly', message: 'Nothing typed: just your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# ask} other {# asks}}, told to {name}' },
+    promptEditsToReader: /*i18n*/ { id: 'enter.promptEditsToReader', message: 'Your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# ask} other {# asks}} {total, plural, one {goes} other {go}} to {name} at the same time, about {tokens} tokens · {source} reads none' },
+    promptEditsOnlyReader: /*i18n*/ { id: 'enter.promptEditsOnlyReader', message: 'Enter sends just your {edits, plural, =0 {} one {# edit} other {# edits}}{both, select, yes { and } other {}}{asks, plural, =0 {} one {# ask} other {# asks}} to {name}, about {tokens} tokens · {source} reads none' },
+    // ask: (stage 11, piece 4; C218 (a)).
+    askOpen: /*i18n*/ { id: 'enter.askOpen', message: 'Enter opens the ask box on the words you selected in a reply, or where the cursor was' },
+    askKeep: /*i18n*/ { id: 'enter.askKeep', message: 'Enter keeps this ask on the words you selected in a reply, or where the cursor was. It goes with your next prompt' },
+    askLong: /*i18n*/ { id: 'enter.askLong', message: 'An ask holds up to {max} characters' },
+    askNoReply: /*i18n*/ { id: 'enter.askNoReply', message: 'Click into a reply first, or select the words to ask about, then ask: again' },
+    askNotPrompt: /*i18n*/ { id: 'enter.askNotPrompt', message: 'Asks are for replies. In your prompt, strike or type over it' },
+    askKept: /*i18n*/ { id: 'enter.askKept', message: 'Kept as an ask. It goes with your next prompt' },
     // markup · clean (stage 11, piece 1; editing spec).
     markupOn: /*i18n*/ { id: 'enter.markupOn', message: 'Enter shows replies marked up: struck words and yours in blue, editable' },
     markupOff: /*i18n*/ { id: 'enter.markupOff', message: 'Enter shows replies clean: the result only, read-only until markup:on' },
@@ -1929,6 +1938,12 @@ export const COPY = {
     askAgain: /*i18n*/ { id: 'chat.askAgain', message: 'ask again' },
     joinedToBar: /*i18n*/ { id: 'chat.joinedToBar', message: 'Your prompt and this reply, as they read now, are in the bar as your next prompt' },
     editsWaitingTab: /*i18n*/ { id: 'chat.editsWaitingTab', message: '{count, plural, one {# edit waits} other {# edits wait}} to go with the next prompt to this branch' },
+    // Asks (stage 11, piece 4; C218).
+    askLabel: /*i18n*/ { id: 'chat.askLabel', message: 'ASK', comment: 'The label of the box an ask is written in' },
+    askPlaceholder: /*i18n*/ { id: 'chat.askPlaceholder', message: 'Ask in your own words: make it shorter, or add the year it opened' },
+    askMarker: /*i18n*/ { id: 'chat.askMarker', message: 'ask', comment: 'Before an ask number in the text: ask 241' },
+    askAccept: /*i18n*/ { id: 'chat.askAccept', message: 'accept' },
+    askUndo: /*i18n*/ { id: 'chat.askUndo', message: 'undo' },
     toldOnly: /*i18n*/ { id: 'chat.toldOnly', message: 'Your edits, told to {name}', comment: 'A prompt that sent only the edits of the person (C216 (e))' },
     pairLabel: /*i18n*/ { id: 'chat.pairLabel', message: 'Your prompt and its reply. Every word can be edited' },
     // "Pin for reference", renamed (R13): a whole message kept as a quote

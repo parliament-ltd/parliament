@@ -225,7 +225,7 @@ function enter(ids) {
  * when the gap between a prompt and its reply is crossed (C214).
  * @param {{ ids: object, blocks?: boolean, onSlash?: (view: object) => boolean, onNote?: (text: string) => void, menuKey?: (event: KeyboardEvent) => boolean, menuText?: (text: string) => boolean, log?: (line: string) => void, now?: () => number }} opts
  */
-export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, menuKey, menuText, log, now }) {
+export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, onAsk, menuKey, menuText, log, now }) {
   const blk = typeof blocks === 'function' ? blocks : () => blocks
   const whenBlocks = (command) => (state, dispatch, view) => (blk(state) ? command(state, dispatch, view) : true)
   const wholeBlock = (node) => onNote?.(`A ${node.type.name} is one block for now: Backspace strikes it whole, and editing inside it comes later.`)
@@ -247,6 +247,16 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, me
     'Mod-i': nothing,
     'Mod-u': nothing,
     'Shift-Mod-x': strike,
+    // An ask (piece 4; C218 (a)): Ctrl+K stays the bar's. In a reply only:
+    // asks are for replies, the spec says, and a prompt says so.
+    'Shift-Mod-k': (state, dispatch, view) => {
+      if (!onAsk) return false
+      if (!blk(state)) {
+        onNote?.('Asks are for replies. In your prompt, strike or type over it.')
+        return true
+      }
+      return onAsk(view)
+    },
   })
 
   const events = new Plugin({

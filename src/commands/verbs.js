@@ -223,6 +223,9 @@ export const VERBS = Object.freeze([
   // Editing in place
   v({ verb: 'tell', group: 'editing', example: 'tell:"Keep it under a page"', rest: true, takes: [['text']], on: ['room'], stage: 11, undoable: true,
     gloss: /*i18n*/ { id: 'verb.tell', message: 'Write a note the model reads with your next prompt' } }),
+  // ask: (C218 (a), option 2): Ctrl+Shift+K in a reply does the same.
+  v({ verb: 'ask', group: 'editing', example: 'ask:"Add the year it opened"', forms: ['ask:', 'ask:"Add the year it opened"'], rest: true, takes: [[], ['text']], on: EDITING, stage: 11,
+    gloss: /*i18n*/ { id: 'verb.ask', message: 'Ask about the selected words in a reply, in your own words. It goes with your next prompt' } }),
   v({ verb: 'strikethrough', group: 'editing', example: 'strikethrough:', takes: [[]], on: EDITING, stage: 11, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.strikethrough', message: 'Strike the selected passage' } }),
   // Where the next prompt goes among a prompt's branches (stage 8; C174);

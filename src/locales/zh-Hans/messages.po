@@ -636,6 +636,10 @@ msgid "chat.answeredFrom"
 msgstr "回答来自 {source}"
 
 #. js-lingui-explicit-id
+msgid "chat.askAccept"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.askAgain"
 msgstr ""
 
@@ -647,6 +651,24 @@ msgstr ""
 #. js-lingui-explicit-id
 msgid "chat.askedAs"
 msgstr "以{language}提问：“{text}”"
+
+#. The label of the box an ask is written in
+#. js-lingui-explicit-id
+msgid "chat.askLabel"
+msgstr ""
+
+#. Before an ask number in the text: ask 241
+#. js-lingui-explicit-id
+msgid "chat.askMarker"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.askPlaceholder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.askUndo"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.close"
@@ -1291,6 +1313,30 @@ msgstr "按 Enter 将 {nums} 移出归档"
 #. js-lingui-explicit-id
 msgid "enter.archiveOn"
 msgstr "按 Enter 归档 {nums}。不会删除任何内容，in:archive 可显示它们"
+
+#. js-lingui-explicit-id
+msgid "enter.askKeep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.askKept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.askLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.askNoReply"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.askNotPrompt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.askOpen"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.backupDoneLocked"
@@ -2929,6 +2975,15 @@ msgstr ""
 msgid "enter.promptEditsOnly"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.promptEditsOnlyReader"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsToReader"
+msgstr ""
+
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptEditsWait"
 msgstr ""
@@ -6301,6 +6356,10 @@ msgstr "收起内容而不删除"
 #. js-lingui-explicit-id
 msgid "verb.arrange"
 msgstr "切换到或保存一整套排布，包括窗口"
+
+#. js-lingui-explicit-id
+msgid "verb.ask"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.backup"

@@ -16,6 +16,7 @@ import { tabBus } from './bus'
 import { stepsFromTurns, storedSteps, forkStep, collabsFromPersonas } from './migrations/v6Plan'
 import { newDocket, addBranch, removeBranch, renameInDocket, withSteps, favoritesWith, favoritesWithout, startedCount, runFromRun, emptyPlan, plannedBranch } from './recordsModel'
 import { STATUS, branchStatus, plannedStep, isFixed, CONDITIONS, ENDED } from './docketModel'
+import { placeAnswer } from '../editing/answers'
 
 export const RECORDS_EVENT = 'parliament-records'
 
@@ -538,6 +539,51 @@ export async function removeMessage(db, id) {
 
 const blocksSize = (blocks) => (Array.isArray(blocks) ? byteSize(JSON.stringify(blocks)) : 0)
 
+/** A chat's asks (stage 11, piece 4). Empty before version 6. */
+export async function asksOfChat(db, conversationId) {
+  if (!isV6(db)) return []
+  return db.getAllFromIndex('asks', 'conversationId', conversationId)
+}
+
+/**
+ * The model's answers to asks it was sent, placed (C218 (b)): each in its
+ * reply, in green after its passage, unless the passage changed since it was
+ * asked, when the answer stays on its card only. One transaction.
+ * @param {Array<{ id: string, text: string, by: string, at: string }>} answers by ask record id
+ */
+export async function answerAsks(db, answers) {
+  if (!isV6(db) || !answers?.length) return []
+  return write(db, ['asks', 'messages'], async (tx) => {
+    const changes = []
+    const placedIn = []
+    for (const a of answers) {
+      const ask = await tx.objectStore('asks').get(a.id)
+      if (!ask || ask.answer) continue
+      const message = await tx.objectStore('messages').get(ask.messageId)
+      const placed = message ? placeAnswer(message.blocks, ask.edit, a.text, ask.passage) : null
+      if (placed) {
+        await tx.objectStore('messages').put({ ...message, blocks: placed })
+        changes.push({ kind: 'message', op: 'updated', id: message.id })
+        placedIn.push({ messageId: message.id, blocks: placed })
+      }
+      await tx.objectStore('asks').put({ ...ask, answer: { text: a.text, by: a.by, at: a.at, inPlace: Boolean(placed) }, state: 'answered', updatedAt: a.at })
+      changes.push({ kind: 'ask', op: 'updated', id: ask.id, num: ask.num })
+    }
+    return { result: placedIn, changes }
+  })
+}
+
+/** An answered ask accepted or taken back (C218). */
+export async function settleAskRecord(db, id, state, at = new Date().toISOString()) {
+  if (!isV6(db)) return null
+  return write(db, ['asks'], async (tx) => {
+    const ask = await tx.objectStore('asks').get(id)
+    if (!ask) return { result: null, changes: [] }
+    await tx.objectStore('asks').put({ ...ask, state, updatedAt: at })
+    return { result: state, changes: [{ kind: 'ask', op: 'updated', id: ask.id, num: ask.num }] }
+  })
+}
+
 /** A chat's edit records (stage 11, piece 3). Empty before version 6. */
 export async function editsOfChat(db, conversationId) {
   if (!isV6(db)) return []
@@ -552,16 +598,16 @@ export async function editsOfChat(db, conversationId) {
  * @param {string[]} ids edit record ids
  * @param {object} sent
  */
-export async function markEditsSent(db, ids, sent) {
+export async function markEditsSent(db, ids, sent, list = 'edits') {
   if (!isV6(db) || !ids?.length) return 0
-  return write(db, ['edits'], async (tx) => {
-    const store = tx.objectStore('edits')
+  return write(db, [list], async (tx) => {
+    const store = tx.objectStore(list)
     const changes = []
     for (const id of ids) {
       const r = await store.get(id)
       if (!r || r.sent) continue
-      await store.put({ ...r, sent, updatedAt: sent.at ?? new Date().toISOString() })
-      changes.push({ kind: 'edit', op: 'updated', id: r.id, num: r.num })
+      await store.put({ ...r, sent, ...(list === 'asks' ? { state: 'asked' } : {}), updatedAt: sent.at ?? new Date().toISOString() })
+      changes.push({ kind: list === 'asks' ? 'ask' : 'edit', op: 'updated', id: r.id, num: r.num })
     }
     return { result: changes.length, changes }
   })
@@ -580,9 +626,9 @@ export async function markEditsSent(db, ids, sent) {
  * @param {{ blocks: object[], edits: Map<string|number, { struck: string, added: string, places: object[] }>, part?: 'reply'|'prompt', now?: string }} saved
  * @returns {Promise<{ created: number, updated: number, removed: number }>}
  */
-export async function saveEditedMessage(db, messageId, { blocks, edits, part = 'reply', now = new Date().toISOString() }) {
+export async function saveEditedMessage(db, messageId, { blocks, edits, asks = null, part = 'reply', now = new Date().toISOString() }) {
   if (!isV6(db)) throw new Error('Editing needs the version 6 database.')
-  return write(db, ['messages', 'conversations', 'edits', 'counters'], async (tx) => {
+  return write(db, ['messages', 'conversations', 'edits', 'counters', ...(asks ? ['asks'] : [])], async (tx) => {
     const message = await tx.objectStore('messages').get(messageId)
     if (!message) throw new Error(`Message not found: ${messageId}`)
     const changes = [{ kind: 'message', op: 'updated', id: messageId }]
@@ -618,9 +664,43 @@ export async function saveEditedMessage(db, messageId, { blocks, edits, part = '
       counts.created += 1
     }
     for (const gone of byEdit.values()) {
+      // One told already stays, the record of what the model was told (C216).
+      if (gone.sent) continue
       await store.delete(gone.id)
       changes.push({ kind: 'edit', op: 'removed', id: gone.id, num: gone.num })
       counts.removed += 1
+    }
+
+    // Asks (piece 4; C218): kept once they have their question, numbered
+    // then; their passage and place follow the reply. One dropped before it
+    // went is removed; one sent, answered or settled stays.
+    if (asks) {
+      const askStore = tx.objectStore('asks')
+      const had = new Map((await askStore.index('conversationId').getAll(message.conversationId)).filter((r) => r.messageId === messageId).map((r) => [r.edit, r]))
+      for (const [ask, said] of asks) {
+        const was = had.get(ask)
+        had.delete(ask)
+        if (was) {
+          if (was.passage === said.passage && JSON.stringify(was.places) === JSON.stringify(said.places)) continue
+          await askStore.put({ ...was, passage: said.passage, places: said.places, updatedAt: now })
+          changes.push({ kind: 'ask', op: 'updated', id: was.id, num: was.num })
+          continue
+        }
+        if (typeof said.question !== 'string' || !said.question.trim()) continue
+        const record = {
+          id: `${messageId}:${ask}`, edit: ask, num: await takeNum(tx),
+          conversationId: message.conversationId, messageId, part,
+          question: said.question.trim(), passage: said.passage, point: Boolean(said.point), places: said.places,
+          answer: null, state: 'open', held: false, sent: null, createdAt: now, updatedAt: now,
+        }
+        await askStore.put(record)
+        changes.push({ kind: 'ask', op: 'created', id: record.id, num: record.num })
+      }
+      for (const gone of had.values()) {
+        if (gone.sent || gone.state !== 'open') continue
+        await askStore.delete(gone.id)
+        changes.push({ kind: 'ask', op: 'removed', id: gone.id, num: gone.num })
+      }
     }
     return { result: counts, changes }
   })
@@ -630,7 +710,7 @@ export async function saveEditedMessage(db, messageId, { blocks, edits, part = '
 
 // The stores a numbered row lives in, and the kind each announces.
 // Edits too: hold: changes one, and undo: takes it back (stage 11, piece 3; C216 (f)).
-const ROW_STORES = Object.freeze({ conversations: 'chat', dockets: 'docket', notes: 'note', highlights: 'term', pins: 'quote', edits: 'edit' })
+const ROW_STORES = Object.freeze({ conversations: 'chat', dockets: 'docket', notes: 'note', highlights: 'term', pins: 'quote', edits: 'edit', asks: 'ask' })
 
 /** A field as the row verbs read it: missing means false, empty or ''. */
 export function rowField(record, key) {

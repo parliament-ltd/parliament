@@ -10,7 +10,7 @@ import { DB_NAME, DB_VERSION, DRAFT_DB_VERSION, TRIAL_DB_NAME, BUILTIN_AUTHOR, u
 import {
   createChat, updateChat, removeChat, createBranchChat, createSummaryChat, setPromptGroup,
   addMessageRecord, updateMessageRecord, removeMessage, saveEditedMessage as saveEditedMessageRecord,
-  editsOfChat, markEditsSent as markEditsSentRecord,
+  editsOfChat, markEditsSent as markEditsSentRecord, asksOfChat, answerAsks as answerAsksRecord, settleAskRecord,
   addNumbered, updateNumbered, removeNumbered,
   addFavoriteRecord, removeFavoriteRecord, saveDocument, changeRecords,
 } from './records'
@@ -515,9 +515,24 @@ export async function getEditsOfChat(conversationId) {
   return editsOfChat(await initDB(), conversationId)
 }
 
-/** Mark edits told, or gone into a prompt (C216). */
-export async function markEditsSent(ids, sent) {
-  return markEditsSentRecord(await initDB(), ids, sent)
+/** Mark edits told, or gone into a prompt (C216); with list 'asks', asks asked (C218). */
+export async function markEditsSent(ids, sent, list = 'edits') {
+  return markEditsSentRecord(await initDB(), ids, sent, list)
+}
+
+/** A chat's asks (stage 11, piece 4). */
+export async function getAsksOfChat(conversationId) {
+  return asksOfChat(await initDB(), conversationId)
+}
+
+/** The model's answers to asks, placed in their replies (C218 (b)). */
+export async function answerAsks(answers) {
+  return answerAsksRecord(await initDB(), answers)
+}
+
+/** An answered ask accepted or taken back (C218). */
+export async function settleAsk(id, state) {
+  return settleAskRecord(await initDB(), id, state)
 }
 
 

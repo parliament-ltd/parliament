@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getEditsOfChat } from '../lib/db'
+import { getEditsOfChat, getAsksOfChat } from '../lib/db'
 import { onRecordsChanged } from '../lib/records'
 
 // The edit records of the chats a room shows (stage 11, piece 3; C216), kept
@@ -11,9 +11,10 @@ const EMPTY = new Map()
 
 /**
  * @param {string[]} chatIds
+ * @param {'edits'|'asks'} [list] which records: edits, or asks (piece 4; C218)
  * @returns {Map<string, object[]>} the records of each chat, by its id
  */
-export function useChatEdits(chatIds) {
+export function useChatEdits(chatIds, list = 'edits') {
   const key = [...new Set((chatIds ?? []).filter(Boolean))].sort().join('|')
   const [byChat, setByChat] = useState(EMPTY)
   useEffect(() => {
@@ -21,15 +22,17 @@ export function useChatEdits(chatIds) {
     let live = true
     const load = async () => {
       const next = new Map()
-      for (const id of key.split('|')) next.set(id, await getEditsOfChat(id).catch(() => []))
+      const read = list === 'asks' ? getAsksOfChat : getEditsOfChat
+      for (const id of key.split('|')) next.set(id, await read(id).catch(() => []))
       if (live) setByChat(next)
     }
     load()
-    const off = onRecordsChanged((c) => { if (c.kind === 'edit') load() })
+    const kind = list === 'asks' ? 'ask' : 'edit'
+    const off = onRecordsChanged((c) => { if (c.kind === kind) load() })
     return () => {
       live = false
       off()
     }
-  }, [key])
+  }, [key, list])
   return key ? byChat : EMPTY
 }

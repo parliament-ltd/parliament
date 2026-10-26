@@ -38,7 +38,10 @@ import EditableMessages from '../../components/core/EditableMessages'
 import { HIGHLIGHT_COLORS } from '../../lib/constants'
 import { stripAttachedFileBlocks } from '../../lib/fileUpload'
 import { useChatEdits } from '../../stores/useChatEdits'
+import { settleAsk as dbSettleAsk } from '../../lib/db'
+const NO_ASK_INFO = new Map()
 import { waiting as editWaits } from '../../editing/told'
+import { withoutAnswers } from '../../editing/answers'
 import BranchSlider from '../../components/core/BranchSlider'
 import { lineItems, membersOf } from '../../lib/branchGroups'
 import { usePlanOf, waitingIn } from '../../stores/usePlanOf'
@@ -379,6 +382,24 @@ export default function MessagesRender() {
     const r = [...chatEdits.values()].flat().find((e) => e.sent?.prompt === msg.id)
     return r ? (modelFacts(r.sent.to)?.name ?? r.sent.to) : null
   }, [chatEdits])
+  // Asks (piece 4; C218): each marker's number and state, by message and
+  // ask id; accepting or undoing one recorded.
+  const chatAsks = useChatEdits([activeConversationId, ...memberIds], 'asks')
+  const askInfoOf = useMemo(() => {
+    const byMessage = new Map()
+    for (const r of [...chatAsks.values()].flat()) {
+      if (!byMessage.has(r.messageId)) byMessage.set(r.messageId, new Map())
+      byMessage.get(r.messageId).set(r.edit, { num: r.num, state: r.state })
+    }
+    return (messageId) => byMessage.get(messageId) ?? NO_ASK_INFO
+  }, [chatAsks])
+  const settleAskOf = useCallback((messageId, askId, how) => {
+    dbSettleAsk(`${messageId}:${askId}`, how === 'accept' ? 'accepted' : 'taken back').catch(() => {})
+  }, [])
+  const askWords = useMemo(() => ({
+    label: i18n._(COPY.chat.askLabel), placeholder: i18n._(COPY.chat.askPlaceholder),
+    ask: i18n._(COPY.chat.askMarker), accept: i18n._(COPY.chat.askAccept), undo: i18n._(COPY.chat.askUndo),
+  }), [i18n])
   const editsWaitingIn = useCallback((chatId) => (chatEdits.get(chatId) ?? []).filter(editWaits).length, [chatEdits])
   const items = useMemo(() => lineItems(visibleMessages, activeConversationId, members, (chatId, groupId) => waitingIn(linePlan, chatId, groupId)), [visibleMessages, activeConversationId, members, linePlan])
   const [planNum, setPlanNum] = useState(null)
@@ -428,7 +449,8 @@ export default function MessagesRender() {
     return {
       id: msg.id,
       type: msg.role === 'user' ? 'user' : 'assistant',
-      content: displayContent,
+      // Answers to asks land where they were asked, not in this reply (C218 (b)).
+      content: msg.role === 'assistant' && !msg.source ? withoutAnswers(displayContent) : displayContent,
       attachmentMeta: msg.attachmentMeta,
       number: numberByMessageId.get(msg.id) || 0,
       index: idx,
@@ -467,9 +489,12 @@ export default function MessagesRender() {
       clean: settings.markup === 'off',
       closedEdits,
       toldTo: toldToOf(msg),
+      askInfo: askInfoOf(msg.id),
+      onSettleAsk: (askId, how) => settleAskOf(msg.id, askId, how),
+      askWords,
     }
   }, [
-    saveEditedReply, settings.markup, closedEdits, toldToOf,
+    saveEditedReply, settings.markup, closedEdits, toldToOf, askInfoOf, settleAskOf, askWords,
     isStreaming, streamingContent, streamingMessageId, streamingThinking, streamingAnswering, activeConversationId, i18n,
     numberByMessageId, activePopoverMsgId,
     favorites, notes, highlights, showNotes,
@@ -536,6 +561,9 @@ export default function MessagesRender() {
     )
   }, [planNum, lineChat, conversations, hosted, i18n])
 
+  // The asks of both cards of a pair, by ask id.
+  const pairAsks = useCallback((sections) => new Map(sections.flatMap((s) => [...askInfoOf(s.message.id)])), [askInfoOf])
+
   const renderPair = useCallback((item, idx) => {
     const { prompt, reply } = item
     const sections = [{ part: 'prompt', message: prompt, card: cardPropsOf(prompt, idx), quotes: quotesByMessage.get(prompt.id) ?? NO_QUOTES, editedLine: editedLineOf(prompt) }]
@@ -550,9 +578,12 @@ export default function MessagesRender() {
         onSave={(messageId, saved) => saveEditedReply(activeConversationId, messageId, saved)}
         words={{ joined: i18n._(COPY.chat.joinedToBar), label: i18n._(COPY.chat.pairLabel) }}
         closedEdits={closedEdits}
+        askInfo={pairAsks(sections)}
+        onSettleAsk={settleAskOf}
+        askWords={askWords}
       />
     )
-  }, [cardPropsOf, quotesByMessage, editedLineOf, highlightTerms, i18n, settings.markup, saveEditedReply, activeConversationId, closedEdits])
+  }, [cardPropsOf, quotesByMessage, editedLineOf, highlightTerms, i18n, settings.markup, saveEditedReply, activeConversationId, closedEdits, settleAskOf, askWords, pairAsks])
 
   // A tab's letter, who answered, and the branch's address (203b).
   const infoOf = useCallback((chatId, tab) => {

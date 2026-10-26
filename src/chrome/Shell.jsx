@@ -1201,10 +1201,20 @@ export default function Shell() {
     }
     if (what.kind === 'holdEdits') {
       // hold: and hold:off for edits (C216 (f)): a change undo: takes back.
-      const done = await changeRecords(db.current, what.edits.map((e) => ({ store: 'edits', id: e.id, num: e.num, set: { held: what.held }, expect: { held: !what.held } })))
+      const done = await changeRecords(db.current, what.edits.map((e) => ({ store: e.list ?? 'edits', id: e.id, num: e.num, set: { held: what.held }, expect: { held: !what.held } })))
       if (touched.current) touched.current.records.push(...done)
       remember(body)
       return null
+    }
+    if (what.kind === 'ask') {
+      // ask: (stage 11, piece 4; C218 (a)): the reply last in focus opens its
+      // ask box, or keeps the ask at once. The words stay on this device
+      // until the next prompt (the event carries them within this window).
+      const detail = { question: what.question ?? null, taken: false }
+      window.dispatchEvent(new CustomEvent('parliament-ask', { detail }))
+      if (detail.taken !== true) return typeof detail.taken === 'string' ? detail.taken : 'askNoReply'
+      remember(body)
+      return what.question ? { done: true, says: { message: 'askKept' } } : null
     }
     if (what.kind === 'markup') {
       // markup:on / markup:off (stage 11, piece 1): replies marked up, or clean.
@@ -2241,10 +2251,12 @@ export default function Shell() {
   }), [settings.runWarn, keyedBy, conversations, settings.defaultModel, chatRowsById, runningHere, roomId, roomRecord, streaming, queryOf, languageName, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
   // The edits of the room's chat (stage 11, piece 3; C216).
   const roomEdits = useChatEdits(roomId ? [roomId] : [])
+  const roomAsks = useChatEdits(roomId ? [roomId] : [], 'asks')
   // The room's edits by number, for hold: (C216 (f)).
   const heldEdits = useMemo(() => ({
-    byNum: new Map((roomEdits.get(roomId) ?? []).filter((r) => Number.isInteger(r.num)).map((r) => [r.num, { id: r.id, held: Boolean(r.held), sent: Boolean(r.sent) }])),
-  }), [roomEdits, roomId])
+    byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
+      .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
+  }), [roomEdits, roomAsks, roomId])
   const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, heldEdits, ...languageScreens, branching, summarizing, including, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, heldEdits, languageScreens, branching, summarizing, including, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
@@ -2260,9 +2272,11 @@ export default function Shell() {
   // The edits waiting in the room's chat, and the note they would make (C216).
   const editsHere = useMemo(() => {
     // Edits of messages joined into the bar go into that prompt, not with it.
-    const note = noteFor(kept, roomEdits.get(roomId) ?? [], { leaveOut: new Set(joinedNow?.from ?? []) })
-    return note.ids.length ? { count: note.ids.length, chars: note.text.length } : null
-  }, [kept, roomEdits, roomId, joinedNow])
+    const note = noteFor(kept, roomEdits.get(roomId) ?? [], { leaveOut: new Set(joinedNow?.from ?? []), asks: roomAsks.get(roomId) ?? [] })
+    return note.ids.length || note.askIds.length ? { count: note.ids.length, asks: note.askIds.length, chars: note.text.length } : null
+  }, [kept, roomEdits, roomAsks, roomId, joinedNow])
+  // Who reads edits and asks on a source's branch: the default model (C218 (e)).
+  const readerHere = useMemo(() => answererOf({ chosen: settings.defaultModel ?? null, keyed: keys, defaultModel: settings.defaultModel }), [settings.defaultModel, keys])
   const sourcesOut = useMemo(() => {
     const answers = kept.filter(fromSource)
     return { count: answers.length, names: [...new Set(answers.map((m) => m.source.name || m.source.id))] }
@@ -2361,10 +2375,11 @@ export default function Shell() {
     resend: !about && Boolean(roomId) && stalledIn === roomId,
     // The person's edits waiting here, and the size of their note (C216).
     edits: about ? null : editsHere,
+    reader: answerer.group === 'source' ? readerHere : null,
     ink,
     roomName: roomNameHere,
     about,
-  }), [arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere])
+  }), [arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -2566,7 +2581,20 @@ export default function Shell() {
 
     // Nothing typed, and edits waiting: just the edits go, told to the model
     // that answers here (C216 (e)), as the Enter line said.
-    if (!text && shown?.edits?.count && chatId && who.group !== 'source' && !shown?.resend) {
+    const toReader = (to) => {
+      // On a source's branch, the edits and asks go to the default model at
+      // the same time as the source is asked (C218 (e)).
+      const r = shown?.reader
+      if (!r || who.group !== 'source' || !shown?.edits || r.needsKey || r.later || r.gone || r.unchecked) return null
+      if (r.group === 'model' && !fresh[r.provider]) return null
+      return sendMessage(to, '', r.id, system(), [], null, { describe: false })
+    }
+    if (!text && chatId && who.group === 'source' && shown?.edits) {
+      const sent = toReader(chatId)
+      if (!sent) return { refused: 'promptFailed' }
+      return { done: sent.then(() => { loadConversations().catch(() => {}); return null }).catch(failure) }
+    }
+    if (!text && (shown?.edits?.count || shown?.edits?.asks) && chatId && who.group !== 'source' && !shown?.resend) {
       if (who.group === 'model' && !fresh[who.provider]) return { refused: 'promptFailed' }
       const done = sendMessage(chatId, '', who.id, system(), [], null, { ...under })
         .then(() => { loadConversations().catch(() => {}); return null })
@@ -2623,7 +2651,7 @@ export default function Shell() {
       const { locale } = latest.current
       return who.group !== 'source'
         ? sendMessage(id, full, who.id, system(), [], null, { ...under, ...withInc(who), ...joinedInto(text) })
-        : askSource(id, text, { source: who.id, lang: askIn(locale), fallbackLang: destination(who.id)?.answersIn === 'yours' ? 'en' : null, asked: searched(locale) })
+        : Promise.all([askSource(id, text, { source: who.id, lang: askIn(locale), fallbackLang: destination(who.id)?.answersIn === 'yours' ? 'en' : null, asked: searched(locale) }), toReader(id)])
     }
     // The edition a source with one in each language is asked in (C166 (e));
     // nothing found there, the English one (LPN §6).

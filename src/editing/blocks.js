@@ -4,14 +4,16 @@
 // so a backup stays readable whatever editor follows. Each block:
 //   { id, type, text?, level?, anchor?, kind?, checked?, rows?, data?, struck? }
 // type is one of paragraph, heading, list, quote, code, divider, table, chart.
-// text is a list of runs: { text, bold?, italic?, code?, link?, struck?, added? }
-// or { break: true } for a line break; struck and added hold an edit's id.
+// text is a list of runs: { text, bold?, italic?, code?, link?, struck?, added?,
+// ask?, answer?, replaced? } or { break: true } for a line break, or
+// { point } for an ask at a point; struck and added hold an edit's id, ask,
+// answer, replaced and point an ask's (piece 4; C218).
 //
 // What is read back is treated as text from outside (a backup, a restored
 // file): only known types and fields are taken, every value is made the kind
 // it should be, and links keep only web and mail addresses.
 
-import { schema, safeHref, STRUCK, ADDED } from './schema'
+import { schema, safeHref, STRUCK, ADDED, ASK, ANSWER, REPLACED } from './schema'
 
 const TYPE_OF = { paragraph: 'paragraph', heading: 'heading', list_item: 'list', quote: 'quote', code_block: 'code', divider: 'divider', table: 'table', chart: 'chart' }
 const NODE_OF = Object.fromEntries(Object.entries(TYPE_OF).map(([node, type]) => [type, node]))
@@ -22,10 +24,17 @@ const editId = (v) => (typeof v === 'number' && Number.isFinite(v)) || (typeof v
 function runsOf(node) {
   const runs = []
   node.forEach((child) => {
+    if (child.type === schema.nodes.ask_point) {
+      runs.push({ point: child.attrs.ask })
+      return
+    }
     const run = child.isText ? { text: child.text } : { break: true }
     for (const m of child.marks) {
       if (m.type === STRUCK) run.struck = m.attrs.edit
       else if (m.type === ADDED) run.added = m.attrs.edit
+      else if (m.type === ASK) run.ask = m.attrs.ask
+      else if (m.type === ANSWER) run.answer = m.attrs.ask
+      else if (m.type === REPLACED) run.replaced = m.attrs.ask
       else if (m.type === schema.marks.link) run.link = m.attrs.href
       else if (m.type === schema.marks.bold) run.bold = true
       else if (m.type === schema.marks.italic) run.italic = true
@@ -66,11 +75,18 @@ function inlineOf(runs, codeLine) {
   const nodes = []
   for (const r of Array.isArray(runs) ? runs : []) {
     if (!r || typeof r !== 'object') continue
+    if (editId(r.point) != null) {
+      if (!codeLine) nodes.push(schema.nodes.ask_point.create({ ask: r.point }))
+      continue
+    }
     const marks = []
     const s = editId(r.struck)
     const a = s == null ? editId(r.added) : null
     if (s != null) marks.push(STRUCK.create({ edit: s }))
     if (a != null) marks.push(ADDED.create({ edit: a }))
+    for (const [key, type] of [['ask', ASK], ['answer', ANSWER], ['replaced', REPLACED]]) {
+      if (!codeLine && editId(r[key]) != null) marks.push(type.create({ ask: r[key] }))
+    }
     if (!codeLine) {
       const href = r.link ? safeHref(r.link) : null
       if (href) marks.push(schema.marks.link.create({ href }))
@@ -112,7 +128,8 @@ export function wordsOf(blocks) {
     }
     if (b.type === 'chart') continue
     const text = (Array.isArray(b.text) ? b.text : [])
-      .filter((r) => r && typeof r === 'object' && editId(r.struck) == null)
+      // An answer not yet accepted is not the reply's yet (C218).
+      .filter((r) => r && typeof r === 'object' && editId(r.struck) == null && editId(r.answer) == null)
       .map((r) => (r.break === true ? '\n' : typeof r.text === 'string' ? r.text : ''))
       .join('')
     if (b.type === 'heading') lines.push(`${'#'.repeat([1, 2, 3].includes(b.level) ? b.level : 1)} ${text}`)

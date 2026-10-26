@@ -116,6 +116,13 @@ export const schema = new Schema({
       parseDOM: [{ tag: 'figure.pm-chart', getAttrs: readId }],
     },
     text: { group: 'inline' },
+    // An ask at a point, not on words (piece 4; C218): where the cursor was.
+    // Takes no room in the text; Backspace over it drops it.
+    ask_point: {
+      group: 'inline', inline: true, atom: true, selectable: false, attrs: { ask: {} },
+      toDOM: (n) => ['span', { class: 'pm-ask-point', 'data-ask': String(n.attrs.ask), contenteditable: 'false' }],
+      parseDOM: [{ tag: 'span.pm-ask-point', getAttrs: (dom) => ({ ask: dom.getAttribute('data-ask') }) }],
+    },
     hard_break: {
       group: 'inline', inline: true, selectable: false,
       toDOM: () => ['br'],
@@ -133,6 +140,24 @@ export const schema = new Schema({
       attrs: { edit: {} }, inclusive: true, excludes: 'struck',
       toDOM: (m) => ['ins', { class: 'pm-added', 'data-edit': String(m.attrs.edit) }, 0],
       parseDOM: [{ tag: 'ins[data-edit]', getAttrs: (dom) => ({ edit: readEdit(dom) }) }],
+    },
+    // An ask (piece 4; C218): the passage it is about; the answer waiting,
+    // in green, dotted; and the passage that answer would replace, struck
+    // in green. Each carries the ask's id. Settling an ask is not an edit.
+    ask: {
+      attrs: { ask: {} }, inclusive: false, excludes: '',
+      toDOM: (m) => ['span', { class: 'pm-ask', 'data-ask': String(m.attrs.ask) }, 0],
+      parseDOM: [{ tag: 'span.pm-ask', getAttrs: (dom) => ({ ask: dom.getAttribute('data-ask') }) }],
+    },
+    answer: {
+      attrs: { ask: {} }, inclusive: false, excludes: '',
+      toDOM: (m) => ['ins', { class: 'pm-answer', 'data-ask': String(m.attrs.ask) }, 0],
+      parseDOM: [{ tag: 'ins.pm-answer', getAttrs: (dom) => ({ ask: dom.getAttribute('data-ask') }) }],
+    },
+    replaced: {
+      attrs: { ask: {} }, inclusive: false, excludes: '',
+      toDOM: (m) => ['del', { class: 'pm-replaced', 'data-ask': String(m.attrs.ask) }, 0],
+      parseDOM: [{ tag: 'del.pm-replaced', getAttrs: (dom) => ({ ask: dom.getAttribute('data-ask') }) }],
     },
     // The whole address shows when the pointer rests on a link (C146 (b)).
     link: {
@@ -158,3 +183,6 @@ export function chartTitle(data) {
 
 export const { struck: STRUCK, added: ADDED } = schema.marks
 export const isEditMark = (m) => m.type === STRUCK || m.type === ADDED
+export const { ask: ASK, answer: ANSWER, replaced: REPLACED } = schema.marks
+/** An answer waiting, or the passage it would replace: the model's, settled by accept or undo. */
+export const isAnswerMark = (m) => m.type === ANSWER || m.type === REPLACED

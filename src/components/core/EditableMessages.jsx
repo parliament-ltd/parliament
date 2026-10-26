@@ -12,8 +12,12 @@ import { track, createEditIds, cursorMarks, REFUSED, SKIP, INTENT } from '../../
 import { editingPlugins, announcePlugin } from '../../editing/keys'
 import { shownPlugin, shownKey } from '../../editing/shown'
 import { chartView } from '../../editing/chartView'
+import { withoutAnswers } from '../../editing/answers'
 import { stripAttachedFileBlocks } from '../../lib/fileUpload'
 import { useBlockMenu } from './useBlockMenu'
+import { useAskBox } from './useAskBox'
+import { asksIn } from '../../editing/edits'
+import { asksPlugin, asksKey, settleAsk } from '../../editing/asks'
 import MessageCard from './MessageCard'
 
 // A prompt and its reply, edited in place as one (stage 11, piece 2; the
@@ -67,7 +71,11 @@ function crosses(sel) {
  * }} props
  */
 const NO_CLOSED = new Set()
-export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, onSave, words, closedEdits = NO_CLOSED }) {
+const ASK_WORDS = { label: 'ASK', placeholder: 'Ask in your own words: make it shorter, or add the year it opened', ask: 'ask', accept: 'accept', undo: 'undo' }
+const NO_ASKS = new Map()
+// askInfo: each ask's number and state, by its id; onSettleAsk(messageId, askId, how)
+// when one is accepted or undone; askWords: the ASK box's and markers' words (C218).
+export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, onSave, words, closedEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS }) {
   // Edits already told to a model: typing beside one starts a new edit (C216 (i)).
   const closedRef = useRef(closedEdits)
   useEffect(() => { closedRef.current = closedEdits }, [closedEdits])
@@ -82,6 +90,12 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
   const sectionsRef = useRef(sections)
   const [hosts, setHosts] = useState({})
   const [said, setSaid] = useState('')
+  // Asks kept here and not yet saved: their questions, by id (C218).
+  const questions = useRef(new Map())
+  const onSettleRef = useRef(onSettleAsk)
+  useEffect(() => { onSettleRef.current = onSettleAsk }, [onSettleAsk])
+  const askBox = useAskBox(view, (askId, question) => { questions.current.set(askId, question) }, askWords, inReply)
+  const askOptions = askBox.options
   const blockMenu = useBlockMenu(view, idsRef)
   const menuOptions = blockMenu.options
   const closeMenu = blockMenu.close
@@ -105,7 +119,8 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
       // Saved only when a card's stored form changes.
       if (savedKeys.current[id] === key) return
       savedKeys.current[id] = key
-      Promise.resolve(onSaveRef.current?.(id, { blocks, edits: editsIn(sec), part: sec.attrs.part })).catch((err) => {
+      const asks = new Map([...asksIn(sec)].map(([askId, a]) => [askId, { ...a, question: questions.current.get(askId) }]))
+      Promise.resolve(onSaveRef.current?.(id, { blocks, edits: editsIn(sec), asks, part: sec.attrs.part })).catch((err) => {
         savedKeys.current[id] = null
         setSaid(`Not saved: ${String(err?.message ?? err)}`)
       })
@@ -152,14 +167,26 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
         ?? (s.part === 'prompt' ? promptFromText(stripAttachedFileBlocks(m.content), ids.block)
           // A source's answer is plain text, never read as Markdown (stage 4).
           : s.plain ? promptFromText(m.content, ids.block)
-            : replyFromMarkdown(m.content, ids.block, { anchors: `msg-${m.id}` }))
+            : replyFromMarkdown(withoutAnswers(m.content), ids.block, { anchors: `msg-${m.id}` }))
       return schema.nodes.section.create({ part: s.part, message: m.id }, inner.content)
     })
     const doc = schema.nodes.doc.create(null, made)
     savedKeys.current = {}
     doc.forEach((sec) => { savedKeys.current[sec.attrs.message] = JSON.stringify(toBlocks(sec)) })
     const plugins = [
-      ...editingPlugins({ ids, blocks: inReply, onNote: (text) => setSaid(text), onJoin: () => join(), ...menuOptions }),
+      ...editingPlugins({ ids, blocks: inReply, onNote: (text) => setSaid(text), onJoin: () => join(), ...menuOptions, ...askOptions }),
+      // Accept or undo an answered ask, in place; its message is the card it is in (C218).
+      asksPlugin({
+        words: askWords,
+        onSettle: (askId, how) => {
+          const v = view.current
+          if (!v) return
+          let messageId = null
+          v.state.doc.forEach((sec) => { if (asksIn(sec).has(askId)) messageId = sec.attrs.message })
+          v.dispatch(settleAsk(v.state, askId, how))
+          if (messageId) onSettleRef.current?.(messageId, askId, how)
+        },
+      }),
       announcePlugin(() => true),
       shownPlugin({ quotedTitle: (num) => quotedTitle?.(num) ?? '' }),
     ]
@@ -247,6 +274,29 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sectionsKey])
 
+  // A card changed from outside (an ask's answer placed in it, C218): the
+  // editor drawn again from what is stored, so it shows and no save writes
+  // over it.
+  const outside = JSON.stringify(sections.map((s) => s.message.blocks ?? null))
+  useEffect(() => {
+    const v = view.current
+    if (!v) return
+    const changed = sectionsRef.current.some((s) => s.message.blocks != null && JSON.stringify(s.message.blocks) !== savedKeys.current[s.message.id])
+    if (!changed) return
+    const ids = idsRef.current
+    const made = []
+    v.state.doc.forEach((sec) => {
+      const s = sectionsRef.current.find((x) => x.message.id === sec.attrs.message)
+      const fresh = s?.message.blocks != null ? fromBlocks(s.message.blocks, ids.block) : null
+      made.push(fresh ? schema.nodes.section.create(sec.attrs, fresh.content) : sec)
+      if (s?.message.blocks != null) savedKeys.current[sec.attrs.message] = JSON.stringify(s.message.blocks)
+    })
+    v.updateState(EditorState.create({ doc: schema.nodes.doc.create(null, made), plugins: v.state.plugins }))
+  }, [outside])
+
+  // Each ask's number and state, for its marker.
+  useEffect(() => { view.current?.dispatch(view.current.state.tr.setMeta(asksKey, askInfo)) }, [askInfo, sectionsKey])
+
   // Highlights and quotes, each card's its own, drawn again only when they change.
   const shownWas = useRef('')
   const shown = {
@@ -279,6 +329,7 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
       })}
       {said && <p className="p-edit-said" role="status">{said}</p>}
       {blockMenu.element}
+      {askBox.element}
     </div>
   )
 }

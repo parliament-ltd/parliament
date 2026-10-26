@@ -11,6 +11,9 @@ import { editingPlugins, announcePlugin } from '../../editing/keys'
 import { shownPlugin, shownKey } from '../../editing/shown'
 import { chartView } from '../../editing/chartView'
 import { useBlockMenu } from './useBlockMenu'
+import { useAskBox } from './useAskBox'
+import { asksIn } from '../../editing/edits'
+import { asksPlugin, asksKey, settleAsk } from '../../editing/asks'
 
 // A finished reply, edited in place (stage 11, piece 1; the editing spec,
 // "Editing replies"; C210, C212). Deleting strikes the model's words, typing
@@ -37,8 +40,12 @@ const SAVE_AFTER_MS = 500
  */
 // plain: a source's answer, read as plain text, never as Markdown (stage 4).
 const NO_CLOSED = new Set()
+const ASK_WORDS = { label: 'ASK', placeholder: 'Ask in your own words: make it shorter, or add the year it opened', ask: 'ask', accept: 'accept', undo: 'undo' }
+const NO_ASKS = new Map()
 // closedEdits: edits already told to a model; typing beside one starts a new edit (C216 (i)).
-export default function EditableReply({ id, content, blocks = null, plain = false, terms = [], quotes = [], quotedTitle, clean = false, onSave, closedEdits = NO_CLOSED }) {
+// askInfo: each ask's number and state, by its id; onSettleAsk(askId, how) when
+// one is accepted or undone; askWords: the ASK box's and markers' words (C218).
+export default function EditableReply({ id, content, blocks = null, plain = false, terms = [], quotes = [], quotedTitle, clean = false, onSave, closedEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS }) {
   const closedRef = useRef(closedEdits)
   useEffect(() => { closedRef.current = closedEdits }, [closedEdits])
   const host = useRef(null)
@@ -52,6 +59,12 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
   const menuOptions = blockMenu.options
   const closeMenu = blockMenu.close
   const [said, setSaid] = useState('')
+  // Asks kept here and not yet saved: their questions, by id (C218).
+  const questions = useRef(new Map())
+  const onSettleRef = useRef(onSettleAsk)
+  useEffect(() => { onSettleRef.current = onSettleAsk }, [onSettleAsk])
+  const askBox = useAskBox(view, (askId, question) => { questions.current.set(askId, question) }, askWords)
+  const askOptions = askBox.options
 
   useEffect(() => { onSaveRef.current = onSave }, [onSave])
 
@@ -67,7 +80,8 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
     const key = JSON.stringify(blocksNow)
     if (key === saved.current) return
     saved.current = key
-    Promise.resolve(onSaveRef.current?.({ blocks: blocksNow, edits: editsIn(doc) })).catch((err) => {
+    const asks = new Map([...asksIn(doc)].map(([askId, a]) => [askId, { ...a, question: questions.current.get(askId) }]))
+    Promise.resolve(onSaveRef.current?.({ blocks: blocksNow, edits: editsIn(doc), asks })).catch((err) => {
       // Kept on screen; the next change tries again.
       saved.current = null
       setSaid(`Not saved: ${String(err?.message ?? err)}`)
@@ -82,7 +96,9 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
     const doc = fromBlocks(blocks, ids.block) ?? (plain ? promptFromText(content, ids.block) : replyFromMarkdown(content, ids.block, { anchors: `msg-${id}` }))
     saved.current = JSON.stringify(toBlocks(doc))
     const plugins = [
-      ...editingPlugins({ ids, blocks: true, onNote: (text) => setSaid(text), ...menuOptions }),
+      ...editingPlugins({ ids, blocks: true, onNote: (text) => setSaid(text), ...menuOptions, ...askOptions }),
+      // Accept or undo an answered ask, in place (C218).
+      asksPlugin({ words: askWords, onSettle: (askId, how) => { view.current?.dispatch(settleAsk(view.current.state, askId, how)); onSettleRef.current?.(askId, how) } }),
       announcePlugin(() => true),
       shownPlugin({ quotedTitle: (num) => quotedTitle?.(num) ?? '' }),
     ]
@@ -123,6 +139,22 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
+  // Changed from outside (an ask's answer placed in it, C218): drawn again
+  // from what is stored, so it shows and a save never writes over it.
+  const outside = JSON.stringify(blocks ?? null)
+  useEffect(() => {
+    const v = view.current
+    if (!v || blocks == null || outside === saved.current) return
+    const doc = fromBlocks(blocks, idsRef.current.block)
+    if (!doc) return
+    saved.current = outside
+    v.updateState(EditorState.create({ doc, plugins: v.state.plugins }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outside])
+
+  // Each ask's number and state, for its marker.
+  useEffect(() => { view.current?.dispatch(view.current.state.tr.setMeta(asksKey, askInfo)) }, [askInfo])
+
   // Highlights and quotes, drawn again only when they change: a card redraws
   // often, and a change sent to the editor then could move the cursor.
   const shownWas = useRef('')
@@ -145,6 +177,7 @@ export default function EditableReply({ id, content, blocks = null, plain = fals
       <div ref={host} />
       {said && <p className="p-edit-said" role="status">{said}</p>}
       {blockMenu.element}
+      {askBox.element}
     </div>
   )
 }

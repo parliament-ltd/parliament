@@ -42,7 +42,8 @@ export const FIELDS = Object.freeze({
   pins: ['id', 'targetConversationId', 'sourceConversationId', 'sourceMessageId', 'content', 'createdAt', 'num', 'kind', 'restoredFrom', 'pinned', 'tags', 'archived', 'tagsMine', 'erasedFrom'],
   // Edits in a reply or a prompt, and asks: each with its chat (stage 11; C212 (c), (d)).
   edits: ['id', 'edit', 'num', 'conversationId', 'messageId', 'part', 'struck', 'added', 'places', 'held', 'sent', 'createdAt', 'updatedAt', 'restoredFrom'],
-  asks: ['id', 'edit', 'num', 'conversationId', 'messageId', 'part', 'places', 'question', 'answer', 'state', 'held', 'sent', 'createdAt', 'updatedAt', 'restoredFrom'],
+  // passage, point: what an ask was about when asked, so a changed passage keeps its answer to its card (C218).
+  asks: ['id', 'edit', 'num', 'conversationId', 'messageId', 'part', 'places', 'question', 'passage', 'point', 'answer', 'state', 'held', 'sent', 'createdAt', 'updatedAt', 'restoredFrom'],
   files: ['id', 'conversationId', 'name', 'type', 'rows', 'cols', 'sizeBytes', 'inContext', 'uploadedAt'],
   file_data: ['fileId', 'data'],
   sbrd_documents: ['conversationId', 'paragraphs', 'suggestionStates', 'submittedReplies', 'updatedAt'],

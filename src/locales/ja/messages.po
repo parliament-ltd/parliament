@@ -636,6 +636,10 @@ msgid "chat.answeredFrom"
 msgstr "{source}からの回答"
 
 #. js-lingui-explicit-id
+msgid "chat.askAccept"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.askAgain"
 msgstr ""
 
@@ -647,6 +651,24 @@ msgstr ""
 #. js-lingui-explicit-id
 msgid "chat.askedAs"
 msgstr "{language}で「{text}」と質問"
+
+#. The label of the box an ask is written in
+#. js-lingui-explicit-id
+msgid "chat.askLabel"
+msgstr ""
+
+#. Before an ask number in the text: ask 241
+#. js-lingui-explicit-id
+msgid "chat.askMarker"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.askPlaceholder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.askUndo"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.close"
@@ -1291,6 +1313,30 @@ msgstr "Enterで{nums}をアーカイブから戻します"
 #. js-lingui-explicit-id
 msgid "enter.archiveOn"
 msgstr "Enterで{nums}をアーカイブします。何も削除されず、in:archive で表示できます"
+
+#. js-lingui-explicit-id
+msgid "enter.askKeep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.askKept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.askLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.askNoReply"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.askNotPrompt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.askOpen"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.backupDoneLocked"
@@ -2929,6 +2975,15 @@ msgstr ""
 msgid "enter.promptEditsOnly"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.promptEditsOnlyReader"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptEditsToReader"
+msgstr ""
+
+#. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptEditsWait"
 msgstr ""
@@ -6301,6 +6356,10 @@ msgstr "削除せずに、しまっておく"
 #. js-lingui-explicit-id
 msgid "verb.arrange"
 msgstr "ウインドウも含めた画面全体の配置を切り替える、または保存する"
+
+#. js-lingui-explicit-id
+msgid "verb.ask"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.backup"

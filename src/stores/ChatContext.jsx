@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
-import { getMessages, addMessage, updateMessage, saveEditedMessage, getEditsOfChat, markEditsSent, getSetting, setSetting, getConversation, groupPrompt } from '../lib/db'
+import { getMessages, addMessage, updateMessage, saveEditedMessage, getEditsOfChat, markEditsSent, getAsksOfChat, answerAsks, getSetting, setSetting, getConversation, groupPrompt } from '../lib/db'
 import { noteFor, waiting } from '../editing/told'
+import { answersIn } from '../editing/answers'
 import { askToKeepStorage } from '../lib/storageKeep'
 import { nameFromChat, titleFromPrompt, fieldsFromDescription } from '../lib/chatTitles'
 import { useConversations } from './ConversationContext'
@@ -308,7 +309,9 @@ export function ChatProvider({ children }) {
     // a note ahead of its words, kept on it (stage 11, piece 3; C216).
     const editRecords = await getEditsOfChat(conversationId).catch(() => [])
     const joinedFrom = new Set(Array.isArray(into) ? into : [])
-    const note = noteFor(before, editRecords, { leaveOut: joinedFrom })
+    // Asks waiting go the same way, each to be answered in place (C218).
+    const askRecords = await getAsksOfChat(conversationId).catch(() => [])
+    const note = noteFor(before, editRecords, { leaveOut: joinedFrom, asks: askRecords })
     const joinedIds = editRecords.filter((r) => waiting(r) && joinedFrom.has(r.messageId)).map((r) => r.id)
     // With privacy:names, the names in what goes, found on this computer
     // first; if that fails, the prompt is not added and nothing is sent.
@@ -337,6 +340,7 @@ export function ChatProvider({ children }) {
     const toldAt = new Date().toISOString()
     if (note.ids.length) markEditsSent(note.ids, { to: model, at: toldAt, prompt: userMsg.id }).catch(() => {})
     if (joinedIds.length) markEditsSent(joinedIds, { into: userMsg.id, at: toldAt }).catch(() => {})
+    if (note.askIds.length) markEditsSent(note.askIds, { to: model, at: toldAt, prompt: userMsg.id }, 'asks').catch(() => {})
 
     // 2. Create a placeholder assistant message marked incomplete
     const assistantMsg = await addMessage({
@@ -469,6 +473,20 @@ export function ChatProvider({ children }) {
       await updateMessage(assistantMsg.id, outcome)
       const finished = { ...assistantMsg, ...outcome }
       updateMessages(conversationId, prev => prev.map(m => (m.id === assistantMsg.id ? finished : m)))
+
+      // The answers to the asks this prompt carried, put in place (C218 (b)).
+      if (note.askIds.length && finalContent) {
+        const found = answersIn(finalContent)
+        const answers = askRecords.filter((a) => note.askIds.includes(a.id) && found.has(a.num))
+          .map((a) => ({ id: a.id, text: found.get(a.num), by: model, at: new Date().toISOString() }))
+        if (answers.length) {
+          const placed = await answerAsks(answers).catch(() => [])
+          if (placed.length) {
+            const byId = new Map(placed.map((p) => [p.messageId, p.blocks]))
+            updateMessages(conversationId, (prev) => prev.map((m) => (byId.has(m.id) ? { ...m, blocks: byId.get(m.id) } : m)))
+          }
+        }
+      }
 
       // Update cumulative token usage (accumulated across all tool loop turns)
       if (activeRef.current === conversationId) {
@@ -686,8 +704,8 @@ export function ChatProvider({ children }) {
   // A reply edited in place: its editable form and its edits, kept in one
   // write (stage 11, piece 1; C212). Its content, what the model wrote, stays.
   // A prompt is saved the same way, its edits marked as the prompt's (piece 2).
-  const saveEditedReply = useCallback(async (conversationId, messageId, { blocks, edits, part = 'reply' }) => {
-    const counts = await saveEditedMessage(messageId, { blocks, edits, part })
+  const saveEditedReply = useCallback(async (conversationId, messageId, { blocks, edits, asks = null, part = 'reply' }) => {
+    const counts = await saveEditedMessage(messageId, { blocks, edits, asks, part })
     updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, blocks } : m)))
     return counts
   }, [])

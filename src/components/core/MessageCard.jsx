@@ -71,6 +71,8 @@ export default function MessageCard({
   // Edits already told to a model (C216 (i)); toldTo: who was told the
   // edits this prompt carried, for a prompt that was only those (C216 (e)).
   closedEdits, toldTo = null,
+  // Asks (C218): each one's number and state, settling one, and the words.
+  askInfo, onSettleAsk, askWords,
 }) {
   const fixed = hostContent ? { contentEditable: false, suppressContentEditableWarning: true } : {}
   const { i18n } = useLingui()
@@ -183,6 +185,9 @@ export default function MessageCard({
           clean={clean}
           onSave={onSaveEdits}
           closedEdits={closedEdits}
+          askInfo={askInfo}
+          onSettleAsk={onSettleAsk}
+          askWords={askWords}
         />
       )
     }
@@ -322,7 +327,7 @@ export default function MessageCard({
         </Markdown>
       </div>
     )
-  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation, editable, type, blocks, clean, onSaveEdits, closedEdits, toldTo])
+  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation, editable, type, blocks, clean, onSaveEdits, closedEdits, toldTo, askInfo, onSettleAsk, askWords])
 
   return (
     <motion.div

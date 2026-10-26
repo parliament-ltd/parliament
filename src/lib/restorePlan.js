@@ -273,7 +273,9 @@ export function planRestore(flat, {
       if (!d || d === 'same') continue
       const messageId = msg(e.messageId)
       const out = { ...e, conversationId: conv(e.conversationId), messageId }
-      if (store === 'edits') out.id = `${messageId}:${e.edit}`
+      // Keyed by message and mark id, as when saved; an ask from before
+      // asks had a mark id, a new id if copied.
+      if (store === 'edits' || e.edit) out.id = `${messageId}:${e.edit}`
       else if (d === 'copy') out.id = newId()
       writes[store].push(renumber(out, e, d === 'copy'))
     }

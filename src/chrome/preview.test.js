@@ -1018,6 +1018,19 @@ describe('markup: replies marked up, or clean (stage 11, piece 1)', () => {
   })
 })
 
+describe('ask: an ask from the bar (stage 11, piece 4; C218 (a))', () => {
+  const at = (value) => {
+    const p = preview(value, { mode: 'command', arrangement: { ...shipped('almanac'), addressed: 'room' }, screens: {} })
+    return { ...p, text: say(i18n, p.says.message, p.says.values) }
+  }
+  it('opens the ask box, or keeps the ask written after it', () => {
+    expect(at('>ask:')).toMatchObject({ act: { kind: 'ask', question: null } })
+    expect(at('>ask:').text).toMatch(/^Enter opens the ask box/)
+    expect(at('>ask:"Add the year it opened"').act).toEqual({ kind: 'ask', question: 'Add the year it opened' })
+    expect(at('>ask:' + '"' + 'x'.repeat(1001) + '"')).toMatchObject({ act: null, text: 'An ask holds up to 1000 characters' })
+  })
+})
+
 describe('thinking: and the Enter line of a model that thinks (C165)', () => {
   const at = (value, on = true) => {
     const p = preview(value, { mode: 'command', arrangement: shipped('almanac'), screens: { thinking: { on } } })
@@ -1050,17 +1063,26 @@ describe('edits on the Enter line (stage 11, piece 3; C216)', () => {
   it('counts what goes with a prompt, and who reads it', () => {
     const p = promptPreview('Go on.', { ...room, answerer: model, edits: { count: 3, chars: 120 } })
     expect(p.ready).toBe(true)
-    expect(also(p)).toContain('3 edits go with it, told once · Haiku 9 reads them')
+    expect(also(p)).toContain('With it, told once: 3 edits · Haiku 9 reads them')
+    const both = promptPreview('Go on.', { ...room, answerer: model, edits: { count: 2, asks: 1, chars: 120 } })
+    expect(also(both)).toContain('With it, told once: 2 edits and 1 ask · Haiku 9 reads them')
   })
   it('sends just the edits on an empty Enter', () => {
     const p = promptPreview('', { ...room, answerer: model, edits: { count: 1, chars: 80 } })
     expect(p).toMatchObject({ ready: true, editsOnly: true })
-    expect(also(p)[0]).toBe('Nothing typed: just your 1 edit goes, told to Haiku 9')
+    expect(also(p)[0]).toBe('Nothing typed: just your 1 edit, told to Haiku 9')
   })
-  it('says a source reads none of them', () => {
-    const p = promptPreview('', { ...room, answerer: { id: 'wikipedia', group: 'source', name: 'Wikipedia' }, edits: { count: 2, chars: 80 } })
+  it('on the branch of a source, sends them to a model at the same time, or says it needs a key (C218 (e))', () => {
+    const wiki = { id: 'wikipedia', group: 'source', name: 'Wikipedia' }
+    const p = promptPreview('', { ...room, answerer: wiki, edits: { count: 2, chars: 80 } })
     expect(p.ready).toBe(false)
-    expect(say(i18n, p.says.message, p.says.values)).toBe('Wikipedia reads none of your 2 edits; they go when a model answers here (by:)')
+    expect(say(i18n, p.says.message, p.says.values)).toBe('Wikipedia reads none of your 2 edits. A model reads them once it has a key: api:')
+    const reader = { id: 'm', group: 'model', name: 'Haiku 9' }
+    const only = promptPreview('', { ...room, answerer: wiki, reader, historyChars: 400, edits: { count: 2, asks: 1, chars: 0 } })
+    expect(only).toMatchObject({ ready: true, editsOnly: true, toReader: true })
+    expect(say(i18n, only.says.message, only.says.values)).toBe('Enter sends just your 2 edits and 1 ask to Haiku 9, about 100 tokens · Wikipedia reads none')
+    const along = promptPreview('glass', { ...room, answerer: wiki, reader, historyChars: 400, edits: { count: 1, chars: 0 } })
+    expect(also(along)).toContain('Your 1 edit goes to Haiku 9 at the same time, about 100 tokens · Wikipedia reads none')
   })
   it('holds an edit here back, and lets it go (C216 (f))', () => {
     const heldEdits = { byNum: new Map([[242, { id: 'm:e1', held: false, sent: false }], [243, { id: 'm:e2', held: true, sent: false }], [244, { id: 'm:e3', held: false, sent: true }]]) }
@@ -1068,8 +1090,8 @@ describe('edits on the Enter line (stage 11, piece 3; C216)', () => {
       const p = preview(value, { mode: 'command', arrangement: { ...shipped('almanac'), addressed: 'room' }, screens: { heldEdits } })
       return { ...p, text: say(i18n, p.says.message, p.says.values) }
     }
-    expect(at('>hold:242')).toMatchObject({ text: 'Enter holds back 242: yours, and not sent, until hold:off', act: { kind: 'holdEdits', edits: [{ num: 242, id: 'm:e1' }], held: true } })
-    expect(at('>hold:off 243').act).toEqual({ kind: 'holdEdits', edits: [{ num: 243, id: 'm:e2' }], held: false })
+    expect(at('>hold:242')).toMatchObject({ text: 'Enter holds back 242: yours, and not sent, until hold:off', act: { kind: 'holdEdits', edits: [{ num: 242, id: 'm:e1', list: 'edits' }], held: true } })
+    expect(at('>hold:off 243').act).toEqual({ kind: 'holdEdits', edits: [{ num: 243, id: 'm:e2', list: 'edits' }], held: false })
     expect(at('>hold:243').text).toBe('Held back already: 243')
     expect(at('>hold:244').text).toBe('244 was told already, so it cannot be held back')
   })

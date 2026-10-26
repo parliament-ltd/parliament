@@ -16,7 +16,7 @@
 import { Mapping, ReplaceStep } from 'prosemirror-transform'
 import { Selection, TextSelection } from 'prosemirror-state'
 import { Fragment, Slice } from 'prosemirror-model'
-import { STRUCK, ADDED, isEditMark } from './schema'
+import { STRUCK, ADDED, isEditMark, isAnswerMark } from './schema'
 
 /** Meta: a change that is not an edit (structure, formatting, undo from a card). */
 export const SKIP = 'editSkip'
@@ -85,6 +85,8 @@ function describe(doc, from, to) {
   const atoms = []
   let struck = 0
   doc.nodesBetween(from, to, (node, pos) => {
+    // An ask's point is no word: never struck, never kept (piece 4).
+    if (node.type.name === 'ask_point') return false
     if (node.isInline) {
       const a = Math.max(pos, from)
       const b = Math.min(pos + node.nodeSize, to)
@@ -122,7 +124,8 @@ function markFragment(fragment, id, parentType) {
   const nodes = []
   fragment.forEach((node) => {
     if (node.isInline) {
-      const kept = node.marks.filter((m) => !isEditMark(m) && (!parentType || parentType.allowsMarkType(m.type)))
+      // The person's words never carry an answer's marks, which are the model's.
+      const kept = node.marks.filter((m) => !isEditMark(m) && !isAnswerMark(m) && (!parentType || parentType.allowsMarkType(m.type)))
       nodes.push(node.mark(ADDED.create({ edit: id }).addToSet(kept)))
     } else {
       nodes.push(node.copy(markFragment(node.content, id, node.type)))
@@ -360,7 +363,7 @@ export function cursorMarks(state, ids) {
   const marks = $pos.marks()
   if (marks.some((m) => m.type === ADDED)) return null
   const id = open(ids, editAt(state.doc, $pos.pos)) ?? ids.peek()
-  const kept = marks.filter((m) => !isEditMark(m) && $pos.parent.type.allowsMarkType(m.type))
+  const kept = marks.filter((m) => !isEditMark(m) && !isAnswerMark(m) && $pos.parent.type.allowsMarkType(m.type))
   return ADDED.create({ edit: id }).addToSet(kept)
 }
 

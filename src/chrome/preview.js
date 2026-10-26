@@ -31,7 +31,7 @@ import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, namesFrom, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
 import { planReply, planLanguage, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
 import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
-import { planHoldEdits } from '../lib/editVerbs'
+import { planHoldEdits, planAsk } from '../lib/editVerbs'
 import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
@@ -56,7 +56,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -722,6 +722,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       framework: planFramework,
       thinking: planThinking,
       markup: planMarkup,
+      // ask: (stage 11, piece 4; C218 (a)).
+      ask: (a1, s1) => planAsk(s1),
       reply: (a1, s1, sc) => planReply(s1, sc),
       language: (a1, s1, sc) => planLanguage(s1, sc),
       helper: (a1, s1, sc) => planHelper(s1, sc),
@@ -938,15 +940,26 @@ export function promptPreview(text, target = {}) {
   // The person's edits waiting here (stage 11, piece 3; C216): they go once
   // with this prompt, to a model, as a note counted in what is sent; a
   // source reads none of them. target.edits: { count, chars } of the note.
-  const edits = target.edits?.count > 0 ? target.edits : null
+  // target.edits: { count, asks, chars }: the edits and asks waiting, and
+  // the size of their note (asks, piece 4; C218).
+  const edits = target.edits && ((target.edits.count ?? 0) + (target.edits.asks ?? 0)) > 0 ? target.edits : null
+  const what = edits ? { edits: edits.count ?? 0, asks: edits.asks ?? 0, total: (edits.count ?? 0) + (edits.asks ?? 0), both: edits.count && edits.asks ? 'yes' : 'no' } : null
   const toModel = (w) => w && w.group !== 'source'
+  // On a source's branch, edits and asks go to a model at the same time as
+  // the prompt searches again (the editing spec, "Keyless sources"; C218 (e)).
+  const r = target.reader
+  const reader = r && toModel(r) && !r.needsKey && !r.later && !r.gone && !r.unchecked ? r : null
+  const readerTokens = () => Math.ceil(((target.historyChars ?? 0) + (edits?.chars ?? 0)) / CHARS_PER_TOKEN)
   if (edits && !String(text ?? '').trim() && !target.streaming && !(Array.isArray(target.many) && target.many.length > 1)) {
-    // Enter on an empty field sends just the edits (C216 (e)).
+    // Enter on an empty field sends just the edits and asks (C216 (e)).
     const who = target.answerer ?? { group: target.keyed ? 'model' : 'source', name: target.keyed ? target.provider : target.source }
-    if (!toModel(who)) return { ready: false, says: { message: 'promptEditsWait', values: { count: edits.count, source: who.name ?? target.source ?? '' } } }
+    if (!toModel(who)) {
+      if (!reader) return { ready: false, says: { message: 'promptEditsWait', values: { ...what, source: who.name ?? target.source ?? '' } } }
+      return { ready: true, editsOnly: true, toReader: true, says: { message: 'promptEditsOnlyReader', values: { ...what, name: reader.name ?? '', source: who.name ?? target.source ?? '', tokens: readerTokens() } } }
+    }
     const p = onePreview('·'.repeat(Math.max(1, edits.chars)), target)
     if (!p.ready || !p.says) return p
-    return { ...p, editsOnly: true, says: { ...p.says, also: [{ message: 'promptEditsOnly', values: { count: edits.count, name: who.name ?? '' } }, ...(p.says.also ?? [])] } }
+    return { ...p, editsOnly: true, says: { ...p.says, also: [{ message: 'promptEditsOnly', values: { ...what, name: who.name ?? '' } }, ...(p.says.also ?? [])] } }
   }
   const counted = edits ? { ...target, historyChars: (target.historyChars ?? 0) + edits.chars } : target
   const p = Array.isArray(target.many) && target.many.length > 1 ? manyPreview(text, counted) : onePreview(text, counted)
@@ -957,8 +970,10 @@ export function promptPreview(text, target = {}) {
   if (edits) {
     const first = Array.isArray(target.many) && target.many.length > 1 ? target.many[0] : target.answerer ?? { group: target.keyed ? 'model' : 'source', name: target.keyed ? target.provider : target.source }
     lines.push(toModel(first)
-      ? { message: 'promptEditsGo', values: { count: edits.count, name: first.name ?? '' } }
-      : { message: 'promptEditsWait', values: { count: edits.count, source: first.name ?? target.source ?? '' } })
+      ? { message: 'promptEditsGo', values: { ...what, name: first.name ?? '' } }
+      : reader
+        ? { message: 'promptEditsToReader', values: { ...what, name: reader.name ?? '', source: first.name ?? target.source ?? '', tokens: readerTokens() } }
+        : { message: 'promptEditsWait', values: { ...what, source: first.name ?? target.source ?? '' } })
   }
   if (target.toBranch) lines.push({ message: 'promptToBranch', values: { address: target.toBranch } })
   if (target.carriesOn) lines.push({ message: 'promptCarriesOn', values: target.carriesOn })

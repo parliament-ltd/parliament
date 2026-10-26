@@ -50,6 +50,24 @@
 /* A hair of space where struck and added words meet, drawn only: the text has none. */
 .p-text del.pm-struck + ins.pm-added, .p-text ins.pm-added + del.pm-struck { margin-inline-start: .22em; }
 
+/* Asks (piece 4; C218; the editing spec's colours): the passage asked
+   about, faintly; the answer waiting, green and dotted; the passage it would
+   replace, struck in green; the marker, small, after it. */
+.p-text .pm-ask { text-decoration: underline dotted; text-decoration-color: var(--ch-ink-3); text-underline-offset: 3px; }
+.p-text ins.pm-answer { color: var(--ch-ai); text-decoration: underline dotted; text-decoration-color: var(--ch-ai); text-underline-offset: 3px; }
+.p-text del.pm-replaced { color: var(--ch-ai); text-decoration: line-through; text-decoration-color: var(--ch-ai); }
+.p-text .pm-ask-point { display: inline-block; width: 6px; height: 6px; margin: 0 2px; border-radius: 50%; background: var(--ch-ai); vertical-align: middle; }
+.p-text .pm-ask-marker { margin-inline-start: 4px; font-size: 11.5px; font-style: italic; color: var(--ch-ai); white-space: nowrap; }
+.p-text .pm-ask-marker button { font: inherit; color: inherit; text-decoration: underline; text-underline-offset: 2px; padding: 0; background: none; border: 0; cursor: pointer; }
+.clean .p-text ins.pm-answer, .clean .p-text .pm-ask-marker, .clean .p-text .pm-ask-point { display: none; }
+.clean .p-text del.pm-replaced { color: inherit; text-decoration: none; }
+.clean .p-text .pm-ask { text-decoration: none; }
+
+/* The ASK box, at the passage. */
+.p-ask-box { position: fixed; z-index: 50; display: flex; align-items: center; gap: 8px; min-width: 300px; background: var(--ch-surface); border: 1px solid var(--ch-ai); border-radius: 8px; box-shadow: 0 6px 24px rgba(0, 0, 0, .08); padding: 6px 8px; }
+.p-ask-box .p-ask-label { font: 600 10.5px var(--ch-sans); letter-spacing: .06em; color: var(--ch-ai); }
+.p-ask-box input { flex: 1; font-size: 13px; border: 0; outline: none; background: transparent; }
+
 /* Said to a screen reader at the edges of a mark: real words, unseen. */
 .p-text .pm-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
