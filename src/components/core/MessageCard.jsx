@@ -164,6 +164,23 @@ export default function MessageCard({
   const renderContent = useMemo(() => {
     if (!displayContent) return null
 
+    // A finished reply edited in place, a source's answer too, as plain text (stage 11).
+    if (editable && type === 'assistant' && onSaveEdits) {
+      return (
+        <EditableReply
+          id={id}
+          content={displayContent}
+          blocks={blocks}
+          plain={Boolean(source)}
+          terms={highlightTerms}
+          quotes={quotes}
+          quotedTitle={(num) => i18n._(COPY.chat.quoted, { num })}
+          clean={clean}
+          onSave={onSaveEdits}
+        />
+      )
+    }
+
     // An answer from a source is plain text and is shown as text: never as
     // HTML, and not read as Markdown either (stage 4). A list of results
     // (stage 7) is drawn from its note, each result's words as text.
@@ -177,21 +194,6 @@ export default function MessageCard({
     if (source) {
       const text = translated && typeof translation.text === 'string' ? translation.text : displayContent
       return <p className="parliament-md text-[15px] whitespace-pre-wrap" dir="auto" lang={translated ? translation.lang : undefined}>{text}</p>
-    }
-
-    if (editable && type === 'assistant' && onSaveEdits) {
-      return (
-        <EditableReply
-          id={id}
-          content={displayContent}
-          blocks={blocks}
-          terms={highlightTerms}
-          quotes={quotes}
-          quotedTitle={(num) => i18n._(COPY.chat.quoted, { num })}
-          clean={clean}
-          onSave={onSaveEdits}
-        />
-      )
     }
 
     function highlightString(text) {

@@ -115,7 +115,9 @@ export function fieldReducer(state, action) {
       // A prompt written into the field from a room, to edit and send: a
       // prompt and its reply joined (stage 11, piece 2; C214 (b)).
       // It opens the field, folded while the reply was edited.
-      return { ...state, mode: 'prompt', text: { ...state.text, prompt: String(action.value ?? '') }, focused: true, minimised: false, editingReply: false, peek: false }
+      // Without focus (joined by typing), it is filled and opened, and the
+      // person goes on typing where they were.
+      return { ...state, mode: 'prompt', text: { ...state.text, prompt: String(action.value ?? '') }, focused: action.focus !== false, minimised: false, editingReply: false, peek: false }
 
     case 'sent':
       // A prompt went, or a search was done with: its text is cleared.

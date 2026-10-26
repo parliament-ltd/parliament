@@ -8,7 +8,7 @@ import { schema } from '../../editing/schema'
 import { replyFromMarkdown, promptFromText } from '../../editing/fromMarkdown'
 import { fromBlocks, toBlocks, wordsOf } from '../../editing/blocks'
 import { editsIn } from '../../editing/edits'
-import { track, createEditIds, cursorMarks, REFUSED, SKIP } from '../../editing/track'
+import { track, createEditIds, cursorMarks, REFUSED, SKIP, INTENT } from '../../editing/track'
 import { editingPlugins, announcePlugin } from '../../editing/keys'
 import { shownPlugin, shownKey } from '../../editing/shown'
 import { chartView } from '../../editing/chartView'
@@ -39,6 +39,8 @@ import MessageCard from './MessageCard'
 // for each edit, half a second after a change and on leaving (C212).
 
 const SAVE_AFTER_MS = 500
+// Joined by typing over both cards: the bar is filled once the typing pauses.
+const JOIN_AFTER_MS = 800
 
 // The section, prompt or reply, a position is in.
 function sectionAt($pos) {
@@ -56,7 +58,7 @@ function crosses(sel) {
 
 /**
  * @param {{
- *   sections: Array<{ part: 'prompt'|'reply', message: object, card: object, quotes?: Array<{ num: number, text: string }>, editedLine?: import('react').ReactNode }>,
+ *   sections: Array<{ part: 'prompt'|'reply', message: object, plain?: boolean, card: object, quotes?: Array<{ num: number, text: string }>, editedLine?: import('react').ReactNode }>,
  *   terms?: Array<{ text: string, bg: string }>,
  *   quotedTitle?: (num: number) => string,
  *   clean?: boolean,
@@ -107,7 +109,13 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
   }, [])
 
   // The words of both still standing, to the bar as the next prompt (C214 (b)).
-  const join = useCallback(() => {
+  // focus: the bar takes the cursor, after Backspace or Delete. Joined by
+  // typing, it does not: the bar is filled when the typing pauses, and the
+  // cursor stays where the person is typing.
+  const joinTimer = useRef(0)
+  const join = useCallback((focus = true) => {
+    clearTimeout(joinTimer.current)
+    joinTimer.current = 0
     const v = view.current
     if (!v) return
     const parts = []
@@ -115,9 +123,13 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
     // The bar holds one line: lines and paragraphs meet with a space.
     const value = parts.filter(Boolean).join('\n\n').replace(/\s*\n+\s*/g, ' ').trim()
     if (!value) return
-    window.dispatchEvent(new CustomEvent('parliament-prompt-draft', { detail: { value } }))
+    window.dispatchEvent(new CustomEvent('parliament-prompt-draft', { detail: { value, focus } }))
     setSaid(wordsRef.current?.joined ?? '')
   }, [])
+  const joinSoon = useCallback(() => {
+    clearTimeout(joinTimer.current)
+    joinTimer.current = setTimeout(() => join(false), JOIN_AFTER_MS)
+  }, [join])
 
   const sectionsKey = sections.map((s) => `${s.part}:${s.message.id}`).join('|')
 
@@ -129,7 +141,10 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
     const made = sectionsRef.current.map((s) => {
       const m = s.message
       const inner = fromBlocks(m.blocks, ids.block)
-        ?? (s.part === 'prompt' ? promptFromText(stripAttachedFileBlocks(m.content), ids.block) : replyFromMarkdown(m.content, ids.block, { anchors: `msg-${m.id}` }))
+        ?? (s.part === 'prompt' ? promptFromText(stripAttachedFileBlocks(m.content), ids.block)
+          // A source's answer is plain text, never read as Markdown (stage 4).
+          : s.plain ? promptFromText(m.content, ids.block)
+            : replyFromMarkdown(m.content, ids.block, { anchors: `msg-${m.id}` }))
       return schema.nodes.section.create({ part: s.part, message: m.id }, inner.content)
     })
     const doc = schema.nodes.doc.create(null, made)
@@ -185,16 +200,38 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
           clearTimeout(timer.current)
           timer.current = setTimeout(save, SAVE_AFTER_MS)
         }
-        // Struck or typed over from the prompt into the reply: joined (C214 (a)).
-        if (joining) join()
+        // Struck or typed over from the prompt into the reply: joined (C214
+        // (a)). By a key, at once, to the bar; by typing, when it pauses.
+        if (joining) {
+          if (tr.getMeta(INTENT)) join(true)
+          else joinSoon()
+        } else if (joinTimer.current && tr.docChanged) joinSoon()
       },
       handleDOMEvents: {
-        blur: () => { if (timer.current) save(); return false },
+        blur: () => {
+          if (timer.current) save()
+          if (joinTimer.current) join(false)
+          return false
+        },
+        // Typing over a selection from one card into the other is the
+        // editor's to make, never the browser's: across the cards the
+        // browser would remove what lies between them, buttons and all.
+        // Struck, typed after, and joined (C214 (a)).
+        beforeinput: (view, event) => {
+          if (!crosses(view.state.selection)) return false
+          if (event.inputType === 'insertText' || event.inputType === 'insertReplacementText') {
+            event.preventDefault()
+            if (event.data) view.dispatch(view.state.tr.insertText(event.data))
+            return true
+          }
+          return false
+        },
       },
     })
     view.current = v
     return () => {
       if (timer.current) save()
+      clearTimeout(joinTimer.current)
       v.destroy()
       view.current = null
     }

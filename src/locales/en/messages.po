@@ -699,7 +699,7 @@ msgstr "Holds words that read like instructions to a model: {phrases}. Shown as 
 
 #. js-lingui-explicit-id
 msgid "chat.joinedToBar"
-msgstr "Your prompt and this reply, as they read now, are in the bar as your next prompt. Nothing here changed"
+msgstr "Your prompt and this reply, as they read now, are in the bar as your next prompt"
 
 #. js-lingui-explicit-id
 msgid "chat.pairLabel"

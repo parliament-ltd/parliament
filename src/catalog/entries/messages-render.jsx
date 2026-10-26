@@ -112,6 +112,13 @@ const DELETE_UNDO_MS = 20_000
 // Why a reply stopped short, said on the reply (C109; stage 4).
 const STOPPED = { left: COPY.chat.stoppedOnReply, limit: COPY.chat.cutLimit, error: COPY.chat.cutError }
 
+// A finished reply is edited in place (stage 11): a model's, and a source's
+// answer too, read as plain text, whose edits go to a model and never to the
+// source (the editing spec; the spike's 201b). Not one still arriving or cut
+// off, a source's list of results, or an answer shown translated.
+const editableReply = (m, streamingId) => m.role === 'assistant' && m.id !== streamingId && !m.incomplete && Boolean(m.content)
+  && (!m.source || (m.source.shape !== 'list' && !m.translation))
+
 export default function MessagesRender() {
   // The conversation this board shows, told by the board (stage 3).
   const conversationId = useConversationId()
@@ -404,7 +411,7 @@ export default function MessagesRender() {
     const isFav = favorites.has(msg.id)
     // A finished reply from a model is edited in place (stage 11, piece 1);
     // one still arriving, cut off, or from a source is not.
-    const editable = msg.role === 'assistant' && !isLatestAssistantStreaming && !isGhost && !msg.source && Boolean(msg.content)
+    const editable = !isGhost && editableReply(msg, isLatestAssistantStreaming ? msg.id : null)
 
     return {
       id: msg.id,
@@ -464,7 +471,7 @@ export default function MessagesRender() {
   // A prompt and its finished reply are one editor, so a selection can run
   // from one into the other; a prompt with no finished reply under it, or
   // with the tabs of several branches under it, is edited on its own.
-  const replyEditable = useCallback((m) => m.role === 'assistant' && !(isStreaming && m.id === streamingMessageId) && !m.incomplete && !m.source && Boolean(m.content), [isStreaming, streamingMessageId])
+  const replyEditable = useCallback((m) => editableReply(m, isStreaming ? streamingMessageId : null), [isStreaming, streamingMessageId])
   const paired = useMemo(() => {
     const out = []
     for (let i = 0; i < items.length; i++) {
@@ -518,7 +525,7 @@ export default function MessagesRender() {
   const renderPair = useCallback((item, idx) => {
     const { prompt, reply } = item
     const sections = [{ part: 'prompt', message: prompt, card: cardPropsOf(prompt, idx), quotes: quotesByMessage.get(prompt.id) ?? NO_QUOTES, editedLine: editedLineOf(prompt) }]
-    if (reply) sections.push({ part: 'reply', message: reply, card: cardPropsOf(reply, idx), quotes: quotesByMessage.get(reply.id) ?? NO_QUOTES })
+    if (reply) sections.push({ part: 'reply', message: reply, plain: Boolean(reply.source), card: cardPropsOf(reply, idx), quotes: quotesByMessage.get(reply.id) ?? NO_QUOTES })
     return (
       <EditableMessages
         key={item.key}

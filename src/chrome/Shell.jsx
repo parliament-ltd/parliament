@@ -633,7 +633,8 @@ export default function Shell() {
     const onDraft = (e) => {
       const value = e.detail?.value
       if (typeof value !== 'string' || !value.trim()) return
-      setWrite({ value: value.slice(0, 200_000), mode: 'prompt', n: ++writes.current })
+      // Joined by typing, the cursor stays where the person is typing.
+      setWrite({ value: value.slice(0, 200_000), mode: 'prompt', focus: e.detail?.focus !== false, n: ++writes.current })
     }
     window.addEventListener('parliament-prompt-draft', onDraft)
     return () => window.removeEventListener('parliament-prompt-draft', onDraft)

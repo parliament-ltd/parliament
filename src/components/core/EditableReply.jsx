@@ -3,7 +3,7 @@ import { EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { Mark } from 'prosemirror-model'
 import '../../editing/editing.css'
-import { replyFromMarkdown } from '../../editing/fromMarkdown'
+import { replyFromMarkdown, promptFromText } from '../../editing/fromMarkdown'
 import { fromBlocks, toBlocks } from '../../editing/blocks'
 import { editsIn } from '../../editing/edits'
 import { track, createEditIds, cursorMarks, REFUSED } from '../../editing/track'
@@ -35,7 +35,8 @@ const SAVE_AFTER_MS = 500
  *   onSave: (saved: { blocks: object[], edits: Map<string, object> }) => Promise<unknown>,
  * }} props
  */
-export default function EditableReply({ id, content, blocks = null, terms = [], quotes = [], quotedTitle, clean = false, onSave }) {
+// plain: a source's answer, read as plain text, never as Markdown (stage 4).
+export default function EditableReply({ id, content, blocks = null, plain = false, terms = [], quotes = [], quotedTitle, clean = false, onSave }) {
   const host = useRef(null)
   const view = useRef(null)
   const saved = useRef(null) // the stored form last saved, or the one first drawn, as text
@@ -73,7 +74,7 @@ export default function EditableReply({ id, content, blocks = null, terms = [], 
   useEffect(() => {
     const ids = createEditIds()
     idsRef.current = ids
-    const doc = fromBlocks(blocks, ids.block) ?? replyFromMarkdown(content, ids.block, { anchors: `msg-${id}` })
+    const doc = fromBlocks(blocks, ids.block) ?? (plain ? promptFromText(content, ids.block) : replyFromMarkdown(content, ids.block, { anchors: `msg-${id}` }))
     saved.current = JSON.stringify(toBlocks(doc))
     const plugins = [
       ...editingPlugins({ ids, blocks: true, onNote: (text) => setSaid(text), ...menuOptions }),

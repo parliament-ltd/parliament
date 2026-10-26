@@ -71,10 +71,15 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   // clicked (stage 5): it waits for Enter.
   useEffect(() => {
     if (!write) return
-    input.current?.focus()
+    if (write.focus !== false) input.current?.focus()
     // The bar turned to a prompt, as the Collection's Prompt act does (C145 (h)).
     // With words, a prompt to edit and send: a prompt and its reply joined (C214 (b)).
-    if (write.mode === 'prompt') { dispatch(write.value ? { type: 'draft', value: write.value } : { type: 'ran', to: 'prompt' }); return }
+    if (write.mode === 'prompt') {
+      dispatch(write.value ? { type: 'draft', value: write.value, focus: write.focus !== false } : { type: 'ran', to: 'prompt' })
+      // The caret goes to the end, so what is typed next follows the words.
+      if (write.value && write.focus !== false) setTimeout(() => { const el = input.current; if (el) el.setSelectionRange(el.value.length, el.value.length) }, 0)
+      return
+    }
     dispatch({ type: 'input', value: write.value })
     // An act that wants words writes "" for them: the caret goes between (C145 (d)).
     const at = write.value.indexOf('""')

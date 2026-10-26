@@ -1916,7 +1916,7 @@ export const COPY = {
     promptEditedOthers: /*i18n*/ { id: 'chat.promptEditedOthers', message: 'the other branches keep theirs' },
     askAgainAs: /*i18n*/ { id: 'chat.askAgainAs', message: 'ask again as {next}', comment: 'Writes again: into the bar; {next} is the new branch, like 201d' },
     askAgain: /*i18n*/ { id: 'chat.askAgain', message: 'ask again' },
-    joinedToBar: /*i18n*/ { id: 'chat.joinedToBar', message: 'Your prompt and this reply, as they read now, are in the bar as your next prompt. Nothing here changed' },
+    joinedToBar: /*i18n*/ { id: 'chat.joinedToBar', message: 'Your prompt and this reply, as they read now, are in the bar as your next prompt' },
     pairLabel: /*i18n*/ { id: 'chat.pairLabel', message: 'Your prompt and its reply. Every word can be edited' },
     // "Pin for reference", renamed (R13): a whole message kept as a quote
     // beside a chat; and the quotes kept beside this one.
