@@ -42,6 +42,8 @@ export function toBlocks(doc) {
   doc.forEach((node) => {
     const type = TYPE_OF[node.type.name]
     if (!type) return
+    // An empty line opened between two blocks is not part of the reply.
+    if (node.attrs.gap && node.content.size === 0) return
     const b = { id: node.attrs.id, type }
     if (node.isTextblock) b.text = runsOf(node)
     if (type === 'heading') {

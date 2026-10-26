@@ -20,10 +20,12 @@ export const BRANCHES = [
   },
 ]
 
-const CHART = JSON.stringify({ title: 'Furnaces on Murano, by decade', xKey: 'decade', yKey: 'furnaces', data: [
-  { decade: '1840s', furnaces: 18 }, { decade: '1850s', furnaces: 14 }, { decade: '1860s', furnaces: 21 },
-  { decade: '1870s', furnaces: 26 }, { decade: '1880s', furnaces: 31 },
-] })
+// In the shape the chart tool gives and every reply draws (ChartRenderer).
+const CHART = JSON.stringify({
+  type: 'bar', title: 'Furnaces on Murano, by decade',
+  labels: ['1840s', '1850s', '1860s', '1870s', '1880s'],
+  datasets: [{ label: 'Furnaces', values: [18, 14, 21, 26, 31] }],
+})
 
 export const EVERY_KIND = {
   key: 'blocks', source: 'Sonnet 4.6', prompt: 'Summarise what we know about the glassworks, with a table and a chart.',

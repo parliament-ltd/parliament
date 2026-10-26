@@ -39,7 +39,7 @@ const choicesFor = (filter) => BLOCK_CHOICES.filter((c) => c.label.toLowerCase()
 export default function EditableReply({ id, content, blocks = null, terms = [], quotes = [], quotedTitle, clean = false, onSave }) {
   const host = useRef(null)
   const view = useRef(null)
-  const saved = useRef(null) // the document last saved, or the one first drawn
+  const saved = useRef(null) // the stored form last saved, or the one first drawn, as text
   const timer = useRef(0)
   const onSaveRef = useRef(onSave)
   const cleanRef = useRef(clean)
@@ -54,10 +54,15 @@ export default function EditableReply({ id, content, blocks = null, terms = [], 
     clearTimeout(timer.current)
     timer.current = 0
     const v = view.current
-    if (!v || (saved.current && v.state.doc.eq(saved.current))) return
+    if (!v) return
+    // Saved only when the stored form changes: an empty line opened and
+    // left, or a cursor moved, is nothing to keep.
     const doc = v.state.doc
-    saved.current = doc
-    Promise.resolve(onSaveRef.current?.({ blocks: toBlocks(doc), edits: editsIn(doc) })).catch((err) => {
+    const blocksNow = toBlocks(doc)
+    const key = JSON.stringify(blocksNow)
+    if (key === saved.current) return
+    saved.current = key
+    Promise.resolve(onSaveRef.current?.({ blocks: blocksNow, edits: editsIn(doc) })).catch((err) => {
       // Kept on screen; the next change tries again.
       saved.current = null
       setSaid(`Not saved: ${String(err?.message ?? err)}`)
@@ -69,7 +74,7 @@ export default function EditableReply({ id, content, blocks = null, terms = [], 
     const ids = createEditIds()
     idsRef.current = ids
     const doc = fromBlocks(blocks, ids.block) ?? replyFromMarkdown(content, ids.block, { anchors: `msg-${id}` })
-    saved.current = doc
+    saved.current = JSON.stringify(toBlocks(doc))
     const setMenuBoth = (next) => { menuRef.current = next; setMenu(next) }
     const plugins = [
       ...editingPlugins({

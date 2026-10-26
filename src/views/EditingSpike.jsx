@@ -4,10 +4,13 @@ import { EditorView } from 'prosemirror-view'
 import { Mark } from 'prosemirror-model'
 import '../styles/tokens.css'
 import '../spike/editing/editing-spike.css'
-import { replyFromMarkdown, promptFromText } from '../spike/editing/fromMarkdown'
-import { track, createIds, cursorMarks, undoEdit, collectEdits, noteForModel, REFUSED } from '../spike/editing/track'
-import { editingPlugins, announcePlugin, BLOCK_CHOICES, setBlock } from '../spike/editing/keys'
+import { replyFromMarkdown, promptFromText } from '../editing/fromMarkdown'
+import { track, createIds, cursorMarks, undoEdit, collectEdits, noteForModel, REFUSED } from '../editing/track'
+import { editingPlugins, announcePlugin, BLOCK_CHOICES, setBlock } from '../editing/keys'
 import { BRANCHES, EVERY_KIND, longReply } from '../spike/editing/samples'
+import { chartView } from '../editing/chartView'
+// The editing rules are the product's (src/editing/), so what is tried here
+// is what a room does (C213 (i)); the samples and checklist are the spike's.
 
 // Throwaway spike for stage 11 (refactor-plan.md; conflicts.md C205): can a
 // reply and a prompt be edited in place on ProseMirror, with the editing
@@ -160,6 +163,7 @@ export default function EditingSpike() {
       const view = new EditorView(el, {
         state: store[currentRef.current][which],
         editable: () => !cleanRef.current,
+        nodeViews: { chart: (node) => chartView(node) },
         attributes: { 'aria-label': which === 'reply' ? 'The reply. Every word can be edited' : 'Your prompt. Every word can be edited', spellcheck: 'true', role: 'textbox', 'aria-multiline': 'true' },
         dispatchTransaction(tr) {
           const t0 = performance.now()

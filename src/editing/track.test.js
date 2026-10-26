@@ -4,7 +4,8 @@ import { Fragment, Slice } from 'prosemirror-model'
 import { schema, STRUCK, ADDED } from './schema'
 import { replyFromMarkdown } from './fromMarkdown'
 import { track, createIds, cursorMarks, undoEdit, collectEdits, noteForModel, INTENT, SKIP } from './track'
-import { commands, atLineStart } from './keys'
+import { commands, atLineStart, setBlock, BLOCK_CHOICES, editingPlugins } from './keys'
+import { toBlocks } from './blocks'
 
 // The reply as text, with each edit shown: [-struck-#id] and {+added+#id}.
 function show(doc) {
@@ -346,5 +347,66 @@ describe('where / opens the block menu (Stefan\'s try of piece 1)', () => {
     state = apply(state, state.tr.delete(start, start + 'That winter'.length).setMeta(INTENT, 'range'), ids)
     expect(atLineStart(caret(state, start + 'That winter'.length))).toBe(true)
     expect(atLineStart(caret(state, start + 'That winter a'.length))).toBe(false)
+  })
+})
+
+describe('/ over selected words (Stefan\'s try of piece 1)', () => {
+  const heading = BLOCK_CHOICES.find((c) => c.key === 'h2')
+  const kinds = (doc) => { const out = []; doc.forEach((b) => out.push(`${b.type.name}:${b.textContent}`)); return out }
+
+  it('makes a word mid-sentence a line of its own of that kind, as layout', () => {
+    const s0 = setup('The furnace had not gone out in eleven years.')
+    const { ids } = s0
+    let { state } = s0
+    const from = at(state, 'eleven')
+    state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, from, from + 'eleven'.length)))
+    const tr = setBlock(state, heading, ids)
+    expect(track(state, tr, { ids })).toBe(tr)
+    state = state.apply(tr)
+    expect(kinds(state.doc)).toEqual(['paragraph:The furnace had not gone out in ', 'heading:eleven', 'paragraph: years.'])
+    expect(state.doc.child(1).attrs.level).toBe(2)
+    expect(new Set([state.doc.child(0), state.doc.child(1), state.doc.child(2)].map((b) => b.attrs.id)).size).toBe(3)
+    expect(collectEdits(state.doc)).toEqual([])
+  })
+
+  it('turns each line a selection touches', () => {
+    const s0 = setup('One line.\n\nAnother line.\n\nA third.')
+    const { ids } = s0
+    let { state } = s0
+    state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, at(state, 'line'), at(state, 'line', 1))))
+    state = state.apply(setBlock(state, heading, ids))
+    expect(kinds(state.doc)).toEqual(['heading:One line.', 'heading:Another line.', 'paragraph:A third.'])
+  })
+})
+
+describe('a line opened in the space between two blocks', () => {
+  const withPlugins = (md) => {
+    const ids = createIds(240)
+    const doc = replyFromMarkdown(md, ids.block)
+    return { ids, state: EditorState.create({ doc, plugins: editingPlugins({ ids, blocks: true }) }) }
+  }
+  const open = (state, ids, at) => {
+    const tr = state.tr.insert(at, schema.nodes.paragraph.create({ id: ids.block(), gap: true })).setMeta(SKIP, true)
+    return state.apply(tr.setSelection(TextSelection.create(tr.doc, at + 1)))
+  }
+
+  it('is never stored while empty, and goes once the cursor leaves it', () => {
+    let { state, ids } = withPlugins('First.\n\nSecond.')
+    const between = state.doc.child(0).nodeSize
+    state = open(state, ids, between)
+    expect(state.doc.childCount).toBe(3)
+    expect(toBlocks(state.doc)).toHaveLength(2)
+    state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, 2)))
+    expect(state.doc.childCount).toBe(2)
+  })
+
+  it('becomes an ordinary line once something is typed in it', () => {
+    let { state, ids } = withPlugins('First.\n\nSecond.')
+    state = open(state, ids, state.doc.child(0).nodeSize)
+    state = state.apply(track(state, state.tr.insertText('New'), { ids }))
+    expect(state.doc.child(1).attrs.gap).toBe(false)
+    expect(show(state.doc)).toBe('First. | {+New+#240} | Second.')
+    state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, 2)))
+    expect(state.doc.childCount).toBe(3)
   })
 })

@@ -234,6 +234,9 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, menuKey, m
         // block menu (replies only): a line that starts with struck words
         // still starts there (Stefan's try of piece 1, 26 October).
         if (blocks && text === '/' && from === to && onSlash && atLineStart(view.state)) return onSlash(view)
+        // "/" over selected words opens it too: they become a line of the
+        // kind picked (setBlock), and nothing is typed over them.
+        if (blocks && text === '/' && !view.state.selection.empty && view.state.selection instanceof TextSelection && onSlash) return onSlash(view)
         return false
       },
       handleDOMEvents: {
@@ -335,7 +338,85 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, menuKey, m
       return tr
     },
   })
-  return [events, keys, uniqueIds, historyPlugin(now ? { now } : {})]
+  return [events, keys, uniqueIds, ...(blocks ? [gapLines(ids)] : []), historyPlugin(now ? { now } : {})]
+}
+
+// The space between two blocks reads as a blank line. Moving into it with
+// the arrow keys, or clicking in it, opens an empty line there to write in
+// (Stefan's try of piece 1, 26 October). It is layout, not an edit: once
+// something is typed in it, it is an ordinary line; left empty, it goes.
+function gapLines(ids) {
+  const gap = () => schema.nodes.paragraph.create({ id: ids.block(), gap: true })
+  const isGap = (node) => node?.type === schema.nodes.paragraph && node.attrs.gap
+  // Open a gap line at a position between two top-level blocks.
+  const openAt = (view, at) => {
+    const tr = view.state.tr.insert(at, gap()).setMeta(SKIP, true)
+    view.dispatch(tr.setSelection(TextSelection.create(tr.doc, at + 1)).scrollIntoView())
+    return true
+  }
+  return new Plugin({
+    props: {
+      handleKeyDown(view, event) {
+        if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return false
+        if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) return false
+        const { selection } = view.state
+        if (!selection.empty || !(selection instanceof TextSelection)) return false
+        const $pos = selection.$from
+        if ($pos.depth !== 1 || isGap($pos.parent)) return false
+        const down = event.key === 'ArrowDown'
+        if (!view.endOfTextblock(down ? 'down' : 'up')) return false
+        const index = $pos.index(0)
+        const next = view.state.doc.maybeChild(down ? index + 1 : index - 1)
+        if (!next || isGap(next)) return false
+        return openAt(view, down ? $pos.after(1) : $pos.before(1))
+      },
+      handleDOMEvents: {
+        mousedown(view, event) {
+          // Only a press on the space itself, not on a line.
+          if (event.button !== 0 || event.target !== view.dom) return false
+          const y = event.clientY
+          let at = null
+          let prevBottom = null
+          view.state.doc.forEach((node, offset) => {
+            if (at != null) return
+            const dom = view.nodeDOM(offset)
+            if (!(dom instanceof Element)) return
+            const box = dom.getBoundingClientRect()
+            if (prevBottom != null && y > prevBottom && y < box.top) at = offset
+            prevBottom = box.bottom
+          })
+          if (at == null) return false
+          const before = view.state.doc.resolve(at).nodeBefore
+          const after = view.state.doc.resolve(at).nodeAfter
+          if (isGap(before) || isGap(after)) return false
+          event.preventDefault()
+          view.focus()
+          return openAt(view, at)
+        },
+      },
+    },
+    // A gap line written in becomes an ordinary line; an empty one the
+    // cursor has left goes.
+    appendTransaction(trs, _old, state) {
+      if (!trs.some((t) => t.docChanged || t.selectionSet)) return null
+      let tr = null
+      const here = state.selection.$from
+      const gone = []
+      state.doc.forEach((node, offset) => {
+        if (!isGap(node)) return
+        if (node.content.size > 0) {
+          tr = (tr ?? state.tr.setMeta(SKIP, true)).setNodeMarkup(offset, null, { ...node.attrs, gap: false })
+        } else if (!(here.depth >= 1 && here.before(1) === offset)) {
+          gone.push(offset)
+        }
+      })
+      for (const offset of gone.reverse()) {
+        tr = tr ?? state.tr.setMeta(SKIP, true)
+        tr.delete(tr.mapping.map(offset), tr.mapping.map(offset + 2))
+      }
+      return tr
+    },
+  })
 }
 
 /**
@@ -410,9 +491,34 @@ export const BLOCK_CHOICES = [
 
 /** The block at the cursor turned into another kind: formatting, never an edit. */
 export function setBlock(state, choice, ids) {
-  const { $from } = state.selection
+  const sel = state.selection
+  const { $from } = sel
   const block = $from.parent
   const tr = state.tr.setMeta(SKIP, true)
+  const type = schema.nodes[choice.type]
+  if (choice.type !== 'divider' && !sel.empty && sel instanceof TextSelection) {
+    // Selected words in one line become a line of their own of that kind:
+    // the line is split before and after them (Stefan's try of piece 1: a
+    // word mid-sentence made a heading). Across lines, each line touched
+    // turns. Layout, never an edit.
+    if ($from.sameParent(sel.$to) && block.isTextblock) {
+      const atStart = $from.parentOffset === 0
+      const atEnd = sel.$to.parentOffset === block.content.size
+      const rest = () => [{ type: block.type, attrs: { ...block.attrs, id: ids.block(), gap: false } }]
+      if (!atEnd) tr.split(sel.to, 1, rest())
+      if (!atStart) tr.split(sel.from, 1, rest())
+      const mid = atStart ? sel.from : sel.from + 2
+      const midBlock = tr.doc.resolve(mid).parent
+      tr.setBlockType(mid, mid, type, { id: midBlock.attrs.id, ...(choice.attrs ?? {}) })
+      return tr
+    }
+    state.doc.nodesBetween(sel.from, sel.to, (node, pos) => {
+      if (!node.isTextblock) return true
+      tr.setBlockType(pos + 1, pos + 1, type, { id: node.attrs.id, ...(choice.attrs ?? {}) })
+      return false
+    })
+    return tr
+  }
   if (choice.type === 'divider') {
     const at = $from.after()
     const divider = schema.nodes.divider.create({ id: ids.block() })

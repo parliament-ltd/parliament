@@ -43,10 +43,13 @@ const wrapStruck = (node, inner) => (node.attrs.struck
 export const schema = new Schema({
   nodes: {
     doc: { content: 'block+' },
+    // gap: an empty line opened between two blocks by moving or clicking
+    // there, to write in (Stefan's try of piece 1, 26 October). Never stored
+    // while empty; an ordinary line once something is typed in it.
     paragraph: {
-      group: 'block', content: 'inline*', attrs: { ...id },
-      toDOM: (n) => ['p', blockAttr(n), 0],
-      parseDOM: [{ tag: 'p', getAttrs: readId }],
+      group: 'block', content: 'inline*', attrs: { ...id, gap: { default: false } },
+      toDOM: (n) => ['p', n.attrs.gap ? { ...blockAttr(n), class: 'pm-gap' } : blockAttr(n), 0],
+      parseDOM: [{ tag: 'p', getAttrs: (dom) => ({ ...readId(dom), gap: dom.classList.contains('pm-gap') }) }],
     },
     heading: {
       // anchor: the heading's place among the reply's own headings, for the
