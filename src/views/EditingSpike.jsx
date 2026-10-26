@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { EditorState, Selection, TextSelection } from 'prosemirror-state'
-import { EditorView } from 'prosemirror-view'
+import { EditorState, Selection, TextSelection, Plugin } from 'prosemirror-state'
+import { EditorView, Decoration, DecorationSet } from 'prosemirror-view'
 import { Mark } from 'prosemirror-model'
 import '../styles/tokens.css'
 import '../spike/editing/editing-spike.css'
 import { replyFromMarkdown, promptFromText } from '../editing/fromMarkdown'
-import { track, createIds, cursorMarks, undoEdit, collectEdits, noteForModel, REFUSED } from '../editing/track'
+import { track, createIds, cursorMarks, undoEdit, collectEdits, noteForModel, REFUSED, SKIP } from '../editing/track'
+import { schema } from '../editing/schema'
+import { toBlocks, wordsOf } from '../editing/blocks'
 import { editingPlugins, announcePlugin, BLOCK_CHOICES, setBlock } from '../editing/keys'
 import { BRANCHES, EVERY_KIND, longReply } from '../spike/editing/samples'
 import { chartView } from '../editing/chartView'
@@ -55,26 +57,66 @@ function readChecks() {
 // What the editors call back into on the page (one spike page at a time).
 const page = {}
 
-// Everything the editors share, made once: the id counter, the plugins and
-// each sample's prompt and reply.
+// The section, prompt or reply, a position is in.
+function sectionAt($pos) {
+  for (let d = $pos.depth; d > 0; d--) if ($pos.node(d).type === schema.nodes.section) return { node: $pos.node(d), pos: $pos.before(d) }
+  return null
+}
+const inReply = (state) => sectionAt(state.selection.$from)?.node.attrs.part !== 'prompt'
+const crosses = (sel) => {
+  if (sel.empty) return false
+  const a = sectionAt(sel.$from)
+  const b = sectionAt(sel.$to)
+  return Boolean(a && b && a.pos !== b.pos)
+}
+
+// The line under the prompt, between the two sections: not part of the text.
+function underPrompt() {
+  return new Plugin({
+    props: {
+      decorations(state) {
+        const first = state.doc.firstChild
+        if (!first || first.type !== schema.nodes.section) return null
+        const text = page.underText?.(state) ?? ''
+        const line = () => {
+          const p = document.createElement('p')
+          p.className = 'es-under es-marg'
+          p.contentEditable = 'false'
+          p.textContent = text
+          return p
+        }
+        return DecorationSet.create(state.doc, [Decoration.widget(first.nodeSize, line, { key: `under:${text}`, side: -1, stopEvent: () => true, ignoreSelection: true })])
+      },
+    },
+  })
+}
+
+// Everything the editor shares, made once: the id counter, the plugins and
+// each sample's prompt and reply, as one document of two sections, so a
+// selection can run from the prompt into the reply (piece 2; C214, C215).
 function createWorld() {
   const ids = createIds(240)
   const samples = [...BRANCHES, EVERY_KIND, longReply(5000)]
-  const plugins = (blocks) => editingPlugins({
-    ids, blocks,
-    log: (line) => page.log?.(`${blocks ? 'reply' : 'prompt'}: ${line}`),
-    onSlash: blocks ? (view) => page.openMenu?.(view) ?? false : undefined,
-    onNote: (text) => page.toast?.(text),
-    menuKey: blocks ? (event) => page.menuKey?.(event) ?? false : undefined,
-    menuText: blocks ? (text) => page.menuText?.(text) ?? false : undefined,
-  })
-  const said = announcePlugin(() => page.announce !== false)
-  const replyPlugins = [...plugins(true), said]
-  const promptPlugins = [...plugins(false), said]
-  const store = Object.fromEntries(samples.map((s) => [s.key, {
-    sample: s,
-    reply: EditorState.create({ doc: replyFromMarkdown(s.reply, ids.block), plugins: replyPlugins }),
-    prompt: EditorState.create({ doc: promptFromText(s.prompt, ids.block), plugins: promptPlugins }),
+  const plugins = [
+    ...editingPlugins({
+      ids, blocks: inReply,
+      log: (line) => page.log?.(line),
+      onSlash: (view) => page.openMenu?.(view) ?? false,
+      onNote: (text) => page.toast?.(text),
+      onJoin: () => page.join?.(),
+      menuKey: (event) => page.menuKey?.(event) ?? false,
+      menuText: (text) => page.menuText?.(text) ?? false,
+    }),
+    announcePlugin(() => page.announce !== false),
+    underPrompt(),
+  ]
+  const pairOf = (x) => schema.nodes.doc.create(null, [
+    schema.nodes.section.create({ part: 'prompt', message: `${x.key}-prompt` }, promptFromText(x.prompt, ids.block).content),
+    schema.nodes.section.create({ part: 'reply', message: `${x.key}-reply` }, replyFromMarkdown(x.reply, ids.block).content),
+  ])
+  const store = Object.fromEntries(samples.map((x) => [x.key, {
+    sample: x,
+    state: EditorState.create({ doc: pairOf(x), plugins }),
     held: new Set(),
     sent: new Map(),
   }]))
@@ -100,14 +142,13 @@ export default function EditingSpike() {
   const [announce, setAnnounce] = useState(true)
   const [checks, setChecks] = useState(readChecks)
   const [copied, setCopied] = useState(null)
-  const replyEl = useRef(null)
-  const promptEl = useRef(null)
-  const views = useRef({})
+  const editorEl = useRef(null)
+  const viewRef = useRef(null)
 
   // The / menu.
   const choices = (filter) => BLOCK_CHOICES.filter((c) => c.label.toLowerCase().includes(filter.toLowerCase()))
   const pick = (choice) => {
-    const v = views.current.reply
+    const v = viewRef.current
     v.dispatch(setBlock(v.state, choice, ids))
     menuRef.current = null
     setMenu(null)
@@ -119,6 +160,9 @@ export default function EditingSpike() {
     currentRef.current = current
     cleanRef.current = clean
     menuRef.current = menu
+    page.underText = (state) => (editsOf(state.doc.child(0)).length > 0
+      ? `your prompt in ${currentRef.current}, edited; the other branches keep theirs`
+      : `your prompt in ${currentRef.current}`)
     // The log, redrawn at most every 60 ms so typing is never held up by it
     // (a timer, not an animation frame, which stops in a background tab).
     page.log = (line) => {
@@ -159,51 +203,70 @@ export default function EditingSpike() {
 
   useEffect(() => {
     page.toast = (text) => setToast(text)
-    const make = (el, which) => {
-      const view = new EditorView(el, {
-        state: store[currentRef.current][which],
-        editable: () => !cleanRef.current,
-        nodeViews: { chart: (node) => chartView(node) },
-        attributes: { 'aria-label': which === 'reply' ? 'The reply. Every word can be edited' : 'Your prompt. Every word can be edited', spellcheck: 'true', role: 'textbox', 'aria-multiline': 'true' },
-        dispatchTransaction(tr) {
-          const t0 = performance.now()
-          const before = view.state
-          const out = track(before, tr, { ids, onError: (e) => setError(String(e?.message ?? e)) })
-          if (out.getMeta(REFUSED)) page.log(`refused: ${out.getMeta(REFUSED)}`)
-          let next = before.apply(out)
-          // Before an input method starts, the cursor carries the person's
-          // mark, so a composed word is theirs from its first character.
-          if (!view.composing) {
-            const marks = cursorMarks(next, ids)
-            if (marks && !(next.storedMarks && Mark.sameSet(next.storedMarks, marks))) next = next.apply(next.tr.setStoredMarks(marks))
+    // Joined (C214): in a room the words of both still standing go to the
+    // bar as the next prompt; the spike has no bar, so it says them.
+    page.join = () => {
+      const v = viewRef.current
+      if (!v) return
+      const parts = []
+      v.state.doc.forEach((sec) => parts.push(wordsOf(toBlocks(sec))))
+      const value = parts.filter(Boolean).join(' ').replace(/\s*\n+\s*/g, ' ')
+      page.log?.('joined')
+      setToast(`Joined. In a room this goes to the bar as your next prompt: ${value.length > 220 ? `${value.slice(0, 219)}…` : value}`)
+    }
+    const view = new EditorView(editorEl.current, {
+      state: store[currentRef.current].state,
+      editable: () => !cleanRef.current,
+      nodeViews: { chart: (node) => chartView(node) },
+      attributes: { class: 'es-pair', 'aria-label': 'Your prompt and the reply. Every word can be edited', spellcheck: 'true', role: 'textbox', 'aria-multiline': 'true' },
+      dispatchTransaction(tr) {
+        const t0 = performance.now()
+        const before = view.state
+        const joining = crosses(before.selection) && tr.docChanged && !tr.getMeta(SKIP)
+        const out = track(before, tr, { ids, onError: (e) => setError(String(e?.message ?? e)) })
+        if (out.getMeta(REFUSED)) page.log(`refused: ${out.getMeta(REFUSED)}`)
+        let next = before.apply(out)
+        // Before an input method starts, the cursor carries the person's
+        // mark, so a composed word is theirs from its first character.
+        if (!view.composing) {
+          const marks = cursorMarks(next, ids)
+          if (marks && !(next.storedMarks && Mark.sameSet(next.storedMarks, marks))) next = next.apply(next.tr.setStoredMarks(marks))
+        }
+        view.updateState(next)
+        store[currentRef.current].state = next
+        if (tr.docChanged) {
+          setToast('')
+          setFacts({ ms: performance.now() - t0, which: inReply(before) ? 'reply' : 'prompt', composing: view.composing, rewritten: out !== tr })
+          setTick((t) => t + 1)
+        }
+        if (joining) page.join()
+      },
+      handleDOMEvents: {
+        // Typing over both is the editor's to make, as in a room.
+        beforeinput: (v, event) => {
+          if (!crosses(v.state.selection)) return false
+          if (event.inputType === 'insertText' || event.inputType === 'insertReplacementText') {
+            event.preventDefault()
+            if (event.data) v.dispatch(v.state.tr.insertText(event.data))
+            return true
           }
-          view.updateState(next)
-          store[currentRef.current][which] = next
-          if (tr.docChanged) {
-            setToast('')
-            setFacts({ ms: performance.now() - t0, which, composing: view.composing, rewritten: out !== tr })
-            setTick((t) => t + 1)
-          }
+          return false
         },
-      })
-      return view
-    }
-    const made = { reply: make(replyEl.current, 'reply'), prompt: make(promptEl.current, 'prompt') }
-    views.current = made
-    return () => {
-      made.reply.destroy()
-      made.prompt.destroy()
-    }
+      },
+    })
+    viewRef.current = view
+    return () => view.destroy()
   }, [ids, store])
 
   useEffect(() => {
-    for (const v of Object.values(views.current)) v.setProps({ editable: () => !clean })
+    viewRef.current?.setProps({ editable: () => !clean })
   }, [clean])
 
   // Words for a screen reader at each mark's edges, drawn again when switched.
   useEffect(() => {
     page.announce = announce
-    for (const v of Object.values(views.current)) v.dispatch(v.state.tr.setMeta('announce', announce))
+    const v = viewRef.current
+    if (v) v.dispatch(v.state.tr.setMeta('announce', announce))
   }, [announce])
 
   useEffect(() => {
@@ -213,8 +276,7 @@ export default function EditingSpike() {
   const switchTo = (key) => {
     setCurrent(key)
     currentRef.current = key
-    views.current.reply.updateState(store[key].reply)
-    views.current.prompt.updateState(store[key].prompt)
+    viewRef.current.updateState(store[key].state)
     menuRef.current = null
     setMenu(null)
     setToast('')
@@ -222,8 +284,11 @@ export default function EditingSpike() {
 
   const entry = store[current]
   const s = entry.sample
-  const replyEdits = editsOf(entry.reply.doc)
-  const promptEdits = editsOf(entry.prompt.doc)
+  // The prompt and the reply, the two sections of one document.
+  const promptNode = entry.state.doc.child(0)
+  const replyNode = entry.state.doc.child(1)
+  const replyEdits = editsOf(replyNode)
+  const promptEdits = editsOf(promptNode)
   const waiting = (list) => list.filter((e) => !entry.held.has(e.id) && !entry.sent.has(e.id))
   const goReply = waiting(replyEdits)
   const goPrompt = waiting(promptEdits)
@@ -231,22 +296,24 @@ export default function EditingSpike() {
   const held = [...replyEdits, ...promptEdits].filter((e) => entry.held.has(e.id)).length
   const reader = s.keyless ? 'Sonnet 4.6' : s.source
   const note = [
-    goPrompt.length ? noteForModel(entry.prompt.doc, goPrompt, { what: `their prompt in ${s.key}` }) : '',
-    goReply.length ? noteForModel(entry.reply.doc, goReply, { what: s.keyless ? `the ${s.source} text in ${s.key}` : `your reply in ${s.key}` }) : '',
+    goPrompt.length ? noteForModel(promptNode, goPrompt, { what: `their prompt in ${s.key}` }) : '',
+    goReply.length ? noteForModel(replyNode, goReply, { what: s.keyless ? `the ${s.source} text in ${s.key}` : `your reply in ${s.key}` }) : '',
   ].filter(Boolean).join('\n\n')
 
   const find = (e, which) => {
-    const v = views.current[which]
+    const v = viewRef.current
     const doc = v.state.doc
-    const from = Math.min(e.first, doc.content.size)
-    const to = Math.min(e.last, doc.content.size)
+    // An edit's place is counted within its section.
+    const base = (which === 'prompt' ? 0 : doc.child(0).nodeSize) + 1
+    const from = Math.min(base + e.first, doc.content.size)
+    const to = Math.min(base + e.last, doc.content.size)
     let sel
     try { sel = TextSelection.between(doc.resolve(from), doc.resolve(to)) } catch { sel = Selection.near(doc.resolve(from)) }
     v.dispatch(v.state.tr.setSelection(sel).scrollIntoView())
     v.focus()
   }
-  const undo = (e, which) => {
-    const v = views.current[which]
+  const undo = (e) => {
+    const v = viewRef.current
     v.dispatch(undoEdit(v.state, e.id))
     entry.held.delete(e.id)
     entry.sent.delete(e.id)
@@ -294,7 +361,7 @@ export default function EditingSpike() {
         <div className="acts">
           <button type="button" className="es-link" onClick={() => find(e, which)}>find</button>
           {!sentTo && <button type="button" className="es-link" onClick={() => hold(e)}>{isHeld ? 'let it go' : 'hold back'}</button>}
-          <button type="button" className="es-link" onClick={() => undo(e, which)}>undo</button>
+          <button type="button" className="es-link" onClick={() => undo(e)}>undo</button>
         </div>
       </div>
     )
@@ -302,9 +369,9 @@ export default function EditingSpike() {
 
   const tabCount = (key) => {
     const x = store[key]
-    return [...editsOf(x.reply.doc), ...editsOf(x.prompt.doc)].filter((e) => !x.held.has(e.id) && !x.sent.has(e.id)).length
+    return [...editsOf(x.state.doc.child(1)), ...editsOf(x.state.doc.child(0))].filter((e) => !x.held.has(e.id) && !x.sent.has(e.id)).length
   }
-  const doc = entry.reply.doc
+  const doc = replyNode
   const menuList = menu ? choices(menu.filter) : []
 
   return (
@@ -335,13 +402,7 @@ export default function EditingSpike() {
             </nav>
             <div className="es-body">
               {s.keyless && <p className="es-said">{s.source} supplies the text. Mark it, edit it: those go to {reader}, never to {s.source}.</p>}
-              <div className="es-prompt"><div ref={promptEl} /></div>
-              <p className="es-under es-marg">
-                {promptEdits.length > 0
-                  ? <>your prompt in {s.key}, edited; the other branches keep theirs · <button type="button" className="es-link" onClick={() => setToast('Asking again makes a new branch from the edited wording, 201d. Not built in the spike.')}>ask again as 201d</button></>
-                  : <>your prompt in {s.key}</>}
-              </p>
-              <div className="es-reply"><div ref={replyEl} /></div>
+              <div ref={editorEl} />
             </div>
             <div className="es-line">
               <span className="es-marg">

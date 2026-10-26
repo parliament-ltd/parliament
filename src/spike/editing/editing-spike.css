@@ -37,6 +37,11 @@
 .es .ProseMirror:hover { background: rgba(25, 25, 25, .02); }
 .es .ProseMirror:focus { box-shadow: 0 0 0 1px var(--ch-border); }
 .es-prompt .ProseMirror { font: 400 14px/1.5 var(--ch-sans); }
+/* One editor for the prompt and the reply (piece 2; C215): the prompt section
+   drawn as its box, the line under it, then the reply. */
+.es .pm-section.pm-prompt { margin: 0 0 6px auto; max-width: 85%; background: var(--ch-subtle); border: 1px solid var(--ch-border); border-radius: 12px; padding: 8px 12px; font: 400 14px/1.5 var(--ch-sans); }
+.es .pm-section.pm-prompt p:last-child { margin-bottom: 0; }
+.es .pm-section.pm-reply { position: relative; }
 .es .ProseMirror p { margin: 0 0 .75em; }
 .es .ProseMirror .pm-h1 { font: 600 20px/1.3 var(--ch-sans); margin: 1em 0 .4em; }
 .es .ProseMirror .pm-h2 { font: 600 17px/1.3 var(--ch-sans); margin: 1em 0 .4em; }
