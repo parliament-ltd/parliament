@@ -1857,6 +1857,17 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   7. **The three advisories in build tools** (c). **Suggestion:** a small update of those tools on its own, after the spike; nothing that reaches the browser is affected.
 - **Suggestion:** try your part of the checklist; the engine is chosen with what it finds.
 
+**C209. Stefan's first try of the spike, and what changed** (25 October; `research/editing-spike.md`, "Stefan's first try").
+- **(a) Worked as built,** in Chrome on Windows: Japanese and Chinese with the input method, paste, spelling correction, the long reply, most of Enter, Backspace and `/`.
+- **(b) Fixed or changed, each waiting for his second try:**
+  1. **Composing over a selection** ("the cursor jumps back and typing starts within the struck word"): the selection was struck when composing began, after the input method had taken its place. It is now struck on the input method's first key (229), before composing begins.
+  2. **Selection across blocks** ("not able to highlight"): a drag starting inside a selection began a drag and drop, which is off, so nothing was selected. A press inside a selection now starts a new one.
+  3. **The table** ("any edit crosses out entire table. need greater delineation"): typing or pasting on a selected table, chart or divider changes nothing and says why; Enter starts a line after it; its edges show on hover, a selected one has a frame and a line saying it is one block for now, a struck one a rule and "Struck as a whole: edit 244". Editing inside a table comes later in the stage, as ruled (C58).
+  4. **Narrator** ("still reads word"): the words "removed" and "added" are now real, unseen words at each mark's edges, which Narrator reads in line; Japanese and Chinese lines carry their language (Narrator reads them with the language's voice, installed in Windows).
+- **(c) Undo:** "works. but did not cancel the strikethrough". Undo on a card was not at fault: a stress test of 400 random runs, every edit undone from its card, always brings every word back, with nothing left struck (`track.fuzz.test.js`). Read as Ctrl+Z, which the editing spec turns off in a reply ("Undo is on the card. The browser's ⌘Z is turned off in replies, because it does not understand struck text"). **The question:** should Ctrl+Z (Cmd+Z) undo the last change, as people expect? The browser's own undo would stay off; Parliament would keep a history of its own changes, which understands struck words, so Ctrl+Z would bring a strike or a word back exactly as it was, one change at a time, and Ctrl+Y would redo. The cards keep their undo, which takes back one whole edit wherever it is. **Suggestion:** yes, both. It changes the spec's line, so it is yours to rule. No new package: ProseMirror's own steps can be undone.
+- **(d) Still untried:** Zen or LibreWolf (Firefox's engine), Android.
+- **Suggestion:** try composing over a selection, selection across blocks, the table and Narrator again; rule on (c).
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

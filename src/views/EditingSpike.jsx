@@ -6,7 +6,7 @@ import '../styles/tokens.css'
 import '../spike/editing/editing-spike.css'
 import { replyFromMarkdown, promptFromText } from '../spike/editing/fromMarkdown'
 import { track, createIds, cursorMarks, undoEdit, collectEdits, noteForModel, REFUSED } from '../spike/editing/track'
-import { editingPlugins, BLOCK_CHOICES, setBlock } from '../spike/editing/keys'
+import { editingPlugins, announcePlugin, BLOCK_CHOICES, setBlock } from '../spike/editing/keys'
 import { BRANCHES, EVERY_KIND, longReply } from '../spike/editing/samples'
 
 // Throwaway spike for stage 11 (refactor-plan.md; conflicts.md C205): can a
@@ -25,8 +25,8 @@ const CHECKLIST = [
   { key: 'ime-ja', q: 'Japanese, with the input method', how: 'Add Japanese under Windows Settings, Time and language, Language and region, then switch with Windows+Space. In 201a, type a few words, convert with Space and confirm with Enter: the line must not split, and the words come out blue. Start another word and cancel it with Escape.' },
   { key: 'ime-zh', q: 'Chinese, with the input method', how: 'The same with Chinese (Simplified), Microsoft Pinyin.' },
   { key: 'ime-over', q: 'Composing over a selection', how: 'Select "eleven years" in 201a and type Japanese or Chinese over it: those words struck, the new ones straight after, one edit card.' },
-  { key: 'narrator', q: 'Narrator', how: 'Ctrl+Windows+Enter turns it on (and off). Put the cursor on a line with a struck word and an added one and read it (Caps Lock+Down reads on): does it say which is removed and which is added? Try with "say marks" on and off.' },
-  { key: 'select', q: 'Selection across blocks', how: 'Select from the middle of one paragraph into the next and press Backspace: both parts struck, one card. Then type over another such selection.' },
+  { key: 'narrator', q: 'Narrator', how: 'Ctrl+Windows+Enter turns it on (and off). Put the cursor on a line with a struck word and an added one and read it (Caps Lock+Down reads on): does it say "removed:" before a struck word and "added:" before yours? Try with "say marks" on and off. For Japanese and Chinese, Narrator needs their voices: Windows Settings, Time and language, Speech, Add voices.' },
+  { key: 'select', q: 'Selection across blocks', how: 'Select from the middle of one paragraph into the next and press Backspace: both parts struck, one card. Then type over another such selection. Also start a drag inside text already selected: a new selection should start.' },
   { key: 'paste', q: 'Paste', how: 'Copy formatted text from a web page or a document and paste it: plain text only, blue. Paste over a selection: the selection struck.' },
   { key: 'undo', q: 'Undo', how: 'Ctrl+Z does nothing in the reply and says why. Undo on a card brings the words back exactly.' },
   { key: 'spell', q: 'Spelling correction', how: 'Type a misspelt word, right-click it and pick the suggestion: it stays your word, one edit.' },
@@ -62,11 +62,13 @@ function createWorld() {
     log: (line) => page.log?.(`${blocks ? 'reply' : 'prompt'}: ${line}`),
     onSlash: blocks ? (view) => page.openMenu?.(view) ?? false : undefined,
     onUndoKey: () => page.toast?.('Undo is on each edit’s card: the browser’s own undo does not know struck words.'),
+    onNote: (text) => page.toast?.(text),
     menuKey: blocks ? (event) => page.menuKey?.(event) ?? false : undefined,
     menuText: blocks ? (text) => page.menuText?.(text) ?? false : undefined,
   })
-  const replyPlugins = plugins(true)
-  const promptPlugins = plugins(false)
+  const said = announcePlugin(() => page.announce !== false)
+  const replyPlugins = [...plugins(true), said]
+  const promptPlugins = [...plugins(false), said]
   const store = Object.fromEntries(samples.map((s) => [s.key, {
     sample: s,
     reply: EditorState.create({ doc: replyFromMarkdown(s.reply, ids.block), plugins: replyPlugins }),
@@ -195,6 +197,12 @@ export default function EditingSpike() {
     for (const v of Object.values(views.current)) v.setProps({ editable: () => !clean })
   }, [clean])
 
+  // Words for a screen reader at each mark's edges, drawn again when switched.
+  useEffect(() => {
+    page.announce = announce
+    for (const v of Object.values(views.current)) v.dispatch(v.state.tr.setMeta('announce', announce))
+  }, [announce])
+
   useEffect(() => {
     try { localStorage.setItem(CHECKS_KEY, JSON.stringify(checks)) } catch { /* a convenience only */ }
   }, [checks])
@@ -297,7 +305,7 @@ export default function EditingSpike() {
   const menuList = menu ? choices(menu.filter) : []
 
   return (
-    <div className={`es${clean ? ' clean' : ''}${announce ? ' announce' : ''}`}>
+    <div className={`es${clean ? ' clean' : ''}`}>
       <header className="es-head">
         <h1>Editing in place: the spike</h1>
         <p>Stage 11 (C205). A reply and its prompt, edited in place on ProseMirror ({PROSEMIRROR}). Nothing here is stored or sent: the replies live in this page and go when it closes. Delete strikes; typing adds your words in blue; typing over a selection does both, as one edit.</p>
@@ -345,7 +353,7 @@ export default function EditingSpike() {
             <div className="es-toast es-marg" role="status">{toast}</div>
           </div>
           <div className="es-toggles">
-            <label><input type="checkbox" checked={announce} onChange={(e) => setAnnounce(e.target.checked)} /> say marks to a screen reader (“removed:”, “added:”)</label>
+            <label><input type="checkbox" checked={announce} onChange={(e) => setAnnounce(e.target.checked)} /> say marks to a screen reader (unseen words “removed:” and “added:” at each mark’s edges)</label>
           </div>
         </main>
 

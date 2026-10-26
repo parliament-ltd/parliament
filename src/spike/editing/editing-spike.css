@@ -56,7 +56,12 @@
 .es .ProseMirror .pm-box { position: absolute; inset-inline-start: 1px; top: .35em; width: 12px; height: 12px; border: 1.2px solid var(--ch-ink-3); border-radius: 3px; cursor: pointer; }
 .es .ProseMirror .pm-check[data-checked="true"] .pm-box { background: var(--ch-ink); border-color: var(--ch-ink); box-shadow: inset 0 0 0 2px var(--ch-surface); }
 .es .ProseMirror .pm-check[data-checked="true"] .pm-lt { color: var(--ch-ink-3); }
-.es .ProseMirror .pm-table { overflow-x: auto; margin: 0 0 .75em; }
+/* A table or a chart is one block for now (C58): its edges show on hover, and
+   when it is selected a line says what that means (C208, Stefan's try). */
+.es .ProseMirror .pm-table, .es .ProseMirror .pm-chart { overflow-x: auto; margin: 0 -7px .75em; padding: 6px; border: 1px dashed transparent; border-radius: 6px; cursor: default; }
+.es .ProseMirror .pm-table:hover, .es .ProseMirror .pm-chart:hover { border-color: var(--ch-border); }
+.es .ProseMirror .pm-table.ProseMirror-selectednode, .es .ProseMirror .pm-chart.ProseMirror-selectednode { border: 1px solid var(--ch-focus-ink); outline: none; }
+.es .ProseMirror .ProseMirror-selectednode.pm-table::after, .es .ProseMirror .ProseMirror-selectednode.pm-chart::after { content: "One block for now: Backspace strikes it whole, Enter starts a line after it. Editing inside comes later."; display: block; margin-top: 6px; font: italic var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); }
 .es .ProseMirror table { border-collapse: collapse; font: 12.5px var(--ch-sans); }
 .es .ProseMirror th, .es .ProseMirror td { border: 1px solid var(--ch-border); padding: 4px 10px; text-align: start; }
 .es .ProseMirror th { background: var(--ch-subtle); font-weight: 600; }
@@ -67,21 +72,22 @@
 .es .ProseMirror .ProseMirror-selectednode { outline: 1px solid var(--ch-focus-ink); outline-offset: 2px; border-radius: 3px; }
 
 /* The marks an edit leaves: each with its own line, not colour alone */
-.es .ProseMirror del.pm-struck, .es .ProseMirror del.pm-blk { color: var(--ch-ink-3); text-decoration: line-through; text-decoration-color: var(--ch-ink-2); }
-.es .ProseMirror del.pm-blk { display: block; opacity: .6; }
-.es .ProseMirror del.pm-blk table, .es .ProseMirror del.pm-blk svg { text-decoration: line-through; }
+.es .ProseMirror del.pm-struck { color: var(--ch-ink-3); text-decoration: line-through; text-decoration-color: var(--ch-ink-2); }
+/* A block struck whole: a rule down its side and a line saying so, its
+   contents faded and crossed, so it reads as one thing removed. */
+.es .ProseMirror del.pm-blk { display: block; text-decoration: none; border-inline-start: 2px solid var(--ch-ink-3); padding-inline-start: 10px; margin: 0 0 .75em; }
+.es .ProseMirror del.pm-blk::before { content: "Struck as a whole: edit " attr(data-edit); display: block; font: italic var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); margin-bottom: 4px; }
+.es .ProseMirror del.pm-blk > * { opacity: .55; margin-bottom: 0; }
+.es .ProseMirror del.pm-blk :is(td, th, figcaption) { text-decoration: line-through; text-decoration-color: var(--ch-ink-2); }
+.es .ProseMirror del.pm-blk.ProseMirror-selectednode { outline: 1px solid var(--ch-focus-ink); outline-offset: 2px; }
 .es .ProseMirror ins.pm-added { color: var(--ch-you); text-decoration: underline; text-decoration-color: var(--ch-you); text-underline-offset: 3px; }
 /* A hair of space where struck and added words meet, drawn only: the text has none */
 .es .ProseMirror del.pm-struck + ins.pm-added, .es .ProseMirror ins.pm-added + del.pm-struck { margin-inline-start: .22em; }
 .es .ProseMirror .flash { animation: es-flash 1.2s ease-out; }
 @keyframes es-flash { from { background: var(--ch-mark-edit); } to { background: transparent; } }
 @media (prefers-reduced-motion: reduce) { .es .ProseMirror .flash { animation: none; outline: 1px solid var(--ch-you); } }
-/* Said to a screen reader at the edges of a mark, unseen */
-.es.announce .ProseMirror del.pm-struck::before, .es.announce .ProseMirror del.pm-blk::before { content: " removed: "; }
-.es.announce .ProseMirror del.pm-struck::after, .es.announce .ProseMirror del.pm-blk::after { content: " end of removed "; }
-.es.announce .ProseMirror ins.pm-added::before { content: " added: "; }
-.es.announce .ProseMirror ins.pm-added::after { content: " end of added "; }
-.es.announce .ProseMirror :is(del, ins)::before, .es.announce .ProseMirror :is(del, ins)::after { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* Said to a screen reader at the edges of a mark: real words, unseen */
+.es .ProseMirror .pm-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 /* clean: the result only, read-only (editing spec, markup · clean) */
 .es.clean .ProseMirror del { display: none; }
 .es.clean .ProseMirror ins.pm-added { color: inherit; text-decoration: none; }

@@ -5,11 +5,12 @@ prompt be edited in place on ProseMirror, under the editing spec's rules, in
 every way a person types? Built on ProseMirror alone, as revised and approved
 the same day (C205 (h): no Android phone to try a hand-built engine on).
 
-**Where it stands:** everything a script can try works in Chromium, including
-under the site's real security headers. What needs a person (typing with an
-input method, a screen reader, a spelling correction) and the Firefox engine
-(Zen, LibreWolf) wait for Stefan. Android is untried. No recommendation
-until those are in.
+**Where it stands (25 October):** Stefan tried his part in Chrome. Japanese
+and Chinese typed with the input method, paste, spelling correction and the
+long reply work. Composing over a selection, selection across blocks, the
+table and Narrator showed problems; each is fixed or changed (below,
+"Stefan's first try") and waits for him to try again. Zen, LibreWolf and
+Android are untried. No recommendation until the second try.
 
 ## How to open it
 
@@ -122,6 +123,25 @@ On the page, under "Your part of the checklist", each with what to do:
    name it as Parliament's own dependency.
 8. **The `/` menu's filter read keys only,** so text from an input method or
    a phone keyboard went into the line instead. It now reads typed text.
+
+## Stefan's first try, and what changed
+
+His results, from the page's "Copy the results", in Chrome on Windows:
+
+| Check | His result | What it was, and what changed |
+|---|---|---|
+| Japanese with the input method | works | |
+| Chinese with the input method | works | |
+| Composing over a selection | works, oddly: "first letter appears in correct space, then the cursor jumps back and typing starts within the struck word" | The selection was struck when composing began, too late: the input method had already taken its place. It is now struck on the input method's first key (key 229, "Process"), before composing begins, so the composition starts after the strike. Tried by script; the real input method is his to try again |
+| Narrator | works, oddly: "still reads word", and had trouble with Japanese | The words "removed" and "added" were drawn by the style sheet, which Narrator does not read in an editable area. They are now real words, unseen, at each mark's edges ("removed: eleven years, end of removed"). Japanese and Chinese lines now carry their language, so Narrator can switch voice, which needs the language's voice installed in Windows |
+| Selection across blocks | fails: "not able to highlight to use backspace across blocks" | Reproduced: a drag that starts inside text already selected begins a drag and drop, which the spike turns off, so no selection came. A press inside a selection now moves the cursor there, so a new selection starts. A drag from fresh text, then Backspace, strikes across blocks as before (tried with a real drag and key) |
+| Paste | works | |
+| Undo | works, "but did not cancel the strikethrough" | Not reproduced on the cards: a stress test of 400 random runs of 25 actions, every edit then undone from its card, brings every word back with nothing left struck. Read as Ctrl+Z, which the spec turns off in a reply: a question for Stefan (C209 (c)) |
+| Spelling correction | works | |
+| Enter, Backspace and / | works, oddly: "table doesn't work. any edit crosses out entire table. need greater delineation" | A click selects the whole table, and typing then replaced it: struck whole, the typed words after it. Typing or pasting on a selected table, chart or divider now changes nothing and says why; Enter starts a line after it. Its edges show on hover; selected, it has a frame and a line saying it is one block for now; struck, it has a rule down its side and "Struck as a whole: edit 244" |
+| A long reply | works | |
+| Zen or LibreWolf | not tried | |
+| Android | not tried | |
 
 ## ProseMirror and safety
 

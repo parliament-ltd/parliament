@@ -18,9 +18,22 @@
 
 import { keymap } from 'prosemirror-keymap'
 import { Plugin, NodeSelection, TextSelection } from 'prosemirror-state'
+import { Decoration, DecorationSet } from 'prosemirror-view'
 import { Slice, Fragment } from 'prosemirror-model'
-import { schema, STRUCK } from './schema'
+import { schema, STRUCK, ADDED } from './schema'
 import { SKIP, INTENT } from './track'
+
+const isBlockAtom = (sel) => sel instanceof NodeSelection && sel.node.isBlock && sel.node.isAtom
+
+// Over a selection, an input method's word is to replace it: the selection is
+// struck first, with the cursor after the strike, so the composition starts
+// there and nothing is rewritten under it while it is composed (C208, found
+// on Stefan's try: struck at compositionstart, the cursor jumped back).
+function strikeBeforeComposing(view) {
+  const sel = view.state.selection
+  if (sel.empty || !(sel instanceof TextSelection)) return
+  view.dispatch(view.state.tr.delete(sel.from, sel.to).setMeta(INTENT, 'range-end'))
+}
 
 const segmenter = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null
 
@@ -122,6 +135,13 @@ function del() {
 
 function enter(ids) {
   return (state, dispatch, view) => {
+    if (isBlockAtom(state.selection)) {
+      // A new line after a table, chart or divider: formatting, not an edit.
+      const at = state.selection.to
+      const tr = state.tr.insert(at, schema.nodes.paragraph.create({ id: ids.block() })).setMeta(SKIP, true)
+      dispatch(tr.setSelection(TextSelection.create(tr.doc, at + 1)).scrollIntoView())
+      return true
+    }
     if (state.selection instanceof NodeSelection) return true
     if (!state.selection.empty) {
       // Striking the selection first, then the new block after it.
@@ -152,9 +172,10 @@ function enter(ids) {
 
 /**
  * The plugins for an editable reply (blocks: true) or prompt (blocks: false).
- * @param {{ ids: object, blocks?: boolean, onSlash?: (view: object) => boolean, onUndoKey?: () => void, menuKey?: (event: KeyboardEvent) => boolean, menuText?: (text: string) => boolean, log?: (line: string) => void }} opts
+ * @param {{ ids: object, blocks?: boolean, onSlash?: (view: object) => boolean, onUndoKey?: () => void, onNote?: (text: string) => void, menuKey?: (event: KeyboardEvent) => boolean, menuText?: (text: string) => boolean, log?: (line: string) => void }} opts
  */
-export function editingPlugins({ ids, blocks = true, onSlash, onUndoKey, menuKey, menuText, log }) {
+export function editingPlugins({ ids, blocks = true, onSlash, onUndoKey, onNote, menuKey, menuText, log }) {
+  const wholeBlock = (node) => onNote?.(`A ${node.type.name} is one block for now: Backspace strikes it whole, and editing inside it comes later.`)
   const nothing = () => true
   const undoKey = () => {
     onUndoKey?.()
@@ -183,6 +204,9 @@ export function editingPlugins({ ids, blocks = true, onSlash, onUndoKey, menuKey
     props: {
       handleKeyDown(view, event) {
         log?.(`keydown ${event.key}${event.isComposing ? ' (composing)' : ''}`)
+        // An input method's first key comes as 229 ("Process"), before it
+        // starts composing: the moment to strike a selection it will replace.
+        if ((event.keyCode === 229 || event.key === 'Process') && !view.composing) strikeBeforeComposing(view)
         return menuKey ? menuKey(event) : false
       },
       handleTextInput(view, from, to, text) {
@@ -190,6 +214,11 @@ export function editingPlugins({ ids, blocks = true, onSlash, onUndoKey, menuKey
         // with no key press (an input method, a phone keyboard), so the
         // filter reads text, not keys.
         if (menuText?.(text)) return true
+        // Typing on a selected table, chart or divider changes nothing.
+        if (isBlockAtom(view.state.selection)) {
+          wholeBlock(view.state.selection.node)
+          return true
+        }
         // "/" at the start of a line opens the block menu (replies only).
         if (blocks && text === '/' && from === to && view.state.doc.resolve(from).parentOffset === 0 && onSlash) return onSlash(view)
         return false
@@ -210,13 +239,9 @@ export function editingPlugins({ ids, blocks = true, onSlash, onUndoKey, menuKey
         },
         compositionstart(view) {
           log?.('compositionstart')
-          // Over a selection, the selection is struck before the input method
-          // writes, so the composed word starts after the strike and nothing
-          // is rewritten under it while it is being composed.
-          const { state } = view
-          if (!state.selection.empty && !(state.selection instanceof NodeSelection)) {
-            view.dispatch(state.tr.delete(state.selection.from, state.selection.to).setMeta(INTENT, 'range-end'))
-          }
+          // Normally struck already, on the first key (229). This is for a
+          // keyboard that sends no such key.
+          strikeBeforeComposing(view)
           return false
         },
         compositionend(_view, event) {
@@ -231,6 +256,10 @@ export function editingPlugins({ ids, blocks = true, onSlash, onUndoKey, menuKey
           log?.(`paste ${text.length} characters, as plain text`)
           if (!text) return true
           const { state } = view
+          if (isBlockAtom(state.selection)) {
+            wholeBlock(state.selection.node)
+            return true
+          }
           const lines = text.replace(/\r\n?/g, '\n').split('\n')
           const parentType = state.selection.$from.parent.type
           let slice
@@ -254,6 +283,14 @@ export function editingPlugins({ ids, blocks = true, onSlash, onUndoKey, menuKey
           return true
         },
         mousedown(view, event) {
+          // A press inside a selection would start dragging it, which is off;
+          // the cursor goes to the press instead, so a new selection starts
+          // there (C208, found on Stefan's try: no selection could be made).
+          const sel = view.state.selection
+          if (event.button === 0 && !event.shiftKey && event.detail === 1 && sel instanceof TextSelection && !sel.empty) {
+            const at = view.posAtCoords({ left: event.clientX, top: event.clientY })
+            if (at && at.pos > sel.from && at.pos < sel.to) view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, at.pos)))
+          }
           // A checklist box ticks in place; ticking is not an edit.
           const box = event.target instanceof Element ? event.target.closest('.pm-box') : null
           if (!box) return false
@@ -285,6 +322,51 @@ export function editingPlugins({ ids, blocks = true, onSlash, onUndoKey, menuKey
     },
   })
   return [events, keys, uniqueIds]
+}
+
+/**
+ * For a screen reader: unseen words at the edges of each mark, "removed:" and
+ * "added:", as real text it reads in line (C208: Narrator read struck words
+ * as ordinary text). On while isOn() says so.
+ */
+export function announcePlugin(isOn) {
+  const said = (words) => () => {
+    const span = document.createElement('span')
+    span.className = 'pm-sr'
+    span.textContent = words
+    return span
+  }
+  return new Plugin({
+    props: {
+      decorations(state) {
+        if (!isOn()) return null
+        const decos = []
+        state.doc.descendants((node, pos) => {
+          if (!node.isTextblock) return !node.isAtom
+          let run = null
+          const close = () => {
+            if (!run) return
+            decos.push(Decoration.widget(run.to, said(run.kind === 'struck' ? ' end of removed, ' : ' end of added, '), { side: -1, key: `e${run.kind}${run.to}` }))
+            run = null
+          }
+          node.forEach((child, offset) => {
+            const at = pos + 1 + offset
+            const m = child.marks.find((x) => x.type === STRUCK || x.type === ADDED)
+            const key = m ? `${m.type.name}${m.attrs.edit}` : null
+            if (run && run.key !== key) close()
+            if (m && !run) {
+              run = { key, kind: m.type === STRUCK ? 'struck' : 'added', to: at }
+              decos.push(Decoration.widget(at, said(run.kind === 'struck' ? ' removed: ' : ' added: '), { side: 1, key: `s${run.kind}${at}` }))
+            }
+            if (run) run.to = at + child.nodeSize
+          })
+          close()
+          return false
+        })
+        return DecorationSet.create(state.doc, decos)
+      },
+    },
+  })
 }
 
 /** The commands, for tests. */

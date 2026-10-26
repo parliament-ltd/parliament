@@ -18,7 +18,19 @@ import { Schema } from 'prosemirror-model'
 
 const id = { id: { default: null } }
 const struck = { struck: { default: null } }
-const blockAttr = (node) => ({ 'data-block': node.attrs.id })
+// Kana means Japanese; Han characters with no Latin letters, Chinese. A
+// guess from the script alone, for the spike: the build should take a
+// reply's language from the reply.
+function langOf(node) {
+  const text = node.textContent
+  if (/[\p{Script=Hiragana}\p{Script=Katakana}]/u.test(text)) return 'ja'
+  if (/\p{Script=Han}/u.test(text) && !/\p{Script=Latin}/u.test(text)) return 'zh-Hans'
+  return null
+}
+const blockAttr = (node) => {
+  const lang = node.isTextblock ? langOf(node) : null
+  return lang ? { 'data-block': node.attrs.id, lang } : { 'data-block': node.attrs.id }
+}
 const readId = (dom) => ({ id: dom.getAttribute('data-block') })
 
 // Links the model wrote keep only addresses that go somewhere ordinary.
