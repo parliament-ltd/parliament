@@ -12,6 +12,7 @@ import { stripAttachedFileBlocks, formatSize } from '../../lib/fileUpload'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../../copy'
 import ChartRenderer from './ChartRenderer'
+import EditableReply from './EditableReply'
 import CitationLink from './CitationLink'
 import { modelFacts } from '../../net'
 import { instructionLike } from '../../lib/injection'
@@ -57,6 +58,10 @@ export default function MessageCard({
   onNote, onFavorite, onNoteSave, onHighlight, onContinue, onDelete, onBranch,
   onHide, onCopyText, onMoveToBranch, onPinForReference, onQuote,
   attachmentMeta,
+  // A finished reply is edited in place (stage 11, piece 1; C210, C212):
+  // editable says this one can be; blocks is its editable form once saved;
+  // onSaveEdits keeps it; clean shows the result only (markup · clean).
+  editable = false, blocks = null, onSaveEdits, clean = false,
 }) {
   const { i18n } = useLingui()
   // PR-18e: strip persisted `<attached_file>...</attached_file>` boundary
@@ -165,6 +170,21 @@ export default function MessageCard({
     if (source) {
       const text = translated && typeof translation.text === 'string' ? translation.text : displayContent
       return <p className="parliament-md text-[15px] whitespace-pre-wrap" dir="auto" lang={translated ? translation.lang : undefined}>{text}</p>
+    }
+
+    if (editable && type === 'assistant' && onSaveEdits) {
+      return (
+        <EditableReply
+          id={id}
+          content={displayContent}
+          blocks={blocks}
+          terms={highlightTerms}
+          quotes={quotes}
+          quotedTitle={(num) => i18n._(COPY.chat.quoted, { num })}
+          clean={clean}
+          onSave={onSaveEdits}
+        />
+      )
     }
 
     function highlightString(text) {
@@ -287,7 +307,7 @@ export default function MessageCard({
         </Markdown>
       </div>
     )
-  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation])
+  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation, editable, type, blocks, clean, onSaveEdits])
 
   return (
     <motion.div
@@ -377,7 +397,8 @@ export default function MessageCard({
         </div>
 
         {/* Content */}
-        <div className="px-4 py-4 overflow-hidden relative" ref={contentRef} onMouseUp={handleMouseUp}>
+        {/* Typing in an edited reply puts the highlight picker away. */}
+        <div className="px-4 py-4 overflow-hidden relative" ref={contentRef} onMouseUp={handleMouseUp} onKeyDown={() => { if (popoverPos) { setPopoverPos(null); onPopoverChange?.(false) } }}>
           <div className="text-sm leading-relaxed" style={{ color: 'var(--p-text-primary)' }}>
             {thinking?.text && <Thinking thinking={thinking} />}
             {renderContent}

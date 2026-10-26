@@ -1004,6 +1004,20 @@ describe('framework:, new:framework and forget: (stage 7, piece 5; C164)', () =>
   })
 })
 
+describe('markup: replies marked up, or clean (stage 11, piece 1)', () => {
+  const at = (value, screens = {}) => {
+    // It works where replies are edited: a room.
+    const p = preview(value, { mode: 'command', arrangement: { ...shipped('almanac'), addressed: 'room' }, screens })
+    return { ...p, text: say(i18n, p.says.message, p.says.values) }
+  }
+  it('turns markup off and on, marked up unless turned off', () => {
+    expect(at('>markup:off')).toMatchObject({ text: 'Enter shows replies clean: the result only, read-only until markup:on', act: { kind: 'markup', on: false, before: true } })
+    expect(at('>markup:on', { markup: { on: false } }).act).toEqual({ kind: 'markup', on: true, before: false })
+    expect(at('>markup:on').text).toBe('Replies are marked up already')
+    expect(at('>markup:off', { markup: { on: false } }).text).toBe('Replies are clean already')
+  })
+})
+
 describe('thinking: and the Enter line of a model that thinks (C165)', () => {
   const at = (value, on = true) => {
     const p = preview(value, { mode: 'command', arrangement: shipped('almanac'), screens: { thinking: { on } } })

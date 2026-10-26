@@ -39,6 +39,9 @@ const DEFAULT_SETTINGS = {
   // (C165). Off unless turned on with thinking:on (Stefan, 22 October:
   // thinking off answers many times faster on a computer).
   thinking: false,
+  // Replies marked up (struck words, the person's in blue, editable) or
+  // clean, the result only (stage 11, piece 1; markup:on, markup:off).
+  markup: 'on',
   // The reply language (a tag, or 'off'; none follows the interface), the
   // helper (a model's id; none takes the usual), and whether questions to
   // sources that read only English go translated (stage 7, piece 6; C166).

@@ -745,6 +745,10 @@ export const COPY = {
       id: 'enter.thinkingNow',
       message: '{on, select, on {Models that can think do so first, shown as they go. thinking:off turns it off} other {Thinking is off. thinking:on turns it back on}}',
     },
+    // markup · clean (stage 11, piece 1; editing spec).
+    markupOn: /*i18n*/ { id: 'enter.markupOn', message: 'Enter shows replies marked up: struck words and yours in blue, editable' },
+    markupOff: /*i18n*/ { id: 'enter.markupOff', message: 'Enter shows replies clean: the result only, read-only until markup:on' },
+    markupSame: /*i18n*/ { id: 'enter.markupSame', message: '{on, select, on {Replies are marked up already} other {Replies are clean already}}' },
     promptPerDay: /*i18n*/ { id: 'enter.promptPerDay', message: 'About {count} searches a day without a key, shared by everyone on your network', comment: 'Said when a source with a daily allowance answers (C156)' },
     sourceNetwork: /*i18n*/ { id: 'enter.sourceNetwork', message: '{source} is not answering from your current network. A VPN can cause this; try without it for this source', comment: 'A source refused the request (403), as some do for shared VPN addresses (LPN §8)' },
     sourceBusy: /*i18n*/ { id: 'enter.sourceBusy', message: '{source} says too many requests from your network for now. Try again later', comment: 'A source answered 429: its allowance for this network is used up, or it is busy' },

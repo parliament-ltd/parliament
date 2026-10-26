@@ -9,7 +9,7 @@ import { V6_NEW_STORES } from './migrations/v6Upgrade'
 import { DB_NAME, DB_VERSION, DRAFT_DB_VERSION, TRIAL_DB_NAME, BUILTIN_AUTHOR, upgradeSchema } from './schema'
 import {
   createChat, updateChat, removeChat, createBranchChat, createSummaryChat, setPromptGroup,
-  addMessageRecord, updateMessageRecord, removeMessage,
+  addMessageRecord, updateMessageRecord, removeMessage, saveEditedMessage as saveEditedMessageRecord,
   addNumbered, updateNumbered, removeNumbered,
   addFavoriteRecord, removeFavoriteRecord, saveDocument, changeRecords,
 } from './records'
@@ -505,6 +505,11 @@ export async function getMessages(conversationId) {
 
 export async function updateMessage(id, updates) {
   return updateMessageRecord(await initDB(), id, updates)
+}
+
+/** Save a reply's editable form and its edits, in one transaction (C212). */
+export async function saveEditedMessage(id, saved) {
+  return saveEditedMessageRecord(await initDB(), id, saved)
 }
 
 export async function deleteMessage(id) {

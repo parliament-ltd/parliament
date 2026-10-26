@@ -31,7 +31,8 @@ export const FIELDS = Object.freeze({
     // summary summarizes and the last message it read (C175).
     // included: answers from sources brought into a prompt (C176).
     // step: the planned step a run sent this message for (stage 10; C196 (j)).
-    'citations', 'from', 'group', 'summary', 'included', 'step'],
+    // blocks: a reply's editable form once it is edited in place (stage 11; C212 (b)).
+    'citations', 'from', 'group', 'summary', 'included', 'step', 'blocks'],
   // quotes: the numbers a note quotes beneath it; summary: a dated summary
   // note's numbers, day and model (stage 6, piece 7; C145 (e), (g)).
   notes: ['id', 'conversationId', 'messageId', 'text', 'createdAt', 'num', 'pinned', 'tags', 'fromScratchpad', 'restoredFrom', 'archived', 'tagsMine', 'erasedFrom', 'quotes', 'summary'],
@@ -117,6 +118,7 @@ const SETTINGS = Object.freeze({
   // model (stage 7, piece 3; C159).
   mistralRegion: (v) => v === 'global' || v === 'eu' || v === 'us',
   thinking: bool, // C165
+  markup: (v) => v === 'on' || v === 'off', // stage 11, piece 1
   // The reply language, a tag or 'off'; the helper, a model's id; whether
   // questions to sources that read only English are translated first (C166).
   replyLanguage: (v) => v === null || typeof v === 'string' && /^(off|[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?)$/.test(v),

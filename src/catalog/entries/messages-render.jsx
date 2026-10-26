@@ -112,7 +112,7 @@ const STOPPED = { left: COPY.chat.stoppedOnReply, limit: COPY.chat.cutLimit, err
 export default function MessagesRender() {
   // The conversation this board shows, told by the board (stage 3).
   const conversationId = useConversationId()
-  const { messages, isStreaming, continueMessage, activeConversationId, watchConversation } = useRoomChat()
+  const { messages, isStreaming, continueMessage, activeConversationId, watchConversation, saveEditedReply } = useRoomChat()
   // The reply being written, read from the chat store, so only this list
   // redraws while it streams; the rest of the page does not (stage 3).
   const streamingContent = useStreamText(activeConversationId)
@@ -397,6 +397,9 @@ export default function MessagesRender() {
       : (msg.role === 'assistant' && msg.thinking ? { text: msg.thinking, ms: msg.thinkingMs ?? null } : null)
     const noteRecord = notes.get(msg.id)
     const isFav = favorites.has(msg.id)
+    // A finished reply from a model is edited in place (stage 11, piece 1);
+    // one still arriving, cut off, or from a source is not.
+    const editable = msg.role === 'assistant' && !isLatestAssistantStreaming && !isGhost && !msg.source && Boolean(msg.content)
 
     return (
       <MessageCard
@@ -436,9 +439,14 @@ export default function MessagesRender() {
         onMoveToBranch={() => handleSendToBranch(msg)}
         onPinForReference={() => handlePinForReference(msg)}
         onQuote={(text) => handleQuote(msg, text)}
+        editable={editable}
+        blocks={msg.blocks ?? null}
+        onSaveEdits={editable ? (saved) => saveEditedReply(activeConversationId, msg.id, saved) : undefined}
+        clean={settings.markup === 'off'}
       />
     )
   }, [
+    saveEditedReply, settings.markup,
     isStreaming, streamingContent, streamingMessageId, streamingThinking, streamingAnswering, activeConversationId, i18n,
     numberByMessageId, activePopoverMsgId,
     favorites, notes, highlights, showNotes,

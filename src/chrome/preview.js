@@ -55,7 +55,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -517,6 +517,14 @@ function planThinking(a, step, screens = {}) {
   return { says: { message: want ? 'thinkingOn' : 'thinkingOff' }, act: { kind: 'thinking', on: want, before: on } }
 }
 
+/** markup:on / markup:off: replies marked up, or clean (stage 11, piece 1). screens.markup: { on }, on by default. */
+function planMarkup(a, step, screens = {}) {
+  const on = screens.markup?.on !== false
+  const want = step.match?.values?.[0]?.value === 'on'
+  if (want === on) return { says: { message: 'markupSame', values: { on: on ? 'on' : 'off' } }, act: null }
+  return { says: { message: want ? 'markupOn' : 'markupOff' }, act: { kind: 'markup', on: want, before: on } }
+}
+
 /** new:framework "Editor" "Make each sentence shorter": one of your own, or rewriting it (C164). */
 function planNewFramework(step, screens = {}) {
   const [, nameArg, textArg] = step.match?.values ?? []
@@ -712,6 +720,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       by: planBy,
       framework: planFramework,
       thinking: planThinking,
+      markup: planMarkup,
       reply: (a1, s1, sc) => planReply(s1, sc),
       language: (a1, s1, sc) => planLanguage(s1, sc),
       helper: (a1, s1, sc) => planHelper(s1, sc),

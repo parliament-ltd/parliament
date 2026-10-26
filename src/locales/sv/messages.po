@@ -2210,6 +2210,18 @@ msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {om inget hittas} failed {om den föregående misslyckas} always {vad den föregående än gör} other {när den föregående är klar}}"
 
 #. js-lingui-explicit-id
+msgid "enter.markupOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.markupOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.markupSame"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.moveBoard"
 msgstr "{place, select, left {Enter flyttar {board} till vänster} right {Enter flyttar {board} till höger} other {Enter flyttar {board} till mitten}}"
 

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
-import { getMessages, addMessage, updateMessage, getSetting, setSetting, getConversation, groupPrompt } from '../lib/db'
+import { getMessages, addMessage, updateMessage, saveEditedMessage, getSetting, setSetting, getConversation, groupPrompt } from '../lib/db'
 import { askToKeepStorage } from '../lib/storageKeep'
 import { nameFromChat, titleFromPrompt, fieldsFromDescription } from '../lib/chatTitles'
 import { useConversations } from './ConversationContext'
@@ -669,6 +669,14 @@ export function ChatProvider({ children }) {
     updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, translation } : m)))
   }, [])
 
+  // A reply edited in place: its editable form and its edits, kept in one
+  // write (stage 11, piece 1; C212). Its content, what the model wrote, stays.
+  const saveEditedReply = useCallback(async (conversationId, messageId, { blocks, edits }) => {
+    const counts = await saveEditedMessage(messageId, { blocks, edits })
+    updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, blocks } : m)))
+    return counts
+  }, [])
+
   // Continue from an interrupted (ghost text) message in the open chat
   // systemPrompt: optional string from collaboration mode presets + custom instruction
   // With several rooms open, the room says which chat (C175 (a)); else the open chat.
@@ -830,6 +838,7 @@ export function ChatProvider({ children }) {
       regroupPrompt,
       veilFor,
       keepTranslation,
+      saveEditedReply,
       continueMessage,
       stopGenerating,
       leaveConversation,

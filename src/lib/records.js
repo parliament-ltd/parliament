@@ -384,6 +384,18 @@ async function removeChatIn(tx, id, { v6, keepMarks = false, now = new Date().to
   await tx.objectStore('sbrd_documents').delete(id)
   await tx.objectStore('conversations').delete(id)
 
+  // Edits and asks mean nothing without their reply: they go with the chat,
+  // even when its notes stay (C212 (f)).
+  if (v6) {
+    for (const [name, kind] of [['edits', 'edit'], ['asks', 'ask']]) {
+      const store = tx.objectStore(name)
+      for (const record of await store.index('conversationId').getAll(id)) {
+        await store.delete(record.id)
+        changes.push({ kind, op: 'removed', id: record.id, num: record.num })
+      }
+    }
+  }
+
   if (v6 && chat?.docketId) {
     const docket = await tx.objectStore('dockets').get(chat.docketId)
     if (docket) {
@@ -412,7 +424,7 @@ async function removeChatIn(tx, id, { v6, keepMarks = false, now = new Date().to
 /** Remove a chat and everything that belongs to it. At version 6 its branch leaves its docket. */
 export async function removeChat(db, id) {
   const v6 = isV6(db)
-  const stores = [...CHAT_STORES, ...(v6 ? ['dockets', 'runs', 'collections'] : [])]
+  const stores = [...CHAT_STORES, ...(v6 ? ['dockets', 'runs', 'collections', 'edits', 'asks'] : [])]
   return write(db, stores, async (tx) => ({ result: undefined, changes: await removeChatIn(tx, id, { v6 }) }))
 }
 
@@ -430,7 +442,7 @@ const MARK_KINDS = Object.freeze({ notes: 'note', highlights: 'term', pins: 'quo
 export async function eraseRecords(db, { chats = [], marks = [], keepMarks = true }) {
   if (!isV6(db)) throw new Error('erase: needs version 6')
   for (const m of marks) if (!MARK_KINDS[m.store]) throw new Error(`Not a marking's store: ${m.store}`)
-  return write(db, [...CHAT_STORES, 'dockets', 'runs', 'collections'], async (tx) => {
+  return write(db, [...CHAT_STORES, 'dockets', 'runs', 'collections', 'edits', 'asks'], async (tx) => {
     const missing = []
     for (const c of chats) if (!(await tx.objectStore('conversations').get(c.id))) missing.push(c.num ?? c.id)
     for (const m of marks) if (!(await tx.objectStore(m.store).get(m.id))) missing.push(m.num ?? m.id)
@@ -498,18 +510,89 @@ export async function updateMessageRecord(db, id, updates) {
 /** Remove a message. At version 6 the chat's steps follow. */
 export async function removeMessage(db, id) {
   const v6 = isV6(db)
-  return write(db, ['messages', 'conversations', ...(v6 ? ['runs'] : [])], async (tx) => {
+  return write(db, ['messages', 'conversations', ...(v6 ? ['runs', 'edits', 'asks'] : [])], async (tx) => {
     const existing = await tx.objectStore('messages').get(id)
     await tx.objectStore('messages').delete(id)
     const changes = [{ kind: 'message', op: 'removed', id }]
     if (existing) {
       const conv = await tx.objectStore('conversations').get(existing.conversationId)
       if (conv) {
-        await tx.objectStore('conversations').put({ ...conv, storageBytes: Math.max(0, (conv.storageBytes || 0) - byteSize(existing.content)) })
+        await tx.objectStore('conversations').put({ ...conv, storageBytes: Math.max(0, (conv.storageBytes || 0) - byteSize(existing.content) - blocksSize(existing.blocks)) })
         if (v6) await refreshSteps(tx, conv, changes)
+      }
+      // Its edits and asks go with it (C212 (f)).
+      if (v6) {
+        for (const [name, kind] of [['edits', 'edit'], ['asks', 'ask']]) {
+          const store = tx.objectStore(name)
+          for (const record of await store.index('conversationId').getAll(existing.conversationId)) {
+            if (record.messageId !== id) continue
+            await store.delete(record.id)
+            changes.push({ kind, op: 'removed', id: record.id, num: record.num })
+          }
+        }
       }
     }
     return { result: undefined, changes }
+  })
+}
+
+const blocksSize = (blocks) => (Array.isArray(blocks) ? byteSize(JSON.stringify(blocks)) : 0)
+
+/**
+ * Save a reply's editable form and keep its edits in step (C212 (b), (c)),
+ * in one transaction. Each edit is a record keyed by its message and its id
+ * (the id its marks carry), so a reply copied with a new message id keeps its
+ * own records apart. A new edit takes its number from the shared counter
+ * (C56); one that is no longer in the reply (taken back whole) is removed,
+ * and its number is not used again.
+ * @param {import('idb').IDBPDatabase} db
+ * @param {string} messageId
+ * @param {{ blocks: object[], edits: Map<string|number, { struck: string, added: string, places: object[] }>, part?: 'reply'|'prompt', now?: string }} saved
+ * @returns {Promise<{ created: number, updated: number, removed: number }>}
+ */
+export async function saveEditedMessage(db, messageId, { blocks, edits, part = 'reply', now = new Date().toISOString() }) {
+  if (!isV6(db)) throw new Error('Editing needs the version 6 database.')
+  return write(db, ['messages', 'conversations', 'edits', 'counters'], async (tx) => {
+    const message = await tx.objectStore('messages').get(messageId)
+    if (!message) throw new Error(`Message not found: ${messageId}`)
+    const changes = [{ kind: 'message', op: 'updated', id: messageId }]
+    const delta = blocksSize(blocks) - blocksSize(message.blocks)
+    await tx.objectStore('messages').put({ ...message, blocks })
+    if (delta) {
+      const conv = await tx.objectStore('conversations').get(message.conversationId)
+      if (conv) await tx.objectStore('conversations').put({ ...conv, storageBytes: Math.max(0, (conv.storageBytes || 0) + delta) })
+    }
+
+    const store = tx.objectStore('edits')
+    const mine = (await store.index('conversationId').getAll(message.conversationId)).filter((r) => r.messageId === messageId)
+    const byEdit = new Map(mine.map((r) => [r.edit, r]))
+    const counts = { created: 0, updated: 0, removed: 0 }
+    for (const [edit, said] of edits) {
+      const had = byEdit.get(edit)
+      byEdit.delete(edit)
+      if (had) {
+        if (had.struck === said.struck && had.added === said.added && JSON.stringify(had.places) === JSON.stringify(said.places)) continue
+        await store.put({ ...had, struck: said.struck, added: said.added, places: said.places, updatedAt: now })
+        changes.push({ kind: 'edit', op: 'updated', id: had.id, num: had.num })
+        counts.updated += 1
+        continue
+      }
+      const record = {
+        id: `${messageId}:${edit}`, edit, num: await takeNum(tx),
+        conversationId: message.conversationId, messageId, part,
+        struck: said.struck, added: said.added, places: said.places,
+        held: false, sent: null, createdAt: now, updatedAt: now,
+      }
+      await store.put(record)
+      changes.push({ kind: 'edit', op: 'created', id: record.id, num: record.num })
+      counts.created += 1
+    }
+    for (const gone of byEdit.values()) {
+      await store.delete(gone.id)
+      changes.push({ kind: 'edit', op: 'removed', id: gone.id, num: gone.num })
+      counts.removed += 1
+    }
+    return { result: counts, changes }
   })
 }
 

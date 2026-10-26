@@ -2210,6 +2210,18 @@ msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {if nothing is found} failed {if the one before fails} always {whatever the one before does} other {once the one before finishes}}"
 
 #. js-lingui-explicit-id
+msgid "enter.markupOff"
+msgstr "Enter shows replies clean: the result only, read-only until markup:on"
+
+#. js-lingui-explicit-id
+msgid "enter.markupOn"
+msgstr "Enter shows replies marked up: struck words and yours in blue, editable"
+
+#. js-lingui-explicit-id
+msgid "enter.markupSame"
+msgstr "{on, select, on {Replies are marked up already} other {Replies are clean already}}"
+
+#. js-lingui-explicit-id
 msgid "enter.moveBoard"
 msgstr "{place, select, left {Enter moves {board} to the left} right {Enter moves {board} to the right} other {Enter moves {board} to the middle}}"
 
