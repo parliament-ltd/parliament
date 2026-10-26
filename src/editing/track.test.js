@@ -4,7 +4,7 @@ import { Fragment, Slice } from 'prosemirror-model'
 import { schema, STRUCK, ADDED } from './schema'
 import { replyFromMarkdown } from './fromMarkdown'
 import { track, createIds, cursorMarks, undoEdit, collectEdits, noteForModel, INTENT, SKIP } from './track'
-import { commands } from './keys'
+import { commands, atLineStart } from './keys'
 
 // The reply as text, with each edit shown: [-struck-#id] and {+added+#id}.
 function show(doc) {
@@ -331,5 +331,20 @@ describe('the reply read from Markdown', () => {
     expect(state.doc.child(2).type.name).toBe('chart')
     expect(JSON.parse(state.doc.child(2).attrs.data).title).toBe('T')
     expect(state.doc.child(3).attrs).toMatchObject({ kind: 'check', checked: true })
+  })
+})
+
+describe('where / opens the block menu (Stefan\'s try of piece 1)', () => {
+  it('at a line\'s start, and after nothing but struck words, never after live ones', () => {
+    const s0 = setup('First line here.\n\nThat winter a stranger came.')
+    const { ids } = s0
+    let { state } = s0
+    const start = at(state, 'That', 1)
+    expect(atLineStart(caret(state, start))).toBe(true)
+    expect(atLineStart(caret(state, start + 4))).toBe(false)
+    // "That winter" struck: the cursor after it is still at the line's start.
+    state = apply(state, state.tr.delete(start, start + 'That winter'.length).setMeta(INTENT, 'range'), ids)
+    expect(atLineStart(caret(state, start + 'That winter'.length))).toBe(true)
+    expect(atLineStart(caret(state, start + 'That winter a'.length))).toBe(false)
   })
 })

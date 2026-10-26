@@ -80,6 +80,17 @@ function nextLive(state, backwards) {
   }
 }
 
+/**
+ * Whether the cursor is at its line's start as a reader sees it: nothing but
+ * struck words, or nothing, before it in the line. Where "/" opens the block
+ * menu (Stefan's try of piece 1, 26 October).
+ */
+export function atLineStart(state) {
+  const sel = state.selection
+  if (!sel.empty || !sel.$from.parent.inlineContent) return false
+  return nextLive(state, true).edge != null
+}
+
 function backspace(blocks) {
   return (state, dispatch) => {
     const sel = state.selection
@@ -219,8 +230,10 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, menuKey, m
           wholeBlock(view.state.selection.node)
           return true
         }
-        // "/" at the start of a line opens the block menu (replies only).
-        if (blocks && text === '/' && from === to && view.state.doc.resolve(from).parentOffset === 0 && onSlash) return onSlash(view)
+        // "/" with nothing but struck words before it in the line opens the
+        // block menu (replies only): a line that starts with struck words
+        // still starts there (Stefan's try of piece 1, 26 October).
+        if (blocks && text === '/' && from === to && onSlash && atLineStart(view.state)) return onSlash(view)
         return false
       },
       handleDOMEvents: {
@@ -328,7 +341,10 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, menuKey, m
 /**
  * For a screen reader: unseen words at the edges of each mark, "removed:" and
  * "added:", as real text it reads in line (C208: Narrator read struck words
- * as ordinary text). On while isOn() says so.
+ * as ordinary text). On while isOn() says so. At a line's start or end a
+ * label is drawn just outside its mark: inside, a line that starts with
+ * struck words starts with the unseen label, the cursor cannot rest before
+ * it, and goes to the line above (Stefan's try of piece 1, 26 October).
  */
 export function announcePlugin(isOn) {
   const said = (words) => () => {
@@ -344,10 +360,15 @@ export function announcePlugin(isOn) {
         const decos = []
         state.doc.descendants((node, pos) => {
           if (!node.isTextblock) return !node.isAtom
+          // At a line's edge a label goes outside its mark, so the cursor can
+          // rest at the edge; between two marks, each stays inside its own,
+          // so they are read in order.
+          const lineStart = pos + 1
+          const lineEnd = pos + 1 + node.content.size
           let run = null
           const close = () => {
             if (!run) return
-            decos.push(Decoration.widget(run.to, said(run.kind === 'struck' ? ' end of removed, ' : ' end of added, '), { side: -1, key: `e${run.kind}${run.to}` }))
+            decos.push(Decoration.widget(run.to, said(run.kind === 'struck' ? ' end of removed, ' : ' end of added, '), { side: run.to === lineEnd ? 1 : -1, key: `e${run.kind}${run.to}` }))
             run = null
           }
           node.forEach((child, offset) => {
@@ -357,7 +378,7 @@ export function announcePlugin(isOn) {
             if (run && run.key !== key) close()
             if (m && !run) {
               run = { key, kind: m.type === STRUCK ? 'struck' : 'added', to: at }
-              decos.push(Decoration.widget(at, said(run.kind === 'struck' ? ' removed: ' : ' added: '), { side: 1, key: `s${run.kind}${at}` }))
+              decos.push(Decoration.widget(at, said(run.kind === 'struck' ? ' removed: ' : ' added: '), { side: at === lineStart ? -1 : 1, key: `s${run.kind}${at}` }))
             }
             if (run) run.to = at + child.nodeSize
           })
