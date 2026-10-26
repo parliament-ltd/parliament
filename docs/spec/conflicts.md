@@ -1986,6 +1986,20 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **(f) Branch tabs** show how many edits wait in each branch, in your blue.
 - **Not tried in the browser:** a real send to a model, as the browser here has no key, and `hold:` there, as the bar stayed pointed at the welcome page in that layout. Tried: the Enter line with a source answering, "Wikipedia reads none of your 9 edits; they go when a model answers here (by:)". The note, what a model reads, holding, marking sent and closed edits are tested.
 
+**C218. Piece 4, asks** (proposed 26 October; C210 piece 4 and (g); C212 (d); the editing spec, "Asks" and "Keyless sources"). Waiting for Stefan: (a) is a conflict, (c) adds to what is stored, (e) corrects piece 3.
+- **What an ask is** (the spec): an instruction in your own words, tied to a passage you select or a point where the cursor is. A small box opens in the text, labelled ASK; Enter keeps it as "ask 241" (its number), Escape drops it. It goes with the next prompt to its branch, or on an empty Enter, like edits. The answer lands in place, in green, with the passage struck in green and "ask 241: accept · undo". Accept makes the answer part of the reply and the passage goes; undo puts the passage back and the answer goes.
+- **(a) The key, a conflict.** The editing spec starts an ask with ⌘K/Ctrl+K in a reply. The bar decisions settled (P2, S6) that Cmd/Ctrl+K opens the bar from anywhere, "including inside a reply". Options:
+  1. In a reply or prompt, Ctrl+K starts an ask; Ctrl+K again, in the empty ask box, goes on to the bar. Elsewhere Ctrl+K opens the bar as now.
+  2. Ctrl+K always opens the bar; an ask starts with Ctrl+Shift+K, or from `ask:` in the bar.
+  **Suggestion:** 1, as the spec has it, with the bar one press further while in a reply.
+- **(b) How the model answers.** The note that goes with the prompt lists each ask with its number and its passage (or the words around its point), and asks the model to answer each in a block of its own, `[ask 241] ... [/ask]`, in its reply. Parliament takes those blocks out of the reply as it is shown and puts each answer in place, read as text only, never as markup (C210 (g)). What the model wrote is still stored as it wrote it. An answer whose passage has changed since it was asked goes on its card only.
+- **(c) Stored, the change.** The asks list as approved (C212 (d)), and in a reply's stored form three more marks a run may carry: the passage an ask is about (`ask`), the answer waiting (`answer`), and the passage it would replace (`replaced`), each with the ask's id; and a point ask as a run of its own (`point`). Read back as text from outside, like the rest. No upgrade. **This is the part to approve.**
+- **(d) What the model is told after:** accept and undo tell it nothing: an accepted answer is its own words. **Suggestion:** as above.
+- **(e) A source's branch, correcting piece 3.** The spec has it that on a Wikipedia branch your edits and asks "go to a model you choose, never to Wikipedia", with your next prompt, the model named in a picker under the tab ("those go to Sonnet 4.6"), while the prompt itself searches Wikipedia again; and it says this supersedes the older rule that they wait. C216 (g), as I proposed it and built it, makes them wait until a model answers there. **Suggestion:** build the spec's way in this piece: with a prompt on a source's branch, its waiting edits and asks go at the same time to the model named under the tab (the default model, changed with a picker there), whose answer comes back under them; the Enter line names both.
+- **(f) markup · clean:** shows the reply as it reads now, answers not yet accepted left out. **Suggestion:** as above.
+- **(g) Cards** (the instruction, the answer, find, drop) come with the Collection in piece 5; until then a marker's accept and undo work in place.
+- **Suggestion:** rule (a) and (e), approve (c), and the rest as above.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
