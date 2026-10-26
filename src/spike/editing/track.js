@@ -161,12 +161,56 @@ function toWholeWords(doc, step) {
   return new ReplaceStep(wf, wt, new Slice(content, 0, 0))
 }
 
+// Typing over a selection that crosses blocks, the browser joins the blocks
+// itself and reports the change as everything up to the end of the joined
+// line, so the model's words after the selection would be struck and come
+// back as the person's. Such a step is cut down to what actually differs.
+// Only a step whose new words end in an open or closed line of their own is
+// touched; typing in a line already arrives as small as it can be.
+// floor: where the selection ended, when known; the cut never reaches inside it.
+function narrow(doc, step, floor = step.from) {
+  const { from, to, slice } = step
+  if (!slice.openStart || slice.openEnd > 1) return step
+  const last = slice.content.lastChild
+  if (!last?.isTextblock) return step
+  // The line the change ends in, in the reply, and where its replaced part starts.
+  const $to = doc.resolve(to)
+  let block
+  let end
+  if (slice.openEnd === 1 && $to.depth === 1 && $to.parent.isTextblock) {
+    block = $to.parent
+    end = to
+  } else if (slice.openEnd === 0 && $to.depth === 0 && $to.nodeBefore?.isTextblock) {
+    block = $to.nodeBefore
+    end = to - 1
+  } else return step
+  const contentStart = slice.openEnd === 1 ? $to.start() : to - block.nodeSize + 1
+  const oldStart = Math.max(contentStart, from)
+  if (oldStart >= end) return step
+  const old = block.content.cut(oldStart - contentStart, end - contentStart)
+  // The same words at the end of both, kept as they are.
+  const diff = old.findDiffEnd(last.content)
+  let newTo = oldStart + (diff ? diff.a : 0)
+  let keepB = diff ? diff.b : last.content.size - old.size
+  // Words matching on both sides of the selection's end: what was typed stays typed.
+  const lowest = Math.max(from, Math.min(floor, to))
+  if (newTo < lowest) { keepB += lowest - newTo; newTo = lowest }
+  if (keepB >= last.content.size || keepB < 0) return step
+  const lastCut = last.copy(last.content.cut(0, keepB))
+  let cutSlice = new Slice(slice.content.replaceChild(slice.content.childCount - 1, lastCut), slice.openStart, 1)
+  if (cutSlice.content.childCount === 1 && cutSlice.openStart === 1) cutSlice = new Slice(lastCut.content, 0, 0)
+  try {
+    const cut = new ReplaceStep(from, newTo, cutSlice)
+    return cut.apply(doc).failed ? step : cut
+  } catch { return step }
+}
+
 // One step of the browser's change, applied to `out` under the rules.
 // Returns where the cursor should go, or null to leave it to the mapping, and
 // whether the step landed unchanged.
 function applyStep(out, given, ctx) {
   const doc = out.doc
-  const step = toWholeWords(doc, given)
+  const step = toWholeWords(doc, narrow(doc, given, ctx.floor))
   const { from, to, slice } = step
   const d = describe(doc, from, to)
   const text = hasInline(slice.content)
@@ -246,7 +290,7 @@ export function track(state, tr, { ids, onError } = {}) {
           else if (mapped.slice.size === 0 && mapped.to === sel.from) intent = 'backspace'
           else if (mapped.slice.size === 0 && mapped.from === sel.from) intent = 'delete'
         }
-        const r = applyStep(out, mapped, { ids, intent })
+        const r = applyStep(out, mapped, { ids, intent, floor: i === 0 && !sel.empty ? sel.to : undefined })
         if (!r.same) allSame = false
         cursor = tr.steps.length === 1 ? r.cursor : null
       } else if (mapped) {

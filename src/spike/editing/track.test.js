@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { EditorState, TextSelection, NodeSelection } from 'prosemirror-state'
+import { Fragment, Slice } from 'prosemirror-model'
 import { schema, STRUCK, ADDED } from './schema'
 import { replyFromMarkdown } from './fromMarkdown'
 import { track, createIds, cursorMarks, undoEdit, collectEdits, noteForModel, INTENT, SKIP } from './track'
@@ -163,6 +164,34 @@ describe('the rules of an edit (editing spec, "Editing replies")', () => {
     const to = at(state, 'line', 1)
     state = apply(state, state.tr.delete(from, to).setMeta(INTENT, 'range'), ids)
     expect(show(state.doc)).toBe('First line [-here.-#240] | [-Second -#240]line here.')
+  })
+
+  it('types over a selection across two blocks as the browser reports it, leaving the rest of the line alone', () => {
+    // Chrome joins the blocks itself and reports the change as everything to
+    // the end of the joined line (found on the spike, 26 October).
+    const s0 = setup('First line here.\n\nSecond line here.')
+    const { ids } = s0
+    let { state } = s0
+    const from = at(state, 'here.')
+    const to = at(state, 'line', 1)
+    state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, from, to)))
+    const joined = schema.nodes.paragraph.create({ id: state.doc.child(0).attrs.id }, schema.text('xline here.'))
+    const tr = state.tr.replace(from, state.doc.content.size, new Slice(Fragment.from(joined), 1, 0))
+    state = apply(state, tr, ids)
+    expect(show(state.doc)).toBe('First line [-here.-#240] | [-Second -#240]{+x+#240}line here.')
+    expect(state.selection.from).toBe(at(state, 'line here.', 1))
+  })
+
+  it('keeps a typed letter that matches the one after the selection as the person\'s', () => {
+    const s0 = setup('First line here.\n\nSecond line here.')
+    const { ids } = s0
+    let { state } = s0
+    const from = at(state, 'here.')
+    const to = at(state, 'ine', 1)
+    state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, from, to)))
+    const joined = schema.nodes.paragraph.create({ id: state.doc.child(0).attrs.id }, schema.text('line here.'))
+    state = apply(state, state.tr.replace(from, state.doc.content.size, new Slice(Fragment.from(joined), 1, 0)), ids)
+    expect(show(state.doc)).toBe('First line [-here.-#240] | [-Second l-#240]{+l+#240}ine here.')
   })
 
   it('passes a split and a join through as formatting, not an edit', () => {
