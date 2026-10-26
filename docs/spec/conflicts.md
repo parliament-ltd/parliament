@@ -1941,6 +1941,15 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   Tried in the browser on the spike page: ArrowDown from a paragraph's end opened a line and typing landed there; a press in the space between two lines opened one, and an empty one went when the cursor left; `/` over "stranger" mid-sentence, then Heading 2, made it a heading line of its own.
 - **Tried in the browser,** in Writing Studio: typing over two words struck them and added the new ones as one edit, numbered 203 after its chat's 202, with the model's text unchanged; the edit came back after a reload; Ctrl+Z and Ctrl+Y; a click placed the cursor where it was clicked; `markup:off` and `markup:on`; the chart drawn as before.
 
+**C214. Piece 2, and joining a prompt to its reply** (proposed 26 October; C210 piece 2, C211 (d), deferred by Stefan to "before piece 2"; the editing spec, "Editing prompts"; C61, A9). Waiting for Stefan.
+- **Piece 2 as C210 has it:** your prompts edited in place like replies (struck, blue, one record for each edit, `part: prompt`); each branch keeps its own copy of the first prompt; an answered prompt stays a record and editing it marks it up; under an edited prompt, "your prompt in 201a, edited; the other branches keep theirs · ask again as 201d", and asking again starts a new branch from the edited wording.
+- **The joining rule, as Stefan gave it:** a prompt and its reply stay apart, with a gap between them; only an act that removes the gap joins them, and what is joined becomes the next prompt in the branch.
+- **(a) What joins them:** Backspace at the start of the reply (with nothing but struck words before the cursor), Delete at the end of the prompt, or a selection that runs from the prompt into the reply, struck or typed over. For the last, the prompt and its reply have to be one surface to select across: they are drawn by one editor, still looking like two cards, the prompt's and the reply's. **Suggestion:** all three, and so one editor for the pair, built in piece 2.
+- **(b) What joining does:** it does not change the transcript. The words of both still standing, in order, with your own and without the struck ones, go into the bar as your next prompt, in prompt mode, to the same branch; you can go on editing them there, and Enter sends them, as any prompt. The prompt and reply stay as they were, with their edits. CLAUDE.md has the bar as the only place a prompt is typed, which this keeps. **Suggestion:** as above.
+- **(c) The edits used:** edits in a prompt and reply that were joined went into that prompt, so they are not also sent as notes (piece 3). **Suggestion:** yes; their cards read "went into your prompt".
+- **(d) Which prompts:** any prompt with its reply in a room, not only the first. **Suggestion:** any.
+- **The question:** build piece 2 with (a) to (d) as suggested?
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
