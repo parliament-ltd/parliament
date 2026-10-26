@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { EditorState } from 'prosemirror-state'
 import { replyFromMarkdown } from './fromMarkdown'
-import { toBlocks, fromBlocks } from './blocks'
+import { toBlocks, fromBlocks, wordsOf } from './blocks'
 import { editsIn } from './edits'
 import { track, createIds, createEditIds } from './track'
 
@@ -86,5 +86,23 @@ describe('edit ids for a reply on screen', () => {
     expect(ids.peek()).toBe(a)
     ids.commit(a)
     expect(ids.peek()).not.toBe(a)
+  })
+})
+
+describe('the words still standing (piece 2)', () => {
+  it('leave struck words out, keep the person\'s, and write lists, headings and tables as typed', () => {
+    expect(wordsOf([
+      { type: 'heading', level: 2, text: [{ text: 'Glass' }] },
+      { type: 'paragraph', text: [{ text: 'It had not gone out in ' }, { text: 'eleven years', struck: 'e1' }, { text: 'a century', added: 'e1' }, { text: '.' }] },
+      { type: 'list', kind: 'number', text: [{ text: 'sand' }] },
+      { type: 'list', kind: 'number', text: [{ text: 'soda' }] },
+      { type: 'paragraph', text: [{ text: 'gone', struck: 'e2' }] },
+      { type: 'table', rows: [['a', 'b'], ['1', '2']] },
+      { type: 'table', rows: [['x']], struck: 'e3' },
+      { type: 'chart', data: '{}' },
+    ])).toBe('## Glass\n\nIt had not gone out in a century.\n\n1. sand\n\n2. soda\n\na | b\n1 | 2')
+  })
+  it('are nothing for nothing stored', () => {
+    expect(wordsOf(null)).toBe('')
   })
 })

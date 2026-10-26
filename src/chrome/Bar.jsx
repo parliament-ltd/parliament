@@ -73,7 +73,8 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     if (!write) return
     input.current?.focus()
     // The bar turned to a prompt, as the Collection's Prompt act does (C145 (h)).
-    if (write.mode === 'prompt') { dispatch({ type: 'ran', to: 'prompt' }); return }
+    // With words, a prompt to edit and send: a prompt and its reply joined (C214 (b)).
+    if (write.mode === 'prompt') { dispatch(write.value ? { type: 'draft', value: write.value } : { type: 'ran', to: 'prompt' }); return }
     dispatch({ type: 'input', value: write.value })
     // An act that wants words writes "" for them: the caret goes between (C145 (d)).
     const at = write.value.indexOf('""')

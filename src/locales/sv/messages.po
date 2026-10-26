@@ -636,6 +636,15 @@ msgid "chat.answeredFrom"
 msgstr "Svar från {source}"
 
 #. js-lingui-explicit-id
+msgid "chat.askAgain"
+msgstr ""
+
+#. Writes again: into the bar; {next} is the new branch, like 201d
+#. js-lingui-explicit-id
+msgid "chat.askAgainAs"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.askedAs"
 msgstr "Frågan ställdes på {language} som ”{text}”"
 
@@ -687,6 +696,23 @@ msgstr "{count, plural, one {Med svaret från {sources}, skickat som material fr
 #. js-lingui-explicit-id
 msgid "chat.instructionLike"
 msgstr "Innehåller ord som ser ut som instruktioner till en modell: {phrases}. Visas som text och följs aldrig"
+
+#. js-lingui-explicit-id
+msgid "chat.joinedToBar"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.pairLabel"
+msgstr ""
+
+#. Under a prompt edited in place; {address} is its branch, like 201a
+#. js-lingui-explicit-id
+msgid "chat.promptEdited"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.promptEditedOthers"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.quote"

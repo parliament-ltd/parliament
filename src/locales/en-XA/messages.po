@@ -636,6 +636,15 @@ msgid "chat.answeredFrom"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.askAgain"
+msgstr ""
+
+#. Writes again: into the bar; {next} is the new branch, like 201d
+#. js-lingui-explicit-id
+msgid "chat.askAgainAs"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.askedAs"
 msgstr ""
 
@@ -686,6 +695,23 @@ msgstr ""
 #. Under an answer from a source (C169)
 #. js-lingui-explicit-id
 msgid "chat.instructionLike"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.joinedToBar"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.pairLabel"
+msgstr ""
+
+#. Under a prompt edited in place; {address} is its branch, like 201a
+#. js-lingui-explicit-id
+msgid "chat.promptEdited"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.promptEditedOthers"
 msgstr ""
 
 #. js-lingui-explicit-id

@@ -199,6 +199,16 @@ export function stripAttachedFileBlocks(content) {
 }
 
 /**
+ * The `<attached_file>` blocks of a stored prompt, as they were, joined. An
+ * edited prompt asked again keeps them, though they are never shown or
+ * edited (stage 11; C210 security).
+ */
+export function attachedFileBlocks(content) {
+  if (typeof content !== 'string') return ''
+  return (content.match(/<attached_file\b[^>]*>[\s\S]*?<\/attached_file>/gi) ?? []).join('\n\n')
+}
+
+/**
  * Pretty-print byte counts for user-facing copy.
  */
 export function formatSize(bytes) {

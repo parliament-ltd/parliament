@@ -34,6 +34,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, ChevronRight, Quote, X } from 'lucide-react'
 import MessageList from '../../components/core/MessageList'
 import MessageCard from '../../components/core/MessageCard'
+import EditableMessages from '../../components/core/EditableMessages'
+import { HIGHLIGHT_COLORS } from '../../lib/constants'
+import { stripAttachedFileBlocks } from '../../lib/fileUpload'
 import BranchSlider from '../../components/core/BranchSlider'
 import { lineItems, membersOf } from '../../lib/branchGroups'
 import { usePlanOf, waitingIn } from '../../stores/usePlanOf'
@@ -385,7 +388,9 @@ export default function MessagesRender() {
     return { address, name: modelFacts(msg.model)?.name ?? null }
   }, [conversations, planNum, lineChat?.docketId])
 
-  const renderCard = useCallback((msg, idx) => {
+  // What a card shows and does, for a message: drawn on its own, or by the
+  // editor of a prompt and its reply (stage 11, piece 2).
+  const cardPropsOf = useCallback((msg, idx) => {
     // The streaming card is the message the stream fills, by id.
     const isLatestAssistantStreaming = isStreaming && msg.id === streamingMessageId
 
@@ -401,50 +406,47 @@ export default function MessagesRender() {
     // one still arriving, cut off, or from a source is not.
     const editable = msg.role === 'assistant' && !isLatestAssistantStreaming && !isGhost && !msg.source && Boolean(msg.content)
 
-    return (
-      <MessageCard
-        key={msg.id}
-        id={msg.id}
-        type={msg.role === 'user' ? 'user' : 'assistant'}
-        content={displayContent}
-        attachmentMeta={msg.attachmentMeta}
-        number={numberByMessageId.get(msg.id) || 0}
-        index={idx}
-        isGhostText={isGhost}
-        stoppedNote={isGhost && Object.hasOwn(STOPPED, msg.stopReason ?? '') ? i18n._(msg.stopReason === 'error' && !msg.content ? COPY.chat.cutErrorEmpty : STOPPED[msg.stopReason]) : null}
-        source={msg.source ?? null}
-        frameworks={msg.role === 'assistant' ? msg.frameworks ?? null : null}
-        translation={msg.role === 'assistant' ? msg.translation ?? null : null}
-        citations={msg.role === 'assistant' ? msg.citations ?? null : null}
-        asked={msg.role === 'user' ? msg.asked ?? null : null}
-        included={msg.role === 'user' ? msg.included ?? null : null}
-        summary={summaryInfo(msg)}
-        thinking={thinking}
-        isFavorited={isFav}
-        showNotes={showNotes.has(msg.id)}
-        savedNoteText={noteRecord?.text || ''}
-        highlights={highlights}
-        quotes={quotesByMessage.get(msg.id) ?? NO_QUOTES}
-        isPopoverActive={activePopoverMsgId === msg.id}
-        onPopoverChange={(active) => setActivePopoverMsgId(active ? msg.id : null)}
-        onContinue={isGhost ? () => handleContinue(msg.id) : undefined}
-        onCopyText={() => handleCopyText(msg.content)}
-        onFavorite={() => toggleFavorite(msg.id)}
-        onNote={() => toggleNotePanel(msg.id)}
-        onNoteSave={(text) => saveNote(msg.id, text)}
-        onHighlight={(text, color) => addHighlight(msg.id, text, color)}
-        onBranch={() => branchFrom(msg)}
-        onHide={() => handleHide(msg.id)}
-        onDelete={() => handleDelete(msg.id)}
-        onMoveToBranch={() => handleSendToBranch(msg)}
-        onPinForReference={() => handlePinForReference(msg)}
-        onQuote={(text) => handleQuote(msg, text)}
-        editable={editable}
-        blocks={msg.blocks ?? null}
-        onSaveEdits={editable ? (saved) => saveEditedReply(activeConversationId, msg.id, saved) : undefined}
-        clean={settings.markup === 'off'}
-      />
-    )
+    return {
+      id: msg.id,
+      type: msg.role === 'user' ? 'user' : 'assistant',
+      content: displayContent,
+      attachmentMeta: msg.attachmentMeta,
+      number: numberByMessageId.get(msg.id) || 0,
+      index: idx,
+      isGhostText: isGhost,
+      stoppedNote: isGhost && Object.hasOwn(STOPPED, msg.stopReason ?? '') ? i18n._(msg.stopReason === 'error' && !msg.content ? COPY.chat.cutErrorEmpty : STOPPED[msg.stopReason]) : null,
+      source: msg.source ?? null,
+      frameworks: msg.role === 'assistant' ? msg.frameworks ?? null : null,
+      translation: msg.role === 'assistant' ? msg.translation ?? null : null,
+      citations: msg.role === 'assistant' ? msg.citations ?? null : null,
+      asked: msg.role === 'user' ? msg.asked ?? null : null,
+      included: msg.role === 'user' ? msg.included ?? null : null,
+      summary: summaryInfo(msg),
+      thinking,
+      isFavorited: isFav,
+      showNotes: showNotes.has(msg.id),
+      savedNoteText: noteRecord?.text || '',
+      highlights,
+      quotes: quotesByMessage.get(msg.id) ?? NO_QUOTES,
+      isPopoverActive: activePopoverMsgId === msg.id,
+      onPopoverChange: (active) => setActivePopoverMsgId(active ? msg.id : null),
+      onContinue: isGhost ? () => handleContinue(msg.id) : undefined,
+      onCopyText: () => handleCopyText(msg.content),
+      onFavorite: () => toggleFavorite(msg.id),
+      onNote: () => toggleNotePanel(msg.id),
+      onNoteSave: (text) => saveNote(msg.id, text),
+      onHighlight: (text, color) => addHighlight(msg.id, text, color),
+      onBranch: () => branchFrom(msg),
+      onHide: () => handleHide(msg.id),
+      onDelete: () => handleDelete(msg.id),
+      onMoveToBranch: () => handleSendToBranch(msg),
+      onPinForReference: () => handlePinForReference(msg),
+      onQuote: (text) => handleQuote(msg, text),
+      editable,
+      blocks: msg.blocks ?? null,
+      onSaveEdits: editable ? (saved) => saveEditedReply(activeConversationId, msg.id, saved) : undefined,
+      clean: settings.markup === 'off',
+    }
   }, [
     saveEditedReply, settings.markup,
     isStreaming, streamingContent, streamingMessageId, streamingThinking, streamingAnswering, activeConversationId, i18n,
@@ -455,6 +457,80 @@ export default function MessagesRender() {
     handleHide, handleDelete, handleSendToBranch, handlePinForReference,
     handleQuote, quotesByMessage, summaryInfo, branchFrom,
   ])
+
+  const renderCard = useCallback((msg, idx) => <MessageCard key={msg.id} {...cardPropsOf(msg, idx)} />, [cardPropsOf])
+
+  // ── Prompts edited in place (stage 11, piece 2; C214) ──────
+  // A prompt and its finished reply are one editor, so a selection can run
+  // from one into the other; a prompt with no finished reply under it, or
+  // with the tabs of several branches under it, is edited on its own.
+  const replyEditable = useCallback((m) => m.role === 'assistant' && !(isStreaming && m.id === streamingMessageId) && !m.incomplete && !m.source && Boolean(m.content), [isStreaming, streamingMessageId])
+  const paired = useMemo(() => {
+    const out = []
+    for (let i = 0; i < items.length; i++) {
+      const m = items[i]
+      const prompt = !m.kind && m.role === 'user' && typeof m.content === 'string' && stripAttachedFileBlocks(m.content).trim() !== ''
+      if (!prompt) { out.push(m); continue }
+      const next = items[i + 1]
+      const reply = next && !next.kind && replyEditable(next) ? next : null
+      out.push({ kind: 'pair', key: `pair-${m.id}`, id: m.id, prompt: m, reply })
+      if (reply) i++
+    }
+    return out
+  }, [items, replyEditable])
+
+  // Highlights as every card finds them, by their words.
+  const highlightTerms = useMemo(() => {
+    const seen = new Map()
+    for (const hl of highlights) {
+      const key = hl.text.toLowerCase()
+      if (!seen.has(key)) seen.set(key, { text: hl.text, bg: HIGHLIGHT_COLORS.find((c) => c.color === hl.color)?.bg || 'rgba(184,160,112,0.18)' })
+    }
+    return [...seen.values()]
+  }, [highlights])
+
+  // Under an edited prompt (the editing spec): its branch, edited; the other
+  // branches keep theirs; ask again as the plan's next letter (again:).
+  const editedLineOf = useCallback((prompt) => {
+    const marked = Array.isArray(prompt.blocks) && prompt.blocks.some((b) => b?.struck != null || (Array.isArray(b?.text) && b.text.some((r) => r?.struck != null || r?.added != null)))
+    const address = planNum != null && lineChat?.branch ? `${planNum}${lineChat.branch}` : null
+    if (!marked || !address) return null
+    const family = lineChat?.docketId ? conversations.filter((c) => c.docketId === lineChat.docketId && c.branch) : []
+    const others = family.length > 1
+    const top = family.reduce((n, c) => Math.max(n, c.branch.charCodeAt(0)), 0)
+    const next = top ? `${planNum}${String.fromCharCode(top + 1)}` : null
+    return (
+      <p className="mt-1 text-xs italic text-[var(--p-text-secondary)]">
+        {i18n._(COPY.chat.promptEdited, { address })}
+        {others && <>; {i18n._(COPY.chat.promptEditedOthers)}</>}
+        {hosted && (
+          <>
+            <span aria-hidden="true"> · </span>
+            <button type="button" className="underline underline-offset-2 italic" onClick={() => window.dispatchEvent(new CustomEvent('parliament-write', { detail: { value: `>again:${address}` } }))}>
+              {next ? i18n._(COPY.chat.askAgainAs, { next }) : i18n._(COPY.chat.askAgain)}
+            </button>
+          </>
+        )}
+      </p>
+    )
+  }, [planNum, lineChat, conversations, hosted, i18n])
+
+  const renderPair = useCallback((item, idx) => {
+    const { prompt, reply } = item
+    const sections = [{ part: 'prompt', message: prompt, card: cardPropsOf(prompt, idx), quotes: quotesByMessage.get(prompt.id) ?? NO_QUOTES, editedLine: editedLineOf(prompt) }]
+    if (reply) sections.push({ part: 'reply', message: reply, card: cardPropsOf(reply, idx), quotes: quotesByMessage.get(reply.id) ?? NO_QUOTES })
+    return (
+      <EditableMessages
+        key={item.key}
+        sections={sections}
+        terms={highlightTerms}
+        quotedTitle={(num) => i18n._(COPY.chat.quoted, { num })}
+        clean={settings.markup === 'off'}
+        onSave={(messageId, saved) => saveEditedReply(activeConversationId, messageId, saved)}
+        words={{ joined: i18n._(COPY.chat.joinedToBar), label: i18n._(COPY.chat.pairLabel) }}
+      />
+    )
+  }, [cardPropsOf, quotesByMessage, editedLineOf, highlightTerms, i18n, settings.markup, saveEditedReply, activeConversationId])
 
   // A tab's letter, who answered, and the branch's address (203b).
   const infoOf = useCallback((chatId, tab) => {
@@ -482,6 +558,7 @@ export default function MessagesRender() {
   // draws its thread the same way, so a later prompt there to several gets
   // tabs of its own (again:, C177).
   function renderItem(item, idx) {
+    if (item.kind === 'pair') return renderPair(item, idx)
     return item.kind === 'slider'
       ? <BranchSlider key={item.key} item={item} line={activeConversationId} infoOf={infoOf} renderLine={renderItem} numberOf={numberOf} />
       : renderCard(item, idx)
@@ -496,7 +573,7 @@ export default function MessagesRender() {
       )}
 
       <MessageList
-        messages={items}
+        messages={paired}
         renderCard={renderItem}
         hiddenCount={messages.filter(m => hiddenIds.has(m.id)).length}
         onShowHidden={handleShowHidden}

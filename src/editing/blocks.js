@@ -89,6 +89,42 @@ function inlineOf(runs, codeLine) {
 }
 
 /**
+ * The words still standing in a stored form, as plain text: struck words
+ * left out, the person's kept; a line each, lists marked as typed. What an
+ * edited prompt now asks (again:), and what joining a prompt to its reply
+ * puts in the bar (C214 (b)). A table or chart struck whole is left out; one
+ * standing is written as its text.
+ * @param {unknown} blocks
+ * @returns {string}
+ */
+export function wordsOf(blocks) {
+  if (!Array.isArray(blocks)) return ''
+  const lines = []
+  let number = 0
+  for (const b of blocks) {
+    if (!b || typeof b !== 'object') continue
+    if (b.type !== 'list' || b.kind !== 'number') number = 0
+    if (editId(b.struck) != null) continue
+    if (b.type === 'divider') { lines.push('---'); continue }
+    if (b.type === 'table') {
+      lines.push((Array.isArray(b.rows) ? b.rows : []).filter(Array.isArray).map((r) => r.map((c) => String(c ?? '')).join(' | ')).join('\n'))
+      continue
+    }
+    if (b.type === 'chart') continue
+    const text = (Array.isArray(b.text) ? b.text : [])
+      .filter((r) => r && typeof r === 'object' && editId(r.struck) == null)
+      .map((r) => (r.break === true ? '\n' : typeof r.text === 'string' ? r.text : ''))
+      .join('')
+    if (b.type === 'heading') lines.push(`${'#'.repeat([1, 2, 3].includes(b.level) ? b.level : 1)} ${text}`)
+    else if (b.type === 'list') lines.push(`${b.kind === 'number' ? `${++number}.` : b.kind === 'check' ? (b.checked ? '- [x]' : '- [ ]') : '-'} ${text}`)
+    else if (b.type === 'quote') lines.push(`> ${text}`)
+    else if (b.type === 'code') lines.push(`\`\`\`\n${text}\n\`\`\``)
+    else lines.push(text)
+  }
+  return lines.filter((l) => l.trim() !== '').join('\n\n').trim()
+}
+
+/**
  * A stored reply's document, or null when nothing usable is stored.
  * @param {unknown} blocks the stored form
  * @param {() => string} nextBlockId for a block that came without an id

@@ -91,7 +91,26 @@ export function atLineStart(state) {
   return nextLive(state, true).edge != null
 }
 
-function backspace(blocks) {
+// A prompt and its reply drawn by one editor are two sections (piece 2;
+// C214). The gap between them is crossed only by joining.
+const isSection = (node) => node?.type === schema.nodes.section
+
+// Where a line sits: its container (the document, or a section), its index
+// there, and the depth of that container.
+function placeOf($pos) {
+  const depth = $pos.depth - 1
+  return { depth, container: $pos.node(depth), index: $pos.index(depth) }
+}
+
+// Whether a position at a container's edge faces the next or previous section.
+function facesSection(state, $pos, depth, forward) {
+  if (depth < 1) return false
+  const $edge = state.doc.resolve(forward ? $pos.after(depth) : $pos.before(depth))
+  return isSection(forward ? $edge.nodeAfter : $edge.nodeBefore)
+}
+
+function backspace(blocks, onJoin) {
+  const blk = typeof blocks === 'function' ? blocks : () => blocks
   return (state, dispatch) => {
     const sel = state.selection
     if (sel instanceof NodeSelection) {
@@ -110,15 +129,23 @@ function backspace(blocks) {
         dispatch(state.tr.setSelection(TextSelection.create(state.doc, live.edge)))
         return true
       }
-      if (!blocks) return true
+      const { depth, container, index } = placeOf($pos)
+      // At a reply's start, under its prompt: the gap between them (C214 (a)).
+      const atGap = index === 0 && isSection(container) && facesSection(state, $pos, depth, false)
+      if (!blk(state)) {
+        if (atGap) onJoin?.()
+        return true
+      }
       const block = $pos.parent
       if (block.type !== schema.nodes.paragraph) {
         dispatch(state.tr.setBlockType($pos.before(), $pos.after(), schema.nodes.paragraph, { id: block.attrs.id }).setMeta(SKIP, true))
         return true
       }
-      const index = $pos.index(0)
-      if (index === 0) return true
-      const prev = state.doc.child(index - 1)
+      if (index === 0) {
+        if (atGap) onJoin?.()
+        return true
+      }
+      const prev = container.child(index - 1)
       if (prev.isTextblock) {
         dispatch(state.tr.join($pos.before()).setMeta(SKIP, true))
         return true
@@ -131,7 +158,7 @@ function backspace(blocks) {
   }
 }
 
-function del() {
+function del(onJoin) {
   return (state, dispatch) => {
     const sel = state.selection
     if (!sel.empty || sel instanceof NodeSelection) {
@@ -140,7 +167,13 @@ function del() {
     }
     const live = nextLive(state, false)
     if (live.edge != null) {
-      if (live.edge !== sel.from) dispatch(state.tr.setSelection(TextSelection.create(state.doc, live.edge)))
+      if (live.edge !== sel.from) {
+        dispatch(state.tr.setSelection(TextSelection.create(state.doc, live.edge)))
+        return true
+      }
+      // At a prompt's end, over its reply: the gap between them (C214 (a)).
+      const { depth, container, index } = placeOf(sel.$from)
+      if (index === container.childCount - 1 && isSection(container) && facesSection(state, sel.$from, depth, true)) onJoin?.()
       return true
     }
     dispatch(state.tr.delete(live.from, live.to).setMeta(INTENT, 'delete'))
@@ -186,10 +219,15 @@ function enter(ids) {
 }
 
 /**
- * The plugins for an editable reply (blocks: true) or prompt (blocks: false).
+ * The plugins for an editable reply (blocks: true) or prompt (blocks: false);
+ * blocks may also be a function of the state, true where the cursor is in a
+ * reply (one editor for a prompt and its reply, piece 2). onJoin: called
+ * when the gap between a prompt and its reply is crossed (C214).
  * @param {{ ids: object, blocks?: boolean, onSlash?: (view: object) => boolean, onNote?: (text: string) => void, menuKey?: (event: KeyboardEvent) => boolean, menuText?: (text: string) => boolean, log?: (line: string) => void, now?: () => number }} opts
  */
-export function editingPlugins({ ids, blocks = true, onSlash, onNote, menuKey, menuText, log, now }) {
+export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, menuKey, menuText, log, now }) {
+  const blk = typeof blocks === 'function' ? blocks : () => blocks
+  const whenBlocks = (command) => (state, dispatch, view) => (blk(state) ? command(state, dispatch, view) : true)
   const wholeBlock = (node) => onNote?.(`A ${node.type.name} is one block for now: Backspace strikes it whole, and editing inside it comes later.`)
   const nothing = () => true
   const strike = (state, dispatch) => {
@@ -198,10 +236,10 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, menuKey, m
     return true
   }
   const keys = keymap({
-    Enter: blocks ? enter(ids) : nothing,
-    'Shift-Enter': blocks ? enter(ids) : nothing,
-    Backspace: backspace(blocks),
-    Delete: del(),
+    Enter: whenBlocks(enter(ids)),
+    'Shift-Enter': whenBlocks(enter(ids)),
+    Backspace: backspace(blk, onJoin),
+    Delete: del(onJoin),
     'Mod-z': undo,
     'Mod-y': redo,
     'Shift-Mod-z': redo,
@@ -233,10 +271,10 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, menuKey, m
         // "/" with nothing but struck words before it in the line opens the
         // block menu (replies only): a line that starts with struck words
         // still starts there (Stefan's try of piece 1, 26 October).
-        if (blocks && text === '/' && from === to && onSlash && atLineStart(view.state)) return onSlash(view)
+        if (blk(view.state) && text === '/' && from === to && onSlash && atLineStart(view.state)) return onSlash(view)
         // "/" over selected words opens it too: they become a line of the
         // kind picked (setBlock), and nothing is typed over them.
-        if (blocks && text === '/' && !view.state.selection.empty && view.state.selection instanceof TextSelection && onSlash) return onSlash(view)
+        if (blk(view.state) && text === '/' && !view.state.selection.empty && view.state.selection instanceof TextSelection && onSlash) return onSlash(view)
         return false
       },
       handleDOMEvents: {
@@ -280,8 +318,8 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, menuKey, m
           const lines = text.replace(/\r\n?/g, '\n').split('\n')
           const parentType = state.selection.$from.parent.type
           let slice
-          if (lines.length === 1 || !blocks || parentType === schema.nodes.code_block) {
-            const joined = blocks && parentType === schema.nodes.code_block ? text : lines.join(' ')
+          if (lines.length === 1 || !blk(state) || parentType === schema.nodes.code_block) {
+            const joined = blk(state) && parentType === schema.nodes.code_block ? text : lines.join(' ')
             slice = new Slice(Fragment.from(schema.text(joined)), 0, 0)
           } else {
             const paras = lines.map((l) => schema.nodes.paragraph.create({ id: ids.block() }, l ? schema.text(l) : null))
@@ -328,17 +366,27 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, menuKey, m
       if (!trs.some((t) => t.docChanged)) return null
       const seen = new Set()
       let tr = null
-      state.doc.forEach((node, offset) => {
+      for (const { node, pos } of linesOf(state.doc)) {
         if (node.attrs.id != null && !seen.has(node.attrs.id)) {
           seen.add(node.attrs.id)
-          return
+          continue
         }
-        tr = (tr ?? state.tr.setMeta(SKIP, true)).setNodeMarkup(offset, null, { ...node.attrs, id: ids.block() })
-      })
+        tr = (tr ?? state.tr.setMeta(SKIP, true)).setNodeMarkup(pos, null, { ...node.attrs, id: ids.block() })
+      }
       return tr
     },
   })
   return [events, keys, uniqueIds, ...(blocks ? [gapLines(ids)] : []), historyPlugin(now ? { now } : {})]
+}
+
+/** Every block of a document, in a section or not, with its position. */
+export function linesOf(doc) {
+  const out = []
+  doc.forEach((node, offset) => {
+    if (isSection(node)) node.forEach((child, at) => out.push({ node: child, pos: offset + 1 + at, container: offset }))
+    else out.push({ node, pos: offset, container: null })
+  })
+  return out
 }
 
 // The space between two blocks reads as a blank line. Clicking in it opens
@@ -349,7 +397,7 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, menuKey, m
 function gapLines(ids) {
   const gap = () => schema.nodes.paragraph.create({ id: ids.block(), gap: true })
   const isGap = (node) => node?.type === schema.nodes.paragraph && node.attrs.gap
-  // Open a gap line at a position between two top-level blocks.
+  // Open a gap line at a position between two blocks of the same container.
   const openAt = (view, at) => {
     const tr = view.state.tr.insert(at, gap()).setMeta(SKIP, true)
     view.dispatch(tr.setSelection(TextSelection.create(tr.doc, at + 1)).scrollIntoView())
@@ -359,17 +407,31 @@ function gapLines(ids) {
     props: {
       handleDOMEvents: {
         mousedown(view, event) {
-          // Only a press on the space itself, not on a line.
-          if (event.button !== 0 || event.target !== view.dom) return false
+          if (event.button !== 0) return false
+          // Only a press on the space itself, not on a line: the editor's
+          // own space, or a reply's within its card. Never the gap between
+          // a prompt and its reply, which is crossed only by joining.
+          const { doc } = view.state
+          let container = null
+          if (event.target === view.dom) {
+            if (doc.firstChild && isSection(doc.firstChild)) return false
+            container = { node: doc, start: 0 }
+          } else {
+            doc.forEach((node, offset) => {
+              if (isSection(node) && view.nodeDOM(offset)?.querySelector?.('.pm-section-content') === event.target) container = { node, start: offset + 1 }
+            })
+            // A prompt takes no new lines, as Enter in it does nothing.
+            if (!container || container.node.attrs.part !== 'reply') return false
+          }
           const y = event.clientY
           let at = null
           let prevBottom = null
-          view.state.doc.forEach((node, offset) => {
+          container.node.forEach((node, offset) => {
             if (at != null) return
-            const dom = view.nodeDOM(offset)
+            const dom = view.nodeDOM(container.start + offset)
             if (!(dom instanceof Element)) return
             const box = dom.getBoundingClientRect()
-            if (prevBottom != null && y > prevBottom && y < box.top) at = offset
+            if (prevBottom != null && y > prevBottom && y < box.top) at = container.start + offset
             prevBottom = box.bottom
           })
           if (at == null) return false
@@ -389,14 +451,15 @@ function gapLines(ids) {
       let tr = null
       const here = state.selection.$from
       const gone = []
-      state.doc.forEach((node, offset) => {
-        if (!isGap(node)) return
+      const cursorIn = here.parent.isTextblock ? here.before(here.depth) : -1
+      for (const { node, pos: offset } of linesOf(state.doc)) {
+        if (!isGap(node)) continue
         if (node.content.size > 0) {
           tr = (tr ?? state.tr.setMeta(SKIP, true)).setNodeMarkup(offset, null, { ...node.attrs, gap: false })
-        } else if (!(here.depth >= 1 && here.before(1) === offset)) {
+        } else if (cursorIn !== offset) {
           gone.push(offset)
         }
-      })
+      }
       for (const offset of gone.reverse()) {
         tr = tr ?? state.tr.setMeta(SKIP, true)
         tr.delete(tr.mapping.map(offset), tr.mapping.map(offset + 2))

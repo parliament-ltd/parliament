@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useCallback, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Markdown from './Markdown'
 import {
@@ -62,7 +62,14 @@ export default function MessageCard({
   // editable says this one can be; blocks is its editable form once saved;
   // onSaveEdits keeps it; clean shows the result only (markup · clean).
   editable = false, blocks = null, onSaveEdits, clean = false,
+  // A prompt and its reply edited as one (stage 11, piece 2; C214): the
+  // editor draws this card, and its text for this card is hostContent, put
+  // where the card's text goes. Everything else on the card stays the
+  // card's own and is never part of the text. editedLine: said under an
+  // edited prompt.
+  hostContent = null, editedLine = null,
 }) {
+  const fixed = hostContent ? { contentEditable: false, suppressContentEditableWarning: true } : {}
   const { i18n } = useLingui()
   // PR-18e: strip persisted `<attached_file>...</attached_file>` boundary
   // blocks from the display text so the user sees only their prose. The
@@ -329,6 +336,7 @@ export default function MessageCard({
       >
         {/* Header row */}
         <div
+          {...fixed}
           className="flex items-center justify-between px-4 py-3"
           style={{ borderBottom: '1px solid var(--p-border-subtle)' }}
         >
@@ -400,8 +408,8 @@ export default function MessageCard({
         {/* Typing in an edited reply puts the highlight picker away. */}
         <div className="px-4 py-4 overflow-hidden relative" ref={contentRef} onMouseUp={handleMouseUp} onKeyDown={() => { if (popoverPos) { setPopoverPos(null); onPopoverChange?.(false) } }}>
           <div className="text-sm leading-relaxed" style={{ color: 'var(--p-text-primary)' }}>
-            {thinking?.text && <Thinking thinking={thinking} />}
-            {renderContent}
+            {thinking?.text && <div {...fixed}><Thinking thinking={thinking} /></div>}
+            {hostContent ? <HostedText el={hostContent} /> : renderContent}
             {/* A source that found nothing says so where its answer would be. */}
             {source?.found === false && <SourceLine source={source} />}
           </div>
@@ -413,6 +421,7 @@ export default function MessageCard({
               an image they no longer "see" in the rendered text. */}
           {type === 'user' && Array.isArray(attachmentMeta) && attachmentMeta.length > 0 && (
             <div
+              {...fixed}
               className="mt-2 flex flex-wrap gap-1.5"
               title="Attachments are visible to Claude only on the turn they were sent. Re-attach if you need them in follow-ups."
             >
@@ -445,6 +454,7 @@ export default function MessageCard({
               const showBelow = popoverPos.y < 40
               return (
                 <motion.div
+                  {...fixed}
                   initial={{ opacity: 0, scale: 0.9, y: showBelow ? -4 : 4 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9, y: showBelow ? -4 : 4 }}
@@ -486,6 +496,7 @@ export default function MessageCard({
         <AnimatePresence>
           {showNotes && (
             <motion.div
+              {...fixed}
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -513,6 +524,7 @@ export default function MessageCard({
         </AnimatePresence>
       </motion.div>
 
+      <div {...fixed}>
       {stoppedNote && (
         <p className="mt-2 text-xs italic text-[var(--p-text-secondary)]">{stoppedNote}</p>
       )}
@@ -546,11 +558,24 @@ export default function MessageCard({
           Continue
         </motion.button>
       )}
+      {editedLine}
+      </div>
     </motion.div>
   )
 }
 
 /* ── Internal sub-components ────────────────────────────── */
+
+// The editor's text for this card, put where the card's text goes. The
+// element belongs to the editor (a prompt and its reply as one); React only
+// places it.
+function HostedText({ el }) {
+  const box = useRef(null)
+  useLayoutEffect(() => {
+    if (box.current && el && el.parentNode !== box.current) box.current.appendChild(el)
+  }, [el])
+  return <div ref={box} className="p-edit parliament-md text-[15px]" />
+}
 
 // A minute and seconds: 2:31.
 const clock = (ms) => {

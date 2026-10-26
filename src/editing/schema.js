@@ -42,7 +42,18 @@ const wrapStruck = (node, inner) => (node.attrs.struck
 
 export const schema = new Schema({
   nodes: {
-    doc: { content: 'block+' },
+    // A reply on its own is its blocks. A prompt and its reply edited as one
+    // (piece 2; C214) are two sections, each a card on screen.
+    doc: { content: '(block | section)+' },
+    // part: 'prompt' or 'reply'; message: the id of the message it is.
+    // isolating: no command joins or lifts across it; only joining crosses
+    // the gap between a prompt and its reply, by sending them to the bar.
+    section: {
+      content: 'block+', isolating: true, defining: true,
+      attrs: { part: { default: 'reply' }, message: { default: null } },
+      toDOM: (n) => ['div', { class: `pm-section pm-${n.attrs.part}`, 'data-message': n.attrs.message ?? '' }, ['div', { class: 'pm-section-content' }, 0]],
+      parseDOM: [{ tag: 'div.pm-section', contentElement: 'div.pm-section-content', getAttrs: (dom) => ({ part: dom.classList.contains('pm-prompt') ? 'prompt' : 'reply', message: dom.getAttribute('data-message') || null }) }],
+    },
     // gap: an empty line opened between two blocks by moving or clicking
     // there, to write in (Stefan's try of piece 1, 26 October). Never stored
     // while empty; an ordinary line once something is typed in it.

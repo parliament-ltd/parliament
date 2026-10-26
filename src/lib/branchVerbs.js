@@ -8,6 +8,19 @@
 
 import { targetsOf } from './rowVerbs'
 import { CHARS_PER_TOKEN, inputCost } from '../shell/estimate'
+import { wordsOf } from '../editing/blocks'
+import { attachedFileBlocks } from './fileUpload'
+
+/**
+ * What a prompt asks now: as written, or once edited in place, its words
+ * still standing (stage 11, piece 2; the editing spec, "ask again as 201d"),
+ * with any attached file's text it carried, which is never shown or edited.
+ */
+export function promptNow(message) {
+  if (!message || typeof message.content !== 'string') return ''
+  if (!Array.isArray(message.blocks)) return message.content
+  return [wordsOf(message.blocks), attachedFileBlocks(message.content)].filter(Boolean).join('\n\n')
+}
 
 const flat = (args = []) => args.flatMap((a) => (a.kind === 'list' ? a.items : [a]))
 const CENT = 0.01
@@ -24,10 +37,13 @@ export function promptFacts(messages = []) {
   for (let i = messages.length - 1; i >= 0; i--) {
     const m = messages[i]
     if (m?.role !== 'user' || typeof m.content !== 'string' || !m.content.trim()) continue
-    const words = m.content.trim()
+    // As it asks now, once edited in place (stage 11, piece 2).
+    const words = promptNow(m).trim()
     const before = messages.slice(0, i).reduce((n, x) => n + charsOf(x), 0)
     const brought = Array.isArray(m.included) ? [...new Set(m.included.map((x) => x?.source?.name ?? x?.source?.id).filter(Boolean))] : []
-    return { id: m.id, text: words.length > 60 ? `${words.slice(0, 59)}…` : words, chars: charsOf(m), before, ...(brought.length ? { brought } : {}) }
+    // What went before goes as written; this prompt goes as it asks now.
+    const chars = promptNow(m).length + charsOf({ included: m.included })
+    return { id: m.id, text: words.length > 60 ? `${words.slice(0, 59)}…` : words, chars, before, ...(brought.length ? { brought } : {}) }
   }
   return null
 }

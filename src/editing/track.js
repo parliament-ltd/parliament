@@ -192,10 +192,10 @@ function narrow(doc, step, floor = step.from) {
   const $to = doc.resolve(to)
   let block
   let end
-  if (slice.openEnd === 1 && $to.depth === 1 && $to.parent.isTextblock) {
+  if (slice.openEnd === 1 && $to.parent.isTextblock) {
     block = $to.parent
     end = to
-  } else if (slice.openEnd === 0 && $to.depth === 0 && $to.nodeBefore?.isTextblock) {
+  } else if (slice.openEnd === 0 && !$to.parent.isTextblock && $to.nodeBefore?.isTextblock) {
     block = $to.nodeBefore
     end = to - 1
   } else return step

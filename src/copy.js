@@ -1911,6 +1911,13 @@ export const COPY = {
     quote: /*i18n*/ { id: 'chat.quote', message: 'Quote' },
     quoteHelp: /*i18n*/ { id: 'chat.quoteHelp', message: 'Keep these words beside the chat, numbered. They are never sent' },
     quoted: /*i18n*/ { id: 'chat.quoted', message: 'Quote {num}. A click finds its card' },
+    // A prompt edited in place, and joined to its reply (stage 11, piece 2; the editing spec; C214).
+    promptEdited: /*i18n*/ { id: 'chat.promptEdited', message: 'your prompt in {address}, edited', comment: 'Under a prompt edited in place; {address} is its branch, like 201a' },
+    promptEditedOthers: /*i18n*/ { id: 'chat.promptEditedOthers', message: 'the other branches keep theirs' },
+    askAgainAs: /*i18n*/ { id: 'chat.askAgainAs', message: 'ask again as {next}', comment: 'Writes again: into the bar; {next} is the new branch, like 201d' },
+    askAgain: /*i18n*/ { id: 'chat.askAgain', message: 'ask again' },
+    joinedToBar: /*i18n*/ { id: 'chat.joinedToBar', message: 'Your prompt and this reply, as they read now, are in the bar as your next prompt. Nothing here changed' },
+    pairLabel: /*i18n*/ { id: 'chat.pairLabel', message: 'Your prompt and its reply. Every word can be edited' },
     // "Pin for reference", renamed (R13): a whole message kept as a quote
     // beside a chat; and the quotes kept beside this one.
     quoteMessage: /*i18n*/ { id: 'chat.quoteMessage', message: 'Quote in a chat' },

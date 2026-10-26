@@ -179,3 +179,15 @@ describe('a saved search opened on Records (C140)', () => {
     expect(fieldReducer(t, { type: 'setSearch', value: 'barn owl' })).toBe(t)
   })
 })
+
+describe('a prompt written in from a room (stage 11, piece 2; C214 (b))', () => {
+  it('turns the field to a prompt with those words, opened, and keeps what was typed elsewhere', () => {
+    let s = fieldReducer(initialField('prompt'), { type: 'input', value: '>open:records' })
+    s = { ...s, minimised: true, editingReply: true }
+    s = fieldReducer(s, { type: 'draft', value: 'Write the opening. It had not gone out in a century.' })
+    expect(s.mode).toBe('prompt')
+    expect(fieldValue(s)).toBe('Write the opening. It had not gone out in a century.')
+    expect([s.minimised, s.editingReply, s.focused]).toEqual([false, false, true])
+    expect(s.text.command).toBe('open:records')
+  })
+})

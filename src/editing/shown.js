@@ -27,10 +27,21 @@ function wordsOf(block, start) {
  * @param {{ terms?: Array<{ text: string, bg: string }>, quotes?: Array<{ num: number, text: string }>, whole?: string }} shown
  *   whole: the reply's own text; a quote of all of it is not a passage
  */
-export function shownDecorations(doc, { terms = [], quotes = [], whole = '' } = {}) {
-  if (!terms.length && !quotes.length) return DecorationSet.empty
+export function shownDecorations(doc, shown = {}) {
+  const { terms = [], sections = null } = shown
+  const anyQuotes = (shown.quotes ?? []).length || Object.values(sections ?? {}).some((s) => (s.quotes ?? []).length)
+  if (!terms.length && !anyQuotes) return DecorationSet.empty
   const decos = []
+  // A prompt and its reply as one: each section's quotes are its own message's.
+  let quotes = shown.quotes ?? []
+  let whole = shown.whole ?? ''
   doc.descendants((node, pos) => {
+    if (node.type.name === 'section') {
+      const own = sections?.[node.attrs.message] ?? {}
+      quotes = own.quotes ?? []
+      whole = own.whole ?? ''
+      return true
+    }
     if (!node.isTextblock) return true
     const { text, at } = wordsOf(node, pos + 1)
     const ranges = []
@@ -77,14 +88,17 @@ export function shownPlugin({ quotedTitle = () => '' } = {}) {
     state: {
       init: () => ({ shown: {}, set: DecorationSet.empty }),
       apply(tr, value, _old, state) {
+        // Each quote carries its title, the words that say where its card is.
+        const titled = (list) => (list ?? []).map((q) => ({ ...q, title: quotedTitle(q.num) }))
+        const draw = (shown) => shownDecorations(state.doc, {
+          ...shown,
+          quotes: titled(shown.quotes),
+          ...(shown.sections ? { sections: Object.fromEntries(Object.entries(shown.sections).map(([k, s]) => [k, { ...s, quotes: titled(s.quotes) }])) } : {}),
+        })
         const next = tr.getMeta(shownKey)
-        if (next) {
-          const quotes = (next.quotes ?? []).map((q) => ({ ...q, title: quotedTitle(q.num) }))
-          return { shown: next, set: shownDecorations(state.doc, { ...next, quotes }) }
-        }
+        if (next) return { shown: next, set: draw(next) }
         if (!tr.docChanged) return value
-        const quotes = (value.shown.quotes ?? []).map((q) => ({ ...q, title: quotedTitle(q.num) }))
-        return { shown: value.shown, set: shownDecorations(state.doc, { ...value.shown, quotes }) }
+        return { shown: value.shown, set: draw(value.shown) }
       },
     },
     props: {

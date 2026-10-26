@@ -35,7 +35,7 @@ import { sendableOf, hiddenIds, pendingDeletes, isStreaming as replyArriving, st
 import { fromSource } from '../stores/sendHistory'
 import { preview, viewFromSaved, lineOf, LOCAL_READS } from './preview'
 import { answerFor, includedOf } from '../lib/included'
-import { promptFacts } from '../lib/branchVerbs'
+import { promptFacts, promptNow } from '../lib/branchVerbs'
 import { checkSourceTexts } from '../lib/sourceCheck'
 import Bar from './Bar'
 import Strip from './Strip'
@@ -624,6 +624,20 @@ export default function Shell() {
     window.addEventListener('parliament-write', onWrite)
     return () => window.removeEventListener('parliament-write', onWrite)
   }, [writeField])
+
+  // A prompt and its reply joined in a room (stage 11, piece 2; C214 (b)):
+  // their words still standing come to the bar as a prompt, to edit and send
+  // with Enter. Always written as a prompt, never read as a command, so words
+  // from a reply can never run one.
+  useEffect(() => {
+    const onDraft = (e) => {
+      const value = e.detail?.value
+      if (typeof value !== 'string' || !value.trim()) return
+      setWrite({ value: value.slice(0, 200_000), mode: 'prompt', n: ++writes.current })
+    }
+    window.addEventListener('parliament-prompt-draft', onDraft)
+    return () => window.removeEventListener('parliament-prompt-draft', onDraft)
+  }, [])
 
   // copy: and export: (C143 (f), C138): built from what is stored, in the
   // reader's language around the person's words. Hidden messages and
@@ -2624,8 +2638,8 @@ export default function Shell() {
     loadConversations().catch(() => {})
     const next = what.plan != null && made.branch ? `${what.plan}${made.branch}` : String(made.num ?? '')
     const sent = w.group === 'source'
-      ? askSourceAs(made.id, p.content, w, { group })
-      : sendMessage(made.id, p.content, w.id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), [], null,
+      ? askSourceAs(made.id, promptNow(p), w, { group })
+      : sendMessage(made.id, promptNow(p), w.id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), [], null,
         { frameworks: recordOf(fw, fwListNow.current), group, describe: false, ...(Array.isArray(p.included) && p.included.length ? { included: p.included } : {}) })
     return sent.then(() => ({ message: 'againDone', values: { next, address: what.address } }), (err) => failure(err, w.group === 'source' ? w.name : undefined))
   }, [askSourceAs, createConversation, loadConversations, regroupPrompt, sendMessage])

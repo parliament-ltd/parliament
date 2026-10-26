@@ -111,6 +111,12 @@ export function fieldReducer(state, action) {
       // turns to prompt mode where the command asks for it (focus:, W §7).
       return { ...state, mode: action.to === 'prompt' ? 'prompt' : 'command', text: { ...state.text, command: '' }, focused: true }
 
+    case 'draft':
+      // A prompt written into the field from a room, to edit and send: a
+      // prompt and its reply joined (stage 11, piece 2; C214 (b)).
+      // It opens the field, folded while the reply was edited.
+      return { ...state, mode: 'prompt', text: { ...state.text, prompt: String(action.value ?? '') }, focused: true, minimised: false, editingReply: false, peek: false }
+
     case 'sent':
       // A prompt went, or a search was done with: its text is cleared.
       return { ...state, text: { ...state.text, [state.mode]: '' } }

@@ -4,8 +4,8 @@ import { Fragment, Slice } from 'prosemirror-model'
 import { schema, STRUCK, ADDED } from './schema'
 import { replyFromMarkdown } from './fromMarkdown'
 import { track, createIds, cursorMarks, undoEdit, collectEdits, noteForModel, INTENT, SKIP } from './track'
-import { commands, atLineStart, setBlock, BLOCK_CHOICES, editingPlugins } from './keys'
-import { toBlocks } from './blocks'
+import { commands, atLineStart, setBlock, BLOCK_CHOICES, editingPlugins, linesOf } from './keys'
+import { toBlocks, wordsOf } from './blocks'
 
 // The reply as text, with each edit shown: [-struck-#id] and {+added+#id}.
 function show(doc) {
@@ -408,5 +408,79 @@ describe('a line opened in the space between two blocks', () => {
     expect(show(state.doc)).toBe('First. | {+New+#240} | Second.')
     state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, 2)))
     expect(state.doc.childCount).toBe(3)
+  })
+})
+
+describe('a prompt and its reply as one editor (piece 2; C214)', () => {
+  const pairOf = (prompt, reply) => {
+    const ids = createIds(240)
+    const section = (part, message, doc) => schema.nodes.section.create({ part, message }, doc.content)
+    const doc = schema.nodes.doc.create(null, [
+      section('prompt', 'p1', replyFromMarkdown(prompt, ids.block)),
+      section('reply', 'r1', replyFromMarkdown(reply, ids.block)),
+    ])
+    return { ids, doc }
+  }
+  const inReply = (state) => {
+    const $f = state.selection.$from
+    for (let d = $f.depth; d > 0; d--) if ($f.node(d).type === schema.nodes.section) return $f.node(d).attrs.part === 'reply'
+    return true
+  }
+  const withJoin = () => {
+    const joined = { n: 0 }
+    return { joined, join: () => { joined.n += 1 } }
+  }
+
+  it('joins on Backspace at the reply\'s start, and on Delete at the prompt\'s end, changing nothing', () => {
+    const { ids, doc } = pairOf('Write the opening.', 'The furnace had not gone out.')
+    const promptEnd = doc.child(0).nodeSize - 2
+    const replyStart = doc.child(0).nodeSize + 2
+    const { joined, join } = withJoin()
+    let state = EditorState.create({ doc, selection: TextSelection.create(doc, replyStart) })
+    state = run(state, commands.backspace(inReply, join), ids)
+    expect(joined.n).toBe(1)
+    expect(state.doc.eq(doc)).toBe(true)
+    state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, promptEnd)))
+    state = run(state, commands.del(join), ids)
+    expect(joined.n).toBe(2)
+    expect(state.doc.eq(doc)).toBe(true)
+  })
+
+  it('never joins inside one card', () => {
+    const { ids, doc } = pairOf('Write the opening.', 'First.\n\nSecond.')
+    const { joined, join } = withJoin()
+    const second = doc.child(0).nodeSize + 1 + doc.child(1).child(0).nodeSize + 1
+    let state = EditorState.create({ doc, selection: TextSelection.create(doc, second) })
+    state = run(state, commands.backspace(inReply, join), ids)
+    expect(joined.n).toBe(0)
+    expect(state.doc.child(1).childCount).toBe(1)
+  })
+
+  it('strikes across both cards as one edit, each card keeping its part', () => {
+    const { ids, doc } = pairOf('Write the opening.', 'The furnace had not gone out.')
+    const from = 1 + 1 + 'Write the '.length
+    const to = doc.child(0).nodeSize + 2 + 'The'.length
+    let state = EditorState.create({ doc })
+    state = apply(state, state.tr.delete(from, to).setMeta(INTENT, 'range'), ids)
+    const prompt = collectEdits(state.doc.child(0))
+    const reply = collectEdits(state.doc.child(1))
+    expect(prompt[0]).toMatchObject({ id: 240, struck: 'opening.' })
+    expect(reply[0]).toMatchObject({ id: 240, struck: 'The' })
+    expect(state.doc.childCount).toBe(2)
+  })
+
+  it('gives the words still standing of both, for the bar', () => {
+    const { ids, doc } = pairOf('Write the opening.', 'The furnace had not gone out.')
+    let state = EditorState.create({ doc })
+    const from = 1 + 1 + 'Write the '.length
+    state = apply(state, state.tr.insertText('ending', from, from + 'opening'.length), ids)
+    const words = []
+    state.doc.forEach((sec) => words.push(wordsOf(toBlocks(sec))))
+    expect(words).toEqual(['Write the ending.', 'The furnace had not gone out.'])
+  })
+
+  it('lists the lines of both cards, so each keeps an id of its own', () => {
+    const { doc } = pairOf('One.', 'Two.\n\nThree.')
+    expect(linesOf(doc).map((l) => l.node.textContent)).toEqual(['One.', 'Two.', 'Three.'])
   })
 })

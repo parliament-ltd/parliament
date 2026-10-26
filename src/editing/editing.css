@@ -1,58 +1,64 @@
 /* A reply edited in place (stage 11, piece 1; the editing spec; v5 mockup).
    Values from the token sheet. Inside a reply card the editor also carries
    .parliament-md, so text, tables, code and quotes look as they always have;
-   what is here is what the editor adds. */
+   what is here is what the editor adds. .p-text holds the lines: a reply's
+   own editor, or a card's part of the editor for a prompt and its reply. */
 @import '../styles/tokens.css';
 
 .p-edit .ProseMirror { outline: none; white-space: pre-wrap; word-wrap: break-word; border-radius: 6px; padding: 4px 6px; margin: -4px -6px; }
 .p-edit .ProseMirror:hover { background: rgba(25, 25, 25, .02); }
+/* The lines keep their spaces and wrap; the editor for a prompt and its reply
+   is cards around them, and keeps no outline or wash of its own. */
+.p-text { white-space: pre-wrap; word-wrap: break-word; outline: none; }
+.p-pair { white-space: normal; outline: none; }
+.p-pair .pm-section-content { min-height: 1em; }
 .p-edit .ProseMirror:focus-visible, .p-edit .ProseMirror.ProseMirror-focused { box-shadow: 0 0 0 1px var(--ch-border); }
 
 /* Headings sit under the page's own (h3 to h5), drawn as a reply's h1 to h3. */
-.p-edit .ProseMirror .pm-h1 { font-size: 1.15em; }
-.p-edit .ProseMirror .pm-h2 { font-size: 1.08em; }
-.p-edit .ProseMirror .pm-h3 { font-size: 1em; }
-.p-edit .ProseMirror blockquote p { margin: 0; }
+.p-text .pm-h1 { font-size: 1.15em; }
+.p-text .pm-h2 { font-size: 1.08em; }
+.p-text .pm-h3 { font-size: 1em; }
+.p-text blockquote p { margin: 0; }
 
 /* Lists: each item is a block of its own. */
-.p-edit .ProseMirror { counter-reset: n; }
-.p-edit .ProseMirror .pm-li { position: relative; padding-inline-start: 22px; margin: 0 0 .2em; }
-.p-edit .ProseMirror .pm-bullet::before { content: "•"; position: absolute; inset-inline-start: 6px; color: var(--ch-ink-3); }
-.p-edit .ProseMirror .pm-number { counter-increment: n; }
-.p-edit .ProseMirror :not(.pm-number) + .pm-number { counter-set: n 1; }
-.p-edit .ProseMirror .pm-number::before { content: counter(n) "."; position: absolute; inset-inline-start: 0; color: var(--ch-ink-3); font-variant-numeric: tabular-nums; }
-.p-edit .ProseMirror .pm-box { position: absolute; inset-inline-start: 1px; top: .35em; width: 12px; height: 12px; border: 1.2px solid var(--ch-ink-3); border-radius: 3px; cursor: pointer; }
-.p-edit .ProseMirror .pm-check[data-checked="true"] .pm-box { background: var(--ch-ink); border-color: var(--ch-ink); box-shadow: inset 0 0 0 2px var(--ch-surface); }
-.p-edit .ProseMirror .pm-check[data-checked="true"] .pm-lt { color: var(--ch-ink-3); }
+.p-text { counter-reset: n; }
+.p-text .pm-li { position: relative; padding-inline-start: 22px; margin: 0 0 .2em; }
+.p-text .pm-bullet::before { content: "•"; position: absolute; inset-inline-start: 6px; color: var(--ch-ink-3); }
+.p-text .pm-number { counter-increment: n; }
+.p-text :not(.pm-number) + .pm-number { counter-set: n 1; }
+.p-text .pm-number::before { content: counter(n) "."; position: absolute; inset-inline-start: 0; color: var(--ch-ink-3); font-variant-numeric: tabular-nums; }
+.p-text .pm-box { position: absolute; inset-inline-start: 1px; top: .35em; width: 12px; height: 12px; border: 1.2px solid var(--ch-ink-3); border-radius: 3px; cursor: pointer; }
+.p-text .pm-check[data-checked="true"] .pm-box { background: var(--ch-ink); border-color: var(--ch-ink); box-shadow: inset 0 0 0 2px var(--ch-surface); }
+.p-text .pm-check[data-checked="true"] .pm-lt { color: var(--ch-ink-3); }
 
 /* A table or a chart is one block for now (C58): its edges show on hover,
    and when it is selected a line says what that means (C208). */
-.p-edit .ProseMirror .pm-table, .p-edit .ProseMirror .pm-chart { overflow-x: auto; margin: 0 -7px .75em; padding: 6px; border: 1px dashed transparent; border-radius: 6px; cursor: default; }
-.p-edit .ProseMirror .pm-table:hover, .p-edit .ProseMirror .pm-chart:hover { border-color: var(--ch-border); }
-.p-edit .ProseMirror .pm-table.ProseMirror-selectednode, .p-edit .ProseMirror .pm-chart.ProseMirror-selectednode { border: 1px solid var(--ch-focus-ink); outline: none; }
-.p-edit .ProseMirror .ProseMirror-selectednode.pm-table::after, .p-edit .ProseMirror .ProseMirror-selectednode.pm-chart::after { content: "One block for now: Backspace strikes it whole, Enter starts a line after it. Editing inside comes later."; display: block; margin-top: 6px; font-size: 12px; font-style: italic; color: var(--ch-marg); }
-.p-edit .ProseMirror figcaption { font-size: 12px; font-style: italic; color: var(--ch-marg); }
-.p-edit .ProseMirror .ProseMirror-selectednode { outline: 1px solid var(--ch-focus-ink); outline-offset: 2px; border-radius: 3px; }
+.p-text .pm-table, .p-text .pm-chart { overflow-x: auto; margin: 0 -7px .75em; padding: 6px; border: 1px dashed transparent; border-radius: 6px; cursor: default; }
+.p-text .pm-table:hover, .p-text .pm-chart:hover { border-color: var(--ch-border); }
+.p-text .pm-table.ProseMirror-selectednode, .p-text .pm-chart.ProseMirror-selectednode { border: 1px solid var(--ch-focus-ink); outline: none; }
+.p-text .ProseMirror-selectednode.pm-table::after, .p-text .ProseMirror-selectednode.pm-chart::after { content: "One block for now: Backspace strikes it whole, Enter starts a line after it. Editing inside comes later."; display: block; margin-top: 6px; font-size: 12px; font-style: italic; color: var(--ch-marg); }
+.p-text figcaption { font-size: 12px; font-style: italic; color: var(--ch-marg); }
+.p-text .ProseMirror-selectednode { outline: 1px solid var(--ch-focus-ink); outline-offset: 2px; border-radius: 3px; }
 
 /* The marks an edit leaves: each with its own line, not colour alone. */
-.p-edit .ProseMirror del.pm-struck { color: var(--ch-ink-3); text-decoration: line-through; text-decoration-color: var(--ch-ink-2); }
-.p-edit .ProseMirror del.pm-blk { display: block; text-decoration: none; border-inline-start: 2px solid var(--ch-ink-3); padding-inline-start: 10px; margin: 0 0 .75em; }
-.p-edit .ProseMirror del.pm-blk::before { content: "Struck as a whole"; display: block; font-size: 12px; font-style: italic; color: var(--ch-marg); margin-bottom: 4px; }
-.p-edit .ProseMirror del.pm-blk > * { opacity: .55; margin-bottom: 0; }
-.p-edit .ProseMirror del.pm-blk :is(td, th, figcaption) { text-decoration: line-through; text-decoration-color: var(--ch-ink-2); }
-.p-edit .ProseMirror ins.pm-added { color: var(--ch-you); text-decoration: underline; text-decoration-color: var(--ch-you); text-underline-offset: 3px; }
+.p-text del.pm-struck { color: var(--ch-ink-3); text-decoration: line-through; text-decoration-color: var(--ch-ink-2); }
+.p-text del.pm-blk { display: block; text-decoration: none; border-inline-start: 2px solid var(--ch-ink-3); padding-inline-start: 10px; margin: 0 0 .75em; }
+.p-text del.pm-blk::before { content: "Struck as a whole"; display: block; font-size: 12px; font-style: italic; color: var(--ch-marg); margin-bottom: 4px; }
+.p-text del.pm-blk > * { opacity: .55; margin-bottom: 0; }
+.p-text del.pm-blk :is(td, th, figcaption) { text-decoration: line-through; text-decoration-color: var(--ch-ink-2); }
+.p-text ins.pm-added { color: var(--ch-you); text-decoration: underline; text-decoration-color: var(--ch-you); text-underline-offset: 3px; }
 /* A hair of space where struck and added words meet, drawn only: the text has none. */
-.p-edit .ProseMirror del.pm-struck + ins.pm-added, .p-edit .ProseMirror ins.pm-added + del.pm-struck { margin-inline-start: .22em; }
+.p-text del.pm-struck + ins.pm-added, .p-text ins.pm-added + del.pm-struck { margin-inline-start: .22em; }
 
 /* Said to a screen reader at the edges of a mark: real words, unseen. */
-.p-edit .ProseMirror .pm-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.p-text .pm-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* Highlights and quoted passages, drawn over the words as before. */
-.p-edit .ProseMirror .pm-hl { border-radius: 2px; padding: 0 1px; }
+.p-text .pm-hl { border-radius: 2px; padding: 0 1px; }
 
 /* clean: the result only, read-only (editing spec, markup · clean). */
-.p-edit.clean .ProseMirror del { display: none; }
-.p-edit.clean .ProseMirror ins.pm-added { color: inherit; text-decoration: none; }
+.clean .p-text del { display: none; }
+.clean .p-text ins.pm-added { color: inherit; text-decoration: none; }
 
 /* A line under the reply that says why a key did nothing. */
 .p-edit-said { min-height: 0; margin-top: 6px; font-size: 12px; font-style: italic; color: var(--ch-marg); }

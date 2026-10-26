@@ -636,6 +636,15 @@ msgid "chat.answeredFrom"
 msgstr "回答来自 {source}"
 
 #. js-lingui-explicit-id
+msgid "chat.askAgain"
+msgstr ""
+
+#. Writes again: into the bar; {next} is the new branch, like 201d
+#. js-lingui-explicit-id
+msgid "chat.askAgainAs"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.askedAs"
 msgstr "以{language}提问：“{text}”"
 
@@ -687,6 +696,23 @@ msgstr "{count, plural, other {附带来自 {sources} 的回答，作为来源�
 #. js-lingui-explicit-id
 msgid "chat.instructionLike"
 msgstr "含有读起来像是给模型的指令的文字：{phrases}。仅作为文本显示，绝不执行"
+
+#. js-lingui-explicit-id
+msgid "chat.joinedToBar"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.pairLabel"
+msgstr ""
+
+#. Under a prompt edited in place; {address} is its branch, like 201a
+#. js-lingui-explicit-id
+msgid "chat.promptEdited"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.promptEditedOthers"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "chat.quote"
