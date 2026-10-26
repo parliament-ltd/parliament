@@ -81,3 +81,25 @@ describe('the three orders (C144 (e))', () => {
     expect(show(sequenceOf(cards, c, 'date', { asc: true }))).toEqual([210, 211, 212])
   })
 })
+
+describe('edits and asks (stage 11, piece 5; C220)', () => {
+  const change = (num, kind, chatId, extra = {}) => ({ num, kind, id: `m:${num}`, store: kind === 'edit' ? 'edits' : 'asks', chatId, text: '', createdAt: `2026-10-${num - 220}T10:00:00Z`, tags: [], change: { kind, mark: `x${num}` }, ...extra })
+  const more = [
+    ...rows,
+    { num: 205, kind: 'chat', id: 'chat-205', chatId: 'chat-205', title: 'Barn owl b', docketNum: 203 },
+    change(242, 'edit', 'chat-202', { chatNum: 202 }),
+    change(243, 'ask', 'chat-204', { chatNum: 204, docketNum: 203, branch: 'a' }),
+    change(244, 'edit', 'chat-205', { chatNum: 205, docketNum: 203, branch: 'b' }),
+  ]
+  it('come with a held chat or plan, from every room, with their own tabs', () => {
+    const { cards } = cardsOf(coll([chatItem, planItem]), more)
+    expect(cards.filter((c) => c.change).map((c) => [c.num, c.kind])).toEqual([[242, 'edit'], [243, 'ask'], [244, 'edit']])
+    expect(tabCounts(cards)).toMatchObject({ edit: 2, ask: 1 })
+  })
+  it('group by branch under their plan, by source', () => {
+    const c = coll([chatItem, planItem])
+    const { cards, sources } = cardsOf(c, more)
+    const groups = sequenceOf(cards, c, 'source', { sources }).filter((e) => e.group).map((e) => `${e.group.kind}:${e.group.num}${e.group.branch ?? ''}`)
+    expect(groups).toEqual(['chat:202', 'plan:203', 'branch:203a', 'branch:203b'])
+  })
+})

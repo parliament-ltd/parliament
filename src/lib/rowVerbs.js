@@ -36,7 +36,7 @@ const change = (row, set) => ({
  * (201b); a plan of one branch's chat, which stands for it (C127).
  * @returns {{ rows: object[] }|{ bad: { message: string, values?: object } }}
  */
-export function targetsOf(args, rows) {
+export function targetsOf(args, rows, { changes = false } = {}) {
   const out = []
   for (const a of flat(args)) {
     if (a.kind !== 'address' && a.kind !== 'number') return { bad: { message: 'byNumber' } }
@@ -45,6 +45,8 @@ export function targetsOf(args, rows) {
       ? rows.find((r) => r.kind === 'chat' && r.docketNum === num && r.branch === a.letter)
       : rows.find((r) => r.num === num) ?? rows.find((r) => r.kind === 'chat' && r.docketNum === num)
     if (!row) return { bad: { message: 'numNone', values: { num: a.text ?? String(num) } } }
+    // Edits and asks are changed by their own commands (C220 (d)).
+    if (!changes && (row.kind === 'edit' || row.kind === 'ask')) return { bad: { message: 'changeNotThis', values: { num: String(num) } } }
     if (!out.includes(row)) out.push(row)
   }
   return { rows: out }

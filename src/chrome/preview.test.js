@@ -589,7 +589,7 @@ describe('the row verbs, copy: and undo: (stage 6, piece 3; C143, C134)', () => 
     expect(at('>undo:', { undo: 'pin:202' }).text).toBe('Enter takes back pin:202')
     expect(at('>undo:', { undo: 'pin:202' }).act).toEqual({ kind: 'undo' })
     expect(at('>undo:').text).toBe('Nothing to take back in this tab')
-    expect(at('>undo:242', { undo: 'pin:202' }).text).toBe('undo: is not built yet')
+    expect(at('>undo:242', { undo: 'pin:202' }).text).toBe('Nothing here has the number 242')
   })
 })
 

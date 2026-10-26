@@ -11,7 +11,9 @@
 
 import { itemKey, markKey, headKey } from './collections'
 
-const MARKS = new Set(['note', 'term', 'quote', 'highlight'])
+// Edits and asks too (stage 11, piece 5; C220): a held chat or plan shows
+// them, from every room it holds chats of (C220 (a1)).
+const MARKS = new Set(['note', 'term', 'quote', 'highlight', 'edit', 'ask'])
 const time = (iso) => {
   const t = Date.parse(iso ?? '')
   return Number.isFinite(t) ? t : 0
@@ -44,6 +46,8 @@ export function cardsOf(collection, rows, messages = new Map()) {
     createdAt: r.createdAt ?? null, tags: r.tags ?? [], via, gone: r.erasedFrom != null,
     // A note of its own: what it quotes beneath it, or what it summarizes (C145).
     quotes: r.quotes ?? [], summary: r.summarized ?? null, own: r.kind === 'note' && !r.chatId && r.erasedFrom == null,
+    // An edit or an ask: what it changed or asks, its state, and its branch (C220 (b), (c)).
+    change: r.change ?? null, branch: r.branch ?? null, docketNum: r.docketNum ?? null,
   })
   const goneCard = (key, what, num, via = null) => ({ key, kind: 'gone', what, num, text: '', chatNum: null, erasedFrom: null, createdAt: null, tags: [], via, gone: true })
   const sources = []
@@ -89,7 +93,7 @@ export function tabCounts(cards) {
 }
 
 /** The kinds a tab shows. A card for something erased shows only under All. */
-export const TABS = Object.freeze(['all', 'highlight', 'term', 'quote', 'note', 'message'])
+export const TABS = Object.freeze(['all', 'edit', 'ask', 'highlight', 'term', 'quote', 'note', 'message'])
 
 /**
  * The cards in an order, with the headings and group labels between them.
@@ -108,18 +112,25 @@ export function sequenceOf(cards, collection, sort = 'yours', { asc = false, sou
   if (sort === 'source') {
     const groups = []
     const order = sources.map((s) => `${s.kind}:${s.num}`)
-    const groupOf = (c) => (c.via ? `${c.via.kind}:${c.via.num}` : c.kind === 'message' ? `chat:${c.chatNum}` : 'added')
+    // A plan's cards by branch, under the plan (C220 (i)).
+    const groupOf = (c) => (c.via?.kind === 'plan' && c.branch ? `branch:${c.via.num}:${c.branch}`
+      : c.via ? `${c.via.kind}:${c.via.num}` : c.kind === 'message' ? `chat:${c.chatNum}` : 'added')
     for (const c of cards) {
       const g = groupOf(c)
       let entry = groups.find((x) => x.key === g)
       if (!entry) { entry = { key: g, cards: [] }; groups.push(entry) }
       entry.cards.push(c)
     }
-    const rank = (g) => (order.includes(g.key) ? order.indexOf(g.key) : g.key === 'added' ? Infinity : order.length)
-    groups.sort((a, b) => rank(a) - rank(b))
+    const planOf = (key) => (key.startsWith('branch:') ? `plan:${key.split(':')[1]}` : key)
+    const rank = (g) => {
+      const k = planOf(g.key)
+      return order.includes(k) ? order.indexOf(k) : g.key === 'added' ? Infinity : order.length
+    }
+    const isBranch = (g) => (g.key.startsWith('branch:') ? 1 : 0)
+    groups.sort((a, b) => rank(a) - rank(b) || isBranch(a) - isBranch(b) || a.key.localeCompare(b.key))
     return groups.flatMap((g) => {
-      const [kind, num] = g.key === 'added' ? ['added', null] : g.key.split(':')
-      return [{ group: { kind, num: num == null || num === 'null' ? null : Number(num) } }, ...g.cards.map((card) => ({ card, under: underOf(collection, card.key) }))]
+      const [kind, num, branch] = g.key === 'added' ? ['added', null, null] : g.key.split(':')
+      return [{ group: { kind, num: num == null || num === 'null' ? null : Number(num), branch: branch ?? null } }, ...g.cards.map((card) => ({ card, under: underOf(collection, card.key) }))]
     })
   }
   // Your order: the order kept, then what is not in it yet, oldest first.

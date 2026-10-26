@@ -537,6 +537,28 @@
 .ch-mk-qs > div { font: italic 400 12px/1.45 var(--ch-serif); color: var(--ch-ink-2); padding-inline-start: 8px; border-inline-start: 1.5px solid var(--ch-soft); white-space: pre-wrap; }
 .ch-mk-qs > div.ck-term { border-inline-start-color: var(--ch-kind-high); }
 .ch-mk-qs > div.gone { border-inline-start-style: dashed; }
+/* Edits and asks as cards (stage 11, piece 5; C220; inline editing v5). */
+.ch-mk.ck-edit .ch-mk-body { border-inline-start: 2px solid var(--ch-you); padding-inline-start: 9px; }
+.ch-mk.ck-ask .ch-mk-body { border-inline-start: 2px solid var(--ch-ai); padding-inline-start: 9px; }
+.ch-mk.held .ch-mk-body { border-inline-start-style: dashed; }
+.ch-ed { font: 400 13px/1.55 var(--ch-serif); color: var(--ch-ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+.ch-ed s { color: var(--ch-ink-3); }
+.ch-ed ins { color: var(--ch-you); text-decoration: underline; text-decoration-color: var(--ch-you); text-underline-offset: 3px; }
+.ch-ed-arrow { margin: 0 5px; font: 11px var(--ch-sans); color: var(--ch-ink-3); }
+.ch-ed-gone { color: var(--ch-ink-3); font-style: italic; }
+.ch-ask-on { font: italic 400 11.5px/1.45 var(--ch-serif); color: var(--ch-ink-2); margin-bottom: 3px; white-space: pre-wrap; }
+.ch-ask-q { font: 400 12.5px/1.5 var(--ch-sans); color: var(--ch-ink); white-space: pre-wrap; }
+.ch-ask-a { margin-top: 5px; font: 400 13px/1.5 var(--ch-serif); color: var(--ch-ai); text-decoration: underline dotted; text-decoration-color: var(--ch-ai); text-underline-offset: 3px; white-space: pre-wrap; }
+.ch-mk-st { color: var(--ch-ink); }
+.ch-col-markup { margin-inline-start: auto; display: inline-flex; gap: 6px; align-items: baseline; }
+.ch-shell .ch-col-markup button.on { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+.ch-col-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 4px 0 2px; font-style: italic; }
+.ch-col-legend s { color: var(--ch-ink-3); }
+.ch-col-legend ins { text-decoration: none; }
+.ch-col-legend ins.l-you { color: var(--ch-you); text-decoration: underline; text-underline-offset: 2px; }
+.ch-col-legend ins.l-ai { color: var(--ch-ai); text-decoration: underline dotted; text-underline-offset: 2px; }
+.ch-col-nothere { margin: 4px 0 2px; }
+.ch-shell .ch-col-nothere button { padding: 0; color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; font-family: var(--ch-mono, monospace); }
 .ch-mk-qs .c-id { margin-inline-start: 6px; font-style: normal; }
 .ch-collection > .ch-col-acts { border-top: 1px solid var(--ch-divider); padding: 8px 16px 10px; }
 .ch-col-scope { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; min-height: 18px; }

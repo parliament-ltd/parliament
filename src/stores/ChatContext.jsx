@@ -710,6 +710,12 @@ export function ChatProvider({ children }) {
     return counts
   }, [])
 
+  // A stored form changed from outside its reply (undo:242, accept:203 and
+  // the rest; piece 5, C220 (d)): the chat on screen draws it.
+  const showStoredBlocks = useCallback((conversationId, messageId, blocks) => {
+    updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, blocks } : m)))
+  }, [])
+
   // Continue from an interrupted (ghost text) message in the open chat
   // systemPrompt: optional string from collaboration mode presets + custom instruction
   // With several rooms open, the room says which chat (C175 (a)); else the open chat.
@@ -872,6 +878,7 @@ export function ChatProvider({ children }) {
       veilFor,
       keepTranslation,
       saveEditedReply,
+      showStoredBlocks,
       continueMessage,
       stopGenerating,
       leaveConversation,

@@ -31,7 +31,7 @@ import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, namesFrom, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
 import { planReply, planLanguage, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
 import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
-import { planHoldEdits, planAsk } from '../lib/editVerbs'
+import { planHoldEdits, planAsk, planUndoChange, planSettle, planDropAsks } from '../lib/editVerbs'
 import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
@@ -56,7 +56,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -168,6 +168,9 @@ function planDeleteStep(a, step, screens = {}) {
   if (!vals.length || (vals.length === 1 && vals[0].kind === 'word' && vals[0].value === 'everything')) {
     return { says: { message: 'deleteEverything', values: { board: 'settings' } }, next: planOpenSettings(a, 'data').next }
   }
+  // delete:203, an ask not yet sent (C220 (d)).
+  const asks = planDropAsks(step, screens)
+  if (asks) return asks
   const unsent = planDeleteUnsent(step, screens)
   if (unsent) return unsent
   const p = planErase(vals, screens.records?.rows ?? [])
@@ -177,7 +180,8 @@ function planDeleteStep(a, step, screens = {}) {
 
 /** undo: takes back the last command line of this tab (C134). undo:242, one edit, comes with editing. */
 function planUndo(a, step, screens = {}) {
-  if ((step.match?.values ?? []).length) return null
+  // undo:242, one edit (stage 11, piece 5; C220 (d)).
+  if ((step.match?.values ?? []).length) return planUndoChange(step, screens)
   if (screens.undo) return { says: { message: 'undoLine', values: { line: screens.undo } }, act: { kind: 'undo' } }
   // Nothing left to take back since a run started: undo stops there (almanac spec §5).
   if (screens.undoFence) return { says: { message: 'undoAtRun', values: screens.undoFence }, act: null }
@@ -520,9 +524,12 @@ function planThinking(a, step, screens = {}) {
 
 /** markup:on / markup:off: replies marked up, or clean (stage 11, piece 1). screens.markup: { on }, on by default. */
 function planMarkup(a, step, screens = {}) {
-  const on = screens.markup?.on !== false
   const want = step.match?.values?.[0]?.value === 'on'
-  if (want === on) return { says: { message: 'markupSame', values: { on: on ? 'on' : 'off' } }, act: null }
+  // markup:off col, or on the Collection: the Collection's own (C220 (g)).
+  const col = step.match?.values?.[1]?.value === 'col' || a.addressed === 'collection'
+  const on = col ? screens.collectionMarkup?.on !== false : screens.markup?.on !== false
+  if (want === on) return { says: { message: col ? 'markupColSame' : 'markupSame', values: { on: on ? 'on' : 'off' } }, act: null }
+  if (col) return { says: { message: want ? 'markupColOn' : 'markupColOff' }, act: { kind: 'markup', col: true, on: want, before: on } }
   return { says: { message: want ? 'markupOn' : 'markupOff' }, act: { kind: 'markup', on: want, before: on } }
 }
 
@@ -724,6 +731,9 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       markup: planMarkup,
       // ask: (stage 11, piece 4; C218 (a)).
       ask: (a1, s1) => planAsk(s1),
+      // accept: and reject: on answered asks (piece 5; C220 (d)); Ripple's suggestions join in stage 12.
+      accept: (a1, s1, sc) => planSettle(s1, sc, 'accept'),
+      reject: (a1, s1, sc) => planSettle(s1, sc, 'reject'),
       reply: (a1, s1, sc) => planReply(s1, sc),
       language: (a1, s1, sc) => planLanguage(s1, sc),
       helper: (a1, s1, sc) => planHelper(s1, sc),

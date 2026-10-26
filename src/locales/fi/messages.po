@@ -879,6 +879,10 @@ msgstr "Kirjoitettu kehyksin: {names}"
 msgid "cited.heading"
 msgstr "Lähteet, joihin se viittasi"
 
+#. js-lingui-explicit-id
+msgid "collection.acceptAnswer"
+msgstr ""
+
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
 msgid "collection.actHelp"
@@ -917,6 +921,38 @@ msgid "collection.actTag"
 msgstr "Tunniste"
 
 #. js-lingui-explicit-id
+msgid "collection.askAccepted"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAnswered"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAnsweredBy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAnsweredHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAsked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAtPoint"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askTakenBack"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.by"
 msgstr "lajittelu"
 
@@ -929,8 +965,28 @@ msgid "collection.cardFrom"
 msgstr "keskustelusta {num}"
 
 #. js-lingui-explicit-id
+msgid "collection.changeHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.changeInto"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.changeSent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.changeWaits"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.chats"
 msgstr "Keskustelut"
+
+#. js-lingui-explicit-id
+msgid "collection.cleanWord"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.count"
@@ -939,6 +995,14 @@ msgstr "{count, plural, =0 {ei mitään} one {# kortti} other {# korttia}}"
 #. js-lingui-explicit-id
 msgid "collection.date"
 msgstr "päiväys"
+
+#. js-lingui-explicit-id
+msgid "collection.dropAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.editWhere"
+msgstr ""
 
 #. add: stays English
 #. js-lingui-explicit-id
@@ -967,6 +1031,10 @@ msgid "collection.findHelp"
 msgstr "Etsii sen keskustelustaan"
 
 #. js-lingui-explicit-id
+msgid "collection.findHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.from"
 msgstr "peräisin"
 
@@ -983,6 +1051,10 @@ msgid "collection.groupAdded"
 msgstr "Lisätty yksitellen"
 
 #. js-lingui-explicit-id
+msgid "collection.groupBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.groupChat"
 msgstr "Keskustelu {num}"
 
@@ -991,8 +1063,44 @@ msgid "collection.groupPlan"
 msgstr "Suunnitelma {num}"
 
 #. js-lingui-explicit-id
+msgid "collection.holdBack"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendBlue"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendBlueIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendGreen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendGreenIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendStruck"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendStruckIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.letGo"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.line"
 msgstr "Kokoelmat"
+
+#. js-lingui-explicit-id
+msgid "collection.markupWord"
+msgstr ""
 
 #. new:collection stays English
 #. js-lingui-explicit-id
@@ -1002,6 +1110,10 @@ msgstr "Ei vielä kokoelmia. new:collection luo sellaisen."
 #. js-lingui-explicit-id
 msgid "collection.noneMatch"
 msgstr "Tässä kokoelmassa ei ole osumia."
+
+#. js-lingui-explicit-id
+msgid "collection.notHeldHere"
+msgstr ""
 
 #. open: stays English
 #. js-lingui-explicit-id
@@ -1025,6 +1137,16 @@ msgstr "Suunnitelmat"
 #. js-lingui-explicit-id
 msgid "collection.quotedGone"
 msgstr "{num}, ei enää täällä"
+
+#. An edit that only struck words, as it reads clean
+#. js-lingui-explicit-id
+msgid "collection.removed"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "collection.runs"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.select"
@@ -1060,6 +1182,14 @@ msgid "collection.tabAll"
 msgstr "Kaikki"
 
 #. js-lingui-explicit-id
+msgid "collection.tabAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabEdit"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.tabHighlight"
 msgstr "Korostukset"
 
@@ -1082,6 +1212,14 @@ msgstr "Avainsanat"
 #. js-lingui-explicit-id
 msgid "collection.under"
 msgstr "otsikon {heading} alla"
+
+#. js-lingui-explicit-id
+msgid "collection.undoAnswer"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.undoEdit"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.untitled"
@@ -1443,6 +1581,15 @@ msgid "enter.byWhich"
 msgstr "{word} voi tarkoittaa: {names}. Kerro mikä, esimerkiksi {example}"
 
 #. js-lingui-explicit-id
+msgid "enter.changeGone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.changeNotThis"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.checkClean"
 msgstr "{name} ei löydä siitä mitään, mikä yrittäisi ohjata mallia. Tarkistus on varoitus, ei koskaan takuu"
 
@@ -1709,6 +1856,16 @@ msgstr "Poista se, mitä ei ole lähetetty, omalla rivillään"
 
 #. Commands stay English
 #. js-lingui-explicit-id
+msgid "enter.deleteAsks"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteAskSent"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
 msgid "enter.deleteBranch"
 msgstr "Enter poistaa haaran {address}, jota ei ole koskaan ajettu, suunnitelman {num} kaikista ajoista. undo: tuo sen takaisin"
 
@@ -1726,6 +1883,11 @@ msgstr "Suunnitelma {num} on poistettu. undo: tuo sen takaisin"
 #. js-lingui-explicit-id
 msgid "enter.deletedStep"
 msgstr "Haaran {address} vaihe {index} on poistettu. undo: tuo sen takaisin"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteEditUse"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.deleteEverything"
@@ -2314,6 +2476,18 @@ msgstr "{count, plural, one {{nums} jäi ajamatta: sen ehto ei täyttynyt} other
 #. js-lingui-explicit-id
 msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {jos mitään ei löydy} failed {jos edellinen epäonnistuu} always {edellisestä riippumatta} other {kun edellinen on valmis}}"
+
+#. js-lingui-explicit-id
+msgid "enter.markupColOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.markupColOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.markupColSame"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.markupOff"
@@ -3680,6 +3854,32 @@ msgstr "Enter poistaa uusien keskustelujen nimeämisen käytöstä: uusi keskust
 msgid "enter.setTitleOn"
 msgstr "Enter ottaa käyttöön uusien keskustelujen nimeämisen: keskustelun ensimmäisen vastauksen jälkeen yksi pieni pyyntö nimeää sen"
 
+#. js-lingui-explicit-id
+msgid "enter.settleAccept"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.settleCardOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleNoneHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleNotAnswered"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.settleNotAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleReject"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.setUnknown"
@@ -4038,12 +4238,31 @@ msgstr "Taulussa {board} type: hyväksyy yhden näistä: keyword, quote, note ta
 
 #. Commands stay English
 #. js-lingui-explicit-id
+msgid "enter.undoAskAnswered"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoAskUse"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
 msgid "enter.undoAtRun"
 msgstr "Suunnitelman {num} ajo {run} on alkanut, ja kumoaminen pysähtyy siihen. Voit yhä muuttaa suunnitelmaa: new:run suunnittelee sen uudelleen"
 
 #. js-lingui-explicit-id
 msgid "enter.undoChanged"
 msgstr "Kohteita on muutettu sen jälkeen ({nums}), joten undo: pysähtyy tähän"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoEditOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.undoEditTold"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.undoFailed"
@@ -4056,6 +4275,11 @@ msgstr "Enter kumoaa: {line}"
 #. js-lingui-explicit-id
 msgid "enter.undone"
 msgstr "Kumottu: {line}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoNotEdit"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.undoNothing"

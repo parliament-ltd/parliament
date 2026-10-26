@@ -95,7 +95,16 @@ export function asksPlugin({ onSettle, words = { ask: 'ask', accept: 'accept', u
     box.className = `pm-ask-marker${answered ? ' answered' : ''}`
     box.contentEditable = 'false'
     box.setAttribute('data-ask', id)
-    box.append(document.createTextNode(info?.num ? `${words.ask} ${info.num}` : words.ask))
+    // "ask 241" finds its card on the Collection (C220 (f)).
+    if (info?.num) {
+      const find = document.createElement('button')
+      find.type = 'button'
+      find.className = 'pm-ask-find'
+      find.textContent = `${words.ask} ${info.num}`
+      find.addEventListener('mousedown', (e) => e.preventDefault())
+      find.addEventListener('click', () => window.dispatchEvent(new CustomEvent('parliament-find-card', { detail: { num: info.num } })))
+      box.append(find)
+    } else box.append(document.createTextNode(words.ask))
     if (answered) {
       const button = (label, how) => {
         const b = document.createElement('button')

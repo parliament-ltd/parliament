@@ -879,6 +879,10 @@ msgstr ""
 msgid "cited.heading"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "collection.acceptAnswer"
+msgstr ""
+
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
 msgid "collection.actHelp"
@@ -917,6 +921,38 @@ msgid "collection.actTag"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "collection.askAccepted"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAnswered"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAnsweredBy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAnsweredHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAsked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAtPoint"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askTakenBack"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.by"
 msgstr ""
 
@@ -929,7 +965,27 @@ msgid "collection.cardFrom"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "collection.changeHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.changeInto"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.changeSent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.changeWaits"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.chats"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.cleanWord"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -938,6 +994,14 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.date"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.dropAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.editWhere"
 msgstr ""
 
 #. add: stays English
@@ -967,6 +1031,10 @@ msgid "collection.findHelp"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "collection.findHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.from"
 msgstr ""
 
@@ -983,6 +1051,10 @@ msgid "collection.groupAdded"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "collection.groupBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.groupChat"
 msgstr ""
 
@@ -991,7 +1063,43 @@ msgid "collection.groupPlan"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "collection.holdBack"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendBlue"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendBlueIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendGreen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendGreenIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendStruck"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendStruckIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.letGo"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.line"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.markupWord"
 msgstr ""
 
 #. new:collection stays English
@@ -1001,6 +1109,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.noneMatch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.notHeldHere"
 msgstr ""
 
 #. open: stays English
@@ -1024,6 +1136,16 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.quotedGone"
+msgstr ""
+
+#. An edit that only struck words, as it reads clean
+#. js-lingui-explicit-id
+msgid "collection.removed"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "collection.runs"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1060,6 +1182,14 @@ msgid "collection.tabAll"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "collection.tabAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabEdit"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.tabHighlight"
 msgstr ""
 
@@ -1081,6 +1211,14 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.under"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.undoAnswer"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.undoEdit"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1443,6 +1581,15 @@ msgid "enter.byWhich"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.changeGone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.changeNotThis"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.checkClean"
 msgstr ""
 
@@ -1709,6 +1856,16 @@ msgstr ""
 
 #. Commands stay English
 #. js-lingui-explicit-id
+msgid "enter.deleteAsks"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteAskSent"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
 msgid "enter.deleteBranch"
 msgstr ""
 
@@ -1725,6 +1882,11 @@ msgstr ""
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.deletedStep"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteEditUse"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -2313,6 +2475,18 @@ msgstr ""
 #. When one of several sent one after another runs
 #. js-lingui-explicit-id
 msgid "enter.manyWhen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.markupColOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.markupColOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.markupColSame"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3680,6 +3854,32 @@ msgstr ""
 msgid "enter.setTitleOn"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.settleAccept"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.settleCardOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleNoneHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleNotAnswered"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.settleNotAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleReject"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.setUnknown"
@@ -4038,11 +4238,30 @@ msgstr ""
 
 #. Commands stay English
 #. js-lingui-explicit-id
+msgid "enter.undoAskAnswered"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoAskUse"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
 msgid "enter.undoAtRun"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.undoChanged"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoEditOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.undoEditTold"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4055,6 +4274,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.undone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoNotEdit"
 msgstr ""
 
 #. js-lingui-explicit-id

@@ -879,6 +879,10 @@ msgstr "Skrivet enligt {names}"
 msgid "cited.heading"
 msgstr "Citerade källor"
 
+#. js-lingui-explicit-id
+msgid "collection.acceptAnswer"
+msgstr ""
+
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
 msgid "collection.actHelp"
@@ -917,6 +921,38 @@ msgid "collection.actTag"
 msgstr "Tagga"
 
 #. js-lingui-explicit-id
+msgid "collection.askAccepted"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAnswered"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAnsweredBy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAnsweredHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAsked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAtPoint"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askTakenBack"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.by"
 msgstr "efter"
 
@@ -929,8 +965,28 @@ msgid "collection.cardFrom"
 msgstr "från {num}"
 
 #. js-lingui-explicit-id
+msgid "collection.changeHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.changeInto"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.changeSent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.changeWaits"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.chats"
 msgstr "Chattar"
+
+#. js-lingui-explicit-id
+msgid "collection.cleanWord"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.count"
@@ -939,6 +995,14 @@ msgstr "{count, plural, =0 {inget} one {# kort} other {# kort}}"
 #. js-lingui-explicit-id
 msgid "collection.date"
 msgstr "datum"
+
+#. js-lingui-explicit-id
+msgid "collection.dropAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.editWhere"
+msgstr ""
 
 #. add: stays English
 #. js-lingui-explicit-id
@@ -967,6 +1031,10 @@ msgid "collection.findHelp"
 msgstr "Hittar den i sin chatt"
 
 #. js-lingui-explicit-id
+msgid "collection.findHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.from"
 msgstr "från"
 
@@ -983,6 +1051,10 @@ msgid "collection.groupAdded"
 msgstr "Tillagda en och en"
 
 #. js-lingui-explicit-id
+msgid "collection.groupBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.groupChat"
 msgstr "Chatt {num}"
 
@@ -991,8 +1063,44 @@ msgid "collection.groupPlan"
 msgstr "Plan {num}"
 
 #. js-lingui-explicit-id
+msgid "collection.holdBack"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendBlue"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendBlueIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendGreen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendGreenIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendStruck"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendStruckIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.letGo"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.line"
 msgstr "Samlingar"
+
+#. js-lingui-explicit-id
+msgid "collection.markupWord"
+msgstr ""
 
 #. new:collection stays English
 #. js-lingui-explicit-id
@@ -1002,6 +1110,10 @@ msgstr "Ingen samling än. new:collection skapar en."
 #. js-lingui-explicit-id
 msgid "collection.noneMatch"
 msgstr "Inget i samlingen matchar."
+
+#. js-lingui-explicit-id
+msgid "collection.notHeldHere"
+msgstr ""
 
 #. open: stays English
 #. js-lingui-explicit-id
@@ -1025,6 +1137,16 @@ msgstr "Planer"
 #. js-lingui-explicit-id
 msgid "collection.quotedGone"
 msgstr "{num}, finns inte längre"
+
+#. An edit that only struck words, as it reads clean
+#. js-lingui-explicit-id
+msgid "collection.removed"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "collection.runs"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.select"
@@ -1060,6 +1182,14 @@ msgid "collection.tabAll"
 msgstr "Alla"
 
 #. js-lingui-explicit-id
+msgid "collection.tabAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabEdit"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.tabHighlight"
 msgstr "Markeringar"
 
@@ -1082,6 +1212,14 @@ msgstr "Nyckelord"
 #. js-lingui-explicit-id
 msgid "collection.under"
 msgstr "under {heading}"
+
+#. js-lingui-explicit-id
+msgid "collection.undoAnswer"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.undoEdit"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.untitled"
@@ -1443,6 +1581,15 @@ msgid "enter.byWhich"
 msgstr "{word} kan vara {names}. Ange vilken, till exempel {example}"
 
 #. js-lingui-explicit-id
+msgid "enter.changeGone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.changeNotThis"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.checkClean"
 msgstr "{name} hittar inget i svaret som försöker instruera en modell. En kontroll är en varning, aldrig en garanti"
 
@@ -1709,6 +1856,16 @@ msgstr "Det som inte har skickats raderas på en egen rad"
 
 #. Commands stay English
 #. js-lingui-explicit-id
+msgid "enter.deleteAsks"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteAskSent"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
 msgid "enter.deleteBranch"
 msgstr "Enter raderar {address}, som aldrig har körts, ur alla körningar av plan {num}. undo: tar tillbaka den"
 
@@ -1726,6 +1883,11 @@ msgstr "Plan {num} har raderats. undo: tar tillbaka den"
 #. js-lingui-explicit-id
 msgid "enter.deletedStep"
 msgstr "Steg {index} i {address} har raderats. undo: tar tillbaka det"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteEditUse"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.deleteEverything"
@@ -2314,6 +2476,18 @@ msgstr "{count, plural, one {{nums} kördes inte: dess villkor uppfylldes inte} 
 #. js-lingui-explicit-id
 msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {om inget hittas} failed {om den föregående misslyckas} always {vad den föregående än gör} other {när den föregående är klar}}"
+
+#. js-lingui-explicit-id
+msgid "enter.markupColOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.markupColOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.markupColSame"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.markupOff"
@@ -3680,6 +3854,32 @@ msgstr "Enter stänger av namngivning av nya chattar: en ny chatt får sitt namn
 msgid "enter.setTitleOn"
 msgstr "Enter slår på namngivning av nya chattar: efter en chatts första svar ger en liten förfrågan den ett namn"
 
+#. js-lingui-explicit-id
+msgid "enter.settleAccept"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.settleCardOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleNoneHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleNotAnswered"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.settleNotAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleReject"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.setUnknown"
@@ -4038,12 +4238,31 @@ msgstr "I {board} tar type: en av keyword, quote, note eller highlight"
 
 #. Commands stay English
 #. js-lingui-explicit-id
+msgid "enter.undoAskAnswered"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoAskUse"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
 msgid "enter.undoAtRun"
 msgstr "Körning {run} av plan {num} har startat, och ångringen stannar där. Planen är fortfarande din att ändra: new:run planerar den på nytt"
 
 #. js-lingui-explicit-id
 msgid "enter.undoChanged"
 msgstr "{nums} har ändrats sedan dess, så undo: stannar här"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoEditOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.undoEditTold"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.undoFailed"
@@ -4056,6 +4275,11 @@ msgstr "Enter ångrar {line}"
 #. js-lingui-explicit-id
 msgid "enter.undone"
 msgstr "Ångrade {line}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoNotEdit"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.undoNothing"

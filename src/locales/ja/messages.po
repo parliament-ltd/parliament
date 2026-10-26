@@ -879,6 +879,10 @@ msgstr "方針：{names}"
 msgid "cited.heading"
 msgstr "参照した情報源"
 
+#. js-lingui-explicit-id
+msgid "collection.acceptAnswer"
+msgstr ""
+
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
 msgid "collection.actHelp"
@@ -917,6 +921,38 @@ msgid "collection.actTag"
 msgstr "タグ"
 
 #. js-lingui-explicit-id
+msgid "collection.askAccepted"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAnswered"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAnsweredBy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAnsweredHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAsked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askAtPoint"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.askTakenBack"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.by"
 msgstr "並べ替え"
 
@@ -929,8 +965,28 @@ msgid "collection.cardFrom"
 msgstr "{num}より"
 
 #. js-lingui-explicit-id
+msgid "collection.changeHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.changeInto"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.changeSent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.changeWaits"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.chats"
 msgstr "チャット"
+
+#. js-lingui-explicit-id
+msgid "collection.cleanWord"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.count"
@@ -939,6 +995,14 @@ msgstr "{count, plural, =0 {なし} other {カード#枚}}"
 #. js-lingui-explicit-id
 msgid "collection.date"
 msgstr "日付"
+
+#. js-lingui-explicit-id
+msgid "collection.dropAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.editWhere"
+msgstr ""
 
 #. add: stays English
 #. js-lingui-explicit-id
@@ -967,6 +1031,10 @@ msgid "collection.findHelp"
 msgstr "チャット内で探します"
 
 #. js-lingui-explicit-id
+msgid "collection.findHere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.from"
 msgstr "出典"
 
@@ -983,6 +1051,10 @@ msgid "collection.groupAdded"
 msgstr "個別に追加"
 
 #. js-lingui-explicit-id
+msgid "collection.groupBranch"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.groupChat"
 msgstr "チャット{num}"
 
@@ -991,8 +1063,44 @@ msgid "collection.groupPlan"
 msgstr "プラン{num}"
 
 #. js-lingui-explicit-id
+msgid "collection.holdBack"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendBlue"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendBlueIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendGreen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendGreenIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendStruck"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendStruckIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.letGo"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.line"
 msgstr "コレクション"
+
+#. js-lingui-explicit-id
+msgid "collection.markupWord"
+msgstr ""
 
 #. new:collection stays English
 #. js-lingui-explicit-id
@@ -1002,6 +1110,10 @@ msgstr "コレクションはまだありません。new:collection で作れま
 #. js-lingui-explicit-id
 msgid "collection.noneMatch"
 msgstr "このコレクションに一致するものはありません。"
+
+#. js-lingui-explicit-id
+msgid "collection.notHeldHere"
+msgstr ""
 
 #. open: stays English
 #. js-lingui-explicit-id
@@ -1025,6 +1137,16 @@ msgstr "プラン"
 #. js-lingui-explicit-id
 msgid "collection.quotedGone"
 msgstr "{num}（もうありません）"
+
+#. An edit that only struck words, as it reads clean
+#. js-lingui-explicit-id
+msgid "collection.removed"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "collection.runs"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.select"
@@ -1060,6 +1182,14 @@ msgid "collection.tabAll"
 msgstr "すべて"
 
 #. js-lingui-explicit-id
+msgid "collection.tabAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.tabEdit"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.tabHighlight"
 msgstr "ハイライト"
 
@@ -1082,6 +1212,14 @@ msgstr "キーワード"
 #. js-lingui-explicit-id
 msgid "collection.under"
 msgstr "{heading}の下"
+
+#. js-lingui-explicit-id
+msgid "collection.undoAnswer"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.undoEdit"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.untitled"
@@ -1443,6 +1581,15 @@ msgid "enter.byWhich"
 msgstr "{word} は{names}のいずれかを指します。{example} のように指定してください"
 
 #. js-lingui-explicit-id
+msgid "enter.changeGone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.changeNotThis"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.checkClean"
 msgstr "{name}の確認では、モデルに指示しようとする言葉は見つかりませんでした。確認は警告であって、保証ではありません"
 
@@ -1709,6 +1856,16 @@ msgstr "まだ送信していないものは、単独の行で削除してくだ
 
 #. Commands stay English
 #. js-lingui-explicit-id
+msgid "enter.deleteAsks"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteAskSent"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
 msgid "enter.deleteBranch"
 msgstr "Enterで、一度も実行していない{address}を、プラン{num}のすべての実行から削除します。undo: で元に戻せます"
 
@@ -1726,6 +1883,11 @@ msgstr "プラン{num}を削除しました。undo: で元に戻せます"
 #. js-lingui-explicit-id
 msgid "enter.deletedStep"
 msgstr "{address}のステップ{index}を削除しました。undo: で元に戻せます"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteEditUse"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.deleteEverything"
@@ -2314,6 +2476,18 @@ msgstr "{count, plural, other {{nums}は、条件を満たさなかったため�
 #. js-lingui-explicit-id
 msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {何も見つからなければ} failed {前のものが失敗したら} always {前のものの結果にかかわらず} other {前のものが終わったら}}"
+
+#. js-lingui-explicit-id
+msgid "enter.markupColOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.markupColOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.markupColSame"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.markupOff"
@@ -3680,6 +3854,32 @@ msgstr "Enterで、新しいチャットの名前付けをオフにします。�
 msgid "enter.setTitleOn"
 msgstr "Enterで、新しいチャットの名前付けをオンにします。チャットの最初の回答のあと、小さなリクエストを1回送って名前を付けます"
 
+#. js-lingui-explicit-id
+msgid "enter.settleAccept"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.settleCardOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleNoneHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleNotAnswered"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.settleNotAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleReject"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.setUnknown"
@@ -4038,12 +4238,31 @@ msgstr "{board}では、type: に keyword、quote、note、highlight のいず�
 
 #. Commands stay English
 #. js-lingui-explicit-id
+msgid "enter.undoAskAnswered"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoAskUse"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
 msgid "enter.undoAtRun"
 msgstr "プラン{num}の実行{run}は開始済みで、取り消しはそこで止まります。プランはまだ自由に変更できます：new:run で計画し直せます"
 
 #. js-lingui-explicit-id
 msgid "enter.undoChanged"
 msgstr "その後{nums}が変わったため、undo: はここで止まります"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoEditOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.undoEditTold"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.undoFailed"
@@ -4056,6 +4275,11 @@ msgstr "Enterで {line} を取り消します"
 #. js-lingui-explicit-id
 msgid "enter.undone"
 msgstr "{line} を取り消しました"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoNotEdit"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.undoNothing"

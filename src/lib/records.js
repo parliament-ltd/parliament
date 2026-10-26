@@ -706,6 +706,60 @@ export async function saveEditedMessage(db, messageId, { blocks, edits, asks = n
   })
 }
 
+/**
+ * A message's stored form and its edit and ask records, as they are now:
+ * what undo: puts back after a change made from outside the reply (stage 11,
+ * piece 5; C220 (d)). null when the message is not there.
+ */
+export async function messageSnapshot(db, messageId) {
+  if (!isV6(db)) return null
+  const message = await db.get('messages', messageId)
+  if (!message) return null
+  const mine = (list) => db.getAllFromIndex(list, 'conversationId', message.conversationId)
+    .then((rows) => rows.filter((r) => r.messageId === messageId))
+  const [edits, asks] = await Promise.all([mine('edits'), mine('asks')])
+  return { messageId, conversationId: message.conversationId, blocks: message.blocks ?? null, edits, asks }
+}
+
+/**
+ * Put a message back as a snapshot had it: its stored form, and its edits and
+ * asks with their numbers. Nothing is written, and Changed is thrown, when the
+ * stored form is no longer what the change left (expect).
+ * @param {import('idb').IDBPDatabase} db
+ * @param {{ messageId: string, conversationId: string, blocks: object[]|null, edits: object[], asks: object[] }} snap
+ * @param {object[]|null} expect the stored form as the change left it
+ * @param {number} [num] the number undo: names when it is refused
+ */
+export async function putMessageBack(db, snap, expect, num = null) {
+  if (!isV6(db)) throw new Error('Editing needs the version 6 database.')
+  return write(db, ['messages', 'conversations', 'edits', 'asks'], async (tx) => {
+    const message = await tx.objectStore('messages').get(snap.messageId)
+    if (!message || !same(message.blocks ?? null, expect ?? null)) throw new Changed(num != null ? [num] : [])
+    const delta = blocksSize(snap.blocks) - blocksSize(message.blocks)
+    await tx.objectStore('messages').put({ ...message, blocks: snap.blocks })
+    if (delta) {
+      const conv = await tx.objectStore('conversations').get(message.conversationId)
+      if (conv) await tx.objectStore('conversations').put({ ...conv, storageBytes: Math.max(0, (conv.storageBytes || 0) + delta) })
+    }
+    const changes = [{ kind: 'message', op: 'updated', id: snap.messageId }]
+    for (const [list, kind, had] of [['edits', 'edit', snap.edits], ['asks', 'ask', snap.asks]]) {
+      const store = tx.objectStore(list)
+      const now = (await store.index('conversationId').getAll(snap.conversationId)).filter((r) => r.messageId === snap.messageId)
+      const keep = new Set(had.map((r) => r.id))
+      for (const r of now) {
+        if (keep.has(r.id)) continue
+        await store.delete(r.id)
+        changes.push({ kind, op: 'removed', id: r.id, num: r.num })
+      }
+      for (const r of had) {
+        await store.put(r)
+        changes.push({ kind, op: 'updated', id: r.id, num: r.num })
+      }
+    }
+    return { result: true, changes }
+  })
+}
+
 // ── Row verbs (stage 6, piece 3; C143) ──────────────────
 
 // The stores a numbered row lives in, and the kind each announces.

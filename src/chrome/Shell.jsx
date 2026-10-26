@@ -65,7 +65,7 @@ import { ROW_GUESS } from './rowWindow'
 import { cardsOf, tabCounts, sequenceOf } from '../lib/collectionCards'
 import { searchTerms } from '../lib/recordsFilter'
 import CollectionBoard from './CollectionBoard'
-import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, planStep, changeStep, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack, removeStep, removePlanBranch, removePlan, createPlanChat, markStep as markRunStep, settleLeft } from '../lib/records'
+import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, planStep, changeStep, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack, removeStep, removePlanBranch, removePlan, createPlanChat, markStep as markRunStep, settleLeft, messageSnapshot, putMessageBack, saveEditedMessage, settleAskRecord } from '../lib/records'
 import { createRunner, runScope } from '../lib/runner'
 import { tabBus, withDocketLock } from '../lib/bus'
 import { showPlan, planKey, planPromptPreview } from '../lib/planVerbs'
@@ -76,6 +76,7 @@ import { dayOf } from './when'
 import { longDay } from './say'
 import { EMPTY_VIEW, applyView, nextView, viewLine, isAtRest } from '../lib/recordsFilter'
 import { onRecordsChanged } from '../lib/records'
+import { changeStored } from '../editing/storedChange'
 
 // The new shell (refactor-plan.md §4 and stages 3 and 4): the board strip,
 // the boards as the arrangement places them, the bar, and windows of their
@@ -423,6 +424,9 @@ export default function Shell() {
   // board then reads its room again.
   const [roomRev, setRoomRev] = useState(0)
 
+  // A stored form changed from outside its reply reaches the chat on screen (C220 (d)).
+  const { showStoredBlocks } = useChat()
+
   // ── The Almanac's rows (stage 5, piece 3) ─────────────
   // Everything numbered, read once the database is open and again whenever
   // something is stored, here or in another tab, or a room is named. They
@@ -608,7 +612,12 @@ export default function Shell() {
       const num = e.detail?.num
       if (!Number.isInteger(num)) return
       findCard(num)
-      if (!cardsNow.current.some((c) => c.num === num)) writeField(`>add:${num}`)
+      if (cardsNow.current.some((c) => c.num === num)) return
+      // An edit or ask comes into a collection with its chat (C220 (a)).
+      const row = numberedNow.current.get(num)
+      const change = row?.kind === 'edit' || row?.kind === 'ask'
+      if (change && row.chatNum == null) return
+      writeField(`>add:${change ? row.chatNum : num}`)
     }
     window.addEventListener('parliament-find-card', onFindCard)
     return () => window.removeEventListener('parliament-find-card', onFindCard)
@@ -894,7 +903,10 @@ export default function Shell() {
       const placed = planRoom(a, row.chatId)
       if (placed.next) { const refused = await run(placed.next, null); if (refused) return refused }
     }
-    flashWhenDrawn([`[data-quote-num="${num}"]`, row.messageId ? `[id="msg-${row.messageId}"]` : null])
+    // An edit's words, or an ask's marker (C220 (f)); else its message.
+    const mark = row.change?.mark && /^[\w-]{1,64}$/.test(row.change.mark) ? row.change.mark : null
+    const spot = !mark ? null : row.kind === 'edit' ? `ins[data-edit="${mark}"], del[data-edit="${mark}"]` : `.pm-ask-marker[data-ask="${mark}"], .pm-ask-point[data-ask="${mark}"]`
+    flashWhenDrawn([spot ?? `[data-quote-num="${num}"]`, row.messageId ? `[id="msg-${row.messageId}"]` : null])
     return null
   }, [run])
 
@@ -1206,6 +1218,31 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'storedChange') {
+      // undo:242, accept:203, reject:203, delete:203 (stage 11, piece 5;
+      // C220 (d)): each a change to a message's stored form and its records,
+      // made by the editor's own rules, and kept for undo:.
+      const done = []
+      for (const c of what.changes) {
+        const snap = await messageSnapshot(db.current, c.messageId).catch(() => null)
+        if (!snap) return { message: 'changeGone', values: { num: c.num } }
+        const settle = c.how === 'accept' ? 'accepted' : c.how === 'undo' || c.how === 'undoHere' ? 'taken back' : null
+        let blocks = snap.blocks
+        if (c.how !== 'undoHere') {
+          const next = changeStored(snap.blocks, c.how, c.mark)
+          if (!next) return { message: 'changeGone', values: { num: c.num } }
+          const asks = new Map([...next.asks].map(([id, a]) => [id, { ...a, question: snap.asks.find((r) => r.edit === id)?.question }]))
+          await saveEditedMessage(db.current, c.messageId, { blocks: next.blocks, edits: next.edits, asks })
+          blocks = next.blocks
+        }
+        if (settle) await settleAskRecord(db.current, `${c.messageId}:${c.mark}`, settle)
+        showStoredBlocks(c.conversationId ?? snap.conversationId, c.messageId, blocks)
+        done.push({ snap, after: blocks, num: c.num })
+      }
+      if (touched.current) touched.current.messages.push(...done)
+      remember(body)
+      return null
+    }
     if (what.kind === 'ask') {
       // ask: (stage 11, piece 4; C218 (a)): the reply last in focus opens its
       // ask box, or keeps the ask at once. The words stay on this device
@@ -1217,9 +1254,11 @@ export default function Shell() {
       return what.question ? { done: true, says: { message: 'askKept' } } : null
     }
     if (what.kind === 'markup') {
-      // markup:on / markup:off (stage 11, piece 1): replies marked up, or clean.
-      await updateSettingNow.current('markup', what.on ? 'on' : 'off')
-      if (touched.current) touched.current.setting = { key: 'markup', before: what.before ? 'on' : 'off' }
+      // markup:on / markup:off (stage 11, piece 1): replies marked up, or
+      // clean; with col, or on the Collection, its cards (piece 5; C220 (g)).
+      const key = what.col ? 'collectionMarkup' : 'markup'
+      await updateSettingNow.current(key, what.on ? 'on' : 'off')
+      if (touched.current) touched.current.setting = { key, before: what.before ? 'on' : 'off' }
       remember(body)
       return null
     }
@@ -1433,7 +1472,7 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'name'))
     remember(body)
     return null
-  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, exportFile, commit, loadConversations, createConversation, findCard, findPassage, findRow, holdNote, clearPicked, i18n, readOwn])
+  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, exportFile, commit, loadConversations, createConversation, findCard, findPassage, findRow, holdNote, clearPicked, i18n, readOwn, showStoredBlocks])
 
   // ── undo: (C134, as built) ────────────────────────────
   // Each command line that changes something is kept with what it changed,
@@ -1478,6 +1517,17 @@ export default function Shell() {
       }
       setCollections(await readCollections(db.current).catch(() => []))
     }
+    if (entry.messages) {
+      // A change to a stored form (C220 (d)): put back as it was, unless changed since.
+      try {
+        for (const m of [...entry.messages].reverse()) {
+          await putMessageBack(db.current, m.snap, m.after, m.num)
+          showStoredBlocks(m.snap.conversationId, m.snap.messageId, m.snap.blocks)
+        }
+      } catch (err) {
+        return stop(err?.name === 'Changed' ? { message: 'undoChanged', values: { nums: err.nums } } : 'undoFailed')
+      }
+    }
     if (entry.plans) {
       // A change to a plan (C198): each record as it was, unless changed since.
       try {
@@ -1519,12 +1569,12 @@ export default function Shell() {
     setUndoTop(undoStack.current.at(-1)?.line ?? null)
     remember(body)
     return { done: true, says: { message: 'undone', values: { line: entry.line } } }
-  }, [remember, run, showView, loadConversations, readOwn])
+  }, [remember, run, showView, loadConversations, readOwn, showStoredBlocks])
 
   const onRun = useCallback(async (next, body, go, what) => {
     if (what?.kind === 'undo') return undo(body)
     const before = { arrangement: current.current, view: viewNow.current }
-    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null, many: null, heldTo: null, plans: [] }
+    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null, many: null, heldTo: null, plans: [], messages: [] }
     const out = what ? await act(what, body, next) : await run(next, body)
     const t = touched.current
     touched.current = null
@@ -1549,6 +1599,7 @@ export default function Shell() {
     if (current.current !== before.arrangement) entry.arrangement = before.arrangement
     if (viewNow.current !== before.view) entry.view = before.view
     if (t.records.length) entry.records = t.records
+    if (t.messages.length) entry.messages = t.messages
     if (t.saved.length) entry.saved = t.saved
     if (t.collections.length) entry.collections = t.collections
     if (t.created.length) entry.created = t.created
@@ -1559,7 +1610,7 @@ export default function Shell() {
     if (t.many) entry.many = t.many
     if (t.heldTo) entry.heldTo = t.heldTo
     if (t.plans.length) entry.plans = t.plans
-    if (body && (entry.arrangement || entry.view || entry.records || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting || entry.many || entry.heldTo || entry.plans)) {
+    if (body && (entry.arrangement || entry.view || entry.records || entry.messages || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting || entry.many || entry.heldTo || entry.plans)) {
       undoStack.current = [...undoStack.current, entry].slice(-UNDO_MAX)
       setUndoTop(body)
     }
@@ -1628,6 +1679,29 @@ export default function Shell() {
   useMemo(() => setRegion('mistral', region), [region])
 
   const roomId = roomOnScreen(arrangement) // the chat in the space's room; null in an empty room; undefined with no room
+
+  // The Collection beside a room (C220 (a2)): when the bar moves to another
+  // room, a collection that holds its chat or plan is shown; the one on
+  // screen stays if it does, else the one changed last. None holding it:
+  // the one shown stays, and offers add: when the chat has edits or asks.
+  const roomChatRow = useMemo(() => (roomId ? (almanacRows ?? []).find((r) => r.kind === 'chat' && r.chatId === roomId) ?? null : null), [almanacRows, roomId])
+  const roomNotHeld = useMemo(() => {
+    if (!roomChatRow || !shownCollection) return null
+    if (roomChatRow.collections.includes(shownCollection.id)) return null
+    const changes = (almanacRows ?? []).some((r) => (r.kind === 'edit' || r.kind === 'ask') && r.chatId === roomId)
+    return changes ? roomChatRow.num : null
+  }, [roomChatRow, shownCollection, almanacRows, roomId])
+  const followedRoom = useRef(undefined)
+  useEffect(() => {
+    if (!roomChatRow || followedRoom.current === roomId) return
+    followedRoom.current = roomId
+    if (shownCollection && roomChatRow.collections.includes(shownCollection.id)) return
+    const holding = collections.filter((c) => roomChatRow.collections.includes(c.id))
+    if (!holding.length) return
+    const last = [...holding].sort((x, y) => String(y.updatedAt ?? '').localeCompare(String(x.updatedAt ?? '')))[0]
+    const a = current.current
+    commit({ ...a, context: { ...a.context, collection: last.id } })
+  }, [roomChatRow, roomId, shownCollection, collections, commit])
   const streaming = useIsStreaming(roomId ?? '')
   // The ink pot in the prompt field: draining while a reply arrives, then
   // refilled, or spilt if the reply was stopped or broke off (C114).
@@ -2257,7 +2331,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, heldEdits, ...languageScreens, branching, summarizing, including, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, heldEdits, languageScreens, branching, summarizing, including, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -2906,6 +2980,8 @@ export default function Shell() {
           onAddress={focusBoard} onWrite={writeField} onView={(change) => setCollectionView((v) => ({ ...v, ...change }))} onShow={onShowCollection}
           cards={collectionAll.cards} picked={pickedHere} onPick={onPick} onClearPicked={clearPicked}
           onFind={(num) => { findPassage(num) }} onPrompt={toPrompt} rowOf={(n) => numbered.get(n) ?? null}
+          clean={settings.collectionMarkup === 'off'} onRun={onPlanDelete} onFindChange={(num) => { findPassage(num) }}
+          nameOf={planModelName} notHeld={roomNotHeld}
         />
       )
     }

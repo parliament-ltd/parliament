@@ -122,7 +122,7 @@ export function planCompare(step, screens = {}) {
  */
 export function planJump(step, screens = {}, addressed = null) {
   const [arg] = step.match?.values ?? []
-  const t = targetsOf([arg], screens.records?.rows ?? [])
+  const t = targetsOf([arg], screens.records?.rows ?? [], { changes: true })
   if (t.bad) return { says: t.bad, act: null }
   const row = t.rows[0]
   if (addressed === 'collection') {
@@ -134,7 +134,7 @@ export function planJump(step, screens = {}, addressed = null) {
     return { says: { message: 'jumpCard', values: { num: row.num } }, act: { kind: 'find', num: row.num, to: 'card' } }
   }
   if (isRoom(addressed)) {
-    if (!WORDED.has(row.kind)) return { says: { message: 'jumpOpen', values: { num: row.num } }, act: null }
+    if (!WORDED.has(row.kind) && row.kind !== 'edit' && row.kind !== 'ask') return { says: { message: 'jumpOpen', values: { num: row.num } }, act: null }
     if (!row.chatId) return { says: { message: 'jumpNoChat', values: { num: row.num } }, act: null }
     return { says: { message: 'jumpPassage', values: { num: row.num } }, act: { kind: 'find', num: row.num, to: 'chat' } }
   }

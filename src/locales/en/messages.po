@@ -879,6 +879,10 @@ msgstr "Written under {names}"
 msgid "cited.heading"
 msgstr "Sources it cited"
 
+#. js-lingui-explicit-id
+msgid "collection.acceptAnswer"
+msgstr "accept"
+
 #. {command} is a command, which stays English
 #. js-lingui-explicit-id
 msgid "collection.actHelp"
@@ -917,6 +921,38 @@ msgid "collection.actTag"
 msgstr "Tag"
 
 #. js-lingui-explicit-id
+msgid "collection.askAccepted"
+msgstr "accepted"
+
+#. js-lingui-explicit-id
+msgid "collection.askAnswered"
+msgstr "answered in place"
+
+#. js-lingui-explicit-id
+msgid "collection.askAnsweredBy"
+msgstr "answered by {name}"
+
+#. js-lingui-explicit-id
+msgid "collection.askAnsweredHere"
+msgstr "answered here only: the passage changed since"
+
+#. js-lingui-explicit-id
+msgid "collection.askAsked"
+msgstr "asked of {name}"
+
+#. js-lingui-explicit-id
+msgid "collection.askAtPoint"
+msgstr "at a point in the reply, after “{passage}”"
+
+#. js-lingui-explicit-id
+msgid "collection.askOn"
+msgstr "on “{passage}”"
+
+#. js-lingui-explicit-id
+msgid "collection.askTakenBack"
+msgstr "taken back"
+
+#. js-lingui-explicit-id
 msgid "collection.by"
 msgstr "by"
 
@@ -929,8 +965,28 @@ msgid "collection.cardFrom"
 msgstr "from {num}"
 
 #. js-lingui-explicit-id
+msgid "collection.changeHeld"
+msgstr "held back: stays yours"
+
+#. js-lingui-explicit-id
+msgid "collection.changeInto"
+msgstr "went into a prompt"
+
+#. js-lingui-explicit-id
+msgid "collection.changeSent"
+msgstr "sent to {name}, {day}"
+
+#. js-lingui-explicit-id
+msgid "collection.changeWaits"
+msgstr "goes with your next prompt"
+
+#. js-lingui-explicit-id
 msgid "collection.chats"
 msgstr "Chats"
+
+#. js-lingui-explicit-id
+msgid "collection.cleanWord"
+msgstr "clean"
 
 #. js-lingui-explicit-id
 msgid "collection.count"
@@ -939,6 +995,14 @@ msgstr "{count, plural, =0 {nothing} one {# card} other {# cards}}"
 #. js-lingui-explicit-id
 msgid "collection.date"
 msgstr "date"
+
+#. js-lingui-explicit-id
+msgid "collection.dropAsk"
+msgstr "drop"
+
+#. js-lingui-explicit-id
+msgid "collection.editWhere"
+msgstr "{part, select, prompt {your prompt in {address}} other {{address}}}"
 
 #. add: stays English
 #. js-lingui-explicit-id
@@ -967,6 +1031,10 @@ msgid "collection.findHelp"
 msgstr "Finds it in its chat"
 
 #. js-lingui-explicit-id
+msgid "collection.findHere"
+msgstr "Find it in the chat"
+
+#. js-lingui-explicit-id
 msgid "collection.from"
 msgstr "from"
 
@@ -983,6 +1051,10 @@ msgid "collection.groupAdded"
 msgstr "Added one by one"
 
 #. js-lingui-explicit-id
+msgid "collection.groupBranch"
+msgstr "Branch {address}"
+
+#. js-lingui-explicit-id
 msgid "collection.groupChat"
 msgstr "Chat {num}"
 
@@ -991,8 +1063,44 @@ msgid "collection.groupPlan"
 msgstr "Plan {num}"
 
 #. js-lingui-explicit-id
+msgid "collection.holdBack"
+msgstr "hold back"
+
+#. js-lingui-explicit-id
+msgid "collection.legendBlue"
+msgstr "blue"
+
+#. js-lingui-explicit-id
+msgid "collection.legendBlueIs"
+msgstr "yours, added"
+
+#. js-lingui-explicit-id
+msgid "collection.legendGreen"
+msgstr "green, dotted"
+
+#. js-lingui-explicit-id
+msgid "collection.legendGreenIs"
+msgstr "an answer"
+
+#. js-lingui-explicit-id
+msgid "collection.legendStruck"
+msgstr "struck"
+
+#. js-lingui-explicit-id
+msgid "collection.legendStruckIs"
+msgstr "yours, removed"
+
+#. js-lingui-explicit-id
+msgid "collection.letGo"
+msgstr "let it go"
+
+#. js-lingui-explicit-id
 msgid "collection.line"
 msgstr "Collections"
+
+#. js-lingui-explicit-id
+msgid "collection.markupWord"
+msgstr "markup"
 
 #. new:collection stays English
 #. js-lingui-explicit-id
@@ -1002,6 +1110,10 @@ msgstr "No collection yet. new:collection makes one."
 #. js-lingui-explicit-id
 msgid "collection.noneMatch"
 msgstr "Nothing in this collection matches."
+
+#. js-lingui-explicit-id
+msgid "collection.notHeldHere"
+msgstr "The chat in the room, {num}, is not in this collection"
 
 #. open: stays English
 #. js-lingui-explicit-id
@@ -1025,6 +1137,16 @@ msgstr "Plans"
 #. js-lingui-explicit-id
 msgid "collection.quotedGone"
 msgstr "{num}, no longer here"
+
+#. An edit that only struck words, as it reads clean
+#. js-lingui-explicit-id
+msgid "collection.removed"
+msgstr "removed"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "collection.runs"
+msgstr "Runs {command}"
 
 #. js-lingui-explicit-id
 msgid "collection.select"
@@ -1060,6 +1182,14 @@ msgid "collection.tabAll"
 msgstr "All"
 
 #. js-lingui-explicit-id
+msgid "collection.tabAsk"
+msgstr "Asks"
+
+#. js-lingui-explicit-id
+msgid "collection.tabEdit"
+msgstr "Edits"
+
+#. js-lingui-explicit-id
 msgid "collection.tabHighlight"
 msgstr "Highlights"
 
@@ -1082,6 +1212,14 @@ msgstr "Keywords"
 #. js-lingui-explicit-id
 msgid "collection.under"
 msgstr "under {heading}"
+
+#. js-lingui-explicit-id
+msgid "collection.undoAnswer"
+msgstr "undo"
+
+#. js-lingui-explicit-id
+msgid "collection.undoEdit"
+msgstr "undo"
 
 #. js-lingui-explicit-id
 msgid "collection.untitled"
@@ -1443,6 +1581,15 @@ msgid "enter.byWhich"
 msgstr "{word} could be {names}. Say which, like {example}"
 
 #. js-lingui-explicit-id
+msgid "enter.changeGone"
+msgstr "{num} is no longer where it was, so nothing changed"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.changeNotThis"
+msgstr "{num} is an edit or an ask. Its own commands act on it: hold:, undo:, accept:, reject:, jump:"
+
+#. js-lingui-explicit-id
 msgid "enter.checkClean"
 msgstr "{name} finds nothing in it that tries to instruct a model. A check is a warning, never a guarantee"
 
@@ -1709,6 +1856,16 @@ msgstr "Delete what has not been sent on a line of its own"
 
 #. Commands stay English
 #. js-lingui-explicit-id
+msgid "enter.deleteAsks"
+msgstr "Enter drops {count, plural, one {ask} other {asks}} {nums}. undo: brings {count, plural, one {it} other {them}} back"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteAskSent"
+msgstr "Ask {num} has gone to a model, so it stays. accept: or reject: settles its answer"
+
+#. Commands stay English
+#. js-lingui-explicit-id
 msgid "enter.deleteBranch"
 msgstr "Enter deletes {address}, which has never run, from every run of plan {num}. undo: brings it back"
 
@@ -1726,6 +1883,11 @@ msgstr "Plan {num} is deleted. undo: brings it back"
 #. js-lingui-explicit-id
 msgid "enter.deletedStep"
 msgstr "Step {index} of {address} is deleted. undo: brings it back"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteEditUse"
+msgstr "An edit is taken back with undo:{num}"
 
 #. js-lingui-explicit-id
 msgid "enter.deleteEverything"
@@ -2314,6 +2476,18 @@ msgstr "{count, plural, one {{nums} did not run: its condition was not met} othe
 #. js-lingui-explicit-id
 msgid "enter.manyWhen"
 msgstr "{cond, select, nothing {if nothing is found} failed {if the one before fails} always {whatever the one before does} other {once the one before finishes}}"
+
+#. js-lingui-explicit-id
+msgid "enter.markupColOff"
+msgstr "Enter shows the cards clean: each edit as it reads now, each answer alone"
+
+#. js-lingui-explicit-id
+msgid "enter.markupColOn"
+msgstr "Enter shows the cards marked up: struck words, yours in blue, answers in green"
+
+#. js-lingui-explicit-id
+msgid "enter.markupColSame"
+msgstr "{on, select, on {The cards are marked up already} other {The cards are clean already}}"
 
 #. js-lingui-explicit-id
 msgid "enter.markupOff"
@@ -3680,6 +3854,32 @@ msgstr "Enter turns off naming new chats: a new chat is named from its first wor
 msgid "enter.setTitleOn"
 msgstr "Enter turns on naming new chats: after a chat’s first answer, one small request names it"
 
+#. js-lingui-explicit-id
+msgid "enter.settleAccept"
+msgstr "Enter keeps the {count, plural, one {answer to ask} other {answers to asks}} {nums} in the reply, and the passage goes"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.settleCardOnly"
+msgstr "The passage of ask {num} changed after it was asked, so its answer is on its card only. reject:{num} lets it go"
+
+#. js-lingui-explicit-id
+msgid "enter.settleNoneHere"
+msgstr "No answers wait in the chat here"
+
+#. js-lingui-explicit-id
+msgid "enter.settleNotAnswered"
+msgstr "Ask {num} has no answer yet"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.settleNotAsk"
+msgstr "{num} is not an ask. accept: and reject: settle the answer to an ask"
+
+#. js-lingui-explicit-id
+msgid "enter.settleReject"
+msgstr "Enter takes back the {count, plural, one {answer to ask} other {answers to asks}} {nums}, and the passage stays"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.setUnknown"
@@ -4038,12 +4238,31 @@ msgstr "On {board}, type: takes one of keyword, quote, note or highlight"
 
 #. Commands stay English
 #. js-lingui-explicit-id
+msgid "enter.undoAskAnswered"
+msgstr "Ask {num} is answered: accept:{num} keeps the answer, reject:{num} takes it back"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoAskUse"
+msgstr "An ask waiting to go is dropped with delete:{num}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
 msgid "enter.undoAtRun"
 msgstr "Run {run} of plan {num} has started, and undo stops there. The plan is still yours to change: new:run plans it again"
 
 #. js-lingui-explicit-id
 msgid "enter.undoChanged"
 msgstr "{nums} changed since, so undo: stops here"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoEditOne"
+msgstr "Enter takes edit {num} out: the struck words stand again and yours go. undo: brings it back"
+
+#. js-lingui-explicit-id
+msgid "enter.undoEditTold"
+msgstr "Edit {num} has been told to a model, so it stays. Change the text again, and that goes as a new edit"
 
 #. js-lingui-explicit-id
 msgid "enter.undoFailed"
@@ -4056,6 +4275,11 @@ msgstr "Enter takes back {line}"
 #. js-lingui-explicit-id
 msgid "enter.undone"
 msgstr "Took back {line}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoNotEdit"
+msgstr "undo: with a number takes back one edit, and {num} is not one"
 
 #. js-lingui-explicit-id
 msgid "enter.undoNothing"

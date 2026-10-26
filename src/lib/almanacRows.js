@@ -9,6 +9,8 @@
 // - a plan (a docket, C131) once it holds more than one branch. Every chat
 //   starts a docket (C18), and a docket of one branch is that chat, so it has
 //   no row of its own until it is forked.
+// - an edit and an ask (stage 11, piece 5; C56, C220 (j)), shown only under
+//   their own type: filter, never in the table as it opens.
 // Archived rows are rows too, marked; the view hides them unless asked for
 // with in:archive (C135, C143 (c)).
 // Pinned rows lead, whatever the order (v30); then the most recently active.
@@ -60,7 +62,7 @@ function heldBy(collections) {
  *   priceOf: a model's price from the list of models, for cost
  * @returns {object[]}
  */
-export function toRows({ chats = [], dockets = [], notes = [], highlights = [], quotes = [], rooms = {}, facts = new Map(), collections = [], priceOf = () => null }) {
+export function toRows({ chats = [], dockets = [], notes = [], highlights = [], quotes = [], edits = [], asks = [], rooms = {}, facts = new Map(), collections = [], priceOf = () => null }) {
   const chatById = new Map(chats.map((c) => [c.id, c]))
   const docketById = new Map(dockets.map((d) => [d.id, d]))
   const held = heldBy(collections)
@@ -172,6 +174,25 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
   for (const n of notes.filter(numbered)) rows.push(marking('note', 'notes', n, n.text, n.conversationId))
   for (const h of highlights.filter(numbered)) rows.push(marking(h.kind === 'quote' ? 'quote' : 'term', 'highlights', h, h.text, h.conversationId))
   for (const q of quotes.filter(numbered)) rows.push(marking('quote', 'pins', q, q.content, q.targetConversationId))
+  // Edits and asks (C220): what a card and a row show, read as text.
+  const str = (v) => (typeof v === 'string' ? v : '')
+  const sentOf = (s) => (s && typeof s === 'object' ? { to: str(s.to) || null, at: str(s.at) || null, into: str(s.into) || null } : null)
+  for (const e of edits.filter(numbered)) {
+    const words = [str(e.struck), str(e.added)].filter(Boolean).join(' → ')
+    rows.push({ ...marking('edit', 'edits', e, words, e.conversationId), change: {
+      kind: 'edit', mark: str(e.edit), part: e.part === 'prompt' ? 'prompt' : 'reply', struck: str(e.struck), added: str(e.added),
+      held: Boolean(e.held), sent: sentOf(e.sent),
+    } })
+  }
+  for (const a of asks.filter(numbered)) {
+    const answer = a.answer && typeof a.answer === 'object'
+      ? { text: str(a.answer.text), by: str(a.answer.by) || null, at: str(a.answer.at) || null, inPlace: Boolean(a.answer.inPlace) }
+      : null
+    rows.push({ ...marking('ask', 'asks', a, str(a.question), a.conversationId), change: {
+      kind: 'ask', mark: str(a.edit), part: 'reply', question: str(a.question), passage: str(a.passage), point: Boolean(a.point),
+      state: str(a.state) || 'open', answer, held: Boolean(a.held), sent: sentOf(a.sent),
+    } })
+  }
   return rows
 }
 
@@ -196,14 +217,14 @@ export function sortRows(rows) {
 export async function readAlmanac(db, { facts = null, priceOf } = {}) {
   if (!db || !isV6(db)) return { rows: [], collections: [], rooms: [] }
   const all = (store) => (db.objectStoreNames.contains(store) ? db.getAll(store) : Promise.resolve([]))
-  const [chats, dockets, notes, highlights, quotes, modes, collections] = await Promise.all(
-    ['conversations', 'dockets', 'notes', 'highlights', 'pins', 'modes', 'collections'].map(all),
+  const [chats, dockets, notes, highlights, quotes, modes, collections, edits, asks] = await Promise.all(
+    ['conversations', 'dockets', 'notes', 'highlights', 'pins', 'modes', 'collections', 'edits', 'asks'].map(all),
   )
   const rooms = {}
   for (const mode of modes) rooms[mode.id] = roomName(mode)
   const inside = facts ? await facts.read(db, chats.filter((c) => Number.isInteger(c.num))) : new Map()
   return {
-    rows: sortRows(toRows({ chats, dockets, notes, highlights, quotes, rooms, facts: inside, collections, priceOf })),
+    rows: sortRows(toRows({ chats, dockets, notes, highlights, quotes, edits, asks, rooms, facts: inside, collections, priceOf })),
     collections: collections.map((c) => ({ id: c.id, name: c.name ?? null, builtIn: c.builtIn ?? null })),
     // The homepage is not a room (R3, R11).
     rooms: modes.filter((m) => m.scope !== 'homepage').map((m) => ({ id: m.id, name: rooms[m.id] })),

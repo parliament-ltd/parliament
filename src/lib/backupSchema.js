@@ -124,6 +124,7 @@ const SETTINGS = Object.freeze({
   mistralRegion: (v) => v === 'global' || v === 'eu' || v === 'us',
   thinking: bool, // C165
   markup: (v) => v === 'on' || v === 'off', // stage 11, piece 1
+  collectionMarkup: (v) => v === 'on' || v === 'off', // stage 11, piece 5 (C220 (g))
   // The reply language, a tag or 'off'; the helper, a model's id; whether
   // questions to sources that read only English are translated first (C166).
   replyLanguage: (v) => v === null || typeof v === 'string' && /^(off|[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?)$/.test(v),

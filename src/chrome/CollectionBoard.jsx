@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { dayOf } from './when'
@@ -21,9 +21,15 @@ import { WORDED, selectionOf, actCommand } from '../lib/cardActs'
 // names what is selected and offers the four acts, each writing its command
 // with the numbers into the bar (Prompt turns the bar to a prompt about
 // them). A card's number finds its passage in the chat.
+//
+// Stage 11, piece 5 (C220): edits and asks are cards too, in the chats and
+// plans a collection holds, from every room (C220 (a1)). Their buttons run
+// their commands at once (hold:, undo:, accept:, reject:, delete:), each
+// said under the bar as Enter would say it; undo: takes any of them back.
+// markup · clean in the head is the cards' own (C220 (g)).
 
 const TABS = [
-  ['all', COPY.collections.tabAll], ['highlight', COPY.collections.tabHighlight], ['term', COPY.collections.tabTerm],
+  ['all', COPY.collections.tabAll], ['edit', COPY.collections.tabEdit], ['ask', COPY.collections.tabAsk], ['highlight', COPY.collections.tabHighlight], ['term', COPY.collections.tabTerm],
   ['quote', COPY.collections.tabQuote], ['note', COPY.collections.tabNote], ['message', COPY.collections.tabMessage],
 ]
 const ORDERS = [['yours', COPY.collections.yours], ['source', COPY.collections.source], ['date', COPY.collections.date]]
@@ -78,6 +84,76 @@ function Card({ card, under, onWrite, picked, onPick, onFind, rowOf }) {
           {card.erasedFrom != null && <span>{i18n._(COPY.collections.erasedFrom, { num: card.erasedFrom })}</span>}
           {under && <span>{i18n._(COPY.collections.under, { heading: under })}</span>}
           {card.tags.map((t) => <span key={t} className="ch-tag" dir="auto">{t}</span>)}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Where an edit or ask sits: its branch's address, or its chat's number.
+const addressOf = (card) => (card.branch && card.docketNum != null ? `${card.docketNum}${card.branch}` : String(card.chatNum ?? ''))
+
+/** An edit's or an ask's card (C220 (b), (c)). */
+function ChangeCard({ card, clean, fresh, onRun, onFind, nameOf }) {
+  const { i18n } = useLingui()
+  const c = card.change
+  const C = COPY.collections
+  const run = (command, word) => (
+    <button type="button" title={i18n._(C.runs, { command })} onClick={() => onRun(command)}>{i18n._(word)}</button>
+  )
+  const sentTo = c.sent?.to ? nameOf(c.sent.to) : null
+  const hold = c.held ? `hold:off ${card.num}` : `hold:${card.num}`
+  let state
+  let acts = []
+  if (card.kind === 'edit') {
+    state = c.sent?.into ? i18n._(C.changeInto)
+      : c.sent ? i18n._(C.changeSent, { name: sentTo ?? '', day: dayOf(i18n, c.sent.at) })
+        : c.held ? i18n._(C.changeHeld) : i18n._(C.changeWaits)
+    if (!c.sent) acts = [run(hold, c.held ? C.letGo : C.holdBack), run(`undo:${card.num}`, C.undoEdit)]
+  } else {
+    const st = c.state
+    state = st === 'answered' ? i18n._(c.answer?.inPlace ? C.askAnswered : C.askAnsweredHere)
+      : st === 'accepted' ? i18n._(C.askAccepted)
+        : st === 'taken back' ? i18n._(C.askTakenBack)
+          : c.sent ? i18n._(C.askAsked, { name: sentTo ?? '' })
+            : c.held ? i18n._(C.changeHeld) : i18n._(C.changeWaits)
+    if (st === 'open' && !c.sent) acts = [run(hold, c.held ? C.letGo : C.holdBack), run(`delete:${card.num}`, C.dropAsk)]
+    if (st === 'answered') acts = [...(c.answer?.inPlace ? [run(`accept:${card.num}`, C.acceptAnswer)] : []), run(`reject:${card.num}`, C.undoAnswer)]
+  }
+  const answer = card.kind === 'ask' && c.answer?.text && c.state !== 'taken back' ? c.answer.text : ''
+  const where = i18n._(C.editWhere, { part: c.part, address: addressOf(card) })
+  return (
+    <div className={`ch-mk ck-${card.kind}${c.held ? ' held' : ''}${fresh ? ' ch-flash' : ''}`} data-key={card.key} data-num={card.num}>
+      <span className="ch-mk-box none" aria-hidden="true" />
+      <div className="ch-mk-body">
+        {card.kind === 'edit'
+          ? (
+            <div className="ch-ed" dir="auto">
+              {clean
+                ? (c.added ? <span>{c.added}</span> : <span className="ch-ed-gone">{i18n._(C.removed)}</span>)
+                : (
+                  <>
+                    {c.struck && <s>{c.struck}</s>}
+                    {c.struck && c.added && <span className="ch-ed-arrow" aria-hidden="true">{'→'}</span>}
+                    {c.added && <ins>{c.added}</ins>}
+                  </>
+                )}
+            </div>
+          )
+          : (
+            <>
+              {!clean && <div className="ch-ask-on" dir="auto">{i18n._(c.point ? C.askAtPoint : C.askOn, { passage: c.passage })}</div>}
+              {!(clean && answer) && <div className="ch-ask-q" dir="auto">{c.question}</div>}
+              {answer && <div className="ch-ask-a" dir="auto">{answer}</div>}
+            </>
+          )}
+        <div className="ch-marg ch-mk-marg">
+          <button type="button" className="c-id" title={i18n._(C.findHere)} onClick={() => onFind(card.num)}>{card.num}</button>
+          <span>{i18n._(COPY.kinds[card.kind])}</span>
+          <button type="button" title={i18n._(C.findHere)} onClick={() => onFind(card.num)}>{where}</button>
+          {card.kind === 'ask' && c.answer?.by && <span>{i18n._(C.askAnsweredBy, { name: nameOf(c.answer.by) })}</span>}
+          <span className="ch-mk-st">{state}</span>
+          {acts.map((a, i) => <span key={i} className="ch-mk-act">{a}</span>)}
         </div>
       </div>
     </div>
@@ -159,9 +235,31 @@ function Picker({ pickable, sources, onWrite }) {
  *   onView: (change: object) => void, onShow: (collection: object) => void }} props
  *   entries: the sequence to draw (collectionCards.sequenceOf); counts: cards by kind; pickable: plans and chats to hold
  */
-export default function CollectionBoard({ collection, collections, label, entries, counts, view, sources, pickable, searching, addressed, onAddress, onWrite, onView, onShow, cards = [], picked = [], onPick, onClearPicked, onFind, onPrompt, rowOf = () => null }) {
+export default function CollectionBoard({ collection, collections, label, entries, counts, view, sources, pickable, searching, addressed, onAddress, onWrite, onView, onShow, cards = [], picked = [], onPick, onClearPicked, onFind, onPrompt, rowOf = () => null,
+  clean = false, onRun = () => {}, onFindChange = () => {}, nameOf = (id) => id, notHeld = null }) {
   const { i18n } = useLingui()
   const [picking, setPicking] = useState(false)
+  const C = COPY.collections
+
+  // A new edit or ask flashes its card as it is made (C220 (f)); a
+  // collection just shown flashes nothing.
+  const seen = useRef(null)
+  const [fresh, setFresh] = useState([])
+  useEffect(() => {
+    const nums = cards.filter((c) => c.kind === 'edit' || c.kind === 'ask').map((c) => c.num)
+    const was = seen.current
+    seen.current = { id: collection?.id ?? null, nums: new Set(nums) }
+    if (!was || was.id !== (collection?.id ?? null)) return
+    // Made just now: numbers past every one seen, not a chat's older ones added.
+    const top = Math.max(0, ...was.nums)
+    const added = nums.filter((n) => !was.nums.has(n) && n > top)
+    if (added.length) setFresh(added)
+  }, [cards, collection])
+  useEffect(() => {
+    if (!fresh.length) return undefined
+    const t = setTimeout(() => setFresh([]), 1600)
+    return () => clearTimeout(t)
+  }, [fresh])
 
   let body
   if (!collection) body = <p className="ch-marg ch-alm-note">{i18n._(COPY.collections.none)}</p>
@@ -171,8 +269,11 @@ export default function CollectionBoard({ collection, collections, label, entrie
       ? entries.map((e) => {
         if (e.head) return <div key={`h:${e.head.id}`} className="ch-mk-head" dir="auto"><span aria-hidden="true">{'§'}</span>{e.head.text}</div>
         if (e.group) {
-          const title = e.group.kind === 'added' ? COPY.collections.groupAdded : e.group.kind === 'plan' ? COPY.collections.groupPlan : COPY.collections.groupChat
-          return <div key={`g:${e.group.kind}:${e.group.num}`} className="ch-mk-group">{i18n._(title, { num: e.group.num ?? '' })}</div>
+          const title = e.group.kind === 'added' ? COPY.collections.groupAdded : e.group.kind === 'plan' ? COPY.collections.groupPlan : e.group.kind === 'branch' ? C.groupBranch : COPY.collections.groupChat
+          return <div key={`g:${e.group.kind}:${e.group.num}:${e.group.branch ?? ''}`} className="ch-mk-group">{i18n._(title, { num: e.group.num ?? '', address: `${e.group.num ?? ''}${e.group.branch ?? ''}` })}</div>
+        }
+        if (e.card.change) {
+          return <ChangeCard key={e.card.key} card={e.card} clean={clean} fresh={fresh.includes(e.card.num)} onRun={onRun} onFind={onFindChange} nameOf={nameOf} />
         }
         return (
           <Card
@@ -195,6 +296,12 @@ export default function CollectionBoard({ collection, collections, label, entrie
           </span>
         </div>
         {picking && <Picker pickable={pickable} sources={sources} onWrite={onWrite} />}
+        {notHeld != null && (
+          <p className="ch-marg ch-col-nothere">
+            <span>{i18n._(C.notHeldHere, { num: notHeld })}</span>{' '}
+            <button type="button" title={i18n._(COPY.collections.pickHelp, { command: ADD(notHeld) })} onClick={() => onWrite(`>${ADD(notHeld)}`)}>{ADD(notHeld)}</button>
+          </p>
+        )}
         <div className="ch-col-tabs" role="tablist">
           {tabs.map(([k, word]) => (
             <button key={k} type="button" role="tab" aria-selected={view.tab === k} className={view.tab === k ? 'on' : undefined} onClick={() => onView({ tab: k })}>
@@ -207,7 +314,21 @@ export default function CollectionBoard({ collection, collections, label, entrie
           {ORDERS.map(([k, word]) => (
             <button key={k} type="button" className={view.sort === k ? 'on' : undefined} onClick={() => onView({ sort: k, asc: false })}>{i18n._(word)}</button>
           ))}
+          {(counts.edit || counts.ask) ? (
+            <span className="ch-col-markup">
+              <button type="button" className={clean ? undefined : 'on'} aria-pressed={!clean} title={i18n._(C.runs, { command: 'markup:on col' })} onClick={() => onRun('markup:on col')}>{i18n._(C.markupWord)}</button>
+              <span aria-hidden="true">{'·'}</span>
+              <button type="button" className={clean ? 'on' : undefined} aria-pressed={clean} title={i18n._(C.runs, { command: 'markup:off col' })} onClick={() => onRun('markup:off col')}>{i18n._(C.cleanWord)}</button>
+            </span>
+          ) : null}
         </div>
+        {(counts.edit || counts.ask) && !clean ? (
+          <div className="ch-col-legend ch-marg">
+            <span><s>{i18n._(C.legendStruck)}</s> {i18n._(C.legendStruckIs)}</span>
+            <span><ins className="l-you">{i18n._(C.legendBlue)}</ins> {i18n._(C.legendBlueIs)}</span>
+            <span><ins className="l-ai">{i18n._(C.legendGreen)}</ins> {i18n._(C.legendGreenIs)}</span>
+          </div>
+        ) : null}
         <div className="ch-col-list">{list}</div>
         <Acts cards={cards} picked={picked} onPick={onPick} onClearPicked={onClearPicked} onWrite={onWrite} onPrompt={onPrompt} />
       </>

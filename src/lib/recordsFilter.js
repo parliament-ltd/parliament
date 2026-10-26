@@ -28,6 +28,8 @@ const TYPE_KIND = Object.freeze({ chat: 'chat', note: 'note', keyword: 'term', q
 const HAS_KIND = Object.freeze({ note: 'note', keyword: 'term', quote: 'quote', highlight: 'highlight' })
 // Rows only when filtered for, or found by a search (A19; C133). One line.
 const ON_REQUEST = new Set(['term', 'quote'])
+// Rows only under their own type: filter (C56, C220 (j)): not even a search finds them.
+const ONLY_TYPED = new Set(['edit', 'ask'])
 
 const DAY = 86_400_000
 const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']
@@ -357,6 +359,7 @@ export function applyView(rows, view = EMPTY_VIEW, ctx = {}) {
     if (row.archived && !archive) return false
     const found = terms.length > 0 && terms.every((t) => haystack(row, ctx).includes(t))
     if (terms.length && !found) return false
+    if (ONLY_TYPED.has(row.kind) && !asked.has(row.kind)) return false
     if (ON_REQUEST.has(row.kind) && !asked.has(row.kind) && !found && !byTag) return false
     return filters.every((f) => passes(row, f, ctx))
   })

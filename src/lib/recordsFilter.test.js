@@ -241,3 +241,14 @@ describe('the archive (C135, C143 (c))', () => {
     expect(readFilter(step('in:archive room'), read).bad).toEqual({ message: 'inNoRoom', values: { name: 'archive' } })
   })
 })
+
+describe('edits and asks as rows (stage 11, piece 5; C56, C220 (j))', () => {
+  const change = [...rows, { ...rows.find((r) => r.num === 210), num: 242, kind: 'edit', id: 'm:e1', title: 'owls → barn owls', text: 'owls → barn owls', pinned: false, archived: false }]
+  const shown = (v) => applyView(change, v, ctx).map((r) => r.num)
+  it('shows them only under their own type: filter, not even for a search', () => {
+    expect(shown(EMPTY_VIEW)).not.toContain(242)
+    expect(shown({ ...EMPTY_VIEW, search: 'barn owls' })).not.toContain(242)
+    expect(shown(view('type:edit'))).toEqual([242])
+    expect(shown(view('type:ask'))).toEqual([])
+  })
+})
