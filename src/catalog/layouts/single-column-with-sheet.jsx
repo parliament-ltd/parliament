@@ -16,6 +16,8 @@ import { useState } from 'react'
 import { ChevronUp, ChevronDown } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import ParliamentMark from '../../components/ParliamentMark'
+import { useLingui } from '@lingui/react'
+import { COPY } from '../../copy'
 
 function renderSlot(nodes) {
   if (!nodes || nodes.length === 0) return null
@@ -44,6 +46,8 @@ export default {
     const hasSheet = sheet && sheet.length > 0
     const [open, setOpen] = useState(false)
     const navigate = useNavigate()
+    const { i18n } = useLingui()
+    const homeLabel = i18n._(COPY.room.home)
 
     return (
       <div
@@ -58,8 +62,8 @@ export default {
           <button
             type="button"
             onClick={() => navigate('/')}
-            aria-label="Go to The Study"
-            title="The Study"
+            aria-label={homeLabel}
+            title={homeLabel}
             className="inline-flex items-center justify-center h-8 w-8 rounded-md text-[var(--p-text-primary)] hover:text-[var(--p-gold-light)] transition-colors"
           >
             <ParliamentMark />

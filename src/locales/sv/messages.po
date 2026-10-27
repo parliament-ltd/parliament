@@ -7411,6 +7411,11 @@ msgstr "Svaret du tittar på. Din prompt följer det när du flyttar mellan dem.
 msgid "room.empty"
 msgstr "Ett tomt rum. Dess första prompt, skriven i fältet, startar chatten."
 
+#. The Parliament mark at the top of a narrow room, read aloud and shown on hover. It opens the main screen
+#. js-lingui-explicit-id
+msgid "room.home"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "room.newTitle"
 msgstr "Nytt rum"

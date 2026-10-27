@@ -7411,6 +7411,11 @@ msgstr ""
 msgid "room.empty"
 msgstr ""
 
+#. The Parliament mark at the top of a narrow room, read aloud and shown on hover. It opens the main screen
+#. js-lingui-explicit-id
+msgid "room.home"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "room.newTitle"
 msgstr ""
