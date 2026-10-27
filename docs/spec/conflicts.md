@@ -2214,6 +2214,23 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - 219 accepted in place and taken back with one Ctrl+Z.
 - **Not tried:** suggestions made by a model, which comes with piece 2.
 
+**C231. Stage 12, piece 2: Ripple, its open points** (proposed 27 October; C228 piece 2, (b), (c), (d), (f); C229 (f); the editing spec, "Ripple across branches"). Each follows the rulings already made and is built as suggested, so a ruling changes one entry.
+- **(a) What is compared.** An edit to a prompt is checked against the same prompt in each other branch of the plan (the first prompt against the first prompts, and so on); an edit to a reply against the same reply. All the edits going with one prompt go in one call per branch. A branch with no such prompt or reply is skipped.
+- **(b) What the helper is sent:**
+  - each edit, as the words struck and the words written, with the line it sits in before and after;
+  - the other branch's prompt or reply as it reads now, your struck words left out and your own words in;
+  - each in its own tag, said to be material, not instructions.
+
+  Nothing else from the chats goes. Held-back edits are not sent. A source's branch is neither checked from nor into (C228 (d)), so Wikipedia's words never go to the helper this way.
+- **(c) What comes back** is JSON: at most six suggestions per branch, each quoting the exact words it would change and giving the new words, and naming the edit it carries. It is read as data, placed only where its quote stands unmarked once (C229 (d)), and the words are shown as text. Nothing else the helper writes is shown.
+- **(d) The prompt's Enter line,** before Enter: "Ripple checks 201b and 201c: 2 calls to Haiku 5.5, about $0.01". If the helper has no key, the line says "Ripple is on, but checking needs a key for the helper: api:", and the prompt goes without it. After Enter the bar says "Ripple: 2 suggestions in 201b, none in 201c" once the checks end, and names any branch it could not check. The prompt goes whatever Ripple does.
+- **(e) The switch.** `ripple:on` and `ripple:off` act on the plan of the chat in the room. It is kept on the plan (C229 (f)), so every branch shares it, and `undo:` takes it back. A click on "ripple: off" in the room's head writes `>ripple:on` into the bar and waits for Enter, since it costs; the head shows it only when the chat is in a plan with other branches. In a chat with none, the line says there is nothing to check.
+- **(f) When.** Once, the moment a prompt carrying edits goes to a branch, Enter on edits alone included. It never runs as you type, and never twice for the same edits.
+- **(g) On the branch tabs,** open suggestions are counted in rust beside your blue.
+- **(h) A suggestion's `from`** holds the edit's number, its chat's number and its branch's address (C229 (b)), so its card reads "the same as your edit 242 in 201a".
+- **Security and privacy:** one call per branch, through the gateway, to the helper the line names, with the cost named first. The helper sees your edits and the other branches' words only. What it returns cannot run a command, write HTML or land anywhere its quote does not match.
+- **Suggestion:** build as above.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
