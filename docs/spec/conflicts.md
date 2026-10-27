@@ -3630,6 +3630,144 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **(f) Test data on the trial copy:** the Essay room keeps the focus set `["room", "collection"]` from piece 1. Every other test arrangement was forgotten, and the screens setting is back to false. **Suggestion:** keep the focus set as test data, as with C250 (h).
 - **Next:** stage 15, close-out and going public, proposed in pieces first as this stage was.
 
+**C264. Stage 15 in pieces: close-out, the vault, going public** (proposed 27 October; refactor-plan.md, stage 15 and §6; C71, C94, C170, C263; `research/vault-scope-review.md`; `privacy-copy-draft.md`; `research/security-audit.md` §3; `browsers.md`; `docs/hosting.md`). Waiting for Stefan: (b), (e), (f), (g), (h) and (i) are choices or approvals; the rest is built as suggested unless ruled otherwise. Nothing is pushed, deployed or made public without your yes at that step.
+- **What exists today** (a survey of the code, the history and the documents, 27 October):
+  - **Retirement lines.** Only three were never put to you: R30 (four unused files), R31 (old process documents) and R35 (the Inter font). R39 (Drafting Desk) waits until after the refactor, as ruled.
+    - Four approved lines are not quite finished: `HomepageTopBar.jsx` (R9) and `exportAllData` in `db.js` (R10) are still in live code with nothing using them; old styles remain in `index.css` (R12, "file by file"); and the homepage scope is still read in `modes.js` (R11), which old rooms may need.
+    - The plan's table does not show the approvals given at the stage 6 checkpoint (R1 to R13, R27); the rulings are in this file.
+  - **Dependencies.**
+    - `@dnd-kit` (four packages) is used by nothing live.
+    - The Inter font is imported in `main.jsx` but no style names it, so the system fonts show.
+    - Most versions are ranges (`^`); a lockfile pins what is installed.
+  - **The words.**
+    - The privacy draft is applied in Settings (About, the four paragraphs, "What leaves your device") and the network card.
+    - Not yet applied: the README and SECURITY.md (both still say "Project Apollo", Anthropic only, session-only keys, old backups); the app's manifest ("chat interface for Claude"); and one comment in `networkLog.js`.
+    - SECURITY.md's policy block is out of date, and nothing tests it.
+    - There is no verb reference and no changelog; the update notice says only "reload".
+  - **The security policy.** Nothing in the built app needs `'unsafe-inline'` for styles or `data:` for images, as far as a search finds: the only style elements are in development screens. Trusted Types has three known blockers, none in Parliament's own code (security audit §3). The vault is not built.
+  - **The history.** 733 commits.
+    - Your personal address is the author on 455 of them, and the committer on 294.
+    - Your first name appears in 104 tracked files, mostly the spec documents.
+    - The two logos in `public/` carry your full name in their file details (the PNG's embedded author field).
+    - No key, password or `.env` file is tracked; the key-like strings are test placeholders.
+    - This branch cannot be pushed as it stands, since GitHub refuses commits with the private address (C71, 12 October). So nothing on it can reach Netlify by a push today.
+  - **Hosting and the repository.**
+    - Netlify builds `main` with no settings for previews.
+    - There is no `.github/` folder (no workflows, no reporting policy), no contributing guide and no changelog. The licence is MIT.
+    - `browsers.md` has the tested-in table; nothing in Settings shows what this browser can do.
+- **The pieces,** each committed and checked before the next:
+  1. **Tidy the code.**
+     - R30 and R35, item by item, as (b) rules.
+     - `@dnd-kit` leaves the dependencies (approved with R16 and R34).
+     - The unfinished parts of R9, R10 and R12 are carried out; R11's reading of old rooms stays.
+     - Every dependency is pinned to the exact version installed.
+     - The plan's table is brought up to date with the rulings.
+  2. **The vault, designed and tried** (C170, ruled). A vault is a second, very small site of Parliament's own (for example `keys.parliament.ltd`), loaded invisibly inside the main page. It alone holds the API keys, so code on the main page, even a compromised package, can never read a key; it can only ask the vault to send a request to a listed provider.
+     - This piece writes the design against today's request path, including the channel between the page and the vault, the vault's own key panel, and how each provider's request goes through it.
+     - It then tries the one unknown on two local addresses: whether each browser keeps the vault's storage.
+     - Nothing stored changes in this piece.
+  3. **The vault, built:**
+     - the vault page as its own small build, with its own key panel (`api:` opens it);
+     - requests to keyed providers sent through it, the gateway's log kept on the main page;
+     - existing keys moved into it once, which is a change to stored data, shown before it runs;
+     - the four narrow exceptions written into CLAUDE.md, as (e) asks.
+
+     Lock Parliament's passphrase or passkey also guards the vault's storage.
+  4. **The policy, tightened:**
+     - styles without `'unsafe-inline'`;
+     - images without `data:`;
+     - Trusted Types, with the three blockers fixed as the audit says;
+     - the vault's single framed origin.
+
+     Each is tried under `vite preview`, which serves the real headers on this computer, then on a preview deploy (f).
+  5. **The words:**
+     - the privacy draft applied everywhere still left: README, SECURITY.md, the manifest;
+     - SECURITY.md's policy block written from `securityHeaders.js` by a script, with a test that fails when they differ;
+     - the verb reference, `docs/verbs.md`, generated from the registry, with a test that it is current;
+     - a "This browser" section in Settings from feature detection: what works here and what happens instead, with `browsers.md` as the full table;
+     - a changelog, whose newest entry the update notice shows.
+  6. **Ready for the public:**
+     - the history sweep and the address rewrite, on a copy, as (h) rules, with a check that no private address is left;
+     - a contributing guide and the block guide;
+     - the files GitHub reads for private vulnerability reporting;
+     - a release zip with its checksum, and a scorecard workflow (OpenSSF) that runs on GitHub only;
+     - the commit ids in CLAUDE.md and the spec updated on the copy.
+
+     Nothing is pushed in this piece.
+  7. **Going public and the release,** each step on your yes:
+     - the copy's `main` pushed to a new public repository;
+     - Netlify pointed at it;
+     - `parliament.ltd` serving the new Parliament, with the one schema upgrade running on each person's data at their next visit, its copy-before-upgrade first;
+     - the vault's site deployed.
+  8. **Redundancy:**
+     - a mirror on a second host;
+     - the headers written also as a `_headers` file that other static hosts read, generated with a test;
+     - a standby copy of the site on a second host;
+     - the two-factor and recovery-code checks on your accounts, a list for you.
+  9. **The checkpoint,** on the live site:
+     - stage 4's production checks;
+     - a real phone and the welcome page's phone line (C263 (b));
+     - two screens;
+     - the vault in each browser.
+- **Open points,** each with its suggestion:
+  - **(a) The order** above: tidy first, the vault before the policy (the policy has to name the vault), words before the copy is made public, the release with going public (see (g)). **Suggestion:** yes.
+  - **(b) Approve, item by item:**
+    - **R30:** `src/hooks/useMode.js`, `src/components/core/ToolToggles.jsx` and `src/components/core/CitedMarkdown.jsx` move to `src/deprecated/`, and `public/flight_logo.png` to `src/deprecated/public/`. Nothing uses them.
+    - **R35:** the Inter font package and its import go. Nothing changes on screen, since no style names it.
+    - **R31:** `refactor/` stays in the repository, since it explains how the code got here. The untracked `continuation-*.md` notes and `.pr-body.md` are never published: they are added to `.gitignore` and stay on this computer.
+    - **Leftovers of approved lines:** `HomepageTopBar.jsx` (R9) and `exportAllData` (R10) move to `src/deprecated/`. R12's remaining old styles go, each rule checked unused, listed in its commit.
+
+    **Suggestion:** approve all four.
+  - **(c) Exact versions:** each `^` range becomes the version the lockfile already installs, so a fresh install builds the same thing. Updates come by hand, one at a time, with the check. **Suggestion:** yes.
+  - **(d) The changelog:** a `CHANGELOG.md` in plain words, one entry per release. The update notice shows the newest entry's lines above "reload". **Suggestion:** yes.
+  - **(e) The vault's address and its exceptions** (choices and an approval).
+    - **Its address:** `keys.parliament.ltd`, as the scope review used, or another name you prefer. It needs a DNS record at deSEC and a second Netlify site, which you create when piece 7 comes.
+    - **The four exceptions,** each narrow and written into CLAUDE.md's hard constraints with its reason (scope review §2 B):
+      - one framed origin, the vault, where frames are otherwise forbidden;
+      - one more host, Parliament's own;
+      - prompts and replies crossing to the vault frame over one private channel, never the tab-to-tab one, and never a key;
+      - the gateway's decision and log on the page, the send in the vault.
+
+      CLAUDE.md says these constraints change only with a scope review, so this is that approval.
+    - **An outside review** of the vault and the key module (security notes §6.6): ask once the repository is public, or not now.
+
+    **Suggestion:** `keys.parliament.ltd`; approve the four; ask for the review once public.
+  - **(f) How to try a build on Netlify before going public** (a choice). The branch cannot be pushed until the history is rewritten, so the usual preview, made from a push, is not available.
+    1. **A draft deploy from this computer** with Netlify's command-line tool: it uploads the built site to a private, unlisted address, with the real headers, and changes nothing on `parliament.ltd`. It needs the tool installed (a download, asked first) and your Netlify login on this computer, which you do.
+    2. **Wait for going public,** and try everything on the live site.
+
+    **Suggestion:** 1. It is where the real phone, the policy trials and the vault get tried before anyone else sees them.
+  - **(g) When the new Parliament reaches `parliament.ltd`** (a choice). Today the site runs `main` as it was before the refactor, and the people who use it have data in the old shape.
+    1. **With going public:** the rewritten `main` goes to the public repository, Netlify builds from it, and the site changes once.
+    2. **Before going public:** this needs the push allowed, either your GitHub setting that blocks pushes with the private address turned off for one push, or the rewrite done first. Then a second change when the public repository takes over.
+
+    **Suggestion:** 1. One switch, after the draft deploy has been tried; the schema upgrade, its dry run on your data done in stage 2, runs then.
+  - **(h) What the public history holds** (a choice). C71 ruled: history kept, the address rewritten to the no-reply address, on a copy, `main` only, this repository kept private.
+    1. **As ruled, and the logos cleaned:**
+      - The address is rewritten.
+      - The full name in the two logos' file details is removed from every version in the history, not only the current one: it is the only place your full name appears.
+      - Your first name stays in the spec documents, where it records who ruled.
+    2. **As 1, and your first name replaced** by "the author" in every file and every past version.
+    3. **As ruled only:** the address rewritten, nothing else.
+
+    Rewriting needs `git-filter-repo`, a small tool, downloaded only on your yes.
+
+    **Suggestion:** 1.
+  - **(i) The mirror and the standby** (a choice of hosts).
+    - **The mirror,** a read-only copy of the public code: Codeberg, run by a non-profit in Germany; or GitLab.
+    - **The standby site,** ready if Netlify fails: Cloudflare Pages, which reads the `_headers` file, so the security policy comes with it. GitHub Pages cannot send headers, so it would serve Parliament without its policy, and is not suggested.
+
+    **Suggestion:** Codeberg and Cloudflare Pages. Each needs an account, which you create.
+  - **(j) What only you can do,** listed so nothing waits unseen. Each is asked for when its piece comes:
+    - log in to Netlify's tool (f);
+    - create the public repository and the vault's site and DNS record (e);
+    - switch on private vulnerability reporting;
+    - check the `support@` mailbox exists at Proton;
+    - set Netlify to deploy only from tagged releases;
+    - two-factor and recovery codes on GitHub, Netlify, the mirror and the standby.
+  - **(k) Stored data,** in all: the keys moved into the vault, once, shown before it runs. Every backup stays readable, since keys are never in one. Nothing else. **Suggestion:** approve the outline; the move itself is shown before it is built.
+  - **(l) After the refactor, not in this stage:** R39 (Drafting Desk), the parked PR-50a and b, the compressed-summary branch, and reviewing asks with Ripple. Each is noted so it is not lost. **Suggestion:** yes.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
