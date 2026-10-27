@@ -1,4 +1,4 @@
-# Project Apollo
+# Parliament
 
 A power-user chat interface for Anthropic's Claude that runs entirely in
 your browser. Bring your own API key — there is no backend, no account,

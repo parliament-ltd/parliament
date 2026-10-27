@@ -1,6 +1,6 @@
 # Security Model
 
-Project Apollo is designed so that you never need to trust us with your data. Here's how.
+Parliament is designed so that you never need to trust us with your data. Here's how.
 
 ## Architecture
 
