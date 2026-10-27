@@ -11,7 +11,7 @@ import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
 import { shipped, address, planOpen, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, columnShares, withShares, withUsualShares, recordsColumns } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
-import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown } from '../shell/welcome'
+import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown, stepsMade } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
 import { keepKeys, metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal, localAway, helperOf, translatorFor, translateText, browserTranslation } from '../net'
@@ -34,7 +34,7 @@ import { useIsStreaming, useHiddenIds, usePendingDeletes, useStreamEnd, useMessa
 import { sendableOf, hiddenIds, pendingDeletes, isStreaming as replyArriving, stopStream, streamingIds } from '../stores/chatStore'
 import { fromSource } from '../stores/sendHistory'
 import { useChatEdits } from '../stores/useChatEdits'
-import { noteFor } from '../editing/told'
+import { noteFor, tellNote } from '../editing/told'
 import { preview, viewFromSaved, lineOf, LOCAL_READS } from './preview'
 import { answerFor, includedOf } from '../lib/included'
 import { promptFacts, promptNow } from '../lib/branchVerbs'
@@ -425,7 +425,7 @@ export default function Shell() {
   const [roomRev, setRoomRev] = useState(0)
 
   // A stored form changed from outside its reply reaches the chat on screen (C220 (d)).
-  const { showStoredBlocks } = useChat()
+  const { showStoredBlocks, tells, holdTell, tellsFor, moveTell } = useChat()
 
   // ── The Almanac's rows (stage 5, piece 3) ─────────────
   // Everything numbered, read once the database is open and again whenever
@@ -464,6 +464,22 @@ export default function Shell() {
     return () => { live = false; off() }
   }, [started, roomRev, priceOf])
   const numbered = useMemo(() => new Map((almanacRows ?? []).map((r) => [r.num, r])), [almanacRows])
+  // Steps 9 and 10, from what is stored: a strike saved, an edit sent (C225).
+  // Also what waits for a row to be numbered (strikethrough:'s edit).
+  const rowWaiters = useRef(new Set())
+  useEffect(() => {
+    if (!started || !almanacRows) return
+    for (const id of stepsMade(almanacRows)) updateWelcome((w) => tick(w, id))
+    for (const w of [...rowWaiters.current]) w(almanacRows)
+  }, [almanacRows, started, updateWelcome])
+  /** The number of the edit with this id once it is saved, or null after a while. */
+  const numberOfEdit = useCallback((mark) => new Promise((resolve) => {
+    const find = (rows) => (rows ?? []).find((r) => r.kind === 'edit' && r.change?.mark === String(mark))?.num ?? null
+    const done = (num) => { rowWaiters.current.delete(check); clearTimeout(timer); resolve(num) }
+    const check = (rows) => { const num = find(rows); if (num != null) done(num) }
+    const timer = setTimeout(() => done(null), 8000)
+    rowWaiters.current.add(check)
+  }), [])
   const [inspected, setInspected] = useState(null) // the number inspect: shows under the bar
   const [compared, setCompared] = useState(null) // the two numbers compare: shows under the bar
 
@@ -1253,6 +1269,28 @@ export default function Shell() {
       remember(body)
       return what.question ? { done: true, says: { message: 'askKept' } } : null
     }
+    if (what.kind === 'strike') {
+      // strikethrough: (stage 11, piece 7; C225 (c)): the reply last in focus
+      // strikes its selection, as Ctrl+Shift+X there. The strike is the
+      // reply's, so undo: alone does not take it back: the line names the
+      // edit's number once it is saved, for undo: with it.
+      const detail = { taken: false, mark: null }
+      window.dispatchEvent(new CustomEvent('parliament-strike', { detail }))
+      if (detail.taken !== true) return typeof detail.taken === 'string' ? detail.taken : 'strikeNoReply'
+      remember(body)
+      const later = detail.mark
+        ? numberOfEdit(detail.mark).then((num) => (num != null ? { message: 'strikeNumbered', values: { num } } : null))
+        : null
+      return { done: true, says: { message: 'strikeDone' }, ...(later ? { later } : {}) }
+    }
+    if (what.kind === 'tell') {
+      // tell: (C225 (d), option 1): held for the next prompt here, as
+      // include: is; nothing is stored until that prompt goes.
+      holdTell(what.room ?? '', what.notes)
+      if (touched.current) touched.current.tell = { room: what.room ?? '', before: what.before ?? [] }
+      remember(body)
+      return { done: true, says: { message: 'tellHeld', values: { count: what.notes.length } } }
+    }
     if (what.kind === 'markup') {
       // markup:on / markup:off (stage 11, piece 1): replies marked up, or
       // clean; with col, or on the Collection, its cards (piece 5; C220 (g)).
@@ -1472,7 +1510,7 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'name'))
     remember(body)
     return null
-  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, exportFile, commit, loadConversations, createConversation, findCard, findPassage, findRow, holdNote, clearPicked, i18n, readOwn, showStoredBlocks])
+  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, exportFile, commit, loadConversations, createConversation, findCard, findPassage, findRow, holdNote, clearPicked, i18n, readOwn, showStoredBlocks, numberOfEdit, holdTell])
 
   // ── undo: (C134, as built) ────────────────────────────
   // Each command line that changes something is kept with what it changed,
@@ -1548,6 +1586,7 @@ export default function Shell() {
     if (entry.pending) setPendingAnswerer(entry.pending.before)
     if (entry.many) setHeldMany(entry.many.before)
     if (entry.heldTo) setHeldTo(entry.heldTo.before)
+    if (entry.tell) holdTell(entry.tell.room, entry.tell.before)
     if (entry.pendingFw) setPendingFrameworks(entry.pendingFw.before)
     if (entry.setting) for (const s of [].concat(entry.setting)) await updateSettingNow.current(s.key, s.before)
     if (entry.own) {
@@ -1569,12 +1608,12 @@ export default function Shell() {
     setUndoTop(undoStack.current.at(-1)?.line ?? null)
     remember(body)
     return { done: true, says: { message: 'undone', values: { line: entry.line } } }
-  }, [remember, run, showView, loadConversations, readOwn, showStoredBlocks])
+  }, [remember, run, showView, loadConversations, readOwn, showStoredBlocks, holdTell])
 
   const onRun = useCallback(async (next, body, go, what) => {
     if (what?.kind === 'undo') return undo(body)
     const before = { arrangement: current.current, view: viewNow.current }
-    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null, many: null, heldTo: null, plans: [], messages: [] }
+    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null, many: null, heldTo: null, tell: null, plans: [], messages: [] }
     const out = what ? await act(what, body, next) : await run(next, body)
     const t = touched.current
     touched.current = null
@@ -1609,8 +1648,9 @@ export default function Shell() {
     if (t.setting) entry.setting = t.setting
     if (t.many) entry.many = t.many
     if (t.heldTo) entry.heldTo = t.heldTo
+    if (t.tell) entry.tell = t.tell
     if (t.plans.length) entry.plans = t.plans
-    if (body && (entry.arrangement || entry.view || entry.records || entry.messages || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting || entry.many || entry.heldTo || entry.plans)) {
+    if (body && (entry.arrangement || entry.view || entry.records || entry.messages || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting || entry.many || entry.heldTo || entry.tell || entry.plans)) {
       undoStack.current = [...undoStack.current, entry].slice(-UNDO_MAX)
       setUndoTop(body)
     }
@@ -2223,6 +2263,9 @@ export default function Shell() {
   // screen with theirs, and what is held.
   const roomAnswer = useMemo(() => answerFor(shown), [shown])
   const including = useMemo(() => ({ room: roomId, chatAnswer: roomAnswer, members: branchShown?.members ?? [], held: heldInclude }), [roomId, roomAnswer, branchShown, heldInclude])
+  // tell: notes held for the next prompt in this room (C225 (d)).
+  const tellsHere = roomId === undefined ? null : tells[roomId ?? ''] ?? null
+  const telling = useMemo(() => ({ room: roomId, held: tellsHere ?? [] }), [roomId, tellsHere])
   // again: (C177): a chat's last prompt and who answers it, for the room's
   // chat and the branches on screen; another chat is opened first.
   const roomPrompt = useMemo(() => promptFacts(shown), [shown])
@@ -2331,7 +2374,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -2449,11 +2492,13 @@ export default function Shell() {
     resend: !about && Boolean(roomId) && stalledIn === roomId,
     // The person's edits waiting here, and the size of their note (C216).
     edits: about ? null : editsHere,
+    // tell: notes held for it, and the size of their part of the note (C225 (d)).
+    told: about || !tellsHere?.length ? null : { count: tellsHere.length, chars: tellNote(tellsHere).length },
     reader: answerer.group === 'source' ? readerHere : null,
     ink,
     roomName: roomNameHere,
     about,
-  }), [arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere])
+  }), [arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere, tellsHere])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -2515,6 +2560,8 @@ export default function Shell() {
         return { refused: 'includeFailed' }
       }
     }
+    // tell: notes held here must be the ones the line counted (C225 (d)).
+    if (!aboutNow && tellsFor(roomChat ?? '').length !== (shown?.told?.count ?? 0)) return { refused: 'promptChanged' }
     const withInc = (w) => (included && w.group !== 'source' ? { included } : {})
     const spentInc = (whos) => { if (included && whos.some((w) => w.group !== 'source')) setHeldInclude(null) }
 
@@ -2564,6 +2611,7 @@ export default function Shell() {
       try {
         if (!id) {
           const chat = await createConversation({ title: titleFromPrompt(text), model: latest.current.settings.defaultModel, answerer: whos[0].id, frameworks: fwIds })
+          moveTell('', chat.id)
           setPendingAnswerer(null)
           setPendingFrameworks(null)
           await assignDefaultRoom(chat.id, latest.current.settings.newChatRoom ?? undefined)
@@ -2659,7 +2707,7 @@ export default function Shell() {
       // On a source's branch, the edits and asks go to the default model at
       // the same time as the source is asked (C218 (e)).
       const r = shown?.reader
-      if (!r || who.group !== 'source' || !shown?.edits || r.needsKey || r.later || r.gone || r.unchecked) return null
+      if (!r || who.group !== 'source' || !(shown?.edits || shown?.told) || r.needsKey || r.later || r.gone || r.unchecked) return null
       if (r.group === 'model' && !fresh[r.provider]) return null
       return sendMessage(to, '', r.id, system(), [], null, { describe: false })
     }
@@ -2697,6 +2745,7 @@ export default function Shell() {
       creating.current = true
       try {
         const chat = await createConversation({ title: titleFromPrompt(text), model: latest.current.settings.defaultModel, answerer: who.chosen ? who.id : null, frameworks: fwIds })
+        moveTell('', chat.id)
         setPendingAnswerer(null)
         setPendingFrameworks(null)
         await assignDefaultRoom(chat.id, latest.current.settings.newChatRoom ?? undefined)
@@ -2754,7 +2803,7 @@ export default function Shell() {
         return failure(err, who.group === 'source' ? who.name : undefined)
       })
     return { done }
-  }, [askSource, askSourceAs, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked, promptToPlan, planRuns, translateQuery])
+  }, [askSource, askSourceAs, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked, promptToPlan, planRuns, translateQuery, tellsFor, moveTell])
 
   // again:203a (editing spec; C177): the branch's last prompt, read again,
   // asked as a new branch of its plan, the next letter, by who answers that

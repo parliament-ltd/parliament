@@ -1096,3 +1096,25 @@ describe('edits on the Enter line (stage 11, piece 3; C216)', () => {
     expect(at('>hold:244').text).toBe('244 was told already, so it cannot be held back')
   })
 })
+
+describe('tell: notes on the Enter line (stage 11, piece 7; C225 (d), (e))', () => {
+  const room = { room: 'c1', streaming: false, keyed: true, provider: 'Anthropic', source: 'Wikipedia', historyChars: 0, systemChars: 0 }
+  const model = { id: 'm', group: 'model', name: 'Haiku 9', price: null }
+  const also = (p) => (p.says?.also ?? []).map((x) => say(i18n, x.message, x.values))
+  it('counts the notes that go with a prompt, and who reads them', () => {
+    expect(also(promptPreview('Go on.', { ...room, answerer: model, told: { count: 1, chars: 80 } }))).toContain('With it, told once: your note · Haiku 9 reads it')
+    expect(also(promptPreview('Go on.', { ...room, answerer: model, told: { count: 2, chars: 80 } }))).toContain('With it, told once: your 2 notes · Haiku 9 reads them')
+  })
+  it('goes with edits sent on an empty Enter, and alone waits for words', () => {
+    const p = promptPreview('', { ...room, answerer: model, edits: { count: 1, chars: 80 }, told: { count: 1, chars: 60 } })
+    expect(p).toMatchObject({ ready: true, editsOnly: true })
+    expect(also(p).slice(0, 2)).toEqual(['Nothing typed: just your 1 edit, told to Haiku 9', 'With it, told once: your note · Haiku 9 reads it'])
+    expect(promptPreview('', { ...room, answerer: model, told: { count: 1, chars: 60 } }).ready).toBe(false)
+  })
+  it('on the branch of a source, goes to the reader, or waits for a key', () => {
+    const wiki = { id: 'wikipedia', group: 'source', name: 'Wikipedia' }
+    expect(also(promptPreview('glass', { ...room, answerer: wiki, told: { count: 1, chars: 60 } }))).toContain('Wikipedia reads no notes. Yours waits for a model with a key: api:')
+    const reader = { id: 'm', group: 'model', name: 'Haiku 9' }
+    expect(also(promptPreview('glass', { ...room, answerer: wiki, reader, told: { count: 2, chars: 60 } }))).toContain('Your 2 notes go to Haiku 9 at the same time · Wikipedia reads none')
+  })
+})

@@ -857,6 +857,11 @@ msgstr "表示"
 msgid "chat.thoughtUntimed"
 msgstr "回答前に思考"
 
+#. A tell: note the prompt carried, in the words of the person (C225 (d))
+#. js-lingui-explicit-id
+msgid "chat.toldNote"
+msgstr ""
+
 #. A prompt that sent only the edits of the person (C216 (e))
 #. js-lingui-explicit-id
 msgid "chat.toldOnly"
@@ -3392,6 +3397,19 @@ msgstr "{count, plural, other {{sources}からの回答#件は送りません}}"
 msgid "enter.promptStalled"
 msgstr "返答が止まりました。ストリーミングの返答を溜めてしまうネットワークでは、こうなることがあります"
 
+#. js-lingui-explicit-id
+msgid "enter.promptTellGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptTellToReader"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptTellWait"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptThinks"
@@ -3955,6 +3973,33 @@ msgid "enter.stopReply"
 msgstr "Enterで、{num}に届いている途中の返答を止めます。届いた分は残ります"
 
 #. js-lingui-explicit-id
+msgid "enter.strikeDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.strikeGo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.strikeNoReply"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.strikeNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.strikeNotNow"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.strikeNumbered"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.summarize"
 msgstr "Enterで、{nums}の要約を今日の日付で{name}に書きます：{provider}を1回呼び出し、最大{cost}"
 
@@ -4073,6 +4118,37 @@ msgstr "→ 新しいチャット"
 #. js-lingui-explicit-id
 msgid "enter.targetNewRoom"
 msgstr "→ 新しいルーム"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tellEmpty"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tellHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tellHold"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tellLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tellMany"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tellNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tellSame"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.thinkingNow"
@@ -7018,6 +7094,24 @@ msgstr "ルームに名前を付ける"
 #. js-lingui-explicit-id
 msgid "welcome.step.pop"
 msgstr "別のディスプレイに移す"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.send"
+msgstr ""
+
+#. {command} is p>, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.sendHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.strike"
+msgstr ""
+
+#. {keys} is the shortcut as this computer writes it: Ctrl+Shift+X or ⌘⇧X
+#. js-lingui-explicit-id
+msgid "welcome.step.strikeHow"
+msgstr ""
 
 #. The name of the list of steps, read by screen readers
 #. js-lingui-explicit-id

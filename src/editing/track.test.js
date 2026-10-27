@@ -4,7 +4,7 @@ import { Fragment, Slice } from 'prosemirror-model'
 import { schema, STRUCK, ADDED } from './schema'
 import { replyFromMarkdown } from './fromMarkdown'
 import { track, createIds, cursorMarks, undoEdit, collectEdits, noteForModel, INTENT, SKIP } from './track'
-import { commands, atLineStart, setBlock, BLOCK_CHOICES, editingPlugins, linesOf } from './keys'
+import { commands, atLineStart, setBlock, BLOCK_CHOICES, editingPlugins, linesOf, strikeSelection, struckIdsIn } from './keys'
 import { toBlocks, wordsOf } from './blocks'
 
 // The reply as text, with each edit shown: [-struck-#id] and {+added+#id}.
@@ -482,5 +482,21 @@ describe('a prompt and its reply as one editor (piece 2; C214)', () => {
   it('lists the lines of both cards, so each keeps an id of its own', () => {
     const { doc } = pairOf('One.', 'Two.\n\nThree.')
     expect(linesOf(doc).map((l) => l.node.textContent)).toEqual(['One.', 'Two.', 'Three.'])
+  })
+})
+
+describe('strikethrough: from the bar (C225 (c))', () => {
+  it('strikes the selection as Ctrl+Shift+X does, and does nothing with none', () => {
+    const s0 = setup()
+    const { ids } = s0
+    let { state } = s0
+    expect(strikeSelection(state)).toBeNull()
+    const from = at(state, 'eleven years')
+    state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, from, from + 'eleven years'.length)))
+    state = apply(state, strikeSelection(state), ids)
+    expect(show(state.doc)).toBe('The furnace had not gone out in [-eleven years-#240].')
+    expect(collectEdits(state.doc).map((e) => e.id)).toEqual([240])
+    // The bar finds the strike it made where the words were.
+    expect([...struckIdsIn(state.doc, from, from + 'eleven years'.length)]).toEqual(['240'])
   })
 })

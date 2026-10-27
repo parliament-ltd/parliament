@@ -2,11 +2,11 @@
 // welcome v9; C43, C119, C120, A1, A20). Pure, so it is tested without the
 // app.
 //
-// Eight steps, each a real command, crossed off in any order when the
-// thing itself happens, not when the command is typed. Their words are in
-// the copy table (COPY.welcome); the commands stay English. Steps 9 and 10
-// of welcome v9 (strike a line, leave the AI a note) come with editing in
-// place (stage 11, A7).
+// Ten steps, each a real command, crossed off in any order when the thing
+// itself happens, not when the command is typed. Their words are in the
+// copy table (COPY.welcome); the commands stay English. Steps 9 and 10 came
+// with editing in place (stage 11, piece 7; A7, C225): strike words in a
+// reply, then send the edit with the next prompt.
 //
 // Progress is kept on this device only, as one setting (C121): which steps
 // are done, whether the list is put away (tour:off), whether the ending was
@@ -29,6 +29,10 @@ export const STEPS = Object.freeze([
   { id: 'pop', shows: 'pop:records', writes: '>pop:records' },
   { id: 'library', shows: 'library:', writes: '>library:' },
   { id: 'key', shows: 'api:', writes: '>api:' }, // A1; crosses off on seeing the panel (C120)
+  // Crossed off when an edit that strikes words is saved, however made (C225 (a)).
+  { id: 'strike', shows: 'strikethrough:', writes: '>strikethrough:' },
+  // Crossed off when a prompt goes out carrying an edit (C225 (b)).
+  { id: 'send', shows: 'p>', writes: 'p>' },
 ].map((s) => Object.freeze(s)))
 
 const IDS = new Set(STEPS.map((s) => s.id))
@@ -70,6 +74,19 @@ export function tick(w, id) {
 
 /** The list shown again, or put away (tour:, tour:off; A20). */
 export const showSteps = (w, on) => (w.off === !on ? w : { ...w, off: !on })
+
+/**
+ * Which of steps 9 and 10 the numbered rows show as done (C225): an edit
+ * that strikes words (9), an edit or ask that went with a prompt (10).
+ * @param {Array<{ kind: string, change?: { struck?: string, sent?: object|null } }>} rows
+ */
+export function stepsMade(rows) {
+  const out = []
+  const changes = (rows ?? []).filter((r) => (r?.kind === 'edit' || r?.kind === 'ask') && r.change)
+  if (changes.some((r) => r.kind === 'edit' && r.change.struck)) out.push('strike')
+  if (changes.some((r) => r.change.sent && (r.change.sent.to || r.change.sent.into))) out.push('send')
+  return out
+}
 
 /** The chat the page started, so its card comes back. */
 export const withChat = (w, chat) => (w.chat === chat ? w : { ...w, chat })

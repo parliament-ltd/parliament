@@ -857,6 +857,11 @@ msgstr "show"
 msgid "chat.thoughtUntimed"
 msgstr "thought first"
 
+#. A tell: note the prompt carried, in the words of the person (C225 (d))
+#. js-lingui-explicit-id
+msgid "chat.toldNote"
+msgstr "Your note, told once: {note}"
+
 #. A prompt that sent only the edits of the person (C216 (e))
 #. js-lingui-explicit-id
 msgid "chat.toldOnly"
@@ -3392,6 +3397,19 @@ msgstr "{count, plural, one {# answer from {sources} stays out} other {# answers
 msgid "enter.promptStalled"
 msgstr "The reply stalled, as happens on networks that hold streamed replies"
 
+#. js-lingui-explicit-id
+msgid "enter.promptTellGo"
+msgstr "With it, told once: {count, plural, one {your note} other {your # notes}} · {name} reads {count, plural, one {it} other {them}}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptTellToReader"
+msgstr "{count, plural, one {Your note goes} other {Your # notes go}} to {name} at the same time · {source} reads none"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptTellWait"
+msgstr "{source} reads no notes. {count, plural, one {Yours waits} other {Your # notes wait}} for a model with a key: api:"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptThinks"
@@ -3955,6 +3973,33 @@ msgid "enter.stopReply"
 msgstr "Enter stops the reply arriving in {num}. What has arrived is kept"
 
 #. js-lingui-explicit-id
+msgid "enter.strikeDone"
+msgstr "Struck. It goes with your next prompt as an edit"
+
+#. js-lingui-explicit-id
+msgid "enter.strikeGo"
+msgstr "Enter strikes the words you selected in a reply. They stay, struck, and go with your next prompt as an edit"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.strikeNoReply"
+msgstr "Click into a reply and select the words to strike, then strikethrough: again"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.strikeNothing"
+msgstr "Select the words to strike in a reply first, then strikethrough: again"
+
+#. js-lingui-explicit-id
+msgid "enter.strikeNotNow"
+msgstr "That reply cannot be edited while it is being written"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.strikeNumbered"
+msgstr "Struck as edit {num}. undo:{num} takes it back"
+
+#. js-lingui-explicit-id
 msgid "enter.summarize"
 msgstr "Enter writes a summary of {nums} in {name}, dated today: one call to {provider}, at most {cost}"
 
@@ -4073,6 +4118,37 @@ msgstr "→ a new chat"
 #. js-lingui-explicit-id
 msgid "enter.targetNewRoom"
 msgstr "→ a new room"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tellEmpty"
+msgstr "Write the note in quotes: tell:\"Keep it under a page\""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tellHeld"
+msgstr "Held for your next prompt here{count, plural, one {} other {, # notes in all}}. undo: takes it back"
+
+#. js-lingui-explicit-id
+msgid "enter.tellHold"
+msgstr "Enter holds this note for your next prompt here. The model reads it once, with that prompt{count, plural, one {} other {, # notes in all}}"
+
+#. js-lingui-explicit-id
+msgid "enter.tellLong"
+msgstr "A note holds up to {max} characters"
+
+#. js-lingui-explicit-id
+msgid "enter.tellMany"
+msgstr "Up to {most} notes wait for one prompt"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tellNoRoom"
+msgstr "A note goes with a prompt in a room. Open one first: room:"
+
+#. js-lingui-explicit-id
+msgid "enter.tellSame"
+msgstr "That note is held already"
 
 #. js-lingui-explicit-id
 msgid "enter.thinkingNow"
@@ -6847,7 +6923,7 @@ msgstr "Halt a run, or every run in every window"
 
 #. js-lingui-explicit-id
 msgid "verb.strikethrough"
-msgstr "Strike the selected passage"
+msgstr "Strike the selected words in a reply. Its number with undo: takes it back"
 
 #. js-lingui-explicit-id
 msgid "verb.summarize"
@@ -7019,7 +7095,25 @@ msgstr "Name the room"
 msgid "welcome.step.pop"
 msgstr "Move it to another monitor"
 
+#. js-lingui-explicit-id
+msgid "welcome.step.send"
+msgstr "Send it with your next prompt"
+
+#. {command} is p>, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.sendHow"
+msgstr "{command} and a prompt, with an edit waiting"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.strike"
+msgstr "Strike through a line"
+
+#. {keys} is the shortcut as this computer writes it: Ctrl+Shift+X or ⌘⇧X
+#. js-lingui-explicit-id
+msgid "welcome.step.strikeHow"
+msgstr "select words in a reply, then {keys}"
+
 #. The name of the list of steps, read by screen readers
 #. js-lingui-explicit-id
 msgid "welcome.steps"
-msgstr "Eight things to try"
+msgstr "Ten things to try"

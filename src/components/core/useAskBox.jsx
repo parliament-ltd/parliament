@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { startAsk, newAskId } from '../../editing/asks'
+import { strikeSelection, struckIdsIn } from '../../editing/keys'
 
 // The ASK box of a reply edited in place (stage 11, piece 4; the editing
 // spec, "Asks"; C218): opened with Ctrl+Shift+K on the selected words, or at
@@ -8,8 +9,8 @@ import { startAsk, newAskId } from '../../editing/asks'
 // marked, a marker after it), Escape drops it. Nothing goes anywhere until
 // the next prompt to the branch.
 
-// The editor last in focus: ask: in the bar acts there, on the selection it
-// kept when the bar took the focus.
+// The editor last in focus: ask: and strikethrough: in the bar act there, on
+// the selection it kept when the bar took the focus.
 let lastFocused = null
 const MAX = 1000
 
@@ -71,11 +72,31 @@ export function useAskBox(viewRef, onKept, words, canAsk) {
       if (detail.question) keepAt(v, v.state.selection, detail.question)
       else open(v)
     }
+    // strikethrough: from the bar (C225 (c)), as Ctrl+Shift+X here: in a
+    // prompt or a reply. detail.mark says back the new edit's id, so the bar
+    // can name its number once it is saved.
+    const onBarStrike = (e) => {
+      const detail = e.detail
+      if (!detail || detail.taken || lastFocused !== token) return
+      const v = viewRef.current
+      if (!v || !v.dom.isConnected) return
+      if (!v.editable) { detail.taken = 'strikeNotNow'; return }
+      const tr = strikeSelection(v.state)
+      if (!tr) { detail.taken = 'strikeNothing'; return }
+      const { from, to } = v.state.selection
+      const before = struckIdsIn(v.state.doc, from, to)
+      v.dispatch(tr)
+      detail.taken = true
+      // The words stay, struck, where they were.
+      detail.mark = [...struckIdsIn(v.state.doc, from, to)].find((id) => !before.has(id)) ?? null
+    }
     document.addEventListener('focusin', onFocus)
     window.addEventListener('parliament-ask', onBarAsk)
+    window.addEventListener('parliament-strike', onBarStrike)
     return () => {
       document.removeEventListener('focusin', onFocus)
       window.removeEventListener('parliament-ask', onBarAsk)
+      window.removeEventListener('parliament-strike', onBarStrike)
       if (lastFocused === token) lastFocused = null
     }
   }, [viewRef, keepAt, open])

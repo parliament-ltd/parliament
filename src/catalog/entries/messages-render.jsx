@@ -40,7 +40,7 @@ import { stripAttachedFileBlocks } from '../../lib/fileUpload'
 import { useChatEdits } from '../../stores/useChatEdits'
 import { settleAsk as dbSettleAsk } from '../../lib/db'
 const NO_ASK_INFO = new Map()
-import { waiting as editWaits } from '../../editing/told'
+import { waiting as editWaits, tellsOf } from '../../editing/told'
 import { withoutAnswers } from '../../editing/answers'
 import BranchSlider from '../../components/core/BranchSlider'
 import { lineItems, membersOf } from '../../lib/branchGroups'
@@ -462,6 +462,7 @@ export default function MessagesRender() {
       citations: msg.role === 'assistant' ? msg.citations ?? null : null,
       asked: msg.role === 'user' ? msg.asked ?? null : null,
       included: msg.role === 'user' ? msg.included ?? null : null,
+      tells: msg.role === 'user' ? tellsOf(msg.told) : null,
       summary: summaryInfo(msg),
       thinking,
       isFavorited: isFav,

@@ -1,3 +1,4 @@
+import { tellsOf } from '../../editing/told'
 import { useEffect, useSyncExternalStore } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../../copy'
@@ -81,6 +82,7 @@ function SiblingMessage({ chatId, msg, index, number }) {
       citations={msg.role === 'assistant' ? msg.citations ?? null : null}
       asked={msg.role === 'user' ? msg.asked ?? null : null}
       included={msg.role === 'user' ? msg.included ?? null : null}
+      tells={msg.role === 'user' ? tellsOf(msg.told) : null}
       thinking={msg.role === 'assistant' && msg.thinking ? { text: msg.thinking, ms: msg.thinkingMs ?? null } : null}
     />
   )

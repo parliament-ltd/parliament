@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
 import { getMessages, addMessage, updateMessage, saveEditedMessage, getEditsOfChat, markEditsSent, getAsksOfChat, answerAsks, getSetting, setSetting, getConversation, groupPrompt } from '../lib/db'
-import { noteFor, waiting } from '../editing/told'
+import { noteFor, waiting, tellNote } from '../editing/told'
 import { answersIn } from '../editing/answers'
 import { askToKeepStorage } from '../lib/storageKeep'
 import { nameFromChat, titleFromPrompt, fieldsFromDescription } from '../lib/chatTitles'
@@ -266,6 +266,28 @@ export function ChatProvider({ children }) {
     await titleIfUntitled(conversationId, prompt)
   }, [updateConversation, titleIfUntitled])
 
+  // tell: notes held for the next prompt to a chat (stage 11, piece 7; C225
+  // (d), option 1): for this tab only, never stored until they go. Kept by
+  // chat id; '' is a room with no chat yet, moved to its chat once made.
+  const [tells, setTells] = useState({})
+  const tellsRef = useRef({})
+  const holdTell = useCallback((chatKey, notes) => {
+    const next = { ...tellsRef.current }
+    if (Array.isArray(notes) && notes.length) next[chatKey ?? ''] = notes
+    else delete next[chatKey ?? '']
+    tellsRef.current = next
+    setTells(next)
+  }, [])
+  const tellsFor = useCallback((chatKey) => tellsRef.current[chatKey ?? ''] ?? [], [])
+  const moveTell = useCallback((from, to) => {
+    const held = tellsRef.current[from ?? '']
+    if (!held?.length || from === to) return
+    const next = { ...tellsRef.current, [to]: held }
+    delete next[from ?? '']
+    tellsRef.current = next
+    setTells(next)
+  }, [])
+
   // Send a message and handle streaming response
   // systemPrompt: optional string from collaboration mode presets + custom instruction
   // tools: optional array of tool definitions from provider.getAvailableTools()
@@ -312,10 +334,13 @@ export function ChatProvider({ children }) {
     // Asks waiting go the same way, each to be answered in place (C218).
     const askRecords = await getAsksOfChat(conversationId).catch(() => [])
     const note = noteFor(before, editRecords, { leaveOut: joinedFrom, asks: askRecords })
+    // The tell: notes held for this chat go at the end of the same note (C225 (d)).
+    const tellsHere = tellsRef.current[conversationId] ?? []
+    const told = [note.text, tellNote(tellsHere)].filter(Boolean).join('\n\n')
     const joinedIds = editRecords.filter((r) => waiting(r) && joinedFrom.has(r.messageId)).map((r) => r.id)
     // With privacy:names, the names in what goes, found on this computer
     // first; if that fails, the prompt is not added and nothing is sent.
-    const names = await namesFor(model, [...forModel(before).flatMap((m) => [textOf(m.content), ...(m.included ?? []).map((i) => i.text)]), userContent, note.text, systemPrompt, ...(included ?? []).map((i) => i.text)])
+    const names = await namesFor(model, [...forModel(before).flatMap((m) => [textOf(m.content), ...(m.included ?? []).map((i) => i.text)]), userContent, told, systemPrompt, ...(included ?? []).map((i) => i.text)])
 
     // 1. Add user message to state and IndexedDB.
     //    PR-18e: `userContent` is already the text the user typed PLUS
@@ -333,9 +358,11 @@ export function ChatProvider({ children }) {
       ...(Array.isArray(included) && included.length ? { included } : {}),
       // The planned step a run sends this for (stage 10; C196 (j)).
       ...(step ? { step } : {}),
-      ...(note.text ? { told: note.text } : {}),
+      ...(told ? { told } : {}),
     })
     updateMessages(conversationId, prev => [...prev, userMsg])
+    // Told: the held notes go, once.
+    if (tellsHere.length && tellsRef.current[conversationId] === tellsHere) holdTell(conversationId, null)
     // Told, or gone into this prompt: neither goes again.
     const toldAt = new Date().toISOString()
     if (note.ids.length) markEditsSent(note.ids, { to: model, at: toldAt, prompt: userMsg.id }).catch(() => {})
@@ -515,7 +542,7 @@ export function ChatProvider({ children }) {
     } finally {
       endStream(conversationId)
     }
-  }, [persistEvery, keepPartial, describeNewChat, updateConversation])
+  }, [persistEvery, keepPartial, describeNewChat, updateConversation, holdTell])
 
   // Sends a chat's last prompt again without streaming, after its reply
   // stalled behind a network that holds streamed replies (C114). Only on the
@@ -879,6 +906,10 @@ export function ChatProvider({ children }) {
       keepTranslation,
       saveEditedReply,
       showStoredBlocks,
+      tells,
+      holdTell,
+      tellsFor,
+      moveTell,
       continueMessage,
       stopGenerating,
       leaveConversation,

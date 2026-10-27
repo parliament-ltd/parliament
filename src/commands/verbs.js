@@ -226,8 +226,11 @@ export const VERBS = Object.freeze([
   // ask: (C218 (a), option 2): Ctrl+Shift+K in a reply does the same.
   v({ verb: 'ask', group: 'editing', example: 'ask:"Add the year it opened"', forms: ['ask:', 'ask:"Add the year it opened"'], rest: true, takes: [[], ['text']], on: EDITING, stage: 11,
     gloss: /*i18n*/ { id: 'verb.ask', message: 'Ask about the selected words in a reply, in your own words. It goes with your next prompt' } }),
-  v({ verb: 'strikethrough', group: 'editing', example: 'strikethrough:', takes: [[]], on: EDITING, stage: 11, undoable: true, click: 'apply',
-    gloss: /*i18n*/ { id: 'verb.strikethrough', message: 'Strike the selected passage' } }),
+  // strikethrough: (C225 (c)): Ctrl+Shift+X in a reply does the same. The
+  // strike is made in the reply, not by the bar, so undo: alone does not
+  // take it back; undo: with its number does, and Ctrl+Z in the reply.
+  v({ verb: 'strikethrough', group: 'editing', example: 'strikethrough:', takes: [[]], on: EDITING, stage: 11,
+    gloss: /*i18n*/ { id: 'verb.strikethrough', message: 'Strike the selected words in a reply. Its number with undo: takes it back' } }),
   // Where the next prompt goes among a prompt's branches (stage 8; C174);
   // several with commas: to:201a, 201c.
   v({ verb: 'to', group: 'editing', example: 'to:201a', forms: ['to:201a', 'to:201a, 201c', 'to:all'], takes: [['addresses'], [['all']]], stage: 8, undoable: true, click: 'apply',

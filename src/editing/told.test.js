@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { EditorState, TextSelection } from 'prosemirror-state'
-import { noteFor, withTold, waiting } from './told'
+import { noteFor, withTold, waiting, tellNote, tellsOf } from './told'
 import { replyFromMarkdown, promptFromText } from './fromMarkdown'
 import { toBlocks } from './blocks'
 import { track, createIds } from './track'
@@ -84,5 +84,18 @@ describe('an edit already told (C216 (i))', () => {
     const marks = []
     state.doc.descendants((n) => { if (n.isText) for (const m of n.marks) marks.push(`${n.text}:${m.attrs.edit}`) })
     expect(marks).toEqual(['really :240', 'truly :241'])
+  })
+})
+
+describe('tell: notes in the note (C225 (d))', () => {
+  it('are written after the edits, one a line, and read back to show on the prompt', () => {
+    expect(tellNote([])).toBe('')
+    const part = tellNote(['Keep it under a page', '  Plainer\nwords  '])
+    expect(part).toBe('The person tells you, for this prompt, in their own words:\n- Keep it under a page\n- Plainer words')
+    const told = ['Edit note here.', part].join('\n\n')
+    expect(tellsOf(told)).toEqual(['Keep it under a page', 'Plainer words'])
+    expect(tellsOf('Edit note only.')).toEqual([])
+    expect(tellsOf(undefined)).toEqual([])
+    expect(withTold({ content: 'Go on.', told: part })).toBe(`${part}\n\nGo on.`)
   })
 })

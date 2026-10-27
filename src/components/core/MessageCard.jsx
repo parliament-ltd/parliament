@@ -48,6 +48,7 @@ export default function MessageCard({
   asked = null, // a question translated before it went to a source (C85, C166 (g))
   summary = null, // the summary a branch starts from: { address, name }, either null when not known (C175)
   included = null, // answers from sources brought into this prompt (C176)
+  tells = null, // the tell: notes this prompt carried, in the person's words (C225 (d))
   thinking = null, // a model's thinking: { text, live, answering, since } while it streams, { text, ms } after (C165)
   isFavorited = false, showNotes = false,
   savedNoteText = '',
@@ -553,6 +554,10 @@ export default function MessageCard({
       {type === 'user' && asked && <AskedLine asked={asked} />}
       {/* Answers from sources brought into this prompt, and how they went (C176). */}
       {type === 'user' && Array.isArray(included) && included.length > 0 && <IncludedLine included={included} />}
+      {/* The notes it carried for the model, told once (C225 (d)). As text. */}
+      {type === 'user' && Array.isArray(tells) && tells.map((t, i) => (
+        <p key={i} className="mt-1 text-xs italic text-[var(--p-text-secondary)]" dir="auto">{i18n._(COPY.chat.toldNote, { note: t })}</p>
+      ))}
       {/* The summary a branch starts from, said to be one, and by whom (C175). */}
       {summary && <SummaryLine summary={summary} />}
       {/* The frameworks it was written under (C164). */}

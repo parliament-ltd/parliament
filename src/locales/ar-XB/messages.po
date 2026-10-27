@@ -857,6 +857,11 @@ msgstr ""
 msgid "chat.thoughtUntimed"
 msgstr ""
 
+#. A tell: note the prompt carried, in the words of the person (C225 (d))
+#. js-lingui-explicit-id
+msgid "chat.toldNote"
+msgstr ""
+
 #. A prompt that sent only the edits of the person (C216 (e))
 #. js-lingui-explicit-id
 msgid "chat.toldOnly"
@@ -3392,6 +3397,19 @@ msgstr ""
 msgid "enter.promptStalled"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.promptTellGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptTellToReader"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptTellWait"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptThinks"
@@ -3955,6 +3973,33 @@ msgid "enter.stopReply"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.strikeDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.strikeGo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.strikeNoReply"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.strikeNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.strikeNotNow"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.strikeNumbered"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.summarize"
 msgstr ""
 
@@ -4072,6 +4117,37 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.targetNewRoom"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tellEmpty"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tellHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tellHold"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tellLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tellMany"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tellNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tellSame"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -7017,6 +7093,24 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "welcome.step.pop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.send"
+msgstr ""
+
+#. {command} is p>, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.sendHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.strike"
+msgstr ""
+
+#. {keys} is the shortcut as this computer writes it: Ctrl+Shift+X or ⌘⇧X
+#. js-lingui-explicit-id
+msgid "welcome.step.strikeHow"
 msgstr ""
 
 #. The name of the list of steps, read by screen readers

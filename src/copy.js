@@ -758,6 +758,23 @@ export const COPY = {
     askNoReply: /*i18n*/ { id: 'enter.askNoReply', message: 'Click into a reply first, or select the words to ask about, then ask: again' },
     askNotPrompt: /*i18n*/ { id: 'enter.askNotPrompt', message: 'Asks are for replies. In your prompt, strike or type over it' },
     askKept: /*i18n*/ { id: 'enter.askKept', message: 'Kept as an ask. It goes with your next prompt' },
+    // strikethrough: and tell: (stage 11, piece 7; C225).
+    strikeGo: /*i18n*/ { id: 'enter.strikeGo', message: 'Enter strikes the words you selected in a reply. They stay, struck, and go with your next prompt as an edit' },
+    strikeDone: /*i18n*/ { id: 'enter.strikeDone', message: 'Struck. It goes with your next prompt as an edit' },
+    strikeNumbered: /*i18n*/ { id: 'enter.strikeNumbered', message: 'Struck as edit {num}. undo:{num} takes it back', comment: 'Commands stay English' },
+    strikeNothing: /*i18n*/ { id: 'enter.strikeNothing', message: 'Select the words to strike in a reply first, then strikethrough: again', comment: 'Commands stay English' },
+    strikeNoReply: /*i18n*/ { id: 'enter.strikeNoReply', message: 'Click into a reply and select the words to strike, then strikethrough: again', comment: 'Commands stay English' },
+    strikeNotNow: /*i18n*/ { id: 'enter.strikeNotNow', message: 'That reply cannot be edited while it is being written' },
+    tellNoRoom: /*i18n*/ { id: 'enter.tellNoRoom', message: 'A note goes with a prompt in a room. Open one first: room:', comment: 'Commands stay English' },
+    tellEmpty: /*i18n*/ { id: 'enter.tellEmpty', message: 'Write the note in quotes: tell:"Keep it under a page"', comment: 'Commands stay English' },
+    tellLong: /*i18n*/ { id: 'enter.tellLong', message: 'A note holds up to {max} characters' },
+    tellMany: /*i18n*/ { id: 'enter.tellMany', message: 'Up to {most} notes wait for one prompt' },
+    tellSame: /*i18n*/ { id: 'enter.tellSame', message: 'That note is held already' },
+    tellHold: /*i18n*/ { id: 'enter.tellHold', message: 'Enter holds this note for your next prompt here. The model reads it once, with that prompt{count, plural, one {} other {, # notes in all}}' },
+    tellHeld: /*i18n*/ { id: 'enter.tellHeld', message: 'Held for your next prompt here{count, plural, one {} other {, # notes in all}}. undo: takes it back', comment: 'Commands stay English' },
+    promptTellGo: /*i18n*/ { id: 'enter.promptTellGo', message: 'With it, told once: {count, plural, one {your note} other {your # notes}} · {name} reads {count, plural, one {it} other {them}}' },
+    promptTellToReader: /*i18n*/ { id: 'enter.promptTellToReader', message: '{count, plural, one {Your note goes} other {Your # notes go}} to {name} at the same time · {source} reads none' },
+    promptTellWait: /*i18n*/ { id: 'enter.promptTellWait', message: '{source} reads no notes. {count, plural, one {Yours waits} other {Your # notes wait}} for a model with a key: api:', comment: 'Commands stay English' },
     // markup · clean (stage 11, piece 1; editing spec).
     markupOn: /*i18n*/ { id: 'enter.markupOn', message: 'Enter shows replies marked up: struck words and yours in blue, editable' },
     markupOff: /*i18n*/ { id: 'enter.markupOff', message: 'Enter shows replies clean: the result only, read-only until markup:on' },
@@ -1417,7 +1434,7 @@ export const COPY = {
   welcome: {
     heading: /*i18n*/ { id: 'welcome.heading', message: 'Welcome' },
     headingTo: /*i18n*/ { id: 'welcome.headingTo', message: 'to Parliament', comment: 'The heading finishes its sentence when the steps are done: Welcome / to Parliament' },
-    steps: /*i18n*/ { id: 'welcome.steps', message: 'Eight things to try', comment: 'The name of the list of steps, read by screen readers' },
+    steps: /*i18n*/ { id: 'welcome.steps', message: 'Ten things to try', comment: 'The name of the list of steps, read by screen readers' },
     stepCommand: /*i18n*/ { id: 'welcome.step.command', message: 'Open the command line' },
     stepBar: /*i18n*/ { id: 'welcome.step.bar', message: 'Move the bar to the bottom' },
     stepAsk: /*i18n*/ { id: 'welcome.step.ask', message: 'Ask something' },
@@ -1427,6 +1444,10 @@ export const COPY = {
     stepPop: /*i18n*/ { id: 'welcome.step.pop', message: 'Move it to another monitor' },
     stepLibrary: /*i18n*/ { id: 'welcome.step.library', message: 'Browse tools to add and customize' },
     stepKey: /*i18n*/ { id: 'welcome.step.key', message: 'Add an AI API key' },
+    stepStrike: /*i18n*/ { id: 'welcome.step.strike', message: 'Strike through a line' },
+    stepStrikeHow: /*i18n*/ { id: 'welcome.step.strikeHow', message: 'select words in a reply, then {keys}', comment: '{keys} is the shortcut as this computer writes it: Ctrl+Shift+X or ⌘⇧X' },
+    stepSend: /*i18n*/ { id: 'welcome.step.send', message: 'Send it with your next prompt' },
+    stepSendHow: /*i18n*/ { id: 'welcome.step.sendHow', message: '{command} and a prompt, with an edit waiting', comment: '{command} is p>, which stays English' },
     letter1: /*i18n*/ { id: 'welcome.letter.1', message: 'Parliament is a place to work with AI on your own terms. It is early, and still being built.' },
     letter2: /*i18n*/ {
       id: 'welcome.letter.2',
@@ -2000,6 +2021,7 @@ export const COPY = {
     askAccept: /*i18n*/ { id: 'chat.askAccept', message: 'accept' },
     askUndo: /*i18n*/ { id: 'chat.askUndo', message: 'undo' },
     toldOnly: /*i18n*/ { id: 'chat.toldOnly', message: 'Your edits, told to {name}', comment: 'A prompt that sent only the edits of the person (C216 (e))' },
+    toldNote: /*i18n*/ { id: 'chat.toldNote', message: 'Your note, told once: {note}', comment: 'A tell: note the prompt carried, in the words of the person (C225 (d))' },
     pairLabel: /*i18n*/ { id: 'chat.pairLabel', message: 'Your prompt and its reply. Every word can be edited' },
     // "Pin for reference", renamed (R13): a whole message kept as a quote
     // beside a chat; and the quotes kept beside this one.

@@ -255,8 +255,8 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
       : `A ${node.type.name} is one block for now: Backspace strikes it whole, and editing inside it comes later.`)
   const nothing = () => true
   const strike = (state, dispatch) => {
-    if (state.selection.empty) return true
-    dispatch(state.tr.delete(state.selection.from, state.selection.to).setMeta(INTENT, 'range'))
+    const tr = strikeSelection(state)
+    if (tr) dispatch(tr)
     return true
   }
   const keys = keymap({
@@ -420,6 +420,32 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
 }
 
 /** Every table cell of a document, with its position: each keeps an id of its own (C222). */
+/**
+ * The selection struck, as Ctrl+Shift+X does and strikethrough: in the bar
+ * (C225 (c)): a deletion the editing rules turn into a strike. Null when
+ * nothing is selected.
+ * @param {import('prosemirror-state').EditorState} state
+ */
+export function strikeSelection(state) {
+  if (state.selection.empty) return null
+  return state.tr.delete(state.selection.from, state.selection.to).setMeta(INTENT, 'range')
+}
+
+/**
+ * The ids of the strikes between two positions: struck words, and cells,
+ * rows or blocks struck whole. Used to find the edit a strike made, by
+ * comparing before and after (strikethrough:, C225 (c)).
+ * @returns {Set<string>}
+ */
+export function struckIdsIn(doc, from, to) {
+  const ids = new Set()
+  doc.nodesBetween(Math.max(0, from), Math.min(doc.content.size, to), (node) => {
+    if (node.attrs?.struck != null) ids.add(String(node.attrs.struck))
+    for (const m of node.marks) if (m.type === STRUCK) ids.add(String(m.attrs.edit))
+  })
+  return ids
+}
+
 export function cellsOf(doc) {
   const out = []
   doc.descendants((node, pos) => {

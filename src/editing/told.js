@@ -89,6 +89,28 @@ ${wordsOf(toBlocks(doc))}
 /** Whether an ask waits to go: open, not sent, not held back (C218). */
 export const waitingAsk = (record) => Boolean(record) && record.state === 'open' && !record.sent && !record.held
 
+// tell: notes (stage 11, piece 7; C225 (d)): the person's own words for the
+// next prompt, held in the tab until it goes, then written at the end of its
+// note under this line, and read back from there to show on the prompt.
+const TELL_LEAD = 'The person tells you, for this prompt, in their own words:'
+export const TELL_MAX = 1000
+export const TELLS_MOST = 10
+
+/** The note's part for tell: notes, or '' with none. */
+export function tellNote(tells) {
+  const notes = (Array.isArray(tells) ? tells : []).map((t) => String(t ?? '').trim()).filter(Boolean)
+  if (!notes.length) return ''
+  return [TELL_LEAD, ...notes.map((t) => `- ${t.replace(/\s*\n\s*/g, ' ')}`)].join('\n')
+}
+
+/** The tell: notes a prompt's note carried, as the person wrote them. */
+export function tellsOf(told) {
+  const text = typeof told === 'string' ? told : ''
+  const at = text.lastIndexOf(TELL_LEAD)
+  if (at < 0) return []
+  return text.slice(at + TELL_LEAD.length).split('\n').filter((l) => l.startsWith('- ')).map((l) => l.slice(2))
+}
+
 /** A prompt's words as a model reads them: the note it carried, then the words. */
 export function withTold(message) {
   const told = typeof message?.told === 'string' ? message.told.trim() : ''

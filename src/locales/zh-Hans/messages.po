@@ -857,6 +857,11 @@ msgstr "显示"
 msgid "chat.thoughtUntimed"
 msgstr "已先思考"
 
+#. A tell: note the prompt carried, in the words of the person (C225 (d))
+#. js-lingui-explicit-id
+msgid "chat.toldNote"
+msgstr ""
+
 #. A prompt that sent only the edits of the person (C216 (e))
 #. js-lingui-explicit-id
 msgid "chat.toldOnly"
@@ -3392,6 +3397,19 @@ msgstr "{count, plural, other {来自 {sources} 的 # 个回答不会发送}}"
 msgid "enter.promptStalled"
 msgstr "回复停滞了。有些网络会把流式回复积压起来，就会出现这种情况"
 
+#. js-lingui-explicit-id
+msgid "enter.promptTellGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptTellToReader"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptTellWait"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptThinks"
@@ -3955,6 +3973,33 @@ msgid "enter.stopReply"
 msgstr "按 Enter 停止 {num} 中正在传来的回复。已收到的内容会保留"
 
 #. js-lingui-explicit-id
+msgid "enter.strikeDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.strikeGo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.strikeNoReply"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.strikeNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.strikeNotNow"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.strikeNumbered"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.summarize"
 msgstr "按 Enter 在“{name}”中写一份 {nums} 的摘要，注明今天的日期：调用 {provider} 一次，最多 {cost}"
 
@@ -4073,6 +4118,37 @@ msgstr "→ 新对话"
 #. js-lingui-explicit-id
 msgid "enter.targetNewRoom"
 msgstr "→ 新房间"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tellEmpty"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tellHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tellHold"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tellLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tellMany"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.tellNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.tellSame"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.thinkingNow"
@@ -7018,6 +7094,24 @@ msgstr "为房间命名"
 #. js-lingui-explicit-id
 msgid "welcome.step.pop"
 msgstr "把它移到另一台显示器上"
+
+#. js-lingui-explicit-id
+msgid "welcome.step.send"
+msgstr ""
+
+#. {command} is p>, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.sendHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "welcome.step.strike"
+msgstr ""
+
+#. {keys} is the shortcut as this computer writes it: Ctrl+Shift+X or ⌘⇧X
+#. js-lingui-explicit-id
+msgid "welcome.step.strikeHow"
+msgstr ""
 
 #. The name of the list of steps, read by screen readers
 #. js-lingui-explicit-id

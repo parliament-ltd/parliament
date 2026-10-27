@@ -31,7 +31,7 @@ import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, namesFrom, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
 import { planReply, planLanguage, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
 import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
-import { planHoldEdits, planAsk, planUndoChange, planSettle, planDropAsks } from '../lib/editVerbs'
+import { planHoldEdits, planAsk, planUndoChange, planSettle, planDropAsks, planStrike, planTell } from '../lib/editVerbs'
 import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
@@ -56,7 +56,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -731,6 +731,9 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       markup: planMarkup,
       // ask: (stage 11, piece 4; C218 (a)).
       ask: (a1, s1) => planAsk(s1),
+      // strikethrough: and tell: (piece 7; C225 (c), (d)).
+      strikethrough: planStrike,
+      tell: (a1, s1, sc) => planTell(s1, sc),
       // accept: and reject: on answered asks (piece 5; C220 (d)); Ripple's suggestions join in stage 12.
       accept: (a1, s1, sc) => planSettle(s1, sc, 'accept'),
       reject: (a1, s1, sc) => planSettle(s1, sc, 'reject'),
@@ -953,13 +956,15 @@ export function promptPreview(text, target = {}) {
   // target.edits: { count, asks, chars }: the edits and asks waiting, and
   // the size of their note (asks, piece 4; C218).
   const edits = target.edits && ((target.edits.count ?? 0) + (target.edits.asks ?? 0)) > 0 ? target.edits : null
+  // tell: notes held for it (C225 (d)): target.told { count, chars }.
+  const told = target.told?.count ? target.told : null
   const what = edits ? { edits: edits.count ?? 0, asks: edits.asks ?? 0, total: (edits.count ?? 0) + (edits.asks ?? 0), both: edits.count && edits.asks ? 'yes' : 'no' } : null
   const toModel = (w) => w && w.group !== 'source'
   // On a source's branch, edits and asks go to a model at the same time as
   // the prompt searches again (the editing spec, "Keyless sources"; C218 (e)).
   const r = target.reader
   const reader = r && toModel(r) && !r.needsKey && !r.later && !r.gone && !r.unchecked ? r : null
-  const readerTokens = () => Math.ceil(((target.historyChars ?? 0) + (edits?.chars ?? 0)) / CHARS_PER_TOKEN)
+  const readerTokens = () => Math.ceil(((target.historyChars ?? 0) + (edits?.chars ?? 0) + (told?.chars ?? 0)) / CHARS_PER_TOKEN)
   if (edits && !String(text ?? '').trim() && !target.streaming && !(Array.isArray(target.many) && target.many.length > 1)) {
     // Enter on an empty field sends just the edits and asks (C216 (e)).
     const who = target.answerer ?? { group: target.keyed ? 'model' : 'source', name: target.keyed ? target.provider : target.source }
@@ -967,11 +972,13 @@ export function promptPreview(text, target = {}) {
       if (!reader) return { ready: false, says: { message: 'promptEditsWait', values: { ...what, source: who.name ?? target.source ?? '' } } }
       return { ready: true, editsOnly: true, toReader: true, says: { message: 'promptEditsOnlyReader', values: { ...what, name: reader.name ?? '', source: who.name ?? target.source ?? '', tokens: readerTokens() } } }
     }
-    const p = onePreview('·'.repeat(Math.max(1, edits.chars)), target)
+    const p = onePreview('·'.repeat(Math.max(1, edits.chars + (told?.chars ?? 0))), target)
     if (!p.ready || !p.says) return p
-    return { ...p, editsOnly: true, says: { ...p.says, also: [{ message: 'promptEditsOnly', values: { ...what, name: who.name ?? '' } }, ...(p.says.also ?? [])] } }
+    const also = [{ message: 'promptEditsOnly', values: { ...what, name: who.name ?? '' } }]
+    if (told) also.push({ message: 'promptTellGo', values: { count: told.count, name: who.name ?? '' } })
+    return { ...p, editsOnly: true, says: { ...p.says, also: [...also, ...(p.says.also ?? [])] } }
   }
-  const counted = edits ? { ...target, historyChars: (target.historyChars ?? 0) + edits.chars } : target
+  const counted = edits || told ? { ...target, historyChars: (target.historyChars ?? 0) + (edits?.chars ?? 0) + (told?.chars ?? 0) } : target
   const p = Array.isArray(target.many) && target.many.length > 1 ? manyPreview(text, counted) : onePreview(text, counted)
   // Among a prompt's branches (C174): which one it carries on, and that the
   // one being viewed is not it.
@@ -984,6 +991,16 @@ export function promptPreview(text, target = {}) {
       : reader
         ? { message: 'promptEditsToReader', values: { ...what, name: reader.name ?? '', source: first.name ?? target.source ?? '', tokens: readerTokens() } }
         : { message: 'promptEditsWait', values: { ...what, source: first.name ?? target.source ?? '' } })
+  }
+  // tell: notes held for this prompt (C225 (d), (e)): to the model that
+  // answers, or on a source's branch the one that reads edits there.
+  if (told) {
+    const first = Array.isArray(target.many) && target.many.length > 1 ? target.many[0] : target.answerer ?? { group: target.keyed ? 'model' : 'source', name: target.keyed ? target.provider : target.source }
+    lines.push(toModel(first)
+      ? { message: 'promptTellGo', values: { count: told.count, name: first.name ?? '' } }
+      : reader
+        ? { message: 'promptTellToReader', values: { count: told.count, name: reader.name ?? '', source: first.name ?? target.source ?? '' } }
+        : { message: 'promptTellWait', values: { count: told.count, source: first.name ?? target.source ?? '' } })
   }
   if (target.toBranch) lines.push({ message: 'promptToBranch', values: { address: target.toBranch } })
   if (target.carriesOn) lines.push({ message: 'promptCarriesOn', values: target.carriesOn })

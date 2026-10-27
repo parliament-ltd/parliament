@@ -1,10 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { STEPS, freshWelcome, cleanWelcome, tick, nextStep, isDone, showSteps, withChat, stepsShown } from './welcome'
+import { STEPS, freshWelcome, cleanWelcome, tick, nextStep, isDone, showSteps, withChat, stepsShown, stepsMade } from './welcome'
 import { shipped } from './arrangement'
 
 describe('the welcome steps (stage 5)', () => {
-  it('are the eight as ruled: bar:bottom second, pop:records sixth, api: last (C131 names)', () => {
-    expect(STEPS.map((s) => s.shows)).toEqual(['>', 'bar:bottom', 'p>', 'records:', 'name:"…"', 'pop:records', 'library:', 'api:'])
+  it('are the ten as ruled: bar:bottom second, pop:records sixth, api: eighth, then strike and send (C131 names, C225)', () => {
+    expect(STEPS.map((s) => s.shows)).toEqual(['>', 'bar:bottom', 'p>', 'records:', 'name:"…"', 'pop:records', 'library:', 'api:', 'strikethrough:', 'p>'])
+    expect(STEPS.find((s) => s.id === 'strike').writes).toBe('>strikethrough:')
     expect(STEPS.find((s) => s.id === 'almanac').writes).toBe('>records:')
   })
 
@@ -40,5 +41,25 @@ describe('the welcome steps (stage 5)', () => {
     expect(stepsShown(a)).toEqual([])
     const b = { ...a, bar: { ...a.bar, at: 'bottom' }, columns: [['welcome'], ['almanac']], popped: [{ board: 'library' }] }
     expect(stepsShown(b)).toEqual(['bar', 'almanac', 'pop', 'library'])
+  })
+})
+
+describe('steps 9 and 10 (stage 11, piece 7; C225)', () => {
+  const edit = (change) => ({ kind: 'edit', num: 242, change: { struck: '', added: '', sent: null, ...change } })
+  it('cross off a strike saved and an edit or ask sent, from the numbered rows', () => {
+    expect(stepsMade([])).toEqual([])
+    expect(stepsMade([edit({ added: 'more' })])).toEqual([])
+    expect(stepsMade([edit({ struck: 'eleven' })])).toEqual(['strike'])
+    expect(stepsMade([edit({ struck: 'eleven', sent: { to: 'haiku', at: 'x', into: null } })])).toEqual(['strike', 'send'])
+    expect(stepsMade([{ kind: 'ask', num: 203, change: { sent: { to: 'haiku' } } }])).toEqual(['send'])
+    expect(stepsMade([{ kind: 'chat', num: 202 }])).toEqual([])
+  })
+  it('leave someone who finished the eight finished, and show two more to someone part way', () => {
+    const was = cleanWelcome({ done: ['command', 'bar', 'ask', 'almanac', 'name', 'pop', 'library', 'key'], finished: true })
+    expect(was.finished).toBe(true)
+    const part = cleanWelcome({ done: ['command', 'bar', 'ask', 'almanac', 'name', 'pop', 'library'] })
+    expect(part.finished).toBe(false)
+    expect(nextStep(tick(part, 'key')).id).toBe('strike')
+    expect(tick(tick(tick(part, 'key'), 'strike'), 'send').finished).toBe(true)
   })
 })

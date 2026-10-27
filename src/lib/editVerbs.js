@@ -1,3 +1,5 @@
+import { TELL_MAX, TELLS_MOST } from '../editing/told'
+
 // hold: and hold:off for edits (stage 11, piece 3; C216 (f)). Planned before
 // Enter: what the Enter line says, and what Enter does. Pure.
 //
@@ -50,6 +52,40 @@ export function planAsk(step) {
   if ([...question].length > ASK_MAX) return { says: { message: 'askLong', values: { max: ASK_MAX } }, act: null }
   if (!question) return { says: { message: 'askOpen' }, act: { kind: 'ask', question: null } }
   return { says: { message: 'askKeep' }, act: { kind: 'ask', question } }
+}
+
+// strikethrough: (stage 11, piece 7; C225 (c)): strikes the words selected in
+// the reply last in focus, as Ctrl+Shift+X there. Which reply is the shell's
+// to find when Enter runs it.
+
+/** @returns {{ says: object, act: object }} */
+export const planStrike = () => ({ says: { message: 'strikeGo' }, act: { kind: 'strike' } })
+
+// tell: (stage 11, piece 7; C225 (d), option 1): a note in the person's own
+// words that the model reads with the next prompt to the chat in the room,
+// once. Held in the tab like include:, nothing stored until that prompt goes.
+//
+//   tell:"Keep it under a page"   held for the next prompt here
+//
+// screens.telling: { room, held } with room as roomOnScreen gives it
+// (undefined with no room) and held the notes held for it.
+
+/** @returns {{ says: object, act: object|null }} */
+export function planTell(step, screens = {}) {
+  const t = screens.telling
+  if (!t || t.room === undefined) return { says: { message: 'tellNoRoom' }, act: null }
+  const raw = String(step.match?.values?.[0] ?? '').trim()
+  const text = raw.replace(/^"([\s\S]*)"$/, '$1').trim()
+  if (!text) return { says: { message: 'tellEmpty' }, act: null }
+  if ([...text].length > TELL_MAX) return { says: { message: 'tellLong', values: { max: TELL_MAX } }, act: null }
+  const held = Array.isArray(t.held) ? t.held : []
+  if (held.length >= TELLS_MOST) return { says: { message: 'tellMany', values: { most: TELLS_MOST } }, act: null }
+  if (held.includes(text)) return { says: { message: 'tellSame' }, act: null }
+  const notes = [...held, text]
+  return {
+    says: { message: 'tellHold', values: { count: notes.length } },
+    act: { kind: 'tell', room: t.room ?? null, notes, before: held },
+  }
 }
 
 // Every edit and ask Records knows, from any board (C220 (d)); else the

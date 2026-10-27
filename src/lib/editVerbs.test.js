@@ -63,3 +63,33 @@ describe('delete: on asks, and the other commands', () => {
     expect(at('>hold:246', 'collection').act.edits[0].list).toBe('asks')
   })
 })
+
+describe('strikethrough: and tell: (piece 7; C225)', () => {
+  const telling = (room, held = []) => (value) => {
+    const p = preview(value, { mode: 'command', arrangement: { ...shipped('almanac'), addressed: 'room' }, screens: { telling: { room, held } } })
+    return { ...p, text: p.says ? say(i18n, p.says.message, p.says.values) : '' }
+  }
+  it('strikethrough: strikes the selection in the reply last in focus', () => {
+    const p = at('>strikethrough:')
+    expect(p.text).toBe('Enter strikes the words you selected in a reply. They stay, struck, and go with your next prompt as an edit')
+    expect(p.act).toEqual({ kind: 'strike' })
+  })
+  it('tell: holds a note for the next prompt in the room, and undo: takes it back', () => {
+    const p = telling('c202')('>tell:"Keep it under a page"')
+    expect(p.text).toBe('Enter holds this note for your next prompt here. The model reads it once, with that prompt')
+    expect(p.act).toEqual({ kind: 'tell', room: 'c202', notes: ['Keep it under a page'], before: [] })
+    const two = telling('c202', ['Keep it under a page'])('>tell:"Plainer words"')
+    expect(two.text).toBe('Enter holds this note for your next prompt here. The model reads it once, with that prompt, 2 notes in all')
+    expect(two.act.notes).toEqual(['Keep it under a page', 'Plainer words'])
+    expect(two.act.before).toEqual(['Keep it under a page'])
+    // A room with no chat yet holds it too, for its first prompt.
+    expect(telling(null)('>tell:"Short"').act).toMatchObject({ room: null, notes: ['Short'] })
+  })
+  it('tell: refuses what cannot be held', () => {
+    expect(telling(undefined)('>tell:"Short"')).toMatchObject({ act: null, text: 'A note goes with a prompt in a room. Open one first: room:' })
+    expect(telling('c202')('>tell:""').text).toBe('tell: does not take that. For example: tell:"Keep it under a page"')
+    expect(telling('c202', ['Short'])('>tell:"Short"').text).toBe('That note is held already')
+    expect(telling('c202')(`>tell:"${'a'.repeat(1001)}"`).text).toBe('A note holds up to 1000 characters')
+    expect(telling('c202', Array.from({ length: 10 }, (_, i) => `n${i}`))('>tell:"more"').text).toBe('Up to 10 notes wait for one prompt')
+  })
+})

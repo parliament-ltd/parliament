@@ -3,6 +3,7 @@ import Globe from './Globe'
 import { COPY } from '../copy'
 import { STEPS, nextStep } from '../shell/welcome'
 import { useNarrower } from './useNarrower'
+import { modKey } from '../shell/keys'
 import BirdsMark from './BirdsMark'
 
 // Below this width the card is one column: steps, field, then the letter
@@ -10,7 +11,7 @@ import BirdsMark from './BirdsMark'
 const CARD_WIDE = 760
 
 // The welcome page's card (refactor-plan.md, stage 5; welcome spec §2 to
-// §4, welcome v9). One large card: "Welcome", the eight steps, the field
+// §4, welcome v9). One large card: "Welcome", the ten steps, the field
 // under them, and the letter beside them. The page is the lesson: every
 // step is a real command, crossed off when the thing itself happens.
 //
@@ -27,6 +28,16 @@ const TITLES = {
   pop: COPY.welcome.stepPop,
   library: COPY.welcome.stepLibrary,
   key: COPY.welcome.stepKey,
+  strike: COPY.welcome.stepStrike,
+  send: COPY.welcome.stepSend,
+}
+
+// What a step's command line says, where it is more than its command.
+function howOf(i18n, s) {
+  if (s.id === 'ask') return i18n._(COPY.welcome.stepAskHow, { command: s.shows })
+  if (s.id === 'strike') return i18n._(COPY.welcome.stepStrikeHow, { keys: modKey() === '⌘' ? '⌘⇧X' : 'Ctrl+Shift+X' })
+  if (s.id === 'send') return i18n._(COPY.welcome.stepSendHow, { command: s.shows })
+  return s.shows
 }
 
 // A line with a command in it, where the command is a link that writes it
@@ -77,7 +88,7 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
             <ol className="ch-steps" aria-label={i18n._(COPY.welcome.steps)}>
               {STEPS.map((s, i) => {
                 const done = welcome.done.includes(s.id)
-                const how = s.id === 'ask' ? i18n._(COPY.welcome.stepAskHow, { command: s.shows }) : s.shows
+                const how = howOf(i18n, s)
                 return (
                   <li key={s.id} className={done ? 'done' : next?.id === s.id ? 'next' : undefined}>
                     <span className="n">{i + 1}</span>
