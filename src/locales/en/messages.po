@@ -3587,6 +3587,81 @@ msgstr "Your question could not be translated, so nothing was sent. Try again, o
 msgid "enter.ready"
 msgstr "Enter runs {verb}"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.reflectChanged"
+msgstr "The room shows another chat now. reflect: again reads it"
+
+#. js-lingui-explicit-id
+msgid "enter.reflectCut"
+msgstr "It is long: the oldest turns are left out"
+
+#. js-lingui-explicit-id
+msgid "enter.reflectDone"
+msgstr "Reflected on {head}. Nothing in it changed"
+
+#. js-lingui-explicit-id
+msgid "enter.reflectFailed"
+msgstr "The reflection did not come back. Nothing changed"
+
+#. js-lingui-explicit-id
+msgid "enter.reflectGo"
+msgstr "Enter reflects on {head}{count, plural, one {} other { and its branches}}: one call to {model}, about {cost}"
+
+#. js-lingui-explicit-id
+msgid "enter.reflectGoCheap"
+msgstr "Enter reflects on {head}{count, plural, one {} other { and its branches}}: one call to {model}, under {cost}"
+
+#. js-lingui-explicit-id
+msgid "enter.reflectGoing"
+msgstr "{model} is reading {head}. Nothing in it changes"
+
+#. js-lingui-explicit-id
+msgid "enter.reflectGoUnpriced"
+msgstr "Enter reflects on {head}{count, plural, one {} other { and its branches}}: one call to {model}, about {tokens} tokens"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.reflectNoKey"
+msgstr "Reflecting on {head} needs a model with a key: api:"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.reflectNoRoom"
+msgstr "Reflection reads the chat in a room. Open one first: room:"
+
+#. js-lingui-explicit-id
+msgid "enter.reflectNothingBack"
+msgstr "Nothing said here goes back into {head}"
+
+#. js-lingui-explicit-id
+msgid "enter.reflectTalkBusy"
+msgstr "Reflection is still writing. Wait for it, then ask"
+
+#. js-lingui-explicit-id
+msgid "enter.reflectTalkFailed"
+msgstr "No answer came back. Nothing changed"
+
+#. js-lingui-explicit-id
+msgid "enter.reflectTalkGo"
+msgstr "Enter asks {model} about {head}: one call, about {cost}"
+
+#. js-lingui-explicit-id
+msgid "enter.reflectTalkGoCheap"
+msgstr "Enter asks {model} about {head}: one call, under {cost}"
+
+#. js-lingui-explicit-id
+msgid "enter.reflectTalkGoUnpriced"
+msgstr "Enter asks {model} about {head}: one call, about {tokens} tokens"
+
+#. js-lingui-explicit-id
+msgid "enter.reflectTalkRest"
+msgstr "Talk about {head} here. Nothing said goes back into it"
+
+#. js-lingui-explicit-id
+msgid "enter.reflectUnder"
+msgstr "Under {names}"
+
 #. Enter puts the new verb in the field; it does not run it
 #. js-lingui-explicit-id
 msgid "enter.renamed"
@@ -6096,6 +6171,139 @@ msgstr "{count, plural, one {a bank account number} other {# bank account number
 #. js-lingui-explicit-id
 msgid "privacy.phone"
 msgstr "{count, plural, one {a phone number} other {# phone numbers}}"
+
+#. js-lingui-explicit-id
+msgid "reflection.again"
+msgstr "reflect again"
+
+#. js-lingui-explicit-id
+msgid "reflection.by"
+msgstr "by {name}"
+
+#. js-lingui-explicit-id
+msgid "reflection.costUnknown"
+msgstr "cost not known"
+
+#. js-lingui-explicit-id
+msgid "reflection.from"
+msgstr "from {head}"
+
+#. js-lingui-explicit-id
+msgid "reflection.keepNote"
+msgstr "keep as a note"
+
+#. js-lingui-explicit-id
+msgid "reflection.markAsks"
+msgstr "{count, plural, one {# ask} other {# asks}}"
+
+#. js-lingui-explicit-id
+msgid "reflection.marked"
+msgstr "Marked so far"
+
+#. js-lingui-explicit-id
+msgid "reflection.markedIn"
+msgstr "{list}, across {branches}."
+
+#. js-lingui-explicit-id
+msgid "reflection.markEdits"
+msgstr "{count, plural, one {# edit} other {# edits}}"
+
+#. js-lingui-explicit-id
+msgid "reflection.markedNothing"
+msgstr "Nothing marked yet."
+
+#. js-lingui-explicit-id
+msgid "reflection.markNotes"
+msgstr "{count, plural, one {# note} other {# notes}}"
+
+#. js-lingui-explicit-id
+msgid "reflection.markQuotes"
+msgstr "{count, plural, one {# quote} other {# quotes}}"
+
+#. js-lingui-explicit-id
+msgid "reflection.markSuggestions"
+msgstr "{count, plural, one {# suggestion} other {# suggestions}}"
+
+#. js-lingui-explicit-id
+msgid "reflection.markTerms"
+msgstr "{count, plural, one {# keyword} other {# keywords}}"
+
+#. js-lingui-explicit-id
+msgid "reflection.noCall"
+msgstr "no call"
+
+#. js-lingui-explicit-id
+msgid "reflection.noRoom"
+msgstr "Reflection reads the chat in the room. Open a room, and it reads that chat and its branches."
+
+#. js-lingui-explicit-id
+msgid "reflection.proposal"
+msgstr "A proposal"
+
+#. js-lingui-explicit-id
+msgid "reflection.questionHelp"
+msgstr "Writes it in the bar, to talk about"
+
+#. js-lingui-explicit-id
+msgid "reflection.questions"
+msgstr "Prompts for reflection"
+
+#. js-lingui-explicit-id
+msgid "reflection.readsOnly"
+msgstr "reads, never writes"
+
+#. js-lingui-explicit-id
+msgid "reflection.reflect"
+msgstr "Reflect"
+
+#. js-lingui-explicit-id
+msgid "reflection.reflectAbout"
+msgstr "Reads {head} and everything marked in it, then writes a synthesis and a few questions drawn from your own markings. One call, named before Enter."
+
+#. js-lingui-explicit-id
+msgid "reflection.reflecting"
+msgstr "Reflecting…"
+
+#. js-lingui-explicit-id
+msgid "reflection.session"
+msgstr "Session"
+
+#. js-lingui-explicit-id
+msgid "reflection.sessionIs"
+msgstr "{messages, plural, one {# message} other {# messages}} · {tokens, plural, =0 {no tokens reported} other {about # tokens}} · {cost}"
+
+#. js-lingui-explicit-id
+msgid "reflection.sessionReading"
+msgstr "Reading…"
+
+#. js-lingui-explicit-id
+msgid "reflection.sweepAs"
+msgstr "Sweep {branch} as {name}"
+
+#. js-lingui-explicit-id
+msgid "reflection.synthesis"
+msgstr "Synthesis"
+
+#. js-lingui-explicit-id
+msgid "reflection.talk"
+msgstr "Talk about the chat"
+
+#. js-lingui-explicit-id
+msgid "reflection.talkFailed"
+msgstr "No answer came back."
+
+#. js-lingui-explicit-id
+msgid "reflection.talkHow"
+msgstr "With this board addressed, the bar talks about {head}. Nothing said here goes back into it."
+
+#. js-lingui-explicit-id
+msgid "reflection.talkWaiting"
+msgstr "Writing…"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "reflection.writes"
+msgstr "Writes {command} in the bar"
 
 #. js-lingui-explicit-id
 msgid "replyPicker.all"

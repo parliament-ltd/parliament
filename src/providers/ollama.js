@@ -1,5 +1,5 @@
 import { BaseProvider } from './base'
-import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary, RIPPLE_SYSTEM_PROMPT, RIPPLE_MAX_TOKENS, rippleMessage, readRipple, SWEEP_SYSTEM_PROMPT, SWEEP_MAX_TOKENS, sweepMessage, readSweep, withIncluded } from './shared'
+import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary, RIPPLE_SYSTEM_PROMPT, RIPPLE_MAX_TOKENS, rippleMessage, readRipple, SWEEP_SYSTEM_PROMPT, SWEEP_MAX_TOKENS, sweepMessage, readSweep, REFLECT_SYSTEM_PROMPT, REFLECT_TALK_SYSTEM_PROMPT, REFLECT_MAX_TOKENS, REFLECT_TALK_MAX_TOKENS, reflectMaterial, reflectTalkMessage, reflectSystem, readReflection, readReflectTalk, withIncluded } from './shared'
 import { NAMES_SYSTEM_PROMPT, CHECK_SYSTEM_PROMPT, readNames, readCheck } from '../lib/injection'
 
 // Text for one of the checks below, in its tag, any such tag inside taken out.
@@ -311,6 +311,15 @@ export class OllamaProvider extends BaseProvider {
   // A sweep (C233) by a model on this computer: free, and nothing leaves it.
   async sweep(request, { model } = {}) {
     return readSweep(await this._lightweightCall(SWEEP_SYSTEM_PROMPT, [{ role: 'user', content: sweepMessage(request) }], SWEEP_MAX_TOKENS, model))
+  }
+
+  // Reflection (C235) by a model on this computer: free, and nothing leaves it.
+  async reflect(request, { model, rules = [] } = {}) {
+    return readReflection(await this._lightweightCall(reflectSystem(REFLECT_SYSTEM_PROMPT, rules), [{ role: 'user', content: reflectMaterial(request) }], REFLECT_MAX_TOKENS, model), request)
+  }
+
+  async reflectTalk(request, { model, rules = [] } = {}) {
+    return readReflectTalk(await this._lightweightCall(reflectSystem(REFLECT_TALK_SYSTEM_PROMPT, rules), [{ role: 'user', content: reflectTalkMessage(request) }], REFLECT_TALK_MAX_TOKENS, model))
   }
 
   async translate(pieces, { from = null, to, query = false, model } = {}) {

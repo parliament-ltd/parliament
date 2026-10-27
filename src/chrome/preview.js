@@ -33,6 +33,7 @@ import { planReply, planLanguage, planHelper, planTranslate, planPrivacy, planCh
 import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
 import { planHoldEdits, planAsk, planUndoChange, planSettle, planDropAsks, planStrike, planTell, planRipple } from '../lib/editVerbs'
 import { planSweep } from '../lib/sweep'
+import { planReflect, reflectTalkPreview } from '../lib/reflection'
 import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
@@ -57,7 +58,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep', 'reflect'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -740,6 +741,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       ripple: (a1, s1, sc) => planRipple(s1, sc),
       // sweep: (piece 3; C233).
       sweep: (a1, s1, sc) => planSweep(s1, sc),
+      // reflect: (piece 4; C235).
+      reflect: (a1, s1, sc) => planReflect(s1, sc),
       // accept: and reject: on answered asks (piece 5; C220 (d)); Ripple's suggestions join in stage 12.
       accept: (a1, s1, sc) => planSettle(s1, sc, 'accept'),
       reject: (a1, s1, sc) => planSettle(s1, sc, 'reject'),
@@ -953,6 +956,8 @@ const CENT = 0.01
 export function promptPreview(text, target = {}) {
   // With the Plan board addressed, a prompt is a step planned; nothing is sent (C198).
   if (target.plan) return planPromptPreview(text, target.plan)
+  // With Reflection addressed, the talk about the chat, never the chat (C235 (f)).
+  if (target.reflection) return reflectTalkPreview(text, target.reflection)
   // A branch a run is sending to takes no prompt by hand until it ends (C196 (f)).
   if (target.branchRunning) return { ready: false, says: { message: 'promptBranchRunning', values: { address: target.branchRunning } } }
   if (target.room === undefined) return { ready: false, says: { message: 'promptNoRoom' } }

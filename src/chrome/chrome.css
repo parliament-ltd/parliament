@@ -888,3 +888,14 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 /* Ripple's switch in a room's head (stage 12, piece 2; C231 (e)): marginalia; rust while on. */
 .ch-shell .ch-chead button.ch-ripple { padding: 0; background: none; border: 0; cursor: pointer; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px; white-space: nowrap; }
 .ch-shell .ch-chead button.ch-ripple.on { color: var(--ch-rust); text-decoration-style: dashed; }
+
+/* The Reflection board (stage 12, piece 4; C235; inline editing v5). */
+.ch-ref { display: flex; flex-direction: column; gap: 14px; }
+.ch-ref-sec h3 { font: 600 12px var(--ch-sans); color: var(--ch-ink); margin: 0 0 4px; }
+.ch-ref-sec h3 .ch-marg { font-weight: 400; margin-inline-start: 6px; }
+.ch-ref-sec p { font: 400 13px/1.55 var(--ch-serif); color: var(--ch-ink); margin: 0 0 4px; }
+.ch-ref-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.ch-shell .ch-ref-sec .ch-marg button { padding: 0; color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+.ch-shell .ch-ref-q { display: block; text-align: start; padding: 4px 0; font: italic 400 13px/1.5 var(--ch-serif); color: var(--ch-ink); text-decoration: underline dotted; text-underline-offset: 3px; }
+.ch-ref-turn { margin: 6px 0; }
+.ch-ref-you { font-style: italic; color: var(--ch-ink-2) !important; }

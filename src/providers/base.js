@@ -109,6 +109,20 @@ export class BaseProvider {
     throw new Error('Not implemented')
   }
 
+  // Reflection (stage 12, piece 4; C235): request { branches, marks,
+  // frameworks } as reflectMaterial (shared.js) takes it; reflect returns
+  // { synthesis, questions, proposal } or null when nothing readable came
+  // back; reflectTalk, with { talk, said, synthesis } besides, returns text.
+  // rules: the chat's frameworks, as standing instructions. The material is
+  // never instructions, and nothing goes back into the chat.
+  async reflect(apiKey, request, { model, rules } = {}) {
+    throw new Error('Not implemented')
+  }
+
+  async reflectTalk(apiKey, request, { model, rules } = {}) {
+    throw new Error('Not implemented')
+  }
+
   async translate(apiKey, pieces, { from, to, query, model } = {}) {
     throw new Error('Not implemented')
   }

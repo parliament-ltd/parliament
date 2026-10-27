@@ -74,4 +74,20 @@ export default defineConfig([
     plugins: { parliament: { rules: { 'no-hard-coded-words': noHardCodedWords } } },
     rules: { 'parliament/no-hard-coded-words': 'error' },
   },
+  {
+    // Reflection reads, never writes (stage 12, piece 4; C228 (j), C235 (h)):
+    // the board and its module import nothing that can write stored data,
+    // on top of the one way out above. reflection.test.js follows every
+    // import they make, so a module that writes cannot come in sideways.
+    files: ['src/lib/reflection.js', 'src/chrome/ReflectionBoard.jsx'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          { group: ['**/providers', '**/providers/*'], message: 'Provider code is reached through the gateway: import from src/net.' },
+          { group: ['**/net', '**/net/*'], message: 'Reflection is given what it reads, and its calls are made by the shell.' },
+          { group: ['**/db', '**/records', '**/stores/*', '**/migrations/*', '**/backup*', '**/restore*'], message: 'Reflection reads, never writes: it is given what it reads, and imports nothing that writes.' },
+        ],
+      }],
+    },
+  },
 ])

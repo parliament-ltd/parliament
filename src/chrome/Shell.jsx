@@ -80,6 +80,8 @@ import { changeStored } from '../editing/storedChange'
 import { settleStored, newSuggestionId } from '../editing/suggestions'
 import { rippleChars, checkBranches, landRipple, landSuggestions as landStored } from '../lib/ripple'
 import { lastReply, sweepRequest, sweepItems } from '../lib/sweep'
+import { reflectionScope, markedSoFar, sessionOf, reflectRequest, readScope } from '../lib/reflection'
+import ReflectionBoard from './ReflectionBoard'
 
 // The new shell (refactor-plan.md §4 and stages 3 and 4): the board strip,
 // the boards as the arrangement places them, the bar, and windows of their
@@ -967,6 +969,8 @@ export default function Shell() {
     return null
   }, [commit])
 
+  // Reflect, reached by the act (defined later, with what it reads; C235).
+  const runReflectNow = useRef(null)
   const act = useCallback(async (what, body, next = null) => {
     if (PLAN_ACTS.has(what.kind)) return planActNow.current(what, body)
     if (what.kind === 'rows') {
@@ -1300,6 +1304,14 @@ export default function Shell() {
       if (touched.current) touched.current.tell = { room: what.room ?? '', before: what.before ?? [] }
       remember(body)
       return { done: true, says: { message: 'tellHeld', values: { count: what.notes.length } } }
+    }
+    if (what.kind === 'reflect') {
+      // reflect: (stage 12, piece 4; C235 (d)): one call to the helper; what
+      // comes back is shown on the board and kept in this tab only.
+      const r = reflectNow.current
+      if (!r?.scope || r.scope.key !== what.key) return 'reflectChanged'
+      remember(body)
+      return { done: true, says: { message: 'reflectGoing', values: { head: r.scope.head, model: r.helper?.name ?? '' } }, later: runReflectNow.current?.() ?? Promise.resolve({ message: 'reflectFailed' }) }
     }
     if (what.kind === 'sweep') {
       // sweep: (stage 12, piece 3; C233): one call to the helper the line
@@ -1874,6 +1886,92 @@ export default function Shell() {
   const languageName = useCallback((tag) => nameOf(tag, i18n.locale), [i18n.locale])
   // The model that reads text from sources, and translates it.
   const helperNow = useMemo(() => helperOf({ chosen: settings.helper ?? null, keyed: keys }), [settings.helper, keys, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- a check changes the models
+
+  // ── Reflection (stage 12, piece 4; C235) ─────────────────
+  // What it reads: the room's chat and its plan's other branches. What it
+  // keeps: in this tab only, until the room shows another chat (C235 (g)).
+  const reflectScope = useMemo(() => reflectionScope(almanacRows ?? [], roomId ?? null), [almanacRows, roomId])
+  const [reflectionState, setReflectionState] = useState(null)
+  useEffect(() => {
+    setReflectionState((s) => (s && s.key !== (reflectScope?.key ?? null) ? null : s))
+  }, [reflectScope?.key])
+  // Its messages, read only while the board is on screen, for Session.
+  const reflectionOnScreen = arrangement.columns.flat().includes('reflection') || arrangement.popped.some((p) => p.board === 'reflection')
+  const [reflectMessages, setReflectMessages] = useState(null)
+  useEffect(() => {
+    if (!reflectionOnScreen || !reflectScope) { setReflectMessages(null); return undefined }
+    let live = true
+    readScope(reflectScope, { messagesOf: getMessages }).then((m) => { if (live) setReflectMessages(m) }, () => {})
+    return () => { live = false }
+  }, [reflectionOnScreen, reflectScope, almanacRows])
+  const reflectMarked = useMemo(() => (reflectScope ? markedSoFar(almanacRows ?? [], reflectScope) : null), [almanacRows, reflectScope])
+  const reflectSession = useMemo(() => (reflectScope && reflectMessages ? sessionOf(almanacRows ?? [], reflectScope, reflectMessages) : null), [almanacRows, reflectScope, reflectMessages])
+  // The room chat's frameworks shape it (C235 (d)), named on its line.
+  const reflectRules = useMemo(() => frameworksOf(fwHere, fwList), [fwHere, fwList])
+  const reflecting = useMemo(() => ({
+    scope: reflectScope, rows: almanacRows ?? [], helper: helperNow, rules: reflectRules.map(nameOfFramework),
+    busy: reflectionState?.busy ?? null, talkChars: (reflectionState?.talk ?? []).reduce((n, t) => n + String(t.you ?? '').length + String(t.ai ?? '').length, 0),
+  }), [reflectScope, almanacRows, helperNow, reflectRules, nameOfFramework, reflectionState])
+  const reflectNow = useRef(null)
+  useEffect(() => { reflectNow.current = { ...reflecting, instructions: reflectRules.map((f) => f.instruction), state: reflectionState, list: fwList, nameOf: nameOfFramework } })
+  // The word sweep: takes for a framework, and its name (C235 (e)).
+  const frameworkWord = useCallback((id) => {
+    const f = fwList.find((x) => x.id === id)
+    if (!f) return id
+    return f.builtIn ? f.id : String(f.name ?? '').trim().split(/\s+/)[0].toLowerCase()
+  }, [fwList])
+  const frameworkName = useCallback((id) => {
+    const f = fwList.find((x) => x.id === id)
+    return f ? nameOfFramework(f) : id
+  }, [fwList, nameOfFramework])
+
+  /** Reflect: one call to the helper; the result stays in this tab (C235 (d), (e)). */
+  const runReflect = useCallback(async () => {
+    const r = reflectNow.current
+    const scope = r?.scope
+    const h = r?.helper
+    if (!scope || !h) return { message: 'reflectFailed' }
+    setReflectionState((s) => ({ ...(s?.key === scope.key ? s : { key: scope.key, talk: [], result: null }), busy: 'reflect' }))
+    try {
+      const messagesByChat = await readScope(scope, { messagesOf: getMessages })
+      const request = reflectRequest({ scope, rows: r.rows, messagesByChat, frameworks: r.list, nameOf: r.nameOf })
+      const result = await gateway.call(h.provider, 'reflect', [request, { model: h.id, rules: r.instructions }], { label: 'reflect' })
+      setReflectionState((s) => (s?.key === scope.key ? { ...s, busy: null, ...(result ? { result, model: h.name } : {}) } : s))
+      return result ? { message: 'reflectDone', values: { head: scope.head } } : { message: 'reflectFailed' }
+    } catch {
+      setReflectionState((s) => (s?.key === scope.key ? { ...s, busy: null } : s))
+      return { message: 'reflectFailed' }
+    }
+  }, [])
+
+  useEffect(() => { runReflectNow.current = runReflect }, [runReflect])
+
+  /** A prompt with Reflection addressed: the talk about the chat, never the chat (C235 (f)). */
+  const talkToReflection = useCallback(async (text) => {
+    const r = reflectNow.current
+    const scope = r?.scope
+    const h = r?.helper
+    if (!scope || !h || r.busy) return { refused: 'reflectTalkBusy' }
+    const before = r.state?.key === scope.key ? r.state.talk ?? [] : []
+    const synthesis = r.state?.key === scope.key ? r.state.result?.synthesis ?? null : null
+    setReflectionState((s) => ({ ...(s?.key === scope.key ? s : { key: scope.key, result: null }), talk: [...before, { you: text }], busy: 'talk' }))
+    const settle = (patch) => setReflectionState((s) => (s?.key === scope.key
+      ? { ...s, busy: null, talk: s.talk.map((t, i) => (i === s.talk.length - 1 ? { ...t, ...patch } : t)) }
+      : s))
+    const done = (async () => {
+      try {
+        const messagesByChat = await readScope(scope, { messagesOf: getMessages })
+        const request = { ...reflectRequest({ scope, rows: r.rows, messagesByChat, frameworks: r.list, nameOf: r.nameOf }), talk: before.filter((t) => t.ai), said: text, synthesis }
+        const ai = await gateway.call(h.provider, 'reflectTalk', [request, { model: h.id, rules: r.instructions }], { label: 'reflect talk' })
+        settle({ ai })
+        return null
+      } catch {
+        settle({ failed: true })
+        return { message: 'reflectTalkFailed' }
+      }
+    })()
+    return { done }
+  }, [])
   const translateTo = translateInto(reply, i18n.locale)
   // The chat on screen's messages, and its last answer from a source.
   // The room a prompt goes to: its chat's messages, held by its room (C175 (a)).
@@ -2432,7 +2530,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -2514,6 +2612,8 @@ export default function Shell() {
   const prompt = useMemo(() => ({
     // With the Plan board addressed, a prompt is a step planned (C198).
     plan: arrangement.addressed === 'docket' ? planBoard ?? NO_PLAN : null,
+    // With Reflection addressed, a prompt is the talk about the chat (C235 (f)).
+    reflection: arrangement.addressed === 'reflection' ? reflecting : null,
     // A branch this tab is running takes no prompt by hand (C196 (f)).
     branchRunning: (() => {
       const r = roomId ? chatRowsById.get(roomId) : null
@@ -2575,7 +2675,7 @@ export default function Shell() {
     ink,
     roomName: roomNameHere,
     about,
-  }), [arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere, tellsHere, rippleFacts])
+  }), [arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere, tellsHere, rippleFacts, reflecting])
 
   // ── Ripple (stage 12, piece 2; C231) ──────────────────
   // What came back for one message, landed (lib/ripple.js landRipple), and
@@ -2609,6 +2709,7 @@ export default function Shell() {
    */
   const onPrompt = useCallback(async (text, shown) => {
     if (shown?.plan) return promptToPlan(text, shown)
+    if (shown?.reflection) return talkToReflection(text)
     const aboutNow = shown?.about ?? null
     const roomChat = aboutNow ? null : roomOnScreen(current.current) ?? null
     // Among a prompt's branches (C174): where the line said it goes, read
@@ -2915,7 +3016,7 @@ export default function Shell() {
         return failure(err, who.group === 'source' ? who.name : undefined)
       })
     return { done: withRipple(done, going, id) }
-  }, [askSource, askSourceAs, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked, promptToPlan, planRuns, translateQuery, tellsFor, moveTell])
+  }, [askSource, askSourceAs, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked, promptToPlan, planRuns, translateQuery, tellsFor, moveTell, talkToReflection])
 
   // again:203a (editing spec; C177): the branch's last prompt, read again,
   // asked as a new branch of its plan, the next letter, by who answers that
@@ -3131,6 +3232,16 @@ export default function Shell() {
     }
     if (board === 'welcome') {
       return <WelcomeBoard key="welcome" welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={() => runCommand('language:')} />
+    }
+    if (board === 'reflection') {
+      return (
+        <ReflectionBoard
+          key="reflection" addressed={arrangement.addressed === 'reflection'} onAddress={focusBoard} onWrite={writeField}
+          scope={reflectScope} marked={reflectMarked} session={reflectSession}
+          reflection={reflectionState?.key === reflectScope?.key ? reflectionState : null}
+          wordOf={frameworkWord} nameOf={frameworkName}
+        />
+      )
     }
     if (board === 'collection') {
       return (

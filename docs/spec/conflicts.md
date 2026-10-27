@@ -2338,6 +2338,42 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Security and privacy:** every call names its model and cost first and goes through the gateway to the helper. The chats go to it as material, a source's text marked as such. What comes back is shown as text and can only write a command into the bar for your Enter.
 - **Suggestion:** build as above.
 
+**C236. Stage 12, pieces 4 and 5, as built: the Reflection board and the talk about the chat** (27 October; C235 as suggested).
+- **The board:** `open:reflection` (or its title on the strip) opens it beside the room. It replaces the placeholder. Its head reads "from 215 · reads, never writes". With no room on screen it says to open one.
+  - **Marked so far, no call:** "1 edit, 1 ask, and 2 suggestions, across 215a".
+  - **Session, no call:** "4 messages · no tokens reported · cost not known", from what the providers reported and Records knows.
+- **Reflect,** the button or `reflect:`. The button writes `>reflect:` into the bar, and Enter runs it. The line reads "Enter reflects on 215 and its branches: one call to Haiku 5.5, under $0.01", with "Under Push back on me" when the chat has frameworks, and "It is long: the oldest turns are left out" when it is. Without a key it says one is needed.
+  - **The call:** a new `reflect` method on each provider, through the gateway, to the helper. It is sent:
+    - the branches' turns as they read now, a source's marked as text fetched from a website;
+    - the markings, as text;
+    - the frameworks, with the chat's own as the helper's standing instructions;
+    - all in tags the text cannot close.
+  - **Shown as text:**
+    - the synthesis, with "keep as a note" (writes `>note:"…"` into the bar) and "reflect again";
+    - three questions, each of which, clicked, writes `p>…` into the bar to talk about;
+    - a proposal, kept only for a branch it read and a framework it was offered. Its button writes `>sweep:215a pushback` for your Enter.
+- **The talk:** with the board addressed, the bar's prompt goes to the board, never to the chat. The field's margin reads "→ Reflection", not the room's chat. The line says "Enter asks Haiku 5.5 about 215: one call, under $0.01 · Nothing said here goes back into 215". Each message is one call (`reflectTalk`) with the same material, the synthesis and the talk so far. The board shows it as text, the answer arriving in place of "Writing…".
+- **What it keeps:** the reflection and the talk stay in this tab, and are cleared when the room shows another chat. Nothing is stored.
+- **Reads, never writes** (C228 (j)):
+  - the board and `lib/reflection.js` are given what they read: rows, and a reader of messages;
+  - a lint rule refuses, in those two files, imports of the database, the records module, the stores, migrations, backups and restores, the providers and the gateway;
+  - a test follows every local import from both files, and finds none of those reached, directly or sideways.
+- **Tests:**
+  - what it reads, counts and sends, tags kept in, a source marked;
+  - reading what comes back, a proposal kept only when it fits;
+  - reading only through the reader given;
+  - `reflect:` and the talk on the Enter line;
+  - the import walk.
+
+  1,260 tests.
+- **Tried in the browser,** on the trial copy, with no key:
+  - `open:reflection` opened it beside room 223;
+  - it read plan 215 and counted its markings and messages;
+  - Reflect wrote `>reflect:`, whose line said a key is needed;
+  - with the board addressed, a prompt showed "→ Reflection" and the same, and went nowhere.
+- **Not tried:** a synthesis or a talk by a model, as the trial copy has no key.
+- **Next:** the stage 12 checkpoint (C228 piece 6): Drafting Desk's R line, Secretarybird's comments and suggestions, and the Review modal against this board.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

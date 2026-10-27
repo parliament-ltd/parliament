@@ -3587,6 +3587,81 @@ msgstr "Kysymystäsi ei voitu kääntää, joten mitään ei lähetetty. Yritä 
 msgid "enter.ready"
 msgstr "Enter suorittaa komennon {verb}"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.reflectChanged"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.reflectCut"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.reflectDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.reflectFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.reflectGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.reflectGoCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.reflectGoing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.reflectGoUnpriced"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.reflectNoKey"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.reflectNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.reflectNothingBack"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.reflectTalkBusy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.reflectTalkFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.reflectTalkGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.reflectTalkGoCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.reflectTalkGoUnpriced"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.reflectTalkRest"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.reflectUnder"
+msgstr ""
+
 #. Enter puts the new verb in the field; it does not run it
 #. js-lingui-explicit-id
 msgid "enter.renamed"
@@ -6096,6 +6171,139 @@ msgstr "{count, plural, one {tilinumero} other {# tilinumeroa}}"
 #. js-lingui-explicit-id
 msgid "privacy.phone"
 msgstr "{count, plural, one {puhelinnumero} other {# puhelinnumeroa}}"
+
+#. js-lingui-explicit-id
+msgid "reflection.again"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.by"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.costUnknown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.from"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.keepNote"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.markAsks"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.marked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.markedIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.markEdits"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.markedNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.markNotes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.markQuotes"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.markSuggestions"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.markTerms"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.noCall"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.noRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.proposal"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.questionHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.questions"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.readsOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.reflect"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.reflectAbout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.reflecting"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.session"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.sessionIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.sessionReading"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.sweepAs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.synthesis"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.talk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.talkFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.talkHow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "reflection.talkWaiting"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "reflection.writes"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "replyPicker.all"
