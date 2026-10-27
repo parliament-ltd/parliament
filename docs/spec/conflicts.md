@@ -3583,6 +3583,53 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   These are for the checkpoint.
 - **Next:** piece 6, the stage 14 checkpoint.
 
+**C263. The stage 14 checkpoint** (proposed 27 October; refactor-plan.md, stage 14; C253 to C262). Pieces 1 to 5 are built and committed. No retirement line belongs to this stage. Waiting for Stefan: (b) and (c) are choices; the rest is a yes or no.
+- **(a) What to try,** on the trial copy (localhost:5174, on this computer). Nothing here needs a key.
+  - **Focus sets** (C254):
+    - In the Essay room, `focus:room collection`: the chat and the Collection, left to right, kept as the room's set.
+    - `focus:off`, then `focus:` alone uses the set again.
+    - At the strip's end, "focus: off ▾": a click toggles, and the caret opens the picker with numbered ticks.
+    - While focused, a click on a board not on screen says "focus:off to arrange freely".
+  - **Calm** (C256): `calm:`, or "calm: off" on the strip.
+    - A reply's marginalia after the first, the board heads' marginalia, the markers (now small numbered dots), Collection cards (folded to their result) and the legend ("colours ▾") wait until you move near.
+    - The field, the Enter line and the review bar never calm.
+  - **Saved arrangements** (C258):
+    - `arrange:save "Review desk"`; change the screen; `arrange:"Review"` switches back; `undo:` returns.
+    - `arrange:"Review desk" 207` puts 207 in its room.
+    - `name:"Review desk" "Two screens"` renames it; `forget:"Two screens"` takes it away.
+  - **The screens map** (C260):
+    - Type `arrange:` and the map shows before Enter; Enter keeps it.
+    - With it open, type `pop:library display 2` and watch the Library leave and land before Enter. A click on a board writes its command. Escape closes the map.
+  - **A second screen,** in Chrome or Edge on this computer, with a screen attached:
+    - "Extra screen detected · arrange across screens" under the field.
+    - The map's Enter says the browser asks once; answer it. The map then has "Display 1, … this window" and "Display 2, … wide".
+    - `pop:library display 2` opens the Library on that screen, and `pop:right` puts it at that screen's edge.
+    - Save that as an arrangement and switch away and back: the window returns to display 2.
+    - After a reload, the numbers come without asking. Detach the screen, then attach it again: the note comes back once.
+  - **Small screens** (C262):
+    - Narrow the window to between 760 and 1,100 pixels: two boards to a row.
+    - Under 760, or Chrome's device mode for a phone: one board at a time. The strip scrolls sideways with each room by its number, and the bar sits at the bottom.
+    - `pop:`, `focus:` and `bar:top` each say why not.
+- **Not tried by me,** and only you can try them:
+  - **Two real screens:** the browser's question, a window on display 2, moving it by switching arrangements.
+  - **A real phone or tablet:** the on-screen keyboard with the bar at the bottom; calm's "near" by tapping.
+
+  A phone cannot reach the trial copy, which runs only on this computer. It can be tried on the first deploy preview (stage 15), or now in Chrome's device mode, which is close but not the same.
+- **(b) The welcome page's phone line** (a choice; C261 (g)). Under "Welcome", on a phone or touch screen, the page says "built for a computer for now; the phone comes later". With piece 5, the phone has a layout, so the line is no longer quite true.
+  1. **Keep it until you have tried a real phone,** on a deploy preview in stage 15, and remove it then on your yes.
+  2. **Remove it now,** on the strength of device mode.
+
+  **Suggestion:** 1. The line costs nothing while it stays, and a real phone is where the bar at the bottom and the keyboard meet.
+- **(c) A tablet** (a choice; C261 (a), as ruled in C253 (i)). A touch screen counts as a phone at any width, so an iPad shows one board at a time.
+  1. **Keep it as ruled,** and decide again once you have used it on a tablet.
+  2. **A touch screen 760 pixels or wider gets the narrow window's layout,** two boards to a row; only phones show one at a time.
+
+  **Suggestion:** 1 until it is tried. Two boards on a tablet held upright are each about the width of a phone, which may be worse, not better.
+- **(d) A departure to confirm** (C260). The screens mockup's line says "Chrome and Edge can; everything else works here." The copy rule from C94 names no browser, since Parliament cannot tell which one it is in, and a test holds it. So the line reads "This browser cannot place boards on other screens. Everything else works here." **Suggestion:** keep the rule; the browser support table planned for stage 15 is where browsers are named.
+- **(e) The cut-off for a narrow window,** 1,100 pixels, as ruled. A laptop window 1,024 pixels wide, or a browser beside another window, now shows two boards to a row rather than a row that scrolls sideways. **Suggestion:** keep it, and say if it feels wrong in use; the number is in one place.
+- **(f) Test data on the trial copy:** the Essay room keeps the focus set `["room", "collection"]` from piece 1. Every other test arrangement was forgotten, and the screens setting is back to false. **Suggestion:** keep the focus set as test data, as with C250 (h).
+- **Next:** stage 15, close-out and going public, proposed in pieces first as this stage was.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
