@@ -5,7 +5,8 @@
 //   arrange:save "Review desk"     keep what is on screen under that name
 //   arrange:"Review desk"          switch to it; its room shows the chat now
 //   arrange:"Review desk" 207      switch to it with 207 in its room
-//   arrange:                       the names (the map comes with piece 4)
+//   arrange:                       the screens map (piece 4; C259)
+//   name:"Review desk" "Two screens" rename one (C259 (h))
 //
 // What one keeps (C257 (a)): the boards and columns, popped windows with
 // their screen and side, the widths, the bar, the board it points at,
@@ -15,6 +16,7 @@
 import { isRoom } from '../shell/boards'
 import { SPACE, settle } from '../shell/arrangement'
 import { SAVED, NAME_MAX } from './arrangements'
+import { mustAsk } from '../shell/screens'
 
 const words = (s) => String(s ?? '').replace(/\s+/g, ' ').trim()
 const lower = (s) => words(s).toLocaleLowerCase()
@@ -76,8 +78,12 @@ export function spaceFrom(saved, a, chat = null) {
 export function planArrange(a, step, screens = {}, newId = () => crypto.randomUUID()) {
   const saved = screens.arrangements?.saved ?? []
   const vals = step.match?.values ?? []
+  // Bare, the map of your screens (C259 (b)); in the Lab too, where it only shows.
   if (!vals.length) {
-    return { says: saved.length ? { message: 'arrangeList', values: { names: saved.map((s) => s.name) } } : { message: 'arrangeNone' }, act: null }
+    const d = screens.displays ?? null
+    const ask = mustAsk(d)
+    const two = d?.list ? d.list.length > 1 : Boolean(d?.can && d.extended && d.permission !== 'denied')
+    return { says: { message: ask ? 'arrangeMapAsk' : two ? 'arrangeMap' : 'arrangeMapOne' }, act: { kind: 'map', ask } }
   }
   if (a.lab) return { says: { message: 'arrangeInLab' }, act: null }
   if (vals[0].kind === 'word' && vals[0].value === 'save') {
@@ -104,6 +110,31 @@ export function planArrange(a, step, screens = {}, newId = () => crypto.randomUU
   }
   const next = spaceFrom(got.found, a, chat)
   return { says: { message: a.focus ? 'arrangeGoFocus' : 'arrangeGo', values: { name: got.found.name } }, next, act: null }
+}
+
+/**
+ * name:"Review desk" "Two screens" (C259 (h)): the arrangement keeps its id
+ * and everything in it, under the new name. undo: names it back. null when
+ * the line is not two names, so name: goes on to what the bar points at.
+ */
+export function planNameArrangement(step, screens = {}) {
+  const vals = step.match?.values ?? []
+  if (vals.length !== 2 || vals.some((v) => v.kind !== 'text')) return null
+  const saved = screens.arrangements?.saved ?? []
+  const name = typed(vals[0])
+  const to = typed(vals[1])
+  const got = findSaved(saved, name)
+  if (got.many) return { says: { message: 'arrangeMany', values: { names: got.many.map((s) => s.name) } }, act: null }
+  if (!got.found) return { says: saved.length ? { message: 'arrangeNotFound', values: { said: name, names: saved.map((s) => s.name) } } : { message: 'arrangeNone' }, act: null }
+  if (!to) return { says: { message: 'arrangeSaveName' }, act: null }
+  if (Array.from(to).length > NAME_MAX) return { says: { message: 'arrangeLong', values: { max: NAME_MAX } }, act: null }
+  if (got.found.name === to) return { says: { message: 'arrangeNameSame', values: { to } }, act: null }
+  if (saved.some((s) => s !== got.found && lower(s.name) === lower(to))) return { says: { message: 'arrangeNameTaken', values: { to } }, act: null }
+  const { updatedAt: _was, ...kept } = got.found
+  return {
+    says: { message: 'arrangeName', values: { name: got.found.name, to } },
+    act: { kind: 'arrangeSave', record: { ...kept, name: to }, before: got.found },
+  }
 }
 
 /** forget:"Review desk" for a saved arrangement: the record goes, undo: brings it back. */

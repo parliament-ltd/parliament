@@ -41,7 +41,8 @@ import { planInclude } from '../lib/included'
 import { planSet } from '../lib/settingVerbs'
 import { planWeb, planAttach } from '../lib/inputFeatures'
 import { boardFor, wordFor } from '../shell/boards'
-import { planArrange, planForgetArrangement } from '../lib/savedArrangements'
+import { planArrange, planForgetArrangement, planNameArrangement } from '../lib/savedArrangements'
+import { popDisplayLine } from '../shell/screens'
 import { planAddBlock, planRmBlock, planPlace, planSetBlock } from '../lib/labBlocks'
 import { findPrivate, KINDS as PRIVATE_KINDS } from '../lib/privacyFilter'
 import { searchWords } from '../lib/searchWords'
@@ -810,7 +811,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
   if (acts.length) {
     if (answer.steps.length > 1) return { answer, says: { message: 'aloneNow', values: { verb: `${acts[0].verb}:` } }, next: null }
     const step = answer.steps[0]
-    const nameIt = (a1, s1, sc) => (a1.addressed === 'collection' ? planNameCollection(s1, sc)
+    // Two names: a saved arrangement renamed, from anywhere (C259 (h)).
+    const nameIt = (a1, s1, sc) => planNameArrangement(s1, sc) ?? (a1.addressed === 'collection' ? planNameCollection(s1, sc)
       // In the Lab, the room on the Canvas (stage 13; C238).
       : a1.lab && (a1.addressed === 'canvas' || a1.addressed === 'blocks') ? planLabName(s1, sc)
         : planName(a1, s1, sc))
@@ -942,7 +944,9 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     // A room found by its chat is named by it, with several rooms open (C175 (a)).
     const num = byRoom ? step.match.values[0].text ?? String(step.match.values[0].num ?? '') : null
     last = byRoom && p.says.message === 'closeRoom' ? { message: 'closeRoomNum', values: { num } }
-      : byRoom && p.says.message === 'widthRoom' ? { message: 'widthRoomNum', values: { ...p.says.values, num } } : p.says
+      : byRoom && p.says.message === 'widthRoom' ? { message: 'widthRoomNum', values: { ...p.says.values, num } }
+        // pop:… display 2, as this computer's screens allow (C259 (d) to (f)).
+        : p.says.message === 'popDisplay' ? popDisplayLine(p.says, screens.displays ?? null) : p.says
   }
 
   // Records after the line: how many rows it will show, said before Enter.

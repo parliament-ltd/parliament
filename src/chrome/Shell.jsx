@@ -14,7 +14,10 @@ import { shipped, address, planOpen, planPopBack, planPopBar, planRoom, planShow
 import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown, stepsMade } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
-import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
+import { openPopout, closePopout, placePopout, movePopout, onPopoutClosed } from '../shell/popout'
+import { screensNow as screensKnown, readScreens, placeOn, mustAsk } from '../shell/screens'
+import { mapOf, mapFoot, savedNow as savedOnScreen } from '../shell/screensMap'
+import ScreensMap from './ScreensMap'
 import { availableTools, keepKeys, metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal, localAway, helperOf, translatorFor, translateText, browserTranslation } from '../net'
 import { replyLanguageOf, withReplyLanguage, sourceAskLanguage, translateInto, nameOf, baseOf } from '../lib/languages'
 import { piecesOfAnswer, translationOf, lastSourceAnswer, BY_BROWSER } from '../lib/translations'
@@ -207,7 +210,11 @@ function windowChanges(from, to) {
   const close = [...was].filter((b) => !now.has(b))
   if (to.bar.popped && !from.bar.popped) open.push(BAR)
   if (!to.bar.popped && from.bar.popped) close.push(BAR)
-  const place = to.popped.filter((p) => p.side && from.popped.find((q) => q.board === p.board)?.side !== p.side)
+  // A window moved to its side, or to another screen (a saved arrangement, C259 (e)).
+  const place = to.popped.filter((p) => {
+    const q = from.popped.find((w) => w.board === p.board)
+    return q && ((p.side && q.side !== p.side) || (q.display ?? null) !== (p.display ?? null))
+  })
   return { open, close, place }
 }
 
@@ -387,6 +394,48 @@ export default function Shell() {
   // Turns the bar to a prompt, writing nothing (C145 (h)).
   const toPrompt = useCallback(() => setWrite({ value: '', mode: 'prompt', n: ++writes.current }), [])
 
+  // ── Screens (stage 14, piece 4; C259) ──
+  // What is known of this computer's screens: whether another is attached,
+  // the browser's permission and, once it allows, each screen. It stays in
+  // the page. The map shows while the field reads arrange: alone, and Enter
+  // keeps it open until Escape.
+  const [displays, setDisplays] = useState(() => ({ can: FEATURES.screens, extended: window.screen?.isExtended === true, permission: null, list: null }))
+  const displaysNow = useRef(displays)
+  useEffect(() => { displaysNow.current = displays }, [displays])
+  const screensWatch = useRef(null)
+  /** Reads the screens in full: asks the browser the first time, so only from an Enter that said so. */
+  const learnScreens = useCallback(async () => {
+    const got = await readScreens((list) => setDisplays((d) => ({ ...d, list, extended: list.length > 1 })))
+    if (!got) {
+      const now = await screensKnown()
+      const d = { ...displaysNow.current, ...now, list: null }
+      displaysNow.current = d
+      setDisplays(d)
+      return null
+    }
+    screensWatch.current?.stop()
+    screensWatch.current = got
+    const d = { ...displaysNow.current, permission: 'granted', list: got.list, extended: got.list.length > 1 }
+    displaysNow.current = d
+    setDisplays(d)
+    return d
+  }, [])
+  useEffect(() => {
+    let live = true
+    screensKnown().then((now) => {
+      if (!live) return
+      setDisplays((d) => ({ ...d, ...now }))
+      // Allowed before: read without asking.
+      if (now.permission === 'granted') learnScreens()
+    }, () => {})
+    const s = window.screen
+    const onChange = () => setDisplays((d) => ({ ...d, extended: s.isExtended === true }))
+    s?.addEventListener?.('change', onChange)
+    return () => { live = false; s?.removeEventListener?.('change', onChange); screensWatch.current?.stop() }
+  }, [learnScreens])
+  const [mapOpen, setMapOpen] = useState(false)
+  const [barLine, setBarLine] = useState(null) // what the main bar's line would do, for the map
+
   // Leaving the page closes every window it opened.
   useEffect(() => {
     const open = handles.current
@@ -414,9 +463,16 @@ export default function Shell() {
     if (waiting.current && roomOnScreen(next) !== waiting.current.chatId) { waiting.current.drop(); waiting.current = null }
     const changes = windowChanges(current.current, next)
     const opened = []
+    // A window for another screen (C259 (e)): the browser is asked first,
+    // at this Enter, when it has not been. A screen not here opens it here.
+    const windowOf = (key) => (key === BAR ? null : next.popped.find((p) => p.board === key) ?? null)
+    let shown = displaysNow.current
+    if ((changes.open.some((key) => windowOf(key)?.display) || changes.place.some((p) => p.display)) && mustAsk(shown)) shown = (await learnScreens()) ?? displaysNow.current
     for (const key of changes.open) {
       const title = key === BAR ? i18n._(COPY.shell.barWindow) : i18n._(COPY.shell.windowTitle, { board: i18n._(COPY.boards[key]) })
-      const handle = await openPopout({ what: key === BAR ? 'bar' : 'board', name: `parliament-${key}`, title, onTop: key === BAR && FEATURES.onTop })
+      const w = windowOf(key)
+      const at = w?.display ? placeOn(shown?.list, w.display, w.side) : null
+      const handle = await openPopout({ what: key === BAR ? 'bar' : 'board', name: `parliament-${key}`, title, onTop: key === BAR && FEATURES.onTop, at })
       if (!handle) { opened.forEach(([, h]) => closePopout(h)); return 'popBlocked' }
       opened.push([key, handle])
     }
@@ -431,14 +487,20 @@ export default function Shell() {
       if (key !== BAR) handle.win.addEventListener('focus', () => commit(address(current.current, key)))
       handles.current[key] = handle
     }
-    for (const p of changes.place) if (handles.current[p.board]) placePopout(handles.current[p.board], p.side)
+    for (const p of changes.place) {
+      const handle = handles.current[p.board]
+      if (!handle) continue
+      const screen = p.display ? (shown?.list ?? []).find((s) => s.n === p.display) ?? null : null
+      if (p.side) placePopout(handle, p.side, screen)
+      else if (screen) movePopout(handle, placeOn(shown.list, p.display))
+    }
     setWindows({ ...handles.current })
     commit(next)
     if (db.current && body) {
       keepCommand(db.current, body).then((kept) => (kept ? readCommands(db.current).then(setLines) : null)).catch(() => {})
     }
     return null
-  }, [commit, i18n, watch])
+  }, [commit, i18n, watch, learnScreens])
 
   // ── The room in the space (stage 4; C125) ─────────────
   // The chat it shows, and a prompt waiting for a new room to load.
@@ -1351,6 +1413,15 @@ export default function Shell() {
       remember(body)
       return null
     }
+    // The screens map (stage 14, piece 4; C259 (b)): kept open after Enter,
+    // the browser asked here when a second screen waits to be known.
+    if (what.kind === 'map') {
+      setMapOpen(true)
+      setNoteState('done')
+      if (what.ask) await learnScreens()
+      remember(body)
+      return null
+    }
     // Saved arrangements (stage 14, piece 3; C257 (b)).
     if (what.kind === 'arrangeSave') {
       await saveArrangement(db.current, what.record)
@@ -1684,7 +1755,7 @@ export default function Shell() {
     updateWelcome((w) => tick(w, 'name'))
     remember(body)
     return null
-  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, exportFile, commit, loadConversations, createConversation, findCard, findPassage, findRow, holdNote, clearPicked, i18n, readOwn, showStoredBlocks, numberOfEdit, holdTell])
+  }, [readKeys, remember, run, showView, updateWelcome, markdownOf, exportFile, commit, loadConversations, createConversation, findCard, findPassage, findRow, holdNote, clearPicked, i18n, readOwn, showStoredBlocks, numberOfEdit, holdTell, learnScreens])
 
   // ── undo: (C134, as built) ────────────────────────────
   // Each command line that changes something is kept with what it changed,
@@ -1886,7 +1957,7 @@ export default function Shell() {
   }, [askSource])
   useEffect(() => { keepTranslationNow.current = keepTranslation }, [keepTranslation])
   useEffect(() => { summarizeChatNow.current = summarizeChat }, [summarizeChat])
-  const { settings, updateSetting } = useSettings()
+  const { settings, updateSetting, loaded: settingsLoaded } = useSettings()
   // A setting changed by set:, a click on Settings, or undo:. How keys are
   // kept moves them there: "Don't save" holds them for this tab and removes
   // the saved copies (settings spec §8).
@@ -2111,6 +2182,18 @@ export default function Shell() {
       document.querySelectorAll('.near').forEach((el) => el.classList.remove('near'))
     }
   }, [calm])
+
+  // ── "Extra screen detected" (stage 14, piece 4; C259 (g)) ──
+  // Once, when a second screen is attached; remembered on this device until
+  // the computer is back to one screen.
+  const [noteState, setNoteState] = useState('unknown') // 'show' or 'done' once decided
+  if (settingsLoaded && displays.extended && noteState === 'unknown') setNoteState(settings.screensNoticed === true ? 'done' : 'show')
+  if (!displays.extended && noteState !== 'unknown') setNoteState('unknown')
+  useEffect(() => {
+    if (!settingsLoaded) return
+    if ((settings.screensNoticed === true) !== displays.extended) updateSetting('screensNoticed', displays.extended)
+  }, [settingsLoaded, displays.extended, settings.screensNoticed, updateSetting])
+  const screenNote = useMemo(() => (noteState === 'show' ? { onGo: () => writeField('>arrange:') } : null), [noteState, writeField])
 
   // ── Focus sets (stage 14, piece 1; C253) ──
   // The room on screen keeps its own focus set on its record; the bar reads
@@ -2866,7 +2949,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, arrangements: arrangementsScreen, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, arrangementsScreen, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, arrangements: arrangementsScreen, displays, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, arrangementsScreen, displays, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -3591,6 +3674,23 @@ export default function Shell() {
   const shareTotal = shares.reduce((sum, x) => sum + x, 0) || 1
   // What stands beside an edge, named in a sentence.
   const edgeName = (board) => (isRoom(board) ? i18n._(COPY.shell.edgeRoom) : board === 'welcome' ? i18n._(COPY.shell.edgeWelcome) : boardName(i18n, board))
+  // The map (C259 (a), (b)): what is on each screen, and, kept open, what the line typed would move.
+  const mapShown = mapOpen || barLine?.act?.kind === 'map'
+  const mapNext = mapOpen && barLine?.next ? barLine.next : null
+  const mapModel = useMemo(() => (mapShown ? mapOf(arrangement, mapNext, displays) : null), [mapShown, arrangement, mapNext, displays])
+  const mapSubOf = (board) => {
+    if (!isRoom(board)) return null
+    const chat = chatIn(arrangement, board)
+    const row = chat ? (almanacRows ?? []).find((r) => r.kind === 'chat' && r.chatId === chat) : null
+    return row ? `${row.num} ${row.title ?? ''}`.trim() : null
+  }
+  // On the line under the map, a room by the number of its chat (C259 (a)).
+  const mapListName = (board) => {
+    if (!isRoom(board)) return boardName(i18n, board)
+    const chat = chatIn(arrangement, board)
+    const row = chat ? (almanacRows ?? []).find((r) => r.kind === 'chat' && r.chatId === chat) : null
+    return row ? String(row.num) : i18n._(COPY.shell.edgeRoom)
+  }
   const stripArrangement = useMemo(
     () => ({ ...arrangement, context: { ...arrangement.context, room: roomRecord?.num ?? undefined } }),
     [arrangement, roomRecord],
@@ -3716,7 +3816,7 @@ export default function Shell() {
           it never loses the field's focus or what is typed. */}
       <div ref={dockSlot} className="ch-bar-host" />
       {!barWindow && createPortal(
-        <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)}
+        <Bar {...shared} board={arrangement.addressed} doc={document} className={`ch-dock ${bar.at} ${bar.side}`} write={write} onMode={onMode} onLine={setBarLine} map={mapOpen} onMapClose={() => setMapOpen(false)} note={screenNote} inspect={inspectedRow} onInspectClose={() => setInspected(null)} compare={comparedRows} onCompareClose={() => setCompared(null)}
           keyPanel={keyPanel ? { ...keyPanel, ...keyInfo, holdOnly: settings.storageMode === 'memory', region, onRegion: (r) => updateSetting('mistralRegion', r),
             local: { ...LOCAL_ENTRY, origin: window.location.origin, status: local.status, models: local.models, away: local.away ?? [], onCheck: () => runLocalCheck() } } : null}
           onKeyFocus={(id) => setKeyPanel({ focus: id })} onKeySaved={onKeySaved} onKeysClose={() => setKeyPanel(null)}
@@ -3730,7 +3830,15 @@ export default function Shell() {
         barHost,
       )}
       {barWindow && <p className="ch-away ch-marg">{i18n._(COPY.shell.barAway)}</p>}
-      <main className="ch-stage space" ref={stageRef}>
+      {mapShown && (
+        <ScreensMap
+          screens={mapModel} foot={mapFoot(displays)} saved={savedLayouts}
+          under={{ lab: Boolean(arrangement.lab), name: savedOnScreen(arrangement, savedLayouts)?.name ?? null, boards: arrangement.columns.flat() }}
+          subOf={mapSubOf} listName={mapListName} onWrite={writeField} onClose={() => setMapOpen(false)}
+        />
+      )}
+      {/* The boards stay as they are under the map, drawn but out of sight. */}
+      <main className={`ch-stage space${mapShown ? ' under-map' : ''}`} ref={stageRef} aria-hidden={mapShown || undefined}>
         {arrangement.columns.map((column, i) => (
           <Fragment key={column.join(' ')}>
             {i > 0 && (

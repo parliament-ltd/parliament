@@ -1932,11 +1932,6 @@ msgstr "Enter switches to {name}, ending focus. undo: brings back the screen as 
 msgid "enter.arrangeInLab"
 msgstr "arrange: works outside the Lab. done: leaves it first"
 
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.arrangeList"
-msgstr "Your arrangements: {names}. arrange:\"name\" switches to one"
-
 #. js-lingui-explicit-id
 msgid "enter.arrangeLong"
 msgstr "A name of at most {max} characters"
@@ -1944,6 +1939,32 @@ msgstr "A name of at most {max} characters"
 #. js-lingui-explicit-id
 msgid "enter.arrangeMany"
 msgstr "Which arrangement: {names}?"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeMap"
+msgstr "Enter keeps this view open. pop:library display 2 puts a board on the other screen"
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeMapAsk"
+msgstr "Enter keeps this view open. The browser asks once whether Parliament may place windows on your screens"
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeMapOne"
+msgstr "Enter keeps this view open. Escape goes back"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeName"
+msgstr "Enter renames {name} to {to}. undo: names it back"
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeNameSame"
+msgstr "It is called {to} already"
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeNameTaken"
+msgstr "Another arrangement is called {to}. Forget it first, or choose another name"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3913,7 +3934,23 @@ msgstr "Enter puts the bar in its own window"
 
 #. js-lingui-explicit-id
 msgid "enter.popDisplay"
-msgstr "Enter puts {board} in its own window on screen {display}"
+msgstr "Enter puts {board} in its own window on display {display}"
+
+#. js-lingui-explicit-id
+msgid "enter.popDisplayAsk"
+msgstr "Enter puts {board} in its own window on display {display}. The browser asks once whether Parliament may place windows on your screens"
+
+#. js-lingui-explicit-id
+msgid "enter.popDisplayCannot"
+msgstr "This browser cannot place windows on other screens. Enter opens {board} in its own window here"
+
+#. js-lingui-explicit-id
+msgid "enter.popDisplayNone"
+msgstr "Display {display} is not connected. Enter opens {board} in its own window here"
+
+#. js-lingui-explicit-id
+msgid "enter.popDisplayRefused"
+msgstr "The browser was told not to let Parliament place windows. Enter opens {board} in its own window here"
 
 #. js-lingui-explicit-id
 msgid "enter.popLast"
@@ -7588,6 +7625,143 @@ msgid "room.unnamed"
 msgstr "unnamed room"
 
 #. js-lingui-explicit-id
+msgid "screensMap.back"
+msgstr "Escape goes back"
+
+#. js-lingui-explicit-id
+msgid "screensMap.cannotBody"
+msgstr "Everything else works here."
+
+#. js-lingui-explicit-id
+msgid "screensMap.cannotHead"
+msgstr "This browser cannot place boards on other screens."
+
+#. A screen, by its number: pop:library display 2
+#. js-lingui-explicit-id
+msgid "screensMap.display"
+msgstr "Display {n}"
+
+#. js-lingui-explicit-id
+msgid "screensMap.empty"
+msgstr "nothing here yet"
+
+#. js-lingui-explicit-id
+msgid "screensMap.extra"
+msgstr "Extra screen detected"
+
+#. js-lingui-explicit-id
+msgid "screensMap.extraGo"
+msgstr "arrange across screens"
+
+#. js-lingui-explicit-id
+msgid "screensMap.ghost"
+msgstr "will land here"
+
+#. js-lingui-explicit-id
+msgid "screensMap.here"
+msgstr "This screen"
+
+#. js-lingui-explicit-id
+msgid "screensMap.hereSub"
+msgstr "this window"
+
+#. js-lingui-explicit-id
+msgid "screensMap.label"
+msgstr "Your screens"
+
+#. js-lingui-explicit-id
+msgid "screensMap.leavingGone"
+msgstr "closing"
+
+#. js-lingui-explicit-id
+msgid "screensMap.leavingHere"
+msgstr "coming back to this window"
+
+#. js-lingui-explicit-id
+msgid "screensMap.leavingOther"
+msgstr "moving to the other screen"
+
+#. js-lingui-explicit-id
+msgid "screensMap.leavingTo"
+msgstr "moving to display {n}"
+
+#. js-lingui-explicit-id
+msgid "screensMap.leavingWindow"
+msgstr "moving to its own window"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "screensMap.move"
+msgstr "Write {command}"
+
+#. js-lingui-explicit-id
+msgid "screensMap.oneBody"
+msgstr "Connect one and boards can go on it."
+
+#. js-lingui-explicit-id
+msgid "screensMap.oneHead"
+msgstr "No external screen detected."
+
+#. js-lingui-explicit-id
+msgid "screensMap.onScreen"
+msgstr "{boards}"
+
+#. js-lingui-explicit-id
+msgid "screensMap.onScreenLab"
+msgstr "The Lab, {boards}"
+
+#. js-lingui-explicit-id
+msgid "screensMap.onScreenNamed"
+msgstr "{name}, {boards}"
+
+#. js-lingui-explicit-id
+msgid "screensMap.other"
+msgstr "Another screen"
+
+#. js-lingui-explicit-id
+msgid "screensMap.otherSub"
+msgstr "its size shows once the browser lets Parliament place windows"
+
+#. js-lingui-explicit-id
+msgid "screensMap.refusedBody"
+msgstr "Its site settings can change that."
+
+#. js-lingui-explicit-id
+msgid "screensMap.refusedHead"
+msgstr "The browser was told not to let Parliament place windows."
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "screensMap.reset"
+msgstr "reset: returns it to its default"
+
+#. A room, as a box on the map
+#. js-lingui-explicit-id
+msgid "screensMap.room"
+msgstr "Room"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "screensMap.save"
+msgstr "arrange:save \"…\" keeps it"
+
+#. js-lingui-explicit-id
+msgid "screensMap.saved"
+msgstr "Saved"
+
+#. js-lingui-explicit-id
+msgid "screensMap.wide"
+msgstr "{width} wide"
+
+#. js-lingui-explicit-id
+msgid "screensMap.wideHere"
+msgstr "{width} wide, this window"
+
+#. js-lingui-explicit-id
+msgid "screensMap.window"
+msgstr "its own window"
+
+#. js-lingui-explicit-id
 msgid "settings.aboutDesc"
 msgstr "Privacy and the network log"
 
@@ -8603,7 +8777,7 @@ msgstr "Move a board to the left, right or middle, or a branch in its plan"
 
 #. js-lingui-explicit-id
 msgid "verb.name"
-msgstr "Name what the bar is pointed at: a room, a collection or a chat"
+msgstr "Name what the bar is pointed at: a room, a collection or a chat. With two names, rename a saved arrangement"
 
 #. js-lingui-explicit-id
 msgid "verb.new"

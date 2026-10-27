@@ -1932,17 +1932,38 @@ msgstr ""
 msgid "enter.arrangeInLab"
 msgstr ""
 
-#. Commands stay English
-#. js-lingui-explicit-id
-msgid "enter.arrangeList"
-msgstr ""
-
 #. js-lingui-explicit-id
 msgid "enter.arrangeLong"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.arrangeMany"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeMap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeMapAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeMapOne"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeName"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeNameSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeNameTaken"
 msgstr ""
 
 #. Commands stay English
@@ -3914,6 +3935,22 @@ msgstr "按 Enter 将输入栏放到独立窗口中"
 #. js-lingui-explicit-id
 msgid "enter.popDisplay"
 msgstr "按 Enter 将{board}放到屏幕 {display} 上的独立窗口中"
+
+#. js-lingui-explicit-id
+msgid "enter.popDisplayAsk"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popDisplayCannot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popDisplayNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.popDisplayRefused"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.popLast"
@@ -7586,6 +7623,143 @@ msgstr "无法显示此房间。其中的对话原样保留。"
 #. js-lingui-explicit-id
 msgid "room.unnamed"
 msgstr "未命名房间"
+
+#. js-lingui-explicit-id
+msgid "screensMap.back"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.cannotBody"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.cannotHead"
+msgstr ""
+
+#. A screen, by its number: pop:library display 2
+#. js-lingui-explicit-id
+msgid "screensMap.display"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.extra"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.extraGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.ghost"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.here"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.hereSub"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.leavingGone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.leavingHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.leavingOther"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.leavingTo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.leavingWindow"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "screensMap.move"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.oneBody"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.oneHead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.onScreen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.onScreenLab"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.onScreenNamed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.other"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.otherSub"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.refusedBody"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.refusedHead"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "screensMap.reset"
+msgstr ""
+
+#. A room, as a box on the map
+#. js-lingui-explicit-id
+msgid "screensMap.room"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "screensMap.save"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.saved"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.wide"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.wideHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "screensMap.window"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "settings.aboutDesc"

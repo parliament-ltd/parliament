@@ -12,8 +12,8 @@ import { messages as en } from '../locales/en/messages.mjs'
 const i18n = setupI18n({ locale: 'en', messages: { en } })
 const space = () => ({ ...shipped('almanac'), columns: [['room'], ['collection']], popped: [{ board: 'library', display: 2, side: 'right', from: 2 }], context: { room: 'c1', collection: 'col_1' }, addressed: 'room', widths: { room: 2 } })
 const desk = cleanArrangement(savedOf(space(), 'abc', 'Review desk'))
-const at = (value, { a = space(), saved = [desk], rows = [] } = {}) => {
-  const p = preview(value, { mode: 'command', arrangement: a, screens: { arrangements: { saved }, roomChat: 'c9', records: { rows } } })
+const at = (value, { a = space(), saved = [desk], rows = [], displays = null } = {}) => {
+  const p = preview(value, { mode: 'command', arrangement: a, screens: { arrangements: { saved }, roomChat: 'c9', records: { rows }, displays } })
   return { ...p, text: p.says ? say(i18n, p.says.message, p.says.values) : '' }
 }
 
@@ -48,13 +48,23 @@ describe('arrange: on the Enter line (C257 (b))', () => {
     expect(at('>arrange:"Review desk" 207', { rows: [{ kind: 'chat', num: 207, chatId: 'c207' }] }).next.context.room).toBe('c207')
     expect(at('>arrange:"Nowhere"').text).toBe('No arrangement is called Nowhere. Yours are Review desk')
   })
-  it('lists them, and stays out of the Lab', () => {
-    expect(at('>arrange:').text).toBe('Your arrangements: Review desk. arrange:"name" switches to one')
-    expect(at('>arrange:', { saved: [] }).text).toBe('No arrangement is saved yet. arrange:save "a name" keeps what is on screen')
+  it('shows the map bare (C259 (b), (d)), and stays out of the Lab', () => {
+    expect(at('>arrange:')).toMatchObject({ text: 'Enter keeps this view open. Escape goes back', act: { kind: 'map', ask: false } })
+    const two = { can: true, extended: true, permission: 'prompt', list: null }
+    expect(at('>arrange:', { displays: two })).toMatchObject({ text: 'Enter keeps this view open. The browser asks once whether Parliament may place windows on your screens', act: { ask: true } })
+    expect(at('>arrange:', { displays: { ...two, permission: 'granted', list: [{ n: 1 }, { n: 2 }] } })).toMatchObject({ text: 'Enter keeps this view open. pop:library display 2 puts a board on the other screen', act: { ask: false } })
+    expect(at('>arrange:Nowhere', { saved: [] }).text).toBe('No arrangement is saved yet. arrange:save "a name" keeps what is on screen')
     expect(at('>arrange:"Review desk"', { a: { ...space(), lab: { columns: [['almanac']], popped: [], addressed: 'almanac', bar: { at: 'top', side: 'center', popped: false } } } }).text).toBe('arrange: works outside the Lab. done: leaves it first')
   })
   it('is forgotten by name, undo: bringing it back', () => {
     expect(at('>forget:"Review desk"')).toMatchObject({ text: 'Enter forgets the arrangement Review desk. undo: brings it back', act: { kind: 'arrangeForget', id: 'saved:abc' } })
     expect(at('>forget:"Review desk" arrangement').act.kind).toBe('arrangeForget')
+  })
+  it('is renamed with two names, keeping its id (C259 (h))', () => {
+    const p = at('>name:"Review" "Two screens"')
+    expect(p).toMatchObject({ text: 'Enter renames Review desk to Two screens. undo: names it back', act: { kind: 'arrangeSave', record: { id: 'saved:abc', name: 'Two screens', columns: [['room'], ['collection']] }, before: { name: 'Review desk' } } })
+    const other = cleanArrangement(savedOf(space(), 'def', 'Two screens'))
+    expect(at('>name:"Review desk" "two screens"', { saved: [desk, other] }).text).toBe('Another arrangement is called two screens. Forget it first, or choose another name')
+    expect(at('>name:"Review desk" "Review desk"').text).toBe('It is called Review desk already')
   })
 })

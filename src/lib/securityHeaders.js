@@ -30,7 +30,9 @@ export const CONTENT_SECURITY_POLICY = [
 ].join('; ') + ';'
 
 // The microphone is allowed for this site only: voice input transcribes on
-// the device (ruling C70). Everything else Parliament does not use is off.
+// the device (ruling C70). Placing windows on other screens is allowed for
+// this site only, and the browser still asks the person once (C259 (i)).
+// Everything else Parliament does not use is off.
 export const PERMISSIONS_POLICY = [
   'accelerometer=()',
   'camera=()',
@@ -44,6 +46,7 @@ export const PERMISSIONS_POLICY = [
   'payment=()',
   'serial=()',
   'usb=()',
+  'window-management=(self)',
 ].join(', ')
 
 export const SECURITY_HEADERS = {

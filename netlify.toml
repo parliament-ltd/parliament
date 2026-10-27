@@ -45,7 +45,7 @@
     Referrer-Policy = "no-referrer"
     # Browser features. The microphone is this site's only, for voice input
     # transcribed on the device; everything Parliament does not use is off.
-    Permissions-Policy = "accelerometer=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), hid=(), magnetometer=(), microphone=(self), midi=(), payment=(), serial=(), usb=()"
+    Permissions-Policy = "accelerometer=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), hid=(), magnetometer=(), microphone=(self), midi=(), payment=(), serial=(), usb=(), window-management=(self)"
     # Keep other sites' windows and pages from reaching into this one.
     Cross-Origin-Opener-Policy = "same-origin"
     Cross-Origin-Resource-Policy = "same-origin"

@@ -45,6 +45,9 @@ const DEFAULT_SETTINGS = {
   // calm: and calm:off (stage 14, piece 2; C255): off for someone new
   // (C253 (c)), kept on this device and not in backups (C253 (d)).
   calm: false,
+  // Whether a second screen was already noticed (stage 14, piece 4; C259 (g)):
+  // on this device, not in backups, false again once back to one screen.
+  screensNoticed: false,
   // The Collection's cards, marked up or clean, apart from the chat's (piece 5; C220 (g)).
   collectionMarkup: 'on',
   // The reply language (a tag, or 'off'; none follows the interface), the

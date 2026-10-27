@@ -54,7 +54,7 @@ import { formatSize } from '../lib/fileUpload'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection', 'settings', 'library'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null, onLine = null, map = false, onMapClose, note = null }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -184,6 +184,8 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   const promptView = useMemo(() => (prompting ? promptPreview(field.text.prompt, prompt) : null), [prompting, field.text.prompt, prompt])
   const planned = prompting ? promptView.says : (view.says.message === 'popCommand' && !onTop ? { ...view.says, also: 'popOrdinary' } : view.says)
   const says = notice ? (typeof notice === 'string' ? { message: notice } : notice) : planned
+  // What the command typed would do, for the screens map (C259 (b)).
+  useEffect(() => { onLine?.(field.mode === 'command' ? { next: view.next ?? null, act: view.act ?? null } : null) }, [field.mode, view, onLine])
 
   // Who answers a prompt here, inside the prompt field: the chat's choice
   // or the default (stage 7; C150). A click shows who else can.
@@ -285,6 +287,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
       if (picker) { onPickerClose?.(); return }
       if (frameworkPicker) { onFrameworkPickerClose?.(); return }
       if (languagePicker) { onLanguagePickerClose?.(); return }
+      if (map) { onMapClose?.(); return }
       // The field's rule first, then the caret: moving the caret blurs the
       // field, which would otherwise come before the Escape.
       dispatch({ type: 'escape' })
@@ -372,6 +375,14 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           </div>
         )}
         <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} told={Boolean(notice)} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} />
+        {/* Extra screen detected (C259 (g)): once, under the field. */}
+        {note && !folded && (
+          <p className="ch-snote ch-marg">
+            {i18n._(COPY.screensMap.extra)}
+            <span className="sep" aria-hidden="true">·</span>
+            <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={note.onGo}>{i18n._(COPY.screensMap.extraGo)}</button>
+          </p>
+        )}
         {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
         {!reference && inspect && <Inspect row={inspect} />}
         {!reference && !inspect && compare && <Compare a={compare.a} b={compare.b} />}

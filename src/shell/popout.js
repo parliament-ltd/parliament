@@ -46,16 +46,18 @@ function prepare(win, { title, from }) {
  * Opens a window and returns { win, container }, or null when the browser
  * would not open one. Call it from the key press or click that asked, so a
  * pop-up blocker lets it through.
- * @param {{ what: 'bar'|'board', name: string, title: string, onTop?: boolean, from?: Document, host?: Window }} options
+ * at: where on which screen it opens, for pop:… display 2 (C259 (e)); the browser places it there once it allows.
+ * @param {{ what: 'bar'|'board', name: string, title: string, onTop?: boolean, at?: { left: number, top: number }|null, from?: Document, host?: Window }} options
  */
-export async function openPopout({ what, name, title, onTop = false, from = document, host = window }) {
+export async function openPopout({ what, name, title, onTop = false, at = null, from = document, host = window }) {
   const size = SIZES[what]
   try {
     if (onTop && host.documentPictureInPicture?.requestWindow) {
       const win = await host.documentPictureInPicture.requestWindow(size)
       return prepare(win, { title, from })
     }
-    const win = host.open('', name, `popup,width=${size.width},height=${size.height}`)
+    const place = at ? `,left=${Math.round(at.left)},top=${Math.round(at.top)}` : ''
+    const win = host.open('', name, `popup,width=${size.width},height=${size.height}${place}`)
     if (!win) return null
     // A window of this name left from before is reused: start it empty.
     win.document.body.replaceChildren()
@@ -65,13 +67,22 @@ export async function openPopout({ what, name, title, onTop = false, from = docu
   }
 }
 
-/** Puts a popped window at the left or right of its screen, where the browser allows it. */
-export function placePopout({ win }, side) {
+/**
+ * Puts a popped window at the left or right of its screen, where the browser
+ * allows it: the screen named (another display, C259 (e)) or the one it is on.
+ */
+export function placePopout({ win }, side, screen = null) {
   try {
     const width = win.outerWidth || SIZES.board.width
-    const left = side === 'left' ? 0 : (win.screen?.availWidth ?? width) - width
-    win.moveTo(left, win.screenY ?? 0)
+    const s = screen ?? { left: win.screen?.availLeft ?? 0, top: win.screenY ?? 0, availWidth: win.screen?.availWidth ?? width }
+    const left = side === 'left' ? s.left : s.left + s.availWidth - width
+    win.moveTo(left, screen ? s.top : win.screenY ?? 0)
   } catch { /* the browser decides where windows go */ }
+}
+
+/** Moves a popped window to a place on a screen (C259 (e)), where the browser allows it. */
+export function movePopout({ win }, at) {
+  try { if (at) win.moveTo(Math.round(at.left), Math.round(at.top)) } catch { /* the browser decides where windows go */ }
 }
 
 /** Closes a popped window, if it is still open. */

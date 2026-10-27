@@ -1047,3 +1047,38 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-shell.calm .ch-col-legend:not(:hover):not(:focus-within):not(.near)::before { content: attr(data-calm); }
 .ch-shell.calm .ch-sg-keys { display: none; }
 .ch-shell.calm .ch-col-tabs .n { opacity: .55; }
+
+/* The screens map (stage 14, piece 4; C259; parliament_screens_v1.html). It
+   stands where the boards are; they stay drawn underneath, out of sight. */
+.ch-stage.under-map { visibility: hidden; height: 0; min-height: 0; overflow: hidden; flex: 0 0 0; padding-block: 0; }
+.ch-map { flex: 1; padding: 34px 20px 24px; }
+.ch-map-screens { display: flex; flex-wrap: wrap; gap: 34px; align-items: flex-end; justify-content: center; }
+.ch-map-disp { display: flex; flex-direction: column; align-items: center; gap: 8px; width: min(var(--w), 100%); }
+.ch-map-scr { position: relative; width: 100%; height: var(--h); background: var(--ch-subtle); border: 1px dotted var(--ch-soft); border-radius: 8px; padding: 10px; display: flex; gap: 7px; align-items: stretch; }
+.ch-map-scr.empty { justify-content: center; align-items: center; }
+.ch-map-scr.unknown { border-style: dashed; }
+.ch-shell .ch-map-b { position: relative; flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; padding: 7px 9px; background: var(--ch-surface); border-radius: 6px; box-shadow: var(--ch-lift); font: 600 10.5px var(--ch-sans); color: var(--ch-ink); text-align: start; overflow: hidden; }
+.ch-shell .ch-map-b.room { flex-grow: 2; }
+.ch-map-page { flex: 1; min-width: 0; display: flex; gap: 7px; }
+.ch-map-wins { position: absolute; inset-inline-end: 14px; bottom: 14px; width: min(200px, 55%); display: flex; flex-direction: column; gap: 6px; }
+.ch-map-scr > .ch-map-wins:first-child { position: static; margin: auto; }
+.ch-shell .ch-map-b.win { flex: none; min-height: 56px; box-shadow: var(--ch-lift), 0 0 0 .5px rgba(25, 25, 25, .12); }
+.ch-shell .ch-map-b.win.ghost { background: linear-gradient(rgba(var(--ch-navy), .07), rgba(var(--ch-navy), .07)), var(--ch-surface); box-shadow: inset 0 0 0 1.5px rgba(var(--ch-navy), .7); }
+.ch-shell button.ch-map-b:hover { box-shadow: var(--ch-lift), 0 0 0 1px var(--ch-soft); }
+.ch-map-b small { display: block; margin-top: 2px; font-size: 10px; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.ch-map-bn { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.ch-map-b.addr::before { content: ""; position: absolute; inset-inline-start: 0; top: 6px; bottom: 6px; width: 2px; background: rgb(var(--ch-navy)); border-radius: 1px; }
+.ch-map-b.leaving { opacity: .35; }
+.ch-map-b.ghost { background: rgba(var(--ch-navy), .07); box-shadow: inset 0 0 0 1.5px rgba(var(--ch-navy), .7); }
+.ch-map-lab { text-align: center; font: italic 400 var(--ch-t-marg)/1.5 var(--ch-serif); color: var(--ch-marg); }
+.ch-map-lab b { font: 600 10.5px var(--ch-sans); color: var(--ch-ink); }
+.ch-map-under, .ch-map-saved { display: block; text-align: center; margin-top: 16px; }
+.ch-map-saved { margin-top: 6px; }
+.ch-map-under .sep, .ch-map-saved .sep, .ch-snote .sep { opacity: .5; margin: 0 3px 0 1px; }
+.ch-shell .ch-map-under button, .ch-shell .ch-map-saved button { font: inherit; color: inherit; }
+.ch-shell .ch-map-under button:hover, .ch-shell .ch-map-saved button:hover { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+.ch-map-foot { margin-top: 28px; text-align: center; font: italic 400 12px var(--ch-serif); color: var(--ch-ink-2); }
+.ch-map-foot b { font: 600 11.5px var(--ch-sans); color: var(--ch-ink); }
+/* Extra screen detected (C259 (g)): marginalia under the field. */
+.ch-snote { padding: 2px 13px 0; }
+.ch-shell .ch-snote button { font: inherit; color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }

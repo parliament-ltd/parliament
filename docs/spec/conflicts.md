@@ -3406,7 +3406,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 
   **Suggestion:** yes.
 - **(f) Browsers that cannot place windows:**
-  - The map draws one screen and says, as the mockup does, "This browser cannot place boards on other screens. Chrome and Edge can; everything else works here."
+  - The map draws one screen and says "This browser cannot place boards on other screens. Everything else works here." The mockup also names Chrome and Edge; the copy names no browser (C94), as C260 records.
   - `pop:… display 2` says "This browser cannot place windows on other screens. Enter opens the Library in its own window here".
   - With one screen: "No external screen detected. Connect one and boards can go on it."
 
@@ -3427,6 +3427,68 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - With (h), a saved arrangement's name changes in place.
 
   Nothing else is new; `display` on a window is already stored. **Suggestion:** yes.
+
+**C260. Stage 14, piece 4, as built: the screens map and other screens** (27 October; C259 as suggested, with (h) built as its suggestion 1 until ruled).
+- **The map** (`ScreensMap.jsx`, `shell/screensMap.js`):
+  - It shows while the field reads `arrange:` alone, and Enter keeps it open. Escape closes it. It stands where the boards are, and the boards stay drawn underneath, out of sight.
+  - Each screen is a box: "Display 2, 2560 wide", with ", this window" on Parliament's own. Before the browser says more, the boxes are "This screen, 1536 wide, this window" (its width is known without asking) and "Another screen" in a dashed outline.
+  - The boards on the page sit side by side. Windows sit over them at the lower right, as on a screen, or in the middle of another screen. The board the bar points at has the navy rule.
+  - A command typed while it is open shows before Enter: the board faded with "moving to display 2", "moving to its own window" or "coming back to this window", and its outline where it will land.
+  - A click on a board writes `pop:library display 2`, or `pop:back library` for a window.
+  - Under the screens:
+    - what is on screen, by the saved arrangement's name when it is exactly one, with rooms by the number of their chat;
+    - `arrange:save "…" keeps it`, `reset: returns it to its default` and "Escape goes back", each writing its command or closing the map;
+    - then "Saved" and your arrangements, each writing `arrange:"…"`.
+  - At its foot, "No external screen detected", "This browser cannot place boards on other screens", or "The browser was told not to let Parliament place windows".
+- **Its Enter line:**
+  - "Enter keeps this view open. pop:library display 2 puts a board on the other screen".
+  - With one screen, or the permission refused: "… Escape goes back".
+  - With a second screen not yet allowed: "… The browser asks once whether Parliament may place windows on your screens", and that Enter asks.
+- **Other screens** (`shell/screens.js`):
+  - Screens are numbered with the main one first, then left to right. The browser is asked only from an Enter that said so: the map's, or `pop:… display 2` and switching to a saved arrangement that places a window.
+  - A window opens at the top of its screen, and `pop:left` and `pop:right` work on that screen. A saved arrangement moves a window already open to its screen.
+  - `pop:library display 2` says before Enter which of these holds:
+    - it goes there;
+    - the browser asks first;
+    - "Display 2 is not connected" (one screen comes before the permission);
+    - the browser cannot;
+    - it was refused.
+
+    In the last three the window opens here.
+  - The screens' names and sizes stay in the page.
+- **"Extra screen detected · arrange across screens"** shows under the field when a second screen is attached, at start or later. The click writes `arrange:`, and the map's Enter ends the note. The device setting `screensNoticed` keeps it from coming back until the computer is down to one screen; it is not in backups.
+- **`name:"Review desk" "Two screens"`** renames a saved arrangement from anywhere, keeping its id; `undo:` names it back. The Enter line refuses a name another arrangement has, or the same name. No `duplicate:` (C259 (h), suggestion 1, waiting for the ruling).
+- **The permissions header:** `window-management=(self)` in `securityHeaders.js` and `netlify.toml`, which a test keeps equal. It takes effect at the next deploy.
+- **Departures, for Stefan:**
+  - **The mockup's foot line names Chrome and Edge.** The copy rule from C94 names no browser, since Parliament cannot tell which it is in, and a test holds it. So the line says only "Everything else works here." C259 (f) is corrected to match.
+  - **Bare `arrange:` now opens the map, not the list of names** (C258). The names are on the map, and `arrangeList` is gone.
+- **Tests:**
+  - numbering screens;
+  - reading them without and with the permission;
+  - where a window opens;
+  - every `pop:… display` line;
+  - when to ask;
+  - what the map draws, before and after a line;
+  - its foot;
+  - the arrangement on screen by name;
+  - the command a click writes;
+  - the map's Enter lines;
+  - renaming.
+
+  1,331 tests; 30 lint warnings, all older.
+- **Tried in the browser,** on the trial copy. The in-app browser can place windows, has one screen, and has the permission refused. It never opens pop-up windows, even directly, so a window on another screen is not tried here.
+  - `arrange:` showed the map: one screen 1536 wide with nine boards, the room addressed, "No external screen detected".
+  - Enter kept it. `pop:library display 2` showed the Library leaving and its outline landing, with "Display 2 is not connected…". Enter was refused by the pane's pop-up block, as any `pop:` is.
+  - A second screen was simulated. The note showed, and its click wrote `arrange:`. The map showed "Another screen" and the refused line. Enter ended the note.
+  - `arrange:save "Trial desk"` then showed it under "Saved" and named the screen. `name:"Trial" "Two screens"` renamed it, and `undo:` named it back.
+  - `forget:` took it away, and Escape brought the boards back as they were. After a reload, the setting was back to false and only the space was stored.
+- **Not tried:**
+  - two real screens;
+  - the browser's question;
+  - a window placed on display 2.
+
+  These need Chrome or Edge with a second screen attached; they are on the checkpoint's list. If the question takes more than a few seconds to answer, the browser may block the window that Enter then opens; a second Enter opens it.
+- **Next:** piece 5, small screens.
 
 ## Proposed CLAUDE.md rewrite
 
