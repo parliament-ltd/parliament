@@ -3367,6 +3367,67 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   The trial copy is as it was.
 - **Next:** piece 4, the screens map.
 
+**C259. Stage 14, piece 4: the screens map and other screens, its open points** (proposed 27 October; C253 piece 4, (g) and (h) as ruled; C257 (c); `parliament_screens_v1.html`; the arrangements spec §7a). Waiting for Stefan: (h) is a choice. The rest is built as suggested, so a ruling changes one entry.
+- **What exists today:**
+  - `pop:library display 2` is read and stored with the window, but the window opens on the screen it is popped from.
+  - Bare `arrange:` lists the saved arrangements (C258).
+  - The browser can say whether a second screen is attached without asking anything. Its size, its position and placing windows on it need the browser's permission. Only Chrome and Edge have this.
+- **(a) What the map draws,** as the mockup does:
+  - Each screen as a box, labelled "Display 2, 2560 wide", with ", this window" on the one Parliament is on.
+  - The boards on the page sit in this window's box, side by side as on screen. Each popped window sits in the box of its screen. The board the bar points at has the navy rule. An empty screen says "nothing here yet".
+  - Under the map, one line of marginalia, every part of which writes its command:
+    - what is on screen, by the saved arrangement's name when it is exactly one of them;
+    - `arrange:save "…" keeps it`;
+    - `reset: returns it to its default`;
+    - Escape goes back.
+  - Then your saved arrangements, each writing `arrange:"Review desk"`.
+  - A click on a board writes the command that moves it: `pop:library display 2` onto the other screen, or `pop:back library` for a window already there.
+  - The map takes the place of the boards while it is open. The boards stay as they are underneath: nothing closes, nothing is lost.
+
+  It also opens in the Lab, where switching and saving are still refused, as built. **Suggestion:** yes.
+- **(b) When it shows:**
+  - The map shows while the field reads `arrange:` alone, before Enter, and Enter keeps it open.
+  - While it is open, a command you type shows on it before Enter: the Library faded with "moving to display 2", and its outline on the other screen with "will land here".
+  - After Enter it shows the result. Escape closes it; nothing else does.
+
+  **Suggestion:** yes, as the mockup's steps draw it.
+- **(c) How screens are numbered:** the main screen, the one the computer calls main, is display 1. The others are numbered left to right as they stand, top to bottom where stacked. So `display 2` keeps meaning the same screen wherever Parliament's own window is, and a saved arrangement keeps placing windows where it did. **Suggestion:** yes.
+- **(d) When the browser asks, and what the map shows first:**
+  - Until the browser has been allowed, it says only that another screen is attached, not which or how big. So the map before Enter draws "this screen" and "another screen", without numbers or sizes.
+  - Enter on `arrange:`, with a second screen attached, asks the browser once; so does Enter on `pop:… display 2`. The Enter line says so before Enter: "the browser asks once whether Parliament may place windows on your screens".
+  - Once allowed, the map has its numbers and sizes and the question does not come again.
+  - If it was refused, the map says "The browser was told not to let Parliament place windows. Its site settings can change that", and `pop:… display 2` opens the window here, saying so.
+
+  **Suggestion:** yes.
+- **(e) Placing a window:**
+  - `pop:library display 2` opens the window at the top of that screen, at the size windows have today. `pop:left` and `pop:right` then place it at that screen's edge.
+  - A screen that is not connected, in a saved arrangement, a restore or the command, opens the window here: "Display 3 is not connected. Enter opens the Library in its own window here", as ruled.
+  - The screens' names and sizes stay in the page; nothing is sent.
+
+  **Suggestion:** yes.
+- **(f) Browsers that cannot place windows:**
+  - The map draws one screen and says, as the mockup does, "This browser cannot place boards on other screens. Chrome and Edge can; everything else works here."
+  - `pop:… display 2` says "This browser cannot place windows on other screens. Enter opens the Library in its own window here".
+  - With one screen: "No external screen detected. Connect one and boards can go on it."
+
+  **Suggestion:** yes.
+- **(g) "Extra screen detected":**
+  - Shown once, as marginalia under the field: "Extra screen detected · arrange across screens", the click writing `arrange:`. It shows when a second screen is attached at start, or plugged in while Parliament is open.
+  - Remembered on this device until the computer is back to one screen, so it comes again the next time a screen is attached, not every time Parliament opens.
+
+  **Suggestion:** yes.
+- **(h) `name:` and `duplicate:` on a saved arrangement** (a choice; C253 piece 3 named both, C257 (c) left them to the map). The map points at no single saved arrangement, so each needs the name typed.
+  1. **`name:"Review desk" "Two screens"`** renames one, from anywhere, and `undo:` names it back. No `duplicate:`: `arrange:"Review desk"` then `arrange:save "Two screens"` makes the copy, and `duplicate:` stays a word for rooms.
+  2. **Both:** `name:` as in 1, and `duplicate:"Review desk" arrangement` keeping a copy as "Review desk 2".
+
+  **Suggestion:** 1. A second word for what two commands already do adds a form to learn for little.
+- **(i) The site's permissions header** gains `window-management=(self)` (C253 (g), ruled). It takes effect at the next deploy, which is not part of this stage.
+- **(j) Stored data:**
+  - One device setting, the screens already noticed for (g), not in backups.
+  - With (h), a saved arrangement's name changes in place.
+
+  Nothing else is new; `display` on a window is already stored. **Suggestion:** yes.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
