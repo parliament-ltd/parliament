@@ -519,6 +519,8 @@ The piece with the most risk in it. It starts with a spike, not with building.
 
 ### Stage 12. Ripple, sweeps, Reflection
 
+**Status, 27 October: proposed in six pieces as C228,** waiting for your rulings on Ripple's reach, who checks, Reflection's source and what it keeps.
+
 - **Added**
   - Ripple across branches, off by default, each check one model call that says so first; suggestions in rust, reviewed one at a time.
   - Sweeps: a collab's rule applied across a reply or a branch, as suggestions in green.
