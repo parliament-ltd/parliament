@@ -2737,6 +2737,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - Four boards fit side by side at desktop width.
 - **The tag** (C244 (c)): `tried`, kept in the chat's tags and as one of your own tags (`tagsMine`), as `favorite` is; `tag:tried` in Records finds them.
 - **A fix found in building:** `undo:` after `new:room` or `duplicate:` took the room away if it was still as made. A chat tried in it since would have lost its room. It now keeps any room a chat lives in.
+- **A second fix, found in trying it:** the tried room took the room board the space had before the Lab ("room"), since the Lab did not count it as taken. So `done:` brought the space back with the tried chat (225) where chat 216 had been. In the Lab, the rooms of the space before it now count as taken, and a tried room gets a board of its own ("room-2"). On the trial copy the screen still shows 225 in 216's place, from before the fix; `open:216` brings 216 back.
 - **The guide** (C244 (d), (e), (f)), on the Canvas above the room:
   - "1 of 5" and a track of five dots, the question, what it does, and the answers, each showing the command it writes. An answer the room has already reads "as it is", and a click on it moves on.
   - The five questions are layout, built for, blocks, theme and name. The name question offers three names and "Your own", which writes `>name:"` to finish.
@@ -2749,9 +2750,10 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - the guide's five questions;
   - what each answer writes, and "as it is";
   - how it moves, and only for its room;
-  - `new:room guided`.
+  - `new:room guided`;
+  - a tried room on a board of its own, `done:` bringing back the room that was there.
 
-  1,293 tests; 30 lint warnings, all older. Trying calls the model or source, so it was tried in the browser, not in a test.
+  1,294 tests; 30 lint warnings, all older. Trying calls the model or source, so it was tried in the browser, not in a test.
 - **Tried in the browser,** on the trial copy:
   - `new:room guided` made a room and opened the guide. "Talking things through" read "as it is" and moved on.
   - "On a phone" wrote `device:mobile`, and Enter ran it and moved the guide on. "Keywords and notes" wrote `add:keywords, notes` and did the same.

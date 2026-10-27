@@ -86,7 +86,10 @@ export const roomShowing = (a, chat) => (chat ? roomsIn(a).find((b) => chatIn(a,
 
 /** The board a new room takes: 'room' when free, else the first free 'room-n'. */
 function freeRoom(a) {
-  const taken = new Set(roomsIn(a))
+  // In the Lab, the rooms of the space before it are kept for done: too
+  // (C245): a room tried there takes a board of its own.
+  const before = a.lab ? [...(a.lab.columns ?? []).flat(), ...(a.lab.popped ?? []).map((p) => p.board)].filter(isRoom) : []
+  const taken = new Set([...roomsIn(a), ...before])
   if (!taken.has('room')) return 'room'
   let n = 2
   while (taken.has(`room-${n}`)) n += 1

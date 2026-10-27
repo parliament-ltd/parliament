@@ -160,3 +160,15 @@ describe('duplicate: (C242 (e))', () => {
     expect(at('>duplicate:').act).toMatchObject({ room: 'mode_1', name: 'Essay room 2' })
   })
 })
+
+describe('a room tried in the Lab (C244 (b); C245)', () => {
+  it('takes a board of its own, so done: brings back the room that was there', async () => {
+    const { planRoom } = await import('../shell/arrangement')
+    const a = { ...shipped('almanac'), columns: [['room'], ['almanac']], context: { room: 'chat_216' }, addressed: 'room' }
+    const inLab = planLabOpen(a, 'mode_1').next
+    const tried = planRoom(inLab, 'chat_225').next
+    const board = tried.columns.flat().find((b) => b.startsWith('room'))
+    expect(board).toBe('room-2')
+    expect(planLabDone(tried).next.context.room).toBe('chat_216')
+  })
+})
