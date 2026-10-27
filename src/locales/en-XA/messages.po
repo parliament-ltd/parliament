@@ -8975,6 +8975,11 @@ msgstr ""
 msgid "verb.width"
 msgstr ""
 
+#. The line before the name that signs the letter
+#. js-lingui-explicit-id
+msgid "welcome.closing"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "welcome.foot.builders"
 msgstr ""
@@ -9030,12 +9035,16 @@ msgstr ""
 msgid "welcome.letter.4"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "welcome.letter.5"
+msgstr ""
+
 #. {command} is focus:, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.now"
 msgstr ""
 
-#. The letter is signed with this name after a dash
+#. The name the letter is signed with, under the closing line
 #. js-lingui-explicit-id
 msgid "welcome.signature"
 msgstr ""
@@ -9057,6 +9066,11 @@ msgstr ""
 msgid "welcome.step.askHow"
 msgstr ""
 
+#. {command} is p>, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.askHowFree"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "welcome.step.bar"
 msgstr ""
@@ -9070,7 +9084,7 @@ msgid "welcome.step.key"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "welcome.step.library"
+msgid "welcome.step.lab"
 msgstr ""
 
 #. js-lingui-explicit-id

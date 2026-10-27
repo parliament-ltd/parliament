@@ -4,18 +4,18 @@ import { shipped } from './arrangement'
 
 describe('the welcome steps (stage 5)', () => {
   it('are the ten as ruled: bar:bottom second, pop:records sixth, api: eighth, then strike and send (C131 names, C225)', () => {
-    expect(STEPS.map((s) => s.shows)).toEqual(['>', 'bar:bottom', 'p>', 'records:', 'name:"…"', 'pop:records', 'library:', 'api:', 'strikethrough:', 'p>'])
+    expect(STEPS.map((s) => s.shows)).toEqual(['>', 'bar:bottom', 'p>', 'records:', 'name:"…"', 'pop:records', 'lab:', 'api:', 'strikethrough:', 'p>'])
     expect(STEPS.find((s) => s.id === 'strike').writes).toBe('>strikethrough:')
     expect(STEPS.find((s) => s.id === 'almanac').writes).toBe('>records:')
   })
 
   it('cross off in any order, and the last one finishes the page', () => {
     let w = freshWelcome()
-    w = tick(w, 'library')
+    w = tick(w, 'lab')
     w = tick(w, 'command')
-    expect(w.done).toEqual(['command', 'library'])
+    expect(w.done).toEqual(['command', 'lab'])
     expect(nextStep(w).id).toBe('bar')
-    expect(tick(w, 'library')).toBe(w)
+    expect(tick(w, 'lab')).toBe(w)
     expect(tick(w, 'nonsense')).toBe(w)
     for (const s of STEPS) w = tick(w, s.id)
     expect(w.finished).toBe(true)
@@ -40,7 +40,13 @@ describe('the welcome steps (stage 5)', () => {
     const a = shipped('welcome')
     expect(stepsShown(a)).toEqual([])
     const b = { ...a, bar: { ...a.bar, at: 'bottom' }, columns: [['welcome'], ['almanac']], popped: [{ board: 'library' }] }
-    expect(stepsShown(b)).toEqual(['bar', 'almanac', 'pop', 'library'])
+    expect(stepsShown(b)).toEqual(['bar', 'almanac', 'pop'])
+    // Step 7 is the Lab open (C265).
+    expect(stepsShown({ ...b, lab: { columns: [['canvas']], popped: [], addressed: 'canvas', bar: b.bar } })).toEqual(['bar', 'almanac', 'pop', 'lab'])
+  })
+
+  it('counts the Library step ticked before C265 as the Lab step', () => {
+    expect(cleanWelcome({ done: ['command', 'library'] }).done).toEqual(['command', 'lab'])
   })
 })
 

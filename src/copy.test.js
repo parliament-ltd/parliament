@@ -12,6 +12,8 @@ const PROPER = new Set(['Parliament', "Parliament's", 'I', 'AI', 'API', 'Wikiped
   'Enter', 'Parliament’s', 'Netlify', 'IP',
   // A passkey's PIN (Lock Parliament).
   'PIN',
+  // The welcome letter, in Stefan's own words (C265): I with its contractions, and a language he has written in.
+  "I've", "I'm", "I'd", 'Ruby',
   // Ripple, carrying edits across branches, a name as the editing spec writes it (C231).
   'Ripple',
   // The Lab and its boards, by their names (C131; stage 13, C238).

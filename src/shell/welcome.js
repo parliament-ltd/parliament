@@ -27,7 +27,8 @@ export const STEPS = Object.freeze([
   { id: 'almanac', shows: 'records:', writes: '>records:' },
   { id: 'name', shows: 'name:"…"', writes: '>name:""' },
   { id: 'pop', shows: 'pop:records', writes: '>pop:records' },
-  { id: 'library', shows: 'library:', writes: '>library:' },
+  // The Lab, where rooms are built (C265; it was the Library until then).
+  { id: 'lab', shows: 'lab:', writes: '>lab:' },
   { id: 'key', shows: 'api:', writes: '>api:' }, // A1; crosses off on seeing the panel (C120)
   // Crossed off when an edit that strikes words is saved, however made (C225 (a)).
   { id: 'strike', shows: 'strikethrough:', writes: '>strikethrough:' },
@@ -48,7 +49,8 @@ export const freshWelcome = () => ({ done: [], off: false, finished: false, chat
 /** Progress read back from storage, made safe: unknown steps dropped. */
 export function cleanWelcome(raw) {
   if (!raw || typeof raw !== 'object') return freshWelcome()
-  const done = Array.isArray(raw.done) ? [...new Set(raw.done.filter((id) => IDS.has(id)))] : []
+  // The Library's step, ticked before C265, counts as the Lab's.
+  const done = Array.isArray(raw.done) ? [...new Set(raw.done.map((id) => (id === 'library' ? 'lab' : id)).filter((id) => IDS.has(id)))] : []
   return {
     done: STEPS.map((s) => s.id).filter((id) => done.includes(id)),
     off: raw.off === true,
@@ -94,7 +96,7 @@ export const withChat = (w, chat) => (w.chat === chat ? w : { ...w, chat })
 /**
  * Which steps an arrangement of the welcome screen shows as done: the bar
  * at the foot (step 2), a board in a window of its own (6), the Almanac
- * and the Library open (4, 7), the key panel seen (8).
+ * open (4), the Lab open (7), the key panel seen (8).
  * @param {{ columns: string[][], popped: Array<{ board: string }>, bar: { at: string, popped: boolean } }} a
  */
 export function stepsShown(a) {
@@ -103,7 +105,7 @@ export function stepsShown(a) {
   if (a.bar.at === 'bottom') out.push('bar')
   if (here.has('almanac')) out.push('almanac')
   if (a.popped.length) out.push('pop')
-  if (here.has('library')) out.push('library')
+  if (a.lab) out.push('lab')
   if (here.has('settings')) out.push('key')
   return out
 }

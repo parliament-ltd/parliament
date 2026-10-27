@@ -8975,6 +8975,11 @@ msgstr ""
 msgid "verb.width"
 msgstr "ボードが使う幅を選ぶ、またはすべての幅を元に戻す"
 
+#. The line before the name that signs the letter
+#. js-lingui-explicit-id
+msgid "welcome.closing"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "welcome.foot.builders"
 msgstr "一緒に作る仲間を探しています"
@@ -9030,12 +9035,16 @@ msgstr "AIとの付き合い方を考え直すために、Parliamentはあなた
 msgid "welcome.letter.4"
 msgstr "多くのAIアプリは、受け身で使うように作られています。何かを尋ね、答えを受け取るだけです。ここでは、コマンドラインから舵を取ります。チャットを分岐させたり、ハイライトしたり、チャットをまたいでメモを足したり組み合わせたり、一連のプロンプトを計画して実行したりと、さまざまなことができます。主導権を取り戻しましょう。"
 
+#. js-lingui-explicit-id
+msgid "welcome.letter.5"
+msgstr ""
+
 #. {command} is focus:, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.now"
 msgstr "では、{command} で集中しましょう"
 
-#. The letter is signed with this name after a dash
+#. The name the letter is signed with, under the closing line
 #. js-lingui-explicit-id
 msgid "welcome.signature"
 msgstr "So Lov"
@@ -9057,6 +9066,11 @@ msgstr "何か尋ねる"
 msgid "welcome.step.askHow"
 msgstr "{command} と質問を入力"
 
+#. {command} is p>, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.askHowFree"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "welcome.step.bar"
 msgstr "バーを下に移動する"
@@ -9070,8 +9084,8 @@ msgid "welcome.step.key"
 msgstr "AIのAPIキーを追加する"
 
 #. js-lingui-explicit-id
-msgid "welcome.step.library"
-msgstr "追加やカスタマイズができるツールを見る"
+msgid "welcome.step.lab"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "welcome.step.name"

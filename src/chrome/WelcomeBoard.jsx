@@ -26,15 +26,15 @@ const TITLES = {
   almanac: COPY.welcome.stepAlmanac,
   name: COPY.welcome.stepName,
   pop: COPY.welcome.stepPop,
-  library: COPY.welcome.stepLibrary,
+  lab: COPY.welcome.stepLab,
   key: COPY.welcome.stepKey,
   strike: COPY.welcome.stepStrike,
   send: COPY.welcome.stepSend,
 }
 
 // What a step's command line says, where it is more than its command.
-function howOf(i18n, s) {
-  if (s.id === 'ask') return i18n._(COPY.welcome.stepAskHow, { command: s.shows })
+function howOf(i18n, s, keyed) {
+  if (s.id === 'ask') return i18n._(keyed ? COPY.welcome.stepAskHow : COPY.welcome.stepAskHowFree, { command: s.shows })
   if (s.id === 'strike') return i18n._(COPY.welcome.stepStrikeHow, { keys: modKey() === '⌘' ? '⌘⇧X' : 'Ctrl+Shift+X' })
   if (s.id === 'send') return i18n._(COPY.welcome.stepSendHow, { command: s.shows })
   return s.shows
@@ -61,7 +61,7 @@ function withCommand(i18n, descriptor, command, onWrite) {
  *   keep?: { asking: boolean, onAsk: () => void }|null }} props
  *   keep: when the browser has not agreed to keep Parliament's data and there is something to lose (C94)
  */
-export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, barSlot, keep = null, languages = null, onLanguage }) {
+export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, barSlot, keep = null, languages = null, onLanguage, keyed = false }) {
   const { i18n } = useLingui()
   const next = nextStep(welcome)
   const steps = !welcome.off && !welcome.finished
@@ -88,7 +88,7 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
             <ol className="ch-steps" aria-label={i18n._(COPY.welcome.steps)}>
               {STEPS.map((s, i) => {
                 const done = welcome.done.includes(s.id)
-                const how = howOf(i18n, s)
+                const how = howOf(i18n, s, keyed)
                 return (
                   <li key={s.id} className={done ? 'done' : next?.id === s.id ? 'next' : undefined}>
                     <span className="n">{i + 1}</span>
@@ -111,7 +111,8 @@ export default function WelcomeBoard({ welcome, addressed, onAddress, onWrite, b
               <p>{i18n._(COPY.welcome.letter2)}</p>
               <p>{i18n._(COPY.welcome.letter3)}</p>
               <p>{i18n._(COPY.welcome.letter4)}</p>
-              <p className="sig">{'— '}{i18n._(COPY.welcome.signature)}</p>
+              <p>{i18n._(COPY.welcome.letter5)}</p>
+              <p className="sig">{i18n._(COPY.welcome.closing)}<br />{i18n._(COPY.welcome.signature)}</p>
             </div>
           )}
           {keep && (

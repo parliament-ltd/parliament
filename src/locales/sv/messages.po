@@ -8975,6 +8975,11 @@ msgstr ""
 msgid "verb.width"
 msgstr "Välj hur stor del av bredden en tavla tar, eller ställ tillbaka alla bredder"
 
+#. The line before the name that signs the letter
+#. js-lingui-explicit-id
+msgid "welcome.closing"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "welcome.foot.builders"
 msgstr "Söker fler som vill bygga"
@@ -9030,12 +9035,16 @@ msgstr "Målet är att tänka om hur vi interagerar med AI, och det är ditt att
 msgid "welcome.letter.4"
 msgstr "De flesta AI-appar är byggda för passiv konsumtion. Du frågar något, du får ett svar. Här styr du från en kommandorad: förgrena chattar, markera, lägg till och kombinera anteckningar mellan chattar, planera en serie promptar och mycket mer. Nu tar vi tillbaka kontrollen."
 
+#. js-lingui-explicit-id
+msgid "welcome.letter.5"
+msgstr ""
+
 #. {command} is focus:, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.now"
 msgstr "Nu kör vi {command}"
 
-#. The letter is signed with this name after a dash
+#. The name the letter is signed with, under the closing line
 #. js-lingui-explicit-id
 msgid "welcome.signature"
 msgstr "So Lov"
@@ -9057,6 +9066,11 @@ msgstr "Fråga något"
 msgid "welcome.step.askHow"
 msgstr "{command} och en fråga"
 
+#. {command} is p>, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.askHowFree"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "welcome.step.bar"
 msgstr "Flytta fältet längst ned"
@@ -9070,8 +9084,8 @@ msgid "welcome.step.key"
 msgstr "Lägg till en API-nyckel för AI"
 
 #. js-lingui-explicit-id
-msgid "welcome.step.library"
-msgstr "Bläddra bland verktyg att lägga till och anpassa"
+msgid "welcome.step.lab"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "welcome.step.name"

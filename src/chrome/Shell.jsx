@@ -3749,7 +3749,7 @@ export default function Shell() {
       )
     }
     if (board === 'welcome') {
-      return <WelcomeBoard key="welcome" welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={() => runCommand('language:')} />
+      return <WelcomeBoard key="welcome" keyed={keyInfo.keys.some((k) => k.has)} welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={() => runCommand('language:')} />
     }
     if (board === 'canvas') {
       return (

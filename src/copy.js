@@ -1669,31 +1669,42 @@ export const COPY = {
     steps: /*i18n*/ { id: 'welcome.steps', message: 'Ten things to try', comment: 'The name of the list of steps, read by screen readers' },
     stepCommand: /*i18n*/ { id: 'welcome.step.command', message: 'Open the command line' },
     stepBar: /*i18n*/ { id: 'welcome.step.bar', message: 'Move the bar to the bottom' },
-    stepAsk: /*i18n*/ { id: 'welcome.step.ask', message: 'Ask something' },
+    stepAsk: /*i18n*/ { id: 'welcome.step.ask', message: 'Ask a question' },
     stepAskHow: /*i18n*/ { id: 'welcome.step.askHow', message: '{command} and a question', comment: '{command} is p>, which stays English' },
+    // With no key saved, the answer comes from Wikipedia (C265).
+    stepAskHowFree: /*i18n*/ { id: 'welcome.step.askHowFree', message: '{command} and a question, answered from Wikipedia with no AI', comment: '{command} is p>, which stays English' },
     stepAlmanac: /*i18n*/ { id: 'welcome.step.almanac', message: 'See what you have made' },
     stepName: /*i18n*/ { id: 'welcome.step.name', message: 'Name the room' },
-    stepPop: /*i18n*/ { id: 'welcome.step.pop', message: 'Move it to another monitor' },
-    stepLibrary: /*i18n*/ { id: 'welcome.step.library', message: 'Browse tools to add and customize' },
+    stepPop: /*i18n*/ { id: 'welcome.step.pop', message: 'Pop a board into its own window' },
+    stepLab: /*i18n*/ { id: 'welcome.step.lab', message: 'Open the Lab, where rooms are built' },
     stepKey: /*i18n*/ { id: 'welcome.step.key', message: 'Add an AI API key' },
     stepStrike: /*i18n*/ { id: 'welcome.step.strike', message: 'Strike through a line' },
     stepStrikeHow: /*i18n*/ { id: 'welcome.step.strikeHow', message: 'select words in a reply, then {keys}', comment: '{keys} is the shortcut as this computer writes it: Ctrl+Shift+X or ⌘⇧X' },
     stepSend: /*i18n*/ { id: 'welcome.step.send', message: 'Send it with your next prompt' },
     stepSendHow: /*i18n*/ { id: 'welcome.step.sendHow', message: '{command} and a prompt, with an edit waiting', comment: '{command} is p>, which stays English' },
-    letter1: /*i18n*/ { id: 'welcome.letter.1', message: 'Parliament is a place to work with AI on your own terms. It is early, and still being built.' },
+    // The letter, in Stefan's own words, as he wrote it (C265): not edited.
+    letter1: /*i18n*/ {
+      id: 'welcome.letter.1',
+      message: "Parliament is an attempt to rethink how we interact with AI. To take part more in the work and conversation. I didn't want a handful of companies deciding how that goes. And yes, I see the irony of building this with Claude.",
+    },
     letter2: /*i18n*/ {
       id: 'welcome.letter.2',
-      message: 'It runs in your browser, with no servers and no accounts. Your chats and keys stay on this computer, and each request goes straight to the provider you pick, to a model running on your own machine, or to a public source such as Wikipedia. There are no ads.',
+      message: "I'm scared of AI too. It's a marvel I don't know how to feel about. But I didn't want to sit there and do nothing. So, after months of chatting and reading, I've tried to put together an app you can use offline. An app where you can search sources without AI first. An app that hopes to empower through active participation. Perhaps that's too bold of me... while I've coded a couple web applications in Ruby, I'd still classify myself as a \"designer\". Building is hard, especially when you're learning as you go and the pace feels like drinking from a fire hose. The code is open, I've run through Claude Code security checks, and plan to do more 3rd-party security checks. I will do my best to keep you posted. I've been wondering how I could make the code accessible... maybe I could turn it into a novel.",
     },
     letter3: /*i18n*/ {
       id: 'welcome.letter.3',
-      message: 'With the goal of rethinking how we interact with AI, it is yours to shape. Rooms are built from blocks, layouts and themes. You create the space, you choose how to interact.',
+      message: "So what is Parliament? In Parliament, you can create rooms, a space where you can chat with one AI model, several, or none. Rooms are built from blocks you can edit and change, and you can make your own layouts, themes, and arrangements.",
     },
     letter4: /*i18n*/ {
       id: 'welcome.letter.4',
-      message: 'Most AI apps are built for passive consumption. You ask something, you receive a response. Here you steer from a command line: branch chats, highlight, add and combine notes across chats, plan a run of prompts, and more. Let\'s take back control.',
+      message: "Everything sits on boards. All boards can be popped out and moved to another monitor, so the workspace is yours.",
     },
-    signature: /*i18n*/ { id: 'welcome.signature', message: 'So Lov', comment: 'The letter is signed with this name after a dash' },
+    letter5: /*i18n*/ {
+      id: 'welcome.letter.5',
+      message: "Right now, Parliament is built for laptops, and hopefully phones soon too.",
+    },
+    closing: /*i18n*/ { id: 'welcome.closing', message: 'All the best,', comment: 'The line before the name that signs the letter' },
+    signature: /*i18n*/ { id: 'welcome.signature', message: 'Stef', comment: 'The name the letter is signed with, under the closing line' },
     // The ending (W §7): the letter gives way to one line. {command} is focus:, drawn as a link that writes it in the bar.
     now: /*i18n*/ { id: 'welcome.now', message: 'Now, let’s {command}', comment: '{command} is focus:, which stays English' },
     // On narrow or touch-only screens only (W §12.4).

@@ -8975,6 +8975,11 @@ msgstr ""
 msgid "verb.width"
 msgstr "选择面板所占的宽度，或将所有宽度恢复默认"
 
+#. The line before the name that signs the letter
+#. js-lingui-explicit-id
+msgid "welcome.closing"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "welcome.foot.builders"
 msgstr "正在寻找其他共建者"
@@ -9030,12 +9035,16 @@ msgstr "它的目标是重新思考我们与 AI 的互动方式，而它的样�
 msgid "welcome.letter.4"
 msgstr "大多数 AI 应用是为被动接收而设计的：你提问，它回答。在这里，你从命令行掌舵：为对话开分支、高亮、跨对话添加和组合笔记、规划一系列提示词的运行，等等。让我们把主动权拿回来。"
 
+#. js-lingui-explicit-id
+msgid "welcome.letter.5"
+msgstr ""
+
 #. {command} is focus:, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.now"
 msgstr "现在，来试试 {command}"
 
-#. The letter is signed with this name after a dash
+#. The name the letter is signed with, under the closing line
 #. js-lingui-explicit-id
 msgid "welcome.signature"
 msgstr "So Lov"
@@ -9057,6 +9066,11 @@ msgstr "提个问题"
 msgid "welcome.step.askHow"
 msgstr "{command} 加上一个问题"
 
+#. {command} is p>, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.askHowFree"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "welcome.step.bar"
 msgstr "把输入栏移到底部"
@@ -9070,8 +9084,8 @@ msgid "welcome.step.key"
 msgstr "添加 AI API 密钥"
 
 #. js-lingui-explicit-id
-msgid "welcome.step.library"
-msgstr "浏览可添加和自定义的工具"
+msgid "welcome.step.lab"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "welcome.step.name"

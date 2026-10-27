@@ -3768,6 +3768,21 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - **(k) Stored data,** in all: the keys moved into the vault, once, shown before it runs. Every backup stays readable, since keys are never in one. Nothing else. **Suggestion:** approve the outline; the move itself is shown before it is built.
   - **(l) After the refactor, not in this stage:** R39 (Drafting Desk), the parked PR-50a and b, the compressed-summary branch, and reviewing asks with Ripple. Each is noted so it is not lost. **Suggestion:** yes.
 
+**C265. The welcome page's letter and steps, rewritten by Stefan** (ruled and built 27 October; welcome spec §3 and §4; C43, C118, C120, C225).
+- **The letter** is Stefan's own, in five paragraphs, exactly as he wrote it, with "All the best," and "Stef" under it in place of "So Lov".
+  - It is not to be edited for style; any change to it is his.
+  - It names Claude, deliberately: an exception to the convention that copy names no provider in a sentence.
+  - It says the app can be used offline. That holds with a model on your own computer; Stefan chose the words with that known.
+  - The page now draws five paragraphs and the two-line closing.
+- **The steps,** ten as before:
+  - **Step 2, `bar:bottom`, stays** (C43): moving things around is part of the lesson.
+  - **Step 3 is "Ask a question".** With no key saved, its line reads "p> and a question, answered from Wikipedia with no AI". With a key saved, it reads "p> and a question", since a model would answer.
+  - **Step 6 is "Pop a board into its own window",** in the command's own words (`pop:records`).
+  - **Step 7 is "Open the Lab, where rooms are built"** (`lab:`), crossed off when the Lab opens, in place of the Library. A Library step ticked before counts as the Lab's, so no one loses progress.
+- **The draft translations** (Japanese, Chinese, Swedish, Finnish) keep the old letter and steps until they are translated again; they show only in development builds.
+- **Tests:** the steps and their commands; the Lab step from the arrangement; the old Library tick read as the Lab's; the copy rules, which now know "I've", "I'm", "I'd" and "Ruby". 1,335 tests.
+- **Tried in the browser:** the trial copy's welcome page shows the letter word for word, the closing, and the ten steps with the new words.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

@@ -8975,6 +8975,11 @@ msgstr "Let the model search the web for your next prompt only"
 msgid "verb.width"
 msgstr "Choose how much of the width a board takes, or put every width back"
 
+#. The line before the name that signs the letter
+#. js-lingui-explicit-id
+msgid "welcome.closing"
+msgstr "All the best,"
+
 #. js-lingui-explicit-id
 msgid "welcome.foot.builders"
 msgstr "Looking for other builders"
@@ -9016,29 +9021,33 @@ msgstr "This browser has not agreed to keep what you make here, so it may clear 
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.1"
-msgstr "Parliament is a place to work with AI on your own terms. It is early, and still being built."
+msgstr "Parliament is an attempt to rethink how we interact with AI. To take part more in the work and conversation. I didn't want a handful of companies deciding how that goes. And yes, I see the irony of building this with Claude."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.2"
-msgstr "It runs in your browser, with no servers and no accounts. Your chats and keys stay on this computer, and each request goes straight to the provider you pick, to a model running on your own machine, or to a public source such as Wikipedia. There are no ads."
+msgstr "I'm scared of AI too. It's a marvel I don't know how to feel about. But I didn't want to sit there and do nothing. So, after months of chatting and reading, I've tried to put together an app you can use offline. An app where you can search sources without AI first. An app that hopes to empower through active participation. Perhaps that's too bold of me... while I've coded a couple web applications in Ruby, I'd still classify myself as a \"designer\". Building is hard, especially when you're learning as you go and the pace feels like drinking from a fire hose. The code is open, I've run through Claude Code security checks, and plan to do more 3rd-party security checks. I will do my best to keep you posted. I've been wondering how I could make the code accessible... maybe I could turn it into a novel."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.3"
-msgstr "With the goal of rethinking how we interact with AI, it is yours to shape. Rooms are built from blocks, layouts and themes. You create the space, you choose how to interact."
+msgstr "So what is Parliament? In Parliament, you can create rooms, a space where you can chat with one AI model, several, or none. Rooms are built from blocks you can edit and change, and you can make your own layouts, themes, and arrangements."
 
 #. js-lingui-explicit-id
 msgid "welcome.letter.4"
-msgstr "Most AI apps are built for passive consumption. You ask something, you receive a response. Here you steer from a command line: branch chats, highlight, add and combine notes across chats, plan a run of prompts, and more. Let's take back control."
+msgstr "Everything sits on boards. All boards can be popped out and moved to another monitor, so the workspace is yours."
+
+#. js-lingui-explicit-id
+msgid "welcome.letter.5"
+msgstr "Right now, Parliament is built for laptops, and hopefully phones soon too."
 
 #. {command} is focus:, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.now"
 msgstr "Now, let’s {command}"
 
-#. The letter is signed with this name after a dash
+#. The name the letter is signed with, under the closing line
 #. js-lingui-explicit-id
 msgid "welcome.signature"
-msgstr "So Lov"
+msgstr "Stef"
 
 #. js-lingui-explicit-id
 msgid "welcome.small"
@@ -9050,12 +9059,17 @@ msgstr "See what you have made"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.ask"
-msgstr "Ask something"
+msgstr "Ask a question"
 
 #. {command} is p>, which stays English
 #. js-lingui-explicit-id
 msgid "welcome.step.askHow"
 msgstr "{command} and a question"
+
+#. {command} is p>, which stays English
+#. js-lingui-explicit-id
+msgid "welcome.step.askHowFree"
+msgstr "{command} and a question, answered from Wikipedia with no AI"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.bar"
@@ -9070,8 +9084,8 @@ msgid "welcome.step.key"
 msgstr "Add an AI API key"
 
 #. js-lingui-explicit-id
-msgid "welcome.step.library"
-msgstr "Browse tools to add and customize"
+msgid "welcome.step.lab"
+msgstr "Open the Lab, where rooms are built"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.name"
@@ -9079,7 +9093,7 @@ msgstr "Name the room"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.pop"
-msgstr "Move it to another monitor"
+msgstr "Pop a board into its own window"
 
 #. js-lingui-explicit-id
 msgid "welcome.step.send"
