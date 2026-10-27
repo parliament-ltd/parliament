@@ -581,7 +581,7 @@ Built to Lab v7 (A2). Can run beside the others once stage 3 exists.
 - **Done early, on 15 October:** DNS moved to deSEC with DNSSEC, and mail set up at Proton. The records are in `docs/hosting.md`.
 - **Needs from you:** a yes before the public push, which cannot be taken back. R31 is put to you here.
 
-**Status, 27 October: proposed in nine pieces as C264,** with the vault (C170) built before going public, and choices on R30, R31 and R35, the vault's address and exceptions, a draft deploy, when the site switches, what the public history holds, and the mirror and standby hosts.
+**Status, 27 October: proposed in nine pieces as C264,** with the vault (C170) built before going public, and choices on R30, R31 and R35, the vault's address and exceptions, a draft deploy, when the site switches, what the public history holds, and the mirror and standby hosts. **Ruled 27 October** (C264): as suggested, except that everything is tried on the live site rather than a draft deploy, and the mirror and standby hosts are chosen again.
 
 ### Across stages: security and privacy (ruled 21 October)
 
