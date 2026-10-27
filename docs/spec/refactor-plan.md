@@ -519,7 +519,7 @@ The piece with the most risk in it. It starts with a spike, not with building.
 
 ### Stage 12. Ripple, sweeps, Reflection
 
-**Status, 27 October:** proposed in six pieces as C228, ruled the same day; the stored data shown as C229. **Piece 1 built (C230):** suggestions in place, the Suggestions tab and its review bar, accept: and reject: on suggestions. **Piece 2 built (C231, C232):** Ripple, its switch, its line and its checks. **Piece 3 built (C233, C234):** sweeps, and an accepted sweep told once. **Pieces 4 and 5 built (C235, C236):** the Reflection board, Reflect and the talk about the chat. **The checkpoint is C237,** waiting for you: Drafting Desk (R39), Secretarybird's comments and suggestions, and the Review modal (R40).
+**Status, 27 October:** proposed in six pieces as C228, ruled the same day; the stored data shown as C229. **Piece 1 built (C230):** suggestions in place, the Suggestions tab and its review bar, accept: and reject: on suggestions. **Piece 2 built (C231, C232):** Ripple, its switch, its line and its checks. **Piece 3 built (C233, C234):** sweeps, and an accepted sweep told once. **Pieces 4 and 5 built (C235, C236):** the Reflection board, Reflect and the talk about the chat. **The checkpoint is C237, ruled 27 October:** Drafting Desk kept for now (R39 waits), the Review modal retired (R40, carried out). Stage 12 is done.
 
 - **Added**
   - Ripple across branches, off by default, each check one model call that says so first; suggestions in rust, reviewed one at a time.
@@ -531,6 +531,8 @@ The piece with the most risk in it. It starts with a spike, not with building.
 - **Needs from you:** the open items the editing spec lists for itself: Ripple's reach, the scope of a collab, how far a sweep goes.
 
 ### Stage 13. The Lab
+
+**Status, 27 October: proposed in seven pieces as C238,** waiting for your rulings on features of input (in this stage or after) and local-only rooms.
 
 Built to Lab v7 (A2). Can run beside the others once stage 3 exists.
 

@@ -2409,6 +2409,60 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **(e) Not in this checkpoint:** reviewing asks with Ripple (your ruling, after the refactor), and C219's asks as built, approved for now.
 - **Suggestion:** (b) 2, (c) 2, (d) 1; then stage 13, the Lab.
 
+**C238. Stage 13 in pieces: the Lab** (proposed 27 October; refactor-plan.md, stage 13; the arrangements spec §2 to §5, §7, §8; Lab v7 and v6; A2, A10, C37, C38, C53, C63, C66, C95, C125, C126, C128, C131, C199, C207 (4)). Waiting for Stefan: (h), (i) and (k) are choices; the rest is built as suggested unless ruled otherwise. Each piece is committed and checked before the next.
+- **What exists today** (a survey of the code and documents, 27 October):
+  - Rooms are mode records (layout, theme, blocks with slot, order and settings, device), drawn by `RoomShell`, which skips what it does not know. Five templates are seeded, with Kingfisher and Starling as "coming soon", empty.
+  - The old editor (`/edit`, about 4,000 lines with its rails, tray, dialogs and drag and drop) and the build wizard (`/build`, about 3,000 lines) still work, reached only from today's chat page.
+  - In the shell: the Lab's arrangement is declared (Library | Canvas | Blocks), but the Canvas and Blocks draw as placeholders. `lab:`, `edit:`, `done:`, `place:`, `layout:`, `theme:`, `device:` and the room forms of `new:`, `add:`, `rm:` and `set:` answer "not built yet". The Library board is read-only.
+  - A room's device is stored but read by nothing. Fifteen block settings are declared that nothing reads (the audit). Layout slots exist in three copies, with fallbacks; slot capacity is not checked.
+  - No tests cover rooms, the editor or the catalogue's registry.
+- **The pieces:**
+  1. **The Lab and the Canvas.**
+     - `lab:` brings the Lab (Library | Canvas | Blocks, bar on top, resting in search, as declared, C125), and `done:` takes you back to what you had. `edit:"Reading room"` opens a room there, and `new:room` opens a blank one.
+     - The Canvas draws the room by slot ("room for 2 more"), in v7's style, with the room line: its name, then Layout, Theme and Built for, then name and inspect.
+     - `layout:`, `theme:`, `name:` and `device:` act on the room in the Lab. Every command saves (A10) and is one step for `undo:`.
+     - A layout change keeps each block where it has room, else its next fit, else takes it out, the Enter line saying which. The layout manifest becomes the one list of slots and capacities (R36).
+  2. **The Blocks board.**
+     - Rows by slot ("2 of 3"); each opens to Sits in (`place:`), Features, Settings, move up and move down, inspect and rm.
+     - `add:`, `rm:`, `place:` and `set:keywords colour yellow`. One of each block per room (C63); messages and input stay.
+     - Settings apply on click and are echoed under the field with undo; anything that moves, removes or spends waits for Enter (A2, C38). Only settings something reads are shown.
+  3. **The Library in full.** Ticking blocks, layouts and themes, and "add to room", which writes `add:`; details opening in place; a room's one action (edit, or duplicate for a template); `duplicate:` copies a room as "Writing studio 2" and opens it in the Lab.
+  4. **Trying a room and the guide.**
+     - `p>` in the Lab tries the room: a chat in it, tagged "tried in the Lab", the Enter line naming the cost.
+     - `new:room guided` (and the first visit) asks six questions, each writing its command: layout, device, place, web search, theme, name.
+  5. **Built for a phone** (C238 (g)) and local-only rooms (C238 (i)).
+  6. **Features of input** (R24, C238 (h)): web search, voice and attaching files become features of the input block, carried by the bar in prompt mode; then R25 can be carried out.
+  7. **The checkpoint,** with R14, R16 to R21, R24, R33, R34 and R36, and the settings nothing reads.
+- **Open points,** each with its suggestion:
+  - **(a) What the Lab holds:** the Library, the Canvas and the Blocks board, as v7 draws it and the shell already declares it; the Collection can be called in (`open:collection`). **Suggestion:** yes.
+  - **(b) Click or Enter** (A2, ruled): a setting, a theme or a device applies on click, echoed, and `undo:` takes it back. A layout, `place:`, `rm:`, `add:`, `duplicate:` and anything that spends wait for Enter. **Suggestion:** as ruled.
+  - **(c) `done:`** is in the plan and the command list but defined nowhere. **Suggestion:** it leaves the Lab for what you had before, with the room you edited in its room. Nothing is left to save, since every command saved.
+  - **(d) `edit:` on a board.** C53 keeps boards (Records, the Collection, the Plan) not editable in this refactor, against the arrangements spec. **Suggestion:** C53 stands. `edit:` takes rooms, and on a board says boards are not editable yet.
+  - **(e) `set:room`** already means the room new chats start in (Settings). **Suggestion:** it keeps that meaning. A room's panel buttons stay as stored and are not offered in this stage.
+  - **(f) Names:** C131's: Keywords, Frameworks, "Three panels" and so on, not the mockups' older words. **Suggestion:** yes.
+  - **(g) Built for:** `device:mobile` draws the room in its narrow form, rails folded into a sheet, whatever its width; `device:desktop`, as now, narrow only when narrow. The stored device is read for the first time. **Suggestion:** yes.
+  - **(h) Features of input** (a choice). This is the largest piece. Web search on for the next prompt only (C66, "to be looked at again"), voice on the device only (C70), and attaching files, all in the bar, in place of three blocks. Options:
+    1. In this stage, as piece 6, its own open points proposed then.
+    2. A stage of its own after the Lab, so the Lab is tried sooner.
+
+    **Suggestion:** 1, as the plan has it, since the guide's web search question and the Blocks board's Features both need it.
+  - **(i) Local-only rooms** (a choice; the plan's security line for stage 13). A room setting, "only models on this computer", under which the Enter line refuses to send to a hosted model or a source. It is a new optional field on a room, `localOnly`, shown here; nothing else in what is stored changes. Options:
+    1. Now, in piece 5.
+    2. Later.
+
+    **Suggestion:** 1. It is small, and it makes "built for" and privacy something a room can promise.
+  - **(j) Kingfisher and Starling** (C207 (4)) stay "coming soon": building them is a design of their own. **Suggestion:** after the refactor.
+  - **(k) The old editor and wizard** (a choice, at the checkpoint). R14 and R16 to R21, R33 and R34 retire them once the Lab does what they do. Until then `/edit` and `/build` keep working. **Suggestion:** put to you at the checkpoint, item by item, as usual.
+  - **(l) Stored data:** no new list and no version change. Rooms stay mode records; each command writes the room once, and `undo:` writes it back as it was. A tried chat is an ordinary chat with a tag. New: `localOnly` on a room, if (i) 1. Backups carry rooms as they are. **Suggestion:** approve this outline; anything more is shown before it is written.
+  - **(m) Security:**
+    - Catalogue entries reach the network, keys and stored data only through what a room gives them, held by a lint rule like Reflection's;
+    - an entry that calls a model must say so in its manifest;
+    - no drag and drop (R16);
+    - a click that would remove, move or spend writes the command and waits for Enter.
+
+    **Suggestion:** yes.
+- **Suggestion:** rule (h) and (i); then piece 1, with (l) as outlined.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
