@@ -2933,7 +2933,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   Not tried in the browser: a web search, voice and choosing files, which need a key, a browser that transcribes on the device and a native file dialog. They are covered by the tests above and by the code they reuse. The trial copy's bar was moved to the top (`bar:top`) to read the field.
 - **Next:** piece 7, the checkpoint.
 
-**C250. The stage 13 checkpoint** (proposed 27 October; refactor-plan.md, stage 13 and §6; C238 to C249). Pieces 1 to 6 are built and committed. Waiting for Stefan: (b) to (h) are each a yes or no, or a choice.
+**C250. The stage 13 checkpoint** (proposed 27 October; **ruled 27 October, as suggested: (b) R14, R16 to R21 and R33 approved, panel buttons stay as stored; (c) R34 approved; (d) R36 approved; (e) R24 approved on R25's condition; (f) option 1, R42 as piece 8; (g) R41 approved; (h) the test data kept. (b), (c), (d) and (g) carried out now**; refactor-plan.md, stage 13 and §6; C238 to C249). Pieces 1 to 6 are built and committed.
 - **(a) What to try,** on the trial copy:
   - **Building:** `lab:`, then `edit:"Pocket chat"`.
     - On the Canvas, change the layout (it writes the command; Enter moves the blocks), the theme, Built for, and Sends to.
@@ -3012,6 +3012,32 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 
   **Suggestion:** your call; nothing depends on them.
 - **Not in this checkpoint:** R39 (Drafting Desk), deferred until after the refactor (C237).
+- **Carried out, 27 October** ((b), (c), (d), (g) as ruled):
+  - **(b) The old editor and the build wizard.**
+    - 29 files moved to `src/deprecated/`, keeping their paths, each headed with its line and how to restore it, and listed in its README:
+      - `EditorView.jsx` and `BuildView.jsx`;
+      - the editor's nine components;
+      - the wizard's gallery and its thirteen steps and parts;
+      - four modules only they used: `editorReducer.js`, `editorHistory.js`, `buildWizard.js` and `layoutMigration.js`.
+    - `/edit`, `/edit/:id` and `/build` now open the Lab on the new screens, with that room on the Canvas. So the wrench on today's chat page leads there.
+    - Panel buttons stay as stored and still draw.
+    - The editor's styles in `index.css` stay, for R12.
+  - **(c) R34:** the drag to reorder is out of the stacked-sections layout and `SectionCard`; the sections draw in their stored order. Nothing live imports `@dnd-kit` now; it leaves the dependencies at stage 15.
+  - **(d) R36:**
+    - The fallback table went with `layoutMigration.js`.
+    - The seven empty `slots: []` placeholders are out of the code that seeds the Library's layout records. No check of a record or a backup needs them.
+    - Records already stored keep theirs, untouched.
+  - **(g) R41:** the ten declarations are out of the blocks' `configSchema`.
+    - Two blocks' schemas are now empty: Messages and Keywords.
+    - Voice's button label was read only by the dev catalogue's preview, which shows its fallback, "Speak".
+    - Values rooms hold stay in their records.
+  - **Not touched:** `src/lib/refs.js`, `components/Button.jsx` and `components/Card.jsx` are now used by nothing outside `src/deprecated/`. They are not in these lines, so they stay for a later one.
+  - **Checks:** `npm run check` passes: 1,304 tests, 30 lint warnings, all older.
+  - **Tried in the browser:**
+    - `/edit/<Essay room's id>?tab=components` opened the Lab with Essay room on the Canvas.
+    - `/build` opened the empty Lab, which offers the guide.
+    - After a fresh load, no request failed.
+- **Next:** piece 8, today's chat page (R42), proposed first.
 
 ## Proposed CLAUDE.md rewrite
 

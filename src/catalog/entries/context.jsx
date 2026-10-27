@@ -45,11 +45,6 @@ export default {
       default: 75,
       label: 'Warning threshold (%) of context window',
     },
-    autoCompress: {
-      type: 'boolean',
-      default: false,
-      label: 'Auto-compress at threshold (Phase 2 — reserved)',
-    },
     displayMode: {
       type: 'enum',
       options: ['meter', 'compact', 'ambient'],

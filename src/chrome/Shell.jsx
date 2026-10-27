@@ -3360,6 +3360,15 @@ export default function Shell() {
     goTo('/', { replace: true, state: null })
     runCommand(`open:${askedOpen}`)
   }, [started, askedOpen, goTo, runCommand])
+  // The old editor's and wizard's addresses (/edit, /edit/:id, /build; R14,
+  // R16 to R21; C250 (b)) open the Lab, with that room on the Canvas.
+  const askedLab = location.state?.lab ?? null
+  useEffect(() => {
+    if (!started || !askedLab) return
+    goTo('/', { replace: true, state: null })
+    const p = planLabOpen(current.current, typeof askedLab === 'string' ? askedLab : null)
+    if (p.next) run(p.next, null)
+  }, [started, askedLab, goTo, run])
   const pickAnswerer = useCallback(async (row) => {
     if (row.later) return
     // For one step of a plan (C202): its model, or none for the branch's own.

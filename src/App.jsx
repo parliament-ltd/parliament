@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { MotionConfig } from 'framer-motion'
 import { SettingsProvider } from './stores/SettingsContext'
 import { ConversationProvider } from './stores/ConversationContext'
@@ -13,8 +13,12 @@ import BranchShortcutHandler from './components/BranchShortcutHandler'
 import { PWAProvider } from './stores/PWAContext'
 import { BackupProvider } from './stores/BackupContext'
 import ChatView from './views/ChatView'
-import EditorView from './views/EditorView'
-import BuildView from './views/BuildView'
+// The old editor and build wizard are retired (R14, R16 to R21, R33; C250 (b)):
+// their addresses open the Lab on the new screens, with the room named, if any.
+function ToLab() {
+  const { roomId = null } = useParams()
+  return <Navigate to="/" replace state={{ lab: roomId ?? true }} />
+}
 import ErrorBoundary from './components/ErrorBoundary'
 import DbStateNotice from './components/DbStateNotice'
 import InterfaceLanguage from './components/InterfaceLanguage'
@@ -109,10 +113,10 @@ export default function App() {
                   <Route path="/chat/:id" element={<ErrorBoundary inline><ChatView /></ErrorBoundary>} />
                   {/* The old Settings page is retired (R37): its address opens the Settings board. */}
                   <Route path="/settings" element={<Navigate to="/" replace state={{ open: 'settings' }} />} />
-                  <Route path="/edit" element={<ErrorBoundary inline><EditorView scope="room" blank /></ErrorBoundary>} />
-                  <Route path="/edit/:roomId" element={<ErrorBoundary inline><EditorView scope="room" /></ErrorBoundary>} />
+                  <Route path="/edit" element={<ToLab />} />
+                  <Route path="/edit/:roomId" element={<ToLab />} />
                   <Route path="/edit-home" element={<Navigate to="/" replace />} />
-                  <Route path="/build" element={<ErrorBoundary inline><BuildView /></ErrorBoundary>} />
+                  <Route path="/build" element={<ToLab />} />
                   {MigrationPreview && (
                     <Route
                       path="/dev/migration"

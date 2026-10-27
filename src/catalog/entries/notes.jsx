@@ -37,11 +37,6 @@ export default {
   ],
   capabilityRequirements: ['storage:read', 'storage:write'],
   configSchema: {
-    showAddButton: {
-      type: 'boolean',
-      default: true,
-      label: 'Show "+ Add a note" affordance',
-    },
     sortOrder: {
       type: 'enum',
       options: ['newest', 'oldest', 'message-order'],

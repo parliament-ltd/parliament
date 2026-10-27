@@ -37,5 +37,34 @@ retirement line approved it, and how to put it back.
 | `catalog/entries/review-render.jsx` | R40 | 27 October 2026 | The Review block, drawn, and its synthesis call |
 | `catalog/entries/review-preview.jsx` | R40 | 27 October 2026 | The Review block, its preview |
 | `views/SettingsView.jsx` | R37, with R10 and R28 | 23 October 2026 | The old Settings page at /settings, with its `.apb` and JSON export buttons and the options nothing read; /settings now opens the Settings board |
+| `views/EditorView.jsx` | R16 to R21, R33 | 27 October 2026 | The old room editor at /edit and /edit/:id: its canvas, rails, tray, dialogs and drag and drop; replaced by the Lab (stage 13, C250 (b)) |
+| `views/BuildView.jsx` | R14 | 27 October 2026 | The build wizard at /build; replaced by new:room guided, the templates in the Library and duplicate: (C250 (b)) |
+| `components/editor/EditorApplyRoomDialog.jsx` | R21 | 27 October 2026 | The dialog that applied another room to the one in the editor; replaced by duplicate: |
+| `components/editor/EditorCanvas.jsx` | R16, R33 | 27 October 2026 | The editor's canvas, with drag and drop, the Showcase glow and connector lines; replaced by the Canvas board |
+| `components/editor/EditorHoldingTray.jsx` | R17 | 27 October 2026 | The holding tray, where removed blocks waited; replaced by rm: and undo: |
+| `components/editor/EditorLeftRail.jsx` | R19 | 27 October 2026 | The editor's left rail; replaced by the Library board |
+| `components/editor/EditorLibraryMode.jsx` | R19 | 27 October 2026 | The editor's library mode; replaced by the Library board |
+| `components/editor/EditorMigrationDialog.jsx` | R21 | 27 October 2026 | The layout-swap dialog; replaced by the Enter line saying what moves |
+| `components/editor/EditorPreviewSheet.jsx` | R20 | 27 October 2026 | The preview sheet; replaced by trying the room with p> |
+| `components/editor/EditorRightRail.jsx` | R18 | 27 October 2026 | The inspector, the editor's right rail, where panel buttons were set; replaced by the room line and the Blocks board (panel buttons stay as stored) |
+| `components/editor/EditorTopBar.jsx` | R19 | 27 October 2026 | The editor's top bar and its pills; replaced by the bar |
+| `components/build/TemplateGallery.jsx` | R14 | 27 October 2026 | The wizard's template gallery; replaced by the templates in the Library |
+| `components/build/wizard/DensityLayoutStep.jsx` | R14 | 27 October 2026 | A step or part of the build wizard; replaced by new:room guided |
+| `components/build/wizard/DeviceStep.jsx` | R14 | 27 October 2026 | A step or part of the build wizard; replaced by new:room guided |
+| `components/build/wizard/FeaturesStep.jsx` | R14 | 27 October 2026 | A step or part of the build wizard; replaced by new:room guided |
+| `components/build/wizard/IgnitionStep.jsx` | R14 | 27 October 2026 | A step or part of the build wizard; replaced by new:room guided |
+| `components/build/wizard/LayoutPreviewOverlay.jsx` | R14 | 27 October 2026 | A step or part of the build wizard; replaced by new:room guided |
+| `components/build/wizard/LayoutWireframe.jsx` | R14 | 27 October 2026 | A step or part of the build wizard; replaced by new:room guided |
+| `components/build/wizard/NameSchemeStep.jsx` | R14 | 27 October 2026 | A step or part of the build wizard; replaced by new:room guided |
+| `components/build/wizard/PurposeStep.jsx` | R14 | 27 October 2026 | A step or part of the build wizard; replaced by new:room guided |
+| `components/build/wizard/StepHeader.jsx` | R14 | 27 October 2026 | A step or part of the build wizard; replaced by new:room guided |
+| `components/build/wizard/TileGrid.jsx` | R14 | 27 October 2026 | A step or part of the build wizard; replaced by new:room guided |
+| `components/build/wizard/WizardEntry.jsx` | R14 | 27 October 2026 | A step or part of the build wizard; replaced by new:room guided |
+| `components/build/wizard/WizardReceipt.jsx` | R14 | 27 October 2026 | A step or part of the build wizard; replaced by new:room guided |
+| `components/build/wizard/WizardTrack.jsx` | R14 | 27 October 2026 | A step or part of the build wizard; replaced by new:room guided |
+| `lib/editorReducer.js` | R16 to R21 | 27 October 2026 | The old editor's state and its actions |
+| `lib/editorHistory.js` | R16 to R21 | 27 October 2026 | The old editor's undo history; replaced by undo: |
+| `lib/buildWizard.js` | R14 | 27 October 2026 | The build wizard's choices turned into a room |
+| `lib/layoutMigration.js` | R36 | 27 October 2026 | The old editor's layout swap, with SLOT_FALLBACKS, one of the old copies of slot data; replaced by the layout manifests and the layout rule (lib/lab.js) |
 
 Files keep their old path under `src/deprecated/`, so putting one back is a move. Their imports point where they used to and are not resolved here.

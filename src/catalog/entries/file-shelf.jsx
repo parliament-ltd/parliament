@@ -97,11 +97,6 @@ export default {
   ],
   capabilityRequirements: ['storage:read', 'storage:write'],
   configSchema: {
-    acceptedTypes: {
-      type: 'string',
-      default: '.csv,.tsv,.xlsx,.xls,.json',
-      label: 'Accepted file extensions (comma-separated)',
-    },
   },
   render: FileShelfRender,
   previewRender: FileShelfPreview,

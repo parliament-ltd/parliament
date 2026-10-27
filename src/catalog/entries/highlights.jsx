@@ -46,17 +46,6 @@ export default {
   ],
   capabilityRequirements: ['storage:read', 'storage:write'],
   configSchema: {
-    defaultColor: {
-      type: 'enum',
-      options: HIGHLIGHT_COLORS.map(c => c.id),
-      default: 'blue',
-      label: 'Default color for new highlights',
-    },
-    showAddForm: {
-      type: 'boolean',
-      default: true,
-      label: 'Show inline "+ Add highlight" form',
-    },
   },
   contributions: {
     messageActions: [

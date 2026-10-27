@@ -1,20 +1,15 @@
-// SectionCard — homepage section chrome (PR-14 rewrite, PR-17 dnd-kit migration).
+// SectionCard — homepage section chrome (PR-14 rewrite).
 //
 // Per refactor/parliament_homepage_v2 (2).html `.section` block:
 //   - 14px section radius, 0.5px border, white surface
-//   - Header has hover-revealed grabber (drag handle), title, meta line,
-//     chevron toggle that rotates -90deg when collapsed
+//   - Header has a title, meta line, and a chevron toggle that rotates
+//     -90deg when collapsed
 //   - Body collapses with a max-height + opacity transition, ~0.28s
 //
-// Drag-reorder uses dnd-kit's useSortable hook directly inside this
-// component (the editor's LayoutCard / ComponentCard / SchemeCard precedent).
-// The parent layout (stacked-sections@1.0) wraps these in a SortableContext
-// and owns the persistence logic. The grabber is a real <button> so the
-// keyboard sensor has a focusable activator and screen readers have a name.
+// Its drag to reorder (PR-17, dnd-kit) was taken out with R34, approved
+// 27 October 2026 (C250 (c)): blocks are reordered in the Lab instead.
 
 import { useState, useEffect, useRef } from 'react'
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
 
 const Chevron = ({ collapsed }) => (
   <svg
@@ -38,21 +33,10 @@ const Chevron = ({ collapsed }) => (
   </svg>
 )
 
-export const Grabber = () => (
-  <div className="section-grabber" title="Drag to reorder" aria-hidden="true">
-    <div /><div /><div />
-  </div>
-)
-
 export default function SectionCard({
   title,
   meta,
   defaultOpen = true,
-  // Drag-reorder via dnd-kit. Pass `sortable` + `sortableId` from the
-  // parent SortableContext to enable. Without them, the section renders
-  // without any drag behavior (useful for non-homepage consumers).
-  sortable = false,
-  sortableId,
   // Right-side header slot for section-level controls (e.g. Favorites' Edit button):
   headerActions,
   children,
@@ -60,25 +44,6 @@ export default function SectionCard({
   const [open, setOpen] = useState(defaultOpen)
   const bodyRef = useRef(null)
   const [bodyMaxHeight, setBodyMaxHeight] = useState(undefined)
-
-  // useSortable is always called (Rules of Hooks). When `sortable` is false
-  // or `sortableId` is absent, we ignore the outputs and skip the wiring.
-  // Destructure at the call site so the eslint react-hooks/refs rule
-  // sees plain local variables rather than property access through an
-  // object (which it mis-flags as ref access during render).
-  const {
-    setNodeRef,
-    setActivatorNodeRef,
-    attributes: sortableAttributes,
-    listeners: sortableListeners,
-    isDragging: sortableIsDragging,
-    transform,
-    transition,
-  } = useSortable({ id: sortableId ?? '__noop__', disabled: !sortable || !sortableId })
-  const isDragging = sortable && sortableIsDragging
-  const dragStyle = sortable
-    ? { transform: CSS.Transform.toString(transform), transition }
-    : undefined
 
   // Measure the body's natural height so we can transition between 0 and
   // the actual content height. Setting max-height to a fixed huge value
@@ -108,25 +73,10 @@ export default function SectionCard({
 
   return (
     <section
-      ref={sortable ? setNodeRef : undefined}
-      style={dragStyle}
-      className={`section${collapsed ? ' collapsed' : ''}${isDragging ? ' dragging' : ''}`}
+      className={`section${collapsed ? ' collapsed' : ''}`}
       aria-expanded={open}
     >
       <header className="section-head">
-        {sortable && (
-          <button
-            type="button"
-            ref={setActivatorNodeRef}
-            className="section-grabber-handle"
-            aria-label={`Reorder ${title} section`}
-            {...sortableAttributes}
-            {...sortableListeners}
-          >
-            <Grabber />
-          </button>
-        )}
-
         <button
           type="button"
           className="section-title-btn"

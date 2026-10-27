@@ -58,11 +58,6 @@ export default {
   ],
   capabilityRequirements: ['storage:read'],
   configSchema: {
-    sampleRows: {
-      type: 'number',
-      default: 50,
-      label: 'Rows sampled per Claude insight call',
-    },
   },
   softDependencies: [
     { component: 'file-shelf@1.0', fallbackUI: 'data-source-needed' },

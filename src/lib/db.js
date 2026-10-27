@@ -207,7 +207,8 @@ async function seedLibraryComponents(db) {
 
 /**
  * Seed `libraryLayouts` with placeholder entries: 5 available + 2 coming-soon.
- * Real layout details (slot inventory, render fns) land in PR-3 and PR-9.
+ * A layout's places are its manifest's (src/catalog/layouts) alone; these
+ * records hold no copy of them (R36, C250 (d)).
  * Idempotent: only seeds when the table is empty.
  */
 async function seedLibraryLayouts(db) {
@@ -225,7 +226,6 @@ async function seedLibraryLayouts(db) {
       status: 'available',
       scopes: ['room'],
       description: 'Dual sidebars and a center message area. Optimal for desktop knowledge work where lots of metadata is visible at once.',
-      slots: [], // Filled in by PR-3
       seedVersion: 1,
       createdAt: now,
     },
@@ -236,7 +236,6 @@ async function seedLibraryLayouts(db) {
       status: 'available',
       scopes: ['room'],
       description: 'A center canvas (chart, table, dashboard) flanked by a sidebar and a chat panel. For working with data and files.',
-      slots: [],
       seedVersion: 1,
       createdAt: now,
     },
@@ -247,7 +246,6 @@ async function seedLibraryLayouts(db) {
       status: 'available',
       scopes: ['room'],
       description: 'An editable document with margin notes for comments and analysis alongside the draft. For writing and editing.',
-      slots: [],
       seedVersion: 1,
       createdAt: now,
     },
@@ -258,7 +256,6 @@ async function seedLibraryLayouts(db) {
       status: 'available',
       scopes: ['room'],
       description: 'A single scrolling column with a slide-up sheet for secondary controls. Optimized for mobile and touch.',
-      slots: [],
       seedVersion: 1,
       createdAt: now,
     },
@@ -269,7 +266,6 @@ async function seedLibraryLayouts(db) {
       status: 'available',
       scopes: ['homepage'],
       description: 'Vertically stacked, reorderable sections. The homepage layout.',
-      slots: [],
       seedVersion: 1,
       createdAt: now,
     },
@@ -282,7 +278,6 @@ async function seedLibraryLayouts(db) {
       status: 'coming-soon',
       scopes: ['room'],
       description: 'Right-heavy annotation layout. Narrow nav, full-width reading area, wide annotation panel. Optimal for deep reading and annotation across long conversations.',
-      slots: [],
       seedVersion: 1,
       createdAt: now,
     },
@@ -293,7 +288,6 @@ async function seedLibraryLayouts(db) {
       status: 'coming-soon',
       scopes: ['room'],
       description: 'Two equal panes side by side for collaboration. Compare conversations or pair a conversation with a document.',
-      slots: [],
       seedVersion: 1,
       createdAt: now,
     },

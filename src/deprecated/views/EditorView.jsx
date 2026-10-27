@@ -1,0 +1,940 @@
+// Retired with R16 to R21, R33, approved by Stefan on 27 October 2026 (C250 (b)).
+// Was src/views/EditorView.jsx. Nothing imports it and it is not built.
+// To restore: move it back with the rest of the old editor and wizard, and put back their routes in App.jsx.
+// EditorView — the three-rail mode editor (PR-8 + PR-8b).
+//
+// Routes:
+//   /edit/:roomId  → loads modes[roomId] (scope='room')
+//   /edit-home     → loads the user's homepage mode (scope='homepage')
+//
+// EditorView owns the draft state via useReducer, wires the dnd-kit
+// DndContext that spans the three rails, and persists to IndexedDB on
+// Save. The three rails plus the holding tray + migration dialog are
+// children — see src/components/editor/.
+//
+// State runs through editorHistoryReducer (PR-8b), which wraps the pure
+// editorReducer with an undo / redo stack. EditorView only reads
+// historyState.present; children never see the history shape.
+
+import { useEffect, useReducer, useState, useCallback } from 'react'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
+import { DndContext, PointerSensor, KeyboardSensor, useSensor, useSensors, rectIntersection } from '@dnd-kit/core'
+import { X } from 'lucide-react'
+import EditorTopBar from '../components/editor/EditorTopBar'
+import EditorLeftRail from '../components/editor/EditorLeftRail'
+import EditorCanvas from '../components/editor/EditorCanvas'
+import EditorRightRail from '../components/editor/EditorRightRail'
+import EditorHoldingTray from '../components/editor/EditorHoldingTray'
+import EditorMigrationDialog from '../components/editor/EditorMigrationDialog'
+import EditorApplyRoomDialog from '../components/editor/EditorApplyRoomDialog'
+import EditorPreviewSheet from '../components/editor/EditorPreviewSheet'
+import EditorLibraryMode from '../components/editor/EditorLibraryMode'
+import Card from '../components/Card'
+import Button from '../components/Button'
+import {
+  editorHistoryReducer,
+  makeInitialHistoryState,
+  canUndo,
+  canRedo,
+} from '../lib/editorHistory'
+import { planLayoutMigration, applyLayoutMigration } from '../lib/layoutMigration'
+import { listModes, loadHomepageMode, loadMode, saveMode, createCopyOfMode } from '../lib/modes'
+import { useIsNarrow } from '../lib/useViewportWidth'
+import { listEntries as listCatalogEntries } from '../catalog'
+
+// PR-48d: pure helper used by onStartCopy when forking from Edit while
+// Library is open. Applies the bag's layout, scheme, and components
+// to a copy of the source mode. Returns { mode, tray } where `tray`
+// is the seed for the fork's holding tray.
+function applyBagToMode(srcMode, bag) {
+  let mode = JSON.parse(JSON.stringify(srcMode))
+  const tray = []
+
+  // Layout swap (with migration → orphans → tray).
+  const layoutRef = bag.layouts?.[0]
+  if (layoutRef && layoutRef !== mode.layout?.ref) {
+    const plan = planLayoutMigration({
+      fromLayout: mode.layout?.ref,
+      toLayout: layoutRef,
+      components: mode.components || [],
+    })
+    const moved = applyLayoutMigration({
+      components: mode.components || [],
+      moves: plan.moves,
+      orphans: plan.orphans,
+    })
+    const orphanIds = new Set(plan.orphans.map((o) => o.compId))
+    const orphanSpecs = (mode.components || []).filter((c) => orphanIds.has(c.id))
+    for (const o of plan.orphans) {
+      const spec = orphanSpecs.find((s) => s.id === o.compId) || {}
+      const entry = {
+        compId: o.compId,
+        ref: spec.ref,
+        fromSlot: o.fromSlot,
+        reason: o.reason,
+        config: spec.config || {},
+      }
+      if (spec.sourceRoomId) entry.sourceRoomId = spec.sourceRoomId
+      tray.push(entry)
+    }
+    const newLayout = { ref: layoutRef }
+    const layoutSrc = bag.sourceRooms?.layouts?.[layoutRef]?.[0]
+    if (layoutSrc) newLayout.sourceRoomId = layoutSrc
+    mode.layout = newLayout
+    mode.components = moved
+  }
+
+  // Scheme.
+  const schemeRef = bag.schemes?.[0]
+  if (schemeRef && schemeRef !== mode.scheme?.ref) {
+    const newScheme = { ref: schemeRef }
+    const schemeSrc = bag.sourceRooms?.schemes?.[schemeRef]?.[0]
+    if (schemeSrc) newScheme.sourceRoomId = schemeSrc
+    mode.scheme = newScheme
+  }
+
+  // New components → tray (dedup against placed + tray-so-far).
+  const placedRefs = new Set((mode.components || []).map((c) => c.ref))
+  const trayRefs = new Set(tray.map((t) => t.ref))
+  for (const ref of bag.components || []) {
+    if (placedRefs.has(ref) || trayRefs.has(ref)) continue
+    const entry = {
+      compId: `comp_${crypto.randomUUID()}`,
+      ref,
+      fromSlot: null,
+      reason: 'added from Library',
+      config: {},
+    }
+    const srcId = bag.sourceRooms?.components?.[ref]?.[0]
+    if (srcId) entry.sourceRoomId = srcId
+    tray.push(entry)
+  }
+
+  return { mode, tray }
+}
+
+export default function EditorView({ scope = 'room', blank = false }) {
+  const navigate = useNavigate()
+  const { roomId } = useParams()
+  const location = useLocation()
+  // PR-19e: when the user clicks the Build pill from Edit mode, the
+  // parent navigates to /edit with location.state.seedMode set to a
+  // freshly-copied draft. The blank-canvas load path picks it up.
+  // PR-48d: forks from Edit while Library was open also carry an
+  // initialTray of unplaced bag components — read here to keep the
+  // init-useEffect dep list honest.
+  const seedMode = location.state?.seedMode || null
+  const seedTray = location.state?.initialTray || null
+  // The editor's three-rail D&D model is unusable below ~768px. PR-15
+  // gates with a friendly full-screen panel; V3 will replace this with
+  // a phone-first wizard-per-section editor (see refactor docs).
+  const tooNarrow = useIsNarrow(768)
+  const [historyState, dispatch] = useReducer(
+    editorHistoryReducer,
+    null,
+    () => makeInitialHistoryState(null),
+  )
+  const state = historyState.present
+  const undoAvailable = canUndo(historyState)
+  const redoAvailable = canRedo(historyState)
+  const [loaded, setLoaded] = useState(false)
+  const [loadError, setLoadError] = useState(null)
+  const [saving, setSaving] = useState(false)
+  const [toast, setToast] = useState('')
+  const [pendingLayoutSwap, setPendingLayoutSwap] = useState(null) // { layoutRef, plan }
+  const [pendingRoomApply, setPendingRoomApply] = useState(null) // { sourceMode }
+  const [previewOpen, setPreviewOpen] = useState(false)
+  // PR-19d: lifted list of all modes for the Rooms tab and for drop-time
+  // source-mode lookups. Loaded once on mount; refreshed after Save so a
+  // freshly-saved mode appears in the tab without a full reload.
+  const [modes, setModes] = useState(null)
+  // PR-44: Library mode is the third top-bar pill. When open, the center
+  // column renders the Library shopping UI in place of the canvas. The
+  // underlying draft is untouched while Library is open — selections
+  // only flow into the draft when Build wiring lands in a later PR.
+  const [libraryOpen, setLibraryOpen] = useState(false)
+  // PR-48a: left rail collapses by default. Library mode is the
+  // primary shopping surface; the left rail is the fast-lane drawer
+  // for users who already know what they want. Toggle on the right
+  // edge expands / collapses it; same chevron pattern as the runtime
+  // layout-panel-toggle (canvas-centric / three-panel).
+  const [leftRailOpen, setLeftRailOpen] = useState(false)
+
+  // ── Load the mode on mount ─────────────────────────────
+  useEffect(() => {
+    let cancelled = false
+    async function init() {
+      try {
+        // PR-19d: /edit (blank) skips the load entirely.
+        // PR-19e: if location.state.seedMode is set (Build pill from
+        // Edit), seed the canvas with that draft instead of resetting
+        // to null. The draft has a fresh id + blank name, so saveMode
+        // will persist it as a new room.
+        if (blank) {
+          if (!cancelled) {
+            // PR-48d: forking with a pre-applied bag lands new
+            // components in the fork's holding tray via initialTray.
+            dispatch({
+              type: 'RESET_TO',
+              mode: seedMode,
+              initialTray: seedTray,
+            })
+            setLoaded(true)
+          }
+          return
+        }
+        let mode
+        if (scope === 'homepage') {
+          mode = await loadHomepageMode()
+          if (!mode) throw new Error('No homepage mode found.')
+        } else {
+          mode = await loadMode(roomId)
+          if (!mode) throw new Error(`Room not found: ${roomId}`)
+        }
+        if (cancelled) return
+        dispatch({ type: 'RESET_TO', mode })
+        setLoaded(true)
+      } catch (err) {
+        if (!cancelled) setLoadError(err.message || 'Failed to load mode')
+      }
+    }
+    init()
+    return () => { cancelled = true }
+  }, [scope, roomId, blank, seedMode, seedTray])
+
+  // ── Load modes list for Rooms tab + drop lookups ───────
+  useEffect(() => {
+    let cancelled = false
+    async function loadAllModes() {
+      try {
+        const all = await listModes()
+        if (!cancelled) setModes(all)
+      } catch {
+        if (!cancelled) setModes([])
+      }
+    }
+    loadAllModes()
+    return () => { cancelled = true }
+  }, [])
+
+  // ── Toast helper ───────────────────────────────────────
+  const showToast = useCallback((msg) => {
+    setToast(msg)
+    setTimeout(() => setToast(''), 2200)
+  }, [])
+
+  // ── PR-19e: Build/Edit pill handlers. ──────────────────
+  // Build pill (from Edit) copies the current canvas state — including
+  // unsaved edits — into a new draft and navigates to /edit with the
+  // seed in router state. The original room is untouched on disk.
+  // PR-48d: when Library is open with pending bag items, the bag
+  // applies to the FORK, not the source draft. Layout swap migrates
+  // components into the fork's tray; new bag components become tray
+  // entries on the fork; scheme updates the fork's scheme. The source
+  // room stays clean. Without this, the prior commitIfOpen → onStart
+  // sequence committed to the source then forked a pre-commit copy.
+  const onStartCopy = useCallback(() => {
+    const sourceMode = historyState.present?.mode
+    if (!sourceMode) return
+    let draft = createCopyOfMode(sourceMode)
+    let initialTray = null
+    const bag = historyState.present?.libraryBag
+    if (libraryOpen && bag) {
+      // Conflict refusal lives here — same union check as
+      // handleCommitLibrary, but on the COPY's fields.
+      const layoutSet = new Set([
+        ...(draft?.layout?.ref ? [draft.layout.ref] : []),
+        ...(bag.layouts || []),
+      ])
+      const schemeSet = new Set([
+        ...(draft?.scheme?.ref ? [draft.scheme.ref] : []),
+        ...(bag.schemes || []),
+      ])
+      if (layoutSet.size > 1) {
+        showToast('Resolve the layout conflict before continuing.')
+        return
+      }
+      if (schemeSet.size > 1) {
+        showToast('Resolve the scheme conflict before continuing.')
+        return
+      }
+      const applied = applyBagToMode(draft, bag)
+      draft = applied.mode
+      initialTray = applied.tray
+      // Clear the bag on the source state; the fork carries the
+      // committed result. Source draft is unchanged.
+      dispatch({ type: 'LIBRARY_CLEAR' })
+      setLibraryOpen(false)
+    }
+    // PR-28g: carry the source room id so the Edit pill can navigate
+    // back to it. Previously the Edit pill always blanked the canvas
+    // via /edit?tab=rooms, which wiped the user's in-progress work
+    // when they were toggling Build ↔ Edit on a populated canvas.
+    navigate('/edit', {
+      state: { seedMode: draft, returnToRoomId: sourceMode.id, initialTray },
+    })
+  }, [historyState, libraryOpen, navigate, showToast])
+  const onSwitchToEdit = useCallback(() => {
+    // PR-28g: if we got to /edit (build mode) from /edit/:id, return
+    // there instead of blanking the canvas. Carries the user's
+    // original edit context through a Build → Edit toggle.
+    const returnTo = location.state?.returnToRoomId
+    if (returnTo) {
+      navigate(`/edit/${returnTo}`)
+      return
+    }
+    navigate('/edit?tab=rooms')
+    // PR-19f: the Edit pill on blank canvas opens the Rooms tab but
+    // can't visually toggle the pill (route is unchanged → labMode
+    // stays 'build'). A toast narrates the next step so the click
+    // doesn't feel like a no-op.
+    showToast('Drag a room from the left rail to start editing')
+  }, [navigate, location.state, showToast])
+
+  // ── PR-46: in-Library conflict-x swap ──────────────────
+  // Hover-x on the active layout in Showcase, when the bag has exactly
+  // one queued layout, swaps to the bag layout (migration moves
+  // components to the holding tray) and clears the bag entry. Lets
+  // the user resolve a layout conflict without bouncing through Build.
+  // Symmetric handler for schemes (APPLY_SCHEME has no migration —
+  // simpler, but the UX intent is the same).
+  const handleSwapToBagLayout = useCallback(() => {
+    const bag = historyState.present.libraryBag
+    const layoutRef = bag?.layouts?.[0]
+    if (!layoutRef) return false
+    const draft = historyState.present.mode
+    // PR-46d: thread the bag's source-room link into the action so
+    // the swapped-in layout remembers which room it came from.
+    const sourceRoomId = bag?.sourceRooms?.layouts?.[layoutRef]?.[0] || null
+    if (!draft) {
+      dispatch({ type: 'INIT_FROM_LAYOUT', layoutRef, sourceRoomId })
+    } else {
+      dispatch({ type: 'SWAP_LAYOUT', layoutRef, sourceRoomId })
+    }
+    dispatch({ type: 'LIBRARY_TOGGLE', kind: 'layout', ref: layoutRef })
+    showToast('New layout applied, components moved to holding.')
+    return true
+  }, [historyState, showToast])
+
+  const handleSwapToBagScheme = useCallback(() => {
+    const bag = historyState.present.libraryBag
+    const schemeRef = bag?.schemes?.[0]
+    if (!schemeRef) return false
+    const sourceRoomId = bag?.sourceRooms?.schemes?.[schemeRef]?.[0] || null
+    dispatch({ type: 'APPLY_SCHEME', schemeRef, sourceRoomId })
+    dispatch({ type: 'LIBRARY_TOGGLE', kind: 'scheme', ref: schemeRef })
+    showToast('New scheme applied.')
+    return true
+  }, [historyState, showToast])
+
+  // ── PR-45: Library apply-on-close ──────────────────────
+  // Clicking Build or Edit while Library is open commits the bag's
+  // diff against the draft via existing actions, then clears the bag.
+  // Library pill toggle itself doesn't commit — the cart persists for
+  // a return visit. Returns true on success, false if a conflict
+  // prevented commit (caller should NOT close Library in that case).
+  const handleCommitLibrary = useCallback(() => {
+    const bag = historyState.present.libraryBag
+    const draft = historyState.present.mode
+    if (!bag) return true
+
+    // Conflict check on union counts: refuse to close if the user has
+    // queued a second layout / scheme alongside what's already in the
+    // draft (or two in the bag).
+    const layoutSet = new Set([
+      ...(draft?.layout?.ref ? [draft.layout.ref] : []),
+      ...(bag.layouts || []),
+    ])
+    const schemeSet = new Set([
+      ...(draft?.scheme?.ref ? [draft.scheme.ref] : []),
+      ...(bag.schemes || []),
+    ])
+    if (layoutSet.size > 1) {
+      showToast('Resolve the layout conflict before continuing.')
+      return false
+    }
+    if (schemeSet.size > 1) {
+      showToast('Resolve the scheme conflict before continuing.')
+      return false
+    }
+
+    // Apply the diff. Layout swap on a populated canvas bypasses the
+    // migration dialog — the user already chose the layout in Library;
+    // re-asking would be condescending. Orphaned components flow into
+    // the tray via the existing SWAP_LAYOUT path. PR-46d threads the
+    // bag's source-room links into the actions so the resulting draft
+    // items remember which Library room (if any) contributed each.
+    const layoutToApply = bag.layouts[0]
+    if (layoutToApply && layoutToApply !== draft?.layout?.ref) {
+      const sourceRoomId = bag.sourceRooms?.layouts?.[layoutToApply]?.[0] || null
+      if (!draft) {
+        dispatch({ type: 'INIT_FROM_LAYOUT', layoutRef: layoutToApply, sourceRoomId })
+      } else {
+        dispatch({ type: 'SWAP_LAYOUT', layoutRef: layoutToApply, sourceRoomId })
+      }
+    }
+
+    // Scheme apply runs even if draft was null at entry — the layout
+    // branch above just materialized a draft via INIT_FROM_LAYOUT, and
+    // the materialized draft has the catalog default scheme that the
+    // bag's scheme should overwrite if different.
+    const schemeToApply = bag.schemes[0]
+    if (schemeToApply && schemeToApply !== draft?.scheme?.ref) {
+      const sourceRoomId = bag.sourceRooms?.schemes?.[schemeToApply]?.[0] || null
+      dispatch({ type: 'APPLY_SCHEME', schemeRef: schemeToApply, sourceRoomId })
+    }
+
+    // Each bag component ref not already placed in the draft becomes
+    // a fresh holding-tray chip. (Layout-swap orphans may also land in
+    // the tray via SWAP_LAYOUT above — the reducer dedupes by ref.)
+    const placedRefs = new Set((draft?.components || []).map((c) => c.ref))
+    const newCompRefs = (bag.components || []).filter((ref) => !placedRefs.has(ref))
+    if (newCompRefs.length > 0) {
+      const sourceRoomMap = {}
+      for (const ref of newCompRefs) {
+        const src = bag.sourceRooms?.components?.[ref]?.[0]
+        if (src) sourceRoomMap[ref] = src
+      }
+      dispatch({ type: 'ADD_REFS_TO_TRAY', refs: newCompRefs, sourceRoomMap })
+    }
+
+    dispatch({ type: 'LIBRARY_CLEAR' })
+    if (newCompRefs.length > 0) {
+      showToast(`Added ${newCompRefs.length} component${newCompRefs.length === 1 ? '' : 's'} to the holding tray.`)
+    }
+    return true
+  }, [historyState, showToast])
+
+  // ── Save ───────────────────────────────────────────────
+  const handleSave = useCallback(async () => {
+    if (saving) return
+    if (!state.mode) {
+      showToast('Drop a layout, scheme, or room first.')
+      return
+    }
+    if (!state.mode.meta?.name?.trim()) {
+      showToast('Name your room first.')
+      return
+    }
+    if (state.tray.length > 0) {
+      showToast('Empty the holding tray first.')
+      return
+    }
+    setSaving(true)
+    try {
+      const saved = await saveMode(state.mode)
+      // MARK_SAVED (not RESET_TO) so undo history survives a save.
+      dispatch({ type: 'MARK_SAVED', mode: saved })
+      // Refresh the lifted modes list so the Rooms tab reflects the new save.
+      try {
+        const all = await listModes()
+        setModes(all)
+      } catch { /* ignore */ }
+      // PR-19d: when saving for the first time on a blank canvas, the
+      // mode now has a real id — switch the URL to /edit/:newId so a
+      // reload returns to the same draft.
+      if (blank) {
+        navigate(`/edit/${saved.id}?tab=rooms`, { replace: true })
+      }
+      showToast('Saved')
+    } catch (err) {
+      showToast(err.message || 'Save failed.')
+    } finally {
+      setSaving(false)
+    }
+  }, [saving, state.tray.length, state.mode, showToast, blank, navigate])
+
+  // ── Build ──────────────────────────────────────────────
+  // The Build button on a never-built mode used to navigate directly
+  // to /build?ignite=:id, but a fresh draft (or any never-persisted
+  // mode) isn't in IDB yet — BuildView's loadMode() returned null and
+  // surfaced "Room not found" + the same error from igniteExistingRoom.
+  // Save first so the mode actually exists in IDB before the wizard
+  // tries to load it; saveMode is idempotent so re-saving a clean
+  // mode is harmless.
+  const handleBuild = useCallback(async () => {
+    if (saving) return
+    if (!state.mode) {
+      showToast('Drop a layout, scheme, or room first.')
+      return
+    }
+    if (!state.mode.meta?.name?.trim()) {
+      showToast('Name your room first.')
+      return
+    }
+    if (state.tray.length > 0) {
+      showToast('Empty the holding tray first.')
+      return
+    }
+    setSaving(true)
+    try {
+      const saved = await saveMode(state.mode)
+      dispatch({ type: 'MARK_SAVED', mode: saved })
+      navigate(`/build?ignite=${saved.id}`)
+    } catch (err) {
+      showToast(err.message || 'Save failed.')
+    } finally {
+      setSaving(false)
+    }
+  }, [saving, state.tray.length, state.mode, showToast, navigate])
+
+  // ── Keyboard shortcuts: Esc deselects, Cmd/Ctrl+Z undo, ─
+  //    Cmd/Ctrl+Shift+Z (or Cmd/Ctrl+Y) redo. All gated against
+  //    typing in inputs / textareas / contenteditable so the
+  //    browser's native text-input undo wins there.
+  useEffect(() => {
+    function onKey(e) {
+      const tag = (e.target?.tagName || '').toLowerCase()
+      const isTyping =
+        tag === 'input' || tag === 'textarea' || e.target?.isContentEditable
+      if (isTyping) return
+
+      if (e.key === 'Escape') {
+        dispatch({ type: 'CLEAR_SELECTION' })
+        return
+      }
+
+      const mod = e.metaKey || e.ctrlKey
+      if (!mod) return
+      const key = e.key.toLowerCase()
+
+      if (key === 'z' && !e.shiftKey) {
+        e.preventDefault()
+        dispatch({ type: 'UNDO' })
+        return
+      }
+      if ((key === 'z' && e.shiftKey) || key === 'y') {
+        e.preventDefault()
+        dispatch({ type: 'REDO' })
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  // ── Drag-and-drop ──────────────────────────────────────
+  // Two sensors so dragging starts only after a small displacement
+  // (prevents accidental drags when clicking) and keyboard works for a11y.
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor)
+  )
+
+  // PR-28i: collision detection prefers nested slot droppables over the
+  // outer canvas wrapper. With the default rectIntersection, holding-
+  // tray drops were silently landing on `canvas-root` instead of the
+  // slot the user hovered — the slot would highlight gold during drag
+  // (slot.isOver true), but at release the over flipped to canvas-root
+  // and handleDragEnd fired the "drop on a specific slot" toast.
+  // Filtering canvas-root out when any slot also matches forces the
+  // intended drop target to win on every drop.
+  function collisionDetection(args) {
+    const collisions = rectIntersection(args)
+    if (collisions.length <= 1) return collisions
+    const slotCollisions = collisions.filter((c) => c.id !== 'canvas-root')
+    return slotCollisions.length > 0 ? slotCollisions : collisions
+  }
+
+  function handleDragEnd(event) {
+    const { active, over } = event
+    if (!over) return
+    const dragData = active.data.current
+    const dropData = over.data.current
+    if (!dragData || !dropData) return
+
+    const isBlankCanvas = state.mode === null
+
+    // Room dropped on canvas (or any slot).
+    if (dragData.kind === 'room' && (dropData.kind === 'canvas' || dropData.kind === 'slot')) {
+      const sourceMode = (modes || []).find((m) => m.id === dragData.ref)
+      if (!sourceMode) {
+        showToast('Room not found — try refreshing the page.')
+        return
+      }
+      if (state.mode && sourceMode.id === state.mode.id) {
+        showToast("That's the room you're editing.")
+        return
+      }
+      // PR-19f: blank canvas has nothing to merge into, so the
+      // ApplyRoomDialog's "keep what" toggle + migration preview are
+      // meaningless. Drop a room → open it for editing directly.
+      if (isBlankCanvas) {
+        navigate(`/edit/${sourceMode.id}?tab=rooms`)
+        return
+      }
+      setPendingRoomApply({ sourceMode })
+      return
+    }
+
+    // Layout dropped on canvas
+    if (dragData.kind === 'layout' && dropData.kind === 'canvas') {
+      const layoutRef = dragData.ref
+      // Blank canvas: materialize a fresh mode from this layout.
+      if (isBlankCanvas) {
+        dispatch({ type: 'INIT_FROM_LAYOUT', layoutRef })
+        showToast('Layout placed. Name your room in the right panel.')
+        return
+      }
+      if (layoutRef === state.mode.layout?.ref) {
+        showToast('That layout is already active.')
+        return
+      }
+      const plan = planLayoutMigration({
+        fromLayout: state.mode.layout?.ref,
+        toLayout: layoutRef,
+        components: state.mode.components || [],
+      })
+      setPendingLayoutSwap({ layoutRef, plan })
+      return
+    }
+
+    // Scheme dropped on canvas → apply (rejected on blank canvas).
+    if (dragData.kind === 'scheme' && (dropData.kind === 'canvas' || dropData.kind === 'slot')) {
+      if (isBlankCanvas) {
+        showToast('Drop a layout or room first.')
+        return
+      }
+      dispatch({ type: 'APPLY_SCHEME', schemeRef: dragData.ref })
+      showToast(`Applied scheme: ${dragData.displayName}`)
+      return
+    }
+
+    // Component dropped on a slot (rejected on blank canvas — no slots yet).
+    if (dragData.kind === 'component' && isBlankCanvas) {
+      showToast('Drop a layout or room first.')
+      return
+    }
+
+    // Component dropped on a slot
+    if (dragData.kind === 'component' && dropData.kind === 'slot') {
+      // PR-28g: tray chip BEFORE already-placed move. Tray chips carry
+      // both `fromTray: true` AND `componentId: chip.compId` (see
+      // EditorHoldingTray.jsx), so checking componentId first ate the
+      // tray case — MOVE_COMPONENT's .map(c => c.id === id) silently
+      // no-op'd because the chip wasn't in state.mode.components, and
+      // the drop appeared to fail with no error.
+      if (dragData.fromTray) {
+        dispatch({
+          type: 'RESTORE_FROM_TRAY',
+          compId: dragData.componentId || dragData.trayCompId,
+          slot: dropData.slot,
+        })
+        return
+      }
+      // Already-placed instance moving between slots
+      if (dragData.componentId) {
+        dispatch({
+          type: 'MOVE_COMPONENT',
+          componentId: dragData.componentId,
+          slot: dropData.slot,
+        })
+        return
+      }
+      // New component instance from the library
+      dispatch({
+        type: 'PLACE_COMPONENT',
+        ref: dragData.ref,
+        slot: dropData.slot,
+      })
+      return
+    }
+
+    // Component dropped on canvas (not a specific slot) → toast hint
+    if (dragData.kind === 'component' && dropData.kind === 'canvas') {
+      showToast('Drop a component on a specific slot, not the canvas.')
+    }
+  }
+
+  function confirmMigration() {
+    if (!pendingLayoutSwap) return
+    dispatch({ type: 'SWAP_LAYOUT', layoutRef: pendingLayoutSwap.layoutRef })
+    setPendingLayoutSwap(null)
+    showToast('Layout switched.')
+  }
+
+  if (tooNarrow) {
+    // PR-19g: when the user came here from a chat via the Wrench icon,
+    // also offer "Back to chat" (browser history back). The Wrench
+    // handlers in NarrowChrome + ChatDesktopChrome pass `fromChat` in
+    // router state.
+    const fromChat = Boolean(location.state?.fromChat)
+    return (
+      <EditorTooNarrow
+        onBackToStudy={() => navigate('/')}
+        onBackToChat={fromChat ? () => navigate(-1) : null}
+        onDismiss={() => navigate(-1)}
+      />
+    )
+  }
+
+  if (loadError) {
+    return (
+      <div className="min-h-screen bg-[var(--p-bg-base)] flex items-center justify-center px-6">
+        <div className="max-w-md text-center">
+          <div className="text-sm font-medium text-[var(--p-text-primary)] mb-2">Couldn't open the editor</div>
+          <div className="text-xs text-[var(--p-text-secondary)] mb-4">{loadError}</div>
+          <button
+            onClick={() => navigate('/')}
+            className="px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--p-border)] text-[var(--p-text-secondary)] hover:border-[var(--p-gold-light)] hover:text-[var(--p-gold-light)]"
+          >
+            Back to home
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (!loaded) return null
+
+  const placedRefs = new Set((state.mode?.components || []).map((c) => c.ref))
+  const catalogEntries = listCatalogEntries()
+  // PR-19d: default tab depends on entry. Blank canvas opens the Rooms
+  // tab because that's where users typically start; populated editors
+  // default to Layouts. ?tab= URL query overrides either.
+  const defaultTab = blank ? 'rooms' : 'layouts'
+  // PR-19e: pill state derives from the route. /edit blank canvas =
+  // Build mode; /edit/:roomId = Edit mode. /edit-home (homepage
+  // editing) hides the pills — copy-as-new-room semantics don't apply
+  // to the singleton homepage mode.
+  const labMode = scope === 'homepage' ? null : (blank ? 'build' : 'edit')
+
+  function confirmRoomApply({ applyLayout, applyScheme, applyComponents, componentRefsToApply }) {
+    if (!pendingRoomApply?.sourceMode) return
+    dispatch({
+      type: 'APPLY_ROOM',
+      sourceMode: pendingRoomApply.sourceMode,
+      applyLayout,
+      applyScheme,
+      applyComponents,
+      componentRefsToApply,
+    })
+    setPendingRoomApply(null)
+    showToast('Applied')
+  }
+
+  function openHomepageEditorFromModal() {
+    setPendingRoomApply(null)
+    navigate('/edit-home')
+  }
+
+  return (
+    <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragEnd={handleDragEnd}>
+      <div className="h-screen flex flex-col bg-[var(--p-bg-subtle)] overflow-hidden">
+        {/* PR-26: when the user arrived from a chat via the wrench
+            icon, the top-bar Back button returns to that chat
+            (history.back) rather than the homepage. The chat-entry
+            path passes `fromChat: true` in router state; this honors
+            it on every viewport (was: only the tooNarrow branch). */}
+        <EditorTopBar
+          mode={state.mode}
+          dirty={state.dirty}
+          saving={saving}
+          trayBlockingBuild={state.tray.length > 0}
+          canUndo={undoAvailable}
+          canRedo={redoAvailable}
+          onUndo={() => dispatch({ type: 'UNDO' })}
+          onRedo={() => dispatch({ type: 'REDO' })}
+          onBack={() => {
+            if (location.state?.fromChat) {
+              navigate(-1)
+            } else {
+              navigate('/')
+            }
+          }}
+          onDeviceClassChange={(deviceClass) => dispatch({ type: 'SET_DEVICE_CLASS', deviceClass })}
+          onSchemeChange={(schemeRef) => dispatch({ type: 'APPLY_SCHEME', schemeRef })}
+          onSave={handleSave}
+          onBuild={handleBuild}
+          onPreview={() => setPreviewOpen(true)}
+          labMode={labMode}
+          onStartCopy={onStartCopy}
+          onSwitchToEdit={onSwitchToEdit}
+          libraryOpen={libraryOpen}
+          onOpenLibrary={() => setLibraryOpen(true)}
+          onCloseLibrary={() => setLibraryOpen(false)}
+          onCommitLibrary={handleCommitLibrary}
+        />
+        <div
+          className="grid flex-1 min-h-0 editor-grid"
+          style={{ gridTemplateColumns: `${leftRailOpen ? '300px' : '36px'} 1fr 300px` }}
+        >
+          <EditorLeftRail
+            scope={scope}
+            currentLayoutRef={state.mode?.layout?.ref}
+            currentSchemeRef={state.mode?.scheme?.ref}
+            placedComponentRefs={placedRefs}
+            catalogEntries={catalogEntries}
+            modes={modes}
+            defaultTab={defaultTab}
+            open={leftRailOpen}
+            onToggle={() => setLeftRailOpen((v) => !v)}
+          />
+          <div className="overflow-y-auto bg-[var(--p-bg-subtle)]">
+            {libraryOpen ? (
+              <EditorLibraryMode
+                scope={scope}
+                mode={state.mode}
+                tray={state.tray}
+                bag={state.libraryBag}
+                modes={modes}
+                catalogEntries={catalogEntries}
+                onToggle={(kind, ref, room) =>
+                  dispatch({ type: 'LIBRARY_TOGGLE', kind, ref, room })
+                }
+                onShowToast={showToast}
+                onRemovePlacedComponent={(ref) => {
+                  // PR-45: Showcase hover-x / click on a placed
+                  // component removes every instance of that ref from
+                  // the draft. One ref = one Showcase card, so the
+                  // user's mental model is "remove this type from the
+                  // room"; multi-instance editing happens via slot-
+                  // level UI (right rail, drag).
+                  //
+                  // PR-49a: route through the tray instead of dropping
+                  // outright. Multi-instance moves become multi-chip
+                  // commits — the user can dismiss them en masse from
+                  // the tray or restore the ones they actually wanted.
+                  const placed = (state.mode?.components || []).filter((c) => c.ref === ref)
+                  for (const c of placed) {
+                    dispatch({ type: 'MOVE_COMPONENT_TO_TRAY', componentId: c.id })
+                  }
+                }}
+                onDismissTrayByRef={(ref) => {
+                  // PR-46d: dismiss every tray chip matching this ref
+                  // when the user hover-x's a tray-sourced Showcase
+                  // card. Symmetric with the placed-component path.
+                  const chips = (state.tray || []).filter((t) => t.ref === ref)
+                  for (const c of chips) {
+                    dispatch({ type: 'DISMISS_FROM_TRAY', compId: c.compId })
+                  }
+                }}
+                onSwapToBagLayout={handleSwapToBagLayout}
+                onSwapToBagScheme={handleSwapToBagScheme}
+              />
+            ) : (
+              <>
+                <EditorCanvas
+                  mode={state.mode}
+                  selection={state.selection}
+                  catalogEntries={catalogEntries}
+                  onSelectRoom={() => dispatch({ type: 'SELECT_ROOM' })}
+                  onSelectSlot={(slotId) => dispatch({ type: 'SELECT_SLOT', slotId })}
+                  onSelectComponent={(componentId) => dispatch({ type: 'SELECT_COMPONENT', componentId })}
+                />
+                <EditorHoldingTray
+                  tray={state.tray}
+                  onDismiss={(compId) => dispatch({ type: 'DISMISS_FROM_TRAY', compId })}
+                />
+              </>
+            )}
+          </div>
+          <EditorRightRail
+            mode={state.mode}
+            selection={state.selection}
+            catalogEntries={catalogEntries}
+            onUpdateConfig={(componentId, patch) =>
+              dispatch({ type: 'UPDATE_COMPONENT_CONFIG', componentId, patch })
+            }
+            onSetName={(name) => dispatch({ type: 'SET_NAME', name })}
+            onSetDeviceClass={(deviceClass) => dispatch({ type: 'SET_DEVICE_CLASS', deviceClass })}
+            onApplyScheme={(schemeRef) => dispatch({ type: 'APPLY_SCHEME', schemeRef })}
+            onSetPanelButton={(slotId, enabled) =>
+              dispatch({ type: 'SET_PANEL_BUTTON', slotId, enabled })
+            }
+            onRemoveComponent={(componentId) => dispatch({ type: 'MOVE_COMPONENT_TO_TRAY', componentId })}
+          />
+        </div>
+
+        {pendingLayoutSwap && (
+          <EditorMigrationDialog
+            targetLayoutRef={pendingLayoutSwap.layoutRef}
+            plan={pendingLayoutSwap.plan}
+            mode={state.mode}
+            catalogEntries={catalogEntries}
+            onCancel={() => setPendingLayoutSwap(null)}
+            onConfirm={confirmMigration}
+          />
+        )}
+
+        {pendingRoomApply && (
+          <EditorApplyRoomDialog
+            sourceMode={pendingRoomApply.sourceMode}
+            currentMode={state.mode}
+            catalogEntries={catalogEntries}
+            onCancel={() => setPendingRoomApply(null)}
+            onConfirm={confirmRoomApply}
+            onOpenHomepageEditor={openHomepageEditorFromModal}
+          />
+        )}
+
+        <EditorPreviewSheet
+          open={previewOpen}
+          mode={state.mode}
+          onClose={() => setPreviewOpen(false)}
+        />
+
+        {toast && (
+          <div className="fixed bottom-5 left-1/2 -translate-x-1/2 bg-[var(--p-text-primary)] text-white px-4 py-2 rounded-md text-xs z-[200] shadow-lg">
+            {toast}
+          </div>
+        )}
+      </div>
+    </DndContext>
+  )
+}
+
+// EditorTooNarrow — full-screen gate shown when the viewport is below
+// the editor's minimum width (768px). PR-15. The editor's three-rail
+// drag-and-drop model assumes a desktop pointer + screen real estate.
+// V3 ships a phone-first wizard-per-section editor that replaces this
+// gate; until then, send the user back to the homepage with a friendly
+// note rather than rendering a broken layout.
+//
+// PR-19g: surface an X dismiss in the corner (browser back), rename
+// "Back to home" → "Back to The Study", and add "Back to chat" when
+// the user arrived here via the Wrench icon in a chat.
+function EditorTooNarrow({ onBackToStudy, onBackToChat, onDismiss }) {
+  return (
+    <div className="min-h-screen bg-[var(--p-bg-base)] flex items-center justify-center px-6">
+      <Card className="max-w-md w-full text-center flex flex-col gap-4 py-6 relative">
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label="Close"
+          className="absolute top-2.5 right-2.5 w-7 h-7 inline-flex items-center justify-center rounded-md text-[var(--p-text-secondary)] hover:text-[var(--p-text-primary)] hover:bg-[var(--p-bg-subtle)] transition-colors"
+        >
+          <X className="w-4 h-4" />
+        </button>
+        <div className="text-base font-medium text-[var(--p-text-primary)]">
+          The editor needs a wider screen
+        </div>
+        <div className="text-xs leading-relaxed text-[var(--p-text-secondary)]">
+          Building rooms is a hands-on, drag-and-drop affair — best on a
+          tablet or laptop for now. We're working on something special
+          for phones in V3. For now, open this on a wider screen to keep
+          building.
+        </div>
+        <div className="flex gap-2 pt-2">
+          {onBackToChat && (
+            <Button
+              variant="default"
+              size="md"
+              onClick={onBackToChat}
+              className="flex-1"
+            >
+              Back to chat
+            </Button>
+          )}
+          <Button
+            variant="default"
+            size="md"
+            onClick={onBackToStudy}
+            className="flex-1"
+          >
+            Back to The Study
+          </Button>
+        </div>
+      </Card>
+    </div>
+  )
+}

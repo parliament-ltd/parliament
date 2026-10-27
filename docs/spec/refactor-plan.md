@@ -532,7 +532,7 @@ The piece with the most risk in it. It starts with a spike, not with building.
 
 ### Stage 13. The Lab
 
-**Status, 27 October: proposed in seven pieces as C238, ruled the same day:** features of input in this stage, local-only rooms in piece 5. **Piece 1 built (C239):** the Lab, the Canvas and the room commands. **Piece 2 built (C241):** the Blocks board, `add:`, `rm:`, `place:` and a block's `set:`. **Piece 3 built (C243):** the Library in full, ticking, details in place, `duplicate:`. **Piece 4 built (C245):** trying a room with `p>`, the room opening beside the Canvas, and the guide. **Piece 5 built (C247):** rooms built for a phone, and local-only rooms (`local:on`, the `localOnly` field). **Piece 6 built (C249):** web search, voice and files in the bar, as features of a room's input. **The checkpoint proposed (C250).**
+**Status, 27 October: proposed in seven pieces as C238, ruled the same day:** features of input in this stage, local-only rooms in piece 5. **Piece 1 built (C239):** the Lab, the Canvas and the room commands. **Piece 2 built (C241):** the Blocks board, `add:`, `rm:`, `place:` and a block's `set:`. **Piece 3 built (C243):** the Library in full, ticking, details in place, `duplicate:`. **Piece 4 built (C245):** trying a room with `p>`, the room opening beside the Canvas, and the guide. **Piece 5 built (C247):** rooms built for a phone, and local-only rooms (`local:on`, the `localOnly` field). **Piece 6 built (C249):** web search, voice and files in the bar, as features of a room's input. **The checkpoint ruled (C250):** the old editor and wizard retired, R34, R36 and R41 carried out; piece 8 to come, today's chat page (R42).
 
 Built to Lab v7 (A2). Can run beside the others once stage 3 exists.
 
@@ -614,17 +614,17 @@ stay readable so every backup ever written still restores.
 | R11 | Homepage-scope mode files and `/edit-home` | `scope: 'homepage'` in `modes.js` | No homepage room | 6 |
 | R12 | Old chrome styles | `index.css` rules for the Study, `/chats`, the top bar, old gold states | The chrome layer. Removed file by file, each listed in its commit | 6 onward |
 | R13 | "Pin for reference" as a label | `messages-render.jsx` | A quote. The stored pins stay | 6 |
-| R14 | The build wizard as a page | `/build`, `BuildView.jsx`, `src/components/build/**` | The guide in the Lab; templates in the Library | 13 |
+| R14 | The build wizard as a page | `/build`, `BuildView.jsx`, `src/components/build/**` | The guide in the Lab; templates in the Library. **Approved 27 October (C250),** moved to `src/deprecated/`; `/build` opens the Lab | 13 |
 | R15 | Tooltip tours, the first-run gate and their flags | `TourTooltip.jsx`, `tourCompleted_*` | The welcome steps and `tour:`. **Approved 21 October,** carried out when `/` shows the welcome page; old backups keep reading the flags | 5 |
-| R16 | Drag and drop in the editor, then `@dnd-kit` | Drag wiring in `EditorView.jsx` and the editor components | Commands | 13, 15 |
-| R17 | The holding tray | `EditorHoldingTray.jsx`, four reducer actions, its styles | `rm:` and `undo:` | 13 |
-| R18 | The inspector | `EditorRightRail.jsx` | The room line, the Blocks board, `inspect:` | 13 |
-| R19 | The editor's left rail and top-bar pills | `EditorLeftRail.jsx`, `EditorTopBar.jsx` | The Library board and the bar | 13 |
-| R20 | The preview sheet | `EditorPreviewSheet.jsx` | Trying the room with `p>` | 13 |
-| R21 | The layout-swap and apply-room dialogs | `EditorMigrationDialog.jsx`, `EditorApplyRoomDialog.jsx` | The Enter line stating the plan; `duplicate:` | 13 |
+| R16 | Drag and drop in the editor, then `@dnd-kit` | Drag wiring in `EditorView.jsx` and the editor components | Commands. **Approved 27 October (C250),** moved to `src/deprecated/`; `@dnd-kit` leaves at stage 15 | 13, 15 |
+| R17 | The holding tray | `EditorHoldingTray.jsx`, four reducer actions, its styles | `rm:` and `undo:`. **Approved 27 October (C250),** moved to `src/deprecated/` | 13 |
+| R18 | The inspector | `EditorRightRail.jsx` | The room line, the Blocks board, `inspect:`. **Approved 27 October (C250),** moved to `src/deprecated/` | 13 |
+| R19 | The editor's left rail and top-bar pills | `EditorLeftRail.jsx`, `EditorTopBar.jsx` | The Library board and the bar. **Approved 27 October (C250),** moved to `src/deprecated/` | 13 |
+| R20 | The preview sheet | `EditorPreviewSheet.jsx` | Trying the room with `p>`. **Approved 27 October (C250),** moved to `src/deprecated/` | 13 |
+| R21 | The layout-swap and apply-room dialogs | `EditorMigrationDialog.jsx`, `EditorApplyRoomDialog.jsx` | The Enter line stating the plan; `duplicate:`. **Approved 27 October (C250),** moved to `src/deprecated/` | 13 |
 | R22 | Collaboration mode's window and block | `CollabModal.jsx`, `collab-mode*.jsx`, `CollabModeContext` | The `collab:` picker in the field. **Approved 22 October,** carried out when today's chat page is replaced by the room in the shell (as R25) | 7 |
 | R23 | The persona editor inside that window | `CollabModal.jsx` | "Yours" collabs. **Approved 22 October,** with R22 | 7 |
-| R24 | Web search, voice input and file attach as separate blocks | Nine files and three small registries | Features of input, carried by the bar in prompt mode. R25 waits for this | 13 |
+| R24 | Web search, voice input and file attach as separate blocks | Nine files and three small registries | Features of input, carried by the bar in prompt mode. R25 waits for this. **Approved 27 October (C250 (e)),** on R25's condition: carried out with R42 | 13 |
 | R25 | The room's own composer on screen | The composer drawn by `input-render.jsx`. `InputArea.jsx`'s logic is kept behind the bar | The bar in prompt mode. **Approved 21 October, on condition:** only once today's chat page is replaced and the bar carries web search, voice input and file attach (with R24) | 4, carried out with R24 |
 | R26 | The branch panel and its shortcut | `BranchCreationPanel.jsx`, `BranchPanelContext.jsx`, `BranchShortcutHandler.jsx` | `open:` with or without a summary, `again:`, `new:branch`. **Approved 23 October,** carried out when today's chat page is replaced by the room in the shell (as R22 and R25) | 8 |
 | R27 | The backup status dot and banner | `BackupStatusIndicator.jsx`, `BackupReminderBanner.jsx` | One line of marginalia on the Almanac | 6 |
@@ -632,14 +632,14 @@ stay readable so every backup ever written still restores.
 | R30 | Files nothing uses today | `src/hooks/useMode.js`, `src/components/core/ToolToggles.jsx`, `src/components/core/CitedMarkdown.jsx`, `public/flight_logo.png` | Nothing | any |
 | R31 | Old process documents | `refactor/`, the `continuation-*.md` notes, `.pr-body.md` | An archive, if you want one. Decide what is published before going public | 15 |
 | R32 | The three silent calls after a first answer | `src/stores/ChatContext.jsx`: **done 21 October** under C62's ruling. The three provider methods they called (`generateTitle`, `generateSummary`, `generateTags`): **approved 21 October,** moved to `src/deprecated/` | One named call (C62) | 4 |
-| R33 | The Showcase, the room-source glow and connector lines in the editor | `src/components/editor/` | Nothing | 13 |
-| R34 | Reordering by drag in the stacked-sections layout | `stacked-sections.jsx`, `SectionCard.jsx` | Move up, move down. The layout itself stays | 13 |
+| R33 | The Showcase, the room-source glow and connector lines in the editor | `src/components/editor/` | Nothing. **Approved 27 October (C250),** moved to `src/deprecated/` | 13 |
+| R34 | Reordering by drag in the stacked-sections layout | `stacked-sections.jsx`, `SectionCard.jsx` | Move up, move down. The layout itself stays. **Approved 27 October (C250),** the drag taken out | 13 |
 | R35 | The Inter font package | `@fontsource-variable/inter`, shipped and never applied | The system fonts already in use | 15 |
-| R36 | The old slot tables and fallback rule | `SLOT_FALLBACKS` and the three copies of slot data | The layout manifest | 13 |
+| R36 | The old slot tables and fallback rule | `SLOT_FALLBACKS` and the three copies of slot data | The layout manifest. **Approved 27 October (C250),** the fallback table moved to `src/deprecated/` with the editor, the seed's placeholders taken out; stored records untouched | 13 |
 | R37 | The old Settings page | `src/views/SettingsView.jsx`, the `/settings` route | The Settings board; `/settings` opens it. **Approved 23 October,** moved to `src/deprecated/` (C186) | 9 |
 | R39 | Drafting Desk, retired into Writing Studio | The `drafting-desk@1.0` template, `document-canvas`, `claude-comments` and `ripple-analysis` blocks, `DocumentContext`, `src/components/core/sbrd/` | Editing in place, asks, suggestions and Ripple (stages 11 and 12). Its documents stay readable. **Proposed 27 October (C237 (b)); ruled the same day to wait:** decided after the refactor, with the review of asks and Ripple | after 15 |
-| R41 | Block settings that nothing reads | Ten declarations in the blocks' `configSchema` (C240 (a)); the input block's three with R25 | Nothing; values rooms hold stay in their records. **Proposed 27 October (C250 (g))** | 13 |
-| R42 | Today's chat page | `/chat/:id`, `ChatView.jsx`; the branches block's links to it | The chat in its room on the new screens. R22, R24, R25 and R26 wait for it. **Proposed 27 October (C250 (f))** | 13 or 14 |
+| R41 | Block settings that nothing reads | Ten declarations in the blocks' `configSchema` (C240 (a)); the input block's three with R25 | Nothing; values rooms hold stay in their records. **Approved 27 October (C250 (g)),** the ten taken out; the input block's three with R25 | 13 |
+| R42 | Today's chat page | `/chat/:id`, `ChatView.jsx`; the branches block's links to it | The chat in its room on the new screens. R22, R24, R25 and R26 wait for it. **Approved 27 October (C250 (f)),** built as piece 8 of stage 13 | 13 |
 | R40 | The Review modal and its block | `src/components/ReviewModal.jsx`, `src/catalog/entries/review*.jsx` | The Reflection board. Rooms keep the block in their stored list and skip it. **Approved 27 October (C237 (d)),** moved to `src/deprecated/` | 12 |
 | R38 | Four Enter-line messages nothing says any more (**approved 24 October; carried out 24 October, C204**) | `enter.openDocket`, `enter.openDocketHere` ("Enter opens its first branch…"), `enter.erase` (the old answer to `delete:`) and `enter.promptManyOrderInclude` in `src/copy.js` | `open:` with a plan's number opens the Plan board (C198); `delete:` is the word (C199); `include:` goes with one after another (C202) | 10 |
 

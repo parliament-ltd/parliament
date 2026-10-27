@@ -44,11 +44,6 @@ export default {
       default: 'en-US',
       label: 'Recognition language (BCP-47 tag)',
     },
-    buttonLabel: {
-      type: 'string',
-      default: 'Speak',
-      label: 'Idle button label',
-    },
   },
 
   // PR-18b: contribute a right-primary input action so input@1.0 can

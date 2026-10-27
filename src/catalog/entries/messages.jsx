@@ -40,17 +40,6 @@ export default {
   ],
   capabilityRequirements: ['storage:read'],
   configSchema: {
-    showTimestamps: {
-      type: 'boolean',
-      default: true,
-      label: 'Show message timestamps',
-    },
-    density: {
-      type: 'enum',
-      options: ['comfortable', 'compact'],
-      default: 'comfortable',
-      label: 'Card density',
-    },
   },
   // The per-message action menu is composed from OTHER components'
   // contributions in the same room. messages@1.0 itself contributes nothing

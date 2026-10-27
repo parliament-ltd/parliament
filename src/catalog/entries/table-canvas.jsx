@@ -73,11 +73,6 @@ export default {
   ],
   capabilityRequirements: ['storage:read'],
   configSchema: {
-    pageSize: {
-      type: 'number',
-      default: 100,
-      label: 'Rows per page',
-    },
   },
   softDependencies: [
     { component: 'file-shelf@1.0', fallbackUI: 'data-source-needed' },
