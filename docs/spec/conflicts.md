@@ -2683,6 +2683,52 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   The trial copy is as it was.
 - **Next:** piece 4, trying a room and the guide.
 
+**C244. Stage 13, piece 4: trying a room and the guide, its open points** (proposed 27 October; C238 piece 4; Lab v7 and its v5 and v6 notes; A2, C38, C147). (a) is a choice; the rest is built as suggested unless ruled otherwise.
+- **What exists today:**
+  - A prompt with no room on screen starts a new chat in your default room (Settings), and the room opens as a board.
+  - In the Lab, the Canvas draws the room by slot; it is a plan of the room, not the room itself.
+  - Tags on chats exist: the model's, and your own, which a model's tagging keeps. `favorite` is a fixed one-word tag (C147).
+- **(a) Where a tried room shows** (a choice). v7 draws the exchange as bubbles inside the Canvas's messages slot. Options:
+  1. **The room itself opens in the Lab beside the Canvas,** as a room board: its real theme and blocks, live, the reply streaming as in any room. Changes made on the Canvas show in it at once.
+  2. **The exchange shows in the Canvas's messages slot,** as v7 draws it: your prompt and the reply as text, the rest of the Canvas unchanged.
+
+  **Suggestion:** 1. The Canvas is a plan of slots, so trying the room there would show a sketch, not the room. The room board already draws rooms, so nothing is built twice.
+- **(b) What `p>` does in the Lab:**
+  - With the Canvas, Blocks board or Library addressed and a room on the Canvas, a prompt starts a new chat in that room, not in your default room.
+  - The Enter line says so, with who answers and the cost as for any prompt ("→ a new chat in Quiet room, tagged tried").
+  - After it, the room's board is addressed, and later prompts carry on in that chat as in any room.
+  - With no room on the Canvas, a prompt goes as it does elsewhere.
+
+  **Suggestion:** yes.
+- **(c) The tag:** `tried`, one fixed word like `favorite`, kept as one of your own tags so a model's tagging keeps it. `tag:tried` in Records finds every tried chat. A tried chat is an ordinary chat, numbered, in Records. v7's "tried in the Lab" would need quotes to filter by. **Suggestion:** `tried`.
+- **(d) The guide's questions:** five now, each answer writing its command into the field, Enter running it.
+  - What is this room for? (the layout: writing long pieces, talking things through, tables and data, quick questions);
+  - Where will you use it? (at a desk, on a phone);
+  - What should be in reach? (keywords and notes, branches, context health, the step list);
+  - How should it feel? (four themes);
+  - What is it called? (three names, or your own).
+
+  v7's sixth, "Should it search the web?", joins with piece 6, where web search becomes a feature of input. **Suggestion:** yes.
+- **(e) How the guide moves:**
+  - It moves on when that kind of command runs on the room, clicked or typed.
+  - An answer that is true already reads "as it is", and a click on it moves on with no command.
+  - "skip this one" and "put the guide away"; at the end, "The room is built", with `undo:` to take any step back.
+  - It shows on the Canvas, above the room.
+
+  **Suggestion:** yes.
+- **(f) When the guide comes:**
+  - `new:room guided` makes a room and opens the guide.
+  - The empty Lab offers it: "edit:"Writing studio" puts one here, new:room makes one, or new:room guided walks you through it".
+  - C238 also says "the first visit". Showing it on the first visit would need a new stored flag. The empty Lab is what a first visit sees, so it is offered there instead.
+
+  **Suggestion:** no stored flag.
+- **(g) What is kept:**
+  - The guide is the screen's: a reload or `done:` puts it away.
+  - A tried chat is a chat record like any other, its tag in the fields chats already have.
+  - Nothing new is stored.
+
+  **Suggestion:** yes.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
