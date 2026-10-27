@@ -2104,6 +2104,19 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Tests:** steps 9 and 10 from rows, and progress kept; `strikethrough:` and `tell:` planned and refused; the notes on the Enter line, alone, with edits and on a source's branch; the note written and read back; the strike made and found. 1208 tests.
 - **Tried in the browser,** in room 202: the ten steps, step 9 crossed off; a word selected, `strikethrough:`, struck, numbered 210, and taken back with `undo:210`; `tell:` held, counted on the prompt line as waiting for a key, and taken back with `undo:`. **Not tried:** a model reading a note, and step 10 crossed off, as the test data has no key; a note held in a room with no chat yet.
 
+**C227. The stage 11 checkpoint** (proposed 26 October; refactor-plan.md, stage 11; C207, C91, C210 to C226). All seven pieces are built and committed. Waiting for Stefan: (b) and (c) are choices.
+- **(a) What to try,** with a key, in Writing Studio: strike words in a reply (select, Ctrl+Shift+X, or `strikethrough:`), type a replacement, ask about a passage (Ctrl+Shift+K, or `ask:`), add `tell:"Keep it under a page"`, then send a prompt and see the next reply say it read them, and the asks answered in place, to accept or undo. Then a table's cell and a chart's number changed; `markup:off`; the Collection's cards for edits and asks; `undo:` with an edit's number; the welcome list's steps 9 and 10. Not yet tried by me with a model, as the test data has no key; nor Zen, LibreWolf or Android (C209 (d)).
+- **(b) Drafting Desk's future** (C207 (3), a choice). C207 ruled that its retirement into Writing Studio is proposed once in-place editing, asks and Ripple do what its document editor does. Stage 11 built the first two; Ripple and suggestions are stage 12. Options:
+  1. Wait: propose the R line at the stage 12 checkpoint, when Ripple exists, and nothing changes now.
+  2. Propose it now, to go after stage 12, so the decision is made today.
+  **Suggestion:** 1. Until Ripple is built, Drafting Desk is the only place its documents' Ripple data shows, and comparing the two is the reason to wait.
+- **(c) Secretarybird's stored comments and suggestions** (C91, a choice). In your second backup, Drafting Desk documents hold 9 comments (a passage, your question and the model's answer) and 57 suggestions from the model. They are shown in Drafting Desk as before (checked at stage 2). Options:
+  1. Leave them where they are, decided again with (b): asks and suggestions are reviewed together with Ripple after the refactor (your ruling on asks, 26 October), and suggestions have no list to go into before stage 12.
+  2. Turn the 9 comments into asks now, answered, with their passages, in a one-time upgrade shown to you first; the 57 suggestions wait for stage 12.
+  **Suggestion:** 1. It changes no stored data, and nothing is out of sight.
+- **(d) A check still to make** (C207 (2)): Quiet Room and Pocket Chat get in-place editing through the same messages block, but the test data has only Writing Studio installed, so they are not yet tried. **Suggestion:** I add both rooms to the trial copy and try a strike and an ask in each, before stage 12 starts.
+- **Suggestion:** (b) 1, (c) 1, then (d), then stage 12.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
