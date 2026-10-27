@@ -2263,7 +2263,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   Plan 215 is left with Ripple on.
 - **Not tried:** a real check by a model, as the trial copy has no key. The same path is covered end to end with a stand-in for the helper, and the landing was tried in the browser in piece 1.
 
-**C233. Stage 12, piece 3: sweeps, its open points** (proposed 27 October; C228 piece 3, (c), (e); C229, its point for piece 3; the editing spec, "Sweeps"). Built as suggested, so a ruling changes one entry. (a) is the choice C229 left for this piece.
+**C233. Stage 12, piece 3: sweeps, its open points** (proposed 27 October; **ruled 27 October: (a) option 1, told once, as built**; C228 piece 3, (c), (e); C229, its point for piece 3; the editing spec, "Sweeps"). Built as suggested, so a ruling changes one entry. (a) is the choice C229 left for this piece.
 - **(a) An accepted sweep and the chat's model** (a choice). The model that answers in the chat reads what it wrote, not the reply as edited, and the sweep was made by the helper in another call. So once you accept a sweep's suggestion, the reply you read and the reply the model reads differ. Options:
   1. **Told once, with your next prompt to that branch,** as an edit is: "You accepted a change suggested under the framework Push back on me to your reply 2: "…" now reads "…"". It is counted on the prompt's line ("With it, told once: 2 changes you accepted from a sweep"). The suggestion's record gains an optional `sent` (to whom, when, with which prompt), as an edit's has, so it is told only once. That one field is the only change to stored data, shown here.
   2. **Not told:** the spec's line ("the model wrote it, so there is nothing to tell it"). The model goes on reading the reply as it wrote it.
@@ -2310,6 +2310,33 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - `sweep:215b push` named Push back on me and said a key is needed;
   - `sweep:211a push` refused a source's answer.
 - **Not tried:** a real sweep by a model, as the trial copy has no key. The landing and accepting were tried in the browser in piece 1, with a sweep suggestion placed by the same function.
+
+**C235. Stage 12, piece 4: the Reflection board, its open points** (proposed 27 October; C228 pieces 4 and 5, (c), (h), (i), (j); the editing spec, "Reflection"; inline editing v5). Built as suggested, so a ruling changes one entry.
+- **(a) Talking about the chat comes with the board,** pieces 4 and 5 together. The board's field rests in prompt mode, as the board registry has it, so a prompt typed with Reflection addressed must go to the board from the start, never into the chat. **Suggestion:** yes.
+- **(b) What it reads:** the chat in the room and the other branches of its plan (C228 (h), option 1). It is opened with `open:reflection` or its title on the strip. Its head reads "from 201 · reads, never writes", 201 being the plan when it has other branches, else the chat. With no room on screen it says to open one.
+- **(c) What costs nothing:**
+  - **Marked so far:** your edits, asks, suggestions, keywords, quotes and notes, counted, and in which branches.
+  - **Session:** messages, tokens as the providers reported them, and the cost.
+- **(d) Reflect,** the button or `reflect:`, is one call to the helper (C228 (c)), named first: "Enter reflects on 201 and its branches: one call to Haiku 5.5, about $0.02". It goes under the room chat's frameworks, named on the line, so Push back on me changes what it notices. What it is sent, each part in a tag, as material:
+  - each branch's turns as they read now, a source's answer marked as a source's, and the oldest left out past about 24,000 characters (the line says when);
+  - your markings: edits, asks and their answers, notes, keywords, quotes, suggestions and what you chose;
+  - the frameworks there are, so it can propose a sweep.
+- **(e) What comes back** is JSON, shown as text:
+  - a synthesis of what you have been steering toward and what you have not touched, at most about 200 words;
+  - three questions drawn from your markings;
+  - a proposal or none: a branch it read, a framework among yours and the built-in ones, and why.
+
+  The proposal's button writes `>sweep:201a pushback` into the bar for your Enter (C233 (f)).
+- **(f) Talk about the chat:** with the board addressed, the field's prompt goes to the board, and "Nothing said here goes back into 201" is said under it. Each message is one call to the helper, named first, with the same material and the talk so far. A question, clicked, fills the field.
+- **(g) What it keeps** (C228 (i), option 1): the reflection and the talk stay in the tab until it closes, or until the room shows another chat. "keep as a note" writes `>note:"…"` with the synthesis into the bar, so it goes into the Collection as your note. A file of it can follow if wanted.
+- **(h) Reads, never writes, enforced** (C228 (j)):
+  - the board and its module (`lib/reflection.js`) read only through what they are given: rows on screen and a reader of messages;
+  - a lint rule refuses, in those files, any import of the database, the records module or the stores;
+  - a test checks the rule holds;
+  - the calls go through the gateway, as every call does.
+- **(i) The Review modal** stays as it is, to be compared at the checkpoint.
+- **Security and privacy:** every call names its model and cost first and goes through the gateway to the helper. The chats go to it as material, a source's text marked as such. What comes back is shown as text and can only write a command into the bar for your Enter.
+- **Suggestion:** build as above.
 
 ## Proposed CLAUDE.md rewrite
 
