@@ -8,8 +8,8 @@
 //   - the two an edit leaves: struck (the model's words, removed) and added
 //     (the person's words), each carrying its edit's id (C212 (b): an id,
 //     not a number, so a restore that renumbers never rewrites a reply).
-// Charts and dividers are whole blocks (atoms): struck as a unit (C58). A
-// table's cells are edited inside, each a short line (piece 6; C222).
+// Dividers are whole blocks (atoms): struck as a unit (C58). A table's
+// cells, and a chart's title and numbers, are edited inside (piece 6; C222).
 //
 // Nothing here is ever rendered as HTML: every node draws through toDOM
 // arrays, whose strings become text nodes.
@@ -124,14 +124,20 @@ export const schema = new Schema({
       }, 0],
       parseDOM: ['td', 'th'].map((tag) => ({ tag, getAttrs: (dom) => ({ ...readId(dom), header: tag === 'th' }) })),
     },
-    // A chart from the model's chart tool: a whole block for now (C58). data
-    // is the chart's own text, as the reply gave it; in a reply on screen it
-    // is drawn by the chart renderer every reply uses (chartView.jsx). Drawn
-    // here, with no view of its own, it is its title in a caption.
+    // A chart from the model's chart tool, drawn in a reply on screen by the
+    // chart renderer every reply uses (chartView.jsx). Edited inside (piece 6; C222 (f)): its title, a line, and the numbers
+    // behind it, a table (charts.js). data stays what the model gave; kind
+    // is the kind drawn now, and kindEdit the edit that changed it, if one did.
     chart: {
-      group: 'block', atom: true, selectable: true, attrs: { ...id, ...struck, data: { default: '' } },
-      toDOM: (n) => wrapStruck(n, ['figure', { ...blockAttr(n), class: 'pm-chart' }, ['figcaption', chartTitle(n.attrs.data)]]),
-      parseDOM: [{ tag: 'figure.pm-chart', getAttrs: readId }],
+      group: 'block', content: 'chart_title table', isolating: true, selectable: true,
+      attrs: { ...id, ...struck, data: { default: '' }, kind: { default: 'bar' }, kindEdit: { default: null } },
+      toDOM: (n) => wrapStruck(n, ['figure', { ...blockAttr(n), class: 'pm-chart' }, ['div', { class: 'pm-chart-parts' }, 0]]),
+      parseDOM: [{ tag: 'figure.pm-chart', contentElement: 'div.pm-chart-parts', getAttrs: readId }],
+    },
+    chart_title: {
+      content: 'inline*', isolating: true, attrs: { ...id },
+      toDOM: (n) => ['div', { ...blockAttr(n), class: 'pm-chart-title' }, 0],
+      parseDOM: [{ tag: 'div.pm-chart-title', getAttrs: readId }],
     },
     text: { group: 'inline' },
     // An ask at a point, not on words (piece 4; C218): where the cursor was.
@@ -205,4 +211,4 @@ export const { ask: ASK, answer: ANSWER, replaced: REPLACED } = schema.marks
 /** An answer waiting, or the passage it would replace: the model's, settled by accept or undo. */
 export const isAnswerMark = (m) => m.type === ANSWER || m.type === REPLACED
 /** A block struck or kept as one: a divider, a chart, or a table struck whole. */
-export const isWholeBlock = (node) => node.isAtom || node.type === schema.nodes.table
+export const isWholeBlock = (node) => node.isAtom || node.type === schema.nodes.table || node.type === schema.nodes.chart

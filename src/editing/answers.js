@@ -63,8 +63,14 @@ export function placeAnswer(blocks, id, text, passage) {
 // blocks come back with them, a block or cell left alone when unchanged.
 function forLines(blocks, fn) {
   return blocks.map((b) => {
-    if (b?.type === 'table' && Array.isArray(b.rows)) {
+    if ((b?.type === 'table' || b?.type === 'chart') && Array.isArray(b.rows)) {
       let changed = false
+      // A chart's title is a line too, before its numbers (C222 (f)).
+      let title = b.title
+      if (b.type === 'chart' && Array.isArray(b.title)) {
+        title = fn(b.title)
+        if (title !== b.title) changed = true
+      }
       const rows = b.rows.map((row) => (Array.isArray(row) ? row.map((c) => {
         if (!c || typeof c !== 'object') return c
         const next = fn(c.text)
@@ -72,7 +78,7 @@ function forLines(blocks, fn) {
         changed = true
         return { ...c, text: next }
       }) : row))
-      return changed ? { ...b, rows } : b
+      return changed ? { ...b, rows, ...(b.type === 'chart' ? { title } : {}) } : b
     }
     if (!Array.isArray(b?.text)) return b
     const next = fn(b.text)

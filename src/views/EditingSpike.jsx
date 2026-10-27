@@ -8,7 +8,7 @@ import { replyFromMarkdown, promptFromText } from '../editing/fromMarkdown'
 import { track, createIds, cursorMarks, undoEdit, collectEdits, noteForModel, REFUSED, SKIP } from '../editing/track'
 import { schema } from '../editing/schema'
 import { toBlocks, wordsOf } from '../editing/blocks'
-import { editingPlugins, announcePlugin, BLOCK_CHOICES, TABLE_CHOICES, setBlock, tableOp, cellDepth } from '../editing/keys'
+import { editingPlugins, announcePlugin, BLOCK_CHOICES, TABLE_CHOICES, CHART_CHOICES, setBlock, tableOp, chartKind, cellDepth, chartDepth } from '../editing/keys'
 import { BRANCHES, EVERY_KIND, longReply } from '../spike/editing/samples'
 import { chartView } from '../editing/chartView'
 // The editing rules are the product's (src/editing/), so what is tried here
@@ -147,10 +147,10 @@ export default function EditingSpike() {
 
   // The / menu.
   // In a table cell, rows and columns (piece 6; C222 (b)).
-  const choices = (filter, table = false) => (table ? TABLE_CHOICES : BLOCK_CHOICES).filter((c) => c.label.toLowerCase().includes(filter.toLowerCase()))
+  const choices = (filter, table = false, chart = false) => [...(table ? TABLE_CHOICES : chart ? [] : BLOCK_CHOICES), ...(chart ? CHART_CHOICES : [])].filter((c) => c.label.toLowerCase().includes(filter.toLowerCase()))
   const pick = (choice) => {
     const v = viewRef.current
-    const tr = choice.table ? tableOp(v.state, choice.key, ids) : setBlock(v.state, choice, ids)
+    const tr = choice.table ? tableOp(v.state, choice.key, ids) : choice.chart ? chartKind(v.state, choice.key, ids) : setBlock(v.state, choice, ids)
     if (tr) v.dispatch(tr)
     menuRef.current = null
     setMenu(null)
@@ -174,7 +174,7 @@ export default function EditingSpike() {
     }
     page.openMenu = (view) => {
       const c = view.coordsAtPos(view.state.selection.from)
-      const next = { filter: '', index: 0, x: c.left, y: c.bottom + 6, table: cellDepth(view.state.selection.$from) != null }
+      const next = { filter: '', index: 0, x: c.left, y: c.bottom + 6, table: cellDepth(view.state.selection.$from) != null, chart: chartDepth(view.state.selection.$from) != null }
       menuRef.current = next
       setMenu(next)
       return true
@@ -190,7 +190,7 @@ export default function EditingSpike() {
     page.menuKey = (e) => {
       const m = menuRef.current
       if (!m) return false
-      const list = choices(m.filter, m.table)
+      const list = choices(m.filter, m.table, m.chart)
       const set = (next) => { menuRef.current = next; setMenu(next) }
       if (e.key === 'Escape') set(null)
       else if (e.key === 'ArrowDown') set({ ...m, index: (m.index + 1) % Math.max(1, list.length) })
@@ -374,7 +374,7 @@ export default function EditingSpike() {
     return [...editsOf(x.state.doc.child(1)), ...editsOf(x.state.doc.child(0))].filter((e) => !x.held.has(e.id) && !x.sent.has(e.id)).length
   }
   const doc = replyNode
-  const menuList = menu ? choices(menu.filter, menu.table) : []
+  const menuList = menu ? choices(menu.filter, menu.table, menu.chart) : []
 
   return (
     <div className={`es${clean ? ' clean' : ''}`}>

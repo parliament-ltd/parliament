@@ -86,7 +86,7 @@ function describe(doc, from, to) {
   const added = []
   const atoms = []
   let struck = 0
-  doc.nodesBetween(from, to, (node, pos) => {
+  doc.nodesBetween(from, to, (node, pos, parent) => {
     // An ask's point is no word: never struck, never kept (piece 4).
     if (node.type.name === 'ask_point') return false
     if (node.isInline) {
@@ -101,7 +101,9 @@ function describe(doc, from, to) {
     }
     // A whole block in the range: a chart, a divider, or a table taken whole
     // (C222 (a)); a table only partly in it is edited cell by cell.
-    if (isWholeBlock(node) && pos >= from && pos + node.nodeSize <= to) {
+    // A chart's own table is never struck alone: the chart is, or its cells' words (C222 (f)).
+    const ownTable = node.type.name === 'table' && parent?.type.name === 'chart'
+    if (isWholeBlock(node) && !ownTable && pos >= from && pos + node.nodeSize <= to) {
       if (node.attrs.struck == null) atoms.push({ pos, node })
       else struck += 1
       return false
@@ -410,7 +412,15 @@ export function undoEdit(state, id) {
       if (all) { cells.push({ from: pos, to: pos + node.nodeSize }); return false }
     }
     if (node.type.name === 'table_cell' && node.attrs.added === id) { cells.push({ from: pos, to: pos + node.nodeSize }); return false }
-    if (node.attrs.struck === id) tr.setNodeMarkup(pos, null, { ...node.attrs, struck: null })
+    // A chart's kind changed back to the model's (C222 (f)).
+    const kindBack = node.type.name === 'chart' && node.attrs.kindEdit === id
+    if (node.attrs.struck === id || kindBack) {
+      tr.setNodeMarkup(pos, null, {
+        ...node.attrs,
+        ...(node.attrs.struck === id ? { struck: null } : {}),
+        ...(kindBack ? { kind: readKind(node.attrs.data) ?? 'bar', kindEdit: null } : {}),
+      })
+    }
     return true
   })
   // From the end back, so the positions before each stay true.
@@ -464,14 +474,17 @@ export function collectEdits(doc) {
       e.last = Math.max(e.last, offset + block.nodeSize)
     }
     if (block.isAtom) return
-    if (block.type.name === 'table') {
+    // A table's cells, at tablePos; in a chart, chart names it (C222 (f)).
+    const cellsOfTable = (table, tablePos, chart = null) => {
       // Each cell a line of its own, named by its row and column (C222 (c)),
       // its edits kept when the table is later struck whole.
-      const header = block.firstChild
+      const header = table.firstChild
+      const block = table
       block.forEach((row, rowAt, r) => {
         row.forEach((cell, cellAt, c) => {
-          const start = offset + 1 + rowAt + 1 + cellAt + 1
+          const start = tablePos + 1 + rowAt + 1 + cellAt + 1
           const where = {
+            ...(chart ? { chart } : {}),
             table: block.attrs.id, row: r, col: c, rows: block.childCount, cols: row.childCount,
             rowName: r === 0 ? null : cellName(row.firstChild), colName: cellName(header.maybeChild(c)),
           }
@@ -491,11 +504,43 @@ export function collectEdits(doc) {
           lineMarks(cell, cell.attrs.id, start, index, kind, where)
         })
       })
+    }
+    if (block.type.name === 'table') {
+      cellsOfTable(block, offset)
+      return
+    }
+    if (block.type.name === 'chart') {
+      // A chart's title, its numbers, and its kind (C222 (f)).
+      const title = block.firstChild
+      const chart = cellName(title) || 'untitled'
+      lineMarks(title, title.attrs.id, offset + 2, index, kind, { chart, chartTitle: true })
+      cellsOfTable(block.lastChild, offset + 1 + title.nodeSize, chart)
+      if (block.attrs.kindEdit != null) {
+        const { e, p } = part(block.attrs.kindEdit, block.attrs.id, index, kind)
+        const was = (readKind(block.attrs.data) ?? 'bar')
+        Object.assign(p, { chart, kindChange: { from: was, to: block.attrs.kind }, from: 0, to: 0 })
+        p.struck += was
+        p.added += block.attrs.kind
+        e.struck += was
+        e.added += block.attrs.kind
+        e.first = Math.min(e.first, offset)
+        e.last = Math.max(e.last, offset + 1)
+      }
       return
     }
     lineMarks(block, block.attrs.id, offset + 1, index, kind)
   })
   return [...edits.values()].sort((a, b) => a.first - b.first)
+}
+
+// The kind the model gave a chart, from its own text.
+function readKind(data) {
+  try {
+    const t = JSON.parse(String(data ?? '')).type
+    return typeof t === 'string' ? t : null
+  } catch {
+    return null
+  }
 }
 
 // A cell's name, for a row or column: the model's words in it, struck or
@@ -539,7 +584,7 @@ function context(doc, edit) {
 export function noteForModel(doc, edits, { what = 'your last reply' } = {}) {
   if (!edits.length) return ''
   const lines = edits.map((e) => {
-    if (e.parts.some((x) => x.table != null)) return tableLines(doc, e)
+    if (e.parts.some((x) => x.table != null || x.chart != null)) return tableLines(doc, e)
     const p = e.parts[0]
     const where = `${p.kind} ${p.index + 1}`
     const struck = e.struck.replace(/\s+/g, ' ').trim()
@@ -555,18 +600,21 @@ export function noteForModel(doc, edits, { what = 'your last reply' } = {}) {
 // An edit in a table, told cell by cell, or as a row or column (C222 (c)):
 // "In the table after “Prices in 2025”, row Oslo, column Price: …".
 function tableLines(doc, e) {
-  const first = e.parts.find((x) => x.table != null)
+  const first = e.parts.find((x) => x.table != null || x.chart != null)
   const before = first.index > 0 ? doc.child(first.index - 1) : null
   const intro = before?.isTextblock && before.textContent.trim()
     ? before.textContent.trim().split(/\s+/).slice(0, 6).join(' ')
     : ''
-  const table = intro ? `the table after "${intro}"` : `table ${first.index + 1}`
+  // A chart's numbers are named by the chart (C222 (f)).
+  const table = first.chart != null ? `the chart "${first.chart}"`
+    : intro ? `the table after "${intro}"` : `table ${first.index + 1}`
   const say = (s) => s.replace(/\s+/g, ' ').trim()
   const out = []
   const told = new Set()
   // Whole rows and columns first: every cell of a row (or a column) carries
   // it, or was struck or added already by another edit.
-  const node = doc.maybeChild(first.index)
+  const top = doc.maybeChild(first.index)
+  const node = top?.type.name === 'chart' ? top.lastChild : top
   const isTable = node?.type.name === 'table'
   const rowDone = (r, how) => isTable && r < node.childCount && [...Array(node.child(r).childCount).keys()].every((j) => node.child(r).child(j).attrs[how] != null)
   const colDone = (c, how) => { let ok = isTable; if (ok) node.forEach((row) => { if (c >= row.childCount || row.child(c).attrs[how] == null) ok = false }); return ok }
@@ -599,8 +647,12 @@ function tableLines(doc, e) {
   // Then each cell's own change.
   for (const x of e.parts) {
     if (told.has(x)) continue
+    if (x.kindChange) {
+      out.push(`- In ${table}: its kind was changed from ${x.kindChange.from} to ${x.kindChange.to}.`)
+      continue
+    }
     // A selection may run on from a table into the line after it.
-    const where = x.table == null ? `${x.kind} ${x.index + 1}`
+    const where = x.chartTitle ? `${table}, its title` : x.table == null ? `${x.kind} ${x.index + 1}`
       : `${table}, ${x.row === 0 ? 'the header row' : `row "${x.rowName || x.row + 1}"`}, column "${x.colName || x.col + 1}"`
     const struck = say(x.struck)
     const added = say(x.added)

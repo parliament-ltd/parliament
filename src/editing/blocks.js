@@ -11,13 +11,18 @@
 // A table's rows are lists of cells, each { id, text, header?, struck?,
 // added? }: its runs, and a row or column struck or added whole (piece 6;
 // C222 (d)). A table stored before piece 6 holds plain words in its rows,
-// and still reads.
+// and still reads. A chart keeps `data`, what the model gave, unchanged,
+// beside its `title` (runs), its `rows` (as a table's: a row per label, a
+// column per series), its `kind`, and `kindEdit` when the person changed
+// the kind (C222 (f)); one stored before holds only `data`, and its title
+// and rows are made from that.
 //
 // What is read back is treated as text from outside (a backup, a restored
 // file): only known types and fields are taken, every value is made the kind
 // it should be, and links keep only web and mail addresses.
 
 import { schema, safeHref, STRUCK, ADDED, ASK, ANSWER, REPLACED } from './schema'
+import { chartParts, KINDS as CHART_KINDS } from './charts'
 
 const TYPE_OF = { paragraph: 'paragraph', heading: 'heading', list_item: 'list', quote: 'quote', code_block: 'code', divider: 'divider', table: 'table', chart: 'chart' }
 const NODE_OF = Object.fromEntries(Object.entries(TYPE_OF).map(([node, type]) => [type, node]))
@@ -49,6 +54,23 @@ function runsOf(node) {
   return runs
 }
 
+// A table's rows, as stored.
+function rowsOf(table) {
+  const rows = []
+  table.forEach((row) => {
+    const cells = []
+    row.forEach((cell) => {
+      const c = { id: cell.attrs.id, text: runsOf(cell) }
+      if (cell.attrs.header) c.header = true
+      if (cell.attrs.struck != null) c.struck = cell.attrs.struck
+      if (cell.attrs.added != null) c.added = cell.attrs.added
+      cells.push(c)
+    })
+    rows.push(cells)
+  })
+  return rows
+}
+
 /** A reply's document in its stored form. */
 export function toBlocks(doc) {
   const out = []
@@ -68,21 +90,18 @@ export function toBlocks(doc) {
       if (node.attrs.checked) b.checked = true
     }
     // A table's rows of cells, each its own runs (piece 6; C222 (d)).
-    if (type === 'table') {
-      b.rows = []
-      node.forEach((row) => {
-        const cells = []
-        row.forEach((cell) => {
-          const c = { id: cell.attrs.id, text: runsOf(cell) }
-          if (cell.attrs.header) c.header = true
-          if (cell.attrs.struck != null) c.struck = cell.attrs.struck
-          if (cell.attrs.added != null) c.added = cell.attrs.added
-          cells.push(c)
-        })
-        b.rows.push(cells)
-      })
+    if (type === 'table') b.rows = rowsOf(node)
+    // A chart: what the model gave, unchanged, beside its title and numbers
+    // as edited, and its kind (C222 (f)).
+    if (type === 'chart') {
+      b.data = node.attrs.data
+      b.kind = node.attrs.kind
+      if (node.attrs.kindEdit != null) b.kindEdit = node.attrs.kindEdit
+      b.title = runsOf(node.firstChild)
+      b.titleId = node.firstChild.attrs.id
+      b.tableId = node.lastChild.attrs.id
+      b.rows = rowsOf(node.lastChild)
     }
-    if (type === 'chart') b.data = node.attrs.data
     if (node.attrs.struck != null) b.struck = node.attrs.struck
     out.push(b)
   })
@@ -194,22 +213,38 @@ export function fromBlocks(blocks, nextBlockId) {
     }
     if (name === 'divider' || name === 'table' || name === 'chart') attrs.struck = struck
     if (name === 'chart') attrs.data = typeof b.data === 'string' ? b.data : ''
+    const freshId = (v) => {
+      let x = typeof v === 'string' && v && v.length <= 64 ? v : nextBlockId()
+      if (seen.has(x)) x = nextBlockId()
+      seen.add(x)
+      return x
+    }
+    // Rows of cells (C222 (d)); a table stored as plain words, before
+    // piece 6, reads as before: its first row the header.
+    const rowsFrom = (stored) => (Array.isArray(stored) ? stored : []).filter((r) => Array.isArray(r) && r.length).map((row, r) => schema.nodes.table_row.create(null, row.map((c) => {
+      const cell = c && typeof c === 'object' ? c : { text: [{ text: String(c ?? '') }], header: r === 0 }
+      const s = editId(cell.struck)
+      return schema.nodes.table_cell.create(
+        { id: freshId(cell.id), header: cell.header === true, struck: s, added: s == null ? editId(cell.added) : null },
+        inlineOf(cell.text, false),
+      )
+    })))
     if (name === 'table') {
-      // Rows of cells (C222 (d)); a table stored as plain words, before
-      // piece 6, reads as before: its first row the header.
-      const rows = (Array.isArray(b.rows) ? b.rows : []).filter((r) => Array.isArray(r) && r.length).map((row, r) => schema.nodes.table_row.create(null, row.map((c) => {
-        const cell = c && typeof c === 'object' ? c : { text: [{ text: String(c ?? '') }], header: r === 0 }
-        let cellId = typeof cell.id === 'string' && cell.id && cell.id.length <= 64 ? cell.id : nextBlockId()
-        if (seen.has(cellId)) cellId = nextBlockId()
-        seen.add(cellId)
-        const s = editId(cell.struck)
-        return schema.nodes.table_cell.create(
-          { id: cellId, header: cell.header === true, struck: s, added: s == null ? editId(cell.added) : null },
-          inlineOf(cell.text, false),
-        )
-      })))
+      const rows = rowsFrom(b.rows)
       if (!rows.length) continue
       nodes.push(schema.nodes.table.create(attrs, rows))
+      continue
+    }
+    if (name === 'chart') {
+      // A chart stored before piece 6 holds only what the model gave: its
+      // title and numbers are made from that, as when it first came (C222 (f)).
+      const rows = rowsFrom(b.rows)
+      const fresh = chartParts(attrs.data, nextBlockId)
+      const title = Array.isArray(b.title) ? schema.nodes.chart_title.create({ id: freshId(b.titleId) }, inlineOf(b.title, false)) : fresh.title
+      const table = rows.length ? schema.nodes.table.create({ id: freshId(b.tableId) }, rows) : fresh.table
+      attrs.kind = CHART_KINDS.includes(b.kind) ? b.kind : fresh.kind
+      attrs.kindEdit = editId(b.kindEdit)
+      nodes.push(schema.nodes.chart.create(attrs, [title, table]))
       continue
     }
     const type = schema.nodes[name]

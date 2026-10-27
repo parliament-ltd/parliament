@@ -136,8 +136,8 @@ function backspace(blocks, onJoin) {
         dispatch(state.tr.setSelection(TextSelection.create(state.doc, live.edge)))
         return true
       }
-      // A cell never joins the one before it (C222 (a)).
-      if ($pos.parent.type === schema.nodes.table_cell) return true
+      // A cell never joins the one before it, nor a chart's title (C222).
+      if ($pos.parent.type === schema.nodes.table_cell || $pos.parent.type === schema.nodes.chart_title) return true
       const { depth, container, index } = placeOf($pos)
       // At a reply's start, under its prompt: the gap between them (C214 (a)).
       const atGap = index === 0 && isSection(container) && facesSection(state, $pos, depth, false)
@@ -200,8 +200,17 @@ function enter(ids) {
       return true
     }
     if (state.selection instanceof NodeSelection) return true
-    // In a table, Enter goes to the cell below (C222 (a)).
+    // In a table, Enter goes to the cell below (C222 (a)); in a chart's
+    // title, to its numbers (C222 (f)).
     if (cellDepth(state.selection.$from) != null) return moveCell(state, dispatch, 'down', ids)
+    if (state.selection.$from.parent.type === schema.nodes.chart_title) {
+      const $t = state.selection.$from
+      const chart = $t.node($t.depth - 1)
+      const tablePos = $t.before($t.depth - 1) + 1 + chart.firstChild.nodeSize
+      const at = cellStart(chart.lastChild, tablePos, 0, 0)
+      dispatch(state.tr.setSelection(TextSelection.create(state.doc, at + chart.lastChild.child(0).child(0).content.size)).scrollIntoView())
+      return true
+    }
     if (!state.selection.empty) {
       // Striking the selection first, then the new block after it.
       dispatch(state.tr.delete(state.selection.from, state.selection.to).setMeta(INTENT, 'range'))
@@ -241,7 +250,9 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
   const whenBlocks = (command) => (state, dispatch, view) => (blk(state) ? command(state, dispatch, view) : true)
   const wholeBlock = (node) => onNote?.(node.type === schema.nodes.table
     ? 'The whole table is selected: Backspace strikes it whole. Click into a cell to change its words.'
-    : `A ${node.type.name} is one block for now: Backspace strikes it whole, and editing inside it comes later.`)
+    : node.type === schema.nodes.chart
+      ? 'The whole chart is selected: Backspace strikes it whole. Click into its title or numbers to change them.'
+      : `A ${node.type.name} is one block for now: Backspace strikes it whole, and editing inside it comes later.`)
   const nothing = () => true
   const strike = (state, dispatch) => {
     if (state.selection.empty) return true
@@ -460,7 +471,9 @@ export function moveCell(state, dispatch, dir, ids = null) {
   if (row < 0) return false
   if (row >= table.childCount) {
     if (dir !== 'down') return false
-    const after = tablePos + table.nodeSize
+    // Past the last row: the line after the table, or after its chart.
+    const inChart = d >= 3 && $from.node(d - 3).type === schema.nodes.chart
+    const after = inChart ? $from.after(d - 3) : tablePos + table.nodeSize
     const next = state.doc.resolve(after).nodeAfter
     if (next?.isTextblock) {
       dispatch(state.tr.setSelection(TextSelection.create(state.doc, after + 1)).scrollIntoView())
@@ -681,6 +694,44 @@ export function setBlock(state, choice, ids) {
   }
   tr.setBlockType($from.before(), $from.after(), schema.nodes[choice.type], { id: block.attrs.id, ...(choice.attrs ?? {}) })
   return tr
+}
+
+/** The depth of the chart a position is in, or null. */
+export function chartDepth($pos) {
+  for (let d = $pos.depth; d > 0; d--) if ($pos.node(d).type === schema.nodes.chart) return d
+  return null
+}
+
+/** The / menu's choices in a chart (C222 (f)): its kind. */
+export const CHART_CHOICES = [
+  { key: 'bar', label: 'Bar chart', chart: true },
+  { key: 'line', label: 'Line chart', chart: true },
+  { key: 'area', label: 'Area chart', chart: true },
+  { key: 'pie', label: 'Pie chart', chart: true },
+]
+
+/**
+ * A chart's kind chosen (C222 (f)): an edit, told to the model, unless it is
+ * back to the kind the model gave. null outside a chart.
+ */
+export function chartKind(state, kind, ids) {
+  const $from = state.selection.$from
+  const d = chartDepth($from)
+  if (d == null) return null
+  const chart = $from.node(d)
+  const pos = $from.before(d)
+  let model = 'bar'
+  try {
+    const t = JSON.parse(String(chart.attrs.data ?? '')).type
+    if (typeof t === 'string') model = t
+  } catch { /* the model's kind is bar */ }
+  if (kind === chart.attrs.kind) return null
+  let edit = null
+  if (kind !== model) {
+    edit = chart.attrs.kindEdit ?? ids.peek()
+    if (edit === ids.peek()) ids.commit(edit)
+  }
+  return state.tr.setMeta(SKIP, true).setNodeMarkup(pos, null, { ...chart.attrs, kind, kindEdit: edit })
 }
 
 /** The / menu's choices in a table cell (C222 (b)). */

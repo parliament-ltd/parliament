@@ -3,7 +3,7 @@ import { EditorState, TextSelection, NodeSelection } from 'prosemirror-state'
 import { STRUCK, ADDED } from './schema'
 import { replyFromMarkdown } from './fromMarkdown'
 import { track, createIds, cursorMarks, undoEdit, collectEdits, INTENT } from './track'
-import { commands, tableOp, cellsOf } from './keys'
+import { commands, tableOp, cellsOf, chartKind } from './keys'
 
 // Stefan's try (C208): an undo from a card that left a strike behind. Random
 // runs of what a person does, then every edit undone from its card: the
@@ -18,7 +18,8 @@ function random(seed) {
   }
 }
 
-const MD = 'The furnace had not gone out in **eleven years**, and old Ferro meant to keep it.\n\n## What they made\n\n- Coloured glass\n- Mirrors\n\n| a | b |\n| --- | --- |\n| 1 | 2 |\n\nThat winter a stranger came, asking for a mirror.'
+const CHART = JSON.stringify({ type: 'bar', title: 'Furnaces', labels: ['1840s', '1850s'], datasets: [{ label: 'Count', values: [18, 14] }] })
+const MD = 'The furnace had not gone out in **eleven years**, and old Ferro meant to keep it.\n\n## What they made\n\n- Coloured glass\n- Mirrors\n\n| a | b |\n| --- | --- |\n| 1 | 2 |\n\n```chart\n' + CHART + '\n```\n\nThat winter a stranger came, asking for a mirror.'
 const WORDS = ['nearly', 'a century', 'ghost', '百年', 'x', 'Tom and Ellen', 'é']
 
 function inlinePositions(doc) {
@@ -36,7 +37,7 @@ function inlinePositions(doc) {
 function marksLeft(doc) {
   let n = 0
   doc.descendants((node) => {
-    if (node.attrs.struck != null || node.attrs.added != null) n += 1
+    if (node.attrs.struck != null || node.attrs.added != null || node.attrs.kindEdit != null) n += 1
     for (const m of node.marks) if (m.type === STRUCK || m.type === ADDED) n += 1
     return true
   })
@@ -96,9 +97,9 @@ function runOnce(seed, steps) {
       if (!cells.length) continue
       const c = pick(cells)
       caret(c.pos + 1)
-      const key = pick(['rowBelow', 'colAfter', 'strikeRow', 'strikeCol'])
+      const key = pick(['rowBelow', 'colAfter', 'strikeRow', 'strikeCol', 'line', 'pie', 'bar'])
       log.push(key + ' at ' + (c.pos + 1))
-      const tr = tableOp(state, key, ids)
+      const tr = ['line', 'pie', 'bar'].includes(key) ? chartKind(state, key, ids) : tableOp(state, key, ids)
       if (tr) state = state.apply(tr)
     } else if (kind === 6) { // the table struck whole, as after a click on it
       let at = null

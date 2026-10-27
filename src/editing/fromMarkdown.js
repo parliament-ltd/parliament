@@ -12,6 +12,7 @@ import { unified } from 'unified'
 import remarkParse from 'remark-parse'
 import remarkGfm from 'remark-gfm'
 import { schema, safeHref } from './schema'
+import { chartFrom } from './charts'
 
 const parser = unified().use(remarkParse).use(remarkGfm)
 
@@ -53,8 +54,6 @@ function inline(nodes, marks = []) {
   return out
 }
 
-// A chart keeps its own text, drawn by the chart renderer every reply uses.
-const chartFrom = (code, attrs) => schema.nodes.chart.create({ ...attrs, data: String(code ?? '') })
 
 /**
  * The blocks of a reply.
@@ -94,7 +93,8 @@ export function replyFromMarkdown(markdown, nextBlockId, { anchors = null } = {}
         }
         break
       case 'code': {
-        const chart = node.lang === 'chart' ? chartFrom(node.value, attrs()) : null
+        // A chart: its title and numbers to edit, what the model gave kept (C222 (f)).
+        const chart = node.lang === 'chart' ? chartFrom(node.value, attrs(), nextBlockId) : null
         blocks.push(chart ?? schema.nodes.code_block.create(attrs(), node.value ? schema.text(node.value) : null))
         break
       }

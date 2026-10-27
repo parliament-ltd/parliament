@@ -36,7 +36,14 @@
 .p-text .pm-table, .p-text .pm-chart { overflow-x: auto; margin: 0 -7px .75em; padding: 6px; border: 1px dashed transparent; border-radius: 6px; cursor: default; }
 .p-text .pm-table:hover, .p-text .pm-chart:hover { border-color: var(--ch-border); }
 .p-text .pm-table.ProseMirror-selectednode, .p-text .pm-chart.ProseMirror-selectednode { border: 1px solid var(--ch-focus-ink); outline: none; }
-.p-text .ProseMirror-selectednode.pm-chart::after { content: "One block for now: Backspace strikes it whole, Enter starts a line after it. Editing inside comes later."; display: block; margin-top: 6px; font-size: 12px; font-style: italic; color: var(--ch-marg); }
+.p-text .ProseMirror-selectednode.pm-chart::after { content: "The whole chart: Backspace strikes it, Enter starts a line after it. Click into its title or numbers to change them."; display: block; margin-top: 6px; font-size: 12px; font-style: italic; color: var(--ch-marg); }
+/* A chart edited inside (piece 6; C222 (f)): the drawing, a line saying what
+   it is, then its title and numbers, edited like any line and table. */
+.p-text .pm-chart { cursor: text; }
+.p-text .pm-chart-draw { cursor: default; }
+.p-text .pm-chart-said { margin: 2px 0 8px; font-size: 12px; font-style: italic; color: var(--ch-marg); }
+.p-text .pm-chart-title { font-weight: 600; margin-bottom: 6px; }
+.p-text .pm-chart-parts .pm-table, .p-text .pm-chart-parts table { margin: 0; }
 /* A table edited inside (piece 6; C222): cells are lines of text. Selected
    whole, it says what Backspace does. */
 .p-text .ProseMirror-selectednode.pm-table::after { content: "The whole table: Backspace strikes it, Enter starts a line after it. Click into a cell to change its words."; display: block; margin-top: 6px; font-size: 12px; font-style: italic; color: var(--ch-marg); }
