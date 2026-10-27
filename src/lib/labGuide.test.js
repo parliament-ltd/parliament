@@ -13,8 +13,8 @@ const mode = {
 const at = (q, o) => optionOf(GUIDE.find((x) => x.id === q).options.find((x) => x.id === o), { mode, layouts, themes, nameWords: 'Essay room' })
 
 describe('the guide (C244 (d))', () => {
-  it('asks five questions, the web search one waiting for piece 6', () => {
-    expect(GUIDE.map((q) => q.verb)).toEqual(['layout', 'device', 'add', 'theme', 'name'])
+  it('asks six questions, web search among them since piece 6', () => {
+    expect(GUIDE.map((q) => q.verb)).toEqual(['layout', 'device', 'add', 'set', 'theme', 'name'])
   })
   it('writes each answer as a command, and knows one that is so already', () => {
     expect(at('for', 'writing')).toEqual({ command: 'layout:"Document in the middle"', already: false })

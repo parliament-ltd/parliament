@@ -2893,6 +2893,46 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - Files are kept as today: text in the prompt, an image's or PDF's name in `attachmentMeta`.
   - What is held for the next prompt is this tab's only.
 
+**C249. Stage 13, piece 6, as built: features of input** (27 October; C248 as suggested).
+- **What a room offers** (C248 (a)):
+  - The input block has three settings: Web search, Voice and Files. They show on the Blocks board's Input row, with `set:input web on` and the like, in place of piece 2's note.
+  - Each is a key in the input block's `config` (`webSearch`, `voice`, `files`).
+  - Unset, a feature is on where the room has the old block, so Pocket chat offers all three, Quiet room none.
+  - The Canvas names the features that are on beside Input.
+  - With no room yet, the bar offers all three.
+- **In the prompt field's marginalia,** before the frameworks and who answers: "web search", "voice" (or "voice off" where the browser cannot transcribe on the device, its note saying what the alternative would send), and "attach". Each shows only where the room offers it. A held one is in ink, underlined.
+  - **"voice off":** C248 said "voice: off in this browser"; the shorter words fit the field, and the note keeps the rest.
+- **Web search** (C248 (b)):
+  - A click, or `web:`, holds it for the next prompt only, in this tab, for this room; `web:off` drops it.
+  - It is offered only where the one answering can search: the provider has the search tool, today Anthropic.
+  - Refusals: "Wikipedia cannot search the web here. by: a model that can"; "Web search is off in Essay room. set:input web on turns it on".
+  - The prompt's line says "It may search the web: up to 3 searches, about $0.01 each, on top of the tokens". In a prompt to several, it names those that cannot.
+  - The tool goes with the send to each one that can search, and the held search is dropped once the prompt goes.
+- **Voice** (C248 (c), C70): the on-device recognition already built (`useVoiceInput`). A click starts listening ("listening"); each finished phrase is added to the field; nothing is sent until Enter.
+- **Files** (C248 (d)):
+  - A click on "attach", or `attach:`, opens the picker for several files. Each is checked and read as today's composer does.
+  - They are held for the next prompt, listed under the field ("With your next prompt: notes.md 12 B ×"), up to 10.
+  - The prompt's line names what goes, and counts text files in the tokens. It says what stays out ("report.pdf stays out: Mistral is not given images or PDFs here"), that a source is sent the words alone, and that the privacy filter does not read images or PDFs.
+  - Packing (`lib/inputFeatures.js`): text and code inside the words, marked as data, kept with the message; images and PDFs a part of this send only, to Anthropic's models; their names in `attachmentMeta`. Each answerer of a prompt to several gets what it can take.
+- **The guide's sixth question,** "Should it search the web?" ("Yes, when I ask" writes `set:input web on`; "No" reads "as it is" in a room without it).
+- **The copy pipeline:** I had been running `lingui extract` alone, which keeps an English entry's old wording when it changes. `npm run i18n` (extract with overwrite) is the project's way, and is used from here. It changed no English already committed.
+- **Not done:** the three old blocks and today's composer stay, for R24 and R25 at the checkpoint (C248 (e)). An empty prompt with only files held is not sent: the prompt still needs words.
+- **Stored data:** none new. On the trial copy, Essay room's input now carries `files: false`, written by turning Files on and off again in the browser; it reads as before.
+- **Tests:**
+  - what a room offers, from its settings or its old blocks;
+  - the guide's question;
+  - files packed for one who reads them, for one who does not, and for a source;
+  - `web:` and `attach:` with their refusals;
+  - the verb list.
+
+  1,304 tests; 30 lint warnings, all older.
+- **Tried in the browser,** on the trial copy, where Wikipedia answers and the browser cannot transcribe on the device:
+  - Pocket chat's field showed "voice off" and "attach", and no web search, since Wikipedia cannot search; `web:` said so.
+  - In the Lab, Essay room's Input row showed the three features off. "on" for Files ran `set:input files on`, echoed, and the Canvas named "file attach". In the Lab the field then offered only "attach", and `web:` said web search is off in Essay room. Files was turned off again.
+
+  Not tried in the browser: a web search, voice and choosing files, which need a key, a browser that transcribes on the device and a native file dialog. They are covered by the tests above and by the code they reuse. The trial copy's bar was moved to the top (`bar:top`) to read the field.
+- **Next:** piece 7, the checkpoint.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

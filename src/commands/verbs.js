@@ -276,6 +276,11 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.check', message: 'Check the last answer from a source for words that try to instruct a model' } }),
   // An answer from a source brought into the next prompt, on purpose (stage
   // 8; C115, C176): alone, the room's last; by address, a branch's on screen.
+  // Features of input, held for the next prompt only (stage 13, piece 6; C248).
+  v({ verb: 'web', group: 'editing', example: 'web:', forms: ['web:', 'web:off'], takes: [[], [['on', 'off']]], stage: 13, click: 'fill',
+    gloss: /*i18n*/ { id: 'verb.web', message: 'Let the model search the web for your next prompt only' } }),
+  v({ verb: 'attach', group: 'editing', example: 'attach:', takes: [[]], stage: 13,
+    gloss: /*i18n*/ { id: 'verb.attach', message: 'Attach files to your next prompt' } }),
   v({ verb: 'include', group: 'editing', example: 'include:201b', forms: ['include:', 'include:201b', 'include:201b, 201c', 'include:off'], takes: [[], ['addresses'], [['off']]], stage: 8, click: 'fill',
     gloss: /*i18n*/ { id: 'verb.include', message: 'Bring an answer from a source into your next prompt, sent as material marked as data' } }),
   // Translating (C84, C85, C166): alone, the last answer from a source,
@@ -336,7 +341,7 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.device', message: 'Say what the room is built for' } }),
   v({ verb: 'local', group: 'building', example: 'local:on', forms: ['local:on', 'local:off'], takes: [[['on', 'off']]], on: BUILDING, stage: 13, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.local', message: 'Say whether a room sends only to models on this computer' } }),
-  v({ verb: 'set', group: 'building', example: 'set:notes order oldest', forms: ['set:notes order oldest', 'set:contents most 50', 'set:default haiku'],
+  v({ verb: 'set', group: 'building', example: 'set:notes order oldest', forms: ['set:notes order oldest', 'set:contents most 50', 'set:input web on', 'set:default haiku'],
     takes: [[], ['word', { many: 'text' }]], on: [...BUILDING, 'settings'], stage: 9, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.set', message: 'Change a setting of a block or of Parliament. The Enter line states the change in full' } }),
 

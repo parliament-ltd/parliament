@@ -567,7 +567,15 @@ msgid "blocksBoard.emptySlot"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "blocksBoard.inputFeatures"
+msgid "blocksBoard.input.files"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.input.voice"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.input.webSearch"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1901,6 +1909,31 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.askOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.attachFull"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.attachGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.attachHeld"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.attachNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.attachPicking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.attachRefused"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3864,6 +3897,22 @@ msgid "enter.promptFailed"
 msgstr "Prompten gick inte fram. Försök igen"
 
 #. js-lingui-explicit-id
+msgid "enter.promptFilesGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptFilesOut"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptFilesPrivacy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptFilesSource"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.promptFrameworks"
 msgstr "{count, plural, one {Ramverket {frameworks} följer med} other {Ramverken {frameworks} följer med, i den ordningen}}"
 
@@ -4161,6 +4210,14 @@ msgstr "{count, plural, other {Enter skickar det här till {nums}, som var och e
 #. js-lingui-explicit-id
 msgid "enter.promptTranslateLater"
 msgstr "Svaret kommer på engelska. translate: översätter det till {language} efteråt"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWebGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptWebSome"
+msgstr ""
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5362,6 +5419,33 @@ msgstr "Enter tar bort {tag} från {nums}"
 msgid "enter.untagAll"
 msgstr "{count, plural, one {Enter tar bort {tag} från den enda sak som har den} other {Enter tar bort {tag} från alla # saker som har den}}"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.webAlready"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.webCannot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.webDrop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.webHoldGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.webNoneHeld"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.webNotHere"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.widthAlone"
 msgstr "En ensam tavla får hela bredden"
@@ -5522,6 +5606,23 @@ msgid "field.answeredHelp"
 msgstr "Välj vem som svarar här (by:)"
 
 #. js-lingui-explicit-id
+msgid "field.attach"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "field.attachHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.fileDrop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.fileKind"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "field.frameworkHelp"
 msgstr "Välj ramverk för den här chatten (framework:)"
 
@@ -5536,6 +5637,14 @@ msgid "field.frameworkSome"
 msgstr "{more, plural, =0 {framework: {first}} other {framework: {first} +#}}"
 
 #. js-lingui-explicit-id
+msgid "field.held"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.listening"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "field.toAll"
 msgstr "{count, plural, other {till alla #}}"
 
@@ -5546,6 +5655,35 @@ msgstr "till {address} · {name}"
 #. js-lingui-explicit-id
 msgid "field.toSome"
 msgstr "till {nums}"
+
+#. js-lingui-explicit-id
+msgid "field.voice"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.voiceDownload"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.voiceHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.voiceOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.voiceOffHelp"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "field.webHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.webSearch"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "framework.about.alts"
@@ -5741,6 +5879,14 @@ msgid "guide.o.thinking"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "guide.o.webNo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "guide.o.webYes"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "guide.o.writing"
 msgstr ""
 
@@ -5762,6 +5908,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "guide.q.reach"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "guide.q.web"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5790,6 +5940,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "guide.why.reach"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "guide.why.web"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -8088,6 +8242,10 @@ msgid "verb.ask"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "verb.attach"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.backup"
 msgstr "Ladda ned en säkerhetskopia av allt utom dina nycklar"
 
@@ -8414,6 +8572,10 @@ msgstr "Ta bort en tagg från vissa saker, eller från allt"
 #. js-lingui-explicit-id
 msgid "verb.until"
 msgstr "Visa vad som skapats fram till ett datum"
+
+#. js-lingui-explicit-id
+msgid "verb.web"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.width"

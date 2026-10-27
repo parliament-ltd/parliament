@@ -345,6 +345,17 @@
 .ch-fmarg.pick:hover::after, .ch-fmarg.pick[aria-expanded="true"]::after { opacity: .5; }
 /* The frameworks sit before who answers, a dot between (C164). */
 .ch-fmarg.fw { margin-inline-end: 0; padding-inline-end: 0; }
+/* Features of input in the field (stage 13, piece 6; C248): words, held ones in ink. */
+.ch-fmarg.feat { margin-inline-end: 0; padding-inline-end: 0; }
+.ch-shell .ch-field .ch-fmarg.feat, .ch-shell .ch-field .ch-fmarg.feat + .ch-fmarg { padding-inline-start: 12px; }
+.ch-fmarg.feat::after { display: none; }
+.ch-shell .ch-fmarg.feat.on { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+.ch-fmarg.feat.off { font: italic 400 var(--ch-t-marg) var(--ch-serif); color: var(--ch-marg); opacity: .7; }
+.ch-fheld { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; padding: 4px 13px 0; }
+.ch-fchip { font: 400 11px var(--ch-sans); font-style: normal; color: var(--ch-ink); }
+.ch-fchip .sz { color: var(--ch-ink-3); }
+.ch-shell .ch-fchip button { padding: 0 2px; color: var(--ch-ink-3); }
+.ch-shell .ch-fchip button:hover { color: var(--ch-ink); }
 .ch-fmarg.fw + .ch-fmarg { padding-inline-start: 10px; }
 .ch-fmarg.fw + .ch-fmarg::before { content: "\00B7"; position: absolute; inset-inline-start: 3px; opacity: .6; }
 

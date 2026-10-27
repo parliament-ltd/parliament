@@ -567,8 +567,16 @@ msgid "blocksBoard.emptySlot"
 msgstr "empty"
 
 #. js-lingui-explicit-id
-msgid "blocksBoard.inputFeatures"
-msgstr "Web search, voice and files come to the bar in piece 6 of this stage."
+msgid "blocksBoard.input.files"
+msgstr "Files"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.input.voice"
+msgstr "Voice"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.input.webSearch"
+msgstr "Web search"
 
 #. js-lingui-explicit-id
 msgid "blocksBoard.moveDown"
@@ -1902,6 +1910,31 @@ msgstr "Asks are for replies. In your prompt, strike or type over it"
 #. js-lingui-explicit-id
 msgid "enter.askOpen"
 msgstr "Enter opens the ask box on the words you selected in a reply, or where the cursor was"
+
+#. js-lingui-explicit-id
+msgid "enter.attachFull"
+msgstr "The next prompt holds {most} files already, the most it takes"
+
+#. js-lingui-explicit-id
+msgid "enter.attachGo"
+msgstr "Enter opens the file picker. The files go with your next prompt only"
+
+#. js-lingui-explicit-id
+msgid "enter.attachHeld"
+msgstr "{count, plural, one {# file goes} other {# files go}} with your next prompt: {files}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.attachNotHere"
+msgstr "Files are off in {room}. set:input files on turns them on"
+
+#. js-lingui-explicit-id
+msgid "enter.attachPicking"
+msgstr "Choose files in the picker"
+
+#. js-lingui-explicit-id
+msgid "enter.attachRefused"
+msgstr "{name}: {why}"
 
 #. js-lingui-explicit-id
 msgid "enter.backupDoneLocked"
@@ -3864,6 +3897,22 @@ msgid "enter.promptFailed"
 msgstr "The prompt did not go through. Try again"
 
 #. js-lingui-explicit-id
+msgid "enter.promptFilesGo"
+msgstr "{count, plural, one {# file goes} other {# files go}} with it: {files}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptFilesOut"
+msgstr "{files} {count, plural, one {stays} other {stay}} out: {name} is not given images or PDFs here"
+
+#. js-lingui-explicit-id
+msgid "enter.promptFilesPrivacy"
+msgstr "The privacy filter reads text files, not images or PDFs"
+
+#. js-lingui-explicit-id
+msgid "enter.promptFilesSource"
+msgstr "{name} is sent the words alone; the files wait for a model"
+
+#. js-lingui-explicit-id
 msgid "enter.promptFrameworks"
 msgstr "{count, plural, one {Framework {frameworks} goes with it} other {Frameworks {frameworks} go with it, in that order}}"
 
@@ -4161,6 +4210,14 @@ msgstr "{count, plural, other {Enter sends this to {nums}, each carrying its own
 #. js-lingui-explicit-id
 msgid "enter.promptTranslateLater"
 msgstr "Its answer comes in English. translate: puts it in {language} afterwards"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWebGo"
+msgstr "It may search the web: up to {most} searches, about {cost} each, on top of the tokens"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWebSome"
+msgstr "{whos} cannot search the web, and {count, plural, one {goes} other {go}} without it"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5362,6 +5419,33 @@ msgstr "Enter takes {tag} off {nums}"
 msgid "enter.untagAll"
 msgstr "{count, plural, one {Enter takes {tag} off the one thing that carries it} other {Enter takes {tag} off all # things that carry it}}"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.webAlready"
+msgstr "Web search is held for the next prompt already. web:off drops it"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.webCannot"
+msgstr "{name} cannot search the web here. by: a model that can"
+
+#. js-lingui-explicit-id
+msgid "enter.webDrop"
+msgstr "Enter drops web search from the next prompt"
+
+#. js-lingui-explicit-id
+msgid "enter.webHoldGo"
+msgstr "Enter lets {name} search the web for your next prompt only"
+
+#. js-lingui-explicit-id
+msgid "enter.webNoneHeld"
+msgstr "Web search is not held for the next prompt"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.webNotHere"
+msgstr "Web search is off in {room}. set:input web on turns it on"
+
 #. js-lingui-explicit-id
 msgid "enter.widthAlone"
 msgstr "A board on its own has the whole width"
@@ -5522,6 +5606,23 @@ msgid "field.answeredHelp"
 msgstr "Choose who answers here (by:)"
 
 #. js-lingui-explicit-id
+msgid "field.attach"
+msgstr "attach"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "field.attachHelp"
+msgstr "Attach files to your next prompt (attach:)"
+
+#. js-lingui-explicit-id
+msgid "field.fileDrop"
+msgstr "Take {name} out"
+
+#. js-lingui-explicit-id
+msgid "field.fileKind"
+msgstr "this kind of file is not taken. Try an image, a PDF, or a text or code file"
+
+#. js-lingui-explicit-id
 msgid "field.frameworkHelp"
 msgstr "Choose the frameworks for this chat (framework:)"
 
@@ -5536,6 +5637,14 @@ msgid "field.frameworkSome"
 msgstr "{more, plural, =0 {framework: {first}} other {framework: {first} +#}}"
 
 #. js-lingui-explicit-id
+msgid "field.held"
+msgstr "With your next prompt"
+
+#. js-lingui-explicit-id
+msgid "field.listening"
+msgstr "listening"
+
+#. js-lingui-explicit-id
 msgid "field.toAll"
 msgstr "{count, plural, other {to all #}}"
 
@@ -5546,6 +5655,35 @@ msgstr "to {address} · {name}"
 #. js-lingui-explicit-id
 msgid "field.toSome"
 msgstr "to {nums}"
+
+#. js-lingui-explicit-id
+msgid "field.voice"
+msgstr "voice"
+
+#. js-lingui-explicit-id
+msgid "field.voiceDownload"
+msgstr "Set up voice: your browser downloads a language pack once, then speech stays on this device."
+
+#. js-lingui-explicit-id
+msgid "field.voiceHelp"
+msgstr "Speak your prompt. It is turned into words on this device; no audio leaves it."
+
+#. js-lingui-explicit-id
+msgid "field.voiceOff"
+msgstr "voice off"
+
+#. js-lingui-explicit-id
+msgid "field.voiceOffHelp"
+msgstr "This browser cannot turn speech into words on this device. Here voice would mean sending your audio to the browser’s maker, so it stays off."
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "field.webHelp"
+msgstr "Let the model search the web for your next prompt only (web:)"
+
+#. js-lingui-explicit-id
+msgid "field.webSearch"
+msgstr "web search"
 
 #. js-lingui-explicit-id
 msgid "framework.about.alts"
@@ -5741,6 +5879,14 @@ msgid "guide.o.thinking"
 msgstr "Thinking room"
 
 #. js-lingui-explicit-id
+msgid "guide.o.webNo"
+msgstr "No"
+
+#. js-lingui-explicit-id
+msgid "guide.o.webYes"
+msgstr "Yes, when I ask"
+
+#. js-lingui-explicit-id
 msgid "guide.o.writing"
 msgstr "Writing long pieces"
 
@@ -5763,6 +5909,10 @@ msgstr "What is it called?"
 #. js-lingui-explicit-id
 msgid "guide.q.reach"
 msgstr "What should be in reach?"
+
+#. js-lingui-explicit-id
+msgid "guide.q.web"
+msgstr "Should it search the web?"
 
 #. js-lingui-explicit-id
 msgid "guide.q.where"
@@ -5791,6 +5941,10 @@ msgstr "Take one of these, or write your own."
 #. js-lingui-explicit-id
 msgid "guide.why.reach"
 msgstr "Blocks are the pieces of a room. The Library has more, to add at any time."
+
+#. js-lingui-explicit-id
+msgid "guide.why.web"
+msgstr "Web search is a feature of the room's input. When you ask for it, the model may search, which costs a little more."
 
 #. js-lingui-explicit-id
 msgid "guide.why.where"
@@ -8088,6 +8242,10 @@ msgid "verb.ask"
 msgstr "Ask about the selected words in a reply, in your own words. It goes with your next prompt"
 
 #. js-lingui-explicit-id
+msgid "verb.attach"
+msgstr "Attach files to your next prompt"
+
+#. js-lingui-explicit-id
 msgid "verb.backup"
 msgstr "Download a backup of everything but your keys"
 
@@ -8414,6 +8572,10 @@ msgstr "Remove a tag from some things, or from everything"
 #. js-lingui-explicit-id
 msgid "verb.until"
 msgstr "Show what was made until a date"
+
+#. js-lingui-explicit-id
+msgid "verb.web"
+msgstr "Let the model search the web for your next prompt only"
 
 #. js-lingui-explicit-id
 msgid "verb.width"

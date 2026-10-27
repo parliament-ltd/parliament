@@ -2,6 +2,7 @@ import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { slotsOf, deviceOf, nameOf } from '../lib/lab'
 import { GUIDE, optionOf } from '../lib/labGuide'
+import { featuresOf } from '../lib/inputFeatures'
 
 // The Canvas (stage 13, piece 1; the arrangements spec §5; Lab v7; C238):
 // the room being built, by slot, in its own theme, with the room line above
@@ -63,7 +64,7 @@ function Guide({ guide, mode, layouts, themes, onWrite, onGuide }) {
   )
 }
 
-const FEATURE_WORDS = { 'web-search': COPY.library.featureWebSearch, 'voice-input': COPY.library.featureVoice, 'file-attach': COPY.library.featureAttach }
+const FEATURE_WORDS = { webSearch: COPY.library.featureWebSearch, voice: COPY.library.featureVoice, files: COPY.library.featureAttach }
 
 /**
  * @param {{ addressed: boolean, onAddress: (board: string) => void, onWrite: (text: string) => void, onRun: (line: string) => void,
@@ -79,6 +80,8 @@ export default function CanvasBoard({ addressed, onAddress, onWrite, onRun, room
   const themeKey = nameOf(mode?.scheme?.ref)
   const layout = layouts.find((l) => l.key === layoutKey) ?? null
   const device = deviceOf(mode)
+  // Its input's features, as its settings say (C248 (a)).
+  const onFeatures = mode ? Object.entries(featuresOf(mode)).filter(([, on]) => on).map(([k]) => k) : []
   const blockWord = (b) => (COPY.blocks[b] ? i18n._(COPY.blocks[b]) : b)
   const slotWord = (s) => (COPY.slots[s] ? i18n._(COPY.slots[s]) : s)
   const quoted = (name) => `"${name}"`
@@ -135,7 +138,7 @@ export default function CanvasBoard({ addressed, onAddress, onWrite, onRun, room
                 <section key={s.id} className={`ch-lab-slot${s.blocks.length ? '' : ' empty'}`} data-slot={s.id}>
                   <h3>{slotWord(s.id)}</h3>
                   {s.blocks.length
-                    ? <ul>{s.blocks.map((b) => <li key={b} className={picked === b ? 'sel' : undefined}><button type="button" className="ch-lab-block" aria-pressed={picked === b} onClick={() => onPick(b)}>{blockWord(b)}</button>{b === 'input' && s.features?.length ? <span className="ch-marg ch-lab-feat">{' '}{s.features.map((f) => i18n._(FEATURE_WORDS[f])).join(', ')}</span> : null}</li>)}</ul>
+                    ? <ul>{s.blocks.map((b) => <li key={b} className={picked === b ? 'sel' : undefined}><button type="button" className="ch-lab-block" aria-pressed={picked === b} onClick={() => onPick(b)}>{blockWord(b)}</button>{b === 'input' && onFeatures.length ? <span className="ch-marg ch-lab-feat">{' '}{onFeatures.map((f) => i18n._(FEATURE_WORDS[f])).join(', ')}</span> : null}</li>)}</ul>
                     : <p className="ch-marg">{i18n._(C.emptySlot)}</p>}
                   <p className="ch-marg">{i18n._(s.capacity === 'single' ? (s.full ? C.full : C.roomForOne) : C.roomForMore)}</p>
                 </section>

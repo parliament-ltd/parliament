@@ -56,7 +56,7 @@ export default function BlocksBoard({ addressed, onAddress, onWrite, onRun, room
 
   // One setting's choices, applied on click (a number takes its presets, or is typed).
   const settingRow = (b, comp, s) => {
-    const now = valueOf(s, comp.config)
+    const now = valueOf(s, comp.config, mode)
     const label = words(`${b}.${s.key}`)
     const cmd = (w) => `set:${wordOfBlock(b)} ${s.word} ${w}`
     const pick = (w, shown, on) => (
@@ -90,7 +90,7 @@ export default function BlocksBoard({ addressed, onAddress, onWrite, onRun, room
     const isOpen = open.has(b)
     const settings = settingsOf(b)
     const state = settings.map((s) => {
-      const v = valueOf(s, comp.config)
+      const v = valueOf(s, comp.config, mode)
       const w = wordOfValue(s, v)
       return s.kind === 'choice' && B[`${b}.${s.key}.${w}`] ? words(`${b}.${s.key}.${w}`) : null
     }).filter(Boolean).join(', ')
@@ -124,7 +124,6 @@ export default function BlocksBoard({ addressed, onAddress, onWrite, onRun, room
             {settings.length
               ? settings.map((s) => settingRow(b, comp, s))
               : <div className="ch-crow"><span className="k">{words('settings')}</span><span className="v ch-marg">{words('nothingToSet')}</span></div>}
-            {b === 'input' && <p className="ch-marg">{words('inputFeatures')}</p>}
             <p className="ch-marg ch-bmarg">
               {i > 0 && <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => onWrite(`>place:${w} up`)}>{words('moveUp')}</button>}
               {i < peers.length - 1 && <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => onWrite(`>place:${w} down`)}>{words('moveDown')}</button>}

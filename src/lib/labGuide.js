@@ -1,10 +1,12 @@
-// The guide (stage 13, piece 4; C244 (d), (e); Lab v7): five questions
+// The guide (stage 13, piece 4; C244 (d), (e); Lab v7): six questions
 // that build a room, each answer a command written into the field for
 // Enter to run. Pure: the questions, and what each answer writes and
-// whether the room has it already. Web search joins with piece 6.
+// whether the room has it already. The web search question came with
+// piece 6 (C248 (a)).
 
 import { nameOf } from './lab'
 import { wordOfBlock } from './labBlocks'
+import { featuresOf } from './inputFeatures'
 
 /**
  * The questions in order. `verb` is the command that answers it: the guide
@@ -24,6 +26,7 @@ export const GUIDE = Object.freeze([
     { id: 'context', blocks: ['context'] },
     { id: 'steps', blocks: ['steps'] },
   ] },
+  { id: 'web', verb: 'set', options: [{ id: 'webYes', web: true }, { id: 'webNo', web: false }] },
   { id: 'feel', verb: 'theme', options: [
     { id: 'soft-violet', theme: 'soft-violet' },
     { id: 'deep-calm', theme: 'deep-calm' },
@@ -52,6 +55,7 @@ export function optionOf(option, { mode, layouts = [], themes = [], nameWords = 
     const here = new Set((mode?.components ?? []).map((c) => nameOf(c.ref)))
     return { command: `add:${option.blocks.map(wordOfBlock).join(', ')}`, already: option.blocks.every((b) => here.has(b)) }
   }
+  if (option.web !== undefined) return { command: `set:input web ${option.web ? 'on' : 'off'}`, already: featuresOf(mode).webSearch === option.web }
   if (option.theme) {
     const t = themes.find((x) => x.key === option.theme)
     return { command: t ? `theme:"${t.name}"` : null, already: nameOf(mode?.scheme?.ref) === option.theme }

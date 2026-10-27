@@ -21,6 +21,8 @@ import AnswerPicker from './AnswerPicker'
 import ReplyPicker from './ReplyPicker'
 import FrameworkPicker from './FrameworkPicker'
 import { step as stepBranch } from '../stores/branchView'
+import { useVoiceInput } from '../hooks/useVoiceInput'
+import { formatSize } from '../lib/fileUpload'
 
 // One bar: the field, its Enter line and the ? reference, pointed at one
 // board. The page has one, and so does every popped window (C6: each window
@@ -52,7 +54,7 @@ import { step as stepBranch } from '../stores/branchView'
 // `searchCounts` says what each search leaves, for the Enter line.
 const SEARCHABLE = new Set(['almanac', 'collection', 'settings', 'library'])
 
-export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {} }) {
+export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {}, featureActs = null }) {
   const { i18n } = useLingui()
   const target = useMemo(() => ({ ...arrangement, addressed: board }), [arrangement, board])
   const resting = restingMode(target)
@@ -200,6 +202,31 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
   }
   // The frameworks on this chat: "framework: none", or the first and how many more (C164).
   const names = prompt?.frameworkNames ?? []
+  // Features of input, in the field's marginalia (stage 13, piece 6; C248):
+  // web search held for the next prompt, voice on this device only (C70),
+  // and attaching files. Each only where the room offers it.
+  const feats = prompt?.features ?? null
+  const voice = useVoiceInput({
+    lang: typeof navigator === 'undefined' ? 'en-US' : navigator.language || 'en-US',
+    onTranscript: (said, isFinal) => {
+      if (!isFinal || !said || field.mode !== 'prompt') return
+      const now = field.text.prompt ?? ''
+      dispatch({ type: 'input', value: now ? `${now.replace(/s+$/, '')} ${said}` : said })
+    },
+  })
+  const features = []
+  if (marginalia && feats && featureActs) {
+    if (feats.offered?.webSearch && feats.canSearch) features.push({ key: 'web', words: i18n._(COPY.field.webSearch), on: feats.web, title: i18n._(COPY.field.webHelp), onClick: featureActs.onWeb })
+    if (feats.offered?.voice) {
+      if (voice.isSupported) {
+        features.push({ key: 'voice', words: i18n._(voice.isListening ? COPY.field.listening : COPY.field.voice), on: voice.isListening, title: i18n._(voice.status === 'available' ? COPY.field.voiceHelp : COPY.field.voiceDownload), onClick: () => (voice.isListening ? voice.stop() : voice.start()) })
+      } else if (voice.status !== 'checking') {
+        features.push({ key: 'voice', words: i18n._(COPY.field.voiceOff), off: true, title: i18n._(COPY.field.voiceOffHelp) })
+      }
+    }
+    if (feats.offered?.files) features.push({ key: 'attach', words: i18n._(COPY.field.attach), on: (feats.files?.length ?? 0) > 0, title: i18n._(COPY.field.attachHelp), onClick: featureActs.onAttach })
+  }
+  const heldFiles = marginalia && feats?.files?.length ? feats.files : []
   const frameworksMarg = marginalia
     ? (names.length ? i18n._(COPY.field.frameworkSome, { first: names[0], more: names.length - 1 }) : i18n._(COPY.field.frameworkNone))
     : null
@@ -312,6 +339,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           onMarginalia={onPicker}
           marginaliaOpen={Boolean(picker)}
           frameworks={frameworksMarg}
+          features={features}
           onFrameworks={onFrameworkPicker}
           frameworksOpen={Boolean(frameworkPicker)}
           ink={prompt?.room !== undefined ? prompt?.ink ?? null : null}
@@ -332,6 +360,17 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           onBlur={() => dispatch({ type: 'blur' })}
         />
         </div>
+        {heldFiles.length > 0 && !folded && (
+          <div className="ch-fheld ch-marg" aria-label={i18n._(COPY.field.held)}>
+            <span>{i18n._(COPY.field.held)}</span>
+            {heldFiles.map((f) => (
+              <span key={f.id} className="ch-fchip" dir="auto">
+                {f.name} <span className="sz">{formatSize(f.size)}</span>
+                <button type="button" aria-label={i18n._(COPY.field.fileDrop, { name: f.name })} onMouseDown={(e) => e.preventDefault()} onClick={() => featureActs?.onDropFile(f.id)}>×</button>
+              </span>
+            ))}
+          </div>
+        )}
         <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} told={Boolean(notice)} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} />
         {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
         {!reference && inspect && <Inspect row={inspect} />}

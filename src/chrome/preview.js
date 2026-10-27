@@ -39,6 +39,7 @@ import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, plan
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
 import { planSet } from '../lib/settingVerbs'
+import { planWeb, planAttach } from '../lib/inputFeatures'
 import { planAddBlock, planRmBlock, planPlace, planSetBlock } from '../lib/labBlocks'
 import { findPrivate, KINDS as PRIVATE_KINDS } from '../lib/privacyFilter'
 import { searchWords } from '../lib/searchWords'
@@ -60,7 +61,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -779,6 +780,9 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       device: (a1, s1, sc) => planDevice(s1, sc),
       // local:on and local:off (piece 5; C246 (b)).
       local: (a1, s1, sc) => planLocal(s1, sc),
+      // Features of input in the bar (piece 6; C248 (b), (d)).
+      web: (a1, s1, sc) => planWeb(s1, sc),
+      attach: (a1, s1, sc) => planAttach(s1, sc),
       // A block's place and settings (piece 2; C240).
       // duplicate: a room (piece 3; C242 (e)); a collection's or a plan's comes later.
       duplicate: (a1, s1, sc) => planDuplicate(s1, sc),
@@ -1046,7 +1050,9 @@ export function promptPreview(text, target = {}) {
     if (edits.sweeps) also.push({ message: 'promptSweepsGo', values: { count: edits.sweeps, name: who.name ?? '' } })
     return { ...p, editsOnly: true, says: { ...p.says, also: [...also, ...(p.says.also ?? [])] } }
   }
-  const counted = edits || told ? { ...target, historyChars: (target.historyChars ?? 0) + (edits?.chars ?? 0) + (told?.chars ?? 0) } : target
+  // Text files held for it go inside the prompt and are counted (C248 (d)).
+  const fileChars = target.inputGo?.files?.chars ?? 0
+  const counted = edits || told || fileChars ? { ...target, historyChars: (target.historyChars ?? 0) + (edits?.chars ?? 0) + (told?.chars ?? 0) + fileChars } : target
   const p = Array.isArray(target.many) && target.many.length > 1 ? manyPreview(text, counted) : onePreview(text, counted)
   // Among a prompt's branches (C174): which one it carries on, and that the
   // one being viewed is not it.
@@ -1078,6 +1084,19 @@ export function promptPreview(text, target = {}) {
       : reader
         ? { message: 'promptTellToReader', values: { count: told.count, name: reader.name ?? '', source: first.name ?? target.source ?? '' } }
         : { message: 'promptTellWait', values: { count: told.count, source: first.name ?? target.source ?? '' } })
+  }
+  // Features of input held for this prompt (stage 13, piece 6; C248 (b), (d)).
+  const go = target.inputGo
+  if (go?.web) {
+    lines.push({ message: 'promptWebGo', values: { most: go.web.most, cost: go.web.cost } })
+    if (go.web.cannot?.length) lines.push({ message: 'promptWebSome', values: { whos: go.web.cannot, count: go.web.cannot.length } })
+  }
+  if (go?.files) {
+    const f = go.files
+    if (f.sent.length) lines.push({ message: 'promptFilesGo', values: { count: f.sent.length, files: f.sent } })
+    if (f.out.length) lines.push({ message: 'promptFilesOut', values: { files: f.out, count: f.out.length, name: f.outBy ?? '' } })
+    if (f.source) lines.push({ message: 'promptFilesSource', values: { name: f.source } })
+    if (f.privacy) lines.push({ message: 'promptFilesPrivacy' })
   }
   if (target.toBranch) lines.push({ message: 'promptToBranch', values: { address: target.toBranch } })
   if (target.carriesOn) lines.push({ message: 'promptCarriesOn', values: target.carriesOn })

@@ -62,8 +62,8 @@ describe('naming a block (C240 (b))', () => {
     expect(slotForWord('left', layouts[1])).toBe('outline')
     expect(slotForWord('canvas', layouts[0])).toBeNull()
   })
-  it('shows the fourteen settings something reads', () => {
-    expect(BLOCK_SETTINGS).toHaveLength(14)
+  it('shows the settings something reads, and the three features of input', () => {
+    expect(BLOCK_SETTINGS).toHaveLength(17)
     expect(valueOf(BLOCK_SETTINGS.find((s) => s.key === 'displayMode'), { displayMode: 'nonsense' })).toBe('meter')
   })
 })

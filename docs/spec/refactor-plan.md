@@ -532,7 +532,7 @@ The piece with the most risk in it. It starts with a spike, not with building.
 
 ### Stage 13. The Lab
 
-**Status, 27 October: proposed in seven pieces as C238, ruled the same day:** features of input in this stage, local-only rooms in piece 5. **Piece 1 built (C239):** the Lab, the Canvas and the room commands. **Piece 2 built (C241):** the Blocks board, `add:`, `rm:`, `place:` and a block's `set:`. **Piece 3 built (C243):** the Library in full, ticking, details in place, `duplicate:`. **Piece 4 built (C245):** trying a room with `p>`, the room opening beside the Canvas, and the guide. **Piece 5 built (C247):** rooms built for a phone, and local-only rooms (`local:on`, the `localOnly` field).
+**Status, 27 October: proposed in seven pieces as C238, ruled the same day:** features of input in this stage, local-only rooms in piece 5. **Piece 1 built (C239):** the Lab, the Canvas and the room commands. **Piece 2 built (C241):** the Blocks board, `add:`, `rm:`, `place:` and a block's `set:`. **Piece 3 built (C243):** the Library in full, ticking, details in place, `duplicate:`. **Piece 4 built (C245):** trying a room with `p>`, the room opening beside the Canvas, and the guide. **Piece 5 built (C247):** rooms built for a phone, and local-only rooms (`local:on`, the `localOnly` field). **Piece 6 built (C249):** web search, voice and files in the bar, as features of a room's input.
 
 Built to Lab v7 (A2). Can run beside the others once stage 3 exists.
 

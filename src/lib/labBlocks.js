@@ -13,6 +13,7 @@
 // { key, name }), where each fits from screens.lab.fitsOf.
 
 import { nameOf, FEATURES, planLayoutChange } from './lab'
+import { legacyOn } from './inputFeatures'
 
 const STAYS = new Set(['messages', 'input'])
 
@@ -29,6 +30,10 @@ const BLOCK_WORDS = Object.freeze({
  * kind: a switch (on, off), a choice (word → value) or a number (min, max).
  */
 export const BLOCK_SETTINGS = Object.freeze([
+  // Features of input (piece 6; C248 (a)): unset, on where the room has the old block.
+  { block: 'input', key: 'webSearch', word: 'web', kind: 'switch', fallback: false, legacy: true },
+  { block: 'input', key: 'voice', word: 'voice', kind: 'switch', fallback: false, legacy: true },
+  { block: 'input', key: 'files', word: 'files', kind: 'switch', fallback: false, legacy: true },
   { block: 'branches', key: 'showParentLink', word: 'parent', kind: 'switch', fallback: true },
   { block: 'branches', key: 'defaultBranchMode', word: 'mode', kind: 'choice', choices: { full: 'full-history', summary: 'compressed-summary' }, fallback: 'full-history' },
   { block: 'branches', key: 'showCompressButton', word: 'compress', kind: 'switch', fallback: true },
@@ -49,8 +54,9 @@ export const BLOCK_SETTINGS = Object.freeze([
 export const settingsOf = (block) => BLOCK_SETTINGS.filter((s) => s.block === block)
 
 /** A setting's value in a room's block, as it stands (its default when unset). */
-export function valueOf(setting, config) {
+export function valueOf(setting, config, mode = null) {
   const v = config?.[setting.key]
+  if (setting.kind === 'switch' && v === undefined && setting.legacy) return legacyOn(setting.key, mode)
   if (setting.kind === 'switch') return v === undefined ? setting.fallback : v !== false
   if (setting.kind === 'choice') return Object.values(setting.choices).includes(v) ? v : setting.fallback
   return typeof v === 'number' && Number.isFinite(v) ? v : setting.fallback
@@ -315,7 +321,7 @@ export function planSetBlock(step, screens = {}) {
     if (!Number.isInteger(num) || num < setting.min || num > setting.max) return { says: { message: 'setBlockNumber', values: { word: setting.word, min: setting.min, max: setting.max } }, act: null }
     value = num
   }
-  if (valueOf(setting, comp.config) === value) return { says: { message: 'setBlockSame', values: { block: block.key, word: setting.word, value: wordOfValue(setting, value) } }, act: null }
+  if (valueOf(setting, comp.config, r.mode) === value) return { says: { message: 'setBlockSame', values: { block: block.key, word: setting.word, value: wordOfValue(setting, value) } }, act: null }
   // A pinned plan's number pins the step list to it (C202).
   const extra = block.key === 'steps' && setting.key === 'plan' ? { follow: 'a pinned plan' } : {}
   const components = (r.mode.components ?? []).map((c) => (c.id === comp.id ? { ...c, config: { ...(c.config ?? {}), ...extra, [setting.key]: value } } : c))

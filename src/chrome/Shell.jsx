@@ -15,7 +15,7 @@ import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown, stepsMade } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
 import { openPopout, closePopout, placePopout, onPopoutClosed } from '../shell/popout'
-import { keepKeys, metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal, localAway, helperOf, translatorFor, translateText, browserTranslation } from '../net'
+import { availableTools, keepKeys, metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal, localAway, helperOf, translatorFor, translateText, browserTranslation } from '../net'
 import { replyLanguageOf, withReplyLanguage, sourceAskLanguage, translateInto, nameOf, baseOf } from '../lib/languages'
 import { piecesOfAnswer, translationOf, lastSourceAnswer, BY_BROWSER } from '../lib/translations'
 import { findPrivate } from '../lib/privacyFilter'
@@ -87,6 +87,8 @@ import CanvasBoard from './CanvasBoard'
 import BlocksBoard from './BlocksBoard'
 import { guideAfter } from '../lib/labGuide'
 import { TRIED_TAG, localOf } from '../lib/lab'
+import { featuresOf, packFiles, isTextFile, MOST_FILES } from '../lib/inputFeatures'
+import { readUploadedFile, categorizeFile, ACCEPTED_FILE_TYPES } from '../lib/fileUpload'
 import { SCHEMES, schemeName } from '../lib/schemes'
 import { roomName as roomNameOfMode } from '../lib/roomNames'
 import { planLabOpen, planLabDone } from '../shell/arrangement'
@@ -166,6 +168,15 @@ async function localBlocked() {
 }
 
 // source: the name of the source asked, when one was.
+// Who can search the web and who reads images and PDFs (C248 (b), (d)):
+// today Anthropic's models, by the tools and files their provider takes.
+const webTool = (w) => (w && w.group === 'model' ? availableTools(w.provider).find((t) => t.id === 'web_search') ?? null : null)
+const canSearch = (w) => Boolean(webTool(w))
+const readsFiles = (w) => Boolean(w) && w.group === 'model' && w.provider === 'anthropic'
+// Anthropic's web search: up to 3 searches a prompt (providers/anthropic.js), $10 per 1,000.
+const WEB_SEARCHES = 3
+const WEB_SEARCH_COST = 0.01
+
 function failure(err, source = destination(SOURCE)?.name) {
   if (err?.name === 'AbortError') return null
   if (err?.name === 'Refused') return 'promptChanged'
@@ -1337,6 +1348,17 @@ export default function Shell() {
       remember(body)
       return null
     }
+    // Features of input held for the next prompt (piece 6; C248 (b), (d)).
+    if (what.kind === 'webHold') {
+      setHeldWeb(what.on ? promptKeyNow.current : null)
+      remember(body)
+      return null
+    }
+    if (what.kind === 'attachPick') {
+      const later = pickFiles()
+      remember(body)
+      return { done: true, says: { message: 'attachPicking' }, later }
+    }
     if (what.kind === 'duplicateRoom') {
       // duplicate: (piece 3; C242 (e)): a copy of a room or a template,
       // named, with fresh ids, opened in the Lab; never its chats.
@@ -2013,6 +2035,81 @@ export default function Shell() {
     return { ids, whos, addresses: ids.map(addressOf) }
   }, [targets, heldWho, roomId, conversations, keys, settings.defaultModel, addressOf, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
   const branching = useMemo(() => ({ shown: branchShown, held: heldTo }), [branchShown, heldTo])
+
+  // ── Features of input in the bar (stage 13, piece 6; C248) ──
+  // What the room a prompt goes to offers (its input block's settings), and
+  // what is held for the next prompt only, in this tab, for this room.
+  const featureMode = tryingHere ? labRoom?.mode ?? null : (roomChatRow?.roomId && targetMode?.id === roomChatRow.roomId ? targetMode.mode : null)
+  const offered = useMemo(() => featuresOf(featureMode), [featureMode])
+  const promptKey = tryingHere ? `try:${tryingHere.id}` : String(roomId ?? '')
+  const [heldWeb, setHeldWeb] = useState(null) // the promptKey it is held for
+  const [heldFiles, setHeldFiles] = useState({ key: null, files: [] })
+  const webHere = heldWeb === promptKey && offered.webSearch
+  const filesHere = useMemo(() => (heldFiles.key === promptKey && offered.files ? heldFiles.files : []), [heldFiles, promptKey, offered.files])
+  const filesNow = useRef([])
+  useEffect(() => { filesNow.current = filesHere }, [filesHere])
+  const whosHere = useMemo(() => (heldWho && heldWho.length > 1 ? heldWho : branchTarget?.whos?.length > 1 ? branchTarget.whos : [branchTarget?.whos?.length === 1 ? branchTarget.whos[0] : answerer]), [heldWho, branchTarget, answerer])
+  const inputScreen = useMemo(() => ({
+    room: featureMode ? roomLabel(i18n, roomNameOfMode(featureMode)) : null,
+    offered,
+    canSearch: whosHere.some(canSearch),
+    who: whosHere[0]?.name ?? null,
+    held: { web: webHere, files: filesHere.length },
+  }), [featureMode, offered, whosHere, webHere, filesHere, i18n])
+  // What goes with the next prompt, for its Enter line (C248 (b), (d)).
+  const inputGo = useMemo(() => {
+    const web = webHere && whosHere.some(canSearch)
+      ? { most: WEB_SEARCHES, cost: WEB_SEARCH_COST, cannot: whosHere.length > 1 ? whosHere.filter((w) => !canSearch(w)).map((w) => w.name) : [] }
+      : null
+    let files = null
+    if (filesHere.length) {
+      const first = whosHere[0]
+      const source = first?.group === 'source'
+      const reads = readsFiles(first)
+      const texts = filesHere.filter(isTextFile)
+      const binary = filesHere.filter((f) => !isTextFile(f))
+      files = source
+        ? { sent: [], out: [], source: first.name, chars: 0, privacy: false }
+        : {
+          sent: [...texts, ...(reads ? binary : [])].map((f) => f.name),
+          out: reads ? [] : binary.map((f) => f.name),
+          outBy: first?.name ?? '',
+          source: null,
+          chars: packFiles('', texts).content.length,
+          privacy: (settings.privacyFilter ?? 'off') !== 'off' && reads && binary.length > 0,
+        }
+    }
+    return web || files ? { web, files } : null
+  }, [webHere, filesHere, whosHere, settings.privacyFilter])
+  // A click in the field's marginalia, or web: and attach: (C248 (b), (d)).
+  const pickFiles = useCallback(() => new Promise((resolve) => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.multiple = true
+    input.accept = ACCEPTED_FILE_TYPES
+    input.onchange = async () => {
+      const picked = Array.from(input.files ?? [])
+      const read = []
+      let refused = null
+      for (const file of picked) {
+        if (filesNow.current.length + read.length >= MOST_FILES) { refused = { message: 'attachFull', values: { most: MOST_FILES } }; break }
+        if (!categorizeFile(file)) { refused = { message: 'attachRefused', values: { name: file.name, why: i18n._(COPY.field.fileKind) } }; continue }
+        try {
+          read.push(await readUploadedFile(file))
+        } catch (err) {
+          refused = { message: 'attachRefused', values: { name: file.name, why: String(err?.message ?? '') } }
+        }
+      }
+      const files = [...filesNow.current, ...read]
+      if (read.length) setHeldFiles({ key: promptKeyNow.current, files })
+      resolve(refused ?? (read.length ? { message: 'attachHeld', values: { count: files.length, files: files.map((f) => f.name) } } : null))
+    }
+    input.click()
+  }), [i18n])
+  const promptKeyNow = useRef(promptKey)
+  useEffect(() => { promptKeyNow.current = promptKey }, [promptKey])
+  const dropFile = useCallback((id) => setHeldFiles((h) => ({ ...h, files: h.files.filter((f) => f.id !== id) })), [])
+  const toggleWeb = useCallback(() => setHeldWeb((h) => (h === promptKeyNow.current ? null : promptKeyNow.current)), [])
   const fwStored = roomId ? roomRecord?.frameworks ?? null : pendingFrameworks
   const fwHere = useMemo(() => frameworksOf(fwStored ?? [], fwList).map((fw) => fw.id), [fwStored, fwList])
   const frameworkScreens = useMemo(() => ({ room: roomId, num: roomRecord?.num ?? null, now: fwHere, stored: fwStored, list: fwList, nameOf: nameOfFramework }), [roomId, roomRecord, fwHere, fwStored, fwList, nameOfFramework])
@@ -2684,7 +2781,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -2831,9 +2928,12 @@ export default function Shell() {
     about,
     trying: tryingHere,
     localOnly: localHere,
+    inputGo,
+    // What the field's marginalia offers and holds (C248).
+    features: { offered, web: webHere, canSearch: whosHere.some(canSearch), files: filesHere.map((f) => ({ id: f.id, name: f.name, size: f.size })) },
     // Ripple's checks are skipped in a room that sends only to this computer, when its helper is not on it.
     rippleHeld: Boolean(localHere && !localHere.helperLocal && rippleFacts),
-  }), [tryingHere, localHere, arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere, tellsHere, rippleFacts, reflecting])
+  }), [tryingHere, localHere, inputGo, offered, webHere, filesHere, whosHere, arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere, tellsHere, rippleFacts, reflecting])
 
   // ── Ripple (stage 12, piece 2; C231) ──────────────────
   // What came back for one message, landed (lib/ripple.js landRipple), and
@@ -2925,7 +3025,19 @@ export default function Shell() {
     // tell: notes held here must be the ones the line counted (C225 (d)).
     if (!aboutNow && tellsFor(roomChat ?? '').length !== (shown?.told?.count ?? 0)) return { refused: 'promptChanged' }
     const withInc = (w) => (included && w.group !== 'source' ? { included } : {})
-    const spentInc = (whos) => { if (included && whos.some((w) => w.group !== 'source')) setHeldInclude(null) }
+    const spentInc = (whos) => {
+      if (included && whos.some((w) => w.group !== 'source')) setHeldInclude(null)
+      // Features of input go with this prompt only (C248 (b), (d)).
+      if (shown?.inputGo) { setHeldWeb(null); setHeldFiles({ key: null, files: [] }) }
+    }
+    // Web search for one who can search, files as each may take them, as the line said.
+    const webGoes = Boolean(shown?.inputGo?.web)
+    const filesGo = shown?.inputGo?.files ? filesNow.current : []
+    const featured = (w, words) => {
+      const packed = packFiles(words, filesGo, { source: w.group === 'source', readsFiles: readsFiles(w) })
+      const tool = webGoes ? webTool(w) : null
+      return { content: packed.content, tools: tool ? [tool] : [], attachments: packed.attachments }
+    }
 
     // Ripple (stage 12, piece 2; C231 (f)): when a prompt carrying edits goes
     // to one branch, as the Enter line said; never from a source's branch.
@@ -2952,7 +3064,8 @@ export default function Shell() {
       const sendOne = (c, w) => {
         const fw = frameworksOf(c.frameworks ?? [], fwListNow.current).map((x) => x.id)
         if (w.group === 'source') return askOne(c.id, w)
-        return sendMessage(c.id, text, w.id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), [], null, { frameworks: recordOf(fw, fwListNow.current), ...withInc(w) })
+        const f = featured(w, text)
+        return sendMessage(c.id, f.content, w.id, withReplyLanguage(instructionsOf(fw, fwListNow.current), replyNow.current?.tag ?? null), f.tools, f.attachments, { frameworks: recordOf(fw, fwListNow.current), ...withInc(w) })
       }
       spentInc(whos)
       const all = convs.map((c, i) => (c.id === roomChat && !isReady(roomChat)
@@ -3047,7 +3160,7 @@ export default function Shell() {
         return { done }
       }
       const sendOne = (to, w, i) => (w.group !== 'source'
-        ? sendMessage(to, text, w.id, system(), [], null, { ...under, group, describe: i === 0, ...withInc(w) })
+        ? (() => { const f = featured(w, text); return sendMessage(to, f.content, w.id, system(), f.tools, f.attachments, { ...under, group, describe: i === 0, ...withInc(w) }) })()
         : askOne(to, w, { group }))
       spentInc(whos)
       const first = isReady(id)
@@ -3147,7 +3260,7 @@ export default function Shell() {
     const send = () => {
       const { locale } = latest.current
       return who.group !== 'source'
-        ? sendMessage(id, full, who.id, system(), [], null, { ...under, ...withInc(who), ...joinedInto(text) })
+        ? (() => { const f = featured(who, full); return sendMessage(id, f.content, who.id, system(), f.tools, f.attachments, { ...under, ...withInc(who), ...joinedInto(text) }) })()
         : Promise.all([askSource(id, text, { source: who.id, lang: askIn(locale), fallbackLang: destination(who.id)?.answersIn === 'yours' ? 'en' : null, asked: searched(locale) }), toReader(id)])
     }
     // The edition a source with one in each language is asked in (C166 (e));
@@ -3362,7 +3475,9 @@ export default function Shell() {
   const welcomeHint = useMemo(() => (onWelcome && !welcome.finished ? { next: nextStep(welcome) } : null), [onWelcome, welcome])
   const searches = { almanac: recordsView.search, collection: collectionSearch, settings: settingsSearch, library: librarySearch }
   const searchCounts = { almanac: recordsSearch, collection: { count: collectionShown.cards.length, cards: true }, settings: { count: settingsCount, settings: true }, library: { count: libraryCount, library: true } }
-  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, searches, searchCounts, said: barSaid }
+  // Features of input, from the field's marginalia (C248).
+  const featureActs = useMemo(() => ({ onWeb: toggleWeb, onAttach: () => { pickFiles().then((says) => { if (says) setBarSaid({ says }) }) }, onDropFile: dropFile }), [toggleWeb, pickFiles, dropFile])
+  const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, searches, searchCounts, said: barSaid, featureActs }
   const filtered = isAtRest(recordsView) ? null : { search: recordsView.search.trim(), line: viewLine(recordsView) }
   const drawBoard = (board) => {
     // Each room with its own chat (C175 (a)).

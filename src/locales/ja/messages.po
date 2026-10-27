@@ -567,7 +567,15 @@ msgid "blocksBoard.emptySlot"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "blocksBoard.inputFeatures"
+msgid "blocksBoard.input.files"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.input.voice"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.input.webSearch"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1901,6 +1909,31 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.askOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.attachFull"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.attachGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.attachHeld"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.attachNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.attachPicking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.attachRefused"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3864,6 +3897,22 @@ msgid "enter.promptFailed"
 msgstr "プロンプトを送信できませんでした。もう一度お試しください"
 
 #. js-lingui-explicit-id
+msgid "enter.promptFilesGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptFilesOut"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptFilesPrivacy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptFilesSource"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.promptFrameworks"
 msgstr "{count, plural, =1 {方針{frameworks}も一緒に送ります} other {方針{frameworks}も、この順で一緒に送ります}}"
 
@@ -4161,6 +4210,14 @@ msgstr "{count, plural, other {Enterで{nums}に送信します。それぞれ�
 #. js-lingui-explicit-id
 msgid "enter.promptTranslateLater"
 msgstr "回答は英語で届きます。あとで translate: を使うと{language}に翻訳できます"
+
+#. js-lingui-explicit-id
+msgid "enter.promptWebGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptWebSome"
+msgstr ""
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -5362,6 +5419,33 @@ msgstr "Enterで{nums}から{tag}タグを外します"
 msgid "enter.untagAll"
 msgstr "{count, plural, =1 {Enterで、{tag}タグが付いている1件からタグを外します} other {Enterで、{tag}タグが付いている#件すべてからタグを外します}}"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.webAlready"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.webCannot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.webDrop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.webHoldGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.webNoneHeld"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.webNotHere"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.widthAlone"
 msgstr "ボードが1つだけのときは、幅全体を使います"
@@ -5522,6 +5606,23 @@ msgid "field.answeredHelp"
 msgstr "ここで答えるものを選ぶ（by:）"
 
 #. js-lingui-explicit-id
+msgid "field.attach"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "field.attachHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.fileDrop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.fileKind"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "field.frameworkHelp"
 msgstr "このチャットの方針を選ぶ（framework:）"
 
@@ -5536,6 +5637,14 @@ msgid "field.frameworkSome"
 msgstr "{more, plural, =0 {framework: {first}} other {framework: {first} +#}}"
 
 #. js-lingui-explicit-id
+msgid "field.held"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.listening"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "field.toAll"
 msgstr "{count, plural, other {#件すべてへ}}"
 
@@ -5546,6 +5655,35 @@ msgstr "{address}（{name}）へ"
 #. js-lingui-explicit-id
 msgid "field.toSome"
 msgstr "{nums}へ"
+
+#. js-lingui-explicit-id
+msgid "field.voice"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.voiceDownload"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.voiceHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.voiceOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.voiceOffHelp"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "field.webHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.webSearch"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "framework.about.alts"
@@ -5741,6 +5879,14 @@ msgid "guide.o.thinking"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "guide.o.webNo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "guide.o.webYes"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "guide.o.writing"
 msgstr ""
 
@@ -5762,6 +5908,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "guide.q.reach"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "guide.q.web"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5790,6 +5940,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "guide.why.reach"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "guide.why.web"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -8088,6 +8242,10 @@ msgid "verb.ask"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "verb.attach"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.backup"
 msgstr "キー以外のすべてをバックアップとしてダウンロードする"
 
@@ -8414,6 +8572,10 @@ msgstr "いくつか、またはすべてのものからタグを外す"
 #. js-lingui-explicit-id
 msgid "verb.until"
 msgstr "ある日付までに作ったものを表示する"
+
+#. js-lingui-explicit-id
+msgid "verb.web"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.width"

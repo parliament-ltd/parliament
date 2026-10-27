@@ -567,7 +567,15 @@ msgid "blocksBoard.emptySlot"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "blocksBoard.inputFeatures"
+msgid "blocksBoard.input.files"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.input.voice"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.input.webSearch"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1901,6 +1909,31 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.askOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.attachFull"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.attachGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.attachHeld"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.attachNotHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.attachPicking"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.attachRefused"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -3864,6 +3897,22 @@ msgid "enter.promptFailed"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.promptFilesGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptFilesOut"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptFilesPrivacy"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptFilesSource"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.promptFrameworks"
 msgstr ""
 
@@ -4160,6 +4209,14 @@ msgstr ""
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.promptTranslateLater"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptWebGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptWebSome"
 msgstr ""
 
 #. Commands stay English
@@ -5362,6 +5419,33 @@ msgstr ""
 msgid "enter.untagAll"
 msgstr ""
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.webAlready"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.webCannot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.webDrop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.webHoldGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.webNoneHeld"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.webNotHere"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.widthAlone"
 msgstr ""
@@ -5522,6 +5606,23 @@ msgid "field.answeredHelp"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "field.attach"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "field.attachHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.fileDrop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.fileKind"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "field.frameworkHelp"
 msgstr ""
 
@@ -5536,6 +5637,14 @@ msgid "field.frameworkSome"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "field.held"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.listening"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "field.toAll"
 msgstr ""
 
@@ -5545,6 +5654,35 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "field.toSome"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.voice"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.voiceDownload"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.voiceHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.voiceOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.voiceOffHelp"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "field.webHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "field.webSearch"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5741,6 +5879,14 @@ msgid "guide.o.thinking"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "guide.o.webNo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "guide.o.webYes"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "guide.o.writing"
 msgstr ""
 
@@ -5762,6 +5908,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "guide.q.reach"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "guide.q.web"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5790,6 +5940,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "guide.why.reach"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "guide.why.web"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -8088,6 +8242,10 @@ msgid "verb.ask"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "verb.attach"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "verb.backup"
 msgstr ""
 
@@ -8413,6 +8571,10 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.until"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "verb.web"
 msgstr ""
 
 #. js-lingui-explicit-id
