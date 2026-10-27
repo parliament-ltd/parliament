@@ -16,6 +16,22 @@ import { useIsStreaming, useMessages } from './chatHooks'
 import { forModel, cutReason } from './sendHistory'
 import { veilRequest, createVeil, withoutPrivate } from '../lib/privacyFilter'
 import { summaryTurns } from '../lib/branchSummary'
+import { loadMode } from '../lib/modes'
+
+// A room that sends only to models on this computer (stage 13, piece 5;
+// C246 (d)): checked again here, at the moment of sending, wherever the
+// send began (a typed prompt, a resend, a continue, a plan's run), so
+// nothing of its chats reaches a hosted model or a source.
+async function heldToThisComputer(conversationId, to) {
+  const conv = await getConversation(conversationId).catch(() => null)
+  if (!conv?.room) return
+  const mode = await loadMode(conv.room).catch(() => null)
+  if (mode?.localOnly === true && destination(to)?.kind !== 'local') {
+    const err = new Error('This room sends only to models on this computer')
+    err.name = 'LocalOnly'
+    throw err
+  }
+}
 
 // The open chat, for today's screens (refactor-plan.md, stages 3 and 4;
 // state audit §11a; C109).
@@ -307,6 +323,7 @@ export function ChatProvider({ children }) {
     // went into this prompt's words and are not told again (C214 (c)).
     // One reply at a time in a chat; other chats are free.
     if (streamingIn(conversationId)) return
+    await heldToThisComputer(conversationId, providerOf(model))
 
     // There is now a chat worth keeping, and a click led here: ask the
     // browser, once, to keep Parliament's storage (C88).
@@ -554,6 +571,7 @@ export function ChatProvider({ children }) {
   // it and the one cut off stays as it was.
   const resendWhole = useCallback(async (conversationId, model, systemPrompt = '', { frameworks = null } = {}) => {
     if (streamingIn(conversationId)) return
+    await heldToThisComputer(conversationId, providerOf(model))
     const held = hasMessages(conversationId) ? heldMessages(conversationId) : await getMessages(conversationId)
     let at = -1
     for (let i = held.length - 1; i >= 0; i--) if (held[i].role === 'user') { at = i; break }
@@ -627,6 +645,7 @@ export function ChatProvider({ children }) {
   // in the first (Wikipedia: the English one, LPN §6).
   const askSource = useCallback(async (conversationId, question, { source = 'wikipedia', lang, asked = null, fallbackLang = null, group = null, step = null } = {}) => {
     if (streamingIn(conversationId)) return
+    await heldToThisComputer(conversationId, source)
     askToKeepStorage({ getSetting, setSetting }).catch(() => {})
 
     // The privacy filter (C167 (e); C179): a search for a placeholder finds
@@ -752,6 +771,7 @@ export function ChatProvider({ children }) {
   const continueMessage = useCallback(async (incompleteMessageId, model, systemPrompt = '', inChat = null) => {
     const conversationId = inChat ?? activeRef.current
     if (!conversationId || streamingIn(conversationId)) return
+    await heldToThisComputer(conversationId, providerOf(model))
     const currentMessages = heldMessages(conversationId)
     const incompleteMsg = currentMessages.find(m => m.id === incompleteMessageId)
     if (!incompleteMsg) return

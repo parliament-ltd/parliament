@@ -233,3 +233,24 @@ export function planDuplicate(step, screens = {}) {
 
 /** The tag a chat started by trying a room carries (C244 (c)): one fixed word, like favorite. */
 export const TRIED_TAG = 'tried'
+
+/**
+ * local:on and local:off (C246 (b), (c)): whether the room sends only to
+ * models on this computer. On, the room carries localOnly: true; off, the
+ * field is taken away, so a room never set keeps the record it has.
+ */
+export function planLocal(step, screens = {}) {
+  const room = roomOf(screens)
+  if (!room) return { says: { message: 'labNoRoom' }, act: null }
+  const word = step.match?.values?.[0]?.value
+  if (word !== 'on' && word !== 'off') return { says: { message: 'localWhich' }, act: null }
+  const on = word === 'on'
+  if ((room.mode.localOnly === true) === on) return { says: { message: 'localSame', values: { on: word } }, act: null }
+  const after = { ...room.mode }
+  if (on) after.localOnly = true
+  else delete after.localOnly
+  return { says: { message: 'localGo', values: { room: room.name, on: word } }, act: change(room, after) }
+}
+
+/** Whether a room sends only to models on this computer. */
+export const localOf = (mode) => mode?.localOnly === true

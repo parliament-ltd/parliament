@@ -334,6 +334,8 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.theme', message: "Choose a room's colours and type" } }),
   v({ verb: 'device', group: 'building', example: 'device:desktop', forms: ['device:desktop', 'device:mobile'], takes: [[['desktop', 'mobile']]], on: BUILDING, stage: 13, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.device', message: 'Say what the room is built for' } }),
+  v({ verb: 'local', group: 'building', example: 'local:on', forms: ['local:on', 'local:off'], takes: [[['on', 'off']]], on: BUILDING, stage: 13, undoable: true, click: 'apply',
+    gloss: /*i18n*/ { id: 'verb.local', message: 'Say whether a room sends only to models on this computer' } }),
   v({ verb: 'set', group: 'building', example: 'set:notes order oldest', forms: ['set:notes order oldest', 'set:contents most 50', 'set:default haiku'],
     takes: [[], ['word', { many: 'text' }]], on: [...BUILDING, 'settings'], stage: 9, undoable: true, click: 'apply',
     gloss: /*i18n*/ { id: 'verb.set', message: 'Change a setting of a block or of Parliament. The Enter line states the change in full' } }),

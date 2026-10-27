@@ -65,6 +65,7 @@ export function catalogueItems({
     // For the Library's details (C242 (c)): the blocks by key, and what it is built for.
     blockKeys: (mode?.components ?? []).map((c) => bare(c?.ref)).filter((b) => b && !FEATURES.includes(b)),
     device: mode?.deviceClass === 'visual-touch-phone' ? 'mobile' : 'desktop',
+    localOnly: mode?.localOnly === true,
   })
   // A room made from a template keeps the template's description until its
   // owner writes another, so it reads in the reader's language too.

@@ -829,6 +829,10 @@ msgid "branches.writing"
 msgstr "writing"
 
 #. js-lingui-explicit-id
+msgid "canvas.anyone"
+msgstr "anyone"
+
+#. js-lingui-explicit-id
 msgid "canvas.builtFor"
 msgstr "Built for"
 
@@ -884,8 +888,16 @@ msgid "canvas.runs"
 msgstr "Runs {command}; undo: takes it back"
 
 #. js-lingui-explicit-id
+msgid "canvas.sendsTo"
+msgstr "Sends to"
+
+#. js-lingui-explicit-id
 msgid "canvas.theme"
 msgstr "Theme"
+
+#. js-lingui-explicit-id
+msgid "canvas.thisComputer"
+msgstr "this computer only"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -3065,6 +3077,33 @@ msgid "enter.leaveSearch"
 msgstr "Escape goes back to search"
 
 #. js-lingui-explicit-id
+msgid "enter.localGo"
+msgstr "{on, select, on {Enter makes {room} send only to models on this computer} other {Enter lets {room} send to any model or source again}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.localOnlyHelper"
+msgstr "{room} sends only to models on this computer, and the helper, {name}, is not one. helper: a model on this computer first"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.localOnlyNoHelper"
+msgstr "{room} sends only to models on this computer, and there is no helper on it. helper: a model on this computer first"
+
+#. js-lingui-explicit-id
+msgid "enter.localOnlyStopped"
+msgstr "Nothing was sent: this room sends only to models on this computer"
+
+#. js-lingui-explicit-id
+msgid "enter.localSame"
+msgstr "{on, select, on {It sends only to models on this computer already} other {It sends to anyone already}}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.localWhich"
+msgstr "local: takes on or off"
+
+#. js-lingui-explicit-id
 msgid "enter.manyFailed"
 msgstr "The branches could not all be made, so nothing was sent. Try again"
 
@@ -3866,6 +3905,15 @@ msgstr "{name} answers here and is not built yet. by: chooses another"
 #. js-lingui-explicit-id
 msgid "enter.promptLocalLong"
 msgstr "This chat is about {tokens, number} tokens. {name} may read only the last {reads, number} or so, unless {provider} is set to read more"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptLocalOnly"
+msgstr "{room} sends only to models on this computer, and {name} is not one. by: a model on this computer, or local:off"
+
+#. js-lingui-explicit-id
+msgid "enter.promptLocalRipple"
+msgstr "Ripple does not check from here: its helper is not on this computer"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -6158,6 +6206,10 @@ msgid "library.close"
 msgstr "close"
 
 #. js-lingui-explicit-id
+msgid "library.dAnyone"
+msgstr "anyone"
+
+#. js-lingui-explicit-id
 msgid "library.dBlocks"
 msgstr "Blocks"
 
@@ -6194,12 +6246,20 @@ msgid "library.dPlaces"
 msgstr "Places"
 
 #. js-lingui-explicit-id
+msgid "library.dSendsTo"
+msgstr "Sends to"
+
+#. js-lingui-explicit-id
 msgid "library.dSettings"
 msgstr "Settings"
 
 #. js-lingui-explicit-id
 msgid "library.dTheme"
 msgstr "Theme"
+
+#. js-lingui-explicit-id
+msgid "library.dThisComputer"
+msgstr "this computer only"
 
 #. js-lingui-explicit-id
 msgid "library.duplicate"
@@ -8166,6 +8226,10 @@ msgstr "Choose the shape of a room"
 #. js-lingui-explicit-id
 msgid "verb.library"
 msgstr "Bring the Library beside what is on screen, or one shelf of it"
+
+#. js-lingui-explicit-id
+msgid "verb.local"
+msgstr "Say whether a room sends only to models on this computer"
 
 #. js-lingui-explicit-id
 msgid "verb.markup"

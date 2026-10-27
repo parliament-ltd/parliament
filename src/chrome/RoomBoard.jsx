@@ -88,7 +88,6 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
   const [found, setFound] = useState({ forId: null, chat: null, mode: null, error: null })
   const [loadedFor, setLoadedFor] = useState(null)
   const [roomRef, narrow] = useNarrower(ROOM_WIDE)
-  const host = useMemo(() => ({ narrow }), [narrow])
 
   // The chat and its room, as ChatView finds them.
   useEffect(() => {
@@ -138,6 +137,11 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
   const live = useMemo(() => conversations.find((c) => c.id === chatId) ?? null, [conversations, chatId])
   const chat = live ?? (found.forId === chatId ? found.chat : null)
   const scheme = found.mode?.scheme?.ref ? schemeName(found.mode.scheme.ref) : 'parliament'
+  // A room built for a phone draws its narrow form at any width, in a
+  // phone's width (stage 13, piece 5; C246 (a)); one built for a computer,
+  // narrow only when its board is.
+  const phone = found.forId === chatId && found.mode?.deviceClass === 'visual-touch-phone'
+  const host = useMemo(() => ({ narrow: narrow || phone }), [narrow, phone])
   // What the room is called, for its header and the Enter line (C40, C90).
   const named = found.forId === chatId && found.mode ? roomName(found.mode) : null
   const namedKey = JSON.stringify(named)
@@ -161,7 +165,7 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
     return card(<div className="ch-cbody"><p className="ch-marg">{i18n._(words)}</p></div>)
   }
   return card(
-    <div className="ch-room" data-scheme={scheme} ref={roomRef}>
+    <div className={`ch-room${phone ? ' phone' : ''}`} data-scheme={scheme} ref={roomRef}>
       {ready && (
         <RoomHost.Provider value={host}>
           <ConversationScope.Provider value={chatId}>

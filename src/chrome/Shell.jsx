@@ -86,7 +86,7 @@ import ReflectionBoard from './ReflectionBoard'
 import CanvasBoard from './CanvasBoard'
 import BlocksBoard from './BlocksBoard'
 import { guideAfter } from '../lib/labGuide'
-import { TRIED_TAG } from '../lib/lab'
+import { TRIED_TAG, localOf } from '../lib/lab'
 import { SCHEMES, schemeName } from '../lib/schemes'
 import { roomName as roomNameOfMode } from '../lib/roomNames'
 import { planLabOpen, planLabDone } from '../shell/arrangement'
@@ -174,6 +174,8 @@ function failure(err, source = destination(SOURCE)?.name) {
   // privacy:names could not find names on this computer: nothing was sent (C169).
   if (err?.name === 'NamesUnchecked') return 'namesUnchecked'
   if (err?.name === 'PrivateOnly') return 'privacySearchEmpty'
+  // A room that sends only to this computer, checked at the moment of sending (C246 (d)).
+  if (err?.name === 'LocalOnly') return 'localOnlyStopped'
   if (err?.kept) return 'replyCut'
   if (err?.name === 'SourceError') {
     // A source that turns away the network (some do for shared VPN
@@ -2028,6 +2030,16 @@ export default function Shell() {
   const languageName = useCallback((tag) => nameOf(tag, i18n.locale), [i18n.locale])
   // The model that reads text from sources, and translates it.
   const helperNow = useMemo(() => helperOf({ chosen: settings.helper ?? null, keyed: keys }), [settings.helper, keys, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- a check changes the models
+  // The room a prompt here goes to, when it sends only to this computer
+  // (stage 13, piece 5; C246 (d)): the room tried in the Lab, else the room
+  // on screen. The chat store checks again when anything is sent.
+  const localHere = useMemo(() => {
+    const mode = tryingHere ? labRoom?.mode : (roomChatRow?.roomId && targetMode?.id === roomChatRow.roomId ? targetMode.mode : null)
+    if (!localOf(mode)) return null
+    const isLocal = (w) => Boolean(w) && w.group !== 'source' && destination(w.provider)?.kind === 'local'
+    const usable = helperNow && !helperNow.needsKey && !helperNow.later && !helperNow.gone ? helperNow : null
+    return { room: roomLabel(i18n, roomNameOfMode(mode)), helper: usable?.name ?? null, helperLocal: isLocal(usable), isLocal }
+  }, [tryingHere, labRoom, roomChatRow, targetMode, helperNow, i18n])
 
   // ── Reflection (stage 12, piece 4; C235) ─────────────────
   // What it reads: the room's chat and its plan's other branches. What it
@@ -2672,7 +2684,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -2812,13 +2824,16 @@ export default function Shell() {
     // tell: notes held for it, and the size of their part of the note (C225 (d)).
     told: about || !tellsHere?.length ? null : { count: tellsHere.length, chars: tellNote(tellsHere).length },
     // Ripple's checks when the edits here go (stage 12, piece 2; C231 (d)).
-    ripple: about ? null : rippleFacts,
+    ripple: about || (localHere && !localHere.helperLocal) ? null : rippleFacts,
     reader: answerer.group === 'source' ? readerHere : null,
     ink,
     roomName: roomNameHere,
     about,
     trying: tryingHere,
-  }), [tryingHere, arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere, tellsHere, rippleFacts, reflecting])
+    localOnly: localHere,
+    // Ripple's checks are skipped in a room that sends only to this computer, when its helper is not on it.
+    rippleHeld: Boolean(localHere && !localHere.helperLocal && rippleFacts),
+  }), [tryingHere, localHere, arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere, tellsHere, rippleFacts, reflecting])
 
   // ── Ripple (stage 12, piece 2; C231) ──────────────────
   // What came back for one message, landed (lib/ripple.js landRipple), and

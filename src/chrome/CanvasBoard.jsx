@@ -113,6 +113,16 @@ export default function CanvasBoard({ addressed, onAddress, onWrite, onRun, room
             ))}
           </span>
           <span className="ch-rl-group">
+            <span className="k">{i18n._(C.sendsTo)}</span>
+            {[['off', C.anyone], ['on', C.thisComputer]].map(([w, words]) => {
+              const on = (w === 'on') === (mode.localOnly === true)
+              return (
+                <button key={w} type="button" className={on ? 'on' : undefined} aria-pressed={on}
+                  title={i18n._(C.runs, { command: `local:${w}` })} onClick={() => { if (!on) onRun(`local:${w}`) }}>{i18n._(words)}</button>
+              )
+            })}
+          </span>
+          <span className="ch-rl-group">
             <button type="button" title={i18n._(C.writes, { command: 'name:' })} onClick={() => onWrite(`>name:${quoted(room.name)}`)}>{i18n._(C.name)}</button>
           </span>
         </div>

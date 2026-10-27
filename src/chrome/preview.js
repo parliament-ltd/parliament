@@ -34,7 +34,7 @@ import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
 import { planHoldEdits, planAsk, planUndoChange, planSettle, planDropAsks, planStrike, planTell, planRipple } from '../lib/editVerbs'
 import { planSweep } from '../lib/sweep'
 import { planReflect, reflectTalkPreview } from '../lib/reflection'
-import { planLab, planEdit, planDone, planNewRoom, planLayout, planTheme, planDevice, planLabName, planDuplicate } from '../lib/lab'
+import { planLab, planEdit, planDone, planNewRoom, planLayout, planTheme, planDevice, planLabName, planDuplicate, planLocal } from '../lib/lab'
 import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
@@ -60,7 +60,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -223,6 +223,15 @@ function showCollection(a, id) {
 // take blocks (stage 13, piece 2; C240).
 // The Library too (C242 (b)): its "add to room" writes add:.
 const building = (a) => Boolean(a.lab) && (a.addressed === 'canvas' || a.addressed === 'blocks' || a.addressed === 'library')
+// A room that sends only to this computer (stage 13, piece 5; C246 (d)):
+// the helper's commands go only when the helper is a model on this computer.
+// While such a room is on screen, they are refused whichever chat they name.
+const HELPER_VERBS = new Set(['summarize', 'sweep', 'reflect', 'ripple', 'translate'])
+function heldByRoom(lo) {
+  if (!lo || lo.helperLocal) return null
+  return lo.helper ? { message: 'localOnlyHelper', values: { room: lo.room, name: lo.helper } } : { message: 'localOnlyNoHelper', values: { room: lo.room } }
+}
+
 const addStep = (a, step, screens) => (building(a) ? planAddBlock(step, screens) : planAdd(step, screens))
 const rmStep = (a, step, screens) => (building(a) ? planRmBlock(step, screens) : planRm(step, screens))
 const headingStep = (a, step, screens) => planHeading(step, screens)
@@ -724,6 +733,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       const [arg] = summaryStep.match.values
       return { answer, says: { message: 'aloneSpends', values: { verb: `open:${arg.num}${arg.letter ?? ''} summary` } }, next: null }
     }
+    const held = heldByRoom(screens.localOnly)
+    if (held) return { answer, says: held, next: null }
     const p = openSummary(summaryStep, screens)
     return { answer, says: p.says, next: null, act: p.act }
   }
@@ -766,6 +777,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       layout: (a1, s1, sc) => planLayout(s1, sc),
       theme: (a1, s1, sc) => planTheme(s1, sc),
       device: (a1, s1, sc) => planDevice(s1, sc),
+      // local:on and local:off (piece 5; C246 (b)).
+      local: (a1, s1, sc) => planLocal(s1, sc),
       // A block's place and settings (piece 2; C240).
       // duplicate: a room (piece 3; C242 (e)); a collection's or a plan's comes later.
       duplicate: (a1, s1, sc) => planDuplicate(s1, sc),
@@ -798,6 +811,9 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       restore: () => ({ says: { message: 'restoreOpen' }, act: { kind: 'filePick', then: 'restore' } }),
       import: () => ({ says: { message: 'importOpen' }, act: { kind: 'filePick', then: 'import' } }),
     }
+    // ripple:off asks nothing of the helper.
+    const helperHeld = HELPER_VERBS.has(step.verb) && !(step.verb === 'ripple' && step.match?.values?.[0]?.value === 'off') ? heldByRoom(screens.localOnly) : null
+    if (helperHeld) return { answer, says: helperHeld, next: null }
     const p = plans[step.verb](arrangement, step, screens)
     if (!p) return { answer, says: { message: 'later', values: { verb: `${step.verb}:` } }, next: null }
     return { answer, says: p.says, next: p.next ?? null, act: p.act ?? null }
@@ -984,9 +1000,20 @@ export function promptPreview(text, target = {}) {
   // With the Plan board addressed, a prompt is a step planned; nothing is sent (C198).
   if (target.plan) return planPromptPreview(text, target.plan)
   // With Reflection addressed, the talk about the chat, never the chat (C235 (f)).
-  if (target.reflection) return reflectTalkPreview(text, target.reflection)
+  if (target.reflection) {
+    const held = heldByRoom(target.localOnly)
+    if (held) return { ready: false, says: held }
+    return reflectTalkPreview(text, target.reflection)
+  }
   // A branch a run is sending to takes no prompt by hand until it ends (C196 (f)).
   if (target.branchRunning) return { ready: false, says: { message: 'promptBranchRunning', values: { address: target.branchRunning } } }
+  // A room that sends only to this computer (C246 (d)): each who answers must be on it.
+  const lo = target.localOnly
+  if (lo && target.room !== undefined) {
+    const whos = Array.isArray(target.many) && target.many.length > 1 ? target.many : [target.answerer ?? { group: target.keyed ? 'model' : 'source', name: target.keyed ? target.provider : target.source }]
+    const away = whos.find((w) => !lo.isLocal?.(w))
+    if (away) return { ready: false, says: { message: 'promptLocalOnly', values: { room: lo.room, name: away.name ?? '' } } }
+  }
   if (target.room === undefined) return { ready: false, says: { message: 'promptNoRoom' } }
   // The person's edits waiting here (stage 11, piece 3; C216): they go once
   // with this prompt, to a model, as a note counted in what is sent; a
@@ -1015,6 +1042,7 @@ export function promptPreview(text, target = {}) {
     const also = [{ message: 'promptEditsOnly', values: { ...what, name: who.name ?? '' } }]
     if (told) also.push({ message: 'promptTellGo', values: { count: told.count, name: who.name ?? '' } })
     if (target.ripple && edits.count) also.push(rippleLine(target.ripple))
+    if (target.rippleHeld && edits.count) also.push({ message: 'promptLocalRipple' })
     if (edits.sweeps) also.push({ message: 'promptSweepsGo', values: { count: edits.sweeps, name: who.name ?? '' } })
     return { ...p, editsOnly: true, says: { ...p.says, also: [...also, ...(p.says.also ?? [])] } }
   }
@@ -1035,6 +1063,7 @@ export function promptPreview(text, target = {}) {
   // Ripple's checks when these edits go (stage 12, piece 2; C231 (d)): to one branch only.
   // Only when a model answers here: a source's branch is not checked from (C228 (d)).
   if (target.ripple && edits?.count && !(Array.isArray(target.many) && target.many.length > 1) && toModel(target.answerer ?? { group: target.keyed ? 'model' : 'source' })) lines.push(rippleLine(target.ripple))
+  if (target.rippleHeld && edits?.count) lines.push({ message: 'promptLocalRipple' })
   // Changes accepted from a sweep, told once to the model that answers (C233 (a)).
   const swept = target.edits?.sweeps ?? 0
   if (swept && toModel(target.answerer ?? { group: target.keyed ? 'model' : 'source' })) {

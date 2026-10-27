@@ -829,6 +829,10 @@ msgid "branches.writing"
 msgstr "作成中"
 
 #. js-lingui-explicit-id
+msgid "canvas.anyone"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "canvas.builtFor"
 msgstr ""
 
@@ -884,7 +888,15 @@ msgid "canvas.runs"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "canvas.sendsTo"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "canvas.theme"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.thisComputer"
 msgstr ""
 
 #. Commands stay English
@@ -3065,6 +3077,33 @@ msgid "enter.leaveSearch"
 msgstr "Escapeで検索に戻ります"
 
 #. js-lingui-explicit-id
+msgid "enter.localGo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.localOnlyHelper"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.localOnlyNoHelper"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.localOnlyStopped"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.localSame"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.localWhich"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.manyFailed"
 msgstr "一部のブランチを作れなかったため、何も送信していません。もう一度お試しください"
 
@@ -3866,6 +3905,15 @@ msgstr "ここでは{name}が答えますが、まだ準備中です。by: で�
 #. js-lingui-explicit-id
 msgid "enter.promptLocalLong"
 msgstr "このチャットは約{tokens, number}トークンあります。{provider}で読む量を増やす設定をしない限り、{name}は最後の約{reads, number}トークンしか読まないことがあります"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptLocalOnly"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptLocalRipple"
+msgstr ""
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -6158,6 +6206,10 @@ msgid "library.close"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "library.dAnyone"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "library.dBlocks"
 msgstr ""
 
@@ -6194,11 +6246,19 @@ msgid "library.dPlaces"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "library.dSendsTo"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "library.dSettings"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "library.dTheme"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.dThisComputer"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -8166,6 +8226,10 @@ msgstr "ルームの形を選ぶ"
 #. js-lingui-explicit-id
 msgid "verb.library"
 msgstr "画面の横にライブラリ、またはその棚の1つを出す"
+
+#. js-lingui-explicit-id
+msgid "verb.local"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "verb.markup"

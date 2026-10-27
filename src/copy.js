@@ -839,6 +839,15 @@ export const COPY = {
     duplicateGo: /*i18n*/ { id: 'enter.duplicateGo', message: "Enter copies {name} as {copy} and opens the copy in the Lab. Its chats stay with it" },
     duplicateGone: /*i18n*/ { id: 'enter.duplicateGone', message: 'That room is not here any more' },
     duplicateTemplate: /*i18n*/ { id: 'enter.duplicateTemplate', message: "Enter copies the template {name} as {copy} and opens it in the Lab" },
+    // Local-only rooms (stage 13, piece 5; C246).
+    localWhich: /*i18n*/ { id: 'enter.localWhich', message: "local: takes on or off", comment: 'Commands stay English' },
+    localSame: /*i18n*/ { id: 'enter.localSame', message: "{on, select, on {It sends only to models on this computer already} other {It sends to anyone already}}" },
+    localGo: /*i18n*/ { id: 'enter.localGo', message: "{on, select, on {Enter makes {room} send only to models on this computer} other {Enter lets {room} send to any model or source again}}" },
+    promptLocalOnly: /*i18n*/ { id: 'enter.promptLocalOnly', message: "{room} sends only to models on this computer, and {name} is not one. by: a model on this computer, or local:off", comment: 'Commands stay English' },
+    localOnlyHelper: /*i18n*/ { id: 'enter.localOnlyHelper', message: "{room} sends only to models on this computer, and the helper, {name}, is not one. helper: a model on this computer first", comment: 'Commands stay English' },
+    localOnlyNoHelper: /*i18n*/ { id: 'enter.localOnlyNoHelper', message: "{room} sends only to models on this computer, and there is no helper on it. helper: a model on this computer first", comment: 'Commands stay English' },
+    promptLocalRipple: /*i18n*/ { id: 'enter.promptLocalRipple', message: "Ripple does not check from here: its helper is not on this computer" },
+    localOnlyStopped: /*i18n*/ { id: 'enter.localOnlyStopped', message: "Nothing was sent: this room sends only to models on this computer" },
     // reflect: and the talk about the chat (stage 12, piece 4; C235).
     reflectNoRoom: /*i18n*/ { id: 'enter.reflectNoRoom', message: 'Reflection reads the chat in a room. Open one first: room:', comment: 'Commands stay English' },
     reflectNoKey: /*i18n*/ { id: 'enter.reflectNoKey', message: 'Reflecting on {head} needs a model with a key: api:', comment: 'Commands stay English' },
@@ -1725,6 +1734,9 @@ export const COPY = {
     roomForOne: /*i18n*/ { id: 'canvas.roomForOne', message: 'room for one' },
     full: /*i18n*/ { id: 'canvas.full', message: 'full' },
     emptySlot: /*i18n*/ { id: 'canvas.emptySlot', message: 'empty' },
+    sendsTo: /*i18n*/ { id: 'canvas.sendsTo', message: 'Sends to' },
+    anyone: /*i18n*/ { id: 'canvas.anyone', message: 'anyone' },
+    thisComputer: /*i18n*/ { id: 'canvas.thisComputer', message: 'this computer only' },
     noLayout: /*i18n*/ { id: 'canvas.noLayout', message: 'This room has no layout yet. layout:"Three panels" gives it one.', comment: 'Commands stay English' },
   },
   // The Blocks board (stage 13, piece 2; C240; Lab v7). A setting's label is
@@ -2030,6 +2042,9 @@ export const COPY = {
     dNoRoom: /*i18n*/ { id: 'library.dNoRoom', message: "no room yet" },
     dComputer: /*i18n*/ { id: 'library.dComputer', message: "a computer" },
     dPhone: /*i18n*/ { id: 'library.dPhone', message: "a phone" },
+    dSendsTo: /*i18n*/ { id: 'library.dSendsTo', message: 'Sends to' },
+    dAnyone: /*i18n*/ { id: 'library.dAnyone', message: 'anyone' },
+    dThisComputer: /*i18n*/ { id: 'library.dThisComputer', message: 'this computer only' },
     noMatch: /*i18n*/ { id: 'library.noMatch', message: "Nothing in the Library matches. Try a shorter word, or clear the field." },
   },
 

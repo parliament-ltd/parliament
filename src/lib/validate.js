@@ -278,6 +278,9 @@ function validateMode(item) {
   if (item.layoutConfig && typeof item.layoutConfig !== 'object') {
     return 'mode.layoutConfig must be an object'
   }
+  // A room that sends only to models on this computer (stage 13; C246 (c)):
+  // true or false when present; rooms before it have none.
+  if (item.localOnly !== undefined && typeof item.localOnly !== 'boolean') return 'mode.localOnly must be true or false'
   return null
 }
 

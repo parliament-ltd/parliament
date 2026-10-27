@@ -2810,6 +2810,38 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   **Suggestion:** yes.
 - **(f) What can be tried:** the trial copy has no Ollama, so the refusals can be tried in the browser, and a local answer only in tests. **Suggestion:** say so in the as-built entry.
 
+**C247. Stage 13, piece 5, as built: built for a phone and local-only rooms** (27 October; C246 as suggested; the field approved in C238 (i), (l)).
+- **Built for a phone** (C246 (a)): a room built for a phone draws its layout's narrow form wherever it shows, the side panels behind the button at its top, in a column no wider than 480 pixels, centred. A room built for a computer stays as it was. The room board reads the stored device for the first time.
+- **`local:on` and `local:off`** (C246 (b)):
+  - A new verb in the building group, on the room in the Lab, or out of the Lab on the room on screen.
+  - The Canvas's room line has "Sends to: anyone · this computer only", which applies on click and is echoed ("Ran local:off. undo: takes it back").
+  - The Library's room details say "Sends to".
+- **The stored field** (C246 (c)):
+  - `localOnly: true` on the room record while on; `local:off` takes the field away, so a room never set keeps its record.
+  - Restore's check of a room accepts it only as true or false. Rooms in backups written before have none, and read as "anyone".
+  - The catalogue reads it for the Library.
+- **What it holds back** (C246 (d)):
+  - **A prompt** to a hosted model or a source is refused on the Enter line: "Essay room sends only to models on this computer, and Wikipedia is not one. by: a model on this computer, or local:off". A prompt to several needs every one on this computer.
+  - **The safety net:** the chat store checks again at the moment of sending, for a prompt, a resend, a continue and a source's search, wherever it began (a plan's run included). It reads the chat's room, and stops anything bound off this computer, saying "Nothing was sent: this room sends only to models on this computer".
+  - **The helper's commands** (`summarize:`, `sweep:`, `reflect:`, `ripple:` on, `translate:`, a summary branch) and the talk on the Reflection board are refused while such a room is on screen, unless the helper is a model on this computer ("… and there is no helper on it. helper: a model on this computer first"). `ripple:off` is not refused.
+  - **Ripple's checks** with a prompt are skipped, the line saying "Ripple does not check from here: its helper is not on this computer".
+  - **Title and tags** go to whoever answered, as before.
+- **Not covered:** the room the Enter line knows is the room tried in the Lab, or the room on screen. A prompt into another room's chat by a path the Enter line does not see is stopped by the safety net, not refused beforehand.
+- **Stored data:** the one field above. Nothing else changes; no migration, no version change.
+- **Tests:**
+  - `local:on` and `local:off`, the field set and taken away;
+  - a backup's room with none, true, or a wrong value;
+  - a prompt refused to a hosted model and to a source, and let through to a model on this computer;
+  - the helper's commands refused, `ripple:off` not, and a helper on this computer let through.
+
+  1,298 tests; 30 lint warnings, all older. The safety net in the chat store is not covered by a test (the store cannot load in tests); it was read through, and the Enter line's refusal was tried in the browser. The trial copy has no Ollama, so a local answer was not tried.
+- **Tried in the browser,** on the trial copy:
+  - Essay room and Pocket chat, both built for a phone, drew their narrow form. One widened to 900 pixels kept its room at 480, centred.
+  - `local:on` on Essay room, from its room on screen, stored `localOnly: true` on it alone.
+  - A prompt there was refused, Wikipedia named; `sweep:` was refused, there being no helper.
+  - In the Lab, the Canvas showed "Sends to: this computer only". A click on "anyone" ran `local:off`, echoed it, and the field was gone from the record. The Library's details said "Sends to: anyone".
+- **Next:** piece 6, features of input.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

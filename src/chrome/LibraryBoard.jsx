@@ -85,6 +85,7 @@ function Details({ item, items, onClose }) {
     rows.push([L.dLayout, item.layout ? own(i18n, COPY.layouts, item.layoutWord, item.layout) : i18n._(L.dNone)])
     rows.push([L.dTheme, item.theme ? own(i18n, COPY.themes, item.themeWord, item.theme) : i18n._(L.dNone)])
     rows.push([L.dBuiltFor, i18n._(item.device === 'mobile' ? L.dPhone : L.dComputer)])
+    rows.push([L.dSendsTo, i18n._(item.localOnly ? L.dThisComputer : L.dAnyone)])
     rows.push([L.dBlocks, list((item.blockKeys ?? []).map(block))])
   }
   return (
