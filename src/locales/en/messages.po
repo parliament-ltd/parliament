@@ -1912,6 +1912,61 @@ msgstr "Enter brings {nums} back from the archive"
 msgid "enter.archiveOn"
 msgstr "Enter archives {nums}. Nothing is deleted, and in:archive shows them"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeForget"
+msgstr "Enter forgets the arrangement {name}. undo: brings it back"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeGo"
+msgstr "Enter switches to {name}. undo: brings back the screen as it is"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeGoFocus"
+msgstr "Enter switches to {name}, ending focus. undo: brings back the screen as it is"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeInLab"
+msgstr "arrange: works outside the Lab. done: leaves it first"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeList"
+msgstr "Your arrangements: {names}. arrange:\"name\" switches to one"
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeLong"
+msgstr "A name of at most {max} characters"
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeMany"
+msgstr "Which arrangement: {names}?"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeNone"
+msgstr "No arrangement is saved yet. arrange:save \"a name\" keeps what is on screen"
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeNotFound"
+msgstr "No arrangement is called {said}. Yours are {names}"
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeReplace"
+msgstr "Enter keeps what is on screen as {name}, in place of the one saved under that name"
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeSave"
+msgstr "Enter keeps what is on screen as {name}, windows and their screens included. The chats in rooms are not kept"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeSaveName"
+msgstr "Name it: arrange:save \"review desk\""
+
 #. js-lingui-explicit-id
 msgid "enter.askKeep"
 msgstr "Enter keeps this ask on the words you selected in a reply, or where the cursor was. It goes with your next prompt"
@@ -3354,6 +3409,11 @@ msgstr "A name is at most {max} characters"
 #. js-lingui-explicit-id
 msgid "enter.nameWhichKind"
 msgstr "{name} is a saved search and a collection. Add search or collection after it"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.nameWhichKindAll"
+msgstr "{name} names more than one thing. Add search, collection, framework or arrangement after it"
 
 #. js-lingui-explicit-id
 msgid "enter.newBranch"

@@ -1912,6 +1912,61 @@ msgstr "Enterで{nums}をアーカイブから戻します"
 msgid "enter.archiveOn"
 msgstr "Enterで{nums}をアーカイブします。何も削除されず、in:archive で表示できます"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeForget"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeGo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeGoFocus"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeInLab"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeList"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeMany"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeNotFound"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeReplace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeSave"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeSaveName"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.askKeep"
 msgstr ""
@@ -3354,6 +3409,11 @@ msgstr "名前は{max}文字までです"
 #. js-lingui-explicit-id
 msgid "enter.nameWhichKind"
 msgstr "{name}は保存した検索とコレクションの両方の名前です。後に search か collection を付けてください"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.nameWhichKindAll"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.newBranch"

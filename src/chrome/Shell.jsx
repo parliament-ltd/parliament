@@ -6,7 +6,7 @@ import { COPY } from '../copy'
 import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch, getStorageEstimate, getPlan, getEditsOfChat } from '../lib/db'
 import { renameMode, loadMode, saveMode, createBlankMode, createCopyOfMode, deleteMode } from '../lib/modes'
 import { TEMPLATES } from '../lib/seedTemplates'
-import { loadSpace, saveArrangement } from '../lib/arrangements'
+import { loadSpace, saveArrangement, loadSaved, removeSaved } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
@@ -1351,6 +1351,21 @@ export default function Shell() {
       remember(body)
       return null
     }
+    // Saved arrangements (stage 14, piece 3; C257 (b)).
+    if (what.kind === 'arrangeSave') {
+      await saveArrangement(db.current, what.record)
+      if (touched.current) touched.current.layouts.push({ id: what.record.id, before: what.before })
+      setLayoutsRev((n) => n + 1)
+      remember(body)
+      return null
+    }
+    if (what.kind === 'arrangeForget') {
+      await removeSaved(db.current, what.id)
+      if (touched.current) touched.current.layouts.push({ id: what.id, before: what.before })
+      setLayoutsRev((n) => n + 1)
+      remember(body)
+      return null
+    }
     // A focus set kept with its room (stage 14, piece 1; C253 (b)), and the
     // screen focused on it when the line does that too.
     if (what.kind === 'focusSet') {
@@ -1695,6 +1710,18 @@ export default function Shell() {
       // A chat's own fields (who answers it) are read from the chat list.
       if (entry.records.some((r) => r.store === 'conversations')) loadConversations().catch(() => {})
     }
+    if (entry.layouts) {
+      // Saved arrangements (C257): each put back as it was, or taken away.
+      try {
+        for (const l of [...entry.layouts].reverse()) {
+          if (l.before) await saveArrangement(db.current, l.before)
+          else await removeSaved(db.current, l.id)
+        }
+      } catch {
+        return stop('undoFailed')
+      }
+      setLayoutsRev((n) => n + 1)
+    }
     if (entry.saved) {
       try {
         for (const s of [...entry.saved].reverse()) {
@@ -1791,7 +1818,7 @@ export default function Shell() {
   const onRun = useCallback(async (next, body, go, what) => {
     if (what?.kind === 'undo') return undo(body)
     const before = { arrangement: current.current, view: viewNow.current }
-    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null, many: null, heldTo: null, tell: null, plans: [], messages: [], rooms: [], roomsMade: [] }
+    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null, many: null, heldTo: null, tell: null, plans: [], messages: [], rooms: [], roomsMade: [], layouts: [] }
     const out = what ? await act(what, body, next) : await run(next, body)
     const t = touched.current
     touched.current = null
@@ -1830,7 +1857,8 @@ export default function Shell() {
     if (t.plans.length) entry.plans = t.plans
     if (t.rooms.length) entry.rooms = t.rooms
     if (t.roomsMade.length) entry.roomsMade = t.roomsMade
-    if (body && (entry.rooms || entry.roomsMade || entry.arrangement || entry.view || entry.records || entry.messages || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting || entry.many || entry.heldTo || entry.tell || entry.plans)) {
+    if (t.layouts.length) entry.layouts = t.layouts
+    if (body && (entry.layouts || entry.rooms || entry.roomsMade || entry.arrangement || entry.view || entry.records || entry.messages || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting || entry.many || entry.heldTo || entry.tell || entry.plans)) {
       undoStack.current = [...undoStack.current, entry].slice(-UNDO_MAX)
       setUndoTop(body)
     }
@@ -2048,6 +2076,17 @@ export default function Shell() {
     return { ids, whos, addresses: ids.map(addressOf) }
   }, [targets, heldWho, roomId, conversations, keys, settings.defaultModel, addressOf, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
   const branching = useMemo(() => ({ shown: branchShown, held: heldTo }), [branchShown, heldTo])
+
+  // ── Saved arrangements (stage 14, piece 3; C257) ──
+  const [savedLayouts, setSavedLayouts] = useState([])
+  const [layoutsRev, setLayoutsRev] = useState(0)
+  useEffect(() => {
+    if (!started || !db.current) return undefined
+    let live = true
+    loadSaved(db.current).then((list) => { if (live) setSavedLayouts(list) }, () => {})
+    return () => { live = false }
+  }, [started, layoutsRev])
+  const arrangementsScreen = useMemo(() => ({ saved: savedLayouts }), [savedLayouts])
 
   // ── Calm (stage 14, piece 2; C255) ──
   // A setting of this device (C253 (d)), off for someone new (C253 (c)).
@@ -2827,7 +2866,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, arrangements: arrangementsScreen, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, arrangementsScreen, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).

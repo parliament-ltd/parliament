@@ -19,6 +19,9 @@ import { boardEntry, isRoom } from '../shell/boards'
 import { shipped, shippedFor, SHIPPED, SPACE, RECORDS_COLUMNS } from '../shell/arrangement'
 
 const STORE = 'arrangements'
+/** The kind of id a saved arrangement has, 'saved:…', and the longest name it takes (C257). */
+export const SAVED = 'saved'
+export const NAME_MAX = 80
 const BAR_PLACES = new Set(['top', 'bottom', 'card'])
 const BAR_SIDES = new Set(['left', 'center', 'right'])
 const SIDES = new Set(['left', 'right'])
@@ -33,7 +36,13 @@ const shareValue = (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0.
  * @returns {import('../shell/arrangement').Arrangement|null}
  */
 export function cleanArrangement(record) {
-  if (!record || typeof record !== 'object' || !ID.test(String(record.id)) || !SHIPPED[shippedFor(record.id)]) return null
+  // A saved arrangement (stage 14, piece 3; C257 (d)): 'saved:…', with its
+  // name, read like the space. A version from before skips it.
+  const saved = shippedFor(record?.id) === SAVED
+  const base = saved ? SHIPPED[SPACE] : SHIPPED[shippedFor(record?.id)]
+  if (!record || typeof record !== 'object' || !ID.test(String(record.id)) || !base) return null
+  const name = saved && typeof record.name === 'string' ? record.name.replace(/\s+/g, ' ').trim() : ''
+  if (saved && (!name || Array.from(name).length > NAME_MAX)) return null
   const seen = new Set()
   const known = (b) => typeof b === 'string' && boardEntry(b) && !seen.has(b) && seen.add(b)
   const columns = (Array.isArray(record.columns) ? record.columns : [])
@@ -76,12 +85,13 @@ export function cleanArrangement(record) {
     columns,
     popped,
     addressed: here.includes(record.addressed) ? record.addressed : columns[0][0],
-    bar: { at: BAR_PLACES.has(bar.at) ? bar.at : SHIPPED[shippedFor(record.id)].bar, side: BAR_SIDES.has(bar.side) ? bar.side : 'center', popped: bar.popped === true },
+    bar: { at: BAR_PLACES.has(bar.at) ? bar.at : base.bar, side: BAR_SIDES.has(bar.side) ? bar.side : 'center', popped: bar.popped === true },
     resting: record.resting === 'search' || record.resting === 'prompt' ? record.resting : null,
     context,
     widths,
-    ...(before ? { focus: { columns: before.columns, popped: before.popped, addressed: before.addressed, bar: before.bar } } : {}),
-    ...(beforeLab ? { lab: { columns: beforeLab.columns, popped: beforeLab.popped, addressed: beforeLab.addressed, bar: beforeLab.bar } } : {}),
+    ...(saved ? { name } : {}),
+    ...(before && !saved ? { focus: { columns: before.columns, popped: before.popped, addressed: before.addressed, bar: before.bar } } : {}),
+    ...(beforeLab && !saved ? { lab: { columns: beforeLab.columns, popped: beforeLab.popped, addressed: beforeLab.addressed, bar: beforeLab.bar } } : {}),
     ...(recordsCols ? { recordsCols } : {}),
     ...(lastRoom ? { lastRoom } : {}),
   }
@@ -109,6 +119,20 @@ export async function loadSpace(db, { fresh }) {
   const stored = db.objectStoreNames.contains(STORE) ? cleanArrangement(await db.get(STORE, SPACE)) : null
   if (stored) return stored
   return fresh ? { ...shipped('welcome'), id: SPACE } : shipped(SPACE)
+}
+
+/** Your saved arrangements on this device, by name (C257). */
+export async function loadSaved(db) {
+  if (!db?.objectStoreNames.contains(STORE)) return []
+  const all = await db.getAll(STORE).catch(() => [])
+  return all.filter((r) => shippedFor(r?.id) === SAVED).map(cleanArrangement).filter(Boolean)
+    .sort((x, y) => x.name.localeCompare(y.name))
+}
+
+/** Takes a saved arrangement off this device (forget:, which undo: can take back). */
+export async function removeSaved(db, id) {
+  if (!db?.objectStoreNames.contains(STORE) || shippedFor(id) !== SAVED) return
+  await db.delete(STORE, id)
 }
 
 /**

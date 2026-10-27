@@ -41,6 +41,7 @@ import { planInclude } from '../lib/included'
 import { planSet } from '../lib/settingVerbs'
 import { planWeb, planAttach } from '../lib/inputFeatures'
 import { boardFor, wordFor } from '../shell/boards'
+import { planArrange, planForgetArrangement } from '../lib/savedArrangements'
 import { planAddBlock, planRmBlock, planPlace, planSetBlock } from '../lib/labBlocks'
 import { findPrivate, KINDS as PRIVATE_KINDS } from '../lib/privacyFilter'
 import { searchWords } from '../lib/searchWords'
@@ -62,7 +63,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm', 'arrange'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -198,6 +199,10 @@ function planUndo(a, step, screens = {}) {
 function planForget(a, step, screens = {}) {
   const [arg, which] = step.match?.values ?? []
   const name = typed(arg)
+  // A saved arrangement by its name (stage 14, piece 3; C257 (b)).
+  const desk = which && which.value !== 'arrangement' ? null
+    : (screens.arrangements?.saved ?? []).find((s) => s.name.toLocaleLowerCase() === name.toLocaleLowerCase()) ?? null
+  if (which?.value === 'arrangement') return desk ? planForgetArrangement(desk) : { says: { message: 'forgetNone', values: { name } }, act: null }
   const own = which && which.value !== 'framework' ? null
     : (screens.frameworks?.list ?? []).find((f) => !f.builtIn && (f.name ?? '').toLocaleLowerCase() === name.toLocaleLowerCase()) ?? null
   if (which?.value === 'framework') {
@@ -205,7 +210,8 @@ function planForget(a, step, screens = {}) {
   }
   const search = which?.value === 'collection' ? { found: null, several: [] } : findSaved(screens.records?.saved ?? [], name)
   const coll = which?.value === 'search' ? { found: null, several: [] } : collectionNamed(screens, name)
-  if ([search.found, coll.found, own].filter(Boolean).length > 1) return { says: { message: 'nameWhichKind', values: { name, verb: 'forget:' } }, act: null }
+  if ([search.found, coll.found, own, desk].filter(Boolean).length > 1) return { says: { message: desk ? 'nameWhichKindAll' : 'nameWhichKind', values: { name, verb: 'forget:' } }, act: null }
+  if (desk) return planForgetArrangement(desk)
   if (own) return planForgetFramework(own)
   if (coll.found) return planForgetCollection(coll.found, screens)
   const several = [...search.several, ...coll.several]
@@ -822,6 +828,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       markup: planMarkup,
       // calm: (stage 14, piece 2; C255).
       calm: planCalm,
+      // arrange: (piece 3; C257).
+      arrange: (a1, s1, sc) => planArrange(a1, s1, sc),
       // ask: (stage 11, piece 4; C218 (a)).
       ask: (a1, s1) => planAsk(s1),
       // strikethrough: and tell: (piece 7; C225 (c), (d)).

@@ -3336,6 +3336,37 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 
   **Suggestion:** yes.
 
+**C258. Stage 14, piece 3, as built: saved arrangements** (27 October; C257 as suggested).
+- **`arrange:save "Review desk"`** keeps what is on screen, as C257 (a) says, under that name. It is one step for `undo:`.
+  - The line: "Enter keeps what is on screen as Review desk, windows and their screens included. The chats in rooms are not kept".
+  - A name already used says it replaces that one, and keeps its id.
+- **`arrange:"Review desk"`** (or its start) switches to it, ending focus if focused ("…, ending focus. undo: brings back the screen as it is").
+  - The room in it shows the chat the bar points at; `arrange:"Review desk" 207` puts 207 there.
+  - A desk with several rooms opens the others empty, since chats are not kept: seen in trying a desk of three rooms.
+- **`forget:"Review desk"`** (or with `arrangement` after it) takes it away, and `undo:` brings it back. A name shared with a saved search, collection or framework asks which kind.
+- **Bare `arrange:`** lists them ("Your arrangements: Review desk. arrange:"name" switches to one"), or says none is saved, until piece 4 makes it the map.
+- **The Lab:** all forms but the list say "arrange: works outside the Lab".
+- **Stored data:**
+  - Records `saved:…` in the existing `arrangements` store, with their name, as shown in C257 (d).
+  - `cleanArrangement` reads them like the space: a name of 1 to 80 characters, no focus or Lab "before".
+  - They travel in backups when window layouts are ticked. A version from before skips them.
+  - `name:` and `duplicate:` on them come with the map (C257 (c)).
+- **Tests:**
+  - what one keeps and leaves out;
+  - a name required;
+  - switching with the chat here or one named;
+  - every line of `arrange:`;
+  - forgetting.
+
+  1,320 tests; 30 lint warnings, all older.
+- **Tried in the browser,** on the trial copy:
+  - `arrange:save "Trial desk"` kept the screen.
+  - `focus:` cleared it to 225 and the Collection. `arrange:"Trial"` switched back, ending focus, 225 in the first room and the other two empty. `undo:` returned to the focused screen.
+  - After a reload, `arrange:` listed Trial desk. `forget:` removed it, `undo:` brought it back, and forgetting it again left none.
+
+  The trial copy is as it was.
+- **Next:** piece 4, the screens map.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

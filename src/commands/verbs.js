@@ -184,7 +184,7 @@ export const VERBS = Object.freeze([
     gloss: /*i18n*/ { id: 'verb.summarize', message: 'Write a dated summary of some cards as a note. One model call' } }),
   v({ verb: 'rewrite', group: 'collection', example: 'rewrite:234', takes: [['address']], on: ['collection'], stage: 6, spends: true, undoable: true,
     gloss: /*i18n*/ { id: 'verb.rewrite', message: 'Write a new dated summary beside the old one' } }),
-  v({ verb: 'forget', group: 'collection', example: 'forget:"Surprised me"', forms: ['forget:"Surprised me"', 'forget:"Q2" collection', 'forget:"Editor" framework'], takes: [['text'], ['text', ['search', 'collection', 'framework']]], stage: 6, undoable: true,
+  v({ verb: 'forget', group: 'collection', example: 'forget:"Surprised me"', forms: ['forget:"Surprised me"', 'forget:"Q2" collection', 'forget:"Editor" framework', 'forget:"Review desk" arrangement'], takes: [['text'], ['text', ['search', 'collection', 'framework', 'arrangement']]], stage: 6, undoable: true,
     gloss: /*i18n*/ { id: 'verb.forget', message: 'Remove a saved search, collection, framework of yours or arrangement' } }),
 
   // Tags

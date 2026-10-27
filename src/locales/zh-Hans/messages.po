@@ -1912,6 +1912,61 @@ msgstr "按 Enter 将 {nums} 移出归档"
 msgid "enter.archiveOn"
 msgstr "按 Enter 归档 {nums}。不会删除任何内容，in:archive 可显示它们"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeForget"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeGo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeGoFocus"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeInLab"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeList"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeMany"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeNotFound"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeReplace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeSave"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeSaveName"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.askKeep"
 msgstr ""
@@ -3354,6 +3409,11 @@ msgstr "名称最多 {max} 个字符"
 #. js-lingui-explicit-id
 msgid "enter.nameWhichKind"
 msgstr "“{name}”既是保存的搜索也是合集。请在后面加上 search 或 collection"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.nameWhichKindAll"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.newBranch"

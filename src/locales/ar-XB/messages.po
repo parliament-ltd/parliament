@@ -1912,6 +1912,61 @@ msgstr ""
 msgid "enter.archiveOn"
 msgstr ""
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeForget"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeGo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeGoFocus"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeInLab"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeList"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeLong"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeMany"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeNotFound"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeReplace"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.arrangeSave"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.arrangeSaveName"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.askKeep"
 msgstr ""
@@ -3353,6 +3408,11 @@ msgstr ""
 #. search and collection stay English: they are words of the command
 #. js-lingui-explicit-id
 msgid "enter.nameWhichKind"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.nameWhichKindAll"
 msgstr ""
 
 #. js-lingui-explicit-id
