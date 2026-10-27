@@ -285,7 +285,7 @@ describe('focus: (stage 5, piece 6)', () => {
     expect(p.after).toBe('prompt')
     expect(at('>focus:off', p.next)).toMatchObject({ text: 'Enter brings back Welcome page', after: null })
     expect(at('>focus:', shipped(SPACE)).text).toBe('Nothing to focus on yet. p> starts a chat')
-    expect(at('>focus:save').text).toBe('focus: is not built yet')
+    expect(at('>focus:save').text).toBe('A focus is kept with its room. Open one first: room:')
   })
 })
 

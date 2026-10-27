@@ -10,7 +10,7 @@ import { loadSpace, saveArrangement } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
 import { titleFromPrompt } from '../lib/chatTitles'
-import { shipped, address, planOpen, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, columnShares, withShares, withUsualShares, recordsColumns } from '../shell/arrangement'
+import { shipped, address, planOpen, planPopBack, planPopBar, planRoom, planShowInRoom, roomOnScreen, currentRoom, chatIn, isRoom, settle, SPACE, columnShares, withShares, withUsualShares, recordsColumns, outOfFocusFor } from '../shell/arrangement'
 import { historyChars } from '../shell/estimate'
 import { WELCOME_SETTING, freshWelcome, cleanWelcome, tick, nextStep, showSteps, stepsShown, stepsMade } from '../shell/welcome'
 import { detectFeatures } from '../shell/features'
@@ -642,6 +642,9 @@ export default function Shell() {
 
   /** Its card on the Collection, the board brought here if need be. */
   const findCard = useCallback((num) => {
+    // Focus hides the Collection: it turns off first, and says so (C253 piece 1).
+    const unfocused = outOfFocusFor(current.current, 'collection')
+    if (unfocused) { commit(unfocused); setBarSaid({ says: { message: 'focusOffFor', values: { board: 'collection' } } }) }
     const a = current.current
     const here = a.columns.flat().includes('collection') || a.popped.some((x) => x.board === 'collection')
     const next = here ? address(a, 'collection') : planOpen(a, 'collection').next ?? a
@@ -1348,6 +1351,16 @@ export default function Shell() {
       remember(body)
       return null
     }
+    // A focus set kept with its room (stage 14, piece 1; C253 (b)), and the
+    // screen focused on it when the line does that too.
+    if (what.kind === 'focusSet') {
+      await saveMode(what.after)
+      if (touched.current) touched.current.rooms.push({ before: what.before })
+      setRoomRev((n) => n + 1)
+      if (next) { const refused = await run(next, null); if (refused) return refused }
+      remember(body)
+      return null
+    }
     // Features of input held for the next prompt (piece 6; C248 (b), (d)).
     if (what.kind === 'webHold') {
       setHeldWeb(what.on ? promptKeyNow.current : null)
@@ -2035,6 +2048,15 @@ export default function Shell() {
     return { ids, whos, addresses: ids.map(addressOf) }
   }, [targets, heldWho, roomId, conversations, keys, settings.defaultModel, addressOf, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
   const branching = useMemo(() => ({ shown: branchShown, held: heldTo }), [branchShown, heldTo])
+
+  // ── Focus sets (stage 14, piece 1; C253) ──
+  // The room on screen keeps its own focus set on its record; the bar reads
+  // it for focus: and keeps a new one with focus:room collection or save.
+  const focusRoomMode = !arrangement.lab && roomChatRow?.roomId && targetMode?.id === roomChatRow.roomId ? targetMode.mode : null
+  const focusScreen = useMemo(() => ({
+    room: focusRoomMode ? { id: focusRoomMode.id, name: roomLabel(i18n, roomNameOfMode(focusRoomMode)), mode: focusRoomMode } : null,
+    set: Array.isArray(focusRoomMode?.focus) ? focusRoomMode.focus : null,
+  }), [focusRoomMode, i18n])
 
   // ── Features of input in the bar (stage 13, piece 6; C248) ──
   // What the room a prompt goes to offers (its input block's settings), and
@@ -2781,7 +2803,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -3359,6 +3381,14 @@ export default function Shell() {
     // An act, or a change to the space (open:settings), as Enter would run it.
     if (p.act || p.next) await onRun(p.next ?? null, line, null, p.act ?? null)
   }, [onRun])
+  // A click that runs a line at once, as focus: on the strip (C253): what it
+  // did, or why not, said under the field.
+  const runClicked = useCallback(async (line) => {
+    const p = preview(`>${line}`, { mode: 'command', arrangement: current.current, screens: screensNow.current ?? {} })
+    if (!p.act && !p.next) { setBarSaid({ says: p.says ?? null }); return }
+    await onRun(p.next ?? null, line, null, p.act ?? null)
+    setBarSaid({ says: { message: 'roomRan', values: { command: line } } })
+  }, [onRun])
   // An address that asks for a board (/settings, the old page's; R37; C186)
   // opens it once the space is loaded, and the address goes back to /.
   const location = useLocation()
@@ -3472,6 +3502,9 @@ export default function Shell() {
 
   function pickBoard(board) {
     const a = current.current
+    // While focused, the strip does not rearrange (C253 piece 1).
+    const shown = (b) => a.columns.flat().some((x) => x === b || (b === 'room' && isRoom(x))) || a.popped.some((p) => p.board === b)
+    if (a.focus && !shown(board)) { setBarSaid({ says: { message: 'focusStripHeld' } }); return }
     // Sym: on the strip brings a room as sym: does, when there is none
     // here; with rooms here, it points the bar at the room a prompt goes to.
     if (board === 'room') {
@@ -3615,7 +3648,7 @@ export default function Shell() {
 
   return (
     <div className={`ch-shell bar-${bar.at}${onWelcome ? ' on-welcome' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}`}>
-      {!onWelcome && <Strip arrangement={stripArrangement} onPick={pickBoard} />}
+      {!onWelcome && <Strip arrangement={stripArrangement} onPick={pickBoard} focus={focusScreen} onRun={runClicked} onWrite={writeField} />}
       {/* One bar in one place, moved by its class or its holder, so moving
           it never loses the field's focus or what is typed. */}
       <div ref={dockSlot} className="ch-bar-host" />

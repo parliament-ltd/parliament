@@ -16,7 +16,7 @@
 // the shell knows: no request is made to find out (C83).
 
 import { enterLine } from '../commands/registry'
-import { plan, planOpen, planOpenSettings, planBring, planRoom, planFocus, planFocusOff, roomOnScreen, roomShowing, isRoom, address, ARRANGEMENT_VERBS } from '../shell/arrangement'
+import { plan, planOpen, planOpenSettings, planBring, planRoom, planFocus, planFocusOff, planFocusSet, focusBoardsOf, FOCUS_BOARDS, roomOnScreen, roomShowing, isRoom, address, ARRANGEMENT_VERBS } from '../shell/arrangement'
 import { cleanRoomName, ROOM_NAME_MAX } from '../lib/roomNames'
 import { CHARS_PER_TOKEN, inputCost, describeCost, LOCAL_READS } from '../shell/estimate'
 import { holdsKey } from '../commands/parse'
@@ -40,6 +40,7 @@ import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
 import { planSet } from '../lib/settingVerbs'
 import { planWeb, planAttach } from '../lib/inputFeatures'
+import { boardFor, wordFor } from '../shell/boards'
 import { planAddBlock, planRmBlock, planPlace, planSetBlock } from '../lib/labBlocks'
 import { findPrivate, KINDS as PRIVATE_KINDS } from '../lib/privacyFilter'
 import { searchWords } from '../lib/searchWords'
@@ -316,12 +317,54 @@ function planViewStep(view, step, records = {}) {
   return { change: { filter }, also }
 }
 
-/** focus: clears the space to the chat alone; focus:off brings it back. Your own sets come with stage 14. */
+/**
+ * focus: clears the space to the room's focus set, or the chat alone until
+ * it has one; focus:off brings it back. focus:room collection and
+ * focus:save are the room's own (stage 14, piece 1; C253), in focusSetLine.
+ */
 function planFocusStep(a, step, screens = {}) {
   const [arg, ...more] = step.match?.values ?? []
-  if (!arg) return planFocus(a, screens.lastRoom?.id ?? null)
+  if (!arg) {
+    const set = screens.focus?.set
+    if (Array.isArray(set) && set.length && !(set.length === 1 && set[0] === 'room')) return planFocusSet(a, set, screens.lastRoom?.id ?? null)
+    return planFocus(a, screens.lastRoom?.id ?? null)
+  }
   if (arg.kind === 'word' && arg.value === 'off' && !more.length) return planFocusOff(a)
   return null
+}
+
+const sameSet = (x, y) => JSON.stringify(x ?? null) === JSON.stringify(y ?? null)
+
+/**
+ * focus:room collection focuses on those boards and keeps them as the focus
+ * of the room on screen; focus:save keeps what is on screen (stage 14,
+ * piece 1; C253 (a), (b)). screens.focus: { room: { id, name, mode }|null, set }.
+ */
+function focusSetLine(a, step, screens = {}) {
+  const f = screens.focus ?? {}
+  const vals = step.match?.values ?? []
+  const keep = (boards) => (f.room ? { kind: 'focusSet', modeId: f.room.id, before: f.room.mode, after: { ...f.room.mode, focus: boards } } : null)
+  if (vals.length === 1 && vals[0].value === 'save') {
+    if (a.lab) return { says: { message: 'focusInLab' }, act: null }
+    if (!f.room) return { says: { message: 'focusSaveNoRoom' }, act: null }
+    const boards = focusBoardsOf(a)
+    if (!boards.length) return { says: { message: 'focusSaveNothing' }, act: null }
+    if (sameSet(boards, f.set)) return { says: { message: 'focusSaveSame', values: { room: f.room.name, focusBoards: boards } }, act: null }
+    return { says: { message: 'focusSave', values: { room: f.room.name, focusBoards: boards } }, act: keep(boards) }
+  }
+  const boards = []
+  for (const v of vals) {
+    const b = boardFor(String(v.value ?? v.text ?? '').toLowerCase())
+    const k = b && isRoom(b) ? 'room' : b
+    if (!k || !FOCUS_BOARDS.includes(k)) return { says: { message: 'focusWhich', values: { said: v.text ?? String(v.value), choices: FOCUS_BOARDS.map(wordFor) } }, act: null }
+    if (!boards.includes(k)) boards.push(k)
+  }
+  const p = planFocusSet(a, boards, screens.lastRoom?.id ?? null)
+  if (!p.next) return { says: p.says, act: null }
+  const kept = !f.room ? { message: 'focusNotKept' }
+    : sameSet(boards, f.set) ? { message: 'focusKeptSame', values: { room: f.room.name } }
+      : { message: 'focusKept', values: { room: f.room.name } }
+  return { says: { ...p.says, also: [kept] }, next: p.next, act: f.room && !sameSet(boards, f.set) ? keep(boards) : null }
 }
 
 // records: brings the Records arrangement, the Records board and the
@@ -727,6 +770,15 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     return { answer, says, next: null, act: { kind: 'rows', changes: p.changes } }
   }
 
+  // focus:room collection and focus:save (stage 14, piece 1; C253): alone on
+  // their line, since they keep a room's set as well as clear the screen.
+  if (only?.verb === FOCUS && (only.match?.values ?? []).length && !(only.match.values.length === 1 && only.match.values[0].value === 'off')) {
+    const p = focusSetLine(arrangement, only, screens)
+    return { answer, says: p.says, next: p.next ?? null, act: p.act ?? null, after: p.next ? 'prompt' : null }
+  }
+  if (answer.steps.some((s) => s.verb === FOCUS && (s.match?.values ?? []).length && !(s.match.values.length === 1 && s.match.values[0].value === 'off')) && answer.steps.length > 1) {
+    return { answer, says: { message: 'aloneNow', values: { verb: 'focus:' } }, next: null }
+  }
   // open:203b summary spends one call, so it goes alone on its line (C175).
   const summaryStep = answer.steps.find(isSummaryOpen)
   if (summaryStep) {

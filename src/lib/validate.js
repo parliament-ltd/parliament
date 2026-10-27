@@ -281,6 +281,8 @@ function validateMode(item) {
   // A room that sends only to models on this computer (stage 13; C246 (c)):
   // true or false when present; rooms before it have none.
   if (item.localOnly !== undefined && typeof item.localOnly !== 'boolean') return 'mode.localOnly must be true or false'
+  // A room's focus set (stage 14; C253 (b)): board names, in order, when present.
+  if (item.focus !== undefined && !(Array.isArray(item.focus) && item.focus.length <= 6 && item.focus.every((b) => typeof b === 'string' && b.length <= 40))) return 'mode.focus must be a list of board names'
   return null
 }
 

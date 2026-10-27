@@ -3108,7 +3108,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Noticed, not changed:** the Parliament mark in a narrow room's header is labelled "Go to The Study", the retired homepage. It takes you to the new screens; only its words are old.
 - **Stage 13:** all eight pieces are built. Still open from its lines: R39 (Drafting Desk), deferred until after the refactor; `@dnd-kit` leaving the dependencies, at stage 15.
 
-**C253. Stage 14 in pieces: focus, calm, screens, small screens** (proposed 27 October; refactor-plan.md, stage 14; the editing spec, "Focus", "Calm", "Legibility"; the arrangements spec §7a, §8; `parliament_screens_v1.html`; welcome spec §12.4; C98, C126, C135, C182). Waiting for Stefan: (b), (c) and (i) are choices; the rest is built as suggested unless ruled otherwise. Each piece is committed and checked before the next.
+**C253. Stage 14 in pieces: focus, calm, screens, small screens** (proposed 27 October; **ruled 27 October, as suggested: (b) 1, focus per room on the room record; (c) 1, calm off for someone new; (i) 1, narrow windows and the phone as proposed, built last; the rest as suggested**; refactor-plan.md, stage 14; the editing spec, "Focus", "Calm", "Legibility"; the arrangements spec §7a, §8; `parliament_screens_v1.html`; welcome spec §12.4; C98, C126, C135, C182). Waiting for Stefan: (b), (c) and (i) are choices; the rest is built as suggested unless ruled otherwise. Each piece is committed and checked before the next.
 - **What exists today** (a survey of the code and documents, 27 October):
   - **Focus:** `focus:` clears the screen to the chat alone and `focus:off` brings back what was there (stage 5, C135). `focus:save` and `focus:room collection` answer "not built yet".
   - **Calm:** `calm:` is in the command list and not built.
@@ -3195,6 +3195,44 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
     - two device settings: calm, and the screens already noticed.
 
     No migration, and every backup stays readable. **Suggestion:** approve this outline; anything more is shown before it is written.
+
+**C254. Stage 14, piece 1, as built: focus sets** (27 October; C253 as ruled).
+- **`focus:room collection`** (C253 (a)):
+  - It focuses on those boards, left to right, each in a column of its own, the rest closed and kept for `focus:off`. The bar is at the bottom, as for the first form.
+  - It takes the boards by the names the strip shows: room, collection, reflection, records, library, plan. A word that is not one is named, with the list.
+  - Already focused, it changes the set, and `focus:off` still brings back what was there before focus began.
+  - Its line: "Enter focuses on the chat and Collection, in that order. Nothing is lost, and focus:off brings back what was here", then "It is kept as the focus of Essay room: focus: alone brings it back".
+- **Kept with the room** (C253 (b) 1):
+  - The set is saved on the record of the room on screen as `focus: ["room", "collection"]`, one step for `undo:`.
+  - With no room on screen it still focuses, saying it is not kept.
+  - `focus:` alone uses the room's set, or the chat alone while it has none.
+  - `focus:save` keeps the boards on screen as the room's set, without changing the screen.
+  - Restore's check of a room accepts the field only as a list of names.
+- **In the Lab,** every form of `focus:` says "focus: works outside the Lab. done: leaves it first".
+- **The strip** ends with "focus: off ▾" or "focus: on ▾".
+  - A click on the words runs `focus:` or `focus:off` at once and echoes it ("Ran focus:off. undo: takes it back").
+  - The caret opens the boards with numbered ticks, the room's set ticked to start. Each tick writes the line, `focus:room collection records`, into the bar for Enter.
+    - **A change from the spec:** it says ticking sets the focus. Writing the line lets several boards be chosen before the screen changes, and Enter keeps it with the room.
+- **While focused,** a click on a board in the strip that focus hides does not rearrange, and says "The screen is in focus. focus:off to arrange freely".
+- **Finding a card** (a click on a quoted passage) turns focus off first when the Collection is hidden, saying "Focus is off, to show Collection. focus: brings it back".
+  - That case is in the code and not yet tried in the browser.
+  - A sweep's review reaches the Collection the same way, through finding.
+- **Stored data:** the room's optional `focus`, as shown in C253 (b) and ruled. Nothing else.
+- **Tests:**
+  - a set laid out and changed while focused, and `focus:off` after;
+  - focus turned off for a hidden board;
+  - the commands' lines and acts, names, `focus:save`, `focus:` with a set, no room, the Lab;
+  - a room record with a focus, and with a wrong one.
+
+  1,311 tests; 30 lint warnings, all older.
+- **Tried in the browser,** on the trial copy, with Essay room's chat (225) on screen:
+  - `focus:room collection` showed its two lines, and Enter left 225 and the Collection, storing `["room", "collection"]` on Essay room.
+  - A click on Records in the strip said the screen is in focus. A click on "focus: on" brought every board back.
+  - `focus:` alone focused on Essay room's set again.
+  - The picker showed "1 the chat 2 Collection", and ticking Records wrote `>focus:room collection records`.
+
+  Essay room keeps that set; the screen is back as it was.
+- **Next:** piece 2, calm.
 
 ## Proposed CLAUDE.md rewrite
 

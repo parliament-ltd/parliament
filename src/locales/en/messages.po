@@ -2664,13 +2664,36 @@ msgstr "The chat is in focus already. focus:off brings back what was here"
 msgid "enter.focusClosing"
 msgstr "Enter clears the screen to the chat, closing {boards}. Nothing is lost, and focus:off brings them back"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusInLab"
+msgstr "focus: works outside the Lab. done: leaves it first"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusKept"
+msgstr "It is kept as the focus of {room}: focus: alone brings it back"
+
+#. js-lingui-explicit-id
+msgid "enter.focusKeptSame"
+msgstr "It is the focus of {room} already"
+
 #. js-lingui-explicit-id
 msgid "enter.focusNothing"
 msgstr "Nothing to focus on yet. p> starts a chat"
 
 #. js-lingui-explicit-id
+msgid "enter.focusNotKept"
+msgstr "No room is on screen, so it is not kept as a focus"
+
+#. js-lingui-explicit-id
 msgid "enter.focusOff"
 msgstr "Enter brings back {boards}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusOffFor"
+msgstr "Focus is off, to show {board}. focus: brings it back"
 
 #. js-lingui-explicit-id
 msgid "enter.focusOffNot"
@@ -2679,6 +2702,47 @@ msgstr "Nothing is in focus"
 #. js-lingui-explicit-id
 msgid "enter.focusOffSame"
 msgstr "Enter brings the screen back as it was"
+
+#. js-lingui-explicit-id
+msgid "enter.focusSave"
+msgstr "Enter keeps what is on screen now as the focus of {room}: {focusBoards}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusSaveNoRoom"
+msgstr "A focus is kept with its room. Open one first: room:"
+
+#. js-lingui-explicit-id
+msgid "enter.focusSaveNothing"
+msgstr "Nothing on screen can be kept as a focus"
+
+#. js-lingui-explicit-id
+msgid "enter.focusSaveSame"
+msgstr "{focusBoards} is the focus of {room} already"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusSetAlready"
+msgstr "That focus is on screen already. focus:off brings back what was here"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusSetGo"
+msgstr "Enter focuses on {focusBoards}, in that order. Nothing is lost, and focus:off brings back what was here"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusStripHeld"
+msgstr "The screen is in focus. focus:off to arrange freely"
+
+#. js-lingui-explicit-id
+msgid "enter.focusTheChat"
+msgstr "the chat"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusWhich"
+msgstr "focus: takes boards by name: {choices}. {said} is not one"
 
 #. js-lingui-explicit-id
 msgid "enter.forgetNone"
@@ -8041,6 +8105,29 @@ msgstr "the welcome page"
 #. js-lingui-explicit-id
 msgid "shell.field"
 msgstr "Search, command or prompt"
+
+#. focus is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.focusOff"
+msgstr "focus: off"
+
+#. focus is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.focusOn"
+msgstr "focus: on"
+
+#. js-lingui-explicit-id
+msgid "shell.focusPick"
+msgstr "Choose the boards of your focus"
+
+#. js-lingui-explicit-id
+msgid "shell.focusPickHead"
+msgstr "left to right:"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "shell.focusRuns"
+msgstr "Runs {command}"
 
 #. js-lingui-explicit-id
 msgid "shell.referenceClose"

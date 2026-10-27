@@ -477,13 +477,15 @@ export function planWidthEven(a) {
 // The first form: the chat alone, and back. focus: closes every board but
 // the room, windows included, docks the bar under it, and keeps the space
 // as it was, so focus:off brings it back; nothing is lost. Your own focus
-// sets (focus:sym col, focus:save) come with stage 14.
+// sets (focus:room collection, focus:save) came with stage 14 (C253), each
+// kept with its room.
 
 /**
  * focus:. The room alone: the chat in the space's room, or the last chat
  * (`chat`) when the space has no room with a chat in it.
  */
 export function planFocus(a, chat = null) {
+  if (a.lab) return refuse('focusInLab')
   if (a.focus) return refuse('focusAlready')
   const here = roomOnScreen(a)
   const target = typeof here === 'string' ? here : chat
@@ -499,6 +501,50 @@ export function planFocus(a, chat = null) {
   next.bar = { ...a.bar, at: 'bottom', popped: false }
   next.context[room] = target
   return go2(next, closing.length ? 'focusClosing' : 'focusAlone', { boards: closing.map((b) => (isRoom(b) ? 'room' : b)) })
+}
+
+/** The boards a focus set can hold (C253 (a)): those on the strip, in its order. */
+export const FOCUS_BOARDS = Object.freeze(['room', 'collection', 'reflection', 'almanac', 'library', 'docket'])
+
+/** The boards on screen, as a focus set names them: every room as 'room', in order, once each. */
+export const focusBoardsOf = (a) => [...new Set(a.columns.flat().map((b) => (isRoom(b) ? 'room' : b)))].filter((b) => FOCUS_BOARDS.includes(b))
+
+/**
+ * focus:room collection, or focus: with a room's set (stage 14, piece 1;
+ * C253): those boards, left to right, each in a column of its own; the rest
+ * close, windows included, kept for focus:off. Already focused, the set
+ * changes and focus:off still brings back what was there before.
+ * @param {string[]} boards from FOCUS_BOARDS
+ * @param {string|null} chat the last chat, when the space has no room with one
+ */
+export function planFocusSet(a, boards, chat = null) {
+  if (a.lab) return refuse('focusInLab')
+  const wantsRoom = boards.includes('room')
+  const room = currentRoom(a) ?? 'room'
+  const here = roomOnScreen(a)
+  const target = typeof here === 'string' ? here : chat
+  if (wantsRoom && !target) return refuse('focusNothing')
+  const keys = boards.map((b) => (b === 'room' ? room : b))
+  if (a.focus && JSON.stringify(a.columns) === JSON.stringify(keys.map((k) => [k])) && !a.popped.length) return refuse('focusSetAlready')
+  const next = copy(a)
+  next.focus = a.focus ? { ...a.focus } : { columns: a.columns.map((c) => [...c]), popped: a.popped.map((p) => ({ ...p })), addressed: a.addressed, bar: { ...a.bar } }
+  next.columns = keys.map((k) => [k])
+  next.popped = []
+  next.addressed = wantsRoom ? room : keys[0]
+  next.bar = { ...a.bar, at: 'bottom', popped: false }
+  if (wantsRoom) next.context[room] = target
+  return go2(next, 'focusSetGo', { focusBoards: boards })
+}
+
+/**
+ * When something needs a board focus hides (finding a card; C253 piece 1):
+ * focus turns off first, the space as it was, and the caller then brings
+ * the board. Null when not focused or the board is on screen.
+ */
+export function outOfFocusFor(a, board) {
+  if (!a.focus) return null
+  if (a.columns.flat().includes(board) || a.popped.some((p) => p.board === board)) return null
+  return planFocusOff(a).next
 }
 
 /** focus:off. The space as it was before focus:, windows and all. */

@@ -2664,13 +2664,36 @@ msgstr "对话已处于专注状态。focus:off 可恢复原来的内容"
 msgid "enter.focusClosing"
 msgstr "按 Enter 让屏幕上只留下对话，并关闭{boards}。不会丢失任何内容，focus:off 可恢复它们"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusInLab"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusKept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusKeptSame"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.focusNothing"
 msgstr "还没有可专注的内容。p> 可开始一个对话"
 
 #. js-lingui-explicit-id
+msgid "enter.focusNotKept"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.focusOff"
 msgstr "按 Enter 恢复{boards}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusOffFor"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.focusOffNot"
@@ -2679,6 +2702,47 @@ msgstr "当前未处于专注状态"
 #. js-lingui-explicit-id
 msgid "enter.focusOffSame"
 msgstr "按 Enter 将屏幕恢复原样"
+
+#. js-lingui-explicit-id
+msgid "enter.focusSave"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusSaveNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusSaveNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusSaveSame"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusSetAlready"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusSetGo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusStripHeld"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.focusTheChat"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.focusWhich"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.forgetNone"
@@ -8041,6 +8105,29 @@ msgstr "欢迎页"
 #. js-lingui-explicit-id
 msgid "shell.field"
 msgstr "搜索、命令或提示词"
+
+#. focus is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.focusOff"
+msgstr ""
+
+#. focus is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.focusOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "shell.focusPick"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "shell.focusPickHead"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "shell.focusRuns"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "shell.referenceClose"

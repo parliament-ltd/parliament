@@ -81,6 +81,8 @@ export function say(i18n, message, values = {}) {
     else if (key === 'blocks') words[key] = joined(i18n, value.map((b) => (COPY.blocks[b] ? i18n._(COPY.blocks[b]) : String(b))), 'conjunction')
     else if (key === 'fromSlot' || key === 'toSlot') words[key] = COPY.slots[value] ? i18n._(COPY.slots[value]) : String(value)
     else if (key === 'boards') words[key] = joined(i18n, value.map((b) => boardName(i18n, b)), 'conjunction')
+    // A focus set's boards (C253): the room as the chat it shows.
+    else if (key === 'focusBoards') words[key] = joined(i18n, value.map((b) => (b === 'room' ? i18n._(COPY.enter.focusTheChat) : boardName(i18n, b))), 'conjunction')
     else if (AND_LISTS.has(key)) words[key] = joined(i18n, value.map(String), 'conjunction')
     // What the privacy filter found, by kind (C167): "an email address and 2 phone numbers".
     else if (key === 'found') words[key] = joined(i18n, Object.entries(value).filter(([k, n]) => n > 0 && COPY.privacyFound[k]).map(([k, n]) => i18n._(COPY.privacyFound[k], { count: n })), 'conjunction')
