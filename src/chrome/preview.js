@@ -231,7 +231,8 @@ const newStep = (a, step, screens) => {
   const what = first?.value
   if (what === 'framework') return planNewFramework(step, screens)
   // new:room (stage 13, piece 1; C238): a room, in the Lab. The guide comes with piece 4.
-  if (what === 'room') return second ? null : planNewRoom()
+  // new:room guided (piece 4; C244 (f)): with the guide.
+  if (what === 'room') return !second ? planNewRoom() : second.value === 'guided' ? planNewRoom(true) : null
   if (what === 'branch') {
     // On the Plan board, or with a name: a branch with no chat until it
     // runs (C198). Otherwise a fork, the plan's next letter (C178).

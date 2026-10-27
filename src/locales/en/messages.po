@@ -839,7 +839,7 @@ msgstr "computer"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "canvas.empty"
-msgstr "No room in the Lab. edit:\"Writing studio\" puts one here, or new:room makes one."
+msgstr "No room in the Lab. edit:\"Writing studio\" puts one here, new:room makes one, or new:room guided walks you through it."
 
 #. js-lingui-explicit-id
 msgid "canvas.emptySlot"
@@ -3214,6 +3214,10 @@ msgid "enter.newRoomGo"
 msgstr "Enter makes a new room, the conversation in three panels, and opens it in the Lab"
 
 #. js-lingui-explicit-id
+msgid "enter.newRoomGuided"
+msgstr "Enter makes a new room, the conversation in three panels, and opens it in the Lab with the guide"
+
+#. js-lingui-explicit-id
 msgid "enter.newRoomHere"
 msgstr "This room is empty. Its first prompt starts it"
 
@@ -5026,6 +5030,11 @@ msgstr "→ a new chat"
 msgid "enter.targetNewRoom"
 msgstr "→ a new room"
 
+#. tried is the tag, as typed in tag:tried
+#. js-lingui-explicit-id
+msgid "enter.targetTrying"
+msgstr "→ a new chat in {room}, tagged tried"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.tellEmpty"
@@ -5600,6 +5609,144 @@ msgstr "Start"
 #. js-lingui-explicit-id
 msgid "group.tags"
 msgstr "Tags"
+
+#. js-lingui-explicit-id
+msgid "guide.asItIs"
+msgstr "as it is"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "guide.back"
+msgstr "new:room guided starts another"
+
+#. js-lingui-explicit-id
+msgid "guide.built"
+msgstr "The room is built."
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "guide.builtWhy"
+msgstr "Every step was a command. undo: takes one back, and the Canvas and Blocks board change the rest."
+
+#. js-lingui-explicit-id
+msgid "guide.done"
+msgstr "done"
+
+#. js-lingui-explicit-id
+msgid "guide.how"
+msgstr "Each answer writes a command into the field; Enter runs it."
+
+#. js-lingui-explicit-id
+msgid "guide.label"
+msgstr "The guide"
+
+#. js-lingui-explicit-id
+msgid "guide.o.branches"
+msgstr "Branches"
+
+#. js-lingui-explicit-id
+msgid "guide.o.context"
+msgstr "Context health"
+
+#. js-lingui-explicit-id
+msgid "guide.o.data"
+msgstr "Tables and data"
+
+#. js-lingui-explicit-id
+msgid "guide.o.dataDesk"
+msgstr "Data desk"
+
+#. js-lingui-explicit-id
+msgid "guide.o.desk"
+msgstr "At a desk"
+
+#. js-lingui-explicit-id
+msgid "guide.o.essay"
+msgstr "Essay room"
+
+#. js-lingui-explicit-id
+msgid "guide.o.keywordsNotes"
+msgstr "Keywords and notes"
+
+#. js-lingui-explicit-id
+msgid "guide.o.own"
+msgstr "Your own"
+
+#. js-lingui-explicit-id
+msgid "guide.o.phone"
+msgstr "On a phone"
+
+#. js-lingui-explicit-id
+msgid "guide.o.quick"
+msgstr "Quick questions"
+
+#. js-lingui-explicit-id
+msgid "guide.o.steps"
+msgstr "The step list"
+
+#. js-lingui-explicit-id
+msgid "guide.o.talking"
+msgstr "Talking things through"
+
+#. js-lingui-explicit-id
+msgid "guide.o.thinking"
+msgstr "Thinking room"
+
+#. js-lingui-explicit-id
+msgid "guide.o.writing"
+msgstr "Writing long pieces"
+
+#. js-lingui-explicit-id
+msgid "guide.off"
+msgstr "put the guide away"
+
+#. js-lingui-explicit-id
+msgid "guide.q.feel"
+msgstr "How should it feel?"
+
+#. js-lingui-explicit-id
+msgid "guide.q.for"
+msgstr "What is this room for?"
+
+#. js-lingui-explicit-id
+msgid "guide.q.name"
+msgstr "What is it called?"
+
+#. js-lingui-explicit-id
+msgid "guide.q.reach"
+msgstr "What should be in reach?"
+
+#. js-lingui-explicit-id
+msgid "guide.q.where"
+msgstr "Where will you use it?"
+
+#. js-lingui-explicit-id
+msgid "guide.skip"
+msgstr "skip this one"
+
+#. js-lingui-explicit-id
+msgid "guide.step"
+msgstr "{n} of {total}"
+
+#. js-lingui-explicit-id
+msgid "guide.why.feel"
+msgstr "A theme colours the inside of the room. The Lab around it stays as it is."
+
+#. js-lingui-explicit-id
+msgid "guide.why.for"
+msgstr "This picks a layout: where the conversation and the side panels go."
+
+#. js-lingui-explicit-id
+msgid "guide.why.name"
+msgstr "Take one of these, or write your own."
+
+#. js-lingui-explicit-id
+msgid "guide.why.reach"
+msgstr "Blocks are the pieces of a room. The Library has more, to add at any time."
+
+#. js-lingui-explicit-id
+msgid "guide.why.where"
+msgstr "A room built for a phone folds its side panels into a sheet."
 
 #. js-lingui-explicit-id
 msgid "hint.kOnly"

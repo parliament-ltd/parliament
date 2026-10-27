@@ -934,6 +934,23 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-shell .ch-lab-slot button.ch-lab-block { padding: 0; font: inherit; color: inherit; text-decoration: none; background: none; border: none; cursor: pointer; }
 .ch-lab-slot li.sel { box-shadow: inset 2px 0 0 var(--ch-ink); padding-inline-start: 6px; }
 
+/* The guide, on the Canvas above the room (stage 13, piece 4; C244; Lab v7). */
+.ch-guide { margin: 0 0 12px; padding: 14px 16px 12px; border-radius: 12px; background: var(--ch-surface); border: 1px dashed var(--ch-soft); }
+.ch-gtop { display: flex; align-items: baseline; gap: 10px; }
+.ch-gstep { font: 500 11px var(--ch-sans); color: var(--ch-ink-3); }
+.ch-gtrack { display: flex; gap: 5px; margin-inline-start: auto; }
+.ch-gtrack i { width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--ch-soft); }
+.ch-gtrack i.done { background: var(--ch-ink); border-color: var(--ch-ink); }
+.ch-gtrack i.now { border-color: var(--ch-ink); }
+.ch-gq { margin: 4px 0 2px; font: 600 14px var(--ch-sans); color: var(--ch-ink); }
+.ch-gopts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.ch-shell .ch-gopts button { padding: 8px 12px; border: 1px dashed var(--ch-soft); border-radius: var(--ch-r-btn); background: none; font: 500 12px var(--ch-sans); color: var(--ch-ink-2); text-align: start; text-decoration: none; cursor: pointer; }
+.ch-shell .ch-gopts button:hover { color: var(--ch-ink); }
+.ch-shell .ch-gopts button.on { background: var(--ch-wash); color: var(--ch-ink); }
+.ch-gopts small { display: block; margin-top: 2px; font: italic 400 11px var(--ch-serif); color: var(--ch-marg); }
+.ch-gfoot { display: flex; flex-wrap: wrap; gap: 0 12px; margin: 10px 0 0; }
+.ch-shell .ch-gfoot button { padding: 0; font: inherit; color: inherit; }
+
 /* The Blocks board (stage 13, piece 2; C240; Lab v7). */
 .ch-bgrp h3 { display: flex; margin: 0; padding: 12px 6px 5px; font: 600 11px var(--ch-sans); color: var(--ch-ink); border-bottom: 1px solid var(--ch-divider); text-transform: none; }
 .ch-bgrp h3 .n { margin-inline-start: auto; font: 500 11px var(--ch-sans); color: var(--ch-ink-3); }

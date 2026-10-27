@@ -42,6 +42,8 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
   if (!toRoom) targetText = i18n._(COPY.enter.target, { board: boardName(i18n, addressed) })
   // A prompt about selected cards starts a chat of its own (C145 (h)).
   else if (room.fresh && mode === 'prompt') targetText = i18n._(COPY.enter.targetNewChat)
+  // Trying the room on the Canvas (C244 (b)): a new chat in it, tagged.
+  else if (room.trying && mode === 'prompt') targetText = i18n._(COPY.enter.targetTrying, { room: room.trying })
   else if (room.chat == null) targetText = i18n._(COPY.enter.targetNewRoom)
   else targetText = room.name ? i18n._(COPY.enter.targetChatIn, { chat: room.chat, room: room.name }) : i18n._(COPY.enter.targetChat, { chat: room.chat })
   const target = { key: 'target', now: true, text: targetText }

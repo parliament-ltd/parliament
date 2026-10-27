@@ -2683,7 +2683,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   The trial copy is as it was.
 - **Next:** piece 4, trying a room and the guide.
 
-**C244. Stage 13, piece 4: trying a room and the guide, its open points** (proposed 27 October; C238 piece 4; Lab v7 and its v5 and v6 notes; A2, C38, C147). (a) is a choice; the rest is built as suggested unless ruled otherwise.
+**C244. Stage 13, piece 4: trying a room and the guide, its open points** (proposed 27 October; **ruled 27 October: (a) 1, the room itself; the rest as suggested**; C238 piece 4; Lab v7 and its v5 and v6 notes; A2, C38, C147). (a) is a choice; the rest is built as suggested unless ruled otherwise.
 - **What exists today:**
   - A prompt with no room on screen starts a new chat in your default room (Settings), and the room opens as a board.
   - In the Lab, the Canvas draws the room by slot; it is a plan of the room, not the room itself.
@@ -2728,6 +2728,38 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - Nothing new is stored.
 
   **Suggestion:** yes.
+
+**C245. Stage 13, piece 4, as built: trying a room and the guide** (27 October; C244 as ruled).
+- **Trying the room** (C244 (a) 1, (b)):
+  - In the Lab with no room open, a prompt starts a new chat in the room on the Canvas, not in your default room. The Enter line says "→ a new chat in Essay room, tagged tried", then who answers and the cost, as for any prompt.
+  - The room then opens in the Lab as a fourth board, beside the Blocks board, live in its own theme with its real blocks, and is addressed. Later prompts carry on in that chat, as in any room.
+  - To try afresh, close the room; the next prompt starts another tried chat.
+  - Four boards fit side by side at desktop width.
+- **The tag** (C244 (c)): `tried`, kept in the chat's tags and as one of your own tags (`tagsMine`), as `favorite` is; `tag:tried` in Records finds them.
+- **A fix found in building:** `undo:` after `new:room` or `duplicate:` took the room away if it was still as made. A chat tried in it since would have lost its room. It now keeps any room a chat lives in.
+- **The guide** (C244 (d), (e), (f)), on the Canvas above the room:
+  - "1 of 5" and a track of five dots, the question, what it does, and the answers, each showing the command it writes. An answer the room has already reads "as it is", and a click on it moves on.
+  - The five questions are layout, built for, blocks, theme and name. The name question offers three names and "Your own", which writes `>name:"` to finish.
+  - It moves on when its question's command runs on its room, clicked or typed. It has "skip this one" and "put the guide away", and ends with "The room is built." and how `undo:` takes a step back.
+  - `new:room guided` opens it. The empty Lab's words offer it.
+  - It is the screen's only: `done:`, another room on the Canvas, or a reload puts it away. `undo:` takes a step's change back but does not move the guide back.
+  - The web search question waits for piece 6.
+- **Stored data:** none new. A tried chat is a chat record, its tag in the fields chats have.
+- **Tests:**
+  - the guide's five questions;
+  - what each answer writes, and "as it is";
+  - how it moves, and only for its room;
+  - `new:room guided`.
+
+  1,293 tests; 30 lint warnings, all older. Trying calls the model or source, so it was tried in the browser, not in a test.
+- **Tried in the browser,** on the trial copy:
+  - `new:room guided` made a room and opened the guide. "Talking things through" read "as it is" and moved on.
+  - "On a phone" wrote `device:mobile`, and Enter ran it and moved the guide on. "Keywords and notes" wrote `add:keywords, notes` and did the same.
+  - The theme was skipped. "Essay room" named it, and the guide said the room is built.
+  - `p>Who built the first lighthouse?` said "→ a new chat in Essay room, tagged tried". Wikipedia answered (the trial copy has no key), and chat 225 opened beside the Canvas in Essay room, carrying the tag `tried` in its record.
+
+  Essay room and chat 225 are left on the trial copy; removing them is a deletion, so it waits for Stefan.
+- **Next:** piece 5, built for a phone and local-only rooms.
 
 ## Proposed CLAUDE.md rewrite
 

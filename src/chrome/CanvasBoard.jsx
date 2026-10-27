@@ -1,6 +1,7 @@
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { slotsOf, deviceOf, nameOf } from '../lib/lab'
+import { GUIDE, optionOf } from '../lib/labGuide'
 
 // The Canvas (stage 13, piece 1; the arrangements spec §5; Lab v7; C238):
 // the room being built, by slot, in its own theme, with the room line above
@@ -11,14 +12,66 @@ import { slotsOf, deviceOf, nameOf } from '../lib/lab'
 // (piece 2): a block clicked here opens its row there (C240 (f)). Web search, voice and attaching files show as features of
 // input, as the Library shows them.
 
+// The guide (piece 4; C244 (d), (e)), above the room: one question at a
+// time, each answer writing its command; one already so moves on at once.
+function Guide({ guide, mode, layouts, themes, onWrite, onGuide }) {
+  const { i18n } = useLingui()
+  const G = COPY.guide
+  const total = GUIDE.length
+  const track = (
+    <span className="ch-gtrack" aria-hidden="true">
+      {GUIDE.map((q, i) => <i key={q.id} className={i < guide.step ? 'done' : i === guide.step ? 'now' : undefined} />)}
+    </span>
+  )
+  if (guide.step >= total) {
+    return (
+      <section className="ch-guide" aria-label={i18n._(G.label)}>
+        <div className="ch-gtop"><span className="ch-gstep">{i18n._(G.done)}</span>{track}</div>
+        <p className="ch-gq">{i18n._(G.built)}</p>
+        <p className="ch-marg">{i18n._(G.builtWhy)}</p>
+        <p className="ch-gfoot ch-marg"><button type="button" onClick={() => onGuide('off')}>{i18n._(G.off)}</button></p>
+      </section>
+    )
+  }
+  const q = GUIDE[guide.step]
+  return (
+    <section className="ch-guide" aria-label={i18n._(G.label)}>
+      <div className="ch-gtop"><span className="ch-gstep">{i18n._(G.step, { n: guide.step + 1, total })}</span>{track}</div>
+      <p className="ch-gq">{i18n._(G[`q.${q.id}`])}</p>
+      <p className="ch-marg">{i18n._(G[`why.${q.id}`])} {i18n._(G.how)}</p>
+      <div className="ch-gopts">
+        {q.options.map((o) => {
+          const words = o.theme ? i18n._(COPY.themes[o.theme]) : i18n._(G[`o.${o.id}`])
+          const { command, already } = optionOf(o, { mode, layouts, themes, nameWords: words })
+          if (!command) return null
+          return (
+            <button key={o.id} type="button" className={already ? 'on' : undefined}
+              title={already ? undefined : i18n._(COPY.canvas.writes, { command })}
+              onClick={() => (already ? onGuide('next') : onWrite(`>${command}`))}>
+              {words}
+              <small>{already ? i18n._(G.asItIs) : command}</small>
+            </button>
+          )
+        })}
+      </div>
+      <p className="ch-gfoot ch-marg">
+        <button type="button" onClick={() => onGuide('next')}>{i18n._(G.skip)}</button>
+        <button type="button" onClick={() => onGuide('off')}>{i18n._(G.off)}</button>
+        <span>{i18n._(G.back)}</span>
+      </p>
+    </section>
+  )
+}
+
 const FEATURE_WORDS = { 'web-search': COPY.library.featureWebSearch, 'voice-input': COPY.library.featureVoice, 'file-attach': COPY.library.featureAttach }
 
 /**
  * @param {{ addressed: boolean, onAddress: (board: string) => void, onWrite: (text: string) => void, onRun: (line: string) => void,
  *   room: { id: string, mode: object|null, name: string }|null, layouts: Array<{ ref: string, key: string, name: string, slots: object[] }>,
- *   themes: Array<{ ref: string, key: string, name: string }>, picked?: string|null, onPick?: (block: string) => void }} props
+ *   themes: Array<{ ref: string, key: string, name: string }>, picked?: string|null, onPick?: (block: string) => void,
+ *   guide?: { step: number }|null, onGuide?: (action: 'next'|'off') => void }} props
  */
-export default function CanvasBoard({ addressed, onAddress, onWrite, onRun, room, layouts, themes, picked = null, onPick = () => {} }) {
+export default function CanvasBoard({ addressed, onAddress, onWrite, onRun, room, layouts, themes, picked = null, onPick = () => {}, guide = null, onGuide = () => {} }) {
   const { i18n } = useLingui()
   const C = COPY.canvas
   const mode = room?.mode ?? null
@@ -63,6 +116,7 @@ export default function CanvasBoard({ addressed, onAddress, onWrite, onRun, room
             <button type="button" title={i18n._(C.writes, { command: 'name:' })} onClick={() => onWrite(`>name:${quoted(room.name)}`)}>{i18n._(C.name)}</button>
           </span>
         </div>
+        {guide && <Guide guide={guide} mode={mode} layouts={layouts} themes={themes} onWrite={onWrite} onGuide={onGuide} />}
         {!layout
           ? <p className="ch-marg">{i18n._(C.noLayout)}</p>
           : (

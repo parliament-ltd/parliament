@@ -135,7 +135,7 @@ export function planDone(step, screens = {}) {
 }
 
 /** new:room: a room with the conversation and nothing else, in three panels, in the Lab. */
-export const planNewRoom = () => ({ says: { message: 'newRoomGo' }, act: { kind: 'newRoom' } })
+export const planNewRoom = (guided = false) => ({ says: { message: guided ? 'newRoomGuided' : 'newRoomGo' }, act: { kind: 'newRoom', ...(guided ? { guided: true } : {}) } })
 
 /** layout:"Three panels" (C238 piece 1). */
 export function planLayout(step, screens = {}) {
@@ -230,3 +230,6 @@ export function planDuplicate(step, screens = {}) {
     act: { kind: 'duplicateRoom', ...(from.template ? { template: from.template } : { room: from.room }), name },
   }
 }
+
+/** The tag a chat started by trying a room carries (C244 (c)): one fixed word, like favorite. */
+export const TRIED_TAG = 'tried'

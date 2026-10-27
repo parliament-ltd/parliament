@@ -204,7 +204,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
     ? (names.length ? i18n._(COPY.field.frameworkSome, { first: names[0], more: names.length - 1 }) : i18n._(COPY.field.frameworkNone))
     : null
   const room = prompt && !prompt.plan && !prompt.reflection && prompt.room !== undefined
-    ? { chat: prompt.chat ?? null, name: prompt.room ? roomLabel(i18n, prompt.roomName ?? null) : null, fresh: Boolean(prompt.about) }
+    ? { chat: prompt.chat ?? null, name: prompt.room ? roomLabel(i18n, prompt.roomName ?? null) : null, fresh: Boolean(prompt.about), trying: prompt.trying?.name ?? null }
     : undefined
 
   async function send() {

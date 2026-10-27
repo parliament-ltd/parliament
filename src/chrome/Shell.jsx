@@ -85,6 +85,8 @@ import { reflectionScope, markedSoFar, sessionOf, reflectRequest, readScope } fr
 import ReflectionBoard from './ReflectionBoard'
 import CanvasBoard from './CanvasBoard'
 import BlocksBoard from './BlocksBoard'
+import { guideAfter } from '../lib/labGuide'
+import { TRIED_TAG } from '../lib/lab'
 import { SCHEMES, schemeName } from '../lib/schemes'
 import { roomName as roomNameOfMode } from '../lib/roomNames'
 import { planLabOpen, planLabDone } from '../shell/arrangement'
@@ -1328,6 +1330,7 @@ export default function Shell() {
     if (what.kind === 'labDone') {
       const p = planLabDone(current.current)
       if (!p.next) return p.says?.message ?? 'doneNotLab'
+      setGuide(null)
       await run(p.next, null)
       remember(body)
       return null
@@ -1357,12 +1360,15 @@ export default function Shell() {
       if (touched.current) touched.current.roomsMade.push({ id: saved.id, components: saved.components, name: saved.meta?.name ?? '' })
       const p = planLabOpen(current.current, saved.id)
       if (p.next) await run(p.next, null)
+      setGuide(what.guided ? { room: saved.id, step: 0 } : null)
       setRoomRev((n) => n + 1)
       remember(body)
       return null
     }
     if (what.kind === 'roomChange') {
       await saveMode(what.after)
+      // The guide moves on when its question's command runs (C244 (e)).
+      setGuide((g) => guideAfter(g, what.modeId, body))
       if (touched.current) touched.current.rooms.push({ before: what.before })
       setRoomRev((n) => n + 1)
       remember(body)
@@ -1703,7 +1709,9 @@ export default function Shell() {
       // A room new:room made, taken out again while it is still as it was made.
       for (const r of entry.roomsMade) {
         const now = await loadMode(r.id).catch(() => null)
-        if (now && JSON.stringify(now.components) === JSON.stringify(r.components) && (now.meta?.name ?? '') === (r.name ?? '')) await deleteMode(r.id).catch(() => {})
+        // Never a room a chat lives in, as one tried there does (C244 (b)).
+        const lived = (await db.current.getAll('conversations').catch(() => [])).some((c) => c.room === r.id)
+        if (now && !lived && JSON.stringify(now.components) === JSON.stringify(r.components) && (now.meta?.name ?? '') === (r.name ?? '')) await deleteMode(r.id).catch(() => {})
       }
       setRoomRev((n) => n + 1)
     }
@@ -1900,6 +1908,14 @@ export default function Shell() {
     // For duplicate: (piece 3; C242 (e)).
     templates: TEMPLATES.filter((t) => t.scope === 'room').map((t) => ({ id: t.id, key: t.id, name: roomLabel(i18n, { template: t.id }), soon: t.status === 'coming-soon' })),
   }), [arrangement.lab, labRoom, roomChatRow, recordsNames, labLayouts, labThemes, blockFits, labBlocks, i18n])
+  // Trying the room (piece 4; C244 (a) ruled 1, (b)): in the Lab with no room
+  // open, a prompt starts a chat in the room on the Canvas, tagged tried, and
+  // that room opens beside it; later prompts carry on there, as in any room.
+  const tryingHere = useMemo(() => (arrangement.lab && !roomId && labRoom?.mode ? { id: labRoom.id, name: labRoom.name } : null), [arrangement.lab, roomId, labRoom])
+  // The guide (piece 4; C244 (e)), for the room it was opened with: the screen's only.
+  const [guide, setGuide] = useState(null)
+  const guideHere = guide && arrangement.lab && labRoomId === guide.room ? guide : null
+  const onGuide = useCallback((action) => setGuide((g) => (!g || action === 'off' ? null : { ...g, step: g.step + 1 })), [])
   // The block picked on the Canvas or the Blocks board, marked on both (C240 (f)).
   const [labPick, setLabPick] = useState(null)
   useEffect(() => { setLabPick(null) }, [labRoomId])
@@ -2801,7 +2817,8 @@ export default function Shell() {
     ink,
     roomName: roomNameHere,
     about,
-  }), [arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere, tellsHere, rippleFacts, reflecting])
+    trying: tryingHere,
+  }), [tryingHere, arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere, tellsHere, rippleFacts, reflecting])
 
   // ── Ripple (stage 12, piece 2; C231) ──────────────────
   // What came back for one message, landed (lib/ripple.js landRipple), and
@@ -2833,6 +2850,9 @@ export default function Shell() {
    * and shows it in a room beside what is here (welcome spec §5; C125).
    * Answers at once whether the prompt went, and `done` once it is answered.
    */
+  // A chat started by trying a room carries the tag tried, as one of your
+  // own tags, so a model's tagging keeps it (C244 (c)).
+  const tagTried = useCallback((id) => changeRecords(db.current, [{ store: 'conversations', id, set: { tags: [TRIED_TAG], tagsMine: [TRIED_TAG] }, expect: { tags: [], tagsMine: [] } }]), [])
   const onPrompt = useCallback(async (text, shown) => {
     if (shown?.plan) return promptToPlan(text, shown)
     if (shown?.reflection) return talkToReflection(text)
@@ -2946,7 +2966,8 @@ export default function Shell() {
       const others = []
       try {
         if (!id) {
-          const chat = await createConversation({ title: titleFromPrompt(text), model: latest.current.settings.defaultModel, answerer: whos[0].id, frameworks: fwIds })
+          const chat = await createConversation({ title: titleFromPrompt(text), model: latest.current.settings.defaultModel, answerer: whos[0].id, frameworks: fwIds, ...(shown?.trying ? { room: shown.trying.id } : {}) })
+          if (shown?.trying) await tagTried(chat.id)
           moveTell('', chat.id)
           setPendingAnswerer(null)
           setPendingFrameworks(null)
@@ -3081,7 +3102,8 @@ export default function Shell() {
     if (!id) {
       creating.current = true
       try {
-        const chat = await createConversation({ title: titleFromPrompt(text), model: latest.current.settings.defaultModel, answerer: who.chosen ? who.id : null, frameworks: fwIds })
+        const chat = await createConversation({ title: titleFromPrompt(text), model: latest.current.settings.defaultModel, answerer: who.chosen ? who.id : null, frameworks: fwIds, ...(shown?.trying ? { room: shown.trying.id } : {}) })
+        if (shown?.trying) await tagTried(chat.id)
         moveTell('', chat.id)
         setPendingAnswerer(null)
         setPendingFrameworks(null)
@@ -3142,7 +3164,7 @@ export default function Shell() {
         return failure(err, who.group === 'source' ? who.name : undefined)
       })
     return { done: withRipple(done, going, id) }
-  }, [askSource, askSourceAs, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked, promptToPlan, planRuns, translateQuery, tellsFor, moveTell, talkToReflection])
+  }, [askSource, askSourceAs, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked, promptToPlan, planRuns, translateQuery, tellsFor, moveTell, talkToReflection, tagTried])
 
   // again:203a (editing spec; C177): the branch's last prompt, read again,
   // asked as a new branch of its plan, the next letter, by who answers that
@@ -3368,7 +3390,7 @@ export default function Shell() {
         <CanvasBoard
           key="canvas" addressed={arrangement.addressed === 'canvas'} onAddress={focusBoard} onWrite={writeField} onRun={onPlanDelete}
           room={arrangement.lab && labRoomId ? (labRoom ?? { id: labRoomId, mode: undefined, name: '' }) : null}
-          layouts={labLayouts} themes={labThemes} picked={labPick} onPick={setLabPick}
+          layouts={labLayouts} themes={labThemes} picked={labPick} onPick={setLabPick} guide={guideHere} onGuide={onGuide}
         />
       )
     }
