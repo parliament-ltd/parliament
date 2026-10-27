@@ -58,6 +58,8 @@ export function cleanArrangement(record) {
   // the space itself; one that cannot be made sense of is dropped, and
   // focus:off then has nothing to bring back.
   const before = record.focus && typeof record.focus === 'object' ? cleanArrangement({ ...record.focus, id: record.id, context: {} }) : null
+  // While the Lab is open, the space as it was before lab:, for done: (C238 (c)).
+  const beforeLab = record.lab && typeof record.lab === 'object' ? cleanArrangement({ ...record.lab, id: record.id, context: {} }) : null
   // Spaces kept before C126 have no widths, and read with the usual shares.
   const widths = {}
   for (const [k, v] of Object.entries(record.widths && typeof record.widths === 'object' ? record.widths : {})) {
@@ -79,6 +81,7 @@ export function cleanArrangement(record) {
     context,
     widths,
     ...(before ? { focus: { columns: before.columns, popped: before.popped, addressed: before.addressed, bar: before.bar } } : {}),
+    ...(beforeLab ? { lab: { columns: beforeLab.columns, popped: beforeLab.popped, addressed: beforeLab.addressed, bar: beforeLab.bar } } : {}),
     ...(recordsCols ? { recordsCols } : {}),
     ...(lastRoom ? { lastRoom } : {}),
   }

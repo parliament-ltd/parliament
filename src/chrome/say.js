@@ -7,7 +7,7 @@
 import { COPY } from '../copy'
 
 const BOARD_VALUES = new Set(['board', 'first', 'second'])
-const AND_LISTS = new Set(['boards', 'verbs', 'sources', 'filters', 'nums', 'frameworks', 'phrases', 'answering'])
+const AND_LISTS = new Set(['boards', 'verbs', 'sources', 'filters', 'nums', 'frameworks', 'phrases', 'answering', 'choices'])
 const PERCENTS = new Set(['percent', 'low', 'high', 'share'])
 
 /** A day, given as 2026-09-01, the way the reader's language writes a date in full. */
@@ -76,6 +76,9 @@ export function say(i18n, message, values = {}) {
   const words = {}
   for (const [key, value] of Object.entries(values ?? {})) {
     if (BOARD_VALUES.has(key)) words[key] = boardName(i18n, value)
+    // A block and a slot of a room, by their ids (the Lab, stage 13; C238).
+    else if (key === 'block') words[key] = COPY.blocks[value] ? i18n._(COPY.blocks[value]) : String(value)
+    else if (key === 'fromSlot' || key === 'toSlot') words[key] = COPY.slots[value] ? i18n._(COPY.slots[value]) : String(value)
     else if (key === 'boards') words[key] = joined(i18n, value.map((b) => boardName(i18n, b)), 'conjunction')
     else if (AND_LISTS.has(key)) words[key] = joined(i18n, value.map(String), 'conjunction')
     // What the privacy filter found, by kind (C167): "an email address and 2 phone numbers".

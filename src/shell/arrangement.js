@@ -150,8 +150,8 @@ const copy = (a) => ({
 })
 const go2 = (next, message, values) => ({ next: settle(next), says: { message, values } })
 const sortedWidths = (a) => Object.entries(a.widths ?? {}).sort(([x], [y]) => (x < y ? -1 : 1))
-const sameLayout = (x, y) => JSON.stringify([x.columns, x.popped, x.addressed, x.bar.at, x.bar.side, x.bar.popped, x.resting, sortedWidths(x), Boolean(x.focus), recordsColumns(x)])
-  === JSON.stringify([y.columns, y.popped, y.addressed, y.bar.at, y.bar.side, y.bar.popped, y.resting, sortedWidths(y), Boolean(y.focus), recordsColumns(y)])
+const sameLayout = (x, y) => JSON.stringify([x.columns, x.popped, x.addressed, x.bar.at, x.bar.side, x.bar.popped, x.resting, sortedWidths(x), Boolean(x.focus), recordsColumns(x), Boolean(x.lab)])
+  === JSON.stringify([y.columns, y.popped, y.addressed, y.bar.at, y.bar.side, y.bar.popped, y.resting, sortedWidths(y), Boolean(y.focus), recordsColumns(y), Boolean(y.lab)])
 const refuse = (message, values) => ({ next: null, says: { message, values } })
 const go = (next, message, values) => ({ next, says: { message, values } })
 
@@ -511,6 +511,47 @@ export function planFocusOff(a) {
   const kept = a.columns.flat().find(isRoom)
   const back = [...before.columns.flat(), ...before.popped.map((p) => p.board)].filter((b) => b !== kept)
   return go2(next, back.length ? 'focusOff' : 'focusOffSame', { boards: back.map((b) => (isRoom(b) ? 'room' : b)) })
+}
+
+// ── The Lab (stage 13, piece 1; C238 (a), (c)) ─────────
+// lab: keeps the space as it is and lays out the Lab's boards (the Library,
+// the Canvas, the Blocks board, bar on top), the room in it named as the
+// Canvas's context; done: brings the space back as it was. With the Lab
+// open already, a room named moves into it.
+
+/** lab:, edit:, new:room. The Lab, with this room on its Canvas (or none). */
+export function planLabOpen(a, modeId = null) {
+  const lab = SHIPPED.lab
+  if (a.lab) {
+    if ((a.context.canvas ?? null) === modeId) return refuse('labAlready')
+    const next = copy(a)
+    if (modeId) next.context.canvas = modeId
+    else delete next.context.canvas
+    next.addressed = 'canvas'
+    return go2(next, 'labRoom')
+  }
+  const next = copy(a)
+  next.lab = { columns: a.columns.map((c) => [...c]), popped: a.popped.map((p) => ({ ...p })), addressed: a.addressed, bar: { ...a.bar } }
+  next.columns = lab.columns.map((c) => [...c])
+  next.popped = []
+  next.addressed = lab.addressed
+  next.bar = { ...a.bar, at: lab.bar, popped: false }
+  if (modeId) next.context.canvas = modeId
+  else delete next.context.canvas
+  return go2(next, 'labOpened')
+}
+
+/** done:. The space as it was before lab:. */
+export function planLabDone(a) {
+  if (!a.lab) return refuse('doneNotLab')
+  const before = a.lab
+  const next = copy(a)
+  delete next.lab
+  next.columns = before.columns.map((c) => [...c])
+  next.popped = before.popped.map((p) => ({ ...p }))
+  next.addressed = before.addressed
+  next.bar = { ...before.bar }
+  return go2(next, 'labLeft')
 }
 
 // ── cols: (Almanac v30; stage 6, piece 2; C141) ─────────

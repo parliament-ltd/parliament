@@ -620,6 +620,70 @@ msgid "branches.writing"
 msgstr "writing"
 
 #. js-lingui-explicit-id
+msgid "canvas.builtFor"
+msgstr "Built for"
+
+#. js-lingui-explicit-id
+msgid "canvas.desktop"
+msgstr "computer"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "canvas.empty"
+msgstr "No room in the Lab. edit:\"Writing studio\" puts one here, or new:room makes one."
+
+#. js-lingui-explicit-id
+msgid "canvas.emptySlot"
+msgstr "empty"
+
+#. js-lingui-explicit-id
+msgid "canvas.full"
+msgstr "full"
+
+#. js-lingui-explicit-id
+msgid "canvas.gone"
+msgstr "That room is not here any more."
+
+#. js-lingui-explicit-id
+msgid "canvas.layout"
+msgstr "Layout"
+
+#. js-lingui-explicit-id
+msgid "canvas.mobile"
+msgstr "phone"
+
+#. js-lingui-explicit-id
+msgid "canvas.name"
+msgstr "name"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "canvas.noLayout"
+msgstr "This room has no layout yet. layout:\"Three panels\" gives it one."
+
+#. js-lingui-explicit-id
+msgid "canvas.roomForMore"
+msgstr "room for more"
+
+#. js-lingui-explicit-id
+msgid "canvas.roomForOne"
+msgstr "room for one"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "canvas.runs"
+msgstr "Runs {command}; undo: takes it back"
+
+#. js-lingui-explicit-id
+msgid "canvas.theme"
+msgstr "Theme"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "canvas.writes"
+msgstr "Writes {command} in the bar"
+
+#. js-lingui-explicit-id
 msgid "chat.aboutCard"
 msgstr "{kind, select, note {note {num}} term {keyword {num}} quote {quote {num}} highlight {highlight {num}} other {{num}}}, kept in Parliament"
 
@@ -2026,6 +2090,19 @@ msgid "enter.deleteSugUse"
 msgstr "A suggestion is turned down with reject:{num}, and kept as the record of it"
 
 #. js-lingui-explicit-id
+msgid "enter.deviceGo"
+msgstr "Enter builds {room} for {device, select, mobile {a phone: its side panels fold into a sheet} other {a computer}}"
+
+#. js-lingui-explicit-id
+msgid "enter.deviceSame"
+msgstr "It is built for {device, select, mobile {a phone} other {a computer}} already"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deviceWhich"
+msgstr "device: takes desktop or mobile"
+
+#. js-lingui-explicit-id
 msgid "enter.didYouMean"
 msgstr "No command called {verb}. Did you mean {near}?"
 
@@ -2055,6 +2132,37 @@ msgstr "Plan {num} has one run. new:run makes another to compare"
 #. js-lingui-explicit-id
 msgid "enter.diffSame"
 msgstr "That is run {run}, on the board already. diff: and another run compares them"
+
+#. js-lingui-explicit-id
+msgid "enter.doneGo"
+msgstr "Enter leaves the Lab for what you had before. Every change was saved as you made it"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.doneNotLab"
+msgstr "done: leaves the Lab, which is not open"
+
+#. js-lingui-explicit-id
+msgid "enter.editHere"
+msgstr "{name} is in the Lab already"
+
+#. js-lingui-explicit-id
+msgid "enter.editMany"
+msgstr "More than one room is called that: {names}"
+
+#. js-lingui-explicit-id
+msgid "enter.editNone"
+msgstr "No room is called {said}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.editNotRoom"
+msgstr "{said} is a number. edit: takes a room, by its name"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.editWhich"
+msgstr "Name the room to change, as edit:\"Writing studio\""
 
 #. js-lingui-explicit-id
 msgid "enter.elsewhere"
@@ -2526,6 +2634,37 @@ msgid "enter.keyRefused"
 msgstr "The key was refused. Update it in {board}, then send again"
 
 #. js-lingui-explicit-id
+msgid "enter.labAlready"
+msgstr "The Lab is open already"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.labEmpty"
+msgstr "Enter opens the Lab with no room in it. Then edit:\"a room\" or new:room"
+
+#. js-lingui-explicit-id
+msgid "enter.labLeft"
+msgstr "Enter leaves the Lab"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.labNoRoom"
+msgstr "Put a room in the Lab first: edit:\"Writing studio\" or new:room"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.labOpen"
+msgstr "Enter opens {name} in the Lab. Each change there is saved as you make it, and undo: takes it back"
+
+#. js-lingui-explicit-id
+msgid "enter.labOpened"
+msgstr "Enter opens the Lab"
+
+#. js-lingui-explicit-id
+msgid "enter.labRoom"
+msgstr "Enter puts the room on the Canvas"
+
+#. js-lingui-explicit-id
 msgid "enter.languageBrowser"
 msgstr "Enter has the page follow your browser again: {language}"
 
@@ -2569,6 +2708,35 @@ msgstr "Enter puts the page in {language}, and your replies and searches follow 
 #. js-lingui-explicit-id
 msgid "enter.later"
 msgstr "{verb} is not built yet"
+
+#. js-lingui-explicit-id
+msgid "enter.layoutGo"
+msgstr "Enter gives {room} the layout {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.layoutMany"
+msgstr "Which layout: {names}?"
+
+#. js-lingui-explicit-id
+msgid "enter.layoutMoves"
+msgstr "{block} moves from {fromSlot} to {toSlot}"
+
+#. js-lingui-explicit-id
+msgid "enter.layoutNoMessages"
+msgstr "{name} has no place for the conversation"
+
+#. js-lingui-explicit-id
+msgid "enter.layoutNone"
+msgstr "No layout is called {said}. The layouts are {choices}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.layoutOut"
+msgstr "{block} has no place in it and comes out of the room; undo: puts it back"
+
+#. js-lingui-explicit-id
+msgid "enter.layoutSame"
+msgstr "Its layout is {name} already"
 
 #. js-lingui-explicit-id
 msgid "enter.leavePrompt"
@@ -2722,6 +2890,10 @@ msgstr "Enter starts {next}, an empty branch beside {address}, in a room of its 
 #. js-lingui-explicit-id
 msgid "enter.newBranchSteps"
 msgstr "{count, plural, =0 {{address} has no steps yet} one {{address} has one step} other {{address} has # steps}}"
+
+#. js-lingui-explicit-id
+msgid "enter.newRoomGo"
+msgstr "Enter makes a new room, the conversation in three panels, and opens it in the Lab"
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomHere"
@@ -3816,6 +3988,11 @@ msgstr "{num} is not a chat, so no room shows it"
 msgid "enter.roomNumberNotHere"
 msgstr "No room here shows {num}. open:{num} shows it"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.roomRan"
+msgstr "Ran {command}. undo: takes it back"
+
 #. js-lingui-explicit-id
 msgid "enter.roomThere"
 msgstr "Enter points the bar at the room that shows it"
@@ -4479,6 +4656,22 @@ msgstr "A note goes with a prompt in a room. Open one first: room:"
 #. js-lingui-explicit-id
 msgid "enter.tellSame"
 msgstr "That note is held already"
+
+#. js-lingui-explicit-id
+msgid "enter.themeGo"
+msgstr "Enter paints {room} in {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.themeMany"
+msgstr "Which theme: {names}?"
+
+#. js-lingui-explicit-id
+msgid "enter.themeNone"
+msgstr "No theme is called {said}. The themes are {choices}"
+
+#. js-lingui-explicit-id
+msgid "enter.themeSame"
+msgstr "Its theme is {name} already"
 
 #. js-lingui-explicit-id
 msgid "enter.thinkingNow"
@@ -6993,6 +7186,54 @@ msgstr "Boards"
 #. js-lingui-explicit-id
 msgid "shell.windowTitle"
 msgstr "{board} · Parliament"
+
+#. js-lingui-explicit-id
+msgid "slot.canvas"
+msgstr "the canvas"
+
+#. js-lingui-explicit-id
+msgid "slot.chat-panel"
+msgstr "the chat panel"
+
+#. js-lingui-explicit-id
+msgid "slot.document"
+msgstr "the document"
+
+#. js-lingui-explicit-id
+msgid "slot.input-dock"
+msgstr "the input dock"
+
+#. js-lingui-explicit-id
+msgid "slot.inspector"
+msgstr "the inspector"
+
+#. js-lingui-explicit-id
+msgid "slot.left-rail"
+msgstr "the left rail"
+
+#. js-lingui-explicit-id
+msgid "slot.margin"
+msgstr "the margin"
+
+#. js-lingui-explicit-id
+msgid "slot.msg-area"
+msgstr "the conversation"
+
+#. js-lingui-explicit-id
+msgid "slot.outline"
+msgstr "the outline"
+
+#. js-lingui-explicit-id
+msgid "slot.right-rail"
+msgstr "the right rail"
+
+#. js-lingui-explicit-id
+msgid "slot.right-rail-extra"
+msgstr "the lower right rail"
+
+#. js-lingui-explicit-id
+msgid "slot.sheet"
+msgstr "the sheet"
 
 #. js-lingui-explicit-id
 msgid "storage.ask"

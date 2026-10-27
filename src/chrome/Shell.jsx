@@ -4,7 +4,7 @@ import { useLingui } from '@lingui/react'
 import './chrome.css'
 import { COPY } from '../copy'
 import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch, getStorageEstimate, getPlan, getEditsOfChat } from '../lib/db'
-import { renameMode } from '../lib/modes'
+import { renameMode, loadMode, saveMode, createBlankMode, deleteMode } from '../lib/modes'
 import { loadSpace, saveArrangement } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
@@ -82,6 +82,10 @@ import { rippleChars, checkBranches, landRipple, landSuggestions as landStored }
 import { lastReply, sweepRequest, sweepItems } from '../lib/sweep'
 import { reflectionScope, markedSoFar, sessionOf, reflectRequest, readScope } from '../lib/reflection'
 import ReflectionBoard from './ReflectionBoard'
+import CanvasBoard from './CanvasBoard'
+import { SCHEMES, schemeName } from '../lib/schemes'
+import { roomName as roomNameOfMode } from '../lib/roomNames'
+import { planLabOpen, planLabDone } from '../shell/arrangement'
 
 // The new shell (refactor-plan.md §4 and stages 3 and 4): the board strip,
 // the boards as the arrangement places them, the bar, and windows of their
@@ -1305,6 +1309,45 @@ export default function Shell() {
       remember(body)
       return { done: true, says: { message: 'tellHeld', values: { count: what.notes.length } } }
     }
+    // The Lab (stage 13, piece 1; C238): lab:, edit:, done:, new:room, and a
+    // room changed there (layout:, theme:, device:, name:), saved at once
+    // (A10) with the room as it was kept for undo:.
+    if (what.kind === 'lab') {
+      const p = planLabOpen(current.current, what.modeId ?? null)
+      if (!p.next) return p.says?.message ?? 'labAlready'
+      await run(p.next, null)
+      remember(body)
+      return null
+    }
+    if (what.kind === 'labDone') {
+      const p = planLabDone(current.current)
+      if (!p.next) return p.says?.message ?? 'doneNotLab'
+      await run(p.next, null)
+      remember(body)
+      return null
+    }
+    if (what.kind === 'newRoom') {
+      const mode = createBlankMode('three-panel@1.0')
+      mode.components = [
+        { id: `comp_${crypto.randomUUID()}`, ref: 'messages@^1.0', slot: 'msg-area', order: 0, config: {} },
+        { id: `comp_${crypto.randomUUID()}`, ref: 'input@^1.0', slot: 'input-dock', order: 1, config: {} },
+      ]
+      const saved = await saveMode(mode)
+      if (touched.current) touched.current.roomsMade.push({ id: saved.id, components: saved.components, name: saved.meta?.name ?? '' })
+      const p = planLabOpen(current.current, saved.id)
+      if (p.next) await run(p.next, null)
+      setRoomRev((n) => n + 1)
+      remember(body)
+      return null
+    }
+    if (what.kind === 'roomChange') {
+      await saveMode(what.after)
+      if (touched.current) touched.current.rooms.push({ before: what.before })
+      setRoomRev((n) => n + 1)
+      remember(body)
+      // Echoed, as a click in the Lab runs it at once (A2, C38).
+      return { done: true, says: { message: 'roomRan', values: { command: body } } }
+    }
     if (what.kind === 'reflect') {
       // reflect: (stage 12, piece 4; C235 (d)): one call to the helper; what
       // comes back is shown on the board and kept in this tab only.
@@ -1626,6 +1669,23 @@ export default function Shell() {
         return stop(err?.name === 'Changed' ? { message: 'undoChanged', values: { nums: err.nums } } : 'undoFailed')
       }
     }
+    if (entry.rooms) {
+      // A room changed in the Lab (stage 13; C238): put back as it was.
+      try {
+        for (const r of [...entry.rooms].reverse()) await saveMode(r.before)
+      } catch {
+        return stop('undoFailed')
+      }
+      setRoomRev((n) => n + 1)
+    }
+    if (entry.roomsMade) {
+      // A room new:room made, taken out again while it is still as it was made.
+      for (const r of entry.roomsMade) {
+        const now = await loadMode(r.id).catch(() => null)
+        if (now && JSON.stringify(now.components) === JSON.stringify(r.components) && (now.meta?.name ?? '') === (r.name ?? '')) await deleteMode(r.id).catch(() => {})
+      }
+      setRoomRev((n) => n + 1)
+    }
     if (entry.created) {
       // A note written by note: or summarize: (C145): taken out, unless changed since.
       try {
@@ -1665,7 +1725,7 @@ export default function Shell() {
   const onRun = useCallback(async (next, body, go, what) => {
     if (what?.kind === 'undo') return undo(body)
     const before = { arrangement: current.current, view: viewNow.current }
-    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null, many: null, heldTo: null, tell: null, plans: [], messages: [] }
+    touched.current = { records: [], saved: [], collections: [], created: [], pending: null, pendingFw: null, own: [], setting: null, many: null, heldTo: null, tell: null, plans: [], messages: [], rooms: [], roomsMade: [] }
     const out = what ? await act(what, body, next) : await run(next, body)
     const t = touched.current
     touched.current = null
@@ -1702,7 +1762,9 @@ export default function Shell() {
     if (t.heldTo) entry.heldTo = t.heldTo
     if (t.tell) entry.tell = t.tell
     if (t.plans.length) entry.plans = t.plans
-    if (body && (entry.arrangement || entry.view || entry.records || entry.messages || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting || entry.many || entry.heldTo || entry.tell || entry.plans)) {
+    if (t.rooms.length) entry.rooms = t.rooms
+    if (t.roomsMade.length) entry.roomsMade = t.roomsMade
+    if (body && (entry.rooms || entry.roomsMade || entry.arrangement || entry.view || entry.records || entry.messages || entry.saved || entry.collections || entry.created || entry.pending || entry.pendingFw || entry.own || entry.setting || entry.many || entry.heldTo || entry.tell || entry.plans)) {
       undoStack.current = [...undoStack.current, entry].slice(-UNDO_MAX)
       setUndoTop(body)
     }
@@ -1777,6 +1839,40 @@ export default function Shell() {
   // screen stays if it does, else the one changed last. None holding it:
   // the one shown stays, and offers add: when the chat has edits or asks.
   const roomChatRow = useMemo(() => (roomId ? (almanacRows ?? []).find((r) => r.kind === 'chat' && r.chatId === roomId) ?? null : null), [almanacRows, roomId])
+
+  // ── The Lab (stage 13, piece 1; C238) ─────────────────
+  // Its layouts (the manifests are the one list of slots, R36), its themes,
+  // and where each block fits, its first choice first.
+  const labLayouts = useMemo(() => listLayoutEntries().filter((l) => l.scope === 'room')
+    .map((l) => ({ ref: `${l.name}@${l.version}`, key: l.name, name: COPY.layouts[l.name] ? i18n._(COPY.layouts[l.name]) : l.name, slots: l.slots })), [i18n])
+  const labThemes = useMemo(() => SCHEMES.map((s) => {
+    const key = schemeName(s.id)
+    return { ref: s.id, key, name: COPY.themes[key] ? i18n._(COPY.themes[key]) : key }
+  }), [i18n])
+  const blockFits = useMemo(() => new Map(listEntries().map((e) => [e.name, [...(e.slotTargets ?? [])].sort((a, b) => (b.primary ? 1 : 0) - (a.primary ? 1 : 0)).map((t) => t.slot)])), [])
+  // The room the building commands act on: the one on the Canvas in the
+  // Lab, else the room on screen.
+  const labRoomId = arrangement.lab ? arrangement.context?.canvas ?? null : null
+  const targetRoomId = arrangement.lab ? labRoomId : (roomChatRow?.roomId ?? null)
+  const [targetMode, setTargetMode] = useState(null)
+  useEffect(() => {
+    if (!targetRoomId) { setTargetMode(null); return undefined }
+    let live = true
+    loadMode(targetRoomId).then((m) => { if (live) setTargetMode({ id: targetRoomId, mode: m ?? null }) }, () => { if (live) setTargetMode({ id: targetRoomId, mode: null }) })
+    return () => { live = false }
+  }, [targetRoomId, roomRev])
+  const labRoom = useMemo(() => (targetMode && targetMode.id === targetRoomId
+    ? { id: targetMode.id, mode: targetMode.mode, name: targetMode.mode ? roomLabel(i18n, roomNameOfMode(targetMode.mode)) : '' }
+    : null), [targetMode, targetRoomId, i18n])
+  const labScreen = useMemo(() => ({
+    inLab: Boolean(arrangement.lab),
+    room: labRoom?.mode ? labRoom : null,
+    here: roomChatRow?.roomId ? { id: roomChatRow.roomId, name: roomLabel(i18n, recordsNames.rooms.find((r) => r.id === roomChatRow.roomId)?.name ?? null) } : null,
+    layouts: labLayouts,
+    themes: labThemes,
+    rooms: recordsNames.rooms.map((r) => ({ id: r.id, key: r.id, name: roomLabel(i18n, r.name) })),
+    fitsOf: (b) => blockFits.get(b) ?? [],
+  }), [arrangement.lab, labRoom, roomChatRow, recordsNames, labLayouts, labThemes, blockFits, i18n])
   const roomNotHeld = useMemo(() => {
     if (!roomChatRow || !shownCollection) return null
     if (roomChatRow.collections.includes(shownCollection.id)) return null
@@ -2530,7 +2626,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -3232,6 +3328,15 @@ export default function Shell() {
     }
     if (board === 'welcome') {
       return <WelcomeBoard key="welcome" welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={() => runCommand('language:')} />
+    }
+    if (board === 'canvas') {
+      return (
+        <CanvasBoard
+          key="canvas" addressed={arrangement.addressed === 'canvas'} onAddress={focusBoard} onWrite={writeField} onRun={onPlanDelete}
+          room={arrangement.lab && labRoomId ? (labRoom ?? { id: labRoomId, mode: undefined, name: '' }) : null}
+          layouts={labLayouts} themes={labThemes}
+        />
+      )
     }
     if (board === 'reflection') {
       return (

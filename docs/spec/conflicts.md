@@ -2409,7 +2409,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **(e) Not in this checkpoint:** reviewing asks with Ripple (your ruling, after the refactor), and C219's asks as built, approved for now.
 - **Suggestion:** (b) 2, (c) 2, (d) 1; then stage 13, the Lab.
 
-**C238. Stage 13 in pieces: the Lab** (proposed 27 October; refactor-plan.md, stage 13; the arrangements spec §2 to §5, §7, §8; Lab v7 and v6; A2, A10, C37, C38, C53, C63, C66, C95, C125, C126, C128, C131, C199, C207 (4)). Waiting for Stefan: (h), (i) and (k) are choices; the rest is built as suggested unless ruled otherwise. Each piece is committed and checked before the next.
+**C238. Stage 13 in pieces: the Lab** (proposed 27 October; **ruled 27 October: (h) 1, features of input in this stage; (i) 1, local-only rooms; the rest as suggested**; refactor-plan.md, stage 13; the arrangements spec §2 to §5, §7, §8; Lab v7 and v6; A2, A10, C37, C38, C53, C63, C66, C95, C125, C126, C128, C131, C199, C207 (4)). Waiting for Stefan: (h), (i) and (k) are choices; the rest is built as suggested unless ruled otherwise. Each piece is committed and checked before the next.
 - **What exists today** (a survey of the code and documents, 27 October):
   - Rooms are mode records (layout, theme, blocks with slot, order and settings, device), drawn by `RoomShell`, which skips what it does not know. Five templates are seeded, with Kingfisher and Starling as "coming soon", empty.
   - The old editor (`/edit`, about 4,000 lines with its rails, tray, dialogs and drag and drop) and the build wizard (`/build`, about 3,000 lines) still work, reached only from today's chat page.
@@ -2462,6 +2462,45 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 
     **Suggestion:** yes.
 - **Suggestion:** rule (h) and (i); then piece 1, with (l) as outlined.
+
+**C239. Stage 13, piece 1, as built: the Lab and the Canvas** (27 October; C238 as ruled).
+- **Into and out of the Lab:**
+  - `lab:` keeps what is on screen and lays out the Library, the Canvas and the Blocks board, the bar on top, with the room on screen on the Canvas ("Enter opens Pocket chat in the Lab. Each change there is saved as you make it, and undo: takes it back"); with no room, it opens empty.
+  - `edit:"Writing studio"` puts a room on the Canvas by its name or its start; a number is refused ("edit: takes a room, by its name").
+  - `new:room` makes a room with the conversation in three panels and opens it.
+  - `done:` brings back what was on screen. The Lab, and what was there before it, survive a reload.
+  - `undo:` after `new:room` takes the room out again while it is still as it was made, and the screen back.
+- **The Canvas:**
+  - The room by slot, in its own theme ("the sheet: Keywords, Branches · room for more"; a slot that holds one, "full").
+  - The room line: the name; Layout, its four choices; Theme, its six; Built for, computer or phone; and "name".
+  - A theme or a device, clicked, runs at once and is echoed under the field ("Ran theme:"Deep calm". undo: takes it back").
+  - A layout, clicked, writes `>layout:"Three panels"` and waits for Enter, since it moves blocks.
+- **The commands:**
+  - `layout:"Three panels"`, `theme:"Deep calm"`, `device:mobile` and, with the Canvas addressed, `name:"Essay room"` act on the room on the Canvas, or out of the Lab on the room on screen. Each is saved at once (A10) and is one step for `undo:`, which puts the room back as it was.
+  - Layouts and themes are named in your words (C131) or by their start.
+- **The layout rule** (refactor-plan.md §4): each block keeps its slot where the new layout has it and room in it, else takes its next fit (its first choice first), else comes out. The Enter line says each ("Keywords moves from the sheet to the left rail"; "… has no place in it and comes out of the room; undo: puts it back"). Exceptions:
+  - The conversation is placed first, and a layout with no place for it is refused.
+  - The input block stays whatever the layout, as the bar's dock (C37).
+  - The slots and their capacity come from the layout manifests alone (R36's replacement in use; the old copies stay until R36 is approved).
+- **Features of input:** an older room's web search, voice input and file attach blocks show as features of its input ("Input · voice input, web search, file attach"), and go where the input goes; piece 6 makes them features in full.
+- **The Enter line** names a room's blocks and slots in your words (`block`, `fromSlot`, `toSlot` in the copy table). A second room board, or the Canvas or Blocks board in the Lab, counts as the right board for the commands that build.
+- **Stored data:** none new. A room is saved as the mode record it is, and the space keeps the Lab's "before" beside `focus:`'s.
+- **Tests:**
+  - the layout rule: kept, moved, out, the conversation refused, a slot that holds one, features carried;
+  - the room by slot;
+  - every command's Enter line and act, and their refusals;
+  - opening, moving and leaving the Lab, through a reload.
+
+  1,270 tests.
+- **Tried in the browser,** on the trial copy:
+  - `lab:` with room 223 open put Pocket chat on the Canvas, its choices marked (One column and a sheet, Parliament, phone);
+  - Deep calm, clicked, painted it at once;
+  - a click on Three panels wrote the command, whose line named the two moves, and Enter made them;
+  - `undo:` put the layout back; a reload kept the Lab; `done:` brought the space back;
+  - `new:room` made an unnamed room in the Lab, and `undo:` took it out.
+
+  The test room's theme was put back to Parliament.
+- **Next:** piece 2, the Blocks board.
 
 ## Proposed CLAUDE.md rewrite
 

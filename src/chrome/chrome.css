@@ -899,3 +899,18 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-shell .ch-ref-q { display: block; text-align: start; padding: 4px 0; font: italic 400 13px/1.5 var(--ch-serif); color: var(--ch-ink); text-decoration: underline dotted; text-underline-offset: 3px; }
 .ch-ref-turn { margin: 6px 0; }
 .ch-ref-you { font-style: italic; color: var(--ch-ink-2) !important; }
+
+/* The Canvas, the room being built (stage 13, piece 1; C238; Lab v7). */
+.ch-roomline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; padding: 2px 0 10px; border-bottom: 1px solid var(--ch-divider); margin-bottom: 10px; }
+.ch-roomline b { font: 600 13px var(--ch-sans); color: var(--ch-ink); font-style: normal; }
+.ch-rl-group { display: inline-flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+.ch-rl-group .k { font-style: normal; color: var(--ch-ink-3); }
+.ch-shell .ch-rl-group button { padding: 0; color: var(--ch-ink-2); text-decoration: none; }
+.ch-shell .ch-rl-group button.on { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+.ch-lab-room { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; padding: 10px; border-radius: 8px; background: var(--p-surface, var(--ch-surface)); border: 1px solid var(--ch-divider); }
+.ch-lab-room.mobile { grid-template-columns: 1fr; max-width: 320px; margin: 0 auto; }
+.ch-lab-slot { border: 1px dashed var(--ch-divider); border-radius: 6px; padding: 8px; min-height: 64px; }
+.ch-lab-slot.empty { opacity: .75; }
+.ch-lab-slot h3 { font: 600 11px var(--ch-sans); color: var(--p-text-secondary, var(--ch-ink-3)); margin: 0 0 4px; text-transform: none; }
+.ch-lab-slot ul { list-style: none; margin: 0 0 4px; padding: 0; }
+.ch-lab-slot li { font: 400 13px var(--ch-sans); color: var(--p-text, var(--ch-ink)); padding: 2px 0; }

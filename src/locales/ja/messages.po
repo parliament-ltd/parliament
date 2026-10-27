@@ -620,6 +620,70 @@ msgid "branches.writing"
 msgstr "作成中"
 
 #. js-lingui-explicit-id
+msgid "canvas.builtFor"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.desktop"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "canvas.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.emptySlot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.full"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.gone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.layout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.mobile"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.name"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "canvas.noLayout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.roomForMore"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.roomForOne"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "canvas.runs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.theme"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "canvas.writes"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.aboutCard"
 msgstr "Parliamentに保存された{kind, select, note {メモ{num}} term {キーワード{num}} quote {引用{num}} highlight {ハイライト{num}} other {{num}}}"
 
@@ -2026,6 +2090,19 @@ msgid "enter.deleteSugUse"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.deviceGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deviceSame"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deviceWhich"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.didYouMean"
 msgstr "{verb} というコマンドはありません。{near} のことですか？"
 
@@ -2055,6 +2132,37 @@ msgstr "プラン{num}の実行は1つだけです。new:run で比較用の実�
 #. js-lingui-explicit-id
 msgid "enter.diffSame"
 msgstr "それはボードに表示中の実行{run}です。diff: と別の実行を指定すると比較できます"
+
+#. js-lingui-explicit-id
+msgid "enter.doneGo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.doneNotLab"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.editHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.editMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.editNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.editNotRoom"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.editWhich"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.elsewhere"
@@ -2526,6 +2634,37 @@ msgid "enter.keyRefused"
 msgstr "キーが拒否されました。{board}で更新してから、もう一度送信してください"
 
 #. js-lingui-explicit-id
+msgid "enter.labAlready"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.labEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.labLeft"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.labNoRoom"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.labOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.labOpened"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.labRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.languageBrowser"
 msgstr "Enterで、ページの言語をブラウザの設定に戻します：{language}"
 
@@ -2569,6 +2708,35 @@ msgstr "Enterでページを{language}にします。返答と検索もこれに
 #. js-lingui-explicit-id
 msgid "enter.later"
 msgstr "{verb} はまだ準備中です"
+
+#. js-lingui-explicit-id
+msgid "enter.layoutGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.layoutMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.layoutMoves"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.layoutNoMessages"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.layoutNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.layoutOut"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.layoutSame"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.leavePrompt"
@@ -2722,6 +2890,10 @@ msgstr "Enterで、{address}の隣に空のブランチ{next}を、専用のル�
 #. js-lingui-explicit-id
 msgid "enter.newBranchSteps"
 msgstr "{count, plural, =0 {{address}にはまだステップがありません} other {{address}には#ステップあります}}"
+
+#. js-lingui-explicit-id
+msgid "enter.newRoomGo"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomHere"
@@ -3816,6 +3988,11 @@ msgstr "{num}はチャットではないため、表示するルームはあり�
 msgid "enter.roomNumberNotHere"
 msgstr "ここには{num}を表示しているルームはありません。open:{num} で表示できます"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.roomRan"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.roomThere"
 msgstr "Enterで、それを表示しているルームをバーの対象にします"
@@ -4478,6 +4655,22 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.tellSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.themeGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.themeMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.themeNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.themeSame"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -6993,6 +7186,54 @@ msgstr "ボード"
 #. js-lingui-explicit-id
 msgid "shell.windowTitle"
 msgstr "{board}・Parliament"
+
+#. js-lingui-explicit-id
+msgid "slot.canvas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.chat-panel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.document"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.input-dock"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.inspector"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.left-rail"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.margin"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.msg-area"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.outline"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.right-rail"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.right-rail-extra"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.sheet"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "storage.ask"

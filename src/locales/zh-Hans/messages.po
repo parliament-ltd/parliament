@@ -620,6 +620,70 @@ msgid "branches.writing"
 msgstr "撰写中"
 
 #. js-lingui-explicit-id
+msgid "canvas.builtFor"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.desktop"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "canvas.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.emptySlot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.full"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.gone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.layout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.mobile"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.name"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "canvas.noLayout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.roomForMore"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.roomForOne"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "canvas.runs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "canvas.theme"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "canvas.writes"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.aboutCard"
 msgstr "{kind, select, note {笔记 {num}} term {关键词 {num}} quote {摘录 {num}} highlight {高亮 {num}} other {{num}}}，保存在 Parliament 中"
 
@@ -2026,6 +2090,19 @@ msgid "enter.deleteSugUse"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.deviceGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.deviceSame"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deviceWhich"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.didYouMean"
 msgstr "没有名为 {verb} 的命令。你是想输入 {near} 吗？"
 
@@ -2055,6 +2132,37 @@ msgstr "计划 {num} 只有一次运行。new:run 可再创建一次，用来对
 #. js-lingui-explicit-id
 msgid "enter.diffSame"
 msgstr "这就是第 {run} 次运行，已经在面板上。diff: 加上另一次运行即可对照二者"
+
+#. js-lingui-explicit-id
+msgid "enter.doneGo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.doneNotLab"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.editHere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.editMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.editNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.editNotRoom"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.editWhich"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.elsewhere"
@@ -2526,6 +2634,37 @@ msgid "enter.keyRefused"
 msgstr "密钥被拒绝。请在{board}中更新，然后重新发送"
 
 #. js-lingui-explicit-id
+msgid "enter.labAlready"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.labEmpty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.labLeft"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.labNoRoom"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.labOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.labOpened"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.labRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.languageBrowser"
 msgstr "按 Enter 让页面重新跟随浏览器的语言：{language}"
 
@@ -2569,6 +2708,35 @@ msgstr "按 Enter 将页面切换为{language}，回复和搜索也随之使用�
 #. js-lingui-explicit-id
 msgid "enter.later"
 msgstr "{verb} 尚未实现"
+
+#. js-lingui-explicit-id
+msgid "enter.layoutGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.layoutMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.layoutMoves"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.layoutNoMessages"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.layoutNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.layoutOut"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.layoutSame"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.leavePrompt"
@@ -2722,6 +2890,10 @@ msgstr "按 Enter 开始 {next}，即与 {address} 并列的空分支，放在�
 #. js-lingui-explicit-id
 msgid "enter.newBranchSteps"
 msgstr "{count, plural, =0 {{address} 还没有步骤} other {{address} 有 # 个步骤}}"
+
+#. js-lingui-explicit-id
+msgid "enter.newRoomGo"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.newRoomHere"
@@ -3816,6 +3988,11 @@ msgstr "{num} 不是对话，因此没有房间显示它"
 msgid "enter.roomNumberNotHere"
 msgstr "这里没有显示 {num} 的房间。open:{num} 可显示它"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.roomRan"
+msgstr ""
+
 #. js-lingui-explicit-id
 msgid "enter.roomThere"
 msgstr "按 Enter 让输入栏指向显示它的房间"
@@ -4478,6 +4655,22 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.tellSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.themeGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.themeMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.themeNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.themeSame"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -6993,6 +7186,54 @@ msgstr "面板"
 #. js-lingui-explicit-id
 msgid "shell.windowTitle"
 msgstr "{board} · Parliament"
+
+#. js-lingui-explicit-id
+msgid "slot.canvas"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.chat-panel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.document"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.input-dock"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.inspector"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.left-rail"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.margin"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.msg-area"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.outline"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.right-rail"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.right-rail-extra"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "slot.sheet"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "storage.ask"
