@@ -2763,6 +2763,53 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   Essay room and chat 225 are left on the trial copy; removing them is a deletion, so it waits for Stefan.
 - **Next:** piece 5, built for a phone and local-only rooms.
 
+**C246. Stage 13, piece 5: built for a phone and local-only rooms, its open points** (proposed 27 October; C238 (g), (i) ruled 1, (l); security-privacy-decisions §4.3; C126, C169). Built as suggested, so a ruling changes one entry. (c) is a change to stored data, shown here before it is written.
+- **What exists today:**
+  - `device:mobile` is stored (piece 1), and the Canvas draws a phone room as one column, but a room on screen ignores it.
+  - A room on screen draws its layout's narrow form when its own board is narrow: the conversation, with the side panels behind buttons at its top (C126).
+  - Ollama is the one model on this computer (stage 7). The privacy filter's names check already runs only there (C169).
+- **(a) Built for a phone:**
+  - A room built for a phone draws its narrow form wherever it shows, at any width, in a column no wider than a phone's (about 480 pixels), centred.
+  - A room built for a computer stays as it is: narrow only when its board is.
+
+  **Suggestion:** yes.
+- **(b) The setting:**
+  - `local:on` and `local:off`, on the room in the Lab, or out of the Lab on the room on screen, as `device:` is.
+  - The Canvas's room line gains "Sends to: anyone · this computer only", which applies on click and is echoed, `undo:` taking it back (A2).
+  - It is a new verb, `local:`, in the building group.
+
+  **Suggestion:** yes.
+- **(c) The stored field** (a change to stored data, shown first). One optional field on a room record (the `modes` store):
+
+  ```
+  { ...room as today, localOnly: true }
+  ```
+
+  - It is present only when on: `local:off` takes it away, so a room never set keeps the record it has.
+  - Templates carry none.
+  - There is no migration and no version change.
+  - Backups keep rooms whole, so it travels in them. Restore's check of a room accepts it only as true or false. Every backup written before has none, so its rooms read as "anyone", and all stay readable.
+
+  **Suggestion:** approve.
+- **(d) What it holds back.** A local-only room's chats go only to a model on this computer:
+  - **Prompts** (typed, a resend, a continue): to a hosted model or a source, the Enter line refuses them ("Essay room sends only to models on this computer: by: one, or local:off").
+  - **The safety net:** the chat store checks again at the moment of sending, wherever the send began, a plan's run included. So nothing reaches a hosted model even by a path the Enter line does not see.
+  - **Title and tags:** already go to whoever answered, so they stay on this computer.
+  - **The helper's work:** Ripple, sweeps, Reflection and its talk, summaries and summary branches, translating replies.
+    - It goes only when the helper is a model on this computer; otherwise the command is refused on the Enter line.
+    - Ripple's checks with a prompt are skipped, the line saying so.
+    - A simplification: while a local-only room is on screen, these commands are refused whichever chat they name.
+  - **Answers from sources** already held with `include:` go to the local model as data, as today. Nothing is sent to the source.
+
+  **Suggestion:** yes.
+- **(e) Where it shows:**
+  - the Canvas's room line;
+  - the Library's room details ("Sends to: this computer only");
+  - the Enter line of any prompt in it, which names the model on this computer as for any prompt.
+
+  **Suggestion:** yes.
+- **(f) What can be tried:** the trial copy has no Ollama, so the refusals can be tried in the browser, and a local answer only in tests. **Suggestion:** say so in the as-built entry.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
