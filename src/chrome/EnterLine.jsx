@@ -80,7 +80,7 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
         key: 'does',
         now: true,
         text: search
-          ? i18n._(search.cards ? COPY.enter.searchCards : search.settings ? COPY.enter.searchSettings : COPY.enter.searchShows, { count: search.count })
+          ? i18n._(search.cards ? COPY.enter.searchCards : search.settings ? COPY.enter.searchSettings : search.library ? COPY.enter.searchLibrary : COPY.enter.searchShows, { count: search.count })
           : i18n._(COPY.enter.searchRecords, { first: boardName(i18n, 'almanac'), second: boardName(i18n, 'collection') }),
       }]
     if (resting !== 'search') parts.push(leave)

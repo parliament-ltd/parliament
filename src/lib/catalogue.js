@@ -62,6 +62,9 @@ export function catalogueItems({
     theme: themeName.get(bare(mode?.scheme?.ref)) ?? null,
     themeWord: bare(mode?.scheme?.ref) || null,
     blocks: blockCount(mode?.components),
+    // For the Library's details (C242 (c)): the blocks by key, and what it is built for.
+    blockKeys: (mode?.components ?? []).map((c) => bare(c?.ref)).filter((b) => b && !FEATURES.includes(b)),
+    device: mode?.deviceClass === 'visual-touch-phone' ? 'mobile' : 'desktop',
   })
   // A room made from a template keeps the template's description until its
   // owner writes another, so it reads in the reader's language too.
@@ -72,7 +75,7 @@ export function catalogueItems({
     // record their template.
     const said = mode.meta?.description
     const aboutTemplate = said ? templates.find((t) => t.description === said)?.id ?? null : null
-    items.push({ shelf: 'room', key: `room:${mode.id}`, mine: true, name: roomName(mode) ?? { unnamed: true }, description: mode.meta?.description || null, aboutTemplate, ...facts(mode) })
+    items.push({ shelf: 'room', key: `room:${mode.id}`, id: mode.id, mine: true, name: roomName(mode) ?? { unnamed: true }, description: mode.meta?.description || null, aboutTemplate, ...facts(mode) })
   }
   for (const t of templates.filter((x) => x.scope === 'room')) {
     items.push({ shelf: 'room', key: `template:${t.id}`, template: t.id, name: { template: t.id }, description: t.description ?? null, aboutTemplate: t.id, soon: t.status === 'coming-soon', ...facts(t) })
@@ -86,14 +89,15 @@ export function catalogueItems({
     built.add(l.name)
     const stored = storedLayouts.find((s) => bare(s.id) === l.name)
     const places = new Set((l.slots ?? []).map((s) => s.id)).size
-    items.push({ shelf: 'layout', key: `layout:${l.name}@${l.version}`, word: l.name, name: l.displayName, description: l.description ?? stored?.description ?? null, places })
+    items.push({ shelf: 'layout', key: `layout:${l.name}@${l.version}`, word: l.name, name: l.displayName, description: l.description ?? stored?.description ?? null, places, slots: [...new Set((l.slots ?? []).map((s) => s.id))] })
   }
   for (const s of storedLayouts.filter((x) => x.status === 'coming-soon' && isRoomScope(x.scopes) && !built.has(bare(x.id)))) {
     items.push({ shelf: 'layout', key: `layout:${s.id}`, word: bare(s.id), name: s.displayName, description: s.description ?? null, soon: true })
   }
 
   for (const b of blocks.filter((x) => (x.surfaces ?? []).includes('room') && !FEATURES.includes(x.name))) {
-    items.push({ shelf: 'block', key: `block:${b.name}`, word: b.name, name: b.displayName, description: b.description ?? null, features: b.name === INPUT ? [...FEATURES] : [] })
+    items.push({ shelf: 'block', key: `block:${b.name}`, word: b.name, name: b.displayName, description: b.description ?? null, features: b.name === INPUT ? [...FEATURES] : [],
+      fits: [...(b.slotTargets ?? [])].sort((x, y) => (y.primary ? 1 : 0) - (x.primary ? 1 : 0)).map((t) => t.slot) })
   }
 
   for (const t of themes) items.push({ shelf: 'theme', key: `theme:${t.id}`, word: bare(t.id), name: t.displayName, description: t.description ?? null })

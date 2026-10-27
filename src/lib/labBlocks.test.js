@@ -75,7 +75,7 @@ describe('add: and rm: in the Lab (C240; C63)', () => {
     expect(where(p.act.after).highlights).toBe('left-rail')
     expect(p.act.after.components.map((c) => c.order)).toEqual([0, 1, 2, 3, 4, 5])
     expect(at('>add:notes').text).toBe('Notes is in the room already. place: moves it')
-    expect(at('>add:nothing').text).toBe('No block is called nothing. The Library lists them')
+    expect(at('>add:nothing').text).toBe('Nothing in the Library is called nothing')
     const two = at('>add:keywords, contents')
     expect(two.text).toBe('Enter puts Keywords and Table of contents in the room')
     expect(two.also).toEqual(['Keywords goes in the left rail', 'Table of contents goes in the left rail'])
@@ -139,5 +139,29 @@ describe('set: a block (C240 (a), (b))', () => {
   it('pins the step list when it is given a plan', () => {
     const withSteps = { ...studio, components: [...studio.components, comp('c6', 'steps@^1.0', 'right-rail', 5)] }
     expect(at('>set:steps plan 201', { mode: withSteps }).act.after.components.find((c) => c.id === 'c6').config).toEqual({ follow: 'a pinned plan', plan: 201 })
+  })
+})
+
+describe('add: with a layout and a theme, as "add to room" writes it (C242 (b))', () => {
+  const themes = [{ ref: 'deep-calm@1.0', key: 'deep-calm', name: 'Deep calm' }, { ref: 'parliament@1.0', key: 'parliament', name: 'Parliament' }]
+  const go = (value, a = inLab('library')) => {
+    const p = preview(value, { mode: 'command', arrangement: a, screens: { lab: { ...labOf(), themes, rooms: [{ id: 'mode_1', key: 'mode_1', name: 'Essay room' }] } } })
+    return { ...p, text: p.says ? say(i18n, p.says.message, p.says.values) : '', also: (p.says?.also ?? []).map((x) => say(i18n, x.message, x.values)) }
+  }
+  it('takes the layout first, then the theme, then each block to its first free place', () => {
+    const p = go('>add:keywords, "Document in the middle", "Deep calm"')
+    expect(p.text).toBe('Enter changes Essay room')
+    expect(p.also[0]).toBe('It takes the layout Document in the middle')
+    expect(p.also).toContain('It is painted in Deep calm')
+    expect(p.also[p.also.length - 1]).toBe('Keywords goes in the margin')
+    expect(p.act.after).toMatchObject({ layout: { ref: 'document-centric@1.0' }, scheme: { ref: 'deep-calm@1.0' } })
+    expect(where(p.act.after).highlights).toBe('margin')
+  })
+  it('works with the Library addressed in the Lab, and refuses what does not go into a room', () => {
+    expect(go('>add:"Deep calm"').act.after.scheme.ref).toBe('deep-calm@1.0')
+    expect(go('>add:"Deep calm", "Parliament"').text).toBe('A room has one theme. Untick one of Deep calm or Parliament')
+    expect(go('>add:"Essay room"').text).toBe('Essay room is a room. Only blocks, a layout and a theme go into a room; edit: opens a room')
+    expect(go('>add:"Three panels", "Parliament"').text).toBe('All of that is in the room already')
+    expect(go('>add:"Nowhere"').text).toBe('Nothing in the Library is called Nowhere')
   })
 })

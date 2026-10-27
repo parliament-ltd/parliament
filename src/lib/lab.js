@@ -195,3 +195,38 @@ export function planLabName(step, screens = {}) {
 
 /** What device a room is built for, as the Canvas says it. */
 export const deviceOf = (mode) => (mode?.deviceClass === 'visual-touch-phone' ? 'mobile' : 'desktop')
+
+/**
+ * duplicate:"Writing studio" (C242 (e)): a copy of a room, yours or a
+ * template, named with the next number free, opened in the Lab. Your room
+ * by that name first; `duplicate:"Writing studio" template` takes the
+ * template. With no name, the room on the Canvas, else the room on screen.
+ * screens.lab.templates: [{ id, key, name, soon }].
+ */
+export function planDuplicate(step, screens = {}) {
+  const l = screens.lab ?? {}
+  const typed = said(step)
+  const onlyTemplate = step.match?.values?.[1]?.value === 'template'
+  let from
+  if (!typed) {
+    const r = l.inLab ? l.room : l.here
+    if (!r) return { says: { message: 'duplicateWhich' }, act: null }
+    from = { room: r.id, name: r.name }
+  } else {
+    const mine = onlyTemplate ? { none: true } : pick(l.rooms ?? [], typed)
+    const tpl = pick(l.templates ?? [], typed)
+    const got = mine.found ? mine : tpl.found ? tpl : mine.many ? mine : tpl
+    if (got.many) return { says: { message: 'editMany', values: { said: typed, names: got.many.map((r) => r.name) } }, act: null }
+    if (!got.found) return { says: { message: 'duplicateNone', values: { said: typed } }, act: null }
+    if (got.found.soon) return { says: { message: 'duplicateSoon', values: { name: got.found.name } }, act: null }
+    from = got === mine ? { room: got.found.id, name: got.found.name } : { template: got.found.id, name: got.found.name }
+  }
+  const taken = new Set((l.rooms ?? []).map((r) => words(r.name)))
+  let n = 2
+  while (taken.has(words(`${from.name} ${n}`))) n += 1
+  const name = `${from.name} ${n}`
+  return {
+    says: { message: from.template ? 'duplicateTemplate' : 'duplicateGo', values: { name: from.name, copy: name } },
+    act: { kind: 'duplicateRoom', ...(from.template ? { template: from.template } : { room: from.room }), name },
+  }
+}

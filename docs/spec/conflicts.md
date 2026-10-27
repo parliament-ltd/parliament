@@ -2632,6 +2632,57 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **(g) Stored data:** none new. A duplicate is a room record like any other; ticks and open details are not kept.
 - **Suggestion:** build as above.
 
+**C243. Stage 13, piece 3, as built: the Library in full** (27 October; C242 as suggested).
+- **Ticking** (C242 (a)):
+  - In the Lab with a room on the Canvas, blocks, layouts and themes carry a tick box; what the room has shows greyed, "in this room".
+  - The line under the shelves: "2 ticked: Keywords, Deep calm · add to room · clear", or at rest "tick blocks, a layout or a theme, then add them to the room together".
+  - Ticks survive a shelf or a search, drop once their item is in the room, and clear when another room comes onto the Canvas. They are never stored.
+- **"add to room"** (C242 (b)) writes `>add:keywords, "Deep calm"` and waits for Enter.
+  - `add:` takes a layout and a theme as well as blocks: the layout first, by piece 1's rule, its moves said; then the theme; then each block to its first free place. The line: "Enter changes Quiet room · It is painted in Deep calm · Keywords goes in the left rail".
+  - It refuses two layouts or two themes ("A room has one theme. Untick one of Deep calm or Parliament"), a room's name ("… is a room. Only blocks, a layout and a theme go into a room; edit: opens a room"), and a list that is all in the room already.
+  - With the Library addressed in the Lab, `add:`, `rm:`, `place:` and `set:` act on the room, as with the Canvas or Blocks board. `name:` there still names what it named before; only the Canvas and Blocks board name the room.
+- **Details in place** (C242 (c)): a click on a name opens its details under it, one at a time, with "close".
+  - Block: where it fits, its settings, the rooms that use it.
+  - Layout: its places, the rooms that use it.
+  - Theme: the rooms painted in it.
+  - Room: its layout, theme, what it is built for, its blocks.
+
+  A popped-out Library opens them in place too; the side column waits for the polish stage.
+- **A room's one action** (C242 (d)):
+  - your room: "edit here" (`>edit:"Pocket chat"`), or "on the Canvas";
+  - a template: "duplicate" (`>duplicate:"Writing studio" template`);
+  - a board: "open";
+  - coming soon: none.
+- **`duplicate:`** (C242 (e)):
+  - `duplicate:"Writing studio"` copies your room by that name, else the template.
+  - `duplicate:"Writing studio" template` takes the template whatever you have: a template and a room made from it share a name, so the Library's "duplicate" writes this form. This form was added in building and was not in C242.
+  - `duplicate:` alone copies the room on the Canvas, or out of the Lab the room on screen.
+  - The copy, named with the next number free ("Data workspace 2"), takes the layout, theme, device and every block with its settings and fresh ids, never chats. It opens in the Lab.
+  - `undo:` takes it away while it is as made, and puts the screen back.
+  - A template coming soon is refused. `duplicate:` moved from the collection group to building in the command list; a collection's or a plan's copy is not offered.
+- **Search** (C242 (f)): with the Library addressed, the bar's search narrows it by name, about and features, counting what shows on the shelf chosen ("3 items match"; "Nothing in the Library matches").
+- **The catalogue** (`lib/catalogue.js`) now also gives:
+  - a room's block keys and device;
+  - a layout's slots;
+  - a block's fits, first choice first.
+
+  It reads nothing new.
+- **Stored data:** none new. A duplicate is a room record like any other.
+- **Tests:**
+  - `add:` with a layout and a theme, and its refusals, with the Library addressed;
+  - `duplicate:`: yours first, the template, the next number, coming soon, none named.
+
+  1,289 tests; 30 lint warnings, all older.
+- **Tried in the browser,** on the trial copy, with Quiet room on the Canvas:
+  - Keywords and Deep calm ticked; Three panels, Parliament, Messages and Input greyed;
+  - "add to room" wrote the line, and Enter put Keywords in the left rail and painted the room; the ticks cleared; `undo:` took it back;
+  - Notes' and Pocket chat's details opened in place, one at a time;
+  - "chart" in the search showed three items, and none on the Themes shelf, the Enter line agreeing;
+  - "duplicate" on Data workspace made "Data workspace 2" with its eight blocks, open in the Lab, and `undo:` took it away.
+
+  The trial copy is as it was.
+- **Next:** piece 4, trying a room and the guide.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

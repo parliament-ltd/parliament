@@ -4,7 +4,8 @@ import { useLingui } from '@lingui/react'
 import './chrome.css'
 import { COPY } from '../copy'
 import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch, getStorageEstimate, getPlan, getEditsOfChat } from '../lib/db'
-import { renameMode, loadMode, saveMode, createBlankMode, deleteMode } from '../lib/modes'
+import { renameMode, loadMode, saveMode, createBlankMode, createCopyOfMode, deleteMode } from '../lib/modes'
+import { TEMPLATES } from '../lib/seedTemplates'
 import { loadSpace, saveArrangement } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
 import { assignDefaultRoom } from '../lib/migration'
@@ -507,7 +508,11 @@ export default function Shell() {
     if (board === 'collection') setCollectionSearch(text)
     // Settings: search narrows the card to the rows that match (C181).
     if (board === 'settings') setSettingsSearch(text)
+    // The Library: search narrows it (C242 (f)).
+    if (board === 'library') setLibrarySearch(text)
   }, [])
+  const [librarySearch, setLibrarySearch] = useState('')
+  const [libraryCount, setLibraryCount] = useState(0)
   const [settingsSearch, setSettingsSearch] = useState('')
   const [settingsCount, setSettingsCount] = useState(0)
   const showView = useCallback((view) => {
@@ -1327,6 +1332,21 @@ export default function Shell() {
       remember(body)
       return null
     }
+    if (what.kind === 'duplicateRoom') {
+      // duplicate: (piece 3; C242 (e)): a copy of a room or a template,
+      // named, with fresh ids, opened in the Lab; never its chats.
+      const source = what.template ? TEMPLATES.find((t) => t.id === what.template) ?? null : await loadMode(what.room)
+      if (!source) return 'duplicateGone'
+      const copy = createCopyOfMode(source)
+      copy.meta = { ...copy.meta, name: what.name }
+      const saved = await saveMode(copy)
+      if (touched.current) touched.current.roomsMade.push({ id: saved.id, components: saved.components, name: saved.meta?.name ?? '' })
+      const p = planLabOpen(current.current, saved.id)
+      if (p.next) await run(p.next, null)
+      setRoomRev((n) => n + 1)
+      remember(body)
+      return null
+    }
     if (what.kind === 'newRoom') {
       const mode = createBlankMode('three-panel@1.0')
       mode.components = [
@@ -1877,6 +1897,8 @@ export default function Shell() {
     rooms: recordsNames.rooms.map((r) => ({ id: r.id, key: r.id, name: roomLabel(i18n, r.name) })),
     fitsOf: (b) => blockFits.get(b) ?? [],
     blocks: labBlocks,
+    // For duplicate: (piece 3; C242 (e)).
+    templates: TEMPLATES.filter((t) => t.scope === 'room').map((t) => ({ id: t.id, key: t.id, name: roomLabel(i18n, { template: t.id }), soon: t.status === 'coming-soon' })),
   }), [arrangement.lab, labRoom, roomChatRow, recordsNames, labLayouts, labThemes, blockFits, labBlocks, i18n])
   // The block picked on the Canvas or the Blocks board, marked on both (C240 (f)).
   const [labPick, setLabPick] = useState(null)
@@ -3301,8 +3323,8 @@ export default function Shell() {
     [arrangement, roomRecord],
   )
   const welcomeHint = useMemo(() => (onWelcome && !welcome.finished ? { next: nextStep(welcome) } : null), [onWelcome, welcome])
-  const searches = { almanac: recordsView.search, collection: collectionSearch, settings: settingsSearch }
-  const searchCounts = { almanac: recordsSearch, collection: { count: collectionShown.cards.length, cards: true }, settings: { count: settingsCount, settings: true } }
+  const searches = { almanac: recordsView.search, collection: collectionSearch, settings: settingsSearch, library: librarySearch }
+  const searchCounts = { almanac: recordsSearch, collection: { count: collectionShown.cards.length, cards: true }, settings: { count: settingsCount, settings: true }, library: { count: libraryCount, library: true } }
   const shared = { arrangement, lines, screens, prompt, onRun, onPrompt, onTop: FEATURES.onTop, welcome: welcomeHint, onSearch, searches, searchCounts, said: barSaid }
   const filtered = isAtRest(recordsView) ? null : { search: recordsView.search.trim(), line: viewLine(recordsView) }
   const drawBoard = (board) => {
@@ -3332,7 +3354,11 @@ export default function Shell() {
       )
     }
     if (board === 'library') {
-      return <LibraryBoard key="library" items={catalogue} addressed={arrangement.addressed === 'library'} onAddress={focusBoard} onWrite={writeField} />
+      return (
+        <LibraryBoard key="library" items={catalogue} addressed={arrangement.addressed === 'library'} onAddress={focusBoard} onWrite={writeField}
+          query={librarySearch} onCount={setLibraryCount}
+          lab={arrangement.lab ? { inLab: true, room: labRoomId && labRoom?.mode ? labRoom : null } : null} />
+      )
     }
     if (board === 'welcome') {
       return <WelcomeBoard key="welcome" welcome={welcome} addressed={arrangement.addressed === 'welcome'} onAddress={focusBoard} onWrite={writeField} barSlot={setCardSlot} keep={keepNotice} languages={offeredLanguages().length > 1 ? { now: i18n.locale } : null} onLanguage={() => runCommand('language:')} />

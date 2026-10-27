@@ -136,3 +136,27 @@ describe('features of input in an older room (C238; R24)', () => {
     expect(p.moved.concat(p.out).some((m) => m.block === 'web-search')).toBe(false)
   })
 })
+
+describe('duplicate: (C242 (e))', () => {
+  const lab = { inLab: false, room: null, here: { id: 'mode_1', name: 'Essay room' }, layouts, themes: [], fitsOf,
+    rooms: [{ id: 'mode_1', key: 'mode_1', name: 'Writing studio' }, { id: 'mode_2', key: 'mode_2', name: 'Writing studio 2' }],
+    templates: [{ id: 'writing-studio', key: 'writing-studio', name: 'Writing studio' }, { id: 'kingfisher', key: 'kingfisher', name: 'Kingfisher', soon: true }] }
+  const at = (value) => {
+    const p = preview(value, { mode: 'command', arrangement: shipped('almanac'), screens: { lab } })
+    return { ...p, text: p.says ? say(i18n, p.says.message, p.says.values) : '' }
+  }
+  it('copies your room first, under the next number free', () => {
+    expect(at('>duplicate:"Writing studio"')).toMatchObject({
+      text: 'Enter copies Writing studio as Writing studio 3 and opens the copy in the Lab. Its chats stay with it',
+      act: { kind: 'duplicateRoom', room: 'mode_1', name: 'Writing studio 3' },
+    })
+  })
+  it('copies a template when told to, and not one coming soon', () => {
+    expect(at('>duplicate:"Writing studio" template')).toMatchObject({ act: { kind: 'duplicateRoom', template: 'writing-studio', name: 'Writing studio 3' } })
+    expect(at('>duplicate:"Kingfisher"').text).toBe('Kingfisher is coming soon, so there is nothing to copy yet')
+    expect(at('>duplicate:"Nowhere"').text).toBe('No room or template is called Nowhere')
+  })
+  it('takes the room on screen when none is named', () => {
+    expect(at('>duplicate:').act).toMatchObject({ room: 'mode_1', name: 'Essay room 2' })
+  })
+})

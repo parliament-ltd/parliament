@@ -532,7 +532,7 @@ The piece with the most risk in it. It starts with a spike, not with building.
 
 ### Stage 13. The Lab
 
-**Status, 27 October: proposed in seven pieces as C238, ruled the same day:** features of input in this stage, local-only rooms in piece 5. **Piece 1 built (C239):** the Lab, the Canvas and the room commands. **Piece 2 built (C241):** the Blocks board, `add:`, `rm:`, `place:` and a block's `set:`.
+**Status, 27 October: proposed in seven pieces as C238, ruled the same day:** features of input in this stage, local-only rooms in piece 5. **Piece 1 built (C239):** the Lab, the Canvas and the room commands. **Piece 2 built (C241):** the Blocks board, `add:`, `rm:`, `place:` and a block's `set:`. **Piece 3 built (C243):** the Library in full, ticking, details in place, `duplicate:`.
 
 Built to Lab v7 (A2). Can run beside the others once stage 3 exists.
 

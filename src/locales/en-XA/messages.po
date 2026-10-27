@@ -1699,6 +1699,39 @@ msgid "count.steps"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.addAllThere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.addLayout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.addNone"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.addNotForRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.addTheme"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.addToRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.addTwoLayouts"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.addTwoThemes"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.again"
 msgstr ""
 
@@ -2400,6 +2433,31 @@ msgstr ""
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.doneNotLab"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.duplicateGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.duplicateGone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.duplicateNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.duplicateSoon"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.duplicateTemplate"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.duplicateWhich"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -4488,6 +4546,10 @@ msgstr ""
 msgid "enter.searchCards"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.searchLibrary"
+msgstr ""
+
 #. In search mode on a board search does not reach yet; {first} and {second} are board names
 #. js-lingui-explicit-id
 msgid "enter.searchRecords"
@@ -5933,7 +5995,75 @@ msgid "library.aboutSettings"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "library.addToRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "library.blocks"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.clear"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.close"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.dBlocks"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.dBuiltFor"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.dComputer"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.dFits"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.dLayout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.dNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.dNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.dPhone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.dPlaces"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.dSettings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.dTheme"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.duplicate"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.dUsedIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.editHere"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -5965,7 +6095,19 @@ msgid "library.inRoom"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "library.inThisRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "library.loading"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.noMatch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.onCanvas"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -6037,6 +6179,23 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "library.themeFact"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.tick"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.ticked"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "library.tickHow"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "library.writes"
 msgstr ""
 
 #. js-lingui-explicit-id

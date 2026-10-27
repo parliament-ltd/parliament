@@ -34,7 +34,7 @@ import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
 import { planHoldEdits, planAsk, planUndoChange, planSettle, planDropAsks, planStrike, planTell, planRipple } from '../lib/editVerbs'
 import { planSweep } from '../lib/sweep'
 import { planReflect, reflectTalkPreview } from '../lib/reflection'
-import { planLab, planEdit, planDone, planNewRoom, planLayout, planTheme, planDevice, planLabName } from '../lib/lab'
+import { planLab, planEdit, planDone, planNewRoom, planLayout, planTheme, planDevice, planLabName, planDuplicate } from '../lib/lab'
 import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
@@ -60,7 +60,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -221,7 +221,8 @@ function showCollection(a, id) {
 
 // In the Lab, with the Canvas or the Blocks board addressed, add: and rm:
 // take blocks (stage 13, piece 2; C240).
-const building = (a) => Boolean(a.lab) && (a.addressed === 'canvas' || a.addressed === 'blocks')
+// The Library too (C242 (b)): its "add to room" writes add:.
+const building = (a) => Boolean(a.lab) && (a.addressed === 'canvas' || a.addressed === 'blocks' || a.addressed === 'library')
 const addStep = (a, step, screens) => (building(a) ? planAddBlock(step, screens) : planAdd(step, screens))
 const rmStep = (a, step, screens) => (building(a) ? planRmBlock(step, screens) : planRm(step, screens))
 const headingStep = (a, step, screens) => planHeading(step, screens)
@@ -669,9 +670,9 @@ function planName(a, step, screens = {}) {
  */
 export function preview(value, { mode, arrangement, built = BUILT, screens = {} }) {
   // A second room (room-2, C175 (a)) is a room to the commands that work in one.
-  // In the Lab, its Canvas and Blocks board are the Lab to the commands that build (C238).
+  // In the Lab, its Canvas, Blocks board and Library are the Lab to the commands that build (C238, C242 (b)).
   const board = isRoom(arrangement.addressed) ? 'room'
-    : arrangement.lab && (arrangement.addressed === 'canvas' || arrangement.addressed === 'blocks') ? 'lab'
+    : building(arrangement) ? 'lab'
       : arrangement.addressed
   const answer = enterLine(value, { mode, board, built })
   if (answer.state !== 'ready') return { answer, says: { message: answer.message, values: answer.values }, next: null }
@@ -732,7 +733,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     const step = answer.steps[0]
     const nameIt = (a1, s1, sc) => (a1.addressed === 'collection' ? planNameCollection(s1, sc)
       // In the Lab, the room on the Canvas (stage 13; C238).
-      : building(a1) ? planLabName(s1, sc)
+      : a1.lab && (a1.addressed === 'canvas' || a1.addressed === 'blocks') ? planLabName(s1, sc)
         : planName(a1, s1, sc))
     const plans = {
       tour: planTour, name: nameIt, inspect: planInspect, api: planApi, save: planSave, forget: planForget, copy: planCopyStep, undo: planUndo,
@@ -765,6 +766,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       theme: (a1, s1, sc) => planTheme(s1, sc),
       device: (a1, s1, sc) => planDevice(s1, sc),
       // A block's place and settings (piece 2; C240).
+      // duplicate: a room (piece 3; C242 (e)); a collection's or a plan's comes later.
+      duplicate: (a1, s1, sc) => planDuplicate(s1, sc),
       place: (a1, s1, sc) => (building(a1) ? planPlace(s1, sc) : { says: { message: 'placeInLab' }, act: null }),
       // accept: and reject: on answered asks (piece 5; C220 (d)); Ripple's suggestions join in stage 12.
       accept: (a1, s1, sc) => planSettle(s1, sc, 'accept'),

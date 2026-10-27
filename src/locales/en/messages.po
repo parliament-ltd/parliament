@@ -1699,6 +1699,39 @@ msgid "count.steps"
 msgstr "{count, plural, one {# step} other {# steps}}"
 
 #. js-lingui-explicit-id
+msgid "enter.addAllThere"
+msgstr "All of that is in the room already"
+
+#. js-lingui-explicit-id
+msgid "enter.addLayout"
+msgstr "It takes the layout {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.addNone"
+msgstr "Nothing in the Library is called {said}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.addNotForRoom"
+msgstr "{said} is a room. Only blocks, a layout and a theme go into a room; edit: opens a room"
+
+#. js-lingui-explicit-id
+msgid "enter.addTheme"
+msgstr "It is painted in {name}"
+
+#. js-lingui-explicit-id
+msgid "enter.addToRoom"
+msgstr "Enter changes {room}"
+
+#. js-lingui-explicit-id
+msgid "enter.addTwoLayouts"
+msgstr "A room has one layout. Untick one of {names}"
+
+#. js-lingui-explicit-id
+msgid "enter.addTwoThemes"
+msgstr "A room has one theme. Untick one of {names}"
+
+#. js-lingui-explicit-id
 msgid "enter.again"
 msgstr "Enter asks “{prompt}” again as {next}, beside {address}: {name}, about {tokens, number} tokens, {cost} to send"
 
@@ -2401,6 +2434,31 @@ msgstr "Enter leaves the Lab for what you had before. Every change was saved as 
 #. js-lingui-explicit-id
 msgid "enter.doneNotLab"
 msgstr "done: leaves the Lab, which is not open"
+
+#. js-lingui-explicit-id
+msgid "enter.duplicateGo"
+msgstr "Enter copies {name} as {copy} and opens the copy in the Lab. Its chats stay with it"
+
+#. js-lingui-explicit-id
+msgid "enter.duplicateGone"
+msgstr "That room is not here any more"
+
+#. js-lingui-explicit-id
+msgid "enter.duplicateNone"
+msgstr "No room or template is called {said}"
+
+#. js-lingui-explicit-id
+msgid "enter.duplicateSoon"
+msgstr "{name} is coming soon, so there is nothing to copy yet"
+
+#. js-lingui-explicit-id
+msgid "enter.duplicateTemplate"
+msgstr "Enter copies the template {name} as {copy} and opens it in the Lab"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.duplicateWhich"
+msgstr "Name the room to copy, as duplicate:\"Writing studio\""
 
 #. js-lingui-explicit-id
 msgid "enter.editHere"
@@ -4488,6 +4546,10 @@ msgstr "{name} is saved as this search already"
 msgid "enter.searchCards"
 msgstr "{count, plural, =0 {No card matches} one {# card matches} other {# cards match}}"
 
+#. js-lingui-explicit-id
+msgid "enter.searchLibrary"
+msgstr "{count, plural, =0 {Nothing in the Library matches} one {# item matches} other {# items match}}"
+
 #. In search mode on a board search does not reach yet; {first} and {second} are board names
 #. js-lingui-explicit-id
 msgid "enter.searchRecords"
@@ -5933,8 +5995,76 @@ msgid "library.aboutSettings"
 msgstr "Keys, languages, your data, and how things behave."
 
 #. js-lingui-explicit-id
+msgid "library.addToRoom"
+msgstr "add to room"
+
+#. js-lingui-explicit-id
 msgid "library.blocks"
 msgstr "{count, plural, one {# block} other {# blocks}}"
+
+#. js-lingui-explicit-id
+msgid "library.clear"
+msgstr "clear"
+
+#. js-lingui-explicit-id
+msgid "library.close"
+msgstr "close"
+
+#. js-lingui-explicit-id
+msgid "library.dBlocks"
+msgstr "Blocks"
+
+#. js-lingui-explicit-id
+msgid "library.dBuiltFor"
+msgstr "Built for"
+
+#. js-lingui-explicit-id
+msgid "library.dComputer"
+msgstr "a computer"
+
+#. js-lingui-explicit-id
+msgid "library.dFits"
+msgstr "Fits"
+
+#. js-lingui-explicit-id
+msgid "library.dLayout"
+msgstr "Layout"
+
+#. js-lingui-explicit-id
+msgid "library.dNone"
+msgstr "none"
+
+#. js-lingui-explicit-id
+msgid "library.dNoRoom"
+msgstr "no room yet"
+
+#. js-lingui-explicit-id
+msgid "library.dPhone"
+msgstr "a phone"
+
+#. js-lingui-explicit-id
+msgid "library.dPlaces"
+msgstr "Places"
+
+#. js-lingui-explicit-id
+msgid "library.dSettings"
+msgstr "Settings"
+
+#. js-lingui-explicit-id
+msgid "library.dTheme"
+msgstr "Theme"
+
+#. js-lingui-explicit-id
+msgid "library.duplicate"
+msgstr "duplicate"
+
+#. js-lingui-explicit-id
+msgid "library.dUsedIn"
+msgstr "Used in"
+
+#. js-lingui-explicit-id
+msgid "library.editHere"
+msgstr "edit here"
 
 #. js-lingui-explicit-id
 msgid "library.emptyShelf"
@@ -5965,8 +6095,20 @@ msgid "library.inRoom"
 msgstr "goes in a room"
 
 #. js-lingui-explicit-id
+msgid "library.inThisRoom"
+msgstr "in this room"
+
+#. js-lingui-explicit-id
 msgid "library.loading"
 msgstr "Reading the shelves"
+
+#. js-lingui-explicit-id
+msgid "library.noMatch"
+msgstr "Nothing in the Library matches. Try a shorter word, or clear the field."
+
+#. js-lingui-explicit-id
+msgid "library.onCanvas"
+msgstr "on the Canvas"
 
 #. js-lingui-explicit-id
 msgid "library.onScreen"
@@ -6038,6 +6180,23 @@ msgstr "{shown} of {all}"
 #. js-lingui-explicit-id
 msgid "library.themeFact"
 msgstr "colour and type for the inside of a room"
+
+#. js-lingui-explicit-id
+msgid "library.tick"
+msgstr "Tick {name}"
+
+#. js-lingui-explicit-id
+msgid "library.ticked"
+msgstr "{count} ticked: {names}"
+
+#. js-lingui-explicit-id
+msgid "library.tickHow"
+msgstr "tick blocks, a layout or a theme, then add them to the room together"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "library.writes"
+msgstr "Writes {command} in the bar"
 
 #. js-lingui-explicit-id
 msgid "lock.addPasskey"
@@ -7783,7 +7942,7 @@ msgstr "Leave the Lab with your changes"
 
 #. js-lingui-explicit-id
 msgid "verb.duplicate"
-msgstr "Copy a room, collection or plan under a new name"
+msgstr "Copy a room, yours or a template, and open the copy in the Lab"
 
 #. js-lingui-explicit-id
 msgid "verb.edit"

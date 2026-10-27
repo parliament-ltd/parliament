@@ -12,7 +12,7 @@
 // The blocks the room can take come from the catalogue (screens.lab.blocks:
 // { key, name }), where each fits from screens.lab.fitsOf.
 
-import { nameOf, FEATURES } from './lab'
+import { nameOf, FEATURES, planLayoutChange } from './lab'
 
 const STAYS = new Set(['messages', 'input'])
 
@@ -151,23 +151,92 @@ function namedAll(step, screens) {
 
 const one = (list, message) => (list.length === 1 ? { message, values: { block: list[0] } } : { message: `${message}Many`, values: { blocks: list } })
 
-/** add:keywords, add:highlights, notes: each into its first free place (C63: one of each). */
+// What add: names, in the Library's three kinds that go into a room: a block,
+// a layout or a theme (C242 (b)). An exact name wins over a start.
+function findForRoom(typed, lab) {
+  const w = words(typed)
+  if (!w) return { none: true }
+  const block = findBlock(typed, lab.blocks)
+  if (block.found && (block.found.key === w || BLOCK_WORDS[w] === block.found.key || words(block.found.name) === w)) return { found: { kind: 'block', ...block.found } }
+  const named = (list, kind) => (list ?? []).map((x) => ({ kind, ...x }))
+  const others = [...named(lab.layouts, 'layout'), ...named(lab.themes, 'theme')]
+  const exact = others.filter((x) => words(x.key) === w || words(x.name) === w)
+  if (exact.length === 1) return { found: exact[0] }
+  const starts = [
+    ...(block.found ? [{ kind: 'block', ...block.found }] : named(block.many, 'block')),
+    ...others.filter((x) => words(x.name).startsWith(w) || words(x.key).startsWith(w)),
+  ]
+  if (starts.length === 1) return { found: starts[0] }
+  if (starts.length) return { many: starts }
+  // A room goes onto the Canvas by edit:, not into a room.
+  if ((lab.rooms ?? []).some((x) => words(x.name) === w)) return { notForRoom: typed }
+  return { none: true }
+}
+
+/**
+ * add:keywords, add:keywords, "Three panels", "Deep calm": a layout first
+ * (piece 1's rule), then a theme, then each block to its first free place
+ * (C63: one of each; C242 (b)).
+ */
 export function planAddBlock(step, screens = {}) {
-  const n = namedAll(step, screens)
-  if (n.bad) return { says: n.bad, act: null }
-  const { r, layout, blocks } = n
+  const r = room(screens)
+  if (!r) return { says: { message: 'labNoRoom' }, act: null }
+  const lab = screens.lab
+  const found = []
+  for (const v of listOf(step.match?.values ?? [])) {
+    const typed = said(v)
+    const got = findForRoom(typed, lab)
+    if (got.many) return { says: { message: 'blockMany', values: { names: got.many.map((b) => b.name) } }, act: null }
+    if (got.notForRoom) return { says: { message: 'addNotForRoom', values: { said: got.notForRoom } }, act: null }
+    if (!got.found) return { says: { message: 'addNone', values: { said: typed } }, act: null }
+    if (!found.some((x) => x.kind === got.found.kind && x.key === got.found.key)) found.push(got.found)
+  }
+  const layouts = found.filter((x) => x.kind === 'layout')
+  const themes = found.filter((x) => x.kind === 'theme')
+  const blocks = found.filter((x) => x.kind === 'block')
+  if (layouts.length > 1) return { says: { message: 'addTwoLayouts', values: { names: layouts.map((x) => x.name) } }, act: null }
+  if (themes.length > 1) return { says: { message: 'addTwoThemes', values: { names: themes.map((x) => x.name) } }, act: null }
+
   let mode = r.mode
+  let layout = layoutOf(screens)
+  const also = []
+  const fitsOf = lab.fitsOf ?? (() => [])
+  const newLayout = layouts[0] && layouts[0].key !== nameOf(mode.layout?.ref) ? layouts[0] : null
+  if (newLayout) {
+    const p = planLayoutChange(mode, newLayout, fitsOf)
+    if (p.refused) return { says: { message: p.refused, values: { name: newLayout.name } }, act: null }
+    mode = { ...mode, layout: { ref: newLayout.ref }, components: p.components }
+    layout = newLayout
+    also.push({ message: 'addLayout', values: { name: newLayout.name } },
+      ...p.moved.map((m) => ({ message: 'layoutMoves', values: { block: m.block, fromSlot: m.from, toSlot: m.to } })),
+      ...p.out.map((o) => ({ message: 'layoutOut', values: { block: o.block } })))
+  }
+  const newTheme = themes[0] && themes[0].key !== nameOf(mode.scheme?.ref) ? themes[0] : null
+  if (newTheme) {
+    mode = { ...mode, scheme: { ref: newTheme.ref } }
+    also.push({ message: 'addTheme', values: { name: newTheme.name } })
+  }
+  if (blocks.length && !layout) return { says: { message: 'blocksNoLayout' }, act: null }
   const added = []
   for (const block of blocks) {
-    if (blocksIn(mode).includes(block.key)) return { says: { message: 'blockThere', values: { block: block.key } }, act: null }
-    const slot = (screens.lab.fitsOf?.(block.key) ?? []).find((s) => hasRoom(layout, mode, s))
+    if (blocksIn(mode).includes(block.key)) {
+      if (blocks.length === 1 && !newLayout && !newTheme) return { says: { message: 'blockThere', values: { block: block.key } }, act: null }
+      continue
+    }
+    const slot = fitsOf(block.key).find((s) => hasRoom(layout, mode, s))
     if (!slot) return { says: { message: 'blockNoPlace', values: { block: block.key, name: layout.name } }, act: null }
     const comp = { id: `comp_${crypto.randomUUID()}`, ref: `${block.key}@^1.0`, slot, order: 0, config: {} }
     mode = { ...mode, components: withBlockIn(mode, comp, slot) }
     added.push({ block: block.key, toSlot: slot })
   }
-  const says = added.length === 1 ? { message: 'blockAdd', values: added[0] }
-    : { message: 'blockAddMany', values: { blocks: added.map((x) => x.block) }, also: added.map((x) => ({ message: 'blockGoesTo', values: x })) }
+  if (!added.length && !newLayout && !newTheme) return { says: { message: 'addAllThere' }, act: null }
+  let says
+  if (!newLayout && !newTheme) {
+    says = added.length === 1 ? { message: 'blockAdd', values: added[0] }
+      : { message: 'blockAddMany', values: { blocks: added.map((x) => x.block) }, also: added.map((x) => ({ message: 'blockGoesTo', values: x })) }
+  } else {
+    says = { message: 'addToRoom', values: { room: r.name }, also: [...also, ...added.map((x) => ({ message: 'blockGoesTo', values: x }))] }
+  }
   return { says, act: change(r, mode) }
 }
 

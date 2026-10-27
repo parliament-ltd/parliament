@@ -50,7 +50,7 @@ import { step as stepBranch } from '../stores/branchView'
 // at, and follows when it is set from elsewhere (clear:filters, a saved
 // search opened). What is typed goes back through onSearch(board, text).
 // `searchCounts` says what each search leaves, for the Enter line.
-const SEARCHABLE = new Set(['almanac', 'collection', 'settings'])
+const SEARCHABLE = new Set(['almanac', 'collection', 'settings', 'library'])
 
 export default function Bar({ arrangement, board, doc, lines, screens, prompt, onRun, onPrompt, onFocusBoard, className, autoFocus = false, onTop = true, write = null, said = null, onMode, welcome = null, inspect = null, onInspectClose, compare = null, onCompareClose, keyPanel = null, onKeyFocus, onKeySaved, onKeysClose, backupPanel = null, onBackupDone, picker = null, onPicker = null, onPickAnswerer, onPickerClose, frameworkPicker = null, onFrameworkPicker = null, onToggleFramework, onFrameworkPickerClose, languagePicker = null, onPickLanguage, onLanguagePickerClose, onSearch, searches = {}, searchCounts = {} }) {
   const { i18n } = useLingui()
