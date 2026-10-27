@@ -2842,6 +2842,57 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - In the Lab, the Canvas showed "Sends to: this computer only". A click on "anyone" ran `local:off`, echoed it, and the field was gone from the record. The Library's details said "Sends to: anyone".
 - **Next:** piece 6, features of input.
 
+**C248. Stage 13, piece 6: features of input, its open points** (proposed 27 October; C238 (h) ruled 1; R24, R25; C37, C66, A12, C70, C167 (g); the globe means language, 15 October). Built as suggested, so a ruling changes one entry.
+- **What exists today:**
+  - Web search, voice input and file attach are three blocks. Each draws into today's composer (`InputArea.jsx`), on today's chat page only.
+  - Web search arms Anthropic's search tool for the next message (up to 3 searches) and drops it after. Citations are kept (C167 (g)).
+  - Voice transcribes on this device only, or stays off with a note (C70).
+  - Files: up to 10 a message, 10 MB each, text up to 200 KB.
+    - Text and code go inside the prompt and are kept with it.
+    - Images and PDFs go to Anthropic's models only and are not kept, only their names. Mistral and Ollama are given the words alone, and nothing says so.
+  - The bar, the composer in the new screens (C37), has none of the three.
+- **(a) Features of the room's input block.** Web search, voice and files are each on or off for a room, as the input block's settings:
+  - **Commands:** `set:input web on`, `set:input voice off`, `set:input files on`.
+  - **Where they show:** the Blocks board's Input row, and the guide's sixth question, "Should it search the web?".
+  - **Stored as keys in the input block's `config`** (`webSearch`, `voice`, `files`), which every room has already. There is no new field on the room.
+  - **Older rooms:** a room that has the old block for a feature reads as on for it, and one without as off, until `set:` writes the key. Writing Studio, Data Workspace, Drafting Desk and Pocket Chat have web search; Pocket Chat has all three; Quiet Room none.
+  - **With no room yet** (the first prompt of a new chat), the bar offers all three.
+
+  **Suggestion:** yes.
+- **(b) Web search in the bar:**
+  - In prompt mode, the field's marginalia shows "web search" as a word, since the globe means language. A click, or `web:`, holds it for the next prompt only (A12), in this tab; `web:off` drops it.
+  - It is offered only where the one answering can search: today Anthropic's models. Otherwise `web:` says who cannot.
+  - The Enter line says "It may search the web: up to 3 searches, about $0.01 each, on top of the tokens".
+  - In a prompt to several, it goes with each that can search, and the line names those that cannot.
+  - After the prompt goes, it is dropped. The citations show under the reply, as built.
+
+  **Suggestion:** yes.
+- **(c) Voice in the bar** (C70):
+  - A microphone in the marginalia, only where the browser can transcribe on this device. The words go into the field, and nothing is sent until Enter.
+  - Where a one-time language pack is needed, the microphone's note says so before it downloads.
+  - Where the browser cannot transcribe on the device, the room's voice shows as "voice: off in this browser", with the note about what the alternative would send.
+  - No command: voice needs the microphone, and the button is reachable by keyboard.
+
+  **Suggestion:** yes.
+- **(d) Files in the bar:**
+  - "attach" in the marginalia, or `attach:`, opens the file picker, as `restore:` does. The files are held for the next prompt only, listed under the field, each with its size and a ×.
+  - The limits are as today.
+  - The Enter line names them and counts text files in the tokens.
+  - Text and code go to any model, inside the prompt, kept with it as today.
+  - Images and PDFs go only to a model that reads them (today Anthropic's). Otherwise they stay out, and the line says so: "report.pdf stays out: Mistral is not given PDFs here". This replaces today's silent dropping.
+  - A source is sent the words alone. The privacy filter reads text files, not images or PDFs, and the line says so when it is on.
+
+  **Suggestion:** yes.
+- **(e) R24 and R25.**
+  - The three old blocks stay in the catalogue and in rooms, read as features (a). Nothing is deleted now.
+  - At the checkpoint (piece 7), R24 (their nine files) and R25 (today's composer, whose condition is that the bar carries these three) are put to you, item by item, with whether today's chat page has been replaced.
+
+  **Suggestion:** yes.
+- **(f) Stored data:** none new.
+  - The features are keys in the input block's `config`.
+  - Files are kept as today: text in the prompt, an image's or PDF's name in `attachmentMeta`.
+  - What is held for the next prompt is this tab's only.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
