@@ -3801,6 +3801,65 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Tried in the browser** on the trial copy, after a reload: the welcome page, the rooms and the Collection, then `lab:` (the Library, the Canvas and the Blocks board) and `done:`, all drawn as before.
 - **Seen in passing:** the board strip shows the Collection's raw id where its name should be. It is older than this piece and offered as a separate task.
 
+**C267. Stage 15, piece 2: the vault, its open points** (proposed 27 October; C170, C264 (e) as ruled; `research/vault-scope-review.md`). Waiting for Stefan: (d) and (e) are choices; the rest is designed as suggested. The design goes in `research/vault-design.md`; nothing in the app changes in this piece.
+- **What exists today:**
+  - The gateway (`src/net/gateway.js`) is the one way out. It asks the key module for a provider's key and hands it to that provider's code.
+  - The provider's code builds the request and puts the key in a header. Anthropic uses `x-api-key` to `api.anthropic.com`; Mistral uses `Authorization` to its three addresses.
+  - Ollama and the sources take no key.
+  - Keys are saved encrypted in their own database, or held in the tab's memory ("Don't save").
+- **(a) What the vault does: it adds the key, nothing more.**
+  - The page builds each request as today, with a stand-in where the key goes, and hands it to the vault.
+  - The vault checks the address against that provider's own list, puts the real key in that provider's header, sends it, and passes the reply back as it arrives.
+  - Provider code stays on the page, so the vault stays small (a few hundred lines), easy to review and rarely deployed. A change to how Parliament talks to a model never touches it.
+  - The other way, all provider code inside the vault, makes the vault large and deployed with every provider change, which defeats keeping it rare and checked.
+
+  **Suggestion:** the vault adds the key.
+- **(b) What the vault allows:** for each keyed provider, its origins and the few paths Parliament uses:
+  - Anthropic: `/v1/messages` and `/v1/messages/count_tokens`, plus the key check.
+  - Mistral: `/v1/chat/completions` and `/v1/models`.
+
+  Anything else is refused and said back to the page. So code on the page can use a key only for what Parliament already does with it, never, for instance, a provider's account or key-management addresses. **Suggestion:** yes.
+- **(c) The channel:**
+  - One private channel (a `MessageChannel`) between the page and its vault frame. It opens only after each side checks the other's exact address.
+  - Messages carry a request, the reply's status, its pieces as they arrive, the end, an error, or "stop". Never a key.
+  - Replies come back as pieces in messages rather than as a handed-over stream, which not every browser on the list can pass.
+  - The network log stays on the page; the vault reports each request it made, and the page's log shows it as today.
+
+  **Suggestion:** yes.
+- **(d) Moving the keys people already have** (a choice). When the vault arrives, saved keys sit in the page's own database.
+  1. **Moved once, over the private channel,** then deleted from the page's database. Shown before it runs. A key crosses between the page and its vault once: a narrow exception to "never in a cross-window message", within the third of the four approved exceptions. Code on the page could read those keys before the move anyway, so the move adds no exposure.
+  2. **Pasted again:** the vault's panel asks for each key once, and the page's copies are deleted once the vault holds one. No key ever crosses, at the cost of finding each key again.
+
+  **Suggestion:** 1. Few people are affected, and it is the same key either way. 2 is the stricter reading of the rule; say if you prefer it.
+- **(e) Lock Parliament and the vault** (a choice). With the lock on, chats are sealed under a key that exists only while Parliament is unlocked. Without help, the vault's keys would stay encrypted only the way they are today, which a copied browser profile can undo.
+  1. **The page lends the vault its unlocked key:** the lock's data key goes over the private channel at unlock. It is a key the browser will not let anyone read out, only use. The vault seals the API keys under it, and forgets it when Parliament locks.
+  2. **The vault has its own lock,** and you unlock twice.
+  3. **The vault ignores the lock;** its keys are encrypted as today.
+
+  **Suggestion:** 1. One unlock, and a copied profile gets nothing, as C170 promised. It needs one more line in the exceptions: the lock's unreadable key may cross to the vault frame, never an API key.
+- **(f) The vault's own key panel:**
+  - `api:` shows the vault's field inside the key panel, as a frame: the field, Save, "Don't save" and Remove. Everything else in the panel stays on the page (training labels, guides, Ollama).
+  - The vault checks a typed key with its provider itself, and tells the page only the outcome (saved, new, not accepted, out of credit, not reached), which the panel shows as today.
+  - Its few words come with it; English for now.
+
+  **Suggestion:** yes.
+- **(g) Its site and headers:**
+  - `keys.parliament.ltd` is a second, small build from this repository (`vault/`), deployed on its own, rarely, with published file hashes.
+  - It may be framed only by `https://www.parliament.ltd`.
+  - Its policy connects only to the keyed providers.
+  - It sends `Origin-Agent-Cluster`, so the two pages can never be merged into one by the browser's old `document.domain` rule.
+  - The main site's policy then allows one frame, the vault, and **drops Anthropic and Mistral from its own connections**: the page itself can no longer reach a keyed provider at all.
+  - In development, the vault runs on `localhost:5175` beside the app.
+
+  **Suggestion:** yes.
+- **(h) When the vault cannot be reached** (blocked, offline, failed to load), keyed models say so on the Enter line before Enter ("the key store did not open"). Local models and sources work as before. **Suggestion:** yes.
+- **(i) The one unknown, tried in this piece:** whether a browser keeps the vault's storage when it is only ever opened inside the page's frame, across reloads and tabs. Both addresses are the same site, so it should.
+  - Tried here in Chromium on two local addresses, with a different site as the control.
+  - The trial pages are kept in `scripts/vault-trial/` so you can run the same check in Firefox, LibreWolf and Zen.
+
+  **Suggestion:** yes.
+- **(j) Stored data:** the vault's own database at its own address, holding keys only. With (d) 1, the page's saved keys are deleted after the move, shown first. Nothing in chats or backups changes. **Suggestion:** approve the outline; the move is shown before it is built (piece 3).
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
