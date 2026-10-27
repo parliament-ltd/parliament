@@ -2502,6 +2502,62 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   The test room's theme was put back to Parliament.
 - **Next:** piece 2, the Blocks board.
 
+**C240. Stage 13, piece 2: the Blocks board, its open points** (proposed 27 October; C238 piece 2; Lab v7; A2, C38, C63). Built as suggested, so a ruling changes one entry.
+- **(a) The settings shown: 15, the ones something reads in the new screens.**
+  - Branches: parent link, new-branch mode, compress button, threshold.
+  - Chart: kind.
+  - Context: threshold, display.
+  - Notes: order.
+  - Steps: which runs, which plan, the pinned plan.
+  - Table of contents: what it lists, how many, where it cuts.
+
+  Not shown:
+  - the input block's three settings, since the bar is the composer there (C37);
+  - voice's language, which comes with piece 6;
+  - Frameworks (the old Collaboration block), retired by R22.
+
+  Ten declared settings are read by nothing:
+  - Context's auto-compress;
+  - the file shelf's types;
+  - Keywords' colour and add form;
+  - Messages' timestamps and density;
+  - Notes' add button;
+  - the dashboard's sample rows;
+  - the table's page size;
+  - voice's button label.
+
+  They are not shown, and their declarations are proposed for removal at the checkpoint (R41), the values rooms hold staying. **Suggestion:** yes.
+- **(b) The words `set:` takes** (commands stay English): `set:<block> <setting> <choice>`.
+  - **Blocks** by their name in your words or a short word: `keywords`, `chart`, `context`, `notes`, `steps`, `contents`, `branches` and the rest.
+  - **Settings and their choices:**
+    - `branches parent on|off`
+    - `branches mode full|summary`
+    - `branches compress on|off`
+    - `branches threshold 75`
+    - `chart kind bar|line|area|scatter|pie`
+    - `context threshold 75`
+    - `context display meter|compact|ambient`
+    - `notes order newest|oldest|message`
+    - `steps show run|all`
+    - `steps follow chat|plan`
+    - `steps plan 201`
+    - `contents lists prompts|headings`
+    - `contents most 50`
+    - `contents cut 60`
+  - **Limits:** a threshold from 10 to 100; numbers whole and within sensible bounds.
+
+  **Suggestion:** yes.
+- **(c) The words `place:` takes for where:**
+  - `left`, `right`, `extra` (the lower right rail), `middle`, `bottom`, `panel`, `margin`, `sheet`, `outline`, `canvas`, `document`, `inspector`, each meaning the matching slot of the room's layout;
+  - `up` and `down`, to move a block within its slot.
+
+  A block placed where it is not built for is allowed, the line saying it may be cramped (v7). A full slot is refused ("the conversation holds one; rm: something first"). **Suggestion:** yes.
+- **(d) The click rule** (A2, C38, as in piece 1): a setting's choice, clicked on the Blocks board, runs at once and is echoed. Anything that moves or removes a block (Sits in, move up and down, rm) writes its command and waits for Enter, as `add:` does.
+- **(e) One of each block** (C63); messages and input stay. Web search, voice and files are features, not blocks, and are not offered here until piece 6.
+- **(f) Pointing both ways:** a block clicked on the Canvas opens its row on the Blocks board, and the row marks its block on the Canvas.
+- **(g) Stored data:** none new. A block's settings are its `config` in the room's record, as today; each command is one step for `undo:`.
+- **Suggestion:** build as above.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
