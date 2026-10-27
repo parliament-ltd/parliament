@@ -127,12 +127,6 @@ export default function RoomShell({ mode, hostAPI: hostAPIProp }) {
   const slotContents = {}
   const skipped = []
   const messageActions = []
-  // PR-18b: parallel collection for inputActions contributions. The `+`
-  // overflow menu in input@1.0 reads from this list at render time.
-  // Convention: contributions with `primary: 'right'` render as the
-  // right-side button slot (mic → send swap consumer); contributions
-  // without `primary` go in the `+` overflow.
-  const inputActions = []
 
   // Sort first so insertion order into slotContents reflects component order.
   const ordered = [...(mode.components || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
@@ -201,19 +195,6 @@ export default function RoomShell({ mode, hostAPI: hostAPIProp }) {
       }
     }
 
-    // PR-18b: same shape, parallel collection.
-    const inActs = entry.contributions?.inputActions
-    if (Array.isArray(inActs)) {
-      for (const a of inActs) {
-        if (!a || !a.id) continue
-        inputActions.push({
-          ...a,
-          componentId: spec.id,
-          contributedBy: ref,
-        })
-      }
-    }
-
     if (!slotContents[spec.slot]) slotContents[spec.slot] = []
 
     const missing = softDependencyMissing(entry)
@@ -255,10 +236,6 @@ export default function RoomShell({ mode, hostAPI: hostAPIProp }) {
   // instance keeps the object reference stable across re-renders, so
   // components subscribing to bus events don't re-bind their handlers.
   hostAPI._setMessageActions?.(messageActions)
-  // PR-18b: publish inputActions list onto the same hostAPI so input@1.0's
-  // `+` overflow + right-primary-button readers can pick them up via
-  // hostAPI.getInputActions().
-  hostAPI._setInputActions?.(inputActions)
 
   if (skipped.length > 0 && import.meta.env.DEV) {
     console.warn(

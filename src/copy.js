@@ -1772,6 +1772,14 @@ export const COPY = {
     thisComputer: /*i18n*/ { id: 'canvas.thisComputer', message: 'this computer only' },
     noLayout: /*i18n*/ { id: 'canvas.noLayout', message: 'This room has no layout yet. layout:"Three panels" gives it one.', comment: 'Commands stay English' },
   },
+  // The Branches block in a room (stage 13, piece 8; C251 (b)).
+  branchesBlock: {
+    title: /*i18n*/ { id: 'branchesBlock.title', message: 'Branches' },
+    full: /*i18n*/ { id: 'branchesBlock.full', message: 'Context {percent}% full:' },
+    carryOnWhole: /*i18n*/ { id: 'branchesBlock.carryOnWhole', message: 'Carry on in a branch' },
+    carryOnSummary: /*i18n*/ { id: 'branchesBlock.carryOnSummary', message: 'Carry on from a summary' },
+    writes: /*i18n*/ { id: 'branchesBlock.writes', message: 'Writes {command} in the bar', comment: 'Commands stay English' },
+  },
   // The Blocks board (stage 13, piece 2; C240; Lab v7). A setting's label is
   // block.key; a choice's words block.key.word.
   blocksBoard: {

@@ -1,3 +1,6 @@
+// Retired with R22, R23, carried out on 27 October 2026 with today's chat page (C251 (e)).
+// Was src/components/CollabModal.jsx. Nothing imports it and it is not built.
+// To restore: move it back, with today's chat page and its route and providers in App.jsx.
 import React, { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {

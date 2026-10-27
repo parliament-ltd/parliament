@@ -62,8 +62,6 @@ import { useAnnotations } from '../../stores/AnnotationsContext'
 
 // No quoted passages: one list, so a message without any draws once.
 const NO_QUOTES = Object.freeze([])
-import { useBranchPanel } from '../../stores/BranchPanelContext'
-import { useCollabMode } from '../../stores/CollabModeContext'
 import { useConversations } from '../../stores/ConversationContext'
 import { hasKey, modelFacts, destination } from '../../net'
 import { RoomHost } from '../../lib/useViewportWidth'
@@ -141,8 +139,9 @@ export default function MessagesRender() {
     favorites, notes, highlights, showNotes,
     toggleFavorite, toggleNotePanel, saveNote, addHighlight,
   } = useAnnotations()
-  const { openBranchPanel } = useBranchPanel()
-  const { buildSystemPrompt } = useCollabMode()
+  // The room board this draws in: its chat's frameworks and reply language,
+  // for Continue (stage 13, piece 8; C251 (d)).
+  const roomHost = useContext(RoomHost)
   const { conversations, loadConversations } = useConversations()
 
   const containerRef = useRef(null)
@@ -328,14 +327,14 @@ export default function MessagesRender() {
     try {
       // The gateway picks the key; here only whether there is one (stage 4).
       if (!(await hasKey())) return
-      const systemPrompt = buildSystemPrompt()
+      const systemPrompt = roomHost?.systemFor?.(activeConversationId) ?? ''
       await continueMessage(incompleteId, settings.defaultModel, systemPrompt)
     } catch (err) {
       if (err?.name !== 'AbortError' && import.meta.env.DEV) {
         console.warn('[messages@1.0] continueMessage failed:', err)
       }
     }
-  }, [settings.defaultModel, continueMessage, buildSystemPrompt])
+  }, [settings.defaultModel, continueMessage, roomHost, activeConversationId])
 
   const handleCopyText = useCallback(async (content) => {
     try {
@@ -429,17 +428,18 @@ export default function MessagesRender() {
     dbGetDocket(lineChat.docketId).then((d) => { if (live) setPlanNum(d?.num ?? null) }, () => {})
     return () => { live = false }
   }, [lineChat?.docketId])
-  // A fork from a message (C178): in the shell, new:branch with the step it
-  // ends, written into the bar for Enter; on today's chat page, the panel.
-  // From a prompt, the fork ends before it, so it can be asked differently.
+  // A fork from a message (C178; C251 (c)): new:branch with the chat's
+  // address in its plan, else its number, and the step it ends, written into
+  // the bar for Enter. From a prompt, the fork ends before it, so it can be
+  // asked differently. The branch panel went with R26.
   const hosted = useContext(RoomHost) != null
   const branchFrom = useCallback((msg) => {
     const at = messages.findIndex((m) => m.id === msg.id)
-    const address = planNum != null && lineChat?.branch ? `${planNum}${lineChat.branch}` : null
-    if (!hosted || at < 0 || !address) { openBranchPanel(msg.id); return }
+    const address = planNum != null && lineChat?.branch ? `${planNum}${lineChat.branch}` : lineChat?.num ?? null
+    if (at < 0 || address == null) return
     const step = messages.slice(0, at + 1).filter((m) => m.role === 'user').length - (msg.role === 'user' ? 1 : 0)
     window.dispatchEvent(new CustomEvent('parliament-write', { detail: { value: `>new:branch ${address} ${step}` } }))
-  }, [hosted, messages, planNum, lineChat?.branch, openBranchPanel])
+  }, [messages, planNum, lineChat?.branch, lineChat?.num])
   // The summary a branch starts from: the branch it summarizes and who wrote it (C175).
   const summaryInfo = useCallback((msg) => {
     if (msg.role !== 'assistant' || !msg.summary) return null

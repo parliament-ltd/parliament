@@ -29,8 +29,11 @@ import highlightsEntry     from './entries/highlights'
 import notesEntry          from './entries/notes'
 import branchesEntry       from './entries/branches'
 import contextEntry        from './entries/context'
-import collabModeEntry     from './entries/collab-mode'
-import voiceInputEntry     from './entries/voice-input'
+// The collaboration block (R22) and the web search, voice and file attach
+// blocks (R24) were retired with today's chat page on 27 October 2026
+// (C251) and live in src/deprecated/catalog/entries. Rooms keep them in
+// their stored lists; a room skips a block it does not know, and the three
+// still read as features of input (lib/inputFeatures.js).
 // The homepage's blocks (blueprint, chats, library, favorites, quick-stats,
 // recent-activity, scratchpad) were retired with the homepage on 22 October
 // 2026 (R1, R5 to R8) and live in src/deprecated/catalog/entries.
@@ -42,8 +45,6 @@ import columnInspectorEntry  from './entries/column-inspector'
 import documentCanvasEntry   from './entries/document-canvas'
 import claudeCommentsEntry   from './entries/claude-comments'
 import rippleAnalysisEntry   from './entries/ripple-analysis'
-import webSearchEntry        from './entries/web-search'
-import fileAttachEntry       from './entries/file-attach'
 import { validateManifest, entryRef } from './validate'
 
 const REGISTRY = new Map()
@@ -72,8 +73,6 @@ register(highlightsEntry)
 register(notesEntry)
 register(branchesEntry)
 register(contextEntry)
-register(collabModeEntry)
-register(voiceInputEntry)
 // PR-11a — Pelican decomposition.
 register(fileShelfEntry)
 register(chartCanvasEntry)
@@ -84,10 +83,6 @@ register(columnInspectorEntry)
 register(documentCanvasEntry)
 register(claudeCommentsEntry)
 register(rippleAnalysisEntry)
-// PR-18d — per-message tool arming via inputAction contributions.
-register(webSearchEntry)
-// PR-18e — per-message file attachments via inputAction contributions.
-register(fileAttachEntry)
 
 /**
  * Look up a manifest entry by `name@version` ref. Exact-match only in PR-2;

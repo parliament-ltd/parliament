@@ -1,3 +1,6 @@
+// Retired with R26, carried out on 27 October 2026 with today's chat page (C251 (e)).
+// Was src/components/BranchCreationPanel.jsx. Nothing imports it and it is not built.
+// To restore: move it back, with today's chat page and its route and providers in App.jsx.
 // BranchCreationPanel — V2 extraction of the V1 Albatross modal.
 //
 // PR-10a.7. Owned by `branches@1.0` per audit NQ-5.8. Visual design and

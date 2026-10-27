@@ -81,7 +81,7 @@ function Card({ board, addressed, onAddress, title, aside, room, ripple, childre
  *   the room is called (roomNames.js); rev: changes when the room was
  *   named, so it is read again
  */
-export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLeave, onName, rev = 0, board = 'room', ripple = null }) {
+export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLeave, onName, rev = 0, board = 'room', ripple = null, systemFor = null }) {
   const { i18n } = useLingui()
   const { holdChat, watchConversation } = useChat()
   const { conversations } = useConversations()
@@ -141,7 +141,8 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
   // phone's width (stage 13, piece 5; C246 (a)); one built for a computer,
   // narrow only when its board is.
   const phone = found.forId === chatId && found.mode?.deviceClass === 'visual-touch-phone'
-  const host = useMemo(() => ({ narrow: narrow || phone }), [narrow, phone])
+  // systemFor: the chat's frameworks and reply language, for Continue (C251 (d)).
+  const host = useMemo(() => ({ narrow: narrow || phone, systemFor }), [narrow, phone, systemFor])
   // What the room is called, for its header and the Enter line (C40, C90).
   const named = found.forId === chatId && found.mode ? roomName(found.mode) : null
   const namedKey = JSON.stringify(named)

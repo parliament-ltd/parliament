@@ -1,3 +1,6 @@
+// Retired with R24, carried out on 27 October 2026 with today's chat page (C251 (e)).
+// Was src/catalog/entries/file-attach-preview.jsx. Nothing imports it and it is not built.
+// To restore: move it back, with today's chat page and its route and providers in App.jsx.
 // file-attach@1.0 — preview render for the dev /catalog debug route.
 //
 // Verbose explanatory card. The production render is null (contribution-

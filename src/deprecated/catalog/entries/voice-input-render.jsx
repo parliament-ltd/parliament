@@ -1,3 +1,6 @@
+// Retired with R24, carried out on 27 October 2026 with today's chat page (C251 (e)).
+// Was src/catalog/entries/voice-input-render.jsx. Nothing imports it and it is not built.
+// To restore: move it back, with today's chat page and its route and providers in App.jsx.
 // voice-input@1.0 — production render for the V2 RoomShell chat path.
 //
 // PR-10a.8. Wraps the existing useVoiceInput hook and publishes

@@ -66,5 +66,26 @@ retirement line approved it, and how to put it back.
 | `lib/editorHistory.js` | R16 to R21 | 27 October 2026 | The old editor's undo history; replaced by undo: |
 | `lib/buildWizard.js` | R14 | 27 October 2026 | The build wizard's choices turned into a room |
 | `lib/layoutMigration.js` | R36 | 27 October 2026 | The old editor's layout swap, with SLOT_FALLBACKS, one of the old copies of slot data; replaced by the layout manifests and the layout rule (lib/lab.js) |
+| `views/ChatView.jsx` | R42 | 27 October 2026 | Today's chat page at /chat/:id, one chat in its room, full page, with a wrench to the old editor; /chat/:id now shows the chat in its room on the new screens |
+| `components/CollabModal.jsx` | R22, R23 | 27 October 2026 | The collaboration window and its persona editor; replaced by frameworks in the bar (personas became your frameworks, A13) |
+| `catalog/entries/collab-mode.jsx` | R22 | 27 October 2026 | The collaboration block, which opened that window |
+| `catalog/entries/collab-mode-render.jsx` | R22 | 27 October 2026 | The collaboration block, drawn |
+| `catalog/entries/collab-mode-preview.jsx` | R22 | 27 October 2026 | The collaboration block, its preview |
+| `stores/CollabModeContext.jsx` | R22 | 27 October 2026 | Collaboration mode's state, kept in memory only |
+| `catalog/entries/web-search.jsx` | R24 | 27 October 2026 | The web search block; now a feature of the room's input, carried by the bar (C248) |
+| `catalog/entries/web-search-render.jsx` | R24 | 27 October 2026 | The web search block, drawn; now a feature of the room's input, carried by the bar (C248) |
+| `catalog/entries/web-search-preview.jsx` | R24 | 27 October 2026 | The web search block, its preview; now a feature of the room's input, carried by the bar (C248) |
+| `catalog/entries/voice-input.jsx` | R24 | 27 October 2026 | The voice input block; now a feature of the room's input, carried by the bar (C248) |
+| `catalog/entries/voice-input-render.jsx` | R24 | 27 October 2026 | The voice input block, drawn; now a feature of the room's input, carried by the bar (C248) |
+| `catalog/entries/voice-input-preview.jsx` | R24 | 27 October 2026 | The voice input block, its preview; now a feature of the room's input, carried by the bar (C248) |
+| `catalog/entries/file-attach.jsx` | R24 | 27 October 2026 | The file attach block; now a feature of the room's input, carried by the bar (C248) |
+| `catalog/entries/file-attach-render.jsx` | R24 | 27 October 2026 | The file attach block, drawn; now a feature of the room's input, carried by the bar (C248) |
+| `catalog/entries/file-attach-preview.jsx` | R24 | 27 October 2026 | The file attach block, its preview; now a feature of the room's input, carried by the bar (C248) |
+| `catalog/entries/input-render.jsx` | R25 | 27 October 2026 | The room's own composer, drawn by the input block; the bar is the composer |
+| `catalog/entries/input-preview.jsx` | R25 | 27 October 2026 | The input block's preview, the composer |
+| `components/core/InputArea.jsx` | R25 | 27 October 2026 | The composer itself: the message box, send and stop, the + menu |
+| `components/BranchCreationPanel.jsx` | R26 | 27 October 2026 | The branch panel: a branch with the whole history or from a summary; replaced by new:branch, open: with a summary and again: |
+| `stores/BranchPanelContext.jsx` | R26 | 27 October 2026 | The branch panel's state |
+| `components/BranchShortcutHandler.jsx` | R26 | 27 October 2026 | Cmd/Ctrl+Shift+B for the branch panel, on today's chat page |
 
 Files keep their old path under `src/deprecated/`, so putting one back is a move. Their imports point where they used to and are not resolved here.

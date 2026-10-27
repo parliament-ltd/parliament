@@ -1,3 +1,6 @@
+// Retired with R24, carried out on 27 October 2026 with today's chat page (C251 (e)).
+// Was src/catalog/entries/file-attach.jsx. Nothing imports it and it is not built.
+// To restore: move it back, with today's chat page and its route and providers in App.jsx.
 // file-attach@1.0 — contributes an "Attach files" item to input@1.0's
 // `+` overflow menu; opens a multi-select file picker and stages the
 // chosen files on the room hostAPI's attachments registry so input@1.0

@@ -21,7 +21,7 @@ const STAYS = new Set(['messages', 'input'])
 const BLOCK_WORDS = Object.freeze({
   keywords: 'highlights', chart: 'chart-canvas', table: 'table-canvas', contents: 'toc', files: 'file-shelf',
   dashboard: 'summary-dashboard', inspector: 'column-inspector', document: 'document-canvas', comments: 'claude-comments',
-  ripple: 'ripple-analysis', frameworks: 'collab-mode',
+  ripple: 'ripple-analysis',
 })
 
 /**

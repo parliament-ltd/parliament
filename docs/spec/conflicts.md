@@ -3082,6 +3082,32 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - Its page-wide colours are the room's own board.
 - **(g) Stored data:** none changes.
 
+**C252. Stage 13, piece 8, as built: today's chat page retired** (27 October; C251 as suggested; C250 (e), (f)).
+- **(a) `/chat/:id`** now shows that chat in its room on the new screens, as `open:` does, and the room is addressed. `ChatView` moved to `src/deprecated/`.
+- **(b) The Branches block:**
+  - Rewritten as described in C251 (b).
+  - It reads its chat through `useRoomChat`, so with several rooms open each shows its own.
+  - It imports no database or provider any more: the panel's own summary call (one fixed model, each message cut to 500 characters) went with R26.
+- **(c) "Branch from here"** writes `new:branch` in every room: with the chat's plan address in a plan (`new:branch 215a 0`), else its number.
+- **(d) "Continue"** sends under the chat's frameworks and reply language. The shell gives them to the room board (`systemFor`), and the message actions read them from it.
+- **(e) Carried out, 21 files moved to `src/deprecated/`,** keeping their paths, each headed and listed in its README:
+  - **R42:** `ChatView.jsx`.
+  - **R22, R23:** `CollabModal.jsx`, the three collaboration block files and `CollabModeContext.jsx`. Its provider is gone from `App.jsx`, and `frameworks` no longer names the block in `add:` and `set:`.
+  - **R24:** the nine web search, voice and file attach files, no longer registered in the catalogue. `hostAPI.js` lost its input actions, armed tools and attachments, with their events; the voice transcript event stays. `RoomShell` no longer collects input actions.
+  - **R25:** `input-render.jsx`, `input-preview.jsx` and `InputArea.jsx`. The input block stays, drawing nothing; its description says what it holds now, and its three composer settings are gone (R41).
+  - **R26:** `BranchCreationPanel.jsx`, `BranchPanelContext.jsx` and `BranchShortcutHandler.jsx`, their provider and handler gone from `App.jsx`.
+- **Stored data:** none changed. Rooms keep the collaboration block and the three old feature blocks in their lists; a room skips them, and the three still read as features on.
+- **Checks:** `npm run check` passes: 1,304 tests, 30 lint warnings, all older. No live code imports any moved file.
+- **Tried in the browser,** on the trial copy:
+  - `/chat/<216's id>` opened 216 in a room of its own on the new screens.
+  - In its sheet, the Branches block listed the parent and its branch. A click on Snowy owl wrote `>open:223`, and "Carry on in a branch" wrote `>new:branch 216`. Neither left the new screens; neither was run.
+  - "Branch from here" on the first prompt wrote `>new:branch 215a 0`, and its line read "Enter starts 215c, an empty branch beside 215a". Not run.
+  - No microphone, collaboration button or hidden file picker is left in the rooms, and nothing failed to load.
+
+  Not tried: Continue on a cut-off reply, which needs a model.
+- **Noticed, not changed:** the Parliament mark in a narrow room's header is labelled "Go to The Study", the retired homepage. It takes you to the new screens; only its words are old.
+- **Stage 13:** all eight pieces are built. Still open from its lines: R39 (Drafting Desk), deferred until after the refactor; `@dnd-kit` leaving the dependencies, at stage 15.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

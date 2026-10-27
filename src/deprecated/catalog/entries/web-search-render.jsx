@@ -1,3 +1,6 @@
+// Retired with R24, carried out on 27 October 2026 with today's chat page (C251 (e)).
+// Was src/catalog/entries/web-search-render.jsx. Nothing imports it and it is not built.
+// To restore: move it back, with today's chat page and its route and providers in App.jsx.
 // web-search@1.0 — production render (PR-18d).
 //
 // No slot UI of its own (returns null). The visible affordance lives

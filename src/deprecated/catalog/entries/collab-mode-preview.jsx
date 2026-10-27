@@ -1,3 +1,6 @@
+// Retired with R22, carried out on 27 October 2026 with today's chat page (C251 (e)).
+// Was src/catalog/entries/collab-mode-preview.jsx. Nothing imports it and it is not built.
+// To restore: move it back, with today's chat page and its route and providers in App.jsx.
 // Self-contained render wrapper for collab-mode@1.0. Renders a labeled
 // trigger button that opens the existing CollabModal with empty defaults.
 // Used both by the catalog debug card and by RoomShell until ChatContext

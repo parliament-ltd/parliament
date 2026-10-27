@@ -1,3 +1,6 @@
+// Retired with R25, carried out on 27 October 2026 with today's chat page (C251 (e)).
+// Was src/catalog/entries/input-preview.jsx. Nothing imports it and it is not built.
+// To restore: move it back, with today's chat page and its route and providers in App.jsx.
 // Self-contained render wrapper for input@1.0. Used both by the catalog
 // debug card (via previewRender) and by RoomShell (via render) until the
 // ChatContext plumbing arrives in a later PR. Manages its own value state

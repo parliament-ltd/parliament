@@ -1,3 +1,6 @@
+// Retired with R24, carried out on 27 October 2026 with today's chat page (C251 (e)).
+// Was src/catalog/entries/voice-input.jsx. Nothing imports it and it is not built.
+// To restore: move it back, with today's chat page and its route and providers in App.jsx.
 // voice-input@1.0 — mic button publishing voice transcripts on the room bus.
 //
 // New component (no V1 source — V1's voice was an in-line button on

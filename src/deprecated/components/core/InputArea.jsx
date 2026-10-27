@@ -1,3 +1,6 @@
+// Retired with R25, carried out on 27 October 2026 with today's chat page (C251 (e)).
+// Was src/components/core/InputArea.jsx. Nothing imports it and it is not built.
+// To restore: move it back, with today's chat page and its route and providers in App.jsx.
 import { useRef, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Square, ArrowUp, Plus, X, Mic, Globe, Paperclip, Image as ImageIcon, FileText } from 'lucide-react'

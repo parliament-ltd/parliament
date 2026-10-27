@@ -5,19 +5,22 @@ import { SettingsProvider } from './stores/SettingsContext'
 import { ConversationProvider } from './stores/ConversationContext'
 import { ChatProvider } from './stores/ChatContext'
 import { AnnotationsProvider } from './stores/AnnotationsContext'
-import { BranchPanelProvider } from './stores/BranchPanelContext'
-import { CollabModeProvider } from './stores/CollabModeContext'
 import { FileShelfProvider } from './stores/FileShelfContext'
 import { DocumentProvider } from './stores/DocumentContext'
-import BranchShortcutHandler from './components/BranchShortcutHandler'
 import { PWAProvider } from './stores/PWAContext'
 import { BackupProvider } from './stores/BackupContext'
-import ChatView from './views/ChatView'
 // The old editor and build wizard are retired (R14, R16 to R21, R33; C250 (b)):
 // their addresses open the Lab on the new screens, with the room named, if any.
 function ToLab() {
   const { roomId = null } = useParams()
   return <Navigate to="/" replace state={{ lab: roomId ?? true }} />
+}
+
+// Today's chat page is retired (R42; C251): its address, kept in bookmarks
+// and links, shows that chat in its room on the new screens.
+function ToChat() {
+  const { id } = useParams()
+  return <Navigate to="/" replace state={{ chat: id }} />
 }
 import ErrorBoundary from './components/ErrorBoundary'
 import DbStateNotice from './components/DbStateNotice'
@@ -85,13 +88,10 @@ export default function App() {
           <ConversationProvider>
             <ChatProvider>
               <AnnotationsProvider>
-              <BranchPanelProvider>
-              <CollabModeProvider>
               <FileShelfProvider>
               <DocumentProvider>
               <BrowserRouter>
                 <BackupProvider>
-                <BranchShortcutHandler />
                 <DbStateNotice />
                 <InterfaceLanguage />
                 <UpdateNotice />
@@ -110,7 +110,7 @@ export default function App() {
                   />
                   <Route path="/chats" element={<Navigate to="/" replace />} />
                   <Route path="/shell" element={<Navigate to="/" replace />} />
-                  <Route path="/chat/:id" element={<ErrorBoundary inline><ChatView /></ErrorBoundary>} />
+                  <Route path="/chat/:id" element={<ToChat />} />
                   {/* The old Settings page is retired (R37): its address opens the Settings board. */}
                   <Route path="/settings" element={<Navigate to="/" replace state={{ open: 'settings' }} />} />
                   <Route path="/edit" element={<ToLab />} />
@@ -182,8 +182,6 @@ export default function App() {
               </BrowserRouter>
               </DocumentProvider>
               </FileShelfProvider>
-              </CollabModeProvider>
-              </BranchPanelProvider>
               </AnnotationsProvider>
             </ChatProvider>
           </ConversationProvider>

@@ -1,3 +1,6 @@
+// Retired with R22, carried out on 27 October 2026 with today's chat page (C251 (e)).
+// Was src/stores/CollabModeContext.jsx. Nothing imports it and it is not built.
+// To restore: move it back, with today's chat page and its route and providers in App.jsx.
 // CollabModeContext — shared per-conversation collab-mode state (PR-10a.9).
 //
 // `collab-mode@1.0` owns the modal that lets the user pick presets / save

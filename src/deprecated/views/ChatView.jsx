@@ -1,3 +1,6 @@
+// Retired with R42, carried out on 27 October 2026 with today's chat page (C251 (a)).
+// Was src/views/ChatView.jsx. Nothing imports it and it is not built.
+// To restore: move it back, with today's chat page and its route and providers in App.jsx.
 // ChatView — `/chat/:id` route shell.
 //
 // PR-10a wired this route through <RoomShell>; PR-10a.5–PR-10a.10

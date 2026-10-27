@@ -2965,6 +2965,15 @@ export default function Shell() {
    * and shows it in a room beside what is here (welcome spec §5; C125).
    * Answers at once whether the prompt went, and `done` once it is answered.
    */
+  // What a reply is continued under in a room (C251 (d)): the chat's
+  // frameworks and the reply language, as a prompt from the bar goes.
+  const conversationsNow = useRef([])
+  useEffect(() => { conversationsNow.current = conversations }, [conversations])
+  const systemFor = useCallback((chatId) => {
+    const conv = conversationsNow.current.find((c) => c.id === chatId)
+    const ids = frameworksOf(conv?.frameworks ?? [], fwListNow.current).map((fw) => fw.id)
+    return withReplyLanguage(instructionsOf(ids, fwListNow.current), replyNow.current?.tag ?? null)
+  }, [])
   // A chat started by trying a room carries the tag tried, as one of your
   // own tags, so a model's tagging keeps it (C244 (c)).
   const tagTried = useCallback((id) => changeRecords(db.current, [{ store: 'conversations', id, set: { tags: [TRIED_TAG], tagsMine: [TRIED_TAG] }, expect: { tags: [], tagsMine: [] } }]), [])
@@ -3360,6 +3369,15 @@ export default function Shell() {
     goTo('/', { replace: true, state: null })
     runCommand(`open:${askedOpen}`)
   }, [started, askedOpen, goTo, runCommand])
+  // Today's chat page's address (/chat/:id; R42, C251): that chat, in its
+  // room on the new screens, as open: shows it.
+  const askedChat = typeof location.state?.chat === 'string' ? location.state.chat : null
+  useEffect(() => {
+    if (!started || !askedChat) return
+    goTo('/', { replace: true, state: null })
+    const p = planRoom(current.current, askedChat)
+    if (p.next) run(p.next, null)
+  }, [started, askedChat, goTo, run])
   // The old editor's and wizard's addresses (/edit, /edit/:id, /build; R14,
   // R16 to R21; C250 (b)) open the Lab, with that room on the Canvas.
   const askedLab = location.state?.lab ?? null
@@ -3492,7 +3510,7 @@ export default function Shell() {
     // Each room with its own chat (C175 (a)).
     if (isRoom(board)) {
       const chat = chatIn(arrangement, board)
-      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} />
+      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} systemFor={systemFor} />
     }
     if (board === 'almanac') {
       return (

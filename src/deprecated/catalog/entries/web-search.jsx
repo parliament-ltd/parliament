@@ -1,3 +1,6 @@
+// Retired with R24, carried out on 27 October 2026 with today's chat page (C251 (e)).
+// Was src/catalog/entries/web-search.jsx. Nothing imports it and it is not built.
+// To restore: move it back, with today's chat page and its route and providers in App.jsx.
 // web-search@1.0 — contributes a "Web search" item to input@1.0's
 // `+` overflow menu; when armed, asks input@1.0 to include the active
 // provider's web_search tool definition in the next outgoing API call.

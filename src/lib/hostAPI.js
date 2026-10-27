@@ -35,34 +35,12 @@ export const PHASE_1_EVENTS = Object.freeze({
 
 const KNOWN_EVENTS = new Set(Object.values(PHASE_1_EVENTS))
 
-// PR-18b: `input-action:${id}` events are published by input@1.0 when
-// the user invokes a contributed action. The id portion is dynamic
-// (one per inputAction contribution), so we recognize the namespace
-// rather than enumerating every concrete event name.
-//
-// PR-18d adds two more events:
-//   - `tool-armed-changed`: emitted whenever a component calls
-//     `_armTool` / `_disarmTool`. Carries `{ componentId, armed }`
-//     so the arming component can update its own visual state and
-//     the input's chip strip can refresh.
-//   - `message-sent`: emitted by input@1.0 after a successful send.
-//     Arming components (e.g. web-search@1.0) subscribe to this so
-//     they can auto-reset their armed state — the contract for
-//     per-message tool toggles (W1).
-// PR-18e adds `attach:` for file-attach@1.0 status events (currently
-// just `attach:error`; input@1.0 subscribes to surface the message
-// inline above the textarea).
-const KNOWN_EVENT_PREFIXES = ['input-action:', 'attach:']
-const KNOWN_EVENTS_PR18D = new Set(['tool-armed-changed', 'message-sent'])
-// PR-18e: attachments-changed fires whenever a component calls
-// `_setAttachments`. Mirrors the tool-armed-changed pattern so the
-// input's chip strip refreshes when the underlying registry changes.
-const KNOWN_EVENTS_PR18E = new Set(['attachments-changed'])
+// The input actions, armed tools and attachments the old composer and its
+// feature blocks passed around (PR-18b, PR-18d, PR-18e), with their events,
+// were retired with them on 27 October 2026 (R24, R25; C251): the bar holds
+// web search and files for the next prompt itself (lib/inputFeatures.js).
 function isKnownEvent(event) {
-  if (KNOWN_EVENTS.has(event)) return true
-  if (KNOWN_EVENTS_PR18D.has(event)) return true
-  if (KNOWN_EVENTS_PR18E.has(event)) return true
-  return KNOWN_EVENT_PREFIXES.some(p => event.startsWith(p))
+  return KNOWN_EVENTS.has(event)
 }
 
 /**
@@ -75,26 +53,11 @@ function isKnownEvent(event) {
  * the per-message menu. The setter is prefixed with `_` to signal that
  * only RoomShell should call it — components must read, not write.
  *
- * PR-18d adds a third aggregation pair — `armedTools` — for the
- * "this component wants its tool def included in the next API call"
- * contract. Unlike `messageActions` / `inputActions` (static manifest
- * declarations aggregated by RoomShell), `armedTools` is runtime state
- * written by components themselves as the user toggles them on/off.
- * input@1.0 reads via `getArmedTools()` at send time and passes the
- * `definition` field of each entry into `provider.sendMessage(..., tools)`.
- *
  * @returns {{
  *   publish:           (event: string, payload?: any) => void,
  *   subscribe:         (event: string, handler: (payload?: any) => void) => () => void,
  *   getMessageActions: () => Array<{ id, label, componentId?, contributedBy?, [string]: any }>,
  *   _setMessageActions:(list: Array<object>) => void,
- *   getInputActions:   () => Array<{ id, label, primary?: 'right', iconName?, componentId?, contributedBy?, [string]: any }>,
- *   _setInputActions:  (list: Array<object>) => void,
- *   getArmedTools:     () => Array<{ componentId, id, label?, iconName?, definition, serverSide? }>,
- *   _armTool:          (componentId: string, info: object) => void,
- *   _disarmTool:       (componentId: string) => void,
- *   getAttachments:    () => Array<{ componentId, id, name, size, mimeType, category, base64?, content?, truncated? }>,
- *   _setAttachments:   (componentId: string, list: Array<object>) => void,
  *   _eventCount?:      () => number,
  * }}
  */
@@ -103,12 +66,6 @@ export function createHostAPI() {
   const handlers = new Map()
   /** @type {Array<object>} */
   let messageActions = []
-  /** @type {Array<object>} */
-  let inputActions = []
-  /** @type {Map<string, object>} componentId → tool registration */
-  const armedTools = new Map()
-  /** @type {Map<string, Array<object>>} componentId → attachments list */
-  const attachmentsByComponent = new Map()
 
   function subscribe(event, handler) {
     if (typeof event !== 'string' || event.length === 0) {
@@ -136,8 +93,7 @@ export function createHostAPI() {
     if (import.meta.env.DEV && !isKnownEvent(event)) {
       console.warn(
         `[hostAPI] publishing unknown event '${event}'. ` +
-        `Phase 1 events: ${[...KNOWN_EVENTS].join(', ')}; ` +
-        `or prefixes: ${KNOWN_EVENT_PREFIXES.join(', ')}.`
+        `Phase 1 events: ${[...KNOWN_EVENTS].join(', ')}.`
       )
     }
     const set = handlers.get(event)
@@ -162,81 +118,11 @@ export function createHostAPI() {
     messageActions = Array.isArray(list) ? list : []
   }
 
-  // PR-18b: parallel readers/writers for inputActions. input@1.0 reads
-  // the merged list at render time and splits by `primary` flag —
-  // `primary: 'right'` becomes the right-side button (mic→send swap);
-  // entries without a `primary` flag fill the `+` overflow menu.
-  function getInputActions() {
-    return inputActions.slice()
-  }
-
-  function _setInputActions(list) {
-    inputActions = Array.isArray(list) ? list : []
-  }
-
-  // PR-18d: per-message tool arming. Components arm a tool def for
-  // the next outgoing message by calling `_armTool(componentId, info)`.
-  // input@1.0 reads `getArmedTools()` at send time and passes the
-  // `definition` field of each entry into `provider.sendMessage`. After
-  // a successful send, input@1.0 publishes `message-sent`, which arming
-  // components subscribe to in order to clear themselves (the W1
-  // per-message-toggle contract).
-  function getArmedTools() {
-    return Array.from(armedTools.values()).map(t => ({ ...t }))
-  }
-  function _armTool(componentId, info) {
-    if (!componentId || !info) return
-    armedTools.set(componentId, { ...info, componentId })
-    publish('tool-armed-changed', { componentId, armed: true })
-  }
-  function _disarmTool(componentId) {
-    if (!componentId) return
-    if (!armedTools.has(componentId)) return
-    armedTools.delete(componentId)
-    publish('tool-armed-changed', { componentId, armed: false })
-  }
-
-  // PR-18e: per-message attachments. Components that want to contribute
-  // file content to the next outgoing message call `_setAttachments
-  // (componentId, list)` whenever their local picker state changes.
-  // input@1.0 reads `getAttachments()` at send time and folds the entries
-  // into the multi-part Anthropic content array (binary → image/document
-  // content blocks; text → wrapped inline and appended to the text part).
-  // The list semantics: each call REPLACES that component's entire list,
-  // so removing one attachment from a chip strip is a re-set with the
-  // shorter list. After a successful send, input@1.0 publishes
-  // `message-sent`; arming components clear themselves the same way
-  // armed-tools does.
-  function getAttachments() {
-    const out = []
-    for (const list of attachmentsByComponent.values()) {
-      for (const a of list) out.push({ ...a })
-    }
-    return out
-  }
-  function _setAttachments(componentId, list) {
-    if (!componentId) return
-    const safe = Array.isArray(list) ? list.map(a => ({ ...a, componentId })) : []
-    if (safe.length === 0) {
-      attachmentsByComponent.delete(componentId)
-    } else {
-      attachmentsByComponent.set(componentId, safe)
-    }
-    publish('attachments-changed', { componentId, count: safe.length })
-  }
-
   return {
     publish,
     subscribe,
     getMessageActions,
     _setMessageActions,
-    getInputActions,
-    _setInputActions,
-    getArmedTools,
-    _armTool,
-    _disarmTool,
-    getAttachments,
-    _setAttachments,
     _eventCount: () => handlers.size,
   }
 }

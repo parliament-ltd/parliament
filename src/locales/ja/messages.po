@@ -837,6 +837,27 @@ msgid "branches.writing"
 msgstr "作成中"
 
 #. js-lingui-explicit-id
+msgid "branchesBlock.carryOnSummary"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branchesBlock.carryOnWhole"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branchesBlock.full"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "branchesBlock.title"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "branchesBlock.writes"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "canvas.anyone"
 msgstr ""
 
