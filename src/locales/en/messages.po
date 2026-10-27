@@ -493,6 +493,215 @@ msgstr "sent, in its chat"
 msgid "blocks.stepsWhole"
 msgstr "shows the whole plan"
 
+#. js-lingui-explicit-id
+msgid "blocksBoard.add"
+msgstr "add"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.branches.contextThreshold"
+msgstr "Warns at"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.branches.defaultBranchMode"
+msgstr "New branches carry"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.branches.defaultBranchMode.full"
+msgstr "the whole history"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.branches.defaultBranchMode.summary"
+msgstr "a summary"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.branches.showCompressButton"
+msgstr "Compress button"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.branches.showParentLink"
+msgstr "Link to its parent"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.chars"
+msgstr "{n} letters"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.chart-canvas.chartType"
+msgstr "Kind"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.close"
+msgstr "Close {block}"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.context.contextThreshold"
+msgstr "Warns at"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.context.displayMode"
+msgstr "Shown as"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.context.displayMode.ambient"
+msgstr "ambient"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.context.displayMode.compact"
+msgstr "compact"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.context.displayMode.meter"
+msgstr "a meter"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.count"
+msgstr "{count, plural, one {# block} other {# blocks}} in {name}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "blocksBoard.empty"
+msgstr "No room in the Lab, so no blocks. edit:\"Writing studio\" puts one here."
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.emptySlot"
+msgstr "empty"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.inputFeatures"
+msgstr "Web search, voice and files come to the bar in piece 6 of this stage."
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.moveDown"
+msgstr "move down"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.moveUp"
+msgstr "move up"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.noLayout"
+msgstr "No layout yet, so no blocks."
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.none"
+msgstr "none"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.notBuilt"
+msgstr "{slot} (not built for it)"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.notes.sortOrder"
+msgstr "Order"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.notes.sortOrder.message"
+msgstr "as in the chat"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.notes.sortOrder.newest"
+msgstr "newest first"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.notes.sortOrder.oldest"
+msgstr "oldest first"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.nothingToSet"
+msgstr "nothing to set"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.notIn"
+msgstr "Not in the room"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.off"
+msgstr "off"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.ofOne"
+msgstr "{count} of 1"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.on"
+msgstr "on"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.open"
+msgstr "Open {block}"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.other"
+msgstr "other"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.percent"
+msgstr "{n}%"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.rm"
+msgstr "rm"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.settings"
+msgstr "Settings"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.sitsIn"
+msgstr "Sits in"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.stays"
+msgstr "every room has one"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.steps.follow"
+msgstr "Follows"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.steps.follow.chat"
+msgstr "this chat"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.steps.follow.plan"
+msgstr "a pinned plan"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.steps.plan"
+msgstr "Pinned plan"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.steps.show"
+msgstr "Shows"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.steps.show.all"
+msgstr "all runs"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.steps.show.run"
+msgstr "this run"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.toc.maxItems"
+msgstr "At most"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.toc.mode"
+msgstr "Lists"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.toc.mode.headings"
+msgstr "reply headings"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.toc.mode.prompts"
+msgstr "your prompts"
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.toc.truncateAt"
+msgstr "Cuts at"
+
 #. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
 msgid "board.almanac"
@@ -1676,6 +1885,57 @@ msgstr "The bar is in its own window already"
 #. js-lingui-explicit-id
 msgid "enter.barThere"
 msgstr "{place, select, top {The bar is at the top already} bottom {The bar is at the bottom already} left {The bar is on the left already} right {The bar is on the right already} other {The bar is in the centre already}}"
+
+#. js-lingui-explicit-id
+msgid "enter.blockAdd"
+msgstr "Enter puts {block} in {toSlot}"
+
+#. js-lingui-explicit-id
+msgid "enter.blockAddMany"
+msgstr "Enter puts {blocks} in the room"
+
+#. js-lingui-explicit-id
+msgid "enter.blockGoesTo"
+msgstr "{block} goes in {toSlot}"
+
+#. js-lingui-explicit-id
+msgid "enter.blockMany"
+msgstr "Which block: {names}?"
+
+#. js-lingui-explicit-id
+msgid "enter.blockNone"
+msgstr "No block is called {said}. The Library lists them"
+
+#. js-lingui-explicit-id
+msgid "enter.blockNoPlace"
+msgstr "{block} has no free place in {name}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.blockNotThere"
+msgstr "{block} is not in the room. add: puts it there"
+
+#. js-lingui-explicit-id
+msgid "enter.blockRm"
+msgstr "Enter takes {block} out of the room. The Library keeps it"
+
+#. js-lingui-explicit-id
+msgid "enter.blockRmMany"
+msgstr "Enter takes {blocks} out of the room. The Library keeps them"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.blocksNoLayout"
+msgstr "The room has no layout yet. layout:\"Three panels\" gives it one"
+
+#. js-lingui-explicit-id
+msgid "enter.blockStays"
+msgstr "{block} stays: every room has it"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.blockThere"
+msgstr "{block} is in the room already. place: moves it"
 
 #. {boards} lists board names
 #. js-lingui-explicit-id
@@ -3121,6 +3381,56 @@ msgid "enter.pinOn"
 msgstr "Enter pins {nums} at the top"
 
 #. js-lingui-explicit-id
+msgid "enter.placeCramped"
+msgstr "Enter moves {block} from {fromSlot} to {toSlot}. It is not built for there and may be cramped"
+
+#. js-lingui-explicit-id
+msgid "enter.placeDown"
+msgstr "Enter moves {block} down in its slot"
+
+#. js-lingui-explicit-id
+msgid "enter.placeFirst"
+msgstr "{block} is first in its slot already"
+
+#. js-lingui-explicit-id
+msgid "enter.placeFull"
+msgstr "Only one block fits in {toSlot}, and it has one. Move that first"
+
+#. js-lingui-explicit-id
+msgid "enter.placeGo"
+msgstr "Enter moves {block} from {fromSlot} to {toSlot}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.placeInLab"
+msgstr "place: moves a block in the Lab. edit: opens the room there"
+
+#. js-lingui-explicit-id
+msgid "enter.placeLast"
+msgstr "{block} is last in its slot already"
+
+#. js-lingui-explicit-id
+msgid "enter.placeNoSlot"
+msgstr "{name} has no place called {where}. Its places are {choices}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.placeOne"
+msgstr "place: moves one block at a time"
+
+#. js-lingui-explicit-id
+msgid "enter.placeSame"
+msgstr "{block} is in {toSlot} already"
+
+#. js-lingui-explicit-id
+msgid "enter.placeUp"
+msgstr "Enter moves {block} up in its slot"
+
+#. js-lingui-explicit-id
+msgid "enter.placeWhere"
+msgstr "Say where {block} goes: right, left, extra, middle, bottom, or up or down in its slot"
+
+#. js-lingui-explicit-id
 msgid "enter.planBranchDone"
 msgstr "{address} is added, with no chat until it runs"
 
@@ -4195,6 +4505,34 @@ msgstr "{count, plural, =0 {No row matches} one {# row matches} other {# rows ma
 #. js-lingui-explicit-id
 msgid "enter.sequence"
 msgstr "{count, plural, one {Enter runs # command: {verbs}} other {Enter runs # commands in turn: {verbs}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.setBlockChoice"
+msgstr "{word} takes {words}"
+
+#. js-lingui-explicit-id
+msgid "enter.setBlockGo"
+msgstr "Enter sets {word} of {block} to {value}"
+
+#. js-lingui-explicit-id
+msgid "enter.setBlockNone"
+msgstr "{block} has no settings to change"
+
+#. js-lingui-explicit-id
+msgid "enter.setBlockNumber"
+msgstr "{word} takes a whole number from {min} to {max}"
+
+#. js-lingui-explicit-id
+msgid "enter.setBlockSame"
+msgstr "{word} of {block} is {value} already"
+
+#. js-lingui-explicit-id
+msgid "enter.setBlockSwitch"
+msgstr "{word} takes on or off"
+
+#. js-lingui-explicit-id
+msgid "enter.setBlockWhich"
+msgstr "Which setting of {block}: {words}?"
 
 #. Commands stay English
 #. js-lingui-explicit-id

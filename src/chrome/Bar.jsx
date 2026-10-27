@@ -332,7 +332,7 @@ export default function Bar({ arrangement, board, doc, lines, screens, prompt, o
           onBlur={() => dispatch({ type: 'blur' })}
         />
         </div>
-        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} />
+        <EnterLine hidden={folded} mode={field.mode} resting={field.resting} empty={!field.text[field.mode]} says={says} told={Boolean(notice)} addressed={board} room={room} welcome={welcome} search={SEARCHABLE.has(board) ? searchCounts[board] ?? null : null} />
         {reference && <Reference board={board} topic={reference.topic} onPick={pick} />}
         {!reference && inspect && <Inspect row={inspect} />}
         {!reference && !inspect && compare && <Compare a={compare.a} b={compare.b} />}

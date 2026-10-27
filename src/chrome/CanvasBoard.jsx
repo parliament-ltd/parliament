@@ -8,7 +8,7 @@ import { slotsOf, deviceOf, nameOf } from '../lib/lab'
 // applies on click and is echoed under the field, undo: taking it back; a
 // layout moves blocks, so a click writes the command and waits for Enter
 // (A2, C38). Blocks are named here; changing them is the Blocks board's
-// (piece 2). Web search, voice and attaching files show as features of
+// (piece 2): a block clicked here opens its row there (C240 (f)). Web search, voice and attaching files show as features of
 // input, as the Library shows them.
 
 const FEATURE_WORDS = { 'web-search': COPY.library.featureWebSearch, 'voice-input': COPY.library.featureVoice, 'file-attach': COPY.library.featureAttach }
@@ -16,9 +16,9 @@ const FEATURE_WORDS = { 'web-search': COPY.library.featureWebSearch, 'voice-inpu
 /**
  * @param {{ addressed: boolean, onAddress: (board: string) => void, onWrite: (text: string) => void, onRun: (line: string) => void,
  *   room: { id: string, mode: object|null, name: string }|null, layouts: Array<{ ref: string, key: string, name: string, slots: object[] }>,
- *   themes: Array<{ ref: string, key: string, name: string }> }} props
+ *   themes: Array<{ ref: string, key: string, name: string }>, picked?: string|null, onPick?: (block: string) => void }} props
  */
-export default function CanvasBoard({ addressed, onAddress, onWrite, onRun, room, layouts, themes }) {
+export default function CanvasBoard({ addressed, onAddress, onWrite, onRun, room, layouts, themes, picked = null, onPick = () => {} }) {
   const { i18n } = useLingui()
   const C = COPY.canvas
   const mode = room?.mode ?? null
@@ -71,7 +71,7 @@ export default function CanvasBoard({ addressed, onAddress, onWrite, onRun, room
                 <section key={s.id} className={`ch-lab-slot${s.blocks.length ? '' : ' empty'}`} data-slot={s.id}>
                   <h3>{slotWord(s.id)}</h3>
                   {s.blocks.length
-                    ? <ul>{s.blocks.map((b) => <li key={b}>{blockWord(b)}{b === 'input' && s.features?.length ? <span className="ch-marg ch-lab-feat">{' '}{s.features.map((f) => i18n._(FEATURE_WORDS[f])).join(', ')}</span> : null}</li>)}</ul>
+                    ? <ul>{s.blocks.map((b) => <li key={b} className={picked === b ? 'sel' : undefined}><button type="button" className="ch-lab-block" aria-pressed={picked === b} onClick={() => onPick(b)}>{blockWord(b)}</button>{b === 'input' && s.features?.length ? <span className="ch-marg ch-lab-feat">{' '}{s.features.map((f) => i18n._(FEATURE_WORDS[f])).join(', ')}</span> : null}</li>)}</ul>
                     : <p className="ch-marg">{i18n._(C.emptySlot)}</p>}
                   <p className="ch-marg">{i18n._(s.capacity === 'single' ? (s.full ? C.full : C.roomForOne) : C.roomForMore)}</p>
                 </section>

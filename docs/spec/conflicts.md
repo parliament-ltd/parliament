@@ -2558,6 +2558,38 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **(g) Stored data:** none new. A block's settings are its `config` in the room's record, as today; each command is one step for `undo:`.
 - **Suggestion:** build as above.
 
+**C241. Stage 13, piece 2, as built: the Blocks board** (27 October; C240 as suggested).
+- **The Blocks board,** beside the Canvas in the Lab:
+  - Every block in the room on the Canvas, grouped by where it sits ("the sheet · 2"; a slot that holds one, "1 of 1"), each with a chevron that opens its row.
+  - An open row shows Sits in (each slot of the layout, "(not built for it)" where it does not fit), the block's settings as segmented choices, and move up, move down and rm. Messages and input say "every room has one" in place of rm.
+  - A closed row carries a short state ("the whole history", "your prompts").
+  - Under the slots, "Not in the room": the blocks that fit somewhere in this layout, each writing `>add:`.
+- **The click rule** (C240 (d)): a setting's choice runs at once and is echoed under the field ("Ran set:branches parent off. undo: takes it back"). Sits in, move up and down, rm and add write their command and wait for Enter. A number setting offers its presets and "other", which writes `>set:contents most ` to type the rest.
+- **The echo with the field at rest:** a click's echo used to show only while the bar was in command mode; with the field empty in search it showed the resting hint instead. It now shows the echo in both (`EnterLine`, `told`). This also fixes piece 1's theme and device clicks, and the Settings board's.
+- **Pointing both ways** (C240 (f)): a block clicked on the Canvas opens and marks its row on the Blocks board and scrolls it into view; a row opened there marks the block on the Canvas. The pick is the screen's only, not stored, and clears when another room comes onto the Canvas.
+- **The commands,** with the Canvas or the Blocks board addressed in the Lab (`src/lib/labBlocks.js`, pure):
+  - `add:keywords`, `add:keywords, contents`: each into its first free place by its fits, first choice first; one of each (C63); a block with no free place is refused.
+  - `rm:context`: out of the room ("The Library keeps it"); messages and input stay.
+  - `place:notes right` and the other words of C240 (c); `place:context up` and `down` within its slot. A place it is not built for is allowed with "may be cramped"; a full slot that holds one is refused ("Only one block fits in the conversation, and it has one. Move that first"); a word with no slot in this layout lists the words that have one. `place:` takes one block at a time.
+  - `set:notes order oldest` and the rest of C240 (b). A number out of bounds, an unknown setting or choice, and a value already set are each said. `set:steps plan 201` also pins the step list to that plan, as the block reads it (C202).
+  - Blocks are named by their short word (keywords, chart, table, contents, files, dashboard, inspector, document, comments, ripple, frameworks), their name in your words, or its start.
+  - Outside the Lab, `add:` and `rm:` stay the Collection's; `place:` in a room says it moves a block in the Lab.
+  - Each is saved at once and is one step for `undo:`, as piece 1's.
+- **The settings:** fourteen, not fifteen as C240 (a) counted; the list there is complete and is what was built. Their labels and choices are in the copy table (`blocksBoard`), the command words stay English.
+- **The verb list:** `place:` takes the new where-words and up and down; `set:`'s example and forms now show a block's setting (`set:notes order oldest`, `set:contents most 50`). Its old example, `set:input web search on`, comes back with piece 6.
+- **Stored data:** none new. A block's settings are its `config` in the room's record.
+- **Tests:** naming a block and a place; add, rm, place and set, each with its refusals, through the bar's preview, on fixture layouts (the catalogue cannot load in tests). 1,284 tests; 30 lint warnings, all older.
+- **Tried in the browser,** on the trial copy, with Pocket chat on the Canvas:
+  - the board drew its three slots and the blocks not in the room;
+  - "off" on Branches' link to its parent applied, was echoed, and `undo:` took it back, as it did a theme;
+  - `place:branches up` swapped Branches and Keywords on both boards;
+  - `add:contents` put the table of contents in the sheet, and `set:contents most 30` showed 30 among its presets;
+  - `rm:messages` was refused;
+  - Keywords clicked on the Canvas opened and marked its row; a row opened marked its block.
+
+  Each change was undone; Pocket chat is as it was.
+- **Next:** piece 3, the Library in full.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

@@ -78,6 +78,7 @@ export function say(i18n, message, values = {}) {
     if (BOARD_VALUES.has(key)) words[key] = boardName(i18n, value)
     // A block and a slot of a room, by their ids (the Lab, stage 13; C238).
     else if (key === 'block') words[key] = COPY.blocks[value] ? i18n._(COPY.blocks[value]) : String(value)
+    else if (key === 'blocks') words[key] = joined(i18n, value.map((b) => (COPY.blocks[b] ? i18n._(COPY.blocks[b]) : String(b))), 'conjunction')
     else if (key === 'fromSlot' || key === 'toSlot') words[key] = COPY.slots[value] ? i18n._(COPY.slots[value]) : String(value)
     else if (key === 'boards') words[key] = joined(i18n, value.map((b) => boardName(i18n, b)), 'conjunction')
     else if (AND_LISTS.has(key)) words[key] = joined(i18n, value.map(String), 'conjunction')

@@ -39,6 +39,7 @@ import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, plan
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
 import { planSet } from '../lib/settingVerbs'
+import { planAddBlock, planRmBlock, planPlace, planSetBlock } from '../lib/labBlocks'
 import { findPrivate, KINDS as PRIVATE_KINDS } from '../lib/privacyFilter'
 import { searchWords } from '../lib/searchWords'
 
@@ -59,7 +60,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -218,8 +219,11 @@ function showCollection(a, id) {
   return { ...next, context: { ...next.context, collection: id } }
 }
 
-const addStep = (a, step, screens) => planAdd(step, screens)
-const rmStep = (a, step, screens) => planRm(step, screens)
+// In the Lab, with the Canvas or the Blocks board addressed, add: and rm:
+// take blocks (stage 13, piece 2; C240).
+const building = (a) => Boolean(a.lab) && (a.addressed === 'canvas' || a.addressed === 'blocks')
+const addStep = (a, step, screens) => (building(a) ? planAddBlock(step, screens) : planAdd(step, screens))
+const rmStep = (a, step, screens) => (building(a) ? planRmBlock(step, screens) : planRm(step, screens))
 const headingStep = (a, step, screens) => planHeading(step, screens)
 const newStep = (a, step, screens) => {
   const [first, second] = step.match?.values ?? []
@@ -728,7 +732,7 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
     const step = answer.steps[0]
     const nameIt = (a1, s1, sc) => (a1.addressed === 'collection' ? planNameCollection(s1, sc)
       // In the Lab, the room on the Canvas (stage 13; C238).
-      : a1.lab && (a1.addressed === 'canvas' || a1.addressed === 'blocks') ? planLabName(s1, sc)
+      : building(a1) ? planLabName(s1, sc)
         : planName(a1, s1, sc))
     const plans = {
       tour: planTour, name: nameIt, inspect: planInspect, api: planApi, save: planSave, forget: planForget, copy: planCopyStep, undo: planUndo,
@@ -760,6 +764,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       layout: (a1, s1, sc) => planLayout(s1, sc),
       theme: (a1, s1, sc) => planTheme(s1, sc),
       device: (a1, s1, sc) => planDevice(s1, sc),
+      // A block's place and settings (piece 2; C240).
+      place: (a1, s1, sc) => (building(a1) ? planPlace(s1, sc) : { says: { message: 'placeInLab' }, act: null }),
       // accept: and reject: on answered asks (piece 5; C220 (d)); Ripple's suggestions join in stage 12.
       accept: (a1, s1, sc) => planSettle(s1, sc, 'accept'),
       reject: (a1, s1, sc) => planSettle(s1, sc, 'reject'),
@@ -772,8 +778,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       to: (a1, s1, sc) => planTo(s1, sc),
       include: (a1, s1, sc) => planInclude(s1, sc),
       again: (a1, s1, sc) => planAgain(s1, sc),
-      // set: on Settings (stage 9; C181); a block's settings come with the Lab.
-      set: (a1, s1, sc) => (a1.addressed === 'settings' ? planSet(s1, sc) : null),
+      // set: on Settings (stage 9; C181), and a block's in the Lab (C240).
+      set: (a1, s1, sc) => (a1.addressed === 'settings' ? planSet(s1, sc) : building(a1) ? planSetBlock(s1, sc) : null),
       // hold: and hold:off for a plan's branches (stage 10, piece 2; C198).
       // Edits first, by their numbers (C216 (f)); else a plan's branches.
       hold: (a1, s1, sc) => planHoldEdits(s1, sc) ?? planHold(s1, sc),

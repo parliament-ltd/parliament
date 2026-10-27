@@ -914,3 +914,32 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-lab-slot h3 { font: 600 11px var(--ch-sans); color: var(--p-text-secondary, var(--ch-ink-3)); margin: 0 0 4px; text-transform: none; }
 .ch-lab-slot ul { list-style: none; margin: 0 0 4px; padding: 0; }
 .ch-lab-slot li { font: 400 13px var(--ch-sans); color: var(--p-text, var(--ch-ink)); padding: 2px 0; }
+.ch-shell .ch-lab-slot button.ch-lab-block { padding: 0; font: inherit; color: inherit; text-decoration: none; background: none; border: none; cursor: pointer; }
+.ch-lab-slot li.sel { box-shadow: inset 2px 0 0 var(--ch-ink); padding-inline-start: 6px; }
+
+/* The Blocks board (stage 13, piece 2; C240; Lab v7). */
+.ch-bgrp h3 { display: flex; margin: 0; padding: 12px 6px 5px; font: 600 11px var(--ch-sans); color: var(--ch-ink); border-bottom: 1px solid var(--ch-divider); text-transform: none; }
+.ch-bgrp h3 .n { margin-inline-start: auto; font: 500 11px var(--ch-sans); color: var(--ch-ink-3); }
+.ch-bgrp ul { list-style: none; margin: 0; padding: 0; }
+.ch-bempty { padding: 7px 6px 7px 30px; margin: 0; }
+.ch-brow { border-bottom: 1px solid var(--ch-divider); }
+.ch-brow.sel { background: var(--ch-wash); box-shadow: inset 2px 0 0 var(--ch-ink); }
+.ch-shell .ch-brow button.ch-bhead { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 6px; width: 100%; padding: 7px 6px; text-align: start; background: none; border: none; cursor: pointer; text-decoration: none; color: var(--ch-ink); }
+.ch-shell .ch-brow button.ch-bhead:hover { background: var(--ch-wash); }
+.ch-bhead .chev { display: flex; align-items: center; justify-content: center; width: 18px; height: 18px; color: var(--ch-ink-3); }
+.ch-bhead .chev svg { width: 11px; height: 11px; transition: transform calc(140ms * var(--ch-k, 1)); }
+.ch-brow.open .chev svg { transform: rotate(90deg); }
+.ch-bmain { display: flex; flex-direction: column; min-width: 0; }
+.ch-bname { font: 500 13px var(--ch-sans); }
+.ch-bst { margin-top: 1px; }
+.ch-bcfg { padding: 6px 8px 10px 30px; }
+.ch-crow { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px; align-items: center; padding: 4px 0; }
+.ch-crow .k { font: 400 12px var(--ch-sans); color: var(--ch-ink-3); }
+.ch-shell .ch-bseg button { padding: 3px 9px; font: 400 12px var(--ch-sans); color: var(--ch-ink-2); border-radius: 6px; white-space: nowrap; text-decoration: none; }
+.ch-shell .ch-bseg button:hover { color: var(--ch-ink); }
+.ch-shell .ch-bseg button.on { background: var(--ch-surface); color: var(--ch-ink); font-weight: 600; box-shadow: 0 0 0 .5px var(--ch-soft); }
+.ch-bwhere { display: flex; flex-wrap: wrap; gap: 2px 10px; }
+.ch-shell .ch-bwhere button { padding: 0; font: 400 12px var(--ch-sans); color: var(--ch-ink-2); }
+.ch-shell .ch-bwhere button.on { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+.ch-bmarg { display: flex; flex-wrap: wrap; gap: 0 12px; margin: 8px 0 0; }
+.ch-bmissing p { display: flex; flex-wrap: wrap; gap: 2px 12px; padding: 6px; margin: 0; }

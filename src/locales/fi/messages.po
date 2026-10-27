@@ -493,6 +493,215 @@ msgstr "lähetetty, näkyy keskustelussaan"
 msgid "blocks.stepsWhole"
 msgstr "näyttää koko suunnitelman"
 
+#. js-lingui-explicit-id
+msgid "blocksBoard.add"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.branches.contextThreshold"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.branches.defaultBranchMode"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.branches.defaultBranchMode.full"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.branches.defaultBranchMode.summary"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.branches.showCompressButton"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.branches.showParentLink"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.chars"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.chart-canvas.chartType"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.close"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.context.contextThreshold"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.context.displayMode"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.context.displayMode.ambient"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.context.displayMode.compact"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.context.displayMode.meter"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.count"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "blocksBoard.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.emptySlot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.inputFeatures"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.moveDown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.moveUp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.noLayout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.none"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.notBuilt"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.notes.sortOrder"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.notes.sortOrder.message"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.notes.sortOrder.newest"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.notes.sortOrder.oldest"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.nothingToSet"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.notIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.off"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.ofOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.on"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.open"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.other"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.percent"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.rm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.settings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.sitsIn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.stays"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.steps.follow"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.steps.follow.chat"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.steps.follow.plan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.steps.plan"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.steps.show"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.steps.show.all"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.steps.show.run"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.toc.maxItems"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.toc.mode"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.toc.mode.headings"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.toc.mode.prompts"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "blocksBoard.toc.truncateAt"
+msgstr ""
+
 #. The table of everything you have made, by number (C131)
 #. js-lingui-explicit-id
 msgid "board.almanac"
@@ -1676,6 +1885,57 @@ msgstr "Palkki on jo omassa ikkunassaan"
 #. js-lingui-explicit-id
 msgid "enter.barThere"
 msgstr "{place, select, top {Palkki on jo ylhäällä} bottom {Palkki on jo alhaalla} left {Palkki on jo vasemmalla} right {Palkki on jo oikealla} other {Palkki on jo keskellä}}"
+
+#. js-lingui-explicit-id
+msgid "enter.blockAdd"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.blockAddMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.blockGoesTo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.blockMany"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.blockNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.blockNoPlace"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.blockNotThere"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.blockRm"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.blockRmMany"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.blocksNoLayout"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.blockStays"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.blockThere"
+msgstr ""
 
 #. {boards} lists board names
 #. js-lingui-explicit-id
@@ -3121,6 +3381,56 @@ msgid "enter.pinOn"
 msgstr "Enter kiinnittää ylös: {nums}"
 
 #. js-lingui-explicit-id
+msgid "enter.placeCramped"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.placeDown"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.placeFirst"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.placeFull"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.placeGo"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.placeInLab"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.placeLast"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.placeNoSlot"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.placeOne"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.placeSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.placeUp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.placeWhere"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.planBranchDone"
 msgstr "Haara {address} on lisätty. Sillä ei ole keskustelua ennen kuin se ajetaan"
 
@@ -4195,6 +4505,34 @@ msgstr "{count, plural, =0 {Ei osuvia rivejä} one {# rivi osuu} other {# riviä
 #. js-lingui-explicit-id
 msgid "enter.sequence"
 msgstr "{count, plural, one {Enter suorittaa # komennon: {verbs}} other {Enter suorittaa # komentoa peräkkäin: {verbs}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.setBlockChoice"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setBlockGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setBlockNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setBlockNumber"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setBlockSame"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setBlockSwitch"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.setBlockWhich"
+msgstr ""
 
 #. Commands stay English
 #. js-lingui-explicit-id

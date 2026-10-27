@@ -15,7 +15,7 @@ const PROPER = new Set(['Parliament', "Parliament's", 'I', 'AI', 'API', 'Wikiped
   // Ripple, carrying edits across branches, a name as the editing spec writes it (C231).
   'Ripple',
   // The Lab and its boards, by their names (C131; stage 13, C238).
-  'Lab', 'Canvas', 'Blocks'])
+  'Lab', 'Canvas', 'Blocks', 'Library'])
 
 describe('the copy table', () => {
   it('gives every entry an id and a message, and no id twice', () => {

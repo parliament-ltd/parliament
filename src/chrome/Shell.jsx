@@ -83,6 +83,7 @@ import { lastReply, sweepRequest, sweepItems } from '../lib/sweep'
 import { reflectionScope, markedSoFar, sessionOf, reflectRequest, readScope } from '../lib/reflection'
 import ReflectionBoard from './ReflectionBoard'
 import CanvasBoard from './CanvasBoard'
+import BlocksBoard from './BlocksBoard'
 import { SCHEMES, schemeName } from '../lib/schemes'
 import { roomName as roomNameOfMode } from '../lib/roomNames'
 import { planLabOpen, planLabDone } from '../shell/arrangement'
@@ -1850,6 +1851,9 @@ export default function Shell() {
     return { ref: s.id, key, name: COPY.themes[key] ? i18n._(COPY.themes[key]) : key }
   }), [i18n])
   const blockFits = useMemo(() => new Map(listEntries().map((e) => [e.name, [...(e.slotTargets ?? [])].sort((a, b) => (b.primary ? 1 : 0) - (a.primary ? 1 : 0)).map((t) => t.slot)])), [])
+  // The blocks a room can take, by name (piece 2; C240): features of input are not among them.
+  const labBlocks = useMemo(() => listEntries().filter((e) => e.slotTargets?.length && !['web-search', 'voice-input', 'file-attach'].includes(e.name))
+    .map((e) => ({ key: e.name, name: COPY.blocks[e.name] ? i18n._(COPY.blocks[e.name]) : e.name })), [i18n])
   // The room the building commands act on: the one on the Canvas in the
   // Lab, else the room on screen.
   const labRoomId = arrangement.lab ? arrangement.context?.canvas ?? null : null
@@ -1872,7 +1876,11 @@ export default function Shell() {
     themes: labThemes,
     rooms: recordsNames.rooms.map((r) => ({ id: r.id, key: r.id, name: roomLabel(i18n, r.name) })),
     fitsOf: (b) => blockFits.get(b) ?? [],
-  }), [arrangement.lab, labRoom, roomChatRow, recordsNames, labLayouts, labThemes, blockFits, i18n])
+    blocks: labBlocks,
+  }), [arrangement.lab, labRoom, roomChatRow, recordsNames, labLayouts, labThemes, blockFits, labBlocks, i18n])
+  // The block picked on the Canvas or the Blocks board, marked on both (C240 (f)).
+  const [labPick, setLabPick] = useState(null)
+  useEffect(() => { setLabPick(null) }, [labRoomId])
   const roomNotHeld = useMemo(() => {
     if (!roomChatRow || !shownCollection) return null
     if (roomChatRow.collections.includes(shownCollection.id)) return null
@@ -3334,7 +3342,16 @@ export default function Shell() {
         <CanvasBoard
           key="canvas" addressed={arrangement.addressed === 'canvas'} onAddress={focusBoard} onWrite={writeField} onRun={onPlanDelete}
           room={arrangement.lab && labRoomId ? (labRoom ?? { id: labRoomId, mode: undefined, name: '' }) : null}
-          layouts={labLayouts} themes={labThemes}
+          layouts={labLayouts} themes={labThemes} picked={labPick} onPick={setLabPick}
+        />
+      )
+    }
+    if (board === 'blocks') {
+      return (
+        <BlocksBoard
+          key="blocks" addressed={arrangement.addressed === 'blocks'} onAddress={focusBoard} onWrite={writeField} onRun={onPlanDelete}
+          room={arrangement.lab && labRoomId ? (labRoom ?? { id: labRoomId, mode: undefined, name: '' }) : null}
+          layouts={labLayouts} blocks={labBlocks} fitsOf={labScreen.fitsOf} picked={labPick} onPick={setLabPick}
         />
       )
     }

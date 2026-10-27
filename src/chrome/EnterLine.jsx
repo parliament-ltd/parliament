@@ -27,7 +27,7 @@ function Parts({ parts }) {
  *   search: on Records, how many rows the search leaves ({ count }); null
  *   where search does not reach yet (C132 (a))
  */
-export default function EnterLine({ mode, resting, empty, says, addressed, room, welcome = null, hidden = false, search = null }) {
+export default function EnterLine({ mode, resting, empty, says, addressed, room, welcome = null, hidden = false, search = null, told = false }) {
   const { i18n } = useLingui()
   // What Enter will do, in the language a language: line names, once its
   // words are loaded (C184); until then, in the page's.
@@ -62,6 +62,10 @@ export default function EnterLine({ mode, resting, empty, says, addressed, room,
   } else if (mode === 'command') {
     parts = [target, { key: 'does', now: true, text: say(speaker, says.message, says.values), lang }, ...also]
     parts.push(leave)
+  } else if (mode === 'search' && empty && told && says?.message) {
+    // What a click on a board just ran, echoed with the field at rest (C240 (d)).
+    parts = [{ key: 'does', now: true, text: say(speaker, says.message, says.values), lang }, ...also]
+    if (resting !== 'search') parts.push(leave)
   } else if (mode === 'search' && welcome && empty) {
     // At rest on the welcome page, one line only (W §2).
     parts = [{ key: 'begin', now: true, text: i18n._(COPY.enter.toBegin, { leader: '>' }) }]
