@@ -557,6 +557,21 @@
 .ch-col-legend ins { text-decoration: none; }
 .ch-col-legend ins.l-you { color: var(--ch-you); text-decoration: underline; text-underline-offset: 2px; }
 .ch-col-legend ins.l-ai { color: var(--ch-ai); text-decoration: underline dotted; text-underline-offset: 2px; }
+/* Suggestions (stage 12, piece 1; C228): Ripple's in rust, dashed; a sweep's in green, dotted. */
+.ch-col-legend ins.l-rust { color: var(--ch-rust); text-decoration: underline dashed; text-underline-offset: 2px; }
+.ch-col-tabs .n.rust { color: var(--ch-rust); opacity: 1; }
+.ch-mk.ck-suggestion.sg-ripple .ch-mk-body { border-inline-start: 2px dashed var(--ch-rust); padding-inline-start: 9px; }
+.ch-mk.ck-suggestion.sg-sweep .ch-mk-body { border-inline-start: 2px dotted var(--ch-ai); padding-inline-start: 9px; }
+.ch-mk.ck-suggestion.sg-ripple .ch-ed s, .ch-mk.ck-suggestion.sg-ripple .ch-ed ins { color: var(--ch-rust); text-decoration-color: var(--ch-rust); }
+.ch-mk.ck-suggestion.sg-ripple .ch-ed ins { text-decoration-style: dashed; }
+.ch-mk.ck-suggestion.sg-sweep .ch-ed s, .ch-mk.ck-suggestion.sg-sweep .ch-ed ins { color: var(--ch-ai); text-decoration-color: var(--ch-ai); }
+.ch-mk.ck-suggestion.sg-sweep .ch-ed ins { text-decoration-style: dotted; }
+.ch-mk.ck-suggestion.sg-accepted .ch-ed, .ch-mk.ck-suggestion.sg-rejected .ch-ed { opacity: .7; }
+.ch-sg-from { font: italic 400 11.5px/1.45 var(--ch-serif); color: var(--ch-ink-2); margin-bottom: 3px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ch-sg-review { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; padding: 6px 0 4px; }
+.ch-sg-review b { font-style: normal; color: var(--ch-ink); }
+.ch-shell .ch-sg-review button { padding: 0; color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+.ch-sg-keys { margin-inline-start: auto; }
 .ch-col-nothere { margin: 4px 0 2px; }
 .ch-shell .ch-col-nothere button { padding: 0; color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; font-family: var(--ch-mono, monospace); }
 .ch-mk-qs .c-id { margin-inline-start: 6px; font-style: normal; }

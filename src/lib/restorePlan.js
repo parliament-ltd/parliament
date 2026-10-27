@@ -157,7 +157,7 @@ export function planRestore(flat, {
     sbrd_documents: [], files: [], file_data: [], settings: [], modes: [],
     libraryLayouts: [], libraryRooms: [], libraryComponents: [], librarySchemes: [], libraryResources: [],
     dockets: [], runs: [], collections: [], collabs: [],
-    edits: [], asks: [],
+    edits: [], asks: [], suggestions: [],
   }
   const summary = {
     chats: { added: 0, copied: 0, skipped: 0 },
@@ -267,7 +267,7 @@ export function planRestore(flat, {
   // the same, under its new message ids when it comes in as a copy. A record
   // is keyed by its message and the id its marks carry, so a copy's records
   // stay apart from the original's.
-  for (const store of ['edits', 'asks']) {
+  for (const store of ['edits', 'asks', 'suggestions']) {
     for (const e of flat[store] || []) {
       const d = decision.get(e.conversationId)
       if (!d || d === 'same') continue
@@ -275,7 +275,8 @@ export function planRestore(flat, {
       const out = { ...e, conversationId: conv(e.conversationId), messageId }
       // Keyed by message and mark id, as when saved; an ask from before
       // asks had a mark id, a new id if copied.
-      if (store === 'edits' || e.edit) out.id = `${messageId}:${e.edit}`
+      if (store === 'suggestions') out.id = `${messageId}:${e.mark}`
+      else if (store === 'edits' || e.edit) out.id = `${messageId}:${e.edit}`
       else if (d === 'copy') out.id = newId()
       writes[store].push(renumber(out, e, d === 'copy'))
     }

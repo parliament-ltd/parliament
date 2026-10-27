@@ -825,6 +825,24 @@ msgid "chat.stoppedOnReply"
 msgstr "Avbröts när du lämnade chatten. Det som hann komma sparas."
 
 #. js-lingui-explicit-id
+msgid "chat.sugAccept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.sugReject"
+msgstr ""
+
+#. Before a Ripple suggestion number in the text: ripple 244
+#. js-lingui-explicit-id
+msgid "chat.sugRipple"
+msgstr ""
+
+#. Before a sweep suggestion number in the text: sweep 245
+#. js-lingui-explicit-id
+msgid "chat.sugSweep"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.summaryBy"
 msgstr "en modell"
 
@@ -1088,11 +1106,23 @@ msgid "collection.legendGreenIs"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "collection.legendRust"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendRustIs"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.legendStruck"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.legendStruckIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendSweepIs"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1148,6 +1178,35 @@ msgstr "{num}, finns inte längre"
 msgid "collection.removed"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "collection.review"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.reviewAll"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.reviewDone"
+msgstr ""
+
+#. The keys a and r, lower case
+#. js-lingui-explicit-id
+msgid "collection.reviewKeys"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.reviewNext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.reviewOf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.reviewPrev"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "collection.runs"
@@ -1177,6 +1236,43 @@ msgstr "Visar den, som open:\"{name}\" gör"
 #. js-lingui-explicit-id
 msgid "collection.source"
 msgstr "källa"
+
+#. js-lingui-explicit-id
+msgid "collection.sugAccept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugAccepted"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugBy"
+msgstr ""
+
+#. A Ripple suggestion carries an edit of the person to another branch
+#. js-lingui-explicit-id
+msgid "collection.sugFromRipple"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugFromRippleBare"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugFromSweep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugReject"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugRejected"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.summaryOf"
@@ -1209,6 +1305,10 @@ msgstr "Anteckningar"
 #. js-lingui-explicit-id
 msgid "collection.tabQuote"
 msgstr "Citat"
+
+#. js-lingui-explicit-id
+msgid "collection.tabSuggestion"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.tabTerm"
@@ -1915,6 +2015,11 @@ msgstr "Enter raderar steg {index} i {address} i körning {run}. undo: tar tillb
 #. js-lingui-explicit-id
 msgid "enter.deleteStepStarted"
 msgstr "Steg {index} i {address} har startat, så det ligger kvar i sin chatt"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteSugUse"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.didYouMean"
@@ -3898,6 +4003,23 @@ msgstr ""
 msgid "enter.settleReject"
 msgstr ""
 
+#. {state} is accepted or rejected
+#. js-lingui-explicit-id
+msgid "enter.settleSugDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleSugReject"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleSugRipple"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleSugSweep"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.setUnknown"
@@ -4360,6 +4482,11 @@ msgstr ""
 #. js-lingui-explicit-id
 msgid "enter.undoNothing"
 msgstr "Inget att ångra i den här fliken"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoSugUse"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.unknown"

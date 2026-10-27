@@ -9,6 +9,8 @@
 // Pure: rows come from almanacRows.js; the Enter line's words from the copy
 // table, by key.
 
+import { isChangeRow } from './recordsFilter'
+
 export const TITLE_MAX = 120
 export const TAG_MAX = 40
 
@@ -45,8 +47,8 @@ export function targetsOf(args, rows, { changes = false } = {}) {
       ? rows.find((r) => r.kind === 'chat' && r.docketNum === num && r.branch === a.letter)
       : rows.find((r) => r.num === num) ?? rows.find((r) => r.kind === 'chat' && r.docketNum === num)
     if (!row) return { bad: { message: 'numNone', values: { num: a.text ?? String(num) } } }
-    // Edits and asks are changed by their own commands (C220 (d)).
-    if (!changes && (row.kind === 'edit' || row.kind === 'ask')) return { bad: { message: 'changeNotThis', values: { num: String(num) } } }
+    // Edits, asks and suggestions are changed by their own commands (C220 (d)).
+    if (!changes && isChangeRow(row)) return { bad: { message: 'changeNotThis', values: { num: String(num) } } }
     if (!out.includes(row)) out.push(row)
   }
   return { rows: out }

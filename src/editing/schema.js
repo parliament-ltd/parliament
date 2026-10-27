@@ -183,6 +183,20 @@ export const schema = new Schema({
       toDOM: (m) => ['del', { class: 'pm-replaced', 'data-ask': String(m.attrs.ask) }, 0],
       parseDOM: [{ tag: 'del.pm-replaced', getAttrs: (dom) => ({ ask: dom.getAttribute('data-ask') }) }],
     },
+    // A suggestion (stage 12, piece 1; C228, C229): the words it would strike
+    // and the words it suggests, in rust for Ripple and green for a sweep.
+    // Each carries the suggestion's id and kind. Settling one is not an edit
+    // by itself; accepting Ripple's makes one.
+    suggest_out: {
+      attrs: { suggestion: {}, kind: { default: 'ripple' } }, inclusive: false, excludes: '',
+      toDOM: (m) => ['del', { class: `pm-sug-out pm-sug-${m.attrs.kind === 'sweep' ? 'sweep' : 'ripple'}`, 'data-suggestion': String(m.attrs.suggestion) }, 0],
+      parseDOM: [{ tag: 'del.pm-sug-out', getAttrs: (dom) => ({ suggestion: dom.getAttribute('data-suggestion'), kind: dom.classList.contains('pm-sug-sweep') ? 'sweep' : 'ripple' }) }],
+    },
+    suggest_in: {
+      attrs: { suggestion: {}, kind: { default: 'ripple' } }, inclusive: false, excludes: '',
+      toDOM: (m) => ['ins', { class: `pm-sug-in pm-sug-${m.attrs.kind === 'sweep' ? 'sweep' : 'ripple'}`, 'data-suggestion': String(m.attrs.suggestion) }, 0],
+      parseDOM: [{ tag: 'ins.pm-sug-in', getAttrs: (dom) => ({ suggestion: dom.getAttribute('data-suggestion'), kind: dom.classList.contains('pm-sug-sweep') ? 'sweep' : 'ripple' }) }],
+    },
     // The whole address shows when the pointer rests on a link (C146 (b)).
     link: {
       attrs: { href: {} }, inclusive: false,
@@ -208,7 +222,14 @@ export function chartTitle(data) {
 export const { struck: STRUCK, added: ADDED } = schema.marks
 export const isEditMark = (m) => m.type === STRUCK || m.type === ADDED
 export const { ask: ASK, answer: ANSWER, replaced: REPLACED } = schema.marks
-/** An answer waiting, or the passage it would replace: the model's, settled by accept or undo. */
-export const isAnswerMark = (m) => m.type === ANSWER || m.type === REPLACED
+export const { suggest_out: SUGGEST_OUT, suggest_in: SUGGEST_IN } = schema.marks
+/** A suggestion's words: what it would strike, or what it suggests (C229). */
+export const isSuggestMark = (m) => m.type === SUGGEST_OUT || m.type === SUGGEST_IN
+/**
+ * An answer waiting, or the passage it would replace, or a suggestion's
+ * words: the model's, settled by accept or reject, never carried onto words
+ * the person types.
+ */
+export const isAnswerMark = (m) => m.type === ANSWER || m.type === REPLACED || isSuggestMark(m)
 /** A block struck or kept as one: a divider, a chart, or a table struck whole. */
 export const isWholeBlock = (node) => node.isAtom || node.type === schema.nodes.table || node.type === schema.nodes.chart

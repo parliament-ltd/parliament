@@ -44,6 +44,8 @@ export const FIELDS = Object.freeze({
   edits: ['id', 'edit', 'num', 'conversationId', 'messageId', 'part', 'struck', 'added', 'places', 'held', 'sent', 'createdAt', 'updatedAt', 'restoredFrom'],
   // passage, point: what an ask was about when asked, so a changed passage keeps its answer to its card (C218).
   asks: ['id', 'edit', 'num', 'conversationId', 'messageId', 'part', 'places', 'question', 'passage', 'point', 'answer', 'state', 'held', 'sent', 'createdAt', 'updatedAt', 'restoredFrom'],
+  // Suggestions from Ripple and sweeps, each with its chat (stage 12; C229 (b)).
+  suggestions: ['id', 'mark', 'num', 'conversationId', 'messageId', 'part', 'kind', 'struck', 'suggested', 'places', 'from', 'model', 'state', 'createdAt', 'updatedAt', 'restoredFrom'],
   files: ['id', 'conversationId', 'name', 'type', 'rows', 'cols', 'sizeBytes', 'inContext', 'uploadedAt'],
   file_data: ['fileId', 'data'],
   sbrd_documents: ['conversationId', 'paragraphs', 'suggestionStates', 'submittedReplies', 'updatedAt'],
@@ -221,6 +223,7 @@ export function cleanFlat(flat) {
   const onReply = (e) => chats.has(e.conversationId) && messages.has(e.messageId)
   const markId = (e) => (typeof e.edit === 'string' && e.edit.length > 0 && e.edit.length <= 64) || Number.isInteger(e.edit)
   dropped.edits = keep('edits', (e) => onReply(e) && markId(e)) + keep('asks', onReply)
+    + keep('suggestions', (e) => onReply(e) && typeof e.mark === 'string' && e.mark.length > 0 && e.mark.length <= 64)
   const files = new Set((out.files || []).map((f) => f.id))
   keep('file_data', (fd) => files.has(fd.fileId))
   return { flat: out, dropped }

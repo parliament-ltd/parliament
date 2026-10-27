@@ -44,7 +44,7 @@ describe('accept: and reject: on answered asks', () => {
     expect(at('>accept:245').act).toBeNull()
     expect(at('>reject:245').act.changes[0]).toMatchObject({ how: 'undoHere' })
     expect(at('>accept:246').text).toBe('Ask 246 has no answer yet')
-    expect(at('>accept:242').text).toBe('242 is not an ask. accept: and reject: settle the answer to an ask')
+    expect(at('>accept:242').text).toBe('242 is not an ask or a suggestion. accept: and reject: settle the answer to an ask, or a suggestion')
     expect(at('>accept:all').act.changes.map((c) => c.num)).toEqual([244])
     expect(at('>reject:all').act.changes.map((c) => c.how)).toEqual(['undo', 'undoHere'])
   })
@@ -91,5 +91,40 @@ describe('strikethrough: and tell: (piece 7; C225)', () => {
     expect(telling('c202', ['Short'])('>tell:"Short"').text).toBe('That note is held already')
     expect(telling('c202')(`>tell:"${'a'.repeat(1001)}"`).text).toBe('A note holds up to 1000 characters')
     expect(telling('c202', Array.from({ length: 10 }, (_, i) => `n${i}`))('>tell:"more"').text).toBe('Up to 10 notes wait for one prompt')
+  })
+})
+
+describe('accept: and reject: on suggestions (stage 12, piece 1; C229 (e))', () => {
+  const sug = (num, made, chatId, change = {}) => ({
+    kind: 'suggestion', num, id: `m9:s${num}`, chatId, chatNum: 202, messageId: 'm9', store: 'suggestions', docketNum: 201, branch: 'b',
+    title: '', text: '', tags: [], pinned: false, archived: false,
+    change: { kind: 'suggestion', made, mark: `s${num}`, part: 'reply', struck: 'a', suggested: 'b', from: {}, model: null, state: 'open', ...change },
+  })
+  const rows = [
+    { kind: 'chat', num: 202, id: 'c202', chatId: 'c202', store: 'conversations', docketNum: 201, branch: 'a', title: '', text: '', tags: [], pinned: false, archived: false },
+    ...ROWS.filter((r) => r.kind !== 'chat'),
+    sug(250, 'ripple', 'c203'), sug(251, 'sweep', 'c202'), sug(252, 'ripple', 'c203', { state: 'accepted' }),
+  ]
+  const on = (value) => {
+    const p = preview(value, { mode: 'command', arrangement: { ...shipped('almanac'), addressed: 'room' }, screens: { records: { rows }, roomChat: 'c202' } })
+    return { ...p, text: p.says ? say(i18n, p.says.message, p.says.values) : '', also: (p.says?.also ?? []).map((x) => say(i18n, x.message, x.values)) }
+  }
+  it('accepts Ripple\'s as an edit of yours, and a sweep\'s as the reply\'s words', () => {
+    expect(on('>accept:250')).toMatchObject({
+      text: 'Enter accepts Ripple’s suggestion 250: each becomes an edit of yours in its branch, and goes with your next prompt there',
+      act: { kind: 'storedChange', changes: [{ how: 'acceptSuggestion', num: 250, mark: 's250', messageId: 'm9', conversationId: 'c203' }] },
+    })
+    expect(on('>accept:251').text).toBe('Enter accepts the sweep’s suggestion 251: the suggested words become the reply’s, and the struck ones go')
+    expect(on('>reject:250, 251')).toMatchObject({ text: 'Enter turns down the suggestions 250 and 251: the reply stays as it is', act: { changes: [{ how: 'rejectSuggestion' }, { how: 'rejectSuggestion' }] } })
+    expect(on('>accept:252').text).toBe('Suggestion 252 was accepted already')
+  })
+  it('takes in accept:all the suggestions waiting in the room\'s chat and its plan\'s branches, with the answers', () => {
+    const p = on('>accept:all')
+    expect(p.act.changes.map((c) => c.num).sort()).toEqual([244, 250, 251])
+    expect(p.also).toHaveLength(2)
+  })
+  it('points undo: and delete: to accept: and reject:', () => {
+    expect(on('>undo:250').text).toBe('A suggestion is settled with accept:250 or reject:250')
+    expect(on('>delete:250').text).toBe('A suggestion is turned down with reject:250, and kept as the record of it')
   })
 })

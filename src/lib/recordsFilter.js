@@ -29,7 +29,9 @@ const HAS_KIND = Object.freeze({ note: 'note', keyword: 'term', quote: 'quote', 
 // Rows only when filtered for, or found by a search (A19; C133). One line.
 const ON_REQUEST = new Set(['term', 'quote'])
 // Rows only under their own type: filter (C56, C220 (j)): not even a search finds them.
-const ONLY_TYPED = new Set(['edit', 'ask'])
+const ONLY_TYPED = new Set(['edit', 'ask', 'suggestion'])
+/** Whether a row is an edit, an ask or a suggestion: a change in a reply, acted on by its own commands (C220, C229). */
+export const isChangeRow = (row) => Boolean(row) && ONLY_TYPED.has(row.kind)
 
 const DAY = 86_400_000
 const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']

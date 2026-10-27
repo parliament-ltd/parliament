@@ -825,6 +825,24 @@ msgid "chat.stoppedOnReply"
 msgstr "チャットを離れたため止まりました。届いた分は残してあります。"
 
 #. js-lingui-explicit-id
+msgid "chat.sugAccept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "chat.sugReject"
+msgstr ""
+
+#. Before a Ripple suggestion number in the text: ripple 244
+#. js-lingui-explicit-id
+msgid "chat.sugRipple"
+msgstr ""
+
+#. Before a sweep suggestion number in the text: sweep 245
+#. js-lingui-explicit-id
+msgid "chat.sugSweep"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.summaryBy"
 msgstr "モデル"
 
@@ -1088,11 +1106,23 @@ msgid "collection.legendGreenIs"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "collection.legendRust"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendRustIs"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.legendStruck"
 msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.legendStruckIs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.legendSweepIs"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -1148,6 +1178,35 @@ msgstr "{num}（もうありません）"
 msgid "collection.removed"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "collection.review"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.reviewAll"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.reviewDone"
+msgstr ""
+
+#. The keys a and r, lower case
+#. js-lingui-explicit-id
+msgid "collection.reviewKeys"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.reviewNext"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.reviewOf"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.reviewPrev"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "collection.runs"
@@ -1177,6 +1236,43 @@ msgstr "open:\"{name}\" と同じように表示します"
 #. js-lingui-explicit-id
 msgid "collection.source"
 msgstr "出典"
+
+#. js-lingui-explicit-id
+msgid "collection.sugAccept"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugAccepted"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugBy"
+msgstr ""
+
+#. A Ripple suggestion carries an edit of the person to another branch
+#. js-lingui-explicit-id
+msgid "collection.sugFromRipple"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugFromRippleBare"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugFromSweep"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugOpen"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugReject"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugRejected"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.summaryOf"
@@ -1209,6 +1305,10 @@ msgstr "メモ"
 #. js-lingui-explicit-id
 msgid "collection.tabQuote"
 msgstr "引用"
+
+#. js-lingui-explicit-id
+msgid "collection.tabSuggestion"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "collection.tabTerm"
@@ -1915,6 +2015,11 @@ msgstr "Enterで、{address}のステップ{index}を実行{run}から削除し�
 #. js-lingui-explicit-id
 msgid "enter.deleteStepStarted"
 msgstr "{address}のステップ{index}は開始済みのため、チャットと一緒に残ります"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteSugUse"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.didYouMean"
@@ -3898,6 +4003,23 @@ msgstr ""
 msgid "enter.settleReject"
 msgstr ""
 
+#. {state} is accepted or rejected
+#. js-lingui-explicit-id
+msgid "enter.settleSugDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleSugReject"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleSugRipple"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.settleSugSweep"
+msgstr ""
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.setUnknown"
@@ -4360,6 +4482,11 @@ msgstr ""
 #. js-lingui-explicit-id
 msgid "enter.undoNothing"
 msgstr "このタブには取り消せるものがありません"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoSugUse"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.unknown"

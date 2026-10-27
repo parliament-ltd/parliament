@@ -23,7 +23,7 @@ import { keymap } from 'prosemirror-keymap'
 import { Plugin, NodeSelection, TextSelection } from 'prosemirror-state'
 import { Decoration, DecorationSet } from 'prosemirror-view'
 import { Slice, Fragment } from 'prosemirror-model'
-import { schema, STRUCK, ADDED, isWholeBlock } from './schema'
+import { schema, STRUCK, ADDED, SUGGEST_OUT, SUGGEST_IN, isWholeBlock } from './schema'
 import { SKIP, INTENT } from './track'
 import { historyPlugin, undo, redo } from './history'
 
@@ -615,6 +615,16 @@ function gapLines(ids) {
  * struck words starts with the unseen label, the cursor cannot rest before
  * it, and goes to the line above (Stefan's try of piece 1, 26 October).
  */
+// What is said at each kind of mark's edges; a suggestion's too (C229).
+const SAID = {
+  struck: [' removed: ', ' end of removed, '],
+  added: [' added: ', ' end of added, '],
+  out: [' suggested to remove: ', ' end of suggested removal, '],
+  in: [' suggested: ', ' end of suggestion, '],
+}
+const kindOf = (m) => (m.type === STRUCK ? 'struck' : m.type === ADDED ? 'added' : m.type === SUGGEST_OUT ? 'out' : 'in')
+const idOf = (m) => m.attrs.edit ?? m.attrs.suggestion
+
 export function announcePlugin(isOn) {
   const said = (words) => () => {
     const span = document.createElement('span')
@@ -637,17 +647,17 @@ export function announcePlugin(isOn) {
           let run = null
           const close = () => {
             if (!run) return
-            decos.push(Decoration.widget(run.to, said(run.kind === 'struck' ? ' end of removed, ' : ' end of added, '), { side: run.to === lineEnd ? 1 : -1, key: `e${run.kind}${run.to}` }))
+            decos.push(Decoration.widget(run.to, said(SAID[run.kind][1]), { side: run.to === lineEnd ? 1 : -1, key: `e${run.kind}${run.to}` }))
             run = null
           }
           node.forEach((child, offset) => {
             const at = pos + 1 + offset
-            const m = child.marks.find((x) => x.type === STRUCK || x.type === ADDED)
-            const key = m ? `${m.type.name}${m.attrs.edit}` : null
+            const m = child.marks.find((x) => x.type === STRUCK || x.type === ADDED || x.type === SUGGEST_OUT || x.type === SUGGEST_IN)
+            const key = m ? `${m.type.name}${idOf(m)}` : null
             if (run && run.key !== key) close()
             if (m && !run) {
-              run = { key, kind: m.type === STRUCK ? 'struck' : 'added', to: at }
-              decos.push(Decoration.widget(at, said(run.kind === 'struck' ? ' removed: ' : ' added: '), { side: at === lineStart ? -1 : 1, key: `s${run.kind}${at}` }))
+              run = { key, kind: kindOf(m), to: at }
+              decos.push(Decoration.widget(at, said(SAID[run.kind][0]), { side: at === lineStart ? -1 : 1, key: `s${run.kind}${at}` }))
             }
             if (run) run.to = at + child.nodeSize
           })

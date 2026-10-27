@@ -2173,8 +2173,46 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **(g) Locked away, deleted, erased:** with Parliament locked, a suggestion is sealed except its number and chat, as the lock's list already says. Deleting a chat or a message deletes its suggestions with it, in the same transaction; `erase:` and Erase everything remove them too, as for edits and asks.
 - **(h) Backups.** A chat in a backup carries its `suggestions`, in the format 2 file as it is, with no new format number. They are optional when read, so every backup written before reads as it always has. A restore treats them as asks: renumbered unless a replace keeps the file's numbers, pointed at the restored chat and message; the counter after a replace counts them.
 - **(i) Tested before piece 1 is committed:** a suggestion placed and read back the same; placing refused on marked words or a passage found twice; accept and reject of each kind, and undo after each; the reply's words without the suggested words; a backup with suggestions restored, renumbered and as kept; a backup from before restored; deleting a chat and a message; a locked database.
+- **Built as shown,** with piece 1 (C230).
 - **One point for piece 3, not now:** an accepted sweep changes the reply, but the model that answers in the chat reads what it wrote, not the reply as edited, and the sweep was made by another call. Whether an accepted sweep is told to it as a change is put to you with piece 3.
 - **Suggestion:** as above.
+
+**C230. Stage 12, piece 1, as built: suggestions in place** (27 October; C228, C229).
+- **In the reply:** Ripple's suggestion in rust, dashed; a sweep's in green, dotted. The words it would strike are struck in its colour, and the words it suggests follow, with a marker "ripple 219: accept · reject". "ripple 219" finds its card. A screen reader hears "suggested to remove: …" and "suggested: …" at their edges, as it hears "removed:" and "added:" for edits.
+- **Settling in place:**
+  - **A sweep's, accepted:** the suggested words become the reply's and the struck ones go.
+  - **Ripple's, accepted:** the struck words are typed over with the suggested ones by the editing rules themselves, so it becomes an edit of yours, numbered, that goes with your next prompt.
+  - **Rejected:** the reply stays as it was.
+  - The record keeps what you chose. Ctrl+Z takes an accept back in one step, and the suggestion is open again.
+- **The Collection:** a Suggestions tab, its count in rust while any wait. Each card shows:
+  - where the suggestion came from ("the same as your edit 242 in 201a", or "framework: Push back on me, "…"");
+  - the words struck → suggested, in its colour;
+  - its number and branch, "by Haiku 5.5", and its state (waiting for you, accepted: now your edit, rejected);
+  - accept and reject while it waits.
+
+  The legend gains "rust, dashed: Ripple's suggestion". Over the tab, the review bar: "Review ‹ 1 of 2 › · accept · reject · accept all". Built as follows:
+  - Its keys (a, r, and the left and right arrows) work while the Collection is addressed and nothing is being typed, so they never take a letter meant for the bar or a reply.
+  - Moving finds the suggestion in its branch, the room following.
+  - Its "accept all" accepts the ones it lists, by number.
+- **From the bar:** `accept:219`, `reject:219, 220`, and `accept:all` / `reject:all`, which now take the suggestions waiting in the room's chat and its plan's other branches with the answers there. `undo:` takes any of them back. `undo:219` and `delete:219` point to accept: and reject:. A row is a suggestion only under `type:suggestion` in Records.
+- **Stored as C229 shows,** with no upgrade.
+- **Fixed in passing:** in clean view, the passage an ask's answer would replace was hidden; it now stands, as the spec has it ("pending answers and suggestions not yet applied").
+- **Tests:** a new set for placing and settling, and one for the records. They cover:
+  - placing: once only, on unmarked words, building a stored form for a reply never edited;
+  - settling: each kind accepted and rejected, Ripple's accepted then undone from its card, from the bar on the stored form;
+  - the records: numbered, opened again after Ctrl+Z, gone with the message and the chat, put back by undo:;
+  - backups: kept, renumbered, a replace keeping numbers, a backup from before, one whose reply is not in the file;
+  - the bar's lines.
+
+  1,228 tests.
+- **Tried in the browser,** on the trial copy, with a Ripple suggestion (219) and a sweep's (220) placed in 216's reply by the same storing function piece 2 will use:
+  - both drawn in their colours with their markers;
+  - the Suggestions tab and its review bar, 1 of 2;
+  - `a` accepting 219, which became edit 221, struck and blue;
+  - `undo:` putting it all back;
+  - 220 accepted from its marker, and Ctrl+Z bringing it back open;
+  - 219 accepted in place and taken back with one Ctrl+Z.
+- **Not tried:** suggestions made by a model, which comes with piece 2.
 
 ## Proposed CLAUDE.md rewrite
 

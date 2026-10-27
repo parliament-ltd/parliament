@@ -62,7 +62,7 @@ function heldBy(collections) {
  *   priceOf: a model's price from the list of models, for cost
  * @returns {object[]}
  */
-export function toRows({ chats = [], dockets = [], notes = [], highlights = [], quotes = [], edits = [], asks = [], rooms = {}, facts = new Map(), collections = [], priceOf = () => null }) {
+export function toRows({ chats = [], dockets = [], notes = [], highlights = [], quotes = [], edits = [], asks = [], suggestions = [], rooms = {}, facts = new Map(), collections = [], priceOf = () => null }) {
   const chatById = new Map(chats.map((c) => [c.id, c]))
   const docketById = new Map(dockets.map((d) => [d.id, d]))
   const held = heldBy(collections)
@@ -193,6 +193,20 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
       state: str(a.state) || 'open', answer, held: Boolean(a.held), sent: sentOf(a.sent),
     } })
   }
+  // Suggestions (stage 12; C229): Ripple's or a sweep's, with where each came from.
+  const num = (v) => (Number.isInteger(v) ? v : null)
+  for (const g of suggestions.filter(numbered)) {
+    const words = [str(g.struck), str(g.suggested)].filter(Boolean).join(' → ')
+    const f = g.from && typeof g.from === 'object' ? g.from : {}
+    const made = g.kind === 'sweep' ? 'sweep' : 'ripple'
+    const from = made === 'sweep'
+      ? { framework: str(f.framework) || null, name: str(f.name), instruction: str(f.instruction) }
+      : { edit: num(f.edit), chat: num(f.chat), branch: str(f.branch) || null }
+    rows.push({ ...marking('suggestion', 'suggestions', g, words, g.conversationId), change: {
+      kind: 'suggestion', made, mark: str(g.mark), part: g.part === 'prompt' ? 'prompt' : 'reply', struck: str(g.struck), suggested: str(g.suggested),
+      from, model: str(g.model) || null, state: ['accepted', 'rejected'].includes(g.state) ? g.state : 'open',
+    } })
+  }
   return rows
 }
 
@@ -217,14 +231,14 @@ export function sortRows(rows) {
 export async function readAlmanac(db, { facts = null, priceOf } = {}) {
   if (!db || !isV6(db)) return { rows: [], collections: [], rooms: [] }
   const all = (store) => (db.objectStoreNames.contains(store) ? db.getAll(store) : Promise.resolve([]))
-  const [chats, dockets, notes, highlights, quotes, modes, collections, edits, asks] = await Promise.all(
-    ['conversations', 'dockets', 'notes', 'highlights', 'pins', 'modes', 'collections', 'edits', 'asks'].map(all),
+  const [chats, dockets, notes, highlights, quotes, modes, collections, edits, asks, suggestions] = await Promise.all(
+    ['conversations', 'dockets', 'notes', 'highlights', 'pins', 'modes', 'collections', 'edits', 'asks', 'suggestions'].map(all),
   )
   const rooms = {}
   for (const mode of modes) rooms[mode.id] = roomName(mode)
   const inside = facts ? await facts.read(db, chats.filter((c) => Number.isInteger(c.num))) : new Map()
   return {
-    rows: sortRows(toRows({ chats, dockets, notes, highlights, quotes, edits, asks, rooms, facts: inside, collections, priceOf })),
+    rows: sortRows(toRows({ chats, dockets, notes, highlights, quotes, edits, asks, suggestions, rooms, facts: inside, collections, priceOf })),
     collections: collections.map((c) => ({ id: c.id, name: c.name ?? null, builtIn: c.builtIn ?? null })),
     // The homepage is not a room (R3, R11).
     rooms: modes.filter((m) => m.scope !== 'homepage').map((m) => ({ id: m.id, name: rooms[m.id] })),

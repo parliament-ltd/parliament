@@ -82,6 +82,24 @@
 .clean .p-text del.pm-replaced { color: inherit; text-decoration: none; }
 .clean .p-text .pm-ask { text-decoration: none; }
 
+/* Suggestions (stage 12, piece 1; C228, C229; the editing spec's colours):
+   Ripple's in rust, dashed; a sweep's in green, dotted. The words it would
+   strike, struck in its colour; the words it suggests after them; the marker. */
+.p-text del.pm-sug-out { text-decoration: line-through; }
+.p-text ins.pm-sug-in { text-decoration: underline; text-underline-offset: 3px; }
+.p-text .pm-sug-ripple { color: var(--ch-rust); text-decoration-color: var(--ch-rust); text-decoration-style: dashed; }
+.p-text .pm-sug-sweep { color: var(--ch-ai); text-decoration-color: var(--ch-ai); text-decoration-style: dotted; }
+.p-text del.pm-sug-out.pm-sug-ripple, .p-text del.pm-sug-out.pm-sug-sweep { text-decoration-line: line-through; text-decoration-style: solid; }
+.p-text .pm-sug-marker { margin-inline-start: 4px; font-size: 11.5px; font-style: italic; white-space: nowrap; }
+.p-text .pm-sug-marker.ripple { color: var(--ch-rust); }
+.p-text .pm-sug-marker.sweep { color: var(--ch-ai); }
+.p-text .pm-sug-marker button { font: inherit; color: inherit; text-decoration: underline; text-underline-offset: 2px; padding: 0; background: none; border: 0; cursor: pointer; }
+.p-text .pm-sug-marker button.pm-sug-find { text-decoration-style: dotted; }
+.p-text .pm-flash-sug { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 2px; }
+/* Clean: the reply as it stands; what a suggestion would strike still stands. */
+.clean .p-text ins.pm-sug-in, .clean .p-text .pm-sug-marker { display: none; }
+.clean .p-text del.pm-sug-out, .clean .p-text del.pm-replaced { display: inline; color: inherit; text-decoration: none; }
+
 /* The ASK box, at the passage. */
 .p-ask-box { position: fixed; z-index: 50; display: flex; align-items: center; gap: 8px; min-width: 300px; background: var(--ch-surface); border: 1px solid var(--ch-ai); border-radius: 8px; box-shadow: 0 6px 24px rgba(0, 0, 0, .08); padding: 6px 8px; }
 .p-ask-box .p-ask-label { font: 600 10.5px var(--ch-sans); letter-spacing: .06em; color: var(--ch-ai); }

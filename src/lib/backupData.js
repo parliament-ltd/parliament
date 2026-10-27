@@ -30,7 +30,7 @@ export const UNASKED = Object.freeze(CATEGORIES.filter((c) => c !== 'layouts'))
 
 const V5_STORES = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'settings', 'files', 'file_data',
   'sbrd_documents', 'modes', 'libraryLayouts', 'libraryRooms', 'libraryComponents', 'librarySchemes', 'libraryResources']
-const V6_STORES = ['dockets', 'runs', 'collections', 'collabs', 'counters', 'edits', 'asks']
+const V6_STORES = ['dockets', 'runs', 'collections', 'collabs', 'counters', 'edits', 'asks', 'suggestions']
 // A "replace" restore keeps these settings, which belong to this browser.
 const KEPT_ON_REPLACE = ['browserFingerprint', 'parliament-api-key', 'backupLog']
 
@@ -78,11 +78,14 @@ export async function gatherContents(db, categories = UNASKED) {
     }
     const editsByConv = await byChat('edits')
     const asksByConv = await byChat('asks')
+    // And its suggestions (stage 12; C229 (h)).
+    const suggestionsByConv = await byChat('suggestions')
 
     contents.chats = conversations.map((c) => {
       const chat = { ...c, messages: messagesByConv.get(c.id) || [] }
       if (editsByConv.get(c.id)?.length) chat.edits = editsByConv.get(c.id)
       if (asksByConv.get(c.id)?.length) chat.asks = asksByConv.get(c.id)
+      if (suggestionsByConv.get(c.id)?.length) chat.suggestions = suggestionsByConv.get(c.id)
       const files = filesByConv.get(c.id)
       if (files?.length) {
         chat.files = files
@@ -189,10 +192,10 @@ export async function restoreInto(db, contents, { strategy = 'merge', newId = ()
     if (v6) {
       for (const c of writes.collabs) await tx.objectStore('collabs').put(c)
       if (keepNumbers) {
-        for (const store of ['dockets', 'runs', 'collections', 'edits', 'asks']) {
+        for (const store of ['dockets', 'runs', 'collections', 'edits', 'asks', 'suggestions']) {
           for (const record of writes[store] ?? []) await tx.objectStore(store).put(record)
         }
-        const nums = [...writes.dockets, ...writes.conversations, ...writes.notes, ...writes.highlights, ...writes.pins, ...(writes.edits ?? []), ...(writes.asks ?? [])]
+        const nums = [...writes.dockets, ...writes.conversations, ...writes.notes, ...writes.highlights, ...writes.pins, ...(writes.edits ?? []), ...(writes.asks ?? []), ...(writes.suggestions ?? [])]
           .map((r) => r.num).filter(Number.isInteger)
         await tx.objectStore('counters').put({ name: 'num', next: nums.length ? Math.max(...nums) + 1 : FIRST_NUM })
       } else {

@@ -344,6 +344,9 @@ export async function updateChat(db, id, updates) {
 }
 
 const CHAT_STORES = ['conversations', 'messages', 'highlights', 'notes', 'favorites', 'pins', 'files', 'file_data', 'sbrd_documents']
+// The lists that mean nothing without their reply: edits, asks (stage 11;
+// C212 (f)) and suggestions (stage 12; C229 (g)), each with its kind.
+const CHANGE_LISTS = Object.freeze([['edits', 'edit'], ['asks', 'ask'], ['suggestions', 'suggestion']])
 
 // Inside a transaction: a chat and everything that is its own. Its notes,
 // keywords and quotes go with it, or with keepMarks stay as items of their
@@ -388,7 +391,7 @@ async function removeChatIn(tx, id, { v6, keepMarks = false, now = new Date().to
   // Edits and asks mean nothing without their reply: they go with the chat,
   // even when its notes stay (C212 (f)).
   if (v6) {
-    for (const [name, kind] of [['edits', 'edit'], ['asks', 'ask']]) {
+    for (const [name, kind] of CHANGE_LISTS) {
       const store = tx.objectStore(name)
       for (const record of await store.index('conversationId').getAll(id)) {
         await store.delete(record.id)
@@ -425,7 +428,7 @@ async function removeChatIn(tx, id, { v6, keepMarks = false, now = new Date().to
 /** Remove a chat and everything that belongs to it. At version 6 its branch leaves its docket. */
 export async function removeChat(db, id) {
   const v6 = isV6(db)
-  const stores = [...CHAT_STORES, ...(v6 ? ['dockets', 'runs', 'collections', 'edits', 'asks'] : [])]
+  const stores = [...CHAT_STORES, ...(v6 ? ['dockets', 'runs', 'collections', 'edits', 'asks', 'suggestions'] : [])]
   return write(db, stores, async (tx) => ({ result: undefined, changes: await removeChatIn(tx, id, { v6 }) }))
 }
 
@@ -443,7 +446,7 @@ const MARK_KINDS = Object.freeze({ notes: 'note', highlights: 'term', pins: 'quo
 export async function eraseRecords(db, { chats = [], marks = [], keepMarks = true }) {
   if (!isV6(db)) throw new Error('erase: needs version 6')
   for (const m of marks) if (!MARK_KINDS[m.store]) throw new Error(`Not a marking's store: ${m.store}`)
-  return write(db, [...CHAT_STORES, 'dockets', 'runs', 'collections', 'edits', 'asks'], async (tx) => {
+  return write(db, [...CHAT_STORES, 'dockets', 'runs', 'collections', 'edits', 'asks', 'suggestions'], async (tx) => {
     const missing = []
     for (const c of chats) if (!(await tx.objectStore('conversations').get(c.id))) missing.push(c.num ?? c.id)
     for (const m of marks) if (!(await tx.objectStore(m.store).get(m.id))) missing.push(m.num ?? m.id)
@@ -511,7 +514,7 @@ export async function updateMessageRecord(db, id, updates) {
 /** Remove a message. At version 6 the chat's steps follow. */
 export async function removeMessage(db, id) {
   const v6 = isV6(db)
-  return write(db, ['messages', 'conversations', ...(v6 ? ['runs', 'edits', 'asks'] : [])], async (tx) => {
+  return write(db, ['messages', 'conversations', ...(v6 ? ['runs', 'edits', 'asks', 'suggestions'] : [])], async (tx) => {
     const existing = await tx.objectStore('messages').get(id)
     await tx.objectStore('messages').delete(id)
     const changes = [{ kind: 'message', op: 'removed', id }]
@@ -523,7 +526,7 @@ export async function removeMessage(db, id) {
       }
       // Its edits and asks go with it (C212 (f)).
       if (v6) {
-        for (const [name, kind] of [['edits', 'edit'], ['asks', 'ask']]) {
+        for (const [name, kind] of CHANGE_LISTS) {
           const store = tx.objectStore(name)
           for (const record of await store.index('conversationId').getAll(existing.conversationId)) {
             if (record.messageId !== id) continue
@@ -584,6 +587,63 @@ export async function settleAskRecord(db, id, state, at = new Date().toISOString
   })
 }
 
+/** A chat's suggestions (stage 12, piece 1). Empty before version 6. */
+export async function suggestionsOfChat(db, conversationId) {
+  if (!isV6(db)) return []
+  return db.getAllFromIndex('suggestions', 'conversationId', conversationId)
+}
+
+/**
+ * Suggestions landed in a reply (C229 (b)): its stored form with them in
+ * place, and a record for each, numbered from the shared counter, in one
+ * transaction. Nothing is written, and Changed is thrown, when the stored
+ * form is no longer what they were placed on (expect).
+ * @param {import('idb').IDBPDatabase} db
+ * @param {string} messageId
+ * @param {{ expect: object[]|null, blocks: object[], part?: 'reply'|'prompt', now?: string,
+ *   suggestions: Array<{ mark: string, kind: 'ripple'|'sweep', struck: string, suggested: string, places: object[], from: object, model: string|null }> }} landed
+ * @returns {Promise<Array<{ id: string, mark: string, num: number }>>}
+ */
+export async function addSuggestions(db, messageId, { expect, blocks, suggestions, part = 'reply', now = new Date().toISOString() }) {
+  if (!isV6(db)) throw new Error('Suggestions need the version 6 database.')
+  return write(db, ['messages', 'conversations', 'suggestions', 'counters'], async (tx) => {
+    const message = await tx.objectStore('messages').get(messageId)
+    if (!message || !same(message.blocks ?? null, expect ?? null)) throw new Changed([])
+    const delta = blocksSize(blocks) - blocksSize(message.blocks)
+    await tx.objectStore('messages').put({ ...message, blocks })
+    if (delta) {
+      const conv = await tx.objectStore('conversations').get(message.conversationId)
+      if (conv) await tx.objectStore('conversations').put({ ...conv, storageBytes: Math.max(0, (conv.storageBytes || 0) + delta) })
+    }
+    const changes = [{ kind: 'message', op: 'updated', id: messageId }]
+    const made = []
+    for (const sg of suggestions) {
+      const record = {
+        id: `${messageId}:${sg.mark}`, mark: sg.mark, num: await takeNum(tx),
+        conversationId: message.conversationId, messageId, part,
+        kind: sg.kind === 'sweep' ? 'sweep' : 'ripple', struck: String(sg.struck ?? ''), suggested: String(sg.suggested ?? ''),
+        places: sg.places ?? [], from: sg.from ?? null, model: sg.model ?? null,
+        state: 'open', createdAt: now, updatedAt: now,
+      }
+      await tx.objectStore('suggestions').put(record)
+      changes.push({ kind: 'suggestion', op: 'created', id: record.id, num: record.num })
+      made.push({ id: record.id, mark: record.mark, num: record.num })
+    }
+    return { result: made, changes }
+  })
+}
+
+/** A suggestion accepted or rejected (C229 (e)); kept as the record of what you chose. */
+export async function settleSuggestionRecord(db, id, state, at = new Date().toISOString()) {
+  if (!isV6(db)) return null
+  return write(db, ['suggestions'], async (tx) => {
+    const r = await tx.objectStore('suggestions').get(id)
+    if (!r) return { result: null, changes: [] }
+    await tx.objectStore('suggestions').put({ ...r, state, updatedAt: at })
+    return { result: state, changes: [{ kind: 'suggestion', op: 'updated', id: r.id, num: r.num }] }
+  })
+}
+
 /** A chat's edit records (stage 11, piece 3). Empty before version 6. */
 export async function editsOfChat(db, conversationId) {
   if (!isV6(db)) return []
@@ -626,9 +686,9 @@ export async function markEditsSent(db, ids, sent, list = 'edits') {
  * @param {{ blocks: object[], edits: Map<string|number, { struck: string, added: string, places: object[] }>, part?: 'reply'|'prompt', now?: string }} saved
  * @returns {Promise<{ created: number, updated: number, removed: number }>}
  */
-export async function saveEditedMessage(db, messageId, { blocks, edits, asks = null, part = 'reply', now = new Date().toISOString() }) {
+export async function saveEditedMessage(db, messageId, { blocks, edits, asks = null, suggestions = null, part = 'reply', now = new Date().toISOString() }) {
   if (!isV6(db)) throw new Error('Editing needs the version 6 database.')
-  return write(db, ['messages', 'conversations', 'edits', 'counters', ...(asks ? ['asks'] : [])], async (tx) => {
+  return write(db, ['messages', 'conversations', 'edits', 'counters', ...(asks ? ['asks'] : []), ...(suggestions ? ['suggestions'] : [])], async (tx) => {
     const message = await tx.objectStore('messages').get(messageId)
     if (!message) throw new Error(`Message not found: ${messageId}`)
     const changes = [{ kind: 'message', op: 'updated', id: messageId }]
@@ -702,6 +762,20 @@ export async function saveEditedMessage(db, messageId, { blocks, edits, asks = n
         changes.push({ kind: 'ask', op: 'removed', id: gone.id, num: gone.num })
       }
     }
+
+    // Suggestions (stage 12; C229): their words and place follow the reply.
+    // One settled whose marks are back (Ctrl+Z after settling it) is open
+    // again; one whose marks have gone stays as its settling left it.
+    if (suggestions) {
+      const sugStore = tx.objectStore('suggestions')
+      for (const r of (await sugStore.index('conversationId').getAll(message.conversationId)).filter((x) => x.messageId === messageId)) {
+        const said = suggestions.get(r.mark)
+        if (!said) continue
+        if (r.state === 'open' && r.struck === said.struck && r.suggested === said.suggested && JSON.stringify(r.places) === JSON.stringify(said.places)) continue
+        await sugStore.put({ ...r, struck: said.struck, suggested: said.suggested, places: said.places, state: 'open', updatedAt: now })
+        changes.push({ kind: 'suggestion', op: 'updated', id: r.id, num: r.num })
+      }
+    }
     return { result: counts, changes }
   })
 }
@@ -717,8 +791,8 @@ export async function messageSnapshot(db, messageId) {
   if (!message) return null
   const mine = (list) => db.getAllFromIndex(list, 'conversationId', message.conversationId)
     .then((rows) => rows.filter((r) => r.messageId === messageId))
-  const [edits, asks] = await Promise.all([mine('edits'), mine('asks')])
-  return { messageId, conversationId: message.conversationId, blocks: message.blocks ?? null, edits, asks }
+  const [edits, asks, suggestions] = await Promise.all([mine('edits'), mine('asks'), mine('suggestions')])
+  return { messageId, conversationId: message.conversationId, blocks: message.blocks ?? null, edits, asks, suggestions }
 }
 
 /**
@@ -732,7 +806,7 @@ export async function messageSnapshot(db, messageId) {
  */
 export async function putMessageBack(db, snap, expect, num = null) {
   if (!isV6(db)) throw new Error('Editing needs the version 6 database.')
-  return write(db, ['messages', 'conversations', 'edits', 'asks'], async (tx) => {
+  return write(db, ['messages', 'conversations', 'edits', 'asks', 'suggestions'], async (tx) => {
     const message = await tx.objectStore('messages').get(snap.messageId)
     if (!message || !same(message.blocks ?? null, expect ?? null)) throw new Changed(num != null ? [num] : [])
     const delta = blocksSize(snap.blocks) - blocksSize(message.blocks)
@@ -742,7 +816,7 @@ export async function putMessageBack(db, snap, expect, num = null) {
       if (conv) await tx.objectStore('conversations').put({ ...conv, storageBytes: Math.max(0, (conv.storageBytes || 0) + delta) })
     }
     const changes = [{ kind: 'message', op: 'updated', id: snap.messageId }]
-    for (const [list, kind, had] of [['edits', 'edit', snap.edits], ['asks', 'ask', snap.asks]]) {
+    for (const [list, kind, had] of [['edits', 'edit', snap.edits], ['asks', 'ask', snap.asks], ['suggestions', 'suggestion', snap.suggestions ?? []]]) {
       const store = tx.objectStore(list)
       const now = (await store.index('conversationId').getAll(snap.conversationId)).filter((r) => r.messageId === snap.messageId)
       const keep = new Set(had.map((r) => r.id))
@@ -841,6 +915,7 @@ const NUMBERED = {
   // Written by saveEditedMessage, numbered here only when restored (C212).
   edits: { kind: 'edit', fields: { part: 'reply', held: false, sent: null } },
   asks: { kind: 'ask', fields: { part: 'reply', held: false, sent: null } },
+  suggestions: { kind: 'suggestion', fields: { part: 'reply' } },
 }
 
 /** Store a new note, term (today's highlight) or quote (a pinned reference). */
@@ -983,7 +1058,7 @@ export async function fileRestored(tx, writes, { now, newId }) {
     ...writes.conversations.map((record) => ({ store: 'conversations', record, tie: 1 })),
     ...['notes', 'highlights', 'pins'].flatMap((store) => writes[store].map((record) => ({ store, record, tie: 2 }))),
     // Edits and asks, numbered after the chat they belong to (stage 11; C212 (g)).
-    ...['edits', 'asks'].flatMap((store) => (writes[store] ?? []).map((record) => ({ store, record, tie: 3 }))),
+    ...['edits', 'asks', 'suggestions'].flatMap((store) => (writes[store] ?? []).map((record) => ({ store, record, tie: 3 }))),
   ].sort((a, b) => byTime(a.record, b.record) || a.tie - b.tie)
 
   for (const item of items) {

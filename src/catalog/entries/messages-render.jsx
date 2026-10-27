@@ -38,7 +38,7 @@ import EditableMessages from '../../components/core/EditableMessages'
 import { HIGHLIGHT_COLORS } from '../../lib/constants'
 import { stripAttachedFileBlocks } from '../../lib/fileUpload'
 import { useChatEdits } from '../../stores/useChatEdits'
-import { settleAsk as dbSettleAsk } from '../../lib/db'
+import { settleAsk as dbSettleAsk, settleSuggestion as dbSettleSuggestion } from '../../lib/db'
 const NO_ASK_INFO = new Map()
 import { waiting as editWaits, tellsOf } from '../../editing/told'
 import { withoutAnswers } from '../../editing/answers'
@@ -396,6 +396,24 @@ export default function MessagesRender() {
   const settleAskOf = useCallback((messageId, askId, how) => {
     dbSettleAsk(`${messageId}:${askId}`, how === 'accept' ? 'accepted' : 'taken back').catch(() => {})
   }, [])
+  // Suggestions (stage 12, piece 1; C229): each marker's number, by message
+  // and suggestion id; accepting or rejecting one in place recorded.
+  const chatSuggestions = useChatEdits([activeConversationId, ...memberIds], 'suggestions')
+  const sugInfoOf = useMemo(() => {
+    const byMessage = new Map()
+    for (const r of [...chatSuggestions.values()].flat()) {
+      if (r.state !== 'open') continue
+      if (!byMessage.has(r.messageId)) byMessage.set(r.messageId, new Map())
+      byMessage.get(r.messageId).set(r.mark, { num: r.num })
+    }
+    return (messageId) => byMessage.get(messageId) ?? NO_ASK_INFO
+  }, [chatSuggestions])
+  const settleSugOf = useCallback((messageId, sugId, how) => {
+    dbSettleSuggestion(`${messageId}:${sugId}`, how === 'accept' ? 'accepted' : 'rejected').catch(() => {})
+  }, [])
+  const sugWords = useMemo(() => ({
+    ripple: i18n._(COPY.chat.sugRipple), sweep: i18n._(COPY.chat.sugSweep), accept: i18n._(COPY.chat.sugAccept), reject: i18n._(COPY.chat.sugReject),
+  }), [i18n])
   const askWords = useMemo(() => ({
     label: i18n._(COPY.chat.askLabel), placeholder: i18n._(COPY.chat.askPlaceholder),
     ask: i18n._(COPY.chat.askMarker), accept: i18n._(COPY.chat.askAccept), undo: i18n._(COPY.chat.askUndo),
@@ -493,9 +511,12 @@ export default function MessagesRender() {
       askInfo: askInfoOf(msg.id),
       onSettleAsk: (askId, how) => settleAskOf(msg.id, askId, how),
       askWords,
+      sugInfo: sugInfoOf(msg.id),
+      onSettleSuggestion: (sugId, how) => settleSugOf(msg.id, sugId, how),
+      sugWords,
     }
   }, [
-    saveEditedReply, settings.markup, closedEdits, toldToOf, askInfoOf, settleAskOf, askWords,
+    saveEditedReply, settings.markup, closedEdits, toldToOf, askInfoOf, settleAskOf, askWords, sugInfoOf, settleSugOf, sugWords,
     isStreaming, streamingContent, streamingMessageId, streamingThinking, streamingAnswering, activeConversationId, i18n,
     numberByMessageId, activePopoverMsgId,
     favorites, notes, highlights, showNotes,
@@ -564,6 +585,7 @@ export default function MessagesRender() {
 
   // The asks of both cards of a pair, by ask id.
   const pairAsks = useCallback((sections) => new Map(sections.flatMap((s) => [...askInfoOf(s.message.id)])), [askInfoOf])
+  const pairSugs = useCallback((sections) => new Map(sections.flatMap((s) => [...sugInfoOf(s.message.id)])), [sugInfoOf])
 
   const renderPair = useCallback((item, idx) => {
     const { prompt, reply } = item
@@ -582,9 +604,12 @@ export default function MessagesRender() {
         askInfo={pairAsks(sections)}
         onSettleAsk={settleAskOf}
         askWords={askWords}
+        sugInfo={pairSugs(sections)}
+        onSettleSuggestion={settleSugOf}
+        sugWords={sugWords}
       />
     )
-  }, [cardPropsOf, quotesByMessage, editedLineOf, highlightTerms, i18n, settings.markup, saveEditedReply, activeConversationId, closedEdits, settleAskOf, askWords, pairAsks])
+  }, [cardPropsOf, quotesByMessage, editedLineOf, highlightTerms, i18n, settings.markup, saveEditedReply, activeConversationId, closedEdits, settleAskOf, askWords, pairAsks, pairSugs, settleSugOf, sugWords])
 
   // A tab's letter, who answered, and the branch's address (203b).
   const infoOf = useCallback((chatId, tab) => {

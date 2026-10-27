@@ -3,6 +3,7 @@ import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
 import { dayOf } from './when'
 import { WORDED, selectionOf, actCommand } from '../lib/cardActs'
+import { isChangeRow } from '../lib/recordsFilter'
 
 // The Collection (refactor-plan.md, stage 6, piece 6; collection board v3;
 // the editing spec; C139, C144): cards, not a table. Markings are read, not
@@ -29,7 +30,7 @@ import { WORDED, selectionOf, actCommand } from '../lib/cardActs'
 // markup · clean in the head is the cards' own (C220 (g)).
 
 const TABS = [
-  ['all', COPY.collections.tabAll], ['edit', COPY.collections.tabEdit], ['ask', COPY.collections.tabAsk], ['highlight', COPY.collections.tabHighlight], ['term', COPY.collections.tabTerm],
+  ['all', COPY.collections.tabAll], ['edit', COPY.collections.tabEdit], ['ask', COPY.collections.tabAsk], ['suggestion', COPY.collections.tabSuggestion], ['highlight', COPY.collections.tabHighlight], ['term', COPY.collections.tabTerm],
   ['quote', COPY.collections.tabQuote], ['note', COPY.collections.tabNote], ['message', COPY.collections.tabMessage],
 ]
 const ORDERS = [['yours', COPY.collections.yours], ['source', COPY.collections.source], ['date', COPY.collections.date]]
@@ -105,6 +106,7 @@ function ChangeCard({ card, clean, fresh, onRun, onFind, nameOf }) {
   const hold = c.held ? `hold:off ${card.num}` : `hold:${card.num}`
   let state
   let acts = []
+  if (card.kind === 'suggestion') return <SuggestionCard card={card} clean={clean} fresh={fresh} run={run} onFind={onFind} nameOf={nameOf} />
   if (card.kind === 'edit') {
     state = c.sent?.into ? i18n._(C.changeInto)
       : c.sent ? i18n._(C.changeSent, { name: sentTo ?? '', day: dayOf(i18n, c.sent.at) })
@@ -156,6 +158,108 @@ function ChangeCard({ card, clean, fresh, onRun, onFind, nameOf }) {
           {acts.map((a, i) => <span key={i} className="ch-mk-act">{a}</span>)}
         </div>
       </div>
+    </div>
+  )
+}
+
+/**
+ * A suggestion's card (stage 12, piece 1; C228, C229): what it would strike
+ * and suggest, in its colour; where it came from ("the same as your edit 242
+ * in 201a", or the framework and its instruction); who made it; accept and
+ * reject while it waits. Model text is shown as text.
+ */
+function SuggestionCard({ card, clean, fresh, run, onFind, nameOf }) {
+  const { i18n } = useLingui()
+  const c = card.change
+  const C = COPY.collections
+  const from = c.made === 'sweep'
+    ? i18n._(C.sugFromSweep, { name: c.from.name || '', instruction: c.from.instruction || '' })
+    : c.from.edit != null && c.from.branch ? i18n._(C.sugFromRipple, { edit: c.from.edit, branch: c.from.branch }) : i18n._(C.sugFromRippleBare)
+  const state = c.state === 'accepted' ? i18n._(C.sugAccepted, { made: c.made }) : c.state === 'rejected' ? i18n._(C.sugRejected) : i18n._(C.sugOpen)
+  const acts = c.state === 'open' ? [run(`accept:${card.num}`, C.sugAccept), run(`reject:${card.num}`, C.sugReject)] : []
+  const where = i18n._(C.editWhere, { part: c.part, address: addressOf(card) })
+  return (
+    <div className={`ch-mk ck-suggestion sg-${c.made} sg-${c.state}${fresh ? ' ch-flash' : ''}`} data-key={card.key} data-num={card.num}>
+      <span className="ch-mk-box none" aria-hidden="true" />
+      <div className="ch-mk-body">
+        <div className="ch-sg-from" dir="auto">{from}</div>
+        <div className="ch-ed" dir="auto">
+          {clean
+            ? <span>{c.state === 'rejected' ? c.struck : c.suggested}</span>
+            : (
+              <>
+                {c.struck && <s>{c.struck}</s>}
+                {c.struck && c.suggested && <span className="ch-ed-arrow" aria-hidden="true">{'→'}</span>}
+                {c.suggested && <ins>{c.suggested}</ins>}
+              </>
+            )}
+        </div>
+        <div className="ch-marg ch-mk-marg">
+          <button type="button" className="c-id" title={i18n._(C.findHere)} onClick={() => onFind(card.num)}>{card.num}</button>
+          <span>{i18n._(COPY.kinds.suggestion)}</span>
+          <button type="button" title={i18n._(C.findHere)} onClick={() => onFind(card.num)}>{where}</button>
+          {c.model && <span>{i18n._(C.sugBy, { name: nameOf(c.model) })}</span>}
+          <span className="ch-mk-st">{state}</span>
+          {acts.map((a, i) => <span key={i} className="ch-mk-act">{a}</span>)}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// What text is being typed in, where A and R are letters, not review keys.
+const typing = (el) => Boolean(el) && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName))
+
+/**
+ * The review bar over the Suggestions tab (the editing spec, "Ripple across
+ * branches"): ‹ 1 of 3 ›, accept, reject, accept all; A, R and the arrow keys
+ * while the Collection is addressed and no text is being typed. Moving finds
+ * the suggestion in its branch, which the room shows. In branch order.
+ */
+function ReviewBar({ open, active, onRun, onFind }) {
+  const { i18n } = useLingui()
+  const C = COPY.collections
+  const [at, setAt] = useState(0)
+  const here = Math.min(at, Math.max(0, open.length - 1))
+  const now = open[here] ?? null
+  const move = (step) => {
+    if (!open.length) return
+    const next = (here + step + open.length) % open.length
+    setAt(next)
+    onFind(open[next].num)
+  }
+  const act = (how) => { if (now) onRun(`${how}:${now.num}`) }
+  const keys = useRef(null)
+  useEffect(() => { keys.current = { move, act } })
+  useEffect(() => {
+    if (!active) return undefined
+    const onKey = (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey || typing(document.activeElement)) return
+      const k = e.key
+      if (k === 'ArrowRight') keys.current.move(1)
+      else if (k === 'ArrowLeft') keys.current.move(-1)
+      else if (k === 'a' || k === 'A') keys.current.act('accept')
+      else if (k === 'r' || k === 'R') keys.current.act('reject')
+      else return
+      e.preventDefault()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [active])
+  if (!open.length) return <p className="ch-marg ch-sg-review">{i18n._(C.reviewDone)}</p>
+  return (
+    <div className="ch-marg ch-sg-review" role="toolbar" aria-label={i18n._(C.review)}>
+      <b>{i18n._(C.review)}</b>
+      <button type="button" aria-label={i18n._(C.reviewPrev)} onClick={() => move(-1)}>{'‹'}</button>
+      <span>{i18n._(C.reviewOf, { at: here + 1, count: open.length })}</span>
+      <button type="button" aria-label={i18n._(C.reviewNext)} onClick={() => move(1)}>{'›'}</button>
+      <span aria-hidden="true">{'·'}</span>
+      <button type="button" title={i18n._(C.runs, { command: `accept:${now.num}` })} onClick={() => act('accept')}>{i18n._(C.sugAccept)}</button>
+      <span aria-hidden="true">{'·'}</span>
+      <button type="button" title={i18n._(C.runs, { command: `reject:${now.num}` })} onClick={() => act('reject')}>{i18n._(C.sugReject)}</button>
+      <span aria-hidden="true">{'·'}</span>
+      <button type="button" title={i18n._(C.runs, { command: `accept:${open.map((s) => s.num).join(', ')}` })} onClick={() => onRun(`accept:${open.map((s) => s.num).join(', ')}`)}>{i18n._(C.reviewAll)}</button>
+      <span className="ch-sg-keys">{i18n._(C.reviewKeys)}</span>
     </div>
   )
 }
@@ -246,7 +350,7 @@ export default function CollectionBoard({ collection, collections, label, entrie
   const seen = useRef(null)
   const [fresh, setFresh] = useState([])
   useEffect(() => {
-    const nums = cards.filter((c) => c.kind === 'edit' || c.kind === 'ask').map((c) => c.num)
+    const nums = cards.filter(isChangeRow).map((c) => c.num)
     const was = seen.current
     seen.current = { id: collection?.id ?? null, nums: new Set(nums) }
     if (!was || was.id !== (collection?.id ?? null)) return
@@ -265,6 +369,10 @@ export default function CollectionBoard({ collection, collections, label, entrie
   if (!collection) body = <p className="ch-marg ch-alm-note">{i18n._(COPY.collections.none)}</p>
   else {
     const tabs = TABS.filter(([k]) => k === 'all' || counts[k])
+    // Suggestions waiting, in branch order, for the review bar; the tab's count is rust while any wait.
+    const waiting = cards.filter((c) => c.kind === 'suggestion' && c.change?.state === 'open')
+      .sort((a, b) => String(a.branch ?? '').localeCompare(String(b.branch ?? '')) || (a.num ?? 0) - (b.num ?? 0))
+    const changed = counts.edit || counts.ask || counts.suggestion
     const list = entries.length
       ? entries.map((e) => {
         if (e.head) return <div key={`h:${e.head.id}`} className="ch-mk-head" dir="auto"><span aria-hidden="true">{'§'}</span>{e.head.text}</div>
@@ -305,7 +413,7 @@ export default function CollectionBoard({ collection, collections, label, entrie
         <div className="ch-col-tabs" role="tablist">
           {tabs.map(([k, word]) => (
             <button key={k} type="button" role="tab" aria-selected={view.tab === k} className={view.tab === k ? 'on' : undefined} onClick={() => onView({ tab: k })}>
-              {i18n._(word)}<span className="n">{counts[k] ?? 0}</span>
+              {i18n._(word)}<span className={`n${k === 'suggestion' && waiting.length ? ' rust' : ''}`}>{counts[k] ?? 0}</span>
             </button>
           ))}
         </div>
@@ -314,7 +422,7 @@ export default function CollectionBoard({ collection, collections, label, entrie
           {ORDERS.map(([k, word]) => (
             <button key={k} type="button" className={view.sort === k ? 'on' : undefined} onClick={() => onView({ sort: k, asc: false })}>{i18n._(word)}</button>
           ))}
-          {(counts.edit || counts.ask) ? (
+          {changed ? (
             <span className="ch-col-markup">
               <button type="button" className={clean ? undefined : 'on'} aria-pressed={!clean} title={i18n._(C.runs, { command: 'markup:on col' })} onClick={() => onRun('markup:on col')}>{i18n._(C.markupWord)}</button>
               <span aria-hidden="true">{'·'}</span>
@@ -322,13 +430,15 @@ export default function CollectionBoard({ collection, collections, label, entrie
             </span>
           ) : null}
         </div>
-        {(counts.edit || counts.ask) && !clean ? (
+        {changed && !clean ? (
           <div className="ch-col-legend ch-marg">
             <span><s>{i18n._(C.legendStruck)}</s> {i18n._(C.legendStruckIs)}</span>
             <span><ins className="l-you">{i18n._(C.legendBlue)}</ins> {i18n._(C.legendBlueIs)}</span>
-            <span><ins className="l-ai">{i18n._(C.legendGreen)}</ins> {i18n._(C.legendGreenIs)}</span>
+            <span><ins className="l-ai">{i18n._(C.legendGreen)}</ins> {i18n._(counts.suggestion ? C.legendSweepIs : C.legendGreenIs)}</span>
+            {counts.suggestion ? <span><ins className="l-rust">{i18n._(C.legendRust)}</ins> {i18n._(C.legendRustIs)}</span> : null}
           </div>
         ) : null}
+        {view.tab === 'suggestion' && <ReviewBar open={waiting} active={addressed} onRun={onRun} onFind={onFindChange} />}
         <div className="ch-col-list">{list}</div>
         <Acts cards={cards} picked={picked} onPick={onPick} onClearPicked={onClearPicked} onWrite={onWrite} onPrompt={onPrompt} />
       </>

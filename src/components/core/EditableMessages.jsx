@@ -18,6 +18,7 @@ import { useBlockMenu } from './useBlockMenu'
 import { useAskBox } from './useAskBox'
 import { asksIn } from '../../editing/edits'
 import { asksPlugin, asksKey, settleAsk } from '../../editing/asks'
+import { suggestionsPlugin, suggestionsKey, settleSuggestion, suggestionsIn } from '../../editing/suggestions'
 import MessageCard from './MessageCard'
 
 // A prompt and its reply, edited in place as one (stage 11, piece 2; the
@@ -71,11 +72,14 @@ function crosses(sel) {
  * }} props
  */
 const NO_CLOSED = new Set()
+const SUG_WORDS = { ripple: 'ripple', sweep: 'sweep', accept: 'accept', reject: 'reject' }
 const ASK_WORDS = { label: 'ASK', placeholder: 'Ask in your own words: make it shorter, or add the year it opened', ask: 'ask', accept: 'accept', undo: 'undo' }
 const NO_ASKS = new Map()
 // askInfo: each ask's number and state, by its id; onSettleAsk(messageId, askId, how)
 // when one is accepted or undone; askWords: the ASK box's and markers' words (C218).
-export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, onSave, words, closedEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS }) {
+// sugInfo: each suggestion's number, by its id; onSettleSuggestion(messageId,
+// suggestionId, how) when one is accepted or rejected in place (C229).
+export default function EditableMessages({ sections, terms = [], quotedTitle, clean = false, onSave, words, closedEdits = NO_CLOSED, askInfo = NO_ASKS, onSettleAsk, askWords = ASK_WORDS, sugInfo = NO_ASKS, onSettleSuggestion, sugWords = SUG_WORDS }) {
   // Edits already told to a model: typing beside one starts a new edit (C216 (i)).
   const closedRef = useRef(closedEdits)
   useEffect(() => { closedRef.current = closedEdits }, [closedEdits])
@@ -94,6 +98,8 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
   const questions = useRef(new Map())
   const onSettleRef = useRef(onSettleAsk)
   useEffect(() => { onSettleRef.current = onSettleAsk }, [onSettleAsk])
+  const onSettleSugRef = useRef(onSettleSuggestion)
+  useEffect(() => { onSettleSugRef.current = onSettleSuggestion }, [onSettleSuggestion])
   const askBox = useAskBox(view, (askId, question) => { questions.current.set(askId, question) }, askWords, inReply)
   const askOptions = askBox.options
   const blockMenu = useBlockMenu(view, idsRef)
@@ -120,7 +126,7 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
       if (savedKeys.current[id] === key) return
       savedKeys.current[id] = key
       const asks = new Map([...asksIn(sec)].map(([askId, a]) => [askId, { ...a, question: questions.current.get(askId) }]))
-      Promise.resolve(onSaveRef.current?.(id, { blocks, edits: editsIn(sec), asks, part: sec.attrs.part })).catch((err) => {
+      Promise.resolve(onSaveRef.current?.(id, { blocks, edits: editsIn(sec), asks, suggestions: suggestionsIn(sec), part: sec.attrs.part })).catch((err) => {
         savedKeys.current[id] = null
         setSaid(`Not saved: ${String(err?.message ?? err)}`)
       })
@@ -185,6 +191,19 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
           v.state.doc.forEach((sec) => { if (asksIn(sec).has(askId)) messageId = sec.attrs.message })
           v.dispatch(settleAsk(v.state, askId, how))
           if (messageId) onSettleRef.current?.(messageId, askId, how)
+        },
+      }),
+      // Accept or reject a suggestion, in place (C229 (e)): Ripple's becomes
+      // an edit of yours, by the editing rules, as the transactions go through them.
+      suggestionsPlugin({
+        words: sugWords,
+        onSettle: (sugId, how) => {
+          const v = view.current
+          if (!v) return
+          let messageId = null
+          v.state.doc.forEach((sec) => { if (suggestionsIn(sec).has(sugId)) messageId = sec.attrs.message })
+          for (const make of settleSuggestion(v.state, sugId, how)) v.dispatch(make(v.state))
+          if (messageId) onSettleSugRef.current?.(messageId, sugId, how)
         },
       }),
       announcePlugin(() => true),
@@ -296,6 +315,8 @@ export default function EditableMessages({ sections, terms = [], quotedTitle, cl
 
   // Each ask's number and state, for its marker.
   useEffect(() => { view.current?.dispatch(view.current.state.tr.setMeta(asksKey, askInfo)) }, [askInfo, sectionsKey])
+  // Each suggestion's number, for its marker (C229).
+  useEffect(() => { view.current?.dispatch(view.current.state.tr.setMeta(suggestionsKey, sugInfo)) }, [sugInfo, sectionsKey])
 
   // Highlights and quotes, each card's its own, drawn again only when they change.
   const shownWas = useRef('')

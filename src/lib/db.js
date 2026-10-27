@@ -11,6 +11,7 @@ import {
   createChat, updateChat, removeChat, createBranchChat, createSummaryChat, setPromptGroup,
   addMessageRecord, updateMessageRecord, removeMessage, saveEditedMessage as saveEditedMessageRecord,
   editsOfChat, markEditsSent as markEditsSentRecord, asksOfChat, answerAsks as answerAsksRecord, settleAskRecord,
+  suggestionsOfChat, addSuggestions as addSuggestionsRecord, settleSuggestionRecord,
   addNumbered, updateNumbered, removeNumbered,
   addFavoriteRecord, removeFavoriteRecord, saveDocument, changeRecords,
 } from './records'
@@ -535,6 +536,21 @@ export async function settleAsk(id, state) {
   return settleAskRecord(await initDB(), id, state)
 }
 
+
+/** A chat's suggestions (stage 12, piece 1). */
+export async function getSuggestionsOfChat(conversationId) {
+  return suggestionsOfChat(await initDB(), conversationId)
+}
+
+/** Suggestions landed in a reply, with their records (C229 (b)). */
+export async function addSuggestions(messageId, landed) {
+  return addSuggestionsRecord(await initDB(), messageId, landed)
+}
+
+/** A suggestion accepted or rejected (C229 (e)). */
+export async function settleSuggestion(id, state) {
+  return settleSuggestionRecord(await initDB(), id, state)
+}
 
 /** Save a reply's editable form and its edits, in one transaction (C212). */
 export async function saveEditedMessage(id, saved) {

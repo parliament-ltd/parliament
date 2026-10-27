@@ -731,8 +731,8 @@ export function ChatProvider({ children }) {
   // A reply edited in place: its editable form and its edits, kept in one
   // write (stage 11, piece 1; C212). Its content, what the model wrote, stays.
   // A prompt is saved the same way, its edits marked as the prompt's (piece 2).
-  const saveEditedReply = useCallback(async (conversationId, messageId, { blocks, edits, asks = null, part = 'reply' }) => {
-    const counts = await saveEditedMessage(messageId, { blocks, edits, asks, part })
+  const saveEditedReply = useCallback(async (conversationId, messageId, { blocks, edits, asks = null, suggestions = null, part = 'reply' }) => {
+    const counts = await saveEditedMessage(messageId, { blocks, edits, asks, suggestions, part })
     updateMessages(conversationId, (prev) => prev.map((m) => (m.id === messageId ? { ...m, blocks } : m)))
     return counts
   }, [])

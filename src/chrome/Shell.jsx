@@ -65,7 +65,7 @@ import { ROW_GUESS } from './rowWindow'
 import { cardsOf, tabCounts, sequenceOf } from '../lib/collectionCards'
 import { searchTerms } from '../lib/recordsFilter'
 import CollectionBoard from './CollectionBoard'
-import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, planStep, changeStep, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack, removeStep, removePlanBranch, removePlan, createPlanChat, markStep as markRunStep, settleLeft, messageSnapshot, putMessageBack, saveEditedMessage, settleAskRecord } from '../lib/records'
+import { changeRecords, eraseRecords, addOwnNote, removeOwnNote, newPlan, planStep, changeStep, holdBranch, newRun, newPlanBranch, moveBranch, putPlanBack, removeStep, removePlanBranch, removePlan, createPlanChat, markStep as markRunStep, settleLeft, messageSnapshot, putMessageBack, saveEditedMessage, settleAskRecord, settleSuggestionRecord } from '../lib/records'
 import { createRunner, runScope } from '../lib/runner'
 import { tabBus, withDocketLock } from '../lib/bus'
 import { showPlan, planKey, planPromptPreview } from '../lib/planVerbs'
@@ -74,9 +74,10 @@ import { spendingOf } from '../lib/spending'
 import { exportItems, gatherExport, itemsMarkdown, exportMarkdown, exportJsonl, exportType } from '../lib/recordsExport'
 import { dayOf } from './when'
 import { longDay } from './say'
-import { EMPTY_VIEW, applyView, nextView, viewLine, isAtRest } from '../lib/recordsFilter'
+import { EMPTY_VIEW, applyView, nextView, viewLine, isAtRest, isChangeRow } from '../lib/recordsFilter'
 import { onRecordsChanged } from '../lib/records'
 import { changeStored } from '../editing/storedChange'
+import { settleStored } from '../editing/suggestions'
 
 // The new shell (refactor-plan.md §4 and stages 3 and 4): the board strip,
 // the boards as the arrangement places them, the bar, and windows of their
@@ -631,7 +632,7 @@ export default function Shell() {
       if (cardsNow.current.some((c) => c.num === num)) return
       // An edit or ask comes into a collection with its chat (C220 (a)).
       const row = numberedNow.current.get(num)
-      const change = row?.kind === 'edit' || row?.kind === 'ask'
+      const change = isChangeRow(row)
       if (change && row.chatNum == null) return
       writeField(`>add:${change ? row.chatNum : num}`)
     }
@@ -921,7 +922,10 @@ export default function Shell() {
     }
     // An edit's words, or an ask's marker (C220 (f)); else its message.
     const mark = row.change?.mark && /^[\w-]{1,64}$/.test(row.change.mark) ? row.change.mark : null
-    const spot = !mark ? null : row.kind === 'edit' ? `ins[data-edit="${mark}"], del[data-edit="${mark}"]` : `.pm-ask-marker[data-ask="${mark}"], .pm-ask-point[data-ask="${mark}"]`
+    // A suggestion's marker, or its struck words once settled (C229).
+    const spot = !mark ? null : row.kind === 'edit' ? `ins[data-edit="${mark}"], del[data-edit="${mark}"]`
+      : row.kind === 'suggestion' ? `.pm-sug-marker[data-suggestion="${mark}"], del[data-suggestion="${mark}"]`
+        : `.pm-ask-marker[data-ask="${mark}"], .pm-ask-point[data-ask="${mark}"]`
     flashWhenDrawn([spot ?? `[data-quote-num="${num}"]`, row.messageId ? `[id="msg-${row.messageId}"]` : null])
     return null
   }, [run])
@@ -1242,16 +1246,20 @@ export default function Shell() {
       for (const c of what.changes) {
         const snap = await messageSnapshot(db.current, c.messageId).catch(() => null)
         if (!snap) return { message: 'changeGone', values: { num: c.num } }
+        // A suggestion (stage 12, piece 1; C229 (e)): accepted or rejected
+        // by the same rules as in the reply, and its record kept.
+        const sug = c.how === 'acceptSuggestion' || c.how === 'rejectSuggestion'
         const settle = c.how === 'accept' ? 'accepted' : c.how === 'undo' || c.how === 'undoHere' ? 'taken back' : null
         let blocks = snap.blocks
         if (c.how !== 'undoHere') {
-          const next = changeStored(snap.blocks, c.how, c.mark)
+          const next = sug ? settleStored(snap.blocks, c.mark, c.how === 'acceptSuggestion' ? 'accept' : 'reject') : changeStored(snap.blocks, c.how, c.mark)
           if (!next) return { message: 'changeGone', values: { num: c.num } }
           const asks = new Map([...next.asks].map(([id, a]) => [id, { ...a, question: snap.asks.find((r) => r.edit === id)?.question }]))
-          await saveEditedMessage(db.current, c.messageId, { blocks: next.blocks, edits: next.edits, asks })
+          await saveEditedMessage(db.current, c.messageId, { blocks: next.blocks, edits: next.edits, asks, suggestions: next.suggestions })
           blocks = next.blocks
         }
         if (settle) await settleAskRecord(db.current, `${c.messageId}:${c.mark}`, settle)
+        if (sug) await settleSuggestionRecord(db.current, `${c.messageId}:${c.mark}`, c.how === 'acceptSuggestion' ? 'accepted' : 'rejected')
         showStoredBlocks(c.conversationId ?? snap.conversationId, c.messageId, blocks)
         done.push({ snap, after: blocks, num: c.num })
       }
@@ -1728,7 +1736,7 @@ export default function Shell() {
   const roomNotHeld = useMemo(() => {
     if (!roomChatRow || !shownCollection) return null
     if (roomChatRow.collections.includes(shownCollection.id)) return null
-    const changes = (almanacRows ?? []).some((r) => (r.kind === 'edit' || r.kind === 'ask') && r.chatId === roomId)
+    const changes = (almanacRows ?? []).some((r) => isChangeRow(r) && r.chatId === roomId)
     return changes ? roomChatRow.num : null
   }, [roomChatRow, shownCollection, almanacRows, roomId])
   const followedRoom = useRef(undefined)

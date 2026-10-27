@@ -103,12 +103,16 @@ function knownChanges(screens) {
 //   reject:203         the answer goes, the passage stays (the marker's "undo")
 //   accept:all         every answer waiting in the chat the room shows
 //   delete:203         drops an ask not yet sent
+//   accept:244         a suggestion taken (stage 12; C229 (e)): Ripple's becomes your edit,
+//                      a sweep's becomes the reply's words
+//   reject:244         the suggestion goes, the reply stays
+//   accept:all         also every suggestion waiting in the room's chat and its plan's branches
 //
 // Each is a change to a message's stored form and its records, which undo:
 // takes back. Rows come from Records (screens.records.rows), where edits and
 // asks carry `change` (almanacRows.js).
 
-const CHANGES = new Set(['edit', 'ask'])
+const CHANGES = new Set(['edit', 'ask', 'suggestion'])
 const numsOf = (vals) => vals.flatMap((v) => (v.kind === 'list' ? v.items : [v]))
 const changeOf = (row, how) => ({ how, num: row.num, mark: row.change.mark, messageId: row.messageId, conversationId: row.chatId })
 
@@ -135,6 +139,7 @@ export function planUndoChange(step, screens = {}) {
   const t = changeRows(vals, rows)
   if (t.bad) return { says: t.bad.message === 'changeNotThis' ? { message: 'undoNotEdit', values: t.bad.values } : t.bad, act: null }
   const [row] = t.rows
+  if (row.kind === 'suggestion') return { says: { message: 'undoSugUse', values: { num: row.num } }, act: null }
   if (row.kind === 'ask') {
     if (row.change.state === 'answered') return { says: { message: 'undoAskAnswered', values: { num: row.num } }, act: null }
     return { says: { message: 'undoAskUse', values: { num: row.num } }, act: null }
@@ -143,7 +148,7 @@ export function planUndoChange(step, screens = {}) {
   return { says: { message: 'undoEditOne', values: { num: row.num } }, act: { kind: 'storedChange', changes: [changeOf(row, 'undoEdit')] } }
 }
 
-/** accept: and reject: on asks answered (the marker's accept and undo). */
+/** accept: and reject: on asks answered (the marker's accept and undo), and on suggestions waiting (C229 (e)). */
 export function planSettle(step, screens = {}, how = 'accept') {
   const vals = step.match?.values ?? []
   const rows = screens.records?.rows ?? []
@@ -151,24 +156,40 @@ export function planSettle(step, screens = {}, how = 'accept') {
   if (vals[0]?.kind === 'word' && vals[0].value === 'all') {
     const room = screens.roomChat ?? null
     // An answer kept on its card only can be let go, never accepted.
-    picked = rows.filter((r) => r.kind === 'ask' && r.chatId && r.chatId === room && r.change?.state === 'answered' && (how !== 'accept' || r.change.answer?.inPlace))
+    const asks = rows.filter((r) => r.kind === 'ask' && r.chatId && r.chatId === room && r.change?.state === 'answered' && (how !== 'accept' || r.change.answer?.inPlace))
+    // Suggestions in the room's chat and its plan's other branches, where Ripple puts them.
+    const plan = rows.find((r) => r.kind === 'chat' && r.chatId === room)?.docketNum ?? null
+    const sugs = rows.filter((r) => r.kind === 'suggestion' && r.chatId && r.change?.state === 'open' && (r.chatId === room || (plan != null && r.docketNum === plan)))
+    picked = [...asks, ...sugs]
     if (!picked.length) return { says: { message: 'settleNoneHere' }, act: null }
   } else {
     const t = changeRows(vals, rows)
     if (t.bad) return { says: t.bad.message === 'changeNotThis' ? { message: 'settleNotAsk', values: t.bad.values } : t.bad, act: null }
     picked = t.rows
-    const notAsk = picked.find((r) => r.kind !== 'ask')
+    const notAsk = picked.find((r) => r.kind !== 'ask' && r.kind !== 'suggestion')
     if (notAsk) return { says: { message: 'settleNotAsk', values: { num: notAsk.num } }, act: null }
-    const waiting = picked.find((r) => r.change.state !== 'answered')
+    const settled = picked.find((r) => r.kind === 'suggestion' && r.change.state !== 'open')
+    if (settled) return { says: { message: 'settleSugDone', values: { num: settled.num, state: settled.change.state } }, act: null }
+    const waiting = picked.find((r) => r.kind === 'ask' && r.change.state !== 'answered')
     if (waiting) return { says: { message: 'settleNotAnswered', values: { num: waiting.num, state: waiting.change.state } }, act: null }
     // An answer kept on its card only cannot go into the reply.
-    const here = picked.find((r) => how === 'accept' && !r.change.answer?.inPlace)
+    const here = picked.find((r) => r.kind === 'ask' && how === 'accept' && !r.change.answer?.inPlace)
     if (here) return { says: { message: 'settleCardOnly', values: { num: here.num } }, act: null }
   }
-  const nums = picked.map((r) => r.num)
+  const asks = picked.filter((r) => r.kind === 'ask').map((r) => r.num)
+  const sugs = picked.filter((r) => r.kind === 'suggestion')
+  const ripple = sugs.filter((r) => r.change.made !== 'sweep').map((r) => r.num)
+  const sweep = sugs.filter((r) => r.change.made === 'sweep').map((r) => r.num)
+  const says = []
+  if (asks.length) says.push({ message: how === 'accept' ? 'settleAccept' : 'settleReject', values: { nums: asks, count: asks.length } })
+  if (how === 'accept' && ripple.length) says.push({ message: 'settleSugRipple', values: { nums: ripple, count: ripple.length } })
+  if (how === 'accept' && sweep.length) says.push({ message: 'settleSugSweep', values: { nums: sweep, count: sweep.length } })
+  if (how !== 'accept' && sugs.length) says.push({ message: 'settleSugReject', values: { nums: sugs.map((r) => r.num), count: sugs.length } })
+  const howOf = (r) => (r.kind === 'suggestion' ? (how === 'accept' ? 'acceptSuggestion' : 'rejectSuggestion')
+    : how === 'accept' ? 'accept' : (r.change.answer?.inPlace ? 'undo' : 'undoHere'))
   return {
-    says: { message: how === 'accept' ? 'settleAccept' : 'settleReject', values: { nums, count: nums.length } },
-    act: { kind: 'storedChange', changes: picked.map((r) => changeOf(r, how === 'accept' ? 'accept' : (r.change.answer?.inPlace ? 'undo' : 'undoHere'))) },
+    says: { ...says[0], ...(says.length > 1 ? { also: says.slice(1) } : {}) },
+    act: { kind: 'storedChange', changes: picked.map((r) => changeOf(r, howOf(r))) },
   }
 }
 
@@ -184,6 +205,8 @@ export function planDropAsks(step, screens = {}) {
   if (t.bad) return { says: t.bad, act: null }
   const edit = t.rows.find((r) => r.kind === 'edit')
   if (edit) return { says: { message: 'deleteEditUse', values: { num: edit.num } }, act: null }
+  const sug = t.rows.find((r) => r.kind === 'suggestion')
+  if (sug) return { says: { message: 'deleteSugUse', values: { num: sug.num } }, act: null }
   const gone = t.rows.find((r) => r.change.sent || r.change.state !== 'open')
   if (gone) return { says: { message: 'deleteAskSent', values: { num: gone.num } }, act: null }
   const nums = t.rows.map((r) => r.num)

@@ -7,7 +7,9 @@
 // text is a list of runs: { text, bold?, italic?, code?, link?, struck?, added?,
 // ask?, answer?, replaced? } or { break: true } for a line break, or
 // { point } for an ask at a point; struck and added hold an edit's id, ask,
-// answer, replaced and point an ask's (piece 4; C218).
+// answer, replaced and point an ask's (piece 4; C218); suggestOut and
+// suggestIn a suggestion's, with suggestKind, ripple or sweep (stage 12;
+// C229 (c)).
 // A table's rows are lists of cells, each { id, text, header?, struck?,
 // added? }: its runs, and a row or column struck or added whole (piece 6;
 // C222 (d)). A table stored before piece 6 holds plain words in its rows,
@@ -21,7 +23,7 @@
 // file): only known types and fields are taken, every value is made the kind
 // it should be, and links keep only web and mail addresses.
 
-import { schema, safeHref, STRUCK, ADDED, ASK, ANSWER, REPLACED } from './schema'
+import { schema, safeHref, STRUCK, ADDED, ASK, ANSWER, REPLACED, SUGGEST_OUT, SUGGEST_IN } from './schema'
 import { chartParts, KINDS as CHART_KINDS } from './charts'
 
 const TYPE_OF = { paragraph: 'paragraph', heading: 'heading', list_item: 'list', quote: 'quote', code_block: 'code', divider: 'divider', table: 'table', chart: 'chart' }
@@ -44,6 +46,10 @@ function runsOf(node) {
       else if (m.type === ASK) run.ask = m.attrs.ask
       else if (m.type === ANSWER) run.answer = m.attrs.ask
       else if (m.type === REPLACED) run.replaced = m.attrs.ask
+      else if (m.type === SUGGEST_OUT || m.type === SUGGEST_IN) {
+        run[m.type === SUGGEST_OUT ? 'suggestOut' : 'suggestIn'] = m.attrs.suggestion
+        run.suggestKind = m.attrs.kind === 'sweep' ? 'sweep' : 'ripple'
+      }
       else if (m.type === schema.marks.link) run.link = m.attrs.href
       else if (m.type === schema.marks.bold) run.bold = true
       else if (m.type === schema.marks.italic) run.italic = true
@@ -124,6 +130,12 @@ function inlineOf(runs, codeLine) {
     for (const [key, type] of [['ask', ASK], ['answer', ANSWER], ['replaced', REPLACED]]) {
       if (!codeLine && editId(r[key]) != null) marks.push(type.create({ ask: r[key] }))
     }
+    // A suggestion's words (C229 (c)): one of the two, never both.
+    const kind = r.suggestKind === 'sweep' ? 'sweep' : 'ripple'
+    const so = codeLine ? null : editId(r.suggestOut)
+    const si = codeLine || so != null ? null : editId(r.suggestIn)
+    if (so != null) marks.push(SUGGEST_OUT.create({ suggestion: so, kind }))
+    if (si != null) marks.push(SUGGEST_IN.create({ suggestion: si, kind }))
     if (!codeLine) {
       const href = r.link ? safeHref(r.link) : null
       if (href) marks.push(schema.marks.link.create({ href }))
@@ -141,10 +153,10 @@ function inlineOf(runs, codeLine) {
   return nodes
 }
 
-// A line's words as they stand: struck words left out, and an answer not yet
-// accepted, which is not the reply's yet (C218).
+// A line's words as they stand: struck words left out, and an answer or a
+// suggestion not yet accepted, which is not the reply's yet (C218, C229).
 const wordsIn = (runs) => (Array.isArray(runs) ? runs : [])
-  .filter((r) => r && typeof r === 'object' && editId(r.struck) == null && editId(r.answer) == null)
+  .filter((r) => r && typeof r === 'object' && editId(r.struck) == null && editId(r.answer) == null && editId(r.suggestIn) == null)
   .map((r) => (r.break === true ? '\n' : typeof r.text === 'string' ? r.text : ''))
   .join('')
 

@@ -825,6 +825,24 @@ msgid "chat.stoppedOnReply"
 msgstr "Stopped when you left the chat. What arrived is kept."
 
 #. js-lingui-explicit-id
+msgid "chat.sugAccept"
+msgstr "accept"
+
+#. js-lingui-explicit-id
+msgid "chat.sugReject"
+msgstr "reject"
+
+#. Before a Ripple suggestion number in the text: ripple 244
+#. js-lingui-explicit-id
+msgid "chat.sugRipple"
+msgstr "ripple"
+
+#. Before a sweep suggestion number in the text: sweep 245
+#. js-lingui-explicit-id
+msgid "chat.sugSweep"
+msgstr "sweep"
+
+#. js-lingui-explicit-id
 msgid "chat.summaryBy"
 msgstr "a model"
 
@@ -1088,12 +1106,24 @@ msgid "collection.legendGreenIs"
 msgstr "an answer"
 
 #. js-lingui-explicit-id
+msgid "collection.legendRust"
+msgstr "rust, dashed"
+
+#. js-lingui-explicit-id
+msgid "collection.legendRustIs"
+msgstr "Ripple’s suggestion"
+
+#. js-lingui-explicit-id
 msgid "collection.legendStruck"
 msgstr "struck"
 
 #. js-lingui-explicit-id
 msgid "collection.legendStruckIs"
 msgstr "yours, removed"
+
+#. js-lingui-explicit-id
+msgid "collection.legendSweepIs"
+msgstr "an answer or a sweep"
 
 #. js-lingui-explicit-id
 msgid "collection.letGo"
@@ -1148,6 +1178,35 @@ msgstr "{num}, no longer here"
 msgid "collection.removed"
 msgstr "removed"
 
+#. js-lingui-explicit-id
+msgid "collection.review"
+msgstr "Review"
+
+#. js-lingui-explicit-id
+msgid "collection.reviewAll"
+msgstr "accept all"
+
+#. js-lingui-explicit-id
+msgid "collection.reviewDone"
+msgstr "Nothing waits for review"
+
+#. The keys a and r, lower case
+#. js-lingui-explicit-id
+msgid "collection.reviewKeys"
+msgstr "a accepts, r rejects, the arrow keys move"
+
+#. js-lingui-explicit-id
+msgid "collection.reviewNext"
+msgstr "The next one"
+
+#. js-lingui-explicit-id
+msgid "collection.reviewOf"
+msgstr "{at} of {count}"
+
+#. js-lingui-explicit-id
+msgid "collection.reviewPrev"
+msgstr "The one before"
+
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "collection.runs"
@@ -1177,6 +1236,43 @@ msgstr "Shows it, as open:\"{name}\" does"
 #. js-lingui-explicit-id
 msgid "collection.source"
 msgstr "source"
+
+#. js-lingui-explicit-id
+msgid "collection.sugAccept"
+msgstr "accept"
+
+#. js-lingui-explicit-id
+msgid "collection.sugAccepted"
+msgstr "{made, select, sweep {accepted} other {accepted: now your edit}}"
+
+#. js-lingui-explicit-id
+msgid "collection.sugBy"
+msgstr "by {name}"
+
+#. A Ripple suggestion carries an edit of the person to another branch
+#. js-lingui-explicit-id
+msgid "collection.sugFromRipple"
+msgstr "the same as your edit {edit} in {branch}"
+
+#. js-lingui-explicit-id
+msgid "collection.sugFromRippleBare"
+msgstr "carried from an edit of yours"
+
+#. js-lingui-explicit-id
+msgid "collection.sugFromSweep"
+msgstr "framework: {name}, “{instruction}”"
+
+#. js-lingui-explicit-id
+msgid "collection.sugOpen"
+msgstr "waiting for you"
+
+#. js-lingui-explicit-id
+msgid "collection.sugReject"
+msgstr "reject"
+
+#. js-lingui-explicit-id
+msgid "collection.sugRejected"
+msgstr "rejected"
 
 #. js-lingui-explicit-id
 msgid "collection.summaryOf"
@@ -1209,6 +1305,10 @@ msgstr "Notes"
 #. js-lingui-explicit-id
 msgid "collection.tabQuote"
 msgstr "Quotes"
+
+#. js-lingui-explicit-id
+msgid "collection.tabSuggestion"
+msgstr "Suggestions"
 
 #. js-lingui-explicit-id
 msgid "collection.tabTerm"
@@ -1915,6 +2015,11 @@ msgstr "Enter deletes step {index} of {address} in run {run}. undo: brings it ba
 #. js-lingui-explicit-id
 msgid "enter.deleteStepStarted"
 msgstr "Step {index} of {address} has started, so it stays with its chat"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.deleteSugUse"
+msgstr "A suggestion is turned down with reject:{num}, and kept as the record of it"
 
 #. js-lingui-explicit-id
 msgid "enter.didYouMean"
@@ -3883,7 +3988,7 @@ msgstr "The passage of ask {num} changed after it was asked, so its answer is on
 
 #. js-lingui-explicit-id
 msgid "enter.settleNoneHere"
-msgstr "No answers wait in the chat here"
+msgstr "No answers or suggestions wait in the chat here"
 
 #. js-lingui-explicit-id
 msgid "enter.settleNotAnswered"
@@ -3892,11 +3997,28 @@ msgstr "Ask {num} has no answer yet"
 #. Commands stay English
 #. js-lingui-explicit-id
 msgid "enter.settleNotAsk"
-msgstr "{num} is not an ask. accept: and reject: settle the answer to an ask"
+msgstr "{num} is not an ask or a suggestion. accept: and reject: settle the answer to an ask, or a suggestion"
 
 #. js-lingui-explicit-id
 msgid "enter.settleReject"
 msgstr "Enter takes back the {count, plural, one {answer to ask} other {answers to asks}} {nums}, and the passage stays"
+
+#. {state} is accepted or rejected
+#. js-lingui-explicit-id
+msgid "enter.settleSugDone"
+msgstr "Suggestion {num} was {state} already"
+
+#. js-lingui-explicit-id
+msgid "enter.settleSugReject"
+msgstr "Enter turns down the {count, plural, one {suggestion} other {suggestions}} {nums}: the reply stays as it is"
+
+#. js-lingui-explicit-id
+msgid "enter.settleSugRipple"
+msgstr "Enter accepts {count, plural, one {Ripple’s suggestion} other {Ripple’s suggestions}} {nums}: each becomes an edit of yours in its branch, and goes with your next prompt there"
+
+#. js-lingui-explicit-id
+msgid "enter.settleSugSweep"
+msgstr "Enter accepts the {count, plural, one {sweep’s suggestion} other {sweep’s suggestions}} {nums}: the suggested words become the reply’s, and the struck ones go"
 
 #. Commands stay English
 #. js-lingui-explicit-id
@@ -4360,6 +4482,11 @@ msgstr "undo: with a number takes back one edit, and {num} is not one"
 #. js-lingui-explicit-id
 msgid "enter.undoNothing"
 msgstr "Nothing to take back in this tab"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.undoSugUse"
+msgstr "A suggestion is settled with accept:{num} or reject:{num}"
 
 #. js-lingui-explicit-id
 msgid "enter.unknown"

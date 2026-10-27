@@ -74,6 +74,8 @@ export default function MessageCard({
   closedEdits, toldTo = null,
   // Asks (C218): each one's number and state, settling one, and the words.
   askInfo, onSettleAsk, askWords,
+  // Suggestions (stage 12; C229): each one's number, settling one, and the words.
+  sugInfo, onSettleSuggestion, sugWords,
 }) {
   const fixed = hostContent ? { contentEditable: false, suppressContentEditableWarning: true } : {}
   const { i18n } = useLingui()
@@ -189,6 +191,9 @@ export default function MessageCard({
           askInfo={askInfo}
           onSettleAsk={onSettleAsk}
           askWords={askWords}
+          sugInfo={sugInfo}
+          onSettleSuggestion={onSettleSuggestion}
+          sugWords={sugWords}
         />
       )
     }
@@ -328,7 +333,7 @@ export default function MessageCard({
         </Markdown>
       </div>
     )
-  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation, editable, type, blocks, clean, onSaveEdits, closedEdits, toldTo, askInfo, onSettleAsk, askWords])
+  }, [id, displayContent, highlightTerms, quotes, source, i18n, translated, translation, editable, type, blocks, clean, onSaveEdits, closedEdits, toldTo, askInfo, onSettleAsk, askWords, sugInfo, onSettleSuggestion, sugWords])
 
   return (
     <motion.div

@@ -11,6 +11,7 @@ import { fromBlocks, toBlocks } from './blocks'
 import { undoEdit } from './track'
 import { settleAsk, dropAsk } from './asks'
 import { editsIn, asksIn } from './edits'
+import { suggestionsIn } from './suggestions'
 
 const newBlockId = () => `b${crypto.randomUUID().replace(/-/g, '').slice(0, 10)}`
 
@@ -45,5 +46,5 @@ export function changeStored(blocks, how, id) {
     : how === 'drop' ? dropAsk(state, id)
       : settleAsk(state, id, how === 'accept' ? 'accept' : 'undo')
   const after = state.apply(tr).doc
-  return { blocks: toBlocks(after), edits: editsIn(after), asks: asksIn(after) }
+  return { blocks: toBlocks(after), edits: editsIn(after), asks: asksIn(after), suggestions: suggestionsIn(after) }
 }

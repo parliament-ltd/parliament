@@ -13,7 +13,7 @@ import { itemKey, markKey, headKey } from './collections'
 
 // Edits and asks too (stage 11, piece 5; C220): a held chat or plan shows
 // them, from every room it holds chats of (C220 (a1)).
-const MARKS = new Set(['note', 'term', 'quote', 'highlight', 'edit', 'ask'])
+const MARKS = new Set(['note', 'term', 'quote', 'highlight', 'edit', 'ask', 'suggestion'])
 const time = (iso) => {
   const t = Date.parse(iso ?? '')
   return Number.isFinite(t) ? t : 0
@@ -93,7 +93,7 @@ export function tabCounts(cards) {
 }
 
 /** The kinds a tab shows. A card for something erased shows only under All. */
-export const TABS = Object.freeze(['all', 'edit', 'ask', 'highlight', 'term', 'quote', 'note', 'message'])
+export const TABS = Object.freeze(['all', 'edit', 'ask', 'suggestion', 'highlight', 'term', 'quote', 'note', 'message'])
 
 /**
  * The cards in an order, with the headings and group labels between them.
