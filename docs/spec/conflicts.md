@@ -3307,6 +3307,35 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   The trial copy is as it was.
 - **Next:** piece 3, saved arrangements.
 
+**C257. Stage 14, piece 3: saved arrangements, its open points** (proposed 27 October; C253 piece 3 and (f) as ruled; the arrangements spec §7a, §8; C125, C182). Built as suggested, so a ruling changes one entry.
+- **What exists today:**
+  - The screen is one space, kept per device in the `arrangements` store under `space`, with the Lab's and focus's "before" inside it.
+  - The store travels in a backup when window layouts are ticked (C182). A restore checks each record, and drops one it cannot read.
+  - `arrange:` answers "not built yet".
+- **(a) What a saved arrangement keeps:**
+  - the boards and their columns;
+  - popped windows with their screen and side;
+  - the widths, where the bar sits, which board the bar points at, Records' columns;
+  - what non-room boards show (the collection shown, the plan, the Settings section).
+
+  It does not keep which chats rooms show: a saved arrangement is a desk, not a session. Saving while in the Lab is refused ("done: first"). Saving while focused keeps what is on screen, without the focus. **Suggestion:** yes.
+- **(b) The commands:**
+  - `arrange:save "Review desk"` keeps the screen under that name. If the name is taken, the Enter line says it replaces that one.
+  - `arrange:"Review desk"` switches to it, by its name or its start. The room in it shows the chat the bar points at now.
+  - `arrange:"Review desk" 207` switches with 207 in its room.
+  - Switching ends focus. It is one step for `undo:`, which brings back the screen as it was. Windows open and close as the arrangement says.
+  - `forget:"Review desk"` removes one, as for a saved search, with the same "which kind?" question when a search, collection or framework shares the name. `undo:` brings it back.
+  - Bare `arrange:` lists your arrangements, until piece 4 makes it the map.
+
+  **Suggestion:** yes.
+- **(c) `name:` and `duplicate:` on a saved arrangement** need one to point at, and the map (piece 4) is where you point. Until then, saving under a new name and forgetting the old does the same. **Suggestion:** build them with the map.
+- **(d) Stored data** (shown in C253 (f), ruled):
+  - Records in the existing `arrangements` store, `{ id: "saved:…", name: "Review desk", columns, popped, addressed, bar, widths, recordsCols, resting, context, updatedAt }`.
+  - Restore's check accepts the new kind of id with its name, up to 80 characters.
+  - A version from before this skips such a record on restore, as it skips any it cannot read. So every backup, old or new, stays readable.
+
+  **Suggestion:** yes.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
