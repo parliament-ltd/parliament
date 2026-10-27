@@ -2263,6 +2263,24 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   Plan 215 is left with Ripple on.
 - **Not tried:** a real check by a model, as the trial copy has no key. The same path is covered end to end with a stand-in for the helper, and the landing was tried in the browser in piece 1.
 
+**C233. Stage 12, piece 3: sweeps, its open points** (proposed 27 October; C228 piece 3, (c), (e); C229, its point for piece 3; the editing spec, "Sweeps"). Built as suggested, so a ruling changes one entry. (a) is the choice C229 left for this piece.
+- **(a) An accepted sweep and the chat's model** (a choice). The model that answers in the chat reads what it wrote, not the reply as edited, and the sweep was made by the helper in another call. So once you accept a sweep's suggestion, the reply you read and the reply the model reads differ. Options:
+  1. **Told once, with your next prompt to that branch,** as an edit is: "You accepted a change suggested under the framework Push back on me to your reply 2: "…" now reads "…"". It is counted on the prompt's line ("With it, told once: 2 changes you accepted from a sweep"). The suggestion's record gains an optional `sent` (to whom, when, with which prompt), as an edit's has, so it is told only once. That one field is the only change to stored data, shown here.
+  2. **Not told:** the spec's line ("the model wrote it, so there is nothing to tell it"). The model goes on reading the reply as it wrote it.
+
+  **Suggestion:** 1. The spec's line assumed the chat's own model wrote the sweep, which, with the helper making it (C228 (c)), it does not.
+- **(b) What `sweep:` sweeps:**
+  - `sweep:201a pushback` (or `sweep:216 pushback`) applies that framework's instruction to that branch's last reply, a model's.
+  - `sweep:201a` alone lists the chat's frameworks on the line to pick one; `sweep:` alone, the room's chat.
+  - A framework is named as `framework:` takes it: a built-in's id, or a name or its start.
+  - A source's answer is not swept, as Ripple does not check into one: its words are the source's.
+- **(c) What the helper is sent:** the framework's name and instruction, as the person's rule, and the reply as it reads now, in a tag it cannot close, as material. Nothing else from the chat.
+- **(d) What comes back:** JSON, at most 30 suggestions, each quoting a sentence or part of one exactly and giving it rewritten under the rule. It must never join or split sentences; a quote over a line break is dropped. Each lands as C229 (d) has it, in green, dotted, its card naming the framework and the instruction applied.
+- **(e) The Enter line:** "Enter sweeps 201a's last reply as Push back on me: one call to Haiku 5.5, about $0.01. At most one suggestion per sentence". Or "needs a model with a key: api:". After it: "Sweep: 4 suggestions in 201a", with what could not be placed. A sweep cannot be taken back by `undo:`, as it spends; its suggestions are rejected one by one or with `reject:all`.
+- **(f) Reflection's proposal** ("Sweep 201a as Editor · 1 call") comes with the Reflection board in piece 4, and writes this same command into the bar.
+- **Security and privacy:** one call, named with its model and cost first, through the gateway, to the helper. What comes back is data, placed only where its quote matches.
+- **Suggestion:** (a) 1, and the rest as above.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
