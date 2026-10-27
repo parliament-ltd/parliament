@@ -2374,6 +2374,41 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Not tried:** a synthesis or a talk by a model, as the trial copy has no key.
 - **Next:** the stage 12 checkpoint (C228 piece 6): Drafting Desk's R line, Secretarybird's comments and suggestions, and the Review modal against this board.
 
+**C237. The stage 12 checkpoint** (proposed 27 October; refactor-plan.md, stage 12; C207 (3), C91, C227 (b) and (c), C228 to C236). All pieces are built and committed. Waiting for Stefan: (b), (c) and (d) are choices.
+- **(a) What to try, with a key,** since nothing in stage 12 has yet been tried with a model:
+  - **Ripple:** in a plan with two branches answered by a model, `ripple:on` from the room's head, an edit in 201a, then a prompt. The line names the checks and the cost; the suggestions land in 201b in rust; review them from the Collection's Suggestions tab with a and r. An accepted one is your edit, blue, and goes with your next prompt there.
+  - **A sweep:** `sweep:201a pushback`, its suggestions in green; accept one and see the next prompt's line say it is told.
+  - **Reflection:** `open:reflection`, Reflect, the three questions, the proposal's button, and a question or two typed with the board addressed.
+- **(b) Drafting Desk** (C207 (3), C227 (b); a choice). Stages 11 and 12 now do what Secretarybird does to a reply: tracked edits, comments as asks answered in place, the model's suggestions, Ripple, and branching from an edit. One thing they do not do: a long document of your own as the main surface. In Parliament your own words are prompts. In your second backup, 17 of 21 chats are Drafting Desk documents. Proposed as **R39**:
+  1. **Retire it into Writing Studio after a conversion:** each document becomes a chat in Writing Studio, its text the chat's first prompt, yours to edit in place. Its comments become answered asks, its suggestions open suggestions, its Ripple notes notes. This would be a piece of its own, a change to stored data shown first and tried on a copy of your backup, and only then would Drafting Desk go.
+  2. **Keep it as a room for now,** its documents as they are, and decide after the refactor, with the review of asks and Ripple you asked for (26 October).
+
+  **Suggestion:** 2. Writing in a document of your own is a different way of working from editing a reply, and choosing how it should look in Parliament is better done after the refactor, with asks and Ripple in view, than hurried into a conversion of most of your chats now. R39 stays in the table, deferred.
+- **(c) Secretarybird's comments and suggestions** (C91; a choice that follows (b)). They are shown in Drafting Desk as they always were.
+  1. **With (b) 1:** converted with the documents. The 9 comments become asks, answered and accepted. The 57 suggestions become open suggestions marked "from Secretarybird", in the Suggestions tab.
+  2. **With (b) 2:** left as they are, decided with Drafting Desk.
+
+  **Suggestion:** 2.
+- **(d) The Review modal against the Reflection board** (the plan: "the Review modal itself stays until you have compared the two").
+
+  | | Review modal (today) | Reflection board |
+  | --- | --- | --- |
+  | What it reads | The open chat: its last 20 messages, each cut to 300 characters; highlights, notes, favourites | The chat and its plan's other branches as they read now, and every marking: edits, asks and answers, suggestions and what you chose, notes, keywords, quotes |
+  | Its call | One call to Haiku, with no instructions and nothing marked as material; cost worked out at fixed prices | One call to the helper, named with its cost before Enter, the chat's frameworks shaping it, text marked as material |
+  | What it gives | A synthesis (brief or detailed); questions made without a call from counts | A synthesis, three questions drawn from your markings, and a proposal of a sweep |
+  | Your own reflection | A text box, kept nowhere | The talk about the chat, and "keep as a note" into the Collection |
+  | Kept | Save as Markdown | In the tab, and as a note |
+  | Writes to the chat | Not intended to | Cannot: enforced by a lint rule and a test |
+  | Only it has | Brief or detailed; category toggles; a Markdown file | |
+
+  Proposed as **R40**: the Review block and its modal (`review*.jsx`, `ReviewModal.jsx`) move to `src/deprecated/`. Rooms that hold the block keep it in their stored list: a room skips a block it does not know, so nothing breaks and nothing stored changes. Options:
+  1. **Approve R40 now.** If a Markdown file of a reflection is wanted, it is added to the board, as `export:md` on Reflection.
+  2. **Keep both until the Lab** (stage 13), where blocks are looked at together.
+
+  **Suggestion:** 1. Reflection does all it did, with the model and cost named first and the chat's text sent as material.
+- **(e) Not in this checkpoint:** reviewing asks with Ripple (your ruling, after the refactor), and C219's asks as built, approved for now.
+- **Suggestion:** (b) 2, (c) 2, (d) 1; then stage 13, the Lab.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

@@ -519,7 +519,7 @@ The piece with the most risk in it. It starts with a spike, not with building.
 
 ### Stage 12. Ripple, sweeps, Reflection
 
-**Status, 27 October:** proposed in six pieces as C228, ruled the same day; the stored data shown as C229. **Piece 1 built (C230):** suggestions in place, the Suggestions tab and its review bar, accept: and reject: on suggestions. **Piece 2 built (C231, C232):** Ripple, its switch, its line and its checks. **Piece 3 built (C233, C234):** sweeps, and an accepted sweep told once. **Pieces 4 and 5 built (C235, C236):** the Reflection board, Reflect and the talk about the chat. The checkpoint is next.
+**Status, 27 October:** proposed in six pieces as C228, ruled the same day; the stored data shown as C229. **Piece 1 built (C230):** suggestions in place, the Suggestions tab and its review bar, accept: and reject: on suggestions. **Piece 2 built (C231, C232):** Ripple, its switch, its line and its checks. **Piece 3 built (C233, C234):** sweeps, and an accepted sweep told once. **Pieces 4 and 5 built (C235, C236):** the Reflection board, Reflect and the talk about the chat. **The checkpoint is C237,** waiting for you: Drafting Desk (R39), Secretarybird's comments and suggestions, and the Review modal (R40).
 
 - **Added**
   - Ripple across branches, off by default, each check one model call that says so first; suggestions in rust, reviewed one at a time.
@@ -635,6 +635,8 @@ stay readable so every backup ever written still restores.
 | R35 | The Inter font package | `@fontsource-variable/inter`, shipped and never applied | The system fonts already in use | 15 |
 | R36 | The old slot tables and fallback rule | `SLOT_FALLBACKS` and the three copies of slot data | The layout manifest | 13 |
 | R37 | The old Settings page | `src/views/SettingsView.jsx`, the `/settings` route | The Settings board; `/settings` opens it. **Approved 23 October,** moved to `src/deprecated/` (C186) | 9 |
+| R39 | Drafting Desk, retired into Writing Studio | The `drafting-desk@1.0` template, `document-canvas`, `claude-comments` and `ripple-analysis` blocks, `DocumentContext`, `src/components/core/sbrd/` | Editing in place, asks, suggestions and Ripple (stages 11 and 12). Its documents stay readable. **Proposed 27 October (C237 (b)),** suggested to wait until after the refactor | 12 |
+| R40 | The Review modal and its block | `src/components/ReviewModal.jsx`, `src/catalog/entries/review*.jsx` | The Reflection board. Rooms keep the block in their stored list and skip it. **Proposed 27 October (C237 (d))** | 12 |
 | R38 | Four Enter-line messages nothing says any more (**approved 24 October; carried out 24 October, C204**) | `enter.openDocket`, `enter.openDocketHere` ("Enter opens its first branch…"), `enter.erase` (the old answer to `delete:`) and `enter.promptManyOrderInclude` in `src/copy.js` | `open:` with a plan's number opens the Plan board (C198); `delete:` is the word (C199); `include:` goes with one after another (C202) | 10 |
 
 R29 (install and update state that nothing displays) is withdrawn: stage 1
