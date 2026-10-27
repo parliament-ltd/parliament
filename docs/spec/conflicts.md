@@ -3234,6 +3234,48 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   Essay room keeps that set; the screen is back as it was.
 - **Next:** piece 2, calm.
 
+**C255. Stage 14, piece 2: calm, its open points** (proposed 27 October; C253 (c), (d), (e) as ruled; the editing spec, "Calm"). Built as suggested, so a ruling changes one entry.
+- **What exists today:**
+  - A reply can already be read "clean", the result only, with `markup:off`. That view is also read-only.
+  - Ask and suggestion markers read "ask 241: accept · undo".
+  - The Collection's legend, its review bar with the keys line, and the branch slider's line ("open:201a · with its history · …") all draw in full.
+  - Nothing yet reads the setting calm will use.
+- **(a) What calm folds, mapped from the spec's table to what is on screen now.** Each comes back in full when you are near it:
+  - **A board's head:** its title only; the marginalia beside it waits.
+  - **A reply:** it reads as it stands, as `markup:off` shows it.
+    - Your edits show as their result. Answers and suggestions not yet accepted are not shown. A small blue tick in the margin says something is marked.
+    - Unlike `markup:off`, it stays editable: being near shows the markup, and you edit with it in view.
+  - **Inline markers:** the ask and suggestion markers become small dots with their numbers, green for asks and sweeps, rust for Ripple.
+  - **The branch slider's line:** its first item only, `open:201a`.
+  - **Collection cards:** one line, the result. An edit shows what it became; a quote or note its first line; the card's marginalia waits.
+  - **The Collection's legend:** "colours ▾".
+  - **The review keys line:** hidden. The tab counts are dimmed.
+
+  **Suggestion:** yes.
+- **(b) What "near" is:**
+  - the board, for its head;
+  - the reply, for itself;
+  - the card;
+  - the legend;
+  - the slider.
+
+  Near means hover, keyboard focus inside it, or on a touch screen the last one tapped (C253 (e)). **Suggestion:** yes.
+- **(c) Never calmed:**
+  - the field and its marginalia;
+  - the Enter line;
+  - the review bar's buttons;
+  - the count line under the field;
+  - the strip, which says "calm: on" or "calm: off".
+
+  **Suggestion:** yes.
+- **(d) The commands:**
+  - `calm:` and `calm:off`; the strip's "calm: off" toggles with a click, echoed, one step for `undo:`.
+  - The setting is kept on this device and not in backups (C253 (d)). It is off for someone new (C253 (c)).
+  - With reduced motion, nothing fades.
+
+  **Suggestion:** yes.
+- **(e) Stored data:** one device setting, `calm`. **Suggestion:** yes.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
