@@ -3583,7 +3583,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   These are for the checkpoint.
 - **Next:** piece 6, the stage 14 checkpoint.
 
-**C263. The stage 14 checkpoint** (proposed 27 October; refactor-plan.md, stage 14; C253 to C262). Pieces 1 to 5 are built and committed. No retirement line belongs to this stage. Waiting for Stefan: (b) and (c) are choices; the rest is a yes or no.
+**C263. The stage 14 checkpoint** (proposed 27 October; **ruled 27 October, as suggested: (b) 1, the phone line stays until a real phone is tried; (c) 1, tablets as ruled; (d) the C94 rule kept; (e) 1,100 kept; (f) the focus set kept as test data**; refactor-plan.md, stage 14; C253 to C262). Pieces 1 to 5 are built and committed. No retirement line belongs to this stage. Waiting for Stefan: (b) and (c) are choices; the rest is a yes or no.
 - **(a) What to try,** on the trial copy (localhost:5174, on this computer). Nothing here needs a key.
   - **Focus sets** (C254):
     - In the Essay room, `focus:room collection`: the chat and the Collection, left to right, kept as the room's set.
