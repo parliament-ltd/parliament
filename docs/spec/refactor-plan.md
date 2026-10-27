@@ -556,7 +556,7 @@ Built to Lab v7 (A2). Can run beside the others once stage 3 exists.
 - **You can try:** a focus set of the chat and the Collection; `calm:`; the map with a second screen attached.
 - **Needs from you:** whether calm is the starting state for someone new; a phone layout you are happy with, which the mockups do not yet draw.
 
-**Status, 27 October: proposed in six pieces as C253, ruled the same day as suggested:** focus per room, calm off for someone new, small screens built last. **Piece 1 built (C254):** focus sets, kept with their room. **Piece 2 built (C256):** calm. **Piece 3 built (C258):** saved arrangements. **Piece 4 built (C260):** the screens map and other screens; C259 (h), renaming without `duplicate:`, waits for a ruling.
+**Status, 27 October: proposed in six pieces as C253, ruled the same day as suggested:** focus per room, calm off for someone new, small screens built last. **Piece 1 built (C254):** focus sets, kept with their room. **Piece 2 built (C256):** calm. **Piece 3 built (C258):** saved arrangements. **Piece 4 built (C260):** the screens map and other screens; C259 (h) ruled: renaming, no `duplicate:`.
 
 ### Stage 15. Close-out and going public
 

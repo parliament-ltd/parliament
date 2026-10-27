@@ -3367,7 +3367,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   The trial copy is as it was.
 - **Next:** piece 4, the screens map.
 
-**C259. Stage 14, piece 4: the screens map and other screens, its open points** (proposed 27 October; C253 piece 4, (g) and (h) as ruled; C257 (c); `parliament_screens_v1.html`; the arrangements spec §7a). Waiting for Stefan: (h) is a choice. The rest is built as suggested, so a ruling changes one entry.
+**C259. Stage 14, piece 4: the screens map and other screens, its open points** (proposed 27 October; **ruled 27 October, as suggested: (h) 1, `name:` with two names, no `duplicate:` for arrangements**; C253 piece 4, (g) and (h) as ruled; C257 (c); `parliament_screens_v1.html`; the arrangements spec §7a). Waiting for Stefan: (h) is a choice. The rest is built as suggested, so a ruling changes one entry.
 - **What exists today:**
   - `pop:library display 2` is read and stored with the window, but the window opens on the screen it is popped from.
   - Bare `arrange:` lists the saved arrangements (C258).
@@ -3428,7 +3428,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 
   Nothing else is new; `display` on a window is already stored. **Suggestion:** yes.
 
-**C260. Stage 14, piece 4, as built: the screens map and other screens** (27 October; C259 as suggested, with (h) built as its suggestion 1 until ruled).
+**C260. Stage 14, piece 4, as built: the screens map and other screens** (27 October; C259 as ruled: (h) 1).
 - **The map** (`ScreensMap.jsx`, `shell/screensMap.js`):
   - It shows while the field reads `arrange:` alone, and Enter keeps it open. Escape closes it. It stands where the boards are, and the boards stay drawn underneath, out of sight.
   - Each screen is a box: "Display 2, 2560 wide", with ", this window" on Parliament's own. Before the browser says more, the boxes are "This screen, 1536 wide, this window" (its width is known without asking) and "Another screen" in a dashed outline.
@@ -3457,7 +3457,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
     In the last three the window opens here.
   - The screens' names and sizes stay in the page.
 - **"Extra screen detected · arrange across screens"** shows under the field when a second screen is attached, at start or later. The click writes `arrange:`, and the map's Enter ends the note. The device setting `screensNoticed` keeps it from coming back until the computer is down to one screen; it is not in backups.
-- **`name:"Review desk" "Two screens"`** renames a saved arrangement from anywhere, keeping its id; `undo:` names it back. The Enter line refuses a name another arrangement has, or the same name. No `duplicate:` (C259 (h), suggestion 1, waiting for the ruling).
+- **`name:"Review desk" "Two screens"`** renames a saved arrangement from anywhere, keeping its id; `undo:` names it back. The Enter line refuses a name another arrangement has, or the same name. No `duplicate:` (C259 (h) 1, as ruled).
 - **The permissions header:** `window-management=(self)` in `securityHeaders.js` and `netlify.toml`, which a test keeps equal. It takes effect at the next deploy.
 - **Departures, for Stefan:**
   - **The mockup's foot line names Chrome and Edge.** The copy rule from C94 names no browser, since Parliament cannot tell which it is in, and a test holds it. So the line says only "Everything else works here." C259 (f) is corrected to match.
