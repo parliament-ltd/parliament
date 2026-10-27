@@ -87,5 +87,12 @@ retirement line approved it, and how to put it back.
 | `components/BranchCreationPanel.jsx` | R26 | 27 October 2026 | The branch panel: a branch with the whole history or from a summary; replaced by new:branch, open: with a summary and again: |
 | `stores/BranchPanelContext.jsx` | R26 | 27 October 2026 | The branch panel's state |
 | `components/BranchShortcutHandler.jsx` | R26 | 27 October 2026 | Cmd/Ctrl+Shift+B for the branch panel, on today's chat page |
+| `hooks/useMode.js` | R30 | 27 October 2026 | The V2 mode loader hook, used by nothing |
+| `components/core/ToolToggles.jsx` | R30 | 27 October 2026 | Toggle buttons for a room's tools, used by nothing |
+| `components/core/CitedMarkdown.jsx` | R30 | 27 October 2026 | Markdown with citation marks, used by nothing |
+| `public/flight_logo.png` | R30 | 27 October 2026 | An old logo image, used by nothing; it was served from `public/` |
+| `components/HomepageTopBar.jsx` | R9 | 22 October 2026, moved 27 October | The homepage's top bar, above the Study |
+| `lib/exportAllData.js` | R10 | 22 October 2026, moved 27 October | The old JSON export, once in `db.js`; its files still restore |
+| `styles/index-old.css` | R12 (second part) | 22 October 2026, moved 27 October | The 167 rules of `src/index.css` that nothing live draws: the old editor, the wizard, the old Settings, /chats, the section drag |
 
 Files keep their old path under `src/deprecated/`, so putting one back is a move. Their imports point where they used to and are not resolved here.

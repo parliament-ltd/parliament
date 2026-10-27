@@ -560,31 +560,6 @@
   background-color: #222 !important;
 }
 
-/* Chat-with-Claude empty-state hint bubble */
-.sbrd-chat-hint {
-  background-color: #F5F5F5;
-  color: #4A5568;
-}
-.dark .sbrd-chat-hint {
-  background-color: #191919;
-  border: 1px solid #3A3730;
-  color: white;
-}
-
-/* Chat text input */
-.sbrd-chat-input {
-  background-color: #F5F5F5;
-  border: 1px solid #EBEBEB;
-  color: #1E2532;
-}
-.sbrd-chat-input::placeholder { color: #9B9A97; }
-.dark .sbrd-chat-input {
-  background-color: #191919;
-  border: 1px solid #3A3730;
-  color: white;
-}
-.dark .sbrd-chat-input::placeholder { color: #6B6963; }
-
 /* Text selection color — warm gold instead of browser-default navy */
 .sbrd-paper [data-editable]::selection,
 .sbrd-paper [data-editable] *::selection {
@@ -593,17 +568,6 @@
 }
 
 /* ── Pelican mode overrides ─────────────────────────────── */
-
-/* FileShelf border */
-.dark .plcn-shelf        { border-right-color: var(--p-border-subtle) !important; }
-
-/* Canvas toolbar separator */
-.dark .plcn-canvas-bar   { border-bottom-color: var(--p-border-subtle) !important; }
-
-/* Inspector panel borders */
-.dark .plcn-inspector    { border-left-color: var(--p-border-subtle) !important; }
-.dark .plcn-insp-bar     { border-bottom-color: var(--p-border-subtle) !important; }
-.dark .plcn-insp-schema  { border-bottom-color: var(--p-border-subtle) !important; }
 
 /* Table rows and header */
 .dark .plcn-table-head   { background-color: var(--p-bg-subtle) !important; border-bottom-color: var(--p-border) !important; }
@@ -734,86 +698,29 @@
   100% { border-color: #F1F1EF; }
 }
 
-.shimmer-card {
-  animation: shimmer-card-pulse 0.85s ease-out forwards;
-}
-
-.shimmer-nav {
-  animation: shimmer-nav-flash 0.7s ease-out forwards;
-}
-
-.shimmer-sidebar-border {
-  animation: shimmer-sidebar-border 0.85s ease-out forwards;
-}
-
 /* ── Build wizard: Ignition step (PR-13) ─────────────────── */
 /* Lifts the spec's keyframes from parliament_wizard_v5.html         */
 /* lines 679–762 verbatim. The component (IgnitionStep.jsx) toggles  */
 /* class names — `wiz-sweep.go`, `wiz-room.igniting`, `wiz-feat.lit`, */
 /* etc. — to drive the chain. Inline-style transitions handled what   */
-/* CSS does best is now back in CSS.                                  */
 
-.wiz-sweep {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #D4A843 40%, #F5E6B8 60%, transparent);
-  top: -4px;
-  opacity: 0;
-  pointer-events: none;
-  box-shadow: 0 0 8px 2px rgba(212, 168, 67, 0.28);
-}
-.wiz-sweep.go {
-  animation: wiz-sweepdn 0.75s ease-out forwards;
-}
 @keyframes wiz-sweepdn {
   0%   { top: -4px; opacity: 1; }
   100% { top: 110%; opacity: 0; }
 }
 
-.wiz-room {
-  border: 1.5px dashed var(--p-text-light);
-  transition: border-color .4s, border-style .4s, background .6s;
-}
-.wiz-room.igniting {
-  animation: wiz-gflash 0.65s ease forwards;
-}
-.wiz-room.lit {
-  border-style: solid;
-  border-color: var(--p-gold-light);
-  background: var(--p-gold-tint);
-}
 @keyframes wiz-gflash {
   0%   { box-shadow: none; border-color: var(--p-text-light); }
   35%  { box-shadow: 0 0 0 2px rgba(212, 168, 67, 0.38), 0 0 14px rgba(212, 168, 67, 0.16); border-color: #D4A843; }
   100% { box-shadow: none; border-color: var(--p-gold-light); }
 }
 
-.wiz-feat {
-  border: 0.5px dashed var(--p-text-light);
-  color: var(--p-text-muted);
-  background: transparent;
-  transition: all .4s;
-}
-.wiz-feat.igniting {
-  animation: wiz-fflash 0.55s ease forwards;
-}
-.wiz-feat.lit {
-  border-style: solid;
-  border-color: var(--p-gold-light);
-  background: var(--p-gold-tint);
-  color: var(--p-gold-deep);
-}
 @keyframes wiz-fflash {
   0%   { border-color: var(--p-text-light); color: var(--p-text-muted); }
   40%  { border-color: #D4A843; color: var(--p-gold-deep); background: rgba(212, 168, 67, 0.10); border-style: solid; }
   100% { border-color: var(--p-gold-light); color: var(--p-gold-deep); background: var(--p-gold-tint); border-style: solid; }
 }
 
-.wiz-conn-dot {
-  animation: wiz-breathe 2.5s ease-in-out infinite;
-}
 @keyframes wiz-breathe {
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.35; }
@@ -831,22 +738,7 @@
   in App.jsx (reducedMotion="user").
 */
 @media (prefers-reduced-motion: reduce) {
-  .shimmer-card,
-  .shimmer-nav,
-  .shimmer-sidebar-border,
-  .wiz-sweep,
-  .wiz-sweep.go,
-  .wiz-room.igniting,
-  .wiz-feat.igniting,
-  .wiz-conn-dot {
-    animation: none !important;
-  }
-  /* Still apply the resting state so power-on UX doesn't feel broken. */
-  .shimmer-card { border-color: #E9E9E7; }
-  .shimmer-sidebar-border { border-color: #F1F1EF; }
   /* The .lit static styles still apply, so users who disable motion */
-  /* see the room jump straight to the gold-tint settled state.       */
-  .wiz-sweep { opacity: 0; }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -864,35 +756,7 @@
   transition: opacity 0.22s ease, transform 0.22s ease;
 }
 .section.dragging { opacity: 0.5; }
-/* PR-17: DragOverlay clone — same .section + .section-head styles plus
-   a lifted shadow so the floating preview reads as "this is the one
-   you're holding." */
-.section-drag-preview {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  cursor: grabbing;
-}
-/* Drag handle wrapper. Now a real <button> (PR-17, for keyboard a11y
-   via dnd-kit's KeyboardSensor); base styling resets button chrome.
-   24x24 hit area on desktop; touch override lower in this file bumps
-   to 40x40. touch-action:none is required on iOS Safari — without it
-   the page scrolls instead of starting the drag. user-select:none
-   suppresses the long-press text callout. */
-.section-grabber-handle {
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: grab;
-  margin-left: -4px;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-.section-grabber-handle:active { cursor: grabbing; }
+
 .section-head {
   display: flex;
   align-items: center;
@@ -902,24 +766,7 @@
   background: var(--p-bg-surface);
 }
 .section.collapsed .section-head { border-bottom-color: transparent; }
-.section-grabber {
-  width: 14px;
-  height: 14px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 3px;
-  color: var(--p-text-muted);
-  opacity: 0;
-  transition: opacity 0.12s;
-}
-.section:hover .section-grabber { opacity: 1; }
-.section-grabber > div {
-  width: 12px;
-  height: 1.5px;
-  border-radius: 1px;
-  background: currentColor;
-}
+
 .section-title-btn {
   background: transparent;
   border: none;
@@ -1048,63 +895,6 @@
   height: 100%;
 }
 
-/* ── Editor cards (PR-27) ─────────────────────────────────
-   Slot zones in the editor canvas read as soft cards, with each
-   placed component nested inside as a secondary card. Same card
-   recipe as .chat-input-card / .bp-action-card so the editor
-   visually belongs to the same family. Subtle bg variance per
-   area kind (rail vs main vs dock) gives the canvas its sense
-   of structure without competing with the components. */
-.editor-area-card {
-  background: var(--p-bg-base);
-  border: 0.5px solid var(--p-border);
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
-  padding: 8px;
-  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
-}
-.editor-area-card[data-area-kind="rail"]  { background: var(--p-bg-subtle); }
-.editor-area-card[data-area-kind="dock"]  { background: var(--p-bg-alt); }
-.editor-area-card[data-area-kind="main"]  { background: var(--p-bg-base); }
-.editor-area-card[data-area-kind="sheet"] { background: var(--p-bg-subtle); }
-.editor-area-card[data-area-empty="true"] {
-  background: transparent;
-  border-style: dashed;
-  box-shadow: none;
-}
-.editor-area-card[data-area-over="true"] {
-  border-color: var(--p-gold-light);
-  background: rgba(196, 169, 77, 0.08);
-}
-.editor-area-card[data-area-selected="true"] {
-  outline: 1.5px solid var(--p-gold-light);
-  outline-offset: 2px;
-}
-.editor-component-card {
-  background: var(--p-bg-surface);
-  border: 0.5px solid var(--p-border);
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-  padding: 6px 8px;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-}
-.editor-component-card:hover {
-  background: rgba(196, 169, 77, 0.06);
-}
-.editor-component-card[data-selected="true"] {
-  border-color: var(--p-gold-light);
-  outline: 1px solid var(--p-gold-light);
-}
-/* PR-49b: subtle feedback while a placed component is being dragged
-   between slots. dnd-kit keeps the source mounted in place during the
-   drag (the visual move is a transform on the overlay), so fading the
-   source while it's airborne makes the move feel real. */
-.editor-component-card.is-dragging {
-  opacity: 0.4;
-  box-shadow: 0 0 0 1px var(--p-gold-light);
-}
-
 /* ── Runtime layout-panel slide toggle (PR-27) ────────────
    Per-slot opt-in lives in mode.layoutConfig.panelButtons. When
    enabled, layouts render a small chevron button at the panel's
@@ -1164,635 +954,13 @@
   .layout-panel-content { transition: none; }
 }
 
-/* ── Editor grid + left-rail toggle (PR-48a) ──────────────
-   The 3-column editor grid transitions its template-columns when the
-   left rail collapses / expands, so the rail width animates smoothly
-   from 36px (collapsed) to 300px (expanded). The toggle button sits
-   on the rail's right edge — chevron-right when collapsed, chevron-
-   left when expanded — same visual language as the runtime
-   layout-panel-toggle. */
-.editor-grid {
-  transition: grid-template-columns 0.18s ease;
-}
-.editor-leftrail-toggle {
-  position: absolute;
-  top: 14px;
-  right: -10px;
-  width: 20px;
-  height: 28px;
-  border-radius: 5px;
-  background: var(--p-bg-surface);
-  border: 0.5px solid var(--p-border);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--p-text-muted);
-  cursor: pointer;
-  z-index: 12;
-  transition: color 0.15s, border-color 0.15s;
-}
-.editor-leftrail-toggle.is-collapsed {
-  position: relative;
-  top: 0;
-  right: 0;
-}
-.editor-leftrail-toggle:hover {
-  color: var(--p-gold-light);
-  border-color: var(--p-gold-light);
-}
-@media (prefers-reduced-motion: reduce) {
-  .editor-grid { transition: none; }
-}
-
-/* ── Editor top-bar primary action tooltip (PR-47) ────────
-   Disabled buttons don't fire mouseenter in Chrome, so we wrap the
-   button in a relative container and trigger the tooltip from the
-   wrapper's :hover. Tooltip sits below the top bar, pointing up. */
-.primary-action-wrap {
-  position: relative;
-  display: inline-flex;
-}
-.primary-action-tooltip {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background: #3A3530;
-  color: #F5F0E8;
-  font-size: 11px;
-  padding: 5px 9px;
-  border-radius: 4px;
-  white-space: nowrap;
-  opacity: 0;
-  transform: translateY(-2px);
-  transition: opacity 0.12s, transform 0.12s;
-  pointer-events: none;
-  z-index: 50;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-.primary-action-tooltip::before {
-  content: '';
-  position: absolute;
-  bottom: 100%;
-  right: 12px;
-  border: 4px solid transparent;
-  border-bottom-color: #3A3530;
-}
-.primary-action-wrap:hover .primary-action-tooltip,
-.primary-action-wrap:focus-within .primary-action-tooltip {
-  opacity: 1;
-  transform: translateY(0);
-}
-@media (prefers-reduced-motion: reduce) {
-  .primary-action-tooltip { transition: opacity 0.12s; transform: none; }
-}
-
-/* ── Editor holding tray (PR-45 / PR-46b) ─────────────────
-   PR-46b: chips are now mini lib-cards — same shape as the Library
-   section's catalog cards, scaled down so a row of them fits below
-   the canvas. Layout is a responsive grid. Hover reveals an x badge
-   in the top-right corner of each card. */
-.tray-mini-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 8px;
-  width: 100%;
-}
-.tray-mini-card {
-  position: relative;
-}
-.tray-mini-card .lib-card {
-  padding: 8px;
-  gap: 4px;
-  border-radius: 8px;
-}
-.tray-mini-card .lib-card:hover {
-  transform: none;
-  border-color: var(--p-gold-light);
-  box-shadow: 0 2px 8px -3px rgba(196, 169, 77, 0.2);
-}
-.tray-mini-card .lib-preview {
-  height: 38px;
-  padding: 4px;
-}
-.tray-mini-card .lib-card-head {
-  gap: 4px;
-}
-.tray-mini-card .lib-card-type {
-  font-size: 8.5px;
-  padding: 0 5px;
-  line-height: 13px;
-}
-.tray-mini-card .lib-card-status {
-  font-size: 8.5px;
-  padding: 0 5px;
-}
-.tray-mini-card .lib-card-name {
-  font-size: 11px;
-  line-height: 1.3;
-}
-.tray-mini-card .lib-card-author,
-.tray-mini-card .lib-card-action {
-  display: none;
-}
-.tray-mini-card.is-dragging .lib-card {
-  opacity: 0.5;
-}
-.tray-mini-card-x {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--p-bg-surface);
-  border: 0.5px solid var(--p-gold-light);
-  color: var(--p-gold-muted);
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.12s, color 0.12s, background 0.12s;
-  z-index: 2;
-}
-.tray-mini-card:hover .tray-mini-card-x,
-.tray-mini-card-x:focus-visible {
-  opacity: 1;
-}
-.tray-mini-card-x:hover {
-  color: #C8313B;
-  background: rgba(200, 49, 59, 0.10);
-}
-
-/* ── Editor Library mode (PR-44) ──────────────────────────
-   The "shopping" surface that replaces the canvas when the user
-   clicks the Library pill in the editor top bar. Three chevron-
-   collapsible sections: Showcase / Library / Details.
-
-   Fixed default section sizes (no drag-to-resize yet — that lands
-   in PR-45+). Showcase + Library sections can grow with content;
-   the parent column scrolls. */
-.editor-library-mode {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 18px 22px 28px;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-.editor-library-section {
-  border: 0.5px solid var(--p-border);
-  border-radius: 10px;
-  background: var(--p-bg-surface);
-  overflow: hidden;
-}
-.editor-library-section-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 14px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--p-text-secondary);
-  text-align: left;
-  font-family: inherit;
-  transition: background 0.12s;
-}
-.editor-library-section-head:hover {
-  background: var(--p-bg-subtle);
-}
-.editor-library-section-body {
-  padding: 4px 14px 14px;
-  border-top: 0.5px solid var(--p-border-subtle);
-}
-
 /* ── Showcase ─────────────────────────────────────────────── */
-/* PR-48c: showcase wrap holds the grid + a same-size SVG overlay
-   that draws thin connector lines between cards sharing a sourceRoomId. */
-.editor-library-showcase-wrap {
-  position: relative;
-}
-.editor-library-showcase-overlay {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-}
-.editor-library-showcase-wrap .editor-library-showcase-card {
-  position: relative;
-  z-index: 1;
-}
-.editor-library-showcase-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 8px;
-  padding: 6px 0;
-}
-.editor-library-showcase-card {
-  position: relative;
-  padding: 9px 11px;
-  border-radius: 7px;
-  border: 0.5px solid var(--p-border);
-  background: var(--p-bg-subtle);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-height: 56px;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-.editor-library-showcase-card.has-glow {
-  border-color: color-mix(in oklab, var(--glow) 60%, transparent);
-  box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--glow) 40%, transparent),
-    0 0 12px -2px color-mix(in oklab, var(--glow) 35%, transparent);
-}
-.editor-library-showcase-card.is-warning {
-  border-color: #E0A300;
-  background: rgba(224, 163, 0, 0.08);
-}
-/* PR-45: items already placed in the draft render with a subtle
-   "In room" tag in the kind row so users can tell at a glance which
-   Showcase cards are committed vs which are still pending in the bag. */
-.editor-library-showcase-card.is-placed {
-  background: var(--p-bg-surface);
-}
-.editor-library-showcase-card-placed-tag {
-  display: inline-block;
-  margin-left: 6px;
-  padding: 0 5px;
-  border-radius: 7px;
-  background: rgba(196, 169, 77, 0.14);
-  color: var(--p-gold-deep, #8B6A10);
-  font-size: 8.5px;
-  letter-spacing: 0.3px;
-  line-height: 12px;
-  vertical-align: 1px;
-}
-.editor-library-showcase-card-kind {
-  font-size: 9.5px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--p-text-muted);
-  font-weight: 500;
-}
-.editor-library-showcase-card-name {
-  font-size: 12px;
-  color: var(--p-text-primary);
-  font-weight: 500;
-  line-height: 1.25;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-.editor-library-showcase-card-x {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 18px;
-  height: 18px;
-  border: none;
-  background: transparent;
-  border-radius: 4px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--p-text-muted);
-  opacity: 0;
-  cursor: pointer;
-  transition: opacity 0.12s, color 0.12s, background 0.12s;
-}
-.editor-library-showcase-card:hover .editor-library-showcase-card-x,
-.editor-library-showcase-card-x:focus-visible {
-  opacity: 1;
-}
-.editor-library-showcase-card-x:hover {
-  color: #C8313B;
-  background: rgba(200, 49, 59, 0.08);
-}
-
-.editor-library-conflict {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  background: rgba(224, 163, 0, 0.10);
-  border: 0.5px solid rgba(224, 163, 0, 0.4);
-  color: #8B6A10;
-  font-size: 11px;
-}
-
-/* ── Library (catalog) ────────────────────────────────────── */
-.editor-library-controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 6px 0 12px;
-  flex-wrap: wrap;
-}
-.editor-library-chips {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.editor-library-search {
-  position: relative;
-  margin-left: auto;
-  width: 200px;
-}
-.editor-library-search svg {
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--p-text-muted);
-  pointer-events: none;
-}
-.editor-library-search input {
-  width: 100%;
-  padding: 6px 26px 6px 26px;
-  font-size: 11.5px;
-  border: 0.5px solid var(--p-border);
-  border-radius: 6px;
-  background: var(--p-bg-surface);
-  color: var(--p-text-primary);
-  outline: none;
-  font-family: inherit;
-  transition: border-color 0.12s;
-}
-.editor-library-search input:focus {
-  border-color: var(--p-gold-light);
-}
-.editor-library-search-clear {
-  position: absolute;
-  right: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
-  border: none;
-  background: transparent;
-  border-radius: 4px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--p-text-muted);
-  cursor: pointer;
-  transition: color 0.12s, background 0.12s;
-}
-.editor-library-search-clear:hover {
-  color: var(--p-text-primary);
-  background: var(--p-bg-subtle);
-}
-.editor-library-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px;
-  padding: 4px 2px;
-}
-/* PR-46c → PR-48b: the catalog grid no longer caps its own height;
-   the Library section body's user-resizable height (default 320px,
-   draggable via the resize handle) is the source of truth, with
-   `overflow-y: auto` set inline by the Section component. */
-.editor-library-section-resize {
-  height: 6px;
-  cursor: row-resize;
-  background: transparent;
-  position: relative;
-  user-select: none;
-  touch-action: none;
-}
-.editor-library-section-resize::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 32px;
-  height: 2px;
-  border-radius: 1px;
-  background: var(--p-border);
-  transition: background 0.12s;
-}
-.editor-library-section-resize:hover::before,
-.editor-library-section-resize:active::before {
-  background: var(--p-gold-light);
-  height: 3px;
-}
-.editor-library-section-resize:hover {
-  background: rgba(196, 169, 77, 0.04);
-}
-.editor-library-card-wrap {
-  position: relative;
-}
-.editor-library-card-wrap .lib-card {
-  width: 100%;
-  transition: border-color 0.12s, transform 0.12s, box-shadow 0.12s;
-}
-.editor-library-card-wrap.is-checked .lib-card {
-  border-color: var(--p-gold-light);
-  box-shadow: 0 0 0 1px var(--p-gold-light);
-}
-.editor-library-card-wrap.is-focused .lib-card {
-  border-color: var(--p-gold-light);
-  box-shadow: 0 4px 14px -4px rgba(196, 169, 77, 0.30);
-}
-.editor-library-card-check {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--p-bg-surface);
-  border: 0.5px solid var(--p-border);
-  color: transparent;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-  pointer-events: none;
-}
-.editor-library-card-check.is-on {
-  background: var(--p-gold-light);
-  border-color: var(--p-gold-light);
-  color: white;
-}
-
-/* ── Details ──────────────────────────────────────────────── */
-.editor-library-details {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 8px 0 4px;
-}
-.editor-library-details-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-}
-.editor-library-details-cta {
-  padding: 6px 12px;
-  font-size: 11px;
-  font-weight: 500;
-  border-radius: 6px;
-  background: var(--p-bg-surface);
-  border: 0.5px solid var(--p-gold-light);
-  color: var(--p-gold-deep, #8B6A10);
-  cursor: pointer;
-  font-family: inherit;
-  flex-shrink: 0;
-  transition: background 0.12s;
-}
-.editor-library-details-cta:hover {
-  background: rgba(196, 169, 77, 0.08);
-}
-.editor-library-details-cta.is-on {
-  background: var(--p-gold-light);
-  color: white;
-}
-.editor-library-details-cta.is-on:hover {
-  background: var(--p-gold-muted);
-}
-.editor-library-details-body-text {
-  font-size: 12px;
-  line-height: 1.6;
-  color: var(--p-text-secondary);
-  margin: 0;
-}
-.editor-library-details-bundle {
-  padding: 10px 12px;
-  border-radius: 6px;
-  background: var(--p-bg-subtle);
-  border: 0.5px solid var(--p-border-subtle);
-}
-.editor-library-details-bundle-list {
-  margin: 0;
-  padding-left: 16px;
-  font-size: 11.5px;
-  line-height: 1.6;
-  color: var(--p-text-secondary);
-}
-
-/* ── Search-icon helper (chats + library) ─────────────────── */
-.chats-search .search-icon,
-.library-search .search-icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--p-text-muted);
-  width: 13px;
-  height: 13px;
-  pointer-events: none;
-}
-
-.view-toggle {
-  display: flex;
-  background: var(--p-bg-subtle);
-  border: 0.5px solid var(--p-border);
-  border-radius: 6px;
-  padding: 2px;
-  gap: 2px;
-  margin-left: auto;
-}
-.view-toggle button {
-  padding: 5px 10px;
-  border: none;
-  background: transparent;
-  font-family: var(--font-sans);
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--p-text-secondary);
-  cursor: pointer;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.view-toggle button.active {
-  background: var(--p-bg-surface);
-  color: var(--p-text-primary);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-}
 
 @keyframes bulk-in {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Library section ──────────────────────────────────────── */
-.library-filters {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 22px;
-  flex-wrap: wrap;
-}
-.filter-chip {
-  padding: 5px 12px;
-  border: 0.5px solid var(--p-border);
-  border-radius: 14px;
-  background: var(--p-bg-surface);
-  color: var(--p-text-secondary);
-  font-size: 11.5px;
-  cursor: pointer;
-  font-family: var(--font-sans);
-  transition: border-color 0.12s, background 0.12s, color 0.12s;
-}
-.filter-chip:hover { border-color: var(--p-text-light); }
-.filter-chip.active {
-  background: rgba(196, 169, 77, 0.08);
-  border-color: var(--p-gold-light);
-  color: var(--p-gold-deep, #8B6A10);
-}
-.library-search {
-  margin-left: auto;
-  position: relative;
-  width: 180px;
-}
-.library-search input {
-  width: 100%;
-  padding: 5px 10px 5px 26px;
-  font-size: 11.5px;
-  border: 0.5px solid var(--p-border);
-  border-radius: 6px;
-  background: var(--p-bg-surface);
-  color: var(--p-text-primary);
-  outline: none;
-}
-.library-search input:focus { border-color: var(--p-gold-light); }
-.library-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  justify-content: start;
-  gap: 12px;
-  max-height: 520px;
-  overflow-y: auto;
-  padding: 6px 6px 6px 2px;
-}
-@media (min-width: 900px) {
-  .library-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-}
-@media (max-width: 899px) and (min-width: 640px) {
-  .library-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-@media (max-width: 639px) {
-  .library-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 420px) {
-  .library-grid { grid-template-columns: 1fr; }
-}
 .lib-card {
   border: 0.5px solid var(--p-border);
   border-radius: 10px;
@@ -1926,17 +1094,6 @@
   color: var(--p-gold-light);
   font-weight: 500;
 }
-
-/* Editor left-rail vertical card stack (PR-19c). Uses .lib-card for visual
-   consistency with the homepage library, just stacked single-column. */
-.lrail-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.lrail-cards .lib-card { padding: 10px; gap: 6px; }
-.lrail-cards .lib-preview { height: 60px; }
-.lrail-cards .lib-card-name { font-size: 12px; }
 
 /* PR-19c: shared LibraryCard states (used in editor + homepage). */
 .lib-card-disabled {
@@ -2180,37 +1337,10 @@
    mobile (<768px), right-side panel on desktop. The `.ov-sheet-mobile`
    modifier is opt-in so the library overlay keeps its right-panel
    feel at all widths. */
-@media (max-width: 768px) {
-  .ov-backdrop.ov-sheet-mobile {
-    align-items: flex-end;
-    justify-content: stretch;
-  }
-  .ov-backdrop.ov-sheet-mobile .ov-panel {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    max-height: 85vh;
-    border-left: none;
-    border-top: 0.5px solid var(--p-border);
-    border-top-left-radius: 16px;
-    border-top-right-radius: 16px;
-    animation: ov-slideup 0.22s ease;
-  }
-}
+
 @keyframes ov-slideup {
   from { transform: translateY(20px); opacity: 0; }
   to   { transform: translateY(0); opacity: 1; }
-}
-.ov-sheet-handle {
-  width: 36px;
-  height: 4px;
-  border-radius: 999px;
-  background: var(--p-border);
-  margin: -8px auto 8px;
-  display: none;
-}
-@media (max-width: 768px) {
-  .ov-backdrop.ov-sheet-mobile .ov-sheet-handle { display: block; }
 }
 
 /* PR-19g — Room details overlay extras. Includes-as-bullets shared with
@@ -2250,22 +1380,6 @@
   color: var(--p-text-muted);
   font-size: 11px;
   line-height: 1.45;
-}
-.ov-room-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.ov-room-pill {
-  font-size: 9.5px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: rgba(196, 169, 77, 0.12);
-  border: 0.5px solid rgba(196, 169, 77, 0.35);
-  color: #8B6A10;
-  font-weight: 500;
 }
 
 @keyframes bp-modal-fade-in {
@@ -2323,13 +1437,6 @@
   input, textarea, select {
     font-size: 16px !important;
   }
-
-  /* PR-17: section reorder works on touch via dnd-kit
-     (TouchSensor delay: 250ms + tolerance: 5px). The grabber stays
-     visible at rest (no hover state on touch primary) and bumps to
-     a 40x40 finger-sized hit target. */
-  .section-grabber { opacity: 1; }
-  .section-grabber-handle { width: 40px; height: 40px; }
 }
 
 /* PR-17: respect reduced-motion preference for the sibling-shift
@@ -2374,21 +1481,6 @@
   to { transform: rotate(360deg); }
 }
 
-.settings-icon-spin {
-  transform-origin: center;
-  transform-box: fill-box;
-}
-
-@media (hover: hover) and (pointer: fine) and (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-  .settings-icon-spin {
-    animation: settings-spin 4s linear infinite;
-    animation-play-state: paused;
-  }
-  .settings-icon-spin-host:hover .settings-icon-spin {
-    animation-play-state: running;
-  }
-}
-
 /* PR-19g — Mobile section header: title + meta stack vertically so
    the surrounding row (grabber, chevron, header actions) center-
    aligns against the now-taller two-line block. Desktop keeps the
@@ -2400,22 +1492,11 @@
     gap: 2px;
   }
 }
-@media (max-width: 520px) {
-  .view-toggle button span { display: none; }
-  .view-toggle button { padding: 5px 8px; }
-}
 
 /* PR-18a — Library search: at narrow viewports the 180px search
    input wraps to its own row inside .library-filters (flex-wrap is
    already set) and stretches full-width. Keeps the filter chips on
    the top row, search on the second. */
-@media (max-width: 600px) {
-  .library-search {
-    width: 100%;
-    flex-basis: 100%;
-    margin-left: 0;
-  }
-}
 
 /* PR-41 — Phone library: swap the multi-column grid for a single
    horizontal row of desktop-sized cards with scroll-snap. Filter
@@ -2425,97 +1506,4 @@
    The 22px trailing padding plus card widths sized below viewport
    width leaves a peek of the next card visible — standard "more
    here" affordance. */
-@media (max-width: 640px) {
-  .library-filters {
-    position: sticky;
-    top: 0;
-    z-index: 5;
-    background: var(--p-bg-surface);
-    padding: 4px 0 6px;
-    margin: -4px 0 12px;
-  }
-  .library-grid {
-    display: flex;
-    flex-wrap: nowrap;
-    max-height: none;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    overscroll-behavior-x: contain;
-    -webkit-overflow-scrolling: touch;
-    padding: 6px 22px 10px 2px;
-    gap: 12px;
-  }
-  .library-grid::-webkit-scrollbar { height: 4px; }
-  .library-grid::-webkit-scrollbar-track { background: transparent; }
-  .library-grid::-webkit-scrollbar-thumb {
-    background: var(--p-border);
-    border-radius: 2px;
-  }
-  .library-grid .lib-card {
-    flex: 0 0 auto;
-    width: clamp(180px, 64vw, 210px);
-    scroll-snap-align: start;
-  }
-  /* Hover-lift translateY plays poorly when the parent is a
-     horizontal scroller — the lift shifts the snap target. */
-  .library-grid .lib-card:hover { transform: none; }
-}
 
-/* ── PR-18c: Mobile Settings ─────────────────────────────
-   Chevron-expandable cards pattern for /settings below 768px.
-   Pattern source: refactor/Menu for mobile settings.png. Multi-open
-   accordion; the section components themselves are unchanged from
-   desktop — only the chrome and the title-hide differ.
-   Desktop Settings (≥768px) is unaffected: this stylesheet defines
-   classes that only render via the MobileSettings JSX branch. */
-.mobile-settings-screen {
-  min-height: 100vh;
-  padding: 8px 16px 32px;
-}
-.mobile-settings-handle {
-  width: 36px;
-  height: 4px;
-  border-radius: 999px;
-  background: #E9E9E7;
-  margin: 6px auto 12px;
-}
-.mobile-settings-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 0 16px;
-}
-.mobile-settings-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.mobile-settings-section {
-  border: 1px solid #E9E9E7;
-  border-radius: 10px;
-  background: var(--p-bg-surface, #fff);
-  overflow: hidden;
-}
-.mobile-settings-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 56px;
-  padding: 14px 14px;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.mobile-settings-row:focus-visible {
-  outline: 2px solid var(--p-accent, #B8A070);
-  outline-offset: -2px;
-}
-.mobile-settings-panel {
-  overflow: hidden;
-}
-.mobile-settings-panel-inner {
-  padding: 4px 14px 14px;
-}

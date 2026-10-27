@@ -1,0 +1,1367 @@
+/*
+  Retired with R12 (the old chrome styles, "file by file"), approved by Stefan
+  on 22 October 2026; this part carried out on 27 October 2026 (C264 (b)).
+  Was in src/index.css. Each rule here names at least one class that nothing
+  in the live code draws any more: the old room editor and its library,
+  rails, tray and showcase (R16 to R21, R33), the build wizard (R14), the old
+  Settings page and its mobile sheet (R37), /chats (R4), the section drag
+  (R34) and the old Drafting Desk chat input. Not imported or built. To
+  restore a rule: move it back into src/index.css, inside the at-rule noted.
+*/
+
+/* was line 564; unused: sbrd-chat-hint */
+/* Chat-with-Claude empty-state hint bubble */
+.sbrd-chat-hint {
+  background-color: #F5F5F5;
+  color: #4A5568;
+}
+
+/* was line 568; unused: sbrd-chat-hint */
+.dark .sbrd-chat-hint {
+  background-color: #191919;
+  border: 1px solid #3A3730;
+  color: white;
+}
+
+/* was line 575; unused: sbrd-chat-input */
+/* Chat text input */
+.sbrd-chat-input {
+  background-color: #F5F5F5;
+  border: 1px solid #EBEBEB;
+  color: #1E2532;
+}
+
+/* was line 580; unused: sbrd-chat-input */
+.sbrd-chat-input::placeholder { color: #9B9A97; }
+
+/* was line 581; unused: sbrd-chat-input */
+.dark .sbrd-chat-input {
+  background-color: #191919;
+  border: 1px solid #3A3730;
+  color: white;
+}
+
+/* was line 586; unused: sbrd-chat-input */
+.dark .sbrd-chat-input::placeholder { color: #6B6963; }
+
+/* was line 598; unused: plcn-shelf */
+/* FileShelf border */
+.dark .plcn-shelf        { border-right-color: var(--p-border-subtle) !important; }
+
+/* was line 601; unused: plcn-canvas-bar */
+/* Canvas toolbar separator */
+.dark .plcn-canvas-bar   { border-bottom-color: var(--p-border-subtle) !important; }
+
+/* was line 604; unused: plcn-inspector */
+/* Inspector panel borders */
+.dark .plcn-inspector    { border-left-color: var(--p-border-subtle) !important; }
+
+/* was line 605; unused: plcn-insp-bar */
+.dark .plcn-insp-bar     { border-bottom-color: var(--p-border-subtle) !important; }
+
+/* was line 606; unused: plcn-insp-schema */
+.dark .plcn-insp-schema  { border-bottom-color: var(--p-border-subtle) !important; }
+
+/* was line 737; unused: shimmer-card */
+.shimmer-card {
+  animation: shimmer-card-pulse 0.85s ease-out forwards;
+}
+
+/* was line 741; unused: shimmer-nav */
+.shimmer-nav {
+  animation: shimmer-nav-flash 0.7s ease-out forwards;
+}
+
+/* was line 745; unused: shimmer-sidebar-border */
+.shimmer-sidebar-border {
+  animation: shimmer-sidebar-border 0.85s ease-out forwards;
+}
+
+/* was line 756; unused: wiz-sweep */
+/* CSS does best is now back in CSS.                                  */
+.wiz-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #D4A843 40%, #F5E6B8 60%, transparent);
+  top: -4px;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 0 8px 2px rgba(212, 168, 67, 0.28);
+}
+
+/* was line 767; unused: wiz-sweep */
+.wiz-sweep.go {
+  animation: wiz-sweepdn 0.75s ease-out forwards;
+}
+
+/* was line 775; unused: wiz-room */
+.wiz-room {
+  border: 1.5px dashed var(--p-text-light);
+  transition: border-color .4s, border-style .4s, background .6s;
+}
+
+/* was line 779; unused: wiz-room, igniting */
+.wiz-room.igniting {
+  animation: wiz-gflash 0.65s ease forwards;
+}
+
+/* was line 782; unused: wiz-room */
+.wiz-room.lit {
+  border-style: solid;
+  border-color: var(--p-gold-light);
+  background: var(--p-gold-tint);
+}
+
+/* was line 793; unused: wiz-feat */
+.wiz-feat {
+  border: 0.5px dashed var(--p-text-light);
+  color: var(--p-text-muted);
+  background: transparent;
+  transition: all .4s;
+}
+
+/* was line 799; unused: wiz-feat, igniting */
+.wiz-feat.igniting {
+  animation: wiz-fflash 0.55s ease forwards;
+}
+
+/* was line 802; unused: wiz-feat */
+.wiz-feat.lit {
+  border-style: solid;
+  border-color: var(--p-gold-light);
+  background: var(--p-gold-tint);
+  color: var(--p-gold-deep);
+}
+
+/* was line 814; unused: wiz-conn-dot */
+.wiz-conn-dot {
+  animation: wiz-breathe 2.5s ease-in-out infinite;
+}
+
+/* was line 834, inside @media (prefers-reduced-motion: reduce); unused: shimmer-card, shimmer-nav, shimmer-sidebar-border, wiz-sweep, wiz-room, igniting, wiz-feat, wiz-conn-dot */
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-card,
+    .shimmer-nav,
+    .shimmer-sidebar-border,
+    .wiz-sweep,
+    .wiz-sweep.go,
+    .wiz-room.igniting,
+    .wiz-feat.igniting,
+    .wiz-conn-dot {
+      animation: none !important;
+    }
+}
+
+/* was line 845, inside @media (prefers-reduced-motion: reduce); unused: shimmer-card */
+/* Still apply the resting state so power-on UX doesn't feel broken. */
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-card { border-color: #E9E9E7; }
+}
+
+/* was line 846, inside @media (prefers-reduced-motion: reduce); unused: shimmer-sidebar-border */
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-sidebar-border { border-color: #F1F1EF; }
+}
+
+/* was line 849, inside @media (prefers-reduced-motion: reduce); unused: wiz-sweep */
+/* see the room jump straight to the gold-tint settled state.       */
+@media (prefers-reduced-motion: reduce) {
+  .wiz-sweep { opacity: 0; }
+}
+
+/* was line 870; unused: section-drag-preview */
+/* PR-17: DragOverlay clone — same .section + .section-head styles plus
+   a lifted shadow so the floating preview reads as "this is the one
+   you're holding." */
+.section-drag-preview {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  cursor: grabbing;
+}
+
+/* was line 880; unused: section-grabber-handle */
+/* Drag handle wrapper. Now a real <button> (PR-17, for keyboard a11y
+   via dnd-kit's KeyboardSensor); base styling resets button chrome.
+   24x24 hit area on desktop; touch override lower in this file bumps
+   to 40x40. touch-action:none is required on iOS Safari — without it
+   the page scrolls instead of starting the drag. user-select:none
+   suppresses the long-press text callout. */
+.section-grabber-handle {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  margin-left: -4px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* was line 895; unused: section-grabber-handle */
+.section-grabber-handle:active { cursor: grabbing; }
+
+/* was line 905; unused: section-grabber */
+.section-grabber {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  color: var(--p-text-muted);
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+/* was line 916; unused: section-grabber */
+.section:hover .section-grabber { opacity: 1; }
+
+/* was line 917; unused: section-grabber */
+.section-grabber > div {
+  width: 12px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+/* was line 1058; unused: editor-area-card */
+/* ── Editor cards (PR-27) ─────────────────────────────────
+   Slot zones in the editor canvas read as soft cards, with each
+   placed component nested inside as a secondary card. Same card
+   recipe as .chat-input-card / .bp-action-card so the editor
+   visually belongs to the same family. Subtle bg variance per
+   area kind (rail vs main vs dock) gives the canvas its sense
+   of structure without competing with the components. */
+.editor-area-card {
+  background: var(--p-bg-base);
+  border: 0.5px solid var(--p-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  padding: 8px;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+/* was line 1066; unused: editor-area-card */
+.editor-area-card[data-area-kind="rail"]  { background: var(--p-bg-subtle); }
+
+/* was line 1067; unused: editor-area-card */
+.editor-area-card[data-area-kind="dock"]  { background: var(--p-bg-alt); }
+
+/* was line 1068; unused: editor-area-card */
+.editor-area-card[data-area-kind="main"]  { background: var(--p-bg-base); }
+
+/* was line 1069; unused: editor-area-card */
+.editor-area-card[data-area-kind="sheet"] { background: var(--p-bg-subtle); }
+
+/* was line 1070; unused: editor-area-card */
+.editor-area-card[data-area-empty="true"] {
+  background: transparent;
+  border-style: dashed;
+  box-shadow: none;
+}
+
+/* was line 1075; unused: editor-area-card */
+.editor-area-card[data-area-over="true"] {
+  border-color: var(--p-gold-light);
+  background: rgba(196, 169, 77, 0.08);
+}
+
+/* was line 1079; unused: editor-area-card */
+.editor-area-card[data-area-selected="true"] {
+  outline: 1.5px solid var(--p-gold-light);
+  outline-offset: 2px;
+}
+
+/* was line 1083; unused: editor-component-card */
+.editor-component-card {
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-border);
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+/* was line 1092; unused: editor-component-card */
+.editor-component-card:hover {
+  background: rgba(196, 169, 77, 0.06);
+}
+
+/* was line 1095; unused: editor-component-card */
+.editor-component-card[data-selected="true"] {
+  border-color: var(--p-gold-light);
+  outline: 1px solid var(--p-gold-light);
+}
+
+/* was line 1103; unused: editor-component-card, is-dragging */
+/* PR-49b: subtle feedback while a placed component is being dragged
+   between slots. dnd-kit keeps the source mounted in place during the
+   drag (the visual move is a transform on the overlay), so fading the
+   source while it's airborne makes the move feel real. */
+.editor-component-card.is-dragging {
+  opacity: 0.4;
+  box-shadow: 0 0 0 1px var(--p-gold-light);
+}
+
+/* was line 1174; unused: editor-grid */
+/* ── Editor grid + left-rail toggle (PR-48a) ──────────────
+   The 3-column editor grid transitions its template-columns when the
+   left rail collapses / expands, so the rail width animates smoothly
+   from 36px (collapsed) to 300px (expanded). The toggle button sits
+   on the rail's right edge — chevron-right when collapsed, chevron-
+   left when expanded — same visual language as the runtime
+   layout-panel-toggle. */
+.editor-grid {
+  transition: grid-template-columns 0.18s ease;
+}
+
+/* was line 1177; unused: editor-leftrail-toggle */
+.editor-leftrail-toggle {
+  position: absolute;
+  top: 14px;
+  right: -10px;
+  width: 20px;
+  height: 28px;
+  border-radius: 5px;
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--p-text-muted);
+  cursor: pointer;
+  z-index: 12;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+/* was line 1195; unused: editor-leftrail-toggle, is-collapsed */
+.editor-leftrail-toggle.is-collapsed {
+  position: relative;
+  top: 0;
+  right: 0;
+}
+
+/* was line 1200; unused: editor-leftrail-toggle */
+.editor-leftrail-toggle:hover {
+  color: var(--p-gold-light);
+  border-color: var(--p-gold-light);
+}
+
+/* was line 1205, inside @media (prefers-reduced-motion: reduce); unused: editor-grid */
+@media (prefers-reduced-motion: reduce) {
+  .editor-grid { transition: none; }
+}
+
+/* was line 1212; unused: primary-action-wrap */
+/* ── Editor top-bar primary action tooltip (PR-47) ────────
+   Disabled buttons don't fire mouseenter in Chrome, so we wrap the
+   button in a relative container and trigger the tooltip from the
+   wrapper's :hover. Tooltip sits below the top bar, pointing up. */
+.primary-action-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+/* was line 1216; unused: primary-action-tooltip */
+.primary-action-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #3A3530;
+  color: #F5F0E8;
+  font-size: 11px;
+  padding: 5px 9px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity 0.12s, transform 0.12s;
+  pointer-events: none;
+  z-index: 50;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* was line 1233; unused: primary-action-tooltip */
+.primary-action-tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  right: 12px;
+  border: 4px solid transparent;
+  border-bottom-color: #3A3530;
+}
+
+/* was line 1241; unused: primary-action-wrap, primary-action-tooltip */
+.primary-action-wrap:hover .primary-action-tooltip,
+.primary-action-wrap:focus-within .primary-action-tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* was line 1247, inside @media (prefers-reduced-motion: reduce); unused: primary-action-tooltip */
+@media (prefers-reduced-motion: reduce) {
+  .primary-action-tooltip { transition: opacity 0.12s; transform: none; }
+}
+
+/* was line 1255; unused: tray-mini-grid */
+/* ── Editor holding tray (PR-45 / PR-46b) ─────────────────
+   PR-46b: chips are now mini lib-cards — same shape as the Library
+   section's catalog cards, scaled down so a row of them fits below
+   the canvas. Layout is a responsive grid. Hover reveals an x badge
+   in the top-right corner of each card. */
+.tray-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+/* was line 1261; unused: tray-mini-card */
+.tray-mini-card {
+  position: relative;
+}
+
+/* was line 1264; unused: tray-mini-card */
+.tray-mini-card .lib-card {
+  padding: 8px;
+  gap: 4px;
+  border-radius: 8px;
+}
+
+/* was line 1269; unused: tray-mini-card */
+.tray-mini-card .lib-card:hover {
+  transform: none;
+  border-color: var(--p-gold-light);
+  box-shadow: 0 2px 8px -3px rgba(196, 169, 77, 0.2);
+}
+
+/* was line 1274; unused: tray-mini-card */
+.tray-mini-card .lib-preview {
+  height: 38px;
+  padding: 4px;
+}
+
+/* was line 1278; unused: tray-mini-card */
+.tray-mini-card .lib-card-head {
+  gap: 4px;
+}
+
+/* was line 1281; unused: tray-mini-card */
+.tray-mini-card .lib-card-type {
+  font-size: 8.5px;
+  padding: 0 5px;
+  line-height: 13px;
+}
+
+/* was line 1286; unused: tray-mini-card */
+.tray-mini-card .lib-card-status {
+  font-size: 8.5px;
+  padding: 0 5px;
+}
+
+/* was line 1290; unused: tray-mini-card */
+.tray-mini-card .lib-card-name {
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+/* was line 1294; unused: tray-mini-card */
+.tray-mini-card .lib-card-author,
+.tray-mini-card .lib-card-action {
+  display: none;
+}
+
+/* was line 1298; unused: tray-mini-card, is-dragging */
+.tray-mini-card.is-dragging .lib-card {
+  opacity: 0.5;
+}
+
+/* was line 1301; unused: tray-mini-card-x */
+.tray-mini-card-x {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-gold-light);
+  color: var(--p-gold-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s, color 0.12s, background 0.12s;
+  z-index: 2;
+}
+
+/* was line 1319; unused: tray-mini-card, tray-mini-card-x */
+.tray-mini-card:hover .tray-mini-card-x,
+.tray-mini-card-x:focus-visible {
+  opacity: 1;
+}
+
+/* was line 1323; unused: tray-mini-card-x */
+.tray-mini-card-x:hover {
+  color: #C8313B;
+  background: rgba(200, 49, 59, 0.10);
+}
+
+/* was line 1336; unused: editor-library-mode */
+/* ── Editor Library mode (PR-44) ──────────────────────────
+   The "shopping" surface that replaces the canvas when the user
+   clicks the Library pill in the editor top bar. Three chevron-
+   collapsible sections: Showcase / Library / Details.
+
+   Fixed default section sizes (no drag-to-resize yet — that lands
+   in PR-45+). Showcase + Library sections can grow with content;
+   the parent column scrolls. */
+.editor-library-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 22px 28px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* was line 1344; unused: editor-library-section */
+.editor-library-section {
+  border: 0.5px solid var(--p-border);
+  border-radius: 10px;
+  background: var(--p-bg-surface);
+  overflow: hidden;
+}
+
+/* was line 1350; unused: editor-library-section-head */
+.editor-library-section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--p-text-secondary);
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.12s;
+}
+
+/* was line 1364; unused: editor-library-section-head */
+.editor-library-section-head:hover {
+  background: var(--p-bg-subtle);
+}
+
+/* was line 1367; unused: editor-library-section-body */
+.editor-library-section-body {
+  padding: 4px 14px 14px;
+  border-top: 0.5px solid var(--p-border-subtle);
+}
+
+/* was line 1375; unused: editor-library-showcase-wrap */
+/* PR-48c: showcase wrap holds the grid + a same-size SVG overlay
+   that draws thin connector lines between cards sharing a sourceRoomId. */
+.editor-library-showcase-wrap {
+  position: relative;
+}
+
+/* was line 1378; unused: editor-library-showcase-overlay */
+.editor-library-showcase-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* was line 1386; unused: editor-library-showcase-wrap, editor-library-showcase-card */
+.editor-library-showcase-wrap .editor-library-showcase-card {
+  position: relative;
+  z-index: 1;
+}
+
+/* was line 1390; unused: editor-library-showcase-grid */
+.editor-library-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  padding: 6px 0;
+}
+
+/* was line 1396; unused: editor-library-showcase-card */
+.editor-library-showcase-card {
+  position: relative;
+  padding: 9px 11px;
+  border-radius: 7px;
+  border: 0.5px solid var(--p-border);
+  background: var(--p-bg-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 56px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+/* was line 1408; unused: editor-library-showcase-card, has-glow */
+.editor-library-showcase-card.has-glow {
+  border-color: color-mix(in oklab, var(--glow) 60%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--glow) 40%, transparent),
+    0 0 12px -2px color-mix(in oklab, var(--glow) 35%, transparent);
+}
+
+/* was line 1414; unused: editor-library-showcase-card, is-warning */
+.editor-library-showcase-card.is-warning {
+  border-color: #E0A300;
+  background: rgba(224, 163, 0, 0.08);
+}
+
+/* was line 1421; unused: editor-library-showcase-card, is-placed */
+/* PR-45: items already placed in the draft render with a subtle
+   "In room" tag in the kind row so users can tell at a glance which
+   Showcase cards are committed vs which are still pending in the bag. */
+.editor-library-showcase-card.is-placed {
+  background: var(--p-bg-surface);
+}
+
+/* was line 1424; unused: editor-library-showcase-card-placed-tag */
+.editor-library-showcase-card-placed-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: 7px;
+  background: rgba(196, 169, 77, 0.14);
+  color: var(--p-gold-deep, #8B6A10);
+  font-size: 8.5px;
+  letter-spacing: 0.3px;
+  line-height: 12px;
+  vertical-align: 1px;
+}
+
+/* was line 1436; unused: editor-library-showcase-card-kind */
+.editor-library-showcase-card-kind {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--p-text-muted);
+  font-weight: 500;
+}
+
+/* was line 1443; unused: editor-library-showcase-card-name */
+.editor-library-showcase-card-name {
+  font-size: 12px;
+  color: var(--p-text-primary);
+  font-weight: 500;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* was line 1455; unused: editor-library-showcase-card-x */
+.editor-library-showcase-card-x {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--p-text-muted);
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.12s, color 0.12s, background 0.12s;
+}
+
+/* was line 1472; unused: editor-library-showcase-card, editor-library-showcase-card-x */
+.editor-library-showcase-card:hover .editor-library-showcase-card-x,
+.editor-library-showcase-card-x:focus-visible {
+  opacity: 1;
+}
+
+/* was line 1476; unused: editor-library-showcase-card-x */
+.editor-library-showcase-card-x:hover {
+  color: #C8313B;
+  background: rgba(200, 49, 59, 0.08);
+}
+
+/* was line 1481; unused: editor-library-conflict */
+.editor-library-conflict {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  background: rgba(224, 163, 0, 0.10);
+  border: 0.5px solid rgba(224, 163, 0, 0.4);
+  color: #8B6A10;
+  font-size: 11px;
+}
+
+/* was line 1495; unused: editor-library-controls */
+/* ── Library (catalog) ────────────────────────────────────── */
+.editor-library-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 12px;
+  flex-wrap: wrap;
+}
+
+/* was line 1502; unused: editor-library-chips */
+.editor-library-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* was line 1507; unused: editor-library-search */
+.editor-library-search {
+  position: relative;
+  margin-left: auto;
+  width: 200px;
+}
+
+/* was line 1512; unused: editor-library-search */
+.editor-library-search svg {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--p-text-muted);
+  pointer-events: none;
+}
+
+/* was line 1520; unused: editor-library-search */
+.editor-library-search input {
+  width: 100%;
+  padding: 6px 26px 6px 26px;
+  font-size: 11.5px;
+  border: 0.5px solid var(--p-border);
+  border-radius: 6px;
+  background: var(--p-bg-surface);
+  color: var(--p-text-primary);
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.12s;
+}
+
+/* was line 1532; unused: editor-library-search */
+.editor-library-search input:focus {
+  border-color: var(--p-gold-light);
+}
+
+/* was line 1535; unused: editor-library-search-clear */
+.editor-library-search-clear {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--p-text-muted);
+  cursor: pointer;
+  transition: color 0.12s, background 0.12s;
+}
+
+/* was line 1552; unused: editor-library-search-clear */
+.editor-library-search-clear:hover {
+  color: var(--p-text-primary);
+  background: var(--p-bg-subtle);
+}
+
+/* was line 1556; unused: editor-library-grid */
+.editor-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 4px 2px;
+}
+
+/* was line 1566; unused: editor-library-section-resize */
+/* PR-46c → PR-48b: the catalog grid no longer caps its own height;
+   the Library section body's user-resizable height (default 320px,
+   draggable via the resize handle) is the source of truth, with
+   `overflow-y: auto` set inline by the Section component. */
+.editor-library-section-resize {
+  height: 6px;
+  cursor: row-resize;
+  background: transparent;
+  position: relative;
+  user-select: none;
+  touch-action: none;
+}
+
+/* was line 1574; unused: editor-library-section-resize */
+.editor-library-section-resize::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--p-border);
+  transition: background 0.12s;
+}
+
+/* was line 1586; unused: editor-library-section-resize */
+.editor-library-section-resize:hover::before,
+.editor-library-section-resize:active::before {
+  background: var(--p-gold-light);
+  height: 3px;
+}
+
+/* was line 1591; unused: editor-library-section-resize */
+.editor-library-section-resize:hover {
+  background: rgba(196, 169, 77, 0.04);
+}
+
+/* was line 1594; unused: editor-library-card-wrap */
+.editor-library-card-wrap {
+  position: relative;
+}
+
+/* was line 1597; unused: editor-library-card-wrap */
+.editor-library-card-wrap .lib-card {
+  width: 100%;
+  transition: border-color 0.12s, transform 0.12s, box-shadow 0.12s;
+}
+
+/* was line 1601; unused: editor-library-card-wrap, is-checked */
+.editor-library-card-wrap.is-checked .lib-card {
+  border-color: var(--p-gold-light);
+  box-shadow: 0 0 0 1px var(--p-gold-light);
+}
+
+/* was line 1605; unused: editor-library-card-wrap, is-focused */
+.editor-library-card-wrap.is-focused .lib-card {
+  border-color: var(--p-gold-light);
+  box-shadow: 0 4px 14px -4px rgba(196, 169, 77, 0.30);
+}
+
+/* was line 1609; unused: editor-library-card-check */
+.editor-library-card-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-border);
+  color: transparent;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  pointer-events: none;
+}
+
+/* was line 1625; unused: editor-library-card-check, is-on */
+.editor-library-card-check.is-on {
+  background: var(--p-gold-light);
+  border-color: var(--p-gold-light);
+  color: white;
+}
+
+/* was line 1632; unused: editor-library-details */
+/* ── Details ──────────────────────────────────────────────── */
+.editor-library-details {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 8px 0 4px;
+}
+
+/* was line 1638; unused: editor-library-details-head */
+.editor-library-details-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* was line 1644; unused: editor-library-details-cta */
+.editor-library-details-cta {
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 6px;
+  background: var(--p-bg-surface);
+  border: 0.5px solid var(--p-gold-light);
+  color: var(--p-gold-deep, #8B6A10);
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+
+/* was line 1657; unused: editor-library-details-cta */
+.editor-library-details-cta:hover {
+  background: rgba(196, 169, 77, 0.08);
+}
+
+/* was line 1660; unused: editor-library-details-cta, is-on */
+.editor-library-details-cta.is-on {
+  background: var(--p-gold-light);
+  color: white;
+}
+
+/* was line 1664; unused: editor-library-details-cta, is-on */
+.editor-library-details-cta.is-on:hover {
+  background: var(--p-gold-muted);
+}
+
+/* was line 1667; unused: editor-library-details-body-text */
+.editor-library-details-body-text {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--p-text-secondary);
+  margin: 0;
+}
+
+/* was line 1673; unused: editor-library-details-bundle */
+.editor-library-details-bundle {
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--p-bg-subtle);
+  border: 0.5px solid var(--p-border-subtle);
+}
+
+/* was line 1679; unused: editor-library-details-bundle-list */
+.editor-library-details-bundle-list {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--p-text-secondary);
+}
+
+/* was line 1688; unused: chats-search, search-icon, library-search */
+/* ── Search-icon helper (chats + library) ─────────────────── */
+.chats-search .search-icon,
+.library-search .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--p-text-muted);
+  width: 13px;
+  height: 13px;
+  pointer-events: none;
+}
+
+/* was line 1700; unused: view-toggle */
+.view-toggle {
+  display: flex;
+  background: var(--p-bg-subtle);
+  border: 0.5px solid var(--p-border);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+  margin-left: auto;
+}
+
+/* was line 1709; unused: view-toggle */
+.view-toggle button {
+  padding: 5px 10px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--p-text-secondary);
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* was line 1723; unused: view-toggle */
+.view-toggle button.active {
+  background: var(--p-bg-surface);
+  color: var(--p-text-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* was line 1735; unused: library-filters */
+/* ── Library section ──────────────────────────────────────── */
+.library-filters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+/* was line 1742; unused: filter-chip */
+.filter-chip {
+  padding: 5px 12px;
+  border: 0.5px solid var(--p-border);
+  border-radius: 14px;
+  background: var(--p-bg-surface);
+  color: var(--p-text-secondary);
+  font-size: 11.5px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: border-color 0.12s, background 0.12s, color 0.12s;
+}
+
+/* was line 1753; unused: filter-chip */
+.filter-chip:hover { border-color: var(--p-text-light); }
+
+/* was line 1754; unused: filter-chip */
+.filter-chip.active {
+  background: rgba(196, 169, 77, 0.08);
+  border-color: var(--p-gold-light);
+  color: var(--p-gold-deep, #8B6A10);
+}
+
+/* was line 1759; unused: library-search */
+.library-search {
+  margin-left: auto;
+  position: relative;
+  width: 180px;
+}
+
+/* was line 1764; unused: library-search */
+.library-search input {
+  width: 100%;
+  padding: 5px 10px 5px 26px;
+  font-size: 11.5px;
+  border: 0.5px solid var(--p-border);
+  border-radius: 6px;
+  background: var(--p-bg-surface);
+  color: var(--p-text-primary);
+  outline: none;
+}
+
+/* was line 1774; unused: library-search */
+.library-search input:focus { border-color: var(--p-gold-light); }
+
+/* was line 1775; unused: library-grid */
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  justify-content: start;
+  gap: 12px;
+  max-height: 520px;
+  overflow-y: auto;
+  padding: 6px 6px 6px 2px;
+}
+
+/* was line 1785, inside @media (min-width: 900px); unused: library-grid */
+@media (min-width: 900px) {
+  .library-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* was line 1788, inside @media (max-width: 899px) and (min-width: 640px); unused: library-grid */
+@media (max-width: 899px) and (min-width: 640px) {
+  .library-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* was line 1791, inside @media (max-width: 639px); unused: library-grid */
+@media (max-width: 639px) {
+  .library-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* was line 1794, inside @media (max-width: 420px); unused: library-grid */
+@media (max-width: 420px) {
+  .library-grid { grid-template-columns: 1fr; }
+}
+
+/* was line 1932; unused: lrail-cards */
+/* Editor left-rail vertical card stack (PR-19c). Uses .lib-card for visual
+   consistency with the homepage library, just stacked single-column. */
+.lrail-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* was line 1937; unused: lrail-cards */
+.lrail-cards .lib-card { padding: 10px; gap: 6px; }
+
+/* was line 1938; unused: lrail-cards */
+.lrail-cards .lib-preview { height: 60px; }
+
+/* was line 1939; unused: lrail-cards */
+.lrail-cards .lib-card-name { font-size: 12px; }
+
+/* was line 2184, inside @media (max-width: 768px); unused: ov-sheet-mobile */
+@media (max-width: 768px) {
+  .ov-backdrop.ov-sheet-mobile {
+      align-items: flex-end;
+      justify-content: stretch;
+    }
+}
+
+/* was line 2188, inside @media (max-width: 768px); unused: ov-sheet-mobile */
+@media (max-width: 768px) {
+  .ov-backdrop.ov-sheet-mobile .ov-panel {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      max-height: 85vh;
+      border-left: none;
+      border-top: 0.5px solid var(--p-border);
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      animation: ov-slideup 0.22s ease;
+    }
+}
+
+/* was line 2204; unused: ov-sheet-handle */
+.ov-sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--p-border);
+  margin: -8px auto 8px;
+  display: none;
+}
+
+/* was line 2213, inside @media (max-width: 768px); unused: ov-sheet-mobile, ov-sheet-handle */
+@media (max-width: 768px) {
+  .ov-backdrop.ov-sheet-mobile .ov-sheet-handle { display: block; }
+}
+
+/* was line 2254; unused: ov-room-pills */
+.ov-room-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* was line 2259; unused: ov-room-pill */
+.ov-room-pill {
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(196, 169, 77, 0.12);
+  border: 0.5px solid rgba(196, 169, 77, 0.35);
+  color: #8B6A10;
+  font-weight: 500;
+}
+
+/* was line 2331, inside @media (hover: none) and (pointer: coarse); unused: section-grabber */
+/* PR-17: section reorder works on touch via dnd-kit
+     (TouchSensor delay: 250ms + tolerance: 5px). The grabber stays
+     visible at rest (no hover state on touch primary) and bumps to
+     a 40x40 finger-sized hit target. */
+@media (hover: none) and (pointer: coarse) {
+  .section-grabber { opacity: 1; }
+}
+
+/* was line 2332, inside @media (hover: none) and (pointer: coarse); unused: section-grabber-handle */
+@media (hover: none) and (pointer: coarse) {
+  .section-grabber-handle { width: 40px; height: 40px; }
+}
+
+/* was line 2377; unused: settings-icon-spin */
+.settings-icon-spin {
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+/* was line 2383, inside @media (hover: hover) and (pointer: fine) and (min-width: 768px) and (prefers-reduced-motion: no-preference); unused: settings-icon-spin */
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .settings-icon-spin {
+      animation: settings-spin 4s linear infinite;
+      animation-play-state: paused;
+    }
+}
+
+/* was line 2387, inside @media (hover: hover) and (pointer: fine) and (min-width: 768px) and (prefers-reduced-motion: no-preference); unused: settings-icon-spin-host, settings-icon-spin */
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .settings-icon-spin-host:hover .settings-icon-spin {
+      animation-play-state: running;
+    }
+}
+
+/* was line 2404, inside @media (max-width: 520px); unused: view-toggle */
+@media (max-width: 520px) {
+  .view-toggle button span { display: none; }
+}
+
+/* was line 2405, inside @media (max-width: 520px); unused: view-toggle */
+@media (max-width: 520px) {
+  .view-toggle button { padding: 5px 8px; }
+}
+
+/* was line 2413, inside @media (max-width: 600px); unused: library-search */
+@media (max-width: 600px) {
+  .library-search {
+      width: 100%;
+      flex-basis: 100%;
+      margin-left: 0;
+    }
+}
+
+/* was line 2429, inside @media (max-width: 640px); unused: library-filters */
+@media (max-width: 640px) {
+  .library-filters {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: var(--p-bg-surface);
+      padding: 4px 0 6px;
+      margin: -4px 0 12px;
+    }
+}
+
+/* was line 2437, inside @media (max-width: 640px); unused: library-grid */
+@media (max-width: 640px) {
+  .library-grid {
+      display: flex;
+      flex-wrap: nowrap;
+      max-height: none;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      padding: 6px 22px 10px 2px;
+      gap: 12px;
+    }
+}
+
+/* was line 2449, inside @media (max-width: 640px); unused: library-grid */
+@media (max-width: 640px) {
+  .library-grid::-webkit-scrollbar { height: 4px; }
+}
+
+/* was line 2450, inside @media (max-width: 640px); unused: library-grid */
+@media (max-width: 640px) {
+  .library-grid::-webkit-scrollbar-track { background: transparent; }
+}
+
+/* was line 2451, inside @media (max-width: 640px); unused: library-grid */
+@media (max-width: 640px) {
+  .library-grid::-webkit-scrollbar-thumb {
+      background: var(--p-border);
+      border-radius: 2px;
+    }
+}
+
+/* was line 2455, inside @media (max-width: 640px); unused: library-grid */
+@media (max-width: 640px) {
+  .library-grid .lib-card {
+      flex: 0 0 auto;
+      width: clamp(180px, 64vw, 210px);
+      scroll-snap-align: start;
+    }
+}
+
+/* was line 2462, inside @media (max-width: 640px); unused: library-grid */
+/* Hover-lift translateY plays poorly when the parent is a
+     horizontal scroller — the lift shifts the snap target. */
+@media (max-width: 640px) {
+  .library-grid .lib-card:hover { transform: none; }
+}
+
+/* was line 2472; unused: mobile-settings-screen */
+/* ── PR-18c: Mobile Settings ─────────────────────────────
+   Chevron-expandable cards pattern for /settings below 768px.
+   Pattern source: refactor/Menu for mobile settings.png. Multi-open
+   accordion; the section components themselves are unchanged from
+   desktop — only the chrome and the title-hide differ.
+   Desktop Settings (≥768px) is unaffected: this stylesheet defines
+   classes that only render via the MobileSettings JSX branch. */
+.mobile-settings-screen {
+  min-height: 100vh;
+  padding: 8px 16px 32px;
+}
+
+/* was line 2476; unused: mobile-settings-handle */
+.mobile-settings-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: #E9E9E7;
+  margin: 6px auto 12px;
+}
+
+/* was line 2483; unused: mobile-settings-header */
+.mobile-settings-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 16px;
+}
+
+/* was line 2489; unused: mobile-settings-list */
+.mobile-settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* was line 2494; unused: mobile-settings-section */
+.mobile-settings-section {
+  border: 1px solid #E9E9E7;
+  border-radius: 10px;
+  background: var(--p-bg-surface, #fff);
+  overflow: hidden;
+}
+
+/* was line 2500; unused: mobile-settings-row */
+.mobile-settings-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  padding: 14px 14px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* was line 2512; unused: mobile-settings-row */
+.mobile-settings-row:focus-visible {
+  outline: 2px solid var(--p-accent, #B8A070);
+  outline-offset: -2px;
+}
+
+/* was line 2516; unused: mobile-settings-panel */
+.mobile-settings-panel {
+  overflow: hidden;
+}
+
+/* was line 2519; unused: mobile-settings-panel-inner */
+.mobile-settings-panel-inner {
+  padding: 4px 14px 14px;
+}

@@ -1,3 +1,7 @@
+// Retired with R30, approved by Stefan on 27 October 2026: Toggle buttons for a room's tools, used by nothing.
+// Was src/components/core/ToolToggles.jsx. Nothing imports it and it is not built. To restore:
+// Move it back; nothing needs changing.
+
 import { motion } from 'framer-motion'
 import { Globe, Calculator, BarChart2 } from 'lucide-react'
 import { SPRING_SNAPPY } from '../../lib/constants'

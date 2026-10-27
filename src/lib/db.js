@@ -804,22 +804,6 @@ export async function runIntegrityCheck() {
 
 // ─── Export / Import ─────────────────────────────────────
 
-export async function exportAllData() {
-  const db = await initDB()
-  return {
-    conversations: await db.getAll('conversations'),
-    messages: await db.getAll('messages'),
-    highlights: await db.getAll('highlights'),
-    notes: await db.getAll('notes'),
-    favorites: await db.getAll('favorites'),
-    pins: await db.getAll('pins'),
-    settings: await db.getAll('settings'),
-    sbrd_documents: await db.getAll('sbrd_documents'),
-    exportedAt: new Date().toISOString(),
-    version: 1,
-  }
-}
-
 export async function importData(data) {
   // The older JSON export (R10) comes in through the same restore as a
   // backup (backupData.js): cleaned to the allowlist, checked, written in one

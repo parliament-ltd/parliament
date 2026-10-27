@@ -3783,6 +3783,24 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Tests:** the steps and their commands; the Lab step from the arrangement; the old Library tick read as the Lab's; the copy rules, which now know "I've", "I'm", "I'd" and "Ruby". 1,335 tests.
 - **Tried in the browser:** the trial copy's welcome page shows the letter word for word, the closing, and the ten steps with the new words.
 
+**C266. Stage 15, piece 1, as built: the code tidied** (27 October; C264 (b), (c) as ruled).
+- **Moved to `src/deprecated/`,** each with a header saying what it was, its line and how to put it back, and listed in the folder's README:
+  - **R30:** `hooks/useMode.js`, `components/core/ToolToggles.jsx` and `components/core/CitedMarkdown.jsx`, plus `public/flight_logo.png` (to `src/deprecated/public/`), so the site no longer serves it.
+  - **R9:** `components/HomepageTopBar.jsx`.
+  - **R10:** `exportAllData`, out of `db.js` into `lib/exportAllData.js`. Files it made still restore.
+  - **R12, the second part:** 167 rules of `src/index.css` (about 830 lines; the file goes from 2,521 lines to 1,686), into `styles/index-old.css`, each with the comment above it, the media query around it, its old line and the classes nothing draws. A rule moved only when every one of its selectors names a class that no live file mentions, whole or built in a template. A rescan finds none left.
+    - They are the old editor, its library, rails, tray and showcase; the wizard; the old Settings page and its mobile sheet; `/chats`; the section drag; and the old Drafting Desk chat input.
+- **R11:** `modes.js` still reads homepage-scope rooms, so old records and backups read, as ruled.
+- **R35:** the Inter font package and its import in `main.jsx` are gone. Nothing named the font, so nothing on screen changes.
+- **`@dnd-kit`:** all four packages left the dependencies (R16, R34). Only files in `src/deprecated/` named it.
+- **Exact versions** (C264 (c)): every `^` range in `package.json` is now the version the lockfile had installed, so nothing installed changes. For example, React 19.2.4, Vite 7.3.7, React Router 7.18.4.
+- **R31:** `refactor/` stays. `continuation-*.md` and `.pr-body.md` are in `.gitignore`, kept on this computer and never published.
+- **The plan's table** now notes each approval and how it was carried out, the stage 6 ones (R1 to R13, R27) included.
+- **Found, proposed as R43:** `src/hooks/useShimmer.js`, the old "power-on shimmer", is used by nothing. It is not on any approved line, so it stays until ruled.
+- **Tests:** 1,335. Lint: 30 warnings, all older; the moved `exportAllData` imports `initDB` from where it used to live, as other moved files do. The build passes.
+- **Tried in the browser** on the trial copy, after a reload: the welcome page, the rooms and the Collection, then `lab:` (the Library, the Canvas and the Blocks board) and `done:`, all drawn as before.
+- **Seen in passing:** the board strip shows the Collection's raw id where its name should be. It is older than this piece and offered as a separate task.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

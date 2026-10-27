@@ -1,3 +1,7 @@
+// Retired with R9, approved by Stefan on 27 October 2026: The homepage's top bar, above the Study.
+// Was src/components/HomepageTopBar.jsx. Nothing imports it and it is not built. To restore:
+// Move it back and draw it where the Study was.
+
 // HomepageTopBar — page-level chrome above The Study (V2 homepage) and
 // the Build wizard.
 //

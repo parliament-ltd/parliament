@@ -25,3 +25,7 @@ dist-ssr
 
 # Claude Code worktrees: full copies of the code that tools must not scan
 .claude/worktrees/
+
+# Working notes between sessions, kept on this computer and never published (R31, C264 (b))
+continuation-*.md
+.pr-body.md

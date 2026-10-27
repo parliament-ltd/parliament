@@ -581,7 +581,7 @@ Built to Lab v7 (A2). Can run beside the others once stage 3 exists.
 - **Done early, on 15 October:** DNS moved to deSEC with DNSSEC, and mail set up at Proton. The records are in `docs/hosting.md`.
 - **Needs from you:** a yes before the public push, which cannot be taken back. R31 is put to you here.
 
-**Status, 27 October: proposed in nine pieces as C264,** with the vault (C170) built before going public, and choices on R30, R31 and R35, the vault's address and exceptions, a draft deploy, when the site switches, what the public history holds, and the mirror and standby hosts. **Ruled 27 October** (C264): as suggested, except that everything is tried on the live site rather than a draft deploy, and the mirror and standby hosts are chosen again: Bitbucket, pushed to with GitHub at each release, and Cloudflare Pages.
+**Status, 27 October: proposed in nine pieces as C264,** with the vault (C170) built before going public, and choices on R30, R31 and R35, the vault's address and exceptions, a draft deploy, when the site switches, what the public history holds, and the mirror and standby hosts. **Ruled 27 October** (C264): as suggested, except that everything is tried on the live site rather than a draft deploy, and the mirror and standby hosts are chosen again: Bitbucket, pushed to with GitHub at each release, and Cloudflare Pages. **Piece 1 built (C266):** the code tidied; R43 proposed.
 
 ### Across stages: security and privacy (ruled 21 October)
 
@@ -605,22 +605,22 @@ stay readable so every backup ever written still restores.
 
 | # | What | Where | Replaced by | Stage |
 |---|---|---|---|---|
-| R1 | Blueprint section of the homepage | `src/catalog/entries/blueprint*.jsx`, `src/lib/blueprintShapes.js` | Nothing; dropped with the homepage | 6 |
-| R2 | Blueprint overlay and its Cmd/Ctrl+. shortcut | `src/components/BlueprintOverlay.jsx` | Nothing | 6 |
-| R3 | The Study: the homepage view and its seeded mode | `src/views/HomepageView.jsx`, `home_default`, `/edit-home` | The Almanac and the welcome page | 6 |
-| R4 | The `/chats` selector | `src/views/SelectorView.jsx`, `SelectorLayout.jsx` | The Almanac | 6 |
-| R5 | The homepage Chats section | `src/catalog/entries/chats*.jsx` | The Almanac | 6 |
+| R1 | Blueprint section of the homepage | `src/catalog/entries/blueprint*.jsx`, `src/lib/blueprintShapes.js` | Nothing; dropped with the homepage **Approved 22 October** (stage 6 checkpoint), moved to `src/deprecated/`. | 6 |
+| R2 | Blueprint overlay and its Cmd/Ctrl+. shortcut | `src/components/BlueprintOverlay.jsx` | Nothing **Approved 22 October,** moved to `src/deprecated/`. | 6 |
+| R3 | The Study: the homepage view and its seeded mode | `src/views/HomepageView.jsx`, `home_default`, `/edit-home` | The Almanac and the welcome page **Approved 22 October,** moved to `src/deprecated/`; `/edit-home` goes to `/`. | 6 |
+| R4 | The `/chats` selector | `src/views/SelectorView.jsx`, `SelectorLayout.jsx` | The Almanac **Approved 22 October,** moved to `src/deprecated/`; `/chats` goes to `/`. | 6 |
+| R5 | The homepage Chats section | `src/catalog/entries/chats*.jsx` | The Almanac **Approved 22 October,** moved to `src/deprecated/`. | 6 |
 | R6 | Favourites as a feature | `favorites*.jsx`, the heart on messages, the favourite functions in `AnnotationsContext` | The Favorites collection. The old list stays readable | 6 |
-| R7 | Quick stats, recent activity, the homepage scratchpad | `quick-stats.jsx`, `recent-activity.jsx`, `scratchpad.jsx` | The Almanac's columns; a free-standing note | 6 |
-| R8 | The homepage Library section | `src/catalog/entries/library*.jsx` | The Library board | 6 |
-| R9 | The homepage top bar | `src/components/HomepageTopBar.jsx` | The bar | 6 |
-| R10 | The older `.apb` and JSON export buttons | `SettingsView.jsx`, `db.js` `exportAllData` | `.parliament` only. Reading old files stays for good. **Approved 23 October,** carried out with R37 | 9 |
-| R11 | Homepage-scope mode files and `/edit-home` | `scope: 'homepage'` in `modes.js` | No homepage room | 6 |
-| R12 | Old chrome styles | `index.css` rules for the Study, `/chats`, the top bar, old gold states | The chrome layer. Removed file by file, each listed in its commit | 6 onward |
-| R13 | "Pin for reference" as a label | `messages-render.jsx` | A quote. The stored pins stay | 6 |
+| R7 | Quick stats, recent activity, the homepage scratchpad | `quick-stats.jsx`, `recent-activity.jsx`, `scratchpad.jsx` | The Almanac's columns; a free-standing note **Approved 22 October,** moved to `src/deprecated/`. | 6 |
+| R8 | The homepage Library section | `src/catalog/entries/library*.jsx` | The Library board **Approved 22 October,** moved to `src/deprecated/`. | 6 |
+| R9 | The homepage top bar | `src/components/HomepageTopBar.jsx` | The bar **Approved 22 October;** `HomepageTopBar.jsx` moved to `src/deprecated/` on 27 October (C264 (b)). | 6 |
+| R10 | The older `.apb` and JSON export buttons | `SettingsView.jsx`, `db.js` `exportAllData` | `.parliament` only. Reading old files stays for good. **Approved 23 October,** carried out with R37 **Carried out with R37;** `exportAllData` moved to `src/deprecated/lib/` on 27 October (C264 (b)). Old files still restore. | 9 |
+| R11 | Homepage-scope mode files and `/edit-home` | `scope: 'homepage'` in `modes.js` | No homepage room **Approved 22 October;** the homepage seed moved to `src/deprecated/`. `modes.js` still reads homepage-scope rooms, so old records and backups read. | 6 |
+| R12 | Old chrome styles | `index.css` rules for the Study, `/chats`, the top bar, old gold states | The chrome layer. Removed file by file, each listed in its commit **Approved 22 October,** file by file: the homepage rules on 22 October (`styles/homepage.css`), the other 167 unused rules on 27 October (`styles/index-old.css`, C264 (b)). | 6 onward |
+| R13 | "Pin for reference" as a label | `messages-render.jsx` | A quote. The stored pins stay **Approved 22 October,** carried out: the label reads "Quote in a chat". | 6 |
 | R14 | The build wizard as a page | `/build`, `BuildView.jsx`, `src/components/build/**` | The guide in the Lab; templates in the Library. **Approved 27 October (C250),** moved to `src/deprecated/`; `/build` opens the Lab | 13 |
 | R15 | Tooltip tours, the first-run gate and their flags | `TourTooltip.jsx`, `tourCompleted_*` | The welcome steps and `tour:`. **Approved 21 October,** carried out when `/` shows the welcome page; old backups keep reading the flags | 5 |
-| R16 | Drag and drop in the editor, then `@dnd-kit` | Drag wiring in `EditorView.jsx` and the editor components | Commands. **Approved 27 October (C250),** moved to `src/deprecated/`; `@dnd-kit` leaves at stage 15 | 13, 15 |
+| R16 | Drag and drop in the editor, then `@dnd-kit` | Drag wiring in `EditorView.jsx` and the editor components | Commands. **Approved 27 October (C250),** moved to `src/deprecated/`; `@dnd-kit` leaves at stage 15 `@dnd-kit` left the dependencies on 27 October (C264). | 13, 15 |
 | R17 | The holding tray | `EditorHoldingTray.jsx`, four reducer actions, its styles | `rm:` and `undo:`. **Approved 27 October (C250),** moved to `src/deprecated/` | 13 |
 | R18 | The inspector | `EditorRightRail.jsx` | The room line, the Blocks board, `inspect:`. **Approved 27 October (C250),** moved to `src/deprecated/` | 13 |
 | R19 | The editor's left rail and top-bar pills | `EditorLeftRail.jsx`, `EditorTopBar.jsx` | The Library board and the bar. **Approved 27 October (C250),** moved to `src/deprecated/` | 13 |
@@ -631,14 +631,14 @@ stay readable so every backup ever written still restores.
 | R24 | Web search, voice input and file attach as separate blocks | Nine files and three small registries | Features of input, carried by the bar in prompt mode. R25 waits for this. **Approved 27 October (C250 (e)),** on R25's condition: carried out with R42. **Carried out 27 October with today's chat page (C252),** moved to `src/deprecated/`; rooms keep the old blocks, read as features | 13 |
 | R25 | The room's own composer on screen | The composer drawn by `input-render.jsx`. `InputArea.jsx`'s logic is kept behind the bar | The bar in prompt mode. **Approved 21 October, on condition:** only once today's chat page is replaced and the bar carries web search, voice input and file attach (with R24). **Carried out 27 October with today's chat page (C252),** moved to `src/deprecated/`; the input block stays, drawing nothing | 4, carried out with R24 |
 | R26 | The branch panel and its shortcut | `BranchCreationPanel.jsx`, `BranchPanelContext.jsx`, `BranchShortcutHandler.jsx` | `open:` with or without a summary, `again:`, `new:branch`. **Approved 23 October,** carried out when today's chat page is replaced by the room in the shell (as R22 and R25). **Carried out 27 October with today's chat page (C252),** moved to `src/deprecated/` | 8 |
-| R27 | The backup status dot and banner | `BackupStatusIndicator.jsx`, `BackupReminderBanner.jsx` | One line of marginalia on the Almanac | 6 |
+| R27 | The backup status dot and banner | `BackupStatusIndicator.jsx`, `BackupReminderBanner.jsx` | One line of marginalia on the Almanac **Approved 22 October,** moved to `src/deprecated/`. | 6 |
 | R28 | Settings options that go or do nothing | "Automatic" compression, the theme switch, session usage figures; the budget alert, summary depth and last-backup values, which nothing reads | Removed by the Settings spec. Stored values stay. **Approved 23 October,** carried out with R37 | 9 |
-| R30 | Files nothing uses today | `src/hooks/useMode.js`, `src/components/core/ToolToggles.jsx`, `src/components/core/CitedMarkdown.jsx`, `public/flight_logo.png` | Nothing | any |
-| R31 | Old process documents | `refactor/`, the `continuation-*.md` notes, `.pr-body.md` | An archive, if you want one. Decide what is published before going public | 15 |
+| R30 | Files nothing uses today | `src/hooks/useMode.js`, `src/components/core/ToolToggles.jsx`, `src/components/core/CitedMarkdown.jsx`, `public/flight_logo.png` | Nothing **Approved 27 October (C264 (b)),** moved to `src/deprecated/`. | any |
+| R31 | Old process documents | `refactor/`, the `continuation-*.md` notes, `.pr-body.md` | An archive, if you want one. Decide what is published before going public **Approved 27 October (C264 (b)):** `refactor/` stays; the notes and `.pr-body.md` are ignored by git and never published. | 15 |
 | R32 | The three silent calls after a first answer | `src/stores/ChatContext.jsx`: **done 21 October** under C62's ruling. The three provider methods they called (`generateTitle`, `generateSummary`, `generateTags`): **approved 21 October,** moved to `src/deprecated/` | One named call (C62) | 4 |
 | R33 | The Showcase, the room-source glow and connector lines in the editor | `src/components/editor/` | Nothing. **Approved 27 October (C250),** moved to `src/deprecated/` | 13 |
-| R34 | Reordering by drag in the stacked-sections layout | `stacked-sections.jsx`, `SectionCard.jsx` | Move up, move down. The layout itself stays. **Approved 27 October (C250),** the drag taken out | 13 |
-| R35 | The Inter font package | `@fontsource-variable/inter`, shipped and never applied | The system fonts already in use | 15 |
+| R34 | Reordering by drag in the stacked-sections layout | `stacked-sections.jsx`, `SectionCard.jsx` | Move up, move down. The layout itself stays. **Approved 27 October (C250),** the drag taken out `@dnd-kit` left the dependencies on 27 October (C264). | 13 |
+| R35 | The Inter font package | `@fontsource-variable/inter`, shipped and never applied | The system fonts already in use **Approved 27 October (C264 (b)),** the package and its import removed. | 15 |
 | R36 | The old slot tables and fallback rule | `SLOT_FALLBACKS` and the three copies of slot data | The layout manifest. **Approved 27 October (C250),** the fallback table moved to `src/deprecated/` with the editor, the seed's placeholders taken out; stored records untouched | 13 |
 | R37 | The old Settings page | `src/views/SettingsView.jsx`, the `/settings` route | The Settings board; `/settings` opens it. **Approved 23 October,** moved to `src/deprecated/` (C186) | 9 |
 | R39 | Drafting Desk, retired into Writing Studio | The `drafting-desk@1.0` template, `document-canvas`, `claude-comments` and `ripple-analysis` blocks, `DocumentContext`, `src/components/core/sbrd/` | Editing in place, asks, suggestions and Ripple (stages 11 and 12). Its documents stay readable. **Proposed 27 October (C237 (b)); ruled the same day to wait:** decided after the refactor, with the review of asks and Ripple | after 15 |
@@ -646,6 +646,7 @@ stay readable so every backup ever written still restores.
 | R42 | Today's chat page | `/chat/:id`, `ChatView.jsx`; the branches block's links to it | The chat in its room on the new screens. R22, R24, R25 and R26 wait for it. **Approved 27 October (C250 (f)),** built as piece 8 of stage 13. **Carried out 27 October (C252):** `/chat/:id` shows the chat in its room on the new screens | 13 |
 | R40 | The Review modal and its block | `src/components/ReviewModal.jsx`, `src/catalog/entries/review*.jsx` | The Reflection board. Rooms keep the block in their stored list and skip it. **Approved 27 October (C237 (d)),** moved to `src/deprecated/` | 12 |
 | R38 | Four Enter-line messages nothing says any more (**approved 24 October; carried out 24 October, C204**) | `enter.openDocket`, `enter.openDocketHere` ("Enter opens its first branch…"), `enter.erase` (the old answer to `delete:`) and `enter.promptManyOrderInclude` in `src/copy.js` | `open:` with a plan's number opens the Plan board (C198); `delete:` is the word (C199); `include:` goes with one after another (C202) | 10 |
+| R43 | The power-on shimmer hook | `src/hooks/useShimmer.js` | Nothing; the ignition is `chrome/ignition.js`. Proposed 27 October (C266) | 15 |
 
 R29 (install and update state that nothing displays) is withdrawn: stage 1
 displays it.

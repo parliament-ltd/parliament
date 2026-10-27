@@ -1,3 +1,7 @@
+// Retired with R30, approved by Stefan on 27 October 2026: The V2 mode loader hook, used by nothing.
+// Was src/hooks/useMode.js. Nothing imports it and it is not built. To restore:
+// Move it back; nothing needs changing.
+
 // useMode(roomId) — V2 mode loader hook (PR-3).
 //
 // Replaces ModeContext for V2 routes. ModeContext stays mounted in App.jsx

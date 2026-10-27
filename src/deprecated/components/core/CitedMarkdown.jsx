@@ -1,3 +1,7 @@
+// Retired with R30, approved by Stefan on 27 October 2026: Markdown with citation marks, used by nothing (replies use the shared Markdown component).
+// Was src/components/core/CitedMarkdown.jsx. Nothing imports it and it is not built. To restore:
+// Move it back; nothing needs changing.
+
 import { useState, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
