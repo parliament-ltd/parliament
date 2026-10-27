@@ -3490,6 +3490,60 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   These need Chrome or Edge with a second screen attached; they are on the checkpoint's list. If the question takes more than a few seconds to answer, the browser may block the window that Enter then opens; a second Enter opens it.
 - **Next:** piece 5, small screens.
 
+**C261. Stage 14, piece 5: small screens, its open points** (proposed 27 October; C253 (i) 1 as ruled; C126; C246 (a); welcome spec §12.4). Built as suggested, so a ruling changes one entry. No mockup draws a phone, so this is built to be tried and changed at the checkpoint.
+- **What exists today:**
+  - Under 900 pixels wide, the boards stack in one column, sharing the window's height, and the edges between them hide.
+  - Rooms take a height from the window, and draw their narrow form by their own width (C126). A room built for a phone draws it at any width (C246 (a)).
+  - The bar sits where `bar:` put it, at the top or the bottom.
+  - The strip lists every board on one line that wraps, rooms as one "Room:".
+  - The welcome page says "built for a computer for now; the phone comes later" on narrow and touch screens.
+- **(a) Where the lines fall,** as ruled:
+  - **A phone:** under 760 pixels wide, or a screen with touch and no pointer that hovers, at any width. A tablet counts as a phone.
+  - **A narrow window:** 760 to 1,100 pixels.
+  - **Wider:** as today. Today's stacking under 900 goes.
+
+  The layout follows the screen as it is now, so turning a tablet or narrowing a window changes it at once.
+
+  **Suggestion:** as ruled. If a tablet feels cramped with one board when you try it, it can take the narrow window's layout instead.
+- **(b) A narrow window:**
+  - Two boards side by side, in their order; a third and more go beneath, two to a row.
+  - Each row is the height a board has today, and the page scrolls down. Columns share a row evenly: the widths set with `width:` or by dragging are kept for a wider window, and the edges hide.
+  - `width:` says "width: works on a wider window" instead of changing anything.
+
+  **Suggestion:** yes.
+- **(c) A phone, one board at a time:**
+  - The board the bar points at fills the screen. The others stay open out of sight, keeping where they were scrolled. If the bar points at a window, the first board shows.
+  - **The strip across the top switches:**
+    - A tap on an open board shows it. A tap on one not open opens it, as today.
+    - Each open room has its own entry, "Room: 225", so a second room can be reached.
+    - The strip is one line that scrolls sideways.
+    - "calm: off" stays; "focus: off ▾" goes.
+  - No swiping between boards for now: a room's own content scrolls, and a swipe would fight it.
+
+  **Suggestion:** yes.
+- **(d) The bar on a phone:**
+  - It sits at the bottom whatever `bar:` says. The place you chose is kept for wider screens.
+  - `bar:top` says "On a phone the bar stays at the bottom. bar:top works on a wider screen".
+  - The field folds and opens as it does today.
+
+  **Suggestion:** yes.
+- **(e) Commands that do not fit a phone** say so before Enter and change nothing:
+  - `pop:`: "pop: works on a wider screen. On a phone one board shows at a time".
+  - `focus:` and `focus:off`: "On a phone one board shows at a time, so focus: is not needed".
+  - `width:`: as in (b).
+  - `bar:top`: as in (d).
+
+  Everything else works as on a computer. `open:` shows what it opens; `close:` shows the board before it. `arrange:` shows one screen; switching to a saved arrangement shows the board it points at. Windows already open, from a wider window made narrow, stay as they are.
+
+  **Suggestion:** yes.
+- **(f) Rooms on a phone** draw their narrow form at any width, a tablet's included: the conversation, with the side panels behind their buttons (C126). **Suggestion:** yes.
+- **(g) The welcome page on a phone:**
+  - It is the one board, with the field in its card as today.
+  - Its line "built for a computer for now; the phone comes later" stays until you have tried the phone at the checkpoint, and goes on your yes there.
+
+  **Suggestion:** yes.
+- **(h) Stored data:** none. The layout follows the screen; nothing is kept, and the space is unchanged. **Suggestion:** yes.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
