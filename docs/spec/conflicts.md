@@ -3039,6 +3039,49 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
     - After a fresh load, no request failed.
 - **Next:** piece 8, today's chat page (R42), proposed first.
 
+**C251. Stage 13, piece 8: today's chat page (R42), its open points** (proposed 27 October; C250 (f) ruled 1; R22, R23, R24, R25, R26, R41; C173 (f), C175, C178, C248). Built as suggested, so a ruling changes one entry.
+- **What exists today** (a survey of the code, 27 October):
+  - `/chat/:id` draws `ChatView`: one chat in its room, full page, with a wrench to the old editor. Nothing on the new screens links to it, with one exception, the Branches block.
+  - **The Branches block,** inside a room on the new screens, leaves them for today's chat page in three ways:
+    - a click on a branch in its list;
+    - the branch panel's "Full history";
+    - the panel's "Compressed summary".
+  - **Two other pieces still run inside rooms on the new screens:**
+    - the messages' "Branch from here" opens the branch panel (R26), except in a plan, where it already writes `new:branch`;
+    - "Continue" on a cut-off reply sends collaboration mode's instructions (R22), not the chat's frameworks.
+  - **Collaboration mode** keeps nothing stored: its choice was in memory only.
+  - **The old feature blocks:** in rooms on the new screens, voice still draws a microphone that feeds nothing, and attaching files mounts a hidden file picker.
+- **(a) `/chat/:id`** shows that chat in its room on the new screens, as `open:` does, so old bookmarks and links keep working. A chat that is not there says so in its room's board. `ChatView` moves to `src/deprecated/`. Its wrench led to the old editor; `edit:` and `lab:` do that now. **Suggestion:** yes.
+- **(b) The Branches block on the new screens.** Each action writes its command into the bar for Enter, as the step list and the branch slider do (C173 (f)):
+  - **A branch in its list:** a click writes `open:225`.
+  - **The button, now "Carry on":** it writes what the block's "New branches carry" setting names. "The whole history" writes `new:branch 225`; "a summary" writes `open:225 summary` (C175).
+  - **At the threshold** (the block's "Warns at"), the block says "Context 80% full", with the same command to click. It never acts by itself.
+    - Today, with the app's auto-compress set to automatic, the panel opened by itself at the threshold.
+    - That setting has not been offered anywhere since the old Settings page went (R37), and it is no longer read; any value stays where it is.
+  - So the block's four settings keep their jobs: the parent link, the button, what it carries, and where it warns.
+
+  **Suggestion:** yes.
+- **(c) "Branch from here"** on a message writes `new:branch` with that chat's address or number and the step, in every room on the new screens: `new:branch 225 2`, as in a plan now (C178). The branch panel never opens. **Suggestion:** yes.
+- **(d) "Continue"** on a cut-off reply sends under the chat's frameworks and reply language, as the bar's prompts do, in place of collaboration mode's text. **Suggestion:** yes.
+- **(e) The retirements, carried out together, nothing deleted and nothing stored changed:**
+  - **R22, R23:** the collaboration window, its block (three files) and its state move to `src/deprecated/`, their provider unmounted.
+    - Rooms that hold the block keep it in their stored list, and a room skips a block it does not know.
+    - `frameworks` stops meaning that block in `add:` and `set:`.
+  - **R24:** the nine feature-block files move, and the catalogue stops listing them.
+    - Rooms keep the old blocks in their lists, still read as "feature on" (C248 (a)).
+    - The three small registries they used (armed tools, attachments, input actions) go from `hostAPI.js`. The room frame stops collecting input actions.
+    - The voice transcript event, one of the original three, stays.
+  - **R25:** the composer (`input-render.jsx`, its preview, `InputArea.jsx`) moves.
+    - The input block stays: every room has one, the Lab places it, and its settings are the features. It draws nothing, since the bar is the composer.
+    - Its three composer settings go, as R41 said.
+  - **R26:** the branch panel, its state and its shortcut move, their provider and handler unmounted. Ctrl/Cmd+Shift+B then does only what it already does on the new screens: open the backup window.
+  - **Tests** that name the old blocks as strings stay true: the names still mean "feature on".
+- **(f) What today's chat page did that the new screens do not:** nothing is lost.
+  - The room board finds a chat and repairs a missing room as the page did.
+  - Its wrench is `edit:`.
+  - Its page-wide colours are the room's own board.
+- **(g) Stored data:** none changes.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
