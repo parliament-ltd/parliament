@@ -2933,6 +2933,86 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   Not tried in the browser: a web search, voice and choosing files, which need a key, a browser that transcribes on the device and a native file dialog. They are covered by the tests above and by the code they reuse. The trial copy's bar was moved to the top (`bar:top`) to read the field.
 - **Next:** piece 7, the checkpoint.
 
+**C250. The stage 13 checkpoint** (proposed 27 October; refactor-plan.md, stage 13 and §6; C238 to C249). Pieces 1 to 6 are built and committed. Waiting for Stefan: (b) to (h) are each a yes or no, or a choice.
+- **(a) What to try,** on the trial copy:
+  - **Building:** `lab:`, then `edit:"Pocket chat"`.
+    - On the Canvas, change the layout (it writes the command; Enter moves the blocks), the theme, Built for, and Sends to.
+    - On the Blocks board, open a row: settings apply on click; move up and down, Sits in and rm write commands.
+    - In the Library, tick a block and a theme and press "add to room"; click a name for its details.
+    - `undo:` takes back each step, and `done:` returns to what you had.
+  - **A new room:** `new:room guided` and its six questions; `duplicate:"Writing studio" template`.
+  - **Trying it:** in the Lab with no room open, `p>` a question. The room opens beside the Canvas, the chat tagged `tried`.
+  - **Phone and local:**
+    - A room built for a phone keeps a phone's width at any size.
+    - `local:on` in a room, then a prompt to Wikipedia, is refused before Enter.
+  - **With a key** (nothing in piece 6 has been tried with a model):
+    - in a room with web search on, an Anthropic model answering: "web search" in the field, then a question that needs the web, and the citations under the reply;
+    - "attach" a PDF and a text file, to Anthropic's model and then to Mistral's, reading the Enter line each time;
+    - voice, in desktop Chrome, where speech can stay on the device.
+- **(b) The old editor and the build wizard: R14, R16 to R21, R33.** The old way of building a room, at `/edit` and `/build`, about 5,600 lines. It is reached today only from the wrench on today's chat page and from the wizard itself.
+
+  | Line | What it is | What does it now |
+  | --- | --- | --- |
+  | R14 | The build wizard, `/build` (purpose, device, layout, features, name, ignition) | `new:room guided`; the templates in the Library and `duplicate:` |
+  | R16 | Dragging blocks in the editor | `place:`, move up and down |
+  | R17 | The holding tray, where removed blocks wait | `rm:` (the Library keeps every block) and `undo:` |
+  | R18 | The inspector, the editor's right rail | The room line and the Blocks board |
+  | R19 | The editor's left rail and top-bar pills | The Library board and the bar |
+  | R20 | The preview sheet | Trying the room with `p>` |
+  | R21 | The dialogs for swapping a layout and applying another room | The Enter line saying what moves; `duplicate:` |
+  | R33 | The Showcase, glow and connector lines in the editor | Nothing |
+
+  **What the Lab does not do that the editor did:** set a room's panel buttons (which side panels get a button when the room is narrow). C238 (e) left these as stored, still drawn, not offered. Nothing else is missing.
+
+  **How it would be carried out, as R40 was:**
+  - `/edit`, `/edit/:id` and `/build` open the Lab on the new screens, with that room on the Canvas.
+  - The files move to `src/deprecated/`.
+  - Every room the editor or the wizard made stays as it is, and nothing stored changes.
+  - `@dnd-kit`, the drag library, stays while R34 holds it.
+
+  **Suggestion:** approve all eight; panel buttons stay as stored.
+- **(c) R34: dragging sections in the stacked-sections layout.** That layout belonged to the old homepage, the Study, already retired (R3, R11). Only its drag-to-reorder goes; the layout's file stays, as the line says. With R16 and R34 both done, `@dnd-kit` can leave the dependencies (stage 15). **Suggestion:** approve.
+- **(d) R36: the old slot tables.** A layout's places used to be written in three spots: the layout's own file (the one the Lab now reads), a fallback table used only by the old editor's layout swap, and empty placeholder lists in the code that seeds the Library's layout records. The fallback table goes with the editor, and the placeholders go from the code. The layout records already stored on your device stay untouched; the Library reads them only for descriptions and "coming soon". **Suggestion:** approve, carried out with (b).
+- **(e) R24 and R25: the three old feature blocks and today's composer.**
+  - R25 was approved on a condition with two parts:
+    - the bar carries web search, voice and files: now true (piece 6);
+    - today's chat page is replaced by the room on the new screens: not yet true.
+  - Today's chat page still draws the old composer, and the composer still uses the three blocks. Retiring them now would take web search, voice and files away from that page.
+
+  **Suggestion:** approve R24 on R25's condition, both carried out with (f).
+- **(f) Today's chat page, proposed as R42** (a choice of when). `/chat/:id` is the old page for one chat.
+  - **Who waits on it:** R22 (the collaboration window), R25 and R26 (the branch panel) were each approved "when today's chat page is replaced". R24 would join them. No stage of the plan says when that happens.
+  - **A problem found in reading for this checkpoint:** the branches block, in a room on the new screens, opens a branch by going to today's chat page. That leaves the new screens. Not yet tried in the browser.
+  - **R42:**
+    - `/chat/:id` opens that chat in its room on the new screens;
+    - the branches block opens branches there;
+    - `ChatView` moves to `src/deprecated/`;
+    - then R22, R24, R25 and R26 are carried out together.
+
+    Nothing stored changes.
+  - **Options:**
+    1. **Now, as piece 8 of this stage,** proposed first like any piece.
+    2. **In stage 14 or 15.**
+
+  **Suggestion:** 1. It unblocks four approved retirements and fixes the branches block, and the bar now carries everything the old page's composer did.
+- **(g) R41: the settings nothing reads** (C240 (a)). Ten settings are declared by blocks but read by no code:
+  - Context's auto-compress;
+  - the file shelf's types;
+  - Keywords' colour and add form;
+  - Messages' timestamps and density;
+  - Notes' add button;
+  - the dashboard's sample rows;
+  - the table's page size;
+  - voice's button label.
+
+  Their declarations go from the blocks' files. Any value a room holds stays in its record, unread, as now. The input block's three composer settings (placeholder, voice transcripts, card layout) become unread with R25, and would join R41 then. **Suggestion:** approve.
+- **(h) Test data on the trial copy:** Essay room (made by `new:room guided` in piece 4) and chat 225 (tried there, a Wikipedia answer about lighthouses). Options:
+  1. **Keep them.**
+  2. **Erase both,** with `erase:225` and the room after it.
+
+  **Suggestion:** your call; nothing depends on them.
+- **Not in this checkpoint:** R39 (Drafting Desk), deferred until after the refactor (C237).
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
