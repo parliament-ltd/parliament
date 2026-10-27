@@ -1,3 +1,7 @@
+// Retired with R40, approved by Stefan on 27 October 2026: the Review modal and its block,
+// replaced by the Reflection board (C237 (d)). Was src/components/ReviewModal.jsx. Nothing imports it and it is not built.
+// To restore: move it back with the three review entries.
+
 import React, { useState, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Markdown from './core/Markdown'

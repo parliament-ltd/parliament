@@ -378,10 +378,6 @@ msgid "block.notes"
 msgstr "メモ"
 
 #. js-lingui-explicit-id
-msgid "block.review"
-msgstr "レビュー"
-
-#. js-lingui-explicit-id
 msgid "block.ripple-analysis"
 msgstr "波及分析"
 
@@ -448,10 +444,6 @@ msgstr "会話。メッセージごとに操作があります。"
 #. js-lingui-explicit-id
 msgid "blockAbout.notes"
 msgstr "チャット全体や1つのメッセージに付けるメモ。送信されることはありません。"
-
-#. js-lingui-explicit-id
-msgid "blockAbout.review"
-msgstr "選んだハイライト、メモ、お気に入り、ピンからまとめ直したチャット。"
 
 #. js-lingui-explicit-id
 msgid "blockAbout.ripple-analysis"

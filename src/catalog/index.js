@@ -30,7 +30,6 @@ import notesEntry          from './entries/notes'
 import branchesEntry       from './entries/branches'
 import contextEntry        from './entries/context'
 import collabModeEntry     from './entries/collab-mode'
-import reviewEntry         from './entries/review'
 import voiceInputEntry     from './entries/voice-input'
 // The homepage's blocks (blueprint, chats, library, favorites, quick-stats,
 // recent-activity, scratchpad) were retired with the homepage on 22 October
@@ -74,7 +73,6 @@ register(notesEntry)
 register(branchesEntry)
 register(contextEntry)
 register(collabModeEntry)
-register(reviewEntry)
 register(voiceInputEntry)
 // PR-11a — Pelican decomposition.
 register(fileShelfEntry)

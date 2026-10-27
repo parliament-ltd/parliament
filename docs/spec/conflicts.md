@@ -2374,7 +2374,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Not tried:** a synthesis or a talk by a model, as the trial copy has no key.
 - **Next:** the stage 12 checkpoint (C228 piece 6): Drafting Desk's R line, Secretarybird's comments and suggestions, and the Review modal against this board.
 
-**C237. The stage 12 checkpoint** (proposed 27 October; refactor-plan.md, stage 12; C207 (3), C91, C227 (b) and (c), C228 to C236). All pieces are built and committed. Waiting for Stefan: (b), (c) and (d) are choices.
+**C237. The stage 12 checkpoint** (proposed 27 October; **ruled 27 October: (b) option 2, Drafting Desk kept for now; (c) option 2, with it; (d) R40 approved**; refactor-plan.md, stage 12; C207 (3), C91, C227 (b) and (c), C228 to C236). All pieces are built and committed. Waiting for Stefan: (b), (c) and (d) are choices.
 - **(a) What to try, with a key,** since nothing in stage 12 has yet been tried with a model:
   - **Ripple:** in a plan with two branches answered by a model, `ripple:on` from the room's head, an edit in 201a, then a prompt. The line names the checks and the cost; the suggestions land in 201b in rust; review them from the Collection's Suggestions tab with a and r. An accepted one is your edit, blue, and goes with your next prompt there.
   - **A sweep:** `sweep:201a pushback`, its suggestions in green; accept one and see the next prompt's line say it is told.

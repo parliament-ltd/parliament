@@ -1,3 +1,7 @@
+// Retired with R40, approved by Stefan on 27 October 2026: the Review modal and its block,
+// replaced by the Reflection board (C237 (d)). Was src/catalog/entries/review-preview.jsx. Nothing imports it and it is not built.
+// To restore: move it back with review.jsx.
+
 // Self-contained render wrapper for review@1.0. Renders a labeled trigger
 // button that opens the existing ReviewModal with empty data. Used both by
 // the catalog debug card and by RoomShell until ChatContext integration

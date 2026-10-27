@@ -378,10 +378,6 @@ msgid "block.notes"
 msgstr "Anteckningar"
 
 #. js-lingui-explicit-id
-msgid "block.review"
-msgstr "Sammanställning"
-
-#. js-lingui-explicit-id
 msgid "block.ripple-analysis"
 msgstr "Ringverkningsanalys"
 
@@ -448,10 +444,6 @@ msgstr "Konversationen, varje meddelande med sina egna åtgärder."
 #. js-lingui-explicit-id
 msgid "blockAbout.notes"
 msgstr "Anteckningar om chatten, eller om ett enskilt meddelande. De skickas aldrig."
-
-#. js-lingui-explicit-id
-msgid "blockAbout.review"
-msgstr "Chatten sammanställd ur de markeringar, anteckningar, favoriter och citat du väljer."
 
 #. js-lingui-explicit-id
 msgid "blockAbout.ripple-analysis"

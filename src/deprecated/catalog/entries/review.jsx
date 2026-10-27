@@ -1,3 +1,7 @@
+// Retired with R40, approved by Stefan on 27 October 2026: the Review modal and its block,
+// replaced by the Reflection board (C237 (d)). Was src/catalog/entries/review.jsx. Nothing imports it and it is not built.
+// To restore: move it back with review-render.jsx, review-preview.jsx and ReviewModal.jsx, register it in src/catalog/index.js, and put back its words in src/copy.js (blocks.review, blocksAbout.review).
+
 // review@1.0 — conversation review modal (synthesis + reflection prompts).
 //
 // Wraps src/components/ReviewModal.jsx without moving or modifying it.

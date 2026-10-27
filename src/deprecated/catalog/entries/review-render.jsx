@@ -1,3 +1,7 @@
+// Retired with R40, approved by Stefan on 27 October 2026: the Review modal and its block,
+// replaced by the Reflection board (C237 (d)). Was src/catalog/entries/review-render.jsx. Nothing imports it and it is not built.
+// To restore: move it back with review.jsx.
+
 // review@1.0 — production render for the V2 RoomShell chat path.
 //
 // PR-10a.9. Self-binds to ChatContext + AnnotationsContext +

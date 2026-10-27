@@ -378,10 +378,6 @@ msgid "block.notes"
 msgstr "笔记"
 
 #. js-lingui-explicit-id
-msgid "block.review"
-msgstr "回顾"
-
-#. js-lingui-explicit-id
 msgid "block.ripple-analysis"
 msgstr "涟漪分析"
 
@@ -448,10 +444,6 @@ msgstr "对话内容，每条消息都有各自的操作。"
 #. js-lingui-explicit-id
 msgid "blockAbout.notes"
 msgstr "关于整个对话或某条消息的笔记。笔记绝不会被发送。"
-
-#. js-lingui-explicit-id
-msgid "blockAbout.review"
-msgstr "把你选出的高亮、笔记、收藏和摘录汇集起来，重新呈现这个对话。"
 
 #. js-lingui-explicit-id
 msgid "blockAbout.ripple-analysis"

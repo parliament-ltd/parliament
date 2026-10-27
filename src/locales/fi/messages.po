@@ -378,10 +378,6 @@ msgid "block.notes"
 msgstr "Muistiinpanot"
 
 #. js-lingui-explicit-id
-msgid "block.review"
-msgstr "Kooste"
-
-#. js-lingui-explicit-id
 msgid "block.ripple-analysis"
 msgstr "Vaikutusanalyysi"
 
@@ -448,10 +444,6 @@ msgstr "Keskustelu, jokainen viesti omine toimintoineen."
 #. js-lingui-explicit-id
 msgid "blockAbout.notes"
 msgstr "Muistiinpanot keskustelusta tai yksittäisestä viestistä. Niitä ei koskaan lähetetä."
-
-#. js-lingui-explicit-id
-msgid "blockAbout.review"
-msgstr "Keskustelu koottuna valitsemistasi korostuksista, muistiinpanoista, suosikeista ja kiinnityksistä."
 
 #. js-lingui-explicit-id
 msgid "blockAbout.ripple-analysis"

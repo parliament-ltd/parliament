@@ -378,10 +378,6 @@ msgid "block.notes"
 msgstr "Notes"
 
 #. js-lingui-explicit-id
-msgid "block.review"
-msgstr "Review"
-
-#. js-lingui-explicit-id
 msgid "block.ripple-analysis"
 msgstr "Ripple analysis"
 
@@ -448,10 +444,6 @@ msgstr "The conversation, each message with its own actions."
 #. js-lingui-explicit-id
 msgid "blockAbout.notes"
 msgstr "Notes on the chat, or on one message. They are never sent."
-
-#. js-lingui-explicit-id
-msgid "blockAbout.review"
-msgstr "The chat drawn together from the highlights, notes, favourites and pins you choose."
 
 #. js-lingui-explicit-id
 msgid "blockAbout.ripple-analysis"

@@ -378,10 +378,6 @@ msgid "block.notes"
 msgstr ""
 
 #. js-lingui-explicit-id
-msgid "block.review"
-msgstr ""
-
-#. js-lingui-explicit-id
 msgid "block.ripple-analysis"
 msgstr ""
 
@@ -447,10 +443,6 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "blockAbout.notes"
-msgstr ""
-
-#. js-lingui-explicit-id
-msgid "blockAbout.review"
 msgstr ""
 
 #. js-lingui-explicit-id

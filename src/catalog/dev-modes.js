@@ -43,7 +43,6 @@ export const THREE_PANEL_DEMO_MODE = Object.freeze({
     // Right-rail-extra (stack): context + builders + voice-input.
     { id: 'demo-context',     ref: 'context@^1.0',     slot: 'right-rail-extra', order: 0, essential: false, config: { displayMode: 'meter', contextThreshold: 75 } },
     { id: 'demo-collab',      ref: 'collab-mode@^1.0', slot: 'right-rail-extra', order: 1, essential: false, config: {} },
-    { id: 'demo-review',      ref: 'review@^1.0',      slot: 'right-rail-extra', order: 2, essential: false, config: {} },
     { id: 'demo-voice-input', ref: 'voice-input@^1.0', slot: 'right-rail-extra', order: 3, essential: false, config: {} },
   ],
   pipelines: [],
