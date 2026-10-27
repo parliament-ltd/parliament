@@ -1,3 +1,7 @@
+// Retired with R43, approved by Stefan on 27 October 2026: the power-on shimmer hook, used by nothing.
+// Was src/hooks/useShimmer.js. Nothing imports it and it is not built. To restore:
+// Move it back; the ignition that replaced it is src/chrome/ignition.js.
+
 import { useState, useRef, useCallback } from 'react'
 
 /**

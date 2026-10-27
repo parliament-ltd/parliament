@@ -646,7 +646,7 @@ stay readable so every backup ever written still restores.
 | R42 | Today's chat page | `/chat/:id`, `ChatView.jsx`; the branches block's links to it | The chat in its room on the new screens. R22, R24, R25 and R26 wait for it. **Approved 27 October (C250 (f)),** built as piece 8 of stage 13. **Carried out 27 October (C252):** `/chat/:id` shows the chat in its room on the new screens | 13 |
 | R40 | The Review modal and its block | `src/components/ReviewModal.jsx`, `src/catalog/entries/review*.jsx` | The Reflection board. Rooms keep the block in their stored list and skip it. **Approved 27 October (C237 (d)),** moved to `src/deprecated/` | 12 |
 | R38 | Four Enter-line messages nothing says any more (**approved 24 October; carried out 24 October, C204**) | `enter.openDocket`, `enter.openDocketHere` ("Enter opens its first branch…"), `enter.erase` (the old answer to `delete:`) and `enter.promptManyOrderInclude` in `src/copy.js` | `open:` with a plan's number opens the Plan board (C198); `delete:` is the word (C199); `include:` goes with one after another (C202) | 10 |
-| R43 | The power-on shimmer hook | `src/hooks/useShimmer.js` | Nothing; the ignition is `chrome/ignition.js`. Proposed 27 October (C266) | 15 |
+| R43 | The power-on shimmer hook | `src/hooks/useShimmer.js` | Nothing; the ignition is `chrome/ignition.js`. Proposed 27 October (C266); **approved and moved to `src/deprecated/` the same day** | 15 |
 
 R29 (install and update state that nothing displays) is withdrawn: stage 1
 displays it.
