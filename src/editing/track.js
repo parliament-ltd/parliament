@@ -13,10 +13,10 @@
 // Because the rules sit on the transaction, not on keys, the same rules hold
 // for every way of typing.
 
-import { Mapping, ReplaceStep } from 'prosemirror-transform'
+import { Mapping, ReplaceStep, ReplaceAroundStep } from 'prosemirror-transform'
 import { Selection, TextSelection } from 'prosemirror-state'
 import { Fragment, Slice } from 'prosemirror-model'
-import { STRUCK, ADDED, isEditMark, isAnswerMark } from './schema'
+import { STRUCK, ADDED, isEditMark, isAnswerMark, isWholeBlock } from './schema'
 
 /** Meta: a change that is not an edit (structure, formatting, undo from a card). */
 export const SKIP = 'editSkip'
@@ -74,7 +74,9 @@ export function editAt(doc, pos, prefer = 'before') {
   if (!$pos.parent.inlineContent) return null
   const before = $pos.nodeBefore && editOf($pos.nodeBefore.marks)
   const after = $pos.nodeAfter && editOf($pos.nodeAfter.marks)
-  return prefer === 'before' ? (before?.id ?? after?.id ?? null) : (after?.id ?? before?.id ?? null)
+  // In a cell of a row or column you added, what you type is that edit (C222 (b)).
+  const cell = $pos.parent.type.name === 'table_cell' ? $pos.parent.attrs.added ?? null : null
+  return prefer === 'before' ? (before?.id ?? after?.id ?? cell) : (after?.id ?? before?.id ?? cell)
 }
 
 // What a range holds: the model's words (to strike), the person's own (to
@@ -97,14 +99,14 @@ function describe(doc, from, to) {
       else original.push({ from: a, to: b })
       return false
     }
-    if (node.isAtom) {
-      if (pos >= from && pos + node.nodeSize <= to) {
-        if (node.attrs.struck == null) atoms.push({ pos, node })
-        else struck += 1
-      }
+    // A whole block in the range: a chart, a divider, or a table taken whole
+    // (C222 (a)); a table only partly in it is edited cell by cell.
+    if (isWholeBlock(node) && pos >= from && pos + node.nodeSize <= to) {
+      if (node.attrs.struck == null) atoms.push({ pos, node })
+      else struck += 1
       return false
     }
-    return true
+    return !node.isAtom
   })
   return { original, added, atoms, struck }
 }
@@ -245,7 +247,9 @@ function applyStep(out, given, ctx) {
 
   // Only the person's own words change (or the structure does): the step
   // stands, and only the new words' edit is settled.
-  if (!keeps) {
+  // strikeOnly: a range cut out of a change across a cell edge; its
+  // structure is never removed, only words struck or the person's taken out.
+  if (!keeps && !ctx.strikeOnly) {
     if (!text) {
       out.step(step)
       return { same: true, cursor: null }
@@ -267,7 +271,7 @@ function applyStep(out, given, ctx) {
     const near = ctx.intent === 'backspace' ? open(ctx.ids, editAt(doc, to, 'after')) ?? open(ctx.ids, editAt(doc, from))
       : ctx.intent === 'delete' ? open(ctx.ids, editAt(doc, from)) ?? open(ctx.ids, editAt(doc, to, 'after'))
         : null
-    strikeId = near ?? ctx.ids.peek()
+    strikeId = ctx.forceId ?? near ?? ctx.ids.peek()
     ctx.ids.commit(strikeId)
     for (const r of d.original) out.addMark(r.from, r.to, STRUCK.create({ edit: strikeId }))
     for (const a of d.atoms) out.setNodeMarkup(a.pos, null, { ...a.node.attrs, struck: strikeId })
@@ -276,6 +280,7 @@ function applyStep(out, given, ctx) {
   // positions to their left stay true).
   for (const r of [...d.added].reverse()) out.delete(r.from, r.to)
   const map = new Mapping(out.mapping.maps.slice(first))
+  if (ctx.struckWith) ctx.struckWith(strikeId)
 
   if (text) {
     // The new words go straight after what was struck, as one edit with it.
@@ -320,6 +325,23 @@ export function track(state, tr, { ids, onError } = {}) {
         const r = applyStep(out, mapped, { ids, intent, floor: i === 0 && !sel.empty ? sel.to : undefined })
         if (!r.same) allSame = false
         cursor = tr.steps.length === 1 ? r.cursor : null
+      } else if (mapped instanceof ReplaceAroundStep) {
+        // A change across a table cell's edge (C222 (a)): ProseMirror would
+        // close the cell around what follows. What it removes is struck
+        // instead, the structure stays, and any new words go after it.
+        allSame = false
+        let id = null
+        const struckWith = (s) => { if (s != null) id = s }
+        const right = applyStep(out, new ReplaceStep(mapped.gapTo, mapped.to, Slice.empty), { ids, intent: 'range', struckWith, strikeOnly: true })
+        const left = applyStep(out, new ReplaceStep(mapped.from, mapped.gapFrom, Slice.empty), { ids, intent: 'range', forceId: id ?? undefined, struckWith, strikeOnly: true })
+        cursor = left.cursor ?? right.cursor
+        const words = mapped.slice.content.textBetween(0, mapped.slice.content.size, '')
+        if (words) {
+          const at = out.mapping.slice(before).map(mapped.gapFrom, -1)
+          const typed = applyStep(out, new ReplaceStep(at, at, new Slice(Fragment.from(out.doc.type.schema.text(words)), 0, 0)), { ids, intent: 'range', forceId: id ?? undefined })
+          cursor = typed.cursor
+        }
+        if (tr.steps.length !== 1) cursor = null
       } else if (mapped) {
         out.step(mapped)
       }
@@ -371,6 +393,9 @@ export function cursorMarks(state, ids) {
 export function undoEdit(state, id) {
   const tr = state.tr.setMeta(SKIP, true)
   const added = []
+  // Rows and cells it added go whole (C222 (b)): a row all of whose cells
+  // it added, else each such cell (a column).
+  const cells = []
   state.doc.descendants((node, pos) => {
     if (node.isInline) {
       for (const m of node.marks) {
@@ -379,10 +404,20 @@ export function undoEdit(state, id) {
       }
       return false
     }
-    if (node.isAtom && node.attrs.struck === id) tr.setNodeMarkup(pos, null, { ...node.attrs, struck: null })
+    if (node.type.name === 'table_row') {
+      let all = node.childCount > 0
+      node.forEach((cell) => { if (cell.attrs.added !== id) all = false })
+      if (all) { cells.push({ from: pos, to: pos + node.nodeSize }); return false }
+    }
+    if (node.type.name === 'table_cell' && node.attrs.added === id) { cells.push({ from: pos, to: pos + node.nodeSize }); return false }
+    if (node.attrs.struck === id) tr.setNodeMarkup(pos, null, { ...node.attrs, struck: null })
     return true
   })
-  for (const r of added.reverse()) tr.delete(r.from, r.to)
+  // From the end back, so the positions before each stay true.
+  const gone = [...added, ...cells].sort((a, b) => b.from - a.from)
+  for (const r of gone) {
+    if (cells.includes(r) || !cells.some((c) => c.from <= r.from && r.to <= c.to)) tr.delete(r.from, r.to)
+  }
   return tr
 }
 
@@ -401,34 +436,85 @@ export function collectEdits(doc) {
     if (!p) e.parts.push(p = { block, index, kind, from: Infinity, to: 0, struck: '', added: '' })
     return { e, p }
   }
-  doc.forEach((block, offset, index) => {
-    const kind = KIND_NAME[block.type.name] ?? block.type.name
-    if (block.isAtom) {
-      if (block.attrs.struck != null) {
-        const { e, p } = part(block.attrs.struck, block.attrs.id, index, kind)
-        p.from = 0
-        p.to = 1
-        p.struck += `[the whole ${kind}]`
-        e.struck += `[the whole ${kind}]`
-        e.first = Math.min(e.first, offset)
-        e.last = Math.max(e.last, offset + block.nodeSize)
-      }
-      return
-    }
-    block.forEach((child, at) => {
+  // A line's marks: the parts of each edit in it.
+  const lineMarks = (line, lineId, start, index, kind, where = null) => {
+    line.forEach((child, at) => {
       const ed = editOf(child.marks)
       if (!ed) return
-      const { e, p } = part(ed.id, block.attrs.id, index, kind)
+      const { e, p } = part(ed.id, lineId, index, kind)
+      if (where) Object.assign(p, where)
       const words = child.isText ? child.text : '\n'
       p.from = Math.min(p.from, at)
       p.to = Math.max(p.to, at + child.nodeSize)
       p[ed.kind] += words
       e[ed.kind] += words
-      e.first = Math.min(e.first, offset + 1 + at)
-      e.last = Math.max(e.last, offset + 1 + at + child.nodeSize)
+      e.first = Math.min(e.first, start + at)
+      e.last = Math.max(e.last, start + at + child.nodeSize)
     })
+  }
+  doc.forEach((block, offset, index) => {
+    const kind = KIND_NAME[block.type.name] ?? block.type.name
+    if (isWholeBlock(block) && block.attrs.struck != null) {
+      const { e, p } = part(block.attrs.struck, block.attrs.id, index, kind)
+      p.from = 0
+      p.to = 1
+      p.struck += `[the whole ${kind}]`
+      e.struck += `[the whole ${kind}]`
+      e.first = Math.min(e.first, offset)
+      e.last = Math.max(e.last, offset + block.nodeSize)
+    }
+    if (block.isAtom) return
+    if (block.type.name === 'table') {
+      // Each cell a line of its own, named by its row and column (C222 (c)),
+      // its edits kept when the table is later struck whole.
+      const header = block.firstChild
+      block.forEach((row, rowAt, r) => {
+        row.forEach((cell, cellAt, c) => {
+          const start = offset + 1 + rowAt + 1 + cellAt + 1
+          const where = {
+            table: block.attrs.id, row: r, col: c, rows: block.childCount, cols: row.childCount,
+            rowName: r === 0 ? null : cellName(row.firstChild), colName: cellName(header.maybeChild(c)),
+          }
+          for (const how of ['struck', 'added']) {
+            const id = cell.attrs[how]
+            if (id == null) continue
+            const { e, p } = part(id, cell.attrs.id, index, kind)
+            Object.assign(p, where, { cell: how, from: 0, to: cell.content.size })
+            if (how === 'struck') {
+              const words = cellWords(cell)
+              p.struck += words
+              e.struck += e.struck && words ? ` | ${words}` : words
+            }
+            e.first = Math.min(e.first, start)
+            e.last = Math.max(e.last, start + cell.content.size)
+          }
+          lineMarks(cell, cell.attrs.id, start, index, kind, where)
+        })
+      })
+      return
+    }
+    lineMarks(block, block.attrs.id, offset + 1, index, kind)
   })
   return [...edits.values()].sort((a, b) => a.first - b.first)
+}
+
+// A cell's name, for a row or column: the model's words in it, struck or
+// not, as the model wrote them; else the person's (a column they added).
+function cellName(cell) {
+  if (!cell) return ''
+  let model = ''
+  cell.forEach((child) => { if (child.isText && editOf(child.marks)?.kind !== 'added') model += child.text })
+  return (model.trim() ? model : cellWords(cell)).replace(/\s+/g, ' ').trim()
+}
+
+// A cell's words as they stand: the model's not struck, and the person's.
+function cellWords(cell) {
+  if (!cell) return ''
+  let out = ''
+  cell.forEach((child) => {
+    if (child.isText && editOf(child.marks)?.kind !== 'struck') out += child.text
+  })
+  return out.replace(/\s+/g, ' ').trim()
 }
 
 // The model's own words just before a place in a block, for context.
@@ -453,6 +539,7 @@ function context(doc, edit) {
 export function noteForModel(doc, edits, { what = 'your last reply' } = {}) {
   if (!edits.length) return ''
   const lines = edits.map((e) => {
+    if (e.parts.some((x) => x.table != null)) return tableLines(doc, e)
     const p = e.parts[0]
     const where = `${p.kind} ${p.index + 1}`
     const struck = e.struck.replace(/\s+/g, ' ').trim()
@@ -463,4 +550,64 @@ export function noteForModel(doc, edits, { what = 'your last reply' } = {}) {
     return `- In ${where}: "${added}" was added${ctx ? ` after "${ctx}"` : ''}.`
   })
   return [`The person edited ${what}. Each change, told once:`, ...lines].join('\n')
+}
+
+// An edit in a table, told cell by cell, or as a row or column (C222 (c)):
+// "In the table after “Prices in 2025”, row Oslo, column Price: …".
+function tableLines(doc, e) {
+  const first = e.parts.find((x) => x.table != null)
+  const before = first.index > 0 ? doc.child(first.index - 1) : null
+  const intro = before?.isTextblock && before.textContent.trim()
+    ? before.textContent.trim().split(/\s+/).slice(0, 6).join(' ')
+    : ''
+  const table = intro ? `the table after "${intro}"` : `table ${first.index + 1}`
+  const say = (s) => s.replace(/\s+/g, ' ').trim()
+  const out = []
+  const told = new Set()
+  // Whole rows and columns first: every cell of a row (or a column) carries
+  // it, or was struck or added already by another edit.
+  const node = doc.maybeChild(first.index)
+  const isTable = node?.type.name === 'table'
+  const rowDone = (r, how) => isTable && r < node.childCount && [...Array(node.child(r).childCount).keys()].every((j) => node.child(r).child(j).attrs[how] != null)
+  const colDone = (c, how) => { let ok = isTable; if (ok) node.forEach((row) => { if (c >= row.childCount || row.child(c).attrs[how] == null) ok = false }); return ok }
+  for (const how of ['struck', 'added']) {
+    const whole = e.parts.filter((x) => x.cell === how)
+    const byRow = new Map()
+    const byCol = new Map()
+    for (const x of whole) {
+      byRow.set(x.row, [...(byRow.get(x.row) ?? []), x])
+      byCol.set(x.col, [...(byCol.get(x.col) ?? []), x])
+    }
+    for (const [r, xs] of byRow) {
+      if (!rowDone(r, how)) continue
+      xs.forEach((x) => told.add(x))
+      const words = xs.map((x) => say(how === 'added' ? x.added : x.struck)).filter(Boolean)
+      out.push(how === 'struck'
+        ? `- In ${table}: the row ${r === 0 ? 'of headers' : `"${xs[0].rowName || r + 1}"`} was removed.`
+        : `- In ${table}: a row was added${words.length ? `: ${words.map((w) => `"${w}"`).join(', ')}` : ', still empty'}.`)
+    }
+    for (const [c, xs] of byCol) {
+      const left = xs.filter((x) => !told.has(x))
+      if (!left.length || !colDone(c, how)) continue
+      left.forEach((x) => told.add(x))
+      const words = left.map((x) => say(how === 'added' ? x.added : '')).filter(Boolean)
+      out.push(how === 'struck'
+        ? `- In ${table}: the column "${xs[0].colName || c + 1}" was removed.`
+        : `- In ${table}: a column was added${words.length ? `: ${words.map((w) => `"${w}"`).join(', ')}` : ', still empty'}.`)
+    }
+  }
+  // Then each cell's own change.
+  for (const x of e.parts) {
+    if (told.has(x)) continue
+    // A selection may run on from a table into the line after it.
+    const where = x.table == null ? `${x.kind} ${x.index + 1}`
+      : `${table}, ${x.row === 0 ? 'the header row' : `row "${x.rowName || x.row + 1}"`}, column "${x.colName || x.col + 1}"`
+    const struck = say(x.struck)
+    const added = say(x.added)
+    if (x.cell === 'struck') out.push(`- In ${where}: the cell was removed.`)
+    else if (struck && added) out.push(`- In ${where}: "${struck}" was struck, and "${added}" written in its place.`)
+    else if (struck) out.push(`- In ${where}: "${struck}" was struck.`)
+    else if (added) out.push(`- In ${where}: "${added}" was added.`)
+  }
+  return out.join('\n')
 }

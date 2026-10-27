@@ -36,7 +36,18 @@
 .p-text .pm-table, .p-text .pm-chart { overflow-x: auto; margin: 0 -7px .75em; padding: 6px; border: 1px dashed transparent; border-radius: 6px; cursor: default; }
 .p-text .pm-table:hover, .p-text .pm-chart:hover { border-color: var(--ch-border); }
 .p-text .pm-table.ProseMirror-selectednode, .p-text .pm-chart.ProseMirror-selectednode { border: 1px solid var(--ch-focus-ink); outline: none; }
-.p-text .ProseMirror-selectednode.pm-table::after, .p-text .ProseMirror-selectednode.pm-chart::after { content: "One block for now: Backspace strikes it whole, Enter starts a line after it. Editing inside comes later."; display: block; margin-top: 6px; font-size: 12px; font-style: italic; color: var(--ch-marg); }
+.p-text .ProseMirror-selectednode.pm-chart::after { content: "One block for now: Backspace strikes it whole, Enter starts a line after it. Editing inside comes later."; display: block; margin-top: 6px; font-size: 12px; font-style: italic; color: var(--ch-marg); }
+/* A table edited inside (piece 6; C222): cells are lines of text. Selected
+   whole, it says what Backspace does. */
+.p-text .ProseMirror-selectednode.pm-table::after { content: "The whole table: Backspace strikes it, Enter starts a line after it. Click into a cell to change its words."; display: block; margin-top: 6px; font-size: 12px; font-style: italic; color: var(--ch-marg); }
+.p-text .pm-table { cursor: text; }
+.p-text .pm-table :is(td, th) { min-width: 3em; vertical-align: top; }
+.p-text .pm-table :is(td, th):focus-within { outline: 1px solid var(--ch-border); outline-offset: -1px; }
+/* A row or column struck whole: a rule through each cell, its words faint. */
+.p-text .pm-table .pm-cell-struck { color: var(--ch-ink-3); text-decoration: line-through; text-decoration-color: var(--ch-ink-2); background: var(--ch-subtle); }
+/* One you added: your blue edge, the cell waiting for your words. */
+.p-text .pm-table .pm-cell-added { box-shadow: inset 2px 0 0 var(--ch-you); }
+.p-text .pm-table :is(td, th) { height: 1.6em; }
 .p-text figcaption { font-size: 12px; font-style: italic; color: var(--ch-marg); }
 .p-text .ProseMirror-selectednode { outline: 1px solid var(--ch-focus-ink); outline-offset: 2px; border-radius: 3px; }
 

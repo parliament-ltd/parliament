@@ -29,26 +29,53 @@ export function withoutAnswers(content) {
  */
 export function placeAnswer(blocks, id, text, passage) {
   if (!Array.isArray(blocks) || !text) return null
-  // The paragraph the ask ends in, where its answer goes.
-  let lastBlock = -1
-  blocks.forEach((b, i) => { if (Array.isArray(b?.text) && b.text.some((r) => r?.ask === id || r?.point === id)) lastBlock = i })
-  if (lastBlock < 0) return null
+  const has = (runs) => Array.isArray(runs) && runs.some((r) => r?.ask === id || r?.point === id)
+  // The line the ask ends in, where its answer goes: a block's, or a table
+  // cell's (piece 6; C222 (a)), counted in reading order.
+  let count = 0
+  let lastLine = -1
+  forLines(blocks, (runs) => { if (has(runs)) lastLine = count; count += 1; return runs })
+  if (lastLine < 0) return null
   let now = ''
-  const out = blocks.map((b, i) => {
-    if (!Array.isArray(b?.text) || !b.text.some((r) => r?.ask === id || r?.point === id)) return b
-    const runs = b.text.map((r) => {
+  let n = 0
+  const out = forLines(blocks, (runs) => {
+    const at = n++
+    if (!has(runs)) return runs
+    const next = runs.map((r) => {
       if (r?.ask !== id) return r
       if (r.struck == null) now += r.text ?? ''
       return { ...r, replaced: id }
     })
-    if (i === lastBlock) {
-      const point = runs.findIndex((r) => r?.point === id)
-      const last = point >= 0 ? point : runs.reduce((n, r, k) => (r?.ask === id ? k : n), -1)
-      runs.splice(last + 1, 0, { text: point >= 0 ? ` ${text}` : text, answer: id })
+    if (at === lastLine) {
+      const point = next.findIndex((r) => r?.point === id)
+      const last = point >= 0 ? point : next.reduce((k, r, i) => (r?.ask === id ? i : k), -1)
+      next.splice(last + 1, 0, { text: point >= 0 ? ` ${text}` : text, answer: id })
     }
-    return { ...b, text: runs }
+    return next
   })
   // Changed since it was asked: the answer goes on its card only.
   if (passage != null && passage !== '' && now !== '' && now !== passage) return null
   return out
+}
+
+// Every line of a stored form, in reading order: a block's runs, or each
+// table cell's. fn(runs) gives the line's runs as they are to be; the
+// blocks come back with them, a block or cell left alone when unchanged.
+function forLines(blocks, fn) {
+  return blocks.map((b) => {
+    if (b?.type === 'table' && Array.isArray(b.rows)) {
+      let changed = false
+      const rows = b.rows.map((row) => (Array.isArray(row) ? row.map((c) => {
+        if (!c || typeof c !== 'object') return c
+        const next = fn(c.text)
+        if (next === c.text) return c
+        changed = true
+        return { ...c, text: next }
+      }) : row))
+      return changed ? { ...b, rows } : b
+    }
+    if (!Array.isArray(b?.text)) return b
+    const next = fn(b.text)
+    return next === b.text ? b : { ...b, text: next }
+  })
 }

@@ -11,7 +11,7 @@ import { toBlocks, wordsOf } from './blocks'
 function show(doc) {
   const out = []
   doc.forEach((block) => {
-    if (block.isAtom) {
+    if (block.isAtom || block.type.name === 'table') {
       out.push(`<${block.type.name}${block.attrs.struck ? ` struck #${block.attrs.struck}` : ''}>`)
       return
     }
@@ -216,7 +216,7 @@ describe('the rules of an edit (editing spec, "Editing replies")', () => {
     state = state.apply(state.tr.setSelection(NodeSelection.create(state.doc, pos)))
     state = apply(state, state.tr.deleteSelection().setMeta(INTENT, 'range'), ids)
     expect(show(state.doc)).toBe('Before. | <table struck #240> | After.')
-    expect(state.doc.child(1).attrs.rows).toEqual([['a', 'b'], ['1', '2']])
+    expect(state.doc.child(1).textContent).toBe('ab12')
   })
 
   it('undoes an edit from its card, bringing the words back exactly', () => {

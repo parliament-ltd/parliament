@@ -101,9 +101,13 @@ export function replyFromMarkdown(markdown, nextBlockId, { anchors = null } = {}
       case 'thematicBreak':
         blocks.push(schema.nodes.divider.create(attrs()))
         break
-      case 'table':
-        blocks.push(schema.nodes.table.create({ ...attrs(), rows: node.children.map((row) => row.children.map(plain)) }))
+      case 'table': {
+        // Cells keep the model's bold, italics, code and links (C222 (a)).
+        const table = attrs()
+        const rows = node.children.filter((row) => row.children.length).map((row, r) => schema.nodes.table_row.create(null, row.children.map((cell) => schema.nodes.table_cell.create({ id: nextBlockId(), header: r === 0 }, inline(cell.children)))))
+        if (rows.length) blocks.push(schema.nodes.table.create(table, rows))
         break
+      }
       default: {
         const text = plain(node)
         if (text) blocks.push(schema.nodes.paragraph.create(attrs(), schema.text(text)))

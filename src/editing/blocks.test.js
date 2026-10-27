@@ -43,7 +43,10 @@ describe('a reply in its stored form (C212 (b))', () => {
     expect(blocks[0]).toMatchObject({ type: 'heading', level: 1, anchor: 'msg-m1-h-0' })
     const chart = blocks.find((b) => b.type === 'chart')
     expect(JSON.parse(chart.data).title).toBe('Glass')
-    expect(blocks.find((b) => b.type === 'table').rows).toEqual([['a', 'b'], ['1', '2']])
+    // Rows of cells, each its own runs, the first row the header (C222 (d)).
+    const table = blocks.find((b) => b.type === 'table')
+    expect(((rows) => rows.map((r) => r.map((c) => c.text.map((x) => x.text).join(''))))(table.rows)).toEqual([['a', 'b'], ['1', '2']])
+    expect(table.rows[0].every((c) => c.header === true && typeof c.id === 'string')).toBe(true)
   })
 
   it('reads HTML in a reply as words, and never keeps an unsafe address', () => {
@@ -69,7 +72,7 @@ describe('a reply in its stored form (C212 (b))', () => {
     expect(back[1]).toMatchObject({ type: 'heading', level: 1 })
     expect(back[1].anchor).toBeUndefined()
     expect(back[1].id).not.toBe('b1')
-    expect(back[2].rows).toEqual([['1', '']])
+    expect(((rows) => rows.map((r) => r.map((c) => c.text.map((x) => x.text).join(''))))(back[2].rows)).toEqual([['1', '']])
   })
 
   it('gives nothing for nothing usable', () => {

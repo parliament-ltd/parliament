@@ -8,6 +8,10 @@
 // ask?, answer?, replaced? } or { break: true } for a line break, or
 // { point } for an ask at a point; struck and added hold an edit's id, ask,
 // answer, replaced and point an ask's (piece 4; C218).
+// A table's rows are lists of cells, each { id, text, header?, struck?,
+// added? }: its runs, and a row or column struck or added whole (piece 6;
+// C222 (d)). A table stored before piece 6 holds plain words in its rows,
+// and still reads.
 //
 // What is read back is treated as text from outside (a backup, a restored
 // file): only known types and fields are taken, every value is made the kind
@@ -63,7 +67,21 @@ export function toBlocks(doc) {
       b.kind = node.attrs.kind
       if (node.attrs.checked) b.checked = true
     }
-    if (type === 'table') b.rows = node.attrs.rows.map((row) => row.map(String))
+    // A table's rows of cells, each its own runs (piece 6; C222 (d)).
+    if (type === 'table') {
+      b.rows = []
+      node.forEach((row) => {
+        const cells = []
+        row.forEach((cell) => {
+          const c = { id: cell.attrs.id, text: runsOf(cell) }
+          if (cell.attrs.header) c.header = true
+          if (cell.attrs.struck != null) c.struck = cell.attrs.struck
+          if (cell.attrs.added != null) c.added = cell.attrs.added
+          cells.push(c)
+        })
+        b.rows.push(cells)
+      })
+    }
     if (type === 'chart') b.data = node.attrs.data
     if (node.attrs.struck != null) b.struck = node.attrs.struck
     out.push(b)
@@ -104,6 +122,13 @@ function inlineOf(runs, codeLine) {
   return nodes
 }
 
+// A line's words as they stand: struck words left out, and an answer not yet
+// accepted, which is not the reply's yet (C218).
+const wordsIn = (runs) => (Array.isArray(runs) ? runs : [])
+  .filter((r) => r && typeof r === 'object' && editId(r.struck) == null && editId(r.answer) == null)
+  .map((r) => (r.break === true ? '\n' : typeof r.text === 'string' ? r.text : ''))
+  .join('')
+
 /**
  * The words still standing in a stored form, as plain text: struck words
  * left out, the person's kept; a line each, lists marked as typed. What an
@@ -123,15 +148,15 @@ export function wordsOf(blocks) {
     if (editId(b.struck) != null) continue
     if (b.type === 'divider') { lines.push('---'); continue }
     if (b.type === 'table') {
-      lines.push((Array.isArray(b.rows) ? b.rows : []).filter(Array.isArray).map((r) => r.map((c) => String(c ?? '')).join(' | ')).join('\n'))
+      // A row or column struck whole is left out (C222).
+      const rows = (Array.isArray(b.rows) ? b.rows : []).filter(Array.isArray)
+        .map((r) => r.filter((c) => !(c && typeof c === 'object' && editId(c.struck) != null)).map((c) => (typeof c === 'string' ? c : wordsIn(c?.text))))
+        .filter((r) => r.length)
+      lines.push(rows.map((r) => r.join(' | ')).join('\n'))
       continue
     }
     if (b.type === 'chart') continue
-    const text = (Array.isArray(b.text) ? b.text : [])
-      // An answer not yet accepted is not the reply's yet (C218).
-      .filter((r) => r && typeof r === 'object' && editId(r.struck) == null && editId(r.answer) == null)
-      .map((r) => (r.break === true ? '\n' : typeof r.text === 'string' ? r.text : ''))
-      .join('')
+    const text = wordsIn(b.text)
     if (b.type === 'heading') lines.push(`${'#'.repeat([1, 2, 3].includes(b.level) ? b.level : 1)} ${text}`)
     else if (b.type === 'list') lines.push(`${b.kind === 'number' ? `${++number}.` : b.kind === 'check' ? (b.checked ? '- [x]' : '- [ ]') : '-'} ${text}`)
     else if (b.type === 'quote') lines.push(`> ${text}`)
@@ -168,8 +193,25 @@ export function fromBlocks(blocks, nextBlockId) {
       attrs.checked = b.checked === true
     }
     if (name === 'divider' || name === 'table' || name === 'chart') attrs.struck = struck
-    if (name === 'table') attrs.rows = Array.isArray(b.rows) ? b.rows.filter(Array.isArray).map((row) => row.map((c) => String(c ?? ''))) : []
     if (name === 'chart') attrs.data = typeof b.data === 'string' ? b.data : ''
+    if (name === 'table') {
+      // Rows of cells (C222 (d)); a table stored as plain words, before
+      // piece 6, reads as before: its first row the header.
+      const rows = (Array.isArray(b.rows) ? b.rows : []).filter((r) => Array.isArray(r) && r.length).map((row, r) => schema.nodes.table_row.create(null, row.map((c) => {
+        const cell = c && typeof c === 'object' ? c : { text: [{ text: String(c ?? '') }], header: r === 0 }
+        let cellId = typeof cell.id === 'string' && cell.id && cell.id.length <= 64 ? cell.id : nextBlockId()
+        if (seen.has(cellId)) cellId = nextBlockId()
+        seen.add(cellId)
+        const s = editId(cell.struck)
+        return schema.nodes.table_cell.create(
+          { id: cellId, header: cell.header === true, struck: s, added: s == null ? editId(cell.added) : null },
+          inlineOf(cell.text, false),
+        )
+      })))
+      if (!rows.length) continue
+      nodes.push(schema.nodes.table.create(attrs, rows))
+      continue
+    }
     const type = schema.nodes[name]
     nodes.push(type.isTextblock ? type.create(attrs, inlineOf(b.text, name === 'code_block')) : type.create(attrs))
   }

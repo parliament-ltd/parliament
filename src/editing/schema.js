@@ -8,8 +8,8 @@
 //   - the two an edit leaves: struck (the model's words, removed) and added
 //     (the person's words), each carrying its edit's id (C212 (b): an id,
 //     not a number, so a restore that renumbers never rewrites a reply).
-// Tables and charts are whole blocks (atoms): struck as a unit, not edited
-// inside, at first (C58).
+// Charts and dividers are whole blocks (atoms): struck as a unit (C58). A
+// table's cells are edited inside, each a short line (piece 6; C222).
 //
 // Nothing here is ever rendered as HTML: every node draws through toDOM
 // arrays, whose strings become text nodes.
@@ -99,12 +99,30 @@ export const schema = new Schema({
       toDOM: (n) => wrapStruck(n, ['hr', blockAttr(n)]),
       parseDOM: [{ tag: 'hr', getAttrs: readId }],
     },
-    // A table the model wrote: a whole block for now (C58).
+    // A table the model wrote, edited inside (piece 6; C222, ruled 26
+    // October): rows of cells, each cell a short line of text with an id of
+    // its own, edited like any line. Struck whole, it carries the edit's id.
     table: {
-      group: 'block', atom: true, selectable: true, attrs: { ...id, ...struck, rows: { default: [] } },
-      toDOM: (n) => wrapStruck(n, ['div', { ...blockAttr(n), class: 'pm-table' },
-        ['table', ['tbody', ...n.attrs.rows.map((row, r) => ['tr', ...row.map((cell) => [r === 0 ? 'th' : 'td', String(cell)])])]]]),
-      parseDOM: [{ tag: 'div.pm-table', getAttrs: readId }],
+      group: 'block', content: 'table_row+', isolating: true, selectable: true, attrs: { ...id, ...struck },
+      toDOM: (n) => wrapStruck(n, ['div', { ...blockAttr(n), class: 'pm-table' }, ['table', ['tbody', 0]]]),
+      parseDOM: [{ tag: 'div.pm-table', contentElement: 'tbody', getAttrs: readId }],
+    },
+    table_row: {
+      content: 'table_cell+',
+      toDOM: () => ['tr', 0],
+      parseDOM: [{ tag: 'tr' }],
+    },
+    // header: a cell of the first row. struck and added: a row or column
+    // struck or added whole, by the edit whose id they carry (C222 (b)).
+    table_cell: {
+      content: 'inline*', isolating: true,
+      attrs: { ...id, header: { default: false }, ...struck, added: { default: null } },
+      toDOM: (n) => [n.attrs.header ? 'th' : 'td', {
+        'data-block': n.attrs.id,
+        ...(n.attrs.struck != null ? { class: 'pm-cell-struck', 'data-edit': String(n.attrs.struck) }
+          : n.attrs.added != null ? { class: 'pm-cell-added', 'data-edit': String(n.attrs.added) } : {}),
+      }, 0],
+      parseDOM: ['td', 'th'].map((tag) => ({ tag, getAttrs: (dom) => ({ ...readId(dom), header: tag === 'th' }) })),
     },
     // A chart from the model's chart tool: a whole block for now (C58). data
     // is the chart's own text, as the reply gave it; in a reply on screen it
@@ -186,3 +204,5 @@ export const isEditMark = (m) => m.type === STRUCK || m.type === ADDED
 export const { ask: ASK, answer: ANSWER, replaced: REPLACED } = schema.marks
 /** An answer waiting, or the passage it would replace: the model's, settled by accept or undo. */
 export const isAnswerMark = (m) => m.type === ANSWER || m.type === REPLACED
+/** A block struck or kept as one: a divider, a chart, or a table struck whole. */
+export const isWholeBlock = (node) => node.isAtom || node.type === schema.nodes.table

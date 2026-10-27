@@ -3,7 +3,7 @@ import { EditorState, TextSelection, NodeSelection } from 'prosemirror-state'
 import { STRUCK, ADDED } from './schema'
 import { replyFromMarkdown } from './fromMarkdown'
 import { track, createIds, cursorMarks, undoEdit, collectEdits, INTENT } from './track'
-import { commands } from './keys'
+import { commands, tableOp, cellsOf } from './keys'
 
 // Stefan's try (C208): an undo from a card that left a strike behind. Random
 // runs of what a person does, then every edit undone from its card: the
@@ -36,7 +36,7 @@ function inlinePositions(doc) {
 function marksLeft(doc) {
   let n = 0
   doc.descendants((node) => {
-    if (node.isAtom && node.attrs.struck != null) n += 1
+    if (node.attrs.struck != null || node.attrs.added != null) n += 1
     for (const m of node.marks) if (m.type === STRUCK || m.type === ADDED) n += 1
     return true
   })
@@ -56,7 +56,7 @@ function runOnce(seed, steps) {
   for (let i = 0; i < steps; i++) {
     const positions = inlinePositions(state.doc)
     const p = pick(positions)
-    const kind = Math.floor(r() * 8)
+    const kind = Math.floor(r() * 9)
     if (kind === 0) { // typing at a caret, its marks set as the page sets them
       caret(p)
       const marks = cursorMarks(state, ids)
@@ -91,6 +91,15 @@ function runOnce(seed, steps) {
       caret(p)
       log.push(`enter at ${p}`)
       run(commands.enter(ids))
+    } else if (kind === 8) { // a row or column added or struck, from / in a cell (C222 (b))
+      const cells = cellsOf(state.doc)
+      if (!cells.length) continue
+      const c = pick(cells)
+      caret(c.pos + 1)
+      const key = pick(['rowBelow', 'colAfter', 'strikeRow', 'strikeCol'])
+      log.push(key + ' at ' + (c.pos + 1))
+      const tr = tableOp(state, key, ids)
+      if (tr) state = state.apply(tr)
     } else if (kind === 6) { // the table struck whole, as after a click on it
       let at = null
       state.doc.forEach((node, offset) => { if (node.type.name === 'table' && node.attrs.struck == null) at = offset })

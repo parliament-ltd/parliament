@@ -23,11 +23,12 @@ import { keymap } from 'prosemirror-keymap'
 import { Plugin, NodeSelection, TextSelection } from 'prosemirror-state'
 import { Decoration, DecorationSet } from 'prosemirror-view'
 import { Slice, Fragment } from 'prosemirror-model'
-import { schema, STRUCK, ADDED } from './schema'
+import { schema, STRUCK, ADDED, isWholeBlock } from './schema'
 import { SKIP, INTENT } from './track'
 import { historyPlugin, undo, redo } from './history'
 
-const isBlockAtom = (sel) => sel instanceof NodeSelection && sel.node.isBlock && sel.node.isAtom
+// A block taken whole: a chart or divider, or a table selected as one (C222).
+const isBlockAtom = (sel) => sel instanceof NodeSelection && sel.node.isBlock && isWholeBlock(sel.node)
 
 // Over a selection, an input method's word is to replace it: the selection is
 // struck first, with the cursor after the strike, so the composition starts
@@ -85,7 +86,13 @@ function nextLive(state, backwards) {
  * struck words, or nothing, before it in the line. Where "/" opens the block
  * menu (Stefan's try of piece 1, 26 October).
  */
-export function atLineStart(state) {
+export function atLineStart(state, pos = null) {
+  // Where the text goes in, when given: the page can move the caret (Home)
+  // a moment before the editor hears of it.
+  if (pos != null && pos !== state.selection.from) {
+    if (!state.doc.resolve(pos).parent.inlineContent) return false
+    state = state.apply(state.tr.setSelection(TextSelection.create(state.doc, pos)))
+  }
   const sel = state.selection
   if (!sel.empty || !sel.$from.parent.inlineContent) return false
   return nextLive(state, true).edge != null
@@ -129,6 +136,8 @@ function backspace(blocks, onJoin) {
         dispatch(state.tr.setSelection(TextSelection.create(state.doc, live.edge)))
         return true
       }
+      // A cell never joins the one before it (C222 (a)).
+      if ($pos.parent.type === schema.nodes.table_cell) return true
       const { depth, container, index } = placeOf($pos)
       // At a reply's start, under its prompt: the gap between them (C214 (a)).
       const atGap = index === 0 && isSection(container) && facesSection(state, $pos, depth, false)
@@ -191,6 +200,8 @@ function enter(ids) {
       return true
     }
     if (state.selection instanceof NodeSelection) return true
+    // In a table, Enter goes to the cell below (C222 (a)).
+    if (cellDepth(state.selection.$from) != null) return moveCell(state, dispatch, 'down', ids)
     if (!state.selection.empty) {
       // Striking the selection first, then the new block after it.
       dispatch(state.tr.delete(state.selection.from, state.selection.to).setMeta(INTENT, 'range'))
@@ -228,7 +239,9 @@ function enter(ids) {
 export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, onAsk, menuKey, menuText, log, now }) {
   const blk = typeof blocks === 'function' ? blocks : () => blocks
   const whenBlocks = (command) => (state, dispatch, view) => (blk(state) ? command(state, dispatch, view) : true)
-  const wholeBlock = (node) => onNote?.(`A ${node.type.name} is one block for now: Backspace strikes it whole, and editing inside it comes later.`)
+  const wholeBlock = (node) => onNote?.(node.type === schema.nodes.table
+    ? 'The whole table is selected: Backspace strikes it whole. Click into a cell to change its words.'
+    : `A ${node.type.name} is one block for now: Backspace strikes it whole, and editing inside it comes later.`)
   const nothing = () => true
   const strike = (state, dispatch) => {
     if (state.selection.empty) return true
@@ -247,6 +260,9 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
     'Mod-i': nothing,
     'Mod-u': nothing,
     'Shift-Mod-x': strike,
+    // Between a table's cells (C222 (a)); outside a table, Tab leaves the reply as usual.
+    Tab: (state, dispatch) => moveCell(state, dispatch, 'next'),
+    'Shift-Tab': (state, dispatch) => moveCell(state, dispatch, 'prev'),
     // An ask (piece 4; C218 (a)): Ctrl+K stays the bar's. In a reply only:
     // asks are for replies, the spec says, and a prompt says so.
     'Shift-Mod-k': (state, dispatch, view) => {
@@ -281,7 +297,10 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
         // "/" with nothing but struck words before it in the line opens the
         // block menu (replies only): a line that starts with struck words
         // still starts there (Stefan's try of piece 1, 26 October).
-        if (blk(view.state) && text === '/' && from === to && onSlash && atLineStart(view.state)) return onSlash(view)
+        if (blk(view.state) && text === '/' && from === to && onSlash && atLineStart(view.state, from)) {
+          if (view.state.selection.from !== from) view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, from)))
+          return onSlash(view)
+        }
         // "/" over selected words opens it too: they become a line of the
         // kind picked (setBlock), and nothing is typed over them.
         if (blk(view.state) && text === '/' && !view.state.selection.empty && view.state.selection instanceof TextSelection && onSlash) return onSlash(view)
@@ -376,7 +395,7 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
       if (!trs.some((t) => t.docChanged)) return null
       const seen = new Set()
       let tr = null
-      for (const { node, pos } of linesOf(state.doc)) {
+      for (const { node, pos } of [...linesOf(state.doc), ...cellsOf(state.doc)]) {
         if (node.attrs.id != null && !seen.has(node.attrs.id)) {
           seen.add(node.attrs.id)
           continue
@@ -387,6 +406,76 @@ export function editingPlugins({ ids, blocks = true, onSlash, onNote, onJoin, on
     },
   })
   return [events, keys, uniqueIds, ...(blocks ? [gapLines(ids)] : []), historyPlugin(now ? { now } : {})]
+}
+
+/** Every table cell of a document, with its position: each keeps an id of its own (C222). */
+export function cellsOf(doc) {
+  const out = []
+  doc.descendants((node, pos) => {
+    if (node.type === schema.nodes.table_cell) { out.push({ node, pos }); return false }
+    return !node.isTextblock && !node.isAtom
+  })
+  return out
+}
+
+// The depth of the table cell a position is in, or null.
+export function cellDepth($pos) {
+  for (let d = $pos.depth; d > 0; d--) if ($pos.node(d).type === schema.nodes.table_cell) return d
+  return null
+}
+
+// Where a cell's words start, by its row and column.
+function cellStart(table, tablePos, r, c) {
+  let pos = tablePos + 1
+  for (let i = 0; i < r; i++) pos += table.child(i).nodeSize
+  pos += 1
+  const row = table.child(r)
+  for (let j = 0; j < c; j++) pos += row.child(j).nodeSize
+  return pos + 1
+}
+
+/**
+ * The cursor to another cell (C222 (a)): 'next' and 'prev' along the rows,
+ * 'down' to the cell below. Past the last row, 'down' goes to the line after
+ * the table, opened if there is none; Tab past the last cell leaves the
+ * table to the browser, so the keyboard is never caught.
+ */
+export function moveCell(state, dispatch, dir, ids = null) {
+  const $from = state.selection.$from
+  const d = cellDepth($from)
+  if (d == null) return false
+  const table = $from.node(d - 2)
+  const tablePos = $from.before(d - 2)
+  const r = $from.index(d - 2)
+  const c = $from.index(d - 1)
+  let row = r
+  let col = c
+  if (dir === 'next') {
+    col += 1
+    if (col >= table.child(r).childCount) { row += 1; col = 0 }
+  } else if (dir === 'prev') {
+    col -= 1
+    if (col < 0) { row -= 1; col = row >= 0 ? table.child(row).childCount - 1 : 0 }
+  } else row += 1
+  if (row < 0) return false
+  if (row >= table.childCount) {
+    if (dir !== 'down') return false
+    const after = tablePos + table.nodeSize
+    const next = state.doc.resolve(after).nodeAfter
+    if (next?.isTextblock) {
+      dispatch(state.tr.setSelection(TextSelection.create(state.doc, after + 1)).scrollIntoView())
+      return true
+    }
+    if (!ids) return true
+    const tr = state.tr.insert(after, schema.nodes.paragraph.create({ id: ids.block() })).setMeta(SKIP, true)
+    dispatch(tr.setSelection(TextSelection.create(tr.doc, after + 1)).scrollIntoView())
+    return true
+  }
+  col = Math.min(col, table.child(row).childCount - 1)
+  const start = cellStart(table, tablePos, row, col)
+  const end = start + table.child(row).child(col).content.size
+  dispatch(state.tr.setSelection(TextSelection.create(state.doc, end)).scrollIntoView())
+  return true
 }
 
 /** Every block of a document, in a section or not, with its position. */
@@ -592,4 +681,73 @@ export function setBlock(state, choice, ids) {
   }
   tr.setBlockType($from.before(), $from.after(), schema.nodes[choice.type], { id: block.attrs.id, ...(choice.attrs ?? {}) })
   return tr
+}
+
+/** The / menu's choices in a table cell (C222 (b)). */
+export const TABLE_CHOICES = [
+  { key: 'rowBelow', label: 'Row below', table: true },
+  { key: 'colAfter', label: 'Column after', table: true },
+  { key: 'strikeRow', label: 'Strike row', table: true },
+  { key: 'strikeCol', label: 'Strike column', table: true },
+]
+
+/**
+ * A row or column added or struck, from the / menu in a cell (C222 (b)):
+ * an edit, with an id of its own, carried by each cell it covers. A row or
+ * column that is all yours goes, as your own words do when struck. null
+ * outside a table.
+ */
+export function tableOp(state, key, ids) {
+  const $from = state.selection.$from
+  const d = cellDepth($from)
+  if (d == null) return null
+  const table = $from.node(d - 2)
+  const tablePos = $from.before(d - 2)
+  const r = $from.index(d - 2)
+  const c = $from.index(d - 1)
+  const id = ids.peek()
+  ids.commit(id)
+  const tr = state.tr.setMeta(SKIP, true)
+  const rowPos = (doc, i) => {
+    const t = doc.nodeAt(tablePos)
+    let p = tablePos + 1
+    for (let k = 0; k < i; k++) p += t.child(k).nodeSize
+    return p
+  }
+  const newCell = (header = false) => schema.nodes.table_cell.create({ id: ids.block(), header, added: id })
+  if (key === 'rowBelow') {
+    const cells = Array.from({ length: table.child(r).childCount }, () => newCell(false))
+    const at = rowPos(state.doc, r + 1)
+    tr.insert(at, schema.nodes.table_row.create(null, cells))
+    return tr.setSelection(TextSelection.create(tr.doc, at + 2))
+  }
+  if (key === 'colAfter') {
+    for (let i = table.childCount - 1; i >= 0; i--) {
+      const row = table.child(i)
+      const j = Math.min(c, row.childCount - 1)
+      tr.insert(cellStart(table, tablePos, i, j) - 1 + row.child(j).nodeSize, newCell(i === 0))
+    }
+    const t = tr.doc.nodeAt(tablePos)
+    return tr.setSelection(TextSelection.create(tr.doc, cellStart(t, tablePos, r, Math.min(c + 1, t.child(r).childCount - 1))))
+  }
+  if (key === 'strikeRow' || key === 'strikeCol') {
+    // The cells it covers: a row's, or the column's in every row.
+    const covered = []
+    if (key === 'strikeRow') table.child(r).forEach((cell, _at, j) => covered.push({ cell, i: r, j }))
+    else table.forEach((row, _at, i) => { if (c < row.childCount) covered.push({ cell: row.child(c), i, j: c }) })
+    if (covered.every((x) => x.cell.attrs.added != null)) {
+      // All yours: it goes, last first.
+      if (key === 'strikeRow' && table.childCount > 1) tr.delete(rowPos(state.doc, r), rowPos(state.doc, r) + table.child(r).nodeSize)
+      else if (key === 'strikeCol') for (const x of [...covered].reverse()) {
+        if (table.child(x.i).childCount > 1) tr.delete(cellStart(table, tablePos, x.i, x.j) - 1, cellStart(table, tablePos, x.i, x.j) - 1 + x.cell.nodeSize)
+      }
+      return tr
+    }
+    for (const x of covered) {
+      if (x.cell.attrs.added != null || x.cell.attrs.struck != null) continue
+      tr.setNodeMarkup(cellStart(table, tablePos, x.i, x.j) - 1, null, { ...x.cell.attrs, struck: id })
+    }
+    return tr
+  }
+  return null
 }

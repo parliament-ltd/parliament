@@ -17,7 +17,10 @@ export function editsIn(doc) {
     out.set(e.id, {
       struck: e.struck,
       added: e.added,
-      places: e.parts.map((p) => ({ block: p.block, from: p.from, to: p.to })),
+      // A cell's place also names its table, row and column (C222 (d)).
+      places: e.parts.map((p) => (p.table != null
+        ? { block: p.block, from: p.from, to: p.to, table: p.table, row: p.row, col: p.col, ...(p.cell ? { cell: p.cell } : {}) }
+        : { block: p.block, from: p.from, to: p.to })),
     })
   }
   return out
