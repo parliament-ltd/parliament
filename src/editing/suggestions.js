@@ -239,6 +239,8 @@ export function suggestionsPlugin({ onSettle, words = { ripple: 'ripple', sweep:
     box.className = `pm-sug-marker ${kind}`
     box.contentEditable = 'false'
     box.setAttribute('data-suggestion', id)
+    // Its number, for calm's numbered dot (C255 (a)).
+    if (info?.num) box.setAttribute('data-num', String(info.num))
     const name = kind === 'sweep' ? words.sweep : words.ripple
     if (info?.num) {
       const find = document.createElement('button')

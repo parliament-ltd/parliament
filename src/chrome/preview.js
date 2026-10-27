@@ -62,7 +62,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep', 'reflect', 'lab', 'edit', 'done', 'layout', 'theme', 'device', 'place', 'duplicate', 'local', 'web', 'attach', 'calm'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -587,6 +587,14 @@ function planThinking(a, step, screens = {}) {
 }
 
 /** markup:on / markup:off: replies marked up, or clean (stage 11, piece 1). screens.markup: { on }, on by default. */
+/** calm: and calm:off (stage 14, piece 2; C255 (d)): a setting of this device. */
+function planCalm(a, step, screens = {}) {
+  const want = step.match?.values?.[0]?.value !== 'off'
+  const on = screens.calm?.on === true
+  if (want === on) return { says: { message: on ? 'calmSameOn' : 'calmSameOff' }, act: null }
+  return { says: { message: want ? 'calmOn' : 'calmOff' }, act: { kind: 'setting', key: 'calm', value: want, before: on } }
+}
+
 function planMarkup(a, step, screens = {}) {
   const want = step.match?.values?.[0]?.value === 'on'
   // markup:off col, or on the Collection: the Collection's own (C220 (g)).
@@ -812,6 +820,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       framework: planFramework,
       thinking: planThinking,
       markup: planMarkup,
+      // calm: (stage 14, piece 2; C255).
+      calm: planCalm,
       // ask: (stage 11, piece 4; C218 (a)).
       ask: (a1, s1) => planAsk(s1),
       // strikethrough: and tell: (piece 7; C225 (c), (d)).

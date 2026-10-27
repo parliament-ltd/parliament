@@ -95,6 +95,8 @@ export function asksPlugin({ onSettle, words = { ask: 'ask', accept: 'accept', u
     box.className = `pm-ask-marker${answered ? ' answered' : ''}`
     box.contentEditable = 'false'
     box.setAttribute('data-ask', id)
+    // Its number, for calm's numbered dot (C255 (a)).
+    if (info?.num) box.setAttribute('data-num', String(info.num))
     // "ask 241" finds its card on the Collection (C220 (f)).
     if (info?.num) {
       const find = document.createElement('button')

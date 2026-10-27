@@ -1657,6 +1657,10 @@ msgid "collection.yours"
 msgstr "your order"
 
 #. js-lingui-explicit-id
+msgid "collections.coloursFold"
+msgstr "colours ▾"
+
+#. js-lingui-explicit-id
 msgid "compare.close"
 msgstr "Nothing was sent. Escape closes this"
 
@@ -2111,6 +2115,24 @@ msgstr "Put then between each of them, as by:wikipedia then sonnet"
 #. js-lingui-explicit-id
 msgid "enter.byWhich"
 msgstr "{word} could be {names}. Say which, like {example}"
+
+#. js-lingui-explicit-id
+msgid "enter.calmOff"
+msgstr "Enter shows every detail again"
+
+#. js-lingui-explicit-id
+msgid "enter.calmOn"
+msgstr "Enter calms the screen: details wait until you are near them"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.calmSameOff"
+msgstr "Every detail shows already. calm: calms the screen"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.calmSameOn"
+msgstr "The screen is calm already. calm:off shows every detail"
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
@@ -8081,6 +8103,16 @@ msgstr "Parliament"
 #. js-lingui-explicit-id
 msgid "shell.boardLater"
 msgstr "This board is drawn in a later stage."
+
+#. calm is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.calmOff"
+msgstr "calm: off"
+
+#. calm is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.calmOn"
+msgstr "calm: on"
 
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id

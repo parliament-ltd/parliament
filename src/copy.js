@@ -630,6 +630,11 @@ export const COPY = {
     focusOff: /*i18n*/ { id: 'enter.focusOff', message: 'Enter brings back {boards}' },
     focusOffSame: /*i18n*/ { id: 'enter.focusOffSame', message: 'Enter brings the screen back as it was' },
     focusOffNot: /*i18n*/ { id: 'enter.focusOffNot', message: 'Nothing is in focus' },
+    // calm: (stage 14, piece 2; C255).
+    calmOn: /*i18n*/ { id: 'enter.calmOn', message: "Enter calms the screen: details wait until you are near them" },
+    calmOff: /*i18n*/ { id: 'enter.calmOff', message: "Enter shows every detail again" },
+    calmSameOn: /*i18n*/ { id: 'enter.calmSameOn', message: "The screen is calm already. calm:off shows every detail", comment: 'Commands stay English' },
+    calmSameOff: /*i18n*/ { id: 'enter.calmSameOff', message: "Every detail shows already. calm: calms the screen", comment: 'Commands stay English' },
     // Focus sets, kept with a room (stage 14, piece 1; C253).
     focusTheChat: /*i18n*/ { id: 'enter.focusTheChat', message: "the chat" },
     focusInLab: /*i18n*/ { id: 'enter.focusInLab', message: "focus: works outside the Lab. done: leaves it first", comment: 'Commands stay English' },
@@ -1975,6 +1980,8 @@ export const COPY = {
     runs: /*i18n*/ { id: 'collection.runs', message: 'Runs {command}', comment: 'Commands stay English' },
     markupWord: /*i18n*/ { id: 'collection.markupWord', message: 'markup' },
     cleanWord: /*i18n*/ { id: 'collection.cleanWord', message: 'clean' },
+    // The legend folded while calm (stage 14, piece 2; C255 (a)).
+    coloursFold: /*i18n*/ { id: 'collections.coloursFold', message: 'colours ▾' },
     legendStruck: /*i18n*/ { id: 'collection.legendStruck', message: 'struck' },
     legendStruckIs: /*i18n*/ { id: 'collection.legendStruckIs', message: 'yours, removed' },
     legendBlue: /*i18n*/ { id: 'collection.legendBlue', message: 'blue' },
@@ -2410,6 +2417,8 @@ export const COPY = {
     focusRuns: /*i18n*/ { id: 'shell.focusRuns', message: 'Runs {command}', comment: 'Commands stay English' },
     focusPick: /*i18n*/ { id: 'shell.focusPick', message: 'Choose the boards of your focus' },
     focusPickHead: /*i18n*/ { id: 'shell.focusPickHead', message: 'left to right:' },
+    calmOff: /*i18n*/ { id: 'shell.calmOff', message: 'calm: off', comment: 'calm is the command word, kept English' },
+    calmOn: /*i18n*/ { id: 'shell.calmOn', message: 'calm: on', comment: 'calm is the command word, kept English' },
     boardLater: /*i18n*/ { id: 'shell.boardLater', message: 'This board is drawn in a later stage.' },
     sampleReply: /*i18n*/ { id: 'shell.sampleReply', message: 'A stand-in reply until rooms arrive. Click into this line to edit it, and the bar folds into a circle.', comment: 'Editable text on a placeholder board; nothing typed here is kept' },
     addressed: /*i18n*/ { id: 'shell.addressed', message: 'the bar points here', comment: 'Marginalia on the board the navy rule is on' },

@@ -2049,6 +2049,30 @@ export default function Shell() {
   }, [targets, heldWho, roomId, conversations, keys, settings.defaultModel, addressOf, region, localRev]) // eslint-disable-line react-hooks/exhaustive-deps -- region changes the prices, a check the models
   const branching = useMemo(() => ({ shown: branchShown, held: heldTo }), [branchShown, heldTo])
 
+  // ── Calm (stage 14, piece 2; C255) ──
+  // A setting of this device (C253 (d)), off for someone new (C253 (c)).
+  const calm = settings.calm === true
+  const calmScreen = useMemo(() => ({ on: calm }), [calm])
+  // On a touch screen, "near" is the one last tapped (C253 (e)).
+  useEffect(() => {
+    if (!calm) return undefined
+    const NEAR = '.ch-card, .p-pair-host, .p-edit, .ch-mk, .ch-col-legend, .ch-branches'
+    const onDown = (e) => {
+      if (e.pointerType === 'mouse') return
+      document.querySelectorAll('.near').forEach((el) => el.classList.remove('near'))
+      let el = e.target instanceof Element ? e.target.closest(NEAR) : null
+      while (el) {
+        el.classList.add('near')
+        el = el.parentElement?.closest(NEAR) ?? null
+      }
+    }
+    document.addEventListener('pointerdown', onDown, true)
+    return () => {
+      document.removeEventListener('pointerdown', onDown, true)
+      document.querySelectorAll('.near').forEach((el) => el.classList.remove('near'))
+    }
+  }, [calm])
+
   // ── Focus sets (stage 14, piece 1; C253) ──
   // The room on screen keeps its own focus set on its record; the bar reads
   // it for focus: and keeps a new one with focus:room collection or save.
@@ -2803,7 +2827,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -3647,8 +3671,8 @@ export default function Shell() {
   if (!started) return <div className="ch-shell" />
 
   return (
-    <div className={`ch-shell bar-${bar.at}${onWelcome ? ' on-welcome' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}`}>
-      {!onWelcome && <Strip arrangement={stripArrangement} onPick={pickBoard} focus={focusScreen} onRun={runClicked} onWrite={writeField} />}
+    <div className={`ch-shell bar-${bar.at}${onWelcome ? ' on-welcome' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}${calm ? ' calm' : ''}`}>
+      {!onWelcome && <Strip arrangement={stripArrangement} onPick={pickBoard} focus={focusScreen} onRun={runClicked} onWrite={writeField} calm={calm} />}
       {/* One bar in one place, moved by its class or its holder, so moving
           it never loses the field's focus or what is typed. */}
       <div ref={dockSlot} className="ch-bar-host" />

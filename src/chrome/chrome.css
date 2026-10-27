@@ -36,7 +36,10 @@
 .ch-btitle.here { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
 .ch-btitle .ch-ctx { font-weight: 400; color: var(--ch-ink-3); margin-inline-start: 4px; }
 /* focus: at the end of the strip, and its picker (stage 14, piece 1; C253). */
-.ch-sfocus { margin-inline-start: auto; display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
+.ch-scalm { margin-inline-start: auto; }
+.ch-shell .ch-scalm button { padding: 0; font: inherit; color: inherit; }
+.ch-shell .ch-scalm button:hover, .ch-shell .ch-scalm button.on { color: var(--ch-ink); }
+.ch-sfocus { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
 .ch-shell .ch-sfocus button { padding: 0; font: inherit; color: inherit; }
 .ch-shell .ch-sfocus button:hover, .ch-shell .ch-sfocus button.on { color: var(--ch-ink); }
 .ch-shell .ch-sfocus button.car { font-style: normal; font-size: 9px; }
@@ -998,3 +1001,49 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-shell .ch-bwhere button.on { color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
 .ch-bmarg { display: flex; flex-wrap: wrap; gap: 0 12px; margin: 8px 0 0; }
 .ch-bmissing p { display: flex; flex-wrap: wrap; gap: 2px 12px; padding: 6px; margin: 0; }
+
+/* Calm (stage 14, piece 2; C255; the editing spec, "Calm"): detail waits
+   until you are near it, by hover, keyboard focus inside, or on a touch
+   screen the one last tapped (.near). Never calmed: the field, the Enter
+   line, the review bar's buttons, the count line and the strip. */
+
+/* A board's head: its title only. */
+.ch-shell.calm .ch-card:not(:hover):not(:focus-within):not(.near) > .ch-chead > :not(h2) { visibility: hidden; }
+
+/* A reply as it stands (as markup:off reads it), with a tick in the margin
+   where something is marked; near, the markup. It stays editable. */
+.ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near) .p-text del { display: none; }
+.ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near) .p-text :is(del.pm-sug-out, del.pm-replaced) { display: inline; color: inherit; text-decoration: none; }
+.ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near) .p-text ins.pm-added { color: inherit; text-decoration: none; }
+.ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near) .p-text :is(ins.pm-answer, ins.pm-sug-in, .pm-ask-point) { display: none; }
+.ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near) .p-text .pm-ask { text-decoration: none; }
+.ch-shell.calm :is(.p-pair-host, .p-edit) { position: relative; }
+.ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near):has(.p-text :is(del, ins, .pm-ask, .pm-ask-point))::before {
+  content: "\2713"; position: absolute; inset-inline-start: -2px; top: 4px; font: 600 11px var(--ch-sans); color: var(--ch-you); pointer-events: none;
+}
+
+/* Inline markers: small numbered dots, green for asks and sweeps, rust for Ripple. */
+.ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near) .p-text :is(.pm-ask-marker, .pm-sug-marker) { font-size: 0; }
+.ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near) .p-text :is(.pm-ask-marker, .pm-sug-marker) > * { display: none; }
+.ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near) .p-text :is(.pm-ask-marker, .pm-sug-marker)::before {
+  content: attr(data-num); display: inline-flex; align-items: center; justify-content: center; min-width: 14px; height: 14px; padding: 0 3px; box-sizing: border-box;
+  border-radius: 7px; background: var(--ch-ai); color: var(--ch-surface); font: 600 9px/1 var(--ch-sans); font-style: normal; vertical-align: middle;
+}
+.ch-shell.calm :is(.p-pair-host, .p-edit):not(:hover):not(:focus-within):not(.near) .p-text .pm-sug-marker.ripple::before { background: var(--ch-rust); }
+
+/* The branch slider's line: its first open: only. */
+.ch-shell.calm .ch-branches:not(:hover):not(:focus-within):not(.near) .ch-bmarg > :not(button:first-of-type) { display: none; }
+
+/* Collection cards: one line, the result. */
+.ch-shell.calm .ch-mk:not(:hover):not(:focus-within):not(.near) :is(.ch-mk-marg, .ch-ask-on, .ch-mk-qs, .ch-sg-from) { display: none; }
+.ch-shell.calm .ch-mk:not(:hover):not(:focus-within):not(.near) .ch-ed :is(s, .ch-ed-arrow) { display: none; }
+.ch-shell.calm .ch-mk:not(:hover):not(:focus-within):not(.near) .ch-ed ins { text-decoration: none; color: inherit; }
+.ch-shell.calm .ch-mk:not(:hover):not(:focus-within):not(.near) .ch-ed:not(:has(ins, .ch-ed-gone))::before { content: attr(data-gone); font-style: italic; color: var(--ch-ink-3); }
+.ch-shell.calm .ch-mk:not(:hover):not(:focus-within):not(.near):has(.ch-ask-a) .ch-ask-q { display: none; }
+.ch-shell.calm .ch-mk:not(:hover):not(:focus-within):not(.near) :is(.t, .q, .ch-ed, .ch-ask-q, .ch-ask-a) { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* The legend: "colours ▾". The review keys hidden; the tab counts dimmed. */
+.ch-shell.calm .ch-col-legend:not(:hover):not(:focus-within):not(.near) > * { display: none; }
+.ch-shell.calm .ch-col-legend:not(:hover):not(:focus-within):not(.near)::before { content: attr(data-calm); }
+.ch-shell.calm .ch-sg-keys { display: none; }
+.ch-shell.calm .ch-col-tabs .n { opacity: .55; }

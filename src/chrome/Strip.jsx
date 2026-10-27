@@ -11,13 +11,14 @@ import { FOCUS_BOARDS } from '../shell/arrangement'
 // It ends with "focus: off ▾" (stage 14, piece 1; C253): a click on "focus"
 // turns it on or off at once, as focus: and focus:off do; the caret opens a
 // picker of the boards with numbered ticks, the numbers their order left to
-// right, which writes focus:room collection into the bar for Enter.
+// right, which writes focus:room collection into the bar for Enter. Before
+// it, "calm: off" turns calm on or off at once (piece 2; C255 (d)).
 
 /**
  * @param {{ arrangement: object, onPick: (board: string) => void,
  *   focus?: { set: string[]|null }|null, onRun?: (line: string) => void, onWrite?: (text: string) => void }} props
  */
-export default function Strip({ arrangement, onPick, focus = null, onRun = null, onWrite = null }) {
+export default function Strip({ arrangement, onPick, focus = null, onRun = null, onWrite = null, calm = false }) {
   const { i18n } = useLingui()
   const [picking, setPicking] = useState(false)
   const [ticked, setTicked] = useState([])
@@ -47,6 +48,15 @@ export default function Strip({ arrangement, onPick, focus = null, onRun = null,
           {b.context != null && <span className="ch-ctx">{String(b.context)}</span>}
         </button>
       ))}
+      {onRun && (
+        <span className="ch-marg ch-scalm">
+          <button type="button" className={calm ? 'on' : undefined} aria-pressed={calm}
+            title={i18n._(COPY.shell.focusRuns, { command: calm ? 'calm:off' : 'calm:' })}
+            onClick={() => onRun(calm ? 'calm:off' : 'calm:')}>
+            {i18n._(calm ? COPY.shell.calmOn : COPY.shell.calmOff)}
+          </button>
+        </span>
+      )}
       {onRun && (
         <span className="ch-marg ch-sfocus">
           <button type="button" className={on ? 'on' : undefined} aria-pressed={on}

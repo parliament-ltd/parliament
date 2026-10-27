@@ -1657,6 +1657,10 @@ msgid "collection.yours"
 msgstr "自分の並び順"
 
 #. js-lingui-explicit-id
+msgid "collections.coloursFold"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "compare.close"
 msgstr "何も送信していません。Escapeで閉じます"
 
@@ -2111,6 +2115,24 @@ msgstr "名前と名前の間に then を入れます。例：by:wikipedia then 
 #. js-lingui-explicit-id
 msgid "enter.byWhich"
 msgstr "{word} は{names}のいずれかを指します。{example} のように指定してください"
+
+#. js-lingui-explicit-id
+msgid "enter.calmOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.calmOn"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.calmSameOff"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.calmSameOn"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
@@ -8081,6 +8103,16 @@ msgstr "Parliament"
 #. js-lingui-explicit-id
 msgid "shell.boardLater"
 msgstr "このボードは、後の段階で作ります。"
+
+#. calm is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.calmOff"
+msgstr ""
+
+#. calm is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.calmOn"
+msgstr ""
 
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id

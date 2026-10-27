@@ -1657,6 +1657,10 @@ msgid "collection.yours"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "collections.coloursFold"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "compare.close"
 msgstr ""
 
@@ -2110,6 +2114,24 @@ msgstr ""
 #. {names} is a list joined with "or"
 #. js-lingui-explicit-id
 msgid "enter.byWhich"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.calmOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.calmOn"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.calmSameOff"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.calmSameOn"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -8080,6 +8102,16 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "shell.boardLater"
+msgstr ""
+
+#. calm is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.calmOff"
+msgstr ""
+
+#. calm is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.calmOn"
 msgstr ""
 
 #. Read aloud for the stretchable edge between two boards

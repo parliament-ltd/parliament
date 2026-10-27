@@ -42,6 +42,9 @@ const DEFAULT_SETTINGS = {
   // Replies marked up (struck words, the person's in blue, editable) or
   // clean, the result only (stage 11, piece 1; markup:on, markup:off).
   markup: 'on',
+  // calm: and calm:off (stage 14, piece 2; C255): off for someone new
+  // (C253 (c)), kept on this device and not in backups (C253 (d)).
+  calm: false,
   // The Collection's cards, marked up or clean, apart from the chat's (piece 5; C220 (g)).
   collectionMarkup: 'on',
   // The reply language (a tag, or 'off'; none follows the interface), the

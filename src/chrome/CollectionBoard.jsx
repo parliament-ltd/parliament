@@ -130,7 +130,7 @@ function ChangeCard({ card, clean, fresh, onRun, onFind, nameOf }) {
       <div className="ch-mk-body">
         {card.kind === 'edit'
           ? (
-            <div className="ch-ed" dir="auto">
+            <div className="ch-ed" dir="auto" data-gone={i18n._(C.removed)}>
               {clean
                 ? (c.added ? <span>{c.added}</span> : <span className="ch-ed-gone">{i18n._(C.removed)}</span>)
                 : (
@@ -433,7 +433,7 @@ export default function CollectionBoard({ collection, collections, label, entrie
           ) : null}
         </div>
         {changed && !clean ? (
-          <div className="ch-col-legend ch-marg">
+          <div className="ch-col-legend ch-marg" tabIndex={0} data-calm={i18n._(C.coloursFold)}>
             <span><s>{i18n._(C.legendStruck)}</s> {i18n._(C.legendStruckIs)}</span>
             <span><ins className="l-you">{i18n._(C.legendBlue)}</ins> {i18n._(C.legendBlueIs)}</span>
             <span><ins className="l-ai">{i18n._(C.legendGreen)}</ins> {i18n._(counts.suggestion ? C.legendSweepIs : C.legendGreenIs)}</span>

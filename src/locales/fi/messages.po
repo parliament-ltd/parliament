@@ -1657,6 +1657,10 @@ msgid "collection.yours"
 msgstr "oma järjestys"
 
 #. js-lingui-explicit-id
+msgid "collections.coloursFold"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "compare.close"
 msgstr "Mitään ei lähetetty. Escape sulkee tämän"
 
@@ -2111,6 +2115,24 @@ msgstr "Kirjoita sana then kunkin nimen väliin, esimerkiksi by:wikipedia then s
 #. js-lingui-explicit-id
 msgid "enter.byWhich"
 msgstr "{word} voi tarkoittaa: {names}. Kerro mikä, esimerkiksi {example}"
+
+#. js-lingui-explicit-id
+msgid "enter.calmOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.calmOn"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.calmSameOff"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.calmSameOn"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.changeGone"
@@ -8081,6 +8103,16 @@ msgstr "Parliament"
 #. js-lingui-explicit-id
 msgid "shell.boardLater"
 msgstr "Tämä taulu piirretään myöhemmässä vaiheessa."
+
+#. calm is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.calmOff"
+msgstr ""
+
+#. calm is the command word, kept English
+#. js-lingui-explicit-id
+msgid "shell.calmOn"
+msgstr ""
 
 #. Read aloud for the stretchable edge between two boards
 #. js-lingui-explicit-id

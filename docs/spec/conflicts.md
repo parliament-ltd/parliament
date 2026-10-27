@@ -3276,6 +3276,37 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   **Suggestion:** yes.
 - **(e) Stored data:** one device setting, `calm`. **Suggestion:** yes.
 
+**C256. Stage 14, piece 2, as built: calm** (27 October; C255 as suggested).
+- **`calm:` and `calm:off`:**
+  - Each is a setting of this device, `calm`, off for someone new, one step for `undo:`.
+  - The lines: "Enter calms the screen: details wait until you are near them"; "Enter shows every detail again".
+  - The strip has "calm: off" before "focus: off ▾"; a click toggles and echoes ("Ran calm:off. undo: takes it back").
+  - The setting is kept on this device and stays out of backups. It survives a reload, after a fix found in trying it: the settings store reads only the keys it lists, so `calm` is now listed, off.
+- **What folds** (C255 (a)), all by the shell's `calm` class in the stylesheet:
+  - **Board heads:** title only.
+  - **Replies:** read as `markup:off` shows them, but editable.
+    - Struck words go, added words are plain, and answers and suggestions not yet accepted are not shown.
+    - A blue ✓ in the margin marks a reply with anything marked.
+  - **Ask and suggestion markers:** small dots with their numbers (the markers now carry `data-num`). Green for asks and sweeps, rust for Ripple; a marker without a number is a plain dot.
+  - **The branch slider's line:** its first `open:` only.
+  - **Collection cards:** one line, the result.
+    - An edit that only removed words says "removed", as `markup:off` does: found in trying it, where such cards folded to nothing.
+    - An answered ask shows its answer.
+  - **The legend:** "colours ▾". It can take keyboard focus, so it opens without a pointer.
+  - **The review keys line:** hidden, and the tab counts dimmed.
+- **Near** (C255 (b)): hover, or keyboard focus inside. On a touch screen, the shell marks the tapped element and every one around it as near, until the next tap.
+- **Never calmed:** the field, the Enter line, the review bar's buttons, the count line and the strip.
+- **Stored data:** the device setting `calm`. Nothing else.
+- **Tests:** the commands and their lines. 1,313 tests; 30 lint warnings, all older. What folds is styling, tried in the browser rather than tested.
+- **Tried in the browser,** on the trial copy:
+  - `calm:` folded the boards' heads to their titles and the Collection's cards to one line, the legend to "colours ▾".
+  - 216's reply showed its markers as dots 218, 219 (rust) and 220, with a ✓ in its margin.
+  - Near on that reply brought back "ripple 219: accept · reject" and the suggestions in place.
+  - Calm survived a reload. "calm: on" in the strip turned it off, `undo:` brought it back, and `calm:off` ended it.
+
+  The trial copy is as it was.
+- **Next:** piece 3, saved arrangements.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
