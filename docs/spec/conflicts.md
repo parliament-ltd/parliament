@@ -3108,6 +3108,94 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Noticed, not changed:** the Parliament mark in a narrow room's header is labelled "Go to The Study", the retired homepage. It takes you to the new screens; only its words are old.
 - **Stage 13:** all eight pieces are built. Still open from its lines: R39 (Drafting Desk), deferred until after the refactor; `@dnd-kit` leaving the dependencies, at stage 15.
 
+**C253. Stage 14 in pieces: focus, calm, screens, small screens** (proposed 27 October; refactor-plan.md, stage 14; the editing spec, "Focus", "Calm", "Legibility"; the arrangements spec §7a, §8; `parliament_screens_v1.html`; welcome spec §12.4; C98, C126, C135, C182). Waiting for Stefan: (b), (c) and (i) are choices; the rest is built as suggested unless ruled otherwise. Each piece is committed and checked before the next.
+- **What exists today** (a survey of the code and documents, 27 October):
+  - **Focus:** `focus:` clears the screen to the chat alone and `focus:off` brings back what was there (stage 5, C135). `focus:save` and `focus:room collection` answer "not built yet".
+  - **Calm:** `calm:` is in the command list and not built.
+  - **Legibility:** the editing spec's contrast and size rules are already the chrome's tokens: marginalia at 62% ink, 11.5px, rust #94491F.
+  - **Windows and screens:**
+    - `pop:library display 2` is read and stored, but a window opens on the screen it is popped from: nothing places it on another screen.
+    - `arrange:` answers "not built yet".
+    - The space and the Lab's "before" are kept per device in the `arrangements` store. Window layouts travel in a backup only when ticked (C182).
+  - **Small screens:**
+    - Under 900 pixels wide, the boards stack one under another, each at full width.
+    - Rooms draw their narrow form by their own width (C126).
+    - The welcome page says "built for a computer for now" on narrow and touch screens (W §12.4).
+    - No mockup draws a phone.
+- **The pieces:**
+  1. **Focus sets.**
+     - `focus:room collection` focuses on those boards, left to right, and keeps them as your set; `focus:save` keeps what is on screen; `focus:` alone uses your set (until you make one, the chat alone).
+     - At the end of the board strip, "focus: off ▾": a click toggles, and the caret opens a picker with numbered ticks.
+     - While focused, a click on a board in the strip says "focus:off to arrange freely". Anything that needs a board focus hides (finding a card, a sweep's review) turns focus off and says so.
+  2. **Calm.**
+     - `calm:` and `calm:off`, with "calm: off" in the strip, a click toggling.
+     - What waits until you are near (hover, or keyboard focus inside), as the spec's table has it:
+       - a reply's marginalia but its first;
+       - the board heads' marginalia;
+       - the inline markers, as small numbered dots;
+       - replies shown as their result, with a mark in the margin;
+       - Collection cards folded to their result;
+       - the legend as "colours ▾";
+       - the review keys.
+     - Never calmed: the field, the Enter line, the review bar, the count line.
+  3. **Saved arrangements.**
+     - `arrange:save "Review desk"` keeps what is on screen, windows and their screens included; `arrange:"Review desk"` switches to it, one step for `undo:`.
+     - `arrange:"Review desk" 207` switches with 207 in its room.
+     - `name:`, `duplicate:` and `forget:` on a saved one, as for saved searches.
+  4. **The screens map and other screens.**
+     - Bare `arrange:` shows the map, as `parliament_screens_v1.html` draws it: each screen labelled, the boards and windows on it, the addressed board in navy, and saved arrangements to switch to. Everything on it writes an existing command. Escape closes it.
+     - `pop:library display 2` places the window on that screen.
+     - "Extra screen detected", once, under the field.
+  5. **Small screens:** a narrow window and a phone, as (i) decides.
+  6. **The checkpoint.**
+- **Open points,** each with its suggestion:
+  - **(a) The words `focus:` takes:** the boards' names as the strip shows them and C131 settled: `room`, `collection`, `reflection`, `records`, `library`, `plan`. So `focus:room collection`, not the spec's older `focus:sym col`. **Suggestion:** yes.
+  - **(b) Whose focus set** (a choice). The editing spec says "Focus is per room", and lists focus per room among its open questions.
+    1. **Per room:** each room keeps its own set, as an optional field on the room record, `focus: ["room", "collection"]` (a change to stored data, shown here). It travels with the room in backups. A room with none uses the chat alone.
+    2. **One set for you,** kept on this device as a setting, whatever room is on screen.
+
+    **Suggestion:** 1, as the spec says. A writing room and a data room want different boards beside them, and the set should go where the room goes.
+  - **(c) Calm for someone new** (a choice; the plan's "needs from you").
+    1. **Off:** everything shows, as today, and the strip's "calm: off" is there to find. The welcome page's steps rely on reading marginalia, which calm would hide until you are near it.
+    2. **On:** a new screen starts quiet, and detail comes as you move to it.
+
+    **Suggestion:** 1. Someone new learns Parliament from what the marginalia says. Calm is for when you know it.
+  - **(d) Where calm is kept:** a setting on this device, like the arrangement, not in backups. **Suggestion:** yes.
+  - **(e) "Near" on a touch screen,** where there is no hover: near is the item last tapped, and a tap elsewhere calms it again. **Suggestion:** yes.
+  - **(f) Saved arrangements, stored:** records in the existing `arrangements` store, `{ id: "saved:…", name: "Review desk", …the space as kept today }` (shown here). There is no new store and no version change.
+    - They travel in a backup only when window layouts are ticked (C182).
+    - On restore, a window on a screen this computer does not have opens on the main screen, as ruled.
+    - `forget:` on one asks for nothing more than a saved search does, and `undo:` brings it back.
+
+    **Suggestion:** yes.
+  - **(g) Other screens, and the browser's permission:**
+    - Placing a window on another screen uses the browser's window management (Chromium only). It asks your permission once, the first time, and the Enter line says so before Enter: "The browser will ask once whether Parliament may place windows on your screens."
+    - In Safari and Firefox the map says they cannot place windows on other screens, and `pop:… display 2` opens on this one, saying so.
+    - The site's permissions header gains `window-management=(self)`, explicitly. It takes effect when the site is next deployed, which is not part of this stage.
+    - The screens' names and sizes stay in the page; nothing is sent.
+
+    **Suggestion:** yes.
+  - **(h) "Extra screen detected":** shown once per setup, as marginalia under the field, when the browser reports a second screen (which it does without asking). A click writes `arrange:`. Remembered on this device so it does not come back for the same screens. **Suggestion:** yes.
+  - **(i) Small screens** (a choice; the plan's "needs from you": no mockup draws a phone).
+    1. **As proposed:**
+       - In a narrow window (760 to 1,100 pixels), at most two boards side by side, the rest beneath.
+       - On a phone (under 760, or touch-only):
+         - one board at a time, full width;
+         - the strip across the top switches between the open boards;
+         - the bar at the bottom;
+         - no popping or focus;
+         - rooms in their narrow form.
+       - The welcome page's "built for a computer for now" line goes once this is tried.
+    2. **Narrow windows only now** (the two-board rule), the phone waiting for a mockup.
+
+    **Suggestion:** 1, built last in the stage so it can be changed after you try it on a phone.
+  - **(j) Stored data, in all:**
+    - the room's optional `focus` (if (b) 1);
+    - saved arrangements as records in the existing store;
+    - two device settings: calm, and the screens already noticed.
+
+    No migration, and every backup stays readable. **Suggestion:** approve this outline; anything more is shown before it is written.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

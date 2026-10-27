@@ -556,6 +556,8 @@ Built to Lab v7 (A2). Can run beside the others once stage 3 exists.
 - **You can try:** a focus set of the chat and the Collection; `calm:`; the map with a second screen attached.
 - **Needs from you:** whether calm is the starting state for someone new; a phone layout you are happy with, which the mockups do not yet draw.
 
+**Status, 27 October: proposed in six pieces as C253,** with (b) focus per room, (c) calm for someone new and (i) small screens put to Stefan.
+
 ### Stage 15. Close-out and going public
 
 - **Close-out**
