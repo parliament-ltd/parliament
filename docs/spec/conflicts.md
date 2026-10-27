@@ -2590,6 +2590,48 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   Each change was undone; Pocket chat is as it was.
 - **Next:** piece 3, the Library in full.
 
+**C242. Stage 13, piece 3: the Library in full, its open points** (proposed 27 October; C238 piece 3; Lab v7 and its v6 notes; A2, C38, C53, C63, C131). Built as suggested, so a ruling changes one entry.
+- **What the Library is today:** a read-only list by shelf (your rooms, templates, boards, layouts, blocks, themes, resources), with the shelves along the top and one action, a board's "open". Nothing on it can be chosen, and the bar's search does not narrow it.
+- **(a) Ticking.** In the Lab, with a room on the Canvas, blocks, layouts and themes get a tick box. Rooms, boards and resources do not, since they do not go into a room.
+  - Something already in the room shows its box greyed, "in this room".
+  - A line under the shelves says what is ticked, with "add to room" and "clear" ("2 ticked: Keywords, Deep calm"). With nothing ticked it says how: "tick blocks, a layout or a theme, then add them to the room together".
+  - Ticks survive a change of shelf or search, as in Records. A tick drops once its item is in the room, and all of them when another room comes onto the Canvas.
+  - Out of the Lab there is no room to add to, so no boxes.
+  - Ticks are the screen's only, never stored.
+
+  **Suggestion:** yes.
+- **(b) "add to room"** writes `>add:keywords, "Three panels", "Deep calm"` and waits for Enter, since it moves blocks (A2). So `add:` takes a layout and a theme as well as blocks:
+  - In one Enter, the layout first (piece 1's layout rule, the moves said), then the theme, then each block to its first free place in the new layout.
+  - Refused: two layouts or two themes ("A room has one layout. Untick one"); a room, board or resource ("Only blocks, a layout and a theme go into a room").
+  - In the Lab, with the Library addressed, `add:` goes to the room, as with the Canvas or Blocks board. With the Collection called in and addressed, `add:` stays the Collection's.
+
+  **Suggestion:** yes.
+- **(c) Details open in place.** A click on an item opens its details under it, one at a time; a second click or "close" shuts them. The tick box only ticks.
+  - For a block: where it fits, the settings it has (from piece 2), and the rooms that use it.
+  - For a layout: its places, by name.
+  - For a theme: the rooms painted in it.
+  - For a room: its layout, theme, what it is built for, and its blocks.
+
+  v7 opens a popped-out Library's details in a side column. **Suggestion:** in place there too for now, the side column at the polish stage.
+- **(d) A room's one action:**
+  - your room: "edit here", which writes `>edit:"Pocket chat"`, or "on the Canvas" when it is there;
+  - a template: "duplicate", which writes `>duplicate:"Writing studio"`, since a template is not edited itself;
+  - a board keeps "open";
+  - anything coming soon has none.
+
+  **Suggestion:** yes.
+- **(e) `duplicate:"Writing studio"`** copies a room, yours or a template, and opens the copy in the Lab. It waits for Enter.
+  - The copy is named "Writing studio 2", or the next number free.
+  - It takes the layout, theme, what it is built for, and every block with its settings; never its chats.
+  - `undo:` takes the copy away while it is still as made, and puts the screen back, as after `new:room`.
+  - It works out of the Lab too, and opens it.
+  - `duplicate:` of a collection or a plan, in the command list since stage 6, stays "not built yet".
+
+  **Suggestion:** yes.
+- **(f) Search.** With the Library addressed, the bar's search narrows it to what matches in a name, a description or a feature, the Enter line counting ("4 items match"), as Settings does. **Suggestion:** yes.
+- **(g) Stored data:** none new. A duplicate is a room record like any other; ticks and open details are not kept.
+- **Suggestion:** build as above.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
