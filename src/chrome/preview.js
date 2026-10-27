@@ -43,6 +43,7 @@ import { planWeb, planAttach } from '../lib/inputFeatures'
 import { boardFor, wordFor } from '../shell/boards'
 import { planArrange, planForgetArrangement, planNameArrangement } from '../lib/savedArrangements'
 import { popDisplayLine } from '../shell/screens'
+import { smallRefusal } from '../shell/sizes'
 import { planAddBlock, planRmBlock, planPlace, planSetBlock } from '../lib/labBlocks'
 import { findPrivate, KINDS as PRIVATE_KINDS } from '../lib/privacyFilter'
 import { searchWords } from '../lib/searchWords'
@@ -745,6 +746,9 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       : arrangement.addressed
   const answer = enterLine(value, { mode, board, built })
   if (answer.state !== 'ready') return { answer, says: { message: answer.message, values: answer.values }, next: null }
+  // On a phone or in a narrow window, what does not fit says so (stage 14, piece 5; C261 (e)).
+  const small = smallRefusal(answer.steps, screens.size)
+  if (small) return { answer, says: small, next: null }
 
   // On the Collection (C144): clear: alone empties it, move: places a card,
   // sort: and type: pick its order and tab.

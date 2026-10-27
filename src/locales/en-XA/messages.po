@@ -5071,6 +5071,26 @@ msgstr ""
 msgid "enter.showRoom"
 msgstr ""
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.smallBar"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.smallFocus"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.smallPop"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.smallWidth"
+msgstr ""
+
 #. The words stay English
 #. js-lingui-explicit-id
 msgid "enter.sortCollection"

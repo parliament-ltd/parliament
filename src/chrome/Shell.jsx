@@ -18,6 +18,7 @@ import { openPopout, closePopout, placePopout, movePopout, onPopoutClosed } from
 import { screensNow as screensKnown, readScreens, placeOn, mustAsk } from '../shell/screens'
 import { mapOf, mapFoot, savedNow as savedOnScreen } from '../shell/screensMap'
 import ScreensMap from './ScreensMap'
+import { useScreenSize } from '../shell/sizes'
 import { availableTools, keepKeys, metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal, localAway, helperOf, translatorFor, translateText, browserTranslation } from '../net'
 import { replyLanguageOf, withReplyLanguage, sourceAskLanguage, translateInto, nameOf, baseOf } from '../lib/languages'
 import { piecesOfAnswer, translationOf, lastSourceAnswer, BY_BROWSER } from '../lib/translations'
@@ -434,6 +435,9 @@ export default function Shell() {
     return () => { live = false; s?.removeEventListener?.('change', onChange); screensWatch.current?.stop() }
   }, [learnScreens])
   const [mapOpen, setMapOpen] = useState(false)
+  // Small screens (stage 14, piece 5; C261): a phone shows one board at a
+  // time with the bar at the bottom; a narrow window two boards to a row.
+  const size = useScreenSize()
   const [barLine, setBarLine] = useState(null) // what the main bar's line would do, for the map
 
   // Leaving the page closes every window it opened.
@@ -2949,7 +2953,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, arrangements: arrangementsScreen, displays, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, arrangementsScreen, displays, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, reflecting, lab: labScreen, localOnly: localHere, input: inputScreen, focus: focusScreen, calm: calmScreen, arrangements: arrangementsScreen, displays, size, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, reflecting, labScreen, localHere, inputScreen, focusScreen, calmScreen, arrangementsScreen, displays, size, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -3646,14 +3650,15 @@ export default function Shell() {
     if (p.act) await onRun(p.next ?? null, 'to:all', null, p.act)
   }, [onRun])
 
-  function pickBoard(board) {
+  // exact: that room itself, from the phone's strip (C261 (c)).
+  function pickBoard(board, exact = false) {
     const a = current.current
     // While focused, the strip does not rearrange (C253 piece 1).
     const shown = (b) => a.columns.flat().some((x) => x === b || (b === 'room' && isRoom(x))) || a.popped.some((p) => p.board === b)
     if (a.focus && !shown(board)) { setBarSaid({ says: { message: 'focusStripHeld' } }); return }
     // Sym: on the strip brings a room as sym: does, when there is none
     // here; with rooms here, it points the bar at the room a prompt goes to.
-    if (board === 'room') {
+    if (board === 'room' && !(exact && a.columns.flat().includes('room'))) {
       const here = currentRoom(a)
       if (!here) {
         const { next } = preview('>room:', { mode: 'command', arrangement: a, screens })
@@ -3667,7 +3672,9 @@ export default function Shell() {
   }
 
   const focusBoard = (board) => { if (board !== current.current.addressed) commit(address(current.current, board)) }
-  const bar = arrangement.bar
+  // On a phone the bar sits at the bottom, whatever bar: chose for wider screens (C261 (d)).
+  // The welcome card keeps its field.
+  const bar = size === 'phone' && arrangement.bar.at !== 'card' ? { ...arrangement.bar, at: 'bottom' } : arrangement.bar
   const barWindow = windows[BAR]
   const onWelcome = arrangement.columns.some((c) => c.includes('welcome'))
   const shares = useMemo(() => columnShares(arrangement), [arrangement])
@@ -3691,6 +3698,12 @@ export default function Shell() {
     const row = chat ? (almanacRows ?? []).find((r) => r.kind === 'chat' && r.chatId === chat) : null
     return row ? String(row.num) : i18n._(COPY.shell.edgeRoom)
   }
+  // On a phone, each open room on the strip by its chat's number (C261 (c)).
+  const stripRooms = arrangement.columns.flat().filter(isRoom).map((board) => {
+    const chat = chatIn(arrangement, board)
+    const row = chat ? (almanacRows ?? []).find((r) => r.kind === 'chat' && r.chatId === chat) : null
+    return { board, num: row?.num ?? null }
+  })
   const stripArrangement = useMemo(
     () => ({ ...arrangement, context: { ...arrangement.context, room: roomRecord?.num ?? undefined } }),
     [arrangement, roomRecord],
@@ -3706,7 +3719,7 @@ export default function Shell() {
     // Each room with its own chat (C175 (a)).
     if (isRoom(board)) {
       const chat = chatIn(arrangement, board)
-      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} systemFor={systemFor} />
+      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} small={size === 'phone'} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} systemFor={systemFor} />
     }
     if (board === 'almanac') {
       return (
@@ -3810,8 +3823,9 @@ export default function Shell() {
   if (!started) return <div className="ch-shell" />
 
   return (
-    <div className={`ch-shell bar-${bar.at}${onWelcome ? ' on-welcome' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}${calm ? ' calm' : ''}`}>
-      {!onWelcome && <Strip arrangement={stripArrangement} onPick={pickBoard} focus={focusScreen} onRun={runClicked} onWrite={writeField} calm={calm} />}
+    <div className={`ch-shell bar-${bar.at} size-${size}${onWelcome ? ' on-welcome' : ''}${stretching !== false ? ' stretching' : ''}${arrangement.focus && arrangement.columns.length === 1 ? ' focused' : ''}${calm ? ' calm' : ''}`}>
+      {/* On a phone the strip is how you move between boards, the welcome page among them (C261 (c)). */}
+      {(!onWelcome || (size === 'phone' && arrangement.columns.flat().length > 1)) && <Strip arrangement={stripArrangement} onPick={pickBoard} focus={focusScreen} onRun={runClicked} onWrite={writeField} calm={calm} phone={size === 'phone' ? { rooms: stripRooms } : null} />}
       {/* One bar in one place, moved by its class or its holder, so moving
           it never loses the field's focus or what is typed. */}
       <div ref={dockSlot} className="ch-bar-host" />

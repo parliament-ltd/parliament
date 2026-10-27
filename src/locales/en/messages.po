@@ -5071,6 +5071,26 @@ msgstr "Enter stops warning before a costly run"
 msgid "enter.showRoom"
 msgstr "Enter shows the last room here"
 
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.smallBar"
+msgstr "On a phone the bar stays at the bottom. bar:top works on a wider screen"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.smallFocus"
+msgstr "On a phone one board shows at a time, so focus: is not needed"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.smallPop"
+msgstr "pop: works on a wider screen. On a phone one board shows at a time"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.smallWidth"
+msgstr "width: works on a wider window"
+
 #. The words stay English
 #. js-lingui-explicit-id
 msgid "enter.sortCollection"

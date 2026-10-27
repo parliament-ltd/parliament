@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
-import { strip, wordFor } from '../shell/boards'
+import { strip, wordFor, isRoom } from '../shell/boards'
 import { FOCUS_BOARDS } from '../shell/arrangement'
 
 // The board strip: every board in its fixed order, open ones underlined, and
@@ -13,12 +13,17 @@ import { FOCUS_BOARDS } from '../shell/arrangement'
 // picker of the boards with numbered ticks, the numbers their order left to
 // right, which writes focus:room collection into the bar for Enter. Before
 // it, "calm: off" turns calm on or off at once (piece 2; C255 (d)).
+//
+// On a phone (piece 5; C261 (c)) it is how you move between boards, one
+// shown at a time: each open room has its own entry, by its chat's number,
+// and focus is not offered.
 
 /**
  * @param {{ arrangement: object, onPick: (board: string) => void,
- *   focus?: { set: string[]|null }|null, onRun?: (line: string) => void, onWrite?: (text: string) => void }} props
+ *   focus?: { set: string[]|null }|null, onRun?: (line: string) => void, onWrite?: (text: string) => void,
+ *   phone?: { rooms: { board: string, num: number|null }[] }|null }} props
  */
-export default function Strip({ arrangement, onPick, focus = null, onRun = null, onWrite = null, calm = false }) {
+export default function Strip({ arrangement, onPick, focus = null, onRun = null, onWrite = null, calm = false, phone = null }) {
   const { i18n } = useLingui()
   const [picking, setPicking] = useState(false)
   const [ticked, setTicked] = useState([])
@@ -35,14 +40,16 @@ export default function Strip({ arrangement, onPick, focus = null, onRun = null,
   }
   return (
     <nav className="ch-strip" aria-label={i18n._(COPY.shell.strip)}>
-      {strip(arrangement).map((b) => (
+      {strip(arrangement).flatMap((b) => (phone && b.board === 'room' && phone.rooms.length
+        ? phone.rooms.map((r) => ({ board: r.board, title: b.title, context: r.num, here: true, exact: true, addressed: arrangement.addressed === r.board }))
+        : [b])).map((b) => (
         <button
           key={b.board}
           type="button"
           className={`ch-btitle${b.here ? ' here' : ''}`}
           aria-current={b.addressed ? 'true' : undefined}
-          aria-label={i18n._(COPY.boards[b.board])}
-          onClick={() => onPick(b.board)}
+          aria-label={[i18n._(COPY.boards[isRoom(b.board) ? 'room' : b.board]), b.context].filter((x) => x != null).join(' ')}
+          onClick={() => onPick(b.board, Boolean(b.exact))}
         >
           <span dir="ltr">{b.title}</span>
           {b.context != null && <span className="ch-ctx">{String(b.context)}</span>}
@@ -57,7 +64,7 @@ export default function Strip({ arrangement, onPick, focus = null, onRun = null,
           </button>
         </span>
       )}
-      {onRun && (
+      {onRun && !phone && (
         <span className="ch-marg ch-sfocus">
           <button type="button" className={on ? 'on' : undefined} aria-pressed={on}
             title={i18n._(COPY.shell.focusRuns, { command: on ? 'focus:off' : 'focus:' })}

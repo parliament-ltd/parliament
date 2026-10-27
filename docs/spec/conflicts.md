@@ -3544,6 +3544,45 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   **Suggestion:** yes.
 - **(h) Stored data:** none. The layout follows the screen; nothing is kept, and the space is unchanged. **Suggestion:** yes.
 
+**C262. Stage 14, piece 5, as built: small screens** (27 October; C261 as suggested).
+- **The sizes** (`shell/sizes.js`):
+  - A phone is under 760 pixels wide, or a touch screen that does not hover. A narrow window is 760 to 1,100 pixels. Wider is as before.
+  - The shell's class follows the screen as it changes, and nothing is stored. Today's stacking under 900 pixels is gone.
+- **A narrow window:** two boards to a row in their order, the rest beneath, two to a row; the page scrolls down. The edges hide, and widths set for a wider window wait for one. `width:` says "width: works on a wider window".
+- **A phone:**
+  - **What shows:** the board the bar points at, alone and full width. The others stay open out of sight, keeping where they were scrolled. With the bar at a window, the first board shows.
+  - **Rooms** draw their narrow form at any width.
+  - **The bar** sits at the bottom whatever `bar:` chose, except on the welcome page, where the field stays in its card.
+  - **The strip** is one line that scrolls sideways. Each open room has its own entry, "Room: 225", that shows that room. The one on screen has a navy underline. "calm: off" stays; "focus: off ▾" goes.
+  - **The strip shows on a phone whenever more than one board is open, the welcome page among them**, since it is the only way to move between boards. A wider screen still hides it while the welcome page is open. The welcome page has no entry on the strip; `tour:` brings it, as on a computer.
+- **Said before Enter on a phone, changing nothing:**
+  - `pop:`: "pop: works on a wider screen. On a phone one board shows at a time".
+  - `focus:` (and `focus:off`): "On a phone one board shows at a time, so focus: is not needed".
+  - `bar:top`: "On a phone the bar stays at the bottom. bar:top works on a wider screen".
+
+  `pop:back` still works, so windows opened on a wider window can come home. `bar:left` and the like are kept for wider screens.
+- **The welcome page's line** "built for a computer for now; the phone comes later" stays until you try a phone at the checkpoint (C261 (g)).
+- **Stored data:** none.
+- **Tests:**
+  - the three sizes;
+  - each refusal, and what passes: `pop:back`, `bar:left`, `pop:` in a narrow window, `width:` when wide, `open:` on a phone.
+
+  1,334 tests; 30 lint warnings, all older.
+- **Tried in the in-app browser,** on the trial copy:
+  - **At 900 pixels:** the welcome page and room 225 on the first row, 223 and 216 on the second, the Collection's column full width beneath. No sideways scroll.
+  - **At a phone's 375 pixels:** room 225 alone, in its narrow form, with the bar at the bottom. The strip read "Room: 225 · Room: 223 · Room: 216 · Collection…". A tap on 223 showed that room, the bar following.
+  - **The refusals:** `pop:library`, `focus:` and `bar:top` each said their line.
+  - **`open:records`** showed Records alone, fitting the width.
+  - **Undoing my changes:** a tap on 225 put the trial copy back as it was.
+  - The pane's own width, 1,024 pixels, is now a narrow window, two boards to a row, as ruled.
+- **Not tried:**
+  - a real phone or tablet;
+  - a touch screen wider than 760;
+  - the on-screen keyboard with the bar at the bottom.
+
+  These are for the checkpoint.
+- **Next:** piece 6, the stage 14 checkpoint.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

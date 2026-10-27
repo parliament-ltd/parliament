@@ -647,6 +647,11 @@ export const COPY = {
     arrangeGo: /*i18n*/ { id: 'enter.arrangeGo', message: "Enter switches to {name}. undo: brings back the screen as it is", comment: 'Commands stay English' },
     arrangeGoFocus: /*i18n*/ { id: 'enter.arrangeGoFocus', message: "Enter switches to {name}, ending focus. undo: brings back the screen as it is", comment: 'Commands stay English' },
     arrangeForget: /*i18n*/ { id: 'enter.arrangeForget', message: "Enter forgets the arrangement {name}. undo: brings it back", comment: 'Commands stay English' },
+    // Small screens (piece 5; C261 (b), (d), (e)).
+    smallPop: /*i18n*/ { id: 'enter.smallPop', message: "pop: works on a wider screen. On a phone one board shows at a time", comment: 'Commands stay English' },
+    smallFocus: /*i18n*/ { id: 'enter.smallFocus', message: "On a phone one board shows at a time, so focus: is not needed", comment: 'Commands stay English' },
+    smallBar: /*i18n*/ { id: 'enter.smallBar', message: "On a phone the bar stays at the bottom. bar:top works on a wider screen", comment: 'Commands stay English' },
+    smallWidth: /*i18n*/ { id: 'enter.smallWidth', message: "width: works on a wider window", comment: 'Commands stay English' },
     // The screens map (piece 4; C259 (b), (d), (h)).
     arrangeMap: /*i18n*/ { id: 'enter.arrangeMap', message: "Enter keeps this view open. pop:library display 2 puts a board on the other screen", comment: 'Commands stay English' },
     arrangeMapOne: /*i18n*/ { id: 'enter.arrangeMapOne', message: "Enter keeps this view open. Escape goes back" },
