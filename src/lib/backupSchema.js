@@ -45,7 +45,8 @@ export const FIELDS = Object.freeze({
   // passage, point: what an ask was about when asked, so a changed passage keeps its answer to its card (C218).
   asks: ['id', 'edit', 'num', 'conversationId', 'messageId', 'part', 'places', 'question', 'passage', 'point', 'answer', 'state', 'held', 'sent', 'createdAt', 'updatedAt', 'restoredFrom'],
   // Suggestions from Ripple and sweeps, each with its chat (stage 12; C229 (b)).
-  suggestions: ['id', 'mark', 'num', 'conversationId', 'messageId', 'part', 'kind', 'struck', 'suggested', 'places', 'from', 'model', 'state', 'createdAt', 'updatedAt', 'restoredFrom'],
+  // sent: a sweep's change, accepted, told to the chat's model (C233 (a)).
+  suggestions: ['id', 'mark', 'num', 'conversationId', 'messageId', 'part', 'kind', 'struck', 'suggested', 'places', 'from', 'model', 'state', 'sent', 'createdAt', 'updatedAt', 'restoredFrom'],
   files: ['id', 'conversationId', 'name', 'type', 'rows', 'cols', 'sizeBytes', 'inContext', 'uploadedAt'],
   file_data: ['fileId', 'data'],
   sbrd_documents: ['conversationId', 'paragraphs', 'suggestionStates', 'submittedReplies', 'updatedAt'],

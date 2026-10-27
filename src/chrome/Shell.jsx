@@ -78,7 +78,8 @@ import { EMPTY_VIEW, applyView, nextView, viewLine, isAtRest, isChangeRow } from
 import { onRecordsChanged } from '../lib/records'
 import { changeStored } from '../editing/storedChange'
 import { settleStored, newSuggestionId } from '../editing/suggestions'
-import { rippleChars, checkBranches, landRipple } from '../lib/ripple'
+import { rippleChars, checkBranches, landRipple, landSuggestions as landStored } from '../lib/ripple'
+import { lastReply, sweepRequest, sweepItems } from '../lib/sweep'
 
 // The new shell (refactor-plan.md §4 and stages 3 and 4): the board strip,
 // the boards as the arrangement places them, the bar, and windows of their
@@ -1300,6 +1301,29 @@ export default function Shell() {
       remember(body)
       return { done: true, says: { message: 'tellHeld', values: { count: what.notes.length } } }
     }
+    if (what.kind === 'sweep') {
+      // sweep: (stage 12, piece 3; C233): one call to the helper the line
+      // named, with the framework's instruction and the reply as it reads
+      // now; what comes back lands in green. The bar is free meanwhile.
+      const later = (async () => {
+        try {
+          const reply = lastReply(await getMessages(what.chatId))
+          if (!reply) return { message: 'sweepNoReply', values: { address: what.address } }
+          const found = await gateway.call(what.helper.provider, 'sweep', [sweepRequest(what.framework, what.framework.name, reply), { model: what.helper.id }], { label: 'sweep' })
+          if (!found) return { message: 'sweepFailed', values: { address: what.address } }
+          if (!found.length) return { message: 'sweepNone', values: { address: what.address, name: what.framework.name } }
+          const got = await landStored(db.current, reply.id, sweepItems(found, newSuggestionId), {
+            kind: 'sweep', model: what.helper.id, fromOf: () => ({ framework: what.framework.id, name: what.framework.name, instruction: what.framework.instruction }),
+          })
+          if (got.blocks) showStoredBlocks(got.conversationId, reply.id, got.blocks)
+          return { message: 'sweepDone', values: { count: got.landed, address: what.address }, ...(got.missed ? { also: [{ message: 'rippleMissed', values: { count: got.missed } }] } : {}) }
+        } catch {
+          return { message: 'sweepFailed', values: { address: what.address } }
+        }
+      })()
+      remember(body)
+      return { done: true, says: { message: 'sweepGoing', values: { address: what.address } }, later }
+    }
     if (what.kind === 'ripple') {
       // ripple:on / ripple:off (stage 12, piece 2; C231 (e)): kept on the plan; undo: takes it back.
       const done = await changeRecords(db.current, [{ store: 'dockets', id: what.docketId, num: what.num, set: { ripple: what.on ? true : null }, expect: { ripple: what.on ? null : true } }])
@@ -2401,6 +2425,8 @@ export default function Shell() {
   // The edits of the room's chat (stage 11, piece 3; C216).
   const roomEdits = useChatEdits(roomId ? [roomId] : [])
   const roomAsks = useChatEdits(roomId ? [roomId] : [], 'asks')
+  // Suggestions in the room's chat: its accepted sweeps go with the next prompt (C233 (a)).
+  const roomSweeps = useChatEdits(roomId ? [roomId] : [], 'suggestions')
   // The room's edits by number, for hold: (C216 (f)).
   const heldEdits = useMemo(() => ({
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
@@ -2421,9 +2447,10 @@ export default function Shell() {
   // The edits waiting in the room's chat, and the note they would make (C216).
   const editsHere = useMemo(() => {
     // Edits of messages joined into the bar go into that prompt, not with it.
-    const note = noteFor(kept, roomEdits.get(roomId) ?? [], { leaveOut: new Set(joinedNow?.from ?? []), asks: roomAsks.get(roomId) ?? [] })
-    return note.ids.length || note.askIds.length ? { count: note.ids.length, asks: note.askIds.length, chars: note.text.length } : null
-  }, [kept, roomEdits, roomAsks, roomId, joinedNow])
+    const note = noteFor(kept, roomEdits.get(roomId) ?? [], { leaveOut: new Set(joinedNow?.from ?? []), asks: roomAsks.get(roomId) ?? [], sweeps: roomSweeps.get(roomId) ?? [] })
+    // Changes accepted from a sweep go too (C233 (a)).
+    return note.ids.length || note.askIds.length || note.sweepIds.length ? { count: note.ids.length, asks: note.askIds.length, sweeps: note.sweepIds.length, chars: note.text.length } : null
+  }, [kept, roomEdits, roomAsks, roomSweeps, roomId, joinedNow])
   // Ripple's checks if the edits here go now (stage 12, piece 2; C231 (d)):
   // each other branch of the plan, one call each to the helper, about as
   // long as what is edited here.

@@ -170,14 +170,15 @@ export async function checkBranches({ going, from, branches, messagesOf, ask, la
 }
 
 /**
- * What came back for one message, placed where each quote stands unmarked
- * once (C229 (d)) and kept as suggestions in one write; if the message
- * changed while the check ran, placed again on what it is now.
+ * Suggestions for one message, placed where each quote stands unmarked once
+ * (C229 (d)) and kept in one write; if the message changed while the helper
+ * was asked, placed again on what it is now. Ripple's and sweeps' alike.
  * @param {import('idb').IDBPDatabase} db
- * @param {{ model: string|null, chat: number|null, branch: string|null }} from
+ * @param {{ kind: 'ripple'|'sweep', model: string|null, fromOf: (item: object) => object }} how
+ *   fromOf: where each came from, as its record keeps it (C229 (b))
  * @returns {Promise<{ landed: number, missed: number, blocks?: object[], conversationId?: string }>}
  */
-export async function landRipple(db, messageId, items, from) {
+export async function landSuggestions(db, messageId, items, { kind, model, fromOf }) {
   for (let tries = 0; tries < 2; tries++) {
     const m = await db.get('messages', messageId)
     if (!m) return { landed: 0, missed: items.length }
@@ -186,7 +187,7 @@ export async function landRipple(db, messageId, items, from) {
     const byId = new Map(items.map((i) => [i.id, i]))
     const list = placed.placed.map((mark) => {
       const s = placed.suggestions.get(mark)
-      return { mark, kind: 'ripple', struck: s.struck, suggested: s.suggested, places: s.places, from: { edit: byId.get(mark).edit, chat: from.chat, branch: from.branch }, model: from.model }
+      return { mark, kind, struck: s.struck, suggested: s.suggested, places: s.places, from: fromOf(byId.get(mark)), model }
     })
     try {
       await addSuggestions(db, messageId, { expect: m.blocks ?? null, blocks: placed.blocks, suggestions: list, part: m.role === 'user' ? 'prompt' : 'reply' })
@@ -197,3 +198,8 @@ export async function landRipple(db, messageId, items, from) {
   }
   return { landed: 0, missed: items.length }
 }
+
+/** Ripple's, carrying the edit each came from (C231 (h)). */
+export const landRipple = (db, messageId, items, from) => landSuggestions(db, messageId, items, {
+  kind: 'ripple', model: from.model, fromOf: (item) => ({ edit: item.edit, chat: from.chat, branch: from.branch }),
+})

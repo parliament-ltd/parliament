@@ -670,7 +670,7 @@ export async function markEditsSent(db, ids, sent, list = 'edits') {
       const r = await store.get(id)
       if (!r || r.sent) continue
       await store.put({ ...r, sent, ...(list === 'asks' ? { state: 'asked' } : {}), updatedAt: sent.at ?? new Date().toISOString() })
-      changes.push({ kind: list === 'asks' ? 'ask' : 'edit', op: 'updated', id: r.id, num: r.num })
+      changes.push({ kind: list === 'asks' ? 'ask' : list === 'suggestions' ? 'suggestion' : 'edit', op: 'updated', id: r.id, num: r.num })
     }
     return { result: changes.length, changes }
   })

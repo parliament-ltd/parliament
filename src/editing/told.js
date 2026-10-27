@@ -21,9 +21,17 @@ export const waiting = (record) => record && !record.sent && !record.held
  *   messages whose edits went into this prompt by joining, told by the
  *   prompt itself (C214 (c)); asks: the chat's ask records, whose waiting
  *   ones are asked (C218 (b))
- * @returns {{ text: string, ids: string[], askIds: string[] }}
+ *   sweeps: the chat's suggestion records, whose accepted sweeps not yet told
+ *   are told (stage 12, piece 3; C233 (a))
+ * @returns {{ text: string, ids: string[], askIds: string[], sweepIds: string[] }}
  */
-export function noteFor(messages, records, { leaveOut = new Set(), asks = [] } = {}) {
+export function noteFor(messages, records, { leaveOut = new Set(), asks = [], sweeps = [] } = {}) {
+  const sweptBy = new Map()
+  for (const s of sweeps ?? []) {
+    if (!sweepWaits(s) || leaveOut.has(s.messageId)) continue
+    if (!sweptBy.has(s.messageId)) sweptBy.set(s.messageId, [])
+    sweptBy.get(s.messageId).push(s)
+  }
   const byMessage = new Map()
   for (const r of records ?? []) {
     if (!waiting(r) || leaveOut.has(r.messageId)) continue
@@ -36,7 +44,9 @@ export function noteFor(messages, records, { leaveOut = new Set(), asks = [] } =
     if (!asksBy.has(a.messageId)) asksBy.set(a.messageId, [])
     asksBy.get(a.messageId).push(a)
   }
-  if (!byMessage.size && !asksBy.size) return { text: '', ids: [], askIds: [] }
+  if (!byMessage.size && !asksBy.size && !sweptBy.size) return { text: '', ids: [], askIds: [], sweepIds: [] }
+  const sweepParts = []
+  const sweepIds = []
   const parts = []
   const ids = []
   const askParts = []
@@ -63,6 +73,24 @@ export function noteFor(messages, records, { leaveOut = new Set(), asks = [] } =
       ].join('\n'))
       for (const a of theirs) askIds.push(a.id)
     }
+    // Changes the person accepted from a sweep, which the helper suggested
+    // and this model never saw (C233 (a)): told once, as the reply reads now.
+    const swept = sweptBy.get(m?.id)
+    if (swept?.length && m.role === 'assistant') {
+      const byRule = new Map()
+      for (const s of [...swept].sort((a, b) => (a.num ?? 0) - (b.num ?? 0))) {
+        const name = s.from?.name || 'a rule of theirs'
+        if (!byRule.has(name)) byRule.set(name, [])
+        byRule.get(name).push(s)
+      }
+      for (const [name, list] of byRule) {
+        sweepParts.push([
+          `The person accepted changes to your reply ${replies} that another model suggested under their rule "${name}". Your reply now reads:`,
+          ...list.map((s) => `- "${s.struck}" now reads "${s.suggested}"`),
+        ].join('\n'))
+      }
+      for (const s of swept) sweepIds.push(s.id)
+    }
     const mine = byMessage.get(m?.id)
     if (!mine || !Array.isArray(m.blocks)) continue
     const doc = fromBlocks(m.blocks, () => `t${++n}`)
@@ -83,8 +111,11 @@ ${wordsOf(toBlocks(doc))}
     }
     for (const r of mine) if (edits.some((e) => e.id === r.edit)) ids.push(r.id)
   }
-  return { text: [...parts, ...askParts].join('\n\n'), ids, askIds }
+  return { text: [...parts, ...sweepParts, ...askParts].join('\n\n'), ids, askIds, sweepIds }
 }
+
+/** Whether a sweep's change waits to be told: accepted, and not told yet (C233 (a)). */
+export const sweepWaits = (record) => Boolean(record) && record.kind === 'sweep' && record.state === 'accepted' && !record.sent
 
 /** Whether an ask waits to go: open, not sent, not held back (C218). */
 export const waitingAsk = (record) => Boolean(record) && record.state === 'open' && !record.sent && !record.held

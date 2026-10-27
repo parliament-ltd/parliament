@@ -102,6 +102,13 @@ export class BaseProvider {
     throw new Error('Not implemented')
   }
 
+  // A sweep (stage 12, piece 3; C233): request { rule: { name, instruction },
+  // text } as sweepMessage (shared.js) takes it; returns the suggestions, each
+  // { quote, replace }, or null when none were readable.
+  async sweep(apiKey, request, { model } = {}) {
+    throw new Error('Not implemented')
+  }
+
   async translate(apiKey, pieces, { from, to, query, model } = {}) {
     throw new Error('Not implemented')
   }

@@ -1279,6 +1279,14 @@ msgid "collection.sugRejected"
 msgstr "rejected"
 
 #. js-lingui-explicit-id
+msgid "collection.sugTold"
+msgstr "accepted, told to {name}, {day}"
+
+#. js-lingui-explicit-id
+msgid "collection.sugToTell"
+msgstr "accepted: told with your next prompt"
+
+#. js-lingui-explicit-id
 msgid "collection.summaryOf"
 msgstr "summary, written {day} from {nums}"
 
@@ -3524,6 +3532,10 @@ msgid "enter.promptStalled"
 msgstr "The reply stalled, as happens on networks that hold streamed replies"
 
 #. js-lingui-explicit-id
+msgid "enter.promptSweepsGo"
+msgstr "With it, told once: {count, plural, one {# change} other {# changes}} you accepted from a sweep · {name} reads {count, plural, one {it} other {them}}"
+
+#. js-lingui-explicit-id
 msgid "enter.promptTellGo"
 msgstr "With it, told once: {count, plural, one {your note} other {your # notes}} · {name} reads {count, plural, one {it} other {them}}"
 
@@ -4244,6 +4256,71 @@ msgstr "Enter swaps {first} and {second}"
 #. js-lingui-explicit-id
 msgid "enter.swapSame"
 msgstr "swap: takes two different boards"
+
+#. js-lingui-explicit-id
+msgid "enter.sweepDone"
+msgstr "Sweep: {count, plural, =0 {nothing could be placed} one {# suggestion} other {# suggestions}} in {address}"
+
+#. js-lingui-explicit-id
+msgid "enter.sweepFailed"
+msgstr "The sweep of {address} did not come back. Nothing changed"
+
+#. js-lingui-explicit-id
+msgid "enter.sweepGo"
+msgstr "Enter sweeps {address}’s last reply as {name}: one call to {model}, about {cost}. At most one suggestion per sentence"
+
+#. js-lingui-explicit-id
+msgid "enter.sweepGoCheap"
+msgstr "Enter sweeps {address}’s last reply as {name}: one call to {model}, under {cost}. At most one suggestion per sentence"
+
+#. js-lingui-explicit-id
+msgid "enter.sweepGoing"
+msgstr "Sweeping {address}. Its suggestions land in the reply, in green"
+
+#. js-lingui-explicit-id
+msgid "enter.sweepGoUnpriced"
+msgstr "Enter sweeps {address}’s last reply as {name}: one call to {model}, about {tokens} tokens. At most one suggestion per sentence"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.sweepNoKey"
+msgstr "Sweeping {address} as {name} needs a model with a key: api:"
+
+#. js-lingui-explicit-id
+msgid "enter.sweepNone"
+msgstr "Sweep: {name} would change nothing in {address}"
+
+#. js-lingui-explicit-id
+msgid "enter.sweepNoReply"
+msgstr "{address} has no reply from a model to sweep"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.sweepNoRoom"
+msgstr "Name the branch to sweep, as sweep:201a pushback, or open its room"
+
+#. js-lingui-explicit-id
+msgid "enter.sweepNotChat"
+msgstr "{address} is not a chat or a branch to sweep"
+
+#. The chat’s frameworks
+#. js-lingui-explicit-id
+msgid "enter.sweepPick"
+msgstr "Which framework sweeps {address}? Name one after it: {names}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.sweepPickAny"
+msgstr "Name a framework after {address}, as sweep:{address} pushback"
+
+#. js-lingui-explicit-id
+msgid "enter.sweepSource"
+msgstr "{address} was answered by a source, whose words are not swept"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.sweepWhichBranch"
+msgstr "Plan {num} has branches: name one, as sweep:{num}a"
 
 #. js-lingui-explicit-id
 msgid "enter.tagAdd"

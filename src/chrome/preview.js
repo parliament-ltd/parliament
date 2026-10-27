@@ -32,6 +32,7 @@ import { readFrameworks, frameworksOf, cleanOwn, namesFrom, NAME_MAX, INSTRUCTIO
 import { planReply, planLanguage, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
 import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
 import { planHoldEdits, planAsk, planUndoChange, planSettle, planDropAsks, planStrike, planTell, planRipple } from '../lib/editVerbs'
+import { planSweep } from '../lib/sweep'
 import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
@@ -56,7 +57,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple', 'sweep'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -737,6 +738,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       tell: (a1, s1, sc) => planTell(s1, sc),
       // ripple: (stage 12, piece 2; C231 (e)).
       ripple: (a1, s1, sc) => planRipple(s1, sc),
+      // sweep: (piece 3; C233).
+      sweep: (a1, s1, sc) => planSweep(s1, sc),
       // accept: and reject: on answered asks (piece 5; C220 (d)); Ripple's suggestions join in stage 12.
       accept: (a1, s1, sc) => planSettle(s1, sc, 'accept'),
       reject: (a1, s1, sc) => planSettle(s1, sc, 'reject'),
@@ -980,6 +983,7 @@ export function promptPreview(text, target = {}) {
     const also = [{ message: 'promptEditsOnly', values: { ...what, name: who.name ?? '' } }]
     if (told) also.push({ message: 'promptTellGo', values: { count: told.count, name: who.name ?? '' } })
     if (target.ripple && edits.count) also.push(rippleLine(target.ripple))
+    if (edits.sweeps) also.push({ message: 'promptSweepsGo', values: { count: edits.sweeps, name: who.name ?? '' } })
     return { ...p, editsOnly: true, says: { ...p.says, also: [...also, ...(p.says.also ?? [])] } }
   }
   const counted = edits || told ? { ...target, historyChars: (target.historyChars ?? 0) + (edits?.chars ?? 0) + (told?.chars ?? 0) } : target
@@ -999,6 +1003,11 @@ export function promptPreview(text, target = {}) {
   // Ripple's checks when these edits go (stage 12, piece 2; C231 (d)): to one branch only.
   // Only when a model answers here: a source's branch is not checked from (C228 (d)).
   if (target.ripple && edits?.count && !(Array.isArray(target.many) && target.many.length > 1) && toModel(target.answerer ?? { group: target.keyed ? 'model' : 'source' })) lines.push(rippleLine(target.ripple))
+  // Changes accepted from a sweep, told once to the model that answers (C233 (a)).
+  const swept = target.edits?.sweeps ?? 0
+  if (swept && toModel(target.answerer ?? { group: target.keyed ? 'model' : 'source' })) {
+    lines.push({ message: 'promptSweepsGo', values: { count: swept, name: (target.answerer ?? {}).name ?? target.provider ?? '' } })
+  }
   // tell: notes held for this prompt (C225 (d), (e)): to the model that
   // answers, or on a source's branch the one that reads edits there.
   if (told) {

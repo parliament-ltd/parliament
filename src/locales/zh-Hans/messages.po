@@ -1279,6 +1279,14 @@ msgid "collection.sugRejected"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "collection.sugTold"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugToTell"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.summaryOf"
 msgstr "摘要，于 {day} 根据 {nums} 撰写"
 
@@ -3524,6 +3532,10 @@ msgid "enter.promptStalled"
 msgstr "回复停滞了。有些网络会把流式回复积压起来，就会出现这种情况"
 
 #. js-lingui-explicit-id
+msgid "enter.promptSweepsGo"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.promptTellGo"
 msgstr ""
 
@@ -4244,6 +4256,71 @@ msgstr "按 Enter 交换{first}和{second}"
 #. js-lingui-explicit-id
 msgid "enter.swapSame"
 msgstr "swap: 需要两个不同的面板"
+
+#. js-lingui-explicit-id
+msgid "enter.sweepDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepGoCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepGoing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepGoUnpriced"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.sweepNoKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepNoReply"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.sweepNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepNotChat"
+msgstr ""
+
+#. The chat’s frameworks
+#. js-lingui-explicit-id
+msgid "enter.sweepPick"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.sweepPickAny"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepSource"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.sweepWhichBranch"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.tagAdd"

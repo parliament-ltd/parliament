@@ -519,7 +519,7 @@ The piece with the most risk in it. It starts with a spike, not with building.
 
 ### Stage 12. Ripple, sweeps, Reflection
 
-**Status, 27 October:** proposed in six pieces as C228, ruled the same day; the stored data shown as C229. **Piece 1 built (C230):** suggestions in place, the Suggestions tab and its review bar, accept: and reject: on suggestions. **Piece 2 built (C231, C232):** Ripple, its switch, its line and its checks.
+**Status, 27 October:** proposed in six pieces as C228, ruled the same day; the stored data shown as C229. **Piece 1 built (C230):** suggestions in place, the Suggestions tab and its review bar, accept: and reject: on suggestions. **Piece 2 built (C231, C232):** Ripple, its switch, its line and its checks. **Piece 3 built (C233, C234):** sweeps, and an accepted sweep told once.
 
 - **Added**
   - Ripple across branches, off by default, each check one model call that says so first; suggestions in rust, reviewed one at a time.

@@ -175,7 +175,9 @@ function SuggestionCard({ card, clean, fresh, run, onFind, nameOf }) {
   const from = c.made === 'sweep'
     ? i18n._(C.sugFromSweep, { name: c.from.name || '', instruction: c.from.instruction || '' })
     : c.from.edit != null && c.from.branch ? i18n._(C.sugFromRipple, { edit: c.from.edit, branch: c.from.branch }) : i18n._(C.sugFromRippleBare)
-  const state = c.state === 'accepted' ? i18n._(C.sugAccepted, { made: c.made }) : c.state === 'rejected' ? i18n._(C.sugRejected) : i18n._(C.sugOpen)
+  const state = c.state === 'accepted'
+    ? (c.made === 'sweep' ? (c.sent ? i18n._(C.sugTold, { name: c.sent.to ? nameOf(c.sent.to) : '', day: dayOf(i18n, c.sent.at) }) : i18n._(C.sugToTell)) : i18n._(C.sugAccepted, { made: c.made }))
+    : c.state === 'rejected' ? i18n._(C.sugRejected) : i18n._(C.sugOpen)
   const acts = c.state === 'open' ? [run(`accept:${card.num}`, C.sugAccept), run(`reject:${card.num}`, C.sugReject)] : []
   const where = i18n._(C.editWhere, { part: c.part, address: addressOf(card) })
   return (

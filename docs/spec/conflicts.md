@@ -2281,6 +2281,36 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Security and privacy:** one call, named with its model and cost first, through the gateway, to the helper. What comes back is data, placed only where its quote matches.
 - **Suggestion:** (a) 1, and the rest as above.
 
+**C234. Stage 12, piece 3, as built: sweeps** (27 October; C233 as suggested, (a) built as option 1, so a ruling of option 2 takes out one part).
+- **`sweep:`:** `sweep:201a pushback` (a branch), `sweep:216 editor` (a chat's number), `sweep:201a` (lists the chat's frameworks to pick from), `sweep:` (the room's chat). A framework is named as `framework:` takes it, a name's start included ("push"). The Enter line: "Enter sweeps 215b's last reply as Push back on me: one call to Haiku 5.5, under $0.01. At most one suggestion per sentence". It refuses with a reason:
+  - a source's answer ("211a was answered by a source, whose words are not swept");
+  - a plan without a branch named;
+  - a word that names no framework;
+  - no key ("Sweeping 215b as Push back on me needs a model with a key: api:").
+- **The call:** a new `sweep` method on each provider, through the gateway, to the helper. It sends the framework's name and instruction as the rule, and the last reply a model wrote, as it reads now, in tags it cannot close. Nothing else is sent. What comes back is JSON: at most 30 suggestions, each on one line, changed, and quoted once. They land in green as C229 has them, the card naming the framework and the instruction applied. The bar is free meanwhile, and says when the sweep ends: "Sweep: 4 suggestions in 215b", or that the framework would change nothing, or that it did not come back.
+- **(a), option 1:** an accepted sweep change is told once, with the next prompt to that branch, in the same note as edits:
+  - the note reads "The person accepted changes to your reply 1 that another model suggested under their rule "Editor". Your reply now reads: - "…" now reads "…"";
+  - the prompt's line counts them ("With it, told once: 2 changes you accepted from a sweep · Sonnet 5.5 reads them");
+  - the record keeps `sent` and is never told again;
+  - its card reads "accepted: told with your next prompt", then "accepted, told to Sonnet 5.5, 27 October".
+
+  The one change to stored data is `sent` on a suggestion record, carried by backups.
+- **Landing shared:** Ripple's and sweeps' suggestions land through one function (`landSuggestions`), placed again if the reply changed meanwhile.
+- **Tests:**
+  - the Enter lines and their refusals;
+  - what is sent, tags kept in;
+  - reading what comes back;
+  - the last reply a model wrote, never a source's;
+  - from landing to acceptance to the note told once and never again;
+  - the prompt's count.
+
+  1,252 tests.
+- **Tried in the browser,** on the trial copy, with no key:
+  - `sweep:215b` asked for a framework;
+  - `sweep:215b push` named Push back on me and said a key is needed;
+  - `sweep:211a push` refused a source's answer.
+- **Not tried:** a real sweep by a model, as the trial copy has no key. The landing and accepting were tried in the browser in piece 1, with a sweep suggestion placed by the same function.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

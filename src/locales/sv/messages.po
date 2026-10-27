@@ -1279,6 +1279,14 @@ msgid "collection.sugRejected"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "collection.sugTold"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "collection.sugToTell"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "collection.summaryOf"
 msgstr "sammanfattning, skriven {day} utifrån {nums}"
 
@@ -3524,6 +3532,10 @@ msgid "enter.promptStalled"
 msgstr "Svaret stannade upp, vilket händer i nätverk som håller kvar strömmade svar"
 
 #. js-lingui-explicit-id
+msgid "enter.promptSweepsGo"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.promptTellGo"
 msgstr ""
 
@@ -4244,6 +4256,71 @@ msgstr "Enter byter plats på {first} och {second}"
 #. js-lingui-explicit-id
 msgid "enter.swapSame"
 msgstr "swap: tar två olika tavlor"
+
+#. js-lingui-explicit-id
+msgid "enter.sweepDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepGo"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepGoCheap"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepGoing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepGoUnpriced"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.sweepNoKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepNone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepNoReply"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.sweepNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepNotChat"
+msgstr ""
+
+#. The chat’s frameworks
+#. js-lingui-explicit-id
+msgid "enter.sweepPick"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.sweepPickAny"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.sweepSource"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.sweepWhichBranch"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.tagAdd"

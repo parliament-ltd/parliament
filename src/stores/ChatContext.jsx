@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react'
-import { getMessages, addMessage, updateMessage, saveEditedMessage, getEditsOfChat, markEditsSent, getAsksOfChat, answerAsks, getSetting, setSetting, getConversation, groupPrompt } from '../lib/db'
+import { getMessages, addMessage, updateMessage, saveEditedMessage, getEditsOfChat, markEditsSent, getAsksOfChat, getSuggestionsOfChat, answerAsks, getSetting, setSetting, getConversation, groupPrompt } from '../lib/db'
 import { noteFor, waiting, tellNote } from '../editing/told'
 import { answersIn } from '../editing/answers'
 import { askToKeepStorage } from '../lib/storageKeep'
@@ -333,7 +333,9 @@ export function ChatProvider({ children }) {
     const joinedFrom = new Set(Array.isArray(into) ? into : [])
     // Asks waiting go the same way, each to be answered in place (C218).
     const askRecords = await getAsksOfChat(conversationId).catch(() => [])
-    const note = noteFor(before, editRecords, { leaveOut: joinedFrom, asks: askRecords })
+    // And changes accepted from a sweep, never told yet (stage 12, piece 3; C233 (a)).
+    const sweepRecords = await getSuggestionsOfChat(conversationId).catch(() => [])
+    const note = noteFor(before, editRecords, { leaveOut: joinedFrom, asks: askRecords, sweeps: sweepRecords })
     // The tell: notes held for this chat go at the end of the same note (C225 (d)).
     const tellsHere = tellsRef.current[conversationId] ?? []
     const told = [note.text, tellNote(tellsHere)].filter(Boolean).join('\n\n')
@@ -368,6 +370,7 @@ export function ChatProvider({ children }) {
     if (note.ids.length) markEditsSent(note.ids, { to: model, at: toldAt, prompt: userMsg.id }).catch(() => {})
     if (joinedIds.length) markEditsSent(joinedIds, { into: userMsg.id, at: toldAt }).catch(() => {})
     if (note.askIds.length) markEditsSent(note.askIds, { to: model, at: toldAt, prompt: userMsg.id }, 'asks').catch(() => {})
+    if (note.sweepIds.length) markEditsSent(note.sweepIds, { to: model, at: toldAt, prompt: userMsg.id }, 'suggestions').catch(() => {})
 
     // 2. Create a placeholder assistant message marked incomplete
     const assistantMsg = await addMessage({

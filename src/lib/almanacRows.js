@@ -207,6 +207,8 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
     rows.push({ ...marking('suggestion', 'suggestions', g, words, g.conversationId), change: {
       kind: 'suggestion', made, mark: str(g.mark), part: g.part === 'prompt' ? 'prompt' : 'reply', struck: str(g.struck), suggested: str(g.suggested),
       from, model: str(g.model) || null, state: ['accepted', 'rejected'].includes(g.state) ? g.state : 'open',
+      // A sweep's change accepted and told to the chat's model (C233 (a)).
+      sent: sentOf(g.sent),
     } })
   }
   return rows
