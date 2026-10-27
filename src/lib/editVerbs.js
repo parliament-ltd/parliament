@@ -88,6 +88,26 @@ export function planTell(step, screens = {}) {
   }
 }
 
+// ripple:on and ripple:off (stage 12, piece 2; C231 (e)): Ripple for the
+// plan of the chat in the room, kept on the plan, so every branch shares it.
+// screens.rippling: { room, plan: { id, num, on, branches }|null, helper }
+// with branches the other branches' addresses and helper who checks.
+
+/** @returns {{ says: object, act: object|null }} */
+export function planRipple(step, screens = {}) {
+  const r = screens.rippling
+  if (!r || r.room === undefined) return { says: { message: 'rippleNoRoom' }, act: null }
+  const on = step.match?.values?.[0]?.value === 'on'
+  const plan = r.plan
+  if (!plan || !plan.branches?.length) return { says: { message: 'rippleNothing' }, act: null }
+  if (plan.on === on) return { says: { message: on ? 'rippleOnAlready' : 'rippleOffAlready', values: { num: plan.num } }, act: null }
+  const act = { kind: 'ripple', docketId: plan.id, num: plan.num, on }
+  if (!on) return { says: { message: 'rippleOff', values: { num: plan.num } }, act }
+  const h = r.helper
+  const ready = h && !h.needsKey && !h.later && !h.gone && !h.unchecked
+  return { says: { message: ready ? 'rippleOn' : 'rippleOnNoKey', values: { num: plan.num, nums: plan.branches, name: ready ? h.name : '' } }, act }
+}
+
 // Every edit and ask Records knows, from any board (C220 (d)); else the
 // room's own, as piece 3 had it.
 function knownChanges(screens) {

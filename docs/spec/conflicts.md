@@ -2231,6 +2231,38 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Security and privacy:** one call per branch, through the gateway, to the helper the line names, with the cost named first. The helper sees your edits and the other branches' words only. What it returns cannot run a command, write HTML or land anywhere its quote does not match.
 - **Suggestion:** build as above.
 
+**C232. Stage 12, piece 2, as built: Ripple** (27 October; C231 as proposed).
+- **The check:** `lib/ripple.js` matches each edit going with a prompt to the same turn in each other branch of the plan, and sends one call per branch to the helper. The call is a new `ripple` method on each provider (Anthropic, Mistral, Ollama on this computer), through the gateway. Its instructions and the reading of its answer are shared (`providers/shared.js`):
+  - each edit goes with the line it sits in, before and after;
+  - each matching prompt or reply of the other branch goes in a tag with an id, as it reads now;
+  - text inside cannot close its tag;
+  - the answer is JSON. A suggestion is kept only if it carries an edit that was sent, quotes a part that was sent, fits on one line and is short. At most six per branch.
+- **Landing:** each is placed where its quote stands unmarked once, and stored as C229 has it, with "the same as your edit 242 in 201a" on its card. If the reply changed while the check ran, it is placed again on what it is now. The bar says what happened when all the checks have ended: "Ripple: 1 suggestion, in 201b", or "nothing to carry over in the branch it checked", with what could not be placed and which branches could not be checked. The prompt goes whatever Ripple does.
+- **The switch:** "ripple: off" in the room's head when its chat is in a plan with other branches; a click writes `>ripple:on` into the bar. Turned on, it reads "ripple: on" in rust. `ripple:on` and `ripple:off` name the plan, the branches and who checks ("Enter turns Ripple on for plan 215: when edits go with a prompt, Haiku 5.5 checks 215a for the same change, one call per branch"), or say a key is needed. `undo:` takes either back. Kept on the plan as `ripple`, carried by backups.
+- **The prompt's line:** "Ripple checks 201b and 201c: 2 calls to Haiku 5.5, under $0.01", or "Ripple is on, but checking … needs a model with a key: api:". Ripple runs only when a model answers the branch and the prompt goes to that one branch: not on a source's branch (C228 (d)), and not for a prompt to several or to several branches at once, whose other branches are the ones being written.
+- **Branch tabs:** open suggestions counted in rust beside your blue.
+- **Found and fixed while building:**
+  - **A new branch copied its parent's open suggestions,** with no records behind them, as markers with no number. A branch's copies now leave suggestions out: the struck words stand and the suggested ones go. They stay with the original.
+  - **A second room on screen (`room-2`, C175 (a)) refused the commands that work in a room** (`tell:`, `ripple:`), saying they work on Rooms. The bar now counts any room as a room.
+- **Tests:**
+  - the matching and the request, a source's answer never sent, tags kept in;
+  - reading what comes back;
+  - the whole check with a stand-in for the helper, from an edit in one chat to a stored suggestion in the other: placed, none to suggest, could not place, could not check;
+  - `ripple:on` and `ripple:off`;
+  - the prompt's line, priced and unpriced, with and without a key, and silent when a source answers;
+  - a branch copied without suggestions;
+  - a second room taking `tell:`.
+
+  1,244 tests.
+- **Tried in the browser,** on the trial copy. Its chats are all answered by Wikipedia, so I made a second branch of my test chat 216 (`new:branch 216`, now 223, plan 215) and marked both test replies as a model's, in the trial copy only. Then:
+  - "ripple: off" shows in 223's head;
+  - a click writes `>ripple:on`, whose line said a key is needed;
+  - Enter turned it on, the head read "ripple: on" and the plan kept it;
+  - `ripple:off`, then `undo:`, put it back on.
+
+  Plan 215 is left with Ripple on.
+- **Not tried:** a real check by a model, as the trial copy has no key. The same path is covered end to end with a stand-in for the helper, and the landing was tried in the browser in piece 1.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

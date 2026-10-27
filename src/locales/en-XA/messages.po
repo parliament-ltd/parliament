@@ -829,6 +829,10 @@ msgid "chat.sugAccept"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.suggestionsWaitingTab"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.sugReject"
 msgstr ""
 
@@ -3465,6 +3469,23 @@ msgstr ""
 msgid "enter.promptResendUnpriced"
 msgstr ""
 
+#. js-lingui-explicit-id
+msgid "enter.promptRipple"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptRippleCheap"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptRippleNoKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptRippleUnpriced"
+msgstr ""
+
 #. A source answers a search; a leading question phrase is left out (C168)
 #. js-lingui-explicit-id
 msgid "enter.promptSearchFor"
@@ -3658,6 +3679,49 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.retiredInstead"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rippleDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rippleFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rippleMissed"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.rippleNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rippleNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rippleOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rippleOffAlready"
+msgstr ""
+
+#. {nums} are the other branches, as 201b and 201c
+#. js-lingui-explicit-id
+msgid "enter.rippleOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rippleOnAlready"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.rippleOnNoKey"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -6004,6 +6068,19 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "room.notFound"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "room.rippleHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "room.rippleOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "room.rippleOn"
 msgstr ""
 
 #. js-lingui-explicit-id

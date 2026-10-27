@@ -56,6 +56,8 @@ function Tab({ tab, info, on, carried, onPick }) {
       {state && <span className="ch-btab-st">{i18n._(state)}</span>}
       {/* Edits waiting to go with the branch's next prompt, in the person's blue (C216 (j)). */}
       {info.waiting > 0 && <span className="ch-btab-wait" title={i18n._(COPY.chat.editsWaitingTab, { count: info.waiting })}>{info.waiting}</span>}
+      {/* Suggestions waiting there, in rust beside your blue (C231 (g)). */}
+      {info.suggesting > 0 && <span className="ch-btab-wait sug" title={i18n._(COPY.chat.suggestionsWaitingTab, { count: info.suggesting })}>{info.suggesting}</span>}
     </button>
   )
 }

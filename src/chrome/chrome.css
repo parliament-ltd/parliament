@@ -610,6 +610,7 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-btab-st { font: italic 11px var(--ch-serif); }
 /* Edits waiting to go with the branch's next prompt: a count in your blue (C216 (j)). */
 .ch-btab-wait { font: 500 11px var(--ch-sans); color: var(--ch-you); font-variant-numeric: tabular-nums; }
+.ch-btab-wait.sug { color: var(--ch-rust); margin-inline-start: 4px; }
 .ch-bslider { display: grid; grid-template-columns: 36px minmax(0, 1fr) 36px; align-items: start; }
 .ch-barrow { position: sticky; top: 40vh; width: 30px; height: 30px; margin: 0 auto; border: none; border-radius: 50%; background: transparent; color: var(--ch-ink-3); font: 400 18px/1 var(--ch-sans); cursor: pointer; }
 .ch-barrow:hover:not(:disabled) { color: var(--ch-ink); background: rgba(25, 25, 25, .045); }
@@ -883,3 +884,7 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 .ch-sl-text { overflow-wrap: anywhere; }
 .ch-sl-foot { margin: 8px 0 0; }
 .ch-sl-foot button { font: inherit; color: inherit; background: none; border: none; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+
+/* Ripple's switch in a room's head (stage 12, piece 2; C231 (e)): marginalia; rust while on. */
+.ch-shell .ch-chead button.ch-ripple { padding: 0; background: none; border: 0; cursor: pointer; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px; white-space: nowrap; }
+.ch-shell .ch-chead button.ch-ripple.on { color: var(--ch-rust); text-decoration-style: dashed; }

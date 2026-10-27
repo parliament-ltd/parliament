@@ -50,7 +50,8 @@ export const FIELDS = Object.freeze({
   file_data: ['fileId', 'data'],
   sbrd_documents: ['conversationId', 'paragraphs', 'suggestionStates', 'submittedReplies', 'updatedAt'],
   // Version 6.
-  dockets: ['id', 'num', 'title', 'createdAt', 'updatedAt', 'pinned', 'tags', 'archived', 'branches', 'order', 'nextLetter', 'restoredFrom', 'tagsMine'],
+  // ripple: Ripple on for the plan's branches (stage 12; C229 (f)).
+  dockets: ['id', 'num', 'title', 'createdAt', 'updatedAt', 'pinned', 'tags', 'archived', 'branches', 'order', 'nextLetter', 'restoredFrom', 'tagsMine', 'ripple'],
   runs: ['id', 'docketId', 'n', 'createdAt', 'cost', 'branches'],
   // order: the cards and headings in the person's own order (C144 (j)).
   collections: ['id', 'name', 'builtIn', 'description', 'items', 'headings', 'order', 'pinned', 'createdAt', 'updatedAt', 'fromFavorites'],

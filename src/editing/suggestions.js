@@ -19,8 +19,10 @@ import { Decoration, DecorationSet } from 'prosemirror-view'
 import { schema, SUGGEST_OUT, SUGGEST_IN, isEditMark, isAnswerMark, ASK } from './schema'
 import { SKIP, track, createEditIds } from './track'
 import { fromBlocks, toBlocks } from './blocks'
-import { replyFromMarkdown } from './fromMarkdown'
+import { replyFromMarkdown, promptFromText } from './fromMarkdown'
 import { editsIn, asksIn } from './edits'
+import { withoutAnswers } from './answers'
+import { stripAttachedFileBlocks } from '../lib/fileUpload'
 
 export const suggestionsKey = new PluginKey('replySuggestions')
 
@@ -100,13 +102,26 @@ export function placeSuggestions(state, items) {
  * @returns {{ blocks: object[], placed: string[], missed: string[], suggestions: Map<string, object>, edits: Map, asks: Map }|null}
  */
 export function placeInStored(blocks, content, items, nextBlockId = () => `b${crypto.randomUUID().replace(/-/g, '').slice(0, 10)}`) {
-  const doc = (Array.isArray(blocks) ? fromBlocks(blocks, nextBlockId) : null) ?? replyFromMarkdown(String(content ?? ''), nextBlockId)
+  // content: the reply's Markdown, or a builder as firstDocOf gives one.
+  const doc = (Array.isArray(blocks) ? fromBlocks(blocks, nextBlockId) : null)
+    ?? (typeof content === 'function' ? content(nextBlockId) : replyFromMarkdown(String(content ?? ''), nextBlockId))
   if (!doc) return null
   const out = placeSuggestions(EditorState.create({ schema, doc }), items)
   if (!out.placed.length) return { blocks: null, placed: [], missed: out.missed, suggestions: new Map(), edits: new Map(), asks: new Map() }
   const after = out.state.doc
   return { blocks: toBlocks(after), placed: out.placed, missed: out.missed, suggestions: suggestionsIn(after), edits: editsIn(after), asks: asksIn(after) }
 }
+
+/**
+ * A message's document as the room's editor first builds it, before it has a
+ * stored form: a prompt as plain lines, its attached files left out; a
+ * source's answer as plain text; a reply from its Markdown, its answers to
+ * asks left out (EditableMessages). For placeInStored.
+ */
+export const firstDocOf = (m) => (nextBlockId) => (m.role === 'user'
+  ? promptFromText(stripAttachedFileBlocks(String(m.content ?? '')), nextBlockId)
+  : m.source ? promptFromText(String(m.content ?? ''), nextBlockId)
+    : replyFromMarkdown(withoutAnswers(String(m.content ?? '')), nextBlockId, { anchors: `msg-${m.id}` }))
 
 /**
  * The suggestions in a document, by id: their kind, the words they would

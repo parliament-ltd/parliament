@@ -42,7 +42,7 @@ const COMPOSER = 'input'
 const blockName = (ref) => String(ref ?? '').split('@')[0]
 const withoutComposer = (mode) => ({ ...mode, components: (mode.components ?? []).filter((c) => blockName(c?.ref) !== COMPOSER) })
 
-function Card({ board, addressed, onAddress, title, aside, room, children }) {
+function Card({ board, addressed, onAddress, title, aside, room, ripple, children }) {
   const { i18n } = useLingui()
   return (
     <article
@@ -56,6 +56,12 @@ function Card({ board, addressed, onAddress, title, aside, room, children }) {
         {aside && <span className="ch-marg ch-aside" dir="auto">{aside}</span>}
         {aside && room && <span className="ch-marg ch-aside ch-sep" aria-hidden="true">·</span>}
         {room && <span className="ch-marg ch-aside" dir="auto">{room}</span>}
+        {/* Ripple for the plan's branches (stage 12, piece 2; C231 (e)): a click writes the command, which costs, and waits for Enter. */}
+        {ripple && (
+          <button type="button" className={`ch-marg ch-ripple${ripple.on ? ' on' : ''}`} title={i18n._(COPY.room.rippleHelp, { command: ripple.on ? 'ripple:off' : 'ripple:on' })} onMouseDown={(e) => e.stopPropagation()} onClick={() => ripple.onWrite(ripple.on ? '>ripple:off' : '>ripple:on')}>
+            {i18n._(ripple.on ? COPY.room.rippleOn : COPY.room.rippleOff)}
+          </button>
+        )}
         {addressed && <span className="ch-marg">{i18n._(COPY.shell.addressed)}</span>}
       </header>
       {children}
@@ -66,14 +72,16 @@ function Card({ board, addressed, onAddress, title, aside, room, children }) {
 /**
  * @param {{ chatId: string|null, addressed: boolean, onAddress: (board: string) => void,
  *   onReady?: (chatId: string) => void, onLeave?: (chatId: string) => void,
- *   onName?: (chatId: string, name: object|null) => void, rev?: number, board?: string }} props
+ *   onName?: (chatId: string, name: object|null) => void, rev?: number, board?: string,
+ *   ripple?: { on: boolean, onWrite: (text: string) => void }|null }} props
+ *   ripple: the switch in its head, when its chat is in a plan with other branches (C231 (e));
  *   board: which room board this is ('room', 'room-2' …), with several open (C175 (a));
  *   onReady: told once the chat's messages are loaded, so a prompt can go;
  *   onLeave: told when the board stops showing the chat; onName: told what
  *   the room is called (roomNames.js); rev: changes when the room was
  *   named, so it is read again
  */
-export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLeave, onName, rev = 0, board = 'room' }) {
+export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLeave, onName, rev = 0, board = 'room', ripple = null }) {
   const { i18n } = useLingui()
   const { holdChat, watchConversation } = useChat()
   const { conversations } = useConversations()
@@ -145,7 +153,7 @@ export default function RoomBoard({ chatId, addressed, onAddress, onReady, onLea
 
   const title = chat?.num != null ? String(chat.num) : i18n._(COPY.boards.room)
   const room = found.forId === chatId && found.mode ? roomLabel(i18n, named) : null
-  const card = (body) => <Card board={board} addressed={addressed} onAddress={onAddress} title={title} aside={chat?.title || null} room={room}>{body}</Card>
+  const card = (body) => <Card board={board} addressed={addressed} onAddress={onAddress} title={title} aside={chat?.title || null} room={room} ripple={ripple}>{body}</Card>
 
   if (found.forId !== chatId) return card(null)
   if (found.error) {

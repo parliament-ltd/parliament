@@ -31,7 +31,7 @@ import { findAnswerers } from '../net/answerers'
 import { readFrameworks, frameworksOf, cleanOwn, namesFrom, NAME_MAX, INSTRUCTION_MAX } from '../lib/frameworks'
 import { planReply, planLanguage, planHelper, planTranslate, planPrivacy, planCheck, queryLines } from '../lib/languageVerbs'
 import { planTo, planAgain, planNewBranch } from '../lib/branchVerbs'
-import { planHoldEdits, planAsk, planUndoChange, planSettle, planDropAsks, planStrike, planTell } from '../lib/editVerbs'
+import { planHoldEdits, planAsk, planUndoChange, planSettle, planDropAsks, planStrike, planTell, planRipple } from '../lib/editVerbs'
 import { planNewPlan, planNewStep, planNewRun, planNewPlanBranch, planHold, planMoveBranch, planOpenPlan, planOpenRun, planOpenUnrun, planPromptPreview, planDeleteUnsent, planRun, planStop, planDiff } from '../lib/planVerbs'
 import { planBranchSummary } from '../lib/branchSummary'
 import { planInclude } from '../lib/included'
@@ -56,7 +56,7 @@ const BRINGS = Object.freeze(['records', 'room', 'library', 'plan'])
 // by: chooses who answers in the chat the room shows (stage 7; C149), and
 // framework: the standing instructions that go with it (C164).
 // reply:, helper: and translate: (piece 6; C166).
-const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell'])
+const ACTS = Object.freeze(['name', 'tour', 'inspect', 'api', 'save', 'forget', 'copy', 'undo', 'delete', 'export', 'new', 'add', 'rm', 'heading', 'note', 'summarize', 'compare', 'jump', 'by', 'framework', 'thinking', 'markup', 'reply', 'helper', 'translate', 'privacy', 'check', 'to', 'include', 'again', 'set', 'backup', 'restore', 'import', 'language', 'hold', 'run', 'stop', 'diff', 'ask', 'accept', 'reject', 'strikethrough', 'tell', 'ripple'])
 // focus: and focus:off, the first form (W §7; stage 5).
 const FOCUS = 'focus'
 // The filters, sort: and clear: change what Records shows (stage 6,
@@ -659,7 +659,8 @@ function planName(a, step, screens = {}) {
  *   the welcome steps (tour:), or to what Records shows (filters)
  */
 export function preview(value, { mode, arrangement, built = BUILT, screens = {} }) {
-  const answer = enterLine(value, { mode, board: arrangement.addressed, built })
+  // A second room (room-2, C175 (a)) is a room to the commands that work in one.
+  const answer = enterLine(value, { mode, board: isRoom(arrangement.addressed) ? 'room' : arrangement.addressed, built })
   if (answer.state !== 'ready') return { answer, says: { message: answer.message, values: answer.values }, next: null }
 
   // On the Collection (C144): clear: alone empties it, move: places a card,
@@ -734,6 +735,8 @@ export function preview(value, { mode, arrangement, built = BUILT, screens = {} 
       // strikethrough: and tell: (piece 7; C225 (c), (d)).
       strikethrough: planStrike,
       tell: (a1, s1, sc) => planTell(s1, sc),
+      // ripple: (stage 12, piece 2; C231 (e)).
+      ripple: (a1, s1, sc) => planRipple(s1, sc),
       // accept: and reject: on answered asks (piece 5; C220 (d)); Ripple's suggestions join in stage 12.
       accept: (a1, s1, sc) => planSettle(s1, sc, 'accept'),
       reject: (a1, s1, sc) => planSettle(s1, sc, 'reject'),
@@ -976,6 +979,7 @@ export function promptPreview(text, target = {}) {
     if (!p.ready || !p.says) return p
     const also = [{ message: 'promptEditsOnly', values: { ...what, name: who.name ?? '' } }]
     if (told) also.push({ message: 'promptTellGo', values: { count: told.count, name: who.name ?? '' } })
+    if (target.ripple && edits.count) also.push(rippleLine(target.ripple))
     return { ...p, editsOnly: true, says: { ...p.says, also: [...also, ...(p.says.also ?? [])] } }
   }
   const counted = edits || told ? { ...target, historyChars: (target.historyChars ?? 0) + (edits?.chars ?? 0) + (told?.chars ?? 0) } : target
@@ -992,6 +996,9 @@ export function promptPreview(text, target = {}) {
         ? { message: 'promptEditsToReader', values: { ...what, name: reader.name ?? '', source: first.name ?? target.source ?? '', tokens: readerTokens() } }
         : { message: 'promptEditsWait', values: { ...what, source: first.name ?? target.source ?? '' } })
   }
+  // Ripple's checks when these edits go (stage 12, piece 2; C231 (d)): to one branch only.
+  // Only when a model answers here: a source's branch is not checked from (C228 (d)).
+  if (target.ripple && edits?.count && !(Array.isArray(target.many) && target.many.length > 1) && toModel(target.answerer ?? { group: target.keyed ? 'model' : 'source' })) lines.push(rippleLine(target.ripple))
   // tell: notes held for this prompt (C225 (d), (e)): to the model that
   // answers, or on a source's branch the one that reads edits there.
   if (told) {
@@ -1030,6 +1037,15 @@ export function promptPreview(text, target = {}) {
     }
   }
   return lines.length ? { ...p, says: { ...p.says, also: [...lines, ...(p.says.also ?? [])] } } : p
+}
+
+/** What Ripple's checks will be: calls to the helper, one per other branch, and their cost (C231 (d)). */
+function rippleLine(rp) {
+  if (!rp.ready) return { message: 'promptRippleNoKey', values: { nums: rp.nums } }
+  const tokens = Math.ceil((rp.chars * rp.count) / CHARS_PER_TOKEN)
+  const cost = inputCost(tokens, rp.perMillion)
+  if (cost == null) return { message: 'promptRippleUnpriced', values: { nums: rp.nums, count: rp.count, name: rp.name, tokens } }
+  return { message: cost < CENT ? 'promptRippleCheap' : 'promptRipple', values: { nums: rp.nums, count: rp.count, name: rp.name, cost: cost < CENT ? CENT : cost } }
 }
 
 function onePreview(text, target) {

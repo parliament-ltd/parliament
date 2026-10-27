@@ -163,3 +163,23 @@ describe('suggestions stored (C229)', () => {
     }
   })
 })
+
+describe('a new branch of a reply with suggestions (C229)', () => {
+  it('copies the reply without them: the struck words stand, the suggested ones go, and their records stay with the original', async () => {
+    const db = await open('sug-branch')
+    try {
+      const c = await R.createChat(db, chat())
+      await R.addMessageRecord(db, message(c.id, 'user', 'Write the opening.'))
+      const reply = await R.addMessageRecord(db, message(c.id, 'assistant', TEXT))
+      await land(db, reply)
+      const branch = await R.createBranchChat(db, { sourceId: c.id, branchAtMessageId: reply.id, title: 'b', model: 'claude-sonnet', newId, now: at() })
+      const copy = (await db.getAllFromIndex('messages', 'conversationId', branch.id)).find((m) => m.role === 'assistant')
+      const runs = copy.blocks[0].text
+      expect(runs.some((r) => r.suggestIn || r.suggestOut)).toBe(false)
+      expect(runs.map((r) => r.text).join('')).toBe(TEXT)
+      expect((await db.getAll('suggestions')).map((s) => s.messageId)).toEqual([reply.id])
+    } finally {
+      db.close()
+    }
+  })
+})

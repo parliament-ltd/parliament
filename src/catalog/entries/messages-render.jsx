@@ -411,6 +411,8 @@ export default function MessagesRender() {
   const settleSugOf = useCallback((messageId, sugId, how) => {
     dbSettleSuggestion(`${messageId}:${sugId}`, how === 'accept' ? 'accepted' : 'rejected').catch(() => {})
   }, [])
+  // Suggestions waiting in a branch, counted in rust on its tab (C231 (g)).
+  const suggestionsOpenIn = useCallback((chatId) => (chatSuggestions.get(chatId) ?? []).filter((r) => r.state === 'open').length, [chatSuggestions])
   const sugWords = useMemo(() => ({
     ripple: i18n._(COPY.chat.sugRipple), sweep: i18n._(COPY.chat.sugSweep), accept: i18n._(COPY.chat.sugAccept), reject: i18n._(COPY.chat.sugReject),
   }), [i18n])
@@ -625,8 +627,8 @@ export default function MessagesRender() {
     const list = chatId === activeConversationId ? visibleMessages : members.get(chatId) ?? []
     const chars = list.reduce((n, m) => n + (m.content && !m.source ? m.content.length : 0), 0)
     // Its last answer from a source, for include: (C176).
-    return { letter, name, address: planNum != null && letter ? `${planNum}${letter}` : null, context: contextShare(chars, window), answer: answerFor(list), prompt: promptFacts(list), steps: list.filter((m) => m.role === 'user').length, waiting: editsWaitingIn(chatId) }
-  }, [conversations, planNum, i18n, activeConversationId, visibleMessages, members, editsWaitingIn])
+    return { letter, name, address: planNum != null && letter ? `${planNum}${letter}` : null, context: contextShare(chars, window), answer: answerFor(list), prompt: promptFacts(list), steps: list.filter((m) => m.role === 'user').length, waiting: editsWaitingIn(chatId), suggesting: suggestionsOpenIn(chatId) }
+  }, [conversations, planNum, i18n, activeConversationId, visibleMessages, members, editsWaitingIn, suggestionsOpenIn])
   // A message of another branch is numbered as in its own chat.
   const numberOf = useCallback((chatId, msg) => {
     const list = members.get(chatId) ?? []

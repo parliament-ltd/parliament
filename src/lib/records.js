@@ -17,6 +17,7 @@ import { stepsFromTurns, storedSteps, forkStep, collabsFromPersonas } from './mi
 import { newDocket, addBranch, removeBranch, renameInDocket, withSteps, favoritesWith, favoritesWithout, startedCount, runFromRun, emptyPlan, plannedBranch } from './recordsModel'
 import { STATUS, branchStatus, plannedStep, isFixed, CONDITIONS, ENDED } from './docketModel'
 import { placeAnswer } from '../editing/answers'
+import { withoutSuggestions } from '../editing/blocks'
 
 export const RECORDS_EVENT = 'parliament-records'
 
@@ -217,6 +218,8 @@ export async function createBranchChat(db, { sourceId, branchAtMessageId, title,
       incomplete: Boolean(m.incomplete),
       createdAt: m.createdAt, // the original times keep the order
       from: m.id,
+      // Its open suggestions stay with the original (stage 12; C229).
+      ...(Array.isArray(m.blocks) ? { blocks: withoutSuggestions(m.blocks) } : {}),
     }))
     for (const m of copies) await msgStore.put(m)
     branch.storageBytes = copies.reduce((n, m) => n + byteSize(m.content), 0)

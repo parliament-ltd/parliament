@@ -128,3 +128,25 @@ describe('accept: and reject: on suggestions (stage 12, piece 1; C229 (e))', () 
     expect(on('>delete:250').text).toBe('A suggestion is turned down with reject:250, and kept as the record of it')
   })
 })
+
+describe('ripple:on and ripple:off (stage 12, piece 2; C231 (e))', () => {
+  const helper = { id: 'claude-haiku-5-5', name: 'Haiku 5.5', provider: 'anthropic', group: 'model' }
+  const on = (value, plan, h = helper) => {
+    const p = preview(value, { mode: 'command', arrangement: { ...shipped('almanac'), addressed: 'room' }, screens: { rippling: { room: 'c202', plan, helper: h } } })
+    return { ...p, text: p.says ? say(i18n, p.says.message, p.says.values) : '' }
+  }
+  const plan = { id: 'd1', num: 201, on: false, branches: ['201b', '201c'] }
+  it('turns Ripple on for the plan, naming who checks which branches', () => {
+    expect(on('>ripple:on', plan)).toMatchObject({
+      text: 'Enter turns Ripple on for plan 201: when edits go with a prompt, Haiku 5.5 checks 201b and 201c for the same change, one call per branch',
+      act: { kind: 'ripple', docketId: 'd1', num: 201, on: true },
+    })
+    expect(on('>ripple:on', plan, { ...helper, needsKey: true }).text).toBe('Enter turns Ripple on for plan 201. Checking 201b and 201c needs a model with a key: api:')
+    expect(on('>ripple:off', { ...plan, on: true }).act).toEqual({ kind: 'ripple', docketId: 'd1', num: 201, on: false })
+    expect(on('>ripple:on', { ...plan, on: true }).text).toBe('Ripple is on for plan 201 already')
+  })
+  it('says when there is nothing to carry edits to', () => {
+    expect(on('>ripple:on', null).text).toBe('Ripple carries edits to the other branches of a plan, and this chat has none yet')
+    expect(on('>ripple:on', { ...plan, branches: [] }).act).toBeNull()
+  })
+})

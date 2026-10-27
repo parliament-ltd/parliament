@@ -829,6 +829,10 @@ msgid "chat.sugAccept"
 msgstr "accept"
 
 #. js-lingui-explicit-id
+msgid "chat.suggestionsWaitingTab"
+msgstr "{count, plural, one {# suggestion waits} other {# suggestions wait}} for you in this branch"
+
+#. js-lingui-explicit-id
 msgid "chat.sugReject"
 msgstr "reject"
 
@@ -3465,6 +3469,23 @@ msgstr "{tokens, plural, one {Enter sends it again without streaming, about # to
 msgid "enter.promptResendUnpriced"
 msgstr "{tokens, plural, one {Enter sends it again without streaming, about # token} other {Enter sends it again without streaming, about # tokens}}"
 
+#. js-lingui-explicit-id
+msgid "enter.promptRipple"
+msgstr "Ripple checks {nums}: {count, plural, one {# call} other {# calls}} to {name}, about {cost}"
+
+#. js-lingui-explicit-id
+msgid "enter.promptRippleCheap"
+msgstr "Ripple checks {nums}: {count, plural, one {# call} other {# calls}} to {name}, under {cost}"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptRippleNoKey"
+msgstr "Ripple is on, but checking {nums} needs a model with a key: api:"
+
+#. js-lingui-explicit-id
+msgid "enter.promptRippleUnpriced"
+msgstr "Ripple checks {nums}: {count, plural, one {# call} other {# calls}} to {name}, about {tokens} tokens"
+
 #. A source answers a search; a leading question phrase is left out (C168)
 #. js-lingui-explicit-id
 msgid "enter.promptSearchFor"
@@ -3659,6 +3680,49 @@ msgstr "{verb} is no longer a command"
 #. js-lingui-explicit-id
 msgid "enter.retiredInstead"
 msgstr "{verb} is no longer a command. Use {instead}"
+
+#. js-lingui-explicit-id
+msgid "enter.rippleDone"
+msgstr "Ripple: {count, plural, =0 {nothing to carry over in {checked, plural, one {the branch it checked} other {the # branches it checked}}} one {# suggestion, in {nums}} other {# suggestions, in {nums}}}"
+
+#. js-lingui-explicit-id
+msgid "enter.rippleFailed"
+msgstr "Ripple could not check {nums}"
+
+#. js-lingui-explicit-id
+msgid "enter.rippleMissed"
+msgstr "{count, plural, one {# more could not be placed: its words were} other {# more could not be placed: their words were}} not found once, unmarked"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.rippleNoRoom"
+msgstr "Ripple works on the chat in a room. Open one first: room:"
+
+#. js-lingui-explicit-id
+msgid "enter.rippleNothing"
+msgstr "Ripple carries edits to the other branches of a plan, and this chat has none yet"
+
+#. js-lingui-explicit-id
+msgid "enter.rippleOff"
+msgstr "Enter turns Ripple off for plan {num}: edits stay in their branch"
+
+#. js-lingui-explicit-id
+msgid "enter.rippleOffAlready"
+msgstr "Ripple is off for plan {num} already"
+
+#. {nums} are the other branches, as 201b and 201c
+#. js-lingui-explicit-id
+msgid "enter.rippleOn"
+msgstr "Enter turns Ripple on for plan {num}: when edits go with a prompt, {name} checks {nums} for the same change, one call per branch"
+
+#. js-lingui-explicit-id
+msgid "enter.rippleOnAlready"
+msgstr "Ripple is on for plan {num} already"
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.rippleOnNoKey"
+msgstr "Enter turns Ripple on for plan {num}. Checking {nums} needs a model with a key: api:"
 
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
@@ -6005,6 +6069,19 @@ msgstr "New room"
 #. js-lingui-explicit-id
 msgid "room.notFound"
 msgstr "This chat could not be found. It may have been removed."
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "room.rippleHelp"
+msgstr "Writes {command} in the bar"
+
+#. js-lingui-explicit-id
+msgid "room.rippleOff"
+msgstr "ripple: off"
+
+#. js-lingui-explicit-id
+msgid "room.rippleOn"
+msgstr "ripple: on"
 
 #. js-lingui-explicit-id
 msgid "room.unavailable"

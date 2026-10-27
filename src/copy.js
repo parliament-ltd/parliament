@@ -758,6 +758,22 @@ export const COPY = {
     askNoReply: /*i18n*/ { id: 'enter.askNoReply', message: 'Click into a reply first, or select the words to ask about, then ask: again' },
     askNotPrompt: /*i18n*/ { id: 'enter.askNotPrompt', message: 'Asks are for replies. In your prompt, strike or type over it' },
     askKept: /*i18n*/ { id: 'enter.askKept', message: 'Kept as an ask. It goes with your next prompt' },
+    // ripple: (stage 12, piece 2; C231).
+    rippleNoRoom: /*i18n*/ { id: 'enter.rippleNoRoom', message: 'Ripple works on the chat in a room. Open one first: room:', comment: 'Commands stay English' },
+    rippleNothing: /*i18n*/ { id: 'enter.rippleNothing', message: 'Ripple carries edits to the other branches of a plan, and this chat has none yet' },
+    rippleOnAlready: /*i18n*/ { id: 'enter.rippleOnAlready', message: 'Ripple is on for plan {num} already' },
+    rippleOffAlready: /*i18n*/ { id: 'enter.rippleOffAlready', message: 'Ripple is off for plan {num} already' },
+    rippleOn: /*i18n*/ { id: 'enter.rippleOn', message: 'Enter turns Ripple on for plan {num}: when edits go with a prompt, {name} checks {nums} for the same change, one call per branch', comment: '{nums} are the other branches, as 201b and 201c' },
+    rippleOnNoKey: /*i18n*/ { id: 'enter.rippleOnNoKey', message: 'Enter turns Ripple on for plan {num}. Checking {nums} needs a model with a key: api:', comment: 'Commands stay English' },
+    // What the Enter line says of Ripple's checks before a prompt goes, and when they end (C231 (d)).
+    promptRipple: /*i18n*/ { id: 'enter.promptRipple', message: 'Ripple checks {nums}: {count, plural, one {# call} other {# calls}} to {name}, about {cost}' },
+    promptRippleCheap: /*i18n*/ { id: 'enter.promptRippleCheap', message: 'Ripple checks {nums}: {count, plural, one {# call} other {# calls}} to {name}, under {cost}' },
+    promptRippleUnpriced: /*i18n*/ { id: 'enter.promptRippleUnpriced', message: 'Ripple checks {nums}: {count, plural, one {# call} other {# calls}} to {name}, about {tokens} tokens' },
+    promptRippleNoKey: /*i18n*/ { id: 'enter.promptRippleNoKey', message: 'Ripple is on, but checking {nums} needs a model with a key: api:', comment: 'Commands stay English' },
+    rippleDone: /*i18n*/ { id: 'enter.rippleDone', message: 'Ripple: {count, plural, =0 {nothing to carry over in {checked, plural, one {the branch it checked} other {the # branches it checked}}} one {# suggestion, in {nums}} other {# suggestions, in {nums}}}' },
+    rippleMissed: /*i18n*/ { id: 'enter.rippleMissed', message: '{count, plural, one {# more could not be placed: its words were} other {# more could not be placed: their words were}} not found once, unmarked' },
+    rippleFailed: /*i18n*/ { id: 'enter.rippleFailed', message: 'Ripple could not check {nums}' },
+    rippleOff: /*i18n*/ { id: 'enter.rippleOff', message: 'Enter turns Ripple off for plan {num}: edits stay in their branch' },
     // strikethrough: and tell: (stage 11, piece 7; C225).
     strikeGo: /*i18n*/ { id: 'enter.strikeGo', message: 'Enter strikes the words you selected in a reply. They stay, struck, and go with your next prompt as an edit' },
     strikeDone: /*i18n*/ { id: 'enter.strikeDone', message: 'Struck. It goes with your next prompt as an edit' },
@@ -1500,6 +1516,10 @@ export const COPY = {
     unnamed: /*i18n*/ { id: 'room.unnamed', message: 'unnamed room', comment: 'A room with no name of its own (bar reference)' },
     newTitle: /*i18n*/ { id: 'room.newTitle', message: 'New room' },
     empty: /*i18n*/ { id: 'room.empty', message: 'An empty room. Its first prompt, written in the bar, starts its chat.' },
+    // Ripple's switch in a room's head (stage 12, piece 2; C231 (e)).
+    rippleOff: /*i18n*/ { id: 'room.rippleOff', message: 'ripple: off' },
+    rippleOn: /*i18n*/ { id: 'room.rippleOn', message: 'ripple: on' },
+    rippleHelp: /*i18n*/ { id: 'room.rippleHelp', message: 'Writes {command} in the bar', comment: 'Commands stay English' },
     notFound: /*i18n*/ { id: 'room.notFound', message: 'This chat could not be found. It may have been removed.' },
     unavailable: /*i18n*/ { id: 'room.unavailable', message: 'This room could not be drawn. Its chat is kept as it was.' },
   },
@@ -2042,6 +2062,7 @@ export const COPY = {
     askAgain: /*i18n*/ { id: 'chat.askAgain', message: 'ask again' },
     joinedToBar: /*i18n*/ { id: 'chat.joinedToBar', message: 'Your prompt and this reply, as they read now, are in the bar as your next prompt' },
     editsWaitingTab: /*i18n*/ { id: 'chat.editsWaitingTab', message: '{count, plural, one {# edit waits} other {# edits wait}} to go with the next prompt to this branch' },
+    suggestionsWaitingTab: /*i18n*/ { id: 'chat.suggestionsWaitingTab', message: '{count, plural, one {# suggestion waits} other {# suggestions wait}} for you in this branch' },
     // Asks (stage 11, piece 4; C218).
     askLabel: /*i18n*/ { id: 'chat.askLabel', message: 'ASK', comment: 'The label of the box an ask is written in' },
     askPlaceholder: /*i18n*/ { id: 'chat.askPlaceholder', message: 'Ask in your own words: make it shorter, or add the year it opened' },

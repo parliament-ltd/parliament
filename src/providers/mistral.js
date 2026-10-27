@@ -1,6 +1,6 @@
 import { BaseProvider } from './base'
 import { findModel } from '../net/answerers'
-import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary, withIncluded, asCheckText } from './shared'
+import { DESCRIBE_SYSTEM_PROMPT, SUMMARIZE_SYSTEM_PROMPT, readDescription, summaryItems, SUMMARY_MAX_TOKENS, SUMMARY_MAX_CHARS, translateSystemPrompt, translatePieces, readPieces, translateMaxTokens, CHAT_SUMMARY_SYSTEM_PROMPT, CHAT_SUMMARY_MAX_TOKENS, readChatSummary, RIPPLE_SYSTEM_PROMPT, RIPPLE_MAX_TOKENS, rippleMessage, readRipple, withIncluded, asCheckText } from './shared'
 import { CHECK_SYSTEM_PROMPT, readCheck } from '../lib/injection'
 
 // Mistral (refactor-plan.md, stage 7, piece 3; LPN §7.1; C82, C159).
@@ -298,6 +298,12 @@ export class MistralProvider extends BaseProvider {
   }
 
   // translate: (C166), as Anthropic's.
+  // Ripple (stage 12, piece 2; C231): where an edit belongs in another
+  // branch, by the model named (the helper). null when nothing readable came back.
+  async ripple(apiKey, request, { model = LIGHT_MODEL } = {}) {
+    return readRipple(await this._lightweightCall(apiKey, RIPPLE_SYSTEM_PROMPT, [{ role: 'user', content: rippleMessage(request) }], RIPPLE_MAX_TOKENS, model), request)
+  }
+
   async translate(apiKey, pieces, { from = null, to, query = false, model = LIGHT_MODEL } = {}) {
     const raw = await this._lightweightCall(apiKey, translateSystemPrompt({ from, to, query }), [{ role: 'user', content: translatePieces(pieces) }], translateMaxTokens(pieces), model)
     return readPieces(raw, pieces.length)

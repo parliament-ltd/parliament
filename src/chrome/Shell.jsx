@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useLingui } from '@lingui/react'
 import './chrome.css'
 import { COPY } from '../copy'
-import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch, getStorageEstimate, getPlan } from '../lib/db'
+import { initDB, getConversation, getSetting, setSetting, getMessages, getSbrdDocument, createBranch, createSummaryBranch, getStorageEstimate, getPlan, getEditsOfChat } from '../lib/db'
 import { renameMode } from '../lib/modes'
 import { loadSpace, saveArrangement } from '../lib/arrangements'
 import { keepCommand, readCommands } from '../lib/commandHistory'
@@ -34,7 +34,7 @@ import { useIsStreaming, useHiddenIds, usePendingDeletes, useStreamEnd, useMessa
 import { sendableOf, hiddenIds, pendingDeletes, isStreaming as replyArriving, stopStream, streamingIds } from '../stores/chatStore'
 import { fromSource } from '../stores/sendHistory'
 import { useChatEdits } from '../stores/useChatEdits'
-import { noteFor, tellNote } from '../editing/told'
+import { noteFor, tellNote, waiting as editWaits } from '../editing/told'
 import { preview, viewFromSaved, lineOf, LOCAL_READS } from './preview'
 import { answerFor, includedOf } from '../lib/included'
 import { promptFacts, promptNow } from '../lib/branchVerbs'
@@ -77,7 +77,8 @@ import { longDay } from './say'
 import { EMPTY_VIEW, applyView, nextView, viewLine, isAtRest, isChangeRow } from '../lib/recordsFilter'
 import { onRecordsChanged } from '../lib/records'
 import { changeStored } from '../editing/storedChange'
-import { settleStored } from '../editing/suggestions'
+import { settleStored, newSuggestionId } from '../editing/suggestions'
+import { rippleChars, checkBranches, landRipple } from '../lib/ripple'
 
 // The new shell (refactor-plan.md §4 and stages 3 and 4): the board strip,
 // the boards as the arrangement places them, the bar, and windows of their
@@ -1299,6 +1300,13 @@ export default function Shell() {
       remember(body)
       return { done: true, says: { message: 'tellHeld', values: { count: what.notes.length } } }
     }
+    if (what.kind === 'ripple') {
+      // ripple:on / ripple:off (stage 12, piece 2; C231 (e)): kept on the plan; undo: takes it back.
+      const done = await changeRecords(db.current, [{ store: 'dockets', id: what.docketId, num: what.num, set: { ripple: what.on ? true : null }, expect: { ripple: what.on ? null : true } }])
+      if (touched.current) touched.current.records.push(...done)
+      remember(body)
+      return null
+    }
     if (what.kind === 'markup') {
       // markup:on / markup:off (stage 11, piece 1): replies marked up, or
       // clean; with col, or on the Collection, its cards (piece 5; C220 (g)).
@@ -2274,6 +2282,22 @@ export default function Shell() {
   // tell: notes held for the next prompt in this room (C225 (d)).
   const tellsHere = roomId === undefined ? null : tells[roomId ?? ''] ?? null
   const telling = useMemo(() => ({ room: roomId, held: tellsHere ?? [] }), [roomId, tellsHere])
+  // Ripple for the plan of the room's chat (stage 12, piece 2; C231): whether
+  // it is on, the other branches it checks (a source's never, C228 (d)), and
+  // the helper that checks them.
+  const rippling = useMemo(() => {
+    const row = roomChatRow
+    const fromSource = (r) => Boolean(r?.sources?.length) && !r?.models?.length
+    const planRow = row?.docketNum != null ? (almanacRows ?? []).find((r) => r.kind === 'docket' && r.docketNum === row.docketNum) ?? null : null
+    const others = planRow ? (almanacRows ?? []).filter((r) => r.kind === 'chat' && r.docketNum === row.docketNum && r.chatId !== roomId && r.branch && !fromSource(r)) : []
+    return {
+      room: roomId,
+      plan: planRow ? { id: planRow.id, num: planRow.num, on: planRow.ripple === true, branches: others.map((r) => `${r.docketNum}${r.branch}`), chats: others.map((r) => ({ chatId: r.chatId, address: `${r.docketNum}${r.branch}` })) } : null,
+      helper: helperNow,
+      fromSource: fromSource(row),
+      from: row ? { chat: row.num, branch: row.docketNum != null && row.branch ? `${row.docketNum}${row.branch}` : null } : null,
+    }
+  }, [roomChatRow, almanacRows, roomId, helperNow])
   // again: (C177): a chat's last prompt and who answers it, for the room's
   // chat and the branches on screen; another chat is opened first.
   const roomPrompt = useMemo(() => promptFacts(shown), [shown])
@@ -2382,7 +2406,7 @@ export default function Shell() {
     byNum: new Map([...(roomEdits.get(roomId) ?? []).map((r) => [r, 'edits']), ...(roomAsks.get(roomId) ?? []).map((r) => [r, 'asks'])]
       .filter(([r]) => Number.isInteger(r.num)).map(([r, list]) => [r.num, { id: r.id, list, held: Boolean(r.held), sent: Boolean(r.sent) }])),
   }), [roomEdits, roomAsks, roomId])
-  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, again, settingScreen, planBoard, runFacts])
+  const screens = useMemo(() => ({ lastRoom, roomName: roomNameHere, stepsOff: welcome.off, measure: measureSpace, numbered, keys: keyInfo.keys, noKey: keyInfo.noKey, records, undo: undoTop, undoFence: fenceShown, hiddenOf, collection: collectionScreens, helper, answering, local: LOCAL_ENTRY, frameworks: frameworkScreens, thinking: { on: settings.thinking === true }, markup: { on: settings.markup !== 'off' }, collectionMarkup: { on: settings.collectionMarkup !== 'off' }, roomChat: roomId, heldEdits, ...languageScreens, branching, summarizing, including, telling, rippling, again, setting: settingScreen, plan: planBoard, runFacts }), [lastRoom, roomNameHere, welcome.off, measureSpace, numbered, keyInfo, records, undoTop, fenceShown, hiddenOf, collectionScreens, helper, answering, frameworkScreens, settings.thinking, settings.markup, settings.collectionMarkup, roomId, heldEdits, languageScreens, branching, summarizing, including, telling, rippling, again, settingScreen, planBoard, runFacts])
 
   // Where a prompt would go, for the Enter line: worked out here, sending
   // nothing (C83).
@@ -2400,6 +2424,22 @@ export default function Shell() {
     const note = noteFor(kept, roomEdits.get(roomId) ?? [], { leaveOut: new Set(joinedNow?.from ?? []), asks: roomAsks.get(roomId) ?? [] })
     return note.ids.length || note.askIds.length ? { count: note.ids.length, asks: note.askIds.length, chars: note.text.length } : null
   }, [kept, roomEdits, roomAsks, roomId, joinedNow])
+  // Ripple's checks if the edits here go now (stage 12, piece 2; C231 (d)):
+  // each other branch of the plan, one call each to the helper, about as
+  // long as what is edited here.
+  // The switch in the room's head, when its chat's plan has other branches (C231 (e)).
+  const rippleHead = useMemo(() => (rippling.plan?.branches.length && !rippling.fromSource ? { on: rippling.plan.on, onWrite: writeField } : null), [rippling, writeField])
+  const rippleFacts = useMemo(() => {
+    const plan = rippling.plan
+    if (!plan?.on || !plan.branches.length || rippling.fromSource || !editsHere?.count) return null
+    const going = (roomEdits.get(roomId) ?? []).filter(editWaits)
+    const h = rippling.helper
+    const ready = Boolean(h) && !h.needsKey && !h.later && !h.gone && !h.unchecked
+    return {
+      nums: plan.branches, count: plan.branches.length, ready, name: h?.name ?? '', id: h?.id ?? null, provider: h?.provider ?? null,
+      perMillion: h?.price?.inputPerMillion ?? null, chars: rippleChars({ edits: going, from: kept }), chats: plan.chats, from: rippling.from,
+    }
+  }, [rippling, editsHere, roomEdits, roomId, kept])
   // Who reads edits and asks on a source's branch: the default model (C218 (e)).
   const readerHere = useMemo(() => answererOf({ chosen: settings.defaultModel ?? null, keyed: keys, defaultModel: settings.defaultModel }), [settings.defaultModel, keys])
   const sourcesOut = useMemo(() => {
@@ -2502,11 +2542,36 @@ export default function Shell() {
     edits: about ? null : editsHere,
     // tell: notes held for it, and the size of their part of the note (C225 (d)).
     told: about || !tellsHere?.length ? null : { count: tellsHere.length, chars: tellNote(tellsHere).length },
+    // Ripple's checks when the edits here go (stage 12, piece 2; C231 (d)).
+    ripple: about ? null : rippleFacts,
     reader: answerer.group === 'source' ? readerHere : null,
     ink,
     roomName: roomNameHere,
     about,
-  }), [arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere, tellsHere])
+  }), [arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere, tellsHere, rippleFacts])
+
+  // ── Ripple (stage 12, piece 2; C231) ──────────────────
+  // What came back for one message, landed (lib/ripple.js landRipple), and
+  // the chat on screen drawn with it.
+  const landSuggestions = useCallback(async (messageId, items, from) => {
+    const got = await landRipple(db.current, messageId, items, from)
+    if (got.blocks) showStoredBlocks(got.conversationId, messageId, got.blocks)
+    return got
+  }, [showStoredBlocks])
+
+  // The checks themselves: one call per other branch, through the gateway,
+  // to the helper the Enter line named (lib/ripple.js checkBranches).
+  const runRipple = useCallback(async (going, chatId, r) => checkBranches({
+    going,
+    from: await getMessages(chatId).catch(() => []),
+    branches: r.chats,
+    messagesOf: (id) => getMessages(id),
+    ask: (request) => gateway.call(r.provider, 'ripple', [request, { model: r.id }], { label: 'ripple' }),
+    land: (messageId, items) => landSuggestions(messageId, items, { model: r.id, chat: r.from?.chat ?? null, branch: r.from?.branch ?? null }),
+    newId: newSuggestionId,
+  }), [landSuggestions])
+  const runRippleNow = useRef(runRipple)
+  useEffect(() => { runRippleNow.current = runRipple }, [runRipple])
 
   /**
    * Sends a prompt to the room in the space: to the provider with a key,
@@ -2572,6 +2637,15 @@ export default function Shell() {
     if (!aboutNow && tellsFor(roomChat ?? '').length !== (shown?.told?.count ?? 0)) return { refused: 'promptChanged' }
     const withInc = (w) => (included && w.group !== 'source' ? { included } : {})
     const spentInc = (whos) => { if (included && whos.some((w) => w.group !== 'source')) setHeldInclude(null) }
+
+    // Ripple (stage 12, piece 2; C231 (f)): when a prompt carrying edits goes
+    // to one branch, as the Enter line said; never from a source's branch.
+    const rippleGoing = async (to) => (shown?.ripple?.ready && to && who.group !== 'source' && !(toIds && toIds.length > 1)
+      ? (await getEditsOfChat(to).catch(() => [])).filter(editWaits)
+      : null)
+    const withRipple = (done, going, to) => (going?.length
+      ? Promise.all([done, runRippleNow.current(going, to, shown.ripple)]).then(([said, rippled]) => said ?? rippled)
+      : done)
 
     // A source answers a search (C168), with its edition (C166 (e)): for a
     // prompt to several, each source on its own.
@@ -2726,10 +2800,11 @@ export default function Shell() {
     }
     if (!text && (shown?.edits?.count || shown?.edits?.asks) && chatId && who.group !== 'source' && !shown?.resend) {
       if (who.group === 'model' && !fresh[who.provider]) return { refused: 'promptFailed' }
+      const going = await rippleGoing(chatId)
       const done = sendMessage(chatId, '', who.id, system(), [], null, { ...under })
         .then(() => { loadConversations().catch(() => {}); return null })
         .catch(failure)
-      return { done }
+      return { done: withRipple(done, going, chatId) }
     }
     // Nothing typed, and the last reply here stalled: send it again without
     // streaming, as the Enter line offered (C114).
@@ -2797,6 +2872,8 @@ export default function Shell() {
       return { text: words.slice(0, 300), lang: baseOf(lang), by: asked?.by ?? 'search', at: new Date().toISOString() }
     }
     spentInc([who])
+    // The edits going with it, for Ripple, read before the prompt marks them told.
+    const going = await rippleGoing(id)
     // A new room sends once its messages are loaded, so nothing is lost
     // between the two.
     const sending = isReady(id)
@@ -2810,7 +2887,7 @@ export default function Shell() {
         if (err?.name === 'Stalled') { setStalledIn(id); return null }
         return failure(err, who.group === 'source' ? who.name : undefined)
       })
-    return { done }
+    return { done: withRipple(done, going, id) }
   }, [askSource, askSourceAs, createConversation, loadConversations, resendWhole, run, sendMessage, updateWelcome, clearPicked, promptToPlan, planRuns, translateQuery, tellsFor, moveTell])
 
   // again:203a (editing spec; C177): the branch's last prompt, read again,
@@ -3000,7 +3077,7 @@ export default function Shell() {
     // Each room with its own chat (C175 (a)).
     if (isRoom(board)) {
       const chat = chatIn(arrangement, board)
-      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} />
+      return <RoomBoard key={`${board}:${chat ?? 'new'}`} board={board} chatId={chat} rev={roomRev} addressed={arrangement.addressed === board} onAddress={focusBoard} onReady={onRoomReady} onLeave={onRoomLeave} onName={onRoomName} ripple={chat && chat === roomId ? rippleHead : null} />
     }
     if (board === 'almanac') {
       return (

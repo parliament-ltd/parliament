@@ -829,6 +829,10 @@ msgid "chat.sugAccept"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "chat.suggestionsWaitingTab"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "chat.sugReject"
 msgstr ""
 
@@ -3465,6 +3469,23 @@ msgstr "{tokens, plural, one {Enter lähettää sen uudelleen ilman suoratoistoa
 msgid "enter.promptResendUnpriced"
 msgstr "{tokens, plural, one {Enter lähettää sen uudelleen ilman suoratoistoa, noin # tokeni} other {Enter lähettää sen uudelleen ilman suoratoistoa, noin # tokenia}}"
 
+#. js-lingui-explicit-id
+msgid "enter.promptRipple"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptRippleCheap"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.promptRippleNoKey"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.promptRippleUnpriced"
+msgstr ""
+
 #. A source answers a search; a leading question phrase is left out (C168)
 #. js-lingui-explicit-id
 msgid "enter.promptSearchFor"
@@ -3659,6 +3680,49 @@ msgstr "{verb} ei ole enää komento"
 #. js-lingui-explicit-id
 msgid "enter.retiredInstead"
 msgstr "{verb} ei ole enää komento. Käytä komentoa {instead}"
+
+#. js-lingui-explicit-id
+msgid "enter.rippleDone"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rippleFailed"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rippleMissed"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.rippleNoRoom"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rippleNothing"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rippleOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rippleOffAlready"
+msgstr ""
+
+#. {nums} are the other branches, as 201b and 201c
+#. js-lingui-explicit-id
+msgid "enter.rippleOn"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "enter.rippleOnAlready"
+msgstr ""
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "enter.rippleOnNoKey"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "enter.roomHere"
@@ -6005,6 +6069,19 @@ msgstr "Uusi huone"
 #. js-lingui-explicit-id
 msgid "room.notFound"
 msgstr "Tätä keskustelua ei löytynyt. Se on ehkä poistettu."
+
+#. Commands stay English
+#. js-lingui-explicit-id
+msgid "room.rippleHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "room.rippleOff"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "room.rippleOn"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "room.unavailable"

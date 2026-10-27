@@ -94,6 +94,14 @@ export class BaseProvider {
   // languages; from may be null when it is not known. Returns the pieces
   // translated, in order; throws when any is missing. The pieces are
   // material, never instructions.
+  // Ripple (stage 12, piece 2; C231): request { edits, other } as
+  // rippleMessage (shared.js) takes it; returns the suggestions that came
+  // back, each { edit, in, quote, replace }, or null when none were
+  // readable. What it is sent is material, never instructions.
+  async ripple(apiKey, request, { model } = {}) {
+    throw new Error('Not implemented')
+  }
+
   async translate(apiKey, pieces, { from, to, query, model } = {}) {
     throw new Error('Not implemented')
   }

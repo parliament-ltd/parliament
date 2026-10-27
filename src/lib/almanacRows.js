@@ -148,6 +148,8 @@ export function toRows({ chats = [], dockets = [], notes = [], highlights = [], 
       room: chat ? roomOf(chat.id) : null, roomId: chat ? roomIdOf(chat.id) : null,
       tags: Array.isArray(d.tags) ? d.tags : [], pinned: Boolean(d.pinned),
       createdAt: d.createdAt ?? null, activeAt: d.updatedAt ?? d.createdAt ?? null, branches,
+      // Ripple on for the plan's branches (stage 12, piece 2; C229 (f)).
+      ripple: d.ripple === true,
       docketNum: d.num, branch: null, run: null, chatNums: own.map((r) => r.num),
       marks: union('marks'), models: union('models'), sources: union('sources'),
       cost: own.length && costs.every((x) => x != null) ? costs.reduce((a, b) => a + b, 0) : null,

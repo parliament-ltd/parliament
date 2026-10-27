@@ -1118,3 +1118,38 @@ describe('tell: notes on the Enter line (stage 11, piece 7; C225 (d), (e))', () 
     expect(also(promptPreview('glass', { ...room, answerer: wiki, reader, told: { count: 2, chars: 60 } }))).toContain('Your 2 notes go to Haiku 9 at the same time · Wikipedia reads none')
   })
 })
+
+describe('Ripple on the Enter line (stage 12, piece 2; C231 (d))', () => {
+  const room = { room: 'c1', streaming: false, keyed: true, provider: 'Anthropic', source: 'Wikipedia', historyChars: 0, systemChars: 0 }
+  const model = { id: 'm', group: 'model', name: 'Sonnet 5.5', price: null }
+  const also = (p) => (p.says?.also ?? []).map((x) => say(i18n, x.message, x.values))
+  const ripple = { nums: ['201b', '201c'], count: 2, ready: true, name: 'Haiku 5.5', perMillion: 1, chars: 4000 }
+  it('names the checks, who makes them and their cost, before Enter', () => {
+    const p = promptPreview('Go on.', { ...room, answerer: model, edits: { count: 1, chars: 80 }, ripple })
+    expect(also(p)).toContain('Ripple checks 201b and 201c: 2 calls to Haiku 5.5, under $0.01')
+    const big = promptPreview('Go on.', { ...room, answerer: model, edits: { count: 1, chars: 80 }, ripple: { ...ripple, perMillion: 3, chars: 40000 } })
+    expect(also(big)).toContain('Ripple checks 201b and 201c: 2 calls to Haiku 5.5, about $0.06')
+    expect(also(promptPreview('', { ...room, answerer: model, edits: { count: 1, chars: 80 }, ripple }))).toContain('Ripple checks 201b and 201c: 2 calls to Haiku 5.5, under $0.01')
+  })
+  it('says when checking needs a key, and says nothing without edits going', () => {
+    expect(also(promptPreview('Go on.', { ...room, answerer: model, edits: { count: 1, chars: 80 }, ripple: { ...ripple, ready: false } }))).toContain('Ripple is on, but checking 201b and 201c needs a model with a key: api:')
+    expect(also(promptPreview('Go on.', { ...room, answerer: model, ripple })).some((t) => t.startsWith('Ripple'))).toBe(false)
+  })
+})
+
+describe('a second room (C175 (a))', () => {
+  it('takes the commands that work in a room', () => {
+    const a = { ...shipped('almanac'), addressed: 'room-2' }
+    const p = preview('>tell:"Shorter"', { mode: 'command', arrangement: a, screens: { telling: { room: 'c1', held: [] } } })
+    expect(p.act).toMatchObject({ kind: 'tell' })
+  })
+})
+
+describe('Ripple and a source answering (C228 (d))', () => {
+  it('names no checks when a source answers the branch', () => {
+    const room = { room: 'c1', streaming: false, keyed: false, provider: 'Anthropic', source: 'Wikipedia', historyChars: 0, systemChars: 0 }
+    const wiki = { id: 'wikipedia', group: 'source', name: 'Wikipedia' }
+    const p = promptPreview('glass', { ...room, answerer: wiki, edits: { count: 1, chars: 80 }, ripple: { nums: ['201b'], count: 1, ready: true, name: 'Haiku 5.5', perMillion: 1, chars: 100 } })
+    expect((p.says?.also ?? []).some((x) => x.message.startsWith('promptRipple'))).toBe(false)
+  })
+})

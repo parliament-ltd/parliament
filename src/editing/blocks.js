@@ -265,3 +265,35 @@ export function fromBlocks(blocks, nextBlockId) {
   if (!nodes.length) return null
   return schema.nodes.doc.create(null, nodes)
 }
+
+/**
+ * A stored form without its suggestions (stage 12; C229): the words they
+ * would strike stand, the words they suggest go. For a reply copied into a
+ * new branch, where its open suggestions do not follow it: they are the
+ * original's, kept with it. The same array back when there are none.
+ * @param {unknown} blocks
+ */
+export function withoutSuggestions(blocks) {
+  if (!Array.isArray(blocks)) return blocks
+  let changed = false
+  const line = (runs) => {
+    if (!Array.isArray(runs) || !runs.some((r) => r && typeof r === 'object' && (r.suggestIn != null || r.suggestOut != null))) return runs
+    changed = true
+    return runs.filter((r) => !(r && typeof r === 'object' && r.suggestIn != null)).map((r) => {
+      if (!r || typeof r !== 'object' || r.suggestOut == null) return r
+      const rest = { ...r }
+      delete rest.suggestOut
+      delete rest.suggestKind
+      return rest
+    })
+  }
+  const out = blocks.map((b) => {
+    if (!b || typeof b !== 'object') return b
+    const next = { ...b }
+    if (Array.isArray(b.text)) next.text = line(b.text)
+    if (Array.isArray(b.title)) next.title = line(b.title)
+    if (Array.isArray(b.rows)) next.rows = b.rows.map((row) => (Array.isArray(row) ? row.map((c) => (c && typeof c === 'object' && Array.isArray(c.text) ? { ...c, text: line(c.text) } : c)) : row))
+    return next
+  })
+  return changed ? out : blocks
+}
