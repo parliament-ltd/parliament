@@ -4032,6 +4032,62 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 
   These are on the live testing list, with the console open.
 
+**C272. Stage 15, piece 5: the words, its open points** (proposed 28 October; C264 as ruled; `privacy-copy-draft.md`, reviewed 12 October; C265; `browsers.md`; C94). Waiting for Stefan: (a) is a choice. The rest is built as suggested, so a ruling changes one entry.
+- **What exists today:**
+  - The privacy draft is applied in Settings and the network card.
+  - The README and SECURITY.md still describe the old app.
+  - The manifest says "a power-user chat interface for Claude".
+  - There is no verb reference, no changelog, and nothing in Settings says what this browser can do.
+  - The draft was written before the vault (C269), so a few of its sentences about keys are no longer quite true, in both directions.
+- **(a) The one line that says what Parliament is** (a choice). It is used in Settings' About, the app's manifest (what a phone shows when Parliament is installed) and the README's first line. Today it reads "A place to work with AI on your own terms". You said you were not sure Parliament can say "on your own terms".
+  1. **Your letter's first sentence:** "Parliament is an attempt to rethink how we interact with AI." In the manifest, without its name: "An attempt to rethink how we interact with AI."
+  2. **Keep** "A place to work with AI on your own terms".
+  3. **A line of your own.**
+
+  **Suggestion:** 1. It is yours already, and it says what the letter goes on to explain.
+- **(b) The sentences the vault changes,** shown before and after; the rest of the draft is applied as reviewed.
+  - **Settings, "Keys are encrypted on this device"** becomes "Keys are kept in Parliament's key vault":
+    - Was: "Each key is encrypted before it is stored, is sent only to its own provider, and is never put in a backup. Encryption protects a key on disk. It cannot protect against code running inside the page, so Parliament loads no code from anywhere else."
+    - Becomes: "Each key is kept by Parliament's key vault, a small page of its own at keys.parliament.ltd, encrypted, and is sent only to its own provider, never put in a backup. Code running on Parliament's page cannot read a key; it can only ask the vault to send to a provider on its list. Parliament loads no code from anywhere else."
+  - **"The app itself":** "from parliament.ltd" becomes "from parliament.ltd and keys.parliament.ltd". The rest stands.
+  - **The key panel's line:** "Encrypted in this browser. Each goes only to its own provider." becomes "Kept in the key vault, encrypted, in this browser. Each goes only to its own provider."
+  - **Save's line:** "…then keeps it encrypted in this browser" becomes "…then the key vault keeps it, encrypted, in this browser".
+  - **SECURITY.md draft 4** (the encryption key) gains the vault in the same words.
+  - **SECURITY.md draft 6:** "the page can connect only to itself and to the providers and sources listed" becomes "the page connects only to itself, a model on your own machine and the sources listed; providers that take a key are reached only through the key vault, which connects to nothing else".
+
+  **Suggestion:** yes.
+- **(c) The README:**
+  - the line from (a);
+  - what Parliament is: boards, the bar, rooms built from blocks, sources without AI first;
+  - draft 1 and "What leaves your device";
+  - the key vault in two sentences;
+  - running it on your own computer (`npm install`, `npm run dev`, `npm run dev:vault`);
+  - links to the verb reference, SECURITY.md, the browser table and the changelog; the MIT licence.
+
+  No mention of anything not yet true. The contributing guide comes with piece 6. **Suggestion:** yes.
+- **(d) SECURITY.md:**
+  - drafts 2 to 9, with (b);
+  - a section on the key vault and its four exceptions;
+  - Trusted Types (C271);
+  - both sites' policies, written into it from `securityHeaders.js` by a script, with a test that fails when they differ;
+  - reporting privately through GitHub's Security tab or support@parliament.ltd. The tab works once you switch on private reporting, at going public.
+
+  **Suggestion:** yes.
+- **(e) The verb reference,** `docs/verbs.md`, written from the registry: every verb with its example, its forms, what it does in its own words, the boards it works on, and whether `undo:` takes it back, grouped as the `?` reference groups them. A test fails when it is out of date; `npm run reference` writes it and the policy block together. **Suggestion:** yes.
+- **(f) "This browser" in Settings,** a section in About, from feature detection, naming no browser (C94):
+  - Each thing Parliament uses, with "works here" or what happens instead: a window that stays on top; windows on other screens; keeping your data; voice on this device; passkeys for the lock; compressed backups; tabs telling each other what changed; Trusted Types.
+  - `browsers.md` stays the full table, linked from the README.
+
+  **Suggestion:** yes.
+- **(g) The changelog:**
+  - `CHANGELOG.md` in plain words, newest first. Its first entry is the refactor, as version 0.5.0 (the version Parliament already gives Wikipedia), dated at the switch.
+  - The build writes the newest entry to `/changelog.json`, which the service worker does not keep. When a new version is waiting, the update notice fetches it and shows its lines above "reload". So the notice says what the new version brings, not what the running one did.
+  - `package.json` goes to 0.5.0.
+
+  **Suggestion:** yes.
+- **(h) The network log's comment** in `networkLog.js` ("only Anthropic's API is contacted") is corrected. **Suggestion:** yes.
+- **(i) Stored data:** none.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
