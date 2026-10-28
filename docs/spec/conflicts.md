@@ -4331,7 +4331,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   **Suggestion:** yes.
 - **(g) Stored data,** as ruled (C264 (k)): the one upgrade at each person's next visit, with its backup offered first, and the keys moved into the vault once (C267 (d)). Nothing else.
 
-**C277. Stage 15, piece 7, step 5: the vault's site, and its published hashes** (proposed 28 October; C170; C274 (h); C276). The vault serves the released code, but the release's list of its files' hashes was made from this computer's copy, whose line ends differ from the ones Netlify builds with.
+**C277. Stage 15, piece 7, step 5: the vault's site, and its published hashes** (proposed 28 October; **ruled 28 October: (a) 1**; C170; C274 (h); C276). The vault serves the released code, but the release's list of its files' hashes was made from this computer's copy, whose line ends differ from the ones Netlify builds with.
 - **The vault's site, checked from outside:**
   - Netlify's site `parliament-keys` serves the vault built from `v0.5.0`.
   - `keys.parliament.ltd` is a CNAME to `parliament-keys.netlify.app`, at deSEC and in public DNS.
@@ -4352,6 +4352,16 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   2. **Leave it until the next release.** Until then the vault's one published check fails for anyone who runs it, just as Parliament goes public.
 
   **Suggestion:** 1.
+
+  **Ruled 1, and built:**
+  - `.gitattributes` keeps LF in every checkout. No file in the repository changed; this folder's 682 copies were written again with LF, and git found no difference in any of them.
+  - `release.mjs` refuses to release, even as a dry run, while any file here has Windows line ends. Tried on a copy with two such files: it stopped and said why.
+  - Version 0.5.1 in `package.json` and in the lockfile, which still said 0.0.0. A backup now records 0.5.1 as the version that wrote it (`src/lib/backup.js`): a value in the file, not its format, so every backup reads as before. The changelog's newest entry says why 0.5.1 exists.
+  - The release's `SHA256SUMS` lists the vault's three files with exactly the hashes `keys.parliament.ltd` serves now (the script `f0c26e7a…`, the stylesheet `d36e4daf…`, the page `57600c6d…`), so the vault is not deployed again.
+  - A fresh clone, with this computer's Windows setting left on, had no file with Windows line ends, and built all 20 of the app's files and all 3 of the vault's exactly as the release's archives hold them.
+  - Tests: 1,359. Lint: 30 warnings, all older. The build passes.
+  - Released here as `v0.5.1`. Nothing pushed: `main` and the tag go to both remotes on your yes, with the CLAUDE.md commit, and then you make the GitHub release, as for 0.5.0. The switch then publishes 0.5.1.
+  - **Noticed, not changed:** the version is written by hand in three places. `src/lib/modes.js` still gives rooms 0.4.0, though its comment says to raise it at each release; `src/catalog/dev-modes.js` says 0.5.0. Reading `package.json` instead is for a later piece.
 
 ## Proposed CLAUDE.md rewrite
 
