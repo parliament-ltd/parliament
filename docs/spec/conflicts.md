@@ -3800,6 +3800,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Tests:** 1,335. Lint: 30 warnings, all older; the moved `exportAllData` imports `initDB` from where it used to live, as other moved files do. The build passes.
 - **Tried in the browser** on the trial copy, after a reload: the welcome page, the rooms and the Collection, then `lab:` (the Library, the Canvas and the Blocks board) and `done:`, all drawn as before.
 - **Seen in passing:** the board strip shows the Collection's raw id where its name should be. It is older than this piece and offered as a separate task.
+  - **Fixed (27 October):** the strip now names the collection as the Collection board's head does ("Collection: Reading list", or "Untitled collection" for one with no name). A collection it cannot find shows nothing after the title. Tried in the browser with a named and an unnamed collection.
 
 **C267. Stage 15, piece 2: the vault, its open points** (proposed 27 October; **ruled 27 October, as suggested: (d) 1, keys moved once over the private channel; (e) 1, the page lends the vault its unlocked key**; C170, C264 (e) as ruled; `research/vault-scope-review.md`). Waiting for Stefan: (d) and (e) are choices; the rest is designed as suggested. The design goes in `research/vault-design.md`; nothing in the app changes in this piece.
 - **What exists today:**
