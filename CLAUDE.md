@@ -115,5 +115,7 @@ to R36). Nothing goes until Stefan approves that line.
 - V2 Phase 1 CLAUDE.md: `git show ae464a3:CLAUDE.md`
 - September CLAUDE.md (Almanac, Docket, Symposium): `git show bf7bf2e:CLAUDE.md`
 
-Commit ids change when the history is rewritten before going public (plan
-stage 15); update these then.
+These ids are the public history's. It was rewritten from a private archive
+before going public on 28 October 2026 (C274 to C276), so ids quoted from
+before then may be marked as in the private archive. The public history is
+never rewritten again: no force pushes.
