@@ -4140,7 +4140,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Tried in the browser,** on the trial copy: Settings' About showed the new line and the vault's paragraph. This browser said "Works here." for seven things, and for voice, "Voice is off: here it would mean sending your audio away".
 - **Not tried:** the update notice with the changelog's lines, which needs a second deploy to show; it is on the live testing list.
 
-**C274. Stage 15, piece 6: ready for the public, its open points** (proposed 28 October; C71; C264 (h) 1 and (i) as ruled). Waiting for Stefan: (b) is a choice. The rest is built as suggested. Nothing is pushed in this piece.
+**C274. Stage 15, piece 6: ready for the public, its open points** (proposed 28 October; **ruled 28 October: (b) 1, git's own filter-branch, no download; the rest as suggested**; C71; C264 (h) 1 and (i) as ruled). Waiting for Stefan: (b) is a choice. The rest is built as suggested. Nothing is pushed in this piece.
 - **What the history holds** (a sweep of every commit, 28 October):
   - **753 commits on this branch.** Your personal address is the author on 455 and the committer on 294; the rest use the no-reply address, or GitHub's own for merges. Commit messages hold none.
   - **Your full name** appears only inside the logos' file details: all four versions of three images (`parliament_logo.png`, `flight_logo.png`, and an older `logo.png` deleted in October but still in the history). Each says "Author: Stefan" and carries the Canva document, user and brand ids the images were made with.
