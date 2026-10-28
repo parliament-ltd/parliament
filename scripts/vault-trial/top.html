@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Vault trial: the page</title>
+</head>
+<body>
+<h1>Vault storage trial</h1>
+<p>The page is here; the vault is the frame below, on another address of the same site. Run <code>node scripts/vault-trial/server.mjs</code>, then:</p>
+<ol>
+  <li>Write. A test value goes into the vault's storage.</li>
+  <li>Reload this page and Read: the value should still be there.</li>
+  <li>Open this page in a second tab and Read: the same value.</li>
+  <li>Open <a href="http://localhost:5191/vault.html" target="_blank" rel="noopener">the vault on its own</a>: it should show the same value (its storage is not split off for being framed).</li>
+  <li>The control: open <a href="http://127.0.0.1:5190/top.html" target="_blank" rel="noopener">this page from a different site</a> and Read: it should show nothing, since a different site gets the vault's storage split off.</li>
+  <li>Close the browser, open this page again, Read: still there.</li>
+</ol>
+<p>
+  <button id="write">Write</button>
+  <button id="read">Read</button>
+  <button id="persist">Ask to keep storage</button>
+  <button id="stream">Stream in pieces</button>
+  <button id="transfer">Pass a whole stream</button>
+</p>
+<iframe id="vault" src="http://localhost:5191/vault.html" title="The vault" width="600" height="120"></iframe>
+<pre id="out"></pre>
+<script src="top.js"></script>
+</body>
+</html>

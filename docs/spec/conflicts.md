@@ -3860,6 +3860,30 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   **Suggestion:** yes.
 - **(j) Stored data:** the vault's own database at its own address, holding keys only. With (d) 1, the page's saved keys are deleted after the move, shown first. Nothing in chats or backups changes. **Suggestion:** approve the outline; the move is shown before it is built (piece 3).
 
+**C268. Stage 15, piece 2, as built: the vault designed and its storage tried** (27 October; C267 as suggested where it is not a choice; (d) and (e) wait for Stefan).
+- **The design** is `research/vault-design.md`. In short:
+  - The vault adds the key and nothing more. Provider code stays on the page and builds each request with a stand-in, `⟨vault:anthropic⟩`, using a `fetch` the gateway gives it. The vault checks the address against its own list, puts the real key in that provider's header, sends it, and passes the reply back in pieces.
+  - What the vault allows: Anthropic's `/v1/messages` and `/v1/messages/count_tokens`; Mistral's `/v1/chat/completions` and `/v1/models`; a short list of header names. Anything else is refused.
+  - One private channel, opened after each side checks the other's exact address. It carries requests, replies in pieces, "stop", the keys' status (never a key) and a note of each request for the page's network log.
+  - The vault's own key field sits inside the `api:` panel as a frame, so a typed key never touches the page; the page learns only the outcome.
+  - Headers: the vault may be framed only by the page and sends `Origin-Agent-Cluster`. The page allows that one frame and drops Anthropic and Mistral from its own connections, so the page itself can no longer reach a keyed provider.
+  - The wording of the four approved exceptions for CLAUDE.md, added when the vault is built.
+  - The order of piece 3's build.
+  - Both ways for (d) and (e), marked as waiting.
+- **The trial** (`scripts/vault-trial/`, run with `node scripts/vault-trial/server.mjs`): a page on `localhost:5190` framing a vault on `localhost:5191`, the same site and different origins, as `www` and `keys` will be. The control is `127.0.0.1:5190`, a different site. In Chromium:
+  - the framed vault kept its value across a reload and in a second tab;
+  - opened on its own address, the vault saw the same value, so its storage is not split off for being framed;
+  - the control saw nothing, so the check tells the two apart;
+  - replies in pieces arrived in order, and a whole stream could be handed across;
+  - the browser declined the frame's request to keep its storage. The design says what follows: keys pasted again if the browser clears them; chats unaffected.
+- **Not tried:**
+  - Firefox, LibreWolf and Zen;
+  - closing the browser between write and read.
+
+  The trial pages are kept so these can be run as written on the page.
+- **Nothing in the app changed.** The trial is not part of the build; `.claude/launch.json` (local, not in the repository) has a `vault-trial` entry for it.
+- **Next:** piece 3, the vault built, once (d) and (e) are ruled.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
