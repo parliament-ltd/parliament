@@ -2,6 +2,11 @@
   command = "npm run build"
   publish = "dist"
 
+# The Node version the check uses, here and on GitHub (C276 (c)). Above the
+# headers, since src/lib/securityHeaders.test.js reads every line after them.
+[build.environment]
+  NODE_VERSION = "24"
+
 # SPA routing — send all paths to index.html for React Router.
 #
 # IMPORTANT: 404 missing /assets/* requests instead of falling through

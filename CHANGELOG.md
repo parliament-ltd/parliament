@@ -3,7 +3,7 @@
 What each version of Parliament changed, in plain words, newest first. When a
 new version is waiting, the update notice shows the first lines of its entry.
 
-## 0.5.0, not yet released
+## 0.5.0, 28 October 2026
 
 - A new Parliament: everything on screen is a board, and one bar does the searching, the commands and the prompts.
 - Everything you have made is in Records, by number. The first visit upgrades what you had, and keeps a copy first.

@@ -5,6 +5,11 @@
   command = "cd .. && npm ci && npm run build:vault"
   publish = "dist"
 
+# The Node version the check uses, here and on GitHub (C276 (c)). Above the
+# headers, since src/lib/securityHeaders.test.js reads every line after them.
+[build.environment]
+  NODE_VERSION = "24"
+
 # Keep these identical to VAULT_HEADERS in src/lib/securityHeaders.js;
 # src/lib/securityHeaders.test.js fails if the two differ.
 [[headers]]
