@@ -4331,6 +4331,28 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   **Suggestion:** yes.
 - **(g) Stored data,** as ruled (C264 (k)): the one upgrade at each person's next visit, with its backup offered first, and the keys moved into the vault once (C267 (d)). Nothing else.
 
+**C277. Stage 15, piece 7, step 5: the vault's site, and its published hashes** (proposed 28 October; C170; C274 (h); C276). The vault serves the released code, but the release's list of its files' hashes was made from this computer's copy, whose line ends differ from the ones Netlify builds with.
+- **The vault's site, checked from outside:**
+  - Netlify's site `parliament-keys` serves the vault built from `v0.5.0`.
+  - `keys.parliament.ltd` is a CNAME to `parliament-keys.netlify.app`, at deSEC and in public DNS.
+  - HTTPS, with a Let's Encrypt certificate for `parliament.ltd` and `*.parliament.ltd`, valid to 9 December and renewed by Netlify. Plain HTTP is sent to HTTPS.
+  - Every header as `vault/netlify.toml` sets it. On the `netlify.app` address, Netlify adds `preload` to HSTS, as it does for its own domain.
+- **What differs from `SHA256SUMS`:**
+  - The repository stores every line end as LF, and Netlify's checkout keeps them. On this computer git writes them as CRLF, the Windows way (`core.autocrlf`), and the release was built here. The vault's stylesheet and page keep their line ends in the build, and the script's file name follows the stylesheet's.
+  - So the script Netlify serves is the released one, byte for byte, under another name. The stylesheet and the page differ in their line ends alone.
+  - Built here from a checkout of `v0.5.0` that keeps LF, the vault is exactly the three files `keys.parliament.ltd` serves.
+  - The app's archive too: 17 of its 20 files are the same. `index.html` and the manifest differ in their line ends alone, and `sw.js` only in its record of those two.
+  - The `v0.5.0` release is immutable, so its `SHA256SUMS` cannot be replaced. Anyone who checks the vault against it finds two files missing and a different page, and anyone who builds it on Windows gets the same wrong answer.
+- **(a) The fix** (a choice).
+  1. **0.5.1, before the switch.**
+     - A `.gitattributes` file keeps LF in every checkout, on any computer. No file in the repository changes, since each is stored with LF; only this folder's copies are written again.
+     - `release.mjs` refuses to release from a checkout whose line ends differ from the repository's.
+     - Version 0.5.1, its changelog saying why, released as before: the check, both builds, `SHA256SUMS` and the tag. Its vault lines are the three files `keys.parliament.ltd` serves now, so the vault is not deployed again.
+     - On your yes, `main` and the tag go to both remotes, with the CLAUDE.md commit, and you make the GitHub release as for 0.5.0. The switch then publishes 0.5.1, so both sites match a release.
+  2. **Leave it until the next release.** Until then the vault's one published check fails for anyone who runs it, just as Parliament goes public.
+
+  **Suggestion:** 1.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
