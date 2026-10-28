@@ -53,6 +53,15 @@ export function clearLog() {
   emit()
 }
 
+/**
+ * A request the vault made for the page (stage 15; research/vault-design.md
+ * §3): the page's own fetch never sees it, so the vault reports it here.
+ */
+export function noteVaultRequest({ method = 'POST', url, status = null }) {
+  const { host, path } = hostAndPath(url)
+  pushEntry({ id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, timestamp: Date.now(), method, host, path, status, ok: status != null ? status >= 200 && status < 300 : null, durationMs: null, via: 'vault' })
+}
+
 // ─── fetch wrapper ───────────────────────────────────────
 
 let installed = false

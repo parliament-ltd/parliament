@@ -1103,3 +1103,8 @@ mark.p-quoted:hover { background: var(--p-bg-hover, rgba(25,25,25,.05)); }
 /* Extra screen detected (C259 (g)): marginalia under the field. */
 .ch-snote { padding: 2px 13px 0; }
 .ch-shell .ch-snote button { font: inherit; color: var(--ch-ink); text-decoration: underline; text-underline-offset: 2px; }
+
+/* The key vault's frame (stage 15, piece 3; C267 (f)): out of sight until
+   the key panel lays it over its field's slot. */
+.ch-vault { position: fixed; left: 0; top: 0; width: 0; height: 0; border: 0; opacity: 0; pointer-events: none; }
+.ch-keyfield.ch-keyvault { display: block; height: 36px; }

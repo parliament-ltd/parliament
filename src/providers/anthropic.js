@@ -208,7 +208,7 @@ export class AnthropicProvider extends BaseProvider {
   // Shared helper for lightweight non-streaming calls (title, summary, tags,
   // a translation), to the small model unless another is named.
   async _lightweightCall(apiKey, systemPrompt, messages, maxTokens = 60, model = LIGHT_MODEL) {
-    const response = await fetch(`${API_BASE}/messages`, {
+    const response = await this._fetch(`${API_BASE}/messages`, {
       method: 'POST',
       headers: this._headers(apiKey),
       body: JSON.stringify({
@@ -243,7 +243,7 @@ export class AnthropicProvider extends BaseProvider {
 
   async validateKey(apiKey) {
     try {
-      const response = await fetch(`${API_BASE}/messages`, {
+      const response = await this._fetch(`${API_BASE}/messages`, {
         method: 'POST',
         headers: this._headers(apiKey),
         body: JSON.stringify({
@@ -338,7 +338,7 @@ export class AnthropicProvider extends BaseProvider {
 
     try {
       alive()
-      const response = await fetch(`${API_BASE}/messages`, {
+      const response = await this._fetch(`${API_BASE}/messages`, {
         method: 'POST',
         headers: this._headers(apiKey),
         body: JSON.stringify(body),
@@ -365,7 +365,7 @@ export class AnthropicProvider extends BaseProvider {
   async sendMessageWhole(apiKey, messages, model, onChunk, signal, systemPrompt, tools = []) {
     const toolDefs = tools.map(t => t.definition ?? t)
     const w = withIncluded(messages, systemPrompt, 'blocks')
-    const response = await fetch(`${API_BASE}/messages`, {
+    const response = await this._fetch(`${API_BASE}/messages`, {
       method: 'POST',
       headers: this._headers(apiKey),
       body: JSON.stringify({
@@ -549,7 +549,7 @@ export class AnthropicProvider extends BaseProvider {
   }
 
   async countTokens(apiKey, messages, model) {
-    const response = await fetch(`${API_BASE}/messages/count_tokens`, {
+    const response = await this._fetch(`${API_BASE}/messages/count_tokens`, {
       method: 'POST',
       headers: this._headers(apiKey),
       body: JSON.stringify({

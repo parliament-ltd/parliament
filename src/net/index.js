@@ -6,7 +6,9 @@ import { answererRows, answererFor, helperFor, findModel } from './answerers'
 import { onDevice } from './translate'
 import { englishNameOf } from '../lib/languages'
 import { requestsByHost } from './requestLog'
-import { createKeyring, checkAndKeep } from './keyring'
+import { createKeyring } from './keyring'
+import { createVaultClient, STAND_IN_TYPED } from './vaultClient'
+import { noteVaultRequest } from '../lib/networkLog'
 import { createGateway } from './gateway'
 import { getProvider } from '../providers'
 import { executeClientTool } from '../providers/anthropic'
@@ -21,7 +23,25 @@ export { destination, shipped, DESTINATIONS } from './list'
 export { findAnswerers, findModel, costMark, GROUPS as ANSWER_GROUPS, SOURCE_KINDS } from './answerers'
 export { translatorFor } from './translate'
 
-export const keys = createKeyring({
+// The key vault (stage 15, piece 3; research/vault-design.md; C267): keys
+// live at its own address, and the page never holds one. In development it
+// runs beside the app on localhost:5175.
+const env = import.meta.env ?? {}
+export const VAULT_ORIGIN = env.VITE_VAULT_ORIGIN ?? (env.DEV ? 'http://localhost:5175' : 'https://keys.parliament.ltd')
+export const vault = createVaultClient({ origin: VAULT_ORIGIN, onSent: noteVaultRequest })
+
+// What the gateway asks for a provider's key: the vault's stand-in when the
+// vault holds a usable key, never the key itself. The vault puts the key in.
+export const keys = {
+  get: (provider) => vault.keyFor(provider),
+  async has(provider) { await vault.ready(); return Boolean(vault.statusOf(provider)?.has) },
+  isHeld: (provider) => Boolean(vault.statusOf(provider)?.held),
+}
+
+// Keys the page kept itself before the vault, read once to move them in
+// (C267 (d)): saved, encrypted, in the page's key database, or held in this
+// tab. Nothing new is ever kept here.
+const pageKeys = createKeyring({
   load: (provider) => loadApiKey('persistent', provider),
   has: (provider) => hasSavedKey(provider),
   save: (provider, key) => saveApiKey(key, 'persistent', provider),
@@ -29,15 +49,36 @@ export const keys = createKeyring({
 })
 
 /**
+ * Moves the keys the page kept before the vault into it, once (C267 (d)):
+ * each goes over the private channel, the vault keeps it unless it already
+ * holds one, and the page's copy is deleted. Shown in C269 before it ran.
+ * @returns {Promise<string[]>} the providers whose keys moved
+ */
+export async function moveKeysToVault() {
+  if (!(await vault.ready())) return []
+  const moved = []
+  for (const d of DESTINATIONS.filter((x) => x.key)) {
+    const key = await pageKeys.get(d.id).catch(() => null)
+    if (!key) continue
+    const r = await vault.move(d.id, key, { save: !pageKeys.isHeld(d.id) }).catch(() => null)
+    if (r?.ok) { await pageKeys.remove(d.id).catch(() => {}); moved.push(d.id) }
+  }
+  return moved
+}
+
+/** The lock's unreadable data key, lent to the vault or taken back (C267 (e)). */
+export const lendLockKey = (key, on) => vault.lock(key, on).catch(() => null)
+
+/** Delete everything reaches the vault's keys too (C183). */
+export const eraseVault = () => vault.erase().catch(() => null)
+
+/**
  * How every key is kept, when the choice changes (settings spec §8; stage
  * 9; C181): saved, encrypted, in this browser, or held for this tab only with
  * the saved copy removed. Each key stays with its own provider.
  */
 export async function keepKeys(save) {
-  for (const d of DESTINATIONS.filter((x) => x.key)) {
-    const k = await keys.get(d.id).catch(() => null)
-    if (k) await keys.put(d.id, k, { save })
-  }
+  await vault.keep(save)
 }
 
 // The code behind each shipped entry. Models come from src/providers;
@@ -51,7 +92,12 @@ const sources = new Map()
 function implementation(id) {
   const d = destination(id)
   if (!d) return null
-  if (d.kind === 'model' || d.kind === 'local') return getProvider(id)
+  if (d.kind === 'model' || d.kind === 'local') {
+    const p = getProvider(id)
+    // A provider that takes a key sends through the vault, which adds it.
+    if (p && d.key && !p.fetchVia) p.fetchVia = vault.fetchFor(id)
+    return p
+  }
   if (d.kind === 'source' && MANIFESTS[id]) {
     if (!sources.has(id)) sources.set(id, createSource(MANIFESTS[id], { origins: d.origins, fetch: (...a) => window.fetch(...a), identity: IDENTITY }))
     return sources.get(id)
@@ -172,19 +218,37 @@ export function modelFacts(id) {
 
 /** The built providers that take a key: whether each has one, and its last four characters. */
 export async function keyStatus() {
+  await vault.ready()
   const out = []
   for (const d of shipped().filter((x) => x.key)) {
-    const key = await keys.get(d.id).catch(() => null)
+    const s = vault.statusOf(d.id)
     // What it does with what it is sent, and the models that differ (C167).
     const current = modelsOf(d.id).filter((m) => m.current !== false)
     const data = d.data ? { ...d.data, longer: current.filter((m) => m.data?.kept === 'atLeast30').map((m) => m.name), trainsAll: current.filter((m) => m.data?.training === 'always').map((m) => m.name) } : null
-    out.push({ id: d.id, name: d.name, has: Boolean(key), held: keys.isHeld(d.id), ending: key ? key.slice(-4) : null, keysPage: d.keysPage, limitsPage: d.limitsPage, data })
+    out.push({ id: d.id, name: d.name, has: Boolean(s?.has), held: Boolean(s?.held), ending: s?.ending ?? null, keysPage: d.keysPage, limitsPage: d.limitsPage, data })
   }
   return out
 }
 
-/** Checks a typed key with its provider, then keeps it saved or for this tab only. */
-export const addKey = (id, typed, { save = true } = {}) => checkAndKeep({ check: gateway.check, keyring: keys }, id, typed, { save })
+/**
+ * Checks the key typed into the vault's field with its provider, then tells
+ * the vault to keep it, saved or for this tab only, or let it go. The
+ * provider's own check runs here; the vault fills in the typed key.
+ * @returns {Promise<{ ok: true, fresh: boolean }|{ ok: false, status: 'empty'|'invalid'|'billing'|'unreached' }>}
+ */
+export async function checkTypedKey(id, { save = true, empty = false } = {}) {
+  if (empty) return { ok: false, status: 'empty' }
+  let result
+  try {
+    result = await gateway.check(id, STAND_IN_TYPED)
+  } catch {
+    result = { valid: false, status: 'unreached' }
+  }
+  const valid = Boolean(result?.valid)
+  const out = await vault.decide(id, { keep: valid, save }).catch(() => null)
+  if (!valid) return { ok: false, status: result?.status === 'billing_error' ? 'billing' : result?.status === 'invalid' ? 'invalid' : 'unreached' }
+  return out?.kept ? { ok: true, fresh: Boolean(out.fresh) } : { ok: false, status: 'unreached' }
+}
 
 /** The built sources that need no key, by name. Models on this computer have their own place in the panel. */
 export const noKeyNeeded = () => shipped().filter((d) => !d.key && d.kind === 'source').map((d) => d.name)

@@ -124,7 +124,7 @@ export class MistralProvider extends BaseProvider {
   async validateKey(apiKey) {
     try {
       // Lists the models the key may use; nothing is generated, nothing spent.
-      const response = await fetch(`${this._base()}/models`, { headers: this._headers(apiKey) })
+      const response = await this._fetch(`${this._base()}/models`, { headers: this._headers(apiKey) })
       if (response.ok) return { valid: true, status: 'valid' }
       if (response.status === 401) return { valid: false, status: 'invalid', error: 'This key is not valid.' }
       if (response.status === 402 || response.status === 403) return { valid: false, status: 'billing_error', error: 'This key was recognised, but the account may not allow it.' }
@@ -159,7 +159,7 @@ export class MistralProvider extends BaseProvider {
     }
     try {
       alive()
-      const response = await fetch(`${this._base()}/chat/completions`, { method: 'POST', headers: { ...this._headers(apiKey), Accept: 'text/event-stream' }, body: JSON.stringify(body), signal: watch.signal })
+      const response = await this._fetch(`${this._base()}/chat/completions`, { method: 'POST', headers: { ...this._headers(apiKey), Accept: 'text/event-stream' }, body: JSON.stringify(body), signal: watch.signal })
       alive()
       if (!response.ok) throw this._failure(response)
       return await this._readStream(response, onChunk, alive, options.onThinking)
@@ -239,7 +239,7 @@ export class MistralProvider extends BaseProvider {
   }
 
   async sendMessageWhole(apiKey, messages, model, onChunk, signal, systemPrompt) {
-    const response = await fetch(`${this._base()}/chat/completions`, {
+    const response = await this._fetch(`${this._base()}/chat/completions`, {
       method: 'POST',
       headers: this._headers(apiKey),
       body: JSON.stringify({ model: this._resolveModel(model), messages: this._messages(messages, systemPrompt), stream: false, max_tokens: 8192, ...this._reasoning(model) }),
@@ -259,7 +259,7 @@ export class MistralProvider extends BaseProvider {
 
   // A short request without streaming, to the small model unless another is named.
   async _lightweightCall(apiKey, systemPrompt, messages, maxTokens, model = LIGHT_MODEL) {
-    const response = await fetch(`${this._base()}/chat/completions`, {
+    const response = await this._fetch(`${this._base()}/chat/completions`, {
       method: 'POST',
       headers: this._headers(apiKey),
       body: JSON.stringify({ model: this._resolveModel(model), messages: this._messages(messages, systemPrompt), stream: false, max_tokens: maxTokens, ...this._reasoning(model) }),

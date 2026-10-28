@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLingui } from '@lingui/react'
 import { COPY } from '../copy'
-import { addKey } from '../net'
+import { vault, checkTypedKey } from '../net'
 import { andList, longDay } from './say'
 
 // The key panel (refactor-plan.md, stage 5, piece 5; settings spec §6;
@@ -10,12 +10,13 @@ import { andList, longDay } from './say'
 // password field. A key goes into that field and nowhere else: never the
 // bar, which keeps a history.
 //
-// The field is told to be left alone by password managers, so a key is not
-// offered up as a site password. What is typed is read once, on Save, and
-// the field is cleared; the key is never held in this component's state.
-// Save checks the key with its own provider first (one short request, said
-// before Save is pressed), then keeps it through the key module, saved or
-// for this tab only as Settings says. Escape goes back to the bar.
+// The field is the key vault's own (stage 15, piece 3; C267 (f)): its frame,
+// from keys.parliament.ltd, laid over this spot, so a key is typed into the
+// vault and never into this page. Save there checks the key with its own
+// provider first (one short request, said before Save is pressed, built
+// here and sent by the vault with the typed key), then the vault keeps it,
+// saved or for this tab only as Settings says, or lets it go. This page
+// learns only the outcome. Escape goes back to the bar.
 
 const PROBLEM = {
   empty: COPY.keys.problemEmpty,
@@ -76,27 +77,66 @@ const LOCAL_STATE = {
  */
 export default function KeyPanel({ keys, noKey, focus, holdOnly, onFocus, onSaved, onClose, region = null, onRegion = null, local = null }) {
   const { i18n } = useLingui()
-  const field = useRef(null)
+  const slot = useRef(null) // where the vault's field is laid
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState(null) // { id, status }
-
-  useEffect(() => { if (focus) field.current?.focus() }, [focus])
-
-  async function save(p) {
-    if (busy || !field.current) return
-    const typed = field.current.value
-    setBusy(true)
-    setProblem(null)
-    const out = await addKey(p.id, typed, { save: !holdOnly })
-    setBusy(false)
-    if (!out.ok) {
-      setProblem({ id: p.id, status: out.status })
-      field.current?.focus()
-      return
-    }
-    if (field.current) field.current.value = ''
-    onSaved(p.id, out.fresh)
+  const [asks, setAsks] = useState(0) // a focus asked of the vault's field
+  // A provider newly asked for: its field takes the focus.
+  const [seenFocus, setSeenFocus] = useState(null)
+  if (focus !== seenFocus) {
+    setSeenFocus(focus)
+    if (focus) setAsks((n) => n + 1)
   }
+  const open = keys.find((p) => p.id === focus) ?? null
+
+  // The vault's frame follows the slot while a key can be typed.
+  useEffect(() => {
+    if (!open) { vault.place(null); return undefined }
+    let raf
+    const follow = () => {
+      const r = slot.current?.getBoundingClientRect()
+      // Only while the slot is wholly in view in the panel, so the frame never floats over anything else.
+      const box = slot.current?.closest('.ch-keys')?.getBoundingClientRect()
+      const seen = r && r.width && box && r.top >= box.top && r.bottom <= box.bottom && r.top >= 0 && r.bottom <= window.innerHeight
+      vault.place(seen ? { left: r.left, top: r.top, width: r.width, height: r.height } : null)
+      raf = requestAnimationFrame(follow)
+    }
+    follow()
+    return () => { cancelAnimationFrame(raf); vault.place(null) }
+  }, [open])
+
+  // What the vault's field shows: this provider's words, and whether it is checking.
+  const words = open ? {
+    provider: open.id,
+    label: i18n._(COPY.keys.fieldLabel, { provider: open.name }),
+    placeholder: i18n._(open.has ? COPY.keys.placeholderNew : COPY.keys.placeholder),
+    save: i18n._(COPY.keys.save),
+    checking: i18n._(COPY.keys.checking),
+  } : null
+  const wordsKey = JSON.stringify(words)
+  useEffect(() => {
+    vault.show(wordsKey === 'null' ? null : { ...JSON.parse(wordsKey), busy, focus: asks > 0 })
+  }, [wordsKey, busy, asks])
+  useEffect(() => () => vault.show(null), [])
+
+  // Save or Escape in the vault's field.
+  useEffect(() => {
+    const offTyped = vault.subscribe('typed', async ({ provider, empty }) => {
+      if (!open || provider !== open.id || busy) return
+      setBusy(true)
+      setProblem(null)
+      const out = await checkTypedKey(provider, { save: !holdOnly, empty })
+      setBusy(false)
+      if (!out.ok) {
+        setProblem({ id: provider, status: out.status })
+        setAsks((n) => n + 1)
+        return
+      }
+      onSaved(provider, out.fresh)
+    })
+    const offEscape = vault.subscribe('escape', () => onClose())
+    return () => { offTyped(); offEscape() }
+  }, [open, busy, holdOnly, onSaved, onClose])
 
   const stateOf = (p) => {
     if (!p.has) return i18n._(COPY.keys.needs)
@@ -138,27 +178,8 @@ export default function KeyPanel({ keys, noKey, focus, holdOnly, onFocus, onSave
           {p.data && <DataLines data={p.data} regions={p.id === 'mistral' && Boolean(region)} />}
           {focus === p.id && (
             <div className="ch-keyopen">
-              <div className="ch-keyfield">
-                <input
-                  ref={field}
-                  type="password"
-                  autoComplete="off"
-                  spellCheck={false}
-                  data-1p-ignore=""
-                  data-lpignore="true"
-                  data-bwignore="true"
-                  data-form-type="other"
-                  aria-label={i18n._(COPY.keys.fieldLabel, { provider: p.name })}
-                  placeholder={i18n._(p.has ? COPY.keys.placeholderNew : COPY.keys.placeholder)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') { e.preventDefault(); save(p) }
-                    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); onClose() }
-                  }}
-                />
-                <button type="button" className="ch-keysave" disabled={busy} onClick={() => save(p)}>
-                  {i18n._(busy ? COPY.keys.checking : COPY.keys.save)}
-                </button>
-              </div>
+              {/* The vault's own field is laid over this slot (C267 (f)). */}
+              <div ref={slot} className="ch-keyfield ch-keyvault" />
               <p className="ch-keys-note">
                 {i18n._(holdOnly ? COPY.keys.checkThenHold : COPY.keys.checkThenKeep, { provider: p.name })}
               </p>

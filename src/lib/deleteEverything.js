@@ -10,12 +10,15 @@ import { closeDB, DB_NAME, TRIAL_DB_NAME, DB_STATE_EVENT } from './db'
 import { closeKeyDB } from './crypto'
 import { KEY_DB_NAME } from './keyStore'
 import { eraseEverything } from './eraseAll'
+import { eraseVault } from '../net'
 
 /**
  * @param {{ onBlocked?: (name: string) => void }} [options]
  * @returns {Promise<{ databases: string[], caches: number, workers: number }>}
  */
 export async function deleteEverything({ onBlocked } = {}) {
+  // The keys at the vault's own address first: only the vault can reach them (stage 15).
+  await eraseVault()
   closeDB()
   closeKeyDB()
   const done = await eraseEverything({ known: [DB_NAME, TRIAL_DB_NAME, KEY_DB_NAME], onBlocked })

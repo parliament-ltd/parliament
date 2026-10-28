@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { DESTINATIONS, destination, shipped, connectOrigins } from './list'
+import { DESTINATIONS, destination, shipped, connectOrigins, vaultOrigins } from './list'
 import { createKeyring, checkAndKeep } from './keyring'
 import { createGateway, Refused } from './gateway'
 import { CONTENT_SECURITY_POLICY } from '../lib/securityHeaders'
@@ -20,10 +20,11 @@ describe('the list of providers and sources', () => {
     for (const d of DESTINATIONS.filter((x) => x.kind === 'source')) expect(d.key, d.id).toBe(false)
   })
 
-  it('lets only shipped entries into the connection policy: Anthropic, the three Mistral addresses, Ollama on its exact port, every Wikipedia (C110), Hacker News and OpenAlex (stage 7)', () => {
+  it('lets only shipped entries into the connection policy: Ollama on its exact port, every Wikipedia (C110), Hacker News and OpenAlex; Anthropic and the three Mistral addresses only through the vault (stage 15)', () => {
     expect(shipped().map((d) => d.id)).toEqual(['anthropic', 'mistral', 'ollama', 'wikipedia', 'hackernews', 'openalex'])
-    expect(connectOrigins()).toEqual(['https://api.anthropic.com', 'https://api.mistral.ai', 'https://api.eu.mistral.ai', 'https://api.us.mistral.ai', 'http://localhost:11434', 'https://*.wikipedia.org', 'https://hn.algolia.com', 'https://api.openalex.org'])
-    expect(CONTENT_SECURITY_POLICY).toContain("connect-src 'self' https://api.anthropic.com https://api.mistral.ai https://api.eu.mistral.ai https://api.us.mistral.ai http://localhost:11434 https://*.wikipedia.org https://hn.algolia.com https://api.openalex.org;")
+    expect(connectOrigins()).toEqual(['http://localhost:11434', 'https://*.wikipedia.org', 'https://hn.algolia.com', 'https://api.openalex.org'])
+    expect(vaultOrigins()).toEqual(['https://api.anthropic.com', 'https://api.mistral.ai', 'https://api.eu.mistral.ai', 'https://api.us.mistral.ai'])
+    expect(CONTENT_SECURITY_POLICY).toContain("connect-src 'self' http://localhost:11434 https://*.wikipedia.org https://hn.algolia.com https://api.openalex.org;")
   })
 })
 

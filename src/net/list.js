@@ -73,5 +73,13 @@ export const destination = (id) => BY_ID.get(id) ?? null
 /** Everything that is built and allowed out. */
 export const shipped = () => DESTINATIONS.filter((d) => d.ships)
 
-/** The origins the connection policy allows, in list order: shipped entries only. */
-export const connectOrigins = () => shipped().flatMap((d) => d.origins)
+/**
+ * The origins the page's connection policy allows, in list order: shipped
+ * entries that take no key. Those that take a key are reached only through
+ * the key vault (stage 15; research/vault-design.md §8), so the page itself
+ * cannot reach them at all.
+ */
+export const connectOrigins = () => shipped().filter((d) => !d.key).flatMap((d) => d.origins)
+
+/** The origins only the key vault connects to: shipped entries that take a key. */
+export const vaultOrigins = () => shipped().filter((d) => d.key).flatMap((d) => d.origins)

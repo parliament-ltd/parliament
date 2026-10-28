@@ -4,6 +4,13 @@
 // V1 only includes Anthropic — others can be added later
 // without changing any consuming code.
 export class BaseProvider {
+  // How a request goes out. A provider that takes a key is given the vault's
+  // fetch (src/net, stage 15): the vault adds the key, so the provider's code
+  // never holds one. Others use the browser's own.
+  _fetch(url, init) {
+    return (this.fetchVia ?? globalThis.fetch)(url, init)
+  }
+
   // Validate that an API key works
   // Returns { valid: boolean, status: 'valid'|'invalid'|'billing_error', error?: string }
   async validateKey(apiKey) {

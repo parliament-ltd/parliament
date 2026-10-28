@@ -19,7 +19,7 @@ import { screensNow as screensKnown, readScreens, placeOn, mustAsk } from '../sh
 import { mapOf, mapFoot, savedNow as savedOnScreen } from '../shell/screensMap'
 import ScreensMap from './ScreensMap'
 import { useScreenSize } from '../shell/sizes'
-import { availableTools, keepKeys, metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal, localAway, helperOf, translatorFor, translateText, browserTranslation } from '../net'
+import { vault, moveKeysToVault, availableTools, keepKeys, metadataModel, destination, keyStatus, noKeyNeeded, gateway, shipped as shippedEntries, DEFAULT_MODEL_PROVIDER as PROVIDER, pickerRows, answererOf, modelFacts, allModels, keyedProviders, setRegion, checkLocal, localAway, helperOf, translatorFor, translateText, browserTranslation } from '../net'
 import { replyLanguageOf, withReplyLanguage, sourceAskLanguage, translateInto, nameOf, baseOf } from '../lib/languages'
 import { piecesOfAnswer, translationOf, lastSourceAnswer, BY_BROWSER } from '../lib/translations'
 import { findPrivate } from '../lib/privacyFilter'
@@ -982,6 +982,14 @@ export default function Shell() {
   const [keysRev, setKeysRev] = useState(0) // changes when a key is kept, so prompts look again
   const readKeys = useCallback(() => keyStatus().then((keys) => setKeyInfo({ keys, noKey: noKeyNeeded() }), () => {}), [])
   useEffect(() => { if (started) readKeys() }, [started, readKeys])
+  // The key vault (stage 15; C267): opened at start, the keys the page kept
+  // before it moved in once (C267 (d)), and the panel told when keys change.
+  useEffect(() => {
+    if (!started) return undefined
+    vault.mount()
+    moveKeysToVault().then(readKeys, () => {})
+    return vault.subscribe('keys', () => readKeys())
+  }, [started, readKeys])
   const onKeySaved = useCallback((id, fresh) => {
     readKeys()
     setKeysRev((n) => n + 1)

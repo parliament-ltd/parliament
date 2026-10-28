@@ -11,7 +11,8 @@ export default defineConfig({
   server: { port: 5175, strictPort: true },
   preview: { port: 5176, strictPort: true },
   build: {
-    outDir: fileURLToPath(new URL('./dist-vault', import.meta.url)),
+    // Inside vault/, so its own Netlify site (base directory vault/) publishes dist.
+    outDir: fileURLToPath(new URL('./vault/dist', import.meta.url)),
     emptyOutDir: true,
     // Plain, readable output: the vault is meant to be read and checked.
     minify: false,

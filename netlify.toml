@@ -31,10 +31,12 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    # Scripts from this site only; connections to this site and the providers
-    # and sources that have shipped. base-uri, form-action and frame-src are
-    # not covered by default-src, so each is closed explicitly.
-    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.anthropic.com https://api.mistral.ai https://api.eu.mistral.ai https://api.us.mistral.ai http://localhost:11434 https://*.wikipedia.org https://hn.algolia.com https://api.openalex.org; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; frame-ancestors 'none'; worker-src 'self'; manifest-src 'self';"
+    # Scripts from this site only; connections to this site and the sources
+    # and local models that have shipped. Providers that take a key are
+    # reached only through the key vault, the one frame allowed (stage 15;
+    # research/vault-design.md). base-uri and form-action are not covered by
+    # default-src, so each is closed explicitly.
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:11434 https://*.wikipedia.org https://hn.algolia.com https://api.openalex.org; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://keys.parliament.ltd; frame-ancestors 'none'; worker-src 'self'; manifest-src 'self';"
     # Force HTTPS for 1 year
     Strict-Transport-Security = "max-age=31536000; includeSubDomains"
     # Prevent clickjacking

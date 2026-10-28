@@ -1,0 +1,21 @@
+# The key vault's own site, keys.parliament.ltd (stage 15; research/vault-design.md §8).
+# A second Netlify site whose base directory is vault/. It is deployed on its
+# own, rarely, from a tagged release, with its files' hashes published.
+[build]
+  command = "cd .. && npm ci && npm run build:vault"
+  publish = "dist"
+
+# Keep these identical to VAULT_HEADERS in src/lib/securityHeaders.js;
+# src/lib/securityHeaders.test.js fails if the two differ.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Nothing but its own files; connections to the keyed providers only; framed only by the page.
+    Content-Security-Policy = "default-src 'none'; script-src 'self'; style-src 'self'; connect-src https://api.anthropic.com https://api.mistral.ai https://api.eu.mistral.ai https://api.us.mistral.ai; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; frame-ancestors https://www.parliament.ltd;"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"
+    # Its own agent cluster: the browser never merges it with the page by the old document.domain rule.
+    Origin-Agent-Cluster = "?1"
+    Cross-Origin-Resource-Policy = "same-site"
+    Permissions-Policy = "accelerometer=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), hid=(), magnetometer=(), microphone=(), midi=(), payment=(), serial=(), usb=()"

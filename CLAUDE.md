@@ -53,8 +53,23 @@ cites that are missing from the repo are gone.
 - Strict CSP. Scripts from self only. Connections only to self, the model
   providers (Anthropic, Mistral, Ollama on localhost by exact port) and the
   named source hosts (Wikipedia, Hacker News via Algolia, OpenAlex), each
-  listed in `netlify.toml` when it ships. A new host is added only with its
-  provider or source. No third-party scripts, analytics or tracking.
+  listed in `netlify.toml` when it ships. Providers that take a key are
+  reached only from the key vault (below), never from the page. A new host
+  is added only with its provider or source. No third-party scripts,
+  analytics or tracking.
+- The key vault (`keys.parliament.ltd`; `docs/spec/research/vault-design.md`;
+  C170, C264 (e), C267) alone holds API keys, at its own address, loaded by
+  the page in one frame. Four narrow exceptions, each approved:
+  1. The page may frame that one origin and nothing else; the vault may be
+     framed only by the page.
+  2. It is one more host, Parliament's own.
+  3. Prompts and replies cross between the page and its vault frame over one
+     private `MessageChannel`, never `BroadcastChannel`, and never an API
+     key, except the one-time move of keys the page kept before the vault
+     (C267 (d)) and the lock's non-extractable data key (C267 (e)).
+  4. The gateway decides and logs on the page; the vault sends, refusing
+     anything its own allow list (`vault/allow.js`) does not name. The vault
+     is deployed on its own, rarely, from a tagged release.
 - Outbound requests go through one gateway (built in plan stage 4). New code
   does not add direct calls to providers, and blocks do not import the
   providers, the key module or the database directly.

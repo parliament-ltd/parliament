@@ -18,6 +18,7 @@ import { readLock, writeLock, removeLock } from './keyStore'
 import { sealEverything, openEverything, sealedDb } from './sealedDb'
 import { tabBus } from './bus'
 import * as K from './lockKeys'
+import { lendLockKey } from '../net'
 import { passkeyBytes, makePasskey } from './lockPasskey'
 
 let key = null
@@ -33,6 +34,9 @@ function holdKey(k) {
   key = k
   setSealKey(k)
   setSavedKeysLock(k)
+  // Lent to the key vault too, so its keys are sealed under it; taken back
+  // when this tab locks (stage 15; C267 (e)).
+  lendLockKey(k, Boolean(k))
 }
 
 /** The lock's record, or null when there is no lock. */
@@ -129,6 +133,8 @@ export async function turnOff() {
   const k = key
   await withRawDB((raw) => openEverything(raw, k))
   await openSavedKeys(k)
+  // The vault opens its sealed keys with it, then lets it go.
+  await lendLockKey(k, false)
   await removeLock(await keyDatabase())
   holdKey(null)
   signal()

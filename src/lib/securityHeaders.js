@@ -11,7 +11,12 @@
 // and sources (src/net/list.js), where an entry is marked as shipped, and
 // netlify.toml must then say the same, which a test checks.
 
-import { connectOrigins } from '../net/list'
+import { connectOrigins, vaultOrigins } from '../net/list'
+
+// The key vault's address (stage 15; research/vault-design.md §8): the one
+// frame the page allows, and the one page that may frame the vault.
+export const VAULT_SITE = 'https://keys.parliament.ltd'
+export const PAGE_SITE = 'https://www.parliament.ltd'
 
 export const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
@@ -23,7 +28,7 @@ export const CONTENT_SECURITY_POLICY = [
   "object-src 'none'",
   "base-uri 'none'",
   "form-action 'none'",
-  "frame-src 'none'",
+  `frame-src ${VAULT_SITE}`,
   "frame-ancestors 'none'",
   "worker-src 'self'",
   "manifest-src 'self'",
@@ -48,6 +53,33 @@ export const PERMISSIONS_POLICY = [
   'usb=()',
   'window-management=(self)',
 ].join(', ')
+
+// The vault's own headers (keys.parliament.ltd; vault/netlify.toml): nothing
+// from anywhere but itself, connections to the keyed providers only, framed
+// only by the page, and its own agent cluster so the browser never merges it
+// with the page by the old document.domain rule.
+export const VAULT_CONTENT_SECURITY_POLICY = [
+  "default-src 'none'",
+  "script-src 'self'",
+  "style-src 'self'",
+  ["connect-src", ...vaultOrigins()].join(' '),
+  "img-src 'none'",
+  "object-src 'none'",
+  "base-uri 'none'",
+  "form-action 'none'",
+  "frame-src 'none'",
+  `frame-ancestors ${PAGE_SITE}`,
+].join('; ') + ';'
+
+export const VAULT_HEADERS = {
+  'Content-Security-Policy': VAULT_CONTENT_SECURITY_POLICY,
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'no-referrer',
+  'Origin-Agent-Cluster': '?1',
+  'Cross-Origin-Resource-Policy': 'same-site',
+  'Permissions-Policy': 'accelerometer=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), hid=(), magnetometer=(), microphone=(), midi=(), payment=(), serial=(), usb=()',
+}
 
 export const SECURITY_HEADERS = {
   'Content-Security-Policy': CONTENT_SECURITY_POLICY,
