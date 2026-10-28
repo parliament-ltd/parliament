@@ -17,8 +17,11 @@ const args = new Set(process.argv.slice(2))
 const dry = args.has('--dry')
 const push = args.has('--push')
 const win = process.platform === 'win32'
+// Only npm.cmd goes through the command shell, which Windows needs for it.
+// git and tar run directly, so an argument with a space (the tag's message)
+// stays one argument.
 const run = (cmd, a, opts = {}) => {
-  const r = spawnSync(cmd, a, { stdio: opts.quiet ? 'pipe' : 'inherit', shell: win, encoding: 'utf8' })
+  const r = spawnSync(cmd, a, { stdio: opts.quiet ? 'pipe' : 'inherit', shell: win && cmd.endsWith('.cmd'), encoding: 'utf8' })
   if (r.status !== 0 && !opts.mayFail) { console.error(`${cmd} ${a.join(' ')} failed`); process.exit(r.status ?? 1) }
   return r
 }
