@@ -1,6 +1,9 @@
-// PNG text chunks (stage 15, piece 6; C264 (h)): lists or removes the text
-// a PNG carries besides its picture (tEXt, zTXt, iTXt: author, software, the
-// XMP block), and leaves the picture byte for byte as it was.
+// PNG file details (stage 15, piece 6; C264 (h); C275 (a)): lists or removes
+// what a PNG carries besides its picture, and leaves the picture byte for
+// byte as it was:
+// - its text (tEXt, zTXt, iTXt: author, software, the XMP block);
+// - its EXIF block (eXIf);
+// - its Content Credentials (caBX, C2PA: a signed note on how it was made).
 //   node scripts/png-text.mjs list  <file>
 //   node scripts/png-text.mjs strip <in> <out>
 // Also used as a module by the history rewrite.
@@ -10,6 +13,7 @@ import { inflateSync } from 'node:zlib'
 
 const SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
 const TEXT = new Set(['tEXt', 'zTXt', 'iTXt'])
+const DETAILS = new Set([...TEXT, 'eXIf', 'caBX'])
 
 function chunks(buf) {
   if (!buf.subarray(0, 8).equals(SIGNATURE)) throw new Error('not a PNG')
@@ -45,16 +49,23 @@ export function pngText(buf) {
   })
 }
 
-/** The same PNG without its text chunks. */
+/** The kinds of file detail a PNG carries, each once: ['iTXt', 'caBX', ...]. */
+export function pngDetailTypes(buf) {
+  return [...new Set(chunks(buf).filter((c) => DETAILS.has(c.type)).map((c) => c.type))]
+}
+
+/** The same PNG without its file details: text, EXIF and Content Credentials. */
 export function stripPngText(buf) {
-  const keep = chunks(buf).filter((c) => !TEXT.has(c.type))
+  const keep = chunks(buf).filter((c) => !DETAILS.has(c.type))
   return Buffer.concat([SIGNATURE, ...keep.map((c) => buf.subarray(c.start, c.end))])
 }
 
 if (process.argv[1]?.endsWith('png-text.mjs')) {
   const [cmd, input, output] = process.argv.slice(2)
   if (cmd === 'list') {
-    for (const t of pngText(readFileSync(input))) console.log(`${t.type} ${t.key}: ${t.text.replace(/\s+/g, ' ').slice(0, 300)}`)
+    const buf = readFileSync(input)
+    for (const t of pngText(buf)) console.log(`${t.type} ${t.key}: ${t.text.replace(/\s+/g, ' ').slice(0, 300)}`)
+    for (const c of chunks(buf).filter((x) => DETAILS.has(x.type) && !TEXT.has(x.type))) console.log(`${c.type}: ${c.data.length} bytes${c.type === 'caBX' ? ' (Content Credentials)' : ''}`)
   } else if (cmd === 'strip') {
     writeFileSync(output, stripPngText(readFileSync(input)))
   }

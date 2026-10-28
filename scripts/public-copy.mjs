@@ -14,8 +14,9 @@
 //
 // What the rewrite changes, and nothing else (C274 (c)):
 // - a personal address on a commit becomes the owner's GitHub no-reply one;
-// - every version of every image loses its file details (the text a PNG
-//   carries beside the picture); the picture stays byte for byte;
+// - every version of every image loses its file details: the text, the EXIF
+//   block and the Content Credentials a PNG carries beside the picture
+//   (C275 (a)); the picture stays byte for byte;
 // - in every version of every text file, a full name or a surname on its own
 //   becomes the first name (the first name stays, as ruled), a personal
 //   address the no-reply one, and a design tool id the word 'removed'.
@@ -27,7 +28,7 @@
 import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve, relative } from 'node:path'
-import { stripPngText, pngText } from './png-text.mjs'
+import { stripPngText, pngText, pngDetailTypes } from './png-text.mjs'
 
 const NOREPLY_RE = /@users\.noreply\.github\.com$|^noreply@github\.com$/
 // A safety stop: only a handful of text files should change. More means a
@@ -209,7 +210,8 @@ if (leftAsIs.length) say(`Ids in the private archive left as they are, inside a 
 
 // ── 7. The sweep ───────────────────────────────────────
 // Stricter than the rewrite: any case, backslashes ignored (so a search
-// pattern is caught), and an image's every byte as well as its text.
+// pattern is caught), and an image's every byte as well as its text. No
+// version of an image may keep any file detail.
 const found = []
 const forbiddenIn = (text) => FORBIDDEN.filter(([, re]) => re.test(text) || re.test(text.replace(/\\/g, ''))).map(([what]) => what)
 for (const line of run(['log', '--format=%h %ae %ce %an %cn', 'main'], { cwd: dest }).split('\n')) for (const what of forbiddenIn(line)) found.push(`commit ${line.slice(0, 7)}: ${what}`)
@@ -218,7 +220,12 @@ const after = blobs(dest, 'main')
 for (const b of after) {
   if (/(^|\/)\.env(\.|$)/.test(b.path)) found.push(`${b.path}: an .env file`)
   let text = b.body.toString('latin1')
-  if (b.path.endsWith('.png')) { try { text += '\n' + pngText(b.body).map((t) => t.text).join('\n') } catch { /* the bytes alone */ } }
+  if (b.path.endsWith('.png')) {
+    try { text += '\n' + pngText(b.body).map((t) => t.text).join('\n') } catch { /* the bytes alone */ }
+    let left = []
+    try { left = pngDetailTypes(b.body) } catch { /* not a PNG after all */ }
+    if (left.length) found.push(`${b.path} (${b.sha.slice(0, 7)}): file details left (${left.join(', ')})`)
+  }
   for (const what of forbiddenIn(text)) found.push(`${b.path} (${b.sha.slice(0, 7)}): ${what}`)
 }
 say(`Searched ${newIds.length} commits and ${after.length} files in all their versions.`)
