@@ -4192,6 +4192,51 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   **Suggestion:** yes.
 - **(i) Stored data:** none.
 
+**C275. Stage 15, piece 6, as built: ready for the public** (28 October; C274 as ruled, (b) 1). Waiting for Stefan: (a) below, the logos' Content Credentials, is a choice. Nothing is pushed.
+- **The logos, cleaned here:** the current `public/parliament_logo.png` and `src/deprecated/public/flight_logo.png` no longer carry their text: the author's full name, the XMP block and the Canva document, user and brand ids. The picture is unchanged, byte for byte. `scripts/png-text.mjs` lists or removes the text a PNG carries.
+- **Two guides:**
+  - `CONTRIBUTING.md`: an issue first for anything larger than a fix; the spec and its rulings decide; the rules every change keeps; `npm run check`; security problems reported privately, as SECURITY.md says.
+  - `docs/blocks.md`: what a block is, its entry and settings, what it may and may not touch, and that blocks arrive by pull request and ship after review.
+- **What GitHub reads:**
+  - SECURITY.md, rewritten in piece 5, is the Security tab's policy.
+  - `.github/workflows/check.yml` runs `npm ci` and `npm run check` on every pull request and every push to `main`.
+  - `.github/workflows/scorecard.yml` runs OpenSSF Scorecard every Monday and on pushes to `main`, and publishes its report to the OpenSSF. It changes nothing.
+  - Both read only; Scorecard also asks GitHub for the token it publishes with. Every action is pinned to an exact commit, its release named beside it.
+  - No automatic dependency pull requests (C264 (c)).
+- **The release,** `scripts/release.mjs`: it runs the check, builds the app and the vault, and packs each into `release/<version>/`, which is not tracked. It writes `SHA256SUMS` with each archive and every file the vault serves (C170), then tags the version here. `--dry` stops before the tag. `--push`, only on your yes in piece 7, pushes `main` and the tag to GitHub and Bitbucket together. A dry run passed.
+- **The public copy,** `scripts/public-copy.mjs`, with git's own `filter-branch`, as ruled:
+  - It clones this branch to `C:\Users\stefan\Desktop\parliament-public` as `main` alone, with no remote, other branch or tag, and rewrites only the clone. This repository is not touched.
+  - It names nothing it removes. The personal address is read from the history; the full name and the Canva ids from the old logos' own text.
+  - What it changes: a personal address on a commit becomes the no-reply one; every version of every image loses its text; in every version of every text file, the full name or the surname on its own becomes the first name, a personal address (also when written as a search pattern) the no-reply one, and a Canva id the word "removed".
+  - A safety stop: it works out every change first, and rewrites nothing if more than 50 text file versions would change. `--plan` lists the changes and stops.
+  - Then one commit on the copy brings the commit ids quoted in the documents into line with the new history. An id of a commit that stays private keeps its id and is marked "in the private archive", never inside a piece of code.
+  - Then the sweep: every commit and every version of every file, in any case, with backslashes ignored, and each image's every byte as well as its text.
+- **The copy, as made** from this branch just before this entry:
+  - Found in the history: one personal address, one full name, four Canva ids.
+  - Changed: seven file versions. Four are of the logos (three images, with `public/logo.png`, deleted in October). Three are text: two versions of this file, which quoted the full name while C274 was proposed and ruled, and the first version of the script, which held the address as a search pattern.
+  - 765 commits, each with the no-reply address as author and committer, or GitHub's own as the committer of 161 made on its website (132 of them merges). The dates are kept, so making the copy again gives the same ids.
+  - Its files are this branch's, exactly, apart from its last commit, the ids.
+  - Commit ids: 24 now follow the public history, CLAUDE.md's three archive pointers among them (the V1, V2 and September commits are all on this branch, so all three go public). 11 mentions of five commits, on `refactor/main` and the parked PR-50 branch, are marked "in the private archive".
+  - The sweep: 765 commits and 4,612 file versions; nothing found. A second search, written apart from the script, read every object's raw bytes: the address, the full name, the middle name and the four ids appear nowhere, and the surname only inside the handle.
+- **On the way, and fixed:**
+  - The first run's sweep found that the script itself held the address and the Canva ids, and that C274 quoted the full name. The script was rewritten to name nothing and to clean text files too.
+  - Two runs stopped on small bugs before writing anything.
+  - One misread a lone space in the logos' text as a full name, and would have removed every space from every text file. It was stopped before it finished. Since then a full name is two words or more, the safety stop and `--plan` exist, and the no-reply addresses are known.
+  - The run in the night of 28 October passed its own sweep, but two things were missing. Ids of commits that stay private were not marked, and a search outside the script found the address in the script's first version, written as a search pattern, which neither the rewrite nor the sweep had recognised. Both were fixed, the sweep made stricter, and the copy made again.
+- **Six folders beside the repository,** kept because the script deletes nothing: `parliament-public.first-try` to `parliament-public.fifth-try`, and `parliament-public-plan`. Each is an earlier attempt, and each still holds the personal address somewhere, in its history or in one old file, so none is ever published. They go only on your yes.
+- **For piece 7:** the copy holds this branch up to the commit before this entry. Just before the push it is made again from this branch's newest commit, the earlier copy moved aside first. So the public history holds this entry and anything after, with the same ids for what is already there, and the sweep runs again.
+- **Tests:** 1,359. Lint: 30 warnings, all older. The build passes. The copy's files differ from this branch only in the commit ids of ten documents, which no test reads.
+- **Not tried:** the two workflows, which run only on GitHub, and `--push`. Both come in piece 7.
+- **Stored data:** none.
+- **(a) The logos' Content Credentials** (a choice). Besides the text, every version of the two current logos carries two blocks the rewrite leaves; the older `logo.png` carries only the second:
+  - **Content Credentials (C2PA):** a note Canva signs and adds to what it makes, about 17 KB. It says the image was created with "Canva AI" and is a composite that includes AI-generated material, with Canva's certificates and the signing date in March 2026. It names no one and holds none of the ids.
+  - **EXIF:** 180 bytes of version numbers.
+
+  1. **Keep them.** Anyone can check that the logos were made with an AI tool, which suits a project about AI, and they name no one.
+  2. **Remove them** from every version, as the text was. Each image gets about 17 KB smaller, and the record of how it was made goes.
+
+  **Suggestion:** 1. If 2, the rewrite removes them, this repository's logos lose them by a commit, and the copy is made again.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
