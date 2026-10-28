@@ -133,6 +133,8 @@ for (const b of before) {
 const textChanges = pending.filter(([, , p]) => !p.endsWith('.png'))
 say(`File versions to change: ${pending.length} (${textChanges.length} text): ${[...new Set(pending.map(([, , p]) => p))].join(', ')}.`)
 if (textChanges.length > TEXT_CHANGES_MAX) throw new Error(`Stopping before any rewrite: ${textChanges.length} text versions would change, more than ${TEXT_CHANGES_MAX}. A rule matched what it should not.`)
+// --plan: say what would change, rewrite nothing.
+if (argv.includes('--plan')) { say(`Plan only: nothing rewritten. ${dest} holds an untouched clone; move it away before the real run.`); process.exit(0) }
 for (const [sha, body] of pending) map.set(sha, write(body))
 const mapFile = join(dest, '.git', 'blob-map').replace(/\\/g, '/')
 writeFileSync(mapFile, [...map].map(([a, b]) => `${a} ${b}`).join('\n') + '\n')
