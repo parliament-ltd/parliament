@@ -1,0 +1,13 @@
+/* The vault's key field, drawn to match the key panel it sits over
+   (chrome.css, .ch-keyfield): the same tokens, the same sizes. */
+@import '../src/styles/tokens.css';
+
+html, body { margin: 0; padding: 0; background: transparent; }
+form { display: flex; gap: 8px; margin: 0; padding: 2px; box-sizing: border-box; }
+form[hidden] { display: none; }
+input { flex: 1; min-width: 0; height: 32px; padding: 0 10px; box-sizing: border-box; border: 1px dotted var(--ch-soft); border-radius: var(--ch-r-btn); background: var(--ch-surface); font: 400 13px var(--ch-mono); color: var(--ch-ink); }
+input:focus-visible { outline: var(--ch-focus); outline-offset: 1px; }
+button { height: 32px; padding: 0 14px; border: 1px dotted var(--ch-soft); border-radius: var(--ch-r-btn); background: var(--ch-surface); font: 500 12px var(--ch-sans); color: var(--ch-ink); cursor: pointer; }
+button:hover { border-color: var(--ch-ink); }
+button:disabled { opacity: .55; cursor: wait; }
+button:focus-visible { outline: var(--ch-focus); outline-offset: 1px; }

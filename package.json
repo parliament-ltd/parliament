@@ -5,11 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:vault": "vite --config vite.vault.config.js",
     "build": "vite build",
+    "build:vault": "vite build --config vite.vault.config.js",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "check": "npm run i18n && vitest run && eslint . && vite build",
+    "check": "npm run i18n && vitest run && eslint . && vite build && vite build --config vite.vault.config.js",
     "i18n": "lingui extract --clean --overwrite && lingui compile"
   },
   "dependencies": {

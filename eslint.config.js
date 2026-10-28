@@ -6,7 +6,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import noHardCodedWords from './eslint-rules/no-hard-coded-words.js'
 
 export default defineConfig([
-  globalIgnores(['dist', '.claude', 'refactor/v1-mockups-archive', 'src/locales']),
+  globalIgnores(['dist', 'dist-vault', '.claude', 'refactor/v1-mockups-archive', 'src/locales']),
   {
     files: ['**/*.{js,jsx}'],
     extends: [

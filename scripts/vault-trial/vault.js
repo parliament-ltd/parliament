@@ -56,6 +56,16 @@ async function answer(msg, port) {
     } catch (e) {
       port.postMessage({ id: msg.id, ok: false, error: String(e?.name ?? e) })
     }
+  } else if (msg.kind === 'lend') {
+    // A key the page cannot read out, lent for use: can the vault use it?
+    try {
+      const iv = crypto.getRandomValues(new Uint8Array(12))
+      const sealed = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, msg.key, new TextEncoder().encode('sealed in the vault'))
+      const back = new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, msg.key, sealed))
+      port.postMessage({ id: msg.id, ok: true, value: { extractable: msg.key.extractable, roundTrip: back } })
+    } catch (e) {
+      port.postMessage({ id: msg.id, ok: false, error: String(e?.name ?? e) })
+    }
   } else port.postMessage({ id: msg.id, ok: false, error: 'unknown' })
 }
 

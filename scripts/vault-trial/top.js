@@ -49,6 +49,11 @@ const act = {
     const r = await ask({ kind: 'stream' })
     say(r.ok ? 'stream ended' : `stream failed: ${r.error}`)
   },
+  async lend() {
+    const key = await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt'])
+    const r = await ask({ kind: 'lend', key })
+    say(r.ok ? `lent key used in the vault: ${JSON.stringify(r.value)}` : `lend failed: ${r.error}`)
+  },
   async transfer() {
     const r = await ask({ kind: 'transfer' })
     if (!r.ok) { say(`whole stream not passed: ${r.error}`); return }
