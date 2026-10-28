@@ -3945,6 +3945,56 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 
   Locally, `vite preview` of the app still points at `keys.parliament.ltd`; piece 4 sets it to the local vault for the policy trials.
 
+**C270. Stage 15, piece 4: the policy tightened, its open points** (proposed 28 October; C264 as ruled; `research/security-audit.md` §1, §3; T-items in the security notes). Built as suggested, so a ruling changes one entry. Tried here under the real headers, with `vite preview`, and then on the live site from the testing list (C264 (f), changed to 2).
+- **What exists today:**
+  - The page's policy allows styles from the site plus `'unsafe-inline'`, and images from the site plus `data:`. It names the vault as its one frame (C269). Trusted Types are not asked for.
+  - The audit found nothing in the built app that needs inline styles or `data:` images. It found three things that Trusted Types would stop, none in Parliament's own code:
+    - the markdown reader's way of decoding `&amp;` and the like;
+    - the service worker's registration;
+    - the service worker's own loader.
+  - Since the audit, two more such places: the spreadsheet reader's and the source checker's workers, started from a URL.
+- **(a) Styles from the site only:** `style-src 'self'`, no `'unsafe-inline'`.
+  - React, the animations and Parliament's own code set styles through the browser's style properties, which the policy does not touch.
+  - The development-only screens that write a `<style>` are not in the built app.
+  - Popped windows take their styles as links to the built stylesheet already.
+
+  **Suggestion:** yes.
+- **(b) Images from the site only:** `img-src 'self'`, no `data:`. Remote images are never loaded already; nothing uses a `data:` image. **Suggestion:** yes.
+- **(c) Trusted Types, for the page itself:**
+  - The browser refuses to turn text into HTML or into a script's address anywhere on the page, unless Parliament's own short policy says yes. Any slip that would let a reply's text run as code is stopped by the browser, not only by care.
+  - The rule goes in a tag inside the page (`<meta http-equiv="Content-Security-Policy">` in `index.html`), not in the header. That way the service worker and the two workers, which load their own scripts in ways the rule would stop, are not covered, while every page and popped window is.
+  - Supported in Chrome and Edge, Safari 26 and Firefox 148; a browser without it ignores the tag and is as safe as today.
+
+  **Suggestion:** yes.
+- **(d) Parliament's one policy** (`src/lib/trustedTypes.js`, loaded before anything else):
+  - It lets a script's address through only when it is one of this site's own built files: `/assets/…js`, or `/sw.js`.
+  - It refuses all HTML and all script text.
+  - It is named `default`, so the few libraries that hand the browser a plain address, for workers and the service worker, pass through it; the tag allows no other policy.
+
+  **Suggestion:** yes.
+- **(e) The markdown reader's entity decoder** is pointed at its plain build, which decodes `&amp;` from a table rather than through HTML. So markdown never comes near the browser's HTML parser. **Suggestion:** yes.
+- **(f) The vault too:**
+  - Its page gets the same tag, with no policy at all (`trusted-types 'none'`), since its code has nothing to pass.
+  - Its policy already allows nothing inline and no images.
+
+  **Suggestion:** yes.
+- **(g) Trying it here, under the real headers:**
+  - `vite preview` serves the built app with the page's headers and the built vault with the vault's. Each is told the other's local address (`localhost:4173` and `localhost:5176`) by one setting, so the trial is exactly the live arrangement on two local addresses.
+  - **Tried:**
+    - the welcome page;
+    - rooms and markdown with `&amp;` in it;
+    - editing a reply, pasting into it, copying from it;
+    - Records, the Collection, the Plan board and a chart;
+    - a spreadsheet read in its worker;
+    - the service worker;
+    - a popped window;
+    - the key panel with the vault's field;
+    - the console, for anything the policy refused.
+
+  **Suggestion:** yes.
+- **(h) Not added:** `upgrade-insecure-requests`, which could interfere with Ollama on `http://localhost:11434` (audit §1). **Suggestion:** leave it out.
+- **(i) Stored data:** none.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
