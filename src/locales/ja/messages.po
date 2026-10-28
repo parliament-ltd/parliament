@@ -4416,6 +4416,10 @@ msgid "enter.promptTranslateLater"
 msgstr "回答は英語で届きます。あとで translate: を使うと{language}に翻訳できます"
 
 #. js-lingui-explicit-id
+msgid "enter.promptVaultUnreached"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.promptWebGo"
 msgstr ""
 
@@ -6381,6 +6385,11 @@ msgstr "置き換える"
 #. js-lingui-explicit-id
 msgid "keys.save"
 msgstr "保存"
+
+#. The key vault, at its own address, could not be reached (stage 15)
+#. js-lingui-explicit-id
+msgid "keys.vaultUnreached"
+msgstr ""
 
 #. js-lingui-explicit-id
 msgid "keysData.cannotSee"

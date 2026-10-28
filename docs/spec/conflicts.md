@@ -3884,6 +3884,67 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Nothing in the app changed.** The trial is not part of the build; `.claude/launch.json` (local, not in the repository) has a `vault-trial` entry for it.
 - **Next:** piece 3, the vault built, once (d) and (e) are ruled.
 
+**C269. Stage 15, piece 3, as built: the key vault** (27 to 28 October; C267 as ruled; `research/vault-design.md`).
+- **The vault site** (`vault/`, built with `vite.vault.config.js` into `vault/dist`; `npm run dev:vault` runs it on `localhost:5175`):
+  - `allow.js`, its own list:
+    - Anthropic `POST /v1/messages` and `/v1/messages/count_tokens`;
+    - Mistral `POST /v1/chat/completions` and `GET /v1/models`;
+    - five header names.
+
+    It sets the key header itself and ignores whatever the page put there.
+  - `store.js`, keys in its own database, `parliament-keys`:
+    - each encrypted with AES-GCM under a device key the browser will not let anyone read out;
+    - sealed again under the lock's lent key while Lock Parliament is on;
+    - "Don't save" held in the frame's memory.
+  - `channel.js`, the private channel: requests in, replies back in pieces, "stop", the keys' status (never a key), a note of each request for the page's network log. Status goes before each answer, so the page is never behind.
+  - `main.js`, the frame's page: it answers only the page's exact address. Its key field shows only while the page lays the frame over the key panel.
+  - About 15 kB of plain, unminified script, to be read and checked.
+- **The page's side:**
+  - `src/net/vaultClient.js` opens the frame and the channel. It turns a provider's fetch into a vault request and the pieces back into an ordinary reply.
+  - The gateway is unchanged: it now gets the stand-in `vault:saved` where it got a key.
+  - Anthropic's and Mistral's code send through the `fetch` they are given (`_fetch` in `base.js`). Ollama and the sources go straight out as before.
+  - **Checking a typed key:** the page builds the provider's own check as today, with `vault:typed` where the key goes. The vault sends it with the typed key. The page judges the answer and tells the vault to keep it, saved or held, or let it go.
+- **The key panel:** where the field was, an empty slot. The vault's frame is laid over it, in its own matching style, only while the slot is wholly in view. The page passes the field its few words (label, placeholder, Save, checking), so the vault needs no copy table of its own: a small departure from the design, which had it carry them. Save and Escape in the vault's field reach the panel as before.
+- **The move of existing keys (C267 (d)), as it runs at the live switch:**
+  - When Parliament opens, the page reads each key it kept the old way, saved in `parliament-keystore` (or held in the tab). With Lock Parliament on, this happens after unlocking.
+  - It sends each key to the vault, once, over the private channel. The vault keeps it as it was kept, saved or held, unless it already holds a key for that provider; then the vault's stays.
+  - Only after the vault confirms is the page's copy deleted.
+  - A move cut short leaves the page's copy, and the next start finishes it. Nothing else in either database changes, and backups never held keys.
+- **The lock (C267 (e)):**
+  - Unlocking lends the vault the data key, and the vault seals its keys under it.
+  - Locking takes it back; turning the lock off has the vault open its keys first.
+  - Tried in tests; not tried in the browser with a lock on.
+- **Delete everything** asks the vault to delete its database first.
+- **If the vault cannot be reached** (C267 (h)): after 8 seconds, the key panel says "the key store did not open; reload to try again". A prompt to a keyed model says "… the key store did not open, so no key can be used. Reload to try again; models on this computer and sources still work". Local models and sources work.
+- **Headers:**
+  - The page now allows one frame, `https://keys.parliament.ltd`. Its own connections drop Anthropic and Mistral, so the page itself can no longer reach a keyed provider.
+  - The vault's headers live in `vault/netlify.toml` (its own policy, `frame-ancestors https://www.parliament.ltd`, `Origin-Agent-Cluster`). They equal `VAULT_HEADERS` in `securityHeaders.js`, and its connections equal the vault's own list, both held by tests.
+  - The list (`src/net/list.js`) gives the page's origins and the vault's apart.
+- **CLAUDE.md** carries the four approved exceptions, with the move and the lent key named in the third.
+- **`npm run check`** now also builds the vault.
+- **Tests:**
+  - **The vault:** its list, the store (held and saved, sealed and opened under a lent key, erased) and the channel (the key added and never sent back, refusals, the typed key, the move).
+  - **The page with the vault:** the client joined to the vault's real channel code, a reply passed back whole, a refusal, the typed check, stop, and no frame at all.
+  - **The headers and the list;** the prompt line when the vault did not open.
+
+  1,350 tests.
+- **Tried in the browser,** the trial copy on `localhost:5174` and the vault on `localhost:5175`:
+  - The vault's frame mounted at start.
+  - `api:anthropic` showed the vault's field laid exactly over the slot, matching. Save on an empty field came back "Paste the key first". Escape in the vault's field closed the panel and put the frame away.
+  - **The move:** a made-up value planted in the page's old store moved into the vault after a reload. The panel then showed it ("ends MOVE"), and the page kept no copy. It was then removed.
+  - With the vault's server stopped, both keyed providers said the key store did not open.
+  - Before building on it, the trial showed Chromium lets a lent key that cannot be read out reach the vault and be used there.
+- **Not tried,** for the live site and your keys:
+  - a real key checked and a real reply streamed through the vault;
+  - the lock with the vault in a browser;
+  - the vault under its real headers on its own address;
+  - Firefox and the other browsers.
+- **Not part of this piece:**
+  - deploying the vault, its tagged releases and published hashes (piece 7);
+  - the outside review (once public).
+
+  Locally, `vite preview` of the app still points at `keys.parliament.ltd`; piece 4 sets it to the local vault for the policy trials.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

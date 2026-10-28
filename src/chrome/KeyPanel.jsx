@@ -139,6 +139,7 @@ export default function KeyPanel({ keys, noKey, focus, holdOnly, onFocus, onSave
   }, [open, busy, holdOnly, onSaved, onClose])
 
   const stateOf = (p) => {
+    if (p.unreached) return i18n._(COPY.keys.vaultUnreached)
     if (!p.has) return i18n._(COPY.keys.needs)
     return i18n._(p.held ? COPY.keys.endsHeld : COPY.keys.ends, { ending: p.ending })
   }

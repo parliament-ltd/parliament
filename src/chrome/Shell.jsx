@@ -3055,6 +3055,8 @@ export default function Shell() {
     streaming,
     keyed,
     keyedBy,
+    // The key vault did not open: a keyed model says so, not that it needs a key (C267 (h)).
+    vaultUnreached: keyInfo.keys.some((k) => k.unreached),
     region: answerer.provider === 'mistral' ? region : null,
     provider: destination(PROVIDER)?.name,
     source: destination(SOURCE)?.name,
@@ -3113,7 +3115,7 @@ export default function Shell() {
     features: { offered, web: webHere, canSearch: whosHere.some(canSearch), files: filesHere.map((f) => ({ id: f.id, name: f.name, size: f.size })) },
     // Ripple's checks are skipped in a room that sends only to this computer, when its helper is not on it.
     rippleHeld: Boolean(localHere && !localHere.helperLocal && rippleFacts),
-  }), [tryingHere, localHere, inputGo, offered, webHere, filesHere, whosHere, arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere, tellsHere, rippleFacts, reflecting])
+  }), [tryingHere, localHere, inputGo, offered, webHere, filesHere, whosHere, arrangement.addressed, planBoard, runningHere, chatRowsById, heldOrder, heldConds, includeHere, roomId, roomRecord, roomNameHere, streaming, ink, keyed, keyedBy, keyInfo, region, byModel, answerer, along, hiddenOut, sourcesOut, describe, describeFresh, stalledIn, fwHere, fwList, nameOfFramework, settings.thinking, about, reply, languageName, edition, query, reads, translateTo, alongPrivate, settings.privacyFilter, localChecker, i18n.locale, heldWho, branchTarget, targets, branchViewed, branchShown, addressOf, editsHere, readerHere, tellsHere, rippleFacts, reflecting])
 
   // ── Ripple (stage 12, piece 2; C231) ──────────────────
   // What came back for one message, landed (lib/ripple.js landRipple), and

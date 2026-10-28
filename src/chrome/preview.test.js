@@ -904,6 +904,8 @@ describe('by: and who answers (stage 7, piece 1; C149, C150)', () => {
   })
   it('sends to no one else: a model with no key, one gone or one not built is refused', () => {
     expect(line('owl', { ...room, keyed: false, answerer: { ...model, needsKey: true } })).toMatchObject({ ready: false, text: 'Haiku 9 answers here and needs a key for Anthropic. api:anthropic adds one, by: chooses another' })
+    // The key vault did not open (stage 15; C267 (h)): said as that, not as a missing key.
+    expect(line('owl', { ...room, keyed: false, vaultUnreached: true, answerer: { ...model, needsKey: true } })).toMatchObject({ ready: false, text: 'Haiku 9 answers here, but the key store did not open, so no key can be used. Reload to try again; models on this computer and sources still work' })
     expect(line('owl', { ...room, answerer: { ...model, gone: true } }).text).toBe('Haiku 9 is no longer offered. by: chooses who answers here')
     expect(line('owl', { ...room, answerer: { id: 'hackernews', group: 'source', name: 'Hacker News', later: true } }).text).toBe('Hacker News answers here and is not built yet. by: chooses another')
   })

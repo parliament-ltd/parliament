@@ -740,6 +740,8 @@ export const COPY = {
     promptFailed: /*i18n*/ { id: 'enter.promptFailed', message: 'The prompt did not go through. Try again' },
     // Who answers (stage 7, piece 1; C149 to C151). {name} is a model's or a
     // source's name, {provider} a provider's, both from the list.
+    // The key vault could not be reached (stage 15; C267 (h)).
+    promptVaultUnreached: /*i18n*/ { id: 'enter.promptVaultUnreached', message: '{name} answers here, but the key store did not open, so no key can be used. Reload to try again; models on this computer and sources still work' },
     promptNeedsKey: /*i18n*/ { id: 'enter.promptNeedsKey', message: '{name} answers here and needs a key for {provider}. {command} adds one, by: chooses another', comment: 'Commands stay English' },
     promptGone: /*i18n*/ { id: 'enter.promptGone', message: '{name} is no longer offered. by: chooses who answers here', comment: 'C151: a chat or a default naming a model the list no longer has' },
     promptRegion: /*i18n*/ {
@@ -2218,6 +2220,7 @@ export const COPY = {
     problemUnreached: /*i18n*/ { id: 'keys.problemUnreached', message: 'The check did not reach {provider}. Nothing was kept.' },
     keysPage: /*i18n*/ { id: 'keys.keysPage', message: '{provider}\'s key page', comment: 'A link to the page where the provider makes and revokes keys' },
     ownKey: /*i18n*/ { id: 'keys.ownKey', message: 'is where to make one for Parliament alone, with its own spending limit, and to revoke one that leaks.', comment: 'Follows the link to the key page, in one sentence' },
+    vaultUnreached: /*i18n*/ { id: 'keys.vaultUnreached', message: 'the key store did not open; reload to try again', comment: 'The key vault, at its own address, could not be reached (stage 15)' },
     noKeyNeeded: /*i18n*/ { id: 'keys.noKeyNeeded', message: '{count, plural, one {{names} needs no key.} other {{names} need no key.}}' },
     foot: /*i18n*/ { id: 'keys.foot', message: 'Escape goes back to the bar. If a key leaks, revoke it at its provider, and paste a new one here.' },
   },

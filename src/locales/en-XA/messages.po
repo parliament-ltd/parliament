@@ -4416,6 +4416,10 @@ msgid "enter.promptTranslateLater"
 msgstr ""
 
 #. js-lingui-explicit-id
+msgid "enter.promptVaultUnreached"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "enter.promptWebGo"
 msgstr ""
 
@@ -6380,6 +6384,11 @@ msgstr ""
 
 #. js-lingui-explicit-id
 msgid "keys.save"
+msgstr ""
+
+#. The key vault, at its own address, could not be reached (stage 15)
+#. js-lingui-explicit-id
+msgid "keys.vaultUnreached"
 msgstr ""
 
 #. js-lingui-explicit-id

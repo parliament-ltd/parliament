@@ -1,5 +1,7 @@
 # The key vault: design (stage 15, piece 2)
 
+**Built in piece 3 (C269), 28 October 2026,** as written here, except that the page passes the vault's field its words (section 5).
+
 Written 27 October 2026, for C170 (build it), C264 (e) (its address and the
 four exceptions, approved) and C267 (its open points). Built in piece 3. Where
 C267 has a choice still open, both ways are written and marked.

@@ -218,14 +218,15 @@ export function modelFacts(id) {
 
 /** The built providers that take a key: whether each has one, and its last four characters. */
 export async function keyStatus() {
-  await vault.ready()
+  // unreached: the vault did not open, so no key can be used (C267 (h)).
+  const unreached = !(await vault.ready())
   const out = []
   for (const d of shipped().filter((x) => x.key)) {
     const s = vault.statusOf(d.id)
     // What it does with what it is sent, and the models that differ (C167).
     const current = modelsOf(d.id).filter((m) => m.current !== false)
     const data = d.data ? { ...d.data, longer: current.filter((m) => m.data?.kept === 'atLeast30').map((m) => m.name), trainsAll: current.filter((m) => m.data?.training === 'always').map((m) => m.name) } : null
-    out.push({ id: d.id, name: d.name, has: Boolean(s?.has), held: Boolean(s?.held), ending: s?.ending ?? null, keysPage: d.keysPage, limitsPage: d.limitsPage, data })
+    out.push({ id: d.id, name: d.name, has: Boolean(s?.has), held: Boolean(s?.held), ending: s?.ending ?? null, unreached, keysPage: d.keysPage, limitsPage: d.limitsPage, data })
   }
   return out
 }

@@ -1015,7 +1015,7 @@ function manyPreview(text, target) {
     const n = i + 1
     if (who.later) return { ready: false, says: { message: 'promptLater', values: { name: who.name } } }
     if (who.gone) return { ready: false, says: { message: 'promptGone', values: { name: who.name } } }
-    if (who.needsKey) return { ready: false, says: { message: 'promptNeedsKey', values: { name: who.name, provider: who.providerName, command: `api:${who.provider}` } } }
+    if (who.needsKey) return { ready: false, says: target.vaultUnreached ? { message: 'promptVaultUnreached', values: { name: who.name } } : { message: 'promptNeedsKey', values: { name: who.name, provider: who.providerName, command: `api:${who.provider}` } } }
     if (who.unchecked) return { ready: false, says: { message: 'promptLocalUnchecked', values: { name: who.name, provider: who.providerName, command: `api:${who.provider}` } } }
     const when = then && i > 0 ? then[i] ?? 'finished' : null
     const as = (plain, chained) => (when ? chained : plain)
@@ -1246,7 +1246,7 @@ function onePreview(text, target) {
   // Never sent to someone other than the line names (C150, C151).
   if (who.later) return { ready: false, says: { message: 'promptLater', values: { name: who.name } } }
   if (who.gone) return { ready: false, says: { message: 'promptGone', values: { name: who.name } } }
-  if (who.needsKey) return { ready: false, says: { message: 'promptNeedsKey', values: { name: who.name, provider: who.providerName, command: `api:${who.provider}` } } }
+  if (who.needsKey) return { ready: false, says: target.vaultUnreached ? { message: 'promptVaultUnreached', values: { name: who.name } } : { message: 'promptNeedsKey', values: { name: who.name, provider: who.providerName, command: `api:${who.provider}` } } }
   // A model on this computer: free, and nothing leaves it (C163). Until a
   // check has listed it, it is not sent to.
   if (who.group === 'local') {

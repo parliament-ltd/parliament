@@ -4416,6 +4416,10 @@ msgid "enter.promptTranslateLater"
 msgstr "Its answer comes in English. translate: puts it in {language} afterwards"
 
 #. js-lingui-explicit-id
+msgid "enter.promptVaultUnreached"
+msgstr "{name} answers here, but the key store did not open, so no key can be used. Reload to try again; models on this computer and sources still work"
+
+#. js-lingui-explicit-id
 msgid "enter.promptWebGo"
 msgstr "It may search the web: up to {most} searches, about {cost} each, on top of the tokens"
 
@@ -6381,6 +6385,11 @@ msgstr "replace"
 #. js-lingui-explicit-id
 msgid "keys.save"
 msgstr "Save"
+
+#. The key vault, at its own address, could not be reached (stage 15)
+#. js-lingui-explicit-id
+msgid "keys.vaultUnreached"
+msgstr "the key store did not open; reload to try again"
 
 #. js-lingui-explicit-id
 msgid "keysData.cannotSee"
