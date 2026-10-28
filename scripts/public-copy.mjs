@@ -19,8 +19,9 @@
 // - in every version of every text file, a full name or a surname on its own
 //   becomes the first name (the first name stays, as ruled), a personal
 //   address the no-reply one, and a design tool id the word 'removed'.
-// Then the commit ids quoted in the documents follow the new history (one
-// commit), and every object in the copy is searched again (C274 (d)).
+// Then the commit ids quoted in the documents follow the new history, and an
+// id of a commit that stays private is marked as in the private archive (one
+// commit, C274 (e)). Every object in the copy is searched again (C274 (d)).
 // Run with git's own filter-branch: nothing to install.
 
 import { spawnSync } from 'node:child_process'
@@ -168,27 +169,41 @@ const oldIds = run(['rev-list', '--reverse', head]).split('\n')
 const newIds = run(['rev-list', '--reverse', 'main'], { cwd: dest }).split('\n')
 if (oldIds.length !== newIds.length) throw new Error('The histories differ in length')
 const ids = new Map(oldIds.map((o, i) => [o, newIds[i]]))
+// A commit only on a branch that does not go public keeps its id and is
+// said to be in the private archive (C274 (e)).
+const archiveIds = run(['rev-list', '--all']).split('\n')
+const PRIVATE = 'in the private archive'
 const docs = ['CLAUDE.md', 'README.md', 'SECURITY.md', 'CONTRIBUTING.md', 'CHANGELOG.md']
 const walk = (dir) => readdirSync(dir).flatMap((n) => { const p = join(dir, n); return statSync(p).isDirectory() ? walk(p) : [p] })
 for (const f of walk(join(dest, 'docs'))) if (f.endsWith('.md')) docs.push(relative(dest, f))
 let changed = 0
+const marked = []
+const leftAsIs = []
 for (const rel of docs) {
   const file = join(dest, rel)
   if (!existsSync(file)) continue
   const text = readFileSync(file, 'utf8')
-  const next = text.replace(/\b[0-9a-f]{7,40}\b/g, (tok) => {
+  const next = text.replace(/(`?)\b([0-9a-f]{7,40})\b(`?)( \()?/g, (all, open, tok, close, paren = '', at, whole) => {
     const hits = oldIds.filter((o) => o.startsWith(tok))
-    if (hits.length !== 1) return tok
-    changed++
-    return ids.get(hits[0]).slice(0, tok.length)
+    if (hits.length === 1) { changed++; return open + ids.get(hits[0]).slice(0, tok.length) + close + paren }
+    if (hits.length) return all
+    const elsewhere = archiveIds.filter((o) => o.startsWith(tok))
+    if (elsewhere.length !== 1) return all // not a commit
+    // The note goes after the id: never inside a longer piece of code.
+    const lineStart = whole.lastIndexOf('\n', at) + 1
+    const ticksBefore = (whole.slice(lineStart, at).match(/`/g) ?? []).length
+    if (ticksBefore % 2 === 1 || open !== close) { leftAsIs.push(`${rel}: ${tok}`); return all }
+    marked.push(`${rel}: ${tok}`)
+    return paren ? `${open}${tok}${close} (${PRIVATE}; ` : `${open}${tok}${close} (${PRIVATE})`
   })
   if (next !== text) writeFileSync(file, next)
 }
-if (changed) {
+if (changed || marked.length) {
   run(['add', '-A'], { cwd: dest })
-  run(['commit', '-q', '-m', 'Commit ids quoted in the documents follow the public history\n\nThe history was rewritten for publishing (C71, C274), so every commit\nid changed.'], { cwd: dest })
+  run(['commit', '-q', '-m', 'Commit ids quoted in the documents follow the public history\n\nThe history was rewritten for publishing (C71, C274), so every commit\nid changed. A commit on a branch that was not published keeps its id\nand is marked as in the private archive.'], { cwd: dest })
 }
-say(`Commit ids updated in the documents: ${changed}.`)
+say(`Commit ids updated in the documents: ${changed}. Marked as in the private archive: ${marked.length}${marked.length ? ` (${marked.join(', ')})` : ''}.`)
+if (leftAsIs.length) say(`Ids in the private archive left as they are, inside a piece of code: ${leftAsIs.join(', ')}.`)
 
 // ── 7. The sweep ───────────────────────────────────────
 const found = []
