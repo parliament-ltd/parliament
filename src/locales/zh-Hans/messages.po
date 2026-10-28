@@ -7834,6 +7834,82 @@ msgid "settings.backupLabel"
 msgstr "备份与恢复"
 
 #. js-lingui-explicit-id
+msgid "settings.browserCompression"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserCompressionNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserHelp"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserHtml"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserHtmlNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserLabel"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserOnTop"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserOnTopNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserPasskeys"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserPasskeysNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserPersist"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserPersistNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserScreens"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserScreensNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserTabs"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserTabsNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserVoice"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserVoiceNot"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "settings.browserWorks"
+msgstr ""
+
+#. js-lingui-explicit-id
 msgid "settings.contextDesc"
 msgstr "新对话如何开始"
 

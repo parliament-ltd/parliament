@@ -8,6 +8,30 @@ import { SECTIONS } from '../shell/boards'
 import { getEntries, subscribe as onLog } from '../lib/networkLog'
 import { gateway, networkByHost } from '../net'
 import { money, longDay } from './say'
+import { browserAbilities } from '../shell/thisBrowser'
+import { checkOnDeviceVoice } from '../hooks/useVoiceInput'
+import { mayOfferPasskeys } from '../lib/lockPasskey'
+
+// This browser (stage 15, piece 5; C272 (f)): what works here, found by trying each thing.
+const ABILITY_WORDS = {
+  onTop: ['browserOnTop', 'browserOnTopNot'],
+  screens: ['browserScreens', 'browserScreensNot'],
+  persist: ['browserPersist', 'browserPersistNot'],
+  voice: ['browserVoice', 'browserVoiceNot'],
+  passkeys: ['browserPasskeys', 'browserPasskeysNot'],
+  compression: ['browserCompression', 'browserCompressionNot'],
+  channel: ['browserTabs', 'browserTabsNot'],
+  trustedTypes: ['browserHtml', 'browserHtmlNot'],
+}
+function useAbilities() {
+  const [list, setList] = useState(null)
+  useEffect(() => {
+    let live = true
+    browserAbilities({ voice: () => checkOnDeviceVoice(), passkeys: () => mayOfferPasskeys() }).then((l) => { if (live) setList(l) }, () => {})
+    return () => { live = false }
+  }, [])
+  return list
+}
 
 // Settings as a board (refactor-plan.md, stage 9, piece 1; settings spec
 // §2 to §13; Settings v1; C181). One card, its sections stacked, a rail as
@@ -139,6 +163,7 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
   const limits = facts.providers.filter((p) => p.limitsPage)
 
   const network = useNetwork()
+  const abilities = useAbilities()
 
   return (
     <article className={`ch-card ch-settings${addressed ? ' addressed' : ''}`} aria-current={addressed ? 'true' : undefined} onMouseDown={() => onAddress('settings')}>
@@ -368,6 +393,14 @@ export default function SettingsBoard({ addressed, onAddress, section, query, fa
                 {say(COPY.settings.leavesFoot)}
               </>}
             />
+            <Row {...rowProps('about', 'browser')} label={say(COPY.settings.browserLabel)} stack
+              help={<>
+                {say(COPY.settings.browserHelp)}
+                <span className="ch-leaves">{(abilities ?? []).map((a) => (
+                  <span key={a.id} className="ch-leave"><b>{say(COPY.settings[ABILITY_WORDS[a.id][0]])}.</b> {a.works ? say(COPY.settings.browserWorks) : say(COPY.settings[ABILITY_WORDS[a.id][1]])}</span>
+                ))}</span>
+              </>}
+            />
             <Row {...rowProps('about', 'network')} label={say(COPY.settings.networkLabel)} stack
               help={<>
                 {say(COPY.settings.networkHelp)}
@@ -445,6 +478,7 @@ function rowWords(facts) {
       private: 'privacy private data security servers accounts local encrypted keys',
       leaves: 'leaves device sent send network prompt key title search voice host analytics tracking',
       network: 'network activity requests log hosts',
+      browser: 'this browser support works here features windows screens voice passkeys backups tabs',
     },
   }
 }

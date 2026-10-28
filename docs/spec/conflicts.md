@@ -4088,6 +4088,58 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **(h) The network log's comment** in `networkLog.js` ("only Anthropic's API is contacted") is corrected. **Suggestion:** yes.
 - **(i) Stored data:** none.
 
+**C273. Stage 15, piece 5, as built: the words** (28 October; C272 as suggested, (a) built as its suggestion 1 until ruled).
+- **The line that says what Parliament is:** "Parliament is an attempt to rethink how we interact with AI." It appears in Settings' About and the README; the manifest has "An attempt to rethink how we interact with AI. No accounts, no servers. Your work is stored in your browser." If C272 (a) is ruled otherwise, these three places change.
+- **The vault's sentences** (C272 (b)), as shown there:
+  - "Keys are kept in Parliament's key vault" and its paragraph;
+  - "The app itself" naming both addresses;
+  - the key panel's line and Save's line.
+- **README.md, rewritten:**
+  - what Parliament is: boards, the bar, rooms, sources before AI, taking part;
+  - "What leaves your device";
+  - the vault in two sentences;
+  - who it can talk to;
+  - running it locally;
+  - links;
+  - the licence.
+- **SECURITY.md, rewritten:**
+  - drafts 2 to 9;
+  - the vault and its four exceptions;
+  - Lock Parliament;
+  - the policy block for both sites and their Trusted Types tags, then the policy in words, and Trusted Types;
+  - backups;
+  - what we don't do;
+  - private reporting through the Security tab or support@parliament.ltd.
+- **Written from the code** by `npm run reference` (`scripts/write-reference.mjs`):
+  - `docs/verbs.md`, every built command by the `?` reference's groups, with its forms, what it does, where it works and whether `undo:` takes it back, then those named but not built yet (`resources:`, `rewrite:`). From `src/commands/referenceDoc.js`.
+  - SECURITY.md's policy block, between its markers. From `src/lib/policyDoc.js`.
+
+  `src/lib/generatedDocs.test.js` fails when either is out of date.
+- **This browser** (Settings, About): eight things Parliament uses, each "Works here." or what happens instead, found by trying each one (`src/shell/thisBrowser.js`), naming no browser:
+  - a window that stays on top;
+  - boards on other screens;
+  - asking to keep your data;
+  - voice on this device;
+  - passkeys for the lock;
+  - smaller backups;
+  - tabs telling each other what changed;
+  - a check on turning text into HTML.
+
+  Settings' search finds it by "browser".
+- **The changelog:**
+  - `CHANGELOG.md`, its first entry "0.5.0, not yet released", eight lines; `package.json` is 0.5.0. The heading takes its date at the switch.
+  - The build writes the newest entry to `/changelog.json`. When a new version is waiting, the update notice fetches it (`waitingVersionNotes` in `src/net`, a request to this site's own file) and shows its first four lines, as text, above "reload".
+- **The network log's comment** no longer says only Anthropic is contacted.
+- **Tests:**
+  - the two generated documents;
+  - the changelog (the newest entry, the notice's lines, the file's entry for this version, no em dashes);
+  - This browser (none and all, a failed voice check);
+  - the copy rules, which now know "HTML".
+
+  1,359 tests.
+- **Tried in the browser,** on the trial copy: Settings' About showed the new line and the vault's paragraph. This browser said "Works here." for seven things, and for voice, "Voice is off: here it would mean sending your audio away".
+- **Not tried:** the update notice with the changelog's lines, which needs a second deploy to show; it is on the live testing list.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

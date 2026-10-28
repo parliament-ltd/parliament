@@ -4,6 +4,8 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { fileURLToPath } from 'node:url'
 import process from 'node:process'
+import { readFileSync } from 'node:fs'
+import { newestEntry } from './src/lib/changelog.js'
 import { SECURITY_HEADERS, PAGE_TRUSTED_TYPES, trustedTypesTag, trialHeaders } from './src/lib/securityHeaders.js'
 
 // Trusted Types for the built page (stage 15, piece 4; C270 (c)): a tag first
@@ -14,6 +16,17 @@ const trustedTypes = (policy) => ({
   transformIndexHtml: { order: 'pre', handler: (html) => html.replace('<head>', `<head>\n    ${trustedTypesTag(policy)}`) },
 })
 
+// The changelog's newest entry, written to /changelog.json for the update
+// notice (C272 (g)). Not precached, so a waiting version's entry is fetched.
+const changelog = () => ({
+  name: 'parliament-changelog',
+  apply: 'build',
+  generateBundle() {
+    const entry = newestEntry(readFileSync(new URL('./CHANGELOG.md', import.meta.url), 'utf8'))
+    this.emitFile({ type: 'asset', fileName: 'changelog.json', source: JSON.stringify(entry ?? { version: '', lines: [] }) })
+  },
+})
+
 export default defineConfig({
   // The markdown reader's entity decoder, in its plain build: it decodes
   // &amp; from a table, never through the browser's HTML parser (C270 (e)).
@@ -22,6 +35,7 @@ export default defineConfig({
   },
   plugins: [
     trustedTypes(PAGE_TRUSTED_TYPES),
+    changelog(),
     // Lingui's macro turns wording written in a component (t`…`, <Trans>)
     // into a lookup in the copy table's catalogue at build time (C87).
     react({ babel: { plugins: ['@lingui/babel-plugin-lingui-macro'] } }),

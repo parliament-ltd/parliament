@@ -7834,6 +7834,82 @@ msgid "settings.backupLabel"
 msgstr "Backup and restore"
 
 #. js-lingui-explicit-id
+msgid "settings.browserCompression"
+msgstr "Smaller backups"
+
+#. js-lingui-explicit-id
+msgid "settings.browserCompressionNot"
+msgstr "Backups are written uncompressed, and are larger."
+
+#. js-lingui-explicit-id
+msgid "settings.browserHelp"
+msgstr "What Parliament uses, and whether it works in the browser you are using now. Each is found by trying it."
+
+#. js-lingui-explicit-id
+msgid "settings.browserHtml"
+msgstr "A check on turning text into HTML"
+
+#. js-lingui-explicit-id
+msgid "settings.browserHtmlNot"
+msgstr "The browser does not add this check; Parliament still shows outside text as text only."
+
+#. js-lingui-explicit-id
+msgid "settings.browserLabel"
+msgstr "This browser"
+
+#. js-lingui-explicit-id
+msgid "settings.browserOnTop"
+msgstr "A window that stays on top"
+
+#. js-lingui-explicit-id
+msgid "settings.browserOnTopNot"
+msgstr "Popped windows open as ordinary windows, which can go behind others."
+
+#. js-lingui-explicit-id
+msgid "settings.browserPasskeys"
+msgstr "Passkeys for the lock"
+
+#. js-lingui-explicit-id
+msgid "settings.browserPasskeysNot"
+msgstr "The lock uses a passphrase and the recovery code."
+
+#. js-lingui-explicit-id
+msgid "settings.browserPersist"
+msgstr "Asking to keep your data"
+
+#. js-lingui-explicit-id
+msgid "settings.browserPersistNot"
+msgstr "The browser may clear what you make here to save space, so back up now and then."
+
+#. js-lingui-explicit-id
+msgid "settings.browserScreens"
+msgstr "Boards on other screens"
+
+#. js-lingui-explicit-id
+msgid "settings.browserScreensNot"
+msgstr "Popped windows open on this screen."
+
+#. js-lingui-explicit-id
+msgid "settings.browserTabs"
+msgstr "Tabs telling each other what changed"
+
+#. js-lingui-explicit-id
+msgid "settings.browserTabsNot"
+msgstr "Another tab shows a change when it is reloaded."
+
+#. js-lingui-explicit-id
+msgid "settings.browserVoice"
+msgstr "Voice, turned into text on this device"
+
+#. js-lingui-explicit-id
+msgid "settings.browserVoiceNot"
+msgstr "Voice is off: here it would mean sending your audio away."
+
+#. js-lingui-explicit-id
+msgid "settings.browserWorks"
+msgstr "Works here."
+
+#. js-lingui-explicit-id
 msgid "settings.contextDesc"
 msgstr "How a new chat starts"
 

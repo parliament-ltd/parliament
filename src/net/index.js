@@ -251,6 +251,16 @@ export async function checkTypedKey(id, { save = true, empty = false } = {}) {
   return out?.kept ? { ok: true, fresh: Boolean(out.fresh) } : { ok: false, status: 'unreached' }
 }
 
+/**
+ * The waiting version's changelog entry (stage 15, piece 5; C272 (g)): one
+ * request to this site's own /changelog.json, which the service worker does
+ * not keep. No provider or source is asked anything.
+ */
+export async function waitingVersionNotes() {
+  const r = await fetch('/changelog.json', { cache: 'no-store', credentials: 'same-origin' })
+  return r.ok ? r.json() : null
+}
+
 /** The built sources that need no key, by name. Models on this computer have their own place in the panel. */
 export const noKeyNeeded = () => shipped().filter((d) => !d.key && d.kind === 'source').map((d) => d.name)
 
