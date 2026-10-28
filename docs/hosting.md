@@ -11,6 +11,8 @@ every record below can be read by anyone with a DNS lookup.
 | DNS | deSEC (`ns1.desec.io`, `ns2.desec.org`) | Signed with DNSSEC; the DS record is published at the registrar |
 | Site | Netlify, site `project-apollo-v1` | Certificate from Let's Encrypt, renewed by Netlify |
 | Mail | Proton Mail | |
+| Code mirror | Bitbucket, workspace `parliament-ltd` | Two-factor on. The repository is made at going public; each release is pushed to it with GitHub (C264 (i)) |
+| Standby site | Cloudflare Pages | Two-factor on. The site is made from the public repository in stage 15, piece 8 |
 
 ## Records
 
