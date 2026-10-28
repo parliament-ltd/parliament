@@ -21,9 +21,10 @@ export const PAGE_SITE = 'https://www.parliament.ltd'
 export const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
   "script-src 'self'",
-  "style-src 'self' 'unsafe-inline'",
+  // Styles and images from this site only (stage 15, piece 4; C270 (a), (b)).
+  "style-src 'self'",
   ["connect-src 'self'", ...connectOrigins()].join(' '),
-  "img-src 'self' data:",
+  "img-src 'self'",
   "font-src 'self'",
   "object-src 'none'",
   "base-uri 'none'",
@@ -79,6 +80,32 @@ export const VAULT_HEADERS = {
   'Origin-Agent-Cluster': '?1',
   'Cross-Origin-Resource-Policy': 'same-site',
   'Permissions-Policy': 'accelerometer=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), hid=(), magnetometer=(), microphone=(), midi=(), payment=(), serial=(), usb=()',
+}
+
+// Trusted Types, for the built pages themselves (C270 (c)): a tag in each
+// page, not the header, so the service worker and the workers, which load
+// their own scripts, are not covered. The page has one policy, 'default'
+// (src/lib/trustedTypes.js); the vault needs none.
+export const PAGE_TRUSTED_TYPES = "require-trusted-types-for 'script'; trusted-types default"
+export const VAULT_TRUSTED_TYPES = "require-trusted-types-for 'script'; trusted-types 'none'"
+
+/** The tag that asks for it, placed first in the page's head at build. */
+export const trustedTypesTag = (policy) => `<meta http-equiv="Content-Security-Policy" content="${policy}">`
+
+/**
+ * Headers for a local trial of the built app and vault under the real
+ * policy (C270 (g)): the same, with the vault's and the page's addresses
+ * swapped for local ones.
+ */
+export function trialHeaders(headers, { vault = null, page = null } = {}) {
+  const out = { ...headers }
+  for (const [k, v] of Object.entries(out)) {
+    let s = v
+    if (vault) s = s.split(VAULT_SITE).join(vault)
+    if (page) s = s.split(PAGE_SITE).join(page)
+    out[k] = s
+  }
+  return out
 }
 
 export const SECURITY_HEADERS = {

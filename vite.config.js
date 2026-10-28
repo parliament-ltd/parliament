@@ -2,10 +2,26 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
-import { SECURITY_HEADERS } from './src/lib/securityHeaders.js'
+import { fileURLToPath } from 'node:url'
+import process from 'node:process'
+import { SECURITY_HEADERS, PAGE_TRUSTED_TYPES, trustedTypesTag, trialHeaders } from './src/lib/securityHeaders.js'
+
+// Trusted Types for the built page (stage 15, piece 4; C270 (c)): a tag first
+// in its head. Not in development, whose own helpers the rule would stop.
+const trustedTypes = (policy) => ({
+  name: 'parliament-trusted-types',
+  apply: 'build',
+  transformIndexHtml: { order: 'pre', handler: (html) => html.replace('<head>', `<head>\n    ${trustedTypesTag(policy)}`) },
+})
 
 export default defineConfig({
+  // The markdown reader's entity decoder, in its plain build: it decodes
+  // &amp; from a table, never through the browser's HTML parser (C270 (e)).
+  resolve: {
+    alias: [{ find: /^decode-named-character-reference$/, replacement: fileURLToPath(new URL('./node_modules/decode-named-character-reference/index.js', import.meta.url)) }],
+  },
   plugins: [
+    trustedTypes(PAGE_TRUSTED_TYPES),
     // Lingui's macro turns wording written in a component (t`…`, <Trans>)
     // into a lookup in the copy table's catalogue at build time (C87).
     react({ babel: { plugins: ['@lingui/babel-plugin-lingui-macro'] } }),
@@ -93,8 +109,9 @@ export default defineConfig({
     format: 'es',
   },
 
+  // A local trial names the vault's local address (C270 (g)); otherwise the deployed headers as they are.
   preview: {
-    headers: SECURITY_HEADERS,
+    headers: process.env.VITE_VAULT_ORIGIN ? trialHeaders(SECURITY_HEADERS, { vault: process.env.VITE_VAULT_ORIGIN }) : SECURITY_HEADERS,
   },
 
   build: {

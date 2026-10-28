@@ -1,3 +1,5 @@
+// Parliament's Trusted Types policy, before anything else can reach a sink (C270 (d)).
+import './lib/trustedTypes'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'

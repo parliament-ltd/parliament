@@ -3995,6 +3995,43 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **(h) Not added:** `upgrade-insecure-requests`, which could interfere with Ollama on `http://localhost:11434` (audit §1). **Suggestion:** leave it out.
 - **(i) Stored data:** none.
 
+**C271. Stage 15, piece 4, as built: the policy tightened** (28 October; C270 as suggested).
+- **The page's policy** (`securityHeaders.js`, `netlify.toml`, kept equal by the test): `style-src 'self'` and `img-src 'self'`. `'unsafe-inline'` and `data:` are gone. The frame allowed is the vault's (C269).
+- **Trusted Types,** in a tag placed first in each built page's head by the build (`vite.config.js`, `vite.vault.config.js`), not in development:
+  - the page: `require-trusted-types-for 'script'; trusted-types default`;
+  - the vault: the same with `trusted-types 'none'`.
+
+  Not in the header, so the service worker and the workers load as before.
+- **The policy** (`src/lib/trustedTypes.js`, loaded first by `main.jsx`): a script's address only when it is one of this site's own built files, `/assets/…js` or `/sw.js`. Never HTML, never script text. Named `default`, so the service worker's registration and Vite's worker loaders pass through it.
+- **The markdown reader's entity decoder** is pointed at its plain build (`resolve.alias`): `&amp;` is decoded from a table, never through the HTML parser. The built bundle carries the table and not the HTML version.
+- **Left as they are, checked:**
+  - **The editor's own clipboard parser** (ProseMirror's) writes HTML, but the editor never reaches it: paste is read as plain text by Parliament's own handler, and drop is off (C210 (i)). Were it reached, the policy would refuse it, and the paste would fail rather than parse HTML.
+  - **React's internal HTML writes** are only for features Parliament does not use.
+- **A local trial under the real headers** (C270 (g)): `node scripts/policy-trial.mjs` builds both sites, each told the other's local address, and serves them with `vite preview`. The app is on `localhost:4173`, the vault on `localhost:5176`. `trialHeaders()` swaps the addresses, and the headers are otherwise the deployed ones.
+- **Tests:**
+  - the policy (own scripts only; HTML, script text, other sites' addresses, `data:` and `javascript:` refused; one `default` policy, made once);
+  - the page's policy without `'unsafe-inline'` or `data:`;
+  - both tags;
+  - the trial's address swap.
+
+  1,353 tests.
+- **Tried in the browser,** under the real headers on `localhost:4173` and `localhost:5176`, after clearing an old service worker left on that port:
+  - The built page carried its tag, the policy was in place, and the service worker registered through it. The vault's frame mounted.
+  - A question went to Wikipedia; the answer came in a room, its page and text drawn.
+  - A word in the reply was struck in place. A paste went in as plain text; the HTML it carried was ignored, and the script planted in it never ran.
+  - This site's spreadsheet worker started. A worker from another site, HTML written from text and a foreign script address were each refused, with Parliament's own words. A style attribute set from script was not applied: the style rule at work.
+  - `api:anthropic` showed the vault's field laid over the slot, the vault reached through the frame under both policies ("needs a key", not "did not open").
+  - The vault's own page carried its tag, its stylesheet from itself, and nothing in its console.
+  - Throughout, nothing else was refused.
+- **Not tried:**
+  - copying from a reply (the automated Ctrl+C did not reach the page as a real copy);
+  - a chart in a reply;
+  - a spreadsheet actually read;
+  - a popped window (the in-app browser opens none);
+  - Firefox and Safari.
+
+  These are on the live testing list, with the console open.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.

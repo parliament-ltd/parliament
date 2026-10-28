@@ -55,3 +55,22 @@ describe('security headers', () => {
     expect(SECURITY_HEADERS['Content-Security-Policy']).toContain("script-src 'self';")
   })
 })
+
+describe('the tightened policy (stage 15, piece 4; C270)', () => {
+  it('keeps styles and images to this site, and asks for Trusted Types in each built page', async () => {
+    const { PAGE_TRUSTED_TYPES, VAULT_TRUSTED_TYPES, trustedTypesTag, trialHeaders, VAULT_SITE, PAGE_SITE } = await import('./securityHeaders.js')
+    const csp = SECURITY_HEADERS['Content-Security-Policy']
+    expect(csp).toContain("style-src 'self';")
+    expect(csp).toContain("img-src 'self';")
+    expect(csp).not.toContain('unsafe-inline')
+    expect(csp).not.toContain('data:')
+    expect(PAGE_TRUSTED_TYPES).toBe("require-trusted-types-for 'script'; trusted-types default")
+    expect(VAULT_TRUSTED_TYPES).toBe("require-trusted-types-for 'script'; trusted-types 'none'")
+    expect(trustedTypesTag(PAGE_TRUSTED_TYPES)).toBe(`<meta http-equiv="Content-Security-Policy" content="require-trusted-types-for 'script'; trusted-types default">`)
+    const local = trialHeaders(SECURITY_HEADERS, { vault: 'http://localhost:5176' })
+    expect(local['Content-Security-Policy']).toContain('frame-src http://localhost:5176;')
+    expect(local['Content-Security-Policy']).not.toContain(VAULT_SITE)
+    expect(trialHeaders(VAULT_HEADERS, { page: 'http://localhost:4173' })['Content-Security-Policy']).toContain('frame-ancestors http://localhost:4173;')
+    expect(SECURITY_HEADERS['Content-Security-Policy']).not.toContain(PAGE_SITE)
+  })
+})
