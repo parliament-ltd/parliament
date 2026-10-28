@@ -6225,7 +6225,7 @@ msgstr "Save checks it with {provider} first, with one short request, then holds
 
 #. js-lingui-explicit-id
 msgid "keys.checkThenKeep"
-msgstr "Save checks it with {provider} first, with one short request, then keeps it encrypted in this browser."
+msgstr "Save checks it with {provider} first, with one short request, then the key vault keeps it, encrypted, in this browser."
 
 #. js-lingui-explicit-id
 msgid "keys.ends"
@@ -6355,7 +6355,7 @@ msgstr "The check did not reach {provider}. Nothing was kept."
 
 #. js-lingui-explicit-id
 msgid "keys.promise"
-msgstr "Encrypted in this browser. Each goes only to its own provider."
+msgstr "Kept in the key vault, encrypted, in this browser. Each goes only to its own provider."
 
 #. Where a provider processes prompts; three choices follow
 #. js-lingui-explicit-id
@@ -7803,9 +7803,10 @@ msgstr "Parliament"
 msgid "settings.aboutTitle"
 msgstr "About and security"
 
+#. The first sentence is from the welcome letter (C272 (a))
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
-msgstr "A place to work with AI on your own terms. MIT licensed. Source published at launch."
+msgstr "Parliament is an attempt to rethink how we interact with AI. MIT licensed. Source published at launch."
 
 #. js-lingui-explicit-id
 msgid "settings.addKey"
@@ -7970,7 +7971,7 @@ msgstr "{day}."
 
 #. js-lingui-explicit-id
 msgid "settings.leaveApp"
-msgstr "Your browser fetches Parliament’s files from parliament.ltd, hosted by Netlify. Like any web host it sees your IP address and browser type. It never receives your chats or keys."
+msgstr "Your browser fetches Parliament’s files from parliament.ltd and keys.parliament.ltd, hosted by Netlify. Like any web host it sees your IP address and browser type. It never receives your chats or keys."
 
 #. js-lingui-explicit-id
 msgid "settings.leaveAppHead"
@@ -8143,11 +8144,11 @@ msgstr "No servers, no accounts"
 
 #. js-lingui-explicit-id
 msgid "settings.private2"
-msgstr "Each key is encrypted before it is stored, is sent only to its own provider, and is never put in a backup. Encryption protects a key on disk. It cannot protect against code running inside the page, so Parliament loads no code from anywhere else."
+msgstr "Each key is kept by Parliament’s key vault, a small page of its own at keys.parliament.ltd, encrypted, and is sent only to its own provider, never put in a backup. Code running on Parliament’s page cannot read a key; it can only ask the vault to send to a provider on its list. Parliament loads no code from anywhere else."
 
 #. js-lingui-explicit-id
 msgid "settings.private2Head"
-msgstr "Keys are encrypted on this device"
+msgstr "Keys are kept in Parliament’s key vault"
 
 #. js-lingui-explicit-id
 msgid "settings.private3"

@@ -2,7 +2,8 @@
 // Wraps window.fetch to record every outbound request made
 // by the app. In-memory ring buffer (max 100 entries); resets
 // on page reload. Powers the Network Activity card in Settings
-// so users can verify that only Anthropic's API is contacted.
+// so people can check that only the providers and sources they use are
+// contacted, and the requests the key vault makes for the page (C272 (h)).
 
 const MAX_ENTRIES = 100
 

@@ -1,7 +1,7 @@
 {
   "name": "Parliament",
   "short_name": "Parliament",
-  "description": "A power-user chat interface for Claude. Bring your own API key — no accounts, no servers, all data stays in your browser.",
+  "description": "An attempt to rethink how we interact with AI. No accounts, no servers. Your work is stored in your browser.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

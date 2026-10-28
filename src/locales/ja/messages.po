@@ -7803,6 +7803,7 @@ msgstr "Parliament"
 msgid "settings.aboutTitle"
 msgstr "概要とセキュリティ"
 
+#. The first sentence is from the welcome letter (C272 (a))
 #. js-lingui-explicit-id
 msgid "settings.aboutWhat"
 msgstr "自分のやり方でAIと仕事をするための場所。MITライセンス。ソースコードはリリース時に公開します。"
