@@ -1,0 +1,24 @@
+# The check on every pull request and every push to main (stage 15, piece 6;
+# C274 (g)): tests, lint, and both builds, as `npm run check` runs them here.
+# Reads only. Each action is pinned to an exact commit; the comment names its
+# release. Versions of Parliament's own dependencies are pinned in package.json.
+name: check
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check

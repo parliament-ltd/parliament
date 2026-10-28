@@ -30,3 +30,4 @@ vault/dist
 # Working notes between sessions, kept on this computer and never published (R31, C264 (b))
 continuation-*.md
 .pr-body.md
+release/

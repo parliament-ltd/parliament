@@ -1,0 +1,33 @@
+# OpenSSF Scorecard (stage 15, piece 6; C274 (g)): a weekly report on how the
+# repository is kept (pinned dependencies, branch protection, reviews and the
+# like), published to the OpenSSF so anyone can read it. It only reports; it
+# changes nothing. Runs on GitHub, never in Parliament. Each action is pinned
+# to an exact commit; the comment names its release.
+name: scorecard
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 4 * * 1'
+permissions: read-all
+jobs:
+  analysis:
+    runs-on: ubuntu-latest
+    permissions:
+      # Publishing the results to the OpenSSF needs GitHub's OIDC token.
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ossf/scorecard-action@fa7117db83c52d787ae5a89f350999701505d78e # v2.5.0
+        with:
+          results_file: results.json
+          results_format: json
+          publish_results: true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: scorecard
+          path: results.json
+          retention-days: 30
