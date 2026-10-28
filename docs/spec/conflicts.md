@@ -4140,6 +4140,58 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 - **Tried in the browser,** on the trial copy: Settings' About showed the new line and the vault's paragraph. This browser said "Works here." for seven things, and for voice, "Voice is off: here it would mean sending your audio away".
 - **Not tried:** the update notice with the changelog's lines, which needs a second deploy to show; it is on the live testing list.
 
+**C274. Stage 15, piece 6: ready for the public, its open points** (proposed 28 October; C71; C264 (h) 1 and (i) as ruled). Waiting for Stefan: (b) is a choice. The rest is built as suggested. Nothing is pushed in this piece.
+- **What the history holds** (a sweep of every commit, 28 October):
+  - **753 commits on this branch.** Your personal address is the author on 455 and the committer on 294; the rest use the no-reply address, or GitHub's own for merges. Commit messages hold none.
+  - **Your full name** appears only inside the logos' file details: all four versions of three images (`parliament_logo.png`, `flight_logo.png`, and an older `logo.png` deleted in October but still in the history). Each says "Author: Stefan" and carries the Canva document, user and brand ids the images were made with.
+  - Elsewhere "Stefan" is only your handle, Solofsson25, which stays.
+  - **No key, private key or `.env` file** in any version; the key-like strings are test placeholders.
+  - The three stashes on this computer are not part of any branch and do not go.
+- **(a) The copy:**
+  - A fresh clone of this repository in a folder beside it, `C:\Users\stefan\Desktop\parliament-public`, with `main` moved up to this branch's latest commit (`main` has nothing this branch lacks) and every other branch and tag left out.
+  - Only the copy is rewritten. This repository stays as it is, the private archive.
+
+  **Suggestion:** yes.
+- **(b) How the history is rewritten** (a choice; C264 (h) named `git-filter-repo`, downloaded on your yes).
+  1. **With git's own `filter-branch`,** already on this computer: no download. Slower (a few minutes for 753 commits) and older, but enough for two plain changes.
+  2. **With `git-filter-repo`,** the tool most people use now, downloaded from its project (a Python script). It needs Python, which is not on this computer, so it is two downloads.
+
+  **Suggestion:** 1. Nothing to install, and the check in (d) proves the result either way.
+- **(c) What the rewrite changes, and nothing else:**
+  - every author and committer address that is your personal one becomes `200635734+Solofsson25@users.noreply.github.com`; names stay as they are;
+  - every version of the three images loses its file details: the text the image carries beside the picture. The picture stays byte for byte as it was (`scripts/png-text.mjs`, written for this);
+  - the current images in this repository lose them too, by an ordinary commit, so the live site no longer serves them.
+  - Your first name stays in the spec documents, as ruled.
+
+  **Suggestion:** yes.
+- **(d) The check after it:** on the copy, every commit is searched for your personal address, your surname outside your handle, the images' author and Canva ids, keys and `.env` files. The copy's newest commit must hold exactly the same files as this branch (the same tree, image details aside). The result is written in the as-built entry. **Suggestion:** yes.
+- **(e) Commit ids quoted in documents:** CLAUDE.md's archive pointers and the spec's mentions of commits change with the rewrite.
+  - On the copy only, one commit maps each old id to its new one.
+  - An id from a branch that does not go public (the September and V1 archives) is said to be in the private archive, not given a new id.
+
+  **Suggestion:** yes.
+- **(f) Two guides:**
+  - **`CONTRIBUTING.md`:** how to propose a change, run `npm run check`, keep to the hard constraints, and that the spec and its rulings decide.
+  - **`docs/blocks.md`:** how a block is built (its entry, its settings, what it may and may not touch), and that blocks arrive by pull request and ship after review.
+
+  **Suggestion:** yes.
+- **(g) What GitHub reads:**
+  - `SECURITY.md` (rewritten in piece 5) becomes the Security tab's policy.
+  - `.github/workflows/check.yml` runs `npm run check` on every pull request and every push to `main`.
+  - `.github/workflows/scorecard.yml` runs OpenSSF Scorecard weekly and on pushes to `main`; it only reports, on GitHub.
+  - Both workflows read only, and use actions pinned to exact commits.
+  - No automatic dependency pull requests: versions are pinned and updated by hand (C264 (c)). GitHub's security alerts are a setting you can switch on.
+
+  **Suggestion:** yes.
+- **(h) A release** (`scripts/release.mjs`):
+  - it runs the check, builds the app and the vault, and packs each into its own archive;
+  - it writes `SHA256SUMS` for the archives and every file of the vault (its published hashes, C170);
+  - it tags the version locally.
+  - With `--push`, run only on your yes in piece 7, it pushes `main` and the tag to GitHub and to Bitbucket together (C264 (i)).
+
+  **Suggestion:** yes.
+- **(i) Stored data:** none.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
