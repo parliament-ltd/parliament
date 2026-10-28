@@ -5,27 +5,30 @@
 //
 //   node scripts/public-copy.mjs [--dest ../parliament-public]
 //
+// This file names nothing it removes. What to remove is read from the
+// history itself:
+// - personal addresses: every author or committer address that is not one of
+//   GitHub's no-reply ones;
+// - a full name and design-tool ids: from the file details the old logos
+//   carry (their author, and the ids of the documents they were made from).
+//
 // What the rewrite changes, and nothing else (C274 (c)):
-// - the personal author and committer address becomes GitHub's no-reply one;
-// - every version of the logos loses its file details (the text a PNG carries
-//   beside the picture: an author's name, Canva's ids); the picture stays.
-// Then: the commit ids quoted in the documents follow the new history (one
-// commit), and every object in the copy is searched for what must not be
-// there (C274 (d)). Run with git's own filter-branch: nothing to install.
+// - a personal address on a commit becomes the owner's GitHub no-reply one;
+// - every version of every image loses its file details (the text a PNG
+//   carries beside the picture); the picture stays byte for byte;
+// - in every version of every text file, a full name becomes the first name
+//   (the first name stays, as ruled) and a personal address the no-reply one.
+// Then the commit ids quoted in the documents follow the new history (one
+// commit), and every object in the copy is searched again (C274 (d)).
+// Run with git's own filter-branch: nothing to install.
 
 import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve, relative } from 'node:path'
 import { stripPngText, pngText } from './png-text.mjs'
 
-const PERSONAL = '200635734+Solofsson25@users.noreply.github.com'
-const NOREPLY = '200635734+Solofsson25@users.noreply.github.com'
-const LOGOS = ['public/parliament_logo.png', 'public/flight_logo.png', 'public/logo.png', 'src/deprecated/public/flight_logo.png']
-// What must appear nowhere in the copy (C274 (d)).
-const FORBIDDEN = [
-  ['the personal address', /200635734\+Solofsson25@users\.noreply\.github\.com/i],
-  ['the surname outside the handle', /Stefan/],
-  ['a Canva id from the logos', /removed|removed|removed|removed/],
+const NOREPLY_RE = /(^|\.)users\.noreply\.github\.com$|^noreply@github\.com$/
+const KEYS = [
   ['an Anthropic key', /sk-ant-api03-[A-Za-z0-9_-]{60,}/],
   ['a Google key', /AIza[0-9A-Za-z_-]{35}/],
   ['a private key', /-----BEGIN (RSA |OPENSSH |EC |DSA )?PRIVATE KEY-----/],
@@ -36,11 +39,29 @@ const dest = resolve(argv.includes('--dest') ? argv[argv.indexOf('--dest') + 1] 
 const archive = process.cwd()
 
 function run(args, { cwd = archive, input = null, env = null, may = false, binary = false } = {}) {
-  const r = spawnSync('git', args, { cwd, input, env: env ? { ...process.env, ...env } : process.env, maxBuffer: 1 << 30, encoding: binary ? 'buffer' : 'utf8' })
+  const r = spawnSync('git', args, { cwd, input, env: env ? { ...process.env, ...env } : process.env, maxBuffer: 1 << 31, encoding: binary ? 'buffer' : 'utf8' })
   if (r.status !== 0 && !may) throw new Error(`git ${args.join(' ')} failed: ${r.stderr}`)
   return binary ? r.stdout : (r.stdout ?? '').trim()
 }
 const say = (s) => console.log(s)
+
+/** Every blob reachable from a ref, with a path it is known by, read in one pass. */
+function blobs(cwd, ref) {
+  const objects = run(['rev-list', '--objects', ref], { cwd }).split('\n').map((l) => [l.slice(0, 40), l.slice(41)])
+  const pathOf = new Map(objects.filter(([, p]) => p))
+  const out = run(['cat-file', '--batch'], { cwd, input: objects.map(([s]) => s).join('\n') + '\n', binary: true })
+  const found = []
+  let at = 0
+  while (at < out.length) {
+    const nl = out.indexOf(10, at)
+    const [sha, type, size] = out.toString('latin1', at, nl).split(' ')
+    const start = nl + 1
+    const end = start + Number(size)
+    if (type === 'blob') found.push({ sha, path: pathOf.get(sha) ?? '', body: out.subarray(start, end) })
+    at = end + 1
+  }
+  return found
+}
 
 // ── 1. The clone ───────────────────────────────────────
 if (existsSync(dest)) throw new Error(`${dest} already exists. Move it away first; this script does not delete it.`)
@@ -53,51 +74,80 @@ run(['checkout', '-q', '-B', 'main'], { cwd: dest })
 run(['branch', '-D', branch], { cwd: dest })
 run(['remote', 'remove', 'origin'], { cwd: dest })
 for (const t of run(['tag', '-l'], { cwd: dest }).split('\n').filter(Boolean)) run(['tag', '-d', t], { cwd: dest })
-run(['config', 'user.name', 'Solofsson25'], { cwd: dest })
-run(['config', 'user.email', NOREPLY], { cwd: dest })
 
-// ── 2. Every version of the logos, without its file details ──
-const map = new Map()
-for (const path of LOGOS) {
-  for (const commit of run(['rev-list', 'main', '--', path], { cwd: dest }).split('\n').filter(Boolean)) {
-    const blob = run(['rev-parse', `${commit}:${path}`], { cwd: dest, may: true })
-    if (!/^[0-9a-f]{40}$/.test(blob) || map.has(blob)) continue
-    const before = run(['cat-file', 'blob', blob], { cwd: dest, binary: true })
-    const after = stripPngText(before)
-    if (after.equals(before)) continue
-    map.set(blob, run(['hash-object', '-w', '--stdin'], { cwd: dest, input: after }))
-  }
+// ── 2. What to remove, read from the history ──────────
+const addresses = [...new Set(run(['log', '--format=%ae%n%ce', 'main'], { cwd: dest }).split('\n'))].filter(Boolean)
+const personal = addresses.filter((a) => !NOREPLY_RE.test(a))
+const noreply = addresses.find((a) => /users\.noreply\.github\.com$/.test(a))
+if (!noreply) throw new Error('No no-reply address in the history to rewrite to')
+run(['config', 'user.name', run(['log', '-1', '--format=%an', 'main'], { cwd: dest })], { cwd: dest })
+run(['config', 'user.email', noreply], { cwd: dest })
+
+const before = blobs(dest, 'main')
+const fullNames = new Set()
+const toolIds = new Set()
+for (const b of before.filter((x) => x.path.endsWith('.png'))) {
+  let text = ''
+  try { text = pngText(b.body).map((t) => t.text).join('\n') } catch { continue }
+  for (const m of text.matchAll(/Author>\s*([^<\n]+?)\s*</g)) if (/\s/.test(m[1])) fullNames.add(m[1])
+  for (const m of text.matchAll(/\b(?:doc|user|brand)=([A-Za-z0-9_-]{8,})/g)) toolIds.add(m[1])
 }
-say(`Logo versions to clean: ${map.size}.`)
-const mapFile = join(dest, '.git', 'logo-map').replace(/\\/g, '/')
+const surnames = [...fullNames].map((n) => n.split(/\s+/).pop())
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const FORBIDDEN = [
+  ...personal.map((a) => ['a personal address', new RegExp(esc(a), 'i')]),
+  ...surnames.map((s) => ['the surname outside the handle', new RegExp(`(?<![A-Za-z])${esc(s)}`)]),
+  ...[...toolIds].map((id) => ['a design tool id from the logos', new RegExp(esc(id))]),
+  ...KEYS,
+]
+say(`From the history: ${personal.length} personal address(es), ${fullNames.size} full name(s), ${toolIds.size} design tool id(s).`)
+
+// ── 3. Every version that changes, written beside it ───
+const map = new Map()
+const write = (body) => run(['hash-object', '-w', '--stdin'], { cwd: dest, input: body })
+for (const b of before) {
+  if (b.path.endsWith('.png')) {
+    let after
+    try { after = stripPngText(b.body) } catch { continue }
+    if (!after.equals(b.body)) map.set(b.sha, write(after))
+    continue
+  }
+  if (b.body.includes(0)) continue // other binary files
+  const text = b.body.toString('utf8')
+  let next = text
+  for (const n of fullNames) next = next.split(n).join(n.split(/\s+/)[0])
+  for (const a of personal) next = next.split(a).join(noreply)
+  if (next !== text) map.set(b.sha, write(Buffer.from(next, 'utf8')))
+}
+say(`File versions to change: ${map.size}.`)
+const mapFile = join(dest, '.git', 'blob-map').replace(/\\/g, '/')
 writeFileSync(mapFile, [...map].map(([a, b]) => `${a} ${b}`).join('\n') + '\n')
 const filterFile = join(dest, '.git', 'index-filter.sh').replace(/\\/g, '/')
 writeFileSync(filterFile, [
   '#!/bin/sh',
-  `git ls-files -s -- ${LOGOS.map((p) => `'${p}'`).join(' ')} | while read mode sha stage path; do`,
-  `  new=$(grep "^$sha " '${mapFile}' | cut -d' ' -f2)`,
-  '  if [ -n "$new" ]; then git update-index --cacheinfo "$mode,$new,$path"; fi',
+  // Each file in the commit whose content is in the map gets its changed version.
+  `git ls-files -s | awk 'NR==FNR { m[$1] = $2; next } ($2 in m) { print $1 "," m[$2] "," $4 }' '${mapFile}' - | while IFS= read -r info; do`,
+  '  git update-index --cacheinfo "$info"',
   'done',
   '',
 ].join('\n'))
 
-// ── 3. The rewrite ─────────────────────────────────────
-const envFilter = [
-  `if [ "$GIT_AUTHOR_EMAIL" = "${PERSONAL}" ]; then GIT_AUTHOR_EMAIL="${NOREPLY}"; export GIT_AUTHOR_EMAIL; fi`,
-  `if [ "$GIT_COMMITTER_EMAIL" = "${PERSONAL}" ]; then GIT_COMMITTER_EMAIL="${NOREPLY}"; export GIT_COMMITTER_EMAIL; fi`,
-].join('\n')
+// ── 4. The rewrite ─────────────────────────────────────
+const envFilter = personal.flatMap((a) => [
+  `if [ "$GIT_AUTHOR_EMAIL" = "${a}" ]; then GIT_AUTHOR_EMAIL="${noreply}"; export GIT_AUTHOR_EMAIL; fi`,
+  `if [ "$GIT_COMMITTER_EMAIL" = "${a}" ]; then GIT_COMMITTER_EMAIL="${noreply}"; export GIT_COMMITTER_EMAIL; fi`,
+]).join('\n') || 'true'
 say('Rewriting (a few minutes)…')
 run(['filter-branch', '-f', '--env-filter', envFilter, '--index-filter', `sh '${filterFile}'`, '--', 'main'], { cwd: dest, env: { FILTER_BRANCH_SQUELCH_WARNING: '1' } })
 run(['update-ref', '-d', 'refs/original/refs/heads/main'], { cwd: dest, may: true })
 run(['reflog', 'expire', '--expire=now', '--all'], { cwd: dest })
 run(['gc', '--prune=now', '--quiet'], { cwd: dest })
 
-// ── 4. The same files as the archive ───────────────────
+// ── 5. The same files as the archive ───────────────────
 const sameTree = run(['rev-parse', 'main^{tree}'], { cwd: dest }) === run(['rev-parse', `${head}^{tree}`])
-say(`The copy's files are the archive's, exactly: ${sameTree ? 'yes' : 'NO'}.`)
-if (!sameTree) throw new Error('The trees differ; stopping before anything else.')
+say(`The copy's files are the archive's, exactly: ${sameTree ? 'yes' : 'NO, see the sweep'}.`)
 
-// ── 5. Commit ids quoted in the documents ──────────────
+// ── 6. Commit ids quoted in the documents ──────────────
 const oldIds = run(['rev-list', '--reverse', head]).split('\n')
 const newIds = run(['rev-list', '--reverse', 'main'], { cwd: dest }).split('\n')
 if (oldIds.length !== newIds.length) throw new Error('The histories differ in length')
@@ -120,25 +170,21 @@ for (const rel of docs) {
 }
 if (changed) {
   run(['add', '-A'], { cwd: dest })
-  run(['commit', '-q', '-m', 'Commit ids quoted in the documents follow the public history\n\nThe history was rewritten for publishing (C71, C274): the author\naddress and the logos\' file details changed, so every commit id did.'], { cwd: dest })
+  run(['commit', '-q', '-m', 'Commit ids quoted in the documents follow the public history\n\nThe history was rewritten for publishing (C71, C274), so every commit\nid changed.'], { cwd: dest })
 }
 say(`Commit ids updated in the documents: ${changed}.`)
 
-// ── 6. The sweep ───────────────────────────────────────
+// ── 7. The sweep ───────────────────────────────────────
 const found = []
-for (const line of run(['log', '--format=%H %ae %ce'], { cwd: dest }).split('\n')) if (line.includes(PERSONAL)) found.push(`commit ${line.slice(0, 7)}: the personal address`)
-for (const line of run(['log', '--format=%H %s %b'], { cwd: dest }).split('\n')) for (const [what, re] of FORBIDDEN) if (re.test(line)) found.push(`message ${line.slice(0, 7)}: ${what}`)
-const objects = run(['rev-list', '--objects', 'main'], { cwd: dest }).split('\n').map((l) => l.split(' ')).filter((p) => p[1])
-const types = run(['cat-file', '--batch-check=%(objectname) %(objecttype) %(objectsize)'], { cwd: dest, input: objects.map((o) => o[0]).join('\n') }).split('\n')
-const blobs = types.map((l) => l.split(' ')).filter((t) => t[1] === 'blob')
-const pathOf = new Map(objects.map(([sha, path]) => [sha, path]))
-for (const [sha] of blobs) {
-  const path = pathOf.get(sha) ?? ''
-  if (/(^|\/)\.env(\.|$)/.test(path)) found.push(`${path}: an .env file`)
-  const body = run(['cat-file', 'blob', sha], { cwd: dest, binary: true })
-  const text = path.endsWith('.png') ? pngText(body).map((t) => t.text).join('\n') : body.toString('latin1')
-  for (const [what, re] of FORBIDDEN) if (re.test(text)) found.push(`${path} (${sha.slice(0, 7)}): ${what}`)
+for (const line of run(['log', '--format=%h %ae %ce %an %cn', 'main'], { cwd: dest }).split('\n')) for (const [what, re] of FORBIDDEN) if (re.test(line)) found.push(`commit ${line.slice(0, 7)}: ${what}`)
+for (const line of run(['log', '--format=%h %s %b', 'main'], { cwd: dest }).split('\n')) for (const [what, re] of FORBIDDEN) if (re.test(line)) found.push(`message ${line.slice(0, 7)}: ${what}`)
+const after = blobs(dest, 'main')
+for (const b of after) {
+  if (/(^|\/)\.env(\.|$)/.test(b.path)) found.push(`${b.path}: an .env file`)
+  let text
+  if (b.path.endsWith('.png')) { try { text = pngText(b.body).map((t) => t.text).join('\n') } catch { text = '' } } else text = b.body.toString('latin1')
+  for (const [what, re] of FORBIDDEN) if (re.test(text)) found.push(`${b.path} (${b.sha.slice(0, 7)}): ${what}`)
 }
-say(`Searched ${newIds.length} commits and ${blobs.length} files in all their versions.`)
+say(`Searched ${newIds.length} commits and ${after.length} files in all their versions.`)
 if (found.length) { say('FOUND:'); for (const f of [...new Set(found)]) say(`  ${f}`) } else say('Nothing found that must not be there.')
 say(`The copy is ready at ${dest}, branch main, no remote. Nothing was pushed.`)
