@@ -16,7 +16,8 @@
 // - a personal address on a commit becomes the owner's GitHub no-reply one;
 // - every version of every image loses its file details: the text, the EXIF
 //   block and the Content Credentials a PNG carries beside the picture
-//   (C275 (a)); the picture stays byte for byte;
+//   (C275 (a)); the picture stays byte for byte; an SVG loses its Content
+//   Credentials, its drawing as it was (C275 (b));
 // - in every version of every text file, a full name or a surname on its own
 //   becomes the first name (the first name stays, as ruled), a personal
 //   address the no-reply one, and a design tool id the word 'removed'.
@@ -29,6 +30,7 @@ import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve, relative } from 'node:path'
 import { stripPngText, pngText, pngDetailTypes } from './png-text.mjs'
+import { stripSvgDetails, svgDetails } from './svg-details.mjs'
 
 const NOREPLY_RE = /@users\.noreply\.github\.com$|^noreply@github\.com$/
 // A safety stop: only a handful of text files should change. More means a
@@ -125,6 +127,8 @@ for (const b of before) {
   if (b.body.includes(0)) continue // other binary files
   const text = b.body.toString('utf8')
   let next = text
+  // An SVG loses its Content Credentials, as an image does (C275 (b)).
+  if (b.path.endsWith('.svg')) next = stripSvgDetails(next)
   for (const n of fullNames) next = next.split(n).join(n.split(/\s+/)[0])
   // A surname on its own (never inside the handle) becomes the first name too.
   for (const n of fullNames) next = next.replace(new RegExp(`(?<![A-Za-z])${esc(n.split(/\s+/).pop())}`, 'g'), n.split(/\s+/)[0])
@@ -224,6 +228,10 @@ for (const b of after) {
     try { text += '\n' + pngText(b.body).map((t) => t.text).join('\n') } catch { /* the bytes alone */ }
     let left = []
     try { left = pngDetailTypes(b.body) } catch { /* not a PNG after all */ }
+    if (left.length) found.push(`${b.path} (${b.sha.slice(0, 7)}): file details left (${left.join(', ')})`)
+  }
+  if (b.path.endsWith('.svg')) {
+    const left = svgDetails(b.body.toString('utf8'))
     if (left.length) found.push(`${b.path} (${b.sha.slice(0, 7)}): file details left (${left.join(', ')})`)
   }
   for (const what of forbiddenIn(text)) found.push(`${b.path} (${b.sha.slice(0, 7)}): ${what}`)
