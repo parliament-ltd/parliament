@@ -1,0 +1,4 @@
+# Every checkout keeps the line ends the repository stores, LF, on any
+# computer, so a build anywhere is the same, byte for byte, as Netlify's and
+# matches the release's hashes (C277).
+* text=auto eol=lf
