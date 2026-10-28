@@ -34,6 +34,10 @@ const heading = (changelog.match(/^## (.+)$/m) ?? [])[1] ?? ''
 if (!heading.startsWith(version)) { console.error(`CHANGELOG.md's newest entry is "${heading}", not ${version}`); process.exit(1) }
 if (!dry && /not yet released/.test(heading)) { console.error('Give the newest CHANGELOG.md entry its date before releasing'); process.exit(1) }
 if (!dry && git('status', '--porcelain', '--untracked-files=no')) { console.error('Commit or put away your changes first'); process.exit(1) }
+// Files whose line ends differ from the repository's build differently from
+// Netlify, and the hashes would not match what the sites serve (C277).
+const eol = git('ls-files', '--eol').split('\n').filter((l) => /^i\/\S+\s+w\/(crlf|mixed)\b/.test(l))
+if (eol.length) { console.error(`${eol.length} files here have Windows line ends, which the repository does not. Write them again with LF first (C277).`); process.exit(1) }
 
 run(win ? 'npm.cmd' : 'npm', ['run', 'check'])
 
