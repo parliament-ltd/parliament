@@ -4264,7 +4264,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - The sweep fails if any version of an SVG keeps a `<metadata>` block or any C2PA.
   - The copy was made again.
 
-**C276. Stage 15, piece 7: going public, its steps and open points** (proposed 28 October; C264 (e), (g), (i), (j) and (k) as ruled; C275; the live testing list). Waiting for Stefan: (a) to (f) are choices or approvals. Nothing is pushed, linked or deployed without your yes at that step, and the push cannot be taken back.
+**C276. Stage 15, piece 7: going public, its steps and open points** (proposed 28 October; **ruled 28 October, as suggested: (a) 1, the organization `parliament-ltd`; (b) yes; (c) yes; (d) 1, auto publishing locked; (e) all; (f) yes**; C264 (e), (g), (i), (j) and (k) as ruled; C275; the live testing list). Nothing is pushed, linked or deployed without your yes at that step, and the push cannot be taken back.
 - **What exists today:**
   - This repository is private on GitHub (`Solofsson25/project-apollo`). Netlify's site `project-apollo-v1` builds its `main`, which is Parliament as it was before the refactor. This branch has never been pushed.
   - The public copy (C275) is clean, with `main` only and no remote. It lags this branch by the commits made since it was made.
