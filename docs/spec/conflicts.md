@@ -4192,7 +4192,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   **Suggestion:** yes.
 - **(i) Stored data:** none.
 
-**C275. Stage 15, piece 6, as built: ready for the public** (28 October; C274 as ruled, (b) 1; **ruled 28 October: (a) 2, the logos' Content Credentials and EXIF removed too**). Waiting for Stefan: (b) below, the birds mark's Content Credentials, is a choice. Nothing is pushed.
+**C275. Stage 15, piece 6, as built: ready for the public** (28 October; C274 as ruled, (b) 1; **ruled 28 October: (a) 2, the logos' Content Credentials and EXIF removed too; (b) 1, the birds mark's removed too**). Nothing is pushed.
 - **The logos, cleaned here:** the current `public/parliament_logo.png` and `src/deprecated/public/flight_logo.png` no longer carry their text (the author's full name, the XMP block and the Canva document, user and brand ids), nor, by (a), their Content Credentials and EXIF block. The picture is unchanged, byte for byte, and each file is about 17 KB smaller. `scripts/png-text.mjs` lists or removes all three.
 - **Two guides:**
   - `CONTRIBUTING.md`: an issue first for anything larger than a fix; the spec and its rulings decide; the rules every change keeps; `npm run check`; security problems reported privately, as SECURITY.md says.
@@ -4211,24 +4211,25 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - A safety stop: it works out every change first, and rewrites nothing if more than 50 text file versions would change. `--plan` lists the changes and stops.
   - Then one commit on the copy brings the commit ids quoted in the documents into line with the new history. An id of a commit that stays private keeps its id and is marked "in the private archive", never inside a piece of code.
   - Then the sweep: every commit and every version of every file, in any case, with backslashes ignored, and each image's every byte as well as its text. No version of an image may keep any file detail.
-- **The copy, as made** from this branch once (a) was built, so it holds this entry as first written, not its ruling:
+- **The copy, as made** from this branch once (a) and (b) were built, so it holds this entry as it stood before their rulings were recorded:
   - Found in the history: one personal address, one full name, four Canva ids.
-  - Changed: nine file versions.
+  - Changed: ten file versions.
     - Six are of the logos: every version of the three images that carried any detail (`public/logo.png` was deleted in October). The copy keeps four image versions, since cleaned versions of one logo are often the same file. Each carries only its picture and its size.
     - Three are text: two versions of this file, which quoted the full name while C274 was proposed and ruled, and the first version of the script, which held the address as a search pattern.
-  - 767 commits, each with the no-reply address as author and committer, or GitHub's own as the committer of 161 made on its website (132 of them merges). The dates are kept, so making the copy again gives the same ids.
+    - One is the birds mark's only version, which loses its Content Credentials by (b).
+  - 769 commits, each with the no-reply address as author and committer, or GitHub's own as the committer of 161 made on its website (132 of them merges). The dates are kept, so making the copy again gives the same ids.
   - Its files are this branch's, exactly, apart from its last commit, the ids.
   - Commit ids: 24 now follow the public history, CLAUDE.md's three archive pointers among them (the V1, V2 and September commits are all on this branch, so all three go public). 11 mentions of five commits, on `refactor/main` and the parked PR-50 branch, are marked "in the private archive".
-  - The sweep: 767 commits and 4,616 file versions; nothing found.
-  - A second search, written apart from the script, read every object's raw bytes: the address, the full name, the middle name and the four ids appear nowhere, and the surname only inside the handle. A listing of every image version found no file detail left.
+  - The sweep: 769 commits and 4,620 file versions; nothing found.
+  - A second search, written apart from the script, read every object's raw bytes: the address, the full name, the middle name and the four ids appear nowhere, and the surname only inside the handle. A listing of every image version, PNG and SVG, found no file detail left.
   - Neither search can read inside a compressed archive or base64. The eight `.tgz` files in `vendor/` (ProseMirror and SheetJS, kept by C72 and C210 (e)) were unpacked and searched apart, with nothing found. The one base64 block is in (b).
 - **On the way, and fixed:**
   - The first run's sweep found that the script itself held the address and the Canva ids, and that C274 quoted the full name. The script was rewritten to name nothing and to clean text files too.
   - Two runs stopped on small bugs before writing anything.
   - One misread a lone space in the logos' text as a full name, and would have removed every space from every text file. It was stopped before it finished. Since then a full name is two words or more, the safety stop and `--plan` exist, and the no-reply addresses are known.
   - The run in the night of 28 October passed its own sweep, but two things were missing. Ids of commits that stay private were not marked, and a search outside the script found the address in the script's first version, written as a search pattern, which neither the rewrite nor the sweep had recognised. Both were fixed, the sweep made stricter, and the copy made again.
-  - That copy was clean, but kept the logos' Content Credentials. Once (a) was ruled, the copy was made once more.
-- **Seven folders beside the repository,** kept because the script deletes nothing: `parliament-public.first-try` to `parliament-public.sixth-try`, and `parliament-public-plan`. Each is an earlier attempt. The first five and the plan's still hold the personal address somewhere, in their history or in one old file; the sixth holds the logos' Content Credentials. None is ever published. They go only on your yes.
+  - That copy was clean, but kept the logos' Content Credentials. Once (a) was ruled the copy was made again, and once more after (b).
+- **Eight folders beside the repository,** kept because the script deletes nothing: `parliament-public.first-try` to `parliament-public.seventh-try`, and `parliament-public-plan`, about 380 MB in all. Each is an earlier attempt, none needed for reference: what they hold is in this repository or made again by the script. The first five and the plan's still hold the personal address somewhere, in their history or in one old file; the sixth holds the logos' Content Credentials, the seventh the birds mark's. None is ever published. They go only on your yes.
 - **For piece 7:** the copy lags this branch by the commits made since. Just before the push it is made again from this branch's newest commit, the earlier copy moved aside first. So the public history holds everything up to then, with the same ids for what is already there, and the sweep runs again.
 - **Tests:** 1,359. Lint: 30 warnings, all older. The build passes. The copy's files differ from this branch only in the commit ids of ten documents, which no test reads.
 - **Not tried:** the two workflows, which run only on GitHub, and `--push`. Both come in piece 7.
@@ -4256,6 +4257,12 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   2. **Keep them.** They say openly that Claude made the file, as the commits' co-author lines already do.
 
   **Suggestion:** 1, to match (a).
+
+  **Ruled 1, and built:**
+  - `scripts/svg-details.mjs` lists or removes an SVG's Content Credentials. The rewrite removes them from every version of every SVG.
+  - This repository's birds mark lost them by a commit, from 8,832 bytes to 1,058. Only the `<metadata>` block and its namespace went; the drawing is the same, character for character.
+  - The sweep fails if any version of an SVG keeps a `<metadata>` block or any C2PA.
+  - The copy was made again.
 
 ## Proposed CLAUDE.md rewrite
 
