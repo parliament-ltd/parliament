@@ -4032,7 +4032,7 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
 
   These are on the live testing list, with the console open.
 
-**C272. Stage 15, piece 5: the words, its open points** (proposed 28 October; C264 as ruled; `privacy-copy-draft.md`, reviewed 12 October; C265; `browsers.md`; C94). Waiting for Stefan: (a) is a choice. The rest is built as suggested, so a ruling changes one entry.
+**C272. Stage 15, piece 5: the words, its open points** (proposed 28 October; **ruled 28 October: (a) 1, the letter's first sentence; the rest as suggested**; C264 as ruled; `privacy-copy-draft.md`, reviewed 12 October; C265; `browsers.md`; C94). Waiting for Stefan: (a) is a choice. The rest is built as suggested, so a ruling changes one entry.
 - **What exists today:**
   - The privacy draft is applied in Settings and the network card.
   - The README and SECURITY.md still describe the old app.
