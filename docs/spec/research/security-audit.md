@@ -1,12 +1,12 @@
 <!-- Security, privacy and dependency audit
      Read-only audit by a research agent, 11 October 2026, of branch
-     claude/almanac-docket-inventory at b7f3419. Filed as delivered, with paths
+     claude/almanac-docket-inventory at d570e5f. Filed as delivered, with paths
      made relative to the repo root. Facts first; the auditor's opinion is in
      its assessment section and carries no authority of its own. -->
 
 # Security, privacy and dependency audit: project-apollo
 
-Branch `claude/almanac-docket-inventory`, HEAD `b7f3419`, audited 2026-10-11. Read-only: no repo file was changed, nothing installed. Two throwaway scripts were written to the session scratchpad only.
+Branch `claude/almanac-docket-inventory`, HEAD `d570e5f`, audited 2026-10-11. Read-only: no repo file was changed, nothing installed. Two throwaway scripts were written to the session scratchpad only.
 
 Conventions
 - Paths are relative to `` (absolute index of key files at the end).

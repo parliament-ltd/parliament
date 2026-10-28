@@ -11,7 +11,7 @@ against the audits in `research/` before they go into the plan.
 
 ## 1. Where the work stands
 
-- **Branch:** `claude/almanac-docket-inventory`, cut from `main` at 5ac8a1d. Nothing is pushed. `main` has not moved.
+- **Branch:** `claude/almanac-docket-inventory`, cut from `main` at ae464a3. Nothing is pushed. `main` has not moved.
 - **Done and committed:**
   - Phase 0 inventory (`inventory.md`), with rulings 1 to 11.
   - Phase 1 conflict register (`conflicts.md`): S1 to S12 confirmed, C1 to C26 ruled, C27 to C36 open.
@@ -525,7 +525,7 @@ disagree, this section is right.** Each audit's full report is in `research/`.
 - **Option a in section 7 still stands, but as new work,** not as "growing Secretarybird". The comparison-against-baseline approach must not be carried over: it orders added words before struck ones, works on whole words, cannot place a deletion among repeated words, and treats splitting or joining a paragraph as an edit.
 - **Keep `content` as the original string beside the new blocks and edits.** About 25 places read it as a string, and the spec says the model keeps reading the original.
 - **Highlights are terms matched across the whole conversation,** not anchored passages. C57 is a real question.
-- **Three commits sit on `refactor/main` and never reached `main`** (all 6 April): two Secretarybird fixes (`974d659`, the space bar hijacked in comment and chat inputs; `50ecd25`, revision suggestions missing in scanned chats) and `c2ed12a`, which moves the update banner for the service worker to the app level. The last one bears on section 7, item 8. See C65.
+- **Three commits sit on `refactor/main` and never reached `main`** (all 6 April): two Secretarybird fixes (`974d659` (in the private archive), the space bar hijacked in comment and chat inputs; `50ecd25` (in the private archive), revision suggestions missing in scanned chats) and `c2ed12a` (in the private archive), which moves the update banner for the service worker to the app level. The last one bears on section 7, item 8. See C65.
 - **Every chat that is opened gets an empty document record,** because the document provider is mounted app-wide and saves a seed paragraph a second later. That clutters the data the migration reads and should be fixed before it.
 - **Accept All and Clear All both accept every suggestion.** Neither discards, and there is no undo.
 - **No HTML sinks** in the editing or message code. The fragile parts are three uses of the deprecated `execCommand`, rich `contentEditable` with no `beforeinput` handling, and input-method handling that rests on one flag.
@@ -561,7 +561,7 @@ disagree, this section is right.** Each audit's full report is in `research/`.
 ### From `research/security-audit.md`
 
 The fifth audit, filed after the rest of this section was written (commit
-e8bb1fa). Its sections 18 (findings T1 to T16) and 19 (other people's blocks)
+930e4b5). Its sections 18 (findings T1 to T16) and 19 (other people's blocks)
 are the parts to read. Against sections 7 and 8 above:
 
 - **The twelve rules in section 8 hold, and nothing found lets a remote party read chats or a key** without the user opening a malicious file, restoring a malicious backup, or a dependency being compromised. There are no HTML sinks, no `eval`, no WebAssembly, and no other origin for scripts, fonts or images.

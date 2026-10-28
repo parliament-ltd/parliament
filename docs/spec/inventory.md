@@ -3,7 +3,7 @@
 Phase 0 of the Almanac, Docket and command line refactor (Almanac spec §13).
 Generated 23 September 2026 from `src/`, `refactor/`, the root handoff files and
 the four files in `docs/spec/`. Branch `claude/almanac-docket-inventory`, cut
-from `main` at 5ac8a1d (PR-50a/b are not on it).
+from `main` at ae464a3 (PR-50a/b are not on it).
 
 **The State column is a draft.** Anything marked `?` is a guess. Only you know
 the State column for certain, so correct it in place.
@@ -207,7 +207,7 @@ pop-outs and cross-tab messaging all came back empty. Every record id is a UUID.
 
 | What it is | State | Where | Return when |
 |---|---|---|---|
-| PR-50a/b: house@1.0 visualizer, homepage default swap, saved-seed migration | Unmerged branch | `claude/pr50-house-visualizer-contract` (abe2ac5, 8f7c5cb) | After this refactor lands; keep what survives the new direction |
+| PR-50a/b: house@1.0 visualizer, homepage default swap, saved-seed migration | Unmerged branch | `claude/pr50-house-visualizer-contract` (abe2ac5 (in the private archive), 8f7c5cb (in the private archive)) | After this refactor lands; keep what survives the new direction |
 | Compressed-summary branch | Live | `src/catalog/entries/branches-render.jsx`, `BranchCreationPanel.jsx` | Kept as a docket branch (change plan 5.7); you want to rethink it after this refactor |
 
 ## Settings (added 24 September 2026)

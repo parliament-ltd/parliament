@@ -2,7 +2,7 @@
 
 Companion to `parliament_settings_v1.html`. Dated 23 September 2026. First pass.
 Reads alongside `almanac-spec-decisions.md` and `docket-spec-decisions.md`, and
-replaces the design in `parliament-settings-current.html` (main `5ac8a1d`).
+replaces the design in `parliament-settings-current.html` (main `ae464a3`).
 
 The mockup carries what can be demonstrated: the stacked sections, the moving
 navy rule, the key panel, the bar positions, the verbs and their Enter lines.

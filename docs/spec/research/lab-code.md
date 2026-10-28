@@ -1,12 +1,12 @@
 <!-- The Lab and the catalogue: the existing code and what can be salvaged
      Read-only audit by a research agent, 11 October 2026, of branch
-     claude/almanac-docket-inventory at b7f3419. Filed as delivered, with paths
+     claude/almanac-docket-inventory at d570e5f. Filed as delivered, with paths
      made relative to the repo root. Facts first; the auditor's opinion is in
      its assessment section and carries no authority of its own. -->
 
 # The Lab and the catalogue: map of the existing code and what can be salvaged
 
-Repo root ``, branch `claude/almanac-docket-inventory`, HEAD `b7f3419`. Read-only: nothing was created, edited or deleted.
+Repo root ``, branch `claude/almanac-docket-inventory`, HEAD `d570e5f`. Read-only: nothing was created, edited or deleted.
 
 Conventions: I give the absolute path the first time a file appears in a section and `File.jsx:line` after that. "Wired" means the production render reads the value. For fit judgments I also read `docs\spec\arrangements-boards-blocks-decisions.md` and the data model inside `docs\spec\parliament_lab_v7_blocks.html` (lines 976-1066, 1524-1847). Both are untracked files in the working tree.
 

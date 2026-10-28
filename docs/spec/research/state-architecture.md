@@ -1,12 +1,12 @@
 <!-- State, rendering and data access: audit
      Read-only audit by a research agent, 11 October 2026, of branch
-     claude/almanac-docket-inventory at b7f3419. Filed as delivered, with paths
+     claude/almanac-docket-inventory at d570e5f. Filed as delivered, with paths
      made relative to the repo root. Facts first; the auditor's opinion is in
      its assessment section and carries no authority of its own. -->
 
 # State, rendering and data-access architecture: audit (state-architecture)
 
-**Baseline.** Branch `claude/almanac-docket-inventory`. I started at `b7f3419`; two docs-only commits landed while I worked (`bc50642`, `5b3f3ab`). `git diff b7f3419 HEAD -- src package.json vite.config.js eslint.config.js vitest.config.js index.html netlify.toml` is empty, so everything below holds for HEAD `5b3f3ab`.
+**Baseline.** Branch `claude/almanac-docket-inventory`. I started at `d570e5f`; two docs-only commits landed while I worked (`0674e17`, `51136cd`). `git diff d570e5f HEAD -- src package.json vite.config.js eslint.config.js vitest.config.js index.html netlify.toml` is empty, so everything below holds for HEAD `51136cd`.
 
 **Method.** Code reading, greps, one read-only ESLint run, inspection of the existing `dist/`. Nothing was edited, built, profiled or run in a browser. Re-render statements are derived from the code, not measured. `dist/` is gitignored and was built 3 June 2026; 21 `src` files have changed since, none adding a production dynamic import.
 

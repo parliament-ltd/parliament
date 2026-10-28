@@ -111,9 +111,9 @@ to R36). Nothing goes until Stefan approves that line.
 
 ## Archive pointers
 
-- V1 spec: `git show 12e142f:CLAUDE.md`
-- V2 Phase 1 CLAUDE.md: `git show 5ac8a1d:CLAUDE.md`
-- September CLAUDE.md (Almanac, Docket, Symposium): `git show d45ff07:CLAUDE.md`
+- V1 spec: `git show f12a0be:CLAUDE.md`
+- V2 Phase 1 CLAUDE.md: `git show ae464a3:CLAUDE.md`
+- September CLAUDE.md (Almanac, Docket, Symposium): `git show bf7bf2e:CLAUDE.md`
 
 Commit ids change when the history is rewritten before going public (plan
 stage 15); update these then.

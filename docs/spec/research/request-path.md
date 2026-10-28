@@ -1,6 +1,6 @@
 # Request path, collaboration mode, review, first run, voice, settings: code audit
 
-Read-only audit of branch `claude/almanac-docket-inventory` at `b7f3419`, run on
+Read-only audit of branch `claude/almanac-docket-inventory` at `d570e5f`, run on
 11 October 2026 by a research agent. `src/` had no uncommitted changes, so every
 line number is the committed code. Paths are relative to the repo root. "Not
 found" means all of `src/` was searched and nothing turned up.
@@ -213,7 +213,7 @@ Defined twice with identical text: `COLLAB_PRESETS` (`src/components/CollabModal
 - **Stored:** `setSetting('parrotPersonas', JSON.stringify(list))` (`:53`, `:110`, `:124`, `:141`). No store of its own; no `parrotId` anywhere.
 - **Backups:** `.parliament` files include it, because only `parliament-api-key` is blocklisted (`src/lib/backupFormat.js:15`). The older JSON and `.apb` export includes it too.
 - **UI:** only inside `CollabModal`: a card list with tick, inline edit and delete (`:258-362`) and a "Parrot Persona: Custom Interaction" block (`:364-423`). Settings section: not found. Input-area selector: not found.
-- **How it reaches the prompt: it does not.** Ticking adds the persona id to the set (`:316`). Apply passes `(localPresets, localCustom)` unchanged (`:96-99`). `buildSystemPrompt` skips ids that are not built-in. The context's comments say the modal merges persona text into the custom instruction (`CollabModeContext.jsx:48-57`, `:86-92`); it does not. V1 behaved the same: `git show 25ae885^:src/adapters/albatross/ChatLayout.jsx` lines 540-553 iterate the five presets and the custom text only.
+- **How it reaches the prompt: it does not.** Ticking adds the persona id to the set (`:316`). Apply passes `(localPresets, localCustom)` unchanged (`:96-99`). `buildSystemPrompt` skips ids that are not built-in. The context's comments say the modal merges persona text into the custom instruction (`CollabModeContext.jsx:48-57`, `:86-92`); it does not. V1 behaved the same: `git show c5ed4e0^:src/adapters/albatross/ChatLayout.jsx` lines 540-553 iterate the five presets and the custom text only.
 - Right after "Save Persona" the text is still in the box, so that one session works by accident. The badge does not count personas (`:111-113`).
 
 ### 2c. What a migration to collabs has to carry

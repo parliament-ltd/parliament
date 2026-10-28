@@ -720,8 +720,8 @@ These look settled by date. "Part 5a: yes" confirms them all, or name a row.
 - No ruling needed. It is work that comes before the new chrome can sit beside a room, and hard-coded colours inside blocks limit how true it can be made at first.
 
 **C65. Three commits on `refactor/main` that never reached `main`.**
-- All from 6 April: `974d659` (the space bar hijacked in comment and chat inputs), `50ecd25` (revision suggestions missing in scanned chats), `c2ed12a` (the update banner for the service worker moved to the app level).
-- **Suggestion:** bring `c2ed12a` onto this branch, since a new version, a security fix included, is never offered to an open tab today. Leave the two Secretarybird fixes until the editing engine is decided.
+- All from 6 April: `974d659` (in the private archive; the space bar hijacked in comment and chat inputs), `50ecd25` (in the private archive; revision suggestions missing in scanned chats), `c2ed12a` (in the private archive; the update banner for the service worker moved to the app level).
+- **Suggestion:** bring `c2ed12a` (in the private archive) onto this branch, since a new version, a security fix included, is never offered to an open tab today. Leave the two Secretarybird fixes until the editing engine is decided.
 
 **C66. What "web search on" means.**
 - Code: offered to the model on each message while the toggle is on.
@@ -4402,6 +4402,6 @@ Almanac). See the retirement section of `docs/spec/change-plan.md`.
 
 ## Archive pointers
 
-- V1 spec: `git show 12e142f:CLAUDE.md`
+- V1 spec: `git show f12a0be:CLAUDE.md`
 - V2 Phase 1 CLAUDE.md: `git show <commit before this rewrite>:CLAUDE.md`
 ```

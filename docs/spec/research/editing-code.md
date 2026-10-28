@@ -1,12 +1,12 @@
 <!-- Editing in place: what the existing code offers
      Read-only audit by a research agent, 11 October 2026, of branch
-     claude/almanac-docket-inventory at b7f3419. Filed as delivered, with paths
+     claude/almanac-docket-inventory at d570e5f. Filed as delivered, with paths
      made relative to the repo root. Facts first; the auditor's opinion is in
      its assessment section and carries no authority of its own. -->
 
 # Editing in place: what the existing code offers
 
-**Scope and method.** Repository ``, branch `claude/almanac-docket-inventory` at commit `b7f3419`. This is static reading plus two read-only `node` runs of `wordDiff`. Nothing was run in a browser, and no file was created, changed or deleted. Statements inferred from code but not observed running are marked "by reading" and listed at the end.
+**Scope and method.** Repository ``, branch `claude/almanac-docket-inventory` at commit `d570e5f`. This is static reading plus two read-only `node` runs of `wordDiff`. Nothing was run in a browser, and no file was created, changed or deleted. Statements inferred from code but not observed running are marked "by reading" and listed at the end.
 
 **Path convention.** The file tables give each absolute path once. After that I cite `FileName.jsx:line`; every basename is unique within the tables.
 
@@ -66,8 +66,8 @@ There are no tests for any of these; the only test files are five under `src\lib
 ```
 
 - **Where persisted:** database `parliament` (version 5), object store `sbrd_documents`, key path `conversationId` (`db.js:75`). The whole record is rewritten 1 second after any change (`DocumentContext.jsx:169-179`).
-- **`suggestionStates` is vestigial.** No component reads or writes it. The autosave omits it (`DocumentContext.jsx:174`); only `RippleScopeModal.jsx:147` passes an old value through. In the first Secretarybird commit (`fe3b881`) it was `{ [paraId]: 'accepted'|'rejected' }` for a read-only mock that stored `segments: [{ type: 'text'|'deletion'|'insertion'|'suggestion', content }]`. `migrateParagraph` (`DocumentContext.jsx:61-72`) still collapses that shape on load.
-- **`claudeOrigin` and `claudeNote` have no writer.** Their writer was the V1 sidebar chat (`parseClaudeResponse` in `git show 8be9942^:src/adapters/secretarybird/ChatLayout.jsx`, lines 231-285), dropped in PR-11b. So "Added by Claude" cards can only appear from old data.
+- **`suggestionStates` is vestigial.** No component reads or writes it. The autosave omits it (`DocumentContext.jsx:174`); only `RippleScopeModal.jsx:147` passes an old value through. In the first Secretarybird commit (`883f27b`) it was `{ [paraId]: 'accepted'|'rejected' }` for a read-only mock that stored `segments: [{ type: 'text'|'deletion'|'insertion'|'suggestion', content }]`. `migrateParagraph` (`DocumentContext.jsx:61-72`) still collapses that shape on load.
+- **`claudeOrigin` and `claudeNote` have no writer.** Their writer was the V1 sidebar chat (`parseClaudeResponse` in `git show 4955760^:src/adapters/secretarybird/ChatLayout.jsx`, lines 231-285), dropped in PR-11b. So "Added by Claude" cards can only appear from old data.
 - **`submittedReplies` are never sent to the model.** The Submit prompt uses only each comment's `text` and `selectedText` (`DocumentContext.jsx:413-423`).
 - **Memory only:** `showMarkup` (default off, reset per conversation), `rippleEnabled` (default on, not reset), selection and expansion state (`DocumentContext.jsx:86-96, 128-137`).
 
@@ -216,7 +216,7 @@ RULES:
 
 There are no TODO or FIXME comments in these files (searched). Found by reading:
 
-- **Two fixes are missing from this branch.** Commits `974d659` (exempt `INPUT` and `TEXTAREA` from the Space hijack) and `50ecd25` (turn Markup on when a document has pending suggestions; count suggestions in scan results) are on `refactor/main` only. Here the guard at `DocumentCanvas.jsx:142-144` exempts only `contentEditable`, and the inline "Add a comment…" input sits inside the canvas.
+- **Two fixes are missing from this branch.** Commits `974d659` (in the private archive; exempt `INPUT` and `TEXTAREA` from the Space hijack) and `50ecd25` (in the private archive; turn Markup on when a document has pending suggestions; count suggestions in scan results) are on `refactor/main` only. Here the guard at `DocumentCanvas.jsx:142-144` exempts only `contentEditable`, and the inline "Add a comment…" input sits inside the canvas.
 - **Every opened conversation gets a document record.** `DocumentProvider` is mounted app-wide (`App.jsx:57`), seeds a paragraph when none exists, and autosaves it 1 second later with no check on the room (`DocumentContext.jsx:148-152, 169-179`). The boot integrity check then never removes such empty chats (`db.js:961-968`), and a cross-document scan would call the model for them.
 - **The pending save is cancelled, not flushed,** on conversation switch (`DocumentContext.jsx:178`).
 - **`String.replace` takes the model's replacement string as a pattern,** so `$&`, `$'` and `$$` in a suggestion are interpreted (`DocumentContext.jsx:306, 354, 373`).
