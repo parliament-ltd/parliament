@@ -3704,10 +3704,16 @@ export default function Shell() {
     const row = chat ? (almanacRows ?? []).find((r) => r.kind === 'chat' && r.chatId === chat) : null
     return { board, num: row?.num ?? null }
   })
-  const stripArrangement = useMemo(
-    () => ({ ...arrangement, context: { ...arrangement.context, room: roomRecord?.num ?? undefined } }),
-    [arrangement, roomRecord],
-  )
+  // The strip names the collection, as its board's head does, never its id.
+  // One not found shows nothing after the title.
+  const stripArrangement = useMemo(() => {
+    const id = arrangement.context?.collection
+    const found = id != null ? collections.find((c) => c.id === id) : null
+    return {
+      ...arrangement,
+      context: { ...arrangement.context, room: roomRecord?.num ?? undefined, collection: found ? collectionLabel(found) : undefined },
+    }
+  }, [arrangement, roomRecord, collections, collectionLabel])
   const welcomeHint = useMemo(() => (onWelcome && !welcome.finished ? { next: nextStep(welcome) } : null), [onWelcome, welcome])
   const searches = { almanac: recordsView.search, collection: collectionSearch, settings: settingsSearch, library: librarySearch }
   const searchCounts = { almanac: recordsSearch, collection: { count: collectionShown.cards.length, cards: true }, settings: { count: settingsCount, settings: true }, library: { count: libraryCount, library: true } }
