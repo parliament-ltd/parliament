@@ -16,8 +16,9 @@
 // - a personal address on a commit becomes the owner's GitHub no-reply one;
 // - every version of every image loses its file details (the text a PNG
 //   carries beside the picture); the picture stays byte for byte;
-// - in every version of every text file, a full name becomes the first name
-//   (the first name stays, as ruled) and a personal address the no-reply one.
+// - in every version of every text file, a full name or a surname on its own
+//   becomes the first name (the first name stays, as ruled), a personal
+//   address the no-reply one, and a design tool id the word 'removed'.
 // Then the commit ids quoted in the documents follow the new history (one
 // commit), and every object in the copy is searched again (C274 (d)).
 // Run with git's own filter-branch: nothing to install.
@@ -116,7 +117,10 @@ for (const b of before) {
   const text = b.body.toString('utf8')
   let next = text
   for (const n of fullNames) next = next.split(n).join(n.split(/\s+/)[0])
+  // A surname on its own (never inside the handle) becomes the first name too.
+  for (const n of fullNames) next = next.replace(new RegExp(`(?<![A-Za-z])${esc(n.split(/\s+/).pop())}`, 'g'), n.split(/\s+/)[0])
   for (const a of personal) next = next.split(a).join(noreply)
+  for (const id of toolIds) next = next.split(id).join('removed')
   if (next !== text) map.set(b.sha, write(Buffer.from(next, 'utf8')))
 }
 say(`File versions to change: ${map.size}.`)
