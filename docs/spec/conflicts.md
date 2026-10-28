@@ -4264,6 +4264,71 @@ Read before planning stage 11: the editing spec (6 October), the welcome v9 spec
   - The sweep fails if any version of an SVG keeps a `<metadata>` block or any C2PA.
   - The copy was made again.
 
+**C276. Stage 15, piece 7: going public, its steps and open points** (proposed 28 October; C264 (e), (g), (i), (j) and (k) as ruled; C275; the live testing list). Waiting for Stefan: (a) to (f) are choices or approvals. Nothing is pushed, linked or deployed without your yes at that step, and the push cannot be taken back.
+- **What exists today:**
+  - This repository is private on GitHub (`Solofsson25/project-apollo`). Netlify's site `project-apollo-v1` builds its `main`, which is Parliament as it was before the refactor. This branch has never been pushed.
+  - The public copy (C275) is clean, with `main` only and no remote. It lags this branch by the commits made since it was made.
+  - Version 0.5.0. The changelog's heading says "0.5.0, not yet released"; it takes its date at the switch (C273).
+  - The vault's site is configured in `vault/netlify.toml`, framed only by `https://www.parliament.ltd`, and the page frames only `https://keys.parliament.ltd`. Neither the vault's site nor its DNS record exists yet.
+  - Nothing pins the Node version Netlify builds with. The check runs on Node 24, here and on GitHub.
+  - Two finished fixes sit on branches of their own: the narrow room's mark, "Go to The Study" becoming "Go to Parliament's start" (`claude/bold-booth-2e563d`), and the board strip naming the collection rather than its id (`claude/strip-collection-name`). The first conflicts only in the generated translation files, which `npm run i18n` writes again; the second merges cleanly.
+  - Git signs in through Git Credential Manager, which opens your browser the first time it meets a host.
+  - The upgrade screen offers each person a backup file before their data is upgraded, and a failed upgrade rolls itself back. Once upgraded, data cannot be opened by the old version.
+- **The steps,** in order, each on your yes:
+  1. **Ready here** (me):
+     - the two fixes merged, as (b) rules; Node pinned, as (c) rules; the changelog's heading dated the day of the switch;
+     - `npm run check`, and a commit;
+     - the copy made again from this branch's newest commit, at `C:\Users\stefan\Desktop\parliament` (f), with both searches;
+     - in the copy, `npm ci` (packages from npm, at the lockfile's exact versions) and `node scripts/release.mjs`: the check, both builds, both archives, `SHA256SUMS`, and the tag `v0.5.0`.
+
+     Nothing leaves this computer.
+  2. **Two empty repositories** (you): `parliament` on GitHub, public, under the owner (a) chooses, with nothing in it (no README, licence or `.gitignore`), so the push lands as it is; and `parliament` in the Bitbucket workspace `parliament-ltd`, public, also empty.
+  3. **The push** (me, on your yes): the copy gets the two remotes, and `node scripts/release.mjs --push` sends `main` and `v0.5.0` to both. Git Credential Manager asks you to sign in to each, in your browser, the first time. This cannot be taken back.
+  4. **GitHub's settings** (you), listed in (e). Then a GitHub release for `v0.5.0` with the two archives and `SHA256SUMS` attached, which publishes the vault's hashes (C170). I check that the two workflows ran.
+  5. **The vault's site** (you, step by step, with me checking):
+     - a new Netlify site from the public repository, with base directory `vault`;
+     - its custom domain `keys.parliament.ltd`, and at deSEC a CNAME from `keys` to the site's `netlify.app` name;
+     - its certificate, issued by Netlify.
+
+     I check that the vault answers with its own policy. It comes before the switch, since the new page sends keyed requests only through it.
+  6. **A backup** (you) on the old site: Settings, export, kept somewhere safe.
+  7. **The switch** (you, step by step):
+     - On `project-apollo-v1`, auto publishing is locked (d), then the site is linked to the public repository's `main`.
+     - Netlify builds it, and the build waits. You open it at its own address, then publish it, and `parliament.ltd` serves the new Parliament.
+     - Each person's data is upgraded once, at their next visit, after the screen that offers a backup.
+     - Undoing it is one click, publishing the previous build, but anyone whose data was upgraded cannot open the old version. Their backup restores in the new one. So undoing is for the first minutes only.
+  8. **After it:** the live testing list, its "Stage 15" and "After the switch" sections first. `docs/hosting.md` records the repository, the vault's site and its record. Work continues as (f) says.
+- **(a) The owner of the public repository** (a choice).
+  1. **An organization, `parliament-ltd`,** free, with you as its owner, matching the Bitbucket workspace: `github.com/parliament-ltd/parliament`. The project is not tied to your personal account, and handing it on later means adding an owner, not moving the repository. Netlify is given access to the organization's repository when the site is linked.
+  2. **Your account:** `github.com/Solofsson25/parliament`. Nothing to set up.
+
+  Either way the commits show your handle, as C274 ruled, unless you rename the account before the push. **Suggestion:** 1.
+- **(b) The two fixes,** merged into this branch before the final copy, the translation files written again, with the check, so they ship in 0.5.0. Otherwise they land later as ordinary commits on the public repository. **Suggestion:** yes.
+- **(c) Node 24 for both sites:** `NODE_VERSION = "24"` in both `netlify.toml` files, as the check uses. **Suggestion:** yes.
+- **(d) Netlify publishes only what you publish** (a choice; C264 (j), "deploy only from tagged releases").
+  1. **Auto publishing locked** on both sites. Every push to `main` still builds, at its own address, but a site changes only when you press "Publish deploy" on a release's build. One click per release, the build can be looked at first, and going back is publishing an earlier one.
+  2. **A `release` branch** as each site's production branch, moved to each tag by `release.mjs --push`. Automatic, but one more branch, and nothing to look at before it is live.
+
+  On a build's own address, the keyed providers do not answer, since the vault is framed only by `www.parliament.ltd`; everything else can be tried there. **Suggestion:** 1.
+- **(e) GitHub's settings at going public,** each yours to switch, from your action steps and C264 (j):
+  - private vulnerability reporting, so SECURITY.md's way of reporting works;
+  - a ruleset on `main` that blocks force pushes and deletion;
+  - secret scanning, with push protection;
+  - Dependabot alerts on, its automatic pull requests off (C264 (c));
+  - CodeQL's default setup, which runs on GitHub and only reports;
+  - release immutability, switched on before the `v0.5.0` release is made;
+  - the description, "An attempt to rethink how we interact with AI.", and the website, `https://parliament.ltd`.
+
+  **Suggestion:** all of them.
+- **(f) Where work continues after the push:** in the public repository's folder, `C:\Users\stefan\Desktop\parliament`. This folder stops changing.
+  - Why: making the copy again replaces its last commit, the one for the ids. The public `main` would then no longer follow from what was pushed, and only a force push could send it.
+  - Claude's notes for this project and the local `.claude` settings are copied to the new folder. The worktrees and stashes stay here.
+  - This folder and its private GitHub repository stay as the private archive. The earlier copy, `parliament-public`, goes to the Recycle Bin on your yes.
+  - CLAUDE.md's archive pointers and its line on rewritten ids are brought up to date in the first commit after the push.
+
+  **Suggestion:** yes.
+- **(g) Stored data,** as ruled (C264 (k)): the one upgrade at each person's next visit, with its backup offered first, and the keys moved into the vault once (C267 (d)). Nothing else.
+
 ## Proposed CLAUDE.md rewrite
 
 Applied 23 September 2026 (see Rulings). Kept here as the record of what was proposed.
