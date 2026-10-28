@@ -104,7 +104,7 @@ const surnames = [...fullNames].map((n) => n.split(/\s+/).pop())
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const FORBIDDEN = [
   ...personal.map((a) => ['a personal address', new RegExp(esc(a), 'i')]),
-  ...surnames.map((s) => ['the surname outside the handle', new RegExp(`(?<![A-Za-z])${esc(s)}`)]),
+  ...surnames.map((s) => ['the surname outside the handle', new RegExp(`(?<![A-Za-z])${esc(s)}`, 'i')]),
   ...[...toolIds].map((id) => ['a design tool id from the logos', new RegExp(esc(id))]),
   ...KEYS,
 ]
@@ -127,7 +127,9 @@ for (const b of before) {
   for (const n of fullNames) next = next.split(n).join(n.split(/\s+/)[0])
   // A surname on its own (never inside the handle) becomes the first name too.
   for (const n of fullNames) next = next.replace(new RegExp(`(?<![A-Za-z])${esc(n.split(/\s+/).pop())}`, 'g'), n.split(/\s+/)[0])
-  for (const a of personal) next = next.split(a).join(noreply)
+  // The address, and the address written as a search pattern (an older
+  // version of this script held it so).
+  for (const a of personal) next = next.split(a).join(noreply).split(esc(a)).join(esc(noreply))
   for (const id of toolIds) next = next.split(id).join('removed')
   if (next !== text) pending.push([b.sha, Buffer.from(next, 'utf8'), b.path])
 }
@@ -206,15 +208,18 @@ say(`Commit ids updated in the documents: ${changed}. Marked as in the private a
 if (leftAsIs.length) say(`Ids in the private archive left as they are, inside a piece of code: ${leftAsIs.join(', ')}.`)
 
 // ── 7. The sweep ───────────────────────────────────────
+// Stricter than the rewrite: any case, backslashes ignored (so a search
+// pattern is caught), and an image's every byte as well as its text.
 const found = []
-for (const line of run(['log', '--format=%h %ae %ce %an %cn', 'main'], { cwd: dest }).split('\n')) for (const [what, re] of FORBIDDEN) if (re.test(line)) found.push(`commit ${line.slice(0, 7)}: ${what}`)
-for (const line of run(['log', '--format=%h %s %b', 'main'], { cwd: dest }).split('\n')) for (const [what, re] of FORBIDDEN) if (re.test(line)) found.push(`message ${line.slice(0, 7)}: ${what}`)
+const forbiddenIn = (text) => FORBIDDEN.filter(([, re]) => re.test(text) || re.test(text.replace(/\\/g, ''))).map(([what]) => what)
+for (const line of run(['log', '--format=%h %ae %ce %an %cn', 'main'], { cwd: dest }).split('\n')) for (const what of forbiddenIn(line)) found.push(`commit ${line.slice(0, 7)}: ${what}`)
+for (const line of run(['log', '--format=%h %s %b', 'main'], { cwd: dest }).split('\n')) for (const what of forbiddenIn(line)) found.push(`message ${line.slice(0, 7)}: ${what}`)
 const after = blobs(dest, 'main')
 for (const b of after) {
   if (/(^|\/)\.env(\.|$)/.test(b.path)) found.push(`${b.path}: an .env file`)
-  let text
-  if (b.path.endsWith('.png')) { try { text = pngText(b.body).map((t) => t.text).join('\n') } catch { text = '' } } else text = b.body.toString('latin1')
-  for (const [what, re] of FORBIDDEN) if (re.test(text)) found.push(`${b.path} (${b.sha.slice(0, 7)}): ${what}`)
+  let text = b.body.toString('latin1')
+  if (b.path.endsWith('.png')) { try { text += '\n' + pngText(b.body).map((t) => t.text).join('\n') } catch { /* the bytes alone */ } }
+  for (const what of forbiddenIn(text)) found.push(`${b.path} (${b.sha.slice(0, 7)}): ${what}`)
 }
 say(`Searched ${newIds.length} commits and ${after.length} files in all their versions.`)
 if (found.length) { say('FOUND:'); for (const f of [...new Set(found)]) say(`  ${f}`) } else say('Nothing found that must not be there.')
