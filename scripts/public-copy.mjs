@@ -40,7 +40,7 @@ const dest = resolve(argv.includes('--dest') ? argv[argv.indexOf('--dest') + 1] 
 const archive = process.cwd()
 
 function run(args, { cwd = archive, input = null, env = null, may = false, binary = false } = {}) {
-  const r = spawnSync('git', args, { cwd, input, env: env ? { ...process.env, ...env } : process.env, maxBuffer: 1 << 31, encoding: binary ? 'buffer' : 'utf8' })
+  const r = spawnSync('git', args, { cwd, input, env: env ? { ...process.env, ...env } : process.env, maxBuffer: 2 ** 31, encoding: binary ? 'buffer' : 'utf8' })
   if (r.status !== 0 && !may) throw new Error(`git ${args.join(' ')} failed: ${r.stderr}`)
   return binary ? r.stdout : (r.stdout ?? '').trim()
 }
